@@ -1158,7 +1158,7 @@ bool user_interface::draw_header()
         {
             char mname[4];
             if (Settings.show_month)
-                snprintf(mname, 4, "%s", get_month_shortcut(month-1));
+                snprintf(mname, 4, "%s", get_month_shortcut(month));
             else
                 snprintf(mname, 4, "%d", month);
 
