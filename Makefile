@@ -1,7 +1,11 @@
-#x######################################
+#######################################
 # target
 ######################################
 TARGET = DB48X
+PLATFORM = dmcp
+VARIANT = DM42
+SDK = dmcp
+PGM = pgm
 
 ######################################
 # building variables
@@ -17,7 +21,7 @@ OPT=release
 # (see https://github.com/c3d/DB48X-on-DM42/issues/66)
 
 # Warning: macOSX only
-MOUNTPOINT=/Volumes/DM42/
+MOUNTPOINT=/Volumes/$(VARIANT)/
 EJECT=hdiutil eject $(MOUNTPOINT)
 
 
@@ -25,7 +29,7 @@ EJECT=hdiutil eject $(MOUNTPOINT)
 # pathes
 #######################################
 # Build path
-BUILD = build/$(OPT)
+BUILD = build/$(VARIANT)/$(OPT)
 
 # Path to aux build scripts (including trailing /)
 # Leave empty for scripts in PATH
@@ -38,7 +42,7 @@ FLASH=$(BUILD)/$(TARGET)_flash.bin
 QSPI =$(BUILD)/$(TARGET)_qspi.bin
 
 VERSION=$(shell git describe --dirty=Z --abbrev=5| sed -e 's/^v//g' -e 's/-g/-/g')
-VERSION_H=src/dm42/version.h
+VERSION_H=src/$(PLATFORM)/version.h
 
 
 #==============================================================================
@@ -48,7 +52,11 @@ VERSION_H=src/dm42/version.h
 #==============================================================================
 
 # default action: build all
-all: $(TARGET).pgm help/$(TARGET).md
+all: $(TARGET).$(PGM) help/$(TARGET).md
+
+dm32:	dm32-all
+dm32-%:
+	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=DM32 $*
 
 # installation steps
 install: install-pgm install-qspi install-help
@@ -56,7 +64,7 @@ install: install-pgm install-qspi install-help
 install-fast: install-pgm
 	$(EJECT)
 install-pgm: all
-	cp -v $(TARGET).pgm $(MOUNTPOINT)
+	cp -v $(TARGET).$(PGM) $(MOUNTPOINT)
 install-qspi: all
 	cp -v $(QSPI) $(MOUNTPOINT)
 install-help: help/$(TARGET).md
@@ -75,6 +83,7 @@ sim:	sim/gcc111libbid.a	\
 	fonts/HelpFont.cc	\
 	.ALWAYS
 
+
 QMAKE_debug=debug
 QMAKE_release=release
 QMAKE_small=release
@@ -90,7 +99,7 @@ sim/gcc111libbid.a: sim/gcc111libbid-$(shell uname)-$(shell uname -m).a
 
 dist: all
 	mv build/release/$(TARGET)_qspi.bin  .
-	tar cvfz v$(VERSION).tgz $(TARGET).pgm $(TARGET)_qspi.bin \
+	tar cvfz v$(VERSION).tgz $(TARGET).$(PGM) $(TARGET)_qspi.bin \
 		help/*.md STATE/*.48S
 
 $(VERSION_H): $(BUILD)/version-$(VERSION).h
@@ -127,16 +136,16 @@ fastest-%:
 ######################################
 # System sources
 ######################################
-C_INCLUDES += -Idmcp
-C_SOURCES += dmcp/sys/pgm_syscalls.c
-ASM_SOURCES = dmcp/startup_pgm.s
+C_INCLUDES += -I$(SDK)
+C_SOURCES += $(SDK)/sys/pgm_syscalls.c
+ASM_SOURCES = $(SDK)/startup_pgm.s
 
 #######################################
 # Custom section
 #######################################
 
 # Includes
-C_INCLUDES += -Isrc/dm42 -Isrc -Iinc
+C_INCLUDES += -Isrc/$(PLATFORM) -Isrc -Iinc
 
 # C sources
 C_SOURCES +=
@@ -147,9 +156,9 @@ DECIMAL_SOURCES=$(DECIMAL_SIZES:%=src/decimal-%.cc)
 
 # C++ sources
 CXX_SOURCES +=				\
-	src/dm42/target.cc		\
-	src/dm42/sysmenu.cc		\
-	src/dm42/main.cc		\
+	src/$(PLATFORM)/target.cc	\
+	src/$(PLATFORM)/sysmenu.cc	\
+	src/$(PLATFORM)/main.cc		\
 	src/user_interface.cc		\
 	src/file.cc			\
 	src/stack.cc			\
@@ -275,7 +284,7 @@ CFLAGS += -MD -MP -MF .dep/$(@F).d
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = src/stm32_program.ld
+LDSCRIPT = src/$(VARIANT)/stm32_program.ld
 LIBDIR =
 LDFLAGS = $(CPUFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) \
 	-Wl,-Map=$(BUILD)/$(TARGET).map,--cref \
@@ -311,7 +320,7 @@ $(BUILD)/%.o: %.s Makefile | $(BUILD)/.exists
 
 $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-$(TARGET).pgm: $(BUILD)/$(TARGET).elf Makefile $(CRCFIX)
+$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX)
 	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
 	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)
 	$(OBJCOPY) --only-section   .qspi -O binary  $<  $(QSPI)

@@ -33,9 +33,9 @@ SOURCES +=                                      \
 	sim-screen.cpp                          \
 	sim-rpl.cpp                             \
 	dmcp.cpp                                \
-	../src/dm42/target.cc                   \
-        ../src/dm42/sysmenu.cc                  \
-        ../src/dm42/main.cc                     \
+	../src/dmcp/target.cc                   \
+        ../src/dmcp/sysmenu.cc                  \
+        ../src/dmcp/main.cc                     \
 	../src/util.cc                          \
 	../src/renderer.cc                      \
 	../src/user_interface.cc                \
@@ -102,7 +102,7 @@ DEFINES += 	DECIMAL_CALL_BY_REFERENCE                       \
 		DECIMAL_GLOBAL_EXCEPTION_FLAGS_ACCESS_FUNCTIONS
 
 # Additional external library HIDAPI linked statically into the code
-INCLUDEPATH += ../src/dm42 ../src ../inc
+INCLUDEPATH += ../src/dmcp ../src ../inc
 
 LIBS += gcc111libbid.a
 

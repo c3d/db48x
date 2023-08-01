@@ -28,9 +28,9 @@
 //
 // This code is distantly derived from the SwissMicro SDKDemo calculator
 
-#include "dm42/main.h"
+#include "main.h"
 
-#include "dm42/sysmenu.h"
+#include "sysmenu.h"
 #include "equation.h"
 #include "font.h"
 #include "graphics.h"
