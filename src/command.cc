@@ -346,6 +346,34 @@ COMMAND_BODY(Bytes)
 
 
 
+COMMAND_BODY(Type)
+// ----------------------------------------------------------------------------
+//   Return the type of the top of stack as a numerical value
+// ----------------------------------------------------------------------------
+{
+    if (object_p top = rt.top())
+        if (integer_p type = integer::make(uint(top->type())))
+            if (rt.top(type))
+                return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(TypeName)
+// ----------------------------------------------------------------------------
+//   Return the type of the top of stack as text
+// ----------------------------------------------------------------------------
+{
+    if (object_p top = rt.top())
+        if (text_p type = text::make(top->fancy()))
+            if (rt.top(type))
+                return OK;
+    return ERROR;
+}
+
+
+
+
 COMMAND_BODY(Off)
 // ----------------------------------------------------------------------------
 //   Switch the calculator off

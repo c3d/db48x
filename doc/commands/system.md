@@ -75,12 +75,48 @@ Delete an existing alarm
 Get first alarm due after the given time
 
 
-## VERSION
-Get newRPL version string
+## Version
+
+Return DB48X version information as text.
+
+ ▶ `"Version information"`
 
 
-## MEM
-Get available memory in bytes
+## FreeMemory
+
+Return the number of bytes immediately available in memory, without performing a
+cleanup of temporary values (garbage collection).
+
+See also: [GarbageCollect](#GarbageCollect), [FreeMemory](#FreeMemory)
+
+
+## AvailableMemory (MEM)
+
+Return the number of bytes available in memory.
+
+*Remark*: The number returned is only a rough indicator of usable memory.
+In particular, [recovery features](#LastThingsMenu) consume or release varying
+amounts of memory with each operation.
+
+Before it can assess the amount of memory available, `AvailableMemory` removes
+objects in temporary memory that are no longer being used. Like on the HP48, you
+can therfore use `MEM` `DROP` to force garbage collection. However, there is
+also a dedicated command for that, [GarbageCollect](#GarbageCollect).
+
+See also: [FreeMemory](#FreeMemory), [GarbageCollect](#GarbageCollect)
+
+
+## GarbageCollect
+
+Perform a clean-up of temporary objects and return number of bytes reclaimed.
+
+In order to speed up normal operations, temporaries are only discarded when
+necessary to make room. This clean-up process, also called *garbage collection*,
+occurs automatically when memory is full. Since garbage collection can slow down
+calculator operation at undesired times, you can force it to occur at a desired
+time by executing [GarbageCollect](#GarbageCollect).
+
+See also: [FreeMemory](#FreeMemory), [Purge](#Purge)
 
 
 ## Bytes
@@ -91,9 +127,26 @@ current [wordsize](#stws) corresponding to the binary representation of the
 object.
 
 For example, the integer `7` hash will be in the form `#7xx`, where `7` is the
-value of the integer, and `xx` represents the integer type.
+value of the integer, and `xx` represents the integer type, as returned by the
+[Type](#type) command.
 
 `X` ▶ `Hash` `Size`
+
+
+## Type
+
+Return the type of the object as a numerical value. The value is not guaranteed
+to be portable across versions of DB48X (and pretty much is guarantteed to _not_
+be portable), nor to ever match the value returned by the `TYPE` command on the
+HP48.
+
+*Note* The [TypeName](#typename) command returns the type as text, and
+this is less likely to change from one release to the next.
+
+## TypeName
+
+Return the [type](#Type) of the object as text. For example, `12 type` returns
+`"integer"`.
 
 
 ## PEEK
@@ -106,10 +159,6 @@ Low level write to memory address
 
 ## NEWOB
 Make a new copy of the given object
-
-
-## GARBAGE
-Force a garbage collection
 
 
 ## USBFWUPDATE

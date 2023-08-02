@@ -304,6 +304,8 @@ CMD(HomeDirectory)
 
 CMD(Ticks)
 CMD(Bytes)
+CMD(Type)
+CMD(TypeName)
 
 
 // ============================================================================

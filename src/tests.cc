@@ -98,15 +98,21 @@ void tests::current()
 // ----------------------------------------------------------------------------
 {
 
-    step ("Bytes command");
-    test(CLEAR, "12", ENTER, "bytes", ENTER)
-        .expect("2")
-        .test(BSP)
-        .match("#C....");
-    test(CLEAR, "129", ENTER, "bytes", ENTER)
-        .expect("3")
-        .test(BSP)
-        .match("#1 81....");
+    step("Type command");
+    test(CLEAR, "12 type", ENTER)
+        .type(object::ID_integer)
+        .expect(object::ID_integer);
+    test(CLEAR, "'ABC*3' type", ENTER)
+        .type(object::ID_integer)
+        .expect(object::ID_equation);
+
+    step("TypeName command");
+    test(CLEAR, "12 typename", ENTER)
+        .type(object::ID_text)
+        .expect("\"integer\"");
+    test(CLEAR, "'ABC*3' typename", ENTER)
+        .type(object::ID_text)
+        .expect("\"equation\"");
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -414,6 +420,22 @@ void tests::data_types()
         .expect("3")
         .test(BSP)
         .match("#1 81....");
+
+    step("Type command");
+    test(CLEAR, "12 type", ENTER)
+        .type(object::ID_integer)
+        .expect(object::ID_integer);
+    test(CLEAR, "'ABC*3' type", ENTER)
+        .type(object::ID_integer)
+        .expect(object::ID_equation);
+
+    step("TypeName command");
+    test(CLEAR, "12 typename", ENTER)
+        .type(object::ID_text)
+        .expect("\"integer\"");
+    test(CLEAR, "'ABC*3' typename", ENTER)
+        .type(object::ID_text)
+        .expect("\"equation\"");
 }
 
 

@@ -52,43 +52,6 @@ directories, `PurgeAll` may purge multiple variables. Use [Purge](#Purge) if you
 want to only purge a variable in the current directory.
 
 
-## FreeMemory
-
-Return the number of bytes immediately available in memory, without performing a
-cleanup of temporary values (garbage collection).
-
-See also: [GarbageCollect](#GarbageCollect), [FreeMemory](#FreeMemory)
-
-
-## AvailableMemory (MEM)
-
-Return the number of bytes available in memory.
-
-*Remark*: The number returned is only a rough indicator of usable memory.
-In particular, [recovery features](#LastThingsMenu) consume or release varying
-amounts of memory with each operation.
-
-Before it can assess the amount of memory available, `AvailableMemory` removes
-objects in temporary memory that are no longer being used. Like on the HP48, you
-can therfore use `MEM` `DROP` to force garbage collection. However, there is
-also a dedicated command for that, [GarbageCollect](#GarbageCollect).
-
-See also: [FreeMemory](#FreeMemory), [GarbageCollect](#GarbageCollect)
-
-
-## GarbageCollect
-
-Perform a clean-up of temporary objects and return number of bytes reclaimed.
-
-In order to speed up normal operations, temporaries are only discarded when
-necessary to make room. This clean-up process, also called *garbage collection*,
-occurs automatically when memory is full. Since garbage collection can slow down
-calculator operation at undesired times, you can force it to occur at a desired
-time by executing [GarbageCollect](#GarbageCollect).
-
-See also: [FreeMemory](#FreeMemory), [Purge](#Purge)
-
-
 ## CreateDirectory (CRDIR)
 Create new directory
 

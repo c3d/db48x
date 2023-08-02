@@ -104,9 +104,6 @@ Store and replace all custom key definitions
 Recall the list of all custom key definitions
 
 
-## TYPE
-Get type information from an object
-
 
 ## TYPEE
 Get extended type information from an object
@@ -138,4 +135,3 @@ Get extended type information on the contents of a variable
 
 ## FMTSTR
 Do →STR using a specific numeric format
-
