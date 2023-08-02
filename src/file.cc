@@ -210,6 +210,18 @@ bool file::write(const char *buf, size_t len)
 }
 
 
+char file::getchar()
+// ----------------------------------------------------------------------------
+//   Read char code at offset
+// ----------------------------------------------------------------------------
+{
+    int c = valid() ? fgetc(data) : 0;
+    if (c == EOF)
+        c = 0;
+    return c;
+}
+
+
 unicode file::get()
 // ----------------------------------------------------------------------------
 //   Read UTF8 code at offset

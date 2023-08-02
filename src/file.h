@@ -53,6 +53,7 @@ struct file
     bool    write(const char *buf, size_t len);
     unicode get();
     unicode get(uint offset);
+    char    getchar();
     void    seek(uint offset);
     unicode peek();
     uint    position();

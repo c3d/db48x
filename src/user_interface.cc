@@ -1879,9 +1879,9 @@ void user_interface::load_help(utf8 topic, size_t len)
 
     if (!len)
         len = strlen(cstring(topic));
-    command    = nullptr;
-    follow     = false;
-    dirtyHelp  = true;
+    command   = nullptr;
+    follow    = false;
+    dirtyHelp = true;
 
     // Need to have the help file open here
     if (!helpfile.valid())
@@ -1890,59 +1890,129 @@ void user_interface::load_help(utf8 topic, size_t len)
         if (!helpfile.valid())
         {
             help = -1u;
-            line          = 0;
+            line = 0;
             return;
         }
     }
     dirtyMenu = true;
 
     // Look for the topic in the file
-    uint         matching = 0;
-    uint         level    = 0;
-    bool         hadcr    = true;
+    int  matching = 0;
+    uint level    = 0;
+    bool hadcr    = true;
+    uint topicpos = 0;
+
+#if SIMULATOR
+    char debug[80];
+    uint debugindex = 0;
+#endif // SIMULATOR
+
     helpfile.seek(0);
-    for (unicode c        = helpfile.get(); c; c = helpfile.get())
+    for (char c = helpfile.getchar(); c; c = helpfile.getchar())
     {
-        if (((hadcr || matching) && c == '#') || (c == ' ' && matching == 1))
+        if (hadcr)
+        {
+            if (c == '#')
+                topicpos = helpfile.position() - 1;
+            matching = level = 0;
+        }
+
+#if SIMULATOR
+        if (matching && debugindex < sizeof(debug) - 1)
+        {
+            debug[debugindex++] = c;
+            if (RECORDER_TRACE(help) > 2)
+            {
+                debug[debugindex] = 0;
+                record(help, "Matching %2d: Scanning %s", matching, debug);
+            }
+        }
+#endif // SIMULATOR
+
+        if (((hadcr || matching == 1) && c == '#') ||
+            (matching == 1 && c == ' '))
         {
             level += c == '#';
             matching = 1;
+#if SIMULATOR
+            debugindex = 0;
+#endif // SIMULATOR
+        }
+        else if (matching < 0)
+        {
+            if (c == '(' || c == ',')
+            {
+                matching = -2;
+                matching = 1;
+            }
+            else if (matching == -2 && c == ' ')
+            {
+                matching = 1;
+            }
+
+#if SIMULATOR
+            if (matching == 1 || c =='\n' || c == ')')
+            {
+                if (RECORDER_TRACE(help) > 1)
+                {
+                    debug[debugindex-1] = 0;
+                    if (debugindex > 1)
+                        record(help, "Scanning topic %s", debug);
+                }
+                debugindex = 0;
+            }
+#endif // SIMULATOR
         }
         else if (matching)
         {
-            // Matching is case-independent, and matches markdown hyperlinks
-            if (tolower(c) == tolower(topic[matching-1]) ||
-                (c         == ' ' && topic[matching-1] == '-'))
-                matching++;
-            else
-                matching    = level = 0;
-            if (matching   == len + 1)
+            if (uint(matching) == len + 1)
             {
-                unicode next  = helpfile.peek();
-                if (next     == '\n')
+                bool match = c == '\n' || c == ')' || c == ',' || c == ' ';
+                record(help, "%+s topic len %u at position %u next [%c]",
+                       match ? "Matched" : "Mismatched",
+                       len, helpfile.position(), c);
+                if (match)
                     break;
-                if (next     == ' ')
+                matching = -1;
+            }
+
+            // Matching is case-independent, and matches markdown hyperlinks
+            else if (byte(c) == topic[matching-1] ||
+                tolower(c) == tolower(topic[matching-1]) ||
+                (c == ' ' && topic[matching-1] == '-'))
+            {
+                matching++;
+            }
+            else if (c == '\n')
+            {
+#if SIMULATOR
+                if (RECORDER_TRACE(help) > 1)
                 {
-                    // Case of something like ## Evaluate (EVAL)
-                    // We accept to match 'evaluate'
-                    uint pos = helpfile.position();
-                    helpfile.get();
-                    if (helpfile.peek() == '(')
-                    {
-                        helpfile.seek(pos);
-                        break;
-                    }
+                    debug[debugindex - 1] = 0;
+                    if (debugindex > 1)
+                        record(help, "Scanned topic %s", debug);
+                    debugindex = 0;
                 }
-                matching = 0;
+#endif // SIMULATOR
+                matching = level = 0;
+            }
+            else
+            {
+#if SIMULATOR
+                if (RECORDER_TRACE(help) > 2)
+                    record(help, "Mismatch at %u: %u != %u",
+                           matching, c, topic[matching-1]);
+#endif // SIMULATOR
+                matching = c == '(' ? -2 : -1;
             }
         }
         hadcr = c == '\n';
     }
 
     // Check if we found the topic
-    if (matching == len + 1)
+    if (uint(matching) == len + 1)
     {
-        help = helpfile.position() - (len+1) - level;
+        help = topicpos;
         line = 0;
         record(help, "Found topic %s at position %u level %u",
                topic, helpfile.position(), level);
@@ -1963,7 +2033,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     else
     {
         static char buffer[50];
-        snprintf(buffer, sizeof(buffer), "No help for %s", topic);
+        snprintf(buffer, sizeof(buffer), "No help for %.*s", int(len), topic);
         rt.error(buffer);
     }
 }
@@ -2475,7 +2545,7 @@ bool user_interface::handle_help(int &key)
                 record(help, "Looking for help topic for key %d\n", key);
                 if (utf8 htopic = obj->help())
                 {
-                    record(help, "Found help topic %s\n", htopic);
+                    record(help, "Help topic is %s\n", htopic);
                     command = htopic;
                     dirtyCommand = true;
                     if (longpress)
