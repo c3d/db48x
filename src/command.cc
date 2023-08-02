@@ -29,6 +29,7 @@
 
 #include "command.h"
 
+#include "bignum.h"
 #include "decimal-32.h"
 #include "decimal-64.h"
 #include "decimal128.h"
@@ -312,6 +313,34 @@ COMMAND_BODY(Ticks)
     if (integer_p ti = rt.make<integer>(ID_integer, ticks))
         if (rt.push(ti))
             return OK;
+    return ERROR;
+}
+
+
+
+COMMAND_BODY(Bytes)
+// ----------------------------------------------------------------------------
+//   Return the bytes and a binary represenetation of the object
+// ----------------------------------------------------------------------------
+{
+    if (object_p top = rt.top())
+    {
+        size_t size = top->size();
+        size_t maxsize = (Settings.wordsize + 7) / 8;
+        size_t hashsize = size > maxsize ? maxsize : size;
+        gcbytes bytes = byte_p(top);
+#if CONFIG_FIXED_BASED_OBJECTS
+        // Force base 16 if we have that option
+        const id type = ID_hex_bignum;
+#else // !CONFIG_FIXED_BASED_OBJECTS
+        const id type = ID_based_bignum;
+#endif // CONFIG_FIXED_BASED_OBJECTS
+        if (bignum_p bin = rt.make<bignum>(type, bytes, hashsize))
+            if (rt.top(bin))
+                if (rt.push(integer::make(size)))
+                    return OK;
+
+    }
     return ERROR;
 }
 

@@ -175,8 +175,8 @@ public:
     uint16_t standard_exp;      // Maximum exponent before switching to sci
     angles   angle_mode;        // Angle mode ( degrees, radians or grads)
     uint8_t  base;              // The default base for #numbers
-    uint16_t wordsize;          // Wordsize for binary numbers (in bits)
-    uint16_t maxbignum;         // Maximum size for a bignum (in bits)
+    size_t   wordsize;          // Wordsize for binary numbers (in bits)
+    size_t   maxbignum;         // Maximum size for a bignum (in bits)
     uint16_t maxrewrites;       // Maximum number of rewrites
     uint16_t fraciter;          // Number of iterations for ->Q
     uint16_t fracprec;          // Number of digits for ->Q

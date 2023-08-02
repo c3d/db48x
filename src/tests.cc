@@ -97,8 +97,16 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-    fraction_decimal_conversions();
 
+    step ("Bytes command");
+    test(CLEAR, "12", ENTER, "bytes", ENTER)
+        .expect("2")
+        .test(BSP)
+        .match("#C....");
+    test(CLEAR, "129", ENTER, "bytes", ENTER)
+        .expect("3")
+        .test(BSP)
+        .match("#1 81....");
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -396,6 +404,16 @@ void tests::data_types()
     test(DOWN, CHS, ENTER).type(object::ID_big_fraction).expect(mbf+1);
 
     clear();
+
+    step ("Bytes command");
+    test(CLEAR, "12", ENTER, "bytes", ENTER)
+        .expect("2")
+        .test(BSP)
+        .match("#C....");
+    test(CLEAR, "129", ENTER, "bytes", ENTER)
+        .expect("3")
+        .test(BSP)
+        .match("#1 81....");
 }
 
 

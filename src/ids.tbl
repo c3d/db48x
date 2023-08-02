@@ -303,6 +303,7 @@ CMD(GarbageCollect)
 CMD(HomeDirectory)
 
 CMD(Ticks)
+CMD(Bytes)
 
 
 // ============================================================================

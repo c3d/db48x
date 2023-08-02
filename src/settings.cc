@@ -742,7 +742,7 @@ SETTINGS_COMMAND_LABEL(stws)
 // ----------------------------------------------------------------------------
 {
     static char buffer[16];
-    snprintf(buffer, sizeof(buffer), "WSz %u", Settings.wordsize);
+    snprintf(buffer, sizeof(buffer), "WSz %zu", Settings.wordsize);
     return buffer;
 }
 
@@ -956,7 +956,7 @@ SETTINGS_COMMAND_LABEL(MaxBigNumBits)
 // ----------------------------------------------------------------------------
 {
     static char buffer[16];
-    snprintf(buffer, sizeof(buffer), "BigNum %u", Settings.maxbignum);
+    snprintf(buffer, sizeof(buffer), "BigNum %zu", Settings.maxbignum);
     return buffer;
 }
 

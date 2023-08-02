@@ -672,7 +672,7 @@ MENU(ObjectMenu,
 // ----------------------------------------------------------------------------
      "→Obj",    ID_Unimplemented,
      "Obj→",    ID_Unimplemented,
-     "Bytes",   ID_Unimplemented,
+     "Bytes",   ID_Bytes,
      "Type",    ID_Unimplemented,
      "Clone",   ID_Unimplemented,
      "Size",    ID_Unimplemented,

@@ -83,8 +83,17 @@ Get newRPL version string
 Get available memory in bytes
 
 
-## BYTES
-Size of an object in bytes and CRC32
+## Bytes
+
+Return the size of the object and a hash of its value. On classic RPL systems,
+teh hash is a 5-nibbles CRC32. On DB48X, the hash is a based integer of the
+current [wordsize](#stws) corresponding to the binary representation of the
+object.
+
+For example, the integer `7` hash will be in the form `#7xx`, where `7` is the
+value of the integer, and `xx` represents the integer type.
+
+`X` ▶ `Hash` `Size`
 
 
 ## PEEK
