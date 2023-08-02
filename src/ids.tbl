@@ -78,7 +78,7 @@ FLAGS(is_real,          bignum,         decimal128)
 FLAGS(is_complex,       rectangular,    polar)
 FLAGS(is_command,       Drop,           Unimplemented)
 FLAGS(is_symbolic,      local,          equation,       pi, ImaginaryUnit)
-FLAGS(is_algebraic,     add,            det)
+FLAGS(is_algebraic,     add,            ToFraction)
 FLAGS(is_immediate,     MainMenu,       LastMenu)
 
 
@@ -246,8 +246,12 @@ CMD(re)
 CMD(im)
 CMD(arg)
 CMD(conj)
-NAMED(det, "Determinant")       // Last algebraic
+NAMED(det, "Determinant")
 
+NAMED(ToDecimal, "→Num")
+ALIAS(ToDecimal, "→Decimal")
+NAMED(ToFraction, "→Frac")         // Last algebraic
+ALIAS(ToFraction, "→Q")
 
 
 // ============================================================================
@@ -274,11 +278,13 @@ CMD(Depth)
 NAMED(ToList, "→List")
 CMD(Get)
 
+/// Equations
 CMD(Rewrite)
 CMD(Expand)
 CMD(Collect)
 CMD(Simplify)
 
+// Complex numbers
 NAMED(RealToComplex, "ℝ→ℂ")
 ALIAS(RealToComplex, "R→C")
 NAMED(ComplexToReal, "ℂ→ℝ")
@@ -287,6 +293,7 @@ NAMED(ToRectangular, "→Rectangular")
 ALIAS(ToRectangular, "→Rect")
 NAMED(ToPolar, "→Polar")
 
+// Memory management
 CMD(Purge)
 CMD(PurgeAll)
 NAMED(Mem, "AvailableMemory")
@@ -362,6 +369,11 @@ CMD(NoAutoSimplify)
 
 CMD(MaxBigNumBits)
 CMD(MaxRewrites)
+
+NAMED(ToFractionIterations, "→FracIterations")
+ALIAS(ToFractionIterations, "→QIterations")
+NAMED(ToFractionDigits, "→FracDigits")
+ALIAS(ToFractionDigits, "→QDigits")
 
 CMD(Modes)
 CMD(Version)

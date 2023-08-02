@@ -29,6 +29,7 @@
 
 #include "decimal128.h"
 
+#include "arithmetic.h"
 #include "bignum.h"
 #include "fraction.h"
 #include "parser.h"
@@ -641,6 +642,79 @@ RENDER_BODY(decimal128)
     // And return it to the caller
     return r.put(buf, sz) ? sz : 0;
 }
+
+
+RECORDER(debug128, 16, "Debug128 fractions");
+
+algebraic_p decimal128::to_fraction(uint count, uint decimals) const
+// ----------------------------------------------------------------------------
+//   Convert a decimal value to a fraction
+// ----------------------------------------------------------------------------
+{
+    int res;
+    BID_UINT128 next, whole_part, decimal_part, one;
+    BID_UINT128 v1num, v1den, v2num, v2den, t, s;
+
+    bid128 num = value();
+    bool neg = is_negative(&num.value);
+    if (neg)
+    {
+        bid128_negate(&t, &num.value);
+        num.value = t;
+    }
+
+    bid128_round_integral_zero(&whole_part, &num.value);
+    bid128_sub(&decimal_part, &num.value, &whole_part);
+    uint uone = 1;
+    bid128_from_uint32(&one, &uone);
+    v1num = whole_part;
+    v1den = one;
+    v2num = one;
+    uint uzero = 0;
+    bid128_from_uint32(&v2den, &uzero);
+
+    if (decimals > BID128_MAXDIGITS - 3)
+        decimals = BID128_MAXDIGITS - 3;
+
+    while (count--)
+    {
+        // Check if the decimal part is small enough
+        bid128_isZero(&res, &decimal_part);
+        if (res)
+            break;
+        bid128_ilogb(&res, &decimal_part);
+        if (-res > int(decimals))
+            break;
+
+        bid128_div(&next, &one, &decimal_part);
+        bid128_round_integral_zero(&whole_part, &next);
+
+        s = v1num;
+        bid128_mul(&t, &whole_part, &v1num);
+        bid128_add(&v1num, &t, &v2num);
+        v2num = s;
+
+        s = v1den;
+        bid128_mul(&t, &whole_part, &v1den);
+        bid128_add(&v1den, &t, &v2den);
+        v2den = s;
+
+        bid128_sub(&decimal_part, &next, &whole_part);
+    }
+
+    ularge numerator, denominator;
+    bid128_to_uint64_floor(&numerator, &v1num);
+    bid128_to_uint64_floor(&denominator, &v1den);
+    algebraic_g result;
+    if (denominator != 1)
+        result = fraction::make(integer::make(numerator),
+                                integer::make(denominator)).Safe();
+    else
+        result = integer::make(numerator);
+    if (neg)
+        result = -result;
+    return result.Safe();
+    }
 
 
 

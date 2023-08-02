@@ -681,7 +681,8 @@ MENU(ObjectMenu,
      "→List",   ID_Unimplemented,
      "→Prog",   ID_Unimplemented,
      "→Array",  ID_Unimplemented,
-     "→Num",    ID_Unimplemented,
+     "→Num",    ID_ToDecimal,
+     "→Frac",   ID_ToFraction,
      "→Graph",  ID_Unimplemented);
 
 
@@ -902,12 +903,15 @@ MENU(FractionsMenu,
      "%",       ID_Unimplemented,
      "%Chg",    ID_Unimplemented,
      "%Total",  ID_Unimplemented,
-     "→Frac",   ID_Unimplemented,
+     "→Frac",   ID_ToFraction,
      "Frac→",   ID_Unimplemented,
-     "→Num",    ID_Unimplemented,
+     "→Num",    ID_ToDecimal,
 
      "→HMS",    ID_Unimplemented,
-     "HMS→",    ID_Unimplemented);
+     "HMS→",    ID_Unimplemented,
+     ToFractionIterations::menu_label,  ID_ToFractionIterations,
+     ToFractionDigits::menu_label,      ID_ToFractionDigits
+);
 
 MENU(PlotMenu,
 // ----------------------------------------------------------------------------

@@ -58,6 +58,10 @@ struct algebraic : command
     // Promotion of integer to bignum
     static id   bignum_promotion(algebraic_g &x);
 
+    static bool decimal_to_fraction(algebraic_g &x);
+
+    static algebraic_g pi();
+
     // Function pointers used by generic evaluation code
     typedef void (*bid128_fn)(BID_UINT128 *res, BID_UINT128 *x);
     typedef void (*bid64_fn) (BID_UINT64  *res, BID_UINT64  *x);

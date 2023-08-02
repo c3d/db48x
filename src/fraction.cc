@@ -231,6 +231,17 @@ fraction_g big_fraction::make(bignum_g n, bignum_g d)
 //
 // ============================================================================
 
+fraction_g operator-(fraction_r x)
+// ----------------------------------------------------------------------------
+//    Negation of a fraction
+// ----------------------------------------------------------------------------
+{
+    bignum_g  xn = x->numerator();
+    bignum_g  xd = x->denominator();
+    return big_fraction::make(-xn, xd);
+}
+
+
 fraction_g operator+(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Add two fractions

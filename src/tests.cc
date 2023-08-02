@@ -97,7 +97,8 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-    complex_functions();
+    fraction_decimal_conversions();
+
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -1443,7 +1444,53 @@ void tests::exact_trig_cases()
     }
 
     test(CLEAR, "DEG", ENTER).noerr();
+}
 
+
+void tests::fraction_decimal_conversions()
+// ----------------------------------------------------------------------------
+//   Exercise the conversion from decimal to fraction and back
+// ----------------------------------------------------------------------------
+{
+    cstring cases[] =
+    {
+        // Easy exact cases (decimal)
+        "1/2",          "0.5",
+        "1/4",          "0.25",
+        "5/4",          "1.25",
+        "-5/4",         "-1.25",
+
+        // More tricky fractions
+        "1/3",          "3.33333 33333 33333 3333⁳⁻¹",
+        "-1/7",         "-1.42857 14285 71428 5714⁳⁻¹",
+        "22/7",         "3.14285 71428 57142 8571",
+        "37/213",       "1.73708 92018 77934 2723⁳⁻¹"
+    };
+
+    begin("Simple conversion to decimal and back");
+    for (uint c = 0; c < sizeof(cases) / sizeof(*cases); c += 2)
+    {
+        step(cases[c]);
+        test(CLEAR, cases[c], ENTER).expect(cases[c]);
+        test("→Num", ENTER).expect(cases[c+1]);
+        test("→Q", ENTER).expect(cases[c]);
+    }
+
+    step("Alternate spellings");
+    test(CLEAR, "1/4 →Decimal", ENTER).expect("0.25");
+    test(CLEAR, "1/5 ToDecimal", ENTER).expect("0.2");
+    test(CLEAR, "0.25 →Frac", ENTER).expect("1/4");
+    test(CLEAR, "0.2 ToFraction", ENTER).expect("1/5");
+
+    step("Complex numbers");
+    test(CLEAR, "1-2ⅈ 4", ENTER, DIV).expect("1/4-1/2ⅈ");
+    test("→Num", ENTER).expect("0.25-0.5ⅈ");
+    test("→Q", ENTER).expect("1/4-1/2ⅈ");
+
+    step("Vectors");
+    test(CLEAR, "[1-2ⅈ 3] 4", ENTER, DIV).expect("[ 1/4-1/2ⅈ 3/4 ]");
+    test("→Num", ENTER).expect("[ 0.25-0.5ⅈ 0.75 ]");
+    test("→Q", ENTER).expect("[ 1/4-1/2ⅈ 3/4 ]");
 }
 
 
@@ -3255,13 +3302,7 @@ tests &tests::command(cstring ref)
     if (ref && !cmd)
         return explain("Expected command [", ref, "], got none").fail();
     if (ref && cmd && strcmp(ref, cstring(cmd)) != 0)
-        return explain("Expected command [",
-                       ref,
-                       "], "
-                       "got [",
-                       cmd,
-                       "]")
-            .fail();
+        return explain("Expected command [", ref, "], got [", cmd, "]").fail();
 
     return *this;
 }

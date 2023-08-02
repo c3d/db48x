@@ -223,6 +223,17 @@ computing `200!` will result in an error, `Number is too big`. You can however
 compute it seting a higher value for `MaxBigNumBits`, for example
 `2048 MaxBigNumBits`.
 
+## ToFractionIterations (→QIterations, →FracIterations)
+
+Define the maximum number of iterations converting a decimal value to a
+fraction. For example, `1 →FracIterations 3.1415926 →Frac` will give `22/7`,
+whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
+
+## ToFractionDigits (→QDigits, →FracDigits)
+
+Define the maximum number of digits of precision converting a decimal value to a
+fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
+
 
 # States
 

@@ -80,6 +80,8 @@ struct settings
           wordsize(64),
           maxbignum(1024),
           maxrewrites(100),
+          fraciter(10),
+          fracprec(12),
           command_fmt(LONG_FORM),
           show_decimal(true),
           fancy_exponent(true),
@@ -176,6 +178,8 @@ public:
     uint16_t wordsize;          // Wordsize for binary numbers (in bits)
     uint16_t maxbignum;         // Maximum size for a bignum (in bits)
     uint16_t maxrewrites;       // Maximum number of rewrites
+    uint16_t fraciter;          // Number of iterations for ->Q
+    uint16_t fracprec;          // Number of digits for ->Q
     commands command_fmt;       // How we prefer to display commands
     bool     show_decimal   :1; // Show decimal dot for integral real numbers
     bool     fancy_exponent :1; // Show exponent with fancy superscripts
@@ -303,5 +307,8 @@ SETTINGS_COMMAND_DECLARE(NoAutoSimplify);
 
 SETTINGS_COMMAND_DECLARE(MaxBigNumBits);
 SETTINGS_COMMAND_DECLARE(MaxRewrites);
+
+SETTINGS_COMMAND_DECLARE(ToFractionIterations);
+SETTINGS_COMMAND_DECLARE(ToFractionDigits);
 
 #endif // SETTINGS_H

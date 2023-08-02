@@ -667,3 +667,85 @@ FUNCTION_BODY(Simplify)
     rt.type_error();
     return nullptr;
 }
+
+
+FUNCTION_BODY(ToDecimal)
+// ----------------------------------------------------------------------------
+//   Convert numbers to a decimal value
+// ----------------------------------------------------------------------------
+{
+    if (!x.Safe())
+        return nullptr;
+    algebraic_g xg = x;
+    if (rectangular_p z = x->as<rectangular>())
+    {
+        algebraic_g re = z->re();
+        algebraic_g im = z->im();
+        if (arithmetic::real_promotion(re) &&
+            arithmetic::real_promotion(im))
+            return rectangular::make(re, im);
+    }
+    else if (polar_p z = x->as<polar>())
+    {
+        algebraic_g mod = z->mod();
+        algebraic_g arg = z->pifrac();
+        if (arithmetic::real_promotion(mod) &&
+            (mod->is_fraction() || arithmetic::real_promotion(arg)))
+            return polar::make(mod, arg, settings::PI_RADIANS);
+    }
+    else if (arithmetic::real_promotion(xg))
+    {
+        return xg;
+    }
+    else if (xg->type() == ID_pi)
+    {
+        return algebraic::pi();
+    }
+    else if (xg->type() == ID_ImaginaryUnit)
+    {
+        return rectangular::make(integer::make(0),integer::make(1));
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return nullptr;
+}
+
+
+FUNCTION_BODY(ToFraction)
+// ----------------------------------------------------------------------------
+//   Convert numbers to fractions
+// ----------------------------------------------------------------------------
+{
+    if (!x.Safe())
+        return nullptr;
+    algebraic_g xg = x;
+    if (rectangular_p z = x->as<rectangular>())
+    {
+        algebraic_g re = z->re();
+        algebraic_g im = z->im();
+        re = ToFraction::run(re);
+        im = ToFraction::run(im);
+        if (re.Safe() && im.Safe())
+            return rectangular::make(re, im);
+    }
+    else if (polar_p z = x->as<polar>())
+    {
+        algebraic_g mod = z->mod();
+        algebraic_g arg = z->pifrac();
+        mod = ToFraction::run(mod);
+        arg = ToFraction::run(arg);
+        if (mod.Safe() && arg.Safe())
+            return polar::make(mod, arg, settings::PI_RADIANS);
+    }
+    else if (arithmetic::decimal_to_fraction(xg))
+    {
+        return xg;
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return nullptr;
+}

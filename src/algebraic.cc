@@ -315,6 +315,45 @@ object::id algebraic::bignum_promotion(algebraic_g &x)
 }
 
 
+bool algebraic::decimal_to_fraction(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//  Check if we can promote the number to a fraction
+// ----------------------------------------------------------------------------
+{
+    id ty = x->type();
+    switch(ty)
+    {
+    case ID_decimal128: x = decimal128_p(x.Safe())->to_fraction(); return true;
+    case ID_decimal64:  x = decimal64_p(x.Safe())->to_fraction();  return true;
+    case ID_decimal32:  x = decimal32_p(x.Safe())->to_fraction();  return true;
+    case ID_fraction:
+    case ID_neg_fraction:
+    case ID_big_fraction:
+    case ID_neg_big_fraction:                                      return true;
+    default: return false;
+    }
+}
+
+
+algebraic_g algebraic::pi()
+// ----------------------------------------------------------------------------
+//   Return the value of pi
+// ----------------------------------------------------------------------------
+{
+    static bool init = false;
+    static byte rep[1+sizeof(bid128)];
+    if (!init)
+    {
+        bid128 pival;
+        bid128_from_string(&pival.value,
+                           "3.141592653589793238462643383279502884");
+        memcpy(rep+1, &pival.value, sizeof(pival.value));
+        rep[0] = object::ID_decimal128;
+        init = true;
+    }
+    return decimal128_p(rep);
+}
+
 
 EVAL_BODY(ImaginaryUnit)
 // ----------------------------------------------------------------------------

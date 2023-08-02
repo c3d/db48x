@@ -36,9 +36,17 @@ Find if an expression matches a rule pattern
 Match and apply a rule to an expression repeatedly
 
 
-## TOFRACTION
-Convert number to fraction
+## →Num (→Decimal, ToDecimal)
 
+Convert fractions and symbolic constants to decimal form.
+For example, `1/4 →Num` results in `0.25`.
+
+## →Frac (→Q, ToFraction)
+
+Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
+The precision of the conversion in digits is defined by
+[→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
+conversion is defined by [→FracDigits](#ToFractionIterations)
 
 ## RULEAPPLY1
 Match and apply a rule to an expression only once

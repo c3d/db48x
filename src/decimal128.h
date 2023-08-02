@@ -253,6 +253,9 @@ struct decimal128 : algebraic
         return is_negative_or_zero(value());
     }
 
+    algebraic_p to_fraction(uint count = Settings.fraciter,
+                            uint decimals = Settings.fracprec) const;
+
 public:
     OBJECT_DECL(decimal128);
     PARSE_DECL(decimal128);

@@ -157,6 +157,7 @@ public:
     RENDER_DECL(neg_big_fraction);
 };
 
+fraction_g operator-(fraction_r x);
 fraction_g operator+(fraction_r x, fraction_r y);
 fraction_g operator-(fraction_r x, fraction_r y);
 fraction_g operator*(fraction_r x, fraction_r y);

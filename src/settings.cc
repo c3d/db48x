@@ -58,6 +58,8 @@ void settings::save(renderer &out, bool show_defaults)
 //   Save the current settings to the given renderer
 // ----------------------------------------------------------------------------
 {
+    settings Defaults;
+
     // Save the current menu
     if (menu_p menu = ui.menu())
     {
@@ -97,7 +99,7 @@ void settings::save(renderer &out, bool show_defaults)
         out.put("FancyExponent\n");
 
     // Save preferred expenent for switching to scientfiic mode
-    if (standard_exp != 9 || show_defaults)
+    if (standard_exp != Defaults.standard_exp || show_defaults)
         out.printf("%u StandardExponent\n", standard_exp);
 
     // Save current angle mode
@@ -111,11 +113,11 @@ void settings::save(renderer &out, bool show_defaults)
     }
 
     // Save default base
-    if( base != 16 || show_defaults)
+    if( base != Defaults.base || show_defaults)
         out.printf("%u Base\n", base);
 
     // Save default word size
-    if (wordsize != 64 || show_defaults)
+    if (wordsize != Defaults.wordsize || show_defaults)
         out.printf("%u WordSize\n", wordsize);
 
     // Save default command format
@@ -135,21 +137,21 @@ void settings::save(renderer &out, bool show_defaults)
         out.put("TrailingDecimal\n");
 
     // Font size
-    if (result_sz != STACK || show_defaults)
+    if (result_sz != Defaults.result_sz || show_defaults)
         out.printf("%u ResultFontSize\n", result_sz);
-    if (stack_sz != STACK || show_defaults)
+    if (stack_sz != Defaults.stack_sz || show_defaults)
         out.printf("%u StackFontSize\n", result_sz);
-    if (editor_sz != EDITOR || show_defaults)
+    if (editor_sz != Defaults.editor_sz || show_defaults)
         out.printf("%u EditorFontSize\n", result_sz);
-    if (editor_ml_sz != STACK || show_defaults)
+    if (editor_ml_sz != Defaults.editor_ml_sz || show_defaults)
         out.printf("%u EditorMultilineFontSize\n", result_sz);
 
     // Number spacing
-    if (spacing_mantissa != 3 || show_defaults)
+    if (spacing_mantissa != Defaults.spacing_mantissa || show_defaults)
         out.printf("%u MantissaSpacing\n", spacing_mantissa);
-    if (spacing_fraction != 5 || show_defaults)
+    if (spacing_fraction != Defaults.spacing_fraction || show_defaults)
         out.printf("%u FractionSpacing\n", spacing_fraction);
-    if (spacing_based != 4 || show_defaults)
+    if (spacing_based != Defaults.spacing_based || show_defaults)
         out.printf("%u BasedSpacing\n", spacing_based);
 
     switch (space)
@@ -179,10 +181,14 @@ void settings::save(renderer &out, bool show_defaults)
     else if (show_defaults)
         out.put("AutoSimplify\n");
 
-    if (maxbignum != 1024 || show_defaults)
+    if (maxbignum != Defaults.maxbignum || show_defaults)
         out.printf("%u MaxBigNumBits\n", maxbignum);
-    if (maxrewrites != 100 || show_defaults)
+    if (maxrewrites != Defaults.maxrewrites || show_defaults)
         out.printf("%u MaxRewrites\n", maxbignum);
+    if (fraciter != Defaults.fraciter || show_defaults)
+        out.printf("%u ToFractionIterations\n", fraciter);
+    if (fracprec != Defaults.fracprec || show_defaults)
+        out.printf("%u ToFractionDigits\n", fracprec);
 }
 
 
@@ -977,5 +983,56 @@ SETTINGS_COMMAND_LABEL(MaxRewrites)
 {
     static char buffer[16];
     snprintf(buffer, sizeof(buffer), "BigRwr %u", Settings.maxrewrites);
+    return buffer;
+}
+
+
+SETTINGS_COMMAND_BODY(ToFractionIterations, false)
+// ----------------------------------------------------------------------------
+//   Select maximum number of loops trying to compute fraction in ->Q
+// ----------------------------------------------------------------------------
+{
+    uint fs = integer_arg(1, 30);
+    if (!rt.error())
+    {
+        Settings.fraciter = fs;
+        return OK;
+    }
+    return object::ERROR;
+}
+
+SETTINGS_COMMAND_LABEL(ToFractionIterations)
+// ----------------------------------------------------------------------------
+//   Return the label for ->Q iterations
+// ----------------------------------------------------------------------------
+{
+    static char buffer[16];
+    snprintf(buffer, sizeof(buffer), "Iter %u", Settings.fraciter);
+    return buffer;
+}
+
+
+SETTINGS_COMMAND_BODY(ToFractionDigits, false)
+// ----------------------------------------------------------------------------
+//   Select maximum number of digits for the ->Q operation
+// ----------------------------------------------------------------------------
+{
+    uint fs = integer_arg(1, BID128_MAXDIGITS - 3);
+    if (!rt.error())
+    {
+        Settings.fracprec = fs;
+        return OK;
+    }
+    return object::ERROR;
+}
+
+
+SETTINGS_COMMAND_LABEL(ToFractionDigits)
+// ----------------------------------------------------------------------------
+//   Return the label for maximum number of rewrites
+// ----------------------------------------------------------------------------
+{
+    static char buffer[16];
+    snprintf(buffer, sizeof(buffer), "Digits %u", Settings.fracprec);
     return buffer;
 }

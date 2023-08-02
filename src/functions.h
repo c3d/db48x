@@ -204,4 +204,7 @@ FUNCTION(Expand);
 FUNCTION(Collect);
 FUNCTION(Simplify);
 
+FUNCTION(ToDecimal);
+FUNCTION(ToFraction);
+
 #endif // FUNCTIONS_H

@@ -147,26 +147,6 @@ rectangular_p complex::make(int re, int im)
 }
 
 
-static decimal128_p get_pi()
-// ----------------------------------------------------------------------------
-//   Return the value of pi
-// ----------------------------------------------------------------------------
-{
-    static bool init = false;
-    static byte rep[1+sizeof(bid128)];
-    if (!init)
-    {
-        bid128 pival;
-        bid128_from_string(&pival.value,
-                           "3.141592653589793238462643383279502884");
-        memcpy(rep+1, &pival.value, sizeof(pival.value));
-        rep[0] = object::ID_decimal128;
-        init = true;
-    }
-    return decimal128_p(rep);
-}
-
-
 algebraic_g complex::convert_angle(algebraic_g a,
                                    angle_unit from,
                                    angle_unit to,
@@ -189,7 +169,7 @@ algebraic_g complex::convert_angle(algebraic_g a,
             break;
         case Settings.RADIANS:
         {
-            algebraic_g pi = get_pi();
+            algebraic_g pi = algebraic::pi();
             if (a->is_fraction())
             {
                 fraction_g f = fraction_p(a.Safe());
