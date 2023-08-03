@@ -29,20 +29,20 @@
 
 #include "stack.h"
 
-#include "graphics.h"
-#include "user_interface.h"
+#include "blitter.h"
 #include "renderer.h"
 #include "runtime.h"
-#include "target.h"
 #include "settings.h"
+#include "target.h"
+#include "user_interface.h"
 
 #include <dmcp.h>
 
 
 stack    Stack;
 
-using coord = graphics::coord;
-using size  = graphics::size;
+using coord = blitter::coord;
+using size  = blitter::size;
 
 
 RECORDER(tests, 16, "Information about tests");

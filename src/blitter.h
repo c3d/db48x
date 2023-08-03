@@ -1,12 +1,12 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef BLITTER_H
+#define BLITTER_H
 // ****************************************************************************
-//  graphics.h                                                    DB48X project
+//  blitter.h                                                    DB48X project
 // ****************************************************************************
 //
 //   File Description:
 //
-//     Graphic routines for the DB48X project
+//     Low-level graphic routines (blitter) for the DB48X project
 //
 //     These routines are designed to be highly-optimizable while being able
 //     to deal with 1, 4 and 16 bits per pixel as found on various calculators
@@ -40,7 +40,7 @@
 #define PACKED  __attribute__((packed))
 
 
-struct graphics
+struct blitter
 // ----------------------------------------------------------------------------
 //    The graphics class managing bitmap operations
 // ----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ struct graphics
         enum { SIZE=1 };                        // Size of the pattern
         enum:uint64_t { SOLID = 1 };            // Multiplier for solids
         enum { BPP = color<Mode>::BPP };        // Bit per pixels for pattern
-        using color = graphics::color<Mode>;
+        using color = blitter::color<Mode>;
 
     public:
         // Build a solid pattern from a single color
@@ -337,8 +337,8 @@ struct graphics
         void vertical_adjust  (coord UNUSED &x1, coord UNUSED &x2) const {}
 
         // Operations used by the blitting routine
-        using color   = graphics::color<Mode>;
-        using pattern = graphics::pattern<Mode>;
+        using color   = blitter::color<Mode>;
+        using pattern = blitter::pattern<Mode>;
         enum { BPP = color::BPP };
 
     public:
@@ -499,7 +499,7 @@ struct graphics
         }
 
     protected:
-        friend struct graphics;
+        friend struct blitter;
         pixword *pixels;        // Word-aligned address of surface buffer
         size     width;         // Pixel width of buffer
         size     height;        // Pixel height of buffer
@@ -636,7 +636,7 @@ public:
 //
 // ============================================================================
 
-template<> union graphics::color<graphics::mode::MONOCHROME>
+template<> union blitter::color<blitter::mode::MONOCHROME>
 // ------------------------------------------------------------------------
 //  Color representation (1-bit, e.g. DM42)
 // ------------------------------------------------------------------------
@@ -655,7 +655,7 @@ public:
 };
 
 
-template<> union graphics::color<graphics::mode::MONOCHROME_REVERSE>
+template<> union blitter::color<blitter::mode::MONOCHROME_REVERSE>
 // ------------------------------------------------------------------------
 //  Color representation (1-bit, e.g. DM42)
 // ------------------------------------------------------------------------
@@ -675,7 +675,7 @@ public:
 };
 
 
-template<> union graphics::color<graphics::mode::GRAY_4BPP>
+template<> union blitter::color<blitter::mode::GRAY_4BPP>
 // ------------------------------------------------------------------------
 //  Color representation (4-bit, e.g. HP50G)
 // ------------------------------------------------------------------------
@@ -695,7 +695,7 @@ public:
 };
 
 
-template<> union graphics::color<graphics::mode::RGB_16BPP>
+template<> union blitter::color<blitter::mode::RGB_16BPP>
 // ------------------------------------------------------------------------
 //  Color representation (16-bit, e.g. HP Prime)
 // ------------------------------------------------------------------------
@@ -729,13 +729,13 @@ public:
 //
 // ============================================================================
 
-template<graphics::mode Mode> template<uint N>
-inline graphics::pattern<Mode>::pattern(graphics::color<Mode> colors[N])
+template<blitter::mode Mode> template<uint N>
+inline blitter::pattern<Mode>::pattern(blitter::color<Mode> colors[N])
 // ------------------------------------------------------------------------
 //  Build a checkerboard from 2 or 4 colors in an array
 // ------------------------------------------------------------------------
 {
-    enum { BPP = graphics::color<Mode>::BPP };
+    enum { BPP = blitter::color<Mode>::BPP };
     for (uint shift = 0; shift < 64 / BPP; shift++)
     {
         uint index = (shift + ((shift / SIZE) % N)) % N;
@@ -743,8 +743,8 @@ inline graphics::pattern<Mode>::pattern(graphics::color<Mode> colors[N])
     }
 }
 
-template<graphics::mode Mode>
-inline graphics::pattern<Mode>::pattern(color a, color b)
+template<blitter::mode Mode>
+inline blitter::pattern<Mode>::pattern(color a, color b)
 // ------------------------------------------------------------------------
 //   Build a pattern from two colors
 // ------------------------------------------------------------------------
@@ -754,8 +754,8 @@ inline graphics::pattern<Mode>::pattern(color a, color b)
     *this = pattern(colors);
 }
 
-template<graphics::mode Mode>
-inline graphics::pattern<Mode>::pattern(color a, color b, color c, color d)
+template<blitter::mode Mode>
+inline blitter::pattern<Mode>::pattern(color a, color b, color c, color d)
 // ------------------------------------------------------------------------
 //   Build a pattern from four colors
 // ------------------------------------------------------------------------
@@ -765,8 +765,8 @@ inline graphics::pattern<Mode>::pattern(color a, color b, color c, color d)
 }
 
 // Pre-built patterns for five shades of grey
-#define GPAT      graphics::pattern<Mode>
-#define TGPAT     template<graphics::mode Mode> const GPAT
+#define GPAT      blitter::pattern<Mode>
+#define TGPAT     template<blitter::mode Mode> const GPAT
 TGPAT GPAT::black  = GPAT(  0,   0,   0);
 TGPAT GPAT::gray10 = GPAT( 32,  32,  32);
 TGPAT GPAT::gray25 = GPAT( 64,  64,  64);
@@ -778,7 +778,7 @@ TGPAT GPAT::white  = GPAT(255, 255, 255);
 #undef GPAT
 
 
-template <> union graphics::pattern<graphics::mode::MONOCHROME>
+template <> union blitter::pattern<blitter::mode::MONOCHROME>
 // ------------------------------------------------------------------------
 //   Pattern for 1-bit bitmaps (e.g. fonts)
 // ------------------------------------------------------------------------
@@ -787,7 +787,7 @@ template <> union graphics::pattern<graphics::mode::MONOCHROME>
 
     enum              { BPP = 1, SIZE = 8 }; // 64-bit = 8x8 1-bit pattern
     enum:uint64_t     { SOLID = 0xFFFFFFFFFFFFFFFFull };
-    using color = graphics::color<MONOCHROME>;
+    using color = blitter::color<MONOCHROME>;
 
 public:
     // Build a solid pattern from a single color
@@ -822,7 +822,7 @@ public:
 };
 
 
-template <> union graphics::pattern<graphics::mode::MONOCHROME_REVERSE>
+template <> union blitter::pattern<blitter::mode::MONOCHROME_REVERSE>
 // ------------------------------------------------------------------------
 //   Pattern for 1-bit screens (DM42)
 // ------------------------------------------------------------------------
@@ -831,7 +831,7 @@ template <> union graphics::pattern<graphics::mode::MONOCHROME_REVERSE>
 
     enum              { BPP = 1, SIZE = 8 }; // 64-bit = 8x8 1-bit pattern
     enum:uint64_t     { SOLID = 0xFFFFFFFFFFFFFFFFull };
-    using color = graphics::color<MONOCHROME_REVERSE>;
+    using color = blitter::color<MONOCHROME_REVERSE>;
 
 public:
     // Build a solid pattern from a single color
@@ -866,7 +866,7 @@ public:
 };
 
 
-template <> union graphics::pattern<graphics::mode::GRAY_4BPP>
+template <> union blitter::pattern<blitter::mode::GRAY_4BPP>
 // ------------------------------------------------------------------------
 //   Pattern for 4-bit screens (HP50G)
 // ------------------------------------------------------------------------
@@ -875,7 +875,7 @@ template <> union graphics::pattern<graphics::mode::GRAY_4BPP>
 
     enum              { BPP = 4, SIZE = 4 }; // 64-bit = 4x4 4-bit pattern
     enum:uint64_t     { SOLID = 0x1111111111111111ull };
-    using color = graphics::color<GRAY_4BPP>;
+    using color = blitter::color<GRAY_4BPP>;
 
   public:
     // Build a solid pattern from a single color
@@ -905,7 +905,7 @@ template <> union graphics::pattern<graphics::mode::GRAY_4BPP>
 };
 
 
-template <> union graphics::pattern<graphics::mode::RGB_16BPP>
+template <> union blitter::pattern<blitter::mode::RGB_16BPP>
 // ------------------------------------------------------------------------
 //   Pattern for 16-bit screens (HP Prime)
 // ------------------------------------------------------------------------
@@ -914,7 +914,7 @@ template <> union graphics::pattern<graphics::mode::RGB_16BPP>
 
     enum              { BPP = 16, SIZE = 2 }; // 64-bit = 4x4 4-bit pattern
     enum:uint64_t     { SOLID = 0x0001000100010001ull };
-    using color = graphics::color<RGB_16BPP>;
+    using color = blitter::color<RGB_16BPP>;
 
 public:
     // Build a solid pattern from a single color
@@ -944,11 +944,11 @@ public:
 };
 
 
-template <graphics::clipping Clip,
+template <blitter::clipping Clip,
           typename Dst,
           typename Src,
-          graphics::mode CMode>
-void graphics::blit(Dst           &dst,
+          blitter::mode CMode>
+void blitter::blit(Dst           &dst,
                     const Src     &src,
                     const rect    &drect,
                     const point   &spos,
@@ -1194,7 +1194,7 @@ void graphics::blit(Dst           &dst,
 // ============================================================================
 
 template<>
-inline void graphics::surface<graphics::MONOCHROME_REVERSE>::
+inline void blitter::surface<blitter::MONOCHROME_REVERSE>::
 horizontal_adjust(coord &x1, coord &x2) const
 // ----------------------------------------------------------------------------
 //   On the DM42, we need horizontal adjustment for coordinates
@@ -1213,11 +1213,11 @@ horizontal_adjust(coord &x1, coord &x2) const
 // ============================================================================
 
 template <>
-inline graphics::pixword
-graphics::blitop_mono_fg<graphics::mode::MONOCHROME_REVERSE>
-        (graphics::pixword dst,
-         graphics::pixword src,
-         graphics::pixword arg)
+inline blitter::pixword
+blitter::blitop_mono_fg<blitter::mode::MONOCHROME_REVERSE>
+        (blitter::pixword dst,
+         blitter::pixword src,
+         blitter::pixword arg)
 // -------------------------------------------------------------------------
 //   Bitmap foreground colorization (1bpp destination)
 // -------------------------------------------------------------------------
@@ -1227,10 +1227,10 @@ graphics::blitop_mono_fg<graphics::mode::MONOCHROME_REVERSE>
 }
 
 template <>
-inline graphics::pixword
-graphics::blitop_mono_fg<graphics::mode::MONOCHROME>(graphics::pixword dst,
-                                                     graphics::pixword src,
-                                                     graphics::pixword arg)
+inline blitter::pixword
+blitter::blitop_mono_fg<blitter::mode::MONOCHROME>(blitter::pixword dst,
+                                                     blitter::pixword src,
+                                                     blitter::pixword arg)
 // -------------------------------------------------------------------------
 //   Bitmap foreground colorization (1bpp destination)
 // -------------------------------------------------------------------------
@@ -1240,10 +1240,10 @@ graphics::blitop_mono_fg<graphics::mode::MONOCHROME>(graphics::pixword dst,
 }
 
 template <>
-inline graphics::pixword
-graphics::blitop_mono_fg<graphics::mode::GRAY_4BPP>(graphics::pixword dst,
-                                                    graphics::pixword src,
-                                                    graphics::pixword arg)
+inline blitter::pixword
+blitter::blitop_mono_fg<blitter::mode::GRAY_4BPP>(blitter::pixword dst,
+                                                    blitter::pixword src,
+                                                    blitter::pixword arg)
 // -------------------------------------------------------------------------
 //   Bitmap foreground colorization (4bpp destination)
 // -------------------------------------------------------------------------
@@ -1257,10 +1257,10 @@ graphics::blitop_mono_fg<graphics::mode::GRAY_4BPP>(graphics::pixword dst,
 }
 
 template <>
-inline graphics::pixword
-graphics::blitop_mono_fg<graphics::mode::RGB_16BPP>(graphics::pixword dst,
-                                                    graphics::pixword src,
-                                                    graphics::pixword arg)
+inline blitter::pixword
+blitter::blitop_mono_fg<blitter::mode::RGB_16BPP>(blitter::pixword dst,
+                                                    blitter::pixword src,
+                                                    blitter::pixword arg)
 // -------------------------------------------------------------------------
 //   Bitmap foreground colorization (16bpp destination)
 // -------------------------------------------------------------------------
@@ -1281,9 +1281,9 @@ graphics::blitop_mono_fg<graphics::mode::RGB_16BPP>(graphics::pixword dst,
 //
 // ============================================================================
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::glyph(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::glyph(coord       x,
                                                coord       y,
                                                unicode    codepoint,
                                                const font *f,
@@ -1310,9 +1310,9 @@ graphics::coord graphics::surface<Mode>::glyph(coord       x,
 }
 
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::glyph(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::glyph(coord       x,
                                                coord       y,
                                                unicode    codepoint,
                                                const font *f,
@@ -1340,9 +1340,9 @@ graphics::coord graphics::surface<Mode>::glyph(coord       x,
 }
 
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::text(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::text(coord       x,
                                               coord       y,
                                               utf8        text,
                                               const font *f,
@@ -1362,9 +1362,9 @@ graphics::coord graphics::surface<Mode>::text(coord       x,
 }
 
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::text(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::text(coord       x,
                                               coord       y,
                                               utf8        text,
                                               const font *f,
@@ -1383,9 +1383,9 @@ graphics::coord graphics::surface<Mode>::text(coord       x,
     return x;
 }
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::text(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::text(coord       x,
                                               coord       y,
                                               utf8        text,
                                               size_t      len,
@@ -1410,9 +1410,9 @@ graphics::coord graphics::surface<Mode>::text(coord       x,
 }
 
 
-template <graphics::mode Mode>
-template <graphics::clipping Clip>
-graphics::coord graphics::surface<Mode>::text(coord       x,
+template <blitter::mode Mode>
+template <blitter::clipping Clip>
+blitter::coord blitter::surface<Mode>::text(coord       x,
                                               coord       y,
                                               utf8        text,
                                               size_t      len,
@@ -1436,4 +1436,4 @@ graphics::coord graphics::surface<Mode>::text(coord       x,
     return x;
 }
 
-#endif // GRAPHICS_H
+#endif // BLITTER_H

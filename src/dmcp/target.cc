@@ -32,7 +32,7 @@
 // Initialize the screen
 surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE);
 
-#define GPAT      graphics::pattern<graphics::mode::MONOCHROME_REVERSE>
+#define GPAT      blitter::pattern<blitter::mode::MONOCHROME_REVERSE>
  const GPAT GPAT::black  = GPAT(  0,   0,   0);
  const GPAT GPAT::gray10 = GPAT( 32,  32,  32);
  const GPAT GPAT::gray25 = GPAT( 64,  64,  64);

@@ -30,9 +30,9 @@
 #include "user_interface.h"
 
 #include "arithmetic.h"
+#include "blitter.h"
 #include "command.h"
 #include "functions.h"
-#include "graphics.h"
 #include "list.h"
 #include "menu.h"
 #include "program.h"
@@ -1569,7 +1569,7 @@ bool user_interface::draw_editor()
     utf8  display         = ed;
     coord y               = bottom - rows * lineHeight;
 
-    graphics::rect clip = Screen.clip();
+    blitter::rect clip = Screen.clip();
     Screen.clip(0, top, LCD_W, bottom);
     record(text_editor, "Clip between %d and %d", top, bottom);
     if (rows > fullRows)

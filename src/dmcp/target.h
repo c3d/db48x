@@ -29,7 +29,7 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include "graphics.h"
+#include "blitter.h"
 #include <dmcp.h>
 
 enum target
@@ -43,14 +43,14 @@ enum target
     LCD_SCANLINE   = 416,
 };
 
-using surface = graphics::surface<graphics::mode::MONOCHROME_REVERSE>;
-using color   = graphics::color  <graphics::mode::MONOCHROME_REVERSE>;
-using pattern = graphics::pattern<graphics::mode::MONOCHROME_REVERSE>;
-using coord   = graphics::coord;
-using size    = graphics::size;
-using rect    = graphics::rect;
-using point   = graphics::point;
-using pixword = graphics::pixword;
+using surface = blitter::surface<blitter::mode::MONOCHROME_REVERSE>;
+using color   = blitter::color  <blitter::mode::MONOCHROME_REVERSE>;
+using pattern = blitter::pattern<blitter::mode::MONOCHROME_REVERSE>;
+using coord   = blitter::coord;
+using size    = blitter::size;
+using rect    = blitter::rect;
+using point   = blitter::point;
+using pixword = blitter::pixword;
 
 extern surface Screen;
 

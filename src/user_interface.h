@@ -29,9 +29,9 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+#include "blitter.h"
 #include "dmcp.h"
 #include "file.h"
-#include "graphics.h"
 #include "object.h"
 #include "runtime.h"
 #include "types.h"
@@ -81,9 +81,9 @@ struct user_interface
     using result = object::result;
     using id     = object::id;
 
-    typedef graphics::coord coord;
-    typedef graphics::size  size;
-    typedef graphics::rect  rect;
+    typedef blitter::coord coord;
+    typedef blitter::size  size;
+    typedef blitter::rect  rect;
 
 
     bool        key(int key, bool repeating, bool transalpha);

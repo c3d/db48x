@@ -30,10 +30,9 @@
 
 #include "main.h"
 
-#include "sysmenu.h"
+#include "blitter.h"
 #include "equation.h"
 #include "font.h"
-#include "graphics.h"
 #include "num.h"
 #include "program.h"
 #include "recorder.h"
