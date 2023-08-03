@@ -65,9 +65,20 @@ protected:
     static result object_parser(parser UNUSED &p,
                                 cstring open,
                                 cstring middle,
-                                cstring close1, id id1,
                                 cstring close2, id id2,
+                                cstring close1, id id1,
+                                cstring terminator,
                                 bool    loopvar);
+    static result object_parser(parser UNUSED &p,
+                                cstring op,
+                                cstring mid,
+                                cstring cl1, id id1,
+                                cstring cl2, id id2,
+                                bool    loopvar)
+    {
+        // Warning: close1/close2 intentionally swapped here
+        return object_parser(p, op, mid, cl1, id1, cl2, id2, nullptr, loopvar);
+    }
     intptr_t object_renderer(renderer &r,
                              cstring open, cstring middle, cstring close,
                              bool loopvar = false) const;

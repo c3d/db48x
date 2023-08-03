@@ -603,7 +603,7 @@ struct runtime
             record(errors, "Error [%s]", message);
         else
             record(runtime, "Clearing error");
-        Error = message;
+        Error = ErrorSave = message;
         return *this;
     }
 
@@ -617,10 +617,18 @@ struct runtime
 
     utf8 error()
     // ------------------------------------------------------------------------
-    //   Get the error message
+    //   Get the error message (as currently displayed)
     // ------------------------------------------------------------------------
     {
         return Error;
+    }
+
+    utf8 error_message()
+    // ------------------------------------------------------------------------
+    //   Get the error message (as saved for errm)
+    // ------------------------------------------------------------------------
+    {
+        return ErrorSave;
     }
 
     runtime &source(utf8 spos)
@@ -684,7 +692,7 @@ struct runtime
 
     void clear_error()
     // ------------------------------------------------------------------------
-    //   Clear error state
+    //   Clear error state (but _does not_ clear ErrorSave intentionally)
     // ------------------------------------------------------------------------
     {
         Error = nullptr;
@@ -706,6 +714,7 @@ struct runtime
 
 protected:
     utf8      Error;        // Error message if any
+    utf8      ErrorSave;    // Last error message (for ERRM)
     utf8      ErrorSource;  // Source of the error if known
     utf8      ErrorCommand; // Source of the error if known
     object_p  Code;         // Currently executing code

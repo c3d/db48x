@@ -28,6 +28,7 @@
 // ****************************************************************************
 
 ERROR(unimplemented,            "Not yet implemented")
+ERROR(interrupted,              "Interrupted")
 ERROR(missing_argument,         "Too few arguments")
 ERROR(invalid_object,           "Invalid object")
 ERROR(out_of_memory,            "Out of memory")

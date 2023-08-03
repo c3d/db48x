@@ -68,6 +68,7 @@ SOURCES +=                                      \
         ../src/equation.cc                      \
         ../src/array.cc                         \
         ../src/loops.cc                         \
+        ../src/conditionals.cc                  \
 	../fonts/EditorFont.cc	                \
 	../fonts/HelpFont.cc	                \
 	../fonts/StackFont.cc			\

@@ -260,6 +260,8 @@ ALIAS(ToFraction, "→Q")
 //
 // ============================================================================
 
+CMD(IfThen)
+CMD(IfThenElse)
 CMD(DoUntil)
 CMD(WhileRepeat)
 CMD(StartNext)
@@ -306,6 +308,15 @@ CMD(Ticks)
 CMD(Bytes)
 CMD(Type)
 CMD(TypeName)
+
+NAMED(IFT, "IfThen")
+NAMED(IFTE, "IfThenElse")
+CMD(IfErrThen)
+CMD(IfErrThenElse)
+NAMED(errm, "ErrorMessage")
+NAMED(errn, "ErrorNumber")
+NAMED(err0, "ClearError")
+NAMED(doerr, "DoError")
 
 
 // ============================================================================

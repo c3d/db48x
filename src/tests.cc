@@ -72,6 +72,7 @@ void tests::run(bool onlyCurrent)
         global_variables();
         local_variables();
         for_loops();
+        conditionals();
         command_display_formats();
         integer_display_formats();
         decimal_display_formats();
@@ -97,22 +98,8 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-
-    step("Type command");
-    test(CLEAR, "12 type", ENTER)
-        .type(object::ID_integer)
-        .expect(object::ID_integer);
-    test(CLEAR, "'ABC*3' type", ENTER)
-        .type(object::ID_integer)
-        .expect(object::ID_equation);
-
-    step("TypeName command");
-    test(CLEAR, "12 typename", ENTER)
-        .type(object::ID_text)
-        .expect("\"integer\"");
-    test(CLEAR, "'ABC*3' typename", ENTER)
-        .type(object::ID_text)
-        .expect("\"equation\"");
+    conditionals();
+    for_loops();
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -769,6 +756,86 @@ void tests::for_loops()
     pgmo = "« 'X' 10 1 for i i x² + next »";
     test(CLEAR, pgm, ENTER).noerr().type(object::ID_program).expect(pgmo);
     test(RUNSTOP).noerr().type(object::ID_equation).expect("'X+100'");
+}
+
+
+void tests::conditionals()
+// ----------------------------------------------------------------------------
+//   Test conditionals
+// ----------------------------------------------------------------------------
+{
+    begin("Conditionals");
+    step("If-Then (true)");
+    test(CLEAR, "PASS if 0 0 > then FAIL end", ENTER)
+        .expect("'PASS'");
+    step("If-Then (false)");
+    test(CLEAR, "FAIL if 1 0 > then PASS end", ENTER)
+        .expect("'PASS'");
+    step("If-Then-Else (true)");
+    test(CLEAR, "if 1 0 > then PASS else FAIL end", ENTER)
+        .expect("'PASS'");
+    step("If-Then-Else (false)");
+    test(CLEAR, "if 1 0 = then FAIL else PASS end", ENTER)
+        .expect("'PASS'");
+
+    step("IFT command (true)");
+    test(CLEAR, "FAIL true PASS IFT", ENTER)
+        .expect("'PASS'");
+    step("IFT command (false)");
+    test(CLEAR, "PASS 0 FAIL IFT", ENTER)
+        .expect("'PASS'");
+    step("IFTE command (true)");
+    test(CLEAR, "true PASS FAIL IFTE", ENTER)
+        .expect("'PASS'");
+    step("IFTE command (false)");
+    test(CLEAR, "0 FAIL PASS IFTE", ENTER)
+        .expect("'PASS'");
+
+    step("IfErr-Then (true)");
+    test(CLEAR, "FAIL iferr 1 0 / drop then PASS end", ENTER)
+        .expect("'PASS'");
+    step("IfErr-Then (false)");
+    test(CLEAR, "PASS iferr 1 0 + drop then FAIL end", ENTER)
+        .expect("'PASS'");
+    step("IfErr-Then-Else (true)");
+    test(CLEAR, "iferr 1 0 / drop then PASS ELSE FAIL end", ENTER)
+        .expect("'PASS'");
+    step("IfErr-Then-Else (false)");
+    test(CLEAR, "IFERR 1 0 + drop then FAIL ELSE PASS end", ENTER)
+        .expect("'PASS'");
+
+    step("IfErr reading error message");
+    test(CLEAR, "iferr 1 0 / drop then errm end", ENTER)
+        .expect("\"Divide by zero\"");
+    step("IfErr reading error number");
+    test(CLEAR, "iferr 1 0 / drop then errn end", ENTER)
+        .type(object::ID_based_integer)
+        .expect("#A₁₆");        // May change if you update errors.tbl
+
+    step("DoErr with built-in message");
+    test(CLEAR, "3 DoErr", ENTER)
+        .error("Too few arguments");
+    step("DoErr with custom message");
+    test(CLEAR, "\"You lose!\" doerr \"You lose worse!\"", ENTER)
+        .error("You lose!");
+    step("errm for custom error message");
+    test(BSP, "errm", ENTER)
+        .expect("\"You lose!\"");
+    step("errn for custom error message");
+    test("errn", ENTER)
+        .expect("#7 0000₁₆");
+
+    step("Getting message after iferr");
+    test(CLEAR, "« FAILA iferr 1 0 / then FAILB end errm »",
+         ENTER, RUNSTOP)
+        .expect("\"Divide by zero\"");
+
+    step("err0 clearing message");
+    test(CLEAR, "« FAILA iferr 1 0 / then FAILB end err0 errm errn »",
+         ENTER, RUNSTOP)
+        .expect("#0₁₆")
+        .test(BSP)
+        .expect("\"\"");
 }
 
 

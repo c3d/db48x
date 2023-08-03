@@ -36,6 +36,7 @@
 #include "catalog.h"
 #include "compare.h"
 #include "complex.h"
+#include "conditionals.h"
 #include "decimal-32.h"
 #include "decimal-64.h"
 #include "decimal128.h"

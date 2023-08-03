@@ -60,6 +60,7 @@ runtime::runtime(byte *mem, size_t size)
 //   Runtime constructor
 // ----------------------------------------------------------------------------
     : Error(nullptr),
+      ErrorSave(nullptr),
       ErrorSource(nullptr),
       ErrorCommand(nullptr),
       Code(nullptr),
@@ -350,6 +351,7 @@ size_t runtime::gc()
             utf8 start = utf8(obj);
             utf8 end = utf8(next);
             found = (Error         >= start && Error         < end)
+                ||  (ErrorSave     >= start && ErrorSave     < end)
                 ||  (ErrorSource   >= start && ErrorSource   < end)
                 ||  (ErrorCommand  >= start && ErrorCommand  < end)
                 ||  (ui.command    >= start && ui.command    < end);
@@ -456,6 +458,8 @@ void runtime::move(object_p to, object_p from, size_t size, bool scratch)
     utf8 end   = utf8(last);
     if (Error >= start && Error < end)
         Error += delta;
+    if (ErrorSave >= start && ErrorSave < end)
+        ErrorSave += delta;
     if (ErrorSource >= start && ErrorSource < end)
         ErrorSource += delta;
     if (ErrorCommand >= start && ErrorCommand < end)
@@ -1066,7 +1070,7 @@ void runtime::ret()
 
 // ============================================================================
 //
-//
+//   Generation of the error functions
 //
 // ============================================================================
 

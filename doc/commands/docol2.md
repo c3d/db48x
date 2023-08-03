@@ -1,19 +1,20 @@
 # Flow control
 
-## IF
-Conditional IF ... THEN ... ELSE ... END statement
+## If
 
+The `if` statement provides conditional structurs that let a program make decisions. It comes in two forms:
 
-## THEN
-Conditional IF ... THEN ... ELSE ... END statement
+* `if` *condition* `then` *true-clause* `end`: This evaluates *condition* and, if true, evaluates *true-clause*.
 
+* `if` *condition* `then` *true-clause* `else` *false-clause* `end`: This evaluates *condition* and, if true, evaluates *true-clause*, otherwise evaluates *false-clause*.
 
-## ELSE
-Conditional IF ... THEN ... ELSE ... END statement
+A condition is true if:
+* It is a number with a non-zero value
+* It is the word `True`
 
-
-## ENDIF
-Conditional IF ... THEN ... ELSE ... END statement
+A condition is false if:
+* It is a number with a zero value
+* It is the word `False`
 
 
 ## CASE
@@ -94,4 +95,3 @@ Loop FORUP ... NEXT/STEP statement
 
 ## FORDN
 Loop FORUP ... NEXT/STEP statement
-

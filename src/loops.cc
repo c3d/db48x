@@ -31,6 +31,7 @@
 
 #include "command.h"
 #include "compare.h"
+#include "conditionals.h"
 #include "decimal-32.h"
 #include "decimal-64.h"
 #include "decimal128.h"
@@ -128,8 +129,9 @@ object::result conditional_loop::condition(bool &value)
 object::result loop::object_parser(parser  &p,
                                    cstring  open,
                                    cstring  middle,
-                                   cstring  close1, id id1,
                                    cstring  close2, id id2,
+                                   cstring  close1, id id1,
+                                   cstring  terminator,
                                    bool     loopvar)
 // ----------------------------------------------------------------------------
 //   Generic parser for loops
@@ -142,13 +144,18 @@ object::result loop::object_parser(parser  &p,
     size_t   max  = p.length;
     object_g obj1 = nullptr;
     object_g obj2 = nullptr;
+    object_g obj3 = nullptr;    // Case of 'else'
     symbol_g name = nullptr;
     id       type = id1;
 
     // Loop over the two or three separators we got
-    while (open || middle || close1 || close2)
+    while (open || middle || close1 || close2 || terminator)
     {
-        cstring  sep   = open ? open : middle ? middle : close1;
+        cstring  sep   = open   ? open
+                       : middle ? middle
+                       : close1 ? close1
+                       : close2 ? close2
+                                : terminator;
         size_t   len   = strlen(sep);
         bool     found = sep == nullptr;
         scribble scr;
@@ -165,9 +172,11 @@ object::result loop::object_parser(parser  &p,
             }
 
             // Check if we have the separator
-            if (len <= max
+            size_t remaining = max - size_t(utf8(src) - utf8(p.source));
+            if (len <= remaining
                 && strncasecmp(cstring(utf8(src)), sep, len) == 0
-                && (len >= max || command::is_separator(utf8(src) + len)))
+                && (len >= remaining ||
+                    command::is_separator(utf8(src) + len)))
             {
                 src += len;
                 found = true;
@@ -179,17 +188,20 @@ object::result loop::object_parser(parser  &p,
                 return SKIP;
 
             // Check if we have the alternate form ('step' vs. 'next')
-            // We keep len here because "step" and "next" have same length ;-)
-            if (sep == close1
-                && close2
-                && len <= max
-                && strncasecmp(cstring(utf8(src)), close2, len) == 0
-                && (len >= max || command::is_separator(utf8(src) + len)))
+            if (sep == close1 && close2)
             {
-                src += len;
-                found = true;
-                type = id2;
-                continue;
+                size_t len2 = strlen(close2);
+                if (len2 <= remaining
+                    && strncasecmp(cstring(utf8(src)), close2, len2) == 0
+                    && (len2 >= remaining ||
+                        command::is_separator(utf8(src) + len2)))
+                {
+                    src += len;
+                    found = true;
+                    type = id2;
+                    terminator = nullptr;
+                    continue;
+                }
             }
 
             // Parse an object
@@ -259,10 +271,15 @@ object::result loop::object_parser(parser  &p,
             obj1 = prog;
             middle = nullptr;
         }
-        else
+        else if (sep == close1 || sep == close2)
         {
             obj2 = prog;
             close1 = close2 = nullptr;
+        }
+        else
+        {
+            obj3 = prog;
+            terminator = nullptr;
         }
     }
 
@@ -271,6 +288,8 @@ object::result loop::object_parser(parser  &p,
     p.out         =
           name
         ? rt.make<ForNext>(type, obj2, name)
+        : obj3
+        ? rt.make<IfThenElse>(type, obj1, obj2, obj3)
         : obj1
         ? rt.make<conditional_loop>(type, obj1, obj2)
         : rt.make<loop>(type, obj2, nullptr);
@@ -422,7 +441,7 @@ PARSE_BODY(WhileRepeat)
 {
     return loop::object_parser(p, "while", "repeat",
                                "end", ID_WhileRepeat,
-                               nullptr, ID_DoUntil,
+                               nullptr, ID_WhileRepeat,
                                false);
 }
 

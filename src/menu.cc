@@ -585,12 +585,16 @@ MENU(TestsMenu,
 // ----------------------------------------------------------------------------
 //   Tests
 // ----------------------------------------------------------------------------
-     "IfThen",  ID_Unimplemented,
-     "IfElse",  ID_Unimplemented,
-     "IfErr",   ID_Unimplemented,
-     "IFTE",    ID_Unimplemented,
-     "Compare", ID_CompareMenu,
-     "Loops",   ID_LoopsMenu);
+     "IfThen",          ID_IfThen,
+     "IfElse",          ID_IfThenElse,
+     "IfErr",           ID_IfErrThen,
+     "IfErrElse",       ID_IfErrThen,
+     "IFT",             ID_IFT,
+     "IFTE",            ID_IFTE,
+
+     "Compare",         ID_CompareMenu,
+     "Loops",           ID_LoopsMenu,
+     "Prog",            ID_ProgramMenu);
 
 
 MENU(CompareMenu,
@@ -609,6 +613,12 @@ MENU(CompareMenu,
      "xor",     ID_Xor,
      "not",     ID_Not,
      "==",      ID_TestSame,
+     "",        ID_Unimplemented,
+
+     "true",    ID_True,
+     "false",   ID_False,
+     "Tests",   ID_TestsMenu,
+     "Loops",   ID_LoopsMenu,
      "Prog",    ID_ProgramMenu);
 
 

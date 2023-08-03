@@ -190,6 +190,7 @@ CXX_SOURCES +=				\
 	src/equation.cc			\
 	src/array.cc			\
 	src/loops.cc			\
+	src/conditionals.cc		\
 	src/font.cc			\
 	fonts/HelpFont.cc		\
 	fonts/EditorFont.cc		\
