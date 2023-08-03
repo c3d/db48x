@@ -195,7 +195,10 @@ algebraic_g complex::convert_angle(algebraic_g a,
         // Bring the result between -1 and 1
         algebraic_g one = integer::make(1);
         algebraic_g two = integer::make(2);
-        a = one - (one - a) % two;
+        a = (one - a) % two;
+        if (a->is_negative(false))
+            a = a + two;
+        a = one - a;
 
         switch (to)
         {
@@ -265,6 +268,10 @@ complex_g operator-(complex_r x, complex_r y)
 {
     if (!x.Safe() || !y.Safe())
         return nullptr;
+    if (x->is_zero())
+        return -y;
+    if (y->is_zero())
+        return x;
     return rectangular::make(x->re() - y->re(), x->im() - y->im());
 }
 

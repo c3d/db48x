@@ -528,7 +528,6 @@ FUNCTION_BODY(neg)
         return nullptr;
     if (x->is_strictly_symbolic())
         return symbolic(ID_neg, x);
-
     algebraic_g zero = rt.make<integer>(ID_integer, 0);
     return zero - x;
 }
