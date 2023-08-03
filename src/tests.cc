@@ -2435,6 +2435,9 @@ void tests::regression_checks()
     step("Bug 272: Type error on logical operations");
     test(CLEAR, "'x' #2134AF AND", ENTER).error("Bad argument type");
 
+    step("Bug 287: arg of negative number");
+    test(CLEAR, "-35 arg", ENTER).expect("180");
+
     step("Bug 288: Abusive simplification of multiplication by -1");
     test(CLEAR, "-1 3 *", ENTER).expect("-3");
 }

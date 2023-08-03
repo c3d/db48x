@@ -390,9 +390,12 @@ FUNCTION_BODY(arg)
     id xt = x->type();
     if (should_be_symbolic(xt))
         return symbolic(ID_arg, x);
+    auto angle_mode = Settings.angle_mode;
     if (is_complex(xt))
-        return complex_p(algebraic_p(x))->arg(Settings.angle_mode);
-    return integer::make(0);
+        return complex_p(algebraic_p(x))->arg(angle_mode);
+    algebraic_g zero = integer::make(0);
+    bool negative = x->is_negative(false);
+    return complex::convert_angle(zero, angle_mode, angle_mode, negative);
 }
 
 

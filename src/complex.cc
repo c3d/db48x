@@ -157,7 +157,7 @@ algebraic_g complex::convert_angle(algebraic_g a,
 //   If radians is set, input is in radians.
 //   Otherwise, input is in fractions of pi (internal format for y() in polar).
 {
-    if (a->is_real() && from != to)
+    if (a->is_real() && (from != to || negmod))
     {
         switch (from)
         {
