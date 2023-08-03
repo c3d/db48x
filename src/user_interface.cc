@@ -3081,12 +3081,17 @@ bool user_interface::handle_alpha(int key)
 //    Handle alphabetic user_interface
 // ----------------------------------------------------------------------------
 {
+    // Things that we never handle in alpha mode
+    if (!key || (key >= KEY_F1 && key <= KEY_F6))
+        return false;
+
+    // Allow "alpha" mode for keys A-F in based number mode
+    // xshift-ENTER inserts quotes, xshift-BSP inserts \n
     bool editing = rt.editing();
     bool hex = editing && mode == BASED && key >= KB_A && key <= KB_F;
-    if (!alpha || !key || ((key == KEY_ENTER || key == KEY_BSP) && !xshift) ||
-        (key >= KEY_F1 && key <= KEY_F6))
-        if (!hex)
-            return false;
+    bool special = xshift && (key == KEY_ENTER || key == KEY_BSP);
+    if (!alpha && !hex && !special)
+        return false;
 
     static const char upper[] =
         "ABCDEF"
@@ -3258,9 +3263,9 @@ static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
 // ----------------------------------------------------------------------------
 //   All the default-assigned commands fit in one or two bytes
 {
-#define OP2BYTES(key, id)                                       \
-    [2*(key) - 2] = (id) < 0x80 ? (id) : ((id) & 0x7F) | 0x80,  \
-    [2*(key) - 1] = (id) < 0x80 ?   0  : ((id) >> 7)
+#define OP2BYTES(key, id)                                              \
+    [2*(key) - 2] = (id) < 0x80 ? (id) & 0x7F : ((id) & 0x7F) | 0x80,  \
+    [2*(key) - 1] = (id) < 0x80 ?           0 : ((id) >> 7)
 
     OP2BYTES(KEY_SIGMA, menu::ID_ToolsMenu),
     OP2BYTES(KEY_INV,   function::ID_inv),
