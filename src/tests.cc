@@ -2435,6 +2435,12 @@ void tests::regression_checks()
     step("Bug 272: Type error on logical operations");
     test(CLEAR, "'x' #2134AF AND", ENTER).error("Bad argument type");
 
+    step("Bug 277: 1+i should have positive arg");
+    test(CLEAR, "1+1ⅈ arg", ENTER).expect("45");
+    test(CLEAR, "1-1ⅈ arg", ENTER).expect("-45");
+    test(CLEAR, "1 1 atan2", ENTER).expect("45");
+    test(CLEAR, "1+1ⅈ ToPolar", ENTER).match("1.414.*∡45°");
+
     step("Bug 287: arg of negative number");
     test(CLEAR, "-35 arg", ENTER).expect("180");
 

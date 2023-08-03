@@ -973,7 +973,8 @@ algebraic_p arithmetic::non_numeric<struct atan2>(algebraic_r y, algebraic_r x)
 //   Note that the first argument to atan2 is traditionally called y,
 //   and represents the imaginary axis for complex numbers
 {
-    if (Settings.angle_mode == settings::PI_RADIANS)
+    auto angle_mode = Settings.angle_mode;
+    if (angle_mode != settings::RADIANS)
     {
         // Deal with special cases without rounding
         if (y->is_zero(false))
@@ -991,15 +992,23 @@ algebraic_p arithmetic::non_numeric<struct atan2>(algebraic_r y, algebraic_r x)
         algebraic_g d = x - y;
         if (!s.Safe() || !d.Safe())
             return nullptr;
-        bool posdiag = s->is_zero(false);
-        bool negdiag = d->is_zero(false);
+        bool posdiag = d->is_zero(false);
+        bool negdiag = s->is_zero(false);
         if (posdiag || negdiag)
         {
             bool xneg = x->is_negative();
-            return fraction::make(integer::make(posdiag
-                                                ? (xneg ? -3 :  1)
-                                                : (xneg ?  3 : -1)),
-                                  integer::make(4));
+            int  num  = posdiag ? (xneg ? -3 : 1) : (xneg ? 3 : -1);
+            switch (angle_mode)
+            {
+            case settings::PI_RADIANS:
+                return fraction::make(integer::make(num), integer::make(4));
+            case settings::DEGREES:
+                return integer::make(num * 45);
+            case settings::GRADS:
+                return integer::make(num * 50);
+            default:
+                break;
+            }
         }
     }
     return nullptr;
