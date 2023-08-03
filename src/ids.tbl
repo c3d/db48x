@@ -318,6 +318,10 @@ NAMED(errn, "ErrorNumber")
 NAMED(err0, "ClearError")
 NAMED(doerr, "DoError")
 
+NAMED(disp, "DisplayText")
+NAMED(dispxy, "DisplayStyledText")
+NAMED(cllcd, "ClearLCD")
+
 
 // ============================================================================
 //

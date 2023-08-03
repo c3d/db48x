@@ -73,6 +73,7 @@ SOURCES +=                                      \
 	../fonts/HelpFont.cc	                \
 	../fonts/StackFont.cc			\
 	../src/font.cc				\
+	../src/graphics.cc			\
 	../src/tests.cc
 
 HEADERS +=                                      \

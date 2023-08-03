@@ -73,13 +73,12 @@ void refresh_dirty()
     if (!dirty.empty())
     {
         // We get garbagge on screen if we pass anything outside of it
-#if SIMULATOR
-        if (dirty.y1 < 0 || dirty.y1 >= LCD_W ||
-            dirty.y2 < 0 || dirty.y2 >= LCD_W)
-            record(main_error, "Dirty range is outside screen (%d to %d)",
-                   dirty.y1, dirty.y2);
-#endif
-        lcd_refresh_lines(dirty.y1, dirty.y2 - dirty.y1);
+        coord top = dirty.y1;
+        coord bottom = dirty.y2;
+        coord height = LCD_H - 1;
+        top = max(coord(0), min(height, top));
+        bottom = max(coord(0), min(height, bottom));
+        lcd_refresh_lines(top, bottom - top);
     }
     ui.draw_clean();
 }

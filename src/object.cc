@@ -44,6 +44,7 @@
 #include "font.h"
 #include "fraction.h"
 #include "functions.h"
+#include "graphics.h"
 #include "integer.h"
 #include "list.h"
 #include "locals.h"

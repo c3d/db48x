@@ -173,6 +173,8 @@ bool algebraic::real_promotion(algebraic_g &x, object::id type)
         bid32       dval = d->value();
         switch (type)
         {
+        case ID_decimal32:
+            return true;
         case ID_decimal64:
             x = rt.make<decimal64>(ID_decimal64, dval);
             return x.Safe();
@@ -194,9 +196,9 @@ bool algebraic::real_promotion(algebraic_g &x, object::id type)
         bid64       dval = d->value();
         switch (type)
         {
+        case ID_decimal32:
         case ID_decimal64:
-            x = rt.make<decimal64>(ID_decimal64, dval);
-            return x.Safe();
+            return true;
         case ID_decimal128:
             x = rt.make<decimal128>(ID_decimal128, dval);
             return x.Safe();
@@ -208,6 +210,24 @@ bool algebraic::real_promotion(algebraic_g &x, object::id type)
                d, object::name(xt), object::name(type));
         break;
     }
+
+    case ID_decimal128:
+    {
+        switch(type)
+        {
+        case ID_decimal32:
+        case ID_decimal64:
+        case ID_decimal128:
+            return x.Safe();
+        default:
+            break;
+        }
+        record(algebraic_error,
+               "Cannot promote decimal128 %p from %+s to %+s",
+               x.Safe(), object::name(xt), object::name(type));
+        break;
+    }
+
     default:
         break;
     }

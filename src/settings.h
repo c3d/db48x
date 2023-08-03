@@ -151,8 +151,8 @@ struct settings
         NUM_FONTS
     };
 
-    font_p font(font_id sz);
-    font_p cursor_font(font_id sz);
+    static font_p font(font_id sz);
+    static font_p cursor_font(font_id sz);
     font_p result_font()        { return font(result_sz); }
     font_p stack_font()         { return font(stack_sz); }
     font_p editor_font(bool ml) { return font(ml ? editor_ml_sz : editor_sz); }

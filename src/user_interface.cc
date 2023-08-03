@@ -71,9 +71,9 @@ RECORDER(help,  16, "On-line help");
 #define NUM_TOPICS      (sizeof(topics) / sizeof(topics[0]))
 
 user_interface::user_interface()
-// ----------------------------------------------------------------------------
-//   Initialize the user interface
-// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    //   Initialize the user interface
+    // ----------------------------------------------------------------------------
     : command(),
       help(-1u),
       line(0),
@@ -120,6 +120,7 @@ user_interface::user_interface()
       dynamicMenu(false),
       autoComplete(false),
       adjustSeps(false),
+      userScreen(false),
       helpfile()
 {
     for (uint p = 0; p < NUM_PLANES; p++)
@@ -898,6 +899,7 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
     dirty = rect();
     force = forceRedraw;
     nextRefresh = refresh;
+    userScreen = false;
 }
 
 
@@ -1229,10 +1231,10 @@ bool user_interface::draw_annunciators()
         utf8 label = utf8(lowercase ? "abc" : "ABC");
         size lw = HeaderFont->width(label);
         if (!force)
-            Screen.fill(280, 1, 280+lw, 1+lh, pattern::black);
+            Screen.fill(280, 0, 280+lw, 1+lh, pattern::black);
         if (alpha)
             Screen.text(280, 1, label, HeaderFont, pattern::white);
-        draw_dirty(280, 1, 280+lw, 1+lh);
+        draw_dirty(280, 0, 280+lw, 1+lh);
         alpha_drawn = alpha;
         lowerc_drawn = lowercase;
         result = true;
@@ -1315,7 +1317,7 @@ bool user_interface::draw_battery()
 
     coord x = Settings.show_voltage ? 311 : 370;
     rect bat(x + 3, ann_y+2, x + 25, ann_y + ann_height);
-    Screen.fill(x, 0, LCD_W, hfh + 1, pattern::black);
+    Screen.fill(x-3, 0, LCD_W, hfh + 1, pattern::black);
     if (Settings.show_voltage)
     {
         char buffer[64];
@@ -1361,12 +1363,15 @@ bool user_interface::draw_busy_cursor(unicode glyph)
 //    Draw the busy flying cursor
 // ----------------------------------------------------------------------------
 {
+    if (userScreen)
+        return false;
+
     size w  = 32;
     size h  = HeaderFont->height();
     size x  = 260;
     size y  = 0;
 
-    rect r(x, y, x + w, y + h);
+    rect r(x, y, x + w, y + h + 1);
     Screen.fill(r, pattern::black);
     if (glyph)
     {
@@ -1376,7 +1381,7 @@ bool user_interface::draw_busy_cursor(unicode glyph)
         Screen.glyph(gx, y, glyph, HeaderFont, pattern::white);
         Screen.clip(clip);
     }
-    draw_dirty(x, y, x + w - 1, y + h - 1);
+    draw_dirty(r);
     refresh_dirty();
     return true;
 }
@@ -1396,6 +1401,7 @@ bool user_interface::draw_idle()
 //   Clear busy indicator
 // ----------------------------------------------------------------------------
 {
+    userScreen = false;
     draw_busy_cursor(0);
     alpha_drawn = !alpha_drawn;
     shift_drawn = !shift;
