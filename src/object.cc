@@ -589,7 +589,6 @@ bool object::is_one(bool error) const
     switch(ty)
     {
     case ID_integer:
-    case ID_neg_integer:
 #if CONFIG_FIXED_BASED_OBJECTS
     case ID_bin_integer:
     case ID_oct_integer:
@@ -599,7 +598,6 @@ bool object::is_one(bool error) const
     case ID_based_integer:
         return integer_p(this)->is_one();
     case ID_bignum:
-    case ID_neg_bignum:
 #if CONFIG_FIXED_BASED_OBJECTS
     case ID_bin_bignum:
     case ID_oct_bignum:
@@ -608,7 +606,6 @@ bool object::is_one(bool error) const
 #endif // CONFIG_FIXED_BASED_OBJECTS
         return bignum_p(this)->is_one();
     case ID_fraction:
-    case ID_neg_fraction:
         return fraction_p(this)->is_one();
     case ID_decimal128:
         return decimal128_p(this)->is_one();
@@ -620,6 +617,10 @@ bool object::is_one(bool error) const
         return polar_p(this)->is_one();
     case ID_rectangular:
         return rectangular_p(this)->is_one();
+    case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+        return false;
 
     default:
         if (error)

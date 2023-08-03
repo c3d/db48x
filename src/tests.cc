@@ -98,8 +98,7 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-    conditionals();
-    for_loops();
+    regression_checks();
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -2435,6 +2434,9 @@ void tests::regression_checks()
 
     step("Bug 272: Type error on logical operations");
     test(CLEAR, "'x' #2134AF AND", ENTER).error("Bad argument type");
+
+    step("Bug 288: Abusive simplification of multiplication by -1");
+    test(CLEAR, "-1 3 *", ENTER).expect("-3");
 }
 
 
