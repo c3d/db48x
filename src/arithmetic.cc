@@ -508,7 +508,14 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
     if (Settings.auto_simplify && x->is_algebraic() && y->is_algebraic())
     {
         if (x->is_zero(false))                  // 0 / X = 0
+        {
+            if (y->is_zero(false))
+            {
+                rt.zero_divide_error();
+                return nullptr;
+            }
             return x;
+        }
         if (y->is_one(false))                   // X / 1 = X
             return x;
         if (x->is_one(false) && y->is_strictly_symbolic())

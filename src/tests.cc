@@ -2440,6 +2440,9 @@ void tests::regression_checks()
 
     step("Bug 288: Abusive simplification of multiplication by -1");
     test(CLEAR, "-1 3 *", ENTER).expect("-3");
+
+    step("Bug 279: 0/0 should error out");
+    test(CLEAR, "0 0 /", ENTER).error("Divide by zero");
 }
 
 
