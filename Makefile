@@ -4,7 +4,7 @@
 TARGET = DB48X
 PLATFORM = dmcp
 VARIANT = DM42
-SDK = dmcp
+SDK = dmcp/dmcp
 PGM = pgm
 
 ######################################
