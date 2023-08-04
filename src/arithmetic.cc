@@ -158,6 +158,20 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
             return x;
     }
 
+    // list + ...
+    if (list_g xl = x->as<list>())
+    {
+        if (list_g yl = y->as<list>())
+            return xl + yl;
+        if (list_g yl = rt.make<list>(byte_p(y.Safe()), y->size()))
+            return xl + yl;
+    }
+    else if (list_g yl = y->as<list>())
+    {
+        if (list_g xl = rt.make<list>(byte_p(x.Safe()), x->size()))
+            return xl + yl;
+    }
+
     // text + ...
     if (text_g xs = x->as<text>())
     {
@@ -174,20 +188,6 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
         // object + text
         if (text_g xs = x->as_text())
             return xs + ys;
-    }
-
-    // list + ...
-    else if (list_g xl = x->as<list>())
-    {
-        if (list_g yl = y->as<list>())
-            return xl + yl;
-        if (list_g yl = rt.make<list>(byte_p(y.Safe()), y->size()))
-            return xl + yl;
-    }
-    else if (list_g yl = y->as<list>())
-    {
-        if (list_g xl = rt.make<list>(byte_p(x.Safe()), x->size()))
-            return xl + yl;
     }
 
     // vector + vector or matrix + matrix

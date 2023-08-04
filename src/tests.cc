@@ -2001,6 +2001,10 @@ void tests::list_functions()
     test(CLEAR, "2.5 { A B C D } +", ENTER)
         .expect("{ 2.5 A B C D }");
 
+    step("Concatenation of list and text");
+    test(CLEAR, "{ } \"Hello\" +", ENTER)
+        .expect("{ \"Hello\" }");
+
     step("Repetition of a list");
     test(CLEAR, "{ A B C D } 3 *", ENTER)
         .expect("{ A B C D A B C D A B C D }");
