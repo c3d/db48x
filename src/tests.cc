@@ -1864,8 +1864,8 @@ void tests::complex_functions()
         .expect("-29 637.47552 74860 62145-4 224.71967 95347 02126ⅈ");
 
     step("Tangent");
-    test(CLEAR, "2+8ⅈ", ENTER, TAN)
-        .expect("1.39772 11770 40026 1373⁳⁻⁴-1.00030 51824 41239 0233ⅈ");
+    test(CLEAR, "2+1ⅈ", ENTER, TAN)
+        .expect("-2.43458 20118 57252 527⁳⁻¹+1.16673 62572 40919 8818ⅈ");
 
     step("Arc sine");
     test(CLEAR, "3+5ⅈ", ENTER, SHIFT, SIN)
@@ -1877,7 +1877,7 @@ void tests::complex_functions()
 
     step("Arc tangent");
     test(CLEAR, "9.+2ⅈ", ENTER, SHIFT, TAN)
-        .expect("1.35459 24390 09627 6993+2.32726 05766 50298 8381⁳⁻²ⅈ");
+        .expect("1.46524 96601 83523 3458+2.32726 05766 50298 8381⁳⁻²ⅈ");
 
     step("Hyperbolic sine");
     test(CLEAR, "4+2ⅈ", ENTER, "SINH", ENTER)

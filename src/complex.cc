@@ -1003,7 +1003,7 @@ COMPLEX_BODY(tan)
     complex_g niz = -iz;
     iz = complex::exp(iz);
     niz = complex::exp(niz);
-    return complex::make(0,-1) * (iz - niz) / (i + niz);
+    return complex::make(0,-1) * (iz - niz) / (iz + niz);
 }
 
 
