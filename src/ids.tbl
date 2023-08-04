@@ -70,7 +70,7 @@ FLAGS(is_bignum,        hex_bignum,     neg_bignum)
 #else
 FLAGS(is_integer,       based_integer,  neg_integer)
 FLAGS(is_based,         based_integer,  based_integer, based_bignum, based_bignum)
-FLAGS(is_bignum,        based_bignum,     neg_bignum)
+FLAGS(is_bignum,        based_bignum,   neg_bignum)
 #endif // CONFIG_FIXED_BASED_OBJECTS
 FLAGS(is_fraction,      fraction,       neg_big_fraction)
 FLAGS(is_decimal,       decimal32,      decimal128)
@@ -302,7 +302,13 @@ NAMED(Mem, "AvailableMemory")
 CMD(FreeMemory)
 CMD(SystemMemory)
 CMD(GarbageCollect)
-CMD(HomeDirectory)
+
+NAMED(home, "HomeDirectory")
+CMD(CurrentDirectory)
+NAMED(path, "DirectoryPath")
+NAMED(crdir, "CreateDirectory")
+NAMED(updir, "UpDirectory")
+NAMED(pgdir, "PurgeDirectory")
 
 CMD(Ticks)
 CMD(Bytes)

@@ -1023,6 +1023,64 @@ bool runtime::unlocals(size_t count)
 
 
 
+// ============================================================================
+//
+//   Directories
+//
+// ============================================================================
+
+bool runtime::enter(directory_p dir)
+// ----------------------------------------------------------------------------
+//   Enter a given directory
+// ----------------------------------------------------------------------------
+{
+    size_t sz = sizeof(dir);
+    if (available(sz) < sz)
+        return false;
+
+    // Move pointers down
+    Stack--;
+    Undos--;
+    Locals--;
+    Directories--;
+
+    size_t moving = Directories - Stack;
+    for (size_t i = 0; i < moving; i++)
+        Stack[i] = Stack[i + 1];
+
+    // Update directory
+    *Directories = dir;
+
+    return true;
+}
+
+
+bool runtime::updir(size_t count)
+// ----------------------------------------------------------------------------
+//   Move one directory up
+// ----------------------------------------------------------------------------
+{
+    size_t depth = (object_p *) Returns - Directories;
+    if (count >= depth - 1)
+        count = depth - 1;
+    if (!count)
+        return false;
+
+    // Move pointers up
+    object_p *oldp = Directories;
+    Stack += count;
+    Undos += count;
+    Locals += count;
+    Directories += count;
+
+    object_p *newp = Directories;
+    size_t moving = Directories - Stack;
+    for (size_t i = 0; i < moving; i++)
+        *(--newp) = *(--oldp);
+
+    return true;
+}
+
 
 // ============================================================================
 //

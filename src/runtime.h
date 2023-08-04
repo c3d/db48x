@@ -577,7 +577,7 @@ struct runtime
     //
     // ========================================================================
 
-    directory *variables(uint depth)
+    directory *variables(uint depth) const
     // ------------------------------------------------------------------------
     //   Current directory for global variables
     // ------------------------------------------------------------------------
@@ -586,6 +586,29 @@ struct runtime
             return nullptr;
         return (directory *) Directories[depth];
     }
+
+    directory *homedir() const
+    // ------------------------------------------------------------------------
+    //   Return the home directory
+    // ------------------------------------------------------------------------
+    {
+        directory **home = (directory **) (Returns - 1);
+        return *home;
+    }
+
+    size_t directories() const
+    // ------------------------------------------------------------------------
+    //   Return number of directories
+    // ------------------------------------------------------------------------
+    {
+        size_t depth = (object_p *) Returns - Directories;
+        return depth;
+    }
+
+
+    bool enter(directory_p dir);
+    bool updir(size_t count = 1);
+
 
 
     // ========================================================================

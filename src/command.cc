@@ -404,18 +404,6 @@ COMMAND_BODY(SystemSetup)
 }
 
 
-COMMAND_BODY(HomeDirectory)
-// ----------------------------------------------------------------------------
-//   Return the home directory
-// ----------------------------------------------------------------------------
-{
-    if (object_g dir = (object *) rt.variables(0))
-        if (rt.push(dir))
-            return OK;
-    return ERROR;
-}
-
-
 COMMAND_BODY(Version)
 // ----------------------------------------------------------------------------
 //   Return a version string

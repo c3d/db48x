@@ -1042,9 +1042,18 @@ MENU(MemMenu,
 // ----------------------------------------------------------------------------
 //   Memory operations
 // ----------------------------------------------------------------------------
-     "GC",      ID_GarbageCollect,
-     "Free",    ID_FreeMemory,
+     "Home",    ID_home,
+     "Path",    ID_path,
+     "CrDir",   ID_crdir,
+     "UpDir",   ID_updir,
+     "Current", ID_CurrentDirectory,
      "Purge",   ID_Purge,
+
+     "GC",      ID_GarbageCollect,
+     "Avail",   ID_Mem,
+     "Free",    ID_FreeMemory,
+     "System",  ID_SystemMemory,
+     "Recall",  ID_Rcl,
      "PgAll",   ID_PurgeAll);
 
 

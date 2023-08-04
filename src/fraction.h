@@ -129,8 +129,8 @@ struct big_fraction : fraction
     // ------------------------------------------------------------------------
     {
         return leb128size(i)
-            + n->object::size() - leb128size(n->type())
-            + d->object::size() - leb128size(d->type());
+            + n->size() - leb128size(n->type())
+            + d->size() - leb128size(d->type());
     }
 
     static fraction_g make(bignum_g n, bignum_g d);

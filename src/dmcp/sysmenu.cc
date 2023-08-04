@@ -254,7 +254,7 @@ static int state_save_callback(cstring fpath,
     Settings.standard_exp = 1;
 
     // Save global variables
-    gcp<directory> home = rt.variables(0);
+    gcp<directory> home = rt.homedir();
     home->enumerate(state_save_variable, &render);
 
     // Save the stack
@@ -269,6 +269,13 @@ static int state_save_callback(cstring fpath,
 
     // Save current settings
     saved.save(render);
+
+    // Write the current path
+    if (list_p path = directory::path(object::ID_block))
+    {
+        path->render(render);
+        render.put('\n');
+    }
 
     // Restore the settings we had
     Settings = saved;

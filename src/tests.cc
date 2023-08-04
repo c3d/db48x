@@ -98,7 +98,7 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-    regression_checks();
+    global_variables();
 
 #if 0
     step("Testing sign of modulo for bignum");
@@ -652,6 +652,43 @@ void tests::global_variables()
     test(CLEAR, XEQ, "SomeLongVariable", ENTER, "RCL", ENTER)
         .error("Undefined name")
         .clear();
+
+    step("Go to top-level");
+    test(CLEAR, "HomeDir").noerr();
+    step("Clear 'DireTest'");
+    test(CLEAR, "'DirTest' pgdir");
+    step("Create directory");
+    test(CLEAR, "'DirTest' crdir", ENTER).noerr();
+    step("Enter directory");
+    test(CLEAR, "DirTest", ENTER).noerr();
+    step("Path function");
+    test(CLEAR, "PATH", ENTER).expect("{ HomeDirectory DirTest }");
+    step("Updir function");
+    test(CLEAR, "UpDir path", ENTER).expect("{ HomeDirectory }");
+    step("Enter directory again");
+    test(CLEAR, "DirTest path", ENTER).expect("{ HomeDirectory DirTest }");
+    step("Current directory content");
+    test(CLEAR, "CurrentDirectory", ENTER).expect("Directory { }");
+    step("Store in subdirectory");
+    test(CLEAR, "242 'Foo' STO", ENTER).noerr();
+    step("Recall from subdirectory");
+    test(CLEAR, "Foo", ENTER).expect("242");
+    step("Recursive directory");
+    test(CLEAR, "'DirTest2' crdir", ENTER).noerr();
+    step("Entering sub-subdirectory");
+    test(CLEAR, "DirTest2", ENTER).noerr();
+    step("Path in sub-subdirectory");
+    test(CLEAR, "path", ENTER).expect("{ HomeDirectory DirTest DirTest2 }");
+    step("Find variable from level above");
+    test(CLEAR, "Foo", ENTER).expect("242");
+    step("Create local variable");
+    test(CLEAR, "\"Hello\" 'Foo' sto", ENTER).noerr();
+    step("Local variable hides variable above");
+    test(CLEAR, "Foo", ENTER).expect("\"Hello\"");
+    step("Updir shows shadowed variable again");
+    test(CLEAR, "Updir Foo", ENTER).expect("242");
+    step("Two independent variables with the same name");
+    test(CLEAR, "DirTest2 Foo", ENTER).expect("\"Hello\"");
 }
 
 

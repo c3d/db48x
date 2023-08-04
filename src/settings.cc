@@ -60,13 +60,6 @@ void settings::save(renderer &out, bool show_defaults)
 {
     settings Defaults;
 
-    // Save the current menu
-    if (menu_p menu = ui.menu())
-    {
-        menu->render(out);
-        out.put('\n');
-    }
-
     // Save current computation precision
     if (precision != BID128_MAXDIGITS || show_defaults)
         out.put("%u Precision\n", precision);
@@ -189,6 +182,13 @@ void settings::save(renderer &out, bool show_defaults)
         out.printf("%u ToFractionIterations\n", fraciter);
     if (fracprec != Defaults.fracprec || show_defaults)
         out.printf("%u ToFractionDigits\n", fracprec);
+
+    // Save the current menu
+    if (menu_p menu = ui.menu())
+    {
+        menu->render(out);
+        out.put('\n');
+    }
 }
 
 

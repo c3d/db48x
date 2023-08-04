@@ -3095,7 +3095,7 @@ bool user_interface::handle_alpha(int key)
     // xshift-ENTER inserts quotes, xshift-BSP inserts \n
     bool editing = rt.editing();
     bool hex = editing && mode == BASED && key >= KB_A && key <= KB_F;
-    bool special = xshift && (key == KEY_ENTER || key == KEY_BSP);
+    bool special = xshift && (key == KEY_ENTER || (key == KEY_BSP && editing));
     if (!alpha && !hex && !special)
         return false;
 
@@ -3403,7 +3403,7 @@ static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_SWAP,  0),
     OP2BYTES(KEY_CHS,   0),
     OP2BYTES(KEY_E,     0),
-    OP2BYTES(KEY_BSP,   0),
+    OP2BYTES(KEY_BSP,   function::ID_updir),
     OP2BYTES(KEY_UP,    0),
     OP2BYTES(KEY_7,     0),
     OP2BYTES(KEY_8,     0),

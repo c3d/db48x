@@ -128,12 +128,23 @@ RENDER_BODY(directory)
 //   Render the directory into the given directory buffer
 // ----------------------------------------------------------------------------
 {
-    bool result = r.put("Directory {");
+    r.put("Directory {");
     r.indent();
-    if (result) result = o->enumerate(directory::render_name, &r);
+    o->enumerate(directory::render_name, &r);
     r.unindent();
-    if (result) result = r.put("}");
+    r.put("}");
     return r.size();
+}
+
+
+EXEC_BODY(directory)
+// ----------------------------------------------------------------------------
+//   Enter directory when executing a directory
+// ----------------------------------------------------------------------------
+{
+    if (rt.enter(o))
+        return OK;
+    return ERROR;
 }
 
 
@@ -144,11 +155,9 @@ bool directory::store(object_g name, object_g value)
 //    Note that the directory itself should never move because of GC
 //    That's because it normally should reside in the globals area
 {
-    object_p header = (object_p) payload();
-    object_p body   = header;
-    size_t   old    = leb128<size_t>(body);     // Old size of directory
-    size_t   now    = old;                      // Updated size
-    size_t   vs     = value->size();            // Size of value
+    size_t      vs      = value->size();        // Size of value
+    int         delta   = 0;                    // Change in directory size
+    directory_g thisdir = this;                 // Can move because of GC
 
     if (object_g existing = lookup(name))
     {
@@ -172,20 +181,23 @@ bool directory::store(object_g name, object_g value)
         // Copy new value into storage location
         memmove((byte *) evalue, (byte *) value, vs);
 
-        // Compute new size of the directory
-        now += vs - es;
+        // Compute change in size for directories
+        delta = vs - es;
     }
     else
     {
         // New entry, need to make room for name and value
-        size_t ns = name->size();
-        size_t vs = value->size();
-        size_t requested = vs + ns;
+        size_t  ns        = name->size();
+        size_t  vs        = value->size();
+        size_t  requested = vs + ns;
+        byte_p  p         = payload();
+        size_t  old       = leb128<size_t>(p);
+        gcbytes body      = p;
         if (rt.available(requested) < requested)
             return false;               // Out of memory
 
         // Move memory above end of directory
-        object_p end = body + old;
+        object_p end = object_p(body.Safe() + old);
         rt.move_globals(end + requested, end);
 
         // Copy name and value at end of directory
@@ -193,18 +205,44 @@ bool directory::store(object_g name, object_g value)
         memmove((byte *) end + ns, (byte *) value, vs);
 
         // Compute new size of the directory
-        now += requested;
+        delta = requested;
     }
 
-    // Adjust directory size
-    size_t nowh = leb128size(now);
-    size_t oldh = leb128size(old);
-    if (nowh != oldh)
-        // Header size changed, move the directory contents and rest of globals
-        rt.move_globals(header + nowh, header + oldh);
-    leb128(header, now);
-
+    // Adjust all directory sizes
+    adjust_sizes(thisdir, delta);
     return true;
+}
+
+
+void directory::adjust_sizes(directory_r thisdir, int delta)
+// ----------------------------------------------------------------------------
+//   Ajust the size for this directory and all enclosing ones
+// ----------------------------------------------------------------------------
+{
+    // Resize directories up the chain
+    uint depth = 0;
+    bool found = false;
+    while (directory_g dir = rt.variables(depth++))
+    {
+        // Start modifying only if we find this directory in path
+        if (dir.Safe() == thisdir.Safe())
+            found = true;
+        if (found)
+        {
+            byte_p p = dir->payload();
+            object_p hdr = object_p(p);
+            size_t dirlen = leb128<size_t>(p);
+            size_t newdirlen = dirlen + delta;
+            size_t szbefore  = leb128size(dirlen);
+            size_t szafter = leb128size(newdirlen);
+            if (szbefore != szafter)
+            {
+                rt.move_globals(hdr + szafter, hdr + szbefore);
+                delta += szafter - szbefore;
+            }
+            leb128(hdr, newdirlen);
+        }
+    }
 }
 
 
@@ -264,6 +302,8 @@ size_t directory::purge(object_p ref)
 //    Purge a name (and associated value) from the directory
 // ----------------------------------------------------------------------------
 {
+    directory_g thisdir = this;
+
     if (object_g name = lookup(ref))
     {
         size_t   ns     = name->size();
@@ -283,18 +323,7 @@ size_t directory::purge(object_p ref)
             purged = old;
         }
 
-        // Update header
-        size_t now = old - purged;
-        size_t oldh = leb128size(old);
-        size_t nowh = leb128size(now);
-        if (nowh > oldh)
-            record(directory_error,
-                   "Purge increased directory size from %u to %u", oldh, nowh);
-        if (nowh < oldh)
-            // Rare case where the directory size itself uses less bytes
-            rt.move_globals(header + nowh, header + oldh);
-        leb128(header, now);
-
+        adjust_sizes(thisdir, -int(purged));
         return purged;
     }
 
@@ -316,7 +345,7 @@ size_t directory::enumerate(enumeration_fn callback, void *arg) const
     while (size)
     {
         symbol_p name = (symbol_p) p;
-        size_t   ns   = name->object::size();
+        size_t   ns   = name->size();
         p += ns;
         object_p value = (object_p) p;
         size_t   vs    = value->size();
@@ -535,6 +564,140 @@ COMMAND_BODY(SystemMemory)
     integer_p result = rt.make<integer>(ID_integer, mem);
     return rt.push(result) ? OK : ERROR;
 }
+
+
+COMMAND_BODY(home)
+// ----------------------------------------------------------------------------
+//   Return the home directory
+// ----------------------------------------------------------------------------
+{
+    rt.updir(~0U);
+    return OK;
+}
+
+
+COMMAND_BODY(CurrentDirectory)
+// ----------------------------------------------------------------------------
+//   Return the current directory as an object
+// ----------------------------------------------------------------------------
+{
+    directory_p dir = rt.variables(0);
+    if (rt.push(dir))
+        return OK;
+    return ERROR;
+}
+
+
+static bool path_callback(symbol_p name, object_p obj, void *arg)
+// ----------------------------------------------------------------------------
+//   Find the directory in enclosing directory
+// ----------------------------------------------------------------------------
+{
+    if (obj == object_p(arg))
+    {
+        rt.append(name->size(), byte_p(name));
+        return true;
+    }
+    return false;
+}
+
+
+list_p directory::path(id type)
+// ----------------------------------------------------------------------------
+//   Return the current directory path as a list object of the given type
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+
+    size_t sz = leb128size(ID_home);
+    byte *p = rt.allocate(sz);
+    leb128(p, ID_home);
+
+    uint depth = rt.directories();
+    directory_p dir = rt.homedir();
+    while (depth > 1)
+    {
+        depth--;
+        directory_p next = rt.variables(depth-1);
+        if (dir->enumerate(path_callback, (void *) next) != 1)
+        {
+            rt.directory_path_error();
+            return nullptr;
+        }
+        dir = next;
+    }
+
+    list_p list = list::make(type, scr.scratch(), scr.growth());
+    return list;
+}
+
+
+COMMAND_BODY(path)
+// ----------------------------------------------------------------------------
+//   Build a path with the list of paths
+// ----------------------------------------------------------------------------
+{
+    if (list_p list = directory::path())
+        if (rt.push(list))
+            return OK;
+
+    return ERROR;
+}
+
+
+COMMAND_BODY(crdir)
+// ----------------------------------------------------------------------------
+//   Create a directory
+// ----------------------------------------------------------------------------
+{
+    directory *dir = rt.variables(0);
+    if (!dir)
+    {
+        rt.no_directory_error();
+        return ERROR;
+    }
+
+    if (object_p obj = rt.pop())
+    {
+        symbol_p name = obj->as_quoted<symbol>();
+        if (!name)
+        {
+            rt.invalid_name_error();
+            return ERROR;
+        }
+        if (dir->recall(name))
+        {
+            rt.name_exists_error();
+            return ERROR;
+        }
+
+        object_p newdir = rt.make<directory>();
+        if (dir->store(name, newdir))
+            return OK;
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(updir)
+// ----------------------------------------------------------------------------
+//   Go up one directory
+// ----------------------------------------------------------------------------
+{
+    rt.updir();
+    return OK;
+}
+
+
+COMMAND_BODY(pgdir)
+// ----------------------------------------------------------------------------
+//   Really the same as 'purge'
+// ----------------------------------------------------------------------------
+{
+    return Purge::evaluate();
+}
+
+
 
 
 
