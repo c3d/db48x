@@ -273,14 +273,14 @@ bool algebraic::complex_promotion(algebraic_g &x, object::id type)
     {
         // Convert from polar to rectangular
         polar_g z = polar_p(algebraic_p(x));
-        x = polar_p(z->as_polar());
+        x = rectangular_p(z->as_rectangular());
         return x.Safe();
     }
     else if (xt == ID_rectangular)
     {
         // Convert from rectangular to polar
         rectangular_g z = rectangular_p(algebraic_p(x));
-        x = rectangular_p(z->as_rectangular());
+        x = polar_p(z->as_polar());
         return x.Safe();
     }
     else if (is_strictly_symbolic(xt))

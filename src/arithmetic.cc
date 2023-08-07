@@ -92,21 +92,16 @@ bool arithmetic::complex_promotion(algebraic_g &x, algebraic_g &y)
     id xt = x->type();
     id yt = y->type();
 
+    // If both are complex, we do not do anything: Complex ops know best how
+    // to handle mixed inputs (mix of rectangular and polar). We should leave
+    // it to them to handle the different representations.
+    if (is_complex(xt) && is_complex(yt)) return true;
+
+    // Try to convert both types to the same complex type
     if (is_complex(xt))
-    {
-        // Success if the two complex types are identical
-        if (yt == xt)
-            return true;
-
-        // Try to convert both types to the same complex type
         return complex_promotion(y, xt);
-    }
-
     if (is_complex(yt))
-    {
-        // Try to convert both types to the same complex type
         return complex_promotion(x, yt);
-    }
 
     // Neither type is complex, no point to promote
     return false;
