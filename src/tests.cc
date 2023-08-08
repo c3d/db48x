@@ -98,20 +98,7 @@ void tests::current()
 //   Test the current thing (this is a temporary test)
 // ----------------------------------------------------------------------------
 {
-    global_variables();
-
-#if 0
-    step("Testing sign of modulo for bignum");
-#define ZEROS "00000000000000000000"
-    test(CLEAR, " 7" ZEROS "  3" ZEROS " MOD", ENTER).expect("1" ZEROS);
-    test(CLEAR, " 7" ZEROS " -3" ZEROS " MOD", ENTER).expect("1" ZEROS);
-    test(CLEAR, "-7" ZEROS "  3" ZEROS " MOD", ENTER).expect("2" ZEROS);
-    test(CLEAR, "-7" ZEROS " -3" ZEROS " MOD", ENTER).expect("2" ZEROS);
-    test(CLEAR, " 7" ZEROS "  3" ZEROS " REM", ENTER).expect("1" ZEROS);
-    test(CLEAR, " 7" ZEROS " -3" ZEROS " REM", ENTER).expect("1" ZEROS);
-    test(CLEAR, "-7" ZEROS "  3" ZEROS " REM", ENTER).expect("-1" ZEROS);
-    test(CLEAR, "-7" ZEROS " -3" ZEROS " REM", ENTER).expect("-1" ZEROS);
-#endif
+    complex_arithmetic();
 }
 
 
@@ -1752,6 +1739,14 @@ void tests::complex_arithmetic()
     test(CLEAR, "a+bⅈ", ENTER, "c+dⅈ", DIV)
         .expect("'(a×c+b×d)÷(c²+d²)'+'(b×c-a×d)÷(c²+d²)'ⅈ");
 
+    step("Addition in aligned polar form");
+    test(CLEAR, "1∡2", ENTER, "3∡2", ENTER, ADD)
+        .expect("4∡2°");
+    step("Subtraction in aligned polar form");
+    test("1∡2", SUB)
+        .expect("3∡2°");
+    test("5∡2", SUB)
+        .expect("2∡-178°");
     step("Addition in polar form");
     test(CLEAR, "1∡2", ENTER, "3∡4", ENTER, ADD)
         .expect("3.99208 29777 98568 4728+2.44168 91793 48768 7397⁳⁻¹ⅈ");
@@ -1772,9 +1767,15 @@ void tests::complex_arithmetic()
     test("5", SHIFT, B)
         .expect("243.∡20.°");
 
+    step("Symbolic addition aligned");
+    test(CLEAR, "a∡b", ENTER, "c∡b", ENTER, ADD)
+        .expect("'a+c'∡b");
     step("Symbolic addition");
     test(CLEAR, "a∡b", ENTER, "c∡d", ENTER, ADD)
         .expect("'a×cos b+c×cos d'+'a×sin b+c×sin d'ⅈ");
+    step("Symbolic substraction aligned");
+    test(CLEAR, "a∡b", ENTER, "c∡b", ENTER, SUB)
+        .expect("'a-c'∡b");
     step("Symbolic subtraction");
     test(CLEAR, "a∡b", ENTER, "c∡d", ENTER, SUB)
         .expect("'a×cos b-c×cos d'+'a×sin b-c×sin d'ⅈ");

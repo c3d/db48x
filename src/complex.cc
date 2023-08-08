@@ -252,18 +252,28 @@ complex_g operator-(complex_r x)
 
 complex_g operator+(complex_r x, complex_r y)
 // ----------------------------------------------------------------------------
-//   Complex addition - Don't even bother doing it in polar form
+//   Complex addition - In rectangular form, unless polar args are aligned
 // ----------------------------------------------------------------------------
 {
     if (!x.Safe() || !y.Safe())
         return nullptr;
+    if (x->type() == object::ID_polar &&
+        y->type() == object::ID_polar)
+    {
+        algebraic_g two = integer::make(2);
+        algebraic_g angle_diff = (x->y() - y->y()) % two;
+        if (angle_diff->is_zero(false))
+            return polar::make(x->x() + y->x(), x->y(), settings::PI_RADIANS);
+        if (angle_diff->is_one(false))
+            return polar::make(x->x() - y->x(), x->y(), settings::PI_RADIANS);
+    }
     return rectangular::make(x->re() + y->re(), x->im() + y->im());
 }
 
 
 complex_g operator-(complex_r x, complex_r y)
 // ----------------------------------------------------------------------------
-//   Complex subtraction - Always in rectangular form
+//   Complex subtraction - In rectangular form, unless polar args are aligned
 // ----------------------------------------------------------------------------
 {
     if (!x.Safe() || !y.Safe())
@@ -272,6 +282,16 @@ complex_g operator-(complex_r x, complex_r y)
         return -y;
     if (y->is_zero())
         return x;
+    if (x->type() == object::ID_polar &&
+        y->type() == object::ID_polar)
+    {
+        algebraic_g two = integer::make(2);
+        algebraic_g angle_diff = (x->y() - y->y()) % two;
+        if (angle_diff->is_zero(false))
+            return polar::make(x->x() - y->x(), x->y(), settings::PI_RADIANS);
+        if (angle_diff->is_one(false))
+            return polar::make(x->x() + y->x(), x->y(), settings::PI_RADIANS);
+    }
     return rectangular::make(x->re() - y->re(), x->im() - y->im());
 }
 
