@@ -621,7 +621,8 @@ void MainWindow::stopBuzzer()
 {
     delete audiobuf;
     audiobuf = nullptr;
-    audio->stop();
+    if (audio)
+        audio->stop();
 }
 
 
