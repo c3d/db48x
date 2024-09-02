@@ -619,12 +619,12 @@ static const cstring basic_equations[] =
     "}",
 
     "Malus Law",  "{ "
-    "'(I(W_m^2)/I0(W_m^2)=(COS(θ_r))^2' "
-    "'I0(W_m^2)=(1/(2*Ⓒμ0*Ⓒc))*(E0_(V/m))^2' "
+    "'I_(W/m^2/I0_(W/m^2)=(COS(θ_r))^2' "
+    "'I0_(W/m^2)=(1/(2*Ⓒμ0*Ⓒc))*(E0_(V/m))^2' "
     "}",
 
     "2 Slits Young Interference",  "{ "
-    "'(I(W_m^2)/Imax(W_m^2)=4*(COS(Δφ_r)/2)^2' "
+    "'I_(W/m^2/Imax_(W/m^2)=4*(COS(Δφ_r)/2)^2' "
     "'(Δφ_r)=(2*Ⓒπ*(d_μm)*SIN(θ_r))/(λ_nm)' "
     "'TAN(θ_r)=(y_m)/(L_m)' "
     "'(Δyint_m)=(λ_nm)*(L_m)/(d_μm)' "
@@ -633,7 +633,7 @@ static const cstring basic_equations[] =
     // WARNING The following requires the definition of the functiom
     // SINC(x)=SIN(X)/X in the db48x
     "One Slit Diffraction",  "{ "
-    "'(I(W_m^2)/Imax(W_m^2)=(SINC(α_r))^2' "
+    "'I_(W/m^2)/Imax_(W/m^2)=(SINC(α_r))^2' "
     "'(α_r)=(Ⓒπ*(a_μm)*SIN(θ_r))/(λ_nm)' "
     "'TAN(θ_r)=(y_m)/(L_m)' "
     "'(Δydiff_m)=2*(λ_nm)*(L_m)/(a_μm)' "
