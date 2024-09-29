@@ -64,6 +64,7 @@
     NSLog(@"Contents of resources: %@", bundleFiles);
     NSLog(@"Contents of documents before copy: %@", [[fileManager enumeratorAtPath:documentsDirectory] allObjects]);
 
+    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] init];
     for (NSString *subdir in @[@"state", @"help", @"help/img",@"config", @"data", @"library"])
     {
         NSString *directory = [documentsDirectory stringByAppendingPathComponent:subdir];
@@ -80,27 +81,39 @@
             {
                 NSString *source = [bundle stringByAppendingPathComponent:file];
                 NSString *destination = [documentsDirectory stringByAppendingPathComponent:file];
-                bool doCopy = ![fileManager fileExistsAtPath:destination];
-                if (!doCopy)
+                
+                auto accessor = ^(NSURL *newURL)
                 {
-                    NSDictionary* sdict = [fileManager attributesOfItemAtPath:source error:nil];
-                    NSDate* sdate = [sdict fileModificationDate];
-                    NSDictionary* ddict = [fileManager attributesOfItemAtPath:destination error:nil];
-                    NSDate* ddate = [ddict fileModificationDate];
-                    doCopy = [sdate compare:ddate] == NSOrderedDescending;
+                    NSURL *filePathURL = [newURL filePathURL];
+                    NSString *destinationFullPath = filePathURL.path;
+                    bool doCopy = ![fileManager fileExistsAtPath:destinationFullPath];
+                    if (!doCopy)
+                    {
+                        NSDictionary* sdict = [fileManager attributesOfItemAtPath:source error:nil];
+                        NSDate* sdate = [sdict fileModificationDate];
+                        NSDictionary* ddict = [fileManager attributesOfItemAtPath:destination error:nil];
+                        NSDate* ddate = [ddict fileModificationDate];
+                        doCopy = [sdate compare:ddate] == NSOrderedDescending;
+                        if (doCopy)
+                        {
+                            [fileManager removeItemAtPath:destinationFullPath error:nil];
+                        }
+                    }
+                    NSLog(@"%s copy %@", doCopy ? "Will" : "Won't", file);
                     if (doCopy)
                     {
-                        [fileManager removeItemAtPath:destination error:nil];
+                        NSError *error = nil;
+                        [fileManager copyItemAtPath:source toPath:destination error:&error];
+                        if (error)
+                            NSLog(@"Error copying '%@': %@", file, error);
                     }
-                }
-                NSLog(@"%s copy %@", doCopy ? "Will" : "Won't", file);
-                if (doCopy)
-                {
-                    NSError *error = nil;
-                    [fileManager copyItemAtPath:source toPath:destination error:&error];
-                    if (error)
-                        NSLog(@"Error copying '%@': %@", file, error);
-                }
+                };
+
+                NSURL *url = [NSURL fileURLWithPath:destination];
+                [coordinator coordinateWritingItemAtURL:url
+                                                options:0
+                                                  error:nil
+                                             byAccessor:accessor];
             }
         }
     }
