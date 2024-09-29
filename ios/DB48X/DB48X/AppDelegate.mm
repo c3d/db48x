@@ -57,9 +57,6 @@
     NSArray<NSString *> *documentsPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSLog(@"Document directories %@", documentsPath);
     NSString *documentsDirectory = [documentsPath lastObject];
-    chdir([documentsDirectory cStringUsingEncoding:[NSString defaultCStringEncoding]]);
-    NSLog(@"Running in directory %@", documentsDirectory);
-
 
     // Create the DB48X standard structure
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -220,6 +217,9 @@
         }
     }
     NSLog(@"Contents of documents after copy: %@", [[fileManager enumeratorAtPath:documentsDirectory] allObjects]);
+
+    chdir([documentsDirectory cStringUsingEncoding:[NSString defaultCStringEncoding]]);
+    NSLog(@"Running in directory %@", documentsDirectory);
 
     // Dispatch the RPL thread
     dispatch_queue_t queue =
