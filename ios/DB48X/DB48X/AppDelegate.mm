@@ -309,4 +309,14 @@
         key_push(tests::SAVE_PGM);
 }
 
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+// ----------------------------------------------------------------------------
+//    Open external file
+// ----------------------------------------------------------------------------
+{
+    NSString *path = [url path];
+    NSLog(@"Opening URL %@ path %@", url, path);
+    return NO;
+}
+
 @end
