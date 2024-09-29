@@ -60,9 +60,10 @@
     chdir([documentsDirectory cStringUsingEncoding:[NSString defaultCStringEncoding]]);
     NSLog(@"Running in directory %@", documentsDirectory);
 
+
     // Create the DB48X standard structure
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    for (NSString *subdir in @[@"state", @"help", @"help/img",@"config", @"data"])
+    for (NSString *subdir in @[@"state", @"help", @"help/img",@"config", @"data", @"library"])
     {
         NSString *directory = [documentsDirectory stringByAppendingPathComponent:subdir];
         NSError *error = nil;
@@ -83,6 +84,25 @@
         @"config/characters.csv",
         @"config/units.csv",
         @"config/constants.csv",
+        @"library/Beeps.48s",
+        @"library/CollatzBenchmark.48s",
+        @"library/CollatzConjecture.48s",
+        @"library/CountPrimes.48s",
+        @"library/CurvePlottingExamples.48s",
+        @"library/DrawingLines.48s",
+        @"library/DrawingPatterns.48s",
+        @"library/DrawingShapes.48s",
+        @"library/DrawingText.48s",
+        @"library/KineticEnergy.48s",
+        @"library/NQueens.48s",
+        @"library/RandomPlot.48s",
+        @"library/RandomXYPlot.48s",
+        @"library/Recursion.48s",
+        @"library/SumTestWithFunction.48s",
+        @"library/SumTestWithLoop.48s",
+        @"library/TriangleEquations.48s",
+        @"library/UnitsBenchmark.48s",
+        @"library/WalkMan.48s",
         @"help/db50x.md",
         @"help/db48x.md",
         @"help/shifts.bmp",
