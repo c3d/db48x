@@ -234,14 +234,14 @@ int ui_wrap_io(file_sel_fn_t callback, const char *path, void *data, bool writin
     if (writing)
     {
         [coordinator coordinateWritingItemAtURL:url
-                                        options:NSFileCoordinatorReadingWithoutChanges
+                                        options:0
                                           error:nil
                                      byAccessor:accessor];
     }
     else
     {
         [coordinator coordinateReadingItemAtURL:url
-                                        options:NSFileCoordinatorReadingWithoutChanges
+                                        options:0
                                           error:nil
                                      byAccessor:accessor];
     }
