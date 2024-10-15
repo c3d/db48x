@@ -10371,6 +10371,7 @@ tests &tests::begin(cstring name, bool disabled)
     tstart = sys_current_ms();
     tname = name;
     tindex++;
+#undef BLACK
 #define BLACK   ESCAPE("\033[40;97m")
 #define GREY    ESCAPE("\033[100;37m")
 #define CLREOL  ESCAPE("\033[K")

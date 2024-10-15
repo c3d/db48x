@@ -891,7 +891,6 @@
 		6F2AC47C2C64105F00C8357F /* keyboard-db48x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6FCEDA552B95E60700C8357F /* keyboard-db48x.png */; };
 		6F2AC4802C64105F00C8357F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F9D29721C72B9BB000025E6 /* Main.storyboard */; };
 		6F2AC4892C64105F00C8357F /* DB48X startup screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F4519A92BBC80A600C8357F /* DB48X startup screen.png */; };
-		6F2AC48D2C64105F00C8357F /* db48x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775112B97966E00C8357F /* db48x.md */; };
 		6F2AC48E2C64105F00C8357F /* db50x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775202B97966E00C8357F /* db50x.md */; };
 		6F2AC48F2C64105F00C8357F /* shifts.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35B2C63640C00C8357F /* shifts.bmp */; };
 		6F2AC4912C64105F00C8357F /* equations.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F4528DA2B9C6DD800C8357F /* equations.csv */; };
@@ -981,7 +980,6 @@
 		6F2AC55A2C6410F700C8357F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F9D29721C72B9BB000025E6 /* Main.storyboard */; };
 		6F2AC5632C6410F700C8357F /* DB48X startup screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F4519A92BBC80A600C8357F /* DB48X startup screen.png */; };
 		6F2AC5672C6410F700C8357F /* db48x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775112B97966E00C8357F /* db48x.md */; };
-		6F2AC5682C6410F700C8357F /* db50x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775202B97966E00C8357F /* db50x.md */; };
 		6F2AC5692C6410F700C8357F /* shifts.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35B2C63640C00C8357F /* shifts.bmp */; };
 		6F2AC56B2C6410F700C8357F /* equations.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F4528DA2B9C6DD800C8357F /* equations.csv */; };
 		6F2AC56C2C6410F700C8357F /* library.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F4528DB2B9C6DD800C8357F /* library.csv */; };
@@ -995,6 +993,79 @@
 		6F4528D22B9C0F4E00C8357F /* library.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F4528CA2B9C0F4E00C8357F /* library.cc */; };
 		6F4528DE2B9C6DEF00C8357F /* equations.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F4528DA2B9C6DD800C8357F /* equations.csv */; };
 		6F4528DF2B9C6DEF00C8357F /* library.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F4528DB2B9C6DD800C8357F /* library.csv */; };
+		6F66AC522CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC532CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC542CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC552CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC562CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC572CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC582CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC592CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC5A2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC5B2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC5C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC5D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC5E2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC5F2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC602CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC612CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC622CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC632CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC642CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC652CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC662CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC672CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC682CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC692CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC6A2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC6B2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC6C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC6D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC6E2CBEA09900C8357F /* B Field In Finite Solenoid.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC6F2CBEA09900C8357F /* E Field Finite Line.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC702CBEA09900C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC712CBEA09900C8357F /* Planck&Wien_Distributions.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC722CBEA0B000C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC732CBEA0B000C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC742CBEA0B000C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC752CBEA0B000C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC762CBEA0BB00C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC772CBEA0BB00C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC782CBEA0BB00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC792CBEA0BB00C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC7A2CBEA0D700C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC7B2CBEA0D700C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC7C2CBEA0D700C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC7D2CBEA0D700C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC7E2CBEA0E300C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC7F2CBEA0E300C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC802CBEA0E300C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC812CBEA0E300C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC822CBEA0EE00C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC832CBEA0EE00C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC842CBEA0EE00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC852CBEA0EE00C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC862CBEA0F900C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */; };
+		6F66AC872CBEA0F900C8357F /* E Field Finite Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */; };
+		6F66AC882CBEA0F900C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */; };
+		6F66AC892CBEA0F900C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */; };
+		6F66AC8C2CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC8D2CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC8E2CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC8F2CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC902CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC912CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC922CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC932CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC942CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC952CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC962CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC972CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC982CBEA40E00C8357F /* db48x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC992CBEA40E00C8357F /* db50x.idx in Resources */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
+		6F66AC9A2CBEA45700C8357F /* db48x.idx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC9B2CBEA47300C8357F /* db48x.idx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC8A2CBEA40E00C8357F /* db48x.idx */; };
+		6F66AC9C2CBEA48400C8357F /* db50x.idx in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F66AC8B2CBEA40E00C8357F /* db50x.idx */; };
 		6F7032682C725CE400C8357F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F9D29751C72B9BB000025E6 /* Assets.xcassets */; };
 		6F7032692C725CE500C8357F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F9D29751C72B9BB000025E6 /* Assets.xcassets */; };
 		6F70326A2C72A79E00C8357F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F9D29771C72B9BB000025E6 /* LaunchScreen.storyboard */; };
@@ -1282,7 +1353,6 @@
 		6FE7F08B2B95E37400C8357F /* bignum.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FE7F0542B95E37400C8357F /* bignum.cc */; };
 		6FEF5C702BAA151400C8357F /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FEF5C6F2BAA151400C8357F /* UniformTypeIdentifiers.framework */; };
 		6FF873942B97B84D00C8357F /* db48x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775112B97966E00C8357F /* db48x.md */; };
-		6FF873952B97B84D00C8357F /* db50x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775202B97966E00C8357F /* db50x.md */; };
 		6FF873972B97B87400C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6FF873982B97B87400C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
 		6FF8739F2B97BAB200C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
@@ -1350,6 +1420,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC7A2CBEA0D700C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC7B2CBEA0D700C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC7C2CBEA0D700C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC7D2CBEA0D700C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6F0FDC022C7934DF00C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */,
 				6F0FDC032C7934DF00C8357F /* 1DElastiCollisions.bmp in CopyFiles */,
 				6F0FDC042C7934DF00C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
@@ -1480,6 +1554,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC7E2CBEA0E300C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC7F2CBEA0E300C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC802CBEA0E300C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC812CBEA0E300C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6F8786D62CA9E09F00C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
 				6F8786D72CA9E09F00C8357F /* 4-basic-math.bmp in CopyFiles */,
 				6F8786D82CA9E09F00C8357F /* 6-trigonometrics.bmp in CopyFiles */,
@@ -1610,6 +1688,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC822CBEA0EE00C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC832CBEA0EE00C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC842CBEA0EE00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC852CBEA0EE00C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6F0FDD8F2C7934E500C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */,
 				6F0FDD902C7934E500C8357F /* 1DElastiCollisions.bmp in CopyFiles */,
 				6F0FDD912C7934E500C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
@@ -1703,6 +1785,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC722CBEA0B000C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC732CBEA0B000C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC742CBEA0B000C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC752CBEA0B000C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6F8786CB2CA9E08600C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
 				6F8786CC2CA9E08600C8357F /* 4-basic-math.bmp in CopyFiles */,
 				6F8786CD2CA9E08600C8357F /* 6-trigonometrics.bmp in CopyFiles */,
@@ -1796,7 +1882,7 @@
 			dstPath = help;
 			dstSubfolderSpec = 7;
 			files = (
-				6F2AC48D2C64105F00C8357F /* db48x.md in CopyFiles */,
+				6F66AC9C2CBEA48400C8357F /* db50x.idx in CopyFiles */,
 				6F2AC48E2C64105F00C8357F /* db50x.md in CopyFiles */,
 				6F2AC48F2C64105F00C8357F /* shifts.bmp in CopyFiles */,
 			);
@@ -1833,6 +1919,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC762CBEA0BB00C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC772CBEA0BB00C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC782CBEA0BB00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC792CBEA0BB00C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6F0FDB3B2C72AB7400C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */,
 				6F0FDB3C2C72AB7400C8357F /* 1DElastiCollisions.bmp in CopyFiles */,
 				6F0FDB3D2C72AB7400C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
@@ -1926,8 +2016,8 @@
 			dstPath = help;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC9A2CBEA45700C8357F /* db48x.idx in CopyFiles */,
 				6F2AC5672C6410F700C8357F /* db48x.md in CopyFiles */,
-				6F2AC5682C6410F700C8357F /* db50x.md in CopyFiles */,
 				6F2AC5692C6410F700C8357F /* shifts.bmp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1963,6 +2053,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC6E2CBEA09900C8357F /* B Field In Finite Solenoid.bmp in Copy Files */,
+				6F66AC6F2CBEA09900C8357F /* E Field Finite Line.bmp in Copy Files */,
+				6F66AC702CBEA09900C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Copy Files */,
+				6F66AC712CBEA09900C8357F /* Planck&Wien_Distributions.bmp in Copy Files */,
 				6F0FDAE62C72AA6400C8357F /* 1-arithmetic-rpl.bmp in Copy Files */,
 				6F0FDAE72C72AA6400C8357F /* 1DElastiCollisions.bmp in Copy Files */,
 				6F0FDAE82C72AA6400C8357F /* 2-arithmetic-cmd.bmp in Copy Files */,
@@ -2148,6 +2242,10 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC862CBEA0F900C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
+				6F66AC872CBEA0F900C8357F /* E Field Finite Line.bmp in CopyFiles */,
+				6F66AC882CBEA0F900C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F66AC892CBEA0F900C8357F /* Planck&Wien_Distributions.bmp in CopyFiles */,
 				6FE399E52C793FE300C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */,
 				6FE399E62C793FE300C8357F /* 1DElastiCollisions.bmp in CopyFiles */,
 				6FE399E72C793FE300C8357F /* 2-arithmetic-cmd.bmp in CopyFiles */,
@@ -2241,8 +2339,8 @@
 			dstPath = help;
 			dstSubfolderSpec = 7;
 			files = (
+				6F66AC9B2CBEA47300C8357F /* db48x.idx in CopyFiles */,
 				6FF873942B97B84D00C8357F /* db48x.md in CopyFiles */,
-				6FF873952B97B84D00C8357F /* db50x.md in CopyFiles */,
 				6F2AC36D2C63640C00C8357F /* shifts.bmp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2405,6 +2503,12 @@
 		6F4528DA2B9C6DD800C8357F /* equations.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = equations.csv; sourceTree = "<group>"; };
 		6F4528DB2B9C6DD800C8357F /* library.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = library.csv; sourceTree = "<group>"; };
 		6F5A77BC2B96862200C8357F /* ScreenView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScreenView.h; sourceTree = "<group>"; };
+		6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "B Field In Finite Solenoid.bmp"; sourceTree = "<group>"; };
+		6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "E Field Finite Line.bmp"; sourceTree = "<group>"; };
+		6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "Planck&Rayleigh-Jeans_Distributions.bmp"; sourceTree = "<group>"; };
+		6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "Planck&Wien_Distributions.bmp"; sourceTree = "<group>"; };
+		6F66AC8A2CBEA40E00C8357F /* db48x.idx */ = {isa = PBXFileReference; lastKnownFileType = text; path = db48x.idx; sourceTree = "<group>"; };
+		6F66AC8B2CBEA40E00C8357F /* db50x.idx */ = {isa = PBXFileReference; lastKnownFileType = text; path = db50x.idx; sourceTree = "<group>"; };
 		6F75CED52BA1B23800C8357F /* HelpViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HelpViewController.h; sourceTree = "<group>"; };
 		6F75CED62BA1B23800C8357F /* HelpViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelpViewController.m; sourceTree = "<group>"; };
 		6F75CED82BA1B7D300C8357F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -3154,6 +3258,10 @@
 				6F2AC3B12C63E4FA00C8357F /* TorsionalPendulum.bmp */,
 				6F2AC3C92C63E4FB00C8357F /* Triangle.bmp */,
 				6F2AC3892C63E4F700C8357F /* VoltageDivider.bmp */,
+				6F66AC4E2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp */,
+				6F66AC4F2CBEA01E00C8357F /* E Field Finite Line.bmp */,
+				6F66AC502CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp */,
+				6F66AC512CBEA01E00C8357F /* Planck&Wien_Distributions.bmp */,
 			);
 			path = img;
 			sourceTree = "<group>";
@@ -3257,6 +3365,8 @@
 				6FE775102B97966E00C8357F /* keyboard.png */,
 				6FE775112B97966E00C8357F /* db48x.md */,
 				6FE775202B97966E00C8357F /* db50x.md */,
+				6F66AC8A2CBEA40E00C8357F /* db48x.idx */,
+				6F66AC8B2CBEA40E00C8357F /* db50x.idx */,
 			);
 			name = help;
 			path = ../../../help;
@@ -3694,7 +3804,13 @@
 				1F9D29791C72B9BB000025E6 /* LaunchScreen.storyboard in Resources */,
 				1F9D29761C72B9BB000025E6 /* Assets.xcassets in Resources */,
 				6FCEDA572B95E60700C8357F /* keyboard-db48x.png in Resources */,
+				6F66AC942CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC952CBEA40E00C8357F /* db50x.idx in Resources */,
 				1F9D29741C72B9BB000025E6 /* Main.storyboard in Resources */,
+				6F66AC5E2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC5F2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC602CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC612CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F4519AA2BBC80A600C8357F /* DB48X startup screen.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3731,11 +3847,17 @@
 				6F0FDBE72C7934DF00C8357F /* db50x.md in Resources */,
 				6F0FDBE82C7934DF00C8357F /* Main.storyboard in Resources */,
 				6F0FDBE92C7934DF00C8357F /* errors.tbl in Resources */,
+				6F66AC902CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC912CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F0FDBEA2C7934DF00C8357F /* ignored_menus.csv in Resources */,
 				6F0FDBEB2C7934DF00C8357F /* decimal-pi.txt in Resources */,
 				6F0FDBEC2C7934DF00C8357F /* equations.csv in Resources */,
 				6F0FDBED2C7934DF00C8357F /* ids.tbl in Resources */,
 				6F0FDBF02C7934DF00C8357F /* DB48X startup screen.png in Resources */,
+				6F66AC5A2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC5B2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC5C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC5D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDBF12C7934DF00C8357F /* decimal-e.txt in Resources */,
 				6F0FDBF22C7934DF00C8357F /* units.csv in Resources */,
 				6F0FDBF32C7934DF00C8357F /* Assets.xcassets in Resources */,
@@ -3760,11 +3882,17 @@
 				6F0FDCB32C7934E300C8357F /* db50x.md in Resources */,
 				6F0FDCB42C7934E300C8357F /* Main.storyboard in Resources */,
 				6F0FDCB52C7934E300C8357F /* errors.tbl in Resources */,
+				6F66AC8E2CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC8F2CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F0FDCB62C7934E300C8357F /* ignored_menus.csv in Resources */,
 				6F0FDCB72C7934E300C8357F /* decimal-pi.txt in Resources */,
 				6F0FDCB82C7934E300C8357F /* equations.csv in Resources */,
 				6F0FDCB92C7934E300C8357F /* ids.tbl in Resources */,
 				6F0FDCBC2C7934E300C8357F /* DB48X startup screen.png in Resources */,
+				6F66AC6A2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC6B2CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC6C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC6D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDCBD2C7934E300C8357F /* decimal-e.txt in Resources */,
 				6F0FDCBE2C7934E300C8357F /* units.csv in Resources */,
 				6F0FDCBF2C7934E300C8357F /* stm32_program.ld in Resources */,
@@ -3789,11 +3917,17 @@
 				6F0FDD742C7934E500C8357F /* Main.storyboard in Resources */,
 				6F0FDD752C7934E500C8357F /* errors.tbl in Resources */,
 				6F0FDD762C7934E500C8357F /* ignored_menus.csv in Resources */,
+				6F66AC962CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC972CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F0FDD772C7934E500C8357F /* decimal-pi.txt in Resources */,
 				6F0FDD782C7934E500C8357F /* equations.csv in Resources */,
 				6F0FDD792C7934E500C8357F /* ids.tbl in Resources */,
 				6F0FDD7C2C7934E500C8357F /* DB48X startup screen.png in Resources */,
 				6F0FDD7D2C7934E500C8357F /* decimal-e.txt in Resources */,
+				6F66AC662CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC672CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC682CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC692CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDD7E2C7934E500C8357F /* units.csv in Resources */,
 				6F0FDD7F2C7934E500C8357F /* stm32_program.ld in Resources */,
 				6F0FDD802C7934E500C8357F /* Assets.xcassets in Resources */,
@@ -3809,7 +3943,13 @@
 				6F2AC47C2C64105F00C8357F /* keyboard-db48x.png in Resources */,
 				6F70326A2C72A79E00C8357F /* LaunchScreen.storyboard in Resources */,
 				6F2AC4802C64105F00C8357F /* Main.storyboard in Resources */,
+				6F66AC8C2CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC8D2CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F2AC4892C64105F00C8357F /* DB48X startup screen.png in Resources */,
+				6F66AC622CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC632CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC642CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC652CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F7032692C725CE500C8357F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3823,7 +3963,13 @@
 				6F2AC5522C6410F700C8357F /* LaunchScreen.storyboard in Resources */,
 				6F2AC5562C6410F700C8357F /* keyboard-db48x.png in Resources */,
 				6F2AC55A2C6410F700C8357F /* Main.storyboard in Resources */,
+				6F66AC922CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC932CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F2AC5632C6410F700C8357F /* DB48X startup screen.png in Resources */,
+				6F66AC522CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC532CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC542CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC552CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F7032682C725CE400C8357F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3846,11 +3992,17 @@
 				6FE399CA2C793FE300C8357F /* Main.storyboard in Resources */,
 				6FE399CB2C793FE300C8357F /* errors.tbl in Resources */,
 				6FE399CC2C793FE300C8357F /* ignored_menus.csv in Resources */,
+				6F66AC982CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F66AC992CBEA40E00C8357F /* db50x.idx in Resources */,
 				6FE399CD2C793FE300C8357F /* decimal-pi.txt in Resources */,
 				6FE399CE2C793FE300C8357F /* equations.csv in Resources */,
 				6FE399CF2C793FE300C8357F /* ids.tbl in Resources */,
 				6FE399D22C793FE300C8357F /* DB48X startup screen.png in Resources */,
 				6FE399D32C793FE300C8357F /* decimal-e.txt in Resources */,
+				6F66AC562CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
+				6F66AC572CBEA01E00C8357F /* E Field Finite Line.bmp in Resources */,
+				6F66AC582CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
+				6F66AC592CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6FE399D42C793FE300C8357F /* units.csv in Resources */,
 				6FE399D52C793FE300C8357F /* stm32_program.ld in Resources */,
 				6FE399D62C793FE300C8357F /* Assets.xcassets in Resources */,
@@ -4571,6 +4723,7 @@
 					"$(inherited)",
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					"MEMORY=70",
@@ -4583,7 +4736,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4598,6 +4751,7 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					"MEMORY=70",
@@ -4610,7 +4764,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4691,6 +4845,7 @@
 					"$(inherited)",
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					"MEMORY=48",
@@ -4704,7 +4859,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4719,6 +4874,7 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					"MEMORY=48",
@@ -4732,7 +4888,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4749,6 +4905,7 @@
 					"$(inherited)",
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					"MEMORY=70",
@@ -4761,7 +4918,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4776,6 +4933,7 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					"MEMORY=70",
@@ -4788,7 +4946,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4806,6 +4964,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					CONFIG_COLOR,
@@ -4819,7 +4978,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -4835,6 +4994,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					CONFIG_COLOR,
@@ -4848,7 +5008,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -4866,6 +5026,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					CONFIG_COLOR,
@@ -4879,7 +5040,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -4895,6 +5056,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					CONFIG_COLOR,
@@ -4907,7 +5069,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -4924,6 +5086,7 @@
 					"$(inherited)",
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					"MEMORY=48",
@@ -4937,7 +5100,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4952,6 +5115,7 @@
 				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
 					"__packed=",
 					"HELPFILE_NAME=\\\"help/db48x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db48x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					"MEMORY=48",
@@ -4965,7 +5129,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4983,6 +5147,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					SIMULATOR,
 					USE_IOS,
 					CONFIG_COLOR,
@@ -4996,7 +5161,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5012,6 +5177,7 @@
 					"__packed=",
 					DM32,
 					"HELPFILE_NAME=\\\"help/db50x.md\\\"",
+					"HELPINDEX_NAME=\\\"help/db50x.idx\\\"",
 					USE_IOS,
 					SIMULATOR,
 					CONFIG_COLOR,
@@ -5024,7 +5190,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.0;
+				MARKETING_VERSION = 0.8.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
