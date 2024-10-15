@@ -31,6 +31,7 @@
 
 #include "arithmetic.h"
 #include "blitter.h"
+#include "characters.h"
 #include "command.h"
 #include "dmcp.h"
 #include "expression.h"
@@ -71,6 +72,7 @@ RECORDER(user_interface,16, "ui processing");
 RECORDER(text_editor,   16, "Text editor");
 RECORDER(menus,         16, "Menu operations");
 RECORDER(help,          16, "On-line help");
+RECORDER(help_search,   16, "On-line help topic search");
 RECORDER(tests_ui,      16, "Test interaction with user interface");
 
 #define NUM_TOPICS      (sizeof(topics) / sizeof(topics[0]))
@@ -1001,6 +1003,17 @@ unicode user_interface::character_left_of_cursor()
     utf8    prev = ed + ppos;
     unicode code = utf8_codepoint(prev);
     return code;
+}
+
+
+bool user_interface::replace_character_left_of_cursor(unicode code)
+// ----------------------------------------------------------------------------
+//   Replace a character code
+// ----------------------------------------------------------------------------
+{
+    byte buf[4];
+    size_t sz = utf8_encode(code, buf);
+    return replace_character_left_of_cursor(buf, sz);
 }
 
 
@@ -2756,25 +2769,13 @@ void user_interface::load_help(utf8 topic, size_t len)
 //   Find the help message associated with the topic
 // ----------------------------------------------------------------------------
 {
-    record(help, "Loading help topic %s", topic);
+    record(help, "Loading help topic %.*s", len, topic);
 
     if (!len)
         len = strlen(cstring(topic));
     command   = nullptr;
     follow    = false;
     dirtyHelp = true;
-
-    // Need to have the help file open here
-    if (!helpfile.valid())
-    {
-        helpfile.open(HELPFILE_NAME);
-        if (!helpfile.valid())
-        {
-            help = -1u;
-            line = 0;
-            return;
-        }
-    }
     dirtyMenu = true;
 
     if (!memcmp(topic, "http", 4))
@@ -2787,121 +2788,146 @@ void user_interface::load_help(utf8 topic, size_t len)
         return;
     }
 
-     // Look for the topic in the file
-    int  matching = 0;
-    uint level    = 0;
-    bool hadcr    = true;
-    uint topicpos = 0;
+    // Check if this matches a command name. If so, we will search for
+    // alternate spellings as well
+    size_t     cmdlen = len;
+    object::id cmd = command::lookup(topic, cmdlen);
+    byte       ref[80];         // Length checked in the makefile
+    size_t     refidx   = 0;
+    if (cmdlen != len)
+        cmd = object::id(0);
+    record(help, "Length %u Command %u (%+s)", len, cmd, object::name(cmd));
 
-#if SIMULATOR
-    char debug[80];
-    uint debugindex = 0;
-#endif // SIMULATOR
+    // Look for the topic in the file
+    uint       level    = 0;
+    bool       hadcr    = true;
+    bool       matching = false;
+    uint       topicpos = 0;
+    bool       found    = false;
+    uint       idxpos   = 0;
 
-    helpfile.seek(0);
-    for (char c = helpfile.getchar(); c; c = helpfile.getchar())
+    // Check if the index exists. If so, scan it
     {
+        file_closer hfc(helpfile, HELPFILE_NAME);
+        file index(HELPINDEX_NAME, false);
+        if (index.valid())
+        {
+            for (char c = index.getchar(); !found && c; c = index.getchar())
+            {
+                if (c == '\n')
+                {
+                    uint filepos = atoi(cstring(ref));
+                    byte_p p = ref;
+                    byte_p end = ref + refidx;
+                    while (p < end && *p++ != ':')
+                        /* nop */;
+
+                    level = 0;
+                    while (p < end && *p++ == '#')
+                        level++;
+                    while (p < end && *p == ' ')
+                        p++;
+
+                    refidx = refidx - (p - ref);
+
+                    // For regular topics, just to a string comparison
+                    // We match markdown hyperlink style, i.e. case independent
+                    // and matching '-' in the topic to ' ' in the text
+                    found = refidx == len;
+                    for (uint i = 0; found && i < len; i++)
+                        found = (tolower(p[i]) == tolower(topic[i]) ||
+                                 (p[i] == ' ' && topic[i] == '-'));
+
+                    // If we do not match a direct comparison, check spellings
+                    // We only do that for second and third level sections
+                    if (!found && cmd && level >= 2)
+                        found = command::lookup(p, refidx) == cmd;
+
+                    if (found)
+                    {
+                        idxpos = filepos;
+                        break;
+                    }
+                    refidx = 0;
+                }
+                else
+                {
+                    ref[refidx++] = c;
+                }
+            }
+
+            // Not found in index, quit
+            if (!found)
+                goto notfound;
+            found = false;
+        }
+    }
+
+
+    // Need to have the help file open here
+    if (!helpfile.valid())
+    {
+        helpfile.open(HELPFILE_NAME);
+        if (!helpfile.valid())
+        {
+            help = -1u;
+            line = 0;
+            return;
+        }
+    }
+
+    helpfile.seek(idxpos);
+    for (char c = helpfile.getchar(); !found && c; c = helpfile.getchar())
+    {
+        // Reset topic after newline
         if (hadcr)
         {
             if (c == '#')
                 topicpos = helpfile.position() - 1;
-            matching = level = 0;
+            refidx = level = 0;
+            matching = false;
         }
 
-#if SIMULATOR
-        if (matching && debugindex < sizeof(debug) - 1)
-        {
-            debug[debugindex++] = c;
-            if (RECORDER_TRACE(help) > 2)
-            {
-                debug[debugindex] = 0;
-                record(help, "Matching %2d: Scanning %s", matching, debug);
-            }
-        }
-#endif // SIMULATOR
-
-        if (((hadcr || matching == 1) && c == '#') ||
-            (matching == 1 && c == ' '))
+        // Check if we start a line with # or ##, deduce topic level
+        if (c == '#' && (hadcr || !refidx))
         {
             level += c == '#';
-            matching = 1;
-#if SIMULATOR
-            debugindex = 0;
-#endif // SIMULATOR
-        }
-        else if (matching < 0)
-        {
-            if (c == '(' || c == ',')
-            {
-                matching = -2;
-                matching = 1;
-            }
-            else if (matching == -2 && c == ' ')
-            {
-                matching = 1;
-            }
-
-#if SIMULATOR
-            if (matching == 1 || c =='\n' || c == ')')
-            {
-                if (RECORDER_TRACE(help) > 1)
-                {
-                    debug[debugindex-1] = 0;
-                    if (debugindex > 1)
-                        record(help, "Scanning topic %s", debug);
-                }
-                debugindex = 0;
-            }
-#endif // SIMULATOR
+            matching = true;
+            refidx = 0;
         }
         else if (matching)
         {
-            if (uint(matching) == len + 1)
+            if (c != '\n')
             {
-                bool match = c == '\n' || c == ')' || c == ',' || c == ' ';
-                record(help, "%+s topic len %u at position %u next [%c]",
-                       match ? "Matched" : "Mismatched",
-                       len, helpfile.position(), c);
-                if (match)
-                    break;
-                matching = -1;
-            }
-
-            // Matching is case-independent, and matches markdown hyperlinks
-            else if (byte(c) == topic[matching-1] ||
-                tolower(c) == tolower(topic[matching-1]) ||
-                (c == ' ' && topic[matching-1] == '-'))
-            {
-                matching++;
-            }
-            else if (c == '\n')
-            {
-#if SIMULATOR
-                if (RECORDER_TRACE(help) > 1)
-                {
-                    debug[debugindex - 1] = 0;
-                    if (debugindex > 1)
-                        record(help, "Scanned topic %s", debug);
-                    debugindex = 0;
-                }
-#endif // SIMULATOR
-                matching = level = 0;
+                // Accumulate comparison topic
+                if (refidx < sizeof(ref) - 1)
+                    if (refidx || c != ' ')
+                        ref[refidx++] = c;
             }
             else
             {
-#if SIMULATOR
-                if (RECORDER_TRACE(help) > 2)
-                    record(help, "Mismatch at %u: %u != %u",
-                           matching, c, topic[matching-1]);
-#endif // SIMULATOR
-                matching = c == '(' ? -2 : -1;
+                ref[refidx] = 0;
+                record(help_search, "Checking %u: %s", level, ref);
+
+                // For regular topics, just to a string comparison
+                // We match markdown hyperlink style, i.e. case independent
+                // and matching '-' in the topic to ' ' in the text
+                found = refidx == len;
+                for (uint i = 0; found && i < len; i++)
+                    found = (tolower(ref[i]) == tolower(topic[i]) ||
+                             (ref[i] == ' ' && topic[i] == '-'));
+
+                // If we do not match a direct comparison, check all spellings
+                // We only do that for second and third level sections
+                if (!found && cmd && level >= 2)
+                    found = command::lookup(ref, refidx) == cmd;
             }
         }
         hadcr = c == '\n';
     }
 
     // Check if we found the topic
-    if (uint(matching) == len + 1)
+    if (found)
     {
         help = topicpos;
         line = 0;
@@ -2923,6 +2949,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     }
     else
     {
+    notfound:
         static char buffer[50];
         snprintf(buffer, sizeof(buffer), "No help for %.*s", int(len), topic);
         rt.command(object::static_object(object::ID_Help));
@@ -2957,6 +2984,7 @@ enum style_name
     BOLD,
     ITALIC,
     CODE,
+    VERBATIM,
     KEY,
     TOPIC,
     HIGHLIGHTED_TOPIC,
@@ -2964,41 +2992,12 @@ enum style_name
 };
 
 
-static coord draw_word(coord   x,
-                       coord   y,
-                       size_t  sz,
-                       unicode word[],
-                       font_p  font,
-                       pattern color)
-// ----------------------------------------------------------------------------
-//   Helper to draw a particular glyph
-// ----------------------------------------------------------------------------
-{
-    for (uint g = 0; g < sz; g++)
-        x = Screen.glyph(x, y, word[g], font, color);
-    return x;
-}
-
-
-static coord skip_word(coord   x,
-                       size_t  sz,
-                       unicode word[],
-                       font_p  font)
-// ----------------------------------------------------------------------------
-//   Helper to draw a particular glyph
-// ----------------------------------------------------------------------------
-{
-    for (uint g = 0; g < sz; g++)
-        x += font->width(word[g]);
-    return x;
-}
-
-
 bool user_interface::draw_help()
 // ----------------------------------------------------------------------------
 //    Draw the help content
 // ----------------------------------------------------------------------------
 {
+restart:
     if ((!force && !dirtyHelp && !dirtyStack) || freezeStack)
         return false;
     dirtyHelp = false;
@@ -3018,6 +3017,7 @@ bool user_interface::draw_help()
         { HelpBoldFont,     p::black,  p::white,   true, false, false, false },
         { HelpItalicFont,   p::black,  p::white,  false, true,  false, false },
         { HelpCodeFont,     p::black,  p::gray50, false, false, false, true  },
+        { HelpCodeFont,     p::black,  p::gray90, false, false, false, false },
         { HelpFont,         p::white,  p::black,  false, false, false, false },
         { HelpFont,         p::black,  p::gray50, false, false, true,  false },
         { HelpFont,         p::white,  p::gray10, false, false, false, false },
@@ -3061,7 +3061,9 @@ bool user_interface::draw_help()
     coord   y         = ytop + 2 - line;
     unicode last      = '\n';
     uint    lastTopic = 0;
+    uint    codeStart = 0;
     uint    shown     = 0;
+    bool    hadTitle  = false;
 
     // Pun not indented
     helpfile.seek(help);
@@ -3069,12 +3071,12 @@ bool user_interface::draw_help()
     // Display until end of help
     while (y < ybot)
     {
-        unicode word[60];
-        uint    widx       = 0;
-        bool    emit       = false;
-        bool    newline    = false;
-        bool    yellow     = false;
-        bool    blue       = false;
+        byte       buffer[80];
+        uint       widx    = 0;
+        bool       emit    = false;
+        bool       newline = false;
+        bool       yellow  = false;
+        bool       blue    = false;
         style_name restyle = style;
 
         if (!shown)
@@ -3095,7 +3097,12 @@ bool user_interface::draw_help()
             unicode ch   = helpfile.get();
             bool    skip = false;
 
-            switch (ch)
+            if (style == VERBATIM && ch != '`')
+            {
+                newline = ch == '\n';
+                emit = ch == '\n' || ch == ' ';
+            }
+            else switch (ch)
             {
             case 0:
                 emit = true;
@@ -3114,7 +3121,6 @@ bool user_interface::draw_help()
                 break;
 
             case '\n':
-
                 if (last == '\n' || last == ' ' || style <= SUBTITLE)
                 {
                     emit    = true;
@@ -3275,17 +3281,39 @@ bool user_interface::draw_help()
             case '`':
                 if (last != '`' && helpfile.peek() != '`')
                 {
-                    if (style   == CODE)
-                        restyle  = NORMAL;
-                    else
-                        restyle  = CODE;
-                    skip         = true;
-                    emit         = true;
+                    restyle = style == CODE ? NORMAL : CODE;
+                    skip    = true;
+                    emit    = true;
                 }
                 else
                 {
-                    if (last == '`')
-                        skip  = true;
+                    if (widx == 2 && buffer[0] == '`' && buffer[1] == '`')
+                    {
+                        bool wasCode = style == VERBATIM;
+                        skip = true;
+                        emit = true;
+                        newline = true;
+                        restyle = wasCode ? NORMAL : VERBATIM;
+
+                        // Skip until end of line, e.g. ```rpl
+                        widx = 0;
+                        do
+                        {
+                            ch = helpfile.get();
+                            buffer[widx] = ch;
+                            if (widx < 3)
+                                widx++;
+                        } while (ch && ch != '\n');
+                        bool rpl = (widx == 3 &&
+                                    tolower(buffer[0]) == 'r' &&
+                                    tolower(buffer[1]) == 'p' &&
+                                    tolower(buffer[2]) == 'l' &&
+                                    buffer[3] == '\n');
+                        widx = 0;
+
+                        if (rpl)
+                            codeStart = helpfile.position();
+                    }
                 }
                 break;
 
@@ -3298,9 +3326,14 @@ bool user_interface::draw_help()
                         if (topic < shown)
                             topic      = lastTopic;
                         if (lastTopic == topic)
+                        {
                             restyle    = HIGHLIGHTED_TOPIC;
+                            codeStart  = 0;
+                        }
                         else
+                        {
                             restyle    = TOPIC;
+                        }
                         skip           = true;
                         emit           = true;
                     }
@@ -3318,7 +3351,7 @@ bool user_interface::draw_help()
                 if (style == TOPIC || style == HIGHLIGHTED_TOPIC)
                 {
                     unicode n  = helpfile.get();
-                    if (n     != '(')
+                    if (n != '(')
                     {
                         ch      = n;
                         restyle = NORMAL;
@@ -3327,25 +3360,22 @@ bool user_interface::draw_help()
                     }
 
                     static char  link[60];
-                    char        *p  = link;
-                    while (n       != ')')
+                    char        *p = link;
+                    while (n != ')')
                     {
                         n      = helpfile.get();
                         if (n != '#')
                             if (p < link + sizeof(link))
                                 *p++ = n;
                     }
-                    if (p < link + sizeof(link))
+                    p[-1] = 0;
+                    if (follow && style == HIGHLIGHTED_TOPIC)
                     {
-                        p[-1]                = 0;
-                        if (follow && style == HIGHLIGHTED_TOPIC)
-                        {
-                            if (topics_history)
-                                topics[topics_history-1] = shown;
-                            load_help(utf8(link));
-                            Screen.clip(clip);
-                            return draw_help();
-                        }
+                        if (topics_history)
+                            topics[topics_history-1] = shown;
+                        load_help(utf8(link));
+                        Screen.clip(clip);
+                        goto restart;
                     }
                     restyle = NORMAL;
                     emit    = true;
@@ -3365,8 +3395,8 @@ bool user_interface::draw_help()
             }
 
             if (!skip)
-                word[widx++]  = ch;
-            if (widx         >= sizeof(word) / sizeof(word[0]))
+                widx += utf8_encode(ch, buffer+widx);
+            if (widx         >= sizeof(buffer) / sizeof(buffer[0]) - 3)
                 emit          = true;
             last              = ch;
         }
@@ -3375,10 +3405,61 @@ bool user_interface::draw_help()
         font              = styles[style].font;
         height            = font->height();
 
+        // If we are rendering a command name, follow user preferences
+        if (style == SUBTITLE || style == CODE)
+        {
+            size_t cmdlen = widx;
+            if (object::id cmd = command::lookup(buffer, cmdlen))
+            {
+                if (cmdlen == widx)
+                {
+                    object_p cmdobj = object::static_object(cmd);
+                    widx = cmdobj->render((char *) buffer, sizeof(buffer) - 1);
+
+                    if (style == SUBTITLE)
+                    {
+                        font_p  af    = HelpFont;
+                        coord ay    = y;
+                        coord ah    = af->height();
+                        int   count = 0;
+
+                        cstring ref = cstring(buffer);
+                        if (widx >= sizeof(buffer))
+                            widx = sizeof(buffer)-1;
+                        buffer[widx] = 0;
+
+                        for (size_t i = 0; i < object::spelling_count; i++)
+                            if (cmd == object::spellings[i].type)
+                                if (cstring name = object::spellings[i].name)
+                                    if (strcasecmp(name, ref))
+                                        count++;
+                        if (count * ah > height * 5 / 4)
+                            ay -= count * ah - height * 5 / 4;
+
+                        for (size_t i = 0; i < object::spelling_count; i++)
+                        {
+                            if (cmd == object::spellings[i].type)
+                            {
+                                if (cstring name = object::spellings[i].name)
+                                {
+
+                                    if (strcasecmp(name, ref))
+                                    {
+                                        size awidth = af->width(utf8(name));
+                                        coord ax = xright - awidth - 1;
+                                        Screen.text(ax, ay, utf8(name), af);
+                                        ay += ah;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Compute width of word (or words in the case of titles)
-        coord width = 0;
-        for (uint i  = 0; i < widx; i++)
-            width += font->width(word[i]);
+        coord width = font->width(buffer, widx);
         size kwidth = 0;
         if (style == KEY)
         {
@@ -3390,16 +3471,23 @@ bool user_interface::draw_help()
         {
             // Center titles
             x  = (LCD_W - width) / 2;
-            y += 3 * height / 4;
+            if (widx && !hadTitle)
+                y += (4 - 3 * style) * height / 4;
+            hadTitle = true;
         }
         else
         {
             // Go to new line if this does not fit
             coord right  = x + width;
-            if (right   >= xright - 1)
+            if (right >= xright - 1)
             {
                 x = xleft;
                 y += height;
+            }
+            if (widx && hadTitle)
+            {
+                y += 5 * height / 4;
+                hadTitle = false;
             }
         }
 
@@ -3416,6 +3504,11 @@ bool user_interface::draw_help()
         // Draw a decoration
         coord xl = x;
         coord xr = x + width;
+
+        if (restyle == style && x == xleft)
+            if (style == VERBATIM)
+                Screen.fill(xleft, y - 2, xright, y + height * 5 / 4 - 3, bg);
+
         if (underline)
         {
             if (draw)
@@ -3465,11 +3558,11 @@ bool user_interface::draw_help()
                 }
                 coord x0 = x;
                 for (int b = 0; b <= bold; b++)
-                    x = draw_word(x0 + b, y, widx, word, font, color);
+                    x = Screen.text(x0+b, y, buffer, widx, font, color);
             }
             else
             {
-                x = skip_word(x + bold, widx, word, font);
+                x += bold + font->width(buffer, widx);
             }
             x += kwidth;
         }
@@ -3518,21 +3611,54 @@ bool user_interface::draw_help()
             imdsp = false;
         }
 
-        // Select style for next round
-        style = restyle;
-
         if (newline)
         {
             xleft  = r.x1 + 2;
             x = xleft;
-            y += height * 5 / 4;
+            if (!hadTitle)
+                y += height * 5 / 4;
         }
+        if (style <= SUBTITLE)
+            y += height / 2;
+
+        // Select style for next round
+        style = restyle;
     }
 
     if (helpfile.position() < topic)
         topic = lastTopic;
 
     Screen.clip(clip);
+
+    if (follow && codeStart)
+    {
+        helpfile.seek(codeStart);
+        uint codeEnd = 0;
+        uint markers = 0;
+        while (unicode c = helpfile.get())
+        {
+            if (c == '`')
+            {
+                if (!markers)
+                    codeEnd = helpfile.position() - 2; // Remove last \n
+                markers++;
+                if (markers == 3)
+                    break;
+            }
+            else
+            {
+                markers = 0;
+            }
+        }
+        helpfile.seek(codeStart);
+        while (helpfile.position() < codeEnd)
+        {
+            unicode c = helpfile.get();
+            edit(c, TEXT, false);
+        }
+        clear_help();
+        dirtyHelp = true;
+    }
     follow = false;
     return true;
 }
@@ -3551,6 +3677,8 @@ bool user_interface::noHelpForKey(int key)
 
     // No help in alpha mode
     if (alpha && key < KEY_F1)
+        return true;
+    if (transalpha)
         return true;
 
     if (editing)
@@ -4246,6 +4374,29 @@ bool user_interface::handle_editing(int key)
         }
     }
 
+    // Transient alpha editor keys (bring up the editor if needed)
+    switch(key)
+    {
+    case KEY_F1:
+        return handle_editing_command(EditMenu::ID_EditorSelect,
+                                      EditMenu::ID_EditorFlip);
+    case KEY_F2:
+        return handle_editing_command(EditMenu::ID_EditorWordLeft,
+                                      EditMenu::ID_EditorBegin);
+    case KEY_F3:
+        return handle_editing_command(EditMenu::ID_EditorWordRight,
+                                      EditMenu::ID_EditorEnd);
+    case KEY_F4:
+        return handle_editing_command(EditMenu::ID_EditorSearch,
+                                      EditMenu::ID_EditorReplace);
+    case KEY_F5:
+        return handle_editing_command(EditMenu::ID_EditorCut,
+                                      EditMenu::ID_EditorCopy);
+    case KEY_F6:
+        return handle_editing_command(EditMenu::ID_EditorPaste,
+                                      EditMenu::ID_EditorClear);
+    }
+
     if (isEditing)
     {
         record(user_interface, "Editing key %d", key);
@@ -4270,12 +4421,21 @@ bool user_interface::handle_editing(int key)
             else
             {
                 utf8 ed = rt.editor();
-                if (shift && cursor < isEditing)
+
+                if (~select && select != cursor)
+                {
+                    editor_clear();
+                }
+                else if (shift && cursor < isEditing)
                 {
                     // Shift + Backspace = Delete to right of cursor
                     uint after = utf8_next(ed, cursor, isEditing);
-                    if (utf8_codepoint(ed + cursor) == '\n')
+                    unicode cp = utf8_codepoint(ed + cursor);
+                    if (cp == '\n')
                         edRows = 0;
+                    else if (cp == Settings.BasedSeparator() ||
+                             cp == Settings.NumberSeparator())
+                        after = utf8_next(ed, after, isEditing);
                     remove(cursor, after - cursor);
                 }
                 else if (!shift && cursor > 0)
@@ -4284,8 +4444,12 @@ bool user_interface::handle_editing(int key)
                     utf8 ed      = rt.editor();
                     uint before  = cursor;
                     cursor       = utf8_previous(ed, cursor);
-                    if (utf8_codepoint(ed + cursor) == '\n')
+                    unicode cp = utf8_codepoint(ed + cursor);
+                    if (cp == '\n')
                         edRows = 0;
+                    else if (cp == Settings.BasedSeparator() ||
+                             cp == Settings.NumberSeparator())
+                        cursor = utf8_previous(ed, cursor);
                     remove(cursor, before - cursor);
                 }
                 else
@@ -4491,10 +4655,40 @@ bool user_interface::handle_editing(int key)
                 return true;
             }
             break;
+
         }
     }
 
     return consumed;
+}
+
+
+bool user_interface::handle_editing_command(object::id lo, object::id hi)
+// ----------------------------------------------------------------------------
+//   Handle F1-F6 in transient alpha mode
+// ----------------------------------------------------------------------------
+{
+    if (!transalpha)
+        return false;
+
+    // All these commands are editing commands, edit if needed
+    if (!rt.editing())
+    {
+        if (!rt.depth())
+            return false;
+
+        if (object_p obj = rt.pop())
+        {
+            editing = obj;
+            editingLevel = 0;
+            obj->edit();
+            dirtyEditor = true;
+        }
+    }
+
+    object_p cmd = command::static_object(lowercase ? lo : hi);
+    cmd->evaluate();
+    return true;
 }
 
 
@@ -4576,6 +4770,26 @@ bool user_interface::handle_alpha(int key)
     }
     else
     {
+        if (menu_p m = menu())
+        {
+            menu::id mid = m->type();
+            if (mid >= menu::ID_CharactersMenu00 &&
+                mid <= menu::ID_CharactersMenu99)
+            {
+                character_menu_p cm = character_menu_p(m);
+                if (cm->transliterate(c))
+                {
+                    size_t edlen = rt.editing();
+                    utf8   ed    = rt.editor();
+                    if (ed && edlen)
+                    {
+                        uint ppos = utf8_previous(ed, cursor);
+                        if (ppos != cursor)
+                            remove(ppos, cursor - ppos);
+                    }
+                }
+            }
+        }
         edit(c, DIRECT);
         if (c == '"')
             alpha = true;
@@ -5319,6 +5533,7 @@ bool user_interface::editor_word_right()
         else
         {
             editor_history(true);
+            cursor = rt.editing();
         }
     }
     return true;
@@ -5738,6 +5953,7 @@ void debug_printf(int row, cstring format, ...)
         coord y = row * h;
         Screen.text(0, y, utf8(buffer), HelpFont, pattern::white, pattern::black);
         ui.draw_dirty(0, y, LCD_W, y + h - 1);
+        refresh_dirty();
     }
 }
 

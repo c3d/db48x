@@ -10,7 +10,7 @@ Library items are defined by the `config/library.csv`, and accessed using the
 `Library` command or the `XLib` command.
 
 
-## Constant (CONST)
+## Constant
 
 Returns the value of a constant from the constants library.
 The name can be given as a symbol or as text.
@@ -18,7 +18,7 @@ The name can be given as a symbol or as text.
 `'c'` ▶ `299792458_m/s`
 
 
-## LibraryEquation (LIBEQ)
+## LibraryEquation
 
 Returns the value of a library equation from the equation library.
 The name can be given as a symbol or as text.
@@ -26,7 +26,7 @@ The name can be given as a symbol or as text.
 `"RelativityMassEnergy"` ▶ `"'E=m*c^2'"`
 
 
-## LibraryItem (XLIB)
+## LibraryItem
 
 Returns the value of a library item from the library.
 The name can be given as a symbol or as text.

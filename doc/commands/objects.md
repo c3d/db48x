@@ -40,7 +40,7 @@ cycle as follows:
 * `0.1_m` at which point the cycle repeats.
 
 
-## Explode (OBJ→)
+## Explode
 
 Explode an object into its sub-components. The various sub-components are placed
 on the stack, and if necessary, information about the size is places on the
@@ -66,3 +66,19 @@ first level of the stack.
 
 * Text is evaluated as if it had been executed on the command line, in a way
   similar to the `STR→` command.
+
+
+## →Program
+
+Convert an object into a program.
+
+* Algebraic expressions or polynomials are converted to an equivalent
+  RPL program. For example, `'sin(X+2*Y)'` will be converted as
+  `« X 2 Y × + sin »`
+
+* Lists are converted to a program with the exact same structure.
+  For example, `{ 1 2 + }` will be converted to `« 1 2 + »`.
+
+* Other objects are simply wrapped in a program.
+  For example, `1.2` will be converted to `« 1.2 »`
+  Note that this applies to programs as well.

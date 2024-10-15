@@ -49,62 +49,11 @@ RECORDER(solve, 16, "Numerical solver");
 RECORDER(solve_error, 16, "Numerical solver errors");
 
 
-NFUNCTION_BODY(Root)
-// ----------------------------------------------------------------------------
-//   Numerical solver
-// ----------------------------------------------------------------------------
-{
-    if (arity != 3)
-    {
-        rt.internal_error();
-        return nullptr;
-    }
-    algebraic_g &eqobj    = args[2];
-    algebraic_g &variable = args[1];
-    algebraic_g &guess    = args[0];
-    if (!eqobj || !variable || !guess)
-        return nullptr;
-
-    record(solve, "Solving %t for variable %t with guess %t",
-           +eqobj, +variable, +guess);
-
-    // Check that we have a variable name on stack level 1 and
-    // a proram or equation on level 2
-    symbol_g name = variable->as_quoted<symbol>();
-    id       eqty = eqobj->type();
-    if (eqty == ID_equation)
-    {
-        eqobj = algebraic_p(equation_p(+eqobj)->value());
-        if (!eqobj || !eqobj->is_algebraic())
-            return nullptr;
-        eqty = eqobj->type();
-    }
-    if ((eqty != ID_program && eqty != ID_expression) || !name)
-    {
-        rt.type_error();
-        return nullptr;
-    }
-
-    if (!eqobj->is_program())
-    {
-        rt.invalid_equation_error();
-        return nullptr;
-    }
-
-    // Actual solving
-    program_g eq = program_p(+eqobj);
-    if (algebraic_g x = solve(eq, +name, +guess))
-    {
-        size_t   nlen = 0;
-        gcutf8   ntxt = name->value(&nlen);
-        object_g top  = tag::make(ntxt, nlen, +x);
-        if (top && !rt.error())
-            return algebraic_p(+top);
-    }
-
-    return nullptr;
-}
-
+// ============================================================================
+//
+//   Numerical solver engine
+//
+// ============================================================================
 
 static inline void solver_command_error()
 // ----------------------------------------------------------------------------
@@ -115,7 +64,35 @@ static inline void solver_command_error()
 }
 
 
-algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
+static bool store(algebraic_r value)
+// ----------------------------------------------------------------------------
+//   Store the last computed value of the variable
+// ----------------------------------------------------------------------------
+{
+    if (expression::independent && +value)
+        return directory::store_here(*expression::independent, value);
+    return false;
+}
+
+
+static algebraic_p recall(algebraic_r name)
+// ----------------------------------------------------------------------------
+//   Recall the current value for the given name
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = directory::recall_all(name, true))
+    {
+        if (algebraic_p alg = obj->as_algebraic())
+        {
+            if (symbol_p sym = name->as_quoted<symbol>())
+                alg = algebraic_p(tag::make(sym, alg));
+            return alg;
+        }
+    }
+    return nullptr;
+}
+
+algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 // ----------------------------------------------------------------------------
 //   The core of the solver
 // ----------------------------------------------------------------------------
@@ -123,17 +100,18 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
     // Check if the guess is an algebraic or if we need to extract one
     algebraic_g x, dx, lx, hx, nx, px;
     algebraic_g y, dy, ly, hy;
-    object::id  gty = guess->type();
+    id  gty = guess->type();
     save<bool>  nodates(unit::nodates, true);
 
     // Convert A=B+C into A-(B+C)
-    if (eq->type() == object::ID_expression)
+    program_g eq = pgm;
+    if (eq->type() == ID_expression)
         if (expression_g diff = expression_p(+eq)->as_difference_for_solve())
             if (+diff != +eq)
                 eq = +diff;
 
     // Check if low and hight values were given explicitly
-    if (gty == object::ID_list || gty == object::ID_array)
+    if (is_array_or_list(gty))
     {
         lx = guess->algebraic_child(0);
         hx = guess->algebraic_child(1);
@@ -150,12 +128,12 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
     }
 
     // Check if the variable we solve for is a unit
-    unit_g      uname = goal->as<unit>();
+    unit_g      uname = unit::get(goal);
     algebraic_g uexpr;
-    if (uname || lx->type() == object::ID_unit || hx->type() == object::ID_unit)
+    if (uname || lx->type() == ID_unit || hx->type() == ID_unit)
     {
-        unit_g lu = lx->as<unit>();
-        unit_g hu = hx->as<unit>();
+        unit_g lu = unit::get(lx);
+        unit_g hu = unit::get(hx);
         if (uname)
             uexpr = uname->uexpr();
         else if (lu)
@@ -235,7 +213,10 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
 
         // If we are starting to use really big numbers, switch to decimal
         if (!algebraic::to_decimal_if_big(x))
+        {
+            store(x);
             return x;
+        }
 
         // Evaluate equation
         y = algebraic::evaluate_function(eq, x);
@@ -245,7 +226,7 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
         {
             if (algebraic_g neps = abs::run(y) * yeps)
             {
-                if (unit_p ru = neps->as<unit>())
+                if (unit_p ru = unit::get(neps))
                     neps = ru->value();
                 if (smaller_magnitude(yeps, neps))
                     yeps = neps;
@@ -262,6 +243,7 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 if (!rt.error())
                     rt.bad_guess_error();
                 solver_command_error();
+                store(x);
                 return nullptr;
             }
             bad = true;
@@ -269,13 +251,14 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
         else
         {
             is_valid = true;
-            if (unit_p yu = y->as<unit>())
+            if (unit_p yu = unit::get(y))
                 dy = yu->value();
             else
                 dy = y;
             if (dy->is_zero() || smaller_magnitude(dy, yeps))
             {
                 record(solve, "[%u] Solution=%t value=%t", i, +x, +y);
+                store(x);
                 return x;
             }
 
@@ -333,7 +316,10 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
             // Check the x interval
             dx = hx - lx;
             if (!dx)
+            {
+                store(x);
                 return nullptr;
+            }
             dy = hx + lx;
             if (!dy || dy->is_zero(false))
                 dy = yeps;
@@ -348,13 +334,17 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 else
                     rt.no_solution_error();
                 solver_command_error();
+                store(x);
                 return x;
             }
 
             // Check the y interval
             dy = hy - ly;
             if (!dy)
+            {
+                store(x);
                 return nullptr;
+            }
             if (dy->is_zero(false))
             {
                 record(solve,
@@ -376,6 +366,7 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 if (!rt.error())
                     rt.invalid_function_error();
                 solver_command_error();
+                store(x);
                 return x;
             }
         }
@@ -390,7 +381,10 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 dx = integer::make(2);
                 x  = (nx + px) / dx;
                 if (!x)
+                {
+                    store(nx);
                     return nullptr;
+                }
             }
             else
             {
@@ -399,7 +393,7 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 if (x && x->is_complex())
                     dx = polar::make(integer::make(997 * s * i),
                                      integer::make(421 * s * i * i),
-                                     object::ID_Deg);
+                                     ID_Deg);
                 else
                     dx = integer::make(0x1081 * s * i);
                 dx = dx * yeps;
@@ -408,7 +402,10 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
                 else
                     x = x + x * dx;
                 if (!x)
+                {
+                    store(dx);
                     return nullptr;
+                }
                 record(solve, "Jitter x=%t", +x);
             }
         }
@@ -425,8 +422,257 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
         rt.no_solution_error();
     if (rt.error())
         solver_command_error();
-    return lx;
+    store(x);
+    return nullptr;
 }
+
+
+algebraic_p Root::solve(algebraic_r eq,
+                        algebraic_r var,
+                        algebraic_r guess)
+// ----------------------------------------------------------------------------
+//   Internal solver code
+// ----------------------------------------------------------------------------
+//   This selects between three modes of operation:
+//   1- Single expression, solving using simple Newton-Raphson in solve():
+//       a) eq is an expression or program
+//       b) var is a symbol
+//       c) guess is a real, complex or an array/list [ low high ]
+//   2- Multiple expressions, solving one variable at a time (HP's MES)
+//       a) eq is an array/list of expressions or programs
+//       b) var is an array/list of symbols
+//       c) guess is an array/list of real, complex or [low,high] items
+//       d) where we can solve one variable at a time.
+//      Specifically, at any point, there is at least one variable where we can
+//      find at least one equation where all other variables are defined,
+//      meaning that we can find the value of the variable by invoking the
+//      single-expression solver.
+//   3- Multi-solver, similar to HP's MSLV, with conditions 2a, 2b and 2c.
+//      In this case, we use a multi-dimensional Newton-Raphson.
+{
+    if (!eq || !var || !guess)
+        return nullptr;
+
+    record(solve, "Solving %t for variable %t with guess %t",
+           +eq, +var, +guess);
+
+    // Check if we have a list of variables to solve for
+    if (list_g vars = var->as_array_or_list())
+    {
+        list_g eqs = eq->as_array_or_list();
+        if (!eqs)
+            eqs = list::make(ID_list, eq);
+        list_g guesses = guess->as_array_or_list();
+        if (!guesses)
+            guesses = list::make(ID_list, guess);
+        return algebraic_p(multiple_equation_solver(eqs, vars, guesses));
+    }
+
+    // Check that we have a variable name on stack level 1 and
+    // a proram or equation on level 2
+    program_g pgm   = program_p(+eq);
+    id        pgmty = pgm->type();
+    if (pgmty == ID_equation)
+    {
+        pgm = expression::get(equation_p(+pgm)->value());
+        if (!pgm || !pgm->is_algebraic())
+            return nullptr;
+        pgmty = pgm->type();
+    }
+
+    if (pgmty != ID_program && pgmty != ID_expression)
+    {
+        rt.type_error();
+        return nullptr;
+    }
+
+    if (!pgm->is_program())
+    {
+        rt.invalid_equation_error();
+        return nullptr;
+    }
+
+    // Actual solving
+    if (algebraic_g x = solve(pgm, var, guess))
+    {
+        if (symbol_p name = var->as_quoted<symbol>())
+            x = algebraic_p(tag::make(name, +x));
+        if (x && !rt.error())
+            return x;
+    }
+
+    return nullptr;
+}
+
+
+list_p Root::multiple_equation_solver(list_r eqs,
+                                      list_r names,
+                                      list_r guesses)
+// ----------------------------------------------------------------------------
+//   Solve multiple equations in sequence (equivalent to HP's MES)
+// ----------------------------------------------------------------------------
+{
+    if (!eqs || !names || !guesses)
+        return nullptr;
+
+    // Check that we have names as variables
+    size_t vcount = 0;
+    for (object_p obj : *names)
+    {
+        if (!obj->as_quoted<symbol>() && !unit::get(obj))
+        {
+            rt.type_error();
+            return nullptr;
+        }
+        vcount++;
+    }
+
+    // Check that the list of guesses contains real or complex values
+    size_t gcount = 0;
+    for (object_p obj : *guesses)
+    {
+        id ty = obj->type();
+        if (!is_real(ty) && !is_complex(ty))
+        {
+            rt.type_error();
+            return nullptr;
+        }
+        gcount++;
+    }
+
+    // Number of guesses and variables should match
+    if (gcount != vcount)
+    {
+        rt.dimension_error();
+        return nullptr;
+    }
+
+    // Looks good: loop on equations trying to find one we can solve
+    size_t ecount = eqs->items();
+    list_g vars   = names;
+
+    // While there are variables to solve for
+    while (vcount && ecount)
+    {
+        list::iterator vi = vars->begin();
+        list::iterator gi = guesses->begin();
+        bool           found = false;
+
+        // Loop on all variables, looking for one we can solve for
+        for (size_t v = 0; !found && v < vcount; v++)
+        {
+            symbol_g var = (*vi)->as_quoted<symbol>();
+            if (!var)
+            {
+                rt.type_error();
+                return nullptr;
+            }
+            list::iterator ei = eqs->begin();
+            for (size_t e = 0; !found && e < ecount; e++)
+            {
+                expression_g eq = expression::get(*ei);
+                if (!eq)
+                {
+                    if (!rt.error())
+                        rt.type_error();
+                    return nullptr;
+                }
+                if (eq->is_well_defined(var, false))
+                {
+                    program_g   pgm    = +eq;
+                    algebraic_g name   = +var;
+                    algebraic_p guess  = algebraic_p(*gi);
+                    algebraic_g solved = solve(pgm, name, guess);
+                    if (!solved)
+                    {
+                        rt.no_solution_error();
+                        return nullptr;
+                    }
+
+                    // That's one variable less to deal with
+                    vars = vars->remove(v);
+                    vcount--;
+                    found = true;
+                }
+                ++ei;
+            }
+            ++vi;
+            ++gi;
+        }
+    }
+
+    list_g result = names->map(recall);
+    return result;
+}
+
+
+
+
+// ============================================================================
+//
+//   User-level solver commands
+//
+// ============================================================================
+
+NFUNCTION_BODY(Root)
+// ----------------------------------------------------------------------------
+//   Numerical solver
+// ----------------------------------------------------------------------------
+//   The DB48X numerical solver unifies what is `ROOT` and `MSLV` on HP50G.
+//   - With a single variable, e.g. `ROOT(sin(X)=0.5;X;0.5)`, it solves for
+//     the given variable
+//   - With multiple variables in a list or array, it solves for the variables
+//     in turn, in the
+{
+    algebraic_r eqobj    = args[2];
+    algebraic_r variable = args[1];
+    algebraic_r guess    = args[0];
+    return solve(eqobj, variable, guess);
+}
+
+
+NFUNCTION_BODY(MultipleEquationsSolver)
+// ----------------------------------------------------------------------------
+//   Solve a set of equations one at a time
+// ----------------------------------------------------------------------------
+//   On DB48X, there is no difference between `MSLV` and `ROOT`
+{
+    return Root::evaluate(op, args, arity);
+}
+
+
+static algebraic_p check_name(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Check if the name exists, if so return its value, otherwise return 0
+// ----------------------------------------------------------------------------
+{
+    if (symbol_p name = x->as_quoted<symbol>())
+    {
+        if (object_p value = directory::recall_all(name, false))
+        {
+            if (value->is_real() || value->is_complex())
+                return algebraic_p(value);
+        }
+    }
+    return integer::make(0);
+}
+
+
+COMMAND_BODY(MultipleEquationsRoots)
+// ----------------------------------------------------------------------------
+//   Apply the multiple equation solver to the contents of EQ
+// ----------------------------------------------------------------------------
+{
+    if (list_g eqs = expression::current_equation(true, true))
+        if (list_g vars = eqs->names())
+            if (list_g values = vars->map(check_name))
+                if (rt.push(+eqs) && rt.push(+vars) && rt.push(+values))
+                    return run<Root>();
+    if (!rt.error())
+        rt.no_equation_error();
+    return ERROR;
+}
+
 
 
 // ============================================================================
@@ -434,36 +680,6 @@ algebraic_p solve(program_g eq, algebraic_g goal, object_g guess)
 //   Solving menu
 //
 // ============================================================================
-
-static bool is_well_defined(expression_r expr, symbol_p solving = nullptr)
-// ----------------------------------------------------------------------------
-//   Check if all variables but the one we solve for are defined
-// ----------------------------------------------------------------------------
-{
-    symbol_g sym = solving;
-    list_p vars = expr->names();
-    for (auto var : *vars)
-    {
-        if (symbol_p vsym = var->as<symbol>())
-        {
-            if (!sym || !sym->is_same_as(vsym))
-            {
-                if (!directory::recall_all(var, false))
-                {
-                    rt.some_undefined_name_error();
-                    return false;
-                }
-            }
-        }
-        else
-        {
-            rt.some_invalid_name_error();
-            return false;
-        }
-    }
-    return true;
-}
-
 
 COMMAND_BODY(StEq)
 // ----------------------------------------------------------------------------
@@ -473,7 +689,7 @@ COMMAND_BODY(StEq)
     if (object_p obj = rt.top())
     {
         id objty = obj->type();
-        if (objty == ID_list || objty == ID_array)
+        if (is_array_or_list(objty))
         {
             for (object_p i: *list_p(obj))
             {
@@ -500,7 +716,7 @@ COMMAND_BODY(RcEq)
 //   Store expression in `Equation` variable
 // ----------------------------------------------------------------------------
 {
-    if (expression_p expr = expression::current_equation(true))
+    if (list_p expr = expression::current_equation(false, true))
         if (rt.push(expr))
             return OK;
     return ERROR;
@@ -524,7 +740,7 @@ COMMAND_BODY(NextEq)
                 ty = obj->type();
         }
 
-        if (ty == ID_list || ty == ID_array)
+        if (is_array_or_list(ty))
         {
             size_t sz = 0;
             if (list_p(obj)->expand_without_size(&sz))
@@ -548,9 +764,10 @@ COMMAND_BODY(EvalEq)
 //   Evaluate the current equation
 // ----------------------------------------------------------------------------
 {
-    if (expression_g expr = expression::current_equation(true))
+    if (list_g eq = expression::current_equation(false, true))
     {
-        if (is_well_defined(expr))
+        expression_p expr = eq->as<expression>();
+        if (expr && expr->is_well_defined())
         {
             // We will run programs, do not save stack, etc.
             settings::PrepareForFunctionEvaluation willEvaluateFunctions;
@@ -581,6 +798,8 @@ COMMAND_BODY(EvalEq)
             }
         }
     }
+    if (!rt.error())
+        rt.no_equation_error();
     return ERROR;
 }
 
@@ -590,10 +809,11 @@ MENU_BODY(SolvingMenu)
 //   Process the MENU command for SolvingMenu
 // ----------------------------------------------------------------------------
 {
-    expression_p expr   = expression::current_equation(false);
-    list_g       vars   = expr ? expr->names() : nullptr;
-    size_t       nitems = vars ? vars->items() : 0;
-    items_init(mi, nitems+1, 3, 1);
+    bool   all    = Settings.AllEquationVariables();
+    list_p expr   = expression::current_equation(all, false);
+    list_g vars   = expr ? expr->names() : nullptr;
+    size_t nitems = vars ? vars->items() : 0;
+    items_init(mi, nitems + 1, 3, 1);
     if (!vars)
         return false;
 
@@ -645,7 +865,7 @@ MENU_BODY(SolvingMenu)
         ui.marker(k + 2 * ui.NUM_SOFTKEYS, L'▶', false);
     }
 
-    if (expression_p expr = expression::current_equation(false))
+    if (list_p expr = expression::current_equation(false, false))
         ui.transient_object(expr);
 
     return true;
@@ -657,7 +877,8 @@ static symbol_p expression_variable(uint index)
 //   Return the variable in EQ for a given index
 // ----------------------------------------------------------------------------
 {
-    if (expression_p expr = expression::current_equation(true))
+    bool all = Settings.AllEquationVariables();
+    if (list_p expr = expression::current_equation(all, true))
         if (list_g vars = expr->names())
             if (object_p obj = vars->at(index))
                 if (symbol_p sym = obj->as<symbol>())
@@ -671,7 +892,8 @@ static algebraic_p expression_variable_or_unit(uint index)
 //   Return the unit in EQ for a given index if there is one, otherwise name
 // ----------------------------------------------------------------------------
 {
-    if (expression_p expr = expression::current_equation(true))
+    bool all = Settings.AllEquationVariables();
+    if (list_p expr = expression::current_equation(all, true))
     {
         if (list_g vars = expr->names(true))
         {
@@ -679,24 +901,12 @@ static algebraic_p expression_variable_or_unit(uint index)
             {
                 if (symbol_p sym = obj->as<symbol>())
                     return sym;
-                if (unit_p u = obj->as<unit>())
+                if (unit_p u = unit::get(obj))
                     return u;
             }
         }
     }
     return nullptr;
-}
-
-
-static tag_p tagged_value(symbol_p sym, object_p value)
-// ----------------------------------------------------------------------------
-//  Tag a solver value with a symbol
-// ----------------------------------------------------------------------------
-{
-    size_t nlen   = 0;
-    gcutf8 ntxt   = sym->value(&nlen);
-    tag_p  tagged = tag::make(ntxt, nlen, value);
-    return tagged;
 }
 
 
@@ -711,7 +921,7 @@ COMMAND_BODY(SolvingMenuRecall)
         uint index = key - KEY_F1 + 5 * ui.page() - 1;
         if (symbol_g sym = expression_variable(index))
             if (object_p value = directory::recall_all(sym, true))
-                if (tag_p tagged = tagged_value(sym, value))
+                if (tag_p tagged = tag::make(sym, value))
                     if (rt.push(tagged))
                         return OK;
     }
@@ -748,13 +958,13 @@ COMMAND_BODY(SolvingMenuStore)
                         if (ui.menu_refresh())
                             return OK;
 
-                if (unit_g uvar = entry->as<unit>())
+                if (unit_g uvar = unit::get(entry))
                 {
                     if (symbol_g sym = symbol_p(uvar->value()))
                     {
                         if (algebraic_g sval = value->as_algebraic())
                         {
-                            unit_g uval = value->as<unit>();
+                            unit_g uval = unit::get(value);
                             if (uval)
                             {
                                 if (!uvar->convert(uval))
@@ -801,21 +1011,23 @@ COMMAND_BODY(SolvingMenuSolve)
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
-        uint index = key - KEY_F1 + 5 * ui.page() - 1;
-        if (symbol_g sym = expression_variable(index))
+        uint idx = key - KEY_F1 + 5 * ui.page() - 1;
+        if (symbol_g sym = expression_variable(idx))
         {
-            object_g value = directory::recall_all(sym, false);
+            object_g obj = directory::recall_all(sym, false);
+            algebraic_g value = obj ? obj->as_algebraic() : nullptr;
             if (!value)
                 value = integer::make(0);
-            if (expression_g eq = expression::current_equation(true))
-                if (value && is_well_defined(eq, sym))
-                    if (algebraic_p var = expression_variable_or_unit(index))
-                        if (algebraic_g result = solve(+eq, var, value))
-                            if (directory::store_here(sym, result))
-                                if (tag_p tagged = tagged_value(sym, result))
-                                    if (rt.push(tagged))
-                                        if (ui.menu_refresh())
-                                            return OK;
+            if (list_g eql = expression::current_equation(false, true))
+                if (program_g eq = eql->as<expression>())
+                    if (value && expression_p(+eq)->is_well_defined(sym))
+                        if (algebraic_p var = expression_variable_or_unit(idx))
+                            if (algebraic_g res = Root::solve(eq, var, value))
+                                if (directory::store_here(sym, res))
+                                    if (tag_p tagged = tag::make(sym, res))
+                                        if (rt.push(tagged))
+                                            if (ui.menu_refresh())
+                                                return OK;
         }
     }
 

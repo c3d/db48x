@@ -210,7 +210,8 @@ struct case_skip_conditional : conditional
 
 // The stack-based forms
 COMMAND_DECLARE(IFT,2);
-COMMAND_DECLARE(IFTE,3);
+COMMAND_DECLARE_SPECIAL(IFTE,command,3,
+                        static bool can_be_symbolic(uint a) { return a!=2; } );
 
 // Saved error message
 COMMAND_DECLARE(errm,0);

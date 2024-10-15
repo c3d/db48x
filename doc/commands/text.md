@@ -9,28 +9,28 @@ Create a Utf8 string from a list of code points
 List all code points in a Utf8 string
 
 
-## ToText (→STR, →TEXT)
+## ToText
 
 Convert an object to its text representation.
 
-## Compile (STR→, TEXT→)
+## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.
 
 `"1 2 + 4" TEXT→` will push `3` and `4` on the stack.
 
-## Char→Code (NUM, CODEPOINT, CharToUnicode)
+## Char→Code
 
 Return the Unicode codepoint of the first character in the text, or `-1` if the
 text is empty. `"Hello" NUM` returns `72`.
 
-## Text→Code (TextToUnicode)
+## Text→Code
 
 Return a list of the Unicode codepoints for all codepoints in the given text.
 `"Hello" Text→Code` returns `{ 72 101 108 108 111 }`.
 
 
-## Code→Text (CHR, Code→Char)
+## Code→Text
 
 Build a text out of a Unicode codepoint. The argument can be either a single
 numerical value or a list of numerical values. A negative numerical value

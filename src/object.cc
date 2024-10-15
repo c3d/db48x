@@ -740,10 +740,8 @@ object_p object::at(object_p index) const
 //  Index an object, either from a list or a numerical value
 // ----------------------------------------------------------------------------
 {
-    id ity = index->type();
-    if (ity == ID_list || ity == ID_array)
+    if (list_p idxlist = index->as_array_or_list())
     {
-        list_p idxlist = list_p(index);
         object_p result = this;
         for (object_p idxobj : *idxlist)
         {
@@ -800,7 +798,7 @@ object_p object::at(object_p index, object_p value) const
     idx--;
 
     id ty = ref->type();
-    if (ty == ID_list || ty == ID_array)
+    if (is_array_or_list(ty))
     {
         object_g first = ref->at(idx);
         if (!first)
@@ -1018,6 +1016,13 @@ GRAPH_BODY(object)
     utf8    end    = txt + sz;
     pixsize rw     = 0;
     bool    flat   = false;
+
+    if (g.graph && sz >= 2 && *txt == '"' && end[-1] == '"')
+    {
+        txt = +txt + 1;
+        end = end-1;
+        sz -= 2;
+    }
 
     // Try to fit it with the original structure
     for (utf8 p = txt; p < end; p = utf8_next(p))

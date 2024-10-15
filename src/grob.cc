@@ -200,7 +200,7 @@ GRAPH_BODY(grob)
  // ----------------------------------------------------------------------------
  {
      // If not rendering for the stack, just return object as is
-     if (!g.stack)
+     if (!g.stack || g.graph)
          return o;
 
      using pixsize  = blitter::size;
@@ -290,7 +290,6 @@ object::result grob::command(grob::blitop op)
         {
             if (grob_p sg = src->as<grob>())
             {
-                ui.draw_graphics();
                 grob::surface srcs = sg->pixels();
                 bool drawn = false;
                 point p(0,0);
@@ -307,6 +306,7 @@ object::result grob::command(grob::blitop op)
                 }
                 else if (dst->type() == ID_Pict)
                 {
+                    ui.draw_graphics();
                     rt.drop(3);
                     blitter::blit<blitter::CLIP_ALL>(Screen, srcs,
                                                      drect, p,
@@ -322,6 +322,80 @@ object::result grob::command(grob::blitop op)
             }
             rt.type_error();
         }
+    }
+    return ERROR;
+}
+
+
+object::result grob::command(grob::grob1_fn gfn)
+// ----------------------------------------------------------------------------
+//   The shared code for GraphicAppend, GraphicStack, etc
+// ----------------------------------------------------------------------------
+{
+    if (object_p x = rt.top())
+    {
+        grob_g gx = x->as<grob>();
+        if (gx)
+        {
+            gx = gfn(gx);
+            if (gx)
+                if (rt.top(+gx))
+                    return OK;
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return ERROR;
+}
+
+
+object::result grob::command(grob::grob2_fn gfn)
+// ----------------------------------------------------------------------------
+//   The shared code for GraphicAppend, GraphicStack, etc
+// ----------------------------------------------------------------------------
+{
+    if (object_p x = rt.stack(0))
+    {
+        if (object_p y = rt.stack(1))
+        {
+            grob_g gx = x->as<grob>();
+            grob_g gy = y->as<grob>();
+            if (gx && gy)
+            {
+                gx = gfn(gy, gx);
+                if (gx)
+                    if (rt.drop())
+                        if (rt.top(+gx))
+                            return OK;
+                if (!rt.error())
+                    rt.graph_does_not_fit_error();
+            }
+            else
+            {
+                rt.type_error();
+            }
+        }
+    }
+    return ERROR;
+}
+
+
+object::result grob::command(grob::grobop_fn gfn)
+// ----------------------------------------------------------------------------
+//   The shared code for GraphicSum, GraphicProduct
+// ----------------------------------------------------------------------------
+{
+    if (object_p x = rt.top())
+    {
+        blitter::size h = x->as_uint32(0, true);
+        if (!rt.error())
+            if (grob_p gx = gfn(h))
+                if (rt.top(+gx))
+                    return OK;
+        if (!rt.error())
+            rt.graph_does_not_fit_error();
     }
     return ERROR;
 }

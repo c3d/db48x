@@ -913,7 +913,16 @@ COMMAND_BODY(ToRectangular)
     object_g x = tag::strip(rt.top());
     if (!x)
         return ERROR;
-    if (!x->is_complex())
+    if (array_p v = x->as<array>())
+    {
+        if (array_p r = v->to_rectangular())
+            if (rt.top(r))
+                return OK;
+        if (!rt.error())
+            rt.type_error();
+        return ERROR;
+    }
+    else if (!x->is_complex())
     {
         rt.type_error();
         return ERROR;
@@ -936,7 +945,15 @@ COMMAND_BODY(ToPolar)
     object_g x = tag::strip(rt.top());
     if (!x)
         return ERROR;
-    if (!x->is_complex())
+    if (array_p v = x->as<array>())
+    {
+        if (array_p polar = v->to_polar())
+            if (rt.top(polar))
+                return OK;
+        rt.type_error();
+        return ERROR;
+    }
+    else if (!x->is_complex())
     {
         rt.type_error();
         return ERROR;
@@ -1111,7 +1128,8 @@ COMPLEX_BODY(sinh)
 // ----------------------------------------------------------------------------
 {
     // sinh(z) = (exp(z) - exp(-z)) / 2
-    return (complex::exp(z) - complex::exp(-z)) / complex_g(complex::make(2,0));
+    complex_g two = complex::make(2,0);
+    return (complex::exp(z) - complex::exp(-z)) / two;
 }
 
 COMPLEX_BODY(cosh)
@@ -1121,7 +1139,7 @@ COMPLEX_BODY(cosh)
 {
     // cosh(z) = (exp(z) + exp(-z)) / 2
     complex_g two = complex::make(2,0);
-    return (complex::exp(z) - complex::exp(-z)) / two;
+    return (complex::exp(z) + complex::exp(-z)) / two;
 }
 
 

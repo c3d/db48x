@@ -59,27 +59,130 @@
 #include <string.h>
 
 
-RECORDER(command,       16, "RPL Commands");
-RECORDER(command_error, 16, "Errors processing a command");
+RECORDER(command,         16, "RPL Commands");
+RECORDER(command_error,   16, "Errors processing a command");
+RECORDER(command_sorting, 16, "Sorting commands");
 
 
-PARSE_BODY(command)
+static inline bool at_end(utf8 name, size_t max, utf8 cmd, size_t len, bool eq)
 // ----------------------------------------------------------------------------
-//    Try to parse this as a command, using either short or long name
+//   Check if we are at end of a command
 // ----------------------------------------------------------------------------
 {
-    bool    eq     = p.precedence;
-    id      type   = id(0);
-    id      found  = id(0);
-    cstring ref    = cstring(utf8(p.source));
-    size_t  maxlen = p.length;
-    size_t  len    = maxlen;
+    return len >= max
+        || (eq && (!is_valid_as_name_initial(cmd) ||
+                   ((name[len] < '0' || name[len] > '9') &&
+                    !is_valid_as_name_initial(name + len))))
+        || (is_separator(name + len) && (*cmd != '=' || name[len] != '='));
+}
 
+
+object::id command::lookup(utf8 name, size_t &maxlen, bool eq)
+// ----------------------------------------------------------------------------
+//   Lookup a command and return its ID
+// ----------------------------------------------------------------------------
+{
+    id     type  = id(0);
+    size_t len   = maxlen;
+
+    if (!sorted_ids)
+    {
+        if (!initialize_sorted_ids())
+        {
+            static bool shown = false;
+            if (!shown)
+            {
+                shown = true;
+                ui.draw_message("Warning: Could not initialize sorted IDs",
+                                "Catalog and object parsing will be slower");
+            }
+        }
+    }
+
+    // Binary search if we have sorted IDs
+    if (sorted_ids)
+    {
+        size_t low  = 0;
+        size_t high = sorted_ids_count;
+
+        // Compute the maximum possible size for the command
+        size_t max = maxlen;
+        if (is_valid_as_name_initial(name) ||
+            (!eq && utf8_codepoint(name) == L'↑')) // e.g. ↑Match
+        {
+            for (max = utf8_size(name, max);
+                 max < maxlen && !is_separator(name + max);
+                 max += utf8_size(name + max, maxlen - max))
+                /* nop */;
+        }
+        else
+        {
+            // '=' is special because there is == (two consecutive separators)
+            if (name[0] == '=')
+                max = 1 + (max > 1 && name[1] == '=');
+            else
+                max = utf8_size(name, maxlen); // All non-names cmds are 1 character
+        }
+
+        while (true)
+        {
+            uint mid = (low + high) / 2;
+            uint16_t spidx = sorted_ids[mid];
+            auto    &s     = spellings[spidx];
+            id       type  = s.type;
+            int      cmp   = -1;
+
+            if (is_command(type))
+            {
+                if (utf8 cmd = utf8(s.name))
+                {
+                    // When parsing an equation skip x³ command spelling,
+                    // since we parse x³ as cubed(x).
+                    bool xsq = (eq && (type == ID_sq  || type == ID_cubed ||
+                                       type == ID_inv || type == ID_fact) &&
+                                *cmd == 'x');
+
+                    // No function name like `min` while parsing units
+                    bool uskip = unit::mode && is_valid_as_name_initial(cmd);
+
+                    len = strlen(cstring(cmd));
+                    if (len <= max)
+                    {
+                        cmp = strncasecmp(cstring(cmd), cstring(name), len);
+                        if (cmp == 0 && at_end(name, max, cmd, len, eq))
+                        {
+                            if (uskip || xsq)
+                                return id(0);
+                            maxlen = len;
+                            return type;
+                        }
+                        if (cmp == 0)
+                            cmp = -1; // Logically equivalent to cmd ending in 0
+                    }
+                    else
+                    {
+                        cmp = strncasecmp(cstring(cmd), cstring(name), max);
+                        if (cmp == 0)
+                            cmp = 1; // Logically equivalent to name ending in 0
+                    }
+                }
+            }
+
+            if (mid == low)
+                return id(0);
+            if (cmp < 0)
+                low = mid;
+            else
+                high = mid;
+        }
+    }
+
+    id found = id(0);
     for (size_t i = 0; i < spelling_count; i++)
     {
         if (!is_command(spellings[i].type))
             continue;
-        if (cstring cmd = spellings[i].name)
+        if (utf8 cmd = utf8(spellings[i].name))
         {
             if (type != spellings[i].type)
             {
@@ -92,28 +195,38 @@ PARSE_BODY(command)
             }
 
             // No function names like `min` while parsing units
-            if (unit::mode && is_valid_as_name_initial(utf8(cmd)))
+            if (unit::mode && is_valid_as_name_initial(cmd))
                 continue;
 
-            len = strlen(cmd);
+            len = strlen(cstring(cmd));
             if (len <= maxlen
-                && strncasecmp(ref, cmd, len) == 0
-                && (len >= maxlen
-                    || (eq && (!is_valid_as_name_initial(utf8(cmd)) ||
-                               ((ref[len] < '0' || ref[len] > '9') &&
-                                !is_valid_as_name_initial(utf8(ref + len)))))
-                    || is_separator(utf8(ref + len))))
+                && strncasecmp(cstring(name), cstring(cmd), len) == 0
+                && at_end(name, maxlen, cmd, len, eq))
             {
                 found = type;
                 break;
             }
         }
     }
+    if (found)
+        maxlen  = len;
+    return found;
+}
 
+
+
+PARSE_BODY(command)
+// ----------------------------------------------------------------------------
+//    Try to parse this as a command, using either short or long name
+// ----------------------------------------------------------------------------
+{
+    bool    eq     = p.precedence;
+    utf8    name   = p.source;
+    size_t  len    = p.length;
+    id      found  = lookup(name, len, eq);
     record(command,
            "Parsing [%s] found %u %+s %+s len %u",
-           ref, found, name(found), fancy(found), len);
-
+           name, found, command::name(found), command::fancy(found), len);
     if (!found)
         return SKIP;
 
@@ -181,6 +294,125 @@ int32_t command::int32_arg(uint level)
         return d->as_int32(0, true);
     return 0;
 }
+
+
+
+// ============================================================================
+//
+//   Sorted IDs for the catalog
+//
+// ============================================================================
+
+uint16_t *command::sorted_ids       = nullptr;
+size_t    command::sorted_ids_count = 0;
+
+
+#ifdef DEOPTIMIZE_CATALOG
+// This is necessary on the DM32, where otherwise we access memory too
+// fast and end up with bad data in the sorted array
+#  pragma GCC push_options
+#  pragma GCC optimize("-O2")
+#endif // DEOPTIMIZE_CATALOG
+
+static int sort_ids(const void *left, const void *right)
+// ----------------------------------------------------------------------------
+//   Sort the IDs alphabetically based on their fancy name
+// ----------------------------------------------------------------------------
+{
+    uint16_t l = *((uint16_t *) left);
+    uint16_t r = *((uint16_t *) right);
+    if (!object::spellings[l].name || !object::spellings[r].name)
+        return !!object::spellings[l].name - !!object::spellings[r].name;
+    return strcasecmp(object::spellings[l].name, object::spellings[r].name);
+}
+
+
+bool command::initialize_sorted_ids()
+// ----------------------------------------------------------------------------
+//   Sort IDs alphabetically
+// ----------------------------------------------------------------------------
+{
+    // Count number of items to put in the list
+    uint count = 0;
+    for (uint i = 0; i < object::spelling_count; i++)
+        if (object::id ty = object::spellings[i].type)
+            if (object::is_command(ty))
+                if (object::spellings[i].name)
+                    count++;
+
+    sorted_ids = (uint16_t *) realloc(sorted_ids, count * sizeof(uint16_t));
+    if (sorted_ids)
+    {
+        uint cmd = 0;
+        for (uint i = 0; i < object::spelling_count; i++)
+            if (object::id ty = object::spellings[i].type)
+                if (object::is_command(ty))
+                    if (object::spellings[i].name)
+                        sorted_ids[cmd++] = i;
+        qsort(sorted_ids, count, sizeof(sorted_ids[0]), sort_ids);
+
+        // Make sure we have unique commands in the catalog
+        cstring spelling = nullptr;
+        cmd = 0;
+        for (uint i = 0; i < count; i++)
+        {
+            uint16_t j = sorted_ids[i];
+            auto &s = object::spellings[j];
+
+            if (object::is_command(s.type))
+            {
+                if (cstring sp = s.name)
+                {
+                    if (!spelling ||
+                        (spelling != sp && strcasecmp(sp, spelling) != 0))
+                    {
+                        sorted_ids[cmd++] = sorted_ids[i];
+                        spelling = sp;
+                    }
+                    else if (cmd)
+                    {
+                        uint c = sorted_ids[cmd - 1];
+                        auto &last = object::spellings[c];
+                        if (s.type != last.type)
+                        {
+                            record(command_error,
+                                   "Types %u and %u have same spelling "
+                                   "%+s and %+s",
+                                   s.type, last.type, spelling, sp);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Do not remove this code
+                // It seems useless, but without it, the catalog is
+                // badly broken on DM42. Apparently, the loop is a bit
+                // too fast, and we end up adding a varying, but too small,
+                // number of commands to the array
+                debug_printf(5, "Not a command for %u, type %u[%s]",
+                             i, s.type, object::name(s.type));
+                debug_wait(-1);
+            }
+        }
+        sorted_ids_count = cmd;
+
+        if (RECORDER_TRACE(command_sorting))
+        {
+            for (size_t i = 0; i < sorted_ids_count; i++)
+            {
+                auto s = spellings[sorted_ids[i]];
+                record(command_sorting, "%u: %u %s spelled %s",
+                       i, s.type, object::name(s.type), s.name);
+            }
+        }
+    }
+    return sorted_ids;
+}
+
+#ifdef DEOPTIMIZE_CATALOG
+#pragma GCC pop_options
+#endif // DEOPTIMIZE_CATALOG
 
 
 
@@ -809,7 +1041,10 @@ COMMAND_BODY(ToProgram)
 {
     if (object_p top = rt.top())
     {
-        if (expression_p expr = expression::as_expression(top))
+        list_p expr = expression::get(top);
+        if (!expr)
+            expr = top->as<list>();
+        if (expr)
         {
             if (object_p clone = rt.clone(expr))
             {

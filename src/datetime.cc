@@ -53,7 +53,7 @@ bool to_time(object_p tobj, tm_t &tm, bool error)
 
     algebraic_g time = nullptr;
     uint scale = 100;
-    if (unit_p u = tobj->as<unit>())
+    if (unit_p u = unit::get(tobj))
         if (object_p uexpr = u->uexpr())
             if (symbol_p sym = uexpr->as_quoted<symbol>())
                 if (sym->matches("hms"))
@@ -103,7 +103,7 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
     dtobj = tag::strip(dtobj);
 
     algebraic_g date = nullptr;
-    if (unit_p u = dtobj->as<unit>())
+    if (unit_p u = unit::get(dtobj))
         if (object_p uexpr = u->uexpr())
             if (symbol_p sym = uexpr->as_quoted<symbol>())
                 if (sym->matches("date"))
@@ -177,7 +177,7 @@ algebraic_p to_days(object_p dobj, bool error)
     dobj = tag::strip(dobj);
 
     algebraic_p dval = nullptr;
-    if (unit_g u = dobj->as<unit>())
+    if (unit_g u = unit::get(dobj))
     {
         unit_g day = unit::make(integer::make(1), +symbol::make("d"));
         if (day->convert(u))
@@ -659,7 +659,7 @@ algebraic_p to_hms_dms(algebraic_r x)
 //   Convert an algebraic value to HMS or DMS value (i.e. no unit)
 // ----------------------------------------------------------------------------
 {
-    if (unit_p u = x->as<unit>())
+    if (unit_p u = unit::get(x))
     {
         algebraic_g uexpr = u->uexpr();
         if (symbol_p sym = uexpr->as_quoted<symbol>())
@@ -738,7 +738,7 @@ algebraic_p from_hms_dms(algebraic_g x, cstring name)
         hours = hours + min;
         return hours;
     }
-    else if (unit_g u = x->as<unit>())
+    else if (unit_g u = unit::get(x))
     {
         algebraic_g uexpr = u->uexpr();
         if (symbol_p sym = uexpr->as_quoted<symbol>())

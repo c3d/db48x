@@ -78,64 +78,7 @@ settings::settings() :
 #include "ids.tbl"
 
         reserved(false)
-{
-#ifdef CONFIG_COLOR
-    AlphaForeground             (pattern(200, 224, 224).bits);
-    LowerAlphaForeground        (pattern(200, 224, 255).bits);
-    LeftShiftForeground         (pattern(  0,   0,   0).bits);
-    RightShiftForeground        (pattern(  0,   0,   0).bits);
-    LeftShiftBackground         (pattern(255, 230, 128).bits);
-    RightShiftBackground        (pattern(128, 192, 255).bits);
-
-    ChargingForeground          (pattern(128, 192, 255).bits);
-    LowBatteryForeground        (pattern(192,  64,  64).bits);
-    HalfBatteryForeground       (pattern(255, 192,  64).bits);
-    BatteryLevelForeground      (pattern( 64, 192,  64).bits);
-    VoltageForeground           (HeaderBackground());
-
-    RunningIconForeground       (pattern(128, 192, 255).bits);
-    SteppingIconForeground      (pattern( 64, 255, 128).bits);
-    HaltedIconForeground        (pattern(255,  64,  64).bits);
-    GCIconForeground            (pattern(255, 192,  64).bits);
-
-    UserCommandBorder           (pattern(128, 128, 255).bits);
-    UserCommandBackground       (pattern(224, 224, 224).bits);
-
-    CursorBackground            (pattern(  0, 128,  64).bits);
-    CursorBorder                (pattern(  0,  64,   0).bits);
-    CursorForeground            (pattern(224, 255, 224).bits);
-    CursorAlphaBackground       (pattern(  0,  64, 128).bits);
-    CursorAlphaBorder           (pattern(  0,   0,  64).bits);
-    CursorAlphaForeground       (pattern(224, 224, 255).bits);
-    CursorSelBackground         (pattern(192, 224, 255).bits);
-
-    EditorBackground            (pattern(224, 240, 255).bits);
-
-    ResultForeground            (pattern( 32,  64,  32).bits);
-    StackForeground             (pattern( 96,  96, 128).bits);
-
-    StackLevelBackground        (pattern(240, 240, 240).bits);
-    StackLevelForeground        (pattern( 96,   0,   0).bits);
-
-    SelectionBackground         (pattern(255, 255, 128).bits);
-    SelectionForeground         (pattern( 24,  24, 128).bits);
-
-    SearchBackground            (pattern(255, 200, 120).bits);
-    SearchForeground            (pattern( 24,  24, 255).bits);
-
-    ErrorBackground             (pattern(255, 240, 224).bits);
-    ErrorForeground             (pattern( 64,   0,   0).bits);
-    ErrorBorder                 (pattern(192,  64,  64).bits);
-#else
-    ChargingForeground          (pattern::gray50.bits);
-    LowBatteryForeground        (pattern::gray25.bits);
-    HalfBatteryForeground       (pattern::gray75.bits);
-    BatteryLevelForeground      (pattern::white.bits);
-    SearchBackground            (pattern::gray25.bits);
-
-    CursorSelBackground         (pattern::gray90.bits);
-#endif // CONFIG_COLOR7
-}
+{}
 
 // ============================================================================
 //
@@ -479,6 +422,20 @@ static object_p object_from_value(Value value)
     if (value < 0)
         return neg_integer::make(-value);
     return integer::make(value);
+}
+
+
+template <>
+object_p object_from_value<ularge>(ularge value)
+// ----------------------------------------------------------------------------
+//   Convert patterns into hexadecimal or based integers
+// ----------------------------------------------------------------------------
+{
+#if CONFIG_FIXED_BASED_OBJECTS
+    return rt.make<hex_integer>(value);
+#else
+    return rt.make<based_integer>(value);
+#endif
 }
 
 

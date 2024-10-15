@@ -90,7 +90,7 @@ bool files::store(text_p name, object_p value, cstring defext) const
     if (strncasecmp(ext, "csv", 3) == 0)
     {
         id ty = value->type();
-        if (ty == ID_array || ty == ID_list)
+        if (is_array_or_list(ty))
             return fs->store_list(name, list_p(value));
     }
 
@@ -206,11 +206,7 @@ bool files::store_list(text_p name, list_p value) const
             bool ok = true;
             for (object_p row : *value)
             {
-                id     type = row->type();
-                list_p li   = nullptr;
-                if (type == ID_list || type == ID_array)
-                    li = list_p(row);;
-                if (li)
+                if (list_p li = row->as_array_or_list())
                 {
                     bool first = true;
                     for (object_p col : *li)
@@ -513,10 +509,7 @@ list_p files::recall_list(text_p name, bool as_array) const
                         for (object_p obj : *result)
                         {
                             list_g ci;
-                            id     oty = obj->type();
-                            bool   isl = oty == ID_list || oty == ID_array;
-                            list_p li  = isl ? list_p(obj) : nullptr;
-                            if (li)
+                            if (list_p li = obj->as_array_or_list())
                             {
                                 b = byte_p(li->objects(&sz));
                                 ci = list::make(b, sz);

@@ -45,6 +45,8 @@
 
 GCP(list);
 GCP(unit);
+GCP(symbol);
+GCP(expression);
 
 
 struct list : text
@@ -288,6 +290,9 @@ struct list : text
     list_p append(list_p a) const;
     list_p append(object_p o) const;
 
+    // Remove a range in the list
+    list_p remove(size_t start, size_t length = 1) const;
+
     // Reduce and filter operations
     object_p reduce(object_p prg) const;
     list_p   filter(object_p prg) const;
@@ -296,6 +301,15 @@ struct list : text
     list_p   pair_map(object_p prg) const;
     object_p map_as_object(object_p prg) const          { return map(prg);    }
     object_p filter_as_object(object_p prg) const       { return filter(prg); }
+
+    // Element substitution
+    static algebraic_p where(algebraic_r expr, algebraic_r args);
+    static object_p substitute(object_p expr, object_p args);
+    list_p substitute(symbol_r name, object_r value, size_t len) const;
+    list_p substitute(symbol_r name, object_r value) const;
+    list_p substitute(expression_r assign) const;
+    list_p substitute(list_r assignments) const;
+    list_p substitute(object_r repl) const;
 
 public:
     // Shared code for parsing and rendering, taking delimiters as input

@@ -1,6 +1,6 @@
 # Stack manipulation
 
-## ClearStack (CLEAR)
+## ClearStack
 
 Remove all objects from the stack
 
@@ -23,21 +23,21 @@ Remove two objects form the stack
 Remove N objects from the stack, N being given in level 1.
 
 
-## Duplicate (DUP)
+## Duplicate
 Duplicate an object on the stack
 
 
-## Duplicate2 (DUP2)
+## Duplicate2
 Duplicate two objects on the stack
 
 
-## DuplicateTwice (DUPDUP)
+## DuplicateTwice
 Duplicate the same object twice on the stack
 
-## DuplicateN (DUPN)
+## DuplicateN
 Duplicate a group of N objects, N being given in stack level 1
 
-## LastArguments (LASTARG)
+## LastArguments
 Put the last arguments back on the stack
 
 ## LastX

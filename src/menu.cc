@@ -506,17 +506,15 @@ MENU(VectorMenu,
      "Norm",    ID_abs,
      "Dot",     ID_dot,
      "Cross",   ID_cross,
-     "→Vec2",   ID_Unimplemented,
-     "→Vec3",   ID_Unimplemented,
-     "Vec→",    ID_Unimplemented,
+     "→Rect",   ID_ToRectangular,
+     "→Polar",  ID_ToPolar,
+     "→Spher",  ID_ToSpherical,
 
-     "→Cart",   ID_Unimplemented,
-     "→Cylin",  ID_Unimplemented,
-     "→Spher",  ID_Unimplemented,
-     "Cart",    ID_Unimplemented,
-     "Cylin",   ID_Unimplemented,
-     "Spher",   ID_Unimplemented,
-
+     "→Vec2",   ID_To2DVector,
+     "→Vec3",   ID_To3DVector,
+     "Vec→",    ID_FromVector,
+     "→Cylind", ID_ToCylindrical,
+     "Complex", ID_ComplexMenu,
      "Matrix",  ID_MatrixMenu);
 
 
@@ -713,7 +711,7 @@ MENU(StatisticsMenu,
 // ----------------------------------------------------------------------------
      "Σ+",      ID_AddData,
      "Σ-",      ID_RemoveData,
-     "Total",   ID_Total,
+     "Total",   ID_DataTotal,
      "Mean",    ID_Average,
      "StdDev" , ID_StandardDeviation,
      "Corr",    ID_Correlation,
@@ -1562,7 +1560,7 @@ MENU(GraphicsMenu,
      "ClLCD",   ID_ClLCD,
      "GOr",     ID_GOr,
      "GXor",    ID_GXor,
-     "GAnd",    ID_And,
+     "GAnd",    ID_GAnd,
 
      "RGB",     ID_RGB,
      "LnWidth", ID_LineWidth,
@@ -1582,8 +1580,22 @@ MENU(GraphicsMenu,
      "Pix?",    ID_PixTest,
      "PixCol?", ID_PixColor,
 
+     "Append",  ID_GraphicAppend,
+     "Stack",   ID_GraphicStack,
+     "Sub",     ID_GraphicSubscript,
+     "Sup",     ID_GraphicExponent,
+     "Ratio",   ID_GraphicRatio,
+
+     "Root",    ID_GraphicRoot,
+     "Paren",   ID_GraphicParentheses,
+     "Norm",    ID_GraphicNorm,
      "Freeze",  ID_Freeze,
-     "Plot",    ID_PlotMenu);
+     "Plot",    ID_PlotMenu,
+
+     "Sum",     ID_GraphicSum,
+     "Product", ID_GraphicProduct,
+     "Integral",ID_GraphicIntegral);
+
 
 MENU(MemoryMenu,
 // ----------------------------------------------------------------------------

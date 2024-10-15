@@ -1,4 +1,3 @@
-
 #ifndef ARRAY_H
 #define ARRAY_H
 // ****************************************************************************
@@ -70,8 +69,11 @@ struct array : list
     static array_p wrap(object_p o);
 
     // Check if vector or matrix, and push all elements on stack
-    bool is_vector(size_t *size, bool push = true) const;
-    bool is_matrix(size_t *rows, size_t *columns, bool push = true) const;
+    bool is_matrix(size_t *rows, size_t *columns,
+                   bool push = true, bool striptags = true) const;
+    bool is_vector(size_t *size,
+                   bool push = true, bool striptags = true) const;
+    id   is_2Dor3D(bool push = true) const;
     bool is_vector() const { return is_vector(nullptr, false); }
     bool is_matrix() const { return is_matrix(nullptr, nullptr, false); }
     list_p dimensions(bool expand = false) const;
@@ -86,19 +88,31 @@ struct array : list
                          item_fn items, void *data = nullptr);
 
     // Compute the result at row r column c from stack-exploded input
-    typedef algebraic_g (*vector_fn)(size_t c, size_t cx, size_t cy);
-    typedef algebraic_g (*matrix_fn)(size_t r, size_t c,
+    typedef algebraic_p (*vector_fn)(size_t c, size_t cx, size_t cy);
+    typedef algebraic_p (*matrix_fn)(size_t r, size_t c,
                                      size_t rx, size_t cx,
                                      size_t ry, size_t cy);
     typedef bool (*dimension_fn)(size_t rx, size_t cx, size_t ry, size_t cy,
                                  size_t *rr, size_t *cr);
-    static array_g      do_matrix(array_r x, array_r y,
+    static array_p      do_matrix(array_r x, array_r y,
                                   dimension_fn d, vector_fn v, matrix_fn m);
 
-    algebraic_g         determinant() const;
-    algebraic_g         norm_square() const;
-    algebraic_g         norm() const;
-    array_g             invert() const;
+    algebraic_p         determinant() const;
+    algebraic_p         norm_square() const;
+    algebraic_p         norm() const;
+    array_p             invert() const;
+
+    array_p             to_rectangular() const;
+    array_p             to_polar() const;
+    array_p             to_cylindrical() const;
+    array_p             to_spherical() const;
+
+    static bool         is_non_rectangular(id type)
+    {
+        return (type == ID_ToPolar       ||
+                type == ID_ToCylindrical ||
+                type == ID_ToSpherical);
+    }
 
 public:
     OBJECT_DECL(array);
@@ -109,11 +123,11 @@ public:
 };
 
 
-array_g operator-(array_r x);
-array_g operator+(array_r x, array_r y);
-array_g operator-(array_r x, array_r y);
-array_g operator*(array_r x, array_r y);
-array_g operator/(array_r x, array_r y);
+array_p operator-(array_r x);
+array_p operator+(array_r x, array_r y);
+array_p operator-(array_r x, array_r y);
+array_p operator*(array_r x, array_r y);
+array_p operator/(array_r x, array_r y);
 
 COMMAND_DECLARE(det, 1);
 COMMAND_DECLARE_SPECIAL(dot,   command, 2, PREC_DECL(MULTIPLICATIVE); );
@@ -123,5 +137,11 @@ COMMAND_DECLARE(FromArray, 1);
 COMMAND_DECLARE(ConstantArray, 2);
 COMMAND_DECLARE(IdentityMatrix, 1);
 COMMAND_DECLARE(RandomMatrix, 1);
+
+COMMAND_DECLARE(ToCylindrical, 1);
+COMMAND_DECLARE(ToSpherical, 1);
+COMMAND_DECLARE(To2DVector, 2);
+COMMAND_DECLARE(To3DVector, 3);
+COMMAND_DECLARE(FromVector, 1);
 
 #endif // ARRAY_H

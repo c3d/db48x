@@ -33,13 +33,16 @@
 #include "array.h"
 #include "bignum.h"
 #include "compare.h"
+#include "conditionals.h"
 #include "decimal.h"
 #include "expression.h"
 #include "fraction.h"
 #include "integer.h"
+#include "integrate.h"
 #include "list.h"
 #include "logical.h"
 #include "polynomial.h"
+#include "solve.h"
 #include "tag.h"
 #include "unit.h"
 
@@ -79,6 +82,56 @@ algebraic_p function::symbolic(id op, algebraic_r x)
     if (result && !unit::factoring && Settings.AutoSimplify())
         result = result->simplify();
     return result;
+}
+
+
+bool function::has_symbolic_arguments(id type)
+// ----------------------------------------------------------------------------
+//   Check if the command has any symbolic arguments, e.g. Root or Sum
+// ----------------------------------------------------------------------------
+{
+    return (type == ID_IFTE                     ||
+            type == ID_Sum                      ||
+            type == ID_Product                  ||
+            type == ID_IFTE                     ||
+            type == ID_Subst                    ||
+            type == ID_Integrate                ||
+            type == ID_Root                     ||
+            type == ID_MultipleEquationsSolver  ||
+            type == ID_Derivative               ||
+            type == ID_Primitive);
+}
+
+
+bool function::is_symbolic_argument(id type, uint arg)
+// ----------------------------------------------------------------------------
+//   Check if the given argument needs to be stored in symbolic form
+// ----------------------------------------------------------------------------
+{
+    switch(type)
+    {
+    case ID_Sum:
+        return Sum::can_be_symbolic(arg);
+    case ID_Product:
+        return Product::can_be_symbolic(arg);
+    case ID_IFTE:
+        return IFTE::can_be_symbolic(arg);
+    case ID_Subst:
+        return Subst::can_be_symbolic(arg);
+    case ID_Integrate:
+        return Integrate::can_be_symbolic(arg);
+    case ID_Root:
+        return Root::can_be_symbolic(arg);
+    case ID_MultipleEquationsSolver:
+        return MultipleEquationsSolver::can_be_symbolic(arg);
+    case ID_Derivative:
+        return Derivative::can_be_symbolic(arg);
+    case ID_Primitive:
+        return Primitive::can_be_symbolic(arg);
+    default:
+        break;
+    }
+    return false;
 }
 
 
@@ -207,7 +260,7 @@ algebraic_p function::evaluate(algebraic_r xr, id op, ops_t ops)
     }
 
     // Check if we need to deal with units specially
-    if (unit_p u = x->as<unit>())
+    if (unit_p u = unit::get(x))
     {
         algebraic_g value = u->value();
         algebraic_g uexpr = u->uexpr();

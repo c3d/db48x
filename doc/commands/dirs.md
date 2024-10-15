@@ -2,7 +2,7 @@
 
 Variables are named storage for RPL values.
 
-## Store (STO)
+## Store
 
 Store an object into a specified location. For example `2 'ABC' STO` stores the value `2` in a global variable named `ABC`.
 
@@ -19,7 +19,7 @@ The `Value` is copied in a storage location identified by `Name`. The storage lo
 * Text: `Value` is stored in a named file on the [flash storage](#flash-storage).
 
 
-## Recall (RCL)
+## Recall
 Recall an object from a specified location. For example `'ABC' RCL` recalls the value from a global variable named `ABC`.
 
 `Name` ▶ `Value`
@@ -50,43 +50,43 @@ The format of the file depends on how the name ends:
 * `.csv`: The value is stored in comma-separated values format. This is mostly interesting for arrays and lists, which can be echanged with spreadsheets and other PC applications that can input or output CSV files.
 
 
-## StoreAdd (STO+)
+## STO+
 Add a value to the content of a variable
 
 
-## StoreSub (STO-)
+## STO-
 Subtract a value from the contents of a variable
 
 
-## StoreMul (STO×)
+## STO×
 Multiply the contents of a variable by a value
 
 
-## StoreDiv (STO÷)
+## STO÷
 Divide the contents of a variable by a value
 
 
-## RecallAdd (RCL+)
+## RCL+
 Add the content of a variable to a value on the stack
 
 
-## RecallSub (RCL-)
+## RCL-
 Subtract the contents of a variable from a value on a stack
 
 
-## RecallMul (RCL×)
+## RCL×
 Multiply a value on the stack by the contents of a variable
 
 
-## RecallDiv (RCL÷)
+## RCL÷
 Divide a value on the stack by the contents of a variable
 
 
-## Increment (INCR)
+## Increment
 Add one to the content of a variable
 
 
-## Decrement (DECR)
+## Decrement
 Subtract one from content of a variable
 
 
@@ -109,34 +109,34 @@ directories, `PurgeAll` may purge multiple variables. Use [Purge](#Purge) if you
 want to only purge a variable in the current directory.
 
 
-## CreateDirectory (CRDIR)
+## CreateDirectory
 Create new directory
 
 
-## PurgeDirectory (PGDIR)
+## PurgeDirectory
 Purge entire directory tree
 
 
-## UpDirectory (UPDIR)
+## UpDirectory
 Change current directory to its parent
 
 
-## HomeDirectory (HOME)
+## HomeDirectory
 Change current directory to HOME
 
 
-## DirectoryPath (PATH)
+## DirectoryPath
 Get a path to the current directory
 
 
-## Variables (VARS)
+## Variables
 
 List all visible variables in a directory
 
 ▶ `{ Variables... }`
 
 
-## TypedVariables (TVARS)
+## TypedVariables
 
 List variables of a specific type
 

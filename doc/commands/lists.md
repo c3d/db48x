@@ -7,7 +7,7 @@ and are not necessarily rectangular, although some operations (e.g. matrix
 operations using arrays as input) can impose stricter constraints.
 
 
-## →List (ToList)
+## →List
 
 Build a list from elements on the stack. Level 1 of the stack contains the
 number of elements in the list. The elements are on the stack, the first element
@@ -15,7 +15,7 @@ being deepest in the stack. This is the opposite of [List→](#fromlist).
 
 `A` `B` ... `Count` ▶ `{ A B ... }`
 
-## List→ (FromList)
+## List→
 
 Expand a list on the stack and return the number of elements. After executing
 the command, level 1 contains the number of elements, and a corresponding number
@@ -26,7 +26,7 @@ at the deepest level in the stack. This is the opposite of [→List](#tolist). T
 `{ A B ... }` ▶ `A` `B` ... `Count`
 
 
-## List→ (FromList)
+## List→
 
 Expand a list on the stack and return the number of elements. After executing
 the command, level 1 contains the number of elements, and a corresponding number
@@ -134,7 +134,7 @@ Sort a list or array by value, in reverse order compared to `Sort`.
 Sort a list or array using the memory representation of objects, in reverse
 order compared to `QuickSort`.
 
-## ReverseList (REVLIST)
+## ReverseList
 
 Reverse the order of elements in a list
 

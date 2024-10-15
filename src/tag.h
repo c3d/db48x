@@ -63,9 +63,16 @@ struct tag : object
         return rt.make<tag>(str, len, obj);
     }
 
-    static tag_p make(cstring str, object_g obj)
+    static tag_p make(cstring str, object_p obj)
     {
         return make(utf8(str), strlen(str), obj);
+    }
+
+    static tag_p make(text_p text, object_p obj)
+    {
+        size_t sz = 0;
+        utf8 name = text->value(&sz);
+        return make(name, sz, obj);
     }
 
     size_t label_length() const

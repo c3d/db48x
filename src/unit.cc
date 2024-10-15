@@ -137,14 +137,14 @@ unit_p unit::make(algebraic_g v, algebraic_g u, id ty)
     {
         more = false;
         unit::mode = false;
-        while (unit_g uu = u->as<unit>())
+        while (unit_g uu = unit::get(u))
         {
             v = uu->value() * v;
             u = uu->uexpr();
             more = true;
         }
         unit::mode = true;
-        while (unit_g vu = v->as<unit>())
+        while (unit_g vu = unit::get(v))
         {
             u = vu->uexpr() * u;
             v = vu->value();
@@ -282,7 +282,7 @@ EVAL_BODY(unit)
             if (!uexpr)
                 return ERROR;
 
-            while (unit_g u = uexpr->as<unit>())
+            while (unit_g u = unit::get(uexpr))
             {
                 algebraic_g scale = u->value();
                 uexpr = u->uexpr();
@@ -682,7 +682,8 @@ static const cstring basic_units[] =
     "Wb",       "1_V*s",                // Weber
 
     "mho",      "1_S",                  // Ohm spelled backwards
-    "ohm",      "1_Ω",                  // Ohm
+    "ohm",      "1_Ω",                  // Ohm
+    "Ω",        "1_Ω",                  // Robustness: Unicode u8486 vs u937
 
     // ------------------------------------------------------------------------
     // Angles menu
@@ -885,7 +886,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
                 file_closer ufilec(ufile, "config/units.csv");
                 if (object_p obj = object::parse(utf8(udef), ulen))
                 {
-                    if (unit_g u = obj->as<unit>())
+                    if (unit_g u = unit::get(obj))
                     {
                         // Record prefix info if we need it
                         if (prefix_info)
@@ -908,7 +909,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
                             exp = +u;
                             scale = scale * exp;
                             if (scale)
-                                if (unit_p us = scale->as<unit>())
+                                if (unit_p us = unit::get(scale))
                                     u = us;
                         }
 
@@ -1014,7 +1015,7 @@ bool unit::convert(unit_g &x) const
         }
 
         // Check if this is a unit and if so, make sure the unit is 1
-        while (unit_p cf = o->as<unit>())
+        while (unit_p cf = unit::get(o))
         {
             algebraic_g cfu = cf->uexpr();
             if (!cfu->is_real())
@@ -1224,6 +1225,19 @@ unit_p unit::cycle() const
         if (arithmetic::decimal_to_fraction(value))
             u = unit::make(value, uexpr);
     }
+    return u;
+}
+
+
+unit_p unit::get(object_p obj)
+// ----------------------------------------------------------------------------
+//   Convert an object to a unit if possible at all
+// ----------------------------------------------------------------------------
+{
+    if (!obj)
+        return nullptr;
+    obj = tag::strip(obj);
+    unit_p u = obj->as_quoted<unit>();
     return u;
 }
 
@@ -1607,8 +1621,8 @@ COMMAND_BODY(Convert)
 //   Convert level 2 into unit of level 1
 // ----------------------------------------------------------------------------
 {
-    unit_p y = rt.stack(1)->as<unit>();
-    unit_p x = rt.stack(0)->as<unit>();
+    unit_p y = unit::get(rt.stack(1));
+    unit_p x = unit::get(rt.stack(0));
     if (!y || !x)
     {
         rt.type_error();
@@ -1629,7 +1643,7 @@ COMMAND_BODY(UBase)
 // ----------------------------------------------------------------------------
 {
     object_p obj = rt.stack(0);
-    if (unit_p x = obj->as<unit>())
+    if (unit_p x = unit::get(obj))
     {
         algebraic_g r = x;
         save<bool> ueval(unit::mode, true);
@@ -1642,7 +1656,7 @@ COMMAND_BODY(UBase)
         scribble scr;
         for (object_p lobj : *expr)
         {
-            if (unit_p u = lobj->as<unit>())
+            if (unit_p u = unit::get(lobj))
             {
                 algebraic_g r = u;
                 save<bool> ueval(unit::mode, true);
@@ -1670,8 +1684,8 @@ COMMAND_BODY(UFact)
 //   Factor level 1 unit out of level 2 unit
 // ----------------------------------------------------------------------------
 {
-    unit_p x = rt.stack(0)->as<unit>();
-    unit_p y = rt.stack(1)->as<unit>();
+    unit_p x = unit::get(rt.stack(0));
+    unit_p y = unit::get(rt.stack(1));
     if (!x || !y)
     {
         rt.type_error();
@@ -1703,7 +1717,7 @@ FUNCTION_BODY(UVal)
         return nullptr;
     if (x->is_symbolic())
         return symbolic(ID_UVal, x);
-    if (unit_p u = x->as<unit>())
+    if (unit_p u = unit::get(x))
         return u->value();
     rt.type_error();
     return nullptr;
@@ -1716,7 +1730,7 @@ COMMAND_BODY(ToUnit)
 // ----------------------------------------------------------------------------
 {
     object_p y = tag::strip(rt.stack(1));
-    unit_p x = tag::strip(rt.stack(0))->as<unit>();
+    unit_p x = unit::get(rt.stack(0));
     if (!x || !y || !y->is_algebraic())
     {
         rt.type_error();
@@ -1764,7 +1778,7 @@ static algebraic_p key_unit(uint key, bool uexpr)
             memcpy(buffer+2, txt, len);
             len += 2;
             if (object_p uobj = object::parse(utf8(buffer), len))
-                if (unit_p u = uobj->as<unit>())
+                if (unit_p u = unit::get(uobj))
                     return uexpr ? u->uexpr() : u;
         }
     }
@@ -1857,7 +1871,7 @@ COMMAND_BODY(ConvertToUnit)
     if (algebraic_g uname = key_unit(key, false))
         if (object_p value = tag::strip(rt.top()))
             if (algebraic_g alg = value->as_algebraic())
-                if (unit_g uobj = uname->as<unit>())
+                if (unit_g uobj = unit::get(uname))
                     if (uobj->convert(alg))
                         if (rt.top(+alg))
                             return OK;
@@ -1884,7 +1898,7 @@ static symbol_p unit_name(object_p obj)
 {
     if (obj)
     {
-        if (unit_p uobj = obj->as<unit>())
+        if (unit_p uobj = unit::get(obj))
         {
             algebraic_p uexpr = uobj->uexpr();
             symbol_p name = uexpr->as<symbol>();
@@ -1942,7 +1956,7 @@ COMMAND_BODY(ConvertToUnitPrefix)
     }
 
     // This must be a unit type with a simple name
-    unit_g   un  = value->as<unit>();
+    unit_g   un  = unit::get(value);
     symbol_p sym = unit_name(un);
     if (!sym)
     {
@@ -1988,7 +2002,7 @@ COMMAND_BODY(ConvertToUnitPrefix)
     object_p scaled = object::parse(r.text(), plen);
     if (!scaled)
         return ERROR;
-    unit_p target = scaled->as<unit>();
+    unit_p target = unit::get(scaled);
     if (!target)
     {
         rt.inconsistent_units_error();
@@ -2015,7 +2029,7 @@ static object::result toAngleUnit(cstring angleUnit)
 // ----------------------------------------------------------------------------
 {
     object_g x = tag::strip(rt.top());
-    unit_g uobj = x->as<unit>();
+    unit_g uobj = unit::get(x);
     if (uobj)
     {
         object::id amode = object::ID_object;

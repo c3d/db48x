@@ -173,6 +173,14 @@ EquationSolving
 
 	SolvingMenu
 »
+
+
+MultiSolver
+«
+	[ 'sin(X)=0.5*cos(Y)' 'sin(X)=0.3*cos(X)' ] [ 'X' 'Y' ] [ 1 1 ]
+	SolverMenu
+	ROOT
+»
 }
 
 

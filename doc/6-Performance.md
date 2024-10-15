@@ -3,6 +3,28 @@
 This sections tracks some performance measurements across releases.
 
 <!--- DMNONE --->
+## NQueens comparison across models
+
+The [NQueens benchmark][nqueens] has been used quite a bit to compare various
+calcualtors. It is tracked across releases below, the code being executed being
+the one [now in the demo library](../library/NQueens.48s) and the time being
+best of 5 runs.
+
+The calculators are also quite different in how they behave when on battery and
+USB power:
+
+| Configuration | Time     | Version |
+|---------------|----------|---------|
+| DM42 Battery  | 4539 ms  | 0.8.0   |
+| DM42 USB      | 1247 ms  | 0.8.0   |
+| DM32 Battery  | 1777 ms  | 0.8.0   |
+| DM32 USB      |  444 ms  | 0.8.0   |
+| iPhone 12     |   50 ms  | 0.8.0   |
+| iPad 9e gen   |   60 ms  | 0.8.0   |
+| Macbook Pro M1|   16 ms  | 0.8.0   |
+
+[nqueens]: https://www.hpmuseum.org/cgi-sys/cgiwrap/hpmuseum/articles.cgi?read=700)
+
 ## NQueens (DM42)
 
 Performance recording for various releases on DM42 with `small` option (which is
@@ -12,6 +34,8 @@ all times in milliseconds, best of 5 runs, on USB power, with presumably no GC.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.8.0   | 1247    | 574012    |  267284   | Back to -Oz             |
+| 0.7.0   | 1214    | 548204    |  223260   | Running at -O2          |
 | 0.6.0   | 1183    | 409252    |  187516   | New table-free decimal  |
 | 0.5.2   | 1310    | 711228    | 1548076   |                         |
 | 0.5.1   |         |           |           |                         |
@@ -50,6 +74,8 @@ is not there.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.8.0   |  444    | 467260    |  187948   |                         |
+| 0.7.0   |  449    | 611020    |  223692   | New DMCP runs at 160MHz |
 | 0.6.0   | 1751    | 467260    |  187948   | New table-free decimal  |
 | 0.5.2   | 1752    | 856228    | 1550436   |                         |
 | 0.5.1   | 1746    |           |           |                         |
@@ -84,12 +110,21 @@ Timing on 0.4.10 are:
 * DM32: 28.507s (14x faster)
 * DM42: 15.769s (25x faster)
 
-| Version | DM32 ms | DM42 ms |
-|---------|---------|---------|
-| 0.6.0   | 26256   |  15355  |
-| 0.5.2   | 26733   |  15695  |
-| 0.4.10  | 28507   |  15769  |
+| Version | DM32 ms | DM42 ms | iPhone 12 | Notes                       |
+|---------|---------|---------|-----------|-----------------------------|
+| 0.7.0   | 25983   |  15061  |       287 | DM32 slower even at 160MHz  |
+| 0.6.0   | 26256   |  15355  |           |                             |
+| 0.5.2   | 26733   |  15695  |           |                             |
+| 0.4.10  | 28507   |  15769  |           |                             |
 
+In this benchmark, the DM32 displays a little more text than the DM42
+(one additional character), but that does not seem sufficient to explain the
+rather massive difference.
+
+If all text drawing is removed, on 0.7.0, the DM32 runs in 182 ms and the DM42
+in 476ms, which is more in line with expectations. It seems that text drawing
+might be a little bit slower on the DM32, which may be an issue with the Flash
+reading speed (drawing characters will read a lot of data from the flash)?
 
 
 ## SumTest (decimal performance)

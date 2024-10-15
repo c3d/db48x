@@ -1,6 +1,6 @@
 # Arithmetic
 
-## + (add)
+## Add
 
 Add two values.
 
@@ -16,7 +16,7 @@ Add two values.
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
   `"X=" 1 +` gives `"X=1"`.
 
-## - (sub)
+## Sub
 
 Subtract two values
 
@@ -28,7 +28,7 @@ Subtract two values
   [autosimplify](#autosimplify) is active.
 
 
-## × (*, mul)
+## Mul
 
 Multiply two values.
 
@@ -48,7 +48,7 @@ Multiply two values.
   gives `"XXX"`.
 
 
-## ÷ (/, div)
+## Div
 
 Divide two values two values
 
@@ -106,12 +106,12 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart (IP, IntPart)
+## IntegerPart
 
 Integer part of a number
 
 
-## FractionalPart (FP, FracPart)
+## FractionalPart
 
 Fractional part of a number
 
@@ -164,21 +164,21 @@ For complex numbers, returns a unit number on the unit circle with the same
 argument as the original number.
 
 
-## Percent (%)
+## Percent
 
 Percentage of a number
 
 `Y` `X` ▶ `Y×(X÷100)`
 
 
-## PercentChange (%CH)
+## PercentChange
 
 Percentage of change on a number
 
 `Y` `X` ▶ `(X÷Y-1)×100`
 
 
-## PercentTotal (%T)
+## PercentTotal
 
 Get percentage of a total
 
@@ -251,7 +251,7 @@ Nth Tchebycheff polynomial of the second kind
 Nth Hermite polynomial as used in probabilities
 
 
-## DIV2 (QuoRem, IDIV2, QuotientRemainder)
+## QuotientRemainder
 
 Euclidean division, returning quotient and remainder.
 

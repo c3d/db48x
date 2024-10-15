@@ -509,32 +509,39 @@ static int state_clear()
 }
 
 
+static bool is_valid_state_file(cstring filename)
+// ----------------------------------------------------------------------------
+//   Check if we have a valid DB48X state (to avoid touching DM42/DM32 states)
+// ----------------------------------------------------------------------------
+//   We accept both .48s and .48S
+{
+    if (cstring ext = file::extension(filename))
+        return
+            ext[1] == '4' && ext[2] == '8' && tolower(ext[3]) == 's'
+            && !ext[4];
+    return false;
+}
+
+
+
 cstring state_name()
 // ----------------------------------------------------------------------------
 //    Return the state name as stored in the non-volatile memory
 // ----------------------------------------------------------------------------
 {
     cstring name = get_reset_state_file();
-    if (name && *name && strstr(name, ".48S"))
+    if (is_valid_state_file(name))
     {
-        cstring last = nullptr;
-        for (cstring p = name; *p; p++)
+        name = file::basename(name);
+        if (cstring ext = file::extension(name))
         {
-            if (*p == '/' || *p == '\\')
-                name = p + 1;
-            else if (*p == '.')
-                last = p;
+            static char buffer[16];
+            char *p = buffer;
+            while (p < buffer+sizeof(buffer)-1 && name < ext)
+                *p++ = *name++;
+            *p = 0;
+            return buffer;
         }
-        if (!last)
-            last = name;
-
-        static char buffer[16];
-        char *end = buffer + sizeof(buffer);
-        char *p = buffer;
-        while (p < end && name < last && (*p++ = *name++))
-            /* Copy */;
-        *p = 0;
-        return buffer;
     }
 
     return PROGRAM_NAME;
@@ -591,7 +598,7 @@ bool load_system_state()
         // extension. This is necessary, because get_reset_state_file() could
         // legitimately return a .f42 file if we just switched from DM42.
         char *state = get_reset_state_file();
-        if (state && *state && strstr(state, ".48S"))
+        if (is_valid_state_file(state))
             return load_state_file(state);
     }
     return false;
@@ -605,11 +612,11 @@ bool save_system_state()
 {
     if (sys_disk_ok())
     {
-        // Try to load the state file, but only if it has the right
+        // Try to save the state file, but only if it has the right
         // extension. This is necessary, because get_reset_state_file() could
         // legitimately return a .f42 file if we just switched from DM42.
         char *state = get_reset_state_file();
-        if (state && *state && strstr(state, ".48S"))
+        if (is_valid_state_file(state))
             return save_state_file(state);
         else
             return state_save() == 0;

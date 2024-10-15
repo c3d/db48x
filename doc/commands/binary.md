@@ -7,93 +7,93 @@ numbers, the operation happens on the number of bits defined by the
 [WordSize](#wordsize) setting. For integer values, the maximum number of bits is
 defined by the [MaxNumberBits](#maxnumberbits) setting.
 
-## ShiftLeft (SL)
+## ShiftLeft
 
 Shift the value left by one bit.
 
 `Value` ▶ `Value*2`
 
-## ShiftLeftByte (SLB)
+## ShiftLeftByte
 
 Shift the value left by one byte (8 bits).
 
 `Value` ▶ `Value*256`
 
-## ShiftLeftCount (SLC)
+## ShiftLeftCount
 
 Shift the value left by a given number of bits.
 
 `Value` `Shift` ▶ `Value*2^Shift`
 
-## ShiftRight (SR)
+## ShiftRight
 
 Shift the value right by one bit.
 
 `Value` ▶ `Value/2`
 
-## ShiftRightByte (SRB)
+## ShiftRightByte
 
 Shift the value right by one byte (8 bits).
 
 `Value` ▶ `Value/256`
 
-## ShiftRightCount (SRC)
+## ShiftRightCount
 
 Shift the value right by a given number of bits.
 
 `Value` `Shift` ▶ `Value/2^Shift`
 
-## ArithmeticShiftRight (ASR)
+## ArithmeticShiftRight
 
 Shift the value right by one bit, preserving the sign bit.
 
 `Value` ▶ `Signed(Value)/2`
 
-## ArithmeticShiftRightByte (ASRB)
+## ArithmeticShiftRightByte
 
 Shift the value right by one byte (8 bits), preserving the sign bit.
 
 `Value` ▶ `Signed(Value)/256`
 
-## ArithmeticShiftRightCount (ASRC)
+## ArithmeticShiftRightCount
 
 Shift the value right by a given number of bits, preserving the sign bit.
 
 `Value` `Shift` ▶ `Signed(Value)/2^Shift`
 
-## RotateLeft (RL)
+## RotateLeft
 
 Rotate the value left by one bit.
 
 `Value`  ▶ `RLC(Value, 1)`
 
 
-## RotateLeftByte (RLB)
+## RotateLeftByte
 
 Rotate the value left by one byte (8 bits).
 
 `Value`  ▶ `RL(Value, 8)`
 
-## RotateLeftCount (RLC)
+## RotateLeftCount
 
 Rotate the value left by a given number of bits.
 
 `Value`  `Shift` ▶ `RLC(Value, Shift)`
 
 
-## RotateRight (RR)
+## RotateRight
 
 Rotate the value right by one bit.
 
 `Value`  ▶ `RRC(Value, 1)`
 
-## RotateRightByte (RRB)
+## RotateRightByte
 
 Rotate the value right by one byte (8 bits).
 
 `Value`  ▶ `RRC(Value, 8)`
 
-## RotateRightCount (RRC)
+## RotateRightCount
 
 Rotate the value right by a given number of bits.
 

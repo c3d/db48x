@@ -30,7 +30,9 @@
 include(db48x.pro)
 
 DEFINES-=HELPFILE_NAME=\\\"help/db48x.md\\\"
+DEFINES-=HELPINDEX_NAME=\\\"help/db48x.idx\\\"
 DEFINES+=HELPFILE_NAME=\\\"help/db50x.md\\\"
+DEFINES+=HELPINDEX_NAME=\\\"help/db50x.idx\\\"
 INCLUDEPATH -= ../src/dm42
 INCLUDEPATH += ../src/dm32
 

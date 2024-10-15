@@ -69,10 +69,12 @@ struct file
     cstring error(int err) const;
     cstring error() const;
 
-    static  bool unlink(text_p path);
-    static  bool unlink(cstring path);
+    static bool    unlink(text_p path);
+    static bool    unlink(cstring path);
+    static cstring extension(cstring path);
+    static cstring basename(cstring path);
 
-protected:
+  protected:
 #if SIMULATOR
     FILE *data;
 #else

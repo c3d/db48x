@@ -30,27 +30,27 @@ DB48X has five display mode (one more than the HP48)s:
 * [Engineering mode](#EngineeringDisplay))
 * [Significant digits mode](#SignificantDisplay))
 
-## StandardDisplay (STD)
+## StandardDisplay
 
 Display numbers using full precision. All significant digts to the right of the
 decimal separator are shown, up to 34 digits.
 
-## FixedDisplay (FIX)
+## FixedDisplay
 
 Display numbers rounded to a specific number of decimal places.
 
-## ScientificDisplay (SCI)
+## ScientificDisplay
 
 Display numbers in scientific notation, i.e. with a mantissa and an
 exponent. The mantissa has one digit to the left of the decimal separator and
 shows the specified number of decimal places.
 
-## EngineeringDisplay (SCI)
+## EngineeringDisplay
 
 Display nunmbers as a mantissa with a sepcified number of digits, followed by an
 exponent that is a multiple of 3.
 
-## SignificantDisplay (SIG)
+## SignificantDisplay
 
 Display up to the given number of digits without trailing zero. This mode is
 useful because DB48X can compute with large precision, and it may be useful to
@@ -128,20 +128,20 @@ DB48X has four angle modes:
 * [Grads](#Grads): A full circle is 400 radians
 * [PiRadians](#PiRadians): Radians shown as multiple of π
 
-## Degrees (DEG)
+## Degrees
 
 Select degrees as the angular unit. A full circle is 360 degrees.
 
-## Radians (RAD)
+## Radians
 
 Select radians as the angular unit. A full circle is 2π radians,
 and the angle is shown as a numerical value.
 
-## Grads (GRAD)
+## Grads
 
 Select grads as the angular unit. A full circle is 400 grads.
 
-## PiRadians (PIRAD)
+## PiRadians
 
 Select multiples of π as the angular unit. A full circle is 2π radians,
 shown as a multiple of π.
@@ -260,19 +260,19 @@ Integer values can be reprecended in a number of different bases:
 * [Decimal](#Decimal) is base 10
 * [Hexadecimal](#Hexadecimal) is base 16
 
-## Binary (BIN)
+## Binary
 
 Selects base 2
 
-## Octal (OCT)
+## Octal
 
 Selects base 8
 
-## Decimal (DEC)
+## Decimal
 
 Selects base 10
 
-## Hexadecimal (HEX)
+## Hexadecimal
 
 Selects base 16
 
@@ -280,13 +280,13 @@ Selects base 16
 
 Select an arbitrary base for computations
 
-## WordSize (STWS)
+## WordSize
 
 Store the current [word size](#wordsize) in bits. The word size is used for
 operations on based numbers. The value must be greater than 1, and the number of
 bits is limited only by memory and performance.
 
-## RecallWordSize (RCWS)
+## RecallWordSize
 
 Return the current [word size](#wordsize) in bits.
 
@@ -323,13 +323,13 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
-## ToFractionIterations (→QIterations, →FracIterations)
+## →QIterations
 
 Define the maximum number of iterations converting a decimal value to a
 fraction. For example, `1 →FracIterations 3.1415926 →Frac` will give `22/7`,
 whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 
-## ToFractionDigits (→QDigits, →FracDigits)
+## →QDigits
 
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
@@ -448,12 +448,12 @@ scale down the font size in order to make stack elements fit.
 
 This is the opposite of [AutoScaleStack](#autoscalestack).
 
-## MaximumShowWidth (MaxW)
+## MaximumShowWidth
 
 Maximum number of horizontal pixels used to display an object with
 [Show](#show).
 
-## MaximumShowHeight (MaxH)
+## MaximumShowHeight
 
 Maximum number of vertical pixels used to display an object with [Show](#show).
 

@@ -717,9 +717,9 @@ Additional contributors to the project include:
 * Camille Wormser (complex number fixes)
 * Jeff, aka spiff72 (keyboard overlay)
 * Conrado Seibel (help file fix)
-- Kjell Christenson (simulator fix)
-- Václav Kadlčík (documentation fix)
-- Franco Trimboli (WASM port)
+* Kjell Christenson (simulator fix)
+* Václav Kadlčík (documentation fix)
+* Franco Trimboli (WASM port)
 
 The authors would like to acknowledge
 
@@ -2330,6 +2330,63 @@ You can edit it by recalling its content on the stack using
 `"config:equations.csv" RCL`, editing the values, and then storing the content
 back to disk using `"config:equations.csv" STO`.
 # Release notes
+
+## Release 0.8.1 "Sale" - Multi-equation solver
+
+### Features
+
+* Multiple-equation solver (HP's MES), solves for variables one at a time
+* The `|` operator (aka `where`) applies to library equations
+* The `|` operator respects variables with units in expressions
+* simulator: Add support for copy and paste (to/from simulator)
+* Add support for cylindrical and spherical 2D and 3D vectors
+* Positional graphic combination operations (e.g. `GraphicRatio`)
+* Switch to Greek or Cyrillic keyboard maps based on character menu
+* Add EDIT menu commands to transient alpha (e.g. ▶F3 is Word→)
+* Index the  help file for performance (about 5x faster on DM32)
+* Accept verbatim code and RPL code snippets in the help file
+* Parse and show help topics taking all aliases into account
+* Convert lists and equations to RPL programs with `→Program`
+
+
+### Bug fixes
+
+* Show tagged values for vectors and matrices
+* Update the target global variable after running `root`
+* Show all variables in the `SolvingMenu` (with a settings to control it)
+* Unit-related commands accept tagged objects and expression-enclosed units
+* Add angular units (e.g. radians) in angular equations
+* Correct unit for `V` in `Cantilever Shear` (was `n` instead of `N`)
+* `Purge` now correctly restores UI patterns settings
+* Add missing font parameter to `→Grob` (HP calculator compatibility)
+* Include equations and xlibs to list of symbolic objects
+* Fix precision loss for `atan`, `acos` and `asin` for some values
+* Add angles for `atan2` when using hardware-accelerated floating-point
+* Remove spaces and separators in the names of library equations
+* keyboard: Replace ASN with ->NUM
+* Preserve trailing decimal separator in `FIX` mode with `NoTrailingDecimal`
+* Fix backspace and delete operation around number separators
+* Fix the definition of `cosh` for complex values (was computing `sinh`)
+* Accept uppercase and lowercase `.48s` when saving/restoring state
+* Accept both `Ω` or `Ω` as spellings for Ohm (different Unicode)
+* Only update the state file when disk operations are successful
+
+
+### Improvements
+
+* Add `arcsin`, `arccos` and `arctan` spellings
+* solver: Reorganize solver code
+* documentation: Udpate equation documentation with examples
+* Save UI patterns as hexadecimal numbers (also in `Modes` command)
+* Use only tabs in library.csv
+* Keep cursor at end of buffer when moving through history with word right
+* Clear selection when BSP is used with a non-empty selection
+* Ensure `debug_printf` always refreshes the screen
+* Switch to binary search for command parsing (~100x faster)
+* Rename some statistical functions for consistency
+* Fix the list of authors in the online help
+* doc: Update performance data
+
 
 ## Release 0.8.0 "Gabriel" - Symbolic operations, equations and library
 
@@ -5356,7 +5413,8 @@ The DB50X calculator features a library of equations covering mathematics,
 physics, chemistry and computer science. The built-in equations can be extended
 using the `config/equations.csv` configuration file.
 
-## Columns and Beams
+
+## Columns and Beams
 
 The variables in the Columns and Beams section are:
 
@@ -5382,9 +5440,7 @@ The variables in the Columns and Beams section are:
 * `x`: Distance along beam
 * `y`: Deflection at x (dim.: length)
 
-For simply supported beams and cantilever beams (“Simple Deflection” through
-“Cantilever Shear”), the calculations differ depending upon the location of x
-relative to the loads.
+For simply supported beams and cantilever beams (“Simple Deflection” through “Cantilever Shear”), the calculations differ depending upon the location of 'x' relative to the loads.
 
 * Applied loads are positive downward.
 * The applied moment is positive counterclockwise.
@@ -5393,55 +5449,102 @@ relative to the loads.
 * Internal bending moment is positive counterclockwise on the left-hand part.
 * Shear force is positive downward on the left-hand part.
 
-### Elastic Buckling
+### Elastic Buckling
 
 These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
+To calculate `Pcr` (Critical load) in kilonewtons (kN):
+```rpl
+'ROOT(ⒺElasticBuckling|L=7.3152_m|r=4.1148_cm|E=199947961.502_kPa|A=53.0967_cm^2|K=0.7|I=8990598.7930_mm^4;Pcr;1_kN)'
+```
 
-### Eccentric Columns
+
+### Eccentric Columns
 
 These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Eccentric Columns](img/EccentricColumns.bmp)
 
+To calculate `σmax` (Maximum stress) in `kPa`:
+```rpl
+'ROOT(ⒺEccentricColumns|L=6.6542_m|A=187.9351_cm^2,|r=8.4836_cm|E=206842718.795_kPa|I=135259652.16_mm^4|K=1;σmax;1_kPa)’
+```
 
-### Simple Deflection
+### Simple Deflection
 
 ![Simple Deflection](img/SimpleDeflection.bmp)
 
+To calculate `y` (Deflection at x):
+```rpl
+'ROOT(ⒺSimpleDeflection|L=20_ft|E=29000000_psi|I=40_in^4|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;y;1_in)'
+```
 
-### Simple Slope
+### Simple Slope
 
 ![Simple Slope](img/SimpleSlope.bmp)
 
+To calculate `θ` (Slope at `x`):
+```rpl
+'ROOT(ⒺSimpleSlope|L=20_ft|E=29000000_psi|I=40_in^4|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;θ;0_°)'
+```
 
-### Simple Moment
+
+### Simple Moment
 
 ![Simple Moment](img/SimpleMoment.bmp)
 
+To calculate `Mx` (Internal bending moment at x):
+```rpl
+'ROOT(ⒺSimpleMoment|L=20_ft|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;Mx;1_ft∗lbf)'
+```
 
-### Simple Shear
+### Simple Shear
 
 ![Simple Shear](img/SimpleShear.bmp)
 
+To calculate `V` (Shear force at x):
+```rpl
+'ROOT(ⒺSimpleShear|L=20_ft|a=10_ft|P=674.427_lbf|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;V;1_lbf)'
+```
 
-### Cantilever Deflection
+### Cantilever Deflection
 
 ![Cantilever Deflection](img/CantileverDeflection.bmp)
 
-### Cantilever Slope
+To calculate `y` (Deflection at x):
+```rpl
+'ROOT(ⒺCantileverDeflection|L=10_ft|E=29000000_psi|I=15_in^4|P=500_lbf|M=800_lb*lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;y;0_in)'
+```
+
+
+### Cantilever Slope
 
 ![Cantilever Slope](img/CantileverSlope.bmp)
 
-### Cantilever Moment
+To calculate `θ` (Slope at `x`):
+```rpl
+'ROOT(ⒺCantileverSlope|L=10_ft|E=29000000_psi|I=15_in^4|P=500_lbf|M=800_ft∗lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;θ;0_°)'
+```
+
+### Cantilever Moment
 
 ![Cantilever Moment](img/CantileverMoment.bmp)
 
-### Cantilever Shear
+To calculate `Mx` (Internal bending moment at x):
+```rpl
+'ROOT(ⒺCantileverMoment|L=10_ft|P=500_lbf|M=800_ft∗lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;Mx;1_ft*lbf)'
+```
+
+### Cantilever Shear
 
 ![Cantilever Shear](img/CantileverShear.bmp)
+
+To calculate `V` (Shear force at x):
+```rpl
+'ROOT(ⒺCantileverShear|L=10_ft|P=500_lbf|a=3_ft|x=8_ft|w=100_lbf/ft;V;1_lbf)'
+```
 
 
 ## Electricity
@@ -5512,81 +5615,81 @@ The variables in the Electricity section are:
 * `meeff`: Electron effective mass
 * `mheff`: Hole effective mass
 
-### Coulomb's Law & E Field
+### Coulomb’s Law & E Field
 
-These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges Q1 or Q2 in the expression of the electric force.
+These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'Q1' or 'Q2' in the expression of the electric force.
 
-### E Field Infinite Line
+### E Field Infinite Line
 
-The expression for the radial electric field at the distance r is approximately valid if the distance r is such that r << L and therefore also applies to a wire of finite length L.
+The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
 
-![E field infinite line](img/E Field Infinite Line.bmp)
+### E Field Finite Line
 
-### E Field Finite Line
+The expression of the radial electric field at the distance 'r' depends on the subtended angles 'θ1' and 'θ2' relative to the ends of the wire of finite length 'L'.
 
-The expression of the radial electric field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L.
+![E field finite line](img/E Field Finite Line.bmp)
 
-### E Field Infinite Plate
+### E Field Infinite Plate
 
-The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance d from a finite plate if d is very small compare to the dimensions (length and width) of the plate.
+The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length and width) of the plate.
 
-### Ohm's Law & Power
+### Ohm’s Law & Power
 
-### Volt Divider
+### Volt Divider
 
-### Current Divider
+### Current Divider
 
-### Wire Resistance
+### Wire Resistance
 
-### Resistivity & Conductivity
+### Resistivity & Conductivity
 
-The electrical resistivity ρ of most materials changes with temperature. If the temperature T does not vary too much, a linear approximation can be used around the reference point (ρ0; T0).
+The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
 
-### Series & Parallel R
+### Series & Parallel R
 
-### Series & Parallel C
+### Series & Parallel C
 
-### Series & Parallel L
+### Series & Parallel L
 
-### Capacitive Energy
+### Capacitive Energy
 
-### Volumic Density Electric Energy
+### Volumic Density Electric Energy
 
-### Inductive Energy
+### Inductive Energy
 
-### RLC Current Delay
+### RLC Current Delay
 
-### DC Capacitor Current
+### DC Capacitor Current
 
 These equations approximate the dc current required to charge the voltage on a capacitor in a certain time interval.
 
-### Capacitor Charge
+### Capacitor Charge
 
-### DC Inductor Voltage
+### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
 
-### RC Transient
+### RC Transient
 
-### RL Transient
+### RL Transient
 
-### Resonant Frequency
+### Resonant Frequency
 
-### Plate Capacitor
+### Plate Capacitor
 
-### Cylindrical Capacitor
+### Cylindrical Capacitor
 
-### Solenoid Inductance
+### Solenoid Inductance
 
-### Toroid Inductance
+### Toroid Inductance
 
-### Sinusoidal Voltage
+### Sinusoidal Voltage
 
-### Sinusoidal Current
+### Sinusoidal Current
 
-### Drift Speed & Current Density
+### Drift Speed & Current Density
 
-### Electron & Hole Mobilities
+### Electron & Hole Mobilities
 
 In accordance with microscopic Ohm's law, the current density is proportional to the electric field. Holes and electrons therefore move at their average drift speeds during the mean free time between collisions. As long as the electric fields are not very high, the mobilities of holes and electrons are constant.
 
@@ -5601,11 +5704,11 @@ The variables in the Fluids section are:
 * `ΔP`: Pressure change (dim.: force/area, in SI: pascal, Pa)
 * `Δy`: Height change
 * `ΣK`: Total fitting coefficients
-* `f`: Fanning friction factor
 * `A`: Cross-sectional area
 * `A1, A2`: Initial and final ross-sectional areas
 * `D`: Diameter
 * `D1, D2`: Initial and final diameters
+* `f`: Fanning friction factor
 * `h`: Depth relative to P0 reference depth
 * `hL`: Head loss (dim.: area/time^2, in SI: m^2/s^2)
 * `L`: Length
@@ -5621,23 +5724,23 @@ The variables in the Fluids section are:
 * `W`: Power input (dim.: energy/time, in SI: watt, W)
 * `y1, y2`: Initial and final heights
 
-### Pressure At Depth
+### Pressure At Depth
 
-This equation describes hydrostatic pressure for an incompressible fluid. Depth h is positive downwards from the reference.
+This equation describes hydrostatic pressure for an incompressible fluid. Depth 'h' is positive downwards from the reference.
 
-### Bernoulli Equation
+### Bernoulli Equation
 
 These equations represent the streamlined flow of an incompressible fluid.
 
-### Flow with Losses
+### Flow with Losses
 
 These equations extend Bernoulli’s equation to include power input (or output) and head loss.
 
-### Flow In Full Pipes
+### Flow In Full Pipes
 
-These equations adapt Bernoulli’s equation for flow in a round, full pipe, including power input (or output) and frictional losses (with the fanning friction factor f).
+These equations adapt Bernoulli’s equation for flow in a round, full pipe, including power input (or output) and frictional losses (with the fanning friction factor 'f').
 
-## Forces and Energy
+## Forces and Energy
 
 The variables in the Force and Energy section are:
 
@@ -5671,21 +5774,21 @@ force (Law of Gravitation), or Drag force (Drag force)
 * `x`: Displacement
 * `UGf, UGi`: Final and initial gravitational potential energy (dim.: force·length, in SI: joule, J)
 
-### Linear Mechanics
+### Linear Mechanics
 
-### Angular Mechanics
+### Angular Mechanics
 
-### Centripetal Force
+### Centripetal Force
 
-### Hooke's Law
+### Hooke’s Law
 
 The force is that exerted by the spring.
 
-### 1D Elastic Collisions
+### 1D Elastic Collisions
 
-### Gravitation Law
+### Gravitation Law
 
-### Relativity Mass Energy
+### Relativity Mass Energy
 
 ## Gases
 
@@ -5718,35 +5821,35 @@ The variables in the Gases section are:
 * `W`: Work (dim.: force·length, in SI: joule, J)
 * `Z, Zi, Zf`: Initial and final gas compressibility correction factors
 
-### Ideal Gas
+### Ideal Gas
 
-### Ideal Gas Law Change
+### Ideal Gas Law Change
 
-### Isothermal Expansion
+### Isothermal Expansion
 
 These equations apply to an ideal gas.
 
-### Polytropic Processes
+### Polytropic Processes
 
-These equations describe a reversible pressure-volume change of an ideal gas such that P ∗Vn is constant. Special cases include isothermal processes (n=1), isentropic processes (n=k, the specific heat ratio), and constant-pressure processes (n=0).
+These equations describe a reversible pressure-volume change of an ideal gas such that 'P·Vn' is constant. Special cases include isothermal processes ('n = 1'), isentropic processes ('n = k', the specific heat ratio), and constant-pressure processes ('n = 0').
 
-### Isentropic Flow
+### Isentropic Flow
 
 The calculation differs at velocities below and above Mach 1. The Mach number is based on the speed of sound in the compressible fluid.
 
-### Real Gas Law
+### Real Gas Law
 
 These equations adapt the ideal gas law to emulate real-gas behavior.
 
-### Real Gas State Change
+### Real Gas State Change
 
 This equation adapts the ideal gas state-change equation to emulate real-gas behavior.
 
-### Kinetic Theory
+### Kinetic Theory
 
 These equations describe properties of an ideal gas.
 
-## Heat transfer
+## Heat transfer
 
 The variables in the Heat Transfer section are:
 
@@ -5772,24 +5875,21 @@ The variables in the Heat Transfer section are:
 * `Ti, Tf`: Initial and final temperatures
 * `U`: Overall heat transfer coefficient (dim.: power/(area·temperature) in SI: W/(m^2·K))
 
-### Heat Capacity
+### Heat Capacity
 
-### Thermal Expansion
+### Thermal Expansion
 
 ### Conduction
 
 ### Convection
 
-### Conduction + Convection
+### Conduction + Convection
 
-If you have fewer than three layers, give the extra layers a zero thickness and any nonzero conductivity. The two
-temperatures are fluid temperatures – if instead you know a surface temperature, set the corresponding convective
-coefficient to 10^999999.
+If you have fewer than three layers, give the extra layers a zero thickness and any nonzero conductivity. The two temperatures are fluid temperatures – if instead you know a surface temperature, set the corresponding convective coefficient to 10^999999.
 
-### Black Body Radiation
+### Black Body Radiation
 
-F0λ(λ_m, T_K) is the black body emissive power Function which eturns the fraction of total black-body emissive power at
-temperature T_K between wavelengths 0 and λ_m. It is the integral of the Planck distribution.
+F0λ(λ_m, T_K) is the black body emissive power Function which returns the fraction of total black-body emissive power at temperature 'T_K' between wavelengths 0 and 'λ_m'. It is the integral of the Planck distribution.
 
 ## Magnetism
 
@@ -5819,43 +5919,43 @@ The variables in the Magnetism section are:
 * `T`: Period (dim.: time)
 * `VH`: Hall tension (dim.: energy/charge, in SI: volt, V)
 
-#### Straight Wire Infinite
+#### Straight Wire Infinite
 
-The magnetic field expression differs depending upon whether the point (at r) is inside or outside the wire (of radius rw) and the calculations are done accordingly. The expression for the magnetic field at the distance r is approximately valid if the distance r is such that r << L and therefore also applies for a wire of finite length L.
+The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly. The expression for the magnetic field at the distance 'r' is approximately valid if the distance is such that 'r << L' and therefore also applies for a wire of finite length 'L'.
 
-#### Straight Wire Finite
+#### Straight Wire Finite
 
-The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point (at r) is inside or outside the wire (of radius rw) and the calculations are done accordingly.
+The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly.
 
-#### Force Between Wires
+#### Force Between Wires
 
 The force between wires is positive for an attractive force (for currents having the same sign) and negative otherwise, corresponding to a repulsive force.
 
-#### B Field In Infinite Solenoid
+#### B Field In Infinite Solenoid
 
-The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < L and therefore also applies inside a solenoid of finite length L.
+The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < 'L' and therefore also applies inside a solenoid of finite length 'L'.
 
-#### B Field In Finite Solenoid
+#### B Field In Finite Solenoid
 
-The expression for the magnetic field in the center depends on the subtended internal angles α1 and α2 relative to the top ends of the solenoid of finite length L.
+The expression for the magnetic field in the center depends on the subtended internal angles 'α1' and 'α2' relative to the top ends of the solenoid of finite length 'L'.
 
 ![B Field In Finite Solenoid](img/B Field In Finite Solenoid.bmp)
 
-#### B Field In Toroid
+#### B Field In Toroid
 
-#### Hall Effect
+#### Hall Effect
 
-The moving charge carrier is deflected by the magnetic field to create the Hall tension between the opposite sides of the conductor.
+The moving charge carrier is deflected by the magnetic field to create the Hall tension 'VH' between the opposite sides of the conductor.
 
-#### Cyclotron Mouvement
+#### Cyclotron Mouvement
 
-Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period T.
+Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period 'T'.
 
-#### Helicoidal Mouvement
+#### Helicoidal Mouvement
 
-Under the magnetic field lines (at angle θ with the speed vector), the moving charge has an helicoidal trajectory of pitch Dpitch, radius Rc and period T.
+Under the magnetic field lines (at angle 'θ' with the speed vector), the moving charge has an helicoidal trajectory of pitch 'Dpitch', radius 'Rc' and period 'T'.
 
-#### Volumic Density Magnetic Energy
+#### Volumic Density Magnetic Energy
 
 ## Motion
 
@@ -5895,27 +5995,27 @@ The variables in the Motion section are:
 * `y`: Vertical position at t
 * `y0`: Initial vertical position
 
-#### Linear Motion
+#### Linear Motion
 
-#### Object In Free Fall
+#### Object In Free Fall
 
-By definition, an object in free fall only experiences local gravitational acceleration (gloc). This depends on the mass of the star or planet and the distance (r) center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value (gearth) of the acceleration of gravity as a function of latitude (φ) and for an altitude (h) low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
+By definition, an object in free fall only experiences local gravitational acceleration 'gloc'. This depends on the mass of the star or planet and the distance 'r' center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value 'gearth' of the acceleration of gravity as a function of latitude 'φ' and for an altitude 'h' low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
 
-Reference: Commissions romandes de mathématique, de physique et de chimie, Formulaires et tables : Mathématiques, Physique, Chimie, Tricorne, 2000, 278
+// Reference: Commissions romandes de mathématique, de physique et de chimie, Formulaires et tables : Mathématiques, Physique, Chimie, Tricorne, 2000, 278
 
-#### Projectile Motion
+#### Projectile Motion
 
-During the time of flight (tf), the motion of a projectile follows a symetric parabole of horizontal range (R) and of maximum height (hmax).
+During the time of flight 'tf', the motion of a projectile follows a symetric parabole of horizontal range 'R' and of maximum height 'hmax'.
 
-#### Angular Motion
+#### Angular Motion
 
-#### Uniform Circular Motion
+#### Uniform Circular Motion
 
-#### Terminal Velocity
+#### Terminal Velocity
 
 Terminal velocity is the maximum speed attainable by an object as it falls through a fluid like air for instance. It is reached when the sum of the increasing drag force plus the buoyancy is equal to the downward force of gravity acting on the object, leading to a zero net force at the resulting terminal velocity.
 
-#### Escape and Orbital Velocities
+#### Escape and Orbital Velocities
 
 The escape velocity is the speed required to completely free oneself from the gravitational field of a star, planet, etc. It is defined as the initial speed allowing you to move away to infinity. The orbital velocity is the speed nneded to maintain a stable circular orbit in a gravitational field.
 
@@ -5959,36 +6059,33 @@ The variables in the Optics section are:
 * `NA`: Numerical aperture of the optic fiber
 * `y`: distance between two image points on the observation screen (perpendicular to the optical axis)
 
-For reflection and refraction problems, the focal length and radius of curvature are positive in the direction of the
-outgoing light (reflected or refracted). The object distance is positive in front of the surface. The image distance is
-positive in the direction of the outgoing light (reflected or refracted). The magnification is positive for an upright
-image.
+For reflection and refraction problems, the focal length and radius of curvature are positive in the direction of the outgoing light (reflected or refracted). The object distance is positive in front of the surface. The image distance is positive in the direction of the outgoing light (reflected or refracted). The magnification is positive for an upright image.
 
-#### Refraction Law
+#### Refraction Law
 
-#### Critical Angle
+#### Critical Angle
 
-#### Fiber Optic
+#### Fiber Optic
 
-#### Brewster's Law
+#### Brewster’s Law
 
 The Brewster angle is the angle of incidence at which the reflected wave is completely polarized.
 
-#### Spherical Reflection
+#### Spherical Reflection
 
-#### Spherical Refraction
+#### Spherical Refraction
 
-#### Thin Lens
+#### Thin Lens
 
-#### Rayleigh's Criterion
+#### Rayleigh’s Criterion
 
-#### Malus Law
+#### Malus Law
 
-If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle θ between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (fx < fx0) and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton effect).
+If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle 'θ' between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency ('fx < fx0') and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
-#### 2 Slits Young Interference
+#### 2 Slits Young Interference
 
-#### One Slit Diffraction
+#### One Slit Diffraction
 
 ## Oscillations
 
@@ -6017,21 +6114,21 @@ The variables in the Oscillations section are:
 * `x`: Displacement at t
 * `xm`: Displace amplitude
 
-#### Mass-Spring System
+#### Mass-Spring System
 
-#### Simple Pendulum
+#### Simple Pendulum
 
-#### Conical Pendulum
+#### Conical Pendulum
 
-#### Torsional Pendulum
+#### Torsional Pendulum
 
-#### Simple Harmonic
+#### Simple Harmonic
 
-#### Underdamped Oscillations
+#### Underdamped Oscillations
 
-#### Driven Damped Oscillations
+#### Driven Damped Oscillations
 
-## Plane Geometry
+## Plane Geometry
 
 The variables in the Plane Geometry section are:
 
@@ -6061,13 +6158,13 @@ The variables in the Plane Geometry section are:
 
 #### Rectangle
 
-#### Regular Polygon
+#### Regular Polygon
 
-#### Circular Ring
+#### Circular Ring
 
 #### Triangle
 
-## Solid geometry
+## Solid geometry
 The variables in the Solid Geometry section are:
 
 * `A`: Total surface area
@@ -6090,7 +6187,7 @@ The variables in the Solid Geometry section are:
 
 #### Sphere
 
-## Solid State Devices
+## Solid State Devices
 The variables in the Solid State Devices section are:
 
 * `αF`: Forward common-base current gain
@@ -6146,29 +6243,17 @@ The variables in the Solid State Devices section are:
 * `xdmax`: Depletion-layer width
 * `xj`: Junction depth
 
-#### PN Step Junctions
+#### PN Step Junctions
 
-These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes
-abruptly at the junction. The equation assume the current density is determined by minority carries injected across
-the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500
-K.
+These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes abruptly at the junction. The equation assume the current density is determined by minority carries injected across the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500 K.
 
-#### NMOS Transistor
+#### NMOS Transistor
 
-These equations for a silicon NMOS transistor use a two-port network model. They include linear and nonlinear
-regions in the device characteristics and are based on a gradual-channel approximation (the electric fields in the
-direction of current flow are small compared to those perpendicular to the flow). The drain current and
-transconductance calculations differ depending on whether the transistor is in the linear, saturated, or cutoff region.
-The equations assume the physical geometry of the device is a rectangle, second-order length-parameter effects are
-negligible, shot-channel, hot-carrier, and velocity-saturation effects are negligible, and subthreshold currents are
-negligible.
+These equations for a silicon NMOS transistor use a two-port network model. They include linear and nonlinear regions in the device characteristics and are based on a gradual-channel approximation (the electric fields in the direction of current flow are small compared to those perpendicular to the flow). The drain current and transconductance calculations differ depending on whether the transistor is in the linear, saturated, or cutoff region. The equations assume the physical geometry of the device is a rectangle, second-order length-parameter effects are negligible, shot-channel, hot-carrier, and velocity-saturation effects are negligible, and subthreshold currents are negligible.
 
-#### Bipolar Transistors
+#### Bipolar Transistors
 
-These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and
-J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The
-equations also include the special conditions when the emitter-base or collector-base junction is open, which are
-convenient for measuring transistor parameters.
+These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The equations also include the special conditions when the emitter-base or collector-base junction is open, which are convenient for measuring transistor parameters.
 
 #### JFETs
 
@@ -6178,7 +6263,7 @@ calculation differs depending on whether the gate-junction depletion-layer thick
 than the channel thickness. The equations assume the channel is uniformly doped and end effects (such as contact,
 drain, and source resistances) are negligible.
 
-## Stress Analysis
+## Stress Analysis
 The variables in the Stress Analysis section are:
 
 * `δ`: Elongation
@@ -6210,15 +6295,15 @@ The variables in the Stress Analysis section are:
 * `r`: Radius
 * `T`: Torque (dim.: force·length, in SI: N·m)
 
-#### Stress Analysis
+#### Stress Analysis
 
-#### Shear Stress
+#### Shear Stress
 
-#### Stress On An Element
+#### Stress On An Element
 
 Stresses and strains are positive in the directions shown in the picture.
 
-#### Mohr's Circle
+#### Mohr’s Circle
 
 ## Waves
 The variables in the Waves section are:
@@ -6257,31 +6342,33 @@ The variables in the Waves section are:
 * `vs`: Velocity at x and t of vibrating particles (Longitudinal Waves), or Velocity at x and t of air particles (Sound Waves)
 * `vsair`: Velocity of the propagating sound in the ait as a function of temperature
 
-#### Transverse Waves
+#### Transverse Waves
 
-#### Longitudinal Waves
+#### Longitudinal Waves
 
-#### Sound Waves
+#### Sound Waves
 
-#### Doppler Effect
+#### Doppler Effect
 
-In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of the sound in the air. The speed of the receiver relative to the air vr is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air va is subtracted from the speed of the sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
+In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of sound in the air. The speed of the receiver relative to the air 'vr' is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air 'va' is subtracted from the speed of sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
 
-#### Mach Number
+#### Mach Number
 
-For an object moving at a supersonic speed, the shockwave describes a cone having the angle θcone at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
+For an object moving at a supersonic speed, the shockwave describes a cone having the angle 'θcone' at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
 
-#### String Standing Waves
+#### String Standing Waves
 
-A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string.
+A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being being fixed at one end and free at the other end admits only all odd integer harmonics.
 
-#### Sound Wave Harmonics
+#### Sound Wave Harmonics
 
-A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube.
+A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being being open at one end and closed at the other end admits only all odd integer harmonics.
 
-#### Beat Acoustics
+#### Beat Acoustics
 
-#### Electromagnetic Waves
+In acoustics, a beat is an interference pattern between two sounds of slightly different frequencies, perceived as a periodic variation in amplitude whose rate is the difference of the two frequencies. The sum of two unit-amplitude sine waves can be expressed as a carrier wave of frequency 'favg' whose amplitude is modulated by an envelope wave of frequency 'fbeat'.
+
+#### Electromagnetic Waves
 
 ## Relativity
 The variables in the Relativity section are:
@@ -6375,57 +6462,56 @@ The variables in the Relativity section are:
 * `ve`: Escape velocity
 * `z`: Gravitational redshift parameter
 
-The relativistic transformations are parametrized by the real constant v representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
+The relativistic transformations are parametrized by the real constant 'v' representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
 
-#### Lorentz Transformation
+#### Lorentz Transformation
 
-The primed reference frame (xp, yp, zp) is travelling with velocity v in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
+The primed reference frame ('xp', 'yp', 'zp') is travelling with velocity 'v' in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
 
-#### Time Dilation
+#### Time Dilation
 
-The dilation comes from the fact that the Lorentz factor γ is greater or equal to one and the proper time interval is multiplied by γ.
+The dilation comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper time interval is multiplied by this factor.
 
-#### Space Contraction
+#### Space Contraction
 
-The contraction comes from the fact that the Lorentz factor γ is greater or equal to one and the proper space interval is divided by γ.
+The contraction comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper space interval is divided by this factor.
 
-#### Velocity Superposition
+#### Velocity Superposition
 
-These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with v = c leads to upx = c, hence the impossibility to superpose velocities to go beyond the velocity limit c. Since the velocity v is confined to the x-direction, the y and z components of velocity remain unchanged.
+These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with 'v = c' leads to 'upx = c', hence the impossibility to superpose velocities to go beyond the velocity limit 'c'. Since the velocity 'v' is confined to the x-direction, the y and z components of velocity remain unchanged.
 
-#### Acceleration Superposition
+#### Acceleration Superposition
 
-Even the velocity v is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
+Even if the velocity 'v' is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
 
-#### E & B Fields Transformation
+#### E & B Fields Transformation
 
-#### Longitudinal Doppler Effect
+#### Longitudinal Doppler Effect
 
-#### Transverse Doppler Effect
+#### Transverse Doppler Effect
 
-#### Energy & Momentum
+#### Energy & Momentum
 
-The total relativistic energy E and the norm of the momentum p form the invariant mo·c^2 which remains the same in all frames The kinetic energy K is the difference between the total relativistic energy E and the rest energy E0 = mo·c^2.
+The total relativistic energy 'E' and the norm of the momentum 'p' form the invariant 'mo·c^2' which remains the same in all frames. The kinetic energy 'K' is the difference between the total relativistic energy 'E' and the rest energy 'E0 = mo·c^2'.
 
-#### Gravitational Time Dilation
+#### Gravitational Time Dilation
 
-#### Gravitational Redshift
+#### Gravitational Redshift
 
-#### Circumnavigating Airplanes
+#### Circumnavigating Airplanes
 
-It is assumed that the planes are circumnavigating at the same altitude h, same latitude φ and the during same flight duration Δt measured in the airplanes. The ground is rotating with the planet at the angular frequency ω. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << c (slow airplanes over a slow rotating planet).
+It is assumed that the planes are circumnavigating at the same altitude 'h', same latitude 'φ' and the during same flight duration 'Δt' measured in the airplanes. The ground is rotating with the planet at the angular frequency 'ω'. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << 'c' (slow airplanes over a slow rotating planet).
 
-#### Clocks at different heights
+#### Clocks at different heights
 
-It is assumed that the two clocks are at rest with respect to the ground at a latitude φ and are rotating with the planet at the angular frequency ω. The clocks are at their respective heights h1 and h2 for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height h1 and h2 are << c (slow rotating planet).
+It is assumed that the two clocks are at rest with respect to the ground at a latitude 'φ' and are rotating with the planet at the angular frequency 'ω'. The clocks are at their respective heights 'h1' and 'h2' for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height 'h1' and 'h2' are << 'c' (slow rotating planet).
 
-#### B H Schwarzschild  Geometry
+#### B H Schwarzschild Geometry
 
-#### B H Thermodynamics
+#### B H Thermodynamics
 
-## Modern Physics
+## Modern Physics
 The variables in the Modern Physics section are:
-
 
 * `β`: Velocity relativistic speed ratio
 * `φ`: Work function of the substance (dim.: energy, in SI: eV)
@@ -6463,27 +6549,33 @@ The variables in the Modern Physics section are:
 * `T`: Temperature
 * `V0`: Stopping potential (dim.: energy/charge, In SI: volt,V)
 
-#### Planck & Wien Comparison
+#### Planck & Wien Comparison
 
-In this section 2 comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature determines the frequency ranges for integration between f1 and f2, or between f3 and f4. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in Frfafb) to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
 
-#### Planck & Rayleigh-Jeans Comparison
+#### Planck & Rayleigh-Jeans Comparison
 
-In this section 2 comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature determines the frequency ranges for integration between f1 and f2, or between f3 and f4. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in Frfafb) to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
 
-#### Photoelectric Effect
+#### Photoelectric Effect
 
-#### Compton Effect
+Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy 'E' of the incident photon is greather or equal to the work function 'φ' of the material. A simple energy budget equation determines the maximum kinetic energy 'Kmax' of the photoelectron.
 
-#### De Broglie Wave
+#### Compton Effect
 
-#### Bohr Atomic Model
+In the Compton effect, both energy and momentum are conserved during the collision of the incident photon and the electron, which underlines the fact that the photon must henceforth be considered as a particle. When a high frequency 'f' (or energy 'E = hf') photon scatters due to an interaction with a charged particle, there is a decrease in the energy of the photon emitted at an angle 'θ' and thus, an increase in its wavelength 'λp'. The energy of the ejected electron 'Kmax' is relativist.
 
-## Nuclear Physics
+#### De Broglie Wave
+
+At all scales where measurements have been possible, matter exhibits wave-like behavior (e.g. Young interference for protons, even for molecules). More precisely, a beam of neutron can be diffracted just like a beam of light or a water wave as it is the case in the Bragg diffraction. Here, the interference is constructive when the phase difference between the matter wave reflected off different atomic planes at an angle 'θ' is a multiple of 2π, giving the Following condition: '2·d·SINθ = n·λ' with 'n' integer and where 'θ' is mesured between the refected waves trajectory and the atomic plane.
+
+#### Bohr Atomic Model
+
+## Nuclear Physics
 The variables in the Nuclear Physics section are:
 //38 variables; 26 eqns
 * `λ`: Decay constant (Radioactivity) (dim.: 1/time, in SI: s^-1)
@@ -6510,33 +6602,35 @@ The variables in the Nuclear Physics section are:
 * `N0`: Initial number of nucleid
 * `Q`: Net energy balance of a nuclear reaction (dim.: energy, in SI: MeV)
 * `Qα`: Net energy balance of an α decay (dim.: energy, in SI: MeV)
-* `Qβminus`: Net energy balance of a β- decay (dim.: energy, in SI: MeV)
-* `Qβplus`: Net energy balance of a β+ decay (dim.: energy, in SI: MeV)
+* `Qβ⊖`: Net energy balance of a β- decay (dim.: energy, in SI: MeV)
+* `Qβ⊕`: Net energy balance of a β+ decay (dim.: energy, in SI: MeV)
 * `R`: Radius of the nucleus having A nucleons
 * `T1/2`: Half-life of radionuclide (dim.: time)
 * `Z`: Number of proton
 * `ZXα`: Proton number of the radionuclide X undergoing α decay
 * `ZYα`: Proton number of the daughter nuclide Y from α decay
-* `ZXβminus`: Proton number of the radionuclide X undergoing β- decay
-* `ZYβminus`: Proton number of the daughter nuclide Y from β- decay
-* `ZXβplus`: Proton number of the radionuclide X undergoing β+ decay
-* `ZYβplus`: Proton number of the daughter nuclide Y from β+ decay
+* `ZXβ⊖`: Proton number of the radionuclide X undergoing β- decay
+* `ZYβ⊖`: Proton number of the daughter nuclide Y from β- decay
+* `ZXβ⊕`: Proton number of the radionuclide X undergoing β+ decay
+* `ZYβ⊕`: Proton number of the daughter nuclide Y from β+ decay
 * `Za`: Proton number of the incident nuclide or charge of the incident particle a
 * `Zb`: Proton number of the incident nuclide or or charge of the product particle b
 * `ZX`: Proton number of the reactant nuclide X
 * `ZY`: Proton number of the product nuclide Y
 
+For all nuclear reactions, including nuclear decays, we have charge conservation 'Zp = Z' and mass number conservation 'Mp = M' (the same number of nucleons). This therefore requires assigning numbers A and Z to incident particles 'a' and 'b' whether they are for example gamma photons ('A = 0', Z = 0'), positrons ('A = 0', Z = -1') or others. The reaction energy 'Q' is always calculated with the mass-energy equivalence by the mass difference between the reactants and the products. Spontaneous decays are for instance always exothermic 'Q > 0' while some nuclear reactions can be endothermic 'Q < 0'.
+
 #### Radioactivity
 
-#### Radius & Binding Energy
+#### Radius & Binding Energy
 
-#### α Decay
+#### α Decay
 
-#### β- Decay
+#### β⊖ Decay
 
-#### β+ Decay
+#### β+ Decay
 
-#### General Nuclear Reaction
+#### General Nuclear Reaction
 # Menus
 
 Menus display at the bottom of the screen, and can be activated using the keys
@@ -6574,10 +6668,10 @@ calculator. It includes the following submenus:
 * [Solve](#SolverMenu): Numerical solver
 
 
-## VariablesMenu (VARS)
+## VariablesMenu
 
-The variables menu displays the variables in the current directory.
-It is a three row menu, where for each variable:
+The variables menu, accessed using the _VAR_ key, displays the variables in the
+current directory. It shows three rows for each variable:
 
 * The primary function [evaluates the variable](#VariablesMenuExecute)
 * The first shifted function [recalls the variable](#VariablesMenuRecall)
@@ -6610,21 +6704,21 @@ It invokes a context-dependent menu adapted to the top level of the stack.
 The `LastMenu` function (🟨 _A_), returns back in the history of past visited menus. The history contains up to 8 entries.
 # Operations with Angles
 
-## ToDegrees (→Deg)
+## ToDegrees
 Convert a number or angle to an angle in degrees.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRadians (→Rad)
+## ToRadians
 Convert a number or angle to an angle in radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToGrads (→Grad)
+## ToGrads
 Convert a number or angle to an angle in grads.
 If given a number, that number is interpreted using the current angle mode.
 
-## ToPiRadians (→πr)
+## ToPiRadians
 Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
@@ -6657,7 +6751,7 @@ Convert vector or complex to polar coordinates
 Convert vector or complex to spherical coordinates
 # Arithmetic
 
-## + (add)
+## Add
 
 Add two values.
 
@@ -6673,7 +6767,7 @@ Add two values.
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
   `"X=" 1 +` gives `"X=1"`.
 
-## - (sub)
+## Sub
 
 Subtract two values
 
@@ -6685,7 +6779,7 @@ Subtract two values
   [autosimplify](#autosimplify) is active.
 
 
-## × (*, mul)
+## Mul
 
 Multiply two values.
 
@@ -6705,7 +6799,7 @@ Multiply two values.
   gives `"XXX"`.
 
 
-## ÷ (/, div)
+## Div
 
 Divide two values two values
 
@@ -6763,12 +6857,12 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart (IP, IntPart)
+## IntegerPart
 
 Integer part of a number
 
 
-## FractionalPart (FP, FracPart)
+## FractionalPart
 
 Fractional part of a number
 
@@ -6821,21 +6915,21 @@ For complex numbers, returns a unit number on the unit circle with the same
 argument as the original number.
 
 
-## Percent (%)
+## Percent
 
 Percentage of a number
 
 `Y` `X` ▶ `Y×(X÷100)`
 
 
-## PercentChange (%CH)
+## PercentChange
 
 Percentage of change on a number
 
 `Y` `X` ▶ `(X÷Y-1)×100`
 
 
-## PercentTotal (%T)
+## PercentTotal
 
 Get percentage of a total
 
@@ -6908,7 +7002,7 @@ Nth Tchebycheff polynomial of the second kind
 Nth Hermite polynomial as used in probabilities
 
 
-## DIV2 (QuoRem, IDIV2, QuotientRemainder)
+## QuotientRemainder
 
 Euclidean division, returning quotient and remainder.
 
@@ -6978,7 +7072,7 @@ Largest prime smaller than the input
 Factorize a polynomial or number
 # Base functions
 
-## Evaluate (EVAL)
+## Evaluate
 
 Evaluate the object at stack level 1.
 
@@ -6986,7 +7080,7 @@ Mapped to the _ R/S _ key
 
 `X` ▶ Result of `X` evaluation
 
-## Negate (NEG)
+## Negate
 
 Negate the value in level 1.
 
@@ -6994,7 +7088,7 @@ Mapped to the _ +/- _ key
 
 `X` ▶ `0-X`
 
-## Invert (INV)
+## Invert
 
 Invert the value in level 1
 
@@ -7010,93 +7104,93 @@ numbers, the operation happens on the number of bits defined by the
 [WordSize](#wordsize) setting. For integer values, the maximum number of bits is
 defined by the [MaxNumberBits](#maxnumberbits) setting.
 
-## ShiftLeft (SL)
+## ShiftLeft
 
 Shift the value left by one bit.
 
 `Value` ▶ `Value*2`
 
-## ShiftLeftByte (SLB)
+## ShiftLeftByte
 
 Shift the value left by one byte (8 bits).
 
 `Value` ▶ `Value*256`
 
-## ShiftLeftCount (SLC)
+## ShiftLeftCount
 
 Shift the value left by a given number of bits.
 
 `Value` `Shift` ▶ `Value*2^Shift`
 
-## ShiftRight (SR)
+## ShiftRight
 
 Shift the value right by one bit.
 
 `Value` ▶ `Value/2`
 
-## ShiftRightByte (SRB)
+## ShiftRightByte
 
 Shift the value right by one byte (8 bits).
 
 `Value` ▶ `Value/256`
 
-## ShiftRightCount (SRC)
+## ShiftRightCount
 
 Shift the value right by a given number of bits.
 
 `Value` `Shift` ▶ `Value/2^Shift`
 
-## ArithmeticShiftRight (ASR)
+## ArithmeticShiftRight
 
 Shift the value right by one bit, preserving the sign bit.
 
 `Value` ▶ `Signed(Value)/2`
 
-## ArithmeticShiftRightByte (ASRB)
+## ArithmeticShiftRightByte
 
 Shift the value right by one byte (8 bits), preserving the sign bit.
 
 `Value` ▶ `Signed(Value)/256`
 
-## ArithmeticShiftRightCount (ASRC)
+## ArithmeticShiftRightCount
 
 Shift the value right by a given number of bits, preserving the sign bit.
 
 `Value` `Shift` ▶ `Signed(Value)/2^Shift`
 
-## RotateLeft (RL)
+## RotateLeft
 
 Rotate the value left by one bit.
 
 `Value`  ▶ `RLC(Value, 1)`
 
 
-## RotateLeftByte (RLB)
+## RotateLeftByte
 
 Rotate the value left by one byte (8 bits).
 
 `Value`  ▶ `RL(Value, 8)`
 
-## RotateLeftCount (RLC)
+## RotateLeftCount
 
 Rotate the value left by a given number of bits.
 
 `Value`  `Shift` ▶ `RLC(Value, Shift)`
 
 
-## RotateRight (RR)
+## RotateRight
 
 Rotate the value right by one bit.
 
 `Value`  ▶ `RRC(Value, 1)`
 
-## RotateRightByte (RRB)
+## RotateRightByte
 
 Rotate the value right by one byte (8 bits).
 
 `Value`  ▶ `RRC(Value, 8)`
 
-## RotateRightCount (RRC)
+## RotateRightCount
 
 Rotate the value right by a given number of bits.
 
@@ -7282,7 +7376,7 @@ Library items are defined by the `config/library.csv`, and accessed using the
 `Library` command or the `XLib` command.
 
 
-## Constant (CONST)
+## Constant
 
 Returns the value of a constant from the constants library.
 The name can be given as a symbol or as text.
@@ -7290,7 +7384,7 @@ The name can be given as a symbol or as text.
 `'c'` ▶ `299792458_m/s`
 
 
-## LibraryEquation (LIBEQ)
+## LibraryEquation
 
 Returns the value of a library equation from the equation library.
 The name can be given as a symbol or as text.
@@ -7298,7 +7392,7 @@ The name can be given as a symbol or as text.
 `"RelativityMassEnergy"` ▶ `"'E=m*c^2'"`
 
 
-## LibraryItem (XLIB)
+## LibraryItem
 
 Returns the value of a library item from the library.
 The name can be given as a symbol or as text.
@@ -7325,7 +7419,7 @@ The debug menu contains operations necessary to debug RPL programs:
 * [Step↑](#stepout)
 
 
-## Debug (DBUG)
+## Debug
 
 The `Debug` command takes a program or expression as an argument, and starts
 debugging execution of it. When a program is halted for debugging, the header
@@ -7340,7 +7434,7 @@ by being interrupted using the _EXIT_ key, then this is seen as part of the same
 debugging session.
 
 
-## SingleStep (SST)
+## SingleStep
 
 The `SingleStep` command steps through a single instruction in the RPL program.
 
@@ -7364,7 +7458,7 @@ program being debugged. The number of steps to execute is passed as an argument
 in the first level of the stack. For example, `40 MultipleSteps` will execute
 the next 40 RPL instructions.
 
-## Continue (CONT)
+## Continue
 
 The `Continue` command resumes execution of the current RPL program at the
 current instruction.
@@ -7382,7 +7476,7 @@ debugged.
 
 Variables are named storage for RPL values.
 
-## Store (STO)
+## Store
 
 Store an object into a specified location. For example `2 'ABC' STO` stores the value `2` in a global variable named `ABC`.
 
@@ -7399,7 +7493,7 @@ The `Value` is copied in a storage location identified by `Name`. The storage lo
 * Text: `Value` is stored in a named file on the [flash storage](#flash-storage).
 
 
-## Recall (RCL)
+## Recall
 Recall an object from a specified location. For example `'ABC' RCL` recalls the value from a global variable named `ABC`.
 
 `Name` ▶ `Value`
@@ -7430,43 +7524,43 @@ The format of the file depends on how the name ends:
 * `.csv`: The value is stored in comma-separated values format. This is mostly interesting for arrays and lists, which can be echanged with spreadsheets and other PC applications that can input or output CSV files.
 
 
-## StoreAdd (STO+)
+## STO+
 Add a value to the content of a variable
 
 
-## StoreSub (STO-)
+## STO-
 Subtract a value from the contents of a variable
 
 
-## StoreMul (STO×)
+## STO×
 Multiply the contents of a variable by a value
 
 
-## StoreDiv (STO÷)
+## STO÷
 Divide the contents of a variable by a value
 
 
-## RecallAdd (RCL+)
+## RCL+
 Add the content of a variable to a value on the stack
 
 
-## RecallSub (RCL-)
+## RCL-
 Subtract the contents of a variable from a value on a stack
 
 
-## RecallMul (RCL×)
+## RCL×
 Multiply a value on the stack by the contents of a variable
 
 
-## RecallDiv (RCL÷)
+## RCL÷
 Divide a value on the stack by the contents of a variable
 
 
-## Increment (INCR)
+## Increment
 Add one to the content of a variable
 
 
-## Decrement (DECR)
+## Decrement
 Subtract one from content of a variable
 
 
@@ -7489,34 +7583,34 @@ directories, `PurgeAll` may purge multiple variables. Use [Purge](#Purge) if you
 want to only purge a variable in the current directory.
 
 
-## CreateDirectory (CRDIR)
+## CreateDirectory
 Create new directory
 
 
-## PurgeDirectory (PGDIR)
+## PurgeDirectory
 Purge entire directory tree
 
 
-## UpDirectory (UPDIR)
+## UpDirectory
 Change current directory to its parent
 
 
-## HomeDirectory (HOME)
+## HomeDirectory
 Change current directory to HOME
 
 
-## DirectoryPath (PATH)
+## DirectoryPath
 Get a path to the current directory
 
 
-## Variables (VARS)
+## Variables
 
 List all visible variables in a directory
 
 ▶ `{ Variables... }`
 
 
-## TypedVariables (TVARS)
+## TypedVariables
 
 List variables of a specific type
 
@@ -7774,14 +7868,14 @@ Change the separator symbols
 Change the display format for numbers
 
 
-## SetFlag (SF)
+## SetFlag
 
 Set a user or system flag.
 
 `33 SF` sets user flag 0.
 `'MixedFractions' SetFlag` enables the `MixedFractions` setting.
 
-## ClearFlag (CF)
+## ClearFlag
 
 Clear a user or system flag
 
@@ -7789,36 +7883,36 @@ Clear a user or system flag
 
 Invert a user or system flag
 
-## TestFlagSet (FS?)
+## TestFlagSet
 
 Test if a flag is set
 
-## TestFlagClear (FC?)
+## TestFlagClear
 
 Test if a flag is clear
 
-## TestFlagClearThenClear (FC?C)
+## TestFlagClearThenClear
 
 Test if a flag is clear, then clear it
 
-## TestFlagSetThenClear (FS?C)
+## TestFlagSetThenClear
 
 Test if a flag is set, then clear it
 
-## TestFlagClearThenSet (FC?S)
+## TestFlagClearThenSet
 
 Test if a flag is clear, then set it
 
-## TestFlagSetThenSet (FS?S)
+## TestFlagSetThenSet
 
 Test if a flag is set, then set it
 
-## FlagsToBinary (RCLF)
+## FlagsToBinary
 
 Recall all system flags as a binary number.
 
 
-## BinaryToFlags (STOF)
+## BinaryToFlags
 
 Store and replace all system flags from a binary number
 # Fonts
@@ -7946,12 +8040,12 @@ Note that unlike on the HP48, a complex value in DB50X can
 contain a based number.
 
 
-## ClearLCD (CLLCD)
+## ClearLCD
 
 Clear the LCD display, and block updates of the header or menu areas.
 
 
-## DrawText (DISP)
+## DrawText
 
 Draw the text or object in level 2 at the position indicated by level 1. A text
 is drawn without the surrounding quotation marks.
@@ -7986,7 +8080,7 @@ top-left corner (`#0 #0`) with the largest (editor) font (font identifier `3`),
 erasing the background (the first `true`), in reverse colors (the second
 `true`).
 
-## DrawStyledText (DISPXY)
+## DrawStyledText
 
 Draw the text or object in level 3 at the position indicated by level 2, using
 the font specified in level 1. This behaves like [DrawText](#drawtext), except
@@ -8018,7 +8112,7 @@ The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
 [MaximumShowHeight](#maximumshowheight) settings.
 
-## DrawLine (line)
+## DrawLine
 
 Draw a line between two points specified by level 1 and level 2 of the stack.
 
@@ -8026,7 +8120,7 @@ The width of the line is specified by [LineWidth](#linewidth). The line is drawn
 using the [foreground](#foreground) pattern.
 
 
-## PlotParameters (PPAR)
+## PlotParameters
 
 The `PlotParameters` reserved variable defines the plot parameters, as a list,
 with the following elements:
@@ -8047,6 +8141,229 @@ with the following elements:
 * *Type* of plot (default `function`)
 
 * *Dependent variable* name (default `y`)
+
+
+## Pict
+
+`Pict` is the name given to the graphics shown on the calculator's screen.
+It can only be used as an argument to `Store`, `Recall` and graphical
+operations such as `GAnd`.
+
+[Not fully implemented yet: `Store` and `Recall` do not work]
+
+
+# Bitmap operations
+
+## ToGrob
+
+Creates a graphics object from a specified object on the stack.
+
+The first level of the stack specifies the character size used while
+rendering the object, where value `0` indicates the `StackFont` value.
+
+If the second level of the stack is a text, then the quotes that appear
+the text is displayed on the stack will not be included in the generated
+graphic object. This is similar to the behaviour of `Disp`. The rendering
+of objects respects the settings used to render on the stack, e.g.
+`FIX` mode or `VerticalVectors`.
+
+The object to draw must fit in a bit map at most `MaxW`-pixels wide and
+`MaxH`-pixels high.
+
+
+```rpl
+@ Show font sizes
+0 7 for fontID
+  "Font " fontID + fontID →Grob
+next
+```
+
+## GXor
+
+Superimposes a source graphic object onto a destination graphic object, which
+can be `Pict` to represent what is presently shown on screen. The upper left
+corner pixel of the positioned at the specified coordinate in the destination.
+
+`GXor` is used for creating cursors, for example, to make the cursor image
+appear dark on a light background and light on a dark background. Executing
+`Gxor` again with the same image restores the original picture.
+
+`GXOR` uses a logical exclusive OR to determine the state of the pixels (on or
+off) in the overlapping portion of the argument graphics objects.
+
+If the destination is not `Pict`, the resulting graphic object is returned on
+the stack. If the destination is `Pict`, the screen is updated and no result
+is returned on the stack.
+
+```rpl
+@ Blinking cursor
+"Hello" 1 DISP
+1 20 start
+  Pict { #0 #0 } "█" 3 →Grob GXor 0.5 Wait
+next
+```
+
+
+## GOr
+
+Superimposes a source graphic object onto a destination graphic object, which
+can be `Pict` to represent what is presently shown on screen. The upper left
+corner pixel of the positioned at the specified coordinate in the destination.
+
+`GOr` uses a logical OR to determine the state of the pixels (on or
+off) in the overlapping portion of the argument graphics objects.
+On DB50X, pixels that are set appear white.
+
+If the destination is not `Pict`, the resulting graphic object is returned on
+the stack. If the destination is `Pict`, the screen is updated and no result
+is returned on the stack.
+
+```rpl
+@ Erasing cursor
+"Hello World" 1 DISP
+1 50 for i
+  Pict i R→B { #0 } + "▶" 3 →Grob GOr 0.05 Wait
+next
+```
+
+## GAnd
+
+Superimposes a source graphic object onto a destination graphic object, which
+can be `Pict` to represent what is presently shown on screen. The upper left
+corner pixel of the positioned at the specified coordinate in the destination.
+
+`GAnd` uses a logical AND to determine the state of the pixels (on or
+off) in the overlapping portion of the argument graphics objects.
+On DB50X, pixels that are set appear white.
+
+If the destination is not `Pict`, the resulting graphic object is returned on
+the stack. If the destination is `Pict`, the screen is updated and no result
+is returned on the stack.
+
+```rpl
+@ Darkening cursor
+"Hello World" 1 DISP
+1 250 for i
+  Pict i R→B { #0 } + "▓" 3 →Grob GAnd 0.05 Wait
+12 step
+```
+
+
+## GraphicAppend
+
+Append two graphic objects side by side.
+The two graphic objects are vertically centered with respect to one another.
+
+```rpl
+@ Juxtapose two font sizes
+"ABC" 4 →Grob
+"DEF" 2 →Grob
+GraphicAppend
+```
+
+
+## GraphicStack
+
+Stack two graphic objects on top of one another.
+The two graphic objects are horizontally centered with respect to one another.
+
+```rpl
+@ Stack two font sizes
+"ABC" 4 →Grob
+"DEF" 2 →Grob
+GraphicStack
+```
+
+## GraphicSubscript
+
+Combine two graphic objects with the second one in subscript position
+
+```rpl
+@ Subscript with two font sizes
+"ABC" 4 →Grob
+"DEF" 2 →Grob
+GraphicSubscript
+```
+
+## GraphicExponent
+
+Combine two graphic objects with the second one in exponent position
+
+```rpl
+@ Exponent with two font sizes
+"ABC" 4 →Grob
+"DEF" 2 →Grob
+GraphicExponent
+```
+
+## GraphicRatio
+
+Combine two graphic objects as if they were in a fraction
+
+```rpl
+@ Ratio with two font sizes
+"ABC" 4 →Grob
+"DEF" 2 →Grob
+GraphicRatio
+```
+
+## GraphicRoot
+
+Generate a square root sign around a graphical object
+
+```rpl
+@ Square root sign
+"ABC" 4 →Grob
+GraphicRoot
+```
+
+## GraphicParentheses
+
+Generate parentheses around a graphical object
+
+```rpl
+@ Parentheses around graphic
+"ABC" 4 →Grob
+GraphicParentheses
+```
+
+## GraphicNorm
+
+Generate a norm (vertical bars) around a graphical object
+
+```rpl
+@ Norm around graphic
+"ABC" 4 →Grob
+GraphicNorm
+```
+
+
+## GraphicSum
+
+Generate a sum (capital Sigma) sign of the given size
+
+```rpl
+@ 128-pixel Sigma sign
+128 GraphicSum
+```
+
+## GraphicProduct
+
+Generate a product (capital Pi) sign of the given size
+
+```rpl
+@ 96-pixel Sigma sign
+96 GraphicProduct
+```
+
+## GraphicIntegral
+
+Generate an integral sign of the given size
+
+```rpl
+@ 45-pixel Sigma sign
+45 GraphicIntegral
+```
 # Local Variables
 
 ## LSTO
@@ -8154,7 +8471,7 @@ and are not necessarily rectangular, although some operations (e.g. matrix
 operations using arrays as input) can impose stricter constraints.
 
 
-## →List (ToList)
+## →List
 
 Build a list from elements on the stack. Level 1 of the stack contains the
 number of elements in the list. The elements are on the stack, the first element
@@ -8162,7 +8479,7 @@ being deepest in the stack. This is the opposite of [List→](#fromlist).
 
 `A` `B` ... `Count` ▶ `{ A B ... }`
 
-## List→ (FromList)
+## List→
 
 Expand a list on the stack and return the number of elements. After executing
 the command, level 1 contains the number of elements, and a corresponding number
@@ -8173,7 +8490,7 @@ at the deepest level in the stack. This is the opposite of [→List](#tolist). T
 `{ A B ... }` ▶ `A` `B` ... `Count`
 
 
-## List→ (FromList)
+## List→
 
 Expand a list on the stack and return the number of elements. After executing
 the command, level 1 contains the number of elements, and a corresponding number
@@ -8281,7 +8598,7 @@ Sort a list or array by value, in reverse order compared to `Sort`.
 Sort a list or array using the memory representation of objects, in reverse
 order compared to `QuickSort`.
 
-## ReverseList (REVLIST)
+## ReverseList
 
 Reverse the order of elements in a list
 
@@ -8294,7 +8611,7 @@ Add elements to a list, keep only the last N elements
 Assemble a list from results of sequential procedure
 # Operations with Matrices and vectors
 
-## ToArray (→Arry)
+## ToArray
 
 Stack to Array Command: Returns a vector of n real or complex elements or a
 matrix of n × m real or complex elements.
@@ -8306,7 +8623,7 @@ The elements of the result array should be entered in row order.
 `A11` ... `Arc` `{ r c }` ▶ `[[ A11 A1c] [ A21 ... Arc ]]`
 
 
-## FromArray (Arry→)
+## FromArray
 
 Array to Stack Command: Takes an array and returns its elements as separate real or complex numbers. Also returns a list of the dimensions of the array.
 If the argument is an n-element vector, the first element is returned to level n + 1 (not level nm + 1), and the nth element to level 2.
@@ -8384,7 +8701,7 @@ Perform Cholesky decomposition on a matrix
 Column norm (one norm) of a matrix
 
 
-## CON (ConstantArray)
+## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
 value.
@@ -8432,7 +8749,7 @@ Cross produce of vectors
 Swap two columns in a matrix
 
 
-## Determinant (DET)
+## Determinant
 
 Compute the determinant of a matrix
 
@@ -8466,7 +8783,7 @@ Assemble a Hilbert symbolic array
 Find a basis of the intersection of two vector spaces
 
 
-## IDN (IdentityMatrix)
+## IdentityMatrix
 
 Identity Matrix Command: Returns an identity matrix, that is, a square matrix
 with its diagonal elements equal to 1 and its off-diagonal elements equal to 0.
@@ -8543,7 +8860,7 @@ QR Decomposition of a matrix
 Rank of a matrix
 
 
-## RANM (RandomMatrix)
+## RandomMatrix
 
 Returns an array containing random integer values between -9 and 9.
 
@@ -8735,7 +9052,7 @@ cycle as follows:
 * `0.1_m` at which point the cycle repeats.
 
 
-## Explode (OBJ→)
+## Explode
 
 Explode an object into its sub-components. The various sub-components are placed
 on the stack, and if necessary, information about the size is places on the
@@ -8761,6 +9078,22 @@ first level of the stack.
 
 * Text is evaluated as if it had been executed on the command line, in a way
   similar to the `STR→` command.
+
+
+## →Program
+
+Convert an object into a program.
+
+* Algebraic expressions or polynomials are converted to an equivalent
+  RPL program. For example, `'sin(X+2*Y)'` will be converted as
+  `« X 2 Y × + sin »`
+
+* Lists are converted to a program with the exact same structure.
+  For example, `{ 1 2 + }` will be converted to `« 1 2 + »`.
+
+* Other objects are simply wrapped in a program.
+  For example, `1.2` will be converted to `« 1.2 »`
+  Note that this applies to programs as well.
 # Scalable plots and graphics
 
 ## BEGINPLOT
@@ -9053,27 +9386,27 @@ DB50X has five display mode (one more than the HP48)s:
 * [Engineering mode](#EngineeringDisplay))
 * [Significant digits mode](#SignificantDisplay))
 
-## StandardDisplay (STD)
+## StandardDisplay
 
 Display numbers using full precision. All significant digts to the right of the
 decimal separator are shown, up to 34 digits.
 
-## FixedDisplay (FIX)
+## FixedDisplay
 
 Display numbers rounded to a specific number of decimal places.
 
-## ScientificDisplay (SCI)
+## ScientificDisplay
 
 Display numbers in scientific notation, i.e. with a mantissa and an
 exponent. The mantissa has one digit to the left of the decimal separator and
 shows the specified number of decimal places.
 
-## EngineeringDisplay (SCI)
+## EngineeringDisplay
 
 Display nunmbers as a mantissa with a sepcified number of digits, followed by an
 exponent that is a multiple of 3.
 
-## SignificantDisplay (SIG)
+## SignificantDisplay
 
 Display up to the given number of digits without trailing zero. This mode is
 useful because DB50X can compute with large precision, and it may be useful to
@@ -9151,20 +9484,20 @@ DB50X has four angle modes:
 * [Grads](#Grads): A full circle is 400 radians
 * [PiRadians](#PiRadians): Radians shown as multiple of π
 
-## Degrees (DEG)
+## Degrees
 
 Select degrees as the angular unit. A full circle is 360 degrees.
 
-## Radians (RAD)
+## Radians
 
 Select radians as the angular unit. A full circle is 2π radians,
 and the angle is shown as a numerical value.
 
-## Grads (GRAD)
+## Grads
 
 Select grads as the angular unit. A full circle is 400 grads.
 
-## PiRadians (PIRAD)
+## PiRadians
 
 Select multiples of π as the angular unit. A full circle is 2π radians,
 shown as a multiple of π.
@@ -9283,19 +9616,19 @@ Integer values can be reprecended in a number of different bases:
 * [Decimal](#Decimal) is base 10
 * [Hexadecimal](#Hexadecimal) is base 16
 
-## Binary (BIN)
+## Binary
 
 Selects base 2
 
-## Octal (OCT)
+## Octal
 
 Selects base 8
 
-## Decimal (DEC)
+## Decimal
 
 Selects base 10
 
-## Hexadecimal (HEX)
+## Hexadecimal
 
 Selects base 16
 
@@ -9303,13 +9636,13 @@ Selects base 16
 
 Select an arbitrary base for computations
 
-## WordSize (STWS)
+## WordSize
 
 Store the current [word size](#wordsize) in bits. The word size is used for
 operations on based numbers. The value must be greater than 1, and the number of
 bits is limited only by memory and performance.
 
-## RecallWordSize (RCWS)
+## RecallWordSize
 
 Return the current [word size](#wordsize) in bits.
 
@@ -9346,13 +9679,13 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
-## ToFractionIterations (→QIterations, →FracIterations)
+## →QIterations
 
 Define the maximum number of iterations converting a decimal value to a
 fraction. For example, `1 →FracIterations 3.1415926 →Frac` will give `22/7`,
 whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 
-## ToFractionDigits (→QDigits, →FracDigits)
+## →QDigits
 
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
@@ -9471,12 +9804,12 @@ scale down the font size in order to make stack elements fit.
 
 This is the opposite of [AutoScaleStack](#autoscalestack).
 
-## MaximumShowWidth (MaxW)
+## MaximumShowWidth
 
 Maximum number of horizontal pixels used to display an object with
 [Show](#show).
 
-## MaximumShowHeight (MaxH)
+## MaximumShowHeight
 
 Maximum number of vertical pixels used to display an object with [Show](#show).
 
@@ -9644,7 +9977,7 @@ Root seeking (bisection method)
 
 # Stack manipulation
 
-## ClearStack (CLEAR)
+## ClearStack
 
 Remove all objects from the stack
 
@@ -9667,21 +10000,21 @@ Remove two objects form the stack
 Remove N objects from the stack, N being given in level 1.
 
 
-## Duplicate (DUP)
+## Duplicate
 Duplicate an object on the stack
 
 
-## Duplicate2 (DUP2)
+## Duplicate2
 Duplicate two objects on the stack
 
 
-## DuplicateTwice (DUPDUP)
+## DuplicateTwice
 Duplicate the same object twice on the stack
 
-## DuplicateN (DUPN)
+## DuplicateN
 Duplicate a group of N objects, N being given in stack level 1
 
-## LastArguments (LASTARG)
+## LastArguments
 Put the last arguments back on the stack
 
 ## LastX
@@ -9856,7 +10189,7 @@ Stores an array from the stack as statistics data in the `ΣData` variable.
 
 Clear statistics data.
 
-## Average (MEAN, AVG)
+## Average
 
 Compute the average (mean) of the values in the statistics data.
 If there is a single column of data, the result is a real number.
@@ -9874,53 +10207,53 @@ Compute the smallest of the values in the statistics data array `ΣData`.
 
 Compute the largest of the values in the statistics data array `ΣData`.
 
-## ΣSize (NΣ)
+## ΣSize
 
 Return the number of data rows in the statistics data array `ΣData`.
 
-## SumOfX (ΣX)
+## ΣX
 
 Return the sum of values in the `XCol` column of the statistics data array
 `ΣData`. The values are adjusted according to the current fitting model defined
 in `ΣParameters` if the `CurrentFitSums` setting is active.
 
-## SumOfY (ΣY)
+## ΣY
 
 Return the sum of values in the `YCol` column of the statistics data array
 `ΣData`. The values are adjusted according to the current fitting model defined
 in `ΣParameters` if the `CurrentFitSums` setting is active.
 
-## SumOfXY (ΣXY)
+## ΣXY
 
 Return the sum of the product of values in the `XCol` and `YCol` columns of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## SumOfXSquares (ΣX²)
+## ΣX²
 
 Return the sum of the squares of the values in the `XCol` column of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## SumOfYSquares (ΣY²)
+## ΣY²
 
 Return the sum of the squares of the values in the `YCol` column of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## Total (TOT)
+## ΣTotal
 
 Returns the sum of all columns in the statistics data array `ΣData`.
 
-## Variance (VAR)
+## Variance
 
 Calculates the sample variance of the coordinate values in each of the columns
 in the current statistics matrix (`ΣData`).
 
-## Correlation (CORR)
+## Correlation
 
 Returns the correlation coefficient of the independent and dependent data
 columns in the current statistics matrix (reserved variable `ΣData`).
@@ -9930,7 +10263,7 @@ The columns are specified by the first two elements in the reserved variable
 exist, `Correlation` creates it and sets the elements to their default values
 (1 and 2).
 
-## Covariance (COV)
+## Covariance
 
 Returns the sample covariance of the independent and dependent data columns in
 the current statistics matrix (reserved variable `ΣData`).
@@ -9940,7 +10273,7 @@ The columns are specified by the first two elements in the reserved variable
 exist, `Correlation` creates it and sets the elements to their default values
 (1 and 2).
 
-## StandardDeviation (SDEV)
+## StandardDeviation
 
 Calculates the sample standard deviation of each of the columns of coordinate values in the current statistics matrix (reserved variable `ΣData`).
 
@@ -9948,7 +10281,7 @@ Calculates the sample standard deviation of each of the columns of coordinate va
 
 The standard deviation is the square root of the `Variance`.
 
-## LinearRegression (LR)
+## LinearRegression
 
 Uses the currently selected statistical model to calculate the linear regression
 coefficients (intercept and slope) for the selected dependent and independent
@@ -9994,24 +10327,24 @@ This is a DB50X extension, not present on HP calculators
 Select the best linear regression mode based on current data, i.e. the
 regression mode where the correlation value is the highest.
 
-## LinearFit (LINFIT)
+## LinearFit
 
 Select linear fit, i.e. try to model data with a linear equation `y = a*x+b`.
 
-## ExponentialFit (EXPFIT)
+## ExponentialFit
 
 Select exponential fit, i.e. try to model data with an equation `y = b*exp(a*x)`
 
-## LogarithmicFit (LOGFIT)
+## LogarithmicFit
 
 Select logarithmic fit, i.e. try to model data with an equation `y = a*ln(x)+b`.
 
-## PowerFit (PWRFIT)
+## PowerFit
 
 Select power fit, i.e. try to model data with an equation `y = x^a * b`.
 
 
-## FrequencyBins (BINS)
+## FrequencyBins
 
 Sorts the elements of the independent column (`XCol`) of the current statistics
 matrix (the reserved variable `ΣDat`) into (`nbins + 2`) bins, where the left
@@ -10026,7 +10359,7 @@ example, by executing `BarPlot`.
 `xmin` `xwidth` `nbins` ▶ `[[ n1 .. n2 ]]` `[ nlow nhigh ]`
 
 
-## PopulationVariance (PVAR)
+## PopulationVariance
 
 Calculates the population variance of the coordinate values in each of the m
 columns in the current statistics matrix (`ΣData`).
@@ -10035,7 +10368,7 @@ The population variance (equal to the square of the population standard
 deviation) is returned as a vector of m real numbers, or as a single real number
 if there is a single column of data.
 
-## PopulationStandardDeviation (PSDEV)
+## PopulationStandardDeviation
 
 Calculates the population standard deviation of each of the m columns of
 coordinate values in the current statistics matrix (reserved variable `ΣData`).
@@ -10043,7 +10376,7 @@ coordinate values in the current statistics matrix (reserved variable `ΣData`).
 The command returns a vector of m real numbers, or a single real number if there
 is a single column of data.
 
-## PopulationCovariance (PCOV)
+## PopulationCovariance
 
 Computes the population covariance of the independent and dependent data columns
 in the current statistics matrix (reserved variable `ΣData`).
@@ -10052,19 +10385,19 @@ The columns are specified by the first two elements in reserved variable
 `ΣParameters`, set by `XCol` and `YCol` respectively. If `ΣParameters` does not
 exist, `PCOV` creates it and sets the elements to their default values, 1 and 2.
 
-## IndependentColumn (XCOL)
+## IndependentColumn
 
 Set the independent variable column in the reserved variable `ΣParameters`.
 
 `XCol` ▶ (Update `ΣParameters`)
 
-## DependentColumn (YCOL)
+## DependentColumn
 
 Set the dependent variable column in the reserved variable `ΣParameters`.
 
 `YCol` ▶ (Update `ΣParameters`)
 
-## DataColumns (COLΣ)
+## DataColumns
 
 Set both the independent and dependent data columns in the reserved variable
 `ΣParameters`.
@@ -10161,7 +10494,7 @@ Examples:
 * `'(A+B)^3' { 'X^N' 'X*X^(N-1)' } ↓Match` returns `(A+B)*(A+B)^2`.
 
 
-## Isolate (ISOL)
+## Isolate
 
 Isolate variable: Returns an expression that rearranges an expression given in
 stack level 2 to “isolate” a variable specified in stack level 1.
@@ -10178,7 +10511,7 @@ The command will generate `Unable to isolate` if the expression cannot be
 reorganized, for example because it contains functions that have no known
 inverse.
 
-## ∂ (Derivative)
+## Derivative
 
 Compute the derivative function for an expression. The algebraic syntax for `∂` is `'∂name(expr)'` For example, `'∂x(sin(2*x^2)'` computes `4*X*cos(2*X^2)`
 
@@ -10234,19 +10567,19 @@ Evaluate algebraic rules on symbolic expressions one step at a time.
 
 
 
-## →Num (→Decimal, ToDecimal)
+## →Num
 
 Convert fractions and symbolic constants to decimal form.
 For example, `1/4 →Num` results in `0.25`.
 
-## →Frac (→Q, ToFraction)
+## →Q
 
 Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
 The precision of the conversion in digits is defined by
 [→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
 conversion is defined by [→FracDigits](#ToFractionIterations)
 
-## ListExpressionNames (LName)
+## ListExpressionNames
 
 List all variables used in an expression or polynomial, leaving the original
 object on the stack, and returning the result as an array.
@@ -10262,7 +10595,7 @@ command, which extracts the units associated with the variables if there are
 any. The `LName` command only returns the names, without the associated unit.
 
 
-## ExpressionVariables (XVars)
+## ExpressionVariables
 
 List all variables used in an expression or polynomial, returning the result as
 a list.
@@ -10434,7 +10767,7 @@ cleanup of temporary values (garbage collection).
 See also: [GarbageCollect](#GarbageCollect), [FreeMemory](#FreeMemory)
 
 
-## AvailableMemory (MEM)
+## AvailableMemory
 
 Return the number of bytes available in memory.
 
@@ -10520,7 +10853,7 @@ Make a new copy of the given object
 ## USBFWUPDATE
 
 
-## PowerOff (OFF)
+## PowerOff
 
 Turn calculator off programmatically
 
@@ -10549,20 +10882,20 @@ integer, where the tag is `X` and the object is `3`.
 When displayed on the stack, tags are shown without the leading colon for
 readability. For example, the object above shows as `X:3` on the stack.
 
-## →Tag (ToTag)
+## →Tag
 
 Apply a tag to an object. The tag is in level 1 as text or name. The object to
 be tagged is in level 2. For example, `"Hello" 1 →Tag` results in `:Hello:1`.
 Like on the HP calculators, it is possible to next tags.
 
-## Tag→ (FromTag)
+## Tag→
 
 Expand a tagged object in level 1 into its object and tag. The object will be in
 level 2, the tag will be in level 1 as a text object.
 
 For example, `:Hello:1 Tag→` results in `"Hello"` in level 1 and `1` in level 2.
 
-## DeleteTag (DTAG)
+## DeleteTag
 
 Remove a tag from an object. For example, `:Hello:1 DeleteTag` results in `1`.
 If there is no tag, the object is returned as is.
@@ -10577,28 +10910,28 @@ Create a Utf8 string from a list of code points
 List all code points in a Utf8 string
 
 
-## ToText (→STR, →TEXT)
+## ToText
 
 Convert an object to its text representation.
 
-## Compile (STR→, TEXT→)
+## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.
 
 `"1 2 + 4" TEXT→` will push `3` and `4` on the stack.
 
-## Char→Code (NUM, CODEPOINT, CharToUnicode)
+## Char→Code
 
 Return the Unicode codepoint of the first character in the text, or `-1` if the
 text is empty. `"Hello" NUM` returns `72`.
 
-## Text→Code (TextToUnicode)
+## Text→Code
 
 Return a list of the Unicode codepoints for all codepoints in the given text.
 `"Hello" Text→Code` returns `{ 72 101 108 108 111 }`.
 
 
-## Code→Text (CHR, Code→Char)
+## Code→Text
 
 Build a text out of a Unicode codepoint. The argument can be either a single
 numerical value or a list of numerical values. A negative numerical value
@@ -10891,13 +11224,13 @@ Create a user-defined unit
 Delete a user-defined unit
 
 
-## UnitValue (UVAL)
+## UnitValue
 
 Return the numeric part of a unit object.
 
 `3_km`  ▶ `3`
 
-## BaseUnits (UBASE)
+## BaseUnits
 
 Expand all unit factors to their base units.
 
@@ -10912,14 +11245,14 @@ Convert value from one unit to another. This convert the values in the second le
 
 
 
-## FactorUnit (UFACT)
+## FactorUnit
 
 Factor the unit in level 1 from the unit expression of the level 2 unit object.
 
 `1_W` `1_N` ▶ `1_N*m/s`
 
 
-## →Unit (ToUnit)
+## →Unit
 
 Creates a unit object from a real number and the unit part of a unit object.
 `→Unit` adds units to a number, combining the number and the unit part of a
@@ -10927,7 +11260,10 @@ unit object. The numerical part of the unit object is ignored.
 
 `→Unit` is the reverse of `Unit→` or of `Obj→` applied to a unit object.
 
-`3000` `2_km` ▶ `3000_km`
+```rpl
+@ Will be 3000_km
+3000 2_km →Unit
+```
 
 
 ## ULIST

@@ -181,7 +181,7 @@ COMMAND_DECLARE(PopulationVariance,0);
 COMMAND_DECLARE(PopulationStandardDeviation,0);
 COMMAND_DECLARE(PopulationCovariance,0);
 COMMAND_DECLARE(FrequencyBins,3);
-COMMAND_DECLARE(Total,0);
+COMMAND_DECLARE(DataTotal,0);
 COMMAND_DECLARE(IndependentColumn,1);
 COMMAND_DECLARE(DependentColumn,1);
 COMMAND_DECLARE(DataColumns,2);

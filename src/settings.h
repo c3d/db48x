@@ -42,6 +42,7 @@ RECORDER_DECLARE(settings);
 #define DB48X_MAXDIGITS    9999
 #define DB48X_MAXEXPONENT  (1LL<<60)
 
+
 struct settings
 // ----------------------------------------------------------------------------
 //    Internal representation of settings
@@ -49,6 +50,23 @@ struct settings
 {
 public:
     using id = object::id;
+
+#ifdef CONFIG_COLOR
+#define BLACK(r, g, b)  (pattern(r,g,b).bits)
+#define WHITE(r, g, b)  (pattern(r,g,b).bits)
+#define GRAY25(r,g, b)  (pattern(r,g,b).bits)
+#define GRAY50(r,g, b)  (pattern(r,g,b).bits)
+#define GRAY75(r,g, b)  (pattern(r,g,b).bits)
+#define GRAY90(r,g, b)  (pattern(r,g,b).bits)
+#else // !CONFIG_COLOR
+#define BLACK(r, g, b)   ularge(0)
+#define WHITE(r, g, b)  ~ularge(0)
+#define GRAY25(r,g, b)  (ularge(pattern::gray25.bits))
+#define GRAY50(r,g, b)  (ularge(pattern::gray50.bits))
+#define GRAY75(r,g, b)  (ularge(pattern::gray75.bits))
+#define GRAY90(r,g, b)  (ularge(pattern::gray90.bits))
+#endif // CONFIG_COLOR
+
 
 #define ID(id)
 #define FLAG(Enable, Disable)
@@ -422,6 +440,7 @@ struct Name : setting                                                   \
     };
 
 #include "ids.tbl"
+
 
 
 COMMAND_DECLARE(Modes,0);

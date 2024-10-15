@@ -61,6 +61,8 @@ struct unit : complex
     unit_p cycle() const;
     unit_p custom_cycle(symbol_r sym) const;
 
+    static unit_p get(object_p obj);
+
     static bool mode;           // Set to true to evaluate units
     static bool factoring;      // Set to true when factoring out units
     static bool nodates;        // Disable conversions about dates

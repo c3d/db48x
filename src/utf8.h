@@ -227,6 +227,15 @@ inline size_t utf8_size(unicode cp)
 }
 
 
+inline size_t utf8_size(utf8 text, size_t max = ~0UL)
+// ----------------------------------------------------------------------------
+//   Return the number of bytes required for a UTF-8 encoding of text
+// ----------------------------------------------------------------------------
+{
+    return utf8_next(text, 0, max);
+}
+
+
 inline uint utf8_length(utf8 text)
 // ----------------------------------------------------------------------------
 //    Return the length of the text in Unicode characters
@@ -336,7 +345,7 @@ inline bool is_valid_in_name(unicode cp)
 //   Check if character is valid in a name after the initial character
 // ----------------------------------------------------------------------------
 {
-    if (cp == byte(cp) && isalnum(cp))
+    if (cp == (cp & 0x7F) && isalnum(cp))
         return true;
     static utf8 valid = utf8("!$%&?");
     for (utf8 p = valid; *p; p = utf8_next(p))

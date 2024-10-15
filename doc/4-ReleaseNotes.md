@@ -1,5 +1,62 @@
 # Release notes
 
+## Release 0.8.1 "Sale" - Multi-equation solver
+
+### Features
+
+* Multiple-equation solver (HP's MES), solves for variables one at a time
+* The `|` operator (aka `where`) applies to library equations
+* The `|` operator respects variables with units in expressions
+* simulator: Add support for copy and paste (to/from simulator)
+* Add support for cylindrical and spherical 2D and 3D vectors
+* Positional graphic combination operations (e.g. `GraphicRatio`)
+* Switch to Greek or Cyrillic keyboard maps based on character menu
+* Add EDIT menu commands to transient alpha (e.g. ▶F3 is Word→)
+* Index the  help file for performance (about 5x faster on DM42)
+* Accept verbatim code and RPL code snippets in the help file
+* Parse and show help topics taking all aliases into account
+* Convert lists and equations to RPL programs with `→Program`
+
+
+### Bug fixes
+
+* Show tagged values for vectors and matrices
+* Update the target global variable after running `root`
+* Show all variables in the `SolvingMenu` (with a settings to control it)
+* Unit-related commands accept tagged objects and expression-enclosed units
+* Add angular units (e.g. radians) in angular equations
+* Correct unit for `V` in `Cantilever Shear` (was `n` instead of `N`)
+* `Purge` now correctly restores UI patterns settings
+* Add missing font parameter to `→Grob` (HP calculator compatibility)
+* Include equations and xlibs to list of symbolic objects
+* Fix precision loss for `atan`, `acos` and `asin` for some values
+* Add angles for `atan2` when using hardware-accelerated floating-point
+* Remove spaces and separators in the names of library equations
+* keyboard: Replace ASN with ->NUM
+* Preserve trailing decimal separator in `FIX` mode with `NoTrailingDecimal`
+* Fix backspace and delete operation around number separators
+* Fix the definition of `cosh` for complex values (was computing `sinh`)
+* Accept uppercase and lowercase `.48s` when saving/restoring state
+* Accept both `Ω` or `Ω` as spellings for Ohm (different Unicode)
+* Only update the state file when disk operations are successful
+
+
+### Improvements
+
+* Add `arcsin`, `arccos` and `arctan` spellings
+* solver: Reorganize solver code
+* documentation: Udpate equation documentation with examples
+* Save UI patterns as hexadecimal numbers (also in `Modes` command)
+* Use only tabs in library.csv
+* Keep cursor at end of buffer when moving through history with word right
+* Clear selection when BSP is used with a non-empty selection
+* Ensure `debug_printf` always refreshes the screen
+* Switch to binary search for command parsing (~100x faster)
+* Rename some statistical functions for consistency
+* Fix the list of authors in the online help
+* doc: Update performance data
+
+
 ## Release 0.8.0 "Gabriel" - Symbolic operations, equations and library
 
 This release adds symbolic integration, differentiation and equation

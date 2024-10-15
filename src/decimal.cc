@@ -353,6 +353,7 @@ RENDER_BODY(decimal)
         mode = object::ID_Std;
         digits += mexp;
         fancy = false;
+        showdec = true;
     }
     if (mode == object::ID_Std)
         mode = object::ID_Sig;
@@ -533,7 +534,7 @@ RENDER_BODY(decimal)
             if (decpos == 0 && (more || showdec))
             {
                 r.put(decimal);
-                lastnz = r.size() - !showdec;
+                lastnz = r.size() - (!showdec && (sigmode || digits == 0));
                 sep = frac_spc - 1;
             }
 
@@ -2375,7 +2376,7 @@ decimal_p decimal::asin(decimal_r x)
 
 decimal_p decimal::acos(decimal_r x)
 // ----------------------------------------------------------------------------
-//   Arc-sine, use acos(x) = atan(sqrt(1-x^2) / x)
+//   Arc-cosine, use acos(x) = atan(sqrt(1-x^2) / x)
 // ----------------------------------------------------------------------------
 {
     if (!x)
@@ -2420,22 +2421,8 @@ decimal_p decimal::atan(decimal_r x)
     }
 
     // Check if we have a value of x above 1, if so reduce for convergence
-    if (x->exponent() >= 1)
+    if (x->exponent() >= 1 && !x->is_one())
     {
-        // Check if above 0.5
-        if (!x->is_magnitude_less_than_half())
-        {
-            // atan(x) = pi/4 + atan((x - 1) / (1 + x))
-            decimal_g one = make(1);
-            decimal_g nx = (x - one) / (x + one);
-            nx = atan(nx);
-            decimal_g fourth = make(25,-2);
-            fourth = fourth * pi();
-            fourth = fourth->adjust_to_angle();
-            nx = fourth + nx;
-            return nx;
-        }
-
         // atan(1/x) = pi/2 - arctan(x) when x > 0
         decimal_g i = make(1);
         i = i / x;
@@ -2447,7 +2434,22 @@ decimal_p decimal::atan(decimal_r x)
         return i;
     }
 
+    // Check if above 0.5
+    if (!x->is_magnitude_less_than_half())
+    {
+        // atan(x) = pi/4 + atan((x - 1) / (1 + x))
+        decimal_g one = make(1);
+        decimal_g nx = (x - one) / (x + one);
+        nx = atan(nx);
+        decimal_g fourth = make(25,-2);
+        fourth = fourth * pi();
+        fourth = fourth->adjust_to_angle();
+        nx = fourth + nx;
+        return nx;
+    }
+
     // Prepare power factor and square that we multiply by every time
+    precision_adjust prec(3);
     decimal_g tmp;
     decimal_g sum = x;
     decimal_g square = x * x;
@@ -2458,7 +2460,6 @@ decimal_p decimal::atan(decimal_r x)
     record(decimal, "power= %t", +power);
     record(decimal, "square=%t", +square);
 
-    uint prec = Settings.Precision();
     for (uint i = 3; i < 3 * prec; i += 2)
     {
         power = power * square;
@@ -2484,7 +2485,7 @@ decimal_p decimal::atan(decimal_r x)
     // Convert to current angle mode
     sum = sum->adjust_to_angle();
 
-    return sum;
+    return prec(sum);
 }
 
 

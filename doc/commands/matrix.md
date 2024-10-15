@@ -1,6 +1,6 @@
 # Operations with Matrices and vectors
 
-## ToArray (→Arry)
+## ToArray
 
 Stack to Array Command: Returns a vector of n real or complex elements or a
 matrix of n × m real or complex elements.
@@ -12,7 +12,7 @@ The elements of the result array should be entered in row order.
 `A11` ... `Arc` `{ r c }` ▶ `[[ A11 A1c] [ A21 ... Arc ]]`
 
 
-## FromArray (Arry→)
+## FromArray
 
 Array to Stack Command: Takes an array and returns its elements as separate real or complex numbers. Also returns a list of the dimensions of the array.
 If the argument is an n-element vector, the first element is returned to level n + 1 (not level nm + 1), and the nth element to level 2.
@@ -90,7 +90,7 @@ Perform Cholesky decomposition on a matrix
 Column norm (one norm) of a matrix
 
 
-## CON (ConstantArray)
+## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
 value.
@@ -138,7 +138,7 @@ Cross produce of vectors
 Swap two columns in a matrix
 
 
-## Determinant (DET)
+## Determinant
 
 Compute the determinant of a matrix
 
@@ -172,7 +172,7 @@ Assemble a Hilbert symbolic array
 Find a basis of the intersection of two vector spaces
 
 
-## IDN (IdentityMatrix)
+## IdentityMatrix
 
 Identity Matrix Command: Returns an identity matrix, that is, a square matrix
 with its diagonal elements equal to 1 and its off-diagonal elements equal to 0.
@@ -249,7 +249,7 @@ QR Decomposition of a matrix
 Rank of a matrix
 
 
-## RANM (RandomMatrix)
+## RandomMatrix
 
 Returns an array containing random integer values between -9 and 9.
 

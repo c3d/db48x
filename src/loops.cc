@@ -649,7 +649,7 @@ EVAL_BODY(StartNext)
 
     if (object_p arg = rt.top())
         if (id argty = arg->type())
-            if (argty == ID_list || argty == ID_array)
+            if (is_array_or_list(argty))
                 return list_loop(ID_start_next_list, o);
 
     return counted_loop(ID_start_next_conditional, o);
@@ -755,7 +755,7 @@ EVAL_BODY(ForNext)
     rt.command(o);
     if (object_p arg = rt.top())
         if (id argty = arg->type())
-            if (argty == ID_list || argty == ID_array)
+            if (is_array_or_list(argty))
                 return list_loop(ID_for_next_list, o);
     return counted_loop(ID_for_next_conditional, o);
 }

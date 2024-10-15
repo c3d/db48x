@@ -29,6 +29,7 @@
 
 #include "expression.h"
 
+#include "algebraic.h"
 #include "arithmetic.h"
 #include "equations.h"
 #include "functions.h"
@@ -39,6 +40,7 @@
 #include "precedence.h"
 #include "renderer.h"
 #include "settings.h"
+#include "tag.h"
 #include "unit.h"
 #include "utf8.h"
 #include "variables.h"
@@ -952,7 +954,7 @@ static size_t check_match(size_t eq, size_t eqsz,
                                     b = integer::make(0);
                                 }
                             }
-                            expression_p x = expression::as_expression(ftop);
+                            expression_p x = expression::get(ftop);
                             if (x && x->is_linear(ivar, a, b))
                                 isok = true;
                         }
@@ -2173,6 +2175,12 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
             if (precedence == precedence::NONE || obj->type() == ID_unit)
                 precedence = precedence::SYMBOL;
             g.voffset = 0;
+            if (expression_p expr = obj->as<expression>())
+            {
+                if (!expr->expand_without_size())
+                    return nullptr;
+                return expr->graph(g, depth, precedence);
+            }
             return obj->graph(g);
 
         case 1:
@@ -2461,26 +2469,27 @@ GRAPH_BODY(expression)
 }
 
 
-expression_p expression::as_expression(object_p obj)
+expression_p expression::get(object_p obj)
 // ----------------------------------------------------------------------------
 //   Convert an object to an expression, including polynomials and equations
 // ----------------------------------------------------------------------------
 {
     if (!obj)
         return nullptr;
+    obj = tag::strip(obj);
     if (expression_p expr = obj->as<expression>())
         return expr;
     if (equation_p eqn = obj->as<equation>())
-        return as_expression(eqn->value());
+        return get(eqn->value());
     if (polynomial_p poly = obj->as<polynomial>())
-        return as_expression(poly->as_expression());
+        return get(poly->as_expression());
     if (algebraic_g alg = obj->as_algebraic())
         return make(alg);
     return nullptr;
 }
 
 
-expression_p expression::current_equation(bool error)
+list_p expression::current_equation(bool all, bool error)
 // ----------------------------------------------------------------------------
 //   Return content of EQ variable
 // ----------------------------------------------------------------------------
@@ -2502,7 +2511,10 @@ expression_p expression::current_equation(bool error)
             break;
         case ID_list:
         case ID_array:
-            obj = list_p(obj)->at(0);
+            if (all)
+                more = false;
+            else
+                obj = list_p(obj)->at(0);
             break;
         case ID_expression:
         case ID_polynomial:
@@ -2513,8 +2525,41 @@ expression_p expression::current_equation(bool error)
             return nullptr;
         }
     }
-    expression_p eq = expression_p(obj);
+    list_p eq = list_p(obj);
     return eq;
+}
+
+
+bool expression::is_well_defined(symbol_p solving, bool error) const
+// ----------------------------------------------------------------------------
+//   Check if all variables but the one we solve for are defined
+// ----------------------------------------------------------------------------
+{
+    expression_g expr = this;
+    symbol_g     sym  = solving;
+    list_p       vars = expr->names();
+    for (auto var : *vars)
+    {
+        if (symbol_p vsym = var->as<symbol>())
+        {
+            if (!sym || !sym->is_same_as(vsym))
+            {
+                if (!directory::recall_all(var, false))
+                {
+                    if (error)
+                        rt.some_undefined_name_error();
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            if (error)
+                rt.some_invalid_name_error();
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -2524,7 +2569,7 @@ object::result expression::variable_command(command_fn callback)
 // ----------------------------------------------------------------------------
 {
     if (object_p exprobj = rt.stack(1))
-        if (expression_g expr = expression::as_expression(exprobj))
+        if (expression_g expr = expression::get(exprobj))
             if (object_p varobj = rt.stack(0))
                 if (symbol_g var = varobj->as_quoted<symbol>())
                     if (expression_p res = (expr->*callback)(var))
@@ -2803,10 +2848,8 @@ COMMAND_BODY(Apply)
     {
         if (object_p args = rt.stack(1))
         {
-            object::id ty = args->type();
-            if (ty == ID_list || ty == ID_array)
+            if (list_g lst = args->as_array_or_list())
             {
-                list_g lst = list_p(args);
                 size_t arity = lst->items();
 
                 if (object_p quoted = callee->as_quoted(ID_object))
@@ -2871,7 +2914,7 @@ static object::result match_up_down(bool down)
     if (!x || !y)
         return object::ERROR;
     list_p transform = x->as<list>();
-    expression_g eq = expression::as_expression(y);
+    expression_g eq = expression::get(y);
     if (!transform || !eq)
     {
         rt.type_error();
@@ -2879,14 +2922,14 @@ static object::result match_up_down(bool down)
     }
 
     list::iterator it(transform);
-    expression_g from = expression::as_expression(*it++);
-    expression_g to = expression::as_expression(*it++);
+    expression_g from = expression::get(*it++);
+    expression_g to = expression::get(*it++);
     if (!from || !to)
     {
         rt.value_error();
         return object::ERROR;
     }
-    expression_g cond = expression::as_expression(*it++);
+    expression_g cond = expression::get(*it++);
     settings::SaveAutoSimplify noas(false);
     uint rwcount = 0;
     cond = eq->rewrite(from, to, cond, &rwcount, down);
@@ -3031,8 +3074,8 @@ bool expression::split(id type, expression_g &left, expression_g &right) const
                 {
                     if (object_g l = grab_arguments(eq, len))
                     {
-                        expression_g ra = expression::as_expression(r);
-                        expression_g la = expression::as_expression(l);
+                        expression_g ra = expression::get(r);
+                        expression_g la = expression::get(l);
                         if (la && ra)
                         {
                             right = ra;
@@ -3450,52 +3493,6 @@ FUNCTION_BODY(Simplify)
 }
 
 
-static expression_p substitute(expression_r pattern,
-                               symbol_r     name,
-                               expression_r to)
-// ----------------------------------------------------------------------------
-//  Substitute a single name with the corresponding expression
-// ----------------------------------------------------------------------------
-{
-    scribble scr;
-    size_t replsz = 0;
-    object_g replobj = to->objects(&replsz);
-    for (object_g obj : *pattern)
-    {
-        symbol_p oname = obj->as<symbol>();
-        if (oname && name->is_same_as(oname))
-        {
-            if (!rt.append(replobj, replsz))
-                return nullptr;
-        }
-        else
-        {
-            if (!rt.append(obj))
-                return nullptr;
-        }
-    }
-    expression_g result = expression_p(list::make(object::ID_expression,
-                                                  scr.scratch(), scr.growth()));
-    return result;
-}
-
-
-static expression_p substitute(expression_r pattern,
-                               expression_r repl)
-// ----------------------------------------------------------------------------
-//   Run a rewrite up or down
-// ----------------------------------------------------------------------------
-{
-    expression_g from, to;
-    if (repl->split_equation(from, to))
-        if (symbol_g name = from->as_quoted<symbol>())
-            return substitute(pattern, name, to);
-
-    if (!rt.error())
-        rt.value_error();
-    return nullptr;
-}
-
 
 NFUNCTION_BODY(Subst)
 // ----------------------------------------------------------------------------
@@ -3505,9 +3502,9 @@ NFUNCTION_BODY(Subst)
     if (args[1]->is_real() || args[1]->is_complex())
         return args[1];
 
-    if (expression_g pat = expression::as_expression(args[1]))
-        if (expression_g repl = expression::as_expression(args[0]))
-            return substitute(pat, repl);
+    if (expression_g pat = expression::get(args[1]))
+        if (expression_g repl = expression::get(args[0]))
+            return pat->substitute(repl);
 
     rt.type_error();
     return nullptr;
@@ -3519,72 +3516,11 @@ COMMAND_BODY(Where)
 //   Perform a substitution and evaluate the resulting expression
 // ----------------------------------------------------------------------------
 {
-    if (object_p patobj = rt.stack(1))
-    {
-        id patty = patobj->type();
-        if (patty == ID_expression)
-        {
-            expression_g pat = expression_p(patobj);
-            if (object_p replobj = rt.stack(0))
-            {
-                id rty = replobj->type();
-                if (rty == ID_expression)
-                {
-                    expression_g repl = expression_p(replobj);
-                    if (algebraic_g res = substitute(pat, repl))
-                        if (rt.drop() && rt.top(+res))
-                            return OK;
-                }
-                else if (rty == ID_list || rty == ID_array)
-                {
-                    symbol_g     name;
-                    expression_g repl;
-                    for (object_g item : *list_p(replobj))
-                    {
-                        if (!name)
-                        {
-                            name = item->as_quoted<symbol>();
-                            if (!name)
-                            {
-                                if (expression_g p = item->as<expression>())
-                                {
-                                    pat = substitute(pat, p);
-                                    if (!pat)
-                                        return ERROR;
-                                }
-                                else
-                                {
-                                    rt.value_error();
-                                    return ERROR;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            repl = item->as<expression>();
-                            if (!repl)
-                            {
-                                rt.value_error();
-                                return ERROR;
-                            }
-                            pat = substitute(pat, name, repl);
-                            if (!pat)
-                                return ERROR;
-                            name = nullptr;
-                        }
-                    }
-                    if (rt.drop() && rt.top(+pat))
-                        return OK;
-                }
-            }
-        }
-        else if (is_real(patty) || is_complex(patty))
-        {
-            rt.drop();
-            return OK;
-        }
-
-    }
+    object_g obj = rt.stack(1);
+    object_g args = rt.stack(0);
+    obj = list::substitute(obj, args);
+    if (obj && rt.drop() && rt.top(+obj))
+        return OK;
     if (!rt.error())
         rt.type_error();
     return ERROR;

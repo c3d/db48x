@@ -89,7 +89,7 @@ Examples:
 * `'(A+B)^3' { 'X^N' 'X*X^(N-1)' } ↓Match` returns `(A+B)*(A+B)^2`.
 
 
-## Isolate (ISOL)
+## Isolate
 
 Isolate variable: Returns an expression that rearranges an expression given in
 stack level 2 to “isolate” a variable specified in stack level 1.
@@ -106,7 +106,7 @@ The command will generate `Unable to isolate` if the expression cannot be
 reorganized, for example because it contains functions that have no known
 inverse.
 
-## ∂ (Derivative)
+## Derivative
 
 Compute the derivative function for an expression. The algebraic syntax for `∂` is `'∂name(expr)'` For example, `'∂x(sin(2*x^2)'` computes `4*X*cos(2*X^2)`
 
@@ -162,19 +162,19 @@ Evaluate algebraic rules on symbolic expressions one step at a time.
 
 
 
-## →Num (→Decimal, ToDecimal)
+## →Num
 
 Convert fractions and symbolic constants to decimal form.
 For example, `1/4 →Num` results in `0.25`.
 
-## →Frac (→Q, ToFraction)
+## →Q
 
 Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
 The precision of the conversion in digits is defined by
 [→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
 conversion is defined by [→FracDigits](#ToFractionIterations)
 
-## ListExpressionNames (LName)
+## ListExpressionNames
 
 List all variables used in an expression or polynomial, leaving the original
 object on the stack, and returning the result as an array.
@@ -190,7 +190,7 @@ command, which extracts the units associated with the variables if there are
 any. The `LName` command only returns the names, without the associated unit.
 
 
-## ExpressionVariables (XVars)
+## ExpressionVariables
 
 List all variables used in an expression or polynomial, returning the result as
 a list.

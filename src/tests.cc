@@ -176,7 +176,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            library();
+            symbolic_operations();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -3003,6 +3003,10 @@ void tests::decimal_display_formats()
         .test("10", DIV).expect("0.0000")
         .test("10", DIV).expect("0.0000");
 
+    step("FIX 4 with no trailing decimal and 500 (#1236)")
+        .test(CLEAR, "NoTrailingDecimals 500.", ENTER).expect("500.0000")
+        .test(CLEAR, "TrailingDecimals 500.", ENTER).expect("500.0000");
+
     step("Reset defaults");
     test(CLEAR, LSHIFT, O, F1, KEY3, LSHIFT, F5).noerror();
 
@@ -3153,9 +3157,9 @@ void tests::decimal_numerical_functions()
     TFN(sin).expect("0.31551 56385 92727 11130 65931 11143 46369 9");
     TFN(cos).expect("0.94892 03769 56583 01754 39451 32826 92553 3");
     TFN(tan).expect("0.33249 95924 36471 87510 87087 30102 73793 5");
-    TFN(asin).expect("0.32678 51765 31495 46326 91997 64519 59826 7 r");
-    TFN(acos).expect("1.24401 11502 63401 15596 21219 27120 15339 r");
-    TFN(atan).expect("0.31060 97928 13889 91760 67000 51446 83602 7 r");
+    TFN(asin).expect("0.32678 51765 31495 46326 91997 64519 5983 r");
+    TFN(acos).expect("1.24401 11502 63401 15596 21219 27120 15314 r");
+    TFN(atan).expect("0.31060 97928 13889 91760 67000 51446 836 r");
     TFN(sinh).expect("0.32654 11649 51806 35701 22065 63885 73434");
     TFN(cosh).expect("1.05196 44159 41947 53843 52241 43605 67798");
     TFN(tanh).expect("0.31041 08466 05886 02148 50502 09383 09588 5");
@@ -3658,7 +3662,7 @@ void tests::high_precision_numerical_functions()
     TFN(cos).expect("0.94892 03769 56583 01754 39451 32826 92551 54763 03148 22817 38878 87425 10454 37289 66657 74827 69303 30686 52796 72622 06704 70515 68539 2249");
     TFN(tan).expect("0.33249 95924 36471 87510 87087 30102 73796 83946 23980 80503 83311 21021 12491 95974 29552 25917 15859 83641 11747 44032 23741 83994 87487 0292");
     TFN(asin).expect("0.32678 51765 31495 46326 91997 64519 59826 36182 58080 21574 39673 71903 92028 08817 69439 28409 80968 96776 17859 18932 19725 72513 95078 4427 r");
-    TFN(acos).expect("1.24401 11502 63401 15596 21219 27120 15317 84803 26619 47180 89431 15568 37587 30264 33703 82040 12171 20636 49246 66407 71348 31811 71283 483 r");
+    TFN(acos).expect("1.24401 11502 63401 15596 21219 27120 15317 84803 26619 47180 89431 15568 37587 30264 33703 82040 12171 20636 49246 66407 71348 31811 71333 091 r");
     TFN(atan).expect("0.31060 97928 13889 91760 67000 51446 83602 81125 07025 77281 14539 44776 64690 76612 68860 40731 31597 84656 31883 84021 79831 76697 34106 3622 r");
     TFN(sinh).expect("0.32654 11649 51806 35701 22065 63885 73434 59869 32810 98627 21625 46131 20539 70600 10083 27315 63713 66136 47461 26495 76415 60697 57676 2937");
     TFN(cosh).expect("1.05196 44159 41947 53843 52241 43605 67798 60702 39830 04737 76342 59201 97569 28172 48173 45468 64605 47110 19220 77704 23747 11369 53013 732");
@@ -3696,13 +3700,13 @@ void tests::high_precision_numerical_functions()
 
     step("atan2 pos / pos quadrant")
         .test(CLEAR, "3.21 1.23 atan2", ENTER)
-        .expect("1.20487 56251 52809 23400 86691 05495 30674 32743 54426 68497 01001 78719 37086 47165 61508 05592 53255 02332 28917 23139 67613 92267 03142 769 r");
+        .expect("1.20487 56251 52809 23400 86691 05495 30674 32743 54426 68497 01001 78719 37086 47165 61508 05592 53255 02332 28917 23139 67613 92267 03142 77 r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
         .expect("1.93671 70284 36984 00445 39742 77784 19614 09228 14972 69013 57207 96225 22144 30998 44778 15307 33025 32493 05294 47540 14534 16384 29680 297 r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
-        .expect("-1.20487 56251 52809 23400 86691 05495 30674 32743 54426 68497 01001 78719 37086 47165 61508 05592 53255 02332 28917 23139 67613 92267 03142 769 r");
+        .expect("-1.20487 56251 52809 23400 86691 05495 30674 32743 54426 68497 01001 78719 37086 47165 61508 05592 53255 02332 28917 23139 67613 92267 03142 77 r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
         .expect("-1.93671 70284 36984 00445 39742 77784 19614 09228 14972 69013 57207 96225 22144 30998 44778 15307 33025 32493 05294 47540 14534 16384 29680 297 r");
@@ -4625,7 +4629,7 @@ void tests::complex_functions()
 
     step("Hyperbolic cosine");
     test(CLEAR, "3+11ⅈ", ENTER, "COSH", ENTER)
-        .expect("0.04433 60889 10782 41416-10.06756 33986 40475 46ⅈ");
+        .expect("0.04455 64314 39089 01653-10.01777 68178 59741 201ⅈ");
 
     step("Hyperbolic tangent");
     test(CLEAR, "2+8ⅈ", ENTER, "TANH", ENTER)
@@ -5439,6 +5443,125 @@ void tests::vector_functions()
     step("Component-wise application of functions");
     test(CLEAR, "[a b c] SIN", ENTER)
         .expect("[ 'sin a' 'sin b' 'sin c' ]");
+
+    step("3D vector rectangular → rectangular")
+        .test(CLEAR, "[1 2 3]", ENTER, NOSHIFT, A, F4)
+        .expect("[ 1 2 3 ]");
+    step("3D vector rectangular → polar")
+        .test(F5)
+        .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]");
+    step("3D vector polar → polar")
+        .test(F5)
+        .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]");
+    step("3D vector polar → spherical")
+        .test(F6)
+        .expect("[ 3.74165 73867 7 63.43494 88229 ° 36.69922 52005 ° ]");
+    step("3D vector spherical → spherical")
+        .test(F6)
+        .expect("[ 3.74165 73867 7 63.43494 88229 ° 36.69922 52005 ° ]");
+    step("3D vector spherical → polar")
+        .test(F5)
+        .expect("[ 2.23606 79775 63.43494 88229 ° 3. ]");
+    step("3D vector polar → rectangular")
+        .test(F4)
+        .expect("[ 1. 2. 3. ]");
+    step("3D vector rectangular → cylindrical")
+        .test(LSHIFT, F4)
+        .expect("[ 2.23606 79775 63.43494 88229 ° 3. ]");
+    step("3D vector cylindrical → rectangular")
+        .test(F4)
+        .expect("[ 1. 2. 3. ]");
+    step("3D vector rectangular → spherical")
+        .test(F6)
+        .expect("[ 3.74165 73867 7 63.43494 88229 ° 36.69922 52005 ° ]");
+    step("3D vector spherical → rectangular")
+        .test(F4)
+        .expect("[ 1. 2. 3. ]");
+
+    step("3D vector conversion error - Symbolic")
+        .test(CLEAR, "[x y z]", ENTER, NOSHIFT, A, F4)
+        .error("Bad argument type")
+        .test(CLEAR, "[x y z]", ENTER, NOSHIFT, A, LSHIFT, F4)
+        .error("Bad argument type")
+        .test(CLEAR, "[x y z]", ENTER, NOSHIFT, A, F5)
+        .error("Bad argument type")
+        .test(CLEAR, "[x y z]", ENTER, NOSHIFT, A, F6)
+        .error("Bad argument type");
+
+    step("2D vector rectangular → rectangular")
+        .test(CLEAR, "[ 1 2 ]", ENTER, NOSHIFT, A)
+        .test(F4)
+        .expect("[ 1 2 ]");
+    step("2D vector rectangular → polar")
+        .test(F5)
+        .expect("[ 2.23606 79775 63.43494 88229 ° ]");
+    step("2D vector polar → polar")
+        .test(F5)
+        .expect("[ 2.23606 79775 63.43494 88229 ° ]");
+    step("2D vector polar → spherical")
+        .test(F6)
+        .error("Bad argument type");
+    step("2D vector polar → rectangular")
+        .test(F4)
+        .expect("[ 1. 2. ]");
+    step("2D vector rectangular → cylindrical")
+        .test(LSHIFT, F4)
+        .error("Bad argument type");
+    step("2D vector rectangular → spherical")
+        .test(F6)
+        .error("Bad argument type");
+
+   step("2D vector conversion error - Symbolic")
+       .test(CLEAR, "[x y]", ENTER, NOSHIFT, A, F4)
+       .error("Bad argument type")
+       .test(CLEAR, "[x y]", ENTER, NOSHIFT, A, LSHIFT, F4)
+       .error("Bad argument type")
+       .test(CLEAR, "[x y]", ENTER, NOSHIFT, A, F5)
+       .error("Bad argument type")
+       .test(CLEAR, "[x y]", ENTER, NOSHIFT, A, F6)
+       .error("Bad argument type");
+
+   step("Vector conversion only works on 2D or 3D vectors")
+       .test(CLEAR, "[ 1 2 3 4 ]", ENTER, NOSHIFT, A, F4)
+       .error("Bad argument type");
+
+   step("3D addition after polar conversion")
+       .test(CLEAR, "[ 1 2 3 ]", ENTER, NOSHIFT, A, F5)
+       .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]")
+       .test("[ 4 5 6 ]", NOSHIFT, ADD)
+       .expect("[ 5. 7. 9 ]");
+   step("3D addition after cylindrical conversion")
+       .test(CLEAR, "[ 1 2 3 ]", ENTER, NOSHIFT, A, F6)
+       .expect("[ 3.74165 73867 7 63.43494 88229 ° 36.69922 52005 ° ]")
+       .test("[ 4 5 6 ]", NOSHIFT, ADD)
+       .expect("[ 5. 7. 9. ]");
+
+   step("3D addition with polar conversion")
+       .test(CLEAR, "[ 1 2 3 ]", ENTER, NOSHIFT, A, F4)
+       .expect("[ 1 2 3 ]")
+       .test("[ 4 5 6 ]", F5, NOSHIFT, ADD)
+       .expect("[ 8.60232 52670 4 54.46232 2208 ° 9 ]");
+   step("3D addition with cylindrical conversion")
+       .test(CLEAR, "[ 1 2 3 ]", ENTER, NOSHIFT, A, F4)
+       .expect("[ 1 2 3 ]")
+       .test("[ 4 5 6 ]", F6, NOSHIFT, ADD)
+       .expect("[ 12.44989 9598 54.46232 2208 ° 43.70578 41445 ° ]");
+   step("3D addition polar + cylindrical")
+       .test(CLEAR, "[ 1 2 3 ]", ENTER, NOSHIFT, A, F5)
+       .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]")
+       .test("[ 4 5 6 ]", F6, NOSHIFT, ADD)
+       .expect("[ 12.44989 9598 54.46232 2208 ° 43.70578 41445 ° ]");
+
+   step("2D addition after polar conversion")
+       .test(CLEAR, "[ 1 2 ]", ENTER, NOSHIFT, A, F5)
+       .expect("[ 2.23606 79775 63.43494 88229 ° ]")
+       .test("[ 4 5 ]", NOSHIFT, ADD)
+       .expect("[ 5. 7. ]");
+   step("2D addition with polar conversion")
+       .test(CLEAR, "[ 1 2 ]", ENTER, NOSHIFT, A, F4)
+       .expect("[ 1 2 ]")
+       .test("[ 4 5 ]", F5, NOSHIFT, ADD)
+       .expect("[ 8.60232 52670 4 54.46232 2208 ° ]");
 }
 
 
@@ -5699,13 +5822,25 @@ void tests::solver_testing()
         .test(CLEAR, "'ROOT(X+3;X;0)'", ENTER)
         .expect("'Root(X+3;X;0)'")
         .test(RUNSTOP)
-        .expect("X:-3.");
+        .expect("X:-3.")
+        .test("X", ENTER)
+        .expect("-3.")
+        .test("'X' purge", ENTER)
+        .noerror();
     step("Solver with equation")
         .test(CLEAR, "'sq(x)=3' 'X' 0 ROOT", ENTER)
-        .noerror().expect("X:1.73205 08075 7");
+        .noerror().expect("X:1.73205 08075 7")
+        .test("X", ENTER)
+        .expect("1.73205 08075 7")
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
+        .noerror();
     step("Solver without solution")
         .test(CLEAR, "'sq(x)+3=0' 'X' 0 ROOT", ENTER)
-        .error("No solution?");
+        .error("No solution?")
+        .test(CLEAR, "X", ENTER)
+        .expect("-8.09667 19281 1⁳⁵³⁶⁸⁷⁰⁸¹²⁵⁴⁹⁷⁹⁸")
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
+        .noerror();
 
     step("Solving menu")
         .test(CLEAR, "'A²+B²=C²'", ENTER)
@@ -5784,6 +5919,9 @@ void tests::eqnlib_columns_and_beams()
 
     step("Enter directory for solving")
         .test(CLEAR, "'SLVTST' CRDIR SLVTST", ENTER);
+
+    step("Select CurrentEquationsVariables")
+        .test(CLEAR, "CurrentEquationVariables", ENTER);
 
     step("Solving Elastic Buckling")
         .test(CLEAR, RSHIFT, F, F2, RSHIFT, F1)
@@ -5942,7 +6080,10 @@ void tests::eqnlib_columns_and_beams()
         .expect("V:200. lbf");
 
     step("Exit: Clear variables")
-        .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
+        .test(CLEAR,
+              "UPDIR "
+              "'SLVTST' PURGE "
+              "'CurrentEquationVariables' PURGE", ENTER);
 }
 
 
@@ -6510,6 +6651,11 @@ void tests::symbolic_operations()
         .expect("'X↑2+3·X+7|X=Z+1|Z=sin(A+B)|A=42'")
         .test(RUNSTOP)
         .expect("'(sin(42+B)+1)²+3·(sin(42+B)+1)+7'");
+    step("Where operator on library equations")
+        .test("'ⒺRelativity Mass Energy|m=(1_g)'", ENTER)
+        .expect("'Relativity Mass Energy:{ E=m·c↑2 }|m=1 g'")
+        .test(RUNSTOP)
+        .expect("{ 'E=¹/₁ ₀₀₀ kg·c↑2' }");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
@@ -7987,6 +8133,11 @@ void tests::online_help()
     step("Select topic with ENTER")
         .test(LENGTHY(200), ENTER).noerror()
         .image_noheader("help-design");
+    step("Loading a URL")
+        .test(F1, F3, ENTER).noerror()
+        .image_noheader("help-url")
+        .test(EXIT)
+        .image_noheader("help-after-url");
     step("Exit to normal command line")
         .test(EXIT, CLEAR, EXIT).noerror();
     step("Invoke help about SIN command with long press")
@@ -8000,6 +8151,15 @@ void tests::online_help()
         .image_noheader("help-degrees");
     step("Exit and cleanup")
         .test(EXIT, CLEAR, EXIT);
+
+    step("Enter example from help file into command line")
+        .test(CLEAR, "\"ToUnit\" HELP", ENTER,
+              DOWN, DOWN, DOWN, DOWN, DOWN)
+        .image_noheader("help-example")
+        .test(ENTER)
+        .editor("@ Will be 3000_km\n3000 2_km →Unit")
+        .test(ENTER)
+        .expect("3 000 km");
 }
 
 
@@ -8205,7 +8365,7 @@ void tests::overflow_and_underflow()
 
     step("Set maximum exponent to 499")
         .test(CLEAR, "499 MaximumDecimalExponent", ENTER).noerror()
-        .test("'MaximumDecimalExponent' RCL", ENTER).expect("499");
+        .test("'MaximumDecimalExponent' RCL", ENTER).expect("#1F3₁₆");
 
     step("Check that undeflow error is not set by default")
         .test("'UnderflowError' FS?", ENTER).expect("False")
@@ -8312,7 +8472,7 @@ void tests::overflow_and_underflow()
     step("Reset modes")
         .test(CLEAR, "ResetModes KillOnError", ENTER)
         .test("'MaximumDecimalExponent' RCL", ENTER)
-        .expect("1 152 921 504 606 846 976");
+        .expect("#1000 0000 0000 0000₁₆");
 }
 
 
@@ -10095,9 +10255,9 @@ void tests::graphic_commands()
     step("Convert to graph")
         .test(CLEAR, "'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /", ENTER, EXIT)
         .image_noheader("eq-xgraph")
-        .test("→Grob", ENTER)
+        .test("0 →Grob", ENTER)
         .image_noheader("eq-graph")
-        .test("→Grob", ENTER)
+        .test("0 →Grob", ENTER)
         .image_noheader("eq-graph");
 
     step("Pattern in graph conversion")
@@ -10105,14 +10265,66 @@ void tests::graphic_commands()
         .noerror()
         .test(CLEAR, "'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /", ENTER, EXIT)
         .image_noheader("pat-eq-xgraph")
-        .test("→Grob", ENTER)
+        .test("2 →Grob", ENTER)
         .image_noheader("pat-eq-graph")
-        .test("→Grob", ENTER)
+        .test("4 →Grob", ENTER)
         .image_noheader("pat-eq-graph");
 
     step("Reset pattern")
         .test(CLEAR, "0 GRAY FOREGROUND 1 GRAY BACKGROUND", ENTER)
         .noerror();
+
+    step("GraphicAppend")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 4", LSHIFT, F1, "DEFGH 2", LSHIFT, F1,
+              F6, RSHIFT, F1, EXIT)
+        .image_noheader("graph-append");
+    step("GraphicStack")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 2", LSHIFT, F1, "DEFGH 4", LSHIFT, F1,
+              F6, RSHIFT, F2, EXIT)
+        .image_noheader("graph-stack");
+    step("GraphicSubscript")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 0", LSHIFT, F1, "DEFGH 1", LSHIFT, F1,
+              F6, RSHIFT, F3, EXIT)
+        .image_noheader("graph-subscript");
+    step("GraphicExponent")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 4", LSHIFT, F1, "DEFGH 3", LSHIFT, F1,
+              F6, RSHIFT, F3, EXIT)
+        .image_noheader("graph-exponent");
+    step("GraphicRatio")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 3", LSHIFT, F1, "DEFGH 0", LSHIFT, F1,
+              F6, RSHIFT, F4, EXIT)
+        .image_noheader("graph-ratio");
+
+    step("GraphicRoot")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 0", LSHIFT, F1,
+              F6, F6, F1, EXIT)
+        .image_noheader("graph-root");
+    step("GraphicParentheses")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 2.1", LSHIFT, F1,
+              F6, F6, F2, EXIT)
+        .image_noheader("graph-paren");
+    step("GraphicNorm")
+        .test(CLEAR, RSHIFT, DOT,
+              "ABC 3.5", LSHIFT, F1,
+              F6, F6, F3, EXIT)
+        .image_noheader("graph-norm");
+
+    step("GraphicSum")
+        .test(CLEAR, RSHIFT, DOT, "123", F6, F6, LSHIFT, F1, EXIT)
+        .image_noheader("graph-sum");
+    step("GraphicProduct")
+        .test(CLEAR, RSHIFT, DOT, "123", F6, F6, LSHIFT, F2, EXIT)
+        .image_noheader("graph-product");
+    step("GraphicIntegral")
+        .test(CLEAR, RSHIFT, DOT, "123", F6, F6, LSHIFT, F3, EXIT)
+        .image_noheader("graph-integral");
 }
 
 
@@ -10789,7 +11001,7 @@ tests &tests::itest(cstring txt)
         case L'∫': k = KEY8;        alpha = true; xshift = true; break;
 
             // Special characters that require the characters menu
-#define NEXT        k = RESERVED2; break
+#define NEXT        itest(NOSHIFT, A); k = RESERVED2; break
         case L'ℂ': itest(RSHIFT, KEY2, F4, RSHIFT, F3); NEXT;
         case L'ℚ': itest(RSHIFT, KEY2, F4, RSHIFT, F4); NEXT;
         case L'ℝ': itest(RSHIFT, KEY2, F4, RSHIFT, F5); NEXT;
@@ -10873,6 +11085,7 @@ tests &tests::itest(cstring txt)
         case L'Ω': itest(RSHIFT, KEY2, LSHIFT, F1, F6, F6, F6, F6, LSHIFT, F4); NEXT;
         case L'∞': itest(RSHIFT, KEY2, F4, F6, F6, RSHIFT, F5); NEXT;
         case L'ℏ': itest(RSHIFT, KEY2, F4, F6, F6, F6, F6, LSHIFT, F5); NEXT;
+        case L' ': itest(RSHIFT, KEY2, F6, RSHIFT, F4); NEXT;
 #undef NEXT
         }
 

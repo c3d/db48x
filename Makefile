@@ -58,7 +58,7 @@ VERSION_H=src/$(PLATFORM)/version.h
 #==============================================================================
 
 # default action: build all
-all: $(PGM_TARGET) help/$(TARGET).md
+all: $(PGM_TARGET) help/$(TARGET).md help/$(TARGET).idx
 	@echo "# Built $(VERSION)"
 
 dm32:	dm32-all
@@ -74,6 +74,7 @@ sim/$(TARGET).mak: sim/$(TARGET).pro Makefile $(VERSION_H)
 
 sim:	recorder/config.h	\
 	help/$(TARGET).md	\
+	help/$(TARGET).idx	\
 	fonts/EditorFont.cc	\
 	fonts/StackFont.cc	\
 	fonts/ReducedFont.cc	\
@@ -136,6 +137,7 @@ TAR_FILES=	$(TARGET).$(PGM)		\
 		$(TARGET)_qspi.bin		\
 		keymap.bin			\
 		help/$(TARGET).md		\
+		help/$(TARGET).idx		\
 		help/*.bmp help/*/*.bmp		\
 		state/*.48[sSbB]		\
 		config/*.csv			\
@@ -184,6 +186,9 @@ help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	cp doc/*.png help/
 	mkdir -p help/img
 	rsync -av --delete doc/img/*.bmp help/img/
+help/$(TARGET).idx: help/$(TARGET).md
+	grep -b '^#' $< | sort -k2 -t: > $@
+	[ "$$(cat $@ | wc -L)" -lt 80 ]
 
 check-ids: help/$(TARGET).md
 	@for I in $$(cpp -xc++ -D'ID(n)=n' src/ids.tbl | 		\
@@ -292,10 +297,11 @@ CXX_SOURCES +=				\
 #C_DEFS += -DXXX
 
 # Defines for the code
-DEFINES += \
-	$(DEFINES_$(OPT)) \
-	$(DEFINES_$(VARIANT)) \
-	HELPFILE_NAME=\"/help/$(TARGET).md\"
+DEFINES +=					\
+	$(DEFINES_$(OPT))			\
+	$(DEFINES_$(VARIANT))			\
+	HELPFILE_NAME=\"/help/$(TARGET).md\"	\
+	HELPINDEX_NAME=\"/help/$(TARGET).idx\"
 DEFINES_debug=DEBUG
 DEFINES_release=NDEBUG
 DEFINES_small=NDEBUG

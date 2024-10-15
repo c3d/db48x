@@ -250,7 +250,7 @@ struct hwfp : hwfp_base
 
     static hwfp_p atan2(hwfp_r x, hwfp_r y)
     {
-        return make(std::atan2(x->value(), y->value()));
+        return make(to_angle(std::atan2(x->value(), y->value())));
     }
 
     static hwfp_p Min(hwfp_r x, hwfp_r y)

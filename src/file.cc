@@ -436,3 +436,35 @@ bool file::unlink(cstring file)
     return f_unlink(file) == FR_OK;
 #endif // SIMULATOR
 }
+
+
+cstring file::extension(cstring path)
+// ----------------------------------------------------------------------------
+//   Extract the extension of the given path
+// ----------------------------------------------------------------------------
+{
+    cstring ext = nullptr;
+    if (path)
+    {
+        for (cstring p = path; *p; p++)
+        {
+            if (*p == '\\' || *p == '/')
+                ext = nullptr;
+            else if (*p == '.')
+                ext = p;
+        }
+    }
+    return ext;
+}
+
+
+cstring file::basename(cstring path)
+// ----------------------------------------------------------------------------
+//   Extract the basename for the given path
+// ----------------------------------------------------------------------------
+{
+    for (cstring p = path; *p; p++)
+        if (*p == '/' || *p == '\\')
+            path = p + 1;
+    return path;
+}

@@ -551,7 +551,7 @@ algebraic::angle_unit algebraic::adjust_angle(algebraic_g &x)
 {
 retry:
     angle_unit amode = ID_object;
-    if (unit_p uobj = x->as<unit>())
+    if (unit_p uobj = unit::get(x))
     {
         algebraic_g uexpr = uobj->uexpr();
         if (symbol_p sym = uexpr->as_quoted<symbol>())

@@ -13,14 +13,14 @@ Change the separator symbols
 Change the display format for numbers
 
 
-## SetFlag (SF)
+## SetFlag
 
 Set a user or system flag.
 
 `33 SF` sets user flag 0.
 `'MixedFractions' SetFlag` enables the `MixedFractions` setting.
 
-## ClearFlag (CF)
+## ClearFlag
 
 Clear a user or system flag
 
@@ -28,35 +28,35 @@ Clear a user or system flag
 
 Invert a user or system flag
 
-## TestFlagSet (FS?)
+## TestFlagSet
 
 Test if a flag is set
 
-## TestFlagClear (FC?)
+## TestFlagClear
 
 Test if a flag is clear
 
-## TestFlagClearThenClear (FC?C)
+## TestFlagClearThenClear
 
 Test if a flag is clear, then clear it
 
-## TestFlagSetThenClear (FS?C)
+## TestFlagSetThenClear
 
 Test if a flag is set, then clear it
 
-## TestFlagClearThenSet (FC?S)
+## TestFlagClearThenSet
 
 Test if a flag is clear, then set it
 
-## TestFlagSetThenSet (FS?S)
+## TestFlagSetThenSet
 
 Test if a flag is set, then set it
 
-## FlagsToBinary (RCLF)
+## FlagsToBinary
 
 Recall all system flags as a binary number.
 
 
-## BinaryToFlags (STOF)
+## BinaryToFlags
 
 Store and replace all system flags from a binary number

@@ -104,6 +104,11 @@ public:
 
     // For functions with N arguments, check if arg can be symbolic
     static bool can_be_symbolic(uint /* argument */) { return false; }
+
+
+    // Check if function has symbolic arguments, e.g. Sum or Root
+    static bool has_symbolic_arguments(id type);
+    static bool is_symbolic_argument(id type, uint arg);
 };
 
 

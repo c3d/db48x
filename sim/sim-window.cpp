@@ -33,8 +33,10 @@
 #include "main.h"
 #include "recorder.h"
 #include "sim-dmcp.h"
+#include "symbol.h"
 #include "target.h"
 #include "tests.h"
+#include "user_interface.h"
 
 #if WASM
 #include "emcc.h"
@@ -178,9 +180,7 @@ const int keyMap[] =
     Qt::Key_Period,     KB_DOT,
     Qt::Key_Space,      KB_SPC,
     Qt::Key_Question,   KB_QUESTION,
-    Qt::Key_Control,    KB_SHIFT,
-    // Qt::Key_Alt,        KB_LSHIFT,
-    Qt::Key_Meta,       KB_RSHIFT,
+    Qt::Key_Meta,       KB_SHIFT,
 
     Qt::Key_Plus,       KB_ADD,
     Qt::Key_Minus,      KB_SUB,
@@ -298,7 +298,7 @@ struct mousemap
     { Qt::Key_6,         26, 0.62, 0.75, 0.645, 0.715 },
     { Qt::Key_Asterisk,  27, 0.81, 0.95, 0.645, 0.715 },
 
-    { Qt::Key_Control,   28, 0.028, 0.145, 0.77, 0.84 },
+    { Qt::Key_Alt,       28, 0.028, 0.145, 0.77, 0.84 },
     { Qt::Key_1,         29, 0.23, 0.36, 0.77, 0.84 },
     { Qt::Key_2,         30, 0.42, 0.56, 0.77, 0.84 },
     { Qt::Key_3,         31, 0.62, 0.75, 0.77, 0.84 },
@@ -427,6 +427,63 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
         return;
     }
 
+    if (k == Qt::Key_C && (ev->modifiers() & Qt::ControlModifier))
+    {
+        // HACK: Not thread safe at all!
+        extern user_interface ui;
+        ui.clear_shift();
+
+        QClipboard *clipboard = QApplication::clipboard();
+        if (ev->modifiers() & Qt::ShiftModifier)
+        {
+            QPixmap &screen = MainWindow::theScreen();
+            clipboard->setPixmap(screen);
+        }
+        else if (size_t sz = rt.editing())
+        {
+            utf8 data = rt.editor();
+            QByteArray ba(cstring(data), sz);
+            QString text(ba);
+            clipboard->setText(text);
+        }
+        else if (!ST(STAT_RUNNING))
+        {
+            if (object_p obj = rt.top())
+            {
+                symbol_p sym = obj->as_symbol(true);
+                size_t sz = 0;
+                utf8 data = sym->value(&sz);
+                QByteArray ba(cstring(data), sz);
+                QString text(ba);
+                clipboard->setText(text);
+            }
+        }
+        ev->accept();
+        return;
+    }
+
+    if (k == Qt::Key_V && (ev->modifiers() & Qt::ControlModifier))
+    {
+        // HACK: Not thread safe at all!
+        extern user_interface ui;
+        ui.clear_shift();
+
+        QClipboard *clipboard = QApplication::clipboard();
+        QString text = clipboard->text();
+        QByteArray ba = text.toUtf8();
+        if (size_t sz = ba.size())
+        {
+            if (!ST(STAT_RUNNING))
+            {
+                uint pos = ui.cursor_position();
+                size_t ins = ui.insert(pos, utf8(ba.data()), sz);
+                ui.cursor_position(pos+ins);
+            }
+        }
+        ev->accept();
+        return;
+    }
+
     if (k == Qt::Key_Shift)
     {
         shift_held = true;
@@ -435,7 +492,8 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
     {
         alt_held = true;
     }
-    else if (k >= Qt::Key_A && k <= Qt::Key_Z)
+    else if ((k >= Qt::Key_A && k <= Qt::Key_Z)    ||
+             (k >= Qt::Key_F1 && k <= Qt::Key_F6))
     {
         if (shift_held)
             key_push(KEY_UP);
@@ -915,14 +973,21 @@ int ui_file_selector(const char *title,
     });
 
     while (!done)
-        sys_sleep();
+        sys_delay(50);
 
     int ret = MRET_EXIT;
     if (!path.isNull())
     {
-        std::cout << "Got path: " << path.toStdString() << "\n";
         QFileInfo fi(path);
+        QString suffix = fi.suffix(); // On Linux we don't get the extension
         QString name = fi.fileName();
+        if ("." + suffix != ext)
+        {
+            path += ext;
+            name += ext;
+        }
+        std::cout << "Got path: " << path.toStdString()
+                  << ", name is " << name.toStdString() << "\n";
         ret = callback(path.toStdString().c_str(),
                        name.toStdString().c_str(),
                        data);

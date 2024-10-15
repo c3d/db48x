@@ -119,7 +119,7 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
 //   - Object + text: Concatenation of object text + text
 {
     // Check addition of unit objects
-    if (unit_g xu = x->as<unit>())
+    if (unit_g xu = unit::get(x))
     {
         if (!unit::nodates)
         {
@@ -129,7 +129,7 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
                 return daf;
         }
 
-        if (unit_g yu = y->as<unit>())
+        if (unit_g yu = unit::get(y))
         {
             if (yu->convert(xu))
             {
@@ -291,12 +291,12 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
 //   This deals with vector and matrix operations
 {
     // Check subtraction of unit objects
-    if (unit_g xu = x->as<unit>())
+    if (unit_g xu = unit::get(x))
     {
         if (!unit::nodates)
             if (algebraic_p dbef = days_before(x, y, false))
                 return dbef;
-        if (unit_g yu = y->as<unit>())
+        if (unit_g yu = unit::get(y))
         {
             if (!unit::nodates)
                 if (algebraic_p ddays = days_between_dates(x, y, false))
@@ -428,11 +428,11 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
 //   - Integer * text: Repeat the text
 {
     // Check multiplication of unit objects
-    if (unit_p xu = x->as<unit>())
+    if (unit_p xu = unit::get(x))
     {
         algebraic_g xv = xu->value();
         algebraic_g xe = xu->uexpr();
-        if (unit_p yu = y->as<unit>())
+        if (unit_p yu = unit::get(y))
         {
             algebraic_g yv = yu->value();
             algebraic_g ye = yu->uexpr();
@@ -449,7 +449,7 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
             return unit::simple(xv, xe);
         }
     }
-    else if (unit_p yu = y->as<unit>())
+    else if (unit_p yu = unit::get(y))
     {
         algebraic_g yv = yu->value();
         if (!x->is_symbolic() || yv->is_one())
@@ -579,11 +579,11 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
 //   This deals with vector and matrix operations
 {
     // Check division of unit objects
-    if (unit_p xu = x->as<unit>())
+    if (unit_p xu = unit::get(x))
     {
         algebraic_g xv = xu->value();
         algebraic_g xe = xu->uexpr();
-        if (unit_p yu = y->as<unit>())
+        if (unit_p yu = unit::get(y))
         {
             algebraic_g yv = yu->value();
             algebraic_g ye = yu->uexpr();
@@ -600,7 +600,7 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
             return unit::simple(xv, xe);
         }
     }
-    else if (unit_p yu = y->as<unit>())
+    else if (unit_p yu = unit::get(y))
     {
         if (!x->is_symbolic())
         {
@@ -885,7 +885,7 @@ algebraic_p arithmetic::non_numeric<struct pow>(algebraic_r x, algebraic_r y)
         return nullptr;
 
     // Deal with the case of units
-    if (unit_p xu = x->as<unit>())
+    if (unit_p xu = unit::get(x))
     {
         algebraic_g xv = xu->value();
         algebraic_g xe = xu->uexpr();

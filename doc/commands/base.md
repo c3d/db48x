@@ -1,6 +1,6 @@
 # Base functions
 
-## Evaluate (EVAL)
+## Evaluate
 
 Evaluate the object at stack level 1.
 
@@ -8,7 +8,7 @@ Mapped to the _ R/S _ key
 
 `X` ▶ Result of `X` evaluation
 
-## Negate (NEG)
+## Negate
 
 Negate the value in level 1.
 
@@ -16,7 +16,7 @@ Mapped to the _ +/- _ key
 
 `X` ▶ `0-X`
 
-## Invert (INV)
+## Invert
 
 Invert the value in level 1
 

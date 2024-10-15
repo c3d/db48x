@@ -100,8 +100,9 @@ struct expression : program
         return rt.make<expression>(type, op, args, arity);
     }
 
-    static expression_p as_expression(object_p obj);
-    static expression_p current_equation(bool error);
+    static expression_p get(object_p obj);
+    static list_p current_equation(bool all, bool error);
+    bool is_well_defined(symbol_p solving = nullptr, bool error = true) const;
 
     typedef expression_p (expression::*command_fn)(symbol_r name) const;
     static result variable_command(command_fn callback);
@@ -259,6 +260,15 @@ struct expression : program
     expression_p isolate(symbol_r sym) const;
     expression_p derivative(symbol_r sym) const;
     expression_p primitive(symbol_r sym) const;
+
+    expression_p where(algebraic_r args) const
+    {
+        algebraic_g expr = this;
+        if (algebraic_p obj = list::where(expr, args))
+            if (expression_p result = obj->as<expression>())
+                return result;
+        return expression_p(+expr);
+    }
 
 
     // ========================================================================
@@ -667,11 +677,13 @@ COMMAND_DECLARE(Isolate, 2);
 COMMAND_DECLARE_SPECIAL(Derivative, algebraic, 2,
                         PREC_DECL(SYMBOL);
                         INSERT_DECL(Derivative);
-                        PARSE_DECL(Derivative););
+                        PARSE_DECL(Derivative);
+                        static bool can_be_symbolic(uint) { return true; });
 COMMAND_DECLARE_SPECIAL(Primitive, algebraic, 2,
                         PREC_DECL(MULTIPLICATIVE);
                         INSERT_DECL(Primitive);
-                        PARSE_DECL(Primitive););
+                        PARSE_DECL(Primitive);
+                        static bool can_be_symbolic(uint) { return true; });
 COMMAND_DECLARE_SPECIAL(Where, arithmetic, 2, PREC_DECL(WHERE); );
 NFUNCTION(Subst, 2, static bool can_be_symbolic(uint) { return true; } );
 

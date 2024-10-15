@@ -32,6 +32,7 @@
 #include "algebraic.h"
 #include "array.h"
 #include "compare.h"
+#include "constants.h"
 #include "expression.h"
 #include "grob.h"
 #include "locals.h"
@@ -53,6 +54,7 @@
 RECORDER(list, 16, "Lists");
 RECORDER(list_parse, 16, "List parsing");
 RECORDER(list_error, 16, "Errors processing lists");
+
 
 object::result list::list_parse(id      type,
                                 parser &p,
@@ -83,11 +85,13 @@ object::result list::list_parse(id      type,
     size_t   non_alg_len = 0;
     bool     xroot       = false;
 
-    // The IFTE command is special in that we don't evaluate its arguments
-    bool        ifte     = false;
+    // Some commands such as IFTE, Sum, Integrate or Root are special in that
+    // we need to defer argument evaluation, i.e. keep arguments as expressions
+    // so that their 'evaluate' function receives the symbolic form
+    id       special     = ID_object;
 
     // The `|` operator (where) is special when parsing parentheses
-    bool        iswhere  = false;
+    bool     iswhere     = false;
 
     record(list, "Parse %lc%lc precedence %d length %u [%s]",
            open, close, precedence, max, utf8(s));
@@ -286,8 +290,9 @@ object::result list::list_parse(id      type,
                 // We just parsed an algebraic, e.g. 'sin', etc
                 // stash it and require parentheses for arguments
                 id type = obj->type();
-                ifte = type == ID_IFTE;
-                if (!is_algebraic(type) && !ifte)
+                if (function::has_symbolic_arguments(type))
+                    special = type;
+                if (!is_algebraic(type) && !special)
                 {
                     if (objcount)
                     {
@@ -365,7 +370,10 @@ object::result list::list_parse(id      type,
                 size_t objsize = obj->size();
 
                 // For equations, copy only the payload
-                if (precedence && (!ifte || arg == 0))
+                bool keepsym = special &&
+                    function::is_symbolic_argument(special, arity-arg);
+
+                if (precedence && !keepsym)
                     if (expression_p eq = obj->as<expression>())
                         obj = eq->objects(&objsize);
 
@@ -488,6 +496,7 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
     list_g list        = this;
     id     lty         = type();
     bool   need_indent = lty == ID_program;
+    settings::SaveShowEquationBody sseb(false);
 
     for (object_p obj : *list)
     {
@@ -601,6 +610,25 @@ list_p list::append(object_p o) const
     text_g x = text_p(this);
     text_g y = text::make(byte_p(o), o->size());
     return list_p(+(x + y));
+}
+
+
+list_p list::remove(size_t first, size_t len) const
+// ----------------------------------------------------------------------------
+//   Remove items in the given range
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    size_t   idx = 0;
+    id       ty  = type();
+    for (object_p copy : *this)
+    {
+        if (idx < first || idx >= first + len)
+            if (!rt.append(copy))
+                return nullptr;
+        idx++;
+    }
+    return list::make(ty, scr.scratch(), scr.growth());
 }
 
 
@@ -737,6 +765,7 @@ grob_p list::graph(grapher &g, size_t rows, size_t cols, bool mat) const
 // ----------------------------------------------------------------------------
 {
     list_g list = this;
+    save<bool> sgraph(g.graph, false);
 
     // Convert all elements to graphical equivalent
     size_t nitems = rows * cols;
@@ -1142,10 +1171,9 @@ COMMAND_BODY(Head)
 // ----------------------------------------------------------------------------
 {
     object_p obj = rt.top();
-    id ty = obj->type();
-    if (ty == ID_list || ty == ID_array)
+    if (list_p li = obj->as_array_or_list())
     {
-        if (object_p hd = list_p(obj)->head())
+        if (object_p hd = li->head())
         {
             if (rt.top(hd))
                 return OK;
@@ -1169,10 +1197,9 @@ COMMAND_BODY(Tail)
 // ----------------------------------------------------------------------------
 {
     object_p obj = rt.top();
-    id ty = obj->type();
-    if (ty == ID_list || ty == ID_array)
+    if (list_p li = obj->as_array_or_list())
     {
-        if (object_p tl = list_p(obj)->tail())
+        if (object_p tl = li->tail())
         {
             if (rt.top(tl))
                 return OK;
@@ -1197,13 +1224,12 @@ static object::result map_reduce_filter(object_p (list::*cmd)(object_p) const)
 //   Shared code for map, reduce and filter
 // ----------------------------------------------------------------------------
 {
-    size_t depth = rt.depth();
-    object_p   obj = rt.stack(1);
-    object_g   prg = rt.top();
-    object::id ty  = obj->type();
-    if (ty == object::ID_list || ty == object::ID_array)
+    size_t   depth = rt.depth();
+    object_p obj   = rt.stack(1);
+    object_g prg   = rt.top();
+    if (list_p li = obj->as_array_or_list())
     {
-        object_p result = (list_p(obj)->*cmd)(prg);
+        object_p result = (li->*cmd)(prg);
         if (!result)
             goto error;
         if (rt.drop() && rt.top(result))
@@ -1253,10 +1279,9 @@ static object::result list_reduce(object::id cmd)
 // ----------------------------------------------------------------------------
 {
     object_p   obj = rt.stack(0);
-    object::id ty  = obj->type();
-    if (ty == object::ID_list || ty == object::ID_array)
+    if (list_p li = obj->as_array_or_list())
     {
-        object_p result = list_p(obj)->reduce(command::static_object(cmd));
+        object_p result = li->reduce(command::static_object(cmd));
         if (result && rt.top(result))
             return object::OK;
     }
@@ -1274,11 +1299,10 @@ static object::result list_pair_map(object::id cmd)
 // ----------------------------------------------------------------------------
 {
     object_p   obj = rt.stack(0);
-    object::id ty  = obj->type();
-    if (ty == object::ID_list || ty == object::ID_array)
+    if (list_p li = obj->as_array_or_list())
     {
         object_p cmdobj = command::static_object(cmd);
-        object_p result = list_p(obj)->pair_map(cmdobj);
+        object_p result = li->pair_map(cmdobj);
         if (result && rt.top(result))
             return object::OK;
     }
@@ -1357,7 +1381,7 @@ list_p list::map(object_p prgobj) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (oty == ID_array || oty == ID_list)
+        if (is_array_or_list(oty))
         {
             list_g sub = list_p(obj)->map(prg);
             obj = +sub;
@@ -1443,7 +1467,7 @@ list_p list::filter(object_p prgobj) const
     {
         id   oty  = obj->type();
         bool keep = false;
-        if (oty == ID_array || oty == ID_list)
+        if (is_array_or_list(oty))
         {
             object_g sub = list_p(+obj)->filter(prg);
             obj = +sub;
@@ -1528,7 +1552,7 @@ list_p list::map(algebraic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (oty == ID_array || oty == ID_list)
+        if (is_array_or_list(oty))
         {
             list_g sub = list_p(obj)->map(fn);
             obj = +sub;
@@ -1566,7 +1590,7 @@ list_p list::map(arithmetic_fn fn, algebraic_r y) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (oty == ID_array || oty == ID_list)
+        if (is_array_or_list(oty))
         {
             list_g sub = list_p(obj)->map(fn, y);
             obj = +sub;
@@ -1604,7 +1628,7 @@ list_p list::map(algebraic_r x, arithmetic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (oty == ID_array || oty == ID_list)
+        if (is_array_or_list(oty))
         {
             list_g sub = list_p(obj)->map(x, fn);
             obj = +sub;
@@ -1702,14 +1726,13 @@ static object::result do_sort(int (*compare)(object_p *x, object_p *y))
 
     if  (object_p obj = rt.stack(0))
     {
-        object::id oty = obj->type();
-        if (oty == object::ID_list || oty == object::ID_array)
+        if (list_g items = obj->as_array_or_list())
         {
-            size_t   depth = rt.depth();
-            list_g   items = list_p(obj);
-            size_t   count;
-            scribble scr;
-            qsort_fn cmp = qsort_fn(compare);
+            size_t     depth = rt.depth();
+            size_t     count;
+            scribble   scr;
+            qsort_fn   cmp = qsort_fn(compare);
+            object::id ity = items->type();
 
             for (object_p item : *items)
                 if (!rt.push(item))
@@ -1723,7 +1746,7 @@ static object::result do_sort(int (*compare)(object_p *x, object_p *y))
                     if (!rt.append(obj))
                         goto err;
             rt.drop(count);
-            items = list::make(oty, scr.scratch(), scr.growth());
+            items = list::make(ity, scr.scratch(), scr.growth());
             if (items && rt.top(+items))
                 return object::OK;
 
@@ -1861,7 +1884,7 @@ bool list::names_insert(size_t depth, symbol_p sym, unit_p uobj)
     for (level = 0; level < existing; level++)
     {
         object_p oobj  = rt.stack(level);
-        unit_p   ounit = oobj->as<unit>();
+        unit_p   ounit = unit::get(oobj);
         symbol_p other = ounit ? symbol_p(ounit->value()) : symbol_p(oobj);
         size_t   olen  = 0;
         utf8     oname = other->value(&olen);
@@ -2036,7 +2059,7 @@ COMMAND_BODY(DoList)
                 if (!obj)
                     return ERROR;
                 id ty = obj->type();
-                if (ty != ID_list && ty != ID_array)
+                if (!is_array_or_list(ty))
                     return ERROR;
                 list_p lst = list_p(obj);
                 if (!d)
@@ -2137,7 +2160,7 @@ COMMAND_BODY(DoSubs)
             if (!obj)
                 return ERROR;
             id lty = obj->type();
-            if (lty != ID_list && lty != ID_array)
+            if (!is_array_or_list(lty))
                 return ERROR;
             list_g lst = list_p(obj);
             size_t length = lst->items();
@@ -2215,4 +2238,165 @@ COMMAND_BODY(EndSub)
         if (rt.push(obj))
             return OK;
     return ERROR;
+}
+
+
+
+// ============================================================================
+//
+//   List element substitution
+//
+// ============================================================================
+
+algebraic_p list::where(algebraic_r expr, algebraic_r args)
+// ----------------------------------------------------------------------------
+//   Implementation of the "where" command
+// ----------------------------------------------------------------------------
+{
+    return algebraic_p(substitute(+expr, +args));
+}
+
+
+object_p list::substitute(object_p source, object_p args)
+// ----------------------------------------------------------------------------
+//   Implementation of the `where` command (input may not be algebraic)
+// ----------------------------------------------------------------------------
+{
+    id patty = source->type();
+    if (patty == ID_expression)
+    {
+        object_g ao = args;
+        return expression_p(+source)->substitute(ao);
+    }
+    else if (is_real(patty) || is_complex(patty))
+    {
+        return source;
+    }
+    else if (is_array_or_list(patty))
+    {
+        algebraic_g aa = algebraic_p(args);
+        return list_p(+source)->map(list::where, aa);
+    }
+    else if (patty == ID_equation || patty == ID_xlib || patty == ID_constant)
+    {
+        object_p value = constant_p(source)->value();
+        return substitute(value, args);
+    }
+    return nullptr;
+}
+
+
+list_p list::substitute(symbol_r name, object_r replobj, size_t replsz) const
+// ----------------------------------------------------------------------------
+//  Substitute a single name with some other object
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    id ltype = type();
+    for (object_p obj : *this)
+    {
+        object_p tobj = obj;
+        unit_p   uobj = obj->as<unit>();
+        if (uobj)
+            tobj = uobj->value();
+        symbol_p oname = tobj->as<symbol>();
+        if (oname && name->is_same_as(oname))
+        {
+            if (uobj)
+            {
+                // We map a name like (M_kg) with a value like 100_g
+                // Check that we can convert units
+
+                // In that case, the replacement needs to be algebraic
+                algebraic_g arepl = replobj->as_algebraic();
+                if (!arepl)
+                {
+                    rt.type_error();
+                    return nullptr;
+                }
+
+                algebraic_g one = integer::make(1);
+                unit_g fromu = unit::make(one, uobj->uexpr());
+                if (!fromu->convert(arepl))
+                {
+                    rt.inconsistent_units_error();
+                    return nullptr;
+                }
+                if (!arepl || !rt.append(arepl, arepl->size()))
+                    return nullptr;
+            }
+            else if (!rt.append(replobj, replsz))
+                return nullptr;
+        }
+        else
+        {
+            if (!rt.append(obj))
+                return nullptr;
+        }
+    }
+    list_p result = list::make(ltype, scr.scratch(), scr.growth());
+    return result;
+}
+
+
+list_p list::substitute(symbol_r name, object_r replobj) const
+// ----------------------------------------------------------------------------
+//  Substitute a name with an object, which can be an expression
+// ----------------------------------------------------------------------------
+{
+    if (expression_p expr = replobj->as<expression>())
+    {
+        size_t sz = 0;
+        object_g obj = expr->objects(&sz);
+        return substitute(name, obj, sz);
+    }
+    return substitute(name, replobj, replobj->size());
+}
+
+
+list_p list::substitute(expression_r assign) const
+// ----------------------------------------------------------------------------
+//   Perform substitution with an input that looks like A=B
+// ----------------------------------------------------------------------------
+{
+    list_g       l = this;
+    expression_g from, to;
+    if (assign->split_equation(from, to))
+        if (symbol_g name = from->as_quoted<symbol>())
+            return l->substitute(name, (object_g) to);
+    if (!rt.error())
+        rt.value_error();
+    return nullptr;
+}
+
+
+list_p list::substitute(list_r assignments) const
+// ----------------------------------------------------------------------------
+//   Substitute a list of assignments
+// ----------------------------------------------------------------------------
+{
+    list_g result = this;
+    for (object_g obj : *assignments)
+        result = result->substitute(obj);
+    return result;
+}
+
+
+list_p list::substitute(object_r repl) const
+// ----------------------------------------------------------------------------
+//   Check if we have an expression or a list as an argument
+// ----------------------------------------------------------------------------
+{
+    id rty = repl->type();
+    if (is_array_or_list(rty))
+    {
+        list_g rlist = list_p(+repl);
+        return substitute(rlist);
+    }
+    if (rty == ID_expression)
+    {
+        expression_g expr = expression_p(+repl);
+        return substitute(expr);
+    }
+    return this;
 }

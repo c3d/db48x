@@ -1,20 +1,20 @@
 # Operations with Angles
 
-## ToDegrees (→Deg)
+## ToDegrees
 Convert a number or angle to an angle in degrees.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRadians (→Rad)
+## ToRadians
 Convert a number or angle to an angle in radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToGrads (→Grad)
+## ToGrads
 Convert a number or angle to an angle in grads.
 If given a number, that number is interpreted using the current angle mode.
 
-## ToPiRadians (→πr)
+## ToPiRadians
 Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 

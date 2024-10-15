@@ -19,7 +19,7 @@ The debug menu contains operations necessary to debug RPL programs:
 * [Step↑](#stepout)
 
 
-## Debug (DBUG)
+## Debug
 
 The `Debug` command takes a program or expression as an argument, and starts
 debugging execution of it. When a program is halted for debugging, the header
@@ -34,7 +34,7 @@ by being interrupted using the _EXIT_ key, then this is seen as part of the same
 debugging session.
 
 
-## SingleStep (SST)
+## SingleStep
 
 The `SingleStep` command steps through a single instruction in the RPL program.
 
@@ -58,7 +58,7 @@ program being debugged. The number of steps to execute is passed as an argument
 in the first level of the stack. For example, `40 MultipleSteps` will execute
 the next 40 RPL instructions.
 
-## Continue (CONT)
+## Continue
 
 The `Continue` command resumes execution of the current RPL program at the
 current instruction.

@@ -164,9 +164,15 @@ static const cstring basic_characters[] =
                  "∩∟∠∡⊿" "⨯⋅")
     ,
     "Punct",    ".,;:!?" "#$%&'\"" "¡¿`´~\\",
-    "Delim",    "()[]{}" "«»'\"¦§" "¨­¯",
+    "Delim",    "()[]{}" "«»'\"¦§" "¨­¯ ",
     "Greek",    ("αβγδεΑΒΓΔΕάΆ·ΈέζηθικΖΗΘΙΚΉήϊίΊλμνξοΛΜΝΞΟʹ͵΅Όό"
-                 "πρστυΠΡΣΤΥ ϋςΎύφχψωΰΦΧΨΩ΄ϕ;ϖώΏ"),
+                 "πρστυΠΡΣΤΥ ϋςΎύφχψωΰΦΧΨΩ΄ϕ;ϖώΏ"
+                 "\n"
+                 "aαά bβ gγ dδ eεέ AΑΆ BΒ GΓ DΔ EΕΈ "
+                 "zζ hηή qθ iιίϊ kκ ZΖ HΗHΉ QΘ IΙΊ KΚ "
+                 "lλ mμ nν xξ oοό LΛ MΜ NΝ XΞ OΟΌ "
+                 "pπ rρ sσς tτ uυύϋΰ PΠ RΡ SΣ TΤ UΥΎ "
+                 "fφϕ cχ vψ wωώϖ FΦ CΧ VΨ WΩΏ"),
 
     "Arrows",   ("←↑→↓↔"
                  "↕⇄⇆↨⌂"
@@ -209,7 +215,20 @@ static const cstring basic_characters[] =
                  "ПРСТУпрсту     "
                  "ФХЦЧШфхцчш     "
                  "ЩЪЫЬЭщъыьэ     "
-                 "ЮЯ   юя        "),
+                 "ЮЯ   юя        "
+                 "\n"
+                 "AАЯ BБ VВ GГҐЃ DДЂ "
+                 "aая bб vв gг dд "
+                 "EЭЕ ZЖЗЅ IИІ "
+                 "eэе zжзѕ iиі "
+                 "JЈ KКЌ LЛЉ MМ NНЊ OО "
+                 "jј kкќ lлљ mм nнњ oо "
+                 "PП RР SСЋ TТ UУЮ "
+                 "pп rр sсћ tт uую "
+                 "FФ KХ HЦ XЧ YЏ WШ CЩ "
+                 "fф kх hц xч yџ wш cщ "
+                 "QЪЬЫ"
+                 "qъьы"),
 
     "Picto",    ("⌂№℡™⚙"
                  "☺☻☼♀♂"
@@ -269,17 +288,17 @@ static const cstring basic_characters[] =
 //
 // ============================================================================
 
-MENU_BODY(character_menu)
+symbol_p character_menu::characters(size_t *matchptr) const
 // ----------------------------------------------------------------------------
-//   Build a characters menu
+//   Return the character list (value for the menu entry)
 // ----------------------------------------------------------------------------
 {
     // Use the characters loaded from the characters file
     characters_file cfile(CFILE);
-    size_t          matching = 0;
-    size_t maxu   = sizeof(basic_characters) / sizeof(basic_characters[0]);
-    id     type   = o->type();
-    id     menu   = ID_CharactersMenu00;
+    size_t   matching = 0;
+    size_t   maxu   = sizeof(basic_characters) / sizeof(basic_characters[0]);
+    id       type   = this->type();
+    id       menu   = ID_CharactersMenu00;
     symbol_g mchars = nullptr;
 
     if (cfile.valid())
@@ -292,9 +311,9 @@ MENU_BODY(character_menu)
                 if (menu == type)
                 {
                     size_t len = 0;
-                    utf8 val = mchars->value(&len);
-                    utf8 end = val + len;
-                    for (utf8 p = val; p < end; p = utf8_next(p))
+                    utf8   val = mchars->value(&len);
+                    utf8   end = val + len;
+                    for (utf8 p = val; p < end && *p >= ' '; p = utf8_next(p))
                         matching++;
                     menu = id(menu + 1);
                     break;
@@ -304,7 +323,7 @@ MENU_BODY(character_menu)
         }
     }
 
-     // Disable built-in characters if we loaded a file
+    // Disable built-in characters if we loaded a file
     if (!matching || Settings.ShowBuiltinCharacters())
     {
         for (size_t u = 0; u < maxu; u += 2)
@@ -316,7 +335,7 @@ MENU_BODY(character_menu)
                     utf8   mtxt = utf8(basic_characters[u + 1]);
                     size_t len  = strlen(cstring(mtxt));
                     mchars      = symbol::make(mtxt, len);
-                    for (utf8 p = mtxt; *p; p = utf8_next(p))
+                    for (utf8 p = mtxt; *p && *p >= ' '; p = utf8_next(p))
                         matching++;
                     break;
                 }
@@ -324,6 +343,21 @@ MENU_BODY(character_menu)
             }
         }
     }
+
+    if (matchptr)
+        *matchptr = matching;
+
+    return mchars;
+}
+
+
+MENU_BODY(character_menu)
+// ----------------------------------------------------------------------------
+//   Build a characters menu
+// ----------------------------------------------------------------------------
+{
+    size_t   matching = 0;
+    symbol_g mchars   = o->characters(&matching);
 
     items_init(mi, matching);
 
@@ -553,4 +587,70 @@ uint character_menu::build_from_characters(menu_info &mi,
     }
 
     return 0;
+}
+
+
+bool character_menu::transliterate(unicode &input) const
+// ----------------------------------------------------------------------------
+//   Transliterate input if applicable, return true if left of cursor
+// ----------------------------------------------------------------------------
+{
+    size_t   matching = 0;
+    symbol_g mchars   = characters(&matching);
+
+    if (mchars)
+    {
+        size_t  len = 0;
+        utf8    txt = mchars->value(&len);
+        utf8    end = txt + len;
+        unicode now = ui.character_left_of_cursor();
+
+        utf8 tmap = txt;
+        while (tmap < end && *tmap != '\n')
+            tmap = utf8_next(tmap);
+        if (*tmap != '\n')
+            return 0;
+        tmap++;
+
+        while (tmap < end)
+        {
+            unicode base = utf8_codepoint(tmap);
+            tmap = utf8_next(tmap);
+            if (base == input)
+            {
+                bool hadit = input == now;
+                unicode xlate = utf8_codepoint(tmap);
+                bool    match = false;
+                while (tmap < end)
+                {
+                    unicode cp = utf8_codepoint(tmap);
+                    tmap = utf8_next(tmap);
+                    if (cp == ' ')
+                        break;
+                    if (match)
+                    {
+                        input = cp;
+                        return true;
+                    }
+                    if (cp == now)
+                        match = true;
+                }
+                if (match)
+                    return true;
+                input = xlate;
+                return hadit;
+            }
+            else
+            {
+                while (tmap < end)
+                {
+                    unicode cp = utf8_codepoint(tmap);
+                    tmap = utf8_next(tmap);
+                    if (cp == ' ')
+                        break;
+                }
+            }
+        }
+    }
+    return false;
 }

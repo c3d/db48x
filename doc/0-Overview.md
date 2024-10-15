@@ -765,9 +765,9 @@ Additional contributors to the project include:
 * Camille Wormser (complex number fixes)
 * Jeff, aka spiff72 (keyboard overlay)
 * Conrado Seibel (help file fix)
-- Kjell Christenson (simulator fix)
-- Václav Kadlčík (documentation fix)
-- Franco Trimboli (WASM port)
+* Kjell Christenson (simulator fix)
+* Václav Kadlčík (documentation fix)
+* Franco Trimboli (WASM port)
 
 The authors would like to acknowledge
 

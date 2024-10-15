@@ -81,7 +81,7 @@ Stores an array from the stack as statistics data in the `ΣData` variable.
 
 Clear statistics data.
 
-## Average (MEAN, AVG)
+## Average
 
 Compute the average (mean) of the values in the statistics data.
 If there is a single column of data, the result is a real number.
@@ -99,53 +99,53 @@ Compute the smallest of the values in the statistics data array `ΣData`.
 
 Compute the largest of the values in the statistics data array `ΣData`.
 
-## ΣSize (NΣ)
+## ΣSize
 
 Return the number of data rows in the statistics data array `ΣData`.
 
-## SumOfX (ΣX)
+## ΣX
 
 Return the sum of values in the `XCol` column of the statistics data array
 `ΣData`. The values are adjusted according to the current fitting model defined
 in `ΣParameters` if the `CurrentFitSums` setting is active.
 
-## SumOfY (ΣY)
+## ΣY
 
 Return the sum of values in the `YCol` column of the statistics data array
 `ΣData`. The values are adjusted according to the current fitting model defined
 in `ΣParameters` if the `CurrentFitSums` setting is active.
 
-## SumOfXY (ΣXY)
+## ΣXY
 
 Return the sum of the product of values in the `XCol` and `YCol` columns of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## SumOfXSquares (ΣX²)
+## ΣX²
 
 Return the sum of the squares of the values in the `XCol` column of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## SumOfYSquares (ΣY²)
+## ΣY²
 
 Return the sum of the squares of the values in the `YCol` column of the
 statistics data array `ΣData`. The values are adjusted according to the current
 fitting model defined in `ΣParameters` if the `CurrentFitSums` setting is
 active.
 
-## Total (TOT)
+## ΣTotal
 
 Returns the sum of all columns in the statistics data array `ΣData`.
 
-## Variance (VAR)
+## Variance
 
 Calculates the sample variance of the coordinate values in each of the columns
 in the current statistics matrix (`ΣData`).
 
-## Correlation (CORR)
+## Correlation
 
 Returns the correlation coefficient of the independent and dependent data
 columns in the current statistics matrix (reserved variable `ΣData`).
@@ -155,7 +155,7 @@ The columns are specified by the first two elements in the reserved variable
 exist, `Correlation` creates it and sets the elements to their default values
 (1 and 2).
 
-## Covariance (COV)
+## Covariance
 
 Returns the sample covariance of the independent and dependent data columns in
 the current statistics matrix (reserved variable `ΣData`).
@@ -165,7 +165,7 @@ The columns are specified by the first two elements in the reserved variable
 exist, `Correlation` creates it and sets the elements to their default values
 (1 and 2).
 
-## StandardDeviation (SDEV)
+## StandardDeviation
 
 Calculates the sample standard deviation of each of the columns of coordinate values in the current statistics matrix (reserved variable `ΣData`).
 
@@ -173,7 +173,7 @@ Calculates the sample standard deviation of each of the columns of coordinate va
 
 The standard deviation is the square root of the `Variance`.
 
-## LinearRegression (LR)
+## LinearRegression
 
 Uses the currently selected statistical model to calculate the linear regression
 coefficients (intercept and slope) for the selected dependent and independent
@@ -219,24 +219,24 @@ This is a DB48X extension, not present on HP calculators
 Select the best linear regression mode based on current data, i.e. the
 regression mode where the correlation value is the highest.
 
-## LinearFit (LINFIT)
+## LinearFit
 
 Select linear fit, i.e. try to model data with a linear equation `y = a*x+b`.
 
-## ExponentialFit (EXPFIT)
+## ExponentialFit
 
 Select exponential fit, i.e. try to model data with an equation `y = b*exp(a*x)`
 
-## LogarithmicFit (LOGFIT)
+## LogarithmicFit
 
 Select logarithmic fit, i.e. try to model data with an equation `y = a*ln(x)+b`.
 
-## PowerFit (PWRFIT)
+## PowerFit
 
 Select power fit, i.e. try to model data with an equation `y = x^a * b`.
 
 
-## FrequencyBins (BINS)
+## FrequencyBins
 
 Sorts the elements of the independent column (`XCol`) of the current statistics
 matrix (the reserved variable `ΣDat`) into (`nbins + 2`) bins, where the left
@@ -251,7 +251,7 @@ example, by executing `BarPlot`.
 `xmin` `xwidth` `nbins` ▶ `[[ n1 .. n2 ]]` `[ nlow nhigh ]`
 
 
-## PopulationVariance (PVAR)
+## PopulationVariance
 
 Calculates the population variance of the coordinate values in each of the m
 columns in the current statistics matrix (`ΣData`).
@@ -260,7 +260,7 @@ The population variance (equal to the square of the population standard
 deviation) is returned as a vector of m real numbers, or as a single real number
 if there is a single column of data.
 
-## PopulationStandardDeviation (PSDEV)
+## PopulationStandardDeviation
 
 Calculates the population standard deviation of each of the m columns of
 coordinate values in the current statistics matrix (reserved variable `ΣData`).
@@ -268,7 +268,7 @@ coordinate values in the current statistics matrix (reserved variable `ΣData`).
 The command returns a vector of m real numbers, or a single real number if there
 is a single column of data.
 
-## PopulationCovariance (PCOV)
+## PopulationCovariance
 
 Computes the population covariance of the independent and dependent data columns
 in the current statistics matrix (reserved variable `ΣData`).
@@ -277,19 +277,19 @@ The columns are specified by the first two elements in reserved variable
 `ΣParameters`, set by `XCol` and `YCol` respectively. If `ΣParameters` does not
 exist, `PCOV` creates it and sets the elements to their default values, 1 and 2.
 
-## IndependentColumn (XCOL)
+## IndependentColumn
 
 Set the independent variable column in the reserved variable `ΣParameters`.
 
 `XCol` ▶ (Update `ΣParameters`)
 
-## DependentColumn (YCOL)
+## DependentColumn
 
 Set the dependent variable column in the reserved variable `ΣParameters`.
 
 `YCol` ▶ (Update `ΣParameters`)
 
-## DataColumns (COLΣ)
+## DataColumns
 
 Set both the independent and dependent data columns in the reserved variable
 `ΣParameters`.

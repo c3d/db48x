@@ -35,10 +35,10 @@ calculator. It includes the following submenus:
 * [Solve](#SolverMenu): Numerical solver
 
 
-## VariablesMenu (VARS)
+## VariablesMenu
 
-The variables menu displays the variables in the current directory.
-It is a three row menu, where for each variable:
+The variables menu, accessed using the _VAR_ key, displays the variables in the
+current directory. It shows three rows for each variable:
 
 * The primary function [evaluates the variable](#VariablesMenuExecute)
 * The first shifted function [recalls the variable](#VariablesMenuRecall)

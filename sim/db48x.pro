@@ -113,6 +113,7 @@ macx:DEFINES += _WCHAR_T_DEFINED
 
 # Configure help file
 DEFINES += 	HELPFILE_NAME=\\\"help/db48x.md\\\"
+DEFINES += 	HELPINDEX_NAME=\\\"help/db48x.idx\\\"
 
 color:DEFINES += CONFIG_COLOR
 

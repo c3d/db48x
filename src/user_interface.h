@@ -160,10 +160,12 @@ struct user_interface
     bool        current_word(utf8 &start, size_t &size);
     bool        at_end_of_number(bool want_polar=false);
     unicode     character_left_of_cursor();
+    bool        replace_character_left_of_cursor(unicode code);
     bool        replace_character_left_of_cursor(symbol_p sym);
     bool        replace_character_left_of_cursor(utf8 text, size_t len);
 
     uint        shift_plane()   { return xshift ? 2 : shift ? 1 : 0; }
+    void        clear_shift()   { xshift = shift = false; }
     void        clear_help();
     void        clear_menu();
     object_p    object_for_key(int key);
@@ -206,6 +208,7 @@ protected:
     bool        handle_shifts(int &key, bool talpha);
     bool        handle_help(int &key);
     bool        handle_editing(int key);
+    bool        handle_editing_command(object::id lower, object::id higher);
     bool        handle_alpha(int key);
     bool        handle_functions(int key);
     bool        handle_digits(int key);

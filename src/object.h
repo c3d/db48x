@@ -121,6 +121,7 @@ struct runtime;
 struct symbol;
 struct text;
 struct grob;
+struct list;
 struct user_interface;
 
 typedef const algebraic *algebraic_p;
@@ -129,6 +130,7 @@ typedef const program   *program_p;
 typedef const symbol    *symbol_p;
 typedef const text      *text_p;
 typedef const grob      *grob_p;
+typedef const list      *list_p;
 
 struct object
 // ----------------------------------------------------------------------------
@@ -712,7 +714,7 @@ struct object
     //    Check if a type denotes an algebraic value or function
     // ------------------------------------------------------------------------
     {
-        return is_algebraic(ty) || ty == ID_list || ty == ID_array;
+        return is_algebraic(ty) || is_array_or_list(ty);
     }
 
 
@@ -751,6 +753,35 @@ struct object
     // ------------------------------------------------------------------------
     {
         return is_extended_algebraic(type());
+    }
+
+
+    static bool is_array_or_list(id ty)
+    // ------------------------------------------------------------------------
+    //   Check if we have an array or list
+    // ------------------------------------------------------------------------
+    {
+        return ty == ID_array || ty == ID_list;
+    }
+
+
+    bool is_array_or_list() const
+    // ------------------------------------------------------------------------
+    //   Check if we have an array or list
+    // ------------------------------------------------------------------------
+    {
+        return is_array_or_list(type());
+    }
+
+
+    list_p as_array_or_list() const
+    // ------------------------------------------------------------------------
+    //   Convert to array or list if this is the type
+    // ------------------------------------------------------------------------
+    {
+        if (is_array_or_list())
+            return list_p(this);
+        return nullptr;
     }
 
 

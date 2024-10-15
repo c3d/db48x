@@ -58,9 +58,13 @@ struct character_menu : menu
     static uint build_from_characters(menu_info &mi,
                                       utf8 chars, size_t len, size_t offset);
 
+    symbol_p characters(size_t *matching) const;
+    bool transliterate(unicode &input) const;
+
 public:
     MENU_DECL(character_menu);
 };
+GCP(character_menu);
 
 
 #define ID(i)

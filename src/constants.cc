@@ -968,7 +968,7 @@ object::result constant::lookup_command(config_r cfg, bool numerical)
                 {
                     value = expr->evaluate();
                 }
-                else if (unit_p u = value->as<unit>())
+                else if (unit_p u = unit::get(value))
                 {
                     if (algebraic_g expr = u->value()->as<expression>())
                     {

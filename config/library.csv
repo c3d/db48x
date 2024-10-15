@@ -1,7 +1,7 @@
 "Secrets"
 
-        "Dedicace",	"""À tous ceux qui se souviennent de Maubert électronique"""
-        "LibraryHelp",	"""To modify the library, edit the config/library.csv file"""
+	"Dedicace",	"""À tous ceux qui se souviennent de Maubert électronique"""
+	"LibraryHelp",	"""To modify the library, edit the config/library.csv file"""
 
 "Physics"
 
@@ -11,28 +11,28 @@
 
 	"CollatzBenchmark",	"="
 	"CollatzConjecture",	"="
-        "CountPrimes",          "="
-        "TriangleEquations",    "="
+	"CountPrimes",		"="
+	"TriangleEquations",	"="
 
 "Graphics"
-        "CurvePlottingExamples", "="
-        "WalkMan", "="
-        "DrawingLines", "="
-        "DrawingText", "="
-        "DrawingShapes", "="
-        "DrawingPatterns", "="
-        "RandomPlot", "="
-        "RandomXYPlot", "="
+	"CurvePlottingExamples", "="
+	"WalkMan", "="
+	"DrawingLines", "="
+	"DrawingText", "="
+	"DrawingShapes", "="
+	"DrawingPatterns", "="
+	"RandomPlot", "="
+	"RandomXYPlot", "="
 
 "Sound"
-        "Beeps", "="
+	"Beeps", "="
 
 "Performance"
-        "NQueens", "="
-        "SumTestWithFunction", "="
-        "SumTestWithLoop", "="
-        "Recursion", "="
-        "UnitsBenchmark", "="
+	"NQueens", "="
+	"SumTestWithFunction", "="
+	"SumTestWithLoop", "="
+	"Recursion", "="
+	"UnitsBenchmark", "="
 
 "Configs"
 

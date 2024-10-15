@@ -134,7 +134,7 @@ cleanup of temporary values (garbage collection).
 See also: [GarbageCollect](#GarbageCollect), [FreeMemory](#FreeMemory)
 
 
-## AvailableMemory (MEM)
+## AvailableMemory
 
 Return the number of bytes available in memory.
 
@@ -220,7 +220,7 @@ Make a new copy of the given object
 ## USBFWUPDATE
 
 
-## PowerOff (OFF)
+## PowerOff
 
 Turn calculator off programmatically
 
