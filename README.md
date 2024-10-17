@@ -7,10 +7,11 @@ language with its rich set of data types and built-in functions, and
 
 The project in this repository is presently targeting the
 [SwissMicro DM42](https://www.swissmicros.com/product/dm42) and
-[DM32](https://www.swissmicros.com/product/dm42) calculators. It leverages their
-built-in software platform, known as
-[DMCP](https://technical.swissmicros.com/dmcp/doc/DMCP-ifc-html/). There is also
-a simulator that is tested on macOS or Linux, and you can even
+[DM32](https://www.swissmicros.com/product/dm42) calculators.
+You can [order keyboard overlays](https://www.hpmuseum.org/forum/thread-20113.html) to adjust the calculator's faceplates to DB48X.
+DB48X leverages SwissMicros's built-in software platform, known as
+[DMCP](https://technical.swissmicros.com/dmcp/doc/DMCP-ifc-html/).
+There is also a simulator that is tested on macOS or Linux, and you can even
 [try it in your browser](http://c3d.github.com/db48x)
 
 In the long-term, the vision is to be able to port DB48X on a number of
