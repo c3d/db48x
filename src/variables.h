@@ -198,6 +198,9 @@ COMMAND_DECLARE(RecallMul, 2);
 COMMAND_DECLARE(RecallDiv, 2);
 COMMAND_DECLARE(Increment, 1);
 COMMAND_DECLARE(Decrement, 1);
+COMMAND_DECLARE_SPECIAL(Copy, command, 2,
+                        PREC_DECL(WHERE);
+                        static bool can_be_symbolic(uint a) { return a==0; });
 COMMAND_DECLARE(Purge,1);
 COMMAND_DECLARE(PurgeAll,1);
 COMMAND_DECLARE(Vars, 0);

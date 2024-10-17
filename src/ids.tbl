@@ -658,6 +658,7 @@ OP(RecallDiv,   "Recall÷")              ALIAS(RecallDiv, "Recall/")
 ALIAS(RecallDiv,"Rcl/")                 ALIAS(RecallDiv, "Rcl÷")
 CMD(Increment)                          ALIAS(Increment, "Incr")
 CMD(Decrement)                          ALIAS(Decrement, "Decr")
+OP(Copy, "▶")
 
 // Other variable operations
 NAMED(Vars,     "Variables")
@@ -1077,8 +1078,8 @@ OP(AlgebraConfiguration,   "Ⓓ")        ALIAS(AlgebraConfiguration,  "CASDir")
 OP(AlgebraVariable,        "ⓧ")        ALIAS(AlgebraVariable,       "VX")
                                         ALIAS(AlgebraVariable,       "RclVX")
 OP(StoreAlgebraVariable,   "Storeⓧ")   ALIAS(StoreAlgebraVariable,  "StoVX")
-OP(StEq,                   "▶Equation") ALIAS(StEq, "StoreEquation")
-OP(RcEq,                   "Equation▶") ALIAS(RcEq, "RecallEquation")
+OP(StEq,                   "StoreEquation")
+OP(RcEq,                   "RecallEquation")
 OP(NextEq,                 "NextEquation")
 OP(EvalEq,                 "EvaluateEquation")
 

@@ -791,6 +791,30 @@ COMMAND_BODY(Rcl)
 }
 
 
+
+COMMAND_BODY(Copy)
+// ----------------------------------------------------------------------------
+//   Arithmetic copy operation
+// ----------------------------------------------------------------------------
+{
+    if (object_p nobj = rt.top())
+    {
+        if (symbol_p name = nobj->as_quoted<symbol>())
+        {
+            if (object_g value = rt.stack(1))
+                if (directory::store_here(name, value))
+                    if (rt.drop() && rt.top(value))
+                        return OK;
+        }
+        else
+        {
+            rt.invalid_name_error();
+        }
+    }
+    return ERROR;
+}
+
+
 static object::result store_op(object::id op)
 // ----------------------------------------------------------------------------
 //   Store with a given operation

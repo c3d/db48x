@@ -1615,8 +1615,8 @@ PARSE_BODY(assignment)
         return SKIP;
     bool swapped = cp == L'▶' || cp == L'→';
 
-    // In an expression, `A=B` is just equality
-    if (p.precedence && cp == '=')
+    // In an expression, `A=B` is just equality and ▶ is the Copy command
+    if (p.precedence && (cp == '=' || cp == L'▶'))
         return SKIP;
 
     // Parse the body

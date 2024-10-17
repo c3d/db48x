@@ -45,6 +45,7 @@
 #include "solve.h"
 #include "tag.h"
 #include "unit.h"
+#include "variables.h"
 
 
 RECORDER(function,              16, "Evaluation of functions");
@@ -95,6 +96,8 @@ bool function::has_symbolic_arguments(id type)
             type == ID_Product                  ||
             type == ID_IFTE                     ||
             type == ID_Subst                    ||
+            type == ID_Where                    ||
+            type == ID_Copy                     ||
             type == ID_Integrate                ||
             type == ID_Root                     ||
             type == ID_MultipleEquationsSolver  ||
@@ -118,6 +121,10 @@ bool function::is_symbolic_argument(id type, uint arg)
         return IFTE::can_be_symbolic(arg);
     case ID_Subst:
         return Subst::can_be_symbolic(arg);
+    case ID_Where:
+        return Where::can_be_symbolic(arg);
+    case ID_Copy:
+        return Copy::can_be_symbolic(arg);
     case ID_Integrate:
         return Integrate::can_be_symbolic(arg);
     case ID_Root:

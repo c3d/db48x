@@ -140,12 +140,17 @@ object::result list::list_parse(id      type,
             {
                 // Check if we see parentheses, or if we have `sin sin X`
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
-                if (parenthese  || infix || prefix || alist)
+                if (parenthese || infix || prefix || alist)
                 {
                     int childp = infix      ? int(infix->precedence() + 1)
                                : parenthese ? int(LOWEST)
                                : alist      ? int(LOWEST)
                                             : int(SYMBOL);
+                    if (infix && infix->type() == ID_Copy)
+                    {
+                        childp = int(SYMBOL);
+                        special = ID_Copy;
+                    }
 
                     if (infix && cp == '(' && infix->type() == ID_Where)
                     {
@@ -374,13 +379,13 @@ object::result list::list_parse(id      type,
 
                 size_t objsize = obj->size();
 
-                // For equations, copy only the payload
-                bool keepsym = special &&
-                    function::is_symbolic_argument(special, arity-arg);
-
-                if (precedence && !keepsym && !alist)
-                    if (expression_p eq = obj->as<expression>())
-                        obj = eq->objects(&objsize);
+                // For expressions, copy only the payload unless we want it
+                // to be preserved as a symbolic expression
+                if (precedence && !alist)
+                    if (!special ||
+                        !function::is_symbolic_argument(special, arity-arg))
+                        if (expression_p eq = obj->as<expression>())
+                            obj = eq->objects(&objsize);
 
                 if (!rt.append(obj, objsize))
                     return ERROR;

@@ -29,8 +29,8 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include "constants.h"
 #include "complex.h"
+#include "constants.h"
 
 #include <string.h>
 
@@ -145,8 +145,5 @@ public:
     GRAPH_DECL(assignment);
     HELP_DECL(assignment);
 };
-
-
-
 
 #endif // EQUATIONS_H
