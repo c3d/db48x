@@ -2538,6 +2538,7 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
     expression_g expr = this;
     symbol_g     sym  = solving;
     list_p       vars = expr->names();
+    bool         found = false;
     for (auto var : *vars)
     {
         if (symbol_p vsym = var->as<symbol>())
@@ -2551,6 +2552,10 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
                     return false;
                 }
             }
+            else
+            {
+                found = true;
+            }
         }
         else
         {
@@ -2559,7 +2564,7 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
             return false;
         }
     }
-    return true;
+    return !sym || found;
 }
 
 
