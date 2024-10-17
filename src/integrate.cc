@@ -90,6 +90,8 @@ NFUNCTION_BODY(Integrate)
     // Actual integration
     program_g  eq = program_p(+eqobj);
     algebraic_g i = integrate(eq, name, algebraic_p(+low), algebraic_p(+high));
+    if (!i)
+        rt.command(object::static_object(object::ID_Integrate));
     return i;
 }
 

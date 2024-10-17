@@ -838,9 +838,16 @@ struct object
     object_p as_quoted(id ty = ID_symbol) const;
     template<typename T>
     const T *as_quoted() const { return (const T *) as_quoted(T::static_id); }
+    template<typename T, typename U, typename ...Rest>
+    const T *as_quoted() const
     // ------------------------------------------------------------------------
     //    Return object as a valid quoted name (e.g. 'ABC')
     // ------------------------------------------------------------------------
+    {
+        if (const T *result = as_quoted<T>())
+            return result;
+        return as_quoted<U, Rest...>();
+    }
 
 
     int as_truth(bool error = true) const;

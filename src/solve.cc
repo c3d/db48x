@@ -218,7 +218,6 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
         // If we failed during evaluation of x, break
         if (!x)
         {
-            solver_command_error();
             if (!rt.error())
                 rt.bad_guess_error();
             return nullptr;
@@ -227,7 +226,6 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
         // If we are starting to use really big numbers, switch to decimal
         if (!algebraic::to_decimal_if_big(x))
         {
-            solver_command_error();
             store(x);
             return nullptr;
         }
@@ -256,7 +254,6 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
             {
                 if (!rt.error())
                     rt.bad_guess_error();
-                solver_command_error();
                 store(x);
                 return nullptr;
             }
@@ -467,9 +464,9 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 }
 
 
-algebraic_p Root::solve(algebraic_r eq,
-                        algebraic_r var,
-                        algebraic_r guess)
+algebraic_p Root::solve(algebraic_g &eq,
+                        algebraic_g &var,
+                        algebraic_g &guess)
 // ----------------------------------------------------------------------------
 //   Internal solver code
 // ----------------------------------------------------------------------------
@@ -496,49 +493,53 @@ algebraic_p Root::solve(algebraic_r eq,
     record(solve, "Solving %t for variable %t with guess %t",
            +eq, +var, +guess);
 
-    // Check that we have a variable name on stack level 1 and
-    // a proram or equation on level 2
-    program_g pgm   = program_p(+eq);
-    id        pgmty = pgm->type();
-    if (equation_p libeq = pgm->as_quoted<equation>())
+    // Check that we have a program or equation as input
+    if (equation_p libeq = eq->as_quoted<equation>())
     {
         object_p value = libeq->value();
         if (!value || !value->is_extended_algebraic())
             return nullptr;
-        pgm = program_p(value);
-        pgmty = pgm->type();
+        eq = algebraic_p(value);
     }
 
+    // Check if input arguments are wrapped in equations (algebraic case)
+    if (list_p eql = eq->as_quoted<list, array>())
+        eq = eql;
+    if (list_p varl = var->as_quoted<list, array>())
+        var = varl;
+    if (list_p guessl = guess->as_quoted<list, array>())
+        guess = guessl;
+
     // Check if we have a list of variables or equations to solve for
-    id varty = var->type();
-    if (is_array_or_list(pgmty) || is_array_or_list(varty))
+    if (eq->is_array_or_list() || var->is_array_or_list())
     {
-        list_g vars = var->as_array_or_list();
-        list_g eqs = pgm->as_array_or_list();
+        list_g vars    = var->as_array_or_list();
+        list_g eqs     = eq->as_array_or_list();
+        list_g guesses = guess->as_array_or_list();
         if (!eqs)
             eqs = list::make(ID_list, eq);
         if (!vars)
             vars = list::make(ID_list, var);
-        list_g guesses = guess->as_array_or_list();
         if (!guesses)
             guesses = list::make(ID_list, guess);
         return algebraic_p(multiple_equation_solver(eqs, vars, guesses));
     }
 
     // Otherwise we expect a regular program
-    if (pgmty != ID_expression && pgmty != ID_program)
+    if (program_g pgm = eq->as_quoted<program, expression>())
+    {
+        // Actual solving
+        if (algebraic_g x = solve(pgm, var, guess))
+        {
+            if (symbol_p name = var->as_quoted<symbol>())
+                x = algebraic_p(tag::make(name, +x));
+            if (x && !rt.error())
+                return x;
+        }
+    }
+    else
     {
         rt.invalid_equation_error();
-        return nullptr;
-    }
-
-    // Actual solving
-    if (algebraic_g x = solve(pgm, var, guess))
-    {
-        if (symbol_p name = var->as_quoted<symbol>())
-            x = algebraic_p(tag::make(name, +x));
-        if (x && !rt.error())
-            return x;
     }
 
     return nullptr;
@@ -568,10 +569,21 @@ list_p Root::multiple_equation_solver(list_r eqs,
     }
 
     // Check that the list of guesses contains real or complex values
-    size_t gcount = 0;
+    scribble scr;
+    size_t   gcount   = 0;
+    bool     computed = false;
     for (object_p obj : *guesses)
     {
         id ty = obj->type();
+        if (ty == ID_expression)
+        {
+            obj = expression_p(obj)->evaluate();
+            if (!obj)
+                return nullptr;
+            ty = obj->type();
+            computed = true;
+        }
+        rt.append(obj);
         if (ty == ID_unit)
         {
             obj = unit_p(obj)->value();
@@ -584,6 +596,9 @@ list_p Root::multiple_equation_solver(list_r eqs,
         }
         gcount++;
     }
+    list_g gvalues = computed
+        ? list::make(guesses->type(), scr.scratch(), scr.growth())
+        : +guesses;
 
     // Number of guesses and variables should match
     if (gcount != vcount)
@@ -600,7 +615,7 @@ list_p Root::multiple_equation_solver(list_r eqs,
     while (vcount && ecount)
     {
         list::iterator vi = vars->begin();
-        list::iterator gi = guesses->begin();
+        list::iterator gi = gvalues->begin();
         bool           found = false;
 
         // Loop on all variables, looking for one we can solve for
@@ -630,12 +645,14 @@ list_p Root::multiple_equation_solver(list_r eqs,
                     algebraic_g solved = solve(pgm, name, guess);
                     if (!solved)
                     {
+                        solver_command_error();
                         rt.no_solution_error();
                         return nullptr;
                     }
 
                     // That's one variable less to deal with
                     vars = vars->remove(v);
+                    gvalues = gvalues->remove(v);
                     vcount--;
                     found = true;
                 }
@@ -643,6 +660,14 @@ list_p Root::multiple_equation_solver(list_r eqs,
             }
             ++vi;
             ++gi;
+        }
+
+        // This algorithm does not apply, some variables were not found
+        if (!found)
+        {
+            rt.multisolver_variable_error();
+            solver_command_error();
+            return nullptr;
         }
     }
 
@@ -669,10 +694,13 @@ NFUNCTION_BODY(Root)
 //   - With multiple variables in a list or array, it solves for the variables
 //     in turn, in the
 {
-    algebraic_r eqobj    = args[2];
-    algebraic_r variable = args[1];
-    algebraic_r guess    = args[0];
-    return solve(eqobj, variable, guess);
+    algebraic_g &eqobj    = args[2];
+    algebraic_g &variable = args[1];
+    algebraic_g &guess    = args[0];
+    algebraic_g result = solve(eqobj, variable, guess);
+    if (!result)
+        solver_command_error();
+    return result;
 }
 
 
