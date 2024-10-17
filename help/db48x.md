@@ -7621,6 +7621,17 @@ List variables of a specific type
 
 See the [`Type`](#type) command for a list of types.
 
+## Copy
+
+Copy a value into a global variable. This is primarily intended for use in
+algebraic notations, although it also works in RPL.
+
+```
+'(2+5)▶X'
+42 'A' ▶ 1 +
+```
+
+
 ## ORDER
 Sort variables in a directory
 

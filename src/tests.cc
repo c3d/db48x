@@ -176,7 +176,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            units_and_conversions();
+            global_variables();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -1838,6 +1838,25 @@ void tests::global_variables()
         .test(CLEAR, "'A' DECR", ENTER).expect("30 861")
         .test(CLEAR, "'A' Decrement", ENTER).expect("30 860");
 
+    step("Copy")
+        .test(CLEAR, "42 'A' ▶", ENTER).expect("42")
+        .test("A", ENTER).expect("42");
+    step("Copy in algebraic")
+        .test(CLEAR, "'A+A▶A' ", ENTER).expect("'A+A▶A'")
+        .test(RUNSTOP).expect("84");
+    step("Copy precedence of target symbol")
+        .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
+        .test(RUNSTOP).expect("'336'")
+        .test("A", ENTER).expect("168");
+    step("Copy with external parentheses")
+        .test("'(A+A▶A)+A'", ENTER).expect("'(A+A▶A)+A'")
+        .test(RUNSTOP).expect("672")
+        .test("A", ENTER).expect("336");
+    step("Copy with internal parentheses")
+        .test("'A+(A+1▶A)+A'", ENTER).expect("'A+(A+1▶A)+A'")
+        .test(RUNSTOP).expect("1 010")
+        .test("A", ENTER).expect("337");
+
     step("Clone")
         .test(CLEAR,
               "Mem Drop Mem "
@@ -1938,7 +1957,7 @@ void tests::global_variables()
     step("Store program in global variable");
     test(CLEAR, "« 1 + »", ENTER, XEQ, "MyINCR", ENTER, STO).noerror();
     step("Evaluate global variable");
-    test(CLEAR, "A MyINCR", ENTER).expect("30 861");
+    test(CLEAR, "A MyINCR", ENTER).expect("338");
 
     step("Purge global variable");
     test(CLEAR, XEQ, "A", ENTER, "PURGE", ENTER).noerror();
