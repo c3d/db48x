@@ -9879,6 +9879,7 @@ void tests::check_help_examples()
                         expect(ref.c_str());
                         ref = "";
                     }
+#ifndef USE_IOS
                     if (failures.size() > nfailures)
                     {
                         std::string grep = "grep -inr '^##*";
@@ -9887,6 +9888,7 @@ void tests::check_help_examples()
                         fprintf(stderr, "[FAIL]\nRunning: %s\n", grep.c_str());
                         system(grep.c_str());
                     }
+#endif // IOS
                 }
             }
         }
