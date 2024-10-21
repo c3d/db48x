@@ -764,12 +764,13 @@ This software is (C) 2022-2023 Christophe de Dinechin and the DB48X team.
 
 Additional contributors to the project include:
 
-* Camille Wormser (complex number fixes)
+* Jean Wilson (Equation Library and associated documentation)
+* Franco Trimboli (WASM port)
 * Jeff, aka spiff72 (keyboard overlay)
+* Camille Wormser (complex number fixes)
 * Conrado Seibel (help file fix)
 * Kjell Christenson (simulator fix)
 * Václav Kadlčík (documentation fix)
-* Franco Trimboli (WASM port)
 
 The authors would like to acknowledge
 
