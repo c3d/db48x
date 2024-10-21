@@ -40,6 +40,7 @@
 #include "complex.h"
 #include "conditionals.h"
 #include "constants.h"
+#include "custom.h"
 #include "datetime.h"
 #include "decimal.h"
 #include "equations.h"
@@ -374,10 +375,12 @@ retry:
         bool maybe_polar = cp == complex::ANGLE_MARK;
         bool maybe_unit  = cp == '_' || cp == settings::SPACE_UNIT;
         bool maybe_fcall = p.precedence && (cp == '(' || utf8_whitespace(cp));
+        bool maybe_asn   = !p.precedence && cp == '=';
 
-        if (maybe_rect || maybe_polar || maybe_unit || maybe_fcall)
+        if (maybe_rect || maybe_polar || maybe_unit || maybe_fcall || maybe_asn)
         {
-            if (p.out->is_algebraic())
+            if (p.out->is_algebraic() || (maybe_asn &&
+                                          p.out->is_extended_algebraic()))
             {
                 size_t parsed = p.length;
                 length -= parsed;
@@ -393,6 +396,8 @@ retry:
                     r2 = unit::do_parse(p);
                 else if (maybe_fcall)
                     r2 = funcall::do_parse(p);
+                else if (maybe_asn)
+                    r2 = assignment::do_parse(p);
 
                 // Check if we found the second part
                 if (r2 == OK)
@@ -443,25 +448,6 @@ size_t object::render(char *output, size_t length) const
     record(render, "Rendering %+s %p into %p", name(), this, output);
     renderer r(output, length);
     return render(r);
-}
-
-
-size_t object::edit() const
-// ----------------------------------------------------------------------------
-//   Render an object into the scratchpad, then move it into editor
-// ----------------------------------------------------------------------------
-{
-    utf8 tname = name();     // Object may be GC'd during render
-    record(render, "Rendering %+s %p into editor", tname, this);
-    renderer r;
-    size_t size = render(r);
-    record(render, "Rendered %+s as size %u [%s]", tname, size, r.text());
-    if (size)
-    {
-        rt.edit();
-        r.clear();
-    }
-    return size;
 }
 
 
@@ -1244,7 +1230,7 @@ INSERT_BODY(object)
 //   Default insertion is as a program object
 // ----------------------------------------------------------------------------
 {
-    return ui.edit(o->name(), ui.PROGRAM);
+    return ui.insert(o->name(), ui.PROGRAM);
 }
 
 
@@ -1334,10 +1320,28 @@ algebraic_p object::as_algebraic() const
 //   Return the value as an algebraic if possible
 // ----------------------------------------------------------------------------
 {
-    object_p untagged = tag::strip(this);
-    if (untagged && untagged->is_algebraic())
-        return algebraic_p(untagged);
+    object_p stripped = strip(this);
+    if (stripped && stripped->is_algebraic())
+        return algebraic_p(stripped);
     return nullptr;
+}
+
+
+object_p object::strip(object_p obj)
+// ----------------------------------------------------------------------------
+//   Strip the object of tags and assignments
+// ----------------------------------------------------------------------------
+{
+    object_p old = nullptr;
+    while (old != obj && obj)
+    {
+        old = obj;
+        if (tag_p tagged = obj->as<tag>())
+            obj = tagged->tagged_object();
+        if (assignment_p asn = obj->as<assignment>())
+            obj = asn->value();
+    }
+    return obj;
 }
 
 

@@ -684,7 +684,9 @@ COMMAND_DECLARE_SPECIAL(Primitive, algebraic, 2,
                         INSERT_DECL(Primitive);
                         PARSE_DECL(Primitive);
                         static bool can_be_symbolic(uint) { return true; });
-COMMAND_DECLARE_SPECIAL(Where, arithmetic, 2, PREC_DECL(WHERE); );
+COMMAND_DECLARE_SPECIAL(Where, arithmetic, 2,
+                        PREC_DECL(WHERE);
+                        static bool can_be_symbolic(uint) { return true; });
 NFUNCTION(Subst, 2, static bool can_be_symbolic(uint) { return true; } );
 
 #endif // EXPRESSION_H

@@ -150,6 +150,7 @@ TESTS(quorem,           "Quotient and remainder");
 TESTS(expr,             "Operations on expressions");
 TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
+TESTS(examples,         "On-line help examples");
 
 EXTRA(plotfns,          "Plot all functions");
 EXTRA(sysflags,         "Enable/disable every RPL flag");
@@ -176,7 +177,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            symbolic_operations();
+            check_help_examples();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -258,6 +259,7 @@ void tests::run(uint onlyCurrent)
         random_number_generation();
         object_structure();
         library();
+        check_help_examples();
         regression_checks();
         demo_ui();
         demo_math();
@@ -1110,20 +1112,23 @@ void tests::editor_operations()
         .test(ENTER, EXIT).image_noheader("xroot-negation");
 
     step("Position of negation parsing summand")
-        .test(CLEAR, "'Σ(X;1;10;-X)'", ENTER, EXIT)
-        .expect("'Σ(X;1;10;-X)'").image_noheader("sum-negation")
+        .test(CLEAR, "'Σ(X;1;10;-X)'", ENTER)
+        .expect("'Σ(X;1;10;-X)'")
+        .test(EXIT).image_noheader("sum-negation")
         .test(DOWN).editor("'Σ(X;1;10;-X)'")
         .test(ENTER, EXIT).image_noheader("sum-negation");
 
     step("Position of negation parsing sum end")
-        .test(CLEAR, "'Σ(X;1;-10;X)'", ENTER, EXIT)
-        .expect("'Σ(X;1;-10;X)'").image_noheader("sum-negation2")
+        .test(CLEAR, "'Σ(X;1;-10;X)'", ENTER)
+        .expect("'Σ(X;1;-10;X)'")
+        .test(EXIT).image_noheader("sum-negation2")
         .test(DOWN).editor("'Σ(X;1;-10;X)'")
         .test(ENTER, EXIT).image_noheader("sum-negation2");
 
     step("Position of negation parsing sum start")
-        .test(CLEAR, "'Σ(X;-1;10;X)'", ENTER, EXIT)
-        .expect("'Σ(X;-1;10;X)'").image_noheader("sum-negation3")
+        .test(CLEAR, "'Σ(X;-1;10;X)'", ENTER)
+        .expect("'Σ(X;-1;10;X)'")
+        .test(EXIT).image_noheader("sum-negation3")
         .test(DOWN).editor("'Σ(X;-1;10;X)'")
         .test(ENTER, EXIT).image_noheader("sum-negation3");
 
@@ -1835,6 +1840,46 @@ void tests::global_variables()
         .test(CLEAR, "'A' DECR", ENTER).expect("30 861")
         .test(CLEAR, "'A' Decrement", ENTER).expect("30 860");
 
+    step("Copy")
+        .test(CLEAR, "42 'A' ▶", ENTER).expect("42")
+        .test("A", ENTER).expect("42");
+    step("Copy in algebraic")
+        .test(CLEAR, "'A+A▶A' ", ENTER).expect("'A+A▶A'")
+        .test(RUNSTOP).expect("84");
+    step("Copy precedence of target symbol")
+        .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
+        .test(RUNSTOP).expect("'336'")
+        .test("A", ENTER).expect("168");
+    step("Copy with external parentheses")
+        .test("'(A+A▶A)+A'", ENTER).expect("'(A+A▶A)+A'")
+        .test(RUNSTOP).expect("672")
+        .test("A", ENTER).expect("336");
+    step("Copy with internal parentheses")
+        .test("'A+(A+1▶A)+A'", ENTER).expect("'A+(A+1▶A)+A'")
+        .test(RUNSTOP).expect("1 010")
+        .test("A", ENTER).expect("337");
+
+    step("Assignment with simple value")
+        .test(CLEAR, "A=42", ENTER).got("A=42")
+        .test(CLEAR, "A", ENTER).got("42");
+    step("Assignment with evaluated value")
+        .test(CLEAR, "A='42+3*5'", ENTER).expect("A='42+3·5'")
+        .test("A", ENTER).expect("57")
+        .test(BSP).expect("A='42+3·5'")
+        .test(RUNSTOP).expect("A='42+3·5'");
+    step("Assignment with evaluated value and PushEvaluatedAssignment")
+        .test(CLEAR, "PushEvaluatedAssignment", ENTER)
+        .test("A='42+3*5'", ENTER).expect("A=57")
+        .test("A", ENTER).expect("57")
+        .test(BSP).expect("A=57")
+        .test(RUNSTOP).expect("A=57")
+        .test("'pushevaluatedassignment' purge", ENTER);
+    step("Assignment with evaluated value and PushEvaluatedAssignment purged")
+        .test(CLEAR, "A='42+3*5'", ENTER).expect("A='42+3·5'")
+        .test("A", ENTER).expect("57")
+        .test(BSP).expect("A='42+3·5'")
+        .test(RUNSTOP).expect("A='42+3·5'");
+
     step("Clone")
         .test(CLEAR,
               "Mem Drop Mem "
@@ -1868,9 +1913,9 @@ void tests::global_variables()
               ENTER)
         .expect("{ Recall Recall+ Recall- Recall× Recall÷ }")
         .test(RSHIFT, RUNSTOP,
-              RSHIFT, F1, RSHIFT, F2,
+              RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ Increment Decrement }");
+        .expect("{ ▶ Increment Decrement Variables TypedVariables }");
 
     step("Store in long-name global variable");
     test(CLEAR, "\"Hello World\"", ENTER, XEQ, "SomeLongVariable", ENTER, STO)
@@ -1935,7 +1980,7 @@ void tests::global_variables()
     step("Store program in global variable");
     test(CLEAR, "« 1 + »", ENTER, XEQ, "MyINCR", ENTER, STO).noerror();
     step("Evaluate global variable");
-    test(CLEAR, "A MyINCR", ENTER).expect("30 861");
+    test(CLEAR, "A MyINCR", ENTER).expect("58");
 
     step("Purge global variable");
     test(CLEAR, XEQ, "A", ENTER, "PURGE", ENTER).noerror();
@@ -4944,6 +4989,12 @@ void tests::units_and_conversions()
               LOWERCASE, S, NOSHIFT, ADD, ALPHA, N,
               ENTER).error("Invalid unit expression")
         .test(CLEAR);
+
+    step("Stop parsing units at end of unit expression")
+        .test(CLEAR, "'360_°-30_°'", ENTER)
+        .expect("'360 °-30 °'")
+        .test(RUNSTOP)
+        .expect("330 °");
 }
 
 
@@ -5258,11 +5309,11 @@ void tests::sorting_functions()
         .test(CLEAR, "[1 2 3] 2 Max", ENTER).expect("[ 2 2 3 ]")
         .test(CLEAR, "2 [1 2 3] Max", ENTER).expect("[ 2 2 3 ]");
     step("Min with array and symbolic scalar")
-        .test(CLEAR, "[1 2 3] X Min", ENTER).expect("'Min([ 1 2 3 ];X)'")
-        .test(CLEAR, "X [1 2 3] Min", ENTER).expect("'Min(X;[ 1 2 3 ])'");
+        .test(CLEAR, "[1 2 3] X Min", ENTER).expect("'Min([1;2;3];X)'")
+        .test(CLEAR, "X [1 2 3] Min", ENTER).expect("'Min(X;[1;2;3])'");
     step("Max with array and symbolic scalar")
-        .test(CLEAR, "[1 2 3] X Max", ENTER).expect("'Max([ 1 2 3 ];X)'")
-        .test(CLEAR, "X [1 2 3] Max", ENTER).expect("'Max(X;[ 1 2 3 ])'");
+        .test(CLEAR, "[1 2 3] X Max", ENTER).expect("'Max([1;2;3];X)'")
+        .test(CLEAR, "X [1 2 3] Max", ENTER).expect("'Max(X;[1;2;3])'");
     step("Max with arrays")
         .test(CLEAR, "[1 2 3] [3 2 1] Max", ENTER).expect("[ 3 2 3 ]");
     step("Min function (symbolic types)")
@@ -5339,7 +5390,7 @@ void tests::text_functions()
     step("Ensure we can parse decimal numbers with separators in them")
         .test(CLEAR, "100000.123456123456", ENTER).expect("100 000.12345 6")
         .test(RSHIFT, ENTER, NOSHIFT, ENTER).expect("\"\"")
-        .test(NOSHIFT, ADD).expect("\"100 000.12345 61234 56\"")
+        .test(NOSHIFT, ADD).expect("\"100 000.12345 6\"")
         .test(NOSHIFT, A, F2).expect("100 000.12345 6");
     step("Ensure we can parse base numbers with separators in them")
         .test(CLEAR, "16#ABCD1234", ENTER).expect("#ABCD 1234₁₆")
@@ -5817,28 +5868,28 @@ void tests::solver_testing()
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
-        .noerror().expect("X:-3.");
+        .noerror().expect("X=-3.");
     step("Solver with arithmetic syntax")
         .test(CLEAR, "'ROOT(X+3;X;0)'", ENTER)
         .expect("'Root(X+3;X;0)'")
         .test(RUNSTOP)
-        .expect("X:-3.")
+        .expect("X=-3.")
         .test("X", ENTER)
         .expect("-3.")
         .test("'X' purge", ENTER)
         .noerror();
     step("Solver with equation")
         .test(CLEAR, "'sq(x)=3' 'X' 0 ROOT", ENTER)
-        .noerror().expect("X:1.73205 08075 7")
+        .noerror().expect("X=1.73205 08075 7")
         .test("X", ENTER)
         .expect("1.73205 08075 7")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver without solution")
-        .test(CLEAR, "'sq(x)+3=0' 'X' 0 ROOT", ENTER)
+        .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
         .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("-8.09667 19281 1⁳⁵³⁶⁸⁷⁰⁸¹²⁵⁴⁹⁷⁹⁸")
+        .expect("0.00000 00712 63")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
 
@@ -5846,12 +5897,13 @@ void tests::solver_testing()
         .test(CLEAR, "'A²+B²=C²'", ENTER)
         .test(LSHIFT, KEY7, LSHIFT, F1, F6)
         .test("3", NOSHIFT, F2, "4", NOSHIFT, F3, LSHIFT, F4)
-        .expect("C:5.");
+        .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.'");
+        .expect("'25=25.-4.⁳⁻²²'");
+
     step("Verify that we display the equation after entering value")
-        .test("4", F4)
+        .test(CLEAR, "42", F4)
         .image_noheader("solver-eqdisplay");
     step("Evaluate equation case Left=Right")
         .test("4", F4, F1)
@@ -5863,17 +5915,17 @@ void tests::solver_testing()
     step("Solving with units")
         .test("30_cm", NOSHIFT, F2, ".4_m", NOSHIFT, F3, "100_in", NOSHIFT, F4)
         .test(LSHIFT, F4)
-        .expect("C:19.68503 93701 in")
+        .expect("C=19.68503 93701 in")
         .test(LSHIFT, KEY5, F4, LSHIFT, F1)
         .test(LSHIFT, A, LSHIFT, A)
         .expect("0.5 m");
 
     step("Solving with large values (#1179")
         .test(CLEAR, "DEG '1E45*sin(x)-0.5E45' 'x' 2 ROOT", ENTER)
-        .expect("x:30.");
+        .expect("x=30.");
     step("Solving equation containing a zero side (#1179")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
-        .expect("x:2.82143 93721 2");
+        .expect("x=2.82143 93721 2");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
@@ -5931,24 +5983,24 @@ void tests::eqnlib_columns_and_beams()
         .test("7.3152", NOSHIFT, F1)
         .test("4.1148", NOSHIFT, F2, F6)
         .test(LSHIFT, F2)
-        .expect("Pcr:676.60192 6324 kN");
+        .expect("Pcr=676.60192 6324 kN");
     step("Solving Elastic Buckling second equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F4)
-        .expect("I:8 990 109.72813 mm↑4")
+        .expect("I=8 990 109.72813 mm↑4")
         .test(NOSHIFT, F1)
         .expect("'676.60192 6324 kN"
                 "=6.76601 92632 4⁳¹⁴ kPa·mm↑4/m↑2"
                 "-0.00000 0005 kPa·mm↑4/m↑2'");
     step("Solving Elastic Buckling third equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F2)
-        .expect("σcr:127 428.24437 8 kPa")
+        .expect("σcr=127 428.24437 8 kPa")
         .test(NOSHIFT, F1)
         .expect("'127 428.24437 8 kPa"
                 "=12.74282 44378 kN/cm↑2"
                 "-8.⁳⁻²² kN/cm↑2'");
     step("Solving Elastic Buckling fourth equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F4)
-        .expect("r:4.1148 cm")
+        .expect("r=4.1148 cm")
         .test(NOSHIFT, F1)
         .expect("'4.1148 cm=411.48 mm↑2/cm+6.12⁳⁻¹⁹ mm↑2/cm'");
 
@@ -5963,10 +6015,10 @@ void tests::eqnlib_columns_and_beams()
         .test("1908.2571", NOSHIFT, F4)
         .test("8.4836", NOSHIFT, F5)
         .test(F6, LSHIFT, F2)
-        .expect("σmax:140 853.09700 6 kPa");
+        .expect("σmax=140 853.09700 6 kPa");
     step("Solving Eccentric Column second equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F3)
-        .expect("I:135 259 652.161 mm↑4");
+        .expect("I=135 259 652.161 mm↑4");
 
     step("Solving Simple Deflection")
         .test(CLEAR, RSHIFT, F, F2, RSHIFT, F3)
@@ -5980,9 +6032,9 @@ void tests::eqnlib_columns_and_beams()
         .test("102.783_lbf/ft", NOSHIFT, F4)
         .test("9_ft", NOSHIFT, F5)
         .test(F6, LSHIFT, F1)
-        .expect("y:-1.52523 29401 2 cm")
+        .expect("y=-1.52523 29401 2 cm")
         .test("1_in", F1, LSHIFT, F1)
-        .expect("y:-0.60048 54094 96 in");
+        .expect("y=-0.60048 54094 96 in");
 
     step("Solving Simple Slope")
         .test(CLEAR, RSHIFT, F, F2, RSHIFT, F4)
@@ -5996,7 +6048,7 @@ void tests::eqnlib_columns_and_beams()
         .test("102.783_lbf/ft", NOSHIFT, F5, F6)
         .test("9_ft", NOSHIFT, F1)
         .test(F6, LSHIFT, F2)
-        .expect("θ:-0.46665 29979 95 °");
+        .expect("θ=-0.08763 17825 27 °");
 
     step("Solving Simple Moment")
         .test(CLEAR, RSHIFT, F, F2, RSHIFT, F5)
@@ -6008,9 +6060,9 @@ void tests::eqnlib_columns_and_beams()
         .test("102.783_lbf/ft", NOSHIFT, F3)
         .test("9_ft", NOSHIFT, F4)
         .test(F6, LSHIFT, F2)
-        .expect("Mx:13 262.87487 72 N·m")
+        .expect("Mx=13 262.87487 72 N·m")
         .test("1_ft*lbf", NOSHIFT, F2, LSHIFT, F2)
-        .expect("Mx:9 782.1945 lbf·ft");
+        .expect("Mx=9 782.1945 lbf·ft");
 
     step("Solving Simple Shear")
         .test(CLEAR, EXIT, RSHIFT, F, F2, F6, RSHIFT, F1)
@@ -6021,9 +6073,9 @@ void tests::eqnlib_columns_and_beams()
         .test("102.783_lbf/ft", NOSHIFT, F6, F2)
         .test("9_ft", NOSHIFT, F3)
         .test(LSHIFT, F1)
-        .expect("V:2 777.41174 969 N")
+        .expect("V=2 777.41174 969 N")
         .test("1_lbf", F1, LSHIFT, F1)
-        .expect("V:624.387 lbf");
+        .expect("V=624.387 lbf");
 
     step("Solving Cantilever Deflection")
         .test(CLEAR, EXIT, RSHIFT, F, F2, F6, RSHIFT, F2)
@@ -6037,11 +6089,11 @@ void tests::eqnlib_columns_and_beams()
         .test("100_lbf/ft", NOSHIFT, F6, F4)
         .test("8_ft", NOSHIFT, F5)
         .test(F6, LSHIFT, F1)
-        .expect("y:-0.33163 03448 28 in")
+        .expect("y=-0.33163 03448 28 in")
         .test("1_lbf", F1)
         .error("Inconsistent units")
         .test(CLEAR, "1_cm", F1, LSHIFT, F1)
-        .expect("y:-0.84234 10758 62 cm");
+        .expect("y=-0.84234 10758 62 cm");
 
     step("Solving Cantilever Slope")
         .test(CLEAR, EXIT, RSHIFT, F, F2, F6, RSHIFT, F3)
@@ -6055,7 +6107,7 @@ void tests::eqnlib_columns_and_beams()
         .test("100_lbf/ft", NOSHIFT, F6, F5)
         .test("8_ft", NOSHIFT, F6, F1)
         .test(F6, LSHIFT, F2)
-        .expect("θ:-0.26522 01876 49 °");
+        .expect("θ=-0.26522 01876 49 °");
 
     step("Solving Cantilever Moment")
         .test(CLEAR, EXIT, RSHIFT, F, F2, F6, RSHIFT, F4)
@@ -6067,7 +6119,7 @@ void tests::eqnlib_columns_and_beams()
         .test("100_lbf/ft", NOSHIFT, F6, F3)
         .test("8_ft", NOSHIFT, F4)
         .test(F6, LSHIFT, F2)
-        .expect("Mx:-200. lbf·ft");
+        .expect("Mx=-200. lbf·ft");
 
     step("Solving Cantilever Shear")
         .test(CLEAR, EXIT, RSHIFT, F, F2, F6, RSHIFT, F5)
@@ -6077,7 +6129,7 @@ void tests::eqnlib_columns_and_beams()
         .test("8_ft", NOSHIFT, F6, F2)
         .test("100_lbf/ft", NOSHIFT, F1)
         .test(F6, LSHIFT, F5)
-        .expect("V:200. lbf");
+        .expect("V=200. lbf");
 
     step("Exit: Clear variables")
         .test(CLEAR,
@@ -6097,7 +6149,7 @@ void tests::numerical_integration_testing()
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, E, SUB).expect("3.00876⁳⁻¹⁹");
+        .test(KEY2, E, SUB).expect("-3.9⁳⁻²³");
     step("Integration through menu")
         .test(CLEAR, 2, ENTER).expect("2")
         .test(3, ENTER).expect("3")
@@ -6110,6 +6162,31 @@ void tests::numerical_integration_testing()
         .test("'sq(Z)+Z'", ENTER).expect("'Z²+Z'")
         .test(F, ALPHA, Z, ENTER).expect("'Z'")
         .test(SHIFT, KEY8, F2).expect("8.83333 33333 3", 350);
+
+    step("Integrate with low precision")
+        .test(CLEAR, "18 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.69314 71819 17")
+        .test(KEY2, E, SUB).expect("0.00000 00013 57");
+    step("Integrate with high precision")
+        .test(CLEAR, "1 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .error("Numerical precision lost");
+    step("Integrate with limited loops")
+        .test(CLEAR, "15 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, E, SUB).expect("1.44607 9304⁳⁻¹⁵")
+        .test("5 IntegrationIterations", ENTER)
+        .test("1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .error("Numerical precision lost");
+    step("Integrate with restored settings")
+        .test(CLEAR, "{ IntegrationImprecision IntegrationIterations } Purge",
+              ENTER).noerror()
+        .test("1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, E, SUB).expect("-3.9⁳⁻²³");
+
     step("Integrate with symbols")
         .test(CLEAR, "A B '1/X' 'X' INTEGRATE", ENTER)
         .expect("'∫(A;B;1÷X;X)'")
@@ -6653,7 +6730,7 @@ void tests::symbolic_operations()
         .expect("'(sin(42+B)+1)²+3·(sin(42+B)+1)+7'");
     step("Where operator on library equations")
         .test("'ⒺRelativity Mass Energy|m=(1_g)'", ENTER)
-        .expect("'Relativity Mass Energy:{ E=m·c↑2 }|m=1 g'")
+        .expect("'Relativity Mass Energy:{E=m·c↑2}|m=1 g'")
         .test(RUNSTOP)
         .expect("{ 'E=¹/₁ ₀₀₀ kg·c↑2' }");
 
@@ -9540,12 +9617,12 @@ void tests::random_number_generation()
         .test(CLEAR, "1 1000 START RAND Σ+ NEXT", ENTER).noerror();
 
     step("Check statistics total")
-        .test(CLEAR, LSHIFT, S, F3).expect("503.03593 6495");
+        .test(CLEAR, LSHIFT, S, F3).expect("504.95829 7562");
     step("Check statistics mean")
-        .test(F4).expect("0.50303 59364 95");
+        .test(F4).expect("0.50495 82975 62");
     step("Check statistics min and max")
-        .test(LSHIFT, F3).expect("0.00621 35929 6")
-        .test(LSHIFT, F4).expect("0.99967 04518 08");
+        .test(LSHIFT, F3).expect("0.00167 92327 04")
+        .test(LSHIFT, F4).expect("0.99918 57116 48");
 
 
     step("Set a known seed 42.42")
@@ -9558,12 +9635,12 @@ void tests::random_number_generation()
         .test(CLEAR, "1 1000 START RAND Σ+ NEXT", ENTER).noerror();
 
     step("Check statistics total")
-        .test(CLEAR, LSHIFT, S, F3).expect("509.25246 401");
+        .test(CLEAR, LSHIFT, S, F3).expect("480.84282 6204");
     step("Check statistics mean")
-        .test(F4).expect("0.50925 24640 1");
+        .test(F4).expect("0.48084 28262 04");
     step("Check statistics min and max")
-        .test(LSHIFT, F3).expect("0.00101 85847 61")
-        .test(LSHIFT, F4).expect("0.99994 94163 52");
+        .test(LSHIFT, F3).expect("0.00003 26239 04")
+        .test(LSHIFT, F4).expect("0.99965 89406 4");
 
     step("Set a known seed 123.456")
         .test(CLEAR, "123.456 RandomSeed", ENTER).noerror();
@@ -9575,12 +9652,12 @@ void tests::random_number_generation()
         .test(CLEAR, "1 1000 START -1000 1000 RANDOM Σ+ NEXT", ENTER).noerror();
 
     step("Check statistics total")
-        .test(CLEAR, LSHIFT, S, F3).expect("-32 132");
+        .test(CLEAR, LSHIFT, S, F3).expect("3 869");
     step("Check statistics mean")
-        .test(F4).expect("-32 ³³/₂₅₀");
+        .test(F4).expect("3 ⁸⁶⁹/₁ ₀₀₀");
     step("Check statistics min and max")
-        .test(LSHIFT, F3).expect("-998")
-        .test(LSHIFT, F4).expect("999");
+        .test(LSHIFT, F3).expect("-999")
+        .test(LSHIFT, F4).expect("998");
 
     step("Random graphing")
         .test(CLEAR,
@@ -9672,6 +9749,175 @@ void tests::library()
     step("Math: Triangle equations")
         .test(CLEAR, F4)
         .image_noheader("lib-triangle");
+}
+
+
+void tests::check_help_examples()
+// ----------------------------------------------------------------------------
+//   Check the help examples
+// ----------------------------------------------------------------------------
+{
+    BEGIN(examples);
+
+    step("Creating and entering ExamplesTest directory")
+        .test(CLEAR, "'ExamplesTest' CRDIR", ENTER).noerror()
+        .test("ExamplesTest", ENTER).noerror();
+    step("Set higher significant digits")
+        .test(CLEAR, "8 MinimumSignificantDigits", ENTER).noerror();
+
+    step("Opening help file").test(CLEAR);
+    FILE *f = fopen(HELPFILE_NAME, "r");
+    if (!f)
+    {
+        fail();
+        return;
+    }
+    noerror();
+
+    uint        opencheck  = 0;
+    uint        closecheck = 0;
+    uint        expcheck   = 0;
+    cstring     open       = "\n```rpl\n";
+    cstring     close      = "\n```\n";
+    cstring     expecting  = "@ Expecting ";
+    bool        hadcr      = false;
+    bool        testing    = false;
+    bool        inref      = false;
+    uint        line       = 1;
+    uint        tidx       = 0;
+    bool        intopic    = false;
+    uint        uidx       = 0;
+    byte        ubuf[8];
+    char        topic[80];
+    std::string ref;
+
+    while (true)
+    {
+        int ci = fgetc(f);
+        if (ci == EOF)
+            break;
+        byte c = ci;
+        ASSERT(tidx < sizeof(topic));
+        ASSERT(uidx < sizeof(ubuf));
+
+        if (c == '#' && (hadcr || intopic))
+            intopic = true;
+        else if (intopic)
+            topic[tidx++] = c;
+        else if (inref)
+            ref += c;
+
+        hadcr = c == '\n';
+        if (hadcr)
+        {
+            line++;
+            if (intopic)
+            {
+                ASSERT(tidx > 0);
+                topic[tidx - 1] = 0;
+                tidx = 0;
+                intopic = false;
+            }
+            if (inref)
+            {
+                inref = false;
+                ref.pop_back();
+            }
+        }
+
+        if (is_utf8_first(c))
+        {
+            uidx = 0;
+            ubuf[uidx++] = c;
+            continue;
+        }
+        else if (is_utf8_next(c) && uidx < 4)
+        {
+            ubuf[uidx++] = c;
+            continue;
+        }
+        else
+        {
+            ubuf[uidx++] = c;
+            ubuf[uidx++] = 0;
+            uidx = 0;
+        }
+
+        if (testing && c != '`')
+            itest(cstring(ubuf));
+
+        if (c == open[opencheck])
+        {
+            opencheck++;
+            if (!open[opencheck])
+            {
+                opencheck = 0;
+                position(HELPFILE_NAME, line);
+                istep(topic).itest(CLEAR);
+                testing = true;
+            }
+        }
+        else
+        {
+            opencheck = (c == open[0]);
+        }
+
+        if (c == close[closecheck])
+        {
+            closecheck++;
+            if (!close[closecheck])
+            {
+                closecheck = 0;
+                if (testing)
+                {
+                    size_t nfailures = failures.size();
+                    testing = false;
+                    itest(LENGTHY(20000), ENTER).noerror();
+                    itest(LENGTHY(20000), RUNSTOP).noerror();
+                    if (!ref.empty())
+                    {
+                        expect(ref.c_str());
+                        ref = "";
+                    }
+                    if (failures.size() > nfailures)
+                    {
+                        std::string grep = "grep -inr '^##*";
+                        grep += topic;
+                        grep += "' doc";
+                        fprintf(stderr, "[FAIL]\nRunning: %s\n", grep.c_str());
+                        system(grep.c_str());
+                    }
+                }
+            }
+        }
+        else
+        {
+            closecheck = (c == close[0]);
+        }
+
+        if (c == expecting[expcheck])
+        {
+            expcheck++;
+            if (!expecting[expcheck])
+            {
+                expcheck = 0;
+                inref = true;
+                ref = "";
+            }
+        }
+        else
+        {
+            expcheck = (c == expecting[0]);
+        }
+
+    }
+    fclose(f);
+
+    step("Exiting ExamplesTest directory and purging it")
+        .test(CLEAR, "UPDIR", ENTER).noerror()
+        .test("'ExamplesTest' PURGE").noerror();
+    step("Restore MinimumSignificantDigits")
+        .test(CLEAR, "'MinimumSignificantDigits' PURGE", ENTER);
 }
 
 
@@ -10943,6 +11189,7 @@ tests &tests::itest(cstring txt)
         case '7': k = KEY7;         shift = alpha; break;
         case '8': k = KEY8;         shift = alpha; break;
         case '9': k = KEY9;         shift = alpha; break;
+        case L'⁳': k = EEX;                        break;
 
         case '+': k = ADD;          alpha = true;  shift = true; break;
         case '-': k = SUB;          alpha = true;  shift = true; break;
@@ -11087,6 +11334,12 @@ tests &tests::itest(cstring txt)
         case L'∞': itest(RSHIFT, KEY2, F4, F6, F6, RSHIFT, F5); NEXT;
         case L'ℏ': itest(RSHIFT, KEY2, F4, F6, F6, F6, F6, LSHIFT, F5); NEXT;
         case L' ': itest(RSHIFT, KEY2, F6, RSHIFT, F4); NEXT;
+        case L'’': itest(RSHIFT, KEY2, F6, RSHIFT, F5); NEXT;
+        case L'█': itest(RSHIFT, KEY2, LSHIFT, F3, F6, F5); NEXT;
+        case L'▓': itest(RSHIFT, KEY2, LSHIFT, F3, F6,F6,F6, LSHIFT, F2); NEXT;
+        case L'⊕': itest(RSHIFT, KEY2, F4, F6, F6, F6, F6, F6, LSHIFT, F3); NEXT;
+        case L'⊖': itest(RSHIFT, KEY2, F4, F6, F6, F6, F6, F6, LSHIFT, F4); NEXT;
+        case L' ': continue;       // Number space: just ignore
 #undef NEXT
         }
 

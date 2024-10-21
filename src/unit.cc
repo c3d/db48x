@@ -85,13 +85,14 @@ PARSE_BODY(unit)
 }
 
 
-algebraic_p unit::parse_uexpr(gcutf8 source, size_t &len)
+algebraic_p unit::parse_uexpr(gcutf8 source, size_t &plen)
 // ----------------------------------------------------------------------------
 //  Parse a uexpr as an expression without quotes
 // ----------------------------------------------------------------------------
 {
     save<bool> save(unit::mode, true);
     uint       parens = 0;
+    size_t     len    = plen;
     for (size_t offs = 0; offs < len; offs = utf8_next(source, offs))
     {
         unicode cp = utf8_codepoint(+source + offs);
@@ -114,6 +115,7 @@ algebraic_p unit::parse_uexpr(gcutf8 source, size_t &len)
     {
         if (algebraic_p alg = p.out->as_algebraic())
         {
+            plen = p.length;
             if (!alg->as_quoted<unit>())
                 return alg;
             rt.syntax_error().source(source, p.length);
@@ -883,7 +885,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
             // If we found a definition, use that unless it begins with '='
             if (udef)
             {
-                file_closer ufilec(ufile, "config/units.csv");
+                file_closer ufilec(ufile);
                 if (object_p obj = object::parse(utf8(udef), ulen))
                 {
                     if (unit_g u = unit::get(obj))
@@ -1236,7 +1238,7 @@ unit_p unit::get(object_p obj)
 {
     if (!obj)
         return nullptr;
-    obj = tag::strip(obj);
+    obj = strip(obj);
     unit_p u = obj->as_quoted<unit>();
     return u;
 }
@@ -1729,7 +1731,7 @@ COMMAND_BODY(ToUnit)
 //   Combine a value and a unit object to build a new unit object
 // ----------------------------------------------------------------------------
 {
-    object_p y = tag::strip(rt.stack(1));
+    object_p y = strip(rt.stack(1));
     unit_p x = unit::get(rt.stack(0));
     if (!x || !y || !y->is_algebraic())
     {
@@ -1793,7 +1795,7 @@ COMMAND_BODY(ApplyUnit)
 {
     int key = ui.evaluating;
     if (algebraic_g uname = key_unit(key, true))
-        if (object_p value = tag::strip(rt.top()))
+        if (object_p value = strip(rt.top()))
             if (algebraic_g alg = value->as_algebraic())
                 if (algebraic_g uobj = unit::simple(alg, uname))
                     if (rt.top(+uobj))
@@ -1828,7 +1830,7 @@ COMMAND_BODY(ApplyInverseUnit)
 {
     int key = ui.evaluating;
     if (algebraic_g uname = key_unit(key, true))
-        if (object_p value = tag::strip(rt.top()))
+        if (object_p value = strip(rt.top()))
             if (algebraic_g alg = value->as_algebraic())
                 if (algebraic_g uobj = unit::simple(alg, inv::run(uname)))
                     if (rt.top(+uobj))
@@ -1869,7 +1871,7 @@ COMMAND_BODY(ConvertToUnit)
 {
     int key = ui.evaluating;
     if (algebraic_g uname = key_unit(key, false))
-        if (object_p value = tag::strip(rt.top()))
+        if (object_p value = strip(rt.top()))
             if (algebraic_g alg = value->as_algebraic())
                 if (unit_g uobj = unit::get(uname))
                     if (uobj->convert(alg))
@@ -1932,7 +1934,7 @@ COMMAND_BODY(ConvertToUnitPrefix)
     }
 
     // Read the stack value
-    object_p value = tag::strip(rt.top());
+    object_p value = strip(rt.top());
     if (!value)
         return ERROR;
 
@@ -2028,7 +2030,7 @@ static object::result toAngleUnit(cstring angleUnit)
 //   Convert the value x to the given angle unit
 // ----------------------------------------------------------------------------
 {
-    object_g x = tag::strip(rt.top());
+    object_g x = object::strip(rt.top());
     unit_g uobj = unit::get(x);
     if (uobj)
     {

@@ -439,7 +439,7 @@ COMMAND_BODY(ToText)
 // ----------------------------------------------------------------------------
 {
     if (object_g obj = rt.top())
-        if (object_g txt = obj->as_text(false, false))
+        if (object_g txt = obj->as_text())
             if (rt.top(txt))
                 return OK;
     return ERROR;
@@ -586,11 +586,11 @@ COMMAND_BODY(SelfInsert)
         {
             size_t len = 0;
             utf8 txt = sym->value(&len);
-            ui.edit(txt, len, ui.TEXT);
+            ui.insert(txt, len, ui.TEXT);
         }
         else if (cstring lbl = ui.label_text(menu_idx))
         {
-            ui.edit(utf8(lbl), ui.TEXT);
+            ui.insert(utf8(lbl), ui.TEXT);
         }
     }
     return OK;

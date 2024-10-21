@@ -131,6 +131,7 @@ struct tests
     void random_number_generation();
     void object_structure();
     void library();
+    void check_help_examples();
     void regression_checks();
     void demo_setup();
     void demo_ui();

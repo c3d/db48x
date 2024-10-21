@@ -165,7 +165,7 @@ static inline bool is_algebraic(user_interface::modes mode)
 }
 
 
-void user_interface::edit(unicode c, modes m, bool autoclose)
+void user_interface::insert(unicode c, modes m, bool autoclose)
 // ----------------------------------------------------------------------------
 //   Begin editing with a given character
 // ----------------------------------------------------------------------------
@@ -198,7 +198,7 @@ void user_interface::edit(unicode c, modes m, bool autoclose)
         byte *ed = rt.editor();
         if (mode == PROGRAM || mode == DIRECT ||
             (is_algebraic(mode) && c != '('))
-            if (savec > 0 && ed[savec] != ' ')
+            if (savec > 0 && ed[savec-1] != ' ' && ed[savec-1] != '=')
                 insert(savec, ' ');
         size_t back = insert(cursor, closing);
         cursor -= back;
@@ -209,17 +209,17 @@ void user_interface::edit(unicode c, modes m, bool autoclose)
 }
 
 
-object::result user_interface::edit(utf8 text, size_t len, modes m)
+object::result user_interface::insert(utf8 text, size_t len, modes m)
 // ----------------------------------------------------------------------------
 //   Enter the given text on the command line
 // ----------------------------------------------------------------------------
 {
     dirtyEditor = true;
 
-    bool editing = rt.editing();
-    byte *ed = rt.editor();
-    bool skip = m == POSTFIX && is_algebraic(mode);
-    bool alpha_infix = m == INFIX && is_alpha(text);
+    bool   editing     = rt.editing();
+    byte  *ed          = rt.editor();
+    bool   skip        = m == POSTFIX && is_algebraic(mode);
+    bool   alpha_infix = m == INFIX && is_alpha(text);
 
     // Skip the x in postfix operators (x⁻¹, x², x³ or x!)
     if (skip)
@@ -242,7 +242,11 @@ object::result user_interface::edit(utf8 text, size_t len, modes m)
     {
         if (!skip && (!is_algebraic(mode) || ((m != INFIX || alpha_infix) &&
                                               m != CONSTANT)))
+        {
+            gcutf8 s = text;
             insert(cursor, ' ');
+            text = +s;
+        }
     }
 
     uint   offset = 0;
@@ -285,12 +289,12 @@ object::result user_interface::edit(utf8 text, size_t len, modes m)
 }
 
 
-object::result user_interface::edit(utf8 text, modes m)
+object::result user_interface::insert(utf8 text, modes m)
 // ----------------------------------------------------------------------------
 //   Edit a null-terminated text
 // ----------------------------------------------------------------------------
 {
-    return edit(text, strlen(cstring(text)), m);
+    return insert(text, strlen(cstring(text)), m);
 }
 
 
@@ -305,6 +309,8 @@ bool user_interface::end_edit()
     xshift      = false;
     dirtyEditor = true;
     dirtyStack  = true;
+    dirtyMenu   = true;
+
     searching   = ~0U;
     edRows      = 0;
     last        = 0;
@@ -492,7 +498,7 @@ void user_interface::editor_history(bool back)
         {
             size_t sz = 0;
             gcutf8 ed = history[cmdHistoryIndex]->value(&sz);
-            rt.edit(ed, sz);
+            rt.edit(+ed, sz);
             cursor = 0;
             select = ~0U;
             alpha = xshift = shift = false;
@@ -770,12 +776,12 @@ void user_interface::update_mode()
         mode = BASED;
     else if (unit)
         mode = UNIT;
-    else if (vecs)
-        mode = MATRIX;
     else if (parn)
         mode = PARENTHESES;
     else if (algs)
-        mode = ALGEBRAIC;
+        mode = vecs ? PARENTHESES : ALGEBRAIC;
+    else if (vecs)
+        mode = MATRIX;
     else if (lists || progs)
         mode = PROGRAM;
     else
@@ -1041,7 +1047,7 @@ bool user_interface::replace_character_left_of_cursor(utf8 text, size_t len)
         if (ppos != cursor)
             remove(ppos, cursor - ppos);
     }
-    edit(text, len, TEXT);
+    insert(text, len, TEXT);
     return true;
 }
 
@@ -1262,7 +1268,7 @@ symbol_p user_interface::label(uint menu_id)
 // ----------------------------------------------------------------------------
 {
     cstring lbl = label_text(menu_id);
-    if (lbl && *lbl == object::ID_symbol)
+    if (lbl && (*lbl == object::ID_symbol || *lbl == object::ID_text))
         return (symbol_p) lbl;
     return nullptr;
 }
@@ -1411,10 +1417,6 @@ bool user_interface::draw_menus()
         animate = 0;
         animating = false;
     }
-
-    lastp = shplane;
-    lastt = time;
-    dirtyMenu = false;
 
     font_p font   = MenuFont;
     bool   square = Settings.SquareMenus();
@@ -1565,9 +1567,10 @@ bool user_interface::draw_menus()
                 coord   mkx    = 0;
 
                 size_t len = 0;
-                if (*label == object::ID_symbol)
+                if (*label == object::ID_symbol || *label == object::ID_text)
                 {
                     COMPILE_TIME_ASSERT(object::ID_symbol < ' ');
+                    COMPILE_TIME_ASSERT(object::ID_text < ' ');
 
                     // If we are given a symbol, use its length
                     label++;
@@ -1664,6 +1667,10 @@ bool user_interface::draw_menus()
         draw_refresh(period);
     if (!animating)
         draw_dirty(0, LCD_H - 1 - menuHeight, LCD_W, LCD_H-1);
+
+    lastp = shplane;
+    lastt = time;
+    dirtyMenu = false;
 
     return true;
 }
@@ -2737,14 +2744,7 @@ object_p user_interface::transient_object()
 //   Return transient object to display if any
 // ----------------------------------------------------------------------------
 {
-    object_p result = editing;
-    if (result)
-    {
-        if (!rt.editing())
-            editing = nullptr;
-        else
-            result = nullptr;
-    }
+    object_p result = rt.editing() ? nullptr : editing;
     return result;
 }
 
@@ -2808,7 +2808,7 @@ void user_interface::load_help(utf8 topic, size_t len)
 
     // Check if the index exists. If so, scan it
     {
-        file_closer hfc(helpfile, HELPFILE_NAME);
+        file_closer hfc(helpfile);
         file index(HELPINDEX_NAME, false);
         if (index.valid())
         {
@@ -3654,7 +3654,7 @@ restart:
         while (helpfile.position() < codeEnd)
         {
             unicode c = helpfile.get();
-            edit(c, TEXT, false);
+            insert(c, TEXT, false);
         }
         clear_help();
         dirtyHelp = true;
@@ -4095,10 +4095,9 @@ bool user_interface::handle_editing(int key)
         case KEY_RUN:
                 if (object_p obj = rt.stack(interactive - 1))
                 {
-                    size_t sz = obj->edit();
-                    cursor += sz;
+                    insert_object(obj);
                     if (!shift && !xshift)
-                        edit(unicode(' '), PROGRAM, false);
+                        insert(unicode(' '), PROGRAM, false);
                     edRows = 0;
                     dirtyEditor = true;
                 }
@@ -4249,8 +4248,7 @@ bool user_interface::handle_editing(int key)
                 {
                     editingLevel = interactive;
                     editing = obj;
-                    size_t sz = obj->edit();
-                    cursor += sz;
+                    insert_object(obj);
                     edRows = 0;
                     dirtyEditor = true;
                     dirtyStack = true;
@@ -4326,7 +4324,7 @@ bool user_interface::handle_editing(int key)
             if ((!isEditing  || mode != BASED) && !shift && !xshift)
             {
                 bool is_eqn = isEditing && is_algebraic(mode);
-                edit(is_eqn ? '(' : '\'', ALGEBRAIC);
+                insert(is_eqn ? '(' : '\'', ALGEBRAIC);
                 last = 0;
                 return true;
             }
@@ -4336,15 +4334,15 @@ bool user_interface::handle_editing(int key)
             {
                 // Shift R/S = PRGM enters a program symbol
                 if (isEditing && (mode == ALGEBRAIC || mode == PARENTHESES))
-                    edit('=', ALGEBRAIC);
+                    insert('=', ALGEBRAIC);
                 else
-                    edit(L'«', PROGRAM);
+                    insert(L'«', PROGRAM);
                 last = 0;
                 return true;
             }
             else if (xshift)
             {
-                edit('{', PROGRAM);
+                insert('{', PROGRAM);
                 last = 0;
                 return true;
             }
@@ -4352,11 +4350,11 @@ bool user_interface::handle_editing(int key)
             {
                 // Stick to space role while editing, do not EVAL, repeat
                 if (mode == PARENTHESES)
-                    edit(';', PARENTHESES);
+                    insert(';', PARENTHESES);
                 else if (mode == ALGEBRAIC)
-                    edit('=', ALGEBRAIC);
+                    insert('=', ALGEBRAIC);
                 else
-                    edit(' ', PROGRAM);
+                    insert(' ', PROGRAM);
                 repeat = true;
                 return true;
             }
@@ -4366,7 +4364,7 @@ bool user_interface::handle_editing(int key)
             if (shift)
             {
                 // Shift-9 enters a matrix
-                edit('[', MATRIX);
+                insert('[', MATRIX);
                 last = 0;
                 return true;
             }
@@ -4466,7 +4464,7 @@ bool user_interface::handle_editing(int key)
 
             // Do not stop editing if we delete last character
             if (!rt.editing())
-                edit(' ', DIRECT);
+                insert(' ', DIRECT);
             last = 0;
             return true;
         case KEY_ENTER:
@@ -4608,7 +4606,7 @@ bool user_interface::handle_editing(int key)
             if (xshift)
             {
                 // Insert quotes and begin editing
-                edit('\"', TEXT);
+                insert('\"', TEXT);
                 alpha = true;
                 return true;
             }
@@ -4630,7 +4628,8 @@ bool user_interface::handle_editing(int key)
                     {
                         editing = obj;
                         editingLevel = 0;
-                        obj->edit();
+                        insert_object(obj);
+                        cursor = 0;
                         dirtyEditor = true;
                         return true;
                     }
@@ -4681,7 +4680,7 @@ bool user_interface::handle_editing_command(object::id lo, object::id hi)
         {
             editing = obj;
             editingLevel = 0;
-            obj->edit();
+            insert_object(obj);
             dirtyEditor = true;
         }
     }
@@ -4790,7 +4789,7 @@ bool user_interface::handle_alpha(int key)
                 }
             }
         }
-        edit(c, DIRECT);
+        insert(c, DIRECT);
         if (c == '"')
             alpha = true;
         repeat = true;
@@ -5045,7 +5044,7 @@ bool user_interface::handle_digits(int key)
                     insert(found - ed, unicode('0'));
             }
         }
-        edit(c, DIRECT);
+        insert(c, DIRECT);
         repeat = true;
         return true;
     }
@@ -5077,7 +5076,7 @@ static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_LN,    function::ID_log),
     OP2BYTES(KEY_XEQ,   0),
     OP2BYTES(KEY_STO,   command::ID_Sto),
-    OP2BYTES(KEY_RCL,   command::ID_VariablesMenu),
+    OP2BYTES(KEY_RCL,   command::ID_ToggleCustomMenu),
     OP2BYTES(KEY_RDN,   menu::ID_StackMenu),
     OP2BYTES(KEY_SIN,   function::ID_sin),
     OP2BYTES(KEY_COS,   function::ID_cos),
@@ -5314,31 +5313,26 @@ bool user_interface::handle_functions(int key)
                 default:
                 case object::ID_Rad:        cp = Settings.RADIANS_SYMBOL; break;
                 }
-                edit(cp, TEXT, false);
+                insert(cp, TEXT, false);
                 return true;
             }
 
             switch (mode)
             {
-            case PROGRAM:
-            case MATRIX:
-            unit_application:
-                if (object::is_program_cmd(ty))
-                {
-                    dirtyEditor = true;
-                    edRows = 0;
-                    return obj->insert() != object::ERROR;
-                }
-                break;
-
             case ALGEBRAIC:
             case PARENTHESES:
                 if (ty == object::ID_Sto)
                 {
                     if (!end_edit())
                         return false;
+                    break;
                 }
-                else if (object::is_algebraic(ty) || object::is_program_cmd(ty))
+                [[fallthrough]];
+
+            case PROGRAM:
+            case MATRIX:
+            unit_application:
+                if (object::is_program_cmd(ty) || object::is_algebraic(ty))
                 {
                     dirtyEditor = true;
                     edRows = 0;
@@ -5800,17 +5794,27 @@ bool user_interface::editor_selection_flip()
 }
 
 
+size_t user_interface::adjust_cursor(size_t offset, size_t len)
+// ----------------------------------------------------------------------------
+//   Adjust cursor after inserting `len` characters
+// ----------------------------------------------------------------------------
+{
+    if (~select && select >= offset)
+        select += len;
+    if (cursor >= offset)
+        cursor += len;
+    if (cursor > rt.editing())
+        record(runtime_error, "Cursor %u > %u", cursor, rt.editing());
+    return len;
+}
+
 size_t user_interface::insert(size_t offset, utf8 data, size_t len)
 // ----------------------------------------------------------------------------
 //   Insert data in the editor
 // ----------------------------------------------------------------------------
 {
-    size_t d = rt.insert(offset, data, len);
-    if (~select && select >= offset)
-        select += d;
-    if (cursor >= offset)
-        cursor += d;
-    return d;
+    len = rt.insert(offset, data, len);
+    return adjust_cursor(offset, len);
 }
 
 
@@ -5863,27 +5867,57 @@ object::result user_interface::insert_softkey(int     key,
 }
 
 
-object::result user_interface::insert_object(object_p obj,
+object::result user_interface::insert_object(object_p o,
                                              cstring before, cstring after,
                                              bool midcursor)
 // ----------------------------------------------------------------------------
 //   Insert the object in the editor
 // ----------------------------------------------------------------------------
 {
-    if (text_g text = obj->as_text())
-    {
-        size_t len = 0;
-        utf8 txt = text->value(&len);
+    object_g obj = o;
 
-        insert(cursor, utf8(before), strlen(before));
-        insert(cursor, utf8(txt), len);
-        uint mid = cursor_position();
-        insert(cursor, utf8(after), strlen(after));
-        if (midcursor)
-            cursor_position(mid);
-        return object::OK;
-    }
-    return object::ERROR;
+    size_t len = strlen(before);
+    if (len && len != insert(cursor, utf8(before), len))
+        return object::ERROR;
+
+    renderer r;
+    len = obj->render(r);
+    if (len != rt.edit(cursor, len))
+        return object::ERROR;
+
+    r.clear();
+    adjust_cursor(cursor, len);
+    uint mid = cursor_position();
+
+    len = strlen(after);
+    if (len && len != insert(cursor, utf8(after), len))
+        return object::ERROR;
+
+    if (midcursor)
+        cursor_position(mid);
+    return object::OK;
+}
+
+
+object::result user_interface::insert_object(object_p obj, modes m)
+// ----------------------------------------------------------------------------
+//   Enter the given text on the command line
+// ----------------------------------------------------------------------------
+{
+    bool    editing = rt.editing();
+    utf8    ed      = rt.editor();
+    bool    hadsp   = !cursor || ed[cursor - 1] == ' ';
+    bool    algb    = is_algebraic(mode);
+    bool    algi    = is_algebraic(m);
+    cstring start   = algb ? "" : (editing && !hadsp) ? " " : "";
+    cstring end     = algb ? (algi ? "()" : "") : editing ? " " : "";
+    result  r       = insert_object(obj, start, end);
+    if (algb && r == object::OK && cursor > 0)
+        cursor--;
+    dirtyEditor = true;
+    adjustSeps  = true;
+    update_mode();
+    return r;
 }
 
 

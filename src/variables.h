@@ -86,12 +86,12 @@ struct directory : list
         return (list *) text::make(bytes, len);
     }
 
-    bool store(object_g name, object_g value);
+    object_p store(object_g name, object_g value);
     // ------------------------------------------------------------------------
-    //    Store an object in the directory
+    //    Store an object in the directory and return stored object
     // ------------------------------------------------------------------------
 
-    static bool update(object_p name, object_p value);
+    static object_p update(object_p name, object_p value);
     // ------------------------------------------------------------------------
     //    Update an existing name
     // ------------------------------------------------------------------------
@@ -106,7 +106,7 @@ struct directory : list
     //    Check if a name exists in the directory, return value ptr if it does
     // ------------------------------------------------------------------------
 
-    static bool store_here(object_p name, object_p value);
+    static object_p store_here(object_p name, object_p value);
     // ------------------------------------------------------------------------
     //    Store in the current directory, or fail if it does not exist
     // ------------------------------------------------------------------------
@@ -198,6 +198,9 @@ COMMAND_DECLARE(RecallMul, 2);
 COMMAND_DECLARE(RecallDiv, 2);
 COMMAND_DECLARE(Increment, 1);
 COMMAND_DECLARE(Decrement, 1);
+COMMAND_DECLARE_SPECIAL(Copy, command, 2,
+                        PREC_DECL(WHERE);
+                        static bool can_be_symbolic(uint a) { return a==0; });
 COMMAND_DECLARE(Purge,1);
 COMMAND_DECLARE(PurgeAll,1);
 COMMAND_DECLARE(Vars, 0);

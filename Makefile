@@ -67,7 +67,7 @@ dm32-%:
 color-%:
 	$(MAKE) COLOR=color $*
 
-sim: sim/$(TARGET).mak
+sim: sim/$(TARGET).mak help/$(TARGET).idx
 	cd sim; $(MAKE) -f $(<F) TARGET=$(shell awk '/^TARGET/ { print $$3; }' sim/$(TARGET).mak)
 sim/$(TARGET).mak: sim/$(TARGET).pro Makefile $(VERSION_H)
 	cd sim; qmake $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
@@ -185,7 +185,10 @@ help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
+help/$(TARGET).md: help/$(TARGET)-images
+help/$(TARGET)-images:
 	rsync -av --delete doc/img/*.bmp help/img/
+
 help/$(TARGET).idx: help/$(TARGET).md
 	grep -b '^#' $< | sort -k2 -t: > $@
 	[ "$$(cat $@ | wc -L)" -lt 80 ]
@@ -251,6 +254,7 @@ CXX_SOURCES +=				\
 	src/complex.cc			\
 	src/conditionals.cc		\
 	src/constants.cc		\
+	src/custom.cc		 	\
 	src/datetime.cc			\
 	src/decimal.cc			\
 	src/equations.cc		\

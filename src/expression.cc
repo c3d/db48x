@@ -2474,17 +2474,23 @@ expression_p expression::get(object_p obj)
 //   Convert an object to an expression, including polynomials and equations
 // ----------------------------------------------------------------------------
 {
-    if (!obj)
-        return nullptr;
-    obj = tag::strip(obj);
-    if (expression_p expr = obj->as<expression>())
-        return expr;
-    if (equation_p eqn = obj->as<equation>())
-        return get(eqn->value());
-    if (polynomial_p poly = obj->as<polynomial>())
-        return get(poly->as_expression());
-    if (algebraic_g alg = obj->as_algebraic())
-        return make(alg);
+    object_p old = nullptr;
+    while (old != obj && obj)
+    {
+        old = obj;
+        if (expression_p expr = obj->as<expression>())
+            return expr;
+        if (tag_p tagged = obj->as<tag>())
+            obj = tagged->tagged_object();
+        else if (equation_p eqn = obj->as<equation>())
+            obj = eqn->value();
+        else if (polynomial_p poly = obj->as<polynomial>())
+            obj = poly->as_expression();
+        else if (assignment_p asn = obj->as<assignment>())
+            return expression::make(ID_TestEQ, asn->name(), asn->value());
+        else if (algebraic_g alg = obj->as_algebraic())
+            return make(alg);
+    }
     return nullptr;
 }
 
@@ -2538,6 +2544,7 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
     expression_g expr = this;
     symbol_g     sym  = solving;
     list_p       vars = expr->names();
+    bool         found = false;
     for (auto var : *vars)
     {
         if (symbol_p vsym = var->as<symbol>())
@@ -2551,6 +2558,10 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
                     return false;
                 }
             }
+            else
+            {
+                found = true;
+            }
         }
         else
         {
@@ -2559,7 +2570,7 @@ bool expression::is_well_defined(symbol_p solving, bool error) const
             return false;
         }
     }
-    return true;
+    return !sym || found;
 }
 
 

@@ -49,7 +49,7 @@ bool to_time(object_p tobj, tm_t &tm, bool error)
 {
     if (!tobj)
         return false;
-    tobj = tag::strip(tobj);
+    tobj = object::strip(tobj);
 
     algebraic_g time = nullptr;
     uint scale = 100;
@@ -100,7 +100,7 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
 {
     if (!dtobj)
         return 0;
-    dtobj = tag::strip(dtobj);
+    dtobj = object::strip(dtobj);
 
     algebraic_g date = nullptr;
     if (unit_p u = unit::get(dtobj))
@@ -174,7 +174,7 @@ algebraic_p to_days(object_p dobj, bool error)
 {
     if (!dobj)
         return nullptr;
-    dobj = tag::strip(dobj);
+    dobj = object::strip(dobj);
 
     algebraic_p dval = nullptr;
     if (unit_g u = unit::get(dobj))
@@ -696,9 +696,9 @@ object::result to_hms_dms(cstring name)
 //   Convert the top of stack to HMS or DMS unit
 // ----------------------------------------------------------------------------
 {
-    algebraic_g x = algebraic_p(tag::strip(rt.top()));
+    algebraic_g x = rt.top()->as_algebraic();
     algebraic_g xc = to_hms_dms(x);
-    if (!xc)
+    if (!x || !xc)
         return object::ERROR;
 
     if (!arithmetic::decimal_to_fraction(xc))
@@ -764,7 +764,7 @@ object::result from_hms_dms(cstring name)
 //   Convert the top of stack from HMS or DMS unit
 // ----------------------------------------------------------------------------
 {
-    algebraic_g x = algebraic_p(tag::strip(rt.top()));
+    algebraic_g x = rt.top()->as_algebraic();
     x = from_hms_dms(x, name);
     if (x && rt.top(x))
         return object::OK;

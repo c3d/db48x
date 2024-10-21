@@ -42,9 +42,9 @@ NFUNCTION(Root,3,
           static algebraic_p solve(program_r   eq,
                                    algebraic_r name,
                                    algebraic_r guess);
-          static algebraic_p solve(algebraic_r eq,
-                                   algebraic_r vars,
-                                   algebraic_r guess);
+          static algebraic_p solve(algebraic_g &eq,
+                                   algebraic_g &vars,
+                                   algebraic_g &guess);
           static list_p multiple_equation_solver(list_r eqs,
                                                  list_r names,
                                                  list_r guesses);

@@ -453,7 +453,17 @@ size_t constant::do_rendering(config_r cfg, constant_p o, renderer &r)
 {
     constant_g cst = o;
     size_t     len = 0;
-    utf8       txt = cst->do_name(cfg, &len);
+    utf8       txt = nullptr;
+    if (file *saving = r.file_save())
+    {
+        // Saving: can't have two files open at once on DMCP
+        file_closer_while_writing fc(*saving);
+        txt = cst->do_name(cfg, &len);
+    }
+    else
+    {
+        txt = cst->do_name(cfg, &len);
+    }
     if (r.editing())
         r.put(cfg.prefix);
     r.put(txt, len);
@@ -614,7 +624,7 @@ object_p constant::do_value(config_r cfg) const
     if (csym)
     {
         // Need to close the configuration file before we parse the constants
-        file_closer fc(cfile, cfg.file);
+        file_closer fc(cfile);
 
         // Special cases for pi and e where we have built-in constants
         if (cname->matches("π"))
@@ -795,7 +805,7 @@ bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
                     mentry = cfile.lookup(mtxt, mlen, false, false);
                     if (cfg.label)
                     {
-                        file_closer fc(cfile, cfg.file);
+                        file_closer fc(cfile);
                         mentry = cfg.label(mentry);
                     }
                     cfile.seek(posafter);
@@ -815,7 +825,7 @@ bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
             if (plane == 1 && cfg.label)
             {
                 symbol_g mentry = symbol::make(label);
-                file_closer fc(cfile, cfg.file);
+                file_closer fc(cfile);
                 mentry = cfg.label(mentry);
                 items(mi, mentry, type);
             }

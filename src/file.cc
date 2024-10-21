@@ -81,7 +81,7 @@ file::file()
 // ----------------------------------------------------------------------------
 //   Construct a file object
 // ----------------------------------------------------------------------------
-    : data()
+    : data(), name()
 {}
 
 
@@ -89,7 +89,7 @@ file::file(cstring path, bool writing)
 // ----------------------------------------------------------------------------
 //   Construct a file object for writing
 // ----------------------------------------------------------------------------
-    : data()
+    : data(), name()
 {
     if (writing)
         open_for_writing(path);
@@ -102,11 +102,11 @@ file::file(text_p name, bool writing)
 // ----------------------------------------------------------------------------
 //   Open a file from a text value
 // ----------------------------------------------------------------------------
-    : data()
+    : data(), name()
 {
     if (name)
     {
-        char   buf[80];
+        static char buf[80];
         size_t len  = 0;
         utf8   path = name->value(&len);
         if (len < sizeof(buf))
@@ -160,7 +160,11 @@ void file::open(cstring path)
     }
     last_open = path;
     data = fopen(path, "r");
-    if (!data)
+    if (data)
+    {
+        name = path;
+    }
+    else
     {
         record(file_error, "Error %s opening %s", strerror(errno), path);
         open_count--;
@@ -168,13 +172,16 @@ void file::open(cstring path)
 #else
     FRESULT ok = f_open(&data, path, FA_READ);
     data.err = ok;
-    if (ok != FR_OK)
+    if (ok == FR_OK)
+        name = path;
+    else
         data.flag = 0;
 #endif                          // SIMULATOR
+    name = path;
 }
 
 
-void file::open_for_writing(cstring path)
+void file::open_for_writing(cstring path, bool append)
 // ----------------------------------------------------------------------------
 //    Open a file for writing
 // ----------------------------------------------------------------------------
@@ -195,15 +202,27 @@ void file::open_for_writing(cstring path)
 #endif
     }
     last_open = path;
-    data = fopen(path, "w");
-    if (!data)
+    data = fopen(path, append ? "a" : "w");
+    if (data)
+    {
+        name = path;
+    }
+    else
+    {
         record(file_error, "Error %s opening %s for writing",
                strerror(errno), path);
+        open_count--;
+    }
 #else
     sys_disk_write_enable(1);
-    FRESULT ok = f_open(&data, path, FA_WRITE | FA_CREATE_ALWAYS);
+    BYTE mode = FA_WRITE | (append ? FA_OPEN_APPEND : FA_CREATE_ALWAYS);
+    FRESULT ok = f_open(&data, path, mode);
     data.err = ok;
-    if (ok != FR_OK)
+    if (ok == FR_OK)
+    {
+        name = path;
+    }
+    else
     {
         sys_disk_write_enable(0);
         data.flag = 0;
@@ -228,6 +247,7 @@ void file::close()
         sys_disk_write_enable(0);
         data.flag = 0;
 #endif // SIMULATOR
+        name = nullptr;
     }
 }
 

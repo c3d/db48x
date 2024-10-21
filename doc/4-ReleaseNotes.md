@@ -1,5 +1,103 @@
 # Release notes
 
+## Release 0.8.2 "Honor Seats" - Equation Library Examples, Assignments
+
+This release is focusing on the testing, validation and usability of the
+equation library contributed by Jean Wilson. To that effect, it introduces a new
+kind of objects, assignments, that only exist on the DB48x and have no direct
+equivalent on original HP calculators. It also completes the support for library
+equations in the `Root` command.
+
+Here is an example that illustrates these capabilities, testing the
+`Ohm’s Law & Power` equation in the library:
+
+```rpl
+V=240_V  I=32_A
+@ Expecting [ R=7.5 Ω P=7 680. W ]
+'ROOT(ⒺOhm’s Law & Power;[R;P];[1_Ω;1_W])'
+```
+
+If you are reading this release note directly on the calculator, you can simply
+click `ENTER` while the text above shows up, and it will be copied in your
+editor. You can change the values of the input variables to explore various
+possibilities.
+
+In this example, `V=24_V` is an assignment object that assigns the value `24_V`
+to the global variable named `V`. It is almost equivalent to `24_V 'V' STO V`,
+except that the value placed on the stack is the assignment object itself. In
+other words, evaluating `V=24_V` places `V=24_V` on the stack. This makes it
+easy to edit or evaluate assignments on the stack using the interactive
+stack. In particular, you can select an assignment on the stack wiht the
+interactive stack and use the `Eval` (F3) function to restore the variable to
+the value in the assignment.
+
+The `ROOT` command in the example illustrates how you can directly use equations
+in the equation library as argument to `Root`, and use the multiple-equation
+solver to solve for more than one variable at a time.
+
+All the examples in the on-line help are now also tested automatically, in order
+to ensure that all the given examples give the expected results.
+
+### Features
+
+* Implement `CustomMenu`, whicih is toggled by successive presses on the _VAR_
+  key. An example is shown in the `Demo.48s` file. The content of the `CST` or
+  `CustomMenu` variable is used to define this menu.
+* The documentation now contains numerous executable examples.
+  These examples are identified by a Markdown code block with the `rpl`
+  syntax colorization indicator. They can be executed directly from the
+  on-line help on the calculator by hitting ENTER while the code block is shown
+  on the screen.
+* The test suite automatically tests all the documentation examples.
+* Two new equation sets, `Light Propagation` and `Ultrarelativistic Cases`
+* Four new equations in `Energy & Momentum` equation set
+* Assignment objects in the form `Name=Value`, e.g. `A=3`.
+* The solver now emits assignment objects for the solution
+* `▶` command to store while keeping value on stack. As an extension relative to
+  the HP50G, this command also works inside RPL algebraic expressions.
+  For example `3▶A` stores `3` in `A` and returns the value in `A`.
+  The command is called `Copy` (the HP50G ARM calls it _▶ (Store)_)
+* The `Root` command now accepts library equations as input.
+* Arrays and lists are now accepted in algebraic expressions, using `;` as
+  a separator between values. For example, `'[1;2;3]+[4;5;6]'` adds two vectors
+  using an algebraic notation. Vectors can contain algebraic expressions. For
+  example `'[x+1;y+2;z=3]'` is a valid vector expression.
+* The solver now accepts algebraic input, including for the multiple equation
+  solver using vectors as input.
+* Ad `RombergPlot` example to Library and Demo file. This example shows how the
+  `Integrate` command evaluates the underlying function.
+* menus: Add `XRng` and `YRng` to the `PlotMenu`
+
+### Bug fixes:
+
+* Fix a sign bug in the `Simple Slope` equation
+* Fix "Too many open files" error while saving constants, xlibs or equations
+* Avoid infinite loop for unterminated `case` statement
+* What follows a unit in an algebraic expression is no longer ignored.
+  `'330_m-20_m'` was incorrectly interpreted as `'330_m'`, now is `'310_m'`.
+* Fix and document the `Integrate` imprecision and iteration settings.
+* text: Respect display settings in `→Str`. For example, `3 FIX 0.1 →Str` now
+  returns `"0.100"` and not `"0.1"`, like on HP calculators
+* Repair parsing of HP-style complex numbers, e.g. `(12;3)`
+* Refactoring of object insertion in text editor to fix various bugs,
+  including the `Echo` command in the interactive stack inserting the object at
+  the end of the text editor instead of at the cursor position.
+* Do not issue `Invalid digit for base` on the console parsing `1E-10`
+* Fix null-dereference issue in `to_decimal_if_big`, which could be triggered if
+  interrupting an `Integrate` command using the _EXIT_ key.
+* Avoid occasional garbage at right of menu area
+* simulator: Ensure Copy correctly quotes equations
+* Move image for _E Field Finite Line_ to right section
+
+### Improvements
+
+* Add references to keyboard overlays in the documentation
+* Add documentation for the `Root` command
+* Improve the way we generate the image files in the Makefile
+* Improve solver behaviour when a solution is not found. Notably, the solver is
+  more likely to converge towards an extremum.
+
+
 ## Release 0.8.1 "Sale" - Multi-equation solver
 
 ### Features

@@ -90,6 +90,8 @@ NFUNCTION_BODY(Integrate)
     // Actual integration
     program_g  eq = program_p(+eqobj);
     algebraic_g i = integrate(eq, name, algebraic_p(+low), algebraic_p(+high));
+    if (!i)
+        rt.command(object::static_object(object::ID_Integrate));
     return i;
 }
 
@@ -120,7 +122,8 @@ algebraic_p integrate(program_g   eq,
 
     // Set independent variable
     save<symbol_g *> iref(expression::independent, &name);
-    int              prec = Settings.IntegratePrecision();
+    int              prec = (Settings.Precision() -
+                             Settings.IntegrationImprecision());
     algebraic_g      eps = decimal::make(1, -prec);
 
     // Select numerical computations (doing this with fraction is slow)
@@ -136,14 +139,14 @@ algebraic_p integrate(program_g   eq,
 
     // Loop for a maximum number of conversion iterations
     size_t loops = 1;
-    uint   max   = Settings.IntegratePrecision();
+    uint   max   = Settings.IntegrationIterations();
 
     // Depth of the original stack, to return to after computation
     size_t depth = rt.depth();
     if (!rt.push(+sy))
         goto error;
 
-    for (uint d = 0; d <= max && !program::interrupted(); d++)
+    for (uint d = 0; d < max && !program::interrupted(); d++)
     {
         dx2 = dx / two;
         sy  = integer::make(0);
@@ -210,9 +213,7 @@ algebraic_p integrate(program_g   eq,
             y = algebraic_p(rt.top());
             x = algebraic_p(rt.stack(d + 2));
             x = y - x;
-            if (y && !y->is_zero())
-                x = x / y;
-            if (smaller_magnitude(x, eps) || d == max)
+            if (smaller_magnitude(x, y*eps) || d == max)
             {
                 rt.drop(rt.depth() - depth);
                 return y;
@@ -232,6 +233,8 @@ algebraic_p integrate(program_g   eq,
         loops += loops;
         dx = dx2;
     }
+
+    rt.precision_loss_error();
 
 error:
     rt.drop(rt.depth() - depth);

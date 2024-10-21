@@ -107,6 +107,7 @@ ERROR(invalid_bitmap_file,      "Invalid bitmap file")
 ERROR(cannot_isolate,           "Unable to isolate")
 ERROR(unknown_derivative,       "Unknown derivative")
 ERROR(unknown_primitive,        "Unknown primitive")
+ERROR(multisolver_variable,     "Unable to solve for all variables")
 
 // Filesystem errors
 #ifndef FRROR

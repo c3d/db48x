@@ -61,7 +61,7 @@ INSERT_BODY(algebraic)
 //   Enter data in algebraic mode
 // ----------------------------------------------------------------------------
 {
-    return ui.edit(o->fancy(), o->arity() ? ui.ALGEBRAIC : ui.CONSTANT);
+    return ui.insert_object(o, o->arity() ? ui.ALGEBRAIC : ui.CONSTANT);
 }
 
 
@@ -74,8 +74,7 @@ bool algebraic::decimal_promotion(algebraic_g &x)
         return false;
 
     id xt = x->type();
-    record(algebraic,
-           "Real promotion of %p from %+s to decimal",
+    record(algebraic, "Real promotion of %p from %+s to decimal",
            (object_p) x, object::name(xt));
 
     switch(xt)
@@ -159,8 +158,7 @@ bool algebraic::hwfp_promotion(algebraic_g &x)
 
 
     id xt = x->type();
-    record(algebraic,
-           "Real promotion of %p from %+s to hwfp",
+    record(algebraic, "Real promotion of %p from %+s to hwfp",
            (object_p) x, object::name(xt));
 
     switch(xt)
@@ -452,6 +450,9 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
 //   Convert a value to decimal
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return false;
+
     id xt = x->type();
 
     switch(xt)

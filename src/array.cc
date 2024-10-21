@@ -149,7 +149,7 @@ GRAPH_BODY(array)
 //   When they return true, these operations push all elements on the stack
 //
 
-bool array::is_vector(size_t *size, bool push, bool strip) const
+bool array::is_vector(size_t *size, bool push, bool stripped) const
 // ----------------------------------------------------------------------------
 //   Check if this is a vector, and if so, push all elements on stack
 // ----------------------------------------------------------------------------
@@ -161,14 +161,14 @@ bool array::is_vector(size_t *size, bool push, bool strip) const
         for (object_p obj : *this)
         {
             object_p tagged = obj;
-            obj = tag::strip(obj);
+            obj = strip(obj);
 
             id oty = obj->type();
             if (is_array_or_list(oty))
                 result = false;
             else if (!obj->is_algebraic())
                 result = false;
-            else if (push && !rt.push(strip ? obj : tagged))
+            else if (push && !rt.push(stripped ? obj : tagged))
                 result = false;
             if (!result)
                 break;
@@ -195,7 +195,7 @@ object::id array::is_2Dor3D(bool push) const
         uint   angles = 0;
         for (object_p obj : *this)
         {
-            obj = tag::strip(obj);
+            obj = strip(obj);
 
             id oty = obj->type();
             if (is_array_or_list(oty))

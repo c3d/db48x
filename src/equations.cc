@@ -31,9 +31,13 @@
 
 #include "expression.h"
 #include "grob.h"
+#include "parser.h"
 #include "renderer.h"
 #include "solve.h"
+#include "tag.h"
 #include "variables.h"
+
+#include <algorithm>
 
 RECORDER(equations,         16, "Equation objects");
 RECORDER(equations_error,   16, "Error on equation objects");
@@ -73,7 +77,7 @@ static const cstring basic_equations[] =
     "}",
 
     "Simple Slope", "{"
-    "  '(θ_°)=(1_r)*(((P_N)*((L_m)-(a_m)))/(6*L*(E_kPa)*(I_mm^4))*(3*(x_m)²+(L-a)²-L²)-(M_N*m)/(E*I)*(c-(x²-c²)/(2*L)-L/3)-(w_N/m)/(24*E*I)*(L³+x²*(4*x-6*L)))'"
+    "  '(θ_°)=(1_r)*(((P_N)*((L_m)-(a_m)))/(6*L*(E_kPa)*(I_mm^4))*(3*(x_m)²+(L-a)²-L²)-(M_N*m)/(E*I)*(c-(x²+c²)/(2*L)-L/3)-(w_N/m)/(24*E*I)*(L³+x²*(4*x-6*L)))'"
     "}",
 
     "Simple Moment", "{"
@@ -1062,7 +1066,19 @@ static const cstring basic_equations[] =
     "'γ=1/√(1-β^2)' "
     "}",
 
+    "Light Propagation",  "{ "
+    "'(fp_Hz)/(f_Hz)=γ*(1+β*COS(α_°))' "
+    "'COS(θp_°)=(COS(θ_°)-β)/(1-β*COS(θ_°))' "
+    "'Pθ=SIN(θ_°)/(2*γ^2*(1-β*COS(θ_°))^2)' "
+    "'β=(v_(m/s))/Ⓒc' "
+    "'γ=1/√(1-β^2)' "
+    "}",
+
     "Energy & Momentum",  "{ "
+    "'(ppx_(kg*(m/s)))=γ*((px_(kg*(m/s)))-v(m/s)*(E_J)/Ⓒc^2)' "
+    "'(ppy_(kg*(m/s)))=(py_(kg*(m/s)))' "
+    "'(ppz_(kg*(m/s)))=(pz_(kg*(m/s)))' "
+    "'(Ep_J)=γ*((E_J)-v(m/s)*(px_(kg*(m/s))))' "
     "'(p_(kg*(m/s)))=γ*(mo_kg)*(v(m/s))' "
     "'(E_J)=γ*(E0_J)' "
     "'(E0_J)=(m0_kg)*Ⓒc^2' "
@@ -1070,6 +1086,16 @@ static const cstring basic_equations[] =
     "'(K_J)=(γ-1)*(E0_J)' "
     "'β=(v_(m/s))/Ⓒc' "
     "'γ=1/√(1-β^2)' "
+    "}",
+
+    "Ultrarelativistic Cases",  "{ "
+    "'(E0_J)=(m0_kg)*Ⓒc^2' "
+    "'(E_J)^2=(p_(kg*(m/s)))^2*Ⓒc^2+(m0_kg)^2*Ⓒc^4' "
+    "'(K_J)=(γ-1)*(E0_J)' "
+    "'β=(v_(m/s))/Ⓒc' "
+    "'γ=1/√(1-β^2)' "
+    "'(Δtp_s)=γ*(Δt_s)' "
+    "'(Δxp_m)=(Δx_m)/γ' "
     "}",
 
     "Gravitational Time Dilation",  "{ "
@@ -1576,4 +1602,146 @@ COMMAND_BODY(LibEq)
 // ----------------------------------------------------------------------------
 {
     return equation::lookup_command(equation::equations, false);
+}
+
+
+
+// ============================================================================
+//
+//    Assignment operations
+//
+// ============================================================================
+
+PARSE_BODY(assignment)
+// ----------------------------------------------------------------------------
+//    Try to parse this as an assignment
+// ----------------------------------------------------------------------------
+{
+    // Assignments can only be parsed in non-algebraic mode
+    if (p.precedence)
+        return SKIP;
+
+    // Check if we have a name
+    algebraic_g name = p.out ? p.out->as_extended_algebraic() : nullptr;
+    if (!name)
+        return SKIP;
+
+    size_t max = p.length;
+    if (!max)
+        return SKIP;
+
+    // First character must be compatible with a unit
+    size_t  offs  = 0;
+    size_t  noffs = 0;
+    unicode cp    = p.separator;
+    if (cp != '=')
+        return SKIP;
+
+    // Parse the body
+    offs = utf8_next(p.source, offs, max);
+    size_t   vsz   = max - offs;
+    object_p vobj  = parse(p.source + offs, vsz);
+    if (!vobj)
+        return ERROR;
+    algebraic_g value = vobj->as_extended_algebraic();
+    if (!value)
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    offs += vsz;
+
+    if (name->type() != ID_symbol)
+    {
+        rt.invalid_name_error().source(p.source + noffs);
+        return ERROR;
+    }
+
+    p.out    = assignment::make(name, value);
+    p.length = offs;
+    return p.out ? OK : ERROR;
+}
+
+
+RENDER_BODY(assignment)
+// ----------------------------------------------------------------------------
+//   Do not emit quotes around assignment objects
+// ----------------------------------------------------------------------------
+{
+    algebraic_g name  = o->name();
+    algebraic_g value = o->value();
+    if (r.expression())
+    {
+        // Inside an expression, use the old HP syntax
+        value->render(r);
+        r.put(unicode(L'▶'));
+        name->render(r);
+    }
+    else
+    {
+        name->render(r);
+        r.put('=');
+        value->render(r);
+    }
+    return r.size();
+}
+
+
+GRAPH_BODY(assignment)
+// ----------------------------------------------------------------------------
+//   Render assignments graphically
+// ----------------------------------------------------------------------------
+{
+    algebraic_g name  = o->name();
+    algebraic_g value = o->value();
+    grob_g      ng    = name->graph(g);
+    coord       nv    = g.voffset;
+    grob_g      vg    = value->graph(g);
+    coord       vv    = g.voffset;
+    if (g.expression)
+        ng = expression::infix(g, vv, vg, 0, "▶", nv, ng);
+    else
+        ng = expression::infix(g, nv, ng, 0, "=", vv, vg);
+    return ng;
+}
+
+
+EVAL_BODY(assignment)
+// ----------------------------------------------------------------------------
+//   Evaluate the value, assign it to the name, and return evaluated value
+// ----------------------------------------------------------------------------
+{
+    assignment_g asn = o;
+
+    symbol_g name = asn->name()->as<symbol>();
+    if (!name)
+    {
+        rt.invalid_name_error();
+        return ERROR;
+    }
+
+    algebraic_g value = asn->value();
+    algebraic_p evalue = value->evaluate();
+    if (evalue != value)
+    {
+        value = evalue;
+        if (Settings.PushEvaluatedAssignment())
+            asn = assignment::make(+name, evalue);
+    }
+
+    if (!directory::store_here(name, value))
+        return ERROR;
+
+    if (!rt.push(+asn))
+        return ERROR;
+    return OK;
+}
+
+
+HELP_BODY(assignment)
+// ----------------------------------------------------------------------------
+//   Help topic for assignments
+// ----------------------------------------------------------------------------
+{
+    return utf8("Assignments");
 }

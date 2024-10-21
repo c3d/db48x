@@ -25,6 +25,8 @@ You can also [try it in your browser](http://48calc.org).
 * [Acknowledgements and credits](#acknowledgements-and-credits)
 * [Release notes](#release-notes)
 * [Performance](#performance-measurements)
+* [Keyboard overlays](https://www.hpmuseum.org/forum/thread-20113.html)
+
 
 ## State of the project
 

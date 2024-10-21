@@ -29,6 +29,7 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+#include "complex.h"
 #include "constants.h"
 
 #include <string.h>
@@ -113,5 +114,36 @@ COMMAND_DECLARE_INSERT_HELP(EquationName,-1);
 COMMAND_DECLARE_INSERT_HELP(EquationValue,-1);
 COMMAND_DECLARE_INSERT_HELP(EquationSolver,-1);
 COMMAND_DECLARE(LibEq, 1);
+
+
+GCP(assignment);
+
+struct assignment : complex
+// ----------------------------------------------------------------------------
+//   An assignment is an operation in the form `A=B` that performs a Store
+// ----------------------------------------------------------------------------
+{
+    assignment(id type, algebraic_r name, algebraic_r value):
+        complex(type, name, value) {}
+
+    static assignment_p make(algebraic_g name, algebraic_g value,
+                             id ty = ID_assignment)
+    {
+        if (!name|| !value)
+            return nullptr;
+        return rt.make<assignment>(ty, name, value);
+    }
+
+    algebraic_p name()  const   { return x(); }
+    algebraic_p value() const   { return y(); }
+
+public:
+    OBJECT_DECL(assignment);
+    EVAL_DECL(assignment);
+    PARSE_DECL(assignment);
+    RENDER_DECL(assignment);
+    GRAPH_DECL(assignment);
+    HELP_DECL(assignment);
+};
 
 #endif // EQUATIONS_H

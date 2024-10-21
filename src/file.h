@@ -50,7 +50,7 @@ struct file
     ~file();
 
     void    open(cstring path);
-    void    open_for_writing(cstring path);
+    void    open_for_writing(cstring path, bool append = false);
     bool    valid();
     bool    eof();
     void    close();
@@ -68,45 +68,47 @@ struct file
     uint    rfind(unicode cp);
     cstring error(int err) const;
     cstring error() const;
+    cstring filename() const { return name; }
 
     static bool    unlink(text_p path);
     static bool    unlink(cstring path);
     static cstring extension(cstring path);
     static cstring basename(cstring path);
 
-  protected:
+protected:
 #if SIMULATOR
     FILE *data;
 #else
     FIL     data;
 #endif
+    cstring name;
 };
 
 
-struct file_closer
+template <bool writing = false>
+struct file_closer_tmpl
 // ----------------------------------------------------------------------------
 //   Structure to temporary close a file
 // ----------------------------------------------------------------------------
 //   DMCP only allows one file open at a time
 {
-    file_closer(file &f, cstring name)
-        : f(f), name(name), position(0)
+    file_closer_tmpl(file &f) : f(f), name(), position(0)
     {
         if (f.valid())
         {
             position = f.position();
+            name = f.filename();
             f.close();
         }
-        else
-        {
-            this->name = nullptr;
-        }
     }
-    ~file_closer()
+    ~file_closer_tmpl()
     {
         if (name)
         {
-            f.open(name);
+            if (writing)
+                f.open_for_writing(name, true);
+            else
+                f.open(name);
             if (f.valid())
                 f.seek(position);
         }
@@ -116,6 +118,8 @@ struct file_closer
     uint    position;
 };
 
+using file_closer = file_closer_tmpl<false>;
+using file_closer_while_writing = file_closer_tmpl<true>;
 
 #define MAGIC_SAVE_STATE         0x05121968
 

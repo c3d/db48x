@@ -410,7 +410,7 @@ PARSE_BODY(rectangular)
 
         algebraic_g im = algebraic_p(imobj);
         p.out = rectangular::make(re, im);
-        p.length = offs;
+        p.length = offs+1;
         return p.out ? OK : ERROR;
     }
 
@@ -796,8 +796,8 @@ COMMAND_BODY(RealToRectangular)
 //   Take two values in x and y and turn them into a rectangular complex
 // ----------------------------------------------------------------------------
 {
-    object_g re = tag::strip(rt.stack(1));
-    object_g im = tag::strip(rt.stack(0));
+    object_g re = strip(rt.stack(1));
+    object_g im = strip(rt.stack(0));
     if (!re || !im)
         return ERROR;
     if (!(re->is_real() || re->is_symbolic()) ||
@@ -821,8 +821,8 @@ COMMAND_BODY(RealToPolar)
 //   Take two values in x and y and turn them into a polar complex
 // ----------------------------------------------------------------------------
 {
-    object_g mod = tag::strip(rt.stack(1));
-    object_g arg = tag::strip(rt.stack(0));
+    object_g mod = strip(rt.stack(1));
+    object_g arg = strip(rt.stack(0));
     if (!mod || !arg)
         return ERROR;
 
@@ -856,7 +856,7 @@ COMMAND_BODY(RectangularToReal)
 //   Take a complex value and convert it into two real values
 // ----------------------------------------------------------------------------
 {
-    object_g z = tag::strip(rt.top());
+    object_g z = strip(rt.top());
     if (!z)
         return ERROR;
     if (!z->is_complex())
@@ -882,7 +882,7 @@ COMMAND_BODY(PolarToReal)
 //   Take a complex value in polar form and convert it into two real values
 // ----------------------------------------------------------------------------
 {
-    object_g z = tag::strip(rt.top());
+    object_g z = strip(rt.top());
     if (!z)
         return ERROR;
     if (!z->is_complex())
@@ -910,7 +910,7 @@ COMMAND_BODY(ToRectangular)
 //  Convert the top-level complex to rectangular form
 // ----------------------------------------------------------------------------
 {
-    object_g x = tag::strip(rt.top());
+    object_g x = strip(rt.top());
     if (!x)
         return ERROR;
     if (array_p v = x->as<array>())
@@ -942,7 +942,7 @@ COMMAND_BODY(ToPolar)
 //  Convert the top-level complex to polar form
 // ----------------------------------------------------------------------------
 {
-    object_g x = tag::strip(rt.top());
+    object_g x = strip(rt.top());
     if (!x)
         return ERROR;
     if (array_p v = x->as<array>())

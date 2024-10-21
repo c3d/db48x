@@ -168,6 +168,7 @@ ID(array)
 ID(menu)
 
 ID(unit)
+ID(assignment)
 
 // Complex types must be parsed before numbers
 ID(rectangular)
@@ -332,10 +333,6 @@ NAMED(RandomMatrix, "RanM")     ALIAS(RandomMatrix, "RandomArray")
 // Tests
 NAMED(IFT, "IfThen")
 NAMED(IFTE, "IfThenElse")
-CMD(SetFlag)                            ALIAS(SetFlag,          "SF")
-CMD(ClearFlag)                          ALIAS(ClearFlag,        "CF")
-CMD(TestFlagSet)                        ALIAS(TestFlagSet,      "FS?")
-CMD(TestFlagClear)                      ALIAS(TestFlagClear,    "FC?")
 
 // Graphics
 NAMED(Disp, "DrawText")
@@ -347,6 +344,12 @@ NAMED(ClLCD, "ClearLCD")
 //   Two byte opcodes below
 //
 // ****************************************************************************
+
+CMD(SetFlag)                            ALIAS(SetFlag,          "SF")
+CMD(ClearFlag)                          ALIAS(ClearFlag,        "CF")
+CMD(TestFlagSet)                        ALIAS(TestFlagSet,      "FS?")
+CMD(TestFlagClear)                      ALIAS(TestFlagClear,    "FC?")
+
 
 
 // ============================================================================
@@ -655,6 +658,7 @@ OP(RecallDiv,   "Recall÷")              ALIAS(RecallDiv, "Recall/")
 ALIAS(RecallDiv,"Rcl/")                 ALIAS(RecallDiv, "Rcl÷")
 CMD(Increment)                          ALIAS(Increment, "Incr")
 CMD(Decrement)                          ALIAS(Decrement, "Decr")
+OP(Copy, "▶")
 
 // Other variable operations
 NAMED(Vars,     "Variables")
@@ -892,6 +896,7 @@ FLAG(ShowEmptyMenu,             HideEmptyMenu)
 FLAG(ListAsProgram,             ListAsData)
 FLAG(KillOnError,               DebugOnError)
 FLAG(AllEquationVariables,      CurrentEquationVariables)
+FLAG(PushEvaluatedAssignment,   PushOriginalAssignment)
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
@@ -966,8 +971,8 @@ SETTING_BITS(FractionDigits,  uint, 6,1U, DB48X_MAXDIGITS, 12U)
 ALIAS(FractionDigits,           "→QDigits")
 SETTING(SolverIterations,       1U, 10000U,             256U)
 SETTING_BITS(SolverImprecision, uint, 6,1U, DB48X_MAXDIGITS-2,  6U)
-SETTING(IntegrateIterations,    1U, 10000U,             100U)
-SETTING(IntegratePrecision,     0U, DB48X_MAXDIGITS,    12U)
+SETTING(IntegrationIterations,  1U, 32U,                12U)
+SETTING(IntegrationImprecision, 1U, DB48X_MAXDIGITS,    6U)
 SETTING(MaximumDecimalExponent, 10ULL, ularge(1ULL << 61), ularge(1ULL << 60))
 
 SETTING_ENUM(SingleRowMenus,    nullptr,        MenuAppearance)
@@ -1074,8 +1079,8 @@ OP(AlgebraConfiguration,   "Ⓓ")        ALIAS(AlgebraConfiguration,  "CASDir")
 OP(AlgebraVariable,        "ⓧ")        ALIAS(AlgebraVariable,       "VX")
                                         ALIAS(AlgebraVariable,       "RclVX")
 OP(StoreAlgebraVariable,   "Storeⓧ")   ALIAS(StoreAlgebraVariable,  "StoVX")
-OP(StEq,                   "▶Equation") ALIAS(StEq, "StoreEquation")
-OP(RcEq,                   "Equation▶") ALIAS(RcEq, "RecallEquation")
+OP(StEq,                   "StoreEquation")
+OP(RcEq,                   "RecallEquation")
 OP(NextEq,                 "NextEquation")
 OP(EvalEq,                 "EvaluateEquation")
 
@@ -1186,6 +1191,8 @@ MENU(TextMenu)
 // Special menus
 MENU(EditMenu)
 CMD(VariablesMenu)
+CMD(CustomMenu)                 ALIAS(CustomMenu, "Cst")
+CMD(ToggleCustomMenu)
 CMD(SolvingMenu)
 CMD(ToolsMenu)
 CMD(Catalog)

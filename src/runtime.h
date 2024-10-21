@@ -224,7 +224,7 @@ struct runtime
     //   Open the editor with a known buffer
     // ------------------------------------------------------------------------
 
-    size_t edit();
+    size_t edit(size_t offset, size_t len);
     // ------------------------------------------------------------------------
     //   Append the scratch pad to the editor (at end)
     // ------------------------------------------------------------------------
@@ -759,7 +759,7 @@ struct runtime
     //   Fetch local at given index
     // ------------------------------------------------------------------------
 
-    bool local(uint index, object_p obj);
+    object_p local(uint index, object_p obj);
     // ------------------------------------------------------------------------
     //   Set a local in the local stack
     // ------------------------------------------------------------------------

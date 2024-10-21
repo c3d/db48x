@@ -83,7 +83,7 @@ bool files::store(text_p name, object_p value, cstring defext) const
     {
         if (text_p txt = value->as<text>())
             return fs->store_text(name, txt);
-        return fs->store_text(name, value->as_text(true, false));
+        return fs->store_text(name, value->as_text(true));
     }
 
     // Save as comma-separated value

@@ -658,18 +658,65 @@ size_t runtime::edit(utf8 buf, size_t len)
 }
 
 
-size_t runtime::edit()
+size_t runtime::edit(size_t offset, size_t len)
 // ----------------------------------------------------------------------------
-//   Append the scratchpad to the editor (at end of buffer)
+//   Append the scratchpad to the editor without any memory allocation
 // ----------------------------------------------------------------------------
+//   Start with: bbbbb|aaa|ssss|iiiiiiii|
+//                    O   E    I        S
+//   where O=offset, E=Editor, I=Scratch-Len, S=Scratch
+//         b=text before, a=text after, s=scratch to keep, i=scratch to insert
+//
+//   End with:   bbbbb|iiiiiiii|aaa|ssss|
+//                    O            E    S
+//
+//   First swapping pass:
+//   Step 1:     bbbbb|iaa|ssss|iiiiiiia|
+//                    O   E    I        S
+//   Step 2:     bbbbb|iiaa|ssss|iiiiiiaa|
+//                    O   E    I        S
+//   ...
+//   Step N:     bbbbb|iiiiiiii|ssss|aaa|
+//                    O   E    I        S
+//
+//   Second swapping pass:
+//   Step 1:     bbbbb|iiiiiiii|asss|aas|
+//                    O   E    I        S
+//   Step 2:     bbbbb|iiiiiiii|aass|ass|
+//                    O   E    I        S
+//   ...
+//   Step N:     bbbbb|iiiiiiii|aaa|ssss|
+//                    O   E    I        S
 {
-    record(editor, "Editing scratch pad size %u, editor was %u",
-           Scratch, Editing);
-    Editing += Scratch;
-    Scratch = 0;
+    if (len > Scratch || offset > Editing)
+    {
+        record(runtime_error, "Invalid edit %u > %u, offset %u into %u",
+               len, Scratch, offset, Editing);
+        return 0;
+    }
+    record(editor, "Editing %u scratch %u, offset %u in editor %u",
+           len, Scratch, offset, Editing);
+    if (Scratch > len || offset < Editing)
+    {
+        // Move data around in place, two passes swapping order of bytes
+        byte *ed = editor();
+        size_t end = Scratch + Editing;
+        size_t swapping = (end - offset)/2;
+        for (size_t idx = 0; idx < swapping; idx++)
+            std::swap(ed[end + ~idx], ed[offset+idx]);
+        swapping = len / 2;
+        size_t tend = offset + len;
+        for (size_t idx = 0; idx < swapping; idx++)
+            std::swap(ed[tend + ~idx], ed[offset + idx]);
+        swapping = (Editing - offset + Scratch - len) / 2;
+        for (size_t idx = 0; idx < swapping; idx++)
+            std::swap(ed[end + ~idx], ed[tend + idx]);
+    }
+    Editing += len;
+    Scratch -= len;
 
     record(editor, "Editor size now %u", Editing);
-    return Editing;
+    return len;
 }
 
 
@@ -1159,19 +1206,19 @@ object_p runtime::local(uint index)
 }
 
 
-bool runtime::local(uint index, object_p obj)
+object_p runtime::local(uint index, object_p obj)
 // ----------------------------------------------------------------------------
 //   Set a local in the local stack
 // ----------------------------------------------------------------------------
 {
     size_t count = Directories - Locals;
-    if (index >= count)
+    if (index >= count || !obj)
     {
         undefined_local_name_error();
-        return false;
+        return nullptr;
     }
     Locals[index] = obj;
-    return true;
+    return obj;
 }
 
 

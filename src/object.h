@@ -376,13 +376,7 @@ struct object
     // ------------------------------------------------------------------------
 
 
-    size_t edit() const;
-    // ------------------------------------------------------------------------
-    //   Render the object into the scratchpad, then move into the editor
-    // ------------------------------------------------------------------------
-
-
-    text_p as_text(bool edit = true, bool eq = false) const;
+    text_p as_text(bool edit = false, bool eq = false) const;
     // ------------------------------------------------------------------------
     //   Return the object as text
     // ------------------------------------------------------------------------
@@ -743,7 +737,7 @@ struct object
     //    Extended algebraics include text and array values
     // ------------------------------------------------------------------------
     {
-        return is_algebraic_or_list(ty) || ty == ID_text;
+        return is_algebraic_or_list(ty) || ty == ID_text || ty == ID_program;
     }
 
 
@@ -844,9 +838,16 @@ struct object
     object_p as_quoted(id ty = ID_symbol) const;
     template<typename T>
     const T *as_quoted() const { return (const T *) as_quoted(T::static_id); }
+    template<typename T, typename U, typename ...Rest>
+    const T *as_quoted() const
     // ------------------------------------------------------------------------
     //    Return object as a valid quoted name (e.g. 'ABC')
     // ------------------------------------------------------------------------
+    {
+        if (const T *result = as_quoted<T>())
+            return result;
+        return as_quoted<U, Rest...>();
+    }
 
 
     int as_truth(bool error = true) const;
@@ -871,7 +872,6 @@ struct object
     // ------------------------------------------------------------------------
     //   Return true if this is negative, false otherwise, can error if bad
     // ------------------------------------------------------------------------
-
 
 
     int compare_to(object_p other) const;
@@ -906,6 +906,15 @@ struct object
     //   Get a static pointer for the given object (typically for commands)
     // ------------------------------------------------------------------------
 
+
+    static object_p strip(object_p obj);
+    object_p strip() const
+    // ------------------------------------------------------------------------
+    //   Strip the object of anything like tags and assignments
+    // ------------------------------------------------------------------------
+    {
+        return strip(this);
+    }
 
 
     // ========================================================================

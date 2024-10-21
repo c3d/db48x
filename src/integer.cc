@@ -259,7 +259,7 @@ PARSE_BODY(integer)
                 if (type == ID_integer || type == ID_neg_integer)
                 {
                     if (v == 0xE) // Exponent
-                        err = WARN;
+                        return SKIP;
                     else
                         break;
                 }

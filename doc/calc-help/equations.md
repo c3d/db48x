@@ -46,11 +46,12 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
-To calculate `Pcr` (Critical load) in kilonewtons (kN):
+* To calculate [Pcr_kN;σcr_kPa] (Critical load; Critical stress) from 6 known variables:
 ```rpl
-'ROOT(ⒺElasticBuckling|L=7.3152_m|r=4.1148_cm|E=199947961.502_kPa|A=53.0967_cm^2|K=0.7|I=8990598.7930_mm^4;Pcr;1_kN)'
+L=7.3152_m  r=4.1148_cm  E=199947961.502_kPa  A=53.0967_cm^2  K=0.7  I=8990598.7930_mm^4
+@ Expecting [ Pcr=676.60192 6324 kN σcr=127 428.24437 8 kPa ]
+'ROOT(ⒺElastic Buckling;[Pcr;σcr];[1_kN;1_kPa])'
 ```
-
 
 ### Eccentric Columns
 
@@ -58,83 +59,102 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Eccentric Columns](img/EccentricColumns.bmp)
 
-To calculate `σmax` (Maximum stress) in `kPa`:
+* To calculate [σmax_kPa;I_mm^4] (Maximum stress; Moment of inertia) from 8 known variables:
 ```rpl
-'ROOT(ⒺEccentricColumns|L=6.6542_m|A=187.9351_cm^2,|r=8.4836_cm|E=206842718.795_kPa|I=135259652.16_mm^4|K=1;σmax;1_kPa)’
+L=6.6542_m  A=187.9351_cm^2  r=8.4836_cm  E=206842718.795_kPa  K=1  P=1908.2571_kN  c=15.24_cm
+ ε=1.1806_cm
+@ Expecting [ σmax=140 853.09700 6 kPa I=135 259 652.161 mm↑4 ]
+'ROOT(ⒺEccentric Columns;[σmax;I];[1_kPa;1_mm^4])'
 ```
 
 ### Simple Deflection
 
 ![Simple Deflection](img/SimpleDeflection.bmp)
 
-To calculate `y` (Deflection at x):
+* To calculate [y_in] (Deflection at x) from 9 known variables:
 ```rpl
-'ROOT(ⒺSimpleDeflection|L=20_ft|E=29000000_psi|I=40_in^4|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;y;1_in)'
+L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
+ w=102.783_lbf/ft  x=9_ft
+@ Expecting [ y=-0.60048 54094 96 in ]
+'ROOT(ⒺSimple Deflection;[y];[1_in])'
 ```
 
 ### Simple Slope
 
 ![Simple Slope](img/SimpleSlope.bmp)
 
-To calculate `θ` (Slope at `x`):
+* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
 ```rpl
-'ROOT(ⒺSimpleSlope|L=20_ft|E=29000000_psi|I=40_in^4|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;θ;0_°)'
+L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
+ w=102.783_lbf/ft  x=9_ft
+@ Expecting [ θ=-0.08763 17825 27 ° ]
+'ROOT(ⒺSimple Slope;[θ];[0_°])'
 ```
-
 
 ### Simple Moment
 
 ![Simple Moment](img/SimpleMoment.bmp)
 
-To calculate `Mx` (Internal bending moment at x):
+* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
 ```rpl
-'ROOT(ⒺSimpleMoment|L=20_ft|a=10_ft|P=674.427_lbf|c=17_ft|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;Mx;1_ft∗lbf)'
+L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
+@ Expecting [ Mx=9 782.1945 lbf·ft ]
+'ROOT(ⒺSimple Moment;[Mx];[1_ft*lbf])'
 ```
 
 ### Simple Shear
 
 ![Simple Shear](img/SimpleShear.bmp)
 
-To calculate `V` (Shear force at x):
+* To calculate [V_lbf] (Shear force at x) from 6 known variables:
 ```rpl
-'ROOT(ⒺSimpleShear|L=20_ft|a=10_ft|P=674.427_lbf|M=3687.81_ft∗lbf|w=102.783_lbf/ft|x=9_ft;V;1_lbf)'
+L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
+@ Expecting [ V=624.387 lbf ]
+'ROOT(ⒺSimple Shear;[V];[1_lbf])'
 ```
 
 ### Cantilever Deflection
 
 ![Cantilever Deflection](img/CantileverDeflection.bmp)
 
-To calculate `y` (Deflection at x):
+* To calculate [y_in] (Deflection at x) from 9 known variables:
 ```rpl
-'ROOT(ⒺCantileverDeflection|L=10_ft|E=29000000_psi|I=15_in^4|P=500_lbf|M=800_lb*lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;y;0_in)'
+L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
+@ Expecting: [y=-0.331630_in]
+'ROOT(ⒺCantilever Deflection;[y];[0_in])'
 ```
-
 
 ### Cantilever Slope
 
 ![Cantilever Slope](img/CantileverSlope.bmp)
 
-To calculate `θ` (Slope at `x`):
+* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
 ```rpl
-'ROOT(ⒺCantileverSlope|L=10_ft|E=29000000_psi|I=15_in^4|P=500_lbf|M=800_ft∗lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;θ;0_°)'
+L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
+@ Expecting [ θ=-0.26522 01876 49 ° ]
+'ROOT(ⒺCantilever Slope;[θ];[0_°])'
 ```
 
 ### Cantilever Moment
 
 ![Cantilever Moment](img/CantileverMoment.bmp)
 
-To calculate `Mx` (Internal bending moment at x):
+* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
 ```rpl
-'ROOT(ⒺCantileverMoment|L=10_ft|P=500_lbf|M=800_ft∗lbf|a=3_ft|c=6_ft|w=100_lbf/ft|x=8_ft;Mx;1_ft*lbf)'
+L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
+@ Expecting [ Mx=-200. lbf·ft ]
+'ROOT(ⒺCantilever Moment;[Mx];[1_ft*lbf])'
 ```
 
 ### Cantilever Shear
 
 ![Cantilever Shear](img/CantileverShear.bmp)
 
-To calculate `V` (Shear force at x):
+* To calculate [V_lbf] (Shear force at x) from 5 known variables:
 ```rpl
-'ROOT(ⒺCantileverShear|L=10_ft|P=500_lbf|a=3_ft|x=8_ft|w=100_lbf/ft;V;1_lbf)'
+L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
+@ Expecting [ V=200. lbf ]
+'ROOT(ⒺCantilever Shear;[V];[1_lbf])'
 ```
 
 
@@ -208,47 +228,211 @@ The variables in the Electricity section are:
 
 ### Coulomb’s Law & E Field
 
-These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'Q1' or 'Q2' in the expression of the electric force.
+These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'q1' or 'q2' in the expression of the electric force. A finite object carrying a net charge 'q1' can be considered as a point charge if the distance to the position of the point charge 'q2' is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
+
+* **Example 1**. To calculate [F_N;Er_N/C] (Electric force; Electric Field) from 5 known variables:
+
+```rpl
+q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
+@ Expecting [ F=14.38008 28598 N Er=8.98755 17873 8⁳¹⁹ N/C ]
+'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
+```
+
+* **Example 2**. A square metal plate 'L = 8_cm' on a side carries a charge of 'q1 = 6_μC'. Approximate values of the electric force & electric field for a point charge 'q2 = 1_μC' located at 'r = 3_m' can be calculated with Coulomb's law if the separation distance is much greater than the plate dimension 'r >> L'. The whole plate is indeed considered as being a point charge providing that 'r > 10 · L'. Therefore, to calculate [F_N;Er_N/C]:
+
+```rpl
+L=8_cm r=3_m q1=6E-6_C  q2=1E-6_C  r=3_m  εr=1  qtest=1E-6_C
+@ Expecting [ F=0.00599 17011 92 N Er=5 991.70119 159 N/C ]
+if 'r > 10*L' then
+ 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
+end
+```
 
 ### E Field Infinite Line
 
 The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
 
+* To calculate [λ_C/m;Er_N/C] (Linear charge density; Electric Field) from 4 known variables:
+
+```rpl
+Q=5E-6_C  L=3_m  r=0.05_m  εr=1
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
+```
+
 ### E Field Finite Line
 
 The expression of the radial electric field at the distance 'r' depends on the subtended angles 'θ1' and 'θ2' relative to the ends of the wire of finite length 'L'.
 
-![E field finite line](img/E Field Finite Line.bmp)
+![E field finite line](img/EFieldFiniteLine.bmp)
+
+* Example 1. To calculate [λ_C/m;Er_N/C] (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
+
+```rpl
+r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
+Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
+@ Expecting [ λ=1.73206 66666 7⁳⁻⁶ C/m Er=5 991.70119 159 N/C ]
+'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C;])'
+```
+
+* Example 2. To show the infinite line approximation ('r << L') of the previous section we calculate [λ_C/m;Er_N/C] with the angles θ1=ATAN((L/2)/r) and θ2=360°-θ1 (see fig):
+
+```rpl
+θ1='atan(3/2/0.05)' θ2='360_°-θ1'
+Q=5E-6_C  L=3_m  r=0.05_m  εr=1  θ1=88.0876_°  θ2=271.9124_°
+@ Expecting [ λ=1.66759 54889⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
+```
+
+```rpl
+5.991701E3_N/C 'Er' %Ch
+@ Verify relative difference under condition 5_cm << 3_m.
+@ Expecting 3.19751 95082 1⁳⁻⁶
+@ (Was 0.056%)
+```
 
 ### E Field Infinite Plate
 
-The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length and width) of the plate.
+The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length or width 'L') of the plate. On the contrary if 'd >> L', 'Ep' can be approximated if we consider the whole plate as being a point charge with 'q = σ·A' (where 'σ' is the surface charge density), see example 2 of "Coulomb's Law & E Field".
+
+* To calculate [Ep_N/C;σ_C/m^2] (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
+
+```rpl
+L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
+@ Expecting [ σ=9.375⁳⁻⁸ C/cm↑2 Ep=52 941 050.0044 N/C ]
+if 'd < L/10' then
+ 'ROOT(ⒺE Field Infinite Plate;[σ;Ep];[1_C/cm^2;1_N/C])'
+end
+```
 
 ### Ohm’s Law & Power
 
+* To calculate [R_Ω;P_W] (Resistance; Powe) from 2 known variables:
+
+```rpl
+V=24_V  I=16_A
+@ Expecting [ R=1.5 Ω P=384. W ]
+'ROOT(ⒺOhm’s Law & Power;[R;P];[1_Ω;1_W])'
+```
+
 ### Volt Divider
+
+* To calculate [V1_V] (Voltage) from 3 known variables:
+
+```rpl
+R1=40_Ω  R2=10_Ω  V=100_V
+@ Expecting [ V1=80. V ]
+'ROOT(ⒺVolt Divider;[V1];[1_V])'
+```
 
 ### Current Divider
 
+* To calculate [I1_A] (Current) from 3 known variables:
+
+```rpl
+R1=10_Ω  R2=6_Ω  I=15_A
+@ Expecting [ I1=5.625 A ]
+'ROOT(ⒺCurrent Divider;[I1];[1_A])'
+```
+
 ### Wire Resistance
+
+* To calculate [R_Ω] (Resistance) from 3 known variables:
+
+```rpl
+ρ=0.0035_Ω*cm  L=50_cm  A=1_cm^2
+@ Expecting [ R=0.175 Ω ]
+'ROOT(ⒺWire Resistance;[R];[1_Ω])'
+```
 
 ### Resistivity & Conductivity
 
 The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
 
+* To calculate [ρ_(Ω*m);σ_(S/m)] (Resistance) from 4 known variables:
+
+```rpl
+ρ0=1.68E-8_Ω*m  αT=4.04E-3_K^-1  T0=293,15_K  T=373,15_K
+@ Expecting [ ρ=2.22297 6⁳⁻⁸ Ω·m σ=44 984 741.1758 S/m ]
+'ROOT(ⒺResistivity & Conductivity;[ρ;σ];[1_(Ω*m);1_(S/m)])'
+```
+
 ### Series & Parallel R
+
+![Series & Parallel R](img/Missing name.bmp)
+
+* To calculate [Rs_Ω;Rp_Ω] (Resistance) from 2 known variables:
+
+```rpl
+R1=2_Ω  R2=3_Ω
+@ Expecting [ Rs=5. Ω Rp=1.2 Ω ]
+'ROOT(ⒺSeries & Parallel R;[Rs;Rp];[1_Ω;1_Ω])'
+```
 
 ### Series & Parallel C
 
+![Series & Parallel C](img/Missing name.bmp)
+
+* To calculate [Cs_μF;Cp_μF] (Capacitance) from 2 known variables:
+
+```rpl
+C1=2_μF  C2=3_μF
+@ Expecting [ Cs=1.2 μF Cp=5. μF ]
+'ROOT(ⒺSeries & Parallel C;[Cs;Cp];[1_μF;1_μF])'
+```
+
 ### Series & Parallel L
+
+![Series & Parallel L](img/Missing name.bmp)
+
+* To calculate [Ls_mH;Lp_mH] (Inductance) from 2 known variables:
+
+```rpl
+L1=17_mH  L2=16.5_mH
+@ Expecting [ Ls=33.5 mH Lp=8.37313 43283 6 mH ]
+'ROOT(ⒺSeries & Parallel L;[Ls;Lp];[1_mH;1_mH])'
+```
 
 ### Capacitive Energy
 
+* To calculate [V_V;q_μC] (Potential; Charge) from 2 known variables:
+
+```rpl
+E=0.025_J  C=20_μF
+@ Expecting [ V=50. V q=1 000. μC ]
+'ROOT(ⒺCapacitive Energy;[V;q];[1_V;1_μC])'
+```
+
 ### Volumic Density Electric Energy
+
+* To calculate [uE_(J/m^3)] (Volumic Density Electric Energy) from 2 known variables:
+
+```rpl
+E=5_V/m  εr=1
+@ Expecting [ uE=1.10677 34772⁳⁻¹⁰ J/m↑3 ]
+'ROOT(ⒺVolumic Density Electric Energy;[uE];[1_(J/m^3)])'
+```
 
 ### Inductive Energy
 
+* To calculate [I_A] (Current) from 2 known variables:
+
+```rpl
+E=4_J L=15_mH
+@ Expecting [ I=23.09401 07676 A ]
+'ROOT(ⒺInductive Energy;[I];[1_A])'
+```
+
 ### RLC Current Delay
+
+![RLC Current Delay](img/Missing name.bmp)
+
+* To calculate [ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω] (Phases and inpedances) from 4 known variables:
+```rpl
+@ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
+f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
+'ROOT(ⒺRLC Current Delay;[ω;φs;φp;XC;XL];[1_r/s;1_°;1_°;1_Ω;1_Ω])'
+```
 
 ### DC Capacitor Current
 

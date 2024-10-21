@@ -170,11 +170,25 @@ struct user_interface
     void        clear_menu();
     object_p    object_for_key(int key);
     int         evaluating_function_key() const;
-    void        edit(unicode c, modes m, bool autoclose = true);
-    result      edit(utf8 s, size_t len, modes m);
-    result      edit(utf8 s, modes m);
     bool        end_edit();
     void        clear_editor();
+
+    void        insert(unicode c, modes m, bool autoclose = true);
+    result      insert(utf8 s, size_t len, modes m);
+    result      insert(utf8 s, modes m);
+    size_t      insert(size_t offs, utf8 data, size_t len);
+    size_t      insert(size_t offs, unicode c);
+    size_t      insert(size_t offs, byte c) { return insert(offs, &c, 1); }
+    size_t      insert(size_t offs, char c) { return insert(offs, byte(c)); }
+    result      insert_object(object_p obj, modes m);
+    result      insert_object(object_p obj,
+                              cstring bef="", cstring aft="",
+                              bool midcursor = false);
+    result      insert_softkey(int key,
+                               cstring before, cstring after,
+                               bool midcursor);
+    size_t      remove(size_t offset, size_t len);
+
     text_p      editor_save(text_r ed, bool rewinding = false);
     text_p      editor_save(bool rewinding = false);
     void        editor_history(bool back = false);
@@ -190,17 +204,8 @@ struct user_interface
     bool        editor_replace();
     bool        editor_clear();
     bool        editor_selection_flip();
-    size_t      insert(size_t offset, utf8 data, size_t len);
-    size_t      insert(size_t offset, unicode c);
-    size_t      insert(size_t offset, byte c) { return insert(offset, &c, 1); }
-    size_t      insert(size_t offset, char c) { return insert(offset, byte(c)); }
-    size_t      remove(size_t offset, size_t len);
-    result      insert_softkey(int key,
-                               cstring before, cstring after,
-                               bool midcursor);
-    result      insert_object(object_p obj,
-                              cstring bef="", cstring aft="",
-                              bool midcursor = false);
+    size_t      adjust_cursor(size_t offset, size_t len);
+
     void        load_help(utf8 topic, size_t len = 0);
 
 protected:

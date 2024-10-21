@@ -74,7 +74,7 @@ struct algebraic : command
     // Convert to decimal if this is a big value
     static bool to_decimal_if_big(algebraic_g &x)
     {
-        return !x->is_big() || to_decimal(x);
+        return x && (!x->is_big() || to_decimal(x));
     }
 
     // Marking that we are talking about angle units

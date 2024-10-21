@@ -145,6 +145,77 @@ List variables of a specific type
 
 See the [`Type`](#type) command for a list of types.
 
+## Copy
+
+Copy a value into a global variable. This is primarily intended for use in
+algebraic notations, although it also works in RPL. The HP50G Advanced Reference
+Manual refers to this command as _▶ (Store)_.
+
+```
+'(2+5)▶X'
+42 'A' ▶ 1 +
+```
+
+The command returns the stored object on the stack. The returned copy is a
+direct reference to the stored global object and does not consume additional
+memory.
+
+## Assignment
+
+An assignment is an RPL object in the form `Name=Value` that sets a global
+variable to a given value. It is intended primarily to facilitated the
+interactive use of library equations.
+
+An assignment evaluates `Value`, stores it into `Name`, and puts the original
+assignment object on the stack. If the `PushEvaluatedAssignment` setting is
+active, then the assignment object pushed on the stack contains the evaluated
+value. Otherwise (by default) it contains the unevaluated value.
+
+The `Name=Value` syntax is only accepted outside of expressions. In expressions,
+`Name=Value` represents the `=` operator applied to `Name` and `Value`, and is
+used among other things to define equations for the solver. If an assignment
+object appears in an expression, it will render as `Value▶Name` so that parsing
+it would turn it into a `Copy` operation.
+
+
+### Assignments with the solver
+
+Assignments are useful in conjonction with the solver. For example, the
+following example will solve a simple triangle equation for specific values of
+`α` and `β`.
+
+```rpl
+α=20 β=30
+'ROOT(α+β+γ=180;γ;0)' EVAL
+@Expecting γ=130.
+```
+
+```rpl
+β=30 γ=60
+'ROOT(α+β+γ=180;α;0)' EVAL
+@Expecting α=90.
+```
+
+The interactive stack, in combination with the `Eval` or `Edit` buttons, makes
+it possible to return to earlier values. This can also be tried with the
+interactive `SolvingMenu`:
+
+```rpl
+'α+β+γ=180' STEQ RCEQ
+SolvingMenu
+```
+
+
+
+### PushEvaluatedAssignment
+
+When evaluating `A='2+3*5'`, pushes `A=17` on the stack.
+
+### PushOriginalAssignment
+
+When evaluating `A='2+3*5'`, pushes `A='2+3*5'` on the stack.
+
+
 ## ORDER
 Sort variables in a directory
 

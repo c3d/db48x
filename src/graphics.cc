@@ -541,7 +541,7 @@ COMMAND_BODY(Disp)
 
             if (text_p t = todisp->as<text>())
                 txt = t->value(&len);
-            else if (text_p tr = todisp->as_text(false, false))
+            else if (text_p tr = todisp->as_text())
                 txt = tr->value(&len);
 
             pattern bg   = Settings.Background();

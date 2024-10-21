@@ -49,6 +49,7 @@ SOURCES +=                                      \
         ../src/complex.cc                       \
         ../src/conditionals.cc                  \
         ../src/constants.cc                     \
+        ../src/custom.cc                        \
         ../src/datetime.cc                      \
         ../src/decimal.cc                       \
         ../src/dmcp/main.cc                     \

@@ -84,6 +84,7 @@ object::result list::list_parse(id      type,
     size_t   non_alg     = 0;
     size_t   non_alg_len = 0;
     bool     xroot       = false;
+    bool     alist       = precedence && (open == '[' || open == '{');
 
     // Some commands such as IFTE, Sum, Integrate or Root are special in that
     // we need to defer argument evaluation, i.e. keep arguments as expressions
@@ -116,11 +117,14 @@ object::result list::list_parse(id      type,
             s = utf8_next(s);
             break;
         }
-        if (precedence && (cp == '\'' || cp == ')' || cp == ';'))
+        if (precedence && (cp == '\'' || cp == ')' ||
+                           (!alist && (cp == ';' || cp == '}' || cp == ']'))))
             break;
-        if (utf8_whitespace(cp))
+        if (utf8_whitespace(cp) || (cp == ';' && alist))
         {
             s = utf8_next(s);
+            if (cp == ';')
+                precedence = p.precedence;
             continue;
         }
 
@@ -136,11 +140,17 @@ object::result list::list_parse(id      type,
             {
                 // Check if we see parentheses, or if we have `sin sin X`
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
-                if (parenthese  || infix || prefix)
+                if (parenthese || infix || prefix || alist)
                 {
-                    int     childp  = infix      ? int(infix->precedence() + 1)
-                                    : parenthese ? int(LOWEST)
-                                                 : int(SYMBOL);
+                    int childp = infix      ? int(infix->precedence() + 1)
+                               : parenthese ? int(LOWEST)
+                               : alist      ? int(LOWEST)
+                                            : int(SYMBOL);
+                    if (infix && infix->type() == ID_Copy)
+                    {
+                        childp = int(SYMBOL);
+                        special = ID_Copy;
+                    }
 
                     if (infix && cp == '(' && infix->type() == ID_Where)
                     {
@@ -157,7 +167,7 @@ object::result list::list_parse(id      type,
                     parser  child(p, s, childp);
                     unicode iopen  = parenthese ? '(' : 0;
                     unicode iclose = parenthese ? ')' : 0;
-                    id      ctype  = type == ID_unit ? ID_expression : type;
+                    id ctype = alist || type == ID_unit ? ID_expression : type;
 
                     if (!infix && arity > 1)
                     {
@@ -292,7 +302,7 @@ object::result list::list_parse(id      type,
                 id type = obj->type();
                 if (function::has_symbolic_arguments(type))
                     special = type;
-                if (!is_algebraic(type) && !special)
+                if (!is_extended_algebraic(type) && !special)
                 {
                     if (objcount)
                     {
@@ -369,13 +379,13 @@ object::result list::list_parse(id      type,
 
                 size_t objsize = obj->size();
 
-                // For equations, copy only the payload
-                bool keepsym = special &&
-                    function::is_symbolic_argument(special, arity-arg);
-
-                if (precedence && !keepsym)
-                    if (expression_p eq = obj->as<expression>())
-                        obj = eq->objects(&objsize);
+                // For expressions, copy only the payload unless we want it
+                // to be preserved as a symbolic expression
+                if (precedence && !alist)
+                    if (!special ||
+                        !function::is_symbolic_argument(special, arity-arg))
+                        if (expression_p eq = obj->as<expression>())
+                            obj = eq->objects(&objsize);
 
                 if (!rt.append(obj, objsize))
                     return ERROR;
@@ -496,46 +506,50 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
     list_g list        = this;
     id     lty         = type();
     bool   need_indent = lty == ID_program;
+    bool   expr        = r.expression();
     settings::SaveShowEquationBody sseb(false);
 
-    for (object_p obj : *list)
+    if (!expr)
     {
-        id oty = obj->type();
-        switch (oty)
+        for (object_p obj : *list)
         {
-        case ID_array:
-            if (first && lty == oty)
-                unnest = true;
-            // fallthrough
-        case ID_list:
-        case ID_program:
-        case ID_locals:
-        case ID_comment:
-        case ID_IfThen:
-        case ID_IfThenElse:
-        case ID_DoUntil:
-        case ID_WhileRepeat:
-        case ID_StartStep:
-        case ID_ForNext:
-        case ID_ForStep:
-        case ID_IfErrThen:
-        case ID_IfErrThenElse:
-            need_indent = true;
-            break;
-        default:
-            break;
+            id oty = obj->type();
+            switch (oty)
+            {
+            case ID_array:
+                if (first && lty == oty)
+                    unnest = true;
+                // fallthrough
+            case ID_list:
+            case ID_program:
+            case ID_locals:
+            case ID_comment:
+            case ID_IfThen:
+            case ID_IfThenElse:
+            case ID_DoUntil:
+            case ID_WhileRepeat:
+            case ID_StartStep:
+            case ID_ForNext:
+            case ID_ForStep:
+            case ID_IfErrThen:
+            case ID_IfErrThenElse:
+                need_indent = true;
+                break;
+            default:
+                break;
+            }
+            if (need_indent)
+                break;
+            first = false;
         }
-        if (need_indent)
-            break;
-        first = false;
     }
 
     // Write the header, e.g. "{ "
-    bool crpgm = need_indent && !unnest;
+    bool crpgm = need_indent && !unnest && !expr;
     if (open)
     {
         r.put(open);
-        if (!unnest)
+        if (!unnest && !expr)
         {
             r.indent();
             r.wantSpace();
@@ -555,17 +569,19 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
             if (unnest && open == 1)
                 r.put("   ");
         }
+        if (open == 1 && expr)
+            r.put(';');
         open = 1;
 
         // Render the object in what remains (may GC)
-        if (oty != ID_array)
+        if (oty != ID_array && !expr)
             r.wantSpace();
         if ((lty == ID_program || lty == ID_block) &&
             r.editing() &&
             Settings.VerticalProgramRendering())
             r.wantCR();
         obj->render(r);
-        if (!unnest && oty != ID_array)
+        if (!unnest && oty != ID_array && !expr)
             r.wantSpace();
     }
 
@@ -575,13 +591,13 @@ intptr_t list::list_render(renderer &r, unicode open, unicode close) const
         if (!unnest)
         {
             r.unindent();
-            if (lty != ID_array)
+            if (lty != ID_array && !expr)
                 r.wantSpace();
         }
         if (crpgm)
             r.wantCR();
         r.put(close);
-        if (!unnest && lty != ID_array)
+        if (!unnest && lty != ID_array && !expr)
             r.wantSpace();
     }
     if (crpgm)
