@@ -1096,6 +1096,13 @@
 		6FB5A8812B97F50E00C8357F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FB5A8802B97F50E00C8357F /* AVFoundation.framework */; };
 		6FB5A8842B98035600C8357F /* KeyboardView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6FB5A8832B98035600C8357F /* KeyboardView.m */; };
 		6FBC10382BC0482F00C8357F /* ScreenView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6FBC10372BC0482F00C8357F /* ScreenView.mm */; };
+		6FC83CA62CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CA72CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CA82CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CA92CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CAA2CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CAB2CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
+		6FC83CAC2CC63BDE00C8357F /* custom.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FC83CA52CC63BDE00C8357F /* custom.cc */; };
 		6FCED4962B95E4C000C8357F /* recorder.c in Sources */ = {isa = PBXBuildFile; fileRef = 6FCECF432B95E4BE00C8357F /* recorder.c */; };
 		6FCED49D2B95E4C000C8357F /* recorder_ring.c in Sources */ = {isa = PBXBuildFile; fileRef = 6FCECF4B2B95E4BE00C8357F /* recorder_ring.c */; };
 		6FCEDA562B95E60700C8357F /* keyboard-dm42.png in Resources */ = {isa = PBXBuildFile; fileRef = 6FCEDA542B95E60700C8357F /* keyboard-dm42.png */; };
@@ -2516,6 +2523,8 @@
 		6FB5A8822B98035600C8357F /* KeyboardView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeyboardView.h; sourceTree = "<group>"; };
 		6FB5A8832B98035600C8357F /* KeyboardView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KeyboardView.m; sourceTree = "<group>"; };
 		6FBC10372BC0482F00C8357F /* ScreenView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenView.mm; sourceTree = "<group>"; };
+		6FC83CA42CC63BDE00C8357F /* custom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = custom.h; path = "/Users/ddd/Work/calc/db48x-ios/src/custom.h"; sourceTree = "<absolute>"; };
+		6FC83CA52CC63BDE00C8357F /* custom.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = custom.cc; path = "/Users/ddd/Work/calc/db48x-ios/src/custom.cc"; sourceTree = "<absolute>"; };
 		6FCECF432B95E4BE00C8357F /* recorder.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = recorder.c; sourceTree = "<group>"; };
 		6FCECF462B95E4BE00C8357F /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		6FCECF4B2B95E4BE00C8357F /* recorder_ring.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = recorder_ring.c; sourceTree = "<group>"; };
@@ -3403,6 +3412,8 @@
 				6FE7750B2B97966E00C8357F /* config */,
 				6FE7F01D2B95E37300C8357F /* constants.cc */,
 				6FE7EFEB2B95E37200C8357F /* constants.h */,
+				6FC83CA42CC63BDE00C8357F /* custom.h */,
+				6FC83CA52CC63BDE00C8357F /* custom.cc */,
 				6FE7F0392B95E37400C8357F /* datetime.cc */,
 				6FE7F0522B95E37400C8357F /* datetime.h */,
 				6FE7F0362B95E37400C8357F /* decimal-e.h */,
@@ -4047,6 +4058,7 @@
 				6FE7F07C2B95E37400C8357F /* grob.cc in Sources */,
 				6FE7F0612B95E37400C8357F /* loops.cc in Sources */,
 				6FE7F05D2B95E37400C8357F /* functions.cc in Sources */,
+				6FC83CA82CC63BDE00C8357F /* custom.cc in Sources */,
 				6F75CED72BA1B23800C8357F /* HelpViewController.m in Sources */,
 				6FE7F05F2B95E37400C8357F /* array.cc in Sources */,
 				6FE7753D2B979AFF00C8357F /* HighlightMarkerView.m in Sources */,
@@ -4140,6 +4152,7 @@
 				6F0FDBAD2C7934DF00C8357F /* grob.cc in Sources */,
 				6F0FDBAE2C7934DF00C8357F /* loops.cc in Sources */,
 				6F0FDBAF2C7934DF00C8357F /* functions.cc in Sources */,
+				6FC83CA72CC63BDE00C8357F /* custom.cc in Sources */,
 				6F0FDBB02C7934DF00C8357F /* HelpViewController.m in Sources */,
 				6F0FDBB12C7934DF00C8357F /* array.cc in Sources */,
 				6F0FDBB22C7934DF00C8357F /* HighlightMarkerView.m in Sources */,
@@ -4217,6 +4230,7 @@
 				6F0FDC792C7934E300C8357F /* grob.cc in Sources */,
 				6F0FDC7A2C7934E300C8357F /* loops.cc in Sources */,
 				6F0FDC7B2C7934E300C8357F /* functions.cc in Sources */,
+				6FC83CAB2CC63BDE00C8357F /* custom.cc in Sources */,
 				6F0FDC7C2C7934E300C8357F /* HelpViewController.m in Sources */,
 				6F0FDC7D2C7934E300C8357F /* array.cc in Sources */,
 				6F0FDC7E2C7934E300C8357F /* HighlightMarkerView.m in Sources */,
@@ -4294,6 +4308,7 @@
 				6F0FDD3A2C7934E500C8357F /* grob.cc in Sources */,
 				6F0FDD3B2C7934E500C8357F /* loops.cc in Sources */,
 				6F0FDD3C2C7934E500C8357F /* functions.cc in Sources */,
+				6FC83CA62CC63BDE00C8357F /* custom.cc in Sources */,
 				6F0FDD3D2C7934E500C8357F /* HelpViewController.m in Sources */,
 				6F0FDD3E2C7934E500C8357F /* array.cc in Sources */,
 				6F0FDD3F2C7934E500C8357F /* HighlightMarkerView.m in Sources */,
@@ -4371,6 +4386,7 @@
 				6F2AC4452C64105F00C8357F /* grob.cc in Sources */,
 				6F2AC4462C64105F00C8357F /* loops.cc in Sources */,
 				6F2AC4472C64105F00C8357F /* functions.cc in Sources */,
+				6FC83CAA2CC63BDE00C8357F /* custom.cc in Sources */,
 				6F2AC4482C64105F00C8357F /* HelpViewController.m in Sources */,
 				6F2AC4492C64105F00C8357F /* array.cc in Sources */,
 				6F2AC44A2C64105F00C8357F /* HighlightMarkerView.m in Sources */,
@@ -4448,6 +4464,7 @@
 				6F2AC51F2C6410F700C8357F /* grob.cc in Sources */,
 				6F2AC5202C6410F700C8357F /* loops.cc in Sources */,
 				6F2AC5212C6410F700C8357F /* functions.cc in Sources */,
+				6FC83CA92CC63BDE00C8357F /* custom.cc in Sources */,
 				6F2AC5222C6410F700C8357F /* HelpViewController.m in Sources */,
 				6F2AC5232C6410F700C8357F /* array.cc in Sources */,
 				6F2AC5242C6410F700C8357F /* HighlightMarkerView.m in Sources */,
@@ -4525,6 +4542,7 @@
 				6FE399902C793FE300C8357F /* grob.cc in Sources */,
 				6FE399912C793FE300C8357F /* loops.cc in Sources */,
 				6FE399922C793FE300C8357F /* functions.cc in Sources */,
+				6FC83CAC2CC63BDE00C8357F /* custom.cc in Sources */,
 				6FE399932C793FE300C8357F /* HelpViewController.m in Sources */,
 				6FE399942C793FE300C8357F /* array.cc in Sources */,
 				6FE399952C793FE300C8357F /* HighlightMarkerView.m in Sources */,
