@@ -97,7 +97,8 @@ user_interface::user_interface()
       xoffset(0),
       mode(STACK),
       last(0),
-      stack(LCD_H),
+      stackTop(0),
+      stackBottom(LCD_H),
       cx(0),
       cy(0),
       edRows(0),
@@ -1343,6 +1344,7 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
     force = forceRedraw;
     nextRefresh = refresh;
     graphics = false;
+    stackTop = Settings.header_font()->height() + 1;
 }
 
 
@@ -1724,10 +1726,11 @@ bool user_interface::draw_header()
 
     if (changed)
     {
-        const coord hdr_right = header_width - 1;
-        const coord hdr_bottom = HeaderFont->height() + 1;
-        rect clip = Screen.clip();
-        rect header = rect(0, 0, hdr_right, hdr_bottom);
+        const coord  hdr_right  = header_width - 1;
+        const coord  hdr_bottom = stackTop;
+        const font_p hdr_font   = Settings.header_font();
+        rect         clip       = Screen.clip();
+        rect         header     = rect(0, 0, hdr_right, hdr_bottom);
         Screen.clip(header);
         Screen.fill(header, pattern(Settings.HeaderBackground()));
 
@@ -1761,7 +1764,7 @@ bool user_interface::draw_header()
             case 3: r.printf("%s%c%s%c%d ", ytext, sep, mname, sep, day); break;
             }
             pattern datecol = Settings.DateForeground();
-            x = Screen.text(x, 0, r.text(), r.size(), HeaderFont, datecol);
+            x = Screen.text(x, 0, r.text(), r.size(), hdr_font, datecol);
         }
         if (Settings.ShowTime())
         {
@@ -1774,14 +1777,14 @@ bool user_interface::draw_header()
                 r.printf("%c", hour < 12 ? 'A' : 'P');
             r.printf(" ");
             pattern timecol = Settings.TimeForeground();
-            x = Screen.text(x, 0, r.text(), r.size(), HeaderFont, timecol);
+            x = Screen.text(x, 0, r.text(), r.size(), hdr_font, timecol);
         }
 
         renderer r;
         r.printf("%s", state_name());
 
         pattern namecol = Settings.StateNameForeground();
-        x = Screen.text(x, 0, r.text(), r.size(), HeaderFont, namecol);
+        x = Screen.text(x, 0, r.text(), r.size(), hdr_font, namecol);
         Screen.clip(clip);
         draw_dirty(header);
 
@@ -1810,7 +1813,7 @@ bool user_interface::draw_battery()
     static uint last       = 0;
     uint        time       = sys_current_ms();
 
-    size        h          = HeaderFont->height() + 1;
+    size        h          = stackTop;
     coord       ann_y      = (h - 1 - ann_height) / 2;
 
     // Print battery voltage
@@ -1836,16 +1839,17 @@ bool user_interface::draw_battery()
     }
 
     // Experimentally, battery voltage below 2.6V cause calculator flakiness
-    const int vmax = BATTERY_VMAX;
-    const int vmin = BATTERY_VMIN;
-    const int vhalf = (BATTERY_VMAX + BATTERY_VMIN) / 2;
+    const int vmax     = BATTERY_VMAX;
+    const int vmin     = BATTERY_VMIN;
+    const int vhalf    = (BATTERY_VMAX + BATTERY_VMIN) / 2;
 
-    pattern   vpat  = usb          ? Settings.ChargingForeground()
-                    : low          ? Settings.LowBatteryForeground()
-                    : vdd <= vhalf ? Settings.HalfBatteryForeground()
-                                   : Settings.BatteryLevelForeground();
-    pattern   bg    = Settings.HeaderBackground();
-    coord     x     = LCD_W - 1;
+    pattern   vpat     = usb          ? Settings.ChargingForeground()
+                       : low          ? Settings.LowBatteryForeground()
+                       : vdd <= vhalf ? Settings.HalfBatteryForeground()
+                                      : Settings.BatteryLevelForeground();
+    pattern   bg       = Settings.HeaderBackground();
+    coord     x        = LCD_W - 1;
+    font_p    hdr_font = Settings.header_font();
 
     if (Settings.ShowVoltage())
     {
@@ -1854,12 +1858,12 @@ bool user_interface::draw_battery()
         pattern vcol = Settings.VoltageForeground();
         if (vcol.bits == Settings.HeaderBackground())
             vcol = vpat;
-        size w = HeaderFont->width(utf8(buffer));
+        size w = hdr_font->width(utf8(buffer));
         x -= w;
 
         rect bgr(x-4, 0, LCD_W-1, h);
         Screen.fill(bgr, bg);
-        Screen.text(x, 0, utf8(buffer), HeaderFont, vcol);
+        Screen.text(x, 0, utf8(buffer), hdr_font, vcol);
 
         x -= 4;
     }
@@ -1956,11 +1960,12 @@ bool user_interface::draw_annunciators()
     if (!adraw && !sdraw)
         return false;
 
-    pattern bg      = Settings.HeaderBackground();
-    size    h       = HeaderFont->height() + 1;
-    size    alpha_w = alpha_width;
-    coord   alpha_x = battery_left - alpha_w;
-    coord   ann_x   = alpha_x - ann_width;
+    pattern bg       = Settings.HeaderBackground();
+    size    h        = stackTop;
+    size    alpha_w  = alpha_width;
+    coord   alpha_x  = battery_left - alpha_w;
+    coord   ann_x    = alpha_x - ann_width;
+    font_p  hdr_font = Settings.header_font();
 
     if (!adraw && busy_right > alpha_x)
         adraw = true;
@@ -1979,7 +1984,7 @@ bool user_interface::draw_annunciators()
             pattern apat = lowercase
                 ? Settings.LowerAlphaForeground()
                 : Settings.AlphaForeground();
-            Screen.text(alpha_x + 1, 0, label, HeaderFont, apat);
+            Screen.text(alpha_x + 1, 0, label, hdr_font, apat);
         }
         alpha_drawn = alpha;
         lowerc_drawn = lowercase;
@@ -2026,7 +2031,7 @@ rect user_interface::draw_busy_background()
     if (freezeHeader)
         return false;
 
-    size h  = HeaderFont->height() + 1;
+    size h  = stackTop;
     pattern bg = Settings.HeaderBackground();
     rect busy(busy_left, 0, busy_right, h);
     Screen.fill(busy, bg);
@@ -2054,12 +2059,13 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
     rect busy = draw_busy_background();
     if (glyph)
     {
-        rect clip = Screen.clip();
+        font_p hdr_font = Settings.header_font();
+        rect   clip        = Screen.clip();
         Screen.clip(busy);
-        size  w = HeaderFont->width('M');
+        size  w = hdr_font->width('M');
         coord x = busy.x1 + sys_current_ms() / 16 % (busy.width() - w);
         coord y = busy.y1;
-        Screen.glyph(x, y, glyph, HeaderFont, color);
+        Screen.glyph(x, y, glyph, hdr_font, color);
         Screen.clip(clip);
     }
     draw_dirty(busy);
@@ -2116,9 +2122,9 @@ bool user_interface::draw_editor()
     {
         // Editor is not open, compute stack bottom
         int ns = LCD_H - menuHeight;
-        if (stack != ns)
+        if (stackBottom != ns)
         {
-            stack = ns;
+            stackBottom = ns;
             dirtyStack = true;
         }
         return false;
@@ -2265,7 +2271,7 @@ reposition:
     int   bottom          = LCD_H-1 - menuHeight;
     int   top             = (Stack.interactive
                              ? bottom - lineHeight - 1
-                             : HeaderFont->height() + errorHeight + 2);
+                             : stackTop + errorHeight + 1);
     int   availableHeight = (bottom - top);
     int   fullRows        = availableHeight / lineHeight;
     int   clippedRows     = (availableHeight + lineHeight - 1) / lineHeight;
@@ -2317,12 +2323,12 @@ reposition:
 
     if (y < top)
         y = top;
-    if (stack != y - 1)
+    if (stackBottom != y - 1)
     {
-        stack      = y - 1;
-        dirtyStack = true;
+        stackBottom = y - 1;
+        dirtyStack  = true;
     }
-    rect edbck(0, stack, LCD_W, bottom);
+    rect edbck(0, stackBottom, LCD_W, bottom);
     Screen.fill(edbck, Settings.EditorBackground());
     draw_dirty(edbck);
 
@@ -2428,7 +2434,7 @@ bool user_interface::draw_cursor(int show, uint ncursor)
     coord   x          = cx;
     utf8    p          = ed + cursor;
     rect    clip       = Screen.clip();
-    coord   ytop       = HeaderFont->height() + 2;
+    coord   ytop       = stackTop + 1;
     coord   ybot       = LCD_H - menuHeight;
 
     Screen.clip(0, ytop, LCD_W, ybot);
@@ -2506,7 +2512,7 @@ bool user_interface::draw_command()
             size   w    = font->width(command);
             size   h    = font->height();
             coord  x    = 25;
-            coord  y    = HeaderFont->height() + 6;
+            coord  y    = stackTop + 5;
 
             pattern bg = Settings.CommandBackground();
             pattern fg = Settings.CommandForeground();
@@ -2533,7 +2539,7 @@ void user_interface::draw_user_command(utf8 cmd, size_t len)
     size   w    = font->width(cmd, len);
     size   h    = font->height();
     coord  x    = 25;
-    coord  y    = HeaderFont->height() + 6;
+    coord  y    = stackTop + 5;
 
     // Erase normal command
     if (command)
@@ -2587,7 +2593,7 @@ bool user_interface::draw_error()
     if (utf8 err = rt.error())
     {
         const int border = 4;
-        coord     top    = HeaderFont->height() + 10;
+        coord     top    = stackTop + 9;
         coord     height = LCD_H / 3;
         coord     width  = LCD_W - 8;
         coord     x      = LCD_W / 2 - width / 2;
@@ -2638,7 +2644,7 @@ bool user_interface::draw_message(utf8 header, uint count, utf8 msgs[])
     font_p font   = LibMonoFont10x17;
     size   h      = font->height();
     size   ch     = h * 5 / 2 + h * count + 10;
-    coord  top    = HeaderFont->height() + 10;
+    coord  top    = stackTop + 9;
     size   height = ch < LCD_H / 3 ? LCD_H / 3 : ch;
     size   width  = LCD_W - 8;
     coord  x      = LCD_W / 2 - width / 2;
@@ -2693,11 +2699,11 @@ bool user_interface::draw_stack()
     if ((!force && !dirtyStack) || freezeStack)
         return false;
     draw_busy();
-    uint top = HeaderFont->height() + 2;
+    uint top = stackTop + 1;
     uint bottom = Stack.draw_stack();
     if (object_p transient = transient_object())
         draw_object(transient, top, bottom);
-    draw_dirty(0, top, stack, LCD_H-1);
+    draw_dirty(0, top, stackBottom, LCD_H-1);
     draw_idle();
     dirtyStack = false;
     dirtyCommand = true;
@@ -3027,7 +3033,7 @@ restart:
 
 
     // Compute the size for the help display
-    coord      ytop   = HeaderFont->height() + 2;
+    coord      ytop   = stackTop + 1;
     coord      ybot   = LCD_H - (MenuFont->height() + 5);
     coord      xleft  = 0;
     coord      xright = LCD_W - 1;

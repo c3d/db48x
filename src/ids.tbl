@@ -428,7 +428,8 @@ NAMED(det, "Determinant")
 // ============================================================================
 
 CMD(PlotParameters)     ALIAS(PlotParameters, "PPar")
-CMD(Equation)           ALIAS(Equation, "eq")
+CMD(Equation)           ALIAS(Equation, "Eq")
+CMD(Header)             ALIAS(Header, "Hdr")
 
 NAMED(DispXY,           "DrawStyledText")
 NAMED(PixOn,            "DrawPixel")
@@ -951,6 +952,7 @@ SETTING_BITS(EditorFont,          settings::font_id, 4,   settings::FIRST_FONT, 
 SETTING_BITS(MultilineEditorFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::STACK)
 SETTING_BITS(CursorFont,          settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::HELP)
 SETTING_BITS(MultilineCursorFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::HELP)
+SETTING_BITS(HeaderFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::LIB17)
 
 SETTING_ENUM(NumberSpaces,      nullptr,        NumberSeparatorCommand)
 SETTING_ENUM(NumberDotOrComma,  nullptr,        NumberSeparatorCommand)

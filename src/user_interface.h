@@ -151,7 +151,8 @@ struct user_interface
     bool        transient_object(object_p obj);
 
     modes       editing_mode()          { return mode; }
-    int         stack_screen_bottom()   { return stack; }
+    int         stack_screen_top()      { return stackTop; }
+    int         stack_screen_bottom()   { return stackBottom; }
     int         menu_screen_bottom()    { return menuHeight; }
     bool        showing_help()          { return help + 1 != 0; }
     bool        showing_graphics()      { return graphics; }
@@ -240,7 +241,8 @@ protected:
     coord    xoffset;           // Offset of the cursor
     modes    mode;              // Current editing mode
     int      last;              // Last key
-    int      stack;             // Vertical bottom of the stack
+    int      stackTop;          // Vertical top of the stack (bottom of header)
+    int      stackBottom;       // Vertical bottom of the stack
     coord    cx, cy;            // Cursor position on screen
     uint     edRows;            // Editor rows
     int      edRow;             // Current editor row

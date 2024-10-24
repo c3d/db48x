@@ -84,13 +84,12 @@ uint stack::draw_stack()
         return draw_stack();
     }
 
-    font_p font       = Settings.result_font();
-    font_p hdrfont    = HeaderFont;
+    font_p font = interactive ? Settings.stack_font() : Settings.result_font();
     font_p idxfont    = HelpFont;
     size   lineHeight = font->height();
     size   idxHeight  = idxfont->height();
     size   idxOffset  = (lineHeight - idxHeight) / 2 - 2;
-    coord  top        = hdrfont->height() + 2;
+    coord  top        = ui.stack_screen_top() + 1;
     coord  bottom     = ui.stack_screen_bottom();
     uint   depth      = rt.depth();
     uint   digits     = countDigits(depth);
@@ -109,11 +108,11 @@ uint stack::draw_stack()
 
     if (interactive)
     {
-        uint height = rt.editing() ? 3 : 4;
+        uint irows = (bottom - top) / font->height();
         if (interactive < interactive_base + 1)
             interactive_base = interactive - 1;
-        else if (interactive > interactive_base + height)
-            interactive_base = interactive - height;
+        else if (interactive > interactive_base + irows)
+            interactive_base = interactive - irows;
     }
     else
     {
@@ -135,7 +134,8 @@ uint stack::draw_stack()
         grob_g   graph = nullptr;
         object_g obj   = rt.stack(level);
         size     w = 0;
-        if (!interactive && (level ? Settings.GraphicStackDisplay()
+        if (!interactive && (level
+                             ? Settings.GraphicStackDisplay()
                              : Settings.GraphicResultDisplay()))
         {
             auto    fid = !level ? Settings.ResultFont() : Settings.StackFont();
@@ -180,6 +180,7 @@ uint stack::draw_stack()
         y -= lineHeight;
         coord ytop = y < top ? top : y;
         coord yb   = y + lineHeight-1;
+        fprintf(stderr, "%d: %d in %d - %d [%d]\n", level+1, y, ytop, yb, top);
         Screen.clip(0, ytop, LCD_W, yb);
 
         pattern fg = level == 0 ? Settings.ResultForeground()
@@ -281,7 +282,7 @@ uint stack::draw_stack()
                     Screen.clip(split, ytop, split + skip, yb);
                     Screen.glyph(split + skip/8, y - offs, sep, font,
                                  pattern::gray50);
-                    Screen.clip(split+skip, y, LCD_W, yb);
+                    Screen.clip(split+skip, ytop, LCD_W, yb);
                     Screen.text(LCD_W - 2 - w, y, out, len, font, fg);
                 }
             }

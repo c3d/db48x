@@ -183,6 +183,7 @@ public:
     font_p stack_font()         { return font(StackFont()); }
     font_p editor_font(bool ml) { return font(ml ? MultilineEditorFont() : EditorFont()); }
     font_p cursor_font(bool ml) { return cursor_font(ml ? MultilineCursorFont() : CursorFont()); }
+    font_p header_font()        { return font(HeaderFont()); }
 
     static unicode digit_separator(uint index);
 

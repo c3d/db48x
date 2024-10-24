@@ -173,8 +173,6 @@ inline font::fuint font::height() const
 extern font_p EditorFont;
 extern font_p StackFont;
 extern font_p ReducedFont;
-extern font_p HeaderFont;
-extern font_p CursorFont;
 extern font_p ErrorFont;
 extern font_p MenuFont;
 extern font_p HelpFont;

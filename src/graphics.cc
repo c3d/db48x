@@ -1143,6 +1143,20 @@ COMMAND_BODY(Freeze)
 }
 
 
+COMMAND_BODY(Header)
+// ----------------------------------------------------------------------------
+//   Set the current header
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (object_p name = static_object(ID_Header))
+            if (directory::store_here(name, obj))
+                if (rt.drop())
+                    return OK;
+    return ERROR;
+}
+
+
 
 // ============================================================================
 //
