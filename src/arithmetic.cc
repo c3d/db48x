@@ -118,42 +118,6 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
 //   - Text + object: Concatenation of text + object text
 //   - Object + text: Concatenation of object text + text
 {
-    // Check addition of unit objects
-    if (unit_g xu = unit::get(x))
-    {
-        if (!unit::nodates)
-        {
-            if (algebraic_p daf = days_after(x, y, false))
-                return daf;
-            if (algebraic_p daf = days_after(y, x, false))
-                return daf;
-        }
-
-        if (unit_g yu = unit::get(y))
-        {
-            if (yu->convert(xu))
-            {
-                algebraic_g xv = xu->value();
-                algebraic_g yv = yu->value();
-                algebraic_g ye = yu->uexpr();
-                xv = xv + yv;
-                return unit::simple(xv, ye);
-            }
-            return nullptr;
-        }
-        rt.inconsistent_units_error();
-        return nullptr;
-    }
-    else if (y->type() == ID_unit)
-    {
-        if (!unit::nodates)
-            if (algebraic_p daf = days_after(y, x, false))
-                return daf;
-
-        rt.inconsistent_units_error();
-        return nullptr;
-    }
-
     // Deal with basic auto-simplifications rules
     if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
     {
@@ -205,6 +169,42 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
     else if (array_g ya = y->as<array>())
     {
         return ya->map(x, add::evaluate);
+    }
+
+    // Check addition of unit objects
+    if (unit_g xu = unit::get(x))
+    {
+        if (!unit::nodates)
+        {
+            if (algebraic_p daf = days_after(x, y, false))
+                return daf;
+            if (algebraic_p daf = days_after(y, x, false))
+                return daf;
+        }
+
+        if (unit_g yu = unit::get(y))
+        {
+            if (yu->convert(xu))
+            {
+                algebraic_g xv = xu->value();
+                algebraic_g yv = yu->value();
+                algebraic_g ye = yu->uexpr();
+                xv = xv + yv;
+                return unit::simple(xv, ye);
+            }
+            return nullptr;
+        }
+        rt.inconsistent_units_error();
+        return nullptr;
+    }
+    else if (y->type() == ID_unit)
+    {
+        if (!unit::nodates)
+            if (algebraic_p daf = days_after(y, x, false))
+                return daf;
+
+        rt.inconsistent_units_error();
+        return nullptr;
     }
 
     // Not yet implemented
@@ -290,6 +290,29 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   This deals with vector and matrix operations
 {
+    // Deal with basic auto-simplifications rules
+    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
+    {
+        if (y->is_zero(false))                  // X - 0 = X
+            return x;
+        if (x->is_same_as(y))                   // X - X = 0
+            return integer::make(0);
+        if (x->is_zero(false) && y->is_symbolic())
+            return neg::run(y);                 // 0 - X = -X
+    }
+
+    // vector + vector or matrix + matrix
+    if (array_g xa = x->as<array>())
+    {
+        if (array_g ya = y->as<array>())
+            return xa - ya;
+        return xa->map(sub::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, sub::evaluate);
+    }
+
     // Check subtraction of unit objects
     if (unit_g xu = unit::get(x))
     {
@@ -318,29 +341,6 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
     {
         rt.inconsistent_units_error();
         return nullptr;
-    }
-
-    // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
-    {
-        if (y->is_zero(false))                  // X - 0 = X
-            return x;
-        if (x->is_same_as(y))                   // X - X = 0
-            return integer::make(0);
-        if (x->is_zero(false) && y->is_symbolic())
-            return neg::run(y);                 // 0 - X = -X
-    }
-
-    // vector + vector or matrix + matrix
-    if (array_g xa = x->as<array>())
-    {
-        if (array_g ya = y->as<array>())
-            return xa - ya;
-        return xa->map(sub::evaluate, y);
-    }
-    else if (array_g ya = y->as<array>())
-    {
-        return ya->map(x, sub::evaluate);
     }
 
     // Not yet implemented
@@ -427,39 +427,6 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
 //   - Text * integer: Repeat the text
 //   - Integer * text: Repeat the text
 {
-    // Check multiplication of unit objects
-    if (unit_p xu = unit::get(x))
-    {
-        algebraic_g xv = xu->value();
-        algebraic_g xe = xu->uexpr();
-        if (unit_p yu = unit::get(y))
-        {
-            algebraic_g yv = yu->value();
-            algebraic_g ye = yu->uexpr();
-            xv = xv * yv;
-            {
-                save<bool> umode(unit::mode, true);
-                xe = xe * ye;
-            }
-            return unit::simple(xv, xe);
-        }
-        else if (!y->is_symbolic() || xv->is_one())
-        {
-            xv = xv * y;
-            return unit::simple(xv, xe);
-        }
-    }
-    else if (unit_p yu = unit::get(y))
-    {
-        algebraic_g yv = yu->value();
-        if (!x->is_symbolic() || yv->is_one())
-        {
-            algebraic_g ye = yu->uexpr();
-            yv = x * yv;
-            return unit::simple(yv, ye);
-        }
-    }
-
     // Deal with basic auto-simplifications rules
     if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
     {
@@ -504,6 +471,39 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
     else if (array_g ya = y->as<array>())
     {
         return ya->map(x, mul::evaluate);
+    }
+
+    // Check multiplication of unit objects
+    if (unit_p xu = unit::get(x))
+    {
+        algebraic_g xv = xu->value();
+        algebraic_g xe = xu->uexpr();
+        if (unit_p yu = unit::get(y))
+        {
+            algebraic_g yv = yu->value();
+            algebraic_g ye = yu->uexpr();
+            xv = xv * yv;
+            {
+                save<bool> umode(unit::mode, true);
+                xe = xe * ye;
+            }
+            return unit::simple(xv, xe);
+        }
+        else if (!y->is_symbolic() || xv->is_one())
+        {
+            xv = xv * y;
+            return unit::simple(xv, xe);
+        }
+    }
+    else if (unit_p yu = unit::get(y))
+    {
+        algebraic_g yv = yu->value();
+        if (!x->is_symbolic() || yv->is_one())
+        {
+            algebraic_g ye = yu->uexpr();
+            yv = x * yv;
+            return unit::simple(yv, ye);
+        }
     }
 
     // Not yet implemented
@@ -578,42 +578,6 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   This deals with vector and matrix operations
 {
-    // Check division of unit objects
-    if (unit_p xu = unit::get(x))
-    {
-        algebraic_g xv = xu->value();
-        algebraic_g xe = xu->uexpr();
-        if (unit_p yu = unit::get(y))
-        {
-            algebraic_g yv = yu->value();
-            algebraic_g ye = yu->uexpr();
-            xv = xv / yv;
-            {
-                save<bool> umode(unit::mode, true);
-                xe = xe / ye;
-            }
-            return unit::simple(xv, xe);
-        }
-        else if (!y->is_symbolic())
-        {
-            xv = xv / y;
-            return unit::simple(xv, xe);
-        }
-    }
-    else if (unit_p yu = unit::get(y))
-    {
-        if (!x->is_symbolic())
-        {
-            algebraic_g yv = yu->value();
-            algebraic_g ye = yu->uexpr();
-            yv = x / yv;
-            save<bool> umode(unit::mode, true);
-            save<bool> ufact(unit::factoring, true);
-            ye = inv::run(ye);
-            return unit::simple(yv, ye);
-        }
-    }
-
     // Check divide by zero
     if (y->is_zero(false))
     {
@@ -650,6 +614,42 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
     else if (array_g ya = y->as<array>())
     {
         return ya->map(x, div::evaluate);
+    }
+
+    // Check division of unit objects
+    if (unit_p xu = unit::get(x))
+    {
+        algebraic_g xv = xu->value();
+        algebraic_g xe = xu->uexpr();
+        if (unit_p yu = unit::get(y))
+        {
+            algebraic_g yv = yu->value();
+            algebraic_g ye = yu->uexpr();
+            xv = xv / yv;
+            {
+                save<bool> umode(unit::mode, true);
+                xe = xe / ye;
+            }
+            return unit::simple(xv, xe);
+        }
+        else if (!y->is_symbolic())
+        {
+            xv = xv / y;
+            return unit::simple(xv, xe);
+        }
+    }
+    else if (unit_p yu = unit::get(y))
+    {
+        if (!x->is_symbolic())
+        {
+            algebraic_g yv = yu->value();
+            algebraic_g ye = yu->uexpr();
+            yv = x / yv;
+            save<bool> umode(unit::mode, true);
+            save<bool> ufact(unit::factoring, true);
+            ye = inv::run(ye);
+            return unit::simple(yv, ye);
+        }
     }
 
     // Not yet implemented
