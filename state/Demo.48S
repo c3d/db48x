@@ -739,6 +739,14 @@ Beeps
 
 RPL directory {
 
+SetHeader
+«
+«
+TIME " " PATH TAIL TOTEXT + + "
+" + DATE + " Mem: " + MEM + » HEADER
+»
+
+
 @@ ---------------------------------------------------------------------------
 @@
 @@	 IFTE evaluation test

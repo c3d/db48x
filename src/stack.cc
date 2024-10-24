@@ -180,7 +180,6 @@ uint stack::draw_stack()
         y -= lineHeight;
         coord ytop = y < top ? top : y;
         coord yb   = y + lineHeight-1;
-        fprintf(stderr, "%d: %d in %d - %d [%d]\n", level+1, y, ytop, yb, top);
         Screen.clip(0, ytop, LCD_W, yb);
 
         pattern fg = level == 0 ? Settings.ResultForeground()

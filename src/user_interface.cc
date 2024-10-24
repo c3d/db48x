@@ -51,6 +51,7 @@
 #include "target.h"
 #include "utf8.h"
 #include "util.h"
+#include "variables.h"
 
 #ifdef SIMULATOR
 #include "tests.h"
@@ -1344,7 +1345,6 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
     force = forceRedraw;
     nextRefresh = refresh;
     graphics = false;
-    stackTop = Settings.header_font()->height() + 1;
 }
 
 
@@ -1726,15 +1726,63 @@ bool user_interface::draw_header()
 
     if (changed)
     {
+        if (object_p cstname = object::static_object(object::ID_Header))
+        {
+            if (object_p cst = directory::recall_all(cstname, false))
+            {
+                if (program_p pgm = cst->as_program())
+                {
+                    if (object_p eval = pgm->evaluate())
+                    {
+                        auto    fid = Settings.HeaderFont();
+                        grapher g(LCD_W, LCD_H / 2, fid,
+                                  grob::pattern::black, grob::pattern::white,
+                                  true, true, true);
+                        if (grob_p gr = eval->graph(g))
+                        {
+                            pattern       fg = Settings.HeaderForeground();
+                            pattern       bg = Settings.HeaderBackground();
+                            grob::surface s  = gr->pixels();
+                            size          w  = gr->width();
+                            size          h  = gr->height();
+                            Screen.fill(0, 0, LCD_W, h+1, bg);
+                            Screen.draw(s, 0, 0, fg);
+                            Screen.draw_background(s, 0, 0, bg);
+                            bool sf = force;
+                            force = true;
+                            draw_battery();
+                            draw_annunciators();
+                            force = sf;
+                            draw_dirty(0, 0, w, h);
+                            draw_refresh(Settings.CustomHeaderRefresh());
+                            if (h != size(stackTop))
+                            {
+                                stackTop = h;
+                                dirtyStack = true;
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
         const coord  hdr_right  = header_width - 1;
         const coord  hdr_bottom = stackTop;
         const font_p hdr_font   = Settings.header_font();
+        size         h          = hdr_font->height() + 1;
+        if (h != size(stackTop))
+        {
+            stackTop = h;
+            dirtyStack = true;
+        }
+
         rect         clip       = Screen.clip();
         rect         header     = rect(0, 0, hdr_right, hdr_bottom);
         Screen.clip(header);
         Screen.fill(header, pattern(Settings.HeaderBackground()));
-
         coord  x  = 1;
+
 
         // Read the real-time clock
         if (Settings.ShowDate())
@@ -1813,8 +1861,9 @@ bool user_interface::draw_battery()
     static uint last       = 0;
     uint        time       = sys_current_ms();
 
-    size        h          = stackTop;
-    coord       ann_y      = (h - 1 - ann_height) / 2;
+    font_p      hdr_font   = Settings.header_font();
+    size        h          = hdr_font->height();
+    coord       ann_y      = (h - ann_height) / 2;
 
     // Print battery voltage
     static int  vdd = 3000;
@@ -1849,7 +1898,6 @@ bool user_interface::draw_battery()
                                       : Settings.BatteryLevelForeground();
     pattern   bg       = Settings.HeaderBackground();
     coord     x        = LCD_W - 1;
-    font_p    hdr_font = Settings.header_font();
 
     if (Settings.ShowVoltage())
     {
@@ -1961,11 +2009,11 @@ bool user_interface::draw_annunciators()
         return false;
 
     pattern bg       = Settings.HeaderBackground();
-    size    h        = stackTop;
+    font_p  hdr_font = Settings.header_font();
+    size    h        = hdr_font->height();
     size    alpha_w  = alpha_width;
     coord   alpha_x  = battery_left - alpha_w;
     coord   ann_x    = alpha_x - ann_width;
-    font_p  hdr_font = Settings.header_font();
 
     if (!adraw && busy_right > alpha_x)
         adraw = true;
