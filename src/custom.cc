@@ -28,8 +28,11 @@
 // ****************************************************************************
 
 #include "custom.h"
-#include "variables.h"
 
+#include "decimal.h"
+#include "integer.h"
+#include "target.h"
+#include "variables.h"
 
 
 COMMAND_BODY(ToggleCustomMenu)
@@ -88,12 +91,14 @@ uint CustomMenu::count_custom()
 }
 
 
-void CustomMenu::list_custom(info &mi)
+void CustomMenu::list_custom(info &mi, list_p cst)
 // ----------------------------------------------------------------------------
 //   Fill the menu with variable names
 // ----------------------------------------------------------------------------
 {
-    if (list_p cst = custom())
+    if (!cst)
+        cst = custom();
+    if (cst)
     {
         for (object_g obj : *cst)
         {
@@ -129,4 +134,345 @@ void CustomMenu::list_custom(info &mi)
             menu::items(mi, sym, obj);
         }
     }
+}
+
+
+object::result CustomMenu::run_menu_command(bool tmp)
+// ----------------------------------------------------------------------------
+//   Shared code between Menu and TMenu
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        id oty = obj->type();
+        if (object::is_real(oty))
+        {
+            if (obj->is_zero(false))
+                if (rt.drop())
+                    return run<LastMenu>();
+
+            // Translation of MENU values is not implemented
+            rt.unimplemented_error();
+            return ERROR;
+        }
+
+        // Check names
+        if (symbol_p sym = obj->as_quoted<symbol>())
+        {
+            obj = directory::recall_all(sym, true);
+            if (!obj)
+                return ERROR;
+            oty = obj->type();
+        }
+
+        // Consume the object
+        if (!rt.drop())
+            return ERROR;
+
+        // Result from RclMenu: apply as is
+        if (is_menu(oty))
+        {
+            ui.menu(menu_p(obj));
+            return OK;
+        }
+
+        // Check the input (differs from HP50G documented behaviour)
+        if (!obj->is_array_or_list())
+        {
+            rt.push(obj);
+            rt.type_error();
+            return ERROR;
+        }
+
+        // Check if we have a persistent menu
+        if (!tmp)
+        {
+            // Store in CST and evaluate the custom menu
+            object_p cst = static_object(ID_CustomMenu);
+            if (directory::store_here(cst, obj))
+                return run<CustomMenu>();
+        }
+
+        // Run the custom menu
+        list_g tmenu  = list_p(obj);
+        uint   nitems = tmenu->items();
+        info   mi(0);
+        items_init(mi, nitems);
+        list_custom(mi, tmenu);
+        return OK;
+    }
+    return ERROR;
+
+}
+
+
+
+COMMAND_BODY(Menu)
+// ----------------------------------------------------------------------------
+//   Define the Custom menu from the input
+// ----------------------------------------------------------------------------
+{
+    return CustomMenu::run_menu_command(false);
+}
+
+
+COMMAND_BODY(TemporaryMenu)
+// ----------------------------------------------------------------------------
+//   Define a temporary menu
+// ----------------------------------------------------------------------------
+{
+    return CustomMenu::run_menu_command(true);
+}
+
+
+COMMAND_BODY(RecallMenu)
+// ----------------------------------------------------------------------------
+//   Recall current menu
+// ----------------------------------------------------------------------------
+{
+    if (menu_p m = ui.menu())
+    {
+        if (rt.push(m))
+            return OK;
+    }
+    else
+    {
+        if (integer_p z = integer::make(0))
+            if (rt.push(z))
+                return OK;
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(KeyMap)
+// ----------------------------------------------------------------------------
+//   Store a complete keymap (like STOKEY with native key IDs)
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (directory_p keymap = obj->as<directory>())
+            if (object_p name = static_object(ID_KeyMap))
+                if (directory::store_here(name, keymap))
+                    if (rt.drop())
+                        return OK;
+    if (!rt.error())
+        rt.value_error();
+    return ERROR;
+}
+
+
+static uint convert_key_position_to_id(object_p obj)
+// ----------------------------------------------------------------------------
+//    Convert the HP48 format (rc.p = row, column, plane) to native key
+// ----------------------------------------------------------------------------
+{
+    uint rc = obj->as_uint32(0, true);
+
+    if (decimal_g rcp = obj->as<decimal>())
+    {
+        if (rc < 100)
+        {
+            if (decimal_g rcps = decimal::make(1, 2)) // Decimal part * 100
+            {
+                if (decimal_g rcpf = (rcps * rcp) % rcps)
+                {
+                    ularge pf = rcpf->as_unsigned();
+                    return platform_keyid(rc, uint(pf));
+                }
+            }
+        }
+        else
+        {
+            rt.value_error();
+        }
+    }
+    return platform_keyid(rc, 0);
+}
+
+
+COMMAND_BODY(AssignKey)
+// ----------------------------------------------------------------------------
+//   Assign a single key
+// ----------------------------------------------------------------------------
+{
+    if (object_g obj = rt.stack(1))
+        if (object_g pos = rt.stack(0))
+            if (uint keyid = convert_key_position_to_id(pos))
+                if (ui.assign(keyid, obj))
+                    if (rt.drop(2))
+                        return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(DeleteKeys)
+// ----------------------------------------------------------------------------
+//  Delete user-defined keys
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        if (obj->is_zero(false))
+        {
+            object_p name = static_object(ID_KeyMap);
+            directory *curdir = rt.variables(0);
+            curdir->purge(name);
+            return OK;
+        }
+
+        if (list_p keys = obj->as_array_or_list())
+        {
+            for (object_p key : *keys)
+            {
+                if (uint keyid = convert_key_position_to_id(key))
+                    ui.assign(keyid, nullptr);
+                else
+                    return rt.value_error(), ERROR;
+            }
+            return OK;
+        }
+        if (uint keyid = convert_key_position_to_id(obj))
+            if (ui.assign(keyid, nullptr))
+                return OK;
+
+        rt.value_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(StoreKeys)
+// ----------------------------------------------------------------------------
+//   Store a sequence of keys
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        if (list_p keys = obj->as_array_or_list())
+        {
+            object_g assigned;
+            for (object_p obj : *keys)
+            {
+                if (assigned)
+                {
+                    // Got a RCLKEY with updir values, ignore them.
+                    if (obj->type() == ID_UpDir &&
+                        assigned->type() == ID_integer)
+                        break;
+
+                    uint keyid = convert_key_position_to_id(obj);
+                    if (!keyid)
+                    {
+                        rt.value_error();
+                        return ERROR;
+                    }
+                    if (!ui.assign(keyid, assigned))
+                        return ERROR;
+                    assigned = nullptr;
+                }
+                else
+                {
+                    assigned = obj;
+                }
+            }
+            rt.drop();
+            return OK;
+        }
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+static bool compatible_keyid(object_p name, object_p obj, void *)
+// ----------------------------------------------------------------------------
+//   Append the compatible key ID to the list
+// ----------------------------------------------------------------------------
+{
+    if (integer_p keyarg = name->as<integer>())
+    {
+        ularge keyid = keyarg->value<ularge>();
+        object_p ckey = compatible_key_id(keyid);
+        return ckey && obj && rt.append(obj) && rt.append(ckey);
+    }
+    return false;
+}
+
+
+COMMAND_BODY(RecallKeys)
+// ----------------------------------------------------------------------------
+//  Convert the key map to a format that is compatible with the HP48
+// ----------------------------------------------------------------------------
+{
+    object_p name = object::static_object(object::ID_KeyMap);
+    scribble scr;
+    directory *dir = nullptr;
+    size_t     used = 0;
+    for (uint depth = 0; (dir = rt.variables(depth)); depth++)
+    {
+        if (depth)
+        {
+            object_p updir = static_object(ID_UpDir);
+            integer_p level = integer::make(depth);
+            if (!rt.append(level) || !rt.append(updir))
+                return ERROR;
+        }
+        if (object_p keymapvar = dir->recall(name))
+        {
+            if (directory_p keymap = keymapvar->as<directory>())
+            {
+                keymap->enumerate(compatible_keyid, nullptr);
+                used = scr.growth();
+            }
+        }
+    }
+    if (!rt.error())
+        if (list_p keys = list::make(ID_list, scr.scratch(), used))
+            if (rt.push(keys))
+                return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(StandardKey)
+// ----------------------------------------------------------------------------
+//   A no-op when evaluated
+// ----------------------------------------------------------------------------
+{
+    return OK;
+}
+
+
+COMMAND_BODY(ToggleUserMode)
+// ----------------------------------------------------------------------------
+//   Immediate for the USER key
+// ----------------------------------------------------------------------------
+//   This cycles across 1USR USR and normal
+{
+    ui.toggle_user();
+    return OK;
+}
+
+
+object_p compatible_key_id(uint keyid)
+// ----------------------------------------------------------------------------
+//   Return a key ID in an HP-compatible format
+// ----------------------------------------------------------------------------
+{
+    uint rc = compatible_key_position(keyid);
+    uint pl = compatible_key_plane(keyid);
+    object_p ckey = nullptr;
+    if (pl)
+    {
+        decimal_g rcd = decimal::make(rc, 0);
+        decimal_g rcf = decimal::make(pl, -2);
+        rcd = rcd + rcf;
+        ckey = rcd;
+    }
+    else
+    {
+        ckey = integer::make(rc);
+    }
+    return ckey;
 }

@@ -1,5 +1,63 @@
 # Release notes
 
+## Release 0.8.3 "Blindness" - User mode and custom header
+
+This release focuses on various user interface aspects.
+
+### Features
+
+* User mode, key assignment, `ASN`, `STOKEYS`, `RCLKEYS`, `DELKEYS`. Unlike HP
+  calculators, key assignments are per directory, with inner directories
+  inheriting the key assignments from the enclosing directories.
+* Add `Header` command to customize the header. For example, you can now show
+  the path in the header, or any relevant information. This customization can be
+  done per-directory.
+* Implement `Menu`, `TMenu` and `RclMenu` commands
+* help: Automatically create links for references to RPL words.
+  When we have `sin` in the Markdown file, the calculator will automatically
+  insert a hyperlink to the corresponding entry. Note that this only applies to
+  the calculator, not to the GitHub rendering of the Markdown files.
+* Display object type in the `Info` box of the interactive stack.
+* Fallback graphic rendering of objects to text when the usual heuristics did
+  not allow the graphics to fit in the alloted pixel space. For example, a
+  fraction that does not fit will now display using the textual form if that
+  particular form can fit in the given box.
+
+### Bug fixes
+
+* Fix a bug that could cause the text editor cursor to move past the end of the
+  editor when inserting text, possibly causing memory corruption.
+* The `Show` command will now show all digits, and render fractions using
+  multiple lines for the numerator and denominator so as to be able to show more
+  digits in a readable way.
+* When terminating a command using auto-completion in the `Catalog` feature, the
+  command that was entered is now present in the command-line history.
+* Arithmetic operations that combine text or lists and unit objects now behave
+  correctly. For example, adding a unit to a list appends like any other object.
+* directories: Move updir if evaluating an updir directory, instead of
+  corrupting the directory stack.
+* Clear transient object if entering the interactive stack, e.g. when exploring
+  the interactive stack while in the `SolvingMenu` and solving an equation, and
+  correctly update the transient object when switching menus.
+* Render vectors as RPL code in the equation examples.
+* Correctly redraw the text editor when using the interactive stack `Echo`
+  feature with stack items spanning multiple lines
+* Fix minor typos in the equations documentation.
+
+
+### Improvements
+
+* tests: Only evaluate after parsing RPL examples in the documentation when the
+  stack is not empty
+* The `Wait` command now returns a key code in the same style as HP calculators,
+  i.e. with row, column and plane. Also, like HP calculators, it processes shift
+  keys and returns a plane, instead of returning the keycode of the shift key.
+* Capitalize `Path`, `CrDir`, `Home`, `UpDir` so that their rendering in
+  compatibility mode with the `Cmd` setting looks better.
+* Add `DB48X_SPEEDUP` environment variable support in the simulator.
+* documentation: Update Authors section
+
+
 ## Release 0.8.2 "Honor Seats" - Equation Library Examples, Assignments
 
 This release is focusing on the testing, validation and usability of the

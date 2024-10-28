@@ -221,5 +221,4 @@ struct SysMenu : menu                                                   \
 COMMAND_DECLARE(LastMenu,-1);   // Return to previous menu
 COMMAND_DECLARE(ToolsMenu,-1);  // Automatic selection of the right menu
 
-
 #endif // MENU_H

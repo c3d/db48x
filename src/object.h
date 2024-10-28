@@ -360,7 +360,7 @@ struct object
         return ops().graph(this, g);
     }
 
-    grob_p graph() const;
+    grob_p graph(bool showing = false) const;
     // ------------------------------------------------------------------------
     //   Render like for the `Show` command
     // ------------------------------------------------------------------------

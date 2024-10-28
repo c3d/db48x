@@ -244,11 +244,18 @@ GRAPH_BODY(unit)
     algebraic_g value = o->value();
     algebraic_g uexpr = o->uexpr();
     if (symbol_p sym = uexpr->as_quoted<symbol>())
+    {
         if (value->is_real())
+        {
             if (sym->matches("dms") ||
                 sym->matches("hms") ||
                 sym->matches("date"))
+            {
+                save<bool> sstk(g.stack, true); // Do not render as _dms
                 return object::do_graph(o, g);
+            }
+        }
+    }
 
     bool hide = value->as_quoted<symbol>();
     grob_g result = value->graph(g);
@@ -258,6 +265,7 @@ GRAPH_BODY(unit)
         coord  vr    = g.voffset;
         grob_g ugrob = uexpr->graph(g);
         coord  vu    = g.voffset;
+        save<bool> sstk(g.stack, true); // Do not render as _dms
         result = expression::infix(g, vr, result, 0, " ", vu, ugrob);
     }
 

@@ -1389,21 +1389,20 @@ MENU(ModesMenu,
      "Deg",     ID_Deg,
      "Rad",     ID_Rad,
      "n×π",     ID_PiRadians,
-     "Rect",    ID_Unimplemented,
-     "Polar",   ID_Unimplemented,
-     "Spheric", ID_Unimplemented,
+     "Math",    ID_MathModesMenu,
+     "User",    ID_UserModeMenu,
+     "UI",      ID_UserInterfaceModesMenu,
 
      ID_Grad,
      "Angles",  ID_AnglesMenu,
-     "Math",    ID_MathModesMenu,
-     "Display", ID_DisplayModesMenu,
-     "Seps",    ID_SeparatorModesMenu,
-     "UI",      ID_UserInterfaceModesMenu,
-
      "Beep",    ID_BeepOn,
      "Flash",   ID_SilentBeepOn,
+     "Display", ID_DisplayModesMenu,
+     "Seps",    ID_SeparatorModesMenu,
+
      "Modes",   ID_Modes,
-     "Reset",   ID_ResetModes);
+     "Reset",   ID_ResetModes,
+     "System",  ID_SystemSetup);
 
 MENU(DisplayModesMenu,
 // ----------------------------------------------------------------------------
@@ -1462,7 +1461,7 @@ MENU(UserInterfaceModesMenu,
      "GrStk",                                   ID_GraphicStackDisplay,
      "Beep",                                    ID_BeepOn,
      "Flash",                                   ID_SilentBeepOn,
-     "Round",                                   ID_RoundedMenus,
+     "User",                                    ID_UserModeMenu,
 
      ResultFont::label,                         ID_ResultFont,
      StackFont::label,                          ID_StackFont,
@@ -1473,8 +1472,8 @@ MENU(UserInterfaceModesMenu,
      "3-lines",                                 ID_ThreeRowsMenus,
      "1-line",                                  ID_SingleRowMenus,
      "Flat",                                    ID_FlatMenus,
-     "VProg",                                   ID_VerticalProgramRendering,
-     "Units",                                   ID_ShowBuiltinUnits,
+     "Round",                                   ID_RoundedMenus,
+     "Hide",                                    ID_HideEmptyMenu,
 
      "cmd",                                     ID_LowerCase,
      "CMD",                                     ID_UpperCase,
@@ -1489,9 +1488,24 @@ MENU(UserInterfaceModesMenu,
      ErrorBeepFrequency::label,                 ID_ErrorBeepFrequency,
 
      "Fixed0",                                  ID_FixedWidthDigits,
+     "VProg",                                   ID_VerticalProgramRendering,
+     "Units",                                   ID_ShowBuiltinUnits,
      "ExitMenu",                                ID_ExitClearsMenu,
-     "HideMenu",                                ID_HideEmptyMenu,
      "ListEval",                                ID_ListAsProgram);
+
+MENU(UserModeMenu,
+// ----------------------------------------------------------------------------
+//   Menu for the user mode configuration
+// ----------------------------------------------------------------------------
+     "Toggle",                                  ID_ToggleUserMode,
+     "User",                                    ID_UserMode,
+     "Lock",                                    ID_UserModeLock,
+     "RclKeys",                                 ID_RecallKeys,
+     "StoKeys",                                 ID_StoreKeys,
+     "Assign",                                  ID_AssignKey,
+
+     "DelKeys",                                 ID_DeleteKeys,
+     "KeyMap",                                  ID_KeyMap);
 
 MENU(MathModesMenu,
 // ----------------------------------------------------------------------------
@@ -1605,11 +1619,11 @@ MENU(MemoryMenu,
      "Store",   ID_Sto,
      "Recall",  ID_Rcl,
      "Purge",   ID_Purge,
-     "CrDir",   ID_crdir,
-     "UpDir",   ID_updir,
+     "CrDir",   ID_CrDir,
+     "UpDir",   ID_UpDir,
 
-     "Home",    ID_home,
-     "Path",    ID_path,
+     "Home",    ID_Home,
+     "Path",    ID_Path,
      "Current", ID_CurrentDirectory,
      "GC",      ID_GarbageCollect,
      "Avail",   ID_Mem,

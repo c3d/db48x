@@ -211,12 +211,12 @@ COMMAND_DECLARE(FreeMemory,0);
 COMMAND_DECLARE(SystemMemory,0);
 COMMAND_DECLARE(GarbageCollect,0);
 
-COMMAND_DECLARE(home,0);                // Return to home directory
+COMMAND_DECLARE(Home,0);                // Return to home directory
 COMMAND_DECLARE(CurrentDirectory,0);    // Return the current directory
-COMMAND_DECLARE(path,0);                // Return a list describing current path
-COMMAND_DECLARE(crdir,1);               // Create a directory
-COMMAND_DECLARE(updir,0);               // Move one directory up
-COMMAND_DECLARE(pgdir,1);               // Purge directory
+COMMAND_DECLARE(Path,0);                // Return a list describing current path
+COMMAND_DECLARE(CrDir,1);               // Create a directory
+COMMAND_DECLARE(UpDir,0);               // Move one directory up
+COMMAND_DECLARE(PgDir,1);               // Purge directory
 
 
 struct VariablesMenu : menu

@@ -625,7 +625,7 @@ object::result show(object_r obj)
 {
     if (obj)
     {
-        grob_g graph = obj->graph();
+        grob_g graph = obj->graph(true);
         if (!graph)
         {
             if (!rt.error())
@@ -1139,6 +1139,20 @@ COMMAND_BODY(Freeze)
             if (ui.freeze(flags))
                 return OK;
     }
+    return ERROR;
+}
+
+
+COMMAND_BODY(Header)
+// ----------------------------------------------------------------------------
+//   Set the current header
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (object_p name = static_object(ID_Header))
+            if (directory::store_here(name, obj))
+                if (rt.drop())
+                    return OK;
     return ERROR;
 }
 

@@ -352,7 +352,7 @@ unicode file::get()
 }
 
 
-uint file::find(unicode   cp)
+uint file::find(unicode cp)
 // ----------------------------------------------------------------------------
 //    Find a given code point in file looking forward
 // ----------------------------------------------------------------------------
@@ -362,9 +362,27 @@ uint file::find(unicode   cp)
     uint    off;
     do
     {
-        off          = ftell(data);
-        c            = get();
+        off = ftell(data);
+        c   = get();
     } while (c && c != cp);
+    return off;
+}
+
+
+uint file::find(unicode cp1, unicode cp2)
+// ----------------------------------------------------------------------------
+//    Find a given code point in file looking forward
+// ----------------------------------------------------------------------------
+//    Return position right before code point, position file right after it
+{
+    unicode c;
+    uint    off;
+    bool    in = false;
+    do
+    {
+        off = ftell(data);
+        c   = get();
+    } while (c && c != cp1 && (c != cp2 || (in = !in)));
     return off;
 }
 
@@ -382,9 +400,30 @@ uint file::rfind(unicode  cp)
         if (off == 0)
             break;
         fseek(data, --off, SEEK_SET);
-        c        = get();
+        c = get();
     }
     while (c != cp);
+    return off;
+}
+
+
+uint file::rfind(unicode  cp1, unicode cp2)
+// ----------------------------------------------------------------------------
+//    Find a given code point in file looking backward
+// ----------------------------------------------------------------------------
+//    Return position right before code point, position file right after it
+{
+    uint    off = ftell(data);
+    unicode c;
+    bool    in = false;
+    do
+    {
+        if (off == 0)
+            break;
+        fseek(data, --off, SEEK_SET);
+        c = get();
+    }
+    while (c != cp1 && (c != cp2 || (in = !in)));
     return off;
 }
 

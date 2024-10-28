@@ -200,6 +200,13 @@ extern surface Screen;
 #define KB_Z                 31         //! Z
 
 
+uint platform_plane(bool ls, bool rs, bool al, bool lc, bool trans);
+uint platform_keyid(uint k, bool ls, bool rs, bool al, bool lc, bool trans);
+uint platform_keyid(uint rc, uint plane);
+uint compatible_key_position(uint key);
+uint compatible_key_plane(uint keyid);
+
+
 
 // ============================================================================
 //

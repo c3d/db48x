@@ -82,8 +82,6 @@ const dmcp_font_p SkrMono18x24     = (dmcp_font_p) (dmcpFontRPL + 24);
 font_p EditorFont;
 font_p StackFont;
 font_p ReducedFont;
-font_p HeaderFont;
-font_p CursorFont;
 font_p ErrorFont;
 font_p MenuFont;
 font_p HelpFont;
@@ -108,8 +106,6 @@ void font_defaults()
     GENERATED_FONT(StackFont);
     GENERATED_FONT(EditorFont);
 
-    HeaderFont       = LibMonoFont10x17;
-    CursorFont       = LibMonoFont17x25;
     ErrorFont        = SkrMono13x18;
     MenuFont         = HelpFont;
 

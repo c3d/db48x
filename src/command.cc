@@ -31,6 +31,7 @@
 
 #include "arithmetic.h"
 #include "bignum.h"
+#include "custom.h"
 #include "decimal.h"
 #include "dmcp.h"
 #include "equations.h"
@@ -47,6 +48,7 @@
 #include "symbol.h"
 #include "sysmenu.h"
 #include "tag.h"
+#include "target.h"
 #include "tests.h"
 #include "unit.h"
 #include "user_interface.h"
@@ -702,11 +704,33 @@ COMMAND_BODY(Wait)
                         program::halted = true;
                         program::stepping = 0;
                     }
+                    if (key == KEY_SHIFT || key == 0)
+                    {
+                        ui.key(key, false, false);
+                        ui.draw_start(false);
+                        ui.draw_annunciators();
+                        ui.draw_battery();
+                        refresh_dirty();
+                        key = 0;
+                    }
                 }
                 if (infinite)
                 {
-                    if (integer_p ikey = integer::make(key))
-                        if (rt.push(ikey))
+                    uint sp = ui.shift_plane();
+                    uint ap = ui.alpha_plane();
+                    bool ls = sp==1;
+                    bool rs = sp==2;
+                    bool al = ap & 1;
+                    bool lc = ap & 2;
+                    bool tr = ap & 4;
+                    key = platform_keyid(key, ls, rs, al, lc, tr);
+                    ui.clear_shift();
+                    ui.draw_start(false);
+                    ui.draw_annunciators();
+                    ui.draw_battery();
+                    refresh_dirty();
+                    if (object_p keyid = compatible_key_id(key))
+                        if (rt.push(keyid))
                             return OK;
                     return ERROR;
                 }
@@ -1337,6 +1361,10 @@ COMMAND_BODY(StackEditor)
 // ----------------------------------------------------------------------------
 {
     if (!Stack.interactive)
+    {
         Stack.interactive = 1;
+        ui.dirty_all();
+    }
+
     return OK;
 }

@@ -761,7 +761,7 @@ algebraic_p algebraic::evaluate() const
     {
         while (tag_p tagged = obj->as<tag>())
             obj = tagged->tagged_object();
-        if (obj->is_algebraic())
+        if (obj->is_extended_algebraic())
             return algebraic_p(obj);
     }
 

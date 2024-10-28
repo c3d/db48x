@@ -47,14 +47,29 @@ struct CustomMenu : menu
     CustomMenu(id type = ID_CustomMenu) : menu(type) {}
 
     static list_p custom();
-    static uint count_custom();
-    static void list_custom(info &mi);
+    static uint   count_custom();
+    static void   list_custom(info &mi, list_p cst = nullptr);
+    static result run_menu_command(bool tmp);
 
-public:
+  public:
     OBJECT_DECL(CustomMenu);
     MENU_DECL(CustomMenu);
 };
 
 COMMAND_DECLARE(ToggleCustomMenu, 0);
+
+COMMAND_DECLARE(Menu,           1);
+COMMAND_DECLARE(TemporaryMenu,  1);
+COMMAND_DECLARE(RecallMenu,     0);
+
+COMMAND_DECLARE(KeyMap,         1);     // Set Keyboard mappings
+COMMAND_DECLARE(StandardKey,    0);     // Restore standard key
+COMMAND_DECLARE(AssignKey,      2);     // Assign one key
+COMMAND_DECLARE(DeleteKeys,     1);     // Delete user keys
+COMMAND_DECLARE(StoreKeys,      1);     // Store multiple user keys
+COMMAND_DECLARE(RecallKeys,     0);     // Recall user-defined keys
+COMMAND_DECLARE(ToggleUserMode, 0);     // Toggle user mode flags
+
+object_p compatible_key_id(uint key);
 
 #endif // CUSTOM_H

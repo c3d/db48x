@@ -118,6 +118,50 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
 //   - Text + object: Concatenation of text + object text
 //   - Object + text: Concatenation of object text + text
 {
+    // list + ...
+    if (list_g xl = x->as<list>())
+    {
+        if (list_g yl = y->as<list>())
+            return xl + yl;
+        if (list_g yl = rt.make<list>(byte_p(+y), y->size()))
+            return xl + yl;
+    }
+    else if (list_g yl = y->as<list>())
+    {
+        if (list_g xl = rt.make<list>(byte_p(+x), x->size()))
+            return xl + yl;
+    }
+
+    // text + ...
+    if (text_g xs = x->as<text>())
+    {
+        // text + text
+        if (text_g ys = y->as<text>())
+            return xs + ys;
+        // text + object
+        if (text_g ys = y->as_text())
+            return xs + ys;
+    }
+    // ... + text
+    else if (text_g ys = y->as<text>())
+    {
+        // object + text
+        if (text_g xs = x->as_text())
+            return xs + ys;
+    }
+
+    // vector + vector or matrix + matrix
+    if (array_g xa = x->as<array>())
+    {
+        if (array_g ya = y->as<array>())
+            return xa + ya;
+        return xa->map(add::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, add::evaluate);
+    }
+
     // Check addition of unit objects
     if (unit_g xu = unit::get(x))
     {
@@ -161,50 +205,6 @@ algebraic_p arithmetic::non_numeric<add>(algebraic_r x, algebraic_r y)
             return y;
         if (y->is_zero(false))                  // X + 0 = X
             return x;
-    }
-
-    // list + ...
-    if (list_g xl = x->as<list>())
-    {
-        if (list_g yl = y->as<list>())
-            return xl + yl;
-        if (list_g yl = rt.make<list>(byte_p(+y), y->size()))
-            return xl + yl;
-    }
-    else if (list_g yl = y->as<list>())
-    {
-        if (list_g xl = rt.make<list>(byte_p(+x), x->size()))
-            return xl + yl;
-    }
-
-    // text + ...
-    if (text_g xs = x->as<text>())
-    {
-        // text + text
-        if (text_g ys = y->as<text>())
-            return xs + ys;
-        // text + object
-        if (text_g ys = y->as_text())
-            return xs + ys;
-    }
-    // ... + text
-    else if (text_g ys = y->as<text>())
-    {
-        // object + text
-        if (text_g xs = x->as_text())
-            return xs + ys;
-    }
-
-    // vector + vector or matrix + matrix
-    if (array_g xa = x->as<array>())
-    {
-        if (array_g ya = y->as<array>())
-            return xa + ya;
-        return xa->map(add::evaluate, y);
-    }
-    else if (array_g ya = y->as<array>())
-    {
-        return ya->map(x, add::evaluate);
     }
 
     // Not yet implemented
@@ -290,6 +290,18 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   This deals with vector and matrix operations
 {
+    // vector + vector or matrix + matrix
+    if (array_g xa = x->as<array>())
+    {
+        if (array_g ya = y->as<array>())
+            return xa - ya;
+        return xa->map(sub::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, sub::evaluate);
+    }
+
     // Check subtraction of unit objects
     if (unit_g xu = unit::get(x))
     {
@@ -329,18 +341,6 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
             return integer::make(0);
         if (x->is_zero(false) && y->is_symbolic())
             return neg::run(y);                 // 0 - X = -X
-    }
-
-    // vector + vector or matrix + matrix
-    if (array_g xa = x->as<array>())
-    {
-        if (array_g ya = y->as<array>())
-            return xa - ya;
-        return xa->map(sub::evaluate, y);
-    }
-    else if (array_g ya = y->as<array>())
-    {
-        return ya->map(x, sub::evaluate);
     }
 
     // Not yet implemented
@@ -427,6 +427,32 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
 //   - Text * integer: Repeat the text
 //   - Integer * text: Repeat the text
 {
+    // Text multiplication
+    if (text_g xs = x->as<text>())
+        if (integer_g yi = y->as<integer>())
+            return xs * yi->value<uint>();
+    if (text_g ys = y->as<text>())
+        if (integer_g xi = x->as<integer>())
+            return ys * xi->value<uint>();
+    if (list_g xl = x->as<list>())
+        if (integer_g yi = y->as<integer>())
+            return xl * yi->value<uint>();
+    if (list_g yl = y->as<list>())
+        if (integer_g xi = x->as<integer>())
+            return yl * xi->value<uint>();
+
+    // vector + vector or matrix + matrix
+    if (array_g xa = x->as<array>())
+    {
+        if (array_g ya = y->as<array>())
+            return xa * ya;
+        return xa->map(mul::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, mul::evaluate);
+    }
+
     // Check multiplication of unit objects
     if (unit_p xu = unit::get(x))
     {
@@ -478,32 +504,6 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
                     return integer::make(-1);
             return sq::run(x);                  // X * X = X²
         }
-    }
-
-    // Text multiplication
-    if (text_g xs = x->as<text>())
-        if (integer_g yi = y->as<integer>())
-            return xs * yi->value<uint>();
-    if (text_g ys = y->as<text>())
-        if (integer_g xi = x->as<integer>())
-            return ys * xi->value<uint>();
-    if (list_g xl = x->as<list>())
-        if (integer_g yi = y->as<integer>())
-            return xl * yi->value<uint>();
-    if (list_g yl = y->as<list>())
-        if (integer_g xi = x->as<integer>())
-            return yl * xi->value<uint>();
-
-    // vector + vector or matrix + matrix
-    if (array_g xa = x->as<array>())
-    {
-        if (array_g ya = y->as<array>())
-            return xa * ya;
-        return xa->map(mul::evaluate, y);
-    }
-    else if (array_g ya = y->as<array>())
-    {
-        return ya->map(x, mul::evaluate);
     }
 
     // Not yet implemented
@@ -578,6 +578,18 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   This deals with vector and matrix operations
 {
+    // vector + vector or matrix + matrix
+    if (array_g xa = x->as<array>())
+    {
+        if (array_g ya = y->as<array>())
+            return xa / ya;
+        return xa->map(div::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, div::evaluate);
+    }
+
     // Check division of unit objects
     if (unit_p xu = unit::get(x))
     {
@@ -638,18 +650,6 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
             return inv::run(y);                 // 1 / X = X⁻¹
         if (x->is_same_as(y))
             return integer::make(1);            // X / X = 1
-    }
-
-    // vector + vector or matrix + matrix
-    if (array_g xa = x->as<array>())
-    {
-        if (array_g ya = y->as<array>())
-            return xa / ya;
-        return xa->map(div::evaluate, y);
-    }
-    else if (array_g ya = y->as<array>())
-    {
-        return ya->map(x, div::evaluate);
     }
 
     // Not yet implemented

@@ -230,6 +230,8 @@ object_p directory::store(object_g name, object_g value)
     case ID_AlgebraConfiguration:
     case ID_AlgebraVariable:
     case ID_CustomMenu:
+    case ID_Header:
+    case ID_KeyMap:
         break;
 
     case ID_symbol:
@@ -470,6 +472,8 @@ object_p directory::recall_all(object_p name, bool report_missing)
     case ID_AlgebraConfiguration:
     case ID_AlgebraVariable:
     case ID_CustomMenu:
+    case ID_Header:
+    case ID_KeyMap:
         break;
 
     case ID_symbol:
@@ -559,6 +563,8 @@ size_t directory::purge(object_p name)
     case ID_AlgebraConfiguration:
     case ID_AlgebraVariable:
     case ID_CustomMenu:
+    case ID_Header:
+    case ID_KeyMap:
         break;
 
     case ID_symbol:
@@ -1006,7 +1012,7 @@ COMMAND_BODY(SystemMemory)
 }
 
 
-COMMAND_BODY(home)
+COMMAND_BODY(Home)
 // ----------------------------------------------------------------------------
 //   Return the home directory
 // ----------------------------------------------------------------------------
@@ -1049,9 +1055,9 @@ list_p directory::path(id type)
 {
     scribble scr;
 
-    size_t sz = leb128size(ID_home);
+    size_t sz = leb128size(ID_Home);
     byte *p = rt.allocate(sz);
-    leb128(p, ID_home);
+    leb128(p, ID_Home);
 
     uint depth = rt.directories();
     directory_p dir = rt.homedir();
@@ -1072,7 +1078,7 @@ list_p directory::path(id type)
 }
 
 
-COMMAND_BODY(path)
+COMMAND_BODY(Path)
 // ----------------------------------------------------------------------------
 //   Build a path with the list of paths
 // ----------------------------------------------------------------------------
@@ -1084,7 +1090,7 @@ COMMAND_BODY(path)
 }
 
 
-COMMAND_BODY(crdir)
+COMMAND_BODY(CrDir)
 // ----------------------------------------------------------------------------
 //   Create a directory
 // ----------------------------------------------------------------------------
@@ -1118,7 +1124,7 @@ COMMAND_BODY(crdir)
 }
 
 
-COMMAND_BODY(updir)
+COMMAND_BODY(UpDir)
 // ----------------------------------------------------------------------------
 //   Go up one directory
 // ----------------------------------------------------------------------------
@@ -1129,7 +1135,7 @@ COMMAND_BODY(updir)
 }
 
 
-COMMAND_BODY(pgdir)
+COMMAND_BODY(PgDir)
 // ----------------------------------------------------------------------------
 //   Really the same as 'purge'
 // ----------------------------------------------------------------------------
@@ -1508,6 +1514,8 @@ static flag_conversion flag_conversions[] =
     {  -52,     object::ID_MultiLineResult              },
     {  -55,     object::ID_NoLastArguments              },
     {  -56,     object::ID_BeepOff                      },
+    {  -61,     object::ID_UserModeLock                 },
+    {  -62,     object::ID_UserMode                     },
     {  -64,     object::ID_IndexWrapped                 },
     {  -65,     object::ID_MultiLineStack               },
     {  -97,     object::ID_VerticalLists                },

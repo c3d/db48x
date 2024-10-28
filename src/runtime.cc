@@ -504,6 +504,13 @@ void runtime::move(object_p to, object_p from,
     for (uint l = 0; l < ui.NUM_MENUS; l++)
         if (label[l] >= start && label[l] < end)
             label[l] += delta;
+
+    // Adjust functions
+    object_p *functions = &ui.function[0][0];
+    const uint max = sizeof(ui.function) / sizeof(ui.function[0][0]);
+    for (uint k = 0; k < max; k++)
+        if (functions[k] >= from && functions[k] < last)
+            functions[k] += delta;
 }
 
 
@@ -1311,6 +1318,12 @@ bool runtime::enter(directory_p dir)
 //   Enter a given directory
 // ----------------------------------------------------------------------------
 {
+    // Check if this is a directory up
+    size_t depth = (object_p *) XLibs - Directories;
+    for (size_t i = 0; i < depth; i++)
+        if (dir == Directories[i])
+            return !i || updir(i);
+
     size_t sz = sizeof(directory_p);
     if (available(sz) < sz)
         return false;

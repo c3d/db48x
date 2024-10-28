@@ -65,7 +65,9 @@ struct file
     unicode peek();
     uint    position();
     uint    find(unicode cp);
+    uint    find(unicode cp1, unicode cp2);
     uint    rfind(unicode cp);
+    uint    rfind(unicode cp1, unicode cp2);
     cstring error(int err) const;
     cstring error() const;
     cstring filename() const { return name; }

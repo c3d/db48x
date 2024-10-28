@@ -91,8 +91,9 @@ struct user_interface
 
     bool        key(int key, bool repeating, bool transalpha);
     bool        repeating()     { return repeat; }
-    void        assign(int key, uint plane, object_p code);
-    object_p    assigned(int key, uint plane);
+    object_p    assign(int keyid, object_p code);
+    object_p    assigned(int keyid);
+    void        toggle_user();
 
     void        update_mode();
 
@@ -142,6 +143,7 @@ struct user_interface
     bool        draw_command();
     void        draw_user_command(utf8 cmd, size_t sz);
     bool        draw_stepping_object();
+    void        dirty_all();
 
     bool        draw_menus();
     bool        draw_cursor(int show, uint ncursor);
@@ -150,7 +152,8 @@ struct user_interface
     bool        transient_object(object_p obj);
 
     modes       editing_mode()          { return mode; }
-    int         stack_screen_bottom()   { return stack; }
+    int         stack_screen_top()      { return stackTop; }
+    int         stack_screen_bottom()   { return stackBottom; }
     int         menu_screen_bottom()    { return menuHeight; }
     bool        showing_help()          { return help + 1 != 0; }
     bool        showing_graphics()      { return graphics; }
@@ -165,6 +168,7 @@ struct user_interface
     bool        replace_character_left_of_cursor(utf8 text, size_t len);
 
     uint        shift_plane()   { return xshift ? 2 : shift ? 1 : 0; }
+    uint        alpha_plane()   { return alpha + 2*lowercase+4*transalpha; }
     void        clear_shift()   { xshift = shift = false; }
     void        clear_help();
     void        clear_menu();
@@ -215,7 +219,9 @@ protected:
     bool        handle_editing(int key);
     bool        handle_editing_command(object::id lower, object::id higher);
     bool        handle_alpha(int key);
+    bool        handle_user(int key);
     bool        handle_functions(int key);
+    bool        handle_functions(int key, object_p obj, bool user);
     bool        handle_digits(int key);
     bool        noHelpForKey(int key);
     bool        do_search(unicode with = 0, bool restart = false);
@@ -239,7 +245,8 @@ protected:
     coord    xoffset;           // Offset of the cursor
     modes    mode;              // Current editing mode
     int      last;              // Last key
-    int      stack;             // Vertical bottom of the stack
+    int      stackTop;          // Vertical top of the stack (bottom of header)
+    int      stackBottom;       // Vertical bottom of the stack
     coord    cx, cy;            // Cursor position on screen
     uint     edRows;            // Editor rows
     int      edRow;             // Current editor row
@@ -266,10 +273,12 @@ protected:
     bool     alpha        : 1;  // Alpha mode active
     bool     transalpha   : 1;  // Transitory alpha (up or down key)
     bool     lowercase    : 1;  // Lowercase
+    bool     user_once    : 1;  // User mode should be reset
     bool     shift_drawn  : 1;  // Cache of drawn annunciators
     bool     xshift_drawn : 1;  // Cache
     bool     alpha_drawn  : 1;  // Cache
     bool     lowerc_drawn : 1;  // Cache
+    bool     user_drawn   : 1;  // Cache
     bool     down         : 1;  // Move one line down
     bool     up           : 1;  // Move one line up
     bool     repeat       : 1;  // Repeat the key
@@ -292,14 +301,14 @@ protected:
 
 protected:
     // Key mappings
-    object_p function[NUM_PLANES][NUM_KEYS];
+    object_p function[NUM_PLANES][NUM_SOFTKEYS];
     cstring  menu_label[NUM_PLANES][NUM_SOFTKEYS];
     uint16_t menu_marker[NUM_PLANES][NUM_SOFTKEYS];
     bool     menu_marker_align[NUM_PLANES][NUM_SOFTKEYS];
     file     helpfile;
     friend struct tests;
     friend struct runtime;
-    };
+};
 
 
 inline int user_interface::evaluating_function_key() const

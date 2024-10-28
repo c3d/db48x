@@ -46,7 +46,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
-* To calculate [Pcr_kN;σcr_kPa] (Critical load; Critical stress) from 6 known variables:
+* To calculate `[Pcr_kN;σcr_kPa]` (Critical load; Critical stress) from 6 known variables:
 ```rpl
 L=7.3152_m  r=4.1148_cm  E=199947961.502_kPa  A=53.0967_cm^2  K=0.7  I=8990598.7930_mm^4
 @ Expecting [ Pcr=676.60192 6324 kN σcr=127 428.24437 8 kPa ]
@@ -59,7 +59,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Eccentric Columns](img/EccentricColumns.bmp)
 
-* To calculate [σmax_kPa;I_mm^4] (Maximum stress; Moment of inertia) from 8 known variables:
+* To calculate `[σmax_kPa;I_mm^4]` (Maximum stress; Moment of inertia) from 8 known variables:
 ```rpl
 L=6.6542_m  A=187.9351_cm^2  r=8.4836_cm  E=206842718.795_kPa  K=1  P=1908.2571_kN  c=15.24_cm
  ε=1.1806_cm
@@ -71,7 +71,7 @@ L=6.6542_m  A=187.9351_cm^2  r=8.4836_cm  E=206842718.795_kPa  K=1  P=1908.2571_
 
 ![Simple Deflection](img/SimpleDeflection.bmp)
 
-* To calculate [y_in] (Deflection at x) from 9 known variables:
+* To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
  w=102.783_lbf/ft  x=9_ft
@@ -83,7 +83,7 @@ L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_f
 
 ![Simple Slope](img/SimpleSlope.bmp)
 
-* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
+* To calculate `[Θ_°]` (Slope at `x`) from 9 known variables:
 ```rpl
 L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
  w=102.783_lbf/ft  x=9_ft
@@ -95,7 +95,7 @@ L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_f
 
 ![Simple Moment](img/SimpleMoment.bmp)
 
-* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
+* To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 @ Expecting [ Mx=9 782.1945 lbf·ft ]
@@ -106,7 +106,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=
 
 ![Simple Shear](img/SimpleShear.bmp)
 
-* To calculate [V_lbf] (Shear force at x) from 6 known variables:
+* To calculate `[V_lbf]` (Shear force at x) from 6 known variables:
 ```rpl
 L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 @ Expecting [ V=624.387 lbf ]
@@ -117,7 +117,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 
 ![Cantilever Deflection](img/CantileverDeflection.bmp)
 
-* To calculate [y_in] (Deflection at x) from 9 known variables:
+* To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting: [y=-0.331630_in]
@@ -128,7 +128,7 @@ L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=1
 
 ![Cantilever Slope](img/CantileverSlope.bmp)
 
-* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
+* To calculate `[Θ_°]` (Slope at `x`) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting [ θ=-0.26522 01876 49 ° ]
@@ -139,7 +139,7 @@ L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=1
 
 ![Cantilever Moment](img/CantileverMoment.bmp)
 
-* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
+* To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting [ Mx=-200. lbf·ft ]
@@ -150,7 +150,7 @@ L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 
 ![Cantilever Shear](img/CantileverShear.bmp)
 
-* To calculate [V_lbf] (Shear force at x) from 5 known variables:
+* To calculate `[V_lbf]` (Shear force at x) from 5 known variables:
 ```rpl
 L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
 @ Expecting [ V=200. lbf ]
@@ -230,7 +230,7 @@ The variables in the Electricity section are:
 
 These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'q1' or 'q2' in the expression of the electric force. A finite object carrying a net charge 'q1' can be considered as a point charge if the distance to the position of the point charge 'q2' is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
 
-* **Example 1**. To calculate [F_N;Er_N/C] (Electric force; Electric Field) from 5 known variables:
+* **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field) from 5 known variables:
 
 ```rpl
 q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
@@ -252,7 +252,7 @@ end
 
 The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
 
-* To calculate [λ_C/m;Er_N/C] (Linear charge density; Electric Field) from 4 known variables:
+* To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field) from 4 known variables:
 
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
@@ -266,7 +266,7 @@ The expression of the radial electric field at the distance 'r' depends on the s
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* Example 1. To calculate [λ_C/m;Er_N/C] (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
+* Example 1. To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
 
 ```rpl
 r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
@@ -295,7 +295,7 @@ Q=5E-6_C  L=3_m  r=0.05_m  εr=1  θ1=88.0876_°  θ2=271.9124_°
 
 The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length or width 'L') of the plate. On the contrary if 'd >> L', 'Ep' can be approximated if we consider the whole plate as being a point charge with 'q = σ·A' (where 'σ' is the surface charge density), see example 2 of "Coulomb's Law & E Field".
 
-* To calculate [Ep_N/C;σ_C/m^2] (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
+* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
 
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
@@ -307,7 +307,7 @@ end
 
 ### Ohm’s Law & Power
 
-* To calculate [R_Ω;P_W] (Resistance; Powe) from 2 known variables:
+* To calculate `[R_Ω;P_W]` (Resistance; Powe) from 2 known variables:
 
 ```rpl
 V=24_V  I=16_A
@@ -317,7 +317,7 @@ V=24_V  I=16_A
 
 ### Volt Divider
 
-* To calculate [V1_V] (Voltage) from 3 known variables:
+* To calculate `[V1_V]` (Voltage) from 3 known variables:
 
 ```rpl
 R1=40_Ω  R2=10_Ω  V=100_V
@@ -327,7 +327,7 @@ R1=40_Ω  R2=10_Ω  V=100_V
 
 ### Current Divider
 
-* To calculate [I1_A] (Current) from 3 known variables:
+* To calculate `[I1_A]` (Current) from 3 known variables:
 
 ```rpl
 R1=10_Ω  R2=6_Ω  I=15_A
@@ -337,7 +337,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 ### Wire Resistance
 
-* To calculate [R_Ω] (Resistance) from 3 known variables:
+* To calculate `[R_Ω]` (Resistance) from 3 known variables:
 
 ```rpl
 ρ=0.0035_Ω*cm  L=50_cm  A=1_cm^2
@@ -349,7 +349,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
 
-* To calculate [ρ_(Ω*m);σ_(S/m)] (Resistance) from 4 known variables:
+* To calculate `[ρ_(Ω*m);σ_(S/m)]` (Resistance) from 4 known variables:
 
 ```rpl
 ρ0=1.68E-8_Ω*m  αT=4.04E-3_K^-1  T0=293,15_K  T=373,15_K
@@ -361,7 +361,7 @@ The electrical resistivity 'ρ' of most materials changes with temperature. If t
 
 ![Series & Parallel R](img/Missing name.bmp)
 
-* To calculate [Rs_Ω;Rp_Ω] (Resistance) from 2 known variables:
+* To calculate `[Rs_Ω;Rp_Ω]` (Resistance) from 2 known variables:
 
 ```rpl
 R1=2_Ω  R2=3_Ω
@@ -373,7 +373,7 @@ R1=2_Ω  R2=3_Ω
 
 ![Series & Parallel C](img/Missing name.bmp)
 
-* To calculate [Cs_μF;Cp_μF] (Capacitance) from 2 known variables:
+* To calculate `[Cs_μF;Cp_μF]` (Capacitance) from 2 known variables:
 
 ```rpl
 C1=2_μF  C2=3_μF
@@ -385,7 +385,7 @@ C1=2_μF  C2=3_μF
 
 ![Series & Parallel L](img/Missing name.bmp)
 
-* To calculate [Ls_mH;Lp_mH] (Inductance) from 2 known variables:
+* To calculate `[Ls_mH;Lp_mH]` (Inductance) from 2 known variables:
 
 ```rpl
 L1=17_mH  L2=16.5_mH
@@ -395,7 +395,7 @@ L1=17_mH  L2=16.5_mH
 
 ### Capacitive Energy
 
-* To calculate [V_V;q_μC] (Potential; Charge) from 2 known variables:
+* To calculate `[V_V;q_μC]` (Potential; Charge) from 2 known variables:
 
 ```rpl
 E=0.025_J  C=20_μF
@@ -405,7 +405,7 @@ E=0.025_J  C=20_μF
 
 ### Volumic Density Electric Energy
 
-* To calculate [uE_(J/m^3)] (Volumic Density Electric Energy) from 2 known variables:
+* To calculate `[uE_(J/m^3)]` (Volumic Density Electric Energy) from 2 known variables:
 
 ```rpl
 E=5_V/m  εr=1
@@ -415,7 +415,7 @@ E=5_V/m  εr=1
 
 ### Inductive Energy
 
-* To calculate [I_A] (Current) from 2 known variables:
+* To calculate `[I_A]` (Current) from 2 known variables:
 
 ```rpl
 E=4_J L=15_mH
@@ -427,7 +427,7 @@ E=4_J L=15_mH
 
 ![RLC Current Delay](img/Missing name.bmp)
 
-* To calculate [ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω] (Phases and inpedances) from 4 known variables:
+* To calculate `[ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω]` (Phases and inpedances) from 4 known variables:
 ```rpl
 @ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
@@ -1326,13 +1326,13 @@ The variables in the Modern Physics section are:
 
 #### Planck & Wien Comparison
 
-In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Wien spectral distributions. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
-In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributions. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
 

@@ -2334,6 +2334,64 @@ You can edit it by recalling its content on the stack using
 back to disk using `"config:equations.csv" STO`.
 # Release notes
 
+## Release 0.8.3 "Blindness" - User mode and custom header
+
+This release focuses on various user interface aspects.
+
+### Features
+
+* User mode, key assignment, `ASN`, `STOKEYS`, `RCLKEYS`, `DELKEYS`. Unlike HP
+  calculators, key assignments are per directory, with inner directories
+  inheriting the key assignments from the enclosing directories.
+* Add `Header` command to customize the header. For example, you can now show
+  the path in the header, or any relevant information. This customization can be
+  done per-directory.
+* Implement `Menu`, `TMenu` and `RclMenu` commands
+* help: Automatically create links for references to RPL words.
+  When we have `sin` in the Markdown file, the calculator will automatically
+  insert a hyperlink to the corresponding entry. Note that this only applies to
+  the calculator, not to the GitHub rendering of the Markdown files.
+* Display object type in the `Info` box of the interactive stack.
+* Fallback graphic rendering of objects to text when the usual heuristics did
+  not allow the graphics to fit in the alloted pixel space. For example, a
+  fraction that does not fit will now display using the textual form if that
+  particular form can fit in the given box.
+
+### Bug fixes
+
+* Fix a bug that could cause the text editor cursor to move past the end of the
+  editor when inserting text, possibly causing memory corruption.
+* The `Show` command will now show all digits, and render fractions using
+  multiple lines for the numerator and denominator so as to be able to show more
+  digits in a readable way.
+* When terminating a command using auto-completion in the `Catalog` feature, the
+  command that was entered is now present in the command-line history.
+* Arithmetic operations that combine text or lists and unit objects now behave
+  correctly. For example, adding a unit to a list appends like any other object.
+* directories: Move updir if evaluating an updir directory, instead of
+  corrupting the directory stack.
+* Clear transient object if entering the interactive stack, e.g. when exploring
+  the interactive stack while in the `SolvingMenu` and solving an equation, and
+  correctly update the transient object when switching menus.
+* Render vectors as RPL code in the equation examples.
+* Correctly redraw the text editor when using the interactive stack `Echo`
+  feature with stack items spanning multiple lines
+* Fix minor typos in the equations documentation.
+
+
+### Improvements
+
+* tests: Only evaluate after parsing RPL examples in the documentation when the
+  stack is not empty
+* The `Wait` command now returns a key code in the same style as HP calculators,
+  i.e. with row, column and plane. Also, like HP calculators, it processes shift
+  keys and returns a plane, instead of returning the keycode of the shift key.
+* Capitalize `Path`, `CrDir`, `Home`, `UpDir` so that their rendering in
+  compatibility mode with the `Cmd` setting looks better.
+* Add `DB50X_SPEEDUP` environment variable support in the simulator.
+* documentation: Update Authors section
+
+
 ## Release 0.8.2 "Honor Seats" - Equation Library Examples, Assignments
 
 This release is focusing on the testing, validation and usability of the
@@ -5556,7 +5614,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
-* To calculate [Pcr_kN;σcr_kPa] (Critical load; Critical stress) from 6 known variables:
+* To calculate `[Pcr_kN;σcr_kPa]` (Critical load; Critical stress) from 6 known variables:
 ```rpl
 L=7.3152_m  r=4.1148_cm  E=199947961.502_kPa  A=53.0967_cm^2  K=0.7  I=8990598.7930_mm^4
 @ Expecting [ Pcr=676.60192 6324 kN σcr=127 428.24437 8 kPa ]
@@ -5569,7 +5627,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Eccentric Columns](img/EccentricColumns.bmp)
 
-* To calculate [σmax_kPa;I_mm^4] (Maximum stress; Moment of inertia) from 8 known variables:
+* To calculate `[σmax_kPa;I_mm^4]` (Maximum stress; Moment of inertia) from 8 known variables:
 ```rpl
 L=6.6542_m  A=187.9351_cm^2  r=8.4836_cm  E=206842718.795_kPa  K=1  P=1908.2571_kN  c=15.24_cm
  ε=1.1806_cm
@@ -5581,7 +5639,7 @@ L=6.6542_m  A=187.9351_cm^2  r=8.4836_cm  E=206842718.795_kPa  K=1  P=1908.2571_
 
 ![Simple Deflection](img/SimpleDeflection.bmp)
 
-* To calculate [y_in] (Deflection at x) from 9 known variables:
+* To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
  w=102.783_lbf/ft  x=9_ft
@@ -5593,7 +5651,7 @@ L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_f
 
 ![Simple Slope](img/SimpleSlope.bmp)
 
-* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
+* To calculate `[Θ_°]` (Slope at `x`) from 9 known variables:
 ```rpl
 L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf
  w=102.783_lbf/ft  x=9_ft
@@ -5605,7 +5663,7 @@ L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_f
 
 ![Simple Moment](img/SimpleMoment.bmp)
 
-* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
+* To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 @ Expecting [ Mx=9 782.1945 lbf·ft ]
@@ -5616,7 +5674,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=
 
 ![Simple Shear](img/SimpleShear.bmp)
 
-* To calculate [V_lbf] (Shear force at x) from 6 known variables:
+* To calculate `[V_lbf]` (Shear force at x) from 6 known variables:
 ```rpl
 L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 @ Expecting [ V=624.387 lbf ]
@@ -5627,7 +5685,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 
 ![Cantilever Deflection](img/CantileverDeflection.bmp)
 
-* To calculate [y_in] (Deflection at x) from 9 known variables:
+* To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting: [y=-0.331630_in]
@@ -5638,7 +5696,7 @@ L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=1
 
 ![Cantilever Slope](img/CantileverSlope.bmp)
 
-* To calculate [Θ_°] (Slope at `x`) from 9 known variables:
+* To calculate `[Θ_°]` (Slope at `x`) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting [ θ=-0.26522 01876 49 ° ]
@@ -5649,7 +5707,7 @@ L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=1
 
 ![Cantilever Moment](img/CantileverMoment.bmp)
 
-* To calculate [Mx_ft*lbf] (Internal bending moment at x) from 7 known variables:
+* To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 @ Expecting [ Mx=-200. lbf·ft ]
@@ -5660,7 +5718,7 @@ L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
 
 ![Cantilever Shear](img/CantileverShear.bmp)
 
-* To calculate [V_lbf] (Shear force at x) from 5 known variables:
+* To calculate `[V_lbf]` (Shear force at x) from 5 known variables:
 ```rpl
 L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
 @ Expecting [ V=200. lbf ]
@@ -5740,7 +5798,7 @@ The variables in the Electricity section are:
 
 These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'q1' or 'q2' in the expression of the electric force. A finite object carrying a net charge 'q1' can be considered as a point charge if the distance to the position of the point charge 'q2' is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
 
-* **Example 1**. To calculate [F_N;Er_N/C] (Electric force; Electric Field) from 5 known variables:
+* **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field) from 5 known variables:
 
 ```rpl
 q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
@@ -5762,7 +5820,7 @@ end
 
 The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
 
-* To calculate [λ_C/m;Er_N/C] (Linear charge density; Electric Field) from 4 known variables:
+* To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field) from 4 known variables:
 
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
@@ -5776,7 +5834,7 @@ The expression of the radial electric field at the distance 'r' depends on the s
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* Example 1. To calculate [λ_C/m;Er_N/C] (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
+* Example 1. To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
 
 ```rpl
 r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
@@ -5805,7 +5863,7 @@ Q=5E-6_C  L=3_m  r=0.05_m  εr=1  θ1=88.0876_°  θ2=271.9124_°
 
 The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length or width 'L') of the plate. On the contrary if 'd >> L', 'Ep' can be approximated if we consider the whole plate as being a point charge with 'q = σ·A' (where 'σ' is the surface charge density), see example 2 of "Coulomb's Law & E Field".
 
-* To calculate [Ep_N/C;σ_C/m^2] (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
+* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
 
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
@@ -5817,7 +5875,7 @@ end
 
 ### Ohm’s Law & Power
 
-* To calculate [R_Ω;P_W] (Resistance; Powe) from 2 known variables:
+* To calculate `[R_Ω;P_W]` (Resistance; Powe) from 2 known variables:
 
 ```rpl
 V=24_V  I=16_A
@@ -5827,7 +5885,7 @@ V=24_V  I=16_A
 
 ### Volt Divider
 
-* To calculate [V1_V] (Voltage) from 3 known variables:
+* To calculate `[V1_V]` (Voltage) from 3 known variables:
 
 ```rpl
 R1=40_Ω  R2=10_Ω  V=100_V
@@ -5837,7 +5895,7 @@ R1=40_Ω  R2=10_Ω  V=100_V
 
 ### Current Divider
 
-* To calculate [I1_A] (Current) from 3 known variables:
+* To calculate `[I1_A]` (Current) from 3 known variables:
 
 ```rpl
 R1=10_Ω  R2=6_Ω  I=15_A
@@ -5847,7 +5905,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 ### Wire Resistance
 
-* To calculate [R_Ω] (Resistance) from 3 known variables:
+* To calculate `[R_Ω]` (Resistance) from 3 known variables:
 
 ```rpl
 ρ=0.0035_Ω*cm  L=50_cm  A=1_cm^2
@@ -5859,7 +5917,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
 
-* To calculate [ρ_(Ω*m);σ_(S/m)] (Resistance) from 4 known variables:
+* To calculate `[ρ_(Ω*m);σ_(S/m)]` (Resistance) from 4 known variables:
 
 ```rpl
 ρ0=1.68E-8_Ω*m  αT=4.04E-3_K^-1  T0=293,15_K  T=373,15_K
@@ -5871,7 +5929,7 @@ The electrical resistivity 'ρ' of most materials changes with temperature. If t
 
 ![Series & Parallel R](img/Missing name.bmp)
 
-* To calculate [Rs_Ω;Rp_Ω] (Resistance) from 2 known variables:
+* To calculate `[Rs_Ω;Rp_Ω]` (Resistance) from 2 known variables:
 
 ```rpl
 R1=2_Ω  R2=3_Ω
@@ -5883,7 +5941,7 @@ R1=2_Ω  R2=3_Ω
 
 ![Series & Parallel C](img/Missing name.bmp)
 
-* To calculate [Cs_μF;Cp_μF] (Capacitance) from 2 known variables:
+* To calculate `[Cs_μF;Cp_μF]` (Capacitance) from 2 known variables:
 
 ```rpl
 C1=2_μF  C2=3_μF
@@ -5895,7 +5953,7 @@ C1=2_μF  C2=3_μF
 
 ![Series & Parallel L](img/Missing name.bmp)
 
-* To calculate [Ls_mH;Lp_mH] (Inductance) from 2 known variables:
+* To calculate `[Ls_mH;Lp_mH]` (Inductance) from 2 known variables:
 
 ```rpl
 L1=17_mH  L2=16.5_mH
@@ -5905,7 +5963,7 @@ L1=17_mH  L2=16.5_mH
 
 ### Capacitive Energy
 
-* To calculate [V_V;q_μC] (Potential; Charge) from 2 known variables:
+* To calculate `[V_V;q_μC]` (Potential; Charge) from 2 known variables:
 
 ```rpl
 E=0.025_J  C=20_μF
@@ -5915,7 +5973,7 @@ E=0.025_J  C=20_μF
 
 ### Volumic Density Electric Energy
 
-* To calculate [uE_(J/m^3)] (Volumic Density Electric Energy) from 2 known variables:
+* To calculate `[uE_(J/m^3)]` (Volumic Density Electric Energy) from 2 known variables:
 
 ```rpl
 E=5_V/m  εr=1
@@ -5925,7 +5983,7 @@ E=5_V/m  εr=1
 
 ### Inductive Energy
 
-* To calculate [I_A] (Current) from 2 known variables:
+* To calculate `[I_A]` (Current) from 2 known variables:
 
 ```rpl
 E=4_J L=15_mH
@@ -5937,7 +5995,7 @@ E=4_J L=15_mH
 
 ![RLC Current Delay](img/Missing name.bmp)
 
-* To calculate [ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω] (Phases and inpedances) from 4 known variables:
+* To calculate `[ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω]` (Phases and inpedances) from 4 known variables:
 ```rpl
 @ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
@@ -6836,13 +6894,13 @@ The variables in the Modern Physics section are:
 
 #### Planck & Wien Comparison
 
-In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Wien spectral distributions. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
-In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributions. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
 
@@ -8720,6 +8778,29 @@ Generate an integral sign of the given size
 @ 45-pixel Sigma sign
 45 GraphicIntegral
 ```
+
+
+## Header
+
+The `Header` command updates a special variable also called `Header`.
+
+When that variable is present, it must evaluate to something that can render
+graphically, either directly a graphic object or a (possibly multi-line) text.
+
+When a header is provided, the normal content of the header, i.e. date, time and
+name of the state file, is no longer shown.  However, annunciators and battery
+status are still overimposed.
+
+It is the responsibility of the programmer to ensure that the header program
+does not draw important data at these locations, and also to make sure that the
+header program is "well behaved", i.e. does not leave things on stack. If the
+header program generates an error, then that error may get in the way of normal
+calculator operations.
+
+```rpl
+« TIME " " PATH TAIL TOTEXT + + "
+" + DATE + " Mem: " + MEM + » HEADER
+```
 # Local Variables
 
 ## LSTO
@@ -9339,6 +9420,67 @@ history.
 
 The constants menu is defined by the `config/constants.csv` file. You are
 encouraged to tailor this file to suit your own needs.
+
+
+## ToggleCustomMenu
+
+The `ToggleCustomMenu` command toggles between the `VariablesMenu` and the
+`CustomMenu`. It is normally bound to the _VAR_ key, so that a first press on
+this key shows the variables in the current directory, and a second press shows
+any user-defined custom menu if it exists.
+
+
+## CustomMenu
+
+The `CustomMenu` command activates a menu defined by the variable of the same
+name. The content of the variable should be an array or list, where each item is
+either an array or list of the form `{ Name Value }`, or an object that is made
+directly accessible in the menu.
+
+The `Menu` command defines the `CustomMenu` variable and shows the corresponding
+custom menu.
+
+
+## Menu
+
+This command shows up a system menu or defines a custom menu.
+
+If the object on the stack is a menu name, typically returned by [RecallMenu](#recallmenu), then `Menu` will activate that menu.
+
+If the object on the stack is `0`, then `Menu` has the same effect as
+`LastMenu`, showing the last menu selected. Other numerical values, which select
+built-in menus on HP's implementation, will cause an `Unimplemented` error.
+
+If the object on the stack is an array or a list, `Menu` will use that array or list to set the value of the `CutomMenu` variable, and then behave like the `CustomMenu` command, i.e. show the menu defined by the list.
+
+The following defines a `CustomMenu` adding or subtracting powers of `10`
+
+```rpl
+{ { "1+"   «   1 + » } { "1-"   «   1 - » }
+  { "10+"  «  10 + » } { "10-"  «  10 - » }
+  { "100+" « 100 + » } { "100-" « 100 - » } }
+MENU
+```
+
+
+## TMenu
+
+The `TMenu` command works like [Menu](#menu), but does not define the
+`CustomMenu` variable. The resulting menu is temporary and cannot be found by
+`RecallMenu` or by the menu history in `LastMenu`.
+
+For example, the following defines a temporary menu showing
+
+```rpl
+{ 2 3 5 7 11 13 97 197 397 797 997 1097 1297 1597 1697 1997 2297 2797 }
+TMENU
+```
+
+
+## RecallMenu
+
+Return the last menu entry, or `0` if there is no current menu. The returned
+value can be used as an argument to `Menu` or `TMenu`.
 # Numerical functions
 
 ## Integrate
@@ -11788,3 +11930,172 @@ Create a backup on a remote machine
 ## USBRESTORE
 Restore a backup from a remote machine
 
+# UserModeMenu
+
+Like most HP calculators, DB50X features a "user mode", where the keyboard can
+be redefined in whole or in part. This lets you customize the keyboard for
+specific tasks, for example if the default key bindings are not optimal for a
+specific situation.
+
+User mode is activated using 🟨 _2_ (`ToggleUserMode`).
+When `UserModeOnce` is selected, the first press enables user mode for one key
+only, and a second press locks user mode.
+When `UserModeLock` is selected, each use toggles user mode on or off.
+
+## KeyMap
+
+Key assignments on DB48x are not global, unlike what happens with `ASN` on HP
+claculators. Instead, assignments are stored in a special variable (really a
+directory containing numbered variables) called `KeyMap`. This approach makes it
+possible to have per-directory key assignments, and to use normal tools such as
+`Store` and `Recall` to manipulate key assignments.
+
+If a `KeyMap` is present in the current directory, it overrides assignments
+while you are in that directory. However, key assignments from the enclosing
+directories are still considered when they are not overriden. In other words,
+key assignments are a hierarchy. When no key assignment is found in any of the
+`KeyMap` variables in any of the enclosing directories, then the default key
+binding for that key applies.
+
+## Key positions
+
+Like on HP calculators, key assignments are specified using a key position.
+The key position is given in the form `rc.ph`, where `r` is a row number, `c` is
+a column number, `p` is a shift plane and `h` indicates if we held the key.
+The shift plane has the following values, where `7`, `8` and `9` are DB50X
+extensions.
+
+* `0`: Unshifted (only used on input, values returned use `1`)
+* `1`: Unshifted
+* `2`: Left shift
+* `3`: Right shift
+* `4`: Uppercase alpha
+* `5`: Uppercase alpha left shift
+* `6`: Uppercase alpha right shift
+* `7`: Lowercase alpha
+* `8`: Lowercase alpha left shift
+* `9`: Lowercase alpha right shift
+
+For example, the key for `SIN` is `34.1`, the key for the right-shifted `MAT`
+menu above the `9` key is `54.3`, and the key for `Z` in Alpha mode is `74.4`.
+
+
+## Behaviour of assigned object
+
+When using the key in user mode, the associated object is evaluated.
+However, when editing, the associated object is inserted into the command
+line. This is different from HP calculators, which do nothing in that case.
+
+If the associated object is a text, then the text is always inserted as is into
+the text editor. In that case, if the text contains a TAB character (`9 CHR`),
+then the cursor will automatically be positioned at that location.
+
+## AssignKey
+
+The `ASN` command defines the behaviour of a given key in user mode.
+It takes two arguments, an object and a [key position](#key-position).
+The assignment is placed in the `KeyMap` variabe for the current directory.
+
+To clear an assignment, assign `StandardKey` to a given key.
+
+For example, to assign the `MathMenu` to the `exp` key, use the following:
+```rpl
+'MathMenu' 24 ASN
+```
+
+To restore the standard key assignment for that same key, use the following:
+```rpl
+'StandardKey' 24 ASN
+```
+
+## StoreKeys
+
+Defines multiple keys on the user keyboard by assigning objects to specified
+keys. The argument is a list where the object to assign is followed by the
+position, using the same format as `ASN`.
+
+For example, to assign Greek letters to the shifted keys `A` through `F` when in
+alpha mode, use the following code:
+```rpl
+{ "α" 21.5 "β" 22.5 "γ" 23.5 "δ" 24.5 "ε" 25.5 "φ" 26.5 }
+STOKEYS
+```
+
+## RecallKeys
+
+Recall the current user key assignment in the current directory.
+
+With the key assignments given in the example for `StoreKeys`, the output will
+match the input list we were given.
+
+```rpl
+RCLKEYS
+@ Expecting { "α" 21.5 "β" 22.5 "γ" 23.5 "δ" 24.5 "ε" 25.5 "φ" 26.5 }
+```
+
+This will merge the key assignments of the current directory and all enclosing
+directories, which will appear at end of the list. In that case, the assignments
+for enclosing directories will appear after a sequence like `1` `UpDir`, `2`
+`UpDir`, and so on. Keys definitions that follow such a sequence are ignored by
+`StoreKeys`, which only modifies the keymap for the current directory.
+
+## DeleteKeys
+
+Delete key assignments.
+
+If the argument is a specific key position, then the assignment for that key
+position is removed. For example, the following code will remove the assignment
+for key `E` that was specified earlier:
+
+```rpl
+25.5 DELKEYS
+```
+
+If the argument is a list, then all the positions given in the list will be
+deleted. For example, to remove assignmens for keys `A`, `B` and `F` assigned
+by the earlier example, you can use:
+
+```rpl
+{ 21.5 22.5 26.5 } DELKEYS
+```
+
+If the argument is `0`, then all assignments in the current directory are
+removed. For example, to remove the assignments given above, use:
+
+```rpl
+0 DELKEYS
+```
+
+
+## StandardKey
+
+The `StandardKey` is given as an argument to `AssignKey` or `StoreKeys` to erase
+a specific key assignment.
+
+
+## UserMode
+
+Enables user mode. The opposite setting is `UserModeOff`.
+
+## UserModeOff
+
+Disable user mode. The opposite setting is `UserMode`.
+
+## ToggleUserMode
+
+Toggle `UserMode` between on and off states. When `UserModeLock` is not set,
+then a first call to `ToggleUserMode` will select user mode for a single
+operation, and the second call will select user mode until it is disabled.
+
+`ToggleUserMode` is bound to 🟨 _2_ by default.
+
+## UserModeLock
+
+Lock user mode when using `ToggleUserMode`, meaning that user mode will not
+automatically be disabled after the first operation. The opposite setting is
+`UserModeOnce`.
+
+## UserModeOnce
+
+Enable temporary user mode, where the first activation of `ToggleUserMode` only
+enables user mode for a single operation. The oppsite setting is `UserModeLock`.

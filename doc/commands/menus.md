@@ -42,3 +42,64 @@ history.
 
 The constants menu is defined by the `config/constants.csv` file. You are
 encouraged to tailor this file to suit your own needs.
+
+
+## ToggleCustomMenu
+
+The `ToggleCustomMenu` command toggles between the `VariablesMenu` and the
+`CustomMenu`. It is normally bound to the _VAR_ key, so that a first press on
+this key shows the variables in the current directory, and a second press shows
+any user-defined custom menu if it exists.
+
+
+## CustomMenu
+
+The `CustomMenu` command activates a menu defined by the variable of the same
+name. The content of the variable should be an array or list, where each item is
+either an array or list of the form `{ Name Value }`, or an object that is made
+directly accessible in the menu.
+
+The `Menu` command defines the `CustomMenu` variable and shows the corresponding
+custom menu.
+
+
+## Menu
+
+This command shows up a system menu or defines a custom menu.
+
+If the object on the stack is a menu name, typically returned by [RecallMenu](#recallmenu), then `Menu` will activate that menu.
+
+If the object on the stack is `0`, then `Menu` has the same effect as
+`LastMenu`, showing the last menu selected. Other numerical values, which select
+built-in menus on HP's implementation, will cause an `Unimplemented` error.
+
+If the object on the stack is an array or a list, `Menu` will use that array or list to set the value of the `CutomMenu` variable, and then behave like the `CustomMenu` command, i.e. show the menu defined by the list.
+
+The following defines a `CustomMenu` adding or subtracting powers of `10`
+
+```rpl
+{ { "1+"   «   1 + » } { "1-"   «   1 - » }
+  { "10+"  «  10 + » } { "10-"  «  10 - » }
+  { "100+" « 100 + » } { "100-" « 100 - » } }
+MENU
+```
+
+
+## TMenu
+
+The `TMenu` command works like [Menu](#menu), but does not define the
+`CustomMenu` variable. The resulting menu is temporary and cannot be found by
+`RecallMenu` or by the menu history in `LastMenu`.
+
+For example, the following defines a temporary menu showing
+
+```rpl
+{ 2 3 5 7 11 13 97 197 397 797 997 1097 1297 1597 1697 1997 2297 2797 }
+TMENU
+```
+
+
+## RecallMenu
+
+Return the last menu entry, or `0` if there is no current menu. The returned
+value can be used as an argument to `Menu` or `TMenu`.

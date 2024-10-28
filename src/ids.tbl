@@ -139,7 +139,7 @@ ID_RANGE(is_plot,          Function,       Parametric)
 ID_RANGE(is_program,       program,        funcall)
 ID_RANGE(is_graph,         grob,           bitmap)
 ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,    IfErrThen, IfErrThenElse)
-
+ID_RANGE(is_menu,          MainMenu,       Catalog,     UnitMenu00, CharactersMenu99)
 
 
 // ============================================================================
@@ -428,7 +428,14 @@ NAMED(det, "Determinant")
 // ============================================================================
 
 CMD(PlotParameters)     ALIAS(PlotParameters, "PPar")
-CMD(Equation)           ALIAS(Equation, "eq")
+CMD(Equation)           ALIAS(Equation, "Eq")
+CMD(Header)             ALIAS(Header, "Hdr")
+CMD(KeyMap)             ALIAS(Header, "Keys")
+CMD(AssignKey)          ALIAS(AssignKey, "Asn")
+CMD(DeleteKeys)         ALIAS(DeleteKeys, "DelKeys")
+CMD(StoreKeys)          ALIAS(StoreKeys, "StoKeys")
+CMD(RecallKeys)         ALIAS(RecallKeys, "RclKeys")
+CMD(StandardKey)        ALIAS(StandardKey, "SKey")
 
 NAMED(DispXY,           "DrawStyledText")
 NAMED(PixOn,            "DrawPixel")
@@ -485,11 +492,15 @@ NAMED(Center,           "PlotCenter")           ALIAS(Center, "Centr")
 
 CMD(Beep)
 
+CMD(Menu)
+CMD(TemporaryMenu)                              ALIAS(TemporaryMenu, "TMenu")
+CMD(RecallMenu)                                 ALIAS(RecallMenu, "RclMenu")
+
 
 
 // ============================================================================
 //
-//   Rarely used commands (two bytes)
+//   Rarely used commands that are deepp in the two-bytes area
 //
 // ============================================================================
 
@@ -517,12 +528,12 @@ CMD(FlagsToBinary)              ALIAS(FlagsToBinary,          "RclF")
 CMD(BinaryToFlags)              ALIAS(BinaryToFlags,          "StoF")
 
 // Directories
-NAMED(home, "HomeDirectory")
+NAMED(Home, "HomeDirectory")
 CMD(CurrentDirectory)
-NAMED(path, "DirectoryPath")
-NAMED(crdir, "CreateDirectory")
-NAMED(updir, "UpDirectory")
-NAMED(pgdir, "PurgeDirectory")
+NAMED(Path, "DirectoryPath")
+NAMED(CrDir, "CreateDirectory") ALIAS(CrDir, "MkDir")
+NAMED(UpDir, "UpDirectory")
+NAMED(PgDir, "PurgeDirectory")
 
 /// Equations
 NAMED(MatchUp,   "↑Match")
@@ -817,6 +828,8 @@ CMD(Modes)
 CMD(ResetModes)
 
 // Default (flag clear) is on the right
+FLAG(UserMode,                  UserModeOff)
+FLAG(UserModeLock,              UserModeOnce)
 FLAG(NoStackSave,               SaveStack)
 FLAG(NoLastArguments,           SaveLastArguments)
 FLAG(ProgramLastArguments,      NoProgramLastArguments)
@@ -947,6 +960,7 @@ SETTING_BITS(EditorFont,          settings::font_id, 4,   settings::FIRST_FONT, 
 SETTING_BITS(MultilineEditorFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::STACK)
 SETTING_BITS(CursorFont,          settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::HELP)
 SETTING_BITS(MultilineCursorFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::HELP)
+SETTING_BITS(HeaderFont, settings::font_id, 4,   settings::FIRST_FONT, settings::LAST_FONT, settings::LIB17)
 
 SETTING_ENUM(NumberSpaces,      nullptr,        NumberSeparatorCommand)
 SETTING_ENUM(NumberDotOrComma,  nullptr,        NumberSeparatorCommand)
@@ -1024,6 +1038,7 @@ SETTING(SkippedMenuBackground,  ularge(0), ~ularge(0), GRAY50(160, 160, 160))
 SETTING(FolderCornerForeground, ularge(0), ~ularge(0), WHITE(255, 255, 255))
 SETTING(UnimplementedForeground,ularge(0), ~ularge(0), GRAY50(160, 160, 160))
 SETTING(HeaderBackground,       ularge(0), ~ularge(0), BLACK(  0,   0,   0))
+SETTING(HeaderForeground,       ularge(0), ~ularge(0), WHITE(224, 224, 255))
 SETTING(DateForeground,         ularge(0), ~ularge(0), WHITE(255, 255, 255))
 SETTING(TimeForeground,         ularge(0), ~ularge(0), WHITE(255, 255, 255))
 SETTING(StateNameForeground,    ularge(0), ~ularge(0), WHITE(255, 255, 255))
@@ -1045,6 +1060,7 @@ SETTING(HalfBatteryForeground,  ularge(0), ~ularge(0), GRAY75(192,  64,  64))
 SETTING(LowBatteryForeground,   ularge(0), ~ularge(0), GRAY25(255, 255, 255))
 SETTING(ChargingForeground,     ularge(0), ~ularge(0), GRAY50(128, 192, 255))
 SETTING(BatteryRefresh,         uint(100),  uint(3600000), uint(3000))
+SETTING(CustomHeaderRefresh,    uint(100),  uint(3600000), uint(1000))
 
 SETTING_ENUM(DateSlash,         nullptr,        DateSeparatorCommand)
 SETTING_ENUM(DateDash,          nullptr,        DateSeparatorCommand)
@@ -1187,6 +1203,7 @@ MENU(PlotMenu)
 MENU(GraphicsMenu)
 MENU(MemoryMenu)
 MENU(TextMenu)
+MENU(UserModeMenu)
 
 // Special menus
 MENU(EditMenu)
@@ -1197,6 +1214,7 @@ CMD(SolvingMenu)
 CMD(ToolsMenu)
 CMD(Catalog)
 
+CMD(ToggleUserMode)
 CMD(Undo)                       // Immediate: do not save stack before Undo
 CMD(LastMenu)                   // Last parseable command
 

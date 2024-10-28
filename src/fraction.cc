@@ -114,16 +114,27 @@ GRAPH_BODY(fraction)
     if (num->is_negative())
         num = -num;
 
+    // The denominator defines the overall width in the mixed case
+    grob_g deng = den->graph(g);
+    if (!deng)
+        deng = object::do_graph(den, g);
+    if (!deng)
+        return nullptr;
+    blitter::size dw = deng->width();
+
     grob_g ipart = nullptr;
-    if (Settings.MixedFractions())
+    if (Settings.MixedFractions() && dw < g.maxw)
     {
         bignum_g quo, rem;
         if (bignum::quorem(num, den, bignum::ID_bignum, &quo, &rem))
         {
             if (!quo->is_zero())
             {
+                save<blitter::size> wsave(g.maxw, g.maxw - dw);
                 save<font_id> isave(g.font, fsave.saved);
                 ipart = quo->graph(g);
+                if (!ipart)
+                    ipart = object::do_graph(quo, g);
                 if (!ipart)
                     return nullptr;
                 num = rem;
@@ -131,7 +142,8 @@ GRAPH_BODY(fraction)
         }
     }
     grob_g numg = num->graph(g);
-    grob_g deng = den->graph(g);
+    if (!numg)
+        numg = object::do_graph(num, g);
     numg = expression::ratio(g, numg, deng);
     if (ipart && numg)
         numg = expression::prefix(g, 0, ipart, g.voffset, numg);
