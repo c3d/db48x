@@ -745,7 +745,7 @@ uint ui_battery()
 
     if (UIDevice.currentDevice.batteryLevel <= 0)
         return 500;
-    uint level = uint(1000 * UIDevice.currentDevice.batteryLevel);
+    uint level = uint(750 * UIDevice.currentDevice.batteryLevel) + 250;
     return level;
 }
 
