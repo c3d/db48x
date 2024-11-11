@@ -671,6 +671,10 @@ cstring setting::label(object::id ty)
         return printf("Slv~%u", s.SolverImprecision());
     case ID_SolverIterations:
         return printf("Slv#%u", s.SolverIterations());
+    case ID_CustomHeaderRefresh:
+        return printf("Header %u", s.CustomHeaderRefresh());
+    case ID_BusyIndicatorRefresh:
+        return printf("Busy %u", s.BusyIndicatorRefresh());
     default:
         break;
     }

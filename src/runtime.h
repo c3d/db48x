@@ -995,8 +995,6 @@ struct runtime
 #include "errors.tbl"
 
 
-
-
 protected:
     utf8      Error;        // Error message if any
     utf8      ErrorSave;    // Last error message (for ERRM)
@@ -1017,10 +1015,20 @@ protected:
     object_p *CallStack;    // Start of call stack (rounded 16 entries)
     object_p *Returns;      // Start of return stack, end of locals
     object_p *HighMem;      // End of available memory
+    size_t    GCCycles;     // Number of garbage collection cycles
+    size_t    GCPurged;     // Number of bytes collected by the GC
+    size_t    GCDuration;   // Total duration of GC execution
+    size_t    GCLPurged;    // Number of bytes collected during last GC
+    size_t    GCLDuration;  // Duration of last GC execution
+    size_t    GCCleared;    // Cleaned automatically by `clearer`
+    size_t    GCUnclear;    // Disable 'clearer' class
     bool      SaveArgs;     // Save arguents (LastArgs)
 
     // Pointers that are GC-adjusted
     static gcptr *GCSafe;
+
+    friend struct GarbageCollectorStatistics;
+    friend struct cleaner;
 };
 
 template<typename T>
@@ -1184,6 +1192,32 @@ struct error_save
     gcutf8    source;
     size_t    srclen;
     gcp<text> command;
+};
+
+
+struct cleaner
+// ----------------------------------------------------------------------------
+//   Reclaim temporaries created during a lengthy operation
+// ----------------------------------------------------------------------------
+{
+    cleaner();
+    object_p adjust(object_p temp);
+
+    template<typename T>
+    const T *operator()(const T* temp)
+    {
+        return (const T *) adjust(object_p(temp));
+    }
+    template<typename T>
+    const T *operator()(const gcp<T> &temp)
+    {
+        return (const T *) adjust(object_p(+temp));
+    }
+
+    static void disable()       { rt.GCUnclear++; }
+
+    object_p temporaries;
+    size_t   gccycles;
 };
 
 #endif // RUNTIME_H

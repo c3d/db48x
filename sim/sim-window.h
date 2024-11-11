@@ -160,6 +160,7 @@ public:
                                    int     y = 0,
                                    int     w = LCD_W,
                                    int     h = LCD_H);
+    static void         load_keymap(cstring path);
 
     void                startBuzzer(uint frequency);
     void                stopBuzzer();

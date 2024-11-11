@@ -55,9 +55,10 @@ any user-defined custom menu if it exists.
 ## CustomMenu
 
 The `CustomMenu` command activates a menu defined by the variable of the same
-name. The content of the variable should be an array or list, where each item is
-either an array or list of the form `{ Name Value }`, or an object that is made
-directly accessible in the menu.
+name. The content of the variable should evaluate as an array or list, where
+each item is either an array or list of the form `{ Name Value }`, or an object
+that is made directly accessible in the menu. See `Menu` below for a description
+of the format of menu descriptions.
 
 The `Menu` command defines the `CustomMenu` variable and shows the corresponding
 custom menu.
@@ -67,13 +68,16 @@ custom menu.
 
 This command shows up a system menu or defines a custom menu.
 
-If the object on the stack is a menu name, typically returned by [RecallMenu](#recallmenu), then `Menu` will activate that menu.
+If the object on the stack is a menu name, typically returned by `RecallMenu`,
+then `Menu` will activate that menu.
 
 If the object on the stack is `0`, then `Menu` has the same effect as
 `LastMenu`, showing the last menu selected. Other numerical values, which select
 built-in menus on HP's implementation, will cause an `Unimplemented` error.
 
-If the object on the stack is an array or a list, `Menu` will use that array or list to set the value of the `CutomMenu` variable, and then behave like the `CustomMenu` command, i.e. show the menu defined by the list.
+If the object on the stack is an array or a list, `Menu` will use that array or
+list to set the value of the `CutomMenu` variable, and then behave like the
+`CustomMenu` command, i.e. show the menu defined by the list.
 
 The following defines a `CustomMenu` adding or subtracting powers of `10`
 
@@ -84,6 +88,16 @@ The following defines a `CustomMenu` adding or subtracting powers of `10`
 MENU
 ```
 
+You can define a menu of vertically-stacked menu items using a matrix.
+For example, you can define a menu that lets you store, evaluate or purge
+variables `X` and `Y as follows:
+
+```rpl
+[ [ X                      Y                      ]
+  [ { ">X" « 'X' Store » } { ">Y" « 'Y' Store » } ]
+  [ { "-X" « 'X' Purge » } { "-Y" « 'Y' Purge » } ] ]
+MENU
+```
 
 ## TMenu
 

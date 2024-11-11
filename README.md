@@ -12,7 +12,7 @@ You can [order keyboard overlays](https://www.hpmuseum.org/forum/thread-20113.ht
 DB48X leverages SwissMicros's built-in software platform, known as
 [DMCP](https://technical.swissmicros.com/dmcp/doc/DMCP-ifc-html/).
 There is also a simulator that is tested on macOS or Linux, and you can even
-[try it in your browser](http://c3d.github.com/db48x)
+[try it in your browser](https://48calc.org)
 
 In the long-term, the vision is to be able to port DB48X on a number of
 [different physical calculator platforms](https://www.youtube.com/watch?v=34pPycq8ia8),

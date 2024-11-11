@@ -102,17 +102,29 @@ cmp-% compare-%:
 	echo mv -f $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
 update-%:
 	mv $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
+	rm -f $*.png
 
 BAD_IMAGES=$(wildcard $(IMAGES)/bad/*.png)
 compare: $(BAD_IMAGES:$(IMAGES)/bad/%.png=cmp-%)
 update: $(BAD_IMAGES:$(IMAGES)/bad/%.png=update-%)
 
-keyboard: Keyboard-Layout.png Keyboard-Cutout.png sim/keyboard-db48x.png help/keyboard.png doc/keyboard.png
+keyboard:				\
+	Keyboard-Layout.png 		\
+	Keyboard-Cutout.png		\
+	sim/keyboard-db48x.png 		\
+	sim/keyboard-db48x-42like.png	\
+	sim/keyboard-db48x-old.png	\
+	help/keyboard.png		\
+	doc/keyboard.png
 Keyboard-Layout.png: DB48X-Keys/DB48X-Keys.001.png
 	cp $< $@
 Keyboard-Cutout.png: DB48X-Keys/DB48X-Keys.002.png
 	cp $< $@
 sim/keyboard-db48x.png: DB48X-Keys/DB48X-Keys.001.png
+	magick $< -crop 698x878+151+138 $@
+sim/keyboard-db48x-42like.png: DB48X-Keys/DB48X-Keys.003.png
+	magick $< -crop 698x878+151+138 $@
+sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 	magick $< -crop 698x878+151+138 $@
 %/keyboard.png: sim/keyboard-db48x.png
 	cp $< $@
@@ -141,6 +153,8 @@ TAR_FILES=	$(TARGET).$(PGM)		\
 		help/*.bmp help/*/*.bmp		\
 		state/*.48[sSbB]		\
 		config/*.csv			\
+		config/*.48k			\
+		config/*.cfg			\
 		library/*.48[sSbB]
 
 # installation steps

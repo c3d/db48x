@@ -793,7 +793,6 @@ MENU(SymbolicMenu,
      "Graph",           ID_PlotMenu,
 
      "Integ",           ID_IntegrationMenu,
-     "Deriv",           ID_DifferentiationMenu,
      "DSolve",          ID_DifferentialSolverMenu,
      "Simplify",        ID_AutoSimplify,
      "KeepAll",         ID_NoAutoSimplify);
@@ -1191,27 +1190,15 @@ MENU(IntegrationMenu,
 // ----------------------------------------------------------------------------
 //   Symbolic and numerical integration
 // ----------------------------------------------------------------------------
+     "∂",       ID_Derivative,
      "∫",       ID_Primitive,
      "Num ∫",   ID_Integrate,
      "Symb ∫",  ID_Primitive,
-     "Prim",    ID_Primitive,
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
 
      "Σ",       ID_Sum,
      "∏",       ID_Product);
-
-MENU(DifferentiationMenu,
-// ----------------------------------------------------------------------------
-//   Symbolic and numerical differentiation
-// ----------------------------------------------------------------------------
-     "∂",       ID_Derivative,
-     "Num",     ID_Unimplemented,
-     "Symb",    ID_Unimplemented,
-     "Diff",    ID_Unimplemented,
-
-     "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented);
 
 MENU(SolverMenu,
 // ----------------------------------------------------------------------------
@@ -1489,9 +1476,18 @@ MENU(UserInterfaceModesMenu,
 
      "Fixed0",                                  ID_FixedWidthDigits,
      "VProg",                                   ID_VerticalProgramRendering,
-     "Units",                                   ID_ShowBuiltinUnits,
+     BusyIndicatorRefresh::label,               ID_BusyIndicatorRefresh,
      "ExitMenu",                                ID_ExitClearsMenu,
-     "ListEval",                                ID_ListAsProgram);
+     "ListEval",                                ID_ListAsProgram,
+
+     "Units",                                   ID_ShowBuiltinUnits,
+     "Const",                                   ID_ShowBuiltinConstants,
+     "Eqns",                                    ID_ShowBuiltinEquations,
+     "Libs",                                    ID_ShowBuiltinLibrary,
+     "Chars",                                   ID_ShowBuiltinCharacters,
+
+     "AllVars",                                 ID_AllEquationVariables,
+     CustomHeaderRefresh::label,                ID_CustomHeaderRefresh);
 
 MENU(UserModeMenu,
 // ----------------------------------------------------------------------------
@@ -1631,7 +1627,7 @@ MENU(MemoryMenu,
      "Free",    ID_FreeMemory,
      "System",  ID_SystemMemory,
      "PgAll",   ID_PurgeAll,
-     "Bytes",   ID_Bytes,
+     "GCStats", ID_GarbageCollectorStatistics,
      "Clone",   ID_Clone,
 
      "Store",   ID_Sto,

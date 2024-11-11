@@ -377,7 +377,55 @@ object::id algebraic::based_promotion(algebraic_g &x)
 }
 
 
-bool algebraic::decimal_to_fraction(algebraic_g &x)
+bool algebraic::to_integer(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//  Check if we can convert the number to an integer (or big integer)
+// ----------------------------------------------------------------------------
+{
+    id ty = x->type();
+    switch(ty)
+    {
+    case ID_hwfloat:
+        x = hwfloat_p(+x)->to_integer();
+        return true;
+    case ID_hwdouble:
+        x = hwdouble_p(+x)->to_integer();
+        return true;
+    case ID_decimal:
+    case ID_neg_decimal:
+        x = decimal_p(+x)->to_integer();
+        return true;
+
+    case ID_integer:
+    case ID_neg_integer:
+    case ID_bignum:
+    case ID_neg_bignum:
+    case ID_fraction:
+    case ID_neg_fraction:
+    case ID_big_fraction:
+    case ID_neg_big_fraction:
+        return true;
+
+    case ID_unit:
+    {
+        unit_p ux = unit_p(+x);
+        algebraic_g v = ux->value();
+        algebraic_g u = ux->uexpr();
+        if (to_integer(v))
+        {
+            x = unit::simple(v, u);
+            return true;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return false;
+}
+
+
+bool algebraic::to_fraction(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //  Check if we can promote the number to a fraction
 // ----------------------------------------------------------------------------
@@ -411,7 +459,7 @@ bool algebraic::decimal_to_fraction(algebraic_g &x)
         rectangular_p z = rectangular_p(+x);
         algebraic_g re = z->re();
         algebraic_g im = z->im();
-        if (!decimal_to_fraction(re) || !decimal_to_fraction(im))
+        if (!to_fraction(re) || !to_fraction(im))
             return false;
         x = rectangular::make(re, im);
         return true;
@@ -421,7 +469,7 @@ bool algebraic::decimal_to_fraction(algebraic_g &x)
         polar_p z = polar_p(+x);
         algebraic_g mod = z->mod();
         algebraic_g arg = z->pifrac();
-        if (!decimal_to_fraction(mod) || !decimal_to_fraction(arg))
+        if (!to_fraction(mod) || !to_fraction(arg))
             return false;
         x = polar::make(mod, arg, object::ID_PiRadians);
         return true;
@@ -431,7 +479,7 @@ bool algebraic::decimal_to_fraction(algebraic_g &x)
         unit_p ux = unit_p(+x);
         algebraic_g v = ux->value();
         algebraic_g u = ux->uexpr();
-        if (decimal_to_fraction(v))
+        if (to_fraction(v))
         {
             x = unit::simple(v, u);
             return true;
@@ -571,7 +619,7 @@ retry:
         {
             algebraic_g aunit = integer::make(1);
             if (add_angle(aunit))
-                if (unit_p(+aunit)->convert(x))
+                if (unit_p(+aunit)->convert(x, false))
                     goto retry;
         }
         if (amode)
@@ -694,6 +742,22 @@ algebraic_p algebraic::convert_angle(algebraic_r ra,
         }
     }
     return a;
+}
+
+
+algebraic_p algebraic::exact_angle(int num, int denom, angle_unit aunit)
+// ----------------------------------------------------------------------------
+//   Generate a fraction of a turn in the given unit
+// ----------------------------------------------------------------------------
+{
+    if (aunit != ID_Deg && aunit != ID_Grad && aunit != ID_PiRadians)
+        return nullptr;
+
+    int hturn = aunit == ID_Deg ? 180 : aunit == ID_Grad ? 200 : 1;
+    num *= hturn;
+    if (num % denom == 0)
+        return integer::make(num/denom);
+    return fraction::make(integer::make(num), integer::make(denom));
 }
 
 

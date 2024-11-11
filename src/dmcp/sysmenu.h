@@ -43,6 +43,7 @@ enum menu_item
     MI_DB48_SETTINGS = 1,       // Application settings
     MI_DB48_ABOUT,              // Display the "About" dialog
     MI_DB48_FLASH,              // Silent flash for beep
+    MI_DB48_KEYMAP,             // Load a keymap
 
     MI_48STATE,                 // Menu for 48 state load and save
     MI_48STATE_CLEAN,           // Restart with a clean state
@@ -66,6 +67,7 @@ extern const smenu_t  application_menu;
 extern const smenu_t  settings_menu;
 extern const smenu_t  state_menu;
 extern const smenu_t  program_menu;
+extern cstring        keymap_filename;
 
 // Callbacks installed in the SDB to run the menu system
 int                   menu_item_run(uint8_t mid);

@@ -21,6 +21,8 @@ The project has the following pre-requisites:
 
 * `make`, `bash`, `dd`, `sed`, `tac`, `printf` and `find`.
 
+  * MacOS: `brew install coreutils`
+
 * Firmware builds require the `arm-none-eabi-gcc` GNU toolchain, which can be
   downloaded [from the ARM site](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads)
   or installed directly on many platforms.

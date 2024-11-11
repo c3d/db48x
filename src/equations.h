@@ -131,6 +131,8 @@ struct assignment : complex
     {
         if (!name|| !value)
             return nullptr;
+        while (assignment_p asn = value->as<assignment>())
+            value = asn->value();
         return rt.make<assignment>(ty, name, value);
     }
 

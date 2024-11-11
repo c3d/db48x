@@ -34,6 +34,7 @@
 #include "recorder.h"
 #include "sim-dmcp.h"
 #include "symbol.h"
+#include "sysmenu.h"
 #include "target.h"
 #include "tests.h"
 #include "user_interface.h"
@@ -65,7 +66,6 @@ RECORDER(sim_keys, 16, "Recorder keys from the simulator");
 RECORDER(sim_audio, 16, "Recorder keys from the simulator");
 
 extern bool run_tests;
-extern bool db48x_keyboard;
 extern bool shift_held;
 extern bool alt_held;
 
@@ -92,14 +92,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui.keyboard->installEventFilter(this);
     ui.screen->setAttribute(Qt::WA_AcceptTouchEvents);
     ui.screen->installEventFilter(this);
-    if (db48x_keyboard)
-        ui.keyboard->setStyleSheet("border-image: "
-                                   "url(:/bitmap/keyboard-db48x.png) "
-                                   "0 0 0 0 stretch stretch;");
-    else
-        ui.keyboard->setStyleSheet("border-image: "
-                                   "url(:/bitmap/keyboard.png) "
-                                   "0 0 0 0 stretch stretch;");
+    ui.keyboard->setStyleSheet("border-image: "
+                               "url(:/bitmap/keyboard-db48x.png) "
+                               "0 0 0 0 stretch stretch;");
 
     highlight = new Highlight(ui.keyboard);
     highlight->setGeometry(0,0,0,0);
@@ -404,13 +399,27 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
     if (k == Qt::Key_F10)
     {
-        db48x_keyboard = !db48x_keyboard;
-        cstring name = db48x_keyboard
-            ? ("border-image: url(:/bitmap/keyboard-db48x.png) "
-               "0 0 0 0 stretch stretch;")
-            : ("border-image: url(:/bitmap/keyboard.png) "
-               "0 0 0 0 stretch stretch;");
-        ui.keyboard->setStyleSheet(name);
+        static cstring keyboards[] =
+        {
+            "config/db48x.48k",
+            "config/legacy.48k",
+            "config/42style.48k",
+            "config/true42.48k",
+        };
+        size_t newmap = 0;
+        size_t max = sizeof(keyboards) / sizeof(keyboards[0]);
+        for (size_t i = 0; i < max; i++)
+        {
+            if (!strcmp(keymap_filename, keyboards[i]))
+            {
+                newmap = (i + 1) % max;
+                break;
+            }
+        }
+        // HACK - Not thread safe, don't do that while running
+        extern user_interface ui;
+        keymap_filename = keyboards[newmap];
+        ui.load_keymap(keymap_filename);
     }
 
     if (k == Qt::Key_F9)
@@ -662,6 +671,19 @@ void MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
     name += today.toString("yyyyMMdd-hhmmss");
     name += ".png";
     img.save(name, "PNG");
+}
+
+
+void MainWindow::load_keymap(cstring keymapfile)
+// ----------------------------------------------------------------------------
+//   A new keymap was loaded, update visible keyboard layout on screen
+// ----------------------------------------------------------------------------
+{
+    QFileInfo fi(keymapfile);
+    QString name = fi.baseName() + ".png";
+    QString style = ("border-image: url(:/bitmap/" + name + ") "
+                     "0 0 0 0 stretch stretch;");
+    theMainWindow()->ui.keyboard->setStyleSheet(style);
 }
 
 
@@ -1102,6 +1124,14 @@ int ui_wrap_io(file_sel_fn callback, const char *path, void *data, bool)
     return callback(path, name, data);
 }
 
+void ui_load_keymap(cstring name)
+// ----------------------------------------------------------------------------
+//   Change the visible keyboard layout
+// ----------------------------------------------------------------------------
+{
+    MainWindow::load_keymap(name);
+}
+
 
 bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 // ----------------------------------------------------------------------------
@@ -1286,5 +1316,11 @@ int ui_wrap_io(file_sel_fn callback, const char *path, void *data, bool)
     return callback(path, name, data);
 }
 
+void ui_load_keymap(cstring name)
+// ----------------------------------------------------------------------------
+//   Change the visible keyboard layout
+// ----------------------------------------------------------------------------
+{
+}
 
 #endif // WASM

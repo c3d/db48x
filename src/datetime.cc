@@ -555,7 +555,7 @@ void render_time(renderer &r, algebraic_g &value,
             settings::SaveDisplayMode sdm(dm);
             value->render(r);
         }
-        else if (algebraic::decimal_to_fraction(value))
+        else if (algebraic::to_fraction(value))
         {
             value->render(r);
         }
@@ -654,12 +654,12 @@ size_t render_date(renderer &r, algebraic_g date)
 //
 // ============================================================================
 
-algebraic_p to_hms_dms(algebraic_r x)
+algebraic_p to_hms_dms(algebraic_r x, cstring name)
 // ----------------------------------------------------------------------------
 //   Convert an algebraic value to HMS or DMS value (i.e. no unit)
 // ----------------------------------------------------------------------------
 {
-    if (unit_p u = unit::get(x))
+    if (unit_g u = unit::get(x))
     {
         algebraic_g uexpr = u->uexpr();
         if (symbol_p sym = uexpr->as_quoted<symbol>())
@@ -679,6 +679,11 @@ algebraic_p to_hms_dms(algebraic_r x)
                 return algebraic::convert_angle(angle, amode, object::ID_Deg);
             }
         }
+        if (integer_g one = integer::make(1))
+            if (symbol_g uname = symbol::make(name))
+                if (unit_g to = unit::make(+one, +uname))
+                    if (to->convert(u))
+                        return u->value();
         rt.inconsistent_units_error();
         return nullptr;
     }
@@ -697,11 +702,11 @@ object::result to_hms_dms(cstring name)
 // ----------------------------------------------------------------------------
 {
     algebraic_g x = rt.top()->as_algebraic();
-    algebraic_g xc = to_hms_dms(x);
+    algebraic_g xc = to_hms_dms(x, name);
     if (!x || !xc)
         return object::ERROR;
 
-    if (!arithmetic::decimal_to_fraction(xc))
+    if (!arithmetic::to_fraction(xc))
     {
         if (!rt.error())
             rt.value_error();
@@ -723,7 +728,7 @@ algebraic_p from_hms_dms(algebraic_g x, cstring name)
     if (x->is_real())
     {
         // Compatibility mode (including behaviour for 1.60->2.00)
-        if (!algebraic::decimal_to_fraction(x))
+        if (!algebraic::to_fraction(x))
             return nullptr;
         algebraic_g hours = IntPart::run(x);
         algebraic_g fp = FracPart::run(x);

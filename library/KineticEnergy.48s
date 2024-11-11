@@ -7,7 +7,7 @@
 
 	@ Select drawing range
 	-0.2 1.2 XRNG
-	-0.2 1.5 YRNG
+	-0.22 1.8 YRNG
 
 	@ Draw the C limit on the right
 	5 LineWidth
@@ -22,21 +22,21 @@
 	@ Draw the classical case (red)
 	0.7 0 0 RGB Foreground
 	3 LineWidth
-	'1/2*sq(x)' Function
+	'1/2*sq(max(x;0))' Function
 	"Classical" { 0.7 0.2 0 } Disp
 
 	@ Draw the relativistic case (green)
 	2 LineWidth
 	0 0.7 0 RGB Foreground
-	'ifte(x<1;1/(1-sq(x))-1;2)' Function
-	"Relativistic" { 0.4 1.0 0 } Disp
+	'1/sqrt(1-sq(min(max(x;0);0.999)))-1' Function
+	"Relativistic" { 0.55 1.0 0 } Disp
 
 	@ Axes labels
 	0 0 0.5 RGB Foreground
-	"Kinetic Energy" { -.13 1.35 0 } Disp
+	"Kinetic Energy" { -.15 1.35 0 } Disp
 	"Speed" { 1.03 -0.03 0 } Disp
-	"c" { 0.95 -0.005 1 } Disp
-	"0.1·c ↑" { 0.095 -0.005 1 } Disp
+	"c" { 0.95 -0.025 1 } Disp
+	"0.1·c ↑" { 0.095 -0.025 1 } Disp
 
 	1 LineWidth
 	#0 Foreground

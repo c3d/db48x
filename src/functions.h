@@ -68,6 +68,7 @@ public:
     // ------------------------------------------------------------------------
 
     static algebraic_p evaluate(algebraic_r x, id op, ops_t ops);
+    static algebraic_p evaluate_noclean(algebraic_r x, id op, ops_t ops);
     // ------------------------------------------------------------------------
     //   C++ evaluation for all functions implemented in BID library
     // ------------------------------------------------------------------------

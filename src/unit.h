@@ -51,8 +51,10 @@ struct unit : complex
     algebraic_p value() const   { return x(); }
     algebraic_p uexpr() const   { return y(); }
 
-    bool convert(algebraic_g &x) const;
-    bool convert(unit_g &x) const;
+    bool convert(algebraic_g &x, bool error = true) const;
+    bool convert(unit_g &x, bool error = true) const;
+
+    static bool convert_to_linear(algebraic_g &value, algebraic_g &uexpr);
 
     static algebraic_p parse_uexpr(gcutf8 source, size_t &len);
 
@@ -102,8 +104,8 @@ struct unit_file : file
     unit_file(cstring name = "config/units.csv"): file(name, false) {}
     ~unit_file() {}
 
-    symbol_g    lookup(gcutf8 what,size_t len,bool menu=false,bool seek0=true);
-    symbol_g    next(bool menu = false);
+    symbol_p    lookup(gcutf8 what,size_t len,bool menu=false,bool seek0=true);
+    symbol_p    next(bool menu = false);
 };
 
 

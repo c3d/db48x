@@ -108,6 +108,7 @@ ERROR(cannot_isolate,           "Unable to isolate")
 ERROR(unknown_derivative,       "Unknown derivative")
 ERROR(unknown_primitive,        "Unknown primitive")
 ERROR(multisolver_variable,     "Unable to solve for all variables")
+ERROR(invalid_custom_menu,      "Invalid CustomMenu variable")
 
 // Filesystem errors
 #ifndef FRROR

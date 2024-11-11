@@ -848,7 +848,6 @@ Hewlett-Packard RPL implementation.
 * [DecimalComma](#decimalcomma): Select comma as decimal separator
 * [DecimalDot](#decimaldot): Select dot as decimal separator
 * [DifferentialSolverMenu](#differentialsolvermenu)
-* [DifferentiationMenu](#differentiationmenu)
 * [DisplayModesMenu](#displaymodesmenu)
 * [EQUIV](#equiv): Logical equivalence
 * [ERFC](#erfc): Complementary error function

@@ -34,6 +34,7 @@ all times in milliseconds, best of 5 runs, on USB power, with presumably no GC.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.8.4   | 1183    | 601396    |  271220   | Temporaries cleaner     |
 | 0.8.0   | 1247    | 574012    |  267284   | Back to -Oz             |
 | 0.7.0   | 1214    | 548204    |  223260   | Running at -O2          |
 | 0.6.0   | 1183    | 409252    |  187516   | New table-free decimal  |
@@ -74,6 +75,7 @@ is not there.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.8.4   |  446    | 853020    |  274964   | Temporaries cleaner     |
 | 0.8.0   |  444    | 467260    |  187948   |                         |
 | 0.7.0   |  449    | 611020    |  223692   | New DMCP runs at 160MHz |
 | 0.6.0   | 1751    | 467260    |  187948   | New table-free decimal  |
@@ -112,6 +114,7 @@ Timing on 0.4.10 are:
 
 | Version | DM32 ms | DM42 ms | iPhone 12 | Notes                       |
 |---------|---------|---------|-----------|-----------------------------|
+| 0.8.4   | 25203   |  15616  |           | Temporaries cleaner         |
 | 0.7.0   | 25983   |  15061  |       287 | DM32 slower even at 160MHz  |
 | 0.6.0   | 26256   |  15355  |           |                             |
 | 0.5.2   | 26733   |  15695  |           |                             |
@@ -140,10 +143,11 @@ For 100000 loops, we see that the variable-precision implementation at 24-digit
 is roughly 10 times slower than the fixed precision implementation at 34 digits
 (128 bits).
 
-| Version      | DM32 ms | DM42 ms |
-|--------------|---------|---------|
-| 0.6.0 (VP24) | 2377390 | 1768510 |
-| 0.5.2 (ID)   |  215421 |  143412 |
+| Version      | DM32 ms | DM42 ms | Notes                                     |
+|--------------|---------|---------|-------------------------------------------|
+| 0.8.4 (VP24) |  496304 | 1427379 | With temporaries cleaner and DM32 @ 160MHz|
+| 0.6.0 (VP24) | 2377390 | 1768510 |                                           |
+| 0.5.2 (ID)   |  215421 |  143412 |                                           |
 
 
 For 1000 loops, comparing variable-precision decimal with the earlier Intel
@@ -151,6 +155,8 @@ decimal
 
 | Version      | DM32 ms | DM42 ms |
 |--------------|---------|---------|
+| 0.8.4 (VP24) |   32346 |   23011 |
+| 0.8.4 (VP12) |   13720 |   10548 |
 | 0.6.4 (VP24) |   32346 |   23011 |
 | 0.6.4 (VP12) |   13720 |   10548 |
 | 0.6.4 (VP6)  |    6905 |    5623 |
@@ -163,6 +169,7 @@ Time in millisecond for 1000 loops:
 
 | DM32 Version | HW7  | HW16 |  VP6 | VP12  | VP24  | VP36  |
 |--------------|------|------|------|-------|-------|-------|
+| 0.8.4 @160MHz|  401 |  482 | 1339 |  2299 |  5226 |  9655 |
 | 0.6.4        | 1414 | 1719 | 6905 | 13720 | 32346 | 60259 |
 | 0.6.2        |      |      | 7436 | 16017 | 34898 | 62012 |
 | 0.6.0 (Note) |      |      |      |       | 23773 |       |
@@ -170,6 +177,7 @@ Time in millisecond for 1000 loops:
 
 | DM42 Version |  HW7 | HW16 | VP6  | VP12  | VP24  |  VP36 |
 |--------------|------|------|------|-------|-------|-------|
+| 0.8.4        |  388 |  879 | 3762 |  6800 | 15164 | 27641 |
 | 0.6.4        |  422 |  705 | 5623 | 10548 | 23811 | 42363 |
 | 0.6.2        |      |      | 5842 | 10782 | 23714 | 42269 |
 | 0.6.0 (Note) |      |      |      |       | 17685 |       |
@@ -235,5 +243,88 @@ For 5 runs on USB power:
 | Units in memory        |   999-1047 | 3325-3503  | 6988-7816 | 2009-2012 |
 | No autosimplify        |   688-723  | 2383-2585  |           |           |
 | Commit no autosimplify |   691-722  | 2362-2568  |           |           |
+
+
+## Garbage collector performance
+
+This is intended to compare the results before and after implementing the
+`cleaner` class.
+
+* IS: Initial State, just loading `Demos` file and displaying initial text
+* L: Sum test Test with loop
+* S: Sum test with "sigma" function
+* N: NQueens benchmark
+* K: Kinetic energy
+* C: Collatz Benchmark
+* R: Romberg plot
+* T: Text drawing example
+
+#### DM42 (USB)
+
+Before `cleaner`:
+
+| GC metric     |DM42 I|DM42 L |DM42 F |DM42 N|DM42 K|DM42 C |DM42 R |DM42 T |
+|---------------|------|-------|-------|------|------|-------|-------|-------|
+| Cycles        |     2|     44|     43|     1|     3|   1349|    119|     30|
+| Purged        | 40621|2599816|2553096| 57541|172967| 241872|6874889|1774830|
+| Duration      |    33|   3345|   3236|    48|   350|    659|  13579|   5086|
+| Last purged   | 19192|  59224|  59521| 57541| 57753|    101|  57741|  59238|
+| Last duration |     7|     81|     64|    48|   137|      0|    114|     99|
+| Test duration |      |  18834|  18394|  1316|      |  15618|       |  96894|
+
+After `cleaner`:
+
+| GC metric     |DM42 I|DM42 L |DM42 F |DM42 N|DM42 K|DM42 C |DM42 R |DM42 T |
+|---------------|------|-------|-------|------|------|-------|-------|-------|
+| Cycles        |     2|      2|      3|     1|     2|   1350|     34|     11|
+| Purged        | 40621| 115942| 174079| 59553|117515| 246941|1962231| 637293|
+| Duration      |    33|     59|    148|   158|   247|    760|   5536|   2185|
+| Last purged   | 19192|  59396|  58265| 59553| 59355|     98|  57686|  59167|
+| Last duration |     7|     53|     78|   158|   148|      0|    168|    157|
+| Cleared       |     7|2382261|2381143|     0|   140|  30261|4488382|1140338|
+| Test duration |      |  15098|  15319|  1320|  2935|  15616|       |  93948|
+
+After adding `BusyIndicatorRefresh`:
+
+| `BusyIndicatorRefresh` |  L  |  F  |  N  |
+|------------------------|-----|-----|-----|
+|                   50ms |15720|15753| 1239|
+|                  100ms |15435|15550| 1211|
+|                  500ms |15220|15397| 1188|
+|                 2500ms |15170|15162| 1183|
+
+
+#### DM32 (USB)
+
+Before `cleaner`:
+
+| GC metric     |DM32 I|DM32 L |DM32 F |DM32 N|DM32 K|DM32 C |DM32 R |DM32 T|
+|---------------|------|-------|-------|------|------|-------|-------|------|
+| Cycles        |     0|      6|      6|     0|     0|   1349|     15|     1|
+| Purged        |     0|2530293|2618873|     0|     0| 483501|6571504| 57541|
+| Duration      |     0|   1462|   1378|     0|     0|    600|   6455|    48|
+| Last purged   |     0| 421768| 439698|     0|     0|    102| 438050| 57541|
+| Last duration |     0|    248|    295|     0|     0|      0|    428|    48|
+| Test duration |     0|   6716|   6660|     0|      |  25391|       |  1316|
+
+After `cleaner`:
+
+| GC metric     |DM32 I|DM32 L |DM32 F |DM32 N|DM32 K|DM32 C |DM32 R |DM32 T |
+|---------------|------|-------|-------|------|------|-------|-------|-------|
+| Cycles        |     0|      0|      0|     0|     0|   1350|      4|      1|
+| Purged        |     0|      0|      0|     0|     0| 382759|1748084| 438443|
+| Duration      |     0|      0|      0|     0|     0|    461|   2400|    644|
+| Last purged   |     0|      0|      0|     0|     0|     99| 438997| 438443|
+| Last duration |     0|      0|      0|     0|     0|      0|    606|    644|
+| Clearer       |     0|2383434|2383489|     0|  5145|  30261|4522881|1147855|
+| Test duration |     0|   5293|   5401|   465|  2433|  25203|       | 141828|
+
+| `BusyIndicatorRefresh` |  L  |  F  |  N  |
+|------------------------|-----|-----|-----|
+|                   50ms | 5687| 5697|  495|
+|                  100ms | 5464| 5544|  466|
+|                  500ms | 5259| 5357|  447|
+|                 2500ms | 5218| 5318|  446|
+
 
 <!--- !DMNONE --->

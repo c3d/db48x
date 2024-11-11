@@ -49,6 +49,7 @@ struct CustomMenu : menu
     static list_p custom();
     static uint   count_custom();
     static void   list_custom(info &mi, list_p cst = nullptr);
+    static void   add_custom_item(info &mi, object_p obj);
     static result run_menu_command(bool tmp);
 
   public:

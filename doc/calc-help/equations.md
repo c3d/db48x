@@ -15,8 +15,8 @@ The variables in the Columns and Beams section are:
 * `θ`: Slope at `x` (dim.: angle)
 * `A`: Cross-sectional area
 * `a`: Distance to point load
-* 'ε': Eccentricity (dim.: length)
-* `c`: Distance to edge fiber (Eccentric Columns), or Distance to applied moment (beams)
+* `ε`: Eccentricity (dim.: length)
+* `c`: Distance to edge fiber ([Eccentric Columns](#Eccentric Columns)), or Distance to applied moment (beams)
 * `E`: Modulus of elasticity (dim.: pressure=force/area, in SI: pascal, Pa)
 * `I`: Moment of inertia (dim.: length^4, in SI: m^4)
 * `K`: Effective length factor of column
@@ -31,7 +31,7 @@ The variables in the Columns and Beams section are:
 * `x`: Distance along beam
 * `y`: Deflection at x (dim.: length)
 
-For simply supported beams and cantilever beams (“Simple Deflection” through “Cantilever Shear”), the calculations differ depending upon the location of 'x' relative to the loads.
+For simply supported beams and cantilever beams ([Simple Deflection](#Simple Deflection) through [Cantilever Shear](#Cantilever Shear)), the calculations differ depending upon the location of `x` relative to the loads.
 
 * Applied loads are positive downward.
 * The applied moment is positive counterclockwise.
@@ -46,7 +46,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
-* To calculate `[Pcr_kN;σcr_kPa]` (Critical load; Critical stress) from 6 known variables:
+* To calculate [Pcr_kN;σcr_kPa] (Critical load; Critical stress) from 6 known variables:
 ```rpl
 L=7.3152_m  r=4.1148_cm  E=199947961.502_kPa  A=53.0967_cm^2  K=0.7  I=8990598.7930_mm^4
 @ Expecting [ Pcr=676.60192 6324 kN σcr=127 428.24437 8 kPa ]
@@ -120,7 +120,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 * To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
-@ Expecting: [y=-0.331630_in]
+@ Expecting [ y=-0.33163 03448 28 in ]
 'ROOT(ⒺCantilever Deflection;[y];[0_in])'
 ```
 
@@ -228,7 +228,7 @@ The variables in the Electricity section are:
 
 ### Coulomb’s Law & E Field
 
-These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'q1' or 'q2' in the expression of the electric force. A finite object carrying a net charge 'q1' can be considered as a point charge if the distance to the position of the point charge 'q2' is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
+These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges `q1` or `q2` in the expression of the electric force. A finite object carrying a net charge `q1` can be considered as a point charge if the distance to the position of the point charge `q2` is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
 
 * **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field) from 5 known variables:
 
@@ -238,11 +238,11 @@ q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 ```
 
-* **Example 2**. A square metal plate 'L = 8_cm' on a side carries a charge of 'q1 = 6_μC'. Approximate values of the electric force & electric field for a point charge 'q2 = 1_μC' located at 'r = 3_m' can be calculated with Coulomb's law if the separation distance is much greater than the plate dimension 'r >> L'. The whole plate is indeed considered as being a point charge providing that 'r > 10 · L'. Therefore, to calculate [F_N;Er_N/C]:
+* **Example 2**. A square metal plate `L = 8_cm` on a side carries a charge of `q1 = 6_μC`. Approximate values of the electric force & electric field for a point charge `q2 = 1_μC` located at `r = 3_m` can be calculated with Coulomb’s law if the separation distance is much greater than the plate dimension `r >> L`. The whole plate is indeed considered as being a point charge providing that `r > 10 · L`. Therefore, to calculate `[F_N;Er_N/C]`:
 
 ```rpl
 L=8_cm r=3_m q1=6E-6_C  q2=1E-6_C  r=3_m  εr=1  qtest=1E-6_C
-@ Expecting [ F=0.00599 17011 92 N Er=5 991.70119 159 N/C ]
+@ Expecting [ F=5.99170 11915 9⁳⁻³ N Er=5 991.70119 159 N/C ]
 if 'r > 10*L' then
  'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 end
@@ -250,52 +250,58 @@ end
 
 ### E Field Infinite Line
 
-The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
+The expression for the radial electric field at the distance `r` is approximately valid if this distance is such that `r << L` and therefore also applies to a wire of finite length `L`.
 
 * To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field) from 4 known variables:
 
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11915 9 N/C ]
 'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
+```
+
+The code below saves the reference value for comparison with the example in [E Field Finite Line](#E Field Finite Line):
+```rpl
+@ Save the reference value for comparison below
+Er0=Er
 ```
 
 ### E Field Finite Line
 
-The expression of the radial electric field at the distance 'r' depends on the subtended angles 'θ1' and 'θ2' relative to the ends of the wire of finite length 'L'.
+The expression of the radial electric field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`.
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* Example 1. To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
+* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance `r=(L/2)/tanθ1` and angle `θ2=360°-θ1` (see figure):
 
 ```rpl
 r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
 Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
-@ Expecting [ λ=1.73206 66666 7⁳⁻⁶ C/m Er=5 991.70119 159 N/C ]
-'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C;])'
-```
-
-* Example 2. To show the infinite line approximation ('r << L') of the previous section we calculate [λ_C/m;Er_N/C] with the angles θ1=ATAN((L/2)/r) and θ2=360°-θ1 (see fig):
-
-```rpl
-θ1='atan(3/2/0.05)' θ2='360_°-θ1'
-Q=5E-6_C  L=3_m  r=0.05_m  εr=1  θ1=88.0876_°  θ2=271.9124_°
-@ Expecting [ λ=1.66759 54889⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 972 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 ```
 
+* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` with the angles `θ1=ATAN((L/2)/r)` and `θ2=360°-θ1` (see figure):
+
 ```rpl
-5.991701E3_N/C 'Er' %Ch
+Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ1='atan(L/2/r)' θ2='360_°-θ1'
+if 'r < L/10' then
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52400 7 N/C ]
+'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
+end
+```
+
+```rpl
 @ Verify relative difference under condition 5_cm << 3_m.
-@ Expecting 3.19751 95082 1⁳⁻⁶
-@ (Was 0.056%)
+Er0 Er %Ch
+@ Expecting -5.55093 02084 6⁳⁻²
 ```
 
 ### E Field Infinite Plate
 
-The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length or width 'L') of the plate. On the contrary if 'd >> L', 'Ep' can be approximated if we consider the whole plate as being a point charge with 'q = σ·A' (where 'σ' is the surface charge density), see example 2 of "Coulomb's Law & E Field".
+The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance `d` from a finite plate if it is very small compare to the dimensions (length or width `L`) of the plate. On the contrary if `d >> L`, `Ep` can be approximated if we consider the whole plate as being a point charge with `q = σ·A` (where `σ` is the surface charge density), see example 2 of [Coulomb’s Law & E Field](#Coulomb’s Law & E Field).
 
-* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
+* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position `[d=5_mm]` above a square plate of width `[L=8_cm]` and surface `A=L^2` where `d << L` when `d < L/10` is verified:
 
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
@@ -347,7 +353,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 ### Resistivity & Conductivity
 
-The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
+The electrical resistivity `ρ` of most materials changes with temperature. If the temperature `T` does not vary too much, a linear approximation can be used around the reference point (`ρ0`; `T0`).
 
 * To calculate `[ρ_(Ω*m);σ_(S/m)]` (Resistance) from 4 known variables:
 
@@ -428,9 +434,10 @@ E=4_J L=15_mH
 ![RLC Current Delay](img/Missing name.bmp)
 
 * To calculate `[ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω]` (Phases and inpedances) from 4 known variables:
+
 ```rpl
-@ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
+@ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 'ROOT(ⒺRLC Current Delay;[ω;φs;φp;XC;XL];[1_r/s;1_°;1_°;1_Ω;1_Ω])'
 ```
 
@@ -438,37 +445,120 @@ f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
 
 These equations approximate the dc current required to charge the voltage on a capacitor in a certain time interval.
 
+* To calculate `[ΔV_V;Δt_s;tf_s]` (Voltage difference, time difference, final time) from 5 known variables:
+
+```rpl
+C=15_μF  Vi=2.3_V  Vf=3.2_V  I=10_A  ti=0_μs
+@ Expecting [ ΔV=0.9 V Δt=1.35 μs tf=1.35 μs ]
+'ROOT(ⒺDC Capacitor Current;[ΔV;Δt;tf];[1_V;1_μs;1_μs])'
+```
+
 ### Capacitor Charge
+
+* To calculate `[q_C]` (Voltage difference, time difference, final time) from 2 known variables:
+
+```rpl
+C=20_μF  V=100_V
+@ Expecting [ q=2.⁳⁻³ C ]
+'ROOT(ⒺCapacitor Charge;[q];[1_C])'
+```
 
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
 
+![DC Inductor Voltage](img/Missing name.bmp)
+
+* To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference, final current, final time) from 5 known variables:
+
+```rpl
+L=100_mH  V=52_V  Δt=32_μs  ILi=23_A  ti=0_μs
+@ Expecting [ ΔIL=-1.664⁳⁻² A ILf=22.98336 A tf=32. μs ]
+'ROOT(ⒺDC Inductor Voltage;[ΔIL;ILf;tf];[1_A;1_A;1_μs])'
+```
+
 ### RC Transient
 
-### RL Transient
+![RC Transient](img/Missing name.bmp)
 
-### Resonant Frequency
+* To calculate `[V_V]` (Voltage) from 5 known variables:
 
-### Plate Capacitor
+```rpl
+Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
+@ Expecting [ V=3.29679 95396 4 V ]
+'ROOT(ⒺRC Transient;[V];[1_V])'
+```
 
 ### Cylindrical Capacitor
 
+![Cylindrical Capacitor](img/Missing name.bmp)
+
+* To calculate `[C_μF;ΔV_V]` (Capacitance, voltage) from 5 known variables:
+
+```rpl
+εr=1  Q=75_μC  ro=1_cm  ri=.999_cm  L=10_cm
+@ Expecting [ C=5 560.46819 129 pF ΔV=13 488.07284 21 V ]
+'ROOT(ⒺCylindrical Capacitor;[C;ΔV];[1_pF;1_V])'
+```
+
 ### Solenoid Inductance
+
+![Solenoid Inductance](img/Missing name.bmp)
+
+* To calculate `[L_mH]` (Inductance) from 4 known variables:
+
+```rpl
+μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
+@ Expecting [ L=3.01592 89474 6⁳⁻² mH ]
+'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
+```
 
 ### Toroid Inductance
 
-### Sinusoidal Voltage
+![Toroid Inductance](img/Missing name.bmp)
 
-### Sinusoidal Current
+* To calculate `[L_mH]` (Inductance) from 4 known variables:
+
+```rpl
+μr=1  N=5000  h=2_cm  ri=2_cm  ro=4_cm
+@ Expecting [ L=69.31471 80562 mH ]
+@ Error in ri input data of HP50gAUR.pdf
+'ROOT(ⒺToroid Inductance;[L];[1_mH])'
+```
 
 ### Drift Speed & Current Density
+
+* To calculate `[vd_m/s;J_(A/m^2);E_(V/m)]` (Drift speed, current density, E field) from 5 known variables:
+
+```rpl
+@ A='Ⓒπ*(0.1_cm)^2'  ρ='Ⓒqe*n'  σ='Ⓒqe*n*40_(cm^2/(V*s))'
+@ Expecting [ vd=2.33733 41683 6⁳⁻⁵ m/s J=31.83098 86184 A/cm↑2 E=5.84333 54209⁳⁻³ V/m ]
+I=1_A  n=8.5e28_(m^-3) A=3.14159 26535 90E-2_cm↑2 ρ=1.36185 01389E10_C/m↑3 σ=54 474 005.556_S/m
+'ROOT(ⒺDrift Speed & Current Density;[vd;J;E];[1_m/s;1_(A/cm^2);1_(V/m)])'
+```
 
 ### Electron & Hole Mobilities
 
 In accordance with microscopic Ohm's law, the current density is proportional to the electric field. Holes and electrons therefore move at their average drift speeds during the mean free time between collisions. As long as the electric fields are not very high, the mobilities of holes and electrons are constant.
 
+* To calculate `[μe_(cm^2/(V*s));μe_(cm^2/(V*s));J_(A/m^2);Je_(A/m^2);Jh_(A/m^2);σ_(S/m)]` (Electron & hole mobilities, current densities, conductivity) from 5 known variables:
 
+```rpl
+@ In Ge typical values can be μe=500_(cm^2/(V*s)) μh=200_(cm^2/(V*s)) meeff_kg='0.12*Ⓒme'
+@ mheff_kg='0.5*Ⓒme'  ne=1.04e19_(cm^-3)  nh=6.0e18_(m^-3) E=6.0e-9_V/m
+
+τc=4.09365 36801 40e-15_s meeff=1.09312 60456 68e-31 kg mheff=4.55469 18569 5e-31 kg nh=6.0e18_(m^-3) ne=1.04e19_(m^-3) E=6.0e-9_V/m
+@ Wanted [ μe=49.03846 15384 64976 91445 22_cm↑2/(s·V) μh=60.00000 00000 03822 512o15 7_cm↑2/(s·V) Je=4.90266 05000 386⁳-11_A/m↑2 Jh=3.46070 15294 402⁳-11_A/m↑2 J=8.36336 20294 771⁳-11_A/m↑2 σ=0.01393 89367 15800 94039 7294_S/m ]
+@ The solution below is different, but seems to validate4 with EvalEq
+@ Expecting [ μe=60. cm↑2/(V·s) μh=14.4 cm↑2/(V·s) Je=5.99854 93176 9⁳⁻¹¹ A/m↑2 Jh=8.30568 36706 4⁳⁻¹² A/m↑2 J=6.82911 76847 6⁳⁻¹¹ A/m↑2 σ=1.13818 62807 9⁳⁻² S/m ]
+'ROOT(ⒺElectron & Hole Mobilities;[μe;μh;Je;Jh;J;σ];[1_(cm^2/(V*s));1_(cm^2/(V*s));1_(A/m^2);1_(A/m^2);1_(A/m^2);1_(S/m)])'
+```
+
+Notes about manually-ordered solution:
+```
+@ 'ROOT(ⒺElectron & Hole Mobilities;[μe #4;μh #5;Je #2;Jh #3;J #1;σ #6];[1_(cm^2/(V*s));1_(cm^2/(V*s));1_(A/m^2);1_(A/m^2);1_(A/m^2);1_(S/m)])'
+
+```
 ## Fluids
 
 The variables in the Fluids section are:
@@ -501,19 +591,17 @@ The variables in the Fluids section are:
 
 ### Pressure At Depth
 
-This equation describes hydrostatic pressure for an incompressible fluid. Depth 'h' is positive downwards from the reference.
+This equation describes hydrostatic pressure for an incompressible fluid. Depth `h` is positive downwards from the reference.
 
-### Bernoulli Equation
+![Pressure At Depth](img/Missing name.bmp)
 
-These equations represent the streamlined flow of an incompressible fluid.
+* To calculate `[P_kPa]` (Pressure) from 3 known variables:
 
-### Flow with Losses
-
-These equations extend Bernoulli’s equation to include power input (or output) and head loss.
-
-### Flow In Full Pipes
-
-These equations adapt Bernoulli’s equation for flow in a round, full pipe, including power input (or output) and frictional losses (with the fanning friction factor 'f').
+```rpl
+h=100_m  ρ=1025.1817_kg/m^3  P0=1_atm
+@ Expecting [ P=1 106.68481 183 kPa ]
+'ROOT(ⒺPressure at Depth;[P];[1_kPa])'
+```
 
 ## Forces and Energy
 
@@ -549,21 +637,37 @@ force (Law of Gravitation), or Drag force (Drag force)
 * `x`: Displacement
 * `UGf, UGi`: Final and initial gravitational potential energy (dim.: force·length, in SI: joule, J)
 
-### Linear Mechanics
-
-### Angular Mechanics
-
-### Centripetal Force
-
-### Hooke’s Law
-
-The force is that exerted by the spring.
-
 ### 1D Elastic Collisions
 
-### Gravitation Law
+![1D Elastic Collisions](img/Missing name.bmp)
+
+* To calculate `[v1f_m/s;v2f_m/s]` (Final velocities of mass m1 & m2) from 3 known variables:
+
+```rpl
+m1=10_kg  m2=25_kg  v1i=100_m/s
+@ Expecting [ v1f=-42.85714 28571 m/s v2f=57.14285 71429 m/s ]
+'ROOT(Ⓔ1D Elastic Collisions;[v1f;v2f];[1_m/s;1_m/s])'
+```
+
+### Drag Force
+
+* To calculate `[F_N]` (Drag force) from 4 known variables:
+
+```rpl
+Cd=0.05  ρ=1000_kg/m^3  A=7.5E6_cm^2  v=35_m/s
+@ Expecting [ F=22 968 750. N ]
+'ROOT(ⒺDrag Force;[F];[1_N])'
+```
 
 ### Relativity Mass Energy
+
+* To calculate `[E_J]` (Relativistic energy) from 1 known variable:
+
+```rpl
+m=9.1E-31_kg
+@ Expecting [ E=8.17867 21247⁳⁻¹⁴ J ]
+'ROOT(ⒺRelativity Mass Energy;[E];[1_J])'
+```
 
 ## Gases
 
@@ -596,33 +700,53 @@ The variables in the Gases section are:
 * `W`: Work (dim.: force·length, in SI: joule, J)
 * `Z, Zi, Zf`: Initial and final gas compressibility correction factors
 
-### Ideal Gas
-
 ### Ideal Gas Law Change
+
+* To calculate `[Vf_l]` (Volume final) from 5 known variables:
+
+```rpl
+Pi=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=373.15_K  Tf=373.15_K
+@ Expecting [ Vf=2. l ]
+'ROOT(ⒺIdeal Gas Law Change;[Vf];[1_l])'
+```
 
 ### Isothermal Expansion
 
 These equations apply to an ideal gas.
 
+* To calculate `[m_kg;W_J]` (Mass, work) from 5 known variables:
+
+```rpl
+Vi=2_l  Vf=125_l  T=573.15_°C  n=0.25_mol  MW=64_g/mol
+@ Expecting [ m=1.6⁳⁻² kg W=7 274.34704 123 J ]
+'ROOT(ⒺIsothermal Expansion;[m;W];[1_kg;1_J])'
+```
+
 ### Polytropic Processes
 
-These equations describe a reversible pressure-volume change of an ideal gas such that 'P·Vn' is constant. Special cases include isothermal processes ('n = 1'), isentropic processes ('n = k', the specific heat ratio), and constant-pressure processes ('n = 0').
+These equations describe a reversible pressure-volume change of an ideal gas such that `P·Vn` is constant. Special cases include isothermal processes (`n = 1`), isentropic processes (`n = k`, the specific heat ratio), and constant-pressure processes (`n = 0`).
+
+* To calculate `[n_1;Tf_°F]` (Polytropic number, final temperature) from 5 known variables:
+
+```rpl
+Pi=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
+@ Expecting [ n=1.22239 24213 4 Tf=346.54537 037 K ]
+'ROOT(ⒺPolytropic Processes;[n;Tf];[1;1_°F])'
+```
 
 ### Isentropic Flow
 
+![Isentropic Flow](img/Missing name.bmp)
+
 The calculation differs at velocities below and above Mach 1. The Mach number is based on the speed of sound in the compressible fluid.
 
-### Real Gas Law
+* To calculate `[P_kPa;ρ_kg/m^3;At_cm^2]` (Flow pressure, flow density, throat area) from 7 known variables:
 
-These equations adapt the ideal gas law to emulate real-gas behavior.
-
-### Real Gas State Change
-
-This equation adapts the ideal gas state-change equation to emulate real-gas behavior.
-
-### Kinetic Theory
-
-These equations describe properties of an ideal gas.
+```rpl
+k=2  M=0.9  T0=300_K  T=373.15_K  ρ0=100_kg/m^3  P0=100_kPa  A=1_cm^2
+@ Expecting [ P=154.71213 6111 kPa ρ=124.38333 3333 kg/m↑3 At=0.99280 71853 34 cm↑2 ]
+'ROOT(ⒺIsentropic Flow;[P;ρ;At];[1_kPa;1_kg/m^3;1_cm^2])'
+```
 
 ## Heat transfer
 
@@ -650,21 +774,43 @@ The variables in the Heat Transfer section are:
 * `Ti, Tf`: Initial and final temperatures
 * `U`: Overall heat transfer coefficient (dim.: power/(area·temperature) in SI: W/(m^2·K))
 
-### Heat Capacity
-
 ### Thermal Expansion
 
-### Conduction
+![Thermal Expansion](img/Missing name.bmp)
+
+* To calculate `[α_K^-1;Ti_°C]` (Expansion coefficient, initial temperature) from 4 known variables:
+
+```rpl
+ΔT=15_°C  L=10_m  Tf=25_°C  δ=1_cm
+@ Expecting [ α=6.66666 66666 7⁳⁻⁵ K⁻¹ Ti=10. °C ]
+'ROOT(ⒺThermal Expansion;[α;Ti];[1_K^-1;1_°C])'
+```
 
 ### Convection
+
+![Convection](img/Missing name.bmp)
+
+* To calculate `[ΔT_°C;Th_°C]` (Temperature difference, hot surface temperature) from 4 known variables:
+
+```rpl
+Tc=26.85_°C  A=200_m^2  h=0.005_W/(m^2*K)  qr=10_W
+@ Expecting [ ΔT=10. °C Th=36.85 °C ]
+'ROOT(ⒺConvection;[ΔT;Th];[1_°C;1_°C])'
+```
 
 ### Conduction + Convection
 
 If you have fewer than three layers, give the extra layers a zero thickness and any nonzero conductivity. The two temperatures are fluid temperatures – if instead you know a surface temperature, set the corresponding convective coefficient to 10^999999.
 
-### Black Body Radiation
+![Conduction + Convection](img/Missing name.bmp)
 
-F0λ(λ_m, T_K) is the black body emissive power Function which returns the fraction of total black-body emissive power at temperature 'T_K' between wavelengths 0 and 'λ_m'. It is the integral of the Planck distribution.
+* To calculate `[qr_W;Tc_°C;U_W/(m^2*K)]` (Heat transfer rate, cold surface temperature, overall heat transfer coefficient) from 11 known variables:
+
+```rpl
+ΔT=35_°C  Th=55_°C  A=10_m^2  h1=0.05_W/(m^2*K)  h3=0.05_W/(m^2*K)  L1=3_cm  L2=5_cm  L3=3_cm  k1=0.1_W/(m*K)  k2=.5_W/(m*K)  k3=0.1_W/(m*K)
+@ Expecting [ qr=8.59950 85995 1 W Tc=20. °C U=0.02457 00245 7 W/(m↑2·K) ]
+'ROOT(ⒺConduction & Convection;[qr;Tc;U];[1_W;1_°C;1_W/(m^2*K)])'
+```
 
 ## Magnetism
 
@@ -696,11 +842,14 @@ The variables in the Magnetism section are:
 
 #### Straight Wire Infinite
 
-The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly. The expression for the magnetic field at the distance 'r' is approximately valid if the distance is such that 'r << L' and therefore also applies for a wire of finite length 'L'.
+The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L`.
 
 #### Straight Wire Finite
 
-The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly.
+The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
+
+![B Field From Finite Wire](img/B Field From Finite Wire.bmp)
+
 
 #### Force Between Wires
 
@@ -708,11 +857,11 @@ The force between wires is positive for an attractive force (for currents having
 
 #### B Field In Infinite Solenoid
 
-The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < 'L' and therefore also applies inside a solenoid of finite length 'L'.
+The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`.
 
 #### B Field In Finite Solenoid
 
-The expression for the magnetic field in the center depends on the subtended internal angles 'α1' and 'α2' relative to the top ends of the solenoid of finite length 'L'.
+The expression for the magnetic field in the center depends on the subtended internal angles `α1` and `α2` relative to the top ends of the solenoid of finite length `L`.
 
 ![B Field In Finite Solenoid](img/B Field In Finite Solenoid.bmp)
 
@@ -720,15 +869,15 @@ The expression for the magnetic field in the center depends on the subtended int
 
 #### Hall Effect
 
-The moving charge carrier is deflected by the magnetic field to create the Hall tension 'VH' between the opposite sides of the conductor.
+The moving charge carrier is deflected by the magnetic field to create the Hall tension `VH` between the opposite sides of the conductor.
 
 #### Cyclotron Mouvement
 
-Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period 'T'.
+Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
 #### Helicoidal Mouvement
 
-Under the magnetic field lines (at angle 'θ' with the speed vector), the moving charge has an helicoidal trajectory of pitch 'Dpitch', radius 'Rc' and period 'T'.
+Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
 #### Volumic Density Magnetic Energy
 
@@ -774,13 +923,13 @@ The variables in the Motion section are:
 
 #### Object In Free Fall
 
-By definition, an object in free fall only experiences local gravitational acceleration 'gloc'. This depends on the mass of the star or planet and the distance 'r' center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value 'gearth' of the acceleration of gravity as a function of latitude 'φ' and for an altitude 'h' low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
+By definition, an object in free fall only experiences local gravitational acceleration `gloc`. This depends on the mass of the star or planet and the distance `r` center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value `gearth` of the acceleration of gravity as a function of latitude `φ` and for an altitude `h` low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
 
 // Reference: Commissions romandes de mathématique, de physique et de chimie, Formulaires et tables : Mathématiques, Physique, Chimie, Tricorne, 2000, 278
 
 #### Projectile Motion
 
-During the time of flight 'tf', the motion of a projectile follows a symetric parabole of horizontal range 'R' and of maximum height 'hmax'.
+During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
 #### Angular Motion
 
@@ -856,7 +1005,7 @@ The Brewster angle is the angle of incidence at which the reflected wave is comp
 
 #### Malus Law
 
-If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle 'θ' between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency ('fx < fx0') and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
+If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx0`) and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
 #### 2 Slits Young Interference
 
@@ -1125,11 +1274,11 @@ The variables in the Waves section are:
 
 #### Doppler Effect
 
-In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of sound in the air. The speed of the receiver relative to the air 'vr' is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air 'va' is subtracted from the speed of sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
+In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of sound in the air. The speed of the receiver relative to the air `vr` is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air `va` is subtracted from the speed of sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
 
 #### Mach Number
 
-For an object moving at a supersonic speed, the shockwave describes a cone having the angle 'θcone' at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
+For an object moving at a supersonic speed, the shockwave describes a cone having the angle `θcone` at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
 
 #### String Standing Waves
 
@@ -1141,13 +1290,14 @@ A tube being open or closed at its ends admits only discrete harmonics as standi
 
 #### Beat Acoustics
 
-In acoustics, a beat is an interference pattern between two sounds of slightly different frequencies, perceived as a periodic variation in amplitude whose rate is the difference of the two frequencies. The sum of two unit-amplitude sine waves can be expressed as a carrier wave of frequency 'favg' whose amplitude is modulated by an envelope wave of frequency 'fbeat'.
+In acoustics, a beat is an interference pattern between two sounds of slightly different frequencies, perceived as a periodic variation in amplitude whose rate is the difference of the two frequencies. The sum of two unit-amplitude sine waves can be expressed as a carrier wave of frequency `favg` whose amplitude is modulated by an envelope wave of frequency `fbeat`.
 
 #### Electromagnetic Waves
 
 ## Relativity
 The variables in the Relativity section are:
 
+* `α`: Light Doppler effect, light arrival angle in the rest frame
 * `β`: Velocity relativistic speed ratio
 * `βe`: Escape velocity relativistic speed ratio
 * `βp`: Plane velocity relativistic speed ratio
@@ -1166,6 +1316,8 @@ The variables in the Relativity section are:
 * `γG1, γG2`: Lorentz factor associated to gravitational dilation at heights h1 and h2
 * `ω`: Angular velocity of a rotating planet during a day (dim.: angle/time, in SI: r/s)
 * `φ`: Latitude (dim.: angle)
+* `θ` : Aberration of light, emission angle in the frame at rest
+* `θp` : Aberration of light, emission angle in the moving frame
 * `ΔτWE`: Time difference between westward and eastward flights
 * `ΔτE`: Flight time in the eastward direction
 * `ΔτW`: Flight time in the westward direction
@@ -1186,6 +1338,7 @@ The variables in the Relativity section are:
 * `Bpy`: Transformed y component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `Bpz`: Transformed z component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `E`: Total energy
+* `Ep`: Transformed total energy
 * `E0`: Rest energy associated to the rest mass
 * `Ex`: X component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ey`: Y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
@@ -1193,6 +1346,8 @@ The variables in the Relativity section are:
 * `Epx`: Transformed x component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Epy`: Transformed y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Epz`: Transformed z component of the electric field (dim.: force/charge, in SI: N/C=V/m)
+* `f` = Light Doppler effect, frequency received in the frame at rest (dim.: 1/time, in SI: hertz, Hz)
+* `fp` = Light Doppler effect, frequency emitted in the moving frame (dim.: 1/time, in SI: hertz, Hz)
 * `fs`: Wave frequency of the source (dim.: 1/time, in SI: hertz, Hz)
 * `frl`: Relativistic longitudinal Doppler frequency (dim.: 1/time, in SI: hertz, Hz)
 * `frt`: Relativistic transverse Doppler frequency (dim.: 1/time, in SI: hertz, Hz)
@@ -1205,7 +1360,14 @@ The variables in the Relativity section are:
 * `Mxearth`: Mass factor as a multiple of Earth mass
 * `Mxsun`: Mass factor as a multiple of Sun mass
 * `MxSagA`: Mass factor as a multiple of SagitariusA* mass
+* `Pθ` = Light relativistic beaming, angular distribution of photon in the moving frame from a source isotropic and stationary
 * `p`: Momentum (dim.: mass·speed, in SI: kg·m/s)
+* `px`: X component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `pz`: Y component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `pz`: Z component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppx`: Transformed x component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppz`: Transformed y component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppz`: Transformed z component of the momentum (dim.: mass·speed, in SI: kg·m/s)
 * `PBH`: Black hole evaporation power (dim.: energy/time, in SI: watt, W)
 * `R`: Planet radius
 * `R1, R2`: Radius to points 1 and 2
@@ -1237,27 +1399,27 @@ The variables in the Relativity section are:
 * `ve`: Escape velocity
 * `z`: Gravitational redshift parameter
 
-The relativistic transformations are parametrized by the real constant 'v' representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
+The relativistic transformations are parametrized by the real constant `v` representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
 
 #### Lorentz Transformation
 
-The primed reference frame ('xp', 'yp', 'zp') is travelling with velocity 'v' in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
+The primed reference frame `[xp yp zp]` is travelling with velocity `v` in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
 
 #### Time Dilation
 
-The dilation comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper time interval is multiplied by this factor.
+The dilation comes from the fact that the Lorentz factor `γ` is greater or equal to one and the proper time interval is multiplied by this factor.
 
 #### Space Contraction
 
-The contraction comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper space interval is divided by this factor.
+The contraction comes from the fact that the Lorentz factor `γ` is greater or equal to one and the proper space interval is divided by this factor.
 
 #### Velocity Superposition
 
-These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with 'v = c' leads to 'upx = c', hence the impossibility to superpose velocities to go beyond the velocity limit 'c'. Since the velocity 'v' is confined to the x-direction, the y and z components of velocity remain unchanged.
+These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with `v = c` leads to `upx = c`, hence the impossibility to superpose velocities to go beyond the velocity limit `c`. Since the velocity `v` is confined to the x-direction, the y and z components of velocity remain unchanged.
 
 #### Acceleration Superposition
 
-Even if the velocity 'v' is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
+Even if the velocity `v` is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
 
 #### E & B Fields Transformation
 
@@ -1267,7 +1429,7 @@ Even if the velocity 'v' is confined to the x-direction, all components of the o
 
 #### Energy & Momentum
 
-The total relativistic energy 'E' and the norm of the momentum 'p' form the invariant 'mo·c^2' which remains the same in all frames. The kinetic energy 'K' is the difference between the total relativistic energy 'E' and the rest energy 'E0 = mo·c^2'.
+The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E0 = mo·c^2`.
 
 #### Gravitational Time Dilation
 
@@ -1275,11 +1437,11 @@ The total relativistic energy 'E' and the norm of the momentum 'p' form the inva
 
 #### Circumnavigating Airplanes
 
-It is assumed that the planes are circumnavigating at the same altitude 'h', same latitude 'φ' and the during same flight duration 'Δt' measured in the airplanes. The ground is rotating with the planet at the angular frequency 'ω'. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << 'c' (slow airplanes over a slow rotating planet).
+It is assumed that the planes are circumnavigating at the same altitude `h`, same latitude `φ` and the during same flight duration `Δt` measured in the airplanes. The ground is rotating with the planet at the angular frequency `ω`. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << `c` (slow airplanes over a slow rotating planet).
 
 #### Clocks at different heights
 
-It is assumed that the two clocks are at rest with respect to the ground at a latitude 'φ' and are rotating with the planet at the angular frequency 'ω'. The clocks are at their respective heights 'h1' and 'h2' for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height 'h1' and 'h2' are << 'c' (slow rotating planet).
+It is assumed that the two clocks are at rest with respect to the ground at a latitude `φ` and are rotating with the planet at the angular frequency `ω`. The clocks are at their respective heights `h1` and `h2` for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height `h1` and `h2` are << `c` (slow rotating planet).
 
 #### B H Schwarzschild Geometry
 
@@ -1326,27 +1488,27 @@ The variables in the Modern Physics section are:
 
 #### Planck & Wien Comparison
 
-In this section, two comparisons are done between the Planck and Wien spectral distributions. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
-In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributions. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
 
 #### Photoelectric Effect
 
-Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy 'E' of the incident photon is greather or equal to the work function 'φ' of the material. A simple energy budget equation determines the maximum kinetic energy 'Kmax' of the photoelectron.
+Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy `E` of the incident photon is greather or equal to the work function `φ` of the material. A simple energy budget equation determines the maximum kinetic energy `Kmax` of the photoelectron.
 
 #### Compton Effect
 
-In the Compton effect, both energy and momentum are conserved during the collision of the incident photon and the electron, which underlines the fact that the photon must henceforth be considered as a particle. When a high frequency 'f' (or energy 'E = hf') photon scatters due to an interaction with a charged particle, there is a decrease in the energy of the photon emitted at an angle 'θ' and thus, an increase in its wavelength 'λp'. The energy of the ejected electron 'Kmax' is relativist.
+In the Compton effect, both energy and momentum are conserved during the collision of the incident photon and the electron, which underlines the fact that the photon must henceforth be considered as a particle. When a high frequency `f` (or energy `E = hf`) photon scatters due to an interaction with a charged particle, there is a decrease in the energy of the photon emitted at an angle `θ` and thus, an increase in its wavelength `λp`. The energy of the ejected electron `Kmax` is relativist.
 
 #### De Broglie Wave
 
-At all scales where measurements have been possible, matter exhibits wave-like behavior (e.g. Young interference for protons, even for molecules). More precisely, a beam of neutron can be diffracted just like a beam of light or a water wave as it is the case in the Bragg diffraction. Here, the interference is constructive when the phase difference between the matter wave reflected off different atomic planes at an angle 'θ' is a multiple of 2π, giving the Following condition: '2·d·SINθ = n·λ' with 'n' integer and where 'θ' is mesured between the refected waves trajectory and the atomic plane.
+At all scales where measurements have been possible, matter exhibits wave-like behavior (e.g. Young interference for protons, even for molecules). More precisely, a beam of neutron can be diffracted just like a beam of light or a water wave as it is the case in the Bragg diffraction. Here, the interference is constructive when the phase difference between the matter wave reflected off different atomic planes at an angle `θ` is a multiple of 2π, giving the Following condition: `2·d·SINθ = n·λ` with `n` integer and where `θ` is mesured between the refected waves trajectory and the atomic plane.
 
 #### Bohr Atomic Model
 
@@ -1393,7 +1555,7 @@ The variables in the Nuclear Physics section are:
 * `ZX`: Proton number of the reactant nuclide X
 * `ZY`: Proton number of the product nuclide Y
 
-For all nuclear reactions, including nuclear decays, we have charge conservation 'Zp = Z' and mass number conservation 'Mp = M' (the same number of nucleons). This therefore requires assigning numbers A and Z to incident particles 'a' and 'b' whether they are for example gamma photons ('A = 0', Z = 0'), positrons ('A = 0', Z = -1') or others. The reaction energy 'Q' is always calculated with the mass-energy equivalence by the mass difference between the reactants and the products. Spontaneous decays are for instance always exothermic 'Q > 0' while some nuclear reactions can be endothermic 'Q < 0'.
+For all nuclear reactions, including nuclear decays, we have charge conservation `Zp = Z` and mass number conservation `Mp = M` (the same number of nucleons). This therefore requires assigning numbers A and Z to incident particles `a` and `b` whether they are for example gamma photons (`A = 0`, Z = 0`), positrons (`A = 0`, Z = -1`) or others. The reaction energy `Q` is always calculated with the mass-energy equivalence by the mass difference between the reactants and the products. Spontaneous decays are for instance always exothermic `Q > 0` while some nuclear reactions can be endothermic `Q < 0`.
 
 #### Radioactivity
 

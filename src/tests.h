@@ -248,13 +248,23 @@ struct tests
 
     };
 
+    enum id : unsigned
+    // ------------------------------------------------------------------------
+    //  Object ID
+    // ------------------------------------------------------------------------
+    {
+#define ID(i)   ID_##i,
+#include "ids.tbl"
+        NUM_IDS
+    };
+
   protected:
     struct failure
     {
         failure(cstring     file,
                 uint        line,
-                cstring     test,
-                cstring     step,
+                std::string test,
+                std::string step,
                 std::string explanation,
                 uint        ti,
                 uint        si,
@@ -271,8 +281,8 @@ struct tests
         }
         cstring     file;
         uint        line;
-        cstring     test;
-        cstring     step;
+        std::string test;
+        std::string step;
         std::string explanation;
         uint        tindex;
         uint        sindex;
@@ -305,10 +315,12 @@ public:
     tests &check(bool test);
     tests &fail();
     tests &summary();
-    tests &show(failure &f, cstring &last, uint &line);
+    tests &show(failure &f, std::string &last, uint &line);
     tests &show(failure &f);
+    tests &passfail(int ok);    // ok=-1 means expected failure
 
     // Used to build the tests
+    tests &itest(id cmd);
     tests &itest(key k, bool release = true);
     tests &itest(unsigned int value);
     tests &itest(int value);
@@ -374,7 +386,7 @@ public:
     tests &image_noheader(cstring name, uint ignoremenus=0,
                           uint extrawait = 0);
     tests &image_menus(cstring name, uint menus=3, uint extrawait = 0);
-    tests &type(object::id ty, uint extrawait = 0);
+    tests &type(id ty, uint extrawait = 0);
     tests &shift(bool s, uint extrawait = 0);
     tests &xshift(bool x, uint extrawait = 0);
     tests &alpha(bool a, uint extrawait = 0);
@@ -435,15 +447,15 @@ public:
     cstring              file;
     uint                 line;
     uint                 tstart;
-    cstring              tname;
-    cstring              sname;
+    std::string          tname;
+    std::string          sname;
     uint                 tindex;
     uint                 sindex;
     uint                 cindex;
     uint                 count;
     uint                 refresh_count;
     int                  last_key;
-    bool                 ok;
+    int                  ok;
     bool                 longpress;
     std::vector<failure> failures;
     std::string          explanation;

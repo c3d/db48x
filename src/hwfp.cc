@@ -40,8 +40,21 @@ size_t hwfp_base::render(renderer &r, double x)
 //   Render the value, ignoring formatting for now
 // ----------------------------------------------------------------------------
 {
-    decimal_g dec = decimal::from(x);
-    return dec->render(r);
+    if (std::isfinite(x))
+    {
+        decimal_g dec = decimal::from(x);
+        if (dec)
+            return dec->render(r);
+    }
+    if (std::isinf(x))
+    {
+        r.put(x < 0 ? "-∞" : "∞");
+    }
+    else
+    {
+        r.put("NaN");
+    }
+    return r.size();
 }
 
 

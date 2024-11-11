@@ -2536,31 +2536,34 @@ list_p expression::current_equation(bool all, bool error)
 }
 
 
-bool expression::is_well_defined(symbol_p solving, bool error) const
+bool expression::is_well_defined(symbol_p solving,
+                                 bool     error,
+                                 symbol_p knowing) const
 // ----------------------------------------------------------------------------
 //   Check if all variables but the one we solve for are defined
 // ----------------------------------------------------------------------------
 {
-    expression_g expr = this;
-    symbol_g     sym  = solving;
-    list_p       vars = expr->names();
+    expression_g expr  = this;
+    symbol_g     sym   = solving;
+    symbol_g     known = knowing;
+    list_p       vars  = expr->names();
     bool         found = false;
     for (auto var : *vars)
     {
         if (symbol_p vsym = var->as<symbol>())
         {
-            if (!sym || !sym->is_same_as(vsym))
-            {
-                if (!directory::recall_all(var, false))
-                {
-                    if (error)
-                        rt.some_undefined_name_error();
-                    return false;
-                }
-            }
-            else
+            if (sym && sym->is_same_as(vsym))
             {
                 found = true;
+            }
+            else if (known && known->is_same_as(vsym))
+            {
+            }
+            else if (!directory::recall_all(var, false))
+            {
+                if (error)
+                    rt.some_undefined_name_error();
+                return false;
             }
         }
         else

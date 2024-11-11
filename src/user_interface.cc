@@ -55,6 +55,7 @@
 #include "variables.h"
 
 #ifdef SIMULATOR
+#include "sim-dmcp.h"
 #include "tests.h"
 #endif // SIMULATOR
 
@@ -76,6 +77,7 @@ RECORDER(menus,         16, "Menu operations");
 RECORDER(help,          16, "On-line help");
 RECORDER(help_search,   16, "On-line help topic search");
 RECORDER(tests_ui,      16, "Test interaction with user interface");
+RECORDER(keymap_warning, 8, "Warnings about invalid keymaps");
 
 #define NUM_TOPICS      (sizeof(topics) / sizeof(topics[0]))
 
@@ -144,6 +146,7 @@ user_interface::user_interface()
       adjustSeps(false),
       graphics(false),
       dbl_release(false),
+      keymap(),
       helpfile()
 {
     for (uint p = 0; p < NUM_PLANES; p++)
@@ -490,7 +493,7 @@ text_p user_interface::editor_save(text_r &editor, bool rewinding)
 }
 
 
-void user_interface::editor_history(bool back)
+bool user_interface::editor_history(bool back)
 // ----------------------------------------------------------------------------
 //   Restore editor buffer from history
 // ----------------------------------------------------------------------------
@@ -514,6 +517,7 @@ void user_interface::editor_history(bool back)
         }
     }
     menu::static_object(menu::ID_EditMenu)->evaluate();
+    return true;
 }
 
 
@@ -4550,13 +4554,9 @@ bool user_interface::handle_editing(int key)
         {
         case KEY_XEQ:
             // XEQ is used to enter algebraic / equation objects
-            if ((!isEditing  || mode != BASED) && !shift && !xshift)
-            {
-                bool is_eqn = isEditing && is_algebraic(mode);
-                insert(is_eqn ? '(' : '\'', ALGEBRAIC);
-                last = 0;
-                return true;
-            }
+            if (!shift && !xshift)
+                if (do_algebraic())
+                    return true;
             break;
         case KEY_RUN:
             if (shift)
@@ -4632,87 +4632,12 @@ bool user_interface::handle_editing(int key)
         case KEY_BSP:
             if (xshift)
                 return false;
-            repeat = true;
-            if (~searching)
-            {
-                utf8 ed = rt.editor();
-                if (cursor > select)
-                    cursor = utf8_previous(ed, cursor);
-                else
-                    select = utf8_previous(ed, select);
-                if (cursor == select)
-                    cursor = select = searching;
-                else
-                    do_search(0, true);
-            }
-            else
-            {
-                utf8 ed = rt.editor();
-
-                if (~select && select != cursor)
-                {
-                    editor_clear();
-                }
-                else if (shift && cursor < isEditing)
-                {
-                    // Shift + Backspace = Delete to right of cursor
-                    uint after = utf8_next(ed, cursor, isEditing);
-                    unicode cp = utf8_codepoint(ed + cursor);
-                    if (cp == '\n')
-                        edRows = 0;
-                    else if (cp == Settings.BasedSeparator() ||
-                             cp == Settings.NumberSeparator())
-                        after = utf8_next(ed, after, isEditing);
-                    remove(cursor, after - cursor);
-                }
-                else if (!shift && cursor > 0)
-                {
-                    // Backspace = Erase on left of cursor
-                    utf8 ed      = rt.editor();
-                    uint before  = cursor;
-                    cursor       = utf8_previous(ed, cursor);
-                    unicode cp = utf8_codepoint(ed + cursor);
-                    if (cp == '\n')
-                        edRows = 0;
-                    else if (cp == Settings.BasedSeparator() ||
-                             cp == Settings.NumberSeparator())
-                        cursor = utf8_previous(ed, cursor);
-                    remove(cursor, before - cursor);
-                }
-                else
-                {
-                    // Limits of line: beep
-                    repeat = false;
-                    beep(4400, 50);
-                }
-
-                dirtyEditor = true;
-                adjustSeps = true;
-                menu_refresh(object::ID_Catalog);
-            }
-
-            // Do not stop editing if we delete last character
-            if (!rt.editing())
-                insert(' ', DIRECT);
-            last = 0;
-            return true;
+            return do_delete(shift);
         case KEY_ENTER:
         {
             // Finish editing and parse the result
             if (!shift && !xshift)
-            {
-                if (~searching)
-                {
-                    searching = ~0U;
-                    dirtyEditor = true;
-                    edRows = 0;
-                }
-                else
-                {
-                    end_edit();
-                }
-                return true;
-            }
+                return do_enter();
             return false;
         }
         case KEY_EXIT:
@@ -4720,109 +4645,21 @@ bool user_interface::handle_editing(int key)
             if (shift || xshift)
                 return false;
 
-            if (rt.error())
-            {
-                rt.clear_error();
-                dirtyEditor = true;
-                dirtyStack = true;
-            }
-            else
-            {
-                editor_save(false);
-                clear_editor();
-                if (editing)
-                {
-                    if (!editingLevel)
-                        rt.push(editing);
-                    editing = nullptr;
-                    dirtyEditor = true;
-                    dirtyStack = true;
-                }
-            }
-            return true;
+            return do_exit();
 
         case KEY_UP:
-            repeat = true;
             if (shift)
-            {
-                up = true;
-                dirtyEditor = true;
-            }
-            else if (xshift)
-            {
-                // Command-line history
-                editor_history();
-                return true;
-            }
-            else if (cursor > 0)
-            {
-                font_p edFont = Settings.editor_font(edRows > 2);
-                utf8 ed = rt.editor();
-                uint pcursor  = utf8_previous(ed, cursor);
-                unicode cp = utf8_codepoint(ed + pcursor);
-                if (cp != '\n')
-                {
-                    draw_cursor(-1, pcursor);
-                    cursor = pcursor;
-                    cx -= edFont->width(cp);
-                    edColumn = cx;
-                    draw_cursor(1, pcursor);
-                    if (cx < 0)
-                        dirtyEditor = true;
-                }
-                else
-                {
-                    cursor = pcursor;
-                    edRows = 0;
-                    dirtyEditor = true;
-                }
-            }
-            else
-            {
-                repeat = false;
-                beep(4000, 50);
-            }
-            return true;
+                return do_up();
+            if (xshift)
+                return editor_history();
+            return do_left();
+
         case KEY_DOWN:
-            repeat = true;
             if (shift)
-            {
-                down = true;
-                dirtyEditor = true;
-            }
-            else if (xshift)
-            {
+                return do_down();
+            if (xshift)
                 return false;
-            }
-            else if (cursor < isEditing)
-            {
-                font_p edFont = Settings.editor_font(edRows > 2);
-                utf8 ed = rt.editor();
-                unicode cp = utf8_codepoint(ed + cursor);
-                uint ncursor = utf8_next(ed, cursor, isEditing);
-                if (cp != '\n')
-                {
-                    draw_cursor(-1, ncursor);
-                    cursor = ncursor;
-                    cx += edFont->width(cp);
-                    edColumn = cx;
-                    draw_cursor(1, ncursor);
-                    if (cx >= LCD_W - edFont->width('M'))
-                        dirtyEditor = true;
-                }
-                else
-                {
-                    cursor = ncursor;
-                    edRows = 0;
-                    dirtyEditor = true;
-                }
-            }
-            else
-            {
-                repeat = false;
-                beep(4800, 50);
-            }
-            return true;
+            return do_right();
         case 0:
             return false;
         }
@@ -4833,12 +4670,7 @@ bool user_interface::handle_editing(int key)
         {
         case KEY_ENTER:
             if (xshift)
-            {
-                // Insert quotes and begin editing
-                insert('\"', TEXT);
-                alpha = true;
-                return true;
-            }
+                return do_text();
             break;
         case KEY_EXIT:
             if (shift || xshift)
@@ -4850,20 +4682,8 @@ bool user_interface::handle_editing(int key)
         case KEY_DOWN:
             // Key down to edit last object on stack
             if (!shift && !xshift && !alpha)
-            {
-                if (rt.depth())
-                {
-                    if (object_p obj = rt.pop())
-                    {
-                        editing = obj;
-                        editingLevel = 0;
-                        insert_object(obj);
-                        cursor = 0;
-                        dirtyEditor = true;
-                        return true;
-                    }
-                }
-            }
+                if (do_edit())
+                    return true;
             break;
         case KEY_UP:
             if (xshift)
@@ -5190,89 +5010,7 @@ bool user_interface::handle_digits(int key)
         if (c == '_')
             return false;
         if (c == '.' && mode != TEXT)
-        {
-            // Check if we enter a DMS value
-            byte   *ed    = rt.editor();
-            byte   *p     = ed + cursor;
-            utf8    found = nullptr;
-            unicode dm    = Settings.DecimalSeparator();
-            unicode ns    = Settings.NumberSeparator();
-            unicode hs    = Settings.BasedSeparator();
-
-            c = char(dm);
-            while (p > ed && !found)
-            {
-                p = (byte *) utf8_previous(p);
-                unicode cp = utf8_codepoint(p);
-                if (cp == L'″')
-                {
-                    found = p;
-                    c = '/';
-                }
-                else if (cp == L'′')
-                {
-                    found = p;
-                    c = L'″';
-                }
-                else if (cp == L'°')
-                {
-                    found = p;
-                    if (uint(found - ed) == cursor - utf8_size(cp))
-                    {
-                        remove(found - ed, utf8_size(cp));
-                        c = dm;
-
-                        size_t edlen = rt.editing();
-                        ed = rt.editor();
-                        if (cursor + 4 <= edlen &&
-                            memcmp(ed + cursor, "_dms", 4) == 0)
-                            remove(cursor, 4);
-                    }
-                    else
-                    {
-                        c = L'′';
-                    }
-                }
-                else if (cp == dm)
-                {
-                    found = p;
-                    remove (found - ed, utf8_size(cp));
-                    if (uint(found - ed - 1) == cursor - utf8_size(cp))
-                    {
-                        c = L'°';
-                    }
-                    else
-                    {
-                        insert(found - ed, unicode(L'°'));
-                        c = L'′';
-                    }
-                    size_t edlen = rt.editing();
-                    ed = rt.editor();
-                    if (cursor + 4 > edlen ||
-                        memcmp(ed + cursor, "_dms", 4) != 0)
-                    {
-                        size_t add = insert(cursor, utf8("_dms"), 4);
-                        cursor -= add;
-                    }
-                }
-                else if ((cp < '0' || cp > '9') && cp != ns && cp != hs)
-                {
-                    break;
-                }
-            }
-            if (found)
-            {
-                bool haddigit = p > ed;
-                if (haddigit)
-                {
-                    utf8 pp = utf8_previous(p);
-                    unicode cpp = utf8_codepoint(pp);
-                    haddigit = cpp >= '0' && cpp <= '9';
-                }
-                if (!haddigit)
-                    insert(found - ed, unicode('0'));
-            }
-        }
+            return do_decimal_separator();
         insert(c, DIRECT);
         repeat = true;
         return true;
@@ -5301,8 +5039,8 @@ static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_SIGMA, menu::ID_ToolsMenu),
     OP2BYTES(KEY_INV,   function::ID_inv),
     OP2BYTES(KEY_SQRT,  function::ID_sqrt),
-    OP2BYTES(KEY_LOG,   function::ID_exp),
-    OP2BYTES(KEY_LN,    function::ID_log),
+    OP2BYTES(KEY_LOG,   function::ID_pow),
+    OP2BYTES(KEY_LN,    function::ID_MathMenu),
     OP2BYTES(KEY_XEQ,   0),
     OP2BYTES(KEY_STO,   command::ID_Sto),
     OP2BYTES(KEY_RCL,   command::ID_ToggleCustomMenu),
@@ -5356,13 +5094,13 @@ static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
 //   All the default assigned commands fit in one or two bytes
 {
     OP2BYTES(KEY_SIGMA, menu::ID_LastMenu),
-    OP2BYTES(KEY_INV,   arithmetic::ID_pow),
+    OP2BYTES(KEY_INV,   arithmetic::ID_exp),
     OP2BYTES(KEY_SQRT,  arithmetic::ID_sq),
-    OP2BYTES(KEY_LOG,   function::ID_exp10),
-    OP2BYTES(KEY_LN,    function::ID_log10),
-    OP2BYTES(KEY_XEQ,   menu::ID_LoopsMenu),
+    OP2BYTES(KEY_LOG,   function::ID_abs),
+    OP2BYTES(KEY_LN,    function::ID_ExpLogMenu),
+    OP2BYTES(KEY_XEQ,   menu::ID_EquationsMenu),
     OP2BYTES(KEY_STO,   menu::ID_ComplexMenu),
-    OP2BYTES(KEY_RCL,   menu::ID_FractionsMenu),
+    OP2BYTES(KEY_RCL,   menu::ID_MemoryMenu),
     OP2BYTES(KEY_RDN,   menu::ID_ConstantsMenu),
     OP2BYTES(KEY_SIN,   function::ID_asin),
     OP2BYTES(KEY_COS,   function::ID_acos),
@@ -5413,25 +5151,25 @@ static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
 //   All the default assigned commands fit in one or two bytes
 {
     OP2BYTES(KEY_SIGMA, menu::ID_MainMenu),
-    OP2BYTES(KEY_INV,   command::ID_xroot),
-    OP2BYTES(KEY_SQRT,  menu::ID_PolynomialsMenu),
-    OP2BYTES(KEY_LOG,   menu::ID_ExpLogMenu),
+    OP2BYTES(KEY_INV,   command::ID_log),
+    OP2BYTES(KEY_SQRT,  menu::ID_xroot),
+    OP2BYTES(KEY_LOG,   menu::ID_AlgebraMenu),
     OP2BYTES(KEY_LN,    menu::ID_PartsMenu),
-    OP2BYTES(KEY_XEQ,   menu::ID_EquationsMenu),
-    OP2BYTES(KEY_STO,   menu::ID_MemoryMenu),
+    OP2BYTES(KEY_XEQ,   menu::ID_CharactersMenu),
+    OP2BYTES(KEY_STO,   menu::ID_RealMenu),
     OP2BYTES(KEY_RCL,   menu::ID_Library),
-    OP2BYTES(KEY_RDN,   menu::ID_MathMenu),
+    OP2BYTES(KEY_RDN,   menu::ID_FractionsMenu),
     OP2BYTES(KEY_SIN,   menu::ID_HyperbolicMenu),
     OP2BYTES(KEY_COS,   menu::ID_CircularMenu),
-    OP2BYTES(KEY_TAN,   menu::ID_RealMenu),
+    OP2BYTES(KEY_TAN,   menu::ID_AnglesMenu),
     OP2BYTES(KEY_ENTER, 0),     // Text
     OP2BYTES(KEY_SWAP,  function::ID_Undo),
-    OP2BYTES(KEY_CHS,   menu::ID_ObjectMenu),
+    OP2BYTES(KEY_CHS,   menu::ID_UserInterfaceModesMenu),
     OP2BYTES(KEY_E,     menu::ID_PlotMenu),
     OP2BYTES(KEY_BSP,   function::ID_UpDir),
     OP2BYTES(KEY_UP,    0),
     OP2BYTES(KEY_7,     menu::ID_SymbolicMenu),
-    OP2BYTES(KEY_8,     menu::ID_DifferentiationMenu),
+    OP2BYTES(KEY_8,     menu::ID_PolynomialsMenu),
     OP2BYTES(KEY_9,     menu::ID_MatrixMenu),
     OP2BYTES(KEY_DIV,   menu::ID_FinanceSolverMenu),
     OP2BYTES(KEY_DOWN,  menu::ID_EditMenu),
@@ -5441,7 +5179,7 @@ static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_MUL,   menu::ID_NumbersMenu),
     OP2BYTES(KEY_SHIFT, 0),
     OP2BYTES(KEY_1,     menu::ID_DebugMenu),
-    OP2BYTES(KEY_2,     menu::ID_CharactersMenu),
+    OP2BYTES(KEY_2,     menu::ID_LoopsMenu),
     OP2BYTES(KEY_3,     menu::ID_TestsMenu),
     OP2BYTES(KEY_SUB,   menu::ID_IOMenu),
     OP2BYTES(KEY_EXIT,  command::ID_SaveState),
@@ -5474,6 +5212,99 @@ static const byte *const defaultCommand[user_interface::NUM_PLANES] =
 };
 
 
+bool user_interface::load_keymap(cstring name)
+// ----------------------------------------------------------------------------
+//   Load the keymap from a file
+// ----------------------------------------------------------------------------
+{
+    file kmap(name, false);
+    if (!kmap.valid())
+    {
+        rt.error(kmap.error());
+        record(keymap_warning, "%s not valid: %s", name, rt.error());
+        return false;
+    }
+
+    static byte buffer[80];
+    size_t      idx = 0;
+    uint        key = 0;
+    scribble    scr;
+    bool        quoted = false;
+    list_g      result;
+
+    while (kmap.valid())
+    {
+        unicode c = kmap.get();
+        if (c == '@')
+        {
+            do { c = kmap.get(); } while (c && c != '\n');
+            continue;
+        }
+        if (c == '"')
+            quoted = !quoted;
+        if (!quoted)
+        {
+            if (c == '[' || c == '{')
+                continue;
+            if (c == ']' || c == '}')
+            {
+                list_g plane = list::make(object::ID_list,
+                                          scr.scratch(), scr.growth());
+                if (!result)
+                    result = list::make(object::ID_list, plane);
+                else
+                    result = result->append(object_p(+plane));
+                scr.clear();
+                key = 0;
+                continue;
+            }
+        }
+        if (quoted || !utf8_whitespace(c))
+        {
+            idx += utf8_encode(c, buffer + idx);
+            if (idx >= sizeof(buffer) - 4)
+            {
+                buffer[idx] = 0;
+                record(keymap_warning, "%s: [%s] is too long",
+                       name, buffer);
+                rt.syntax_error();
+                return false;
+            }
+        }
+        else if (idx)
+        {
+            // Parse object
+            object_p parsed = object::parse(buffer, idx);
+            if (!parsed)
+            {
+                record(keymap_warning, "%s key %u: could not parse [%s]: %s",
+                       name, key, buffer, rt.error());
+                return false;
+            }
+            key++;
+            record(user_interface, "For key %u object %t", key, parsed);
+            if (parsed->type() == object::ID_symbol)
+                record(keymap_warning, "%s key %u: %t is a symbol",
+                       name, key, parsed);
+            rt.append(parsed);
+            idx = 0;
+        }
+        if (!c)
+            break;
+    }
+
+    if (result)
+    {
+        keymap = result;
+#if SIMULATOR
+        ui_load_keymap(name);
+#endif // SIMULATOR
+    }
+
+    return result;
+}
+
+
 object_p user_interface::object_for_key(int key)
 // ----------------------------------------------------------------------------
 //    Return the object for a given key
@@ -5488,6 +5319,12 @@ object_p user_interface::object_for_key(int key)
         if (obj)
             return obj;
     }
+
+    if (keymap && key > 0 && key <= NUM_KEYS)
+        if (object_p planeobj = keymap->at(plane + NUM_PLANES * alpha_plane()))
+            if (list_p plane = planeobj->as_array_or_list())
+                if (object_p keyobj = plane->at(key-1))
+                    return keyobj;
 
     const byte *ptr = defaultCommand[plane] + 2 * (key - 1);
     if (*ptr)
@@ -5525,20 +5362,7 @@ bool user_interface::handle_user(int key)
                              shift, xshift,
                              alpha, lowercase, transalpha);
     if (object_p binding = assigned(kc))
-    {
-        if (text_p direct = binding->as<text>())
-        {
-            size_t sz = 0;
-            utf8 txt = direct->value(&sz);
-            result = insert(txt, sz, TEXT) == object::OK;
-            if (user_once)
-                Settings.UserMode(false);
-        }
-        else
-        {
-            result = handle_functions(key, binding, true);
-        }
-    }
+        result = handle_functions(key, binding, true);
     return result;
 }
 
@@ -5548,6 +5372,16 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
 //   Code shared for user-mode and normal mode commands
 // ----------------------------------------------------------------------------
 {
+    if (text_p direct = obj->as<text>())
+    {
+        size_t sz = 0;
+        utf8 txt = direct->value(&sz);
+        bool result = insert(txt, sz, TEXT) == object::OK;
+        if (user_once)
+            Settings.UserMode(false);
+        return result;
+    }
+
     save<int>  saveEvaluating(evaluating, key);
     object::id ty = obj->type();
     if (object::is_forced_entry(ty))
@@ -5559,6 +5393,7 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
 
     bool imm     = object::is_immediate(ty);
     bool editing = rt.editing();
+    bool skipcmd = false;
     if (editing && !imm)
     {
         if (key == KEY_ENTER || key == KEY_BSP)
@@ -5593,14 +5428,7 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
         case ALGEBRAIC:
         case PARENTHESES:
             if (ty == object::ID_Sto)
-            {
-                if (autoComplete)
-                    if (obj->insert() != object::OK)
-                        return false;
-                if (!end_edit())
-                    return false;
-                break;
-            }
+                goto direct;
             [[fallthrough]];
 
         case PROGRAM:
@@ -5631,9 +5459,14 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
             // If we have the editor open, need to close it
             if (ty != object::ID_SelfInsert)
             {
+            direct:
+                draw_busy();
                 if (autoComplete)
+                {
                     if (obj->insert() != object::OK)
                         return false;
+                    skipcmd = true;
+                }
                 if (!end_edit())
                     return false;
                 editing = false;
@@ -5652,7 +5485,8 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
     }
     save<bool> no_halt(program::halted, false);
     bool usr = Settings.UserMode();
-    obj->evaluate();
+    if (!skipcmd)
+        obj->evaluate();
     draw_idle();
     dirtyStack = true;
     if (!imm)
@@ -5705,6 +5539,371 @@ bool user_interface::current_word(utf8 &start, size_t &size)
         }
     }
     return false;
+}
+
+
+
+// ============================================================================
+//
+//   User interface commands, which can be invoked from keymap
+//
+// ============================================================================
+
+bool user_interface::do_edit()
+// ----------------------------------------------------------------------------
+//   Edit lowest-level on the stack
+// ----------------------------------------------------------------------------
+{
+    if (rt.depth())
+    {
+        if (object_p obj = rt.pop())
+        {
+            editing = obj;
+            editingLevel = 0;
+            insert_object(obj);
+            cursor = 0;
+            dirtyEditor = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool user_interface::do_enter()
+// ----------------------------------------------------------------------------
+//   Finish current editing session and enter command-line
+// ----------------------------------------------------------------------------
+{
+    if (~searching)
+    {
+        searching   = ~0U;
+        dirtyEditor = true;
+        edRows      = 0;
+    }
+    else
+    {
+        end_edit();
+    }
+    return true;
+}
+
+
+bool user_interface::do_exit()
+// ----------------------------------------------------------------------------
+//   Exit current editing session
+// ----------------------------------------------------------------------------
+{
+    if (rt.error())
+    {
+        rt.clear_error();
+        dirtyEditor = true;
+        dirtyStack = true;
+    }
+    else
+    {
+        editor_save(false);
+        clear_editor();
+        if (editing)
+        {
+            if (!editingLevel)
+                rt.push(editing);
+            editing = nullptr;
+            dirtyEditor = true;
+            dirtyStack = true;
+        }
+    }
+    return true;
+}
+
+
+bool user_interface::do_left()
+// ----------------------------------------------------------------------------
+//   Move cursor left
+// ----------------------------------------------------------------------------
+{
+    if (cursor > 0)
+    {
+        font_p edFont = Settings.editor_font(edRows > 2);
+        utf8 ed = rt.editor();
+        uint pcursor  = utf8_previous(ed, cursor);
+        unicode cp = utf8_codepoint(ed + pcursor);
+        if (cp != '\n')
+        {
+            draw_cursor(-1, pcursor);
+            cursor = pcursor;
+            cx -= edFont->width(cp);
+            edColumn = cx;
+            draw_cursor(1, pcursor);
+            if (cx < 0)
+                dirtyEditor = true;
+        }
+        else
+        {
+            cursor = pcursor;
+            edRows = 0;
+            dirtyEditor = true;
+        }
+        repeat = true;
+        return true;
+    }
+
+    beep(4000, 50);
+    return false;
+}
+
+
+bool user_interface::do_right()
+// ----------------------------------------------------------------------------
+//   Move cursor right
+// ----------------------------------------------------------------------------
+{
+    size_t edlen = rt.editing();
+    if (cursor < edlen)
+    {
+        font_p edFont = Settings.editor_font(edRows > 2);
+        utf8 ed = rt.editor();
+        unicode cp = utf8_codepoint(ed + cursor);
+        uint ncursor = utf8_next(ed, cursor, edlen);
+        if (cp != '\n')
+        {
+            draw_cursor(-1, ncursor);
+            cursor = ncursor;
+            cx += edFont->width(cp);
+            edColumn = cx;
+            draw_cursor(1, ncursor);
+            if (cx >= LCD_W - edFont->width('M'))
+                dirtyEditor = true;
+        }
+        else
+        {
+            cursor = ncursor;
+            edRows = 0;
+            dirtyEditor = true;
+        }
+        repeat = true;
+        return true;
+    }
+    beep(4800, 50);
+    return true;
+}
+
+
+bool user_interface::do_up()
+// ----------------------------------------------------------------------------
+//   Move cursor up
+// ----------------------------------------------------------------------------
+{
+    repeat      = true;
+    up          = true;
+    dirtyEditor = true;
+    return true;
+}
+
+
+bool user_interface::do_down()
+// ----------------------------------------------------------------------------
+//   Move cursor down
+// ----------------------------------------------------------------------------
+{
+    repeat      = true;
+    down        = true;
+    dirtyEditor = true;
+    return true;
+}
+
+
+bool user_interface::do_delete(bool forward)
+// ----------------------------------------------------------------------------
+//   Delete what is right of cursor
+// ----------------------------------------------------------------------------
+{
+    if (~searching)
+    {
+        utf8 ed = rt.editor();
+        if (cursor > select)
+            cursor = utf8_previous(ed, cursor);
+        else
+            select = utf8_previous(ed, select);
+        if (cursor == select)
+            cursor = select = searching;
+        else
+            do_search(0, true);
+    }
+    else
+    {
+        utf8 ed = rt.editor();
+        size_t edlen = rt.editing();
+
+        if (~select && select != cursor)
+        {
+            editor_clear();
+        }
+        else if (forward && cursor < edlen)
+        {
+            // Shift + Backspace = Delete to right of cursor
+            uint after = utf8_next(ed, cursor, edlen);
+            unicode cp = utf8_codepoint(ed + cursor);
+            if (cp == '\n')
+                edRows = 0;
+            else if (cp == Settings.BasedSeparator() ||
+                     cp == Settings.NumberSeparator())
+                after = utf8_next(ed, after, edlen);
+            remove(cursor, after - cursor);
+            repeat = true;
+        }
+        else if (!forward && cursor > 0)
+        {
+            // Backspace = Erase on left of cursor
+            utf8 ed      = rt.editor();
+            uint before  = cursor;
+            cursor       = utf8_previous(ed, cursor);
+            unicode cp = utf8_codepoint(ed + cursor);
+            if (cp == '\n')
+                edRows = 0;
+            else if (cp == Settings.BasedSeparator() ||
+                     cp == Settings.NumberSeparator())
+                cursor = utf8_previous(ed, cursor);
+            remove(cursor, before - cursor);
+            repeat = true;
+        }
+        else
+        {
+            // Limits of line: beep
+            repeat = false;
+            beep(4400, 50);
+        }
+
+        dirtyEditor = true;
+        adjustSeps = true;
+        menu_refresh(object::ID_Catalog);
+    }
+
+    // Do not stop editing if we delete last character
+    if (!rt.editing())
+        insert(' ', DIRECT);
+    last = 0;
+    return true;
+}
+
+
+bool user_interface::do_algebraic()
+// ----------------------------------------------------------------------------
+//   Magic key to enter algebraic objects
+// ----------------------------------------------------------------------------
+{
+    bool editing = rt.editing();
+    if (!editing || mode != BASED)
+    {
+        bool is_eqn = editing && is_algebraic(mode);
+        insert(is_eqn ? '(' : '\'', ALGEBRAIC);
+        last = 0;
+        return true;
+    }
+    return false;
+}
+
+
+bool user_interface::do_text()
+// ----------------------------------------------------------------------------
+//   Magic key to enter text
+// ----------------------------------------------------------------------------
+{
+    // Insert quotes and begin editing
+    insert('\"', TEXT);
+    alpha = true;
+    return true;
+}
+
+
+bool user_interface::do_decimal_separator()
+// ----------------------------------------------------------------------------
+//   Behavior of decimal separator key
+// ----------------------------------------------------------------------------
+{
+    // Check if we enter a DMS value
+    byte   *ed    = rt.editor();
+    byte   *p     = ed + cursor;
+    utf8    found = nullptr;
+    unicode dm    = Settings.DecimalSeparator();
+    unicode ns    = Settings.NumberSeparator();
+    unicode hs    = Settings.BasedSeparator();
+
+    unicode c = mode == TEXT ? '.' : char(dm);
+    while (p > ed && !found)
+    {
+        p = (byte *) utf8_previous(p);
+        unicode cp = utf8_codepoint(p);
+        if (cp == L'″')
+        {
+            found = p;
+            c = '/';
+        }
+        else if (cp == L'′')
+        {
+            found = p;
+            c = L'″';
+        }
+        else if (cp == L'°')
+        {
+            found = p;
+            if (uint(found - ed) == cursor - utf8_size(cp))
+            {
+                remove(found - ed, utf8_size(cp));
+                c = dm;
+
+                size_t edlen = rt.editing();
+                ed = rt.editor();
+                if (cursor + 4 <= edlen &&
+                    memcmp(ed + cursor, "_dms", 4) == 0)
+                    remove(cursor, 4);
+            }
+            else
+            {
+                c = L'′';
+            }
+        }
+        else if (cp == dm)
+        {
+            found = p;
+            remove (found - ed, utf8_size(cp));
+            if (uint(found - ed - 1) == cursor - utf8_size(cp))
+            {
+                c = L'°';
+            }
+            else
+            {
+                insert(found - ed, unicode(L'°'));
+                c = L'′';
+            }
+            size_t edlen = rt.editing();
+            ed = rt.editor();
+            if (cursor + 4 > edlen ||
+                memcmp(ed + cursor, "_dms", 4) != 0)
+            {
+                size_t add = insert(cursor, utf8("_dms"), 4);
+                cursor -= add;
+            }
+        }
+        else if ((cp < '0' || cp > '9') && cp != ns && cp != hs)
+        {
+            break;
+        }
+    }
+    if (found)
+    {
+        bool haddigit = p > ed;
+        if (haddigit)
+        {
+            utf8 pp = utf8_previous(p);
+            unicode cpp = utf8_codepoint(pp);
+            haddigit = cpp >= '0' && cpp <= '9';
+        }
+        if (!haddigit)
+            insert(found - ed, unicode('0'));
+    }
+    insert(c, DIRECT);
+    return true;
 }
 
 

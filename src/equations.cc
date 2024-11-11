@@ -204,8 +204,8 @@ static const cstring basic_equations[] =
     "}",
 
     "DC Inductor Voltage",  "{ "
-    "  '(V_V)=-(L_mH)*((ΔI_A)/(Δt_μs))' "
-    "  '(ΔI_A)=(If_A)-(Ii_A)' "
+    "  '(V_V)=-(L_mH)*((ΔIL_A)/(Δt_μs))' "
+    "  '(ΔIL_A)=(ILf_A)-(ILi_A)' "
     "  '(Δt_μs)=(tf_μs)-(ti_μs)' "
     "}",
 
@@ -216,12 +216,12 @@ static const cstring basic_equations[] =
     "RL Transient",  "{ "
     "  '(I_A)=1/(R_Ω)*((Vf_V)-((Vf_V)-(Vi_V))*EXP((-(t_μs))/((R_Ω)*(L_mH))))' "
     "}",
-
+    // Modif of radian in eqn (4)
     "Resonant Frequency",  "{ "
     "  'Qs=1/(R_Ω)*√((L_mH)/(C_μF))' "
     "  'Qp=(R_Ω)*√((C_μF)/(L_mH))' "
     "  '(ω0_(r/s))=2*(Ⓒπ_r)*(f0_Hz)' "
-    "  '(ω0_(r/s))=1/√((L_mH)*(C_μF))' "
+    "  '(ω0_(r/s))=(1_r)/√((L_mH)*(C_μF))' "
     "}",
 
     "Plate Capacitor",  "{ "
@@ -277,7 +277,6 @@ static const cstring basic_equations[] =
     "Fluids", nullptr,
     // ------------------------------------------------------------------------
     // 29 eqns in Fluids
-    // The first is the only equ that does work in FLUIDS
     "Pressure at Depth",  "{ "
     "  '(P_kPa)=(P0_atm)+(ρ_(kg/m^3))*Ⓒg*(h_m)' "
     "}",
@@ -347,10 +346,10 @@ static const cstring basic_equations[] =
     "}",
 
     "Angular Mechanics",  "{ "
-    "'(τ_(N*m))=(I_(kg*m^2))*(α_(r/s^2))' "
+    "'(τ_(N*m))=(I_(kg*m^2))*(α_(r/s^2))/(1_r)' "
     "'(Ki_J)=1/2*(I_(kg*m^2))*(ωi_(r/s))^2' "
     "'(Kf_J)=1/2*(I_(kg*m^2))*(ωf_(r/s))^2' "
-    "'(W_J)=(τ_(N*m))*(θ_°)' "
+    "'(W_J)=(τ_(N*m))*(θ_°)/(1_°)' "
     "'(W_J)=(Kf_J)-(KI_J)' "
     "'(P_W)=(τ_(N*m))*(ω_(r/s))/(1_r)' "
     "'(Pavg_W)=(W_J)/(t_s)' "
@@ -377,12 +376,16 @@ static const cstring basic_equations[] =
     "'(v1f_(m/s))=(((m1_kg)-(m2_kg))/((m1_kg)+(m2_kg)))*(v1i_(m/s))' "
     "'(v2f_(m/s))=((2*(m1_kg))/((m1_kg)+(m2_kg)))*(v1i_(m/s))' "
     "}",
-
+    // The following sub-section was missing from v8.2
+    "Drag Force",  "{ "
+    "'(F_N)=Cd*((ρ_kg/m^3)*(v_m/s)^2/2)*(A_cm^2)' "
+    "}",
+    // Formulas 3 & 4 corrected: (m1_kg)*(m2_kg) in the numerator instead of (m_kg) alone in the gravitational potential
     "Gravitation Law",  "{ "
     "'(F_N)=ⒸG*((m1_kg)*(m2_kg))/(r_m)^2' "
     "'(W_J)=(UGf_J)-(UGi_J)' "
-    "'(UGf_J)=-ⒸG*((m_kg))/(rf_m)' "
-    "'(UGi_J)=-ⒸG*((m_kg))/(ri_m)' "
+    "'(UGf_J)=-ⒸG*((m1_kg)*(m2_kg))/(rf_m)' "
+    "'(UGi_J)=-ⒸG*((m1_kg)*(m2_kg))/(ri_m)' "
     "}",
 
     "Relativity Mass Energy",  "{ "
@@ -394,23 +397,25 @@ static const cstring basic_equations[] =
     "Gases", nullptr,
     // ------------------------------------------------------------------------
     // 18 eqns
+    // Change all occurrences of gmol by mol
+    // In eq (1) units of T should be K instead of °C
     "Ideal Gas",  "{ "
-    "'(P_atm)*(V_l)=(n_gmol)*ⒸR*(T_°C)' "
-    "'(m_kg)=(n_gmol)*(MW_(g/gmol))' "
+    "'(P_atm)*(V_l)=(n_mol)*ⒸR*(T_K)' "
+    "'(m_kg)=(n_mol)*(MW_(g/mol))' "
     "}",
 
     "Ideal Gas Law Change",  "{ "
     "'((Pf_Pa)*(Vf_l))/(Tf_K)=((Pi_Pa)*(Vi_l))/(Ti_K)' "
     "}",
-
+    // Change all occurrences of gmol by mol
     "Isothermal Expansion",  "{ "
-    "'(W_J)=(n_gmol)*ⒸR*(T_°C)*LN((Vf_l)/(Vi_l))' "
-    "'(m_kg)=(n_gmol)*(MW_(g/gmol))' "
+    "'(W_J)=(n_mol)*ⒸR*(T_°C)*LN((Vf_l)/(Vi_l))' "
+    "'(m_kg)=(n_mol)*(MW_(g/mol))' "
     "}",
 
     "Polytropic Processes",  "{ "
     "'(Pf_atm)/(Pi_atm)=((Vf_(ft^3))/(Vi_(ft^3)))^(-n)' "
-    "'(Tf_°F)/(Ti_°F)=((Pf_atm)/(Pi_atm))^((n-1)/n)' "
+    "'(Tf_°C)/(Ti_°C)=((Pf_atm)/(Pi_atm))^((n-1)/n)' "
     "}",
 
     "Isentropic Flow",  "{ "
@@ -419,71 +424,78 @@ static const cstring basic_equations[] =
     "'(ρ_(kg/m^3))/(ρ0_(kg/m^3))=((T_K)/(T0_K))^(1/(k-1))' "
     "'(A_(cm^2))/(At_(cm^2))=(1/M)*(2/(k+1)*(1+(k-1)/2*M^2))^((k+1)/(2*(k-1)))' "
     "}",
-
+    // Change all occurrences of gmol by mol : Change °C for K in eqn 1
     "Real Gas Law",  "{ "
-    "'(P_atm)*(V_l)=(n_gmol)*Z*ⒸR*(T_°C)' "
-    "'(m_kg)=(n_gmol)*(MW_(g/gmol))' "
-    "'Tr=(T_K)/(Tc_K)' "
-    "'Pr=(P_Pa)/(Pc_Pa)' "
-    "'ρr=0.27*(Pr/(Z*Tr))' "
-    "'Z=1+(0.31506237-1.04670990/Tr-0.57832729/Tr^3)*ρr+(0.53530771-0.61232032/Tr)*ρr^2+0.61232032*0.10488813*ρr^5/Tr+0.68157001*ρr^2/Tr^3*(1+0.68446549*ρr^2)*exp(-0.68446549*ρr^2)' "
+    "'(P_atm)*(V_l)=(n_mol)*Z*ⒸR*(T_K)' "
+    "'(m_kg)=(n_mol)*(MW_(g/mol))' "
+    //"'Tr=(T_K)/(Tc_K)' " These 3 eqns will be substitute in a closed form for Z
+    //"'Pr=(P_Pa)/(Pc_Pa)' "
+    //"'ρr=0.27*(Pr/(Z*Tr))' "
+    //"'Z=1+(0.31506237-1.04670990/Tr-0.57832729/Tr^3)*ρr+(0.53530771-0.61232032/Tr)*ρr^2+0.61232032*0.10488813*ρr^5/Tr+0.68157001*ρr^2/Tr^3*(1+0.68446549*ρr^2)*exp(-0.68446549*ρr^2)' "
+    "'Z=1+(0.31506237-1.04670990/((Ti_K)/(Tc_K))-0.57832729/((Ti_K)/(Tc_K))^3)*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))+(0.53530771-0.61232032/((Ti_K)/(Tc_K)))*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))^2+0.61232032*0.10488813*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))^5/((Ti_K)/(Tc_K))+0.68157001*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))^2/((Ti_K)/(Tc_K))^3*(1+0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))^2)*exp(-0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Z*((Ti_K)/(Tc_K)))))^2)' "
     "}",
-
+    // Change all °C for K in eqn 1
     "Real Gas State Change",  "{ "
-    "'((Pf_atm)*(Vf_l))/(Zf*(Tf_°C))=((Pi_atm)*(Vi_l))/(Zi*(Ti_°C))' "
-    "'Tri=(Ti_K)/(Tc_K)' "
-    "'Pri=(Pi_Pa)/(Pc_Pa)' "
-    "'ρri=0.27*(Pri/(Zi*Tri))' "
-    "'Zi=1+(0.31506237-1.04670990/Tri-0.57832729/Tri^3)*ρri+(0.53530771-0.61232032/Tri)*ρri^2+0.61232032*0.10488813*ρri^5/Tri+0.68157001*ρri^2/Tri^3*(1+0.68446549*ρri^2)*exp(-0.68446549*ρri^2)' "
-    "'Trf=(Tf_K)/(Tc_K)' "
-    "'Prf=(Pf_Pa)/(Pc_Pa)' "
-    "'ρrf= 0.27*(Prf/(Zf*Trf))' "
-    "'Zf=1+(0.31506237-1.04670990/Trf-0.57832729/Trf^3)*ρrf+(0.53530771-0.61232032/Trf)*ρrf^2+0.61232032*0.10488813*ρrf^5/Trf+0.68157001*ρrf^2/Trf^3*(1+0.68446549*ρrf^2)*exp(-0.68446549*ρrf^2)' "
+    "'((Pf_atm)*(Vf_l))/(Zf*(Tf_K))=((Pi_atm)*(Vi_l))/(Zi*(Ti_K))' "
+    //"'Tri=(Ti_K)/(Tc_K)' " These 3 eqns will be substitute in a closed form for Zi
+    //"'Pri=(Pi_Pa)/(Pc_Pa)' "
+    //"'ρri=0.27*(Pri/(Zi*Tri))' "
+    //"'Zi=1+(0.31506237-1.04670990/Tri-0.57832729/Tri^3)*ρri+(0.53530771-0.61232032/Tri)*ρri^2+0.61232032*0.10488813*ρri^5/Tri+0.68157001*ρri^2/Tri^3*(1+0.68446549*ρri^2)*exp(-0.68446549*ρri^2)' "
+    "'Zi=1+(0.31506237-1.04670990/((Ti_K)/(Tc_K))-0.57832729/((Ti_K)/(Tc_K))^3)*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))+(0.53530771-0.61232032/((Ti_K)/(Tc_K)))*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))^2+0.61232032*0.10488813*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))^5/((Ti_K)/(Tc_K))+0.68157001*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))^2/((Ti_K)/(Tc_K))^3*(1+0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))^2)*exp(-0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*((Ti_K)/(Tc_K)))))^2)' "
+    //"'Trf=(Tf_K)/(Tc_K)' " These 3 eqns will be substitute in a closed form for Zf
+    //"'Prf=(Pf_Pa)/(Pc_Pa)' "
+    //"'ρrf= 0.27*(Prf/(Zf*Trf))' "
+    //"'Zf=1+(0.31506237-1.04670990/Trf-0.57832729/Trf^3)*ρrf+(0.53530771-0.61232032/Trf)*ρrf^2+0.61232032*0.10488813*ρrf^5/Trf+0.68157001*ρrf^2/Trf^3*(1+0.68446549*ρrf^2)*exp(-0.68446549*ρrf^2)' "
+    "'Zf=1+(0.31506237-1.04670990/((Tf_K)/(Tc_K))-0.57832729/((Tf_K)/(Tc_K))^3)*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))+(0.53530771-0.61232032/((Tf_K)/(Tc_K)))*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))^2+0.61232032*0.10488813*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))^5/((Tf_K)/(Tc_K))+0.68157001*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))^2/((Tf_K)/(Tc_K))^3*(1+0.68446549*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))^2)*exp(-0.68446549*(0.27*(((Pf_Pa)/(Pc_Pa))/(Zf*((Tf_K)/(Tc_K)))))^2)' "
     "}",
-
+    // Change all occurrences of gmol by mol
     "Kinetic Theory",  "{ "
-    "'(P_kPa)=((n_gmol)*(MW_(g/gmol))*(vrms_(m/s))^2)/(3*(V_l))' "
-    "'(vrms_(m/s))=√((3*ⒸR*(T_°C))/(MW_(g/gmol)))' "
-    "'(λ_nm)=1/(√(2)*Ⓒπ*((n_gmol)*ⒸNA)/(V_l)*(d_nm)^2)' "
-    "'(m_kg)=(n_gmol)*(MW_(g/gmol))' "
+    "'(P_kPa)=((n_mol)*(MW_(g/mol))*(vrms_(m/s))^2)/(3*(V_l))' "
+    "'(vrms_(m/s))=√((3*ⒸR*(T_°C))/(MW_(g/mol)))' "
+    "'(λ_nm)=1/(√(2)*Ⓒπ*((n_mol)*ⒸNA)/(V_l)*(d_nm)^2)' "
+    "'(m_kg)=(n_mol)*(MW_(g/mol))' "
     "}",
 
     // ------------------------------------------------------------------------
     "Heat Transfer", nullptr,
     // ------------------------------------------------------------------------
     // 17 eqns
+    // We need to use UBASE to ensure we get Kelvin everywhere
     "Heat Capacity",  "{ "
-    "'(Q_kJ)=(m_kg)*(c_(kJ/(kg*K)))*(ΔT_°C)' "
-    "'(Q_kJ)=(m_kg)*(c_(kJ/(kg*K)))*((Tf_°C)-(Ti_°C))' "
+    "'(Q_kJ)=(m_kg)*(c_(kJ/(kg*K)))*(UBASE(Tf_°C)-UBASE(Ti_°C))' "
+    "'(ΔT_°C)=(Tf_°C)-(Ti_°C)' "
     "}",
 
     "Thermal Expansion",  "{ "
-    "'(δ_cm)=(α_(1/°C))*(L_m)*(ΔT_°C)' "
-    "'(δ_cm)=(α_(1/°C))*(L_m)*((Tf_°C)-(Ti_°C))' "
+    "'(δ_cm)=(α_(1/K))*(L_m)*(UBASE(Tf_°C)-UBASE(Ti_°C))' "
+    "'(ΔT_°C)=(Tf_°C)-(Ti_°C)' "
     "}",
 
     "Conduction",  "{ "
-    "'(qr_W)=((k_(W/(m*K)))*(A_(m^2))/(L_m))*(ΔT_°C)' "
-    "'(qr_W)=((k_(W/(m*K)))*(A_(m^2))/(L_m))*((Th_°C)-(Tc_°C))' "
+    "'(qr_W)=((k_(W/(m*K)))*(A_(m^2))/(L_m))*(UBASE(Th_°C)-UBASE(Tc_°C))' "
+    "'(ΔT_°C)=(Th_°C)-(Tc_°C)' "
     "}",
 
     "Convection",  "{ "
-    "'(qr_W)=(h_(W/(m^2*K)))*(A_(m^2))*(ΔT_°C)' "
-    "'(qr_W)=(h_(W/(m^2*K)))*(A_(m^2))*((Th_°C)-(Tc_°C))' "
+    "'(qr_W)=(h_(W/(m^2*K)))*(A_(m^2))*(UBASE(Th_°C)-UBASE(Tc_°C))' "
+    "'(ΔT_°C)=(Th_°C)-(Tc_°C)' "
     "}",
 
     "Conduction & Convection",  "{ "
-    "'(qr_W)=(A_(m^2))*(ΔT_°C)/(1/(h1_(W/(m^2*K)))+(L1_cm)/(k1_(W/(m*K)))+(L2_cm)/(k2_(W/(m*K)))+(L3_cm)/(k3_(W/(m*K)))+1/(h3_(W/(m^2*K))))' "
+    "'(qr_W)=(A_(m^2))*(UBASE(Th_°C)-UBASE(Tc_°C))/(1/(h1_(W/(m^2*K)))+(L1_cm)/(k1_(W/(m*K)))+(L2_cm)/(k2_(W/(m*K)))+(L3_cm)/(k3_(W/(m*K)))+1/(h3_(W/(m^2*K))))' "
     "'(qr_W)=(A_(m^2))*((Th_°C)-(Tc_°C))/(1/(h1_(W/(m^2*K)))+(L1_cm)/(k1_(W/(m*K)))+(L2_cm)/(k2_(W/(m*K)))+(L3_cm)/(k3_(W/(m*K)))+1/(h3_(W/(m^2*K))))' "
-    "'(U_(W/(m^2*K)))=(qr_W)/((A_(m^2))*(ΔT_°C))' "
-    "'(U_(W/(m^2*K)))=(qr_W)/((A_(m^2))*((Th_°C)-(Tc_°C)))' "
+    "'(U_(W/(m^2*K)))=(qr_W)/((A_(m^2))*(UBASE(Th_°C)-UBASE(Tc_°C)))' "
+    "'(ΔT_°C)=(Th_°C)-(Tc_°C)' "
     "}",
-
+//
     // WARNING The db48x needs the Black-Body Integral function F0λ(T_K,λ_nm)
     // defined in the HP50G (SP50G_AUR 3-82, 5-31)
+    // In eqn 1, change °C for K
+    // In eqn 2, change the calls for F0λ to explicit integral where the integration limits are from x1 to x2 with xi,j=Ⓒh*Ⓒc/((λi,j_nm)*Ⓒk*(T_K))
     "Black Body Radiation",  "{ "
-    "'(eb_(W/m^2))=Ⓒσ*(T_°C)^4' "
-    "'f=F0λ((λ2_nm);(T_°C))-F0λ((λ1_nm);(T_°C))' "
+    "'(eb_(W/m^2))=Ⓒσ*(T_K)^4' "
+    //"'f=F0λ((λ2_nm);(T_°C))-F0λ((λ1_nm);(T_°C))' "
+    "'f=15/Ⓒπ^4*∫(Ⓒh*Ⓒc/((λ2_nm)*Ⓒk*(T_K));Ⓒh*Ⓒc/((λ1_nm)*Ⓒk*(T_K));x^3/expm1(x);X)' "
     "'(eb12_(W/m^2))=f*(eb_(W/m^2))' "
     "'(λmax_nm)*(Tmax_°C)=Ⓒc3' "
     "'(q_W)=(eb_(W/m^2))*(A_(cm^2))' "
@@ -683,6 +695,7 @@ static const cstring basic_equations[] =
 
     "Simple Pendulum",  "{ "
     "'(ω_(r/s))=(1_r)*√(Ⓒg/(L_cm))' "
+    "'(Treal_s)=2*Ⓒπ*√((L_cm)/Ⓒg)*(Σ(x;0;5;((2·x)!÷((2↑x)·x!)²)²·sin(θmax÷2)↑(2·x)))' "
     "'(T_s)=2*(Ⓒπ_r)/(ω_(r/s))' "
     "'(ω_(r/s))=2*(Ⓒπ_r)*(f_Hz)' "
     "}",
@@ -699,22 +712,23 @@ static const cstring basic_equations[] =
     "'(T_s)=2*(Ⓒπ_r)/(ω_(r/s))' "
     "'(ω_(r/s))=2*(Ⓒπ_r)*(f_Hz)' "
     "}",
-
+    // Modif of radian in eqns 2, 3, 4 & 5
     "Simple Harmonic",  "{ "
     "'(x_cm)=(xm_cm)*COS((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(v_(m/s))=-(ω0_(r/s))*(xm_m)*SIN((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(a_(m/s^2))=-(ω0_(r/s))^2*(xm_m)*COS((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(ω0_(r/s))=√((k_(N/m))/(m_kg))' "
-    "'(E_J)=(1/2)*(m_kg)*((ω0_(r/s))*(xm_m))^2' "
+    "'(v_(m/s))=-(ω0_(r/s))/(1_r)*(xm_m)*SIN((ω0_(r/s))*(t_s)+(φ_°))' "
+    "'(a_(m/s^2))=-(ω0_(r/s))^2/(1_r)^2*(xm_m)*COS((ω0_(r/s))*(t_s)+(φ_°))' "
+    "'(ω0_(r/s))=(1_r)*√((k_(N/m))/(m_kg))' "
+    "'(E_J)=(1/2)*(m_kg)*((ω0_(r/s))/(1_r)*(xm_m))^2' "
     "}",
+    // Modif of radian in eqns (3) & (6)
     // Ref.: https://scholar.harvard.edu/files/david-morin/files/waves_oscillations.pdf
     "Underdamped Oscillations",  "{ "
     "'(x_m)=(xm_m)*EXP(-(γ_(r/s))*(t_s)/2)*COS((ωu_(r/s))*(t_s)+(φ_°))' "
     "'(γ_(r/s))=(b_(kg/s))/(m_kg)' "
-    "'(ω0_(r/s))=√((k_(N/m))/(m_kg))' "
+    "'(ω0_(r/s))=(1_r)*√((k_(N/m))/(m_kg))' "
     "'(ωu_(r/s))=(ω0_(r/s))*√(1-((γ_(r/s))/(2*(ω0_(r/s))))^2)' "
     "'(v_(m/s))=(xm_m)*EXP(-(γ_(r/s))*(t_s)/2)*(-((γ_(r/s))/2)*COS((ωu_(r/s))*(t_s)+(φ_°))-(ωu_(r/s))*SIN((ωu_(r/s))*(t_s)+(φ_°)))' "
-    "'(a_(m^2/s))=-((ω0_(r/s))^2*(x_m)+(γ_(r/s))*(v_m/s))' "
+    "'(a_(m^2/s))=-((ω0_(r/s))^2/(1_r)^2*(x_m)+(γ_(r/s))*(v_m/s))' "
     "'(E_J)=(1/2)*(k_(N/m))*(x_m)^2+(1/2)*(m_kg)*(v_(m/s))^2' "
     "'Q=(ω0_(r/s))/(γ_(r/s))' "
     "}",
@@ -1065,7 +1079,7 @@ static const cstring basic_equations[] =
     "'β=(v_(m/s))/Ⓒc' "
     "'γ=1/√(1-β^2)' "
     "}",
-
+// Réef.: chrome-extension://efaidnbmnnnibpcajpcglclefindmkaj/https://www.fisica.net/formulas/The-Cambridge-Handbook-of-Physics-Formulas.pdf
     "Light Propagation",  "{ "
     "'(fp_Hz)/(f_Hz)=γ*(1+β*COS(α_°))' "
     "'COS(θp_°)=(COS(θ_°)-β)/(1-β*COS(θ_°))' "
@@ -1415,17 +1429,17 @@ GRAPH_BODY(equation)
                     {
                         coord nv = g.voffset;
                         g.voffset = 0;
-                        grob_g r = expression::infix(g,
-                                                     nv, nameg,
-                                                     0, ":",
-                                                     vv, valg);
-                        return r;
+                        if (grob_g r = expression::infix(g,
+                                                         nv, nameg,
+                                                         0, ":",
+                                                         vv, valg))
+                            return r;
                     }
                 }
             }
         }
     }
-    return object::do_graph(o, g);
+    return object::do_graph(+eq, g);
 }
 
 

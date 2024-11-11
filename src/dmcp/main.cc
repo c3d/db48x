@@ -195,6 +195,9 @@ int db48x_is_beep_mute()
     return Settings.BeepOff();
 }
 
+cstring keymap_default = "config/keymap.48k";
+cstring keymap_filename = keymap_default;
+
 
 extern uint memory_size;
 void program_init()
@@ -224,6 +227,30 @@ void program_init()
 
     // Check if we have a state file to load
     load_system_state();
+
+    if (keymap_filename == keymap_default)
+    {
+        char keymapcfg[80] = { 0 };
+        file kcfg("config/keymap.cfg", false);
+        if (kcfg.valid())
+        {
+            kcfg.read(keymapcfg, sizeof(keymapcfg)-1);
+            for (size_t i = 0; i < sizeof(keymapcfg); i++)
+                if (keymapcfg[i] == '\n')
+                    keymapcfg[i] = 0;
+            keymap_filename = keymapcfg;
+        }
+    }
+
+    // Load default keymap
+    if (!ui.load_keymap(keymap_filename))
+    {
+        // Fail silently if we try to load a default file
+        if (keymap_filename == keymap_default)
+            rt.clear_error();
+        else
+            rt.command(command::static_object(object::ID_KeyMap));
+    }
 }
 
 

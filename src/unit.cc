@@ -281,17 +281,44 @@ EVAL_BODY(unit)
     algebraic_g value = o->value();
     algebraic_g uexpr = o->uexpr();
     bool skip = value->as_quoted<symbol>();
-    value = value->evaluate();
+    {
+        save<bool> umode(unit::mode, false);
+        value = value->evaluate();
+    }
     if (!value)
         return ERROR;
     if (!skip)
     {
         if (unit::mode)
         {
+            algebraic_g svu = uexpr;
             uexpr = uexpr->evaluate();
             if (!uexpr)
                 return ERROR;
+            if (unit_g u = uexpr->as<unit>())
+            {
+                if (expression_p oe = u->value()->as<expression>())
+                {
+                    symbol_g name = svu->as<symbol>();
+                    if (!name)
+                    {
+                        // Cannot convert °F/s into °C/min, sorry
+                        rt.inconsistent_units_error();
+                        return ERROR;
+                    }
+                    save<symbol_g *> si(expression::independent, &name);
+                    object_g         xvalue = +value;
+                    save<object_g *> sv(expression::independent_value, &xvalue);
+                    save<bool>       sumode(unit::mode, false);
+                    uexpr = oe->evaluate();
+                    if (!uexpr)
+                        return ERROR;
+                    uexpr = unit_p(unit::simple(uexpr, u->uexpr()));
+                    return uexpr && rt.push(+uexpr) ? OK : ERROR;
+                }
+            }
 
+            settings::SaveAutoSimplify sas(true);
             while (unit_g u = unit::get(uexpr))
             {
                 algebraic_g scale = u->value();
@@ -528,6 +555,8 @@ static const cstring basic_units[] =
     "minute",   "1_min",                // Minute
     "second",   "1_s",                  // Second
 
+    "hms",      "1_h",                  // Hour/minutes/seconds to hours
+
     // ------------------------------------------------------------------------
     // Speed menu
     // ------------------------------------------------------------------------
@@ -641,6 +670,12 @@ static const cstring basic_units[] =
     // ------------------------------------------------------------------------
     "Fluids",    nullptr,
 
+    "K",        "1_K",                  // Kelvin
+    "°C",       "'(°C+273.15)'_K",      // Celsius
+    "°R",       "5/9_K",                // Rankin
+    "°F",       "'((°F+459.67)*5/9)'_K",// Fahrenheit
+    "°D",       "'(373.15-2/3*°D)'_K",  // Delisle
+
     "Pa",       "1_N/m^2",              // Pascal
     "atm",      "101325_Pa",            // Atmosphere
     "bar",      "100000_Pa",            // bar
@@ -652,12 +687,6 @@ static const cstring basic_units[] =
     "inHg",     "1_in/mm*mmHg",         // inch of mercury
     "inH2O",    "249.0889_Pa",          // Inch of H2O
     "torr",     "1/760_atm",            // Torr = 1/760 standard atm
-
-    "K",        "1_K",                  // Kelvin
-    "°C",       "1_K",                  // Celsius
-    "°R",       "9/5_K",                // Rankin
-    "°F",       "9/5_K",                // Fahrenheit
-    "°D",       "-2/3_K",               // Delisle
 
     "m³/yr",    "=",                    // Cubic meters per year
     "m³/d",     "=",                    // Cubic meters per day
@@ -828,13 +857,14 @@ static const si_prefix si_prefixes[] =
 
 
 
-unit_p unit::lookup(symbol_p name, int *prefix_info)
+unit_p unit::lookup(symbol_p namep, int *prefix_info)
 // ----------------------------------------------------------------------------
 //   Lookup a built-in unit
 // ----------------------------------------------------------------------------
 {
+    symbol_g  name = namep;
     size_t    len  = 0;
-    gcutf8    gtxt = name->value(&len);
+    gcutf8    gtxt = namep->value(&len);
     uint      maxs = sizeof(si_prefixes) / sizeof(si_prefixes[0]);
     unit_file ufile;
 
@@ -854,7 +884,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
         for (uint kibi = 0; kibi < maxkibi; kibi++)
         {
             size_t  rlen = len - plen - kibi;
-            utf8    txt  = ntxt + plen + kibi;
+            gcutf8  txt  = +gtxt + plen + kibi;
             cstring utxt = nullptr;
             cstring udef = nullptr;
             size_t  ulen = 0;
@@ -872,7 +902,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
                     if (*fdef != '=')
                     {
                         udef = cstring(fdef);
-                        utxt = cstring(txt);
+                        utxt = cstring(+txt);
                         break;
                     }
                 }
@@ -882,7 +912,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
             for (size_t u = 0; !udef && u < maxu; u += 2)
             {
                 utxt = basic_units[u];
-                if (memcmp(utxt, txt, rlen) == 0 && utxt[rlen] == 0)
+                if (memcmp(utxt, +txt, rlen) == 0 && utxt[rlen] == 0)
                 {
                     udef = basic_units[u + 1];
                     if (udef)
@@ -929,8 +959,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
                         {
                             size_t slen = 0;
                             utf8   stxt = sym->value(&slen);
-                            if (slen == rlen &&
-                                memcmp(stxt, utxt, slen) == 0)
+                            if (slen == rlen && memcmp(stxt, utxt, slen) == 0)
                                 return u;
                         }
 
@@ -939,6 +968,9 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
 
                         settings::SaveAutoSimplify sas(false);
                         settings::SaveNumericalConstants snc(true);
+                        save<symbol_g *> si(expression::independent, &name);
+                        save<object_g *> sv(expression::independent_value,
+                                            nullptr);
                         uexpr = u->evaluate();
                         if (!uexpr || uexpr->type() != ID_unit)
                         {
@@ -963,7 +995,7 @@ unit_p unit::lookup(symbol_p name, int *prefix_info)
 //
 // ============================================================================
 
-bool unit::convert(algebraic_g &x) const
+bool unit::convert(algebraic_g &x, bool error) const
 // ----------------------------------------------------------------------------
 //   Convert the object to the given unit
 // ----------------------------------------------------------------------------
@@ -973,19 +1005,19 @@ bool unit::convert(algebraic_g &x) const
 
     // If we already have a unit object, perform a conversion
     if (x->type() == ID_unit)
-        return convert((unit_g &) x);
+        return convert((unit_g &) x, error);
 
     // Otherwise, convert to a unity unit
     algebraic_g one = algebraic_p(integer::make(1));
     unit_g u = unit::make(x, one);
-    if (!convert(u))
+    if (!convert(u, error))
         return false;
     x = +u;
     return true;
 }
 
 
-bool unit::convert(unit_g &x) const
+bool unit::convert(unit_g &x, bool error) const
 // ----------------------------------------------------------------------------
 //   Convert a unit object to the current unit
 // ----------------------------------------------------------------------------
@@ -1006,7 +1038,7 @@ bool unit::convert(unit_g &x) const
 
     if (!unit::mode)
     {
-        save<bool> save(unit::mode, true);
+        save<bool> sumode(unit::mode, true);
 
         // Evaluate the unit expression for this one
         u = u->evaluate();
@@ -1018,8 +1050,76 @@ bool unit::convert(unit_g &x) const
         if (!o)
             return false;
 
-        // Compute conversion factor
+        // Check the complicated cases involving expressions, e.g. °C to K
+        if (unit_p ou = o->as<unit>())
         {
+            if (expression_p oe = ou->value()->as<expression>())
+            {
+                algebraic_g      ounit = ou->uexpr();
+                symbol_g         name  = x->uexpr()->as<symbol>();
+                if (!name)
+                {
+                    // Cannot convert °F/s into °C/min, sorry
+                    rt.inconsistent_units_error();
+                    return false;
+                }
+                save<symbol_g *> si(expression::independent, &name);
+                object_g         xvalue = x->value();
+                save<object_g *> sv(expression::independent_value, &xvalue);
+                save<bool>       sumode2(unit::mode, false);
+                o = oe->evaluate();
+                if (!o)
+                    return false;
+                x = unit_p(unit::simple(o, ounit));
+                o = unit::simple(integer::make(1), ounit);
+            }
+        }
+        // If the expression is in the destination
+        if (unit_p uu = u->as<unit>())
+        {
+            if (expression_g ue = uu->value()->as<expression>())
+            {
+                // We have an expression like '(°C+273.15)_K'
+                // Turn it into K=(°C+273.15), then isolate °C to get
+                // °C=K-273.15, and run that the second half
+                symbol_g tname = uu->uexpr()->as<symbol>(); // K
+                if (!tname)
+                {
+                    rt.inconsistent_units_error();
+                    return false;
+                }
+                algebraic_g tdef = +tname;
+                algebraic_g udef = +ue;
+                symbol_g xname = svu->as<symbol>();            // °C
+                if (!xname)
+                {
+                    rt.inconsistent_units_error();
+                    return false;
+                }
+                ue = expression::make(ID_TestEQ, tdef, udef);
+                if (!ue)
+                {
+                    rt.inconsistent_units_error();
+                    return false;
+                }
+                ue = ue->isolate(xname);
+
+                expression_g tmpeq;
+                if (ue && ue->split_equation(tmpeq, ue))
+                {
+                    save<symbol_g *> si(expression::independent, &tname);
+                    object_g         xv = x->value();
+                    save<object_g *> sv(expression::independent_value, &xv);
+                    save<bool> sumode3(unit::mode, false);
+                    udef = ue->evaluate();
+                    x = unit_p(unit::simple(udef, +xname));
+                    u = unit::simple(integer::make(1), +tname);
+                }
+            }
+        }
+        if (o)
+        {
+            // Two numerical values, simply compute conversion factor
             settings::SaveAutoSimplify sas(true);
             o = o / u;
         }
@@ -1030,7 +1130,8 @@ bool unit::convert(unit_g &x) const
             algebraic_g cfu = cf->uexpr();
             if (!cfu->is_real())
             {
-                rt.inconsistent_units_error();
+                if (error)
+                    rt.inconsistent_units_error();
                 return false;
             }
             o = cf->value();
@@ -1040,7 +1141,8 @@ bool unit::convert(unit_g &x) const
 
         if (!o->is_real())
         {
-            rt.inconsistent_units_error();
+            if (error)
+                rt.inconsistent_units_error();
             return false;
         }
 
@@ -1054,6 +1156,35 @@ bool unit::convert(unit_g &x) const
     }
 
     // For now, the rest is not implemented
+    return false;
+}
+
+
+bool unit::convert_to_linear(algebraic_g &value, algebraic_g &uexpr)
+// ----------------------------------------------------------------------------
+//   For units like °C, we need to convert to the baseline before computing
+// ----------------------------------------------------------------------------
+{
+    if (symbol_g usym = uexpr->as<symbol>())
+    {
+        if (unit_g base = lookup(usym))
+        {
+            if (expression_p be = base->value()->as<expression>())
+            {
+                algebraic_g      bunit = base->uexpr();
+                save<symbol_g *> si(expression::independent, &usym);
+                object_g         xvalue = +value;
+                save<object_g *> sv(expression::independent_value, &xvalue);
+                save<bool>       sumode(unit::mode, false);
+                if (algebraic_g cvt = be->evaluate())
+                {
+                    value = cvt;
+                    uexpr = bunit;
+                    return true;
+                }
+            }
+        }
+    }
     return false;
 }
 
@@ -1115,7 +1246,7 @@ unit_p unit::cycle() const
                     uval = u->value();
                     if (isdec)
                     {
-                        if (!arithmetic::decimal_to_fraction(uval))
+                        if (!arithmetic::to_fraction(uval))
                             return nullptr;
                     }
                     else
@@ -1232,7 +1363,7 @@ unit_p unit::cycle() const
     }
     else if (decimal)
     {
-        if (arithmetic::decimal_to_fraction(value))
+        if (arithmetic::to_fraction(value))
             u = unit::make(value, uexpr);
     }
     return u;
@@ -1278,7 +1409,7 @@ unit_p unit::custom_cycle(symbol_r sym) const
 }
 
 
-symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
+symbol_p unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
 // ----------------------------------------------------------------------------
 //   Find the next row that begins with "what", return definition for it
 // ----------------------------------------------------------------------------
@@ -1287,7 +1418,10 @@ symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
     uint     column   = 0;
     bool     quoted   = false;
     bool     found    = false;
+    bool     hadeq    = false;
+    bool     nodefs   = false;
     size_t   matching = 0;
+    size_t   index    = 0;
     symbol_g def      = nullptr;
     scribble scr;
 
@@ -1299,7 +1433,6 @@ symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
         byte c = getchar();
         if (!c)
             break;
-
         if (c == '"')
         {
             if (quoted && peek() == '"') // Treat double "" as a data quote
@@ -1317,6 +1450,7 @@ symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
             }
             if (quoted)
             {
+                index = 0;
                 if (!column)
                 {
                     found = true;
@@ -1325,20 +1459,29 @@ symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
             }
             else
             {
+                bool endline = peek() == '\n';
                 if (found)
                 {
                     if (column == 0)
                     {
-                        found = found && matching == len;
+                        found = found && matching == len && (!menu || endline);
                         if (menu && found)
                             def = symbol::make(what, matching);
                     }
                     else if (column == 1 && !menu)
                     {
-                        def = symbol::make(scr.scratch(), scr.growth());
-                        scr.clear();
+                        if (!nodefs)
+                            def = symbol::make(scr.scratch(), scr.growth());
+                        else
+                            found = false;
                     }
                 }
+                if (column == 0 && endline)
+                {
+                    nodefs = hadeq;
+                    hadeq = false;
+                }
+                scr.clear();
                 column++;
             }
         }
@@ -1354,19 +1497,22 @@ symbol_g unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
             if (column == 0)
             {
                 found = found && matching < len && c == (+what)[matching++];
+                if (!index && c == '=')
+                    hadeq = true;
             }
             else if (column == 1 && found)
             {
                 byte *buf = rt.allocate(1);
                 *buf = byte(c);
             }
+            index++;
         }
     }
     return def;
 }
 
 
-symbol_g unit_file::next(bool menu)
+symbol_p unit_file::next(bool menu)
 // ----------------------------------------------------------------------------
 //   Find the next file entry if there is one
 // ----------------------------------------------------------------------------
@@ -1492,6 +1638,7 @@ MENU_BODY(unit_menu)
                 position = ufile.position();
                 while (ufile.next(false))
                     matching++;
+                menu = id(menu + 1);
                 break;
             }
             menu = id(menu + 1);
@@ -1519,7 +1666,8 @@ MENU_BODY(unit_menu)
                 menu = id(menu + 1);
             }
         }
-        count = (last - first) / 2;
+        if (found)
+            count = (last - first) / 2;
     }
 
     items_init(mi, count + matching, 3, 1);
@@ -1661,7 +1809,13 @@ COMMAND_BODY(UBase)
         if (r && rt.top(r))
             return OK;
     }
-    if (expression_p expr = obj->as<expression>())
+
+    // No-op for numerical values
+    id ty = obj->type();
+    if (is_real(ty) || is_complex(ty) || ty == ID_symbol)
+        return OK;
+
+    if (expression_p expr = expression::get(obj))
     {
         scribble scr;
         for (object_p lobj : *expr)
@@ -1682,7 +1836,6 @@ COMMAND_BODY(UBase)
         if (list && rt.top(list))
             return OK;
     }
-
     if (!rt.error())
         rt.type_error();
     return ERROR;

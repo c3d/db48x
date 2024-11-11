@@ -230,6 +230,7 @@ EVAL_BODY(IfErrThen)
     object_g cond = object_p(p);
     object_g body = cond->skip();
     result   r    = OK;
+    settings::SaveDebugOnError sdoe(false);
 
     // Evaluate the condition
     r = program::run(+cond);
@@ -273,11 +274,12 @@ EVAL_BODY(IfErrThenElse)
 //   Evaluate iferr-then-else
 // ----------------------------------------------------------------------------
 {
-    byte    *p    = (byte *) o->payload();
-    object_g cond = object_p(p);
-    object_g ift  = cond->skip();
-    object_g iff  = ift->skip();
-    result   r    = OK;
+    byte     *p    = (byte *) o->payload();
+    object_g  cond = object_p(p);
+    object_g  ift  = cond->skip();
+    object_g  iff  = ift->skip();
+    result    r    = OK;
+    settings::SaveDebugOnError sdoe(false);
 
     // Evaluate the condition
     r = program::run(+cond);

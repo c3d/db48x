@@ -76,11 +76,14 @@ static bool store(algebraic_r value)
 }
 
 
-static algebraic_p recall(algebraic_r name)
+static algebraic_p recall(algebraic_r namer)
 // ----------------------------------------------------------------------------
 //   Recall the current value for the given name
 // ----------------------------------------------------------------------------
 {
+    algebraic_g name = namer;
+    while (unit_p u = unit::get(+name))
+        name = u->value();
     if (object_p obj = directory::recall_all(name, true))
     {
         if (algebraic_p alg = obj->as_algebraic())
@@ -95,7 +98,7 @@ static algebraic_p recall(algebraic_r name)
 
 algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 // ----------------------------------------------------------------------------
-//   The core of the solver
+//   The core of the solver, numerical solving for a single variable
 // ----------------------------------------------------------------------------
 {
     // Check if the guess is an algebraic or if we need to extract one
@@ -384,7 +387,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                     record(solve, "[%u] Moving to %t - %t * %t / %t",
                            i, +lx, +y, +dx, +dy);
                     is_constant = false;
-                    x = lx - y * dx / dy;
+                    x = lx - (y / dy) * dx;
                     record(solve, "[%u] Moved to %t [%t, %t]",
                            i, +x, +lx, +hx);
                 }
@@ -411,7 +414,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
             if (nx && px)
             {
                 // Try to bisect
-                x  = (nx + px) / two;
+                x = (nx + px) / two;
                 if (!x)
                 {
                     store(nx);
@@ -518,11 +521,17 @@ algebraic_p Root::solve(algebraic_g &eq,
         list_g guesses = guess->as_array_or_list();
         if (!eqs)
             eqs = list::make(ID_list, eq);
-        if (!vars)
+        bool onevar = !vars;
+        if (onevar)
             vars = list::make(ID_list, var);
         if (!guesses)
             guesses = list::make(ID_list, guess);
-        return algebraic_p(multiple_equation_solver(eqs, vars, guesses));
+        algebraic_g r = multiple_equation_solver(eqs, vars, guesses);
+        if (r && onevar)
+            if (list_p lst = r->as_array_or_list())
+                if (lst->items() == 1)
+                    r = algebraic_p(lst->head());
+        return r;
     }
 
     // Otherwise we expect a regular program
@@ -546,9 +555,7 @@ algebraic_p Root::solve(algebraic_g &eq,
 }
 
 
-list_p Root::multiple_equation_solver(list_r eqs,
-                                      list_r names,
-                                      list_r guesses)
+list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
 // ----------------------------------------------------------------------------
 //   Solve multiple equations in sequence (equivalent to HP's MES)
 // ----------------------------------------------------------------------------
@@ -610,25 +617,37 @@ list_p Root::multiple_equation_solver(list_r eqs,
     // Looks good: loop on equations trying to find one we can solve
     size_t ecount = eqs->items();
     list_g vars   = names;
+    list_g eqns   = eqs;
 
     // While there are variables to solve for
     while (vcount && ecount)
     {
-        list::iterator vi = vars->begin();
-        list::iterator gi = gvalues->begin();
+        list::iterator vi    = vars->begin();
+        list::iterator gi    = gvalues->begin();
         bool           found = false;
 
         // Loop on all variables, looking for one we can solve for
         for (size_t v = 0; !found && v < vcount; v++)
         {
-            symbol_g var = (*vi)->as_quoted<symbol>();
+            algebraic_g varobj = algebraic_p(*vi);
+            algebraic_g name = varobj;
+            algebraic_g uexpr;
+            while (unit_p u = unit::get(varobj))
+            {
+                varobj = u->value();
+                uexpr = u->uexpr();
+            }
+            symbol_g var = varobj->as_quoted<symbol>();
             if (!var)
             {
                 rt.type_error();
                 return nullptr;
             }
-            list::iterator ei = eqs->begin();
-            for (size_t e = 0; !found && e < ecount; e++)
+            list::iterator ei = eqns->begin();
+            expression_g   best;
+            uint           bestvars = ~0U;
+            size_t         bestidx  = 0;
+            for (size_t e = 0; !found && e < ecount && bestvars; e++)
             {
                 expression_g eq = expression::get(*ei);
                 if (!eq)
@@ -639,24 +658,46 @@ list_p Root::multiple_equation_solver(list_r eqs,
                 }
                 if (eq->is_well_defined(var, false))
                 {
-                    program_g   pgm    = +eq;
-                    algebraic_g name   = +var;
-                    algebraic_p guess  = algebraic_p(*gi);
-                    algebraic_g solved = solve(pgm, name, guess);
-                    if (!solved)
+                    list::iterator ovi    = vars->begin();
+                    uint           wdvars = 0;
+                    for (size_t ov = 0; ov < vcount; ov++)
                     {
-                        solver_command_error();
-                        rt.no_solution_error();
-                        return nullptr;
+                        if (ov != v)
+                            if (symbol_g ovar = (*ovi)->as_quoted<symbol>())
+                                if (eq->is_well_defined(ovar, false, var))
+                                    wdvars++;
+                        ++ovi;
                     }
-
-                    // That's one variable less to deal with
-                    vars = vars->remove(v);
-                    gvalues = gvalues->remove(v);
-                    vcount--;
-                    found = true;
+                    if (wdvars < bestvars)
+                    {
+                        best     = eq;
+                        bestvars = wdvars;
+                        bestidx  = e;
+                    }
                 }
                 ++ei;
+            }
+
+            if (best)
+            {
+                program_g   pgm    = +best;
+                algebraic_p guess  = algebraic_p(*gi);
+                algebraic_g solved = solve(pgm, name, guess);
+                if (!solved)
+                {
+                    solver_command_error();
+                    if (!rt.error())
+                        rt.no_solution_error();
+                    return nullptr;
+                }
+
+                // That's one variable less to deal with
+                vars    = vars->remove(v);
+                gvalues = gvalues->remove(v);
+                eqns    = eqns->remove(bestidx);
+                vcount--;
+                ecount--;
+                found = true;
             }
             ++vi;
             ++gi;
@@ -674,8 +715,6 @@ list_p Root::multiple_equation_solver(list_r eqs,
     list_g result = names->map(recall);
     return result;
 }
-
-
 
 
 // ============================================================================
@@ -1112,17 +1151,16 @@ COMMAND_BODY(SolvingMenuSolve)
         uint idx = key - KEY_F1 + 5 * ui.page() - 1;
         if (symbol_g sym = expression_variable(idx))
         {
-            object_g obj = directory::recall_all(sym, false);
+            object_g    obj   = directory::recall_all(sym, false);
             algebraic_g value = obj ? obj->as_algebraic() : nullptr;
             if (!value)
                 value = integer::make(0);
-            if (list_g eql = expression::current_equation(false, true))
-                if (program_g eq = eql->as<expression>())
-                    if (value && expression_p(+eq)->is_well_defined(sym))
-                        if (algebraic_p var = expression_variable_or_unit(idx))
-                            if (algebraic_g res = Root::solve(eq, var, value))
-                                if (assign(sym, res))
-                                    return OK;
+            if (algebraic_g eql = expression::current_equation(true, true))
+                if (algebraic_g var = expression_variable_or_unit(idx))
+                    if (algebraic_g res = Root::solve(eql, var, value))
+                        if (rt.push(+res))
+                            if (ui.menu_refresh())
+                                return OK;
         }
     }
 

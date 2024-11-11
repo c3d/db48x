@@ -148,7 +148,7 @@ bool decimal::is_infinity() const
 //  Check if the value overflowed and represents an infinity
 // ----------------------------------------------------------------------------
 {
-    return exponent() > large(Settings.MaximumDecimalExponent()) + 1;
+    return exponent() > large(Settings.MaximumDecimalExponent());
 }
 
 
@@ -1199,10 +1199,11 @@ algebraic_p decimal::to_integer() const
     {
         size_t  xs    = xi.nkigits;
         gcbytes xb    = xi.base;
-        bool    neg   = x->type() == ID_neg_decimal;
+        bool    neg   = x->type() == ID_neg_decimal && xe >= 0;
         large   xl    = xe - 3 * xs;
         ularge  scale = 1;
         ularge  mul   = 10;
+        ularge  res   = 0;
         if (xl >= 0)
         {
             large p = xl;
@@ -1214,18 +1215,27 @@ algebraic_p decimal::to_integer() const
                 mul *= mul;
             }
         }
+        else
+        {
+            xs += xl/3;
+            xl = xl % 3;
+            if (xl < 0)
+            {
+                xs--;
 
-        ularge res = 0;
-        for (size_t xd = xs; xd --> 0; )
+                kint xk = kigit(xb, xs);
+                scale = xl == -1 ? 100 : 10;
+                res = xk / (1000 / scale);
+            }
+
+        }
+
+        for (size_t xd = xs; xd --> 0; xl += 3)
         {
             kint xk = kigit(xb, xd);
             res += xk * scale;
             scale *= 1000;
         }
-        if (xl == -1)
-            res = res / 10;
-        else if (xl == -2)
-            res = res / 100;
 
         id ty = neg ? ID_neg_integer : ID_integer;
         return rt.make<integer>(ty, res);
@@ -1270,6 +1280,8 @@ bignum_p decimal::to_bignum() const
         tmp = rt.make<bignum>(ty, xk);
         res = res + tmp * scale;
         scale = scale / mul;
+        if (scale && scale->is_zero())
+            break;
     }
 
     res = res / mul;
@@ -3135,6 +3147,7 @@ decimal_p decimal::lgamma_internal(decimal_r x)
             tmp = tmp * scale / factorial;
 
             cks[i-1] = tmp;
+            cleaner::disable();
             if (!tmp)
                 return nullptr;
 
@@ -3367,6 +3380,7 @@ decimal::ccache &decimal::constants()
         cst->oosqpi    = nullptr;
         cst->lpi       = nullptr;
         cst->precision = precision;
+        cleaner::disable();
     }
     return *cst;
 }
@@ -3381,6 +3395,7 @@ decimal_r decimal::ccache::ln10()
     {
         decimal_g ten = make(10);
         log10 = log(ten);
+        cleaner::disable();
     }
     return log10;
 }
@@ -3395,6 +3410,7 @@ decimal_r decimal::ccache::ln2()
     {
         decimal_g two = make(2);
         log2 = log(two);
+        cleaner::disable();
     }
     return log2;
 }
@@ -3406,7 +3422,10 @@ decimal_r decimal::ccache::lnpi()
 // ----------------------------------------------------------------------------
 {
     if (!lpi)
+    {
         lpi = log(pi);
+        cleaner::disable();
+    }
     return lpi;
 }
 
@@ -3417,7 +3436,10 @@ decimal_r decimal::ccache::sqrt_2pi()
 // ----------------------------------------------------------------------------
 {
     if (!sq2pi)
+    {
         sq2pi = sqrt(pi + pi);
+        cleaner::disable();
+    }
     return sq2pi;
 }
 
@@ -3432,6 +3454,7 @@ decimal_r decimal::ccache::one_over_sqrt_pi()
         decimal_g one = make(1);
         decimal_g sqpi = sqrt(pi);
         oosqpi = one / sqpi;
+        cleaner::disable();
     }
     return oosqpi;
 }

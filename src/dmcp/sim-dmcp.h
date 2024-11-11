@@ -100,6 +100,7 @@ int       ui_wrap_io(file_sel_fn callback,
                      const char *path,
                      void       *data,
                      bool        writing);
+void      ui_load_keymap(const char *path);
 
 #if WASM
 int       ui_init();

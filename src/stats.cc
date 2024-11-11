@@ -1630,7 +1630,7 @@ algebraic_p random_number(algebraic_r min, algebraic_r max)
             {
                 algebraic_g half = decimal::make(5,-1);
                 scaled = scaled + half;
-                scaled = decimal_p(+scaled)->to_bignum();
+                algebraic::to_integer(scaled);
             }
             return scaled;
         }

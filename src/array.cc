@@ -1907,8 +1907,12 @@ COMMAND_BODY(FromVector)
     if (object_g obj = rt.pop())
     {
         if (array_p v = obj->as<array>())
+        {
             if (v->is_2Dor3D(true))
                 return OK;
+            if (v->is_vector(nullptr, true, false))
+                return OK;
+        }
         rt.push(obj);
         rt.type_error();
     }
@@ -1962,6 +1966,9 @@ array_p array::do_matrix(array_r x, array_r y,
 //   Perform a matrix or vector operation
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+
     size_t rx = 0, cx = 0, ry = 0, cy = 0, rr = 0, cr = 0;
     size_t depth = rt.depth();
 
@@ -1978,10 +1985,13 @@ array_p array::do_matrix(array_r x, array_r y,
     {
         array_g yr = y->to_rectangular();
         yr =  do_matrix(x, yr, dim, vec, mat);
-        if (yty == ID_ToSpherical)
-            yr = yr->to_spherical();
-        else
-            yr = yr->to_polar();
+        if (yr)
+        {
+            if (yty == ID_ToSpherical)
+                yr = yr->to_spherical();
+            else
+                yr = yr->to_polar();
+        }
         return yr;
     }
 

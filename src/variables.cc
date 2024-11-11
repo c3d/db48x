@@ -39,7 +39,7 @@
 #include "locals.h"
 #include "parser.h"
 #include "renderer.h"
-
+#include "tag.h"
 
 RECORDER(directory,       16, "Directories");
 RECORDER(directory_error, 16, "Errors from directories");
@@ -982,6 +982,53 @@ COMMAND_BODY(GarbageCollect)
     integer_p result = rt.make<integer>(ID_integer, saved);
     if (rt.push(result))
         return OK;
+    return  ERROR;
+}
+
+
+COMMAND_BODY(GarbageCollectorStatistics)
+// ----------------------------------------------------------------------------
+//   Return garbage collector statistics
+// ----------------------------------------------------------------------------
+{
+    tag_g cycles    = tag::make("Cycles",       integer::make(rt.GCCycles));
+    tag_g purged    = tag::make("Purged",       integer::make(rt.GCPurged));
+    tag_g duration  = tag::make("Duration",     integer::make(rt.GCDuration));
+    tag_g lpurged   = tag::make("LastPurged",   integer::make(rt.GCLPurged));
+    tag_g lduration = tag::make("LastDuration", integer::make(rt.GCLDuration));
+    tag_g cleared   = tag::make("Cleared",      integer::make(rt.GCCleared));
+
+    if (cycles && purged && duration && lpurged && lduration)
+    {
+        scribble scr;
+        if (rt.append(cycles)    &&
+            rt.append(purged)    &&
+            rt.append(duration)  &&
+            rt.append(lpurged)   &&
+            rt.append(lduration) &&
+            rt.append(cleared))
+        {
+            size_t sz = scr.growth();
+            gcbytes data = scr.scratch();
+            if (array_p a = rt.make<array>(ID_array, data, sz))
+            {
+                if (rt.push(a))
+                {
+                    if (Settings.GCStatsClearAfterRead())
+                    {
+                        rt.GCCycles    = 0;
+                        rt.GCPurged    = 0;
+                        rt.GCDuration  = 0;
+                        rt.GCLPurged   = 0;
+                        rt.GCLDuration = 0;
+                        rt.GCCleared   = 0;
+                    }
+                    return OK;
+                }
+            }
+        }
+    }
+
     return  ERROR;
 }
 

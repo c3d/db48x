@@ -210,6 +210,7 @@ COMMAND_DECLARE(Mem,0);
 COMMAND_DECLARE(FreeMemory,0);
 COMMAND_DECLARE(SystemMemory,0);
 COMMAND_DECLARE(GarbageCollect,0);
+COMMAND_DECLARE(GarbageCollectorStatistics,0);
 
 COMMAND_DECLARE(Home,0);                // Return to home directory
 COMMAND_DECLARE(CurrentDirectory,0);    // Return the current directory

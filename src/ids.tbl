@@ -132,7 +132,18 @@ ID_RANGE(is_complex,       rectangular,    polar)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
 ID_RANGE(is_command,       Drop,           ToFraction,    ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,      polynomial, polynomial)
-ID_RANGE(is_algebraic_fn,  add,            ToFraction,    asinh, det)
+ID_RANGE(is_algebraic_fn,  Rcl,            ToFraction,
+                           TestFlagSet,    det,
+                           Get,            IFTE,
+                           CurrentClip,    GraphicIntegral,
+                           Mem,            FlagsToBinary,
+                           ConstantArray,  CurrentDirectory,
+                           MatchUp,        errn,
+                           ToTag,          Ticks,
+                           QuickSort,      ListDifferences,
+                           RecallAdd,      TextToUnicode,
+                           Convert,        ToUnit,
+                           RandomNumber,   Random)
 ID_RANGE(is_immediate,     MainMenu,       SelfInsert)
 ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)
@@ -226,9 +237,9 @@ NAMED(RollD, "RollDown")
 CMD(Depth)
 
 // Variables
+CMD(Purge)
 NAMED(Sto, "Store")
 NAMED(Rcl, "Recall")
-CMD(Purge)
 
 // Evaluation and rendering
 NAMED(Eval, "Evaluate")
@@ -318,21 +329,14 @@ CMD(CaseWhen)
 // Data processing
 NAMED(ToList, "→List")
 NAMED(Explode, "Object→")       ALIAS(Explode, "FromObj") ALIAS(Explode, "Obj→")
-CMD(Get)
 CMD(Put)
+CMD(Get)
 CMD(Size)
 CMD(Sort)
 
-// Array / Matrix commands
-NAMED(ToArray, "→Arry")         ALIAS(ToArray, "→Array")
-NAMED(FromArray, "Arry→")       ALIAS(FromArray, "Array→")
-NAMED(ConstantArray, "Con")
-NAMED(IdentityMatrix, "Idn")
-NAMED(RandomMatrix, "RanM")     ALIAS(RandomMatrix, "RandomArray")
-
 // Tests
-NAMED(IFT, "IfThen")
 NAMED(IFTE, "IfThenElse")
+NAMED(IFT, "IfThen")
 
 // Graphics
 NAMED(Disp, "DrawText")
@@ -430,7 +434,7 @@ NAMED(det, "Determinant")
 CMD(PlotParameters)     ALIAS(PlotParameters, "PPar")
 CMD(Equation)           ALIAS(Equation, "Eq")
 CMD(Header)             ALIAS(Header, "Hdr")
-CMD(KeyMap)             ALIAS(Header, "Keys")
+CMD(KeyMap)             ALIAS(KeyMap, "Keys")
 CMD(AssignKey)          ALIAS(AssignKey, "Asn")
 CMD(DeleteKeys)         ALIAS(DeleteKeys, "DelKeys")
 CMD(StoreKeys)          ALIAS(StoreKeys, "StoKeys")
@@ -456,9 +460,9 @@ NAMED(Parametric,       "ParametricPlot")
 NAMED(Scatter,          "ScatterPlot")
 NAMED(Bar,              "BarPlot")
 
+CMD(Freeze)
 CMD(Clip)
 CMD(CurrentClip)
-CMD(Freeze)
 
 NAMED(Gray,             "GrayPattern")          ALIAS(Gray,     "GreyPattern")
                                                 ALIAS(Gray,     "Grey")
@@ -506,31 +510,39 @@ CMD(RecallMenu)                                 ALIAS(RecallMenu, "RclMenu")
 
 // Memory management
 CMD(PurgeAll)
+CMD(GarbageCollect)             ALIAS(GarbageCollect, "GC")
 NAMED(Mem, "AvailableMemory")
 CMD(FreeMemory)
 CMD(SystemMemory)
-CMD(GarbageCollect)             ALIAS(GarbageCollect, "GC")
 CMD(Clone)                      ALIAS(Clone, "NewObject")
                                 ALIAS(Clone, "NewObj")
                                 ALIAS(Clone, "NewOb")
+CMD(GarbageCollectorStatistics) ALIAS(GarbageCollectorStatistics, "GCStats")
 
 // Object commands
 NAMED(Compile, "Text→")         ALIAS(Compile, "Str→")
 NAMED(ToProgram, "→Program")
 
 // Flags
-CMD(FlipFlag)                   ALIAS(FlipFlag,               "FF")
 CMD(TestFlagClearThenClear)     ALIAS(TestFlagClearThenClear, "FC?C")
 CMD(TestFlagClearThenSet)       ALIAS(TestFlagClearThenSet,   "FC?S")
 CMD(TestFlagSetThenClear)       ALIAS(TestFlagSetThenClear,   "FS?C")
 CMD(TestFlagSetThenSet)         ALIAS(TestFlagSetThenSet,     "FS?S")
 CMD(FlagsToBinary)              ALIAS(FlagsToBinary,          "RclF")
+CMD(FlipFlag)                   ALIAS(FlipFlag,               "FF")
 CMD(BinaryToFlags)              ALIAS(BinaryToFlags,          "StoF")
 
+// Array / Matrix commands
+NAMED(ToArray, "→Arry")         ALIAS(ToArray, "→Array")
+NAMED(FromArray, "Arry→")       ALIAS(FromArray, "Array→")
+NAMED(ConstantArray, "Con")
+NAMED(IdentityMatrix, "Idn")
+NAMED(RandomMatrix, "RanM")     ALIAS(RandomMatrix, "RandomArray")
+
 // Directories
-NAMED(Home, "HomeDirectory")
-CMD(CurrentDirectory)
 NAMED(Path, "DirectoryPath")
+CMD(CurrentDirectory)
+NAMED(Home, "HomeDirectory")
 NAMED(CrDir, "CreateDirectory") ALIAS(CrDir, "MkDir")
 NAMED(UpDir, "UpDirectory")
 NAMED(PgDir, "PurgeDirectory")
@@ -616,19 +628,19 @@ OP(ToGrads,     "→Grads")               ALIAS(ToGrads,   "→Grad")
 OP(ToPiRadians, "→PiRadians")           ALIAS(ToPiRadians, "→πr")
 
 // Timing and system commands
+CMD(Type)
+CMD(TypeName)
+CMD(Version)
 CMD(Date)
-OP(SetDate, "→Date")
 CMD(Time)
-OP(SetTime, "→Time")
 CMD(DateTime)
 CMD(ChronoTime)
 CMD(TimedEval)                          ALIAS(TimedEval, "TEval")
 CMD(Ticks)
+OP(SetDate, "→Date")
+OP(SetTime, "→Time")
 CMD(Wait)
 CMD(Bytes)
-CMD(Type)
-CMD(TypeName)
-CMD(Version)
 CMD(ScreenCapture)
 
 // Special arithmetic
@@ -813,8 +825,8 @@ CMD(ExponentialFit)                     ALIAS(ExponentialFit,           "ExpFit"
 CMD(PowerFit)                           ALIAS(PowerFit,                 "PwrFit")
 CMD(LogarithmicFit)                     ALIAS(LogarithmicFit,           "LogFit")
 
-CMD(RandomNumber)                       ALIAS(RandomNumber,             "rand")
 CMD(RandomSeed)                         ALIAS(RandomSeed,               "rdz")
+CMD(RandomNumber)                       ALIAS(RandomNumber,             "rand")
 CMD(Random)
 
 
@@ -907,9 +919,11 @@ FLAG(FixedWidthDigits,          VariableWidthDigits)
 FLAG(ExitKeepsMenu,             ExitClearsMenu)
 FLAG(ShowEmptyMenu,             HideEmptyMenu)
 FLAG(ListAsProgram,             ListAsData)
-FLAG(KillOnError,               DebugOnError)
+FLAG(DebugOnError,              KillOnError)
 FLAG(AllEquationVariables,      CurrentEquationVariables)
 FLAG(PushEvaluatedAssignment,   PushOriginalAssignment)
+FLAG(GCStatsKeepAfterRead,      GCStatsClearAfterRead)
+FLAG(GCTemporariesCleanup,      AutomaticTemporariesCleanup)
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
@@ -1061,6 +1075,7 @@ SETTING(LowBatteryForeground,   ularge(0), ~ularge(0), GRAY25(255, 255, 255))
 SETTING(ChargingForeground,     ularge(0), ~ularge(0), GRAY50(128, 192, 255))
 SETTING(BatteryRefresh,         uint(100),  uint(3600000), uint(3000))
 SETTING(CustomHeaderRefresh,    uint(100),  uint(3600000), uint(1000))
+SETTING(BusyIndicatorRefresh,   uint(5),    uint(3600000), uint(50))
 
 SETTING_ENUM(DateSlash,         nullptr,        DateSeparatorCommand)
 SETTING_ENUM(DateDash,          nullptr,        DateSeparatorCommand)
@@ -1166,8 +1181,7 @@ MENU(ArithmeticMenu)
 MENU(CalculationMenu)
 MENU(TrigIdentitiesMenu)
 MENU(ExpLogIdentitiesMenu)
-MENU(IntegrationMenu)
-MENU(DifferentiationMenu)
+MENU(IntegrationMenu)           ALIAS(IntegrationMenu, "DifferentiationMenu")
 MENU(SolverMenu)
 MENU(PolynomialsMenu)
 MENU(NumericalSolverMenu)
@@ -1216,6 +1230,51 @@ CMD(Catalog)
 
 CMD(ToggleUserMode)
 CMD(Undo)                       // Immediate: do not save stack before Undo
+
+
+
+// ============================================================================
+//
+//   Editor commands
+//
+// ============================================================================
+
+CMD(Edit)
+CMD(StackEditor)
+
+CMD(UILeftShift)
+CMD(UIRightShift)
+CMD(UINoShift)
+CMD(UIAlpha)
+CMD(UILowercase)
+CMD(UINoAlpha)
+CMD(UIAlgebraic)
+CMD(UIExit)
+CMD(UIDecimal)
+CMD(UIText)
+CMD(UIEnter)
+CMD(UILeft)
+CMD(UIRight)
+CMD(UIUp)
+CMD(UIDown)
+CMD(UIBackspace)
+CMD(UIDelete)
+
+CMD(EditorSelect)
+CMD(EditorWordLeft)
+CMD(EditorWordRight)
+CMD(EditorBegin)
+CMD(EditorEnd)
+CMD(EditorCut)
+CMD(EditorCopy)
+CMD(EditorPaste)
+CMD(EditorSearch)
+CMD(EditorReplace)
+CMD(EditorClear)
+CMD(EditorFlip)
+CMD(EditorHistory)
+CMD(EditorHistoryBack)
+
 CMD(LastMenu)                   // Last parseable command
 
 
@@ -1341,28 +1400,6 @@ CHARACTER_MENUS(CharactersMenu7)
 CHARACTER_MENUS(CharactersMenu8)
 CHARACTER_MENUS(CharactersMenu9)
 
-
-// ============================================================================
-//
-//   Editor commands
-//
-// ============================================================================
-
-CMD(EditorSelect)
-CMD(EditorWordLeft)
-CMD(EditorWordRight)
-CMD(EditorBegin)
-CMD(EditorEnd)
-CMD(EditorCut)
-CMD(EditorCopy)
-CMD(EditorPaste)
-CMD(EditorSearch)
-CMD(EditorReplace)
-CMD(EditorClear)
-CMD(EditorFlip)
-CMD(EditorHistory)
-CMD(EditorHistoryBack)
-CMD(StackEditor)
 
 
 // ============================================================================

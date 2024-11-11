@@ -238,12 +238,12 @@ Select the comma as a decimal separator, e.g.  `1,23`
 ## Precision
 
 Set the default computation precision, given as a number of decimal digits. For
-example, `7 Precision` will ensure at least 7 decimal digits for compuation, and
-`1.0 3 /` will compute `0.3333333` in that case.
+example, `7 Precision` will ensure at least 7 decimal digits for computation,
+and `1.0 3 /` will compute `0.3333333` in that case.
 
-DB48X supports an arbitrary precision for decimal numbers, limited only by
-memory and the size of built-in constants needed for the computation of
-transcendental functions.
+DB48X supports an arbitrary precision for [decimal numbers](#decimal-numbers),
+limited only by memory, performance and the size of built-in constants needed
+for the computation of transcendental functions.
 
 ## SolverImprecision
 

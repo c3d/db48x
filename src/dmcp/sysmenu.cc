@@ -132,8 +132,10 @@ const uint8_t settings_menu_items[] =
     MI_SET_TIME,                // Standard set time menu
     MI_SET_DATE,                // Standard set date menu
     MI_BEEP_MUTE,               // Mute the beep
-    MI_DB48_FLASH,              // Mute the beep
+    MI_DB48_FLASH,              // Silent beep
     MI_SLOW_AUTOREP,            // Slow auto-repeat
+    MI_DB48_KEYMAP,             // Select keymap
+
     0
 }; // Terminator
 
@@ -548,6 +550,50 @@ cstring state_name()
 }
 
 
+static int keymap_load_callback(cstring path, cstring name, void *)
+// ----------------------------------------------------------------------------
+//   Callback when a keymap is selected for loading
+// ----------------------------------------------------------------------------
+{
+    // Display the name of the file being saved
+    ui.draw_message("Load keymap",
+                    "Loading key layout...", name);
+
+    if (!ui.load_keymap(path))
+    {
+        file kmap(path, false);
+        ui.draw_message("Keymap load failed",
+                        kmap.valid() ? "Invalid keymap" : kmap.error(),
+                        name);
+        wait_for_key_press();
+        return 1;
+    }
+
+    file kcfg("config/keymap.cfg", true);
+    kcfg.write(path, strlen(path));
+
+    // Exit with success
+    return MRET_EXIT;
+}
+
+
+static int keymap_load()
+// ----------------------------------------------------------------------------
+//   Load a keymap from disk
+// ----------------------------------------------------------------------------
+{
+    bool display_new = false;
+    bool overwrite_check = false;
+    void *user_data = nullptr;
+    int ret = file_selection_screen("Load keymap",
+                                    "/config", ".48k",
+                                    keymap_load_callback,
+                                    display_new, overwrite_check,
+                                    user_data);
+    return ret;
+}
+
+
 #ifndef SIMULATOR
 int ui_wrap_io(file_sel_fn callback,
                const char *path,
@@ -660,6 +706,7 @@ int menu_item_run(uint8_t menu_id)
 
     case MI_DB48_FLASH:
         Settings.SilentBeepOn(!Settings.SilentBeepOn());                break;
+    case MI_DB48_KEYMAP:   ret = keymap_load();                         break;
 
     case MI_48STATUS:
         ret = handle_menu(&status_bar_menu, MENU_ADD, 0);               break;
@@ -733,6 +780,7 @@ cstring menu_item_description(uint8_t menu_id, char *s, const int UNUSED len)
     case MI_DB48_ABOUT:                 ln = "About >";                 break;
     case MI_DB48_FLASH:
         ln = flag_str(s, "Silent beep", Settings.SilentBeepOn());       break;
+    case MI_DB48_KEYMAP:                ln = "Load keymap";             break;
 
     case MI_48STATE:                    ln = "State >";                 break;
     case MI_48STATE_LOAD:               ln = "Load State";              break;

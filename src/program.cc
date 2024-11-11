@@ -28,6 +28,7 @@
 
 #include "program.h"
 
+#include "dmcp.h"
 #include "parser.h"
 #include "settings.h"
 #include "sysmenu.h"
@@ -209,12 +210,25 @@ object::result program::run_loop(size_t depth)
 }
 
 
+static uint last_interrupted = 0;
+static uint count_interrupted = 0;
+
 bool program::interrupted()
 // ----------------------------------------------------------------------------
 //   Return true if the current program must be interrupted
 // ----------------------------------------------------------------------------
 {
+    if (count_interrupted++ < 32)
+        return halted;
+
+    count_interrupted = 0;
     reset_auto_off();
+    uint now = sys_current_ms();
+    if (now - last_interrupted >= Settings.BusyIndicatorRefresh())
+    {
+        ui.draw_busy();
+        last_interrupted = now;
+    }
     while (!key_empty())
     {
         int tail = key_tail();

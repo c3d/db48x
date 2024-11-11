@@ -65,8 +65,11 @@ struct algebraic : command
     // Promotion to based numbers
     static id   based_promotion(algebraic_g &x);
 
+    // Convert to an integer (or big integer)
+    static bool to_integer(algebraic_g &x);
+
     // Convert to a fraction
-    static bool decimal_to_fraction(algebraic_g &x);
+    static bool to_fraction(algebraic_g &x);
 
     // Convert to decimal number
     static bool to_decimal(algebraic_g &x, bool weak = false);
@@ -90,6 +93,9 @@ struct algebraic : command
     static algebraic_p  convert_angle(algebraic_r arg,
                                       angle_unit from, angle_unit to,
                                       bool negmod = false);
+
+    // Generate a fraction of a turn in the given unit
+    static algebraic_p exact_angle(int num, int denom, angle_unit aunit);
 
     // Numerical value of pi
     static algebraic_g pi();

@@ -85,6 +85,23 @@ struct hwfp : hwfp_base
     // ------------------------------------------------------------------------
     {
         hw fp = x;
+        if (!std::isfinite(fp))
+        {
+            if (std::isinf(fp))
+            {
+                if (Settings.OverflowError())
+                {
+                    rt.overflow_error();
+                    return nullptr;
+                }
+                Settings.OverflowIndicator(true);
+            }
+            else
+            {
+                rt.domain_error();
+                return nullptr;
+            }
+        }
         return rt.make<hwfp>(ty, fp);
     }
 
@@ -102,7 +119,7 @@ struct hwfp : hwfp_base
     // ------------------------------------------------------------------------
     {
         hw fp = 0.0;
-        byte_p p = payload(this);
+        byte_p p  = payload(this);
         memcpy(&fp, p, sizeof(fp));
         return fp;
     }
@@ -127,7 +144,7 @@ struct hwfp : hwfp_base
         return (ularge) fp;
     }
 
-    large            as_integer() const
+    large as_integer() const
     // ------------------------------------------------------------------------
     //   Convert to a signed value
     // ------------------------------------------------------------------------
@@ -136,24 +153,48 @@ struct hwfp : hwfp_base
         return (large) fp;
     }
 
-    int32_t          as_int32() const     { return int32_t(as_integer()); }
-    hw               as_hwfp() const      { return value(); }
-    float            as_float() const     { return value(); }
-    double           as_double() const    { return value(); }
+    int32_t as_int32() const
+    {
+        return int32_t(as_integer());
+    }
+    hw as_hwfp() const
+    {
+        return value();
+    }
+    float as_float() const
+    {
+        return value();
+    }
+    double as_double() const
+    {
+        return value();
+    }
     // ------------------------------------------------------------------------
     //   Conversion to machine values
     // ------------------------------------------------------------------------
 
-    bool             is_zero() const                { return value() == 0.0; }
-    bool             is_one() const                 { return value() == 1.0; }
-    bool             is_negative() const            { return value() < 0.0;  }
-    bool             is_negative_or_zero() const    { return value() <= 0.0; }
+    bool is_zero() const
+    {
+        return value() == 0.0;
+    }
+    bool is_one() const
+    {
+        return value() == 1.0;
+    }
+    bool is_negative() const
+    {
+        return value() < 0.0;
+    }
+    bool is_negative_or_zero() const
+    {
+        return value() <= 0.0;
+    }
     // ------------------------------------------------------------------------
     //   Tests about the value of a given hwfp number
     // ------------------------------------------------------------------------
 
 
-    algebraic_p      to_integer() const
+    algebraic_p to_integer() const
     // ------------------------------------------------------------------------
     //   Convert floating point to integer value
     // ------------------------------------------------------------------------
@@ -169,8 +210,8 @@ struct hwfp : hwfp_base
     }
 
 
-    algebraic_p      to_fraction(uint count = Settings.FractionIterations(),
-                                 uint prec  = Settings.FractionDigits()) const;
+    algebraic_p   to_fraction(uint count = Settings.FractionIterations(),
+                              uint prec  = Settings.FractionDigits()) const;
     // ------------------------------------------------------------------------
     //   Convert floating point to fraction
     // ------------------------------------------------------------------------
@@ -220,7 +261,7 @@ struct hwfp : hwfp_base
             return nullptr;
         }
         hw fx = x->value();
-        fx = ::fmod(fx, fy);
+        fx    = ::fmod(fx, fy);
         if (fx < 0)
             fx = fy < 0 ? fx - fy : fx + fy;
         return make(fx);
@@ -268,8 +309,6 @@ struct hwfp : hwfp_base
     }
 
 
-
-
     // ========================================================================
     //
     //    Math functions
@@ -278,24 +317,24 @@ struct hwfp : hwfp_base
 
     static hw from_angle(hw x)
     {
-        switch(Settings.AngleMode())
+        switch (Settings.AngleMode())
         {
-        case ID_Deg:            return x * hw(M_PI / 180.);
+        case ID_Deg: return x * hw(M_PI / 180.);
         default:
-        case ID_Rad:            return x;
-        case ID_Grad:           return x * hw(M_PI / 200.);
-        case ID_PiRadians:      return x * hw(M_PI);
+        case ID_Rad: return x;
+        case ID_Grad: return x * hw(M_PI / 200.);
+        case ID_PiRadians: return x * hw(M_PI);
         }
     }
     static hw to_angle(hw x)
     {
-        switch(Settings.AngleMode())
+        switch (Settings.AngleMode())
         {
-        case ID_Deg:            return x * hw(180. / M_PI);
+        case ID_Deg: return x * hw(180. / M_PI);
         default:
-        case ID_Rad:            return x;
-        case ID_Grad:           return x * hw(200. / M_PI);
-        case ID_PiRadians:      return x * hw(1.0 / M_PI);
+        case ID_Rad: return x;
+        case ID_Grad: return x * hw(200. / M_PI);
+        case ID_PiRadians: return x * hw(1.0 / M_PI);
         }
     }
 
@@ -312,7 +351,6 @@ struct hwfp : hwfp_base
 
     static hwfp_p sin(hwfp_r x)
     {
-
         return make(std::sin(from_angle(x->value())));
     }
 
@@ -472,7 +510,7 @@ struct hwfp : hwfp_base
             rt.zero_divide_error();
             return nullptr;
         }
-        return make(1.0/fx);
+        return make(1.0 / fx);
     }
 
     static hwfp_p sq(hwfp_r x)
@@ -500,7 +538,7 @@ struct hwfp : hwfp_base
     }
 
 
-public:
+  public:
     SIZE_DECL(hwfp)
     {
         byte_p p = o->payload();
@@ -515,11 +553,11 @@ public:
 };
 
 
-#define GCP_HWFLOAT(T)                          \
-    typedef const hwfp<T>      *hw##T##_p;      \
-    typedef gcp<hwfp<T>>        hw##T##_g;      \
-    typedef gcm<hwfp<T>>        hw##T##_m;      \
-    typedef const hw##T##_g    &hw##T##_r;
+#define GCP_HWFLOAT(T)                  \
+    typedef const hwfp<T>   *hw##T##_p; \
+    typedef gcp<hwfp<T>>     hw##T##_g; \
+    typedef gcm<hwfp<T>>     hw##T##_m; \
+    typedef const hw##T##_g &hw##T##_r;
 
 GCP_HWFLOAT(float);
 GCP_HWFLOAT(double);
@@ -535,7 +573,10 @@ struct hwfloat : hwfp<float>
         return hwfloat_p(hwfp<float>::make(ID_hwfloat, x));
     }
     OBJECT_DECL(hwfloat);
-    HELP_DECL(hwfloat)                  { return utf8("hwfloat"); }
+    HELP_DECL(hwfloat)
+    {
+        return utf8("hwfloat");
+    }
 };
 
 
@@ -549,36 +590,29 @@ struct hwdouble : hwfp<double>
         return hwdouble_p(hwfp<double>::make(ID_hwdouble, x));
     }
     OBJECT_DECL(hwdouble);
-    HELP_DECL(hwdouble)                 { return utf8("hwdouble"); }
+    HELP_DECL(hwdouble)
+    {
+        return utf8("hwdouble");
+    }
 };
 
 
-template<typename hw>
+template <typename hw>
 typename hwfp<hw>::hwfp_p hwfp<hw>::make(float x)
 // ----------------------------------------------------------------------------
 //  Make an object from a float
 // ----------------------------------------------------------------------------
 {
-    if (!std::isfinite(x))
-    {
-        rt.domain_error();
-        return nullptr;
-    }
     return hwfloat::make(x);
 }
 
 
-template<typename hw>
+template <typename hw>
 typename hwfp<hw>::hwfp_p hwfp<hw>::make(double x)
 // ----------------------------------------------------------------------------
 //  Make an object from a double
 // ----------------------------------------------------------------------------
 {
-    if (!std::isfinite(x))
-    {
-        rt.domain_error();
-        return nullptr;
-    }
     return hwdouble::make(x);
 }
 

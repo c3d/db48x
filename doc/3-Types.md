@@ -25,20 +25,144 @@ computations, like exploring the Syracuse conjecture.
 ## Decimal numbers
 
 Decimal numbers are used to represent values with a fractional part.
-DB48X supports three decimal numbers, using the 32-bit, 64-bit and 128-bit
-[binary decimal representation](#intel-decimal-floating-point-math).
-In memory, all decimal numbers use one additional byte: a 32-bit decimal number
-uses 5 bytes, a 128-bit binary decimal number uses 17 bytes.
+DB48X supports three internal representations for decimal numbers:
 
-The 32-bit format offers a 7 digits mantissa and has a maximum exponent
-of 96. The 64-bit format offers a 16 digits mantissa and has a maximum
-exponent of 384. The 128-bit format offers a 34 digits mantissa and a maximum
-exponent of 6144.
+* Hardware accelerated 32-bit IEEE-754 with a binary representation. This is
+  similar to the `float` type in a programming language like C.
 
-The [Precision](#precision) command selects the default precision.
+* Hardware accelerated 64-bit IEEE-754 with a binary representation. This is
+  similar to the `double` type in a programming language like C.
 
-Note that a future implementation of DB48X is expected to feature
-variable-precision decimal numbers similar to [newRPL](#newRPL-project).
+* Software variable-precision decimal representation, which is much slower.
+  The default configuration selects 24 digits of precision.
+
+Decimal numbers of various size and formats can be mixed and matched
+transparently. It is valid and safe to adjust `Precision` settings along a
+computation to only pay the cost of increased precision where it matters.
+
+For example, you can compute the following expression at various precisions:
+
+```rpl
+'(SQRT(2)-1)^10-(3363-2378*SQRT(2))' DUP
+512 Precision EVAL 'Precision' PURGE
+@ Expecting 5.99480 35⁳⁻⁵⁰⁹
+```
+
+
+### Variable-precision decimal
+
+DB48X features a variable-precision decimal implementation of floating point,
+like [newRPL](#newRPL-project).
+
+The [Precision](#precision) command selects the precision for computations,
+given as a number of digits.
+
+Internally, computations are not done in base 10, but in base 1000, which allows
+a more compact decimal representation. Each base-1000 "kigit" uses 10 bits in
+memory. As a result:
+
+* From a performance point of view, the cost of computations is determined by
+  the `Precision` divided by 3 and rounded up to the next integer, corresponding
+  to one new base-1000 kigit being added.
+
+* From a memory point of view, `Precision` values that are multiples of 12 are
+  optimal, because four base-1000 kigit require 40 bits, which line up perfectly
+  with five 8-bit bytes. `Precision` values that are not multiples of 12 will
+  contain a few unused bits.
+
+The `typename` command returns `"decimal"` for variable-precision decimal
+floating-point values.
+
+When `HardwareFloatingPoint` is disabled, numerical values entered on the command
+line or in a program are always stored internally with all the digits entered,
+and only those. For example, if you enter a decial number with 3 digits or less,
+it will only use 5 bytes:
+
+```rpl
+1.23 BYTES
+@ Expecting 5
+```
+
+On the other hand, if you enter a constant with a high number of digits, then
+all the digits will be preserved internally irrespective of the `Precision`
+setting:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+BYTES
+@ Expecting 37
+```
+
+Computations are performed according to the `Precision` setting, irrespective of
+the precision of input values. For example, the following computation is
+guaranteed to gives `0.` irrespective of `Precision`, even if one of the inputs
+to `+` has a larger number of digits stored internally:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+DUP 0 SWAP - +
+@ Expecting 0.
+```
+
+If desired, the larger number of digits in the user-entered constant can be
+exploited by setting `Precision` before the digit-cancelling operation, as
+shown below:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+DUP 0 SWAP -     @ Recompute value at 24 digits
+60 Precision +   @ Computation at 60 digits
+'Precision' PURGE
+@ Expecting 3.38327 95028 8⁳⁻²⁴
+```
+
+
+### Binary floating-point
+
+The 32-bit format offers a 7 digits mantissa and has a maximum exponent of 96.
+The 64-bit format offers a 16 digits mantissa and has a maximum exponent of 384.
+
+The benefits of the binary floating-point representation are:
+
+* It delivers higher performance using hardware acceleration.
+* It is compatible with the IEEE-754 representation used in most computers.
+  If you need to replicate results computed by a desktop computer, this may be
+  the best format to use for that reason.
+
+The primary drawback of this representation is that it cannot represent some
+decimal values exactly, in the same way as `1/3` cannot be represented exactly
+in decimal. For example, `0.2` cannot be represented exactly using a binary
+floating-point representation.
+
+Using a binary format is not recommended if you need exact results on decimal
+values, for example adding monetary amounts. As an example, if you enable
+16-digit hardware binary floating-point and add `0.20` and `0.45`, the result is
+`0.65000 00000 00000 022`. This is not a bug, but a limitation of the
+floating-point representation. The same computation with `SoftwareFloatingPoint`
+gives the exact expected result `0.65`.
+
+The `typename` command returns `"hwfloat"` for 32-bit binary floating-point
+numbers, and `"hwdouble"` for 64-bit binary floating-point numbers.
+
+### HardwareFloatingPoint
+
+This command enables IEEE-754 accelerated binary floating point. It is the
+opposite of `SoftwareFloatingPoint`.
+
+When this setting is active, a 32-bit IEEE-754 format is used for `Precision`
+values below 7, and a 64-bit IEEE-754 format is used for `Precision` values
+below 16. Variable-precision decimal computations are used for `Precision`
+settings of 17 and higher.
+
+The `HardwareFloatingPoint` setting is disabled by default because of the
+inherent precision loss incurred by the binary format when dealing with decimal
+numbers. For example, `0.2` cannot be represented exactly using a binary format.
+
+### SoftwareFloatingPoint
+
+This command disables accelerated binary floating point, and ensures that the
+variable-precision decimal floating-point format is used even for `Precision`
+values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
 
 
 ## Based numbers

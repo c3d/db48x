@@ -48,7 +48,7 @@ ularge julian_day_number(int d, int m, int y);
 algebraic_p date_from_julian_day(object_p jdn, bool error = true);
 
 // Convert algebraic to HMS or DMS
-algebraic_p to_hms_dms(algebraic_r x);
+algebraic_p to_hms_dms(algebraic_r x, cstring name);
 
 // Convert the top of stack ot HMS or DMS unit
 object::result to_hms_dms(cstring name);

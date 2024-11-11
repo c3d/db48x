@@ -29,8 +29,10 @@
 
 #include "custom.h"
 
+#include "array.h"
 #include "decimal.h"
 #include "integer.h"
+#include "program.h"
 #include "target.h"
 #include "variables.h"
 
@@ -42,8 +44,12 @@ COMMAND_BODY(ToggleCustomMenu)
 {
     menu_p m = ui.menu();
     if (m && m->type() == ID_VariablesMenu)
+    {
         if (CustomMenu::custom())
             return run<CustomMenu>();
+        if (rt.error())
+            return ERROR;
+    }
     return run<VariablesMenu>();
 }
 
@@ -74,8 +80,16 @@ list_p CustomMenu::custom()
 {
     object_p name = static_object(ID_CustomMenu);
     if (object_p cst = directory::recall_all(name, false))
-        if (list_p cstl = cst->as_array_or_list())
+    {
+        list_p cstl = cst->as_array_or_list();
+        if (!cstl)
+            if (algebraic_p alg = cst->as_extended_algebraic())
+                if (algebraic_p eval = alg->evaluate())
+                    cstl = eval->as_array_or_list();
+        if (cstl)
             return cstl;
+        rt.invalid_custom_menu_error();
+    }
     return nullptr;
 }
 
@@ -86,7 +100,16 @@ uint CustomMenu::count_custom()
 // ----------------------------------------------------------------------------
 {
     if (list_p cst = custom())
+    {
+        if (array_p ary = cst->as<array>())
+        {
+            size_t rows = 0, columns = 0;
+            if (ary->is_matrix(&rows, &columns, false))
+                if (rows <= 3)
+                    return columns;
+        }
         return cst->items();
+    }
     return 0;
 }
 
@@ -100,40 +123,100 @@ void CustomMenu::list_custom(info &mi, list_p cst)
         cst = custom();
     if (cst)
     {
-        for (object_g obj : *cst)
+        if (array_p ary = cst->as<array>())
         {
-            symbol_p sym = obj->as_quoted<symbol>();
-            if (sym)
+            size_t rows = ary->items();
+            if (rows <= 3)
             {
-                if (object_p obj = directory::recall_all(sym, false))
-                    if (obj->type() == object::ID_directory)
-                        mi.marker = L'◥';
-            }
-            else
-            {
-                if (list_p lst = obj->as_array_or_list())
+                size_t columns = 0;
+                for (size_t r = 0; r < rows; r++)
                 {
-                    object_p name = lst->at(0);
-                    object_p payload = lst->at(1);
-                    if (name && payload)
+                    if (array_p rvec = ary->at(r)->as<array>())
                     {
-                        id nty = name->type();
-                        if (nty == ID_text || nty == ID_symbol)
-                        {
-                            sym = symbol_p(name);
-                            obj = payload;
-                        }
+                        size_t cols = rvec->items();
+                        if (columns < cols)
+                            columns = cols;
                     }
                 }
 
+                size_t page = rows * columns <= 18 ? 6 : 5;
+                for (size_t r = 0; r < rows; r++)
+                {
+                    array_p rvec = ary->at(r)->as<array>();
+                    size_t cols = rvec->items();
+                    for (size_t c = 0; c < cols; c++)
+                        add_custom_item(mi, rvec->at(c));
+                    for (size_t c = cols; c % page; c++)
+                        add_custom_item(mi, nullptr);
+                }
+                return;
             }
-            if (!sym)
-                sym = obj->as_symbol(false);
-            if (obj->type() == object::ID_directory)
-                mi.marker = L'◥';
-            menu::items(mi, sym, obj);
+        }
+        for (object_g obj : *cst)
+            add_custom_item(mi, obj);
+    }
+}
+
+
+void CustomMenu::add_custom_item(info &mi, object_p obj)
+// ----------------------------------------------------------------------------
+//   Add an object to the list
+// ----------------------------------------------------------------------------
+{
+    bool separator = !obj;
+    symbol_p sym;
+
+    if (obj)
+    {
+        sym = obj->as_quoted<symbol>();
+        if (sym)
+        {
+            if (object_p value = directory::recall_all(sym, false))
+                if (value->type() == object::ID_directory)
+                    mi.marker = L'◥';
+        }
+        else
+        {
+            if (list_p lst = obj->as_array_or_list())
+            {
+                object_p name = lst->at(0);
+                object_p payload = lst->at(1);
+                if (name && payload)
+                {
+                    id nty = name->type();
+                    if (nty == ID_text || nty == ID_symbol)
+                    {
+                        sym = symbol_p(name);
+                        obj = payload;
+                    }
+                }
+                else if (name)
+                {
+                    obj = name;
+                }
+                else
+                {
+                    // Accept {} as a separator
+                    separator = true;
+                }
+            }
+            else if (text_p txt = obj->as<text>())
+            {
+                if (txt->length() == 0)
+                    separator = true;
+            }
         }
     }
+    if (separator)
+    {
+        sym = symbol::make("");
+        obj = program::make(ID_program, nullptr, 0);
+    }
+    if (!sym)
+        sym = obj->as_symbol(false);
+    if (obj->type() == object::ID_directory)
+        mi.marker = L'◥';
+    menu::items(mi, sym, obj);
 }
 
 

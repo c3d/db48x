@@ -237,6 +237,19 @@ algebraic_p function::evaluate(algebraic_r xr, id op, ops_t ops)
 //   Shared code for evaluation of all common math functions
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
+    algebraic_p result = evaluate_noclean(xr, op, ops);
+    if (result != +xr)
+        result = purge(result);
+    return result;
+}
+
+
+algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
+// ----------------------------------------------------------------------------
+//   Shared code for evaluation of all common math functions
+// ----------------------------------------------------------------------------
+{
     if (!xr)
         return nullptr;
 
@@ -271,7 +284,6 @@ algebraic_p function::evaluate(algebraic_r xr, id op, ops_t ops)
     {
         algebraic_g value = u->value();
         algebraic_g uexpr = u->uexpr();
-        value = evaluate(value, op, ops);
 
         settings::SaveNumericalResults snr(false);
         save<bool> ueval(unit::mode, true);
@@ -281,6 +293,7 @@ algebraic_p function::evaluate(algebraic_r xr, id op, ops_t ops)
             uint divisor = 2 + (op == ID_cbrt);
             algebraic_g exponent = +fraction::make(integer::make(1),
                                                    integer::make(divisor));
+            value = evaluate(value, op, ops);
             uexpr = pow(uexpr, exponent);
             if (value && uexpr)
                 return unit::make(value, uexpr);
@@ -293,6 +306,7 @@ algebraic_p function::evaluate(algebraic_r xr, id op, ops_t ops)
         if (uexpr && uexpr->is_real())
         {
             value = value * uexpr;
+            value = evaluate(value, op, ops);
             return value;
         }
         rt.inconsistent_units_error();
@@ -1411,7 +1425,7 @@ FUNCTION_BODY(ToFraction)
     if (!x)
         return nullptr;
     algebraic_g xg = x;
-    if (arithmetic::decimal_to_fraction(xg))
+    if (arithmetic::to_fraction(xg))
         return xg;
     if (!rt.error())
         rt.type_error();

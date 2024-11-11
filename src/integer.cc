@@ -494,17 +494,21 @@ PARSE_BODY(integer)
             {
                 // We rely here on the fact that an integer can also be read as
                 // a bignum (they share the same payload format)
+                gcutf8   gs = s;
                 bignum_g n = (bignum *) (object_p) numerator;
                 bignum_g d = (bignum *) (object_p) number;
                 number     = (object_p) big_fraction::make(n, d);
+                s = gs;
             }
             else
             {
                 // We rely here on the fact that an integer can also be read as
                 // a bignum (they share the same payload format)
+                gcutf8   gs = s;
                 integer_g n = (integer *) (object_p) numerator;
                 integer_g d = (integer *) (object_p) number;
                 number      = (object_p) fraction::make(n, d);
+                s = gs;
             }
             is_fraction = false;
         }

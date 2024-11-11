@@ -1185,6 +1185,8 @@ grob_p object::graph(bool showing) const
 {
     object_g obj = this;
 
+    cleaner purge;
+
     using size = grob::pixsize;
     grob_g  graph  = obj->is_graph() ? grob_p(+obj) : nullptr;
     size    width  = LCD_W;
@@ -1226,6 +1228,7 @@ grob_p object::graph(bool showing) const
         // Exhausted all options, give up
         break;
     }
+    graph = purge(graph);
     return graph;
 }
 

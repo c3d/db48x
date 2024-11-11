@@ -162,6 +162,15 @@ time by executing [GarbageCollect](#GarbageCollect).
 
 See also: [FreeMemory](#FreeMemory), [Purge](#Purge)
 
+## GarbageCollectorStatistics
+
+Return an array containing garbage collector statistics, including:
+
+* The number of garbage collection cycles
+* The total number of bytes collected
+* The total time spent collecting garbage
+* The number of bytes collected during the last collection cycle
+* The time spent during the last collection cycle
 
 ## Bytes
 

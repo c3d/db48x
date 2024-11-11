@@ -184,6 +184,26 @@ COMMAND_DECLARE(EditorClear,-1);        // Clear editor
 COMMAND_DECLARE(EditorFlip,-1);         // Flip cursor and selection
 COMMAND_DECLARE(EditorHistory,-1);      // Find last entry in editor history
 COMMAND_DECLARE(EditorHistoryBack,-1);  // Find previous entry in editor history
+
+COMMAND_DECLARE(Edit,-1);               // Edit top level object
 COMMAND_DECLARE(StackEditor,-1);        // Enter interactive stack
+
+COMMAND_DECLARE(UILeftShift,-1);        // Set left shift
+COMMAND_DECLARE(UIRightShift,-1);       // Set right shift
+COMMAND_DECLARE(UINoShift,-1);          // Set no shift
+COMMAND_DECLARE(UIAlpha,-1);            // Set alpha
+COMMAND_DECLARE(UILowercase,-1);        // Set lowercase alpha
+COMMAND_DECLARE(UINoAlpha,-1);          // Set no alpha
+COMMAND_DECLARE(UIAlgebraic,-1);        // Algebraic key (ticks and parens)
+COMMAND_DECLARE(UIEnter,-1);            // Enter current line (end of editing)
+COMMAND_DECLARE(UIExit,-1);             // Exit current editing session
+COMMAND_DECLARE(UIDecimal,-1);          // Insert decimal dot for current mode
+COMMAND_DECLARE(UIText,-1);             // Insert text in the editor
+COMMAND_DECLARE(UILeft,-1);             // Actions related to left key
+COMMAND_DECLARE(UIRight,-1);            // Actions related to right key
+COMMAND_DECLARE(UIUp,-1);               // Actions related to up key
+COMMAND_DECLARE(UIDown,-1);             // Actions related to down key
+COMMAND_DECLARE(UIBackspace,-1);        // Actions related to backspace
+COMMAND_DECLARE(UIDelete,-1);           // Action related to delete
 
 #endif // COMMAND_H

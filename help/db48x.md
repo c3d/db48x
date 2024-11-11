@@ -1,13 +1,13 @@
 # Overview
 
-## DB48X on DM42
+## DB48X on WASM
 
 The DB48X project intends to rebuild and improve the user experience of the
 legendary HP48 family of calculators, notably their *"Reverse Polish Lisp"*
  [(RPL)](#Introduction-to-RPL)
 language with its rich set of data types and built-in functions.
 
-This project is presently targeting the **SwissMicro DM42 calculator**
+This project is presently targeting the **SwissMicro WASM calculator**
 and leveraging its built-in software platform, known as **DMCP**. This is
 presumably the calculator you are currently running this software on.
 You can also [try it in your browser](http://48calc.org).
@@ -51,16 +51,7 @@ RPL commands in the HP50G and in DB48X into "implemented", "not implemented" and
 ## Design overview
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
-existing DM42 physical hardware.
-Ideally, DB48X should be fully usable without a
-keyboard overlay. though one is
-[being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
-
-Compared to the original HP48, the DM42 has a much larger screen, but no
-annunciators (it is a fully bitmap screen). It has a keyboard with dedicated
-soft-menu (function) keys, but only one shift key (whereas the HP48 has two),
-lacks a dedicated alpha key, does not provides left or right arrow keys (only up
-and down), and has no space key (_SPC_ on the HP48).
+existing WASM physical hardware.
 
 
 
@@ -69,11 +60,6 @@ and down), and has no space key (_SPC_ on the HP48).
 The keyboard differences force us to revisit the user interaction with the
 calculator compared to the HP48:
 
-* When running DB48X on the DM42, the single yellow shift key cycles between
-  three states, *Shift* (shown in the documentation as 🟨), *Right Shift* (shown
-  in the documentation as 🟦), and no shift.  This double-shift shortcut appears
-  necessary because RPL calculators like the HP48 have a rather full keyboard
-  even with two shift keys.
 
 
 * A first press on the shift key is shown as 🟨 in the documentation, and
@@ -96,10 +82,6 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
   accessible seems important, so there are
   [three distinct ways to activate it](#alpha-mode).
 
-* The _▲_ and _▼_ keys move the cursor *left* and *right* while editing
-  instead of *up* and *down*. These cursor movements are much more useful for a
-  text-based program editing as found in RPL. In the rest of this document,
-  they are described as _◀︎_ and _▶︎_ respectively.
 
 * Using 🟨 _◀︎_ and 🟨 _▶︎_ moves the cursor up and down.  When not editing, _◀︎_
   and _▶︎_ behave like _▲_ and _▼_ on the HP48, i.e. _◀︎_ enters the *interactive
@@ -117,7 +99,7 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
 ### Alpha mode
 
 Entering alphabetic characters is done using *Alpha* mode. These alphabetic
-characters are labeled on the right of each key on the DM42's keyboard.
+characters are labeled on the right of each key on the WASM's keyboard.
 
 When *Alpha* mode is active, an _ABC_ indicator shows up in the annunciator area
 at the top of the screen. For lowercase entry, the indicator changes to
@@ -126,7 +108,7 @@ _abc_.
 There are three ways to enter *Alpha* mode:
 
 * The first method is to use 🟨 _ENTER_ as indicated by the _ALPHA_ yellow label
-  on the DM42 ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
+  on the WASM ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
   and *Normal* entry modes.
 
 * The second method is to hold 🟨 for more than half a second. This cycles
@@ -144,7 +126,7 @@ or by holding 🟨).
 
 Alpha mode is cancelled when pressing _ENTER_ or _EXIT_.
 
-Since the DM42's alphabetic keys overlap with the numeric keys (unlike the
+Since the WASM's alphabetic keys overlap with the numeric keys (unlike the
 HP48), as well as with operations such as _×_ and _÷_, using 🟨 in Alpha mode
 brings back numbers. This means 🟨 cannot be used for lowercase, but as
 indicated above, there are two other methods to enter lowercase
@@ -175,22 +157,6 @@ In some cases, the label between parentheses may refer to another calculator
 model, which will be indicated as follows. For example, the _A_ key can be
 described as _A_ (_⚙️_, DM-42 _Σ+_, DM-32 _√x_).
 
-However, if you are using DB48X on a DM42, it is possible to do it without a
-keyboard overlay, because great care was taken to have the DB48X keboard layout
-remain close to that of the DM42, in order to preserve muscle memory. New
-features were positioned on the keyboard at positions that are close to what is
-familiar in the original DM42 firmware.
-
-A few keys that have little use in RPL are reassigned to features that you
-should be able to quickly remember. For example, the DM-42 _RCL_ key is used for
-the DB48X _VAR_ key, which invokes the [VariablesMenu](#VariablesMenu).
-
-Note that the _LOG_ and _e^x_ keys are swapped relative to the DM-42. The HP42
-has _LOG_ and _LN_ with shifted _10^x_ and _e^x_. DB48X has _e^x_ and _LN_
-with shifted _10^X_ and _LOG_, so that the more frequently used mathematical
-functions are available without shifting. Note that in the future, full
-keyboard remapping similar to the HP41 or HP48 will allow you to change that
-if you prefer.
 
 
 Here are a few of the interesting RPL-specific key mappings:
@@ -281,7 +247,7 @@ Here are a few of the interesting RPL-specific key mappings:
 
 ## Soft menus
 
-The DM42 has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
+The WASM has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
 advanced features of DB48X can be accessed through these soft menus. Soft menu
 keys have no label on the physical calculator, but in this documentation, they
 may sometimes be referred to as _F1_ through _F6_.
@@ -485,7 +451,7 @@ unintentional differences, since the implementation is completely new.
   queried with `SF?` and `CF?`. For example, `'HideDate' CF` will clear the
   `HideDate` flag, meaning that the date will show in the header.
 
-* The DB48X also provides full-screen setup menus, taking advantage of the DM42
+* The DB48X also provides full-screen setup menus, taking advantage of the WASM
   existing system menus. It is likely that the same menu objects used for
   softkey menus will be able to control system menus, with a different function
   to start the interaction.
@@ -674,7 +640,7 @@ corresponding to a valid help topic, this topic will be shown in the help
 viewer. Otherwise, a help topic corresponding to the type of data in the stack
 will be selected.
 
-The DB48X help viewer works roughly similarly to the DM42's, but with history
+The DB48X help viewer works roughly similarly to the WASM's, but with history
 tracking and the ability to directly access help about a given function by
 holding a key for more than half a second.
 
@@ -819,7 +785,7 @@ DB48X inherits many ideas from newRPL, including, but not limited to:
 A first iteration of DB48X started as a
 [branch of newRPL](https://github.com/c3d/db48x/), although the
 current implementation had to restart from scratch due to heavy space
-constraints on the DM42.
+constraints on the WASM.
 
 
 ### WP43 and C47 projects
@@ -828,19 +794,19 @@ The DB48X took several ideas and some inspiration from the
 [WP43](https://gitlab.com/rpncalculators/wp43) and
 [C47](https://47calc.com) projects.
 
-Walter Bonin initiated the WP43 firwmare for the DM42 as a "superset of the
+Walter Bonin initiated the WP43 firwmare for the WASM as a "superset of the
 legendary HP42S RPN Scientific".
 
 C47 (initially called C43) is a variant of that firmware initiated by Jaco
-Mostert, which focuses on compatibility with the existing DM42, notably with
+Mostert, which focuses on compatibility with the existing WASM, notably with
 respect to keyboard layout.
 
 DB48X borrowed at least the following from these projects:
 
-* The very idea of writing a new firmware for the DM42
+* The very idea of writing a new firmware for the WASM
 * The idea of converting standard Unicode TrueType fonts into bitmaps
   (with some additional contributions from newRPL)
-* How to recompute the CRC for QSPI images so that the DM42 loads them,
+* How to recompute the CRC for QSPI images so that the WASM loads them,
   thanks to Ben Titmus
 * At least some aspects of the double-shift logic and three-level menus
 * The original keyboard layout template and styling, with special thanks
@@ -851,13 +817,13 @@ DB48X borrowed at least the following from these projects:
 
 [SwissMicros](https://www.swissmicros.com/products) offers a range of
 RPN calculators that emulate well-known models from Hewlett-Packard.
-This includes the [DM42](https://www.swissmicros.com/product/dm42),
+This includes the [WASM](https://www.swissmicros.com/product/dm42),
 which is currently the primary target for the DB48X firmware.
 
 Special thanks and kudos to Michael Steinmann and his team for keeping
 the shining spirit of HP RPN calculators alive.
 
-The DM42 version of the DB48X software relies on
+The WASM version of the DB48X software relies on
 [SwissMicro's DMCP SDK](https://github.com/swissmicros/SDKdemo), which
 is released under the following BSD 3-Clause License:
 
@@ -903,7 +869,7 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB48X.
 
 DB48X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros DM42 calculator. This has [implications on the design](#design-overview)
+SwissMicros WASM calculator. This has [implications on the design](#design-overview)
 of this particular implementation of RPL.
 
 ## The RPL stack
@@ -1389,7 +1355,7 @@ does not have a `NXT` key unlike HP calculators. Instead, when necessary, the
 
 ### Exponential and log in base 10
 
-### DM42 layout difference: EXP LN instead of LOG LN
+### WASM layout difference: EXP LN instead of LOG LN
 
 ### Trigonometric functions and their inverse
 
@@ -1885,8 +1851,6 @@ You can download pre-built versions of the firmware from the releases page of
 the project (https://github.com/c3d/db48x/releases), or alternatively,
 you can download the source code and build it yourself.
 
-The pre-built firmware for the DM-42 is split into two components, `db48x.pgm`
-and `db48x_qspi.bin`. The built-in help is stored in a file called `db48x.md`.
 
 
 In addition, a file called `Demo.48s` contains a few sample RPL programs to
@@ -1896,14 +1860,13 @@ respectively.
 
 ### Connecting the calculator to a computer
 
-The DM-42 calculator connects to your computer using a standard micro-USB cable.
 
 
 
 ### System menu
 
 The `Setup` menu is displayed by using 🟨 _0_. This key combination is the same
-on the stock DM42 firmware and on the new DB48X firmware, and it contains
+on the stock WASM firmware and on the new DB48X firmware, and it contains
 similar entries. However, the setup menu entries are not necessarily in the same
 order.
 
@@ -1930,10 +1893,6 @@ from your computer as an external disk.
 
 The files should be copied as follows:
 
-* `db48x.pgm` and `db48x_qspi.bin` in the root directory of the calculator's USB
-  disk.
-
-* `db48x.md` should be placed in a directory called `help`.
 
 
 * `units.csv` and `constants.csv` should be placed in a directory called
@@ -1941,7 +1900,7 @@ The files should be copied as follows:
   [constants](#constants).
 
 
-### Copying DM42 installation files
+### Copying WASM installation files
 
 Refer to the SwissMicros installation instructions to install or reinstall the
 original calculator firmware.
@@ -1966,10 +1925,10 @@ After loading the DB48X program, the firmware loaded asks you to press a key,
 and the new firmware automatically runs.
 
 
-## Switching between DM42 and DB48X
+## Switching between WASM and DB48X
 
 Early releases of the DB48X firmware produced a QSPI image file that was capable
-of running the stock DM42 program file. Unfortunately, this is no longer the
+of running the stock WASM program file. Unfortunately, this is no longer the
 case due to space constraints.
 
 Unfortunately, the installation procedure for the QSPI file erases the file
@@ -2019,20 +1978,144 @@ computations, like exploring the Syracuse conjecture.
 ## Decimal numbers
 
 Decimal numbers are used to represent values with a fractional part.
-DB48X supports three decimal numbers, using the 32-bit, 64-bit and 128-bit
-[binary decimal representation](#intel-decimal-floating-point-math).
-In memory, all decimal numbers use one additional byte: a 32-bit decimal number
-uses 5 bytes, a 128-bit binary decimal number uses 17 bytes.
+DB48X supports three internal representations for decimal numbers:
 
-The 32-bit format offers a 7 digits mantissa and has a maximum exponent
-of 96. The 64-bit format offers a 16 digits mantissa and has a maximum
-exponent of 384. The 128-bit format offers a 34 digits mantissa and a maximum
-exponent of 6144.
+* Hardware accelerated 32-bit IEEE-754 with a binary representation. This is
+  similar to the `float` type in a programming language like C.
 
-The [Precision](#precision) command selects the default precision.
+* Hardware accelerated 64-bit IEEE-754 with a binary representation. This is
+  similar to the `double` type in a programming language like C.
 
-Note that a future implementation of DB48X is expected to feature
-variable-precision decimal numbers similar to [newRPL](#newRPL-project).
+* Software variable-precision decimal representation, which is much slower.
+  The default configuration selects 24 digits of precision.
+
+Decimal numbers of various size and formats can be mixed and matched
+transparently. It is valid and safe to adjust `Precision` settings along a
+computation to only pay the cost of increased precision where it matters.
+
+For example, you can compute the following expression at various precisions:
+
+```rpl
+'(SQRT(2)-1)^10-(3363-2378*SQRT(2))' DUP
+512 Precision EVAL 'Precision' PURGE
+@ Expecting 5.99480 35⁳⁻⁵⁰⁹
+```
+
+
+### Variable-precision decimal
+
+DB48X features a variable-precision decimal implementation of floating point,
+like [newRPL](#newRPL-project).
+
+The [Precision](#precision) command selects the precision for computations,
+given as a number of digits.
+
+Internally, computations are not done in base 10, but in base 1000, which allows
+a more compact decimal representation. Each base-1000 "kigit" uses 10 bits in
+memory. As a result:
+
+* From a performance point of view, the cost of computations is determined by
+  the `Precision` divided by 3 and rounded up to the next integer, corresponding
+  to one new base-1000 kigit being added.
+
+* From a memory point of view, `Precision` values that are multiples of 12 are
+  optimal, because four base-1000 kigit require 40 bits, which line up perfectly
+  with five 8-bit bytes. `Precision` values that are not multiples of 12 will
+  contain a few unused bits.
+
+The `typename` command returns `"decimal"` for variable-precision decimal
+floating-point values.
+
+When `HardwareFloatingPoint` is disabled, numerical values entered on the command
+line or in a program are always stored internally with all the digits entered,
+and only those. For example, if you enter a decial number with 3 digits or less,
+it will only use 5 bytes:
+
+```rpl
+1.23 BYTES
+@ Expecting 5
+```
+
+On the other hand, if you enter a constant with a high number of digits, then
+all the digits will be preserved internally irrespective of the `Precision`
+setting:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+BYTES
+@ Expecting 37
+```
+
+Computations are performed according to the `Precision` setting, irrespective of
+the precision of input values. For example, the following computation is
+guaranteed to gives `0.` irrespective of `Precision`, even if one of the inputs
+to `+` has a larger number of digits stored internally:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+DUP 0 SWAP - +
+@ Expecting 0.
+```
+
+If desired, the larger number of digits in the user-entered constant can be
+exploited by setting `Precision` before the digit-cancelling operation, as
+shown below:
+
+```rpl
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208
+DUP 0 SWAP -     @ Recompute value at 24 digits
+60 Precision +   @ Computation at 60 digits
+'Precision' PURGE
+@ Expecting 3.38327 95028 8⁳⁻²⁴
+```
+
+
+### Binary floating-point
+
+The 32-bit format offers a 7 digits mantissa and has a maximum exponent of 96.
+The 64-bit format offers a 16 digits mantissa and has a maximum exponent of 384.
+
+The benefits of the binary floating-point representation are:
+
+* It delivers higher performance using hardware acceleration.
+* It is compatible with the IEEE-754 representation used in most computers.
+  If you need to replicate results computed by a desktop computer, this may be
+  the best format to use for that reason.
+
+The primary drawback of this representation is that it cannot represent some
+decimal values exactly, in the same way as `1/3` cannot be represented exactly
+in decimal. For example, `0.2` cannot be represented exactly using a binary
+floating-point representation.
+
+Using a binary format is not recommended if you need exact results on decimal
+values, for example adding monetary amounts. As an example, if you enable
+16-digit hardware binary floating-point and add `0.20` and `0.45`, the result is
+`0.65000 00000 00000 022`. This is not a bug, but a limitation of the
+floating-point representation. The same computation with `SoftwareFloatingPoint`
+gives the exact expected result `0.65`.
+
+The `typename` command returns `"hwfloat"` for 32-bit binary floating-point
+numbers, and `"hwdouble"` for 64-bit binary floating-point numbers.
+
+### HardwareFloatingPoint
+
+This command enables IEEE-754 accelerated binary floating point. It is the
+opposite of `SoftwareFloatingPoint`.
+
+When this setting is active, a 32-bit IEEE-754 format is used for `Precision`
+values below 7, and a 64-bit IEEE-754 format is used for `Precision` values
+below 16. Variable-precision decimal computations are used for `Precision`
+settings of 17 and higher.
+
+The `HardwareFloatingPoint` setting is disabled by default because of the
+inherent precision loss incurred by the binary format when dealing with decimal
+numbers. For example, `0.2` cannot be represented exactly using a binary format.
+
+### SoftwareFloatingPoint
+
+This command disables accelerated binary floating point, and ensures that the
+variable-precision decimal floating-point format is used even for `Precision`
+values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
 
 
 ## Based numbers
@@ -2334,6 +2417,186 @@ You can edit it by recalling its content on the stack using
 back to disk using `"config:equations.csv" STO`.
 # Release notes
 
+## Release 0.8.4 "Commands" - Optimizations and equation fixups
+
+This release focuses on improving the solver support for the equation
+library, fixing various bugs found during development of that equation
+library, and optimizing the garbage collector.
+
+### Features
+
+* ui: The keyboard layout is now configured by a a `config/[keymap].48k`
+  file that describes which commands are assigned to which key by
+  default. A new setup entry, `Load keymap`, lets you change the
+  keyboard layout.
+
+* ui: Add four predefined keyboard layouts:
+
+  * `db48x.48k` is a key layout that is more logical and effective for DB48x
+    [See thread](https://www.hpmuseum.org/forum/thread-20157-post-193647.html#pid193647)
+  * `legacy.48k` is the layout used for earlier releases, which
+    swaps the `exp` and `log10` keys relative to the WASM in `42style.48k`.
+  * `42style.48k` keeps key layout as close as possible to the WASM
+  * `true42.48k` is identical to `42style.48k`, but the simulator shows an image
+    of the WASM keyboard.
+
+* Add various commands such as `Edit` to directly perform editing
+  operations in a programmatic way.
+
+* units: Implement non-proportional unit conversions, notably
+  temperature conversions like `°F` to `°C`. The underlying engine
+  allows arbitrary conversions, including non-linear ones, which would
+  be useful for example for the Dalton temperature scale. However,
+  that capability is not presently used.
+
+* units: Convert temperatures to `K` in multiplication and
+  division. For example, when computing `ⒸR*T`, we need the
+  temperature `T` to be in `K` even if given in Celsius or Farenheit
+  initially.
+
+* solver: Report underlying evaluation error. For example, if the
+  expression being evaluated reports `Inconsistent units`, this is
+  what the solver will return instead of `No solution?`.
+
+* ui: Add configurable interval for busy cursor drawing,
+  `BusyIndicatorRefresh`.  The default is now 50ms, which refreshes
+  the busy cursor more frequently than before, and may be detrimental
+  to battery life and performance. You can restore the previous
+  behaviour by setting a higher value, e.g. 1000ms.
+
+* performance: Automatic cleanup of temporaries to minimize the number
+  of garbage collection occurences. When a complex operation such as
+  `exp` is performed, there are a number of intermediate results that
+  require storage, and were previously only cleaned up by the garbage
+  collector. They are now automatically cleaned up before the function
+  returns. The same optimization applies to intermediate graphics
+  while rendering equations, notably on the stack. This delivers
+  [significant performance improvements](#garbage-collector-performance)
+  for long-running operations:
+  the "[floating-point sum test](https://www.hpmuseum.org/forum/thread-9750.html)
+  is now about 20% faster on SwissMicros calculators.
+
+* commands: Add `GCStats` command to show garbage collector statistics.
+
+* Allow `CustomMenu` to contain the name of a menu, or a program that
+  builds the menu dynamically. An example is shown in the `RPL`
+  directory of the Demo file.
+
+* Allow `CustomMenu` to define "vertical" menus, i.e. menus where the
+  items are stacked on top of one another.
+
+### Bug fixes
+
+* Fix functions taking real-like unit input. For example,
+  `atan(1_cm/1_m)` now computes correctly.
+
+* solver: Do not solve system of equations using existing values. The
+  multiple equation solver would incorrectly consider existing values
+  in variables to check if an equation could be used for solving. The
+  heuristic now picks up the equation that requires the smallest
+  number of unknown variables among the available equations.
+
+* Parse `x!` as factorial of `x` and not as a `x!` symbol. The
+  incorrect parsing was due to an ambiguity in the HP48 parser that
+  was resolved in the HP50G. DB48X now behaves like the HP50G and does
+  not allow `!` to appear at the end of a name.
+
+* Do not enter the debugger if `DebugOnError` is set while evaluating
+  an `iferr` statement. The assumption is that if you try to catch an
+  error, you do not intend to debug the code being tested for an
+  error. If this is not the desired behaviour, then an explicit
+  `DebugOnError` should be inserted in the body of `iferr`.
+
+* Various unit-related fixes in the equation library.
+
+* Ensure that we don't execute auto-completed catalog commands
+  twice. The recent change that added the auto-completed command to
+  the command-line history also caused the command to be executed on
+  the command-line before being evaluated again from the key.
+
+* Avoid a rare crash when an equation was too big to be rendered
+  graphically and a garbage collection cycle occured between graphic
+  rendering and text rendering.
+
+* Do not emit error message from `Vec→` for vectors containing
+  units. The incorrect error was introduced by the logic detecting
+  polar, cylindrical or spherical vectors.
+
+* Fixed `atan2` special cases to always generate the correct
+  angle. Cases where `atan2` would generate an exact result would
+  usually result in the wrong angle unit scaling being applied.
+
+* Fixed parsing of `tan⁻¹` in expressions.
+
+* units: Skip the `=Cycle` section for unit definitions. This was
+  causing incorrect unit conversion errors for users who had added
+  common units in the `=Cycle` section of their `config/units.csv`
+  file.
+
+* The user-defined units menu no longer list all the built-in units
+  after the user-defined ones.
+
+* Add a missing `sqrt` in the `RelativisticKineticEnergy` sample code,
+  and do not compute the kinetic energies for negative values.
+
+* Alias `keys` is for `KeyMap`, not `Header`. Fix typo in identifiers
+  table.
+
+* Avoid a crash in `RandomMatrix` when hardware floating-point is
+  enabled, due to an incorrect conversion to integer. As a side
+  effect, fixed a couple of minor issues in the conversion to integer
+  values from decimal or binary floating-point values.
+
+* Fix bogus `Bad argument type` message for `V→` when the number of
+  elements was not 2 or 3.
+
+* Fix crash when dividing a matrix by a non-invertible matrix.
+
+* Fix crash displaying non-normal hardware floating-point values.
+
+* Fix crash in vector operations that cause errors, e.g. `[1][0] /`.
+
+* Parse `ubase` algebraic expressions, e.g. `ubase(1_km)`, as well
+  as other function-like commands such as `size`.
+
+* Accept numerical values in `ubase` and leave them as is.
+
+* Adjust the "next step" computation in the solver to minimize the
+  complexity of conversions and remove unit ambiguity for temperatures.
+
+* Rewrite the Heat Transfer equations to clarify temperature unit used
+  in the computation. Specifically, avoid having a `ΔT` in a
+  multiplication, where the value would be incorrectly converted to
+  `K`.
+
+* Fix a problem when a garbage collection while parsing a fraction
+  could cause a large fraction of the subsequent program to be
+  skipped. This normally led to anomalous `Inconsistent units`
+  messages when this caused a unit such as `254/10_mm` for `in` to be
+  incorrectly parsed as `254/10`.
+
+
+### Enhancements
+
+* Major update to the documentation of the equation library,
+  contributed by Jean Wilson.
+* equations: Replace `°F` with `°C` in equations
+* tests: Add support for tests that are known to fail
+* tests: Run equation tests with `11 DIG`
+* tests: Add ability to take screen snapshots on failure
+* units: Put temperatures before pressure in `Fluids` section
+* help: Add image for B Field From Finite Wire
+* Makefile: When using `make update`, do not keep the temporary `.png`
+* Indicate where to get `tac` in the build documentation
+* Fix README link to browser version
+* Disable `DebugOnError` by default, since it confused new users
+* Enhance the test suite so that it looks up the keys to use.
+  This makes the test suite more readable, e.g. we have `ID_exp` in
+  the test instead of `D` (the `D` key being where `exp` was on the
+  original layout), and it makes the test suite layout-independent,
+  paving the way for reuse on other hardware (e.g. HP50G).
+
+
 ## Release 0.8.3 "Blindness" - User mode and custom header
 
 This release focuses on various user interface aspects.
@@ -2502,7 +2765,7 @@ to ensure that all the given examples give the expected results.
 * Positional graphic combination operations (e.g. `GraphicRatio`)
 * Switch to Greek or Cyrillic keyboard maps based on character menu
 * Add EDIT menu commands to transient alpha (e.g. ▶F3 is Word→)
-* Index the  help file for performance (about 5x faster on DM42)
+* Index the  help file for performance (about 5x faster on WASM)
 * Accept verbatim code and RPL code snippets in the help file
 * Parse and show help topics taking all aliases into account
 * Convert lists and equations to RPL programs with `→Program`
@@ -3256,7 +3519,7 @@ simulator, and more.
 * locals: Document the absence of compiled local variables
 * makefile: Add configuration files to the release `.tgz` file
 * parsing: Make the error message for sub-expressions more local
-* readme: Remove reference to DM42 from top-level readme
+* readme: Remove reference to WASM from top-level readme
 * simulator: Avoid crash rendering %t in recorder
 * simulator: Convert simulator code to support color
 * simulator: Replicate open files limitations
@@ -3819,7 +4082,7 @@ A few quick bug fixes that make DB48X a bit more usable.
 ## Release 0.6.0 "Christmas": Introducing variable precision
 
 This release was a bit longer in coming than earlier ones, because we are about
-to reach the limits of what can fit on a DM42. This release uses 711228 bytes
+to reach the limits of what can fit on a WASM. This release uses 711228 bytes
 out of the 716800 (99.2%).
 
 Without the Intel Decimal Library code, we use only 282980 bytes. This means
@@ -3832,7 +4095,7 @@ implementation of decimal computations. In this release, most operations are
 implemented, but some features are still missing (e.g. Gamma function). This
 release will be simultaneous with 0.5.2, which is functionally equivalent but
 still uses the Intel Decimal library. The new implementation is much more
-compact, allowing us to return to normal optimizations for the DM42 and regain
+compact, allowing us to return to normal optimizations for the WASM and regain
 some of the lost performance. On the other hand, having to switch to a table
 free implementation means that it's significantly slower than the Intel Decimal
 Library. The upside of course is that you can compute with decimal numbers that
@@ -3849,7 +4112,7 @@ still return "unimplemented error".
 ### Bug fixes
 
 None. If anything, this release introduces bugs in computations and performance
-regressions. However, it frees *a lot* of space for further DM42 development.
+regressions. However, it frees *a lot* of space for further WASM development.
 
 ### Improvements
 
@@ -3857,20 +4120,20 @@ The `Precision` setting now sets the number of digits with a granularity of one,
 between 3 and 9999. Ideal use of memory is with multiples of 12 digits, e.g. 12,
 24 or 36 digits, where decimal packing does not cause lost bits.
 
-Performance on the DM42 is somewhat improved, since it is now possible to return
+Performance on the WASM is somewhat improved, since it is now possible to return
 to a higher level of optimization.
 
 ### Regressions
 
 In addition to lower performance and unimplemented functions, this version no
-longer builds a compatible QSPI. This means that returning to the DM42 requires
+longer builds a compatible QSPI. This means that returning to the WASM requires
 flashing *both* the QSPI and the PGM file.
 
 
-## Release 0.5.2 "Christmas Eve": Reaching hard limits on the DM42
+## Release 0.5.2 "Christmas Eve": Reaching hard limits on the WASM
 
 This release was a bit longer in coming than earlier ones, because we are about
-to reach the limits of what can fit on a DM42. This release uses 711228 bytes
+to reach the limits of what can fit on a WASM. This release uses 711228 bytes
 out of the 716800 (99.2%).
 
 Without the Intel Decimal Library code, we use only 282980 bytes. This means
@@ -4101,7 +4364,7 @@ for unit data files.
 * Status of implementation and performance data in documentation (#530)
 * Performance: Reduce frequency of busy cursor drawing (#531)
 * Performance: Reimplement range-based type checkig (#532)
-* Performance: Focused -O3 optimizations on DM42 (#533)
+* Performance: Focused -O3 optimizations on WASM (#533)
 * Makefile: Install target installs demo and config (#547)
 * Garbage collector for menu labels (#548)
 
@@ -5024,7 +5287,6 @@ Hewlett-Packard RPL implementation.
 * [DecimalComma](#decimalcomma): Select comma as decimal separator
 * [DecimalDot](#decimaldot): Select dot as decimal separator
 * [DifferentialSolverMenu](#differentialsolvermenu)
-* [DifferentiationMenu](#differentiationmenu)
 * [DisplayModesMenu](#displaymodesmenu)
 * [EQUIV](#equiv): Logical equivalence
 * [ERFC](#erfc): Complementary error function
@@ -5583,8 +5845,8 @@ The variables in the Columns and Beams section are:
 * `θ`: Slope at `x` (dim.: angle)
 * `A`: Cross-sectional area
 * `a`: Distance to point load
-* 'ε': Eccentricity (dim.: length)
-* `c`: Distance to edge fiber (Eccentric Columns), or Distance to applied moment (beams)
+* `ε`: Eccentricity (dim.: length)
+* `c`: Distance to edge fiber ([Eccentric Columns](#Eccentric Columns)), or Distance to applied moment (beams)
 * `E`: Modulus of elasticity (dim.: pressure=force/area, in SI: pascal, Pa)
 * `I`: Moment of inertia (dim.: length^4, in SI: m^4)
 * `K`: Effective length factor of column
@@ -5599,7 +5861,7 @@ The variables in the Columns and Beams section are:
 * `x`: Distance along beam
 * `y`: Deflection at x (dim.: length)
 
-For simply supported beams and cantilever beams (“Simple Deflection” through “Cantilever Shear”), the calculations differ depending upon the location of 'x' relative to the loads.
+For simply supported beams and cantilever beams ([Simple Deflection](#Simple Deflection) through [Cantilever Shear](#Cantilever Shear)), the calculations differ depending upon the location of `x` relative to the loads.
 
 * Applied loads are positive downward.
 * The applied moment is positive counterclockwise.
@@ -5614,7 +5876,7 @@ These equations apply to a slender column (`K·L/r>100`) with length factor `K`.
 
 ![Elastic Buckling](img/ElasticBuckling.bmp)
 
-* To calculate `[Pcr_kN;σcr_kPa]` (Critical load; Critical stress) from 6 known variables:
+* To calculate [Pcr_kN;σcr_kPa] (Critical load; Critical stress) from 6 known variables:
 ```rpl
 L=7.3152_m  r=4.1148_cm  E=199947961.502_kPa  A=53.0967_cm^2  K=0.7  I=8990598.7930_mm^4
 @ Expecting [ Pcr=676.60192 6324 kN σcr=127 428.24437 8 kPa ]
@@ -5688,7 +5950,7 @@ L=20_ft  a=10_ft  P=674.427_lbf  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
 * To calculate `[y_in]` (Deflection at x) from 9 known variables:
 ```rpl
 L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
-@ Expecting: [y=-0.331630_in]
+@ Expecting [ y=-0.33163 03448 28 in ]
 'ROOT(ⒺCantilever Deflection;[y];[0_in])'
 ```
 
@@ -5796,7 +6058,7 @@ The variables in the Electricity section are:
 
 ### Coulomb’s Law & E Field
 
-These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges 'q1' or 'q2' in the expression of the electric force. A finite object carrying a net charge 'q1' can be considered as a point charge if the distance to the position of the point charge 'q2' is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
+These equations describe the electrostatic force between two point charged particles and the electric field observed at the position of a test charge which replaces one of the two charges `q1` or `q2` in the expression of the electric force. A finite object carrying a net charge `q1` can be considered as a point charge if the distance to the position of the point charge `q2` is much greater than the object dimension, see example 2, for the approximate calculations of the electric force and electric field far away from a charged plate.
 
 * **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field) from 5 known variables:
 
@@ -5806,11 +6068,11 @@ q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 ```
 
-* **Example 2**. A square metal plate 'L = 8_cm' on a side carries a charge of 'q1 = 6_μC'. Approximate values of the electric force & electric field for a point charge 'q2 = 1_μC' located at 'r = 3_m' can be calculated with Coulomb's law if the separation distance is much greater than the plate dimension 'r >> L'. The whole plate is indeed considered as being a point charge providing that 'r > 10 · L'. Therefore, to calculate [F_N;Er_N/C]:
+* **Example 2**. A square metal plate `L = 8_cm` on a side carries a charge of `q1 = 6_μC`. Approximate values of the electric force & electric field for a point charge `q2 = 1_μC` located at `r = 3_m` can be calculated with Coulomb’s law if the separation distance is much greater than the plate dimension `r >> L`. The whole plate is indeed considered as being a point charge providing that `r > 10 · L`. Therefore, to calculate `[F_N;Er_N/C]`:
 
 ```rpl
 L=8_cm r=3_m q1=6E-6_C  q2=1E-6_C  r=3_m  εr=1  qtest=1E-6_C
-@ Expecting [ F=0.00599 17011 92 N Er=5 991.70119 159 N/C ]
+@ Expecting [ F=5.99170 11915 9⁳⁻³ N Er=5 991.70119 159 N/C ]
 if 'r > 10*L' then
  'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 end
@@ -5818,52 +6080,58 @@ end
 
 ### E Field Infinite Line
 
-The expression for the radial electric field at the distance 'r' is approximately valid if this distance is such that 'r << L' and therefore also applies to a wire of finite length 'L'.
+The expression for the radial electric field at the distance `r` is approximately valid if this distance is such that `r << L` and therefore also applies to a wire of finite length `L`.
 
 * To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field) from 4 known variables:
 
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11915 9 N/C ]
 'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
+```
+
+The code below saves the reference value for comparison with the example in [E Field Finite Line](#E Field Finite Line):
+```rpl
+@ Save the reference value for comparison below
+Er0=Er
 ```
 
 ### E Field Finite Line
 
-The expression of the radial electric field at the distance 'r' depends on the subtended angles 'θ1' and 'θ2' relative to the ends of the wire of finite length 'L'.
+The expression of the radial electric field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`.
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* Example 1. To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance 'r=(L/2)/tanθ1' and angle 'θ2=360°-θ1' (see fig):
+* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Electric Field; Linear charge density) from 6 known variables and also with the distance `r=(L/2)/tanθ1` and angle `θ2=360°-θ1` (see figure):
 
 ```rpl
 r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
 Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
-@ Expecting [ λ=1.73206 66666 7⁳⁻⁶ C/m Er=5 991.70119 159 N/C ]
-'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C;])'
-```
-
-* Example 2. To show the infinite line approximation ('r << L') of the previous section we calculate [λ_C/m;Er_N/C] with the angles θ1=ATAN((L/2)/r) and θ2=360°-θ1 (see fig):
-
-```rpl
-θ1='atan(3/2/0.05)' θ2='360_°-θ1'
-Q=5E-6_C  L=3_m  r=0.05_m  εr=1  θ1=88.0876_°  θ2=271.9124_°
-@ Expecting [ λ=1.66759 54889⁳⁻⁸ C/m Er=5 991.70119 159 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 972 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 ```
 
+* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` with the angles `θ1=ATAN((L/2)/r)` and `θ2=360°-θ1` (see figure):
+
 ```rpl
-5.991701E3_N/C 'Er' %Ch
+Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ1='atan(L/2/r)' θ2='360_°-θ1'
+if 'r < L/10' then
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52400 7 N/C ]
+'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
+end
+```
+
+```rpl
 @ Verify relative difference under condition 5_cm << 3_m.
-@ Expecting 3.19751 95082 1⁳⁻⁶
-@ (Was 0.056%)
+Er0 Er %Ch
+@ Expecting -5.55093 02084 6⁳⁻²
 ```
 
 ### E Field Infinite Plate
 
-The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance 'd' from a finite plate if it is very small compare to the dimensions (length or width 'L') of the plate. On the contrary if 'd >> L', 'Ep' can be approximated if we consider the whole plate as being a point charge with 'q = σ·A' (where 'σ' is the surface charge density), see example 2 of "Coulomb's Law & E Field".
+The expression of the perpendicular electric field is constant over an infinite plate and can approximate the field at a distance `d` from a finite plate if it is very small compare to the dimensions (length or width `L`) of the plate. On the contrary if `d >> L`, `Ep` can be approximated if we consider the whole plate as being a point charge with `q = σ·A` (where `σ` is the surface charge density), see example 2 of [Coulomb’s Law & E Field](#Coulomb’s Law & E Field).
 
-* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position [d=5_mm] above a square plate of width [L=8_cm] and surface 'A=L^2' where 'd << L' when 'd < L/10' is verified:
+* To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position `[d=5_mm]` above a square plate of width `[L=8_cm]` and surface `A=L^2` where `d << L` when `d < L/10` is verified:
 
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
@@ -5915,7 +6183,7 @@ R1=10_Ω  R2=6_Ω  I=15_A
 
 ### Resistivity & Conductivity
 
-The electrical resistivity 'ρ' of most materials changes with temperature. If the temperature 'T' does not vary too much, a linear approximation can be used around the reference point ('ρ0'; 'T0').
+The electrical resistivity `ρ` of most materials changes with temperature. If the temperature `T` does not vary too much, a linear approximation can be used around the reference point (`ρ0`; `T0`).
 
 * To calculate `[ρ_(Ω*m);σ_(S/m)]` (Resistance) from 4 known variables:
 
@@ -5996,9 +6264,10 @@ E=4_J L=15_mH
 ![RLC Current Delay](img/Missing name.bmp)
 
 * To calculate `[ω_r/s;φs_°;φp_°;XC_Ω;XL_Ω]` (Phases and inpedances) from 4 known variables:
+
 ```rpl
-@ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
+@ Expecting [ ω=672.30082 7868 r/s φs=-45.82915 71488 ° φp=-5.87715 65317 1 ° XC=18.59286 71836 Ω XL=13.44601 65574 Ω ]
 'ROOT(ⒺRLC Current Delay;[ω;φs;φp;XC;XL];[1_r/s;1_°;1_°;1_Ω;1_Ω])'
 ```
 
@@ -6006,37 +6275,120 @@ f=107_Hz  C=80_μF  L=20_mH  R=5_Ω
 
 These equations approximate the dc current required to charge the voltage on a capacitor in a certain time interval.
 
+* To calculate `[ΔV_V;Δt_s;tf_s]` (Voltage difference, time difference, final time) from 5 known variables:
+
+```rpl
+C=15_μF  Vi=2.3_V  Vf=3.2_V  I=10_A  ti=0_μs
+@ Expecting [ ΔV=0.9 V Δt=1.35 μs tf=1.35 μs ]
+'ROOT(ⒺDC Capacitor Current;[ΔV;Δt;tf];[1_V;1_μs;1_μs])'
+```
+
 ### Capacitor Charge
+
+* To calculate `[q_C]` (Voltage difference, time difference, final time) from 2 known variables:
+
+```rpl
+C=20_μF  V=100_V
+@ Expecting [ q=2.⁳⁻³ C ]
+'ROOT(ⒺCapacitor Charge;[q];[1_C])'
+```
 
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
 
+![DC Inductor Voltage](img/Missing name.bmp)
+
+* To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference, final current, final time) from 5 known variables:
+
+```rpl
+L=100_mH  V=52_V  Δt=32_μs  ILi=23_A  ti=0_μs
+@ Expecting [ ΔIL=-1.664⁳⁻² A ILf=22.98336 A tf=32. μs ]
+'ROOT(ⒺDC Inductor Voltage;[ΔIL;ILf;tf];[1_A;1_A;1_μs])'
+```
+
 ### RC Transient
 
-### RL Transient
+![RC Transient](img/Missing name.bmp)
 
-### Resonant Frequency
+* To calculate `[V_V]` (Voltage) from 5 known variables:
 
-### Plate Capacitor
+```rpl
+Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
+@ Expecting [ V=3.29679 95396 4 V ]
+'ROOT(ⒺRC Transient;[V];[1_V])'
+```
 
 ### Cylindrical Capacitor
 
+![Cylindrical Capacitor](img/Missing name.bmp)
+
+* To calculate `[C_μF;ΔV_V]` (Capacitance, voltage) from 5 known variables:
+
+```rpl
+εr=1  Q=75_μC  ro=1_cm  ri=.999_cm  L=10_cm
+@ Expecting [ C=5 560.46819 129 pF ΔV=13 488.07284 21 V ]
+'ROOT(ⒺCylindrical Capacitor;[C;ΔV];[1_pF;1_V])'
+```
+
 ### Solenoid Inductance
+
+![Solenoid Inductance](img/Missing name.bmp)
+
+* To calculate `[L_mH]` (Inductance) from 4 known variables:
+
+```rpl
+μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
+@ Expecting [ L=3.01592 89474 6⁳⁻² mH ]
+'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
+```
 
 ### Toroid Inductance
 
-### Sinusoidal Voltage
+![Toroid Inductance](img/Missing name.bmp)
 
-### Sinusoidal Current
+* To calculate `[L_mH]` (Inductance) from 4 known variables:
+
+```rpl
+μr=1  N=5000  h=2_cm  ri=2_cm  ro=4_cm
+@ Expecting [ L=69.31471 80562 mH ]
+@ Error in ri input data of HP50gAUR.pdf
+'ROOT(ⒺToroid Inductance;[L];[1_mH])'
+```
 
 ### Drift Speed & Current Density
+
+* To calculate `[vd_m/s;J_(A/m^2);E_(V/m)]` (Drift speed, current density, E field) from 5 known variables:
+
+```rpl
+@ A='Ⓒπ*(0.1_cm)^2'  ρ='Ⓒqe*n'  σ='Ⓒqe*n*40_(cm^2/(V*s))'
+@ Expecting [ vd=2.33733 41683 6⁳⁻⁵ m/s J=31.83098 86184 A/cm↑2 E=5.84333 54209⁳⁻³ V/m ]
+I=1_A  n=8.5e28_(m^-3) A=3.14159 26535 90E-2_cm↑2 ρ=1.36185 01389E10_C/m↑3 σ=54 474 005.556_S/m
+'ROOT(ⒺDrift Speed & Current Density;[vd;J;E];[1_m/s;1_(A/cm^2);1_(V/m)])'
+```
 
 ### Electron & Hole Mobilities
 
 In accordance with microscopic Ohm's law, the current density is proportional to the electric field. Holes and electrons therefore move at their average drift speeds during the mean free time between collisions. As long as the electric fields are not very high, the mobilities of holes and electrons are constant.
 
+* To calculate `[μe_(cm^2/(V*s));μe_(cm^2/(V*s));J_(A/m^2);Je_(A/m^2);Jh_(A/m^2);σ_(S/m)]` (Electron & hole mobilities, current densities, conductivity) from 5 known variables:
 
+```rpl
+@ In Ge typical values can be μe=500_(cm^2/(V*s)) μh=200_(cm^2/(V*s)) meeff_kg='0.12*Ⓒme'
+@ mheff_kg='0.5*Ⓒme'  ne=1.04e19_(cm^-3)  nh=6.0e18_(m^-3) E=6.0e-9_V/m
+
+τc=4.09365 36801 40e-15_s meeff=1.09312 60456 68e-31 kg mheff=4.55469 18569 5e-31 kg nh=6.0e18_(m^-3) ne=1.04e19_(m^-3) E=6.0e-9_V/m
+@ Wanted [ μe=49.03846 15384 64976 91445 22_cm↑2/(s·V) μh=60.00000 00000 03822 512o15 7_cm↑2/(s·V) Je=4.90266 05000 386⁳-11_A/m↑2 Jh=3.46070 15294 402⁳-11_A/m↑2 J=8.36336 20294 771⁳-11_A/m↑2 σ=0.01393 89367 15800 94039 7294_S/m ]
+@ The solution below is different, but seems to validate4 with EvalEq
+@ Expecting [ μe=60. cm↑2/(V·s) μh=14.4 cm↑2/(V·s) Je=5.99854 93176 9⁳⁻¹¹ A/m↑2 Jh=8.30568 36706 4⁳⁻¹² A/m↑2 J=6.82911 76847 6⁳⁻¹¹ A/m↑2 σ=1.13818 62807 9⁳⁻² S/m ]
+'ROOT(ⒺElectron & Hole Mobilities;[μe;μh;Je;Jh;J;σ];[1_(cm^2/(V*s));1_(cm^2/(V*s));1_(A/m^2);1_(A/m^2);1_(A/m^2);1_(S/m)])'
+```
+
+Notes about manually-ordered solution:
+```
+@ 'ROOT(ⒺElectron & Hole Mobilities;[μe #4;μh #5;Je #2;Jh #3;J #1;σ #6];[1_(cm^2/(V*s));1_(cm^2/(V*s));1_(A/m^2);1_(A/m^2);1_(A/m^2);1_(S/m)])'
+
+```
 ## Fluids
 
 The variables in the Fluids section are:
@@ -6069,19 +6421,17 @@ The variables in the Fluids section are:
 
 ### Pressure At Depth
 
-This equation describes hydrostatic pressure for an incompressible fluid. Depth 'h' is positive downwards from the reference.
+This equation describes hydrostatic pressure for an incompressible fluid. Depth `h` is positive downwards from the reference.
 
-### Bernoulli Equation
+![Pressure At Depth](img/Missing name.bmp)
 
-These equations represent the streamlined flow of an incompressible fluid.
+* To calculate `[P_kPa]` (Pressure) from 3 known variables:
 
-### Flow with Losses
-
-These equations extend Bernoulli’s equation to include power input (or output) and head loss.
-
-### Flow In Full Pipes
-
-These equations adapt Bernoulli’s equation for flow in a round, full pipe, including power input (or output) and frictional losses (with the fanning friction factor 'f').
+```rpl
+h=100_m  ρ=1025.1817_kg/m^3  P0=1_atm
+@ Expecting [ P=1 106.68481 183 kPa ]
+'ROOT(ⒺPressure at Depth;[P];[1_kPa])'
+```
 
 ## Forces and Energy
 
@@ -6117,21 +6467,37 @@ force (Law of Gravitation), or Drag force (Drag force)
 * `x`: Displacement
 * `UGf, UGi`: Final and initial gravitational potential energy (dim.: force·length, in SI: joule, J)
 
-### Linear Mechanics
-
-### Angular Mechanics
-
-### Centripetal Force
-
-### Hooke’s Law
-
-The force is that exerted by the spring.
-
 ### 1D Elastic Collisions
 
-### Gravitation Law
+![1D Elastic Collisions](img/Missing name.bmp)
+
+* To calculate `[v1f_m/s;v2f_m/s]` (Final velocities of mass m1 & m2) from 3 known variables:
+
+```rpl
+m1=10_kg  m2=25_kg  v1i=100_m/s
+@ Expecting [ v1f=-42.85714 28571 m/s v2f=57.14285 71429 m/s ]
+'ROOT(Ⓔ1D Elastic Collisions;[v1f;v2f];[1_m/s;1_m/s])'
+```
+
+### Drag Force
+
+* To calculate `[F_N]` (Drag force) from 4 known variables:
+
+```rpl
+Cd=0.05  ρ=1000_kg/m^3  A=7.5E6_cm^2  v=35_m/s
+@ Expecting [ F=22 968 750. N ]
+'ROOT(ⒺDrag Force;[F];[1_N])'
+```
 
 ### Relativity Mass Energy
+
+* To calculate `[E_J]` (Relativistic energy) from 1 known variable:
+
+```rpl
+m=9.1E-31_kg
+@ Expecting [ E=8.17867 21247⁳⁻¹⁴ J ]
+'ROOT(ⒺRelativity Mass Energy;[E];[1_J])'
+```
 
 ## Gases
 
@@ -6164,33 +6530,53 @@ The variables in the Gases section are:
 * `W`: Work (dim.: force·length, in SI: joule, J)
 * `Z, Zi, Zf`: Initial and final gas compressibility correction factors
 
-### Ideal Gas
-
 ### Ideal Gas Law Change
+
+* To calculate `[Vf_l]` (Volume final) from 5 known variables:
+
+```rpl
+Pi=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=373.15_K  Tf=373.15_K
+@ Expecting [ Vf=2. l ]
+'ROOT(ⒺIdeal Gas Law Change;[Vf];[1_l])'
+```
 
 ### Isothermal Expansion
 
 These equations apply to an ideal gas.
 
+* To calculate `[m_kg;W_J]` (Mass, work) from 5 known variables:
+
+```rpl
+Vi=2_l  Vf=125_l  T=573.15_°C  n=0.25_mol  MW=64_g/mol
+@ Expecting [ m=1.6⁳⁻² kg W=7 274.34704 123 J ]
+'ROOT(ⒺIsothermal Expansion;[m;W];[1_kg;1_J])'
+```
+
 ### Polytropic Processes
 
-These equations describe a reversible pressure-volume change of an ideal gas such that 'P·Vn' is constant. Special cases include isothermal processes ('n = 1'), isentropic processes ('n = k', the specific heat ratio), and constant-pressure processes ('n = 0').
+These equations describe a reversible pressure-volume change of an ideal gas such that `P·Vn` is constant. Special cases include isothermal processes (`n = 1`), isentropic processes (`n = k`, the specific heat ratio), and constant-pressure processes (`n = 0`).
+
+* To calculate `[n_1;Tf_°F]` (Polytropic number, final temperature) from 5 known variables:
+
+```rpl
+Pi=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
+@ Expecting [ n=1.22239 24213 4 Tf=346.54537 037 K ]
+'ROOT(ⒺPolytropic Processes;[n;Tf];[1;1_°F])'
+```
 
 ### Isentropic Flow
 
+![Isentropic Flow](img/Missing name.bmp)
+
 The calculation differs at velocities below and above Mach 1. The Mach number is based on the speed of sound in the compressible fluid.
 
-### Real Gas Law
+* To calculate `[P_kPa;ρ_kg/m^3;At_cm^2]` (Flow pressure, flow density, throat area) from 7 known variables:
 
-These equations adapt the ideal gas law to emulate real-gas behavior.
-
-### Real Gas State Change
-
-This equation adapts the ideal gas state-change equation to emulate real-gas behavior.
-
-### Kinetic Theory
-
-These equations describe properties of an ideal gas.
+```rpl
+k=2  M=0.9  T0=300_K  T=373.15_K  ρ0=100_kg/m^3  P0=100_kPa  A=1_cm^2
+@ Expecting [ P=154.71213 6111 kPa ρ=124.38333 3333 kg/m↑3 At=0.99280 71853 34 cm↑2 ]
+'ROOT(ⒺIsentropic Flow;[P;ρ;At];[1_kPa;1_kg/m^3;1_cm^2])'
+```
 
 ## Heat transfer
 
@@ -6218,21 +6604,43 @@ The variables in the Heat Transfer section are:
 * `Ti, Tf`: Initial and final temperatures
 * `U`: Overall heat transfer coefficient (dim.: power/(area·temperature) in SI: W/(m^2·K))
 
-### Heat Capacity
-
 ### Thermal Expansion
 
-### Conduction
+![Thermal Expansion](img/Missing name.bmp)
+
+* To calculate `[α_K^-1;Ti_°C]` (Expansion coefficient, initial temperature) from 4 known variables:
+
+```rpl
+ΔT=15_°C  L=10_m  Tf=25_°C  δ=1_cm
+@ Expecting [ α=6.66666 66666 7⁳⁻⁵ K⁻¹ Ti=10. °C ]
+'ROOT(ⒺThermal Expansion;[α;Ti];[1_K^-1;1_°C])'
+```
 
 ### Convection
+
+![Convection](img/Missing name.bmp)
+
+* To calculate `[ΔT_°C;Th_°C]` (Temperature difference, hot surface temperature) from 4 known variables:
+
+```rpl
+Tc=26.85_°C  A=200_m^2  h=0.005_W/(m^2*K)  qr=10_W
+@ Expecting [ ΔT=10. °C Th=36.85 °C ]
+'ROOT(ⒺConvection;[ΔT;Th];[1_°C;1_°C])'
+```
 
 ### Conduction + Convection
 
 If you have fewer than three layers, give the extra layers a zero thickness and any nonzero conductivity. The two temperatures are fluid temperatures – if instead you know a surface temperature, set the corresponding convective coefficient to 10^999999.
 
-### Black Body Radiation
+![Conduction + Convection](img/Missing name.bmp)
 
-F0λ(λ_m, T_K) is the black body emissive power Function which returns the fraction of total black-body emissive power at temperature 'T_K' between wavelengths 0 and 'λ_m'. It is the integral of the Planck distribution.
+* To calculate `[qr_W;Tc_°C;U_W/(m^2*K)]` (Heat transfer rate, cold surface temperature, overall heat transfer coefficient) from 11 known variables:
+
+```rpl
+ΔT=35_°C  Th=55_°C  A=10_m^2  h1=0.05_W/(m^2*K)  h3=0.05_W/(m^2*K)  L1=3_cm  L2=5_cm  L3=3_cm  k1=0.1_W/(m*K)  k2=.5_W/(m*K)  k3=0.1_W/(m*K)
+@ Expecting [ qr=8.59950 85995 1 W Tc=20. °C U=0.02457 00245 7 W/(m↑2·K) ]
+'ROOT(ⒺConduction & Convection;[qr;Tc;U];[1_W;1_°C;1_W/(m^2*K)])'
+```
 
 ## Magnetism
 
@@ -6264,11 +6672,14 @@ The variables in the Magnetism section are:
 
 #### Straight Wire Infinite
 
-The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly. The expression for the magnetic field at the distance 'r' is approximately valid if the distance is such that 'r << L' and therefore also applies for a wire of finite length 'L'.
+The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L`.
 
 #### Straight Wire Finite
 
-The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at 'r' is inside or outside the wire of radius 'rw' and the calculations are done accordingly.
+The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
+
+![B Field From Finite Wire](img/B Field From Finite Wire.bmp)
+
 
 #### Force Between Wires
 
@@ -6276,11 +6687,11 @@ The force between wires is positive for an attractive force (for currents having
 
 #### B Field In Infinite Solenoid
 
-The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < 'L' and therefore also applies inside a solenoid of finite length 'L'.
+The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`.
 
 #### B Field In Finite Solenoid
 
-The expression for the magnetic field in the center depends on the subtended internal angles 'α1' and 'α2' relative to the top ends of the solenoid of finite length 'L'.
+The expression for the magnetic field in the center depends on the subtended internal angles `α1` and `α2` relative to the top ends of the solenoid of finite length `L`.
 
 ![B Field In Finite Solenoid](img/B Field In Finite Solenoid.bmp)
 
@@ -6288,15 +6699,15 @@ The expression for the magnetic field in the center depends on the subtended int
 
 #### Hall Effect
 
-The moving charge carrier is deflected by the magnetic field to create the Hall tension 'VH' between the opposite sides of the conductor.
+The moving charge carrier is deflected by the magnetic field to create the Hall tension `VH` between the opposite sides of the conductor.
 
 #### Cyclotron Mouvement
 
-Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period 'T'.
+Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
 #### Helicoidal Mouvement
 
-Under the magnetic field lines (at angle 'θ' with the speed vector), the moving charge has an helicoidal trajectory of pitch 'Dpitch', radius 'Rc' and period 'T'.
+Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
 #### Volumic Density Magnetic Energy
 
@@ -6342,13 +6753,13 @@ The variables in the Motion section are:
 
 #### Object In Free Fall
 
-By definition, an object in free fall only experiences local gravitational acceleration 'gloc'. This depends on the mass of the star or planet and the distance 'r' center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value 'gearth' of the acceleration of gravity as a function of latitude 'φ' and for an altitude 'h' low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
+By definition, an object in free fall only experiences local gravitational acceleration `gloc`. This depends on the mass of the star or planet and the distance `r` center to center (where we assume that the position is greater than the radius of the mass). For the Earth, we can calculate an approximate value `gearth` of the acceleration of gravity as a function of latitude `φ` and for an altitude `h` low compared to the Earth's radius (typically: a few thousand meters, valid in commercial aviation).
 
 // Reference: Commissions romandes de mathématique, de physique et de chimie, Formulaires et tables : Mathématiques, Physique, Chimie, Tricorne, 2000, 278
 
 #### Projectile Motion
 
-During the time of flight 'tf', the motion of a projectile follows a symetric parabole of horizontal range 'R' and of maximum height 'hmax'.
+During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
 #### Angular Motion
 
@@ -6424,7 +6835,7 @@ The Brewster angle is the angle of incidence at which the reflected wave is comp
 
 #### Malus Law
 
-If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle 'θ' between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency ('fx < fx0') and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
+If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx0`) and thefore in energy (hfx) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
 #### 2 Slits Young Interference
 
@@ -6693,11 +7104,11 @@ The variables in the Waves section are:
 
 #### Doppler Effect
 
-In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of sound in the air. The speed of the receiver relative to the air 'vr' is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air 'va' is subtracted from the speed of sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
+In the classical Doppler effect it is assumed that the speed of the observer and the source are lower than the speed of sound in the air. The speed of the receiver relative to the air `vr` is added to the speed of sound in the air if the receiver is moving towards the source, subtracted if the receiver is moving away from the source whatever the movement of the source. The speed of the source relative to the air `va` is subtracted from the speed of sound in the air if the source is moving towards the receiver, added if the source is moving away from the receiver whatever the movement of the receiver.
 
 #### Mach Number
 
-For an object moving at a supersonic speed, the shockwave describes a cone having the angle 'θcone' at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
+For an object moving at a supersonic speed, the shockwave describes a cone having the angle `θcone` at its tip where the opposite side is the distance travelled by the sound and the hypothenuse is the distance travelled by the object.
 
 #### String Standing Waves
 
@@ -6709,13 +7120,14 @@ A tube being open or closed at its ends admits only discrete harmonics as standi
 
 #### Beat Acoustics
 
-In acoustics, a beat is an interference pattern between two sounds of slightly different frequencies, perceived as a periodic variation in amplitude whose rate is the difference of the two frequencies. The sum of two unit-amplitude sine waves can be expressed as a carrier wave of frequency 'favg' whose amplitude is modulated by an envelope wave of frequency 'fbeat'.
+In acoustics, a beat is an interference pattern between two sounds of slightly different frequencies, perceived as a periodic variation in amplitude whose rate is the difference of the two frequencies. The sum of two unit-amplitude sine waves can be expressed as a carrier wave of frequency `favg` whose amplitude is modulated by an envelope wave of frequency `fbeat`.
 
 #### Electromagnetic Waves
 
 ## Relativity
 The variables in the Relativity section are:
 
+* `α`: Light Doppler effect, light arrival angle in the rest frame
 * `β`: Velocity relativistic speed ratio
 * `βe`: Escape velocity relativistic speed ratio
 * `βp`: Plane velocity relativistic speed ratio
@@ -6734,6 +7146,8 @@ The variables in the Relativity section are:
 * `γG1, γG2`: Lorentz factor associated to gravitational dilation at heights h1 and h2
 * `ω`: Angular velocity of a rotating planet during a day (dim.: angle/time, in SI: r/s)
 * `φ`: Latitude (dim.: angle)
+* `θ` : Aberration of light, emission angle in the frame at rest
+* `θp` : Aberration of light, emission angle in the moving frame
 * `ΔτWE`: Time difference between westward and eastward flights
 * `ΔτE`: Flight time in the eastward direction
 * `ΔτW`: Flight time in the westward direction
@@ -6754,6 +7168,7 @@ The variables in the Relativity section are:
 * `Bpy`: Transformed y component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `Bpz`: Transformed z component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `E`: Total energy
+* `Ep`: Transformed total energy
 * `E0`: Rest energy associated to the rest mass
 * `Ex`: X component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ey`: Y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
@@ -6761,6 +7176,8 @@ The variables in the Relativity section are:
 * `Epx`: Transformed x component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Epy`: Transformed y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Epz`: Transformed z component of the electric field (dim.: force/charge, in SI: N/C=V/m)
+* `f` = Light Doppler effect, frequency received in the frame at rest (dim.: 1/time, in SI: hertz, Hz)
+* `fp` = Light Doppler effect, frequency emitted in the moving frame (dim.: 1/time, in SI: hertz, Hz)
 * `fs`: Wave frequency of the source (dim.: 1/time, in SI: hertz, Hz)
 * `frl`: Relativistic longitudinal Doppler frequency (dim.: 1/time, in SI: hertz, Hz)
 * `frt`: Relativistic transverse Doppler frequency (dim.: 1/time, in SI: hertz, Hz)
@@ -6773,7 +7190,14 @@ The variables in the Relativity section are:
 * `Mxearth`: Mass factor as a multiple of Earth mass
 * `Mxsun`: Mass factor as a multiple of Sun mass
 * `MxSagA`: Mass factor as a multiple of SagitariusA* mass
+* `Pθ` = Light relativistic beaming, angular distribution of photon in the moving frame from a source isotropic and stationary
 * `p`: Momentum (dim.: mass·speed, in SI: kg·m/s)
+* `px`: X component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `pz`: Y component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `pz`: Z component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppx`: Transformed x component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppz`: Transformed y component of the momentum (dim.: mass·speed, in SI: kg·m/s)
+* `ppz`: Transformed z component of the momentum (dim.: mass·speed, in SI: kg·m/s)
 * `PBH`: Black hole evaporation power (dim.: energy/time, in SI: watt, W)
 * `R`: Planet radius
 * `R1, R2`: Radius to points 1 and 2
@@ -6805,27 +7229,27 @@ The variables in the Relativity section are:
 * `ve`: Escape velocity
 * `z`: Gravitational redshift parameter
 
-The relativistic transformations are parametrized by the real constant 'v' representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
+The relativistic transformations are parametrized by the real constant `v` representing a velocity confined to the x-direction. The respective inverse transformation is then parameterized by the negative of this velocity.
 
 #### Lorentz Transformation
 
-The primed reference frame ('xp', 'yp', 'zp') is travelling with velocity 'v' in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
+The primed reference frame `[xp yp zp]` is travelling with velocity `v` in the positive x direction. Therefore, the y and z coordinates of the rest frame remain unchanged.
 
 #### Time Dilation
 
-The dilation comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper time interval is multiplied by this factor.
+The dilation comes from the fact that the Lorentz factor `γ` is greater or equal to one and the proper time interval is multiplied by this factor.
 
 #### Space Contraction
 
-The contraction comes from the fact that the Lorentz factor 'γ' is greater or equal to one and the proper space interval is divided by this factor.
+The contraction comes from the fact that the Lorentz factor `γ` is greater or equal to one and the proper space interval is divided by this factor.
 
 #### Velocity Superposition
 
-These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with 'v = c' leads to 'upx = c', hence the impossibility to superpose velocities to go beyond the velocity limit 'c'. Since the velocity 'v' is confined to the x-direction, the y and z components of velocity remain unchanged.
+These expressions replace the usual Galilean addition of velocities. It can be checked that superposing with `v = c` leads to `upx = c`, hence the impossibility to superpose velocities to go beyond the velocity limit `c`. Since the velocity `v` is confined to the x-direction, the y and z components of velocity remain unchanged.
 
 #### Acceleration Superposition
 
-Even if the velocity 'v' is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
+Even if the velocity `v` is confined to the x-direction, all components of the observed acceleration are transformed in the moving frame.
 
 #### E & B Fields Transformation
 
@@ -6835,7 +7259,7 @@ Even if the velocity 'v' is confined to the x-direction, all components of the o
 
 #### Energy & Momentum
 
-The total relativistic energy 'E' and the norm of the momentum 'p' form the invariant 'mo·c^2' which remains the same in all frames. The kinetic energy 'K' is the difference between the total relativistic energy 'E' and the rest energy 'E0 = mo·c^2'.
+The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E0 = mo·c^2`.
 
 #### Gravitational Time Dilation
 
@@ -6843,11 +7267,11 @@ The total relativistic energy 'E' and the norm of the momentum 'p' form the inva
 
 #### Circumnavigating Airplanes
 
-It is assumed that the planes are circumnavigating at the same altitude 'h', same latitude 'φ' and the during same flight duration 'Δt' measured in the airplanes. The ground is rotating with the planet at the angular frequency 'ω'. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << 'c' (slow airplanes over a slow rotating planet).
+It is assumed that the planes are circumnavigating at the same altitude `h`, same latitude `φ` and the during same flight duration `Δt` measured in the airplanes. The ground is rotating with the planet at the angular frequency `ω`. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the velocities of the plane and the planet surface are << `c` (slow airplanes over a slow rotating planet).
 
 #### Clocks at different heights
 
-It is assumed that the two clocks are at rest with respect to the ground at a latitude 'φ' and are rotating with the planet at the angular frequency 'ω'. The clocks are at their respective heights 'h1' and 'h2' for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height 'h1' and 'h2' are << 'c' (slow rotating planet).
+It is assumed that the two clocks are at rest with respect to the ground at a latitude `φ` and are rotating with the planet at the angular frequency `ω`. The clocks are at their respective heights `h1` and `h2` for inxtance at the top and bottom of a mountain. For simplicity, the planet is assumed to have a spherical distribution. The Schwarzschild metric is taken into account. The calculation should formally invokes an integral for the elapsed proper time along a path and is approximated here to the first order in speed since the tangential velociies at height `h1` and `h2` are << `c` (slow rotating planet).
 
 #### B H Schwarzschild Geometry
 
@@ -6894,27 +7318,27 @@ The variables in the Modern Physics section are:
 
 #### Planck & Wien Comparison
 
-In this section, two comparisons are done between the Planck and Wien spectral distributions. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
-In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributions. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature 'T' determines the frequency ranges for integration between 'f1' and 'f2', or between 'f3' and 'f4'. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in 'Frfafb') to compute the corresponding enissive power and the heat transfer rate from the black-body.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
 
 #### Photoelectric Effect
 
-Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy 'E' of the incident photon is greather or equal to the work function 'φ' of the material. A simple energy budget equation determines the maximum kinetic energy 'Kmax' of the photoelectron.
+Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy `E` of the incident photon is greather or equal to the work function `φ` of the material. A simple energy budget equation determines the maximum kinetic energy `Kmax` of the photoelectron.
 
 #### Compton Effect
 
-In the Compton effect, both energy and momentum are conserved during the collision of the incident photon and the electron, which underlines the fact that the photon must henceforth be considered as a particle. When a high frequency 'f' (or energy 'E = hf') photon scatters due to an interaction with a charged particle, there is a decrease in the energy of the photon emitted at an angle 'θ' and thus, an increase in its wavelength 'λp'. The energy of the ejected electron 'Kmax' is relativist.
+In the Compton effect, both energy and momentum are conserved during the collision of the incident photon and the electron, which underlines the fact that the photon must henceforth be considered as a particle. When a high frequency `f` (or energy `E = hf`) photon scatters due to an interaction with a charged particle, there is a decrease in the energy of the photon emitted at an angle `θ` and thus, an increase in its wavelength `λp`. The energy of the ejected electron `Kmax` is relativist.
 
 #### De Broglie Wave
 
-At all scales where measurements have been possible, matter exhibits wave-like behavior (e.g. Young interference for protons, even for molecules). More precisely, a beam of neutron can be diffracted just like a beam of light or a water wave as it is the case in the Bragg diffraction. Here, the interference is constructive when the phase difference between the matter wave reflected off different atomic planes at an angle 'θ' is a multiple of 2π, giving the Following condition: '2·d·SINθ = n·λ' with 'n' integer and where 'θ' is mesured between the refected waves trajectory and the atomic plane.
+At all scales where measurements have been possible, matter exhibits wave-like behavior (e.g. Young interference for protons, even for molecules). More precisely, a beam of neutron can be diffracted just like a beam of light or a water wave as it is the case in the Bragg diffraction. Here, the interference is constructive when the phase difference between the matter wave reflected off different atomic planes at an angle `θ` is a multiple of 2π, giving the Following condition: `2·d·SINθ = n·λ` with `n` integer and where `θ` is mesured between the refected waves trajectory and the atomic plane.
 
 #### Bohr Atomic Model
 
@@ -6961,7 +7385,7 @@ The variables in the Nuclear Physics section are:
 * `ZX`: Proton number of the reactant nuclide X
 * `ZY`: Proton number of the product nuclide Y
 
-For all nuclear reactions, including nuclear decays, we have charge conservation 'Zp = Z' and mass number conservation 'Mp = M' (the same number of nucleons). This therefore requires assigning numbers A and Z to incident particles 'a' and 'b' whether they are for example gamma photons ('A = 0', Z = 0'), positrons ('A = 0', Z = -1') or others. The reaction energy 'Q' is always calculated with the mass-energy equivalence by the mass difference between the reactants and the products. Spontaneous decays are for instance always exothermic 'Q > 0' while some nuclear reactions can be endothermic 'Q < 0'.
+For all nuclear reactions, including nuclear decays, we have charge conservation `Zp = Z` and mass number conservation `Mp = M` (the same number of nucleons). This therefore requires assigning numbers A and Z to incident particles `a` and `b` whether they are for example gamma photons (`A = 0`, Z = 0`), positrons (`A = 0`, Z = -1`) or others. The reaction energy `Q` is always calculated with the mass-energy equivalence by the mass difference between the reactants and the products. Spontaneous decays are for instance always exothermic `Q > 0` while some nuclear reactions can be endothermic `Q < 0`.
 
 #### Radioactivity
 
@@ -7038,7 +7462,7 @@ Hitting the second shifted function in the [Vars menu](#VariablesMenu) will
 
 ## ToolsMenu
 
-The `ToolsMenu` maps to the _A_ key (_Σ+_ on the original DM42 keyboard).
+The `ToolsMenu` maps to the _A_ key (_Σ+_ on the original WASM keyboard).
 It invokes a context-dependent menu adapted to the top level of the stack.
 
 
@@ -9433,9 +9857,10 @@ any user-defined custom menu if it exists.
 ## CustomMenu
 
 The `CustomMenu` command activates a menu defined by the variable of the same
-name. The content of the variable should be an array or list, where each item is
-either an array or list of the form `{ Name Value }`, or an object that is made
-directly accessible in the menu.
+name. The content of the variable should evaluate as an array or list, where
+each item is either an array or list of the form `{ Name Value }`, or an object
+that is made directly accessible in the menu. See `Menu` below for a description
+of the format of menu descriptions.
 
 The `Menu` command defines the `CustomMenu` variable and shows the corresponding
 custom menu.
@@ -9445,13 +9870,16 @@ custom menu.
 
 This command shows up a system menu or defines a custom menu.
 
-If the object on the stack is a menu name, typically returned by [RecallMenu](#recallmenu), then `Menu` will activate that menu.
+If the object on the stack is a menu name, typically returned by `RecallMenu`,
+then `Menu` will activate that menu.
 
 If the object on the stack is `0`, then `Menu` has the same effect as
 `LastMenu`, showing the last menu selected. Other numerical values, which select
 built-in menus on HP's implementation, will cause an `Unimplemented` error.
 
-If the object on the stack is an array or a list, `Menu` will use that array or list to set the value of the `CutomMenu` variable, and then behave like the `CustomMenu` command, i.e. show the menu defined by the list.
+If the object on the stack is an array or a list, `Menu` will use that array or
+list to set the value of the `CutomMenu` variable, and then behave like the
+`CustomMenu` command, i.e. show the menu defined by the list.
 
 The following defines a `CustomMenu` adding or subtracting powers of `10`
 
@@ -9462,6 +9890,16 @@ The following defines a `CustomMenu` adding or subtracting powers of `10`
 MENU
 ```
 
+You can define a menu of vertically-stacked menu items using a matrix.
+For example, you can define a menu that lets you store, evaluate or purge
+variables `X` and `Y as follows:
+
+```rpl
+[ [ X                      Y                      ]
+  [ { ">X" « 'X' Store » } { ">Y" « 'Y' Store » } ]
+  [ { "-X" « 'X' Purge » } { "-Y" « 'Y' Purge » } ] ]
+MENU
+```
 
 ## TMenu
 
@@ -10106,12 +10544,12 @@ Select the comma as a decimal separator, e.g.  `1,23`
 ## Precision
 
 Set the default computation precision, given as a number of decimal digits. For
-example, `7 Precision` will ensure at least 7 decimal digits for compuation, and
-`1.0 3 /` will compute `0.3333333` in that case.
+example, `7 Precision` will ensure at least 7 decimal digits for computation,
+and `1.0 3 /` will compute `0.3333333` in that case.
 
-DB48X supports an arbitrary precision for decimal numbers, limited only by
-memory and the size of built-in constants needed for the computation of
-transcendental functions.
+DB48X supports an arbitrary precision for [decimal numbers](#decimal-numbers),
+limited only by memory, performance and the size of built-in constants needed
+for the computation of transcendental functions.
 
 ## SolverImprecision
 
@@ -10585,7 +11023,6 @@ THEN
 ELSE
  "HP50G"
 END
-
 ```
 
 
@@ -11424,6 +11861,15 @@ time by executing [GarbageCollect](#GarbageCollect).
 
 See also: [FreeMemory](#FreeMemory), [Purge](#Purge)
 
+## GarbageCollectorStatistics
+
+Return an array containing garbage collector statistics, including:
+
+* The number of garbage collection cycles
+* The total number of bytes collected
+* The total time spent collecting garbage
+* The number of bytes collected during the last collection cycle
+* The time spent during the last collection cycle
 
 ## Bytes
 

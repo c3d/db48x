@@ -1,5 +1,185 @@
 # Release notes
 
+## Release 0.8.4 "Commands" - Optimizations and equation fixups
+
+This release focuses on improving the solver support for the equation
+library, fixing various bugs found during development of that equation
+library, and optimizing the garbage collector.
+
+### Features
+
+* ui: The keyboard layout is now configured by a a `config/[keymap].48k`
+  file that describes which commands are assigned to which key by
+  default. A new setup entry, `Load keymap`, lets you change the
+  keyboard layout.
+
+* ui: Add four predefined keyboard layouts:
+
+  * `db48x.48k` is a key layout that is more logical and effective for DB48x
+    [See thread](https://www.hpmuseum.org/forum/thread-20157-post-193647.html#pid193647)
+  * `legacy.48k` is the layout used for earlier releases, which
+    swaps the `exp` and `log10` keys relative to the DM42 in `42style.48k`.
+  * `42style.48k` keeps key layout as close as possible to the DM42
+  * `true42.48k` is identical to `42style.48k`, but the simulator shows an image
+    of the DM42 keyboard.
+
+* Add various commands such as `Edit` to directly perform editing
+  operations in a programmatic way.
+
+* units: Implement non-proportional unit conversions, notably
+  temperature conversions like `°F` to `°C`. The underlying engine
+  allows arbitrary conversions, including non-linear ones, which would
+  be useful for example for the Dalton temperature scale. However,
+  that capability is not presently used.
+
+* units: Convert temperatures to `K` in multiplication and
+  division. For example, when computing `ⒸR*T`, we need the
+  temperature `T` to be in `K` even if given in Celsius or Farenheit
+  initially.
+
+* solver: Report underlying evaluation error. For example, if the
+  expression being evaluated reports `Inconsistent units`, this is
+  what the solver will return instead of `No solution?`.
+
+* ui: Add configurable interval for busy cursor drawing,
+  `BusyIndicatorRefresh`.  The default is now 50ms, which refreshes
+  the busy cursor more frequently than before, and may be detrimental
+  to battery life and performance. You can restore the previous
+  behaviour by setting a higher value, e.g. 1000ms.
+
+* performance: Automatic cleanup of temporaries to minimize the number
+  of garbage collection occurences. When a complex operation such as
+  `exp` is performed, there are a number of intermediate results that
+  require storage, and were previously only cleaned up by the garbage
+  collector. They are now automatically cleaned up before the function
+  returns. The same optimization applies to intermediate graphics
+  while rendering equations, notably on the stack. This delivers
+  [significant performance improvements](#garbage-collector-performance)
+  for long-running operations:
+  the "[floating-point sum test](https://www.hpmuseum.org/forum/thread-9750.html)
+  is now about 20% faster on SwissMicros calculators.
+
+* commands: Add `GCStats` command to show garbage collector statistics.
+
+* Allow `CustomMenu` to contain the name of a menu, or a program that
+  builds the menu dynamically. An example is shown in the `RPL`
+  directory of the Demo file.
+
+* Allow `CustomMenu` to define "vertical" menus, i.e. menus where the
+  items are stacked on top of one another.
+
+### Bug fixes
+
+* Fix functions taking real-like unit input. For example,
+  `atan(1_cm/1_m)` now computes correctly.
+
+* solver: Do not solve system of equations using existing values. The
+  multiple equation solver would incorrectly consider existing values
+  in variables to check if an equation could be used for solving. The
+  heuristic now picks up the equation that requires the smallest
+  number of unknown variables among the available equations.
+
+* Parse `x!` as factorial of `x` and not as a `x!` symbol. The
+  incorrect parsing was due to an ambiguity in the HP48 parser that
+  was resolved in the HP50G. DB48X now behaves like the HP50G and does
+  not allow `!` to appear at the end of a name.
+
+* Do not enter the debugger if `DebugOnError` is set while evaluating
+  an `iferr` statement. The assumption is that if you try to catch an
+  error, you do not intend to debug the code being tested for an
+  error. If this is not the desired behaviour, then an explicit
+  `DebugOnError` should be inserted in the body of `iferr`.
+
+* Various unit-related fixes in the equation library.
+
+* Ensure that we don't execute auto-completed catalog commands
+  twice. The recent change that added the auto-completed command to
+  the command-line history also caused the command to be executed on
+  the command-line before being evaluated again from the key.
+
+* Avoid a rare crash when an equation was too big to be rendered
+  graphically and a garbage collection cycle occured between graphic
+  rendering and text rendering.
+
+* Do not emit error message from `Vec→` for vectors containing
+  units. The incorrect error was introduced by the logic detecting
+  polar, cylindrical or spherical vectors.
+
+* Fixed `atan2` special cases to always generate the correct
+  angle. Cases where `atan2` would generate an exact result would
+  usually result in the wrong angle unit scaling being applied.
+
+* Fixed parsing of `tan⁻¹` in expressions.
+
+* units: Skip the `=Cycle` section for unit definitions. This was
+  causing incorrect unit conversion errors for users who had added
+  common units in the `=Cycle` section of their `config/units.csv`
+  file.
+
+* The user-defined units menu no longer list all the built-in units
+  after the user-defined ones.
+
+* Add a missing `sqrt` in the `RelativisticKineticEnergy` sample code,
+  and do not compute the kinetic energies for negative values.
+
+* Alias `keys` is for `KeyMap`, not `Header`. Fix typo in identifiers
+  table.
+
+* Avoid a crash in `RandomMatrix` when hardware floating-point is
+  enabled, due to an incorrect conversion to integer. As a side
+  effect, fixed a couple of minor issues in the conversion to integer
+  values from decimal or binary floating-point values.
+
+* Fix bogus `Bad argument type` message for `V→` when the number of
+  elements was not 2 or 3.
+
+* Fix crash when dividing a matrix by a non-invertible matrix.
+
+* Fix crash displaying non-normal hardware floating-point values.
+
+* Fix crash in vector operations that cause errors, e.g. `[1][0] /`.
+
+* Parse `ubase` algebraic expressions, e.g. `ubase(1_km)`, as well
+  as other function-like commands such as `size`.
+
+* Accept numerical values in `ubase` and leave them as is.
+
+* Adjust the "next step" computation in the solver to minimize the
+  complexity of conversions and remove unit ambiguity for temperatures.
+
+* Rewrite the Heat Transfer equations to clarify temperature unit used
+  in the computation. Specifically, avoid having a `ΔT` in a
+  multiplication, where the value would be incorrectly converted to
+  `K`.
+
+* Fix a problem when a garbage collection while parsing a fraction
+  could cause a large fraction of the subsequent program to be
+  skipped. This normally led to anomalous `Inconsistent units`
+  messages when this caused a unit such as `254/10_mm` for `in` to be
+  incorrectly parsed as `254/10`.
+
+
+### Enhancements
+
+* Major update to the documentation of the equation library,
+  contributed by Jean Wilson.
+* equations: Replace `°F` with `°C` in equations
+* tests: Add support for tests that are known to fail
+* tests: Run equation tests with `11 DIG`
+* tests: Add ability to take screen snapshots on failure
+* units: Put temperatures before pressure in `Fluids` section
+* help: Add image for B Field From Finite Wire
+* Makefile: When using `make update`, do not keep the temporary `.png`
+* Indicate where to get `tac` in the build documentation
+* Fix README link to browser version
+* Disable `DebugOnError` by default, since it confused new users
+* Enhance the test suite so that it looks up the keys to use.
+  This makes the test suite more readable, e.g. we have `ID_exp` in
+  the test instead of `D` (the `D` key being where `exp` was on the
+  original layout), and it makes the test suite layout-independent,
+  paving the way for reuse on other hardware (e.g. HP50G).
+
+
 ## Release 0.8.3 "Blindness" - User mode and custom header
 
 This release focuses on various user interface aspects.

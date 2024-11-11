@@ -84,6 +84,13 @@ runtime::runtime(byte *mem, size_t size)
       CallStack(),
       Returns(),
       HighMem(),
+      GCCycles(),
+      GCPurged(),
+      GCDuration(),
+      GCLPurged(),
+      GCLDuration(),
+      GCCleared(),
+      GCUnclear(),
       SaveArgs(false)
 {
     if (mem)
@@ -312,6 +319,7 @@ size_t runtime::gc()
 //   Objects in the global area are copied there, so they need no recycling
 //   This algorithm is linear in number of objects and moves only live data
 {
+    uint     now      = sys_current_ms();
     size_t   recycled = 0;
     object_p first    = (object_p) Globals;
     object_p last     = Temporaries;
@@ -371,12 +379,18 @@ size_t runtime::gc()
                 ||  (ErrorSave     >= start && ErrorSave     < end)
                 ||  (ErrorSource   >= start && ErrorSource   < end)
                 ||  (ErrorCommand  >= obj   && ErrorCommand  < next)
-                ||  (ui.command    >= start && ui.command    < end);
+                ||  (ui.command    >= start && ui.command    < end)
+                ||  (ui.keymap     >= obj   && ui.keymap     < next);
             if (!found)
             {
                 utf8 *label = (utf8 *) &ui.menu_label[0][0];
                 for (uint l = 0; !found && l < ui.NUM_MENUS; l++)
                     found = label[l] >= start && label[l] < end;
+
+                object_p *functions = &ui.function[0][0];
+                const uint max = sizeof(ui.function)/sizeof(ui.function[0][0]);
+                for (uint k = 0; !found && k < max; k++)
+                    found = functions[k] >= obj && functions[k] < next;
             }
         }
 
@@ -425,6 +439,15 @@ size_t runtime::gc()
            recycled, available());
 
     ui.draw_busy();
+
+    // Update statistics
+    uint duration = sys_current_ms() - now;
+    GCCycles += 1;
+    GCLPurged = recycled;
+    GCLDuration = duration;
+    GCPurged += recycled;
+    GCDuration += duration;
+
     return recycled;
 }
 
@@ -504,6 +527,10 @@ void runtime::move(object_p to, object_p from,
     for (uint l = 0; l < ui.NUM_MENUS; l++)
         if (label[l] >= start && label[l] < end)
             label[l] += delta;
+
+    // Adjust keymap
+    if (ui.keymap >= from && ui.keymap < last)
+        ui.keymap = list_p(object_p(ui.keymap) + delta);
 
     // Adjust functions
     object_p *functions = &ui.function[0][0];
@@ -763,7 +790,7 @@ byte *runtime::append(object_p obj)
 //   Append an object at end of scratch pad
 // ----------------------------------------------------------------------------
 {
-    return append(obj, obj->size());
+    return obj ? append(obj, obj->size()) : nullptr;
 }
 
 
@@ -1845,4 +1872,45 @@ error_save::~error_save()
 // ----------------------------------------------------------------------------
 {
     rt.error(errmsg).source(source, srclen).command(+command);
+}
+
+
+
+// ============================================================================
+//
+//    Class that automatically cleans up temporaries
+//
+// ============================================================================
+
+cleaner::cleaner()
+// ----------------------------------------------------------------------------
+//    Save the current temporaries and the latest number of GC Cycles
+// ----------------------------------------------------------------------------
+    : temporaries(rt.Temporaries), gccycles(rt.GCCycles + rt.GCUnclear)
+{}
+
+
+RECORDER(cleaner, 32, "Runtime temporary object cleaner");
+
+object_p cleaner::adjust(object_p temp)
+// ----------------------------------------------------------------------------
+//   Check if we can cleanup temporaries
+// ----------------------------------------------------------------------------
+{
+    if (temp && temp > temporaries &&
+        gccycles == rt.GCCycles + rt.GCUnclear &&
+        Settings.AutomaticTemporariesCleanup() &&
+        !rt.Editing && !rt.Scratch)
+    {
+        size_t sz = temp->size();
+        record(cleaner,
+               "Cleaning %u for %u bytes from %p to %p, T from %p to %p",
+               temp - temporaries, sz, temp, temporaries,
+               rt.Temporaries, temporaries + sz);
+        rt.GCCleared += temp - temporaries;
+        memmove((void *) temporaries, temp, sz);
+        temp = temporaries;
+        rt.Temporaries = temp + sz;
+    }
+    return temp;
 }
