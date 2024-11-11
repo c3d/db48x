@@ -613,6 +613,26 @@ enum FileSelectorState
 }
 
 
+- (void)loadKeymap:(cstring)keymapfile
+// ----------------------------------------------------------------------------
+//   Change the picture for the keymap
+// ----------------------------------------------------------------------------
+{
+    NSString *filename = [NSString stringWithUTF8String:keymapfile];
+    NSURL *resource = [NSURL fileURLWithPath:filename];
+    NSString *pngFilename = [resource.lastPathComponent stringByReplacingOccurrencesOfString:@".48k" withString:@".png"];
+    NSString *bundle = [[NSBundle mainBundle] resourcePath];
+    NSString *imageFilePath = [bundle stringByAppendingPathComponent:pngFilename];
+    UIImage *image = [UIImage imageWithContentsOfFile:imageFilePath];
+    KeyboardView *kv = keyboardView;
+    if (image)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            kv.image = image;
+        });
+    }
+}
+
 @end
 
 
@@ -776,4 +796,14 @@ void ui_stop_buzzer()
 {
     if (theViewController)
         [theViewController stopBuzzer];
+}
+
+
+void ui_load_keymap(cstring map)
+// ----------------------------------------------------------------------------
+//   Load a new key layout when changing the underlying keymap
+// ----------------------------------------------------------------------------
+{
+    if (theViewController)
+        [theViewController loadKeymap:map];
 }

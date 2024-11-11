@@ -28,7 +28,6 @@
 /*.tgz
 /db50x.pg5
 /db48x.pgm
-/src/dmcp/version.h
 /tools/decimize/.build/
 /tools/decimize/.logs/
 /tools/decimize/decimize

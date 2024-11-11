@@ -738,6 +738,76 @@
 		6F0FDDE02C7934E500C8357F /* TorsionalPendulum.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3B12C63E4FA00C8357F /* TorsionalPendulum.bmp */; };
 		6F0FDDE12C7934E500C8357F /* Triangle.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3C92C63E4FB00C8357F /* Triangle.bmp */; };
 		6F0FDDE22C7934E500C8357F /* VoltageDivider.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3892C63E4F700C8357F /* VoltageDivider.bmp */; };
+		6F10E0722CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0732CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0742CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0752CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0762CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0772CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0782CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0792CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E07A2CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E07B2CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E07C2CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E07D2CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E07E2CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E07F2CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0802CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0812CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0822CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0832CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0842CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0852CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0862CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0872CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0882CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0892CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E08A2CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E08B2CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E08C2CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E08D2CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E08E2CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E08F2CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0902CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0912CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0922CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0932CE24B0E00C8357F /* legacy.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0942CE24B0E00C8357F /* true42.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0952CE24B1A00C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0962CE24B1A00C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0972CE24B1A00C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0982CE24B1A00C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0992CE24B1A00C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E09A2CE24B2F00C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E09B2CE24B2F00C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E09C2CE24B2F00C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E09D2CE24B2F00C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E09E2CE24B2F00C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E09F2CE24B4300C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0A02CE24B4300C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0A12CE24B4300C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0A22CE24B4300C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0A32CE24B4300C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0A42CE24B6100C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0A52CE24B6100C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0A62CE24B6100C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0A72CE24B6100C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0A82CE24B6100C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0A92CE24B6D00C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0AA2CE24B6D00C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0AB2CE24B6D00C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0AC2CE24B6D00C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0AD2CE24B6D00C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0AE2CE24B7800C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0AF2CE24B7800C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0B02CE24B7800C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0B12CE24B7800C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0B22CE24B7800C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F10E0B32CE24B8600C8357F /* 42style.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
+		6F10E0B42CE24B8600C8357F /* db48x.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
+		6F10E0B52CE24B8600C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
+		6F10E0B62CE24B8600C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
+		6F10E0B72CE24B8600C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
 		6F18F27F2C2DAC3400C8357F /* polynomial.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F18F27D2C2DAC3400C8357F /* polynomial.cc */; };
 		6F2AC36D2C63640C00C8357F /* shifts.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35B2C63640C00C8357F /* shifts.bmp */; };
 		6F2AC36E2C63640C00C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
@@ -1402,6 +1472,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E0A42CE24B6100C8357F /* 42style.48k in CopyFiles */,
+				6F10E0A52CE24B6100C8357F /* db48x.48k in CopyFiles */,
+				6F10E0A62CE24B6100C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0A72CE24B6100C8357F /* legacy.48k in CopyFiles */,
+				6F10E0A82CE24B6100C8357F /* true42.48k in CopyFiles */,
 				6F0FDBF92C7934DF00C8357F /* equations.csv in CopyFiles */,
 				6F0FDBFA2C7934DF00C8357F /* library.csv in CopyFiles */,
 				6F0FDBFB2C7934DF00C8357F /* characters.csv in CopyFiles */,
@@ -1536,6 +1611,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E0A92CE24B6D00C8357F /* 42style.48k in CopyFiles */,
+				6F10E0AA2CE24B6D00C8357F /* db48x.48k in CopyFiles */,
+				6F10E0AB2CE24B6D00C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0AC2CE24B6D00C8357F /* legacy.48k in CopyFiles */,
+				6F10E0AD2CE24B6D00C8357F /* true42.48k in CopyFiles */,
 				6F0FDCC52C7934E300C8357F /* equations.csv in CopyFiles */,
 				6F0FDCC62C7934E300C8357F /* library.csv in CopyFiles */,
 				6F0FDCC72C7934E300C8357F /* characters.csv in CopyFiles */,
@@ -1670,6 +1750,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E0AE2CE24B7800C8357F /* 42style.48k in CopyFiles */,
+				6F10E0AF2CE24B7800C8357F /* db48x.48k in CopyFiles */,
+				6F10E0B02CE24B7800C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0B12CE24B7800C8357F /* legacy.48k in CopyFiles */,
+				6F10E0B22CE24B7800C8357F /* true42.48k in CopyFiles */,
 				6F0FDD862C7934E500C8357F /* equations.csv in CopyFiles */,
 				6F0FDD872C7934E500C8357F /* library.csv in CopyFiles */,
 				6F0FDD882C7934E500C8357F /* characters.csv in CopyFiles */,
@@ -1901,6 +1986,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E09F2CE24B4300C8357F /* 42style.48k in CopyFiles */,
+				6F10E0A02CE24B4300C8357F /* db48x.48k in CopyFiles */,
+				6F10E0A12CE24B4300C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0A22CE24B4300C8357F /* legacy.48k in CopyFiles */,
+				6F10E0A32CE24B4300C8357F /* true42.48k in CopyFiles */,
 				6F2AC4912C64105F00C8357F /* equations.csv in CopyFiles */,
 				6F2AC4922C64105F00C8357F /* library.csv in CopyFiles */,
 				6F2AC4932C64105F00C8357F /* characters.csv in CopyFiles */,
@@ -2035,6 +2125,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E0952CE24B1A00C8357F /* 42style.48k in CopyFiles */,
+				6F10E0962CE24B1A00C8357F /* db48x.48k in CopyFiles */,
+				6F10E0972CE24B1A00C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0982CE24B1A00C8357F /* legacy.48k in CopyFiles */,
+				6F10E0992CE24B1A00C8357F /* true42.48k in CopyFiles */,
 				6F2AC56B2C6410F700C8357F /* equations.csv in CopyFiles */,
 				6F2AC56C2C6410F700C8357F /* library.csv in CopyFiles */,
 				6F2AC56D2C6410F700C8357F /* characters.csv in CopyFiles */,
@@ -2224,6 +2319,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E0B32CE24B8600C8357F /* 42style.48k in CopyFiles */,
+				6F10E0B42CE24B8600C8357F /* db48x.48k in CopyFiles */,
+				6F10E0B52CE24B8600C8357F /* keymap.cfg in CopyFiles */,
+				6F10E0B62CE24B8600C8357F /* legacy.48k in CopyFiles */,
+				6F10E0B72CE24B8600C8357F /* true42.48k in CopyFiles */,
 				6FE399DC2C793FE300C8357F /* equations.csv in CopyFiles */,
 				6FE399DD2C793FE300C8357F /* library.csv in CopyFiles */,
 				6FE399DE2C793FE300C8357F /* characters.csv in CopyFiles */,
@@ -2358,6 +2458,11 @@
 			dstPath = config;
 			dstSubfolderSpec = 7;
 			files = (
+				6F10E09A2CE24B2F00C8357F /* 42style.48k in CopyFiles */,
+				6F10E09B2CE24B2F00C8357F /* db48x.48k in CopyFiles */,
+				6F10E09C2CE24B2F00C8357F /* keymap.cfg in CopyFiles */,
+				6F10E09D2CE24B2F00C8357F /* legacy.48k in CopyFiles */,
+				6F10E09E2CE24B2F00C8357F /* true42.48k in CopyFiles */,
 				6F4528DE2B9C6DEF00C8357F /* equations.csv in CopyFiles */,
 				6F4528DF2B9C6DEF00C8357F /* library.csv in CopyFiles */,
 				6FD555872B995FB800C8357F /* characters.csv in CopyFiles */,
@@ -2398,6 +2503,11 @@
 		6F0FDC592C7934DF00C8357F /* DB40X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB40X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0FDD1A2C7934E300C8357F /* DB48X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB48X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0FDDE62C7934E500C8357F /* DB50X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB50X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F10E06D2CE24B0E00C8357F /* 42style.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = 42style.48k; sourceTree = "<group>"; };
+		6F10E06E2CE24B0E00C8357F /* db48x.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = db48x.48k; sourceTree = "<group>"; };
+		6F10E06F2CE24B0E00C8357F /* keymap.cfg */ = {isa = PBXFileReference; lastKnownFileType = text; path = keymap.cfg; sourceTree = "<group>"; };
+		6F10E0702CE24B0E00C8357F /* legacy.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = legacy.48k; sourceTree = "<group>"; };
+		6F10E0712CE24B0E00C8357F /* true42.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = true42.48k; sourceTree = "<group>"; };
 		6F18F27D2C2DAC3400C8357F /* polynomial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polynomial.cc; path = ../../../src/polynomial.cc; sourceTree = "<group>"; };
 		6F18F27E2C2DAC3400C8357F /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../../src/polynomial.h; sourceTree = "<group>"; };
 		6F2AC35B2C63640C00C8357F /* shifts.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = shifts.bmp; sourceTree = "<group>"; };
@@ -3003,6 +3113,7 @@
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6F10E0BC2CE24D9400C8357F /* keymaps */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = keymaps; sourceTree = "<group>"; };
 		6F87878D2CA9E25500C8357F /* library */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6F8788132CA9E2BA00C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F8788282CA9E2F600C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788962CA9E5EC00C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F87883D2CA9E33000C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788972CA9E60200C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F8788522CA9E34C00C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788922CA9E45C00C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F8788672CA9E36500C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788932CA9E46400C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F87887C2CA9E38800C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788942CA9E46C00C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 6F8788912CA9E39E00C8357F /* PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet */, 6F8788952CA9E47400C8357F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); name = library; path = "/Users/ddd/Work/calc/db48x-ios/library"; sourceTree = "<absolute>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -3334,6 +3445,7 @@
 		6FCEDA532B95E5AB00C8357F /* Pictures */ = {
 			isa = PBXGroup;
 			children = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F4519A92BBC80A600C8357F /* DB48X startup screen.png */,
 				6FCEDA552B95E60700C8357F /* keyboard-db48x.png */,
 				6FCEDA542B95E60700C8357F /* keyboard-dm42.png */,
@@ -3356,6 +3468,11 @@
 		6FE7750B2B97966E00C8357F /* config */ = {
 			isa = PBXGroup;
 			children = (
+				6F10E06D2CE24B0E00C8357F /* 42style.48k */,
+				6F10E06E2CE24B0E00C8357F /* db48x.48k */,
+				6F10E06F2CE24B0E00C8357F /* keymap.cfg */,
+				6F10E0702CE24B0E00C8357F /* legacy.48k */,
+				6F10E0712CE24B0E00C8357F /* true42.48k */,
 				6F4528DA2B9C6DD800C8357F /* equations.csv */,
 				6F4528DB2B9C6DD800C8357F /* library.csv */,
 				6FD555852B995FA500C8357F /* characters.csv */,
@@ -3563,6 +3680,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = DB48X;
@@ -3624,6 +3742,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = "DB40X release";
@@ -3649,6 +3768,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = "DB48X release";
@@ -3674,6 +3794,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = "DB50X release";
@@ -3699,6 +3820,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = DB50X;
@@ -3724,6 +3846,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = DB40X;
@@ -3748,6 +3871,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6F10E0BC2CE24D9400C8357F /* keymaps */,
 				6F87878D2CA9E25500C8357F /* library */,
 			);
 			name = "DB50X release small";
@@ -3816,6 +3940,11 @@
 				1F9D29761C72B9BB000025E6 /* Assets.xcassets in Resources */,
 				6FCEDA572B95E60700C8357F /* keyboard-db48x.png in Resources */,
 				6F66AC942CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F10E0902CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E0912CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E0922CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E0932CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E0942CE24B0E00C8357F /* true42.48k in Resources */,
 				6F66AC952CBEA40E00C8357F /* db50x.idx in Resources */,
 				1F9D29741C72B9BB000025E6 /* Main.storyboard in Resources */,
 				6F66AC5E2CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
@@ -3870,6 +3999,11 @@
 				6F66AC5C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
 				6F66AC5D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDBF12C7934DF00C8357F /* decimal-e.txt in Resources */,
+				6F10E0812CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E0822CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E0832CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E0842CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E0852CE24B0E00C8357F /* true42.48k in Resources */,
 				6F0FDBF22C7934DF00C8357F /* units.csv in Resources */,
 				6F0FDBF32C7934DF00C8357F /* Assets.xcassets in Resources */,
 			);
@@ -3905,6 +4039,11 @@
 				6F66AC6C2CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
 				6F66AC6D2CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDCBD2C7934E300C8357F /* decimal-e.txt in Resources */,
+				6F10E0772CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E0782CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E0792CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E07A2CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E07B2CE24B0E00C8357F /* true42.48k in Resources */,
 				6F0FDCBE2C7934E300C8357F /* units.csv in Resources */,
 				6F0FDCBF2C7934E300C8357F /* stm32_program.ld in Resources */,
 			);
@@ -3940,6 +4079,11 @@
 				6F66AC682CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
 				6F66AC692CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6F0FDD7E2C7934E500C8357F /* units.csv in Resources */,
+				6F10E0722CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E0732CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E0742CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E0752CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E0762CE24B0E00C8357F /* true42.48k in Resources */,
 				6F0FDD7F2C7934E500C8357F /* stm32_program.ld in Resources */,
 				6F0FDD802C7934E500C8357F /* Assets.xcassets in Resources */,
 			);
@@ -3955,6 +4099,11 @@
 				6F70326A2C72A79E00C8357F /* LaunchScreen.storyboard in Resources */,
 				6F2AC4802C64105F00C8357F /* Main.storyboard in Resources */,
 				6F66AC8C2CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F10E0862CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E0872CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E0882CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E0892CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E08A2CE24B0E00C8357F /* true42.48k in Resources */,
 				6F66AC8D2CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F2AC4892C64105F00C8357F /* DB48X startup screen.png in Resources */,
 				6F66AC622CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
@@ -3975,6 +4124,11 @@
 				6F2AC5562C6410F700C8357F /* keyboard-db48x.png in Resources */,
 				6F2AC55A2C6410F700C8357F /* Main.storyboard in Resources */,
 				6F66AC922CBEA40E00C8357F /* db48x.idx in Resources */,
+				6F10E07C2CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E07D2CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E07E2CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E07F2CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E0802CE24B0E00C8357F /* true42.48k in Resources */,
 				6F66AC932CBEA40E00C8357F /* db50x.idx in Resources */,
 				6F2AC5632C6410F700C8357F /* DB48X startup screen.png in Resources */,
 				6F66AC522CBEA01E00C8357F /* Planck&Wien_Distributions.bmp in Resources */,
@@ -4015,6 +4169,11 @@
 				6F66AC582CBEA01E00C8357F /* B Field In Finite Solenoid.bmp in Resources */,
 				6F66AC592CBEA01E00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Resources */,
 				6FE399D42C793FE300C8357F /* units.csv in Resources */,
+				6F10E08B2CE24B0E00C8357F /* keymap.cfg in Resources */,
+				6F10E08C2CE24B0E00C8357F /* 42style.48k in Resources */,
+				6F10E08D2CE24B0E00C8357F /* db48x.48k in Resources */,
+				6F10E08E2CE24B0E00C8357F /* legacy.48k in Resources */,
+				6F10E08F2CE24B0E00C8357F /* true42.48k in Resources */,
 				6FE399D52C793FE300C8357F /* stm32_program.ld in Resources */,
 				6FE399D62C793FE300C8357F /* Assets.xcassets in Resources */,
 			);
@@ -4782,7 +4941,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4877,7 +5036,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4906,7 +5065,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -4936,7 +5095,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4964,7 +5123,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -4996,7 +5155,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5026,7 +5185,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5058,7 +5217,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5087,7 +5246,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5118,7 +5277,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5147,7 +5306,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5179,7 +5338,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5208,7 +5367,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.8.3;
+				MARKETING_VERSION = 0.8.4;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";

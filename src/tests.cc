@@ -11146,7 +11146,7 @@ tests &tests::passfail(int ok)
 //   Print a pass/fail message
 // ----------------------------------------------------------------------------
 {
-#idef USE_IOS
+#ifdef USE_IOS
 #define ESCAPE(x)
 #else
 #define ESCAPE(x)       x
