@@ -1316,4 +1316,11 @@ int ui_wrap_io(file_sel_fn callback, const char *path, void *data, bool)
     return callback(path, name, data);
 }
 
+void ui_load_keymap(cstring name)
+// ----------------------------------------------------------------------------
+//   Change the visible keyboard layout
+// ----------------------------------------------------------------------------
+{
+}
+
 #endif // WASM
