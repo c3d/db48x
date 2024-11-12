@@ -1,1 +1,1 @@
-#define DB48X_VERSION "i0.8.4"
+#define DB48X_VERSION "i0.8.5"
