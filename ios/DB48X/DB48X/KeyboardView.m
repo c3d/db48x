@@ -46,6 +46,24 @@
     bool downArrowHeld;
 }
 
+- (int)keyAt:(CGPoint)pos
+// ----------------------------------------------------------------------------
+//   Find key under given point
+// ----------------------------------------------------------------------------
+{
+    CGFloat relx = pos.x / self.frame.size.width;
+    CGFloat rely = pos.y / self.frame.size.height;
+    const CGFloat dx = 0.03;
+    const CGFloat dy = 0.03;
+    for (struct tapmap *ptr = tapMap; ptr->key; ptr++)
+        if ((relx >= ptr->left - dx) && (relx <= ptr->right + dx) &&
+            (rely >= ptr->top - dy) && (rely <= ptr->bot + dy))
+            return ptr->keynum;
+    
+    return -1;
+}
+
+
 - (void)touchesBegan:(NSSet<UITouch*> *)touches withEvent:(UIEvent *)event
 // ----------------------------------------------------------------------------
 //   A touch happens on the virtual keyboard
@@ -54,44 +72,55 @@
     for (UITouch *touch in touches)
     {
         CGPoint pos = [touch locationInView:self];
-        CGFloat relx = pos.x / self.frame.size.width;
-        CGFloat rely = pos.y / self.frame.size.height;
-
-        for (struct tapmap *ptr = tapMap; ptr->key; ptr++)
+        int key = [self keyAt:pos];
+        if (key != lastKey)
         {
-            const CGFloat dx = 0.03;
-            const CGFloat dy = 0.03;
-            if ((relx >= ptr->left - dx) && (relx <= ptr->right + dx) &&
-                (rely >= ptr->top - dy) && (rely <= ptr->bot + dy))
+            if (theAppSettings.hapticFeedback)
             {
-                int key = ptr->keynum;
-                if (key != lastKey)
-                {
-                    if (theAppSettings.hapticFeedback)
-                    {
-                        feedback = [[UISelectionFeedbackGenerator alloc] init];
-
-                        // Prepare the generator when the gesture begins.
-                        [feedback selectionChanged];
-                    }
-
-                    if (key == KEY_UP)
-                        upArrowHeld = true;
-                    else if (key == KEY_DOWN)
-                        downArrowHeld = true;
-                    else if (upArrowHeld)
-                        key_push(KEY_UP);
-                    else if (downArrowHeld)
-                        key_push(KEY_DOWN);
-                    else
-                        key_push(0);
-                    shift_held = upArrowHeld;
-                    alt_held = downArrowHeld;
-                    key_push(key);
-                    lastKey = key;
-                }
+                feedback = [[UISelectionFeedbackGenerator alloc] init];
+                
+                // Prepare the generator when the gesture begins.
+                [feedback selectionChanged];
             }
+            
+            if (key == KEY_UP)
+                upArrowHeld = true;
+            else if (key == KEY_DOWN)
+                downArrowHeld = true;
+            else if (upArrowHeld)
+                key_push(KEY_UP);
+            else if (downArrowHeld)
+                key_push(KEY_DOWN);
+            else
+                key_push(0);
+            shift_held = upArrowHeld;
+            alt_held = downArrowHeld;
+            key_push(key);
+            lastKey = key;
         }
+    }
+}
+
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+// ----------------------------------------------------------------------------
+//   A touch moved on the virtual keyboard
+// ----------------------------------------------------------------------------
+{
+    for (UITouch *touch in touches)
+    {
+        CGPoint posIn = [touch locationInView:self];
+        CGPoint posOut = [touch previousLocationInView:self];
+        int kin = [self keyAt:posIn];
+        int kout = [self keyAt:posOut];
+        if (kin == KEY_UP)
+            upArrowHeld = true;
+        else if (kin == KEY_DOWN)
+            downArrowHeld = true;
+        else if (kout == KEY_UP)
+            upArrowHeld = false;
+        else if (kout == KEY_DOWN)
+            downArrowHeld = false;
     }
 }
 
@@ -104,22 +133,11 @@
     for (UITouch *touch in touches)
     {
         CGPoint pos = [touch locationInView:self];
-        CGFloat relx = pos.x / self.frame.size.width;
-        CGFloat rely = pos.y / self.frame.size.height;
-
-        int key = 0;
-        for (struct tapmap *ptr = tapMap; ptr->key; ptr++)
-        {
-            if ((relx >= ptr->left) && (relx <= ptr->right) &&
-                (rely >= ptr->top) && (rely <= ptr->bot))
-            {
-                key = ptr->keynum;
-                if (key == KEY_UP)
-                    upArrowHeld = false;
-                else if (key == KEY_DOWN)
-                    downArrowHeld = false;
-            }
-        }
+        int key = [self keyAt:pos];
+        if (key == KEY_UP)
+            upArrowHeld = false;
+        else if (key == KEY_DOWN)
+            downArrowHeld = false;
     }
     if (lastKey)
     {
