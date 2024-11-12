@@ -1431,7 +1431,7 @@ COMMAND_BODY(UILowercase)
 //   Set right shift
 // ----------------------------------------------------------------------------
 {
-    ui.alpha_plane(3);
+    ui.alpha_plane(2);
     return OK;
 }
 

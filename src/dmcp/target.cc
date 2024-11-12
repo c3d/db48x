@@ -107,7 +107,7 @@ uint platform_plane(bool ls, bool rs, bool al, bool lc, bool trans)
 //   Create the platform plane for a combination of modifiers
 // ----------------------------------------------------------------------------
 {
-    return ls + 2 * rs + 3 * al + 3 * (lc * (1 + !al)) + 10 * trans;
+    return ls + 2 * rs + 3 * al + 3 * (lc && al) + 10 * trans;
 }
 
 

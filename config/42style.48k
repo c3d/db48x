@@ -1,6 +1,6 @@
 @  PLANE 0: UNSHIFTED
 [
-ToolsMenu	inv		sqrt		exp		ln		UIAlgebraic
+ToolsMenu	inv		sqrt		log10		ln		UIAlgebraic
 Store	       ToggleCustomMenu	StackMenu	sin		cos		tan
 Duplicate			Swap		neg		Cycle           Drop
 StackEditor			"7"		"8"		"9"		/
@@ -11,7 +11,7 @@ UIExit				"0"		UIDecimal	Evaluate	+
 
 @ PLANE 1: LEFT SHIFTED
 [
-LastMenu	pow		sq		exp10		log10		LoopsMenu
+LastMenu	pow		sq		exp10		exp		LoopsMenu
 ComplexMenu	FractionsMenu	ConstantsMenu	asin		acos		atan
 UIAlpha				LastArg		ModesMenu	DisplayModesMenu ClearThingsMenu
 EditorHistory			SolverMenu	IntegrationMenu "[	]"	StatisticsMenu

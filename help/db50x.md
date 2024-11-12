@@ -2458,6 +2458,22 @@ You can edit it by recalling its content on the stack using
 back to disk using `"config:equations.csv" STO`.
 # Release notes
 
+## Release 0.8.5 "Stone" - Emergency keyboard fixups
+
+The major changes in 0.8.4 caused some damage to keyboard handling
+code that require a few emergency fixes.
+
+### Bug fixes
+
+* Fix incorrect selection of lowercase characters
+
+* Fix the location of `exp` and `log10` in `42style` and `true42`
+  keymaps.
+
+* Do not enter interactive stack if reaching leftmost position of the
+  text editor.
+
+
 ## Release 0.8.4 "Commands" - Optimizations and equation fixups
 
 This release focuses on improving the solver support for the equation
@@ -2808,7 +2824,7 @@ to ensure that all the given examples give the expected results.
 * Add EDIT menu commands to transient alpha (e.g. ▶F3 is Word→)
 * Index the  help file for performance (about 5x faster on DM32)
 * Accept verbatim code and RPL code snippets in the help file
-* Parse and show help topics taking all aliases into account
+* Parse and show help topics  taking all aliases into account
 * Convert lists and equations to RPL programs with `→Program`
 
 

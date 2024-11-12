@@ -169,8 +169,8 @@ struct user_interface
 
     void        shift_plane(uint p) { shift = p & 1; xshift = p & 2; }
     uint        shift_plane()       { return xshift ? 2 : shift ? 1 : 0; }
-    void        alpha_plane(uint p) { alpha = p & 1; lowercase = p & 2; }
-    uint        alpha_plane()       { return alpha + 2*lowercase+4*transalpha; }
+    void        alpha_plane(uint p) { alpha = p != 0; lowercase = p == 2; }
+    uint        alpha_plane()       { return alpha ? (lowercase ? 2 : 1) : 0; }
     void        clear_shift()       { xshift = shift = false; }
     void        clear_help();
     void        clear_menu();
