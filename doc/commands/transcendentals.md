@@ -120,6 +120,9 @@ Compute anti-logarithm in base 10
 ## SQRT
 Compute the square root
 
+## CBRT
+Compute the cube root
+
 
 ## EXPM
 Compute exp(x)-1
@@ -127,7 +130,3 @@ Compute exp(x)-1
 
 ## LNP1
 Compute ln(x+1)
-
-
-## PINUM
-Numeric constant π with twice the current system precision

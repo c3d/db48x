@@ -2133,7 +2133,7 @@ in decimal. For example, `0.2` cannot be represented exactly using a binary
 floating-point representation.
 
 Using a binary format is not recommended if you need exact results on decimal
-values, for example adding monetary amounts. As an example, if you enable
+values, for example adding monetary amounts. As an illustration, if you enable
 16-digit hardware binary floating-point and add `0.20` and `0.45`, the result is
 `0.65000 00000 00000 022`. This is not a bug, but a limitation of the
 floating-point representation. The same computation with `SoftwareFloatingPoint`
@@ -7523,8 +7523,8 @@ Hitting the second shifted function in the [Vars menu](#VariablesMenu) will
 
 ## ToolsMenu
 
-The `ToolsMenu` maps to the _A_ key (_Σ+_ on the original DM32 keyboard).
-It invokes a context-dependent menu adapted to the top level of the stack.
+The `ToolsMenu` invokes a context-dependent menu adapted to the top level of the
+stack.
 
 
 ## LastMenu
@@ -7647,11 +7647,11 @@ Divide two values two values
   and division of 0 when [autosimplify](#autosimplify) is active.
 
 
-## ↑ (^, pow)
+## Pow
 
 Raise to the power
 
-`Y` `X` ▶ `Y↑X`
+`Y` `X` ▶ `Y^X`
 
 * For integer, fractional, decimal or complex numbers, this raises the
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.
@@ -8573,7 +8573,7 @@ List variables of a specific type
 `type` ▶ `{ Variables... }`
 `{ types... }` ▶ `{ Variables... }`
 
-See the [`Type`](#type) command for a list of types.
+See the `Type` command for a list of types.
 
 ## Copy
 
@@ -8581,9 +8581,11 @@ Copy a value into a global variable. This is primarily intended for use in
 algebraic notations, although it also works in RPL. The HP50G Advanced Reference
 Manual refers to this command as _▶ (Store)_.
 
-```
-'(2+5)▶X'
+```rpl
+'(2+5)▶X' EVAL
 42 'A' ▶ 1 +
+{} X + A + +
+@ Expecting { 43 7 42 }
 ```
 
 The command returns the stored object on the stack. The returned copy is a
@@ -8593,7 +8595,7 @@ memory.
 ## Assignment
 
 An assignment is an RPL object in the form `Name=Value` that sets a global
-variable to a given value. It is intended primarily to facilitated the
+variable to a given value. It is intended primarily to facilitate the
 interactive use of library equations.
 
 An assignment evaluates `Value`, stores it into `Name`, and puts the original
@@ -12379,6 +12381,9 @@ Compute anti-logarithm in base 10
 ## SQRT
 Compute the square root
 
+## CBRT
+Compute the cube root
+
 
 ## EXPM
 Compute exp(x)-1
@@ -12386,10 +12391,6 @@ Compute exp(x)-1
 
 ## LNP1
 Compute ln(x+1)
-
-
-## PINUM
-Numeric constant π with twice the current system precision
 # User Interface
 
 ## COPYCLIP
