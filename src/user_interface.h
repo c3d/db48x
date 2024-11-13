@@ -114,6 +114,8 @@ struct user_interface
     void        menu_auto_complete()    { autoComplete = true; }
     symbol_p    label(uint index);
     cstring     label_text(uint index);
+    utf8        label_for_function_key(int key, size_t *sz = nullptr);
+    utf8        label_for_function_key(size_t *sz = nullptr);
 
     bool        freeze(uint flags);
 

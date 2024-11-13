@@ -926,24 +926,9 @@ constant_p constant::do_key(config_r cfg, int key)
 //   Return a softkey label as a constant value
 // ----------------------------------------------------------------------------
 {
-    if (key >= KEY_F1 && key <= KEY_F6)
-    {
-        size_t   len = 0;
-        utf8     txt = nullptr;
-        symbol_p sym = ui.label(key - KEY_F1);
-        if (sym)
-        {
-            txt = sym->value(&len);
-        }
-        else if (cstring label = ui.label_text(key - KEY_F1))
-        {
-            txt = utf8(label);
-            len = strlen(label);
-        }
-
-        if (txt)
-            return do_lookup(cfg, txt, len, true);
-    }
+    size_t   len = 0;
+    if (utf8 txt = ui.label_for_function_key(key, &len))
+        return do_lookup(cfg, txt, len, true);
     return nullptr;
 }
 

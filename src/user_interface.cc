@@ -1367,6 +1367,40 @@ cstring user_interface::label_text(uint menu_id)
 }
 
 
+utf8 user_interface::label_for_function_key(size_t *len)
+// ----------------------------------------------------------------------------
+//   Return label for current function key
+// ----------------------------------------------------------------------------
+{
+    return label_for_function_key(evaluating, len);
+}
+
+
+utf8 user_interface::label_for_function_key(int key, size_t *len)
+// ----------------------------------------------------------------------------
+//   Return label for given function key
+// ----------------------------------------------------------------------------
+{
+    if (key >= KEY_F1 && key <= KEY_F6)
+    {
+        utf8     txt = nullptr;
+        symbol_p sym = label(key - KEY_F1);
+        if (sym)
+        {
+            txt = sym->value(len);
+        }
+        else if (cstring label = label_text(key - KEY_F1))
+        {
+            txt = utf8(label);
+            if (len)
+                *len = strlen(label);
+        }
+        return txt;
+    }
+    return nullptr;
+}
+
+
 uint user_interface::menu_planes()
 // ----------------------------------------------------------------------------
 //   Count menu planes
@@ -2950,10 +2984,13 @@ void user_interface::load_help(utf8 topic, size_t len)
         return;
     }
 
+    // Check if we lookup a solver variable
+    bool isvar = topic[0] == '`';
+
     // Check if this matches a command name. If so, we will search for
     // alternate spellings as well
     size_t     cmdlen = len;
-    object::id cmd = command::lookup(topic, cmdlen);
+    object::id cmd = isvar ? object::id(0) : command::lookup(topic, cmdlen);
     byte       ref[80];         // Length checked in the makefile
     size_t     refidx   = 0;
     if (cmdlen != len)
@@ -3021,7 +3058,10 @@ void user_interface::load_help(utf8 topic, size_t len)
             // Not found in index, quit
             if (!found)
                 goto notfound;
-            found = false;
+            if (!isvar)
+                found = false;
+            else if (found)
+                topicpos = idxpos;
         }
     }
 
@@ -3142,6 +3182,7 @@ enum style_name
 {
     TITLE,
     SUBTITLE,
+    SUBSUBTITLE,
     NORMAL,
     BOLD,
     ITALIC,
@@ -3176,6 +3217,7 @@ restart:
     {
         { HelpTitleFont,    p::black,  p::white,  false, false, false, false },
         { HelpSubTitleFont, p::black,  p::gray50,  true, false, true,  false },
+        { HelpSubTitleFont, p::black,  p::white,   true,  true, false, false },
         { HelpFont,         p::black,  p::white,  false, false, false, false },
         { HelpBoldFont,     p::black,  p::white,   true, false, false, false },
         { HelpItalicFont,   p::black,  p::white,  false, true,  false, false },
@@ -3276,7 +3318,7 @@ restart:
                 break;
 
             case ' ':
-                if (style <= SUBTITLE)
+                if (style <= SUBSUBTITLE)
                 {
                     skip = last == '#';
                     break;
@@ -3286,7 +3328,7 @@ restart:
                 break;
 
             case '\n':
-                if (last == '\n' || last == ' ' || style <= SUBTITLE)
+                if (last == '\n' || last == ' ' || style <= SUBSUBTITLE)
                 {
                     emit    = true;
                     skip    = true;
@@ -3317,7 +3359,9 @@ restart:
             case '#':
                 if (last == '#' || last == '\n')
                 {
-                    if (restyle == TITLE)
+                    if (restyle == SUBTITLE)
+                        restyle = SUBSUBTITLE;
+                    else if (restyle == TITLE)
                         restyle = SUBTITLE;
                     else
                         restyle = TITLE;
@@ -3391,6 +3435,8 @@ restart:
                         }
                         imdsp = true;
                         emit = true;
+                        if (hadTitle)
+                            y += height;
                     }
                 }
                 skip = true;
@@ -3672,7 +3718,7 @@ restart:
             width += 2*kwidth;
         }
 
-        if (style <= SUBTITLE)
+        if (style <= SUBSUBTITLE)
         {
             // Center titles
             x  = (LCD_W - width) / 2;
@@ -3830,7 +3876,7 @@ restart:
             if (!hadTitle)
                 y += height * 5 / 4;
         }
-        if (style <= SUBTITLE)
+        if (style <= SUBSUBTITLE)
             y += height / 2;
 
         // Select style for next round
