@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            units_and_conversions();
+            editor_operations();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -1232,6 +1232,50 @@ void tests::editor_operations()
         .error("Syntax error")
         .test(DOWN, DOWN, RUNSTOP, KEY3, ENTER)
         .want("« 123 ft 3 yd 25.4 »");
+
+    step("Using regular unit cycle for meters")
+        .test(CLEAR, "1_m", NOSHIFT).editor("1_m")
+        .test(EEX).editor("1_km")
+        .test(EEX).editor("1_cm")
+        .test(EEX).editor("1_mm")
+        .test(EEX).editor("1_μm")
+        .test(EEX).editor("1_Mm")
+        .test(EEX).editor("1_Gm")
+        .test(EEX).editor("1_Tm")
+        .test(EEX).editor("1_pm")
+        .test(EEX).editor("1_nm")
+        .test(EEX).editor("1_m")
+        .test(EEX).editor("1_km")
+        .test(EEX).editor("1_cm")
+        .test(EEX).editor("1_mm")
+        .test(EEX).editor("1_μm")
+        .test(EEX).editor("1_Mm")
+        .test(EEX).editor("1_Gm")
+        .test(EEX).editor("1_Tm")
+        .test(EEX).editor("1_pm")
+        .test(EEX).editor("1_nm");
+    step("Setting units SI cycle that works well for Farad")
+        .test(CLEAR, "\"pμn\" ", ID_UnitsSIPrefixCycle).noerror()
+        .test(CLEAR, "1_F", NOSHIFT).editor("1_F")
+        .test(EEX).editor("1_pF")
+        .test(EEX).editor("1_μF")
+        .test(EEX).editor("1_nF")
+        .test(EEX).editor("1_F");
+    step("Setting units SI cycle that works well for bytes")
+        .test(CLEAR, "\"KMGTPE\" ", ID_UnitsSIPrefixCycle).noerror()
+        .test(CLEAR, "1_B", NOSHIFT).editor("1_B")
+        .test(EEX).editor("1_KB")
+        .test(EEX).editor("1_MB")
+        .test(EEX).editor("1_GB")
+        .test(EEX).editor("1_TB")
+        .test(EEX).editor("1_PB")
+        .test(EEX).editor("1_EB")
+        .test(EEX).editor("1_B");
+    step("Setting units SI prefix to something wrong")
+        .test(CLEAR, "123 ", ID_UnitsSIPrefixCycle)
+        .error("Bad argument type");
+    step("Purge SI units variable")
+        .test(CLEAR, "'unitssiprefixcycle'", ID_Purge).noerror();
 }
 
 

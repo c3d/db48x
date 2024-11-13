@@ -1129,7 +1129,9 @@ MENU(UnitsConversionsMenu,
      "Zi",      ID_ConvertToUnitPrefix,
      "Yi",      ID_ConvertToUnitPrefix,
      "Ri",      ID_ConvertToUnitPrefix,
-     "Qi",      ID_ConvertToUnitPrefix
+     "Qi",      ID_ConvertToUnitPrefix,
+
+     "SIPfx",   ID_UnitsSIPrefixCycle
 );
 
 
@@ -1442,7 +1444,7 @@ MENU(SeparatorModesMenu,
 
 MENU(UserInterfaceModesMenu,
 // ----------------------------------------------------------------------------
-//   Mode setting for numbers
+//   Mode setting for user interface
 // ----------------------------------------------------------------------------
      "GrRes",                                   ID_GraphicResultDisplay,
      "GrStk",                                   ID_GraphicStackDisplay,
@@ -1487,7 +1489,8 @@ MENU(UserInterfaceModesMenu,
      "Chars",                                   ID_ShowBuiltinCharacters,
 
      "AllVars",                                 ID_AllEquationVariables,
-     CustomHeaderRefresh::label,                ID_CustomHeaderRefresh);
+     CustomHeaderRefresh::label,                ID_CustomHeaderRefresh,
+     "SIPfx",                                   ID_UnitsSIPrefixCycle);
 
 MENU(UserModeMenu,
 // ----------------------------------------------------------------------------

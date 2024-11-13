@@ -49,6 +49,14 @@ unit object. The numerical part of the unit object is ignored.
 3000 2_km →Unit
 ```
 
+## UnitsSIPrefixCycle
 
-## ULIST
-List all user-defined units
+Sets a prefix cycle for SI units when using the `Cycle` key (_EEX_ or _×10ⁿ_,
+next to _O_) on the command-line to cycle through SI prefixes. The cycle is
+specified as a text string containing all the desired prefixes, in the order in
+which they should appear. This preference is stored in the `UnitsSIPrefixCycle`
+variable in the current directory.
+
+For example, after executing `"cmkμ" UnitsSIPrefixCycle`, typing _1_ ___ _m_ __
+_×10ⁿ_ will show `1_cm` on the command line. Hitting _×10ⁿ_ again will change
+that command line to `1_mm`, and again to `1_km`.
