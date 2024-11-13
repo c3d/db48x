@@ -16,6 +16,11 @@ Add two values.
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
   `"X=" 1 +` gives `"X=1"`.
 
+*Note*: The ` Add ` command and the ` + ` operation are identical on DB48X.
+[This differs from HP calculators](#list-operation-differences).
+
+
+
 ## Sub
 
 Subtract two values
@@ -63,11 +68,11 @@ Divide two values two values
   and division of 0 when [autosimplify](#autosimplify) is active.
 
 
-## ↑ (^, pow)
+## Pow
 
 Raise to the power
 
-`Y` `X` ▶ `Y↑X`
+`Y` `X` ▶ `Y^X`
 
 * For integer, fractional, decimal or complex numbers, this raises the
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.

@@ -135,7 +135,7 @@ in decimal. For example, `0.2` cannot be represented exactly using a binary
 floating-point representation.
 
 Using a binary format is not recommended if you need exact results on decimal
-values, for example adding monetary amounts. As an example, if you enable
+values, for example adding monetary amounts. As an illustration, if you enable
 16-digit hardware binary floating-point and add `0.20` and `0.45`, the result is
 `0.65000 00000 00000 022`. This is not a bug, but a limitation of the
 floating-point representation. The same computation with `SoftwareFloatingPoint`

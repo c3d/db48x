@@ -65,6 +65,11 @@ struct unit : complex
 
     static unit_p get(object_p obj);
 
+    static object_p si_prefixes_variable()
+    {
+        return object::static_object(object::ID_UnitsSIPrefixCycle);
+    }
+
     static bool mode;           // Set to true to evaluate units
     static bool factoring;      // Set to true when factoring out units
     static bool nodates;        // Disable conversions about dates
@@ -121,7 +126,8 @@ FUNCTION(UVal);
 COMMAND_DECLARE(ToUnit,2);
 COMMAND_DECLARE_INSERT(ApplyUnit,1);
 COMMAND_DECLARE_INSERT(ConvertToUnit,1);
-COMMAND_DECLARE_INSERT(ApplyInverseUnit,1);
+COMMAND_DECLARE_INSERT(ApplyInverseUnit, 1);
+COMMAND_DECLARE(UnitsSIPrefixCycle, 1);
 
 COMMAND_DECLARE(ToDegrees,1);
 COMMAND_DECLARE(ToRadians,1);

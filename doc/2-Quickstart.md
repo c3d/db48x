@@ -45,7 +45,7 @@ multiplications, `49.8` and `9.8`, could be seen on the stack.
 
 RPL also supports the standard algebraic notation. Begin the computation with
 the _'()_ key. The editor contains quotes, `''` with the cursor between
-them. The cursor shows the latter `A`, indicating algebraic entry. Type _6_,
+them. The cursor shows the letter `A`, indicating algebraic entry. Type _6_,
 _×_, _8_, _._, _3_, _+_, _3_, _._, _5_, _×_, _2_, _._, _8_. At this point,
 the text editor should show the whole expression, `'6·8.3+3.5·2.8'`
 or `'6×8.3+3.5×2.8'`. Press `ENTER` and the expression shows up on the

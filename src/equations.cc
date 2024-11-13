@@ -495,7 +495,7 @@ static const cstring basic_equations[] =
     "Black Body Radiation",  "{ "
     "'(eb_(W/m^2))=Ⓒσ*(T_K)^4' "
     //"'f=F0λ((λ2_nm);(T_°C))-F0λ((λ1_nm);(T_°C))' "
-    "'f=15/Ⓒπ^4*∫(Ⓒh*Ⓒc/((λ2_nm)*Ⓒk*(T_K));Ⓒh*Ⓒc/((λ1_nm)*Ⓒk*(T_K));x^3/expm1(x);X)' "
+    "'f=15/Ⓒπ^4*∫(Ⓒh*Ⓒc/((λ2_nm)*Ⓒk*(T_K));Ⓒh*Ⓒc/((λ1_nm)*Ⓒk*(T_K));x^3/expm1(x);x)' "
     "'(eb12_(W/m^2))=f*(eb_(W/m^2))' "
     "'(λmax_nm)*(Tmax_°C)=Ⓒc3' "
     "'(q_W)=(eb_(W/m^2))*(A_(cm^2))' "

@@ -246,7 +246,7 @@ object::result comparison::compare(comparison_fn comparator, id op)
     object_p y = rt.stack(0);
     if (!x || !y)
         return ERROR;
-    if (!x->is_algebraic() || !y->is_algebraic())
+    if (!x->is_extended_algebraic() || !y->is_extended_algebraic())
     {
         rt.type_error();
         return ERROR;

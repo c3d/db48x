@@ -50,6 +50,7 @@
 #include "symbol.h"
 #include "sysmenu.h"
 #include "target.h"
+#include "unit.h"
 #include "utf8.h"
 #include "util.h"
 #include "variables.h"
@@ -751,7 +752,7 @@ void user_interface::update_mode()
         {
             if (unit)
             {
-                unit = code == byte(code) && isalnum(code);
+                unit = is_valid_in_name(code);
                 if (!unit)
                 {
                     static utf8 valid = utf8("/÷×·^↑⁻¹²³");
@@ -1364,6 +1365,40 @@ cstring user_interface::label_text(uint menu_id)
     int     plane      = menu_id / NUM_SOFTKEYS;
     cstring lbl        = menu_label[plane][softkey_id];
     return lbl;
+}
+
+
+utf8 user_interface::label_for_function_key(size_t *len)
+// ----------------------------------------------------------------------------
+//   Return label for current function key
+// ----------------------------------------------------------------------------
+{
+    return label_for_function_key(evaluating, len);
+}
+
+
+utf8 user_interface::label_for_function_key(int key, size_t *len)
+// ----------------------------------------------------------------------------
+//   Return label for given function key
+// ----------------------------------------------------------------------------
+{
+    if (key >= KEY_F1 && key <= KEY_F6)
+    {
+        utf8     txt = nullptr;
+        symbol_p sym = label(key - KEY_F1);
+        if (sym)
+        {
+            txt = sym->value(len);
+        }
+        else if (cstring label = label_text(key - KEY_F1))
+        {
+            txt = utf8(label);
+            if (len)
+                *len = strlen(label);
+        }
+        return txt;
+    }
+    return nullptr;
 }
 
 
@@ -2950,10 +2985,13 @@ void user_interface::load_help(utf8 topic, size_t len)
         return;
     }
 
+    // Check if we lookup a solver variable
+    bool isvar = topic[0] == '`';
+
     // Check if this matches a command name. If so, we will search for
     // alternate spellings as well
     size_t     cmdlen = len;
-    object::id cmd = command::lookup(topic, cmdlen);
+    object::id cmd = isvar ? object::id(0) : command::lookup(topic, cmdlen);
     byte       ref[80];         // Length checked in the makefile
     size_t     refidx   = 0;
     if (cmdlen != len)
@@ -3021,7 +3059,10 @@ void user_interface::load_help(utf8 topic, size_t len)
             // Not found in index, quit
             if (!found)
                 goto notfound;
-            found = false;
+            if (!isvar)
+                found = false;
+            else if (found)
+                topicpos = idxpos;
         }
     }
 
@@ -3142,6 +3183,7 @@ enum style_name
 {
     TITLE,
     SUBTITLE,
+    SUBSUBTITLE,
     NORMAL,
     BOLD,
     ITALIC,
@@ -3176,6 +3218,7 @@ restart:
     {
         { HelpTitleFont,    p::black,  p::white,  false, false, false, false },
         { HelpSubTitleFont, p::black,  p::gray50,  true, false, true,  false },
+        { HelpSubTitleFont, p::black,  p::white,   true,  true, false, false },
         { HelpFont,         p::black,  p::white,  false, false, false, false },
         { HelpBoldFont,     p::black,  p::white,   true, false, false, false },
         { HelpItalicFont,   p::black,  p::white,  false, true,  false, false },
@@ -3276,7 +3319,7 @@ restart:
                 break;
 
             case ' ':
-                if (style <= SUBTITLE)
+                if (style <= SUBSUBTITLE)
                 {
                     skip = last == '#';
                     break;
@@ -3286,7 +3329,7 @@ restart:
                 break;
 
             case '\n':
-                if (last == '\n' || last == ' ' || style <= SUBTITLE)
+                if (last == '\n' || last == ' ' || style <= SUBSUBTITLE)
                 {
                     emit    = true;
                     skip    = true;
@@ -3317,7 +3360,9 @@ restart:
             case '#':
                 if (last == '#' || last == '\n')
                 {
-                    if (restyle == TITLE)
+                    if (restyle == SUBTITLE)
+                        restyle = SUBSUBTITLE;
+                    else if (restyle == TITLE)
                         restyle = SUBTITLE;
                     else
                         restyle = TITLE;
@@ -3391,6 +3436,8 @@ restart:
                         }
                         imdsp = true;
                         emit = true;
+                        if (hadTitle)
+                            y += height;
                     }
                 }
                 skip = true;
@@ -3672,7 +3719,7 @@ restart:
             width += 2*kwidth;
         }
 
-        if (style <= SUBTITLE)
+        if (style <= SUBSUBTITLE)
         {
             // Center titles
             x  = (LCD_W - width) / 2;
@@ -3830,7 +3877,7 @@ restart:
             if (!hadTitle)
                 y += height * 5 / 4;
         }
-        if (style <= SUBTITLE)
+        if (style <= SUBSUBTITLE)
             y += height / 2;
 
         // Select style for next round
@@ -4935,39 +4982,66 @@ bool user_interface::handle_digits(int key)
                 size_t len = 0;
                 if (current_word(start, len))
                 {
-                    byte *ed = rt.editor();
-                    byte *st = (byte *) start;
-                    unicode prefix = 0;
-                    bool    ins    = false;
+                    byte   *ed     = rt.editor();
+                    byte   *st     = (byte *) start;
+                    bool    ins    = true;
                     bool    del    = false;
+                    utf8    cycle = utf8("kcmμMGTpn"); // Default cycle
+                    size_t cylen = strlen(cstring(cycle));
+                    if (object_p name = unit::si_prefixes_variable())
+                        if (object_p si = directory::recall_all(name, false))
+                            if (text_p txt = si->as<text>())
+                                cycle = txt->value(&cylen);
 
-                    switch(*start)
+                    if (cylen)
                     {
-                    case 'k':   prefix = 'M';           break;
-                    case 'M':   prefix = 'G';           break;
-                    case 'G':   prefix = 'T';           break;
-                    case 'T':   prefix = 'm';           break;
-                    case 'm':   prefix = 'c';           break;
-                    case 'c':                           del = true; break;
-                    default:    prefix = 'k';           ins = true; break;
-                    }
-                    if (del && size_t(st - ed + 1) < rt.editing() &&
-                        isalnum(start[1]))
-                    {
-                        remove(st - ed, 1);
-                    }
-                    else
-                    {
-                        if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
-                                     !isalnum(start[1])))
+                        unicode prefix = utf8_codepoint(cycle);
+                        size_t toremove = 1;
+                        if (len > 1)
                         {
-                            ins = true;
-                            prefix = 'k';
+                            unicode existing = utf8_codepoint(st);
+                            utf8    cyend    = cycle + cylen;
+                            ins = false;
+                            while (cycle < cyend)
+                            {
+                                utf8 ncycle = utf8_next(cycle);
+                                if (existing == utf8_codepoint(cycle))
+                                {
+                                    if (ncycle < cyend)
+                                        prefix = utf8_codepoint(ncycle);
+                                    else
+                                        del = true;
+                                    toremove = utf8_size(existing);
+                                    break;
+                                }
+                                cycle = ncycle;
+                            }
                         }
-                        if (ins)
-                            insert(st - ed, prefix);
+
+                        if (del &&
+                            size_t(st - ed + 1) < rt.editing() &&
+                            is_valid_in_name(start))
+                        {
+                            remove(st - ed, toremove);
+                        }
                         else
-                            *st = prefix;
+                        {
+                            if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
+                                         !is_valid_in_name(start)))
+                            {
+                                ins = true;
+                                prefix = utf8_codepoint(cycle);
+                            }
+                            if (ins)
+                            {
+                                insert(st - ed, prefix);
+                            }
+                            else
+                            {
+                                remove(st - ed, toremove);
+                                insert(st - ed, prefix);
+                            }
+                        }
                     }
                 }
             }

@@ -115,14 +115,16 @@ ELSE
 END
 ```
 
-
-
-on HP calculators is documented as follows, according to the HP50G Advanced Refernece Manu
-silently returns an extremum when there is no solution.
-
 As an extension to the HP implementation, `ROOT` can solve systems of equations
 and multiple variables by solving them one equation at a time, a programmatic version of what the HP50G Advanced Reference Manual calls the Multiple Equation Solver (`MINIT`, `MITM` and `MSOLVR` commands).
 
+## SolvingMenuSolve
+
+Solve the system of equations for the given variable.
+
+## SolvingMenuRecall
+
+Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
 
 ## MSOLVE

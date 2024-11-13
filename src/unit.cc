@@ -43,6 +43,7 @@
 #include "settings.h"
 #include "tag.h"
 #include "user_interface.h"
+#include "variables.h"
 
 
 RECORDER(units,         16, "Unit objects");
@@ -529,6 +530,8 @@ static const cstring basic_units[] =
     "bbl",      "7056_in³",             // Barrel
     "crbl",     "5826_in³",             // Cranberry barrel
 
+    "L",        "l",                    // Liter can be spelled uppercase
+
     // ------------------------------------------------------------------------
     // Time menu
     // ------------------------------------------------------------------------
@@ -835,6 +838,7 @@ static const si_prefix si_prefixes[] =
     { "K",      3 },                    // kilo (computer-science)
     { "µ",     -6 },                    // micro (0xB5)
     { "μ",     -6 },                    // micro (0x3BC)
+    { "u",     -6 },                    // micro (for quick transalpha entry)
     { "M",      6 },                    // mega
     { "n",     -9 },                    // nano
     { "G",      9 },                    // giga
@@ -2287,4 +2291,21 @@ COMMAND_BODY(ToPiRadians)
 // ----------------------------------------------------------------------------
 {
     return toAngleUnit("πr");
+}
+
+
+COMMAND_BODY(UnitsSIPrefixCycle)
+// ----------------------------------------------------------------------------
+//   Store the units cycle preference in the current directory
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (text_p pfx = obj->as<text>())
+            if (object_p name = unit::si_prefixes_variable())
+                if (directory::store_here(name, pfx))
+                    if (rt.drop())
+                        return OK;
+    if (!rt.error())
+        rt.type_error();
+    return ERROR;
 }

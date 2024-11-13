@@ -45,8 +45,11 @@ or [submit a proposed change](https://github.com/c3d/db48x/pulls) is
 on the project's [GitHub page](https://github.com/c3d/db48x).
 
 The [implementation status](#implementation-status) section categorizes all the
-RPL commands in the HP50G and in DB48X into "implemented", "not implemented" and
-"DB48X only" lists.
+RPL commands in the HP50G and in DB48X into
+[implemented](#implemented-commands),
+[not implemented yet](#unimplemented-commands),
+[unapplicable commands](#unapplicable-commands) and
+[DB48X only](#additional-commands) lists.
 
 ## Design overview
 
@@ -85,8 +88,7 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
 
 * Using 🟨 _◀︎_ and 🟨 _▶︎_ moves the cursor up and down.  When not editing, _◀︎_
   and _▶︎_ behave like _▲_ and _▼_ on the HP48, i.e. _◀︎_ enters the *interactive
-  stack* (not yet implemented) and _▶︎_ edits the object on the first level of
-  the stack.
+  stack*  and _▶︎_ edits the object on the first level of the stack.
 
 * Long-pressing arrow keys, the _←_ (also known as *Backspace*) or text entry
   keys in Alpha mode activates auto-repeat.
@@ -132,8 +134,9 @@ brings back numbers. This means 🟨 cannot be used for lowercase, but as
 indicated above, there are two other methods to enter lowercase
 characters.
 
-Using 🟨 or 🟦 in combination with keys other than the numeric keypad
-gives a variety of special characters.
+Using 🟨 or 🟦 in combination with keys other than the numeric keypad gives a
+variety of special characters. The `CharactersMenu` and `Catalog` can be used to
+enter special characters in a more comfortable way.
 
 
 ### Key mapping
@@ -469,9 +472,10 @@ unintentional differences, since the implementation is completely new.
 The application of a same operation on arrays or matrices has never been very
 consistent nor logical across RPL models from HP.
 
-* On HP48 and HP50, `{ 1 2 3 } 4 +` gives `{1 2 3 4}`. However, `{ 1 2 3} 4 *`
+* On HP48 and HP50, `{1 2 3} 4 +` gives `{1 2 3 4}`. However, `{1 2 3} 4 *`
   gives a type error on the HP48 but applies the operation to list elements on
-  the HP50, yielding `{ 4 8 12}`.
+  the HP50, yielding `{4 8 12}`. Finally, `{1 2 3} 4 add` will give `{5 6 7}` on
+  the HP50, but that command does not exist on HP48.
 
 * For arrays, `[ 1 2 3 ] 4 +` fails on both the HP48 and HP50, but
   `[ 1 2 3 ] 4 *` works.
@@ -887,7 +891,7 @@ following stack diagram:
 
 `Y` `X` ▶ `Y+X`
 
-The duplication operation `Duplicate` (`DUP`) can be described in synthetic form
+The duplication operation `Duplicate` can be described in synthetic form
 using the following synthetic stack diagram:
 
 `X` ▶ `X` `X`
@@ -949,9 +953,9 @@ statistic operations had non-obvious interactions with numbered data registers.
 
 All this was solved with RPL, because now a complex number, a matrix or a text
 would occupy a single entry on the stack. So whereas adding two integers would
-require a sequence like `1 ENTER 2 +` like in RPN, a very similar sequence would
-add two texts: `"ABC" ENTER "DEF" +`, and the exact same logic would also add
-two vectors in `[1 2 3] ENTER [4 5 6] +`.
+require a sequence like _1_ _ENTER_ _2_ _+_ like in RPN, a very similar sequence
+would add two texts: `"ABC"` _ENTER_ `"DEF"` _+_, and the exact same logic would
+also add two vectors in `[1 2 3]` _ENTER_ `[4 5 6]` _+_.
 
 DB48X adopts this extremely powerful idea, with a focus on making it as
 efficient as possible for interactive calculations as well as for custom
@@ -1003,7 +1007,7 @@ multiplications, `49.8` and `9.8`, could be seen on the stack.
 
 RPL also supports the standard algebraic notation. Begin the computation with
 the _'()_ key. The editor contains quotes, `''` with the cursor between
-them. The cursor shows the latter `A`, indicating algebraic entry. Type _6_,
+them. The cursor shows the letter `A`, indicating algebraic entry. Type _6_,
 _×_, _8_, _._, _3_, _+_, _3_, _._, _5_, _×_, _2_, _._, _8_. At this point,
 the text editor should show the whole expression, `'6·8.3+3.5·2.8'`
 or `'6×8.3+3.5×2.8'`. Press `ENTER` and the expression shows up on the
@@ -2088,7 +2092,7 @@ in decimal. For example, `0.2` cannot be represented exactly using a binary
 floating-point representation.
 
 Using a binary format is not recommended if you need exact results on decimal
-values, for example adding monetary amounts. As an example, if you enable
+values, for example adding monetary amounts. As an illustration, if you enable
 16-digit hardware binary floating-point and add `0.20` and `0.45`, the result is
 `0.65000 00000 00000 022`. This is not a bug, but a limitation of the
 floating-point representation. The same computation with `SoftwareFloatingPoint`
@@ -4469,279 +4473,279 @@ HP48 implementation.
 
 The following is a list of the HP50 RPL commands which are implemented in DB48X.
 
-* [!](#fact) (Factorial)
-* [+](#add) (Add)
-* [<](#testlt) (Less than)
-* [==](#same) (Different meaning: object equality)
-* [=](#testeq) (Equal)
-* [>](#testgt) (Greater than)
-* [ABS](#abs)
-* [ACOSH](#acosh)
-* [ACOS](#acos)
-* [ADD](#add)
-* [ALOG](#alog)
-* [AND](#and)
-* [ARG](#arg)
-* [ARRY→](#fromarray)
-* [→ARRY](#toarray)
-* [ASINH](#asinh)
-* [ASIN](#asin)
-* [ASR](#asr)
-* [ASRC](#asr)
-* [ATANH](#atanh)
-* [ATAN](#atan)
-* [AXES](#axes)
-* [BARPLOT](#barplot)
-* [BEEP](#beep)
-* [BESTFIT](#bestfit)
-* [BIN](#bin)
-* [BYTES](#bytes)
-* [B→R](#binarytoreal)
-* [CASE](#case)
-* [CEIL](#ceil)
-* [CF](#clearflag)
-* [%CH](#percentchange)
-* [CHR](#codetext-chr-codechar)
-* [CLEAR](#clearstack)
-* [CLLCD](#cllcd)
-* [CLΣ](#cleardata)
-* [COLΣ](#columndata)
-* [COMB](#combinations)
-* [CON](#constantarray)
-* [CONJ](#conj)
-* [CONLIB](#constantsmenu)
-* [CONST](#constant)
-* [CONSTANTS](#constantsmenu)
-* [CONT](#continue)
-* [CONVERT](#convert)
-* [COSH](#cosh)
-* [COS](#cos)
-* [COV](#covariance)
-* [CRDIR](#crdir)
-* [CROSS](#cross)
-* [C→R](#complextoreal)
-* [DATE](#date)
-* [→DATE](#setdate)
-* [DATE+](#dateadd)
-* [DDAYS](#ddays)
-* [DBUG](#debug)
-* [DEC](#dec)
-* [DECR](#decrement)
-* [DEDICACE](#libraryitem)
-* [DEG](#deg)
-* [DEPTH](#depth)
-* [DET](#determinant)
-* [DIR](#dir)
-* [DISP](#disp)
-* [DISPXY](#dispxy)
-* [DIV2](#div2)
-* [DO](#do)
-* [DOERR](#doerr)
-* [DOLIST](#dolist)
-* [DOSUBS](#dosub)
-* [DOT](#dot)
-* [DRAW](#draw)
-* [DRAX](#drax)
-* [DROP2](#drop2)
-* [DROPN](#dropn)
-* [DROP](#drop)
-* [DTAG](#dtag)
-* [DUP2](#dup2)
-* [DUPN](#dupn)
-* [DUP](#dup)
-* [D→R](#d-r)
-* [e](#constants)
-* [ELSE](#else)
-* [END](#end)
-* [ENG](#eng)
-* [EQNLIB](#equationsmenu)
-* [ERR0](#err0)
-* [ERRM](#errm)
-* [ERRN](#errn)
-* [EVAL](#eval)
-* [EXPAND](#expand)
-* [EXPAN](#expan)
-* [EXPFIT](#exponentialfit)
-* [EXPM](#expm)
-* [EXP](#exp)
-* [FACT](#fact)
-* [FC?C](#testflagclearthenclear)
-* [FC?](#testflagclear)
-* [FIX](#fix)
-* [FOR](#for)
-* [FP](#FractionalPart)
-* [FREEZE](#freeze)
-* [FS?C](#testflagsetthenclear)
-* [FS?](#testflagset)
-* [FUNCTION](#function)
-* [GAMMA](#gamma)
-* [GET](#get)
-* [GETI](#geti)
-* [GOR](#gor)
-* [GROB](#grob)
-* [GXOR](#gxor)
-* [HALT](#halt)
-* [HEAD](#head)
-* [HELP](#help) (Different meaning)
-* [HEX](#hex)
-* [HOME](#home)
-* [HMS–](#hmsadd)
-* [HMS+](#hmssub)
-* [HMS→](#fromhms)
-* [→HMS](#tohms)
-* [IFERR](#iferr)
-* [IFTE](#ifte)
-* [IFT](#ift)
-* [IF](#if)
-* [IM](#im)
-* [INV](#inv)
-* [IP](#IntegerPart)
-* [ISOL](#isolate)
-* [KILL](#kill)
-* [LASTARG](#lastarg)
-* [LINE](#line)
-* [LINFIT](#linearfit)
-* [LNP1](#lnp1)
-* [LN](#ln)
-* [LOG](#log)
-* [LOGFIT](#logarithmicfit)
-* [LR](#linearregression)
-* [MAX](#max)
-* [MAXΣ](#maxdata)
-* [MEAN](#mean)
-* [MEM](#mem)
-* [MIN](#min)
-* [MINΣ](#mindata)
-* [MOD](#mod)
-* [NEG](#neg)
-* [NEXT](#next)
-* [NOT](#not)
-* [NΣ](#datasize)
-* [NUM](#char-code)
-* [OBJ→](#explode)
-* [OCT](#oct)
-* [OFF](#off)
-* [OR](#or)
-* [OVER](#over)
-* [PARAMETRIC](#parametric)
-* [PATH](#path)
-* [PGDIR](#pgdir)
-* [PICK](#pick)
-* [PICK3](#pick3)
-* [PICT](#pict)
-* [PIX?](#pixtest)
-* [PIXOFF](#pixon)
-* [PIXON](#pixoff)
-* [POLAR](#polar)
-* [PMAX](#plotmax)
-* [PMIN](#plotmin)
-* [PURGE](#purge)
-* [PUT](#put)
-* [PUTI](#puti)
-* [PVAR](#populationvariance)
-* [PWRFIT](#powerfit)
-* [RAD](#rad)
-* [RCL](#rcl)
-* [RCLΣ](#recalldata)
-* [RCWS](#rcws)
-* [RE](#re)
-* [RECT](#rect) (Different meaning: draws a rectangle)
-* [REPEAT](#repeat)
-* [REVLIST](#reverselist)
-* [REWRITE](#rewrite) (Different meaning: performs a rewrite)
-* [RL](#rl)
-* [RLB](#rlb)
-* [RLC](#rlc)
-* [ROLLD](#rolld)
-* [ROLL](#roll)
-* [ROOT](#root)
-* [ROT](#rot)
-* [RR](#rr)
-* [RRB](#rrb)
-* [RRC](#rrb)
-* [R→B](#realtobinary)
-* [R→C](#realtocomplex)
-* [R→D](#radianstodegrees)
-* [SAME](#same)
-* [SCALE](#plotscale)
-* [SCALEH](#xscale)
-* [SCALEW](#yscale)
-* [SCI](#sci)
-* [SF](#showflag)
-* [SIGN](#sign)
-* [SINH](#sinh)
-* [SIN](#sin)
-* [SL](#sl)
-* [SLB](#slb)
-* [SLC](#slb)
-* [SORT](#sort)
-* [SQ](#sq)
-* [SR](#shiftright)
-* [SRB](#shiftrightbyte)
-* [SST](#stepover)
-* [SST↓](#singlestep)
-* [START](#start)
-* [STD](#standarddisplay)
-* [STEP](#step)
-* [STORE](#store) (Different meaning: long form of STO)
-* [STO](#sto)
-* [STOΣ](#storedata)
-* [STR→](#compile)
-* [STWS](#stws)
-* [SWAP](#swap)
-* [%T](#percenttotal)
-* [TAIL](#tail)
-* [TANH](#tanh)
-* [TAN](#tan)
-* [THEN](#then)
-* [TICKS](#ticks)
-* [TIME](#time)
-* [→TIME](#settime)
-* [TOT](#total)
-* [TYPE](#type)
-* [UBASE](#ubase)
-* [UFACT](#ufact)
-* [UNTIL](#until)
-* [UPDIR](#updir)
-* [UVAL](#uval)
-* [VAR](#variance)
-* [VERSION](#version)
-* [WAIT](#wait)
-* [WHILE](#while)
-* [XCOL](#independentcolumn)
-* [XOR](#xor)
-* [XRNG](#xrange)
-* [XROOT](#xroot)
-* [YRNG](#yrange)
-* [YCOL](#dependentcolumn)
-* [%](#percent)
-* [^](#pow) (Power)
-* [i](#iconstant)
-* [«»](#programs) (Program delimiters)
-* [×](#mul) (Multiply)
-* [÷](#div) (Divide)
-* [Σ+](#adddata)
-* [ΣXY](#sumofxy)
-* [ΣX](#sumofx)
-* [ΣX²](#sumofxsquares)
-* [ΣY](#sumofy)
-* [ΣY²](#sumofysquares)
-* [Σ–](#removedata)
-* [π](#pi) (Pi)
-* [–](#sub) (Subtract)
-* [→LIST](#tolist)
-* [→NUM](#todecimal)
-* [→Q](#tofraction)
-* [→STR](#totext)
-* [→TAG](#→tag)
-* [→UNIT](#→unit)
-* [→](#locals) (Create Local)
-* [√](#sqrt) (Square root)
-* [∫](#integrate) (Integrate)
-* [≠](#testne) (Not equal)
-* [≤](#testle) (Less than or equal)
-* [≥](#testge) (Greater than or Equal)
-* [＿](#units) (Unit attachment)
+* `!` Factorial
+* `+` Addition
+* `<` Less than
+* `==` Object equality
+* `=` Mathematical equality
+* `>` Greater than
+* `ABS` Absolute value
+* `ACOSH` Inverse hyperbolic cosine
+* `ACOS` Arc cosine
+* `ADD` Addition (differs from the HP Add command)
+* `ALOG`
+* `AND`
+* `ARG`
+* `ARRY→`
+* `→ARRY`
+* `ASINH`
+* `ASIN`
+* `ASR`
+* `ASRC`
+* `ATANH`
+* `ATAN`
+* `AXES`
+* `BARPLOT`
+* `BEEP`
+* `BESTFIT`
+* `BIN`
+* `BYTES`
+* `B→R`
+* `CASE`
+* `CEIL`
+* `CF`
+* `%CH`
+* `CHR`
+* `CLEAR`
+* `CLLCD`
+* `CLΣ`
+* `COLΣ`
+* `COMB`
+* `CON`
+* `CONJ`
+* `CONLIB`
+* `CONST`
+* `CONSTANTS`
+* `CONT`
+* `CONVERT`
+* `COSH`
+* `COS`
+* `COV`
+* `CRDIR`
+* `CROSS`
+* `C→R`
+* `DATE`
+* `→DATE`
+* `DATE+`
+* `DDAYS`
+* `DBUG`
+* `DEC`
+* `DECR`
+* `DEDICACE`
+* `DEG`
+* `DEPTH`
+* `DET`
+* `DIR`
+* `DISP`
+* `DISPXY`
+* `DIV2`
+* `DO`
+* `DOERR`
+* `DOLIST`
+* `DOSUBS`
+* `DOT`
+* `DRAW`
+* `DRAX`
+* `DROP2`
+* `DROPN`
+* `DROP`
+* `DTAG`
+* `DUP2`
+* `DUPN`
+* `DUP`
+* `D→R`
+* `e`
+* `ELSE`
+* `END`
+* `ENG`
+* `EQNLIB`
+* `ERR0`
+* `ERRM`
+* `ERRN`
+* `EVAL`
+* `EXPAND`
+* `EXPAN`
+* `EXPFIT`
+* `EXPM`
+* `EXP`
+* `FACT`
+* `FC?C`
+* `FC?`
+* `FIX`
+* `FOR`
+* `FP`
+* `FREEZE`
+* `FS?C`
+* `FS?`
+* `FUNCTION`
+* `GAMMA`
+* `GET`
+* `GETI`
+* `GOR`
+* `GROB`
+* `GXOR`
+* `HALT`
+* `HEAD`
+* `HELP` (Different meaning)
+* `HEX`
+* `HOME`
+* `HMS–`
+* `HMS+`
+* `HMS→`
+* `→HMS`
+* `IFERR`
+* `IFTE`
+* `IFT`
+* `IF`
+* `IM`
+* `INV`
+* `IP`
+* `ISOL`
+* `KILL`
+* `LASTARG`
+* `LINE`
+* `LINFIT`
+* `LNP1`
+* `LN`
+* `LOG`
+* `LOGFIT`
+* `LR`
+* `MAX`
+* `MAXΣ`
+* `MEAN`
+* `MEM`
+* `MIN`
+* `MINΣ`
+* `MOD`
+* `NEG`
+* `NEXT`
+* `NOT`
+* `NΣ`
+* `NUM`
+* `OBJ→`
+* `OCT`
+* `OFF`
+* `OR`
+* `OVER`
+* `PARAMETRIC`
+* `PATH`
+* `PGDIR`
+* `PICK`
+* `PICK3`
+* `PICT`
+* `PIX?`
+* `PIXOFF`
+* `PIXON`
+* `POLAR`
+* `PMAX`
+* `PMIN`
+* `PURGE`
+* `PUT`
+* `PUTI`
+* `PVAR`
+* `PWRFIT`
+* `RAD`
+* `RCL`
+* `RCLΣ`
+* `RCWS`
+* `RE`
+* `RECT` (Different meaning: draws a rectangle)
+* `REPEAT`
+* `REVLIST`
+* `REWRITE` (Different meaning: performs a rewrite)
+* `RL`
+* `RLB`
+* `RLC`
+* `ROLLD`
+* `ROLL`
+* `ROOT`
+* `ROT`
+* `RR`
+* `RRB`
+* `RRC`
+* `R→B`
+* `R→C`
+* `R→D`
+* `SAME`
+* `SCALE`
+* `SCALEH`
+* `SCALEW`
+* `SCI`
+* `SF`
+* `SIGN`
+* `SINH`
+* `SIN`
+* `SL`
+* `SLB`
+* `SLC`
+* `SORT`
+* `SQ`
+* `SR`
+* `SRB`
+* `SST`
+* `SST↓`
+* `START`
+* `STD`
+* `STEP`
+* `STORE` (Different meaning: long form of STO)
+* `STO`
+* `STOΣ`
+* `STR→`
+* `STWS`
+* `SWAP`
+* `%T`
+* `TAIL`
+* `TANH`
+* `TAN`
+* `THEN`
+* `TICKS`
+* `TIME`
+* `→TIME`
+* `TOT`
+* `TYPE`
+* `UBASE`
+* `UFACT`
+* `UNTIL`
+* `UPDIR`
+* `UVAL`
+* `VAR`
+* `VERSION`
+* `WAIT`
+* `WHILE`
+* `XCOL`
+* `XOR`
+* `XRNG`
+* `XROOT`
+* `YRNG`
+* `YCOL`
+* `%`
+* `^` (Power)
+* `i`
+* `«»` (Program delimiters)
+* `×` (Multiply)
+* `÷` (Divide)
+* `Σ+`
+* `ΣXY`
+* `ΣX`
+* `ΣX²`
+* `ΣY`
+* `ΣY²`
+* `Σ–`
+* `π` (Pi)
+* `–` (Subtract)
+* `→LIST`
+* `→NUM`
+* `→Q`
+* `→STR`
+* `→TAG`
+* `→UNIT`
+* `→` (Create Local)
+* `√` (Square root)
+* `∫` (Integrate)
+* `≠` (Not equal)
+* `≤` (Less than or equal)
+* `≥` (Greater than or Equal)
+* `＿` (Unit attachment)
 
 
 
@@ -4749,454 +4753,454 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 
 The following is a list of unimplemented HP50 RPL commands which should be implemented by the time the project reaches version 1.0.
 
-* ABCUV
-* ACK
-* ACKALL
-* ACOS2S
-* ADDTMOD
-* ADDTOREAL
-* ALGB
-* AMORT
-* ANIMATE
-* ANS
-* APPLY
-* ARC
-* ARCHIVE
-* ARIT
-* ASIN2C
-* ASIN2T
-* ASN
-* ASSUME
-* ATAN2S
-* ATICK
-* AUGMENT
-* AUTO
-* AXL
-* AXM
-* AXQ
-* BAR
-* BASIS
-* BINS
-* BLANK
-* BOX
-* C2P
-* CASCFG
-* CASCMD
-* CENTR
-* CHINREM
-* CHOLESKY
-* CHOOSE
-* CIRC
-* CLUSR
-* CLVAR
-* CMPLX
-* CNRM
-* →COL
-* COL→
-* COL–
-* COL+
-* COLCT
-* COLLECT
-* COND
-* CONIC
-* CORR
-* CSWP
-* CURL
-* CYCLOTOMIC
-* CYLIN
-* C→PX
-* DARCY
-* DEF
-* DEFINE
-* DEGREE
-* DELALARM
-* DELKEYS
-* DEPND
-* DERIV
-* DERVX
-* DESOLVE
-* DIAG→
-* →DIAG
-* DIAGMAP
-* DIFF
-* DIFFEQ
-* DISTRIB
-* DIV
-* DIV2MOD
-* DIVIS
-* DIVMOD
-* DIVPC
-* dn
-* DOMAIN
-* DRAW3DMATRIX
-* DROITE
-* DUPDUP
-* EDIT
-* EDITB
-* EGCD
-* EGV
-* EGVL
-* ENDSUB
-* EPSX0
-* EQW
-* EQ→
-* ERASE
-* EULER
-* EXLR
-* EXP&LN
-* EXP2HYP
-* EXP2POW
-* EXPANDMOD
-* EXPLN
-* EYEPT
-* F0λ
-* FACTOR
-* FACTORMOD
-* FACTORS
-* FANNING
-* FAST3D
-* FCOEF
-* FDISTRIB
-* FFT
-* FINDALARM
-* FLOOR
-* FONT6
-* FONT7
-* FONT8
-* FONT→
-* →FONT
-* FOURIER
-* FROOTS
-* FXND
-* GAUSS
-* GBASIS
-* GCD
-* GCDMOD
-* GRAD
-* GRAMSCHMIDT
-* GRAPH
-* GREDUCE
-* GRIDMAP
-* →GROB
-* GROBADD
-* *H
-* HADAMARD
-* HALFTAN
-* HEADER→
-* →HEADER
-* HERMITE
-* HESS
-* HILBERT
-* HISTOGRAM
-* HISTPLOT
-* HORNER
-* IABCUV
-* IBASIS
-* IBERNOULLI
-* IBP
-* ICHINREM
-* IDN
-* IDIV2
-* IEGCD
-* IFFT
-* ILAP
-* IMAGE
-* INCR
-* INDEP
-* INFORM
-* INPUT
-* INT
-* INTEGER
-* INTVX
-* INVMOD
-* IQUOT
-* IREMAINDER
-* ISOM
-* ISPRIME?
-* I→R
-* JORDAN
-* KER
-* KEY
-* KEYEVAL
-* LABEL
-* LAGRANGE
-* LAP
-* LAPL
-* LAST
-* LCD→
-* →LCD
-* LCM
-* LCXM
-* LDEC
-* LEGENDRE
-* LGCD
-* lim
-* LIMIT
-* LIN
-* ΣLINE
-* LININ
-* LINSOLVE
-* LIST→
-* ∆LIST
-* ΠLIST
-* ΣLIST
-* LNAME
-* LNCOLLECT
-* LOCAL
-* LQ
-* LR
-* LSQ
-* LU
-* LVAR
-* MAD
-* MAIN
-* MANT
-* MAP
-* ↓MATCH
-* ↑MATCH
-* MATHS
-* MATR
-* MAXR
-* MCALC
-* MENU
-* MENUXY
-* MINIFONT→
-* →MINIFONT
-* MINIT
-* MINR
-* MITM
-* MKISOM
-* MODSTO
-* MODULAR
-* MOLWT
-* MROOT
-* MSGBOX
-* MSLV
-* MSOLVR
-* MULTMOD
-* MUSER
-* NDIST
-* NDUPN
-* NEWOB
-* NEXTPRIME
-* NIP
-* NOVAL
-* NSUB
-* NUMX
-* NUMY
-* ORDER
-* P2C
-* PA2B2
-* PARSURFACE
-* PARTFRAC
-* PCAR
-* PCOEF
-* PCONTOUR
-* PCOV
-* PDIM
-* PERINFO
-* PERM
-* PERTBL
-* PEVAL
-* PICTURE
-* PLOT
-* PLOTADD
-* PMINI
-* POLYNOMIAL
-* POP
-* POS
-* POTENTIAL
-* POWEXPAND
-* POWMOD
-* PREDV
-* PREDX
-* PREDY
-* PREVAL
-* PREVPRIME
-* PROMPT
-* PROMPTSTO
-* PROOT
-* PROPFRAC
-* PSDEV
-* PSI
-* Psi
-* PTAYL
-* PTPROP
-* PUSH
-* PVIEW
-* PX→C
-* →Qπ
-* qr
-* QR
-* QUAD
-* QUOT
-* QUOTE
-* QXA
-* RAND
-* RANK
-* RANM
-* RATIO
-* RCEQ
-* RCI
-* RCIJ
-* RCLALARM
-* RCLF
-* RCLKEYS
-* RCLMENU
-* RCLVX
-* RDM
-* RDZ
-* REF
-* REMAINDER
-* RENAME
-* REORDER
-* REPL
-* RES
-* RESULTANT
-* RISCH
-* RKF
-* RKFERR
-* RKFSTEP
-* RND
-* RNRM
-* ROW–
-* ROW+
-* ROW→
-* →ROW
-* rref
-* RREF
-* RREFMOD
-* RRK
-* RRKSTEP
-* RSBERR
-* RSD
-* RSWP
-* RULES
-* R→I
-* SCATRPLOT
-* SCATTER
-* SCHUR
-* SCLΣ
-* SCONJ
-* SCROLL
-* SDEV
-* SEQ
-* SERIES
-* SEVAL
-* SHOW
-* SIDENS
-* SIGMA
-* SIGMAVX
-* SIGNTAB
-* SIMP2
-* SIMPLIFY
-* SINCOS
-* SINV
-* SIZE
-* SLOPEFIELD
-* SNEG
-* SNRM
-* SOLVE
-* SOLVEQN
-* SOLVER
-* SOLVEVX
-* SPHERE
-* SRAD
-* SREPL
-* STEQ
-* STOALARM
-* STOF
-* STOKEYS
-* STOVX
-* STO+
-* STO–
-* STO*
-* STO/
-* STREAM
-* STURM
-* STURMAB
-* SUB
-* SUBST
-* SUBTMOD
-* SVD
-* SVL
-* SYLVESTER
-* SYST2MAT
-* TABVAL
-* TABVAR
-* TAN2CS2
-* TAN2SC
-* TAN2SC2
-* TAYLOR0
-* TAYLR
-* TCHEBYCHEFF
-* TCOLLECT
-* TDELTA
-* TESTS
-* TEVAL
-* TEXPAND
-* TEXT
-* TINC
-* TLIN
-* TLINE
-* TMENU
-* TRACE
-* TRAN
-* TRIG
-* TRIGCOS
-* TRIGO
-* TRIGSIN
-* TRIGTAN
-* TRN
-* TRNC
-* TRUNC
-* TRUTH
-* TSIMP
-* TSTR
-* TVARS
-* TVM
-* TVMBEG
-* TVMEND
-* TVMROOT
-* UNASSIGN
-* UNASSUME
-* UNBIND
-* UNPICK
-* UNROT
-* UTPC
-* UTPF
-* UTPN
-* UTPT
-* V→
-* →V2
-* →V3
-* VANDERMONDE
-* VARS
-* VER
-* VISIT
-* VISITB
-* VPOTENTIAL
-* VTYPE
-* *W
-* WIREFRAME
-* XNUM
-* XPON
-* XQ
-* XVOL
-* XXRNG
-* YSLICE
-* YVOL
-* YYRNG
-* ZEROS
-* ZFACTOR
-* ZVOL
-* | (Where)
-* ?
-* ∞
-* Σ
-* ∂
-*  (Store)
-* ; (Semicolon)
+* `ABCUV`
+* `ACK`
+* `ACKALL`
+* `ACOS2S`
+* `ADDTMOD`
+* `ADDTOREAL`
+* `ALGB`
+* `AMORT`
+* `ANIMATE`
+* `ANS`
+* `APPLY`
+* `ARC`
+* `ARCHIVE`
+* `ARIT`
+* `ASIN2C`
+* `ASIN2T`
+* `ASN`
+* `ASSUME`
+* `ATAN2S`
+* `ATICK`
+* `AUGMENT`
+* `AUTO`
+* `AXL`
+* `AXM`
+* `AXQ`
+* `BAR`
+* `BASIS`
+* `BINS`
+* `BLANK`
+* `BOX`
+* `C2P`
+* `CASCFG`
+* `CASCMD`
+* `CENTR`
+* `CHINREM`
+* `CHOLESKY`
+* `CHOOSE`
+* `CIRC`
+* `CLUSR`
+* `CLVAR`
+* `CMPLX`
+* `CNRM`
+* `→COL`
+* `COL→`
+* `COL–`
+* `COL+`
+* `COLCT`
+* `COLLECT`
+* `COND`
+* `CONIC`
+* `CORR`
+* `CSWP`
+* `CURL`
+* `CYCLOTOMIC`
+* `CYLIN`
+* `C→PX`
+* `DARCY`
+* `DEF`
+* `DEFINE`
+* `DEGREE`
+* `DELALARM`
+* `DELKEYS`
+* `DEPND`
+* `DERIV`
+* `DERVX`
+* `DESOLVE`
+* `DIAG→`
+* `→DIAG`
+* `DIAGMAP`
+* `DIFF`
+* `DIFFEQ`
+* `DISTRIB`
+* `DIV`
+* `DIV2MOD`
+* `DIVIS`
+* `DIVMOD`
+* `DIVPC`
+* `dn`
+* `DOMAIN`
+* `DRAW3DMATRIX`
+* `DROITE`
+* `DUPDUP`
+* `EDIT`
+* `EDITB`
+* `EGCD`
+* `EGV`
+* `EGVL`
+* `ENDSUB`
+* `EPSX0`
+* `EQW`
+* `EQ→`
+* `ERASE`
+* `EULER`
+* `EXLR`
+* `EXP&LN`
+* `EXP2HYP`
+* `EXP2POW`
+* `EXPANDMOD`
+* `EXPLN`
+* `EYEPT`
+* `F0λ`
+* `FACTOR`
+* `FACTORMOD`
+* `FACTORS`
+* `FANNING`
+* `FAST3D`
+* `FCOEF`
+* `FDISTRIB`
+* `FFT`
+* `FINDALARM`
+* `FLOOR`
+* `FONT6`
+* `FONT7`
+* `FONT8`
+* `FONT→`
+* `→FONT`
+* `FOURIER`
+* `FROOTS`
+* `FXND`
+* `GAUSS`
+* `GBASIS`
+* `GCD`
+* `GCDMOD`
+* `GRAD`
+* `GRAMSCHMIDT`
+* `GRAPH`
+* `GREDUCE`
+* `GRIDMAP`
+* `→GROB`
+* `GROBADD`
+* `*H`
+* `HADAMARD`
+* `HALFTAN`
+* `HEADER→`
+* `→HEADER`
+* `HERMITE`
+* `HESS`
+* `HILBERT`
+* `HISTOGRAM`
+* `HISTPLOT`
+* `HORNER`
+* `IABCUV`
+* `IBASIS`
+* `IBERNOULLI`
+* `IBP`
+* `ICHINREM`
+* `IDN`
+* `IDIV2`
+* `IEGCD`
+* `IFFT`
+* `ILAP`
+* `IMAGE`
+* `INCR`
+* `INDEP`
+* `INFORM`
+* `INPUT`
+* `INT`
+* `INTEGER`
+* `INTVX`
+* `INVMOD`
+* `IQUOT`
+* `IREMAINDER`
+* `ISOM`
+* `ISPRIME?`
+* `I→R`
+* `JORDAN`
+* `KER`
+* `KEY`
+* `KEYEVAL`
+* `LABEL`
+* `LAGRANGE`
+* `LAP`
+* `LAPL`
+* `LAST`
+* `LCD→`
+* `→LCD`
+* `LCM`
+* `LCXM`
+* `LDEC`
+* `LEGENDRE`
+* `LGCD`
+* `lim`
+* `LIMIT`
+* `LIN`
+* `ΣLINE`
+* `LININ`
+* `LINSOLVE`
+* `LIST→`
+* `∆LIST`
+* `ΠLIST`
+* `ΣLIST`
+* `LNAME`
+* `LNCOLLECT`
+* `LOCAL`
+* `LQ`
+* `LR`
+* `LSQ`
+* `LU`
+* `LVAR`
+* `MAD`
+* `MAIN`
+* `MANT`
+* `MAP`
+* `↓MATCH`
+* `↑MATCH`
+* `MATHS`
+* `MATR`
+* `MAXR`
+* `MCALC`
+* `MENU`
+* `MENUXY`
+* `MINIFONT→`
+* `→MINIFONT`
+* `MINIT`
+* `MINR`
+* `MITM`
+* `MKISOM`
+* `MODSTO`
+* `MODULAR`
+* `MOLWT`
+* `MROOT`
+* `MSGBOX`
+* `MSLV`
+* `MSOLVR`
+* `MULTMOD`
+* `MUSER`
+* `NDIST`
+* `NDUPN`
+* `NEWOB`
+* `NEXTPRIME`
+* `NIP`
+* `NOVAL`
+* `NSUB`
+* `NUMX`
+* `NUMY`
+* `ORDER`
+* `P2C`
+* `PA2B2`
+* `PARSURFACE`
+* `PARTFRAC`
+* `PCAR`
+* `PCOEF`
+* `PCONTOUR`
+* `PCOV`
+* `PDIM`
+* `PERINFO`
+* `PERM`
+* `PERTBL`
+* `PEVAL`
+* `PICTURE`
+* `PLOT`
+* `PLOTADD`
+* `PMINI`
+* `POLYNOMIAL`
+* `POP`
+* `POS`
+* `POTENTIAL`
+* `POWEXPAND`
+* `POWMOD`
+* `PREDV`
+* `PREDX`
+* `PREDY`
+* `PREVAL`
+* `PREVPRIME`
+* `PROMPT`
+* `PROMPTSTO`
+* `PROOT`
+* `PROPFRAC`
+* `PSDEV`
+* `PSI`
+* `Psi`
+* `PTAYL`
+* `PTPROP`
+* `PUSH`
+* `PVIEW`
+* `PX→C`
+* `→Qπ`
+* `qr`
+* `QR`
+* `QUAD`
+* `QUOT`
+* `QUOTE`
+* `QXA`
+* `RAND`
+* `RANK`
+* `RANM`
+* `RATIO`
+* `RCEQ`
+* `RCI`
+* `RCIJ`
+* `RCLALARM`
+* `RCLF`
+* `RCLKEYS`
+* `RCLMENU`
+* `RCLVX`
+* `RDM`
+* `RDZ`
+* `REF`
+* `REMAINDER`
+* `RENAME`
+* `REORDER`
+* `REPL`
+* `RES`
+* `RESULTANT`
+* `RISCH`
+* `RKF`
+* `RKFERR`
+* `RKFSTEP`
+* `RND`
+* `RNRM`
+* `ROW–`
+* `ROW+`
+* `ROW→`
+* `→ROW`
+* `rref`
+* `RREF`
+* `RREFMOD`
+* `RRK`
+* `RRKSTEP`
+* `RSBERR`
+* `RSD`
+* `RSWP`
+* `RULES`
+* `R→I`
+* `SCATRPLOT`
+* `SCATTER`
+* `SCHUR`
+* `SCLΣ`
+* `SCONJ`
+* `SCROLL`
+* `SDEV`
+* `SEQ`
+* `SERIES`
+* `SEVAL`
+* `SHOW`
+* `SIDENS`
+* `SIGMA`
+* `SIGMAVX`
+* `SIGNTAB`
+* `SIMP2`
+* `SIMPLIFY`
+* `SINCOS`
+* `SINV`
+* `SIZE`
+* `SLOPEFIELD`
+* `SNEG`
+* `SNRM`
+* `SOLVE`
+* `SOLVEQN`
+* `SOLVER`
+* `SOLVEVX`
+* `SPHERE`
+* `SRAD`
+* `SREPL`
+* `STEQ`
+* `STOALARM`
+* `STOF`
+* `STOKEYS`
+* `STOVX`
+* `STO+`
+* `STO–`
+* `STO*`
+* `STO/`
+* `STREAM`
+* `STURM`
+* `STURMAB`
+* `SUB`
+* `SUBST`
+* `SUBTMOD`
+* `SVD`
+* `SVL`
+* `SYLVESTER`
+* `SYST2MAT`
+* `TABVAL`
+* `TABVAR`
+* `TAN2CS2`
+* `TAN2SC`
+* `TAN2SC2`
+* `TAYLOR0`
+* `TAYLR`
+* `TCHEBYCHEFF`
+* `TCOLLECT`
+* `TDELTA`
+* `TESTS`
+* `TEVAL`
+* `TEXPAND`
+* `TEXT`
+* `TINC`
+* `TLIN`
+* `TLINE`
+* `TMENU`
+* `TRACE`
+* `TRAN`
+* `TRIG`
+* `TRIGCOS`
+* `TRIGO`
+* `TRIGSIN`
+* `TRIGTAN`
+* `TRN`
+* `TRNC`
+* `TRUNC`
+* `TRUTH`
+* `TSIMP`
+* `TSTR`
+* `TVARS`
+* `TVM`
+* `TVMBEG`
+* `TVMEND`
+* `TVMROOT`
+* `UNASSIGN`
+* `UNASSUME`
+* `UNBIND`
+* `UNPICK`
+* `UNROT`
+* `UTPC`
+* `UTPF`
+* `UTPN`
+* `UTPT`
+* `V→`
+* `→V2`
+* `→V3`
+* `VANDERMONDE`
+* `VARS`
+* `VER`
+* `VISIT`
+* `VISITB`
+* `VPOTENTIAL`
+* `VTYPE`
+* `*W`
+* `WIREFRAME`
+* `XNUM`
+* `XPON`
+* `XQ`
+* `XVOL`
+* `XXRNG`
+* `YSLICE`
+* `YVOL`
+* `YYRNG`
+* `ZEROS`
+* `ZFACTOR`
+* `ZVOL`
+* `|` (Where)
+* `?`
+* `∞`
+* `Σ`
+* `∂`
+* `▶` (Store)
+* `;` (Semicolon)
 
 ## Unapplicable commands
 
@@ -5205,63 +5209,63 @@ for example because they are dealing with hardware details or system-level
 features that have no equivalent on the hardware DB48X runs on.
 As a result, they behave like normal names on DB48X.
 
-* ATTACH
-* BAUD
-* BUFLEN
-* C$
-* CKSM
-* CLKADJ
-* CLOSEIO
-* CR
-* DELAY
-* DETACH
-* FILER
-* FINISH
-* FLASHEVAL
-* FREE
-* KERRM
-* →KEYTIME
-* KEYTIME→
-* KGET
-* LANGUAGE→
-* →LANGUAGE
-* LIBEVAL
-* LIBS
-* MERGE
-* MINEHUNT
-* →NDISP
-* OLDPRT
-* OPENIO
-* PARITY
-* PINIT
-* PKT
-* PR1
-* PRLCD
-* PRST
-* PRSTC
-* PRVAR
-* PVARS
-* RECN
-* RECV
-* RESTORE
-* ROMUPLOAD
-* RPL>
-* SBRK
-* SEND
-* SERVER
-* SRECV
-* STIME
-* STRM
-* SYSEVAL
-* TRANSIO
-* UFL1→MINIF
-* WSLOG
-* XGET
-* XMIT
-* XPUT
-* XRECV
-* XSEND
-* XSERV
+* `ATTACH`
+* `BAUD`
+* `BUFLEN`
+* `C$`
+* `CKSM`
+* `CLKADJ`
+* `CLOSEIO`
+* `CR`
+* `DELAY`
+* `DETACH`
+* `FILER`
+* `FINISH`
+* `FLASHEVAL`
+* `FREE`
+* `KERRM`
+* `→KEYTIME`
+* `KEYTIME→`
+* `KGET`
+* `LANGUAGE→`
+* `→LANGUAGE`
+* `LIBEVAL`
+* `LIBS`
+* `MERGE`
+* `MINEHUNT`
+* `→NDISP`
+* `OLDPRT`
+* `OPENIO`
+* `PARITY`
+* `PINIT`
+* `PKT`
+* `PR1`
+* `PRLCD`
+* `PRST`
+* `PRSTC`
+* `PRVAR`
+* `PVARS`
+* `RECN`
+* `RECV`
+* `RESTORE`
+* `ROMUPLOAD`
+* `RPL>`
+* `SBRK`
+* `SEND`
+* `SERVER`
+* `SRECV`
+* `STIME`
+* `STRM`
+* `SYSEVAL`
+* `TRANSIO`
+* `UFL1→MINIF`
+* `WSLOG`
+* `XGET`
+* `XMIT`
+* `XPUT`
+* `XRECV`
+* `XSEND`
+* `XSERV`
 
 
 ## Additional commands
@@ -5269,182 +5273,182 @@ As a result, they behave like normal names on DB48X.
 The following commands are unique to DB48X and are not found in any
 Hewlett-Packard RPL implementation.
 
-* [ATAN2](#atan2): Arc-tangent from two arguments
-* [AngleUnitsMenu](#angleunitsmenu)
-* [AnglesMenu](#anglesmenu)
-* [ApplyInverseUnit](#applyinverseunit)
-* [ApplyUnit](#applyunit)
-* [AreaUnitsMenu](#areaunitsmenu)
-* [AutoSimplify](#autosimplify): Automatically simplify expressions
-* [BASE](#base): Select an arbitrary base for based numbers
-* [Background](#background): Select background pattern for graphic operations
-* [BasedDotOrComma](#baseddotorcomma): Use dot or comma as based number digit separator
-* [BasedSpaces](#basedspaces): Use thin spaces as based number digit separator
-* [BasedSpacing](#basedspacing): Grouping of digits for based numbers
-* [BasedTicks](#basedticks): Use tick marsk `'` as based number digit separator
-* [BasedUnderscore](#basedunderscore): Use underscore `_` as based number digit separator
-* [BasesMenu](#basesmenu)
-* [CBRT](#cbrt): Cube root
-* [CYCLE](#cycle): Cycle between object representations
-* [Capitalized](#capitalized): Show commands capitalized
-* [Catalog](#catalog): Present catalog of all functions with auto-completion
-* [CharsMenu](#charsmenu)
-* [CircularMenu](#circularmenu)
-* [ClassicExponent](#classicexponent): Use E as exponent marker, e.g. 1.3E128
-* [ClearThingsMenu](#clearthingsmenu)
-* [CompareMenu](#comparemenu)
-* [ComplexMenu](#complexmenu)
-* [ComputerUnitsMenu](#computerunitsmenu)
-* [ConstantsMenu](#constantsmenu)
-* [ConvertToUnitPrefix](#converttounitprefix)
-* [ConvertToUnit](#converttounit)
-* [CursorBlinkRate](#cursorblinkrate): Select cursor blink rate in milliseconds
-* [DebugMenu](#debugmenu)
-* [DecimalComma](#decimalcomma): Select comma as decimal separator
-* [DecimalDot](#decimaldot): Select dot as decimal separator
-* [DifferentialSolverMenu](#differentialsolvermenu)
-* [DisplayModesMenu](#displaymodesmenu)
-* [EQUIV](#equiv): Logical equivalence
-* [ERFC](#erfc): Complementary error function
-* [ERF](#erf): Error function
-* [EXCLUDES](#excludes): Logical exclusion
-* [EditMenu](#editmenu)
-* [EditorBegin](#editorbegin)
-* [EditorClear](#editorclear)
-* [EditorCopy](#editorcopy)
-* [EditorCut](#editorcut)
-* [EditorEnd](#editorend)
-* [EditorFlip](#editorflip)
-* [EditorFontSize](#editorfontsize): Select font size for text editor
-* [EditorMultilineFontSize](#editormultilinefontsize): Select font size for multi-line text editor
-* [EditorPaste](#editorpaste)
-* [EditorReplace](#editorreplace)
-* [EditorSearch](#editorsearch)
-* [EditorSelect](#editorselect)
-* [EditorWordLeft](#editorwordleft)
-* [EditorWordRight](#editorwordright)
-* [ElectricityUnitsMenu](#electricityunitsmenu)
-* [EnergyUnitsMenu](#energyunitsmenu)
-* [EquationsMenu](#equationsmenu)
-* [ExpLogMenu](#explogmenu)
-* [FancyExponent](#fancyexponent): Use power-of-ten rendering, e.g. 1.3×₁₀¹²⁸
-* [FilesMenu](#filesmenu)
-* [FinanceSolverMenu](#financesolvermenu)
-* [FlagsMenu](#flagsmenu)
-* [FlatMenus](#flatmenus): Flatten menus (no use of shift)
-* [ForceUnitsMenu](#forceunitsmenu)
-* [Foreground](#foreground): Select foreground pattern for graphic operations
-* [FractionSpacing](#fractionspacing): Grouping of digits for fractional part of numbers
-* [FractionsMenu](#fractionsmenu)
-* [GAND](#gand): Graphical And
-* [GarbageCollect](#garbagecollect)
-* [GraphicsMenu](#graphicsmenu)
-* [GraphicsStackDisplay](#graphicsstackdisplay): Select graphic display of the stack
-* [HYPOT](#hypot): Hypothenuse
-* [HideBuiltinUnits](#hidebuiltinunits)
-* [HyperbolicMenu](#hyperbolicmenu)
-* [IMPLIES](#implies): Logical implication
-* [IOMenu](#iomenu)
-* [IntegrationMenu](#integrationmenu)
-* [LastMenu](#lastmenu): Select last menu
-* [LastX](#lastx): Return last X argument (for easier translation of RPN programs)
-* [LengthUnitsMenu](#lengthunitsmenu)
-* [LibrariesMenu](#librariesmenu)
-* [LightUnitsMenu](#lightunitsmenu)
-* [LineWidth](#linewidth): Select line width for line drawing operations
-* [LinearSolverMenu](#linearsolvermenu)
-* [ListMenu](#listmenu)
-* [LongForm](#longform): Show commands in long form
-* [LoopsMenu](#loopsmenu)
-* [LowerCase](#lowercase): Show commands in lowercase
-* [MainMenu](#mainmenu)
-* [MantissaSpacing](#mantissaspacing): Grouping of digits for whole part of numbers
-* [MassUnitsMenu](#massunitsmenu)
-* [MathMenu](#mathmenu)
-* [MathModesMenu](#mathmodesmenu)
-* [MatrixMenu](#matrixmenu)
-* [MaxNumberBits](#maxnumberbits): Maximum number of bits used by a number
-* [MaxRewrites](#maxrewrites): Maximum number of equation rewrites
-* [MemoryMenu](#memorymenu)
-* [MenuFirstPage](#menufirstpage)
-* [MenuNextPage](#menunextpage)
-* [MenuPreviousPage](#menupreviouspage)
-* [MinimumSignificantDigits](#minimumsignificantdigits): adjustment of FIX mode switch to SCI
-* [ModesMenu](#modesmenu)
-* [MultiSolverMenu](#multisolvermenu)
-* [NAND](#nand): Not And
-* [NOR](#nor): Not Or
-* [NoAutoSimplify](#noautosimplify): Do not automatically simplify expressions
-* [NoTrailingDecimal](#notrailingdecimal): display 1.0 as 1
-* [NumberDotOrComma](#numberdotorcomma): Use dot or comma as digit group separator
-* [NumberSpaces](#numberspaces): Use thin spaces as digit group separator
-* [NumberTicks](#numberticks): Use tick marks `'` as digit group separator
-* [NumberUnderscore](#numberunderscore): Use underscore `_` as digit group separator
-* [NumbersMenu](#numbersmenu)
-* [NumericResults](#numericresults): Produce numeric (decimal) results
-* [NumericalSolverMenu](#numericalsolvermenu)
-* [ObjectMenu](#objectmenu)
-* [PIRADIANS](#piradians): Angle mode with multiples of pi
-* [PartsMenu](#partsmenu)
-* [PlotMenu](#plotmenu)
-* [PolynomialSolverMenu](#polynomialsolvermenu)
-* [PolynomialsMenu](#polynomialsmenu)
-* [PowerUnitsMenu](#powerunitsmenu)
-* [PowersMenu](#powersmenu)
-* [Precision](#precision): Select decimal computing precision
-* [PressureUnitsMenu](#pressureunitsmenu)
-* [PrintingMenu](#printingmenu)
-* [ProbabilitiesMenu](#probabilitiesmenu)
-* [ProgramMenu](#programmenu)
-* [REM](#rem): remainder
-* [RadiationUnitsMenu](#radiationunitsmenu)
-* [RealMenu](#realmenu)
-* [ResultFontSize](#resultfontsize): Select font size to display level 1 of stack
-* [RoundedMenus](#roundedmenus): Select round menu style
-* [SIG](#sig): Significant digits mode
-* [SaveState](#savestate): Save system state to current state file
-* [SelfInsert](#selfinsert)
-* [SeparatorModesMenu](#separatormodesmenu)
-* [ShowBuiltinUnits](#showbuiltinunits)
-* [SignalProcessingMenu](#signalprocessingmenu)
-* [SingleRowMenus](#singlerowmenus): Display menus on single row
-* [SolverMenu](#solvermenu)
-* [SpeedUnitsMenu](#speedunitsmenu)
-* [SquareMenus](#squaremenus): Select square (C47-like) menu style
-* [StackFontSize](#stackfontsize): Select font size to display levels above 1 of stack
-* [StackMenu](#stackmenu)
-* [StandardExponent](#standardexponent): Display with standard exponent mode
-* [StatisticsMenu](#statisticsmenu)
-* [SymbolicMenu](#symbolicmenu)
-* [SymbolicResults](#symbolicresults): Produce symbolic results
-* [SymbolicSolverMenu](#symbolicsolvermenu)
-* [SystemMemory](#systemmemory)
-* [SystemSetup](#systemsetup): Enter DMCP system setup menu
-* [Tag](#tag)→
-* [TemperatureUnitsMenu](#temperatureunitsmenu)
-* [TestsMenu](#testsmenu)
-* [TextMenu](#textmenu)
-* [TextStackDisplay](#textstackdisplay): Select text-only display of the stack
-* [ThreeRowsMenus](#threerowsmenus): Display menus on up to three rows
-* [TimeMenu](#timemenu)
-* [TimeUnitsMenu](#timeunitsmenu)
-* [ToFractionDigits](#tofractiondigits): Required digits of precision for →Q
-* [ToFractionIterations](#tofractioniterations): Max number of iterations for →Q
-* [ToolsMenu](#toolsmenu): Automatically select a menu based on context
-* [TrailingDecimal](#trailingdecimal): display 1.0 with trailing decimal separator
-* [TypeName](#typename)
-* [Undo](#undo): Restore stack to state before command
-* [UnitsConversionsMenu](#unitsconversionsmenu)
-* [UnitsMenu](#unitsmenu)
-* [UpperCase](#uppercase): Show commands in uppercase
-* [UserInterfaceModesMenu](#userinterfacemodesmenu)
-* [VariablesMenuExecute](#variablesmenuexecute)
-* [VariablesMenuRecall](#variablesmenurecall)
-* [VariablesMenuStore](#variablesmenustore)
-* [VariablesMenu](#variablesmenu)
-* [VectorMenu](#vectormenu)
-* [ViscosityUnitsMenu](#viscosityunitsmenu)
-* [VolumeUnitsMenu](#volumeunitsmenu)
+* `atan2` Arc-tangent from two arguments
+* `AngleUnitsMenu`
+* `AnglesMenu`
+* `ApplyInverseUnit`
+* `ApplyUnit`
+* `AreaUnitsMenu`
+* `AutoSimplify` Automatically simplify expressions
+* `BASE` Select an arbitrary base for based numbers
+* `Background` Select background pattern for graphic operations
+* `BasedDotOrComma` Use dot or comma as based number digit separator
+* `BasedSpaces` Use thin spaces as based number digit separator
+* `BasedSpacing` Grouping of digits for based numbers
+* `BasedTicks` Use tick marsk `'` as based number digit separator
+* `BasedUnderscore` Use underscore `_` as based number digit separator
+* `BasesMenu`
+* `CBRT` Cube root
+* `CYCLE` Cycle between object representations
+* `Capitalized` Show commands capitalized
+* `Catalog` Present catalog of all functions with auto-completion
+* `CharsMenu`
+* `CircularMenu`
+* `ClassicExponent` Use E as exponent marker, e.g. 1.3E128
+* `ClearThingsMenu`
+* `CompareMenu`
+* `ComplexMenu`
+* `ComputerUnitsMenu`
+* `ConstantsMenu`
+* `ConvertToUnitPrefix`
+* `ConvertToUnit`
+* `CursorBlinkRate` Select cursor blink rate in milliseconds
+* `DebugMenu`
+* `DecimalComma` Select comma as decimal separator
+* `DecimalDot` Select dot as decimal separator
+* `DifferentialSolverMenu`
+* `DisplayModesMenu`
+* `EQUIV` Logical equivalence
+* `ERFC` Complementary error function
+* `ERF` Error function
+* `EXCLUDES` Logical exclusion
+* `EditMenu`
+* `EditorBegin`
+* `EditorClear`
+* `EditorCopy`
+* `EditorCut`
+* `EditorEnd`
+* `EditorFlip`
+* `EditorFontSize` Select font size for text editor
+* `EditorMultilineFontSize` Select font size for multi-line text editor
+* `EditorPaste`
+* `EditorReplace`
+* `EditorSearch`
+* `EditorSelect`
+* `EditorWordLeft`
+* `EditorWordRight`
+* `ElectricityUnitsMenu`
+* `EnergyUnitsMenu`
+* `EquationsMenu`
+* `ExpLogMenu`
+* `FancyExponent` Use power-of-ten rendering, e.g. 1.3×₁₀¹²⁸
+* `FilesMenu`
+* `FinanceSolverMenu`
+* `FlagsMenu`
+* `FlatMenus` Flatten menus (no use of shift)
+* `ForceUnitsMenu`
+* `Foreground` Select foreground pattern for graphic operations
+* `FractionSpacing` Grouping of digits for fractional part of numbers
+* `FractionsMenu`
+* `GAND` Graphical And
+* `GarbageCollect`
+* `GraphicsMenu`
+* `GraphicsStackDisplay` Select graphic display of the stack
+* `HYPOT` Hypothenuse
+* `HideBuiltinUnits`
+* `HyperbolicMenu`
+* `IMPLIES` Logical implication
+* `IOMenu`
+* `IntegrationMenu`
+* `LastMenu` Select last menu
+* `LastX` Return last X argument (for easier translation of RPN programs)
+* `LengthUnitsMenu`
+* `LibrariesMenu`
+* `LightUnitsMenu`
+* `LineWidth` Select line width for line drawing operations
+* `LinearSolverMenu`
+* `ListMenu`
+* `LongForm` Show commands in long form
+* `LoopsMenu`
+* `LowerCase` Show commands in lowercase
+* `MainMenu`
+* `MantissaSpacing` Grouping of digits for whole part of numbers
+* `MassUnitsMenu`
+* `MathMenu`
+* `MathModesMenu`
+* `MatrixMenu`
+* `MaxNumberBits` Maximum number of bits used by a number
+* `MaxRewrites` Maximum number of equation rewrites
+* `MemoryMenu`
+* `MenuFirstPage`
+* `MenuNextPage`
+* `MenuPreviousPage`
+* `MinimumSignificantDigits` adjustment of FIX mode switch to SCI
+* `ModesMenu`
+* `MultiSolverMenu`
+* `NAND` Not And
+* `NOR` Not Or
+* `NoAutoSimplify` Do not automatically simplify expressions
+* `NoTrailingDecimal` display 1.0 as 1
+* `NumberDotOrComma` Use dot or comma as digit group separator
+* `NumberSpaces` Use thin spaces as digit group separator
+* `NumberTicks` Use tick marks `'` as digit group separator
+* `NumberUnderscore` Use underscore `_` as digit group separator
+* `NumbersMenu`
+* `NumericResults` Produce numeric (decimal) results
+* `NumericalSolverMenu`
+* `ObjectMenu`
+* `PIRADIANS` Angle mode with multiples of pi
+* `PartsMenu`
+* `PlotMenu`
+* `PolynomialSolverMenu`
+* `PolynomialsMenu`
+* `PowerUnitsMenu`
+* `PowersMenu`
+* `Precision` Select decimal computing precision
+* `PressureUnitsMenu`
+* `PrintingMenu`
+* `ProbabilitiesMenu`
+* `ProgramMenu`
+* `REM` remainder
+* `RadiationUnitsMenu`
+* `RealMenu`
+* `ResultFontSize` Select font size to display level 1 of stack
+* `RoundedMenus` Select round menu style
+* `SIG` Significant digits mode
+* `SaveState` Save system state to current state file
+* `SelfInsert`
+* `SeparatorModesMenu`
+* `ShowBuiltinUnits`
+* `SignalProcessingMenu`
+* `SingleRowMenus` Display menus on single row
+* `SolverMenu`
+* `SpeedUnitsMenu`
+* `SquareMenus` Select square (C47-like) menu style
+* `StackFontSize` Select font size to display levels above 1 of stack
+* `StackMenu`
+* `StandardExponent` Display with standard exponent mode
+* `StatisticsMenu`
+* `SymbolicMenu`
+* `SymbolicResults` Produce symbolic results
+* `SymbolicSolverMenu`
+* `SystemMemory`
+* `SystemSetup` Enter DMCP system setup menu
+* `Tag→`
+* `TemperatureUnitsMenu`
+* `TestsMenu`
+* `TextMenu`
+* `TextStackDisplay` Select text-only display of the stack
+* `ThreeRowsMenus` Display menus on up to three rows
+* `TimeMenu`
+* `TimeUnitsMenu`
+* `ToFractionDigits` Required digits of precision for →Q
+* `ToFractionIterations` Max number of iterations for →Q
+* `ToolsMenu` Automatically select a menu based on context
+* `TrailingDecimal` display 1.0 with trailing decimal separator
+* `TypeName`
+* `Undo` Restore stack to state before command
+* `UnitsConversionsMenu`
+* `UnitsMenu`
+* `UpperCase` Show commands in uppercase
+* `UserInterfaceModesMenu`
+* `VariablesMenuExecute`
+* `VariablesMenuRecall`
+* `VariablesMenuStore`
+* `VariablesMenu`
+* `VectorMenu`
+* `ViscosityUnitsMenu`
+* `VolumeUnitsMenu`
 # Performance measurements
 
 This sections tracks some performance measurements across releases.
@@ -7478,8 +7482,8 @@ Hitting the second shifted function in the [Vars menu](#VariablesMenu) will
 
 ## ToolsMenu
 
-The `ToolsMenu` maps to the _A_ key (_Σ+_ on the original WASM keyboard).
-It invokes a context-dependent menu adapted to the top level of the stack.
+The `ToolsMenu` invokes a context-dependent menu adapted to the top level of the
+stack.
 
 
 ## LastMenu
@@ -7550,6 +7554,11 @@ Add two values.
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
   `"X=" 1 +` gives `"X=1"`.
 
+*Note*: The ` Add ` command and the ` + ` operation are identical on DB48X.
+[This differs from HP calculators](#list-operation-differences).
+
+
+
 ## Sub
 
 Subtract two values
@@ -7597,11 +7606,11 @@ Divide two values two values
   and division of 0 when [autosimplify](#autosimplify) is active.
 
 
-## ↑ (^, pow)
+## Pow
 
 Raise to the power
 
-`Y` `X` ▶ `Y↑X`
+`Y` `X` ▶ `Y^X`
 
 * For integer, fractional, decimal or complex numbers, this raises the
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.
@@ -8057,6 +8066,127 @@ the second input is false.
 ## STRIPCOMMENTS
 Remove all comments from a compiled program
 
+# Comparisons
+
+Comparison operators take two inputs and return a truth value,
+`True` or `False`.
+
+For compound objects, lexicographical order is used.
+For text, Unicode code point order is used.
+
+
+## True
+
+Represent a logical truth, the opposite of `False`.
+
+## False
+
+Represent a logical untruth, the opposite of `True`.
+
+
+## =
+
+Checks if two values are mathematically equal.
+This does not check the type of the object but its value.
+The `=` comparison operator can be used to form equations such as `'X=1'`, for
+example for use with the `Root` numerical solver.
+
+```rpl
+@ Expecting True
+'1=2.0-1.0' Evaluate
+```
+
+In most cases, `=` is the best replacement for `==` in programs written for
+HP variants of RPL.
+
+
+## ≠
+
+Check if two values are mathematically different. This is the opposite of `=`.
+
+```rpl
+@ Expecting False
+'1≠2.0-1.0' Evaluate
+```
+
+## ==
+
+Checks if two objects are identical after evaluating names
+(contrary to `same`).
+
+```rpl
+A=1
+'A==1' Evaluate
+@ Expecting True
+```
+
+Unlike `=`, `==` takes the type of the object into account, meaning that
+`'1==1.0'` evaluates as `False`.
+
+```rpl
+'1==2.0-1.0' Evaluate
+@ Expecting False
+```
+
+## Same
+
+Checks if two objects are identical without evaluating names
+(contrary to `==`).
+
+```rpl
+A=1
+'A' 1 SAME
+@ Expecting False
+```
+
+
+## <
+
+Check if the first value is less than the second value.
+
+```rpl
+{}
+1 2 < + 2.3 1.2 < +
+"ABC" "DEF" < + "a" "à" < +
+{ 1 2 3 } { 1 2 4 } < + { 1 2 3 } { 1 2 3 } < +
+@ Expecting { True False True True True False }
+```
+
+## ≤
+
+Check if the first value is less than or equal to the second value.
+
+```rpl
+{}
+1 2 ≤ + 2.3 1.2 ≤ +
+"ABC" "DEF" ≤ + "a" "à" ≤ +
+{ 1 2 3 } { 1 2 4 } ≤ + { 1 2 3 } { 1 2 3 } ≤ +
+@ Expecting { True False True True True True }
+```
+
+## >
+
+Check if the first value is greater than the second value.
+
+```rpl
+{}
+1 2 > + 2.3 1.2 > +
+"ABC" "DEF" > + "a" "à" > +
+{ 1 2 3 } { 1 2 4 } > + { 1 2 3 } { 1 2 3 } > +
+@ Expecting { True False True True True False }
+```
+
+## ≥
+
+Check if the first value is greater than or equal to the second value.
+
+```rpl
+{}
+1 2 ≥ + 2.3 1.2 ≥ +
+"ABC" "DEF" ≥ + "a" "à" ≥ +
+{ 1 2 3 } { 1 2 4 } ≥ + { 1 2 3 } { 1 2 3 } ≥ +
+@ Expecting { False True False False False True }
+```
 # Operations with Complex Numbers
 
 ## RE
@@ -8333,6 +8463,8 @@ Subtract the contents of a variable from a value on a stack
 
 ## RCL×
 Multiply a value on the stack by the contents of a variable
+The value in the variable is multiplied on the right, in cases where
+multiplication is non-commutative (e.g. matrix multiplication).
 
 
 ## RCL÷
@@ -8400,7 +8532,7 @@ List variables of a specific type
 `type` ▶ `{ Variables... }`
 `{ types... }` ▶ `{ Variables... }`
 
-See the [`Type`](#type) command for a list of types.
+See the `Type` command for a list of types.
 
 ## Copy
 
@@ -8408,9 +8540,11 @@ Copy a value into a global variable. This is primarily intended for use in
 algebraic notations, although it also works in RPL. The HP50G Advanced Reference
 Manual refers to this command as _▶ (Store)_.
 
-```
-'(2+5)▶X'
+```rpl
+'(2+5)▶X' EVAL
 42 'A' ▶ 1 +
+{} X + A + +
+@ Expecting { 43 7 42 }
 ```
 
 The command returns the stored object on the stack. The returned copy is a
@@ -8420,7 +8554,7 @@ memory.
 ## Assignment
 
 An assignment is an RPL object in the form `Name=Value` that sets a global
-variable to a given value. It is intended primarily to facilitated the
+variable to a given value. It is intended primarily to facilitate the
 interactive use of library equations.
 
 An assignment evaluates `Value`, stores it into `Name`, and puts the original
@@ -9830,8 +9964,8 @@ displayed in alphabetical order. If you type `ACO`, `ACOS, `ACOSH` and
 Inside text, all characters related to the last entered character will be shown.
 For example, if you typed `A`, options to add accents to `A` or to select the
 Greek `α` or the related `ª` character. If no matching character is found,
-the `CharactersMenu` [characters menu](#CharactersMenu) is presented, allowing
-you to select specific characters from predefined categories.
+the `CharactersMenu` is presented, allowing you to select specific characters
+from predefined categories.
 
 
 ## CharactersMenu
@@ -9849,6 +9983,12 @@ the `config/characters.csv` file. Each row in that file contains two texts:
   shown, but is used to find characters related to a given character.
 
 * The second is the list of characters to be shown.
+
+Some language-specific submenus in the characters menu enable *transliteration*,
+which select alphabetic characters in that language. For example, if you use the
+character menu for Greek and lowercase, then typing `A` will insert
+`α` (greek lowercase alpha). Repeated use of the same key cycles through
+options, in that case `ά` and `a` before cycling back to `α`.
 
 
 ## ConstantsMenu
@@ -11041,14 +11181,16 @@ ELSE
 END
 ```
 
-
-
-on HP calculators is documented as follows, according to the HP50G Advanced Refernece Manu
-silently returns an extremum when there is no solution.
-
 As an extension to the HP implementation, `ROOT` can solve systems of equations
 and multiple variables by solving them one equation at a time, a programmatic version of what the HP50G Advanced Reference Manual calls the Multiple Equation Solver (`MINIT`, `MITM` and `MSOLVR` commands).
 
+## SolvingMenuSolve
+
+Solve the system of equations for the given variable.
+
+## SolvingMenuRecall
+
+Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
 
 ## MSOLVE
@@ -12356,9 +12498,17 @@ unit object. The numerical part of the unit object is ignored.
 3000 2_km →Unit
 ```
 
+## UnitsSIPrefixCycle
 
-## ULIST
-List all user-defined units
+Sets a prefix cycle for SI units when using the `Cycle` key (_EEX_ or _×10ⁿ_,
+next to _O_) on the command-line to cycle through SI prefixes. The cycle is
+specified as a text string containing all the desired prefixes, in the order in
+which they should appear. This preference is stored in the `UnitsSIPrefixCycle`
+variable in the current directory.
+
+For example, after executing `"cmkμ" UnitsSIPrefixCycle`, typing _1_ ___ _m_ __
+_×10ⁿ_ will show `1_cm` on the command line. Hitting _×10ⁿ_ again will change
+that command line to `1_mm`, and again to `1_km`.
 # USB Communications
 
 ## USBSTATUS
@@ -12456,18 +12606,18 @@ then the cursor will automatically be positioned at that location.
 
 The `ASN` command defines the behaviour of a given key in user mode.
 It takes two arguments, an object and a [key position](#key-position).
-The assignment is placed in the `KeyMap` variabe for the current directory.
+The assignment is placed in the `KeyMap` variable for the current directory.
 
 To clear an assignment, assign `StandardKey` to a given key.
 
-For example, to assign the `MathMenu` to the `exp` key, use the following:
+For example, to assign the `asn` command to the key on the third row and fourth column (which is _sin_ by default), use the following:
 ```rpl
-'MathMenu' 24 ASN
+'ASN' 34 ASN
 ```
 
 To restore the standard key assignment for that same key, use the following:
 ```rpl
-'StandardKey' 24 ASN
+'StandardKey' 34 ASN
 ```
 
 ## StoreKeys

@@ -31,7 +31,7 @@ following stack diagram:
 
 `Y` `X` ▶ `Y+X`
 
-The duplication operation `Duplicate` (`DUP`) can be described in synthetic form
+The duplication operation `Duplicate` can be described in synthetic form
 using the following synthetic stack diagram:
 
 `X` ▶ `X` `X`
@@ -93,9 +93,9 @@ statistic operations had non-obvious interactions with numbered data registers.
 
 All this was solved with RPL, because now a complex number, a matrix or a text
 would occupy a single entry on the stack. So whereas adding two integers would
-require a sequence like `1 ENTER 2 +` like in RPN, a very similar sequence would
-add two texts: `"ABC" ENTER "DEF" +`, and the exact same logic would also add
-two vectors in `[1 2 3] ENTER [4 5 6] +`.
+require a sequence like _1_ _ENTER_ _2_ _+_ like in RPN, a very similar sequence
+would add two texts: `"ABC"` _ENTER_ `"DEF"` _+_, and the exact same logic would
+also add two vectors in `[1 2 3]` _ENTER_ `[4 5 6]` _+_.
 
 DB48X adopts this extremely powerful idea, with a focus on making it as
 efficient as possible for interactive calculations as well as for custom
