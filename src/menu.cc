@@ -1303,12 +1303,12 @@ MENU(PowersMenu,
 // ----------------------------------------------------------------------------
 //   Menu with the common powers
 // ----------------------------------------------------------------------------
-     "Square",  ID_sq,
-     "Cube",    ID_cubed,
+     ID_sq,
+     ID_cubed,
      ID_pow,
      ID_sqrt,
      ID_cbrt,
-     "xroot",   ID_Unimplemented);
+     ID_xroot);
 
 
 MENU(FractionsMenu,
