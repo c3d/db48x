@@ -12633,18 +12633,18 @@ then the cursor will automatically be positioned at that location.
 
 The `ASN` command defines the behaviour of a given key in user mode.
 It takes two arguments, an object and a [key position](#key-position).
-The assignment is placed in the `KeyMap` variabe for the current directory.
+The assignment is placed in the `KeyMap` variable for the current directory.
 
 To clear an assignment, assign `StandardKey` to a given key.
 
-For example, to assign the `MathMenu` to the `exp` key, use the following:
+For example, to assign the `asn` command to the key on the third row and fourth column (which is _sin_ by default), use the following:
 ```rpl
-'MathMenu' 24 ASN
+'ASN' 34 ASN
 ```
 
 To restore the standard key assignment for that same key, use the following:
 ```rpl
-'StandardKey' 24 ASN
+'StandardKey' 34 ASN
 ```
 
 ## StoreKeys
