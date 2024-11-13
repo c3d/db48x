@@ -837,6 +837,7 @@ static const si_prefix si_prefixes[] =
     { "K",      3 },                    // kilo (computer-science)
     { "µ",     -6 },                    // micro (0xB5)
     { "μ",     -6 },                    // micro (0x3BC)
+    { "u",     -6 },                    // micro (for quick transalpha entry)
     { "M",      6 },                    // mega
     { "n",     -9 },                    // nano
     { "G",      9 },                    // giga
