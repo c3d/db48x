@@ -68,11 +68,11 @@ Divide two values two values
   and division of 0 when [autosimplify](#autosimplify) is active.
 
 
-## ↑ (^, pow)
+## Pow
 
 Raise to the power
 
-`Y` `X` ▶ `Y↑X`
+`Y` `X` ▶ `Y^X`
 
 * For integer, fractional, decimal or complex numbers, this raises the
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.

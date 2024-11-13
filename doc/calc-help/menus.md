@@ -62,8 +62,8 @@ Hitting the second shifted function in the [Vars menu](#VariablesMenu) will
 
 ## ToolsMenu
 
-The `ToolsMenu` maps to the _A_ key (_Σ+_ on the original DM42 keyboard).
-It invokes a context-dependent menu adapted to the top level of the stack.
+The `ToolsMenu` invokes a context-dependent menu adapted to the top level of the
+stack.
 
 
 ## LastMenu
