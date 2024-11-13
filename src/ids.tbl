@@ -545,7 +545,7 @@ CMD(CurrentDirectory)
 NAMED(Home, "HomeDirectory")
 NAMED(CrDir, "CreateDirectory") ALIAS(CrDir, "MkDir")
 NAMED(UpDir, "UpDirectory")
-NAMED(PgDir, "PurgeDirectory")
+NAMED(PgDir, "PurgeDirectory")  ALIAS(PgDir, "RmDir")
 
 /// Equations
 NAMED(MatchUp,   "↑Match")
