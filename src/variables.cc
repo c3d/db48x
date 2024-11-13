@@ -232,6 +232,7 @@ object_p directory::store(object_g name, object_g value)
     case ID_CustomMenu:
     case ID_Header:
     case ID_KeyMap:
+    case ID_UnitsSIPrefixCycle:
         break;
 
     case ID_symbol:
@@ -474,6 +475,7 @@ object_p directory::recall_all(object_p name, bool report_missing)
     case ID_CustomMenu:
     case ID_Header:
     case ID_KeyMap:
+    case ID_UnitsSIPrefixCycle:
         break;
 
     case ID_symbol:
@@ -565,6 +567,7 @@ size_t directory::purge(object_p name)
     case ID_CustomMenu:
     case ID_Header:
     case ID_KeyMap:
+    case ID_UnitsSIPrefixCycle:
         break;
 
     case ID_symbol:
