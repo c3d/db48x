@@ -145,7 +145,7 @@ List variables of a specific type
 `type` ▶ `{ Variables... }`
 `{ types... }` ▶ `{ Variables... }`
 
-See the [`Type`](#type) command for a list of types.
+See the `Type` command for a list of types.
 
 ## Copy
 
@@ -153,9 +153,11 @@ Copy a value into a global variable. This is primarily intended for use in
 algebraic notations, although it also works in RPL. The HP50G Advanced Reference
 Manual refers to this command as _▶ (Store)_.
 
-```
-'(2+5)▶X'
+```rpl
+'(2+5)▶X' EVAL
 42 'A' ▶ 1 +
+{} X + A + +
+@ Expecting { 43 7 42 }
 ```
 
 The command returns the stored object on the stack. The returned copy is a
@@ -165,7 +167,7 @@ memory.
 ## Assignment
 
 An assignment is an RPL object in the form `Name=Value` that sets a global
-variable to a given value. It is intended primarily to facilitated the
+variable to a given value. It is intended primarily to facilitate the
 interactive use of library equations.
 
 An assignment evaluates `Value`, stores it into `Name`, and puts the original
