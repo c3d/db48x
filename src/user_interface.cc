@@ -50,6 +50,7 @@
 #include "symbol.h"
 #include "sysmenu.h"
 #include "target.h"
+#include "unit.h"
 #include "utf8.h"
 #include "util.h"
 #include "variables.h"
@@ -751,7 +752,7 @@ void user_interface::update_mode()
         {
             if (unit)
             {
-                unit = code == byte(code) && isalnum(code);
+                unit = is_valid_in_name(code);
                 if (!unit)
                 {
                     static utf8 valid = utf8("/÷×·^↑⁻¹²³");
@@ -4981,39 +4982,66 @@ bool user_interface::handle_digits(int key)
                 size_t len = 0;
                 if (current_word(start, len))
                 {
-                    byte *ed = rt.editor();
-                    byte *st = (byte *) start;
-                    unicode prefix = 0;
-                    bool    ins    = false;
+                    byte   *ed     = rt.editor();
+                    byte   *st     = (byte *) start;
+                    bool    ins    = true;
                     bool    del    = false;
+                    utf8    cycle = utf8("kcmμMGTpn"); // Default cycle
+                    size_t cylen = strlen(cstring(cycle));
+                    if (object_p name = unit::si_prefixes_variable())
+                        if (object_p si = directory::recall_all(name, false))
+                            if (text_p txt = si->as<text>())
+                                cycle = txt->value(&cylen);
 
-                    switch(*start)
+                    if (cylen)
                     {
-                    case 'k':   prefix = 'M';           break;
-                    case 'M':   prefix = 'G';           break;
-                    case 'G':   prefix = 'T';           break;
-                    case 'T':   prefix = 'm';           break;
-                    case 'm':   prefix = 'c';           break;
-                    case 'c':                           del = true; break;
-                    default:    prefix = 'k';           ins = true; break;
-                    }
-                    if (del && size_t(st - ed + 1) < rt.editing() &&
-                        isalnum(start[1]))
-                    {
-                        remove(st - ed, 1);
-                    }
-                    else
-                    {
-                        if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
-                                     !isalnum(start[1])))
+                        unicode prefix = utf8_codepoint(cycle);
+                        size_t toremove = 1;
+                        if (len > 1)
                         {
-                            ins = true;
-                            prefix = 'k';
+                            unicode existing = utf8_codepoint(st);
+                            utf8    cyend    = cycle + cylen;
+                            ins = false;
+                            while (cycle < cyend)
+                            {
+                                utf8 ncycle = utf8_next(cycle);
+                                if (existing == utf8_codepoint(cycle))
+                                {
+                                    if (ncycle < cyend)
+                                        prefix = utf8_codepoint(ncycle);
+                                    else
+                                        del = true;
+                                    toremove = utf8_size(existing);
+                                    break;
+                                }
+                                cycle = ncycle;
+                            }
                         }
-                        if (ins)
-                            insert(st - ed, prefix);
+
+                        if (del &&
+                            size_t(st - ed + 1) < rt.editing() &&
+                            is_valid_in_name(start))
+                        {
+                            remove(st - ed, toremove);
+                        }
                         else
-                            *st = prefix;
+                        {
+                            if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
+                                         !is_valid_in_name(start)))
+                            {
+                                ins = true;
+                                prefix = utf8_codepoint(cycle);
+                            }
+                            if (ins)
+                            {
+                                insert(st - ed, prefix);
+                            }
+                            else
+                            {
+                                remove(st - ed, toremove);
+                                insert(st - ed, prefix);
+                            }
+                        }
                     }
                 }
             }

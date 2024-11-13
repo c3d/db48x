@@ -440,6 +440,7 @@ CMD(DeleteKeys)         ALIAS(DeleteKeys, "DelKeys")
 CMD(StoreKeys)          ALIAS(StoreKeys, "StoKeys")
 CMD(RecallKeys)         ALIAS(RecallKeys, "RclKeys")
 CMD(StandardKey)        ALIAS(StandardKey, "SKey")
+CMD(UnitsSIPrefixCycle)
 
 NAMED(DispXY,           "DrawStyledText")
 NAMED(PixOn,            "DrawPixel")
