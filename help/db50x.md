@@ -8504,6 +8504,8 @@ Subtract the contents of a variable from a value on a stack
 
 ## RCL×
 Multiply a value on the stack by the contents of a variable
+The value in the variable is multiplied on the right, in cases where
+multiplication is non-commutative (e.g. matrix multiplication).
 
 
 ## RCL÷
