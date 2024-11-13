@@ -81,7 +81,7 @@ public:
     MENU_DECL(SolvingMenu);
 };
 
-COMMAND_DECLARE_INSERT(SolvingMenuStore,1);
+COMMAND_DECLARE_INSERT_HELP(SolvingMenuStore,1);
 COMMAND_DECLARE_INSERT(SolvingMenuSolve,0);
 COMMAND_DECLARE_INSERT(SolvingMenuRecall,0);
 

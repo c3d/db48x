@@ -1140,6 +1140,22 @@ INSERT_BODY(SolvingMenuStore)
 }
 
 
+HELP_BODY(SolvingMenuStore)
+// ----------------------------------------------------------------------------
+//   Help for storing in a solver variable
+// ----------------------------------------------------------------------------
+{
+    size_t len = 0;
+    if (utf8 topic = ui.label_for_function_key(&len))
+    {
+        static char buf[64];
+        snprintf(buf, sizeof(buf), "`%.*s`", int(len), topic);
+        return utf8(buf);
+    }
+    return nullptr;
+}
+
+
 COMMAND_BODY(SolvingMenuSolve)
 // ----------------------------------------------------------------------------
 //  Solve for a given variable

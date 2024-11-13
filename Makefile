@@ -204,7 +204,9 @@ help/$(TARGET)-images:
 	rsync -av --delete doc/img/*.bmp help/img/
 
 help/$(TARGET).idx: help/$(TARGET).md
-	grep -b '^#' $< | sort -k2 -t: > $@
+	grep -b '^#\|^\* `[^`]*`' $< 		|	\
+	sed -e 's/:\(\* `[^`]*`\).*/:\1/g'   	|	\
+	sort -k2 -t: > $@
 	[ "$$(cat $@ | wc -L)" -lt 80 ]
 
 check-ids: help/$(TARGET).md
