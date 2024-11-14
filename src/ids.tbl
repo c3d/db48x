@@ -522,7 +522,7 @@ CMD(GarbageCollectorStatistics) ALIAS(GarbageCollectorStatistics, "GCStats")
 
 // Object commands
 NAMED(Compile, "Text→")         ALIAS(Compile, "Str→")
-NAMED(ToProgram, "→Program")
+NAMED(ToProgram, "→Program")    ALIAS(ToProgram, "→Prg")
 
 // Flags
 CMD(TestFlagClearThenClear)     ALIAS(TestFlagClearThenClear, "FC?C")
