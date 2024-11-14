@@ -497,6 +497,7 @@ COMMAND_BODY(Disp)
             bool           erase  = true;
             bool           invert = false;
             id             ty     = pos->type();
+            algebraic_g    halign, valign;
 
             if (ty == ID_rectangular || ty == ID_polar ||
                 ty == ID_list || ty == ID_array)
@@ -515,6 +516,12 @@ COMMAND_BODY(Disp)
                         erase = eflag->as_truth(true);
                     if (object_p iflag = args->at(4))
                         invert = iflag->as_truth(true);
+                    if (object_p aflag = args->at(5))
+                        if (algebraic_p al = aflag->as_real())
+                            halign = al;
+                    if (object_p aflag = args->at(6))
+                        if (algebraic_p al = aflag->as_real())
+                            valign = al;
                 }
             }
             else if (pos->is_algebraic())
@@ -552,13 +559,57 @@ COMMAND_BODY(Disp)
             if (invert)
                 std::swap(bg, fg);
             ui.draw_graphics();
+
+            if (halign || valign)
+            {
+                blitter::size width  = 0;
+                blitter::size lwidth = 0;
+                uint rows = 1;
+                for (utf8 p = txt; p < last; p = utf8_next(p))
+                {
+                    unicode cp = utf8_codepoint(p);
+                    if (cp == '\n')
+                    {
+                        if (width < lwidth)
+                            width = lwidth;
+                        lwidth = 0;
+                        rows++;
+                    }
+                    else
+                    {
+                        blitter::size w = font->width(cp);
+                        lwidth += w;
+                    }
+                }
+                if (width < lwidth)
+                    width = lwidth;
+                if (halign)
+                {
+                    algebraic_g o = integer::make(width/2);
+                    o = o * halign;
+                    if (o)
+                        x0 += o->as_int32(0, false);
+                    x0 -= width/2;
+                    x = x0;
+                }
+                if (valign)
+                {
+                    blitter::size height = rows * font->height();
+                    algebraic_g o = integer::make(height / 2);
+                    o = o * valign;
+                    if (o)
+                        y += o->as_int32(0, false);
+                    y -= height / 2;
+                }
+            }
+
             while (txt < last)
             {
                 unicode       cp = utf8_codepoint(txt);
                 blitter::size w  = font->width(cp);
 
                 txt = utf8_next(txt);
-                if (x + w >= LCD_W || cp == '\n')
+                if (cp == '\n' || (!halign && x + w >= LCD_W))
                 {
                     x = x0;
                     y += font->height();
