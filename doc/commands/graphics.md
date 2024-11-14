@@ -73,10 +73,23 @@ provide:
 * An *invert* flag (default false) which, if set, will swap the foreground and
   background patterns.
 
-For example, `"Hello" { #0 #0 3 true true } DrawText` will draw `Hello` in the
+* An *horizontal align* value, where -1 means align left, 1 means align right,
+  and 0 means center the text. Note that fractional values or values below -1 or
+  above 1 are allowed for special effects.
+
+* A *vertical align* value, where -1 means align top, 1 means align bottom, and
+  0 means center the text vertically. Note that fractional values or values
+  below -1 or above 1 are allowed for special effects.
+
+For example, the following code will draw `Hello` in the
 top-left corner (`#0 #0`) with the largest (editor) font (font identifier `3`),
 erasing the background (the first `true`), in reverse colors (the second
-`true`).
+`true`), and then draws `World` in the bottom right corner.
+
+```rpl
+"Hello" { #0 #0 3 true true } DrawText
+"World" { 10#400 10#240 3 true true -1 -1 } DrawText
+```
 
 ## DrawStyledText
 

@@ -413,7 +413,8 @@ Texts
 		ClearLCD
 		0 300
 		for i
-			"Pixel positioning " { 10#75 10#150 0 true true } Disp
+			" Pixel positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
 			"Pos " { } #0 i + 223 mod + #0 i 45 mod + 25 + +
 			dup Rot Swap ToText + " " +
 			Swap
@@ -424,7 +425,8 @@ Texts
 		Degrees
 		1 360
 		for i
-			"Complex positioning " { 10#55 10#100 0 true true } Disp
+			" Complex positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
 			" Angle " i +
 			4.5 i R->P 2.9 -
 			DispThenErase
@@ -433,7 +435,8 @@ Texts
 		ClearLCD
 		1 360
 		for i
-			"Scaled positioning " { 10#55 10#100 0 true true } Disp
+			" Scaled positioning "
+			{ 10#200 10#120 2 true true 0 0 } Disp
 			" Angle " i +
 			{ } i cos 7 * 2.9 - + i 3 * sin 3 * +
 			DispThenErase
@@ -442,7 +445,7 @@ Texts
 
 
 	ClearLCD
-	"	 Fonts	"	 { 10#75 10#180 0 true true } Disp
+	" Fonts "	 { 10#200 10#180 2 true true 0 1 } Disp
 	0 11 for f
 			"Font " f +
 			{
@@ -466,7 +469,7 @@ Texts
 	1.5 Wait
 
 	ClearLCD
-	"	 Patterns	 "	{ 10#75 10#180 0 true true } Disp
+	" Patterns "	{ 10#200 10#180 2 true true 0 1 } Disp
 	0 15 for p
 		16#1111111111111111 p * Foreground
 		0 11 for f
@@ -494,7 +497,7 @@ Texts
 
 	ClearLCD
 	#0 Foreground
-	"	 Background	 "	{ 10#75 10#180 0 true true } Disp
+	" Background "	{ 10#200 10#180 2 true true 0 1 } Disp
 	16#FFFFFFFFFFFFFFFF Foreground
 	0 15 for p
 		16#1111111111111111 p * Background
@@ -520,6 +523,14 @@ Texts
 		next
 		0.2 Wait
 	next
+
+	ClearLCD
+	0 GRAY Foreground 1 GRAY Background
+	" Align left "	 { 10#000 10#120 2 true true  1  0 } Disp
+	" Align Right "	 { 10#400 10#120 2 true true -1  0 } Disp
+	" Center "	 { 10#200 10#120 2 true true  0  0 } Disp
+	" Align Top "	 { 10#200 10#000 2 true true  0  1 } Disp
+	" Align Bottom " { 10#200 10#240 2 true true  0 -1 } Disp
 »
 
 
@@ -550,7 +561,7 @@ Shapes
 	«
 		ClearLCD
 		#0 Foreground
-		"	 Rectangles	 "	{ 10#75 10#180 0 true true } Disp
+		" Rectangles "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -560,7 +571,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Outlines	 "	{ 10#75 10#180 0 true true } Disp
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -571,7 +582,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Ellipse	 "	{ 10#75 10#180 0 true true } Disp
+		" Ellipse "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -581,7 +592,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Outlines	 "	{ 10#75 10#180 0 true true } Disp
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -592,7 +603,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Rounded Rect " { 10#75 10#180 0 true true } Disp
+		" Rounded Rect " { 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -602,7 +613,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Outlines	 "	{ 10#75 10#180 0 true true } Disp
+		" Outlines "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		0 300
 		for i
@@ -613,7 +624,7 @@ Shapes
 
 		ClearLCD
 		#0 Foreground
-		"	 Clipping	 "	{ 10#75 10#180 0 true true } Disp
+		" Clipping "	{ 10#200 10#180 3 true true 0 1 } Disp
 		0 LineWidth
 		{ 30 30 370 150 } Clip
 		0 300

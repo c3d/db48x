@@ -1456,7 +1456,8 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
     dirty = rect();
     force = forceRedraw;
     nextRefresh = refresh;
-    graphics = false;
+    if (forceRedraw)
+        graphics = false;
 }
 
 
@@ -1800,7 +1801,7 @@ bool user_interface::draw_header()
 //   Draw the header with the state name
 // ----------------------------------------------------------------------------
 {
-    if (freezeHeader)
+    if (freezeHeader || graphics)
         return false;
 
     static uint day = 0, month = 0, year = 0;
@@ -1986,7 +1987,7 @@ bool user_interface::draw_battery()
 //    Draw the battery information
 // ----------------------------------------------------------------------------
 {
-    if (freezeHeader)
+    if (freezeHeader || graphics)
         return false;
 
     static uint last       = 0;
@@ -2130,7 +2131,7 @@ bool user_interface::draw_annunciators()
 //    Draw the annunciators for Shift, Alpha, etc
 // ----------------------------------------------------------------------------
 {
-    if (freezeHeader)
+    if (freezeHeader || graphics)
         return false;
 
     bool user  = Settings.UserMode();
@@ -2216,7 +2217,7 @@ rect user_interface::draw_busy_background()
 //   Draw the background behind the busy cursor and annunciators
 // ----------------------------------------------------------------------------
 {
-    if (freezeHeader)
+    if (freezeHeader || graphics)
         return false;
 
     const font_p hdr_font   = Settings.header_font();
@@ -2242,7 +2243,7 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
 //    Draw the busy flying cursor
 // ----------------------------------------------------------------------------
 {
-    if (graphics || freezeHeader)
+    if (freezeHeader || graphics)
         return false;
 
     rect busy = draw_busy_background();
@@ -2293,7 +2294,7 @@ bool user_interface::draw_editor()
 //   Draw the editor
 // ----------------------------------------------------------------------------
 {
-    if ((!force && !dirtyEditor) || freezeHeader)
+    if ((!force && !dirtyEditor) || freezeStack)
         return false;
 
     record(text_editor, "Redrawing %+s %+s curs=%d, offset=%d cx=%d",
