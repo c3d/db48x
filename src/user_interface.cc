@@ -402,7 +402,7 @@ bool user_interface::end_edit()
                     if (Settings.SaveStack())
                         rt.save();
                     save<bool> no_halt(program::halted, false);
-                    cmds->run(Settings.SaveLastArguments());
+                    cmds->run();
                 }
             }
             else
