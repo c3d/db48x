@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            editor_operations();
+            for_loops();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -2278,6 +2278,14 @@ void tests::for_loops()
     pgmo = "« 'X' 10 1 for i i x² + next »";
     test(CLEAR, pgm, ENTER).noerror().type(ID_program).want(pgmo);
     test(RUNSTOP).noerror().type(ID_expression).expect("'X+100'");
+
+    step("Update variable inside the loop")
+        .test(CLEAR,
+              "1 10 FOR i "
+              " i "
+              " IF i 3 > THEN 'Exiting' 100 'i' STO END "
+              "NEXT", ENTER)
+        .got("'Exiting'", "4", "3", "2", "1");
 
     step("For loop on a list")
         .test(CLEAR, "{ 1 3 5 \"ABC\" } for i i 2 * 1 + next", ENTER)
