@@ -827,9 +827,21 @@ void tests::data_types()
 #endif // CONFIG_FIXED_BASED_OBJECTS
 
     step("Arbitrary base input");
-    test(CLEAR, "8#777", ENTER).type(ID_based_integer).expect("#1FF₁₆");
-    test(CLEAR, "2#10000#ABCDE", ENTER)
+    test(CLEAR, "8#777", ENTER)
+#if CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_oct_integer)
+        .expect("#777₈")
+#else // !CONFIG_FIXED_BASED_OBJECTS
         .type(ID_based_integer)
+        .expect("#1FF₁₆")
+#endif // CONFIG_FIXED_BASED_OBJECTS
+        .noerror();
+    test(CLEAR, "2#10000#ABCDE", ENTER)
+#if CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_hex_integer)
+#else // !CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_based_integer)
+#endif // CONFIG_FIXED_BASED_OBJECTS
         .expect("#A BCDE₁₆");
 
     step("Do not parse #7D as a decimal (#371)")

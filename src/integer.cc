@@ -238,7 +238,18 @@ PARSE_BODY(integer)
                 }
                 base = result;
                 result = 0;
+#ifdef CONFIG_FIXED_BASED_OBJECTS
+                switch(base)
+                {
+                case 2:  type = ID_bin_integer;   break;
+                case 8:  type = ID_oct_integer;   break;
+                case 10: type = ID_dec_integer;   break;
+                case 16: type = ID_hex_integer;   break;
+                default: type = ID_based_integer; break;
+                }
+#else // CONFIG_FIXED_BASED_OBJECTS
                 type = ID_based_integer;
+#endif // CONFIG_FIXED_BASED_OBJECTS
                 sep = Settings.BasedSeparator();
                 s++;
                 continue;
