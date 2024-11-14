@@ -1573,6 +1573,8 @@ bool runtime::run_select_start_step(bool for_loop, bool has_step)
     }
 
     // Increment and compare with last iteration
+    if (for_loop)
+        Returns[0] = rt.local(0);
     algebraic_g cur  = Returns[0] ? Returns[0]->as_algebraic() : nullptr;
     algebraic_g last = Returns[1] ? Returns[1]->as_algebraic() : nullptr;
     if (!cur || !last)
