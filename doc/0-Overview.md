@@ -775,6 +775,7 @@ Additional contributors to the project include:
 * Conrado Seibel (help file fix)
 * Kjell Christenson (simulator fix)
 * Václav Kadlčík (documentation fix)
+* GitHub user mipa83 (Windows documentation)
 
 The authors would like to acknowledge
 
