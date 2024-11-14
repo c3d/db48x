@@ -9449,7 +9449,7 @@ void tests::character_menu()
               LSHIFT, F1, LSHIFT, F2, LSHIFT, F3, LSHIFT, F4, LSHIFT, F5,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("\"αβγδεΑΒΓΔΕάΆ·Έέ\"");
+        .expect("\"αβγδεΑΒΓΔΕάΆϵΈέ\"");
     step("Europe menu")
         .test(CLEAR, ID_CharactersMenu)
         .noerror()
@@ -11998,6 +11998,7 @@ tests &tests::itest(cstring txt)
         case L'γ': itest(ID_CharactersMenu, LSHIFT, F1, F3); NEXT;
         case L'δ': itest(ID_CharactersMenu, LSHIFT, F1, F4); NEXT;
         case L'ε': itest(ID_CharactersMenu, LSHIFT, F1, F5); NEXT;
+        case L'ϵ': itest(ID_CharactersMenu, LSHIFT, F1, RSHIFT, F3); NEXT;
         case L'ζ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F1); NEXT;
         case L'η': itest(ID_CharactersMenu, LSHIFT, F1, F6, F2); NEXT;
         case L'ι': itest(ID_CharactersMenu, LSHIFT, F1, F6, F4); NEXT;
