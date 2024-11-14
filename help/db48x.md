@@ -1,13 +1,13 @@
 # Overview
 
-## DB48X on WASM
+## DB48X on DM42
 
 The DB48X project intends to rebuild and improve the user experience of the
 legendary HP48 family of calculators, notably their *"Reverse Polish Lisp"*
  [(RPL)](#Introduction-to-RPL)
 language with its rich set of data types and built-in functions.
 
-This project is presently targeting the **SwissMicro WASM calculator**
+This project is presently targeting the **SwissMicro DM42 calculator**
 and leveraging its built-in software platform, known as **DMCP**. This is
 presumably the calculator you are currently running this software on.
 You can also [try it in your browser](http://48calc.org).
@@ -54,7 +54,16 @@ RPL commands in the HP50G and in DB48X into
 ## Design overview
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
-existing WASM physical hardware.
+existing DM42 physical hardware.
+Ideally, DB48X should be fully usable without a
+keyboard overlay. though one is
+[being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
+
+Compared to the original HP48, the DM42 has a much larger screen, but no
+annunciators (it is a fully bitmap screen). It has a keyboard with dedicated
+soft-menu (function) keys, but only one shift key (whereas the HP48 has two),
+lacks a dedicated alpha key, does not provides left or right arrow keys (only up
+and down), and has no space key (_SPC_ on the HP48).
 
 
 
@@ -63,6 +72,11 @@ existing WASM physical hardware.
 The keyboard differences force us to revisit the user interaction with the
 calculator compared to the HP48:
 
+* When running DB48X on the DM42, the single yellow shift key cycles between
+  three states, *Shift* (shown in the documentation as 🟨), *Right Shift* (shown
+  in the documentation as 🟦), and no shift.  This double-shift shortcut appears
+  necessary because RPL calculators like the HP48 have a rather full keyboard
+  even with two shift keys.
 
 
 * A first press on the shift key is shown as 🟨 in the documentation, and
@@ -85,6 +99,10 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
   accessible seems important, so there are
   [three distinct ways to activate it](#alpha-mode).
 
+* The _▲_ and _▼_ keys move the cursor *left* and *right* while editing
+  instead of *up* and *down*. These cursor movements are much more useful for a
+  text-based program editing as found in RPL. In the rest of this document,
+  they are described as _◀︎_ and _▶︎_ respectively.
 
 * Using 🟨 _◀︎_ and 🟨 _▶︎_ moves the cursor up and down.  When not editing, _◀︎_
   and _▶︎_ behave like _▲_ and _▼_ on the HP48, i.e. _◀︎_ enters the *interactive
@@ -101,7 +119,7 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
 ### Alpha mode
 
 Entering alphabetic characters is done using *Alpha* mode. These alphabetic
-characters are labeled on the right of each key on the WASM's keyboard.
+characters are labeled on the right of each key on the DM42's keyboard.
 
 When *Alpha* mode is active, an _ABC_ indicator shows up in the annunciator area
 at the top of the screen. For lowercase entry, the indicator changes to
@@ -110,7 +128,7 @@ _abc_.
 There are three ways to enter *Alpha* mode:
 
 * The first method is to use 🟨 _ENTER_ as indicated by the _ALPHA_ yellow label
-  on the WASM ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
+  on the DM42 ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
   and *Normal* entry modes.
 
 * The second method is to hold 🟨 for more than half a second. This cycles
@@ -128,7 +146,7 @@ or by holding 🟨).
 
 Alpha mode is cancelled when pressing _ENTER_ or _EXIT_.
 
-Since the WASM's alphabetic keys overlap with the numeric keys (unlike the
+Since the DM42's alphabetic keys overlap with the numeric keys (unlike the
 HP48), as well as with operations such as _×_ and _÷_, using 🟨 in Alpha mode
 brings back numbers. This means 🟨 cannot be used for lowercase, but as
 indicated above, there are two other methods to enter lowercase
@@ -160,6 +178,22 @@ In some cases, the label between parentheses may refer to another calculator
 model, which will be indicated as follows. For example, the _A_ key can be
 described as _A_ (_⚙️_, DM-42 _Σ+_, DM-32 _√x_).
 
+However, if you are using DB48X on a DM42, it is possible to do it without a
+keyboard overlay, because great care was taken to have the DB48X keboard layout
+remain close to that of the DM42, in order to preserve muscle memory. New
+features were positioned on the keyboard at positions that are close to what is
+familiar in the original DM42 firmware.
+
+A few keys that have little use in RPL are reassigned to features that you
+should be able to quickly remember. For example, the DM-42 _RCL_ key is used for
+the DB48X _VAR_ key, which invokes the [VariablesMenu](#VariablesMenu).
+
+Note that the _LOG_ and _e^x_ keys are swapped relative to the DM-42. The HP42
+has _LOG_ and _LN_ with shifted _10^x_ and _e^x_. DB48X has _e^x_ and _LN_
+with shifted _10^X_ and _LOG_, so that the more frequently used mathematical
+functions are available without shifting. Note that in the future, full
+keyboard remapping similar to the HP41 or HP48 will allow you to change that
+if you prefer.
 
 
 Here are a few of the interesting RPL-specific key mappings:
@@ -250,7 +284,7 @@ Here are a few of the interesting RPL-specific key mappings:
 
 ## Soft menus
 
-The WASM has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
+The DM42 has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
 advanced features of DB48X can be accessed through these soft menus. Soft menu
 keys have no label on the physical calculator, but in this documentation, they
 may sometimes be referred to as _F1_ through _F6_.
@@ -454,7 +488,7 @@ unintentional differences, since the implementation is completely new.
   queried with `SF?` and `CF?`. For example, `'HideDate' CF` will clear the
   `HideDate` flag, meaning that the date will show in the header.
 
-* The DB48X also provides full-screen setup menus, taking advantage of the WASM
+* The DB48X also provides full-screen setup menus, taking advantage of the DM42
   existing system menus. It is likely that the same menu objects used for
   softkey menus will be able to control system menus, with a different function
   to start the interaction.
@@ -644,7 +678,7 @@ corresponding to a valid help topic, this topic will be shown in the help
 viewer. Otherwise, a help topic corresponding to the type of data in the stack
 will be selected.
 
-The DB48X help viewer works roughly similarly to the WASM's, but with history
+The DB48X help viewer works roughly similarly to the DM42's, but with history
 tracking and the ability to directly access help about a given function by
 holding a key for more than half a second.
 
@@ -789,7 +823,7 @@ DB48X inherits many ideas from newRPL, including, but not limited to:
 A first iteration of DB48X started as a
 [branch of newRPL](https://github.com/c3d/db48x/), although the
 current implementation had to restart from scratch due to heavy space
-constraints on the WASM.
+constraints on the DM42.
 
 
 ### WP43 and C47 projects
@@ -798,19 +832,19 @@ The DB48X took several ideas and some inspiration from the
 [WP43](https://gitlab.com/rpncalculators/wp43) and
 [C47](https://47calc.com) projects.
 
-Walter Bonin initiated the WP43 firwmare for the WASM as a "superset of the
+Walter Bonin initiated the WP43 firwmare for the DM42 as a "superset of the
 legendary HP42S RPN Scientific".
 
 C47 (initially called C43) is a variant of that firmware initiated by Jaco
-Mostert, which focuses on compatibility with the existing WASM, notably with
+Mostert, which focuses on compatibility with the existing DM42, notably with
 respect to keyboard layout.
 
 DB48X borrowed at least the following from these projects:
 
-* The very idea of writing a new firmware for the WASM
+* The very idea of writing a new firmware for the DM42
 * The idea of converting standard Unicode TrueType fonts into bitmaps
   (with some additional contributions from newRPL)
-* How to recompute the CRC for QSPI images so that the WASM loads them,
+* How to recompute the CRC for QSPI images so that the DM42 loads them,
   thanks to Ben Titmus
 * At least some aspects of the double-shift logic and three-level menus
 * The original keyboard layout template and styling, with special thanks
@@ -821,13 +855,13 @@ DB48X borrowed at least the following from these projects:
 
 [SwissMicros](https://www.swissmicros.com/products) offers a range of
 RPN calculators that emulate well-known models from Hewlett-Packard.
-This includes the [WASM](https://www.swissmicros.com/product/dm42),
+This includes the [DM42](https://www.swissmicros.com/product/dm42),
 which is currently the primary target for the DB48X firmware.
 
 Special thanks and kudos to Michael Steinmann and his team for keeping
 the shining spirit of HP RPN calculators alive.
 
-The WASM version of the DB48X software relies on
+The DM42 version of the DB48X software relies on
 [SwissMicro's DMCP SDK](https://github.com/swissmicros/SDKdemo), which
 is released under the following BSD 3-Clause License:
 
@@ -873,7 +907,7 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB48X.
 
 DB48X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros WASM calculator. This has [implications on the design](#design-overview)
+SwissMicros DM42 calculator. This has [implications on the design](#design-overview)
 of this particular implementation of RPL.
 
 ## The RPL stack
@@ -1359,7 +1393,7 @@ does not have a `NXT` key unlike HP calculators. Instead, when necessary, the
 
 ### Exponential and log in base 10
 
-### WASM layout difference: EXP LN instead of LOG LN
+### DM42 layout difference: EXP LN instead of LOG LN
 
 ### Trigonometric functions and their inverse
 
@@ -1855,6 +1889,8 @@ You can download pre-built versions of the firmware from the releases page of
 the project (https://github.com/c3d/db48x/releases), or alternatively,
 you can download the source code and build it yourself.
 
+The pre-built firmware for the DM-42 is split into two components, `db48x.pgm`
+and `db48x_qspi.bin`. The built-in help is stored in a file called `db48x.md`.
 
 
 In addition, a file called `Demo.48s` contains a few sample RPL programs to
@@ -1864,13 +1900,14 @@ respectively.
 
 ### Connecting the calculator to a computer
 
+The DM-42 calculator connects to your computer using a standard micro-USB cable.
 
 
 
 ### System menu
 
 The `Setup` menu is displayed by using 🟨 _0_. This key combination is the same
-on the stock WASM firmware and on the new DB48X firmware, and it contains
+on the stock DM42 firmware and on the new DB48X firmware, and it contains
 similar entries. However, the setup menu entries are not necessarily in the same
 order.
 
@@ -1897,6 +1934,10 @@ from your computer as an external disk.
 
 The files should be copied as follows:
 
+* `db48x.pgm` and `db48x_qspi.bin` in the root directory of the calculator's USB
+  disk.
+
+* `db48x.md` should be placed in a directory called `help`.
 
 
 * `units.csv` and `constants.csv` should be placed in a directory called
@@ -1904,7 +1945,7 @@ The files should be copied as follows:
   [constants](#constants).
 
 
-### Copying WASM installation files
+### Copying DM42 installation files
 
 Refer to the SwissMicros installation instructions to install or reinstall the
 original calculator firmware.
@@ -1929,10 +1970,10 @@ After loading the DB48X program, the firmware loaded asks you to press a key,
 and the new firmware automatically runs.
 
 
-## Switching between WASM and DB48X
+## Switching between DM42 and DB48X
 
 Early releases of the DB48X firmware produced a QSPI image file that was capable
-of running the stock WASM program file. Unfortunately, this is no longer the
+of running the stock DM42 program file. Unfortunately, this is no longer the
 case due to space constraints.
 
 Unfortunately, the installation procedure for the QSPI file erases the file
@@ -2455,10 +2496,10 @@ library, and optimizing the garbage collector.
   * `db48x.48k` is a key layout that is more logical and effective for DB48x
     [See thread](https://www.hpmuseum.org/forum/thread-20157-post-193647.html#pid193647)
   * `legacy.48k` is the layout used for earlier releases, which
-    swaps the `exp` and `log10` keys relative to the WASM in `42style.48k`.
-  * `42style.48k` keeps key layout as close as possible to the WASM
+    swaps the `exp` and `log10` keys relative to the DM42 in `42style.48k`.
+  * `42style.48k` keeps key layout as close as possible to the DM42
   * `true42.48k` is identical to `42style.48k`, but the simulator shows an image
-    of the WASM keyboard.
+    of the DM42 keyboard.
 
 * Add various commands such as `Edit` to directly perform editing
   operations in a programmatic way.
@@ -2785,7 +2826,7 @@ to ensure that all the given examples give the expected results.
 * Positional graphic combination operations (e.g. `GraphicRatio`)
 * Switch to Greek or Cyrillic keyboard maps based on character menu
 * Add EDIT menu commands to transient alpha (e.g. ▶F3 is Word→)
-* Index the  help file for performance (about 5x faster on WASM)
+* Index the  help file for performance (about 5x faster on DM42)
 * Accept verbatim code and RPL code snippets in the help file
 * Parse and show help topics  taking all aliases into account
 * Convert lists and equations to RPL programs with `→Program`
@@ -3539,7 +3580,7 @@ simulator, and more.
 * locals: Document the absence of compiled local variables
 * makefile: Add configuration files to the release `.tgz` file
 * parsing: Make the error message for sub-expressions more local
-* readme: Remove reference to WASM from top-level readme
+* readme: Remove reference to DM42 from top-level readme
 * simulator: Avoid crash rendering %t in recorder
 * simulator: Convert simulator code to support color
 * simulator: Replicate open files limitations
@@ -4102,7 +4143,7 @@ A few quick bug fixes that make DB48X a bit more usable.
 ## Release 0.6.0 "Christmas": Introducing variable precision
 
 This release was a bit longer in coming than earlier ones, because we are about
-to reach the limits of what can fit on a WASM. This release uses 711228 bytes
+to reach the limits of what can fit on a DM42. This release uses 711228 bytes
 out of the 716800 (99.2%).
 
 Without the Intel Decimal Library code, we use only 282980 bytes. This means
@@ -4115,7 +4156,7 @@ implementation of decimal computations. In this release, most operations are
 implemented, but some features are still missing (e.g. Gamma function). This
 release will be simultaneous with 0.5.2, which is functionally equivalent but
 still uses the Intel Decimal library. The new implementation is much more
-compact, allowing us to return to normal optimizations for the WASM and regain
+compact, allowing us to return to normal optimizations for the DM42 and regain
 some of the lost performance. On the other hand, having to switch to a table
 free implementation means that it's significantly slower than the Intel Decimal
 Library. The upside of course is that you can compute with decimal numbers that
@@ -4132,7 +4173,7 @@ still return "unimplemented error".
 ### Bug fixes
 
 None. If anything, this release introduces bugs in computations and performance
-regressions. However, it frees *a lot* of space for further WASM development.
+regressions. However, it frees *a lot* of space for further DM42 development.
 
 ### Improvements
 
@@ -4140,20 +4181,20 @@ The `Precision` setting now sets the number of digits with a granularity of one,
 between 3 and 9999. Ideal use of memory is with multiples of 12 digits, e.g. 12,
 24 or 36 digits, where decimal packing does not cause lost bits.
 
-Performance on the WASM is somewhat improved, since it is now possible to return
+Performance on the DM42 is somewhat improved, since it is now possible to return
 to a higher level of optimization.
 
 ### Regressions
 
 In addition to lower performance and unimplemented functions, this version no
-longer builds a compatible QSPI. This means that returning to the WASM requires
+longer builds a compatible QSPI. This means that returning to the DM42 requires
 flashing *both* the QSPI and the PGM file.
 
 
-## Release 0.5.2 "Christmas Eve": Reaching hard limits on the WASM
+## Release 0.5.2 "Christmas Eve": Reaching hard limits on the DM42
 
 This release was a bit longer in coming than earlier ones, because we are about
-to reach the limits of what can fit on a WASM. This release uses 711228 bytes
+to reach the limits of what can fit on a DM42. This release uses 711228 bytes
 out of the 716800 (99.2%).
 
 Without the Intel Decimal Library code, we use only 282980 bytes. This means
@@ -4384,7 +4425,7 @@ for unit data files.
 * Status of implementation and performance data in documentation (#530)
 * Performance: Reduce frequency of busy cursor drawing (#531)
 * Performance: Reimplement range-based type checkig (#532)
-* Performance: Focused -O3 optimizations on WASM (#533)
+* Performance: Focused -O3 optimizations on DM42 (#533)
 * Makefile: Install target installs demo and config (#547)
 * Garbage collector for menu labels (#548)
 

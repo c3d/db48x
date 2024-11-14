@@ -3668,6 +3668,7 @@
 			buildPhases = (
 				1F9D29621C72B9BB000025E6 /* Sources */,
 				1F9D29631C72B9BB000025E6 /* Frameworks */,
+				6F10EF322CE582BA00C8357F /* ShellScript */,
 				1F9D29641C72B9BB000025E6 /* Resources */,
 				6FF873932B97B82C00C8357F /* CopyFiles */,
 				6FF873962B97B85D00C8357F /* CopyFiles */,
@@ -3808,6 +3809,7 @@
 			buildPhases = (
 				6F2AC4282C64105F00C8357F /* Sources */,
 				6F2AC46F2C64105F00C8357F /* Frameworks */,
+				6F10EF332CE582D300C8357F /* ShellScript */,
 				6F2AC4732C64105F00C8357F /* Resources */,
 				6F2AC48C2C64105F00C8357F /* CopyFiles */,
 				6F2AC4902C64105F00C8357F /* CopyFiles */,
@@ -3834,6 +3836,7 @@
 			buildPhases = (
 				6F2AC5022C6410F700C8357F /* Sources */,
 				6F2AC5492C6410F700C8357F /* Frameworks */,
+				6F10EF312CE5825200C8357F /* Run Script */,
 				6F2AC54D2C6410F700C8357F /* Resources */,
 				6F2AC5662C6410F700C8357F /* CopyFiles */,
 				6F2AC56A2C6410F700C8357F /* CopyFiles */,
@@ -4180,6 +4183,61 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6F10EF312CE5825200C8357F /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo Path is $(pwd)\ncd ../..\nrm -f help/db48x.md help/db48x.idx\nmake help/db48x.idx\n";
+		};
+		6F10EF322CE582BA00C8357F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo Path is $(pwd)\ncd ../..\nrm -f help/db48x.md help/db48x.idx\nmake help/db48x.idx\n";
+		};
+		6F10EF332CE582D300C8357F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo Path is $(pwd)\ncd ../..\nrm -f help/db50x.md help/db50x.idx\nmake TARGET=db50x help/db50x.idx\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1F9D29621C72B9BB000025E6 /* Sources */ = {
