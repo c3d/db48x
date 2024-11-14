@@ -115,9 +115,12 @@ PARSE_BODY(integer)
     }
     else if (*s == '#')
     {
+        unicode sep = Settings.BasedSeparator();
         s++;
-        for (byte_p e = s; !endp; e++)
-            if (e >= last || (value[*e] == NODIGIT && *e != '#'))
+
+        for (byte_p e = s; !endp; e = utf8_next(e))
+            if (e >= last || (utf8_codepoint(e) != sep &&
+                              value[*e] == NODIGIT && *e != '#'))
                 endp = e;
 
         if (endp > s)
@@ -238,7 +241,18 @@ PARSE_BODY(integer)
                 }
                 base = result;
                 result = 0;
+#ifdef CONFIG_FIXED_BASED_OBJECTS
+                switch(base)
+                {
+                case 2:  type = ID_bin_integer;   break;
+                case 8:  type = ID_oct_integer;   break;
+                case 10: type = ID_dec_integer;   break;
+                case 16: type = ID_hex_integer;   break;
+                default: type = ID_based_integer; break;
+                }
+#else // CONFIG_FIXED_BASED_OBJECTS
                 type = ID_based_integer;
+#endif // CONFIG_FIXED_BASED_OBJECTS
                 sep = Settings.BasedSeparator();
                 s++;
                 continue;
