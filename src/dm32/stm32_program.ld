@@ -46,6 +46,7 @@ SECTIONS
   {
     . = ALIGN(8);
     _qspi_start = .;   /* create a global symbol at qspi start */
+    KEEP(*(.qspi.qspi_build_id))
     *(.qspi)           /* .qspi sections */
     *(.qspi*)          /* .qspi* sections */
 /* ==== Symbols to QSPI - in direct order === */
@@ -75,6 +76,7 @@ SECTIONS
   .rodata :
   {
     KEEP(*(.rodata.prog_info)) /* Program info */
+    KEEP(*(.qspi.qspi_build_id))
     . = ALIGN(64);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
