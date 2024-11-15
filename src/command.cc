@@ -972,15 +972,20 @@ COMMAND_BODY(Cycle)
 #else // ! CONFIG_FIXED_BASED_OBJECTS
         case ID_based_integer:
         case ID_based_bignum:
-            switch(Settings.Base())
+        {
+            uint base = Settings.Base();
+            switch(base)
             {
             default:
-            case 2:                     Settings.Base(16);     return OK;
-            case 8:                     Settings.Base(2);      return OK;
-            case 10:                    Settings.Base(8);      return OK;
-            case 16:                    Settings.Base(10);     return OK;
+            case 2:     base = 16; break;
+            case 8:     base = 2;  break;
+            case 10:    base = 8;  break;
+            case 16:    base = 10; break;
             }
-            break;
+            Settings.Base(base);
+            ui.menu_refresh(ID_BasesMenu);
+            return OK;
+        }
 #endif // CONFIG_FIXED_BASED_OBJECTS
         case ID_constant:
         case ID_equation:
