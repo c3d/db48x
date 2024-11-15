@@ -7,6 +7,7 @@ VARIANT = dm42
 SDK = dmcp/dmcp
 PGM = pgm
 PGM_TARGET = $(TARGET).$(PGM)
+BUILD_ID = $(shell tools/build_id)
 
 ######################################
 # Building variables
@@ -59,7 +60,7 @@ VERSION_H=src/$(PLATFORM)/version.h
 
 # default action: build all
 all: $(PGM_TARGET) help/$(TARGET).md help/$(TARGET).idx
-	@echo "# Built $(VERSION)"
+	@echo "# Built $(VERSION), build ID is now $(BUILD_ID)"
 
 dm32:	dm32-all
 dm32-%:
@@ -470,7 +471,10 @@ $(WASM_TARGET): $(SOURCES) Makefile
 	 make VARIANT=wasm PGM=js PGM_TARGET=wasm/$(TARGET).js SDK=sim )
 
 $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	@tools/build_id -u
+	@echo Build ID $(BUILD_ID)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ \
+		-DBUILD_ID=$(BUILD_ID) src/dmcp/qspi_check.c
 $(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX)
 	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
 	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)

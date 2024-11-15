@@ -344,6 +344,10 @@ bool power_check(bool draw_off_image)
     return false;
 }
 
+#ifndef SIMULATOR
+extern const uint prog_build_id;
+extern const uint qspi_build_id;
+#endif
 
 extern "C" void program_main()
 // ----------------------------------------------------------------------------
@@ -352,6 +356,20 @@ extern "C" void program_main()
 {
     int  key        = 0;
     bool transalpha = false;
+
+#ifndef SIMULATOR
+    if (prog_build_id != qspi_build_id)
+    {
+        msg_box(t24,
+                "Incompatible " PROGRAM_NAME " build ID\n"
+                "Please reload program and QSPI\n"
+                "from the same build",
+                true);
+        lcd_refresh();
+        wait_for_key_press();
+        return;
+    }
+#endif
 
     // Initialization
     program_init();
