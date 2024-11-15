@@ -5601,7 +5601,7 @@ void tests::text_functions()
     step("Ensure we can parse base numbers with separators in them")
         .test(CLEAR, "16#ABCD1234", ENTER).expect("#ABCD 1234₁₆")
         .test(RSHIFT, ENTER, NOSHIFT, ENTER).expect("\"\"")
-        .test(ID_add).expect("\"16#ABCD 1234\"")
+        .test(ID_add).expect("\"#ABCD 1234₁₆\"")
         .test(NOSHIFT, A, F2).expect("#ABCD 1234₁₆");
     step("Compatible based numbers")
         .test(CLEAR, ID_CompatibleBasedNumbers).noerror()

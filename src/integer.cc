@@ -98,6 +98,7 @@ PARSE_BODY(integer)
     size_t length = p.length;
     byte_p last   = s + length;
     byte_p endp   = nullptr;
+    size_t basesz = 0;
 
     if (*s == '-')
     {
@@ -132,9 +133,10 @@ PARSE_BODY(integer)
             type     = ID_based_integer;
 
             uint max = 0;
-            for (byte_p e = s; e < endp - 1; e++)
-                if (max < value[*e])
-                    max = value[*e];
+            for (utf8 e = s; e < endp - 1; e = utf8_next(e))
+                if (utf8_codepoint(e) != sep)
+                    if (max < value[*e])
+                        max = value[*e];
 
             switch (endp[-1])
             {
@@ -194,9 +196,45 @@ PARSE_BODY(integer)
 #endif // CONFIG_FIXED_BASED_OBJECTS
                 break;
             default:
+            {
+                // Scan a base that uses fancy digits
+                utf8    basep  = endp;
+                unicode bchar  = utf8_codepoint(endp);
+                uint    bdigit = fancy_digit_value(bchar, false);
+                uint    fbase  = 0;
+                while (bdigit < 10 && endp < last)
+                {
+                    fbase = 10 * fbase + bdigit;
+                    endp = utf8_next(endp);
+                    bchar = utf8_codepoint(endp);
+                    bdigit = fancy_digit_value(bchar, false);
+                }
+                if (endp != basep)
+                {
+                    base = fbase;
+                    basesz = endp - basep;
+                    endp = basep;
+                    if (base <= 2 || int(max) >= base)
+                    {
+                        rt.based_number_error().source(basep);
+                        return ERROR;
+                    }
+#ifdef CONFIG_FIXED_BASED_OBJECTS
+                    switch(base)
+                    {
+                    case 2:  type = ID_bin_integer;   break;
+                    case 8:  type = ID_oct_integer;   break;
+                    case 10: type = ID_dec_integer;   break;
+                    case 16: type = ID_hex_integer;   break;
+                    default: type = ID_based_integer; break;
+                    }
+#endif // CONFIG_FIXED_BASED_OBJECTS
+                    break;
+                }
                 // Use current default base
                 endp = nullptr;
                 break;
+            }
             }
             if (endp && s >= endp)
             {
@@ -383,6 +421,7 @@ PARSE_BODY(integer)
             s++;
         else
             s--;
+        s += basesz;
 
         // Create the intermediate result, which may GC
         {
@@ -589,7 +628,7 @@ static size_t render_num(renderer &r,
     // Check which kind of spacing to use
     bool based = *fmt == '#';
     char suffix = based ? fmt[1] : 0;
-    bool fancy_base = based && r.stack();
+    bool fancy_base = based && !r.editing();
     uint spacing = based ? Settings.BasedSpacing() : Settings.MantissaSpacing();
     auto space = based ? Settings.BasedSeparator() : Settings.NumberSeparator();
 

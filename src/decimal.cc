@@ -250,27 +250,37 @@ PARSE_BODY(decimal)
     }
 
     // Check if we were given an exponent
-    utf8 expsrc = nullptr;
     if (+s < +last)
     {
         unicode cp = utf8_codepoint(+s);
         if (cp == 'e' || cp == 'E' || cp == expsep)
         {
+            large expval = 0;
+            bool  expneg = false;
             s = utf8_next(s);
-            expsrc = s;
-            if (*s == '+' || *s == '-')
-                ++s;
-            utf8 expstart = s;
-            while (+s < +last && (*s >= '0' && *s <= '9'))
-                ++s;
-            if (s == expstart)
+            unicode sign = utf8_codepoint(s);
+            if (sign == '+' || sign == '-' || sign == L'⁻')
+            {
+                expneg = sign == '-' || sign == L'⁻';
+                s = utf8_next(s);
+            }
+            bool expok = false;
+            while (+s < +last)
+            {
+                unicode expchar = utf8_codepoint(s);
+                uint expdig = fancy_digit_value(expchar, true);
+                if (expdig >= 10)
+                    break;
+                expval = expval * 10 + expdig;
+                s = utf8_next(s);
+                expok = true;
+            }
+            if (!expok)
             {
                 rt.exponent_error().source(s);
                 return ERROR;
             }
-
-            large expval =  atoll(cstring(expsrc));
-            exponent += expval;
+            exponent += expneg ? -expval : expval;
         }
     }
 
