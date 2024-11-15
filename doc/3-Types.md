@@ -11,7 +11,9 @@ internally in a compact and efficient format, saving memory and making
 computations faster. All values between -127 and 127 can be stored in two bytes.
 All values between -16383 and 16383 in three bytes.
 
-Integers can be [as large as memory permits](#big-integers).
+Integers can be [as large as memory permits](#big-integers). They represent
+values in the mathematical sets known as ℕ (natural numbers, i.e. positive
+integers) and ℤ (positive and negative integers).
 
 
 ## Big integers
@@ -20,6 +22,13 @@ The DB48X version of RPL can perform computations on arbitrarily large integers,
 limited only by available memory, enabling for example the exact computation of
 `100!` and making it possible to address problems that require exact integer
 computations, like exploring the Syracuse conjecture.
+
+## Fractions
+
+Fractions represent a ratio between two integers, like `2/3`. They represent
+values in the mathematical set known as ℚ. In DB48X, fractions are first-class
+objects, allowing exact and relatively inexpensive operations in many common
+cases.
 
 
 ## Decimal numbers
@@ -47,6 +56,10 @@ For example, you can compute the following expression at various precisions:
 512 Precision EVAL 'Precision' PURGE
 @ Expecting 5.99480 35⁳⁻⁵⁰⁹
 ```
+
+In a calculator, decimal numbers are always part of the mathematical set known
+as ℚ, and more precisely of a subset sometimes written as 𝔻. However, they are
+often improperly considered as an approximation of the set of *real* numbers, ℝ.
 
 
 ### Variable-precision decimal

@@ -389,23 +389,26 @@ unintentional differences, since the implementation is completely new.
   file named `/help/db48x.md`, stored in the calculator's flash storage.
 
 * DB48X features auto-completion for commands while typing, through
-  the  _CAT_ key (a [Catalog](#Catalog) of all commands).
+  the  _CAT_ key (a [catalog](#catalog) of all commands).
 
 * Many RPL words exist in short and long form, and a user preference selects how
-  a program shows. For example, the [Negate](#negate) command, which the HP48
-  calls `NEG`, can display, based on user preferences, as `NEG`, `neg`, `Neg` or
-  `Negate`. In the help, it will be shown as **Negate (NEG)**.
+  a program shows. For example, the ` Negate ` command, which the HP48 calls
+  ` NEG `, can display, based on [user preferences](#command-display), as
+  ` NEG `, ` neg `, ` Neg ` or ` Negate `. In the help, commands are shown using
+  the current spelling preference, and all possible aliases are shown on the
+  right of the default spelling.
 
 * The DB48X dialect of RPL is not case sensitive, but it is case-respecting.
   For example, if your preference is to display built-in functions in long form,
-  typing `inv` or `INV` will show up as `Invert` in the resulting program.
+  typing ` inv ` or ` INV ` will show up as `Invert` in the resulting program.
   This means that the space of "reserved words" is larger in DB48X than in other
-  RPL implementations. Notably, on HP's implementations, `DUP` is a keyword but
-  you can use `DuP` as a valid variable name. This is not possible in DB48X.
+  RPL implementations. Notably, on HP's implementations, ` DUP ` is a keyword
+  but you can use ` DuP ` as a valid variable name. This is not possible in
+  DB48X.
 
 * The saving of the stack arguments for the `LastArg` command is controled
-  independently by two distinct settings, `SaveLastArg` and
-  `SaveLastArgInPrograms`. The first one controls if `LastArg` is saved for
+  independently by two distinct settings, `SaveLastArguments` and
+  `ProgramLastArguments`. The first one controls if `LastArg` is saved for
   interactive operations, and is enabled by default. The second one controls if
   `LastArg` is saved before executing commands while running a program or
   evaluating an expression, and is disabled by default. This impacts commands
@@ -414,14 +417,14 @@ unintentional differences, since the implementation is completely new.
   whereas on DB48X with the default settings, it returns the arguments to
   `ROOT`.
 
-* When parsing the `Σ` (`sum`) function (as well as the `∏` (`product`)
-  function which the HP calculators do not have), all arguments are separated by
-  semi-colons like for all other functions. HP calculators have a special syntax
-  in that case, where an `=` sign separates the index and its initial value. In
-  other words, where an HP calculator would show `Σ(i=1;10;i^2)`, which
-  corresponds to the 4-argument sequence `i 1 10 'i^2' Σ`, the DB48X
-  implementation shows and requires the `Σ(i;1;10;i^2)` syntax. Note that an `=`
-  sign may appear inside an expression, but it always denotes equality.
+* When parsing the `Σ` or `∏` functions (HP calculators only have `Σ`), all
+  arguments are separated by semi-colons like for all other functions. HP
+  calculators have a special syntax in that case, where an `=` sign separates
+  the index and its initial value. In other words, where an HP calculator would
+  show `Σ(i=1;10;i^2)`, which corresponds to the 4-argument sequence `i 1 10
+  'i^2' Σ`, the DB48X implementation shows and requires the `Σ(i;1;10;i^2)`
+  syntax. Note that an `=` sign may appear inside an expression, but it always
+  denotes equality.
 
 
 ### Evaluation
@@ -432,16 +435,17 @@ unintentional differences, since the implementation is completely new.
   you need to use `RCL` like for global variables.
 
 * Lists do not evaluate as programs by default, like on the HP28, but unlike on
-  the HP48 and later HP models. This can be controlled using the `ListEvaluation` setting. Note that a list can be converted to a program using the `Cycle`
-  command, which makes it easy to build programs from lists.
+  the HP48 and later HP models. This can be controlled using the
+  `ListEvaluation` setting. Note that a list can be converted to a program using
+  the `→Program` command, which makes it easy to build programs from lists.
 
 * The `case` statement can contain `when` clauses as a shortcut for the frequent
   combination of duplicating the value and testing against a reference. For
-  example, `case dup "A" = then "Alpha" end` can be replaced with `case "A" when
-  "Alpha" end`.
+  example, `case dup "A" = then "Alpha" end` can be replaced with
+  `case "A" when "Alpha" end`.
 
-* There are no _compiled local variables_. The a program like `→ ←x « Prog »`
-  might perform incorrectly if `Prog` attempts to access `←x`. Compiled local
+* There are no _compiled local variables_. A program like `→ ←x « Prog »`
+  may perform incorrectly if `Prog` attempts to access `←x`. Compiled local
   variables are a rather obscure feature with a very limited use, and might be
   replaced with true closures (which have a well-defined meaning) if there is
   enough demand.
@@ -449,12 +453,15 @@ unintentional differences, since the implementation is completely new.
 
 ### Numbers
 
-* DB48X has several separate representations for numbers: integers, fractions
-  and decimal. Notably, it keeps integer values and fractions in exact form for
-  as long as possible to optimize both performance and memory usage.
-  This is closer to the HP50G in exact mode than to the HP48. Like
-  the HP50G, DB48X will distinguish `1` (an integer) from `1.` (a decimal
-  value), and the `TYPE` command will return distinct values.
+* DB48X has several separate representations for numbers:
+  [integers](#integers), [fractions](#fractions),
+  [decimal](#decimal-numbers) and [complex](#complex-numbers) in polar or
+  rectangular form.Notably, this implementation of RPL keeps integer values
+  and fractions in exact form for as long as possible to optimize both
+  performance and memory usage.  This is closer to the HP50G in exact mode than
+  to the HP48. Like the HP50G, DB48X will distinguish `1` (an integer) from `1.`
+  (a decimal value), and the `TYPE` or `TypeName` commands will return distinct
+  values.
 
 * Integer and fraction arithmetic can be performed with arbitrary
   precision, similar to the HP50G. The `MaxNumberBits` setting controls how much
@@ -471,8 +478,10 @@ unintentional differences, since the implementation is completely new.
   benchmark code will contain `1.` instead of `1` for that reason. On DB48X,
   arithmetic on integers and fractions is generally faster.
 
-* Like the HP Prime, DB48X displays a leading zero for decimal values, whereas
-  HP RPL calculators do not. For example, it will display `0.5` and not `.5`.
+* Like the HP Prime, DB48X displays a leading zero for decimal values by
+  default, whereas HP RPL calculators do not. For example, DB48x with default
+  settings will display `0.5` and not `.5`. This is controlled by the
+  `LeadingZero` flag.
 
 * DB48X has two distinct representations for complex numbers, polar and
   rectangular, and transparently converts between the two formats as needed.
@@ -486,14 +495,16 @@ unintentional differences, since the implementation is completely new.
   numerical operations. In addition, it supports 32-bit and 64-bit
   hardware-accelerated binary floating-point.
 
+<!--- DM32 --->
 * Based numbers with an explicit base, like `#123h` keep their base, which makes
   it possible to show on stack binary and decimal numbers side by side. Mixed
   operations convert to the base in stack level X, so that `#10d #A0h +`
   evaluates as `#AAh`. Based numbers without an explicit base change base
-  depending on the [Base](#base) setting, much like based numbers on the HP48,
+  depending on the [base](#base) setting, much like based numbers on the HP48,
   but with the option to any base between 2 and 36. In addition to the
   HP-compatible trailing letter syntax (e.g. `#1Ah`), the base can be given
   before the number (e.g. `16#1A`), which works for all supported bases.
+<!--- !DM32 --->
 
 ### Representation of objects
 
@@ -511,13 +522,12 @@ unintentional differences, since the implementation is completely new.
   computations to mimic the HP50G behaviour with limited benefit, `Size` returns
   1 for integers, algebraic expressions and unit objects.
 
-* The [`Type`](#type) command can return HP-compatible values that are sometimes
+* The `Type` command can return HP-compatible values that are sometimes
   imprecise (e.g. it cannot distinguish between polar and rectangular complex
   values), or numerical values that distinguish all the types in DB48X. This is
-  controlled by the [`CompatibleTypes`](#compatibletypes) setting.  The
-  `TypeName` command is a DB48X-only extension that returns more precise textual
-  information, and should be preferred both for readability and future
-  compatibility.
+  controlled by the `CompatibleTypes` setting. The `TypeName` command is a
+  DB48X-only extension that returns more precise textual information, and should
+  be preferred both for readability and future compatibility.
 
 * DB48X has a dedicated data type to represent multi-variate polynomials, in
   addition to the classical RPL-based algebraic expressions.
@@ -542,12 +552,11 @@ unintentional differences, since the implementation is completely new.
   to start the interaction.
 
 * The whole banking and flash access storage mechanism of the HP48 will be
-  replaced with a system that works well with FAT USB storage. It should be
-  possible to directly use a part of the flash storage to store RPL programs,
-  either in source or compiled form. As an example, using a text argument to
-  `STO` and `RCL` accesses files on the USB disk, e.g. `1 "FOO.TXT" STO` stores
-  the text representation of `1` in a file named `DATA/FOO.TXT` on the USB
-  flash storage.
+  replaced with a system that works well with FAT USB storage. It is possible to
+  directly use a part of the flash storage to store RPL programs or data, either
+  in source or compiled form. Using a text argument to `STO` and `RCL` accesses
+  files on the USB disk, e.g. `1 "FOO.TXT" STO` stores the text representation
+  of `1` in a file named `DATA/FOO.TXT` on the USB flash storage.
 
 ### List operation differences
 
@@ -705,10 +714,9 @@ The `Size` operation when applying to text counts the number of Unicode
 characters, not the number of bytes. The number of bytes can be computed using
 the `Bytes` command.
 
-The `Num` and `Chr` commands (also spelled `Char→Code` and `Code→Char`) deal
-with Unicode codepoints, and do not use the special HP characters codes. In
-addition, `Num` return `-1` for an empty string, not `0`. `0` is only returned
-for a string that begins with a `NUL` codepoint.
+The `Num` and `Chr` commands deal with Unicode codepoints, and do not use the
+special HP characters codes. In addition, `Num` return `-1` for an empty string,
+not `0`. `0` is only returned for a string that begins with a ` NUL ` codepoint.
 
 The `Code→Char` command can also be spelled as `Code→Text`, and take a list of
 Unicode codepoints as input. Conversely, `Text→Code` will generate a list of all
@@ -739,7 +747,8 @@ To navigate the help on the calculator, use the following keys:
 * While the help is shown, the keys _◀︎_ and _▶︎_ on the keyboard scroll
   through the text.
 
-* The _F1_ key returns to the [Home](#overview) (overview).
+* The _F1_ key returns to the [Home](#overview) of the help file, which gives an
+  overview of the project and top-down navigation links.
 
 * The _F2_ and _F3_ keys (labels `Page▲` and `Page▼`) scroll the text one full
   page at a time.
@@ -867,7 +876,7 @@ DB48X inherits many ideas from newRPL, including, but not limited to:
 
 * Implementing RPL natively for ARM CPUs
 * Adding indicators in the cursor to indicate current status
-* Integrating a catalog of functions to the command line
+* Integrating a [catalog](#catalog) of functions to the command line
 
 A first iteration of DB48X started as a
 [branch of newRPL](https://github.com/c3d/db48x/), although the

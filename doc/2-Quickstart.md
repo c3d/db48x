@@ -60,7 +60,7 @@ preference. Algebraic data entry makes it easier to view the entire
 expression. Reverse-polish makes it easier to see intermediate results.
 
 
-## Fractions
+## Using Fractions
 
 Let us now compute how many pies we need to feed 22 kids if we divide each pie
 in 8 slices. Using the RPL approach, we would type _2_, _2_, _ENTER_, _8_,
