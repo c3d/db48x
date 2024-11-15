@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            editor_operations();
+            for_loops();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -827,9 +827,21 @@ void tests::data_types()
 #endif // CONFIG_FIXED_BASED_OBJECTS
 
     step("Arbitrary base input");
-    test(CLEAR, "8#777", ENTER).type(ID_based_integer).expect("#1FF₁₆");
-    test(CLEAR, "2#10000#ABCDE", ENTER)
+    test(CLEAR, "8#777", ENTER)
+#if CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_oct_integer)
+        .expect("#777₈")
+#else // !CONFIG_FIXED_BASED_OBJECTS
         .type(ID_based_integer)
+        .expect("#1FF₁₆")
+#endif // CONFIG_FIXED_BASED_OBJECTS
+        .noerror();
+    test(CLEAR, "2#10000#ABCDE", ENTER)
+#if CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_hex_integer)
+#else // !CONFIG_FIXED_BASED_OBJECTS
+        .type(ID_based_integer)
+#endif // CONFIG_FIXED_BASED_OBJECTS
         .expect("#A BCDE₁₆");
 
     step("Do not parse #7D as a decimal (#371)")
@@ -2278,6 +2290,14 @@ void tests::for_loops()
     pgmo = "« 'X' 10 1 for i i x² + next »";
     test(CLEAR, pgm, ENTER).noerror().type(ID_program).want(pgmo);
     test(RUNSTOP).noerror().type(ID_expression).expect("'X+100'");
+
+    step("Update variable inside the loop")
+        .test(CLEAR,
+              "1 10 FOR i "
+              " i "
+              " IF i 3 > THEN 'Exiting' 100 'i' STO END "
+              "NEXT", ENTER)
+        .got("'Exiting'", "4", "3", "2", "1");
 
     step("For loop on a list")
         .test(CLEAR, "{ 1 3 5 \"ABC\" } for i i 2 * 1 + next", ENTER)
@@ -9441,7 +9461,7 @@ void tests::character_menu()
               LSHIFT, F1, LSHIFT, F2, LSHIFT, F3, LSHIFT, F4, LSHIFT, F5,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("\"αβγδεΑΒΓΔΕάΆ·Έέ\"");
+        .expect("\"αβγδεΑΒΓΔΕάΆϵΈέ\"");
     step("Europe menu")
         .test(CLEAR, ID_CharactersMenu)
         .noerror()
@@ -11997,6 +12017,7 @@ tests &tests::itest(cstring txt)
         case L'γ': itest(ID_CharactersMenu, LSHIFT, F1, F3); NEXT;
         case L'δ': itest(ID_CharactersMenu, LSHIFT, F1, F4); NEXT;
         case L'ε': itest(ID_CharactersMenu, LSHIFT, F1, F5); NEXT;
+        case L'ϵ': itest(ID_CharactersMenu, LSHIFT, F1, RSHIFT, F3); NEXT;
         case L'ζ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F1); NEXT;
         case L'η': itest(ID_CharactersMenu, LSHIFT, F1, F6, F2); NEXT;
         case L'ι': itest(ID_CharactersMenu, LSHIFT, F1, F6, F4); NEXT;

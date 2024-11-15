@@ -9,6 +9,8 @@ The DB48X project can be built in two variants:
   [test suite](https://www.youtube.com/watch?v=vT-I3UlROtA) that can be invoked
   by running the simulator with the `-T` option or hitting the `F12` key.
 
+  Step-by-Step guide at the end of the document for MS WINDOWS users.
+
 * A firmware for the DM42, which is designed to run on top of SwissMicro's DMCP
   platform, and takes advantage of it.
 
@@ -92,3 +94,115 @@ The latest version of SDKdemo is available on
 The [db48x.md](help/db48x.md) help file can be copied to the DM42's `/HELP`
 directory to act as the built-in help for the calculator. It is built
 from individual files in the [doc](doc/) directory.
+
+# Installation guide (step-by-step) to MS Windows users:
+
+To run db48x on Windows you need a linux enviroment:
+You are better served with a good internet connection and some free space on your disc (3GB):
+
+## How to install Fedora WSL on Windows
+
+https://apps.microsoft.com/detail/9npcp8drchsn?hl=en-US&gl=US
+
+Set username and password.
+Rember your password!!!
+
+## Prepare Fedora to run DB48x
+
+Run fedora and enter:
+
+```bash
+sudo dnf install make
+sudo dnf install arm-none-eabi-gcc arm-none-eabi-gcc-cs-c++ arm-none-eabi-newlibsudo dnf install qt-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel
+sudo dnf install freetype-devel
+sudo dnf install rsync
+sudo dnf upgrade --refresh
+```
+
+## Install and build DB48x
+
+Run fedora and enter:
+
+```bash
+git clone https://github.com/c3d/db48x.git
+git submodule update --init --recursive
+cd db48x
+```
+
+And then run the following to build DB48x:
+```bash
+make sim
+```
+
+DB48x looks for `help` and `config` relative to your current directory, so you
+need to run it from the top-level directory if you want the built-in help files
+and the configuration files to be found:
+
+```bash
+`./sim/db48x
+```
+
+DB48x should run now :-)
+
+## Update DB48x
+
+Run fedora and enter:
+
+```bash
+cd db48x
+git pull
+```
+
+## Reset DB48x branch
+
+Run fedora and enter:
+
+```bash
+git reset --hard HEAD~1
+```
+
+## Add Shortcut to Windows (Start-Menu):
+
+###  DB48x - WSL terminal
+
+To create a shortcut that lets you operate in the terminal in the DB48x
+directory:
+
+* Hit the windows key on your keyboard and enter `powershell`
+* Move the cursor over the Powershell icon, right-click and select
+  `Open file location`
+* Windows explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to your liking,
+  e.g. `DB48x - WSL terminal`
+* Right-click on the file and select `Properties`:
+* Change the target of the shortcut to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x"`
+
+
+###  DB48x + WSL
+
+This configuration launches DB48x through a terminal window, so that you can see
+DB48x's output, for example traces or error messages:
+
+* Hit the Windows key on your keyboard and enter `powershell`
+* Move the cursor over the Powershell icon, right-click and select
+  `Open file location`
+* Windows explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `db48x + WSL`
+* Right-click on the file and select `Properties`
+* Change the target of the shortcut to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./sim/db48x`
+
+###  DB48x (without terminal)
+
+In this configuration, the terminal is hidden and you will not see any error
+message emitted by DB48x.
+
+* Hit the windows key on your keyboard and enter `powershell`
+* Move the cursor over the Powershell icon, right-click and and select
+  `Open file location`
+* Windows explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `DB48x`
+* Right-click on the file and `Properties`
+* Change the target of the shortcut to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl --cd "~/db48x" -- ./sim/db48x`

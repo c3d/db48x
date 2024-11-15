@@ -6,8 +6,8 @@ available commands or characters.
 
 When entering a program, all commands matching the text currently matched will
 be shown. For example, if you typed `A`, all commands containing an `A` are
-displayed in alphabetical order. If you type `ACO`, `ACOS, `ACOSH` and
-`DataColumn` (a possible spelling for `ColΣ`) will all be shown.
+displayed in alphabetical order. If you type ` ACO `, ` ACOS `, ` ACOSH ` and
+` DataColumn ` (a possible spelling for ` ColΣ `) will all be shown.
 
 Inside text, all characters related to the last entered character will be shown.
 For example, if you typed `A`, options to add accents to `A` or to select the

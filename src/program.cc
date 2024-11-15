@@ -103,7 +103,6 @@ object::result program::run(bool synchronous) const
 // ----------------------------------------------------------------------------
 //   Execute a program
 // ----------------------------------------------------------------------------
-//   The 'save_last_args' indicates if we save `LastArgs` at this level
 {
     size_t   depth     = rt.call_depth();
     bool     outer     = depth == 0 && !running;

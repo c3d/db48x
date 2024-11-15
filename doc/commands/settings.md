@@ -100,6 +100,18 @@ Display the exponent in scientific mode using a fancy rendering that is visually
 
 Display the exponent in scientific mode in a way reminiscent of classical HP48 calculators, for example `1.23E-4`.
 
+## LeadingZero
+
+Display a leading zero for fractional decimal values, i.e. display `0.5` and not
+`.5`. This corresponds to the way most HP calculators display decimal values,
+with the notable exception of RPL calculators in ` STD ` mode.
+
+## NoLeadingZero
+
+Do not display the leading zero for fractional decimal values, i.e. display `.5`
+and not `0.5`. This corresponds to the way HP RPL calculators display numbers in
+` STD ` mode.
+
 ## MixedFractions
 
 Display fractions as mixed fractions when necessary, e.g. `3/2` will show up as `1 1/2`.
@@ -176,17 +188,18 @@ irrespective of the display mode.
 
 DB48X has four command spelling modes:
 
-* [Lowercase](#LowerCase): Display `sto`
-* [Uppercase](#UpperCase): Display `STO`
-* [Capitalized](#Capitalized): Display `Sto`
-* [LongForm](#LongForm): Display `Store`
+* [Lowercase](#LowerCase): Display ` sto `
+* [Uppercase](#UpperCase): Display ` STO `
+* [Capitalized](#Capitalized): Display ` Sto `
+* [LongForm](#LongForm): Display ` Store `
 
-There are four parallel settings for displaying a variable name such as `varName`:
+There are four parallel settings for displaying a variable name such as
+`varName`:
 
-* [LowercaseNames](#LowerCaseNames): Display as `varname`
-* [UppercaseNames](#UpperCaseNames): Display as `VARNAME`
-* [CapitalizedNames](#CapitalizedNames): Display as `VarName`
-* [LongFormNames](#LongFormNames): Display as `varName`
+* [LowercaseNames](#LowerCaseNames): Display as ` varname `
+* [UppercaseNames](#UpperCaseNames): Display as ` VARNAME `
+* [CapitalizedNames](#CapitalizedNames): Display as ` VarName `
+* [LongFormNames](#LongFormNames): Display as ` varName `
 
 
 ## LowerCase
@@ -590,6 +603,30 @@ then use the `Continue` command.
 
 An error during a program enters the debugger, letting you correct the problem
 before resuming execution. This is the default setting.
+
+
+## SaveLastArguments
+
+Save last arguments when evaluating commands interactively.
+This is disabled by `NoLastArguments`.
+
+Saving arguments during program execution is controlled by a separate setting,
+`ProgramLastArguments`.
+
+## NoLastArguments
+
+Disable the saving of last arguments when interactively evaluating commands.
+
+## ProgramLastArguments
+
+Save last arguments during program execution. This may impact performance,
+and is disabled by default (`NoProgramLastArguments`).
+
+## NoProgramLastArguments
+
+Disable the saving of command arguments during program execution.
+If `SaveLastArguments` is set, arguments to interactive commands will still be
+saved.
 
 
 # States

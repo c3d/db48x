@@ -20,12 +20,12 @@
 - [x] RPL program evaluattion
 - [x] RPL program single-stepping / debugging
 - [x] Stack undo / redo
-- [X] Accelerated [blitter code with 8x8 patterns](https://github.com/c3d/db48x/blob/dm42/firmware/include/ggl.h)
-- [X] Unicode-capable [text drawing replacement](https://github.com/c3d/db48x/blob/dm42/firmware/sys/graphics.c)
-- [X] Unicode / UTF-8 support
-- [X] [Unicode fonts](https://github.com/c3d/db48x/blob/dm42/firmware/include/unifont.h)
+- [x] Accelerated [blitter code with 8x8 patterns](https://github.com/c3d/db48x/blob/dm42/firmware/include/ggl.h)
+- [x] Unicode-capable [text drawing replacement](https://github.com/c3d/db48x/blob/dm42/firmware/sys/graphics.c)
+- [x] Unicode / UTF-8 support
+- [x] [Unicode fonts](https://github.com/c3d/db48x/blob/dm42/firmware/include/unifont.h)
       (e.g. derived from [WP43S](https://gitlab.com/wpcalculators/wp43) project)
-- [X] Larger font for editor (old geezer mode)
+- [x] Larger font for editor (old geezer mode)
 - [x] Objects in USB-accessible flash storage
 - [x] Calculator state load/save
 - [x] Global help from [generated markdown file](help/db48x.md)
@@ -34,7 +34,7 @@
 - [x] Character menu / table
 - [x] Brezenham lines, circles and ellipses
 - [ ] Polygon fill
-- [ ] RPL-controlled soft-menu system
+- [x] RPL-controlled soft-menu system
 - [x] Domain-specific features / customizaton from files on USB disk
 - [x] Single-key object format cycling
 - [x] Units and conversion customization from `units.csv` file
@@ -66,14 +66,14 @@
 - [x] Decimal floating-point with fixed size (32, 64 and 128 bits)
 - [x] Decimal floating-point with arbitrary size
 - [x] Binary floating-point with arbitrary size
-- [X] Hardware-accelerated 32-bit and 64-bit binary floating-point
+- [x] Hardware-accelerated 32-bit and 64-bit binary floating-point
 - [x] Text / strings, e.g. `"ABC"`
 - [x] Name / symbols, e.g. `ABC`
 - [x] Complex numbers in rectangular form, e.g. `2 + 3i`
 - [x] Complex numbers in polar form, e.g. `2 ∡ 30°`
 - [ ] Quaternions
 - [ ] Intervals / ranges, e.g. `1..5`
-- [X] Angles, e.g. `∡30°`
+- [x] Angles, e.g. `∡30°`
 - [x] Lists, e.g. `{ A 1 "Hello" }`
 - [x] Arrays, vectors, matrices and tensors, e.g. `[ [ 1 2 3] [ 4 5 6] ]`
 - [x] Program objects, e.g `« IF 1 = THEN "Equal to one" END »`
@@ -86,9 +86,9 @@
 - [x] Algebraic expressions
 - [x] Unit objects
 - [x] Directories
-- [ ] Software libraries
-- [ ] Keymaps
-- [X] Softkey menus
+- [x] Software libraries
+- [x] Keymaps
+- [x] Softkey menus
 - [ ] Full-screen menus
 - [ ] Forms
 - [ ] Object handler (can replace eval, parse, render, graphical editor)
@@ -162,20 +162,20 @@
 - [x] Symbolic operations
 - [ ] Integrate existing CAS like [GIAC](https://github.com/geogebra/giac)
 - [x] Rules engine
-- [ ] Symbolic differentiation
-- [ ] Symbolic integration
+- [x] Symbolic differentiation
+- [x] Symbolic integration
 
 
 ### Numerical evaluation
 
-- [X] Integration
-- [X] Root finding
+- [x] Integration
+- [x] Root finding
 
 ### Other RPL functional areas (to be expanded)
 
-- [ ] Real-time clock
+- [x] Real-time clock
 - [ ] Alarms
-- [ ] File system access
+- [x] File system access
 - [ ] Printing
 - [x] Plotting
 - [ ] Equation writer
