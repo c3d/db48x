@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            for_loops();
+            text_functions();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -5601,8 +5601,15 @@ void tests::text_functions()
     step("Ensure we can parse base numbers with separators in them")
         .test(CLEAR, "16#ABCD1234", ENTER).expect("#ABCD 1234₁₆")
         .test(RSHIFT, ENTER, NOSHIFT, ENTER).expect("\"\"")
-        .test(ID_add).expect("\"#ABCD 1234h\"")
+        .test(ID_add).expect("\"16#ABCD 1234\"")
         .test(NOSHIFT, A, F2).expect("#ABCD 1234₁₆");
+    step("Compatible based numbers")
+        .test(CLEAR, ID_CompatibleBasedNumbers).noerror()
+        .test(CLEAR, "16#ABCD1234", ENTER).expect("#ABCD 1234h")
+        .test(RSHIFT, ENTER, NOSHIFT, ENTER).expect("\"\"")
+        .test(ID_add).expect("\"#ABCD 1234h\"")
+        .test(NOSHIFT, A, F2).expect("#ABCD 1234h")
+        .test(ID_ModernBasedNumbers).expect("#ABCD 1234₁₆");
 }
 
 

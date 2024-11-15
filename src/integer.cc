@@ -281,12 +281,8 @@ PARSE_BODY(integer)
                 return err;
             }
             ularge next = result * base + v;
-            record(integer,
-                   "Digit %c value %u value=%llu next=%llu",
-                   s[-1],
-                   v,
-                   result,
-                   next);
+            record(integer, "Digit %c value %u value=%llu next=%llu",
+                   s[-1], v, result, next);
             digits++;
 
             // If the value does not fit in an integer, defer to bignum / real
@@ -592,9 +588,23 @@ static size_t render_num(renderer &r,
 
     // Check which kind of spacing to use
     bool based = *fmt == '#';
+    char suffix = based ? fmt[1] : 0;
     bool fancy_base = based && r.stack();
     uint spacing = based ? Settings.BasedSpacing() : Settings.MantissaSpacing();
-    unicode space = based ? Settings.BasedSeparator() : Settings.NumberSeparator();
+    auto space = based ? Settings.BasedSeparator() : Settings.NumberSeparator();
+
+    // Insert base if we have a fixed-base number
+    if (based)
+    {
+        if (fancy_base && Settings.CompatibleBasedNumbers() &&
+            ((base == 2  && (suffix = 'b')) || // Intentionally setting suffix
+             (base == 8  && (suffix = 'o')) ||
+             (base == 10 && (suffix = 'd')) ||
+             (base == 16 && (suffix = 'h'))))
+            fancy_base = false;
+        if (!fancy_base && Settings.ModernBasedNumbers())
+            r.printf("%u", base);
+    }
 
     // Copy the '#' or '-' sign
     if (*fmt)
@@ -637,9 +647,9 @@ static size_t render_num(renderer &r,
             r.put(unicode(fancy_lower_digits[base/10]));
         r.put(unicode(fancy_lower_digits[base%10]));
     }
-    else if (*fmt)
+    else if (suffix && (!based || Settings.CompatibleBasedNumbers()))
     {
-        r.put(*fmt++);
+        r.put(suffix);
     }
 
     return r.size();

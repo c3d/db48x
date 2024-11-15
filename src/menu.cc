@@ -668,7 +668,8 @@ MENU(BasesMenu,
 
      "PopCnt",  ID_Unimplemented,
      "1-comp",  ID_OnesComplement,
-     "2-comp",  ID_TwosComplement);
+     "2-comp",  ID_TwosComplement,
+     "Modern",  ID_ModernBasedNumbers);
 
 
 MENU(ProbabilitiesMenu,
