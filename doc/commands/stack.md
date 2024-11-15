@@ -38,7 +38,9 @@ Duplicate the same object twice on the stack
 Duplicate a group of N objects, N being given in stack level 1
 
 ## LastArguments
-Put the last arguments back on the stack
+Put the last arguments back on the stack.
+Command arguments are saved based on the `SaveLastArguments` and
+`ProgramLastArguments` setttings.
 
 ## LastX
 Put the last first argument on the stack.
