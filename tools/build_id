@@ -1,0 +1,7 @@
+#!/bin/bash
+BUILD_ID=$(cat .build_id)
+if [ "$1" == "-u" ]; then
+    BUILD_ID=$(($BUILD_ID + 1))
+    echo $BUILD_ID > .build_id
+fi
+echo $BUILD_ID
