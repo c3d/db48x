@@ -26,17 +26,20 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `ADD` Addition (differs from the HP Add command)
 * `ALOG`
 * `AND`
+* `APPLY`
 * `ARG`
 * `ARRY→`
 * `→ARRY`
 * `ASINH`
 * `ASIN`
+* `ASN`
 * `ASR`
 * `ASRC`
 * `ATANH`
 * `ATAN`
 * `AXES`
 * `BARPLOT`
+* `BAR`
 * `BEEP`
 * `BESTFIT`
 * `BIN`
@@ -50,6 +53,7 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `CLEAR`
 * `CLLCD`
 * `CLΣ`
+* `COLLECT`
 * `COLΣ`
 * `COMB`
 * `CON`
@@ -92,12 +96,15 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `DROP`
 * `DTAG`
 * `DUP2`
+* `DUPDUP`
 * `DUPN`
 * `DUP`
 * `D→R`
 * `e`
+* `EDIT`
 * `ELSE`
 * `END`
+* `ENDSUB`
 * `ENG`
 * `EQNLIB`
 * `ERR0`
@@ -113,6 +120,7 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `FC?C`
 * `FC?`
 * `FIX`
+* `FLOOR`
 * `FOR`
 * `FP`
 * `FREEZE`
@@ -124,6 +132,8 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `GETI`
 * `GOR`
 * `GROB`
+* `→GROB`
+* `GROBADD`
 * `GXOR`
 * `HALT`
 * `HEAD`
@@ -134,11 +144,14 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `HMS+`
 * `HMS→`
 * `→HMS`
+* `IDN`
+* `IDIV2`
 * `IFERR`
 * `IFTE`
 * `IFT`
 * `IF`
 * `IM`
+* `INCR`
 * `INV`
 * `IP`
 * `ISOL`
@@ -146,21 +159,35 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `LASTARG`
 * `LINE`
 * `LINFIT`
+* `LIST→`
+* `∆LIST`
+* `ΠLIST`
+* `ΣLIST`
 * `LNP1`
 * `LN`
+* `LNAME`
 * `LOG`
 * `LOGFIT`
 * `LR`
+* `MAP`
+* `↓MATCH`
+* `↑MATCH`
 * `MAX`
 * `MAXΣ`
 * `MEAN`
 * `MEM`
+* `MENU`
 * `MIN`
 * `MINΣ`
 * `MOD`
+* `MROOT`
+* `NDUPN`
 * `NEG`
+* `NEWOB`
 * `NEXT`
+* `NIP`
 * `NOT`
+* `NSUB`
 * `NΣ`
 * `NUM`
 * `OBJ→`
@@ -170,6 +197,8 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `OVER`
 * `PARAMETRIC`
 * `PATH`
+* `PCOV`
+* `PERM`
 * `PGDIR`
 * `PICK`
 * `PICK3`
@@ -186,14 +215,22 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `PVAR`
 * `PWRFIT`
 * `RAD`
+* `RAND`
+* `RANM`
+* `RCEQ`
 * `RCL`
+* `RCLKEYS`
+* `RCLMENU`
 * `RCLΣ`
 * `RCWS`
+* `RDZ`
 * `RE`
 * `RECT` (Different meaning: draws a rectangle)
 * `REPEAT`
 * `REVLIST`
 * `REWRITE` (Different meaning: performs a rewrite)
+* `RISCH`
+* `RND`
 * `RL`
 * `RLB`
 * `RLC`
@@ -228,33 +265,51 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `START`
 * `STD`
 * `STEP`
+* `STEQ`
+* `STOKEYS`
 * `STORE` (Different meaning: long form of STO)
 * `STO`
+* `STO+`
+* `STO–`
+* `STO*`
+* `STO/`
 * `STOΣ`
 * `STR→`
 * `STWS`
+* `SUBST`
 * `SWAP`
 * `%T`
 * `TAIL`
 * `TANH`
 * `TAN`
+* `TEVAL`
 * `THEN`
 * `TICKS`
 * `TIME`
 * `→TIME`
+* `TMENU`
 * `TOT`
+* `TRNC`
+* `TVARS`
 * `TYPE`
 * `UBASE`
 * `UFACT`
+* `UNPICK`
+* `UNROT`
 * `UNTIL`
 * `UPDIR`
 * `UVAL`
+* `V→`
+* `→V2`
+* `→V3`
 * `VAR`
+* `VARS`
 * `VERSION`
 * `WAIT`
 * `WHILE`
 * `XCOL`
 * `XOR`
+* `XPON`
 * `XRNG`
 * `XROOT`
 * `YRNG`
@@ -280,12 +335,18 @@ The following is a list of the HP50 RPL commands which are implemented in DB48X.
 * `→STR`
 * `→TAG`
 * `→UNIT`
+* `?`
+* `|` (Where)
+* `Σ`
 * `→` (Create Local)
+* `∂`
 * `√` (Square root)
+* `∞`
 * `∫` (Integrate)
 * `≠` (Not equal)
 * `≤` (Less than or equal)
 * `≥` (Greater than or Equal)
+* `▶` (Store)
 * `＿` (Unit attachment)
 
 
@@ -304,13 +365,11 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `AMORT`
 * `ANIMATE`
 * `ANS`
-* `APPLY`
 * `ARC`
 * `ARCHIVE`
 * `ARIT`
 * `ASIN2C`
 * `ASIN2T`
-* `ASN`
 * `ASSUME`
 * `ATAN2S`
 * `ATICK`
@@ -319,7 +378,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `AXL`
 * `AXM`
 * `AXQ`
-* `BAR`
 * `BASIS`
 * `BINS`
 * `BLANK`
@@ -341,7 +399,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `COL–`
 * `COL+`
 * `COLCT`
-* `COLLECT`
 * `COND`
 * `CONIC`
 * `CORR`
@@ -375,8 +432,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `DOMAIN`
 * `DRAW3DMATRIX`
 * `DROITE`
-* `DUPDUP`
-* `EDIT`
 * `EDITB`
 * `EGCD`
 * `EGV`
@@ -404,7 +459,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `FDISTRIB`
 * `FFT`
 * `FINDALARM`
-* `FLOOR`
 * `FONT6`
 * `FONT7`
 * `FONT8`
@@ -422,8 +476,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `GRAPH`
 * `GREDUCE`
 * `GRIDMAP`
-* `→GROB`
-* `GROBADD`
 * `*H`
 * `HADAMARD`
 * `HALFTAN`
@@ -440,13 +492,10 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `IBERNOULLI`
 * `IBP`
 * `ICHINREM`
-* `IDN`
-* `IDIV2`
 * `IEGCD`
 * `IFFT`
 * `ILAP`
 * `IMAGE`
-* `INCR`
 * `INDEP`
 * `INFORM`
 * `INPUT`
@@ -481,29 +530,19 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `ΣLINE`
 * `LININ`
 * `LINSOLVE`
-* `LIST→`
-* `∆LIST`
-* `ΠLIST`
-* `ΣLIST`
-* `LNAME`
 * `LNCOLLECT`
 * `LOCAL`
 * `LQ`
-* `LR`
 * `LSQ`
 * `LU`
 * `LVAR`
 * `MAD`
 * `MAIN`
 * `MANT`
-* `MAP`
-* `↓MATCH`
-* `↑MATCH`
 * `MATHS`
 * `MATR`
 * `MAXR`
 * `MCALC`
-* `MENU`
 * `MENUXY`
 * `MINIFONT→`
 * `→MINIFONT`
@@ -514,19 +553,14 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `MODSTO`
 * `MODULAR`
 * `MOLWT`
-* `MROOT`
 * `MSGBOX`
 * `MSLV`
 * `MSOLVR`
 * `MULTMOD`
 * `MUSER`
 * `NDIST`
-* `NDUPN`
-* `NEWOB`
 * `NEXTPRIME`
-* `NIP`
 * `NOVAL`
-* `NSUB`
 * `NUMX`
 * `NUMY`
 * `ORDER`
@@ -537,10 +571,8 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `PCAR`
 * `PCOEF`
 * `PCONTOUR`
-* `PCOV`
 * `PDIM`
 * `PERINFO`
-* `PERM`
 * `PERTBL`
 * `PEVAL`
 * `PICTURE`
@@ -577,20 +609,14 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `QUOT`
 * `QUOTE`
 * `QXA`
-* `RAND`
 * `RANK`
-* `RANM`
 * `RATIO`
-* `RCEQ`
 * `RCI`
 * `RCIJ`
 * `RCLALARM`
 * `RCLF`
-* `RCLKEYS`
-* `RCLMENU`
 * `RCLVX`
 * `RDM`
-* `RDZ`
 * `REF`
 * `REMAINDER`
 * `RENAME`
@@ -598,11 +624,9 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `REPL`
 * `RES`
 * `RESULTANT`
-* `RISCH`
 * `RKF`
 * `RKFERR`
 * `RKFSTEP`
-* `RND`
 * `RNRM`
 * `ROW–`
 * `ROW+`
@@ -648,20 +672,13 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `SPHERE`
 * `SRAD`
 * `SREPL`
-* `STEQ`
 * `STOALARM`
 * `STOF`
-* `STOKEYS`
 * `STOVX`
-* `STO+`
-* `STO–`
-* `STO*`
-* `STO/`
 * `STREAM`
 * `STURM`
 * `STURMAB`
 * `SUB`
-* `SUBST`
 * `SUBTMOD`
 * `SVD`
 * `SVL`
@@ -678,13 +695,11 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `TCOLLECT`
 * `TDELTA`
 * `TESTS`
-* `TEVAL`
 * `TEXPAND`
 * `TEXT`
 * `TINC`
 * `TLIN`
 * `TLINE`
-* `TMENU`
 * `TRACE`
 * `TRAN`
 * `TRIG`
@@ -693,12 +708,10 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `TRIGSIN`
 * `TRIGTAN`
 * `TRN`
-* `TRNC`
 * `TRUNC`
 * `TRUTH`
 * `TSIMP`
 * `TSTR`
-* `TVARS`
 * `TVM`
 * `TVMBEG`
 * `TVMEND`
@@ -706,17 +719,11 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `UNASSIGN`
 * `UNASSUME`
 * `UNBIND`
-* `UNPICK`
-* `UNROT`
 * `UTPC`
 * `UTPF`
 * `UTPN`
 * `UTPT`
-* `V→`
-* `→V2`
-* `→V3`
 * `VANDERMONDE`
-* `VARS`
 * `VER`
 * `VISIT`
 * `VISITB`
@@ -725,7 +732,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `*W`
 * `WIREFRAME`
 * `XNUM`
-* `XPON`
 * `XQ`
 * `XVOL`
 * `XXRNG`
@@ -735,12 +741,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `ZEROS`
 * `ZFACTOR`
 * `ZVOL`
-* `|` (Where)
-* `?`
-* `∞`
-* `Σ`
-* `∂`
-* `▶` (Store)
 * `;` (Semicolon)
 
 ## Unapplicable commands
