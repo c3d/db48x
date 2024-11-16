@@ -98,6 +98,7 @@ PARSE_BODY(integer)
     size_t length = p.length;
     byte_p last   = s + length;
     byte_p endp   = nullptr;
+    size_t basesz = 0;
 
     if (*s == '-')
     {
@@ -115,9 +116,12 @@ PARSE_BODY(integer)
     }
     else if (*s == '#')
     {
+        unicode sep = Settings.BasedSeparator();
         s++;
-        for (byte_p e = s; !endp; e++)
-            if (e >= last || (value[*e] == NODIGIT && *e != '#'))
+
+        for (byte_p e = s; !endp; e = utf8_next(e))
+            if (e >= last || (utf8_codepoint(e) != sep &&
+                              value[*e] == NODIGIT && *e != '#'))
                 endp = e;
 
         if (endp > s)
@@ -129,9 +133,10 @@ PARSE_BODY(integer)
             type     = ID_based_integer;
 
             uint max = 0;
-            for (byte_p e = s; e < endp - 1; e++)
-                if (max < value[*e])
-                    max = value[*e];
+            for (utf8 e = s; e < endp - 1; e = utf8_next(e))
+                if (utf8_codepoint(e) != sep)
+                    if (max < value[*e])
+                        max = value[*e];
 
             switch (endp[-1])
             {
@@ -191,9 +196,45 @@ PARSE_BODY(integer)
 #endif // CONFIG_FIXED_BASED_OBJECTS
                 break;
             default:
+            {
+                // Scan a base that uses fancy digits
+                utf8    basep  = endp;
+                unicode bchar  = utf8_codepoint(endp);
+                uint    bdigit = fancy_digit_value(bchar, false);
+                uint    fbase  = 0;
+                while (bdigit < 10 && endp < last)
+                {
+                    fbase = 10 * fbase + bdigit;
+                    endp = utf8_next(endp);
+                    bchar = utf8_codepoint(endp);
+                    bdigit = fancy_digit_value(bchar, false);
+                }
+                if (endp != basep)
+                {
+                    base = fbase;
+                    basesz = endp - basep;
+                    endp = basep;
+                    if (base <= 2 || int(max) >= base)
+                    {
+                        rt.based_number_error().source(basep);
+                        return ERROR;
+                    }
+#ifdef CONFIG_FIXED_BASED_OBJECTS
+                    switch(base)
+                    {
+                    case 2:  type = ID_bin_integer;   break;
+                    case 8:  type = ID_oct_integer;   break;
+                    case 10: type = ID_dec_integer;   break;
+                    case 16: type = ID_hex_integer;   break;
+                    default: type = ID_based_integer; break;
+                    }
+#endif // CONFIG_FIXED_BASED_OBJECTS
+                    break;
+                }
                 // Use current default base
                 endp = nullptr;
                 break;
+            }
             }
             if (endp && s >= endp)
             {
@@ -278,12 +319,8 @@ PARSE_BODY(integer)
                 return err;
             }
             ularge next = result * base + v;
-            record(integer,
-                   "Digit %c value %u value=%llu next=%llu",
-                   s[-1],
-                   v,
-                   result,
-                   next);
+            record(integer, "Digit %c value %u value=%llu next=%llu",
+                   s[-1], v, result, next);
             digits++;
 
             // If the value does not fit in an integer, defer to bignum / real
@@ -384,6 +421,7 @@ PARSE_BODY(integer)
             s++;
         else
             s--;
+        s += basesz;
 
         // Create the intermediate result, which may GC
         {
@@ -589,9 +627,23 @@ static size_t render_num(renderer &r,
 
     // Check which kind of spacing to use
     bool based = *fmt == '#';
-    bool fancy_base = based && r.stack();
+    char suffix = based ? fmt[1] : 0;
+    bool fancy_base = based && !r.editing();
     uint spacing = based ? Settings.BasedSpacing() : Settings.MantissaSpacing();
-    unicode space = based ? Settings.BasedSeparator() : Settings.NumberSeparator();
+    auto space = based ? Settings.BasedSeparator() : Settings.NumberSeparator();
+
+    // Insert base if we have a fixed-base number
+    if (based)
+    {
+        if (fancy_base && Settings.CompatibleBasedNumbers() &&
+            ((base == 2  && (suffix = 'b')) || // Intentionally setting suffix
+             (base == 8  && (suffix = 'o')) ||
+             (base == 10 && (suffix = 'd')) ||
+             (base == 16 && (suffix = 'h'))))
+            fancy_base = false;
+        if (!fancy_base && Settings.ModernBasedNumbers())
+            r.printf("%u", base);
+    }
 
     // Copy the '#' or '-' sign
     if (*fmt)
@@ -634,9 +686,9 @@ static size_t render_num(renderer &r,
             r.put(unicode(fancy_lower_digits[base/10]));
         r.put(unicode(fancy_lower_digits[base%10]));
     }
-    else if (*fmt)
+    else if (suffix && (!based || Settings.CompatibleBasedNumbers()))
     {
-        r.put(*fmt++);
+        r.put(suffix);
     }
 
     return r.size();

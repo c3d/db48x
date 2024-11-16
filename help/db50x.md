@@ -10645,6 +10645,17 @@ Show fractions using smaller characters, for example `¹²/₄₃`
 
 Show fractions using regular characters, for example `12/43`
 
+## ModernBasedNumbers
+
+Display based numbers using the modern DB48x syntax, i.e. `#12AB₁₆` for
+hexadecimal on the stack, and `16#12AB` on the command line.
+This is the opposite of `CompatibleBasedNumbers`.
+
+## CompatibleBasedNumbers
+
+Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
+This is the opposite of `ModernBasedNumbers`.
+
 # Angle settings
 
 The angle mode determines how the calculator interprets angle arguments and how

@@ -477,6 +477,25 @@ inline bool is_separator_or_digit(utf8 str)
 }
 
 
+inline uint fancy_digit_value(unicode c, bool upper)
+// ----------------------------------------------------------------------------
+//   Return the digit value associated to a Unicode fancy digit
+// ----------------------------------------------------------------------------
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    utf8 fancy = utf8(upper ? "⁰¹²³⁴⁵⁶⁷⁸⁹" : "₀₁₂₃₄₅₆₇₈₉");
+    uint digit = 0;
+    for (utf8 p = fancy; *p; p = utf8_next(p))
+    {
+        if (utf8_codepoint(p) == c)
+            return digit;
+        digit++;
+    }
+    return ~0;
+}
+
+
 inline bool is_unicode_space(unicode c)
 // ----------------------------------------------------------------------------
 //   The `iswspace` function is broken on the GNU arm toolchain
