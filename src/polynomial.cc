@@ -1214,7 +1214,7 @@ RENDER_BODY(polynomial)
             factor = -factor;
 
         // Separate terms with + or -
-        if (!first)
+        if (!first || isneg)
             r.put(isneg ? '-' : '+');
         first = false;
 

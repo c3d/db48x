@@ -5002,7 +5002,7 @@ bool user_interface::handle_digits(int key)
                         {
                             unicode existing = utf8_codepoint(st);
                             utf8    cyend    = cycle + cylen;
-                            ins = false;
+                            ins = true;
                             while (cycle < cyend)
                             {
                                 utf8 ncycle = utf8_next(cycle);
@@ -5013,6 +5013,7 @@ bool user_interface::handle_digits(int key)
                                     else
                                         del = true;
                                     toremove = utf8_size(existing);
+                                    ins = false;
                                     break;
                                 }
                                 cycle = ncycle;

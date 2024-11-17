@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            text_functions();
+            matrix_functions();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -2567,6 +2567,10 @@ void tests::logical_operations()
     test(CLEAR, "#12 not", ENTER).expect("#FFED₁₆");
     test("not", ENTER).expect("#12₁₆");
 
+    step("Binary neg");
+    test(CLEAR, "#12 neg", ENTER).expect("#FFEE₁₆");
+    test("neg", ENTER).expect("#12₁₆");
+
     step("Binary or");
     test(CLEAR, "#123 #A23 or", ENTER).expect("#B23₁₆");
 
@@ -2597,18 +2601,24 @@ void tests::logical_operations()
     test(CLEAR, "30 STWS", ENTER).noerror();
     test(CLEAR, "#142 not", ENTER).expect("#3FFF FEBD₁₆");
     test("not", ENTER).expect("#142₁₆");
+    test(CLEAR, "#142 neg", ENTER).expect("#3FFF FEBE₁₆");
+    test("neg", ENTER).expect("#142₁₆");
     test("#3 #5 -", ENTER).expect("#3FFF FFFE₁₆");
 
     step("Set word size to 48");
     test(CLEAR, "48 STWS", ENTER).noerror();
     test(CLEAR, "#233 not", ENTER).expect("#FFFF FFFF FDCC₁₆");
     test("not", ENTER).expect("#233₁₆");
+    test(CLEAR, "#233 neg", ENTER).expect("#FFFF FFFF FDCD₁₆");
+    test("neg", ENTER).expect("#233₁₆");
     test("#8 #15 -", ENTER).expect("#FFFF FFFF FFF3₁₆");
 
     step("Set word size to 64");
     test(CLEAR, "64 STWS", ENTER).noerror();
     test(CLEAR, "#64123 not", ENTER).expect("#FFFF FFFF FFF9 BEDC₁₆");
     test("not", ENTER).expect("#6 4123₁₆");
+    test(CLEAR, "#64123 neg", ENTER).expect("#FFFF FFFF FFF9 BEDD₁₆");
+    test("neg", ENTER).expect("#6 4123₁₆");
     test("#8 #21 -", ENTER).expect("#FFFF FFFF FFFF FFE7₁₆");
 
     step("Set word size to 128");
@@ -2617,6 +2627,10 @@ void tests::logical_operations()
         .expect("#FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFED₁₆");
     test("dup not", ENTER).expect("#12₁₆");
     test("xor not", ENTER).expect("#0₁₆");
+    test(CLEAR, "#12 neg", ENTER)
+        .expect("#FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFEE₁₆");
+    test("neg", ENTER)
+        .expect("#12₁₆");
     test("#7A02 #21445 -", ENTER)
         .expect("#FFFF FFFF FFFF FFFF FFFF FFFF FFFE 65BD₁₆");
 
@@ -2634,6 +2648,12 @@ void tests::logical_operations()
                 "FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF "
                 "FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF "
                 "FFFF FFFE 65BC₁₆");
+    test(CLEAR, "#12 neg", ENTER)
+        .expect("#7FFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF "
+                "FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF "
+                "FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFF "
+                "FFFF FFFF FFEE₁₆");
+    test("#12", ID_add).expect("#0₁₆");
 
     step("Check that arithmetic truncates to small word size (#624)")
         .test("15 STWS", ENTER).noerror()
@@ -5886,6 +5906,14 @@ void tests::matrix_functions()
     test(CLEAR, "[[a b][c d]] [[e f][g h]] +", ENTER)
         .want("[[ 'a+e' 'b+f' ] [ 'c+g' 'd+h' ]]");
 
+    step("Addition (non-square), #1343");
+    test(CLEAR, "[[1 2]] [[7 8]] +", ENTER)
+        .want("[[ 8 10 ]]");
+    test(CLEAR, "[[a b c]] [[g h i]] -", ENTER)
+        .want("[[ 'a-g' 'b-h' 'c-i' ]]");
+    test(CLEAR, "[[a] [b] [c]] [[g][ h] [i]] +", ENTER)
+        .want("[[ 'a+g' ] [ 'b+h' ] [ 'c+i' ]]");
+
     step("Subtraction");
     test(CLEAR, "[[1 2] [3 4]] [[5 6][7 8]] -", ENTER)
         .want("[[ -4 -4 ] [ -4 -4 ]]");
@@ -5961,6 +5989,12 @@ void tests::matrix_functions()
         .error("Invalid dimension");
     test(CLEAR, "[[1 2] [3 4]][1 2] /", ENTER)
         .error("Bad argument type");
+
+    step("Min and max")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [[0 3][4 6][2 1]] MIN", ENTER)
+        .want("[[ 0 2 ] [ 3 4 ] [ 2 1 ]]")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [[0 3][4 6][2 1]] MAX", ENTER)
+        .want("[[ 1 3 ] [ 4 6 ] [ 5 6 ]]");
 
     step("Inversion of a definite matrix");
     test(CLEAR, "[[1 2 3][4 5 6][7 8 19]] INV", ENTER)
@@ -9747,12 +9781,12 @@ void tests::polynomials()
         .expect("Ⓟ2·Y↑2+2·Y·Z↑3-3·X·Y+X↑2-2·X↑4");
     step("... step 5")
         .test("'(Y+Y)*(Y+Z*sq(Z))'", ENTER, ID_sub)
-        .expect("Ⓟ3·X·Y+X↑2-2·X↑4");
+        .expect("Ⓟ-3·X·Y+X↑2-2·X↑4");
     step("... step 6")
         .test("'X'", ENTER, ID_sq, ENTER, ID_sq, ENTER, ID_add, ID_sub, ID_sub)
-        .expect("Ⓟ3·X·Y");
-    step("... step 7").test("'Y*X'", ENTER, ID_add).expect("Ⓟ2·X·Y");
-    step("... step 8").test("'X*Y'", ENTER, ID_add).expect("ⓅX·Y");
+        .expect("Ⓟ-3·X·Y");
+    step("... step 7").test("'Y*X'", ENTER, ID_add).expect("Ⓟ-2·X·Y");
+    step("... step 8").test("'X*Y'", ENTER, ID_add).expect("Ⓟ-X·Y");
     step("Special case where resulting polynomial is empty")
         .test("'X*Y'", ENTER, ID_add)
         .expect("Ⓟ0");
@@ -9775,6 +9809,12 @@ void tests::polynomials()
     step("Checking result")
         .test(ID_Swap, F1, "X-Y", ENTER, ID_mul, ID_add)
         .expect("ⓅY↑3+X↑3+3·X↑2·Y+3·X·Y↑2");
+
+    step("Polynomial negation")
+        .test(CLEAR, "'X-2*Y'", ENTER, ID_ToolsMenu, F4)
+        .expect("ⓅX-2·Y")
+        .test(ID_neg)
+        .expect("Ⓟ-X+2·Y");
 
     step("Restore default rendering for polynomials")
         .test(CLEAR, "'PrefixPolynomialRender' purge", ENTER)
@@ -9815,8 +9855,9 @@ void tests::quotient_and_remainder()
         .test(BSP)
         .expect("Q:¹/₂·X-¹/₂");
     step("Polynomials with polynomial remainder")
-        .test(CLEAR, "'(X^2+X+1)^3'", ENTER, "'2*(X+2)^2'", ID_PolynomialsMenu, F6)
-        .expect("R:81·X-135")
+        .test(CLEAR, "'(X^2+X+1)^3'", ENTER,
+              "'2*(X+2)^2'", ID_PolynomialsMenu, F6)
+        .expect("R:-81·X-135")
         .test(BSP)
         .expect("Q:¹/₂·X↑4-¹/₂·X↑3+3·X↑2-6 ¹/₂·X+17");
     step("Polynomials with zero remainder")
@@ -9948,10 +9989,10 @@ void tests::random_number_generation()
         .noerror();
 
     step("Check statistics total")
-        .test(CLEAR, ID_StatisticsMenu, ID_DataTotal).expect("3 869");
-    step("Check statistics mean").test(ID_Average).expect("3 ⁸⁶⁹/₁ ₀₀₀");
+        .test(CLEAR, ID_StatisticsMenu, ID_DataTotal).expect("3 375");
+    step("Check statistics mean").test(ID_Average).expect("3 ³/₈");
     step("Check statistics min and max")
-        .test(ID_MinData).expect("-999")
+        .test(ID_MinData).expect("-1 000")
         .test(ID_MaxData).expect("998");
 
     step("Random graphing")
@@ -11983,6 +12024,9 @@ tests &tests::itest(cstring txt)
 
             // Special characters that require the characters menu
 #define NEXT        itest(ID_ToolsMenu); k = RESERVED2; break
+
+        case L'à': itest(ID_CharactersMenu, F1, F1); NEXT;
+
         case L'ℂ': itest(ID_CharactersMenu, F4, RSHIFT, F3); NEXT;
         case L'ℚ': itest(ID_CharactersMenu, F4, RSHIFT, F4); NEXT;
         case L'ℝ': itest(ID_CharactersMenu, F4, RSHIFT, F5); NEXT;

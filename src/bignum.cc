@@ -977,9 +977,8 @@ bignum_p bignum::promote(object_p obj)
         case ID_dec_integer:    rty = ID_dec_bignum; break;
         case ID_oct_integer:    rty = ID_oct_bignum; break;
         case ID_bin_integer:    rty = ID_bin_bignum; break;
-#else
-        case ID_based_integer:  rty = ID_based_bignum; break;
 #endif // CONFIG_FIXED_BASED_OBJECTS
+        case ID_based_integer:  rty = ID_based_bignum; break;
         }
         return rt.make<bignum>(rty, integer_g(integer_p(obj)));
     }

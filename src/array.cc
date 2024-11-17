@@ -469,8 +469,8 @@ static bool add_sub_dimension(size_t rx, size_t cx,
 //   For addition and subtraction, we need identical dimensions
 // ----------------------------------------------------------------------------
 {
-    *rr = cx;
-    *cr = rx;
+    *rr = rx;
+    *cr = cx;
     return cx == cy && rx == ry;
 }
 

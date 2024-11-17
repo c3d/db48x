@@ -1207,6 +1207,9 @@ algebraic_p decimal::to_integer() const
     // but kigit scaling below tops out at 16 digits, then may overflow
     if (xe <= 16)
     {
+        if (xe < 0)
+            return integer::make(0);
+
         size_t  xs    = xi.nkigits;
         gcbytes xb    = xi.base;
         bool    neg   = x->type() == ID_neg_decimal && xe >= 0;
@@ -1225,7 +1228,7 @@ algebraic_p decimal::to_integer() const
                 mul *= mul;
             }
         }
-        else
+        else if (large(xs) > -xl/3)
         {
             xs += xl/3;
             xl = xl % 3;
@@ -1237,7 +1240,10 @@ algebraic_p decimal::to_integer() const
                 scale = xl == -1 ? 100 : 10;
                 res = xk / (1000 / scale);
             }
-
+        }
+        else
+        {
+            return integer::make(0);
         }
 
         for (size_t xd = xs; xd --> 0; xl += 3)

@@ -1153,20 +1153,37 @@ COMMAND_BODY(RealToBinary)
 {
     if (object_p top = rt.top())
     {
+    retry:
         id   type = top->type();
         id   to   = ID_object;
-        bool neg  = type == ID_neg_integer || type == ID_neg_bignum;
+        bool neg  = false;
 
         switch (type)
         {
         case ID_neg_integer:
+            neg = true;
+            [[fallthrough]];
         case ID_integer:
             to = ID_based_integer;
             break;
         case ID_neg_bignum:
+            neg = true;
+            [[fallthrough]];
         case ID_bignum:
             to = ID_based_bignum;
             break;
+        case ID_hwfloat:
+            top = hwfloat_p(top)->to_integer();
+            goto retry;
+        case ID_hwdouble:
+            top = hwdouble_p(top)->to_integer();
+            goto retry;
+        case ID_neg_decimal:
+            neg = true;
+            [[fallthrough]];
+        case ID_decimal:
+            top = decimal_p(top)->to_integer();
+            goto retry;
         default:
             rt.type_error();
             return ERROR;

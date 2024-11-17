@@ -397,9 +397,13 @@ object::result function::evaluate(algebraic_fn op, bool mat)
                 polynomial_g xp = polynomial_p(top);
                 ularge exp = op == algebraic_fn(cubed::evaluate) ? 3 : 2;
                 top = polynomial::pow(xp, exp);
-                if (top && rt.top(top))
-                    return OK;
-                return ERROR;
+                return (top && rt.top(top)) ? OK : ERROR;
+            }
+            else if (op == algebraic_fn(neg::evaluate))
+            {
+                polynomial_g xp = polynomial_p(top);
+                top = polynomial::neg(xp);
+                return (top && rt.top(top)) ? OK : ERROR;
             }
             else
             {
@@ -411,7 +415,9 @@ object::result function::evaluate(algebraic_fn op, bool mat)
         {
             top = list_p(top)->map(op);
         }
-        else if (is_algebraic(topty) || (topty == ID_array && mat))
+        else if (is_algebraic(topty)            ||
+                 (topty == ID_array && mat)     ||
+                 (is_integer(topty) && op == algebraic_fn(neg::evaluate)))
         {
             algebraic_g x = algebraic_p(top);
             x = op(x);
@@ -495,6 +501,11 @@ FUNCTION_BODY(neg)
     case ID_symbol:
     case ID_constant:
         return symbolic(ID_neg, x);
+    case ID_polynomial:
+    {
+        polynomial_g p = polynomial_p(+x);
+        return polynomial::neg(p);
+    }
 
     case ID_integer:
     case ID_bignum:
@@ -522,6 +533,24 @@ FUNCTION_BODY(neg)
         byte *tp = (byte *) clone;
         *tp = negty;
         return clone;
+    }
+
+#if CONFIG_FIXED_BASED_OBJECTS
+    case ID_hex_integer:
+    case ID_dec_integer:
+    case ID_oct_integer:
+    case ID_bin_integer:
+    case ID_hex_bignum:
+    case ID_dec_bignum:
+    case ID_oct_bignum:
+    case ID_bin_bignum:
+ #endif // CONFIG_FIXED_BASED_OBJECTS
+    case ID_based_integer:
+    case ID_based_bignum:
+    {
+        algebraic_g z = integer::make(0);
+        z = z - x;
+        return z;
     }
 
     case ID_rectangular:
@@ -1487,10 +1516,10 @@ static algebraic_p min_max(algebraic_r x, algebraic_r y,
             while (xi != xe && yi != ye)
             {
                 object_p xobj = *xi++;
-                if (!xobj->is_algebraic())
+                if (!xobj->is_extended_algebraic())
                     return nullptr;
                 object_p yobj = *yi++;
-                if (!yobj->is_algebraic())
+                if (!yobj->is_extended_algebraic())
                     return nullptr;
                 xo = algebraic_p(xobj);
                 yo = algebraic_p(yobj);

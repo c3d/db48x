@@ -98,7 +98,7 @@ L=20_ft  E=29000000_psi  I=40_in^4  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_f
 * To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=20_ft  a=10_ft  P=674.427_lbf  c=17_ft  M=3687.81_ft*lbf  w=102.783_lbf/ft  x=9_ft
-@ Expecting [ Mx=9 782.1945 lbf·ft ]
+@ Expecting [ Mx=9 782.1945 ft·lbf ]
 'ROOT(ⒺSimple Moment;[Mx];[1_ft*lbf])'
 ```
 
@@ -142,7 +142,7 @@ L=10_ft  E=29000000_psi  I=15_in^4  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=1
 * To calculate `[Mx_ft*lbf]` (Internal bending moment at x) from 7 known variables:
 ```rpl
 L=10_ft  P=500_lbf  M=800_ft*lbf  a=3_ft  c=6_ft  w=100_lbf/ft  x=8_ft
-@ Expecting [ Mx=-200. lbf·ft ]
+@ Expecting [ Mx=-200. ft·lbf ]
 'ROOT(ⒺCantilever Moment;[Mx];[1_ft*lbf])'
 ```
 
@@ -509,7 +509,7 @@ Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
 
 ```rpl
 μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
-@ Expecting [ L=3.01592 89474 6⁳⁻² mH ]
+@ Expecting [ L=0.03015 92894 75 mH ]
 'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
 ```
 
@@ -550,7 +550,7 @@ In accordance with microscopic Ohm's law, the current density is proportional to
 τc=4.09365 36801 40e-15_s meeff=1.09312 60456 68e-31 kg mheff=4.55469 18569 5e-31 kg nh=6.0e18_(m^-3) ne=1.04e19_(m^-3) E=6.0e-9_V/m
 @ Wanted [ μe=49.03846 15384 64976 91445 22_cm↑2/(s·V) μh=60.00000 00000 03822 512o15 7_cm↑2/(s·V) Je=4.90266 05000 386⁳-11_A/m↑2 Jh=3.46070 15294 402⁳-11_A/m↑2 J=8.36336 20294 771⁳-11_A/m↑2 σ=0.01393 89367 15800 94039 7294_S/m ]
 @ The solution below is different, but seems to validate4 with EvalEq
-@ Expecting [ μe=60. cm↑2/(V·s) μh=14.4 cm↑2/(V·s) Je=5.99854 93176 9⁳⁻¹¹ A/m↑2 Jh=8.30568 36706 4⁳⁻¹² A/m↑2 J=6.82911 76847 6⁳⁻¹¹ A/m↑2 σ=1.13818 62807 9⁳⁻² S/m ]
+@ Expecting [ μe=60. cm↑2/(V·s) μh=14.4 cm↑2/(V·s) Je=5.99854 93176 9⁳⁻¹¹ A/m↑2 Jh=8.30568 36706 3⁳⁻¹² A/m↑2 J=6.82911 76847 6⁳⁻¹¹ A/m↑2 σ=0.01138 18628 08 S/m ]
 'ROOT(ⒺElectron & Hole Mobilities;[μe;μh;Je;Jh;J;σ];[1_(cm^2/(V*s));1_(cm^2/(V*s));1_(A/m^2);1_(A/m^2);1_(A/m^2);1_(S/m)])'
 ```
 
@@ -665,7 +665,7 @@ Cd=0.05  ρ=1000_kg/m^3  A=7.5E6_cm^2  v=35_m/s
 
 ```rpl
 m=9.1E-31_kg
-@ Expecting [ E=8.17867 21247⁳⁻¹⁴ J ]
+@ Expecting [ E=8.17867 2124⁳⁻¹⁴ J ]
 'ROOT(ⒺRelativity Mass Energy;[E];[1_J])'
 ```
 
@@ -718,7 +718,7 @@ These equations apply to an ideal gas.
 
 ```rpl
 Vi=2_l  Vf=125_l  T=573.15_°C  n=0.25_mol  MW=64_g/mol
-@ Expecting [ m=1.6⁳⁻² kg W=7 274.34704 123 J ]
+@ Expecting [ m=0.016 kg W=7 274.34704 123 J ]
 'ROOT(ⒺIsothermal Expansion;[m;W];[1_kg;1_J])'
 ```
 
@@ -730,7 +730,7 @@ These equations describe a reversible pressure-volume change of an ideal gas suc
 
 ```rpl
 Pi=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
-@ Expecting [ n=1.22239 24213 4 Tf=346.54537 037 K ]
+@ Expecting [ n=1.22239 24213 4 Tf=87.5 °F ]
 'ROOT(ⒺPolytropic Processes;[n;Tf];[1;1_°F])'
 ```
 
@@ -782,7 +782,7 @@ The variables in the Heat Transfer section are:
 
 ```rpl
 ΔT=15_°C  L=10_m  Tf=25_°C  δ=1_cm
-@ Expecting [ α=6.66666 66666 7⁳⁻⁵ K⁻¹ Ti=10. °C ]
+@ Expecting [ α=9.⁳⁻⁴ K⁻¹ Ti=10. °C ]
 'ROOT(ⒺThermal Expansion;[α;Ti];[1_K^-1;1_°C])'
 ```
 
@@ -798,7 +798,7 @@ Tc=26.85_°C  A=200_m^2  h=0.005_W/(m^2*K)  qr=10_W
 'ROOT(ⒺConvection;[ΔT;Th];[1_°C;1_°C])'
 ```
 
-### Conduction + Convection
+### Conduction & Convection
 
 If you have fewer than three layers, give the extra layers a zero thickness and any nonzero conductivity. The two temperatures are fluid temperatures – if instead you know a surface temperature, set the corresponding convective coefficient to 10^999999.
 
@@ -808,7 +808,7 @@ If you have fewer than three layers, give the extra layers a zero thickness and 
 
 ```rpl
 ΔT=35_°C  Th=55_°C  A=10_m^2  h1=0.05_W/(m^2*K)  h3=0.05_W/(m^2*K)  L1=3_cm  L2=5_cm  L3=3_cm  k1=0.1_W/(m*K)  k2=.5_W/(m*K)  k3=0.1_W/(m*K)
-@ Expecting [ qr=8.59950 85995 1 W Tc=20. °C U=0.02457 00245 7 W/(m↑2·K) ]
+@ Expecting [ qr=6.91646 19164 6 W Tc=300. °C U=-2.82304 56801 9⁳⁻³ W/(m↑2·K) ]
 'ROOT(ⒺConduction & Convection;[qr;Tc;U];[1_W;1_°C;1_W/(m^2*K)])'
 ```
 
