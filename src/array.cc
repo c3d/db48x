@@ -2009,16 +2009,21 @@ array_p array::do_matrix(array_r x, array_r y,
             goto err;
         }
 
+        cleaner purge;
         scribble scr;
         for (size_t c = 0; c < cx; c++)
         {
+            cleaner purge;
             algebraic_g e = vec(c, cx, cy);
+            e = purge(e);
             if (!rt.append(e))
                 goto err;
         }
 
         rt.drop(rt.depth() - depth);
-        return array_p(list::make(ty, scr.scratch(), scr.growth()));
+        array_g a = array_p(list::make(ty, scr.scratch(), scr.growth()));
+        a = purge(a);
+        return a;
     }
 
     if (x->is_matrix(&rx, &cx))
@@ -2052,31 +2057,40 @@ array_p array::do_matrix(array_r x, array_r y,
             return do_matrix(ya, x, mul_dimension, vector_mul, matrix_mul);
         }
 
+        cleaner purge;
         scribble scr;
         for (size_t r = 0; r < rr; r++)
         {
             object_g row = nullptr;
             if (vector)
             {
+                cleaner purge;
                 row = object_p(mat(r, 0, rx, cx, ry, cy));
+                row = purge(row);
             }
             else
             {
+                cleaner purge;
                 scribble sr;
                 for (size_t c = 0; c < cr; c++)
                 {
+                    cleaner purge;
                     algebraic_g e = mat(r, c, rx, cx, ry, cy);
+                    e = purge(e);
                     if (!rt.append(e))
                         goto err;
                 }
                 row = object_p(list::make(ty, sr.scratch(), sr.growth()));
+                row = purge(row);
             }
             if (!rt.append(row))
                 goto err;
         }
 
         rt.drop(rt.depth() - depth);
-        return array_p(list::make(ty, scr.scratch(), scr.growth()));
+        array_g a = array_p(list::make(ty, scr.scratch(), scr.growth()));
+        a = purge(a);
+        return a;
     }
 
 err:

@@ -1,5 +1,100 @@
 # Release notes
 
+## Release 0.8.6 "Daniel" - Bug fixes and optimizations
+
+This release is mostly intended to fix a number of issues reported by
+users or discovered during testing.
+
+### Features
+
+* Fancy digits are now accepted for decimal and based numbers.
+  This means that `1.⁳³²` is now a valid input to `Str→`, ensuring
+  that we can parse the output of `→Str` if it uses fancy characters,
+  or that copy-paste works from the stack to the editor.
+* Accept array arguments for `min` and `max`, applied element-wise in
+  the same way as addition for example.
+* Add `CompatibleBasedNumbers` setting to render `16#AB` as `#ABh`
+  like HP calculators.
+* Improve protection against mismatched QSPI and PGM. Only binaries
+  issued from the same build are now accepted. This is mostly of
+  interest to developers, although releases that are very close to one
+  another, like v0.8.4 and v0.8.5 were, can require this protection.
+* On DM32, numbers with an explicit numerical base keep that base if
+  it's 16, 10, 8 or 2. For example, `10#200` and `#200₁₀` will display in
+  base 10 irrespective of the `Base` setting, just like `#200d`.
+* Add `ϵ` character (Greek Lunate epsilon), which appears in some
+  equations.
+* Add text alignment options to `DrawText`, making it possible to
+  align text horizontally or vertically. See examples at end of the
+  `Texts` program in `Demo.48s`
+* Add `UnitsSIPrefixCycle` command to set the variable with the same
+  name to customize SI prefixes cycling for units on the command-line.
+  After `"KMG" UnitsSIPrefixCycle`, typing the `Cycle` key (__×10ⁿ_ or
+  _EEX_) with `1_B` will cycle through `1_KB`, `1_MB`, `1_GB` and back
+  to `1_B`.
+* Accept `u` as an alternative SI prefix for "micro-", e.g. `1_us`.
+  This is intended to allow entering of the "micro" prefix using
+  transient alpha mode.
+* Add help lookup for solver variables. When in the `SolverMenu`,
+  holding the function key for a vairable brings up the help for the
+  corresponding variable in the equations library.
+* Add `SiDensity` (`SIDENS` on HP) and `Fanning` functions to the
+  library. These functions are used by some equations in the library.
+* Add `invert` alias for 1/x operation (like `negate` for `neg`).
+
+
+### Bug fixes
+
+* Fix unit scale cycling for multi-character units
+* Fix incorrect computation of output matrix size for non-square
+  matrices. `[[1 2]][[3 4]] +` now works.
+* Negation on based numbers and polynomials now works.
+* Conversion of decimal values smaller than 1.0 to integer no longer
+  crashes (this could only happen with the `RanM` command)
+* Render `-` for first term of polynonials if negative
+* On DM42, update the bases menu when cycling based numbers
+* Fix parameter mixup for call to `program::run`. In theory, this
+  could lead to programs not evaluating correctly if `NoLastArguments`
+  setting was set, although another bug apparently made this very
+  unlikely to be observed.
+* Update index footer to point to `https://48calc.org` instead of
+  obsolete `https://github.io` location.
+* Updating a `for` loop variable from within the loop now behaves like
+  on HP calculators, and can be used to control loop exit.
+* Do not draw activity indicator in graphical mode. This was a
+  regression introduced with `BusyIndicatorRefresh`.
+* Mark `xroot` command as implemented in the `PowersMenu`
+* Use consistent case for variable `x` in the equations library
+* Do not error out comparing text values
+* doc: Fix typo `latter` -> `letter`
+
+
+### Improvements
+
+* Add auto-cleaner optimizations for matrix and vector operations.
+  This reduces the memory usage and frequency of garbage collections.
+* Reduce `random` bias for integer input, e.g. `-10 10 random` no
+  longer has a +0.5 bias on average.
+* doc: Several updates and fixes to the documentation, notably with
+  respect to the description of the current status, and instructions
+  for Windows developers.
+* Add `→Prg` alias for `→Program`
+* Add the simulator minimum window size
+* Add `rmdir` as an alias for `pgdir`. "This is Unix".
+* Add `L` (uppercase) spelling for "liter" unit
+* doc: Avoid overlapping aliases in `Rcl/` help text by adding some
+  aditional text to the `Rcl*` help.
+* doc: Add documentation for `SolverMenuSolve` and `SolverMenuRecall`
+* doc: Fix documentation for `AssignKey`
+* doc: Add documentation for comparisons
+* doc: Remove duplicate `dup`
+* doc: Update documentation about `add`
+* doc: Refer to `CharactersMenu` and `Catalog` in alpha overview
+* doc: Update keyboard sequences typography
+* doc: Remove false claim that interactive stack is not implemented
+* doc: Update implemented / unimplemented list
+
+
 ## Release 0.8.5 "Stone" - Emergency keyboard fixups
 
 The major changes in 0.8.4 caused some damage to keyboard handling
