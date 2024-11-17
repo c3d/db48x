@@ -447,14 +447,6 @@ unintentional differences, since the implementation is completely new.
   numerical operations. In addition, it supports 32-bit and 64-bit
   hardware-accelerated binary floating-point.
 
-* Based numbers with an explicit base, like `#123h` keep their base, which makes
-  it possible to show on stack binary and decimal numbers side by side. Mixed
-  operations convert to the base in stack level X, so that `#10d #A0h +`
-  evaluates as `#AAh`. Based numbers without an explicit base change base
-  depending on the [base](#base) setting, much like based numbers on the HP48,
-  but with the option to any base between 2 and 36. In addition to the
-  HP-compatible trailing letter syntax (e.g. `#1Ah`), the base can be given
-  before the number (e.g. `16#1A`), which works for all supported bases.
 
 ### Representation of objects
 
