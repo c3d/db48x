@@ -185,6 +185,11 @@ STANDARD_FUNCTION(lgamma);
 
 
 #define FUNCTION_EXT(derived, extra)                                    \
+    FUNCTION_EXT_PREC(derived, extra, FUNCTION)
+#define FUNCTION_PREC(derived, prec)                                    \
+    FUNCTION_EXT_PREC(derived,, prec)
+
+#define FUNCTION_EXT_PREC(derived, extra, prec)                         \
 struct derived : function                                               \
 /* ----------------------------------------------------------------- */ \
 /*  Macro to define a mathematical function not from the library     */ \
@@ -195,7 +200,7 @@ struct derived : function                                               \
 public:                                                                 \
     OBJECT_DECL(derived);                                               \
     ARITY_DECL(1);                                                      \
-    PREC_DECL(FUNCTION);                                                \
+    PREC_DECL(prec);                                                    \
     EVAL_DECL(derived)                                                  \
     {                                                                   \
         record(function, "Evaluating " #derived " function %t", o);     \
@@ -238,7 +243,7 @@ FUNCTION(floor);
 FUNCTION(mant);
 FUNCTION(xpon);
 FUNCTION_FANCY_MAT(inv);
-FUNCTION(neg);
+FUNCTION_PREC(neg,ADDITIVE);
 FUNCTION_FANCY_MAT(sq);
 FUNCTION_FANCY_MAT(cubed);
 FUNCTION_FANCY(fact);

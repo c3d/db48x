@@ -142,9 +142,13 @@ object::result list::list_parse(id      type,
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
                 if (parenthese || infix || prefix || alist)
                 {
+                    int pp = prefix && prefix->precedence() < FUNCTION
+                        ? int(prefix->precedence())
+                        : 0;
                     int childp = infix      ? int(infix->precedence() + 1)
                                : parenthese ? int(LOWEST)
                                : alist      ? int(LOWEST)
+                               : pp         ? pp + 1
                                             : int(SYMBOL);
                     if (infix && infix->type() == ID_Copy)
                     {
@@ -328,8 +332,8 @@ object::result list::list_parse(id      type,
                     }
                     if (arity)
                     {
-                        obj = nullptr;
                         precedence = -SYMBOL;
+                        obj = nullptr;
                     }
                     else
                     {
@@ -934,18 +938,18 @@ HELP_BODY(list)
 //
 // ============================================================================
 
-list_p to_list_object(uint depth)
+list_p list::list_from_stack(uint depth, id ty)
 // ----------------------------------------------------------------------------
 //  Make a list from the stack as an object
 // ----------------------------------------------------------------------------
 {
     scribble scr;
     for (uint i = 0; i < depth; i++)
-        if (object_g obj = rt.stack(depth - 1 - i))
+        if (object_g obj = rt.stack(depth + ~i))
             if (!rt.append(obj))
                 return nullptr;
 
-    if (list_p result = list::make(scr.scratch(), scr.growth()))
+    if (list_p result = list::make(ty, scr.scratch(), scr.growth()))
     {
         rt.drop(depth);
         return result;
@@ -954,12 +958,12 @@ list_p to_list_object(uint depth)
 }
 
 
-object::result to_list(uint depth)
+object::result list::push_list_from_stack(uint depth, id ty)
 // ----------------------------------------------------------------------------
 //  Make a list on the stack
 // ----------------------------------------------------------------------------
 {
-    if (object_g list = to_list_object(depth))
+    if (object_g list = list_from_stack(depth, ty))
         if (rt.push(list))
             return object::OK;
     return object::ERROR;
@@ -978,7 +982,7 @@ COMMAND_BODY(ToList)
             return ERROR;
 
         if (rt.pop())
-            return to_list(depth);
+            return list::push_list_from_stack(depth);
     }
     return ERROR;
 }
@@ -1199,6 +1203,15 @@ COMMAND_BODY(Head)
             rt.dimension_error();
         }
     }
+    else if (text_p tobj = obj->as<text>())
+    {
+        size_t len = 0;
+        gcutf8 txt = tobj->value(&len);
+        if (len)
+            tobj = text::make(txt, utf8_size(txt, len));
+        if (tobj && rt.top(tobj))
+            return OK;
+    }
     else
     {
         rt.type_error();
@@ -1226,6 +1239,18 @@ COMMAND_BODY(Tail)
             // rt.dimension_error();
             return OK;
         }
+    }
+    else if (text_p tobj = obj->as<text>())
+    {
+        size_t len = 0;
+        gcutf8 txt = tobj->value(&len);
+        if (len)
+        {
+            size_t sz = utf8_size(txt, len);
+            tobj = text::make(txt + sz, len > sz ? len - sz : 0);
+        }
+        if (tobj && rt.top(tobj))
+            return OK;
     }
     else
     {
@@ -1831,12 +1856,13 @@ COMMAND_BODY(ReverseList)
 //
 // ============================================================================
 
-bool list::names_enumerate(size_t depth, bool units) const
+bool list::names_enumerate(size_t depth, bool units, list_g &forbidden) const
 // ----------------------------------------------------------------------------
 //   Enumerate the names in the object
 // ----------------------------------------------------------------------------
 {
-    size_t vars;
+    save<list_g> sforbidden(forbidden, forbidden);
+
     switch(type())
     {
     case ID_expression:
@@ -1845,38 +1871,121 @@ bool list::names_enumerate(size_t depth, bool units) const
     case ID_list:
     case ID_block:
     case ID_array:
+    {
+        list_g   lst = this;
+        size_t   max = items();
+        size_t   pos[max];
+        size_t   local = 0;
+        size_t   arg   = 0;
+        size_t   nargs = 0;
+        size_t   vars  = 0;
+        object_g deferred[4];
+        bool     clear = false;
+
         for (auto obj : *this)
+            pos[vars++] = byte_p(obj) - byte_p(+lst);
+        ASSERT(vars == max || "Incorrect count of objects in list");
+        for (size_t i = 0; i < max; i++)
         {
-            switch(obj->type())
+            object_p obj = object_p(byte_p(+lst) + pos[max + ~i]);
+            if (local)
             {
-            case ID_symbol:
-                if (!names_insert(depth, symbol_p(obj), nullptr))
-                    return false;
-                break;
-            case ID_expression:
-            case ID_funcall:
-            case ID_polynomial:
-                if (!expression_p(obj)->names_enumerate(depth, units))
-                    return false;
-                break;
-            case ID_unit:
-                if (algebraic_p value = unit_p(obj)->value())
-                    if (symbol_p sym = value->as_quoted<symbol>())
-                        if (!names_insert(depth, sym,
-                                          units ? unit_p(obj) : nullptr))
-                            return false;
-                break;
-            default:
-                break;
+                --local;
+                if (!local)
+                {
+                    symbol_g lsym = obj->as_quoted<symbol>();
+                    if (!lsym)
+                        return false;
+                    if (forbidden)
+                        forbidden = forbidden->append(+lsym);
+                    else
+                        forbidden = make(lsym);
+                }
             }
+            if (nargs)
+            {
+                if (arg < nargs)
+                    deferred[arg++] = obj;
+                if (arg < nargs)
+                {
+                    obj = nullptr;
+                }
+                else
+                {
+                    nargs = 0;
+                    arg--;
+                }
+            }
+
+            while (obj)
+            {
+                switch(obj->type())
+                {
+                case ID_symbol:
+                    if (!names_insert(depth, symbol_p(obj), nullptr, forbidden))
+                        return false;
+                    break;
+                case ID_expression:
+                case ID_funcall:
+                case ID_polynomial:
+                    if (!expression_p(obj)->names_enumerate(depth,
+                                                            units,
+                                                            forbidden))
+                        return false;
+                    break;
+                case ID_unit:
+                    if (algebraic_p value = unit_p(obj)->value())
+                        if (symbol_p sym = value->as_quoted<symbol>())
+                            if (!names_insert(depth,
+                                              sym,
+                                              units ? unit_p(obj) : nullptr,
+                                              forbidden))
+                                return false;
+                    break;
+                case ID_Sum:
+                case ID_Product:
+                    local = 4;
+                    nargs = obj->arity();
+                    break;
+                case ID_Isolate:
+                case ID_Root:
+                    local = 1;
+                    nargs = obj->arity();
+                    break;
+                case ID_Integrate:
+                    local = 1;
+                    nargs = obj->arity();
+                    break;
+                case ID_Derivative:
+                case ID_Primitive:
+                    local = 1;
+                    nargs = obj->arity();
+                    break;
+                default:
+                    break;
+                }
+                if (arg && !nargs)
+                {
+                    obj = deferred[--arg];
+                    if (!arg)
+                        clear = true;
+                }
+                else
+                {
+                    obj = nullptr;
+                }
+            }
+            if (clear)
+                forbidden = sforbidden.saved;
         }
         break;
+    }
     case ID_polynomial:
     {
-        polynomial_g p = polynomial_p(this);
-        vars = p->variables();
+        polynomial_g p    = polynomial_p(this);
+        size_t       vars = p->variables();
         for (size_t v = 0; v < vars; v++)
-            if (!names_insert(depth, p->variable(v), nullptr))
+            if (!names_insert(depth, p->variable(v), nullptr, forbidden))
                 return false;
         break;
     }
@@ -1887,11 +1996,20 @@ bool list::names_enumerate(size_t depth, bool units) const
 }
 
 
-bool list::names_insert(size_t depth, symbol_p sym, unit_p uobj)
+bool list::names_insert(size_t   depth,
+                        symbol_p sym,
+                        unit_p   uobj,
+                        list_g  &forbidden)
 // ----------------------------------------------------------------------------
 //   Insert a name according to LNAME sorting order
 // ----------------------------------------------------------------------------
 {
+    if (+forbidden)
+        for (object_p obj : *forbidden)
+            if (symbol_p unwanted = obj->as<symbol>())
+                if (unwanted->is_same_as(sym))
+                    return true;
+
     size_t existing = rt.depth() - depth;
     size_t len      = 0;
     utf8   name     = sym->value(&len);
@@ -1906,7 +2024,13 @@ bool list::names_insert(size_t depth, symbol_p sym, unit_p uobj)
         utf8     oname = other->value(&olen);
         cmp = olen - len;
         if (!cmp)
+        {
             cmp = symbol::compare(name, oname, olen);
+
+            // If one iteration has no unit and we add it afterwards...
+            if (cmp == 0 && !ounit && uobj)
+                rt.stack(level, uobj);
+        }
         if (cmp <= 0)
             break;
     }
@@ -1935,20 +2059,20 @@ list_p list::names(bool units, id type) const
 //   - For same size, alphabetic order
 {
     size_t   depth = rt.depth();
-    scribble scr;
-
-    if (!names_enumerate(depth, units))
-        goto error;
-
-    // Copy the items to the list
-    while (rt.depth() > depth)
+    list_g   forbidden;
+    if (names_enumerate(depth, units, forbidden))
     {
-        object_g obj = rt.pop();
-        if (!rt.append(obj))
-            goto error;
-    }
+        // Copy the items to the list
+        scribble scr;
+        while (rt.depth() > depth)
+        {
+            object_g obj = rt.pop();
+            if (!rt.append(obj))
+                goto error;
+        }
 
-    return list::make(type, scr.scratch(), scr.growth());
+        return list::make(type, scr.scratch(), scr.growth());
+    }
 
 error:
     if (size_t now = rt.depth())
@@ -1981,7 +2105,7 @@ static list_p list_variables(object_p obj, object::id type, bool units)
 
 COMMAND_BODY(XVars)
 // ----------------------------------------------------------------------------
-//   List all variable names in an array, leave expression in place
+//   List all variable names in an array, consume input
 // ----------------------------------------------------------------------------
 {
     if (object_p obj = rt.top())

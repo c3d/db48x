@@ -606,6 +606,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     list_g gvalues = computed
         ? list::make(guesses->type(), scr.scratch(), scr.growth())
         : +guesses;
+    scr.clear();
 
     // Number of guesses and variables should match
     if (gcount != vcount)
@@ -858,7 +859,7 @@ COMMAND_BODY(NextEq)
             if (list_p(obj)->expand_without_size(&sz))
             {
                 rt.roll(sz);
-                list_g now = to_list_object(sz);
+                list_g now = list::list_from_stack(sz);
                 if (directory::store_here(eqname, now))
                 {
                     ui.menu_refresh(ID_SolvingMenu);

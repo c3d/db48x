@@ -1294,7 +1294,8 @@ bignum_p decimal::to_bignum() const
     {
         kint xk = kigit(xb, xd);
         tmp = rt.make<bignum>(ty, xk);
-        res = res + tmp * scale;
+        tmp = tmp * scale;
+        res = res + tmp;
         scale = scale / mul;
         if (scale && scale->is_zero())
             break;
@@ -1352,11 +1353,13 @@ algebraic_p decimal::to_fraction(uint count, uint decimals) const
         i = ip->to_bignum();
 
         s = n1;
-        n1 = i * n1 + n2;
+        n1 = i * n1;
+        n1 = n1 + n2;
         n2 = s;
 
         s = d1;
-        d1 = i * d1 + d2;
+        d1 = i * d1;
+        d1 = d1 + d2;
         d2 = s;
 
         fraction_g f = +big_fraction::make(n1, d1);
@@ -1537,6 +1540,17 @@ decimal_p decimal::neg(decimal_r x)
 }
 
 
+
+template <decimal_p (*code)(decimal_r, decimal_r)>
+arithmetic_fn target(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//  Target function for bignum objects
+// ----------------------------------------------------------------------------
+{
+    return x->is_decimal() && y->is_decimal() ? arithmetic_fn(code) : nullptr;
+}
+
+
 decimal_p decimal::add(decimal_r x, decimal_r y)
 // ----------------------------------------------------------------------------
 //   Addition of two numbers with the same sign
@@ -1544,8 +1558,11 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
-    if (x->type() != y->type())
+    id xty = x->type();
+    id yty = y->type();
+    if (xty != yty)
         return sub(x, decimal_g(neg(y)));
+    add::remember(target<add>);
 
     // Read information from both numbers
     info  xi = x->shape();
@@ -1656,8 +1673,11 @@ decimal_p decimal::sub(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
-    if (x->type() != y->type())
+    id xty = x->type();
+    id yty = y->type();
+    if (xty != yty)
         return add(x, decimal_g(neg(y)));
+    sub::remember(target<sub>);
 
     // Read information from both numbers
     info  xi = x->shape();
@@ -1758,6 +1778,7 @@ decimal_p decimal::mul(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
+    mul::remember(target<mul>);
 
     // Read information from both numbers
     info     xi  = x->shape();
@@ -1882,6 +1903,7 @@ decimal_p decimal::div(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
+    div::remember(target<div>);
 
     // Check if we divide by zero
     if (y->is_zero())
@@ -2047,6 +2069,9 @@ decimal_p decimal::rem(decimal_r x, decimal_r y)
 //   Remainder
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    rem::remember(target<rem>);
     decimal_g q = x / y;
     if (!q)
         return nullptr;
@@ -2060,6 +2085,9 @@ decimal_p decimal::mod(decimal_r x, decimal_r y)
 //   Modulo
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    mod::remember(target<mod>);
     decimal_g r = rem(x, y);
     if (x->is_negative() && !r->is_zero())
         r = y->is_negative() ? r - y : r + y;
@@ -2072,6 +2100,9 @@ decimal_p decimal::pow(decimal_r x, decimal_r y)
 //   Power
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    pow::remember(target<pow>);
     return exp(y * log(x));
 }
 
@@ -2081,6 +2112,9 @@ decimal_p decimal::hypot(decimal_r x, decimal_r y)
 //   Hypothenuse
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    hypot::remember(target<hypot>);
     return sqrt(x*x + y*y);
 }
 
@@ -2090,6 +2124,9 @@ decimal_p decimal::atan2(decimal_r x, decimal_r y)
 //   Arc-tangent with two arguments (arctan(x/y))
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    atan2::remember(target<atan2>);
     if (y->is_zero())
     {
         if (x->is_zero())

@@ -637,30 +637,12 @@ struct object
     }
 
 
-    static bool is_algebraic_number(id ty)
-    // ------------------------------------------------------------------------
-    //   Check if something is a number (real or complex)
-    // ------------------------------------------------------------------------
-   {
-       return is_real(ty) || is_complex(ty) || is_unit(ty);
-    }
-
-
-    bool is_algebraic_number() const
-    // ------------------------------------------------------------------------
-    //   Check if something is a number (real or complex)
-    // ------------------------------------------------------------------------
-    {
-        return is_algebraic_number(type());
-    }
-
-
     static bool is_symbolic_arg(id ty)
     // ------------------------------------------------------------------------
     //    Check if a type denotes a symbolic argument (symbol, equation, number)
     // ------------------------------------------------------------------------
     {
-        return is_symbolic(ty) || is_algebraic_number(ty);
+        return is_symbolic(ty) || is_algebraic_num(ty);
     }
 
 

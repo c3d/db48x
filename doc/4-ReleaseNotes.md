@@ -1,5 +1,126 @@
 # Release notes
 
+## Release 0.8.7 "Signs" - Performance optimizations
+
+This release focuses on performance improvements and bug fixes for
+issues reported by users and contributors.
+
+### Features
+
+* Long array operations such as matrix multiplications can now be
+  interrupted with the EXIT key.
+
+* Eliminate local names from `LNAME` output. For example, if you
+  perform a sum with a variable named `i` as an index, no longer
+  report `i` as being a name used by the expression..
+
+* Implement `HEAD` and `TAIL` for text objects.
+
+* Allow constant definitions to contain expressions, which will be
+  fully evaluated when using the `→Num`. This makes it possible to now
+  define constants using other constants, in the spirit of the more
+  recent CODATA recommandations.
+
+* Library management commands `Attach`, `Detach` and `Libs` are now
+  implemented. These commands make it possible to reload a library
+  entry after changing its definition on disk. While they take
+  arguments that are similar to what HP calculators do, they are not
+  interpreting them in the same way due to hardware differences
+  between SwissMicros and HP calculators.
+
+
+### Bug fixes
+
+* Fix hard crash when running some RPL programs using conditional
+  loops, local variables and/or deep recursion. The crash was caused
+  by a non-robust check of whether the call stack needed to grow or
+  shrink, which was replaced with a much more robust check.
+
+* Fixed the precedence of the unary `-` operator, so that `-X^2` now
+  parses correctly (it used to be interpretd as `(-X)^2`)
+
+* Fix a crash where an error during an array operation could cause a
+  null pointer to be pushed on the stack.
+
+* The test suite now correctly reports error detected while
+  checking the examples in the online help.
+
+* The multi-solver no longer considers the index variable in a sum or
+  product as a variable to solve for. This avoids spurious errors
+  claiming that a solution cannot be found. The same also applies
+  other functions that take a variable name as an argument, such as
+  `Root`, `Integrate` or `Isolate`.
+
+* Fix a crash when comparing unit objects that cannot be converted
+  from one to the other, e.g. comparing `1_m` and `1_h`.
+
+* Fix the order of commands in the build instructions for Windows.
+
+* Fix the `NDupN` command to duplicate an object N times. In earlier
+  releases, it was incorrectly duplicating N objects and leaving  N on
+  the stack.
+
+* Accept addition and subtraction between a number and a unit object
+  where the unit can be reduced to a number, so that `'1+1_km/m'` is
+  now a valid expression. A few additional entries in the equation
+  library now work thanks to that fix.
+
+* Avoid a rare crash where the error command would be corrupted when
+  cleaning temporaries.
+
+### Improvements
+
+* Performance optimizations for decimal arithmetic, using 25x25 matrix
+  multiplication as a test scenario to optimize. The performance of
+  such multiplication was improved by about one order of magnitude,
+  and is now comparable to DM42 performance. This was achieved in
+  particular by making more aggressive cleanup of temporaries, by
+  reducing the need for garbage collection, by adding a fast-tracked
+  path for arithmetic operations when the types are the same as for
+  the last operation, and by deferring the construction of arrays
+  until the value of all elements are computed.
+
+* Add a few new sanity checks for the runtime when running on the
+  simulator, notably to detect cases where the internal pointers are
+  not in the expected order, and to more precisely report issues if
+  integrity checks fail during garbage collection
+
+* Add locking to the garbage collected pointers list when running on
+  the simulator, in order to improve test stability. Testing on the
+  simulator is the one case where multiple threads may concurently
+  access the pointers list.
+
+* Accelerate the tests that insert large amounts of text from source
+  code, notably the equation parsing tests and the help examples
+  checks. In addition, use a smarter method to insert RPL separators
+  such as `[]` or `''`, taking advantage of the fact that they are
+  usually entered in pairs. These two improvements reduce the total
+  runtime of the entire test suite by a factor of more than 4.
+
+* While testing the online help examples, only report the exact
+  section title and not all the section titles that contain the same
+  text.
+
+* Systematically strip tags and assignment objects for all arithmetic
+  operations.
+
+* Add a version of the `debug_printf` that automatically selects where
+  to draw on the screen, and automatically clear what follows the
+  printed text using a gray pattern.
+
+* Render the DB48x TrueType font to bitmap using a more recent version
+  of the FreeType library. This causes minor glyph differences
+  compared to earlier releases. The test suite was adjusted
+  accordingly.
+
+* Remove some of the leftover references to newRPL commands that will
+  not be implemented or make no sense for DB48x. This work is not
+  finished yet. The mechanism to remember which command caused a
+  particular error was also made somewhat more efficient.
+
+* Consolidate the two distinct documentations of the `Root` command.
+
+
 ## Release 0.8.6 "Daniel" - Bug fixes and optimizations
 
 This release is mostly intended to fix a number of issues reported by

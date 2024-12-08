@@ -462,9 +462,13 @@ being set, such operations will generate an `Undefined operation` error.
 The `Library` is a catalog of frequently used and rarely modified objects that
 are stored on disk in the `config/library.csv` file.
 
-You can edit it by recalling its content on the stack using
+You can edit the library content by recalling its content on the stack using
 `"config:library.csv" RCL`, editing the values, and then storing the content
 back to disk using `"config:library.csv" STO`.
+
+Library entries are cached in memory for efficiency.
+See [library management](#library-management) for operations to use when you
+update the library content.
 
 
 ## Equations Library

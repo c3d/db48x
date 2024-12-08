@@ -44,13 +44,13 @@ struct comparison : arithmetic
     typedef bool (*comparison_fn)(int cmp);
     static bool compare(int *cmp, algebraic_r left, algebraic_r right);
     static result compare(comparison_fn cmp, id op);
-    static algebraic_g compare(comparison_fn cmp, id op,
+    static algebraic_p compare(comparison_fn cmp, id op,
                                algebraic_r x, algebraic_r y);
     static result is_same(bool derefNames);
 
     template <typename Cmp> static result      evaluate();
     template <typename Cmp>
-    static algebraic_g evaluate(algebraic_r x, algebraic_r y);
+    static algebraic_p evaluate(algebraic_r x, algebraic_r y);
 };
 
 
@@ -79,7 +79,7 @@ struct derived : comparison                                             \
     {                                                                   \
         return comparison::evaluate<derived>();                         \
     }                                                                   \
-    static algebraic_g evaluate(algebraic_r x, algebraic_r y)           \
+    static algebraic_p evaluate(algebraic_r x, algebraic_r y)           \
     {                                                                   \
         return comparison::evaluate<derived>(x, y);                     \
     }                                                                   \
@@ -112,12 +112,12 @@ COMMAND_DECLARE_SPECIAL(False, algebraic, 0, ); // Evaluate as self
 //
 // ============================================================================
 
-algebraic_g operator==(algebraic_r x, algebraic_r y);
-algebraic_g operator<=(algebraic_r x, algebraic_r y);
-algebraic_g operator>=(algebraic_r x, algebraic_r y);
-algebraic_g operator <(algebraic_r x, algebraic_r y);
-algebraic_g operator >(algebraic_r x, algebraic_r y);
-algebraic_g operator!=(algebraic_r x, algebraic_r y);
+algebraic_p operator==(algebraic_r x, algebraic_r y);
+algebraic_p operator<=(algebraic_r x, algebraic_r y);
+algebraic_p operator>=(algebraic_r x, algebraic_r y);
+algebraic_p operator <(algebraic_r x, algebraic_r y);
+algebraic_p operator >(algebraic_r x, algebraic_r y);
+algebraic_p operator!=(algebraic_r x, algebraic_r y);
 
 bool smaller_magnitude(algebraic_r x, algebraic_r y);
 

@@ -135,8 +135,13 @@ struct list : text
     }
 
     list_p      names(bool units = false, id type = ID_list) const;
-    bool        names_enumerate(size_t depth, bool with_units) const;
-    static bool names_insert(size_t depth, symbol_p sym, unit_p unit);
+    bool        names_enumerate(size_t depth,
+                                bool with_units,
+                                list_g &forbidden) const;
+    static bool names_insert(size_t   depth,
+                             symbol_p sym,
+                             unit_p   unit,
+                             list_g  &forbidden);
 
 
     // Iterator, built in a way that is robust to garbage collection in loops
@@ -286,6 +291,16 @@ struct list : text
         return y->map(x, fn);
     }
 
+    static object::result push_list_from_stack(uint depth, id ty = ID_list);
+    static list_p list_from_stack(uint depth, id ty = ID_list);
+    // ------------------------------------------------------------------------
+    //   Convert `depth` items to a list
+    // ------------------------------------------------------------------------
+
+
+
+
+
     // Append data to a list
     list_p append(list_p a) const;
     list_p append(object_p o) const;
@@ -374,13 +389,6 @@ inline list_g operator*(list_r x, uint y)
     text_r xt = (text_r) x;
     return list_p(+(xt * y));
 }
-
-
-object::result to_list(uint depth);
-list_p to_list_object(uint depth);
-// ----------------------------------------------------------------------------
-//   Convert `depth` items to a list
-// ----------------------------------------------------------------------------
 
 
 int value_compare(object_p *xp, object_p *yp);

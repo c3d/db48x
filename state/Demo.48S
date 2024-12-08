@@ -938,6 +938,37 @@ UnitBenchmark
 	»
 	TEVAL
 »
+
+
+@@ ---------------------------------------------------------------------------
+@@
+@@	 Evaluate performance of matrix multiplication
+@@
+@@ ---------------------------------------------------------------------------
+
+MatrixMultiplyBenchmark
+«
+	if Depth 0 = then 20 end
+	→ N
+	«
+		«
+			N N 2 →List RanM sin
+		»
+		TimedEval 2 DrawText GarbageCollect 1 DrawText
+		«
+			N N 2 →List RanM sin
+		»
+		TimedEval 4 DrawText GarbageCollect 3 DrawText
+		GarbageCollectorStatistics 'PreGC' Store
+		«
+			×
+		»
+		TimedEval
+		Duplicate 6 DrawText
+                GarbageCollectorStatistics 'PostGC' ▶
+	»
+»
+
 }
 
 

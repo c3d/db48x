@@ -83,6 +83,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#if SIMULATOR
+#include <mutex>
+#endif
+
 
 struct object;                  // RPL object
 struct directory;               // Directory (storing global variables)
@@ -103,6 +107,34 @@ RECORDER_DECLARE(editor);
 // The one and only runtime
 struct runtime;
 extern runtime rt;
+
+
+// ============================================================================
+//
+//   Runtime invariants check
+//
+// ============================================================================
+
+struct runtime_invariants
+// ----------------------------------------------------------------------------
+//  Check runtime invariants on entry and return from runtime code
+// ----------------------------------------------------------------------------
+{
+#ifdef SIMULATOR
+    runtime_invariants()
+    {
+        check_invariants();
+    }
+    ~runtime_invariants()
+    {
+        check_invariants();
+    }
+    void check_invariants();
+#else // !SIMULATOR
+    runtime_invariants()        {}
+    ~runtime_invariants()       {}
+#endif // SIMULATOR
+};
 
 
 
@@ -127,6 +159,19 @@ struct runtime
     // Amount of space we want to keep between stack top and temporaries
     const uint redzone = 2*sizeof(object_p);;
 
+#if SIMULATOR
+    struct lock : std::lock_guard<std::mutex>
+    {
+        lock() : std::lock_guard<std::mutex>(rt.mutex) {}
+    };
+    std::mutex mutex;
+#else // !SIMULATOR
+    struct lock
+    {
+        lock() {}
+        ~lock() {}
+    };
+#endif // SIMULATOR
 
 
     // ========================================================================
@@ -315,12 +360,16 @@ struct runtime
     //   Protect a pointer against garbage collection
     // ------------------------------------------------------------------------
     {
-        gcptr(byte *ptr = nullptr) : safe(ptr), next(rt.GCSafe)
+        gcptr(byte *ptr = nullptr) : safe(ptr)
         {
+            lock it;
+            next = rt.GCSafe;
             rt.GCSafe = this;
         }
-        gcptr(const gcptr &o): safe(o.safe), next(rt.GCSafe)
+        gcptr(const gcptr &o): safe(o.safe)
         {
+            lock it;
+            next = rt.GCSafe;
             rt.GCSafe = this;
         }
         ~gcptr();
@@ -504,7 +553,8 @@ struct runtime
     //   Push an object to call on the RPL stack
     // ------------------------------------------------------------------------
     {
-        if ((HighMem - Returns) % CALLS_BLOCK == 0)
+        runtime_invariants check;
+        if (Returns <= CallStack)
             if (!call_stack_grow(next, end))
                 return false;
         *(--Returns) = end;
@@ -517,6 +567,7 @@ struct runtime
     //   Push an object to call on the RPL stack
     // ------------------------------------------------------------------------
     {
+        runtime_invariants check;
         if (next < end || !next)    // Can be nullptr for conditionals
         {
             end = object_p(byte_p(end) - 1);
@@ -533,6 +584,7 @@ struct runtime
     //   that requires the definition of object::skip()
 #ifdef OBJECT_H
     {
+        runtime_invariants check;
         object_p *high = HighMem - depth;
         while (Returns < high)
         {
@@ -545,19 +597,15 @@ struct runtime
                     object_p nnext = next->skip();
                     Returns[0] = nnext;
                     if (nnext >= end)
-                    {
-                        Returns += 2;
-                        if ((HighMem - Returns) % CALLS_BLOCK == 0)
-                            call_stack_drop();
-                    }
+                        // Note that call_stack_drop() cannot and MUST NOT GC
+                        // so that the value of next cannot change
+                        call_stack_drop(2);
                     return next;
                 }
                 unlocals(size_t(end) - 1);
             }
 
-            Returns += 2;
-            if ((HighMem - Returns) % CALLS_BLOCK == 0)
-                call_stack_drop();
+            call_stack_drop(2);
         }
         return nullptr;
     }
@@ -575,6 +623,7 @@ struct runtime
     //   Return the next instruction for single-stepping
     // ------------------------------------------------------------------------
     {
+        runtime_invariants check;
         if (Returns < HighMem)
             return Returns[0];
         return nullptr;
@@ -614,9 +663,15 @@ struct runtime
 
     bool call_stack_grow(object_p &next, object_p &end);
     void call_stack_drop();
+    void call_stack_drop(uint n)
     // ------------------------------------------------------------------------
     //  Manage the call stack in blocks
     // ------------------------------------------------------------------------
+    {
+        Returns += n;
+        if (Returns >= CallStack + CALLS_BLOCK)
+            call_stack_drop();
+    }
 
 
     size_t call_depth() const
@@ -624,6 +679,7 @@ struct runtime
     //   Return calldepth
     // ------------------------------------------------------------------------
     {
+        runtime_invariants check;
         return HighMem - Returns;
     }
 
@@ -950,9 +1006,9 @@ struct runtime
     // ------------------------------------------------------------------------
 
 
-    text_p command() const;
+    object_p command() const;
     // ------------------------------------------------------------------------
-    //   Get the faulting command name
+    //   Get the faulting command
     // ------------------------------------------------------------------------
 
 
@@ -1029,6 +1085,7 @@ protected:
 
     friend struct GarbageCollectorStatistics;
     friend struct cleaner;
+    friend struct runtime_invariants;
 };
 
 template<typename T>
@@ -1188,10 +1245,10 @@ struct error_save
 {
     error_save();
     ~error_save();
-    gcutf8    errmsg;
-    gcutf8    source;
-    size_t    srclen;
-    gcp<text> command;
+    gcutf8      errmsg;
+    gcutf8      source;
+    size_t      srclen;
+    gcp<object> command;
 };
 
 

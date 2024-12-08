@@ -179,7 +179,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            matrix_functions();
+            library();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -732,12 +732,12 @@ void tests::keyboard_entry()
     test(CLEAR, special).editor(special);
 
     step("Separators");
-    cstring seps = "\"Hello [A] (B) {C} 'Test' D";
+    cstring seps = "\"Hello [A] (B) {C} 'Test' D\"";
     test(CLEAR, seps).editor(seps);
 
     step("Separators with auto-spacing");
     cstring seps2     = "{}()[]";
-    cstring seps2auto = "{ } () []";
+    cstring seps2auto = "{} () []";
     test(CLEAR, seps2).editor(seps2auto);
 
     step("Key repeat");
@@ -1494,16 +1494,8 @@ void tests::stack_operations()
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("NDupN in program")
-        .test(CLEAR, "13 17 25 42 3 NDUPN", ENTER).expect("3")
-        .test(BSP).expect("42")
-        .test(BSP).expect("25")
-        .test(BSP).expect("17")
-        .test(BSP).expect("42")
-        .test(BSP).expect("25")
-        .test(BSP).expect("17")
-        .test(BSP).expect("13")
-        .test(BSP).noerror()
-        .test(BSP).error("Too few arguments");
+        .test(CLEAR, "13 17 25 42 3 NDUPN", ENTER)
+        .got("3", "42", "42", "42", "25", "17", "13");
     step("DupDup in program")
         .test(CLEAR, "13 17 42 DUPDUP", ENTER).expect("42")
         .test(BSP).expect("42")
@@ -1589,16 +1581,8 @@ void tests::stack_operations()
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("NDupN in stack menu")
-        .test(CLEAR, "13 17 25 42 3", F6, LSHIFT, F1, F6).expect("3")
-        .test(BSP).expect("42")
-        .test(BSP).expect("25")
-        .test(BSP).expect("17")
-        .test(BSP).expect("42")
-        .test(BSP).expect("25")
-        .test(BSP).expect("17")
-        .test(BSP).expect("13")
-        .test(BSP).noerror()
-        .test(BSP).error("Too few arguments");
+        .test(CLEAR, "13 17 25 42 3", F6, LSHIFT, F1, F6)
+        .got("3", "42", "42", "42", "25", "17", "13");
     step("DupDup in stack menu")
         .test(CLEAR, "13 17 42", F6, LSHIFT, F2, F6).expect("42")
         .test(BSP).expect("42")
@@ -5607,6 +5591,16 @@ void tests::text_functions()
               RSHIFT, KEY4, SHIFT, F2)
         .type(ID_text).expect("\"èéêëπ√∫\"");
 
+    step("Head of text")
+        .test(CLEAR, "\"Hello\" HEAD", ENTER)
+        .expect("\"H\"")
+        .test(CLEAR, "\"À demain\" HEAD", ENTER)
+            .expect("\"À\"");
+    step("Tail of text")
+        .test(CLEAR, "\"Hello\" TAIL", ENTER)
+        .expect("\"ello\"")
+        .test(CLEAR, "\"À demain\" TAIL", ENTER)
+        .expect("\" demain\"");
 
     step("Ensure we can parse integer numbers with separators in them")
         .test(CLEAR, "100000", ENTER).expect("100 000")
@@ -5676,7 +5670,7 @@ void tests::vector_functions()
     test(CLEAR, "[1 2  3 4 6][4 5 2 1 3] /", ENTER)
         .expect("[ ¹/₄ ²/₅ 1 ¹/₂ 4 2 ]");
     test(CLEAR, "[a b c][d e f] /", ENTER)
-        .expect("[ 'a÷d' 'b÷e' 'c÷f' ]");
+        .expect("[ 'd⁻¹·a' 'e⁻¹·b' 'f⁻¹·c' ]");
 
     step("Addition of constant (extension)");
     test(CLEAR, "[1 2 3] 3 +", ENTER)
@@ -5889,7 +5883,9 @@ void tests::matrix_functions()
 
     step("Non-rectangular matrices");
     test(CLEAR, "[  [ 1.5  2.300 ] [ 3.02 ]]", ENTER)
-        .type(ID_array).want("[[ 1.5 2.3 ] [ 3.02 ]]");
+        .type(ID_array).want("[[ 1.5 2.3 ] [ 3.02 ]]")
+        .test(ENTER, ID_add)
+        .want("[[ 3. 4.6 ] [ 6.04 ]]");
 
     step("Symbolic matrix");
     test(CLEAR, "[[a b] [c d]]", ENTER)
@@ -5966,29 +5962,44 @@ void tests::matrix_functions()
     test(CLEAR, "x [[a b] [c d]] /", ENTER)
         .want("[[ 'x÷a' 'x÷b' ] [ 'x÷c' 'x÷d' ]]");
 
-    step("Invalid dimension for binary operations");
-    test(CLEAR, "[[1 2] [3 4]][1 2] +", ENTER)
-        .error("Bad argument type");
-    test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] +", ENTER)
+    step("Invalid dimension for addition (second is larger)")
+        .test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] +", ENTER)
         .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][1 2] +", ENTER)
-        .error("Bad argument type");
-    test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] -", ENTER)
+    step("Invalid dimension for addition (second is smaller)")
+        .test(CLEAR, "[[1 2] [3 4] [5 6]][[1 2][3 4]] +", ENTER)
         .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][1 2] +", ENTER)
-        .error("Bad argument type");
-    test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] -", ENTER)
+    step("Invalid dimension for subtraction (second is larger)")
+        .test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] -", ENTER)
         .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][1 2] +", ENTER)
-        .error("Bad argument type");
-    test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] *", ENTER)
+    step("Invalid dimension for subtraction (second is smaller)")
+        .test(CLEAR, "[[1 2] [3 4] [5 6]][[1 2][3 4]] -", ENTER)
         .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][1 2 3] *", ENTER)
-        .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] /", ENTER)
-        .error("Invalid dimension");
-    test(CLEAR, "[[1 2] [3 4]][1 2] /", ENTER)
-        .error("Bad argument type");
+    step("Element-wise addition (extension)")
+        .test(CLEAR, "[[1 2] [3 4]][1 2] +", ENTER)
+        .want("[[ 2 3 ] [ 5 6 ]]");
+    step("Element-wise subtraction (extension)")
+        .test(CLEAR, "[[1 2] [3 4]][1 2] -", ENTER)
+        .want("[[ 0 1 ] [ 1 2 ]]");
+    step("Element-wise multiplication (extension)")
+        .test(CLEAR, "[[1 2] [3 4]] 4 *", ENTER)
+        .want("[[ 4 8 ] [ 12 16 ]]");
+    step("Matrix-vector multiplication")
+        .test(CLEAR, "[[1 2] [3 4]][4 5] *", ENTER)
+        .want("[ 14 32 ]");
+    step("Element-wise division (extension)")
+        .test(CLEAR, "[[1 2] [3 4]][2 3] /", ENTER)
+        .want("[[ ¹/₂ 1 ] [ 1 1 ¹/₃ ]]");
+
+    step("Non-rectangular addition (extension)")
+        .test(CLEAR, "[[1][2 3]][[4][5 6]] +", ENTER)
+        .want("[[ 5 ] [ 7 9 ]]");
+    step("Non-rectangular subtraction (extension)")
+        .test(CLEAR, "[[1][2 3]][4 [5 6]] -", ENTER)
+        .want("[[ -3 ] [ -3 -3 ]]");
+    step("Matrix of matrices")
+        .test(CLEAR, "[[[ 1 2 ][3 4]][[ 1 2 ][3 4]]]", ENTER,
+              ENTER, 3, ID_mul, ID_mul)
+        .want("[[[ 12 24 ] [ 54 72 ]] [[ 12 24 ] [ 54 72 ]]]");
 
     step("Min and max")
         .test(CLEAR, "[[1 2][3 4][5 6]] [[0 3][4 6][2 1]] MIN", ENTER)
@@ -6131,6 +6142,10 @@ void tests::matrix_functions()
     step("Divide fails")
         .test(CLEAR, "[[1 1][1 1]]", ENTER, ENTER, DIV)
         .error("Divide by zero");
+
+    step("Tagged array operations")
+        .test(CLEAR, ":A:[1 2] :B:[3 4] +", ENTER)
+        .want("[ 4 6 ]");
 }
 
 
@@ -6225,7 +6240,7 @@ void tests::eqnlib_parsing()
         if (eq[i+1])
         {
             istep(eq[i]);
-            test(CLEAR, eq[i+1], ENTER).noerror();
+            test(CLEAR, DIRECT(eq[i+1]), ENTER).noerror();
         }
         else
         {
@@ -6256,12 +6271,16 @@ void tests::eqnlib_columns_and_beams()
     step("Solving Elastic Buckling")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F1)
         .test("53.0967", NOSHIFT, F3)
+        .expect("A=53.0967 cm↑2")
         .test("199947961.502", NOSHIFT, F4)
+        .expect("E=199 947 961.502 kPa")
         .test(".7", NOSHIFT, F5, F6)
+        .expect("K=0.7")
         .test("7.3152", NOSHIFT, F1)
+        .expect("L=7.3152 m")
         .test("4.1148", NOSHIFT, F2, F6)
-        .test(LSHIFT, F2)
-        .expect("Pcr=676.60192 6324 kN");
+        .expect("r=4.1148 cm")
+        .test(LSHIFT, F2).expect("Pcr=676.60192 6324 kN");
     step("Solving Elastic Buckling second equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F4)
         .expect("I=8 990 109.72813 mm↑4")
@@ -6283,13 +6302,21 @@ void tests::eqnlib_columns_and_beams()
     step("Solving Eccentric Columns")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F2)
         .test("1.1806", NOSHIFT, F3)
+        .expect("ε=1.1806 cm")
         .test("187.9351", NOSHIFT, F4)
+        .expect("A=187.9351 cm↑2")
         .test("15.24", NOSHIFT, F5, F6)
+        .expect("c=15.24 cm")
         .test("206842718.795", NOSHIFT, F1)
+        .expect("E=206 842 718.795 kPa")
         .test("1", NOSHIFT, F2)
+        .expect("K=1")
         .test("6.6542", NOSHIFT, F3)
+        .expect("L=6.6542 m")
         .test("1908.2571", NOSHIFT, F4)
+        .expect("P=1 908.2571 kN")
         .test("8.4836", NOSHIFT, F5)
+        .expect("r=8.4836 cm")
         .test(F6, LSHIFT, F2)
         .expect("σmax=140 853.09700 6 kPa");
     step("Solving Eccentric Column second equation")
@@ -6299,111 +6326,180 @@ void tests::eqnlib_columns_and_beams()
     step("Solving Simple Deflection")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F3)
         .test("10_ft", NOSHIFT, F2)
+        .expect("a=10 ft")
         .test("17_ft", NOSHIFT, F3)
+        .expect("c=17 ft")
         .test("29000000_psi", NOSHIFT, F4)
+        .expect("E=29 000 000 psi")
         .test("40_in^4", NOSHIFT, F5, F6)
+        .expect("I=40 in↑4")
         .test("20_ft", NOSHIFT, F1)
+        .expect("L=20 ft")
         .test("3687.81_ft*lbf", NOSHIFT, F2)
+        .expect("M=3 687.81 ft·lbf")
         .test("674.427_lbf", NOSHIFT, F3)
+        .expect("P=674.427 lbf")
         .test("102.783_lbf/ft", NOSHIFT, F4)
+        .expect("w=102.783 lbf/ft")
         .test("9_ft", NOSHIFT, F5)
+        .expect("x=9 ft")
         .test(F6, LSHIFT, F1)
         .expect("y=-1.52523 29401 2 cm")
-        .test("1_in", F1, LSHIFT, F1)
+        .test("1_in", F1)
+        .expect("y=1 in")
+        .test(LSHIFT, F1)
         .expect("y=-0.60048 54094 96 in");
 
     step("Solving Simple Slope")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F4)
         .test("10_ft", NOSHIFT, F3)
+        .expect("a=10 ft")
         .test("17_ft", NOSHIFT, F4)
+        .expect("c=17 ft")
         .test("29000000_psi", NOSHIFT, F5, F6)
+        .expect("E=29 000 000 psi")
         .test("40_in^4", NOSHIFT, F1)
+        .expect("I=40 in↑4")
         .test("20_ft", NOSHIFT, F2)
+        .expect("L=20 ft")
         .test("3687.81_ft*lbf", NOSHIFT, F3)
+        .expect("M=3 687.81 ft·lbf")
         .test("674.427_lbf", NOSHIFT, F4)
+        .expect("P=674.427 lbf")
         .test("102.783_lbf/ft", NOSHIFT, F5, F6)
+        .expect("w=102.783 lbf/ft")
         .test("9_ft", NOSHIFT, F1)
+        .expect("x=9 ft")
         .test(F6, LSHIFT, F2)
         .expect("θ=-0.08763 17825 27 °");
 
     step("Solving Simple Moment")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F5)
         .test("20_ft", NOSHIFT, F5)
+        .expect("L=20 ft")
         .test("10_ft", NOSHIFT, F3)
+        .expect("a=10 ft")
         .test("674.427_lbf", NOSHIFT, F6, F2)
+        .expect("P=674.427 lbf")
         .test("17_ft", NOSHIFT, F6, F4)
+        .expect("c=17 ft")
         .test("3687.81_ft*lbf", NOSHIFT, F6, F1)
+        .expect("M=3 687.81 ft·lbf")
         .test("102.783_lbf/ft", NOSHIFT, F3)
+        .expect("w=102.783 lbf/ft")
         .test("9_ft", NOSHIFT, F4)
+        .expect("x=9 ft")
         .test(F6, LSHIFT, F2)
         .expect("Mx=13 262.87487 72 N·m")
-        .test("1_ft*lbf", NOSHIFT, F2, LSHIFT, F2)
+        .test("1_ft*lbf", NOSHIFT, F2)
+        .expect("Mx=1 ft·lbf")
+        .test(LSHIFT, F2)
         .expect("Mx=9 782.1945 ft·lbf");
 
     step("Solving Simple Shear")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F1)
         .test("20_ft", NOSHIFT, F3)
+        .expect("L=20 ft")
         .test("10_ft", NOSHIFT, F2)
+        .expect("a=10 ft")
         .test("674.427_lbf", NOSHIFT, F5)
+        .expect("P=674.427 lbf")
         .test("3687.81_ft*lbf", NOSHIFT, F4)
+        .expect("M=3 687.81 ft·lbf")
         .test("102.783_lbf/ft", NOSHIFT, F6, F2)
+        .expect("w=102.783 lbf/ft")
         .test("9_ft", NOSHIFT, F3)
+        .expect("x=9 ft")
         .test(LSHIFT, F1)
         .expect("V=2 777.41174 969 N")
-        .test("1_lbf", F1, LSHIFT, F1)
+        .test("1_lbf", F1)
+        .expect("V=1 lbf")
+        .test(LSHIFT, F1)
         .expect("V=624.387 lbf");
 
     step("Solving Cantilever Deflection")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F2)
         .test("10_ft", NOSHIFT, F6, F1)
+        .expect("L=10 ft")
         .test("29000000_psi", NOSHIFT, F6, F6, F4)
+        .expect("E=29 000 000 psi")
         .test("15_in^4", NOSHIFT, F5)
+        .expect("I=15 in↑4")
         .test("500_lbf", NOSHIFT, F6, F3)
+        .expect("P=500 lbf")
         .test("800_ft*lbf", NOSHIFT, F2)
+        .expect("M=800 ft·lbf")
         .test("3_ft", NOSHIFT, F6, F6, F2)
+        .expect("a=3 ft")
         .test("6_ft", NOSHIFT, F3)
+        .expect("c=6 ft")
         .test("100_lbf/ft", NOSHIFT, F6, F4)
+        .expect("w=100 lbf/ft")
         .test("8_ft", NOSHIFT, F5)
+        .expect("x=8 ft")
         .test(F6, LSHIFT, F1)
         .expect("y=-0.33163 03448 28 in")
         .test("1_lbf", F1)
         .error("Inconsistent units")
-        .test(CLEAR, "1_cm", F1, LSHIFT, F1)
+        .test(CLEAR, "1_cm", F1)
+        .expect("y=1 cm")
+        .test(LSHIFT, F1)
         .expect("y=-0.84234 10758 62 cm");
 
     step("Solving Cantilever Slope")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F3)
         .test("10_ft", NOSHIFT, F6, F2)
+        .expect("L=10 ft")
         .test("29000000_psi", LSHIFT, F6, F5)
+        .expect("E=29 000 000 psi")
         .test("15_in^4", NOSHIFT, F6, F1)
+        .expect("I=15 in↑4")
         .test("500_lbf", NOSHIFT, F4)
+        .expect("P=500 lbf")
         .test("800_ft*lbf", NOSHIFT, F3)
+        .expect("M=800 ft·lbf")
         .test("3_ft", LSHIFT, F6, F3)
+        .expect("a=3 ft")
         .test("6_ft", NOSHIFT, F4)
+        .expect("c=6 ft")
         .test("100_lbf/ft", NOSHIFT, F6, F5)
+        .expect("w=100 lbf/ft")
         .test("8_ft", NOSHIFT, F6, F1)
+        .expect("x=8 ft")
         .test(F6, LSHIFT, F2)
         .expect("θ=-0.26522 01876 49 °");
 
     step("Solving Cantilever Moment")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F4)
         .test("10_ft", NOSHIFT, F5)
+        .expect("L=10 ft")
         .test("500_lbf", NOSHIFT, F6, F2)
+        .expect("P=500 lbf")
         .test("800_ft*lbf", NOSHIFT, F1)
+        .expect("M=800 ft·lbf")
         .test("3_ft", LSHIFT, F6, F3)
+        .expect("a=3 ft")
         .test("6_ft", NOSHIFT, F4)
+        .expect("c=6 ft")
         .test("100_lbf/ft", NOSHIFT, F6, F3)
+        .expect("w=100 lbf/ft")
         .test("8_ft", NOSHIFT, F4)
+        .expect("x=8 ft")
         .test(F6, LSHIFT, F2)
         .expect("Mx=-200. ft·lbf");
 
     step("Solving Cantilever Shear")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F5)
         .test("10_ft", NOSHIFT, F3)
+        .expect("L=10 ft")
         .test("500_lbf", NOSHIFT, F4)
+        .expect("P=500 lbf")
         .test("3_ft", NOSHIFT, F2)
+        .expect("a=3 ft")
         .test("8_ft", NOSHIFT, F6, F2)
+        .expect("x=8 ft")
         .test("100_lbf/ft", NOSHIFT, F1)
+        .expect("w=100 lbf/ft")
         .test(F6, LSHIFT, F5)
         .expect("V=200. lbf");
 
@@ -7317,15 +7413,15 @@ void tests::tagged_objects()
     step("Parsing tagged integer");
     test(CLEAR, ":ABC:123", ENTER)
         .type(ID_tag)
-        .expect("ABC :123");
+        .expect("ABC:123");
     step("Parsing tagged fraction");
     test(CLEAR, ":Label:123/456", ENTER)
         .type(ID_tag)
-        .expect("Label :⁴¹/₁₅₂");
+        .expect("Label:⁴¹/₁₅₂");
     step("Parsing nested label");
     test(CLEAR, ":Nested::Label:123.456", ENTER)
         .type(ID_tag)
-        .expect("Nested :Label :123.456");
+        .expect("Nested:Label:123.456");
 
     step("Arithmetic");
     test(CLEAR, ":First:1 :Second:2 +", ENTER)
@@ -7351,7 +7447,7 @@ void tests::tagged_objects()
     step("FromTag");
     test(CLEAR, ":Hello:123 FromTag", ENTER)
         .type(ID_text)
-        .expect("\"Hello \"")
+        .expect("\"Hello\"")
         .test("Drop", ENTER)
         .expect("123");
 
@@ -7361,7 +7457,7 @@ void tests::tagged_objects()
 
     step("Tagged unit")
         .test(CLEAR, ":ABC:1_kg", ENTER)
-        .expect("ABC :1 kg");
+        .expect("ABC:1 kg");
     step("Tagged unit (without space)")
         .test(CLEAR, ALPHA, KEY0, A, B, C, NOSHIFT, DOWN,
               KEY1, ID_UnitsMenu, F1,
@@ -7454,9 +7550,9 @@ void tests::cycle_test()
     step("Convert program to list")
         .test(O).expect("{ 1 2 3 }");
     step("Tags are preserved, cycle applies to tagged value")
-        .test(CLEAR, ":ABC:1.25", ENTER).expect("ABC :1.25")
-        .test(O).expect("ABC :1 ¹/₄")
-        .test(O).expect("ABC :1.25");
+        .test(CLEAR, ":ABC:1.25", ENTER).expect("ABC:1.25")
+        .test(O).expect("ABC:1 ¹/₄")
+        .test(O).expect("ABC:1.25");
     step("Cycle unit orders of magnitude up (as fractions)")
         .test(CLEAR, "1_kN", ENTER).expect("1 kN")
         .test(O).expect("¹/₁ ₀₀₀ MN")
@@ -8158,26 +8254,26 @@ void tests::flags_by_name()
     BEGIN(sysflags);
 
 #define ID(id)
-#define FLAG(Enable, Disable)                                   \
-    step("Clearing flag " #Disable " (default)")                \
-        .test(CLEAR, #Disable, ENTER).noerror()                 \
-        .test("'" #Enable "' RCL", ENTER).expect("False")       \
-        .test("'" #Disable "' RCL", ENTER).expect("True");      \
-    step("Setting flag " #Enable)                               \
-        .test(CLEAR, #Enable, ENTER).noerror()                  \
-        .test("'" #Enable "' RCL", ENTER).expect("True")        \
-        .test("'" #Disable "' RCL", ENTER).expect("False");     \
-    step("Purging flag " #Enable " (return to default)")        \
-        .test(CLEAR, "'" #Disable "' PURGE", ENTER).noerror()   \
-        .test("'" #Enable "' RCL", ENTER).expect("False")       \
-        .test("'" #Disable "' RCL", ENTER).expect("True");      \
-    step("Purging flag " #Disable " (return to default)")       \
-        .test(CLEAR, "'" #Enable "' PURGE", ENTER).noerror()    \
-        .test("'" #Enable "' RCL", ENTER).expect("False")       \
-        .test("'" #Disable "' RCL", ENTER).expect("True");
-#define SETTING(Name, Low, High, Init)                          \
-    step("Purging " #Name " to revert it to default " #Init)    \
-        .test(CLEAR, "'" #Name "' PURGE", ENTER).noerror();
+#define FLAG(Enable, Disable)                                           \
+    step("Clearing flag " #Disable " (default)")                        \
+        .test(CLEAR, DIRECT(#Disable), ENTER).noerror()                 \
+        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");      \
+    step("Setting flag " #Enable)                                       \
+        .test(CLEAR, DIRECT(#Enable), ENTER).noerror()                  \
+        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("True")        \
+        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("False");     \
+    step("Purging flag " #Enable " (return to default)")                \
+        .test(CLEAR, DIRECT("'" #Disable "' PURGE"), ENTER).noerror()   \
+        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");      \
+    step("Purging flag " #Disable " (return to default)")               \
+        .test(CLEAR, DIRECT("'" #Enable "' PURGE"), ENTER).noerror()    \
+        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");
+#define SETTING(Name, Low, High, Init)                                  \
+    step("Purging " #Name " to revert it to default " #Init)            \
+        .test(CLEAR, DIRECT("'" #Name "' PURGE"), ENTER).noerror();
 #include "ids.tbl"
 
     step("Clear DebugOnError for testing")
@@ -8196,10 +8292,10 @@ void tests::settings_by_name()
 #define FLAG(Enable, Disable)
 #define SETTING(Name, Low, High, Init)                  \
     step("Getting " #Name " current value")             \
-        .test("'" #Name "' RCL", ENTER)                 \
+        .test(DIRECT("'" #Name "' RCL"), ENTER)         \
         .noerror();                                     \
     step("Setting " #Name " to its current value")      \
-        .test("" #Name "", ENTER)                       \
+        .test(DIRECT("" #Name ""), ENTER)               \
         .noerror();
 #include "ids.tbl"
 }
@@ -8218,7 +8314,13 @@ void tests::parsing_commands_by_name()
         if (name)                                                       \
         {                                                               \
             step("Parsing " #name " for " #ty);                         \
-            test(CLEAR, "{ ", (cstring) name, " } 1 GET", ENTER)        \
+            test(CLEAR,                                                 \
+                 DIRECT("{ " + std::string(name) + " } 1 GET"),         \
+                 ENTER)                                                 \
+                .type(ID_##ty);                                         \
+            test(CLEAR,                                                 \
+                 DIRECT("\"{ \" " #name " + \" }\" + Str→ 1 GET"),      \
+                 ENTER)                                                 \
                 .type(ID_##ty);                                         \
         }                                                               \
     }
@@ -9879,9 +9981,50 @@ void tests::expression_operations()
         .test(CLEAR, "'ABC+A+X+Foo(Z;B;A)'", ENTER)
         .expect("'ABC+A+X+Foo(Z;B;A)'")
         .test("LNAME", ENTER)
-        .expect("[ ABC Foo A B X Z ]")
-        .test(BSP)
-        .expect("'ABC+A+X+Foo(Z;B;A)'");
+        .got("[ ABC Foo A B X Z ]", "'ABC+A+X+Foo(Z;B;A)'");
+    step("... with hidden local in sum")
+        .test(CLEAR, "'ABC+A+X+SUM(Z;B;A;A+B*Z)'", ENTER)
+        .expect("'ABC+A+X+Σ(Z;B;A;A+B·Z)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+X+Σ(Z;B;A;A+B·Z)'");
+    step("... with local in sum and same name before")
+        .test(CLEAR, "'ABC+A+X+SUM(X;B;A;A+B*X)'", ENTER)
+        .expect("'ABC+A+X+Σ(X;B;A;A+B·X)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+X+Σ(X;B;A;A+B·X)'");
+    step("... with local in sum and same name after")
+        .test(CLEAR, "'ABC+A+SUM(X;B;A;A+B*X)+X'", ENTER)
+        .expect("'ABC+A+Σ(X;B;A;A+B·X)+X'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+Σ(X;B;A;A+B·X)+X'");
+    step("... with hidden local in product")
+        .test(CLEAR, "'ABC+A+X+PRODUCT(Z;B;A;A+B*Z)'", ENTER)
+        .expect("'ABC+A+X+∏(Z;B;A;A+B·Z)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+X+∏(Z;B;A;A+B·Z)'");
+     step("... with local in sum and same name before")
+        .test(CLEAR, "'ABC+A+X+PRODUCT(X;B;A;A+B*X)'", ENTER)
+        .expect("'ABC+A+X+∏(X;B;A;A+B·X)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+X+∏(X;B;A;A+B·X)'");
+    step("... with local in sum and same name after")
+        .test(CLEAR, "'ABC+A+PRODUCT(X;B;A;A+B*X)+X'", ENTER)
+        .expect("'ABC+A+∏(X;B;A;A+B·X)+X'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B X ]", "'ABC+A+∏(X;B;A;A+B·X)+X'");
+
+    step("List variables in integral")
+        .test(CLEAR, "'ABC+∫(A;B;X+Y;X)'", ENTER)
+        .expect("'ABC+∫(A;B;X+Y;X)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A B Y ]", "'ABC+∫(A;B;X+Y;X)'");
+
+    step("List variables in root")
+        .test(CLEAR, "'ABC+ROOT(X+A*Y;Z;X)'", ENTER)
+        .expect("'ABC+Root(X+A·Y;Z;X)'")
+        .test("LNAME", ENTER)
+        .got("[ ABC A Y Z ]", "'ABC+Root(X+A·Y;Z;X)'");
+
     step("List variables in program")
         .test(CLEAR, LSHIFT, RUNSTOP, "A BD + C *", ENTER)
         .want("« A BD + C × »")
@@ -10027,26 +10170,26 @@ void tests::object_structure()
         .test(CLEAR, LSHIFT, RUNSTOP, "A B + 5 *", ENTER, ID_ObjectMenu, ID_Explode)
         .got("5", "×", "5", "+", "B", "A");
     step("Obj→ on expression")
-        .test(CLEAR, LSHIFT, "'5*(A+B)'", ENTER, ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "'5*(A+B)'", ENTER, ID_ObjectMenu, ID_Explode)
         .got("5", "×", "+", "B", "A", "5");
     step("Obj→ on list")
-        .test(CLEAR, LSHIFT, "{ A B + 5 * }", ENTER, ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "{ A B + 5 * }", ENTER, ID_ObjectMenu, ID_Explode)
         .got("5", "×", "5", "+", "B", "A");
     step("Obj→ on user-defined function call")
-        .test(CLEAR, LSHIFT, "'F(A+B;C*D;E-F)'", ENTER, ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "'F(A+B;C*D;E-F)'", ENTER, ID_ObjectMenu, ID_Explode)
         .expect("1")
         .test(BSP)
         .expect("'F(A+B;C·D;E-F)'")
         .test(F4)
         .got("[ F 'A+B' 'C·D' 'E-F' ]");
     step("Obj→ on vector")
-        .test(CLEAR, LSHIFT, "[a b c d]", ENTER, ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "[a b c d]", ENTER, ID_ObjectMenu, ID_Explode)
         .got("{ 4 }", "d", "c", "b", "a");
     step("Obj→ on matrix")
-        .test(CLEAR, LSHIFT, "[[a b][c d]]", ENTER, ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "[[a b][c d]]", ENTER, ID_ObjectMenu, ID_Explode)
         .got("{ 2 2 }", "d", "c", "b", "a");
     step("Obj→ on polynomial")
-        .test(CLEAR, LSHIFT, "'X-Y+3*(X+Y^2)' →Poly", ENTER)
+        .test(CLEAR, "'X-Y+3*(X+Y^2)' →Poly", ENTER)
         .expect("4·X-Y+3·Y↑2")
         .test(ID_ObjectMenu, ID_Explode)
         .expect("'4·X+-1·Y+3·Y²'")
@@ -10060,7 +10203,7 @@ void tests::object_structure()
         .got("2", "1");
     step("Obj→ on tags")
         .test(CLEAR, ":abc:1.5", ENTER, ID_ObjectMenu, ID_Explode)
-        .got("\"abc \"", "1.5");
+        .got("\"abc\"", "1.5");
 }
 
 
@@ -10071,6 +10214,10 @@ void tests::library()
 {
     BEGIN(library);
 
+    step("Clear attached libraries")
+        .test(CLEAR, ID_FilesMenu, ID_Libs, ID_Detach, ID_Libs)
+        .expect("{ }");
+
     step("Secrets: Dedicace")
         .test(CLEAR, RSHIFT, H, F1, F1)
         .expect("\"À tous ceux qui se souviennent de Maubert électronique\"");
@@ -10078,9 +10225,40 @@ void tests::library()
         .test(CLEAR, F2)
         .expect("\"To modify the library, edit the config/library.csv file\"");
 
+    step("Check that libraries were attached")
+        .test(CLEAR, ID_FilesMenu, ID_Libs)
+        .expect("{ Dedicace LibraryHelp }");
+    step("Detach library by number")
+        .test(CLEAR, "0", ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ LibraryHelp }");
+
     step("Physics: Relativistic and classical kinetic energy")
         .test(CLEAR, RSHIFT, H, F2, F1)
         .image("lib-kinetic", 2000);
+
+    step("Check that libraries were attached")
+        .test(CLEAR, ID_FilesMenu, ID_Libs)
+        .expect("{ LibraryHelp KineticEnergy }");
+    step("Detach library by library entry")
+        .test(CLEAR, "'ⓁLibraryHelp'",
+              ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ KineticEnergy }");
+    step("Attach library by library entry")
+        .test(CLEAR, "'ⓁLibraryHelp'",
+              ID_FilesMenu, ID_Attach, ID_Libs)
+        .expect("{ LibraryHelp KineticEnergy }");
+    step("Attach library by library ID")
+        .test(CLEAR, "{ 0 5 }",
+              ID_FilesMenu, ID_Attach, ID_Libs)
+        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark }");
+    step("Detach library by library name")
+        .test(CLEAR, "\"LibraryHelp\"",
+              ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ Dedicace KineticEnergy CollatzBenchmark }");
+    step("Attach library by library name")
+        .test(CLEAR, "{ \"LibraryHelp\" \"KineticEnergy\" }",
+              ID_FilesMenu, ID_Attach, ID_Libs)
+        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark }");
 
     step("Math: Collatz conjecture benchmark")
         .test(CLEAR, RSHIFT, H, F3, LENGTHY(5000), F1, ENTER, SWAP)
@@ -10094,6 +10272,32 @@ void tests::library()
     step("Math: Triangle equations")
         .test(CLEAR, F4)
         .image_noheader("lib-triangle");
+
+    step("Check attached libraries")
+        .test(CLEAR, ID_FilesMenu, ID_Libs)
+        .expect("{ "
+                "Dedicace LibraryHelp KineticEnergy "
+                "CollatzBenchmark CollatzConjecture CountPrimes "
+                "TriangleEquations "
+                "}");
+
+    step("Detach libraries")
+        .test(CLEAR, "{ ⓁTriangleEquations ⓁCollatzConjecture }",
+              ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark "
+                "CountPrimes }");
+
+    step("Detach libraries by number")
+        .test(CLEAR, "{ 0 { 1 2 }}",
+              ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ CollatzBenchmark CountPrimes }");
+
+    step("Detach libraries by name")
+        .test(CLEAR, "{ \"CollatzBenchmark\" { CountPrimes }}",
+              ID_FilesMenu, ID_Detach, ID_Libs)
+        .expect("{ }");
+
+
 }
 
 
@@ -10195,7 +10399,7 @@ void tests::check_help_examples()
         }
 
         if (testing && c != '`')
-            itest(cstring(ubuf));
+            itest(DIRECT(cstring(ubuf)));
 
         if (c == open[opencheck])
         {
@@ -10228,22 +10432,18 @@ void tests::check_help_examples()
                         itest(LENGTHY(20000), RUNSTOP).noerror();
                     if (!ref.empty())
                         want(ref.c_str());
-                    if (failures.size() > nfailures)
+                    bool fails = failures.size() > nfailures;
+                    if (fails || skiptest)
                     {
                         std::string grep = "grep -inr '^##*";
                         grep += topic;
-                        grep += "' doc";
-                        passfail(skiptest ? -1 : 0);
-                        fprintf(stderr, "Running: %s\n", grep.c_str());
+                        grep += "$' doc";
+                        passfail(!skiptest ? 0 : fails ? 1 : -1);
 #ifndef USE_IOS
                         system(grep.c_str());
 #endif // USE_IOS
-                        ok = -1;
-                    }
-                    else if (skiptest)
-                    {
-                        explain("Test '", ref.c_str(), "'now passes");
-                        fail();
+                        if (skiptest && fails)
+                            ok = -1;
                     }
                     ref      = "";
                     skiptest = false;
@@ -11530,6 +11730,7 @@ tests &tests::clear(uint extrawait)
 //   Make sure we are in a clean state
 // ----------------------------------------------------------------------------
 {
+    flush();
     nokeys(extrawait);
     rpl_command(CLEAR, extrawait);
     noerror(extrawait);
@@ -11546,6 +11747,7 @@ tests &tests::clear_error(uint extrawait)
 //   - Having a beep may delay how long it takes for screen refresh to show up
 //   So for that reason, we send a special key to
 {
+    flush();
     nokeys(extrawait);
     rpl_command(CLEARERR, extrawait);
     noerror(extrawait);
@@ -11744,7 +11946,6 @@ tests &tests::itest(tests::key k, bool release)
         longpress = true; // Next key will be a long press
         return *this;
 
-
     default: break;
     }
 
@@ -11874,12 +12075,52 @@ tests &tests::itest(char c)
 }
 
 
+void tests::end(unicode closer)
+// ----------------------------------------------------------------------------
+//   Add a terminator to the list of closing characters
+// ----------------------------------------------------------------------------
+{
+    terminators.push_back(closer);
+}
+
+
+bool tests::had(unicode closer)
+// ----------------------------------------------------------------------------
+//   Check that we have the expected terminator, if so just skip right
+// ----------------------------------------------------------------------------
+{
+    if (terminators.size() && terminators.back() == closer)
+    {
+        itest(NOSHIFT, DOWN);
+        terminators.pop_back();
+        return true;
+    }
+    return false;
+}
+
+
+void tests::flush()
+// ----------------------------------------------------------------------------
+//  Remove the terminator we did not use
+// ----------------------------------------------------------------------------
+{
+    if (size_t sz = terminators.size())
+    {
+        terminators.clear();
+        for (size_t i = 0; i < sz; i++)
+            itest(LSHIFT, BSP);
+    }
+}
+
+
 tests &tests::itest(cstring txt)
 // ----------------------------------------------------------------------------
 //   Type the string on the calculator's keyboard
 // ----------------------------------------------------------------------------
 {
     utf8 u = utf8(txt);
+    shift(false);
+    xshift(false);
 
     while (*u)
     {
@@ -11889,12 +12130,11 @@ tests &tests::itest(cstring txt)
         nokeys();
 
         bool alpha  = ui.alpha;
+        bool lower  = ui.lowercase;
         bool shift  = false;
         bool xshift = false;
-        bool lower  = ui.lowercase;
         key  k      = RELEASE;
         key  fn     = RELEASE;
-        bool del    = false;
         bool bsp    = false;
 
         switch(c)
@@ -11972,24 +12212,33 @@ tests &tests::itest(cstring txt)
         case '.': k = DOT;          shift = alpha; break;
         case ',': k = DOT;          alpha = true;  break;
         case ' ': k = RUNSTOP;      alpha = true;  break;
-        case '?': k = KEY7;         alpha = true; xshift = true; break;
-        case '!': k = ADD;          alpha = true; xshift = true; break;
+        case '?': k = KEY7;         alpha = true; xshift = true;  break;
+        case '!': k = ADD;          alpha = true; xshift = true;  break;
         case '_': k = SUB;          alpha = true;  break;
-        case '%': k = RCL;          alpha = true;  shift = true; break;
-        case ':': k = KEY0;         alpha = true;  bsp   = true; break;
+        case '%': k = RCL;          alpha = true;  shift = true;  break;
+        case ':': if (had(':')) continue; end(':');
+                  k = KEY0;         alpha = true;                 break;
         case ';': k = KEY0;         alpha = true; xshift = true;  break;
         case '<': k = SIN;          alpha = true;  shift = true;  break;
         case '=': k = COS;          alpha = true;  shift = true;  break;
         case '>': k = TAN;          alpha = true;  shift = true;  break;
         case '^': k = INV;          alpha = true;  shift = true;  break;
-        case '(': k = XEQ;          alpha = true;  shift = true;  del = true; break;
-        case ')': k = XEQ;          alpha = true;  shift = true;  bsp = true; break;
-        case '[': k = KEY9;         alpha = false; shift = true;  del = true; break;
-        case ']': k = KEY9;         alpha = false; shift = true;  bsp = true; break;
-        case '{': k = RUNSTOP;      alpha = true; xshift = true;  del = true; break;
-        case '}': k = RUNSTOP;      alpha = true; xshift = true;  bsp = true; break;
-        case '"': k = ENTER;        alpha = true; xshift = true;  bsp = true; break;
-        case '\'': k = XEQ;         alpha = true; xshift = true;  bsp = true; break;
+        case '(': end(')');
+                  k = XEQ;          alpha = true;  shift = true;  break;
+        case ')': if (had(')')) continue;
+                  k = XEQ;          alpha = true;  shift = true;  bsp = true; break;
+        case '[': end(']');
+                  k = KEY9;         xshift = alpha; shift = !alpha; break;
+        case ']': if (had(']')) continue;
+                  k = KEY9;         xshift = alpha; shift = !alpha;  bsp = true; break;
+        case '{': end('}');
+                  k = RUNSTOP;      xshift = true; break;
+        case '}': if (had('}')) continue;
+                  k = RUNSTOP;      xshift = true;  bsp = true; break;
+        case '"': if (had('"')) continue; end('"');
+                  k = ENTER;        xshift = true; break;
+        case '\'':if (had('\'')) continue; end('\'');
+                  k = XEQ;          xshift = alpha; break;
         case '&': k = KEY1;         alpha = true; xshift = true; break;
         case '@': k = KEY2;         alpha = true; xshift = true; break;
         case '$': k = KEY3;         alpha = true; xshift = true; break;
@@ -11997,8 +12246,10 @@ tests &tests::itest(cstring txt)
         case '|': k = KEY6;         alpha = true; xshift = true; break;
         case '\\': k = ADD;         alpha = true; xshift = true; break;
         case '\n': k = BSP;         alpha = true; xshift = true; break;
-        case L'«': k = RUNSTOP;     alpha = false; shift = true; del = true; break;
-        case L'»': k = RUNSTOP;     alpha = false; shift = true; bsp = true; break;
+        case L'«': end(L'»');
+                   k = RUNSTOP;     shift = true; break;
+        case L'»': if (had(L'»')) continue;
+                   k = RUNSTOP;     shift = true; bsp = true; break;
         case L'▶': k = STO;         alpha = true;  shift = true; break;
         case L'→': k = STO;         alpha = true; xshift = true; break;
         case L'←': k = H;           alpha = true; xshift = true; break;
@@ -12026,6 +12277,7 @@ tests &tests::itest(cstring txt)
 #define NEXT        itest(ID_ToolsMenu); k = RESERVED2; break
 
         case L'à': itest(ID_CharactersMenu, F1, F1); NEXT;
+        case L'À': itest(ID_CharactersMenu, F1, LSHIFT, F1); NEXT;
 
         case L'ℂ': itest(ID_CharactersMenu, F4, RSHIFT, F3); NEXT;
         case L'ℚ': itest(ID_CharactersMenu, F4, RSHIFT, F4); NEXT;
@@ -12057,7 +12309,7 @@ tests &tests::itest(cstring txt)
         case L'∠': itest(ID_CharactersMenu, F4, F6, F6, F6, F6, F6, F3); NEXT;
         case L'Ⓒ': itest(ID_CharactersMenu, F2, RSHIFT, F1); NEXT;
         case L'Ⓔ': itest(ID_CharactersMenu, F2, RSHIFT, F2); NEXT;
-        case L'Ⓛ': itest(ID_CharactersMenu, F2, LSHIFT, F3); NEXT;
+        case L'Ⓛ': itest(ID_CharactersMenu, F2, RSHIFT, F3); NEXT;
         case L'Ⓓ': itest(ID_CharactersMenu, F2, F6, F6, F1); NEXT;
         case L'ⓧ': itest(ID_CharactersMenu, F2, F6, F6, F2); NEXT;
         case L'°': itest(ID_CharactersMenu, F2, F6, SHIFT, F3); NEXT;
@@ -12146,8 +12398,6 @@ tests &tests::itest(cstring txt)
             // If we have a pair, like (), check if we need bsp or del
             if (bsp)
                 itest(BSP, DOWN);
-            else if (del)
-                itest(SHIFT, BSP);
 
             // If we have a follow-up key, use that
             if (fn != RELEASE)
@@ -12204,6 +12454,18 @@ tests &tests::itest(tests::WAIT delay)
     sys_delay(delay.delay);
     return *this;
 }
+
+
+tests &tests::itest(tests::DIRECT direct)
+// ----------------------------------------------------------------------------
+//   Insert some text directly into the editor
+// ----------------------------------------------------------------------------
+{
+    nokeys(2000);
+    ui.insert(utf8(direct.text.c_str()), direct.text.size(), ui.TEXT);
+    return *this;
+}
+
 
 
 // ============================================================================
@@ -12729,18 +12991,17 @@ tests &tests::command(cstring ref, uint extrawait)
 //   Check that the command result matches expectations
 // ----------------------------------------------------------------------------
 {
-    text_p cmdo = nullptr;
-    size_t sz   = 0;
     utf8   cmd  = nullptr;
-
     nokeys(extrawait);
 
     uint start     = sys_current_ms();
     uint wait_time = image_wait_time + extrawait;
     while (sys_current_ms() - start < wait_time)
     {
-        cmdo = rt.command();
-        cmd  = cmdo->value(&sz);
+        size_t   sz   = 0;
+        if (object_p cmdo = rt.command())
+            if (text_p cmdt = cmdo->as_text())
+                cmd = cmdt->value(&sz);
         if (!ref == !cmd && (!ref || strcmp(ref, cstring(cmd)) == 0))
             return *this;
 

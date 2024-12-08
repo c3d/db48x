@@ -603,6 +603,12 @@ operate on these items when it makes sense. Therefore:
   is accepted, but is converted to the DB48X sequence of `|` form during
   parsing.
 
+* On HP calculators, the behavior on tagged lists is not very consistent.
+  For example, `{ 1 2 } :A:{ 3 4 } +` gives `{ 1 2 :A:{ 3 4 } }` but
+  `:A:{ 1 2 } :B:{ 3 4 } +` gives `{ 1 2 3 4 }`, and so does
+  `:A:{ 1 2 } { 3 4 } +`. DB48x strips the tags in all cases, i.e. the first
+  case gives the same `{ 1 2 3 4 }` as the other two.
+
 
 ### Vectors and matrices differences
 

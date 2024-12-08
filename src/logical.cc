@@ -42,10 +42,17 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
 //   Evaluation for binary logical operations
 // ----------------------------------------------------------------------------
 {
-    algebraic_g y = algebraic_p(rt.stack(1));
-    algebraic_g x = algebraic_p(rt.stack(0));
-    if (!x || !y)
+    object_p yo = strip(rt.stack(1));
+    object_p xo = strip(rt.stack(0));
+    if (!xo || !yo)
         return ERROR;
+    algebraic_g y = yo->as_extended_algebraic();
+    algebraic_g x = xo->as_extended_algebraic();
+    if (!x || !y)
+    {
+        rt.type_error();
+        return ERROR;
+    }
 
     id xt = x->type();
     switch (xt)

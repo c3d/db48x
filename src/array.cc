@@ -36,6 +36,7 @@
 #include "stats.h"
 #include "tag.h"
 #include "variables.h"
+#include "unit.h"
 
 
 RECORDER(matrix, 16, "Determinant computation");
@@ -174,8 +175,8 @@ bool array::is_vector(size_t *size, bool push, bool stripped) const
                 break;
             count++;
         }
-        if (!result)
-            rt.drop(push ? count : 0);
+        if (!result && push)
+            rt.drop(count);
         else if (size)
             *size = count;
     }
@@ -230,8 +231,8 @@ object::id array::is_2Dor3D(bool push) const
                               : ID_object);
         }
 
-        if (!r)
-            rt.drop(push ? count : 0);
+        if (!r && push)
+            rt.drop(count);
     }
     return r;
 }
@@ -422,12 +423,12 @@ array_p array::build(size_t rows, size_t columns, item_fn items, void *data)
                     for (size_t c = 0; c < columns; c++)
                     {
                         object_g it = items(rows, columns, r, c, data);
-                        if (!rt.append(it))
+                        if (program::interrupted() || !rt.append(it))
                             return nullptr;
                     }
                     row = list::make(ID_array, srow.scratch(), srow.growth());
                 }
-                if (!rt.append(row))
+                if (program::interrupted() || !rt.append(row))
                     return nullptr;
             }
         }
@@ -436,7 +437,7 @@ array_p array::build(size_t rows, size_t columns, item_fn items, void *data)
             for (size_t r = 0; r < rows; r++)
             {
                 object_g it = items(rows, columns, r, 0, data);
-                if (!rt.append(it))
+                if (program::interrupted() || !rt.append(it))
                     return nullptr;
             }
         }
@@ -459,170 +460,6 @@ array_p operator-(array_r x)
 // ----------------------------------------------------------------------------
 {
     return array::map(neg::evaluate, x);
-}
-
-
-static bool add_sub_dimension(size_t rx, size_t cx,
-                              size_t ry, size_t cy,
-                              size_t *rr, size_t *cr)
-// ----------------------------------------------------------------------------
-//   For addition and subtraction, we need identical dimensions
-// ----------------------------------------------------------------------------
-{
-    *rr = rx;
-    *cr = cx;
-    return cx == cy && rx == ry;
-}
-
-
-static algebraic_p matrix_op(object::id op,
-                             size_t r, size_t c,
-                             size_t rx, size_t cx,
-                             size_t ry, size_t cy)
-// ----------------------------------------------------------------------------
-//   Perform a matrix component-wise operation
-// ----------------------------------------------------------------------------
-{
-    size_t py = cx*rx;
-    size_t px = py + cy*ry;
-    size_t i = r * cx + c;
-    object_p x = rt.stack(px + ~i);
-    object_p y = rt.stack(py + ~i);
-    if (!x || !y)
-        return nullptr;
-    algebraic_g xa = x->as_algebraic();
-    algebraic_g ya = y->as_algebraic();
-    if (!xa || !ya)
-    {
-        rt.type_error();
-        return nullptr;
-    }
-    switch(op)
-    {
-    case object::ID_add: return xa + ya;
-    case object::ID_sub: return xa - ya;
-    case object::ID_mul: return xa * ya;
-    case object::ID_div: return xa / ya;
-    default:             rt.type_error(); return nullptr;
-    }
-}
-
-
-static algebraic_p vector_op(object::id op, size_t c, size_t cx, size_t cy)
-// ----------------------------------------------------------------------------
-//   Add two elements in a vector
-// ----------------------------------------------------------------------------
-{
-    return matrix_op(op, 0, c, 1, cx, 1, cy);
-}
-
-
-static algebraic_p vector_add(size_t c, size_t cx, size_t cy)
-// ----------------------------------------------------------------------------
-//   Addition of vector elements
-// ----------------------------------------------------------------------------
-{
-    return vector_op(object::ID_add, c, cx, cy);
-}
-
-
-static algebraic_p matrix_add(size_t r, size_t c,
-                              size_t rx, size_t cx,
-                              size_t ry, size_t cy)
-// ----------------------------------------------------------------------------
-//   Addition of matrix elements
-// ----------------------------------------------------------------------------
-{
-    return matrix_op(object::ID_add, r, c, rx, cx, ry, cy);
-}
-
-
-static algebraic_p vector_sub(size_t c, size_t cx, size_t cy)
-// ----------------------------------------------------------------------------
-//   Subtraction of vector elements
-// ----------------------------------------------------------------------------
-{
-    return vector_op(object::ID_sub, c, cx, cy);
-}
-
-
-static algebraic_p matrix_sub(size_t r, size_t c,
-                              size_t rx, size_t cx,
-                              size_t ry, size_t cy)
-// ----------------------------------------------------------------------------
-//   Subtraction of matrix elements
-// ----------------------------------------------------------------------------
-{
-    return matrix_op(object::ID_sub, r, c, rx, cx, ry, cy);
-}
-
-
-
-// ============================================================================
-//
-//    Matrix multiplication
-//
-// ============================================================================
-
-static bool mul_dimension(size_t rx, size_t cx,
-                          size_t ry, size_t cy,
-                          size_t *rr, size_t *cr)
-// ----------------------------------------------------------------------------
-//   For multiplication, need matching rows and columns
-// ----------------------------------------------------------------------------
-//   We accept matrices with matching sizes, or vectors of the same size
-{
-    *rr = rx;
-    *cr = cy;
-
-    return cx == ry || (!rx && !ry && cx == cy);
-}
-
-
-static algebraic_p vector_mul(size_t c, size_t cx, size_t cy)
-// ----------------------------------------------------------------------------
-//   Multiplication of vector elements
-// ----------------------------------------------------------------------------
-{
-    return vector_op(object::ID_mul, c, cx, cy);
-}
-
-
-static algebraic_p matrix_mul(size_t r, size_t c,
-                              size_t rx, size_t cx,
-                              size_t ry, size_t cy)
-// ----------------------------------------------------------------------------
-//   Compute one element in matrix multiplication
-// ----------------------------------------------------------------------------
-{
-    size_t py = cy*ry;
-    size_t px = py + cx*rx;
-
-    algebraic_g e;
-    if (ry != cx)
-        record(matrix_error,
-               "Inconsistent matrix size rx=%u cx=%u ry=%u cy%=u",
-               rx, cx, ry, cy);
-    for (size_t i = 0; i < cx; i++)
-    {
-        size_t ix = r * cx + i;
-        size_t iy = cy * i + c;
-        object_p x = rt.stack(px + ~ix);
-        object_p y = rt.stack(py + ~iy);
-        if (!x || !y)
-            return nullptr;
-        algebraic_g xa = x->as_algebraic();
-        algebraic_g ya = y->as_algebraic();
-        if (!xa || !ya)
-        {
-            rt.type_error();
-            return nullptr;
-        }
-        e = i ? e + xa * ya : xa * ya;
-        if (!e)
-            return nullptr;
-    }
-    return e;
 }
 
 
@@ -679,6 +516,9 @@ algebraic_p array::determinant() const
             // Find the index of first non-zero element
             bool zero = true;
             size_t index;
+
+            if (program::interrupted())
+                goto err;
 
             record(matrix, " Row %u", i);
             for (index = i; zero && index < n; index++)
@@ -770,6 +610,9 @@ algebraic_p array::determinant() const
                 // Traverse columns in this row
                 for (size_t k = 0; k < n; k++)
                 {
+                    if (program::interrupted())
+                        goto err;
+
                     size_t ixjk = j * n + k;
                     object_p mjk = rt.stack(px + ~ixjk);
                     object_p tk = rt.stack(pt + ~k);
@@ -952,6 +795,7 @@ array_p array::invert() const
             goto err;
         }
 
+        cleaner     purge;
         size_t      n   = cx;
         size_t      pt  = n * n;    // n temporary elements to save diagonal
         size_t      pm  = 2 * pt;
@@ -960,6 +804,7 @@ array_p array::invert() const
         algebraic_g tot;
         algebraic_g one = integer::make(1);
         algebraic_g zero = integer::make(0);
+        algebraic_g aa, ca, mika, mjka;
 
         // Create an identity matrix of the right size
         for (size_t i = 0; i < n; i++)
@@ -972,14 +817,17 @@ array_p array::invert() const
         // Loop across the diagonal
         for (size_t i = 0; i < n; i++)
         {
+            if (program::interrupted())
+                goto err;
+
             // Find the index of first non-zero element
-            bool zero = true;
+            bool   zero = true;
             size_t index;
 
             record(matrix, "Row %u", i);
             for (index = i; zero && index < n; index++)
             {
-                size_t ix = index * n + i;
+                size_t   ix  = index * n + i;
                 object_p xij = rt.stack(pm + ~ix);
                 if (!xij)
                     goto err;
@@ -1013,8 +861,10 @@ array_p array::invert() const
                     size_t ob = i * n + j;
                     for (uint mat = 0; mat < 2; mat++)
                     {
-                        size_t p = mat ? pt : pm;
+                        if (program::interrupted())
+                            goto err;
 
+                        size_t p = mat ? pt : pm;
                         object_p a = rt.stack(p + ~oa);
                         object_p b = rt.stack(p + ~ob);
                         rt.stack(p + ~oa, b);
@@ -1034,17 +884,18 @@ array_p array::invert() const
             }
 
             // Fetch 'a', which we now know to be non-zero
-            size_t oii = i * n + i;
-            object_p a = rt.stack(pm + ~oii);
+            size_t   oii = i * n + i;
+            object_p a   = rt.stack(pm + ~oii);
             record(matrix, "m[%u,%u]     a=%t", i, i, a);
             if (!a)
                 goto err;
-            algebraic_g aa = a->as_algebraic();
+            aa = a->as_algebraic();
             if (!aa)
                 goto err;
 
             // Loop below row i to compute r[j] = r[j] * a - r[i] * c
             record(matrix, "Zeroing sub-diagonals below %u", i);
+            cleaner purge;
             for (size_t j = i + 1; j < n; j++)
             {
                 // Fetch value on diagonal and in next row
@@ -1053,7 +904,7 @@ array_p array::invert() const
                 record(matrix, "m[%u,%u]     c=%t", j, i, c);
                 if (!c)
                     goto err;
-                algebraic_g ca = c->as_algebraic();
+                ca = c->as_algebraic();
                 if (!ca)
                     goto err;
 
@@ -1066,18 +917,19 @@ array_p array::invert() const
                     // We don't bother computing r[j] below i, they are 0
                     for (size_t k = mat ? 0 : i; k < n; k++)
                     {
-                        size_t ojk = j * n + k;
-                        size_t oik = i * n + k;
-
+                        cleaner  purge;
+                        size_t   ojk = j * n + k;
+                        size_t   oik = i * n + k;
                         object_p mjk = rt.stack(p + ~ojk);
                         object_p mik = rt.stack(p + ~oik);
                         if (!mjk || !mik)
                             goto err;
-                        algebraic_g mjka = mjk->as_algebraic();
-                        algebraic_g mika = mik->as_algebraic();
-                        if (!mjka || !mika)
-                            goto err;
+                        mjka = mjk->as_algebraic();
+                        mika = mik->as_algebraic();
                         mjka = aa * mjka - ca * mika;
+                        if (!mjka)
+                            goto err;
+                        mjka = purge(mjka);
                         rt.stack(p + ~ojk, +mjka);
                         record(matrix, "%+s[%u,%u] is now %t",
                                mat ? "t" : "m", j, k, +mjka);
@@ -1094,14 +946,16 @@ array_p array::invert() const
                 size_t p = mat ? pt : pm;
                 for (size_t k = mat ? 0 : i + 1; k < n; k++)
                 {
-                    size_t oik = i * n + k;
+                    cleaner purge;
+                    size_t   oik = i * n + k;
                     object_p mik = rt.stack(p + ~oik);
                     if (!mik)
                         goto err;
-                    algebraic_g mika = mik->as_algebraic();
+                    mika = mik->as_algebraic();
                     if (!mika)
                         goto err;
                     mika = mika / aa;
+                    mika = purge(mika);
                     rt.stack(p + ~oik, +mika);
                 }
             }
@@ -1114,27 +968,32 @@ array_p array::invert() const
                 object_p z = rt.stack(pm + ~oz);
                 if (!z)
                     goto err;
-                algebraic_g za = z->as_algebraic();
-                if (!za)
+                ca = z->as_algebraic();
+                if (!ca)
                     goto err;
 
                 // This is only needed on the right matrix
                 for (uint mat = 0; mat < 2; mat++)
                 {
+                    if (program::interrupted())
+                        goto err;
+
                     size_t p = mat ? pt : pm;
                     for (size_t k = mat ? 0 : i; k < n; k++)
                     {
-                        size_t oik = i * n + k;
-                        size_t ojk = j * n + k;
+                        cleaner  purge;
+                        size_t   oik = i * n + k;
+                        size_t   ojk = j * n + k;
                         object_p mik = rt.stack(p + ~oik);
                         object_p mjk = rt.stack(p + ~ojk);
                         if (!mik || !mjk)
                             goto err;
-                        algebraic_g mika = mik->as_algebraic();
-                        algebraic_g mjka = mjk->as_algebraic();
+                        mika = mik->as_algebraic();
+                        mjka = mjk->as_algebraic();
                         if (!mika || !mjka)
                             goto err;
-                        mjka = mjka  - za * mika;
+                        mjka = mjka  - ca * mika;
+                        mjka = purge(mjka);
                         rt.stack(p + ~ojk, +mjka);
                     }
                 }
@@ -1152,6 +1011,8 @@ array_p array::invert() const
                 scribble sv;
                 for (uint c = 0; c < n; c++)
                 {
+                    if (program::interrupted())
+                        goto err;
                     size_t orc = r * n + c;
                     object_p mrc = rt.stack(pt + ~orc);
                     if (!rt.append(mrc))
@@ -1166,6 +1027,8 @@ array_p array::invert() const
         // Return result
         rt.drop(rt.depth() - depth);
         object_p inv = list::make(atype, sr.scratch(), sr.growth());
+        sr.clear();
+        inv = purge(inv);
         record(matrix, "Result inv=%t", inv);
         return array_p(inv);
     }
@@ -1194,6 +1057,8 @@ algebraic_p array::norm_square() const
     algebraic_g sum;
     for (object_p obj : *this)
     {
+        if (program::interrupted())
+            return nullptr;
         id oty = obj->type();
         if (oty == ID_array)
         {
@@ -1247,58 +1112,211 @@ COMMAND_BODY(det)
 }
 
 
+algebraic_p array::dot(array_r &x, array_r &y)
+// ----------------------------------------------------------------------------
+//   Perform a dot product on the two arrays
+// ----------------------------------------------------------------------------
+{
+    if (!x || !y)
+        return nullptr;
+
+    array::iterator xi = x->begin();
+    array::iterator yi = y->begin();
+    size_t          count  = 0;
+    uint            xangles = 0;
+    uint            yangles = 0;
+    algebraic_g     xa, ya, sum;
+
+    cleaner         purge;
+    while (object_p xo = *xi++)
+    {
+        if (program::interrupted())
+            return nullptr;
+
+        object_p yo = *yi++;
+        if (!yo)
+        {
+            rt.dimension_error();
+            return nullptr;
+        }
+        xo = object::strip(xo);
+        yo = object::strip(yo);
+        xa = xo->as_extended_algebraic();
+        ya = yo->as_extended_algebraic();
+        if (!xa || !ya)
+        {
+            rt.type_error();
+            return nullptr;
+        }
+
+        // Check if we have a 2D or 3D polar, cylindrical or spherical vector
+        if (count < 3)
+        {
+            if (xa->as<unit>())
+                if (algebraic::adjust_angle(xa))
+                    xangles |= (1 << count);
+            if (ya->as<unit>())
+                if (algebraic::adjust_angle(ya))
+                    yangles |= (1 << count);
+        }
+        xa = xa * ya;
+        sum = sum ? sum + xa : xa;
+        if (!sum)
+            return nullptr;
+        count++;
+    }
+    sum = purge(sum);
+
+    object_p yo = *yi++;
+    if (yo)
+    {
+        rt.dimension_error();
+        return nullptr;
+    }
+
+    // Check if we actually deal with polar or cylindrical or spherical vectors
+    if (count == 2 && (xangles == 2 || yangles == 2))
+    {
+        array_g xx = xangles == 2 ? x->to_rectangular() : +x;
+        array_g yx = yangles == 2 ? y->to_rectangular() : +y;
+        xa = dot(xx, yx);
+        return xa;
+    }
+    else if (count == 3)
+    {
+        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        if (xnonrect || ynonrect)
+        {
+            array_g xx = xnonrect ? x->to_rectangular() : +x;
+            array_g yy = ynonrect ? y->to_rectangular() : +y;
+            xa = dot(xx, yy);
+            return xa;
+        }
+    }
+
+    // Normal rectangular case
+    return sum;
+}
+
+
+array_p array::cross(array_r &x, array_r &y)
+// ----------------------------------------------------------------------------
+//   Perform a cross product on the two arrays
+// ----------------------------------------------------------------------------
+{
+    if (!x || !y)
+        return nullptr;
+
+    array::iterator xi      = x->begin();
+    array::iterator yi      = y->begin();
+    size_t          count   = 0;
+    size_t          vsize   = 0;
+    uint            xangles = 0;
+    uint            yangles = 0;
+    algebraic_g     xa[3], ya[3];
+    id              xty = x->type();
+
+    cleaner         purge;
+    while (count < 3)
+    {
+        if (program::interrupted())
+            return nullptr;
+
+        object_p xo = *xi++;
+        object_p yo = *yi++;
+        bool hadx = xo;
+        bool hady = yo;
+        if (!hadx)
+            xo = integer::make(0);
+        if (!hady)
+            yo = integer::make(0);
+        xo = object::strip(xo);
+        yo = object::strip(yo);
+        xa[count] = xo->as_extended_algebraic();
+        ya[count] = yo->as_extended_algebraic();
+        if (!xa[count] || !ya[count])
+        {
+            rt.type_error();
+            return nullptr;
+        }
+
+        // Check if we have a 2D or 3D polar, cylindrical or spherical vector
+        if (hadx)
+            if (xa[count]->as<unit>())
+                if (algebraic::adjust_angle(xa[count]))
+                    xangles |= (1 << count);
+        if (hady)
+            if (ya[count]->as<unit>())
+                if (algebraic::adjust_angle(ya[count]))
+                    yangles |= (1 << count);
+        count++;
+        if (hadx || hady)
+            vsize = count;
+    }
+
+    object_p xo = *xi++;
+    object_p yo = *yi++;
+    if (xo || yo)
+    {
+        rt.dimension_error();
+        return nullptr;
+    }
+
+    // Check if we actually deal with polar or cylindrical or spherical vectors
+    if (vsize == 2 && (xangles == 2 || yangles == 2))
+    {
+        array_g xx = xangles == 2 ? x->to_rectangular() : +x;
+        array_g yy = yangles == 2 ? y->to_rectangular() : +y;
+        xx = cross(xx, yy);
+        return xx;
+    }
+    else if (vsize == 3)
+    {
+        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        if (xnonrect || ynonrect)
+        {
+            array_g xx = xnonrect ? x->to_rectangular() : +x;
+            array_g yy = ynonrect ? y->to_rectangular() : +y;
+            xx = cross(xx, yy);
+            return xx;
+        }
+    }
+
+    // Normal rectangular case
+    algebraic_g r1 = xa[1] * ya[2] - xa[2] * ya[1];
+    algebraic_g r2 = xa[2] * ya[0] - xa[0] * ya[2];
+    algebraic_g r3 = xa[0] * ya[1] - xa[1] * ya[0];
+
+    array_g result = array_p(list::make(xty, r1, r2, r3));
+    result = purge(result);
+    return result;
+}
+
+
 COMMAND_BODY(dot)
 // ----------------------------------------------------------------------------
 //   Implement a dot product
 // ----------------------------------------------------------------------------
 {
-    object_p x = rt.stack(1);
-    object_p y = rt.stack(0);
-    if (x && y)
+    if (object_p x = rt.stack(1))
     {
-        array_g xa = x->as<array>();
-        array_g ya = y->as<array>();
-        if (xa && ya && rt.drop(2))
+        if (object_p y = rt.stack(0))
         {
-            size_t      depth = rt.depth();
-            size_t      xs    = 0;
-            size_t      ys    = 0;
-            algebraic_g xi, yi;
-            if (xa->is_vector(&xs) && ya->is_vector(&ys))
-            {
-                if (xs == ys)
-                {
-                    algebraic_g result;
-                    for (size_t i = 0; i < xs; i++)
-                    {
-                        xi = rt.stack(xs + ys + ~i)->as_algebraic();
-                        yi = rt.stack(     ys + ~i)->as_algebraic();
-                        result = result ? result + xi * yi : xi * yi;
-                    }
-                    rt.drop(rt.depth() - depth);
-                    if (result && rt.push(+result))
-                        return OK;
-                }
-                else
-                {
-                    rt.dimension_error();
-                }
-            }
-            rt.drop(rt.depth() - depth);
-            rt.push(+xa);
-            rt.push(+ya);
-        }
-        else if ((xa || x->is_symbolic()) && (ya || y->is_symbolic()))
-        {
-            algebraic_g xe = x->as_algebraic_or_list();
-            algebraic_g ye = y->as_algebraic_or_list();
-            xe = expression::make(ID_dot, xe, ye);
-            if (xe && rt.drop(2) && rt.push(+xe))
-                return OK;
-        }
-        else
-        {
-            rt.type_error();
+            if (array_g xa = x->as<array>())
+                if (array_g ya = y->as<array>())
+                    if (algebraic_g r = array::dot(xa, ya))
+                        if (rt.drop() && rt.top(+r))
+                            return OK;
+            if (algebraic_g xa = x->as_algebraic())
+                if (algebraic_g ya = y->as_algebraic())
+                    if (xa->is_symbolic() || ya->is_symbolic())
+                        if (expression_g e = expression::make(ID_dot, xa, ya))
+                            if (rt.drop() && rt.top(+e))
+                                return OK;
+            if (!rt.error())
+                rt.type_error();
         }
     }
     return ERROR;
@@ -1310,60 +1328,23 @@ COMMAND_BODY(cross)
 //   Implement a cross product
 // ----------------------------------------------------------------------------
 {
-    object_p x = rt.stack(1);
-    object_p y = rt.stack(0);
-    if (x && y)
+    if (object_p x = rt.stack(1))
     {
-        array_g xa = x->as<array>();
-        array_g ya = y->as<array>();
-        if (xa && ya && rt.drop(2))
+        if (object_p y = rt.stack(0))
         {
-            size_t      depth = rt.depth();
-            size_t      xs    = 0;
-            size_t      ys    = 0;
-            algebraic_g xi, yi;
-            if (xa->is_vector(&xs) && ya->is_vector(&ys))
-            {
-                if ((xs == 2 || xs == 3) && (ys == 2 || ys == 3))
-                {
-                    algebraic_g x1 = rt.stack(xs + ys + ~0)->as_algebraic();
-                    algebraic_g x2 = rt.stack(xs + ys + ~1)->as_algebraic();
-                    algebraic_g x3 = xs == 3
-                        ? rt.stack(xs + ys + ~2)->as_algebraic()
-                        : integer::make(0);
-                    algebraic_g y1 = rt.stack(ys + ~0)->as_algebraic();
-                    algebraic_g y2 = rt.stack(ys + ~1)->as_algebraic();
-                    algebraic_g y3 = ys == 3
-                        ? rt.stack(ys + ~2)->as_algebraic()
-                        : integer::make(0);
-                    algebraic_g r1 = x2 * y3 - x3 * y2;
-                    algebraic_g r2 = x3 * y1 - x1 * y3;
-                    algebraic_g r3 = x1 * y2 - x2 * y1;
-                    algebraic_g r = list::make(ID_array, r1, r2, r3);
-                    rt.drop(rt.depth() - depth);
-                    if (r && rt.push(+r))
-                        return OK;
-                }
-                else
-                {
-                    rt.dimension_error();
-                }
-            }
-            rt.drop(rt.depth() - depth);
-            rt.push(+ya);
-            rt.push(+xa);
-        }
-        else if ((xa || x->is_symbolic()) && (ya || y->is_symbolic()))
-        {
-            algebraic_g xe = x->as_algebraic();
-            algebraic_g ye = y->as_algebraic();
-            xe = expression::make(ID_cross, xe, ye);
-            if (xe && rt.drop(2) && rt.push(+xe))
-                return OK;
-        }
-        else
-        {
-            rt.type_error();
+            if (array_g xa = x->as<array>())
+                if (array_g ya = y->as<array>())
+                    if (algebraic_g r = array::cross(xa, ya))
+                        if (rt.drop() && rt.top(r))
+                            return OK;
+            if (algebraic_g xa = x->as_algebraic())
+                if (algebraic_g ya = y->as_algebraic())
+                    if (xa->is_symbolic() || ya->is_symbolic())
+                        if (expression_g e = expression::make(ID_cross, xa, ya))
+                            if (rt.drop() && rt.top(+e))
+                                return OK;
+            if (!rt.error())
+                rt.type_error();
         }
     }
     return ERROR;
@@ -1923,197 +1904,259 @@ COMMAND_BODY(FromVector)
 
 // ============================================================================
 //
-//    Division
+//    Arithmetic operations
 //
 // ============================================================================
 
-static bool div_dimension(size_t rx, size_t cx,
-                          size_t ry, size_t cy,
-                          size_t *rr, size_t *cr)
+array_p array::add_sub(array_r x, array_r y, bool sub)
 // ----------------------------------------------------------------------------
-//   Divide vectors component-wide, or square matrices of same size
-// ----------------------------------------------------------------------------
-{
-    *rr = rx;
-    *cr = cx;
-    return (rx == cx && ry == cy && rx == ry) || (!rx && !ry && cx == cy);
-}
-
-
-static algebraic_p vector_div(size_t c, size_t cx, size_t cy)
-// ----------------------------------------------------------------------------
-//   Division of vector elements
-// ----------------------------------------------------------------------------
-{
-    return vector_op(object::ID_div, c, cx, cy);
-}
-
-
-static algebraic_p matrix_div(size_t r, size_t c,
-                              size_t rx, size_t cx,
-                              size_t ry, size_t cy)
-// ----------------------------------------------------------------------------
-//   Compute one element in matrix division
-// ----------------------------------------------------------------------------
-{
-    return matrix_op(object::ID_div, r, c, rx, cx, ry, cy);
-}
-
-
-array_p array::do_matrix(array_r x, array_r y,
-                         dimension_fn dim, vector_fn vec, matrix_fn mat)
-// ----------------------------------------------------------------------------
-//   Perform a matrix or vector operation
+//   Perform an addition or a subtraction of two vectors
 // ----------------------------------------------------------------------------
 {
     if (!x || !y)
         return nullptr;
 
-    size_t rx = 0, cx = 0, ry = 0, cy = 0, rr = 0, cr = 0;
-    size_t depth = rt.depth();
+    array::iterator xi = x->begin();
+    array::iterator yi = y->begin();
+    size_t          count  = 0;
+    uint            xangles = 0;
+    uint            yangles = 0;
+    algebraic_g     xa, ya;
+    id              xty = x->type();
 
-    // Check if either argument is non-rectangular.
-    // If so, convert to rectangular for computation, convert back to Y format
-    id xty = x->is_2Dor3D(false);
-    if (is_non_rectangular(xty))
+    cleaner         purge;
+    while (object_p xo = *xi++)
     {
-        array_g xr = x->to_rectangular();
-        return do_matrix(xr, y, dim, vec, mat);
-    }
-    id yty = y->is_2Dor3D(false);
-    if (is_non_rectangular(yty))
-    {
-        array_g yr = y->to_rectangular();
-        yr =  do_matrix(x, yr, dim, vec, mat);
-        if (yr)
+        if (program::interrupted())
+            return nullptr;
+
+        object_p yo = *yi++;
+        if (!yo)
         {
-            if (yty == ID_ToSpherical)
-                yr = yr->to_spherical();
-            else
-                yr = yr->to_polar();
+            rt.dimension_error();
+            return nullptr;
         }
-        return yr;
-    }
-
-    object::id ty = x->type();
-    if (x->is_vector(&cx))
-    {
-        if (!y->is_vector(&cy))
+        xo = object::strip(xo);
+        yo = object::strip(yo);
+        xa = xo->as_extended_algebraic();
+        ya = yo->as_extended_algebraic();
+        if (!xa || !ya)
         {
             rt.type_error();
-            goto err;
-        }
-        if (!dim(0, cx, 0, cy, &rr, &cr))
-        {
-            rt.dimension_error();
-            goto err;
+            return nullptr;
         }
 
-        cleaner purge;
-        scribble scr;
-        for (size_t c = 0; c < cx; c++)
+        // Check if we have a 2D or 3D polar, cylindrical or spherical vector
+        if (count < 3)
         {
-            cleaner purge;
-            algebraic_g e = vec(c, cx, cy);
-            e = purge(e);
-            if (!rt.append(e))
-                goto err;
+            if (xa->as<unit>())
+                if (algebraic::adjust_angle(xa))
+                    xangles |= (1 << count);
+            if (ya->as<unit>())
+                if (algebraic::adjust_angle(ya))
+                    yangles |= (1 << count);
         }
-
-        rt.drop(rt.depth() - depth);
-        array_g a = array_p(list::make(ty, scr.scratch(), scr.growth()));
-        a = purge(a);
-        return a;
+        xa = sub ? xa - ya : xa + ya;
+        if (!xa || !rt.push(+xa))
+            return nullptr;
+        count++;
     }
 
-    if (x->is_matrix(&rx, &cx))
+    object_p yo = *yi++;
+    if (yo)
     {
-        bool vector = false;
-        if (!y->is_matrix(&ry, &cy))
+        rt.dimension_error();
+        return nullptr;
+    }
+
+    // Check if we actually deal with polar or cylindrical or spherical vectors
+    if (count == 2 && (xangles == 2 || yangles == 2))
+    {
+        rt.drop(count);
+        array_g xx = xangles == 2 ? x->to_rectangular() : +x;
+        array_g yy = yangles == 2 ? y->to_rectangular() : +y;
+        xx = add_sub(xx, yy, sub);
+        if (yangles == 2)
+            xx = xx->to_polar();
+        return xx;
+    }
+    else if (count == 3)
+    {
+        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        if (xnonrect || ynonrect)
         {
-            if (mat == matrix_mul && y->is_vector(&ry))
+            rt.drop(count);
+            array_g xx = xnonrect ? x->to_rectangular() : +x;
+            array_g yy = ynonrect ? y->to_rectangular() : +y;
+            xx = add_sub(xx, yy, sub);
+            if (yangles == 2 || yangles == 4)
+                xx = xx->to_cylindrical();
+            else if (yangles == 6)
+                xx = xx->to_spherical();
+            return xx;
+        }
+    }
+
+    // Normal rectangular case
+    array_p result = array_p(list::list_from_stack(count, xty));
+    result = purge(result);
+    return result;
+}
+
+
+array_p array::mul(array_r x, array_r y)
+// ----------------------------------------------------------------------------
+//   Multiply two arrays
+// ----------------------------------------------------------------------------
+//  [[a b][c d]] * [x y]        = [a*x+b*y c*x+d*y]
+//  [[a b][c d]] * [[e f][g h]] = [[a*e+b*g a*f+b*h][c*e+d*g c*f+d*h]]
+//  [a*[e f] + b*[g h] c*[e f]+d*[g h]]
+//  [[a*e a*f]+[b*g b*h] [c*e c*f]+[d*g d*h]]
+//  [[a*e+b*g a*f+b*h][c*e+d*g c*f+d*h]]
+//
+{
+    if (!x || !y)
+        return nullptr;
+
+    array::iterator xi = x->begin();
+    array::iterator yi = y->begin();
+    size_t          count  = 0;
+    uint            xangles = 0;
+    uint            yangles = 0;
+    id              xty = x->type();
+    algebraic_g     xa, ya;
+    array_g         xrow;
+    enum { UNKNOWN, MATRIX, VECTOR } matvec = UNKNOWN;
+
+    cleaner         purge;
+    while (object_p xo = *xi++)
+    {
+        if (program::interrupted())
+            return nullptr;
+
+        cleaner purge;
+        xo = object::strip(xo);
+        xa = xo->as_extended_algebraic();
+        if (!xa)
+        {
+            rt.type_error();
+            return nullptr;
+        }
+
+        xrow = xa->as<array>();
+        if (xrow)
+        {
+            if (matvec == VECTOR)
             {
-                // We can multiply a matrix by a vector
-                cy = 1;
-                vector = true;
+                rt.dimension_error();
+                return nullptr;
             }
-            else
+
+            // Need a dot product
+            xa = array::dot(xrow, y);
+            matvec = MATRIX;
+        }
+        else
+        {
+            object_p yo = *yi++;
+            if (!yo || matvec == MATRIX)
+            {
+                rt.dimension_error();
+                return nullptr;
+            }
+            yo = object::strip(yo);
+            ya = yo->as_extended_algebraic();
+            if (!ya)
             {
                 rt.type_error();
-                goto err;
+                return nullptr;
             }
-        }
-        if (!dim(rx, cx, ry, cy, &rr, &cr))
-        {
-            rt.dimension_error();
-            goto err;
-        }
 
-        // Special case of matrix division
-        if (mat == matrix_div)
-        {
-            rt.drop(rt.depth() - depth);
-            array_g ya = y->invert();
-            return do_matrix(ya, x, mul_dimension, vector_mul, matrix_mul);
-        }
-
-        cleaner purge;
-        scribble scr;
-        for (size_t r = 0; r < rr; r++)
-        {
-            object_g row = nullptr;
-            if (vector)
+            // Check if 2D or 3D polar, cylindrical or spherical vector
+            if (count < 3)
             {
-                cleaner purge;
-                row = object_p(mat(r, 0, rx, cx, ry, cy));
-                row = purge(row);
+                if (xa->as<unit>())
+                    if (algebraic::adjust_angle(xa))
+                        xangles |= (1 << count);
+                if (ya->as<unit>())
+                    if (algebraic::adjust_angle(ya))
+                        yangles |= (1 << count);
             }
-            else
-            {
-                cleaner purge;
-                scribble sr;
-                for (size_t c = 0; c < cr; c++)
-                {
-                    cleaner purge;
-                    algebraic_g e = mat(r, c, rx, cx, ry, cy);
-                    e = purge(e);
-                    if (!rt.append(e))
-                        goto err;
-                }
-                row = object_p(list::make(ty, sr.scratch(), sr.growth()));
-                row = purge(row);
-            }
-            if (!rt.append(row))
-                goto err;
+            xa = xa * ya;
+            matvec = VECTOR;
         }
-
-        rt.drop(rt.depth() - depth);
-        array_g a = array_p(list::make(ty, scr.scratch(), scr.growth()));
-        a = purge(a);
-        return a;
+        xa = purge(xa);
+        if (!xa || !rt.push(+xa))
+            return nullptr;
+        count++;
     }
 
-err:
-    rt.drop(rt.depth() - depth);
-    return nullptr;
+    if (matvec != MATRIX)
+    {
+        object_p yo = *yi++;
+        if (yo)
+        {
+            rt.dimension_error();
+            return nullptr;
+        }
+    }
+
+    // Check if we actually deal with polar or cylindrical or spherical vectors
+    if (count == 2 && (xangles == 2 || yangles == 2))
+    {
+        rt.drop(count);
+        array_g xx = xangles == 2 ? x->to_rectangular() : +x;
+        array_g yy = yangles == 2 ? y->to_rectangular() : +y;
+        xx = mul(xx, yy);
+        if (yangles == 2)
+            xx = xx->to_polar();
+        return xx;
+    }
+    else if (count == 3)
+    {
+        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        if (xnonrect || ynonrect)
+        {
+            rt.drop(count);
+            array_g xx = xnonrect ? x->to_rectangular() : +x;
+            array_g yy = ynonrect ? y->to_rectangular() : +y;
+            xx = mul(xx, yy);
+            if (yangles == 2 || yangles == 4)
+                xx = xx->to_cylindrical();
+            else if (yangles == 6)
+                xx = xx->to_spherical();
+            return xx;
+        }
+    }
+
+    // Normal rectangular case
+    array_p result = array_p(list::list_from_stack(count, xty));
+    result = purge(result);
+    return result;
 }
+
+
 
 
 array_p operator+(array_r x, array_r y)
 // ----------------------------------------------------------------------------
-//   Add two arrays
+//   Add two arrays: do element-wise addition
 // ----------------------------------------------------------------------------
+//   This also works when adding matrices as vectors of vectors
+//   As a result, this works with non-rectangular arrays, or [[[1]]] + [[[2]]]
 {
-    return array::do_matrix(x, y, add_sub_dimension, vector_add, matrix_add);
+    return array::add_sub(x, y, false);
 }
 
 
 array_p operator-(array_r x, array_r y)
 // ----------------------------------------------------------------------------
-//   Subtract two arrays
+//   Subtract two arrays: do element-wise subtraction
 // ----------------------------------------------------------------------------
 {
-    return array::do_matrix(x, y, add_sub_dimension, vector_sub, matrix_sub);
+    return array::add_sub(x, y, true);
 }
 
 
@@ -2121,15 +2164,23 @@ array_p operator*(array_r x, array_r y)
 // ----------------------------------------------------------------------------
 //   Multiply two arrays
 // ----------------------------------------------------------------------------
+//  [[a b][c d]] * [x y]        = [a*x+b*y c*x+d*y]
+//  [[a b][c d]] * [[e f][g h]] = [[a*e+b*g a*f+b*h][c*e+d*g c*f+d*h]]
+//  [a*[e f] + b*[g h] c*[e f]+d*[g h]]
+//  [[a*e a*f]+[b*g b*h] [c*e c*f]+[d*g d*h]]
+//  [[a*e+b*g a*f+b*h][c*e+d*g c*f+d*h]]
+//
 {
-    return array::do_matrix(x, y, mul_dimension, vector_mul, matrix_mul);
+    return array::mul(x, y);
 }
-
 
 array_p operator/(array_r x, array_r y)
 // ----------------------------------------------------------------------------
 //   Divide two arrays
 // ----------------------------------------------------------------------------
 {
-    return array::do_matrix(x, y, div_dimension, vector_div, matrix_div);
+    array_g yi = y->invert();
+    if (!yi)
+        return nullptr;
+    return array::mul(yi, x);
 }

@@ -77,6 +77,11 @@ struct xlib : constant
         return do_value(library);
     }
 
+    object_p            attach() const;
+    object_p            detach() const;
+    static bool         operation(object_p obj, object_p (xlib::*op)() const);
+    static xlib_p       from_object(object_p obj);
+
     static const config library;
     OBJECT_DECL(xlib);
     PARSE_DECL(xlib);
@@ -106,5 +111,9 @@ struct library_menu : constant_menu
 COMMAND_DECLARE_INSERT_HELP(XlibName,-1);
 COMMAND_DECLARE_INSERT_HELP(XlibValue,-1);
 COMMAND_DECLARE(XLib, 1);
+
+COMMAND_DECLARE(Attach, 1);
+COMMAND_DECLARE(Detach, 1);
+COMMAND_DECLARE(Libs, 0);
 
 #endif // LIBRARY_H

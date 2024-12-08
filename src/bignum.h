@@ -180,14 +180,14 @@ public:
     static id product_type(id yt, id xt);
 
     template<bool extend, typename Op>
-    static bignum_g binary(Op op, bignum_r x, bignum_r y, id ty);
+    static bignum_p binary(Op op, bignum_r x, bignum_r y, id ty);
     template<bool extend, typename Op>
-    static bignum_g unary(Op op, bignum_r x);
+    static bignum_p unary(Op op, bignum_r x);
 
-    static bignum_g add_sub(bignum_r y, bignum_r x, bool subtract);
-    static bignum_g multiply(bignum_r y, bignum_r x, id ty);
+    static bignum_p add_sub(bignum_r y, bignum_r x, bool subtract);
+    static bignum_p multiply(bignum_r y, bignum_r x, id ty);
     static bool quorem(bignum_r y, bignum_r x, id ty, bignum_g *q, bignum_g *r);
-    static bignum_g pow(bignum_r y, bignum_r x);
+    static bignum_p pow(bignum_r y, bignum_r x);
     static bignum_p shift(bignum_r x, int bits, bool rotate, bool arith);
 
     static bignum_p promote(object_p ival);
@@ -272,20 +272,20 @@ inline bool operator!=(bignum_r y, bignum_r x)
 }
 
 
-bignum_g operator- (bignum_r x);
-bignum_g operator~ (bignum_r x);
-bignum_g operator+ (bignum_r y, bignum_r x);
-bignum_g operator- (bignum_r y, bignum_r x);
-bignum_g operator* (bignum_r y, bignum_r x);
-bignum_g operator/ (bignum_r y, bignum_r x);
-bignum_g operator% (bignum_r y, bignum_r x);
-bignum_g operator& (bignum_r y, bignum_r x);
-bignum_g operator| (bignum_r y, bignum_r x);
-bignum_g operator^ (bignum_r y, bignum_r x);
-bignum_g operator<<(bignum_r y, bignum_r x);
-bignum_g operator>>(bignum_r y, bignum_r x);
-bignum_g operator<<(bignum_r y, uint x);
-bignum_g operator>>(bignum_r y, uint x);
+bignum_p operator- (bignum_r x);
+bignum_p operator~ (bignum_r x);
+bignum_p operator+ (bignum_r y, bignum_r x);
+bignum_p operator- (bignum_r y, bignum_r x);
+bignum_p operator* (bignum_r y, bignum_r x);
+bignum_p operator/ (bignum_r y, bignum_r x);
+bignum_p operator% (bignum_r y, bignum_r x);
+bignum_p operator& (bignum_r y, bignum_r x);
+bignum_p operator| (bignum_r y, bignum_r x);
+bignum_p operator^ (bignum_r y, bignum_r x);
+bignum_p operator<<(bignum_r y, bignum_r x);
+bignum_p operator>>(bignum_r y, bignum_r x);
+bignum_p operator<<(bignum_r y, uint x);
+bignum_p operator>>(bignum_r y, uint x);
 
 
 
@@ -307,7 +307,7 @@ inline size_t bignum::wordsize(id type)
 
 
 template <bool extend, typename Op>
-bignum_g bignum::binary(Op op, bignum_r xg, bignum_r yg, id ty)
+bignum_p bignum::binary(Op op, bignum_r xg, bignum_r yg, id ty)
 // ----------------------------------------------------------------------------
 //   Perform binary operation op on bignum values xg and yg
 // ----------------------------------------------------------------------------
@@ -396,7 +396,7 @@ bignum_g bignum::binary(Op op, bignum_r xg, bignum_r yg, id ty)
 
 
 template<bool extend, typename Op>
-bignum_g bignum::unary(Op op, bignum_r xg)
+bignum_p bignum::unary(Op op, bignum_r xg)
 // ----------------------------------------------------------------------------
 //   Perform a unary operation on a bignum
 // ----------------------------------------------------------------------------

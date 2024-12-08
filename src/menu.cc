@@ -1554,6 +1554,9 @@ MENU(FilesMenu,
 // ----------------------------------------------------------------------------
 //   Files and disk operations
 // ----------------------------------------------------------------------------
+     "Libs",    ID_Libs,
+     "Attach",  ID_Attach,
+     "Detach",  ID_Detach,
      "Open",    ID_Unimplemented,
      "Close",   ID_Unimplemented,
      "Read",    ID_Unimplemented,

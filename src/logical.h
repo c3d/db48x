@@ -44,7 +44,7 @@ struct logical : arithmetic
 
     static int       as_truth(object_p obj);
     typedef ularge   (*binary_fn)(ularge x, ularge y);
-    typedef bignum_p (*big_binary_fn)(bignum_r x, bignum_r y);
+    typedef bignum_p (*big_binary_fn)(bignum_g x, bignum_g y);
     static result    evaluate(binary_fn opn, big_binary_fn opb, bool num);
     typedef ularge   (*unary_fn)(ularge x);
     typedef bignum_p (*big_unary_fn)(bignum_r x);
@@ -98,8 +98,8 @@ struct derived : logical                                                \
     }                                                                   \
                                                                         \
     enum { numerical = num };                                           \
-    static ularge    native(ularge Y, ularge X)        { return code; } \
-    static bignum_p  bignum(bignum_r Y, bignum_r X)    { return code; } \
+    static ularge    native(ularge Y, ularge X)        { code; }        \
+    static bignum_p  bignum(bignum_g Y, bignum_g X)    { code; }        \
 }
 
 
@@ -127,39 +127,39 @@ struct derived : logical                                                \
         return evaluate<derived>();                                     \
     }                                                                   \
     enum { numerical = num };                                           \
-    static ularge    native(ularge X)           { return code; }        \
-    static bignum_p  bignum(bignum_r X)         { return code; }        \
+    static ularge    native(ularge X)           { code; }               \
+    static bignum_p  bignum(bignum_r X)         { code; }               \
 }
 
 
-BINARY_LOGICAL(And,      LOGICAL,       Y &  X);
-BINARY_LOGICAL(Or,       LOGICAL,       Y |  X);
-BINARY_LOGICAL(Xor,      LOGICAL,       Y ^  X);
-BINARY_LOGICAL(NAnd,     LOGICAL,     ~(Y &  X));
-BINARY_LOGICAL(NOr,      LOGICAL,     ~(Y |  X));
-BINARY_LOGICAL(Implies,  RELATIONAL,   ~Y |  X);
-BINARY_LOGICAL(Equiv,    RELATIONAL,  ~(Y ^  X));
-BINARY_LOGICAL(Excludes, RELATIONAL,    Y & ~X); // If Y then X=0
-UNARY_LOGICAL(Not,                      ~X);
+BINARY_LOGICAL(And,      LOGICAL,       return   Y &  X);
+BINARY_LOGICAL(Or,       LOGICAL,       return   Y |  X);
+BINARY_LOGICAL(Xor,      LOGICAL,       return  Y ^  X);
+BINARY_LOGICAL(NAnd,     LOGICAL,       X = Y & X; return ~X);
+BINARY_LOGICAL(NOr,      LOGICAL,       X = Y | X; return ~X);
+BINARY_LOGICAL(Implies,  RELATIONAL,    Y = ~Y; return Y |  X);
+BINARY_LOGICAL(Equiv,    RELATIONAL,    X = Y ^ X; return ~X);
+BINARY_LOGICAL(Excludes, RELATIONAL,    X = ~X; return  Y & X);
+UNARY_LOGICAL(Not,                      return ~X);
 
-UNARY_LOGICAL_NUM(RL,                   rol(X));
-UNARY_LOGICAL_NUM(RR,                   ror(X));
-UNARY_LOGICAL_NUM(RLB,                  rol(X, 8));
-UNARY_LOGICAL_NUM(RRB,                  ror(X, 8));
-UNARY_LOGICAL_NUM(SL,                   X << 1U);
-UNARY_LOGICAL_NUM(SR,                   X >> 1U);
-UNARY_LOGICAL_NUM(ASR,                  asr(X));
-UNARY_LOGICAL_NUM(SLB,                  X << 8U);
-UNARY_LOGICAL_NUM(SRB,                  X >> 8U);
-UNARY_LOGICAL_NUM(ASRB,                 asr(X, 8U));
+UNARY_LOGICAL_NUM(RL,                   return rol(X));
+UNARY_LOGICAL_NUM(RR,                   return ror(X));
+UNARY_LOGICAL_NUM(RLB,                  return rol(X, 8));
+UNARY_LOGICAL_NUM(RRB,                  return ror(X, 8));
+UNARY_LOGICAL_NUM(SL,                   return X << 1U);
+UNARY_LOGICAL_NUM(SR,                   return X >> 1U);
+UNARY_LOGICAL_NUM(ASR,                  return asr(X));
+UNARY_LOGICAL_NUM(SLB,                  return X << 8U);
+UNARY_LOGICAL_NUM(SRB,                  return X >> 8U);
+UNARY_LOGICAL_NUM(ASRB,                 return asr(X, 8U));
 
-BINARY_LOGICAL_NUM(SLC,     LOGICAL,    Y << X);
-BINARY_LOGICAL_NUM(SRC,     LOGICAL,    Y >> X);
-BINARY_LOGICAL_NUM(ASRC,    LOGICAL,    asr(Y, X));
-BINARY_LOGICAL_NUM(RLC,     LOGICAL,    rol(Y, X));
-BINARY_LOGICAL_NUM(RRC,     LOGICAL,    ror(Y, X));
-BINARY_LOGICAL_NUM(SetBit,  LOGICAL,    Y |  bit(X));
-BINARY_LOGICAL_NUM(ClearBit,LOGICAL,    Y & ~bit(X));
-BINARY_LOGICAL_NUM(FlipBit, LOGICAL,    Y ^  bit(X));
+BINARY_LOGICAL_NUM(SLC,     LOGICAL,    return Y << X);
+BINARY_LOGICAL_NUM(SRC,     LOGICAL,    return Y >> X);
+BINARY_LOGICAL_NUM(ASRC,    LOGICAL,    return asr(Y, X));
+BINARY_LOGICAL_NUM(RLC,     LOGICAL,    return rol(Y, X));
+BINARY_LOGICAL_NUM(RRC,     LOGICAL,    return ror(Y, X));
+BINARY_LOGICAL_NUM(SetBit,  LOGICAL,    return Y |  bit(X));
+BINARY_LOGICAL_NUM(ClearBit,LOGICAL,    return Y & ~bit(X));
+BINARY_LOGICAL_NUM(FlipBit, LOGICAL,    return Y ^  bit(X));
 
 #endif // LOGICAL_H

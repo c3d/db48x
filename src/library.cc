@@ -129,25 +129,11 @@ EVAL_BODY(xlib)
 //   Library entries evaluate like a program entry
 // ----------------------------------------------------------------------------
 {
-    uint index = o->index();
-
-    object_p value = rt.xlib(index);
-    if (!value)
-    {
-        // Resize the cache if needed
-        if (index >= rt.xlibs())
-            if (!rt.attach(index+1))
-                return ERROR;
-
-        value = o->value();
-        if (!value)
-        {
-            rt.invalid_xlib_error();
-            return ERROR;
-        }
-        rt.xlib(index, value);
-    }
-    return program::run_program(value);
+    if (object_p value = o->attach())
+        return program::run_program(value);
+    if (!rt.error())
+        rt.invalid_xlib_error();
+    return ERROR;
 }
 
 
@@ -211,6 +197,97 @@ utf8 library_menu::name(id type, size_t &len)
 // ----------------------------------------------------------------------------
 {
     return do_name(xlib::library, type, len);
+}
+
+
+object_p xlib::attach() const
+// ----------------------------------------------------------------------------
+//   Attach the library at the given index
+// ----------------------------------------------------------------------------
+{
+    xlib_g   xl    = this;
+    uint     idx   = xl->index();
+
+    object_p value = rt.xlib(idx);
+    if (!value)
+    {
+        // Resize the cache if needed
+        if (idx >= rt.xlibs())
+            if (!rt.attach(idx+1))
+                return nullptr;;
+
+        value = xl->value();
+        if (!value)
+        {
+            rt.invalid_xlib_error();
+            return nullptr;
+        }
+        rt.xlib(idx, value);
+    }
+    return value;
+}
+
+
+object_p xlib::detach() const
+// ----------------------------------------------------------------------------
+//   Detach the library at the given index
+// ----------------------------------------------------------------------------
+{
+    xlib_g   xl    = this;
+    uint     idx   = xl->index();
+    if (idx < rt.xlibs())
+        rt.xlib(idx, nullptr);
+    return +xl;
+}
+
+
+xlib_p xlib::from_object(object_p obj)
+// ----------------------------------------------------------------------------
+//   Find the library item associated with an xlib, a name or an index
+// ----------------------------------------------------------------------------
+{
+    xlib_g lib = obj->as_quoted<xlib>();
+    if (!lib)
+    {
+        if (object_p inner = obj->as_quoted())
+            obj = inner;
+        if (text_g name = obj->as<text, symbol>())
+        {
+            size_t sz = 0;
+            utf8 lname = name->value(&sz);
+            lib = xlib_p(do_lookup(library, lname, sz, true));
+        }
+        else
+        {
+            uint idx = obj->as_uint32(0, true);
+            if (rt.error())
+                return nullptr;
+            lib = xlib::make(idx);
+        }
+    }
+    return lib;
+}
+
+
+bool xlib::operation(object_p obj, object_p (xlib::*op)() const)
+// ----------------------------------------------------------------------------
+//   Perform an operation on the given item or items
+// ----------------------------------------------------------------------------
+{
+    if (list_p lst = obj->as_array_or_list())
+    {
+        for (object_p obj : *lst)
+            if (!operation(obj, op))
+                return false;
+        return true;
+    }
+
+    if (xlib_p lib = xlib::from_object(obj))
+        if ((lib->*op)())
+            return true;
+    if (!rt.error())
+        rt.type_error();
+    return false;
 }
 
 
@@ -299,4 +376,66 @@ COMMAND_BODY(XLib)
 // ----------------------------------------------------------------------------
 {
     return xlib::lookup_command(xlib::library, false);
+}
+
+
+COMMAND_BODY(Attach)
+// ----------------------------------------------------------------------------
+//   Attach a library, i.e. ensure it is loaded in the cache
+// ----------------------------------------------------------------------------
+{
+    object_g obj = rt.pop();
+    if (xlib::operation(obj, &xlib::attach))
+        return OK;
+    rt.push(obj);
+    return ERROR;
+}
+
+
+COMMAND_BODY(Detach)
+// ----------------------------------------------------------------------------
+//   Detach a library, i.e. ensure it is no longer loaded in the cache
+// ----------------------------------------------------------------------------
+{
+    object_g obj = rt.pop();
+    if (xlib::operation(obj, &xlib::detach))
+    {
+        size_t nlibs   = rt.xlibs();
+        size_t highest = 0;
+        for (size_t i = 0; i < nlibs; i++)
+        {
+            if (rt.xlib(nlibs + ~i))
+            {
+                highest = nlibs - i;
+                break;
+            }
+        }
+        if (highest < nlibs)
+            rt.attach(highest);
+        return OK;
+    }
+    rt.push(obj);
+    return ERROR;
+}
+
+
+COMMAND_BODY(Libs)
+// ----------------------------------------------------------------------------
+//   List the currently attached libraries
+// ----------------------------------------------------------------------------
+{
+    size_t depth = rt.depth();
+    for (size_t i = 0; i < rt.xlibs(); i++)
+    {
+        if (rt.xlib(i))
+        {
+            xlib_p xl = xlib::make(i);
+            if (!rt.push(xl))
+            {
+                rt.drop(rt.depth() - depth);
+                return ERROR;
+            }
+        }
+    }
+    return list::push_list_from_stack(rt.depth() - depth);
 }

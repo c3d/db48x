@@ -524,16 +524,16 @@ COMMAND_BODY(Disp)
                             valign = al;
                 }
             }
+            else if (pos->is_based())
+            {
+                algebraic_g ya = algebraic_p(+pos);
+                y = ppar.pixel_y(ya);
+            }
             else if (pos->is_algebraic())
             {
                 algebraic_g ya = algebraic_p(+pos);
                 ya = ya * integer::make(LCD_H/8);
                 y = ya->as_uint32(0, false) - (LCD_H/8);
-            }
-            else if (pos->is_based())
-            {
-                algebraic_g ya = algebraic_p(+pos);
-                y = ppar.pixel_y(ya);
             }
             else
             {

@@ -559,19 +559,24 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
     case ID_neg_decimal:
         return decimal_promotion(x);
     case ID_constant:
+    case ID_xlib:
         x = constant_p(+x)->value();
-        return true;
+        if (x)
+        {
+            if (expression_p expr = x->as<expression>())
+            {
+                settings::SaveNumericalResults save(true);
+                x = expr->evaluate();
+            }
+        }
+        return x && !rt.error();
     case ID_expression:
         if (!unit::mode)
         {
             expression_p eq = expression_p(+x);
             settings::SaveNumericalResults save(true);
-            result r = eq->run();
-            if (r == OK)
-                if (object_p obj = rt.pop())
-                    if (algebraic_p alg = obj->as_algebraic())
-                        x = alg;
-            return !rt.error();
+            x = eq->evaluate();
+            return x && !rt.error();
         }
         // fallthrough
     default:
@@ -859,4 +864,13 @@ algebraic_p algebraic::as_numeric_constant() const
     if (is_numeric_constant())
         return this;
     return nullptr;
+}
+
+
+algebraic_p algebraic::zero_divide(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Deal with division by zero
+// ----------------------------------------------------------------------------
+{
+    return rt.zero_divide(x && x->is_negative(false));
 }

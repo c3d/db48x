@@ -113,7 +113,8 @@ Run fedora and enter:
 
 ```bash
 sudo dnf install make
-sudo dnf install arm-none-eabi-gcc arm-none-eabi-gcc-cs-c++ arm-none-eabi-newlibsudo dnf install qt-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel
+sudo dnf install arm-none-eabi-gcc arm-none-eabi-gcc-cs-c++ arm-none-eabi-newlib
+sudo dnf install qt-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel
 sudo dnf install freetype-devel
 sudo dnf install rsync
 sudo dnf upgrade --refresh
@@ -125,8 +126,8 @@ Run fedora and enter:
 
 ```bash
 git clone https://github.com/c3d/db48x.git
-git submodule update --init --recursive
 cd db48x
+git submodule update --init --recursive
 ```
 
 And then run the following to build DB48x:

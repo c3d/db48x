@@ -29,6 +29,7 @@
 
 #include "bignum.h"
 
+#include "arithmetic.h"
 #include "fraction.h"
 #include "integer.h"
 #include "parser.h"
@@ -359,7 +360,7 @@ inline object::id bignum::opposite_type(id type)
 }
 
 
-bignum_g operator-(bignum_r xg)
+bignum_p operator-(bignum_r xg)
 // ----------------------------------------------------------------------------
 //   Negate the input value
 // ----------------------------------------------------------------------------
@@ -379,7 +380,7 @@ bignum_g operator-(bignum_r xg)
 }
 
 
-bignum_g operator~(bignum_r x)
+bignum_p operator~(bignum_r x)
 // ----------------------------------------------------------------------------
 //   Boolean not
 // ----------------------------------------------------------------------------
@@ -395,7 +396,7 @@ bignum_g operator~(bignum_r x)
 }
 
 
-bignum_g bignum::add_sub(bignum_r y, bignum_r x, bool issub)
+bignum_p bignum::add_sub(bignum_r y, bignum_r x, bool issub)
 // ----------------------------------------------------------------------------
 //   Add the two bignum values
 // ----------------------------------------------------------------------------
@@ -437,25 +438,37 @@ bignum_g bignum::add_sub(bignum_r y, bignum_r x, bool issub)
 }
 
 
-bignum_g operator+(bignum_r y, bignum_r x)
+template <bignum_p (*code)(bignum_r, bignum_r)>
+arithmetic_fn target(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//  Target function for bignum objects
+// ----------------------------------------------------------------------------
+{
+    return x->is_bignum() && y->is_bignum() ? arithmetic_fn(code) : nullptr;
+}
+
+
+bignum_p operator+(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Add the two bignum values, result has type of x
 // ----------------------------------------------------------------------------
 {
+    add::remember(target< operator+ >);
     return bignum::add_sub(y, x, false);
 }
 
 
-bignum_g operator-(bignum_r y, bignum_r x)
+bignum_p operator-(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Subtract two bignum values, result has type of x
 // ----------------------------------------------------------------------------
 {
+    sub::remember(target< operator- >);
     return bignum::add_sub(y, x, true);
 }
 
 
-bignum_g operator&(bignum_r y, bignum_r x)
+bignum_p operator&(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Perform a binary and operation
 // ----------------------------------------------------------------------------
@@ -464,7 +477,7 @@ bignum_g operator&(bignum_r y, bignum_r x)
 }
 
 
-bignum_g operator|(bignum_r y, bignum_r x)
+bignum_p operator|(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Perform a binary or operation
 // ----------------------------------------------------------------------------
@@ -473,7 +486,7 @@ bignum_g operator|(bignum_r y, bignum_r x)
 }
 
 
-bignum_g operator^(bignum_r y, bignum_r x)
+bignum_p operator^(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Perform a binary xor operation
 // ----------------------------------------------------------------------------
@@ -482,7 +495,7 @@ bignum_g operator^(bignum_r y, bignum_r x)
 }
 
 
-bignum_g bignum::multiply(bignum_r yg, bignum_r xg, id ty)
+bignum_p bignum::multiply(bignum_r yg, bignum_r xg, id ty)
 // ----------------------------------------------------------------------------
 //   Perform multiply operation on the two big nums, with result type ty
 // ----------------------------------------------------------------------------
@@ -550,13 +563,14 @@ bignum_g bignum::multiply(bignum_r yg, bignum_r xg, id ty)
 }
 
 
-bignum_g operator*(bignum_r y, bignum_r x)
+bignum_p operator*(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Multiplication of bignums
 // ----------------------------------------------------------------------------
 {
     if (!x || !y)
         return nullptr;
+    mul::remember(target< operator* >);
     object::id xt = x->type();
     object::id yt = y->type();
     object::id prodtype = bignum::product_type(yt, xt);
@@ -678,30 +692,49 @@ bool bignum::quorem(bignum_r yg, bignum_r xg, id ty, bignum_g *q, bignum_g *r)
 }
 
 
-bignum_g operator/(bignum_r y, bignum_r x)
+static bignum_p divide_and_optimize(bignum_r y, bignum_r x)
+// ----------------------------------------------------------------------------
+//   Invoked we are called through the arithmetic optimization target
+// ----------------------------------------------------------------------------
+{
+    object::id yt = y->type();
+    object::id xt = x->type();
+    object::id prodtype = bignum::product_type(yt, xt);
+    bignum_g q, r;
+    bignum::quorem(y, x, prodtype, &q, &r);
+    if (r->is_zero())
+        return q;
+    return bignum_p(big_fraction::make(y, x));
+}
+
+
+bignum_p operator/(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Perform long division of y by x
 // ----------------------------------------------------------------------------
 {
     if (!x || !y)
         return nullptr;
+    // Can't do: div::remember(target<operator/>);
+    // because the division can generate fractions
+    div::remember(target<divide_and_optimize>);
     object::id yt = y->type();
     object::id xt = x->type();
     object::id prodtype = bignum::product_type(yt, xt);
-
-    bignum_g q = nullptr;
+    bignum_g q;
     bignum::quorem(y, x, prodtype, &q, nullptr);
     return q;
 }
 
 
-bignum_g operator%(bignum_r y, bignum_r x)
+bignum_p operator%(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //  Perform long-remainder of y by x
 // ----------------------------------------------------------------------------
 {
     if (!x || !y)
         return nullptr;
+    rem::remember(target< operator% >);
     object::id yt = y->type();
     bignum_g r = nullptr;
     bignum::quorem(y, x, yt, nullptr, &r);
@@ -709,7 +742,7 @@ bignum_g operator%(bignum_r y, bignum_r x)
 }
 
 
-bignum_g bignum::pow(bignum_r yr, bignum_r xr)
+bignum_p bignum::pow(bignum_r yr, bignum_r xr)
 // ----------------------------------------------------------------------------
 //    Compute y^abs(x)
 // ----------------------------------------------------------------------------
@@ -717,6 +750,7 @@ bignum_g bignum::pow(bignum_r yr, bignum_r xr)
 {
     if (!xr || !yr)
         return nullptr;
+    pow::remember(target<pow>);
     bignum_g r  = bignum::make(1);
     size_t   xs = 0;
     byte_p   x  = xr->value(&xs);
@@ -903,7 +937,7 @@ bignum_p bignum::shift(bignum_r xg, int bits, bool rotate, bool arith)
 }
 
 
-bignum_g operator<<(bignum_r y, bignum_r x)
+bignum_p operator<<(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //   Shift left
 // ----------------------------------------------------------------------------
@@ -917,7 +951,7 @@ bignum_g operator<<(bignum_r y, bignum_r x)
 }
 
 
-bignum_g operator>>(bignum_r y, bignum_r x)
+bignum_p operator>>(bignum_r y, bignum_r x)
 // ----------------------------------------------------------------------------
 //  Shift right (as an unsigned)
 // ----------------------------------------------------------------------------
@@ -931,7 +965,7 @@ bignum_g operator>>(bignum_r y, bignum_r x)
 }
 
 
-bignum_g operator<<(bignum_r y, uint x)
+bignum_p operator<<(bignum_r y, uint x)
 // ----------------------------------------------------------------------------
 //   Shift left
 // ----------------------------------------------------------------------------
@@ -942,7 +976,7 @@ bignum_g operator<<(bignum_r y, uint x)
 }
 
 
-bignum_g operator>>(bignum_r y, uint x)
+bignum_p operator>>(bignum_r y, uint x)
 // ----------------------------------------------------------------------------
 //  Shift right (as an unsigned)
 // ----------------------------------------------------------------------------

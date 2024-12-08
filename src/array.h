@@ -87,16 +87,6 @@ struct array : list
     static array_p build(size_t rows, size_t columns,
                          item_fn items, void *data = nullptr);
 
-    // Compute the result at row r column c from stack-exploded input
-    typedef algebraic_p (*vector_fn)(size_t c, size_t cx, size_t cy);
-    typedef algebraic_p (*matrix_fn)(size_t r, size_t c,
-                                     size_t rx, size_t cx,
-                                     size_t ry, size_t cy);
-    typedef bool (*dimension_fn)(size_t rx, size_t cx, size_t ry, size_t cy,
-                                 size_t *rr, size_t *cr);
-    static array_p      do_matrix(array_r x, array_r y,
-                                  dimension_fn d, vector_fn v, matrix_fn m);
-
     algebraic_p         determinant() const;
     algebraic_p         norm_square() const;
     algebraic_p         norm() const;
@@ -113,6 +103,11 @@ struct array : list
                 type == ID_ToCylindrical ||
                 type == ID_ToSpherical);
     }
+
+    static array_p      add_sub(array_r x, array_r y, bool sub);
+    static array_p      mul(array_r x, array_r y);
+    static algebraic_p  dot(array_r x, array_r y);
+    static array_p      cross(array_r x, array_r y);
 
 public:
     OBJECT_DECL(array);

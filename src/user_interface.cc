@@ -2799,11 +2799,12 @@ bool user_interface::draw_error()
 
         Screen.clip(r);
         pattern fg = Settings.ErrorForeground();
-        if (text_p cmd = rt.command())
+        if (object_p cmd = rt.command())
         {
-            size_t sz = 0;
-            utf8 cmdt = cmd->value(&sz);
-            coord x = Screen.text(r.x1, r.y1, cmdt, sz, ErrorFont, fg);
+            text_p cmdr = cmd->as_text();
+            size_t sz   = 0;
+            utf8   cmdt = cmdr->value(&sz);
+            coord  x    = Screen.text(r.x1, r.y1, cmdt, sz, ErrorFont, fg);
             Screen.text(x, r.y1, utf8(" error:"), ErrorFont);
         }
         else
@@ -4477,7 +4478,7 @@ bool user_interface::handle_editing(int key)
             else if (shift)
             {
                 // To List
-                to_list(interactive);
+                list::push_list_from_stack(interactive);
                 Stack.interactive = 1;
             }
             else
@@ -6525,6 +6526,8 @@ void ui_draw_message(const char *hdr)
 #include "font.h"
 #include <cstdarg>
 
+uint debug_printf_row = 2;
+
 void debug_printf(int row, cstring format, ...)
 // ----------------------------------------------------------------------------
 //   Debug printf on the given row
@@ -6539,9 +6542,38 @@ void debug_printf(int row, cstring format, ...)
         va_end(va);
         size  h = HelpFont->height();
         coord y = row * h;
-        Screen.text(0, y, utf8(buffer), HelpFont, pattern::white, pattern::black);
+        coord x = Screen.text(0, y, utf8(buffer), HelpFont,
+                              pattern::white, pattern::black);
+        Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
         ui.draw_dirty(0, y, LCD_W, y + h - 1);
         refresh_dirty();
+    }
+    debug_printf_row = row - 2;
+}
+
+
+
+void debug_printf(cstring format, ...)
+// ----------------------------------------------------------------------------
+//   Debug printf on the given row
+// ----------------------------------------------------------------------------
+{
+    if (HelpFont)
+    {
+        char buffer[256];
+        size_t sz = snprintf(buffer, sizeof(buffer), "%u: ", debug_printf_row);
+        va_list va;
+        va_start(va, format);
+        vsnprintf(buffer + sz, sizeof(buffer) - sz, format, va);
+        va_end(va);
+        size  h = HelpFont->height();
+        coord y = (debug_printf_row % 8 + 2) * h;
+        coord x = Screen.text(0, y, utf8(buffer), HelpFont,
+                              pattern::white, pattern::black);
+        Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
+        ui.draw_dirty(0, y, LCD_W, y + h - 1);
+        refresh_dirty();
+        ++debug_printf_row;
     }
 }
 

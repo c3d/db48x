@@ -74,6 +74,7 @@ struct save
 };
 
 extern void debug_printf(int row, cstring format, ...);
+extern void debug_printf(cstring format, ...);
 extern void debug_wait(int delay);
 
 #endif // TYPES_H

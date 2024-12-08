@@ -4,13 +4,13 @@
 //
 //   File Description:
 //
+//     Block with local variables, e.g. `→ X Y « X Y - X Y + * »`
 //
-//
-//
-//
-//
-//
-//
+//     Local values reside above the stack. They are referenced by an index,
+//     which makes them very efficient (there is no name lookup). Reading
+//     or storing in a local variable is as efficient as accessing the stack.
+//     This is much faster than global variables, which require a rather slow
+//     linear name lookup and, when storing, moving the directory object.
 //
 //
 // ****************************************************************************

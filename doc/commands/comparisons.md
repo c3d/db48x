@@ -105,7 +105,7 @@ Check if the first value is greater than the second value.
 1 2 > + 2.3 1.2 > +
 "ABC" "DEF" > + "a" "à" > +
 { 1 2 3 } { 1 2 4 } > + { 1 2 3 } { 1 2 3 } > +
-@ Expecting { True False True True True False }
+@ Expecting { False True False False False False }
 ```
 
 ## ≥

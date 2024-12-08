@@ -90,8 +90,9 @@ struct arithmetic : algebraic
         return algebraic::complex_promotion(x, type);
     }
     static bool complex_promotion(algebraic_g &x, algebraic_g &y);
-
     static fraction_p fraction_promotion(algebraic_g &x);
+    static algebraic_p zero_divide(algebraic_r y, algebraic_r x);
+
 
     // We do not insert parentheses for algebraic values
     INSERT_DECL(arithmetic);
@@ -106,6 +107,7 @@ protected:
     typedef hwfloat_p (*hwfloat_fn)(hwfloat_r, hwfloat_r y);
     typedef hwdouble_p (*hwdouble_fn)(hwdouble_r, hwdouble_r y);
     typedef decimal_p (*decimal_fn)(decimal_r x, decimal_r y);
+    typedef arithmetic_fn (*target_fn)(algebraic_r x, algebraic_r y);
 
     // Structure holding the function pointers called by generic code
     struct ops
@@ -133,18 +135,28 @@ protected:
 
     template <typename Op>
     static algebraic_p evaluate(algebraic_r x, algebraic_r y);
-    // --------------------------------------------------Z----------------------
+    // ------------------------------------------------------------------------
     //   C++ wrapper for the operation
     // ------------------------------------------------------------------------
 
     template <typename Op>
     static algebraic_p non_numeric(algebraic_r UNUSED x, algebraic_r UNUSED y)
     // ------------------------------------------------------------------------
-    //   Return true if we can process non-numeric objects of the type
+    //   Return value if we can process non-numeric objects of the type
     // ------------------------------------------------------------------------
     {
         return nullptr;
     }
+
+    template <typename Op>
+    static algebraic_p optimize(algebraic_r UNUSED x, algebraic_r UNUSED y)
+    // ------------------------------------------------------------------------
+    //   Return optimizations that are shared between fast and slow path
+    // ------------------------------------------------------------------------
+    {
+        return nullptr;
+    }
+
 };
 
 
@@ -162,8 +174,30 @@ struct derived : arithmetic                                             \
     static bool fraction_ok(fraction_g &x, fraction_g &y);              \
     static bool complex_ok(complex_g &x, complex_g &y);                 \
     static constexpr decimal_fn decop = decimal::derived;               \
-    static constexpr auto       fop   = hwfloat::derived;               \
-    static constexpr auto       dop   = hwdouble::derived;              \
+                                                                        \
+    static arithmetic_fn target_float(algebraic_r x, algebraic_r y)     \
+    {                                                                   \
+        return x->type() == ID_hwfloat && y->type() == ID_hwfloat       \
+            ? arithmetic_fn(hwfloat::derived) : nullptr;                \
+    }                                                                   \
+    static arithmetic_fn target_double(algebraic_r x, algebraic_r y)    \
+    {                                                                   \
+        return x->type() == ID_hwdouble && y->type() == ID_hwdouble     \
+            ? arithmetic_fn(hwdouble::derived) : nullptr;               \
+    }                                                                   \
+                                                                        \
+    static hwfloat_p do_float(hwfloat_r x, hwfloat_r y)                 \
+    {                                                                   \
+        remember(target_float);                                         \
+        return hwfloat::derived(x, y);                                  \
+    }                                                                   \
+    static hwdouble_p do_double(hwdouble_r x, hwdouble_r y)             \
+    {                                                                   \
+        remember(target_double);                                        \
+        return hwdouble::derived(x, y);                                 \
+    }                                                                   \
+    static constexpr auto       fop   = do_float;                       \
+    static constexpr auto       dop   = do_double;                      \
                                                                         \
     OBJECT_DECL(derived)                                                \
     ARITY_DECL(2);                                                      \
@@ -184,18 +218,24 @@ struct derived : arithmetic                                             \
     {                                                                   \
         return arithmetic::evaluate<derived>(x, y);                     \
     }                                                                   \
+    static void remember(target_fn tgt)                                 \
+    {                                                                   \
+        target = tgt;                                                   \
+    }                                                                   \
+                                                                        \
+    static target_fn target;                                            \
 }
 
 
-ARITHMETIC_DECLARE(add,                 ADDITIVE);
-ARITHMETIC_DECLARE(sub,                 ADDITIVE);
-ARITHMETIC_DECLARE(mul,                 MULTIPLICATIVE);
-ARITHMETIC_DECLARE(div,                 MULTIPLICATIVE);
-ARITHMETIC_DECLARE(mod,                 MULTIPLICATIVE);
-ARITHMETIC_DECLARE(rem,                 MULTIPLICATIVE);
-ARITHMETIC_DECLARE(pow,                 POWER);
-ARITHMETIC_DECLARE(hypot,               POWER);
-ARITHMETIC_DECLARE(atan2,               POWER);
+ARITHMETIC_DECLARE(add,             ADDITIVE);
+ARITHMETIC_DECLARE(sub,             ADDITIVE);
+ARITHMETIC_DECLARE(mul,             MULTIPLICATIVE);
+ARITHMETIC_DECLARE(div,             MULTIPLICATIVE);
+ARITHMETIC_DECLARE(mod,             MULTIPLICATIVE);
+ARITHMETIC_DECLARE(rem,             MULTIPLICATIVE);
+ARITHMETIC_DECLARE(pow,             POWER);
+ARITHMETIC_DECLARE(hypot,           POWER);
+ARITHMETIC_DECLARE(atan2,           POWER);
 
 COMMAND_DECLARE(Div2, 2);
 

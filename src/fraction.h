@@ -79,22 +79,22 @@ struct fraction : algebraic
             + d->size() - leb128size(d->type());
     }
 
-    bignum_g numerator() const;
-    bignum_g denominator() const;
-    integer_g numerator(int) const;
-    integer_g denominator(int) const;
+    bignum_p numerator() const;
+    bignum_p denominator() const;
+    integer_p numerator(int) const;
+    integer_p denominator(int) const;
     ularge numerator_value() const;
     ularge denominator_value() const;
 
     bool is_zero() const { return numerator()->is_zero(); }
-    bool is_one()  const { return (numerator() - denominator())->is_zero(); }
+    bool is_one()  const { return numerator()->is_same_as(denominator()); }
 
     ularge as_unsigned() const
     {
         return numerator()->value<ularge>() / denominator()->value<ularge>();
     }
 
-    static fraction_g make(integer_g n, integer_g d);
+    static fraction_p make(integer_r n, integer_r d);
 
 public:
     OBJECT_DECL(fraction);
@@ -143,10 +143,10 @@ struct big_fraction : fraction
             + d->size() - leb128size(d->type());
     }
 
-    static fraction_g make(bignum_g n, bignum_g d);
+    static fraction_p make(bignum_r n, bignum_r d);
 
-    bignum_g numerator() const;
-    bignum_g denominator() const;
+    bignum_p numerator() const;
+    bignum_p denominator() const;
 
     ularge as_unsigned() const
     {
@@ -172,12 +172,12 @@ public:
     RENDER_DECL(neg_big_fraction);
 };
 
-fraction_g operator-(fraction_r x);
-fraction_g operator+(fraction_r x, fraction_r y);
-fraction_g operator-(fraction_r x, fraction_r y);
-fraction_g operator*(fraction_r x, fraction_r y);
-fraction_g operator/(fraction_r x, fraction_r y);
-fraction_g operator%(fraction_r x, fraction_r y);
+fraction_p operator-(fraction_r x);
+fraction_p operator+(fraction_r x, fraction_r y);
+fraction_p operator-(fraction_r x, fraction_r y);
+fraction_p operator*(fraction_r x, fraction_r y);
+fraction_p operator/(fraction_r x, fraction_r y);
+fraction_p operator%(fraction_r x, fraction_r y);
 
 
 #endif // FRACTION_H

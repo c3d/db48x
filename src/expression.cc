@@ -2548,6 +2548,9 @@ bool expression::is_well_defined(symbol_p solving,
     symbol_g     known = knowing;
     list_p       vars  = expr->names();
     bool         found = false;
+    if (!vars)
+        return false;
+
     for (auto var : *vars)
     {
         if (symbol_p vsym = var->as<symbol>())

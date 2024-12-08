@@ -545,6 +545,12 @@ operate on these items when it makes sense. Therefore:
   is accepted, but is converted to the DB50X sequence of `|` form during
   parsing.
 
+* On HP calculators, the behavior on tagged lists is not very consistent.
+  For example, `{ 1 2 } :A:{ 3 4 } +` gives `{ 1 2 :A:{ 3 4 } }` but
+  `:A:{ 1 2 } :B:{ 3 4 } +` gives `{ 1 2 3 4 }`, and so does
+  `:A:{ 1 2 } { 3 4 } +`. DB48x strips the tags in all cases, i.e. the first
+  case gives the same `{ 1 2 3 4 }` as the other two.
+
 
 ### Vectors and matrices differences
 
@@ -2460,9 +2466,13 @@ being set, such operations will generate an `Undefined operation` error.
 The `Library` is a catalog of frequently used and rarely modified objects that
 are stored on disk in the `config/library.csv` file.
 
-You can edit it by recalling its content on the stack using
+You can edit the library content by recalling its content on the stack using
 `"config:library.csv" RCL`, editing the values, and then storing the content
 back to disk using `"config:library.csv" STO`.
+
+Library entries are cached in memory for efficiency.
+See [library management](#library-management) for operations to use when you
+update the library content.
 
 
 ## Equations Library
@@ -2474,6 +2484,127 @@ You can edit it by recalling its content on the stack using
 `"config:equations.csv" RCL`, editing the values, and then storing the content
 back to disk using `"config:equations.csv" STO`.
 # Release notes
+
+## Release 0.8.7 "Signs" - Performance optimizations
+
+This release focuses on performance improvements and bug fixes for
+issues reported by users and contributors.
+
+### Features
+
+* Long array operations such as matrix multiplications can now be
+  interrupted with the EXIT key.
+
+* Eliminate local names from `LNAME` output. For example, if you
+  perform a sum with a variable named `i` as an index, no longer
+  report `i` as being a name used by the expression..
+
+* Implement `HEAD` and `TAIL` for text objects.
+
+* Allow constant definitions to contain expressions, which will be
+  fully evaluated when using the `→Num`. This makes it possible to now
+  define constants using other constants, in the spirit of the more
+  recent CODATA recommandations.
+
+* Library management commands `Attach`, `Detach` and `Libs` are now
+  implemented. These commands make it possible to reload a library
+  entry after changing its definition on disk. While they take
+  arguments that are similar to what HP calculators do, they are not
+  interpreting them in the same way due to hardware differences
+  between SwissMicros and HP calculators.
+
+
+### Bug fixes
+
+* Fix hard crash when running some RPL programs using conditional
+  loops, local variables and/or deep recursion. The crash was caused
+  by a non-robust check of whether the call stack needed to grow or
+  shrink, which was replaced with a much more robust check.
+
+* Fixed the precedence of the unary `-` operator, so that `-X^2` now
+  parses correctly (it used to be interpretd as `(-X)^2`)
+
+* Fix a crash where an error during an array operation could cause a
+  null pointer to be pushed on the stack.
+
+* The test suite now correctly reports error detected while
+  checking the examples in the online help.
+
+* The multi-solver no longer considers the index variable in a sum or
+  product as a variable to solve for. This avoids spurious errors
+  claiming that a solution cannot be found. The same also applies
+  other functions that take a variable name as an argument, such as
+  `Root`, `Integrate` or `Isolate`.
+
+* Fix a crash when comparing unit objects that cannot be converted
+  from one to the other, e.g. comparing `1_m` and `1_h`.
+
+* Fix the order of commands in the build instructions for Windows.
+
+* Fix the `NDupN` command to duplicate an object N times. In earlier
+  releases, it was incorrectly duplicating N objects and leaving  N on
+  the stack.
+
+* Accept addition and subtraction between a number and a unit object
+  where the unit can be reduced to a number, so that `'1+1_km/m'` is
+  now a valid expression. A few additional entries in the equation
+  library now work thanks to that fix.
+
+* Avoid a rare crash where the error command would be corrupted when
+  cleaning temporaries.
+
+### Improvements
+
+* Performance optimizations for decimal arithmetic, using 25x25 matrix
+  multiplication as a test scenario to optimize. The performance of
+  such multiplication was improved by about one order of magnitude,
+  and is now comparable to DM32 performance. This was achieved in
+  particular by making more aggressive cleanup of temporaries, by
+  reducing the need for garbage collection, by adding a fast-tracked
+  path for arithmetic operations when the types are the same as for
+  the last operation, and by deferring the construction of arrays
+  until the value of all elements are computed.
+
+* Add a few new sanity checks for the runtime when running on the
+  simulator, notably to detect cases where the internal pointers are
+  not in the expected order, and to more precisely report issues if
+  integrity checks fail during garbage collection
+
+* Add locking to the garbage collected pointers list when running on
+  the simulator, in order to improve test stability. Testing on the
+  simulator is the one case where multiple threads may concurently
+  access the pointers list.
+
+* Accelerate the tests that insert large amounts of text from source
+  code, notably the equation parsing tests and the help examples
+  checks. In addition, use a smarter method to insert RPL separators
+  such as `[]` or `''`, taking advantage of the fact that they are
+  usually entered in pairs. These two improvements reduce the total
+  runtime of the entire test suite by a factor of more than 4.
+
+* While testing the online help examples, only report the exact
+  section title and not all the section titles that contain the same
+  text.
+
+* Systematically strip tags and assignment objects for all arithmetic
+  operations.
+
+* Add a version of the `debug_printf` that automatically selects where
+  to draw on the screen, and automatically clear what follows the
+  printed text using a gray pattern.
+
+* Render the DB48x TrueType font to bitmap using a more recent version
+  of the FreeType library. This causes minor glyph differences
+  compared to earlier releases. The test suite was adjusted
+  accordingly.
+
+* Remove some of the leftover references to newRPL commands that will
+  not be implemented or make no sense for DB48x. This work is not
+  finished yet. The mechanism to remember which command caused a
+  particular error was also made somewhat more efficient.
+
+* Consolidate the two distinct documentations of the `Root` command.
+
 
 ## Release 0.8.6 "Daniel" - Bug fixes and optimizations
 
@@ -8322,7 +8453,7 @@ Check if the first value is greater than the second value.
 1 2 > + 2.3 1.2 > +
 "ABC" "DEF" > + "a" "à" > +
 { 1 2 3 } { 1 2 4 } > + { 1 2 3 } { 1 2 3 } > +
-@ Expecting { True False True True True False }
+@ Expecting { False True False False False False }
 ```
 
 ## ≥
@@ -9537,84 +9668,84 @@ calculator operations.
 « TIME " " PATH TAIL TOTEXT + + "
 " + DATE + " Mem: " + MEM + » HEADER
 ```
-# Arbitrary data containers
+# Library Management
 
-## MKBINDATA
-Create binary data container object
+DB48x features a [library](#library) that can contain arbitary RPL code,
+which is made readily available for use in your programs.
 
+References to library functions are efficient both in terms of memory usage and
+execution speed.  Typically, a reference to a library item takes 2 or 3 bytes,
+and evaluating it is as fast as if it was on the stack, and faster than if
+storedin a global variable.
 
-## BINPUTB
-Store bytes into binary data object
+Library items are also shared across DB48x states.
 
+A key aspect of the execution speed for library items is that they are loaded
+from disk only once, and then cached in compiled form in memory. This is how the
+next uses of that library item can be as fast as if it was on the stack.
 
-## BINGETB
-Extract binary data as list of bytes
+ Library items that are currently loaded in memory can be identified using
+`Libs`. The `Attach` commadn can be used to load items ahead of time. The
+`Detach` command can be used to evacuate library elements that are no longer
+used.
 
+When you modify the content of the library, you can use the following sequence
+to make sure that the new version of thelibrary items are reloaded from disk:
 
-## BINPUTW
-Store 32-bit words into binary data object
-
-
-## BINGETW
-Extract data from a binary data object as a list of 32-bit words
-
-
-## BINPUTOBJ
-Store an entire object into a binary data container
-
-
-## BINGETOBJ
-Extract an entire object from a binary data container
-
-
-## BINMOVB
-Copy binary data block into a binary data object
+```rpl
+LIBS DUP DETACH ATTACH
+```
 
 
-## BINMOVW
-Copy 32-bit words between binary data objects
+## Attach
 
-# User Libraries
+Load one or more library items from disk, ensuring that they are ready for use.
+This command is not strictly necessary, since library items are loaded on
+demand, but it can be used to "preload" library items for performance.
 
-## CRLIB
-Create a library from current directory
+The libraries to attach can be identified by one of:
+* A library index, e.g. `0`
+* A library name, given as a text object or a symbol
+* A library object
+* A list or array of valid arguments to `attach`
 
+For example, to preload the `Dedicace` library item, you can use one of:
 
-## ATTACH
-Install a library
-
-
-## DETACH
-Uninstall a library
-
-
-## LIBMENU
-Show a menu within a library
-
-
-## LIBMENUOTHR
-Show library menu in the other menu
+```rpl
+'Dedicace' Attach
+Libs
+@ Expecting { Dedicace }
+```
 
 
-## LIBMENULST
-Show library menu in the last used menu
+## Detach
 
+Unload one or more library items from disk, freeing the memory they used.
 
-## LIBSTO
-Store private library data
+The libraries to attach can be identified by one of:
+* A library index, e.g. `0`
+* A library name, given as a text object or a symbol
+* A library object
+* A list or array of valid arguments to `detach`
 
+For example, to unload the `Dedicace` and `KineticEnergy` library item, you can use one of:
 
-## LIBRCL
-Recall private library data
+```rpl
+{ Dedicace "KineticEnergy" } Detach
+Libs
+@ Expecting { }
+```
 
+## Libs
 
-## LIBDEFRCL
-Recall private data with default value
+Returns a list containing the currently attached libraries.
 
+A typical sequence to reload the library items after changing the source files
+on disk is:
 
-## LIBCLEAR
-Purge all private data for a specific library
-
+```rpl
+Libs Duplicate Detach Attach
+```
 # Operations with data
 
 Data in RPL is generally represented using lists, such as `{ {1 2 } 3 "A"}`.
@@ -10217,7 +10348,7 @@ TMENU
 
 Return the last menu entry, or `0` if there is no current menu. The returned
 value can be used as an argument to `Menu` or `TMenu`.
-# Numerical functions
+# Numerical integration
 
 ## Integrate
 
@@ -10244,20 +10375,6 @@ This setting limits the number of iterations for the integration algorithm. Each
 iteration requires the evaluation of twice as many samples of the function to
 integrate as the previous one, so the maximum number of samples taken is in the
 order of `2^IntegrationIterations`.
-
-
-## Root
-
-Root-finder command. Returns a real number that is a value of the specified
-variable for which the specified program or algebraic object most nearly
-evaluates to zero or a local extremum. For example, `'X^2=3' 'X' 0` returns
-`X:1.732050807568877293527446341953458`.
-
-The function takes three arguments:
-
-* The program or expression to evaluate
-* The variable to solve for
-* An initial guess, or a list containing an upper and lower guess.
 # Objects
 
 ## Cycle
@@ -11260,7 +11377,7 @@ The following information is stored in state files:
 Numerical integration (adaptive Simpson)
 
 
-## ROOT
+## Root
 
 Find the root of an equation or of a system of equations.
 

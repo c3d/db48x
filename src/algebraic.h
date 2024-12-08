@@ -126,6 +126,7 @@ struct algebraic : command
     //   Check if a value is a valid numerical constant (real or complex)
     // ------------------------------------------------------------------------
 
+    static algebraic_p zero_divide(algebraic_r x);
 
     INSERT_DECL(algebraic);
 };

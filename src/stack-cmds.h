@@ -90,17 +90,17 @@ COMMAND(DupN,~1)
 
 COMMAND(NDupN,~1)
 // ----------------------------------------------------------------------------
-//   Implement the RPL "NDUPN" command, duplicate two elements at top of stack
+//   Implement the RPL "NDUPN" command, duplicate an element N times
 // ----------------------------------------------------------------------------
 {
     uint32_t depth = uint32_arg();
     if (!rt.error() && rt.args(depth+1))
     {
         object_g count = rt.pop();
+        object_g value = rt.pop();
         for (uint i = 0; i < depth; i++)
-            if (object_p obj = rt.stack(depth-1))
-                if (!rt.push(obj))
-                    return ERROR;
+            if (!rt.push(value))
+                return ERROR;
         if (rt.push(count))
             return OK;
     }

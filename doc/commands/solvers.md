@@ -4,7 +4,7 @@
 Numerical integration (adaptive Simpson)
 
 
-## ROOT
+## Root
 
 Find the root of an equation or of a system of equations.
 

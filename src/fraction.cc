@@ -156,7 +156,7 @@ GRAPH_BODY(fraction)
 }
 
 
-fraction_g fraction::make(integer_g n, integer_g d)
+fraction_p fraction::make(integer_r n, integer_r d)
 // ----------------------------------------------------------------------------
 //   Create a reduced fraction from n and d
 // ----------------------------------------------------------------------------
@@ -165,17 +165,18 @@ fraction_g fraction::make(integer_g n, integer_g d)
     ularge dv = d->value<ularge>();
     ularge cd = gcd(nv, dv);
     bool neg = (n->type() == ID_neg_integer) != (d->type() == ID_neg_integer);
+    id ty = neg ? ID_neg_fraction : ID_fraction;
     if (cd > 1)
     {
-        n = integer::make(nv / cd);
-        d = integer::make(dv / cd);
+        integer_g nn = integer::make(nv / cd);
+        integer_g dd = integer::make(dv / cd);
+        return rt.make<fraction>(ty, nn, dd);
     }
-    id ty = neg ? ID_neg_fraction : ID_fraction;
     return rt.make<fraction>(ty, n, d);
 }
 
 
-bignum_g fraction::numerator() const
+bignum_p fraction::numerator() const
 // ----------------------------------------------------------------------------
 //   Return the numerator as an integer
 // ----------------------------------------------------------------------------
@@ -191,7 +192,7 @@ bignum_g fraction::numerator() const
 }
 
 
-bignum_g fraction::denominator() const
+bignum_p fraction::denominator() const
 // ----------------------------------------------------------------------------
 //   Return the denominator as an integer (always positive)
 // ----------------------------------------------------------------------------
@@ -207,7 +208,7 @@ bignum_g fraction::denominator() const
 }
 
 
-integer_g fraction::numerator(int) const
+integer_p fraction::numerator(int) const
 // ----------------------------------------------------------------------------
 //   Return the numerator as an integer
 // ----------------------------------------------------------------------------
@@ -217,7 +218,7 @@ integer_g fraction::numerator(int) const
 }
 
 
-integer_g fraction::denominator(int) const
+integer_p fraction::denominator(int) const
 // ----------------------------------------------------------------------------
 //   Return the denominator as an integer (always positive)
 // ----------------------------------------------------------------------------
@@ -272,7 +273,7 @@ SIZE_BODY(big_fraction)
 }
 
 
-bignum_g big_fraction::numerator() const
+bignum_p big_fraction::numerator() const
 // ------------------------------------------------------------------------
 //   Return the numerator as a bignum
 // ------------------------------------------------------------------------
@@ -284,7 +285,7 @@ bignum_g big_fraction::numerator() const
 }
 
 
-bignum_g big_fraction::denominator() const
+bignum_p big_fraction::denominator() const
 // ------------------------------------------------------------------------
 //   Return the denominator as bignum (always positive)
 // ------------------------------------------------------------------------
@@ -297,7 +298,7 @@ bignum_g big_fraction::denominator() const
 }
 
 
-static bignum_g gcd(bignum_g a, bignum_g b)
+static inline bignum_p gcd(bignum_g a, bignum_g b)
 // ----------------------------------------------------------------------------
 //   Compute the greatest common denominator between a and b
 // ----------------------------------------------------------------------------
@@ -312,11 +313,13 @@ static bignum_g gcd(bignum_g a, bignum_g b)
 }
 
 
-fraction_g big_fraction::make(bignum_g n, bignum_g d)
+fraction_p big_fraction::make(bignum_r nn, bignum_r dd)
 // ----------------------------------------------------------------------------
 //   Create a reduced fraction from n and d
 // ----------------------------------------------------------------------------
 {
+    bignum_g n = nn;
+    bignum_g d = dd;
     bignum_g cd = gcd(n, d);
     if (!cd)
         return nullptr;
@@ -347,80 +350,128 @@ fraction_g big_fraction::make(bignum_g n, bignum_g d)
 //
 // ============================================================================
 
-fraction_g operator-(fraction_r x)
+template <fraction_p (*code)(fraction_r, fraction_r)>
+arithmetic_fn target(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//  Target function for bignum objects
+// ----------------------------------------------------------------------------
+{
+    return x->is_fraction() && y->is_fraction() ? arithmetic_fn(code) : nullptr;
+}
+
+
+fraction_p operator-(fraction_r x)
 // ----------------------------------------------------------------------------
 //    Negation of a fraction
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return nullptr;
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
-    return big_fraction::make(-xn, xd);
+    xn = -xn;
+    return big_fraction::make(xn, xd);
 }
 
 
-fraction_g operator+(fraction_r x, fraction_r y)
+fraction_p operator+(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Add two fractions
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    add::remember(target< operator+ >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
     bignum_g  yd = y->denominator();
-    return big_fraction::make(xn * yd + yn * xd, xd * yd);
+    bignum_g  a = xn * yd;
+    bignum_g  b = yn * xd;
+    xn = a + b;
+    xd = xd * yd;
+    return big_fraction::make(xn, xd);
 }
 
 
-fraction_g operator-(fraction_r x, fraction_r y)
+fraction_p operator-(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Subtract two fractions
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    sub::remember(target< operator- >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
     bignum_g  yd = y->denominator();
-    return big_fraction::make(xn * yd - yn * xd, xd * yd);
+    bignum_g  a = xn * yd;
+    bignum_g  b = yn * xd;
+    xn = a - b;
+    xd = xd * yd;
+    return big_fraction::make(xn, xd);
 }
 
 
-fraction_g operator*(fraction_r x, fraction_r y)
+fraction_p operator*(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Multiply two fractions
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    mul::remember(target< operator* >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
     bignum_g  yd = y->denominator();
-    return big_fraction::make(xn * yn, xd * yd);
+    xn = xn * yn;
+    xd = xd * yd;
+    return big_fraction::make(xn, xd);
 }
 
 
-fraction_g operator/(fraction_r x, fraction_r y)
+fraction_p operator/(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Divide two fractions
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    div::remember(target< operator/ >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
     bignum_g  yd = y->denominator();
-    return big_fraction::make(xn * yd, xd * yn);
+    xn = xn * yd;
+    xd = xd * yn;
+    return big_fraction::make(xn, xd);
 }
 
 
-fraction_g operator%(fraction_r x, fraction_r y)
+fraction_p operator%(fraction_r x, fraction_r y)
 // ----------------------------------------------------------------------------
 //    Compute the remainder of two fractions
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+    rem::remember(target< operator% >);
     bignum_g   xn = x->numerator();
     bignum_g   xd = x->denominator();
     bignum_g   yn = y->numerator();
     bignum_g   yd = y->denominator();
-    fraction_g q  = big_fraction::make(xn * yd, xd * yn);
-    bignum_g   ir = q->numerator() / q->denominator();
+    bignum_g   qn = xn * yd;
+    bignum_g   qd = xd * yn;
+    fraction_g q  = big_fraction::make(qn, qd);
+    if (!q)
+        return nullptr;
+    qn = q->numerator();
+    qd = q->denominator();
+    bignum_g   ir = qn / qd;
+    if (!ir)
+        return nullptr;
     fraction_g fr = big_fraction::make(ir, bignum::make(1));
     fr            = fr * y;
     q             = x - fr;
