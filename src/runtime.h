@@ -332,6 +332,19 @@ struct runtime
 
     // ========================================================================
     //
+    //   Cached association (for stack rendering acceleration)
+    //
+    // ========================================================================
+
+    object_p cached(bool level0, object_p key);
+    bool     cache(bool level0, object_p key, object_p value);
+    void     uncache(object_p key, size_t sz);
+    void     uncache(object_p key)      { uncache(key, 1); }
+    void     uncache()                  { uncache(nullptr, ~0UL); }
+
+
+    // ========================================================================
+    //
     //   Object management
     //
     // ========================================================================
@@ -1071,6 +1084,8 @@ protected:
     object_p *CallStack;    // Start of call stack (rounded 16 entries)
     object_p *Returns;      // Start of return stack, end of locals
     object_p *HighMem;      // End of available memory
+    object_p  Cache[2][32]; // 16 Key/Value pairs for stack acceleration
+    uint      CacheIndex;   // Index of latest entry in cache
     size_t    GCCycles;     // Number of garbage collection cycles
     size_t    GCPurged;     // Number of bytes collected by the GC
     size_t    GCDuration;   // Total duration of GC execution

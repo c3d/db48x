@@ -79,6 +79,7 @@ bool                  load_system_state();
 bool                  save_system_state();
 void                  power_off();
 void                  system_setup();
+void                  mark_dirty(uint row);
 void                  refresh_dirty();
 void                  redraw_lcd(bool force);
 

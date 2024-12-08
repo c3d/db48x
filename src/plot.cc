@@ -351,7 +351,6 @@ object::result draw_plot(object::id                  kind,
         if (now - then >= Settings.PlotRefreshRate())
         {
             refresh_dirty();
-            ui.draw_clean();
             then = sys_current_ms();
         }
     }
@@ -359,7 +358,6 @@ object::result draw_plot(object::id                  kind,
 
 err:
     refresh_dirty();
-    ui.draw_clean();
     return result;
 }
 

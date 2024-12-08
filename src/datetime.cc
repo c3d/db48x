@@ -376,7 +376,6 @@ COMMAND_BODY(DateTime)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
 
     ularge tval = tm.hour * 10000 + tm.min * 100 + tm.sec;
@@ -397,7 +396,6 @@ COMMAND_BODY(Date)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
 
     ularge dval = dt.year * 10000 + dt.month * 100 + dt.day;
@@ -416,7 +414,6 @@ static bool setDate(object_p dobj)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
     if (!to_date(dobj, dt, tm))
         return false;
@@ -446,7 +443,6 @@ COMMAND_BODY(Time)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
 
     ularge tval = tm.hour * 10000 + tm.min * 100 + tm.sec;
@@ -468,7 +464,6 @@ COMMAND_BODY(ChronoTime)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
 
     ularge tval = tm.hour * 1000000 + tm.min * 10000 + tm.sec * 100 + tm.csec;
@@ -493,7 +488,6 @@ static bool setTime(object_p tobj)
 {
     dt_t dt;
     tm_t tm;
-    rtc_wakeup_delay();
     rtc_read(&tm, &dt);
     if (!to_time(tobj, tm))
         return false;

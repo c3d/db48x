@@ -92,7 +92,7 @@ user_interface::user_interface()
       help(-1u),
       line(0),
       topic(0),
-      topics_history(0),
+      topicsHistory(0),
       topics(),
       image(nullptr),
       impos(0),
@@ -102,7 +102,7 @@ user_interface::user_interface()
       xoffset(0),
       mode(STACK),
       last(0),
-      stackTop(0),
+      stackTop(32),
       stackBottom(LCD_H),
       cx(0),
       cy(0),
@@ -116,7 +116,14 @@ user_interface::user_interface()
       menuHeight(),
       busy(0),
       nextRefresh(~0U),
-      dirty(),
+      lastShiftPlane(0),
+      menuAnimate(0),
+      menuDrawn(0),
+      cursorDrawn(0),
+      customHeaderDrawn(0),
+      batteryDrawn(0),
+      day(0), month(0), year(0), dow(0),
+      hour(0), minute(0), second(0),
       editing(),
       editingLevel(0),
       cmdIndex(0),
@@ -126,12 +133,12 @@ user_interface::user_interface()
       alpha(false),
       transalpha(false),
       lowercase(false),
-      user_once(false),
-      shift_drawn(false),
-      xshift_drawn(false),
-      alpha_drawn(false),
-      lowerc_drawn(false),
-      user_drawn(false),
+      userOnce(false),
+      shiftDrawn(false),
+      xshiftDrawn(false),
+      alphaDrawn(false),
+      lowercDrawn(false),
+      userDrawn(false),
       down(false),
       up(false),
       repeat(false),
@@ -146,7 +153,8 @@ user_interface::user_interface()
       autoComplete(false),
       adjustSeps(false),
       graphics(false),
-      dbl_release(false),
+      doubleRelease(false),
+      batteryLow(false),
       keymap(),
       helpfile()
 {
@@ -154,9 +162,9 @@ user_interface::user_interface()
     {
         for (uint k = 0; k < NUM_SOFTKEYS; k++)
         {
-            menu_label[p][k] = nullptr;
-            menu_marker[p][k] = 0;
-            menu_marker_align[p][k] = false;
+            menuLabel[p][k] = nullptr;
+            menuMarker[p][k] = 0;
+            menuMarkerAlign[p][k] = false;
             function[p][k] = nullptr;
         }
     }
@@ -452,6 +460,7 @@ void user_interface::clear_editor()
     dirtyEditor = true;
     dirtyStack  = true;
     clear_help();
+    menu_refresh(menu::ID_Catalog, true);
 }
 
 
@@ -616,7 +625,6 @@ bool user_interface::key(int key, bool repeating, bool talpha)
         freezeHeader = false;
         freezeStack = false;
         freezeMenu = false;
-        menu_refresh(menu::ID_Catalog);
     }
 
     if (!skey)
@@ -702,12 +710,12 @@ void user_interface::toggle_user()
     }
     else if (!user)
     {
-        user_once = true;
+        userOnce = true;
         Settings.UserMode(true);
     }
-    else if (user_once)
+    else if (userOnce)
     {
-        user_once = false;
+        userOnce = false;
     }
     else
     {
@@ -1285,9 +1293,9 @@ void user_interface::menu(uint menu_id, cstring label, object_p fn)
         int softkey_id       = menu_id % NUM_SOFTKEYS;
         int plane            = menu_id / NUM_SOFTKEYS;
         function[plane][softkey_id] = fn;
-        menu_label[plane][softkey_id] = label;
-        menu_marker[plane][softkey_id] = 0;
-        menu_marker_align[plane][softkey_id] = false;
+        menuLabel[plane][softkey_id] = label;
+        menuMarker[plane][softkey_id] = 0;
+        menuMarkerAlign[plane][softkey_id] = false;
         dirtyMenu = true;       // Redraw menu
     }
 }
@@ -1302,7 +1310,7 @@ void user_interface::menu(uint id, symbol_p label, object_p fn)
 }
 
 
-bool user_interface::menu_refresh()
+bool user_interface::menu_refresh(bool page0)
 // ----------------------------------------------------------------------------
 //   Udpate current menu
 // ----------------------------------------------------------------------------
@@ -1310,13 +1318,15 @@ bool user_interface::menu_refresh()
     if (menuStack[0])
     {
         menu_p m = menu_p(menu::static_object(menuStack[0]));
+        if (page0)
+            menuPage = 0;
         return m->update(menuPage) == object::OK;
     }
     return false;
 }
 
 
-bool user_interface::menu_refresh(object::id menu)
+bool user_interface::menu_refresh(object::id menu, bool page0)
 // ----------------------------------------------------------------------------
 //   Request a refresh of a menu
 // ----------------------------------------------------------------------------
@@ -1324,7 +1334,7 @@ bool user_interface::menu_refresh(object::id menu)
     if (menuStack[0] == menu ||
         (menu == object::ID_VariablesMenu &&
          menuStack[0] == object::ID_SolvingMenu))
-        return menu_refresh();
+        return menu_refresh(page0);
     return false;
 }
 
@@ -1337,8 +1347,8 @@ void user_interface::marker(uint menu_id, unicode mark, bool alignLeft)
     {
         int softkey_id       = menu_id % NUM_SOFTKEYS;
         int plane            = menu_id / NUM_SOFTKEYS;
-        menu_marker[plane][softkey_id] = mark;
-        menu_marker_align[plane][softkey_id] = alignLeft;
+        menuMarker[plane][softkey_id] = mark;
+        menuMarkerAlign[plane][softkey_id] = alignLeft;
         dirtyMenu = true;
     }
 }
@@ -1363,7 +1373,7 @@ cstring user_interface::label_text(uint menu_id)
 {
     int     softkey_id = menu_id % NUM_SOFTKEYS;
     int     plane      = menu_id / NUM_SOFTKEYS;
-    cstring lbl        = menu_label[plane][softkey_id];
+    cstring lbl        = menuLabel[plane][softkey_id];
     return lbl;
 }
 
@@ -1422,7 +1432,7 @@ uint user_interface::menu_planes()
         {
             bool found = false;
             for (uint sk = 0; !found && sk < NUM_SOFTKEYS; sk++)
-                found = menu_label[planes-1][sk] != 0;
+                found = menuLabel[planes-1][sk] != 0;
             if (found)
                 break;
             planes--;
@@ -1453,9 +1463,9 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
 //   Start a drawing cycle
 // ----------------------------------------------------------------------------
 {
-    dirty = rect();
     force = forceRedraw;
     nextRefresh = refresh;
+    time = sys_current_ms();
     if (forceRedraw)
         graphics = false;
 }
@@ -1476,7 +1486,20 @@ void user_interface::draw_dirty(coord x1, coord y1, coord x2, coord y2)
 //   Indicates that a component dirtied a given area of the screen
 // ----------------------------------------------------------------------------
 {
-    draw_dirty(rect(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2)));
+    (void) (x1 + x2);
+    if (y1 > y2)
+        std::swap(y1, y2);
+    if (y1 < 0)
+        y1 = 0;
+    else if (y1 >= LCD_H)
+        y1 = LCD_H - 1;
+    if (y2 < 0)
+        y2 = 0;
+    else if (y2 >= LCD_H)
+        y2 = LCD_H - 1;
+
+    for (coord y = y1; y <= y2; y++)
+        mark_dirty(y);
 }
 
 
@@ -1485,10 +1508,7 @@ void user_interface::draw_dirty(const rect &r)
 //   Indicates that a component dirtied a given area of the screen
 // ----------------------------------------------------------------------------
 {
-    if (dirty.empty())
-        dirty = r;
-    else
-        dirty |= r;
+    draw_dirty(r.x1, r.y1, r.x2, r.y2);
 }
 
 
@@ -1517,44 +1537,33 @@ bool user_interface::draw_menus()
     if (freezeMenu)
         return false;
 
-    static int  lastp   = 0;
-    static uint lastt   = 0;
-    static uint animate = 0;
-    uint        time    = sys_current_ms();
-    int         shplane = shift_plane();
-    uint        period  = usb_powered() ? 200 : 850;
-
-    bool animating = animate && (time - lastt > period);
-    bool redraw = dirtyMenu || shplane != lastp || animating;
+    enum { SPEED = 256 };
+    int  shplane   = shift_plane();
+    uint period    = SPEED;
+    bool animating = menuAnimate && (time - menuDrawn > period);
+    bool redraw    = dirtyMenu || shplane != lastShiftPlane || animating;
     if (!force && !redraw)
         return false;
 
-    if (force || dirtyMenu || shplane != lastp)
+    if (force || dirtyMenu || shplane != lastShiftPlane)
     {
-        animate = 0;
+        menuAnimate = 0;
         animating = false;
     }
 
-    font_p font   = MenuFont;
-    bool   square = Settings.SquareMenus();
-    int    mh     = font->height() + 5 - square;
-    int    mw     = (LCD_W - 10) / 6;
-    int    sp     = (LCD_W - 5) - 6 * mw;
-    rect   clip   = Screen.clip();
-    bool   help   = showing_help();
-
-    if (period > time - last)
-        period = time - last;
-
-    static unsigned menuShift = 0;
-    menuShift++;
-
-    int  planes        = menu_planes();
-    id   menuStyle     = Settings.MenuAppearance();
-    bool single        = menuStyle == object::ID_SingleRowMenus;
-    bool flat          = menuStyle == object::ID_FlatMenus;
-    int  visiblePlanes = single ? 1 : planes;
-    uint newMenuHeight = visiblePlanes * mh;
+    font_p font          = MenuFont;
+    bool   square        = Settings.SquareMenus();
+    int    mh            = font->height() + 5 - square;
+    int    mw            = (LCD_W - 10) / 6;
+    int    sp            = (LCD_W - 5) - 6 * mw;
+    rect   clip          = Screen.clip();
+    bool   help          = showing_help();
+    int    planes        = menu_planes();
+    id     menuStyle     = Settings.MenuAppearance();
+    bool   single        = menuStyle == object::ID_SingleRowMenus;
+    bool   flat          = menuStyle == object::ID_FlatMenus;
+    int    visiblePlanes = single ? 1 : planes;
+    uint   newMenuHeight = visiblePlanes * mh;
     if (newMenuHeight != menuHeight)
     {
         menuHeight = newMenuHeight;
@@ -1576,12 +1585,12 @@ bool user_interface::draw_menus()
                 if (shplane)
                 {
                     function[0][KEY_F6-KEY_F1] = prevo;
-                    menu_label[0][NUM_SOFTKEYS-1] = "◀︎";
+                    menuLabel[0][NUM_SOFTKEYS-1] = "◀︎";
                 }
                 else
                 {
                     function[0][KEY_F6-KEY_F1] = nexto;
-                    menu_label[0][NUM_SOFTKEYS-1] = "▶";
+                    menuLabel[0][NUM_SOFTKEYS-1] = "▶";
                 }
             }
         }
@@ -1591,7 +1600,7 @@ bool user_interface::draw_menus()
     settings::SaveTabWidth stw(0);
     for (int plane = 0; plane < planes; plane++)
     {
-        cstring *labels = menu_label[plane];
+        cstring *labels = menuLabel[plane];
         if (help)
         {
             static cstring helpMenu[] =
@@ -1624,7 +1633,7 @@ bool user_interface::draw_menus()
         for (int m = 0; m < NUM_SOFTKEYS; m++)
         {
             uint animask = (1<<(m + plane * NUM_SOFTKEYS));
-            if (animating && (~animate & animask))
+            if (animating && (~menuAnimate & animask))
                 continue;
 
             coord x = (2 * m + 1) * mw / 2 + (m * sp) / 5 + 2;
@@ -1703,7 +1712,7 @@ bool user_interface::draw_menus()
                 rect trect = mrect;
                 if (!help && !Stack.interactive)
                 {
-                    if (unicode mark = menu_marker[plane][m])
+                    if (unicode mark = menuMarker[plane][m])
                     {
                         if (mark == 1)
                         {
@@ -1715,7 +1724,7 @@ bool user_interface::draw_menus()
                         }
                         else
                         {
-                            bool alignLeft = menu_marker_align[plane][m];
+                            bool alignLeft = menuMarkerAlign[plane][m];
                             marker         = mark;
                             mkw            = (marker == '/'
                                               ? 0
@@ -1737,8 +1746,8 @@ bool user_interface::draw_menus()
                     tw += font->width(utf8("⁻¹"));
                 if (tw + 2 >= mcw)
                 {
-                    animate |= animask;
-                    x = mrect.x1 - menuShift % (tw - mcw + 5);
+                    menuAnimate |= animask;
+                    x = mrect.x1 - time / SPEED % (tw - mcw + 5);
                 }
                 else
                 {
@@ -1780,13 +1789,13 @@ bool user_interface::draw_menus()
         Screen.fill(0, my, LCD_W-1, my, sel);
     }
 
-    if (animate)
+    if (menuAnimate && program::animated())
         draw_refresh(period);
     if (!animating)
         draw_dirty(0, LCD_H - 1 - menuHeight, LCD_W, LCD_H-1);
 
-    lastp = shplane;
-    lastt = time;
+    lastShiftPlane = shplane;
+    menuDrawn = time;
     dirtyMenu = false;
 
     return true;
@@ -1804,117 +1813,120 @@ bool user_interface::draw_header()
     if (freezeHeader || graphics)
         return false;
 
-    static uint day = 0, month = 0, year = 0;
-    static uint hour = 0, minute = 0, second = 0;
-    static uint dow = 0;
     bool changed = force;
-
-    if (!changed || !day)
+    if (!day || Settings.ShowDate() || Settings.ShowTime())
     {
         dt_t dt;
         tm_t tm;
-        rtc_wakeup_delay();
         rtc_read(&tm, &dt);
 
-        if (day != dt.day || month != dt.month || year != dt.year)
+        if (Settings.ShowDate())
         {
-            day = dt.day;
-            month = dt.month;
-            year = dt.year;
-            changed = true;
+            if (day != dt.day || month != dt.month || year != dt.year)
+            {
+                day = dt.day;
+                month = dt.month;
+                year = dt.year;
+                changed = true;
+            }
+            if (dow != tm.dow)
+            {
+                dow = tm.dow;
+                changed = true;
+            }
         }
-        if (hour != tm.hour || minute != tm.min || second != tm.sec)
+        if (Settings.ShowTime())
         {
-            hour = tm.hour;
-            minute = tm.min;
-            second = tm.sec;
-            changed = true;
-        }
-        if (dow != tm.dow)
-        {
-            dow = tm.dow;
-            changed = true;
+            if (hour != tm.hour || minute != tm.min || second != tm.sec)
+            {
+                hour = tm.hour;
+                minute = tm.min;
+                second = tm.sec;
+                changed = true;
+            }
         }
     }
 
+    program_g pgm;
+    if (object_p cstname = object::static_object(object::ID_Header))
+    {
+        if (object_p cst = directory::recall_all(cstname, false))
+        {
+            uint        period    = Settings.CustomHeaderRefresh();
+            uint        remaining = period;
+            pgm = cst->as_program();
+            record(user_interface,
+                   "Header %s%s last=%u time=%u d=%u period=%u\n",
+                   force ? "force " : "",
+                   changed ? "redraw" : "keep",
+                   customHeaderDrawn, time, time - customHeaderDrawn, period);
+            changed = !rt.editing() && time - customHeaderDrawn > period;
+            if (changed)
+                customHeaderDrawn = time;
+            if (time - last < remaining)
+                remaining -= time - last;
+            draw_refresh(remaining);
+        }
+    }
+    if (!pgm && Settings.ShowTime())
+        draw_refresh(Settings.ShowSeconds() ? 1000 : 1000 * (60 - second));
+
     if (changed)
     {
-        if (object_p cstname = object::static_object(object::ID_Header))
-        {
-            if (object_p cst = directory::recall_all(cstname, false))
-            {
-                if (program_p pgm = cst->as_program())
-                {
-                    static uint lastt   = 0;
-                    uint        time    = sys_current_ms();
-                    uint        period  = Settings.CustomHeaderRefresh();
-                    bool        redraw = force || time - lastt > period;
-                    record(user_interface,
-                           "Header %s%s last=%u time=%u d=%u period=%u\n",
-                           force ? "force " : "",
-                           redraw ? "redraw" : "keep",
-                           lastt, time, time-lastt, period);
-                    if (!redraw)
-                    {
-                        draw_refresh(lastt + period - time);
-                        return false;
-                    }
-
-                    bool fh = freezeHeader;
-                    freezeHeader = true;
-                    if (object_p eval = pgm->evaluate())
-                    {
-                        auto    fid = Settings.HeaderFont();
-                        grapher g(LCD_W, LCD_H / 2, fid,
-                                  grob::pattern::black, grob::pattern::white,
-                                  true, true, true);
-                        if (grob_p gr = eval->graph(g))
-                        {
-                            pattern       fg = Settings.HeaderForeground();
-                            pattern       bg = Settings.HeaderBackground();
-                            grob::surface s  = gr->pixels();
-                            size          w  = gr->width();
-                            size          h  = gr->height();
-                            Screen.fill(0, 0, LCD_W, h+1, bg);
-                            Screen.draw(s, 0, 0, fg);
-                            Screen.draw_background(s, 0, 0, bg);
-                            bool sf = force;
-                            force = true;
-                            freezeHeader = fh;
-                            draw_battery();
-                            draw_annunciators();
-                            force = sf;
-                            draw_dirty(0, 0, w, h);
-                            draw_refresh(Settings.CustomHeaderRefresh());
-                            if (h != size(stackTop))
-                            {
-                                stackTop = h;
-                                dirtyStack = true;
-                            }
-                            lastt = time;
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
         const font_p hdr_font   = Settings.header_font();
         const size   h          = hdr_font->height() + 1;
-        const coord  hdr_bottom = stackTop > coord(h) ? stackTop : coord(h);
         const coord  hdr_right  = header_width - 1;
-        if (h != size(stackTop))
-        {
-            stackTop = h;
-            dirtyStack = true;
-        }
-
+        const coord  hdr_bottom = h - 1;
         rect         clip       = Screen.clip();
         rect         header     = rect(0, 0, hdr_right, hdr_bottom);
-        Screen.clip(header);
-        Screen.fill(header, pattern(Settings.HeaderBackground()));
-        coord  x  = 1;
 
+        // Case of a custom header
+        if (pgm)
+        {
+            stack_depth_restore sdr;
+            error_save errs;
+            bool fh = freezeHeader;
+            freezeHeader = true;
+            object_p eval = pgm->evaluate();
+            if (!eval && rt.error())
+                eval = text::make(rt.error());
+            if (eval)
+            {
+                auto    fid = Settings.HeaderFont();
+                grapher g(LCD_W, LCD_H / 3, fid,
+                          grob::pattern::black, grob::pattern::white,
+                          true, true, true);
+                if (grob_p gr = eval->graph(g))
+                {
+                    pattern       fg = Settings.HeaderForeground();
+                    pattern       bg = Settings.HeaderBackground();
+                    grob::surface s  = gr->pixels();
+                    size          h  = gr->height()+1;
+                    if (h != size(stackTop))
+                    {
+                        stackTop = h;
+                        dirtyStack = true;
+                    }
+
+                    Screen.fill(0, 0, LCD_W-1, h-1, bg);
+                    Screen.draw(s, 0, 0, fg);
+                    Screen.draw_background(s, 0, 0, bg);
+
+                    bool sf = force;
+                    force = true;
+                    freezeHeader = fh;
+                    draw_battery();
+                    draw_annunciators();
+                    force = sf;
+                    draw_dirty(0, 0, LCD_W-1, h-1);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        coord  x  = 1;
+        Screen.fill(header, pattern(Settings.HeaderBackground()));
 
         // Read the real-time clock
         if (Settings.ShowDate())
@@ -1964,16 +1976,21 @@ bool user_interface::draw_header()
         r.printf("%s", state_name());
 
         pattern namecol = Settings.StateNameForeground();
+        Screen.clip(header);
         x = Screen.text(x, 0, r.text(), r.size(), hdr_font, namecol);
         Screen.clip(clip);
         draw_dirty(header);
 
         if (x > coord(header_width))
             x = header_width;
-        busy_left = x;
+        busyLeft = x;
+
+        if (h != size(stackTop))
+        {
+            stackTop = h;
+            dirtyStack = true;
+        }
     }
-    if (Settings.ShowTime() || Settings.ShowDate())
-        draw_refresh(Settings.ShowSeconds() ? 1000 : 1000 * (60 - second));
     return changed;
 }
 
@@ -1982,7 +1999,7 @@ static const uint ann_width   = 15;
 static const uint ann_height  = 12;
 static const uint alpha_width = 30;
 
-bool user_interface::draw_battery()
+bool user_interface::draw_battery(bool now)
 // ----------------------------------------------------------------------------
 //    Draw the battery information
 // ----------------------------------------------------------------------------
@@ -1990,46 +2007,50 @@ bool user_interface::draw_battery()
     if (freezeHeader || graphics)
         return false;
 
-    static uint last       = 0;
-    uint        time       = sys_current_ms();
-
     font_p      hdr_font   = Settings.header_font();
-    size        h          = hdr_font->height();
+    size        h          = hdr_font->height() + 1;
     coord       ann_y      = (h - ann_height) / 2;
 
     // Print battery voltage
-    static int  vdd = 3000;
-    static bool low = false;
-    static bool usb = false;
-
-    uint delay = time - last;
-    uint refresh = Settings.BatteryRefresh();
-    if (delay > refresh)
+    uint        vdd        = program::power_voltage;
+    bool        usb        = program::on_usb;
+    uint        delay      = time - batteryDrawn;
+    uint        refresh    = Settings.BatteryRefresh();
+    if (now || delay > refresh)
     {
-        vdd  = (int) read_power_voltage();
-        low  = get_lowbat_state();
-        usb  = usb_powered();
+        program::read_battery();
+        batteryLow = program::low_battery();
+        vdd = program::power_voltage;
+        usb = program::on_usb;
     }
-    else if (!force)
+    else if (!force && !batteryLow)
     {
-        delay = refresh - delay;
-        if (delay < 20)
-            delay = 20;
-        draw_refresh(delay);
+        if (program::animated())
+            refresh -= delay;
+        draw_refresh(refresh);
         return false;
     }
 
     // Experimentally, battery voltage below 2.6V cause calculator flakiness
-    const int vmax     = BATTERY_VMAX;
-    const int vmin     = BATTERY_VMIN;
-    const int vhalf    = (BATTERY_VMAX + BATTERY_VMIN) / 2;
+    const uint vmax  = BATTERY_VMAX;
+    const uint vmin  = Settings.MinimumBatteryVoltage();
+    const uint vlow  = (vmax + 3 * vmin) / 4;
+    const uint vhalf = (vmax + vmin) / 4;
 
-    pattern   vpat     = usb          ? Settings.ChargingForeground()
-                       : low          ? Settings.LowBatteryForeground()
-                       : vdd <= vhalf ? Settings.HalfBatteryForeground()
-                                      : Settings.BatteryLevelForeground();
-    pattern   bg       = Settings.HeaderBackground();
-    coord     x        = LCD_W - 1;
+    pattern    vpat  = usb          ? Settings.ChargingForeground()
+                     : vdd <= vlow  ? Settings.LowBatteryForeground()
+                     : vdd <= vhalf ? Settings.HalfBatteryForeground()
+                                    : Settings.BatteryLevelForeground();
+    pattern    bg    = Settings.HeaderBackground();
+    coord      x     = LCD_W - 1;
+
+    bool       blink = false;
+    if (vdd <= vlow)
+    {
+        batteryLow = true;
+        draw_refresh((-time) & 511);
+        blink = (time / 512) & 1;
+    }
 
     if (Settings.ShowVoltage())
     {
@@ -2041,10 +2062,10 @@ bool user_interface::draw_battery()
         size w = hdr_font->width(utf8(buffer));
         x -= w;
 
-        rect bgr(x-4, 0, LCD_W-1, h);
+        rect bgr(x-4, 0, LCD_W-1, h-1);
         Screen.fill(bgr, bg);
-        Screen.text(x, 0, utf8(buffer), hdr_font, vcol);
-
+        Screen.text(x, 0, utf8(buffer), hdr_font,
+                    blink ? Settings.BatteryLevelForeground() : vcol);
         x -= 4;
     }
 
@@ -2053,7 +2074,7 @@ bool user_interface::draw_battery()
 
     x -= bat_width;
 
-    rect  bat_bgr(x, 0, x + bat_width, h);
+    rect  bat_bgr(x, 0, x + bat_width, h-1);
     Screen.fill(bat_bgr, bg);
 
     rect  bat_body(x + bat_tipw, ann_y,
@@ -2062,23 +2083,28 @@ bool user_interface::draw_battery()
     pattern bbg = Settings.BatteryBackground();
 
     rect bat_tip(x, ann_y + 3, x + 4, ann_y + ann_height - 3);
-    Screen.fill(bat_tip, bfg);
 
-    Screen.fill(bat_body, bfg);
-    bat_body.inset(1,1);
-    Screen.fill(bat_body, bbg);
-    bat_body.inset(1,1);
+    if (!blink)
+    {
+        Screen.fill(bat_tip, bfg);
+
+        Screen.fill(bat_body, bfg);
+        bat_body.inset(1,1);
+        Screen.fill(bat_body, bbg);
+        bat_body.inset(1,1);
+    }
 
     size batw = bat_body.width();
-    size w = (vdd - vmin) * batw / (vmax - vmin);
+    size w = int(vdd - vmin) * batw / (vmax - vmin);
     if (w > batw)
         w = batw;
     else if (w < 1)
         w = 1;
     bat_body.x1 = bat_body.x2 - w;
-    Screen.fill(bat_body, vpat);
+    if (!blink)
+        Screen.fill(bat_body, vpat);
 
-    if (!usb)
+    if (!usb && !blink)
     {
         bat_body.x2 += 1;
         while (bat_body.x2 > x + 8)
@@ -2089,14 +2115,17 @@ bool user_interface::draw_battery()
         }
     }
 
-    battery_left = x;
-    draw_dirty(x, 0, LCD_W-1, h);
+    batteryLeft = x;
+    draw_dirty(x, 0, LCD_W-1, h-1);
     draw_refresh(refresh);
-    last = time;
+    batteryDrawn = time;
 
     // Power off if battery power is really low
-    if (vdd < BATTERY_VOFF)
+    if (program::low_battery())
+    {
         power_off();
+        power_check(true);
+    }
 
     return true;
 }
@@ -2135,29 +2164,29 @@ bool user_interface::draw_annunciators()
         return false;
 
     bool user  = Settings.UserMode();
-    bool adraw = force || alpha != alpha_drawn || lowercase != lowerc_drawn;
-    bool sdraw = force || shift != shift_drawn || xshift != xshift_drawn;
-    bool udraw = force || user != user_drawn;
+    bool adraw = force || alpha != alphaDrawn || lowercase != lowercDrawn;
+    bool sdraw = force || shift != shiftDrawn || xshift != xshiftDrawn;
+    bool udraw = force || user != userDrawn;
 
     if (!adraw && !sdraw && !udraw)
         return false;
 
     pattern bg       = Settings.HeaderBackground();
     font_p  hdr_font = Settings.header_font();
-    size    h        = hdr_font->height();
+    size    h        = hdr_font->height() + 1;
     size    alpha_w  = alpha_width;
-    coord   alpha_x  = battery_left - alpha_w;
+    coord   alpha_x  = batteryLeft - alpha_w;
     coord   ann_x    = alpha_x - ann_width;
 
-    if (!adraw && busy_right > alpha_x)
+    if (!adraw && busyRight > alpha_x)
         adraw = true;
-    if (!sdraw && busy_right > ann_x)
+    if (!sdraw && busyRight > ann_x)
         sdraw = true;
 
-    busy_right = battery_left - 1;
+    busyRight = batteryLeft - 1;
     if (adraw)
     {
-        rect r = rect(alpha_x, 0, battery_left - 1, h);
+        rect r = rect(alpha_x, 0, batteryLeft - 1, h - 1);
         Screen.fill(r, bg);
 
         if (alpha || user)
@@ -2168,23 +2197,23 @@ bool user_interface::draw_annunciators()
                 "", "ABC", "abc", "abc",
                 "1US", "α1U", "1u", "α1u"
             };
-            utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*user_once]);
+            utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*userOnce]);
             pattern apat = lowercase
                 ? Settings.LowerAlphaForeground()
                 : Settings.AlphaForeground();
             Screen.text(alpha_x + 1, 0, label, hdr_font, apat);
         }
-        alpha_drawn = alpha;
-        lowerc_drawn = lowercase;
-        user_drawn = Settings.UserMode();
+        alphaDrawn = alpha;
+        lowercDrawn = lowercase;
+        userDrawn = Settings.UserMode();
     }
     if (alpha)
-        busy_right = alpha_x - 1;
+        busyRight = alpha_x - 1;
 
     if (sdraw)
     {
         coord       ann_y  = (h - ann_height) / 2;
-        rect        ann(ann_x, 0, alpha_x - 1, h);
+        rect        ann(ann_x, 0, alpha_x - 1, h - 1);
         Screen.fill(ann, bg);
         const byte *source = xshift ? ann_right : shift ? ann_left : nullptr;
         if (source)
@@ -2200,13 +2229,13 @@ bool user_interface::draw_annunciators()
             Screen.draw(s, ann_x, ann_y, fg);
             Screen.draw_background(s, ann_x, ann_y, bg);
         }
-        shift_drawn = shift;
-        xshift_drawn = xshift;
+        shiftDrawn = shift;
+        xshiftDrawn = xshift;
     }
     if (shift || xshift)
-        busy_right = ann_x - 1;
+        busyRight = ann_x - 1;
 
-    rect dirty(busy_right, 0, battery_left, h);
+    rect dirty(busyRight, 0, batteryLeft, h - 1);
     draw_dirty(dirty);
     return true;
 }
@@ -2220,10 +2249,10 @@ rect user_interface::draw_busy_background()
     if (freezeHeader || graphics)
         return false;
 
-    const font_p hdr_font   = Settings.header_font();
-    const size   h          = hdr_font->height() + 1;
-    pattern bg = Settings.HeaderBackground();
-    rect busy(busy_left, 0, busy_right, h);
+    const font_p hdr_font = Settings.header_font();
+    const size   h        = hdr_font->height() + 1;
+    pattern      bg       = Settings.HeaderBackground();
+    rect         busy(busyLeft, 0, busyRight, h - 1);
     Screen.fill(busy, bg);
     return busy;
 }
@@ -2252,8 +2281,9 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
         font_p hdr_font = Settings.header_font();
         rect   clip        = Screen.clip();
         Screen.clip(busy);
+        time = sys_current_ms();
         size  w = hdr_font->width('M');
-        coord x = busy.x1 + sys_current_ms() / 16 % (busy.width() - w);
+        coord x = busy.x1 + time / 16 % (busy.width() - w);
         coord y = busy.y1;
         Screen.glyph(x, y, glyph, hdr_font, color);
         Screen.clip(clip);
@@ -2280,9 +2310,9 @@ bool user_interface::draw_idle()
         redraw_lcd(true);
     }
     draw_busy(0, pattern::black);
-    alpha_drawn = !alpha_drawn;
-    shift_drawn = !shift;
-    xshift_drawn = !xshift;
+    alphaDrawn = !alphaDrawn;
+    shiftDrawn = !shift;
+    xshiftDrawn = !xshift;
     draw_annunciators();
     refresh_dirty();
     return true;
@@ -2461,7 +2491,7 @@ reposition:
     int   bottom          = LCD_H-1 - menuHeight;
     int   top             = (Stack.interactive
                              ? bottom - lineHeight - 1
-                             : stackTop + errorHeight + 1);
+                             : stackTop + errorHeight);
     int   availableHeight = (bottom - top);
     int   fullRows        = availableHeight / lineHeight;
     int   clippedRows     = (availableHeight + lineHeight - 1) / lineHeight;
@@ -2585,18 +2615,18 @@ bool user_interface::draw_cursor(int show, uint ncursor)
     if (!rt.editing() || showing_help() || freezeStack)
         return false;
 
-    static uint lastT = 0;
-    uint time = sys_current_ms();
     const uint period = Settings.CursorBlinkRate();
 
-    if (!force && !show && time - lastT < period)
+    if (!force && !show && time - cursorDrawn < period)
     {
-        draw_refresh(lastT + period - time);
+        draw_refresh(cursorDrawn + period - time);
         return false;
     }
-    lastT = time;
+    cursorDrawn = time;
     if (show)
         blink = show > 0;
+    else if (!program::animated())
+        blink = true;
 
     // Select editor font
     bool   ml         = edRows > 2;
@@ -2678,9 +2708,12 @@ bool user_interface::draw_cursor(int show, uint ncursor)
         draw_dirty(r);
     }
 
-    blink = !blink;
     Screen.clip(clip);
-    draw_refresh(period);
+    if (program::animated())
+    {
+        blink = !blink;
+        draw_refresh(period);
+    }
     return true;
 }
 
@@ -2890,14 +2923,16 @@ bool user_interface::draw_stack()
     if ((!force && !dirtyStack) || freezeStack)
         return false;
     draw_busy();
+    uint now = sys_current_ms();
     uint top = stackTop + 1;
     uint bottom = Stack.draw_stack();
     if (object_p transient = transient_object())
         draw_object(transient, top, bottom);
-    draw_dirty(0, top, stackBottom, LCD_H-1);
+    draw_dirty(0, stackTop, LCD_W-1, stackBottom);
     draw_idle();
     dirtyStack = false;
     dirtyCommand = true;
+    program::stack_display_time += sys_current_ms() - now;
     return true;
 }
 
@@ -3139,17 +3174,17 @@ void user_interface::load_help(utf8 topic, size_t len)
         record(help, "Found topic %s at position %u level %u",
                topic, helpfile.position(), level);
 
-        if (topics_history >= NUM_TOPICS)
+        if (topicsHistory >= NUM_TOPICS)
         {
             // Overflow, keep the last topics
             for (uint i = 1; i < NUM_TOPICS; i++)
                 topics[i - 1]   = topics[i];
-            topics[topics_history - 1] = help;
+            topics[topicsHistory - 1] = help;
         }
         else
         {
             // New topic, store it
-            topics[topics_history++] = help;
+            topics[topicsHistory++] = help;
         }
     }
     else
@@ -3531,8 +3566,8 @@ restart:
 
                             if (follow && restyle == HIGHLIGHTED_CODE)
                             {
-                                if (topics_history)
-                                    topics[topics_history-1] = shown;
+                                if (topicsHistory)
+                                    topics[topicsHistory-1] = shown;
                                 load_help(utf8(link));
                                 Screen.clip(clip);
                                 goto restart;
@@ -3625,8 +3660,8 @@ restart:
                     p[-1] = 0;
                     if (follow && style == HIGHLIGHTED_TOPIC)
                     {
-                        if (topics_history)
-                            topics[topics_history-1] = shown;
+                        if (topicsHistory)
+                            topics[topicsHistory-1] = shown;
                         load_help(utf8(link));
                         Screen.clip(clip);
                         goto restart;
@@ -3995,12 +4030,12 @@ bool user_interface::handle_screen_capture(int key)
                 rt.screenshot_capture_error();
         }
         if (key == KEY_DOUBLE_RELEASE)
-            dbl_release = true; // Ignore next key
+            doubleRelease = true; // Ignore next key
         return true;
     }
-    if (!key && dbl_release)
+    if (!key && doubleRelease)
     {
-        dbl_release = false;
+        doubleRelease = false;
         return true;
     }
     return false;
@@ -4153,12 +4188,12 @@ bool user_interface::handle_help(int &key)
 
     case KEY_F6:
     case KEY_BSP:
-        if (topics_history)
+        if (topicsHistory)
         {
-            --topics_history;
-            if (topics_history)
+            --topicsHistory;
+            if (topicsHistory)
             {
-                help = topics[topics_history-1];
+                help = topics[topicsHistory-1];
                 line = 0;
                 dirtyHelp = true;
                 break;
@@ -4284,7 +4319,6 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             repeat = true;
         }
         consumed = true;
-        menu_refresh(menu::ID_Catalog);
 #undef SHM
 #undef SHD
     }
@@ -4892,8 +4926,8 @@ bool user_interface::handle_alpha(int key)
         if (c == '"')
             alpha = true;
         repeat = true;
+        menu_refresh(object::ID_Catalog, true);
     }
-    menu_refresh(object::ID_Catalog);
     return true;
 }
 
@@ -5455,7 +5489,7 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
         size_t sz = 0;
         utf8 txt = direct->value(&sz);
         bool result = insert(txt, sz, TEXT) == object::OK;
-        if (user_once)
+        if (userOnce)
             Settings.UserMode(false);
         return result;
     }
@@ -5472,17 +5506,20 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
     bool imm     = object::is_immediate(ty);
     bool editing = rt.editing();
     bool skipcmd = false;
+    bool ac      = autoComplete;
     if (editing && !imm)
     {
         if (key == KEY_ENTER || key == KEY_BSP)
             return false;
 
-        if (autoComplete && key >= KEY_F1 && key <= KEY_F6)
+        if (ac && key >= KEY_F1 && key <= KEY_F6)
         {
             size_t start = 0;
             size_t size  = 0;
             if (current_word(start, size))
                 remove(start, size);
+            menu_refresh(menu::ID_Catalog, true);
+            ac = false;
         }
 
         if ((ty >= object::ID_Deg && ty <= object::ID_PiRadians) &&
@@ -5544,6 +5581,7 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
                     if (obj->insert() != object::OK)
                         return false;
                     skipcmd = true;
+                    ac = false;
                 }
                 if (!end_edit())
                     return false;
@@ -5564,7 +5602,11 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
     save<bool> no_halt(program::halted, false);
     bool usr = Settings.UserMode();
     if (!skipcmd)
+    {
         obj->evaluate();
+        if (ac)
+            menu_refresh(menu::ID_Catalog);
+    }
     draw_idle();
     dirtyStack = true;
     if (!imm)
@@ -5572,7 +5614,7 @@ bool user_interface::handle_functions(int key, object_p obj, bool user)
     xshift = false;
     shift = false;
 
-    if (user_once && usr == Settings.UserMode())
+    if (userOnce && usr == Settings.UserMode())
         Settings.UserMode(false);
     return true;
 }
@@ -5854,7 +5896,7 @@ bool user_interface::do_delete(bool forward)
 
         dirtyEditor = true;
         adjustSeps = true;
-        menu_refresh(object::ID_Catalog);
+        menu_refresh(object::ID_Catalog, true);
     }
 
     // Do not stop editing if we delete last character

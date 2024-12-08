@@ -75,7 +75,10 @@ Math directory {
 
 Collatz
 «
-	DUP "	  " + 1 DISP MEM 2 DISP
+	DUP "	  " + 1 DISP
+	IF USBPowered THEN
+	   MEM 2 DISP
+	END
 
 	IF DUP 1 ≠ THEN
 		IF DUP 2 MOD THEN
@@ -750,13 +753,49 @@ Beeps
 
 RPL directory {
 
-SetHeader
+PathHeader
 «
-« TIME " " PATH TAIL TOTEXT + + "
+	« TIME " " PATH TAIL TOTEXT + + "
 " + DATE + " Mem: " + MEM + »
-HEADER
-10000 CustomHeaderRefresh
+	HEADER
+	10000 CustomHeaderRefresh
 »
+
+BatteryLevelHeader
+«
+	10000 CustomHeaderRefresh
+
+	«
+		BatteryVoltage " " + LowBattery +
+	»
+	HEADER
+»
+
+RuntimeStatsHeader
+«
+	10000 CustomHeaderRefresh
+	«
+		RuntimeStatistics Array→
+		→ running sleeping runs dims
+		« "" runs + ":" + running UVAL + "/" + sleeping UVAL + »
+	»
+	HEADER
+»
+
+BatteryStatsHeader
+«
+	10000 CustomHeaderRefresh
+
+	@ We want statistics to persist even in case of low-bat crash
+	"BATTERY.CSV" 'ΣData' STO
+
+	«
+		TIME UVAL →Num BatteryVoltage DUP2 2 →Arry Σ+
+		ΣSize " " + Swap + " " + Swap 5 Round + " " + LowBattery +
+	»
+	HEADER
+»
+
 
 
 @@ ---------------------------------------------------------------------------
@@ -985,13 +1024,31 @@ MatrixMultiplyBenchmark
 «
 	{
 		Demos
+		{ "Release" « "Release notes" HELP DROP » }
+		{ "RunStats" RuntimeStatistics }
+		{ "VBat" BatteryVoltage }
+		{ "VPow" PowerVoltage }
+		{ "VStat"
+			«
+				"BAT.CSV" StoΣ
+				DateTime UVal
+				BatteryVoltage UVAL 1000. /
+				→V2 Σ+
+			»
+		}
+
 		{ "Hello" « "Hello" 3 DISP » }
 		{ "Authors" « "Authors" HELP DROP » }
-		ⓁKineticEnergy
+		RunStatsKeepAfterRead
+		MinimumBatteryVoltage
+		LowBattery
+		RclΣ
+
 		42_in
+		ⓁKineticEnergy
 		DebugOnError
 	}
-	Time + Date + "" + { Purge } +
+	Time + Date +  { Purge } +
 »
 'CustomMenu' STO
 

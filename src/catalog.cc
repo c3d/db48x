@@ -55,11 +55,11 @@ MENU_BODY(Catalog)
         // Command catalog
         uint  nitems = count_commands();
         items_init(mi, nitems);
-        ui.menu_auto_complete();
         list_commands(mi);
         if (mi.page >= mi.pages)
             mi.page = 0;
     }
+    ui.menu_auto_complete();
     return OK;
 }
 

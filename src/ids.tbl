@@ -520,6 +520,7 @@ CMD(Clone)                      ALIAS(Clone, "NewObject")
                                 ALIAS(Clone, "NewObj")
                                 ALIAS(Clone, "NewOb")
 CMD(GarbageCollectorStatistics) ALIAS(GarbageCollectorStatistics, "GCStats")
+CMD(RuntimeStatistics)          ALIAS(RuntimeStatistics, "RunStats")
 
 // Object commands
 NAMED(Compile, "Text→")         ALIAS(Compile, "Str→")
@@ -928,8 +929,11 @@ FLAG(ListAsProgram,             ListAsData)
 FLAG(DebugOnError,              KillOnError)
 FLAG(AllEquationVariables,      CurrentEquationVariables)
 FLAG(PushEvaluatedAssignment,   PushOriginalAssignment)
-FLAG(GCStatsKeepAfterRead,      GCStatsClearAfterRead)
+FLAG(GCStatsClearAfterRead,     GCStatsKeepAfterRead)
+FLAG(RunStatsClearAfterRead,    RunStatsKeepAfterRead)
 FLAG(GCTemporariesCleanup,      AutomaticTemporariesCleanup)
+FLAG(SoftwareDisplayRefresh,    DMCPDisplayRefresh)
+
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
@@ -1079,9 +1083,16 @@ SETTING(BatteryLevelForeground, ularge(0), ~ularge(0), WHITE( 64, 192,  64))
 SETTING(HalfBatteryForeground,  ularge(0), ~ularge(0), GRAY75(192,  64,  64))
 SETTING(LowBatteryForeground,   ularge(0), ~ularge(0), GRAY25(255, 255, 255))
 SETTING(ChargingForeground,     ularge(0), ~ularge(0), GRAY50(128, 192, 255))
-SETTING(BatteryRefresh,         uint(100),  uint(3600000), uint(3000))
 SETTING(CustomHeaderRefresh,    uint(100),  uint(3600000), uint(1000))
 SETTING(BusyIndicatorRefresh,   uint(5),    uint(3600000), uint(50))
+SETTING(BatteryRefresh,         uint(100),  uint(3600000), uint(60000))
+SETTING(MinimumBatteryVoltage,  uint(2000), uint(3000),    uint(2600))
+SETTING(GraphingTimeLimit,      uint(0),    uint(300000),  uint(2500))
+SETTING(ShowTimeLimit,          uint(0),    uint(300000),  uint(10000))
+SETTING(ResultGraphingTimeLimit,uint(0),    uint(300000),  uint(1500))
+SETTING(StackGraphingTimeLimit, uint(0),    uint(300000),  uint(250))
+SETTING(TextRenderingSizeLimit, uint(32),   uint(0x10000), uint(256))
+SETTING(GraphRenderingSizeLimit,uint(32),   uint(0x10000), uint(256))
 
 SETTING_ENUM(DateSlash,         nullptr,        DateSeparatorCommand)
 SETTING_ENUM(DateDash,          nullptr,        DateSeparatorCommand)
@@ -1129,9 +1140,12 @@ OP(EvalEq,                 "EvaluateEquation")
 //
 // ============================================================================
 
-NAMED(Off, "PowerOff")
 CMD(SaveState)
-CMD(SystemSetup)
+CMD(BatteryVoltage)
+CMD(PowerVoltage)
+CMD(USBPowered)
+CMD(DMCPLowBattery)
+CMD(LowBattery)
 
 CMD(Unimplemented)              // Last command in catalog
 
@@ -1236,7 +1250,8 @@ CMD(Catalog)
 
 CMD(ToggleUserMode)
 CMD(Undo)                       // Immediate: do not save stack before Undo
-
+NAMED(Off, "PowerOff")
+CMD(SystemSetup)
 
 
 // ============================================================================

@@ -1,3 +1,4 @@
+
 // ****************************************************************************
 //  menu.cc                                                       DB48X project
 // ****************************************************************************
@@ -1489,9 +1490,17 @@ MENU(UserInterfaceModesMenu,
      "Libs",                                    ID_ShowBuiltinLibrary,
      "Chars",                                   ID_ShowBuiltinCharacters,
 
-     "AllVars",                                 ID_AllEquationVariables,
+     ResultGraphingTimeLimit::label,            ID_ResultGraphingTimeLimit,
+     StackGraphingTimeLimit::label,             ID_StackGraphingTimeLimit,
+     GraphingTimeLimit::label,                  ID_GraphingTimeLimit,
+     ShowTimeLimit::label,                      ID_ShowTimeLimit,
      CustomHeaderRefresh::label,                ID_CustomHeaderRefresh,
-     "SIPfx",                                   ID_UnitsSIPrefixCycle);
+
+     TextRenderingSizeLimit::label,             ID_TextRenderingSizeLimit,
+     GraphRenderingSizeLimit::label,            ID_GraphRenderingSizeLimit,
+     MinimumBatteryVoltage::label,              ID_MinimumBatteryVoltage,
+     "AllVars",                                 ID_AllEquationVariables,
+     "SIPrefixCycle",                           ID_UnitsSIPrefixCycle );
 
 MENU(UserModeMenu,
 // ----------------------------------------------------------------------------
@@ -1546,9 +1555,14 @@ MENU(IOMenu,
 // ----------------------------------------------------------------------------
 //   I/O operations
 // ----------------------------------------------------------------------------
-     "Save",    ID_Unimplemented,
-     "Load",    ID_Unimplemented,
-     "Print",   ID_Unimplemented);
+     "Save",                            ID_Unimplemented,
+     "Load",                            ID_Unimplemented,
+     "Print",                           ID_Unimplemented,
+     "Voltage",                         ID_BatteryVoltage,
+     "USB?",                            ID_USBPowered,
+     "Low?",                            ID_LowBattery,
+     "Save",                            ID_Unimplemented,
+     MinimumBatteryVoltage::label,      ID_MinimumBatteryVoltage);
 
 MENU(FilesMenu,
 // ----------------------------------------------------------------------------
@@ -1557,6 +1571,11 @@ MENU(FilesMenu,
      "Libs",    ID_Libs,
      "Attach",  ID_Attach,
      "Detach",  ID_Detach,
+     "Voltage", ID_BatteryVoltage,
+     "USB?",    ID_USBPowered,
+     "Low?",    ID_LowBattery,
+     "Save",    ID_Unimplemented,
+     "Load",    ID_Unimplemented,
      "Open",    ID_Unimplemented,
      "Close",   ID_Unimplemented,
      "Read",    ID_Unimplemented,
@@ -1634,7 +1653,7 @@ MENU(MemoryMenu,
      "Free",    ID_FreeMemory,
      "System",  ID_SystemMemory,
      "PgAll",   ID_PurgeAll,
-     "GCStats", ID_GarbageCollectorStatistics,
+     "GCStats", ID_RuntimeStatistics,
      "Clone",   ID_Clone,
 
      "Store",   ID_Sto,

@@ -119,6 +119,7 @@ TESTS(text,             "Text operations");
 TESTS(vectors,          "Vectors");
 TESTS(matrices,         "Matrices");
 TESTS(solver,           "Solver");
+TESTS(cstlib,           "Built-in constants parsing");
 TESTS(equations,        "Built-in equations");
 TESTS(colnbeams,        "Columns and Beams equations in library");
 TESTS(integrate,        "Numerical integration");
@@ -179,7 +180,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            library();
+            constants_parsing();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -224,6 +225,7 @@ void tests::run(uint onlyCurrent)
         vector_functions();
         matrix_functions();
         solver_testing();
+        constants_parsing();
         eqnlib_parsing();
         eqnlib_columns_and_beams();
         numerical_integration_testing();
@@ -1496,6 +1498,9 @@ void tests::stack_operations()
     step("NDupN in program")
         .test(CLEAR, "13 17 25 42 3 NDUPN", ENTER)
         .got("3", "42", "42", "42", "25", "17", "13");
+    step("NDupN with short stack")
+        .test(CLEAR, "2 5 NDUPN", ENTER)
+        .got("5", "2", "2", "2", "2", "2");
     step("DupDup in program")
         .test(CLEAR, "13 17 42 DUPDUP", ENTER).expect("42")
         .test(BSP).expect("42")
@@ -1583,6 +1588,9 @@ void tests::stack_operations()
     step("NDupN in stack menu")
         .test(CLEAR, "13 17 25 42 3", F6, LSHIFT, F1, F6)
         .got("3", "42", "42", "42", "25", "17", "13");
+    step("NDupN with short stack")
+        .test(CLEAR, "2 5", F6, LSHIFT, F1, F6)
+        .got("5", "2", "2", "2", "2", "2");
     step("DupDup in stack menu")
         .test(CLEAR, "13 17 42", F6, LSHIFT, F2, F6).expect("42")
         .test(BSP).expect("42")
@@ -1961,7 +1969,7 @@ void tests::global_variables()
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
         .expect("{ FreeMemory SystemMemory PurgeAll "
-                "GarbageCollectorStatistics Clone }")
+                "RuntimeStatistics Clone }")
         .test(F6,
               RSHIFT, RUNSTOP,
               F1, F2, F3, F4, F5,
@@ -6143,6 +6151,16 @@ void tests::matrix_functions()
         .test(CLEAR, "[[1 1][1 1]]", ENTER, ENTER, DIV)
         .error("Divide by zero");
 
+    step("Do not leave garbage on the stack (#1363)")
+        .test(CLEAR, "[[1 2 3][4 5 6]][[1 2][3 4][5 6]] DOT", ENTER)
+        .error("Invalid dimension")
+        .test(EXIT)
+        .want("[[ 1 2 ] [ 3 4 ] [ 5 6 ]]")
+        .test(BSP)
+        .want("[[ 1 2 3 ] [ 4 5 6 ]]")
+        .test(BSP).noerror()
+        .test(BSP).error("Too few arguments");
+
     step("Tagged array operations")
         .test(CLEAR, ":A:[1 2] :B:[3 4] +", ENTER)
         .want("[ 4 6 ]");
@@ -6222,6 +6240,36 @@ void tests::solver_testing()
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
+}
+
+
+void tests::constants_parsing()
+// ----------------------------------------------------------------------------
+//   Test that we can parse every single builtin constant
+// ----------------------------------------------------------------------------
+{
+    BEGIN(cstlib);
+
+    size_t nbuiltins = constant::constants.nbuiltins;
+    const cstring *cst = constant::constants.builtins;
+
+    for (size_t i = 0; i < nbuiltins; i += 2)
+    {
+        if (cst[i+1])
+        {
+            istep(cst[i]);
+            test(CLEAR, DIRECT(cst[i+1]), ENTER).noerror();
+        }
+        else
+        {
+            begin(cst[i], true);
+        }
+        if (!ok)
+        {
+            test(cst[i+1]);
+            break;
+        }
+    }
 }
 
 
@@ -7357,14 +7405,17 @@ void tests::symbolic_integration()
         .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'", ID_Primitive)
         .expect("'(-cos(A·X+3))÷A+sin(X·B-5)÷B+(-ln (cos(Z-C·X)))÷C'");
     step("Primitive of hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'sinh(A*X-3)+cosh(B*X+5*A)+tanh(C*(X-A))' 'X'", ID_Primitive)
-        .expect("'cosh(A·X-3)÷A+sinh(B·X+5·A)÷B+ln (cosh(C·(X-A)))÷C'", 2000);
+        .test(CLEAR, "'sinh(A*X-3)+cosh(B*X+5*A)+tanh(C*(X-A))' 'X'",
+              LENGTHY(2000), ID_Primitive)
+        .expect("'cosh(A·X-3)÷A+sinh(B·X+5·A)÷B+ln (cosh(C·(X-A)))÷C'");
     step("Primitive of arcsine, arccosine, arctangent")
-        .test(CLEAR, "'asin(A*X+B)+acos(X*B+A*(X+1))+atan(C*(X-6))' 'X'", ID_Primitive)
-        .expect("'((A·X+B)·sin⁻¹(A·X+B)+√(1-(A·X+B)²))÷A+((X·B+A·(X+1))·cos⁻¹(X·B+A·(X+1))-√(1-(X·B+A·(X+1))²))÷(B+A)+(C·(X-6)·tan⁻¹(C·(X-6))-ln((C·(X-6))²+1)÷2)÷C'", 2000);
+        .test(CLEAR, "'asin(A*X+B)+acos(X*B+A*(X+1))+atan(C*(X-6))' 'X'",
+              LENGTHY(2000), ID_Primitive)
+        .expect("'((A·X+B)·sin⁻¹(A·X+B)+√(1-(A·X+B)²))÷A+((X·B+A·(X+1))·cos⁻¹(X·B+A·(X+1))-√(1-(X·B+A·(X+1))²))÷(B+A)+(C·(X-6)·tan⁻¹(C·(X-6))-ln((C·(X-6))²+1)÷2)÷C'");
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'", ID_Primitive)
-        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'", 2000);
+        .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
+              LENGTHY(2000), ID_Primitive)
+        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
         .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'", ID_Primitive)
@@ -9352,16 +9403,16 @@ void tests::constants_menu()
         .test(CLEAR, LSHIFT, I, F3);
     step("Avogadro constant")
         .test(CLEAR, NOSHIFT, F1).expect("NA")
-        .test(LSHIFT, F1).expect("6.02213 67⁳²³ mol⁻¹");
+        .test(LSHIFT, F1).expect("6.02214 076⁳²³ mol⁻¹");
     step("Boltzmann constant")
         .test(CLEAR, NOSHIFT, F2).expect("k")
-        .test(LSHIFT, F2).expect("1.38065 8⁳⁻²³ J/K");
+        .test(LSHIFT, F2).expect("1.38064 9⁳⁻²³ J/K");
     step("Molar volume")
         .test(CLEAR, NOSHIFT, F3).expect("Vm")
-        .test(LSHIFT, F3).expect("22.4141 mol⁻¹");
+        .test(LSHIFT, F3).expect("0.02241 39695 45 m↑3/mol");
     step("Universal Gas constant")
         .test(CLEAR, NOSHIFT, F4).expect("R")
-        .test(LSHIFT, F4).expect("8.31451 J/(mol·K)");
+        .test(LSHIFT, F4).expect("8.31446 26181 5 J/(mol·K)");
     step("Standard temperature")
         .test(CLEAR, NOSHIFT, F5).expect("StdT")
         .test(LSHIFT, F5).expect("273.15 K");
@@ -9371,7 +9422,7 @@ void tests::constants_menu()
         .test(LSHIFT, F1).expect("101.325 kPa");
     step("Stefan-Boltzmann constant")
         .test(CLEAR, NOSHIFT, F2).expect("σ")
-        .test(LSHIFT, F2).expect("0.00000 00567 05 W/(m↑2·K↑4)");
+        .test(LSHIFT, F2).expect("0.00000 00567 04 W/(m↑2·K↑4)");
 
     step("Physics constants")
         .test(CLEAR, LSHIFT, I, F4);
@@ -9383,7 +9434,7 @@ void tests::constants_menu()
         .test(LSHIFT, F2).expect("299 792 458 m/s");
     step("Vaccuum permittivity")
         .test(CLEAR, NOSHIFT, F3).expect("ε0")
-        .test(LSHIFT, F3).expect("8.85418 78176 1⁳⁻¹² F/m");
+        .test(LSHIFT, F3).expect("8.85418 78188 4⁳⁻¹² F/m");
     step("Vaccuum permeability")
         .test(CLEAR, NOSHIFT, F4).expect("μ0")
         .test(LSHIFT, F4).expect("0.00000 12566 37 H/m");
@@ -9393,13 +9444,13 @@ void tests::constants_menu()
     step("Gravitational constant")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("G")
-        .test(LSHIFT, F1).expect("6.67259⁳⁻¹¹ m↑3/(s↑2·kg)");
+        .test(LSHIFT, F1).expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)");
     step("Planck constant")
         .test(CLEAR, NOSHIFT, F2).expect("h")
-        .test(LSHIFT, F2).expect("6.62607 55⁳⁻³⁴ J·s");
+        .test(LSHIFT, F2).expect("6.62607 015⁳⁻³⁴ J·s");
     step("Reduced Planck constant")
         .test(CLEAR, NOSHIFT, F3).expect("ℏ")
-        .test(LSHIFT, F3).expect("1.05457 266⁳⁻³⁴ J·s");
+        .test(LSHIFT, F3).expect("1.05457 18176 5⁳⁻³⁴ J·s");
     step("Electric charge")
         .test(CLEAR, NOSHIFT, F4).expect("qe")
         .test(LSHIFT, F4).expect("1.60217 6634⁳⁻¹⁹ C");
@@ -9409,13 +9460,13 @@ void tests::constants_menu()
     step("Neutron mass")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("mn")
-        .test(LSHIFT, F1).expect("1.67492 7471⁳⁻²⁷ kg");
+        .test(LSHIFT, F1).expect("1.67492 75005 6⁳⁻²⁷ kg");
     step("Proton mass")
         .test(CLEAR, NOSHIFT, F2).expect("mp")
         .test(LSHIFT, F2).expect("1.67262 19259 5⁳⁻²⁷ kg");
     step("Hydrogen mass")
         .test(CLEAR, NOSHIFT, F3).expect("mH")
-        .test(LSHIFT, F3).expect("1.00782 5 u");
+        .test(LSHIFT, F3).expect("1.00782 50322 3 u");
     step("Unified mass unit")
         .test(CLEAR, NOSHIFT, F4).expect("u")
         .test(LSHIFT, F4).expect("1.66053 90689 2⁳⁻²⁷ kg");
@@ -9425,66 +9476,70 @@ void tests::constants_menu()
     step("Electron mass/charge ratio")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("qme")
-        .test(LSHIFT, F1).expect("175 881 962 000 C/kg");
+        .test(LSHIFT, F1).expect("1.75882 00083 8⁳¹¹ C/kg");
     step("Proton/electron mass ratio")
         .test(CLEAR, NOSHIFT, F2).expect("mpme")
-        .test(LSHIFT, F2).expect("1 836.15270 1");
+        .test(LSHIFT, F2).expect("1 836.15267 342");
     step("Fine structure constant")
         .test(CLEAR, NOSHIFT, F3).expect("α")
-        .test(LSHIFT, F3).expect("0.00729 73530 8");
+        .test(LSHIFT, F3).expect("0.00729 73525 64");
     step("Magnetic flux quantum")
         .test(CLEAR, NOSHIFT, F4).expect("ø")
-        .test(LSHIFT, F4).expect("2.06783 461⁳⁻¹⁵ Wb");
+        .test(LSHIFT, F4).expect("2.06783 38484 6⁳⁻¹⁵ Wb");
     step("Faraday constant")
         .test(CLEAR, NOSHIFT, F5).expect("F")
-        .test(LSHIFT, F5).expect("96 485.309 C/mol");
+        .test(LSHIFT, F5).expect("96 485.33212 33 C/mol");
     step("Rydberg constant")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("R∞")
-        .test(LSHIFT, F1).expect("10 973 731.534 m⁻¹");
+        .test(LSHIFT, F1).expect("10 973 731.568 m⁻¹");
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F2).expect("a0")
-        .test(LSHIFT, F2).expect("0.05291 77249 nm");
+        .test(LSHIFT, F2).expect("0.05291 77210 55 nm");
     step("Bohr magneton")
         .test(CLEAR, NOSHIFT, F3).expect("μB")
-        .test(LSHIFT, F3).expect("9.27401 54⁳⁻²⁴ J/T");
+        .test(LSHIFT, F3).expect("9.27401 00657 4⁳⁻²⁴ J/T");
     step("Nuclear magneton")
         .test(CLEAR, NOSHIFT, F4).expect("μN")
-        .test(LSHIFT, F4).expect("5.05078 37393⁳⁻²⁷ J/T");
+        .test(LSHIFT, F4).expect("5.05078 37392 7⁳⁻²⁷ J/T");
     step("Photon wavelength")
         .test(CLEAR, NOSHIFT, F5).expect("λ0")
-        .test(LSHIFT, F5).expect("1 239.8425 nm");
+        .test(LSHIFT, F5).expect("1 239.84198 433 nm");
     step("Photon frequency")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("f0")
-        .test(LSHIFT, F1).expect("2.41798 83⁳¹⁴ Hz");
-    step("Compton wavelength")
+        .test(LSHIFT, F1).expect("2.41798 92420 8⁳¹⁴ Hz");
+    step("Electron Compton wavelength")
         .test(CLEAR, NOSHIFT, F2).expect("λc")
-        .test(LSHIFT, F2).expect("0.00242 63105 8 nm");
+        .test(LSHIFT, F2).expect("0.00242 63102 35 nm");
+    step("Proton Compton wavelength")
+        .test(CLEAR, NOSHIFT, F3).expect("λpc")
+        .test(LSHIFT, F3).expect("0.00000 13214 1 nm");
+    step("Neutron Compton wavelength")
+        .test(CLEAR, NOSHIFT, F4).expect("λnc")
+        .test(LSHIFT, F4).expect("0.00000 13195 91 nm");
     step("Wien's constant")
-        .test(CLEAR, NOSHIFT, F3).expect("c3")
-        .test(LSHIFT, F3).expect("0.00289 7756 m·K");
+        .test(CLEAR, NOSHIFT, F5).expect("c3")
+        .test(LSHIFT, F5).expect("2.89777 19551 9 mm·K");
     step("Boltzman / elementary charge ratio")
-        .test(CLEAR, NOSHIFT, F4).expect("kq")
-        .test(LSHIFT, F4).expect("0.00008 61738 6 J/(K·C)");
+        .test(CLEAR, NOSHIFT, F6, F1).expect("kq")
+        .test(LSHIFT, F1).expect("0.00008 61733 33 J/(K·C)");
     step("Permitivity / elementary charge ratio")
-        .test(CLEAR, NOSHIFT, F5).expect("ε0q")
-        .test(LSHIFT, F5).expect("55 263 469.6 F/(m·C)");
+        .test(CLEAR, NOSHIFT, F2).expect("ε0q")
+        .test(LSHIFT, F2).expect("55 263 493.6183 F/(m·C)");
     step("Permittivity - elementary charge product")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("qε0")
-        .test(LSHIFT, F1).expect("1.41859 78⁳⁻³⁰ F·C/m");
+        .test(CLEAR, NOSHIFT, F3).expect("qε0")
+        .test(LSHIFT, F3).expect("1.41859 72836 4⁳⁻³⁰ F·C/m");
     step("Dielectric constant of silicon")
-        .test(CLEAR, NOSHIFT, F2).expect("εsi")
-        .test(LSHIFT, F2).expect("11.9");
+        .test(CLEAR, NOSHIFT, F4).expect("εsi")
+        .test(LSHIFT, F4).expect("11.9");
     step("SiO2 dielectric constant")
-        .test(CLEAR, NOSHIFT, F3).expect("εox")
-        .test(LSHIFT, F3).expect("3.9");
+        .test(CLEAR, NOSHIFT, F5).expect("εox")
+        .test(LSHIFT, F5).expect("3.9");
     step("Reference sound intensity")
-        .test(CLEAR, NOSHIFT, F4).expect("I0")
-        .test(LSHIFT, F4).expect("1.⁳⁻¹² W/m↑2");
+        .test(CLEAR, F6, NOSHIFT, F1).expect("I0")
+        .test(LSHIFT, F1).expect("1.⁳⁻¹² W/m↑2");
 }
-
 
 
 void tests::character_menu()
@@ -10610,6 +10665,19 @@ void tests::regression_checks()
         .test(CLEAR, ID_ConstantsMenu, F4, F3, F4,
               ID_mul, ID_sqrt, ID_inv, ID_ToDecimal)
         .expect("299 792 458. m/(F↑(¹/₂)·H↑(¹/₂))");
+
+    step("Checking parsing of unary -")
+        .test(CLEAR, "'-X'", ENTER).expect("'-X'")
+        .test(CLEAR, "'-X^2'", ENTER).expect("'-(X↑2)'")
+        .test(CLEAR, "'-(X)^2'", ENTER).expect("'-(X↑2)'")
+        .test(CLEAR, "'-(((X)))^2'", ENTER).expect("'-(X↑2)'")
+        .test(CLEAR, "'-(((X))^2)'", ENTER).expect("'-(X↑2)'")
+        .test(CLEAR, "'-X-Y'", ENTER).expect("'-X-Y'")
+        .test(CLEAR, "'-X*3-Y'", ENTER).expect("'-(X·3)-Y'")
+        .test(CLEAR, "'-X^2*3-Y'", ENTER).expect("'-(X↑2·3)-Y'")
+        .test(CLEAR, "'-X²'", ENTER).expect("'-X²'")
+        .test(CLEAR, "'-X²-Y'", ENTER).expect("'-X²-Y'")
+        .test(CLEAR, "'-X²-3*-Y'", ENTER).expect("'-X²-3·(-Y)'");
 }
 
 
@@ -10646,58 +10714,24 @@ void tests::plotting()
 
     step("Function plot: Equation");
     test(CLEAR,
-         ALPHA,
-         X,
-         ENTER,
-         ENTER,
-         J,
-         3,
-         MUL,
-         M,
-         21,
-         MUL,
-         COS,
-         2,
-         MUL,
-         ADD,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F1)
+         ALPHA, X, ENTER, ENTER, ID_sin, 3, ID_mul,
+         ID_Swap, 21, ID_mul, ID_cos, 2, ID_mul, ID_add, ENTER,
+         ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-eq");
     step("Function plot: Program");
     test(CLEAR,
-         SHIFT,
-         RUNSTOP,
-         NOSHIFT,
-         I,
-         F1,
-         L,
-         M,
-         41,
-         MUL,
-         J,
-         MUL,
-         ENTER,
-         ENTER,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F1)
+         LSHIFT, RUNSTOP,
+         ID_StackMenu, ID_Dup, ID_tan, ID_Swap,
+         41, ID_mul, ID_sin, ID_mul, ENTER,
+         ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-pgm");
     step("Function plot: Disable curve filling");
     test(CLEAR,
-         RSHIFT,
-         UP,
-         ENTER,
-         "NoCurveFilling",
-         ENTER,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F1)
+         RSHIFT, UP, ENTER,
+         ID_NoCurveFilling,
+         ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-nofill");
     step("Check that LastArgs gives us the previous plot")
@@ -10710,90 +10744,38 @@ void tests::plotting()
 
     step("Polar plot: Program");
     test(CLEAR,
-         SHIFT,
-         RUNSTOP,
-         61,
-         MUL,
-         L,
-         SHIFT,
-         C,
-         2,
-         ADD,
+         LSHIFT, RUNSTOP,
+         61, ID_mul,
+         ID_tan, ID_sq,
+         2, ID_add,
          ENTER,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F2)
+         ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm");
     step("Polar plot: Program, no fill");
     test(CLEAR,
-         "NoCurveFilling",
-         ENTER,
-         SHIFT,
-         RUNSTOP,
-         61,
-         MUL,
-         L,
-         SHIFT,
-         C,
-         2,
-         ADD,
-         ENTER,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F2)
+         ID_NoCurveFilling,
+         SHIFT, RUNSTOP,
+         61, ID_mul,
+         ID_tan, ID_sq, 2, ID_add, ENTER,
+         ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm-nofill");
     step("Polar plot: Program, curve filling");
     test(CLEAR,
-         "CurveFilling",
-         ENTER,
-         SHIFT,
-         RUNSTOP,
-         61,
-         MUL,
-         L,
-         SHIFT,
-         C,
-         2,
-         ADD,
-         ENTER,
-         RSHIFT,
-         O,
-         LENGTHY(200),
-         F2)
+         ID_CurveFilling,
+         LSHIFT, RUNSTOP,
+         61, ID_mul,
+         ID_tan, ID_sq, 2, ID_add, ENTER,
+         ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm");
     step("Polar plot: Equation");
     test(CLEAR,
-         F,
-         J,
-         611,
-         MUL,
-         ALPHA,
-         X,
-         NOSHIFT,
-         DOWN,
-         MUL,
-         K,
-         271,
-         MUL,
-         ALPHA,
-         X,
-         NOSHIFT,
-         DOWN,
-         ADD,
-         KEY2,
-         DOT,
-         KEY5,
-         ENTER,
-         RSHIFT,
-         O,
-         ENTER,
-         LENGTHY(200),
-         F2)
+         F, J, 611, MUL, ALPHA, X, NOSHIFT, DOWN,
+         MUL, K, 271, MUL, ALPHA, X, NOSHIFT, DOWN,
+         ADD, KEY2, DOT, KEY5, ENTER,
+         RSHIFT, O, ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-eq");
     step("Polar plot: Zoom in X and Y");
@@ -10869,14 +10851,8 @@ void tests::plotting()
     step("Bar plot");
     test(CLEAR,
          "[[ 1 -1 ][2 -2][3 -3][4 -4][5 -6][7 -8][9 -10]]",
-         LENGTHY(200),
-         ENTER,
-         33,
-         MUL,
-         K,
-         2,
-         MUL,
-         RSHIFT,
+         LENGTHY(200), ENTER,
+         33, MUL, K, 2, MUL, RSHIFT,
          O,
          LENGTHY(200),
          F5)
@@ -10997,7 +10973,7 @@ void tests::graphic_commands()
         .image("cllcd");
 
     step("Draw graphic objects")
-        .test(CLEAR,
+        .test(CLEAR, DIRECT(
               "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
               "GROB 9 15 "
               "E300140015001C001400E3008000C110AA00940090004100220014102800 "
@@ -11011,7 +10987,7 @@ void tests::graphic_commands()
               "PICT OVER "
               "4.12 ⅈ * i * exp 4.22 0.08 i * + * Swap "
               "GOr "
-              "next",
+              "next"),
               ENTER)
         .noerror()
         .image("walkman")
@@ -11019,8 +10995,8 @@ void tests::graphic_commands()
 
     step("Displaying text, compatibility mode");
     test(CLEAR,
-         "\"Hello World\" 1 DISP "
-         "\"Compatibility mode\" 2 DISP",
+         DIRECT("\"Hello World\" 1 DISP "
+                "\"Compatibility mode\" 2 DISP"),
          ENTER)
         .noerror()
         .image("text-compat")
@@ -11028,8 +11004,8 @@ void tests::graphic_commands()
 
     step("Displaying text, fractional row");
     test(CLEAR,
-         "\"Gutentag\" 1.5 DrawText "
-         "\"Fractional row\" 3.8 DrawText",
+         DIRECT("\"Gutentag\" 1.5 DrawText "
+                "\"Fractional row\" 3.8 DrawText"),
          ENTER)
         .noerror()
         .image("text-frac")
@@ -11037,42 +11013,44 @@ void tests::graphic_commands()
 
     step("Displaying text, pixel row");
     test(CLEAR,
-         "\"Bonjour tout le monde\" #5d DISP "
-         "\"Pixel row mode\" #125d DISP",
+         DIRECT("\"Bonjour tout le monde\" #5d DISP "
+                "\"Pixel row mode\" #125d DISP"),
          ENTER)
         .noerror()
         .image("text-pixrow")
         .test(ENTER);
 
     step("Displaying text, x-y coordinates");
-    test(CLEAR, "\"Hello\" { 0 0 } DISP ", ENTER)
+    test(CLEAR, DIRECT("\"Hello\" { 0 0 } DISP "), ENTER)
         .noerror()
         .image("text-xy")
         .test(ENTER);
 
     step("Displaying text, x-y pixel coordinates");
-    test(CLEAR, "\"Hello\" { #20d #20d } DISP ", ENTER)
+    test(CLEAR, DIRECT("\"Hello\" { #20d #20d } DISP"), ENTER)
         .noerror()
         .image("text-pixxy")
         .test(ENTER);
 
     step("Displaying text, font ID");
-    test(CLEAR, "\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP ", ENTER)
+    test(CLEAR,
+         DIRECT("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
+         ENTER)
         .noerror()
         .image("text-font")
         .test(ENTER);
 
     step("Displaying text, erase and invert");
-    test(CLEAR, "\"Inverted\" { 0 0 3 true true } DISP", ENTER)
+    test(CLEAR, DIRECT("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
         .noerror()
         .image("text-invert")
         .test(ENTER);
 
     step("Displaying text, background and foreground");
     test(CLEAR,
-         "1 Gray Background cllcd "
-         "0.25 Gray Foreground 0.75 Gray Background "
-         "\"Grayed\" { 0 0 } Disp",
+         DIRECT("1 Gray Background cllcd "
+                "0.25 Gray Foreground 0.75 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
          ENTER)
         .noerror()
         .image("text-gray")
@@ -11080,8 +11058,8 @@ void tests::graphic_commands()
 
     step("Displaying text, restore background and foreground");
     test(CLEAR,
-         "0 Gray Foreground 1 Gray Background "
-         "\"Grayed\" { 0 0 } Disp",
+         DIRECT("0 Gray Foreground 1 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
          ENTER)
         .noerror()
         .image("text-normal")
@@ -11092,30 +11070,31 @@ void tests::graphic_commands()
 
     step("Displaying styled text");
     test(CLEAR,
-         "0 10 for i"
-         "  \"Hello\" { }"
-         "  i 135 * 321 mod 25 + R→B +"
-         "  i  51 * 200 mod  3 + R→B +"
-         "  i DISPXY "
-         "next",
+         DIRECT("0 10 for i"
+                "  \"Hello\" { }"
+                "  i 135 * 321 mod 25 + R→B +"
+                "  i  51 * 200 mod  3 + R→B +"
+                "  i DISPXY "
+                "next"),
          ENTER)
         .noerror()
         .image("text-dispxy");
 
     step("Lines");
-    test(CLEAR, "3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next", ENTER)
+    test(CLEAR,
+         DIRECT("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
         .noerror()
         .image("lines")
         .test(ENTER);
 
     step("Line width");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
          "i LineWidth Line "
          "next "
-         "1 LineWidth",
+         "1 LineWidth"),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11123,14 +11102,14 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Line width, grayed");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
          "i 12 / gray foreground "
          "i LineWidth Line "
          "next "
-         "1 LineWidth 0 Gray Foreground",
+         "1 LineWidth 0 Gray Foreground"),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11138,11 +11117,11 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Circles");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "1 11 for i "
          "{ 0 0 } i Circle "
          "{ 0 1 } i 0.25 * Circle "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11151,9 +11130,9 @@ void tests::graphic_commands()
 
     step("Circles, complex coordinates");
     test(CLEAR,
-         "2 150 for i "
-         "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * +  Circle "
-         "next ",
+         DIRECT("2 150 for i "
+                "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * + Circle "
+                "next"),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11161,12 +11140,12 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Circles, fill and patterns");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 LineWidth "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
          "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11174,13 +11153,13 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Ellipses");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
          "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
          " Ellipse "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11188,14 +11167,14 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Ellipses, fill and patterns");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
          "0.23 ⅈ * exp 5.75 0.01 i * - * "
          "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
          " Ellipse "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11203,13 +11182,13 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rectangles");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
          "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
          " Rect "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11217,14 +11196,14 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rectangles, fill and patterns");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
          "0.23 ⅈ * exp 5.75 0.01 i * - * "
          "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
          " Rect "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11232,13 +11211,13 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rounded rectangles");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
          "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
          "0.8 RRect "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11246,14 +11225,14 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rounded rectangles, fill and patterns");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
          "0.23 ⅈ * exp 5.75 0.01 i * - * "
          "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
          "0.8 RRect "
-         "next ",
+         "next "),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11261,13 +11240,13 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Clipping");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "0 LineWidth CLLCD { 120 135 353 175 } Clip "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
          "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
          "next "
-         "{} Clip",
+         "{} Clip"),
          LENGTHY(5000),
          ENTER)
         .noerror()
@@ -11275,34 +11254,34 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Cleanup");
-    test(CLEAR,
+    test(CLEAR, DIRECT(
          "1 LineWidth 0 Gray Foreground 1 Gray Background "
-         "{ -1 -1 } { 3 2 } rect",
+         "{ -1 -1 } { 3 2 } rect"),
          ENTER)
         .noerror()
         .image("cleanup");
 
     step("PixOn")
-        .test(CLEAR,
+        .test(CLEAR, DIRECT(
               "0 "
               "0 5000 for i"
               " 0.005 i * i 1.5 * R→P pixon "
               " 0.005 i * i 1.5 * R→P pix? 1 - neg + "
-              "next",
+              "next"),
               LENGTHY(5000),
               ENTER)
         .image("pixon")
         .test(ENTER)
         .expect("5 001");
     step("PixOff")
-        .test(CLEAR,
+        .test(CLEAR, DIRECT(
               "0 LINEWIDTH { #0 #0 } { 10#400 10#240 } rect 3 LINEWIDTH "
               "0 "
               "0 5000 for i"
               " 0.002 i * i 1.5 * R→P pixoff "
               " 0.002 i * i 1.5 * R→P pixelcolor + + + "
               "next "
-              "1 LINEWIDTH",
+              "1 LINEWIDTH"),
               LENGTHY(5000),
               ENTER)
         .image("pixoff")
@@ -11310,7 +11289,7 @@ void tests::graphic_commands()
         .expect("12 429");
 
     step("PixTest")
-        .test(CLEAR,
+        .test(CLEAR, DIRECT(
               "CLLCD "
               "0 399 for i "
               "{ } 10#0 i + + 10#100 + "
@@ -11320,7 +11299,7 @@ void tests::graphic_commands()
               "0 399 for i "
               "{ } 10#0 i + + 10#100 + "
               "pix? i 997.42 * sin 0 > 0 1 IFTE - 1 + +  "
-              "next",
+              "next"),
               LENGTHY(5000),
               ENTER)
         .image("pixtest")
@@ -11328,7 +11307,8 @@ void tests::graphic_commands()
         .expect("400");
 
     step("Convert to graph")
-        .test(CLEAR, "'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /", ENTER, EXIT)
+        .test(CLEAR, DIRECT("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
+              ENTER, EXIT)
         .image_noheader("eq-xgraph")
         .test("0 →Grob", ENTER)
         .image_noheader("eq-graph")
@@ -11336,9 +11316,11 @@ void tests::graphic_commands()
         .image_noheader("eq-graph");
 
     step("Pattern in graph conversion")
-        .test(CLEAR, "0.85 GRAY FOREGROUND 0.15 GRAY BACKGROUND", ENTER)
+        .test(CLEAR, DIRECT("0.85 GRAY FOREGROUND 0.15 GRAY BACKGROUND"),
+              ENTER)
         .noerror()
-        .test(CLEAR, "'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /", ENTER, EXIT)
+        .test(CLEAR, DIRECT("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
+              ENTER, EXIT)
         .image_noheader("pat-eq-xgraph")
         .test("2 →Grob", ENTER)
         .image_noheader("pat-eq-graph")
@@ -11869,11 +11851,22 @@ tests &tests::itest(id cmd)
 //   Find a key sequence that can send the given command
 // ----------------------------------------------------------------------------
 //   Three strategies are tried in turn to send a command:
-//   1. Scan the current keymap to see if the command is anywhere
-//   2. Scan the current menus to find the command in a menu, if so use fkeys
+//   1. Scan the current menus to find the command in a menu, if so use fkeys
+//   2. Scan the current keymap to see if the command is anywhere
 //   3. Type the name of the command
+//   We start with the menu in order to be able to enter DUP from the menu,
+//   because otherwise the keymap uses the ENTER key irrespective of current
+//   keyboard entry state (i.e. even while entering a program)
 {
-    // Pass 1: Try to find it in the user interface keymap
+    // Pass 1: Look into the current menu to see if we find it
+    for (uint p = 0; p < ui.NUM_PLANES; p++)
+        for (uint f = 0; f < ui.NUM_SOFTKEYS; f++)
+            if (object_p asn = ui.function[p][f])
+                if (id(asn->type()) == cmd)
+                    return shifts(p&1, p&2, false, false)
+                        .itest(tests::key(F1 + f));
+
+    // Pass 2: Try to find it in the user interface keymap
     if (list_p keymap = ui.keymap)
     {
         uint shplane = 0;
@@ -11900,14 +11893,6 @@ tests &tests::itest(id cmd)
             shplane++;
         }
     }
-
-    // Pass 2: Look into the current menu to see if we find it
-    for (uint p = 0; p < ui.NUM_PLANES; p++)
-        for (uint f = 0; f < ui.NUM_SOFTKEYS; f++)
-            if (object_p asn = ui.function[p][f])
-                if (id(asn->type()) == cmd)
-                    return shifts(p&1, p&2, false, false)
-                        .itest(tests::key(F1 + f));
 
     // No solution found: simply type the name
     return itest(cstring(object::name(object::id(cmd))), ENTER);
@@ -12506,9 +12491,7 @@ tests &tests::data_entry_noerror(uint extrawait)
     // Check that we are not displaying an error message
     if (rt.error())
     {
-        explain("Unexpected error message [",
-                rt.error(),
-                "] "
+        explain("Unexpected error message [", rt.error(), "] "
                 "during data entry, cleared");
         fail();
         clear_error();

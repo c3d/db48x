@@ -185,7 +185,7 @@ object::result directory::enter() const
         if (menu_p m = ui.menu())
             if (m->type() == ID_CustomMenu)
                 run<VariablesMenu>();
-        ui.menu_refresh(ID_VariablesMenu);
+        ui.menu_refresh(ID_VariablesMenu, true);
         return OK;
     }
     return ERROR;
@@ -1001,7 +1001,7 @@ COMMAND_BODY(GarbageCollectorStatistics)
     tag_g lduration = tag::make("LastDuration", integer::make(rt.GCLDuration));
     tag_g cleared   = tag::make("Cleared",      integer::make(rt.GCCleared));
 
-    if (cycles && purged && duration && lpurged && lduration)
+    if (cycles && purged && duration && lpurged && lduration && cleared)
     {
         scribble scr;
         if (rt.append(cycles)    &&
@@ -1019,12 +1019,12 @@ COMMAND_BODY(GarbageCollectorStatistics)
                 {
                     if (Settings.GCStatsClearAfterRead())
                     {
-                        rt.GCCycles    = 0;
-                        rt.GCPurged    = 0;
-                        rt.GCDuration  = 0;
-                        rt.GCLPurged   = 0;
-                        rt.GCLDuration = 0;
-                        rt.GCCleared   = 0;
+                        rt.GCCycles            = 0;
+                        rt.GCPurged            = 0;
+                        rt.GCDuration          = 0;
+                        rt.GCLPurged           = 0;
+                        rt.GCLDuration         = 0;
+                        rt.GCCleared           = 0;
                     }
                     return OK;
                 }
@@ -1068,7 +1068,7 @@ COMMAND_BODY(Home)
 // ----------------------------------------------------------------------------
 {
     rt.updir(~0U);
-    ui.menu_refresh(ID_VariablesMenu);
+    ui.menu_refresh(ID_VariablesMenu, true);
     return OK;
 }
 
@@ -1180,7 +1180,7 @@ COMMAND_BODY(UpDir)
 // ----------------------------------------------------------------------------
 {
     rt.updir();
-    ui.menu_refresh(ID_VariablesMenu);
+    ui.menu_refresh(ID_VariablesMenu, true);
     return OK;
 }
 

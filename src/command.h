@@ -157,7 +157,12 @@ COMMAND_DECLARE(Bytes,1);               // Return bytes for object
 COMMAND_DECLARE(Type,1);                // Return the type of the object
 COMMAND_DECLARE(TypeName,1);            // Return the type name of the object
 COMMAND_DECLARE(Off,-1);                // Switch the calculator off
-COMMAND_DECLARE(SaveState,-1);          // Save state to disk
+COMMAND_DECLARE(SaveState, -1);         // Save state to disk
+COMMAND_DECLARE(BatteryVoltage, 0);     // Return battery voltage
+COMMAND_DECLARE(PowerVoltage, 0);       // Return power voltage
+COMMAND_DECLARE(USBPowered, 0);         // Return true if on battery
+COMMAND_DECLARE(DMCPLowBattery, 0);     // Return DMCP low-battery indicator
+COMMAND_DECLARE(LowBattery, 0);         // Return true if battery is low
 COMMAND_DECLARE(SystemSetup,-1);        // Select the system menu
 COMMAND_DECLARE(ScreenCapture,-1);      // Snapshot screen state to a file
 COMMAND_DECLARE(Beep,2);                // Emit a sound (if enabled)

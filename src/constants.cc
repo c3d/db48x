@@ -278,7 +278,7 @@ COMMAND_BODY(Constants)
 // ============================================================================
 //
 //   Constant definitions
-//
+//   *: Algefrification & Conformity to CODATA2022
 // ============================================================================
 
 static const cstring basic_constants[] =
@@ -310,13 +310,13 @@ static const cstring basic_constants[] =
 
     "Chemistry",     nullptr,
 
-    "NA",       "6.0221367E23_mol⁻¹",   // Avogradro's number
-    "k",        "1.380658E-23_J/K",     // Boltzmann
-    "Vm",       "22.4141_mol⁻¹",        // Molar volume
-    "R",        "8.31451_J/(mol*K)",    // Universal gas constant
-    "StdT",     "273.15_K",             // Standard temperature
-    "StdP",     "101.325_kPa",          // Standard temperature
-    "σ",        "5.67051E-8_W/(m^2*K^4)", // Stefan-Boltzmann
+    "NA",       "6.02214076E23_mol⁻¹",     //*Avogadro's number
+    "k",        "1.380649E-23_J/K",        //*Boltzmann
+    "Vm",       "'CONVERT(ⒸR*ⒸStdT/ⒸStdP;1_m^3/mol)'",//*Molar volume
+    "R",        "'CONVERT(ⒸNA*Ⓒk;1_J/(mol*K))'",    //*Universal gas constant
+    "StdT",     "273.15_K",             //*Standard temperature
+    "StdP",     "101.325_kPa",          //*Standard temperature
+    "σ",        "'CONVERT(Ⓒπ^2/60*Ⓒk^4/(Ⓒℏ^3*Ⓒc^2);1_W/(m^2*K^4))'", //*Stefan-Boltzmann
 
     // ------------------------------------------------------------------------
     //   Physics
@@ -324,42 +324,65 @@ static const cstring basic_constants[] =
 
     "Physics",     nullptr,
 
-    "ⅉ",        "0+ⅈ1",                 // Imaginary unit in physics
-    "c",        "299792458_m/s",        // Speed of light
-    "ε0",       "8.85418781761E-12_F/m",// Vaccuum permittivity
-    "μ0",       "1.25663706144E-6_H/m", // Vaccuum permeability
-    "g",        "9.80665_m/s²",         // Acceleration of Earth gravity
-    "G",        "6.67259E-11_m^3/(s^2*kg)",// Gravitation constant
-    "h",        "6.6260755E-34_J*s",    // Planck
-    "ℏ",        "1.05457266E-34_J*s",   // Dirac
-    "qe",       "1.602176634E-19_C",    // Electronic charge
-    "me",       "9.1093837139E-31_kg",  // Electron mass
-    "mn",       "1.674927471E-27_kg",   // Neutron mass
-    "mp",       "1.67262192595E-27_kg", // Proton mass
-    "mH",       "1.007825_u",           // Hydrogen mass
-    "u",        "1.66053906892E-27_kg", // Mass unit
-    "Da",       "1.66053906892E-27_kg", // Mass unit (Dalton)
-    "qme",      "175881962000_C/kg",    // q/me ratio
-    "mpme",     "1836.152701",          // mp/me ratio
-    "α",        "0.00729735308",        // fine structure
-    "ø",        "2.06783461E-15_Wb",    // Magnetic flux quantum
-    "F",        "96485.309_C/mol",      // Faraday
-    "R∞",       "10973731.534_m⁻¹",     // Rydberg
-    "a0",       "0.0529177249_nm",      // Bohr radius
-    "μB",       "9.2740154E-24_J/T",    // Bohr magneton
-    "μN",       "5.0507837393E-27_J/T",    // Nuclear magneton
-    "λ0",       "1239.8425_nm",         // Photon wavelength
-    "f0",       "2.4179883E14_Hz",      // Photon frequency
-    "λc",       "0.00242631058_nm",     // Compton wavelength
-    "c3",       "0.002897756_m*K",      // Wien's
-    "kq",       "0.00008617386_J/(K*C)",// k/q
-    "ε0q",      "55263469.6_F/(m*C)",   // ε0/q
-    "qε0",      "1.4185978E-30_F*C/m",  // q*ε0
+    "ⅉ",         "0+ⅈ1",                 // Imaginary unit in physics
+    "c",        "299792458_m/s",        //*Speed of light
+    "ε0",       "'CONVERT(1/(Ⓒμ0*Ⓒc^2);1_F/m)'",//*Vaccuum permittivity
+    "μ0",       "'CONVERT(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe^2*Ⓒc);1_H/m)'", //*Vaccuum permeability
+    "g",        "9.80665_m/s²",            //*Acceleration of Earth gravity
+    "G",        "6.67430E-11_m^3/(s^2*kg)",//*Gravitation constant
+    "h",        "6.62607015E-34_J*s",      //*Planck
+    "ℏ",        "'CONVERT(Ⓒh/(2*Ⓒπ);1_J*s)'",   //*Dirac
+    "qe",       "1.602176634E-19_C",       //*Electronic charge
+    "me",       "9.1093837139E-31_kg",     //*Electron mass
+    "mn",       "1.67492750056E-27_kg",    //*Neutron mass
+    "mp",       "1.67262192595E-27_kg",    //*Proton mass
+    "mH",       "1.00782503223_u",         //*Hydrogen mass
+    "u",        "1.66053906892E-27_kg",    //*Mass unit
+    "Da",       "1.66053906892E-27_kg",    //*Mass unit (Dalton)
+    "qme",      "'CONVERT(Ⓒqe/Ⓒme;1_C/kg)'",  //*q/me ratio
+    "mpme",     "'Ⓒmp/Ⓒme'",             //*mp/me ratio
+    "α",        "0.0072973525643",        //*fine structure
+    "ø",        "'CONVERT(Ⓒπ*Ⓒℏ/Ⓒqe;1_Wb)'",      //*Magnetic flux quantum
+    "F",        "'CONVERT(ⒸNA*Ⓒqe;1_C/mol)'",      //*Faraday
+    "R∞",       "'CONVERT(Ⓒme*Ⓒqe^4/(8*Ⓒε0^2*Ⓒh^3*Ⓒc);1_m⁻¹)'", //*Rydberg
+    "a0",       "'CONVERT(4*Ⓒπ*Ⓒε0*Ⓒℏ^2/(Ⓒme*Ⓒqe^2);1_nm)'",    //*Bohr radius
+    "μB",       "'CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒme);1_J/T)'",  //*Bohr magneton
+    "μN",       "'CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒmp);1_J/T)'",  //*Nuclear magneton
+    "λ0",       "'CONVERT(Ⓒh*Ⓒc/Ⓒqe/(1_V);1_nm)'",  //*Photon wavelength
+    "f0",       "'CONVERT(Ⓒc/Ⓒλ0;1_Hz)'",            //*Photon frequency
+    "λc",       "'CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm)'",      //*Electron Compton wavelength
+    "λpc",      "'CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm)'",      //*Proton Compton wavelength
+    "λnc",      "'CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm)'",      //*Neutron Compton wavelength
+    "c3",       "2.897771955185172661_mm*K",       //*Wien's
+    "kq",       "'CONVERT(Ⓒk/Ⓒqe;1_J/(K*C))'",   //* k/q
+    "ε0q",      "'CONVERT(Ⓒε0/Ⓒqe;1_F/(m*C))'",  //* ε0/q
+    "qε0",      "'CONVERT(Ⓒqe*Ⓒε0;1_F*C/m)'",    //* q*ε0
     "εsi",      "11.9",                 // Dielectric constant
     "εox",      "3.9",                  // SiO2 dielectric constant
-    "I0",       "0.000000000001_W/m^2", // Ref intensity
+    "I0",       "0.000000000001_W/m^2", //*Ref intensity
+    "Z0",       "'CONVERT(Ⓒμ0*Ⓒc;1_Ω)'",   //*Vacuum characteristic impedance
+    "mD",       "2.01410177812_u",           //*Deuterium mass
+    "mT",       "3.0160492779_u",            //*Tritium mass
+    "mHe",      "4.00260325413_u",           //*Helium atomic mass
+    "G0",       "'CONVERT(Ⓒqe^2/(Ⓒπ*Ⓒℏ);1_S)'",  //*Conductance quantum
+    "Rk",       "'CONVERT(2*Ⓒπ*Ⓒℏ/Ⓒqe^2;1_Ω)'",  //*von Klitzing constant
+    "KJ",       "'CONVERT(2*Ⓒqe/Ⓒh;1_Hz/V)'",    //*Josephson constant
+    "re",       "'CONVERT(Ⓒα^2*Ⓒa0;1_m)'",       //*Classical electron radius
+    "σe",       "'CONVERT(8*Ⓒπ*Ⓒre^2/3;1_m^2)'", //*Thomson cross-section
+    "μe",       "'(-1)*9.2847646917E-24_J/T'",    //*Electron magnetic moment
+    "μp",       "1.41060679545E-26_J/T",          //*Proton magnetic moment
+    "μn",       "'(-1)*9.6623653E-27_J/T'",       //*Neutron magnetic moment
+    "μμ",       "'(-1)*4.49044830E-26_J/T'",      //*Muon magnetic moment
+    "ge",       "'(-1)*2.00231930436092'",        //*Electron g-factor
+    "Mpl",      "'CONVERT(√(Ⓒℏ*Ⓒc/ⒸG);1_kg)'",       //*Planck mass
+    "T°pl",     "'CONVERT(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk;1_K)'",//*Planck temperature
+    "Lpl",      "'CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^3);1_m)'",      //*Planck length
+    "Tpl",      "'CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^5);1_s)'",      //*Planck time
+    "Eh",       "'CONVERT(2*Ⓒh*Ⓒc*ⒸR∞;1_J)'",        //*Hartree energy
+    "θw",       "'CONVERT(ASIN(√(0.22305));1_r)'",     //*Weak mixing angle
+    "ΔfCs",     "9192631770_Hz",                //*Cs hyperfine transition
 
-    // ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
     //  Computing
     // ------------------------------------------------------------------------
     "Computing",   nullptr,

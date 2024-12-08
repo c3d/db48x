@@ -1916,6 +1916,7 @@ array_p array::add_sub(array_r x, array_r y, bool sub)
     if (!x || !y)
         return nullptr;
 
+    stack_depth_restore sdr;
     array::iterator xi = x->begin();
     array::iterator yi = y->begin();
     size_t          count  = 0;
@@ -2019,6 +2020,7 @@ array_p array::mul(array_r x, array_r y)
     if (!x || !y)
         return nullptr;
 
+    stack_depth_restore sdr;
     array::iterator xi = x->begin();
     array::iterator yi = y->begin();
     size_t          count  = 0;

@@ -722,8 +722,7 @@ object::result show(object_r obj)
                     reset_auto_off();
 
                 // Honor auto-off while waiting, do not erase drawn image
-                if (power_check(false))
-                    continue;
+                power_check(true);
 
                 if (!key_empty())
                 {

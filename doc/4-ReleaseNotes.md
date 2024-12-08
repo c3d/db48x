@@ -1,5 +1,110 @@
 # Release notes
 
+## Release 0.8.8 "Voice" - Power usage reduction
+
+This release focuses on reducing power usage and improving reactivity,
+notably while running on battery.
+
+### Features
+
+* Cache rendered graphics and text on the stack to reduce the time
+spent redrawing the stack.
+
+* Limit the size of objects being rendered on the stack. Objects that
+  are too large will simply render as something like `Large bignum
+  (399 bytes)` on the stack. This is configured by two new settings,
+  `TextRenderingSizeLimit` and `GraphRenderingSizeLimit`.
+
+* Limit the size spent rendering graphical objects. There are four
+  settings controlling the maximum time spent rendering objects
+  graphically.  `ResultGraphingSizeLimits` controls the display for
+  the first level on the stack, `StackGraphingSizeLimit` controls the
+  display for the other levels on the stack, `ShowTimeLimit` controls
+  the display for the `Show` command, and `GraphingTimeLimit` controls
+  other graphical rendering.
+
+* Blink the battery icon when in a low-battery situation.
+
+* Add configurable `MinimumBatteryVoltage` to adjust the threshold for
+  low-battery detection and automatic power-off.
+
+* Power-related commands: The `BatteryVoltage` and `PowerVoltage` read
+  the battery and power voltage respectively. The `USBPowered`
+  commands detects if the calculator is running on USB power. The
+  `LowBattery` command detects if the calculator is running low on
+  battery.
+
+* Detect and reject Unicode characters that look like mathematical
+  characters, and are produced by auto-correction on Windows, notably
+  the`-` and `*` signs that look like `-` and `*`. This is notably
+  useful when copy-pasting in the simulator on Windows.
+
+### Bug fixes
+
+* Fix `NDupN` again. While the previous release fixed what `NDupN`
+  does, it did not fix the detection of the number of arguments,
+  meaning that `NDupN` would incorrectly complain about missing
+  arguments if the stack was not deep enough.
+
+* Fix the precedence of unary `-` when in front of a parenthesized
+  expression.  For example, `-(X)^2` now parses correctly.
+
+* Disable keyboard repeat timer when no key is pressed. It was
+  possible to trigger a condition where the keyboard repeat timer
+  would trigger continuously if two keys had been pressed in rapid
+  succession, keeping the CPU in a busy loop and depleting the battery
+  unnecessarily rapidly until another key was pressed. This could also
+  trigger incorrect long-press detections, e.g. the shift key
+  triggering alpha mode instead of a simple shift.
+
+* Disable all timers when switching the calculator off. In some
+  situations, the display refresh timer could still remain active
+  after the calcualtor had been switched off.
+
+* `RclΣ` now returns the statistics data even when the `ΣData`
+  variable contains the name of a variable or file.
+
+* The `Off` command can now be used while editing and no longer causes
+  immediate command-line evaluation.
+
+* Return to the first page of the catalog menus when updating it, to
+  avoid scenarios where the catalog appeared empty
+
+* Return to the first page of the cartalog menu when changing
+  directories, to avoid showing an empty variables menu in a non-empty
+  directory.
+
+* Do not leave garbage on the stack after failed array arithmetic.
+
+* Avoid occasional test crashes due to concurrent pixmap updates in
+  the simulator.
+
+* Avoid occasional spurious error on `Primitive` test due to long
+  execution time.
+
+* Switch to `kg` as the base unit for `UBASE` instead of `g`,
+  following the SI standard.
+
+### Improvements
+
+* Reduce animations more drastically while on battery power.
+  Notably, the cursor does not blink, and menu animations are entirely
+  disabled.
+
+* Rework the animation and screen refresh system to make it easier to
+  maintain and more power-efficient while on battery.
+
+* Refresh the display using hardware-accelerated background refresh
+  routines provided by the DMCP platform. This can be disabled using
+  the `SoftwareDisplayRefresh` flag.
+
+* Redraw the battery immediately on power change, i.e. plugging or
+  unplugging the USB cable.
+
+* Updated built-in constants with latets CODATA values
+  (contributed by Jean Wilson)
+
+
 ## Release 0.8.7 "Signs" - Performance optimizations
 
 This release focuses on performance improvements and bug fixes for

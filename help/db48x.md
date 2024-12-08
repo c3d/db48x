@@ -2485,6 +2485,111 @@ You can edit it by recalling its content on the stack using
 back to disk using `"config:equations.csv" STO`.
 # Release notes
 
+## Release 0.8.8 "Voice" - Power usage reduction
+
+This release focuses on reducing power usage and improving reactivity,
+notably while running on battery.
+
+### Features
+
+* Cache rendered graphics and text on the stack to reduce the time
+spent redrawing the stack.
+
+* Limit the size of objects being rendered on the stack. Objects that
+  are too large will simply render as something like `Large bignum
+  (399 bytes)` on the stack. This is configured by two new settings,
+  `TextRenderingSizeLimit` and `GraphRenderingSizeLimit`.
+
+* Limit the size spent rendering graphical objects. There are four
+  settings controlling the maximum time spent rendering objects
+  graphically.  `ResultGraphingSizeLimits` controls the display for
+  the first level on the stack, `StackGraphingSizeLimit` controls the
+  display for the other levels on the stack, `ShowTimeLimit` controls
+  the display for the `Show` command, and `GraphingTimeLimit` controls
+  other graphical rendering.
+
+* Blink the battery icon when in a low-battery situation.
+
+* Add configurable `MinimumBatteryVoltage` to adjust the threshold for
+  low-battery detection and automatic power-off.
+
+* Power-related commands: The `BatteryVoltage` and `PowerVoltage` read
+  the battery and power voltage respectively. The `USBPowered`
+  commands detects if the calculator is running on USB power. The
+  `LowBattery` command detects if the calculator is running low on
+  battery.
+
+* Detect and reject Unicode characters that look like mathematical
+  characters, and are produced by auto-correction on Windows, notably
+  the`-` and `*` signs that look like `-` and `*`. This is notably
+  useful when copy-pasting in the simulator on Windows.
+
+### Bug fixes
+
+* Fix `NDupN` again. While the previous release fixed what `NDupN`
+  does, it did not fix the detection of the number of arguments,
+  meaning that `NDupN` would incorrectly complain about missing
+  arguments if the stack was not deep enough.
+
+* Fix the precedence of unary `-` when in front of a parenthesized
+  expression.  For example, `-(X)^2` now parses correctly.
+
+* Disable keyboard repeat timer when no key is pressed. It was
+  possible to trigger a condition where the keyboard repeat timer
+  would trigger continuously if two keys had been pressed in rapid
+  succession, keeping the CPU in a busy loop and depleting the battery
+  unnecessarily rapidly until another key was pressed. This could also
+  trigger incorrect long-press detections, e.g. the shift key
+  triggering alpha mode instead of a simple shift.
+
+* Disable all timers when switching the calculator off. In some
+  situations, the display refresh timer could still remain active
+  after the calcualtor had been switched off.
+
+* `RclΣ` now returns the statistics data even when the `ΣData`
+  variable contains the name of a variable or file.
+
+* The `Off` command can now be used while editing and no longer causes
+  immediate command-line evaluation.
+
+* Return to the first page of the catalog menus when updating it, to
+  avoid scenarios where the catalog appeared empty
+
+* Return to the first page of the cartalog menu when changing
+  directories, to avoid showing an empty variables menu in a non-empty
+  directory.
+
+* Do not leave garbage on the stack after failed array arithmetic.
+
+* Avoid occasional test crashes due to concurrent pixmap updates in
+  the simulator.
+
+* Avoid occasional spurious error on `Primitive` test due to long
+  execution time.
+
+* Switch to `kg` as the base unit for `UBASE` instead of `g`,
+  following the SI standard.
+
+### Improvements
+
+* Reduce animations more drastically while on battery power.
+  Notably, the cursor does not blink, and menu animations are entirely
+  disabled.
+
+* Rework the animation and screen refresh system to make it easier to
+  maintain and more power-efficient while on battery.
+
+* Refresh the display using hardware-accelerated background refresh
+  routines provided by the DMCP platform. This can be disabled using
+  the `SoftwareDisplayRefresh` flag.
+
+* Redraw the battery immediately on power change, i.e. plugging or
+  unplugging the USB cable.
+
+* Updated built-in constants with latets CODATA values
+  (contributed by Jean Wilson)
+
+
 ## Release 0.8.7 "Signs" - Performance optimizations
 
 This release focuses on performance improvements and bug fixes for
@@ -9668,6 +9773,37 @@ calculator operations.
 « TIME " " PATH TAIL TOTEXT + + "
 " + DATE + " Mem: " + MEM + » HEADER
 ```
+
+
+## GraphingTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object
+graphically. The default is 250ms.
+
+## ShowTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object for the
+`Show` command. The default is 10000 (10s)
+
+## ResultGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the result (level 1 of the
+stack) graphically. The default value is 1500 (1.5s)
+
+## StackGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the levels of the stack above
+level 1. The default value is 250ms.
+
+## TextRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
+`Large text (399 bytes)`.
+
+## GraphRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack
+graphically. Objects that are larger than this size are text.
 # Library Management
 
 DB48x features a [library](#library) that can contain arbitary RPL code,
@@ -12336,7 +12472,21 @@ Return an array containing garbage collector statistics, including:
 * The total number of bytes collected
 * The total time spent collecting garbage
 * The number of bytes collected during the last collection cycle
-* The time spent during the last collection cycle
+* The duration of the last collection cycle
+* The number of bytes cleared by temporaries cleaning
+
+
+## RuntimeStatistics
+
+Return an array containing runtime statistics, including:
+
+* The time spent running (i.e. the calculator is in high-power state)
+* The time spent sleeping (i.e. the calculator is in low-power state)
+* The number of times the calculator entered high-power state
+
+Note that the calculator tends to spend more time in active state when on USB
+power, because of additional animations or more expensive graphical rendering.
+
 
 ## Bytes
 
@@ -12415,6 +12565,77 @@ upgrade.
 ## ScreenCapture
 
 Capture the current state of the screen in a dated file stored on the flash storage under the `SCREENS/` directory. This is activated by *holding* 🟨 and _O_ simultaneously. Pressing the keys one after another activates the [DisplayMenu](#displaymenu).
+
+
+## BatteryVoltage
+
+Return the current battery voltage as a decimal value.
+
+## USBPowered
+
+Returns `True` if the calculator is connected to USB power.
+
+Programmers can use this command in a long-running program to alter the
+frequency of power-hungry operations such as displaying on the screen.
+
+For example, the `CollatzConjecture` library program only displays the amount of
+memory used when powered by USB:
+
+```rpl
+ⓁCollatzBenchmark
+```
+
+## LowBattery
+
+Returns `True` if the calculator is running low on battery, which is defined as
+having less than 1/4th of the charge between 3000 mV and the value defined in
+`MinimumBatteryVoltage`.
+
+Programmers can use this command in long-running programs to automatically pause
+their programs in order to avoid draining the battery and losing memory.
+
+## DMCPLowBattery
+
+Returns `True` if the calculator is running low on battery according to the DMCP
+`get_lowbat_state()` function. Experimentally, this function is not very
+reliable in detecting low-battery conditions. Use `LowBattery` instead.
+
+## MinimumBatteryVoltage
+
+This setting defines the minimum battery voltage in millivolts where the
+calculator will automatically switch off to preserve battery. The default
+value is 2600mV, which appears to be safe even with no-brand batteries.
+
+Experimentally, the DM42 can operate at much lower voltages than 2.4V, but some
+operations become unreliable or even cause a reset. Notably, the calculator may
+not be able to wake up without rebooting, losing user data in the process.
+
+If the battery goes below `MinimumBatteryVoltage`, the calculator will
+automatically switch off with a message on the screen requesting to connect to
+USB power or to change the battery. Selecting a higher value than the
+default can be used to have an early reminder that you need to purchase
+replacement batteries.
+
+
+## BatteryRefresh
+
+This setting defines the refresh interval in milliseconds between checks or updates of the battery levels. The default is `5000` (5 seconds).
+
+Note that explicitly calling `BatteryVoltage`, `USBPowered` or `LowBattery`
+causes the corresponding values to be immediatley refreshed, but does not
+necessarily cause the battery status on screen to update.
+
+
+## DMCPDisplayRefresh
+
+On hardware calculators, use the DMCP system background display refresh.
+This is the default setting, and presumably should use less energy.
+
+
+## SoftwareDisplayRefresh
+
+On hardware calculator, use the software display refresh.
+This should be used for debugging purpose only.
 # Tagged objects
 
 Tagged objects are a way to indicate what a value represents, using a *tag*

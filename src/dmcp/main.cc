@@ -67,24 +67,67 @@ RECORDER(tests_rpl,    256, "Test request processing on RPL");
 RECORDER(refresh,       16, "Refresh requests");
 
 
+static byte *lcd_buffer = nullptr;
+static uint  row_min    = ~0;
+static uint  row_max    = 0;
+
+void mark_dirty(uint row)
+// ----------------------------------------------------------------------------
+//   Mark a screen range as dirty
+// ----------------------------------------------------------------------------
+{
+    if (row < LCD_H)
+    {
+#ifndef SIMULATOR
+        if (Settings.DMCPDisplayRefresh())
+        {
+            bitblt24(0, 8, row, 0, BLT_XOR, BLT_NONE);
+        }
+        else if (!lcd_buffer[52 * row - 2])
+        {
+            lcd_buffer[52 * row - 2] = 1;
+            lcd_buffer[52 * row] ^= 1;
+            if (row_min > row)
+                row_min = row;
+            if (row_max < row)
+                row_max = row;
+        }
+#endif // SIMULATOR
+    }
+}
+
+
 void refresh_dirty()
 // ----------------------------------------------------------------------------
 //  Send an LCD refresh request for the area dirtied by drawing
 // ----------------------------------------------------------------------------
 {
-    rect dirty = ui.draw_dirty();
-    if (!dirty.empty())
+    uint start = sys_current_ms();
+#ifndef SIMULATOR
+    if (ST(STAT_OFF))
+        return;
+    if (Settings.DMCPDisplayRefresh())
     {
-        // We get garbagge on screen if we pass anything outside of it
-        coord top = dirty.y1;
-        coord bottom = dirty.y2;
-        coord height = LCD_H - 1;
-        top = max(coord(0), min(height, top));
-        bottom = max(coord(0), min(height, bottom));
-        lcd_refresh_lines(top, bottom - top + 1);
-        record(refresh, "Refresh %u lines from %u", bottom-top+1, top);
+        lcd_refresh();
     }
-    ui.draw_clean();
+    else
+    {
+        for (uint row = 0; row < LCD_H; row++)
+        {
+            if (lcd_buffer[52 * row - 2])
+            {
+                lcd_buffer[52 * row - 1] = LCD_H - row;
+                LCD_write_line(&lcd_buffer[52 * row - 2]);
+                lcd_buffer[52 * row - 2] = 0;
+            }
+        }
+    }
+#else
+    lcd_refresh();
+#endif
+    row_min = ~0;
+    row_max = 0;
+    program::refresh_time += sys_current_ms() - start;
 }
 
 
@@ -93,7 +136,7 @@ void redraw_lcd(bool force)
 //   Redraw the whole LCD
 // ----------------------------------------------------------------------------
 {
-    uint now     = sys_current_ms();
+    uint now = sys_current_ms();
 
     record(main, "Begin redraw at %u", now);
 
@@ -125,6 +168,8 @@ void redraw_lcd(bool force)
 
     // Refresh screen moving elements after the requested period
     sys_timer_start(TIMER1, period);
+
+    program::display_time += sys_current_ms() - now;
 }
 
 
@@ -138,26 +183,38 @@ static void redraw_periodics()
 
     record(main, "Periodics %u", now);
     ui.draw_start(false);
-    ui.draw_cursor(false, ui.cursor_position());
     ui.draw_header();
     ui.draw_battery();
-    ui.draw_menus();
+    if (program::animated())
+    {
+        ui.draw_cursor(false, ui.cursor_position());
+        ui.draw_menus();
+    }
     refresh_dirty();
 
     // Slow things down if inactive for long enough
     uint period = ui.draw_refresh();
-    if (dawdle_time > 180000)           // If inactive for 3 minutes
-        period = 60000;                 // Only upate screen every minute
-    else if (dawdle_time > 60000)       // If inactive for 1 minute
-        period = 10000;                 // Onlyi update screen every 10s
-    else if (dawdle_time > 10000)       // If inactive for 10 seconds
-        period = 3000;                  // Only upate screen every 3 second
+    if (!program::animated())
+    {
+        // Adjust refresh time based on time since last interaction
+        // After 10s, update at most every 3s
+        // After 1 minute, update at most every 10s
+        // After 3 minutes, update at most once per minute
+        if (dawdle_time > 180000 && period < 60000)
+            period = 60000;
+        else if (dawdle_time > 60000 && period < 10000)
+            period = 10000;
+        else if (dawdle_time > 10000 && period < 3000)
+            period = 3000;
+    }
 
     uint then = sys_current_ms();
     record(main, "Dawdling for %u at %u after %u", period, then, then-now);
 
     // Refresh screen moving elements after 0.1s
     sys_timer_start(TIMER1, period);
+
+    program::display_time += sys_current_ms() - now;
 }
 
 
@@ -210,6 +267,7 @@ void program_init()
     menu_line_str_app = menu_item_description;
     is_beep_mute = db48x_is_beep_mute;
     set_beep_mute = db48x_set_beep_mute;
+    lcd_buffer = lcd_line_addr(0);
 
     // Setup default fonts
     font_defaults();
@@ -254,9 +312,9 @@ void program_init()
 }
 
 
-bool power_check(bool draw_off_image)
+void power_check(bool running)
 // ----------------------------------------------------------------------------
-//   Check power state, returns true if we need to keep looping
+//   Check power state, keep looping until it's safe to run
 // ----------------------------------------------------------------------------
 // Status flags:
 // ST(STAT_PGM_END)   - Program should go to off state (set by auto off timer)
@@ -264,58 +322,66 @@ bool power_check(bool draw_off_image)
 // ST(STAT_OFF)       - Program in off state (only [EXIT] key can wake it up)
 // ST(STAT_RUNNING)   - OS doesn't sleep in this mode
 {
-    // Already in off mode and suspended
-    if ((ST(STAT_PGM_END) && ST(STAT_SUSPENDED)) ||
-        // Go to sleep if no keys available
-        (!ST(STAT_PGM_END) && key_empty()))
+    while (true)
     {
-        CLR_ST(STAT_RUNNING);
-        sys_sleep();
-    }
-
-    // Wakeup in off state or going to sleep
-    if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
-    {
-        if (!ST(STAT_SUSPENDED))
+        // Already in off mode and suspended
+        if ((ST(STAT_PGM_END) && ST(STAT_SUSPENDED)) ||
+            // Go to sleep if no keys available
+            (!ST(STAT_PGM_END) && key_empty()))
         {
-            bool lowbat = read_power_voltage() < BATTERY_VOFF;
-
-            // Going to off mode
-            lcd_set_buf_cleared(0); // Mark no buffer change region
-            if (draw_off_image)
-                draw_power_off_image(0);
-            else
-                ui.draw_message("Switched off to conserve battery",
-                                "Press the ON/EXIT key to resume");
-            if (lowbat)
-            {
-                symbol_p cmd = symbol::make("Low power");
-                rt.command(cmd);
-                rt.error("Connect to USB / change battery");
-                ui.draw_error();
-                refresh_dirty();
-            }
-
-            sys_critical_start();
-            SET_ST(STAT_SUSPENDED);
-            LCD_power_off(0);
-            SET_ST(STAT_OFF);
-            sys_critical_end();
+            CLR_ST(STAT_RUNNING);
+            static uint last_awake = 0;
+            uint now = sys_current_ms();
+            if (last_awake)
+                program::active_time += now - last_awake;
+            sys_sleep();
+            uint then = sys_current_ms();
+            last_awake = then;
+            program::sleeping_time += then - now;
+            program::run_cycles++;
         }
-        // Already in OFF -> just continue to sleep above
-        return true;
-    }
+        if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
+        {
+            // Wakeup in off state or going to sleep
+            if (!ST(STAT_SUSPENDED))
+            {
+                bool lowbat = !program::on_usb && program::low_battery();
+                if (lowbat)
+                    ui.draw_message("Switched off due to low power",
+                                    "Connect to USB to avoid losing memory",
+                                    "Replace the battery as soon as possible");
+                else if (running)
+                    ui.draw_message("Switched off to conserve battery",
+                                    "Press the ON/EXIT key to resume");
+                else
+                    draw_power_off_image(0);
 
-    // Check power change or wakeup
-    if (ST(STAT_CLK_WKUP_FLAG))
-    {
-        CLR_ST(STAT_CLK_WKUP_FLAG);
-        return true;
-    }
-    if (ST(STAT_POWER_CHANGE))
-    {
-        CLR_ST(STAT_POWER_CHANGE);
-        return true;
+                sys_critical_start();
+                SET_ST(STAT_SUSPENDED);
+                LCD_power_off(0);
+                sys_timer_disable(TIMER0);
+                sys_timer_disable(TIMER1);
+                SET_ST(STAT_OFF);
+                sys_critical_end();
+            }
+            // Already in OFF -> just continue to sleep above
+        }
+
+        // Check power change or wakeup
+        else if (ST(STAT_CLK_WKUP_FLAG))
+        {
+            CLR_ST(STAT_CLK_WKUP_FLAG);
+        }
+        else if (ST(STAT_POWER_CHANGE))
+        {
+            CLR_ST(STAT_POWER_CHANGE);
+            ui.draw_battery(true);
+            refresh_dirty();
+        }
+        else
+        {
+            break;
+        }
     }
 
     // Well, we are woken-up
@@ -332,16 +398,14 @@ bool power_check(bool draw_off_image)
         CLR_ST(STAT_OFF);
 
         // Check if we need to redraw
-        if (lcd_get_buf_cleared())
-            redraw_lcd(true);
+        if (ui.showing_graphics())
+            ui.draw_graphics(true);
         else
-            lcd_forced_refresh();
+            redraw_lcd(true);
     }
 
     // We definitely reached active state, clear suspended flag
     CLR_ST(STAT_SUSPENDED);
-
-    return false;
 }
 
 #ifndef SIMULATOR
@@ -380,8 +444,7 @@ extern "C" void program_main()
     while (true)
     {
         // Check power state, and switch off if necessary
-        if (power_check(true))
-            continue;
+        power_check(false);
 
         // Key is ready -> clear auto off timer
         bool hadKey = false;
@@ -437,7 +500,9 @@ extern "C" void program_main()
             }
 
         }
-        bool repeating = sys_timer_timeout(TIMER0);
+        bool repeating = key > 0
+            && sys_timer_active(TIMER0)
+            && sys_timer_timeout(TIMER0);
         if (repeating)
         {
             hadKey = true;
@@ -469,12 +534,13 @@ extern "C" void program_main()
             // Blink the cursor
             if (sys_timer_timeout(TIMER1))
                 redraw_periodics();
+            if (!key)
+                sys_timer_disable(TIMER0);
         }
 #if SIMULATOR && !WASM
         if (tests::running && test_command && key_empty())
             process_test_commands();
 #endif // SIMULATOR && !WASM
-
     }
 }
 

@@ -398,3 +398,34 @@ calculator operations.
 « TIME " " PATH TAIL TOTEXT + + "
 " + DATE + " Mem: " + MEM + » HEADER
 ```
+
+
+## GraphingTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object
+graphically. The default is 250ms.
+
+## ShowTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object for the
+`Show` command. The default is 10000 (10s)
+
+## ResultGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the result (level 1 of the
+stack) graphically. The default value is 1500 (1.5s)
+
+## StackGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the levels of the stack above
+level 1. The default value is 250ms.
+
+## TextRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
+`Large text (399 bytes)`.
+
+## GraphRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack
+graphically. Objects that are larger than this size are text.

@@ -162,6 +162,9 @@ public:
 
     settings();
 
+    // Hash value, used to check if settings changed
+    uint hash() const;
+
     // Accessor functions
 #define ID(id)
 #define FLAG(Enable,Disable)                                            \

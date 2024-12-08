@@ -88,13 +88,13 @@ COMMAND(DupN,~1)
 }
 
 
-COMMAND(NDupN,~1)
+COMMAND(NDupN,2)
 // ----------------------------------------------------------------------------
 //   Implement the RPL "NDUPN" command, duplicate an element N times
 // ----------------------------------------------------------------------------
 {
     uint32_t depth = uint32_arg();
-    if (!rt.error() && rt.args(depth+1))
+    if (!rt.error())
     {
         object_g count = rt.pop();
         object_g value = rt.pop();

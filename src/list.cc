@@ -142,14 +142,19 @@ object::result list::list_parse(id      type,
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
                 if (parenthese || infix || prefix || alist)
                 {
-                    int pp = prefix && prefix->precedence() < FUNCTION
-                        ? int(prefix->precedence())
-                        : 0;
                     int childp = infix      ? int(infix->precedence() + 1)
                                : parenthese ? int(LOWEST)
                                : alist      ? int(LOWEST)
-                               : pp         ? pp + 1
                                             : int(SYMBOL);
+                    if (prefix)
+                    {
+                        int pp = prefix->precedence();
+                        if (pp && pp < FUNCTION)
+                        {
+                            childp = pp + 1;
+                            parenthese = false;
+                        }
+                    }
                     if (infix && infix->type() == ID_Copy)
                     {
                         childp = int(SYMBOL);

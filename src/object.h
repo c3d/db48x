@@ -341,24 +341,17 @@ struct object
     // ------------------------------------------------------------------------
 
 
-    size_t render(renderer &r) const
+    size_t render(renderer &r) const;
     // ------------------------------------------------------------------------
     //   Render the object into an existing renderer
     // ------------------------------------------------------------------------
-    {
-        record(render, "Rendering %p into %p", this, &r);
-        return ops().render(this, r);
-    }
 
 
-    grob_p graph(grapher &g) const
+    grob_p graph(grapher &g) const;
     // ------------------------------------------------------------------------
     //   Render the object into an existing grapher
     // ------------------------------------------------------------------------
-    {
-        record(render, "Graphing %+s %p into %p", name(), this, &g);
-        return ops().graph(this, g);
-    }
+
 
     grob_p graph(bool showing = false) const;
     // ------------------------------------------------------------------------

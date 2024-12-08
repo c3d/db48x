@@ -170,7 +170,21 @@ Return an array containing garbage collector statistics, including:
 * The total number of bytes collected
 * The total time spent collecting garbage
 * The number of bytes collected during the last collection cycle
-* The time spent during the last collection cycle
+* The duration of the last collection cycle
+* The number of bytes cleared by temporaries cleaning
+
+
+## RuntimeStatistics
+
+Return an array containing runtime statistics, including:
+
+* The time spent running (i.e. the calculator is in high-power state)
+* The time spent sleeping (i.e. the calculator is in low-power state)
+* The number of times the calculator entered high-power state
+
+Note that the calculator tends to spend more time in active state when on USB
+power, because of additional animations or more expensive graphical rendering.
+
 
 ## Bytes
 
@@ -249,3 +263,74 @@ upgrade.
 ## ScreenCapture
 
 Capture the current state of the screen in a dated file stored on the flash storage under the `SCREENS/` directory. This is activated by *holding* 🟨 and _O_ simultaneously. Pressing the keys one after another activates the [DisplayMenu](#displaymenu).
+
+
+## BatteryVoltage
+
+Return the current battery voltage as a decimal value.
+
+## USBPowered
+
+Returns `True` if the calculator is connected to USB power.
+
+Programmers can use this command in a long-running program to alter the
+frequency of power-hungry operations such as displaying on the screen.
+
+For example, the `CollatzConjecture` library program only displays the amount of
+memory used when powered by USB:
+
+```rpl
+ⓁCollatzBenchmark
+```
+
+## LowBattery
+
+Returns `True` if the calculator is running low on battery, which is defined as
+having less than 1/4th of the charge between 3000 mV and the value defined in
+`MinimumBatteryVoltage`.
+
+Programmers can use this command in long-running programs to automatically pause
+their programs in order to avoid draining the battery and losing memory.
+
+## DMCPLowBattery
+
+Returns `True` if the calculator is running low on battery according to the DMCP
+`get_lowbat_state()` function. Experimentally, this function is not very
+reliable in detecting low-battery conditions. Use `LowBattery` instead.
+
+## MinimumBatteryVoltage
+
+This setting defines the minimum battery voltage in millivolts where the
+calculator will automatically switch off to preserve battery. The default
+value is 2600mV, which appears to be safe even with no-brand batteries.
+
+Experimentally, the DM42 can operate at much lower voltages than 2.4V, but some
+operations become unreliable or even cause a reset. Notably, the calculator may
+not be able to wake up without rebooting, losing user data in the process.
+
+If the battery goes below `MinimumBatteryVoltage`, the calculator will
+automatically switch off with a message on the screen requesting to connect to
+USB power or to change the battery. Selecting a higher value than the
+default can be used to have an early reminder that you need to purchase
+replacement batteries.
+
+
+## BatteryRefresh
+
+This setting defines the refresh interval in milliseconds between checks or updates of the battery levels. The default is `5000` (5 seconds).
+
+Note that explicitly calling `BatteryVoltage`, `USBPowered` or `LowBattery`
+causes the corresponding values to be immediatley refreshed, but does not
+necessarily cause the battery status on screen to update.
+
+
+## DMCPDisplayRefresh
+
+On hardware calculators, use the DMCP system background display refresh.
+This is the default setting, and presumably should use less energy.
+
+
+## SoftwareDisplayRefresh
+
+On hardware calculator, use the software display refresh.
+This should be used for debugging purpose only.

@@ -56,6 +56,10 @@
 #include "util.h"
 #include "version.h"
 
+#ifdef SIMULATOR
+#include "sim-dmcp.h"
+#endif // SIMULATOR
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -676,12 +680,11 @@ COMMAND_BODY(Wait)
                     sys_timer_start(TIMER1, remains);
 
                     // Do not switch off if on USB power
-                    if (usb_powered())
+                    if (program::on_usb)
                         reset_auto_off();
 
                     // Honor auto-off while waiting, do not erase drawn image
-                    if (power_check(false))
-                        continue;
+                    power_check(true);
 
                     if (!key_empty())
                     {
@@ -819,6 +822,85 @@ COMMAND_BODY(SaveState)
 {
     save_system_state();
     return OK;
+}
+
+
+COMMAND_BODY(BatteryVoltage)
+// ----------------------------------------------------------------------------
+//   Return the current battery voltage, e.g. for custom headers
+// ----------------------------------------------------------------------------
+{
+    int vdd = get_vbat();
+    program::battery_voltage = vdd;
+    if (algebraic_g value = integer::make(vdd))
+        if (algebraic_g sym = +symbol::make("mV"))
+            if (algebraic_p uvalue = unit::make(value, sym))
+                if (rt.push(uvalue))
+                    return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(PowerVoltage)
+// ----------------------------------------------------------------------------
+//   Return the current battery voltage, e.g. for custom headers
+// ----------------------------------------------------------------------------
+{
+    int vdd = read_power_voltage();
+    program::power_voltage = vdd;
+    if (algebraic_g value = integer::make(vdd))
+        if (algebraic_g sym = +symbol::make("mV"))
+            if (algebraic_p uvalue = unit::make(value, sym))
+                if (rt.push(uvalue))
+                    return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(USBPowered)
+// ----------------------------------------------------------------------------
+//   Return True if the calculator is on USB power
+// ----------------------------------------------------------------------------
+{
+    bool usb = usb_powered();
+    program::on_usb = usb;
+    if (object_p value = object::static_object(usb ? ID_True : ID_False))
+        if (rt.push(value))
+            return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(DMCPLowBattery)
+// ----------------------------------------------------------------------------
+//   Return True if the battery is low according to DMCP
+// ----------------------------------------------------------------------------
+//   This proved quite unreliable in practice, at least on DM42
+//   Left in place for the purpose of experimentation by developers
+{
+    bool low = get_lowbat_state();
+    if (object_p value = object::static_object(low ? ID_True : ID_False))
+        if (rt.push(value))
+            return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(LowBattery)
+// ----------------------------------------------------------------------------
+//   Return True if the battery is low
+// ----------------------------------------------------------------------------
+{
+    uint vdd  = read_power_voltage();
+    uint vmax = BATTERY_VMAX;
+    uint vmin = Settings.MinimumBatteryVoltage();
+    uint vlow = (vmax + 3 * vmin) / 4;
+    bool low  = vdd < vlow;
+    program::battery_voltage = vdd;
+    if (object_p value = object::static_object(low ? ID_True : ID_False))
+        if (rt.push(value))
+            return OK;
+    return ERROR;
 }
 
 

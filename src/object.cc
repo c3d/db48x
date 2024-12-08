@@ -955,6 +955,32 @@ RENDER_BODY(object)
 }
 
 
+size_t object::render(renderer &r) const
+// ------------------------------------------------------------------------
+//   Render the object into an existing text renderer
+// ------------------------------------------------------------------------
+{
+    record(render, "Rendering %p into %p", this, &r);
+    size_t sz = size();
+    if (r.stack() && sz > Settings.TextRenderingSizeLimit())
+        return r.printf("Large %s (%lu bytes)", name(), sz);
+    return ops().render(this, r);
+}
+
+
+grob_p object::graph(grapher &g) const
+// ------------------------------------------------------------------------
+//   Render the object into an existing grapher
+// ------------------------------------------------------------------------
+{
+    record(render, "Graphing %+s %p into %p", name(), this, &g);
+    size_t sz = size();
+    if (g.stack && !is_graph() && sz > Settings.GraphRenderingSizeLimit())
+        return nullptr;
+    return ops().graph(this, g);
+}
+
+
 grob_p object::as_grob() const
 // ----------------------------------------------------------------------------
 //   Return object as a graphic object
@@ -1194,6 +1220,8 @@ grob_p object::graph(bool showing) const
     bool    astext = false;
     grapher g(width, height, settings::EDITOR,
               Settings.Foreground(), Settings.Background(), !showing);
+    if (showing)
+        g.duration = Settings.ShowTimeLimit();
     while (!graph)
     {
         if (astext)

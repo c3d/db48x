@@ -584,8 +584,8 @@ static const cstring basic_units[] =
     "Mass",     nullptr,
 
     // Metric units
-    "kg",       "=",                    // Kilogram
-    "g",        "1_g",                  // Gram
+    "kg",       "1_kg",                 // Kilogram (SI base unit)
+    "g",        "1/1000_kg",            // Gram
     "t",        "1000_kg",              // Metric ton
     "ct",       "200_mg",               // Carat
     "mol",      "1_mol",                // Mole (quantity of matter)

@@ -249,7 +249,7 @@ bool StatsData::Access::parse(object_p name)
         object::id oty = obj->type();
         if (oty == object::ID_text || oty == object::ID_symbol)
         {
-            obj = directory::recall_all(obj, true);
+            obj = directory::recall_all(obj, false);
             if (!obj)
                 return false;
         }
@@ -390,10 +390,10 @@ COMMAND_BODY(RecallData)
 //  Recall stats data
 // ----------------------------------------------------------------------------
 {
-    if (directory *dir = rt.variables(0))
-        if (object_p value = dir->recall(command::static_object(ID_StatsData)))
-            if (rt.push(value))
-                return OK;
+    StatsData::Access stats;
+    if (stats.data)
+        if (rt.push(+stats.data))
+            return OK;
     return ERROR;
 }
 

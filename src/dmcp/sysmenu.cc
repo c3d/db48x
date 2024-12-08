@@ -429,7 +429,6 @@ static int state_load_callback(cstring path, cstring name, void *merge)
                 if (exec != object::OK)
                 {
                     ui.draw_error();
-                    refresh_dirty();
                     return 1;
                 }
 

@@ -109,8 +109,8 @@ struct user_interface
     void        menu(uint index, cstring label, object_p function);
     void        menu(uint index, symbol_p label, object_p function);
     void        marker(uint index, unicode mark, bool alignLeft = false);
-    bool        menu_refresh();
-    bool        menu_refresh(object::id menu);
+    bool        menu_refresh(bool page0 = false);
+    bool        menu_refresh(object::id menu, bool page0 = false);
     void        menu_auto_complete()    { autoComplete = true; }
     symbol_p    label(uint index);
     cstring     label_text(uint index);
@@ -124,13 +124,11 @@ struct user_interface
     void        draw_dirty(const rect &r);
     void        draw_dirty(coord x1, coord y1, coord x2, coord y2);
     uint        draw_refresh()          { return nextRefresh; }
-    rect        draw_dirty()            { return dirty; }
-    void        draw_clean()            { dirty = rect(); }
     bool        draw_graphics(bool erase = false);
 
-    bool        draw_header();          // Left part of header
-    bool        draw_battery();         // Rightmost part of header
-    bool        draw_annunciators();    // Left of battery
+    bool        draw_header();                  // Left part of header
+    bool        draw_battery(bool now=false);   // Rightmost part of header
+    bool        draw_annunciators();            // Left of battery
     bool        draw_busy(unicode glyph, pattern col);
     rect        draw_busy_background();
     bool        draw_busy();
@@ -253,7 +251,7 @@ protected:
     uint     help;              // Offset of help being displayed in help file
     uint     line;              // Line offset in the help display
     uint     topic;             // Offset of topic being highlighted
-    uint     topics_history;    // History depth
+    uint     topicsHistory;     // History depth
     uint     topics[8];         // Topics history
     grob_g   image;             // Image loaded in help file
     uint     impos;             // Position of image file
@@ -275,11 +273,21 @@ protected:
     uint     menuPages;         // Number of menu pages
     uint     menuHeight;        // Height of the menu
     uint     busy;              // Busy counter
-    coord    busy_left;         // Left column for busy area in header
-    coord    busy_right;        // Right column for busy area in header
-    coord    battery_left;      // Left column for battery in header
+    coord    busyLeft;          // Left column for busy area in header
+    coord    busyRight;         // Right column for busy area in header
+    coord    batteryLeft;       // Left column for battery in header
+    uint     time;              // Time at which we began drawing
     uint     nextRefresh;       // Time for next refresh
-    rect     dirty;             // Dirty rectangles
+    int      lastShiftPlane;    // Last shift plane when drawing indicators
+    uint     menuAnimate;       // Menu items to animate
+    uint     menuDrawn;         // Last time the menu was drawn
+    uint     cursorDrawn;       // Last time the cursor was drawn
+    uint     customHeaderDrawn; // Last time the custom header was drawn
+    uint     batteryDrawn;      // Last time the battery
+    uint     day, month, year;  // Date shown in header
+    uint     dow;               // Day of week shown in header
+    uint     hour, minute;      // Hour and minute shown
+    uint     second;            // Second shown in header
     object_g editing;           // Object being edited if any
     uint     editingLevel;      // Stack level being edited
     uint     cmdIndex;          // Command index for next command to save
@@ -291,12 +299,12 @@ protected:
     bool     alpha        : 1;  // Alpha mode active
     bool     transalpha   : 1;  // Transitory alpha (up or down key)
     bool     lowercase    : 1;  // Lowercase
-    bool     user_once    : 1;  // User mode should be reset
-    bool     shift_drawn  : 1;  // Cache of drawn annunciators
-    bool     xshift_drawn : 1;  // Cache
-    bool     alpha_drawn  : 1;  // Cache
-    bool     lowerc_drawn : 1;  // Cache
-    bool     user_drawn   : 1;  // Cache
+    bool     userOnce     : 1;  // User mode should be reset
+    bool     shiftDrawn   : 1;  // Cache of drawn annunciators
+    bool     xshiftDrawn  : 1;  // Cache
+    bool     alphaDrawn   : 1;  // Cache
+    bool     lowercDrawn  : 1;  // Cache
+    bool     userDrawn    : 1;  // Cache
     bool     down         : 1;  // Move one line down
     bool     up           : 1;  // Move one line up
     bool     repeat       : 1;  // Repeat the key
@@ -315,15 +323,16 @@ protected:
     bool     freezeHeader : 1;  // Freeze the header area
     bool     freezeStack  : 1;  // Freeze the stack area
     bool     freezeMenu   : 1;  // Freeze the menu area
-    bool     dbl_release  : 1;  // Double release
+    bool     doubleRelease: 1;  // Double release
+    bool     batteryLow   : 1;  // Battery low indicator is shown
 
 protected:
     // Key mappings
     list_p   keymap;
     object_p function[NUM_PLANES][NUM_SOFTKEYS];
-    cstring  menu_label[NUM_PLANES][NUM_SOFTKEYS];
-    uint16_t menu_marker[NUM_PLANES][NUM_SOFTKEYS];
-    bool     menu_marker_align[NUM_PLANES][NUM_SOFTKEYS];
+    cstring  menuLabel[NUM_PLANES][NUM_SOFTKEYS];
+    uint16_t menuMarker[NUM_PLANES][NUM_SOFTKEYS];
+    bool     menuMarkerAlign[NUM_PLANES][NUM_SOFTKEYS];
     file     helpfile;
     friend struct tests;
     friend struct runtime;
