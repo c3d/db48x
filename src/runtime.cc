@@ -42,9 +42,6 @@
 #include <cstring>
 
 
-// The one and only runtime
-runtime rt(nullptr, 0);
-runtime::gcptr *runtime::GCSafe;
 
 RECORDER(runtime,       16, "RPL runtime");
 RECORDER(runtime_error, 16, "RPL runtime error (anomalous behaviors)");
