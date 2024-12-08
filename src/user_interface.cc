@@ -66,9 +66,6 @@
 #include <wctype.h>
 
 
-// The primary user interface of the calculator
-user_interface ui;
-
 using std::max;
 using std::min;
 

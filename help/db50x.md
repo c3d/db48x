@@ -6469,7 +6469,7 @@ These equations describe the electrostatic force between two point charged parti
 
 ```rpl
 q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
-@ Expecting [ F=14.38008 28598 N Er=8.98755 17873 8⁳¹⁹ N/C ]
+@ Expecting [ F=5.99170 11907 5⁳⁻³ N Er=5 991.70119 075 N/C ]
 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 ```
 
@@ -6491,7 +6491,7 @@ The expression for the radial electric field at the distance `r` is approximatel
 
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11915 9 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11907 5 N/C ]
 'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
 ```
 
@@ -6512,7 +6512,7 @@ The expression of the radial electric field at the distance `r` depends on the s
 ```rpl
 r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
 Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 972 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52392 4 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 ```
 
@@ -6540,7 +6540,7 @@ The expression of the perpendicular electric field is constant over an infinite 
 
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
-@ Expecting [ σ=9.375⁳⁻⁸ C/cm↑2 Ep=52 941 050.0044 N/C ]
+@ Expecting [ σ=9.375⁳⁻⁸ C/cm↑2 Ep=52 941 049.997 N/C ]
 if 'd < L/10' then
  'ROOT(ⒺE Field Infinite Plate;[σ;Ep];[1_C/cm^2;1_N/C])'
 end
@@ -6650,7 +6650,7 @@ E=0.025_J  C=20_μF
 
 ```rpl
 E=5_V/m  εr=1
-@ Expecting [ uE=1.10677 34772⁳⁻¹⁰ J/m↑3 ]
+@ Expecting [ uE=1.10677 34773 5⁳⁻¹⁰ J/m↑3 ]
 'ROOT(ⒺVolumic Density Electric Energy;[uE];[1_(J/m^3)])'
 ```
 
@@ -6732,7 +6732,7 @@ Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
 
 ```rpl
 εr=1  Q=75_μC  ro=1_cm  ri=.999_cm  L=10_cm
-@ Expecting [ C=5 560.46819 129 pF ΔV=13 488.07284 21 V ]
+@ Expecting [ C=5 560.46819 206 pF ΔV=13 488.07284 02 V ]
 'ROOT(ⒺCylindrical Capacitor;[C;ΔV];[1_pF;1_V])'
 ```
 
@@ -6744,7 +6744,7 @@ Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
 
 ```rpl
 μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
-@ Expecting [ L=0.03015 92894 75 mH ]
+@ Expecting [ L=0.03015 92894 7 mH ]
 'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
 ```
 
@@ -6756,7 +6756,7 @@ Vi=0_V  C=50_μF  Vf=10_V  R=100_Ω  t=2_ms
 
 ```rpl
 μr=1  N=5000  h=2_cm  ri=2_cm  ro=4_cm
-@ Expecting [ L=69.31471 80562 mH ]
+@ Expecting [ L=69.31471 80464 mH ]
 @ Error in ri input data of HP50gAUR.pdf
 'ROOT(ⒺToroid Inductance;[L];[1_mH])'
 ```
@@ -6953,7 +6953,7 @@ These equations apply to an ideal gas.
 
 ```rpl
 Vi=2_l  Vf=125_l  T=573.15_°C  n=0.25_mol  MW=64_g/mol
-@ Expecting [ m=0.016 kg W=7 274.34704 123 J ]
+@ Expecting [ m=0.016 kg W=7 274.30558 695 J ]
 'ROOT(ⒺIsothermal Expansion;[m;W];[1_kg;1_J])'
 ```
 

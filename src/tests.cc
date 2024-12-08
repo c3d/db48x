@@ -9234,7 +9234,7 @@ void tests::insertion_of_variables_constants_and_units()
         .expect("\"À tous ceux qui se souviennent de Maubert électronique\"");
     step("Programmatic constant lookup (text)")
         .test(CLEAR, "\"NA\" CONST", ENTER)
-        .expect("6.02213 67⁳²³ mol⁻¹");
+        .expect("6.02214 076⁳²³ mol⁻¹");
     step("Programmatic equation lookup (text)")
         .test(CLEAR, "\"IdealGas\" LIBEQ", ENTER)
         .expect("'P·V=n·R·T'");
