@@ -2763,7 +2763,7 @@ users or discovered during testing.
 * Conversion of decimal values smaller than 1.0 to integer no longer
   crashes (this could only happen with the `RanM` command)
 * Render `-` for first term of polynonials if negative
-* On DM32, update the bases menu when cycling based numbers
+* On DM42, update the bases menu when cycling based numbers
 * Fix parameter mixup for call to `program::run`. In theory, this
   could lead to programs not evaluating correctly if `NoLastArguments`
   setting was set, although another bug apparently made this very
