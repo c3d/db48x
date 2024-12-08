@@ -1024,7 +1024,7 @@ MatrixMultiplyBenchmark
 «
 	{
 		Demos
-		{ "Hello" « "Hello" 3 DISP » }
+		{ "Release" « "Release notes" HELP DROP » }
 		{ "RunStats" RuntimeStatistics }
 		{ "VBat" BatteryVoltage }
 		{ "VPow" PowerVoltage }
@@ -1037,7 +1037,7 @@ MatrixMultiplyBenchmark
 			»
 		}
 
-		ⓁKineticEnergy
+		{ "Hello" « "Hello" 3 DISP » }
 		{ "Authors" « "Authors" HELP DROP » }
 		RunStatsKeepAfterRead
 		MinimumBatteryVoltage
@@ -1045,9 +1045,10 @@ MatrixMultiplyBenchmark
 		RclΣ
 
 		42_in
+		ⓁKineticEnergy
 		DebugOnError
 	}
-	Time + Date + "" + { Purge } +
+	Time + Date +  { Purge } +
 »
 'CustomMenu' STO
 
