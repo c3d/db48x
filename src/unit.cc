@@ -927,7 +927,6 @@ unit_p unit::lookup(symbol_p namep, int *prefix_info)
             // If we found a definition, use that unless it begins with '='
             if (udef)
             {
-                file_closer ufilec(ufile);
                 if (object_p obj = object::parse(utf8(udef), ulen))
                 {
                     if (unit_g u = unit::get(obj))

@@ -106,7 +106,7 @@ struct unit_file : file
 //   Manage a unit file
 // ----------------------------------------------------------------------------
 {
-    unit_file(cstring name = "config/units.csv"): file(name, false) {}
+    unit_file(cstring name = "config/units.csv"): file(name, READING) {}
     ~unit_file() {}
 
     symbol_p    lookup(gcutf8 what,size_t len,bool menu=false,bool seek0=true);

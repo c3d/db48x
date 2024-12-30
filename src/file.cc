@@ -42,6 +42,9 @@ RECORDER(file,          16, "File operations");
 RECORDER(file_error,    16, "File errors");
 
 
+// The one and only open file in DMCP...
+file *file::current = nullptr;
+
 
 // ============================================================================
 //
@@ -81,28 +84,25 @@ file::file()
 // ----------------------------------------------------------------------------
 //   Construct a file object
 // ----------------------------------------------------------------------------
-    : data(), name()
+    : data(), name(), closed(), previous(nullptr)
 {}
 
 
-file::file(cstring path, bool writing)
+file::file(cstring path, mode wrmode)
 // ----------------------------------------------------------------------------
 //   Construct a file object for writing
 // ----------------------------------------------------------------------------
-    : data(), name()
+    : file()
 {
-    if (writing)
-        open_for_writing(path);
-    else
-        open(path);
+    open(path, wrmode);
 }
 
 
-file::file(text_p name, bool writing)
+file::file(text_p name, mode wrmode)
 // ----------------------------------------------------------------------------
 //   Open a file from a text value
 // ----------------------------------------------------------------------------
-    : data(), name()
+    : file()
 {
     if (name)
     {
@@ -113,10 +113,7 @@ file::file(text_p name, bool writing)
         {
             memcpy(buf, path, len);
             buf[len] = 0;
-            if (writing)
-                open_for_writing(buf);
-            else
-                open(buf);
+            open(buf, wrmode);
         }
         else
         {
@@ -135,119 +132,87 @@ file::~file()
 }
 
 
-#if SIMULATOR
-// DMCP is configured to only allows one open file at a time
-static int open_count = 0;
-static cstring last_open = nullptr;
-#endif
-
-
-void file::open(cstring path)
+void file::open(cstring path, mode wrmode)
 // ----------------------------------------------------------------------------
 //    Open a file for reading
 // ----------------------------------------------------------------------------
 {
-#if SIMULATOR
-    if (open_count++)
+    bool reading = wrmode == READING;
+    bool append  = wrmode == APPEND;
+    writing      = append || wrmode == WRITING;
+    previous     = current;
+    if (previous)
+        previous->close(false);
+    current = this;
+    name = path;
+
+#if NOSAVE
+    if (!reading)
     {
-        record(file_error,
-               "open is opening %u files at the same time"
-               " (%s and %s)", open_count--, last_open, path);
-#ifdef DEBUG
-        errno = EMFILE;
+        errno = EPERM;
         return;
+    }
 #endif
-    }
-    last_open = path;
-    data = fopen(path, "r");
-    if (data)
-    {
-        name = path;
-    }
-    else
+
+#if SIMULATOR
+    data = fopen(path, reading ? "r" : append ? "a" : "w");
+    if (!data)
     {
         record(file_error, "Error %s opening %s", strerror(errno), path);
-        open_count--;
+        current = nullptr;
     }
-#else
-    FRESULT ok = f_open(&data, path, FA_READ);
+#else // !SIMULATOR
+    if (writing)
+        sys_disk_write_enable(1);
+
+    BYTE    mode = (reading  ? FA_READ
+                    : append ? (FA_WRITE | FA_OPEN_APPEND)
+                             : (FA_WRITE | FA_CREATE_ALWAYS));
+    FRESULT ok   = f_open(&data, path, mode);
     data.err = ok;
-    if (ok == FR_OK)
-        name = path;
-    else
+    if (ok != FR_OK)
+    {
         data.flag = 0;
-#endif                          // SIMULATOR
-    name = path;
+        sys_disk_write_enable(0);
+        current = nullptr;
+    }
+#endif // SIMULATOR
 }
 
 
-void file::open_for_writing(cstring path, bool append)
+void file::reopen()
 // ----------------------------------------------------------------------------
-//    Open a file for writing
+//   Reopen file from saved data
 // ----------------------------------------------------------------------------
 {
-#if NOSAVE
-    errno = EPERM;
-    return;
-#else
-#if SIMULATOR
-    if (open_count++)
-    {
-        record(file_error,
-               "open_for_writing is opening %u files at the same time"
-               "(%s and %s)", open_count--, last_open, path);
-#ifdef DEBUG
-        errno = EMFILE;
-        return;
-#endif
-    }
-    last_open = path;
-    data = fopen(path, append ? "a" : "w");
-    if (data)
-    {
-        name = path;
-    }
-    else
-    {
-        record(file_error, "Error %s opening %s for writing",
-               strerror(errno), path);
-        open_count--;
-    }
-#else
-    sys_disk_write_enable(1);
-    BYTE mode = FA_WRITE | (append ? FA_OPEN_APPEND : FA_CREATE_ALWAYS);
-    FRESULT ok = f_open(&data, path, mode);
-    data.err = ok;
-    if (ok == FR_OK)
-    {
-        name = path;
-    }
-    else
-    {
-        sys_disk_write_enable(0);
-        data.flag = 0;
-    }
-#endif                          // SIMULATOR
-#endif
+    open(name, writing ? APPEND : READING);
+    if (valid() && !writing)
+        seek(closed);
 }
 
 
-void file::close()
+void file::close(bool reopen)
 // ----------------------------------------------------------------------------
 //    Close the help file
 // ----------------------------------------------------------------------------
 {
     if (valid())
     {
+        closed = ftell(data);
         fclose(data);
 #if SIMULATOR
         data = nullptr;
-        open_count--;
 #else
         sys_disk_write_enable(0);
         data.flag = 0;
 #endif // SIMULATOR
-        name = nullptr;
+    }
+    current = nullptr;
+
+    if (previous && reopen)
+    {
+        previous->reopen();
+        previous = nullptr;
     }
 }
 

@@ -136,7 +136,7 @@ bool files::store_binary(text_p name, object_p value) const
 {
     if (value)
     {
-        file f(filename(name, true), true);
+        file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
             uint32_t checksum = id_checksum();
@@ -158,7 +158,7 @@ bool files::store_source(text_p name, object_p value) const
 {
     if (value)
     {
-        file f(filename(name, true), true);
+        file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
             renderer r(f);
@@ -178,7 +178,7 @@ bool files::store_text(text_p name, text_p value) const
 {
     if (value)
     {
-        file f(filename(name, true), true);
+        file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
             size_t len = 0;
@@ -199,7 +199,7 @@ bool files::store_list(text_p name, list_p value) const
 {
     if (value)
     {
-        file f(filename(name, true), true);
+        file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
             renderer r(f);
@@ -302,7 +302,7 @@ object_p files::recall_binary(text_p name) const
         return nullptr;
     }
 
-    file f(filename(name), false);
+    file f(filename(name), file::READING);
     if (f.valid())
     {
         scribble scr;
@@ -358,7 +358,7 @@ object_p files::recall_source(text_p name) const
 // ----------------------------------------------------------------------------
 {
     {
-        file prog(filename(name), false);
+        file prog(filename(name), file::READING);
         if (!prog.valid())
         {
             rt.error(prog.error());
@@ -404,7 +404,7 @@ text_p files::recall_text(text_p name) const
 //   Recall text from a text file
 // ----------------------------------------------------------------------------
 {
-    file f(filename(name), false);
+    file f(filename(name), file::READING);
     if (!f.valid())
     {
         rt.error(f.error());
@@ -432,7 +432,7 @@ list_p files::recall_list(text_p name, bool as_array) const
 //  Recall list from a CSV file
 // ----------------------------------------------------------------------------
 {
-    file f(filename(name), false);
+    file f(filename(name), file::READING);
     if (!f.valid())
     {
         if (!rt.error())
@@ -805,7 +805,7 @@ bool files::store_grob(text_p name, grob_p value) const
 {
     if (value)
     {
-        file f(filename(name, true), true);
+        file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
             bmsize  width      = 0;
@@ -871,7 +871,7 @@ grob_p files::recall_grob(text_p name) const
 //  Recall graphic object from a BMP file
 // ----------------------------------------------------------------------------
 {
-    file f(filename(name), false);
+    file f(filename(name), file::READING);
     bool ok = f.valid();
     bmp b{};
 
@@ -883,7 +883,7 @@ grob_p files::recall_grob(text_p name) const
               b.info.planes == 1 &&
               b.info.bitsPerPixel == 1 &&
               b.info.compression == 0 &&
-              b.info.numColors == 2);
+              (b.info.numColors == 2 || b.info.numColors == 0));
 
     char palette[8] = { 0 };
     if (ok)

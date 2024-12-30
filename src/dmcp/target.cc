@@ -29,19 +29,6 @@
 
 #include "target.h"
 
-// Initialize the screen
-surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE);
-
-// Pre-built patterns for shades of grey
-const pattern pattern::black   = pattern(0, 0, 0);
-const pattern pattern::gray10  = pattern(32, 32, 32);
-const pattern pattern::gray25  = pattern(64, 64, 64);
-const pattern pattern::gray50  = pattern(128, 128, 128);
-const pattern pattern::gray75  = pattern(192, 192, 192);
-const pattern pattern::gray90  = pattern(224, 224, 224);
-const pattern pattern::white   = pattern(255, 255, 255);
-const pattern pattern::invert  = pattern(~0ULL);
-
 static const byte dmcp_position[] =
 // ----------------------------------------------------------------------------
 //   Convert DMCP key codes to row/column positions

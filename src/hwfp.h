@@ -50,8 +50,7 @@ struct hwfp_base : algebraic
 // ----------------------------------------------------------------------------
 {
     hwfp_base(id type) : algebraic(type) {}
-    static size_t render(renderer &r, double d);
-    PARSE_DECL(hwfp_base);
+    static size_t render(renderer &r, double d, char suffix);
 };
 
 
@@ -153,42 +152,19 @@ struct hwfp : hwfp_base
         return (large) fp;
     }
 
-    int32_t as_int32() const
-    {
-        return int32_t(as_integer());
-    }
-    hw as_hwfp() const
-    {
-        return value();
-    }
-    float as_float() const
-    {
-        return value();
-    }
-    double as_double() const
-    {
-        return value();
-    }
+    int32_t     as_int32()              const { return int32_t(as_integer()); }
+    hw          as_hwfp()               const { return value(); }
+    float       as_float()              const { return value(); }
+    double      as_double()             const { return value(); }
     // ------------------------------------------------------------------------
     //   Conversion to machine values
     // ------------------------------------------------------------------------
 
-    bool is_zero() const
-    {
-        return value() == 0.0;
-    }
-    bool is_one() const
-    {
-        return value() == 1.0;
-    }
-    bool is_negative() const
-    {
-        return value() < 0.0;
-    }
-    bool is_negative_or_zero() const
-    {
-        return value() <= 0.0;
-    }
+    bool        is_zero()               const { return value() == 0.0; }
+    bool        is_one()                const { return value() == 1.0; }
+    bool        is_negative()           const { return value() < 0.0; }
+    bool        is_negative_or_zero()   const { return value() <= 0.0; }
+    bool        is_simplifiable()   const { return std::isfinite(value());}
     // ------------------------------------------------------------------------
     //   Tests about the value of a given hwfp number
     // ------------------------------------------------------------------------
@@ -217,96 +193,40 @@ struct hwfp : hwfp_base
     // ------------------------------------------------------------------------
 
 
+    template <hwfp_p (*code)(hwfp_r, hwfp_r)>
+    static arithmetic_fn target(algebraic_r x, algebraic_r y)
+    // ------------------------------------------------------------------------
+    //  Target function for hwfp objects
+    // ------------------------------------------------------------------------
+    {
+        bool       flt = sizeof(hw) == sizeof(float);
+        object::id ty  = flt ? ID_hwfloat : ID_hwdouble;
+        uint       prc = flt ? 7 : 16;
+        return x->type() == ty && y->type() == ty &&
+            Settings.HardwareFloatingPoint() && Settings.Precision() <= prc
+            ? arithmetic_fn(code) : nullptr;
+    }
+
+
+
     // ========================================================================
     //
     //    Arithmetic
     //
     // ========================================================================
 
-    static hwfp_p neg(hwfp_r x)
-    {
-        return make(-x->value());
-    }
-    static hwfp_p add(hwfp_r x, hwfp_r y)
-    {
-        return make(x->value() + y->value());
-    }
-    static hwfp_p sub(hwfp_r x, hwfp_r y)
-    {
-        return make(x->value() - y->value());
-    }
-
-    static hwfp_p mul(hwfp_r x, hwfp_r y)
-    {
-        return make(x->value() * y->value());
-    }
-
-    static hwfp_p div(hwfp_r x, hwfp_r y)
-    {
-        hw fy = y->value();
-        if (fy == 0.0)
-        {
-            rt.zero_divide_error();
-            return nullptr;
-        }
-        return make(x->value() / fy);
-    }
-
-    static hwfp_p mod(hwfp_r x, hwfp_r y)
-    {
-        hw fy = y->value();
-        if (fy == 0.0)
-        {
-            rt.zero_divide_error();
-            return nullptr;
-        }
-        hw fx = x->value();
-        fx    = ::fmod(fx, fy);
-        if (fx < 0)
-            fx = fy < 0 ? fx - fy : fx + fy;
-        return make(fx);
-    }
-
-    static hwfp_p rem(hwfp_r x, hwfp_r y)
-    {
-        hw fy = y->value();
-        if (fy == 0.0)
-        {
-            rt.zero_divide_error();
-            return nullptr;
-        }
-        return make(std::fmod(x->value(), fy));
-    }
-
-    static hwfp_p pow(hwfp_r x, hwfp_r y)
-    {
-        return make(std::pow(x->value(), y->value()));
-    }
-
-
-    static hwfp_p hypot(hwfp_r x, hwfp_r y)
-    {
-        return make(std::hypot(x->value(), y->value()));
-    }
-
-    static hwfp_p atan2(hwfp_r x, hwfp_r y)
-    {
-        return make(to_angle(std::atan2(x->value(), y->value())));
-    }
-
-    static hwfp_p Min(hwfp_r x, hwfp_r y)
-    {
-        hw fx = x->value();
-        hw fy = y->value();
-        return make(fx < fy ? fx : fy);
-    }
-
-    static hwfp_p Max(hwfp_r x, hwfp_r y)
-    {
-        hw fx = x->value();
-        hw fy = y->value();
-        return make(fx > fy ? fx : fy);
-    }
+    static hwfp_p neg(hwfp_r x);
+    static hwfp_p add(hwfp_r x, hwfp_r y);
+    static hwfp_p sub(hwfp_r x, hwfp_r y);
+    static hwfp_p mul(hwfp_r x, hwfp_r y);
+    static hwfp_p div(hwfp_r x, hwfp_r y);
+    static hwfp_p mod(hwfp_r x, hwfp_r y);
+    static hwfp_p rem(hwfp_r x, hwfp_r y);
+    static hwfp_p pow(hwfp_r x, hwfp_r y);
+    static hwfp_p hypot(hwfp_r x, hwfp_r y);
+    static hwfp_p atan2(hwfp_r x, hwfp_r y);
+    static hwfp_p Min(hwfp_r x, hwfp_r y);
+    static hwfp_p Max(hwfp_r x, hwfp_r y);
 
 
     // ========================================================================
@@ -545,11 +465,6 @@ struct hwfp : hwfp_base
         p += sizeof(hw);
         return ptrdiff(p, o);
     }
-
-    RENDER_DECL(hwfp)
-    {
-        return render(r, o->value());
-    }
 };
 
 
@@ -577,6 +492,10 @@ struct hwfloat : hwfp<float>
     {
         return utf8("hwfloat");
     }
+    RENDER_DECL(hwfloat)
+    {
+        return render(r, o->value(), 'F');
+    }
 };
 
 
@@ -594,6 +513,12 @@ struct hwdouble : hwfp<double>
     {
         return utf8("hwdouble");
     }
+    RENDER_DECL(hwdouble)
+    {
+        return render(r, o->value(), 'D');
+    }
+
+
 };
 
 

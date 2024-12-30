@@ -212,6 +212,7 @@ object_p object::parse(utf8    source,
     // Try parsing with the various handlers
     size_t  length = size;
     result  r      = SKIP;
+    bool    is_fp  = false;
     unicode cp     = utf8_codepoint(source);
     parser  p(source, size, precedence, separator);
 
@@ -228,10 +229,11 @@ retry:
         if (cp != '#')
         {
     case '.': case ',':
-            if (r == SKIP || r == WARN)
-                r = hwfp_base::do_parse(p);
             if (r == SKIP)
+            {
                 r = decimal::do_parse(p);
+                is_fp = r == OK;
+            }
             if (r == OK)
                 rt.clear_error();
         }
@@ -368,6 +370,22 @@ retry:
     {
         result r2 = SKIP;
         cp = utf8_codepoint(p.source + p.length);
+
+        bool is_hwfp = is_fp && (cp == 'd' || cp == 'D' ||
+                                 cp == 'f' || cp == 'F');
+        if (is_hwfp)
+        {
+            decimal_p dec = decimal_p(+p.out);
+            object_p res = (cp == 'd' || cp == 'D')
+                ? object_p(hwdouble::make(dec->to_double()))
+                : object_p(hwfloat::make(dec->to_float()));
+            if (!res)
+                return nullptr;
+            p.out = res;
+            p.length++;
+            size++;
+            cp = p.length < length ? utf8_codepoint(p.source + p.length) : 0;
+        }
 
         bool maybe_rect  =
             (precedence < ADDITIVE && (cp == '+' || cp == '-')) ||
@@ -1537,6 +1555,34 @@ bool object::is_negative(bool error) const
             rt.type_error();
     }
     return false;
+}
+
+
+bool object::is_simplifiable() const
+// ----------------------------------------------------------------------------
+//   Return true if auto-simplification does not apply
+// ----------------------------------------------------------------------------
+{
+    id ty = type();
+    if (!is_algebraic(ty))
+        return false;
+    switch (ty)
+    {
+    case ID_hwfloat:
+        return hwfloat_p(this)->is_simplifiable();
+    case ID_hwdouble:
+        return hwdouble_p(this)->is_simplifiable();
+    case ID_decimal:
+    case ID_neg_decimal:
+        return decimal_p(this)->is_simplifiable();
+    case ID_constant:
+        return constant_p(this)->is_simplifiable();
+    case ID_expression:
+        return expression_p(this)->is_simplifiable();
+    default:
+        break;
+    }
+    return true;
 }
 
 

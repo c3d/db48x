@@ -406,20 +406,12 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
             "config/42style.48k",
             "config/true42.48k",
         };
-        size_t newmap = 0;
-        size_t max = sizeof(keyboards) / sizeof(keyboards[0]);
-        for (size_t i = 0; i < max; i++)
-        {
-            if (!strcmp(keymap_filename, keyboards[i]))
-            {
-                newmap = (i + 1) % max;
-                break;
-            }
-        }
+
         // HACK - Not thread safe, don't do that while running
         extern user_interface ui;
-        keymap_filename = keyboards[newmap];
-        ui.load_keymap(keymap_filename);
+        static uint newmap = 0;
+        ui.load_keymap(keyboards[newmap++]);
+        newmap %= sizeof(keyboards) / sizeof(keyboards[0]);
     }
 
     if (k == Qt::Key_F9)
@@ -1006,11 +998,15 @@ int ui_file_selector(const char *title,
         QFileInfo fi(path);
         QString suffix = fi.suffix(); // On Linux we don't get the extension
         QString name = fi.fileName();
-        if ("." + suffix != ext)
+        path = fi.absoluteFilePath();
+        if (QFileInfo("." + suffix) != QFileInfo(ext))
         {
             path += ext;
             name += ext;
         }
+        QString here = QDir::currentPath() + QDir::separator();
+        if (path.startsWith(here))
+            path = path.remove(0, here.length());
         std::cout << "Got path: " << path.toStdString()
                   << ", name is " << name.toStdString() << "\n";
         ret = callback(path.toStdString().c_str(),
@@ -1263,6 +1259,10 @@ uint ui_battery()
 //   Return the battery voltage
 // ----------------------------------------------------------------------------
 {
+    const uint vmax = 3000;
+    const uint vmin = 2600;
+    const uint vlow = (vmax + 3 * vmin) / 4;
+
     uint now = sys_current_ms();
     if (last_battery_ms < now - 1000)
         last_battery_ms = now - 1000;
@@ -1276,8 +1276,8 @@ uint ui_battery()
     else
     {
         battery -= (now - last_battery_ms) / 10;
-        uint v = battery * (BATTERY_VMAX - BATTERY_VMIN) / 1000 + BATTERY_VMIN;
-        if (v < BATTERY_VLOW)
+        uint v = battery * (vmax - vmin) / 1000 + vmin;
+        if (v < vlow)
             charging = true;
     }
 

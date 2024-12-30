@@ -180,7 +180,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            constants_parsing();
+            auto_simplification();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -2684,21 +2684,21 @@ void tests::command_display_formats()
     step("Lower case");
     test("lowercase", ENTER)
         .want("« 1 1. + - * / ^ √ sq inv neg sin cos tan asin acos atan "
-              "lowercase purgeall precision "
+              "lowercase purgeall prec "
               "start  step next start  step for i  next for i  step "
               "while  repeat  end do  until  end »");
 
     step("Upper case");
     test("UPPERCASE", ENTER)
         .want("« 1 1. + - * / ^ √ SQ INV NEG SIN COS TAN ASIN ACOS ATAN "
-              "LOWERCASE PURGEALL PRECISION "
+              "LOWERCASE PURGEALL PREC "
               "START  STEP next START  STEP FOR i  NEXT FOR i  STEP "
               "WHILE  REPEAT  END DO  UNTIL  END »");
 
     step("Capitalized");
     test("Capitalized", ENTER)
         .want("« 1 1. + - * / ^ √ Sq Inv Neg Sin Cos Tan Asin Acos Atan "
-              "LowerCase PurgeAll Precision "
+              "LowerCase PurgeAll Prec "
               "Start  Step next Start  Step For i  Next For i  Step "
               "While  Repeat  End Do  Until  End »");
 
@@ -3330,7 +3330,7 @@ void tests::decimal_numerical_functions()
 #undef TFNA
 
     step("pow")
-        ,test(CLEAR, "3.21 1.23 pow", ENTER)
+        .test(CLEAR, "3.21 1.23 pow", ENTER)
         .expect("4.19760 13402 69557 03133 41557 04388 7116")
         .test(CLEAR, "1.23 2.31", ID_pow)
         .expect("1.61317 24907 55543 84434 14148 92337 98556");
@@ -3344,13 +3344,13 @@ void tests::decimal_numerical_functions()
         .expect("1.20487 56251 52809 23400 86691 05495 30674 r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
-        .expect("1.93671 70284 36984 00445 39742 77784 19614 r");
+        .expect("1.93671 70284 36984 00445 39742 77784 19616 r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
         .expect("-1.20487 56251 52809 23400 86691 05495 30674 r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
-        .expect("-1.93671 70284 36984 00445 39742 77784 19614 r");
+        .expect("-1.93671 70284 36984 00445 39742 77784 19616 r");
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG", ENTER).noerror();
@@ -3369,82 +3369,88 @@ void tests::float_numerical_functions()
 {
     BEGIN(float);
 
+    step("Direct data entry of float value")
+        .test(CLEAR, "1.2F", ENTER).noerror().expect("1.20000 00476 8F");
     step("Select float acceleration")
         .test(CLEAR, "7 PRECISION 10 SIG HardFP", ENTER).noerror();
+    step("Data entry is in decimal")
+        .test(CLEAR, "1.2", ENTER).noerror().expect("1.2");
+    step("Computation results in inexact binary representation")
+        .test(CLEAR, "1.2 2 * 2 /", ENTER).noerror().expect("1.20000 0048F");
     step("Binary representation does not align with decimal")
-        .test(CLEAR, "1.2", ENTER).noerror().expect("1.20000 0048");
+        .test(CLEAR, "1.2F", ENTER).noerror().expect("1.20000 0048F");
     step("Select 6-digit precision and Radians for output stability")
         .test("6 SIG RAD", ENTER)
         .noerror();
 
     step("Addition")
-        .test(CLEAR, "1.23 2.34", ID_add).expect("3.57")
-        .test(CLEAR, "1.23 -2.34", ID_add).expect("-1.11")
-        .test(CLEAR, "-1.23 2.34", ID_add).expect("1.11")
-        .test(CLEAR, "-1.23 -2.34", ID_add).expect("-3.57")
-        .test(CLEAR, "1.234 SIN 2.34", ID_add).expect("3.28382")
-        .test(CLEAR, "1.23 COS -2.34", ID_add).expect("-2.00576")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_add).expect("-0.47981 6")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_add).expect("-3.18258");
+        .test(CLEAR, "1.23 2.34", ID_add).expect("3.57F")
+        .test(CLEAR, "1.23 -2.34", ID_add).expect("-1.11F")
+        .test(CLEAR, "-1.23 2.34", ID_add).expect("1.11F")
+        .test(CLEAR, "-1.23 -2.34", ID_add).expect("-3.57F")
+        .test(CLEAR, "1.234 SIN 2.34", ID_add).expect("3.28382F")
+        .test(CLEAR, "1.23 COS -2.34", ID_add).expect("-2.00576F")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_add).expect("-0.47981 6F")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_add).expect("-3.18258F");
     step("Subtraction")
-        .test(CLEAR, "1.23 2.34", ID_sub).expect("-1.11")
-        .test(CLEAR, "1.23 -2.34", ID_sub).expect("3.57")
-        .test(CLEAR, "-1.23 2.34", ID_sub).expect("-3.57")
-        .test(CLEAR, "-1.23 -2.34", ID_sub).expect("1.11")
-        .test(CLEAR, "1.234 SIN 2.34", ID_sub).expect("-1.39618")
-        .test(CLEAR, "1.23 COS -2.34", ID_sub).expect("2.67424")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_sub).expect("-5.15982")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_sub).expect("1.49742");
+        .test(CLEAR, "1.23 2.34", ID_sub).expect("-1.11F")
+        .test(CLEAR, "1.23 -2.34", ID_sub).expect("3.57F")
+        .test(CLEAR, "-1.23 2.34", ID_sub).expect("-3.57F")
+        .test(CLEAR, "-1.23 -2.34", ID_sub).expect("1.11F")
+        .test(CLEAR, "1.234 SIN 2.34", ID_sub).expect("-1.39618F")
+        .test(CLEAR, "1.23 COS -2.34", ID_sub).expect("2.67424F")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_sub).expect("-5.15982F")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_sub).expect("1.49742F");
     step("Multiplication")
-        .test(CLEAR, "1.23 2.34", ID_mul).expect("2.8782")
-        .test(CLEAR, "1.23 -2.34", ID_mul).expect("-2.8782")
-        .test(CLEAR, "-1.23 2.34", ID_mul).expect("-2.8782")
-        .test(CLEAR, "-1.23 -2.34", ID_mul).expect("2.8782")
-        .test(CLEAR, "1.234 SIN 2.34", ID_mul).expect("2.20853")
-        .test(CLEAR, "1.23 COS -2.34", ID_mul).expect("-0.78211 6")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_mul).expect("-6.59837")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_mul).expect("1.97164");
+        .test(CLEAR, "1.23 2.34", ID_mul).expect("2.8782F")
+        .test(CLEAR, "1.23 -2.34", ID_mul).expect("-2.8782F")
+        .test(CLEAR, "-1.23 2.34", ID_mul).expect("-2.8782F")
+        .test(CLEAR, "-1.23 -2.34", ID_mul).expect("2.8782F")
+        .test(CLEAR, "1.234 SIN 2.34", ID_mul).expect("2.20853F")
+        .test(CLEAR, "1.23 COS -2.34", ID_mul).expect("-0.78211 6F")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_mul).expect("-6.59837F")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_mul).expect("1.97164F");
     step("Division")
-        .test(CLEAR, "1.23 2.34", ID_div).expect("0.52564 1")
-        .test(CLEAR, "1.23 -2.34", ID_div).expect("-0.52564 1")
-        .test(CLEAR, "-1.23 2.34", ID_div).expect("-0.52564 1")
-        .test(CLEAR, "-1.23 -2.34", ID_div).expect("0.52564 1")
-        .test(CLEAR, "1.234 SIN 2.34", ID_div).expect("0.40334 1")
-        .test(CLEAR, "1.23 COS -2.34", ID_div).expect("-0.14283 7")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_div).expect("-1.20505")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_div).expect("0.36007 7");
+        .test(CLEAR, "1.23 2.34", ID_div).expect("0.52564 1F")
+        .test(CLEAR, "1.23 -2.34", ID_div).expect("-0.52564 1F")
+        .test(CLEAR, "-1.23 2.34", ID_div).expect("-0.52564 1F")
+        .test(CLEAR, "-1.23 -2.34", ID_div).expect("0.52564 1F")
+        .test(CLEAR, "1.234 SIN 2.34", ID_div).expect("0.40334 1F")
+        .test(CLEAR, "1.23 COS -2.34", ID_div).expect("-0.14283 7F")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_div).expect("-1.20505F")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_div).expect("0.36007 7F");
     step("Power")
-        .test(CLEAR, "1.23 2.34", ID_pow).expect("1.62322")
-        .test(CLEAR, "1.23 -2.34", ID_pow).expect("0.61605 9")
-        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.901")
+        .test(CLEAR, "1.23 2.34", ID_pow).expect("1.62322F")
+        .test(CLEAR, "1.23 -2.34", ID_pow).expect("0.61605 9F")
+        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.901F")
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.901")
+        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.901F")
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.87345 1")
-        .test(CLEAR, "1.23 COS -2.34", ID_pow).expect("12.993")
-        .test(CLEAR, "-1.23 TAN 23", ID_pow).expect("-2.26505⁳¹⁰")
+        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.87345 1F")
+        .test(CLEAR, "1.23 COS -2.34", ID_pow).expect("12.993F")
+        .test(CLEAR, "-1.23 TAN 23", ID_pow).expect("-2.26505⁳¹⁰F")
         .test(CLEAR, "-1.23 TAN 2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "-1.23 TAN -23", ID_pow).expect("-4.41492⁳⁻¹¹")
+        .test(CLEAR, "-1.23 TAN -23", ID_pow).expect("-4.41492⁳⁻¹¹F")
         .test(CLEAR, "-1.23 TANH -2.34", ID_pow).error("Argument outside domain");
 
     step("Square root of 2")
         .test(CLEAR, "2 sqrt", ENTER)
-        .expect("1.41421");
+        .expect("1.41421F");
     step("Square root of 3")
         .test(CLEAR, "3 sqrt", ENTER)
-        .expect("1.73205");
+        .expect("1.73205F");
     step("Square root of 4")
         .test(CLEAR, "4 sqrt", ENTER)
-        .expect("2.");
+        .expect("2.F");
     step("Cube root of 2")
         .test(CLEAR, "2 cbrt", ENTER)
-        .expect("1.25992");
+        .expect("1.25992F");
     step("Cube root of 3")
         .test(CLEAR, "3 cbrt", ENTER)
-        .expect("1.44225");
+        .expect("1.44225F");
     step("Cube root of 27")
         .test(CLEAR, "27 cbrt", ENTER)
-        .expect("3.");
+        .expect("3.F");
 
     step("neg")
         .test(CLEAR, "3.21 neg", ENTER).expect("-3.21")
@@ -3454,16 +3460,16 @@ void tests::float_numerical_functions()
         .expect("0.31152 6")
         .test("inv", ENTER).expect("3.21");
     step("sq (square)")
-        .test(CLEAR, "-3.21 sq", ENTER).expect("10.3041")
-        .test("sq", ENTER).expect("106.174");
+        .test(CLEAR, "-3.21 sq", ENTER).expect("10.3041F")
+        .test("sq", ENTER).expect("106.174F");
     step("cubed")
-        .test(CLEAR, "3.21 cubed", ENTER).expect("33.0762")
-        .test("cubed", ENTER).expect("36 186.4")
+        .test(CLEAR, "3.21 cubed", ENTER).expect("33.0762F")
+        .test("cubed", ENTER).expect("36 186.4F")
         .test(CLEAR, "-3 cubed", ENTER).expect("-27")
         .test("cubed", ENTER).expect("-19 683");
     step("abs")
         .test(CLEAR, "-3.21 abs", ENTER).expect("3.21")
-        .test("abs", ENTER, 1, ADD).expect("4.21");
+        .test("abs", ENTER, 1, ADD).expect("4.21F");
 
     step("Setting radians mode");
     test(CLEAR, "RAD", ENTER).noerror();
@@ -3471,59 +3477,59 @@ void tests::float_numerical_functions()
 #define TFNA(name, arg)         step(#name).test(CLEAR, #arg " " #name, ENTER)
 #define TFN(name)               TFNA(name, 0.321)
 
-    TFN(sqrt).expect("0.56656 9");
-    TFN(sin).expect("0.31551 6");
-    TFN(cos).expect("0.94892");
-    TFN(tan).expect("0.3325");
-    TFN(asin).expect("0.32678 5 r");
-    TFN(acos).expect("1.24401 r");
-    TFN(atan).expect("0.31061 r");
-    TFN(sinh).expect("0.32654 1");
-    TFN(cosh).expect("1.05196");
-    TFN(tanh).expect("0.31041 1");
-    TFN(asinh).expect("0.31572 8");
-    TFNA(acosh, 1.321).expect("0.78123");
-    TFN(atanh).expect("0.33276 2");
-    TFN(log1p).expect("0.27838 9");
-    TFN(lnp1).expect("0.27838 9");
-    TFN(expm1).expect("0.37850 6");
-    TFN(log).expect("-1.13631");
-    TFN(log10).expect("-0.49349 5");
-    TFN(exp).expect("1.37851");
-    TFN(exp10).expect("2.09411");
-    TFN(exp2).expect("1.2492");
-    TFN(erf).expect("0.35014 4");
-    TFN(erfc).expect("0.64985 6");
-    TFN(tgamma).expect("2.78663");
-    TFN(lgamma).expect("1.02483");
-    TFN(gamma).expect("2.78663");
-    TFN(cbrt).expect("0.68470 2");
+    TFN(sqrt).expect("0.56656 9F");
+    TFN(sin).expect("0.31551 6F");
+    TFN(cos).expect("0.94892F");
+    TFN(tan).expect("0.3325F");
+    TFN(asin).expect("0.32678 5F r");
+    TFN(acos).expect("1.24401F r");
+    TFN(atan).expect("0.31061F r");
+    TFN(sinh).expect("0.32654 1F");
+    TFN(cosh).expect("1.05196F");
+    TFN(tanh).expect("0.31041 1F");
+    TFN(asinh).expect("0.31572 8F");
+    TFNA(acosh, 1.321).expect("0.78123F");
+    TFN(atanh).expect("0.33276 2F");
+    TFN(log1p).expect("0.27838 9F");
+    TFN(lnp1).expect("0.27838 9F");
+    TFN(expm1).expect("0.37850 6F");
+    TFN(log).expect("-1.13631F");
+    TFN(log10).expect("-0.49349 5F");
+    TFN(exp).expect("1.37851F");
+    TFN(exp10).expect("2.09411F");
+    TFN(exp2).expect("1.2492F");
+    TFN(erf).expect("0.35014 4F");
+    TFN(erfc).expect("0.64985 6F");
+    TFN(tgamma).expect("2.78663F");
+    TFN(lgamma).expect("1.02483F");
+    TFN(gamma).expect("2.78663F");
+    TFN(cbrt).expect("0.68470 2F");
     TFN(norm).expect("0.321");
 #undef TFN
 #undef TFNA
 
     step("pow")
-        ,test(CLEAR, "3.21 1.23 pow", ENTER)
-        .expect("4.1976")
+        .test(CLEAR, "3.21 1.23 pow", ENTER)
+        .expect("4.1976F")
         .test(CLEAR, "1.23 2.31", ID_pow)
-        .expect("1.61317");
+        .expect("1.61317F");
 
     step("hypot")
         .test(CLEAR, "3.21 1.23 hypot", ENTER)
-        .expect("3.43759");
+        .expect("3.43759F");
 
     step("atan2 pos / pos quadrant")
         .test(CLEAR, "3.21 1.23 atan2", ENTER)
-        .expect("1.20488 r");
+        .expect("1.20488F r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
-        .expect("1.93672 r");
+        .expect("1.93672F r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
-        .expect("-1.20488 r");
+        .expect("-1.20488F r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
-        .expect("-1.93672 r");
+        .expect("-1.93672F r");
 
     step("Check integer rounding in hardware FP mode (#1309)")
         .test(CLEAR, "{ 3 3 } RANM", ENTER)
@@ -3550,81 +3556,84 @@ void tests::double_numerical_functions()
 {
     BEGIN(double);
 
-    step("Select double acceleration")
+    step("Direct data entry of double value")
+        .test(CLEAR, "1.2D", ENTER).noerror().expect("1.2D");
+    step("Select double-precision witih hardware acceleration")
         .test(CLEAR, "16 PRECISION 24 SIG HardFP", ENTER).noerror();
     step("Binary representation does not align with decimal")
-        .test(CLEAR, "1.2", ENTER).noerror().expect("1.19999 99999 99999 96");
+        .test(CLEAR, "1.2 2 * 2 /", ENTER).noerror()
+        .expect("1.19999 99999 99999 96D");
     step("Select 15-digit precision for output stability")
-        .test("15 SIG", ENTER).noerror();
+        .test("15 SIG RAD", ENTER).noerror();
 
     step("Addition")
-        .test(CLEAR, "1.23 2.34", ID_add).expect("3.57")
-        .test(CLEAR, "1.23 -2.34", ID_add).expect("-1.11")
-        .test(CLEAR, "-1.23 2.34", ID_add).expect("1.11")
-        .test(CLEAR, "-1.23 -2.34", ID_add).expect("-3.57")
-        .test(CLEAR, "1.234 SIN 2.34", ID_add).expect("3.28381 82093 7463")
-        .test(CLEAR, "1.23 COS -2.34", ID_add).expect("-2.00576 22728 755")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_add).expect("-0.47981 57342 68152")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_add).expect("-3.18257 93256 5893");
+        .test(CLEAR, "1.23 2.34", ID_add).expect("3.57D")
+        .test(CLEAR, "1.23 -2.34", ID_add).expect("-1.11D")
+        .test(CLEAR, "-1.23 2.34", ID_add).expect("1.11D")
+        .test(CLEAR, "-1.23 -2.34", ID_add).expect("-3.57D")
+        .test(CLEAR, "1.234 SIN 2.34", ID_add).expect("3.28381 82093 7463D")
+        .test(CLEAR, "1.23 COS -2.34", ID_add).expect("-2.00576 22728 755D")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_add).expect("-0.47981 57342 68152D")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_add).expect("-3.18257 93256 5893D");
     step("Subtraction")
-        .test(CLEAR, "1.23 2.34", ID_sub).expect("-1.11")
-        .test(CLEAR, "1.23 -2.34", ID_sub).expect("3.57")
-        .test(CLEAR, "-1.23 2.34", ID_sub).expect("-3.57")
-        .test(CLEAR, "-1.23 -2.34", ID_sub).expect("1.11")
-        .test(CLEAR, "1.234 SIN 2.34", ID_sub).expect("-1.39618 17906 2537")
-        .test(CLEAR, "1.23 COS -2.34", ID_sub).expect("2.67423 77271 245")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_sub).expect("-5.15981 57342 6815")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_sub).expect("1.49742 06743 4107");
+        .test(CLEAR, "1.23 2.34", ID_sub).expect("-1.11D")
+        .test(CLEAR, "1.23 -2.34", ID_sub).expect("3.57D")
+        .test(CLEAR, "-1.23 2.34", ID_sub).expect("-3.57D")
+        .test(CLEAR, "-1.23 -2.34", ID_sub).expect("1.11D")
+        .test(CLEAR, "1.234 SIN 2.34", ID_sub).expect("-1.39618 17906 2537D")
+        .test(CLEAR, "1.23 COS -2.34", ID_sub).expect("2.67423 77271 245D")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_sub).expect("-5.15981 57342 6815D")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_sub).expect("1.49742 06743 4107D");
     step("Multiplication")
-        .test(CLEAR, "1.23 2.34", ID_mul).expect("2.8782")
-        .test(CLEAR, "1.23 -2.34", ID_mul).expect("-2.8782")
-        .test(CLEAR, "-1.23 2.34", ID_mul).expect("-2.8782")
-        .test(CLEAR, "-1.23 -2.34", ID_mul).expect("2.8782")
-        .test(CLEAR, "1.234 SIN 2.34", ID_mul).expect("2.20853 46099 3664")
-        .test(CLEAR, "1.23 COS -2.34", ID_mul).expect("-0.78211 62814 71336")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_mul).expect("-6.59836 88181 8747")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_mul).expect("1.97163 56220 419");
+        .test(CLEAR, "1.23 2.34", ID_mul).expect("2.8782D")
+        .test(CLEAR, "1.23 -2.34", ID_mul).expect("-2.8782D")
+        .test(CLEAR, "-1.23 2.34", ID_mul).expect("-2.8782D")
+        .test(CLEAR, "-1.23 -2.34", ID_mul).expect("2.8782D")
+        .test(CLEAR, "1.234 SIN 2.34", ID_mul).expect("2.20853 46099 3664D")
+        .test(CLEAR, "1.23 COS -2.34", ID_mul).expect("-0.78211 62814 71336D")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_mul).expect("-6.59836 88181 8747D")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_mul).expect("1.97163 56220 419D");
     step("Division")
-        .test(CLEAR, "1.23 2.34", ID_div).expect("0.52564 10256 41026")
-        .test(CLEAR, "1.23 -2.34", ID_div).expect("-0.52564 10256 41026")
-        .test(CLEAR, "-1.23 2.34", ID_div).expect("-0.52564 10256 41026")
-        .test(CLEAR, "-1.23 -2.34", ID_div).expect("0.52564 10256 41026")
-        .test(CLEAR, "1.234 SIN 2.34", ID_div).expect("0.40334 11151 17365")
-        .test(CLEAR, "1.23 COS -2.34", ID_div).expect("-0.14283 66355 23292")
-        .test(CLEAR, "-1.23 TAN 2.34", ID_div).expect("-1.20504 94590 8895")
-        .test(CLEAR, "-1.23 TANH -2.34", ID_div).expect("0.36007 66348 96978");
+        .test(CLEAR, "1.23 2.34", ID_div).expect("0.52564 10256 41026D")
+        .test(CLEAR, "1.23 -2.34", ID_div).expect("-0.52564 10256 41026D")
+        .test(CLEAR, "-1.23 2.34", ID_div).expect("-0.52564 10256 41026D")
+        .test(CLEAR, "-1.23 -2.34", ID_div).expect("0.52564 10256 41026D")
+        .test(CLEAR, "1.234 SIN 2.34", ID_div).expect("0.40334 11151 17365D")
+        .test(CLEAR, "1.23 COS -2.34", ID_div).expect("-0.14283 66355 23292D")
+        .test(CLEAR, "-1.23 TAN 2.34", ID_div).expect("-1.20504 94590 8895D")
+        .test(CLEAR, "-1.23 TANH -2.34", ID_div).expect("0.36007 66348 96978D");
     step("Power")
-        .test(CLEAR, "1.23 2.34", ID_pow).expect("1.62322 21516 8537")
-        .test(CLEAR, "1.23 -2.34", ID_pow).expect("0.61605 86207 88111")
-        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.90082 15014 43")
+        .test(CLEAR, "1.23 2.34", ID_pow).expect("1.62322 21516 8537D")
+        .test(CLEAR, "1.23 -2.34", ID_pow).expect("0.61605 86207 88111D")
+        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.90082 15014 43D")
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.90082 15014 43")
+        .test(CLEAR, "-1.23 23", ID_pow).expect("-116.90082 15014 43D")
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.87345 13971 11437")
-        .test(CLEAR, "1.23 COS -2.34", ID_pow).expect("12.99302 28339 821")
-        .test(CLEAR, "-1.23 TAN 23", ID_pow).expect("-2.26504 47100 3673⁳¹⁰")
+        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.87345 13971 11437D")
+        .test(CLEAR, "1.23 COS -2.34", ID_pow).expect("12.99302 28339 821D")
+        .test(CLEAR, "-1.23 TAN 23", ID_pow).expect("-2.26504 47100 3673⁳¹⁰D")
         .test(CLEAR, "-1.23 TAN 2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "-1.23 TAN -23", ID_pow).expect("-4.41492 38890 0254⁳⁻¹¹")
+        .test(CLEAR, "-1.23 TAN -23", ID_pow).expect("-4.41492 38890 0254⁳⁻¹¹D")
         .test(CLEAR, "-1.23 TANH -2.34", ID_pow).error("Argument outside domain");
 
     step("Square root of 2")
         .test(CLEAR, "2 sqrt", ENTER)
-        .expect("1.41421 35623 731");
+        .expect("1.41421 35623 731D");
     step("Square root of 3")
         .test(CLEAR, "3 sqrt", ENTER)
-        .expect("1.73205 08075 6888");
+        .expect("1.73205 08075 6888D");
     step("Square root of 4")
         .test(CLEAR, "4 sqrt", ENTER)
-        .expect("2.");
+        .expect("2.D");
     step("Cube root of 2")
         .test(CLEAR, "2 cbrt", ENTER)
-        .expect("1.25992 10498 9487");
+        .expect("1.25992 10498 9487D");
     step("Cube root of 3")
         .test(CLEAR, "3 cbrt", ENTER)
-        .expect("1.44224 95703 0741");
+        .expect("1.44224 95703 0741D");
     step("Cube root of 27")
         .test(CLEAR, "27 cbrt", ENTER)
-        .expect("3.");
+        .expect("3.D");
 
     step("neg")
         .test(CLEAR, "3.21 neg", ENTER).expect("-3.21")
@@ -3634,16 +3643,16 @@ void tests::double_numerical_functions()
         .expect("0.31152 64797 50779")
         .test("inv", ENTER).expect("3.21");
     step("sq (square)")
-        .test(CLEAR, "-3.21 sq", ENTER).expect("10.3041")
-        .test("sq", ENTER).expect("106.17447 681");
+        .test(CLEAR, "-3.21 sq", ENTER).expect("10.3041D")
+        .test("sq", ENTER).expect("106.17447 681D");
     step("cubed")
-        .test(CLEAR, "3.21 cubed", ENTER).expect("33.07616 1")
-        .test("cubed", ENTER).expect("36 186.39267 80659")
+        .test(CLEAR, "3.21 cubed", ENTER).expect("33.07616 1D")
+        .test("cubed", ENTER).expect("36 186.39267 80659D")
         .test(CLEAR, "-3 cubed", ENTER).expect("-27")
         .test("cubed", ENTER).expect("-19 683");
     step("abs")
         .test(CLEAR, "-3.21 abs", ENTER).expect("3.21")
-        .test("abs", ENTER, 1, ADD).expect("4.21");
+        .test("abs", ENTER, 1, ADD).expect("4.21D");
 
     step("Setting radians mode");
     test(CLEAR, "RAD", ENTER).noerror();
@@ -3651,59 +3660,59 @@ void tests::double_numerical_functions()
 #define TFNA(name, arg)         step(#name).test(CLEAR, #arg " " #name, ENTER)
 #define TFN(name)               TFNA(name, 0.321)
 
-    TFN(sqrt).expect("0.56656 86189 68612");
-    TFN(sin).expect("0.31551 56385 92727");
-    TFN(cos).expect("0.94892 03769 56583");
-    TFN(tan).expect("0.33249 95924 36472");
-    TFN(asin).expect("0.32678 51765 31495 r");
-    TFN(acos).expect("1.24401 11502 634 r");
-    TFN(atan).expect("0.31060 97928 1389 r");
-    TFN(sinh).expect("0.32654 11649 51806");
-    TFN(cosh).expect("1.05196 44159 4195");
-    TFN(tanh).expect("0.31041 08466 05886");
-    TFN(asinh).expect("0.31572 82658 2938");
-    TFNA(acosh, 1.321).expect("0.78123 02051 96253");
-    TFN(atanh).expect("0.33276 15884 81815");
-    TFN(log1p).expect("0.27838 90255 40188");
-    TFN(lnp1).expect("0.27838 90255 40188");
-    TFN(expm1).expect("0.37850 55808 93754");
-    TFN(log).expect("-1.13631 41558 5212");
-    TFN(log10).expect("-0.49349 49675 95128");
-    TFN(exp).expect("1.37850 55808 9375");
-    TFN(exp10).expect("2.09411 24558 5089");
-    TFN(exp2).expect("1.24919 61256 5338");
-    TFN(erf).expect("0.35014 42208 20024");
-    TFN(erfc).expect("0.64985 57791 79976");
-    TFN(tgamma).expect("2.78663 45408 4547");
-    TFN(lgamma).expect("1.02483 46099 5731");
-    TFN(gamma).expect("2.78663 45408 4547");
-    TFN(cbrt).expect("0.68470 21277 57224");
+    TFN(sqrt).expect("0.56656 86189 68612D");
+    TFN(sin).expect("0.31551 56385 92727D");
+    TFN(cos).expect("0.94892 03769 56583D");
+    TFN(tan).expect("0.33249 95924 36472D");
+    TFN(asin).expect("0.32678 51765 31495D r");
+    TFN(acos).expect("1.24401 11502 634D r");
+    TFN(atan).expect("0.31060 97928 1389D r");
+    TFN(sinh).expect("0.32654 11649 51806D");
+    TFN(cosh).expect("1.05196 44159 4195D");
+    TFN(tanh).expect("0.31041 08466 05886D");
+    TFN(asinh).expect("0.31572 82658 2938D");
+    TFNA(acosh, 1.321).expect("0.78123 02051 96253D");
+    TFN(atanh).expect("0.33276 15884 81815D");
+    TFN(log1p).expect("0.27838 90255 40188D");
+    TFN(lnp1).expect("0.27838 90255 40188D");
+    TFN(expm1).expect("0.37850 55808 93754D");
+    TFN(log).expect("-1.13631 41558 5212D");
+    TFN(log10).expect("-0.49349 49675 95128D");
+    TFN(exp).expect("1.37850 55808 9375D");
+    TFN(exp10).expect("2.09411 24558 5089D");
+    TFN(exp2).expect("1.24919 61256 5338D");
+    TFN(erf).expect("0.35014 42208 20024D");
+    TFN(erfc).expect("0.64985 57791 79976D");
+    TFN(tgamma).expect("2.78663 45408 4547D");
+    TFN(lgamma).expect("1.02483 46099 5731D");
+    TFN(gamma).expect("2.78663 45408 4547D");
+    TFN(cbrt).expect("0.68470 21277 57224D");
     TFN(norm).expect("0.321");
 #undef TFN
 #undef TFNA
 
     step("pow")
-        ,test(CLEAR, "3.21 1.23 pow", ENTER)
-        .expect("4.19760 13402 6956")
+        .test(CLEAR, "3.21 1.23 pow", ENTER)
+        .expect("4.19760 13402 6956D")
         .test(CLEAR, "1.23 2.31", ID_pow)
-        .expect("1.61317 24907 5554");
+        .expect("1.61317 24907 5554D");
 
     step("hypot")
         .test(CLEAR, "3.21 1.23 hypot", ENTER)
-        .expect("3.43758 63625 5149");
+        .expect("3.43758 63625 5149D");
 
     step("atan2 pos / pos quadrant")
         .test(CLEAR, "3.21 1.23 atan2", ENTER)
-        .expect("1.20487 56251 5281 r");
+        .expect("1.20487 56251 5281D r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
-        .expect("1.93671 70284 3698 r");
+        .expect("1.93671 70284 3698D r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
-        .expect("-1.20487 56251 5281 r");
+        .expect("-1.20487 56251 5281D r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
-        .expect("-1.93671 70284 3698 r");
+        .expect("-1.93671 70284 3698D r");
 
     step("Check integer rounding in hardware FP mode (#1309)")
         .test(CLEAR, "{ 3 3 } RANM", ENTER)
@@ -3860,7 +3869,7 @@ void tests::high_precision_numerical_functions()
 #undef TFNA
 
     step("pow")
-        ,test(CLEAR, "3.21 1.23 pow", ENTER)
+        .test(CLEAR, "3.21 1.23 pow", ENTER)
         .expect("4.19760 13402 69557 03133 41557 04388 71185 62403 13482 15741 54975 76397 39514 93831 64438 34447 96787 36431 56648 68643 95471 93476 15863 225")
         .test(CLEAR, "1.23 2.31", ID_pow)
         .expect("1.61317 24907 55543 84434 14148 92337 98559 17006 64245 18957 27180 28125 67872 74870 17458 75459 57723 53996 95111 93456 40634 86700 09601 018");
@@ -4029,6 +4038,36 @@ void tests::exact_trig_cases()
             .type(ID_unit)
             .test("UVAL 4 *", ENTER)
             .expect(circle[unit] * -1 / 2);
+        step("asin(0) = 0")
+            .test("0 asin", ENTER)
+            .type(ID_unit)
+            .test("UVAL", ENTER)
+            .expect("0.");
+        step("asin(1) = 90")
+            .test("1 asin", ENTER)
+            .type(ID_unit)
+            .test("UVAL 4 * ", circle[unit], " -", ENTER)
+            .expect("0.");
+        step("asin(-1) = -90")
+            .test("-1 asin", ENTER)
+            .type(ID_unit)
+            .test("UVAL -4 * ", circle[unit], " -", ENTER)
+            .expect("0.");
+        step("acos(0) = 90")
+            .test("0 acos", ENTER)
+            .type(ID_unit)
+            .test("UVAL 4 * ", circle[unit], " -", ENTER)
+            .expect("0.");
+        step("acos(1) = 0")
+            .test("1 acos", ENTER)
+            .type(ID_unit)
+            .test("UVAL", ENTER)
+            .expect("0.");
+        step("acos(-1) = 180 degrees")
+            .test("-1 acos", ENTER)
+            .type(ID_unit)
+            .test("UVAL 2 * ", circle[unit], " - ToDecimal", ENTER)
+            .expect("0.");
     }
 
     step("Conversion from non-standard units")
@@ -4046,19 +4085,19 @@ void tests::fraction_decimal_conversions()
 // ----------------------------------------------------------------------------
 {
     cstring cases[] =
-        {
-            // Easy exact cases (decimal)
-            "1/2",          "0.5",
-            "1/4",          "0.25",
-            "5/4",          "1.25",
-            "-5/4",         "-1.25",
+    {
+        // Easy exact cases (decimal)
+        "1/2",          "0.5",
+        "1/4",          "0.25",
+        "5/4",          "1.25",
+        "-5/4",         "-1.25",
 
-            // More tricky fractions
-            "1/3",          "0.33333 33333 33",
-            "-1/7",         "-0.14285 71428 57",
-            "22/7",         "3.14285 71428 6",
-            "37/213",       "0.17370 89201 88",
-        };
+        // More tricky fractions
+        "1/3",          "0.33333 33333 33",
+        "-1/7",         "-0.14285 71428 57",
+        "22/7",         "3.14285 71428 6",
+        "37/213",       "0.17370 89201 88",
+    };
 
     BEGIN(dfrac);
 
@@ -4078,6 +4117,11 @@ void tests::fraction_decimal_conversions()
     test(CLEAR, "1/5 ToDecimal", ENTER).expect("0.2");
     test(CLEAR, "0.25 →Frac", ENTER).expect("1/4");
     test(CLEAR, "0.2 ToFraction", ENTER).expect("1/5");
+
+    step("Integer conversions");
+    test(CLEAR, "3. R→I", ENTER).expect("3");
+    test(CLEAR, "-3. R→I", ENTER).expect("-3");
+    test(CLEAR, "3.2 R→I", ENTER).error("Bad argument value");
 
     step("Complex numbers");
     test(CLEAR, "1-2ⅈ 4", ENTER, DIV).expect("1/4-1/2ⅈ");
@@ -6721,6 +6765,22 @@ void tests::auto_simplification()
     step("Does not apply to lists");
     test(CLEAR, "{ 1 2 3 } 0 +", ENTER)
         .expect("{ 1 2 3 0 }");
+
+    step("Do not apply to infinities")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞ +", ENTER)
+        .expect("'∞+∞'")
+        .test(CLEAR, "0 Ⓒ∞ +", ENTER)
+        .expect("'0+∞'")
+        .test(CLEAR, "Ⓒ∞ 0 +", ENTER)
+        .expect("'∞+0'")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞ -", ENTER)
+        .expect("'∞-∞'")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞ *", ENTER)
+        .expect("'∞·∞'")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞ /", ENTER)
+        .expect("'∞÷∞'")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞ NEG /", ENTER)
+        .expect("'∞÷(-∞)'");
 
     step("Fold constants: additions")
         .test(CLEAR, "'1+X+2'", ENTER).expect("'1+X+2'")
@@ -9770,9 +9830,31 @@ void tests::probabilities()
         .expect("0");
     step("Permutations in program")
         .test(CLEAR, "42 37 PERM", ENTER)
-        .expect(
-            "11 708 384 314 607 332 487 859 521 718 704 263 082 803 200 000 00"
-            "0");
+        .expect("11 708 384 314 607 332 487 859 521 718 704 263 082 803 "
+                "200 000 000");
+    step("Combination with decimal non-fractional input")
+        .test(CLEAR, "42. 37. COMB", ENTER)
+        .expect("850 668.");
+    step("Combination with decimal fractional input")
+        .test(CLEAR, "0.5 2. COMB", ENTER)
+        .expect("-0.125");
+    step("Combination with very large decimal values")
+        .test(CLEAR, "9999. 555. COMB", ENTER)
+        .expect("2.24470 86227 3⁳⁹²⁹");
+    step("Combination with hardware floating-point")
+        .test(CLEAR, "HFP 16 Precision", ENTER, "9999. 555. COMB", ENTER)
+        .error("Argument outside domain");
+    step("Combination with hardware floating-point and symbolic input")
+        .test(CLEAR, "NumericalResults", ENTER, "9999. 555. COMB", ENTER)
+        .error("Argument outside domain");
+    step("Restore software floating point and symbolc results")
+        .test(CLEAR, "SFP 24 Precision SymbolicResults", ENTER).noerror();
+    step("Permutations in program with decimal input")
+        .test(CLEAR, "42. 37. PERM", ENTER)
+        .expect("1.17083 84314 6⁳⁴⁹");
+    step("Permutations in program")
+        .test(CLEAR, "6. 4. PERM", ENTER)
+        .expect("360.");
 
     step("Factorial in menu")
         .test(CLEAR, LSHIFT, W)
@@ -10187,8 +10269,8 @@ void tests::random_number_generation()
         .noerror();
 
     step("Check statistics total")
-        .test(CLEAR, ID_StatisticsMenu, ID_DataTotal).expect("3 375");
-    step("Check statistics mean").test(ID_Average).expect("3 ³/₈");
+        .test(CLEAR, ID_StatisticsMenu, ID_DataTotal).expect("3 388");
+    step("Check statistics mean").test(ID_Average).expect("3 ⁹⁷/₂₅₀");
     step("Check statistics min and max")
         .test(ID_MinData).expect("-1 000")
         .test(ID_MaxData).expect("998");

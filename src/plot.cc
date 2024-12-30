@@ -245,6 +245,7 @@ object::result draw_plot(object::id                  kind,
     bool    split_points = Settings.NoCurveFilling();
     size    lw           = Settings.LineWidth();
     pattern fg           = Settings.Foreground();
+    pattern errbg        = Settings.PlotErrorBackground();
 
     while (!program::interrupted())
     {
@@ -325,6 +326,18 @@ object::result draw_plot(object::id                  kind,
         }
         else
         {
+            if (kind == object::ID_Function)
+            {
+                rx = ppar.pixel_x(x);
+                ry = ppar.pixel_y(ppar.yorigin);
+                if (ry < 0)
+                    ry = 0;
+                else if (ry >= LCD_H)
+                    ry = LCD_H-1;
+                rect r(rx, ry - LCD_H/32, rx, ry + LCD_H/32);
+                Screen.fill(r, errbg);
+                ui.draw_dirty(r);
+            }
             if (!rt.error())
                 rt.invalid_function_error();
             Screen.text(0, 0, rt.error(), ErrorFont,
@@ -333,7 +346,6 @@ object::result draw_plot(object::id                  kind,
             lx = ly = -1;
             rt.clear_error();
         }
-
 
         if (kind != object::ID_Scatter)
         {

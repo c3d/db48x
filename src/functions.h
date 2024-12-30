@@ -255,6 +255,7 @@ FUNCTION(conj);
 
 FUNCTION(ToDecimal);
 FUNCTION(ToFraction);
+FUNCTION(ToInteger);
 FUNCTION(RadiansToDegrees);
 FUNCTION(DegreesToRadians);
 

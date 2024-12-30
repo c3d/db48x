@@ -315,7 +315,11 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 
     // Convert arguments to numeric if necessary
     if (Settings.NumericalResults())
+    {
         (void) to_decimal(x, true);   // May fail silently, and that's OK
+        if (!x)
+            return nullptr;
+    }
 
     id xt = x->type();
     if (should_be_symbolic(xt))
@@ -1268,7 +1272,7 @@ INSERT_BODY(fact)
 
 NFUNCTION_BODY(comb)
 // ----------------------------------------------------------------------------
-//   Compute number of combinations
+//   Compute number of combinations (n! / (n! * (n-m)!))
 // ----------------------------------------------------------------------------
 {
     algebraic_g &n = args[1];
@@ -1288,11 +1292,7 @@ NFUNCTION_BODY(comb)
         }
     }
 
-    if (n->is_real() && m->is_real())
-        rt.value_error();
-    else
-        rt.type_error();
-    return nullptr;
+    return fact::run(n) / (fact::run(m) * fact::run(n-m));
 }
 
 
@@ -1316,11 +1316,7 @@ NFUNCTION_BODY(perm)
         }
     }
 
-    if (n->is_real() && m->is_real())
-        rt.value_error();
-    else
-        rt.type_error();
-    return nullptr;
+    return fact::run(n) / fact::run(n-m);
 }
 
 
@@ -1456,6 +1452,26 @@ FUNCTION_BODY(ToFraction)
     algebraic_g xg = x;
     if (arithmetic::to_fraction(xg))
         return xg;
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
+}
+
+
+FUNCTION_BODY(ToInteger)
+// ----------------------------------------------------------------------------
+//   Convert numbers to integer
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    algebraic_g xg = x;
+    if (arithmetic::to_fraction(xg))
+    {
+        if (xg->is_integer())
+            return xg;
+        rt.value_error();
+    }
     if (!rt.error())
         rt.type_error();
     return nullptr;

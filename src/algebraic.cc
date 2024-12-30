@@ -80,47 +80,59 @@ bool algebraic::decimal_promotion(algebraic_g &x)
     switch(xt)
     {
     case ID_hwfloat:
-        x = decimal::from(hwfloat_p(+x)->value());
-        return x;
+        if (algebraic_p xx = decimal::from(hwfloat_p(+x)->value()))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     case ID_hwdouble:
-        x = decimal::from(hwdouble_p(+x)->value());
-        return x;
+        if (algebraic_p xx = decimal::from(hwdouble_p(+x)->value()))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     case ID_decimal:
     case ID_neg_decimal:
         return true;
 
     case ID_integer:
     case ID_neg_integer:
-    {
-        integer_p i = integer_p(+x);
-        x = decimal::from_integer(i);
-        return x;
-    }
+        if (algebraic_p xx = decimal::from_integer(integer_p(+x)))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     case ID_bignum:
     case ID_neg_bignum:
-    {
-        bignum_p i = bignum_p(+x);
-        x = decimal::from_bignum(i);
-        return x;
-    }
-
+        if (algebraic_p xx = decimal::from_bignum(bignum_p(+x)))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     case ID_fraction:
     case ID_neg_fraction:
-    {
-        fraction_p f = fraction_p(+x);
-        x = decimal::from_fraction(f);
-        return x;
-    }
+        if (algebraic_p xx = decimal::from_fraction(fraction_p(+x)))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     case ID_big_fraction:
     case ID_neg_big_fraction:
-    {
-        big_fraction_p f = big_fraction_p(+x);
-        x = decimal::from_big_fraction(f);
-        return x;
-    }
+        if (algebraic_p xx = decimal::from_big_fraction(big_fraction_p(+x)))
+        {
+            x = xx;
+            return true;
+        }
+        break;
     default:
-        return false;
+        break;
     }
+    return false;
 }
 
 template<typename value>

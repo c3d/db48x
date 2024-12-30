@@ -419,6 +419,7 @@ struct decimal : algebraic
     bool             is_magnitude_less_than(uint kigit, large exp) const;
     bool             is_magnitude_less_than_half() const;
     bool             is_infinity() const;
+    bool             is_simplifiable() const { return is_normal(); }
     // ------------------------------------------------------------------------
     //   Tests about the value of a given decimal number
     // ------------------------------------------------------------------------
@@ -601,6 +602,7 @@ struct decimal : algebraic
     static decimal_p lnpi()     { return constants().lnpi(); }
     bool             adjust_from_angle(uint &qturns, decimal_g &fp) const;
     decimal_p        adjust_to_angle() const;
+    static decimal_p exact_angle(int digits, int exp);
 
 public:
     OBJECT_DECL(decimal);

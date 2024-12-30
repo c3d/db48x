@@ -719,6 +719,12 @@ struct object
     }
 
 
+    bool is_simplifiable() const;
+    // ------------------------------------------------------------------------
+    //   Return true if algebraic and can be simplified
+    // ------------------------------------------------------------------------
+
+
     static bool is_array_or_list(id ty)
     // ------------------------------------------------------------------------
     //   Check if we have an array or list

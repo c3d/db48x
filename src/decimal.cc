@@ -30,6 +30,7 @@
 
 #include "arithmetic.h"
 #include "bignum.h"
+#include "constants.h"
 #include "fraction.h"
 #include "parser.h"
 #include "renderer.h"
@@ -1422,11 +1423,21 @@ decimal_p decimal::from(double x)
 //   Conversion from hardware floating-point to decimal
 // ----------------------------------------------------------------------------
 {
-    renderer r;
-    r.printf("%.18g", x);
-    parser p(r.text(), r.size());
-    if (decimal::do_parse(p) == OK)
-        return decimal_p(+p.out);
+    if (std::isfinite(x))
+    {
+        renderer r;
+        r.printf("%.18g", x);
+        parser p(r.text(), r.size());
+        if (decimal::do_parse(p) == OK)
+            return decimal_p(+p.out);
+    }
+    else if (std::isinf(x))
+    {
+        if (constant_p cst = constant::lookup("∞"))
+            if (decimal_p inf = decimal_p(cst->value()))
+                return x > 0 ? inf : neg(inf);
+
+    }
     return nullptr;
 }
 
@@ -1547,7 +1558,9 @@ arithmetic_fn target(algebraic_r x, algebraic_r y)
 //  Target function for bignum objects
 // ----------------------------------------------------------------------------
 {
-    return x->is_decimal() && y->is_decimal() ? arithmetic_fn(code) : nullptr;
+    return x->is_decimal() && y->is_decimal() &&
+        (!Settings.HardwareFloatingPoint() || Settings.Precision() > 16)
+        ? arithmetic_fn(code) : nullptr;
 }
 
 
@@ -2130,36 +2143,15 @@ decimal_p decimal::atan2(decimal_r x, decimal_r y)
     if (y->is_zero())
     {
         if (x->is_zero())
-            return y->is_negative() ? decimal_p(pi()) : +x;
-        decimal_g two = make(2);
-        decimal_g result = pi() / two;
-        if (x->is_negative())
-            result = -result;
-        return result;
+            return y->is_negative() ? exact_angle(1, 0) : +x;
+        return exact_angle(x->is_negative() ? -5 : 5, -1);
     }
 
     decimal_g result = atan(x/y);
     if (y->is_negative())
     {
-        uint half_circle = 0;
-        switch(Settings.AngleMode())
-        {
-        case object::ID_Deg:                half_circle = 180; break;
-        case object::ID_Grad:               half_circle = 200; break;
-        case object::ID_PiRadians:          half_circle =   1; break;
-        default:
-        case object::ID_Rad:
-            if (x->is_negative())
-                result = result - constants().pi;
-            else
-                result = result + constants().pi;
-            return result;
-        }
-        decimal_g hc = make(half_circle);
-        if (x->is_negative())
-            result = result - hc;
-        else
-            result = result + hc;
+        decimal_g offs = exact_angle(x->is_negative() ? -1 : 1, 0);
+        result = result + offs;
     }
     return result;
 }
@@ -2426,9 +2418,7 @@ decimal_p decimal::asin(decimal_r x)
     tmp = tmp - x * x;
     if (tmp && tmp->is_zero())
     {
-        tmp = pi();
-        if (x->is_negative())
-            tmp = -tmp;
+        tmp = exact_angle(x->is_negative() ? -5 : 5, -1);
     }
     else
     {
@@ -2456,11 +2446,14 @@ decimal_p decimal::acos(decimal_r x)
         tmp = atan(tmp);
 
         if (x->is_negative())
-            tmp = tmp + decimal_g(pi()->adjust_to_angle());
+        {
+            decimal_g offs = exact_angle(1, 0);
+            tmp = tmp + offs;
+        }
     }
     else
     {
-        tmp = pi()->adjust_to_angle() * decimal_g(make(5,-1));
+        tmp = exact_angle(5,-1);
     }
     return tmp;
 }
@@ -2492,9 +2485,7 @@ decimal_p decimal::atan(decimal_r x)
         decimal_g i = make(1);
         i = i / x;
         i = atan(i);
-        decimal_g half = make(5, -1);
-        half = half * pi();
-        half = half->adjust_to_angle();
+        decimal_g half = exact_angle(5, -1);
         i = half - i;
         return i;
     }
@@ -2506,9 +2497,7 @@ decimal_p decimal::atan(decimal_r x)
         decimal_g one = make(1);
         decimal_g nx = (x - one) / (x + one);
         nx = atan(nx);
-        decimal_g fourth = make(25,-2);
-        fourth = fourth * pi();
-        fourth = fourth->adjust_to_angle();
+        decimal_g fourth = exact_angle(25,-2);
         nx = fourth + nx;
         return nx;
     }
@@ -3614,4 +3603,21 @@ decimal_p decimal::adjust_to_angle() const
     x = x * ratio;
     x = x / pi();
     return x;
+}
+
+
+
+decimal_p decimal::exact_angle(int digits, int exponent)
+// ----------------------------------------------------------------------------
+//   Generate an exact fraction of pi for exact angles
+// ----------------------------------------------------------------------------
+{
+    id        am    = Settings.AngleMode();
+    auto      deg   = object::ID_Deg;
+    auto      grad  = object::ID_Grad;
+    int       half  = am == deg ? 180 : am == grad ? 200 : 1;
+    decimal_g ratio = make(digits * half, exponent);
+    if (am == object::ID_Rad)
+        ratio = ratio * pi();
+    return ratio;
 }

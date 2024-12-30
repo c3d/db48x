@@ -420,8 +420,8 @@ MENU(PartsMenu,
 
      "Ceil",    ID_ceil,
      "Floor",   ID_floor,
-     "RowNorm", ID_Unimplemented,
-     "ColNorm", ID_Unimplemented,
+     "→Int",    ID_ToInteger,
+     "→Q",      ID_ToFraction,
      "Dim",     ID_Size,
      "Type",    ID_Type);
 
@@ -445,6 +445,7 @@ MENU(NumbersMenu,
      RandomGeneratorBits::label,        ID_RandomGeneratorBits,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,
 
+     "→Int",    ID_ToInteger,
      "IsPrime", ID_Unimplemented,
      "NextPr",  ID_Unimplemented,
      "PrevPr",  ID_Unimplemented);

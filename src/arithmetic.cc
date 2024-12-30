@@ -115,7 +115,7 @@ algebraic_p arithmetic::optimize<add>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 {
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
+    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
     {
         if (x->is_zero(false) && !x->is_based()) // 0 + X = X
             return y;
@@ -303,7 +303,7 @@ algebraic_p arithmetic::optimize<sub>(algebraic_r x, algebraic_r y)
 //   Optimizations for subtractions
 // ----------------------------------------------------------------------------
 {
-    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
+    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
     {
         if (y->is_zero(false) && !y->is_based())                  // X - 0 = X
             return x;
@@ -453,7 +453,7 @@ algebraic_p arithmetic::optimize<mul>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 {
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
+    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
     {
         if (x->is_zero(false) && !x->is_based()) // 0 * X = 0
             return x;
@@ -623,7 +623,7 @@ algebraic_p arithmetic::optimize<struct div>(algebraic_r x, algebraic_r y)
         return zero_divide(x, y);
 
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_algebraic() && y->is_algebraic())
+    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
     {
         if (x->is_zero(false) && !x->is_based()) // 0 / X = 0
             return x;
@@ -1300,6 +1300,8 @@ algebraic_p arithmetic::evaluate(id          op,
     {
         (void) to_decimal(x, true);          // May fail silently
         (void) to_decimal(y, true);
+        if (!x || !y)
+            return nullptr;
     }
 
     id xt = x->type();

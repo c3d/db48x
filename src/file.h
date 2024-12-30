@@ -41,19 +41,23 @@ typedef const struct text *text_p;
 
 struct file
 // ----------------------------------------------------------------------------
-//   Direct access to the help file
+//   Direct access to daa files
 // ----------------------------------------------------------------------------
+//   This class deals with a linked list of files, because DMCP has a really
+//   annoying limit where only one file can be open at a time.
 {
+    enum mode { READING, WRITING, APPEND };
     file();
-    file(cstring path, bool writing);
-    file(text_p path, bool writing);
+    file(cstring path, mode wrmode);
+    file(text_p path, mode wrmode);
     ~file();
 
-    void    open(cstring path);
-    void    open_for_writing(cstring path, bool append = false);
+    void    open(cstring path, mode wrmode);
+    void    close(bool reopen = true);
+    void    reopen();
+
     bool    valid();
     bool    eof();
-    void    close();
     bool    put(unicode out);
     bool    put(char c);
     bool    write(const char *buf, size_t len);
@@ -78,50 +82,17 @@ struct file
     static cstring basename(cstring path);
 
 protected:
+    static file *current;       // Only one open file at a time
 #if SIMULATOR
-    FILE *data;
-#else
-    FIL     data;
-#endif
-    cstring name;
+    typedef FILE *FIL;
+#endif // SIMULATOR
+    FIL         data;
+    cstring     name;           // File name to use when reopening
+    uint        closed;         // Position in file when closing
+    file *      previous;       // Previous file to reopen when closing
+    bool        writing;        // Should we reopen for writing
 };
 
-
-template <bool writing = false>
-struct file_closer_tmpl
-// ----------------------------------------------------------------------------
-//   Structure to temporary close a file
-// ----------------------------------------------------------------------------
-//   DMCP only allows one file open at a time
-{
-    file_closer_tmpl(file &f) : f(f), name(), position(0)
-    {
-        if (f.valid())
-        {
-            position = f.position();
-            name = f.filename();
-            f.close();
-        }
-    }
-    ~file_closer_tmpl()
-    {
-        if (name)
-        {
-            if (writing)
-                f.open_for_writing(name, true);
-            else
-                f.open(name);
-            if (f.valid())
-                f.seek(position);
-        }
-    }
-    file   &f;
-    cstring name;
-    uint    position;
-};
-
-using file_closer = file_closer_tmpl<false>;
-using file_closer_while_writing = file_closer_tmpl<true>;
 
 #define MAGIC_SAVE_STATE         0x05121968
 

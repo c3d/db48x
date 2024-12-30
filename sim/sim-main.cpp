@@ -30,6 +30,7 @@
 #include "main.h"
 #include "object.h"
 #include "recorder.h"
+#include "settings.h"
 #include "sim-rpl.h"
 #include "sim-window.h"
 #include "sysmenu.h"
@@ -41,9 +42,10 @@
 RECORDER(options, 32, "Information about command line options");
 RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
 
-bool run_tests = false;
-bool noisy_tests = false;
-uint memory_size = 100;           // Memory size in kilobytes
+bool   run_tests   = false;
+bool   noisy_tests = false;
+bool   no_beep     = false;
+uint   memory_size = 100; // Memory size in kilobytes
 
 size_t recorder_render_object(intptr_t tracing,
                               const char *UNUSED /* format */,
@@ -126,23 +128,27 @@ int main(int argc, char *argv[])
            "Simulator invoked as %+s with %d arguments", argv[0], argc-1);
     for (int a = 1; a < argc; a++)
     {
-        record(options, "  %u: %+s", a, argv[a]);
-        if (argv[a][0] == '-')
+        cstring as = argv[a];
+        record(options, "  %u: %+s", a, as);
+        if (as[0] == '-')
         {
-            switch(argv[a][1])
+            switch(as[1])
             {
             case 't':
-                recorder_trace_set(argv[a]+2);
+                recorder_trace_set(as+2);
                 break;
             case 'n':
                 noisy_tests = true;
+                break;
+            case 'N':
+                no_beep = true;
                 break;
 
             case 'T':
                 run_tests = true;
                 // fall-through
             case 'O':
-                if (argv[a][2])
+                if (as[2])
                 {
                     static bool first = true;
                     if (first)
@@ -151,64 +157,107 @@ int main(int argc, char *argv[])
                         first = false;
                     }
                     char tname[256];
-                    if (strcmp(argv[a]+2, "all") == 0)
+                    if (strcmp(as+2, "all") == 0)
                         strcpy(tname, "est_.*");
                     else
-                        snprintf(tname, sizeof(tname)-1, "est_%s", argv[a]+2);
+                        snprintf(tname, sizeof(tname)-1, "est_%s", as+2);
                     recorder_trace_set(tname);
                 }
                 break;
             case 'D':
-                if (argv[a][2])
-                    tests::dump_on_fail = argv[a]+2;
+                if (as[2])
+                    tests::dump_on_fail = as+2;
                 else if (a < argc)
                     tests::dump_on_fail = argv[++a];
                 break;
 
             case 'k':
-                if (argv[a][2])
-                    keymap_filename = argv[a] + 2;
+                if (as[2])
+                    load_saved_keymap(as + 2);
                 else if (a < argc)
-                    keymap_filename = argv[++a];
+                    load_saved_keymap(argv[++a]);
                 break;
             case 'w':
-                if (argv[a][2])
-                    tests::default_wait_time = atoi(argv[a]+2);
+                if (as[2])
+                    tests::default_wait_time = atoi(as+2);
                 else if (a < argc)
                     tests::default_wait_time = atoi(argv[++a]);
                 break;
             case 'd':
-                if (argv[a][2])
-                    tests::key_delay_time = atoi(argv[a]+2);
+                if (as[2])
+                    tests::key_delay_time = atoi(as+2);
                 else if (a < argc)
                     tests::key_delay_time = atoi(argv[++a]);
                 break;
             case 'r':
-                if (argv[a][2])
-                    tests::refresh_delay_time = atoi(argv[a]+2);
+                if (as[2])
+                    tests::refresh_delay_time = atoi(as+2);
                 else if (a < argc)
                     tests::refresh_delay_time = atoi(argv[++a]);
                 break;
             case 'i':
-                if (argv[a][2])
-                    tests::image_wait_time = atoi(argv[a]+2);
+                if (as[2])
+                    tests::image_wait_time = atoi(as+2);
                 else if (a < argc)
                     tests::image_wait_time = atoi(argv[++a]);
                 break;
             case 'm':
-                if (argv[a][2])
-                    memory_size = atoi(argv[a]+2);
+                if (as[2])
+                    memory_size = atoi(as+2);
                 else if (a < argc)
                     memory_size = atoi(argv[++a]);
                 break;
             case 's':
-                if (argv[a][2])
-                    MainWindow::devicePixelRatio = atof(argv[a]+2);
+                if (as[2])
+                    MainWindow::devicePixelRatio = atof(as+2);
                 else if (a < argc)
                     MainWindow::devicePixelRatio = atof(argv[++a]);
                 break;
 
             }
+        }
+        else if (cstring pos = strchr(as, '='))
+        {
+            size_t len   = pos - as;
+            ularge value = strtoull(pos + 1, nullptr, 0);
+
+#define ID(Name)                                                \
+            const object::id ID_##Name = object::ID_##Name;     \
+            (void) ID_##Name;
+#include "ids.tbl"
+
+            if (isalpha(pos[1]))
+            {
+                if (!strcasecmp(pos+1, "yes") || !strcasecmp(pos+1, "true"))
+                    value = true;
+
+#define ID(id)
+#define SETTING_ENUM(Name, Alias, Base)         \
+                if (sizeof(#Name) - 1 == len && \
+                    (!strcasecmp(#Name, pos+1) ||       \
+                     !strcasecmp(#Alias, pos+1)))       \
+                    value = int(ID_##Name);
+#include "ids.tbl"
+            }
+
+#define ID(id)
+#define SETTING(Name, Low, High, Init)                  \
+            if (sizeof(#Name) - 1 == len &&             \
+                strncasecmp(#Name, as, len) == 0)       \
+                Settings.Name((typeof(Init))value);     \
+            else
+#define FLAG(Enable, Disable)                           \
+            if (sizeof(#Enable) - 1 == len &&           \
+                strncasecmp(#Enable, as, len) == 0)     \
+                Settings.Enable((bool) value);          \
+            else if (sizeof(#Disable) - 1 == len &&     \
+                strncasecmp(#Disable, as, len) == 0)    \
+                Settings.Disable((bool) value);         \
+            else
+
+#include "ids.tbl"
+            fprintf(stderr,
+                    "Warning: Setting '%.*s' does not exist\n", int(len), as);
         }
     }
 

@@ -160,20 +160,6 @@ Evaluate algebraic rules on symbolic expressions repeatedly until no futher chan
 
 Evaluate algebraic rules on symbolic expressions one step at a time.
 
-
-
-## →Num
-
-Convert fractions and symbolic constants to decimal form.
-For example, `1/4 →Num` results in `0.25`.
-
-## →Q
-
-Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
-The precision of the conversion in digits is defined by
-[→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
-conversion is defined by [→FracDigits](#ToFractionIterations)
-
 ## ListExpressionNames
 
 List all variables used in an expression or polynomial, leaving the original

@@ -1624,26 +1624,18 @@ algebraic_p random_number(algebraic_r min, algebraic_r max)
 {
     if (algebraic_g val = random_number())
     {
-        algebraic_g scaled = val * (max - min) + min;
         if (min->is_integer() && max->is_integer())
         {
-            if (min->is_negative() == max->is_negative())
-            {
-                algebraic_g half = decimal::make(5, -1);
-                if (min->is_negative())
-                    scaled = scaled - half;
-                else
-                    scaled = scaled + half;
-            }
-            else
-            {
-                algebraic_g one = decimal::make(1, 0);
-                algebraic_g half = decimal::make(5, -1);
-                scaled = val * (max - min + one) + min - half;
-            }
-            algebraic::to_integer(scaled);
+            algebraic_g one = decimal::make(1, 0);
+            algebraic_g half = decimal::make(5, -1);
+            val = floor::run(val * (max - min + one) + min);
+            algebraic::to_integer(val);
         }
-        return scaled;
+        else
+        {
+            val = val * (max - min) + min;
+        }
+        return val;
     }
     return nullptr;
 }

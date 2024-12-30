@@ -35,7 +35,7 @@
 
 #include <cmath>
 
-size_t hwfp_base::render(renderer &r, double x)
+size_t hwfp_base::render(renderer &r, double x, char suffix)
 // ----------------------------------------------------------------------------
 //   Render the value, ignoring formatting for now
 // ----------------------------------------------------------------------------
@@ -43,10 +43,13 @@ size_t hwfp_base::render(renderer &r, double x)
     if (std::isfinite(x))
     {
         decimal_g dec = decimal::from(x);
-        if (dec)
-            return dec->render(r);
+        if (dec && dec->render(r))
+        {
+            r.put(suffix);
+            return r.size();
+        }
     }
-    if (std::isinf(x))
+    else if (std::isinf(x))
     {
         r.put(x < 0 ? "-∞" : "∞");
     }
@@ -55,128 +58,6 @@ size_t hwfp_base::render(renderer &r, double x)
         r.put("NaN");
     }
     return r.size();
-}
-
-
-PARSE_BODY(hwfp_base)
-// ----------------------------------------------------------------------------
-//   Parse a floating point value if this is configured
-// ----------------------------------------------------------------------------
-{
-    // Check if hardware floating point is enabled
-    if (!Settings.HardwareFloatingPoint())
-        return SKIP;
-
-    // If hardware FP is enabled, we need to have low-enough precision
-    uint prec = Settings.Precision();
-    if (prec > 16)
-        return SKIP;
-
-    // Check if we use double or float
-    gcutf8   source = p.source;
-    gcutf8   s      = source;
-    gcutf8   last   = source + p.length;
-    scribble scr;
-
-    // Skip leading sign
-    if (*s == '+' || *s == '-')
-    {
-        // In an equation, `1 + 3` should interpret `+` as an infix
-        if (p.precedence < 0)
-            return SKIP;
-        byte *p = rt.allocate(1);
-        *p = *s;
-        ++s;
-    }
-
-    // Scan digits and decimal dot
-    int    decimalDot = -1;
-    size_t digits     = 0;
-    while (+s < +last)
-    {
-        byte c = *s;
-        bool digit = c >= '0' && c <= '9';
-        digits += digit ? 1 : 0;
-        if (!(digit || (decimalDot < 0 && (c == '.' || c == ','))))
-            break;
-
-        byte *p = rt.allocate(1);
-        if (!p)
-            return ERROR;
-        if (c == ',')
-            c = '.';
-        *p = c;
-        ++s;
-    }
-    if (!digits)
-        return SKIP;
-
-    // Check how many digits were given
-    if (Settings.TooManyDigitsErrors() && digits > prec)
-    {
-        rt.mantissa_error().source(source, +s - +source);
-        return ERROR;
-    }
-
-    // Check if we were given an exponent
-    if (+s < +last)
-    {
-        unicode cp = utf8_codepoint(s);
-        if (cp == 'e' || cp == 'E' || cp == Settings.ExponentSeparator())
-        {
-            s = utf8_next(s);
-            byte *p = rt.allocate(1);
-            if (!p)
-                return ERROR;
-            *p = 'e';
-            if (*s == '+' || *s == '-')
-            {
-                byte *p = rt.allocate(1);
-                if (!p)
-                    return ERROR;
-                *p = *s;
-                ++s;
-            }
-            utf8 expstart = s;
-            while (+s < +last && (*s >= '0' && *s <= '9'))
-            {
-                byte *p = rt.allocate(1);
-                if (!p)
-                    return ERROR;
-                *p = *s;
-                ++s;
-            }
-
-            if (s == expstart)
-            {
-                rt.exponent_error().source(s);
-                return ERROR;
-            }
-        }
-    }
-
-    // Add trailing zero
-    byte *bp = rt.allocate(1);
-    if (!bp)
-        return ERROR;
-    *bp = 0;
-
-    // Convert to floating point
-    cstring src = cstring(scr.scratch());
-    p.length = +s - +source;
-    if (prec > 7)
-    {
-        double fp = std::strtod(src, nullptr);
-        p.out = hwdouble::make(fp);
-
-    }
-    else
-    {
-        float fp = std::strtof(src, nullptr);
-        p.out = hwfloat::make(fp);
-    }
-
-    return p.out ? OK : ERROR;
 }
 
 
@@ -244,5 +125,180 @@ algebraic_p hwfp<hw>::to_fraction(uint count, uint prec) const
 }
 
 
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::neg(hwfp_r x)
+// ----------------------------------------------------------------------------
+//   Negation
+// ----------------------------------------------------------------------------
+{
+    return make(-x->value());
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::add(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Addition
+// ----------------------------------------------------------------------------
+{
+    add::remember(target<add>);
+    return make(x->value() + y->value());
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::sub(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Subtraction
+// ----------------------------------------------------------------------------
+{
+    sub::remember(target<sub>);
+    return make(x->value() - y->value());
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::mul(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Multiplication
+// ----------------------------------------------------------------------------
+{
+    mul::remember(target<mul>);
+    return make(x->value() * y->value());
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::div(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Division
+// ----------------------------------------------------------------------------
+{
+    div::remember(target<div>);
+    hw fy = y->value();
+    if (fy == 0.0)
+    {
+        rt.zero_divide_error();
+        return nullptr;
+    }
+    return make(x->value() / fy);
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::mod(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Modulo
+// ----------------------------------------------------------------------------
+{
+    mod::remember(target<mod>);
+    hw fy = y->value();
+    if (fy == 0.0)
+    {
+        rt.zero_divide_error();
+        return nullptr;
+    }
+    hw fx = x->value();
+    fx    = ::fmod(fx, fy);
+    if (fx < 0)
+        fx = fy < 0 ? fx - fy : fx + fy;
+    return make(fx);
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::rem(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Remainder
+// ----------------------------------------------------------------------------
+{
+    rem::remember(target<rem>);
+    hw fy = y->value();
+    if (fy == 0.0)
+    {
+        rt.zero_divide_error();
+        return nullptr;
+    }
+    return make(std::fmod(x->value(), fy));
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::pow(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Power
+// ----------------------------------------------------------------------------
+{
+    pow::remember(target<pow>);
+    return make(std::pow(x->value(), y->value()));
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::hypot(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Hypothenuse
+// ----------------------------------------------------------------------------
+{
+    hypot::remember(target<hypot>);
+    return make(std::hypot(x->value(), y->value()));
+}
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::atan2(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Arctangent for two lengths
+// ----------------------------------------------------------------------------
+{
+    atan2::remember(target<atan2>);
+    return make(to_angle(std::atan2(x->value(), y->value())));
+}
+
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::Min(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Minimum
+// ----------------------------------------------------------------------------
+{
+    hw fx = x->value();
+    hw fy = y->value();
+    return make(fx < fy ? fx : fy);
+}
+
+template<typename hw>
+typename hwfp<hw>::hwfp_p hwfp<hw>::Max(hwfp_r x, hwfp_r y)
+// ----------------------------------------------------------------------------
+//   Maximum1
+// ----------------------------------------------------------------------------
+{
+    hw fx = x->value();
+    hw fy = y->value();
+    return make(fx > fy ? fx : fy);
+}
+
+
 template algebraic_p hwfp<float>::to_fraction(uint count, uint prec) const;
 template algebraic_p hwfp<double>::to_fraction(uint count, uint prec) const;
+
+#define ARITH1(name)     ARITH1I(name, float); ARITH1I(name, double)
+#define ARITH1I(name,ty)                                                 \
+    template hwfp<ty>::hwfp_p hwfp<ty>::name(hwfp<ty>::hwfp_r);
+#define ARITH2(name)     ARITH2I(name, float); ARITH2I(name, double)
+#define ARITH2I(name,ty)                                                \
+    template hwfp<ty>::hwfp_p hwfp<ty>::name(hwfp<ty>::hwfp_r,          \
+                                             hwfp<ty>::hwfp_r);
+
+ARITH1(neg);
+ARITH2(add);
+ARITH2(sub);
+ARITH2(mul);
+ARITH2(div);
+ARITH2(mod);
+ARITH2(rem);
+ARITH2(pow);
+ARITH2(hypot);
+ARITH2(atan2);
+ARITH2(Min);
+ARITH2(Max);

@@ -39,7 +39,7 @@ struct characters_file : file
 // ----------------------------------------------------------------------------
 {
     characters_file(cstring name = "config/characters.csv")
-        : file(name, false) {}
+        : file(name, READING) {}
     ~characters_file() {}
     symbol_g    next();
 };

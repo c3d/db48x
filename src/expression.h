@@ -100,6 +100,8 @@ struct expression : program
         return rt.make<expression>(type, op, args, arity);
     }
 
+    bool is_simplifiable() const;
+
     static expression_p get(object_p obj);
     static list_p current_equation(bool all, bool error);
     bool is_well_defined(symbol_p solving = nullptr, bool error = true,

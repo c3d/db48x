@@ -57,9 +57,31 @@
 using std::max;
 using std::min;
 
+// ============================================================================
+//
 // Those are put in the same file to guarantee initialization order
-runtime rt(nullptr, 0);
+//
+// ============================================================================
+
+// Initialize the screen
+surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE);
+
+// Pre-built patterns for shades of grey
+const pattern pattern::black   = pattern(0, 0, 0);
+const pattern pattern::gray10  = pattern(32, 32, 32);
+const pattern pattern::gray25  = pattern(64, 64, 64);
+const pattern pattern::gray50  = pattern(128, 128, 128);
+const pattern pattern::gray75  = pattern(192, 192, 192);
+const pattern pattern::gray90  = pattern(224, 224, 224);
+const pattern pattern::white   = pattern(255, 255, 255);
+const pattern pattern::invert  = pattern(~0ULL);
+
+// Settings depend on patterns
+settings Settings;
+
+// Runtime must be initialized before ser interface, which contains GC pointers
 runtime::gcptr *runtime::GCSafe;
+runtime rt(nullptr, 0);
 user_interface ui;
 
 uint last_keystroke_time = 0;
@@ -256,8 +278,47 @@ int db48x_is_beep_mute()
     return Settings.BeepOff();
 }
 
-cstring keymap_default = "config/keymap.48k";
-cstring keymap_filename = keymap_default;
+
+bool load_saved_keymap(cstring name)
+// ----------------------------------------------------------------------------
+//   Load the default system state file
+// ----------------------------------------------------------------------------
+{
+    bool isdefault = false;
+    char keymap_name[80] = { 0 };
+    if (name)
+    {
+        file kcfg("config/keymap.cfg", file::WRITING);
+        if (kcfg.valid())
+            kcfg.write(name, strlen(name));
+    }
+
+    file kcfg("config/keymap.cfg", file::READING);
+    if (kcfg.valid())
+    {
+        kcfg.read(keymap_name, sizeof(keymap_name)-1);
+        for (size_t i = 0; i < sizeof(keymap_name); i++)
+            if (keymap_name[i] == '\n')
+                keymap_name[i] = 0;
+    }
+    else
+    {
+        strncpy(keymap_name, "config/db48x.48k", sizeof(keymap_name));
+        isdefault = true;
+    }
+
+    // Load default keymap
+    if (!ui.load_keymap(keymap_name))
+    {
+        // Fail silently if we try to load a default file
+        if (isdefault)
+            rt.clear_error();
+        else
+            rt.command(command::static_object(object::ID_KeyMap));
+        return false;
+    }
+    return true;
+}
 
 
 extern uint memory_size;
@@ -289,30 +350,7 @@ void program_init()
 
     // Check if we have a state file to load
     load_system_state();
-
-    if (keymap_filename == keymap_default)
-    {
-        char keymapcfg[80] = { 0 };
-        file kcfg("config/keymap.cfg", false);
-        if (kcfg.valid())
-        {
-            kcfg.read(keymapcfg, sizeof(keymapcfg)-1);
-            for (size_t i = 0; i < sizeof(keymapcfg); i++)
-                if (keymapcfg[i] == '\n')
-                    keymapcfg[i] = 0;
-            keymap_filename = keymapcfg;
-        }
-    }
-
-    // Load default keymap
-    if (!ui.load_keymap(keymap_filename))
-    {
-        // Fail silently if we try to load a default file
-        if (keymap_filename == keymap_default)
-            rt.clear_error();
-        else
-            rt.command(command::static_object(object::ID_KeyMap));
-    }
+    load_saved_keymap();
 }
 
 
@@ -553,6 +591,7 @@ extern "C" void program_main()
 uint            memory_size           = 100;
 volatile uint   test_command          = 0;
 bool            noisy_tests           = false;
+bool            no_beep               = false;
 bool            tests::running        = false;
 
 static void *rpl_thread(void *)

@@ -134,6 +134,10 @@ struct constant : algebraic
     {
         return matches("π");
     }
+    bool is_simplifiable() const
+    {
+        return !matches("∞") && !matches("?");
+    }
     bool        matches(cstring ref) const
     {
         size_t nlen = strlen(ref);

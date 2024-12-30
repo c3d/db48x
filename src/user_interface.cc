@@ -3042,8 +3042,7 @@ void user_interface::load_help(utf8 topic, size_t len)
 
     // Check if the index exists. If so, scan it
     {
-        file_closer hfc(helpfile);
-        file index(HELPINDEX_NAME, false);
+        file index(HELPINDEX_NAME, file::READING);
         if (index.valid())
         {
             for (char c = index.getchar(); !found && c; c = index.getchar())
@@ -3104,7 +3103,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     // Need to have the help file open here
     if (!helpfile.valid())
     {
-        helpfile.open(HELPFILE_NAME);
+        helpfile.open(HELPFILE_NAME, file::READING);
         if (!helpfile.valid())
         {
             help = -1u;
@@ -3465,7 +3464,7 @@ restart:
                                 image = files->recall_grob(name);
                             impos = offs;
 
-                            helpfile.open(HELPFILE_NAME);
+                            helpfile.open(HELPFILE_NAME, file::READING);
                             helpfile.seek(offs);
                         }
                         imdsp = true;
@@ -3655,7 +3654,7 @@ restart:
                                 *p++ = n;
                     }
                     p[-1] = 0;
-                    if (follow && style == HIGHLIGHTED_TOPIC)
+                    if (follow && style == HIGHLIGHTED_TOPIC && y >= 0)
                     {
                         if (topicsHistory)
                             topics[topicsHistory-1] = shown;
@@ -5326,7 +5325,7 @@ bool user_interface::load_keymap(cstring name)
 //   Load the keymap from a file
 // ----------------------------------------------------------------------------
 {
-    file kmap(name, false);
+    file kmap(name, file::READING);
     if (!kmap.valid())
     {
         rt.error(kmap.error());
@@ -5476,11 +5475,12 @@ bool user_interface::handle_user(int key)
 }
 
 
-bool user_interface::handle_functions(int key, object_p obj, bool user)
+bool user_interface::handle_functions(int key, object_p objp, bool user)
 // ----------------------------------------------------------------------------
 //   Code shared for user-mode and normal mode commands
 // ----------------------------------------------------------------------------
 {
+    object_g obj = objp;
     if (text_p direct = obj->as<text>())
     {
         size_t sz = 0;

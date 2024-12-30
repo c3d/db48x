@@ -77,6 +77,7 @@ bool                  load_state_file(cstring path);
 bool                  save_state_file(cstring path);
 bool                  load_system_state();
 bool                  save_system_state();
+bool                  load_saved_keymap(cstring name = nullptr);
 void                  power_off();
 void                  system_setup();
 void                  mark_dirty(uint row);

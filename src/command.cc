@@ -267,11 +267,22 @@ RENDER_BODY(command)
                 break;
             return r.size();
         }
-        if (ty == ID_mul && format == ID_LongForm &&
-            r.expression() && Settings.UseDotForMultiplication())
-            fname = utf8("·");
-        if ((ty == ID_dot || ty == ID_cross) && !r.expression())
-            fname = object::alias(ty, 1);
+        if (r.expression())
+        {
+            if (ty == ID_mul &&
+                format == ID_LongForm &&
+                Settings.UseDotForMultiplication())
+                fname = utf8("·");
+            else if (ty == ID_Derivative ||
+                     ty == ID_Primitive  ||
+                     ty == ID_Where)
+                fname = object::alias(ty, 0);
+        }
+        else
+        {
+            if (ty == ID_dot || ty == ID_cross)
+                fname = object::alias(ty, 1);
+        }
         r.put(format, fname);
     }
 
