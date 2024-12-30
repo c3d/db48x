@@ -39,11 +39,13 @@
 
 RECORDER(options, 32, "Information about command line options");
 
-bool run_tests = false;
-bool noisy_tests = false;
+bool run_tests      = false;
+bool noisy_tests    = false;
+bool no_beep        = false;
 bool db48x_keyboard = true;
+
 #ifndef MEMORY
-#define MEMORY 70
+#  define MEMORY 70
 #endif /* MEMORY */
 uint memory_size = MEMORY;           // Memory size in kilobytes
 
@@ -109,7 +111,7 @@ int main(int argc, char * argv[])
         if (cstring result = debug())
             record(options, "Strange input %s", result);
 #endif // DEBUG\
-    
+
     // Indicate the first two-byte opcode
     fprintf(stderr,
             "DB48X version %s\n"
@@ -133,6 +135,9 @@ int main(int argc, char * argv[])
                 break;
             case 'n':
                 noisy_tests = true;
+                break;
+            case 'N':
+                no_beep = true;
                 break;
             case 'T':
                 run_tests = true;
