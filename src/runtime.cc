@@ -506,6 +506,12 @@ size_t runtime::gc()
                 const uint max = sizeof(ui.function)/sizeof(ui.function[0][0]);
                 for (uint k = 0; !found && k < max; k++)
                     found = functions[k] >= obj && functions[k] < next;
+
+                if (!found)
+                {
+                    object_p vi = object_p(ui.validate_input);
+                    found = (vi >= obj && vi < next);
+                }
             }
         }
 
@@ -641,6 +647,9 @@ void runtime::move(object_p to, object_p from,
         ErrorCommand += delta;
     if (ui.command >= start && ui.command < end)
         ui.command += delta;
+    if (object_p vi = object_p(ui.validate_input))
+        if (vi >= from && vi < last)
+            ui.validate_input = (typeof(ui.validate_input))(vi + delta);
 
     // Adjust menu labels
     utf8 *label = (utf8 *) &ui.menuLabel[0][0];

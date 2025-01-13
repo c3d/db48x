@@ -100,7 +100,14 @@ HEADERS +=                                      \
 
 # User interface forms
 FORMS    += sim-window.ui
-RESOURCES += sim.qrc
+RESOURCES +=                    \
+        sim.qrc                 \
+        config.qrc              \
+        state.qrc 		\
+	library.qrc             \
+	help.qrc		\
+	help/img.qrc
+
 
 # Indicate we are on simulator
 DEFINES += SIMULATOR CONFIG_FIXED_BASED_OBJECTS
@@ -115,6 +122,7 @@ macx:DEFINES += _WCHAR_T_DEFINED
 # Configure help file
 DEFINES += 	HELPFILE_NAME=\\\"help/db48x.md\\\"
 DEFINES += 	HELPINDEX_NAME=\\\"help/db48x.idx\\\"
+DEFINES +=      MEMORY=100
 
 color:DEFINES += CONFIG_COLOR
 
@@ -133,3 +141,11 @@ clang:   QMAKE_CXXFLAGS += -Wno-unknown-pragmas
 OBJECTS_DIR=db48x-build
 
 ICON = db48x.icns
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/build.gradle \
+    android/res/values/libs.xml \
+    android/res/xml/qtprovider_paths.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>583</width>
-    <height>900</height>
+    <width>424</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="focusPolicy">
-   <enum>Qt::StrongFocus</enum>
+   <enum>Qt::FocusPolicy::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -22,7 +22,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
+    <enum>Qt::LayoutDirection::LeftToRight</enum>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
@@ -34,81 +34,75 @@
     <property name="spacing">
      <number>0</number>
     </property>
-    <property name="margin">
+    <property name="margin" stdset="0">
      <number>0</number>
     </property>
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <widget class="QWidget" name="page">
        <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
+        <item alignment="Qt::AlignmentFlag::AlignHCenter">
          <widget class="SimScreen" name="screen">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimumSize">
            <size>
-            <width>200</width>
-            <height>120</height>
+            <width>400</width>
+            <height>240</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>1056</width>
-            <height>728</height>
+            <width>4000</width>
+            <height>2400</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>400</width>
+            <height>240</height>
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
+           <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
+           <enum>QFrame::Shadow::Plain</enum>
           </property>
           <property name="lineWidth">
            <number>0</number>
           </property>
           <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="keyboard">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimumSize">
            <size>
-            <width>116</width>
-            <height>175</height>
+            <width>400</width>
+            <height>504</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
-            <height>16777215</height>
+            <width>4000</width>
+            <height>5040</height>
            </size>
           </property>
           <property name="baseSize">
            <size>
-            <width>464</width>
-            <height>700</height>
+            <width>400</width>
+            <height>504</height>
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
@@ -118,7 +112,7 @@
 border-width: 0px;</string>
           </property>
           <property name="text">
-           <string></string>
+           <string/>
           </property>
           <property name="flat">
            <bool>true</bool>

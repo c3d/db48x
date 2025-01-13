@@ -36,16 +36,21 @@
 #include "sysmenu.h"
 #include "version.h"
 
+#include <unistd.h>
+
 #include <QApplication>
 #include <QWindow>
+#include <QStandardPaths>
+#include <QDirIterator>
 
 RECORDER(options, 32, "Information about command line options");
 RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
 
 bool   run_tests   = false;
+bool   no_copy     = false;
 bool   noisy_tests = false;
 bool   no_beep     = false;
-uint   memory_size = 100; // Memory size in kilobytes
+uint   memory_size = MEMORY; // Memory size in kilobytes
 
 size_t recorder_render_object(intptr_t tracing,
                               const char *UNUSED /* format */,
@@ -89,9 +94,45 @@ size_t recorder_render_object(intptr_t tracing,
 }
 
 
+static void copy(const QString &fromName, const QString &toName)
+// ----------------------------------------------------------------------------
+//   Copy resource files to the target destination
+// ----------------------------------------------------------------------------
+{
+    QDir from(fromName);
+    QDir to(toName);
+    if (!to.exists())
+        to.mkpath(toName);
+
+    for (QDirIterator it(fromName, QDirIterator::Subdirectories);
+         it.hasNext();
+         it.next())
+    {
+        const auto fi = it.fileInfo();
+        if (!fi.isHidden())
+        {
+            QString relPath = from.relativeFilePath(fi.absoluteFilePath());
+            QString absPath = to.filePath(relPath);
+            if(fi.isDir())
+            {
+                // Create directory in target folder
+                to.mkpath(absPath);
+            }
+            else if (fi.isFile())
+            {
+                auto perms = fi.permissions()
+                    | QFile::WriteUser | QFile::WriteOwner;
+                QFile::remove(absPath);
+                QFile::copy(fi.absoluteFilePath(), absPath);
+                QFile::setPermissions(absPath, perms);
+            }
+        }
+    }
+}
+
+
 // Ensure linker keeps debug code
 extern cstring debug();
-
 
 int main(int argc, char *argv[])
 // ----------------------------------------------------------------------------
@@ -144,8 +185,13 @@ int main(int argc, char *argv[])
                 no_beep = true;
                 break;
 
+            case 'c':
+                no_copy = true;
+                break;
+
             case 'T':
                 run_tests = true;
+                no_copy = true;
                 // fall-through
             case 'O':
                 if (as[2])
@@ -209,9 +255,9 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 if (as[2])
-                    MainWindow::devicePixelRatio = atof(as+2);
+                    MainWindow::userScaling = atof(as+2);
                 else if (a < argc)
-                    MainWindow::devicePixelRatio = atof(argv[++a]);
+                    MainWindow::userScaling = atof(argv[++a]);
                 break;
 
             }
@@ -265,9 +311,20 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif // QT version 6
 
-    QCoreApplication::setOrganizationName("DB48X Project");
+
+    QCoreApplication::setOrganizationName("DB48X");
     QCoreApplication::setOrganizationDomain("48calc.org");
     QCoreApplication::setApplicationName("DB48X");
+
+    if (getenv("DB48X_NOCOPY") || strstr(argv[0], "sim/"))
+        no_copy = true;
+    if (!no_copy)
+    {
+        QString files =
+            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        copy(":/", files);
+        QDir::setCurrent(files);
+    }
 
     QApplication a(argc, argv);
     MainWindow w;

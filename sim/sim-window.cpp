@@ -72,13 +72,14 @@ extern bool alt_held;
 #if !WASM
 
 MainWindow *MainWindow::mainWindow = nullptr;
-qreal MainWindow::devicePixelRatio = 1.0;
+qreal MainWindow::userScaling = 1.0;
 
 MainWindow::MainWindow(QWidget *parent)
 // ----------------------------------------------------------------------------
 //    The main window of the simulator
 // ----------------------------------------------------------------------------
     : QMainWindow(parent), ui(), rpl(this), tests(this), highlight(),
+      keyboard_width(698), keyboard_height(878),
       devices(new QMediaDevices(this)), generator(), audio()
 {
     mainWindow = this;
@@ -105,9 +106,15 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(this, SIGNAL(keyResizeSignal(const QRect &)),
                      highlight, SLOT(keyResizeSlot(const QRect &)));
 
-    qreal dpratio = qApp->primaryScreen()->devicePixelRatio();
-    dpratio *= devicePixelRatio;
-    resize(210 * dpratio, 370 * dpratio);
+#ifdef ANDROID
+    adjustSize(QApplication::primaryScreen()->availableSize());
+#else
+    if (userScaling != 1.0)
+    {
+        QSize sz = size();
+        resize(sz.width() * userScaling, sz.height() * userScaling);
+    }
+#endif
 
     // Audio setup
     connect(devices, &QMediaDevices::audioOutputsChanged,
@@ -121,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
         tests.start();
     }
 }
+
 
 MainWindow::~MainWindow()
 // ----------------------------------------------------------------------------
@@ -137,29 +145,43 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 //   Resizing the window
 // ----------------------------------------------------------------------------
 {
-    qreal dpratio = qApp->primaryScreen()->devicePixelRatio();
-    int w = ui.screen->screen_width;
-    int h = ui.screen->screen_height + 5;
-    if(!h)
-        h = LCD_H+5;
-    if(!w)
-        w = LCD_W;
-    qreal dpwidth = event->size().width();
-    qreal realwidth = dpwidth * dpratio;
-    qreal scale = realwidth / w;
-    if((int)scale < 1)
-        scale = 1.0;
-    else
-        scale = (int)scale;
-    if (event->size().height() * 0.38 * dpratio < scale * h)
+    int   sw = ui.screen->screen_width;
+    int   sh = ui.screen->screen_height + 5;
+    qreal rw = event->size().width();
+    qreal rh = event->size().height();
+
+    // Screen scaling ratio as an integer value
+    qreal sr = qMax(floor(rw / sw), 1.0);
+
+    // Remaining space for the keyboard if screen at full scale
+    qreal kh = rh - sr * sh;
+    if (kh < 0.0)
     {
-        scale = event->size().height() * 0.38 * dpratio / h;
-        if ((int) scale < 1)
-            scale = 1.0;
-        else
-            scale = (int) scale;
+        // Not enough space at full scale, try at scale 1.0
+        kh = rh - sh;
+        sr = 1.0;
     }
-    ui.screen->setScale(scale / dpratio);
+
+    // Ratio for keyboard
+    qreal kr = kh / keyboard_height;
+    qreal kw = keyboard_width * kr;
+    if (kw >= rw)
+    {
+        kr *= rw / kw;
+        kw = rw;
+        kh = keyboard_height * kr;
+    }
+
+    // Set screen ratio and geometry
+    ui.screen->setScale(sr);
+    sw = int(sw * sr);
+    sh = int(sh * sr);
+    QRect sframe((rw - sw) / 2, 0, sw, sh);
+    ui.screen->setGeometry(sframe);
+
+    // Set keyboard size
+    QRect kframe((rw - kw) / 2, rh - kh - (rh - kh - sh) / 4, kw, kh);
+    ui.keyboard->setGeometry(kframe);
 }
 
 
@@ -833,8 +855,6 @@ void MainWindow::initializeAudio(const QAudioDevice &deviceInfo, uint freq)
     QAudioFormat format = deviceInfo.preferredFormat();
     const int    durationUs = 1000000 /* microseconds */;
 
-    if (audio)
-        audio->stop();
     audio.reset(new QAudioSink(deviceInfo, format));
     generator.reset(new AudioGenerator(format, durationUs, freq));
     generator->start();
@@ -1156,7 +1176,36 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
         img.save(name, "PNG");
         return true;
     }
-    return data.toImage() == img.toImage();
+    bool ok = data.toImage() == img.toImage();
+    if (!ok)
+    {
+        // Workaround for what appears to be a Qt bug, seen on Input test
+        const auto &r = data.toImage();
+        const auto &i = img.toImage();
+        auto rw = r.width();
+        auto rh = r.height();
+        auto iw = i.width();
+        auto ih = i.height();
+        ok = true;
+        if (rw != iw || rh != ih)
+        {
+            ok = false;
+        }
+        else
+        {
+            for (int x = 0; x < rw; x++)
+            {
+                for (int y = 0; y < rh; y++)
+                {
+                    QRgb rc = r.pixel(x, y);
+                    QRgb ic = r.pixel(x, y);
+                    if (rc != ic)
+                        ok = false;
+                }
+            }
+        }
+    }
+    return ok;
 }
 
 #else // WASM

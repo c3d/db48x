@@ -659,6 +659,468 @@ COMMAND_BODY(DispXY)
 }
 
 
+void draw_prompt(text_r msg)
+// ----------------------------------------------------------------------------
+//   Draw a prompt for user input commands
+// ----------------------------------------------------------------------------
+{
+    size_t len = 0;
+    utf8   txt = msg->value(&len);
+    return draw_prompt(txt, len);
+}
+
+
+void draw_prompt(utf8 txt, size_t len)
+// ----------------------------------------------------------------------------
+//   Draw a prompt for user input commands
+// ----------------------------------------------------------------------------
+{
+    using size   = blitter::size;
+    using coord  = blitter::coord;
+
+    coord   y    = 0;
+    coord   x    = 0;
+    bool    clr  = true;
+    utf8    last = txt + len;
+    pattern bg   = Settings.Background();
+    pattern fg   = Settings.Foreground();
+    font_p  font = settings::font(Settings.StackFont());
+    size    h    = font->height();
+
+    while (txt < last)
+    {
+        unicode cp = utf8_codepoint(txt);
+        size    w  = font->width(cp);
+        txt        = utf8_next(txt);
+        if (cp == '\n' || x + w >= LCD_W)
+        {
+            x = 0;
+            y += h;
+            clr = true;
+            if (cp == '\n')
+                continue;
+        }
+        if (cp == '\t')
+            cp = ' ';
+
+        if (clr)
+        {
+            Screen.fill(0, y, LCD_W-1, y+h-1, bg);
+            Screen.fill(0, y+h, LCD_W-1, y+h, fg);
+            ui.draw_dirty(0, y, LCD_W-1, y+h);
+            clr = false;
+        }
+        Screen.glyph(x, y, cp, font, fg);
+        x += w;
+    }
+    ui.freeze(1);
+    ui.stack_screen_top(y + h + 1);
+
+    uint    top  = ui.stack_screen_top();
+    uint    bot  = ui.stack_screen_bottom();
+    Screen.fill(0, top, LCD_W-1, bot, bg);
+    ui.draw_dirty(0, top, LCD_W-1, bot);
+
+    refresh_dirty();
+}
+
+
+COMMAND_BODY(Prompt)
+// ----------------------------------------------------------------------------
+//   Display the given message in the first line, then halt program
+// ----------------------------------------------------------------------------
+{
+    if (object_p msgo = rt.pop())
+    {
+        text_g msg = msgo->as_text();
+        if (msg)
+        {
+            draw_prompt(msg);
+            program::halted = true;
+            program::stepping = 0;
+            return OK;
+        }
+    }
+    return ERROR;
+}
+
+
+
+// ============================================================================
+//
+//    Input command and modes
+//
+// ============================================================================
+
+static void configure_alpha()
+// ----------------------------------------------------------------------------
+//   Configure for alphabetic mode
+// ----------------------------------------------------------------------------
+{
+    ui.alpha_plane(1);
+    ui.editing_mode(ui.TEXT);
+}
+
+
+static bool validate_alpha(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an alphabetic value
+// ----------------------------------------------------------------------------
+{
+    if (text_p text = text::make(+src, len))
+        return rt.push(+text);
+    return false;
+}
+
+
+static void configure_alg()
+// ----------------------------------------------------------------------------
+//   Configure for algebraic mode
+// ----------------------------------------------------------------------------
+{
+    ui.alpha_plane(0);
+    ui.editing_mode(ui.ALGEBRAIC);
+}
+
+
+static bool validate_alg(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an algebraic value and return it as text
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (obj->as_extended_algebraic())
+            if (text_p text = text::make(src, len))
+                return rt.push(+text);
+    return false;
+}
+
+
+static bool validate_algebraic(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an algebraic value and return it as algebraic
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (algebraic_p alg = obj->as_extended_algebraic())
+            return rt.push(alg);
+    return false;
+}
+
+
+static bool validate_expression(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an algeraic value and return it as expression
+// ----------------------------------------------------------------------------
+{
+    if (expression_p expr = expression::parse_all(src, len))
+        return rt.push(expr);
+    return false;
+}
+
+
+static void configure_value()
+// ----------------------------------------------------------------------------
+//   Configure for algebraic mode to enter a single value
+// ----------------------------------------------------------------------------
+{
+    ui.alpha_plane(0);
+    ui.editing_mode(ui.ALGEBRAIC);
+}
+
+
+static bool validate_value(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept a single object
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        return rt.push(obj);
+    return false;
+}
+
+
+static void configure_values()
+// ----------------------------------------------------------------------------
+//   Configure for program mode to enter an RPL command line
+// ----------------------------------------------------------------------------
+{
+    ui.alpha_plane(0);
+    ui.editing_mode(ui.PROGRAM);
+}
+
+
+static bool validate_values(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept a command line
+// ----------------------------------------------------------------------------
+{
+    if (program_p cmds = program::parse(src, len))
+        return rt.push(cmds);
+    return false;
+}
+
+
+static bool validate_values_source(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept a command line
+// ----------------------------------------------------------------------------
+{
+    if (program::parse(src, len))
+        if (text_p txt = text::make(src, len))
+            return rt.push(txt);
+    return false;
+}
+
+
+static bool validate_number(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept a number
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (obj->is_real() || obj->is_complex())
+            return rt.push(obj);
+    return false;
+}
+
+
+static bool validate_real(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept a real number
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (obj->is_real())
+            return rt.push(obj);
+    return false;
+}
+
+
+static bool validate_integer(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an integer number
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (obj->is_integer())
+            return rt.push(obj);
+    return false;
+}
+
+
+static bool validate_positive(gcutf8 &src, size_t len)
+// ----------------------------------------------------------------------------
+//  Check if we can accept an integer number
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::parse_all(src, len))
+        if (obj->is_integer())
+            if (!obj->is_negative(false))
+                return rt.push(obj);
+    return false;
+}
+
+
+static const struct validate_input_lookup
+// ----------------------------------------------------------------------------
+//   Structure associating a name to an input lookup function
+// ----------------------------------------------------------------------------
+{
+    cstring name;
+    void (*configure)();
+    bool (*validate)(gcutf8 &src, size_t len);
+}
+
+    input_validators[] =
+// ----------------------------------------------------------------------------
+//   List of input validators
+// ----------------------------------------------------------------------------
+{
+    { "α",              configure_alpha,        validate_alpha },
+    { "alpha",          configure_alpha,        validate_alpha },
+    { "text",           configure_alpha,        validate_alpha },
+    { "alg",            configure_alg,          validate_alg },
+    { "algebraic",      configure_alg,          validate_algebraic },
+    { "expression",     configure_alg,          validate_expression },
+    { "value",          configure_value,        validate_value },
+    { "object",         configure_value,        validate_value },
+    { "v",              configure_values,       validate_values_source },
+    { "values",         configure_values,       validate_values_source },
+    { "objects",        configure_values,       validate_values_source },
+    { "p",              configure_values,       validate_values },
+    { "prog",           configure_values,       validate_values },
+    { "program",        configure_values,       validate_values },
+    { "n",              configure_alg,          validate_number },
+    { "number",         configure_alg,          validate_number },
+    { "r",              configure_alg,          validate_real },
+    { "real",           configure_alg,          validate_real },
+    { "i",              configure_alg,          validate_integer },
+    { "integer",        configure_alg,          validate_integer },
+    { "positive",       configure_alg,          validate_positive },
+};
+
+
+
+COMMAND_BODY(Input)
+// ----------------------------------------------------------------------------
+//   Display the given message in the first line, then halt program for input
+// ----------------------------------------------------------------------------
+{
+    bool (*validate)(gcutf8 &, size_t) = validate_alpha;
+    void (*config)() = configure_alpha;
+
+    object_p edo  = rt.pop();
+    object_p msgo = rt.pop();
+    uint     pos  = ~0;
+
+    // Check the prompt
+    text_g   msg  = msgo->as_text();
+
+    // Check the editor value
+    text_g ed;
+    if (list_g lst = edo->as_array_or_list())
+    {
+        edo = lst->at(0);
+        if (edo)
+        {
+            ed = edo->as_text();
+            if (!ed)
+                goto error;
+            object_p poso = lst->at(1);
+            if (poso)
+            {
+                if (poso->is_real())
+                {
+                    pos = poso->as_uint32(0, true) - 1;
+                }
+                else if (list_p posl = poso->as_array_or_list())
+                {
+                    uint row = 0;
+                    uint col = 0;
+                    if (object_p rowo = posl->at(0))
+                    {
+                        row = rowo->as_uint32(0, true) - 1;
+                        if (object_p colo = posl->at(1))
+                            col = colo->as_uint32(0, true) - 1;
+                    }
+                    size_t sz  = 0;
+                    utf8   edt = ed->value(&sz);
+                    while (pos < sz)
+                    {
+                        if (!row)
+                        {
+                            if (!col)
+                                break;
+                            col--;
+                        }
+                        if (edt[pos] == '\n')
+                            row--;
+                        pos++;
+                    }
+                }
+                else
+                {
+                    rt.value_error();
+                    goto error;
+                }
+
+                if (object_p valo = lst->at(2))
+                {
+                    id ty = valo->type();
+                    if (ty == ID_text || ty == ID_symbol)
+                    {
+                        text_p valn = text_p(valo);
+                        size_t sz   = 0;
+                        utf8   valt = valn->value(&sz);
+                        for (const auto &p : input_validators)
+                        {
+                            if (strncasecmp(p.name, cstring(valt), sz) == 0)
+                            {
+                                validate = p.validate;
+                                config = p.configure;
+                                break;
+                            }
+                        }
+                    }
+                    else if (ty == ID_program)
+                    {
+                        validate = (typeof validate) valo;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        ed = edo->as_text();
+    }
+
+    if (msg && ed)
+    {
+        draw_prompt(msg);
+
+        size_t sz  = 0;
+        utf8   txt = ed->value(&sz);
+        if (pos > sz)
+            pos = sz;
+        rt.edit(txt, sz);
+        config();
+        ui.cursor_position(pos);
+        ui.input(validate);
+        program::halted = true;
+        program::stepping = 0;
+        return OK;
+    }
+
+error:
+    if (!rt.error())
+        rt.value_error();
+    return ERROR;
+}
+
+
+static object::result compile_to(bool (*validator)(gcutf8 &src, size_t sz))
+// ----------------------------------------------------------------------------
+//   Process text input to check if it has the expected type
+// ----------------------------------------------------------------------------
+{
+    if (object_p top = rt.pop())
+    {
+        if (text_p srct = top->as<text>())
+        {
+            size_t length = 0;
+            gcutf8 src = srct->value(&length);
+            if (validator(src, length))
+                return object::OK;
+            rt.input_validation_error();
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return object::ERROR;
+}
+
+
+COMMAND_BODY(CompileToAlgebraic){ return compile_to(validate_algebraic); }
+COMMAND_BODY(CompileToNumber)   { return compile_to(validate_number); }
+COMMAND_BODY(CompileToInteger)  { return compile_to(validate_integer); }
+COMMAND_BODY(CompileToPositive) { return compile_to(validate_positive); }
+COMMAND_BODY(CompileToReal)     { return compile_to(validate_real); }
+COMMAND_BODY(CompileToObject)   { return compile_to(validate_value); }
+COMMAND_BODY(CompileToExpression){ return compile_to(validate_expression); }
+
+
+
+
+// ============================================================================
+//
+//    Show command
+//
+// ============================================================================
+
 COMMAND_BODY(Show)
 // ----------------------------------------------------------------------------
 //   Show the top-level of the stack graphically, using entire screen

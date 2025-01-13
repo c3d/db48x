@@ -72,3 +72,13 @@ to insert breakpoints at specific locations in a program.
 
 The `Kill` instruction stops the execution of the program currently being
 debugged.
+
+
+## Run
+
+The `Run` command is intended to run programs or resume their execution.
+
+* If a program is currently stopped, then it resumes its execution.
+  This can be used to resume execution when a program is waiting for input
+  from the `Prompt` command.
+* Otherwise, `Run` evaluates the top of the stack like `Evaluate`.

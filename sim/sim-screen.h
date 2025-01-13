@@ -44,6 +44,8 @@ class SimScreen : public QGraphicsView
 public:
     int                  screen_width;
     int                  screen_height;
+    int                  keyboard_width;
+    int                  keyboard_height;
     qreal                scale;
 
     QColor               bgColor;

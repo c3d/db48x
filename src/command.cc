@@ -450,6 +450,19 @@ COMMAND_BODY(Eval)
 }
 
 
+COMMAND_BODY(Run)
+// ----------------------------------------------------------------------------
+//   Resume execution if halted, otherwise evaluate
+// ----------------------------------------------------------------------------
+{
+    if (rt.run_stepping())
+        return program::run_loop(0);
+    if (object_p x = rt.pop())
+        return program::run(x);
+    return OK;
+}
+
+
 COMMAND_BODY(ToText)
 // ----------------------------------------------------------------------------
 //   Convert an object to text

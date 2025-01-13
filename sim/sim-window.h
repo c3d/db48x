@@ -136,6 +136,8 @@ class MainWindow : public QMainWindow
     RPLThread                      rpl;
     TestsThread                    tests;
     Highlight                     *highlight;
+    int                            keyboard_width;
+    int                            keyboard_height;
 
     // Audio support
     QMediaDevices                 *devices = nullptr;
@@ -145,7 +147,7 @@ class MainWindow : public QMainWindow
 
     enum { SAMPLE_RATE = 20000, SAMPLE_COUNT = SAMPLE_RATE };
 public:
-    static qreal       devicePixelRatio;
+    static qreal       userScaling;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

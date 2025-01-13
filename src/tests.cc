@@ -137,6 +137,7 @@ TESTS(explode,          "Extracting object structure");
 TESTS(regressions,      "Regression checks");
 TESTS(plotting,         "Plotting, graphing and charting");
 TESTS(graphics,         "Graphic commands");
+TESTS(input,            "User input");
 TESTS(help,             "On-line help");
 TESTS(gstack,           "Graphic stack rendering")
 TESTS(hms,              "HMS and DMS operations");
@@ -180,7 +181,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            auto_simplification();
+            user_input_commands();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -246,6 +247,7 @@ void tests::run(uint onlyCurrent)
         plotting();
         plotting_all_functions();
         graphic_commands();
+        user_input_commands();
         hms_dms_operations();
         date_operations();
         infinity_and_undefined();
@@ -10565,7 +10567,7 @@ void tests::check_help_examples()
                     size_t nfailures = failures.size();
                     testing          = false;
                     itest(LENGTHY(20000), ENTER).noerror();
-                    if (rt.depth())
+                    if (rt.depth() && Stack.type() == object::ID_expression)
                         itest(LENGTHY(20000), RUNSTOP).noerror();
                     if (!ref.empty())
                         want(ref.c_str());
@@ -11509,6 +11511,244 @@ void tests::graphic_commands()
         .test(CLEAR, RSHIFT, DOT, "123", F6, F6, LSHIFT, F3, EXIT)
         .image_noheader("graph-integral");
 }
+
+
+void tests::user_input_commands()
+// ----------------------------------------------------------------------------
+//   User input commands (PROMPT, INPUT)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(input);
+
+    step("Prompt with single-line display")
+        .test(CLEAR, EXIT, "\"Enter value\" PROMPT 1 +", ENTER)
+        .image("prompt-display")
+        .test("123")
+        .image("prompt-entry")
+        .test(ENTER)
+        .expect("123")
+        .test(RUNSTOP)
+        .expect("124");
+    step("Prompt with 2 lines display")
+        .test(CLEAR, EXIT, "123 456 \"Enter value\nNow!\" PROMPT 1 +", ENTER)
+        .image("prompt2-display")
+        .test("123")
+        .image("prompt2-entry")
+        .test(ENTER)
+        .expect("123")
+        .test(RUNSTOP)
+        .got("124", "456", "123");
+    step("Multiple prompts")
+        .test(CLEAR, EXIT,
+              "\"Enter first value\" PROMPT "
+              "\"Enter second value\" PROMPT +", ENTER)
+        .image("prompts-display1")
+        .test("123", ENTER)
+        .expect("123")
+        .test(RUNSTOP, "456")
+        .image("prompts-display2")
+        .test(ENTER, RUNSTOP)
+        .got("579");
+
+    step("Input command with text")
+        .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +",ENTER)
+        .image("input-display")
+        .test("123")
+        .image("input-display-123")
+        .test(ENTER)
+        .got("\"Data1234\"");
+
+    step("Input command with list")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +",ENTER)
+        .image("input-list-display")
+        .test("123")
+        .image("input-list-display-123", 2000)
+        .test(ENTER)
+        .got("\"Data1234\"");
+
+    step("Input command with list and position")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +",ENTER)
+        .image("input-pos2-display")
+        .test("123")
+        .image("input-pos2-display-123", 2000)
+        .test(ENTER)
+        .got("\"Da123ta4\"");
+
+    step("Input command for text")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 text } INPUT 4 +",ENTER)
+        .image("input-pos2-display")
+        .test("123")
+        .image("input-pos2-display-123", 2000)
+        .test(ENTER)
+        .got("\"Da123ta4\"");
+
+    step("Input command for alpha")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +",ENTER)
+        .image("input-pos2-display")
+        .test("123")
+        .image("input-pos2-display-123", 2000)
+        .test(ENTER)
+        .got("\"Da123ta4\"");
+
+    step("Input command text")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +",ENTER)
+        .image("input-pos2-display")
+        .test("123")
+        .image("input-pos2-display-123", 2000)
+        .test(ENTER)
+        .got("\"Da123ta4\"");
+
+    step("Input command for alg")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +",ENTER)
+        .image("input-pos2-display")
+        .test("123")
+        .image("input-pos2-display-123", 2000)
+        .test(ENTER)
+        .got("\"Da123ta4\"");
+
+    step("Input command for algebraic")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 algebraic } INPUT",ENTER)
+        .test("123", ENTER)
+        .type(ID_symbol)
+        .got("Da123ta");
+
+    step("Input command for expression")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"Data\" 3 expression } INPUT",ENTER)
+        .test("123", ENTER)
+        .type(ID_expression)
+        .got("'Da123ta'");
+
+    step("Input command with for algebraic number")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"\" 3 algebraic } INPUT",ENTER)
+        .test("123+").editor("123+")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, ".4").editor("123.4")
+        .test(ENTER).type(ID_decimal).got("123.4");
+
+    step("Input command for expression")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+        .test("123+").editor("123+")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, ".4").editor("123.4")
+        .test(ENTER).type(ID_expression).got("'123.4'");
+
+    step("Input command for arithmetic expression")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+        .test("123+X").editor("123+X")
+        .test(ENTER).type(ID_expression).got("'123+X'");
+
+    step("Input command for single object with text")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"\"\"He\"\"\" 4 object } INPUT", ENTER)
+        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, LSHIFT, BSP).editor("\"Hello\"")
+        .test(ENTER).type(ID_text).got("\"Hello\"");
+
+    step("Input command for single object with list")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"{ Hello } World\" 0 object } INPUT", ENTER)
+        .editor("{ Hello } World")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, BSP, BSP, BSP, BSP).editor("{ Hello } ")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP).editor("{ Hello }")
+        .test(ENTER).type(ID_list).got("{ Hello }");
+
+    step("Input command for multiple objects with text")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"\"\"He\"\"\" 4 objects } INPUT", ENTER)
+        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, LSHIFT, BSP, " World").editor("\"Hello\" World")
+        .test(ENTER).type(ID_text).got("\"\"\"Hello\"\" World\"");
+
+    step("Input command for multiple object with list")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"{ Hello } World\" 0 objects } INPUT", ENTER)
+        .editor("{ Hello } World")
+        .test(ENTER).type(ID_text).got("\"{ Hello } World\"");
+
+    step("Input command for program with text")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"\"\"He\"\"\" 4 program } INPUT", ENTER)
+        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, LSHIFT, BSP, " World").editor("\"Hello\" World")
+        .test(ENTER).type(ID_program).want("« \"Hello\" World »");
+
+    step("Input command for program with list")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { \"{ Hello } World\" 0 program } INPUT", ENTER)
+        .editor("{ Hello } World")
+        .test(ENTER).type(ID_program).want("« { Hello } World »");
+
+    step("Input command for number with integer")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123 0 n } INPUT", ENTER)
+        .editor("123")
+        .test("45+", ENTER).error("Invalid input")
+        .test(BSP, BSP).editor("12345")
+        .test(ENTER).type(ID_integer).got("12 345");
+
+    step("Input command for number with decimal")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123.45 0 n } INPUT", ENTER)
+        .editor("123.45")
+        .test("45+", ENTER).error("Invalid input")
+        .test(BSP, BSP).editor("123.4545")
+        .test(ENTER).type(ID_decimal).got("123.4545");
+
+    step("Input command for integer with decimal then integer")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123.45 0 i } INPUT", ENTER)
+        .editor("123.45")
+        .test("45+", ENTER).error("Invalid input")
+        .test(BSP, BSP).editor("123.4545")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, BSP, BSP, BSP, BSP).editor("123")
+        .test(ENTER).type(ID_integer).got("123");
+
+    step("Input command for integer with negative integer")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123 1 i } INPUT", ENTER)
+        .editor("123")
+        .test("-", ENTER).type(ID_neg_integer).got("-123");
+
+    step("Input command for real with decimal")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123.45 0 r } INPUT", ENTER)
+        .editor("123.45")
+        .test("45+", ENTER).error("Invalid input")
+        .test(BSP, BSP).editor("123.4545")
+        .test(ENTER).type(ID_decimal).got("123.4545");
+
+    step("Input command for positive with negative then positive")
+        .test(CLEAR, EXIT,
+              "\"Enter object\" { 123 1 positive } INPUT", ENTER)
+        .editor("123")
+        .test("-").editor("-123")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, BSP, ENTER).type(ID_integer).got("123");
+
+    step("Input command with user-defined validation")
+        .test(CLEAR, EXIT,
+              "\"Enter 42\" { 123 0 « if \"42\" = then 55 end » } INPUT", ENTER)
+        .editor("123")
+        .test(ENTER).error("Invalid input")
+        .test(BSP, "42", UP, UP, BSP, BSP, BSP, ENTER)
+        .type(ID_integer).got("55");
+}
+
 
 
 // ============================================================================

@@ -27,15 +27,27 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #******************************************************************************
 
+CONFIG += color
+
 include(db48x.pro)
 
 DEFINES-=HELPFILE_NAME=\\\"help/db48x.md\\\"
 DEFINES-=HELPINDEX_NAME=\\\"help/db48x.idx\\\"
 DEFINES+=HELPFILE_NAME=\\\"help/db50x.md\\\"
 DEFINES+=HELPINDEX_NAME=\\\"help/db50x.idx\\\"
+DEFINES-=MEMORY=100
+DEFINES+=MEMORY=500
 INCLUDEPATH -= ../src/dm42
 INCLUDEPATH += ../src/dm32
 
 OBJECTS_DIR=db50x-build
 
 ICON = db50x.icns
+
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/build.gradle \
+    android/res/values/libs.xml \
+    android/res/xml/qtprovider_paths.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

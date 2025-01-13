@@ -455,6 +455,19 @@ struct object
     //  If precedence != 0, parse as an equation object with that precedence
 
 
+    static object_p parse_all(utf8 source, size_t sz)
+    // ------------------------------------------------------------------------
+    //  Try parsing the object and make sure we parsed all
+    // ------------------------------------------------------------------------
+    {
+        size_t len = sz;
+        object_p result = parse(source, sz);
+        if (sz != len)
+            result = nullptr;
+        return result;
+    }
+
+
     utf8 help() const
     // ------------------------------------------------------------------------
     //   Return the help topic for the given object

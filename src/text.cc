@@ -242,6 +242,21 @@ text_p text::import() const
 }
 
 
+object_p text::compile() const
+// ----------------------------------------------------------------------------
+//   Compile and run the text as if on the command line
+// ----------------------------------------------------------------------------
+{
+    size_t len = 0;
+    utf8   txt = value(&len);
+    size_t sz  = len;
+    object_p result = object::parse(txt, len);
+    if (len != sz)
+        result = nullptr;
+    return result;
+}
+
+
 bool text::compile_and_run() const
 // ----------------------------------------------------------------------------
 //   Compile and run the text as if on the command line

@@ -152,6 +152,8 @@ struct user_interface
     bool        transient_object(object_p obj);
 
     modes       editing_mode()          { return mode; }
+    void        editing_mode(modes m)   { mode = m; }
+    void        stack_screen_top(int s) { stackTop = s; }
     int         stack_screen_top()      { return stackTop; }
     int         stack_screen_bottom()   { return stackBottom; }
     int         menu_screen_bottom()    { return menuHeight; }
@@ -223,6 +225,9 @@ struct user_interface
     bool        editor_clear();
     bool        editor_selection_flip();
     size_t      adjust_cursor(size_t offset, size_t len);
+    bool        in_input() const { return validate_input != nullptr; }
+    void        input(bool (*fn)(gcutf8 &, size_t)) { validate_input = fn; }
+    bool        check_input(gcutf8 &src, size_t len);
 
     void        load_help(utf8 topic, size_t len = 0);
 
@@ -334,6 +339,7 @@ protected:
     uint16_t menuMarker[NUM_PLANES][NUM_SOFTKEYS];
     bool     menuMarkerAlign[NUM_PLANES][NUM_SOFTKEYS];
     file     helpfile;
+    bool     (*validate_input)(gcutf8 &src, size_t len);
     friend struct tests;
     friend struct runtime;
 };

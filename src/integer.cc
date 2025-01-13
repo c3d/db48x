@@ -257,7 +257,8 @@ PARSE_BODY(integer)
         byte   v;
         unicode sep = Settings.NumberSeparator();
 
-        if (is_fraction && value[*s] == NODIGIT)
+        last = p.source + p.length;
+        if (is_fraction && (s >= last || value[*s] == NODIGIT))
         {
             // This can be something like `1/(1+x)`
             number = numerator;
@@ -267,7 +268,7 @@ PARSE_BODY(integer)
 
         while (!endp || s < endp)
         {
-            unicode cp = utf8_codepoint(s);
+            unicode cp = s < last ? utf8_codepoint(s) : 0;
 
             // Check new syntax for based numbers
             if (cp == '#')
@@ -426,11 +427,10 @@ PARSE_BODY(integer)
         s += basesz;
 
         // Create the intermediate result, which may GC
-        {
-            gcutf8 gs = s;
-            number = big ? object_p(bresult) : rt.make<integer>(type, result);
-            s = gs;
-        }
+        size_t sz = utf8(s) - utf8(p.source);
+        number = big ? object_p(bresult) : rt.make<integer>(type, result);
+        s = utf8(p.source) + sz;
+
         if (!number)
             return ERROR;
 

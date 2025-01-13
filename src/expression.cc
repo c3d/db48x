@@ -111,6 +111,21 @@ HELP_BODY(expression)
 }
 
 
+expression_p expression::parse_all(utf8 src, size_t len)
+// ----------------------------------------------------------------------------
+//   Parse the object
+// ----------------------------------------------------------------------------
+{
+    parser p(src, len);
+    p.precedence = LOWEST;
+    if (list_parse(ID_expression, p, 0, 0) == OK)
+        if (p.length == len)
+            if (expression_p expr = expression::get(p.out))
+                return expr;
+    return nullptr;
+}
+
+
 symbol_p expression::parentheses(symbol_g arg)
 // ----------------------------------------------------------------------------
 //   Render, putting parentheses around an argument

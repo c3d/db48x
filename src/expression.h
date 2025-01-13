@@ -100,6 +100,8 @@ struct expression : program
         return rt.make<expression>(type, op, args, arity);
     }
 
+    static expression_p parse_all(utf8 src, size_t len);
+
     bool is_simplifiable() const;
 
     static expression_p get(object_p obj);

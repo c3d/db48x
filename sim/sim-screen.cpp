@@ -92,7 +92,6 @@ SimScreen::SimScreen(QWidget *parent)
     setScene(&screen);
     setSceneRect(0, -5, screen_width, screen_height + 5);
     centerOn(qreal(screen_width) / 2, qreal(screen_height) / 2);
-    scale = 1.0;
     setScale(4.0);
 
     for (size_t i = 0; i < sizeof(lcd_copy) / sizeof(*lcd_copy); i++)
@@ -118,7 +117,7 @@ void SimScreen::setScale(qreal sf)
 // ----------------------------------------------------------------------------
 {
     QGraphicsView::scale(sf / scale, sf / scale);
-    this->scale = sf;
+    scale = sf;
 
     QSize s;
     s.setWidth(0);

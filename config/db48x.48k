@@ -6,7 +6,7 @@ Duplicate			Swap		neg		Cycle           Drop
 StackEditor			"7"		"8"		"9"		/
 Edit				"4"		"5"		"6"		*
 UILeftShift			"1"		"2"		"3"		-
-UIExit				"0"		UIDecimal	Evaluate	+
+UIExit				"0"		UIDecimal	Run		+
 ]
 
 @ PLANE 1: LEFT SHIFTED

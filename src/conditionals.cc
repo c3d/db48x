@@ -775,7 +775,7 @@ COMMAND_BODY(errm)
 }
 
 
-static cstring messages[] =
+static const cstring messages[] =
 // ----------------------------------------------------------------------------
 //   List of built-in error messages
 // ----------------------------------------------------------------------------

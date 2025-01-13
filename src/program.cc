@@ -178,7 +178,11 @@ object::result program::run_loop(size_t depth)
         if (interrupted())
         {
             obj->defer();
-            if (!halted)
+            if (ui.in_input())
+            {
+                halted = false;
+            }
+            else if (!halted)
             {
                 result = ERROR;
                 rt.interrupted_error().command(obj);
@@ -343,6 +347,7 @@ COMMAND_BODY(Halt)
 // ----------------------------------------------------------------------------
 {
     program::halted = true;
+    program::stepping = 0;
     return OK;
 }
 
@@ -359,6 +364,7 @@ COMMAND_BODY(Debug)
             settings::SaveDebugOnError doe(true);
             rt.pop();
             program::halted = true;
+            program::stepping = 0;
             prog->run_program();
             return OK;
         }
@@ -376,6 +382,12 @@ COMMAND_BODY(SingleStep)
 //   Single step an instruction
 // ----------------------------------------------------------------------------
 {
+    if (!rt.run_stepping())
+    {
+        rt.no_debugged_program_error();
+        return ERROR;
+    }
+
     settings::SaveDebugOnError doe(true);
     program::stepping = 1;
     program::halted = false;
@@ -388,6 +400,12 @@ COMMAND_BODY(StepOver)
 //   Step over the next instruction
 // ----------------------------------------------------------------------------
 {
+    if (!rt.run_stepping())
+    {
+        rt.no_debugged_program_error();
+        return ERROR;
+    }
+
     if (object_p next = rt.run_next(0))
     {
         settings::SaveDebugOnError doe(true);
@@ -406,6 +424,12 @@ COMMAND_BODY(StepOut)
 //   Step over the next instruction
 // ----------------------------------------------------------------------------
 {
+    if (!rt.run_stepping())
+    {
+        rt.no_debugged_program_error();
+        return ERROR;
+    }
+
     settings::SaveDebugOnError doe(true);
     size_t depth = rt.call_depth();
     save<bool> no_halt(program::halted, false);
@@ -418,6 +442,12 @@ COMMAND_BODY(MultipleSteps)
 //   Step multiple instructions
 // ----------------------------------------------------------------------------
 {
+    if (!rt.run_stepping())
+    {
+        rt.no_debugged_program_error();
+        return ERROR;
+    }
+
     if (object_p obj = rt.top())
     {
         if (uint steps = obj->as_uint32(0, true))
@@ -440,6 +470,7 @@ COMMAND_BODY(Continue)
 {
     settings::SaveDebugOnError doe(true);
     program::halted = false;
+    program::stepping = 0;
     return program::run_loop(0);
 }
 

@@ -145,6 +145,7 @@ struct Unimplemented : command
 
 // Various global commands
 COMMAND_DECLARE(Eval,1);                // Evaluate an object
+COMMAND_DECLARE(Run, 0);                // Resume execution or evaluate
 COMMAND_DECLARE(Compile,1);             // Compile and evalaute a text
 COMMAND_DECLARE(Explode,1);             // Explode an object (aka Obj→)
 COMMAND_DECLARE(ToText,1);              // Convert an object to text

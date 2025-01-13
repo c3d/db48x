@@ -114,7 +114,7 @@ public:
     GRAPH_DECL(tag);
 };
 
-COMMAND_DECLARE(dtag,1);
+COMMAND_DECLARE(DTag,1);
 COMMAND_DECLARE(ToTag,2);
 COMMAND_DECLARE(FromTag,1);
 

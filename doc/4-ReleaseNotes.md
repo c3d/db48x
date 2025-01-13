@@ -1,5 +1,70 @@
 # Release notes
 
+## Release 0.8.10 "Fire Dove" - Input and Prompt, Android preparation
+
+The focus of this release is support for user input in programs, with
+the addition of the `Input` and `Prompt` commands. Internally, a lot
+of groundwork was performed towards Android builds.
+
+### New features
+
+* Add `Prompt` command, which programs can use to let users manipulate
+  the stack or do other operations before resuming execution.
+
+* In order to facilitate the use of `Prompt`, added the `Run` command,
+  which resumes execution of halted programs and otherwise evaluates
+  the first item on the stack. The key at the left of the _+_ key,
+  which is labeled _R/S_ on the DM-42 calculators, is now bound to the
+  `Run` command instead of `Evaluate`. Therefore, after a `Prompt`,
+  you can resume execution with a single key.
+
+* Add `Input` command, which programs can use to let users enter data.
+  The DB48x version makes it easier to enter and validate numerical
+  data or other non-text objects, with input validators for numbers,
+  integer values, arithmetic objects or expressions. It is also
+  possible to use custom code to validate user input.
+
+* Additional `Compile` variants were created to help with this user
+  input validation, checking if the input is a number, an integer, a
+  positive integer, a real number, a single object, a single algebraic
+  object or an expression.
+
+### Bug fixes
+
+* Fixed problem with the computation of the length of the integer
+  value being parsed if it was parsed from a text value at the end of
+  the temporaries.
+
+* Emit an error from `Step` and variants if no program is being
+  debugged. The effect was that the next program being run would halt
+  after the first step.
+
+* Avoid persisting beep in the simulator when two beeps were emitted
+  rapidly in successioon.
+
+* Reload the user-selected keymap file after loading the state file.
+
+### Improvements
+
+* Change capitalization of `DTag` as a shortcut for `DeleteTag`.
+
+* Various code improvements making it easier to compile for Android.
+  A side effect is that the simulator can now safely be started from
+  any current directory.
+
+* Improve rescaling of the window in the simulator to keep the
+  keyboard and screen larger and easier to read.
+
+* Improve the detection of the default simulator size for Hi-DPI
+  screens.
+
+* Add documentation about matrix multiplication performance
+
+* Make the default memory size more consistent with the simulated
+  device.
+
+
+
 ## Release 0.8.9 "Advent" - Mostly bug fixes
 
 This is a relatively minor release, with mostly bug fixes, but also a

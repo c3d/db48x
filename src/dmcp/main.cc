@@ -657,6 +657,7 @@ void process_test_commands()
         rt.clear_error();
         ui.clear_editor();
         rt.drop(rt.depth());
+        while (rt.run_next(0));
     }
     else if (test_command == tests::KEYSYNC)
     {

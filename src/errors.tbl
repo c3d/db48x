@@ -109,6 +109,8 @@ ERROR(unknown_derivative,       "Unknown derivative")
 ERROR(unknown_primitive,        "Unknown primitive")
 ERROR(multisolver_variable,     "Unable to solve for all variables")
 ERROR(invalid_custom_menu,      "Invalid CustomMenu variable")
+ERROR(no_debugged_program,      "No program being debugged")
+ERROR(input_validation,         "Invalid input")
 
 // Filesystem errors
 #ifndef FRROR

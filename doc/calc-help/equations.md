@@ -848,7 +848,7 @@ The magnetic field expression differs depending upon whether the point at `r` is
 
 The expression for the magnetic field at the distance r depends on the subtended angles θ1 and θ2 relative to the ends of the wire of finite length L. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
 
-![B Field From Finite Wire](img/B Field From Finite Wire.bmp)
+![B Field From Finite Wire](img/B_Field_From_Finite_Wire.bmp)
 
 
 #### Force Between Wires
@@ -863,7 +863,7 @@ The expression for the magnetic field in the center is approximately valid if th
 
 The expression for the magnetic field in the center depends on the subtended internal angles `α1` and `α2` relative to the top ends of the solenoid of finite length `L`.
 
-![B Field In Finite Solenoid](img/B Field In Finite Solenoid.bmp)
+![B Field In Finite Solenoid](img/B_Field_In_Finite_Solenoid.bmp)
 
 #### B Field In Toroid
 
@@ -1490,13 +1490,13 @@ The variables in the Modern Physics section are:
 
 In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
-![Planck & Wien Comparison](img/Planck&Wien_Distributions.bmp)
+![Planck & Wien Comparison](img/Planck_and_Wien_Distributions.bmp)
 
 #### Planck & Rayleigh-Jeans Comparison
 
 In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` and `f2`, or between `f3` and `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power and the heat transfer rate from the black-body.
 
-![Planck & Rayleigh-Jeans Comparison](img/Planck&Rayleigh-Jeans_Distributions.bmp)
+![Planck & Rayleigh-Jeans Comparison](img/Planck_and_Rayleigh-Jeans_Distributions.bmp)
 
 #### Photoelectric Effect
 
