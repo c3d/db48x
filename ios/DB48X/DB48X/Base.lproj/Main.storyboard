@@ -21,10 +21,10 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
-                                <rect key="frame" x="0.0" y="53" width="393" height="746"/>
+                                <rect key="frame" x="0.0" y="61" width="393" height="730"/>
                                 <subviews>
                                     <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="VyD-TD-Hcr" customClass="ScreenView">
-                                        <rect key="frame" x="0.0" y="15.999999999999986" width="393" height="235.66666666666663"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="393" height="235.66666666666666"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VyD-TD-Hcr" secondAttribute="height" multiplier="5:3" id="TEg-nX-cri"/>
@@ -34,7 +34,7 @@
                                         </connections>
                                     </mtkView>
                                     <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
-                                        <rect key="frame" x="0.0" y="251.66666666666671" width="393" height="494.33333333333326"/>
+                                        <rect key="frame" x="0.0" y="235.66666666666671" width="393" height="494.33333333333326"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VeI-TE-aJE" secondAttribute="height" multiplier="698:878" id="Pzg-fD-vL7"/>
@@ -67,13 +67,12 @@
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <gestureRecognizers/>
                                 <constraints>
-                                    <constraint firstItem="VyD-TD-Hcr" firstAttribute="top" secondItem="mcR-Hw-POX" secondAttribute="bottom" id="0yP-ZE-2bv"/>
+                                    <constraint firstItem="VyD-TD-Hcr" firstAttribute="top" secondItem="mcR-Hw-POX" secondAttribute="top" id="0yP-ZE-2bv"/>
                                     <constraint firstItem="VyD-TD-Hcr" firstAttribute="leading" secondItem="R4Q-96-XuB" secondAttribute="leading" id="45Q-z2-FZ5"/>
                                     <constraint firstItem="mcR-Hw-POX" firstAttribute="centerX" secondItem="R4Q-96-XuB" secondAttribute="centerX" id="6CS-eU-6gD"/>
                                     <constraint firstAttribute="bottom" secondItem="VeI-TE-aJE" secondAttribute="bottom" id="OtN-Pl-ozO"/>
                                     <constraint firstItem="VyD-TD-Hcr" firstAttribute="width" secondItem="VeI-TE-aJE" secondAttribute="width" id="ZxN-V4-45B"/>
                                     <constraint firstItem="VyD-TD-Hcr" firstAttribute="centerX" secondItem="VeI-TE-aJE" secondAttribute="centerX" id="jod-0f-ORe"/>
-                                    <constraint firstItem="VyD-TD-Hcr" firstAttribute="top" secondItem="mcR-Hw-POX" secondAttribute="bottom" id="mX1-e6-Jfb"/>
                                     <constraint firstAttribute="trailing" secondItem="VyD-TD-Hcr" secondAttribute="trailing" id="ps2-Xr-DSd"/>
                                     <constraint firstItem="mcR-Hw-POX" firstAttribute="top" secondItem="R4Q-96-XuB" secondAttribute="top" id="yVP-YT-ABn"/>
                                     <constraint firstItem="VeI-TE-aJE" firstAttribute="top" secondItem="VyD-TD-Hcr" secondAttribute="bottom" id="zrb-fz-nT9"/>
@@ -118,34 +117,28 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DB48X Logo" translatesAutoresizingMaskIntoConstraints="NO" id="H54-Ng-o74">
-                                <rect key="frame" x="16" y="40" width="361" height="48"/>
+                                <rect key="frame" x="96" y="40" width="201" height="48"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="2JU-PS-F3z"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="57r-Mt-XsI">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="10" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="57r-Mt-XsI">
                                 <rect key="frame" x="16" y="108" width="361" height="204"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="204" id="ree-VL-cJC"/>
                                 </constraints>
-                                <attributedString key="attributedText">
-                                    <fragment>
-                                        <string key="content">A modern and improved implementation of Reverse Polish Lisp (RPL), in the spirit of the iconic HP48 and HP50 calculators,
+                                <mutableString key="text">A modern and improved implementation of Reverse Polish Lisp (RPL), in the spirit of the iconic HP48 and HP50 calculators,
 
 and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often known as HP)
 
 © 2024 Christophe de Dinechin
-Ⓟ Carlo Acutis</string>
-                                        <attributes>
-                                            <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <font key="NSFont" metaFont="system" size="17"/>
-                                            <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                        </attributes>
-                                    </fragment>
-                                </attributedString>
+Ⓟ Carlo Acutis</mutableString>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
+                                <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yHc-0x-2dG" userLabel="scroll">
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yHc-0x-2dG" userLabel="scroll">
                                 <rect key="frame" x="16" y="332" width="361" height="410"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jj3-Zw-DY9" userLabel="scrollcontents">
@@ -281,10 +274,12 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                                 <constraints>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="leading" secondItem="s7F-Lb-RML" secondAttribute="leading" id="3oD-pJ-L0P"/>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="bottom" secondItem="s7F-Lb-RML" secondAttribute="bottom" id="Gou-sX-oiM"/>
+                                    <constraint firstAttribute="trailing" secondItem="jj3-Zw-DY9" secondAttribute="trailing" id="L4l-8y-cUr"/>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="width" secondItem="yHc-0x-2dG" secondAttribute="width" id="Pvn-mz-xfa"/>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="top" secondItem="s7F-Lb-RML" secondAttribute="top" id="fha-VQ-vwS"/>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="trailing" secondItem="s7F-Lb-RML" secondAttribute="trailing" id="iAW-uc-20L"/>
                                     <constraint firstItem="jj3-Zw-DY9" firstAttribute="height" secondItem="yHc-0x-2dG" secondAttribute="height" priority="250" id="uKl-2P-fJH"/>
+                                    <constraint firstAttribute="bottom" secondItem="jj3-Zw-DY9" secondAttribute="bottom" id="zlF-7y-WKf"/>
                                 </constraints>
                                 <viewLayoutGuide key="contentLayoutGuide" id="0nG-iG-SI7"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="s7F-Lb-RML"/>
@@ -304,7 +299,7 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="H54-Ng-o74" firstAttribute="leading" secondItem="Z70-Fw-xQi" secondAttribute="leadingMargin" id="0Lo-6R-Jj6"/>
+                            <constraint firstItem="H54-Ng-o74" firstAttribute="leading" secondItem="Z70-Fw-xQi" secondAttribute="leadingMargin" constant="80" id="0Lo-6R-Jj6"/>
                             <constraint firstItem="yHc-0x-2dG" firstAttribute="top" secondItem="57r-Mt-XsI" secondAttribute="bottom" constant="20" id="6Jf-ff-VLf"/>
                             <constraint firstItem="9R9-mV-wfN" firstAttribute="top" secondItem="Hsy-SF-nTx" secondAttribute="bottom" constant="20" id="7R0-UI-3Vr"/>
                             <constraint firstItem="Hsy-SF-nTx" firstAttribute="leading" secondItem="Z70-Fw-xQi" secondAttribute="leadingMargin" constant="20" id="DDT-VI-Ysn"/>
@@ -313,7 +308,7 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                             <constraint firstItem="yHc-0x-2dG" firstAttribute="leading" secondItem="Z70-Fw-xQi" secondAttribute="leadingMargin" id="LBN-G3-0Or"/>
                             <constraint firstItem="57r-Mt-XsI" firstAttribute="trailing" secondItem="Z70-Fw-xQi" secondAttribute="trailingMargin" id="Yeo-Se-pg0"/>
                             <constraint firstItem="yHc-0x-2dG" firstAttribute="trailing" secondItem="Z70-Fw-xQi" secondAttribute="trailingMargin" id="dJs-OO-8GY"/>
-                            <constraint firstItem="H54-Ng-o74" firstAttribute="trailing" secondItem="Z70-Fw-xQi" secondAttribute="trailingMargin" id="gTM-9r-hIk"/>
+                            <constraint firstItem="H54-Ng-o74" firstAttribute="trailing" secondItem="Z70-Fw-xQi" secondAttribute="trailingMargin" constant="-80" id="gTM-9r-hIk"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Hsy-SF-nTx" secondAttribute="trailing" constant="20" id="kN2-wi-Ls5"/>
                             <constraint firstItem="57r-Mt-XsI" firstAttribute="leading" secondItem="Z70-Fw-xQi" secondAttribute="leadingMargin" id="qi1-02-Ypb"/>
                             <constraint firstItem="Hsy-SF-nTx" firstAttribute="top" secondItem="yHc-0x-2dG" secondAttribute="bottom" constant="40" id="wDd-we-HgE"/>
