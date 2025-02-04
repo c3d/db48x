@@ -1058,6 +1058,86 @@
 		6F2AC56F2C6410F700C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
 		6F2AC5712C6410F700C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F2AC5722C6410F700C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
+		6F3215DC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3215DD2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3215DE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3215DF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3215E02D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3215E12D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3215E22D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3215E32D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3215E42D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3215E52D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3215E62D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3215E72D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3215E82D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3215E92D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3215EA2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3215EB2D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3215EC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3215ED2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3215EE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3215EF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3215F02D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3215F12D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3215F22D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3215F32D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3215F42D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3215F52D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3215F62D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3215F72D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3215F82D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3215F92D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3215FA2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3215FB2D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3215FC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3215FD2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3215FE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3215FF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216002D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3216012D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3216022D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3216032D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3216042D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3216052D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3216062D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3216072D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216082D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3216092D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F32160A2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F32160B2D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F32160C2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F32160D2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F32160E2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F32160F2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216102D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3216112D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3216122D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3216132D528D360063178B /* B Field From Finite Wire.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3216142D528DC30063178B /* B Field From Finite Wire.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3216152D528DC30063178B /* B_Field_From_Finite_Wire.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3216162D528DC30063178B /* B_Field_In_Finite_Solenoid.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3216172D528DC30063178B /* Compton_Scattering_BW.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3216182D528DC30063178B /* Driven Damped Oscillations.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216192D528DC30063178B /* E_Field_Finite_Line.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F32161A2D528DC30063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F32161B2D528DC30063178B /* Planck_and_Wien_Distributions.bmp in Copy Files */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F32161C2D528DE40063178B /* B Field From Finite Wire.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F32161D2D528DE40063178B /* B_Field_From_Finite_Wire.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F32161E2D528DE40063178B /* B_Field_In_Finite_Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F32161F2D528DE40063178B /* Compton_Scattering_BW.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3216202D528DE40063178B /* Driven Damped Oscillations.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216212D528DE40063178B /* E_Field_Finite_Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F3216222D528DE40063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F3216232D528DE40063178B /* Planck_and_Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
+		6F3216242D528DF70063178B /* B Field From Finite Wire.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */; };
+		6F3216252D528DF70063178B /* B_Field_From_Finite_Wire.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */; };
+		6F3216262D528DF70063178B /* B_Field_In_Finite_Solenoid.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
+		6F3216272D528DF70063178B /* Compton_Scattering_BW.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */; };
+		6F3216282D528DF70063178B /* Driven Damped Oscillations.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */; };
+		6F3216292D528DF70063178B /* E_Field_Finite_Line.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
+		6F32162A2D528DF70063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */; };
+		6F32162B2D528DF70063178B /* Planck_and_Wien_Distributions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */; };
 		6F4519AA2BBC80A600C8357F /* DB48X startup screen.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F4519A92BBC80A600C8357F /* DB48X startup screen.png */; };
 		6F4528D02B9C0F4E00C8357F /* equations.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F4528C52B9C0F4E00C8357F /* equations.cc */; };
 		6F4528D22B9C0F4E00C8357F /* library.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F4528CA2B9C0F4E00C8357F /* library.cc */; };
@@ -1877,6 +1957,14 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F32161C2D528DE40063178B /* B Field From Finite Wire.bmp in CopyFiles */,
+				6F32161D2D528DE40063178B /* B_Field_From_Finite_Wire.bmp in CopyFiles */,
+				6F32161E2D528DE40063178B /* B_Field_In_Finite_Solenoid.bmp in CopyFiles */,
+				6F32161F2D528DE40063178B /* Compton_Scattering_BW.bmp in CopyFiles */,
+				6F3216202D528DE40063178B /* Driven Damped Oscillations.bmp in CopyFiles */,
+				6F3216212D528DE40063178B /* E_Field_Finite_Line.bmp in CopyFiles */,
+				6F3216222D528DE40063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F3216232D528DE40063178B /* Planck_and_Wien_Distributions.bmp in CopyFiles */,
 				6F66AC722CBEA0B000C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
 				6F66AC732CBEA0B000C8357F /* E Field Finite Line.bmp in CopyFiles */,
 				6F66AC742CBEA0B000C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
@@ -2016,6 +2104,14 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F3216242D528DF70063178B /* B Field From Finite Wire.bmp in CopyFiles */,
+				6F3216252D528DF70063178B /* B_Field_From_Finite_Wire.bmp in CopyFiles */,
+				6F3216262D528DF70063178B /* B_Field_In_Finite_Solenoid.bmp in CopyFiles */,
+				6F3216272D528DF70063178B /* Compton_Scattering_BW.bmp in CopyFiles */,
+				6F3216282D528DF70063178B /* Driven Damped Oscillations.bmp in CopyFiles */,
+				6F3216292D528DF70063178B /* E_Field_Finite_Line.bmp in CopyFiles */,
+				6F32162A2D528DF70063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
+				6F32162B2D528DF70063178B /* Planck_and_Wien_Distributions.bmp in CopyFiles */,
 				6F66AC762CBEA0BB00C8357F /* B Field In Finite Solenoid.bmp in CopyFiles */,
 				6F66AC772CBEA0BB00C8357F /* E Field Finite Line.bmp in CopyFiles */,
 				6F66AC782CBEA0BB00C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in CopyFiles */,
@@ -2155,6 +2251,14 @@
 			dstPath = help/img;
 			dstSubfolderSpec = 7;
 			files = (
+				6F3216142D528DC30063178B /* B Field From Finite Wire.bmp in Copy Files */,
+				6F3216152D528DC30063178B /* B_Field_From_Finite_Wire.bmp in Copy Files */,
+				6F3216162D528DC30063178B /* B_Field_In_Finite_Solenoid.bmp in Copy Files */,
+				6F3216172D528DC30063178B /* Compton_Scattering_BW.bmp in Copy Files */,
+				6F3216182D528DC30063178B /* Driven Damped Oscillations.bmp in Copy Files */,
+				6F3216192D528DC30063178B /* E_Field_Finite_Line.bmp in Copy Files */,
+				6F32161A2D528DC30063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Copy Files */,
+				6F32161B2D528DC30063178B /* Planck_and_Wien_Distributions.bmp in Copy Files */,
 				6F66AC6E2CBEA09900C8357F /* B Field In Finite Solenoid.bmp in Copy Files */,
 				6F66AC6F2CBEA09900C8357F /* E Field Finite Line.bmp in Copy Files */,
 				6F66AC702CBEA09900C8357F /* Planck&Rayleigh-Jeans_Distributions.bmp in Copy Files */,
@@ -2605,6 +2709,14 @@
 		6F2AC5E52C64195700C8357F /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		6F2AC5E62C64195700C8357F /* qspi_crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = qspi_crc.h; sourceTree = "<group>"; };
 		6F2AC5E72C64195700C8357F /* stm32_program.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32_program.ld; sourceTree = "<group>"; };
+		6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "B Field From Finite Wire.bmp"; sourceTree = "<group>"; };
+		6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = B_Field_From_Finite_Wire.bmp; sourceTree = "<group>"; };
+		6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = B_Field_In_Finite_Solenoid.bmp; sourceTree = "<group>"; };
+		6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = Compton_Scattering_BW.bmp; sourceTree = "<group>"; };
+		6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "Driven Damped Oscillations.bmp"; sourceTree = "<group>"; };
+		6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = E_Field_Finite_Line.bmp; sourceTree = "<group>"; };
+		6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = "Planck_and_Rayleigh-Jeans_Distributions.bmp"; sourceTree = "<group>"; };
+		6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = Planck_and_Wien_Distributions.bmp; sourceTree = "<group>"; };
 		6F4519A92BBC80A600C8357F /* DB48X startup screen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "DB48X startup screen.png"; sourceTree = "<group>"; };
 		6F4528C52B9C0F4E00C8357F /* equations.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = equations.cc; path = ../../../src/equations.cc; sourceTree = "<group>"; };
 		6F4528C62B9C0F4E00C8357F /* equations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = equations.h; path = ../../../src/equations.h; sourceTree = "<group>"; };
@@ -3294,6 +3406,14 @@
 		6F2AC36C2C63640C00C8357F /* img */ = {
 			isa = PBXGroup;
 			children = (
+				6F3215D42D528D360063178B /* B Field From Finite Wire.bmp */,
+				6F3215D52D528D360063178B /* B_Field_From_Finite_Wire.bmp */,
+				6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */,
+				6F3215D72D528D360063178B /* Compton_Scattering_BW.bmp */,
+				6F3215D82D528D360063178B /* Driven Damped Oscillations.bmp */,
+				6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */,
+				6F3215DA2D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp */,
+				6F3215DB2D528D360063178B /* Planck_and_Wien_Distributions.bmp */,
 				6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */,
 				6F2AC3852C63E4F700C8357F /* 1DElastiCollisions.bmp */,
 				6F2AC35D2C63640C00C8357F /* 2-arithmetic-cmd.bmp */,
@@ -3940,6 +4060,14 @@
 				6FCEDA562B95E60700C8357F /* keyboard-dm42.png in Resources */,
 				6FE775282B97966E00C8357F /* keyboard.png in Resources */,
 				1F9D29791C72B9BB000025E6 /* LaunchScreen.storyboard in Resources */,
+				6F3215DC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3215DD2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3215DE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3215DF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3215E02D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3215E12D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3215E22D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3215E32D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				1F9D29761C72B9BB000025E6 /* Assets.xcassets in Resources */,
 				6FCEDA572B95E60700C8357F /* keyboard-db48x.png in Resources */,
 				6F66AC942CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -3988,6 +4116,14 @@
 				6F0FDBE52C7934DF00C8357F /* library.csv in Resources */,
 				6F0FDBE62C7934DF00C8357F /* db48x.md in Resources */,
 				6F0FDBE72C7934DF00C8357F /* db50x.md in Resources */,
+				6F3215E42D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3215E52D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3215E62D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3215E72D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3215E82D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3215E92D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3215EA2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3215EB2D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6F0FDBE82C7934DF00C8357F /* Main.storyboard in Resources */,
 				6F0FDBE92C7934DF00C8357F /* errors.tbl in Resources */,
 				6F66AC902CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -4028,6 +4164,14 @@
 				6F0FDCB12C7934E300C8357F /* library.csv in Resources */,
 				6F0FDCB22C7934E300C8357F /* db48x.md in Resources */,
 				6F0FDCB32C7934E300C8357F /* db50x.md in Resources */,
+				6F3215FC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3215FD2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3215FE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3215FF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3216002D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3216012D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3216022D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3216032D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6F0FDCB42C7934E300C8357F /* Main.storyboard in Resources */,
 				6F0FDCB52C7934E300C8357F /* errors.tbl in Resources */,
 				6F66AC8E2CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -4068,6 +4212,14 @@
 				6F0FDD722C7934E500C8357F /* db48x.md in Resources */,
 				6F0FDD732C7934E500C8357F /* db50x.md in Resources */,
 				6F0FDD742C7934E500C8357F /* Main.storyboard in Resources */,
+				6F32160C2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F32160D2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F32160E2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F32160F2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3216102D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3216112D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3216122D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3216132D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6F0FDD752C7934E500C8357F /* errors.tbl in Resources */,
 				6F0FDD762C7934E500C8357F /* ignored_menus.csv in Resources */,
 				6F66AC962CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -4099,6 +4251,14 @@
 				6F2AC4752C64105F00C8357F /* keyboard-dm42.png in Resources */,
 				6F2AC4762C64105F00C8357F /* keyboard.png in Resources */,
 				6F2AC47C2C64105F00C8357F /* keyboard-db48x.png in Resources */,
+				6F3215F42D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3215F52D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3215F62D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3215F72D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3215F82D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3215F92D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3215FA2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3215FB2D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6F70326A2C72A79E00C8357F /* LaunchScreen.storyboard in Resources */,
 				6F2AC4802C64105F00C8357F /* Main.storyboard in Resources */,
 				6F66AC8C2CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -4124,6 +4284,14 @@
 				6F2AC54F2C6410F700C8357F /* keyboard-dm42.png in Resources */,
 				6F2AC5502C6410F700C8357F /* keyboard.png in Resources */,
 				6F2AC5522C6410F700C8357F /* LaunchScreen.storyboard in Resources */,
+				6F3215EC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3215ED2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3215EE2D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3215EF2D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3215F02D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3215F12D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F3215F22D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F3215F32D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6F2AC5562C6410F700C8357F /* keyboard-db48x.png in Resources */,
 				6F2AC55A2C6410F700C8357F /* Main.storyboard in Resources */,
 				6F66AC922CBEA40E00C8357F /* db48x.idx in Resources */,
@@ -4158,6 +4326,14 @@
 				6FE399C82C793FE300C8357F /* db48x.md in Resources */,
 				6FE399C92C793FE300C8357F /* db50x.md in Resources */,
 				6FE399CA2C793FE300C8357F /* Main.storyboard in Resources */,
+				6F3216042D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */,
+				6F3216052D528D360063178B /* E_Field_Finite_Line.bmp in Resources */,
+				6F3216062D528D360063178B /* Compton_Scattering_BW.bmp in Resources */,
+				6F3216072D528D360063178B /* Driven Damped Oscillations.bmp in Resources */,
+				6F3216082D528D360063178B /* Planck_and_Rayleigh-Jeans_Distributions.bmp in Resources */,
+				6F3216092D528D360063178B /* Planck_and_Wien_Distributions.bmp in Resources */,
+				6F32160A2D528D360063178B /* B_Field_From_Finite_Wire.bmp in Resources */,
+				6F32160B2D528D360063178B /* B Field From Finite Wire.bmp in Resources */,
 				6FE399CB2C793FE300C8357F /* errors.tbl in Resources */,
 				6FE399CC2C793FE300C8357F /* ignored_menus.csv in Resources */,
 				6F66AC982CBEA40E00C8357F /* db48x.idx in Resources */,
