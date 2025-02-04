@@ -150,7 +150,11 @@ object::result program::run(algebraic_p obj, bool sync)
     }
     if (directory_p dir = obj->as<directory>())
         return dir->enter();
-    return object_p(obj)->evaluate();
+    size_t depth = rt.call_depth();
+    result ok    = object_p(obj)->evaluate();
+    if (sync && ok == OK)
+        ok = run_loop(depth);
+    return ok;
 }
 
 #ifdef DM42

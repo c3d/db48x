@@ -423,7 +423,7 @@ MENU(PartsMenu,
      "→Int",    ID_ToInteger,
      "→Q",      ID_ToFraction,
      "Dim",     ID_Size,
-     "Type",    ID_Type);
+     "SigDig",  ID_SigDig);
 
 
 MENU(NumbersMenu,

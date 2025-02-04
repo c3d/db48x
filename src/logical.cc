@@ -33,7 +33,7 @@
 #include "integer.h"
 
 
-RECORDER(logical,       16, "Logical operations");
+RECORDER(logical, 16, "Logical operations");
 RECORDER(logical_error, 16, "Errors during logical operations");
 
 
@@ -55,6 +55,10 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
     }
 
     id xt = x->type();
+    id yt = y->type();
+    if (is_integer(yt) && is_integer(xt))
+        num = true;
+
     switch (xt)
     {
     case ID_True:
@@ -78,6 +82,7 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
         if (!num)
         {
             // Logical truth
+        logical:
             int xv = x->as_truth();
             int yv = y->as_truth();
             if (xv < 0 || yv < 0)
@@ -100,30 +105,30 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
     case ID_based_integer:
     {
         integer_p xi = integer_p(object_p(x));
-        if (y->is_integer())
+        if (!y->is_integer())
+            goto logical;
+
+        integer_p yi = integer_p(object_p(y));
+        size_t    ws = Settings.WordSize();
+        if (ws <= 64 && yi->native() && xi->native())
         {
-            integer_p yi = integer_p(object_p(y));
-            size_t    ws = Settings.WordSize();
-            if (ws <= 64 && yi->native() && xi->native())
-            {
-                // Short-enough integers to fit as native machine type
-                ularge xv    = xi->value<ularge>();
-                ularge yv    = yi->value<ularge>();
-                ularge value = native(yv, xv);
-                if (ws < 64)
-                    value &= (1ULL << ws) - 1ULL;
-                rt.pop();
-                if (!is_based(xt) && y->is_based())
-                    xt = y->type();
-                integer_p result = rt.make<integer>(xt, value);
-                if (result && rt.top(result))
-                    return OK;
-                return ERROR; // Out of memory
-            }
+            // Short-enough integers to fit as native machine type
+            ularge xv    = xi->value<ularge>();
+            ularge yv    = yi->value<ularge>();
+            ularge value = native(yv, xv);
+            if (ws < 64)
+                value &= (1ULL << ws) - 1ULL;
+            rt.pop();
+            if (!is_based(xt) && y->is_based())
+                xt = y->type();
+            integer_p result = rt.make<integer>(xt, value);
+            if (result && rt.top(result))
+                return OK;
+            return ERROR; // Out of memory
         }
     }
-    // fallthrough
-    [[fallthrough]];
+        // fallthrough
+        [[fallthrough]];
 
 #if CONFIG_FIXED_BASED_OBJECTS
     case ID_bin_bignum:
@@ -133,17 +138,13 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
 #endif // CONFIG_FIXED_BASED_OBJECTS
     case ID_based_bignum:
     {
-        id yt = y->type();
         if (!is_bignum(xt))
             xt = bignum_promotion(x);
         if (!is_bignum(yt))
         {
             yt = bignum_promotion(y);
             if (!is_bignum(yt))
-            {
-                rt.type_error();
-                return ERROR;
-            }
+                goto logical;
         }
 
         // Proceed with big integers if native did not fit
@@ -230,8 +231,8 @@ object::result logical::evaluate(unary_fn native, big_unary_fn big, bool num)
         }
         // fallthrough
     }
-    // fallthrough
-    [[fallthrough]];
+        // fallthrough
+        [[fallthrough]];
 
 #if CONFIG_FIXED_BASED_OBJECTS
     case ID_bin_bignum:
@@ -364,7 +365,7 @@ bignum_p logical::asr(bignum_r x, bignum_r y)
 //   Arithmetic shift right
 // ----------------------------------------------------------------------------
 {
-    if (!x|| !y)
+    if (!x || !y)
         return nullptr;
     uint shift = y->as_uint32(0, true);
     if (rt.error())
@@ -390,9 +391,9 @@ bignum_g logical::bit(bignum_r X)
 //   Return the bit for the given bit index
 // ----------------------------------------------------------------------------
 {
-    bignum_g one = bignum::make(1);
-    uint ws = Settings.WordSize();
-    uint shift = X->as_uint32(0, true);
+    bignum_g one   = bignum::make(1);
+    uint     ws    = Settings.WordSize();
+    uint     shift = X->as_uint32(0, true);
     if (shift > ws)
         return bignum::make(0);
     return bignum::shift(one, shift, false, false);

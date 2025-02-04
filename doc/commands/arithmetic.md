@@ -154,12 +154,30 @@ Return true/false (1/0) if a number is prime or not
 
 
 ## MANT
-Mantissa of a real number (M*10<sup>exp</sup>)
+Mantissa of a real number
+
+```rpl
+1.2345E123 MANT
+@Expecting 1.2345
+```
 
 
 ## XPON
-Exponent of a number represented as (M*10<sup>exp</sup>)
+Exponent of a real number
 
+```rpl
+1.2345E123 XPON
+@Expecting 123
+```
+
+
+## SigDig
+Number of significant digits in a real number
+
+```rpl
+1.2345E123 SigDig
+@Expecting 5
+```
 
 ## Sign
 

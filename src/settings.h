@@ -265,15 +265,22 @@ public:
               saveDebugOnError(false)
         {}
     };
-    struct PrepareForFunctionEvaluation : PrepareForProgramEvaluation
+    struct PrepareForSolveFunctionEvaluation : PrepareForProgramEvaluation
     {
-        SaveSetAngleUnits        saveAngleUnits; // For sin, cos, tan
         SaveNumericalResults     saveNumericalResults;
 
-        PrepareForFunctionEvaluation()
+        PrepareForSolveFunctionEvaluation()
             : PrepareForProgramEvaluation(),
-              saveAngleUnits(false),
               saveNumericalResults(true)
+        {}
+    };
+    struct PrepareForFunctionEvaluation : PrepareForSolveFunctionEvaluation
+    {
+        SaveSetAngleUnits     saveAngleUnits;
+
+        PrepareForFunctionEvaluation()
+            : PrepareForSolveFunctionEvaluation(),
+              saveAngleUnits(false)
         {}
     };
 };

@@ -256,6 +256,8 @@ bool symbol::found_in(object_p obj) const
                     return true;
             break;
         }
+        case ID_unit:
+            return found_in(unit_p(obj)->value());
         default:
             break;
         }

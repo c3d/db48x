@@ -130,11 +130,17 @@ algebraic_p integrate(program_g   eq,
     settings::SaveNumericalResults snr(true);
 
     // Initial integration step and first trapezoidal step
-    dx              = hx - lx;
-    sy              = algebraic::evaluate_function(eq, lx);
-    sy2             = algebraic::evaluate_function(eq, hx);
-    sy              = (sy + sy2) * dx / two;
-    if (!dx || !sy)
+    dx = hx - lx;
+    if (!dx)
+        return nullptr;
+    sy = algebraic::evaluate_function(eq, lx);
+    if (!sy)
+        return nullptr;
+    sy2 = algebraic::evaluate_function(eq, hx);
+    if (!sy2)
+        return nullptr;
+    sy = (sy + sy2) * dx / two;
+    if (!sy)
         return nullptr;
 
     // Loop for a maximum number of conversion iterations

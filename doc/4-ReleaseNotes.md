@@ -1,5 +1,113 @@
 # Release notes
 
+## Release 0.9.0 "Wilson's Dream" - Full equation library
+
+This version integrates an extended version of the HP50G equation
+library that Jean Wilson has been working on for many weeks.
+Equations are also fully documented, with examples illustrating how to
+use them, and a full documentation of the variables they contain.
+
+It also fully enables the algebraic-assisted solver, i.e. a version of
+the solver that attempts to isolate variables to evaluate expressions
+directly, which is both faster and more accurate when possible.
+
+*WARNING* Equations in the current state of the library are not
+fully validated yet. DB48x users are invited to test them and report
+issues they find.
+
+*WARNING* Constants used in the library are relatively accurate and
+have been modernized compared to the HP50G version. However, an effort
+is underway to compute the physical constants that are not fundamental
+but derived from other constants. It is expected that the numerical
+values returned from the equations will changeslightly as constants
+are udpated.
+
+
+### Features
+
+* Improved equation library and documentation
+  The equation library now features more than 650 equations, more than
+  700 variables, 18 sections and 158 subsections. This is roughtly
+  twice as big as the HP50G equation library, and covers more modern
+  aspects of science such as nuclear physics.
+
+### Bug fixes
+
+* solver: Do not propagate errors during `isolate`
+  When using the algebraic-assisted solver, errors raised by the
+  internal calls to `isolate` no longer manifest as solver errors.
+* units: Do not leave error behind in `unit::convert_to_real`
+  This could cause spurious `Inconsistent units` errors while solving.
+* logical: Make logical operations behave symmetrically, i.e.
+  ensure that `#100+1` and `1+#100` both return `#101`.
+* nfunctions: Evaluate symbolic arguments symbolically and
+  fix bugs converting arguments to decimal.
+  The evaluation of `'∫(0;1;x+1;x)'` after `x=3` would result in a
+  nonsensical expression `'∫(0;1;4;3)'`.
+* integrate: Report errors in bound evaluation.
+  An error in the evaluation of the first bound could be "erased" if
+  the evaluation of the second bound was successful. For example, in
+  `'∫(0;1;sin(x)/x;x)'`, the `Divide by zero` error evaluating
+  `'sin(x)/x'` at `x=0` is erased by the successful evaluation at
+  `x=1` that follows.
+
+### Improvements
+
+* equations: Accept units in `isolate`
+  This allows many equations in the equation library to successfully
+  use the symbolic approach, improving accuracy significantly.
+* add/sub: Accept zero as an operand around units.
+  An operation like `1_km+0` is now accepted, and evaluates as `1_km`.
+
+
+## Release 0.8.11 "Accomplishment" - Towards full equation library
+
+This release contains a number of fixes and features intended for use in the
+equation library being contributed by Jean Wilson
+
+### Features
+
+* Accept library items for functionc calls. For example, the expression
+  `'ⓁSiDensity(273_K)'` is now accepted. This function is usd in semi-conductor
+  equations in the library.
+* The `Root` command now attempts symbolic solving using the `Isol` command.
+  This can lead to exact solutions for common equations.
+* The `SigDig` command is a DB48x extension that returns the number of
+  significant digits in a number, i.e. the number of non-zero digits.
+* The `xpon` and `mant` now apply to unit objects
+* Functions now accept assignments as input, e.g. `x=9` `sqrt` gives `3.0`
+* The equation referenced to by the `Equation` variable can now be identified
+  using a name.
+* The `NxEq` command now works with quoted equations
+
+### Bug fixes
+
+* The `ln(1E-100)` expression no longer gives a `Argument outside domain`
+  error. The error was caused by rouding during argument reduction.
+* Comparison between a value and a unit object now work correclty
+* Arithmetic now correctly deals with dimensionless unit objects, for example in
+  expression `'1-1000_mm/m'`, and improves the evaluation of unit expressions
+  when adding or subtracting unit objects.
+* Names containing programs or functions are now evaluated as part of algebraic
+  evaluation
+* The solver now correctly processes equations wrapped in an expression.
+* `Convert` now correclty evaluates its arguments when necessary
+* Assignment objects no longer cause a crash on error. For example, `x='ln(0)'`
+  no longer crashes.
+
+### Improvements
+
+* Improve solver heuristic when slope is small. This allows the solver to find a
+  solution for an equation like `'tan(x)=224'` in degrees mode.
+* Add more recorder entries in the solver describing what is being solved.
+* Move recorder entries for tests to `tests` data logger.
+* Tests use a larger text rendering limit
+* Tests now purge the directory between examples. This prevents stray variables
+  from influencing later tests.
+* The handling of long UTF-8 sequences in tests was improved, which allows tests
+  involving a lot of text (e.g. examples) to run faster.
+
+
 ## Release 0.8.10 "Fire Dove" - Input and Prompt, Android preparation
 
 The focus of this release is support for user input in programs, with
@@ -752,7 +860,7 @@ Here is an example that illustrates these capabilities, testing the
 
 ```rpl
 V=240_V  I=32_A
-@ Expecting [ R=7.5 Ω P=7 680. W ]
+@ Expecting [ R=7.5 Ω P=7 680 W ]
 'ROOT(ⒺOhm’s Law & Power;[R;P];[1_Ω;1_W])'
 ```
 

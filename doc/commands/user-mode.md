@@ -87,6 +87,7 @@ alpha mode, use the following code:
 ```rpl
 { "α" 21.5 "β" 22.5 "γ" 23.5 "δ" 24.5 "ε" 25.5 "φ" 26.5 }
 STOKEYS
+@ Save for RecallKeys below
 ```
 
 ## RecallKeys

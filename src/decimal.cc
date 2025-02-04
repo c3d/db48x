@@ -2798,7 +2798,15 @@ decimal_p decimal::log(decimal_r x)
         return nullptr;
     }
 
+    bool      negln  = x->exponent() <= -1;
     decimal_g one    = make(1);
+    if (negln)
+    {
+        decimal_g scaled = one / x - one;
+        scaled = log1p(scaled);
+        scaled = -scaled;
+        return scaled;
+    }
     decimal_g scaled = x - one;
     scaled = log1p(scaled);
     return scaled;

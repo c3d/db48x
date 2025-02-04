@@ -63,8 +63,9 @@ struct expression : program
     static size_t required_memory(id i, id op, algebraic_r x, algebraic_r y);
 
     // Building expressions from an array of arguments
-    expression(id type, id op, algebraic_g arg[], uint arity);
-    static size_t required_memory(id i, id op,  algebraic_g arg[], uint arity);
+    expression(id type, id op, algebraic_g arg[], uint arity, bool wrap);
+    static size_t required_memory(id i, id op,
+                                  algebraic_g arg[], uint arity, bool wrap);
 
     object_p quoted(id type = ID_object) const;
     static size_t size_in_expression(object_p obj);
@@ -92,12 +93,12 @@ struct expression : program
     }
 
     static expression_p make(id op, algebraic_g args[], uint arity,
-                             id type = ID_expression)
+                             id type = ID_expression, bool wrap = false)
     {
         for (uint a = 0; a < arity; a++)
             if (!args[a])
                 return nullptr;
-        return rt.make<expression>(type, op, args, arity);
+        return rt.make<expression>(type, op, args, arity, wrap);
     }
 
     static expression_p parse_all(utf8 src, size_t len);
@@ -371,8 +372,8 @@ struct funcall : expression
         : expression(type, bytes, len) {}
 
     // Building expressions from an array of arguments
-    funcall(id type, id op, algebraic_g args[], uint arity)
-        : expression(type, op, args, arity) {}
+    funcall(id type, id op, algebraic_g args[], uint arity, bool wrap=false)
+        : expression(type, op, args, arity, wrap) {}
 
     object_p arg(uint depth) const;
     array_p  args() const;

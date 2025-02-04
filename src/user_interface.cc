@@ -317,7 +317,7 @@ object::result user_interface::insert(utf8 text, modes m)
 
 bool user_interface::check_input(gcutf8 &src, size_t len)
 // ----------------------------------------------------------------------------
-//  Check user validation for
+//  Check user validation for INPUT command
 // ----------------------------------------------------------------------------
 {
     // If user typed EXIT, then accept entry
@@ -331,7 +331,7 @@ bool user_interface::check_input(gcutf8 &src, size_t len)
         if (!rt.push(cmdline))
             return false;
         program_p pgm = program_p(validate_input);
-        if (program::run(pgm, true) != program::OK)
+        if (program::run(pgm) != program::OK)
             return false;
         bool ok = rt.depth() == depth + 1;
         if (!ok)

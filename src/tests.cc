@@ -181,7 +181,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            user_input_commands();
+            check_help_examples();
         if (onlyCurrent & 2)
             demo_ui();
         if (onlyCurrent & 4)
@@ -949,12 +949,12 @@ void tests::data_types()
     step("Parsing text in an algebraic expression")
         .test(CLEAR, "'SIZE(\"Hello\")'", ENTER)
         .expect("'Size \"Hello\"'")
-        .test(ID_Eval)
+        .test(ID_Run)
         .expect("5");
     step("Parsing arrays in an algebraic expression")
         .test(CLEAR, "'SIZE([1;2;3;4])'", ENTER)
         .expect("'Size [1;2;3;4]'")
-        .test(ID_Eval)
+        .test(ID_Run)
         .expect("{ 4 }");
 
     step("Fractions");
@@ -1188,6 +1188,14 @@ void tests::editor_operations()
         .test(RUNSTOP).expect("'F'")
         .test("DEPTH TOLIST", ENTER)
         .expect("{ 1 5 1 024 'x' 'y' 'z' 'G' 'F' }");
+    step("Library function call")
+        .test(CLEAR, "'ⓁSiDensity(273_K)'", ENTER)
+        .expect("'SiDensity(273 K)'")
+        .test(DOWN).editor("'ⓁSiDensity(273_K)'")
+        .test(ENTER)
+        .expect("'SiDensity(273 K)'")
+        .test(RUNSTOP)
+        .expect("799 498 575.637 (cm↑3)⁻¹");
 
     step("Implicit multiplication")
         .test(CLEAR, "'2X'", ENTER).expect("'2·X'");
@@ -1935,6 +1943,8 @@ void tests::global_variables()
         .test("A", ENTER).expect("57")
         .test(BSP).expect("A='42+3·5'")
         .test(RUNSTOP).expect("A='42+3·5'");
+    step("Assignment with error in evaluation")
+        .test(CLEAR, "A='(42+3*5)/0'", ENTER).error("Divide by zero");
     step("Assignment with evaluated value and PushEvaluatedAssignment")
         .test(CLEAR, "PushEvaluatedAssignment", ENTER)
         .test("A='42+3*5'", ENTER).expect("A=57")
@@ -2661,6 +2671,13 @@ void tests::logical_operations()
 
     step("Reset word size to default")
         .test(CLEAR, "64 WordSize", ENTER).noerror();
+
+    step("Check that we promote to binary")
+        .test(CLEAR, "100 #45 AND", ENTER).expect("#44₁₆")
+        .test(CLEAR, "#45 100 AND", ENTER).expect("#44₁₆");
+    step("Check that deal with logical")
+        .test(CLEAR, "100. #45 AND", ENTER).expect("True")
+        .test(CLEAR, "#45 100. AND", ENTER).expect("True");
 }
 
 
@@ -3248,7 +3265,7 @@ void tests::decimal_numerical_functions()
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
         .test(CLEAR, "-1.23 23", ID_pow).expect("-116.90082 15014 43291 74653 48578 88750 679")
         .test(CLEAR, "-1.23 -2.34", ID_pow).error("Argument outside domain")
-        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.00012 57743 10956 55759 81666 83961 25288 114")
+        .test(CLEAR, "1.234 SIN 2.34", ID_pow).expect("0.00012 57743 10956 55759 81666 83961 25288 1331")
         .test(CLEAR, "1.23 COS -2.34", ID_pow).expect("1.00053 93880 00606 36152 22273 75863 57849")
         .test(CLEAR, "-1.23 TAN 23", ID_pow).expect("-4.29073 45139 05064 31475 52781 67797 518⁳⁻³⁹")
         .test(CLEAR, "-1.23 TAN 2.34", ID_pow).error("Argument outside domain")
@@ -3354,6 +3371,10 @@ void tests::decimal_numerical_functions()
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
         .expect("-1.93671 70284 36984 00445 39742 77784 19616 r");
 
+    step("ln for very small value")
+        .test(CLEAR, "1E-100 LN", ENTER)
+        .expect("-230.25850 92994 04568 40179 91454 68436 426");
+
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG", ENTER).noerror();
 
@@ -3361,6 +3382,31 @@ void tests::decimal_numerical_functions()
         .test(CLEAR, "0 →Frac", ENTER).noerror().expect("0")
         .test(CLEAR, "1 →Frac", ENTER).noerror().expect("1")
         .test(CLEAR, "-123 →Frac", ENTER).noerror().expect("-123");
+
+    step("Assignment with functions")
+        .test(CLEAR, "x=3 TAN", ENTER).noerror().expect("-0.14254 65430 74")
+        .test(CLEAR, "'x' PURGE", ENTER);
+
+    step("xpon function")
+        .test(ID_PartsMenu)
+        .test(CLEAR, "12.345E37", ID_xpon).expect("38");
+    step("mant function")
+        .test(CLEAR, "12.345E37", ID_mant).expect("1.2345");
+    step("SigDig function")
+        .test(CLEAR, "0", ID_SigDig).expect("0")
+        .test(CLEAR, "1", ID_SigDig).expect("1")
+        .test(CLEAR, "12", ID_SigDig).expect("2")
+        .test(CLEAR, "1.23", ID_SigDig).expect("3")
+        .test(CLEAR, "1.234", ID_SigDig).expect("4")
+        .test(CLEAR, "1.2345", ID_SigDig).expect("5")
+        .test(CLEAR, "123456", ID_SigDig).expect("6")
+        .test(CLEAR, "123.4567", ID_SigDig).expect("7");
+    step("xpon function with unit")
+        .test(CLEAR, "12.345E37_cm XPON", ENTER).expect("38");
+    step("mant function with unit")
+        .test(CLEAR, "12.345E37_cm MANT", ENTER).expect("1.2345");
+    step("SigDig function")
+        .test(CLEAR, "12.345E7_nm SIGDIG", ENTER).expect("5");
 }
 
 
@@ -5043,6 +5089,10 @@ void tests::complex_promotion()
     step("log(-2) succeeds in complex mode")
         .test(CLEAR, "-2 log", ENTER)
         .expect("0.69314 71805 6+3.14159 26535 9ⅈ");
+
+    step("Restore complex mode")
+        .test(CLEAR, "'ComplexResults' purge", ENTER).noerror()
+        .test("-103 FS?", ENTER).expect("False");
 }
 
 
@@ -5162,9 +5212,9 @@ void tests::units_and_conversions()
         .test(DOWN, DOWN, BSP, DOWN, DOWN, "_").editor("190_°")
         .test(ENTER).expect("190 °");
 
-    step("No auto-simplification for unit addition")
+    step("Auto-simplification for unit addition")
         .test(CLEAR, "1_s", ENTER, "0", ID_add)
-        .error("Inconsistent units");
+        .expect("1 s");
     step("No auto-simplification for unit subtraction")
         .test(CLEAR, "1_s", ENTER, ENTER, SUB)
         .noerror()
@@ -5250,15 +5300,57 @@ void tests::units_and_conversions()
     step("Ubase in arithmetic expression (#1321)")
         .test(CLEAR, "'UBASE(100_km)'", ENTER)
         .expect("'BaseUnits 100 km'")
-        .test(ID_Eval)
+        .test(ID_Run)
         .expect("100 000 m");
     step("Ubase on numerical values (#1322)")
         .test(CLEAR, "'ubase(1)'", ENTER)
         .expect("'BaseUnits 1'")
-        .test(ID_Eval)
+        .test(ID_Run)
         .expect ("1")
         .test(CLEAR, "1 ubase", ENTER)
         .expect("1");
+
+    step("Convert when evaluation is needed")
+        .test(CLEAR,
+              "α=0.00729735256434 Urα=1.6E-10 "
+              "μ0='CONVERT(4*Ⓒπ*α*Ⓒℏ/(Ⓒqe^2*Ⓒc);1_H/m)' "
+              "Urμ0='Urα' "
+              "Usμ0='ROUND(Urα*μ0;-2)'", ENTER)
+        .got("Usμ0='Round(Urα·μ0;-2)'",
+             "Urμ0='Urα'",
+             "μ0='Convert(4·π·α·ℏ÷(qe↑2·c);1 H/m)'",
+             "Urα=1.6⁳⁻¹⁰",
+             "α=0.00729 73525 64")
+        .test(CLEAR, "Usμ0", ENTER)
+        .expect("2.⁳⁻¹⁶ H/m");
+
+    step("Convert arguments to add")
+        .test(CLEAR,
+              DIRECT("'1_m/s+(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
+              ENTER)
+        .expect("'1 m/s+1 A÷(8.5⁳²⁸ (m↑3)⁻¹·qe·π·0.01 cm↑2)'")
+        .test(ID_Run)
+        .expect("0.00010 00023 37 A·m↑3/(C·cm↑2)");
+    step("Convert arguments to sub")
+        .test(CLEAR,
+              DIRECT("'1_m/s-(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
+              ENTER)
+        .expect("'1 m/s-1 A÷(8.5⁳²⁸ (m↑3)⁻¹·qe·π·0.01 cm↑2)'")
+        .test(ID_Run)
+        .expect("0.00009 99976 63 A·m↑3/(C·cm↑2)");
+
+    step("Convert dimensionless argument to add")
+        .test(CLEAR, "'1_km/in+3'", ENTER, ID_Run)
+        .expect("39 373 ¹⁰/₁₂₇");
+    step("Convert dimensionless argument to add")
+        .test(CLEAR, "'3+1_km/in'", ENTER, ID_Run)
+        .expect("39 373 ¹⁰/₁₂₇");
+    step("Convert dimensionless argument to sub")
+        .test(CLEAR, "'1_km/in-3'", ENTER, ID_Run)
+        .expect("39 367 ¹⁰/₁₂₇");
+    step("Convert dimensionless argument to sub")
+        .test(CLEAR, "'3-1_km/in'", ENTER, ID_Run)
+        .expect("-39 367 ¹⁰/₁₂₇");
 }
 
 
@@ -6223,6 +6315,9 @@ void tests::solver_testing()
     step("Enter directory for solving")
         .test(CLEAR, "'SLVTST' CRDIR SLVTST", ENTER);
 
+    step("Select purely numerical solver")
+        .test(CLEAR, "SolveNumericallyOnly", ENTER).noerror();
+
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
         .noerror().expect("X=-3.");
@@ -6240,15 +6335,22 @@ void tests::solver_testing()
         .noerror().expect("X=1.73205 08075 7")
         .test("X", ENTER)
         .expect("1.73205 08075 7")
-        .test("'X'", ENTER, NOSHIFT, BSP, F2)
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver without solution")
         .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
         .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("0.00000 00712 63")
-        .test("'X'", ENTER, NOSHIFT, BSP, F2)
+        .expect("-2.19049 50593 6⁳⁻¹³")
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
+    step("Solver with slow slope")
+        .test(CLEAR, "'tan(x)=224' 'x' 1 ROOT", ENTER)
+        .expect("x=89.74421 69693");
+    step("Solver with slow slope 2")
+        .test(CLEAR, "'tan(x)=224' 'x' 0 ROOT", ENTER)
+        .expect("x=89.74421 69693");
+
 
     step("Solving menu")
         .test(CLEAR, "'A²+B²=C²'", ENTER)
@@ -6257,7 +6359,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-4.⁳⁻²²'");
+        .expect("'25=25.-7.8⁳⁻²¹'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -6277,12 +6379,86 @@ void tests::solver_testing()
         .test(LSHIFT, A, LSHIFT, A)
         .expect("0.5 m");
 
-    step("Solving with large values (#1179")
+    step("Solving with large values (#1179)")
         .test(CLEAR, "DEG '1E45*sin(x)-0.5E45' 'x' 2 ROOT", ENTER)
         .expect("x=30.");
-    step("Solving equation containing a zero side (#1179")
+    step("Solving equation containing a zero side (#1179)")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
+
+
+    step("Select algebraically-assisted solver")
+        .test(CLEAR, "SolveSymbolicallyThenNumerically", ENTER).noerror();
+
+    step("Solver with expression")
+        .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
+        .noerror().expect("X=-3");
+    step("Solver with arithmetic syntax")
+        .test(CLEAR, "'ROOT(X+3;X;0)'", ENTER)
+        .expect("'Root(X+3;X;0)'")
+        .test(RUNSTOP)
+        .expect("X=-3")
+        .test("X", ENTER)
+        .expect("-3")
+        .test("'X' purge", ENTER)
+        .noerror();
+    step("Solver with equation")
+        .test(CLEAR, "'sq(x)=3' 'X' 0 ROOT", ENTER)
+        .noerror().expect("X=1.73205 08075 7")
+        .test("X", ENTER)
+        .expect("1.73205 08075 7")
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
+        .noerror();
+    step("Solver without solution")
+        .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
+        .error("Argument outside domain")
+        .test(CLEAR, "X", ENTER)
+        .expect("'X'")
+        .test("'X'", ENTER, LSHIFT, BSP, F2)
+        .noerror();
+    step("Solver with slow slope")
+        .test(CLEAR, "'tan(x)=224' 'x' 1 ROOT", ENTER)
+        .expect("x=89.74421 69693 °");
+    step("Solver with slow slope 2")
+        .test(CLEAR, "'tan(x)=224' 'x' 0 ROOT", ENTER)
+        .expect("x=89.74421 69693 °");
+
+
+    step("Solving menu")
+        .test(CLEAR, "{ A B C } PURGE", ENTER).noerror()
+        .test(CLEAR, "'A²+B²=C²'", ENTER)
+        .test(LSHIFT, KEY7, LSHIFT, F1, F6)
+        .test("3", NOSHIFT, F2, "4", NOSHIFT, F3, LSHIFT, F4)
+        .expect("C=5.");
+    step("Evaluate equation case Left=Right")
+        .test(F1)
+        .expect("'25=25.-3.⁳⁻²²'");
+
+    step("Verify that we display the equation after entering value")
+        .test(CLEAR, "42", F4)
+        .image_noheader("solver-eqdisplay");
+    step("Evaluate equation case Left=Right")
+        .test("4", F4, F1)
+        .expect("'25=16+9'");
+    step("Evaluate equation case Left=Right")
+        .test("7", F4, F1)
+        .expect("'25=49-24'");
+
+    step("Solving with units")
+        .test("30_cm", NOSHIFT, F2, ".4_m", NOSHIFT, F3, "100_in", NOSHIFT, F4)
+        .test(LSHIFT, F4)
+        .expect("C=19.68503 93701 in")
+        .test(LSHIFT, KEY5, F4, LSHIFT, F1)
+        .test(LSHIFT, A, LSHIFT, A)
+        .expect("0.5 m");
+
+    step("Solving with large values (#1179)")
+        .test(CLEAR, "DEG '1E45*sin(x)-0.5E45' 'x' 2 ROOT", ENTER)
+        .expect("x=30. °");
+    step("Solving equation containing a zero side (#1179)")
+        .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
+        .expect("x=2.82143 93721 2");
+
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
@@ -6381,17 +6557,17 @@ void tests::eqnlib_columns_and_beams()
         .test(NOSHIFT, F1)
         .expect("'676.60192 6324 kN"
                 "=6.76601 92632 4⁳¹⁴ kPa·mm↑4/m↑2"
-                "-0.00000 0001 kPa·mm↑4/m↑2'");
+                "+0.00000 0005 kPa·mm↑4/m↑2'");
     step("Solving Elastic Buckling third equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F2)
         .expect("σcr=127 428.24437 8 kPa")
         .test(NOSHIFT, F1)
-        .expect("'127 428.24437 8 kPa=12.74282 44378 kN/cm↑2+1.⁳⁻²² kN/cm↑2'");
+        .expect("'127 428.24437 8 kPa=12.74282 44378 kN/cm↑2'");
     step("Solving Elastic Buckling fourth equation")
         .test(CLEAR, LSHIFT, F1, LSHIFT, F4)
         .expect("r=4.1148 cm")
         .test(NOSHIFT, F1)
-        .expect("'4.1148 cm=411.48 mm↑2/cm+6.13⁳⁻¹⁹ mm↑2/cm'");
+        .expect("'16.93157 904 cm↑2=169 315.7904 mm↑4/cm↑2+2.5⁳⁻¹⁷ mm↑4/cm↑2'");
 
     step("Solving Eccentric Columns")
         .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F2)
@@ -6580,7 +6756,7 @@ void tests::eqnlib_columns_and_beams()
         .test("8_ft", NOSHIFT, F4)
         .expect("x=8 ft")
         .test(F6, LSHIFT, F2)
-        .expect("Mx=-200. ft·lbf");
+        .expect("Mx=-200 ft·lbf");
 
     step("Solving Cantilever Shear")
         .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F5)
@@ -6595,7 +6771,7 @@ void tests::eqnlib_columns_and_beams()
         .test("100_lbf/ft", NOSHIFT, F1)
         .expect("w=100 lbf/ft")
         .test(F6, LSHIFT, F5)
-        .expect("V=200. lbf");
+        .expect("V=200 lbf");
 
     step("Exit: Clear variables")
         .test(CLEAR,
@@ -6653,6 +6829,19 @@ void tests::numerical_integration_testing()
         .noerror().expect("0.69314 71805 6")
         .test(KEY2, ID_log, ID_sub).expect("-3.9⁳⁻²³");
 
+    step("Integration with error on low bound")
+        .test(CLEAR, "0 1 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .error("Divide by zero");
+    step("Integration with error on high bound")
+        .test(CLEAR, "1 0 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .error("Divide by zero");
+    step("Integration with error on difference")
+        .test(CLEAR, "1_m 1_h 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .error("Inconsistent units");
+
     step("Integrate with symbols")
         .test(CLEAR, "A B '1/X' 'X' ∫", ENTER)
         .expect("'∫(A;B;1÷X;X)'")
@@ -6674,6 +6863,36 @@ void tests::numerical_integration_testing()
         .editor("'∫(A;1;1÷X;X)'")
         .test(ENTER)
         .expect("'∫(A;1;1÷X;X)'");
+
+    step("Check evaluation with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF 3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check evaluation without NumericalResults flag clear")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'∫(0;π;exp X;X)'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'∫(0;π;exp X;X)'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Cleanup")
+         .test(CLEAR, "'X'", ID_ClearThingsMenu, ID_Purge);
 }
 
 
@@ -7212,9 +7431,9 @@ void tests::symbolic_operations()
         .expect("'(sin(42+B)+1)²+3·(sin(42+B)+1)+7'");
     step("Where operator on library equations")
         .test("'ⒺRelativity Mass Energy|m=(1_g)'", ENTER)
-        .expect("'Relativity Mass Energy:{E=m·c↑2}|m=1 g'")
+        .expect("'Relativity Mass Energy:{E=m·c²}|m=1 g'")
         .test(RUNSTOP)
-        .expect("{ 'E=¹/₁ ₀₀₀ kg·c↑2' }");
+        .expect("{ 'E=¹/₁ ₀₀₀ kg·c²' }");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
@@ -9554,7 +9773,7 @@ void tests::constants_menu()
     step("Rydberg constant")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("R∞")
-        .test(LSHIFT, F1).expect("10 973 731.568 m⁻¹");
+        .test(LSHIFT, F1).expect("10 973 731.5682 m⁻¹");
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F2).expect("a0")
         .test(LSHIFT, F2).expect("0.05291 77210 55 nm");
@@ -10453,8 +10672,9 @@ void tests::check_help_examples()
         .test("ExamplesTest", ENTER)
         .noerror();
     step("Set higher significant digits")
-        .test(CLEAR, "11 MinimumSignificantDigits", ENTER)
-        .noerror();
+        .test(CLEAR, "11 MinimumSignificantDigits", ENTER).noerror();
+    step("Set higher rendering limit for text")
+        .test(CLEAR, "2048 TextRenderingSizeLimit", ENTER).noerror();
 
     step("Opening help file").test(CLEAR);
     FILE *f = fopen(HELPFILE_NAME, "r");
@@ -10480,9 +10700,8 @@ void tests::check_help_examples()
     uint        tidx       = 0;
     bool        intopic    = false;
     bool        skiptest   = false;
-    uint        uidx       = 0;
-    byte        ubuf[8];
     char        topic[80];
+    std::string ubuf;
     std::string ref;
 
     while (true)
@@ -10492,7 +10711,6 @@ void tests::check_help_examples()
             break;
         byte c = ci;
         ASSERT(tidx < sizeof(topic));
-        ASSERT(uidx < sizeof(ubuf));
 
         if (c == '#' && (hadcr || intopic))
             intopic = true;
@@ -10519,26 +10737,8 @@ void tests::check_help_examples()
             }
         }
 
-        if (is_utf8_first(c))
-        {
-            uidx         = 0;
-            ubuf[uidx++] = c;
-            continue;
-        }
-        else if (is_utf8_next(c) && uidx < 4)
-        {
-            ubuf[uidx++] = c;
-            continue;
-        }
-        else
-        {
-            ubuf[uidx++] = c;
-            ubuf[uidx++] = 0;
-            uidx         = 0;
-        }
-
         if (testing && c != '`')
-            itest(DIRECT(cstring(ubuf)));
+            ubuf += c;
 
         if (c == open[opencheck])
         {
@@ -10564,6 +10764,12 @@ void tests::check_help_examples()
                 closecheck = 0;
                 if (testing)
                 {
+                    bool keep =
+                        ubuf.find("@ Keep") != ubuf.npos ||
+                        ubuf.find("@ Save") != ubuf.npos;
+                    itest(DIRECT(ubuf));
+                    ubuf.clear();
+
                     size_t nfailures = failures.size();
                     testing          = false;
                     itest(LENGTHY(20000), ENTER).noerror();
@@ -10586,6 +10792,8 @@ void tests::check_help_examples()
                     }
                     ref      = "";
                     skiptest = false;
+                    if (!keep)
+                        itest(DIRECT("variables purge"), ENTER);
                 }
             }
         }
@@ -10633,6 +10841,8 @@ void tests::check_help_examples()
         .noerror();
     step("Restore MinimumSignificantDigits")
         .test(CLEAR, "'MinimumSignificantDigits' PURGE", ENTER);
+    step("Restore TextRenderingSizeLimit")
+        .test(CLEAR, "'TextRenderingSizeLimit' PURGE", ENTER);
 }
 
 
@@ -12117,7 +12327,7 @@ tests &tests::refreshed(uint extrawait)
         screen_refreshed(extrawait);
 
         uint available = Stack.available();
-        record(errors, "Stack available = %u", available);
+        record(tests, "Stack available = %u", available);
         if (!available)
         {
             sys_delay(refresh_delay_time);
@@ -13221,7 +13431,9 @@ tests &tests::editor(cstring text, uint extrawait)
         if (rt.error())
         {
             explain("Expected editor [", text, "], "
-                    "got error [", rt.error(), "] instead");
+                    "got error [",
+                    rt.error(),
+                    "] instead");
             return fail();
         }
 
@@ -13234,16 +13446,30 @@ tests &tests::editor(cstring text, uint extrawait)
     }
 
     if (!ed)
-        explain("Expected editor to contain [", text, "], "
+        explain("Expected editor to contain [",
+                text,
+                "], "
                 "but it's empty");
     if (sz != strlen(text))
-        explain("Expected ", strlen(text), " characters in editor"
-                " [", text, "], "
-                "but got ", sz, " characters "
-                " [", std::string(cstring(ed), sz), "]");
+        explain("Expected ",
+                strlen(text),
+                " characters in editor"
+                " [",
+                text,
+                "], "
+                "but got ",
+                sz,
+                " characters "
+                " [",
+                std::string(cstring(ed), sz),
+                "]");
     if (memcmp(ed, text, sz))
-        explain("Expected editor to contain [", text, "], "
-                "but it contains [", std::string(cstring(ed), sz), "]");
+        explain("Expected editor to contain [",
+                text,
+                "], "
+                "but it contains [",
+                std::string(cstring(ed), sz),
+                "]");
 
     fail();
     return *this;
@@ -13257,8 +13483,10 @@ tests &tests::cursor(size_t csr, uint extrawait)
 {
     nokeys(extrawait);
     return check(ui.cursor == csr,
-                 "Expected cursor to be at position ", csr,
-                 " but it's at position ", ui.cursor);
+                 "Expected cursor to be at position ",
+                 csr,
+                 " but it's at position ",
+                 ui.cursor);
 }
 
 
@@ -13284,8 +13512,12 @@ tests &tests::error(cstring msg, uint extrawait)
     if (msg && !err)
         explain("Expected error message [", msg, "], got none");
     if (msg && err && strcmp(cstring(err), msg) != 0)
-        explain("Expected error message [", msg, "], "
-                "got [", err, "]");
+        explain("Expected error message [",
+                msg,
+                "], "
+                "got [",
+                err,
+                "]");
     fail();
     return *this;
 }
@@ -13296,14 +13528,14 @@ tests &tests::command(cstring ref, uint extrawait)
 //   Check that the command result matches expectations
 // ----------------------------------------------------------------------------
 {
-    utf8   cmd  = nullptr;
+    utf8 cmd = nullptr;
     nokeys(extrawait);
 
     uint start     = sys_current_ms();
     uint wait_time = image_wait_time + extrawait;
     while (sys_current_ms() - start < wait_time)
     {
-        size_t   sz   = 0;
+        size_t sz = 0;
         if (object_p cmdo = rt.command())
             if (text_p cmdt = cmdo->as_text())
                 cmd = cmdt->value(&sz);

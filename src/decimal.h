@@ -309,6 +309,21 @@ struct decimal : algebraic
     }
 
 
+    unsigned significant_digits() const
+    // ------------------------------------------------------------------------
+    //   Return the number of significant digits in the number
+    // ------------------------------------------------------------------------
+    {
+        info     i     = shape();
+        unsigned nk    = i.nkigits;
+        if (!nk)
+            return 0;
+        kint     k     = kigit(i.base, nk - 1);
+        unsigned nlast = k % 10 ? 3 : k % 100 ? 2 : k ? 1 : 0;
+        return 3 * (nk - 1) + nlast;
+    }
+
+
     struct iterator
     // ------------------------------------------------------------------------
     // Iterator, built in a way that is robust to garbage collection in loops

@@ -48,6 +48,7 @@ NFUNCTION(Root,3,
           static list_p multiple_equation_solver(list_r eqs,
                                                  list_r names,
                                                  list_r guesses);
+          static expression_p isolate(expression_p eq, symbol_p name);
     );
 NFUNCTION(MultipleEquationsSolver,3,
           static bool can_be_symbolic(uint a)

@@ -146,7 +146,7 @@ bool comparison::compare(int *cmp, algebraic_r x, algebraic_r y)
         return true;
     }
 
-    if (xt == ID_unit && yt == ID_unit)
+    if (xt == ID_unit || yt == ID_unit)
     {
         algebraic_g diff = xa - ya; // Deal with cases such as ddays
         if (!diff)

@@ -68,7 +68,9 @@ For example, the following will find a "solution" to `1/x=0` once it reaches the
 desired precision:
 
 ```rpl
+SolveNumericallyOnly
 'ROOT(1/x;x;1)' EVAL
+SolveSymbolicallyThenNumerically
 @Expect: :x:1.10008 77783 66101 93099 87⁳18
 ```
 
@@ -89,7 +91,7 @@ compared to HP implementations of RPL.
 For example, you can find a complex root for the following equation:
 ```rpl
 'ROOT((X-5)²+3;X;0+0ⅈ)'
-@ Expecting X=5.+1.73205 08075 7ⅈ
+@ Expecting X=5+1.73205 08075 7ⅈ
 ```
 
 ### Differences with HP calculators
