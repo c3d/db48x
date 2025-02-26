@@ -19,29 +19,16 @@ Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ANGTODEG
-Convert an angle to degrees
+## ToRectangular
 
-
-## ANGTORAD
-Convert an angle to radians
-
-
-## ANGTOGRAD
-Convert an angle to grads (gons)
-
-
-## ANGTODMS
-Convert an angle to DMS (DD.MMSS)
-
-
-## TORECT
 Convert vector or complex to cartesian coordinates
 
 
-## TOPOLAR
+## ToPolar
+
 Convert vector or complex to polar coordinates
 
 
-## TOSPHER
+## ToSpherical
+
 Convert vector or complex to spherical coordinates

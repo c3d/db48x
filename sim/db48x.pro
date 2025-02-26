@@ -59,6 +59,7 @@ SOURCES +=                                      \
         ../src/expression.cc                    \
         ../src/file.cc                          \
         ../src/files.cc                         \
+        ../src/finance.cc                       \
         ../src/font.cc                          \
         ../src/fraction.cc                      \
         ../src/functions.cc                     \

@@ -45,6 +45,7 @@
 #include "decimal.h"
 #include "equations.h"
 #include "expression.h"
+#include "finance.h"
 #include "font.h"
 #include "fraction.h"
 #include "functions.h"
@@ -296,6 +297,12 @@ retry:
         break;
     case L'Ⓛ':                  // Library items
         r = xlib::do_parse(p);
+        break;
+    case L'Ⓡ':                  // Constants relative uncertainty
+        r = relative_uncertainty::do_parse(p);
+        break;
+    case L'Ⓢ':                  // Constants standard uncertainty
+        r = standard_uncertainty::do_parse(p);
         break;
     case L'Ⓟ':                  // Polynomials
         r = polynomial::do_parse(p);

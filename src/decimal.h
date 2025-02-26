@@ -504,9 +504,9 @@ struct decimal : algebraic
 
     static decimal_p neg(decimal_r x);
     static decimal_p add(decimal_r x, decimal_r y);
-    static decimal_p sub(decimal_r x, decimal_r y);
-    static decimal_p mul(decimal_r x, decimal_r y);
-    static decimal_p div(decimal_r x, decimal_r y);
+    static decimal_p subtract(decimal_r x, decimal_r y);
+    static decimal_p multiply(decimal_r x, decimal_r y);
+    static decimal_p divide(decimal_r x, decimal_r y);
     static decimal_p mod(decimal_r x, decimal_r y);
     static decimal_p rem(decimal_r x, decimal_r y);
     static decimal_p pow(decimal_r x, decimal_r y);
@@ -673,7 +673,7 @@ inline decimal_g operator-(decimal_g x, decimal_g y)
 //  Subtraction
 // ----------------------------------------------------------------------------
 {
-    return decimal::sub(x, y);
+    return decimal::subtract(x, y);
 }
 
 
@@ -682,7 +682,7 @@ inline decimal_g operator*(decimal_g x, decimal_g y)
 //   Multiplication
 // ----------------------------------------------------------------------------
 {
-    return decimal::mul(x, y);
+    return decimal::multiply(x, y);
 }
 
 
@@ -691,7 +691,7 @@ inline decimal_g operator/(decimal_g x, decimal_g y)
 //   Division
 // ----------------------------------------------------------------------------
 {
-    return decimal::div(x, y);
+    return decimal::divide(x, y);
 }
 
 

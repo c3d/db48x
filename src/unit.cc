@@ -1918,6 +1918,8 @@ FUNCTION_BODY(UVal)
         return symbolic(ID_UVal, x);
     if (unit_p u = unit::get(x))
         return u->value();
+    if (x->is_algebraic_num())
+        return x;
     rt.type_error();
     return nullptr;
 }

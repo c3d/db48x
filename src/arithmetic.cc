@@ -311,7 +311,7 @@ bool add::complex_ok(complex_g &x, complex_g &y)
 
 
 template <>
-algebraic_p arithmetic::optimize<sub>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::optimize<subtract>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Optimizations for subtractions
 // ----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ algebraic_p arithmetic::optimize<sub>(algebraic_r x, algebraic_r y)
 
 
 template <>
-algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::non_numeric<subtract>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Deal with non-numerical data types for multiplication
 // ----------------------------------------------------------------------------
@@ -343,11 +343,11 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
     {
         if (array_g ya = y->as<array>())
             return xa - ya;
-        return xa->map(sub::evaluate, y);
+        return xa->map(subtract::evaluate, y);
     }
     else if (array_g ya = y->as<array>())
     {
-        return ya->map(x, sub::evaluate);
+        return ya->map(x, subtract::evaluate);
     }
 
     // Check subtraction of unit objects
@@ -382,7 +382,7 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
             rt.inconsistent_units_error();
             return nullptr;
         }
-        return sub::evaluate(ubased, y);
+        return subtract::evaluate(ubased, y);
     }
     else if (unit_g yu = unit::get(y))
     {
@@ -400,14 +400,14 @@ algebraic_p arithmetic::non_numeric<sub>(algebraic_r x, algebraic_r y)
             rt.inconsistent_units_error();
             return nullptr;
         }
-        return sub::evaluate(x, ubased);
+        return subtract::evaluate(x, ubased);
     }
-    return optimize<sub>(x, y);
+    return optimize<subtract>(x, y);
 }
 
 
-bool sub::integer_ok(object::id &xt, object::id &yt,
-                     ularge &xv, ularge &yv)
+bool subtract::integer_ok(object::id &xt, object::id &yt,
+                          ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------
 //   Check if subtracting two integers works or if we need to promote to real
 // ----------------------------------------------------------------------------
@@ -446,7 +446,7 @@ bool sub::integer_ok(object::id &xt, object::id &yt,
 }
 
 
-bool sub::bignum_ok(bignum_g &x, bignum_g &y)
+bool subtract::bignum_ok(bignum_g &x, bignum_g &y)
 // ----------------------------------------------------------------------------
 //   We can always subtract two big integers (memory permitting)
 // ----------------------------------------------------------------------------
@@ -456,7 +456,7 @@ bool sub::bignum_ok(bignum_g &x, bignum_g &y)
 }
 
 
-bool sub::fraction_ok(fraction_g &x, fraction_g &y)
+bool subtract::fraction_ok(fraction_g &x, fraction_g &y)
 // ----------------------------------------------------------------------------
 //   We can always subtract two fractions (memory permitting)
 // ----------------------------------------------------------------------------
@@ -466,7 +466,7 @@ bool sub::fraction_ok(fraction_g &x, fraction_g &y)
 }
 
 
-bool sub::complex_ok(complex_g &x, complex_g &y)
+bool subtract::complex_ok(complex_g &x, complex_g &y)
 // ----------------------------------------------------------------------------
 //   Subtract complex numbers if we have them
 // ----------------------------------------------------------------------------
@@ -477,7 +477,7 @@ bool sub::complex_ok(complex_g &x, complex_g &y)
 
 
 template <>
-algebraic_p arithmetic::optimize<mul>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::optimize<multiply>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Optimization rules for multiplication
 // ----------------------------------------------------------------------------
@@ -508,7 +508,7 @@ algebraic_p arithmetic::optimize<mul>(algebraic_r x, algebraic_r y)
 
 
 template <>
-algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::non_numeric<multiply>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Deal with non-numerical data types for multiplication
 // ----------------------------------------------------------------------------
@@ -535,11 +535,11 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
     {
         if (array_g ya = y->as<array>())
             return xa * ya;
-        return xa->map(mul::evaluate, y);
+        return xa->map(multiply::evaluate, y);
     }
     else if (array_g ya = y->as<array>())
     {
-        return ya->map(x, mul::evaluate);
+        return ya->map(x, multiply::evaluate);
     }
 
     // Check multiplication of unit objects
@@ -579,11 +579,11 @@ algebraic_p arithmetic::non_numeric<mul>(algebraic_r x, algebraic_r y)
             return unit::simple(yv, ye);
         }
     }
-    return optimize<mul>(x, y);
+    return optimize<multiply>(x, y);
 }
 
-bool mul::integer_ok(object::id &xt, object::id &yt,
-                     ularge &xv, ularge &yv)
+bool multiply::integer_ok(object::id &xt, object::id &yt,
+                          ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------
 //   Check if multiplying two integers works or if we need to promote to real
 // ----------------------------------------------------------------------------
@@ -612,7 +612,7 @@ bool mul::integer_ok(object::id &xt, object::id &yt,
 }
 
 
-bool mul::bignum_ok(bignum_g &x, bignum_g &y)
+bool multiply::bignum_ok(bignum_g &x, bignum_g &y)
 // ----------------------------------------------------------------------------
 //   We can always multiply two big integers (memory permitting)
 // ----------------------------------------------------------------------------
@@ -622,7 +622,7 @@ bool mul::bignum_ok(bignum_g &x, bignum_g &y)
 }
 
 
-bool mul::fraction_ok(fraction_g &x, fraction_g &y)
+bool multiply::fraction_ok(fraction_g &x, fraction_g &y)
 // ----------------------------------------------------------------------------
 //   We can always multiply two fractions (memory permitting)
 // ----------------------------------------------------------------------------
@@ -632,7 +632,7 @@ bool mul::fraction_ok(fraction_g &x, fraction_g &y)
 }
 
 
-bool mul::complex_ok(complex_g &x, complex_g &y)
+bool multiply::complex_ok(complex_g &x, complex_g &y)
 // ----------------------------------------------------------------------------
 //   Multiply complex numbers if we have them
 // ----------------------------------------------------------------------------
@@ -643,7 +643,7 @@ bool mul::complex_ok(complex_g &x, complex_g &y)
 
 
 template <>
-algebraic_p arithmetic::optimize<struct div>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::optimize<divide>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Optimizations for division
 // ----------------------------------------------------------------------------
@@ -671,7 +671,7 @@ algebraic_p arithmetic::optimize<struct div>(algebraic_r x, algebraic_r y)
 
 
 template <>
-algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
+algebraic_p arithmetic::non_numeric<divide>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //   Deal with non-numerical data types for division
 // ----------------------------------------------------------------------------
@@ -682,11 +682,11 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
     {
         if (array_g ya = y->as<array>())
             return xa / ya;
-        return xa->map(div::evaluate, y);
+        return xa->map(divide::evaluate, y);
     }
     else if (array_g ya = y->as<array>())
     {
-        return ya->map(x, div::evaluate);
+        return ya->map(x, divide::evaluate);
     }
 
     // Check division of unit objects
@@ -741,20 +741,20 @@ algebraic_p arithmetic::non_numeric<struct div>(algebraic_r x, algebraic_r y)
         }
     }
 
-    return optimize<struct div>(x, y);
+    return optimize<divide>(x, y);
 }
 
 
-bool div::integer_ok(object::id &xt, object::id &yt,
-                     ularge &xv, ularge &yv)
+bool divide::integer_ok(object::id &xt, object::id &yt,
+                        ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------
 //   Check if dividing two integers works or if we need to promote to real
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero (defensive coding: optimize<div> should have done it
+    // Check divide by zero (defensive coding: optimize<divide> should have done it
     if (yv == 0)
     {
-        ASSERT(!"integer_ok divide by zero, optimize<div> failed?");
+        ASSERT(!"integer_ok divide by zero, optimize<divide> failed?");
         rt.zero_divide_error();
         return false;
     }
@@ -781,14 +781,14 @@ bool div::integer_ok(object::id &xt, object::id &yt,
 }
 
 
-bool div::bignum_ok(bignum_g &x, bignum_g &y)
+bool divide::bignum_ok(bignum_g &x, bignum_g &y)
 // ----------------------------------------------------------------------------
 //   Division works if there is no remainder
 // ----------------------------------------------------------------------------
 {
     if (!y)
     {
-        ASSERT(!"bignum divide by zero, optimize<div> failed");
+        ASSERT(!"bignum divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -809,14 +809,14 @@ bool div::bignum_ok(bignum_g &x, bignum_g &y)
 }
 
 
-bool div::fraction_ok(fraction_g &x, fraction_g &y)
+bool divide::fraction_ok(fraction_g &x, fraction_g &y)
 // ----------------------------------------------------------------------------
 //   Division of fractions, except division by zero
 // ----------------------------------------------------------------------------
 {
     if (!y->numerator())
     {
-        ASSERT(!"fraction divide by zero, optimize<div> failed");
+        ASSERT(!"fraction divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -825,14 +825,14 @@ bool div::fraction_ok(fraction_g &x, fraction_g &y)
 }
 
 
-bool div::complex_ok(complex_g &x, complex_g &y)
+bool divide::complex_ok(complex_g &x, complex_g &y)
 // ----------------------------------------------------------------------------
 //   Divide complex numbers if we have them
 // ----------------------------------------------------------------------------
 {
     if (y->is_zero())
     {
-        ASSERT(!"complex divide by zero, optimize<div> failed");
+        ASSERT(!"complex divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -873,7 +873,7 @@ bool mod::integer_ok(object::id &xt, object::id &yt,
     // Check divide by zero
     if (yv == 0)
     {
-        ASSERT(!"integer mod divide by zero, optimize<div> failed");
+        ASSERT(!"integer mod divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -919,7 +919,7 @@ bool mod::fraction_ok(fraction_g &x, fraction_g &y)
 {
     if (!y->numerator())
     {
-        ASSERT(!"fraction mod divide by zero, optimize<div> failed");
+        ASSERT(!"fraction mod divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -971,7 +971,7 @@ bool rem::integer_ok(object::id &/* xt */, object::id &/* yt */,
     // Check divide by zero
     if (yv == 0)
     {
-        ASSERT(!"integer rem divide by zero, optimize<div> failed");
+        ASSERT(!"integer rem divide by zero, optimize<divide> failed");
         rt.zero_divide_error();
         return false;
     }
@@ -1393,7 +1393,7 @@ algebraic_p arithmetic::evaluate(id          op,
 
     // Fraction types
     if ((x->is_fraction() || y->is_fraction() ||
-         (op == ID_div && x->is_fractionable() && y->is_fractionable())))
+         (op == ID_divide && x->is_fractionable() && y->is_fractionable())))
     {
         if (fraction_g xf = fraction_promotion(x))
         {
@@ -1483,12 +1483,12 @@ algebraic_p arithmetic::evaluate(id          op,
                 {
                     switch(op)
                     {
-                    case ID_add: return polynomial::add(xp, yp); break;
-                    case ID_sub: return polynomial::sub(xp, yp); break;
-                    case ID_mul: return polynomial::mul(xp, yp); break;
-                    case ID_div: return polynomial::div(xp, yp); break;
+                    case ID_add:        return polynomial::add(xp, yp); break;
+                    case ID_subtract:   return polynomial::sub(xp, yp); break;
+                    case ID_multiply:   return polynomial::mul(xp, yp); break;
+                    case ID_divide:     return polynomial::div(xp, yp); break;
                     case ID_mod:
-                    case ID_rem: return polynomial::mod(xp, yp); break;
+                    case ID_rem:        return polynomial::mod(xp, yp); break;
                     default: break;
                     }
                 }
@@ -1604,10 +1604,10 @@ object::result arithmetic::evaluate(id op, ops_t ops)
 //
 // ============================================================================
 
-template object::result arithmetic::evaluate<struct add>();
-template object::result arithmetic::evaluate<struct sub>();
-template object::result arithmetic::evaluate<struct mul>();
-template object::result arithmetic::evaluate<struct div>();
+template object::result arithmetic::evaluate<add>();
+template object::result arithmetic::evaluate<subtract>();
+template object::result arithmetic::evaluate<multiply>();
+template object::result arithmetic::evaluate<divide>();
 template object::result arithmetic::evaluate<struct mod>();
 template object::result arithmetic::evaluate<struct rem>();
 template object::result arithmetic::evaluate<struct pow>();
@@ -1720,7 +1720,7 @@ algebraic_g operator-(algebraic_r x, algebraic_r y)
 //   Subtraction
 // ----------------------------------------------------------------------------
 {
-    return sub::evaluate(x, y);
+    return subtract::evaluate(x, y);
 }
 
 
@@ -1729,7 +1729,7 @@ algebraic_g operator*(algebraic_r x, algebraic_r y)
 //   Multiplication
 // ----------------------------------------------------------------------------
 {
-    return mul::evaluate(x, y);
+    return multiply::evaluate(x, y);
 }
 
 
@@ -1738,7 +1738,7 @@ algebraic_g operator/(algebraic_r x, algebraic_r y)
 //   Division
 // ----------------------------------------------------------------------------
 {
-    return div::evaluate(x, y);
+    return divide::evaluate(x, y);
 }
 
 
@@ -1783,7 +1783,7 @@ INSERT_BODY(arithmetic)
 //   Arithmetic objects do not insert parentheses
 // ----------------------------------------------------------------------------
 {
-    if (o->type() == ID_mul && Settings.UseDotForMultiplication())
+    if (o->type() == ID_multiply && Settings.UseDotForMultiplication())
     {
         auto mode = ui.editing_mode();
         if (mode == ui.ALGEBRAIC || mode == ui.PARENTHESES)
@@ -1959,9 +1959,9 @@ COMMAND_BODY(Div2)
 #define ARITHMETIC_DEFINE(derived)      arithmetic::target_fn derived::target;
 
 ARITHMETIC_DEFINE(add);
-ARITHMETIC_DEFINE(sub);
-ARITHMETIC_DEFINE(mul);
-ARITHMETIC_DEFINE(div);
+ARITHMETIC_DEFINE(subtract);
+ARITHMETIC_DEFINE(multiply);
+ARITHMETIC_DEFINE(divide);
 ARITHMETIC_DEFINE(mod);
 ARITHMETIC_DEFINE(rem);
 ARITHMETIC_DEFINE(pow);

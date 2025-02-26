@@ -497,16 +497,16 @@ struct eq
     operator+(eq<y...>) { return eq<args..., y..., leb(object::ID_add)>(); }
 
     template<byte ...y>
-    eq<args..., y..., leb(object::ID_sub)>
-    operator-(eq<y...>) { return eq<args..., y..., leb(object::ID_sub)>(); }
+    eq<args..., y..., leb(object::ID_subtract)>
+    operator-(eq<y...>) { return eq<args..., y..., leb(object::ID_subtract)>(); }
 
     template<byte ...y>
-    eq<args..., y..., leb(object::ID_mul)>
-    operator*(eq<y...>) { return eq<args..., y..., leb(object::ID_mul)>(); }
+    eq<args..., y..., leb(object::ID_multiply)>
+    operator*(eq<y...>) { return eq<args..., y..., leb(object::ID_multiply)>(); }
 
     template<byte ...y>
-    eq<args..., y..., leb(object::ID_div)>
-    operator/(eq<y...>) { return eq<args..., y..., leb(object::ID_div)>(); }
+    eq<args..., y..., leb(object::ID_divide)>
+    operator/(eq<y...>) { return eq<args..., y..., leb(object::ID_divide)>(); }
 
     template<byte ...y>
     eq<args..., y..., leb(object::ID_mod)>

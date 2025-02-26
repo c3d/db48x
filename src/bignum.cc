@@ -463,7 +463,7 @@ bignum_p operator-(bignum_r y, bignum_r x)
 //   Subtract two bignum values, result has type of x
 // ----------------------------------------------------------------------------
 {
-    sub::remember(target< operator- >);
+    subtract::remember(target< operator- >);
     return bignum::add_sub(y, x, true);
 }
 
@@ -570,7 +570,7 @@ bignum_p operator*(bignum_r y, bignum_r x)
 {
     if (!x || !y)
         return nullptr;
-    mul::remember(target< operator* >);
+    multiply::remember(target< operator* >);
     object::id xt = x->type();
     object::id yt = y->type();
     object::id prodtype = bignum::product_type(yt, xt);
@@ -717,7 +717,7 @@ bignum_p operator/(bignum_r y, bignum_r x)
         return nullptr;
     // Can't do: div::remember(target<operator/>);
     // because the division can generate fractions
-    div::remember(target<divide_and_optimize>);
+    divide::remember(target<divide_and_optimize>);
     object::id yt = y->type();
     object::id xt = x->type();
     object::id prodtype = bignum::product_type(yt, xt);

@@ -227,6 +227,14 @@ struct text : algebraic
         return iterator(this, index).as_text();
     }
 
+
+    text_p extract(object_r first, object_r last) const;
+    text_p extract(size_t first, size_t last) const;
+    // ------------------------------------------------------------------------
+    //   Extract a subtext
+    // ------------------------------------------------------------------------
+
+
     object_p compile() const;
     bool compile_and_run() const;
     // ------------------------------------------------------------------------
@@ -247,5 +255,6 @@ text_g operator*(text_r x, uint y);
 COMMAND_DECLARE(CharToUnicode,1);
 COMMAND_DECLARE(TextToUnicode,1);
 COMMAND_DECLARE(UnicodeToText,1);
+COMMAND_DECLARE(Extract, 3);
 
 #endif // TEXT_H

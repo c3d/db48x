@@ -22,7 +22,7 @@ Off				SystemSetup	Show		"«	»"	Catalog
 
 @ PLANE 2: RIGHT SHIFTED
 [
-MainMenu	xroot		PolynomialsMenu ExpLogMenu	PartsMenu	EquationsMenu
+MainMenu	xroot		PolynomialsMenu PowersMenu	PartsMenu	EquationsMenu
 MemoryMenu	Library		MathMenu	HyperbolicMenu	CircularMenu	RealMenu
 UIText				Undo		ObjectMenu	PlotMenu	UpDir
 EditorHistory			SymbolicMenu	DifferentiationMenu MatrixMenu	FinanceSolverMenu

@@ -1189,6 +1189,93 @@ NFUNCTION_BODY(Truncate)
 
 
 
+NFUNCTION_BODY(ToStandardUncertainty)
+// ----------------------------------------------------------------------------
+//   Compute standard uncertainty
+// ----------------------------------------------------------------------------
+{
+    algebraic_g r = args[0] * args[1];
+    r = abs::run(r);
+    return rnd_or_trnc(r, -2, round);
+}
+
+
+NFUNCTION_BODY(ToRelativeUncertainty)
+// ----------------------------------------------------------------------------
+//   Compute relative uncertainty
+// ----------------------------------------------------------------------------
+{
+   algebraic_g r = args[0] / args[1];
+   r = abs::run(r);
+   return rnd_or_trnc(r, -2, round);
+}
+
+
+static algebraic_p uncertainty_rounding(algebraic_g args[], object::
+                                        id which)
+// ----------------------------------------------------------------------------
+//  Compute standard or relative round
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x  = args[1];
+    algebraic_g u  = args[0];
+    algebraic_g xv = x;
+    if (unit_p xu = unit::get(x))
+        xv = xu->value();
+    if (unit_p uu = unit::get(u))
+    {
+        save<bool> ueval(unit::mode, true);
+        u = u->evaluate();
+        uu = unit::get(u);
+        if (uu)
+            u = uu->value();
+    }
+    if (arithmetic::decimal_promotion(xv, u))
+    {
+        bool      prc = which == object::ID_PrecisionRound;
+        bool      rel = which == object::ID_RelativeRound;
+        decimal_g xd = decimal_p(+xv);
+        decimal_g ud = decimal_p(+u);
+        if (rel)
+            ud = xd * ud;
+        uint  un  = prc ? ud->significant_digits() : 2;
+        large xe  = xd->exponent();
+        large ue  = ud->exponent();
+        large re  = ue - xe - un;
+        return rnd_or_trnc(x, re, round);
+    }
+    rt.type_error();
+    return nullptr;
+}
+
+
+NFUNCTION_BODY(StandardRound)
+// ----------------------------------------------------------------------------
+//   Compute standard rounding
+// ----------------------------------------------------------------------------
+{
+    return uncertainty_rounding(args, ID_StandardRound);
+}
+
+
+NFUNCTION_BODY(RelativeRound)
+// ----------------------------------------------------------------------------
+//   Compute relative rounding
+// ----------------------------------------------------------------------------
+{
+    return uncertainty_rounding(args, ID_RelativeRound);
+}
+
+
+NFUNCTION_BODY(PrecisionRound)
+// ----------------------------------------------------------------------------
+//   Round one value to the precision of another
+// ----------------------------------------------------------------------------
+{
+    return uncertainty_rounding(args, ID_PrecisionRound);
+}
+
+
 NFUNCTION_BODY(xroot)
 // ----------------------------------------------------------------------------
 //   Compute the x-th root
@@ -1381,7 +1468,7 @@ static algebraic_p sum_product(object::id op,
         large            b    = last->as_int64(0, false);
         save<symbol_g *> iref(expression::independent, &name);
 
-        if (op == object::ID_mul)
+        if (op == object::ID_multiply)
         {
             init = integer::make(1);
             for (large i = a; i <= b && init; i++)
@@ -1411,7 +1498,7 @@ static algebraic_p sum_product(object::id op,
     {
         program_g        prg  = program_p(+expr);
         save<symbol_g *> iref(expression::independent, &name);
-        bool             product = op == object::ID_mul;
+        bool             product = op == object::ID_multiply;
         algebraic_g      result  = integer::make(product ? 1 : 0);
         algebraic_g      one     = integer::make(1);
         while (!program::interrupted())
@@ -1450,7 +1537,7 @@ NFUNCTION_BODY(Product)
 //   Product operation
 // ----------------------------------------------------------------------------
 {
-    return sum_product(ID_mul, args, arity);
+    return sum_product(ID_multiply, args, arity);
 }
 
 

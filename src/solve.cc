@@ -35,6 +35,7 @@
 #include "compare.h"
 #include "equations.h"
 #include "expression.h"
+#include "finance.h"
 #include "functions.h"
 #include "integer.h"
 #include "list.h"
@@ -595,6 +596,8 @@ algebraic_p Root::solve(algebraic_g &eq,
         // Actual solving
         if (algebraic_g x = solve(pgm, var, guess))
         {
+            if (FinanceSolverMenu::active())
+                FinanceSolverMenu::round(x);
             if (symbol_p name = var->as_quoted<symbol>())
                 x = assignment::make(name, x);
             if (x && !rt.error())
@@ -957,7 +960,7 @@ COMMAND_BODY(EvalEq)
                 if (d && !d->is_zero(false))
                 {
                     if (d->is_negative(false))
-                        rv = expression::make(ID_sub, rv, -d);
+                        rv = expression::make(ID_subtract, rv, -d);
                     else
                         rv = expression::make(ID_add, rv, d);
                 }
@@ -986,9 +989,18 @@ MENU_BODY(SolvingMenu)
 {
     bool   all    = Settings.AllEquationVariables();
     list_p expr   = expression::current_equation(all, false);
+    return build(mi, expr);
+}
+
+
+bool SolvingMenu::build(menu_info &mi, list_p expr, bool withcmds)
+// ----------------------------------------------------------------------------
+//   Build the solving menu for a given expression
+// ----------------------------------------------------------------------------
+{
     list_g vars   = expr ? expr->names() : nullptr;
     size_t nitems = vars ? vars->items() : 0;
-    items_init(mi, nitems + 1, 3, 1);
+    items_init(mi, nitems + int(withcmds), 3, 1);
     if (!vars)
         return false;
 
@@ -997,7 +1009,8 @@ MENU_BODY(SolvingMenu)
     // First row: Store variables
     mi.plane  = 0;
     mi.planes = 1;
-    menu::items(mi, "EvalEq", ID_EvalEq);
+    if (withcmds)
+        menu::items(mi, "EvalEq", ID_EvalEq);
     for (auto name : *vars)
         if (symbol_p sym = name->as<symbol>())
             menu::items(mi, sym, menu::ID_SolvingMenuStore);
@@ -1007,7 +1020,8 @@ MENU_BODY(SolvingMenu)
     mi.planes = 2;
     mi.skip   = skip;
     mi.index  = mi.plane * ui.NUM_SOFTKEYS;
-    menu::items(mi, "NextEq", ID_NextEq);
+    if (withcmds)
+        menu::items(mi, "NextEq", ID_NextEq);
     for (auto name : *vars)
         if (symbol_p sym = name->as<symbol>())
             menu::items(mi, sym, menu::ID_SolvingMenuSolve);
@@ -1017,7 +1031,8 @@ MENU_BODY(SolvingMenu)
     mi.planes = 3;
     mi.skip   = skip;
     mi.index  = mi.plane * ui.NUM_SOFTKEYS;
-    menu::items(mi, "Eq▶", ID_RcEq);
+    if (withcmds)
+        menu::items(mi, "Eq▶", ID_RcEq);
     for (auto name : *vars)
     {
         if (symbol_g sym = name->as<symbol>())
@@ -1033,15 +1048,16 @@ MENU_BODY(SolvingMenu)
     }
 
     // Add markers
-    for (uint k = 1; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
+    for (uint k = withcmds ? 1 : 0; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
     {
         ui.marker(k + 0 * ui.NUM_SOFTKEYS, L'▶', true);
         ui.marker(k + 1 * ui.NUM_SOFTKEYS, L'?', false);
         ui.marker(k + 2 * ui.NUM_SOFTKEYS, L'▶', false);
     }
 
-    if (list_p expr = expression::current_equation(false, false))
-        ui.transient_object(expr);
+    if (withcmds)
+        if (list_p expr = expression::current_equation(false, false))
+            ui.transient_object(expr);
 
     return true;
 }
@@ -1085,6 +1101,15 @@ static algebraic_p expression_variable_or_unit(uint index)
 }
 
 
+static uint solver_menu_index(int key)
+// ----------------------------------------------------------------------------
+//   Return the menu index in the solver menu
+// ----------------------------------------------------------------------------
+{
+    return key - KEY_F1 + 5 * ui.page() - (FinanceSolverMenu::active() ? 0 : 1);
+}
+
+
 COMMAND_BODY(SolvingMenuRecall)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the SolvingMenu
@@ -1093,7 +1118,7 @@ COMMAND_BODY(SolvingMenuRecall)
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
-        uint index = key - KEY_F1 + 5 * ui.page() - 1;
+        uint index = solver_menu_index(key);
         if (symbol_g sym = expression_variable(index))
             if (object_p value = directory::recall_all(sym, true))
                 if (algebraic_p a = value->as_algebraic())
@@ -1138,7 +1163,7 @@ COMMAND_BODY(SolvingMenuStore)
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
-        uint index = key - KEY_F1 + 5 * ui.page() - 1;
+        uint index = solver_menu_index(key);
         if (algebraic_p entry = expression_variable_or_unit(index))
         {
             if (object_p obj = strip(rt.pop()))
@@ -1227,7 +1252,7 @@ COMMAND_BODY(SolvingMenuSolve)
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
-        uint idx = key - KEY_F1 + 5 * ui.page() - 1;
+        uint idx = solver_menu_index(key);
         if (symbol_g sym = expression_variable(idx))
         {
             object_g    obj   = directory::recall_all(sym, false);

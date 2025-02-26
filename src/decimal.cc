@@ -1574,7 +1574,7 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
     id xty = x->type();
     id yty = y->type();
     if (xty != yty)
-        return sub(x, decimal_g(neg(y)));
+        return subtract(x, decimal_g(neg(y)));
     add::remember(target<add>);
 
     // Read information from both numbers
@@ -1679,7 +1679,7 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
 }
 
 
-decimal_p decimal::sub(decimal_r x, decimal_r y)
+decimal_p decimal::subtract(decimal_r x, decimal_r y)
 // ----------------------------------------------------------------------------
 //   Subtraction of two numbers with the same sign
 // ----------------------------------------------------------------------------
@@ -1690,7 +1690,7 @@ decimal_p decimal::sub(decimal_r x, decimal_r y)
     id yty = y->type();
     if (xty != yty)
         return add(x, decimal_g(neg(y)));
-    sub::remember(target<sub>);
+    subtract::remember(target<subtract>);
 
     // Read information from both numbers
     info  xi = x->shape();
@@ -1782,7 +1782,7 @@ decimal_p decimal::sub(decimal_r x, decimal_r y)
 }
 
 
-decimal_p decimal::mul(decimal_r x, decimal_r y)
+decimal_p decimal::multiply(decimal_r x, decimal_r y)
 // ----------------------------------------------------------------------------
 //   Multiplication of two decimal numbers
 // ----------------------------------------------------------------------------
@@ -1791,7 +1791,7 @@ decimal_p decimal::mul(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
-    mul::remember(target<mul>);
+    multiply::remember(target<multiply>);
 
     // Read information from both numbers
     info     xi  = x->shape();
@@ -1900,7 +1900,7 @@ decimal_p decimal::mul(decimal_r x, decimal_r y)
 }
 
 
-decimal_p decimal::div(decimal_r x, decimal_r y)
+decimal_p decimal::divide(decimal_r x, decimal_r y)
 // ----------------------------------------------------------------------------
 //   Division of two decimal numbers
 // ----------------------------------------------------------------------------
@@ -1916,7 +1916,7 @@ decimal_p decimal::div(decimal_r x, decimal_r y)
 {
     if (!x || !y)
         return nullptr;
-    div::remember(target<div>);
+    divide::remember(target<divide>);
 
     // Check if we divide by zero
     if (y->is_zero())

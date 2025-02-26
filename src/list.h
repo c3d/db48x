@@ -297,10 +297,6 @@ struct list : text
     //   Convert `depth` items to a list
     // ------------------------------------------------------------------------
 
-
-
-
-
     // Append data to a list
     list_p append(list_p a) const;
     list_p append(object_p o) const;
@@ -325,6 +321,9 @@ struct list : text
     list_p substitute(expression_r assign) const;
     list_p substitute(list_r assignments) const;
     list_p substitute(object_r repl) const;
+
+    // Extract a sublist
+    list_p extract(object_r first, object_r last) const;
 
 public:
     // Shared code for parsing and rendering, taking delimiters as input

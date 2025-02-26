@@ -505,6 +505,34 @@ bool algebraic::to_fraction(algebraic_g &x)
 }
 
 
+static algebraic_p to_decimal_callback(algebraic_r x, bool weak)
+// ----------------------------------------------------------------------------
+//  Callback for to_decimal applied to arrays
+// ----------------------------------------------------------------------------
+{
+    algebraic_g v = x;
+    return algebraic::to_decimal(v, weak) ? v : nullptr;
+}
+
+
+static algebraic_p to_decimal_strong(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   For the string case (error emitting)
+// ----------------------------------------------------------------------------
+{
+    return to_decimal_callback(x, false);
+}
+
+
+static algebraic_p to_decimal_weak(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   For the weak case (no error emission)
+// ----------------------------------------------------------------------------
+{
+    return to_decimal_callback(x, true);
+}
+
+
 bool algebraic::to_decimal(algebraic_g &x, bool weak)
 // ----------------------------------------------------------------------------
 //   Convert a value to decimal
@@ -571,17 +599,28 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
     case ID_neg_decimal:
         return decimal_promotion(x);
     case ID_constant:
+    case ID_standard_uncertainty:
+    case ID_relative_uncertainty:
     case ID_xlib:
-        x = constant_p(+x)->value();
-        if (x)
-        {
-            if (expression_p expr = x->as<expression>())
-            {
-                settings::SaveNumericalResults save(true);
-                x = expr->evaluate();
-            }
-        }
+    {
+        settings::SaveNumericalResults save(true);
+        x = constant_p(+x)->evaluate();
         return x && !rt.error();
+    }
+
+    case ID_array:
+    case ID_list:
+    {
+        bool ok = true;
+        if (list_p res = list_p(+x)->map(weak
+                                         ? to_decimal_weak
+                                         : to_decimal_strong))
+            x = res;
+        else
+            ok = false;
+        return ok;
+    }
+
     case ID_expression:
         if (!unit::mode)
         {

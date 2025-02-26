@@ -67,7 +67,8 @@ void runtime_invariants::check_invariants()
 {
     ASSERT(rt.Returns <= rt.HighMem);
     ASSERT(rt.CallStack <= rt.Returns);
-    ASSERT(rt.XLibs <= rt.CallStack);
+    ASSERT(rt.XLibs <= rt.Constants);
+    ASSERT(rt.Constants <= rt.CallStack);
     ASSERT(rt.Directories <= rt.XLibs);
     ASSERT(rt.Locals <= rt.Directories);
     ASSERT(rt.Undo <= rt.Locals);
@@ -104,6 +105,7 @@ runtime::runtime(byte *mem, size_t size)
       Locals(),
       Directories(),
       XLibs(),
+      Constants(),
       CallStack(),
       Returns(),
       HighMem(),
@@ -135,7 +137,8 @@ void runtime::memory(byte *memory, size_t size)
     // Stuff at top of memory
     Returns = HighMem;                          // No return stack
     CallStack = Returns;                        // Reserve space for call stack
-    XLibs = CallStack;                          // No XLibs loaded
+    Constants = CallStack;                      // No Constants loaded
+    XLibs = Constants;                          // No XLibs loaded
     Directories = XLibs - 1;                    // Make room for one path
     Locals = Directories;                       // No locals
     Args = Locals;                              // No args
@@ -1559,7 +1562,7 @@ bool runtime::updir(size_t count)
 
 // ============================================================================
 //
-//   XLibs
+//   XLibs and constants
 //
 // ============================================================================
 
@@ -1571,28 +1574,67 @@ bool runtime::attach(size_t nentries)
     runtime_invariants check;
     size_t existing = xlibs();
     size_t count    = nentries - existing;
-    if (nentries > existing)
+    if (count)
     {
-        size_t needed = (nentries - existing) * sizeof(object_p);
-        if (available(needed) < needed)
-            return false;
-        for (object_p *ptr = Stack; ptr < CallStack; ptr++)
-            ptr[-count] = ptr[0];
-        for (object_p *ptr = CallStack - count; ptr < CallStack; ptr++)
-            *ptr = nullptr;
+        if (nentries > existing)
+        {
+            size_t needed = (nentries - existing) * sizeof(object_p);
+            if (available(needed) < needed)
+                return false;
+            for (object_p *ptr = Stack; ptr < Constants; ptr++)
+                ptr[-count] = ptr[0];
+            for (object_p *ptr = Constants - count; ptr < Constants; ptr++)
+                *ptr = nullptr;
+        }
+        else if (nentries < existing)
+        {
+            for (object_p *ptr = Constants-1; ptr >= Stack; ptr--)
+                ptr[0] = ptr[count];
+        }
+        Stack       -= count;
+        Args        -= count;
+        Undo        -= count;
+        Locals      -= count;
+        Directories -= count;
+        XLibs       -= count;
     }
-    else if (nentries < existing)
-    {
-        for (object_p *ptr = CallStack-1; ptr >= Stack; ptr--)
-            ptr[0] = ptr[count];
-    }
-    Stack       -= count;
-    Args        -= count;
-    Undo        -= count;
-    Locals      -= count;
-    Directories -= count;
-    XLibs       -= count;
+    return true;
+}
 
+
+bool runtime::constants(size_t nentries)
+// ----------------------------------------------------------------------------
+//   Change the number of constants to the given number, then zero the new ones
+// ----------------------------------------------------------------------------
+{
+    runtime_invariants check;
+    size_t existing = constants();
+    size_t count    = nentries - existing;
+    if (count)
+    {
+        if (nentries > existing)
+        {
+            size_t needed = (nentries - existing) * sizeof(object_p);
+            if (available(needed) < needed)
+                return false;
+            for (object_p *ptr = Stack; ptr < CallStack; ptr++)
+                ptr[-count] = ptr[0];
+            for (object_p *ptr = CallStack - count; ptr < CallStack; ptr++)
+                *ptr = nullptr;
+        }
+        else if (nentries < existing)
+        {
+            for (object_p *ptr = CallStack-1; ptr >= Stack; ptr--)
+                ptr[0] = ptr[count];
+        }
+        Stack       -= count;
+        Args        -= count;
+        Undo        -= count;
+        Locals      -= count;
+        Directories -= count;
+        XLibs       -= count;
+        Constants   -= count;
+    }
     return true;
 }
 
@@ -1867,6 +1909,7 @@ bool runtime::call_stack_grow(object_p &next, object_p &end)
     Locals -= CALLS_BLOCK;
     Directories -= CALLS_BLOCK;
     XLibs -= CALLS_BLOCK;
+    Constants -= CALLS_BLOCK;
     CallStack -= CALLS_BLOCK;
     next = nextg;
     end = endg;
@@ -1886,6 +1929,7 @@ void runtime::call_stack_drop()
     Locals += CALLS_BLOCK;
     Directories += CALLS_BLOCK;
     XLibs += CALLS_BLOCK;
+    Constants += CALLS_BLOCK;
     CallStack += CALLS_BLOCK;
     for (object_p *s = CallStack-1; s >= Stack; s--)
         s[0] = s[-CALLS_BLOCK];

@@ -182,11 +182,11 @@ values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
 
 Based numbers are used to perform computations in any base. The most common
 bases used in computer science, 2, 8, 10 and 16, have special shortcuts.
-The [Bases Menu](#bases-menu) list operations on based numbers.
+The `BasesMenu` list operations on based numbers.
 
 Like integers, based numbers can be [arbitrary large](#big-integers).
 However, operations on based numbers can be truncated to a specific number of
-bits using the [WordSize](#wordsize) setting. This makes it possible to perform
+bits using the `WordSize` setting. This makes it possible to perform
 computations simulating a 16-bit or 256-bit processor.
 
 
@@ -210,8 +210,8 @@ typically selects the most efficient form for a given operation.
 
 Available operations on complex numbers include basic arithmetic, trigonometric,
 logarithms, exponential and hyperbolic functions, as well as a few specific
-functions such as [conj](#conj) or [arg](#arg). These functions are available in
-the [Complex Menu](#complex-menu).
+functions such as `conj` or `arg`. These functions are available in
+the `ComplexMenu`.
 
 
 ## Expressions
@@ -223,6 +223,19 @@ or hyperbolic functions can apply to algebraic expressions.
 An expression that contains an equal sign, e.g. `sin X + 1 = cos X`, is called
 an *equation*. It can be given as an argument to the solver.
 
+
+## Symbols
+
+A symbol is a sequence of characters such as `Hello` or `A→B` that can be used
+ot identify variables. Evaluating a symbol evaluates the underlying variable if
+it exists, or evaluates as itself otherwise.
+
+## Programs
+
+Programs are represented as RPL objects enclosed between the `«` and `»`
+delimiters, and containing a sequence of RPL objects. Running (or evaluating) a
+program is done using the `Run` or `Eval` commands, which evaluate each RPL
+object in the program in turn.
 
 ## Lists
 

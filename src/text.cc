@@ -29,6 +29,7 @@
 
 #include "text.h"
 
+#include "grob.h"
 #include "integer.h"
 #include "parser.h"
 #include "program.h"
@@ -389,4 +390,79 @@ COMMAND_BODY(UnicodeToText)
             return OK;
     }
     return ERROR;
+}
+
+
+COMMAND_BODY(Extract)
+// ----------------------------------------------------------------------------
+//   Extract a subtext from the main text (called "sub" on HP calculators)
+// ----------------------------------------------------------------------------
+{
+    object_g value = rt.stack(2);
+    object_g start = rt.stack(1);
+    object_g end   = rt.stack(0);
+
+    id ty = value->type();
+    switch (ty)
+    {
+    case ID_text:
+        value = text_p(+value)->extract(start, end);
+        break;
+
+    case ID_array:
+    case ID_list:
+        value = list_p(+value)->extract(start, end);
+        break;
+
+    case ID_grob:
+    case ID_bitmap:
+    case ID_Pict:
+        value = grob_p(+value)->extract(start, end);
+        break;
+
+    default:
+        rt.type_error();
+        return ERROR;
+    }
+
+    if (value && rt.drop(2) && rt.top(value))
+        return OK;
+
+    return ERROR;
+}
+
+
+
+text_p text::extract(object_r &first, object_r &last) const
+// ----------------------------------------------------------------------------
+//   Extract a subtext
+// ----------------------------------------------------------------------------
+{
+    int fidx = first->as_int32(1, true);
+    int lidx = last->as_int32(1, true);
+    if (rt.error())
+        return nullptr;
+    if (--fidx < 0)
+        fidx = 0;
+    if (--lidx < 0)
+        lidx = 0;
+    return extract(fidx, lidx);
+}
+
+
+text_p text::extract(size_t first, size_t last) const
+// ----------------------------------------------------------------------------
+//   Extract a text from a given range
+// ----------------------------------------------------------------------------
+{
+    iterator it(this, first);
+    size_t fidx = it.index;
+    while (first <= last)
+    {
+        first++;
+        it++;
+    }
+    size_t len = it.index - fidx;
+    gcutf8 txt = it.first + fidx;
+    return text::make(txt, len);
 }

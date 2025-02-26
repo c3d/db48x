@@ -1,4 +1,4 @@
-#Equations library
+# Equations library
 
 The DB48X calculator features a library of equations covering mathematics,
 physics, chemistry and computer science. The built-in equations can be extended
@@ -163,12 +163,12 @@ The 78 variables in the Electricity section are:
 * `∈r`: Relative permittivity
 * `μr`: Relative permeability
 * `ω`: Angular frequency (dim.: angle/time)
-* `ω0`: Resonant angular frequency (dim.: angle/time)
+* `ω₀`: Resonant angular frequency (dim.: angle/time)
 * `φ`: Phase angle
 * `φp`: Parallel phase angle
 * `φs`: Series phase angle
-* `θ1`: First subtended angle relative to the left end of the wire
-* `θ2`: Second subtended angle relative to the right end of the wire
+* `θ₁`: First subtended angle relative to the left end of the wire
+* `θ₂`: Second subtended angle relative to the right end of the wire
 * `ρ`: Resistivity (dim.: resistance·length; in SI: ohm·meter, Ω·m), or Volumic charge density ([Drift Speed & Current Density](#Drift Speed & Current Density)) (dim.: charge/volume, in SI: C/m^3)
 * `ρ0`: Resistivity at the reference temperature `T0` (dim.: resistance·length; in SI: ohm·meter, Ω·m)
 * `ΔI`: Current Change (dim.: charge/time; in SI: ampere, A)
@@ -246,14 +246,14 @@ These equations describe the electrostatic force between two point charged parti
 * **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field at position `r`) from 5 known variables:
 ```rpl
 q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
-@ Expecting [ F=14.38008 28578 N Er=8.98755 17861 3⁳¹⁹ N/C ]
+@ Expecting [ F=14.38008 28579 N Er=8.98755 17861 7⁳¹⁹ N/C ]
 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 ```
 
 * **Example 2**. A square metal plate `L = 8_cm` on a side carries a charge of `q1 = 6_μC`. Approximate values of the electric force & electric field for a point charge `q2 = 1_μC` located at `r = 3_m` can be calculated with Coulomb’s law if the separation distance is much greater than the plate dimension `r >> L`. The whole plate is indeed considered as being a point charge providing that `r > 10 · L`. Therefore, to calculate `[F_N;Er_N/C]`:
 ```rpl
 L=8_cm r=3_m q1=6E-6_C  q2=1E-6_C  r=3_m  εr=1  qtest=1E-6_C
-@ Expecting [ F=5.99170 11907 5⁳⁻³ N Er=5 991.70119 075 N/C ]
+@ Expecting [ F=5.99170 11907 8⁳⁻³ N Er=5 991.70119 078 N/C ]
 if 'r > 10*L' then
  'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 end
@@ -266,7 +266,7 @@ The expression for the radial electric field at the distance `r` is approximatel
 * To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 4 known variables:
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11907 5 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11907 8 N/C ]
 'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
 @ Keep
 ```
@@ -278,24 +278,24 @@ Er0=Er
 
 ### E Field Finite Line
 
-The expression of the radial electric field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`.
+The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ1` and angle `θ2=360°-θ1` (see figure):
+* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
-r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
-Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 892 N/C ]
+r='(3_m)/(2*tan 30_°)' θ₂='360_°-30_°'
+Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ₁=30_°
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 894 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 @ Keep
 ```
 
-* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) with the angles `θ1=ATAN((L/2)/r)` and `θ2=360°-θ1` (see figure):
+* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) with the angles `θ₁=ATAN((L/2)/r)` and `θ₂=360°-θ₁` (see figure):
 ```rpl
-Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ1='atan(L/2/r)' θ2='360_°-θ1'
+Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ₁='atan(L/2/r)' θ₂='360_°-θ₁'
 if 'r < L/10' then
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52392 4 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52392 7 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 end
 @ Keep
@@ -303,7 +303,7 @@ end
 Verify relative difference under condition `5_cm << 3_m` with the example of [E Field Infinite Line](#E Field Infinite Line)
 ```rpl
 Er0 Er %Ch
-@ Expecting -5.55093 02084 6⁳⁻²
+@ Expecting -0.05550 93020 85
 @ % of relative difference
 ```
 
@@ -314,7 +314,7 @@ The expression of the perpendicular electric field is constant over an infinite 
 * To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position `[d=5_mm]` above a square plate of width `[L=8_cm]` and surface `A=L^2` where `d << L` when `d < L/10` is verified:
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
-@ Expecting [ σ=0.00000 00937 5 C/cm↑2 Ep=52 941 049.997 N/C ]
+@ Expecting [ σ=0.00000 00937 5 C/cm↑2 Ep=52 941 049.9972 N/C ]
 if 'd < L/10' then
  'ROOT(ⒺE Field Infinite Plate;[σ;Ep];[1_C/cm^2;1_N/C])'
 end
@@ -414,7 +414,7 @@ E=0.025_J  C=20_μF
 * To calculate `[uE_(J/m^3)]` (Volumic density electric energy) from 2 known variables:
 ```rpl
 E=5_V/m  εr=1
-@ Expecting [ uE=1.10677 34773 6⁳⁻¹⁰ J/m↑3 ]
+@ Expecting [ uE=1.10677 34773 5⁳⁻¹⁰ J/m↑3 ]
 'ROOT(ⒺVolumic Density Electric Energy;[uE];[1_(J/m^3)])'
 ```
 
@@ -495,11 +495,11 @@ Vi=0_V  Vf=5_V  R=50_Ω  L=50_mH  t=75_μs
 
 ### Resonant Frequency
 
-* To calculate `[ω0;Qs;Qp;f0]` (Resonant angular velocity; Parallel & Series quality factors; Resonant frequency) from 3 known variables:
+* To calculate `[ω₀;Qs;Qp;f0]` (Resonant angular velocity; Parallel & Series quality factors; Resonant frequency) from 3 known variables:
 ```rpl
 L=500_mH  C=8_μF  R=10_Ω
-@ Expecting [ ω0=500. r/s Qs=25. Qp=0.04 f0=79.57747 15459 Hz ]
-'ROOT(ⒺResonant Frequency;[ω0;Qs;Qp;f0];[1_r/s;1;1;1_Hz])'
+@ Expecting [ ω₀=500. r/s Qs=25. Qp=0.04 f0=79.57747 15459 Hz ]
+'ROOT(ⒺResonant Frequency;[ω₀;Qs;Qp;f0];[1_r/s;1;1;1_Hz])'
 ```
 
 ### Plate Capacitor
@@ -509,7 +509,7 @@ L=500_mH  C=8_μF  R=10_Ω
 * To calculate `[d_cm;ΔV_V;Ein_(N/C);σ_(μC/m^2)]` (Distance; Voltage; Internal E field; Surface charge density) from 4 known variables:
 ```rpl
 C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
-@ Expecting [ d=80.04185 78823 pm σ=750 000. μC/m↑2 Ein=3.74803 89378 4⁳¹⁰ N/C ΔV=3. V ]
+@ Expecting [ d=80.04185 7882 pm σ=750 000. μC/m↑2 Ein=3.74803 89378 6⁳¹⁰ N/C ΔV=3. V ]
 'ROOT(ⒺPlate Capacitor;[d;σ;Ein;ΔV];[1_pm;1_(μC/m^2);1_(N/C);1_V])'
 ```
 
@@ -520,7 +520,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[C_μF;ΔV_V]` (Capacitance; Voltage) from 5 known variables:
 ```rpl
 εr=1  Q=75_μC  ro=1_cm  ri=.999_cm  L=10_cm
-@ Expecting [ C=5 560.46819 206 pF ΔV=13 488.07284 02 V ]
+@ Expecting [ C=5 560.46819 203 pF ΔV=13 488.07284 02 V ]
 'ROOT(ⒺCylindrical Capacitor;[C;ΔV];[1_pF;1_V])'
 ```
 
@@ -531,7 +531,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[L_mH]` (Inductance) from 4 known variables:
 ```rpl
 μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
-@ Expecting [ L=3.01592 89470 3⁳⁻² mH ]
+@ Expecting [ L=0.03015 92894 7 mH ]
 'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
 ```
 
@@ -542,7 +542,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[L_mH]` (Inductance) from 4 known variables:
 ```rpl
 μr=1  N=5000  h=2_cm  ri=2_cm  ro=4_cm
-@ Expecting [ L=69.31471 80464 mH ]
+@ Expecting [ L=69.31471 80468 mH ]
 'ROOT(ⒺToroid Inductance;[L];[1_mH])'
 ```
 
@@ -1034,8 +1034,8 @@ The 28 variables in the Magnetism section are:
 
 * `α1`: Subtended internal left angle relative to the top ends of the solenoid
 * `α2`: Subtended internal right angle relative to the top ends of the solenoid
-* `θ1`: Subtended left angle relative to the top ends of the solenoid
-* `θ2`: Subtended right angle relative to the ends of the wire
+* `θ₁`: Subtended left angle relative to the top ends of the solenoid
+* `θ₂`: Subtended right angle relative to the ends of the wire
 * `θ`: Angle between the line of the magnetic field and the speed of the moving charge
 * `μr`: Relative permeability
 * `B`: Magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
@@ -1071,14 +1071,14 @@ The magnetic field expression differs depending upon whether the point at `r` is
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
 μr=1  rw=0.25_cm  r=0.2_cm  I=25_A
-@ Expecting [ B=1.59999 99997 8⁳⁻³ T ]
+@ Expecting [ B=1.59999 99997 9⁳⁻³ T ]
 'ROOT(ⒺStraight Wire Infinite;[B];[1_T])'
 ```
 
 * **Example 2.** Outside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
 μr=1  rw=0.25_cm  r=5_cm  I=25_A
-@ Expecting [ B=9.99999 99986 2⁳⁻⁵ T ]
+@ Expecting [ B=9.99999 99986 8⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Infinite;[B];[1_T])'
 @ Save B for later
 ```
@@ -1091,23 +1091,23 @@ B0=B
 
 #### Straight Wire Finite
 
-The expression for the magnetic field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
+The expression for the magnetic field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
 
 ![B Field From Finite Wire](img/B_Field_From_Finite_Wire.bmp)
 
 * **Example 1.** To calculate `[B_T]` (Magnetic field) from 6 known variables:
 ```rpl
-μr=1_1  rw=0.25_cm  r=5_cm  I=25_A  θ1=30_°  θ2=150_°
-@ Expecting [ B=8.66025 40366 5⁳⁻⁵ T ]
+μr=1_1  rw=0.25_cm  r=5_cm  I=25_A  θ₁=30_°  θ₂=150_°
+@ Expecting [ B=8.66025 40367⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Finite;[B];[1_T])'
 @ Save for test below
 ```
 
 * **Example 2.** When 'r << L' which means 'r < L/10', we can verify that the value of B for a infinite wire approximates the exact value calculated for a finite wire of length 'L'.
 ```rpl
-L=3_m  μr=1  rw=0.25_cm  r=5_cm  I=25_A  θ1='atan(r/L/2)'  θ2='180_°-θ1'
+L=3_m  μr=1  rw=0.25_cm  r=5_cm  I=25_A  θ₁='atan(r/L/2)'  θ₂='180_°-θ₁'
 if 'r < L/10' then
-@ Expecting [ B=9.99965 27944 8⁳⁻⁵ T ]
+@ Expecting [ B=9.99965 27945 4⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Finite;[B];[1_T])'
 end
 @ Save for test below
@@ -1128,7 +1128,7 @@ The force between wires is positive for an attractive force (for currents having
 * To calculate `[Fba_N]` (Magnetic force) from 4 known variables:
 ```rpl
 Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
-@ Expecting [ Fba=1.99999 99997 2⁳⁻³ N ]
+@ Expecting [ Fba=1.99999 99997 4⁳⁻³ N ]
 'ROOT(ⒺForce Between Wires;[Fba];[1_N])'
 ```
 
@@ -1161,7 +1161,7 @@ The expression for the magnetic field in the center depends on the subtended int
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
 μr=10  nl=5_mm^-1  I=1.25_A  α1=150_°  α2=30_°
-@ Expecting [ B=0.06801 74761 49 T ]
+@ Expecting [ B=6.80174 76149 8⁳⁻² T ]
 'ROOT(ⒺB Field In Finite Solenoid;[B];[1_T])'
 @ Save variables for later use
 ```
@@ -1170,7 +1170,7 @@ The expression for the magnetic field in the center depends on the subtended int
 ```rpl
 L=3_m  μr=10  r=10_cm  nl=5000_m^-1  I=1.25_A  α2='atan(r/L/2)'  α1='180_°-α2'
 if 'r < L/10' then
-@ Expecting [ B=0.07852 89102 93 T ]
+@ Expecting [ B=0.07852 89102 94 T ]
 'ROOT(ⒺB Field In Finite Solenoid;[B];[1_T])'
 end
 @ Save variables for later use
@@ -1191,7 +1191,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
 μr=10  N=50  ri=5_cm  ro=7_cm  I=10_A
-@ Expecting [ B=1.66666 66664 4⁳⁻² T ]
+@ Expecting [ B=1.66666 66664 5⁳⁻² T ]
 'ROOT(ⒺB Field In Toroid;[B];[1_T])'
 ```
 
@@ -1239,7 +1239,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s  θ=3
 * To calculate `[uB_(J/m^3)]` (Volumic density of magnetic energy) from 2 known variables:
 ```rpl
 μr=3.0  B=0.8_T
-@ Expecting [ uB=84 882.63632 74 J/m↑3 ]
+@ Expecting [ uB=84 882.63632 69 J/m↑3 ]
 'ROOT(ⒺVolumic Density Magnetic Energy;[uB];[1_(J/m^3)])'
 ```
 
@@ -1250,7 +1250,7 @@ The 38 variables in the Motion section are:
 
 * `α`: Angular acceleration (dim.: angle/time^2, in SI: r/s^2)
 * `ω`: Angular velocity ([Circular Motion](#Circular Motion)), or Angular velocity at `t` ([Angular Motion](#Angular Motion)) (dim.: angle/time, in SI: r/s)
-* `ω0`: Initial angular velocity (dim.: angle/time, in SI: r/s)
+* `ω₀`: Initial angular velocity (dim.: angle/time, in SI: r/s)
 * `ρ`: Fluid density (dim.: mass/volume, in SI: kg/m^3)
 * `θ`: Angular position at `t` (dim.: angle)
 * `θ0`: Initial angular position ([Angular Motion](#Angular Motion)), or Initial vertical angle ([Projectile Motion](#Projectile Motion))
@@ -1324,7 +1324,7 @@ x0=0_ft  y0=0_ft  θ0=45_°  v0=200_ft/s  t=10_s
 
 * To calculate `[ω_r/min;Θ_°]` (Angular velocity at time `t`; Angular position at time `t`) from 4 known variables:
 ```rpl
-θ0=0_°  ω0=0_r/min  α=1.5_r/min^2  t=30_s
+θ0=0_°  ω₀=0_r/min  α=1.5_r/min^2  t=30_s
 @ Expecting [ ω=0.75 r/min θ=10.74295 86587 ° ]
 'ROOT(ⒺAngular Motion;[ω;θ];[1_r/min;1_°])'
 ```
@@ -1345,15 +1345,15 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a falling big mass, to calculate `[vt_ft/s;v_ft/s;tfr_s;xfr_ft]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 6 known variables:
 ```rpl
 Cd=0.15  ρ=0.025_lb/ft^3  Ah=100000_in^2  m=1250_lb  t=5_s  fr=0.95
-@ Expecting [ vt=175.74722 3631 ft/s v=127.18655 2185 ft/s tfr=10.00590 25332 s ]
-'ROOT(ⒺTerminal Velocity;[vt;v;tfr];[1_ft/s;1_ft/s;1_s])'
+@ Expecting [ vt=175.74722 3631 ft/s v=127.18655 2185 ft/s tfr=10.00590 25332 s xfr=1 117.39339 247 ft ]
+'ROOT(ⒺTerminal Velocity;[vt;v;tfr;xfr];[1_ft/s;1_ft/s;1_s;1_ft])'
 ```
 
 * **Example 2**. For a human skydiving head first, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 6 known variables:
 ```rpl
 Cd=0.7  ρ=1.29_kg/m^3  Ah=0.18_m^2  m=75_kg  t=5_s  fr=0.95
-@ Expecting [ vt=95.13182 74789 m/s v=45.10777 55851 m/s tfr=17.76964 17471 s ]
-'ROOT(ⒺTerminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=312.11229 4878 ft/s v=147.99138 9715 ft/s tfr=17.76964 17471 s xfr=3 524.12177 429 ft ]
+'ROOT(ⒺTerminal Velocity;[vt;v;tfr;xfr];[1_ft/s;1_ft/s;1_s;1_ft])'
 ```
 
 #### Buoyancy & Terminal Velocity
@@ -1363,15 +1363,15 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a golf ball falling in water, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.5  ρ=1077,5_(kg/m^3)  ρf=1000_(kg/m^3)  d=4.282_cm  Ah=14.40068 68745_cm↑2  Vol=41.10916 07978_cm↑3  t=3e-2_s  fr=0.95
-@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=5.50264 78343 2⁳⁻² s ]
-'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=5.50264 78343 2⁳⁻² s xfr=1.03003 49562 7⁳⁻² m ]
+'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
 * **Example 2**. For a CO2 bubble in a glass of champagne, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3_cm↑2  Vol=5.23598 77559 8e-4_cm↑3  t=0.1_s  fr=0.95
-@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s ]
-'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s xfr=0.15488 56277 51 m ]
+'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
 #### Escape and Orbital Velocities
@@ -1397,19 +1397,19 @@ The 40 variables in the Optics section are:
 * `λ`: Light wavelength
 * `θ`: Angle between initial light polarisation direction and polarizer transmission axis ([Malus Law](#Malus Law)), or Angle subtended by two points separated by y on the screen and the middle of one slit ([2 Slits Young Interference](#2 Slits Young Interference)), or two slits ([One Slit Diffraction](#One Slit Diffraction))
 * `θ0`: Acceptance angle to enter an optical fiber in the outer medium of refraction index `n0f`
-* `θ1`: Angle of incidence in the medium of refraction index n1
-* `θ2`: Angle of refraction in the medium of refraction index n2
+* `θ₁`: Angle of incidence in the medium of refraction index n1
+* `θ₂`: Angle of refraction in the medium of refraction index n2
 * `θB`: Brewster angle
 * `θc`: Critical angle
 * `θr`: Rayleigh's criterion limiting
 * `a`: Width of a diffraction slit
 * `d`: Distance between two interference slits
-* `E0`: Incident light electrtc field
+* `E₀`: Incident light electrtc field
 * `f`: Focal length
-* `fx0`: Frequency of the incident X-ray (dim.: time^-1, in SI: hertz, Hz)
+* `fx₀`: Frequency of the incident X-ray (dim.: time^-1, in SI: hertz, Hz)
 * `fx`: Frequency of the transmitted X-ray (dim.: time^-1, in SI: hertz, Hz)
 * `I`: Transmitted irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
-* `I0`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
+* `I₀`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix`: Transmitted irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix0`: Incident irradiance or polarized X rayx radiance flux (dim.: power/area, in SI: W/m^2)
 * `m`: Magnification
@@ -1437,11 +1437,11 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 ![Refraction Law](img/RefractionLaw.bmp)
 
-* To calculate `[θ2_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
+* To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
-n1=1  n2=1.333  θ1=45_°
-@ Expecting [ θ2=32.03672 30399 ° v1=299 792 458 m/s v2=224 900 568.642 m/s ]
-'ROOT(ⒺRefraction Law;[θ2;v1;v2];[1_°;1_m/s;1_m/s])'
+n1=1  n2=1.333  θ₁=45_°
+@ Expecting [ θ₂=32.03672 30399 ° v1=299 792 458 m/s v2=224 900 568.642 m/s ]
+'ROOT(ⒺRefraction Law;[θ₂;v1;v2];[1_°;1_m/s;1_m/s])'
 ```
 
 #### Critical Angle
@@ -1472,12 +1472,11 @@ The Brewster angle is the angle of incidence at which the reflected wave is comp
 
 ![Brewster’s Law](img/Brewster’sLaw.bmp)
 
-* To calculate `[θB_°;θ2_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
+* To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
 n1=1  n2=1.5
-@ Faiing [ v1=299 792 458 m/s v2=199 861 638.667 m/s θB=56.30993 2474 ° θ2=33.69006 7526 ° ]
-@ C#10 NOT OK MSOLVER: "Inconsistent units". SOLVE computation of θ2 alone fails for the eqn: 'θB+θ2=90'!!
-'ROOT(ⒺBrewster’s Law;[v1;v2;θB;θ2];[1_m/s;1_m/s;1_°;1_°])'
+@ Expecting [ v1=299 792 458 m/s v2=199 861 638.667 m/s θB=56.30993 2474 ° θ₂=33.69006 7526 ° ]
+'ROOT(ⒺBrewster’s Law;[v1;v2;θB;θ₂];[1_m/s;1_m/s;1_°;1_°])'
 ```
 
 #### Spherical Reflection
@@ -1526,15 +1525,15 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Malus Law
 
-If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx0`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
+If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
 ![Malus Law](img/Malus Law BW.bmp)
 
-* To calculate `[I_(W/m^2);Ix_(W/m^2),E0_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
+* To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
-θ=30_°  I0=10_(W/m^2)  fx0=3e17_Hz  fx=2.7e17_Hz  I0x=0.1_(W/m^2)
-@ Expecting [ I=7.5 W/m↑2 Ix=0.06751 63889 32 W/m↑2 E0=86.80210 98142 V/m ]
-'ROOT(ⒺMalus Law;[I;Ix;E0];[1_(W/m^2);1_(W/m^2);1_V/m])'
+θ=30_°  I₀=10_(W/m^2)  fx₀=3e17_Hz  fx=2.7e17_Hz  I₀x=0.1_(W/m^2)
+@ Expecting [ I=7.5 W/m↑2 Ix=6.75163 88932 1⁳⁻² W/m↑2 E₀=86.80210 98145 V/m ]
+'ROOT(ⒺMalus Law;[I;Ix;E₀];[1_(W/m^2);1_(W/m^2);1_V/m])'
 ```
 
 #### 2 Slits Young Interference
@@ -1561,7 +1560,7 @@ L=3_m  a=1000._μm  λ=600_nm  θ='ASIN(0.3*(λ_nm)/(a_μm))'  Imax=10_(W/m^2)
 The 25 variables in the Oscillations section are:
 
 * `ω`: Angular frequency (dim.: angle/time, in SI: r!s)
-* `ω0`: Natural angular frequency (dim.: angle#time, in SI: r!s)
+* `ω₀`: Natural angular frequency (dim.: angle#time, in SI: r!s)
 * `ωu`: Underdamped angular frequency (dim.: angle/time, in SI: r!s)
 * `γ`: Reduced damping coefficient (dim.: angle/time, in SI: r/s)
 * `φ`: Phase angle
@@ -1640,18 +1639,18 @@ G=1000_kPa  J=17_mm^4  L=26_cm  I=50_kg*m^2
 
 * To calculate `[x_cm;v_cm/s;a_m/s^2;m_kg;E_J]` (Displacement; Velocity & Acceleration at `t`; Mass; Total energy) from 5 known variables:
 ```rpl
-xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m
+xm=10_cm  ω₀=15_r/s  φ=25_°  t=25_μs  k=10_N/m
 @ Expecting [ x=9.06149 24146 7 cm v=-63.44371 46156 cm/s a=-20.38835 7933 m/s↑2 m=4.44444 44444 4⁳⁻² kg E=0.05 J ]
 'ROOT(ⒺSimple Harmonic;[x;v;a;m;E];[1_cm;1_cm/s;1_m/s^2;1_kg;1_J])'
 ```
 
 #### Underdamped Oscillations
 
-We are considering here a damped mass-spring oscillator having the natural angular frequency `ω0`. The corresponding differential equation : `−k*x − b*dx/dt = m*d^2x/dt^2` describes the underdamped oscillations.
+We are considering here a damped mass-spring oscillator having the natural angular frequency `ω₀`. The corresponding differential equation : `−k*x − b*dx/dt = m*d^2x/dt^2` describes the underdamped oscillations.
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Displacement; Velocity & Acceleration at `t`; Mass; Total energy at `t`; Quality factor) from 6 known variables:
 ```rpl
-xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
+xm=10_cm  ω₀=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
 @ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s x=9.06100 06640 3 cm v=-83.10906 53488 cm/s a=-16.64734 35534 m/s↑2 E=0.05640 00148 35 J Q=3.33333 33333 3 ]
 'ROOT(ⒺUnderdamped Oscillations;[m;γ;ωu;x;v;a;E;Q];[1_kg;1_(r/s);1_(r/s);1_cm;1_cm/s;1_m/s^2;1_J;1])'
 @ Save E for later use
@@ -1660,19 +1659,19 @@ xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
 The code below saves the reference value for comparison with the example in [Driven Damped Oscillations](#Driven Damped Oscillations):
 ```rpl
 @ Save the reference value for comparison below
-E0=E
-@ Save E0 for later
+E₀=E
+@ Save E₀ for later
 ```
 
 #### Driven Damped Oscillations
 
-We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω0` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
+We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
 ![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
-ω=14.99_r/s  ω0=15_r/s  θ=25_°  t=500_s  k=10_N/m  b=0.2_(kg/s)  xh=10_cm  Fd=0.9_N
+ω=14.99_r/s  ω₀=15_r/s  θ=25_°  t=500_s  k=10_N/m  b=0.2_(kg/s)  xh=10_cm  Fd=0.9_N
 @ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s φ=-89.74526 88301 ° xp=0.30019 71665 48 m x=-22.26611 11734 cm v=301.81823 6224 cm/s a=50.03197 40728 m/s↑2 E=0.45032 15149 87 J Q=3.33333 33333 3 ]
 'ROOT(ⒺDriven Damped Oscillations;[m;γ;ωu;φ;xp;x;v;a;E;Q];[1_kg;1_(r/s);1_(r/s);1_°;1_m;1_cm;1_cm/s;1_m/s^2;1_J;1])'
 @ Save E for comparison
@@ -1680,8 +1679,8 @@ We are considering here a damped mass-spring oscillator where the external drivi
 
 Verify relative difference with the total energy of the case [Underdamped Oscillations](#Underdamped Oscillations)
 ```rpl
-E0 E %Ch
-@ Expecting
+E₀ E %Ch
+@ Expecting 698.44219 2445
 @ % of relative augmentation which illustrates the huge energy gain due to the driving force acting very near the resonance frequency.
 ```
 
@@ -1907,7 +1906,7 @@ These equations for a silicon PN-junction diode use a “two-sided step-junction
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
 ND=1E22_cm^-3  NA=1E15_cm^-3  T=300_K  Js=1e-6_μA/cm^2  Va=-20_V  E1=3.3E5_V/cm  W=10_μ  ΔW=1_μ  L=10_μ  ΔL=1_μ  xj=2_μ
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=1.01379 20414 3 V xd=5.25726 51776 8 μ Cj=2 004.17577 358 pF/cm↑2 Emax=79 941.91402 27 V/cm BV=358.08260 5883 V J=-1.⁳⁻¹² A/cm↑2 Aj=2.57097 33552 9⁳⁻⁶ cm↑2 I=-2.57097 33552 9⁳⁻¹⁵ mA ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=1.01379 20414 3 V xd=5.25726 51776 7 μ Cj=2 004.17577 358 pF/cm↑2 Emax=79 941.91402 29 V/cm BV=358.08260 5881 V J=-1.⁳⁻¹² A/cm↑2 Aj=2.57097 33552 9⁳⁻⁶ cm↑2 I=-2.57097 33552 9⁳⁻¹⁵ mA ]
 'ROOT(ⒺPN Step Junctions;[ni;Vbi;xd;Cj;Emax;BV;J;Aj;I];[1_cm^-3;1_V;1_μ;1_pF/cm^2;1_V/cm;1_V;1_A/cm^2;1_cm^2;1_mA])'
 ```
 
@@ -1920,7 +1919,7 @@ These equations for a silicon NMOS transistor use a two-port network model. They
 * To calculate `[ni_(cm^-3);We_μ;Le_μ;Cox_pF/cm^2;γ_V^.5;φp_V;Vt_V;VDsat_V;IDS_mA;gds_S;gm_mA/V]` (Silicon density; Effective width; Effectives gate length; Silicon dioxide capacitance per unit area; Body factor; Fermi potential; Threshold voltage; Saturation voltage; Drain current; Output conductance; Transconductance) from 13 known variables:
 ```rpl
 tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=5_V  VBS=0_V  VDS=5_V  W=25_μ  ΔW=1_μ  L=4_μ  ΔL=0.75_μ  λ=0.05_1/V
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ We=23 μ Le=2.5 μ Cox=49 330.47499 07 pF/cm↑2 γ=0.37247 98153 09 V↑(¹/₂) φp=-0.29855 35180 52 V Vt=0.75 V VDsat=4.25 V IDS=2.97832 74275 6 mA gds=1.48916 37137 8⁳⁻⁴ S gm=1.42391 28597 6 mA/V ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ We=23 μ Le=2.5 μ Cox=49 330.47499 05 pF/cm↑2 γ=0.37247 98153 1 V↑(¹/₂) φp=-0.29855 35180 52 V Vt=0.75 V VDsat=4.25 V IDS=2.97832 74275 5 mA gds=1.48916 37137 7⁳⁻⁴ S gm=1.42391 28597 5 mA/V ]
 'ROOT(ⒺNMOS Transistor;[ni;We;Le;Cox;γ;φp;Vt;VDsat;IDS;gds;gm];[1_cm^-3;1_μ;1_μ;1_pF/cm^2;1_V^(1/2);1_V;1_V;1_V;1_mA;1_S;1_mA/V])'
 ```
 
@@ -1950,7 +1949,7 @@ drain, and source resistances) are negligible.
 * To calculate `[ni_(cm^-3);Vbi_V;xdmax_μ;G0_S;ID_mA;VDsat_V;Vt_V;gm_mA/V]` (Silicon density; Built-in voltage; Depletion-layer width; Channel conductance; Drain current; Saturation voltage; Threshold voltage; Transconductance) from 8 known variables:
 ```rpl
 ND=1e16_1/cm^3  W=6_μ  a=1_μ  L=2_μ  μn=1248_cm^2/(V*s)  VGS=-4_V  VDS=4_V  T=26.85_°C
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=0.35807 99473 84 V xdmax=1.04848 18266 6 μ G0=5.99854 93177⁳⁻⁴ S ID=0.21443 71687 18 mA VDsat=3.24491 50809 3 V Vt=-7.24491 50809 3 V gm=0.14570 26745 72 mA/V ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=0.35807 99473 84 V xdmax=1.04848 18266 6 μ G0=5.99854 93177⁳⁻⁴ S ID=0.21443 71687 23 mA VDsat=3.24491 50809 6 V Vt=-7.24491 50809 6 V gm=0.14570 26745 73 mA/V ]
 'ROOT(ⒺJFETs;[ni;Vbi;xdmax;G0;ID;VDsat;Vt;gm];[1_(cm^-3);1_V;1_μ;1_S;1_mA;1_V;1_V;1_mA/V])'
 ```
 
@@ -2178,7 +2177,6 @@ f1=400_Hz f2=402_Hz t=5_s sm=2e-6_m
 ```rpl
 λ=500_nm  Em=5_N/C  x=1e-8_m  t=5e-13_s  φ=25_°
 @ Expecting [ f=5.99584 916⁳¹⁴ Hz k=12 566 370.6144 r/m ω=3.76730 31346 2⁳¹⁵ r/s E=4.78368 41812 N/C B=1.59566 52856 2⁳⁻⁸ T ]
-@ C#21 NOT OK MSOLVER: "No solution ?". SOLVE works for f & ω but with "Sign reversal" and fails for B: "Constant?"
 'ROOT(ⒺElectromagnetic Waves;[f;k;ω;E;B];[1_Hz;1_(r/m);1_(r/s);1_(N/C);1_T])'
 ```
 
@@ -2232,7 +2230,7 @@ The 110 variables in the Relativity section are:
 * `Bpz`: Transformed z component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `E`: Total energy (dim.: force·length, in SI: joule, J) or, Norm of the Electric field ([E & B Fields Transformation](#E & B Fields Transformation)) (dim.: force/charge, in SI: N/C=V/m)
 * `Ep`: Transformed total energy (dim.: force·length, in SI: joule, J)
-* `E0`: Total energy associated to the rest mass (dim.: force·length, in SI: joule, J)
+* `E₀`: Total energy associated to the rest mass (dim.: force·length, in SI: joule, J)
 * `Ex`: X component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ey`: Y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ez`: Z component of the electric field (dim.: force/charge, in SI: N/C=V/m)
@@ -2407,31 +2405,31 @@ v=298 293 495.71_m/s  f=2e3_Hz  α=20_°  θ=10_°
 
 #### Energy & Momentum
 
-The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E0 = mo·c^2`.
+The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E₀ = mo·c^2`.
 
 * To calculate `[β;γ;ppx_(kg*(m/s));ppy_(kg*(m/s));ppz_(kg*(m/s));Ep_J;E_J;K_J]` (Relativistic speed ratio; Lorentz factor; Transformed x, y & z component of the momentum, Transformed total energy; Total & Kinetic energy of the moving mass) from 5 known variables:
 ```rpl
 v=299 192 873.084 m/s  px=10_(kg*(m/s))  py=20_(kg*(m/s))  pz=30_(kg*(m/s))  E=1.42176 77735 4e19_J
-@ Expecting [ β=0.998 γ=15.81929 99292 ppx=-7.48730 91346 7⁳¹¹ kg·m/s ppy=20 kg·m/s ppz=30 kg·m/s Ep=2.24913 70834 6⁳²⁰ J E0=8.98755 17873 9⁳¹⁷ J m0=10. kg p=4.73302 17960 1⁳¹⁰ kg·m/s K=1.33189 22556 7⁳¹⁹ J ]
-'ROOT(ⒺEnergy & Momentum;[β;γ;ppx;ppy;ppz;Ep;E0;m0;p;K];[1;1;1_(kg*(m/s));1_(kg*(m/s));1_(kg*(m/s));1_J;1_J;1_kg;1_(kg*(m/s));1_J])'
+@ Expecting [ β=0.998 γ=15.81929 99292 ppx=-7.48730 91346 7⁳¹¹ kg·m/s ppy=20 kg·m/s ppz=30 kg·m/s Ep=2.24913 70834 6⁳²⁰ J E₀=8.98755 17873 9⁳¹⁷ J m0=10. kg p=4.73302 17960 1⁳¹⁰ kg·m/s K=1.33189 22556 7⁳¹⁹ J ]
+'ROOT(ⒺEnergy & Momentum;[β;γ;ppx;ppy;ppz;Ep;E₀;m0;p;K];[1;1;1_(kg*(m/s));1_(kg*(m/s));1_(kg*(m/s));1_J;1_J;1_kg;1_(kg*(m/s));1_J])'
 ```
 
 #### Ultrarelativistic Cases
 
-* **Example 1** In the 27 km circonference accelerator of LHC, protons are accelerated to kinetic energy of 6.8 TeV. To calculate `[E0_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, one can calculate the speed, the contracted space interval and proper time of the protons:
+* **Example 1** In the 27 km circonference accelerator of LHC, protons are accelerated to kinetic energy of 6.8 TeV. To calculate `[E₀_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, one can calculate the speed, the contracted space interval and proper time of the protons:
 ```rpl
 K=6.8_TeV  m0='Ⓒmp'  Δx=27_km  Δtp='Δx/(299 792 455.147_m/s)'  Δtp=0.00009 00623 07_s
-@ Expecting [ E0=1.50327 76180 2⁳⁻¹⁰ J γ=7 248.36782 709 β=0.99999 99904 83 v=299 792 455.147 m/s Δt=1.24251 84420 6⁳⁻⁸ s Δxp=3.72497 65249 3 m ]
-'ROOT(ⒺUltrarelativistic Cases;[E0;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=7 248.36782 709 β=0.99999 99904 83 v=299 792 455.147 m/s Δt=1.24251 84420 6⁳⁻⁸ s Δxp=3.72497 65249 3 m ]
+'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ```
-* **Example 2** The "Oh-My-God" particle (probably a proton) had a kinetic energy of 3.2e20 eV. To calculate `[E0_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, in order to calculate the speed, the contracted space interval and proper time of the proton, the precision needs to be set to 32 digits and 28 significant digits:
+* **Example 2** The "Oh-My-God" particle (probably a proton) had a kinetic energy of 3.2e20 eV. To calculate `[E₀_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, in order to calculate the speed, the contracted space interval and proper time of the proton, the precision needs to be set to 32 digits and 28 significant digits:
 ```rpl
 Modes 'MyModes' STO
 32 Precision 28 Sig @ Need high precision for this one
 K=3.2e20_eV  m0='Ⓒmp'  Δx=100_km  Δtp='Δx/(299 792 457.99999 99999 99998 7113_m/s)'  Δtp=0.00033 35640 95198 15204 95755 781 s
 781_s
-@ Expecting [ E0=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
-'ROOT(ⒺUltrarelativistic Cases;[E0;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
+'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ResetModes MyModes @ Restore initial state
 ```
 
@@ -2618,7 +2616,7 @@ In this section, two comparisons are done between the Planck and Wien spectral d
 * To calculate `[fpeak_THz;f1_THz;f2_THz;FrPl12;FrWn12;%rFr12;f3_THz;f4_THz;FrPl34;FrWn34;%rFr34;FrPlab;eb_(W/m^2);ebfafb_(W/m^2);q_W]` (Frequency of maximum emissive power for the Planck distribution; Lower & Upper frequency limits of integration; Fractions of Planck & Wien emissive power in the range `f1` to `f2`; Relative % of change between distribution fractions integrated from `f3` to `f4`; Lower & Upper frequency limits of integration; Fractions of Planck & Wien emissive power in the range `fa` to `fb`; Total emissive power for the entire Planck spectrum; Emissive power in the range `fa` to `fb`; Heat transfer rate) from 5 known variables:
 ```rpl
 T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964 2⁳¹⁴ Hz  Frfafb=0.64388 90934 2
-@ Expecting [ fpeak=131.71525 3583 THz f1=106.11256 6547 THz f2=238.75327 4732 THz FrPl12=0.38336 04816 94 FrWn12=0.38088 77248 71 %rFr12=0.64502 13155 81 f3=0.26528 14163 69 THz f4=66.32035 40922 THz FrPl34=0.28402 76245 74 FrWn34=0.22398 47200 01 %rFr34=21.13981 15457 FrPlab=0.64388 90934 2 eb=148 980.70811 W/m↑2 ebfafb=95 927.05308 19 W/m↑2 q=959.27053 0819 W ]
+@ Expecting [ fpeak=74.84754 32835 THz f1=106.11256 6547 THz f2=238.75327 4732 THz FrPl12=0.38336 04816 94 FrWn12=0.38088 77248 71 %rFr12=0.64502 13155 81 f3=0.26528 14163 69 THz f4=66.32035 40922 THz FrPl34=0.28402 76245 74 FrWn34=0.22398 47200 01 %rFr34=21.13981 15457 FrPlab=0.64388 90934 2 eb=148 980.70811 W/m↑2 ebfafb=95 927.05308 19 W/m↑2 q=959.27053 0819 W ]
 'ROOT(ⒺPlanck & Wien Comparison;[fpeak;f1;f2;FrPl12;FrWn12;%rFr12;f3;f4;FrPl34;FrWn34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
@@ -2631,7 +2629,7 @@ In this section, two comparisons are done between the Planck and Rayleigh-Jeans 
 * To calculate `[fpeak_THz;f1_THz;f2_THz;FrPl12;FrRJ12;%rFr12;f3_THz;f4_THz;FrPl34;FrRJ34;%rFr34;FrPlab;eb_(W/m^2);ebfafb_(W/m^2);q_W]` (Frequency of maximum emissive power for the Planck distribution; Lower & Upper frequency limits of integration; Fractions of Planck & Rayleigh‐Jeans emissive power in the range `f1` to `f2`; Relative % of change between distribution fractions integrated from `f3` to `f4`; Lower & Upper frequency limits of integration; Fractions of Planck & Rayleigh‐Jeans emissive power in the range `fa` to `fb`; Total emissive power for the entire Planck spectrum; Emissive power in the range `fa` to `fb`; Heat transfer rate) from 5 known variables:
 ```rpl
 T=1273.15_K  A=100_cm^2  fa=2.65281 41636 9⁳¹⁰ Hz  fb=7.48475 43283 5⁳¹³ Hz  Frfafb=0.35399 34269 15
-@ Expecting [ fpeak=131.71525 3583 THz f1=45.09784 07827 THz f2=98.15412 40564 THz FrPl12=0.41306 62386 78 FrRJ12=2.34783 01416 5 %rFr12=468.39071 3596 f3=2.65281 41636 9⁳⁻² THz f4=1.32640 70818 4 THz FrPl34=6.29668 51249 6⁳⁻⁶ FrRJ34=6.41618 75792 7⁳⁻⁶ %rFr34=1.89786 29538 3 FrPlab=0.35399 34269 15 eb=148 980.70811 W/m↑2 ebfafb=52 738.19140 8 W/m↑2 q=527.38191 408 W ]
+@ Expecting [ fpeak=74.84754 32835 THz f1=45.09784 07827 THz f2=98.15412 40564 THz FrPl12=0.41306 62386 78 FrRJ12=2.34783 01416 5 %rFr12=468.39071 3596 f3=2.65281 41636 9⁳⁻² THz f4=1.32640 70818 4 THz FrPl34=6.29668 51249 6⁳⁻⁶ FrRJ34=6.41618 75792 7⁳⁻⁶ %rFr34=1.89786 29538 3 FrPlab=0.35399 34269 15 eb=148 980.70811 W/m↑2 ebfafb=52 738.19140 8 W/m↑2 q=527.38191 408 W ]
 'ROOT(ⒺPlanck & Rayleigh‐Jeans Comparison;[fpeak;f1;f2;FrPl12;FrRJ12;%rFr12;f3;f4;FrPl34;FrRJ34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
@@ -2655,7 +2653,7 @@ In the Compton Scattering, both energy and momentum are conserved during the col
 * To calculate `[λp_nm;K_eV;γ;β;v_m/s;Eph_eV;Epph_eV;p_(kg*m/s);φ_°]` (Wavelength of scattered photon; Kinetic energy of scattered electron; Lorentz factor; Speed of the scattered electron; Energy of the Incident & Scattered photon; Momentum of the scattered electron; Angle of scattering of the electron) from 2 known variables:
 ```rpl
 θ=40_°  λ=0.024_nm
-@ Expecting [ λp=0.02456 76487 62 nm K=1 193.63352 749 eV γ=1.00233 58835 6 β=0.06823 08499 8 v=20 455 094.227 m/s Eph=51 660.06023 89 eV Epph=50 466.42671 14 eV p=1.86768 55511 5⁳⁻²³ kg·m/s φ=68.16075 25239 ° ]
+@ Expecting [ λp=2.45676 48762 3⁳⁻² nm K=1 193.63352 749 eV γ=1.00233 58835 6 β=6.82308 49980 3⁳⁻² v=20 455 094.227 m/s Eph=51 660.06023 89 eV Epph=50 466.42671 14 eV p=1.86768 55511 5⁳⁻²³ kg·m/s φ=68.16075 25239 ° ]
 'ROOT(ⒺCompton Scattering;[λp;K;γ;β;v;Eph;Epph;p;φ];[1_nm;1_eV;1;1;1_m/s;1_eV;1_eV;1_(kg*m/s);1_°])'
 ```
 
@@ -2677,13 +2675,13 @@ Since the hydrogen atom is a bound system between the proton of the nucleus and 
 * **Example 1** In the case of an emission, to calculate `[Enp_eV;En_eV;r_m;f_THz;Eph_eV;λ_nm;r_m]` (Energy of the final atomic level `np`; Energy of the initial atomic level `n`; Radius of the initial atomic level `n`; Frequency, Energy & Wavelength of the emitted photon) from 3 known variables:
 ```rpl
 np=2  n=1  Z=1
-@ Expecting [ Enp=-3.40142 18031 eV En=-13.60568 72124 eV r=5.29177 21054 7⁳⁻¹¹ m f=2 467.38147 016 THz Eph=10.20426 54093 eV λ=121.50227 3412 nm ]
+@ Expecting [ Enp=-3.40142 18031 3 eV En=-13.60568 72125 eV r=5.29177 21054 4⁳⁻¹¹ m f=2 467.38147 018 THz Eph=10.20426 54094 eV λ=121.50227 3411 nm ]
 'ROOT(ⒺBohr Atomic Model;[Enp;En;r;f;Eph;λ];[1_eV;1_eV;1_m;1_THz;1_eV;1_nm])'
 ```
 * **Example 2** In the case of an absorption, to calculate `[Enp_eV;En_eV;r_m;f_THz;Eph_eV;λ_nm]` (Energy of the final atomic level `np`; Energy of the initial atomic level `n`; Radius of the initial atomic level n; Frequency, Energy & Wavelength of the absorbed photon) from 3 known variables (Note: instead to `n→∞` one can choose `n=9.99999E999999`):
 ```rpl
 np=2  n=9.99999E999999  Z=1
-@ Expecting [ Enp=-3.40142 18031 eV En=-1.36057 14423 8⁳⁻¹⁹⁹⁹⁹⁹⁹ eV r=5.29176 15219 3⁳¹⁹⁹⁹⁹⁸⁹ m f=-822.46049 0054 THz Eph=-3.40142 18031 eV λ=-364.50682 0237 nm ]
+@ Expecting [ Enp=-3.40142 18031 3 eV En=-1.36057 14423 9⁳⁻¹⁹⁹⁹⁹⁹⁹ eV r=5.29176 15219⁳¹⁹⁹⁹⁹⁸⁹ m f=-822.46049 0061 THz Eph=-3.40142 18031 3 eV λ=-364.50682 0234 nm ]
 'ROOT(ⒺBohr Atomic Model;[Enp;En;r;f;Eph;λ];[1_eV;1_eV;1_m;1_THz;1_eV;1_nm])'
 ```
 
@@ -2852,4 +2850,42 @@ A=235  Z=92  AX=235  ZX=92  AY2=94  ZY2=38  mX=235.043924_u  mY1=139.9216458_u  
 A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u  mY2=102.926597_u  nn=3
 @ Expecting [ N=145 Δm=0.20283 55078 88 u Q=188.93999 7545 MeV ΔKtot=188.93999 7545 MeV AY1=134 ZY1=54 ]
 'ROOT(ⒺFission Reaction;[N;Δm;Q;ΔKtot;AY1;ZY1];[1;1_u;1_MeV;1_MeV;1;1])'
+```
+
+
+## Finance
+
+The `Finance` section contains equations to compute time value of money (TVM).
+The variables in the Finance section include:
+
+* `n`: The number of compounding periods. For example, a 30 years loan with
+       monthly payments has 360 compounding periods.
+* `I%Yr`: Interest rate per year in percent
+* `PYr`: Payments per year.
+* `Pmt`: The periodic payment amount.
+* `PV`: The present value of a series of future cash flows,
+        or the initial cash flow.
+* `FV`: The future value, that is the final cash flow
+        (balloon payment or remaining balance),
+        or the compounded value of a series of prior cash flows.
+
+### TVMBeg
+
+Time value of money equation when payments are made at the beginning of the
+period.
+
+```rpl
+n='9*12' I%Yr=5.75 PV=-155 Pmt=0 PYr=12
+@ Expecting FV=259.74210 1025
+'ROOT(ⒺTVMBeg;FV;0)'
+```
+
+### TVMEnd
+
+Time value of money equation when payments are made at the end of the period.
+
+```rpl
+n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
+@ Expecting Pmt=1 314.24620 468
+'ROOT(ⒺTVMEnd;Pmt;0)'
 ```

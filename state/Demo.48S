@@ -798,6 +798,50 @@ BatteryStatsHeader
 
 
 
+@@ ===========================================================================
+@@
+@@	Anagrams
+@@
+@@ ===========================================================================
+
+Anagram directory {
+PRANAG
+«
+  IF
+    B 0 >
+  THEN
+    -1 'B' STO+ PRDEPTH DUP B -
+    FOR X
+      X ROLL PRANAG X ROLLD -1
+    STEP
+    1 'B' STO+
+  ELSE
+    PRDEPTH DUPN PRDEPTH 2 / 1 - 1
+    START
+      + -1
+    STEP
+    4 DISP
+  END
+»
+
+PRDEPTH
+« DEPTH C - »
+
+ANAG
+« → A
+  «
+    CLLCD A SIZE 'B' STO DEPTH 'C' STO
+    1 B
+    FOR X
+      A X DUP SUB
+    NEXT
+    PRANAG PRDEPTH DROPN { B C } PURGE
+  »
+»
+}
+
+
+
 @@ ---------------------------------------------------------------------------
 @@
 @@	 IFTE evaluation test

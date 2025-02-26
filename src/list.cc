@@ -361,7 +361,7 @@ object::result list::list_parse(id      type,
                 else if (!infix)
                 {
                     // Implicit multiplication
-                    infix = static_object(ID_mul);
+                    infix = static_object(ID_multiply);
                 }
             }
             else
@@ -1374,7 +1374,7 @@ COMMAND_BODY(ListProduct)
 //   Return the product of a list or array
 // ----------------------------------------------------------------------------
 {
-    return list_reduce(ID_mul);
+    return list_reduce(ID_multiply);
 }
 
 
@@ -1383,7 +1383,7 @@ COMMAND_BODY(ListDifferences)
 //   Return the product of a list or array
 // ----------------------------------------------------------------------------
 {
-    return list_pair_map(ID_sub);
+    return list_pair_map(ID_subtract);
 }
 
 
@@ -2205,7 +2205,10 @@ COMMAND_BODY(DoList)
                     return ERROR;
                 id ty = obj->type();
                 if (!is_array_or_list(ty))
+                {
+                    rt.type_error();
                     return ERROR;
+                }
                 list_p lst = list_p(obj);
                 if (!d)
                 {
@@ -2544,4 +2547,78 @@ list_p list::substitute(object_r repl) const
         return substitute(expr);
     }
     return this;
+}
+
+
+static list_p extract_sublist(list_r data, uint level, uint depth,
+                              size_t fidx[], size_t lidx[])
+// ----------------------------------------------------------------------------
+//   Extract a rectangular sublist
+// ----------------------------------------------------------------------------
+{
+    object::id ty = data->type();
+    scribble   scr;
+    for (size_t i = fidx[level]; i <= lidx[level]; i++)
+    {
+        object_p item = data->at(i);
+        if (!item)
+            break;
+        if (level + 1 < depth)
+        {
+            if (list_g sublist = item->as_array_or_list())
+            {
+                item = extract_sublist(sublist, level+1, depth, fidx, lidx);
+                if (!item)
+                    return nullptr;
+            }
+            else
+            {
+                rt.dimension_error();
+                return nullptr;
+            }
+        }
+        rt.append(item);
+    }
+
+    list_p result = list::make(ty, scr.scratch(), scr.growth());
+    return result;
+
+}
+
+
+list_p list::extract(object_r &first, object_r &last) const
+// ----------------------------------------------------------------------------
+//   Extract a sublist
+// ----------------------------------------------------------------------------
+{
+    list_g   data = this;
+    list_g   flst = first->as_array_or_list();
+    list_g   llst = last->as_array_or_list();
+    size_t   fnum = flst ? flst->items() : 1;
+    size_t   lnum = llst ? llst->items() : 1;
+    if (fnum != lnum)
+    {
+        rt.dimension_error();
+        return nullptr;
+    }
+
+    size_t fidx[fnum];
+    size_t lidx[fnum];
+    for (size_t i = 0; i < fnum; i++)
+    {
+        int idx = (flst ? flst->at(i) : +first)->as_int32(1, true);
+        if (--idx < 0)
+            idx = 0;
+        fidx[i] = idx;
+        if (rt.error())
+            return nullptr;
+        idx = (llst ? llst->at(i) : +last)->as_int32(1, true);
+        if (--idx < 0)
+            idx = 0;
+        lidx[i] = idx;
+        if (rt.error())
+            return nullptr;
+    }
+
+    return extract_sublist(data, 0, fnum, fidx, lidx);
 }

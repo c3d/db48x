@@ -37,6 +37,8 @@
 //      Returns
 //        [... Returns reserve]
 //      CallStack
+//        [Pointers to constants or 0 if not loaded]
+//      Constants
 //        [Pointers to xlibs or 0 if not loaded]
 //      XLibs
 //        [Pointer to outermost directory in path]
@@ -904,7 +906,7 @@ struct runtime
     //   Return the given xlib
     // ------------------------------------------------------------------------
     {
-        if (id >= size_t(CallStack - XLibs))
+        if (id >= size_t(Constants - XLibs))
             return nullptr;
         return XLibs[id];
     }
@@ -914,7 +916,7 @@ struct runtime
     //   Set the given xlib
     // ------------------------------------------------------------------------
     {
-        if (id >= size_t(CallStack - XLibs))
+        if (id >= size_t(Constants - XLibs))
             return false;
         XLibs[id] = value;
         return true;
@@ -925,11 +927,54 @@ struct runtime
     //   Return number of xlibs
     // ------------------------------------------------------------------------
     {
-        size_t depth = size_t(CallStack - XLibs);
+        size_t depth = size_t(Constants - XLibs);
         return depth;
     }
 
     bool attach(size_t nentries);
+    // ------------------------------------------------------------------------
+    //   Reserve and clear the given number of entries
+    // ------------------------------------------------------------------------
+
+
+
+    // ========================================================================
+    //
+    //   Constant items
+    //
+    // ========================================================================
+
+    object_p constant(size_t id) const
+    // ------------------------------------------------------------------------
+    //   Return the given constant
+    // ------------------------------------------------------------------------
+    {
+        if (id >= size_t(CallStack - Constants))
+            return nullptr;
+        return Constants[id];
+    }
+
+    bool constant(size_t id, object_p value) const
+    // ------------------------------------------------------------------------
+    //   Set the given constant
+    // ------------------------------------------------------------------------
+    {
+        if (id >= size_t(CallStack - Constants))
+            return false;
+        Constants[id] = value;
+        return true;
+    }
+
+    size_t constants() const
+    // ------------------------------------------------------------------------
+    //   Return number of constants
+    // ------------------------------------------------------------------------
+    {
+        size_t depth = size_t(CallStack - Constants);
+        return depth;
+    }
+
+    bool constants(size_t nentries);
     // ------------------------------------------------------------------------
     //   Reserve and clear the given number of entries
     // ------------------------------------------------------------------------
@@ -1081,6 +1126,7 @@ protected:
     object_p *Locals;       // Start of locals
     object_p *Directories;  // Start of directories
     object_p *XLibs;        // Start of xlibs (which can be null)
+    object_p *Constants;    // Start of constants (which can be null)
     object_p *CallStack;    // Start of call stack (rounded 16 entries)
     object_p *Returns;      // Start of return stack, end of locals
     object_p *HighMem;      // End of available memory

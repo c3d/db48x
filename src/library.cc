@@ -105,7 +105,8 @@ const xlib::config xlib::library =
     .nbuiltins      = sizeof(basic_library) / sizeof(*basic_library),
     .error          = invalid_xlib_error,
     .label          = nullptr,
-    .show_builtins  = show_builtin_library
+    .show_builtins  = show_builtin_library,
+    .stack_prefix   = false,
 };
 
 
@@ -224,6 +225,7 @@ object_p xlib::attach() const
             return nullptr;
         }
         rt.xlib(idx, value);
+        cleaner::disable();
     }
     return value;
 }

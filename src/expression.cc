@@ -32,6 +32,7 @@
 #include "algebraic.h"
 #include "arithmetic.h"
 #include "equations.h"
+#include "finance.h"
 #include "functions.h"
 #include "grob.h"
 #include "integer.h"
@@ -1435,7 +1436,7 @@ algebraic_p expression::factor_out(algebraic_g expr,
 
         switch (ty)
         {
-        case ID_mul:
+        case ID_multiply:
             x = algebraic_p(rt.pop());
             y = algebraic_p(rt.pop());
             y = factor_out(y, factor, ys, ye);
@@ -1447,7 +1448,7 @@ algebraic_p expression::factor_out(algebraic_g expr,
                 return nullptr;
             break;
 
-        case ID_div:
+        case ID_divide:
             x = algebraic_p(rt.pop());
             y = algebraic_p(rt.pop());
             y = factor_out(y, factor, ys, ye);
@@ -2305,24 +2306,25 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
                 return prefix(g, ov, op, av, arg);
             }
 
-            if ((oid != ID_div || unit::mode) && oid != ID_xroot &&
+            if ((oid != ID_divide || unit::mode) && oid != ID_xroot &&
                 oid != ID_comb && oid != ID_perm)
             {
                 if (lprec < prec)
                     lg = parentheses(g, lg);
                 if (oid != ID_pow &&
                     (rprec < prec ||
-                     (rprec == prec && (oid == ID_sub || oid == ID_div))))
+                     (rprec == prec &&
+                      (oid == ID_subtract || oid == ID_divide))))
                     rg = parentheses(g, rg);
             }
             precedence = prec;
             switch (oid)
             {
             case ID_pow: return suscript(g, lv, lg, rv, rg);
-            case ID_div: return unit::mode
+            case ID_divide: return unit::mode
                     ? infix(g, lv, lg, 0, "/", rv, rg)
                     : ratio(g, lg, rg);
-            case ID_mul: return infix(g, lv, lg, 0, mulsep(), rv, rg);
+            case ID_multiply: return infix(g, lv, lg, 0, mulsep(), rv, rg);
             case ID_xroot:
             {
                 lg = root(g, lg);
@@ -2530,7 +2532,9 @@ list_p expression::current_equation(bool all, bool error)
 //   Return content of EQ variable
 // ----------------------------------------------------------------------------
 {
-    object_p obj = directory::recall_all(static_object(ID_Equation), false);
+    object_p obj  = FinanceSolverMenu::active()
+        ? FinanceSolverMenu::equation()
+        : directory::recall_all(static_object(ID_Equation), false);
     bool more = true;
     while (more)
     {
@@ -2673,7 +2677,8 @@ bool expression::is_linear(symbol_r sym, algebraic_g &a, algebraic_g &b) const
 
     }
 
-    if (type == ID_add || type == ID_sub || type == ID_mul || type == ID_div)
+    if (type == ID_add || type == ID_subtract ||
+        type == ID_multiply || type == ID_divide)
     {
         expression_g l, r;
         if (split(type, l, r))
@@ -2689,11 +2694,11 @@ bool expression::is_linear(symbol_r sym, algebraic_g &a, algebraic_g &b) const
                     algebraic_g t = l->evaluate();
                     switch(type)
                     {
-                    case ID_add: b = t + b; break;
-                    case ID_sub: b = t - b; break;
-                    case ID_mul: b = t * b; a = t * a; break;
+                    case ID_add:        b = t + b; break;
+                    case ID_subtract:   b = t - b; break;
+                    case ID_multiply:   b = t * b; a = t * a; break;
                     default:
-                    case ID_div: return false;
+                    case ID_divide:     return false;
                     }
                     return a && b;
                 }
@@ -2706,11 +2711,11 @@ bool expression::is_linear(symbol_r sym, algebraic_g &a, algebraic_g &b) const
                     algebraic_g t = r->evaluate();
                     switch(type)
                     {
-                    case ID_add: b = b + t; break;
-                    case ID_sub: b = b - t; break;
-                    case ID_mul: b = b * t; a = a * t; break;
-                    case ID_div: b = b / t; a = a / t; break;
-                    default:     return false;
+                    case ID_add:        b = b + t; break;
+                    case ID_subtract:   b = b - t; break;
+                    case ID_multiply:   b = b * t; a = a * t; break;
+                    case ID_divide:     b = b / t; a = a / t; break;
+                    default:            return false;
                     }
                     return a && b;
                 }
@@ -2724,11 +2729,11 @@ bool expression::is_linear(symbol_r sym, algebraic_g &a, algebraic_g &b) const
                 {
                     switch(type)
                     {
-                    case ID_add: a = a + ra; b = b + rb; break;
-                    case ID_sub: a = a - ra; b = b - rb; break;
-                    case ID_mul:
-                    case ID_div:
-                    default:     return false;
+                    case ID_add:        a = a + ra; b = b + rb; break;
+                    case ID_subtract:   a = a - ra; b = b - rb; break;
+                    case ID_multiply:
+                    case ID_divide:
+                    default:            return false;
                     }
                     return a && b;
                 }
@@ -3165,7 +3170,7 @@ expression_p expression::as_difference_for_solve() const
     expression_g left = this;
     expression_g right;
     if (split_equation(left, right))
-        return expression::make(ID_sub, +left, +right);
+        return expression::make(ID_subtract, +left, +right);
     return left;
 }
 

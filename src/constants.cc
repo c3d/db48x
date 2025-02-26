@@ -50,7 +50,7 @@ RECORDER(constants_error,   16, "Error on constant objects");
 
 // ============================================================================
 //
-//   Parsing the constant from teh constant file
+//   Parsing the constant from the constant file
 //
 // ============================================================================
 
@@ -123,8 +123,8 @@ EVAL_BODY(constant)
     // Check if we should preserve the constant as is
     if (!Settings.NumericalConstants() && !Settings.NumericalResults())
         return rt.push(o) ? OK : ERROR;
-    algebraic_g value = o->value();
-    return rt.push(+value) ? OK : ERROR;
+    object_p value = o->numerical_value();
+    return rt.push(value) ? OK : ERROR;
 }
 
 
@@ -160,7 +160,16 @@ MENU_BODY(ConstantsMenu)
 //   The constants menu is dynamically populated
 // ----------------------------------------------------------------------------
 {
-    return constant::do_collection_menu(constant::constants, mi);
+    bool ok = constant::do_collection_menu(constant::constants, mi);
+    if (ok)
+        items(mi,
+              "Ⓒ",              ID_SelfInsert,
+              "Const",          ID_Const,
+              "Ⓢ",              ID_SelfInsert,
+              "StdUnc",         ID_StandardUncertainty,
+              "Ⓡ",              ID_SelfInsert,
+              "RelUnc",         ID_RelativeUncertainty);
+    return ok;
 }
 
 
@@ -179,7 +188,11 @@ COMMAND_BODY(ConstantName)
 // ----------------------------------------------------------------------------
 {
     int key = ui.evaluating;
-    if (object_p cstobj = constant::do_key(constant::constants, key))
+    unicode pfx = ui.character_left_of_cursor();
+    const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
+                                : pfx == L'Ⓢ' ? standard_uncertainty::standard
+                                              : constant::constants;
+    if (object_p cstobj = constant::do_key(cfg, key))
         if (constant_p cst = cstobj->as<constant>())
             if (rt.push(cst))
                 return OK;
@@ -195,7 +208,9 @@ INSERT_BODY(ConstantName)
 // ----------------------------------------------------------------------------
 {
     int key = ui.evaluating;
-    return ui.insert_softkey(key, " Ⓒ", " ", false);
+    unicode prefix = ui.character_left_of_cursor();
+    bool noprefix = prefix == L'Ⓒ' || prefix == L'Ⓡ' || prefix == L'Ⓢ';
+    return ui.insert_softkey(key, noprefix ? "" : " Ⓒ", " ", false);
 }
 
 
@@ -237,7 +252,7 @@ INSERT_BODY(ConstantValue)
     int key = ui.evaluating;
     if (object_p cstobj = constant::do_key(constant::constants, key))
         if (constant_p cst = cstobj->as<constant>())
-            if (object_p value = cst->value())
+            if (object_p value = cst->numerical_value())
                 return ui.insert_object(value, " ", " ");
     return ERROR;
 }
@@ -258,6 +273,24 @@ COMMAND_BODY(Const)
 // ----------------------------------------------------------------------------
 {
     return constant::lookup_command(constant::constants, true);
+}
+
+
+COMMAND_BODY(StandardUncertainty)
+// ----------------------------------------------------------------------------
+//   Evaluate the standard uncertainty for a library constant
+// ----------------------------------------------------------------------------
+{
+    return constant::lookup_command(standard_uncertainty::standard, true);
+}
+
+
+COMMAND_BODY(RelativeUncertainty)
+// ----------------------------------------------------------------------------
+//   Evaluate the relative uncertainty for a library constant
+// ----------------------------------------------------------------------------
+{
+    return constant::lookup_command(relative_uncertainty::relative, true);
 }
 
 
@@ -283,14 +316,14 @@ COMMAND_BODY(Constants)
 
 static const cstring basic_constants[] =
 // ----------------------------------------------------------------------------
-//   List of basic constants
+//   List of basic constants (including standard and relative uncertainty)
 // ----------------------------------------------------------------------------
 //   clang-format off
 {
     // ------------------------------------------------------------------------
-    // MATH CONSTANTS MENU
+    // Mathematics
     // ------------------------------------------------------------------------
-    "Mathematics",   nullptr,
+    "Mathematics",     nullptr,
 
     "π",        "3.14159",              // Evaluated specially (decimal-pi.h)
     "e",        "2.71828",              // Evaluated specially (decimal-e.h)
@@ -298,9 +331,10 @@ static const cstring basic_constants[] =
     "∞",        "9.99999E999999",       // A small version of infinity
     "?",        "Undefined",            // Undefined result
 
+    // ------------------------------------------------------------------------
     "ⅉ",        "0+ⅈ1",                 // Imaginary unit
     "rad",      "1_r",                  // One radian
-    "twoπ",     "'2*Ⓒπ'_r",             // Two pi radian
+    "twoπ",     "'2*Ⓒπ'_r",            // Two pi radian
     "angl",     "180_°",                // Half turn
 
 
@@ -310,80 +344,431 @@ static const cstring basic_constants[] =
 
     "Chemistry",     nullptr,
 
-    "NA",       "6.02214076E23_mol⁻¹",     //*Avogadro's number
-    "k",        "1.380649E-23_J/K",        //*Boltzmann
-    "Vm",       "'CONVERT(ⒸR*ⒸStdT/ⒸStdP;1_m^3/mol)'",//*Molar volume
-    "R",        "'CONVERT(ⒸNA*Ⓒk;1_J/(mol*K))'",    //*Universal gas constant
-    "StdT",     "273.15_K",             //*Standard temperature
-    "StdP",     "101.325_kPa",          //*Standard temperature
-    "σ",        "'CONVERT(Ⓒπ^2/60*Ⓒk^4/(Ⓒℏ^3*Ⓒc^2);1_W/(m^2*K^4))'", //*Stefan-Boltzmann
+    // *Avogadro's number - Exact definition
+    "NA",       "[ 6.02214076E23_mol⁻¹ "
+                "  0_mol⁻¹ "
+                "  0 ]",
+    // *Boltzmann - Exact definition
+    "k",        "[ 1.380649E-23_J/K "
+                "  0_J/K "
+                "  0 ]",
+    // *Molar volume - Calculation convention
+    "Vm",       "[ 'CONVERT(ⒸR*ⒸStdT/ⒸStdP;1_m^3/mol)' "
+                "  0_m^3/mol "
+                "  0 ]",
+    // *Universal gas constant - Exact calculation
+    "R",        "[ 'CONVERT(ⒸNA*Ⓒk;1_J/(mol*K))' "
+                "  0_J/(mol*K) "
+                "  0 ]",
+    // *Stefan-Boltzmann - Exact calculation
+    "σ",        "[ 'CONVERT(Ⓒπ²/60*Ⓒk^4/(Ⓒℏ^3*Ⓒc²);1_W/(m²*K^4))' "
+                "  0_W/(m²*K^4) "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Standard temperature - Definition convention
+    "StdT",     "[ 273.15_K "
+                "  0_K "
+                "  0 ]",
+    // *Standard pressure - Definition convention
+    "StdP",     "[ 101.325_kPa "
+                "  0_kPa "
+                "  0 ]",
+    // *Molar Mass Constant - Calculation from measurement
+    "Mu",       "[ 'ROUND(CONVERT(ⒸNA*Ⓒu;1_g/mol);XPON(ⓇMu*ⒸNA*Ⓒu)-XPON(ⒸNA*Ⓒu)-2)' "
+                "  'ROUND(CONVERT(ⓇMu*ⒸMu;1_g/mol);-2)' "
+                "  'Ⓡu' ]",
+    // *C12 Molar Mass - Calculation from measurement
+    "MC12",     "[ 'ROUND(CONVERT(12*ⒸMu;1_g/mol);XPON(UVAL(ⓇMC12*12*ⒸMu))-XPON(UVAL(12*ⒸMu))-2)' "
+                "  'ROUND(CONVERT(ⓇMC12*ⒸMC12;1_kg/mol);-2)' "
+                "  'ⓇMu' ]",
+    // *Loschmidt constant - Exact calculation
+    "n0",       "[ 'CONVERT(ⒸNA/ⒸVm;1_m^-3)' "
+                "  0_m^-3 "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Sakur-Tetrode constant - Calculation from measurement
+    "SoR",      "[ 'ROUND((5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP));XPON(ⓇSoR*(5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP)))-XPON((5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP)))-2)' "
+                "  'ROUND(ⓇSoR*ABS(ⒸSoR);-2)' "
+                "  4.0E-10 ]",        //ⓇSoR=4.0E-10
+    // *Mass unit (Dalton) - Calculation from measurement
+    "Da",       "[ 'Ⓒu' "
+                "  'Ⓢu' "
+                "  'Ⓡu' ]",
+    // * kq ratio - Exact calculation
+    "kq",       "[ 'CONVERT(Ⓒk/Ⓒqe;1_J/(K*C))' "
+                "  0_J/(K*C) "
+                "  0 ]",
 
     // ------------------------------------------------------------------------
     //   Physics
     // ------------------------------------------------------------------------
 
-    "Physics",     nullptr,
+    "Physics",      nullptr,
 
-    "ⅉ",         "0+ⅈ1",                 // Imaginary unit in physics
-    "c",        "299792458_m/s",        //*Speed of light
-    "ε0",       "'CONVERT(1/(Ⓒμ0*Ⓒc^2);1_F/m)'",//*Vaccuum permittivity
-    "μ0",       "'CONVERT(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe^2*Ⓒc);1_H/m)'", //*Vaccuum permeability
-    "g",        "9.80665_m/s²",            //*Acceleration of Earth gravity
-    "G",        "6.67430E-11_m^3/(s^2*kg)",//*Gravitation constant
-    "h",        "6.62607015E-34_J*s",      //*Planck
-    "ℏ",        "'CONVERT(Ⓒh/(2*Ⓒπ);1_J*s)'",   //*Dirac
-    "qe",       "1.602176634E-19_C",       //*Electronic charge
-    "me",       "9.1093837139E-31_kg",     //*Electron mass
-    "mn",       "1.67492750056E-27_kg",    //*Neutron mass
-    "mp",       "1.67262192595E-27_kg",    //*Proton mass
-    "mH",       "1.00782503223_u",         //*Hydrogen mass
-    "u",        "1.66053906892E-27_kg",    //*Mass unit
-    "Da",       "1.66053906892E-27_kg",    //*Mass unit (Dalton)
-    "qme",      "'CONVERT(Ⓒqe/Ⓒme;1_C/kg)'",  //*q/me ratio
-    "mpme",     "'Ⓒmp/Ⓒme'",             //*mp/me ratio
-    "α",        "0.0072973525643",        //*fine structure
-    "ø",        "'CONVERT(Ⓒπ*Ⓒℏ/Ⓒqe;1_Wb)'",      //*Magnetic flux quantum
-    "F",        "'CONVERT(ⒸNA*Ⓒqe;1_C/mol)'",      //*Faraday
-    "R∞",       "10973731.568157_m⁻¹",    //*Rydberg
-    "a0",       "'CONVERT(4*Ⓒπ*Ⓒε0*Ⓒℏ^2/(Ⓒme*Ⓒqe^2);1_nm)'",    //*Bohr radius
-    "μB",       "'CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒme);1_J/T)'",  //*Bohr magneton
-    "μN",       "'CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒmp);1_J/T)'",  //*Nuclear magneton
-    "λ0",       "'CONVERT(Ⓒh*Ⓒc/Ⓒqe/(1_V);1_nm)'",  //*Photon wavelength
-    "f0",       "'CONVERT(Ⓒc/Ⓒλ0;1_Hz)'",            //*Photon frequency
-    "λc",       "'CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm)'",      //*Electron Compton wavelength
-    "λpc",      "'CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm)'",      //*Proton Compton wavelength
-    "λnc",      "'CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm)'",      //*Neutron Compton wavelength
-    "c3",       "2.897771955185172661_mm*K",       //*Wien's
-    "kq",       "'CONVERT(Ⓒk/Ⓒqe;1_J/(K*C))'",   //* k/q
-    "ε0q",      "'CONVERT(Ⓒε0/Ⓒqe;1_F/(m*C))'",  //* ε0/q
-    "qε0",      "'CONVERT(Ⓒqe*Ⓒε0;1_F*C/m)'",    //* q*ε0
-    "εsi",      "11.9",                 // Dielectric constant
-    "εox",      "3.9",                  // SiO2 dielectric constant
-    "I0",       "0.000000000001_W/m^2", //*Ref intensity
-    "Z0",       "'CONVERT(Ⓒμ0*Ⓒc;1_Ω)'",   //*Vacuum characteristic impedance
-    "mD",       "2.01410177812_u",           //*Deuterium mass
-    "mT",       "3.0160492779_u",            //*Tritium mass
-    "mHe",      "4.00260325413_u",           //*Helium atomic mass
-    "G0",       "'CONVERT(Ⓒqe^2/(Ⓒπ*Ⓒℏ);1_S)'",  //*Conductance quantum
-    "Rk",       "'CONVERT(2*Ⓒπ*Ⓒℏ/Ⓒqe^2;1_Ω)'",  //*von Klitzing constant
-    "KJ",       "'CONVERT(2*Ⓒqe/Ⓒh;1_Hz/V)'",    //*Josephson constant
-    "re",       "'CONVERT(Ⓒα^2*Ⓒa0;1_m)'",       //*Classical electron radius
-    "σe",       "'CONVERT(8*Ⓒπ*Ⓒre^2/3;1_m^2)'", //*Thomson cross-section
-    "μe",       "'(-1)*9.2847646917E-24_J/T'",    //*Electron magnetic moment
-    "μp",       "1.41060679545E-26_J/T",          //*Proton magnetic moment
-    "μn",       "'(-1)*9.6623653E-27_J/T'",       //*Neutron magnetic moment
-    "μμ",       "'(-1)*4.49044830E-26_J/T'",      //*Muon magnetic moment
-    "ge",       "'(-1)*2.00231930436092'",        //*Electron g-factor
-    "Mpl",      "'CONVERT(√(Ⓒℏ*Ⓒc/ⒸG);1_kg)'",       //*Planck mass
-    "T°pl",     "'CONVERT(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk;1_K)'",//*Planck temperature
-    "Lpl",      "'CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^3);1_m)'",      //*Planck length
-    "Tpl",      "'CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^5);1_s)'",      //*Planck time
-    "Eh",       "'CONVERT(2*Ⓒh*Ⓒc*ⒸR∞;1_J)'",        //*Hartree energy
-    "θw",       "'CONVERT(ASIN(√(0.22305));1_r)'",     //*Weak mixing angle
-    "ΔfCs",     "9192631770_Hz",                //*Cs hyperfine transition
+    // *Imaginary unit in physics - Definition convention
+    "ⅉ",         "0+ⅈ1",
+    // *Speed of light - Exact definition
+    "c",        "[ 299792458_m/s "
+                "  0_m/s "
+                "  0 ]",
+    // *Gravitation constant - Measurement
+    "G",        "[ 6.67430E-11_m^3/(s²*kg) "
+                "  0.00015E-11_m^3/(s²*kg) "
+                "  'ROUND(UBASE(ⓈG/ⒸG);-2)' ]",
+    // *Acceleration of Earth gravity - Definition convention
+    "g",        "[ 9.80665_m/s² "
+                "  0_m/s² "
+                "  0 ]",
+    // *Vacuum characteristic impedance - Calculation from measurement
+    "Z₀",       "[ 'ROUND(CONVERT(Ⓒμ₀*Ⓒc;1_Ω);XPON(UVAL(ⓇZ₀*Ⓒμ₀*Ⓒc))-XPON(UVAL(Ⓒμ₀*Ⓒc))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇZ₀*ⒸZ₀);-2);1_Ω)' "
+                "  'Ⓡμ₀' ]",
 
-// ------------------------------------------------------------------------
-    //  Computing
+    // ------------------------------------------------------------------------
+    // *Vaccuum permittivity - Calculation from measurement
+    "ε₀",       "[ 'ROUND(CONVERT(1/(Ⓒμ₀*Ⓒc²);1_F/m);XPON(UVAL(Ⓡε₀/(Ⓒμ₀*Ⓒc²)))-XPON(UVAL(1/(Ⓒμ₀*Ⓒc²)))-2)' "
+                "  'ROUND(UBASE(Ⓡε₀*Ⓒε₀);-2)' "
+                "  'Ⓡμ₀' ]",
+    // *Vaccuum permeability - Calculation from measurement
+    "μ₀",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc);1_H/m);XPON(UVAL(Ⓡμ₀*4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc)))-XPON(UVAL(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡμ₀*Ⓒμ₀);-2);1_H/m)' "
+                "  'Ⓡα' ]",
+    // *Coulomb constant - Calculation from measurement
+    "ke",      "[ 'ROUND(CONVERT(1/(4*Ⓒπ*Ⓒε₀);1_(N*(m/C)²));XPON(UVAL(Ⓡke/(4*Ⓒπ*Ⓒε₀)))-XPON(UVAL(1/(4*Ⓒπ*Ⓒε₀)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡke*Ⓒke);-2);1_(N*(m/C)²))' "
+                "  'Ⓡε₀' ]",
+
+    // ------------------------------------------------------------------------
+    //   Particle masses
+    // ------------------------------------------------------------------------
+
+    "Mass",     nullptr,
+
+    // ------------------------------------------------------------------------
+    // *Electron mass - Calculation from measurement
+    "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
+                "  'Ⓡu' ]",
+    // *Neutron mass - Measurement
+    "mn",       "[ 1.67492750056E-27_kg "
+                "  0.00000000085E-27_kg "
+                "  'ROUND(UBASE(Ⓢmn/Ⓒmn);-2)' ]",
+    // *Proton mass - Measurement
+    "mp",       "[ 1.67262192595E-27_kg "
+                "  0.00000000052E-27_kg "
+                "  'ROUND(UBASE(Ⓢmp/Ⓒmp);-2)' ]",
+    // *Hydrogen mass - Measurement
+    "mH",       "[ 1.00782503223_u "
+                "  0.00000000009_u "
+                "  'ROUND(UBASE(ⓈmH/ⒸmH);-2)' ]",
+    // *Mass unit (u) - Calculation from measurement
+    "u",        "[ 'ROUND(CONVERT(Ⓒme/ⒸAre;1_kg);XPON(UVAL(Ⓡu*Ⓒme/ⒸAre))-XPON(UVAL(Ⓒme/ⒸAre))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡu*Ⓒu);-2);1_kg)' "
+                "  3.1E-10 ]",
+
+    // ------------------------------------------------------------------------
+    // *Deuterium mass - Measurement
+    "mD",       "[ 2.01410177812_u "
+                "  0.00000000012_u "
+                "  'ROUND(UBASE(ⓈmD/ⒸmD);-2)' ]",
+    // *Tritium mass - Measurement
+    "mT",       "[ 3.0160492779_u "
+                "  0.0000000024_u "
+                "  'ROUND(UBASE(ⓈmT/ⒸmT);-2)' ]",
+    // *Helium atomic mass - Measurement
+    "mHe",      "[ 4.00260325413_u "
+                "  0.00000000006_u "
+                "  'ROUND(UBASE(ⓈmHe/ⒸmHe);-2)' ]",
+    // *Muon mass - Measurement
+    "mμ",       "[ 0.1134289257_u "
+                "  0.0000000025_u "
+                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' ]",
+    // *Tau mass - Measurement
+    "mτ",       "[ 1.90754_u "
+                "  0.00013_u "
+                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *mpme ratio - Measurement
+    "mpme",     "[ 1836.152673426 "
+                "  0.000000032 "
+                "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' ]",
+    // *Electron relative atomic mass - Measurement
+    "Are",       "[ 5.485799090441E-4 "
+                "  0.000000000097E-4 "
+                "  'ROUND(ⓈAre/ⒸAre;-2)' ]",
+
+
+    // ------------------------------------------------------------------------
+    //   Electromagnetism
+    // ------------------------------------------------------------------------
+
+    "Electromagnetism",     nullptr,
+
+    // ------------------------------------------------------------------------
+    // *Electronic charge - Exact definition
+    "qe",       "[ 1.602176634E-19_C "
+                "  0_C "
+                "  0 ]",
+    // *Photon wavelength - Exact calculation
+    "λ0",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒqe/(1_V);1_nm)' "
+                "  0_nm "
+                "  0 ]",
+    // *Photon frequency - Exact calculation1 239.84198 43320 03 nm
+    "f0",       "[ 'CONVERT(Ⓒc/Ⓒλ0;1_Hz)' "
+                "  0_Hz "
+                "  0 ]",
+    // *Electron g-factor - Measurement
+    "ge",       "[ '(-1)*2.00231930436092' "
+                "  0.00000000000036 "
+                "  'ROUND(UBASE(ABS(Ⓢge/Ⓒge));-2)' ]",
+    // *qme ratio - Calculation from measurement
+    "qme",      "[ 'ROUND(CONVERT(Ⓒqe/Ⓒme;1_C/kg);XPON(UVAL(Ⓡqme*Ⓒqe/Ⓒme))-XPON(UVAL(Ⓒqe/Ⓒme))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡqme*Ⓒqme);-2);1_C/kg)' "
+                "  'Ⓡme' ]",
+
+    // ------------------------------------------------------------------------
+    // *Electron magnetic moment - Measurement
+    "μe",       "[ '(-1)*9.2847646917E-24_J/T' "
+                "  0.0000000029E-24_J/T "
+                "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
+    // *Proton magnetic moment - Measurement
+    "μp",       "[ 1.41060679545E-26_J/T "
+                "  0.00000000060E-26_J/T "
+                "  'ROUND(UBASE(ABS(Ⓢμp/Ⓒμp));-2)' ]",
+    // *Neutron magnetic moment - Measurement
+    "μn",       "[ '(-1)*9.6623653E-27_J/T' "
+                "  0.0000023E-27_J/T "
+                "  'ROUND(UBASE(ABS(Ⓢμn/Ⓒμn));-2)' ]",
+    // *Muon magnetic moment - Measurement
+    "μμ",       "[ '(-1)*4.49044830E-26_J/T' "
+                "  0.00000010E-26_J/T "
+                "  'ROUND(UBASE(ABS(Ⓢμμ/Ⓒμμ));-2)' ]",
+
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    //   Particle sizes
+    // ------------------------------------------------------------------------
+
+    "Size",     nullptr,
+
+    // *Classical electron radius - Calculation from measurement
+    "re",       "[ 'CONVERT(Ⓒα²*Ⓒa0;1_fm)' "
+                "  'ROUND(Ⓡre*Ⓒre;-2)' "
+                "  'ROUND(3*Ⓢα/α;-2)' ]",
+    // *Proton charge radius - Measurement
+    "rp",       "[ 8.4075-16_m "
+                "  0.0064-16_m "
+                "  'ROUND(Ⓢrp/Ⓒrp;-2)' ]",
+    // *Bohr radius - Calculation from measurement
+    "a0",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²);1_nm);XPON(UVAL(Ⓡa0*4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-XPON(UVAL(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓢα/Ⓒα*Ⓒa0);-2);1_nm)' "
+                "  'Ⓡα' ]",
+    // *Thomson cross-section - Calculation from measurement
+    "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
+                "  'ROUND(6*Ⓢα/Ⓒα;-2)' ]",
+
+
+    // ------------------------------------------------------------------------
+    //    Compton effect
+    // ------------------------------------------------------------------------
+
+    "Scattering",   nullptr,
+    // ------------------------------------------------------------------------
+    // *Electron Compton wavelength - Calculation from measurement
+    "λc",       "[ 'ROUND(CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm);XPON(UVAL(Ⓡλc*Ⓒh/(Ⓒme*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒme*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλc*Ⓒλc);-2);1_nm)' "
+                "  'Ⓡme' ]",
+    // *Proton Compton wavelength - Calculation from measurement
+    "λcp",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm);XPON(UVAL(Ⓡλcp*Ⓒh/(Ⓒmp*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmp*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcp*Ⓒλcp);-2);1_nm)' "
+                "  'Ⓡmp' ]",
+    // *Neutron Compton wavelength - Calculation from measurement
+    "λcn",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm);XPON(UVAL(Ⓡλcn*Ⓒh/(Ⓒmn*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmn*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcn*Ⓒλcn);-2);1_nm)' "
+                "  'Ⓡmn' ]",
+    // *Muon Compton wavelength - Calculation from measurement
+    "λcμ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmμ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcμ*Ⓒh/(Ⓒmμ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmμ*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcμ*Ⓒλcμ);-2);1_nm)' "
+                "  'Ⓡmμ' ]",
+    // *Tau Compton wavelength - Calculation from measurement
+    "λcτ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmτ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcτ*Ⓒh/(Ⓒmτ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmτ*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcτ*Ⓒλcτ);-2);1_nm)' "
+                "  'Ⓡmτ' ]",
+
+    // ------------------------------------------------------------------------
+    //   Quantum mechanics
+    // ------------------------------------------------------------------------
+
+    "Quantum",    nullptr,
+
+    // *Planck - Exact definition
+    "h",        "[ 6.62607015E-34_J*s "
+                "  0_J*s "
+                "  0 ]",
+    // *Dirac - Exact definition
+    "ℏ",        "[ 'CONVERT(Ⓒh/(2*Ⓒπ);1_J*s)' "
+                "  0_J*s "
+                "  0 ]",
+    // *fine structure constant - Measurement
+    "α",        "[ 0.00729735256434 "
+                "  0.00000000000114 "
+                "  'ROUND(UBASE(Ⓢα/Ⓒα);-2)' ]",
+    // *Cs hyperfine transition - Exact definition
+    "ΔfCs",     "[ 9192631770_Hz "
+                "  0_Hz "
+                "  0 ]",
+    // *Weak mixing angle - Measurement
+    "θw",       "[ 'ROUND(CONVERT(ASIN(√(0.22305));1_°);XPON(UVAL(Ⓡθw*ASIN(√(0.22305))))-XPON(UVAL(ASIN(√(0.22305))))-2)' "
+                   "'CONVERT(ROUND((ASIN(√(0.22305+0.00023))-ASIN(√(0.22305-0.00023)))/2;-2);1_°)' "
+                "  'ROUND(UBASE(ABS(Ⓢθw/CONVERT(ASIN(√(0.22305));1_°)));-2)' ]"
+,
+
+    // ------------------------------------------------------------------------
+    // *Planck length - Calculation from measurement
+    "Lpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^3);1_m);XPON(UVAL(ⓇLpl*√(Ⓒℏ*ⒸG/Ⓒc^3)))-XPON(UVAL(√(Ⓒℏ*ⒸG/Ⓒc^3)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇLpl*ⒸLpl);-2);1_m)' "
+                "  'ⓇG/2' ]",
+    // *Planck time - Calculation from measurement
+    "Tpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^5);1_s);XPON(UVAL(ⓇTpl*√(Ⓒℏ*ⒸG/Ⓒc^5)))-XPON(UVAL(√(Ⓒℏ*ⒸG/Ⓒc^5)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇTpl*ⒸTpl);-2);1_s)' "
+                "  'ⓇG/2' ]",
+    // *Planck mass - Calculation from measurement
+    "Mpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc/ⒸG);1_kg);XPON(UVAL(ⓇMpl*√(Ⓒℏ*Ⓒc/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc/ⒸG)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇMpl*ⒸMpl);-2);1_kg)' "
+                "  'ⓇG/2' ]",
+    // *Planck energy - Calculation from measurement
+    "Epl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc^5/ⒸG);1_GeV);XPON(UVAL(ⓇEpl*√(Ⓒℏ*Ⓒc^5/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc^5/ⒸG)))-2)' "
+                "  'ROUND(CONVERT(ROUND(UBASE(ⓇEpl*Epl);-2);1_GeV);-2)' "
+                "  'ⓇG/2' ]",
+    // *Planck temperature - Calculation from measurement
+    "T°pl",     "[ 'ROUND(CONVERT(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk;1_K);XPON(UVAL(ⓇT°pl*√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-XPON(UVAL(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇT°pl*ⒸT°pl);-2);1_K)' "
+                "  'ⓇG/2' ]",
+
+    // ------------------------------------------------------------------------
+    // *Hartree energy - Calculation from measurement
+    "Eh",       "[ 'ROUND(CONVERT(2*Ⓒh*Ⓒc*ⒸR∞;1_J);XPON(UVAL(ⓇEh*2*Ⓒh*Ⓒc*ⒸR∞))-XPON(UVAL(2*Ⓒh*Ⓒc*ⒸR∞))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇEh*ⒸEh);-2);1_J)' "
+                "  'ⓇR∞' ]",
+
+    // ------------------------------------------------------------------------
+    //   Quantum mechanics (electro) magnetic effects
+    // ------------------------------------------------------------------------
+
+    "Magnetism",      nullptr,
+
+    // ------------------------------------------------------------------------
+    // *Bohr magneton - Calculation from measurement
+    "μB",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒme);1_J/T);XPON(UVAL(ⓇμB*Ⓒqe*Ⓒℏ/(2*Ⓒme)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒme)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇμB*ⒸμB);-2);1_J/T)' "
+                "  'Ⓡme' ]",
+    // *Nuclear magneton - Calculation from measurement
+    "μN",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒmp);1_J/T);XPON(UVAL(ⓇμN*Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇμN*ⒸμN);-2);1_J/T)' "
+                "  'Ⓡmp' ]",
+    // *Electron gyromagnetic ratio - Calculation from measurement
+    "γe",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμe)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγe*2*ABS(Ⓒμe)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμe)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγe*Ⓒγe);-2);1_(s*T)^-1)' "
+                "  'Ⓡμe' ]",
+    // *Proton gyromagnetic ratio - Calculation from measurement
+    "γp",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμp)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγp*2*ABS(Ⓒμp)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμp)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγp*Ⓒγp);-2);1_(s*T)^-1)' "
+                "  'Ⓡμp' ]",
+    // *Neutron gyromagnetic ratio - Calculation from measurement
+    "γn",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμn)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγn*2*ABS(Ⓒμn)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμn)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγn*Ⓒγn);-2);1_(s*T)^-1)' "
+                "  'Ⓡμn' ]",
+
+    // ------------------------------------------------------------------------
+    // *Rydberg - Measurement
+    "R∞",       "[ 10973731.568157_m⁻¹ "
+                "  0.000012_m⁻¹ "
+                "  'ROUND(UBASE(ⓈR∞/ⒸR∞);-2)' ]",
+    // *von Klitzing constant - Exact calculation
+    "Rk",       "[ 'CONVERT(2*Ⓒπ*Ⓒℏ/Ⓒqe²;1_Ω)' "
+                "  0_Ω "
+                "  0 ]",
+    // *Faraday constant - Exact calculation
+    "F",        "[ 'CONVERT(ⒸNA*Ⓒqe;1_C/mol)' "
+                "  0_C/mol "
+                "  0 ]",
+    // *Conductance quantum - Exact calculation
+    "G0",       "[ 'CONVERT(Ⓒqe²/(Ⓒπ*Ⓒℏ);1_S)' "
+                "  0_S "
+                "  0 ]",
+    // *Fermi reduced coupling constant - Measurement
+    "G0F",       "[ 1.1663787E-5_GeV^-2 "
+                "  0.0000006E-5_GeV^-2 "
+                "  'ROUND(UBASE(ABS(ⓈG0F/ⒸG0F));-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *First radiation constant - Exact calculation
+    "c1",       "[ 'CONVERT(2*Ⓒπ*Ⓒh*Ⓒc²;1_(W*m²))' "
+                "  0_(W*m²) "
+                "  0 ]",
+    // *Second radiation constant - Exact calculation
+    "c2",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒk;1_(m*K))' "
+                "  0_(m*K) "
+                "  0 ]",
+    // *Wien's constant - Theory approximation
+    "c3",       "[ 2.897771955185172661478605448092885_mm*K "
+                "  0_mm*K "
+                "  0 ]",
+    // *Wien's frequency constant - Theory approximation
+    "c3f",      "[ 0.05878925757646824946606130795309722_THz/K "
+                "  0_THz/K "
+                "  0 ]",
+    // *Magnetic flux quantum - Exact calculation
+    "ø",        "[ 'CONVERT(Ⓒπ*Ⓒℏ/Ⓒqe;1_Wb)' "
+                "  0_Wb "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Josephson constant - Exact calculation
+    "KJ",       "[ 'CONVERT(2*Ⓒqe/Ⓒh;1_Hz/V)' "
+                "  0_Hz/V "
+                "  0 ]",
+    // *Quantum of circulation - Calculation from measurement
+    "Kc",       "[ 'ROUND(CONVERT(Ⓒπ*Ⓒℏ/Ⓒme;1_m²/s);XPON(UVAL(ⓇKc*Ⓒπ*Ⓒℏ/Ⓒme))-XPON(UVAL(Ⓒπ*Ⓒℏ/Ⓒme))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇKc*ⒸKc);-2);1_m²/s)' "
+                "  'Ⓡme' ]",
+
+    // ------------------------------------------------------------------------
+    //  Materials
+    // ------------------------------------------------------------------------
+
+    "Materials",     nullptr,
+
+    // * ε₀q ratio - Calculation from measurement
+    "ε₀q",      "[ 'ROUND(CONVERT(Ⓒε₀/Ⓒqe;1_F/(m*C));XPON(UVAL(Ⓡε₀q*Ⓒε₀/Ⓒqe))-XPON(UVAL(Ⓒε₀/Ⓒqe))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡε₀q*Ⓒε₀q);-2);1_F/(m*C))' "
+                "  'Ⓡε₀' ]",
+    // * qε₀ product - Calculation from measurement
+    "qε₀",      "[ 'ROUND(CONVERT(Ⓒqe*Ⓒε₀;1_F*C/m);XPON(UVAL(Ⓡqε₀*Ⓒqe*Ⓒε₀))-XPON(UVAL(Ⓒqe*Ⓒε₀))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡqε₀*Ⓒqε₀);-2);1_F*C/m)' "
+                "  'Ⓡε₀' ]",
+    // *Dielectric constant - Definition convention
+    "εsi",      "[ 11.9 "
+                "  0 "
+                "  0 ]",
+    // *SiO2 dielectric constant - Definition convention
+    "εox",      "[ 3.9 "
+                "  0 "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Ref intensity - Definition convention
+    "I₀",       "[ 0.000000000001_W/m² "
+                "  0_W/m² "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    //  Comp
     // ------------------------------------------------------------------------
     "Computing",   nullptr,
 
@@ -420,22 +805,23 @@ const constant::config constant::constants =
 //  Define the configuration for the constants
 // ----------------------------------------------------------------------------
 {
-    .menu_help      = " Constants",
-    .help           = " Constant",
-    .prefix         = L'Ⓒ',
-    .type           = ID_constant,
-    .first_menu     = ID_ConstantsMenu00,
-    .last_menu      = ID_ConstantsMenu99,
-    .name           = ID_ConstantName,
-    .value          = ID_ConstantValue,
-    .command        = ID_object,
-    .file           = "config/constants.csv",
-    .library        = "library",
-    .builtins       = basic_constants,
-    .nbuiltins      = sizeof(basic_constants) / sizeof(*basic_constants),
-    .error          = invalid_constant_error,
-    .label          = nullptr,
-    .show_builtins  = show_builtin_constants
+    .menu_help     = " Constants",
+    .help          = " Constant",
+    .prefix        = L'Ⓒ',
+    .type          = ID_constant,
+    .first_menu    = ID_ConstantsMenu00,
+    .last_menu     = ID_ConstantsMenu99,
+    .name          = ID_ConstantName,
+    .value         = ID_ConstantValue,
+    .command       = ID_object,
+    .file          = "config/constants.csv",
+    .library       = "library",
+    .builtins      = basic_constants,
+    .nbuiltins     = sizeof(basic_constants) / sizeof(*basic_constants),
+    .error         = invalid_constant_error,
+    .label         = nullptr,
+    .show_builtins = show_builtin_constants,
+    .stack_prefix  = false,
 };
 
 
@@ -478,7 +864,7 @@ size_t constant::do_rendering(config_r cfg, constant_p o, renderer &r)
     size_t     len = 0;
     utf8       txt = nullptr;
     txt = cst->do_name(cfg, &len);
-    if (r.editing())
+    if (r.editing() || cfg.stack_prefix)
         r.put(cfg.prefix);
     r.put(txt, len);
     return r.size();
@@ -946,28 +1332,49 @@ object::result constant::lookup_command(config_r cfg, bool numerical)
 // ----------------------------------------------------------------------------
 {
     object_p name = rt.top();
-    id ty = name->type();
-    if (symbol_p sym = name->as_quoted<symbol>())
-    {
+    if (object_p sym = name->as_quoted(ID_object))
         name = sym;
-        ty = name->type();
+
+    size_t len = 0;
+    utf8   txt = nullptr;
+    id     ty  = name->type();
+    if (ty == ID_constant               ||
+        ty == ID_standard_uncertainty   ||
+        ty == ID_relative_uncertainty)
+    {
+        txt = constant_p(name)->name(&len);
     }
-    if (ty != ID_symbol && ty != ID_text)
+    else if (ty == ID_symbol || ty == ID_text)
+    {
+        txt = text_p(name)->value(&len);
+    }
+    else
     {
         rt.type_error();
         return ERROR;
     }
 
-    size_t      len    = 0;
-    utf8        txt    = text_p(name)->value(&len);
     if (constant_p cst = constant::do_lookup(cfg, txt, len, false))
     {
         if (object_p value = cst->do_value(cfg))
         {
             if (numerical)
             {
+                if (array_p a = value->as<array>())
+                {
+                    if (object_p item = a->at(cst->value_index()))
+                        value = item;
+                }
+                else if (cst->value_index() != 0)
+                {
+                    value = integer::make(0);
+                    if (!value)
+                        return ERROR;
+                }
+
                 if (expression_p expr = value->as<expression>())
                 {
+                    settings::SaveNumericalResults snr(true);
                     value = expr->evaluate();
                 }
                 else if (unit_p u = unit::get(value))
@@ -1038,4 +1445,167 @@ object_p constant::lookup_menu(config_r cfg, cstring name)
 // ----------------------------------------------------------------------------
 {
     return lookup_menu(cfg, utf8(name), strlen(name));
+}
+
+
+object_p constant::cache() const
+// ----------------------------------------------------------------------------
+//   Cache the constant value in the runtime
+// ----------------------------------------------------------------------------
+{
+    constant_g cst   = this;
+    uint       idx   = cst->index();
+    object_g   value = rt.constant(idx);
+    if (!value)
+    {
+        // Resize the cache if needed
+        if (idx >= rt.constants())
+            if (!rt.constants(idx+1))
+                return nullptr;;
+
+        value = cst->do_value(constants);
+        rt.constant(idx, value);
+
+        if (value)
+            if (algebraic_g alg = value->as_extended_algebraic())
+                if (to_decimal(alg, true))
+                    value = +alg;
+        if (!value)
+        {
+            if (!rt.error())
+                rt.invalid_constant_error();
+            return nullptr;
+        }
+        rt.constant(idx, value);
+        cleaner::disable();
+    }
+    return value;
+}
+
+
+object_p constant::uncache() const
+// ----------------------------------------------------------------------------
+//   Remove teh cached value from the runtime
+// ----------------------------------------------------------------------------
+{
+    constant_g cst   = this;
+    uint       idx   = cst->index();
+    if (idx < rt.constants())
+        rt.constant(idx, nullptr);
+    return +cst;
+}
+
+
+
+// ============================================================================
+//
+//   Standard and relative uncertainty
+//
+// ============================================================================
+
+const constant::config standard_uncertainty::standard =
+// ----------------------------------------------------------------------------
+//  Define the configuration for the standard uncertainty of constants
+// ----------------------------------------------------------------------------
+{
+    .menu_help      = " Constants",
+    .help           = " Constant",
+    .prefix         = L'Ⓢ',
+    .type           = ID_standard_uncertainty,
+    .first_menu     = ID_ConstantsMenu00,
+    .last_menu      = ID_ConstantsMenu99,
+    .name           = ID_ConstantName,
+    .value          = ID_ConstantValue,
+    .command        = ID_object,
+    .file           = "config/constants.csv",
+    .library        = "library",
+    .builtins       = basic_constants,
+    .nbuiltins      = sizeof(basic_constants) / sizeof(*basic_constants),
+    .error          = invalid_constant_error,
+    .label          = nullptr,
+    .show_builtins  = show_builtin_constants,
+    .stack_prefix  = true,
+};
+
+
+SIZE_BODY(standard_uncertainty)
+// ----------------------------------------------------------------------------
+//   Compute the size
+// ----------------------------------------------------------------------------
+{
+    object_p p = object_p(payload(o));
+    p += leb128size(p);
+    return byte_p(p) - byte_p(o);
+}
+
+
+PARSE_BODY(standard_uncertainty)
+// ----------------------------------------------------------------------------
+//    Skip, the actual parsing is done in the symbol parser
+// ----------------------------------------------------------------------------
+{
+    return do_parsing(standard, p);
+}
+
+
+RENDER_BODY(standard_uncertainty)
+// ----------------------------------------------------------------------------
+//   Render the constant into the given constant buffer
+// ----------------------------------------------------------------------------
+{
+    return do_rendering(standard, o, r);
+}
+
+
+const constant::config relative_uncertainty::relative =
+// ----------------------------------------------------------------------------
+//  Define the configuration for the relative uncertainty of constants
+// ----------------------------------------------------------------------------
+{
+    .menu_help      = " Constants",
+    .help           = " Constant",
+    .prefix         = L'Ⓡ',
+    .type           = ID_relative_uncertainty,
+    .first_menu     = ID_ConstantsMenu00,
+    .last_menu      = ID_ConstantsMenu99,
+    .name           = ID_ConstantName,
+    .value          = ID_ConstantValue,
+    .command        = ID_object,
+    .file           = "config/constants.csv",
+    .library        = "library",
+    .builtins       = basic_constants,
+    .nbuiltins      = sizeof(basic_constants) / sizeof(*basic_constants),
+    .error          = invalid_constant_error,
+    .label          = nullptr,
+    .show_builtins  = show_builtin_constants,
+    .stack_prefix   = true,
+};
+
+
+SIZE_BODY(relative_uncertainty)
+// ----------------------------------------------------------------------------
+//   Compute the size
+// ----------------------------------------------------------------------------
+{
+    object_p p = object_p(payload(o));
+    p += leb128size(p);
+    return byte_p(p) - byte_p(o);
+}
+
+
+PARSE_BODY(relative_uncertainty)
+// ----------------------------------------------------------------------------
+//    Skip, the actual parsing is done in the symbol parser
+// ----------------------------------------------------------------------------
+{
+    return do_parsing(relative, p);
+}
+
+
+RENDER_BODY(relative_uncertainty)
+// ----------------------------------------------------------------------------
+//   Render the constant into the given constant buffer
+// ----------------------------------------------------------------------------
+{
+    return do_rendering(relative, o, r);
 }

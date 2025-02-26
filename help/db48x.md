@@ -16,6 +16,7 @@ You can also [try it in your browser](http://48calc.org).
 
 * [Using the on-line help](#help)
 * [Quickstart guide](#quickstart-guide)
+* [Programming examples](#rpl-programming-examples)
 * [State of the project](#state-of-the-project)
 * [Design overview](#design-overview)
 * [Keyboard interaction](#keyboard-interaction)
@@ -390,6 +391,8 @@ unintentional differences, since the implementation is completely new.
   the HP48 and later HP models. This can be controlled using the
   `ListEvaluation` setting. Note that a list can be converted to a program using
   the `→Program` command, which makes it easy to build programs from lists.
+  See also the differences regarding quoted names in
+  [Representation of objects](#representation-of-objects)
 
 * The `case` statement can contain `when` clauses as a shortcut for the frequent
   combination of duplicating the value and testing against a reference. For
@@ -471,6 +474,16 @@ unintentional differences, since the implementation is completely new.
   DB48X-only extension that returns more precise textual information, and should
   be preferred both for readability and future compatibility.
 
+* Expressions between quotes are always algebraic expressions, unlike on HP
+  calculators, where a number or a name in quotes is parsed as a number or
+  name. The `Type` for `'N'` is `9` on DB48x vs. `6` on HP calculators.
+  Parsing names always behaves like in programs, and is consistent for arrays
+  and lists as well. By contrast, on HP calculators, if you enter `« 'N' N »`
+  and edit it, you get a quoted name followed by an unquote, but if you enter
+  `{ 'N' N }`, you get `{ N N }` as a resulting object, which is not very
+  consistent, and makes it harder to programmatically use lists to create
+  programs (e.g. using `→Program`).
+
 * DB48X has a dedicated data type to represent multi-variate polynomials, in
   addition to the classical RPL-based algebraic expressions.
 
@@ -550,6 +563,9 @@ operate on these items when it makes sense. Therefore:
   `:A:{ 1 2 } :B:{ 3 4 } +` gives `{ 1 2 3 4 }`, and so does
   `:A:{ 1 2 } { 3 4 } +`. DB48x strips the tags in all cases, i.e. the first
   case gives the same `{ 1 2 3 4 }` as the other two.
+
+* As indicated [earlier](#representation-of-objects), quoted names in lists
+  remain quoted, whereas on HP calculators, the quotes are removed.
 
 
 ### Vectors and matrices differences
@@ -903,9 +919,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 The original RPL (*Reverse Polish Lisp*) programming language was designed and
 implemented by Hewlett Packard for their calculators from the mid-1980s until
 2015 (the year the HP50g was discontinued). It is based on older calculators
-that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size of
-4, RPL has a stack size only limited by memory and also incorporates
-programmatic concepts from the Lisp programming language.
+that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size
+of 4, RPL has a stack size only limited by memory and also incorporates
+programmatic concepts from the Lisp and Forth programming languages.
 
 The first implementation of RPL accessible by the user was on the HP28C, circa
 1987, which had an HP Saturn processor. More recent implementations (e.g., HP49,
@@ -913,8 +929,9 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB48X.
 
 DB48X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros DM42 calculator. This has [implications on the design](#design-overview)
-of this particular implementation of RPL.
+SwissMicros DM42 calculator.
+This has [consequences on the design](#design-overview) of this particular
+implementation of RPL.
 
 ## The RPL stack
 
@@ -2186,11 +2203,11 @@ values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
 
 Based numbers are used to perform computations in any base. The most common
 bases used in computer science, 2, 8, 10 and 16, have special shortcuts.
-The [Bases Menu](#bases-menu) list operations on based numbers.
+The `BasesMenu` list operations on based numbers.
 
 Like integers, based numbers can be [arbitrary large](#big-integers).
 However, operations on based numbers can be truncated to a specific number of
-bits using the [WordSize](#wordsize) setting. This makes it possible to perform
+bits using the `WordSize` setting. This makes it possible to perform
 computations simulating a 16-bit or 256-bit processor.
 
 
@@ -2214,8 +2231,8 @@ typically selects the most efficient form for a given operation.
 
 Available operations on complex numbers include basic arithmetic, trigonometric,
 logarithms, exponential and hyperbolic functions, as well as a few specific
-functions such as [conj](#conj) or [arg](#arg). These functions are available in
-the [Complex Menu](#complex-menu).
+functions such as `conj` or `arg`. These functions are available in
+the `ComplexMenu`.
 
 
 ## Expressions
@@ -2227,6 +2244,19 @@ or hyperbolic functions can apply to algebraic expressions.
 An expression that contains an equal sign, e.g. `sin X + 1 = cos X`, is called
 an *equation*. It can be given as an argument to the solver.
 
+
+## Symbols
+
+A symbol is a sequence of characters such as `Hello` or `A→B` that can be used
+ot identify variables. Evaluating a symbol evaluates the underlying variable if
+it exists, or evaluates as itself otherwise.
+
+## Programs
+
+Programs are represented as RPL objects enclosed between the `«` and `»`
+delimiters, and containing a sequence of RPL objects. Running (or evaluating) a
+program is done using the `Run` or `Eval` commands, which evaluate each RPL
+object in the program in turn.
 
 ## Lists
 
@@ -2483,7 +2513,221 @@ in the `config/equations.csv` file.
 You can edit it by recalling its content on the stack using
 `"config:equations.csv" RCL`, editing the values, and then storing the content
 back to disk using `"config:equations.csv" STO`.
+# RPL Programming examples
+
+The programs in this section demonstrate basic programming concepts in
+[RPL](#introduction-to-rpl). They are intended to develop and improve your
+programming skills, and to provide supplementary functions for your
+calculator. The DB48X calculator features a library of introductory programs
+covering mathematics, physics and computer science, which is accessible using
+the `Library` command, 🟦 _H_ (_LIB_).
+
+## What defines a RPL program?
+
+A RPL program is a regular [RPL object](#programs) describing a procedure
+consisting in a space-separated sequence of RPL objects such as numbers,
+algebraic and RPN instructions. The whole sequence is enclosed between the `«`
+and `»` delimiters.
+
+To enter a program, use the 🟨 _=_ (`«PROG»`) key, which puts `« »` in the text
+editor, with the cursor in the middle. One enters the sequence of instructions
+defining the procedure at the position indicated by the cursor. The _Enter_ key
+then enters the sequence as an object on the stack. If there is an error in the
+program, it will be reported, and the cursor will be positioned next to it.
+
+A program can be executed by evaluating it, typically using the _=_ key, which
+is bound to the `Run` command. The `Run` and `Eval` commands also execute
+programs. Programs can also be stored in variables, like any RPL
+object. Evaluating the name of the variable evaluates the program.
+
+
+## Volume of a cylinder
+
+The following programs take the values of the radius `r` and the height `h` of a
+cylinder to compute the total area of the corresponding cylinder according to
+the equation `ACyl=2·π·R↑2+2·π·R·H`. We use the symbolic constant `Ⓒπ`,
+which we convert to its numerical value using the `→Num` function.
+
+The following code stores the program in the `ACyl` variable, and then supplies
+the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
+examples, we will use `R=2_m` and `H=3_m`.
+
+### RPN style
+
+The following code computes the cylinder area using _stack RPN instructions_,
+i.e. manipulating values on the stack directly. This approach is the most
+similar to traditional HP calculators.
+
+```rpl
+« Duplicate Rot + * 2 * Ⓒπ →Num * »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### Using global variables
+
+The following implementation computes the cylinder area using _RPN instructions_
+and global variables to store `R` and `H`. It then stores the result in a global
+variable named `A`, using the `Copy` command that copies the result from the
+stack into global variable `A` without removing it from the stack..
+
+Using global variables is rarely the most efficient, but it has the benefit that
+it leaves the inputs and output of the program avaiable for later use. This can
+be beneficial if these values are precious and should be preserved.
+
+```rpl
+«
+  'R' Store 'H' Store
+  2 Ⓒπ →Num * R * R H + *
+  'A' Copy
+»
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Note that global variables stick around in the current directory after the
+program executes. They can be purged using `{ R H A } Purge`.
+
+### Using algebraic expressions
+
+The following example computes the cylinder area using an _algebraic expression_
+and global variables. Using algebraic expressions can make programs easier to
+read, since the operations look similar to normal mathematical expressions.
+
+```rpl
+« 'R' Store 'H' Store
+'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### Using local variables
+
+The following example computes the cylinder area using _local variables_, which
+make it easier to reuse the same value multiple times, and do so much faster
+than global variables. The code otherwise uses regular RPN instructions.
+
+```rpl
+« → H R « 2 Ⓒπ →Num * R * R H + * » »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Notice that when we declare local variables, the order of the arguments is the
+order in which they are given on the command line, not the order in which they
+appear on the stack. In that case, we enter `H` first, and `R` second, meaning
+that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
+`→ H R` notation instead of `→ R H`. This is the opposite order compared to the
+`Store` commands we used for global variables.
+
+### Local algebraics
+
+The following example computes the cylinder area using _local variables_, along
+with an _algebraic expression_.
+
+```rpl
+« → H R '2*→Num(Ⓒπ)*R*(R+H)' »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
 # Release notes
+
+## Release 0.9.1 "Follow" - Finances, bit-counting and constants
+
+This release follows-up on 0.9.0 by improving the way constants are
+evaluated to better serve the equation library. It also adds
+finance-related functions, and specialized bit-counting functions.
+
+### New features
+
+* Add standard and relative uncertainty for all constants. For a
+  constant like `G`, which when edited looks like `ⒸG`, the standard
+  uncertainty is `ⓈG` and the relative uncertainty is `ⓇG`. This shows
+  as `UsG` and `UrG` on screen, to match common practice.
+
+* The constants menu now contains helpers to enter constants, and for
+  the commands `Const`, `StdUnc` and `RelUnc`, which generate a
+  constant, a standard uncertainty or a relative uncertainty from a
+  name.
+
+* Implement precision-control functions that make it possible to
+  adjust the result of computatoins adjusting to relative or standard
+  uncertainty. `→Us` and `→Ur` convert betwen standard and relative
+  uncertainty. `StandardRound`, `RelativeRound` and `PrecisionRound`
+  round a value based on its standard or relative uncertainty, or
+  according to the precision of some other value.
+
+* Add bit-counting operations. `FirstBitSet` and `LastBitSet` find the
+  position of the first and last bit set in an integer value.
+  `CountBits` counts the number of bits set in an integer value.
+
+* Add finance operations. The finance menu `TVM` now shows a solver
+  for time value of money, with payments at beginning (`TVMBeg`) or at
+  end (`TVMEnd`). The `Amort` command generates the amortization
+  (principal, interest and balance). The `AmortTable`, a DB48x
+  extension, generates a complete amortization table. A new setting,
+  `FinanceRounding`, a DB48x extension, sets the rounding of finance
+  results.
+
+* Add the `Sub` command to extract a subset of texts, lists or grobs.
+  As an illustration, the `Anagram` program was added to the demo
+  state. As a side effect, the named variants for arithmetic operators
+  have been renamed from `sub`, `mul` and `div` to `subtract`,
+  `multiply` and `divide`.
+
+
+### Bug fixes
+
+* Avoid possible crash when using the delete key while searching.
+
+* Fix a few broken (obsolete) links in the help file.
+
+* `UVal` now works on numbers, not just on unit objects, like on HP
+  calculators.
+
+* Remove NewRPL names for some commands like `ToRectangular`, and
+  replace them with the DB48x spelling.
+
+### Improvements
+
+* Constants are brought up to date to the latest best practice from
+  the scientific community. This includes computing many derived
+  constants from a smaller subset of exact constants, as well as
+  providing standard and relative uncertainty for each constant.
+
+* Constant values are cached to accelerate their evaluation. This
+  avoids having to parse and evalute constant definitions.
+
+* The `ConstantMenus` was reorganized with more constant categories
+  covering dates, mathematics, chemistry, phsyics, particle masses,
+  electromagnetism, atomic sizes, Compton scattering, magnetism,
+  materials and computing.
+
+* The `MathMenu` was reorganized, notably to make the exp and log
+  functions easier to access. This merges the former `PowerMenu` and
+  `ExpLogMenu` so that the `MathMenu` still has less than 18 entries.
+
+* Numerical integration now uses the refinements documented in Kahan's
+  1980 HP Journal article about numerical integration on the HP34.
+  This makes it possible for example to integrate `'sin(x)/x'` over
+  0 to π interval.
+
+* Numerical integration now limits its precision to the number of
+  digits being displayed, like on HP calculators.
+
+* Document the difference and rationale for parsing quoted names
+  compared to HP calculators.
+
 
 ## Release 0.9.0 "Wilson's Dream" - Full equation library
 
@@ -6154,11 +6398,27 @@ Its numerical value is an arbitrary large number that is not really infinite.
 
 The undefined constant is used to represent undefined values, such as the result of undefined operations.
 
+### rad constant
+
+This constant defines corresponds to one radian.
+
+### twoπ constant
+
+This constant holds the value of two times [π](#π-constant).
+
+### angl constant
+
+This constants holds one half-turn expressed in degrees.
+
+
 ## Chemistry constant
 
 ### NA constant
 
 Avogradro constant is the number of constituent particles per mole.
+
+Since the redefinition of the mole in 2019, the `NA` constant is therefore
+defined as an exact value.
 
 ### k constant
 
@@ -6166,9 +6426,14 @@ The Boltzmann constant is the proportionality factor that relates the average
 relative thermal energy of particles in a gas with the thermodynamic temperature
 of the gas.
 
+Since the 2019 redefinition of the SI units, the `k` constant is therefore
+defined as an exact value.
+
 ### Vm constant
 
 Molar volume of an ideal gas at 1 atmosphere of pressure and 0°C.
+
+By convention, it is chosen as to be the exact result of `R*StdT/StdP`.
 
 ### R constant
 
@@ -6176,29 +6441,8 @@ The universal gas constant is the molar equivalent to the Boltzmann constant,
 expressed in units of energy per temperature increment per amount of substance,
 rather than energy per temperature increment per particle.
 
-### StdT constant
-
-Standard temperature as defined by IUPAC in 1982.
-
-Standard temperature and pressure (STP) or Standard conditions for temperature
-and pressure are various standard sets of conditions for experimental
-measurements used to allow comparisons to be made between different sets of
-data. The most used standards are those of the International Union of Pure and
-Applied Chemistry (IUPAC, used by DB48X) and the National Institute of Standards
-and Technology (NIST). Other organizations have established a variety of other
-definitions.
-
-### StdP constant
-
-Standard pressure as defined by IUPAC in 1982, corresponding to 1 atm
-
-Standard temperature and pressure (STP) or Standard conditions for temperature
-and pressure are various standard sets of conditions for experimental
-measurements used to allow comparisons to be made between different sets of
-data. The most used standards are those of the International Union of Pure and
-Applied Chemistry (IUPAC, used by DB48X) and the National Institute of Standards
-and Technology (NIST). Other organizations have established a variety of other
-definitions.
+Since the 2019 redefinition of the SI units, the `R` constant is therefore
+defined as an exact quantity.
 
 ### σ constant
 
@@ -6210,6 +6454,91 @@ For an ideal absorber/emitter or black body, the Stefan–Boltzmann law states
 that the total energy radiated per unit surface area per unit time (also known
 as the radiant exitance) is directly proportional to the fourth power of the
 black body's temperature, T:`M°=σ·T⁴`
+
+Since the 2019 redefinition of the SI units, the `σ` constant is defined as an
+exact result.
+
+### StdT constant
+
+Standard temperature as defined by IUPAC in 1982.
+
+Standard temperature and pressure (STP) or Standard conditions for temperature
+and pressure are various standard sets of conditions for experimental
+measurements used to allow comparisons to be made between different sets of
+data. The most used standards are those of the International Union of Pure and
+Applied Chemistry (IUPAC, used by DB48X) and the National Institute of Standards
+and Technology (NIST). Other organizations have established a variety of other
+definitions. By convention, it is chosen as the exact value StdT=273.15_K`.
+
+### StdP constant
+
+Standard pressure as defined by IUPAC in 1982, corresponding to 1 atm
+
+Standard temperature and pressure (STP) or Standard conditions for temperature
+and pressure are various standard sets of conditions for experimental
+measurements used to allow comparisons to be made between different sets of
+data. The most used standards are those of the International Union of Pure and
+Applied Chemistry (IUPAC, used by DB48X) and the National Institute of Standards
+and Technology (NIST). Other organizations have established a variety of other
+definitions. By convention, it is chosen as the exact value `StdP=101.325_kPa`.
+
+### F constant
+
+Faraday constant. In physical chemistry, the Faraday constant is a
+physical constant defined as the quotient of the total electric charge
+(`q`) by the amount (`n`) of elementary charge carriers in any given
+sample of matter. It's an exact constant.
+
+### Mu constant
+
+Molar mass constant, defined as one twelfth of the molar mass of carbon-12.
+
+The molar mass of an element or compound is its relative atomic mass (or atomic
+weight, noted `Ar`) or relative molecular mass multiplied by the molar mass
+constant.
+
+Following the 2019 revision of the SI system, the
+[Avogadro constant](#NA-constant) became exact. As a result the molar mass
+constant is no longer exactly `1_g/mol`. For internal consistency this value
+depends therefore on the mass unit `u` [u-constant](#u-constant) and is
+calculated by the following expression: `NA·u`.
+
+### MC12 constant
+
+Molar mass of carbon-12. Since 1960, mole is the amount of substance of
+a system which contains as many elementary entities as there are atoms in
+12 gram of carbon-12. Since 2019, the SI definition of mole changed such
+that the molar mass of carbone-12 remains nearly but no longer exactly
+12 g/mol. For internal consistency this value depends therefore on the
+mass unit `u` [u-constant](#u-constant) and is calculated by the following
+expression: `12·Mu`.
+
+### n0 constant
+
+Loschmidt constant or Loschmidt's number is the number of particles
+(atoms or molecules) of an ideal gas per volume (the number density),
+and usually quoted at standard temperature and pressure. Since 2019 with
+the redifinition of the mole, it is calculated exactly as: `NA·Vm`.
+
+### SoR constant
+
+Sakur-Tetrode constant gives the absolute entropy at an absolute temperature
+of `T=1_K` and standard atmospheric pressure `StdP` for one mole of an ideal
+monoatomic gas composed of particles of mass equal to the atomic mass constant.
+
+This constant is used in the Sakur-Tetrode equation expression the entropy of a
+monoatomic ideal gas in terms of its thermodynamic state.
+
+### Da constant
+
+The Dalton constant is the unit mass defined as one twelfth the mass of an
+unbound neutral atom of carbon-12 in its nuclear and electronic ground state and
+at rest.
+
+### kq constant
+
+This constant expresses the ratio of Boltzmann constant [k](#k-constant) to the
+elementary charge [qe](#qe-constant). It has the exact value `kq=k/qe`.
 
 
 ## Physics constants
@@ -6224,40 +6553,17 @@ Speed of light in vaccuum, a universal physical constant that is exactly equal
 to 299,792,458 metres per second (by definition of the metre).
 
 According to the [special theory of relativity](http://en.wikipedia.org/wiki/Special_relativity),
- *c* is the upper limit for the speed at which conventional matter or energy
+`c` is the upper limit for the speed at which conventional matter or energy
 (and thus any signal carrying information) can travel through space.
 
 The [theory of incomplete measurements](http://physics.dinechin.org) presents
 space and time as having no existence on their own. We only derive them from
 *measurements* of distance and duration made using photons. In that viewpoint,
-*c* is the limit of what can be measured using photons. Anything travelling
+`c` is the limit of what can be measured using photons. Anything travelling
 faster than light is indistinguishable from anti-matter. This is illustrated by
 the thought experiment known (or not) as the *bat and the supersonic jet*.
 This little tidbit is only mentioned here because this particular theory was
 devised by the primary author of DB48X.
-
-
-### ε0 constant
-
-Vacuum permittivity, commonly denoted ε0 (pronounced "epsilon nought" or
-"epsilon zero"), is the value of the absolute dielectric permittivity of
-classical vacuum. It may also be referred to as the permittivity of free space,
-the electric constant, or the distributed capacitance of the vacuum. It is an
-ideal (baseline) physical constant. It is a measure of how dense of an electric
-field is "permitted" to form in response to electric charges and relates the
-units for electric charge to mechanical quantities such as length and force.
-
-### μ0 constant
-
-The vacuum magnetic permeability (variously vacuum permeability, permeability of
-free space, permeability of vacuum, magnetic constant) is the magnetic
-permeability in a classical vacuum. It is a physical constant, conventionally
-written as μ0 (pronounced "mu nought" or "mu zero"). It quantifies the strength
-of the magnetic field induced by an electric current.
-
-### g constant
-
-Acceleration of Earth gravity, equivalent to the free-fall acceleration.
 
 ### G constant
 
@@ -6266,31 +6572,268 @@ calculation of gravitational effects in Sir Isaac Newton's law of universal
 gravitation and in Albert Einstein's theory of general relativity.
 
 According to Newton's law of universal gravitation, the magnitude of the
-attractive force (F) between two bodies each with a spherically symmetric
-density distribution is directly proportional to the product of their masses, m₁
-and m₂, and inversely proportional to the square of the distance, r, directed
-along the line connecting their centres of mass:
+attractive force `F` between two bodies each with a spherically symmetric
+density distribution is directly proportional to the product of their masses,
+`m₁` and `m₂`, and inversely proportional to the square of the distance, `r`,
+directed along the line connecting their centres of mass:
 
 ![Newton Gravitation](img/NewtonGravitation.bmp)
+
+### g constant
+
+Acceleration of Earth gravity, equivalent to the free-fall acceleration.
+Its value is exactly defined by convention as `g=9.80665_m/s²`.
+
+### Z₀ constant
+
+Vaccuum characteristic impedance, also called impedance of free space.
+
+This constant relates the magnitudes of the electric and magnetic fields of
+electromagnetic radiation travelling through free space: `Zo=|E|/|H|`. Its
+value depends on the vacuum permittivity `μ0`.
+
+### ε₀ constant
+
+Vacuum permittivity, commonly denoted ε₀ (pronounced "epsilon nought" or
+"epsilon zero"), is the value of the absolute dielectric permittivity of
+classical vacuum. It may also be referred to as the permittivity of free space,
+the electric constant, or the distributed capacitance of the vacuum. It is an
+ideal (baseline) physical constant. It is a measure of how dense of an electric
+field is "permitted" to form in response to electric charges and relates the
+units for electric charge to mechanical quantities such as length and force.
+Its value depends on the vaccuum permeability constant `μ0`.
+
+### μ₀ constant
+
+The vacuum magnetic permeability (variously vacuum permeability, permeability of
+free space, permeability of vacuum, magnetic constant) is the magnetic
+permeability in a classical vacuum. It is a physical constant, conventionally
+written as μ₀ (pronounced "mu nought" or "mu zero"). It quantifies the strength
+of the magnetic field induced by an electric current. Its value depends on the
+fine structure constant measurement `α`.
+
+### ke constant
+
+Coulomb constant as it appears in the expression of the Coulomb force:
+`Fe=ke·q1·q2/r^2`. Its value depends on the vacuum permittivity `ε0`.
+
+
+## Mass constants
+
+### me constant
+
+Electron mass. In particle physics, the electron mass is the mass of a
+stationary electron, also known as the invariant mass of the electron and it is
+one of the fundamental constants of physics. Its value is closely related to
+the unit mass measurement through the electron relative atomic mass:
+`me=u·Ar(e)` where `Ar(e)`, i.e. [Are](#Are-constant), is determined
+iteratively by frequency measurements using Penning trap. Its value can also be
+calculated with the fine structure constant `α` and the Rysberg constant `R∞`.
+
+### mn constant
+
+Neutron mass measurement. Its value is determined experimentally by mass
+spectrometry.
+
+### mp constant
+
+Proton mass measurement which is the hydrogen H-1 nucleus. Its value is
+determined by particle drag race experiments.
+
+### mH constant
+
+Hydrogen mass measurement. The electrically neutral hydrogen H-1
+atom contains a single positively charged proton in the nucleus, and
+a single negatively charged electron bound to the nucleus by the Coulomb
+force. Its value is measured by spectrometry.
+
+### u constant
+
+Unified atomic mass unit.
+
+A unit of mass defined as one twelfth of the mass of an unbound neutral atom of
+carbon-12 in its nuclear and electronic ground state and at rest. It is a non-SI
+unit accepted for use with SI. It is identical to the
+[Dalton](#dalton constant).
+
+Its value can be determined from the calculation of the electron rest mass `me`
+and the measurement of the electron relative atomic mass `Ar(e)`
+[Are-constant](#Are-constant) (that is, the mass of electron divided by the
+atomic mass constant).
+
+### mD constant
+
+Mass of the neutral deuterium atom which is a stable isotope of hydrogen.
+The electrically neutral deuterium atom H-2 (also known as heavy hydrogen)
+contains a single positively charged proton and a neutron in the nucleus,
+and a single negatively charged electron bound to the nucleus by the
+Coulomb force. Precise measurements of deuterium is obtained by
+spectrometry.
+
+### mT constant
+
+Mass of the neutral tritium atom which is an unstable isotope of hydrogen
+H-3 . Its nucleus contains a single positively charged proton and two
+neutrons, surrounded by a single negatively charged electron bound to
+the nucleus by the Coulomb force. Its mass is measured by spectrometry.
+
+### mHe constant
+
+Mass of the neutral helium atom. The electrically neutral helium atom
+He-4 contains two positively charged protons and two neutrons, and two
+negatively charged electrons bound to the nucleus by the Coulomb force.
+Its mass is measured by spectrometry.
+
+### mμ constant
+
+Mass of the muon which is an unstable elementary particle similar
+to the electron (both are classified as leptons), with an electric
+charge of `−qe` and spin -1/2, but with a much greater mass. Its mass
+is evaluated from energy conservation budget in pair creation reaction.
+
+### mτ constant
+
+Mass of the tau which is an elementary particle similar to the
+electron (both are classidief as leptons), with an electric charge
+of `−qe` and spin -1/2, but it is heaviest of leptons. Its mass is
+evaluated from energy conservation budget in pair creation reaction.
+
+### mpme constant
+
+Dimensionless ratio between the mass of the proton `mp` and the mass
+of the electron `me`. Currently, the most precise measurements of the
+charge-to-mass ratio of a proton still use a magnetic field like Thompson
+did, but rely on measuring (cyclotron) frequencies rather than deflection.
+
+### Are constant
+
+Electron relative atomic mass. The experimental value of the electron
+relative atomic mass is an important constant (usually noted as
+`Ar(e)`) which is needed to calculate the unit mass value `u`
+[u-constant](#u-constant). According to COTATA2022, it is a dimensionless
+quantity which is determined iteratively by frequency measurements using
+Penning trap.
+
+
+## Quantum constants
 
 ### h constant
 
 The Planck constant is a fundamental physical constant that appears in quantum
 mechanics. A photon's energy is equal to its frequency multiplied by the Planck
-constant (`E=h·ν`), and the wavelength of a matter wave equals the Planck constant
-divided by the associated particle momentum (`λ=h/p`).
+constant (`E=h·ν`), and the wavelength of a matter wave equals the Planck
+constant divided by the associated particle momentum (`λ=h/p`). Since the 2019
+SI redefinition, it has an exact value.
 
 ### ℏ constant
 
-The reduced Planck constant, ℏ, also known as the Dirac Constant, is defined as
-`ℏ=h/2π`.
+The reduced Planck constant, ℏ, also known as the Dirac Constant, is
+exactly defined as `ℏ=h/2π`.
+
+### α constant
+
+Fine-structure constant. In physics, the fine-structure constant, also known as
+the Sommerfeld constant, commonly denoted by α (the Greek letter alpha), is a
+fundamental physical constant which quantifies the strength of the
+electromagnetic interaction between elementary charged particles. It is measured
+by observing the recoil frequency of atoms, like cesium or rubidium, when they
+absorb a photon, essentially gauging how strongly the atoms recoil, which
+provides an accurate determination of the constant's value using high precision
+measurements achieved through techniques like matter-wave interferometry.
+
+It is a dimensionless quantity, independent of the system of units used, which
+is related to the strength of the coupling of an elementary charge `qe` with
+the electromagnetic field.
+
+### ΔfCs constant
+
+Caesium (Cs) hyperfine transition. It is the transition between the two
+hyperfine ground states of the caesium atom. The frequency `ΔfCs` of this
+transition is used to define the second as the official time unit of the
+International System of Units (SI): one second is therefore the duration
+of exactly 9192631770 cycles of this radiation. It represents the "tick"
+of an extremely accurate atomic clock based on the properties of the
+Caesium atom. By convention this constant is exact.
+
+### θw constant
+
+The weak mixing angle or Weinberg angle. It is a parameter in the
+Weinberg–Salam theory of the electroweak interaction, part of the
+Standard Model of particle physics. It is the angle by which spontaneous
+symmetry breaking rotates the original W0 and B0 vector boson plane,
+producing as a result the Z0 boson, and the photon. Its value is
+calculated from the mesurement of the following dimensionless parameter
+for the W and Z bosons: `(sinθw)^2 = 1 - (mW/mZ)^2 = 0.22305 ± 0.00023`.
+
+### Lpl constant
+
+Planck length unit. As an attempt to devise a universal and natural units
+system, the Planck units are combinations of basic universal constants. It
+is the smallest distance that can be measured, and it represents the
+scale at which quantum gravity effects become dominant. It is the distance
+travelled by light during one Planck time `Tpl`. Its value depends on the
+measured value of the gravitational constant `G`.
+
+### Tpl constant
+
+Planck time unit. As an attempt to devise a universal and natural units
+system, the Planck units are combinations of basic universal constants.
+It is the shortest time interval that can be measured and it is fundamental
+in the study of the universe beginning. It is the time required for light
+to travel one Planck length `Lpl`. Its value depends on the measured value
+of the gravitational constant `G`.
+
+### Mpl constant
+
+Planck mass unit. As an attempt to devise a universal and natural units
+system, the Planck units are combinations of basic universal constants.
+It can be viewed as the mass of a black hole with a Swarzhchild radius
+of 2 Planck lengths (`rs=2·Lpl`) or, the minimum mass of a black hole
+is one half of the Planck mass, the latter having a Planck Length radius.
+Its value depends on the measured value of the gravitational constant
+`G`.
+
+### Epl constant
+
+Planck energy unit. As an attempt to devise a universal and natural units
+system, the Planck units are combinations of basic universal constants.
+According to the mass-energy equivalence: `Epl=Mpl·c^2` it is the energy
+equivalent to the Planck mass. Considered to be the smallest possible unit
+of energy, which is theoretically meaningful within the framework of quantum
+gravity, where both effects of quantum mechanics and general relativity
+become significant; and also the energy scale at which the universe is thought
+to have existed at times near the start of the Big Bang, characterized by
+extremely high densities and temperatures. Its value depends on the measured
+value of the gravitational constant `G`.
+
+### T°pl constant
+
+Planck temperature unit. As an attempt to devise a universal and natural
+units system, the Planck units are combinations of basic universal constants.
+It is the highest temperature that conventional physics can describe. It's a
+fundamental limit of quantum mechanics and is considered the temperature of
+the universe during the Big Bang when quantum gravity effects became
+dominant. Its value depends on the measured value of the gravitational
+constant `G`.
+
+### Eh constant
+
+Hartree energy constant. It is a unit of energy used in atomic physics
+and computational chemistry, which is also used in molecular orbital
+calculations. It is approximately the negative electric potential energy
+of an electron in a hydrogen atom's ground state, and also approximately
+twice the ionization energy of a hydrogen atom. Its value depends on the
+measured value of the Rydberg constant `R∞`.
+
+
+## Electromagnetism constants
 
 ### qe constant
 
 The elementary electric charge is a fundamental physical constant, defined as
 the electric charge carried by a single proton or, equivalently, the magnitude
 of the negative electric charge carried by a single electron, which has charge
-−qe.
+`−qe`.
 
 In the SI system of units, the value of the elementary charge is exactly defined
 as `qe=1.602176634⁳⁻¹⁹` coulombs. Since the 2019 redefinition of SI base units,
@@ -6299,163 +6842,336 @@ which the elementary charge is one. As a consequence of this change, the value
 of that constant in DB48X differs from the value in the HP50G, which named it q,
 with value `1.60217733⁳⁻¹⁹` coulombs.
 
-### me constant
+### λ0 constant
 
-Electron mass. In particle physics, the electron mass is the mass of a
-stationary electron, also known as the invariant mass of the electron. It is one
-of the fundamental constants of physics. It has a value of about `9.109⁳⁻³¹`
-kilograms
+Photon wavelength. Photon energy can be expressed using any unit of energy
+such as the electronvolt (eV) or the Joule (J). For short wavelength sources,
+researchers often discuss photon energies in units of eV (or keV for hard
+X-rays) out of convenience.  The SI definition for 1 eV derives from the
+[definitional value of the electron charge](#me-constant). Photon energy `E`
+in eV can be computed from wavelength `λ` in nm as: `E=λ0/λ`. This is an
+exact constant.
+
+### f0 constant
+
+Photon frequency. This is the exact frequency associated to the
+[photon wavelength λ0][#λ0-constant].
+
+### ge constant
+
+Electron g-factor. It is a dimensionless quantity that characterizes
+the magnetic moment and angular momentum of an electron. It is the
+ratio of the magnetic moment (or, equivalently, the gyromagnetic ratio)
+of the electron to that expected of a classical particle of the same
+charge and angular momentum. The electron g-factor is one of the most
+precisely measured values in physics.
 
 ### qme constant
 
-Ratio between the electron charge and its mass.
+Ratio between the electron charge `qe` and its mass `me`. The uncertainty
+of `qme` dépends on the one of `me`.
 
-### mp constant
+### μe constant
 
-Mass of the proton.
+Electron magnetic moment. The electron magnetic moment, or more
+specifically the electron magnetic dipole moment, is the magnetic
+moment of an electron resulting from its intrinsic properties of spin
+and electric charge. Its angular momentum comes from two types of
+rotation: spin and orbital motion. Therefore an external magnetic field
+exerts a torque on the electron magnetic moment revealing its existence.
+It's a mearured quantity.
 
-### mpme constant
+### μp constant
 
-Ratio between the mass of the proton and the mass of the electron.
+Proton magnetic moment. It is the magnetic dipole moment of the proton
+resulting from its intrinsic properties of spin and electric charge. Its
+angular momentum comes from two types of rotation: spin and orbital motion.
+Therefore an external magnetic field exerts a torque on the proton magnetic
+moment revealing its existence. It's a measured quantity.
 
-### α constant
+### μn constant
 
-Fine-structure constant. In physics, the fine-structure constant, also known as
-the Sommerfeld constant, commonly denoted by α (the Greek letter alpha), is a
-fundamental physical constant which quantifies the strength of the
-electromagnetic interaction between elementary charged particles.
+Neutron magnetic moment. It is the magnetic dipole moment of the meutron
+resulting from its intrinsic properties of spin. Normally it sould be
+zero for an elementary neutral particle because of zero charge. The fact
+that it was non-vanishing prooves that the neutron is a composite particle.
+Its angular momentum comes from two types of rotation: spin and orbital
+motion. Therefore an external magnetic field exerts a torque on the
+neutron magnetic moment revealing its existence. It's a measured quantity.
 
-It is a dimensionless quantity, independent of the system of units used, which
-is related to the strength of the coupling of an elementary charge e with the
-electromagnetic field.
+### μμ constant
+
+Muon magnetic moment. It is the magnetic dipole moment of the meutron
+resulting from its intrinsic properties of spin and electric charge.
+Its angular momentum comes from two types of rotation: spin and orbital
+motion. Therefore an external magnetic field exerts a torque on the muon
+magnetic moment revealing its existence. It's a measured quantity.
+
+
+## Size constants
+
+### re constant
+
+The classical electron radius. Through the Bohr radius `a0`, it
+depends on fine structure constant `α`.
+
+### rp constant
+
+Proton charge radius. A direct measure of the proton radius. Since 2010,
+the measure was done using either spectroscopy method with muonic hydrogen,
+and then with deuterium atom, or either using a more recent electron-proton
+scattering experiment.
+
+### a0 constant
+
+Bohr radius. The Bohr radius is a physical constant, approximately equal to
+the most probable distance between the nucleus and the electron in a hydrogen
+atom in its ground state. Its value depends on the vacuum electric
+permittivity `ε0`.
+
+### σe constant
+
+The Thomson cross-section. This type of scattering is valid when the field
+energy `h·ν` is much less than the rest mass of the electron `m0·c^2`, the
+electric field of the incident wave accelerates the charged target-particle,
+causing it, in turn, to emit radiation at the same frequency `ν` as the
+incident wave, hence the scattering of the wave. Through the classical
+electron radius `re`, its value depends on fine structure constant `α`.
+
+
+## Magnetism constants
+
+### μB constant
+
+Bohr magneton. In atomic physics, the Bohr magneton is a physical constant
+and the natural unit for expressing the magnetic moment of an electron caused
+by its orbital or spin angular momentum. In SI units, the Bohr magneton
+depends on the electron mass `me`.
+
+### μN constant
+
+The nuclear magneton is a physical constant of magnetic moment. It
+is the standard unit used to measure the magnetic dipole moment of
+atomic nuclei and nucleons (protons and neutrons), essentially acting
+as a scale to quantify their magnetic strength. Defined in SI units,
+it depends on the measured value of the proton mass `mp`.
+
+### γe constant
+
+Electron gyromagnetic ratio. It is the ratio of the electron's magnetic
+moment to its angular momentum. It can be used to determine the direction
+of precession and the resonance frequency of an electron in a magnetic
+field. Its value depends on the electron magnetic moment `μe`.
+
+### γp constant
+
+Proton gyromagnetic ratio. It is the ratio of the proton's magnetic
+moment to its angular momentum. It can be used to determine the direction
+of precession and the resonance frequency of a proton in a magnetic field.
+Its value depends on the proton magnetic moment `μp`.
+
+### γn constant
+
+Neutron gyromagnetic ratio. It is the ratio of the Neutron's magnetic
+moment to its angular momentum. It is a characteristic of the neutron's
+nuclear spin and its sign determines the direction of precession. Its
+value depends on the neutron magnetic moment `μn`.
+
+### R∞ constant
+
+Rydberg constant. In spectroscopy, the Rydberg constant is a physical
+constant relating to the electromagnetic spectra of an atom. The constant
+first arose as an empirical fitting parameter in the Rydberg formula for
+the hydrogen spectral series, but Niels Bohr later showed that its value
+is related to more fundamental constants according to his model of the
+atom. The Rydberg constant value is inferred from measurements of atomic
+transition frequencies in three different atoms (hydrogen, deuterium,
+and antiprotonic helium).
+
+### Rk constant
+
+Von Klitzing constant. It appears in the expression of the Hall
+resistance `Rxy=Rk/ν` (`ν` being either an integer or a fraction)
+of the quantum Hall effect, a quantized version of the Hall effect
+which is observed in two-dimensional electron systems subjected to
+low temperatures and strong magnetic fields. It's an exact constant.
+
+### G0 constant
+
+Conductance quantum constant. It is the quantized unit of electrical
+conductance. It is required when measuring the conductance of a quantum
+point contact, and also, it appears explicitly in the Landauer formula:
+`G(μ)=G0·ΣTn(μ) sum over n` which relates the electrical conductance of
+a quantum conductor to its quantum properties. It's an exact constant.
+
+### G0F constant
+
+Fermi reduced coupling constant. It is a fundamental physical constant
+that represents the strength of the weak nuclear interaction, essentially
+indicating how readily particles can interact via the weak force; a
+larger value signifies a stronger interaction, and it is a key parameter
+in the Standard Model of particle physics, primarily used to calculate
+the decay rates of particles involved in weak interactions like beta
+decay. It's a measured quantity.
+
+### c1 constant
+
+First radiation constant. This constant appears in the Radiance
+expression of the Planck's law: `Bλ(λ;T)=c1/λ^5/EXPM1(c2/λT)`.
+It's an exact constant.
+
+### c2 constant
+
+Second radiation constant. This constant appears in the Radiance
+expression of the Planck's law: `Bλ(λ;T)=c1/λ^5/EXPM1(c2/λT)`.
+It's an exact constant.
+
+### c3 constant
+
+Wien's constant also knowm as the third radiation constant. In physics, Wien's
+displacement law states that the black-body radiation curve for different
+temperatures will peak at different wavelengths that are inversely proportional
+to the temperature. The shift of that peak is a direct consequence of the
+Planck radiation law, which describes the spectral brightness or intensity of
+black-body radiation as a function of wavelength at any given temperature.
+However, it had been discovered by German physicist Wilhelm Wien several years
+before Max Planck developed that more general equation, and describes the
+entire shift of the spectrum of black-body radiation toward shorter
+wavelengths as temperature increases.
+
+Formally, the wavelength version of Wien's displacement law states that the
+spectral radiance of black-body radiation per unit wavelength, peaks at the
+wavelength `λpeak=c3/T` where `T` is absolute temperature. From a theoretic
+expression (using Lambert W function), it's an exact constant.
+
+### c3f constant
+
+Wien's frequency constant is the frequency version of the third radiation
+constant. In physics, Wien's frequency displacement law states that the
+black-body radiation curve for different temperatures will peak at different
+frequencies that are directly proportional to the temperature. The shift of
+that peak is a direct consequence of the Planck radiation law, which describes
+the spectral brightness or intensity of black-body radiation as a function
+of frequency at any given temperature.
+
+Formally, the frequency version of Wien's displacement law states that the
+spectral radiance of black-body radiation per unit frequency, peaks at the
+frequency `fpeak=Ⓒc3f·T` where `T` is absolute temperature. From a theoretic
+expression (using Lambert W function), it's an exact constant.
 
 ### ø constant
 
 Magnetic flux quantum. The (superconducting) magnetic flux quantum is a
-combination of fundamental physical constants: the Planck constant h and the
-electron charge e. Its value is, therefore, the same for any superconductor.
+combination of fundamental physical constants: the Planck constant `h`
+and the electron charge `qe`. Its value is, therefore, the same for
+any superconductor. It's an exact constant.
 
-### F constant
+### KJ constant
 
-Faraday constant. In physical chemistry, the Faraday constant is a physical
-constant defined as the quotient of the total electric charge (q) by the amount
-(n) of elementary charge carriers in any given sample of matter
+Josephson constant. The Josephson constant is a constant of
+proportionality that relates the potential difference across a
+Josephson junction to the frequency of irradiation. It's also
+the inverse of the magnetic flux quantum `ø`. It's an exact
+constant.
 
-### R∞ constant
+### Kc constant
 
-Rydberg constant. In spectroscopy, the Rydberg constant is a physical constant
-relating to the electromagnetic spectra of an atom. The constant first arose as
-an empirical fitting parameter in the Rydberg formula for the hydrogen spectral
-series, but Niels Bohr later showed that its value could be calculated from more
-fundamental constants according to his model of the atom.
-
-### a0 constant
-
-Bohr radius. The Bohr radius is a physical constant, approximately equal to the
-most probable distance between the nucleus and the electron in a hydrogen atom
-in its ground state.
-
-### μB constant
-
-Bohr magneton. In atomic physics, the Bohr magneton is a physical constant and
-the natural unit for expressing the magnetic moment of an electron caused by its
-orbital or spin angular momentum. In SI units, the Bohr magneton is defined as
-`μB=qe*ℏ/(2·me)`.
+Quantum of circulation constant. It represents the discrete unit
+of circulation in a superfluid, meaning that such circulation around
+a vortex can only occur in multiples of this value. The existence
+of quantum vortices was first predicted by Lars Onsager in 1949 in
+connection with superfluid helium. It is defined as the ratio of
+Planck's constant `h` to the mass of the relevant particle `m`
+chosen here as the electron.
 
 
-### μN constant
-
-The nuclear magneton is a physical constant of magnetic moment, defined in SI
-units by `μN=qe·ℏ/(2·mp)`.
-
-
-### λ0 constant
-
-Photon wavelength. Photon energy can be expressed using any unit of energy such
-as the electronvolt (eV) or the Joule (J). For short wavelength sources,
-researchers often discuss photon energies in units of eV (or keV for hard
-X-rays) out of convenience.  The SI definition for 1 eV derives from the
-[definitional value of the electron charge](#me-constant). Photon energy `E` in
-eV can be computed from wavelength `l` in nm as: `E=λ0/l`.
-
-### f0 constant
-
-Photon frequency. This is the frequency associated to the
-[photon wavelength λ0][#λ0-constant].
+## Scattering constants
 
 ### λc constant
 
-Compton wavelength. The Compton wavelength is a quantum mechanical property of a
-particle, defined as the wavelength of a photon whose energy is the same as the
-rest energy of that particle (based on the mass–energy equivalence).
+Electron Compton wavelength. The Compton wavelength is a quantum
+mechanical property of a particle, defined as the wavelength of a
+photon whose energy is the same as the rest energy of that particle
+(based on the mass–energy equivalence). The standard Compton wavelength
+`λ` of a particle of mass `m` is given by `λ=h/(m·c)`. Since it is
+defined here for the electron, it depends on the value of the electron
+mass `me`.
 
-The standard Compton wavelength `λ` of a particle of mass `m` is given by
-`λ=h/(m·c)`
+### λcp constant
 
-### rad constant
+Proton Compton wavelength. The Compton wavelength is a quantum
+mechanical property of a particle, defined as the wavelength of
+a photon whose energy is the same as the rest energy of that particle
+(based on the mass–energy equivalence). The standard Compton wavelength
+`λ` of a particle of mass `m` is given by `λ=h/(m·c)`. Since it is
+defined here for the proton, it depends on the measured value of the
+proton mass `mp`.
 
-One radian.
+### λcn constant
 
-### twoπ constant
+Neutron Compton wavelength. The Compton wavelength is a quantum
+mechanical property of a particle, defined as the wavelength of
+a photon whose energy is the same as the rest energy of that particle
+(based on the mass–energy equivalence). The standard Compton wavelength
+`λ` of a particle of mass `m` is given by `λ=h/(m·c)`. Since it is
+defined here for the neutron, it depends on the measured value of the
+neutron mass `mn`.
 
-Two π radian (one full circle).
+### λcμ constant
 
-### angl constant
+Muon Compton wavelength. The Compton wavelength is a quantum
+mechanical property of a particle, defined as the wavelength of
+a photon whose energy is the same as the rest energy of that particle
+(based on the mass–energy equivalence). The standard Compton wavelength
+`λ` of a particle of mass `m` is given by `λ=h/(m·c)`. Since it is
+defined here for the muon particle, it depends on the measured value of
+the muon mass `mμ`.
 
-Half turn in degrees.
+### λcτ constant
 
-### c3 constant
-
-Wien's constant. In physics, Wien's displacement law states that the black-body
-radiation curve for different temperatures will peak at different wavelengths
-that are inversely proportional to the temperature. The shift of that peak is a
-direct consequence of the Planck radiation law, which describes the spectral
-brightness or intensity of black-body radiation as a function of wavelength at
-any given temperature. However, it had been discovered by German physicist
-Wilhelm Wien several years before Max Planck developed that more general
-equation, and describes the entire shift of the spectrum of black-body radiation
-toward shorter wavelengths as temperature increases.
-
-Formally, the wavelength version of Wien's displacement law states that the
-spectral radiance of black-body radiation per unit wavelength, peaks at the
-wavelength `λpeak=c3/T` where `T` is absolute temperature.
-
-### kq constant
-
-Ratio of the [Boltzman constant][#k-constant] by the
-[elementary charge](#qe-constant): `kq=k/qe`.
-
-### ε0q constant
-
-Ratio of the [vaccum permittivity](#ε0-constant) by the
-[elementary charge](#qe-constant): `ε0q=ε0/qe`.
+Tau Compton wavelength. The Compton wavelength is a quantum
+mechanical property of a particle, defined as the wavelength of
+a photon whose energy is the same as the rest energy of that particle
+(based on the mass–energy equivalence). The standard Compton wavelength
+`λ` of a particle of mass `m` is given by `λ=h/(m·c)`. Since it is
+defined here for the tau particle, it depends on the measured value of
+the tau mass `mτ`.
 
 
-### qε0 constant
+## Materials constants
 
-Product of the [vaccum permittivity](#ε0-constant) by the
-[elementary charge](#qe-constant): `qε0=ε0·qe`.
+### ε₀q constant
+
+Ratio of the vacuum permittivity [vaccum permittivity](#ε₀-constant) to
+the elementary charge [elementary charge](#qe-constant): `ε₀q=ε₀/qe`.
+
+### qε₀ constant
+
+Product of the vaccum permittivity [vaccum permittivity](#ε₀-constant) by
+the elementary charge [elementary charge](#qe-constant): `qε₀=ε₀·qe`.
 
 ### εsi constant
 
 Dielectric constant of silicon. The dielectric constant (or relative
 permittivity), is a material property that measures how well an applied electric
 field can penetrate a dielectric medium compared to a vacuum. A higher value
-corresponds to a lower penetration.
+corresponds to a lower penetration. It has an exact value by convention.
 
 ### εox constant
 
 SiO2 dielectric constant. The dielectric constant (or relative
 permittivity), is a material property that measures how well an applied electric
 field can penetrate a dielectric medium compared to a vacuum. A higher value
-corresponds to a lower penetration.
+corresponds to a lower penetration. By convention it has an exact value.
 
-### I0 constant
+### I₀ constant
 
 Reference sound intensity. Sound intensity level or acoustic intensity level is
 the level of the intensity of a sound relative to a reference value. It is a
-logarithmic quantity, most often expressed in decibels dB. I0 is the sound
-intensity used as a reference, corresponding to 0dB.
+logarithmic quantity, most often expressed in decibels dB. I₀ is the sound
+intensity used as a reference, corresponding to `β=0_dB` due to the definition
+of the sound pressure level `β=10·LOG10(I/I₀)` where `I=I₀`. By convention it
+has an exact value.
 
 
 ## Dates Constants
@@ -6476,6 +7192,7 @@ Independence Day, known colloquially as the Fourth of July, is a federal holiday
 in the United States which commemorates the ratification of the Declaration of
 Independence by the Second Continental Congress on July 4, 1776, establishing
 the United States of America.
+
 
 ## Computing constants
 
@@ -6506,7 +7223,7 @@ for performance reason, many modern computers now support multiple page sizes.
 
 A constant often used in computer programs to denote joy, happiness and the
 emergence into the world of some new computer language.
-#Equations library
+# Equations library
 
 The DB48X calculator features a library of equations covering mathematics,
 physics, chemistry and computer science. The built-in equations can be extended
@@ -6671,12 +7388,12 @@ The 78 variables in the Electricity section are:
 * `∈r`: Relative permittivity
 * `μr`: Relative permeability
 * `ω`: Angular frequency (dim.: angle/time)
-* `ω0`: Resonant angular frequency (dim.: angle/time)
+* `ω₀`: Resonant angular frequency (dim.: angle/time)
 * `φ`: Phase angle
 * `φp`: Parallel phase angle
 * `φs`: Series phase angle
-* `θ1`: First subtended angle relative to the left end of the wire
-* `θ2`: Second subtended angle relative to the right end of the wire
+* `θ₁`: First subtended angle relative to the left end of the wire
+* `θ₂`: Second subtended angle relative to the right end of the wire
 * `ρ`: Resistivity (dim.: resistance·length; in SI: ohm·meter, Ω·m), or Volumic charge density ([Drift Speed & Current Density](#Drift Speed & Current Density)) (dim.: charge/volume, in SI: C/m^3)
 * `ρ0`: Resistivity at the reference temperature `T0` (dim.: resistance·length; in SI: ohm·meter, Ω·m)
 * `ΔI`: Current Change (dim.: charge/time; in SI: ampere, A)
@@ -6754,14 +7471,14 @@ These equations describe the electrostatic force between two point charged parti
 * **Example 1**. To calculate `[F_N;Er_N/C]` (Electric force; Electric Field at position `r`) from 5 known variables:
 ```rpl
 q1=1.6E-19_C  q2=1.6E-19_C  r=4.00E-13_cm  εr=1  qtest=1.6E-19_C
-@ Expecting [ F=14.38008 28578 N Er=8.98755 17861 3⁳¹⁹ N/C ]
+@ Expecting [ F=14.38008 28579 N Er=8.98755 17861 7⁳¹⁹ N/C ]
 'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 ```
 
 * **Example 2**. A square metal plate `L = 8_cm` on a side carries a charge of `q1 = 6_μC`. Approximate values of the electric force & electric field for a point charge `q2 = 1_μC` located at `r = 3_m` can be calculated with Coulomb’s law if the separation distance is much greater than the plate dimension `r >> L`. The whole plate is indeed considered as being a point charge providing that `r > 10 · L`. Therefore, to calculate `[F_N;Er_N/C]`:
 ```rpl
 L=8_cm r=3_m q1=6E-6_C  q2=1E-6_C  r=3_m  εr=1  qtest=1E-6_C
-@ Expecting [ F=5.99170 11907 5⁳⁻³ N Er=5 991.70119 075 N/C ]
+@ Expecting [ F=5.99170 11907 8⁳⁻³ N Er=5 991.70119 078 N/C ]
 if 'r > 10*L' then
  'ROOT(ⒺCoulomb’s Law & E Field;[F;Er];[1_N;1_N/C])'
 end
@@ -6774,7 +7491,7 @@ The expression for the radial electric field at the distance `r` is approximatel
 * To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 4 known variables:
 ```rpl
 Q=5E-6_C  L=3_m  r=0.05_m  εr=1
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11907 5 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=599 170.11907 8 N/C ]
 'ROOT(ⒺE Field Infinite Line;[λ;Er];[1_C/m;1_N/C])'
 @ Keep
 ```
@@ -6786,24 +7503,24 @@ Er0=Er
 
 ### E Field Finite Line
 
-The expression of the radial electric field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`.
+The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
 ![E field finite line](img/EFieldFiniteLine.bmp)
 
-* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ1` and angle `θ2=360°-θ1` (see figure):
+* **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
-r='(3_m)/(2*tan 30_°)' θ2='360_°-30_°'
-Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ1=30_°
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 892 N/C ]
+r='(3_m)/(2*tan 30_°)' θ₂='360_°-30_°'
+Q=5E-6_C  L=3_m  r=2.5981_m  εr=1  θ₁=30_°
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=5 765.46436 894 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 @ Keep
 ```
 
-* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) with the angles `θ1=ATAN((L/2)/r)` and `θ2=360°-θ1` (see figure):
+* **Example 2.** To show that the infinite line of the previous section can approximate the finite case (if `r << L` realised when `r < L/10`), we calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) with the angles `θ₁=ATAN((L/2)/r)` and `θ₂=360°-θ₁` (see figure):
 ```rpl
-Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ1='atan(L/2/r)' θ2='360_°-θ1'
+Q=5E-6_C  L=3_m  r=5_cm  εr=1  θ₁='atan(L/2/r)' θ₂='360_°-θ₁'
 if 'r < L/10' then
-@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52392 4 N/C ]
+@ Expecting [ λ=1.66666 66666 7⁳⁻⁶ C/m Er=598 837.52392 7 N/C ]
 'ROOT(ⒺE Field Finite Line;[λ;Er];[1_C/m;1_N/C])'
 end
 @ Keep
@@ -6811,7 +7528,7 @@ end
 Verify relative difference under condition `5_cm << 3_m` with the example of [E Field Infinite Line](#E Field Infinite Line)
 ```rpl
 Er0 Er %Ch
-@ Expecting -5.55093 02084 6⁳⁻²
+@ Expecting -0.05550 93020 85
 @ % of relative difference
 ```
 
@@ -6822,7 +7539,7 @@ The expression of the perpendicular electric field is constant over an infinite 
 * To calculate `[Ep_N/C;σ_C/m^2]` (Electric Field; Linear charge density) at position `[d=5_mm]` above a square plate of width `[L=8_cm]` and surface `A=L^2` where `d << L` when `d < L/10` is verified:
 ```rpl
 L=8_cm A='L^2' d=5_mm Q=6E-6_C  A=64_cm^2  εr=1
-@ Expecting [ σ=0.00000 00937 5 C/cm↑2 Ep=52 941 049.997 N/C ]
+@ Expecting [ σ=0.00000 00937 5 C/cm↑2 Ep=52 941 049.9972 N/C ]
 if 'd < L/10' then
  'ROOT(ⒺE Field Infinite Plate;[σ;Ep];[1_C/cm^2;1_N/C])'
 end
@@ -6922,7 +7639,7 @@ E=0.025_J  C=20_μF
 * To calculate `[uE_(J/m^3)]` (Volumic density electric energy) from 2 known variables:
 ```rpl
 E=5_V/m  εr=1
-@ Expecting [ uE=1.10677 34773 6⁳⁻¹⁰ J/m↑3 ]
+@ Expecting [ uE=1.10677 34773 5⁳⁻¹⁰ J/m↑3 ]
 'ROOT(ⒺVolumic Density Electric Energy;[uE];[1_(J/m^3)])'
 ```
 
@@ -7003,11 +7720,11 @@ Vi=0_V  Vf=5_V  R=50_Ω  L=50_mH  t=75_μs
 
 ### Resonant Frequency
 
-* To calculate `[ω0;Qs;Qp;f0]` (Resonant angular velocity; Parallel & Series quality factors; Resonant frequency) from 3 known variables:
+* To calculate `[ω₀;Qs;Qp;f0]` (Resonant angular velocity; Parallel & Series quality factors; Resonant frequency) from 3 known variables:
 ```rpl
 L=500_mH  C=8_μF  R=10_Ω
-@ Expecting [ ω0=500. r/s Qs=25. Qp=0.04 f0=79.57747 15459 Hz ]
-'ROOT(ⒺResonant Frequency;[ω0;Qs;Qp;f0];[1_r/s;1;1;1_Hz])'
+@ Expecting [ ω₀=500. r/s Qs=25. Qp=0.04 f0=79.57747 15459 Hz ]
+'ROOT(ⒺResonant Frequency;[ω₀;Qs;Qp;f0];[1_r/s;1;1;1_Hz])'
 ```
 
 ### Plate Capacitor
@@ -7017,7 +7734,7 @@ L=500_mH  C=8_μF  R=10_Ω
 * To calculate `[d_cm;ΔV_V;Ein_(N/C);σ_(μC/m^2)]` (Distance; Voltage; Internal E field; Surface charge density) from 4 known variables:
 ```rpl
 C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
-@ Expecting [ d=80.04185 78823 pm σ=750 000. μC/m↑2 Ein=3.74803 89378 4⁳¹⁰ N/C ΔV=3. V ]
+@ Expecting [ d=80.04185 7882 pm σ=750 000. μC/m↑2 Ein=3.74803 89378 6⁳¹⁰ N/C ΔV=3. V ]
 'ROOT(ⒺPlate Capacitor;[d;σ;Ein;ΔV];[1_pm;1_(μC/m^2);1_(N/C);1_V])'
 ```
 
@@ -7028,7 +7745,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[C_μF;ΔV_V]` (Capacitance; Voltage) from 5 known variables:
 ```rpl
 εr=1  Q=75_μC  ro=1_cm  ri=.999_cm  L=10_cm
-@ Expecting [ C=5 560.46819 206 pF ΔV=13 488.07284 02 V ]
+@ Expecting [ C=5 560.46819 203 pF ΔV=13 488.07284 02 V ]
 'ROOT(ⒺCylindrical Capacitor;[C;ΔV];[1_pF;1_V])'
 ```
 
@@ -7039,7 +7756,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[L_mH]` (Inductance) from 4 known variables:
 ```rpl
 μr=2.5  n=40_1/cm  A=0.2_cm^2  h=3_cm
-@ Expecting [ L=3.01592 89470 3⁳⁻² mH ]
+@ Expecting [ L=0.03015 92894 7 mH ]
 'ROOT(ⒺSolenoid Inductance;[L];[1_mH])'
 ```
 
@@ -7050,7 +7767,7 @@ C=25_μF  εr=2.26  A=1_cm^2  Q=75_μC
 * To calculate `[L_mH]` (Inductance) from 4 known variables:
 ```rpl
 μr=1  N=5000  h=2_cm  ri=2_cm  ro=4_cm
-@ Expecting [ L=69.31471 80464 mH ]
+@ Expecting [ L=69.31471 80468 mH ]
 'ROOT(ⒺToroid Inductance;[L];[1_mH])'
 ```
 
@@ -7542,8 +8259,8 @@ The 28 variables in the Magnetism section are:
 
 * `α1`: Subtended internal left angle relative to the top ends of the solenoid
 * `α2`: Subtended internal right angle relative to the top ends of the solenoid
-* `θ1`: Subtended left angle relative to the top ends of the solenoid
-* `θ2`: Subtended right angle relative to the ends of the wire
+* `θ₁`: Subtended left angle relative to the top ends of the solenoid
+* `θ₂`: Subtended right angle relative to the ends of the wire
 * `θ`: Angle between the line of the magnetic field and the speed of the moving charge
 * `μr`: Relative permeability
 * `B`: Magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
@@ -7579,14 +8296,14 @@ The magnetic field expression differs depending upon whether the point at `r` is
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
 μr=1  rw=0.25_cm  r=0.2_cm  I=25_A
-@ Expecting [ B=1.59999 99997 8⁳⁻³ T ]
+@ Expecting [ B=1.59999 99997 9⁳⁻³ T ]
 'ROOT(ⒺStraight Wire Infinite;[B];[1_T])'
 ```
 
 * **Example 2.** Outside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
 μr=1  rw=0.25_cm  r=5_cm  I=25_A
-@ Expecting [ B=9.99999 99986 2⁳⁻⁵ T ]
+@ Expecting [ B=9.99999 99986 8⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Infinite;[B];[1_T])'
 @ Save B for later
 ```
@@ -7599,23 +8316,23 @@ B0=B
 
 #### Straight Wire Finite
 
-The expression for the magnetic field at the distance `r` depends on the subtended angles `θ1` and `θ2` relative to the ends of the wire of finite length `L`. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
+The expression for the magnetic field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`. The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly.
 
 ![B Field From Finite Wire](img/B_Field_From_Finite_Wire.bmp)
 
 * **Example 1.** To calculate `[B_T]` (Magnetic field) from 6 known variables:
 ```rpl
-μr=1_1  rw=0.25_cm  r=5_cm  I=25_A  θ1=30_°  θ2=150_°
-@ Expecting [ B=8.66025 40366 5⁳⁻⁵ T ]
+μr=1_1  rw=0.25_cm  r=5_cm  I=25_A  θ₁=30_°  θ₂=150_°
+@ Expecting [ B=8.66025 40367⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Finite;[B];[1_T])'
 @ Save for test below
 ```
 
 * **Example 2.** When 'r << L' which means 'r < L/10', we can verify that the value of B for a infinite wire approximates the exact value calculated for a finite wire of length 'L'.
 ```rpl
-L=3_m  μr=1  rw=0.25_cm  r=5_cm  I=25_A  θ1='atan(r/L/2)'  θ2='180_°-θ1'
+L=3_m  μr=1  rw=0.25_cm  r=5_cm  I=25_A  θ₁='atan(r/L/2)'  θ₂='180_°-θ₁'
 if 'r < L/10' then
-@ Expecting [ B=9.99965 27944 8⁳⁻⁵ T ]
+@ Expecting [ B=9.99965 27945 4⁳⁻⁵ T ]
 'ROOT(ⒺStraight Wire Finite;[B];[1_T])'
 end
 @ Save for test below
@@ -7636,7 +8353,7 @@ The force between wires is positive for an attractive force (for currents having
 * To calculate `[Fba_N]` (Magnetic force) from 4 known variables:
 ```rpl
 Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
-@ Expecting [ Fba=1.99999 99997 2⁳⁻³ N ]
+@ Expecting [ Fba=1.99999 99997 4⁳⁻³ N ]
 'ROOT(ⒺForce Between Wires;[Fba];[1_N])'
 ```
 
@@ -7669,7 +8386,7 @@ The expression for the magnetic field in the center depends on the subtended int
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
 μr=10  nl=5_mm^-1  I=1.25_A  α1=150_°  α2=30_°
-@ Expecting [ B=0.06801 74761 49 T ]
+@ Expecting [ B=6.80174 76149 8⁳⁻² T ]
 'ROOT(ⒺB Field In Finite Solenoid;[B];[1_T])'
 @ Save variables for later use
 ```
@@ -7678,7 +8395,7 @@ The expression for the magnetic field in the center depends on the subtended int
 ```rpl
 L=3_m  μr=10  r=10_cm  nl=5000_m^-1  I=1.25_A  α2='atan(r/L/2)'  α1='180_°-α2'
 if 'r < L/10' then
-@ Expecting [ B=0.07852 89102 93 T ]
+@ Expecting [ B=0.07852 89102 94 T ]
 'ROOT(ⒺB Field In Finite Solenoid;[B];[1_T])'
 end
 @ Save variables for later use
@@ -7699,7 +8416,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
 μr=10  N=50  ri=5_cm  ro=7_cm  I=10_A
-@ Expecting [ B=1.66666 66664 4⁳⁻² T ]
+@ Expecting [ B=1.66666 66664 5⁳⁻² T ]
 'ROOT(ⒺB Field In Toroid;[B];[1_T])'
 ```
 
@@ -7747,7 +8464,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s  θ=3
 * To calculate `[uB_(J/m^3)]` (Volumic density of magnetic energy) from 2 known variables:
 ```rpl
 μr=3.0  B=0.8_T
-@ Expecting [ uB=84 882.63632 74 J/m↑3 ]
+@ Expecting [ uB=84 882.63632 69 J/m↑3 ]
 'ROOT(ⒺVolumic Density Magnetic Energy;[uB];[1_(J/m^3)])'
 ```
 
@@ -7758,7 +8475,7 @@ The 38 variables in the Motion section are:
 
 * `α`: Angular acceleration (dim.: angle/time^2, in SI: r/s^2)
 * `ω`: Angular velocity ([Circular Motion](#Circular Motion)), or Angular velocity at `t` ([Angular Motion](#Angular Motion)) (dim.: angle/time, in SI: r/s)
-* `ω0`: Initial angular velocity (dim.: angle/time, in SI: r/s)
+* `ω₀`: Initial angular velocity (dim.: angle/time, in SI: r/s)
 * `ρ`: Fluid density (dim.: mass/volume, in SI: kg/m^3)
 * `θ`: Angular position at `t` (dim.: angle)
 * `θ0`: Initial angular position ([Angular Motion](#Angular Motion)), or Initial vertical angle ([Projectile Motion](#Projectile Motion))
@@ -7832,7 +8549,7 @@ x0=0_ft  y0=0_ft  θ0=45_°  v0=200_ft/s  t=10_s
 
 * To calculate `[ω_r/min;Θ_°]` (Angular velocity at time `t`; Angular position at time `t`) from 4 known variables:
 ```rpl
-θ0=0_°  ω0=0_r/min  α=1.5_r/min^2  t=30_s
+θ0=0_°  ω₀=0_r/min  α=1.5_r/min^2  t=30_s
 @ Expecting [ ω=0.75 r/min θ=10.74295 86587 ° ]
 'ROOT(ⒺAngular Motion;[ω;θ];[1_r/min;1_°])'
 ```
@@ -7853,15 +8570,15 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a falling big mass, to calculate `[vt_ft/s;v_ft/s;tfr_s;xfr_ft]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 6 known variables:
 ```rpl
 Cd=0.15  ρ=0.025_lb/ft^3  Ah=100000_in^2  m=1250_lb  t=5_s  fr=0.95
-@ Expecting [ vt=175.74722 3631 ft/s v=127.18655 2185 ft/s tfr=10.00590 25332 s ]
-'ROOT(ⒺTerminal Velocity;[vt;v;tfr];[1_ft/s;1_ft/s;1_s])'
+@ Expecting [ vt=175.74722 3631 ft/s v=127.18655 2185 ft/s tfr=10.00590 25332 s xfr=1 117.39339 247 ft ]
+'ROOT(ⒺTerminal Velocity;[vt;v;tfr;xfr];[1_ft/s;1_ft/s;1_s;1_ft])'
 ```
 
 * **Example 2**. For a human skydiving head first, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 6 known variables:
 ```rpl
 Cd=0.7  ρ=1.29_kg/m^3  Ah=0.18_m^2  m=75_kg  t=5_s  fr=0.95
-@ Expecting [ vt=95.13182 74789 m/s v=45.10777 55851 m/s tfr=17.76964 17471 s ]
-'ROOT(ⒺTerminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=312.11229 4878 ft/s v=147.99138 9715 ft/s tfr=17.76964 17471 s xfr=3 524.12177 429 ft ]
+'ROOT(ⒺTerminal Velocity;[vt;v;tfr;xfr];[1_ft/s;1_ft/s;1_s;1_ft])'
 ```
 
 #### Buoyancy & Terminal Velocity
@@ -7871,15 +8588,15 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a golf ball falling in water, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.5  ρ=1077,5_(kg/m^3)  ρf=1000_(kg/m^3)  d=4.282_cm  Ah=14.40068 68745_cm↑2  Vol=41.10916 07978_cm↑3  t=3e-2_s  fr=0.95
-@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=5.50264 78343 2⁳⁻² s ]
-'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=5.50264 78343 2⁳⁻² s xfr=1.03003 49562 7⁳⁻² m ]
+'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
 * **Example 2**. For a CO2 bubble in a glass of champagne, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3_cm↑2  Vol=5.23598 77559 8e-4_cm↑3  t=0.1_s  fr=0.95
-@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s ]
-'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr];[1_m/s;1_m/s;1_s])'
+@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s xfr=0.15488 56277 51 m ]
+'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
 #### Escape and Orbital Velocities
@@ -7905,19 +8622,19 @@ The 40 variables in the Optics section are:
 * `λ`: Light wavelength
 * `θ`: Angle between initial light polarisation direction and polarizer transmission axis ([Malus Law](#Malus Law)), or Angle subtended by two points separated by y on the screen and the middle of one slit ([2 Slits Young Interference](#2 Slits Young Interference)), or two slits ([One Slit Diffraction](#One Slit Diffraction))
 * `θ0`: Acceptance angle to enter an optical fiber in the outer medium of refraction index `n0f`
-* `θ1`: Angle of incidence in the medium of refraction index n1
-* `θ2`: Angle of refraction in the medium of refraction index n2
+* `θ₁`: Angle of incidence in the medium of refraction index n1
+* `θ₂`: Angle of refraction in the medium of refraction index n2
 * `θB`: Brewster angle
 * `θc`: Critical angle
 * `θr`: Rayleigh's criterion limiting
 * `a`: Width of a diffraction slit
 * `d`: Distance between two interference slits
-* `E0`: Incident light electrtc field
+* `E₀`: Incident light electrtc field
 * `f`: Focal length
-* `fx0`: Frequency of the incident X-ray (dim.: time^-1, in SI: hertz, Hz)
+* `fx₀`: Frequency of the incident X-ray (dim.: time^-1, in SI: hertz, Hz)
 * `fx`: Frequency of the transmitted X-ray (dim.: time^-1, in SI: hertz, Hz)
 * `I`: Transmitted irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
-* `I0`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
+* `I₀`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix`: Transmitted irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix0`: Incident irradiance or polarized X rayx radiance flux (dim.: power/area, in SI: W/m^2)
 * `m`: Magnification
@@ -7945,11 +8662,11 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 ![Refraction Law](img/RefractionLaw.bmp)
 
-* To calculate `[θ2_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
+* To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
-n1=1  n2=1.333  θ1=45_°
-@ Expecting [ θ2=32.03672 30399 ° v1=299 792 458 m/s v2=224 900 568.642 m/s ]
-'ROOT(ⒺRefraction Law;[θ2;v1;v2];[1_°;1_m/s;1_m/s])'
+n1=1  n2=1.333  θ₁=45_°
+@ Expecting [ θ₂=32.03672 30399 ° v1=299 792 458 m/s v2=224 900 568.642 m/s ]
+'ROOT(ⒺRefraction Law;[θ₂;v1;v2];[1_°;1_m/s;1_m/s])'
 ```
 
 #### Critical Angle
@@ -7980,12 +8697,11 @@ The Brewster angle is the angle of incidence at which the reflected wave is comp
 
 ![Brewster’s Law](img/Brewster’sLaw.bmp)
 
-* To calculate `[θB_°;θ2_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
+* To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
 n1=1  n2=1.5
-@ Faiing [ v1=299 792 458 m/s v2=199 861 638.667 m/s θB=56.30993 2474 ° θ2=33.69006 7526 ° ]
-@ C#10 NOT OK MSOLVER: "Inconsistent units". SOLVE computation of θ2 alone fails for the eqn: 'θB+θ2=90'!!
-'ROOT(ⒺBrewster’s Law;[v1;v2;θB;θ2];[1_m/s;1_m/s;1_°;1_°])'
+@ Expecting [ v1=299 792 458 m/s v2=199 861 638.667 m/s θB=56.30993 2474 ° θ₂=33.69006 7526 ° ]
+'ROOT(ⒺBrewster’s Law;[v1;v2;θB;θ₂];[1_m/s;1_m/s;1_°;1_°])'
 ```
 
 #### Spherical Reflection
@@ -8034,15 +8750,15 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Malus Law
 
-If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx0`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
+If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
 ![Malus Law](img/Malus Law BW.bmp)
 
-* To calculate `[I_(W/m^2);Ix_(W/m^2),E0_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
+* To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
-θ=30_°  I0=10_(W/m^2)  fx0=3e17_Hz  fx=2.7e17_Hz  I0x=0.1_(W/m^2)
-@ Expecting [ I=7.5 W/m↑2 Ix=0.06751 63889 32 W/m↑2 E0=86.80210 98142 V/m ]
-'ROOT(ⒺMalus Law;[I;Ix;E0];[1_(W/m^2);1_(W/m^2);1_V/m])'
+θ=30_°  I₀=10_(W/m^2)  fx₀=3e17_Hz  fx=2.7e17_Hz  I₀x=0.1_(W/m^2)
+@ Expecting [ I=7.5 W/m↑2 Ix=6.75163 88932 1⁳⁻² W/m↑2 E₀=86.80210 98145 V/m ]
+'ROOT(ⒺMalus Law;[I;Ix;E₀];[1_(W/m^2);1_(W/m^2);1_V/m])'
 ```
 
 #### 2 Slits Young Interference
@@ -8069,7 +8785,7 @@ L=3_m  a=1000._μm  λ=600_nm  θ='ASIN(0.3*(λ_nm)/(a_μm))'  Imax=10_(W/m^2)
 The 25 variables in the Oscillations section are:
 
 * `ω`: Angular frequency (dim.: angle/time, in SI: r!s)
-* `ω0`: Natural angular frequency (dim.: angle#time, in SI: r!s)
+* `ω₀`: Natural angular frequency (dim.: angle#time, in SI: r!s)
 * `ωu`: Underdamped angular frequency (dim.: angle/time, in SI: r!s)
 * `γ`: Reduced damping coefficient (dim.: angle/time, in SI: r/s)
 * `φ`: Phase angle
@@ -8148,18 +8864,18 @@ G=1000_kPa  J=17_mm^4  L=26_cm  I=50_kg*m^2
 
 * To calculate `[x_cm;v_cm/s;a_m/s^2;m_kg;E_J]` (Displacement; Velocity & Acceleration at `t`; Mass; Total energy) from 5 known variables:
 ```rpl
-xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m
+xm=10_cm  ω₀=15_r/s  φ=25_°  t=25_μs  k=10_N/m
 @ Expecting [ x=9.06149 24146 7 cm v=-63.44371 46156 cm/s a=-20.38835 7933 m/s↑2 m=4.44444 44444 4⁳⁻² kg E=0.05 J ]
 'ROOT(ⒺSimple Harmonic;[x;v;a;m;E];[1_cm;1_cm/s;1_m/s^2;1_kg;1_J])'
 ```
 
 #### Underdamped Oscillations
 
-We are considering here a damped mass-spring oscillator having the natural angular frequency `ω0`. The corresponding differential equation : `−k*x − b*dx/dt = m*d^2x/dt^2` describes the underdamped oscillations.
+We are considering here a damped mass-spring oscillator having the natural angular frequency `ω₀`. The corresponding differential equation : `−k*x − b*dx/dt = m*d^2x/dt^2` describes the underdamped oscillations.
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Displacement; Velocity & Acceleration at `t`; Mass; Total energy at `t`; Quality factor) from 6 known variables:
 ```rpl
-xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
+xm=10_cm  ω₀=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
 @ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s x=9.06100 06640 3 cm v=-83.10906 53488 cm/s a=-16.64734 35534 m/s↑2 E=0.05640 00148 35 J Q=3.33333 33333 3 ]
 'ROOT(ⒺUnderdamped Oscillations;[m;γ;ωu;x;v;a;E;Q];[1_kg;1_(r/s);1_(r/s);1_cm;1_cm/s;1_m/s^2;1_J;1])'
 @ Save E for later use
@@ -8168,19 +8884,19 @@ xm=10_cm  ω0=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
 The code below saves the reference value for comparison with the example in [Driven Damped Oscillations](#Driven Damped Oscillations):
 ```rpl
 @ Save the reference value for comparison below
-E0=E
-@ Save E0 for later
+E₀=E
+@ Save E₀ for later
 ```
 
 #### Driven Damped Oscillations
 
-We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω0` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
+We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
 ![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
-ω=14.99_r/s  ω0=15_r/s  θ=25_°  t=500_s  k=10_N/m  b=0.2_(kg/s)  xh=10_cm  Fd=0.9_N
+ω=14.99_r/s  ω₀=15_r/s  θ=25_°  t=500_s  k=10_N/m  b=0.2_(kg/s)  xh=10_cm  Fd=0.9_N
 @ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s φ=-89.74526 88301 ° xp=0.30019 71665 48 m x=-22.26611 11734 cm v=301.81823 6224 cm/s a=50.03197 40728 m/s↑2 E=0.45032 15149 87 J Q=3.33333 33333 3 ]
 'ROOT(ⒺDriven Damped Oscillations;[m;γ;ωu;φ;xp;x;v;a;E;Q];[1_kg;1_(r/s);1_(r/s);1_°;1_m;1_cm;1_cm/s;1_m/s^2;1_J;1])'
 @ Save E for comparison
@@ -8188,8 +8904,8 @@ We are considering here a damped mass-spring oscillator where the external drivi
 
 Verify relative difference with the total energy of the case [Underdamped Oscillations](#Underdamped Oscillations)
 ```rpl
-E0 E %Ch
-@ Expecting
+E₀ E %Ch
+@ Expecting 698.44219 2445
 @ % of relative augmentation which illustrates the huge energy gain due to the driving force acting very near the resonance frequency.
 ```
 
@@ -8415,7 +9131,7 @@ These equations for a silicon PN-junction diode use a “two-sided step-junction
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
 ND=1E22_cm^-3  NA=1E15_cm^-3  T=300_K  Js=1e-6_μA/cm^2  Va=-20_V  E1=3.3E5_V/cm  W=10_μ  ΔW=1_μ  L=10_μ  ΔL=1_μ  xj=2_μ
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=1.01379 20414 3 V xd=5.25726 51776 8 μ Cj=2 004.17577 358 pF/cm↑2 Emax=79 941.91402 27 V/cm BV=358.08260 5883 V J=-1.⁳⁻¹² A/cm↑2 Aj=2.57097 33552 9⁳⁻⁶ cm↑2 I=-2.57097 33552 9⁳⁻¹⁵ mA ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=1.01379 20414 3 V xd=5.25726 51776 7 μ Cj=2 004.17577 358 pF/cm↑2 Emax=79 941.91402 29 V/cm BV=358.08260 5881 V J=-1.⁳⁻¹² A/cm↑2 Aj=2.57097 33552 9⁳⁻⁶ cm↑2 I=-2.57097 33552 9⁳⁻¹⁵ mA ]
 'ROOT(ⒺPN Step Junctions;[ni;Vbi;xd;Cj;Emax;BV;J;Aj;I];[1_cm^-3;1_V;1_μ;1_pF/cm^2;1_V/cm;1_V;1_A/cm^2;1_cm^2;1_mA])'
 ```
 
@@ -8428,7 +9144,7 @@ These equations for a silicon NMOS transistor use a two-port network model. They
 * To calculate `[ni_(cm^-3);We_μ;Le_μ;Cox_pF/cm^2;γ_V^.5;φp_V;Vt_V;VDsat_V;IDS_mA;gds_S;gm_mA/V]` (Silicon density; Effective width; Effectives gate length; Silicon dioxide capacitance per unit area; Body factor; Fermi potential; Threshold voltage; Saturation voltage; Drain current; Output conductance; Transconductance) from 13 known variables:
 ```rpl
 tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=5_V  VBS=0_V  VDS=5_V  W=25_μ  ΔW=1_μ  L=4_μ  ΔL=0.75_μ  λ=0.05_1/V
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ We=23 μ Le=2.5 μ Cox=49 330.47499 07 pF/cm↑2 γ=0.37247 98153 09 V↑(¹/₂) φp=-0.29855 35180 52 V Vt=0.75 V VDsat=4.25 V IDS=2.97832 74275 6 mA gds=1.48916 37137 8⁳⁻⁴ S gm=1.42391 28597 6 mA/V ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ We=23 μ Le=2.5 μ Cox=49 330.47499 05 pF/cm↑2 γ=0.37247 98153 1 V↑(¹/₂) φp=-0.29855 35180 52 V Vt=0.75 V VDsat=4.25 V IDS=2.97832 74275 5 mA gds=1.48916 37137 7⁳⁻⁴ S gm=1.42391 28597 5 mA/V ]
 'ROOT(ⒺNMOS Transistor;[ni;We;Le;Cox;γ;φp;Vt;VDsat;IDS;gds;gm];[1_cm^-3;1_μ;1_μ;1_pF/cm^2;1_V^(1/2);1_V;1_V;1_V;1_mA;1_S;1_mA/V])'
 ```
 
@@ -8458,7 +9174,7 @@ drain, and source resistances) are negligible.
 * To calculate `[ni_(cm^-3);Vbi_V;xdmax_μ;G0_S;ID_mA;VDsat_V;Vt_V;gm_mA/V]` (Silicon density; Built-in voltage; Depletion-layer width; Channel conductance; Drain current; Saturation voltage; Threshold voltage; Transconductance) from 8 known variables:
 ```rpl
 ND=1e16_1/cm^3  W=6_μ  a=1_μ  L=2_μ  μn=1248_cm^2/(V*s)  VGS=-4_V  VDS=4_V  T=26.85_°C
-@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=0.35807 99473 84 V xdmax=1.04848 18266 6 μ G0=5.99854 93177⁳⁻⁴ S ID=0.21443 71687 18 mA VDsat=3.24491 50809 3 V Vt=-7.24491 50809 3 V gm=0.14570 26745 72 mA/V ]
+@ Expecting [ ni=9.64987 39813 5⁳⁹ (cm↑3)⁻¹ Vbi=0.35807 99473 84 V xdmax=1.04848 18266 6 μ G0=5.99854 93177⁳⁻⁴ S ID=0.21443 71687 23 mA VDsat=3.24491 50809 6 V Vt=-7.24491 50809 6 V gm=0.14570 26745 73 mA/V ]
 'ROOT(ⒺJFETs;[ni;Vbi;xdmax;G0;ID;VDsat;Vt;gm];[1_(cm^-3);1_V;1_μ;1_S;1_mA;1_V;1_V;1_mA/V])'
 ```
 
@@ -8686,7 +9402,6 @@ f1=400_Hz f2=402_Hz t=5_s sm=2e-6_m
 ```rpl
 λ=500_nm  Em=5_N/C  x=1e-8_m  t=5e-13_s  φ=25_°
 @ Expecting [ f=5.99584 916⁳¹⁴ Hz k=12 566 370.6144 r/m ω=3.76730 31346 2⁳¹⁵ r/s E=4.78368 41812 N/C B=1.59566 52856 2⁳⁻⁸ T ]
-@ C#21 NOT OK MSOLVER: "No solution ?". SOLVE works for f & ω but with "Sign reversal" and fails for B: "Constant?"
 'ROOT(ⒺElectromagnetic Waves;[f;k;ω;E;B];[1_Hz;1_(r/m);1_(r/s);1_(N/C);1_T])'
 ```
 
@@ -8740,7 +9455,7 @@ The 110 variables in the Relativity section are:
 * `Bpz`: Transformed z component of the magnetic field (dim.: mass/(time^2·current), in SI: tesla, T)
 * `E`: Total energy (dim.: force·length, in SI: joule, J) or, Norm of the Electric field ([E & B Fields Transformation](#E & B Fields Transformation)) (dim.: force/charge, in SI: N/C=V/m)
 * `Ep`: Transformed total energy (dim.: force·length, in SI: joule, J)
-* `E0`: Total energy associated to the rest mass (dim.: force·length, in SI: joule, J)
+* `E₀`: Total energy associated to the rest mass (dim.: force·length, in SI: joule, J)
 * `Ex`: X component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ey`: Y component of the electric field (dim.: force/charge, in SI: N/C=V/m)
 * `Ez`: Z component of the electric field (dim.: force/charge, in SI: N/C=V/m)
@@ -8915,31 +9630,31 @@ v=298 293 495.71_m/s  f=2e3_Hz  α=20_°  θ=10_°
 
 #### Energy & Momentum
 
-The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E0 = mo·c^2`.
+The total relativistic energy `E` and the norm of the momentum `p` form the invariant `mo·c^2` which remains the same in all frames. The kinetic energy `K` is the difference between the total relativistic energy `E` and the rest energy `E₀ = mo·c^2`.
 
 * To calculate `[β;γ;ppx_(kg*(m/s));ppy_(kg*(m/s));ppz_(kg*(m/s));Ep_J;E_J;K_J]` (Relativistic speed ratio; Lorentz factor; Transformed x, y & z component of the momentum, Transformed total energy; Total & Kinetic energy of the moving mass) from 5 known variables:
 ```rpl
 v=299 192 873.084 m/s  px=10_(kg*(m/s))  py=20_(kg*(m/s))  pz=30_(kg*(m/s))  E=1.42176 77735 4e19_J
-@ Expecting [ β=0.998 γ=15.81929 99292 ppx=-7.48730 91346 7⁳¹¹ kg·m/s ppy=20 kg·m/s ppz=30 kg·m/s Ep=2.24913 70834 6⁳²⁰ J E0=8.98755 17873 9⁳¹⁷ J m0=10. kg p=4.73302 17960 1⁳¹⁰ kg·m/s K=1.33189 22556 7⁳¹⁹ J ]
-'ROOT(ⒺEnergy & Momentum;[β;γ;ppx;ppy;ppz;Ep;E0;m0;p;K];[1;1;1_(kg*(m/s));1_(kg*(m/s));1_(kg*(m/s));1_J;1_J;1_kg;1_(kg*(m/s));1_J])'
+@ Expecting [ β=0.998 γ=15.81929 99292 ppx=-7.48730 91346 7⁳¹¹ kg·m/s ppy=20 kg·m/s ppz=30 kg·m/s Ep=2.24913 70834 6⁳²⁰ J E₀=8.98755 17873 9⁳¹⁷ J m0=10. kg p=4.73302 17960 1⁳¹⁰ kg·m/s K=1.33189 22556 7⁳¹⁹ J ]
+'ROOT(ⒺEnergy & Momentum;[β;γ;ppx;ppy;ppz;Ep;E₀;m0;p;K];[1;1;1_(kg*(m/s));1_(kg*(m/s));1_(kg*(m/s));1_J;1_J;1_kg;1_(kg*(m/s));1_J])'
 ```
 
 #### Ultrarelativistic Cases
 
-* **Example 1** In the 27 km circonference accelerator of LHC, protons are accelerated to kinetic energy of 6.8 TeV. To calculate `[E0_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, one can calculate the speed, the contracted space interval and proper time of the protons:
+* **Example 1** In the 27 km circonference accelerator of LHC, protons are accelerated to kinetic energy of 6.8 TeV. To calculate `[E₀_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, one can calculate the speed, the contracted space interval and proper time of the protons:
 ```rpl
 K=6.8_TeV  m0='Ⓒmp'  Δx=27_km  Δtp='Δx/(299 792 455.147_m/s)'  Δtp=0.00009 00623 07_s
-@ Expecting [ E0=1.50327 76180 2⁳⁻¹⁰ J γ=7 248.36782 709 β=0.99999 99904 83 v=299 792 455.147 m/s Δt=1.24251 84420 6⁳⁻⁸ s Δxp=3.72497 65249 3 m ]
-'ROOT(ⒺUltrarelativistic Cases;[E0;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=7 248.36782 709 β=0.99999 99904 83 v=299 792 455.147 m/s Δt=1.24251 84420 6⁳⁻⁸ s Δxp=3.72497 65249 3 m ]
+'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ```
-* **Example 2** The "Oh-My-God" particle (probably a proton) had a kinetic energy of 3.2e20 eV. To calculate `[E0_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, in order to calculate the speed, the contracted space interval and proper time of the proton, the precision needs to be set to 32 digits and 28 significant digits:
+* **Example 2** The "Oh-My-God" particle (probably a proton) had a kinetic energy of 3.2e20 eV. To calculate `[E₀_J;γ;β;v_m/s;Δt_s;Δxp_m]` (Rest energy; Lorentz factor; Relativistic speed ratio; Speed; Proper time; Contracted space interval) from 4 known variables, in order to calculate the speed, the contracted space interval and proper time of the proton, the precision needs to be set to 32 digits and 28 significant digits:
 ```rpl
 Modes 'MyModes' STO
 32 Precision 28 Sig @ Need high precision for this one
 K=3.2e20_eV  m0='Ⓒmp'  Δx=100_km  Δtp='Δx/(299 792 457.99999 99999 99998 7113_m/s)'  Δtp=0.00033 35640 95198 15204 95755 781 s
 781_s
-@ Expecting [ E0=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
-'ROOT(ⒺUltrarelativistic Cases;[E0;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
+'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ResetModes MyModes @ Restore initial state
 ```
 
@@ -9126,7 +9841,7 @@ In this section, two comparisons are done between the Planck and Wien spectral d
 * To calculate `[fpeak_THz;f1_THz;f2_THz;FrPl12;FrWn12;%rFr12;f3_THz;f4_THz;FrPl34;FrWn34;%rFr34;FrPlab;eb_(W/m^2);ebfafb_(W/m^2);q_W]` (Frequency of maximum emissive power for the Planck distribution; Lower & Upper frequency limits of integration; Fractions of Planck & Wien emissive power in the range `f1` to `f2`; Relative % of change between distribution fractions integrated from `f3` to `f4`; Lower & Upper frequency limits of integration; Fractions of Planck & Wien emissive power in the range `fa` to `fb`; Total emissive power for the entire Planck spectrum; Emissive power in the range `fa` to `fb`; Heat transfer rate) from 5 known variables:
 ```rpl
 T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964 2⁳¹⁴ Hz  Frfafb=0.64388 90934 2
-@ Expecting [ fpeak=131.71525 3583 THz f1=106.11256 6547 THz f2=238.75327 4732 THz FrPl12=0.38336 04816 94 FrWn12=0.38088 77248 71 %rFr12=0.64502 13155 81 f3=0.26528 14163 69 THz f4=66.32035 40922 THz FrPl34=0.28402 76245 74 FrWn34=0.22398 47200 01 %rFr34=21.13981 15457 FrPlab=0.64388 90934 2 eb=148 980.70811 W/m↑2 ebfafb=95 927.05308 19 W/m↑2 q=959.27053 0819 W ]
+@ Expecting [ fpeak=74.84754 32835 THz f1=106.11256 6547 THz f2=238.75327 4732 THz FrPl12=0.38336 04816 94 FrWn12=0.38088 77248 71 %rFr12=0.64502 13155 81 f3=0.26528 14163 69 THz f4=66.32035 40922 THz FrPl34=0.28402 76245 74 FrWn34=0.22398 47200 01 %rFr34=21.13981 15457 FrPlab=0.64388 90934 2 eb=148 980.70811 W/m↑2 ebfafb=95 927.05308 19 W/m↑2 q=959.27053 0819 W ]
 'ROOT(ⒺPlanck & Wien Comparison;[fpeak;f1;f2;FrPl12;FrWn12;%rFr12;f3;f4;FrPl34;FrWn34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
@@ -9139,7 +9854,7 @@ In this section, two comparisons are done between the Planck and Rayleigh-Jeans 
 * To calculate `[fpeak_THz;f1_THz;f2_THz;FrPl12;FrRJ12;%rFr12;f3_THz;f4_THz;FrPl34;FrRJ34;%rFr34;FrPlab;eb_(W/m^2);ebfafb_(W/m^2);q_W]` (Frequency of maximum emissive power for the Planck distribution; Lower & Upper frequency limits of integration; Fractions of Planck & Rayleigh‐Jeans emissive power in the range `f1` to `f2`; Relative % of change between distribution fractions integrated from `f3` to `f4`; Lower & Upper frequency limits of integration; Fractions of Planck & Rayleigh‐Jeans emissive power in the range `fa` to `fb`; Total emissive power for the entire Planck spectrum; Emissive power in the range `fa` to `fb`; Heat transfer rate) from 5 known variables:
 ```rpl
 T=1273.15_K  A=100_cm^2  fa=2.65281 41636 9⁳¹⁰ Hz  fb=7.48475 43283 5⁳¹³ Hz  Frfafb=0.35399 34269 15
-@ Expecting [ fpeak=131.71525 3583 THz f1=45.09784 07827 THz f2=98.15412 40564 THz FrPl12=0.41306 62386 78 FrRJ12=2.34783 01416 5 %rFr12=468.39071 3596 f3=2.65281 41636 9⁳⁻² THz f4=1.32640 70818 4 THz FrPl34=6.29668 51249 6⁳⁻⁶ FrRJ34=6.41618 75792 7⁳⁻⁶ %rFr34=1.89786 29538 3 FrPlab=0.35399 34269 15 eb=148 980.70811 W/m↑2 ebfafb=52 738.19140 8 W/m↑2 q=527.38191 408 W ]
+@ Expecting [ fpeak=74.84754 32835 THz f1=45.09784 07827 THz f2=98.15412 40564 THz FrPl12=0.41306 62386 78 FrRJ12=2.34783 01416 5 %rFr12=468.39071 3596 f3=2.65281 41636 9⁳⁻² THz f4=1.32640 70818 4 THz FrPl34=6.29668 51249 6⁳⁻⁶ FrRJ34=6.41618 75792 7⁳⁻⁶ %rFr34=1.89786 29538 3 FrPlab=0.35399 34269 15 eb=148 980.70811 W/m↑2 ebfafb=52 738.19140 8 W/m↑2 q=527.38191 408 W ]
 'ROOT(ⒺPlanck & Rayleigh‐Jeans Comparison;[fpeak;f1;f2;FrPl12;FrRJ12;%rFr12;f3;f4;FrPl34;FrRJ34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
@@ -9163,7 +9878,7 @@ In the Compton Scattering, both energy and momentum are conserved during the col
 * To calculate `[λp_nm;K_eV;γ;β;v_m/s;Eph_eV;Epph_eV;p_(kg*m/s);φ_°]` (Wavelength of scattered photon; Kinetic energy of scattered electron; Lorentz factor; Speed of the scattered electron; Energy of the Incident & Scattered photon; Momentum of the scattered electron; Angle of scattering of the electron) from 2 known variables:
 ```rpl
 θ=40_°  λ=0.024_nm
-@ Expecting [ λp=0.02456 76487 62 nm K=1 193.63352 749 eV γ=1.00233 58835 6 β=0.06823 08499 8 v=20 455 094.227 m/s Eph=51 660.06023 89 eV Epph=50 466.42671 14 eV p=1.86768 55511 5⁳⁻²³ kg·m/s φ=68.16075 25239 ° ]
+@ Expecting [ λp=2.45676 48762 3⁳⁻² nm K=1 193.63352 749 eV γ=1.00233 58835 6 β=6.82308 49980 3⁳⁻² v=20 455 094.227 m/s Eph=51 660.06023 89 eV Epph=50 466.42671 14 eV p=1.86768 55511 5⁳⁻²³ kg·m/s φ=68.16075 25239 ° ]
 'ROOT(ⒺCompton Scattering;[λp;K;γ;β;v;Eph;Epph;p;φ];[1_nm;1_eV;1;1;1_m/s;1_eV;1_eV;1_(kg*m/s);1_°])'
 ```
 
@@ -9185,13 +9900,13 @@ Since the hydrogen atom is a bound system between the proton of the nucleus and 
 * **Example 1** In the case of an emission, to calculate `[Enp_eV;En_eV;r_m;f_THz;Eph_eV;λ_nm;r_m]` (Energy of the final atomic level `np`; Energy of the initial atomic level `n`; Radius of the initial atomic level `n`; Frequency, Energy & Wavelength of the emitted photon) from 3 known variables:
 ```rpl
 np=2  n=1  Z=1
-@ Expecting [ Enp=-3.40142 18031 eV En=-13.60568 72124 eV r=5.29177 21054 7⁳⁻¹¹ m f=2 467.38147 016 THz Eph=10.20426 54093 eV λ=121.50227 3412 nm ]
+@ Expecting [ Enp=-3.40142 18031 3 eV En=-13.60568 72125 eV r=5.29177 21054 4⁳⁻¹¹ m f=2 467.38147 018 THz Eph=10.20426 54094 eV λ=121.50227 3411 nm ]
 'ROOT(ⒺBohr Atomic Model;[Enp;En;r;f;Eph;λ];[1_eV;1_eV;1_m;1_THz;1_eV;1_nm])'
 ```
 * **Example 2** In the case of an absorption, to calculate `[Enp_eV;En_eV;r_m;f_THz;Eph_eV;λ_nm]` (Energy of the final atomic level `np`; Energy of the initial atomic level `n`; Radius of the initial atomic level n; Frequency, Energy & Wavelength of the absorbed photon) from 3 known variables (Note: instead to `n→∞` one can choose `n=9.99999E999999`):
 ```rpl
 np=2  n=9.99999E999999  Z=1
-@ Expecting [ Enp=-3.40142 18031 eV En=-1.36057 14423 8⁳⁻¹⁹⁹⁹⁹⁹⁹ eV r=5.29176 15219 3⁳¹⁹⁹⁹⁹⁸⁹ m f=-822.46049 0054 THz Eph=-3.40142 18031 eV λ=-364.50682 0237 nm ]
+@ Expecting [ Enp=-3.40142 18031 3 eV En=-1.36057 14423 9⁳⁻¹⁹⁹⁹⁹⁹⁹ eV r=5.29176 15219⁳¹⁹⁹⁹⁹⁸⁹ m f=-822.46049 0061 THz Eph=-3.40142 18031 3 eV λ=-364.50682 0234 nm ]
 'ROOT(ⒺBohr Atomic Model;[Enp;En;r;f;Eph;λ];[1_eV;1_eV;1_m;1_THz;1_eV;1_nm])'
 ```
 
@@ -9361,6 +10076,45 @@ A=239  Z=94  AX=239  ZX=94  AY2=103  ZY2=40  mX=239.052157_u  mY1=133.90539466_u
 @ Expecting [ N=145 Δm=0.20283 55078 88 u Q=188.93999 7545 MeV ΔKtot=188.93999 7545 MeV AY1=134 ZY1=54 ]
 'ROOT(ⒺFission Reaction;[N;Δm;Q;ΔKtot;AY1;ZY1];[1;1_u;1_MeV;1_MeV;1;1])'
 ```
+
+
+## Finance
+
+The `Finance` section contains equations to compute time value of money (TVM).
+The variables in the Finance section include:
+
+* `n`: The number of compounding periods. For example, a 30 years loan with
+       monthly payments has 360 compounding periods.
+* `I%Yr`: Interest rate per year in percent
+* `PYr`: Payments per year.
+* `Pmt`: The periodic payment amount.
+* `PV`: The present value of a series of future cash flows,
+        or the initial cash flow.
+* `FV`: The future value, that is the final cash flow
+        (balloon payment or remaining balance),
+        or the compounded value of a series of prior cash flows.
+
+### TVMBeg
+
+Time value of money equation when payments are made at the beginning of the
+period.
+
+```rpl
+n='9*12' I%Yr=5.75 PV=-155 Pmt=0 PYr=12
+@ Expecting FV=259.74210 1025
+'ROOT(ⒺTVMBeg;FV;0)'
+```
+
+### TVMEnd
+
+Time value of money equation when payments are made at the end of the period.
+
+```rpl
+n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
+@ Expecting Pmt=1 314.24620 468
+'ROOT(ⒺTVMEnd;Pmt;0)'
+```
+
 # Menus
 
 Menus display at the bottom of the screen, and can be activated using the keys
@@ -9453,31 +10207,18 @@ Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ANGTODEG
-Convert an angle to degrees
+## ToRectangular
 
-
-## ANGTORAD
-Convert an angle to radians
-
-
-## ANGTOGRAD
-Convert an angle to grads (gons)
-
-
-## ANGTODMS
-Convert an angle to DMS (DD.MMSS)
-
-
-## TORECT
 Convert vector or complex to cartesian coordinates
 
 
-## TOPOLAR
+## ToPolar
+
 Convert vector or complex to polar coordinates
 
 
-## TOSPHER
+## ToSpherical
+
 Convert vector or complex to spherical coordinates
 # Arithmetic
 
@@ -9502,7 +10243,7 @@ Add two values.
 
 
 
-## Sub
+## Subtract
 
 Subtract two values
 
@@ -9514,7 +10255,7 @@ Subtract two values
   [autosimplify](#autosimplify) is active.
 
 
-## Mul
+## Multiply
 
 Multiply two values.
 
@@ -9534,7 +10275,7 @@ Multiply two values.
   gives `"XXX"`.
 
 
-## Div
+## Divide
 
 Divide two values two values
 
@@ -10272,6 +11013,178 @@ Returns the value of a library item from the library.
 The name can be given as a symbol or as text.
 
 `'Dedicace'"` ▶ `"À tous ceux qui se souviennent de Maubert électronique"`
+
+
+# Precision control
+
+Scientific calculations lead to the numerical evaluation of expressions whose
+result is given in the form of a [decimal number](#Decimal-number) for which
+[scientific notation](#Entering-a-number-in-scientific-notation-with-_×10ⁿ_) is
+often used.
+
+Calculations must be made with sufficient [precision](#Precision) to avoid
+rounding errors affecting the validity of the results sought. Since DB48x has
+variable precision floating point, the default configuration of 24 digits is
+more than enough for most scientific applications.
+
+However, a numerical value `X`, whether a measurement result or a constant, is
+most of the time known with limited precision. It is therefore provided with
+either an absolute uncertainty `ΔX` which is here designated by standard
+uncertainty represented by `UsX`, or, equivalently, with a relative uncertainty
+`UrX=UsX/|X|`. This makes it possible to establish an interval (either of a
+statistical nature for a given probability distribution or of extreme limits or
+other estimations) for the values ​​of `Xval`: `Xval = X ± ΔX = X ± UsX` noted
+also as `Xval = X @ (UrX*100)%`.
+
+A constant like `G` when edited shows as `ⒸG`.
+Its relative uncertainty `UrG` is shown as `ⓇG` on DB48x, whether on the stack
+or while editing. Its standard uncertainty `UsG` is shown as `ⓈG`.
+
+## Calculating uncertainty
+
+The calculation of uncertainty in science (metrology) obeys a certain number of simple rules concerning the significant digits (SD):
+
+### Rule 1
+
+`UsX` and `UrX` must be rounded to count at most 2 SD.
+
+### Rule 2
+
+`UsX` and `UrX` are equivalent and are determined between them knowing the
+central value `X`.
+
+### Rule 3
+
+A central value `X` must be rounded so that its last decimal place corresponds
+to the last decimal place of `UsX`.
+
+### Rule 4
+
+The final result of a calculation (multiplicative, functional, etc.)  involving
+several uncertain values ​​gives a result that cannot be more precise than the
+least precise of the uncertain input values. Note that before rounding the
+final result, the intermediate calculations can be done at maximum precision,
+thus avoiding the accumulation of rounding errors.
+
+### Rule 5
+
+In the case of a sum (or difference) between two uncertain values,
+rounding is carried out to the leftmost decimal position of the last
+significant digit among the inputs of the final calculation.
+
+### Uncertainty-related commands
+
+DB48x benefits from several features that support uncertainty calculations, SD
+display mode and manipulation:
+
+* `SignificantDisplay` is a mode where values can be displayed with a given
+  number of SDs regardless of the precision of the calculations.
+
+* `SigDig` is a command (DB48x extension) that returns the number of significant
+  digits of its input.
+
+* `Trunc` is a command that truncates its input to a given number of SDs when
+  given a negative precision (and to a given number of decimal digits when given
+  a positive precision).
+
+* `Round` is a command (from HP50g) that rounds its input in the same way
+  `Trunc` truncates it.
+
+If the uncertainty `UsX` and `UrX` result from a calculation, *Rule1* is easily
+implemented by `UsX=ROUND(UsX,-2)` and `UrX=ROUND(UrX,-2)`.
+
+The following five commands are added as extensions of DB48x to support the
+remaining 4 rules: `→Us`, `→Ur`, `StandardRound`, `RelativeRound` and
+`PrecisionRound`.
+
+
+## →Us
+
+Calculate standard uncertainty.
+
+This command calculates a standard uncertainty `UsX` given the relative
+uncertainty `UrX` and the central value `X`. This implements *Rule2* for `UsX`.
+
+```rpl
+-3.141592654_m  0.000012  →Us
+@ Expecting 0.00003 8 m
+```
+
+## →Ur
+
+Calculate relative uncertainty.
+
+This command calculates a relative uncertainty `UrX` given the standard
+uncertainty `UsX` and the central value `X`. This implements *Rule2* for `UrX`.
+
+
+```rpl
+-3.141592654_m  0.000097_m  →Ur
+@ Expecting 0.00003 1
+```
+
+## StandardRound
+
+Round a value based on a standard uncertainty, implementing *Rule3*.
+
+```rpl
+-3.141592654_m  0.000045_m  StdRnd
+@ Expecting -3.14159 3 m
+```
+
+To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
+```rpl
+'ⒸNA*Ⓒu'  Duplicate  ⓇMu  →Us  StdRnd →Num
+@ Expecting 1.00000 00010 5⁳⁻³ kg/mol
+@ which is the correctly rounded value of ⒸMu
+```
+
+
+## RelativeRound
+
+Round a value based on a relative uncertainty, implementing *Rule2* and *Rule3*.
+
+```rpl
+-3.141592654_m  0.000012  RelRnd
+@ Expecting -3.14159 3 m
+```
+
+To calculate `UrMu=ⓇMu` and then the correct rounding of `Mu='ⒸNA*Ⓒu'`,
+you can use the following code:
+```rpl
+'ⒸNA*Ⓒu'  Duplicate  ⓈMu →Ur RelRnd  →Num
+@ Expecting 1.00000 00010 5⁳⁻³ kg/mol
+@ which is the correctly rounded value of ⒸMu
+```
+
+To calculate `Urε₀=Ⓡε₀` and then the correct rounding of
+`ε₀='CONVERT(1/(Ⓒc^2·Ⓒμ₀);1_F/m)'`:
+
+```rpl
+'CONVERT(1/(Ⓒc^2·Ⓒμ₀);1_F/m)'  Duplicate  Ⓢε₀  →Ur RelRnd  →Num
+@ Expecting 8.85418 78188⁳⁻¹² F/m
+@ which is the correctly rounded value of Ⓒε₀
+```
+
+
+## PrecisionRound
+
+Round one value to the precision of another one.
+
+This implements *Rule4* and *Rule5*. The user has to judge carefully to
+establish the respective role of `X` and `Y`. There is no automatic use here,
+since it depends on the precise nature of the calculation.
+
+
+```rpl
+-3.141592654_m 0.000045_m  PrcRnd
+@ Expecting -3.14159 3 m
+```
+
+```rpl
+-3.141592654_m 0.00045  PrcRnd
+@ Expecting -3.14159 m
+```
 # Debugging
 
 DB48X offers a variety of capabilities to help debugging RPL programs. These are
@@ -10743,6 +11656,167 @@ Loop FORUP ... NEXT/STEP statement
 
 ## FORDN
 Loop FORUP ... NEXT/STEP statement
+# Finance
+
+DB48x features a finance solver for basic compound interest computations
+and amortization tables.
+
+
+## FinanceSolverMenu
+
+Display the Time Value of Money (TVM) solver menu.
+
+This menu can be used to directly resolve payment and interests problems.
+It works like the `SolvingMenu`, except that it gives no access to
+equation-related features such as `NxEq` or `EvalEq`.
+
+```rpl
+TVM
+```
+
+## FinanceRounding
+
+This setting defines the number of digits values returned by finance values will be rounded two. The default avalue is `2`.
+
+```rpl
+@ Set finance rounding to 10 digits
+10 FinanceRounding
+
+@ Reset finance rounding to default
+'FinanceRounding' Purge
+
+@ Check current value for finance rounding
+'FinanceRounding' RCL
+@ Expecting 2
+```
+
+## TVMRoot
+
+Solves for the specified TVM variable using values from the remaining TVM
+variables.
+
+For example, to compute the interest rate for a 3-years €40000 loan with $1200
+monthly payments at end of period, use the following code:
+
+```rpl
+@ Set loan conditions
+PV=40000 Pmt=-1200 n=36 FV=0 Pyr=12 TVMEnd
+
+@ Solve for interest rate
+'I%Yr' TVMRoot
+
+@ Expecting
+```
+
+
+## Amort
+
+Amortizes a loan or investment based upon the current amortization settings.
+Values must be stored in the TVM variables (`I%Yr`, `PV`, `Pmt`, and `PYr`). The
+number of payments `n` is taken from the input together with flag –14
+(`TVMPayAtBeginningOfPeriod` / `TVMPayAtEndOfPeriod`).
+
+Given the number of payments `n`, the command deposits the value of the
+principal, interest and balance in stack levels 1, 2 and 3.
+
+For example, to compute the amount of principal, interest and balance 6 months
+into a 10-years loan of $15000 at 10% yearly interest rates with monthly
+payments at the end of each month, you can use the following code:
+
+```rpl
+@ Set loan conditions
+I%Yr=10 PV=15000 PYr=12 FV=0 n=120 TVMEnd
+
+@ First solve to get the payment value
+'Pmt' TVMRoot
+
+@ Compute amortization data after 6 months and put it in a vector
+6 Amort →V3
+
+@ Expecting [ -448.61 -740.74 14 551.39 ]
+```
+
+
+## AmortTable
+
+Build an amortization table based on the current amortization settings.
+Values must be stored in the TVM variables (`I%Yr`, `PV`, `Pmt`, and `PYr`). The
+number of payments `n` is taken from the input together with flag –14
+(`TVMPayAtBeginningOfPeriod` / `TVMPayAtEndOfPeriod`).
+
+Given the number of payments `n`, the command deposits the amortization table
+for the first `n` periods on the stack. If `n` is negative, then its value is
+read from the `n` variable.
+
+If the first level of the stack is a list, it can contain up to three values:
+
+* The first period for which amortization is computed
+* The number of amortization periods
+* The step interval between amortization periods
+
+All three values default to 1.
+
+For example, to compute the amortization table of a home loan for $250,000 with
+a downpayment of $62,500, an interest rate of 5.25% for 30 years, use the
+following code:
+
+```rpl
+@ Set loan initial conditions
+I%Yr=5.25 n='30*12' PYr=12 FV=0 PV='250000-62500'
+
+@ Compute payment
+'Pmt' TVMRoot
+
+@ Compute amortization table
+25 AmortTable
+```
+
+
+## TVMPayAtBeginningOfPeriod
+
+This flag indicates that payments occur at the beginning of a payment period.
+For compatibility with HP calculators, flag `-14` can also be set.
+
+For example, to compute the amount of principal, interest and balance paid
+at the end of a 2-years loan at 1.5% yearly interest rates with monthly payments of $200 at the beginning of each month, you can use the following code:
+
+```rpl
+@ Set loan conditions
+I%Yr=1.5 Pmt=-200 PYr=12 FV=0 n=24 TVMBeg
+
+@ First solve to get the payment value
+'PV' TVMRoot
+
+@ Compute amortization data after 24 months and put it in a vector
+n Amort →V3
+
+@ Expecting [ -4 731.71 -68.29 0. ]
+```
+
+
+
+
+## TVMPayAtEndOfPeriod
+
+This flag indicates that payments occur at the end of a payment period.
+For compatibility with HP calculators, flag `-14` can also be cleared.
+
+For example, to compute the amount of principal, interest and balance paid at
+the end of a 5-years loan at 2.5% yearly interest rates with monthly payments of
+$500 at the beginning of each month, you can use the following code:
+
+```rpl
+@ Set loan conditions
+I%Yr=1.5 Pmt=-200 PYr=12 FV=0 n=60 TVMEnd
+
+@ First solve to get the payment value
+'PV' TVMRoot
+
+@ Compute amortization data after 60 months and put it in a vector
+n Amort →V3
+
+@ Expecting [ -11 554.09 -445.91 0. ]
+```
 # Flags
 
 Flags are truth value that can be controled and tested by the user.
@@ -12021,6 +13095,11 @@ This setting defines the relative imprecision for the result with respect to the
 [Precision](#precision) setting. The default value is `6`, which means that at
 the default precision of `24` digits, `Integrate` will try to compute to an
 accuracy of 18 digits.
+
+This setting only applies if the result is smaller than the display
+settings. Like HP calculators, the display settings limits the precision
+requested from the integration algorithm. For example, if the display is set to
+`3 FIX`, then only 3 digits of precision are considered necessary in the result.
 
 ### IntegrationIterations
 

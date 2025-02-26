@@ -113,22 +113,22 @@ static const cstring basic_equations[] =
     //T#*: 78 vars 67 eqns 32 sims 30 secs
 
     "Coulomb’s Law & E Field",  "{ "
-    "  '(F_N)=1/(4*Ⓒπ*Ⓒε0*εr)*((q1_C)*(q2_C)/(r_m)²)' "
+    "  '(F_N)=1/(4*Ⓒπ*Ⓒε₀*εr)*((q1_C)*(q2_C)/(r_m)²)' "
     "  '(Er_(N/C))=(F_N)/(qtest_C)' "
     "}",
 
     "E Field Infinite Line",  "{ "
-    "  '(Er_(N/C))=1/(2*Ⓒπ*Ⓒε0*εr)*((λ_(C/m))/(r_m))' "
+    "  '(Er_(N/C))=1/(2*Ⓒπ*Ⓒε₀*εr)*((λ_(C/m))/(r_m))' "
     "  '(λ_(C/m))=(Q_C)/(L_m)' "
     "}",
 
     "E Field Finite Line",  "{ "
-    "  '(Er_(N/C))=1/(4*Ⓒπ*Ⓒε0*εr)*((λ_(C/m))/(r_m)*(SIN(θ1_r)-SIN(θ2_r)))' "
+    "  '(Er_(N/C))=1/(4*Ⓒπ*Ⓒε₀*εr)*((λ_(C/m))/(r_m)*(SIN(θ₁_r)-SIN(θ₂_r)))' "
     "  '(λ_(C/m))=(Q_C)/(L_m)' "
     "}",
 
     "E Field Infinite Plate",  "{ "
-    "  '(Ep_(N/C))=(σ_(μC/cm²))/(2*Ⓒε0*εr)' "
+    "  '(Ep_(N/C))=(σ_(μC/cm²))/(2*Ⓒε₀*εr)' "
     "  '(σ_(μC/cm²))=(Q_μC)/(A_(cm²))' "
     "}",
 
@@ -178,7 +178,7 @@ static const cstring basic_equations[] =
     "}",
 
     "Volumic Density Electric Energy",  "{ "
-    "  '(uE_(J/m^3))=(1/2)*Ⓒε0*εr*(E_(V/m))²' "
+    "  '(uE_(J/m^3))=(1/2)*Ⓒε₀*εr*(E_(V/m))²' "
     "}",
 
     "Inductive Energy",  "{ "
@@ -222,28 +222,28 @@ static const cstring basic_equations[] =
     "Resonant Frequency",  "{ "
     "  'Qs=1/(R_Ω)*√((L_mH)/(C_μF))' "
     "  'Qp=(R_Ω)*√((C_μF)/(L_mH))' "
-    "  '(ω0_(r/s))=2*(Ⓒπ_r)*(f0_Hz)' "
-    "  '(ω0_(r/s))=(1_r)/√((L_mH)*(C_μF))' "
+    "  '(ω₀_(r/s))=2*(Ⓒπ_r)*(f0_Hz)' "
+    "  '(ω₀_(r/s))=(1_r)/√((L_mH)*(C_μF))' "
     "}",
 
     "Plate Capacitor",  "{ "
-    "  '(C_μF)=Ⓒε0*εr*(A_(cm²))/(d_cm)' "
+    "  '(C_μF)=Ⓒε₀*εr*(A_(cm²))/(d_cm)' "
     "  '(ΔV_V)=(Ein_(V/m))*(d_cm)' "
-    "  '(Ein_(N/C))=(σ_(μC/cm²))/(Ⓒε0*εr)' "
+    "  '(Ein_(N/C))=(σ_(μC/cm²))/(Ⓒε₀*εr)' "
     "  '(σ_(μC/m²))=(Q_μC)/(A_(cm²))' "
     "}",
 
     "Cylindrical Capacitor",  "{ "
-    "  '(C_μF)=2*Ⓒπ*Ⓒε0*εr*(L_cm)/(LN((ro_cm)/(ri_cm)))' "
-    "  '(ΔV_V)=(Q_μC)*(LN((ro_cm)/(ri_cm)))/(2*Ⓒπ*Ⓒε0*εr*(L_cm))' "
+    "  '(C_μF)=2*Ⓒπ*Ⓒε₀*εr*(L_cm)/(LN((ro_cm)/(ri_cm)))' "
+    "  '(ΔV_V)=(Q_μC)*(LN((ro_cm)/(ri_cm)))/(2*Ⓒπ*Ⓒε₀*εr*(L_cm))' "
     "}",
 
     "Solenoid Inductance",  "{ "
-    "  '(L_mH)=Ⓒμ0*μr*(n_cm^-1)²*(A_(cm²))*(h_cm)' "
+    "  '(L_mH)=Ⓒμ₀*μr*(n_cm^-1)²*(A_(cm²))*(h_cm)' "
     "}",
 
     "Toroid Inductance",  "{ "
-    "  '(L_mH)=Ⓒμ0*μr*N²*(h_cm)/(2*Ⓒπ)*LN((ro_cm)/(ri_cm))' "
+    "  '(L_mH)=Ⓒμ₀*μr*N²*(h_cm)/(2*Ⓒπ)*LN((ro_cm)/(ri_cm))' "
     "}",
 
     "Sinusoidal Voltage",  "{ "
@@ -515,27 +515,27 @@ static const cstring basic_equations[] =
     // WARNING both HP50G & HP50G_AUR.pdf used a variables rw absent from all
     // equations
     "Straight Wire Infinite",  "{ "
-    "'(B_T)=Ⓒμ0*IFTE((r_m)≤(rw_m);μr*(r_m)*(I_A)/(2*Ⓒπ*(rw_cm)²);(I_A)/(2*Ⓒπ*(r_cm)))' "
+    "'(B_T)=Ⓒμ₀*IFTE((r_m)≤(rw_m);μr*(r_m)*(I_A)/(2*Ⓒπ*(rw_cm)²);(I_A)/(2*Ⓒπ*(r_cm)))' "
     "}",
     // Correction factor 1/4 replace factor 1/2
     "Straight Wire Finite",  "{ "
-    "'(B_T)=Ⓒμ0*IFTE((r_m)≤(rw_m);μr*(r_m)*(I_A)/(4*Ⓒπ*(rw_cm)²);(I_A)/(4*Ⓒπ*(r_cm)))*(COS(θ1_r)-COS(θ2_r))' "
+    "'(B_T)=Ⓒμ₀*IFTE((r_m)≤(rw_m);μr*(r_m)*(I_A)/(4*Ⓒπ*(rw_cm)²);(I_A)/(4*Ⓒπ*(r_cm)))*(COS(θ₁_r)-COS(θ₂_r))' "
     "}",
 
     "Force Between Wires",  "{ "
-    "'(Fba_N)=(Ⓒμ0*μr*(Ib_A)*(Ia_A)*(L_cm))/(2*Ⓒπ*(d_m))' "
+    "'(Fba_N)=(Ⓒμ₀*μr*(Ib_A)*(Ia_A)*(L_cm))/(2*Ⓒπ*(d_m))' "
     "}",
 
     "B Field In Infinite Solenoid",  "{ "
-    "'(B_T)=Ⓒμ0*μr*(I_A)*nl' "
+    "'(B_T)=Ⓒμ₀*μr*(I_A)*nl' "
     "}",
 
     "B Field In Finite Solenoid",  "{ "
-    "'(B_T)=(1/2)*Ⓒμ0*μr*(I_A)*nl*(COS(α2_°)-COS(α1_°))' "
+    "'(B_T)=(1/2)*Ⓒμ₀*μr*(I_A)*nl*(COS(α2_°)-COS(α1_°))' "
     "}",
 
     "B Field In Toroid",  "{ "
-    "'(B_T)=(Ⓒμ0*μr*(I_A)*N)/(2*Ⓒπ)*(2/((ro_cm)+(ri_cm)))' "
+    "'(B_T)=(Ⓒμ₀*μr*(I_A)*N)/(2*Ⓒπ)*(2/((ro_cm)+(ri_cm)))' "
     "}",
 
     "Hall Effect",  "{ "
@@ -556,7 +556,7 @@ static const cstring basic_equations[] =
     "}",
 
     "Volumic Density Magnetic Energy",  "{ "
-    "'(uB_(J/m^3))=(1/(2*Ⓒμ0*μr))*(B_T)²' "
+    "'(uB_(J/m^3))=(1/(2*Ⓒμ₀*μr))*(B_T)²' "
     "}",
 
     // ------------------------------------------------------------------------
@@ -595,14 +595,14 @@ static const cstring basic_equations[] =
 
     "Angular Motion",  "{ "
 // Due to "Inconsistent units" I had to rewrite all angular units of ω & α
-//    "'(θ_°)=(θ0_°)+(ω0_rpm)*(t_s)+1/2*(α_(rpm²))*(t_s)²' "
+//    "'(θ_°)=(θ0_°)+(ω₀_rpm)*(t_s)+1/2*(α_(rpm²))*(t_s)²' "
 //    "'(θ_°)=(θ0_°)+(ω_rpm)*(t_s)-1/2*(α_(rpm²))*(t_s)²' "
-//    "'(θ_°)=(θ0_°)+1/2*((ω0_rpm)+(ω_rpm))*(t_s)' "
-//    "'(ω_rpm)=(ω0_rpm)+(α_(rpm²))/(1_turn)*(t_s)' "
-    "'(θ_°)=(θ0_°)+(ω0_r/min)*(t_s)+1/2*(α_r/min²)*(t_s)²' "
+//    "'(θ_°)=(θ0_°)+1/2*((ω₀_rpm)+(ω_rpm))*(t_s)' "
+//    "'(ω_rpm)=(ω₀_rpm)+(α_(rpm²))/(1_turn)*(t_s)' "
+    "'(θ_°)=(θ0_°)+(ω₀_r/min)*(t_s)+1/2*(α_r/min²)*(t_s)²' "
     "'(θ_°)=(θ0_°)+(ω_r/min)*(t_s)-1/2*(α_r/min²)*(t_s)²' "
-    "'(θ_°)=(θ0_°)+1/2*((ω0_r/min)+(ω_r/min))*(t_s)' "
-    "'(ω_r/min)=(ω0_r/min)+(α_r/min²)*(t_s)' "
+    "'(θ_°)=(θ0_°)+1/2*((ω₀_r/min)+(ω_r/min))*(t_s)' "
+    "'(ω_r/min)=(ω₀_r/min)+(α_r/min²)*(t_s)' "
 
     "}",
     // I rewrote the angular units in eqns (1) & (3)
@@ -618,7 +618,7 @@ static const cstring basic_equations[] =
     "'(vt_(m/s))=√((2*(m_kg)*Ⓒg)/(Cd*(ρ_(kg/m^3))*(Ah_cm²)))' "
     "'v_(m/s)=(vt_(m/s))*TANH((t_s)*Ⓒg/(vt_(m/s)))' "
     "'tfr_s=ATANH(fr)/(Ⓒg/(vt_(m/s)))' "
-    "'xfr_ft=(vt_(m/s))*∫(0;(tfr_s)/(1_s);TANH(t*Ⓒg/(vt_(m/s))*(1_s));t)*(1_s)' "
+    "'xfr_ft=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/(vt_(m/s)));t)' "
 //  This last integration shall work since it is stripped of units but it doesn't
 //  "'xfr_ft=(vt_(m/s))*∫(0_s;tfr_s;TANH((t_s)*Ⓒg/(vt_(m/s)));t)' " that's the failing integral with units
 //  "'xfr_ft=(175.74722 3631_ft/s)*∫(0;10.00590 25332;TANH(t*Ⓒg/(175.74722 3631_ft/s)*(1_s));t)*(1_s)' " works in example 1
@@ -631,7 +631,7 @@ static const cstring basic_equations[] =
     "'(vt_(m/s))=IFTE((ρ_(kg/m^3))<(ρf_(kg/m^3));-1;1)*√(2*(Vol_m^3)/(Ah_m²)*ABS((ρ_(kg/m^3))/(ρf_(kg/m^3))-1)*Ⓒg/Cd)' "
     "'v_(m/s)=(vt_(m/s))*TANH((t_s)*Ⓒg/ABS(vt_(m/s)))' "
     "'tfr_s=ATANH(fr)/(Ⓒg/ABS(vt_(m/s)))' "
-    "'xfr_m=(vt_(m/s))*∫(0;(tfr_s)/(1_s);TANH(t*Ⓒg/ABS(vt_(m/s))*(1_s));t)*(1_s)' "
+    "'xfr_m=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/(vt_(m/s)));t)' "
 //  This last integration shall work since it is stripped of units (but I tried and it also failed)
 //  "'xfr_m=(vt_(m/s))*∫(0_s;tfr_s;TANH((t_s)*Ⓒg/(vt_(m/s)));t)' " that's the failing integral wuth units
 //  "'xfr_ft=? (175.74722 3631_ft/s)*∫(0;10.00590 25332;t*TANH(t*Ⓒg/(175.74722 3631_ft/s)*(1_s));t)*(1_s)' " works in example 1
@@ -650,7 +650,7 @@ static const cstring basic_equations[] =
     //T#*: 40 vars 38 eqns 11 sims 11 secs
 
     "Refraction Law",  "{ "
-    "'n1*SIN(θ1_°)=n2*SIN(θ2_°)' "
+    "'n1*SIN(θ₁_°)=n2*SIN(θ₂_°)' "
     "'n1=Ⓒc/(v1_(m/s))' "
     "'n2=Ⓒc/(v2_(m/s))' "
     "}",
@@ -673,7 +673,7 @@ static const cstring basic_equations[] =
 
     "Brewster’s Law",  "{ "
        "'TAN(θB_°)=n2/n1' "
-       "'(θB_°)+(θ2_°)=90_°' "
+       "'(θB_°)+(θ₂_°)=90_°' "
        "'n1=Ⓒc/(v1_(m/s))' "
        "'n2=Ⓒc/(v2_(m/s))' "
     "}",
@@ -703,10 +703,10 @@ static const cstring basic_equations[] =
     "}",
 // Error in second eqn last "+" to be replaced by "*"
     "Malus Law",  "{ "
-    "'(I_(W/m²))/(I0_(W/m²))=(COS(θ_°))²' "
-    //"'(Ix_(W/m²))/I0x_(W/m²)=((fx_Hz)/(fx0_Hz))*(1+Ⓒλc/Ⓒc*((fx0_Hz)-(fx_Hz)))+(COS(θ_°))²' "
-    "'(Ix_(W/m²))/I0x_(W/m²)=((fx_Hz)/(fx0_Hz))*(1+Ⓒλc/Ⓒc*((fx0_Hz)-(fx_Hz)))*(COS(θ_°))²' "
-    "'(I0_(W/m²))=(1/(2*Ⓒμ0*Ⓒc))*(E0_(V/m))²' "
+    "'(I_(W/m²))/(I₀_(W/m²))=(COS(θ_°))²' "
+    //"'(Ix_(W/m²))/I₀x_(W/m²)=((fx_Hz)/(fx₀_Hz))*(1+Ⓒλc/Ⓒc*((fx₀_Hz)-(fx_Hz)))+(COS(θ_°))²' "
+    "'(Ix_(W/m²))/I₀x_(W/m²)=((fx_Hz)/(fx₀_Hz))*(1+Ⓒλc/Ⓒc*((fx₀_Hz)-(fx_Hz)))*(COS(θ_°))²' "
+    "'(I₀_(W/m²))=(1/(2*Ⓒμ₀*Ⓒc))*(E₀_(V/m))²' "
     "}",
 
     "2 Slits Young Interference",  "{ "
@@ -755,11 +755,11 @@ static const cstring basic_equations[] =
     "}",
     // Modif of radian in eqns 2, 3, 4 & 5
     "Simple Harmonic",  "{ "
-    "'(x_cm)=(xm_cm)*COS((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(v_(m/s))=-(ω0_(r/s))/(1_r)*(xm_m)*SIN((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(a_(m/s²))=-(ω0_(r/s))²/(1_r)²*(xm_m)*COS((ω0_(r/s))*(t_s)+(φ_°))' "
-    "'(ω0_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
-    "'(E_J)=(1/2)*(m_kg)*((ω0_(r/s))/(1_r)*(xm_m))²' "
+    "'(x_cm)=(xm_cm)*COS((ω₀_(r/s))*(t_s)+(φ_°))' "
+    "'(v_(m/s))=-(ω₀_(r/s))/(1_r)*(xm_m)*SIN((ω₀_(r/s))*(t_s)+(φ_°))' "
+    "'(a_(m/s²))=-(ω₀_(r/s))²/(1_r)²*(xm_m)*COS((ω₀_(r/s))*(t_s)+(φ_°))' "
+    "'(ω₀_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
+    "'(E_J)=(1/2)*(m_kg)*((ω₀_(r/s))/(1_r)*(xm_m))²' "
     "}",
     // Modif of radian in eqns (3) & (6)
     // Add radians to eqn (2); Eliminate radians in eqn (1) & 2 times in eqn (5) & in eqn (6)
@@ -767,26 +767,26 @@ static const cstring basic_equations[] =
     "Underdamped Oscillations",  "{ "
     "'(x_m)=(xm_m)*EXP(-(γ_(r/s))*(t_s)/2/(1_r))*COS((ωu_(r/s))*(t_s)+(φ_°))' "
     "'(γ_(r/s))=(1_r)*(b_(kg/s))/(m_kg)' "
-    "'(ω0_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
-    "'(ωu_(r/s))²=(ω0_(r/s))²*(1-((γ_(r/s))/(2*(ω0_(r/s))))²)' "
+    "'(ω₀_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
+    "'(ωu_(r/s))²=(ω₀_(r/s))²*(1-((γ_(r/s))/(2*(ω₀_(r/s))))²)' "
     "'(v_(m/s))=(xm_m)/(1_r)*EXP(-(γ_(r/s))*(t_s)/2/(1_r))*(-((γ_(r/s))/2)*COS((ωu_(r/s))*(t_s)+(φ_°))-(ωu_(r/s))*SIN((ωu_(r/s))*(t_s)+(φ_°)))' "
-    "'(a_(m²/s))=-((ω0_(r/s))²/(1_r)²*(x_m)+(γ_(r/s))*(v_m/s)/(1_r))' "
+    "'(a_(m²/s))=-((ω₀_(r/s))²/(1_r)²*(x_m)+(γ_(r/s))*(v_m/s)/(1_r))' "
     "'(E_J)=(1/2)*(k_(N/m))*(x_m)²+(1/2)*(m_kg)*(v_(m/s))²' "
-    "'Q=(ω0_(r/s))/(γ_(r/s))' "
+    "'Q=(ω₀_(r/s))/(γ_(r/s))' "
     "}",
     // Ref.: https://scholar.harvard.edu/files/david-morin/files/waves_oscillations.pdf
     "Driven Damped Oscillations",  "{ "
     "'(x_m)=(xp_m)*COS((ω_(r/s))*(t_s)+(φ_°))+(xh_m)*EXP(-(γ_(r/s))/(1_r)*(t_s)/2)*COS((ωu_(r/s))*(t_s)+(θ_°))' "
     "'(γ_(r/s))=(1_r)*(b_(kg/s))/(m_kg)' "
-    "'(ω0_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
-    "'(ωu_(r/s))²=(ω0_(r/s))²*(1-((γ_(r/s))/(2*(ω0_(r/s))))²)' "
-    "'(xp_m)²=((1_r)²*((Fd_N)/(m_kg)))²/(((ω0_(r/s))²-(ω_(r/s))²)²+((γ_(r/s))*(ω_(r/s)))²)' "
-    "'TAN(φ_°)=-((γ_(r/s))*(ω_(r/s)))/((ω0_(r/s))²-(ω_(r/s))²)' "
+    "'(ω₀_(r/s))²=(1_r)²*((k_(N/m))/(m_kg))' "
+    "'(ωu_(r/s))²=(ω₀_(r/s))²*(1-((γ_(r/s))/(2*(ω₀_(r/s))))²)' "
+    "'(xp_m)²=((1_r)²*((Fd_N)/(m_kg)))²/(((ω₀_(r/s))²-(ω_(r/s))²)²+((γ_(r/s))*(ω_(r/s)))²)' "
+    "'TAN(φ_°)=-((γ_(r/s))*(ω_(r/s)))/((ω₀_(r/s))²-(ω_(r/s))²)' "
     // The next 7th eqn doesn't fit on the screen, but it goes on the stack with Eq
     "'(v_(m/s))=-(xp_m)*(ω_(r/s))/(1_r)*SIN((ω_(r/s))*(t_s)+(φ_°))+(xh_m)*EXP(-(γ_(r/s))/(1_r)*(t_s)/2)*(-((γ_(r/s))/(1_r)/2)*COS((ωu_(r/s))*(t_s)+(θ_°))-(ωu_(r/s))/(1_r)*SIN((ωu_(r/s))*(t_s)+(θ_°)))' "
-    "'(a_(m²/s))=-(((ω0_(r/s))/(1_r))²*(x_m)+(γ_(r/s))/(1_r)*(v_m/s))+((Fd_N)/(m_kg))*COS((ω_(r/s))*(t_s))' "
+    "'(a_(m²/s))=-(((ω₀_(r/s))/(1_r))²*(x_m)+(γ_(r/s))/(1_r)*(v_m/s))+((Fd_N)/(m_kg))*COS((ω_(r/s))*(t_s))' "
     "'(E_J)=(1/2)*(k_(N/m))*(x_m)²+(1/2)*(m_kg)*(v_(m/s))²' "
-    "'Q=(ω0_(r/s))/(γ_(r/s))' "
+    "'Q=(ω₀_(r/s))/(γ_(r/s))' "
     "}",
 
     // ------------------------------------------------------------------------
@@ -891,10 +891,10 @@ static const cstring basic_equations[] =
     "'(Vbi_V)=(Ⓒk*(T_°C))/Ⓒqe*LN((NA_(cm^-3))*(ND_(cm^-3))/((ni_(cm^-3))²))' "
     "'(ni_(cm^-3))=ⓁSiDensity(T_K)' "
     //"'(ni_(cm^-3))=(8.35123e20_cm^-3)*exp(-(7555.17_K)/(T_K))' "
-    "'(xd_μ)²=((2*Ⓒεsi*Ⓒε0)/Ⓒqe*((Vbi_V)-(Va_V))*(1/(NA_(cm^-3))+1/(ND_(cm^-3))))' "
-    "'(Cj_(pF/cm²))=(Ⓒεsi*Ⓒε0)/(xd_μ)' "
+    "'(xd_μ)²=((2*Ⓒεsi*Ⓒε₀)/Ⓒqe*((Vbi_V)-(Va_V))*(1/(NA_(cm^-3))+1/(ND_(cm^-3))))' "
+    "'(Cj_(pF/cm²))=(Ⓒεsi*Ⓒε₀)/(xd_μ)' "
     "'(Emax_(V/m))=2*((Vbi_V)-(Va_V))/(xd_μ)' "
-    "'(BV_V)=(Ⓒεsi*Ⓒε0*(E1_(V/m))²)/(2*Ⓒqe)*(1/(NA_(cm^-3))+1/(ND_(cm^-3)))' "
+    "'(BV_V)=(Ⓒεsi*Ⓒε₀*(E1_(V/m))²)/(2*Ⓒqe)*(1/(NA_(cm^-3))+1/(ND_(cm^-3)))' "
     "'(J_(A/cm²))=(Js_(μA/cm²))*(EXP((Ⓒqe*(Va_V))/(Ⓒk*UBASE(T_K)))-1)' "
     "'(Aj_(cm²))=((W_μ)+2*(ΔW_μ))*((L_μ)+2*(ΔL_μ))+Ⓒπ*((W_μ)+2*(ΔW_μ)+2*(ΔL_μ))*(xj_μ)+2*Ⓒπ*(xj_m)²' "
     "'(I_mA)=(J_(A/cm²))*(Aj_(cm²))' "
@@ -907,9 +907,9 @@ static const cstring basic_equations[] =
     "NMOS Transistor",  "{ "
     "'(We_μ)=(W_μ)-2*(ΔW_μ)' "
     "'(Le_μ)=(L_m)-2*(ΔL_μ)' "
-    "'(Cox_(pF/cm²))=(Ⓒεox*Ⓒε0)/(tox_nm)' "
+    "'(Cox_(pF/cm²))=(Ⓒεox*Ⓒε₀)/(tox_nm)' "
     "'(IDS_mA)=(Cox_(pF/cm²))*(μn_((cm²)/(V*s)))*((We_μ)/(Le_μ))*(((VGS_V)-(Vt_V))*(VDS_V)-(VDS_V)²/2)*(1+(λ_(1/V))*(VDS_V))' "
-    "'(γ_(V^(1/2)))²=((2*Ⓒεsi*Ⓒε0)*Ⓒqe*(NA_(cm^-3)))/(Cox_(pF/cm²))²' "
+    "'(γ_(V^(1/2)))²=((2*Ⓒεsi*Ⓒε₀)*Ⓒqe*(NA_(cm^-3)))/(Cox_(pF/cm²))²' "
     "'(Vt_V)=(Vt0_V)+(γ_(V^(1/2)))*(√(2*ABS(φp_V)-ABS(VBS_V))-√(2*ABS(φp_V)))' "
     //"'(φp_V)=Ⓒk*UBASE(T_K)/Ⓒqe*LN((NA_(cm^-3))/(ni_(cm^-3)))' "
     "'(φp_V)=-Ⓒk*UBASE(T_K)/Ⓒqe*LN((NA_(cm^-3))/(ni_(cm^-3)))' "
@@ -940,12 +940,12 @@ static const cstring basic_equations[] =
     "'(Vbi_V)=(Ⓒk*UBASE(T_K))/Ⓒqe*LN((ND_(cm^-3))/(ni_(cm^-3)))' "
     "'(ni_(cm^-3))=ⓁSiDensity(T_K)' "
     //"'(ni_(cm^-3))=(8.35123e20_cm^-3)*exp(-(7555.17_K)/UBASE(T_K))' "
-    "'(xdmax_μ)²=((2*Ⓒεsi*Ⓒε0)/(Ⓒqe*(ND_(cm^-3)))*((Vbi_V)-(VGS_V)+(VDS_V)))' "
+    "'(xdmax_μ)²=((2*Ⓒεsi*Ⓒε₀)/(Ⓒqe*(ND_(cm^-3)))*((Vbi_V)-(VGS_V)+(VDS_V)))' "
     "'(G0_S)=Ⓒqe*(ND_(cm^-3))*(μn_((cm²)/(V*s)))*(((a_μ)*(W_μ))/(L_μ))' "
-    "'(ID_mA)=(G0_S)*((VDS_V)-((2/3)*√((2*Ⓒεsi*Ⓒε0)/(Ⓒqe*(ND_(cm^-3))*(a_μ)²)))*(((Vbi_V)-(VGS_V)+(VDS_V))^(3/2)-((Vbi_V)-(VGS_V))^(3/2)))' "
-    "'(VDsat_V)=(Ⓒqe*(ND_(cm^-3))*(a_μ)²)/(2*Ⓒεsi*Ⓒε0)-((Vbi_V)-(VGS_V))' "
-    "'(Vt_V)=(Vbi_V)-(Ⓒqe*(ND_(cm^-3))*(a_μ)²)/(2*Ⓒεsi*Ⓒε0)' "
-    "'(gm_(mA/V))=(G0_S)*(1-√(((2*Ⓒεsi*Ⓒε0)/(Ⓒqe*(ND_(cm^-3))*(a_μ)²))*((Vbi_V)-(VGS_V))))' "
+    "'(ID_mA)=(G0_S)*((VDS_V)-((2/3)*√((2*Ⓒεsi*Ⓒε₀)/(Ⓒqe*(ND_(cm^-3))*(a_μ)²)))*(((Vbi_V)-(VGS_V)+(VDS_V))^(3/2)-((Vbi_V)-(VGS_V))^(3/2)))' "
+    "'(VDsat_V)=(Ⓒqe*(ND_(cm^-3))*(a_μ)²)/(2*Ⓒεsi*Ⓒε₀)-((Vbi_V)-(VGS_V))' "
+    "'(Vt_V)=(Vbi_V)-(Ⓒqe*(ND_(cm^-3))*(a_μ)²)/(2*Ⓒεsi*Ⓒε₀)' "
+    "'(gm_(mA/V))=(G0_S)*(1-√(((2*Ⓒεsi*Ⓒε₀)/(Ⓒqe*(ND_(cm^-3))*(a_μ)²))*((Vbi_V)-(VGS_V))))' "
     "}",
 
     // ------------------------------------------------------------------------
@@ -1007,7 +1007,7 @@ static const cstring basic_equations[] =
     "'(vs_(cm/s))=(sm_cm)*(ω_(r/s))/(1_r)*SIN((k_(r/cm))*(x_cm)-(ω_(r/s))*(t_s)+(φ_r))' "
     "'(as_(cm/(s²)))=-((ω_(r/s))/(1_r))²*(s_cm)' "
     "}",
-    // Rewrite the last eqn to have explicit LOG in base 10 and with the fact that I0 has 1_(W/m²) units
+    // Rewrite the last eqn to have explicit LOG in base 10 and with the fact that I₀ has 1_(W/m²) units
     "Sound Waves",  "{ "
     "'(s_cm)=(sm_cm)*SIN((k_(r/cm))*(x_cm)-(ω_(r/s))*(t_s)+(φ_r))' "
     "'(vs_(cm/s))=(sm_cm)*(ω_(r/s))/(1_r)*COS((k_(r/cm))*(x_cm)-(ω_(r/s))*(t_s)+(φ_r))' "
@@ -1018,8 +1018,8 @@ static const cstring basic_equations[] =
     "'(Δpm_Pa)=(ρ_(kg/(m^3)))*(ω_(r/s))/(1_r)*(v_(m/s))*(sm_cm)' "
     "'(I_(W/(m²)))=1/2*(ρ_(kg/(m^3)))*(v_(m/s))*((ω_(r/s))/(1_r))²*(sm_cm)²' "
     "'(I_(W/m²))=(Ps_W)/(4*Ⓒπ*(r_m)²)' "
-    //"'(β_dB)=10*LOG((I_(W/(m²)))/(ⒸI0_(W/(m²))))' "
-    "'(β_dB)=(10_dB)*LOG10((I_(W/(m²)))/(ⒸI0))' "
+    //"'(β_dB)=10*LOG((I_(W/(m²)))/(ⒸI₀_(W/(m²))))' "
+    "'(β_dB)=(10_dB)*LOG10((I_(W/(m²)))/(ⒸI₀))' "
     "}",
     // Error in  eqn 1 cair => vsair
     "Doppler Effect",  "{ "
@@ -1162,18 +1162,18 @@ static const cstring basic_equations[] =
     "'(ppz_(kg*(m/s)))=(pz_(kg*(m/s)))' "
     "'(Ep_J)=γ*((E_J)-(v_m/s)*(px_(kg*(m/s))))' "
     "'(p_(kg*(m/s)))=γ*(m0_kg)*(v_(m/s))' "
-    "'(E_J)=γ*(E0_J)' "
-    "'(E0_J)=(m0_kg)*Ⓒc²' "
+    "'(E_J)=γ*(E₀_J)' "
+    "'(E₀_J)=(m0_kg)*Ⓒc²' "
     "'(E_J)²=(p_(kg*(m/s)))²*Ⓒc²+(m0_kg)²*Ⓒc^4' "
-    "'(K_J)=(γ-1)*(E0_J)' "
+    "'(K_J)=(γ-1)*(E₀_J)' "
     "'β=(v_(m/s))/Ⓒc' "
     "'γ²=1/(1-β²)' "
     "}",
 
     "Ultrarelativistic Cases",  "{ "
-    "'(E0_J)=(m0_kg)*Ⓒc²' "
+    "'(E₀_J)=(m0_kg)*Ⓒc²' "
     "'(E_J)²=(p_(kg*(m/s)))²*Ⓒc²+(m0_kg)²*Ⓒc^4' "
-    "'(K_J)=(γ-1)*(E0_J)' "
+    "'(K_J)=(γ-1)*(E₀_J)' "
     "'β=(v_(m/s))/Ⓒc' "
     "'γ²=1/(1-β²)' "
     "'(Δtp_s)=γ*(Δt_s)' "
@@ -1250,7 +1250,7 @@ static const cstring basic_equations[] =
     //T#*: 43 vars 56 eqns 7 sims 6 secs
     "Planck & Wien Comparison",  "{ "
     // Eqns order change. Modifications to eqns 5, 6, 9, 11 & 12
-    "'(fpeak_THz)=Ⓒc*UBASE(T_K)/Ⓒc3' "
+    "'(fpeak_THz)=UBASE(T_K)*Ⓒc3f' "
     "'(f1_THz)=Ⓒk*4*UBASE(T_K)/Ⓒh' "
     "'(f2_THz)=Ⓒk*9*UBASE(T_K)/Ⓒh' "
     "'FrPl12=15/Ⓒπ^4*∫(UBASE(Ⓒh*(f1_Hz)/(Ⓒk*UBASE(T_K)));UBASE(Ⓒh*(f2_Hz)/(Ⓒk*UBASE(T_K)));x^3/expm1(x);x)' "
@@ -1269,7 +1269,7 @@ static const cstring basic_equations[] =
 
     "Planck & Rayleigh‐Jeans Comparison",  "{ "
     // Eqns order change. Modifications to eqns 6, 9, 11 & 12
-    "'(fpeak_THz)=Ⓒc*UBASE(T_K)/Ⓒc3' "
+    "'(fpeak_THz)=UBASE(T_K)*Ⓒc3f' "
     "'(f1_THz)=Ⓒk*1.7*UBASE(T_K)/Ⓒh' "
     "'(f2_THz)=Ⓒk*3.7*UBASE(T_K)/Ⓒh' "
     "'FrPl12=15/Ⓒπ^4*∫(UBASE(Ⓒh*(f1_Hz)/(Ⓒk*UBASE(T_K)));UBASE(Ⓒh*(f2_Hz)/(Ⓒk*UBASE(T_K)));x^3/expm1(x);x)' "
@@ -1320,9 +1320,9 @@ static const cstring basic_equations[] =
     "Bohr Atomic Model",  "{ "
     "'(Eph_eV)=Ⓒh*(f_Hz)' "
     "'Ⓒh*(f_Hz)=(Enp_eV)-(En_eV)' "
-    "'(En_eV)=-(Ⓒme*Ⓒqe^4*Z²)/(8*Ⓒε0²*Ⓒh²)*(1/n²)' "
-    "'(Enp_eV)=-(Ⓒme*Ⓒqe^4*Z²)/(8*Ⓒε0²*Ⓒh²)*(1/np²)' "
-    "'(r_m)=n²/Z*(Ⓒε0*Ⓒh²)/(Ⓒπ*Ⓒme*Ⓒqe²)' "
+    "'(En_eV)=-(Ⓒme*Ⓒqe^4*Z²)/(8*Ⓒε₀²*Ⓒh²)*(1/n²)' "
+    "'(Enp_eV)=-(Ⓒme*Ⓒqe^4*Z²)/(8*Ⓒε₀²*Ⓒh²)*(1/np²)' "
+    "'(r_m)=n²/Z*(Ⓒε₀*Ⓒh²)/(Ⓒπ*Ⓒme*Ⓒqe²)' "
     "'(λ_nm)=Ⓒc/(f_Hz)' "
     "}",
 
@@ -1403,6 +1403,11 @@ static const cstring basic_equations[] =
     "'(ZX)=(ZY1)+(ZY2)' "
     "}",
 
+
+    "Finance", nullptr,
+    "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
+    "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
@@ -1466,7 +1471,8 @@ const equation::config equation::equations =
     .nbuiltins      = sizeof(basic_equations) / sizeof(*basic_equations),
     .error          = invalid_equation_error,
     .label          = equation_label,
-    .show_builtins  = show_builtin_equations
+    .show_builtins  = show_builtin_equations,
+    .stack_prefix   = false,
 };
 
 

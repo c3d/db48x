@@ -129,10 +129,11 @@ ID_RANGE(is_fraction,      fraction,       neg_big_fraction)
 ID_RANGE(is_decimal,       decimal,        neg_decimal)
 ID_RANGE(is_real,          bignum,         neg_decimal)
 ID_RANGE(is_complex,       rectangular,    polar)
-ID_RANGE(is_algebraic_num, unit,        neg_decimal)
+ID_RANGE(is_algebraic_num, unit,           neg_decimal)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
 ID_RANGE(is_command,       Drop,           ToFraction,    ToList, LastMenu)
-ID_RANGE(is_symbolic,      expression,     xlib,      polynomial, polynomial)
+ID_RANGE(is_symbolic,      expression,     xlib,
+                           polynomial,     relative_uncertainty)
 ID_RANGE(is_algebraic_fn,  Rcl,            ToFraction,
                            TestFlagSet,    det,
                            Get,            IFTE,
@@ -248,9 +249,9 @@ NAMED(ToText, "→Text") ALIAS(ToText, "ToStr")           ALIAS(ToText, "→Str"
 
 // Arithmetic and basic operations
 OP(add, "+")                    ALIAS(add, "+")
-OP(sub, "-")                    ALIAS(sub, "-")
-OP(mul, "×")                    ALIAS(mul, "·")         ALIAS(mul, "*")
-OP(div, "÷")                    ALIAS(div, "/")
+OP(subtract, "-")               ALIAS(subtract, "-")
+OP(multiply, "×")               ALIAS(multiply, "·")    ALIAS(multiply, "*")
+OP(divide, "÷")                 ALIAS(divide, "/")
 CMD(mod)
 CMD(rem)
 OP(pow, "↑")                    ALIAS(pow, "Power")     ALIAS(pow, "^")
@@ -411,6 +412,7 @@ NAMED(PercentTotal,     "%Total")               ALIAS(PercentChange, "%T")
 CMD(Min)
 CMD(Max)
 
+NAMED(Extract, "Sub")
 CMD(NSub)
 CMD(EndSub)
 
@@ -723,6 +725,9 @@ NAMED(ASRC, "ArithmeticShiftRightCount")
 CMD(SetBit)
 CMD(ClearBit)
 CMD(FlipBit)
+CMD(FirstBitSet)
+CMD(LastBitSet)
+CMD(CountBits)
 
 // Binary operations
 OP(NAnd,        "nand")
@@ -772,6 +777,14 @@ CMD(ConvertToUnitPrefix)
 NAMED(Const, "LibraryConstant")
 CMD(ConstantName)
 CMD(ConstantValue)
+CMD(StandardUncertainty)                ALIAS(StandardUncertainty, "CstSU")
+CMD(RelativeUncertainty)                ALIAS(RelativeUncertainty, "CstRU")
+NAMED(ToStandardUncertainty, "→Us")     ALIAS(ToStandardUncertainty, "→StdUnc")
+NAMED(ToRelativeUncertainty, "→Ur")     ALIAS(ToRelativeUncertainty, "→RelUnc")
+NAMED(StandardRound, "StdRnd")
+NAMED(RelativeRound, "RelRnd")
+NAMED(PrecisionRound, "PrcRnd")
+
 NAMED(LibEq, "LibraryEquation")
 CMD(EquationName)
 CMD(EquationValue)
@@ -847,6 +860,22 @@ CMD(LogarithmicFit)                     ALIAS(LogarithmicFit,           "LogFit"
 CMD(RandomSeed)                         ALIAS(RandomSeed,               "rdz")
 CMD(RandomNumber)                       ALIAS(RandomNumber,             "rand")
 CMD(Random)
+
+
+// ============================================================================
+//
+//    Finance (Time value of money)
+//
+// ============================================================================
+
+NAMED(TVMAmort, "TVMAmortize")
+ALIAS(TVMAmort, "Amort")
+NAMED(TVMAmortTable, "TVMAmortizationTable")
+ALIAS(TVMAmortTable, "AmortTable")
+ALIAS(TVMAmortTable, "AmortizationSchedule")
+CMD(TVMRoot)
+CMD(TVMEquation)
+
 
 
 // ============================================================================
@@ -947,12 +976,14 @@ FLAG(RunStatsClearAfterRead,    RunStatsKeepAfterRead)
 FLAG(GCTemporariesCleanup,      AutomaticTemporariesCleanup)
 FLAG(SoftwareDisplayRefresh,    DMCPDisplayRefresh)
 FLAG(SolveNumericallyOnly,      SolveSymbolicallyThenNumerically)
-
+FLAG(TVMPayAtBeginningOfPeriod, TVMPayAtEndOfPeriod)
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
 ALIAS(SoftwareFloatingPoint,    "SFP")
 ALIAS(SoftwareFloatingPoint,    "SoftFP")
+ALIAS(TVMPayAtBeginningOfPeriod,"TVMBeg")
+ALIAS(TVMPayAtEndOfPeriod,      "TVMEnd")
 
 SETTING_ENUM(Std, "StandardDisplay",    DisplayMode)
 SETTING_ENUM(Sig, "SignificantDisplay", DisplayMode)
@@ -1027,6 +1058,7 @@ SETTING_BITS(SolverImprecision, uint, 6,1U, DB48X_MAXDIGITS-2,  6U)
 SETTING(IntegrationIterations,  1U, 32U,                12U)
 SETTING(IntegrationImprecision, 1U, DB48X_MAXDIGITS,    6U)
 SETTING(MaximumDecimalExponent, 10ULL, ularge(1ULL << 61), ularge(1ULL << 60))
+SETTING(FinanceRounding,        0U, 9999U, 2U)
 
 SETTING_ENUM(SingleRowMenus,    nullptr,        MenuAppearance)
 SETTING_ENUM(FlatMenus,         nullptr,        MenuAppearance)
@@ -1188,13 +1220,12 @@ MENU(MathMenu)
 MENU(RealMenu)
 MENU(PartsMenu)
 MENU(FractionsMenu)
-MENU(PowersMenu)
+MENU(PowersMenu)                ALIAS(PowersMenu, "ExpLogMenu")
 MENU(ComplexMenu)
 MENU(VectorMenu)
 MENU(MatrixMenu)
 MENU(AnglesMenu)
 MENU(HyperbolicMenu)
-MENU(ExpLogMenu)
 MENU(CircularMenu)
 MENU(BasesMenu)
 MENU(ProbabilitiesMenu)
@@ -1226,7 +1257,6 @@ MENU(SymbolicSolverMenu)
 MENU(PolynomialSolverMenu)
 MENU(LinearSolverMenu)
 MENU(MultiSolverMenu)
-MENU(FinanceSolverMenu)
 
 MENU(ProgramMenu)
 MENU(TestsMenu)
@@ -1261,6 +1291,7 @@ CMD(VariablesMenu)
 CMD(CustomMenu)                 ALIAS(CustomMenu, "Cst")
 CMD(ToggleCustomMenu)
 CMD(SolvingMenu)
+CMD(FinanceSolverMenu)          ALIAS(FinanceSolverMenu, "TVM")
 CMD(ToolsMenu)
 CMD(Catalog)
 
@@ -1477,6 +1508,8 @@ ID(dmcp_font)
 
 ID(tag)
 ID(polynomial)
+ID(standard_uncertainty)
+ID(relative_uncertainty)
 
 ID(conditional)
 ID(while_conditional)

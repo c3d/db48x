@@ -162,4 +162,8 @@ BINARY_LOGICAL_NUM(SetBit,  LOGICAL,    return Y |  bit(X));
 BINARY_LOGICAL_NUM(ClearBit,LOGICAL,    return Y & ~bit(X));
 BINARY_LOGICAL_NUM(FlipBit, LOGICAL,    return Y ^  bit(X));
 
+COMMAND_DECLARE(FirstBitSet, 1);
+COMMAND_DECLARE(LastBitSet, 1);
+COMMAND_DECLARE(CountBits, 1);
+
 #endif // LOGICAL_H

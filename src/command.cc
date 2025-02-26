@@ -259,9 +259,9 @@ RENDER_BODY(command)
 
         while (unit::mode)
         {
-            if (ty == ID_div)
+            if (ty == ID_divide)
                 r.put('/');
-            else if (ty == ID_mul)
+            else if (ty == ID_multiply)
                 r.put(unicode(L'·'));
             else
                 break;
@@ -269,7 +269,7 @@ RENDER_BODY(command)
         }
         if (r.expression())
         {
-            if (ty == ID_mul &&
+            if (ty == ID_multiply &&
                 format == ID_LongForm &&
                 Settings.UseDotForMultiplication())
                 fname = utf8("·");

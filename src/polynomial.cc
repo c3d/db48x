@@ -257,12 +257,12 @@ polynomial_p polynomial::make(expression_p expr, bool error)
             if (!polynomial_op(depth, add))
                 goto error;
         }
-        else if (ty == ID_sub)
+        else if (ty == ID_subtract)
         {
             if (!polynomial_op(depth, sub))
                 goto error;
         }
-        else if (ty == ID_mul)
+        else if (ty == ID_multiply)
         {
             if (!polynomial_op(depth, mul))
                 goto error;

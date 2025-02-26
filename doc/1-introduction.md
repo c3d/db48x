@@ -3,9 +3,9 @@
 The original RPL (*Reverse Polish Lisp*) programming language was designed and
 implemented by Hewlett Packard for their calculators from the mid-1980s until
 2015 (the year the HP50g was discontinued). It is based on older calculators
-that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size of
-4, RPL has a stack size only limited by memory and also incorporates
-programmatic concepts from the Lisp programming language.
+that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size
+of 4, RPL has a stack size only limited by memory and also incorporates
+programmatic concepts from the Lisp and Forth programming languages.
 
 The first implementation of RPL accessible by the user was on the HP28C, circa
 1987, which had an HP Saturn processor. More recent implementations (e.g., HP49,
@@ -13,8 +13,9 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB48X.
 
 DB48X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros DM42 calculator. This has [implications on the design](#design-overview)
-of this particular implementation of RPL.
+SwissMicros DM42 calculator.
+This has [consequences on the design](#design-overview) of this particular
+implementation of RPL.
 
 ## The RPL stack
 

@@ -228,9 +228,9 @@ struct derived : arithmetic                                             \
 
 
 ARITHMETIC_DECLARE(add,             ADDITIVE);
-ARITHMETIC_DECLARE(sub,             ADDITIVE);
-ARITHMETIC_DECLARE(mul,             MULTIPLICATIVE);
-ARITHMETIC_DECLARE(div,             MULTIPLICATIVE);
+ARITHMETIC_DECLARE(subtract,        ADDITIVE);
+ARITHMETIC_DECLARE(multiply,        MULTIPLICATIVE);
+ARITHMETIC_DECLARE(divide,          MULTIPLICATIVE);
 ARITHMETIC_DECLARE(mod,             MULTIPLICATIVE);
 ARITHMETIC_DECLARE(rem,             MULTIPLICATIVE);
 ARITHMETIC_DECLARE(pow,             POWER);

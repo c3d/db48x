@@ -398,3 +398,189 @@ bignum_g logical::bit(bignum_r X)
         return bignum::make(0);
     return bignum::shift(one, shift, false, false);
 }
+
+
+
+// ============================================================================
+//
+//   Operations on bit populations
+//
+// ============================================================================
+
+
+COMMAND_BODY(FirstBitSet)
+// ----------------------------------------------------------------------------
+//   Find first bit set
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    int      bit = 0;
+    bool     ok  = false;
+    if (obj->is_bignum())
+    {
+        size_t sz  = 0;
+        byte_p bp  = bignum_p(obj)->value(&sz);
+        for (size_t i = 0; i < sz; i++)
+        {
+            if (byte b = bp[i])
+            {
+                while (~b & 1)
+                {
+                    bit++;
+                    b >>= 1;
+                }
+                ok = true;
+                break;
+            }
+            bit += 8;
+        }
+    }
+    else if (obj->is_integer())
+    {
+        byte_p bp  = object::payload(integer_p(obj));
+        byte   b   = 0;
+        do
+        {
+            b = *bp++;
+            if (b & 0x7F)
+            {
+                b &= ~0x80;
+                while (~b & 1)
+                {
+                    bit++;
+                    b >>= 1;
+                }
+                ok = true;
+                break;
+            }
+            bit += 7;
+        } while (b & 0x80);
+    }
+    else
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    if (!ok)
+        bit = -1;
+    if (integer_p value = integer::make(bit))
+        if (rt.top(value))
+            return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(LastBitSet)
+// ----------------------------------------------------------------------------
+//   Find last bit set
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    int      bit = 0;
+    bool     ok  = false;
+    if (obj->is_bignum())
+    {
+        size_t sz  = 0;
+        byte_p bp  = bignum_p(obj)->value(&sz);
+        for (size_t i = 0; i < sz; i++)
+        {
+            if (byte b = bp[sz + ~i])
+            {
+                while (~b & 0x80)
+                {
+                    bit++;
+                    b <<= 1;
+                }
+                ok = true;
+                break;
+            }
+            bit += 8;
+        }
+        bit = 8 * sz - bit;
+    }
+    else if (obj->is_integer())
+    {
+        byte_p bp  = object::payload(integer_p(obj));
+        byte   b   = 0;
+        int    lst = 0;
+        do
+        {
+            b = *bp++;
+            if (b & 0x7F)
+            {
+                byte bb   = b & ~0x80;
+                int  bbit = bit + 7;
+                while (~bb & 0x40)
+                {
+                    bbit--;
+                    bb <<= 1;
+                }
+                lst = bbit;
+                ok = true;
+            }
+            bit += 7;
+        } while (b & 0x80);
+        bit = lst;
+    }
+    else
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    if (!ok)
+        bit = -1;
+    if (integer_p value = integer::make(bit))
+        if (rt.top(value))
+            return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(CountBits)
+// ----------------------------------------------------------------------------
+//   Count all bits set in the number
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    int      cnt = 0;
+    if (obj->is_bignum())
+    {
+        size_t sz  = 0;
+        byte_p bp  = bignum_p(obj)->value(&sz);
+        for (size_t i = 0; i < sz; i++)
+        {
+            byte b = bp[i];
+            while (b)
+            {
+                if (b & 1)
+                    cnt++;
+                b >>= 1;
+            }
+        }
+    }
+    else if (obj->is_integer())
+    {
+        byte_p bp  = object::payload(integer_p(obj));
+        byte   b   = 0;
+        do
+        {
+            b = *bp++;
+            byte bb = b & 0x7F;
+            while (bb)
+            {
+                if (bb & 1)
+                    cnt++;
+                bb >>= 1;
+            }
+        } while (b & 0x80);
+    }
+    else
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    if (integer_p value = integer::make(cnt))
+        if (rt.top(value))
+            return OK;
+    return ERROR;
+}

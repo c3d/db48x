@@ -401,7 +401,7 @@ fraction_p operator-(fraction_r x, fraction_r y)
 {
     if (!x || !y)
         return nullptr;
-    sub::remember(target< operator- >);
+    subtract::remember(target< operator- >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
@@ -421,7 +421,7 @@ fraction_p operator*(fraction_r x, fraction_r y)
 {
     if (!x || !y)
         return nullptr;
-    mul::remember(target< operator* >);
+    multiply::remember(target< operator* >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();
@@ -439,7 +439,7 @@ fraction_p operator/(fraction_r x, fraction_r y)
 {
     if (!x || !y)
         return nullptr;
-    div::remember(target< operator/ >);
+    divide::remember(target< operator/ >);
     bignum_g  xn = x->numerator();
     bignum_g  xd = x->denominator();
     bignum_g  yn = y->numerator();

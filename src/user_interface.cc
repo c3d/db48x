@@ -5230,21 +5230,21 @@ static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_7,     0),
     OP2BYTES(KEY_8,     0),
     OP2BYTES(KEY_9,     0),
-    OP2BYTES(KEY_DIV,   arithmetic::ID_div),
+    OP2BYTES(KEY_DIV,   arithmetic::ID_divide),
     OP2BYTES(KEY_DOWN,  0),
     OP2BYTES(KEY_4,     0),
     OP2BYTES(KEY_5,     0),
     OP2BYTES(KEY_6,     0),
-    OP2BYTES(KEY_MUL,   arithmetic::ID_mul),
+    OP2BYTES(KEY_MUL,   arithmetic::ID_multiply),
     OP2BYTES(KEY_SHIFT, 0),
     OP2BYTES(KEY_1,     0),
     OP2BYTES(KEY_2,     0),
     OP2BYTES(KEY_3,     0),
-    OP2BYTES(KEY_SUB,   command::ID_sub),
+    OP2BYTES(KEY_SUB,   command::ID_subtract),
     OP2BYTES(KEY_EXIT,  0),
     OP2BYTES(KEY_0,     0),
     OP2BYTES(KEY_DOT,   0),
-    OP2BYTES(KEY_RUN,   command::ID_Eval),
+    OP2BYTES(KEY_RUN,   command::ID_Run),
     OP2BYTES(KEY_ADD,   command::ID_add),
 
     OP2BYTES(KEY_F1,    0),
@@ -5270,7 +5270,7 @@ static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_INV,   arithmetic::ID_exp),
     OP2BYTES(KEY_SQRT,  arithmetic::ID_sq),
     OP2BYTES(KEY_LOG,   function::ID_abs),
-    OP2BYTES(KEY_LN,    function::ID_ExpLogMenu),
+    OP2BYTES(KEY_LN,    function::ID_PowersMenu),
     OP2BYTES(KEY_XEQ,   menu::ID_EquationsMenu),
     OP2BYTES(KEY_STO,   menu::ID_ComplexMenu),
     OP2BYTES(KEY_RCL,   menu::ID_MemoryMenu),
@@ -5574,14 +5574,27 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         if (key == KEY_ENTER || key == KEY_BSP)
             return false;
 
-        if (ac && key >= KEY_F1 && key <= KEY_F6)
+        if (key >= KEY_F1 && key <= KEY_F6)
         {
-            size_t start = 0;
-            size_t size  = 0;
-            if (current_word(start, size))
-                remove(start, size);
-            menu_refresh(menu::ID_Catalog, true);
-            ac = false;
+            if (ac)
+            {
+                size_t start = 0;
+                size_t size  = 0;
+                if (current_word(start, size))
+                    remove(start, size);
+                menu_refresh(menu::ID_Catalog, true);
+                ac = false;
+            }
+            else if (ty == object::ID_ConstantName)
+            {
+                unicode lc = character_left_of_cursor();
+                if (lc == L'Ⓒ' || lc == L'Ⓡ' || lc == L'Ⓢ')
+                {
+                    dirtyEditor = true;
+                    edRows = 0;
+                    return obj->insert() != object::ERROR;
+                }
+            }
         }
 
         if ((ty >= object::ID_Deg && ty <= object::ID_PiRadians) &&
@@ -5620,8 +5633,8 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
             break;
 
         case UNIT:
-            if (ty == object::ID_mul ||
-                ty == object::ID_div ||
+            if (ty == object::ID_multiply ||
+                ty == object::ID_divide   ||
                 ty == object::ID_pow)
                 goto insert_object;
             [[fallthrough]];
@@ -5914,7 +5927,7 @@ bool user_interface::do_delete(bool forward)
         utf8 ed = rt.editor();
         if (cursor > select)
             cursor = utf8_previous(ed, cursor);
-        else
+        else if (~select)
             select = utf8_previous(ed, select);
         if (cursor == select)
             cursor = select = searching;

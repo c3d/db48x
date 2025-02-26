@@ -148,34 +148,34 @@ typename hwfp<hw>::hwfp_p hwfp<hw>::add(hwfp_r x, hwfp_r y)
 
 
 template<typename hw>
-typename hwfp<hw>::hwfp_p hwfp<hw>::sub(hwfp_r x, hwfp_r y)
+typename hwfp<hw>::hwfp_p hwfp<hw>::subtract(hwfp_r x, hwfp_r y)
 // ----------------------------------------------------------------------------
 //   Subtraction
 // ----------------------------------------------------------------------------
 {
-    sub::remember(target<sub>);
+    subtract::remember(target<subtract>);
     return make(x->value() - y->value());
 }
 
 
 template<typename hw>
-typename hwfp<hw>::hwfp_p hwfp<hw>::mul(hwfp_r x, hwfp_r y)
+typename hwfp<hw>::hwfp_p hwfp<hw>::multiply(hwfp_r x, hwfp_r y)
 // ----------------------------------------------------------------------------
 //   Multiplication
 // ----------------------------------------------------------------------------
 {
-    mul::remember(target<mul>);
+    multiply::remember(target<multiply>);
     return make(x->value() * y->value());
 }
 
 
 template<typename hw>
-typename hwfp<hw>::hwfp_p hwfp<hw>::div(hwfp_r x, hwfp_r y)
+typename hwfp<hw>::hwfp_p hwfp<hw>::divide(hwfp_r x, hwfp_r y)
 // ----------------------------------------------------------------------------
 //   Division
 // ----------------------------------------------------------------------------
 {
-    div::remember(target<div>);
+    divide::remember(target<divide>);
     hw fy = y->value();
     if (fy == 0.0)
     {
@@ -292,9 +292,9 @@ template algebraic_p hwfp<double>::to_fraction(uint count, uint prec) const;
 
 ARITH1(neg);
 ARITH2(add);
-ARITH2(sub);
-ARITH2(mul);
-ARITH2(div);
+ARITH2(subtract);
+ARITH2(multiply);
+ARITH2(divide);
 ARITH2(mod);
 ARITH2(rem);
 ARITH2(pow);

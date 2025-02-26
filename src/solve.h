@@ -77,6 +77,8 @@ struct SolvingMenu : menu
 {
     SolvingMenu(id type = ID_SolvingMenu) : menu(type) {}
 
+    static bool build(menu_info &mi, list_p eq, bool withcmds = true);
+
 public:
     OBJECT_DECL(SolvingMenu);
     MENU_DECL(SolvingMenu);

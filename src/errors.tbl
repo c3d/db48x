@@ -111,6 +111,8 @@ ERROR(multisolver_variable,     "Unable to solve for all variables")
 ERROR(invalid_custom_menu,      "Invalid CustomMenu variable")
 ERROR(no_debugged_program,      "No program being debugged")
 ERROR(input_validation,         "Invalid input")
+ERROR(invalid_tvm_variable,     "Undefined TVM variable")
+ERROR(invalid_tvm_equation,     "Invalid TVM equation")
 
 // Filesystem errors
 #ifndef FRROR

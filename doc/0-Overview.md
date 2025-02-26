@@ -16,6 +16,7 @@ You can also [try it in your browser](http://48calc.org).
 
 * [Using the on-line help](#help)
 * [Quickstart guide](#quickstart-guide)
+* [Programming examples](#rpl-programming-examples)
 * [State of the project](#state-of-the-project)
 * [Design overview](#design-overview)
 * [Keyboard interaction](#keyboard-interaction)
@@ -438,6 +439,8 @@ unintentional differences, since the implementation is completely new.
   the HP48 and later HP models. This can be controlled using the
   `ListEvaluation` setting. Note that a list can be converted to a program using
   the `→Program` command, which makes it easy to build programs from lists.
+  See also the differences regarding quoted names in
+  [Representation of objects](#representation-of-objects)
 
 * The `case` statement can contain `when` clauses as a shortcut for the frequent
   combination of duplicating the value and testing against a reference. For
@@ -529,6 +532,16 @@ unintentional differences, since the implementation is completely new.
   DB48X-only extension that returns more precise textual information, and should
   be preferred both for readability and future compatibility.
 
+* Expressions between quotes are always algebraic expressions, unlike on HP
+  calculators, where a number or a name in quotes is parsed as a number or
+  name. The `Type` for `'N'` is `9` on DB48x vs. `6` on HP calculators.
+  Parsing names always behaves like in programs, and is consistent for arrays
+  and lists as well. By contrast, on HP calculators, if you enter `« 'N' N »`
+  and edit it, you get a quoted name followed by an unquote, but if you enter
+  `{ 'N' N }`, you get `{ N N }` as a resulting object, which is not very
+  consistent, and makes it harder to programmatically use lists to create
+  programs (e.g. using `→Program`).
+
 * DB48X has a dedicated data type to represent multi-variate polynomials, in
   addition to the classical RPL-based algebraic expressions.
 
@@ -608,6 +621,9 @@ operate on these items when it makes sense. Therefore:
   `:A:{ 1 2 } :B:{ 3 4 } +` gives `{ 1 2 3 4 }`, and so does
   `:A:{ 1 2 } { 3 4 } +`. DB48x strips the tags in all cases, i.e. the first
   case gives the same `{ 1 2 3 4 }` as the other two.
+
+* As indicated [earlier](#representation-of-objects), quoted names in lists
+  remain quoted, whereas on HP calculators, the quotes are removed.
 
 
 ### Vectors and matrices differences

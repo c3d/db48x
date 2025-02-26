@@ -133,6 +133,7 @@ struct tests
     void expression_operations();
     void random_number_generation();
     void object_structure();
+    void financial_functions();
     void library();
     void check_help_examples();
     void regression_checks();

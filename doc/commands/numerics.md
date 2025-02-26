@@ -19,6 +19,11 @@ This setting defines the relative imprecision for the result with respect to the
 the default precision of `24` digits, `Integrate` will try to compute to an
 accuracy of 18 digits.
 
+This setting only applies if the result is smaller than the display
+settings. Like HP calculators, the display settings limits the precision
+requested from the integration algorithm. For example, if the display is set to
+`3 FIX`, then only 3 digits of precision are considered necessary in the result.
+
 ### IntegrationIterations
 
 This setting limits the number of iterations for the integration algorithm. Each

@@ -1,5 +1,92 @@
 # Release notes
 
+## Release 0.9.1 "Follow" - Finances, bit-counting and constants
+
+This release follows-up on 0.9.0 by improving the way constants are
+evaluated to better serve the equation library. It also adds
+finance-related functions, and specialized bit-counting functions.
+
+### New features
+
+* Add standard and relative uncertainty for all constants. For a
+  constant like `G`, which when edited looks like `ⒸG`, the standard
+  uncertainty is `ⓈG` and the relative uncertainty is `ⓇG`. This shows
+  as `UsG` and `UrG` on screen, to match common practice.
+
+* The constants menu now contains helpers to enter constants, and for
+  the commands `Const`, `StdUnc` and `RelUnc`, which generate a
+  constant, a standard uncertainty or a relative uncertainty from a
+  name.
+
+* Implement precision-control functions that make it possible to
+  adjust the result of computatoins adjusting to relative or standard
+  uncertainty. `→Us` and `→Ur` convert betwen standard and relative
+  uncertainty. `StandardRound`, `RelativeRound` and `PrecisionRound`
+  round a value based on its standard or relative uncertainty, or
+  according to the precision of some other value.
+
+* Add bit-counting operations. `FirstBitSet` and `LastBitSet` find the
+  position of the first and last bit set in an integer value.
+  `CountBits` counts the number of bits set in an integer value.
+
+* Add finance operations. The finance menu `TVM` now shows a solver
+  for time value of money, with payments at beginning (`TVMBeg`) or at
+  end (`TVMEnd`). The `Amort` command generates the amortization
+  (principal, interest and balance). The `AmortTable`, a DB48x
+  extension, generates a complete amortization table. A new setting,
+  `FinanceRounding`, a DB48x extension, sets the rounding of finance
+  results.
+
+* Add the `Sub` command to extract a subset of texts, lists or grobs.
+  As an illustration, the `Anagram` program was added to the demo
+  state. As a side effect, the named variants for arithmetic operators
+  have been renamed from `sub`, `mul` and `div` to `subtract`,
+  `multiply` and `divide`.
+
+
+### Bug fixes
+
+* Avoid possible crash when using the delete key while searching.
+
+* Fix a few broken (obsolete) links in the help file.
+
+* `UVal` now works on numbers, not just on unit objects, like on HP
+  calculators.
+
+* Remove NewRPL names for some commands like `ToRectangular`, and
+  replace them with the DB48x spelling.
+
+### Improvements
+
+* Constants are brought up to date to the latest best practice from
+  the scientific community. This includes computing many derived
+  constants from a smaller subset of exact constants, as well as
+  providing standard and relative uncertainty for each constant.
+
+* Constant values are cached to accelerate their evaluation. This
+  avoids having to parse and evalute constant definitions.
+
+* The `ConstantMenus` was reorganized with more constant categories
+  covering dates, mathematics, chemistry, phsyics, particle masses,
+  electromagnetism, atomic sizes, Compton scattering, magnetism,
+  materials and computing.
+
+* The `MathMenu` was reorganized, notably to make the exp and log
+  functions easier to access. This merges the former `PowerMenu` and
+  `ExpLogMenu` so that the `MathMenu` still has less than 18 entries.
+
+* Numerical integration now uses the refinements documented in Kahan's
+  1980 HP Journal article about numerical integration on the HP34.
+  This makes it possible for example to integrate `'sin(x)/x'` over
+  0 to π interval.
+
+* Numerical integration now limits its precision to the number of
+  digits being displayed, like on HP calculators.
+
+* Document the difference and rationale for parsing quoted names
+  compared to HP calculators.
+
+
 ## Release 0.9.0 "Wilson's Dream" - Full equation library
 
 This version integrates an extended version of the HP50G equation

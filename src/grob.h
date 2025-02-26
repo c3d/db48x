@@ -210,6 +210,10 @@ struct grob : object
     // ------------------------------------------------------------------------
 
 
+    // Extract a subimage
+    grob_p extract(object_r first, object_r last) const;
+    grob_p extract(coord x1, coord y1, coord x2, coord y2) const;
+
 
 public:
     OBJECT_DECL(grob);

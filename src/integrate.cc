@@ -107,13 +107,26 @@ algebraic_p integrate(program_g   eq,
 //   from the previous loop, called P, and one for the current loop, called C.
 //   At each step, the size of C is one more than P.
 //   In the implementation below, those arrays are on the stack, P above C.
+//
+//   For reasons explained in the HP15C advanced function handbook, we perform
+//   two changes of variables:
+//   1) We change the a-b interval to -1..1 to enable the second change
+//         x = (b-a)(u+1)/2 + a
+//        dx = (b-a)/2 du
+//   2) We avoid sampling uniformly with another variable change:
+//         u = 3/2 v - 1/2 v^3
+//        du = 3/2 (1 - v^2) dv
 {
     // We will run commands below, do not save stack while doing it
     settings::PrepareForProgramEvaluation wilLRunPrograms;
 
     // Check if the guess is an algebraic or if we need to extract one
+    algebraic_g u, du, du2;
+    algebraic_g v, dv, dv2, lv, hv;
     algebraic_g x, dx, dx2;
     algebraic_g y, dy, sy, sy2;
+    algebraic_g half = decimal::make(5, -1);
+    algebraic_g zero = integer::make(0);
     algebraic_g one  = integer::make(1);
     algebraic_g two  = integer::make(2);
     algebraic_g four = integer::make(4);
@@ -122,70 +135,77 @@ algebraic_p integrate(program_g   eq,
 
     // Set independent variable
     save<symbol_g *> iref(expression::independent, &name);
-    int              prec = (Settings.Precision() -
-                             Settings.IntegrationImprecision());
-    algebraic_g      eps = decimal::make(1, -prec);
+    int              disp = Settings.DisplayDigits();
+    int              prec = Settings.Precision();
+    int              impr = Settings.IntegrationImprecision();
+    int              dig = std::min(disp + 1, std::max(prec - impr, 3));
+    algebraic_g      eps = decimal::make(1, -dig);
+
+    // Check initializations happened correctly
+    if (!half || !zero || !one || !two  || !four || !eps)
+        return nullptr;
 
     // Select numerical computations (doing this with fraction is slow)
     settings::SaveNumericalResults snr(true);
 
     // Initial integration step and first trapezoidal step
-    dx = hx - lx;
-    if (!dx)
-        return nullptr;
-    sy = algebraic::evaluate_function(eq, lx);
-    if (!sy)
-        return nullptr;
-    sy2 = algebraic::evaluate_function(eq, hx);
-    if (!sy2)
-        return nullptr;
-    sy = (sy + sy2) * dx / two;
-    if (!sy)
+    dv = two;
+    algebraic_g hl2 = (hx - lx) * half;
+    sy = zero;
+    lv = -one;
+    hv = one;
+    if (!hl2 || !lv)
         return nullptr;
 
     // Loop for a maximum number of conversion iterations
     size_t loops = 1;
-    uint   max   = Settings.IntegrationIterations();
+    int    max   = Settings.IntegrationIterations();
 
     // Depth of the original stack, to return to after computation
     size_t depth = rt.depth();
-    if (!rt.push(+sy))
-        goto error;
-
-    for (uint d = 0; d < max && !program::interrupted(); d++)
+    for (int d = -1; d < max && !program::interrupted(); d++)
     {
-        dx2 = dx / two;
-        sy  = integer::make(0);
-        x   = lx + dx2;
-        if (!x || !sy || !dx)
+        sy  = zero;
+        dv2 = dv;
+        dv = dv * half;
+        v   = lv + dv;
+        if (!v || !sy || !dv)
             goto error;
 
         // Compute the sum of f(low + k*i)
         for (uint i = 0; i < loops; i++)
         {
-            if (!algebraic::to_decimal_if_big(x))
-                goto error;
+            u = ((v + v + v) - v * v * v) * half; // 3/2v - 1/2v^3
+            du = (one - v * v) * dv;              // (1-v^2) dv
+            du = (du + du + du) * half;           // 3/2 (1-v^2) * dv
+            x = hl2 * (u + one) + lx;             // (b-a) * (u+1) / 2
+            dx = hl2 * du;                        // (b-a)/2 du
 
             // Evaluate equation
             y  = algebraic::evaluate_function(eq, x);
 
             // Sum elements, and approximate when necessary
-            sy = sy + y;
-            if (!algebraic::to_decimal_if_big(sy))
-                goto error;
+            sy = sy + y * dx;
             record(integrate, "[%u:%u] x=%t y=%t sum=%t", d, i, +x, +y, +sy);
-            x = x + dx;
+            v = v + dv2;
             if (!sy || !x)
                 goto error;
         }
 
+        // First iteration simply initializes the first approximation
+        if (d < 0)
+        {
+            if (!rt.push(+sy))
+                goto error;
+            loops += loops;
+            continue;
+        }
+
         // Get P[0]
-        y   = algebraic_p(rt.stack(d));
+        y = algebraic_p(rt.stack(d));
 
         // Compute C[0]
-        sy2 = dx2 * sy + y / two;
-        if (!algebraic::to_decimal_if_big(sy2))
-            goto error;
+        sy2 = sy + y * half;
         if (!sy2 || !rt.push(+sy2))
             goto error;
 
@@ -193,16 +213,12 @@ algebraic_p integrate(program_g   eq,
         pow4 = four;
 
         // Loop to compute C[i] for i > 0
-        for (uint i = 0; i <= d; i++)
+        for (int i = 0; i <= d; i++)
         {
             // Compute (C[i] * 4^(i+1) - P[i]) / (4^(i+1)-1)
             x = algebraic_p(rt.stack(d + 1)); // P[i]
             y = algebraic_p(rt.top());        // C[i]
             y = (y * pow4 - x) / (pow4 - one);
-
-            // If we are starting to get really big numbers, approximate
-            if (!algebraic::to_decimal_if_big(y))
-                goto error;
 
             // Compute next power of 4
             pow4 = pow4 * four;
@@ -229,7 +245,7 @@ algebraic_p integrate(program_g   eq,
         // Copy C to P
         uint off_p = 2 * d + 2; // P[d+1], C[d+2], -1 to get end of array
         uint off_c = d + 1;
-        for (size_t i = 0; i <= d + 1; i++)
+        for (int i = 0; i <= d + 1; i++)
             rt.stack(off_p - i, rt.stack(off_c - i));
 
         // Drop P
@@ -237,7 +253,6 @@ algebraic_p integrate(program_g   eq,
 
         // Twice as many items to evaluate in next loop
         loops += loops;
-        dx = dx2;
     }
 
     rt.precision_loss_error();

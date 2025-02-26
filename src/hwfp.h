@@ -217,9 +217,9 @@ struct hwfp : hwfp_base
 
     static hwfp_p neg(hwfp_r x);
     static hwfp_p add(hwfp_r x, hwfp_r y);
-    static hwfp_p sub(hwfp_r x, hwfp_r y);
-    static hwfp_p mul(hwfp_r x, hwfp_r y);
-    static hwfp_p div(hwfp_r x, hwfp_r y);
+    static hwfp_p subtract(hwfp_r x, hwfp_r y);
+    static hwfp_p multiply(hwfp_r x, hwfp_r y);
+    static hwfp_p divide(hwfp_r x, hwfp_r y);
     static hwfp_p mod(hwfp_r x, hwfp_r y);
     static hwfp_p rem(hwfp_r x, hwfp_r y);
     static hwfp_p pow(hwfp_r x, hwfp_r y);

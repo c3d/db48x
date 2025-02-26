@@ -402,6 +402,68 @@ object::result grob::command(grob::grobop_fn gfn)
 
 
 
+
+// ============================================================================
+//
+//   Extracting a sub-image
+//
+// ============================================================================
+
+grob_p grob::extract(object_r first, object_r last) const
+// ----------------------------------------------------------------------------
+//   Extract a rectangle from a grob
+// ----------------------------------------------------------------------------
+{
+    PlotParametersAccess ppar;
+    coord xf = ppar.pair_pixel_x(first);
+    coord yf = ppar.pair_pixel_y(first);
+    coord xl = ppar.pair_pixel_x(last);
+    coord yl = ppar.pair_pixel_y(last);
+    if (rt.error())
+        return nullptr;
+    return extract(xf, yf, xl, yl);
+}
+
+
+grob_p grob::extract(coord x1, coord y1, coord x2, coord y2) const
+// ----------------------------------------------------------------------------
+//   Extract the given region
+// ----------------------------------------------------------------------------
+{
+    bool          pict = type() == ID_Pict;
+#if CONFIG_COLOR
+    if (pict)
+    {
+        rt.unimplemented_error();
+        return nullptr;
+    }
+    grob::surface src  = pixels();
+#else
+    grob::surface src  = pict ? Screen : pixels();
+#endif // COLOR
+    if (x1 < 0)
+        x1 = 0;
+    if (y1 < 0)
+        y1 = 0;
+    pixsize w = src.width();
+    pixsize h = src.height();
+    if (pixsize(x2) > w)
+        x2 = w;
+    if (pixsize(y2) > h)
+        y2 = h;
+    w = x2 - x1;
+    h = y2 - y1;
+    grob_p result = grob::make(w, h);
+    if (result)
+    {
+        grob::surface dst = result->pixels();
+        dst.copy(src, -x1, -y1);
+    }
+    return result;
+}
+
+
+
 // ============================================================================
 //
 //   Black and white patterns

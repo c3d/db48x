@@ -11,7 +11,7 @@ UIExit				"0"		UIDecimal	Run		+
 
 @ PLANE 1: LEFT SHIFTED
 [
-LastMenu	exp		sq		abs		ExpLogMenu	EquationsMenu
+LastMenu	exp		sq		abs		PowersMenu	EquationsMenu
 ComplexMenu	MemoryMenu	ConstantsMenu	asin		acos		atan
 UIAlpha				LastArg		ModesMenu	DisplayModesMenu ClearThingsMenu
 EditorHistory			SolverMenu	IntegrationMenu "[	]"	StatisticsMenu

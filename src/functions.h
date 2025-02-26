@@ -300,6 +300,13 @@ public:                                                                 \
 
 NFUNCTION(Round, 2, );
 NFUNCTION(Truncate, 2, );
+
+NFUNCTION(ToStandardUncertainty, 2, );
+NFUNCTION(ToRelativeUncertainty, 2, );
+NFUNCTION(StandardRound, 2, );
+NFUNCTION(RelativeRound, 2, );
+NFUNCTION(PrecisionRound, 2, );
+
 NFUNCTION(xroot, 2, );
 NFUNCTION(comb, 2, );
 NFUNCTION(perm, 2, );

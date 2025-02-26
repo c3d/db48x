@@ -355,7 +355,7 @@ MENU(MathMenu,
      "Real",    ID_RealMenu,
      "Cmplx",   ID_ComplexMenu,
      "Trig",    ID_CircularMenu,
-     "Vector",  ID_VectorMenu,
+     "Powers",  ID_PowersMenu,
      "Matrix",  ID_MatrixMenu,
      "Const",   ID_ConstantsMenu,
 
@@ -363,14 +363,14 @@ MENU(MathMenu,
      "Proba",   ID_ProbabilitiesMenu,
      "Stats",   ID_StatisticsMenu,
      "Solver",  ID_SolverMenu,
-     "Symb",    ID_SymbolicMenu,
+     "Vector",  ID_VectorMenu,
      "Eqns",    ID_EquationsMenu,
 
      "Signal",  ID_SignalProcessingMenu,
      "Bases",   ID_BasesMenu,
-     "Powers",  ID_PowersMenu,
      "Angles",  ID_AnglesMenu,
      "Poly",    ID_PolynomialsMenu,
+     "Symb",    ID_SymbolicMenu,
      "Frac",    ID_FractionsMenu);
 
 
@@ -394,7 +394,7 @@ MENU(RealMenu,
 
      "Trig",    ID_CircularMenu,
      "Hyper",   ID_HyperbolicMenu,
-     "Exp/Log", ID_ExpLogMenu,
+     "Powers",  ID_PowersMenu,
      "Prob",    ID_ProbabilitiesMenu,
      "Angles",  ID_AnglesMenu,
      "Parts",   ID_PartsMenu);
@@ -519,7 +519,6 @@ MENU(VectorMenu,
      "Complex", ID_ComplexMenu,
      "Matrix",  ID_MatrixMenu);
 
-
 MENU(MatrixMenu,
 // ----------------------------------------------------------------------------
 //   Matrix operations
@@ -587,20 +586,8 @@ MENU(HyperbolicMenu,
 //   Hyperbolic operations
 // ----------------------------------------------------------------------------
      ID_sinh,   ID_cosh,        ID_tanh,
-     ID_asinh,  ID_acosh,       ID_atanh);
-
-MENU(ExpLogMenu,
-// ----------------------------------------------------------------------------
-//   Exp and log operations
-// ----------------------------------------------------------------------------
-     ID_exp,    ID_log,
-     ID_exp10,  ID_log10,
-     ID_expm1,  ID_log1p,
-     ID_exp2,
-     ID_log2,
-     "fhbs",    ID_Unimplemented,
-     "flbsc",   ID_Unimplemented,
-     "popcnt",  ID_Unimplemented);
+     ID_asinh,  ID_acosh,       ID_atanh,
+     "Powers", ID_PowersMenu);
 
 MENU(CircularMenu,
 // ----------------------------------------------------------------------------
@@ -665,10 +652,10 @@ MENU(BasesMenu,
      "SetBit",  ID_SetBit,
      "ClrBit",  ID_ClearBit,
      "FlipBit", ID_FlipBit,
-     "FstSet",  ID_Unimplemented,
-     "LstSet",  ID_Unimplemented,
+     "FstSet",  ID_FirstBitSet,
+     "LstSet",  ID_LastBitSet,
 
-     "PopCnt",  ID_Unimplemented,
+     "CntBits", ID_CountBits,
      "1-comp",  ID_OnesComplement,
      "2-comp",  ID_TwosComplement,
      "Modern",  ID_ModernBasedNumbers);
@@ -1054,7 +1041,7 @@ MENU(ListMenu,
      "DoSubs",  ID_DoSubs,
      "NSub",    ID_NSub,
      "EndSub",  ID_EndSub,
-     "Loops",   ID_LoopsMenu,
+     "Extract", ID_Extract,
 
      "Obj→",    ID_Explode,
      "Find",    ID_Unimplemented,
@@ -1283,16 +1270,6 @@ MENU(LinearSolverMenu,
 
      ID_SolverMenu);
 
-MENU(FinanceSolverMenu,
-// ----------------------------------------------------------------------------
-//   Menu for finance time value of money solving
-// ----------------------------------------------------------------------------
-     "TVMR",    ID_Unimplemented,
-     "Amort",   ID_Unimplemented,
-     "Begin",   ID_Unimplemented,
-
-     ID_SolverMenu);
-
 MENU(MultiSolverMenu,
 // ----------------------------------------------------------------------------
 //   Menu for linear system solving
@@ -1307,13 +1284,19 @@ MENU(PowersMenu,
 // ----------------------------------------------------------------------------
 //   Menu with the common powers
 // ----------------------------------------------------------------------------
-     ID_sq,
-     ID_cubed,
-     ID_pow,
-     ID_sqrt,
-     ID_cbrt,
-     ID_xroot);
+     ID_exp,    ID_log,
+     ID_exp10,  ID_log10,
+     ID_sq,     ID_sqrt,
 
+     ID_exp2,   ID_log2,
+     ID_expm1,  ID_log1p,
+     ID_cubed,  ID_cbrt,
+
+     ID_pow, ID_xroot,
+     "FstSet",  ID_Unimplemented,
+     "LstSet",  ID_Unimplemented,
+     "popcnt",  ID_Unimplemented,
+     "Hyper",   ID_HyperbolicMenu);
 
 MENU(FractionsMenu,
 // ----------------------------------------------------------------------------
@@ -1596,10 +1579,10 @@ MENU(GraphicsMenu,
      "Circle",  ID_Circle,
 
      "→Grob",   ID_ToGrob,
-     "ClLCD",   ID_ClLCD,
      "GOr",     ID_GOr,
      "GXor",    ID_GXor,
      "GAnd",    ID_GAnd,
+     "Extract", ID_Extract,
 
      "RGB",     ID_RGB,
      "LnWidth", ID_LineWidth,
@@ -1611,7 +1594,7 @@ MENU(GraphicsMenu,
      "Foregnd", ID_Foreground,
      "Bckgnd",  ID_Background,
      "Disp",    ID_Disp,
-     "DispXY",  ID_DispXY,
+     "ClLCD",   ID_ClLCD,
 
      "Show",    ID_Show,
      "PixOn",   ID_PixOn,
@@ -1619,21 +1602,22 @@ MENU(GraphicsMenu,
      "Pix?",    ID_PixTest,
      "PixCol?", ID_PixColor,
 
+     "DispXY",  ID_DispXY,
      "Append",  ID_GraphicAppend,
      "Stack",   ID_GraphicStack,
      "Sub",     ID_GraphicSubscript,
      "Sup",     ID_GraphicExponent,
-     "Ratio",   ID_GraphicRatio,
 
+     "Ratio",   ID_GraphicRatio,
      "Root",    ID_GraphicRoot,
      "Paren",   ID_GraphicParentheses,
      "Norm",    ID_GraphicNorm,
      "Freeze",  ID_Freeze,
-     "Plot",    ID_PlotMenu,
 
      "Sum",     ID_GraphicSum,
      "Product", ID_GraphicProduct,
-     "Integral",ID_GraphicIntegral);
+     "Integral",ID_GraphicIntegral,
+     "Plot",    ID_PlotMenu);
 
 
 MENU(MemoryMenu,
@@ -1745,16 +1729,17 @@ MENU(TextMenu,
      "Text→",           ID_Compile,
      "Length",          ID_Size,
      "Append",          ID_add,
-     "Repeat",          ID_mul,
+     "Repeat",          ID_multiply,
      "C→Code",          ID_CharToUnicode,
 
      "T→Code",          ID_TextToUnicode,
      "Code→T",          ID_UnicodeToText,
+     "Extract",         ID_Extract,
      "T→Obj",           ID_CompileToObject,
      "T→Alg",           ID_CompileToAlgebraic,
      "T→Num",           ID_CompileToNumber,
-     "T→Real",          ID_CompileToReal,
 
+     "T→Real",          ID_CompileToReal,
      "T→Expr",          ID_CompileToExpression,
      "T→Int",           ID_CompileToInteger,
      "T→Pos",           ID_CompileToPositive);
