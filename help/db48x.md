@@ -2251,12 +2251,21 @@ A symbol is a sequence of characters such as `Hello` or `A→B` that can be used
 ot identify variables. Evaluating a symbol evaluates the underlying variable if
 it exists, or evaluates as itself otherwise.
 
+## Text
+
+Text is represented as a sequence of Unicode characters placed between double
+quotes, such as `"Hello"`. Operations on text include concatenation using the
+`+` operator, and multiplication by a positive integer to repeat a text.
+
 ## Programs
 
 Programs are represented as RPL objects enclosed between the `«` and `»`
 delimiters, and containing a sequence of RPL objects. Running (or evaluating) a
-program is done using the `Run` or `Eval` commands, which evaluate each RPL
-object in the program in turn.
+program is done using the `Run` (the _=_ key) or `Eval` commands, which evaluate
+each RPL object in the program in turn.
+
+See [RPL Programming](#rpl-programming) for more details and examples about
+programming your DB48x.
 
 ## Lists
 

@@ -182,7 +182,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            check_help_examples();
+            online_help();
 #if 0
         if (onlyCurrent & 2)
             demo_ui();
@@ -9129,6 +9129,39 @@ void tests::online_help()
         .test(EXIT, SHIFT, N, LONGPRESS, F1)
         .image_noheader("help-degrees");
     step("Exit and cleanup")
+        .test(EXIT, CLEAR, EXIT);
+
+    step("Help about integers")
+        .test(CLEAR, "123", ENTER, ID_Help)
+        .image_noheader("help-integers")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about decimal numbers")
+        .test(CLEAR, "123.456", ENTER, ID_Help)
+        .image_noheader("help-decimal")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about based integers")
+        .test(CLEAR, "16#123", ENTER, ID_Help)
+        .image_noheader("help-based")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about texts")
+        .test(CLEAR, "\"Text\"", ENTER, ID_Help)
+        .image_noheader("help-text")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about lists")
+        .test(CLEAR, "{ 1 2 3 }", ENTER, ID_Help)
+        .image_noheader("help-lists")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about vectors")
+        .test(CLEAR, "[ 1 2 3 ]", ENTER, ID_Help)
+        .image_noheader("help-vectors")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about programs")
+        .test(CLEAR, "« 1 2 3 »", ENTER, ID_Help)
+        .image_noheader("help-programs")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about unit objects")
+        .test(CLEAR, "« 1 2 3 »", ENTER, ID_Help)
+        .image_noheader("help-units")
         .test(EXIT, CLEAR, EXIT);
 
     step("Enter example from help file into command line")

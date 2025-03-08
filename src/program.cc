@@ -78,6 +78,15 @@ RENDER_BODY(program)
 }
 
 
+HELP_BODY(program)
+// ----------------------------------------------------------------------------
+//   Help topic for programs
+// ----------------------------------------------------------------------------
+{
+    return utf8("Programs");
+}
+
+
 program_p program::parse(utf8 source, size_t size)
 // ----------------------------------------------------------------------------
 //   Parse a program without delimiters (e.g. command line)
