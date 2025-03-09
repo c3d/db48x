@@ -2953,6 +2953,51 @@ You can check when you enter this program from the help file that all the
 remain in the resulting program.
 # Release notes
 
+## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
+
+This release introduces a true multiple-variables solver, additional
+matrix operations, and extends the RPL programming documentation.
+
+### New features
+
+* The `Root` command now selects a true multi-variable solver
+  (_Jacobian solver_), capable of solving systems of equations with
+  multiple variables, even when variables cannot be isolated one at a
+  time, for example solving `{ 'sin(x)=y' 'sin(y)=x+1' }`. As a
+  result, the DB48x `Root` command now covers the functionality
+  provided by the HP50G's `ROOT`, `MROOT` and `MSLV` .
+* Compatibility for `MSLV` is preserved thanks to a dedicated command,
+  which like the HP50G leaves input equations and variables on the
+  stack.
+* Add `RNRM` and `CNRM` (row and column norms) commands for matrices.
+* Add `TRN` and `TRAN` commands (matrix transpose, with or without
+  conjugate)
+
+### Bug fixes
+
+* Add several missing images used by the test suite to the `git`
+  repository, e.g. for the `TVM` menu.
+* Fix rare bug parsing lists causing a validation error
+* Fix theoretical risk of memory corruption in `det`
+* Solutions found by the solver no longer depend on the existence and
+  value of global variables by the same name prior to solving
+* Emit "Interrupted" error when interrupting the solver
+* Fix bug comparing decimal zero with small decimal values
+
+### Improvements
+
+* Add a section with RPL programming examples, seeded with examples
+  from Chapter 1 of the HP50G _Advanced Reference Manual_.
+* Add documentation about program objects, text, symbols and comments.
+* Update documentation for complex numbers, e.g. `ℝ→ℂ` command.
+* Add documentation for `abs`
+* Add links to "Rules" in constant uncertainty section
+* Add a few additional tests in the documentation
+* Split instrumentation for the three solver algorithms.
+* The solver now uses the display precision to limit the precision of
+  the desired result, like the integrator and like HP calculators.
+
+
 ## Release 0.9.1 "Follow" - Finances, bit-counting and constants
 
 This release follows-up on 0.9.0 by improving the way constants are
