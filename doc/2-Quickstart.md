@@ -806,7 +806,7 @@ does not have a `NXT` key unlike HP calculators. Instead, when necessary, the
 ### General expression rewriting facility
 
 
-## Local variables
+## Adding Local variables
 
 ### Why use local variables
 

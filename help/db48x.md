@@ -1825,7 +1825,7 @@ does not have a `NXT` key unlike HP calculators. Instead, when necessary, the
 ### General expression rewriting facility
 
 
-## Local variables
+## Adding Local variables
 
 ### Why use local variables
 
@@ -2578,23 +2578,32 @@ sequences of objects.
 Programs can also contain structures. A structure is a program segment with a
 defined organization. Two basic kinds of structure are available:
 
-* *Local variable structure*. The `→` command defines local variable names and a
-  corresponding algebraic or program object that’s evaluated using those
-  variables.
+* *Local variable structure*. The `→` operator defines
+  [local variables](#local-variables), followed by an algebraic or
+  program object that’s evaluated using those variables.
 * *Branching structures*. Structure words (like `DO`…`UNTIL`…`END`) define
-  conditional or loop structures to control the order of execution within a
-  program.
+  [conditional](#conditionals) or [loop](#loops) structures to control the order
+  of execution within a program.
+
+
+### Local variables
 
 A local variable structure has `→` followed by local names, followed by either a
 program or an algebraic. This removes values from the stack, puts them in the
 local variables, and then evaluates the algebraic or program.
 
 For example, the following program takes two numbers from the stack and returns
-a numeric result:
+the absolute value of their difference:
 
 ```rpl
+3 5
 « → a b 'ABS(a-b)' »
+EVAL
+@ Expecting 2
 ```
+
+When evaluating the algebraic expression `'ABS(a-b)'`, the value `3` is put in
+local variable `a` and the value `5` is put in local variable `b`.
 
 
 ### Calculations in a program
@@ -2609,21 +2618,28 @@ manipulate stack data are:
 
 Numeric calculations provide convenient examples of these methods. The following
 programs use two numbers from the stack to calculate the hypotenuse of a right
-triangle using the square root of the sum of the squares.
-
+triangle using the square root of the sum of the squares (Pythagorean theorem).
 
 The first program uses stack commands to manipulate the numbers on the stack,
 and the calculation uses stack syntax.
 
 ```rpl
+3 4
 « SQ SWAP SQ + √ »
+EVAL
+@ Expecting 5.
 ```
 
 The second program uses a local variable structure to store and retrieve the
-numbers, while the calculation uses stack syntax.
+numbers, while the calculation uses stack syntax. In that case, the value `3` is
+stored in local variable `x`, and the value `4` is stored in local variable
+`y`.
 
 ```rpl
+3 4
 « → x y « x SQ y SQ + √ » »
+EVAL
+@ Expecting 5.
 ```
 
 The third program also uses a local variable structure, but this time the
@@ -2636,6 +2652,42 @@ calculation uses algebraic syntax.
 Note that the underlying formula is most apparent in the third program. This
 third method is often the easiest to write, read, and debug.
 
+
+### Efficiency vs. readability
+
+Programmers should be be aware that the DB48x implementation of local variables
+makes accessing them as efficient as accessing a stack value. Furthermore, using
+local variables often makes it possible to avoid stack manipulation commands.
+
+Consequently, this programming style can often lead to an implementation that is
+both more readable and more efficient than using complicated stack manipulations
+with commands such as `Swap`, `Rot` or `Over`.
+
+This is particularly true when a value is used multiple times, as shown in the
+following example:
+
+```rpl
+2 3
+« → x y 'x^y-(x+y)/(x^2-y^2)' »
+EVAL
+@ Expecting 9
+```
+
+An equivalent program using stack operations could be written as follows:
+
+```rpl
+2 3
+« DUP2 POW UNROT DUP2 + UNROT SQ SWAP SQ SWAP - / - »
+EVAL
+@ Expecting 9
+```
+
+The first program is more readable. Both implementations run at almost exactly
+the same speed. However, the second version uses half the number of bytes in
+program memory (17 vs. 34), primarily because each local variable reference uses
+at least two bytes, whereas most stack manipulation operations only use
+one. This difference may become lower as the program grows larger, since the
+program may require more complicated stack operations such as `Pick`.
 
 ## Entering and running programs
 
@@ -2792,6 +2844,113 @@ with an _algebraic expression_.
 3_m 2_m ACyl
 @ Expecting 62.83185 30718 m↑2
 ```
+
+## Volume of a sphere
+
+The following program computes the volume of a sphere given the radius put on
+the stack, using stack-based programming, and stores it in a variable named
+`VOL`:
+
+```rpl
+« 3 ^ Ⓒπ * 4 3 / * →NUM »
+'VOL' STO
+4 VOL
+@ Expecting 268.08257 3106
+```
+
+We need the `→NUM` command in this program to get a numerical result, because
+the `Ⓒπ` constant, by default, evaluates symbolically.
+This can be changed using the `NumericalConstants` or `NumericalResults`
+settings, or, for compatibility with the HP48 calculator, using the `SF` command
+on flags `-2` or `-3` respectively.
+
+The following is the same program using an algebraic expression for readability:
+
+```rpl
+« → r '4/3*Ⓒπ*r^3' →NUM »
+'VOL' STO
+4 VOL
+@ Expecting 268.08257 3106
+```
+
+
+## Volume of a spherical cap
+
+Instead of local variables, a program can take input from global variables.
+The following program, `SPH`, calculates the volume of a spherical cap of height
+_h_ within a sphere of radius _R_ using values stored in variables `H` and `R`.
+We can then use assignments like `R=10` and `H=3` to set the values before we
+run the program.
+
+```rpl
+« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
+'SPH' STO
+
+R=10 H=3 SPH
+@ Expecting 254.46900 4941
+```
+
+Alternatively, we can use the `STO` command sto initialize the values for `R`
+and `H`:
+
+```rpl
+« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
+'SPH' STO
+
+10 'R' STO
+3 'H' STO
+SPH
+@ Expecting 254.46900 4941
+```
+
+## Creating programs on a computer
+
+It is convenient to create programs and other objects on a computer and then
+load them into the calculator. This is typically done by editing a text file
+with extension `.48s`, and then storing them on the internal storage of DM42.
+The state files stored under `STATE` are such files, and example being the file
+named `STATE/Demo.48s` that comes with the DB48x distribution.
+
+
+### Comments
+
+If you are creating programs on a computer, you can include _comments_ in the
+computer version of the program. Comments are free text annotations that a
+programmer can add to document a program.
+
+Comments in a DB48x program begin with `@` or `@@`, and finish at the end of a
+line.  Comments that begin with `@` are preserved in a program, while comments
+that begin with `@@` are removed while loading a program.
+
+The following program is the program from an
+[earlier section](#calculations-in-a-program) computing the hypothenuse of a
+square rectangle, with comments added:
+
+```rpl
+«
+@@ Compute the hypothenuse of a square rectangle
+@@ Input is from the two levels of the stack
+@@ Output is left on the first level of the stack
+@@ These comment will be removed from the program
+@@ The comments below will remain the program
+
+@ Square first side
+SQ
+
+@ Get second side and square it
+SWAP SQ
+
+@ Add the two squares
++
+
+@ Take the square root
+√
+»
+```
+
+You can check when you enter this program from the help file that all the
+`@@` comments at the top are removed, while the `@` comments in the middle
+remain in the resulting program.
 # Release notes
 
 ## Release 0.9.1 "Follow" - Finances, bit-counting and constants
@@ -10924,11 +11083,6 @@ the second input is false.
 # Bitmaps
 
 ## TOSYSBITMAP
-
-# Comments
-
-## STRIPCOMMENTS
-Remove all comments from a compiled program
 
 # Comparisons
 

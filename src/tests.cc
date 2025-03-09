@@ -182,7 +182,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            online_help();
+            check_help_examples();
 #if 0
         if (onlyCurrent & 2)
             demo_ui();
