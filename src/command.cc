@@ -995,7 +995,7 @@ COMMAND_BODY(Version)
         "Reverse Polish Lisp (RPL)\n"
         "and a tribute to\n"
         "Bill Hewlett and Dave Packard\n"
-        "© 2024 Christophe de Dinechin";
+        "© 2025 Christophe de Dinechin";
     if (text_g version = text::make(version_text))
         if (rt.push(object_p(version)))
             return OK;
