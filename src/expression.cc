@@ -2589,14 +2589,14 @@ list_p expression::current_equation(bool all, bool error)
 
 bool expression::is_well_defined(symbol_p solving,
                                  bool     error,
-                                 symbol_p knowing) const
+                                 list_p   unknowns) const
 // ----------------------------------------------------------------------------
 //   Check if all variables but the one we solve for are defined
 // ----------------------------------------------------------------------------
 {
     expression_g expr  = this;
     symbol_g     sym   = solving;
-    symbol_g     known = knowing;
+    list_g       unset = unknowns;
     list_p       vars  = expr->names();
     bool         found = false;
     if (!vars)
@@ -2610,10 +2610,8 @@ bool expression::is_well_defined(symbol_p solving,
             {
                 found = true;
             }
-            else if (known && known->is_same_as(vsym))
-            {
-            }
-            else if (!directory::recall_all(var, false))
+            else if ((unset && unset->contains(vsym)) ||
+                     !directory::recall_all(var, false))
             {
                 if (error)
                     rt.some_undefined_name_error();

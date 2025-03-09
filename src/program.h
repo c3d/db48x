@@ -80,6 +80,7 @@ struct program : list
     PARSE_DECL(program);
     RENDER_DECL(program);
     EVAL_DECL(program);
+    HELP_DECL(program);
 };
 typedef const program *program_p;
 

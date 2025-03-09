@@ -1468,15 +1468,17 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     info xi   = x->shape();
     info yi   = y->shape();
 
+    // Check special case of zero
+    size_t xs = xi.nkigits;
+    size_t ys = yi.nkigits;
+
     // Number with largest exponent is larger
-    large xe   = xi.exponent;
-    large ye   = yi.exponent;
+    large xe   = xs ? xi.exponent : std::numeric_limits<large>::min();
+    large ye   = ys ? yi.exponent : std::numeric_limits<large>::min();
     if (xe != ye)
         return sign * (xe > ye ? 1 : -1);
 
     // If same exponent, compare mantissa digits starting with highest one
-    size_t xs = xi.nkigits;
-    size_t ys = yi.nkigits;
     byte_p xb = xi.base;
     byte_p yb = yi.base;
 

@@ -1932,7 +1932,7 @@ These equations for an NPN silicon bipolar transistor are based on large-signal 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
 IES=1e-5_nA  ICS=2e-5_nA  T=26.85_°C  αF=0.98  αR=0.49  IC=1_mA  VBC=-10_V
-@ Expecting [ VBE=0.63739 37622 77 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40816 27 mA IB=-0.48979 59183 73 mA VCEsat=-5.95264 29332 3 V ]
+@ Expecting [ VBE=0.63739 37623 73 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40835 27 mA IB=-0.48979 59164 73 mA VCEsat=-5.95264 29332 3 V ]
 'ROOT(ⒺBipolar Transistors;[VBE;IS;ICO;ICEO;IE;IB;VCEsat];[1_V;1_nA;1_nA;1_nA;1_mA;1_mA;1_V])'
 ```
 
@@ -2487,6 +2487,7 @@ Tday=86400_s  R=6371e3_m  h1=0_m  h2=2000_m  M=5.972168e24_kg  φ=15_°
 "1a) Prerequisite conditions:"
 "(Δh_m)/((R_m)+(h1_m)) < 0.1/100  AND  ABS(γv1/γv2-1) < 0.1/100"
 '(Δh_m)/((R_m)+(h1_m)) < 0.1/100  AND  ABS(γv1/γv2-1) < 0.1/100'
+@ Expecting True
 @ Save result for later use
 ```
 * **Example 1c)** EVAL => True, then APPROXIMATION can be checked (EVAL => True) by:
@@ -2494,6 +2495,7 @@ Tday=86400_s  R=6371e3_m  h1=0_m  h2=2000_m  M=5.972168e24_kg  φ=15_°
 "1b) APPROXIMATION check:"
 "→NUM(ABS(approx1/approx2-1)) < 0.1/100"
 '→NUM(ABS(approx1/approx2-1)) < 0.1/100'
+@ Expecting True
 @ Save result for later use
 ```
 * **Example 1d)** The important CONSEQUENCE is that the following value is the RATE OF TIME DILATION per meter of height due to a gravitational field `gloc` at height `h1`:
@@ -2518,6 +2520,7 @@ Tday=86400_s  R=6371e3_m  h1=5200_m  h2=8860_m  M=5.972168e24_kg  φ=15_°
 "2a) Prerequisite CONDITIONS:"
 "(Δh_m)/((R_m)+(h1_m)) < 0.1/100  AND  ABS(γv1/γv2-1) < 0.1/100"
 '(Δh_m)/((R_m)+(h1_m)) < 0.1/100  AND  ABS(γv1/γv2-1) < 0.1/100'
+@ Expecting True
 @ Save result for later use
 ```
 * **Example 2c)** EVAL => True, then APPROXIMATION can be checked (EVAL => True) by:
@@ -2525,14 +2528,15 @@ Tday=86400_s  R=6371e3_m  h1=5200_m  h2=8860_m  M=5.972168e24_kg  φ=15_°
 "1b) APPROXIMATION check:"
 "→NUM(ABS(approx1/approx2-1)) < 0.1/100"
 '→NUM(ABS(approx1/approx2-1)) < 0.1/100'
+@ Expecting True
 @ Save result for later use
 ```
 * **Example 2d)** The important CONSEQUENCE is that the following value is the RATE OF TIME DILATION per meter of height due to a gravitational field  `gloc` at height `h1`:
 ```rpl
 "=> Rate of t Dilation /m - vert :"
 "ABS(γ21-1)/Δh≈gloc/Ⓒc^2="
-@ Expecting 1.09086 86778 4⁳⁻¹⁶ m⁻¹
 '→NUM(gloc/Ⓒc^2)'
+@ Expecting 1.09086 86778 4⁳⁻¹⁶ m⁻¹
 ```
 
 #### B H Schwarzschild Geometry

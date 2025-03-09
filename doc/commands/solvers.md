@@ -30,11 +30,61 @@ case the algorithm will first evaluate the two given values. Otherwise, it will
 first evaluate the guess value and a value close to it.
 
 
+### Multiple variables
+
+Unlike on HP calculators, the DB48x `Root` command can solve for multiple
+variables, playing the role of the `Root` command, the _multiple equation
+solver_ and the `MROOT` command. The `MROOT` command, which uses the `Eq`
+variable, remains available for compatibility.
+
+The `Root` command is adaptative. It will shift to the multiple equation solver
+mode, solving one variable at a time, if that is possible
+
+### Multiple equation solver
+
+If equations can be solved one at a time, then the `Root` command will use the
+multiple equation solver to solve them in turn.
+
+For example, in the following code, the multiple equation solver can first solve
+for `y` using the second equation, the solve for `x`. In both cases, it can use
+the `Isolate` command to get an exact expression for the solution.
+
+```rpl
+{ 'sin(x)=y' '7*y^3=2' } { x y } { 0 0 } ROOT
+@ Expecting { x=41.19575 8315 ° y=0.65863 37560 08 }
+```
+
+### Jacobian solver
+
+If equations cannot be solved one at a time, then the `Root` command will
+compute the Jacobian of the equations given as input, and use that to solve the
+systerm iteratively. This is necessary when there is "crosstalk" between
+variables across equations.
+
+For example, to find the coordinates of the intersection between two circles,
+you can use the following code:
+
+```rpl
+[ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' ] [ X Y ] [ 0 0 ] ROOT
+@ Expecting [ X=0.5 Y=0.86602 54037 84 ]
+```
+
+
+### Algebraic isolation
+
+When possible, the numerical solver will attempt to use the `Isolate` command to
+find results more rapidly and accurately using an exact symbolic expression of
+the solution. This is controlled by the `SolvingSymbolicallyThenNumerically`
+flag.
+
+
 ### Unit management
 
-Specifying a unit for the initial value forces the calculator to compute the result using the given unit.
+Specifying a unit for the initial value forces the calculator to compute the
+result using the given unit.
 
-In the example above, the guess was . Otherwise, the result would depend on the angle mode, e.g. in `Radians` mode:
+In the example above, the guess was . Otherwise, the result would depend on the
+angle mode, e.g. in `Radians` mode:
 
 ```rpl
 RAD
@@ -61,8 +111,9 @@ EVAL
 The desired precision is given by the `SolverImprecision` setting relative to
 the current `Precision` setting, allowing the solver to stop earlier. For
 example, the default value `6` for `SolverImprecision`, combined with the
-default 24-digit `Precision` means that the solver will seek 18-digit precision
-(i.e. 24-6).
+default 24-digit `Precision` means that the solver will seek at most 18-digit
+precision (i.e. 24-6). Solving precision may be further reduced according to
+display settings, like on HP calculators.
 
 For example, the following will find a "solution" to `1/x=0` once it reaches the
 desired precision:
@@ -128,10 +179,30 @@ Solve the system of equations for the given variable.
 
 Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
+## MSlv
 
-## MSOLVE
-Multiple non-linear equation solver/optimization search
+On HP50G, a special command is dedicated to solving systems of equations.
 
+On DB48x, the `MSlv` command is provided for comptability. It behaves almost
+exactly like `Root`, except that it leaves the equations and variable lists on
+the stack in addition to the result.
 
-## BISECT
-Root seeking (bisection method)
+```rpl
+RAD
+[ 'sin(x)+y' 'x+sin(y)=1' ] [x y] [0 0] MSLV
+"" + + +
+@ Expecting "[ 'sin x+y' 'x+sin y=1' ][ x y ][ x=1.82384 11261 1 y=-0.96815 46361 75 ]"
+```
+
+Since `Root` on DB48x accepts a wider range of inputs and automatically detects
+when it needs to solve [systems of simultaneous equations](#jacobian-solver),
+`MSLV` will work on cases accepted on the HP50G, but will also accept other
+inputs accepted by `Root`, e.g. single variables, and will benefit from symbolic
+solving using `isol` (resulting in the generation of an angle units in the
+example below):
+
+```rpl
+DEG
+'sin(x)=0.3' x 0 MSLV
+@ Expecting x=17.45760 31237 °
+```

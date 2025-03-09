@@ -30,6 +30,7 @@
 #include "array.h"
 
 #include "arithmetic.h"
+#include "compare.h"
 #include "expression.h"
 #include "functions.h"
 #include "grob.h"
@@ -393,12 +394,31 @@ static object_p item_from_stack(size_t rows, size_t columns,
 }
 
 
-array_p array::from_stack(size_t rows, size_t columns)
+static object_p transpose_from_stack(size_t rows, size_t columns,
+                                     size_t r, size_t c, void *)
+// ----------------------------------------------------------------------------
+//   Return an item from the stack
+// ----------------------------------------------------------------------------
+{
+    if (!rows)
+        rows = 1;
+    size_t nitems = rows * columns;
+    size_t idx = c * rows + r;
+    if (object_p obj = rt.stack(nitems + ~idx))
+        return obj;
+    return nullptr;
+}
+
+
+array_p array::from_stack(size_t rows, size_t columns, bool transpose)
 // ----------------------------------------------------------------------------
 //   Build an array from items on the stack
 // ----------------------------------------------------------------------------
 {
-    array_p result = build(rows, columns, item_from_stack);
+    array_p result = transpose
+        ? build(columns, rows, transpose_from_stack)
+        : build(rows, columns, item_from_stack);
+
     if (result)
         rt.drop(rows * (columns ? columns : 1));
     return result;
@@ -477,6 +497,7 @@ algebraic_p array::determinant() const
 {
     size_t cx, rx;
     size_t depth = rt.depth();
+    algebraic_g det = this;
     if (is_matrix(&rx, &cx))
     {
         if (rx != cx)
@@ -489,13 +510,13 @@ algebraic_p array::determinant() const
         size_t      pt  = n;    // n temporary elements to save diagonal
         size_t      px  = n * n + n;
         bool        neg = false;
-        algebraic_g det;
         algebraic_g tot;
 
         // Make space for temporary elements
         for (size_t j = 0; j < n; j++)
-            if (!rt.push(this))
+            if (!rt.push(+det))
                 goto err;
+        det = nullptr;
 
 #if SIMULATOR
         record(matrix, "Determinant of %ux%u matrix", n, n);
@@ -1351,6 +1372,110 @@ COMMAND_BODY(cross)
 }
 
 
+algebraic_p array::one_norm(array_p ao, bool column)
+// ----------------------------------------------------------------------------
+//   Compute a row or column 1-norm
+// ----------------------------------------------------------------------------
+{
+    size_t  cx, rx;
+    array_g a = ao;
+    algebraic_g norm, item, sum;
+    if (a->is_matrix(&cx, &rx))
+    {
+        size_t nitems = cx * rx;
+        if (column)
+        {
+            for (size_t c = 0; c < cx; c++)
+            {
+                for (size_t r = 0; r < rx; r++)
+                {
+                    size_t i = r * cx + c;
+                    item = rt.stack(nitems + ~i)->as_algebraic();
+                    item = abs::evaluate(item);
+                    sum = sum ? sum + item : item;
+                }
+                if (!norm || compare(norm, sum) < 0)
+                    norm = sum;
+                sum = nullptr;
+            }
+        }
+        else
+        {
+            for (size_t r = 0; r < rx; r++)
+            {
+                for (size_t c = 0; c < cx; c++)
+                {
+                    size_t i = r * cx + c;
+                    item = rt.stack(nitems + ~i)->as_algebraic();
+                    item = abs::evaluate(item);
+                    sum = sum ? sum + item : item;
+                }
+                if (!norm || compare(norm, sum) < 0)
+                    norm = sum;
+                sum = nullptr;
+            }
+        }
+        rt.drop(rx * cx);
+        return norm;
+    }
+    else if (a->is_vector(&rx))
+    {
+        // For vectors, sum of the absolute values of vector elements
+        for (size_t i = 0; i < rx; i++)
+        {
+            item = rt.stack(i)->as_algebraic();
+            item = abs::evaluate(item);
+            if (column)
+                norm = norm ? norm + item : item;
+            else if (!norm || compare(norm, item) < 0)
+                norm = item;
+        }
+        rt.drop(rx);
+        return norm;
+    }
+
+    rt.type_error();
+    return nullptr;
+}
+
+
+object::result array::one_norm(bool column)
+// ----------------------------------------------------------------------------
+//   Compute a 1-norm (row or column)
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    if (array_p a = obj->as<array>())
+    {
+        if (algebraic_p norm = one_norm(a, column))
+            if (rt.top(norm))
+                return OK;
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(ColumnNorm)
+// ----------------------------------------------------------------------------
+//   Compute the column norm
+// ----------------------------------------------------------------------------
+{
+    return array::one_norm(true);}
+
+
+COMMAND_BODY(RowNorm)
+// ----------------------------------------------------------------------------
+//   Implement a cross product
+// ----------------------------------------------------------------------------
+{
+    return array::one_norm(false);
+}
+
+
 COMMAND_BODY(FromArray)
 // ----------------------------------------------------------------------------
 //   Array to stack
@@ -1899,6 +2024,53 @@ COMMAND_BODY(FromVector)
     }
     return ERROR;
 }
+
+
+static object::result transpose(bool conjugate)
+// ----------------------------------------------------------------------------
+//   Transpose with or without conjugate
+// ----------------------------------------------------------------------------
+{
+    if (object_g obj = rt.top())
+    {
+        if (array_p v = obj->as<array>())
+        {
+            size_t rows = 0, columns = 0;
+            if (v->is_matrix(&rows, &columns, true))
+            {
+                if (algebraic_p res = array::from_stack(rows, columns, true))
+                {
+                    if (res && rt.top(res))
+                        return conjugate ? conj::evaluate() : object::OK;
+                }
+            }
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return object::ERROR;
+}
+
+
+COMMAND_BODY(Transpose)
+// ----------------------------------------------------------------------------
+//   Convert an array to its transposed version
+// ----------------------------------------------------------------------------
+{
+    return transpose(false);
+}
+
+
+COMMAND_BODY(TransConjugate)
+// ----------------------------------------------------------------------------
+//   Convert an array to its transposed / conjugate version
+// ----------------------------------------------------------------------------
+{
+    return transpose(true);
+}
+
 
 
 

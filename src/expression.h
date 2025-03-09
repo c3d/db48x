@@ -107,8 +107,9 @@ struct expression : program
 
     static expression_p get(object_p obj);
     static list_p current_equation(bool all, bool error);
-    bool is_well_defined(symbol_p solving = nullptr, bool error = true,
-                         symbol_p knowing = nullptr) const;
+    bool is_well_defined(symbol_p solving = nullptr,
+                         bool error = true,
+                         list_p unknowns = nullptr) const;
 
     typedef expression_p (expression::*command_fn)(symbol_r name) const;
     static result variable_command(command_fn callback);

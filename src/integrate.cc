@@ -135,11 +135,8 @@ algebraic_p integrate(program_g   eq,
 
     // Set independent variable
     save<symbol_g *> iref(expression::independent, &name);
-    int              disp = Settings.DisplayDigits();
-    int              prec = Settings.Precision();
     int              impr = Settings.IntegrationImprecision();
-    int              dig = std::min(disp + 1, std::max(prec - impr, 3));
-    algebraic_g      eps = decimal::make(1, -dig);
+    algebraic_g      eps = algebraic::epsilon(impr);
 
     // Check initializations happened correctly
     if (!half || !zero || !one || !two  || !four || !eps)

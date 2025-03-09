@@ -47,6 +47,8 @@
 #include "unit.h"
 #include "variables.h"
 
+RECORDER(msolve, 16, "Multiple-equation numerical solver");
+RECORDER(jsolve, 16, "Jacobian numerical solver");
 RECORDER(solve, 16, "Numerical solver");
 RECORDER(solve_error, 16, "Numerical solver errors");
 
@@ -95,6 +97,17 @@ static algebraic_p recall(algebraic_r namer)
         }
     }
     return nullptr;
+}
+
+static algebraic_p difference_for_solve(algebraic_r eq)
+// ----------------------------------------------------------------------------
+//   Transform equations into proper differences
+// ----------------------------------------------------------------------------
+{
+    if (expression_p eqeq = expression::get(eq))
+        if (expression_g diff = eqeq->as_difference_for_solve())
+            return diff;
+    return eq;
 }
 
 algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
@@ -212,9 +225,9 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     }
 
     save<symbol_g *> iref(expression::independent, &name);
-    int              prec = Settings.Precision() - Settings.SolverImprecision();
-    algebraic_g      yeps  = decimal::make(1, prec <= 0 ? -1 : -prec);
-    algebraic_g      xeps  = (lx + hx) * yeps;
+    int              impr        = Settings.SolverImprecision();
+    algebraic_g      yeps        = algebraic::epsilon(impr);
+    algebraic_g      xeps        = (lx + hx) * yeps;
     bool             is_constant = true;
     bool             is_valid    = false;
     uint             max         = Settings.SolverIterations();
@@ -259,8 +272,14 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
         }
     }
 
-    for (uint i = 0; i < max && !program::interrupted(); i++)
+    for (uint i = 0; i < max; i++)
     {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
         // If we failed during evaluation of x, break
         if (!x)
         {
@@ -621,6 +640,10 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     if (!eqs || !names || !guesses)
         return nullptr;
 
+    save<bool>  nodates(unit::nodates, true);
+    record(msolve, "Solve equations %t for names %t with guesses %t",
+           +eqs, +names, +guesses);
+
     // Check that we have names as variables
     size_t vcount = 0;
     for (object_p obj : *names)
@@ -681,6 +704,12 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     // While there are variables to solve for
     while (vcount && ecount)
     {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
         list::iterator vi    = vars->begin();
         list::iterator gi    = gvalues->begin();
         bool           found = false;
@@ -702,11 +731,14 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 rt.type_error();
                 return nullptr;
             }
+            record(msolve, "Trying to solve for %t", +var);
+
+            // The variable must be well-defined in exactly one equation
             list::iterator ei = eqns->begin();
-            expression_g   best;
-            uint           bestvars = ~0U;
-            size_t         bestidx  = 0;
-            for (size_t e = 0; !found && e < ecount && bestvars; e++)
+            expression_g   def;
+            size_t         defidx = 0;
+            uint           defs   = 0;
+            for (size_t e = 0; !found && e < ecount && defs < 2; e++)
             {
                 expression_g eq = expression::get(*ei);
                 if (!eq)
@@ -715,33 +747,26 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                         rt.type_error();
                     return nullptr;
                 }
-                if (eq->is_well_defined(var, false))
+                bool defined = eq->is_well_defined(var, false, vars);
+                record(msolve, "For %t %+s %t",
+                       +var, defined ? "ok" : "ko", +eq);
+                if (defined)
                 {
-                    list::iterator ovi    = vars->begin();
-                    uint           wdvars = 0;
-                    for (size_t ov = 0; ov < vcount; ov++)
+                    if (!defs++)
                     {
-                        if (ov != v)
-                            if (symbol_g ovar = (*ovi)->as_quoted<symbol>())
-                                if (eq->is_well_defined(ovar, false, var))
-                                    wdvars++;
-                        ++ovi;
-                    }
-                    if (wdvars < bestvars)
-                    {
-                        best     = eq;
-                        bestvars = wdvars;
-                        bestidx  = e;
+                        def = eq;
+                        defidx = e;
                     }
                 }
                 ++ei;
             }
 
-            if (best)
+            if (defs >= 1 && defs <= 1 + ecount - vcount)
             {
-                program_g   pgm    = +best;
+                program_g   pgm    = +def;
                 algebraic_p guess  = algebraic_p(*gi);
                 algebraic_g solved = solve(pgm, name, guess);
+                record(msolve, "Solved %t as %t", +pgm, +solved);
                 if (!solved)
                 {
                     solver_command_error();
@@ -753,7 +778,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
                 // That's one variable less to deal with
                 vars    = vars->remove(v);
                 gvalues = gvalues->remove(v);
-                eqns    = eqns->remove(bestidx);
+                eqns    = eqns->remove(defidx);
                 vcount--;
                 ecount--;
                 found = true;
@@ -763,6 +788,14 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
         }
 
         // This algorithm does not apply, some variables were not found
+        if (!found && ecount >= vcount)
+        {
+            record(msolve, "Could not solve for %t in %t", +vars, +eqns);
+            eqns = eqns->map(difference_for_solve);
+            found = jacobi_solver(eqns, vars, gvalues);
+            ecount = 0;
+            vcount = 0;
+        }
         if (!found)
         {
             rt.multisolver_variable_error();
@@ -773,6 +806,194 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
 
     list_g result = names->map(recall);
     return result;
+}
+
+
+bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
+// ----------------------------------------------------------------------------
+//  Compute a Jacobian when there is cross-talk between variables
+// ----------------------------------------------------------------------------
+{
+    size_t n = vars->items();
+    ASSERT("We need more equations than variables" && n <= eqs->items());
+    ASSERT("Variable count must match guess count" && n == guesses->items());
+
+    // Memorise depth
+    size_t depth = rt.depth();
+
+    // Compute the desired precision
+    int            impr  = Settings.SolverImprecision();
+    algebraic_g    eps   = algebraic::epsilon(impr);
+    algebraic_g    oeps  = decimal::make(101,-2);
+    uint           max   = Settings.SolverIterations();
+    uint           iter  = 0;
+    int            errs  = 0;
+    bool           back  = false; // Go backwards
+    array_g        j, v, d;
+    algebraic_g    magnitude, last, forward;
+
+    record(jsolve, "Solve for %t in %t guesses %t", +vars, +eqs, +guesses);
+
+    while (iter++ < max)
+    {
+        if (program::interrupted())
+        {
+            rt.interrupted_error();
+            break;              // This will keep current values
+        }
+
+        // Set all variables to current value of guesses
+        list::iterator gi = guesses->begin();
+        for (object_p varo : *vars)
+        {
+            object_p valo = *gi;
+            if (errs)
+            {
+                if (algebraic_g valg = valo->as_algebraic())
+                {
+                    // Shuffle slightly around current position
+                    algebraic_g pw = pow(oeps, errs) + eps;
+                    if (!pw)
+                        goto error;
+                    valo = pw;
+                }
+            }
+            if (!directory::store_here(varo, valo))
+                goto error;
+            ++gi;
+        }
+
+        // Evaluate all equations at current values of variables
+        size_t neqs = 0;
+        magnitude = nullptr;
+        for (object_p eqo : *eqs)
+        {
+            expression_p eq = expression::get(eqo);
+            if (!eq)
+                goto error;
+            algebraic_p value = eq->evaluate();
+            if (!value)
+            {
+                // Possibly a transient domain error, try shuffling around
+                if (errs++ == 0)
+                {
+                    if (last)
+                    {
+                        // Return to a known good position
+                        v = v + d;
+                        guesses = +v;
+                    }
+                }
+                // Try shuffling around the known good position a few times
+                if (errs < 5)
+                    continue;
+            }
+            if (!value || !(neqs >= n || rt.push(value)))
+                goto error;
+            while (unit_p u = value->as<unit>())
+                value = u->value();
+            algebraic_g absval = abs::run(value);
+            magnitude = magnitude ? magnitude + absval : absval;
+            neqs++;
+        }
+        record(jsolve, "Magnitude is %t", +magnitude);
+
+        // Check if we already found a solution, if so exit
+        if (smaller_magnitude(magnitude, eps))
+            break;
+
+        // Check if we are going in the wrong direction
+        if (last && smaller_magnitude(last, magnitude))
+        {
+            if (!back)
+            {
+                record(jsolve, "Worse than  %t, try backwards", +last);
+                v = v + d;
+                v = v + d;
+                guesses = +v;
+                forward = magnitude;
+                back = true;
+                continue;
+            }
+            back = false;
+            last = nullptr;
+            if (smaller_magnitude(forward, magnitude))
+            {
+                // Pick up forward direction if it was better
+                record(jsolve, "Forward worse, resume forward", +last);
+                v = v - d;
+                v = v - d;
+                guesses = +v;
+                continue;
+            }
+        }
+        last = magnitude;
+
+        // Compute the Jacobi matrix by shifting each variable
+        gi = guesses->begin();
+        size_t column = 0;
+        for (object_g varo : *vars)
+        {
+            // Put (1+eps)*value into the variable
+            object_p valo = *gi;
+            algebraic_g val = valo->as_algebraic();
+            if (!val)
+                goto error;
+            algebraic_g dx = val;
+            val = val * oeps;
+            if (val->is_same_as(*gi))
+                val = val + oeps;
+            dx = dx - val;
+            if (!directory::store_here(varo, +val))
+                goto error;
+
+            // Evaluate each expression and subtract current value
+            neqs = 0;
+            for (object_p eqo : *eqs)
+            {
+                if (neqs >= n)
+                    break;
+                expression_p eq = expression::get(eqo);
+                if (!eq)
+                    goto error;
+                algebraic_g now = eq->evaluate();
+                algebraic_g dydx = rt.stack(column + n - 1)->as_algebraic();
+                dydx = (dydx - now) / dx;
+                if (!dydx || !rt.push(+dydx))
+                    goto error;
+                neqs++;
+            }
+
+            // We added a column
+            column += n;
+
+            // Restore original value
+            valo = *gi;
+            if (!directory::store_here(varo, valo))
+                goto error;
+            ++gi;
+        }
+
+        // It's a bit inefficient to create arrays here, but save code space
+        j = array::from_stack(n, n, true);
+        v = array::from_stack(n, 0);
+        d = v / j;
+        record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
+        v = array_p(+guesses);
+        v = v - d;
+        if (!v)
+            goto error;
+
+        // This is the new guesses
+        guesses = +v;
+    } // while (iter < max)
+
+    rt.drop(rt.depth() - depth);
+    return iter < max;
+
+error:
+    rt.drop(rt.depth() - depth);
+    return false;
 }
 
 
@@ -814,16 +1035,6 @@ NFUNCTION_BODY(Root)
 }
 
 
-NFUNCTION_BODY(MultipleEquationsSolver)
-// ----------------------------------------------------------------------------
-//   Solve a set of equations one at a time
-// ----------------------------------------------------------------------------
-//   On DB48X, there is no difference between `MSLV` and `ROOT`
-{
-    return Root::evaluate(op, args, arity);
-}
-
-
 static algebraic_p check_name(algebraic_r x)
 // ----------------------------------------------------------------------------
 //   Check if the name exists, if so return its value, otherwise return 0
@@ -841,10 +1052,13 @@ static algebraic_p check_name(algebraic_r x)
 }
 
 
-COMMAND_BODY(MultipleEquationsRoots)
+COMMAND_BODY(MultipleEquationsSolver)
 // ----------------------------------------------------------------------------
-//   Apply the multiple equation solver to the contents of EQ
+//   Solve a set of equations one at a time (MROOT)
 // ----------------------------------------------------------------------------
+//   On DB48X, the underlying engine for `Root` knows how to deal with multiple
+//   equations. However, the MROOT command starts with the `EQ` variable
+//   instead of the stack (compatibility with HP's implementaiton)
 {
     if (list_g eqs = expression::current_equation(true, true))
         if (list_g vars = eqs->names())
@@ -853,6 +1067,43 @@ COMMAND_BODY(MultipleEquationsRoots)
                     return run<Root>();
     if (!rt.error())
         rt.no_equation_error();
+    return ERROR;
+}
+
+
+COMMAND_BODY(MultipleVariablesSolver)
+// ----------------------------------------------------------------------------
+//   Solve multiple equations with multiple variables (MSLV)
+// ----------------------------------------------------------------------------
+//   On DB48x, the underlying engine for `Root` knows how to deal with
+//   multiple simultaneous variables, including the case where variables
+//   are simultaneously present in multiple equations. On HP50G, this is dealt
+//   with by a separate command, `MSLV`, that behaves almost like `ROOT`,
+//   except that it leaves equations and variables on the stack.
+//   As a result, on DB48x, the only real difference between `ROOT` and `MSLV`
+//   is that the latter leaves its input on the stack, and as a result is a
+//   command and not an N-ary function
+{
+    object_p    eo      = rt.stack(2);
+    object_p    vo      = rt.stack(1);
+    object_p    go      = rt.stack(0);
+
+    algebraic_g eqs     = eo->as_algebraic_or_list();
+    algebraic_g vars    = vo->as_algebraic_or_list();
+    algebraic_g guesses = go->as_algebraic_or_list();
+
+    if (eqs && vars && guesses)
+    {
+        algebraic_g result = Root::solve(eqs, vars, guesses);
+        if (!result)
+            solver_command_error();
+        if (rt.top(+result))
+            return OK;
+    }
+    else
+    {
+        rt.type_error();
+    }
     return ERROR;
 }
 

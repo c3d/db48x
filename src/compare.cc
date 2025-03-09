@@ -388,8 +388,7 @@ bool smaller_magnitude(algebraic_r x, algebraic_r y)
 //   Compare magnitude
 // ----------------------------------------------------------------------------
 {
-    algebraic_p cmp = abs::run(x) < abs::run(y);
-    return cmp && cmp->as_truth(false);
+    return algebraic::compare(abs::run(x), abs::run(y)) < 0;
 }
 
 

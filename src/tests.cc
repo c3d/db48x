@@ -183,7 +183,6 @@ void tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
             check_help_examples();
-
 #if 0
         if (onlyCurrent & 2)
             demo_ui();
@@ -6444,6 +6443,26 @@ void tests::matrix_functions()
     step("Tagged array operations")
         .test(CLEAR, ":A:[1 2] :B:[3 4] +", ENTER)
         .want("[ 4 6 ]");
+
+    step("Transpose")
+        .test(CLEAR, "[[1 2 3+2ⅈ][4 5-2ⅈ 6]]", ID_ToolsMenu, ID_Transpose)
+        .want("[[ 1 4 ] [ 2 5-2ⅈ ] [ 3+2ⅈ 6 ]]");
+    step("Transpose and conjugate")
+        .test(CLEAR, "[[1 2 3+2ⅈ][4 5-2ⅈ 6]]", ID_ToolsMenu, ID_TransConjugate)
+        .want("[[ 1 4 ] [ 2 5+2ⅈ ] [ 3-2ⅈ 6 ]]");
+
+    step("Row norm for vector")
+        .test(CLEAR, "[1 2 3 4]", ID_MatrixMenu, ID_RowNorm)
+        .expect("4");
+    step("Row norm for vector")
+        .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_RowNorm)
+        .expect("7");
+    step("Column norm for vector")
+        .test(CLEAR, "[1 2 3 4]", ID_MatrixMenu, ID_ColumnNorm)
+        .expect("10");
+    step("Column norm for vector")
+        .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_ColumnNorm)
+        .expect("6");
 }
 
 
@@ -6501,7 +6520,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-7.8⁳⁻²¹'");
+        .expect("'25=25.+2.11075 8519⁳⁻¹²'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -6601,6 +6620,22 @@ void tests::solver_testing()
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
 
+    step("Jacobian solver, linear case")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
+              "{ X Y } { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.2 Y=1.8 }");
+    step("Jacobian solver, linear case with extra true equation")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y+10=0' }"
+              "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.2 Y=1.8 }");
+    step("Jacobian solver, linear case with extra false equation")
+        .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y=10' }"
+              "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
+        .error("Unable to solve for all variables");
+    step("Jacobian solver, two circles")
+        .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
+              "{ X Y } { 0 0 } ROOT", ENTER)
+        .expect("{ X=0.5 Y=0.86602 54037 84 }");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
@@ -9094,6 +9129,39 @@ void tests::online_help()
         .test(EXIT, SHIFT, N, LONGPRESS, F1)
         .image_noheader("help-degrees");
     step("Exit and cleanup")
+        .test(EXIT, CLEAR, EXIT);
+
+    step("Help about integers")
+        .test(CLEAR, "123", ENTER, ID_Help)
+        .image_noheader("help-integers")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about decimal numbers")
+        .test(CLEAR, "123.456", ENTER, ID_Help)
+        .image_noheader("help-decimal")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about based integers")
+        .test(CLEAR, "16#123", ENTER, ID_Help)
+        .image_noheader("help-based")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about texts")
+        .test(CLEAR, "\"Text\"", ENTER, ID_Help)
+        .image_noheader("help-text")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about lists")
+        .test(CLEAR, "{ 1 2 3 }", ENTER, ID_Help)
+        .image_noheader("help-lists")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about vectors")
+        .test(CLEAR, "[ 1 2 3 ]", ENTER, ID_Help)
+        .image_noheader("help-vectors")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about programs")
+        .test(CLEAR, "« 1 2 3 »", ENTER, ID_Help)
+        .image_noheader("help-programs")
+        .test(EXIT, CLEAR, EXIT);
+    step("Help about unit objects")
+        .test(CLEAR, "« 1 2 3 »", ENTER, ID_Help)
+        .image_noheader("help-units")
         .test(EXIT, CLEAR, EXIT);
 
     step("Enter example from help file into command line")

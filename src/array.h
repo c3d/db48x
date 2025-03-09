@@ -80,7 +80,7 @@ struct array : list
     bool expand() const;
     static bool size_from_stack(size_t *rows, size_t *columns, uint level=0);
     static bool size_from_object(size_t *rows, size_t *columns, object_r obj);
-    static array_p from_stack(size_t rows, size_t columns);
+    static array_p from_stack(size_t rows, size_t columns, bool transp=false);
     typedef object_p (*item_fn)(size_t rows, size_t columns,
                                 size_t row, size_t column,
                                 void *data);
@@ -108,6 +108,8 @@ struct array : list
     static array_p      mul(array_r x, array_r y);
     static algebraic_p  dot(array_r x, array_r y);
     static array_p      cross(array_r x, array_r y);
+    static algebraic_p  one_norm(array_p x, bool column);
+    static result       one_norm(bool column);
 
 public:
     OBJECT_DECL(array);
@@ -132,6 +134,10 @@ COMMAND_DECLARE(FromArray, 1);
 COMMAND_DECLARE(ConstantArray, 2);
 COMMAND_DECLARE(IdentityMatrix, 1);
 COMMAND_DECLARE(RandomMatrix, 1);
+COMMAND_DECLARE(Transpose, 1);
+COMMAND_DECLARE(TransConjugate, 1);
+COMMAND_DECLARE(ColumnNorm, 1);
+COMMAND_DECLARE(RowNorm, 1);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);

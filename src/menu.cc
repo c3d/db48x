@@ -526,34 +526,37 @@ MENU(MatrixMenu,
      "[\t]",    ID_SelfInsert,
      "Idnty",   ID_IdentityMatrix,
      "Const",   ID_ConstantArray,
-     "Transp",  ID_Unimplemented,
-     "Redim",   ID_Unimplemented,
-     "Random",  ID_RandomMatrix,
+     "Transp",  ID_Transpose,
+     "TrConj",  ID_TransConjugate,
 
      "Det",     ID_det,
      "Norm",    ID_abs,
      "→Array",  ID_ToArray,
      "Array→",  ID_FromArray,
-     "Factor",  ID_Unimplemented,
-     "Resize",  ID_Unimplemented,
+     "Random",  ID_RandomMatrix,
 
-#if 0
-     "RowNrm",  ID_Unimplemented,
-     "ColNrm",  ID_Unimplemented,
+     "RowNrm",  ID_RowNorm,
+     "ColNrm",  ID_ColumnNorm,
      "CondNum", ID_Unimplemented,
      "SpecRad", ID_Unimplemented,
-     "→Mat",    ID_Unimplemented,
-     "Mat→",    ID_Unimplemented,
-
-     "QR",      ID_Unimplemented,
-#endif
+     "Vector",  ID_VectorMenu,
 
      "Size",    ID_Unimplemented,
-     "→Diag",   ID_Unimplemented,
+     "Row+",    ID_Unimplemented,
+     "Row-",    ID_Unimplemented,
+     "Col+",    ID_Unimplemented,
+     "Col-",    ID_Unimplemented,
+
      "LU",      ID_Unimplemented,
-     "Schur",   ID_Unimplemented,
      "LQ",      ID_Unimplemented,
-     "Vector",  ID_VectorMenu);
+     "QR",      ID_Unimplemented,
+     "Schur",   ID_Unimplemented,
+     "Cholesky",ID_Unimplemented,
+
+     "SVD",     ID_Unimplemented,
+     "SVL",     ID_Unimplemented,
+     "Diag→",   ID_Unimplemented,
+     "→Diag",   ID_Unimplemented);
 
 
 MENU(PolynomialsMenu,

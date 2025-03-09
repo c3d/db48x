@@ -325,6 +325,9 @@ struct list : text
     // Extract a sublist
     list_p extract(object_r first, object_r last) const;
 
+    // Find a symbol in a list
+    symbol_p contains(symbol_p sym) const;
+
 public:
     // Shared code for parsing and rendering, taking delimiters as input
     static result list_parse(id type, parser &p, unicode open, unicode close);

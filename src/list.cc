@@ -114,7 +114,7 @@ object::result list::list_parse(id      type,
         cp = utf8_codepoint(s);
         if (cp == close)
         {
-            s = utf8_next(s);
+            s = +p.source + utf8_next(+p.source, s - +p.source, max);
             break;
         }
         if (precedence && (cp == '\'' || cp == ')' ||
@@ -2621,4 +2621,17 @@ list_p list::extract(object_r &first, object_r &last) const
     }
 
     return extract_sublist(data, 0, fnum, fidx, lidx);
+}
+
+
+symbol_p list::contains(symbol_p vsym) const
+// ----------------------------------------------------------------------------
+//   Check if the list contains a given symbol, if so return it
+// ----------------------------------------------------------------------------
+{
+    for (object_p obj : *this)
+        if (symbol_p known = obj->as_quoted<symbol>())
+            if (known->is_same_as(vsym))
+                return known;
+    return nullptr;
 }

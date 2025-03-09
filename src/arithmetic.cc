@@ -1096,7 +1096,7 @@ algebraic_p arithmetic::non_numeric<struct pow>(algebraic_r x, algebraic_r y)
 
 
 bool pow::integer_ok(object::id &xt, object::id &yt,
-                            ularge &xv, ularge &yv)
+                     ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------
 //   Compute Y^X
 // ----------------------------------------------------------------------------

@@ -386,8 +386,8 @@ NAMED(Sum, "Σ")
 NAMED(Product, "∏")
 
 CMD(Root)
-CMD(MultipleEquationsSolver)
-CMD(MultipleEquationsRoots)     ALIAS(MultipleEquationsRoots, "MRoot")
+CMD(MultipleEquationsSolver)    ALIAS(MultipleEquationsSolver, "MRoot")
+CMD(MultipleVariablesSolver)    ALIAS(MultipleVariablesSolver, "MSlv")
 
 NAMED(Integrate, "∫")           ALIAS(Integrate, "∫")
 
@@ -426,6 +426,8 @@ CMD(conj)
 OP(dot, "⋅")
 OP(cross, "⨯")
 NAMED(det, "Determinant")
+CMD(ColumnNorm)         ALIAS(ColumnNorm, "CNrm")
+CMD(RowNorm)            ALIAS(ColumnNorm, "RNrm")
 
 
 
@@ -553,6 +555,8 @@ NAMED(FromArray, "Arry→")       ALIAS(FromArray, "Array→")
 NAMED(ConstantArray, "Con")
 NAMED(IdentityMatrix, "Idn")
 NAMED(RandomMatrix, "RanM")     ALIAS(RandomMatrix, "RandomArray")
+CMD(Transpose)                  ALIAS(Transpose, "Tran")
+CMD(TransConjugate)             ALIAS(TransConjugate, "Trn")
 
 // Directories
 NAMED(Path, "DirectoryPath")

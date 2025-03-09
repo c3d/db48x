@@ -1,25 +1,46 @@
 # Operations with Complex Numbers
 
-## RE
+## Re
 Real part of a complex number
 
-
-## IM
+## Im
 Imaginary part of a complex number
 
-
-## ARG
+## Arg
 Argument of a complex number
 
-
-## CONJ
+## Conj
 Conjugate of a complex number
 
+## RectangularToReal
+Extract real and imaginary parts from a complex number in rectangular form
 
-## CPLX2REAL
-Split Complex into two Reals
+## RealToRectangular
+Make a complex number in rectangular form from real and imaginary part
 
+## PolarToReal
+Extract modulus and argument from a complex number in polar form
 
-## REAL2CPLX
-Make Complex from real and imaginary parts
+## RealToPolar
+Make a complex number in polar form from argument and modulus
 
+## ToRectangular
+Convert a complex number to rectangular form
+
+## ToPolar
+Convert a complex number or a 2D or 3D vector to polar form
+
+## ToCylindrical
+Convert a 3D vector to cylindrical form
+
+## ToSpherical
+Convert a 3D vector to spherical form
+
+## To2DVector
+Make a 2D vector from two components
+
+## To3DVector
+Make a 3D vector from three components
+
+## FromVector
+Expand a vector into its individual components

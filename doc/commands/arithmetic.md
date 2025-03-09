@@ -89,18 +89,6 @@ Raise to the inverse power. `X Y xroot` is equivalent to `X Y inv pow`.
 `Y` `X` ▶ `Y↑(1/X)`
 
 
-# Integer arithmetic and polynomials
-
-This section documents newRPL commands that are not implemented yet in DB48X.
-
-## SETPREC
-Set the current system precision
-
-
-## GETPREC
-Get the current system precision
-
-
 ## Floor
 
 Largest integer less than the input
@@ -119,6 +107,24 @@ Integer part of a number
 ## FractionalPart
 
 Fractional part of a number
+
+
+## Abs
+
+Return the absolute value for a real numner.
+Return the Euclidean norm for a complex number, vector or matrix.
+
+
+# Integer arithmetic and polynomials
+
+This section documents newRPL commands that are not implemented yet in DB48X.
+
+## SETPREC
+Set the current system precision
+
+
+## GETPREC
+Get the current system precision
 
 
 ## MODSTO
