@@ -129,8 +129,6 @@ bool function::is_symbolic_argument(id type, uint arg)
         return Integrate::can_be_symbolic(arg);
     case ID_Root:
         return Root::can_be_symbolic(arg);
-    case ID_MultipleEquationsSolver:
-        return MultipleEquationsSolver::can_be_symbolic(arg);
     case ID_Derivative:
         return Derivative::can_be_symbolic(arg);
     case ID_Primitive:

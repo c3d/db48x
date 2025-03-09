@@ -1035,16 +1035,6 @@ NFUNCTION_BODY(Root)
 }
 
 
-NFUNCTION_BODY(MultipleEquationsSolver)
-// ----------------------------------------------------------------------------
-//   Solve a set of equations one at a time
-// ----------------------------------------------------------------------------
-//   On DB48X, there is no difference between `MSLV` and `ROOT`
-{
-    return Root::evaluate(op, args, arity);
-}
-
-
 static algebraic_p check_name(algebraic_r x)
 // ----------------------------------------------------------------------------
 //   Check if the name exists, if so return its value, otherwise return 0
@@ -1062,10 +1052,13 @@ static algebraic_p check_name(algebraic_r x)
 }
 
 
-COMMAND_BODY(MultipleEquationsRoots)
+COMMAND_BODY(MultipleEquationsSolver)
 // ----------------------------------------------------------------------------
-//   Apply the multiple equation solver to the contents of EQ
+//   Solve a set of equations one at a time (MROOT)
 // ----------------------------------------------------------------------------
+//   On DB48X, the underlying engine for `Root` knows how to deal with multiple
+//   equations. However, the MROOT command starts with the `EQ` variable
+//   instead of the stack (compatibility with HP's implementaiton)
 {
     if (list_g eqs = expression::current_equation(true, true))
         if (list_g vars = eqs->names())
@@ -1074,6 +1067,43 @@ COMMAND_BODY(MultipleEquationsRoots)
                     return run<Root>();
     if (!rt.error())
         rt.no_equation_error();
+    return ERROR;
+}
+
+
+COMMAND_BODY(MultipleVariablesSolver)
+// ----------------------------------------------------------------------------
+//   Solve multiple equations with multiple variables (MSLV)
+// ----------------------------------------------------------------------------
+//   On DB48x, the underlying engine for `Root` knows how to deal with
+//   multiple simultaneous variables, including the case where variables
+//   are simultaneously present in multiple equations. On HP50G, this is dealt
+//   with by a separate command, `MSLV`, that behaves almost like `ROOT`,
+//   except that it leaves equations and variables on the stack.
+//   As a result, on DB48x, the only real difference between `ROOT` and `MSLV`
+//   is that the latter leaves its input on the stack, and as a result is a
+//   command and not an N-ary function
+{
+    object_p    eo      = rt.stack(2);
+    object_p    vo      = rt.stack(1);
+    object_p    go      = rt.stack(0);
+
+    algebraic_g eqs     = eo->as_algebraic_or_list();
+    algebraic_g vars    = vo->as_algebraic_or_list();
+    algebraic_g guesses = go->as_algebraic_or_list();
+
+    if (eqs && vars && guesses)
+    {
+        algebraic_g result = Root::solve(eqs, vars, guesses);
+        if (!result)
+            solver_command_error();
+        if (rt.top(+result))
+            return OK;
+    }
+    else
+    {
+        rt.type_error();
+    }
     return ERROR;
 }
 

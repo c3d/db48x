@@ -69,6 +69,7 @@ you can use the following code:
 @ Expecting [ X=0.5 Y=0.86602 54037 84 ]
 ```
 
+
 ### Algebraic isolation
 
 When possible, the numerical solver will attempt to use the `Isolate` command to
@@ -178,10 +179,30 @@ Solve the system of equations for the given variable.
 
 Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
+## MSlv
 
-## MSOLVE
-Multiple non-linear equation solver/optimization search
+On HP50G, a special command is dedicated to solving systems of equations.
 
+On DB48x, the `MSlv` command is provided for comptability. It behaves almost
+exactly like `Root`, except that it leaves the equations and variable lists on
+the stack in addition to the result.
 
-## BISECT
-Root seeking (bisection method)
+```rpl
+RAD
+[ 'sin(x)+y' 'x+sin(y)=1' ] [x y] [0 0] MSLV
+"" + + +
+@ Expecting "[ 'sin x+y' 'x+sin y=1' ][ x y ][ x=1.82384 11261 1 y=-0.96815 46361 75 ]"
+```
+
+Since `Root` on DB48x accepts a wider range of inputs and automatically detects
+when it needs to solve [systems of simultaneous equations](#jacobian-solver),
+`MSLV` will work on cases accepted on the HP50G, but will also accept other
+inputs accepted by `Root`, e.g. single variables, and will benefit from symbolic
+solving using `isol` (resulting in the generation of an angle units in the
+example below):
+
+```rpl
+DEG
+'sin(x)=0.3' x 0 MSLV
+@ Expecting x=17.45760 31237 °
+```

@@ -386,8 +386,8 @@ NAMED(Sum, "Σ")
 NAMED(Product, "∏")
 
 CMD(Root)
-CMD(MultipleEquationsSolver)
-CMD(MultipleEquationsRoots)     ALIAS(MultipleEquationsRoots, "MRoot")
+CMD(MultipleEquationsSolver)    ALIAS(MultipleEquationsSolver, "MRoot")
+CMD(MultipleVariablesSolver)    ALIAS(MultipleVariablesSolver, "MSlv")
 
 NAMED(Integrate, "∫")           ALIAS(Integrate, "∫")
 

@@ -53,14 +53,9 @@ NFUNCTION(Root,3,
                                     list_g &guesses);
           static expression_p isolate(expression_p eq, symbol_p name);
     );
-NFUNCTION(MultipleEquationsSolver,3,
-          static bool can_be_symbolic(uint a)
-          {
-              return a == 1 || a == 2;
-          }
-);
-COMMAND_DECLARE(MultipleEquationsRoots, 1);
+COMMAND_DECLARE(MultipleEquationsSolver, 1);
 
+COMMAND_DECLARE(MultipleVariablesSolver,3);
 
 COMMAND_DECLARE(StEq, 1);
 COMMAND_DECLARE(RcEq, 0);
