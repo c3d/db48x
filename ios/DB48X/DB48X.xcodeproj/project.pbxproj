@@ -808,6 +808,13 @@
 		6F10E0B52CE24B8600C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
 		6F10E0B62CE24B8600C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
 		6F10E0B72CE24B8600C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
+		6F11C9752D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C9762D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C9772D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C9782D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C9792D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C97A2D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
+		6F11C97B2D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
 		6F18F27F2C2DAC3400C8357F /* polynomial.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F18F27D2C2DAC3400C8357F /* polynomial.cc */; };
 		6F2AC36D2C63640C00C8357F /* shifts.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35B2C63640C00C8357F /* shifts.bmp */; };
 		6F2AC36E2C63640C00C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
@@ -2612,6 +2619,8 @@
 		6F10E06F2CE24B0E00C8357F /* keymap.cfg */ = {isa = PBXFileReference; lastKnownFileType = text; path = keymap.cfg; sourceTree = "<group>"; };
 		6F10E0702CE24B0E00C8357F /* legacy.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = legacy.48k; sourceTree = "<group>"; };
 		6F10E0712CE24B0E00C8357F /* true42.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = true42.48k; sourceTree = "<group>"; };
+		6F11C9732D6F76BC008AE248 /* finance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = finance.h; sourceTree = "<group>"; };
+		6F11C9742D6F76BC008AE248 /* finance.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = finance.cc; sourceTree = "<group>"; };
 		6F18F27D2C2DAC3400C8357F /* polynomial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polynomial.cc; path = ../../../src/polynomial.cc; sourceTree = "<group>"; };
 		6F18F27E2C2DAC3400C8357F /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../../src/polynomial.h; sourceTree = "<group>"; };
 		6F2AC35B2C63640C00C8357F /* shifts.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = shifts.bmp; sourceTree = "<group>"; };
@@ -3621,6 +3630,8 @@
 		6FE7EFE12B95E2F600C8357F /* Runtime */ = {
 			isa = PBXGroup;
 			children = (
+				6F11C9732D6F76BC008AE248 /* finance.h */,
+				6F11C9742D6F76BC008AE248 /* finance.cc */,
 				6FE7F0142B95E37300C8357F /* algebraic.cc */,
 				6FE7F0082B95E37300C8357F /* algebraic.h */,
 				6FE7F0372B95E37400C8357F /* arithmetic.cc */,
@@ -4430,6 +4441,7 @@
 				6FCEDA972B95F28F00C8357F /* catalog.cc in Sources */,
 				6FE7F0672B95E37400C8357F /* integer.cc in Sources */,
 				6FE7F05E2B95E37400C8357F /* expression.cc in Sources */,
+				6F11C97A2D6F76BC008AE248 /* finance.cc in Sources */,
 				6FE7F06A2B95E37400C8357F /* compare.cc in Sources */,
 				6FE7F0592B95E37400C8357F /* stack.cc in Sources */,
 				6FE7F0832B95E37400C8357F /* solve.cc in Sources */,
@@ -4524,6 +4536,7 @@
 				6F0FDB982C7934DF00C8357F /* catalog.cc in Sources */,
 				6F0FDB992C7934DF00C8357F /* integer.cc in Sources */,
 				6F0FDB9A2C7934DF00C8357F /* expression.cc in Sources */,
+				6F11C9772D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDB9B2C7934DF00C8357F /* compare.cc in Sources */,
 				6F0FDB9C2C7934DF00C8357F /* stack.cc in Sources */,
 				6F0FDB9D2C7934DF00C8357F /* solve.cc in Sources */,
@@ -4602,6 +4615,7 @@
 				6F0FDC642C7934E300C8357F /* catalog.cc in Sources */,
 				6F0FDC652C7934E300C8357F /* integer.cc in Sources */,
 				6F0FDC662C7934E300C8357F /* expression.cc in Sources */,
+				6F11C97B2D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDC672C7934E300C8357F /* compare.cc in Sources */,
 				6F0FDC682C7934E300C8357F /* stack.cc in Sources */,
 				6F0FDC692C7934E300C8357F /* solve.cc in Sources */,
@@ -4680,6 +4694,7 @@
 				6F0FDD252C7934E500C8357F /* catalog.cc in Sources */,
 				6F0FDD262C7934E500C8357F /* integer.cc in Sources */,
 				6F0FDD272C7934E500C8357F /* expression.cc in Sources */,
+				6F11C9762D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDD282C7934E500C8357F /* compare.cc in Sources */,
 				6F0FDD292C7934E500C8357F /* stack.cc in Sources */,
 				6F0FDD2A2C7934E500C8357F /* solve.cc in Sources */,
@@ -4758,6 +4773,7 @@
 				6F2AC4302C64105F00C8357F /* catalog.cc in Sources */,
 				6F2AC4312C64105F00C8357F /* integer.cc in Sources */,
 				6F2AC4322C64105F00C8357F /* expression.cc in Sources */,
+				6F11C9752D6F76BC008AE248 /* finance.cc in Sources */,
 				6F2AC4332C64105F00C8357F /* compare.cc in Sources */,
 				6F2AC4342C64105F00C8357F /* stack.cc in Sources */,
 				6F2AC4352C64105F00C8357F /* solve.cc in Sources */,
@@ -4836,6 +4852,7 @@
 				6F2AC50A2C6410F700C8357F /* catalog.cc in Sources */,
 				6F2AC50B2C6410F700C8357F /* integer.cc in Sources */,
 				6F2AC50C2C6410F700C8357F /* expression.cc in Sources */,
+				6F11C9792D6F76BC008AE248 /* finance.cc in Sources */,
 				6F2AC50D2C6410F700C8357F /* compare.cc in Sources */,
 				6F2AC50E2C6410F700C8357F /* stack.cc in Sources */,
 				6F2AC50F2C6410F700C8357F /* solve.cc in Sources */,
@@ -4914,6 +4931,7 @@
 				6FE3997B2C793FE300C8357F /* catalog.cc in Sources */,
 				6FE3997C2C793FE300C8357F /* integer.cc in Sources */,
 				6FE3997D2C793FE300C8357F /* expression.cc in Sources */,
+				6F11C9782D6F76BC008AE248 /* finance.cc in Sources */,
 				6FE3997E2C793FE300C8357F /* compare.cc in Sources */,
 				6FE3997F2C793FE300C8357F /* stack.cc in Sources */,
 				6FE399802C793FE300C8357F /* solve.cc in Sources */,
