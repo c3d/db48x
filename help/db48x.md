@@ -2745,106 +2745,6 @@ and execution can be resumed using `Continue`. These commands are available from
 the `DebugMenu`.
 
 
-## Volume of a cylinder
-
-The following programs take the values of the radius `r` and the height `h` of a
-cylinder to compute the total area of the corresponding cylinder according to
-the equation `ACyl=2·π·R↑2+2·π·R·H`. We use the symbolic constant `Ⓒπ`,
-which we convert to its numerical value using the `→Num` function.
-
-The following code stores the program in the `ACyl` variable, and then supplies
-the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
-examples, we will use `R=2_m` and `H=3_m`.
-
-### RPN style
-
-The following code computes the cylinder area using _stack RPN instructions_,
-i.e. manipulating values on the stack directly. This approach is the most
-similar to traditional HP calculators.
-
-```rpl
-« Duplicate Rot + * 2 * Ⓒπ →Num * »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-### Using global variables
-
-The following implementation computes the cylinder area using _RPN instructions_
-and global variables to store `R` and `H`. It then stores the result in a global
-variable named `A`, using the `Copy` command that copies the result from the
-stack into global variable `A` without removing it from the stack..
-
-Using global variables is rarely the most efficient, but it has the benefit that
-it leaves the inputs and output of the program avaiable for later use. This can
-be beneficial if these values are precious and should be preserved.
-
-```rpl
-«
-  'R' Store 'H' Store
-  2 Ⓒπ →Num * R * R H + *
-  'A' Copy
-»
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-Note that global variables stick around in the current directory after the
-program executes. They can be purged using `{ R H A } Purge`.
-
-### Using algebraic expressions
-
-The following example computes the cylinder area using an _algebraic expression_
-and global variables. Using algebraic expressions can make programs easier to
-read, since the operations look similar to normal mathematical expressions.
-
-```rpl
-« 'R' Store 'H' Store
-'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-### Using local variables
-
-The following example computes the cylinder area using _local variables_, which
-make it easier to reuse the same value multiple times, and do so much faster
-than global variables. The code otherwise uses regular RPN instructions.
-
-```rpl
-« → H R « 2 Ⓒπ →Num * R * R H + * » »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-Notice that when we declare local variables, the order of the arguments is the
-order in which they are given on the command line, not the order in which they
-appear on the stack. In that case, we enter `H` first, and `R` second, meaning
-that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
-`→ H R` notation instead of `→ R H`. This is the opposite order compared to the
-`Store` commands we used for global variables.
-
-### Local algebraics
-
-The following example computes the cylinder area using _local variables_, along
-with an _algebraic expression_.
-
-```rpl
-« → H R '2*→Num(Ⓒπ)*R*(R+H)' »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
 ## Volume of a sphere
 
 The following program computes the volume of a sphere given the radius put on
@@ -2903,6 +2803,35 @@ SPH
 @ Expecting 254.46900 4941
 ```
 
+## Viewing and editing programs
+
+You view and edit programs the same way you view and edit other objects, using
+the command line.
+
+### Edit from level 1
+
+To view or edit a program placed in level 1 on the stack, use the _▶_ key to
+place the program in the text editor. Then edit it normally, and press _ENTER_
+to put it back on the stack, or _EXIT_ to close the text editor leaving the
+program unmodified on the stack.
+
+### Edit from the stack
+
+To view or edit a program placed at some other level on the stack, first enter
+the [interactive stack](#interactive-stack) using the _◀︎_ key, and then moving
+up and down using the _◀︎_ and _▶_ keys. Then use the _F6_ key to edit the
+program. After editing the program, you can validate the modifications with the
+_ENTER_ key, or cancel the changes with the _EXIT_ key.
+
+### Edit from variables
+
+When a program is placed in a variable, you need to recall it first to place
+it on the stack, and then store it back. To that effect, you can use the
+`Recall` and `Store` commands with a name on the stack. A faster way is to use
+the `VariablesMenu`, which you can access using the _VAR_ key. Using 🟨 and a
+function key recalls the corresponding variable. Using 🟦 and a function key
+stores into the corresponding variable.
+
 ## Creating programs on a computer
 
 It is convenient to create programs and other objects on a computer and then
@@ -2951,6 +2880,233 @@ SWAP SQ
 You can check when you enter this program from the help file that all the
 `@@` comments at the top are removed, while the `@` comments in the middle
 remain in the resulting program.
+
+
+## Using local variables
+
+The program SPH in the previous example uses global variables for data storage
+and recall. There are disadvantages to using global variables in programs:
+
+* After program execution, global variables that you no longer need to use must
+be purged if you want to clear the `VariablesMenu` (_VAR_ key) and free user
+memory.
+
+* You must explicitly store data in global variables prior to program execution,
+  or have the program execute `STO`.
+
+*Local variables* address the disadvantages of global variables in
+programs. Local variables are temporary variables *created by a program*.
+They exist only while the program is being executed and cannot be used outside
+the program.  They never appear in the `VariablesMenu` (_VAR_ key).
+In addition, local variables are accessed faster than global variables, with a
+cost very similar to a stack access, and they generally require use less memory.
+
+### Creating Local Variables
+
+In a program, a [local variable structure](#local-variable) creates local
+variables.  To enter a local variable structure in a program, the fastest method
+is to use the `ProgramMenu` (🟨 _3_), and then the `→  «»` data entry key
+(_F4_). To enter a local variable structure for an algebraic expression, use the
+`→  ''` data entry key instead (_F5_).
+
+On the right of the `→` symbol, use the names of the local variables, separated
+by spaces. Then, inside `«»`, enter an RPL program that uses the local
+variables, or alternatively, inside `''`, enter an algebraic expression.
+
+For example, if the stack contains `10` in level 3, `6` in level 2 and `20` in
+level 1, then:
+
+* `→ a « a a ^ »` or `→ a 'a^a'` will execute with `a` containing `20`, and then
+  compute evaluate `20^20`, i.e. `104 857 600 000 000 000 000 000 000`.
+
+* `→ a b « a b ^ »` or `→ a b 'a^b'` will execute with `a` containing `6`, and
+  `b` containing `20`, then compute evaluate `6^20`, i.e.
+  `3 656 158 440 062 976`.
+
+* `→ a b c « a b ^ c + »` or `→ a b c 'a^b+c'` will execute with `a` containing
+  `10`, `b` containing `6` and `c` containing `20`, then compute evaluate
+  `10^6+20`, i.e.  `1 000 020`.
+
+### Advantages of Local Variables
+
+Local variable structures have these advantages:
+
+* The `→` command stores the values from the stack in the corresponding
+  variables: you don’t need to explicitly execute `STO`.
+
+* Local variables automatically disappear when the defining procedure for which
+  they are created has completed execution. Consequently, local variables don’t
+  appear in the `VariablesMenu`, and they occupy user memory only during program
+  execution.
+* Local variables exist only within their defining structure. Different local
+  variable structures can use the same variable names without conflict,
+  including in the same program.
+* Local variables consume less memory than a global variable, both in a program
+  and in memory.
+
+### Memory Usage Comparison
+
+Each global variable name with `n` characters uses `n+2` bytes (assuming `n` is
+less than 128). An additional `n+2` bytes are also used in the directory
+containing the global variable. If a program uses a global variable `VOLUME`
+three times, that's 24 bytes of memory in the program, and 8 additional bytes
+in the directory.
+
+Each local variable name with `n` characters uses `n+1` bytes in the local
+variables structure, an additional 4 bytes of temporary storage, and each
+reference in a program uses two bytes (assuming there are less than 128 local
+variables). If a program uses a local variable `volume` three times, that's 13
+bytes of memory in the program (insstead of 24) and 4 bytes in temporary storage
+(instead of 8).
+
+
+### Spherical cap using local variables
+
+The following program SPHLV calculates the volume of a spherical cap using local
+variables. The defining procedure is an algebraic expression.
+
+```rpl
+«
+  @@ Creates local variables r and h for the radius
+  @@ of the sphere and height of the cap.
+  @@ Expresses the defining procedure. In this
+  @@ program, the defining procedure for the local
+  @@ variable structure is an algebraic expression.
+  → r h
+  '1/3*Ⓒπ*h^2*(3*r-h)'
+
+  @@ Converts expression to a number.
+  →NUM
+»
+'SPHLV' STO
+@ Save for later use
+```
+
+Now, we can use `SPHLV` to calculate the volume of a spherical cap of radius
+`r=10` and height `h=3`. We enter the data on the stack in the correct order,
+then execute the program either by name or by pressing the corresponding
+unshifted key in the `VariablesMenu`:
+
+```rpl
+10 3 SPHLV
+@ Expecting 254.46900 4941
+```
+
+
+### Evaluating Local Names
+
+On DB48x, local names evaluate just like global names.
+
+By contrast, on HP calculators, local names are evaluated differently from
+global names. When a global name is evaluated, the object stored in the
+corresponding variable is itself evaluated. When a local name is evaluated on HP
+calculators, the object stored in the corresponding variable is returned to the
+stack but is not evaluated. When a local variable contains a number, the effect
+is identical to evaluation of a global name, since putting a number on the stack
+is equivalent to evaluating it. However, if a local variable contains a program,
+algebraic expression, or global variable name, and if you want it evaluated,
+programs on HP calculators would typically execute `EVAL` after the object is
+put on the stack. This is not necessary on DB48x.
+
+## Volume of a cylinder
+
+The following programs take the values of the radius `r` and the height `h` of a
+cylinder to compute the total area of the corresponding cylinder according to
+the equation `ACyl=2·π·R↑2+2·π·R·H`. We use the symbolic constant `Ⓒπ`,
+which we convert to its numerical value using the `→Num` function.
+
+The following code stores the program in the `ACyl` variable, and then supplies
+the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
+examples, we will use `R=2_m` and `H=3_m`.
+
+### ACyl: RPN style
+
+The following code computes the cylinder area using _stack RPN instructions_,
+i.e. manipulating values on the stack directly. This approach is the most
+similar to traditional HP calculators.
+
+```rpl
+« Duplicate Rot + * 2 * Ⓒπ →Num * »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### ACyl: Using global variables
+
+The following implementation computes the cylinder area using _RPN instructions_
+and global variables to store `R` and `H`. It then stores the result in a global
+variable named `A`, using the `Copy` command that copies the result from the
+stack into global variable `A` without removing it from the stack..
+
+Using global variables is rarely the most efficient, but it has the benefit that
+it leaves the inputs and output of the program avaiable for later use. This can
+be beneficial if these values are precious and should be preserved.
+
+```rpl
+«
+  'R' Store 'H' Store
+  2 Ⓒπ →Num * R * R H + *
+  'A' Copy
+»
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Note that global variables stick around in the current directory after the
+program executes. They can be purged using `{ R H A } Purge`.
+
+### ACyl: Using algebraic expressions
+
+The following example computes the cylinder area using an _algebraic expression_
+and global variables. Using algebraic expressions can make programs easier to
+read, since the operations look similar to normal mathematical expressions.
+
+```rpl
+« 'R' Store 'H' Store
+'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### ACyl: Using local variables
+
+The following example computes the cylinder area using _local variables_, which
+make it easier to reuse the same value multiple times, and do so much faster
+than global variables. The code otherwise uses regular RPN instructions.
+
+```rpl
+« → H R « 2 Ⓒπ →Num * R * R H + * » »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Notice that when we declare local variables, the order of the arguments is the
+order in which they are given on the command line, not the order in which they
+appear on the stack. In that case, we enter `H` first, and `R` second, meaning
+that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
+`→ H R` notation instead of `→ R H`. This is the opposite order compared to the
+`Store` commands we used for global variables.
+
+### ACyl: Local algebraics
+
+The following example computes the cylinder area using _local variables_, along
+with an _algebraic expression_.
+
+```rpl
+« → H R '2*→Num(Ⓒπ)*R*(R+H)' »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
 # Release notes
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
