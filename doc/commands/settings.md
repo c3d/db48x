@@ -245,6 +245,8 @@ Display names using the short form capitalized, for example `varName` will show 
 
 Display names using the long form, for example `varName` will show as `varName`.
 
+
+
 # Decimal separator settings
 
 The decimal separator can be either a dot (`1.23`) or a comma (`1,23`).
@@ -256,6 +258,8 @@ Select the dot as a decimal separator, e.g.  `1.23`
 ## DecimalComma
 
 Select the comma as a decimal separator, e.g.  `1,23`
+
+
 
 # Precision settings
 
@@ -274,6 +278,27 @@ for the computation of transcendental functions.
 Set the number of digits that can be ignored when solving. The default value is
 6, meaning that if the current precision is 24, we only solve to an accuracy of
 18 digits (i.e. 24-6).
+
+See also `IntegrationImprecision`
+
+## MaxNumberBits
+
+Define the maxmimum number of bits for numbers.
+
+Large integer operations can take a very long time, notably when displaying them
+on the stack. With the default value of 1024 bits, you can compute `100!` but
+computing `200!` will result in an error, `Number is too big`. You can however
+compute it seting a higher value for `MaxNumberBits`, for example
+`2048 MaxNumberBits`.
+
+This setting applies to integer components in a number. In other words, it
+applies separately for the numerator and denominator in a fraction, or for the
+real and imaginary part in a complex number. A complex number made of two
+fractions can therefore take up to four times the number of bits specified by
+this setting.
+
+
+
 
 # Base settings
 
@@ -323,6 +348,12 @@ Return the current [word size](#wordsize) in bits.
 `RCWS` is a compatibility spelling for the [RecallWordSize](#recallwordsize)
 command.
 
+
+# Command tuning
+
+Various settings can be used to tune specific commands.
+See also `IntegrationIterations`
+
 ## MaxRewrites
 
 Defines the maximum number of rewrites in an equation.
@@ -330,22 +361,6 @@ Defines the maximum number of rewrites in an equation.
 [Equations rewrites](#rewrite) can go into infinite loops, e.g. `'X+Y' 'A+B'
 'B+A' rewrite` can never end, since it keeps rewriting terms. This setting
 indicates how many attempts at rewriting will be done before erroring out.
-
-## MaxNumberBits
-
-Define the maxmimum number of bits for numbers.
-
-Large integer operations can take a very long time, notably when displaying them
-on the stack. With the default value of 1024 bits, you can compute `100!` but
-computing `200!` will result in an error, `Number is too big`. You can however
-compute it seting a higher value for `MaxNumberBits`, for example
-`2048 MaxNumberBits`.
-
-This setting applies to integer components in a number. In other words, it
-applies separately for the numerator and denominator in a fraction, or for the
-real and imaginary part in a complex number. A complex number made of two
-fractions can therefore take up to four times the number of bits specified by
-this setting.
 
 ## →QIterations
 
@@ -365,6 +380,27 @@ Various user-interface aspects can be customized, including the appearance of
 Soft-key menus. Menus can show on one or three rows, with 18 (shifted) or 6
 (flat) functions per page, and there are two possible visual themes for the
 labels, rounded or square.
+
+## Header
+
+This command can be used to define a program that is evaluated when drawing the
+header, i.e. what is shown above the stack. The header should be returned as a
+text, and leave room for the battery to display.
+
+For example, the following shows the current time, the current path, the date
+and free memory in a two-line header, with a 10 second `CustomHeaderRefresh`.
+
+```rpl
+« TIME " " PATH TAIL TOTEXT + + "
+" + DATE + " Mem: " + MEM + »
+HEADER
+10000 CustomHeaderRefresh
+```
+
+## CustomHeaderRefresh
+
+This setting indicates how frequently a custom `Header` should be evaluated. The
+time interval is expressed in milliseconds.
 
 ## ThreeRowsMenus
 
@@ -540,7 +576,6 @@ contain zeros after the 12th digit. The reason is that 64 bits of randomness
 corresponds to only 20 digits, which is less than the default 24-digits
 precision of DB48X.
 
-
 ## RandomGeneratorOrder
 
 Define the order of the ACORN random number generator, i.e. the value called `k`
@@ -616,6 +651,9 @@ An error during a program enters the debugger, letting you correct the problem
 before resuming execution. This is the default setting.
 
 
+# Evaluation settings
+
+
 ## SaveLastArguments
 
 Save last arguments when evaluating commands interactively.
@@ -638,6 +676,9 @@ and is disabled by default (`NoProgramLastArguments`).
 Disable the saving of command arguments during program execution.
 If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
+
+
+
 
 
 # States

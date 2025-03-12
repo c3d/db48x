@@ -685,7 +685,7 @@ cstring setting::label(object::id ty)
     case ID_SolverIterations:
         return printf("Slv#%u", s.SolverIterations());
     case ID_CustomHeaderRefresh:
-        return printf("Header %u", s.CustomHeaderRefresh());
+        return printf("HdrRefrsh %ums", s.CustomHeaderRefresh());
     case ID_BusyIndicatorRefresh:
         return printf("Busy %u", s.BusyIndicatorRefresh());
     case ID_MinimumBatteryVoltage:
@@ -702,6 +702,8 @@ cstring setting::label(object::id ty)
         return printf("Txt%uB", s.TextRenderingSizeLimit());
     case ID_GraphRenderingSizeLimit:
         return printf("Grph%uB", s.GraphRenderingSizeLimit());
+    case ID_PlotRefreshRate:
+        return printf("Plot%ums", s.PlotRefreshRate());
     default:
         break;
     }
