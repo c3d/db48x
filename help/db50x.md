@@ -3016,6 +3016,117 @@ algebraic expression, or global variable name, and if you want it evaluated,
 programs on HP calculators would typically execute `EVAL` after the object is
 put on the stack. This is not necessary on DB48x.
 
+
+### Defining the Scope of Local Variables
+
+Local variables exist _only_ inside the defining procedure.
+
+The following program excerpt illustrates the availability of local variables in
+nested defining procedures (procedures within procedures). Because local
+variables `a`, `b`, and `c` already exist when the defining procedure for local
+variables `d`, `e`, and `f` is executed, they’re available for use in that
+procedure.
+
+```rpl
+«
+  → a b c «
+    a b + c +
+    → d e f 'a/(d*e+f)'
+    a c / -
+ »
+»
+'Nested' STO
+
+'X' 'Y' 'Z' 'T' 'U' Nested
+@ Expecting 'Z÷(X·Y+Z+T+U)-Z÷U'
+```
+
+In the following program excerpt, the defining procedure for local variables
+`d`, `e`, and `f` calls a program that you previously created and stored in
+global variable `P1`.
+
+
+```rpl
+«
+  a b - c * → d e f '(a+d)/(d*e+f)' a c / -
+»
+'P1' STO
+
+«
+  → a b c « a b + c + → d e f 'P1+a/(d*e+f)' a c / - »
+»
+'Nested' STO
+
+'X' 'Y' 'Z' 'T' 'U' 'V' 'W' Nested
+@ Expecting '(a+X)÷(X·Y+(a-b)·c)+U÷(Z·T+U+V+W)-a÷c-U÷W'
+```
+
+The six local variables `a`, `b`, `c`, `d`, `e` and `f` are not available in
+program `P1` because they didn’t exist when you created `P1`. Consequently, `a`
+in `P1` evaluates as itself. The objects stored in the local variables are
+available to program `P1` only if you put those objects on the stack for `P1` to
+use or store those objects in global variables.  Conversely, program `P1` can
+create its own local variable structure (with any names, such as `d`, `e`, and
+`f`, for example) without conflicting with the local variables of the same name
+in the procedure that calls `P1`.
+
+
+### User-defined functions
+
+A program that consists solely of a local variable structure whose defining
+procedure is an algebraic expression is a user-defined function. It can be used
+in an algebraic expression like a built-in function.
+
+```rpl
+« → x y 'x+2*y/x'» 'MyFN' STO
+'MyFN(A;B)' EVAL
+@ Expecting 'A+2·B÷A'
+```
+
+### Compiled Local Variables
+
+DB48x does not support compiled local variables.
+
+On the HP50G, it is possible to create a special type of local variable that can
+be used in other programs or subroutines. This type of local variable is called
+a *compiled local variable*.
+
+Compiled local variables have a special naming convention: they must begin with
+a `←`. For example, in the code below, the variable `←y` is a compiled local
+variable that can be used in the two programs `BELOW` and `ABOVE`.
+
+```rpl
+« ←y " is negative" + »
+'BELOW' STO
+« ←y " is positive" + »
+'ABOVE' STO
+
+« → ←y 'IFTE(←y<0;BELOW;ABOVE)' »
+'Incompatible' STO
+-33 Incompatible
+
+@ Expecting "'←y' is negative"
+@ HP50G: "-33 is negative"
+```
+
+The rationale for not supporting them is that they sound like a complex
+non-solution to a simple non-problem, encouraging a terrible programming style.
+The above example is trivially rewritten using user-defined functions as
+follows:
+
+```rpl
+« → y « y " is negative" + » »
+'BELOW' STO
+« → y « y " is positive" + » »
+'ABOVE' STO
+
+« → y 'IFTE(y<0;BELOW(y);ABOVE(y))' »
+'Compatible' STO
+-33 Compatible
+
+@ Expecting "-33 is negative"
+```
+
 ## Volume of a cylinder
 
 The following programs take the values of the radius `r` and the height `h` of a
@@ -3026,6 +3137,8 @@ which we convert to its numerical value using the `→Num` function.
 The following code stores the program in the `ACyl` variable, and then supplies
 the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
 examples, we will use `R=2_m` and `H=3_m`.
+
+See also the [cylinder](#cylinder) entry in the equation library.
 
 ### ACyl: RPN style
 
@@ -3115,6 +3228,9 @@ with an _algebraic expression_.
 3_m 2_m ACyl
 @ Expecting 62.83185 30718 m↑2
 ```
+
+
+## Using Tests and Conditional Structures
 # Release notes
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
