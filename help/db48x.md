@@ -3223,6 +3223,116 @@ with an _algebraic expression_.
 
 
 ## Using Tests and Conditional Structures
+
+You can use commands and branching structures that let programs ask questions
+and make decisions. _Comparison functions_ and _logical functions_ test whether
+or not specified conditions exist. _Conditional structures_ and _conditional
+commands_ use test results to make decisions.
+
+### Testing conditions
+
+A test is an algebraic or a command sequence that returns a test result to the
+stack. A test result is either `True` or `False`. Alternatively, a non-zero
+numerical value is interpreted as `True`, and a zero numerical value is
+interpreted as `False`.
+
+Note: This is a difference from HP calculators, where a test returns `0` or `1`.
+
+#### To include a test in a program
+
+Tests can be entered using the stack or algebraic syntax.
+
+To use the stack syntax, enter the two arguments then enter the test command.
+
+```rpl
+2 3 >
+@ Expecting False
+```
+
+To use algebraic syntax, enter the test expression between single quotes:
+
+```rpl
+'2<3'
+@ Expecting True
+```
+
+You often use test results in conditional structures to determine which clause
+of the structure to execute.  Conditional structures are described under
+[Using Conditional Structures and Commands](#using-conditional-structures-and-commands).
+
+
+#### Using comparisoin functions
+
+Comparision functions compare two objects, and are most easily accessed from the
+`TestsMenu` (🟦 _3_):
+
+* `=`: value equality
+* `==`: representation equality
+* `≠`: value inequality
+* `<`: less than
+* `≤`: less than or equal to
+* `>`: greater than
+* `≥`: greater than or equal to
+* `Same`: object identity
+
+When used in stack syntax, the order of comparison is `level2` _test_ `level1`,
+where _test_ is the comparison function, and where `level2` and `level1`
+represent the values in stack levels 2 and 1 respectively.
+
+
+#### Equality comparisons
+
+There are three functions that compare if two objects are equal, `=`, `==` and
+`same`. They play slightly different roles, corresponding to different use
+cases.
+
+The `=` function tests _value_ equality of two objects, irrespective of their
+representation. This is typically the operation you would use if you are
+interested in the mathematical aspect of equality. For example, integer and
+decimal numbers with the same values are considered as equal by `=` if their
+value is the same.
+
+```rpl
+'1=1.'
+@ Expecting True
+```
+
+The `==` function, by contrast, tests _representation_ equality of two objects,
+i.e. that two objects have the same internal structure. This function will
+distinguish two objects that do not have the same type, even if their numerical
+value is the same.
+
+```rpl
+'1==1.'
+@ Expecting False
+```
+
+The `same` function, finally, tests _identity_ of two objects. It differs from
+`==` in that it does not even attempt to evaluate names.
+
+```rpl
+2 'A' STO
+2 'B' STO
+'A' 'B' == EVAL
+'A==B' EVAL
+'A' 'B' SAME EVAL
+3 →List
+@ Expecting { True True False }
+```
+
+
+#### Differences with HP regarding equality tests
+
+The DB48x `=` operator differs from HP calculators, that use `=` only to build
+equations. As a result, `2=3` returns `False` on DB48x, but evaluates as `2=3`
+on HP50G, and as `-1` (i.e. `2-3`) if using `→Num`. For numerical values, `=`
+on DB48x behaves roughly like `==` on HP50G, e.g. `1=1.` returns `True` just
+like `1==1.` returns `1` on HP50G.
+
+The DB48x `==` comparison is roughly equivalent to `SAME`, except that it
+evaluates names. In other words, `A==B` returns `True` if variables `A` and `B`
+contain identical objects, whereas `SAME(A,B)` returns `False` because the names
+are different.
 # Release notes
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
