@@ -2714,6 +2714,16 @@ void tests::logical_operations()
 
     step("Restore word size")
         .test(CLEAR, "'WordSize' PURGE", ENTER).noerror();
+
+    step("Logical with symbolic values")
+        .test(CLEAR, "'X' 'Y' AND", ENTER)
+        .expect("'X and Y'")
+        .test(CLEAR, "2 'Y' OR", ENTER)
+        .expect("'2 or Y'")
+        .test(CLEAR, "'X' 2 XOR", ENTER)
+        .expect("'X xor 2'")
+        .test(CLEAR, "'X' NOT", ENTER)
+        .expect("'not X'");
 }
 
 
@@ -11408,8 +11418,9 @@ void tests::regression_checks()
         .expect("3.41528 61889 6⁳¹³⁰²⁸∡0°");
     test(CLEAR, "0+30000.ⅈ tan", ENTER).expect("1∡90°");
 
-    step("Bug 272: Type error on logical operations");
-    test(CLEAR, "'x' #2134AF AND", ENTER).error("Bad argument type");
+    step("Bug 272: Type error on logical operations")
+        .test(CLEAR, "{ x } #2134AF AND", ENTER).error("Bad argument type")
+        .test(CLEAR, "'x' #2134AF AND", ENTER).expect("'x and #21 34AF₁₆'");
 
     step("Bug 277: 1+i should have positive arg");
     test(CLEAR, "1+1ⅈ arg", ENTER).expect("45 °");

@@ -1,3 +1,4 @@
+
 // ****************************************************************************
 //  logical.cc                                                    DB48X project
 // ****************************************************************************
@@ -30,6 +31,7 @@
 #include "logical.h"
 
 #include "decimal.h"
+#include "expression.h"
 #include "integer.h"
 
 
@@ -37,7 +39,8 @@ RECORDER(logical, 16, "Logical operations");
 RECORDER(logical_error, 16, "Errors during logical operations");
 
 
-object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
+object::result logical::evaluate(id ty,
+                                 binary_fn native, big_binary_fn big, bool num)
 // ----------------------------------------------------------------------------
 //   Evaluation for binary logical operations
 // ----------------------------------------------------------------------------
@@ -56,6 +59,15 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
 
     id xt = x->type();
     id yt = y->type();
+
+    if (is_symbolic(xt) || is_symbolic(yt))
+    {
+        x = expression::make(ty, y, x);
+        if (x && rt.drop() && rt.top(x))
+            return OK;
+        return ERROR;
+    }
+
     if (is_integer(yt) && is_integer(xt))
         num = true;
 
@@ -164,7 +176,8 @@ object::result logical::evaluate(binary_fn native, big_binary_fn big, bool num)
 }
 
 
-object::result logical::evaluate(unary_fn native, big_unary_fn big, bool num)
+object::result logical::evaluate(id ty,
+                                 unary_fn native, big_unary_fn big, bool num)
 // ----------------------------------------------------------------------------
 //   Evaluation for unary logical operations
 // ----------------------------------------------------------------------------
@@ -174,6 +187,15 @@ object::result logical::evaluate(unary_fn native, big_unary_fn big, bool num)
         return ERROR;
 
     id   xt  = x->type();
+
+    if (is_symbolic(xt))
+    {
+        x = expression::make(ty, x);
+        if (x && rt.top(x))
+            return OK;
+        return ERROR;
+    }
+
     bool neg = xt == ID_neg_integer || xt == ID_neg_bignum;
     switch (xt)
     {
