@@ -354,8 +354,7 @@ object::result comparison::is_same(bool names)
         if (xs == ys)
             same = memcmp(x, y, xs) == 0;
     }
-    rt.pop();
-    rt.pop();
+    rt.drop(2);
     id type = same ? ID_True : ID_False;
     if (rt.push(command::static_object(type)))
         return OK;
