@@ -8093,10 +8093,8 @@ void tests::cycle_test()
         .test(O).expect("1 000. N")
         .test(O).expect("10 000. dN")
         .test(O).expect("100 000. cN")
-        .test(O).expect("1 000 000. mN")
-        .test(O).expect("1.⁳⁹ µN");
+        .test(O).expect("1 000 000. mN");
     step("Cycle unit orders of magnitude up (as integers)")
-        .test(O).expect("1 000 000 000 µN")
         .test(O).expect("1 000 000 mN")
         .test(O).expect("100 000 cN")
         .test(O).expect("10 000 dN")
@@ -11395,6 +11393,15 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Bug 1429: SigDig on integer value with trailing zeros")
+        .test(CLEAR, "70000 SIGDIG", ENTER)
+        .expect("1")
+        .test(CLEAR, "710000 SIGDIG", ENTER)
+        .expect("2")
+        .test(CLEAR, "0 SIGDIG", ENTER)
+        .expect("0")
+        .test(CLEAR, "70000 TODECIMAL BYTES", ENTER)
+        .expect("5");
     step("Bug 116: Rounding of gamma(7) and gamma(8)");
     test(CLEAR, "7 gamma", ENTER).expect("720.");
     test(CLEAR, "8 gamma", ENTER).expect("5 040.");

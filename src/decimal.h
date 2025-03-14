@@ -132,6 +132,11 @@ struct decimal : algebraic
     //   Constructor from (unsigned) integer value
     // ------------------------------------------------------------------------
     {
+        while (value && value % 10 == 0)
+        {
+            value /= 10;
+            exp++;
+        }
         Int  copy = value;
         Int  mul  = 1000;
         Int  div  = 1;
@@ -165,6 +170,11 @@ struct decimal : algebraic
     static size_t required_memory(id type, Int value, large exp = 0)
     {
         size_t iexp = 0;
+        while (value && value % 10 == 0)
+        {
+            value /= 10;
+            exp++;
+        }
         while (value)
         {
             iexp += 1;
