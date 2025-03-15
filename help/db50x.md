@@ -2793,7 +2793,7 @@ The following is the same program using an algebraic expression for readability:
 
 Instead of local variables, a program can take input from global variables.
 The following program, `SPH`, calculates the volume of a spherical cap of height
-_h_ within a sphere of radius _R_ using values stored in variables `H` and `R`.
+*h* within a sphere of radius *R* using values stored in variables `H` and `R`.
 We can then use assignments like `R=10` and `H=3` to set the values before we
 run the program.
 
@@ -2858,7 +2858,7 @@ named `STATE/Demo.48s` that comes with the DB48x distribution.
 
 ### Comments
 
-If you are creating programs on a computer, you can include _comments_ in the
+If you are creating programs on a computer, you can include *comments* in the
 computer version of the program. Comments are free text annotations that a
 programmer can add to document a program.
 
@@ -3026,7 +3026,7 @@ put on the stack. This is not necessary on DB48x.
 
 ### Defining the Scope of Local Variables
 
-Local variables exist _only_ inside the defining procedure.
+Local variables exist *only* inside the defining procedure.
 
 The following program excerpt illustrates the availability of local variables in
 nested defining procedures (procedures within procedures). Because local
@@ -3149,7 +3149,7 @@ See also the [cylinder](#cylinder) entry in the equation library.
 
 ### ACyl: RPN style
 
-The following code computes the cylinder area using _stack RPN instructions_,
+The following code computes the cylinder area using *stack RPN instructions*,
 i.e. manipulating values on the stack directly. This approach is the most
 similar to traditional HP calculators.
 
@@ -3163,7 +3163,7 @@ similar to traditional HP calculators.
 
 ### ACyl: Using global variables
 
-The following implementation computes the cylinder area using _RPN instructions_
+The following implementation computes the cylinder area using *RPN instructions*
 and global variables to store `R` and `H`. It then stores the result in a global
 variable named `A`, using the `Copy` command that copies the result from the
 stack into global variable `A` without removing it from the stack..
@@ -3189,7 +3189,7 @@ program executes. They can be purged using `{ R H A } Purge`.
 
 ### ACyl: Using algebraic expressions
 
-The following example computes the cylinder area using an _algebraic expression_
+The following example computes the cylinder area using an *algebraic expression*
 and global variables. Using algebraic expressions can make programs easier to
 read, since the operations look similar to normal mathematical expressions.
 
@@ -3204,7 +3204,7 @@ read, since the operations look similar to normal mathematical expressions.
 
 ### ACyl: Using local variables
 
-The following example computes the cylinder area using _local variables_, which
+The following example computes the cylinder area using *local variables*, which
 make it easier to reuse the same value multiple times, and do so much faster
 than global variables. The code otherwise uses regular RPN instructions.
 
@@ -3225,8 +3225,8 @@ that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
 
 ### ACyl: Local algebraics
 
-The following example computes the cylinder area using _local variables_, along
-with an _algebraic expression_.
+The following example computes the cylinder area using *local variables*, along
+with an *algebraic expression*.
 
 ```rpl
 « → H R '2*→Num(Ⓒπ)*R*(R+H)' »
@@ -3237,12 +3237,12 @@ with an _algebraic expression_.
 ```
 
 
-## Using Tests and Conditional Structures
+## Tests and Conditional Structures
 
 You can use commands and branching structures that let programs ask questions
-and make decisions. _Comparison functions_ and _logical functions_ test whether
-or not specified conditions exist. _Conditional structures_ and _conditional
-commands_ use test results to make decisions.
+and make decisions. *Comparison functions* and *logical functions* test whether
+or not specified conditions exist. *Conditional structures* and
+*conditional commands* use test results to make decisions.
 
 ### Testing conditions
 
@@ -3276,7 +3276,7 @@ of the structure to execute.  Conditional structures are described under
 [Using Conditional Structures and Commands](#using-conditional-structures-and-commands).
 
 
-#### Using comparisoin functions
+### Comparison Functions
 
 Comparision functions compare two objects, and are most easily accessed from the
 `TestsMenu` (🟦 _3_):
@@ -3290,18 +3290,77 @@ Comparision functions compare two objects, and are most easily accessed from the
 * `≥`: greater than or equal to
 * `Same`: object identity
 
-When used in stack syntax, the order of comparison is `level2` _test_ `level1`,
-where _test_ is the comparison function, and where `level2` and `level1`
-represent the values in stack levels 2 and 1 respectively.
+When used in stack syntax, the order of comparison is `level2` *test* `level1`,
+where *test* is the comparison function, and where `level2` and `level1`
+represent the values in stack levels 2 and 1 respectively. Inside algebraic
+expressions, the test is placed between the two values, e.g. `'X<5'`.
 
+The comparison commands all return `True` or `False`, although when used for
+testing purpose, e.g. in an `IFTE` command, non-zero numerical values are
+interpreted as `True`, and zero numerical values are interpreted as false. For
+example, the following code will interpret `42` as `True` and `0+0ⅈ` as `False`.
 
-#### Equality comparisons
+```rpl
+IF 42 THEN
+    'IFTE(0+0ⅈ;"KO";"OK")' EVAL
+ELSE
+    "WRONG!"
+END
+@ Expecting "OK"
+```
+
+All comparisons except `Same` return the following:
+
+* If neither object is an algebraic or a name, return `True` if the two objects
+  are the same type and have values that compare according to the operation, or
+  `False` otherwise. Lists, arrays and text are compared in lexicographic order.
+  Programs can only be compared with `==` or `Same`, order comparisons will
+  error out with `Bad argument type`.
+* If one object is algebraic or name, and the other object is an algebraic, name
+  or number, then the command returns an expression that must be evaluated to
+  get a test result based on numeric value. This evalution is automatic if the
+  resulting expression is used as a test in a conditional statement such as
+  `IF THEN ELSE END`.
+
+For example, `'X' 5 <` returns `'X<5'`:
+
+```rpl
+'X' 5 <
+@ Expecting 'X<5'
+```
+
+if `6` is stored in `X`, then this evaluates as `False`:
+
+```rpl
+X=6
+'X' 5 < EVAL
+@ Expecting False
+```
+
+This evaluation is automatic inside a conditional statement:
+
+```rpl
+X=6
+IF 'X' 5 > THEN "OK" ELSE "KO" END
+@ Expecting "OK"
+```
+
+### Equality comparisons
 
 There are three functions that compare if two objects are equal, `=`, `==` and
 `same`. They play slightly different roles, corresponding to different use
 cases.
 
-The `=` function tests _value_ equality of two objects, irrespective of their
+Inside an algebraic expression, `=` creates an equation that can be
+used in the solver or in `Isol`, but also evaluates as numerical equality
+(unlike HP calculators). This would be the case for `'sin X=0.5'`. Finally, the
+`==` command is used for non-numerical comparisons.
+
+Note that `=` on the command-line creates an [assignment object](#assignment),
+e.g. `X=6`, which is a DB48x extension to RPL used notably in the examples for
+the [equations library](#equations-library).
+
+The `=` function tests *value* equality of two objects, irrespective of their
 representation. This is typically the operation you would use if you are
 interested in the mathematical aspect of equality. For example, integer and
 decimal numbers with the same values are considered as equal by `=` if their
@@ -3312,7 +3371,7 @@ value is the same.
 @ Expecting True
 ```
 
-The `==` function, by contrast, tests _representation_ equality of two objects,
+The `==` function, by contrast, tests *representation* equality of two objects,
 i.e. that two objects have the same internal structure. This function will
 distinguish two objects that do not have the same type, even if their numerical
 value is the same.
@@ -3322,7 +3381,7 @@ value is the same.
 @ Expecting False
 ```
 
-The `same` function, finally, tests _identity_ of two objects. It differs from
+The `same` function, finally, tests *identity* of two objects. It differs from
 `==` in that it does not even attempt to evaluate names.
 
 ```rpl
@@ -3335,8 +3394,7 @@ The `same` function, finally, tests _identity_ of two objects. It differs from
 @ Expecting { True True False }
 ```
 
-
-#### Differences with HP regarding equality tests
+#### Equality: Differences with HP
 
 The DB48x `=` operator differs from HP calculators, that use `=` only to build
 equations. As a result, `2=3` returns `False` on DB48x, but evaluates as `2=3`
@@ -3348,6 +3406,95 @@ The DB48x `==` comparison is roughly equivalent to `SAME`, except that it
 evaluates names. In other words, `A==B` returns `True` if variables `A` and `B`
 contain identical objects, whereas `SAME(A,B)` returns `False` because the names
 are different.
+
+
+### Using Logical Functions
+
+Logical functions return a test result based on the outcomes of one or two
+previously executed tests. Note that these functions interpret any
+*nonzero numerical argument* as a true result, with the important exception that
+if the two arguments are integers, then the operation is performed bitwise.
+For non-based integers, this [deviates from HP calculators](#evaluation), and
+can be changed with the `TruthLogicForIntegers` flag.
+
+* `and` returns `True` only if both arguments are true
+* `or` returns `True` if either or both arguments are true
+* `xor` returns `True` if either argument, but not both, is true
+* `not` returns `True` if its argument is false
+* `nand` returns the `not` of `and`
+* `nor` returns the `not` of `and`
+* `implies` returns `True` if `not` the first argument `or` the other
+  (i.e. if the first result logically implies the other)
+* `equiv` returns the `not` of `xor`, i.e. it returns `True` iff the two
+  arguments are logically equivalent.
+* `excludes` returns `True` if the first one is true and `not` the second one,
+  i.e. if the first result excludes the second one.
+
+`AND`, `OR`, and `XOR` combine two test results. For example, if `4` is stored
+in `Y`, `Y 8 < 5 AND` returns `True`. First, `Y 8 <` returns `True`, then `AND`
+removes `True` and `5` from the stack, interpreting both as true results, and
+returns `True` to the stack.
+
+```rpl
+Y=4
+Y 8 < 5 AND
+@ Expecting True
+```
+
+`NOT` returns the logical inverse of a test result. For example, if `1` is
+stored in `X` and `2` is stored in `Y`, `X Y < NOT` returns `False`:
+
+```rpl
+X=1 Y=2
+X Y < NOT
+@ Expecting False
+```
+
+You can use `AND`, `OR`, and `XOR` in algebraics as infix functions,
+for example the following code returns `True`:
+
+```rpl
+'3<5 XOR 4>7'
+@ Expecting True
+```
+
+You can use `NOT` as a prefix function in algebraics.
+For example, the following code returns `False`:
+
+```rpl
+Z=2
+'NOT(Z≤4)'
+@ Expecting False
+```
+
+### Logical Functions on Integers
+
+When given integer or based numbers as input, logical operations applies
+bitwise, where each bit set is interpreted as `True` and each bit clear is
+interpreted as `False`.
+
+For example, the `Xor` operation will apply bit by bit in the following:
+
+```rpl
+16#32 16#F24 XOR
+@ Expecting #F16₁₆
+```
+
+This can be made more explicity visible using binary operations:
+
+```rpl
+                 2#11 0010
+           2#111 0010 0100 XOR
+@ Expecting #111 0001 0110₂
+```
+
+Unless the `TruthLogicForIntegers` flag is set, this is also true for integer
+values:
+
+```rpl
+42 7 XOR
+@ Expecting 45
+```
 # Release notes
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
