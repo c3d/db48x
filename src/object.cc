@@ -1768,7 +1768,7 @@ int object::type_value(id ty)
         case object::ID_bitmap:                 type = 11; break;
         case object::ID_tag:                    type = 12; break;
         case object::ID_unit:                   type = 13; break;
-        // No XLIB type 14 yet
+        case object::ID_xlib:                   type = 14; break;
         case object::ID_directory:              type = 15; break;
         // No Library type 16 yet
         // No Backup object type 17 yet
