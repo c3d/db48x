@@ -956,3 +956,45 @@ values:
 42 7 XOR
 @ Expecting 45
 ```
+
+## Testing Object Types
+
+The `Type` command found in the `ObjectsMenu` (🟦 _-_, _Type_) takes any object
+as an argument and returns a number that identifies that object type.
+
+### DB48x detailed types
+
+In DB48x detailed type mode (`DetailedTypes`), the returned value is a negative
+value that uniquely identifies each DB48x type. For example:
+
+```rpl
+DetailedTypes
+"Hello" TYPE
+@ Expecting -3
+```
+
+### HP-compatible types
+
+In HP compatibility mode (`CompatibleTypes`), the returned value is a positive
+integer that matches the value returned by HP's implementation of RPL, and may
+group distinct DB48x types under the same number. For example:
+
+```rpl
+CompatibleTypes
+"Hello" TYPE
+@ Expecting 2
+```
+
+See the description of the `Type` command for a list of the returned values.
+
+### Type names
+
+The `TypeName` command is a DB48x-only command that returns a text describing
+the type. For example:
+
+```rpl
+"Hello" TYPENAME
+@ Expecting "text"
+```
+
+Using `TypeName` can make code easier to read.

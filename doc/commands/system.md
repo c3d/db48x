@@ -206,6 +206,8 @@ Return the type of the object as a numerical value. The value is not guaranteed
 to be portable across versions of DB48X (and pretty much is guarantteed to _not_
 be portable at the current stage of development).
 
+### HP-compatible types
+
 If the `CompatibleTypes` setting is active, the returned value roughly matches
 the value returned by the HP50G. It always returns `29` for arrays, not `3`
 (real array) nor `4` (complex array). It returns `1` for both polar and
@@ -213,6 +215,44 @@ rectangular complex numbers, irrespective of their precision. 128-bit decimal
 values return `21` (extended real), 32-bit and 64-bit return `0` (real number).
 The separation between `18` (built-in function) and `19` (built-in command) may
 not be accurate.
+
+The values returned by `Type` in HP-compatible mode are as follows:
+
+* 0: Real number
+* 1: Complex number
+* 2: Text (called *character string* in HP manuals)
+* 3: Real array (DB48x returns 29)
+* 4: Complex array (DB48x returns 29)
+* 5: List
+* 6: Global name
+* 7: Local name
+* 8: Program
+* 9: Expression
+* 10: Based integer (binary integer in HP manuals)
+* 11: Graphic object
+* 12: Tagged object
+* 13: Unit object
+* 14: Library reference (XLIB name)
+* 15: Directory
+* 16: Library (not on DB48x)
+* 17: Backup object (not on DB48x)
+* 18: Built-in function (DB48x returns 19)
+* 19: Built-in command
+* 20: System binary (not on DB48x)
+* 21: Extended real (DB48x returns 0)
+* 22: Extended complex (DB48x returns 1)
+* 23: Linked array (not on DB48x)
+* 24: Character (not on DB48x)
+* 25: Code object (not on DB48x)
+* 26: Library data (not on DB48x)
+* 27: Mini font (dense font on DB48x)
+* 28: Real integer
+* 29: Symbolic vector/matrix (all arrays on DB48x)
+* 30: Font (sparse fonts on DB48x)
+* 31: Extended object (not on DB48x)
+
+
+### DB48x detailed types
 
 If the `DetailedTypes` setting is active, the return value is negative, and
 matches the internal representation precisely. For example, distinct values will
@@ -222,10 +262,86 @@ be returned for fractions and expressions.
 this is less likely to change from one release to the next. DB48X-only code
 should favor the use of `TypeName`, both for portability and readability.
 
+The values returned by `Type` are negative, beginning at `-2`, in the order
+shown in the table for `TypeName` below. Commands each have their individual
+type number.  Returned values are not guaranteed from release to release, and
+they may differ depending on build options or hardware platform (e.g. the values
+on DM32 or DM42) may differ. The values for data types are not necessarily
+contiguous either. For example, the `Type` for a tagged object may be `-1473` on
+version 0.9.1, and may change over time (the reason being that rarely used types
+have a two-byte type prefix).
+
+Use `TypeName` for portability.
+
 ## TypeName
 
-Return the [type](#Type) of the object as text. For example, `12 type` returns
-`"integer"`.
+Return the [type](#Type) of the object as text. For example:
+
+```rpl
+12 typename`
+@ Expecting "integer"
+```
+
+The values returned by `Type` in detailed mode are as follows, where the
+spelling is what `TypeName` returns:
+
+* directory
+* text
+* list
+* program
+* block (unquoted code block)
+* locals (local variables structure)
+* expression
+* funcall (function call in expression, e.g. `F(1;2;3)`
+* local (local variable name)
+* symbol (global variable name)
+* constant (reference to constant library, e.g. `ⒸNA`)
+* equation (reference to equation library, e.g. `ⒺSimple Shear`)
+* xlib (reference to library, e.g. `ⓁDedicace`)
+* array
+* menu
+* unit (e.g. `1_km`)
+* assignment (e.g. `X=3`)
+* rectangular (complex numbers such as `2+3ⅈ`)
+* polar (complex numbers such as `2∡30°`)
+<!--- DM32 --->
+* hex_integer (based number with enforced base 16)
+* dec_integer (based number with enforced base 10)
+* oct_integer (based number with enforced base 8)
+* bin_integer (based number with enforced base 2)
+<!--- !DM32 --->
+* based_integer (based number with current base)
+<!--- DM32 --->
+* hex_bignum (large based number with enforced base 16)
+* dec_bignum (large based number with enforced base 10)
+* oct_bignum (large based number with enforced base 8)
+* bin_bignum (large based number with enforced base 2)
+<!--- !DM32 --->
+* based_bignum (large based number with current base)
+* bignum (large integer, typically more than 64 bits)
+* neg_bignum (negative large integer)
+* integer (typically for integers where value takes less than 64 bits)
+* neg_integer (negative small integer)
+* fraction
+* neg_fraction
+* big_fraction
+* neg_big_fraction
+* hwfloat (hardware-accelerated 32-bit binary floating point)
+* hwdouble (hardware-accelerated 64-bit binary floating point)
+* decimal (variable precision decimal)
+* neg_decimal (variable precision negative decimal)
+* comment
+* grob (HP-compatible graphic object)
+* bitmap (hardware-optimized bitmap)
+* Drop (commands have their name as type name)
+* font
+* dense_font
+* sparse_font
+* dmcp_font
+* tag
+* polynomial
+* standard_uncertainty
+* relative_uncertainty
 
 
 ## PEEK
