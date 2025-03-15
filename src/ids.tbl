@@ -981,6 +981,7 @@ FLAG(GCTemporariesCleanup,      AutomaticTemporariesCleanup)
 FLAG(SoftwareDisplayRefresh,    DMCPDisplayRefresh)
 FLAG(SolveNumericallyOnly,      SolveSymbolicallyThenNumerically)
 FLAG(TVMPayAtBeginningOfPeriod, TVMPayAtEndOfPeriod)
+FLAG(TruthLogicForIntegers,     BitwiseLogicForIntegers)
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")

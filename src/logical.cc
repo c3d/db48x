@@ -68,7 +68,9 @@ object::result logical::evaluate(id ty,
         return ERROR;
     }
 
-    if (is_integer(yt) && is_integer(xt))
+    if ((is_based(xt) && is_based(yt)) ||
+        (is_integer(yt) && is_integer(xt) &&
+         Settings.BitwiseLogicForIntegers()))
         num = true;
 
     switch (xt)

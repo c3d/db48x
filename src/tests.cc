@@ -2724,6 +2724,18 @@ void tests::logical_operations()
         .expect("'X xor 2'")
         .test(CLEAR, "'X' NOT", ENTER)
         .expect("'not X'");
+
+    step("Logical with integers")
+        .test(CLEAR, "42 7 XOR", ENTER)
+        .expect("45")
+        .test(CLEAR, "10#42 10#7 XOR", ENTER)
+        .expect("#45₁₀")
+        .test(CLEAR, "TruthLogicForIntegers", ENTER)
+        .test(CLEAR, "42 7 XOR", ENTER)
+        .expect("False")
+        .test(CLEAR, "10#42 10#7 XOR", ENTER)
+        .expect("#45₁₀")
+        .test(CLEAR, "'TruthLogicForIntegers' Purge", ENTER).noerror();
 }
 
 

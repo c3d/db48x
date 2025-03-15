@@ -651,6 +651,23 @@ An error during a program enters the debugger, letting you correct the problem
 before resuming execution. This is the default setting.
 
 
+## TruthLogicForIntegers
+
+When this flag is set, [logical operations](#logical-operations) such as `and`
+or `not` applied to integers return `True` or `False`, for compatibility with HP
+implementations of RPL.
+
+The opposite setting is `BitwiseLogicForIntegers`.
+
+## BitwiseLogicForIntegers
+
+When this flag is set, [logical operations](#logical-operations) such as `and`
+or `not` applied to integers return a bitwise numerical result, which deviates
+from the HP implementations of RPL.
+
+The opposite setting is `TruthLogicForIntegers`.
+
+
 # Evaluation settings
 
 

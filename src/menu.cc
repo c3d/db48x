@@ -661,7 +661,8 @@ MENU(BasesMenu,
      "CntBits", ID_CountBits,
      "1-comp",  ID_OnesComplement,
      "2-comp",  ID_TwosComplement,
-     "Modern",  ID_ModernBasedNumbers);
+     "Modern",  ID_ModernBasedNumbers,
+     ID_TruthLogicForIntegers);
 
 
 MENU(ProbabilitiesMenu,
