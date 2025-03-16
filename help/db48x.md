@@ -3490,8 +3490,9 @@ values:
 
 ## Testing Object Types
 
-The `Type` command found in the `ObjectsMenu` (🟦 _-_, _Type_) takes any object
-as an argument and returns a number that identifies that object type.
+The `Type` command takes any object as an argument and returns a number that
+identifies that object type. You can find it in the `ObjectsMenu` (🟦 _-_),
+using the _Type_ (_F2_) softkey.
 
 ### DB48x detailed types
 
@@ -3529,6 +3530,153 @@ the type. For example:
 ```
 
 Using `TypeName` can make code easier to read.
+
+You can find `TypeName` in the `ObjectsMenu` (🟦 _-_), using the
+_TypeName_ (_F3_) softkey.
+
+
+## Conditional Structures & Commands
+
+*Conditional structures* let a program make a decision based on the result of
+tests.
+
+*Conditional commands* let you execute a true-clause or a false-clause, each of
+which are a *single* command or object.
+
+These conditional structures and commands are contained in the `TestsMenu`
+(🟦 _3_):
+
+* `IF…THEN…END` structure
+* `IF…THEN…ELSE…END` structure
+* `CASE…END` structure
+* `IFT` command (if-then)
+* `IFTE` function (if-then-else)
+
+### The IF…THEN…END Structure
+
+The syntax for this structure is:
+`IF` *test-clause* `THEN` *true-clause* `END`
+
+```rpl
+Condition='1<2'
+IF Condition THEN Success END
+@ Expecting 'Success'
+```
+
+`IF…THEN…END` executes the sequence of commands in the *true-clause* only if the
+*test-clause* evaluates to a true value, i.e. `True` or a non-zero numerical
+value. The test-clause can be a command sequence, for example, `A B <`, or an
+algebraic expression, for example, `'A<B'`. If the *test-clause* is an
+algebraic expression, it’s *automatically evaluated* — you don’t need `→NUM` or
+`EVAL`.
+
+`IF` begins the *test-clause*, which leaves a test result on the stack.
+`THEN` conceptually removes the test result from the stack. If the value is
+`True` or a non-zero numerical value, the *true-clause* is executed. Otherwise,
+program execution resumes following `END`.
+
+To enter `IF…THEN…END` in a program, select the  `TestsMenu` (🟦 _3_) and then
+the _IfThen_ command (🟨 _F1_).
+
+### The IFT Command
+
+The `IFT` command takes two arguments: a *test-result* in level 2 and a
+*true-clause* object in level 1. If the *test-result* is true, the *true-clause*
+object is executed:
+
+```rpl
+Condition='2<3'
+Condition Success IFT
+@ Expecting 'Success'
+```
+
+Otherwise, the two arguments are removed from the stack:
+
+```rpl
+Condition='2>3'
+Success
+Condition Failure IFT
+@ Expecting 'Success'
+```
+
+To enter `IFT` in a program, select the `TestsMenu` (🟦 _3_) and then the _IFT_
+command (🟨 _F5_).
+
+
+### The IF…THEN…ELSE…END Structure
+
+The syntax for this structure is:
+`IF` *test-clause* `THEN` *true-clause* `ELSE` *false-clause* `END`
+
+```rpl
+Condition='1<2'
+IF Condition THEN Success END
+@ Expecting 'Success'
+```
+
+`IF…THEN…END` executes either the *true-clause* sequence of commands if the
+*test-clause* is `True` or a non-zero numerical value, or the *false-clause*
+if the *test-clause* is `False` or a zero numerical value. If the *test-clause*
+is an algebraic expression, it is automatically evaluated.
+
+the sequence of commands in the *true-clause* only if the
+*test-clause* evaluates to a true value, i.e. `True` or a non-zero numerical
+value. The test-clause can be a command sequence, for example, `A B <`, or an
+algebraic expression, for example, `'A<B'`. If the *test-clause* is an
+algebraic expression, it’s *automatically evaluated* — you don’t need `→NUM` or
+`EVAL`.
+
+`IF` begins the *test-clause*, which leaves a test result on the stack.
+`THEN` conceptually removes the test result from the stack. If the value is
+`True` or a non-zero numerical value, the *true-clause* is executed. Otherwise,
+program execution resumes following `END`.
+
+To enter `IF…THEN…ELSE…END` in a program, select the `TestsMenu` (🟦 _3_) and
+then the _IfElse_ command (🟨 _F2_).
+
+### The IFTE Function
+
+The `IFTE` command takes three arguments: a *test-result* in level 3, a
+*true-clause* object in level 2 and a *false-clause* in level 1. It can also be
+entered in an algebraic expression as
+`'IFTE(test-result;true-clause;false-clause)'.
+
+If the *test-result* is `True` or a non-zero number, the *true-clause* object is
+executed and left on the stack:
+
+```rpl
+Condition='2<3'
+Condition Success Failure IFTE
+@ Expecting 'Success'
+```
+
+Otherwise, the arguments are removed from the stack, and the *false-clause*
+object is executed and left on the stack:
+
+```rpl
+Condition='2>3'
+Condition Failure Success IFTE
+@ Expecting 'Success'
+```
+
+In an algebraic expression, `IFTE` is used as a function that returns its first
+second if the condition in the first argument is `True` or a non-zero number:
+
+```rpl
+'IFTE(0<1;Success;Failure)'
+@ Expection 'Success'
+```
+
+If the condition is `False` or a zero number, the `IFTE` function returns its
+third argument:
+
+```rpl
+'IFTE(0.0;Failure;Success)'
+@ Expection 'Success'
+```
+
+To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
+the _IFTE_ command (🟨 _F6_).
 # Release notes
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
