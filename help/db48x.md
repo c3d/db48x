@@ -3679,6 +3679,86 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.3 "Transfigured" - Documentation, bug fixes
+
+This release keeps improving the documentation based on the original HP50G
+_Advanced Reference Manual_, and fixing issues that are found along the way.
+It also improves statistics support and adds low-level array manipulation.
+
+### New features
+
+* Add `PredX`, `PredY` and `ΣLine` commands for linear regression predictions.
+  The `PredX` command predicts the independent value from the dependent one.
+  The `PredY` command predicts the dependent value from the independent one.
+  The `ΣLine` command returns the regression formula.
+* Add `Median` command to compute the median of statistics series
+* Add low-level array manipulation commands, `COL+`, `COL-`, `ROW+`, `ROW-`,
+  `CSWP` and `RSWP`, to add, remove and swap rows or columns.
+
+### Bug fixes
+
+* Strip trailing zeros from decimals converted from integers, in order to avoid
+  producing incorrectly normalized values. For example, `70000` converted to
+  decimal now produces a 5-bytes decimal value and no longer a 6-bytes decimal
+  value. This fixes the result of the `SigDig` command on this input value, as
+  well as fixes cases where comparisions would be incorrect.
+* Accept quoted names in `==` and `same`. HP calculators evaluate `A` and `B` in
+  `'A' 'B' ==` but not in `'A' 'B' same`.
+* Add symbolic support for logical operations, i.e. correctly create an
+  expression for `'X' 3 and` instead of a type error.
+* Compute linear regression for each mode when running `BestFit`.
+  The previous implementation would erroneously compute the correlation with
+  various modes (linear, log, exp and power), but without optimally recomputing
+  the parameters with that mode.
+* Consume arguments in `XCol`, `YCol` and `ColΣ`
+* Write slope and intercept in the correct order when updating `ΣPar`.
+  The order was wrong, causing various commands to either update them in the
+  wrong order, or to swap them.
+* Do not emit an error if the stack is empty when running `Σ-`
+* Fix and optimize parsing of `==`
+* Fix a bug in decimal comparisions used by `sqrt` and `cbrt`, fixes the
+  computation of the last digits of `sqrt(163)` at 24-digit precision.
+* Compute `log` with 3 additional digits to avoid getting the last digit wrong
+  in `'ln(640320^3+744)/sqrt(163)'`
+* Compute `exp`, `exp10`, `log` and `log10` with additional internal digits to
+  make sure that the last digit is good (verifiied using `calc`).
+* Fix sign error in buoyancy equation for Champagne bubbles
+* Fix `ppar` parsing and premature validty checking, which caused `20 30 XRNG`
+  to fail because of a transient state where `xmin<xmax` was not verified.
+* expression: Fix rare GC bug in `expression::simplify`
+
+### Improvements
+
+* Compute all decimal functions with increased precision. The tests now check
+  that the last digit of the functions result for the tested input is correctly
+  rounded.
+* Add `type` value for `xlib` objects in HP compatibility mode
+* Add `TruthLogicForIntegers` flag for compatibility with HP calculators when
+  evaluating something like `42 and 4`. DB48x by default computes this bitwise,
+  which returns `0`, a logically `False` value. With the new compatibility flag,
+  the arguments are interpreted as truth values, and the computation produces
+  `True` for improved compatibility with HP calculators.
+* Add RPL programming examples in the documentation, lifted from the HP50G
+  _Advanced Reference Manual_, covering conditional statements such as`IF`,
+  `IFT`, `IFTE`, documentation about tests and conditional structures, type
+  tests, logical commands such as `and`, `or`, `not`.
+* Add documentation and menu entry for `Header` command
+* Add documentation about local variables and  the scope of local variables
+* Add tests for statistics operations
+* Optimize retention of slope and intercept in `BestFit`
+* Micro-optimization on stack operation for comparisons
+* Add `MSolvr` alias for `SolverMenu` for compatibility with HP calculators
+* Allow nested precision adjustments in `decimal::precision_adjust` class
+* Tests now display failures in a way that makes it easier to compare.
+* Add documentation for `SeparatorModesMenu` entries
+* runtime: Add check that we push only valid objects
+* runtime: Cleanup, remove leftovers from earlier debug
+* runtime: Add check for pointer validity
+* runtime: Add utility to dump GC pointers
+* arithmeric: Add recorder entry to record what operations happen
+* Update copyright year to 2025 in `VERSION` command
+
+
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
 
 This release introduces a true multiple-variables solver, additional
