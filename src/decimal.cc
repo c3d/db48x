@@ -660,7 +660,7 @@ RENDER_BODY(decimal)
             if (fancy)
             {
                 char expbuf[32];
-                size_t written = snprintf(expbuf, 32, "%" PRId64, dispexp);
+                size_t written = snprintf(expbuf, 32, "%" PRId32, dispexp);
                 for (uint e = 0; e < written; e++)
                 {
                     char c = expbuf[e];
@@ -670,7 +670,7 @@ RENDER_BODY(decimal)
             }
             else
             {
-                r.printf("%d", dispexp);
+                r.printf("%ld", dispexp);
             }
         }
         return r.size();
