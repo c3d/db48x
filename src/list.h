@@ -304,6 +304,10 @@ struct list : text
     // Remove a range in the list
     list_p remove(size_t start, size_t length = 1) const;
 
+    // Insert a list in the middle of another list
+    list_p insert(object_p what, size_t pos) const;
+    list_p insert(list_p what, size_t pos) const;
+
     // Reduce and filter operations
     object_p reduce(object_p prg) const;
     list_p   filter(object_p prg) const;

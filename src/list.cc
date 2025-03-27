@@ -657,6 +657,58 @@ list_p list::remove(size_t first, size_t len) const
 }
 
 
+list_p list::insert(object_p whato, size_t pos) const
+// ----------------------------------------------------------------------------
+//   Insert `what` in the list at position `pos` (0-based)
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    size_t   idx = 0;
+    id       ty  = type();
+    object_g what = whato;
+    for (object_g copy : *this)
+    {
+        if (idx == pos)
+            if (!rt.append(what))
+                return nullptr;
+        if (!rt.append(copy))
+            return nullptr;
+        idx++;
+    }
+    if (idx == pos)
+        if (!rt.append(what))
+            return nullptr;
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+list_p list::insert(list_p whato, size_t pos) const
+// ----------------------------------------------------------------------------
+//   Insert items in `what` in the list at position `pos` (0-based)
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    size_t   idx = 0;
+    id       ty  = type();
+    list_g   what = whato;
+    for (object_g copy : *this)
+    {
+        if (idx == pos)
+            for (object_p inserted : *what)
+                if (!rt.append(inserted))
+                    return nullptr;
+        if (!rt.append(copy))
+            return nullptr;
+        idx++;
+    }
+    if (idx == pos)
+        for (object_p inserted : *what)
+            if (!rt.append(inserted))
+                return nullptr;
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
 bool list::expand_without_size(size_t *size) const
 // ----------------------------------------------------------------------------
 //   Expand items on the stack, but do not add the size

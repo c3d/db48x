@@ -1,42 +1,316 @@
 # Operations with Matrices and vectors
 
-## ToArray
+## →Array
 
-Stack to Array Command: Returns a vector of n real or complex elements or a
-matrix of n × m real or complex elements.
+Stack to Array Command: Returns a vector or matrix built from individual
+elements placed on the stack and dimensions.
 
-The elements of the result array should be entered in row order.
+If the dimension is given as a positive integer, then `→Array` returns a
+vector built from the given number of individual items.
 
-`A1` ... `An` `n` ▶ `[ A1 ... An ]`
+```rpl
+x y z 3 →Array
+@ Expecting [ 'x' 'y' 'z' ]
+```
 
-`A11` ... `Arc` `{ r c }` ▶ `[[ A11 A1c] [ A21 ... Arc ]]`
+The number of items can also be given as a list or array containing one or two
+positive integers. If it contains one item, then `→Array` returns a vector:
 
+```rpl
+1.2 3.4 5.6 { 2.5 } →Array
+@ Expecting [ 3.4 5.6 ]
+```
 
-## FromArray
+If the list contains two items, the first one is the number of rows, the second
+one the number of columns. Elements of the result array should be entered on the
+stack in row order.
 
-Array to Stack Command: Takes an array and returns its elements as separate real or complex numbers. Also returns a list of the dimensions of the array.
-If the argument is an n-element vector, the first element is returned to level n + 1 (not level nm + 1), and the nth element to level 2.
+```rpl
+1 2 3 4 5 6 [ 2 3 ] →Array
+@ Expecting [[ 1 2 3 ] [ 4 5 6 ]]
+```
 
-`[ A1 ... An ]`  ▶ `A1` ... `An` `n`
+## Array→
 
-`[[ A11 A1c] [ A21 ... Arc ]]`  ▶ `A11` ... `Arc` `{ r c }`
+Array to Stack Command: Takes an array and returns its elements as separate
+values. Also returns a list of the dimensions of the array.
 
+If the argument is a vector, elements are placed on the stack with the first one
+higher in the stack and the last one on the second level of the stack.
 
-## TOCOL
+```rpl
+[ 1 2 3 ] Array→ + + +
+@ Expecting { 1 2 3 3 }
+```
+
+If the argument is a matrix, elements are placed on the stack in row order:
+
+```rpl
+[[1 2 3][4 5 6]] Array→ + + + + + +
+@ Expecting { 1 2 3 4 5 6 2 3 }
+```
+
+## →Columns
+
 Split an array into column vectors
 
+If the input is a vector, `→Columns` returns the individual elements.
 
-## ADDCOL
-Instert a column into an array
+```rpl
+[ 1 2 3 ] →Columns
+4 →List
+@ Expecting { 1 2 3 3 }
+```
+
+If the input is a matrix, `→Columns` returns the individual columns.
+
+```rpl
+[[ 1 2 3 ][ 4 5 6 ]] →Columns
+4 →List
+@ Expecting { [ 1 4 ] [ 2 5 ] [ 3 6 ] 3 }
+```
 
 
-## REMCOL
-Remove a column from an array
+
+## COL+
+
+Insert Columns Command: Insert columns into an existing array. The `COL+`
+command takes three arguments:
+* an input array or list where the columns will be inserted
+* the columns to insert
+* the insertion position
+
+If the input is a matrix, the columns can be an individual vector:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ 22 33 ]              @ Column to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 2 3 ] [ 4 33 5 6 ]]
+```
+
+or a matrix with the same number of rows:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ [22 33 ] [ 44 55 ] ] @ Columns to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 33 2 3 ] [ 4 44 55 5 6 ]]
+```
+
+If the input is a vector, then the columns can be an individual value:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+4          @ Value to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 2 3 ]
+```
+
+The columns can also be another vector:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+[ 4 5 ]    @ Values to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 5 2 3 ]
+```
 
 
-## FROMCOL
-Assemble a matrix from its columns
+## COL-
 
+Delete Columns Command: Deletes one or more columns from an array.
+
+The `COL-` command takes an input array and a column index in the array, and
+returns an array with the given column removed.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+3 COL-
+@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+```
+
+Multiple columns can be removed by giving the first one and the number of
+columns to remove.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+[ 3 2 ] COL-
+@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+```
+
+## Columns→
+
+Columns to Matrix Command: Transforms a series of column vectors and a column
+count into a matrix containing those columns, or transforms a sequence of
+numbers and an element count into a vector with those numbers as elements.
+
+```rpl
+[ 1 2 ]
+[ 4 5 ]
+[ 7 8 ]
+3 Columns→
+@ Expecting [[ 1 4 7 ] [ 2 5 8 ]]
+```
+
+If the individual values are not arrays, then a vector is produced:
+
+```rpl
+1 2 3 4
+4 Columns→
+@ Expecting [ 1 2 3 4 ]
+```
+
+If not all vectors have the same length, the number of rows of the array
+returned by `Columns→` is the maximum size of all input vectors, and the
+remaining elements are padded with `0`.
+
+```rpl
+[ 1     ]
+[ 2 3 4 ]
+[ 5 6   ]
+3 Columns→
+@ Expecting [[ 1 2 5 ] [ 0 3 6 ] [ 0 4 0 ]]
+```
+
+
+## →Rows
+
+Split an array into row vectors
+
+If the input is a vector, `→Rows` returns the individual elements.
+
+```rpl
+[ 1 2 3 ] →Rows
+4 →List
+@ Expecting { 1 2 3 3 }
+```
+
+If the input is a matrix, `→Rows` returns the individual rows.
+
+```rpl
+[[ 1 2 3 ][ 4 5 6 ]] →Rows
+3 →List
+@ Expecting { [ 1 2 3 ] [ 4 5 6 ] 2 }
+```
+
+
+
+## ROW+
+
+Insert Rows Command: Insert rows into an existing array. The `COL+`
+command takes three arguments:
+* an input array or list where the rows will be inserted
+* the rows to insert
+* the insertion position
+
+If the input is a matrix, the rows can be an individual vector:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ 22 33 ]              @ Row to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 2 3 ] [ 4 33 5 6 ]]
+```
+
+or a matrix with the same number of rows:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ [22 33 ] [ 44 55 ] ] @ Rows to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 33 2 3 ] [ 4 44 55 5 6 ]]
+```
+
+If the input is a vector, then the rows can be an individual value:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+4          @ Value to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 2 3 ]
+```
+
+The rows can also be another vector:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+[ 4 5 ]    @ Values to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 5 2 3 ]
+```
+
+
+## ROW-
+
+Delete Rows Command: Deletes one or more rows from an array.
+
+The `COL-` command takes an input array and a row index in the array, and
+returns an array with the given row removed.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+3 COL-
+@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+```
+
+Multiple rows can be removed by giving the first one and the number of
+rows to remove.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+[ 3 2 ] COL-
+@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+```
+
+## Rows→
+
+Rows to Matrix Command: Transforms a series of row vectors and a row
+count into a matrix containing those rows, or transforms a sequence of
+numbers and an element count into a vector with those numbers as elements.
+
+```rpl
+[ 1 2 ]
+[ 4 5 ]
+[ 7 8 ]
+3 Rows→
+@ Expecting [[ 1 2 ] [ 4 5 ] [ 7 8 ]]
+```
+
+If the individual values are not arrays, then a vector is produced:
+
+```rpl
+1 2 3 4
+4 Rows→
+@ Expecting [ 1 2 3 4 ]
+```
+
+If not all vectors have the same length, a non-rectangular array will be
+produced. Unlike `Rows→`, no padding with `0` will occur for missing elements.
+
+```rpl
+[ 1     ]
+[ 2 3 4 ]
+[ 5 6   ]
+3 Rows→
+@ Expecting [[ 1 ] [ 2 3 4 ] [ 5 6 ]]
+```
 
 ## TODIAG
 Extract diagonal elements from a matrix
@@ -45,33 +319,6 @@ Extract diagonal elements from a matrix
 ## FROMDIAG
 Create a matrix with the given diagonal elements
 
-
-## TOROW
-Split an array into its row vectors
-
-
-## ADDROW
-Insert a row into an array
-
-
-## REMROW
-Remove a row from an array
-
-
-## FROMROW
-Assemble an array from its rows
-
-
-## TOV2
-Assemble a vector from two values
-
-
-## TOV3
-Assemble a vector from three values
-
-
-## FROMV
-Split a vector into its elements
 
 
 ## AXL
@@ -142,11 +389,8 @@ Swap two columns in a matrix
 
 Compute the determinant of a matrix
 
-
-## DIAGMAP
-
-
 ## DOT
+
 Internal product (dot product) of vectors
 
 

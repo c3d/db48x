@@ -34,10 +34,11 @@
 #include "expression.h"
 #include "functions.h"
 #include "grob.h"
+#include "stack-cmds.h"
 #include "stats.h"
 #include "tag.h"
-#include "variables.h"
 #include "unit.h"
+#include "variables.h"
 
 
 RECORDER(matrix, 16, "Determinant computation");
@@ -283,6 +284,17 @@ bool array::is_matrix(size_t *rows, size_t *cols, bool push, bool strip) const
         }
     }
     return result;
+}
+
+
+bool array::is_matrix_or_vector(size_t *rows, size_t *cols,
+                                bool push, bool strip) const
+// ----------------------------------------------------------------------------
+//   Return true if this is a matrix or vector
+// ----------------------------------------------------------------------------
+{
+    return (is_matrix(rows, cols, push, strip) ||
+            is_vector(rows, push, strip));
 }
 
 
@@ -1518,6 +1530,545 @@ COMMAND_BODY(ToArray)
 }
 
 
+COMMAND_BODY(MatrixToRows)
+// ----------------------------------------------------------------------------
+//   Convert matrix to row vectors
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    if (list_g a = obj->as_array_or_list())
+    {
+        size_t rows  = 0;
+        if (rt.pop())
+        {
+            for (object_p row : *a)
+            {
+                if (!rt.push(row))
+                    goto error;
+                rows++;
+            }
+            integer_p robj = integer::make(rows);
+            if (robj && rt.push(+robj))
+                return OK;
+        }
+    error:
+        rt.drop(rows);
+        rt.push(+a);
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(RowsToMatrix)
+// ----------------------------------------------------------------------------
+//   Transform individual rows to a matrix
+// ----------------------------------------------------------------------------
+{
+    size_t rows = 0, columns = 0;
+    if (array::size_from_stack(&rows, &columns))
+    {
+        if (columns)
+        {
+            rt.type_error();
+            return ERROR;
+        }
+
+        scribble scr;
+        for (size_t row = 0; row < rows; row++)
+        {
+            object_p obj = rt.stack(rows - row);
+            if (!obj || !obj->is_extended_algebraic())
+                goto type_error;
+            if (!rt.append(obj))
+                goto error;
+        }
+        list_p result = list::make(ID_array, scr.scratch(), scr.growth());
+        if (result && rt.drop(rows) && rt.top(result))
+            return OK;
+    }
+    else
+    {
+    type_error:
+        rt.type_error();
+    }
+error:
+    return ERROR;
+}
+
+
+COMMAND_BODY(MatrixToColumns)
+// ----------------------------------------------------------------------------
+//   Convert matrix to column vectors
+// ----------------------------------------------------------------------------
+{
+    object_p obj = rt.top();
+    if (list_g a = obj->as_array_or_list())
+    {
+        size_t rows  = 0, cols = 0;
+        if (rt.pop())
+        {
+            id ty = a->type();
+            for (object_p row : *a)
+            {
+                if (list_p l = row->as_array_or_list())
+                    cols = std::max(cols, l->items());
+                if (!rt.push(row))
+                    goto error;
+                rows++;
+            }
+            if (cols == 0)
+            {
+                // Vector case
+                integer_g robj = integer::make(rows);
+                if (robj && rt.push(+robj))
+                    return OK;
+            }
+            for (size_t c = 0; c < cols; c++)
+            {
+                scribble scr;
+                for (size_t r = 0; r < rows; r++)
+                {
+                    object_p row = rt.stack(c + rows + ~r);
+                    if (list_p lrow = row->as_array_or_list())
+                    {
+                        if (object_p lcol = lrow->at(c))
+                            row = lcol;
+                        else
+                            row = integer::make(0);
+                    }
+                    if (!row || !rt.append(row))
+                    {
+                        rows += c;
+                        goto error;
+                    }
+                }
+                list_p column = list::make(ty, scr.scratch(), scr.growth());
+                if (!column || !rt.push(column))
+                {
+                    rows += c;
+                    goto error;
+                }
+            }
+            for (size_t c = 0; c < cols; c++)
+            {
+                object_p col = rt.stack(cols + ~c);
+                rt.stack(cols + rows + ~c, col);
+            }
+            rt.drop(rows);
+            integer_p cobj = integer::make(cols);
+            if (cobj && rt.push(+cobj))
+                return OK;
+            rows = cols;
+        }
+    error:
+        rt.drop(rows);
+        rt.push(+a);
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(ColumnsToMatrix)
+// ----------------------------------------------------------------------------
+//   Transform individual columns to a matrix
+// ----------------------------------------------------------------------------
+{
+    size_t rows = 0, columns = 0;
+    if (array::size_from_stack(&columns, &rows))
+    {
+        if (rows)
+        {
+            rt.type_error();
+            return ERROR;
+        }
+
+        rows = 0;
+        for (size_t col = 0; col < columns; col++)
+        {
+            object_p obj = rt.stack(columns - col);
+            if (list_p lobj = obj->as_array_or_list())
+                rows = std::max(rows, lobj->items());
+        }
+        list_p result = nullptr;
+        if (!rows)
+        {
+            rt.drop();
+            result = array::from_stack(columns, 0);
+            if (result && rt.push(result))
+                return OK;
+        }
+        else
+        {
+            scribble scr;
+            for (size_t row = 0; row < rows; row++)
+            {
+                list_g robj;
+                {
+                    scribble rscr;
+                    for (size_t col = 0; col < columns; col++)
+                    {
+                        object_p obj = rt.stack(columns - col);
+                        if (list_p lobj = obj->as_array_or_list())
+                        {
+                            if (object_p lrow = lobj->at(row))
+                                obj = lrow;
+                            else
+                                obj = integer::make(0);
+                        }
+                        if (!obj || !rt.append(obj))
+                        {
+                            rt.drop(columns);
+                            return ERROR;
+                        }
+                    }
+                    robj = list::make(ID_array, rscr.scratch(), rscr.growth());
+                }
+                if (!robj || !rt.append(robj))
+                {
+                    rt.drop(columns);
+                    return ERROR;
+                }
+            }
+            result = list::make(ID_array, scr.scratch(), scr.growth());
+            if (result && rt.drop(columns) && rt.top(result))
+                return OK;
+        }
+
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+object::result array::add_row_or_column(bool columnist)
+// ----------------------------------------------------------------------------
+//   Shared code to add rows or columns (ROW+, COL+)
+// ----------------------------------------------------------------------------
+{
+    // First argument must give the index position
+    size_t row = 0, column = 0;
+    if (!array::size_from_stack(&row, &column) || column)
+    {
+    type_error:
+        rt.type_error();
+        return ERROR;
+    }
+    row--;
+
+    // Get outer and inner object
+    object_g inner = rt.stack(1);
+    object_p outer = rt.stack(2);
+
+    // The outer always needs to be an array or vector
+    list_g ol = outer->as_array_or_list();
+    list_g il = inner->as_array_or_list();
+    if (!ol)
+        goto type_error;
+
+    // The logic for reproducing HP50G's error is more complicated than
+    // the rest of this functoin, which is weird
+    if (Settings.StrictArrayResizing())
+    {
+        array_p oa = outer->as<array>();
+        array_p ia = inner->as<array>();
+        if (!oa)
+            goto type_error;
+
+        size_t orows = 0, ocols = 0;
+        if (!oa->is_matrix_or_vector(&orows, &ocols, false))
+            goto dimension_error;
+
+        if (ocols)
+        {
+            size_t irows = 0, icols = 0;
+            if (!ia)
+                goto type_error;
+            if (!ia->is_matrix_or_vector(&irows, &icols, false))
+                goto dimension_error;
+            if (columnist ? (orows != irows) : (ocols != icols))
+                goto dimension_error;
+            if (row > (columnist ? ocols : orows))
+                goto value_error;
+        }
+        else if (row > orows)
+        {
+            goto value_error;
+        }
+        else
+        {
+            // Single value insert: works the same for rows or columns
+            il = il ? ol->insert(il, row) : ol->insert(inner, row);
+            if (il && rt.drop(2) && rt.top(il))
+                return OK;
+            return ERROR;
+        }
+    }
+
+    // Insert row object
+    if (columnist)
+    {
+        if (il)
+        {
+            list::iterator oi = ol->begin();
+            list::iterator ii = il->begin();
+            list::iterator oe = ol->end();
+            list::iterator ie = il->end();
+            id             ty = ol->type();
+            scribble       scr;
+            while (oi != oe && ii != ie)
+            {
+                object_p orow = *oi;
+                object_p irow = *ii;
+                list_p orl = orow->as_array_or_list();
+                if (!orl)
+                    goto dimension_error;
+                list_p irl = irow->as_array_or_list();
+                orl = irl ? orl->insert(irl, row) : orl->insert(irow, row);
+                if (!orl || !rt.append(orl))
+                    return ERROR;
+                ++oi;
+                ++ii;
+            }
+            il = list::make(ty, scr.scratch(), scr.growth());
+        }
+        else
+        {
+            il = ol->insert(inner, row);
+        }
+    }
+    else
+    {
+        // Row case: simply build the outer array
+        il = il ? ol->insert(il, row) : ol->insert(inner, row);
+    }
+
+    // Put result on stack
+    if (il && rt.drop(2) && rt.top(il))
+        return OK;
+
+    // Return whatever error failed above
+    return ERROR;
+dimension_error:
+    rt.dimension_error();
+    return ERROR;
+value_error:
+    rt.value_error();
+    return ERROR;
+}
+
+
+object::result array::delete_row_or_column(bool columnist)
+// ----------------------------------------------------------------------------
+//   Shared code to delete rows or columns (ROW-, COL-)
+// ----------------------------------------------------------------------------
+{
+    // First argument must give the index position
+    size_t row = 0, count = 1;
+    if (!array::size_from_stack(&row, &count))
+    {
+    type_error:
+        rt.type_error();
+        return ERROR;
+    }
+    if (!count)
+        count = 1;
+    row--;
+
+    // Get object we want to remove rows / columns from
+    object_p outer = rt.stack(1);
+
+    // The input always needs to be an array, list or vector
+    list_g ol = outer->as_array_or_list();
+    if (!ol)
+        goto type_error;
+
+    // Check if we want strict checking that we got rectangular arrays
+    if (Settings.StrictArrayResizing())
+    {
+        array_p oa = outer->as<array>();
+        if (!oa)
+            goto type_error;
+
+        size_t orows = 0, ocols = 0;
+        if (!oa->is_matrix_or_vector(&orows, &ocols, false))
+            goto dimension_error;
+
+        if (ocols)
+        {
+            if (row > (columnist ? ocols : orows))
+                goto value_error;
+        }
+        else if (row > orows)
+        {
+            goto value_error;
+        }
+        else
+        {
+            // Delete from a vector
+            ol = ol->remove(row, count);
+            if (ol && rt.drop() && rt.top(ol))
+                return OK;
+            return ERROR;
+        }
+    }
+
+    // Remove row object
+    if (columnist)
+    {
+        id       ty = ol->type();
+        scribble scr;
+        for (object_p orow : *ol)
+        {
+            list_p orl = orow->as_array_or_list();
+            if (!orl)
+                goto dimension_error;
+            orl = orl->remove(row, count);
+            if (!orl || !rt.append(orl))
+                return ERROR;
+        }
+        ol = list::make(ty, scr.scratch(), scr.growth());
+    }
+    else
+    {
+        ol = ol->remove(row, count);
+    }
+
+    // Put result on stack
+    if (ol && rt.drop() && rt.top(ol))
+        return OK;
+
+    // Return whatever error failed above
+    return ERROR;
+dimension_error:
+    rt.dimension_error();
+    return ERROR;
+value_error:
+    rt.value_error();
+    return ERROR;
+}
+
+
+COMMAND_BODY(AddRow)
+// ----------------------------------------------------------------------------
+//   Add a row in a matrix and returned combined matrix
+// ----------------------------------------------------------------------------
+{
+    return array::add_row_or_column(false);
+}
+
+
+COMMAND_BODY(AddColumn)
+// ----------------------------------------------------------------------------
+//   Add a column in a matrix and returned combined matrix
+// ----------------------------------------------------------------------------
+{
+    return array::add_row_or_column(true);
+}
+
+
+COMMAND_BODY(DeleteRow)
+// ----------------------------------------------------------------------------
+//   Add a row in a matrix and returned combined matrix and element
+// ----------------------------------------------------------------------------
+{
+    return array::delete_row_or_column(false);
+}
+
+
+COMMAND_BODY(DeleteColumn)
+// ----------------------------------------------------------------------------
+//   Delete a column in a matrix and returned reduced matrix
+// ----------------------------------------------------------------------------
+{
+    return array::delete_row_or_column(true);
+}
+
+
+COMMAND_BODY(RowSwap)
+// ----------------------------------------------------------------------------
+//   Swap two rows in an array
+// ----------------------------------------------------------------------------
+{
+    uint i = rt.stack(0)->as_uint32(1, true);
+    uint j = rt.stack(1)->as_uint32(1, true);
+    if (rt.error())
+        return ERROR;
+    array_p a = rt.stack(2)->as<array>();
+    if (!a)
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    uint r = 0;
+    for (object_p obj : *a)
+    {
+        if (!rt.push(obj))
+        {
+            rt.drop(r);
+            return ERROR;
+        }
+        r++;
+    }
+    if (i < 1 || i > r || j < 1 || j > r)
+    {
+        rt.drop(r);
+        rt.value_error();
+        return ERROR;
+    }
+    i--;
+    j--;
+    object_p x = rt.stack(r + ~i);
+    object_p y = rt.stack(r + ~j);
+    if (!x || !y)
+    {
+        rt.drop(r);
+        return ERROR;
+    }
+    rt.stack(r + ~i, y);
+    rt.stack(r + ~j, x);
+    scribble scr;
+    i = r;
+    while (i-->0)
+    {
+        if (!rt.append(rt.stack(i)))
+        {
+            rt.drop(r);
+            return ERROR;
+        }
+    }
+    rt.drop(r + 2);
+    object_p res = list::make(ID_array, scr.scratch(), scr.growth());
+    if (res && rt.top(res))
+        return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(ColumnSwap)
+// ----------------------------------------------------------------------------
+//   Delete a column in a matrix and returned reduced matrix
+// ----------------------------------------------------------------------------
+{
+    if (OK == run<Rot>()        &&
+        OK == run<Transpose>()  &&
+        OK == run<UnRot>()      &&
+        OK == run<RowSwap>())
+        return OK;
+    return ERROR;
+}
+
+
 static object_p item_from_constant(size_t, size_t,
                                    size_t, size_t, void *data)
 // ----------------------------------------------------------------------------
@@ -2026,6 +2577,19 @@ COMMAND_BODY(FromVector)
 }
 
 
+array_p array::transpose() const
+// ----------------------------------------------------------------------------
+//   Transpose an array without conjugating elements
+// ----------------------------------------------------------------------------
+{
+    array_g a    = this;
+    size_t  rows = 0, columns = 0;
+    if (a->is_matrix(&rows, &columns, true))
+        return array::from_stack(rows, columns, true);
+    return nullptr;
+}
+
+
 static object::result transpose(bool conjugate)
 // ----------------------------------------------------------------------------
 //   Transpose with or without conjugate
@@ -2033,17 +2597,11 @@ static object::result transpose(bool conjugate)
 {
     if (object_g obj = rt.top())
     {
-        if (array_p v = obj->as<array>())
+        if (array_p a = obj->as<array>())
         {
-            size_t rows = 0, columns = 0;
-            if (v->is_matrix(&rows, &columns, true))
-            {
-                if (algebraic_p res = array::from_stack(rows, columns, true))
-                {
-                    if (res && rt.top(res))
-                        return conjugate ? conj::evaluate() : object::OK;
-                }
-            }
+            a = a->transpose();
+            if (a && rt.top(a))
+                return conjugate ? conj::evaluate() : object::OK;
         }
         else
         {

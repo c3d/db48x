@@ -182,7 +182,8 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            check_help_examples();
+            matrix_functions();
+
 #if 0
         if (onlyCurrent & 2)
             demo_ui();
@@ -6204,6 +6205,41 @@ void tests::matrix_functions()
     test(CLEAR, "[  [ \"ABC\"  'X' ] 3/2  [ 4 [5] [6 7]]]", ENTER)
         .type(ID_array)
         .want("[[ \"ABC\" 'X' ] 1 ¹/₂ [ 4 [ 5 ] [ 6 7 ] ] ]");
+
+    step("Insert single row in vector")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 0 ROW+"), ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 1 ROW+"), ENTER)
+        .want("[ 4 1 2 3 ]")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 2 ROW+"), ENTER)
+        .want("[ 1 4 2 3 ]")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 3 ROW+"), ENTER)
+        .want("[ 1 2 4 3 ]")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 4 ROW+"), ENTER)
+        .want("[ 1 2 3 4 ]")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 5 ROW+"), ENTER)
+        .error("Bad argument value");
+
+    step("Insert multiple rows in vector")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] [ 4 5 ] 2 ROW+"), ENTER)
+        .want("[ 1 4 5 2 3 ]");
+
+    step("Insert single column in vector")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 2 COL+"), ENTER)
+        .want("[ 1 4 2 3 ]");
+
+    step("Insert multiple column in vector")
+        .test(CLEAR, DIRECT("[ 1 2 3 ] [ 4 5 ] 2 COL+"), ENTER)
+        .want("[ 1 4 5 2 3 ]");
+
+    step("Insert rows in list vector")
+        .test(CLEAR, DIRECT("{ 1 2 3 } 4 1 ROW+"), ENTER)
+        .error("Bad argument type")
+        .test(CLEAR, DIRECT("LaxArrayResizing { 1 2 3 } 4 1 ROW+"), ENTER)
+        .want("{ 4 1 2 3 }")
+        .test(CLEAR, DIRECT("'LaxArrayResizing' PURGE "
+                            "{ 1 2 3 } 4 1 ROW+"), ENTER)
+        .error("Bad argument type");
 
     step("Addition");
     test(CLEAR, "[[1 2] [3 4]] [[5 6][7 8]] +", ENTER)

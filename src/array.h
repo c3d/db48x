@@ -73,6 +73,8 @@ struct array : list
                    bool push = true, bool striptags = true) const;
     bool is_vector(size_t *size,
                    bool push = true, bool striptags = true) const;
+    bool is_matrix_or_vector(size_t *rows, size_t *columns,
+                             bool push = true, bool striptags = true) const;
     id   is_2Dor3D(bool push = true) const;
     bool is_vector() const { return is_vector(nullptr, false); }
     bool is_matrix() const { return is_matrix(nullptr, nullptr, false); }
@@ -91,6 +93,7 @@ struct array : list
     algebraic_p         norm_square() const;
     algebraic_p         norm() const;
     array_p             invert() const;
+    array_p             transpose() const;
 
     array_p             to_rectangular() const;
     array_p             to_polar() const;
@@ -110,6 +113,9 @@ struct array : list
     static array_p      cross(array_r x, array_r y);
     static algebraic_p  one_norm(array_p x, bool column);
     static result       one_norm(bool column);
+
+    static result       add_row_or_column(bool columnist);
+    static result       delete_row_or_column(bool columnist);
 
 public:
     OBJECT_DECL(array);
@@ -138,6 +144,17 @@ COMMAND_DECLARE(Transpose, 1);
 COMMAND_DECLARE(TransConjugate, 1);
 COMMAND_DECLARE(ColumnNorm, 1);
 COMMAND_DECLARE(RowNorm, 1);
+
+COMMAND_DECLARE(MatrixToColumns, 1);
+COMMAND_DECLARE(MatrixToRows, 1);
+COMMAND_DECLARE(ColumnsToMatrix, ~2);
+COMMAND_DECLARE(RowsToMatrix, ~2);
+COMMAND_DECLARE(AddColumn, 3);
+COMMAND_DECLARE(AddRow, 3);
+COMMAND_DECLARE(DeleteColumn, 2);
+COMMAND_DECLARE(DeleteRow, 2);
+COMMAND_DECLARE(ColumnSwap, 3);
+COMMAND_DECLARE(RowSwap, 3);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);

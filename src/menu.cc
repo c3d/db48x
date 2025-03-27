@@ -539,13 +539,13 @@ MENU(MatrixMenu,
      "ColNrm",  ID_ColumnNorm,
      "CondNum", ID_Unimplemented,
      "SpecRad", ID_Unimplemented,
-     "Vector",  ID_VectorMenu,
+     "Size",    ID_Size,
 
-     "Size",    ID_Unimplemented,
-     "Row+",    ID_Unimplemented,
-     "Row-",    ID_Unimplemented,
-     "Col+",    ID_Unimplemented,
-     "Col-",    ID_Unimplemented,
+     "Col+",    ID_AddColumn,
+     "Col-",    ID_DeleteColumn,
+     "→Col",    ID_MatrixToColumns,
+     "Col→",    ID_ColumnsToMatrix,
+     "ColSwp",  ID_ColumnSwap,
 
      "LU",      ID_Unimplemented,
      "LQ",      ID_Unimplemented,
@@ -556,7 +556,14 @@ MENU(MatrixMenu,
      "SVD",     ID_Unimplemented,
      "SVL",     ID_Unimplemented,
      "Diag→",   ID_Unimplemented,
-     "→Diag",   ID_Unimplemented);
+     "→Diag",   ID_Unimplemented,
+     "Vector",  ID_VectorMenu,
+
+     "Row+",    ID_AddRow,
+     "Row-",    ID_DeleteRow,
+     "→Row",    ID_MatrixToRows,
+     "Row→",    ID_RowsToMatrix,
+     "RowSwp",  ID_RowSwap);
 
 
 MENU(PolynomialsMenu,
