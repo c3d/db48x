@@ -131,6 +131,11 @@ struct StatsAccess : StatsParameters::Access, StatsData::Access
     algebraic_p         population_variance() const;
     algebraic_p         population_standard_deviation() const;
     algebraic_p         population_covariance() const;
+    algebraic_p         regression_formula() const;
+    algebraic_p         regression_formula_inverse() const;
+    algebraic_p         predict(bool predx) const;
+    algebraic_p         predict_x() const;
+    algebraic_p         predict_y() const;
 
     algebraic_p         intercept_value() const         { return intercept; }
     algebraic_p         slope_value() const             { return slope; }
@@ -188,6 +193,9 @@ COMMAND_DECLARE(DataColumns,2);
 COMMAND_DECLARE(Intercept,0);
 COMMAND_DECLARE(Slope,0);
 COMMAND_DECLARE(LinearRegression,0);
+COMMAND_DECLARE(RegressionFormula,0);
+COMMAND_DECLARE(PredictX,1);
+COMMAND_DECLARE(PredictY,1);
 COMMAND_DECLARE(BestFit,0);
 COMMAND_DECLARE(LinearFit,0);
 COMMAND_DECLARE(ExponentialFit,0);

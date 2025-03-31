@@ -715,57 +715,42 @@ MENU(StatisticsMenu,
      "Total",   ID_DataTotal,
      "Mean",    ID_Average,
      "StdDev" , ID_StandardDeviation,
-     "Corr",    ID_Correlation,
 
      "XCol",    ID_IndependentColumn,
      "YCol",    ID_DependentColumn,
      "MinΣ",    ID_MinData,
      "MaxΣ",    ID_MaxData,
      "ΣSize",   ID_DataSize,
-     "Median",  ID_Median,
 
      "StoΣ",    ID_StoreData,
      "RclΣ",    ID_RecallData,
      "ClrΣ",    ID_ClearData,
-     "Popul",   ID_PopulationMenu,
-     "Regres",  ID_RegressionMenu,
-     "Plot",    ID_PlotMenu);
+     "Proba",   ID_ProbabilitiesMenu,
+     "Plot",    ID_PlotMenu,
 
-MENU(RegressionMenu,
-// ----------------------------------------------------------------------------
-//   Statistics regression menu
-// ----------------------------------------------------------------------------
-     "BestFit",         ID_BestFit,
-     "LinFit",          ID_LinearFit,
-     "ExpFit",          ID_ExponentialFit,
-     "LogFit",          ID_PowerFit,
-     "PwrFit",          ID_LogarithmicFit,
-     "LR",              ID_LinearRegression,
+     "LR",      ID_LinearRegression,
+     "ΣLine",   ID_RegressionFormula,
+     "PredX",   ID_PredictX,
+     "PredY",   ID_PredictY,
+     "Corr",    ID_Correlation,
 
-     "XCol",            ID_IndependentColumn,
-     "YCol",            ID_DependentColumn,
-     "StdDev" ,         ID_StandardDeviation,
-     "Corr",            ID_Correlation,
-     "Inter",           ID_Intercept,
-     "Slope",           ID_Slope,
+     "BestFit", ID_BestFit,
+     "LinFit",  ID_LinearFit,
+     "ExpFit",  ID_ExponentialFit,
+     "LogFit",  ID_PowerFit,
+     "PwrFit",  ID_LogarithmicFit,
 
-     "ΣX",              ID_SumOfX,
-     "ΣY",              ID_SumOfY,
-     "ΣXY",             ID_SumOfXY,
-     "ΣX²",             ID_SumOfXSquares,
-     "ΣY²",             ID_SumOfYSquares,
-     "ΣSize",           ID_DataSize);
+     "ΣX",      ID_SumOfX,
+     "ΣY",      ID_SumOfY,
+     "ΣXY",     ID_SumOfXY,
+     "ΣX²",     ID_SumOfXSquares,
+     "ΣY²",     ID_SumOfYSquares,
 
-MENU(PopulationMenu,
-// ----------------------------------------------------------------------------
-//   Statistics population menu
-// ----------------------------------------------------------------------------
-     "XCol",            ID_IndependentColumn,
-     "YCol",            ID_DependentColumn,
-     "Bins",            ID_FrequencyBins,
-     "PopVar",          ID_PopulationVariance,
-     "PopSDev",         ID_PopulationStandardDeviation,
-     "PCovar",          ID_PopulationCovariance);
+     "Median",  ID_Median,
+     "Bins",    ID_FrequencyBins,
+     "PopVar",  ID_PopulationVariance,
+     "PopSDev", ID_PopulationStandardDeviation,
+     "PCovar",  ID_PopulationCovariance);
 
 
 MENU(SignalProcessingMenu,

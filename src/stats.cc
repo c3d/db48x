@@ -33,6 +33,7 @@
 #include "bignum.h"
 #include "compare.h"
 #include "dmcp.h"
+#include "expression.h"
 #include "integer.h"
 #include "tag.h"
 #include "variables.h"
@@ -1060,6 +1061,94 @@ algebraic_p StatsAccess::population_covariance() const
 }
 
 
+algebraic_p StatsAccess::regression_formula() const
+// ----------------------------------------------------------------------------
+//   Return the regression formula
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = +symbol::make("x");
+    algebraic_g a = slope;
+    algebraic_g b = intercept;
+    switch(model)
+    {
+    default:
+    case object::ID_LinearFit:          x = a * x + b; break;
+    case object::ID_LogarithmicFit:     x = a * log::run(x) + b; break;
+    case object::ID_ExponentialFit:     x = b * exp::run(a * x); break;
+    case object::ID_PowerFit:           x = b * pow(x, a); break;
+    }
+    return x;
+}
+
+
+algebraic_p StatsAccess::regression_formula_inverse() const
+// ----------------------------------------------------------------------------
+//   Return the inverse regression formula
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = +symbol::make("x");
+    algebraic_g a = slope;
+    algebraic_g b = intercept;
+    switch(model)
+    {
+    default:
+    case object::ID_LinearFit:          x = (x - b) / a; break;
+    case object::ID_LogarithmicFit:     x = exp::run((x - b) / a); break;
+    case object::ID_ExponentialFit:     x = log::run(x / b) / a; break;
+    case object::ID_PowerFit:           x = pow(x / b, inv::run(a)); break;
+    }
+    return x;
+}
+
+
+algebraic_p StatsAccess::predict_x() const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    return predict(true);
+}
+
+algebraic_p StatsAccess::predict_y() const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    return predict(false);
+}
+
+
+algebraic_p StatsAccess::predict(bool predx) const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    if (object_g obj = rt.pop())
+    {
+        if (obj->is_algebraic())
+        {
+            if (algebraic_p formula = predx
+                ? regression_formula_inverse()
+                : regression_formula())
+            {
+                if (expression_g expr = formula->as<expression>())
+                {
+                    symbol_g         name = symbol::make("x");
+                    save<symbol_g *> iref(expression::independent, &name);
+                    save<object_g *> ival(expression::independent_value, &obj);
+                    return expr->evaluate();
+                }
+            }
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return nullptr;
+}
+
+
 static algebraic_p do_popvar(algebraic_r s, algebraic_r x, algebraic_r mean)
 // ----------------------------------------------------------------------------
 //   Compute the terms of the population variance
@@ -1422,6 +1511,33 @@ COMMAND_BODY(LinearRegression)
     if (!rt.push(+itag) || !rt.push(+stag))
         return ERROR;
     return OK;
+}
+
+
+COMMAND_BODY(RegressionFormula)
+// ----------------------------------------------------------------------------
+//   Compute the regression formula
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::regression_formula, true);
+}
+
+
+COMMAND_BODY(PredictX)
+// ----------------------------------------------------------------------------
+//   Predict the X value
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::predict_x, true);
+}
+
+
+COMMAND_BODY(PredictY)
+// ----------------------------------------------------------------------------
+//   Predict the Y value
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::predict_y, true);
 }
 
 

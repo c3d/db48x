@@ -148,6 +148,7 @@ TESTS(overflow,         "Overflow and underflow");
 TESTS(insert,           "Insertion of variables, units and constants");
 TESTS(constants,        "Check the value of all built-in constants");
 TESTS(characters,       "Character menu and catalog");
+TESTS(statistics,       "Statistics");
 TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
@@ -182,7 +183,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            matrix_functions();
+            statistics();
 
 #if 0
         if (onlyCurrent & 2)
@@ -261,6 +262,7 @@ void tests::run(uint onlyCurrent)
         insertion_of_variables_constants_and_units();
         constants_menu();
         character_menu();
+        statistics();
         probabilities();
         sum_and_product();
         polynomials();
@@ -10499,6 +10501,57 @@ void tests::character_menu()
 }
 
 
+void tests::statistics()
+// ----------------------------------------------------------------------------
+//   Statistics commands
+// ----------------------------------------------------------------------------
+{
+    BEGIN(statistics);
+
+    step("Clear statistics")
+        .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
+        .test(ID_DataSize).got("0")
+        .test(ID_RecallData).got("[ ]");
+
+    step("1-variable add data");
+    for (uint i = 0; i < 10; i++)
+        test(i * i + 3 * i + 21, ID_AddData);
+    step("1-variable size")
+        .test(ID_DataSize).got("10");
+    step("1-variable total")
+        .test(ID_DataTotal).got("630");
+    step("1-variable average")
+        .test(ID_Average).got("63");
+    step("1-variable minimum")
+        .test(ID_MinData).got("21");
+    step("1-variable maximum")
+        .test(ID_MaxData).got("129");
+#if 0 // Unimplemented
+    step("1-variable median")
+        .test(ID_Median).expect("129");
+#endif
+    step("1-variable standard deviation")
+        .test(ID_StandardDeviation).got("37.13040 08417");
+    step("1-variable RclΣ")
+        .test("RclΣ", ENTER)
+        .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
+              " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]");
+    char buffer[80];
+    step("1-variable remove data");
+    for (uint j = 0; j < 10; j++)
+    {
+        uint i = 9-j;
+        snprintf(buffer, sizeof(buffer), "[ %u ]", i * i + 3 * i + 21);
+        test(ID_RemoveData).expect(buffer);
+    }
+    test(ID_RemoveData).error("Invalid ΣData").clear_error();
+    step("1-variable StoΣ")
+        .test("[1 2 3 4] StoΣ", ENTER).noerror()
+        .test("AVG", ENTER).expect("2 ¹/₂");
+
+}
+
+
 void tests::probabilities()
 // ----------------------------------------------------------------------------
 //   Probabilities functions and probabilities menu
@@ -10920,7 +10973,7 @@ void tests::random_number_generation()
 
     step("Set a known seed 17").test(CLEAR, "17 RandomSeed", ENTER).noerror();
 
-    step("Clear statistics data").test(CLEAR, LSHIFT, S, RSHIFT, F3);
+    step("Clear statistics data").test(CLEAR, ID_StatisticsMenu, ID_ClearData);
 
     step("Generate 1000 random numbers")
         .test(CLEAR, "1 1000 START RAND Σ+ NEXT", ENTER)
