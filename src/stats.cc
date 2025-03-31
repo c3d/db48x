@@ -1435,6 +1435,7 @@ COMMAND_BODY(BestFit)
         return ERROR;
 
     algebraic_g best_correlation, correlation, test;
+    algebraic_g best_slope, best_intercept;
     object::id  best_model = ID_LinearFit;
     for (uint type = ID_LinearFit; type <= ID_LogarithmicFit; type++)
     {
@@ -1452,9 +1453,16 @@ COMMAND_BODY(BestFit)
         {
             best_correlation = correlation;
             best_model = stats.model;
+            best_slope = stats.slope;
+            best_intercept = stats.intercept;
         }
     }
-    stats.model = best_model;
+    if (stats.model != best_model)
+    {
+        stats.model = best_model;
+        stats.slope = best_slope;
+        stats.intercept = best_intercept;
+    }
     return OK;
 }
 
