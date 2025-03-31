@@ -159,7 +159,7 @@ struct StatsAccess : StatsParameters::Access, StatsData::Access
 
 
 COMMAND_DECLARE(AddData,1);
-COMMAND_DECLARE(RemoveData,1);
+COMMAND_DECLARE(RemoveData,0);
 COMMAND_DECLARE(RecallData,0);
 COMMAND_DECLARE(StoreData,1);
 COMMAND_DECLARE(ClearData,0);
