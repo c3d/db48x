@@ -1149,6 +1149,31 @@ algebraic_p StatsAccess::predict(bool predx) const
 }
 
 
+bool StatsAccess::linear_regression()
+// ----------------------------------------------------------------------------
+//   Compute linear regression, return true if successful
+// ----------------------------------------------------------------------------
+{
+    StatsAccess stats;
+    if (!*this || !two_columns())
+        return false;
+    algebraic_g n = num_rows();
+    algebraic_g sx2 = sum_x2();
+    algebraic_g sx = sum_x();
+    algebraic_g sy = sum_y();
+    algebraic_g sxy = sum_xy();
+    algebraic_g ssxx = sx2 - sx * sx / n;
+    algebraic_g ssxy = sxy - sx * sy / n;
+    slope = ssxy / ssxx;
+    intercept = (sy - slope * sx) / n;
+    if (model == object::ID_ExponentialFit || model == object::ID_PowerFit)
+        intercept = exp::evaluate(intercept);
+    if (!intercept || !slope)
+        return false;
+    return true;
+}
+
+
 static algebraic_p do_popvar(algebraic_r s, algebraic_r x, algebraic_r mean)
 // ----------------------------------------------------------------------------
 //   Compute the terms of the population variance
@@ -1488,25 +1513,10 @@ COMMAND_BODY(LinearRegression)
 // ----------------------------------------------------------------------------
 {
     StatsAccess stats;
-    if (!stats || !stats.two_columns())
+    if (!stats.linear_regression())
         return ERROR;
-    algebraic_g n = stats.num_rows();
-    algebraic_g sx2 = stats.sum_x2();
-    algebraic_g sx = stats.sum_x();
-    algebraic_g sy = stats.sum_y();
-    algebraic_g sxy = stats.sum_xy();
-    algebraic_g ssxx = sx2 - sx * sx / n;
-    algebraic_g ssxy = sxy - sx * sy / n;
-    algebraic_g slope = ssxy / ssxx;
-    algebraic_g intercept = (sy - slope * sx) / n;
-    if (stats.model == ID_ExponentialFit || stats.model == ID_PowerFit)
-        intercept = exp::evaluate(intercept);
-    if (!intercept || !slope)
-        return ERROR;
-    stats.intercept = intercept;
-    stats.slope = slope;
-    tag_g itag = tag::make("Intercept", +intercept);
-    tag_g stag = tag::make("Slope", +slope);
+    tag_g itag = tag::make("Intercept", +stats.intercept);
+    tag_g stag = tag::make("Slope", +stats.slope);
     if (!itag || !stag)
         return ERROR;
     if (!rt.push(+itag) || !rt.push(+stag))
@@ -1557,6 +1567,8 @@ COMMAND_BODY(BestFit)
     for (uint type = ID_LinearFit; type <= ID_LogarithmicFit; type++)
     {
         stats.model = object::id(type);
+        if (!stats.linear_regression())
+            continue;
         correlation = stats.correlation();
         bool is_best = !best_correlation;
         if (!is_best)

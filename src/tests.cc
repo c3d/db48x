@@ -10510,33 +10510,33 @@ void tests::statistics()
 
     step("Clear statistics")
         .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
-        .test(ID_DataSize).got("0")
-        .test(ID_RecallData).got("[ ]");
+        .test(CLEAR, ID_DataSize).expect("0")
+        .test(CLEAR, ID_RecallData).expect("[ ]");
 
     step("1-variable add data");
     for (uint i = 0; i < 10; i++)
         test(i * i + 3 * i + 21, ID_AddData);
     step("1-variable size")
-        .test(ID_DataSize).got("10");
+        .test(CLEAR, ID_DataSize).expect("10");
     step("1-variable total")
-        .test(ID_DataTotal).got("630");
+        .test(CLEAR, ID_DataTotal).expect("630");
     step("1-variable average")
-        .test(ID_Average).got("63");
+        .test(CLEAR, ID_Average).expect("63");
     step("1-variable minimum")
-        .test(ID_MinData).got("21");
+        .test(CLEAR, ID_MinData).expect("21");
     step("1-variable maximum")
-        .test(ID_MaxData).got("129");
+        .test(CLEAR, ID_MaxData).expect("129");
 #if 0 // Unimplemented
     step("1-variable median")
-        .test(ID_Median).got("129");
+        .test(CLEAR, ID_Median).expect("129");
 #endif
     step("1-variable standard deviation")
-        .test(ID_StandardDeviation).got("37.13040 08417");
+        .test(CLEAR, ID_StandardDeviation).expect("37.13040 08417");
     step("1-variable LinearRegression")
-        .test(ID_LinearRegression)
+        .test(CLEAR, ID_LinearRegression)
         .error("Invalid ΣParameters").clear_error();
     step("1-variable RclΣ")
-        .test("RclΣ", ENTER)
+        .test(CLEAR, "RclΣ", ENTER)
         .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
               " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]")
         .clear();
@@ -10546,74 +10546,128 @@ void tests::statistics()
     {
         uint i = 9-j;
         snprintf(buffer, sizeof(buffer), "[ %u ]", i * i + 3 * i + 21);
-        test(ID_RemoveData).got(buffer);
+        test(CLEAR, ID_RemoveData).expect(buffer);
     }
-    test(ID_RemoveData).error("Invalid ΣData").clear_error();
+    test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
     step("2-variables StoΣ")
-        .test("[1 2 3 4] StoΣ", ENTER).noerror()
-        .test("AVG", ENTER).got("2 ¹/₂");
+        .test(CLEAR, "[1 2 3 4] StoΣ", ENTER).noerror()
+        .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
 
     step("Clear statistics for 2-variable tests")
         .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
-        .test(ID_DataSize).got("0")
-        .test(ID_RecallData).got("[ ]");
+        .test(CLEAR, ID_DataSize).expect("0")
+        .test(CLEAR, ID_RecallData).expect("[ ]");
 
     step("2-variables add data");
-    for (uint i = 0; i < 10; i++)
+    for (uint i = 1; i <= 10; i++)
     {
         snprintf(buffer, sizeof(buffer),
-                 "[ %u %u %u %u ] Σ+", i, 2*i+3, 3*i*i*i, 1<<i);
-        test(cstring(buffer), ENTER);
+                 "[ %u %u %u %u ] Σ+", i, 2*i+3, 2*i*i*i, 3<<i);
+        test(CLEAR, DIRECT(cstring(buffer)), ENTER);
     }
     step("2-variables size")
-        .test(ID_DataSize).got("10");
+        .test(CLEAR, ID_DataSize).expect("10");
     step("2-variables total")
-        .test(ID_DataTotal).got("[ 45 120 6 075 1 023 ]");
+        .test(CLEAR, ID_DataTotal).expect("[ 55 140 6 050 6 138 ]");
     step("2-variables average")
-        .test(ID_Average).got("[ 4 ¹/₂ 12 607 ¹/₂ 102 ³/₁₀ ]");
+        .test(CLEAR, ID_Average).expect("[ 5 ¹/₂ 14 605 613 ⁴/₅ ]");
     step("2-variables minimum")
-        .test(ID_MinData).got("[ 0 3 0 1 ]");
+        .test(CLEAR, ID_MinData).expect("[ 1 5 2 6 ]");
     step("2-variables maximum")
-        .test(ID_MaxData).got("[ 9 21 2 187 512 ]");
+        .test(CLEAR, ID_MaxData).expect("[ 10 23 2 000 3 072 ]");
 #if 0 // Unimplemented
     step("2-variables median")
-        .test(ID_Median).got("129");
+        .test(CLEAR, ID_Median).expect("129");
 #endif
     step("2-variables standard deviation")
-        .test(ID_StandardDeviation).expect("[ 3.02765 03541 6.05530 07081 9 753.88493 817 164.94851 0485 ]");
+        .test(CLEAR, ID_StandardDeviation)
+        .expect("[ 3.02765 03541 6.05530 07081 9 687.45666 5301 989.69106 2908 ]");
     step("2-variables RclΣ")
-        .test("RclΣ", ENTER)
-        .want("[[ 0 3 0 1 ]"
-              " [ 1 5 3 2 ]"
-              " [ 2 7 24 4 ]"
-              " [ 3 9 81 8 ]"
-              " [ 4 11 192 16 ]"
-              " [ 5 13 375 32 ]"
-              " [ 6 15 648 64 ]"
-              " [ 7 17 1 029 128 ]"
-              " [ 8 19 1 536 256 ]"
-              " [ 9 21 2 187 512 ]]")
+        .test(CLEAR, "RclΣ", ENTER)
+        .want("[[ 1 5 2 6 ]"
+              " [ 2 7 16 12 ]"
+              " [ 3 9 54 24 ]"
+              " [ 4 11 128 48 ]"
+              " [ 5 13 250 96 ]"
+              " [ 6 15 432 192 ]"
+              " [ 7 17 686 384 ]"
+              " [ 8 19 1 024 768 ]"
+              " [ 9 21 1 458 1 536 ]"
+              " [ 10 23 2 000 3 072 ]]")
         .clear();
     step("2-variable LinearRegression")
-        .test(ID_LinearRegression)
+        .test(CLEAR, ID_LinearRegression)
         .got("Slope:2", "Intercept:3");
     step("2-variable ΣLine")
-        .test(ID_RegressionFormula)
-        .got("'2·x+3'");
+        .test(CLEAR, ID_RegressionFormula)
+        .expect("'2·x+3'");
+    step("PredX")
+        .test(CLEAR, "3", ID_PredictX)
+        .expect("0")
+        .test(CLEAR, "7", ID_PredictX)
+        .expect("2");
+    step("PredY")
+        .test(CLEAR, "4", ID_PredictY)
+        .expect("11")
+        .test(CLEAR, "6", ID_PredictY)
+        .expect("15");
+    step("Column 3: Power law")
+        .test(CLEAR, "3", ID_DependentColumn)
+        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+        .expect("'2.·x↑3.'");
+    step("PredX")
+        .test(CLEAR, "54", ID_PredictX)
+        .expect("3.")
+        .test(CLEAR, "16", ID_PredictX)
+        .expect("2.");
+    step("PredY")
+        .test(CLEAR, "4", ID_PredictY)
+        .expect("128.")
+        .test(CLEAR, "6", ID_PredictY)
+        .expect("432.");
+    step("Column 4: Exponential law")
+        .test(CLEAR, "4", ID_DependentColumn)
+        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+        .expect("'3.·exp(0.69314 71805 6·x)'");
+    step("PredX")
+        .test(CLEAR, "3", ID_PredictX)
+        .expect("0.")
+        .test(CLEAR, "24", ID_PredictX)
+        .expect("3.");
+    step("PredY")
+        .test(CLEAR, "4", ID_PredictY)
+        .expect("48.")
+        .test(CLEAR, "6", ID_PredictY)
+        .expect("192.");
+    step("Column 4 and 1 reversed: Log law")
+        .test(CLEAR, "4", ID_IndependentColumn)
+        .test(CLEAR, "1", ID_DependentColumn)
+        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+        .expect("'1.44269 50408 9·ln x+-1.58496 25007 2'");
+    step("PredX")
+        .test(CLEAR, "3", ID_PredictX)
+        .expect("24.")
+        .test(CLEAR, "7", ID_PredictX)
+        .expect("384.");
+    step("PredY")
+        .test(CLEAR, "768", ID_PredictY)
+        .expect("8.")
+        .test(CLEAR, "6", ID_PredictY)
+        .expect("1.");
     step("2-variables remove data");
-    test("0 MantissaSpacing", ENTER);
+    test("0 MantissaSpacing", ENTER); // sprintf does not add spacing ;-)
     for (uint j = 0; j < 10; j++)
     {
-        uint i = 9-j;
+        uint i = 10-j;
         snprintf(buffer, sizeof(buffer),
-                 "[ %u %u %u %u ]", i, 2*i+3, 3*i*i*i, 1<<i);
-        test(ID_RemoveData).want(buffer);
+                 "[ %u %u %u %u ]", i, 2*i+3, 2*i*i*i, 3<<i);
+        test(CLEAR, ID_RemoveData).want(buffer);
     }
-    test(ID_RemoveData).error("Invalid ΣData").clear_error();
+    test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
     test("'MantissaSpacing' PURGE", ENTER);
     step("2-variables StoΣ")
         .test("[1 2 3 4] StoΣ", ENTER).noerror()
-        .test("AVG", ENTER).expect("2 ¹/₂");
+        .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
 }
 
 

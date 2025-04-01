@@ -139,6 +139,7 @@ struct StatsAccess : StatsParameters::Access, StatsData::Access
 
     algebraic_p         intercept_value() const         { return intercept; }
     algebraic_p         slope_value() const             { return slope; }
+    bool                linear_regression();
 
     typedef algebraic_p (StatsAccess::*eval_fn)() const;
     static object::result evaluate(eval_fn op, bool two_columns);
