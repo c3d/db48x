@@ -1487,7 +1487,7 @@ COMMAND_BODY(LinearRegression)
 // ----------------------------------------------------------------------------
 {
     StatsAccess stats;
-    if (!stats)
+    if (!stats || !stats.two_columns())
         return ERROR;
     algebraic_g n = stats.num_rows();
     algebraic_g sx2 = stats.sum_x2();

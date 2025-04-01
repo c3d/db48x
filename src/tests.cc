@@ -10532,6 +10532,9 @@ void tests::statistics()
 #endif
     step("1-variable standard deviation")
         .test(ID_StandardDeviation).got("37.13040 08417");
+    step("1-variable LinearRegression")
+        .test(ID_LinearRegression)
+        .error("Invalid ΣParameters").clear_error();
     step("1-variable RclΣ")
         .test("RclΣ", ENTER)
         .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
