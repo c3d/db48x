@@ -150,7 +150,7 @@ bool StatsParameters::Access::write(object_p name) const
         integer_g xc = integer::make(xcol);
         integer_g yc = integer::make(ycol);
         object_g  m  = command::static_object(model);
-        object_g par = list::make(xc, yc, slope, intercept, m);
+        object_g par = list::make(xc, yc, intercept, slope, m);
         if (par)
             return dir->store(name, par);
     }

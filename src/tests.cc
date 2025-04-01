@@ -10594,6 +10594,12 @@ void tests::statistics()
               " [ 8 19 1 536 256 ]"
               " [ 9 21 2 187 512 ]]")
         .clear();
+    step("2-variable LinearRegression")
+        .test(ID_LinearRegression)
+        .got("Slope:2", "Intercept:3");
+    step("2-variable ΣLine")
+        .test(ID_RegressionFormula)
+        .got("'2·x+3'");
     step("2-variables remove data");
     test("0 MantissaSpacing", ENTER);
     for (uint j = 0; j < 10; j++)
