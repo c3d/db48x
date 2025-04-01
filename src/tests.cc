@@ -10528,7 +10528,7 @@ void tests::statistics()
         .test(ID_MaxData).got("129");
 #if 0 // Unimplemented
     step("1-variable median")
-        .test(ID_Median).expect("129");
+        .test(ID_Median).got("129");
 #endif
     step("1-variable standard deviation")
         .test(ID_StandardDeviation).got("37.13040 08417");
@@ -10538,20 +10538,76 @@ void tests::statistics()
     step("1-variable RclΣ")
         .test("RclΣ", ENTER)
         .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
-              " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]");
+              " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]")
+        .clear();
     char buffer[80];
     step("1-variable remove data");
     for (uint j = 0; j < 10; j++)
     {
         uint i = 9-j;
         snprintf(buffer, sizeof(buffer), "[ %u ]", i * i + 3 * i + 21);
-        test(ID_RemoveData).expect(buffer);
+        test(ID_RemoveData).got(buffer);
     }
     test(ID_RemoveData).error("Invalid ΣData").clear_error();
-    step("1-variable StoΣ")
+    step("2-variables StoΣ")
+        .test("[1 2 3 4] StoΣ", ENTER).noerror()
+        .test("AVG", ENTER).got("2 ¹/₂");
+
+    step("Clear statistics for 2-variable tests")
+        .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
+        .test(ID_DataSize).got("0")
+        .test(ID_RecallData).got("[ ]");
+
+    step("2-variables add data");
+    for (uint i = 0; i < 10; i++)
+    {
+        snprintf(buffer, sizeof(buffer),
+                 "[ %u %u %u %u ] Σ+", i, 2*i+3, 3*i*i*i, 1<<i);
+        test(cstring(buffer), ENTER);
+    }
+    step("2-variables size")
+        .test(ID_DataSize).got("10");
+    step("2-variables total")
+        .test(ID_DataTotal).got("[ 45 120 6 075 1 023 ]");
+    step("2-variables average")
+        .test(ID_Average).got("[ 4 ¹/₂ 12 607 ¹/₂ 102 ³/₁₀ ]");
+    step("2-variables minimum")
+        .test(ID_MinData).got("[ 0 3 0 1 ]");
+    step("2-variables maximum")
+        .test(ID_MaxData).got("[ 9 21 2 187 512 ]");
+#if 0 // Unimplemented
+    step("2-variables median")
+        .test(ID_Median).got("129");
+#endif
+    step("2-variables standard deviation")
+        .test(ID_StandardDeviation).expect("[ 3.02765 03541 6.05530 07081 9 753.88493 817 164.94851 0485 ]");
+    step("2-variables RclΣ")
+        .test("RclΣ", ENTER)
+        .want("[[ 0 3 0 1 ]"
+              " [ 1 5 3 2 ]"
+              " [ 2 7 24 4 ]"
+              " [ 3 9 81 8 ]"
+              " [ 4 11 192 16 ]"
+              " [ 5 13 375 32 ]"
+              " [ 6 15 648 64 ]"
+              " [ 7 17 1 029 128 ]"
+              " [ 8 19 1 536 256 ]"
+              " [ 9 21 2 187 512 ]]")
+        .clear();
+    step("2-variables remove data");
+    test("0 MantissaSpacing", ENTER);
+    for (uint j = 0; j < 10; j++)
+    {
+        uint i = 9-j;
+        snprintf(buffer, sizeof(buffer),
+                 "[ %u %u %u %u ]", i, 2*i+3, 3*i*i*i, 1<<i);
+        test(ID_RemoveData).want(buffer);
+    }
+    test(ID_RemoveData).error("Invalid ΣData").clear_error();
+    test("'MantissaSpacing' PURGE", ENTER);
+    step("2-variables StoΣ")
         .test("[1 2 3 4] StoΣ", ENTER).noerror()
         .test("AVG", ENTER).expect("2 ¹/₂");
-
 }
 
 
