@@ -1427,6 +1427,7 @@ static object::result set_columns(bool setx, bool sety)
                 return object::ERROR;
         }
     }
+    rt.drop(setx + sety);
     return object::OK;
 }
 
