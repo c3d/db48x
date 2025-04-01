@@ -709,6 +709,44 @@ list_p list::insert(list_p whato, size_t pos) const
 }
 
 
+list_p list::swap(size_t first, size_t second) const
+// ----------------------------------------------------------------------------
+//   Swap elements at first and second position
+// ----------------------------------------------------------------------------
+{
+    if (first == second)
+        return this;
+    if (first > second)
+        std::swap(first, second);
+
+    scribble scr;
+    size_t   idx  = 0;
+    id       ty   = type();
+    object_g sobj = at(second);
+    if (!sobj)
+        return nullptr;
+
+    for (object_g copy : *this)
+    {
+        if (idx == first)
+        {
+            if (!rt.append(sobj))
+                return nullptr;
+            sobj = copy;
+            first = second;
+        }
+        else
+        {
+            if (!rt.append(copy))
+                return nullptr;
+        }
+        idx++;
+    }
+
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
 bool list::expand_without_size(size_t *size) const
 // ----------------------------------------------------------------------------
 //   Expand items on the stack, but do not add the size

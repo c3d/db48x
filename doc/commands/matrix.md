@@ -382,8 +382,36 @@ Cross produce of vectors
 
 
 ## CSWP
-Swap two columns in a matrix
+Swap two columns in an array or vector. The `CSWP` command takes an array and
+two column numbers.
 
+If the input is a vector, then the elements at the given index are swapped with
+one another, much like `RSWP`.
+
+```rpl
+[11 22 33 44 55] 2 3 CSWP
+@ Expecting [ 11 33 22 44 55 ]
+```
+
+If the input is an array with more than one dimension, then the columns at the
+given index are swapped with one another:
+
+```rpl
+[[ 11 12 13 14 ]
+ [ 21 22 23 24 ]
+ [ 31 32 33 34 ]]
+1 4 CSWP
+@ Expecting [[ 14 12 13 11 ] [ 24 22 23 21 ] [ 34 32 33 31 ]]
+```
+
+As an extension relative to HP's implementation, the command also works with
+lists.
+
+```rpl
+{ { "A" 2 } { "C" 4 "X" } }
+1 2 CSWP
+@ Expecting { { 2 "A" } { 4 "C" "X" } }
+```
 
 ## Determinant
 
@@ -530,7 +558,37 @@ Residual R=B-A*X' on a system A*X=B
 
 
 ## RSWP
-Swap two rows in a matrix
+Swap two rows in an array or vector. The `RSWP` command takes an array and
+two column numbers.
+
+If the input is a vector, then the elements at the given index are swapped with
+one another, much like `CSWP`.
+
+```rpl
+[11 22 33 44 55] 2 3 RSWP
+@ Expecting [ 11 33 22 44 55 ]
+```
+
+If the input is an array with more than one dimension, then the columns at the
+given index are swapped with one another:
+
+```rpl
+[[ 11 12 13 14 ]
+ [ 21 22 23 24 ]
+ [ 31 32 33 34 ]]
+1 2 RSWP
+@ Expecting [[ 21 22 23 24 ] [ 11 12 13 14 ] [ 31 32 33 34 ]]
+```
+
+As an extension relative to HP's implementation, the `RSWP` command also works with
+lists.
+
+```rpl
+{ { "A" 2 } { "C" 4 "X" } }
+1 2 RSWP
+@ Expecting { { "C" 4 "X" } { "A" 2 } }
+```
+
 
 
 ## SCHUR

@@ -116,6 +116,7 @@ struct array : list
 
     static result       add_row_or_column(bool columnist);
     static result       delete_row_or_column(bool columnist);
+    static result       swap_row_or_column(bool columnist);
 
 public:
     OBJECT_DECL(array);

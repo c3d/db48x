@@ -308,6 +308,9 @@ struct list : text
     list_p insert(object_p what, size_t pos) const;
     list_p insert(list_p what, size_t pos) const;
 
+    // Swap two elements in the array
+    list_p swap(size_t first, size_t second) const;
+
     // Reduce and filter operations
     object_p reduce(object_p prg) const;
     list_p   filter(object_p prg) const;

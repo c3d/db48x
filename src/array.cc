@@ -1959,6 +1959,61 @@ value_error:
 }
 
 
+object::result array::swap_row_or_column(bool columnist)
+// ----------------------------------------------------------------------------
+//   Shared code to swap rows or columns (CSWP, RSWP)
+// ----------------------------------------------------------------------------
+{
+    uint i = rt.stack(0)->as_uint32(1, true);
+    uint j = rt.stack(1)->as_uint32(1, true);
+    if (rt.error())
+        return ERROR;
+    list_p lst = rt.stack(2)->as_array_or_list();
+    if (!lst)
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    i--;
+    j--;
+    if (columnist)
+    {
+        scribble scr;
+        id       ty = lst->type();
+        bool     vec = true;
+        for (object_p row : *lst)
+        {
+            if (list_p rlst = row->as_array_or_list())
+            {
+                vec = false;
+                row = rlst->swap(i, j);
+                if (!row)
+                {
+                    if (!rt.error())
+                        rt.value_error();
+                    return ERROR;
+                }
+            }
+            if (!rt.append(row))
+                return ERROR;
+        }
+        if (vec)
+            lst = lst->swap(i, j);
+        else
+            lst = list::make(ty, scr.scratch(), scr.growth());
+    }
+    else
+    {
+        lst = lst->swap(i, j);
+    }
+    if (lst && rt.drop(2) && rt.top(lst))
+        return OK;
+    if (!rt.error())
+        rt.value_error();
+    return ERROR;
+}
+
+
 COMMAND_BODY(AddRow)
 // ----------------------------------------------------------------------------
 //   Add a row in a matrix and returned combined matrix
@@ -2000,72 +2055,16 @@ COMMAND_BODY(RowSwap)
 //   Swap two rows in an array
 // ----------------------------------------------------------------------------
 {
-    uint i = rt.stack(0)->as_uint32(1, true);
-    uint j = rt.stack(1)->as_uint32(1, true);
-    if (rt.error())
-        return ERROR;
-    array_p a = rt.stack(2)->as<array>();
-    if (!a)
-    {
-        rt.type_error();
-        return ERROR;
-    }
-    uint r = 0;
-    for (object_p obj : *a)
-    {
-        if (!rt.push(obj))
-        {
-            rt.drop(r);
-            return ERROR;
-        }
-        r++;
-    }
-    if (i < 1 || i > r || j < 1 || j > r)
-    {
-        rt.drop(r);
-        rt.value_error();
-        return ERROR;
-    }
-    i--;
-    j--;
-    object_p x = rt.stack(r + ~i);
-    object_p y = rt.stack(r + ~j);
-    if (!x || !y)
-    {
-        rt.drop(r);
-        return ERROR;
-    }
-    rt.stack(r + ~i, y);
-    rt.stack(r + ~j, x);
-    scribble scr;
-    i = r;
-    while (i-->0)
-    {
-        if (!rt.append(rt.stack(i)))
-        {
-            rt.drop(r);
-            return ERROR;
-        }
-    }
-    rt.drop(r + 2);
-    object_p res = list::make(ID_array, scr.scratch(), scr.growth());
-    if (res && rt.top(res))
-        return OK;
-    return ERROR;
+    return array::swap_row_or_column(false);
 }
 
 
 COMMAND_BODY(ColumnSwap)
 // ----------------------------------------------------------------------------
-//   Delete a column in a matrix and returned reduced matrix
+//   Swap two columns in an array
 // ----------------------------------------------------------------------------
 {
-    if (OK == run<Rot>()        &&
-        OK == run<Transpose>()  &&
-        OK == run<UnRot>()      &&
-        OK == run<RowSwap>())
-        return OK;
-    return ERROR;
+    return array::swap_row_or_column(true);
 }
 
 
