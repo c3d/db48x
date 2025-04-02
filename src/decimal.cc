@@ -2745,7 +2745,7 @@ decimal_p decimal::expm1(decimal_r x)
     decimal_g power = fp;
     decimal_g tmp;
 
-    uint prec = Settings.Precision();
+    precision_adjust prec(3);
     for (uint i = 2; i < prec; i++)
     {
         power = power * fp;
@@ -2786,7 +2786,7 @@ decimal_p decimal::expm1(decimal_r x)
             sum = (sum + one) * fact - one;
     }
 
-    return sum;
+    return prec(sum);
 }
 
 
@@ -2803,11 +2803,11 @@ decimal_p decimal::log(decimal_r x)
         return nullptr;
     }
 
+    precision_adjust prec(3);
     bool      negln  = x->exponent() <= -1;
     decimal_g one    = make(1);
     if (negln)
     {
-        precision_adjust prec(3);
         decimal_g scaled = one / x - one;
         scaled = log1p(scaled);
         scaled = -scaled;
@@ -2815,7 +2815,7 @@ decimal_p decimal::log(decimal_r x)
     }
     decimal_g scaled = x - one;
     scaled = log1p(scaled);
-    return scaled;
+    return prec(scaled);
 }
 
 
@@ -2876,6 +2876,7 @@ decimal_p decimal::exp(decimal_r x)
         return nullptr;
 
     // Compute exponential for integral part
+    precision_adjust prec(3);
     decimal_g one = make(1);
     decimal_g result = expm1(fp);
     result = (one + result);
@@ -2901,7 +2902,7 @@ decimal_p decimal::exp(decimal_r x)
             result = result * scale;
     }
 
-    return result;
+    return prec(result);
 }
 
 
