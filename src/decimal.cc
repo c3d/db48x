@@ -2626,6 +2626,7 @@ decimal_p decimal::log1p(decimal_r x)
     if (x->is_zero())
         return x;
 
+    precision_adjust prec(3);
     decimal_g one = make(1);
     decimal_g scaled = x + one;
     if (scaled->is_negative() || scaled->is_zero())
@@ -2688,7 +2689,6 @@ decimal_p decimal::log1p(decimal_r x)
 
     // Taylor's serie
     decimal_g sum = scaled;
-    uint prec = Settings.Precision();
     power = scaled;
     for (uint i = 2; i < 3*prec; i++)
     {
@@ -2719,7 +2719,7 @@ decimal_p decimal::log1p(decimal_r x)
         scale = make(ipart);
         sum = sum + scale;
     }
-    return sum;
+    return prec(sum);
 }
 
 
@@ -2805,10 +2805,11 @@ decimal_p decimal::log(decimal_r x)
     decimal_g one    = make(1);
     if (negln)
     {
+        precision_adjust prec(3);
         decimal_g scaled = one / x - one;
         scaled = log1p(scaled);
         scaled = -scaled;
-        return scaled;
+        return prec(scaled);
     }
     decimal_g scaled = x - one;
     scaled = log1p(scaled);
