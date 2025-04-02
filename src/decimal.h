@@ -474,19 +474,22 @@ struct decimal : algebraic
     {
         precision_adjust(uint extra): saved(Settings.Precision())
         {
-            Settings.Precision((saved + extra + 2) / 3 * 3);
+            if (adjusted++ == 0)
+                Settings.Precision((saved + extra + 2) / 3 * 3);
         }
         ~precision_adjust()
         {
+            --adjusted;
             Settings.Precision(saved);
         }
         operator uint()         { return saved; }
         decimal_p operator()(decimal_p dec)
         {
-            return dec ? dec->precision(saved) : nullptr;
+            return adjusted > 1 ? dec : dec ? dec->precision(saved) : nullptr;
         }
 
         uint saved;
+        static uint adjusted;
     };
 
     algebraic_p      to_integer() const;

@@ -2185,6 +2185,8 @@ decimal_p decimal::Max(decimal_r x, decimal_r y)
 //
 // ============================================================================
 
+uint decimal::precision_adjust::adjusted = 0;
+
 decimal_p decimal::sqrt(decimal_r x)
 // ----------------------------------------------------------------------------
 //   Square root using Newton's method
