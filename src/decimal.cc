@@ -1446,7 +1446,7 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
 // ----------------------------------------------------------------------------
 //   Return -1, 0 or 1 for comparison
 // ----------------------------------------------------------------------------
-//   epsilon indicates how many digits we are ready to ignore
+//   epsilon indicates how many digits we are considering
 {
     // Quick exit if identical pointers
     if (+x == +y)
@@ -1482,16 +1482,18 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     byte_p xb = xi.base;
     byte_p yb = yi.base;
 
-    // Compare up to the given
+    // Compare up to the given precision
+    size_t s  = std::min(xs, ys);
     if (epsilon)
     {
         // epsilon = 1 -> s = 1, m = 100
         // epsilon = 2 -> s = 1, m = 10
-        size_t s = (epsilon + 2) / 3;
         size_t l = epsilon / 3;
         size_t m = epsilon % 3;
         size_t d = m == 1 ? 100 : m == 2 ? 10 : 1;
-        for (size_t i = 0; i + 1 < s; i++)
+        size_t e = (epsilon + 2) / 3;
+        s = std::min(s, e);
+        for (size_t i = 0; i < s; i++)
         {
             uint xk = i < xs ? kigit(xb, i) : 0;
             uint yk = i < ys ? kigit(yb, i) : 0;
@@ -1506,7 +1508,6 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     }
     else
     {
-        size_t s  = std::min(xs, ys);
         for (size_t i = 0; i < s; i++)
             if (int diff = kigit(xb, i) - kigit(yb, i))
                 return sign * diff;
