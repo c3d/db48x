@@ -160,7 +160,7 @@ struct decimal : algebraic
         for (uint i = 0; i < nkigits; i++)
         {
             kigit(p, i, (value * mul / div) % 1000);
-            if (div > 1000)
+            if (div >= 1000)
                 div /= 1000;
             else
                 mul *= 1000;

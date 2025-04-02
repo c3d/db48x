@@ -183,7 +183,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            statistics();
+            regression_checks();
 
 #if 0
         if (onlyCurrent & 2)
@@ -11612,6 +11612,10 @@ void tests::regression_checks()
     BEGIN(regressions);
 
     Settings = settings();
+
+    step("Bug 1440: Conversion of integer to decimal may lose precision")
+        .test("987654321 SQ ToDecimal 987654321 2 ^ ToDecimal -", ENTER)
+        .expect("0");
 
     step("Bug 1429: SigDig on integer value with trailing zeros")
         .test(CLEAR, "70000 SIGDIG", ENTER)
