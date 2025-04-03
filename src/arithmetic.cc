@@ -1767,6 +1767,16 @@ algebraic_g pow(algebraic_r xr, ularge y)
 {
     algebraic_g r = integer::make(1);
     algebraic_g x = xr;
+    if (x->is_decimal() &&
+        !decimal::precision_adjust::adjusted &&
+        !(Settings.HardwareFloatingPoint() && Settings.Precision() <= 16))
+    {
+        decimal::precision_adjust prec(3);
+        r = pow(xr, y);
+        if (r && r->is_decimal())
+            r = prec(decimal_p(+r));
+        return r;
+    }
     while (y)
     {
         if (y & 1)
