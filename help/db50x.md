@@ -14925,6 +14925,9 @@ DB50X has five display mode (one more than the HP48)s:
 * [Engineering mode](#EngineeringDisplay))
 * [Significant digits mode](#SignificantDisplay))
 
+DB50X also features digit [grouping and spacing](#display-grouping-and-spacing)
+
+
 ## StandardDisplay
 
 Display numbers using full precision. All significant digts to the right of the
@@ -15034,6 +15037,77 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+
+# Display Grouping and Spacing
+
+DB50X can group digits in a way similar to the HP business calculators like the
+HP17B. The DB50X version is fully configurable through the `SeparatorModesMenu`.
+
+## SeparatorModesMenu
+
+This menu contains the configuration of separators used when displaying numbers.
+
+## MantissaSpacing
+
+Select the spacing for the non-fractional part of the mantissa.
+
+The default value is `3`, meaning that a spacing separator is inserted every
+third digit. `123456789` will show as `123 456 789`. After `4 MantissaSpacing`,
+it would show as `1 2345 6789`. A value of `0` disables spacing.
+
+## FractionSpacing
+
+Select the spacing for the fractional part of the mantissa.
+
+The default value is `5`, meaning that a spacing separator is inserted every
+fifth digit. `1.23456789` will show as `1.23456 789`. After `3 FractionSpacing`,
+it would show as `1.234 567 89`. A value of `0` disables spacing.
+
+## BasedSpacing
+
+Select the spacing for based numbers.
+
+The default value is `4`, meaning that a spacing separator is inserted every
+fourth digit. `#1234ABCDE` will show as `#1 234A BCDE₁₆`.
+After `2 BasedSpacing`, it would show as `#1 23 4A BC DE₁₆`.
+A value of `0` disables spacing.
+
+## NumberSpaces
+
+Separate digits with thin spaces. This is the default.
+
+For example, `1234.567890123` will display as `1 234.56789 012`.
+
+## NumberDotOrComma
+
+Separate digits with dots if `DecimalComma` is active, and with commas if
+`DecimalDot` is active.
+
+For example, `1234.567890123` will display as `1,234.56789,012` when the decimal
+separator is a `.`, and as `1.234,56789.012` if it is `,`.
+
+## NumberTicks
+
+Separate digits with ticks `’`.
+
+For example, `1234.567890123` will display as `1’234’567’890’123`.
+
+## NumberUnderscore
+
+Separate digits with underscores `_`.
+
+For example, `1234.567890123` will display as `1_234_567_890_123`.
+
+
+## DecimalDot
+
+Select the dot as a decimal separator, e.g.  `1.23`
+
+## DecimalComma
+
+Select the comma as a decimal separator, e.g.  `1,23`
+
+
 # Angle settings
 
 The angle mode determines how the calculator interprets angle arguments and how
@@ -15139,20 +15213,6 @@ Display names using the short form capitalized, for example `varName` will show 
 ## LongForm
 
 Display names using the long form, for example `varName` will show as `varName`.
-
-
-
-# Decimal separator settings
-
-The decimal separator can be either a dot (`1.23`) or a comma (`1,23`).
-
-## DecimalDot
-
-Select the dot as a decimal separator, e.g.  `1.23`
-
-## DecimalComma
-
-Select the comma as a decimal separator, e.g.  `1,23`
 
 
 
