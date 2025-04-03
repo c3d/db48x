@@ -13834,9 +13834,10 @@ tests &tests::want(cstring ref, uint extrawait)
 
             if (strcmp(ref, cstring(out)) == 0)
                 return *this;
-            explain("Expected output matching [", iref, "], "
-                    "got [", iout, "] instead, "
-                    "[", ref, "] differs from [", out, "]");
+            explain("Expected output matching [", iref, "], ");
+            explain("                     got [", iout, "] instead, ");
+            explain("                         [", ref, "] differs from ");
+            explain("                         [", out, "]");
             return fail();
         }
         sys_delay(refresh_delay_time);
@@ -13874,8 +13875,8 @@ tests &tests::expect(cstring output, uint extrawait)
                    strcmp(output, cstring(out)) == 0 ? "OK" : "FAIL");
             if (strcmp(output, cstring(out)) == 0)
                 return *this;
-            explain("Expected output [", output, "], "
-                    "got [", cstring(out), "] instead");
+            explain("Expected output [", output, "], ");
+            explain("            got [", cstring(out), "] instead");
             return fail();
         }
         sys_delay(refresh_delay_time);
