@@ -333,6 +333,18 @@ void runtime::object_validate(unsigned      typeID,
         object::object_error(type, object);
 }
 
+
+
+
+void runtime::dump_gc_pointers()
+// ----------------------------------------------------------------------------
+//   Helper function to dump all the GC pointers
+// ----------------------------------------------------------------------------
+{
+    uint i = 0;
+    for (gcptr *p = GCSafe; p; p = p->next)
+        printf("%4u: %p: %p\n", ++i, p, p->safe);
+}
 #endif // SIMULATOR
 
 

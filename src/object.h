@@ -246,11 +246,13 @@ struct object
     {
         byte *ptr = (byte *) this;
         id ty = (id) leb128_u16(ptr);
+#if SIMULATOR
         if (ty > NUM_IDS)
         {
             object_error(ty, this);
             ty = ID_object;
         }
+#endif // SIMULATOR
         return ty;
     }
 
@@ -311,11 +313,12 @@ struct object
     }
 
 
-    static void object_error(id type, const object *ptr);
+#if SIMULATOR
+    static bool object_error(id type, const object *ptr);
     // ------------------------------------------------------------------------
     //   Report an error e.g. with with an object type
     // ------------------------------------------------------------------------
-
+#endif // SIMULATOR
 
 
     // ========================================================================

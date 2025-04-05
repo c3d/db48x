@@ -911,7 +911,8 @@ bool object::next_index(object_p *indexp) const
 }
 
 
-void object::object_error(id type, object_p ptr)
+#if SIMULATOR
+bool object::object_error(id type, object_p ptr)
 // ----------------------------------------------------------------------------
 //    Report an error in an object
 // ----------------------------------------------------------------------------
@@ -924,7 +925,10 @@ void object::object_error(id type, object_p ptr)
     record(object_errors,
            "Invalid type %d for %p  Data %16llX %16llX",
            type, ptr, debug[0], debug[1]);
+    runtime::dump_gc_pointers();
+    return false;
 }
+#endif // SIMULATOR
 
 
 

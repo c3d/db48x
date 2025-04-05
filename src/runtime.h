@@ -464,6 +464,7 @@ struct runtime
     static void object_validate(unsigned typeID,
                                 const object *obj,
                                 size_t size);
+    static void dump_gc_pointers();
 #endif // SIMULATOR
 
 
@@ -1147,6 +1148,7 @@ protected:
     friend struct GarbageCollectorStatistics;
     friend struct cleaner;
     friend struct runtime_invariants;
+    friend void dump_gc_pointers();
 };
 
 template<typename T>
