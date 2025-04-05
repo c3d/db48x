@@ -1580,7 +1580,7 @@ bool object::is_negative(bool error) const
 
 bool object::is_simplifiable() const
 // ----------------------------------------------------------------------------
-//   Return true if auto-simplification does not apply
+//   Return true if auto-simplification does not apply - This may GC!
 // ----------------------------------------------------------------------------
 {
     id ty = type();
@@ -1596,7 +1596,7 @@ bool object::is_simplifiable() const
     case ID_neg_decimal:
         return decimal_p(this)->is_simplifiable();
     case ID_constant:
-        return constant_p(this)->is_simplifiable();
+        return constant_p(this)->is_simplifiable(); // May GC!
     case ID_expression:
         return expression_p(this)->is_simplifiable();
     default:
