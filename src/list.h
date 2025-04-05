@@ -48,6 +48,7 @@ GCP(unit);
 GCP(symbol);
 GCP(expression);
 
+RECORDER_DECLARE(list);
 
 struct list : text
 // ----------------------------------------------------------------------------
@@ -154,19 +155,29 @@ struct list : text
         explicit iterator(list_p list, bool atend = false)
             : size(0),
               first(list->objects(&size)),
-              index(atend ? size : 0) {}
+              index(atend ? size : 0)
+        {
+            ASSERT(object::is_valid(list));
+            record(list, "iterator(%t) size %lu first %t index %lu",
+                   list, size, +first, index);
+        }
         explicit iterator(list_p list, size_t skip)
             : size(0),
               first(list->objects(&size)),
               index(0)
         {
+            ASSERT(object::is_valid(list));
+            record(list, "skip iterator(%t) size %lu first %t index %lu",
+                   list, size, +first, index);
             while (skip && index < size)
             {
                 operator++();
                 skip--;
             }
         }
-        iterator() : size(0), first(), index(0) {}
+        iterator() : size(0), first(), index(0) {
+            record(list, "default iterator");
+        }
 
     public:
         iterator& operator++()
@@ -200,7 +211,8 @@ struct list : text
         }
         value_type operator*() const
         {
-            return index < size ? +first+ index : nullptr;
+            record(list, "at %lu size %lu first=%t", index, size, +first);
+            return index < size ? +first + index : nullptr;
         }
 
     public:

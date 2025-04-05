@@ -912,6 +912,15 @@ bool object::next_index(object_p *indexp) const
 
 
 #if SIMULATOR
+bool object::is_valid(object_p ptr)
+// ----------------------------------------------------------------------------
+//   Check that an object is valid
+// ----------------------------------------------------------------------------
+{
+    return rt.is_valid_object(ptr);
+}
+
+
 bool object::object_error(id type, object_p ptr)
 // ----------------------------------------------------------------------------
 //    Report an error in an object

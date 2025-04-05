@@ -314,6 +314,7 @@ struct object
 
 
 #if SIMULATOR
+    static bool is_valid(object_p ptr);
     static bool object_error(id type, const object *ptr);
     // ------------------------------------------------------------------------
     //   Report an error e.g. with with an object type
