@@ -423,7 +423,7 @@ bool runtime::cache(bool level0, object_p key, object_p value)
 void runtime::uncache(object_p start, size_t sz)
 // ----------------------------------------------------------------------------
 //   Drop the whole cache
-// ------------------]----------------------------------------------------------
+// ----------------------------------------------------------------------------
 {
     object_p end = start + sz;
     record(cache, "Clear cache %p-%p sz %u", start, end, sz);
@@ -624,8 +624,6 @@ void runtime::move(object_p to, object_p from,
     {
         if (p->safe >= (byte *) from && p->safe < (byte *) last)
         {
-            if ((long(p->safe) & 0xffffff) == 0x23ffa)
-                record(gc_details, "Badaboom");
             record(gc_details, "Adjusting GC-safe %p from %p to %p",
                    p, p->safe, p->safe + delta);
             p->safe += delta;
