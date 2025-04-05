@@ -1093,6 +1093,9 @@ bool runtime::push(object_g obj)
 {
     runtime_invariants check;
     ASSERT(obj && "Pushing a NULL object");
+    ASSERT((obj->type() < object::NUM_IDS ||
+            object::object_error(obj->type(), obj)) &&
+           "Invalid type pushed");
 
     // This may cause garbage collection, hence the need to adjust
     if (available(sizeof(void *)) < sizeof(void *))
