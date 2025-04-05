@@ -1321,6 +1321,7 @@ algebraic_p arithmetic::evaluate(id          op,
     if (!xr || !yr)
         return nullptr;
 
+    record(arithmetic, "Op %u x=%t y=%t", op, +xr, +yr);
     algebraic_g x   = xr;
     algebraic_g y   = yr;
     utf8        err = rt.error();
@@ -1542,6 +1543,7 @@ algebraic_p arithmetic::evaluate(id          op,
 
         x = expression::make(op, x, y);
     done:
+        record(arithmetic, "Done x=%t", +x);
         if (x)
             if (expression_p expr = x->as<expression>())
                 if (!unit::factoring && !unit::mode && Settings.AutoSimplify())
