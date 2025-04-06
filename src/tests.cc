@@ -10533,10 +10533,8 @@ void tests::statistics()
         .test(CLEAR, ID_MinData).expect("21");
     step("1-variable maximum")
         .test(CLEAR, ID_MaxData).expect("129");
-#if 0 // Unimplemented
     step("1-variable median")
-        .test(CLEAR, ID_Median).expect("129");
-#endif
+        .test(CLEAR, ID_Median).expect("55");
     step("1-variable standard deviation")
         .test(CLEAR, ID_StandardDeviation).expect("37.13040 08417");
     step("1-variable LinearRegression")
@@ -10582,10 +10580,8 @@ void tests::statistics()
         .test(CLEAR, ID_MinData).expect("[ 1 5 2 6 ]");
     step("2-variables maximum")
         .test(CLEAR, ID_MaxData).expect("[ 10 23 2 000 3 072 ]");
-#if 0 // Unimplemented
     step("2-variables median")
-        .test(CLEAR, ID_Median).expect("129");
-#endif
+        .test(CLEAR, ID_Median).expect("[ 5 ¹/₂ 14 341 144 ]");
     step("2-variables standard deviation")
         .test(CLEAR, ID_StandardDeviation)
         .expect("[ 3.02765 03541 6.05530 07081 9 687.45666 5301 989.69106 2908 ]");

@@ -123,6 +123,7 @@ struct StatsAccess : StatsParameters::Access, StatsData::Access
     algebraic_p         min() const;
     algebraic_p         max() const;
     algebraic_p         average() const;
+    algebraic_p         median() const;
     algebraic_p         variance() const;
     algebraic_p         standard_deviation() const;
     algebraic_p         correlation() const;

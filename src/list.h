@@ -347,6 +347,14 @@ struct list : text
     // Find a symbol in a list
     symbol_p contains(symbol_p sym) const;
 
+    // Get a row or column, or item for 1-dimensional lists
+    object_p row(size_t index) const;
+    object_p column(size_t index) const;
+
+    // Get a sorted list
+    list_p sort() const;
+    list_p sort(int (*compare)(object_p *x, object_p *y)) const;
+
 public:
     // Shared code for parsing and rendering, taking delimiters as input
     static result list_parse(id type, parser &p, unicode open, unicode close);

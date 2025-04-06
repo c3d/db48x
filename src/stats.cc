@@ -888,6 +888,67 @@ algebraic_p StatsAccess::average() const
 }
 
 
+static algebraic_p list_median(list_g &data)
+// ----------------------------------------------------------------------------
+//   Find the median in a one-dimensional sorted list or array
+// ----------------------------------------------------------------------------
+{
+    // List needs to be sorted
+    data = data->sort();
+    if (!data)
+        return nullptr;
+
+    size_t count = data->items();
+    if (count & 1)
+        return data->at(count/2)->as_algebraic();
+
+    size_t      half = count / 2;
+    algebraic_g two  = integer::make(2);
+    algebraic_g l   = data->at(half - 1)->as_algebraic();
+    algebraic_g h   = data->at(half - 0)->as_algebraic();
+    return (l + h) / two;
+}
+
+
+algebraic_p StatsAccess::median() const
+// ----------------------------------------------------------------------------
+//   Compute the median
+// ----------------------------------------------------------------------------
+{
+    if (rows <= 0)
+    {
+        rt.insufficient_stats_data_error();
+        return nullptr;
+    }
+
+    scribble    scr;
+    algebraic_g m;
+    for (size_t c = 0; c < columns; c++)
+    {
+        object_p col = data->column(c);
+        if (list_g lcol = col->as_array_or_list())
+        {
+            m = list_median(lcol);
+            if (columns == 1)
+                return m;
+            if (!m || !rt.append(+m))
+                return nullptr;
+        }
+        else if (c == 0 && columns == 1)
+        {
+            list_g d = +data;
+            return list_median(d);
+        }
+        else
+        {
+            rt.invalid_stats_data_error();
+            return nullptr;
+        }
+    }
+    return list::make(data->type(), scr.scratch(), scr.growth());
+}
+
+
 static algebraic_p do_variance(algebraic_r s, algebraic_r x, algebraic_r mean)
 // ----------------------------------------------------------------------------
 //   Compute the terms of the variance
@@ -1275,8 +1336,7 @@ COMMAND_BODY(Median)
 //  Find the median of the input data
 // ----------------------------------------------------------------------------
 {
-    rt.unimplemented_error();
-    return ERROR;
+    return StatsAccess::evaluate(&StatsAccess::median, false);
 }
 
 

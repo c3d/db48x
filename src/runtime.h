@@ -1306,6 +1306,7 @@ struct stack_depth_restore
         if (now > depth)
             rt.drop(now - depth);
     }
+    size_t count() const        { return rt.depth() - depth; }
     size_t depth;
 };
 
