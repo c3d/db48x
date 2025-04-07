@@ -453,6 +453,13 @@ unintentional differences, since the implementation is completely new.
   replaced with true closures (which have a well-defined meaning) if there is
   enough demand.
 
+* Logical operations such as `AND` or `NOT` will apply bitwise when given
+  integer arguments. For example, `42 4 AND` returns `0` on DB48x, but `1.`
+  (logical truth) on HP calculators. Both DB48x and HP calculators will perform
+  bitwise operations when given based numbers, e.g. `#42d #4d AND` returns `#0`
+  in the two implementations. This can be changed using `TruthLogicForIntegers`,
+  which restores the HP-like behaviour.
+
 
 ### Numbers
 

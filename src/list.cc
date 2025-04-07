@@ -657,6 +657,96 @@ list_p list::remove(size_t first, size_t len) const
 }
 
 
+list_p list::insert(object_p whato, size_t pos) const
+// ----------------------------------------------------------------------------
+//   Insert `what` in the list at position `pos` (0-based)
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    size_t   idx = 0;
+    id       ty  = type();
+    object_g what = whato;
+    for (object_g copy : *this)
+    {
+        if (idx == pos)
+            if (!rt.append(what))
+                return nullptr;
+        if (!rt.append(copy))
+            return nullptr;
+        idx++;
+    }
+    if (idx == pos)
+        if (!rt.append(what))
+            return nullptr;
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+list_p list::insert(list_p whato, size_t pos) const
+// ----------------------------------------------------------------------------
+//   Insert items in `what` in the list at position `pos` (0-based)
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    size_t   idx = 0;
+    id       ty  = type();
+    list_g   what = whato;
+    for (object_g copy : *this)
+    {
+        if (idx == pos)
+            for (object_p inserted : *what)
+                if (!rt.append(inserted))
+                    return nullptr;
+        if (!rt.append(copy))
+            return nullptr;
+        idx++;
+    }
+    if (idx == pos)
+        for (object_p inserted : *what)
+            if (!rt.append(inserted))
+                return nullptr;
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+list_p list::swap(size_t first, size_t second) const
+// ----------------------------------------------------------------------------
+//   Swap elements at first and second position
+// ----------------------------------------------------------------------------
+{
+    if (first == second)
+        return this;
+    if (first > second)
+        std::swap(first, second);
+
+    scribble scr;
+    size_t   idx  = 0;
+    id       ty   = type();
+    object_g sobj = at(second);
+    if (!sobj)
+        return nullptr;
+
+    for (object_g copy : *this)
+    {
+        if (idx == first)
+        {
+            if (!rt.append(sobj))
+                return nullptr;
+            sobj = copy;
+            first = second;
+        }
+        else
+        {
+            if (!rt.append(copy))
+                return nullptr;
+        }
+        idx++;
+    }
+
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
 bool list::expand_without_size(size_t *size) const
 // ----------------------------------------------------------------------------
 //   Expand items on the stack, but do not add the size
@@ -1768,37 +1858,12 @@ static object::result do_sort(int (*compare)(object_p *x, object_p *y))
 //   RPL command for a sort
 // ----------------------------------------------------------------------------
 {
-    typedef int (*qsort_fn)(const void *, const void*);
-
     if  (object_p obj = rt.stack(0))
     {
-        if (list_g items = obj->as_array_or_list())
+        if (list_p items = obj->as_array_or_list())
         {
-            size_t     depth = rt.depth();
-            size_t     count;
-            scribble   scr;
-            qsort_fn   cmp = qsort_fn(compare);
-            object::id ity = items->type();
-
-            for (object_p item : *items)
-                if (!rt.push(item))
-                    goto err;
-            count = rt.depth() - depth;
-            if (cmp)
-                qsort(rt.stack_base(), count, sizeof(object_p), cmp);
-
-            for (uint i = 0; i < count; i++)
-                if (object_g obj = rt.stack(i))
-                    if (!rt.append(obj))
-                        goto err;
-            rt.drop(count);
-            items = list::make(ity, scr.scratch(), scr.growth());
-            if (items && rt.top(+items))
-                return object::OK;
-
-        err:
-            rt.drop(rt.depth() - depth);
-            return object::ERROR;
+            items = items->sort(compare);
+            return items && rt.top(+items) ? object::OK : object::ERROR;
         }
         else
         {
@@ -2634,4 +2699,94 @@ symbol_p list::contains(symbol_p vsym) const
             if (known->is_same_as(vsym))
                 return known;
     return nullptr;
+}
+
+
+object_p list::row(size_t index) const
+// ----------------------------------------------------------------------------
+//   Return the given row or item
+// ----------------------------------------------------------------------------
+{
+    object_p result = nullptr;
+    bool     vector = true;
+    for (object_p obj : *this)
+    {
+        if (obj->is_array_or_list())
+            vector = false;
+        if (index-- == 0)
+            result = obj;
+    }
+    return vector ? result : result->as_array_or_list();
+}
+
+
+object_p list::column(size_t index) const
+// ----------------------------------------------------------------------------
+//   Return the given column or item
+// ----------------------------------------------------------------------------
+{
+    object_p result = nullptr;
+    bool     vector = true;
+    size_t   colidx = index;
+    for (object_p obj : *this)
+    {
+        if (obj->is_array_or_list())
+            vector = false;
+        if (index-- == 0)
+            result = obj;
+    }
+    // If processing a vector, return what we found
+    if (vector)
+        return result;
+
+    // For more than one dimension, need a list at every level
+    scribble scr;
+    id ty = type();
+    for (object_p obj : *this)
+    {
+        list_p row = obj->as_array_or_list();
+        if (!row)
+            return nullptr;
+        object_p item = row->at(colidx);
+        if (!item || !rt.append(item))
+            return nullptr;
+    }
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+// Get a sorted list
+list_p list::sort() const
+// ----------------------------------------------------------------------------
+//   Return a sorted list based on value-compare
+// ----------------------------------------------------------------------------
+{
+    return sort(value_compare);
+}
+
+
+list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
+// ----------------------------------------------------------------------------
+//  Return a sorted list based on the given comparison function
+// ----------------------------------------------------------------------------
+{
+    typedef int (*qsort_fn)(const void *, const void*);
+    qsort_fn            cmp = qsort_fn(compare);
+    id                  ty  = type();
+    stack_depth_restore sdr;
+    for (object_p item : *this)
+        if (!rt.push(item))
+            return nullptr;
+
+    size_t count = sdr.count();
+    if (cmp)
+        qsort(rt.stack_base(), count, sizeof(object_p), cmp);
+
+    scribble scr;
+    for (size_t i = 0; i < count; i++)
+        if (object_g obj = rt.stack(i))
+            if (!rt.append(obj))
+                return nullptr;
+    rt.drop(count);
+    return list::make(ty, scr.scratch(), scr.growth());
 }

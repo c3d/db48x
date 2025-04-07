@@ -124,9 +124,15 @@ object::id command::lookup(utf8 name, size_t &maxlen, bool eq)
         {
             // '=' is special because there is == (two consecutive separators)
             if (name[0] == '=')
-                max = 1 + (max > 1 && name[1] == '=');
+            {
+                maxlen = (max > 1 && name[1] == '=') ? 2 : 1;
+                return  maxlen == 2 ? ID_TestSame : ID_TestEQ;
+            }
             else
-                max = utf8_size(name, maxlen); // All non-names cmds are 1 character
+            {
+                // All non-names cmds are 1 character
+                max = utf8_size(name, maxlen);
+            }
         }
 
         while (true)
@@ -995,7 +1001,7 @@ COMMAND_BODY(Version)
         "Reverse Polish Lisp (RPL)\n"
         "and a tribute to\n"
         "Bill Hewlett and Dave Packard\n"
-        "© 2024 Christophe de Dinechin";
+        "© 2025 Christophe de Dinechin";
     if (text_g version = text::make(version_text))
         if (rt.push(object_p(version)))
             return OK;

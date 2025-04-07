@@ -1446,7 +1446,7 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
 // ----------------------------------------------------------------------------
 //   Return -1, 0 or 1 for comparison
 // ----------------------------------------------------------------------------
-//   epsilon indicates how many digits we are ready to ignore
+//   epsilon indicates how many digits we are considering
 {
     // Quick exit if identical pointers
     if (+x == +y)
@@ -1482,16 +1482,18 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     byte_p xb = xi.base;
     byte_p yb = yi.base;
 
-    // Compare up to the given
+    // Compare up to the given precision
+    size_t s  = std::min(xs, ys);
     if (epsilon)
     {
         // epsilon = 1 -> s = 1, m = 100
         // epsilon = 2 -> s = 1, m = 10
-        size_t s = (epsilon + 2) / 3;
         size_t l = epsilon / 3;
         size_t m = epsilon % 3;
         size_t d = m == 1 ? 100 : m == 2 ? 10 : 1;
-        for (size_t i = 0; i + 1 < s; i++)
+        size_t e = (epsilon + 2) / 3;
+        s = std::min(s, e);
+        for (size_t i = 0; i < s; i++)
         {
             uint xk = i < xs ? kigit(xb, i) : 0;
             uint yk = i < ys ? kigit(yb, i) : 0;
@@ -1506,7 +1508,6 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     }
     else
     {
-        size_t s  = std::min(xs, ys);
         for (size_t i = 0; i < s; i++)
             if (int diff = kigit(xb, i) - kigit(yb, i))
                 return sign * diff;
@@ -2118,7 +2119,8 @@ decimal_p decimal::pow(decimal_r x, decimal_r y)
     if (!x || !y)
         return nullptr;
     pow::remember(target<pow>);
-    return exp(y * log(x));
+    precision_adjust prec(3);
+    return prec(exp(y * log(x)));
 }
 
 
@@ -2130,7 +2132,8 @@ decimal_p decimal::hypot(decimal_r x, decimal_r y)
     if (!x || !y)
         return nullptr;
     hypot::remember(target<hypot>);
-    return sqrt(x*x + y*y);
+    precision_adjust prec(3);
+    return prec(sqrt(x*x + y*y));
 }
 
 
@@ -2183,6 +2186,8 @@ decimal_p decimal::Max(decimal_r x, decimal_r y)
 //   Math functions
 //
 // ============================================================================
+
+uint decimal::precision_adjust::adjusted = 0;
 
 decimal_p decimal::sqrt(decimal_r x)
 // ----------------------------------------------------------------------------
@@ -2247,9 +2252,10 @@ decimal_p decimal::sin(decimal_r x)
 {
     uint qturns;
     decimal_g fp;
+    precision_adjust prec(3);
     if (!x->adjust_from_angle(qturns, fp))
         return nullptr;
-    return sin_fracpi(qturns, fp);
+    return prec(sin_fracpi(qturns, fp));
 }
 
 
@@ -2260,9 +2266,10 @@ decimal_p decimal::cos(decimal_r x)
 {
     uint qturns;
     decimal_g fp;
+    precision_adjust prec(3);
     if (!x->adjust_from_angle(qturns, fp))
         return nullptr;
-    return cos_fracpi(qturns, fp);
+    return prec(cos_fracpi(qturns, fp));
 }
 
 
@@ -2403,11 +2410,12 @@ decimal_p decimal::tan(decimal_r x)
 {
     uint qturns;
     decimal_g fp;
+    precision_adjust prec(3);
     if (!x->adjust_from_angle(qturns, fp))
         return nullptr;
     decimal_g s = sin_fracpi(qturns, fp);
     decimal_g c = cos_fracpi(qturns, fp);
-    return s / c;
+    return prec(s / c);
 }
 
 
@@ -2416,6 +2424,7 @@ decimal_p decimal::asin(decimal_r x)
 //   Arc-sine, use asin(x) = atan(x / sqrt(1-x^2))
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g tmp = make(1);
     tmp = tmp - x * x;
     if (tmp && tmp->is_zero())
@@ -2427,7 +2436,7 @@ decimal_p decimal::asin(decimal_r x)
         tmp = x / sqrt(tmp);
         tmp = atan(tmp);
     }
-    return tmp;
+    return prec(tmp);
 }
 
 
@@ -2439,6 +2448,7 @@ decimal_p decimal::acos(decimal_r x)
     if (!x)
         return nullptr;
 
+    precision_adjust prec(3);
     decimal_g tmp;
     if (!x->is_zero())
     {
@@ -2457,7 +2467,7 @@ decimal_p decimal::acos(decimal_r x)
     {
         tmp = exact_angle(5,-1);
     }
-    return tmp;
+    return prec(tmp);
 }
 
 
@@ -2481,6 +2491,7 @@ decimal_p decimal::atan(decimal_r x)
     }
 
     // Check if we have a value of x above 1, if so reduce for convergence
+    precision_adjust prec(3);
     if (x->exponent() >= 1 && !x->is_one())
     {
         // atan(1/x) = pi/2 - arctan(x) when x > 0
@@ -2489,7 +2500,7 @@ decimal_p decimal::atan(decimal_r x)
         i = atan(i);
         decimal_g half = exact_angle(5, -1);
         i = half - i;
-        return i;
+        return prec(i);
     }
 
     // Check if above 0.5
@@ -2501,11 +2512,10 @@ decimal_p decimal::atan(decimal_r x)
         nx = atan(nx);
         decimal_g fourth = exact_angle(25,-2);
         nx = fourth + nx;
-        return nx;
+        return prec(nx);
     }
 
     // Prepare power factor and square that we multiply by every time
-    precision_adjust prec(3);
     decimal_g tmp;
     decimal_g sum = x;
     decimal_g square = x * x;
@@ -2550,10 +2560,11 @@ decimal_p decimal::sinh(decimal_r x)
 //    Hyperbolic sine
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g half = make(5,-1);
     decimal_g ep = exp(x);
     decimal_g em = exp(-x);
-    return (ep - em) * half;
+    return prec((ep - em) * half);
 }
 
 
@@ -2562,10 +2573,11 @@ decimal_p decimal::cosh(decimal_r x)
 //  Hyperbolic cosine
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g half = make(5,-1);
     decimal_g ep = exp(x);
     decimal_g em = exp(-x);
-    return (ep + em) * half;
+    return prec((ep + em) * half);
 }
 
 
@@ -2574,9 +2586,10 @@ decimal_p decimal::tanh(decimal_r x)
 //   Hyperbolic tangent
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g hs = sinh(x);
     decimal_g hc = cosh(x);
-    return hs / hc;
+    return prec(hs / hc);
 }
 
 
@@ -2585,8 +2598,9 @@ decimal_p decimal::asinh(decimal_r x)
 //  Inverse hyperbolic sine
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g one = make(1);
-    return log(x + decimal_g(sqrt(x*x + one)));
+    return prec(log(x + decimal_g(sqrt(x*x + one))));
 }
 
 
@@ -2595,8 +2609,9 @@ decimal_p decimal::acosh(decimal_r x)
 //  Inverse hyperbolic cosine
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g one = make(1);
-    return log(x + decimal_g(sqrt(x*x - one)));
+    return prec(log(x + decimal_g(sqrt(x*x - one))));
 }
 
 
@@ -2605,9 +2620,10 @@ decimal_p decimal::atanh(decimal_r x)
 //   Inverse hyperbolic tangent
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g one = make(1);
     decimal_g half = make(5, -1);
-    return half * log((one + x) / (one - x));
+    return prec(half * log((one + x) / (one - x)));
 }
 
 
@@ -2625,6 +2641,7 @@ decimal_p decimal::log1p(decimal_r x)
     if (x->is_zero())
         return x;
 
+    precision_adjust prec(3);
     decimal_g one = make(1);
     decimal_g scaled = x + one;
     if (scaled->is_negative() || scaled->is_zero())
@@ -2687,7 +2704,6 @@ decimal_p decimal::log1p(decimal_r x)
 
     // Taylor's serie
     decimal_g sum = scaled;
-    uint prec = Settings.Precision();
     power = scaled;
     for (uint i = 2; i < 3*prec; i++)
     {
@@ -2718,7 +2734,7 @@ decimal_p decimal::log1p(decimal_r x)
         scale = make(ipart);
         sum = sum + scale;
     }
-    return sum;
+    return prec(sum);
 }
 
 
@@ -2742,7 +2758,7 @@ decimal_p decimal::expm1(decimal_r x)
     decimal_g power = fp;
     decimal_g tmp;
 
-    uint prec = Settings.Precision();
+    precision_adjust prec(3);
     for (uint i = 2; i < prec; i++)
     {
         power = power * fp;
@@ -2783,7 +2799,7 @@ decimal_p decimal::expm1(decimal_r x)
             sum = (sum + one) * fact - one;
     }
 
-    return sum;
+    return prec(sum);
 }
 
 
@@ -2800,6 +2816,7 @@ decimal_p decimal::log(decimal_r x)
         return nullptr;
     }
 
+    precision_adjust prec(3);
     bool      negln  = x->exponent() <= -1;
     decimal_g one    = make(1);
     if (negln)
@@ -2807,11 +2824,11 @@ decimal_p decimal::log(decimal_r x)
         decimal_g scaled = one / x - one;
         scaled = log1p(scaled);
         scaled = -scaled;
-        return scaled;
+        return prec(scaled);
     }
     decimal_g scaled = x - one;
     scaled = log1p(scaled);
-    return scaled;
+    return prec(scaled);
 }
 
 
@@ -2828,6 +2845,7 @@ decimal_p decimal::log10(decimal_r x)
         return nullptr;
     }
 
+    precision_adjust prec(3);
     large exp10 = x->exponent() - 1;
     decimal_g fp = x;
     if (exp10)
@@ -2843,7 +2861,7 @@ decimal_p decimal::log10(decimal_r x)
         fp = make(exp10);
         ln10 = ln10 + fp;
     }
-    return ln10;
+    return prec(ln10);
 }
 
 
@@ -2852,9 +2870,10 @@ decimal_p decimal::log2(decimal_r x)
 //  Logarithm in base 2
 // ----------------------------------------------------------------------------
 {
+    precision_adjust prec(3);
     decimal_g lnx = log(x);
     decimal_g ln2 = constants().ln2();
-    return lnx / ln2;
+    return prec(lnx / ln2);
 }
 
 
@@ -2872,6 +2891,7 @@ decimal_p decimal::exp(decimal_r x)
         return nullptr;
 
     // Compute exponential for integral part
+    precision_adjust prec(3);
     decimal_g one = make(1);
     decimal_g result = expm1(fp);
     result = (one + result);
@@ -2897,7 +2917,7 @@ decimal_p decimal::exp(decimal_r x)
             result = result * scale;
     }
 
-    return result;
+    return prec(result);
 }
 
 
@@ -2913,6 +2933,7 @@ decimal_p decimal::exp10(decimal_r x)
     decimal_g fp;
     if (!x->split(ip, fp))
         return nullptr;
+    precision_adjust prec(3);
     fp = constants().ln10() * fp;
     fp = exp(fp);
     if (ip)
@@ -2920,7 +2941,7 @@ decimal_p decimal::exp10(decimal_r x)
         decimal_g scale = make(1, ip);
         fp = scale * fp;
     }
-    return fp;
+    return prec(fp);
 }
 
 
@@ -2929,7 +2950,8 @@ decimal_p decimal::exp2(decimal_r x)
 //   Exponential in base 2
 // ----------------------------------------------------------------------------
 {
-    return exp(constants().ln2() * x);
+    precision_adjust prec(3);
+    return prec(exp(constants().ln2() * x));
 }
 
 
@@ -2945,12 +2967,13 @@ decimal_p decimal::erf(decimal_r x)
     if (x->is_negative())
         return -decimal_g(erf(-x));
 
+    precision_adjust prec(3);
     if (!x->is_magnitude_less_than(300, 1))
     {
         // Use asymptotic expansion
         decimal_g one = make(1);
         decimal_g rest = erfc(x);
-        return one - rest;
+        return prec(one - rest);
     }
 
     // Taylor's serie
@@ -2960,7 +2983,6 @@ decimal_p decimal::erf(decimal_r x)
     decimal_g fact = make(1);
     decimal_g tmp;
 
-    uint prec = Settings.Precision();
     for (uint i = 1; i < 2 * prec; i++)
     {
         // First term is x^3 / (3 * 1!), second is x^5 / (5 * 2!)
@@ -2986,7 +3008,7 @@ decimal_p decimal::erf(decimal_r x)
 
     // Multiply result by 2 / sqrt(pi)
     sum = sum * constants().two_over_sqrt_pi();
-    return sum;
+    return prec(sum);
 }
 
 
@@ -2999,12 +3021,13 @@ decimal_p decimal::erfc(decimal_r x)
         return nullptr;
 
     // Use erf() for values below 2
+    precision_adjust prec(3);
     if (x->is_negative() || x->is_magnitude_less_than(300, 1))
     {
         // Use asymptotic expansion
         decimal_g one = make(1);
         decimal_g rest = erf(x);
-        return one - rest;
+        return prec(one - rest);
     }
 
     // 1 - 1 / (2x^2) + (1*3) / (2x^2)^2 - (1*3*5) / (2x^2)^3 + ...
@@ -3016,7 +3039,6 @@ decimal_p decimal::erfc(decimal_r x)
     decimal_g tmp;
     square = square + square;           // 2x^2
 
-    uint prec = Settings.Precision();
     for (uint i = 1; i < prec; i++)
     {
         // First term is x^3 / (3 * 1!), second is x^5 / (5 * 2!)
@@ -3043,7 +3065,7 @@ decimal_p decimal::erfc(decimal_r x)
     sum = sum / x;
     tmp = exp(-(x * x));
     sum = sum * tmp;
-    return sum;
+    return prec(sum);
 }
 
 

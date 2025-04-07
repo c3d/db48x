@@ -613,29 +613,21 @@ static const cstring basic_equations[] =
     //"'(ω_rpm)=2*(Ⓒπ_r)*(N_rpm)' "
     "'(ω_r/min)=2*(Ⓒπ_r/turn)*(N_rpm)' "
     "}",
-// 2 new eqns added (3) & (4), but the integration doesn't work
+// 2 new eqns added (3) & (4),
     "Terminal Velocity",  "{ "
     "'(vt_(m/s))=√((2*(m_kg)*Ⓒg)/(Cd*(ρ_(kg/m^3))*(Ah_cm²)))' "
-    "'v_(m/s)=(vt_(m/s))*TANH((t_s)*Ⓒg/(vt_(m/s)))' "
-    "'tfr_s=ATANH(fr)/(Ⓒg/(vt_(m/s)))' "
-    "'xfr_ft=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/(vt_(m/s)));t)' "
-//  This last integration shall work since it is stripped of units but it doesn't
-//  "'xfr_ft=(vt_(m/s))*∫(0_s;tfr_s;TANH((t_s)*Ⓒg/(vt_(m/s)));t)' " that's the failing integral with units
-//  "'xfr_ft=(175.74722 3631_ft/s)*∫(0;10.00590 25332;TANH(t*Ⓒg/(175.74722 3631_ft/s)*(1_s));t)*(1_s)' " works in example 1
-//  "'xfr_m=(95.13182 74789_m/s)*∫(0;17.76964 17471;TANH(t*Ⓒg/(95.13182 74789_m/s)*(1_s));t)*(1_s)' " works in example 2
+    "'v_(m/s)=(vt_(m/s))*TANH((t_s)*Ⓒg/ABS(vt_(m/s)))' "
+    "'tfr_s=ATANH(fr)/(Ⓒg/ABS(vt_(m/s)))' "
+    "'xfr_ft=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/ABS(vt_(m/s)));t)' "
     "}",
 
-// New section added with new eqns (1), (3) & (4), but the integration doesn't work
+// New section added with new eqns (1), (3) & (4),
 //W=Fb+D <=> Vol*(ρ-ρf)*g=1/2*Cd*Ah*ρf*vt²  => vt=IFTE('ρ<ρf';-1;1)*√(2*Vol/Ah*ABS(ρ/ρf-1)*g/Cd)
     "Buoyancy & Terminal Velocity",  "{ "
     "'(vt_(m/s))=IFTE((ρ_(kg/m^3))<(ρf_(kg/m^3));-1;1)*√(2*(Vol_m^3)/(Ah_m²)*ABS((ρ_(kg/m^3))/(ρf_(kg/m^3))-1)*Ⓒg/Cd)' "
     "'v_(m/s)=(vt_(m/s))*TANH((t_s)*Ⓒg/ABS(vt_(m/s)))' "
     "'tfr_s=ATANH(fr)/(Ⓒg/ABS(vt_(m/s)))' "
-    "'xfr_m=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/(vt_(m/s)));t)' "
-//  This last integration shall work since it is stripped of units (but I tried and it also failed)
-//  "'xfr_m=(vt_(m/s))*∫(0_s;tfr_s;TANH((t_s)*Ⓒg/(vt_(m/s)));t)' " that's the failing integral wuth units
-//  "'xfr_ft=? (175.74722 3631_ft/s)*∫(0;10.00590 25332;t*TANH(t*Ⓒg/(175.74722 3631_ft/s)*(1_s));t)*(1_s)' " works in example 1
-//  "'xfr_ft=? (175.74722 3631_ft/s)*∫(0;10.00590 25332;t*TANH(t*Ⓒg/(175.74722 3631_ft/s)*(1_s));t)*(1_s)' " works in example 2
+    "'xfr_m=(vt_(m/s))*∫(0_s;tfr_s;TANH(t*Ⓒg/ABS(vt_(m/s)));t)' "
     "}",
 
     "Escape & Orbital Velocity",  "{ "

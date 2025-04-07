@@ -321,30 +321,29 @@ object::result comparison::is_same(bool names)
     id xt = x->type();
     id yt = y->type();
 
-    if (names && xt != yt)
+    if (names)
     {
-        if (xt == ID_symbol)
+        if (symbol_p xs = x->as_quoted<symbol>())
         {
-            x = ((symbol_p) x)->recall();
+            x = xs->recall();
             xt = x->type();
         }
-        else if (xt == ID_local)
+        else if (local_p xl = x->as_quoted<local>())
         {
-            x = ((local_p) x)->recall();
+            x = xl->recall();
             xt = x->type();
         }
 
-        if (yt == ID_symbol)
+        if (symbol_p ys = y->as_quoted<symbol>())
         {
-            y = ((symbol_p) y)->recall();
+            y = ys->recall();
             yt = y->type();
         }
-        else if (yt == ID_local)
+        else if (local_p yl = x->as_quoted<local>())
         {
-            y = ((local_p) y)->recall();
+            y = yl->recall();
             yt = y->type();
         }
-
     }
 
     if (xt == yt)
@@ -354,8 +353,7 @@ object::result comparison::is_same(bool names)
         if (xs == ys)
             same = memcmp(x, y, xs) == 0;
     }
-    rt.pop();
-    rt.pop();
+    rt.drop(2);
     id type = same ? ID_True : ID_False;
     if (rt.push(command::static_object(type)))
         return OK;

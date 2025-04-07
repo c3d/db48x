@@ -132,6 +132,11 @@ struct decimal : algebraic
     //   Constructor from (unsigned) integer value
     // ------------------------------------------------------------------------
     {
+        while (value && value % 10 == 0)
+        {
+            value /= 10;
+            exp++;
+        }
         Int  copy = value;
         Int  mul  = 1000;
         Int  div  = 1;
@@ -155,7 +160,7 @@ struct decimal : algebraic
         for (uint i = 0; i < nkigits; i++)
         {
             kigit(p, i, (value * mul / div) % 1000);
-            if (div > 1000)
+            if (div >= 1000)
                 div /= 1000;
             else
                 mul *= 1000;
@@ -165,6 +170,11 @@ struct decimal : algebraic
     static size_t required_memory(id type, Int value, large exp = 0)
     {
         size_t iexp = 0;
+        while (value && value % 10 == 0)
+        {
+            value /= 10;
+            exp++;
+        }
         while (value)
         {
             iexp += 1;
@@ -464,19 +474,22 @@ struct decimal : algebraic
     {
         precision_adjust(uint extra): saved(Settings.Precision())
         {
-            Settings.Precision((saved + extra + 2) / 3 * 3);
+            if (adjusted++ == 0)
+                Settings.Precision((saved + extra + 2) / 3 * 3);
         }
         ~precision_adjust()
         {
+            --adjusted;
             Settings.Precision(saved);
         }
         operator uint()         { return saved; }
         decimal_p operator()(decimal_p dec)
         {
-            return dec ? dec->precision(saved) : nullptr;
+            return adjusted > 1 ? dec : dec ? dec->precision(saved) : nullptr;
         }
 
         uint saved;
+        static uint adjusted;
     };
 
     algebraic_p      to_integer() const;

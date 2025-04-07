@@ -539,13 +539,13 @@ MENU(MatrixMenu,
      "ColNrm",  ID_ColumnNorm,
      "CondNum", ID_Unimplemented,
      "SpecRad", ID_Unimplemented,
-     "Vector",  ID_VectorMenu,
+     "Size",    ID_Size,
 
-     "Size",    ID_Unimplemented,
-     "Row+",    ID_Unimplemented,
-     "Row-",    ID_Unimplemented,
-     "Col+",    ID_Unimplemented,
-     "Col-",    ID_Unimplemented,
+     "Col+",    ID_AddColumn,
+     "Col-",    ID_DeleteColumn,
+     "→Col",    ID_MatrixToColumns,
+     "Col→",    ID_ColumnsToMatrix,
+     "ColSwp",  ID_ColumnSwap,
 
      "LU",      ID_Unimplemented,
      "LQ",      ID_Unimplemented,
@@ -556,7 +556,14 @@ MENU(MatrixMenu,
      "SVD",     ID_Unimplemented,
      "SVL",     ID_Unimplemented,
      "Diag→",   ID_Unimplemented,
-     "→Diag",   ID_Unimplemented);
+     "→Diag",   ID_Unimplemented,
+     "Vector",  ID_VectorMenu,
+
+     "Row+",    ID_AddRow,
+     "Row-",    ID_DeleteRow,
+     "→Row",    ID_MatrixToRows,
+     "Row→",    ID_RowsToMatrix,
+     "RowSwp",  ID_RowSwap);
 
 
 MENU(PolynomialsMenu,
@@ -661,7 +668,8 @@ MENU(BasesMenu,
      "CntBits", ID_CountBits,
      "1-comp",  ID_OnesComplement,
      "2-comp",  ID_TwosComplement,
-     "Modern",  ID_ModernBasedNumbers);
+     "Modern",  ID_ModernBasedNumbers,
+     ID_TruthLogicForIntegers);
 
 
 MENU(ProbabilitiesMenu,
@@ -707,57 +715,42 @@ MENU(StatisticsMenu,
      "Total",   ID_DataTotal,
      "Mean",    ID_Average,
      "StdDev" , ID_StandardDeviation,
-     "Corr",    ID_Correlation,
 
      "XCol",    ID_IndependentColumn,
      "YCol",    ID_DependentColumn,
      "MinΣ",    ID_MinData,
      "MaxΣ",    ID_MaxData,
      "ΣSize",   ID_DataSize,
-     "Median",  ID_Median,
 
      "StoΣ",    ID_StoreData,
      "RclΣ",    ID_RecallData,
      "ClrΣ",    ID_ClearData,
-     "Popul",   ID_PopulationMenu,
-     "Regres",  ID_RegressionMenu,
-     "Plot",    ID_PlotMenu);
+     "Proba",   ID_ProbabilitiesMenu,
+     "Plot",    ID_PlotMenu,
 
-MENU(RegressionMenu,
-// ----------------------------------------------------------------------------
-//   Statistics regression menu
-// ----------------------------------------------------------------------------
-     "BestFit",         ID_BestFit,
-     "LinFit",          ID_LinearFit,
-     "ExpFit",          ID_ExponentialFit,
-     "LogFit",          ID_PowerFit,
-     "PwrFit",          ID_LogarithmicFit,
-     "LR",              ID_LinearRegression,
+     "LR",      ID_LinearRegression,
+     "ΣLine",   ID_RegressionFormula,
+     "PredX",   ID_PredictX,
+     "PredY",   ID_PredictY,
+     "Corr",    ID_Correlation,
 
-     "XCol",            ID_IndependentColumn,
-     "YCol",            ID_DependentColumn,
-     "StdDev" ,         ID_StandardDeviation,
-     "Corr",            ID_Correlation,
-     "Inter",           ID_Intercept,
-     "Slope",           ID_Slope,
+     "BestFit", ID_BestFit,
+     "LinFit",  ID_LinearFit,
+     "ExpFit",  ID_ExponentialFit,
+     "LogFit",  ID_PowerFit,
+     "PwrFit",  ID_LogarithmicFit,
 
-     "ΣX",              ID_SumOfX,
-     "ΣY",              ID_SumOfY,
-     "ΣXY",             ID_SumOfXY,
-     "ΣX²",             ID_SumOfXSquares,
-     "ΣY²",             ID_SumOfYSquares,
-     "ΣSize",           ID_DataSize);
+     "ΣX",      ID_SumOfX,
+     "ΣY",      ID_SumOfY,
+     "ΣXY",     ID_SumOfXY,
+     "ΣX²",     ID_SumOfXSquares,
+     "ΣY²",     ID_SumOfYSquares,
 
-MENU(PopulationMenu,
-// ----------------------------------------------------------------------------
-//   Statistics population menu
-// ----------------------------------------------------------------------------
-     "XCol",            ID_IndependentColumn,
-     "YCol",            ID_DependentColumn,
-     "Bins",            ID_FrequencyBins,
-     "PopVar",          ID_PopulationVariance,
-     "PopSDev",         ID_PopulationStandardDeviation,
-     "PCovar",          ID_PopulationCovariance);
+     "Median",  ID_Median,
+     "Bins",    ID_FrequencyBins,
+     "PopVar",  ID_PopulationVariance,
+     "PopSDev", ID_PopulationStandardDeviation,
+     "PCovar",  ID_PopulationCovariance);
 
 
 MENU(SignalProcessingMenu,
@@ -1482,13 +1475,17 @@ MENU(UserInterfaceModesMenu,
      StackGraphingTimeLimit::label,             ID_StackGraphingTimeLimit,
      GraphingTimeLimit::label,                  ID_GraphingTimeLimit,
      ShowTimeLimit::label,                      ID_ShowTimeLimit,
-     CustomHeaderRefresh::label,                ID_CustomHeaderRefresh,
+     MinimumBatteryVoltage::label,              ID_MinimumBatteryVoltage,
 
      TextRenderingSizeLimit::label,             ID_TextRenderingSizeLimit,
      GraphRenderingSizeLimit::label,            ID_GraphRenderingSizeLimit,
-     MinimumBatteryVoltage::label,              ID_MinimumBatteryVoltage,
+     PlotRefreshRate::label,                    ID_PlotRefreshRate,
      "AllVars",                                 ID_AllEquationVariables,
-     "SIPrefixCycle",                           ID_UnitsSIPrefixCycle );
+     "SIPrefixCycle",                           ID_UnitsSIPrefixCycle,
+
+     "Header",                                  ID_Header,
+     CustomHeaderRefresh::label,                ID_CustomHeaderRefresh
+);
 
 MENU(UserModeMenu,
 // ----------------------------------------------------------------------------

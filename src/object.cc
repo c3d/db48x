@@ -911,7 +911,17 @@ bool object::next_index(object_p *indexp) const
 }
 
 
-void object::object_error(id type, object_p ptr)
+#if SIMULATOR
+bool object::is_valid(object_p ptr)
+// ----------------------------------------------------------------------------
+//   Check that an object is valid
+// ----------------------------------------------------------------------------
+{
+    return rt.is_valid_object(ptr);
+}
+
+
+bool object::object_error(id type, object_p ptr)
 // ----------------------------------------------------------------------------
 //    Report an error in an object
 // ----------------------------------------------------------------------------
@@ -924,7 +934,10 @@ void object::object_error(id type, object_p ptr)
     record(object_errors,
            "Invalid type %d for %p  Data %16llX %16llX",
            type, ptr, debug[0], debug[1]);
+    runtime::dump_gc_pointers();
+    return false;
 }
+#endif // SIMULATOR
 
 
 
@@ -1567,7 +1580,7 @@ bool object::is_negative(bool error) const
 
 bool object::is_simplifiable() const
 // ----------------------------------------------------------------------------
-//   Return true if auto-simplification does not apply
+//   Return true if auto-simplification does not apply - This may GC!
 // ----------------------------------------------------------------------------
 {
     id ty = type();
@@ -1583,7 +1596,7 @@ bool object::is_simplifiable() const
     case ID_neg_decimal:
         return decimal_p(this)->is_simplifiable();
     case ID_constant:
-        return constant_p(this)->is_simplifiable();
+        return constant_p(this)->is_simplifiable(); // May GC!
     case ID_expression:
         return expression_p(this)->is_simplifiable();
     default:
@@ -1768,7 +1781,7 @@ int object::type_value(id ty)
         case object::ID_bitmap:                 type = 11; break;
         case object::ID_tag:                    type = 12; break;
         case object::ID_unit:                   type = 13; break;
-        // No XLIB type 14 yet
+        case object::ID_xlib:                   type = 14; break;
         case object::ID_directory:              type = 15; break;
         // No Library type 16 yet
         // No Backup object type 17 yet

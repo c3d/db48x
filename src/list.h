@@ -48,6 +48,7 @@ GCP(unit);
 GCP(symbol);
 GCP(expression);
 
+RECORDER_DECLARE(list);
 
 struct list : text
 // ----------------------------------------------------------------------------
@@ -154,19 +155,29 @@ struct list : text
         explicit iterator(list_p list, bool atend = false)
             : size(0),
               first(list->objects(&size)),
-              index(atend ? size : 0) {}
+              index(atend ? size : 0)
+        {
+            ASSERT(object::is_valid(list));
+            record(list, "iterator(%t) size %lu first %t index %lu",
+                   list, size, +first, index);
+        }
         explicit iterator(list_p list, size_t skip)
             : size(0),
               first(list->objects(&size)),
               index(0)
         {
+            ASSERT(object::is_valid(list));
+            record(list, "skip iterator(%t) size %lu first %t index %lu",
+                   list, size, +first, index);
             while (skip && index < size)
             {
                 operator++();
                 skip--;
             }
         }
-        iterator() : size(0), first(), index(0) {}
+        iterator() : size(0), first(), index(0) {
+            record(list, "default iterator");
+        }
 
     public:
         iterator& operator++()
@@ -200,7 +211,8 @@ struct list : text
         }
         value_type operator*() const
         {
-            return index < size ? +first+ index : nullptr;
+            record(list, "at %lu size %lu first=%t", index, size, +first);
+            return index < size ? +first + index : nullptr;
         }
 
     public:
@@ -304,6 +316,13 @@ struct list : text
     // Remove a range in the list
     list_p remove(size_t start, size_t length = 1) const;
 
+    // Insert a list in the middle of another list
+    list_p insert(object_p what, size_t pos) const;
+    list_p insert(list_p what, size_t pos) const;
+
+    // Swap two elements in the array
+    list_p swap(size_t first, size_t second) const;
+
     // Reduce and filter operations
     object_p reduce(object_p prg) const;
     list_p   filter(object_p prg) const;
@@ -327,6 +346,14 @@ struct list : text
 
     // Find a symbol in a list
     symbol_p contains(symbol_p sym) const;
+
+    // Get a row or column, or item for 1-dimensional lists
+    object_p row(size_t index) const;
+    object_p column(size_t index) const;
+
+    // Get a sorted list
+    list_p sort() const;
+    list_p sort(int (*compare)(object_p *x, object_p *y)) const;
 
 public:
     // Shared code for parsing and rendering, taking delimiters as input
