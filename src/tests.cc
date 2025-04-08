@@ -11616,6 +11616,10 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Bug 1445: sqrt for perfect squares")
+        .test(CLEAR, "25 sqrt 5 -", ENTER).expect("0.")
+        .test(CLEAR, "36 sqrt 6 -", ENTER).expect("0.")
+        .test(CLEAR, "49 sqrt 7 -", ENTER).expect("0.");
     step("Bug 1442: STOVX and RCLVX")
         .test(CLEAR, "'Z' STOVX", ENTER).noerror()
         .test(CLEAR, "RCLVX", ENTER).expect("Z")
@@ -11661,7 +11665,7 @@ void tests::regression_checks()
         .expect("3.41528 61889 6⁳¹³⁰²⁸∡90°");
     test(CLEAR, "0+30000.ⅈ cos", ENTER)
         .expect("3.41528 61889 6⁳¹³⁰²⁸∡0°");
-    test(CLEAR, "0+30000.ⅈ tan", ENTER).expect("1.∡90°");
+    test(CLEAR, "0+30000.ⅈ tan", ENTER).expect("1∡90°");
 
     step("Bug 272: Type error on logical operations")
         .test(CLEAR, "{ x } #2134AF AND", ENTER).error("Bad argument type")
