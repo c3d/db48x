@@ -54,7 +54,7 @@ For example, you can compute the following expression at various precisions:
 ```rpl
 '(SQRT(2)-1)^10-(3363-2378*SQRT(2))' DUP
 512 Precision EVAL 'Precision' PURGE
-@ Expecting 5.99480 35⁳⁻⁵⁰⁹
+@ Expecting 5.99488 3⁳⁻⁵⁰⁹
 ```
 
 In a calculator, decimal numbers are always part of the mathematical set known

@@ -3390,9 +3390,11 @@ expression_p expression::simplify() const
 //   Run various rewrites to simplify equations
 // ----------------------------------------------------------------------------
 {
-    if (!is_simplifiable())
-        return this;
-    return rewrites(
+    record(expression, "Simplify %t", this);
+    expression_g eq = this;
+    if (!eq->is_simplifiable())
+        return eq;
+    return eq->rewrites(
         // Compute constant sub-expressions
         A+B,            A+B,
         A*B,            A*B,

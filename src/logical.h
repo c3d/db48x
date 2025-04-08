@@ -45,10 +45,10 @@ struct logical : arithmetic
     static int       as_truth(object_p obj);
     typedef ularge   (*binary_fn)(ularge x, ularge y);
     typedef bignum_p (*big_binary_fn)(bignum_g x, bignum_g y);
-    static result    evaluate(binary_fn opn, big_binary_fn opb, bool num);
+    static result    evaluate(id ty, binary_fn n, big_binary_fn b, bool num);
     typedef ularge   (*unary_fn)(ularge x);
     typedef bignum_p (*big_unary_fn)(bignum_r x);
-    static result    evaluate(unary_fn opn, big_unary_fn opb, bool num);
+    static result    evaluate(id ty,unary_fn opn, big_unary_fn opb, bool num);
     enum { numerical = false };
 
     template <typename Cmp> static result evaluate()
@@ -56,7 +56,7 @@ struct logical : arithmetic
     //   The actual evaluation for all binary operators
     // ------------------------------------------------------------------------
     {
-        return evaluate(Cmp::native, Cmp::bignum, Cmp::numerical);
+        return evaluate(Cmp::static_id, Cmp::native, Cmp::bignum, Cmp::numerical);
     }
 
     static ularge       rol(ularge X, ularge Y = 1);

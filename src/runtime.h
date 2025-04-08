@@ -248,6 +248,15 @@ struct runtime
     }
 
 
+    bool is_valid_object(object_p obj)
+    // ------------------------------------------------------------------------
+    //   Check if the object is valid
+    // ------------------------------------------------------------------------
+    {
+        return !(intptr_t(obj) <= 0x1000 ||
+                 (obj >= Temporaries && obj <= object_p(HighMem)));
+    }
+
 
     // ========================================================================
     //
@@ -464,6 +473,7 @@ struct runtime
     static void object_validate(unsigned typeID,
                                 const object *obj,
                                 size_t size);
+    static void dump_gc_pointers();
 #endif // SIMULATOR
 
 
@@ -1147,6 +1157,7 @@ protected:
     friend struct GarbageCollectorStatistics;
     friend struct cleaner;
     friend struct runtime_invariants;
+    friend void dump_gc_pointers();
 };
 
 template<typename T>
@@ -1295,6 +1306,7 @@ struct stack_depth_restore
         if (now > depth)
             rt.drop(now - depth);
     }
+    size_t count() const        { return rt.depth() - depth; }
     size_t depth;
 };
 

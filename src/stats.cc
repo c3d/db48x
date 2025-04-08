@@ -33,6 +33,7 @@
 #include "bignum.h"
 #include "compare.h"
 #include "dmcp.h"
+#include "expression.h"
 #include "integer.h"
 #include "tag.h"
 #include "variables.h"
@@ -149,7 +150,7 @@ bool StatsParameters::Access::write(object_p name) const
         integer_g xc = integer::make(xcol);
         integer_g yc = integer::make(ycol);
         object_g  m  = command::static_object(model);
-        object_g par = list::make(xc, yc, slope, intercept, m);
+        object_g par = list::make(xc, yc, intercept, slope, m);
         if (par)
             return dir->store(name, par);
     }
@@ -887,6 +888,67 @@ algebraic_p StatsAccess::average() const
 }
 
 
+static algebraic_p list_median(list_g &data)
+// ----------------------------------------------------------------------------
+//   Find the median in a one-dimensional sorted list or array
+// ----------------------------------------------------------------------------
+{
+    // List needs to be sorted
+    data = data->sort();
+    if (!data)
+        return nullptr;
+
+    size_t count = data->items();
+    if (count & 1)
+        return data->at(count/2)->as_algebraic();
+
+    size_t      half = count / 2;
+    algebraic_g two  = integer::make(2);
+    algebraic_g l   = data->at(half - 1)->as_algebraic();
+    algebraic_g h   = data->at(half - 0)->as_algebraic();
+    return (l + h) / two;
+}
+
+
+algebraic_p StatsAccess::median() const
+// ----------------------------------------------------------------------------
+//   Compute the median
+// ----------------------------------------------------------------------------
+{
+    if (rows <= 0)
+    {
+        rt.insufficient_stats_data_error();
+        return nullptr;
+    }
+
+    scribble    scr;
+    algebraic_g m;
+    for (size_t c = 0; c < columns; c++)
+    {
+        object_p col = data->column(c);
+        if (list_g lcol = col->as_array_or_list())
+        {
+            m = list_median(lcol);
+            if (columns == 1)
+                return m;
+            if (!m || !rt.append(+m))
+                return nullptr;
+        }
+        else if (c == 0 && columns == 1)
+        {
+            list_g d = +data;
+            return list_median(d);
+        }
+        else
+        {
+            rt.invalid_stats_data_error();
+            return nullptr;
+        }
+    }
+    return list::make(data->type(), scr.scratch(), scr.growth());
+}
+
+
 static algebraic_p do_variance(algebraic_r s, algebraic_r x, algebraic_r mean)
 // ----------------------------------------------------------------------------
 //   Compute the terms of the variance
@@ -1060,6 +1122,119 @@ algebraic_p StatsAccess::population_covariance() const
 }
 
 
+algebraic_p StatsAccess::regression_formula() const
+// ----------------------------------------------------------------------------
+//   Return the regression formula
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = +symbol::make("x");
+    algebraic_g a = slope;
+    algebraic_g b = intercept;
+    switch(model)
+    {
+    default:
+    case object::ID_LinearFit:          x = a * x + b; break;
+    case object::ID_LogarithmicFit:     x = a * log::run(x) + b; break;
+    case object::ID_ExponentialFit:     x = b * exp::run(a * x); break;
+    case object::ID_PowerFit:           x = b * pow(x, a); break;
+    }
+    return x;
+}
+
+
+algebraic_p StatsAccess::regression_formula_inverse() const
+// ----------------------------------------------------------------------------
+//   Return the inverse regression formula
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = +symbol::make("x");
+    algebraic_g a = slope;
+    algebraic_g b = intercept;
+    switch(model)
+    {
+    default:
+    case object::ID_LinearFit:          x = (x - b) / a; break;
+    case object::ID_LogarithmicFit:     x = exp::run((x - b) / a); break;
+    case object::ID_ExponentialFit:     x = log::run(x / b) / a; break;
+    case object::ID_PowerFit:           x = pow(x / b, inv::run(a)); break;
+    }
+    return x;
+}
+
+
+algebraic_p StatsAccess::predict_x() const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    return predict(true);
+}
+
+algebraic_p StatsAccess::predict_y() const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    return predict(false);
+}
+
+
+algebraic_p StatsAccess::predict(bool predx) const
+// ----------------------------------------------------------------------------
+//   Compute predicted X value
+// ----------------------------------------------------------------------------
+{
+    if (object_g obj = rt.pop())
+    {
+        if (obj->is_algebraic())
+        {
+            if (algebraic_p formula = predx
+                ? regression_formula_inverse()
+                : regression_formula())
+            {
+                if (expression_g expr = formula->as<expression>())
+                {
+                    symbol_g         name = symbol::make("x");
+                    save<symbol_g *> iref(expression::independent, &name);
+                    save<object_g *> ival(expression::independent_value, &obj);
+                    return expr->evaluate();
+                }
+            }
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return nullptr;
+}
+
+
+bool StatsAccess::linear_regression()
+// ----------------------------------------------------------------------------
+//   Compute linear regression, return true if successful
+// ----------------------------------------------------------------------------
+{
+    StatsAccess stats;
+    if (!*this || !two_columns())
+        return false;
+    algebraic_g n = num_rows();
+    algebraic_g sx2 = sum_x2();
+    algebraic_g sx = sum_x();
+    algebraic_g sy = sum_y();
+    algebraic_g sxy = sum_xy();
+    algebraic_g ssxx = sx2 - sx * sx / n;
+    algebraic_g ssxy = sxy - sx * sy / n;
+    slope = ssxy / ssxx;
+    intercept = (sy - slope * sx) / n;
+    if (model == object::ID_ExponentialFit || model == object::ID_PowerFit)
+        intercept = exp::evaluate(intercept);
+    if (!intercept || !slope)
+        return false;
+    return true;
+}
+
+
 static algebraic_p do_popvar(algebraic_r s, algebraic_r x, algebraic_r mean)
 // ----------------------------------------------------------------------------
 //   Compute the terms of the population variance
@@ -1161,8 +1336,7 @@ COMMAND_BODY(Median)
 //  Find the median of the input data
 // ----------------------------------------------------------------------------
 {
-    rt.unimplemented_error();
-    return ERROR;
+    return StatsAccess::evaluate(&StatsAccess::median, false);
 }
 
 
@@ -1338,6 +1512,7 @@ static object::result set_columns(bool setx, bool sety)
                 return object::ERROR;
         }
     }
+    rt.drop(setx + sety);
     return object::OK;
 }
 
@@ -1398,30 +1573,42 @@ COMMAND_BODY(LinearRegression)
 // ----------------------------------------------------------------------------
 {
     StatsAccess stats;
-    if (!stats)
+    if (!stats.linear_regression())
         return ERROR;
-    algebraic_g n = stats.num_rows();
-    algebraic_g sx2 = stats.sum_x2();
-    algebraic_g sx = stats.sum_x();
-    algebraic_g sy = stats.sum_y();
-    algebraic_g sxy = stats.sum_xy();
-    algebraic_g ssxx = sx2 - sx * sx / n;
-    algebraic_g ssxy = sxy - sx * sy / n;
-    algebraic_g slope = ssxy / ssxx;
-    algebraic_g intercept = (sy - slope * sx) / n;
-    if (stats.model == ID_ExponentialFit || stats.model == ID_PowerFit)
-        intercept = exp::evaluate(intercept);
-    if (!intercept || !slope)
-        return ERROR;
-    stats.intercept = intercept;
-    stats.slope = slope;
-    tag_g itag = tag::make("Intercept", +intercept);
-    tag_g stag = tag::make("Slope", +slope);
+    tag_g itag = tag::make("Intercept", +stats.intercept);
+    tag_g stag = tag::make("Slope", +stats.slope);
     if (!itag || !stag)
         return ERROR;
     if (!rt.push(+itag) || !rt.push(+stag))
         return ERROR;
     return OK;
+}
+
+
+COMMAND_BODY(RegressionFormula)
+// ----------------------------------------------------------------------------
+//   Compute the regression formula
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::regression_formula, true);
+}
+
+
+COMMAND_BODY(PredictX)
+// ----------------------------------------------------------------------------
+//   Predict the X value
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::predict_x, true);
+}
+
+
+COMMAND_BODY(PredictY)
+// ----------------------------------------------------------------------------
+//   Predict the Y value
+// ----------------------------------------------------------------------------
+{
+    return StatsAccess::evaluate(&StatsAccess::predict_y, true);
 }
 
 
@@ -1435,10 +1622,13 @@ COMMAND_BODY(BestFit)
         return ERROR;
 
     algebraic_g best_correlation, correlation, test;
+    algebraic_g best_slope, best_intercept;
     object::id  best_model = ID_LinearFit;
     for (uint type = ID_LinearFit; type <= ID_LogarithmicFit; type++)
     {
         stats.model = object::id(type);
+        if (!stats.linear_regression())
+            continue;
         correlation = stats.correlation();
         bool is_best = !best_correlation;
         if (!is_best)
@@ -1452,9 +1642,16 @@ COMMAND_BODY(BestFit)
         {
             best_correlation = correlation;
             best_model = stats.model;
+            best_slope = stats.slope;
+            best_intercept = stats.intercept;
         }
     }
-    stats.model = best_model;
+    if (stats.model != best_model)
+    {
+        stats.model = best_model;
+        stats.slope = best_slope;
+        stats.intercept = best_intercept;
+    }
     return OK;
 }
 

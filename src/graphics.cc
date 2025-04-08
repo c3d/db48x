@@ -51,6 +51,7 @@ typedef const based_bignum  *based_bignum_p;
 using std::max;
 using std::min;
 
+RECORDER(graphics, 16, "Graphics");
 
 
 // ============================================================================
@@ -106,6 +107,7 @@ bool PlotParametersAccess::parse(list_p parms)
     for (object_p obj: *parms)
     {
         bool valid = false;
+        record(graphics, "%u: %t", index, obj);
         switch(index)
         {
         case 0:                 // xmin,ymin
@@ -114,6 +116,7 @@ bool PlotParametersAccess::parse(list_p parms)
             {
                 if (algebraic_g ya = obj->algebraic_child(1))
                 {
+                    record(graphics, "%u: xa=%t ya=%t", index, +xa, +ya);
                     (index ? xmax : xmin) = xa;
                     (index ? ymax : ymin) = ya;
                     valid = true;
@@ -226,17 +229,23 @@ bool PlotParametersAccess::parse(list_p parms)
             break;
         }
 
-        // Check that we have sane input
-        if (valid)
-            valid = check_validity();
-
         if (!valid)
         {
             rt.invalid_ppar_error();
             return false;
         }
+
         index++;
     }
+
+    // Check that we have sane input
+    if (!check_validity())
+    {
+        check_validity();
+        rt.invalid_ppar_error();
+        return false;
+    }
+
     return true;
 }
 

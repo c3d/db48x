@@ -405,6 +405,13 @@ unintentional differences, since the implementation is completely new.
   replaced with true closures (which have a well-defined meaning) if there is
   enough demand.
 
+* Logical operations such as `AND` or `NOT` will apply bitwise when given
+  integer arguments. For example, `42 4 AND` returns `0` on DB48x, but `1.`
+  (logical truth) on HP calculators. Both DB48x and HP calculators will perform
+  bitwise operations when given based numbers, e.g. `#42d #4d AND` returns `#0`
+  in the two implementations. This can be changed using `TruthLogicForIntegers`,
+  which restores the HP-like behaviour.
+
 
 ### Numbers
 
@@ -2075,7 +2082,7 @@ For example, you can compute the following expression at various precisions:
 ```rpl
 '(SQRT(2)-1)^10-(3363-2378*SQRT(2))' DUP
 512 Precision EVAL 'Precision' PURGE
-@ Expecting 5.99480 35⁳⁻⁵⁰⁹
+@ Expecting 5.99488 3⁳⁻⁵⁰⁹
 ```
 
 In a calculator, decimal numbers are always part of the mathematical set known
@@ -2745,106 +2752,6 @@ and execution can be resumed using `Continue`. These commands are available from
 the `DebugMenu`.
 
 
-## Volume of a cylinder
-
-The following programs take the values of the radius `r` and the height `h` of a
-cylinder to compute the total area of the corresponding cylinder according to
-the equation `ACyl=2·π·R↑2+2·π·R·H`. We use the symbolic constant `Ⓒπ`,
-which we convert to its numerical value using the `→Num` function.
-
-The following code stores the program in the `ACyl` variable, and then supplies
-the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
-examples, we will use `R=2_m` and `H=3_m`.
-
-### RPN style
-
-The following code computes the cylinder area using _stack RPN instructions_,
-i.e. manipulating values on the stack directly. This approach is the most
-similar to traditional HP calculators.
-
-```rpl
-« Duplicate Rot + * 2 * Ⓒπ →Num * »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-### Using global variables
-
-The following implementation computes the cylinder area using _RPN instructions_
-and global variables to store `R` and `H`. It then stores the result in a global
-variable named `A`, using the `Copy` command that copies the result from the
-stack into global variable `A` without removing it from the stack..
-
-Using global variables is rarely the most efficient, but it has the benefit that
-it leaves the inputs and output of the program avaiable for later use. This can
-be beneficial if these values are precious and should be preserved.
-
-```rpl
-«
-  'R' Store 'H' Store
-  2 Ⓒπ →Num * R * R H + *
-  'A' Copy
-»
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-Note that global variables stick around in the current directory after the
-program executes. They can be purged using `{ R H A } Purge`.
-
-### Using algebraic expressions
-
-The following example computes the cylinder area using an _algebraic expression_
-and global variables. Using algebraic expressions can make programs easier to
-read, since the operations look similar to normal mathematical expressions.
-
-```rpl
-« 'R' Store 'H' Store
-'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-### Using local variables
-
-The following example computes the cylinder area using _local variables_, which
-make it easier to reuse the same value multiple times, and do so much faster
-than global variables. The code otherwise uses regular RPN instructions.
-
-```rpl
-« → H R « 2 Ⓒπ →Num * R * R H + * » »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
-Notice that when we declare local variables, the order of the arguments is the
-order in which they are given on the command line, not the order in which they
-appear on the stack. In that case, we enter `H` first, and `R` second, meaning
-that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
-`→ H R` notation instead of `→ R H`. This is the opposite order compared to the
-`Store` commands we used for global variables.
-
-### Local algebraics
-
-The following example computes the cylinder area using _local variables_, along
-with an _algebraic expression_.
-
-```rpl
-« → H R '2*→Num(Ⓒπ)*R*(R+H)' »
-'ACyl' Store
-
-3_m 2_m ACyl
-@ Expecting 62.83185 30718 m↑2
-```
-
 ## Volume of a sphere
 
 The following program computes the volume of a sphere given the radius put on
@@ -2878,7 +2785,7 @@ The following is the same program using an algebraic expression for readability:
 
 Instead of local variables, a program can take input from global variables.
 The following program, `SPH`, calculates the volume of a spherical cap of height
-_h_ within a sphere of radius _R_ using values stored in variables `H` and `R`.
+*h* within a sphere of radius *R* using values stored in variables `H` and `R`.
 We can then use assignments like `R=10` and `H=3` to set the values before we
 run the program.
 
@@ -2903,6 +2810,35 @@ SPH
 @ Expecting 254.46900 4941
 ```
 
+## Viewing and editing programs
+
+You view and edit programs the same way you view and edit other objects, using
+the command line.
+
+### Edit from level 1
+
+To view or edit a program placed in level 1 on the stack, use the _▶_ key to
+place the program in the text editor. Then edit it normally, and press _ENTER_
+to put it back on the stack, or _EXIT_ to close the text editor leaving the
+program unmodified on the stack.
+
+### Edit from the stack
+
+To view or edit a program placed at some other level on the stack, first enter
+the [interactive stack](#interactive-stack) using the _◀︎_ key, and then moving
+up and down using the _◀︎_ and _▶_ keys. Then use the _F6_ key to edit the
+program. After editing the program, you can validate the modifications with the
+_ENTER_ key, or cancel the changes with the _EXIT_ key.
+
+### Edit from variables
+
+When a program is placed in a variable, you need to recall it first to place
+it on the stack, and then store it back. To that effect, you can use the
+`Recall` and `Store` commands with a name on the stack. A faster way is to use
+the `VariablesMenu`, which you can access using the _VAR_ key. Using 🟨 and a
+function key recalls the corresponding variable. Using 🟦 and a function key
+stores into the corresponding variable.
+
 ## Creating programs on a computer
 
 It is convenient to create programs and other objects on a computer and then
@@ -2914,7 +2850,7 @@ named `STATE/Demo.48s` that comes with the DB48x distribution.
 
 ### Comments
 
-If you are creating programs on a computer, you can include _comments_ in the
+If you are creating programs on a computer, you can include *comments* in the
 computer version of the program. Comments are free text annotations that a
 programmer can add to document a program.
 
@@ -2951,7 +2887,877 @@ SWAP SQ
 You can check when you enter this program from the help file that all the
 `@@` comments at the top are removed, while the `@` comments in the middle
 remain in the resulting program.
+
+
+## Using local variables
+
+The program SPH in the previous example uses global variables for data storage
+and recall. There are disadvantages to using global variables in programs:
+
+* After program execution, global variables that you no longer need to use must
+be purged if you want to clear the `VariablesMenu` (_VAR_ key) and free user
+memory.
+
+* You must explicitly store data in global variables prior to program execution,
+  or have the program execute `STO`.
+
+*Local variables* address the disadvantages of global variables in
+programs. Local variables are temporary variables *created by a program*.
+They exist only while the program is being executed and cannot be used outside
+the program.  They never appear in the `VariablesMenu` (_VAR_ key).
+In addition, local variables are accessed faster than global variables, with a
+cost very similar to a stack access, and they generally require use less memory.
+
+### Creating Local Variables
+
+In a program, a [local variable structure](#local-variable) creates local
+variables.  To enter a local variable structure in a program, the fastest method
+is to use the `ProgramMenu` (🟨 _3_), and then the `→  «»` data entry key
+(_F4_). To enter a local variable structure for an algebraic expression, use the
+`→  ''` data entry key instead (_F5_).
+
+On the right of the `→` symbol, use the names of the local variables, separated
+by spaces. Then, inside `«»`, enter an RPL program that uses the local
+variables, or alternatively, inside `''`, enter an algebraic expression.
+
+For example, if the stack contains `10` in level 3, `6` in level 2 and `20` in
+level 1, then:
+
+* `→ a « a a ^ »` or `→ a 'a^a'` will execute with `a` containing `20`, and then
+  compute evaluate `20^20`, i.e. `104 857 600 000 000 000 000 000 000`.
+
+* `→ a b « a b ^ »` or `→ a b 'a^b'` will execute with `a` containing `6`, and
+  `b` containing `20`, then compute evaluate `6^20`, i.e.
+  `3 656 158 440 062 976`.
+
+* `→ a b c « a b ^ c + »` or `→ a b c 'a^b+c'` will execute with `a` containing
+  `10`, `b` containing `6` and `c` containing `20`, then compute evaluate
+  `10^6+20`, i.e.  `1 000 020`.
+
+### Advantages of Local Variables
+
+Local variable structures have these advantages:
+
+* The `→` command stores the values from the stack in the corresponding
+  variables: you don’t need to explicitly execute `STO`.
+
+* Local variables automatically disappear when the defining procedure for which
+  they are created has completed execution. Consequently, local variables don’t
+  appear in the `VariablesMenu`, and they occupy user memory only during program
+  execution.
+* Local variables exist only within their defining structure. Different local
+  variable structures can use the same variable names without conflict,
+  including in the same program.
+* Local variables consume less memory than a global variable, both in a program
+  and in memory.
+
+### Memory Usage Comparison
+
+Each global variable name with `n` characters uses `n+2` bytes (assuming `n` is
+less than 128). An additional `n+2` bytes are also used in the directory
+containing the global variable. If a program uses a global variable `VOLUME`
+three times, that's 24 bytes of memory in the program, and 8 additional bytes
+in the directory.
+
+Each local variable name with `n` characters uses `n+1` bytes in the local
+variables structure, an additional 4 bytes of temporary storage, and each
+reference in a program uses two bytes (assuming there are less than 128 local
+variables). If a program uses a local variable `volume` three times, that's 13
+bytes of memory in the program (insstead of 24) and 4 bytes in temporary storage
+(instead of 8).
+
+
+### Spherical cap using local variables
+
+The following program SPHLV calculates the volume of a spherical cap using local
+variables. The defining procedure is an algebraic expression.
+
+```rpl
+«
+  @@ Creates local variables r and h for the radius
+  @@ of the sphere and height of the cap.
+  @@ Expresses the defining procedure. In this
+  @@ program, the defining procedure for the local
+  @@ variable structure is an algebraic expression.
+  → r h
+  '1/3*Ⓒπ*h^2*(3*r-h)'
+
+  @@ Converts expression to a number.
+  →NUM
+»
+'SPHLV' STO
+@ Save for later use
+```
+
+Now, we can use `SPHLV` to calculate the volume of a spherical cap of radius
+`r=10` and height `h=3`. We enter the data on the stack in the correct order,
+then execute the program either by name or by pressing the corresponding
+unshifted key in the `VariablesMenu`:
+
+```rpl
+10 3 SPHLV
+@ Expecting 254.46900 4941
+```
+
+
+### Evaluating Local Names
+
+On DB48x, local names evaluate just like global names.
+
+By contrast, on HP calculators, local names are evaluated differently from
+global names. When a global name is evaluated, the object stored in the
+corresponding variable is itself evaluated. When a local name is evaluated on HP
+calculators, the object stored in the corresponding variable is returned to the
+stack but is not evaluated. When a local variable contains a number, the effect
+is identical to evaluation of a global name, since putting a number on the stack
+is equivalent to evaluating it. However, if a local variable contains a program,
+algebraic expression, or global variable name, and if you want it evaluated,
+programs on HP calculators would typically execute `EVAL` after the object is
+put on the stack. This is not necessary on DB48x.
+
+
+### Defining the Scope of Local Variables
+
+Local variables exist *only* inside the defining procedure.
+
+The following program excerpt illustrates the availability of local variables in
+nested defining procedures (procedures within procedures). Because local
+variables `a`, `b`, and `c` already exist when the defining procedure for local
+variables `d`, `e`, and `f` is executed, they’re available for use in that
+procedure.
+
+```rpl
+«
+  → a b c «
+    a b + c +
+    → d e f 'a/(d*e+f)'
+    a c / -
+ »
+»
+'Nested' STO
+
+'X' 'Y' 'Z' 'T' 'U' Nested
+@ Expecting 'Z÷(X·Y+Z+T+U)-Z÷U'
+```
+
+In the following program excerpt, the defining procedure for local variables
+`d`, `e`, and `f` calls a program that you previously created and stored in
+global variable `P1`.
+
+
+```rpl
+«
+  a b - c * → d e f '(a+d)/(d*e+f)' a c / -
+»
+'P1' STO
+
+«
+  → a b c « a b + c + → d e f 'P1+a/(d*e+f)' a c / - »
+»
+'Nested' STO
+
+'X' 'Y' 'Z' 'T' 'U' 'V' 'W' Nested
+@ Expecting '(a+X)÷(X·Y+(a-b)·c)+U÷(Z·T+U+V+W)-a÷c-U÷W'
+```
+
+The six local variables `a`, `b`, `c`, `d`, `e` and `f` are not available in
+program `P1` because they didn’t exist when you created `P1`. Consequently, `a`
+in `P1` evaluates as itself. The objects stored in the local variables are
+available to program `P1` only if you put those objects on the stack for `P1` to
+use or store those objects in global variables.  Conversely, program `P1` can
+create its own local variable structure (with any names, such as `d`, `e`, and
+`f`, for example) without conflicting with the local variables of the same name
+in the procedure that calls `P1`.
+
+
+### User-defined functions
+
+A program that consists solely of a local variable structure whose defining
+procedure is an algebraic expression is a user-defined function. It can be used
+in an algebraic expression like a built-in function.
+
+```rpl
+« → x y 'x+2*y/x'» 'MyFN' STO
+'MyFN(A;B)' EVAL
+@ Expecting 'A+2·B÷A'
+```
+
+### Compiled Local Variables
+
+DB48x does not support compiled local variables.
+
+On the HP50G, it is possible to create a special type of local variable that can
+be used in other programs or subroutines. This type of local variable is called
+a *compiled local variable*.
+
+Compiled local variables have a special naming convention: they must begin with
+a `←`. For example, in the code below, the variable `←y` is a compiled local
+variable that can be used in the two programs `BELOW` and `ABOVE`.
+
+```rpl
+« ←y " is negative" + »
+'BELOW' STO
+« ←y " is positive" + »
+'ABOVE' STO
+
+« → ←y 'IFTE(←y<0;BELOW;ABOVE)' »
+'Incompatible' STO
+-33 Incompatible
+
+@ Expecting "'←y' is negative"
+@ HP50G: "-33 is negative"
+```
+
+The rationale for not supporting them is that they sound like a complex
+non-solution to a simple non-problem, encouraging a terrible programming style.
+The above example is trivially rewritten using user-defined functions as
+follows:
+
+```rpl
+« → y « y " is negative" + » »
+'BELOW' STO
+« → y « y " is positive" + » »
+'ABOVE' STO
+
+« → y 'IFTE(y<0;BELOW(y);ABOVE(y))' »
+'Compatible' STO
+-33 Compatible
+
+@ Expecting "-33 is negative"
+```
+
+## Volume of a cylinder
+
+The following programs take the values of the radius `r` and the height `h` of a
+cylinder to compute the total area of the corresponding cylinder according to
+the equation `ACyl=2·π·R↑2+2·π·R·H`. We use the symbolic constant `Ⓒπ`,
+which we convert to its numerical value using the `→Num` function.
+
+The following code stores the program in the `ACyl` variable, and then supplies
+the value for `R` and `H` on level 1 and 2 of the stack respectively. In the
+examples, we will use `R=2_m` and `H=3_m`.
+
+See also the [cylinder](#cylinder) entry in the equation library.
+
+### ACyl: RPN style
+
+The following code computes the cylinder area using *stack RPN instructions*,
+i.e. manipulating values on the stack directly. This approach is the most
+similar to traditional HP calculators.
+
+```rpl
+« Duplicate Rot + * 2 * Ⓒπ →Num * »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### ACyl: Using global variables
+
+The following implementation computes the cylinder area using *RPN instructions*
+and global variables to store `R` and `H`. It then stores the result in a global
+variable named `A`, using the `Copy` command that copies the result from the
+stack into global variable `A` without removing it from the stack..
+
+Using global variables is rarely the most efficient, but it has the benefit that
+it leaves the inputs and output of the program avaiable for later use. This can
+be beneficial if these values are precious and should be preserved.
+
+```rpl
+«
+  'R' Store 'H' Store
+  2 Ⓒπ →Num * R * R H + *
+  'A' Copy
+»
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Note that global variables stick around in the current directory after the
+program executes. They can be purged using `{ R H A } Purge`.
+
+### ACyl: Using algebraic expressions
+
+The following example computes the cylinder area using an *algebraic expression*
+and global variables. Using algebraic expressions can make programs easier to
+read, since the operations look similar to normal mathematical expressions.
+
+```rpl
+« 'R' Store 'H' Store
+'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+### ACyl: Using local variables
+
+The following example computes the cylinder area using *local variables*, which
+make it easier to reuse the same value multiple times, and do so much faster
+than global variables. The code otherwise uses regular RPN instructions.
+
+```rpl
+« → H R « 2 Ⓒπ →Num * R * R H + * » »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+Notice that when we declare local variables, the order of the arguments is the
+order in which they are given on the command line, not the order in which they
+appear on the stack. In that case, we enter `H` first, and `R` second, meaning
+that `R` is on level 1 of the stack and `H` on level 2, yet we must use the
+`→ H R` notation instead of `→ R H`. This is the opposite order compared to the
+`Store` commands we used for global variables.
+
+### ACyl: Local algebraics
+
+The following example computes the cylinder area using *local variables*, along
+with an *algebraic expression*.
+
+```rpl
+« → H R '2*→Num(Ⓒπ)*R*(R+H)' »
+'ACyl' Store
+
+3_m 2_m ACyl
+@ Expecting 62.83185 30718 m↑2
+```
+
+
+## Tests and Conditional Structures
+
+You can use commands and branching structures that let programs ask questions
+and make decisions. *Comparison functions* and *logical functions* test whether
+or not specified conditions exist. *Conditional structures* and
+*conditional commands* use test results to make decisions.
+
+### Testing conditions
+
+A test is an algebraic or a command sequence that returns a test result to the
+stack. A test result is either `True` or `False`. Alternatively, a non-zero
+numerical value is interpreted as `True`, and a zero numerical value is
+interpreted as `False`.
+
+Note: This is a difference from HP calculators, where a test returns `0` or `1`.
+
+#### To include a test in a program
+
+Tests can be entered using the stack or algebraic syntax.
+
+To use the stack syntax, enter the two arguments then enter the test command.
+
+```rpl
+2 3 >
+@ Expecting False
+```
+
+To use algebraic syntax, enter the test expression between single quotes:
+
+```rpl
+'2<3'
+@ Expecting True
+```
+
+You often use test results in conditional structures to determine which clause
+of the structure to execute.  Conditional structures are described under
+[Using Conditional Structures and Commands](#using-conditional-structures-and-commands).
+
+
+### Comparison Functions
+
+Comparision functions compare two objects, and are most easily accessed from the
+`TestsMenu` (🟦 _3_):
+
+* `=`: value equality
+* `==`: representation equality
+* `≠`: value inequality
+* `<`: less than
+* `≤`: less than or equal to
+* `>`: greater than
+* `≥`: greater than or equal to
+* `Same`: object identity
+
+When used in stack syntax, the order of comparison is `level2` *test* `level1`,
+where *test* is the comparison function, and where `level2` and `level1`
+represent the values in stack levels 2 and 1 respectively. Inside algebraic
+expressions, the test is placed between the two values, e.g. `'X<5'`.
+
+The comparison commands all return `True` or `False`, although when used for
+testing purpose, e.g. in an `IFTE` command, non-zero numerical values are
+interpreted as `True`, and zero numerical values are interpreted as false. For
+example, the following code will interpret `42` as `True` and `0+0ⅈ` as `False`.
+
+```rpl
+IF 42 THEN
+    'IFTE(0+0ⅈ;"KO";"OK")' EVAL
+ELSE
+    "WRONG!"
+END
+@ Expecting "OK"
+```
+
+All comparisons except `Same` return the following:
+
+* If neither object is an algebraic or a name, return `True` if the two objects
+  are the same type and have values that compare according to the operation, or
+  `False` otherwise. Lists, arrays and text are compared in lexicographic order.
+  Programs can only be compared with `==` or `Same`, order comparisons will
+  error out with `Bad argument type`.
+* If one object is algebraic or name, and the other object is an algebraic, name
+  or number, then the command returns an expression that must be evaluated to
+  get a test result based on numeric value. This evalution is automatic if the
+  resulting expression is used as a test in a conditional statement such as
+  `IF THEN ELSE END`.
+
+For example, `'X' 5 <` returns `'X<5'`:
+
+```rpl
+'X' 5 <
+@ Expecting 'X<5'
+```
+
+if `6` is stored in `X`, then this evaluates as `False`:
+
+```rpl
+X=6
+'X' 5 < EVAL
+@ Expecting False
+```
+
+This evaluation is automatic inside a conditional statement:
+
+```rpl
+X=6
+IF 'X' 5 > THEN "OK" ELSE "KO" END
+@ Expecting "OK"
+```
+
+### Equality comparisons
+
+There are three functions that compare if two objects are equal, `=`, `==` and
+`same`. They play slightly different roles, corresponding to different use
+cases.
+
+Inside an algebraic expression, `=` creates an equation that can be
+used in the solver or in `Isol`, but also evaluates as numerical equality
+(unlike HP calculators). This would be the case for `'sin X=0.5'`. Finally, the
+`==` command is used for non-numerical comparisons.
+
+Note that `=` on the command-line creates an [assignment object](#assignment),
+e.g. `X=6`, which is a DB48x extension to RPL used notably in the examples for
+the [equations library](#equations-library).
+
+The `=` function tests *value* equality of two objects, irrespective of their
+representation. This is typically the operation you would use if you are
+interested in the mathematical aspect of equality. For example, integer and
+decimal numbers with the same values are considered as equal by `=` if their
+value is the same.
+
+```rpl
+'1=1.'
+@ Expecting True
+```
+
+The `==` function, by contrast, tests *representation* equality of two objects,
+i.e. that two objects have the same internal structure. This function will
+distinguish two objects that do not have the same type, even if their numerical
+value is the same.
+
+```rpl
+'1==1.'
+@ Expecting False
+```
+
+The `same` function, finally, tests *identity* of two objects. It differs from
+`==` in that it does not even attempt to evaluate names.
+
+```rpl
+2 'A' STO
+2 'B' STO
+'A' 'B' == EVAL
+'A==B' EVAL
+'A' 'B' SAME EVAL
+3 →List
+@ Expecting { True True False }
+```
+
+#### Equality: Differences with HP
+
+The DB48x `=` operator differs from HP calculators, that use `=` only to build
+equations. As a result, `2=3` returns `False` on DB48x, but evaluates as `2=3`
+on HP50G, and as `-1` (i.e. `2-3`) if using `→Num`. For numerical values, `=`
+on DB48x behaves roughly like `==` on HP50G, e.g. `1=1.` returns `True` just
+like `1==1.` returns `1` on HP50G.
+
+The DB48x `==` comparison is roughly equivalent to `SAME`, except that it
+evaluates names. In other words, `A==B` returns `True` if variables `A` and `B`
+contain identical objects, whereas `SAME(A,B)` returns `False` because the names
+are different.
+
+
+### Using Logical Functions
+
+Logical functions return a test result based on the outcomes of one or two
+previously executed tests. Note that these functions interpret any
+*nonzero numerical argument* as a true result, with the important exception that
+if the two arguments are integers, then the operation is performed bitwise.
+For non-based integers, this [deviates from HP calculators](#evaluation), and
+can be changed with the `TruthLogicForIntegers` flag.
+
+* `and` returns `True` only if both arguments are true
+* `or` returns `True` if either or both arguments are true
+* `xor` returns `True` if either argument, but not both, is true
+* `not` returns `True` if its argument is false
+* `nand` returns the `not` of `and`
+* `nor` returns the `not` of `and`
+* `implies` returns `True` if `not` the first argument `or` the other
+  (i.e. if the first result logically implies the other)
+* `equiv` returns the `not` of `xor`, i.e. it returns `True` iff the two
+  arguments are logically equivalent.
+* `excludes` returns `True` if the first one is true and `not` the second one,
+  i.e. if the first result excludes the second one.
+
+`AND`, `OR`, and `XOR` combine two test results. For example, if `4` is stored
+in `Y`, `Y 8 < 5 AND` returns `True`. First, `Y 8 <` returns `True`, then `AND`
+removes `True` and `5` from the stack, interpreting both as true results, and
+returns `True` to the stack.
+
+```rpl
+Y=4
+Y 8 < 5 AND
+@ Expecting True
+```
+
+`NOT` returns the logical inverse of a test result. For example, if `1` is
+stored in `X` and `2` is stored in `Y`, `X Y < NOT` returns `False`:
+
+```rpl
+X=1 Y=2
+X Y < NOT
+@ Expecting False
+```
+
+You can use `AND`, `OR`, and `XOR` in algebraics as infix functions,
+for example the following code returns `True`:
+
+```rpl
+'3<5 XOR 4>7'
+@ Expecting True
+```
+
+You can use `NOT` as a prefix function in algebraics.
+For example, the following code returns `False`:
+
+```rpl
+Z=2
+'NOT(Z≤4)'
+@ Expecting False
+```
+
+### Logical Functions on Integers
+
+When given integer or based numbers as input, logical operations applies
+bitwise, where each bit set is interpreted as `True` and each bit clear is
+interpreted as `False`.
+
+For example, the `Xor` operation will apply bit by bit in the following:
+
+```rpl
+16#32 16#F24 XOR
+@ Expecting #F16₁₆
+```
+
+This can be made more explicity visible using binary operations:
+
+```rpl
+                 2#11 0010
+           2#111 0010 0100 XOR
+@ Expecting #111 0001 0110₂
+```
+
+Unless the `TruthLogicForIntegers` flag is set, this is also true for integer
+values:
+
+```rpl
+42 7 XOR
+@ Expecting 45
+```
+
+## Testing Object Types
+
+The `Type` command takes any object as an argument and returns a number that
+identifies that object type. You can find it in the `ObjectsMenu` (🟦 _-_),
+using the _Type_ (_F2_) softkey.
+
+### DB48x detailed types
+
+In DB48x detailed type mode (`DetailedTypes`), the returned value is a negative
+value that uniquely identifies each DB48x type. For example:
+
+```rpl
+DetailedTypes
+"Hello" TYPE
+@ Expecting -3
+```
+
+### HP-compatible types
+
+In HP compatibility mode (`CompatibleTypes`), the returned value is a positive
+integer that matches the value returned by HP's implementation of RPL, and may
+group distinct DB48x types under the same number. For example:
+
+```rpl
+CompatibleTypes
+"Hello" TYPE
+@ Expecting 2
+```
+
+See the description of the `Type` command for a list of the returned values.
+
+### Type names
+
+The `TypeName` command is a DB48x-only command that returns a text describing
+the type. For example:
+
+```rpl
+"Hello" TYPENAME
+@ Expecting "text"
+```
+
+Using `TypeName` can make code easier to read.
+
+You can find `TypeName` in the `ObjectsMenu` (🟦 _-_), using the
+_TypeName_ (_F3_) softkey.
+
+
+## Conditional Structures & Commands
+
+*Conditional structures* let a program make a decision based on the result of
+tests.
+
+*Conditional commands* let you execute a true-clause or a false-clause, each of
+which are a *single* command or object.
+
+These conditional structures and commands are contained in the `TestsMenu`
+(🟦 _3_):
+
+* `IF…THEN…END` structure
+* `IF…THEN…ELSE…END` structure
+* `CASE…END` structure
+* `IFT` command (if-then)
+* `IFTE` function (if-then-else)
+
+### The IF…THEN…END Structure
+
+The syntax for this structure is:
+`IF` *test-clause* `THEN` *true-clause* `END`
+
+```rpl
+Condition='1<2'
+IF Condition THEN Success END
+@ Expecting 'Success'
+```
+
+`IF…THEN…END` executes the sequence of commands in the *true-clause* only if the
+*test-clause* evaluates to a true value, i.e. `True` or a non-zero numerical
+value. The test-clause can be a command sequence, for example, `A B <`, or an
+algebraic expression, for example, `'A<B'`. If the *test-clause* is an
+algebraic expression, it’s *automatically evaluated* — you don’t need `→NUM` or
+`EVAL`.
+
+`IF` begins the *test-clause*, which leaves a test result on the stack.
+`THEN` conceptually removes the test result from the stack. If the value is
+`True` or a non-zero numerical value, the *true-clause* is executed. Otherwise,
+program execution resumes following `END`.
+
+To enter `IF…THEN…END` in a program, select the  `TestsMenu` (🟦 _3_) and then
+the _IfThen_ command (🟨 _F1_).
+
+### The IFT Command
+
+The `IFT` command takes two arguments: a *test-result* in level 2 and a
+*true-clause* object in level 1. If the *test-result* is true, the *true-clause*
+object is executed:
+
+```rpl
+Condition='2<3'
+Condition Success IFT
+@ Expecting 'Success'
+```
+
+Otherwise, the two arguments are removed from the stack:
+
+```rpl
+Condition='2>3'
+Success
+Condition Failure IFT
+@ Expecting 'Success'
+```
+
+To enter `IFT` in a program, select the `TestsMenu` (🟦 _3_) and then the _IFT_
+command (🟨 _F5_).
+
+
+### The IF…THEN…ELSE…END Structure
+
+The syntax for this structure is:
+`IF` *test-clause* `THEN` *true-clause* `ELSE` *false-clause* `END`
+
+```rpl
+Condition='1<2'
+IF Condition THEN Success END
+@ Expecting 'Success'
+```
+
+`IF…THEN…END` executes either the *true-clause* sequence of commands if the
+*test-clause* is `True` or a non-zero numerical value, or the *false-clause*
+if the *test-clause* is `False` or a zero numerical value. If the *test-clause*
+is an algebraic expression, it is automatically evaluated.
+
+the sequence of commands in the *true-clause* only if the
+*test-clause* evaluates to a true value, i.e. `True` or a non-zero numerical
+value. The test-clause can be a command sequence, for example, `A B <`, or an
+algebraic expression, for example, `'A<B'`. If the *test-clause* is an
+algebraic expression, it’s *automatically evaluated* — you don’t need `→NUM` or
+`EVAL`.
+
+`IF` begins the *test-clause*, which leaves a test result on the stack.
+`THEN` conceptually removes the test result from the stack. If the value is
+`True` or a non-zero numerical value, the *true-clause* is executed. Otherwise,
+program execution resumes following `END`.
+
+To enter `IF…THEN…ELSE…END` in a program, select the `TestsMenu` (🟦 _3_) and
+then the _IfElse_ command (🟨 _F2_).
+
+### The IFTE Function
+
+The `IFTE` command takes three arguments: a *test-result* in level 3, a
+*true-clause* object in level 2 and a *false-clause* in level 1. It can also be
+entered in an algebraic expression as
+`'IFTE(test-result;true-clause;false-clause)'.
+
+If the *test-result* is `True` or a non-zero number, the *true-clause* object is
+executed and left on the stack:
+
+```rpl
+Condition='2<3'
+Condition Success Failure IFTE
+@ Expecting 'Success'
+```
+
+Otherwise, the arguments are removed from the stack, and the *false-clause*
+object is executed and left on the stack:
+
+```rpl
+Condition='2>3'
+Condition Failure Success IFTE
+@ Expecting 'Success'
+```
+
+In an algebraic expression, `IFTE` is used as a function that returns its first
+second if the condition in the first argument is `True` or a non-zero number:
+
+```rpl
+'IFTE(0<1;Success;Failure)'
+@ Expection 'Success'
+```
+
+If the condition is `False` or a zero number, the `IFTE` function returns its
+third argument:
+
+```rpl
+'IFTE(0.0;Failure;Success)'
+@ Expection 'Success'
+```
+
+To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
+the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.3 "Transfigured" - Documentation, bug fixes
+
+This release keeps improving the documentation based on the original HP50G
+_Advanced Reference Manual_, and fixing issues that are found along the way.
+It also improves statistics support and adds low-level array manipulation.
+
+### New features
+
+* Add `PredX`, `PredY` and `ΣLine` commands for linear regression predictions.
+  The `PredX` command predicts the independent value from the dependent one.
+  The `PredY` command predicts the dependent value from the independent one.
+  The `ΣLine` command returns the regression formula.
+* Add `Median` command to compute the median of statistics series
+* Add low-level array manipulation commands, `COL+`, `COL-`, `ROW+`, `ROW-`,
+  `CSWP` and `RSWP`, to add, remove and swap rows or columns.
+
+### Bug fixes
+
+* Strip trailing zeros from decimals converted from integers, in order to avoid
+  producing incorrectly normalized values. For example, `70000` converted to
+  decimal now produces a 5-bytes decimal value and no longer a 6-bytes decimal
+  value. This fixes the result of the `SigDig` command on this input value, as
+  well as fixes cases where comparisions would be incorrect.
+* Accept quoted names in `==` and `same`. HP calculators evaluate `A` and `B` in
+  `'A' 'B' ==` but not in `'A' 'B' same`.
+* Add symbolic support for logical operations, i.e. correctly create an
+  expression for `'X' 3 and` instead of a type error.
+* Compute linear regression for each mode when running `BestFit`.
+  The previous implementation would erroneously compute the correlation with
+  various modes (linear, log, exp and power), but without optimally recomputing
+  the parameters with that mode.
+* Consume arguments in `XCol`, `YCol` and `ColΣ`
+* Write slope and intercept in the correct order when updating `ΣPar`.
+  The order was wrong, causing various commands to either update them in the
+  wrong order, or to swap them.
+* Do not emit an error if the stack is empty when running `Σ-`
+* Fix and optimize parsing of `==`
+* Fix a bug in decimal comparisions used by `sqrt` and `cbrt`, fixes the
+  computation of the last digits of `sqrt(163)` at 24-digit precision.
+* Compute `log` with 3 additional digits to avoid getting the last digit wrong
+  in `'ln(640320^3+744)/sqrt(163)'`
+* Compute `exp`, `exp10`, `log` and `log10` with additional internal digits to
+  make sure that the last digit is good (verifiied using `calc`).
+* Fix sign error in buoyancy equation for Champagne bubbles
+* Fix `ppar` parsing and premature validty checking, which caused `20 30 XRNG`
+  to fail because of a transient state where `xmin<xmax` was not verified.
+* expression: Fix rare GC bug in `expression::simplify`
+
+### Improvements
+
+* Compute all decimal functions with increased precision. The tests now check
+  that the last digit of the functions result for the tested input is correctly
+  rounded.
+* Add `type` value for `xlib` objects in HP compatibility mode
+* Add `TruthLogicForIntegers` flag for compatibility with HP calculators when
+  evaluating something like `42 and 4`. DB48x by default computes this bitwise,
+  which returns `0`, a logically `False` value. With the new compatibility flag,
+  the arguments are interpreted as truth values, and the computation produces
+  `True` for improved compatibility with HP calculators.
+* Add RPL programming examples in the documentation, lifted from the HP50G
+  _Advanced Reference Manual_, covering conditional statements such as`IF`,
+  `IFT`, `IFTE`, documentation about tests and conditional structures, type
+  tests, logical commands such as `and`, `or`, `not`.
+* Add documentation and menu entry for `Header` command
+* Add documentation about local variables and  the scope of local variables
+* Add tests for statistics operations
+* Optimize retention of slope and intercept in `BestFit`
+* Micro-optimization on stack operation for comparisons
+* Add `MSolvr` alias for `SolverMenu` for compatibility with HP calculators
+* Allow nested precision adjustments in `decimal::precision_adjust` class
+* Tests now display failures in a way that makes it easier to compare.
+* Add documentation for `SeparatorModesMenu` entries
+* runtime: Add check that we push only valid objects
+* runtime: Cleanup, remove leftovers from earlier debug
+* runtime: Add check for pointer validity
+* runtime: Add utility to dump GC pointers
+* arithmeric: Add recorder entry to record what operations happen
+* Update copyright year to 2025 in `VERSION` command
+
 
 ## Release 0.9.2 "Temptations" - Multi-variate solver, documentation
 
@@ -8499,7 +9305,7 @@ These equations describe properties of an ideal gas.
 * To calculate `[vrms_m/s;n_mol;m_kg;λ_nm]` (Root-mean-square velocity; Number of mole; Mean free path) from 7 known variables:
 ```rpl
 P=100_kPa  V=2_l  T=300_K  MW=18_g/mol  d=2.5_nm
-@ Expecting [ vrms=644.76595 0487 m/s n=0.08018 15700 28 mol m=1.44326 82605 1⁳⁻³ kg λ=1.49162 49859 nm ]
+@ Expecting [ vrms=644.76595 0487 m/s n=8.01815 70028 5⁳⁻² mol m=1.44326 82605 1⁳⁻³ kg λ=1.49162 49859 nm ]
 'ROOT(ⒺKinetic Theory;[vrms;n;m;λ];[1_m/s;1_mol;1_kg;1_nm])'
 ```
 
@@ -8742,7 +9548,7 @@ The expression for the magnetic field in the center depends on the subtended int
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
 μr=10  nl=5_mm^-1  I=1.25_A  α1=150_°  α2=30_°
-@ Expecting [ B=6.80174 76149 8⁳⁻² T ]
+@ Expecting [ B=0.06801 74761 5 T ]
 'ROOT(ⒺB Field In Finite Solenoid;[B];[1_T])'
 @ Save variables for later use
 ```
@@ -8854,7 +9660,7 @@ The 38 variables in the Motion section are:
 * `t`: Time
 * `tf`: Time of flight of a projectile
 * `tfr`: time required to reach the fraction `fr` of the terminal velocity
-* `v`: Velocity at `t` ([linear Motion](#linear Motion)), or Tangential velocity at `r` ([Circular Motion¸](#Circular Motion)), or Falling velocity at time `t` ([Terminal Velocity](#Terminal Velocity)) & ([Buoyancy & Terminal Velocity](#Buoyancy & Terminal Velocity))
+* `v`: Velocity at `t` ([linear Motion](#linear Motion)), or Tangential velocity at `r` ([Circular Motion](#Circular Motion)), or Falling velocity at time `t` ([Terminal Velocity](#Terminal Velocity)) & ([Buoyancy & Terminal Velocity](#Buoyancy & Terminal Velocity))
 * `v0`: Initial velocity
 * `ve`: Escape velocity in a gravitational field
 * `vcx`: Horizontal (component x) of velocity at `t`
@@ -8944,14 +9750,14 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a golf ball falling in water, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.5  ρ=1077,5_(kg/m^3)  ρf=1000_(kg/m^3)  d=4.282_cm  Ah=14.40068 68745_cm↑2  Vol=41.10916 07978_cm↑3  t=3e-2_s  fr=0.95
-@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=5.50264 78343 2⁳⁻² s xfr=1.03003 49562 7⁳⁻² m ]
+@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=0.05502 64783 43 s xfr=0.01030 03495 63 m ]
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
 * **Example 2**. For a CO2 bubble in a glass of champagne, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3_cm↑2  Vol=5.23598 77559 8e-4_cm↑3  t=0.1_s  fr=0.95
-@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s xfr=0.15488 56277 51 m ]
+@ Expecting [ vt=-1.14234 81034 5 m/s v=-0.79446 37698 68 m/s tfr=0.21337 88142 9 s xfr=-0.15488 56277 51 m ]
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
@@ -9113,7 +9919,7 @@ If lineraly polarized light is incident on a perfect linear polarizer the transm
 * To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
 θ=30_°  I₀=10_(W/m^2)  fx₀=3e17_Hz  fx=2.7e17_Hz  I₀x=0.1_(W/m^2)
-@ Expecting [ I=7.5 W/m↑2 Ix=6.75163 88932 1⁳⁻² W/m↑2 E₀=86.80210 98145 V/m ]
+@ Expecting [ I=7.5 W/m↑2 Ix=0.06751 63889 32 W/m↑2 E₀=86.80210 98145 V/m ]
 'ROOT(ⒺMalus Law;[I;Ix;E₀];[1_(W/m^2);1_(W/m^2);1_V/m])'
 ```
 
@@ -9232,7 +10038,7 @@ We are considering here a damped mass-spring oscillator having the natural angul
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Displacement; Velocity & Acceleration at `t`; Mass; Total energy at `t`; Quality factor) from 6 known variables:
 ```rpl
 xm=10_cm  ω₀=15_r/s  φ=25_°  t=25_μs  k=10_N/m  b=0.2_(kg/s)
-@ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s x=9.06100 06640 3 cm v=-83.10906 53488 cm/s a=-16.64734 35534 m/s↑2 E=0.05640 00148 35 J Q=3.33333 33333 3 ]
+@ Expecting [ m=4.44444 44444 4⁳⁻² kg γ=4.5 r/s ωu=14.83028 995 r/s x=9.06100 06640 3 cm v=-83.10906 53488 cm/s a=-16.64734 35534 m/s↑2 E=5.64000 14834 9⁳⁻² J Q=3.33333 33333 3 ]
 'ROOT(ⒺUnderdamped Oscillations;[m;γ;ωu;x;v;a;E;Q];[1_kg;1_(r/s);1_(r/s);1_cm;1_cm/s;1_m/s^2;1_J;1])'
 @ Save E for later use
 ```
@@ -9726,7 +10532,7 @@ A string being fixed or free at its ends admits only discrete harmonics as stand
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Ts_N;y_m;ffixedfixed_Hz;ffixedfree_Hz]` (Propagation speed of waves, Wave number; Angular frequency; Tension; Frequency of harmonics on a string fixed at both ends; Frequency of harmonics on a string fixed at one end and free at the other end) from 9 known variables:
 ```rpl
 λ=1.2_m  f=112_Hz  μ=1.8_(g/m)  L=0.6_m  ninteger=2  nodd=3  x=10_cm  t=5_s  ym=2_cm
-@ Expecting [ v=134.4 m/s k=5.23598 77559 8 r/m ω=703.71675 4404 r/s Ts=32.51404 8 N y=1.⁳⁻² m ffixedfixed=224. Hz ffixedfree=168. Hz ]
+@ Expecting [ v=134.4 m/s k=5.23598 77559 8 r/m ω=703.71675 4404 r/s Ts=32.51404 8 N y=0.01 m ffixedfixed=224. Hz ffixedfree=168. Hz ]
 'ROOT(ⒺString Standing Waves;[v;k;ω;Ts;y;ffixedfixed;ffixedfree];[1_m/s;1_(r/m);1_(r/s);1_N;1_m;1_Hz;1_Hz])'
 ```
 
@@ -10009,7 +10815,7 @@ Modes 'MyModes' STO
 32 Precision 28 Sig @ Need high precision for this one
 K=3.2e20_eV  m0='Ⓒmp'  Δx=100_km  Δtp='Δx/(299 792 457.99999 99999 99998 7113_m/s)'  Δtp=0.00033 35640 95198 15204 95755 781 s
 781_s
-@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458. m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
 'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ResetModes MyModes @ Restore initial state
 ```
@@ -13007,43 +13813,317 @@ Add elements to a list, keep only the last N elements
 Assemble a list from results of sequential procedure
 # Operations with Matrices and vectors
 
-## ToArray
+## →Array
 
-Stack to Array Command: Returns a vector of n real or complex elements or a
-matrix of n × m real or complex elements.
+Stack to Array Command: Returns a vector or matrix built from individual
+elements placed on the stack and dimensions.
 
-The elements of the result array should be entered in row order.
+If the dimension is given as a positive integer, then `→Array` returns a
+vector built from the given number of individual items.
 
-`A1` ... `An` `n` ▶ `[ A1 ... An ]`
+```rpl
+x y z 3 →Array
+@ Expecting [ 'x' 'y' 'z' ]
+```
 
-`A11` ... `Arc` `{ r c }` ▶ `[[ A11 A1c] [ A21 ... Arc ]]`
+The number of items can also be given as a list or array containing one or two
+positive integers. If it contains one item, then `→Array` returns a vector:
 
+```rpl
+1.2 3.4 5.6 { 2.5 } →Array
+@ Expecting [ 3.4 5.6 ]
+```
 
-## FromArray
+If the list contains two items, the first one is the number of rows, the second
+one the number of columns. Elements of the result array should be entered on the
+stack in row order.
 
-Array to Stack Command: Takes an array and returns its elements as separate real or complex numbers. Also returns a list of the dimensions of the array.
-If the argument is an n-element vector, the first element is returned to level n + 1 (not level nm + 1), and the nth element to level 2.
+```rpl
+1 2 3 4 5 6 [ 2 3 ] →Array
+@ Expecting [[ 1 2 3 ] [ 4 5 6 ]]
+```
 
-`[ A1 ... An ]`  ▶ `A1` ... `An` `n`
+## Array→
 
-`[[ A11 A1c] [ A21 ... Arc ]]`  ▶ `A11` ... `Arc` `{ r c }`
+Array to Stack Command: Takes an array and returns its elements as separate
+values. Also returns a list of the dimensions of the array.
 
+If the argument is a vector, elements are placed on the stack with the first one
+higher in the stack and the last one on the second level of the stack.
 
-## TOCOL
+```rpl
+[ 1 2 3 ] Array→ + + +
+@ Expecting { 1 2 3 3 }
+```
+
+If the argument is a matrix, elements are placed on the stack in row order:
+
+```rpl
+[[1 2 3][4 5 6]] Array→ + + + + + +
+@ Expecting { 1 2 3 4 5 6 2 3 }
+```
+
+## →Columns
+
 Split an array into column vectors
 
+If the input is a vector, `→Columns` returns the individual elements.
 
-## ADDCOL
-Instert a column into an array
+```rpl
+[ 1 2 3 ] →Columns
+4 →List
+@ Expecting { 1 2 3 3 }
+```
+
+If the input is a matrix, `→Columns` returns the individual columns.
+
+```rpl
+[[ 1 2 3 ][ 4 5 6 ]] →Columns
+4 →List
+@ Expecting { [ 1 4 ] [ 2 5 ] [ 3 6 ] 3 }
+```
 
 
-## REMCOL
-Remove a column from an array
+
+## COL+
+
+Insert Columns Command: Insert columns into an existing array. The `COL+`
+command takes three arguments:
+* an input array or list where the columns will be inserted
+* the columns to insert
+* the insertion position
+
+If the input is a matrix, the columns can be an individual vector:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ 22 33 ]              @ Column to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 2 3 ] [ 4 33 5 6 ]]
+```
+
+or a matrix with the same number of rows:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ [22 33 ] [ 44 55 ] ] @ Columns to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 33 2 3 ] [ 4 44 55 5 6 ]]
+```
+
+If the input is a vector, then the columns can be an individual value:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+4          @ Value to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 2 3 ]
+```
+
+The columns can also be another vector:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+[ 4 5 ]    @ Values to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 5 2 3 ]
+```
 
 
-## FROMCOL
-Assemble a matrix from its columns
+## COL-
 
+Delete Columns Command: Deletes one or more columns from an array.
+
+The `COL-` command takes an input array and a column index in the array, and
+returns an array with the given column removed.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+3 COL-
+@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+```
+
+Multiple columns can be removed by giving the first one and the number of
+columns to remove.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+[ 3 2 ] COL-
+@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+```
+
+## Columns→
+
+Columns to Matrix Command: Transforms a series of column vectors and a column
+count into a matrix containing those columns, or transforms a sequence of
+numbers and an element count into a vector with those numbers as elements.
+
+```rpl
+[ 1 2 ]
+[ 4 5 ]
+[ 7 8 ]
+3 Columns→
+@ Expecting [[ 1 4 7 ] [ 2 5 8 ]]
+```
+
+If the individual values are not arrays, then a vector is produced:
+
+```rpl
+1 2 3 4
+4 Columns→
+@ Expecting [ 1 2 3 4 ]
+```
+
+If not all vectors have the same length, the number of rows of the array
+returned by `Columns→` is the maximum size of all input vectors, and the
+remaining elements are padded with `0`.
+
+```rpl
+[ 1     ]
+[ 2 3 4 ]
+[ 5 6   ]
+3 Columns→
+@ Expecting [[ 1 2 5 ] [ 0 3 6 ] [ 0 4 0 ]]
+```
+
+
+## →Rows
+
+Split an array into row vectors
+
+If the input is a vector, `→Rows` returns the individual elements.
+
+```rpl
+[ 1 2 3 ] →Rows
+4 →List
+@ Expecting { 1 2 3 3 }
+```
+
+If the input is a matrix, `→Rows` returns the individual rows.
+
+```rpl
+[[ 1 2 3 ][ 4 5 6 ]] →Rows
+3 →List
+@ Expecting { [ 1 2 3 ] [ 4 5 6 ] 2 }
+```
+
+
+
+## ROW+
+
+Insert Rows Command: Insert rows into an existing array. The `COL+`
+command takes three arguments:
+* an input array or list where the rows will be inserted
+* the rows to insert
+* the insertion position
+
+If the input is a matrix, the rows can be an individual vector:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ 22 33 ]              @ Row to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 2 3 ] [ 4 33 5 6 ]]
+```
+
+or a matrix with the same number of rows:
+
+```rpl
+[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
+[ [22 33 ] [ 44 55 ] ] @ Rows to insert
+2                      @ Insertion position
+COL+
+@ Expecting [[ 1 22 33 2 3 ] [ 4 44 55 5 6 ]]
+```
+
+If the input is a vector, then the rows can be an individual value:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+4          @ Value to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 2 3 ]
+```
+
+The rows can also be another vector:
+
+```rpl
+[ 1 2 3 ]  @ Input vector
+[ 4 5 ]    @ Values to insert
+2          @ Insertion position
+COL+
+@ Expecting [ 1 4 5 2 3 ]
+```
+
+
+## ROW-
+
+Delete Rows Command: Deletes one or more rows from an array.
+
+The `COL-` command takes an input array and a row index in the array, and
+returns an array with the given row removed.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+3 COL-
+@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+```
+
+Multiple rows can be removed by giving the first one and the number of
+rows to remove.
+
+```rpl
+[[11 12 13 14 15 16]
+ [21 22 23 24 25 26]
+ [31 32 33 34 35 36]]
+[ 3 2 ] COL-
+@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+```
+
+## Rows→
+
+Rows to Matrix Command: Transforms a series of row vectors and a row
+count into a matrix containing those rows, or transforms a sequence of
+numbers and an element count into a vector with those numbers as elements.
+
+```rpl
+[ 1 2 ]
+[ 4 5 ]
+[ 7 8 ]
+3 Rows→
+@ Expecting [[ 1 2 ] [ 4 5 ] [ 7 8 ]]
+```
+
+If the individual values are not arrays, then a vector is produced:
+
+```rpl
+1 2 3 4
+4 Rows→
+@ Expecting [ 1 2 3 4 ]
+```
+
+If not all vectors have the same length, a non-rectangular array will be
+produced. Unlike `Rows→`, no padding with `0` will occur for missing elements.
+
+```rpl
+[ 1     ]
+[ 2 3 4 ]
+[ 5 6   ]
+3 Rows→
+@ Expecting [[ 1 ] [ 2 3 4 ] [ 5 6 ]]
+```
 
 ## TODIAG
 Extract diagonal elements from a matrix
@@ -13052,33 +14132,6 @@ Extract diagonal elements from a matrix
 ## FROMDIAG
 Create a matrix with the given diagonal elements
 
-
-## TOROW
-Split an array into its row vectors
-
-
-## ADDROW
-Insert a row into an array
-
-
-## REMROW
-Remove a row from an array
-
-
-## FROMROW
-Assemble an array from its rows
-
-
-## TOV2
-Assemble a vector from two values
-
-
-## TOV3
-Assemble a vector from three values
-
-
-## FROMV
-Split a vector into its elements
 
 
 ## AXL
@@ -13142,18 +14195,43 @@ Cross produce of vectors
 
 
 ## CSWP
-Swap two columns in a matrix
+Swap two columns in an array or vector. The `CSWP` command takes an array and
+two column numbers.
 
+If the input is a vector, then the elements at the given index are swapped with
+one another, much like `RSWP`.
+
+```rpl
+[11 22 33 44 55] 2 3 CSWP
+@ Expecting [ 11 33 22 44 55 ]
+```
+
+If the input is an array with more than one dimension, then the columns at the
+given index are swapped with one another:
+
+```rpl
+[[ 11 12 13 14 ]
+ [ 21 22 23 24 ]
+ [ 31 32 33 34 ]]
+1 4 CSWP
+@ Expecting [[ 14 12 13 11 ] [ 24 22 23 21 ] [ 34 32 33 31 ]]
+```
+
+As an extension relative to HP's implementation, the command also works with
+lists.
+
+```rpl
+{ { "A" 2 } { "C" 4 "X" } }
+1 2 CSWP
+@ Expecting { { 2 "A" } { 4 "C" "X" } }
+```
 
 ## Determinant
 
 Compute the determinant of a matrix
 
-
-## DIAGMAP
-
-
 ## DOT
+
 Internal product (dot product) of vectors
 
 
@@ -13293,7 +14371,37 @@ Residual R=B-A*X' on a system A*X=B
 
 
 ## RSWP
-Swap two rows in a matrix
+Swap two rows in an array or vector. The `RSWP` command takes an array and
+two column numbers.
+
+If the input is a vector, then the elements at the given index are swapped with
+one another, much like `CSWP`.
+
+```rpl
+[11 22 33 44 55] 2 3 RSWP
+@ Expecting [ 11 33 22 44 55 ]
+```
+
+If the input is an array with more than one dimension, then the columns at the
+given index are swapped with one another:
+
+```rpl
+[[ 11 12 13 14 ]
+ [ 21 22 23 24 ]
+ [ 31 32 33 34 ]]
+1 2 RSWP
+@ Expecting [[ 21 22 23 24 ] [ 11 12 13 14 ] [ 31 32 33 34 ]]
+```
+
+As an extension relative to HP's implementation, the `RSWP` command also works with
+lists.
+
+```rpl
+{ { "A" 2 } { "C" 4 "X" } }
+1 2 RSWP
+@ Expecting { { "C" 4 "X" } { "A" 2 } }
+```
+
 
 
 ## SCHUR
@@ -13889,6 +14997,9 @@ DB50X has five display mode (one more than the HP48)s:
 * [Engineering mode](#EngineeringDisplay))
 * [Significant digits mode](#SignificantDisplay))
 
+DB50X also features digit [grouping and spacing](#display-grouping-and-spacing)
+
+
 ## StandardDisplay
 
 Display numbers using full precision. All significant digts to the right of the
@@ -13998,6 +15109,77 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+
+# Display Grouping and Spacing
+
+DB50X can group digits in a way similar to the HP business calculators like the
+HP17B. The DB50X version is fully configurable through the `SeparatorModesMenu`.
+
+## SeparatorModesMenu
+
+This menu contains the configuration of separators used when displaying numbers.
+
+## MantissaSpacing
+
+Select the spacing for the non-fractional part of the mantissa.
+
+The default value is `3`, meaning that a spacing separator is inserted every
+third digit. `123456789` will show as `123 456 789`. After `4 MantissaSpacing`,
+it would show as `1 2345 6789`. A value of `0` disables spacing.
+
+## FractionSpacing
+
+Select the spacing for the fractional part of the mantissa.
+
+The default value is `5`, meaning that a spacing separator is inserted every
+fifth digit. `1.23456789` will show as `1.23456 789`. After `3 FractionSpacing`,
+it would show as `1.234 567 89`. A value of `0` disables spacing.
+
+## BasedSpacing
+
+Select the spacing for based numbers.
+
+The default value is `4`, meaning that a spacing separator is inserted every
+fourth digit. `#1234ABCDE` will show as `#1 234A BCDE₁₆`.
+After `2 BasedSpacing`, it would show as `#1 23 4A BC DE₁₆`.
+A value of `0` disables spacing.
+
+## NumberSpaces
+
+Separate digits with thin spaces. This is the default.
+
+For example, `1234.567890123` will display as `1 234.56789 012`.
+
+## NumberDotOrComma
+
+Separate digits with dots if `DecimalComma` is active, and with commas if
+`DecimalDot` is active.
+
+For example, `1234.567890123` will display as `1,234.56789,012` when the decimal
+separator is a `.`, and as `1.234,56789.012` if it is `,`.
+
+## NumberTicks
+
+Separate digits with ticks `’`.
+
+For example, `1234.567890123` will display as `1’234’567’890’123`.
+
+## NumberUnderscore
+
+Separate digits with underscores `_`.
+
+For example, `1234.567890123` will display as `1_234_567_890_123`.
+
+
+## DecimalDot
+
+Select the dot as a decimal separator, e.g.  `1.23`
+
+## DecimalComma
+
+Select the comma as a decimal separator, e.g.  `1,23`
+
+
 # Angle settings
 
 The angle mode determines how the calculator interprets angle arguments and how
@@ -14104,17 +15286,7 @@ Display names using the short form capitalized, for example `varName` will show 
 
 Display names using the long form, for example `varName` will show as `varName`.
 
-# Decimal separator settings
 
-The decimal separator can be either a dot (`1.23`) or a comma (`1,23`).
-
-## DecimalDot
-
-Select the dot as a decimal separator, e.g.  `1.23`
-
-## DecimalComma
-
-Select the comma as a decimal separator, e.g.  `1,23`
 
 # Precision settings
 
@@ -14133,6 +15305,27 @@ for the computation of transcendental functions.
 Set the number of digits that can be ignored when solving. The default value is
 6, meaning that if the current precision is 24, we only solve to an accuracy of
 18 digits (i.e. 24-6).
+
+See also `IntegrationImprecision`
+
+## MaxNumberBits
+
+Define the maxmimum number of bits for numbers.
+
+Large integer operations can take a very long time, notably when displaying them
+on the stack. With the default value of 1024 bits, you can compute `100!` but
+computing `200!` will result in an error, `Number is too big`. You can however
+compute it seting a higher value for `MaxNumberBits`, for example
+`2048 MaxNumberBits`.
+
+This setting applies to integer components in a number. In other words, it
+applies separately for the numerator and denominator in a fraction, or for the
+real and imaginary part in a complex number. A complex number made of two
+fractions can therefore take up to four times the number of bits specified by
+this setting.
+
+
+
 
 # Base settings
 
@@ -14182,6 +15375,12 @@ Return the current [word size](#wordsize) in bits.
 `RCWS` is a compatibility spelling for the [RecallWordSize](#recallwordsize)
 command.
 
+
+# Command tuning
+
+Various settings can be used to tune specific commands.
+See also `IntegrationIterations`
+
 ## MaxRewrites
 
 Defines the maximum number of rewrites in an equation.
@@ -14189,22 +15388,6 @@ Defines the maximum number of rewrites in an equation.
 [Equations rewrites](#rewrite) can go into infinite loops, e.g. `'X+Y' 'A+B'
 'B+A' rewrite` can never end, since it keeps rewriting terms. This setting
 indicates how many attempts at rewriting will be done before erroring out.
-
-## MaxNumberBits
-
-Define the maxmimum number of bits for numbers.
-
-Large integer operations can take a very long time, notably when displaying them
-on the stack. With the default value of 1024 bits, you can compute `100!` but
-computing `200!` will result in an error, `Number is too big`. You can however
-compute it seting a higher value for `MaxNumberBits`, for example
-`2048 MaxNumberBits`.
-
-This setting applies to integer components in a number. In other words, it
-applies separately for the numerator and denominator in a fraction, or for the
-real and imaginary part in a complex number. A complex number made of two
-fractions can therefore take up to four times the number of bits specified by
-this setting.
 
 ## →QIterations
 
@@ -14224,6 +15407,27 @@ Various user-interface aspects can be customized, including the appearance of
 Soft-key menus. Menus can show on one or three rows, with 18 (shifted) or 6
 (flat) functions per page, and there are two possible visual themes for the
 labels, rounded or square.
+
+## Header
+
+This command can be used to define a program that is evaluated when drawing the
+header, i.e. what is shown above the stack. The header should be returned as a
+text, and leave room for the battery to display.
+
+For example, the following shows the current time, the current path, the date
+and free memory in a two-line header, with a 10 second `CustomHeaderRefresh`.
+
+```rpl
+« TIME " " PATH TAIL TOTEXT + + "
+" + DATE + " Mem: " + MEM + »
+HEADER
+10000 CustomHeaderRefresh
+```
+
+## CustomHeaderRefresh
+
+This setting indicates how frequently a custom `Header` should be evaluated. The
+time interval is expressed in milliseconds.
 
 ## ThreeRowsMenus
 
@@ -14399,7 +15603,6 @@ contain zeros after the 12th digit. The reason is that 64 bits of randomness
 corresponds to only 20 digits, which is less than the default 24-digits
 precision of DB50X.
 
-
 ## RandomGeneratorOrder
 
 Define the order of the ACORN random number generator, i.e. the value called `k`
@@ -14475,6 +15678,26 @@ An error during a program enters the debugger, letting you correct the problem
 before resuming execution. This is the default setting.
 
 
+## TruthLogicForIntegers
+
+When this flag is set, [logical operations](#logical-operations) such as `and`
+or `not` applied to integers return `True` or `False`, for compatibility with HP
+implementations of RPL.
+
+The opposite setting is `BitwiseLogicForIntegers`.
+
+## BitwiseLogicForIntegers
+
+When this flag is set, [logical operations](#logical-operations) such as `and`
+or `not` applied to integers return a bitwise numerical result, which deviates
+from the HP implementations of RPL.
+
+The opposite setting is `TruthLogicForIntegers`.
+
+
+# Evaluation settings
+
+
 ## SaveLastArguments
 
 Save last arguments when evaluating commands interactively.
@@ -14497,6 +15720,9 @@ and is disabled by default (`NoProgramLastArguments`).
 Disable the saving of command arguments during program execution.
 If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
+
+
+
 
 
 # States
@@ -15569,6 +16795,8 @@ Return the type of the object as a numerical value. The value is not guaranteed
 to be portable across versions of DB50X (and pretty much is guarantteed to _not_
 be portable at the current stage of development).
 
+### HP-compatible types
+
 If the `CompatibleTypes` setting is active, the returned value roughly matches
 the value returned by the HP50G. It always returns `29` for arrays, not `3`
 (real array) nor `4` (complex array). It returns `1` for both polar and
@@ -15576,6 +16804,44 @@ rectangular complex numbers, irrespective of their precision. 128-bit decimal
 values return `21` (extended real), 32-bit and 64-bit return `0` (real number).
 The separation between `18` (built-in function) and `19` (built-in command) may
 not be accurate.
+
+The values returned by `Type` in HP-compatible mode are as follows:
+
+* 0: Real number
+* 1: Complex number
+* 2: Text (called *character string* in HP manuals)
+* 3: Real array (DB48x returns 29)
+* 4: Complex array (DB48x returns 29)
+* 5: List
+* 6: Global name
+* 7: Local name
+* 8: Program
+* 9: Expression
+* 10: Based integer (binary integer in HP manuals)
+* 11: Graphic object
+* 12: Tagged object
+* 13: Unit object
+* 14: Library reference (XLIB name)
+* 15: Directory
+* 16: Library (not on DB48x)
+* 17: Backup object (not on DB48x)
+* 18: Built-in function (DB48x returns 19)
+* 19: Built-in command
+* 20: System binary (not on DB48x)
+* 21: Extended real (DB48x returns 0)
+* 22: Extended complex (DB48x returns 1)
+* 23: Linked array (not on DB48x)
+* 24: Character (not on DB48x)
+* 25: Code object (not on DB48x)
+* 26: Library data (not on DB48x)
+* 27: Mini font (dense font on DB48x)
+* 28: Real integer
+* 29: Symbolic vector/matrix (all arrays on DB48x)
+* 30: Font (sparse fonts on DB48x)
+* 31: Extended object (not on DB48x)
+
+
+### DB48x detailed types
 
 If the `DetailedTypes` setting is active, the return value is negative, and
 matches the internal representation precisely. For example, distinct values will
@@ -15585,10 +16851,82 @@ be returned for fractions and expressions.
 this is less likely to change from one release to the next. DB50X-only code
 should favor the use of `TypeName`, both for portability and readability.
 
+The values returned by `Type` are negative, beginning at `-2`, in the order
+shown in the table for `TypeName` below. Commands each have their individual
+type number.  Returned values are not guaranteed from release to release, and
+they may differ depending on build options or hardware platform (e.g. the values
+on DM32 or DM32) may differ. The values for data types are not necessarily
+contiguous either. For example, the `Type` for a tagged object may be `-1473` on
+version 0.9.1, and may change over time (the reason being that rarely used types
+have a two-byte type prefix).
+
+Use `TypeName` for portability.
+
 ## TypeName
 
-Return the [type](#Type) of the object as text. For example, `12 type` returns
-`"integer"`.
+Return the [type](#Type) of the object as text. For example:
+
+```rpl
+12 typename`
+@ Expecting "integer"
+```
+
+The values returned by `Type` in detailed mode are as follows, where the
+spelling is what `TypeName` returns:
+
+* directory
+* text
+* list
+* program
+* block (unquoted code block)
+* locals (local variables structure)
+* expression
+* funcall (function call in expression, e.g. `F(1;2;3)`
+* local (local variable name)
+* symbol (global variable name)
+* constant (reference to constant library, e.g. `ⒸNA`)
+* equation (reference to equation library, e.g. `ⒺSimple Shear`)
+* xlib (reference to library, e.g. `ⓁDedicace`)
+* array
+* menu
+* unit (e.g. `1_km`)
+* assignment (e.g. `X=3`)
+* rectangular (complex numbers such as `2+3ⅈ`)
+* polar (complex numbers such as `2∡30°`)
+* hex_integer (based number with enforced base 16)
+* dec_integer (based number with enforced base 10)
+* oct_integer (based number with enforced base 8)
+* bin_integer (based number with enforced base 2)
+* based_integer (based number with current base)
+* hex_bignum (large based number with enforced base 16)
+* dec_bignum (large based number with enforced base 10)
+* oct_bignum (large based number with enforced base 8)
+* bin_bignum (large based number with enforced base 2)
+* based_bignum (large based number with current base)
+* bignum (large integer, typically more than 64 bits)
+* neg_bignum (negative large integer)
+* integer (typically for integers where value takes less than 64 bits)
+* neg_integer (negative small integer)
+* fraction
+* neg_fraction
+* big_fraction
+* neg_big_fraction
+* hwfloat (hardware-accelerated 32-bit binary floating point)
+* hwdouble (hardware-accelerated 64-bit binary floating point)
+* decimal (variable precision decimal)
+* neg_decimal (variable precision negative decimal)
+* comment
+* grob (HP-compatible graphic object)
+* bitmap (hardware-optimized bitmap)
+* Drop (commands have their name as type name)
+* font
+* dense_font
+* sparse_font
+* dmcp_font
+* tag
+* polynomial
+* standard_uncertainty
+* relative_uncertainty
 
 
 ## PEEK

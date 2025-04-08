@@ -333,6 +333,18 @@ void runtime::object_validate(unsigned      typeID,
         object::object_error(type, object);
 }
 
+
+
+
+void runtime::dump_gc_pointers()
+// ----------------------------------------------------------------------------
+//   Helper function to dump all the GC pointers
+// ----------------------------------------------------------------------------
+{
+    uint i = 0;
+    for (gcptr *p = GCSafe; p; p = p->next)
+        printf("%4u: %p: %p\n", ++i, p, p->safe);
+}
 #endif // SIMULATOR
 
 
@@ -411,7 +423,7 @@ bool runtime::cache(bool level0, object_p key, object_p value)
 void runtime::uncache(object_p start, size_t sz)
 // ----------------------------------------------------------------------------
 //   Drop the whole cache
-// ------------------]----------------------------------------------------------
+// ----------------------------------------------------------------------------
 {
     object_p end = start + sz;
     record(cache, "Clear cache %p-%p sz %u", start, end, sz);
@@ -612,8 +624,6 @@ void runtime::move(object_p to, object_p from,
     {
         if (p->safe >= (byte *) from && p->safe < (byte *) last)
         {
-            if ((long(p->safe) & 0xffffff) == 0x23ffa)
-                record(gc_details, "Badaboom");
             record(gc_details, "Adjusting GC-safe %p from %p to %p",
                    p, p->safe, p->safe + delta);
             p->safe += delta;
@@ -1083,6 +1093,9 @@ bool runtime::push(object_g obj)
 {
     runtime_invariants check;
     ASSERT(obj && "Pushing a NULL object");
+    ASSERT((obj->type() < object::NUM_IDS ||
+            object::object_error(obj->type(), obj)) &&
+           "Invalid type pushed");
 
     // This may cause garbage collection, hence the need to adjust
     if (available(sizeof(void *)) < sizeof(void *))

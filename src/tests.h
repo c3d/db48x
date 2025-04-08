@@ -126,6 +126,7 @@ struct tests
     void insertion_of_variables_constants_and_units();
     void constants_menu();
     void character_menu();
+    void statistics();
     void probabilities();
     void sum_and_product();
     void polynomials();
@@ -387,7 +388,7 @@ public:
     tests &expect(unsigned long long output, uint extrawait = 0);
     tests &igot()
     {
-        return itest(NOSHIFT, BSP).error("Too few arguments");
+        return itest(NOSHIFT, BSP).error("Too few arguments").itest(CLEARERR);
     }
 
     template<typename T, typename ...Rest>
