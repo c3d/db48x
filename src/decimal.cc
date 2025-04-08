@@ -1483,7 +1483,6 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     byte_p yb = yi.base;
 
     // Compare up to the given precision
-    size_t s  = std::min(xs, ys);
     if (epsilon)
     {
         // epsilon = 1 -> s = 1, m = 100
@@ -1492,8 +1491,7 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
         size_t m = epsilon % 3;
         size_t d = m == 1 ? 100 : m == 2 ? 10 : 1;
         size_t e = (epsilon + 2) / 3;
-        s = std::min(s, e);
-        for (size_t i = 0; i < s; i++)
+        for (size_t i = 0; i < e; i++)
         {
             uint xk = i < xs ? kigit(xb, i) : 0;
             uint yk = i < ys ? kigit(yb, i) : 0;
@@ -1508,6 +1506,7 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     }
     else
     {
+        size_t s  = std::min(xs, ys);
         for (size_t i = 0; i < s; i++)
             if (int diff = kigit(xb, i) - kigit(yb, i))
                 return sign * diff;
