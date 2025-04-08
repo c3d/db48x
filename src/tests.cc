@@ -11616,6 +11616,14 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Bug 1442: STOVX and RCLVX")
+        .test(CLEAR, "'Z' STOVX", ENTER).noerror()
+        .test(CLEAR, "RCLVX", ENTER).expect("Z")
+        .test(CLEAR, "'Ⓓ' RCL", ENTER).want("Directory { ⓧ Z }")
+        .test(CLEAR, "'AbCd' STOVX", ENTER).noerror()
+        .test(CLEAR, "RCLVX", ENTER).expect("AbCd")
+        .test(CLEAR, "'Ⓓ' RCL", ENTER).want("Directory { ⓧ AbCd }");
+
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
         .noerror();             // Bug was "Invalid Plot Data"
