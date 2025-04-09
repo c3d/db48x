@@ -500,7 +500,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
             {
                 // Find the next step
                 dx = x - hx;
-                dy = +decimal::constants().e;
+                dy = +decimal::e();
                 if (is_complex)
                     dy = polar::make(dy, dy, ID_Deg);
                 if (degraded > 0)

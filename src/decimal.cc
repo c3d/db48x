@@ -3578,6 +3578,56 @@ decimal_g *decimal::ccache::gamma_realloc(size_t na)
 }
 
 
+decimal_p decimal::pi()
+// ----------------------------------------------------------------------------
+//   Compute pi without clearing the constants
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    return prec(constants().pi);
+}
+
+
+decimal_p decimal::e()
+// ----------------------------------------------------------------------------
+//   Compute e without clearing the constants
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    return prec(constants().e);
+}
+
+
+decimal_p decimal::ln10()
+// ----------------------------------------------------------------------------
+//   Compute ln(10) without clearing the constants
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    return prec(constants().ln10());
+}
+
+
+decimal_p decimal::ln2()
+// ----------------------------------------------------------------------------
+//   Compute ln(2) without clearing the constants
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    return prec(constants().ln2());
+}
+
+
+decimal_p decimal::lnpi()
+// ----------------------------------------------------------------------------
+//   Compute ln(pi) without clearing the constants
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    return prec(constants().lnpi());
+}
+
+
 bool decimal::adjust_from_angle(uint &qturns, decimal_g &fp) const
 // ----------------------------------------------------------------------------
 //   Adjust an angle value for sin/cos/tan, qturns is number of quarter turns
