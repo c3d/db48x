@@ -1619,6 +1619,7 @@ bool polynomial::main_variable(symbol_p sym)
 // ----------------------------------------------------------------------------
 {
     directory_g cfg = config();
+    symbol_g    symg = sym;
     if (!cfg)
     {
         object_p name = static_object(ID_AlgebraConfiguration);
@@ -1630,13 +1631,16 @@ bool polynomial::main_variable(symbol_p sym)
         }
 
         cfg = rt.make<directory>();
-        if (!cfg || !dir->store(name, +cfg))
+        if (!cfg)
+            return false;
+        cfg = (directory_p) dir->store(name, +cfg);
+        if (!cfg || cfg->type() != ID_directory)
             return false;
     }
 
     if (object_p name = static_object(ID_AlgebraVariable))
         if (directory *wcfg = (directory *) +cfg)
-            return wcfg->store(name, sym);
+            return wcfg->store(name, +symg);
 
     return false;
 }
