@@ -3406,9 +3406,9 @@ void tests::decimal_numerical_functions()
     TFN(exp2).expect("1.249196125653376700521466782085807");
     TFN(erf).expect("0.3501442208200238235516032450502391");
     TFN(erfc).expect("0.6498557791799761764483967549497609");
-    TFN(tgamma).expect("2.786634540845446211390013619645449");
-    TFN(lgamma).expect("1.024834609957303812257253942202042");
-    TFN(gamma).expect("2.786634540845446211390013619645449");
+    TFN(tgamma).expect("2.786634540845472367950764212781773");
+    TFN(lgamma).expect("1.024834609957313198691092753834887");
+    TFN(gamma).expect("2.786634540845472367950764212781773");
     TFN(cbrt).expect("0.684702127757224161840927732646815");
     TFN(norm).expect("0.321");
 #undef TFN
@@ -3429,13 +3429,13 @@ void tests::decimal_numerical_functions()
         .expect("1.204875625152809234008669105495307 r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
-        .expect("1.9367170284369840044539742777841959 r");
+        .expect("1.936717028436984004453974277784196 r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
         .expect("-1.204875625152809234008669105495307 r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
-        .expect("-1.9367170284369840044539742777841959 r");
+        .expect("-1.936717028436984004453974277784196 r");
 
     step("ln for very small value")
         .test(CLEAR, "1E-100 LN", ENTER)
@@ -3976,9 +3976,9 @@ void tests::high_precision_numerical_functions()
     TFN(exp2).expect("1.24919 61256 53376 70052 14667 82085 80659 83711 96789 11078 50872 03968 89639 54927 57400 23696 00219 70718 47302 80643 90803 89872 28867 485");
     TFN(erf).expect("0.35014 42208 20023 82355 16032 45050 23912 83120 71924 29072 35684 90423 15676 68631 26483 67740 59618 93127 36786 06239 23468 00013 58887 219");
     TFN(erfc).expect("0.64985 57791 79976 17644 83967 54949 76087 16879 28075 70927 64315 09576 84323 31368 73516 32259 40381 06872 63213 93760 76531 99986 41112 781");
-    TFN(tgamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16607 03231 08411 72385 14857 71635 68840 33879 04492 85639 28147 42453 43682 50364 207", 2000);
-    TFN(lgamma).expect("1.02483 46099 57313 19869 10927 53834 88666 18028 66769 43210 69015 44104 40692 40540 76847 15434 19659 48991 03165 49795 04087 64469 59538 319", 2000);
-    TFN(gamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16607 03231 08411 72385 14857 71635 68840 33879 04492 85639 28147 42453 43682 50364 207", 2000);
+    TFN(tgamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16602 55760 07828 51424 44941 90542 89306 12905 33223 77665 62678 93736 32221 42288 144", 2000);
+    TFN(lgamma).expect("1.02483 46099 57313 19869 10927 53834 88666 18028 66769 43209 08437 87004 46327 04911 25770 09539 00530 12325 23947 42518 21539 88411 28272 448", 2000);
+    TFN(gamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16602 55760 07828 51424 44941 90542 89306 12905 33223 77665 62678 93736 32221 42288 144", 2000);
     TFN(cbrt).expect("0.68470 21277 57224 16184 09277 32646 81496 28057 14749 53139 45950 35873 52977 73009 35191 71304 84396 28932 73625 07589 02266 77954 73690 2353");
     TFN(norm).expect("0.321");
 #undef TFN
@@ -4902,7 +4902,7 @@ void tests::complex_arithmetic()
         .test(CLEAR, LSHIFT, I, F2, F2, F3, F1, MUL, ID_pow)
         .expect("'e↑(ⅈ·π)'")
         .test(LSHIFT, KEY1)
-        .expect("1.∡180.°");
+        .expect("-1.");
 }
 
 
@@ -6569,7 +6569,7 @@ void tests::solver_testing()
         .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
         .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("-2.19049 50593 6⁳⁻¹³")
+        .expect("-2.19049 50614 3⁳⁻¹³")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver with slow slope")
@@ -6660,7 +6660,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-3.⁳⁻²²'");
+        .expect("'25=25.'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -9721,22 +9721,22 @@ void tests::insertion_of_variables_constants_and_units()
     step("Insert e value")
         .test(LSHIFT, F2).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028 »");
+                                 "2.71828 18284 59045 23536 029 »");
     step("Insert i value")
         .test(LSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1 »");
     step("Insert infinity value")
         .test(LSHIFT, F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1  "
                                  "9.99999⁳999999 »");
     step("Insert undefined value")
         .test(LSHIFT, F5).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1  "
                                  "9.99999⁳999999  "
                                  "Undefined »");
@@ -10689,7 +10689,7 @@ void tests::probabilities()
         .expect("13 763 753 091 226 345 046 315 979 581 580 902 400 000 000");
     step("Factorial in program using Gamma")
         .test(CLEAR, "37.2 FACT", ENTER)
-        .expect("2.84300 06466 2⁳⁴³");
+        .expect("2.84300 02599 5⁳⁴³");
     step("Combinations in program, returning zero")
         .test(CLEAR, "37 42 COMB", ENTER)
         .expect("0");
@@ -10733,7 +10733,7 @@ void tests::probabilities()
         .expect("13 763 753 091 226 345 046 315 979 581 580 902 400 000 000");
     step("Factorial in menu using Gamma")
         .test(CLEAR, "37.2", NOSHIFT, F3)
-        .expect("2.84300 06466 2⁳⁴³");
+        .expect("2.84300 02599 5⁳⁴³");
     step("Combinations in menu, returning zero")
         .test(CLEAR, "37 42", NOSHIFT, F1)
         .expect("0");
