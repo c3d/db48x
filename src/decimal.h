@@ -472,9 +472,10 @@ struct decimal : algebraic
     //   Helper to adjust precision during a computation
     // ------------------------------------------------------------------------
     {
-        precision_adjust(uint extra): saved(Settings.Precision())
+        precision_adjust(uint extra = 3, bool force = false)
+            : saved(Settings.Precision())
         {
-            if (adjusted++ == 0)
+            if (adjusted++ == 0 || force)
                 Settings.Precision((saved + extra + 2) / 3 * 3);
         }
         ~precision_adjust()
