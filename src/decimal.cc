@@ -657,20 +657,34 @@ RENDER_BODY(decimal)
         if (hasexp)
         {
             r.put(ds.ExponentSeparator());
+            char expbuf[32];
+
+            // Manually write the exponent, because nano library has no %PRId64
+            char *end = expbuf + sizeof(expbuf);
+            char *ptr = end;
+            bool neg = dispexp < 0;
+            if (neg)
+                dispexp = -dispexp;
+            do
+            {
+                *--ptr = '0' + (dispexp % 10);
+                dispexp /= 10;
+            } while (dispexp);
+            if (neg)
+                *--ptr = '-';
+
             if (fancy)
             {
-                char expbuf[32];
-                size_t written = snprintf(expbuf, 32, "%" PRId64, dispexp);
-                for (uint e = 0; e < written; e++)
+                while (ptr < end)
                 {
-                    char c = expbuf[e];
+                    char c = *ptr++;
                     unicode u = c == '-' ? L'⁻' : fancy_digit[c - '0'];
                     r.put(u);
                 }
             }
             else
             {
-                r.printf("%" PRId64, dispexp);
+                r.put(cstring(ptr), end - ptr);
             }
         }
         return r.size();
