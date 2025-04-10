@@ -175,15 +175,29 @@ struct derived : arithmetic                                             \
     static bool complex_ok(complex_g &x, complex_g &y);                 \
     static constexpr decimal_fn decop = decimal::derived;               \
                                                                         \
+    static algebraic_p arith_float(algebraic_r x, algebraic_r y)        \
+    {                                                                   \
+        hwfloat_r xf = (hwfloat_r) x;                                   \
+        hwfloat_r yf = (hwfloat_r) y;                                   \
+        return hwfloat::derived(xf, yf);                                \
+    }                                                                   \
+                                                                        \
+    static algebraic_p arith_double(algebraic_r x, algebraic_r y)       \
+    {                                                                   \
+        hwdouble_r xf = (hwdouble_r) x;                                 \
+        hwdouble_r yf = (hwdouble_r) y;                                 \
+        return hwdouble::derived(xf, yf);                               \
+    }                                                                   \
+                                                                        \
     static arithmetic_fn target_float(algebraic_r x, algebraic_r y)     \
     {                                                                   \
         return x->type() == ID_hwfloat && y->type() == ID_hwfloat       \
-            ? arithmetic_fn(hwfloat::derived) : nullptr;                \
+            ? arith_float : nullptr;                                    \
     }                                                                   \
     static arithmetic_fn target_double(algebraic_r x, algebraic_r y)    \
     {                                                                   \
         return x->type() == ID_hwdouble && y->type() == ID_hwdouble     \
-            ? arithmetic_fn(hwdouble::derived) : nullptr;               \
+            ? arith_double : nullptr;                                   \
     }                                                                   \
                                                                         \
     static hwfloat_p do_float(hwfloat_r x, hwfloat_r y)                 \
