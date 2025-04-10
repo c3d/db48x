@@ -15008,6 +15008,11 @@ DB50X has five display mode (one more than the HP48)s:
 DB50X also features digit [grouping and spacing](#display-grouping-and-spacing)
 
 
+## DisplayModesMenu
+
+The `DisplayModesMenu` is accessible through 🟨_O_ and gives a quick access to
+the various [display settings](#display-settings).
+
 ## StandardDisplay
 
 Display numbers using full precision. All significant digts to the right of the
