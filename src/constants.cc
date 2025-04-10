@@ -1454,6 +1454,17 @@ object_p constant::cache() const
 // ----------------------------------------------------------------------------
 {
     constant_g cst   = this;
+
+    // Clear constant cache if precision changed
+    static uint precision = 0;
+    if (Settings.Precision() != precision)
+    {
+        record(constants, "Precision changed from %u to %u",
+               precision, Settings.Precision());
+        rt.constants(0);
+        precision = Settings.Precision();
+    }
+
     uint       idx   = cst->index();
     object_g   value = rt.constant(idx);
     if (!value)

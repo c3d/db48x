@@ -183,7 +183,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            regression_checks();
+            constants_menu();
 
 #if 0
         if (onlyCurrent & 2)
@@ -9930,6 +9930,23 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
+
+    step("Check that numerical constants are adjusted with precision")
+        .test(CLEAR,
+              ID_DisplayModesMenu, 60, ID_Sig,
+              NOSHIFT, F, ID_Precision, ENTER, ID_Purge,
+              ID_ConstantsMenu, F2, LSHIFT, F1)
+        .expect("3.14159 26535 89793 23846 264")
+        .test(LSHIFT, F2)
+        .expect("2.71828 18284 59045 23536 029")
+        .test(CLEAR,
+              ID_DisplayModesMenu, 60, ID_Precision,
+              ID_ConstantsMenu, F2, LSHIFT, F1)
+        .expect("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 7494")
+        .test(LSHIFT, F2)
+        .expect("2.71828 18284 59045 23536 02874 71352 66249 77572 47093 69995 95749 6697")
+        .test(CLEAR, ID_DisplayModesMenu, ID_Std,
+              NOSHIFT, F, ID_Precision, ENTER, ID_Purge);
 
     step("Insert constant standard uncertainty from command line")
         .test(CLEAR, "Ⓢc", ENTER)
