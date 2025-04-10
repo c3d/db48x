@@ -670,7 +670,7 @@ RENDER_BODY(decimal)
             }
             else
             {
-                r.printf("%d", dispexp);
+                r.printf("%" PRId64, dispexp);
             }
         }
         return r.size();

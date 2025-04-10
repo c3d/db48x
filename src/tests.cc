@@ -3240,6 +3240,14 @@ void tests::decimal_display_formats()
     test(CLEAR, "50000.", ENTER)       .expect("50 000.");
     test(CLEAR, "500000.", ENTER)      .expect("500 000.");
     test(CLEAR, "5000000.", ENTER)     .expect("5 000 000.");
+
+    step("Test display of very large exponents")
+        .test(CLEAR, "1E1234567890123456", ENTER,
+              ID_DisplayModesMenu, ID_SeparatorModesMenu)
+        .expect("1.⁳¹²³⁴⁵⁶⁷⁸⁹⁰¹²³⁴⁵⁶")
+        .test(ID_ClassicExponent)
+        .expect("1.E1234567890123456")
+        .test(ID_FancyExponent);
 }
 
 
