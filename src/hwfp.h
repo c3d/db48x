@@ -194,6 +194,19 @@ struct hwfp : hwfp_base
 
 
     template <hwfp_p (*code)(hwfp_r, hwfp_r)>
+    static algebraic_p hwfp_wrapper(algebraic_r x, algebraic_r y)
+    // ------------------------------------------------------------------------
+    //   Wrapper to silence warning about function casts in recent XCode
+    // ------------------------------------------------------------------------
+    {
+        hwfp_r xb = (hwfp_r) x;
+        hwfp_r yb = (hwfp_r) y;
+        hwfp_p rb = code(xb, yb);
+        return rb;
+    }
+
+
+    template <hwfp_p (*code)(hwfp_r, hwfp_r)>
     static arithmetic_fn target(algebraic_r x, algebraic_r y)
     // ------------------------------------------------------------------------
     //  Target function for hwfp objects
@@ -204,7 +217,7 @@ struct hwfp : hwfp_base
         uint       prc = flt ? 7 : 16;
         return x->type() == ty && y->type() == ty &&
             Settings.HardwareFloatingPoint() && Settings.Precision() <= prc
-            ? arithmetic_fn(code) : nullptr;
+            ? hwfp_wrapper<code> : nullptr;
     }
 
 

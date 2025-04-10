@@ -1555,14 +1555,27 @@ decimal_p decimal::neg(decimal_r x)
 
 
 template <decimal_p (*code)(decimal_r, decimal_r)>
+algebraic_p decimal_wrapper(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   Wrapper to silence warning about function casts in recent XCode
+// ----------------------------------------------------------------------------
+{
+    decimal_r xb = (decimal_r) x;
+    decimal_r yb = (decimal_r) y;
+    decimal_p rb = code(xb, yb);
+    return rb;
+}
+
+
+template <decimal_p (*code)(decimal_r, decimal_r)>
 arithmetic_fn target(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
-//  Target function for bignum objects
+//  Target function for decimal objects
 // ----------------------------------------------------------------------------
 {
     return x->is_decimal() && y->is_decimal() &&
         (!Settings.HardwareFloatingPoint() || Settings.Precision() > 16)
-        ? arithmetic_fn(code) : nullptr;
+        ? decimal_wrapper<code> : nullptr;
 }
 
 

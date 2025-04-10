@@ -351,12 +351,27 @@ fraction_p big_fraction::make(bignum_r nn, bignum_r dd)
 // ============================================================================
 
 template <fraction_p (*code)(fraction_r, fraction_r)>
-arithmetic_fn target(algebraic_r x, algebraic_r y)
+algebraic_p fraction_wrapper(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
-//  Target function for bignum objects
+//   Wrapper to silence warning about function casts in recent XCode
 // ----------------------------------------------------------------------------
 {
-    return x->is_fraction() && y->is_fraction() ? arithmetic_fn(code) : nullptr;
+    fraction_r xb = (fraction_r) x;
+    fraction_r yb = (fraction_r) y;
+    fraction_p rb = code(xb, yb);
+    return rb;
+}
+
+
+template <fraction_p (*code)(fraction_r, fraction_r)>
+arithmetic_fn target(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//  Target function for fraction objects
+// ----------------------------------------------------------------------------
+{
+    return x->is_fraction() && y->is_fraction()
+        ? fraction_wrapper<code>
+        : nullptr;
 }
 
 
