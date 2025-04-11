@@ -22,7 +22,7 @@
 QT += core gui quick widgets quickcontrols2 quickwidgets multimedia
 TEMPLATE = app
 
-CONFIG += debug
+CONFIG += debug warn_off
 
 # Qt support code
 SOURCES +=                                      \
@@ -136,8 +136,8 @@ freebsd: LIBS += -lthr -liconv
 macx:    LIBS += -framework CoreFoundation -framework IOKit
 macx:    QMAKE_CFLAGS += -fsanitize=address
 macx:    LIBS += -fsanitize=address
-clang:   QMAKE_CFLAGS   += -Wno-unknown-pragmas
-clang:   QMAKE_CXXFLAGS += -Wno-unknown-pragmas
+clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
+clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-cxx-extension
 
 OBJECTS_DIR=db48x-build
 
