@@ -153,6 +153,11 @@ Round a value based on a standard uncertainty, implementing [Rule 3](#rule-3).
 @ Expecting -3.14159 3 m
 ```
 
+```rpl
+-3.141592654_m  0.000045  StdRnd
+@ Expecting -3.14159 3 m
+```
+
 To compute the correct rounding of `Mu='ⒸNA*Ⓒu'`:
 ```rpl
 'ⒸNA*Ⓒu'  Duplicate  ⓇMu  →Us  StdRnd →Num
