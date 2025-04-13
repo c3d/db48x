@@ -3687,6 +3687,38 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.4 "Face, meet palms" - Pixmaps, bug fixes
+
+This release fixes embarassing numerical bugs introduced in 0.9.3 and introduces
+a new `pixmap` type intended to capture screen pixel maps including in color.
+Builds for hardware calculators are also smaller due to switching to a `nano`
+configuration for the compiler.
+
+### New features
+
+* graphics: Add `pixmap` type
+
+
+### Bug fixes
+
+* Adjust unit conversion in `StdRnd`
+* Fix parsing of `ΣY²` in equations
+* Render non-fancy large exponents correctly (e.g. `1E123456789012345`)
+* The precision of numerical constants now adjusts after changing `PREC`
+* Avoid unnecessary purging of constants cache due to internal precision changes
+* Return tests values to rounded valus as validated with Wolfram Alpha
+* directory: Fix `STOVX` and `Store` to non-current directories
+
+### Improvements
+
+* Fix `sqrt` precision, notably for perfect squares (ouch)
+* Improve support for recent ARM compilers
+* Eliminate new `clang` warnings
+* Eliminate warnings about function pointers in latest XCode
+* Add documentation for `DisplayModesMenu`
+* Precision adjustments are now more consistent across decimal functions
+
+
 ## Release 0.9.3 "Transfigured" - Documentation, bug fixes
 
 This release keeps improving the documentation based on the original HP50G
