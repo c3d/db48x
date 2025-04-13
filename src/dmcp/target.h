@@ -37,12 +37,13 @@ enum target
 //   Constants for a given target
 // ----------------------------------------------------------------------------
 {
-    BITS_PER_PIXEL = 1,
     LCD_W          = 400,
     LCD_H          = 240,
 #ifndef CONFIG_COLOR
+    BITS_PER_PIXEL = 1,
     LCD_SCANLINE   = 416,
 #else
+    BITS_PER_PIXEL = 16,
     LCD_SCANLINE   = 400,
 #endif
 
@@ -67,6 +68,8 @@ using point   = blitter::point;
 using pixword = blitter::pixword;
 
 extern surface Screen;
+extern surface display();
+
 
 // Soft menu tab size
 #define MENU_TAB_SPACE      1

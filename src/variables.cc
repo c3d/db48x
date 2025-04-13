@@ -223,6 +223,7 @@ object_p directory::store(object_g name, object_g value)
     }
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:
@@ -469,6 +470,7 @@ object_p directory::recall_all(object_p name, bool report_missing)
         return constant_p(name)->value();
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:
@@ -561,6 +563,7 @@ size_t directory::purge(object_p name)
     }
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:
