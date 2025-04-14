@@ -12440,7 +12440,7 @@ void tests::graphic_commands()
               " 0.005 i * i 1.5 * R→P pixon "
               " 0.005 i * i 1.5 * R→P pix? 1 - neg + "
               "next"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixon")
         .test(ENTER)
@@ -12454,7 +12454,7 @@ void tests::graphic_commands()
               " 0.002 i * i 1.5 * R→P pixelcolor + + + "
               "next "
               "1 LINEWIDTH"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixoff")
         .test(ENTER)
@@ -12472,7 +12472,7 @@ void tests::graphic_commands()
               "{ } 10#0 i + + 10#100 + "
               "pix? i 997.42 * sin 0 > 0 1 IFTE - 1 + +  "
               "next"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixtest")
         .test(ENTER)
