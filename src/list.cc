@@ -888,7 +888,7 @@ grob_p list::graph(grapher &g, size_t rows, size_t cols, bool mat) const
     {
         object_p item = rt.stack(i);
         grob_g   grob = item->graph(g);
-        if (!grob || grob->type() != ID_grob)
+        if (!grob || !grob->is_monochrome())
         {
             // Ran into a problem with one rendering, e.g. out of memory
             // Fallback to rendering as text.

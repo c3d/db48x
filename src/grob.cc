@@ -388,7 +388,7 @@ object::result grob::command(grob::grob1_fn gfn)
 {
     if (object_p x = rt.top())
     {
-        grob_g gx = x->as<grob>();
+        grob_g gx = x->as_monochrome();
         if (gx)
         {
             gx = gfn(gx);
@@ -414,8 +414,8 @@ object::result grob::command(grob::grob2_fn gfn)
     {
         if (object_p y = rt.stack(1))
         {
-            grob_g gx = x->as<grob>();
-            grob_g gy = y->as<grob>();
+            grob_g gx = x->as_monochrome();
+            grob_g gy = y->as_monochrome();
             if (gx && gy)
             {
                 gx = gfn(gy, gx);

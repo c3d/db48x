@@ -64,7 +64,7 @@ using std::min;
 // ============================================================================
 
 // Initialize the screen
-surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE);
+surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
 
 // Pre-built patterns for shades of grey
 const pattern pattern::black   = pattern(0, 0, 0);

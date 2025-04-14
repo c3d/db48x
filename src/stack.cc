@@ -166,7 +166,7 @@ uint stack::draw_stack()
         {
             graph  = nullptr;
             if (cached)
-                if (grob_p gr = cached->as<grob>())
+                if (grob_p gr = cached->as_monochrome())
                     graph = gr;
 
             if (graph && !obj->is_graph() &&

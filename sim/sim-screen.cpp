@@ -135,7 +135,7 @@ void SimScreen::updatePixmap()
     // Monochrome screen
     QPainter pt(&mainPixmap);
     pixword mask = ~(~0U << color::BPP);
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     for (int y = 0; y < SIM_LCD_H; y++)
     {
         for (int xw = 0; xw < SIM_LCD_SCANLINE*color::BPP/32; xw++)

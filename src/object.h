@@ -420,6 +420,14 @@ struct object
         return is_graph() ? grob_p(this) : nullptr;
     }
 
+    grob_p as_monochrome() const
+    // ------------------------------------------------------------------------
+    //  Return as graphical object if it is monochrome
+    // ------------------------------------------------------------------------
+    {
+        return is_monochrome() ? grob_p(this) : nullptr;
+    }
+
     uint32_t as_uint32(uint32_t def, bool err) const;
     int32_t  as_int32 (int32_t  def, bool err)  const;
     uint64_t as_uint64(uint64_t def, bool err) const;

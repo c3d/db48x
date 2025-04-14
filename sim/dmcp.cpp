@@ -407,7 +407,7 @@ inline void lcd_set_pixel(int x, int y)
         }
         return;
     }
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::black);
 }
 
@@ -424,7 +424,7 @@ inline void lcd_clear_pixel(int x, int y)
         }
         return;
     }
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::white);
 }
 

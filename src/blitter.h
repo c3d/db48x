@@ -388,12 +388,17 @@ struct blitter
     //   Structure representing a surface on screen
     // -------------------------------------------------------------------------
     {
-        surface(pixword *p, size w, size h, size scanline)
+        surface(pixword *p, size w, size h, size scanline, size swap)
             : pixels(p),
               w(w),
               h(h),
               scanline(scanline),
+              swapsize(swap-1),
               drawable(w, h)
+        {
+        }
+        surface(pixword *p, size w, size h, size scanline)
+            : surface(p, w, h, scanline, scanline)
         {
         }
         surface(pixword *p, size w, size h) : surface(p, w, h, w)
@@ -799,6 +804,7 @@ struct blitter
         size     w;             // Pixel width of buffer
         size     h;             // Pixel height of buffer
         size     scanline;      // Scanline for the buffer (can be > width)
+        size     swapsize;      // Size used for swapping left/right coords
         rect     drawable;      // Draw area (clipping outside)
     };
 
@@ -1673,9 +1679,8 @@ inline void blitter::surface<blitter::MONOCHROME_REVERSE>::horizontal_adjust(
 //   On the DM42, we need horizontal adjustment for coordinates
 // ----------------------------------------------------------------------------
 {
-    size  w   = (width() + 7)/8*8 - 1;
-    coord ox1 = w - x2;
-    x2        = w - x1;
+    coord ox1 = swapsize - x2;
+    x2        = swapsize - x1;
     x1        = ox1;
 }
 
@@ -1698,9 +1703,8 @@ inline void blitter::surface<blitter::RGB_16BPP>::horizontal_adjust(
 //   On the DM42, we need horizontal adjustment for coordinates
 // ----------------------------------------------------------------------------
 {
-    size  w   = (width() + 7)/8*8 - 1;
-    coord ox1 = w - x2;
-    x2        = w - x1;
+    coord ox1 = swapsize - x2;
+    x2        = swapsize - x1;
     x1        = ox1;
 }
 
