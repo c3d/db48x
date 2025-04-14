@@ -1536,20 +1536,23 @@ void user_interface::draw_dirty(coord x1, coord y1, coord x2, coord y2)
 //   Indicates that a component dirtied a given area of the screen
 // ----------------------------------------------------------------------------
 {
-    (void) (x1 + x2);
-    if (y1 > y2)
-        std::swap(y1, y2);
-    if (y1 < 0)
-        y1 = 0;
-    else if (y1 >= LCD_H)
-        y1 = LCD_H - 1;
-    if (y2 < 0)
-        y2 = 0;
-    else if (y2 >= LCD_H)
-        y2 = LCD_H - 1;
+    if (!graphics || !user_display())
+    {
+        (void) (x1 + x2);
+        if (y1 > y2)
+            std::swap(y1, y2);
+        if (y1 < 0)
+            y1 = 0;
+        else if (y1 >= LCD_H)
+            y1 = LCD_H - 1;
+        if (y2 < 0)
+            y2 = 0;
+        else if (y2 >= LCD_H)
+            y2 = LCD_H - 1;
 
-    for (coord y = y1; y <= y2; y++)
-        mark_dirty(y);
+        for (coord y = y1; y <= y2; y++)
+            mark_dirty(y);
+    }
 }
 
 
@@ -1569,9 +1572,10 @@ bool user_interface::draw_graphics(bool erase)
 {
     if (!graphics || erase)
     {
+        surface disp = display();
         draw_start(false);
         graphics = true;
-        Screen.fill(pattern(Settings.Background()));
+        disp.fill(pattern(Settings.Background()));
         draw_dirty(0, 0, LCD_W-1, LCD_H-1);
         return true;
     }
@@ -2639,7 +2643,7 @@ reposition:
             pattern bg = sel ? (~searching ? Settings.SearchBackground()
                                            : Settings.SelectionBackground())
                              : Settings.EditorBackground();
-            x          = Screen.glyph(x, y, c, font, fg, bg);
+            x = Screen.glyph(x, y, c, font, fg, bg);
         }
         else
         {

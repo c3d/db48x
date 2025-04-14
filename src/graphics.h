@@ -37,6 +37,11 @@
 #include "target.h"
 
 
+GCP(grob);
+GCP(bitmap);
+GCP(pixmap);
+
+
 struct PlotParameters : command
 // ----------------------------------------------------------------------------
 //   A replication of the PlotParameters / PPAR vaariable
@@ -97,24 +102,6 @@ struct PlotParametersAccess
 };
 
 
-inline uint ScreenWidth()
-// ----------------------------------------------------------------------------
-//   Adjustment for the radius of a circle or rounded rectangle
-// ----------------------------------------------------------------------------
-{
-    return Screen.area().width();
-}
-
-
-inline uint ScreenHeight()
-// ----------------------------------------------------------------------------
-//   Adjustment for the radius of a circle or rounded rectangle
-// ----------------------------------------------------------------------------
-{
-    return Screen.area().height();
-}
-
-
 object::result show(object_r obj);
 // ----------------------------------------------------------------------------
 //   Show the given object full screen
@@ -127,7 +114,13 @@ void           draw_prompt(text_r txt);
 //   Draw a prompt for `Prompt`, `Input`, `PromptStore`
 // ----------------------------------------------------------------------------
 
-
+surface        display();
+pixmap_p       user_display();
+rect           user_clip();
+void           user_clip(rect r);
+// ----------------------------------------------------------------------------
+//   Return the current display, i.e. `Pict`
+// ----------------------------------------------------------------------------
 
 
 COMMAND_DECLARE(Disp,2);

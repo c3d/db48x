@@ -223,6 +223,7 @@ object_p directory::store(object_g name, object_g value)
     }
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:
@@ -289,7 +290,7 @@ object_p directory::store(object_g name, object_g value)
         size_t  ns        = name->size();
         size_t  vs        = value->size();
         size_t  requested = vs + ns;
-        byte_p  p         = payload();
+        byte_p  p         = thisdir->payload();
         size_t  dirsize   = leb128<size_t>(p);
         gcbytes body      = p;
         if (rt.available(requested) < requested)
@@ -311,7 +312,7 @@ object_p directory::store(object_g name, object_g value)
     }
 
     // Adjust all directory sizes
-    adjust_sizes(thisdir, delta);
+     adjust_sizes(thisdir, delta);
 
     // Refresh the variables menu
     ui.menu_refresh(ID_VariablesMenu);
@@ -348,6 +349,8 @@ void directory::adjust_sizes(directory_r thisdir, int delta)
     // Resize directories up the chain
     uint depth = 0;
     bool found = false;
+    directory_g current = rt.variables(0);
+    rt.enter(thisdir);
     while (directory_g dir = rt.variables(depth++))
     {
         // Start modifying only if we find this directory in path
@@ -369,6 +372,7 @@ void directory::adjust_sizes(directory_r thisdir, int delta)
             leb128(hdr, newdirlen);
         }
     }
+    rt.enter(current);
 }
 
 
@@ -466,6 +470,7 @@ object_p directory::recall_all(object_p name, bool report_missing)
         return constant_p(name)->value();
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:
@@ -558,6 +563,7 @@ size_t directory::purge(object_p name)
     }
 
     // Special names that are allowed as variable names
+    case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
     case ID_Equation:

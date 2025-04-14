@@ -472,9 +472,10 @@ struct decimal : algebraic
     //   Helper to adjust precision during a computation
     // ------------------------------------------------------------------------
     {
-        precision_adjust(uint extra): saved(Settings.Precision())
+        precision_adjust(uint extra = 3, bool force = false)
+            : saved(Settings.Precision())
         {
-            if (adjusted++ == 0)
+            if (adjusted++ == 0 || force)
                 Settings.Precision((saved + extra + 2) / 3 * 3);
         }
         ~precision_adjust()
@@ -623,11 +624,11 @@ struct decimal : algebraic
     static ccache   &constants();
 
 
-    static decimal_p pi()       { return constants().pi; }
-    static decimal_p e()        { return constants().e; }
-    static decimal_p ln10()     { return constants().ln10(); }
-    static decimal_p ln2()      { return constants().ln2(); }
-    static decimal_p lnpi()     { return constants().lnpi(); }
+    static decimal_p pi();
+    static decimal_p e();
+    static decimal_p ln10();
+    static decimal_p ln2();
+    static decimal_p lnpi();
     bool             adjust_from_angle(uint &qturns, decimal_g &fp) const;
     decimal_p        adjust_to_angle() const;
     static decimal_p exact_angle(int digits, int exp);

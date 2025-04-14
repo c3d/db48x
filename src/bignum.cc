@@ -439,12 +439,25 @@ bignum_p bignum::add_sub(bignum_r y, bignum_r x, bool issub)
 
 
 template <bignum_p (*code)(bignum_r, bignum_r)>
+algebraic_p bignum_wrapper(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   Wrapper to silence warning about function casts in recent XCode
+// ----------------------------------------------------------------------------
+{
+    bignum_r xb = (bignum_r) x;
+    bignum_r yb = (bignum_r) y;
+    bignum_p rb = code(xb, yb);
+    return rb;
+}
+
+
+template <bignum_p (*code)(bignum_r, bignum_r)>
 arithmetic_fn target(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 //  Target function for bignum objects
 // ----------------------------------------------------------------------------
 {
-    return x->is_bignum() && y->is_bignum() ? arithmetic_fn(code) : nullptr;
+    return x->is_bignum() && y->is_bignum() ? bignum_wrapper<code> : nullptr;
 }
 
 

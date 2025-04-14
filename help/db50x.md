@@ -3679,6 +3679,38 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.4 "Face, meet palms" - Pixmaps, bug fixes
+
+This release fixes embarassing numerical bugs introduced in 0.9.3 and introduces
+a new `pixmap` type intended to capture screen pixel maps including in color.
+Builds for hardware calculators are also smaller due to switching to a `nano`
+configuration for the compiler.
+
+### New features
+
+* graphics: Add `pixmap` type
+
+
+### Bug fixes
+
+* Adjust unit conversion in `StdRnd`
+* Fix parsing of `ΣY²` in equations
+* Render non-fancy large exponents correctly (e.g. `1E123456789012345`)
+* The precision of numerical constants now adjusts after changing `PREC`
+* Avoid unnecessary purging of constants cache due to internal precision changes
+* Return tests values to rounded valus as validated with Wolfram Alpha
+* directory: Fix `STOVX` and `Store` to non-current directories
+
+### Improvements
+
+* Fix `sqrt` precision, notably for perfect squares (ouch)
+* Improve support for recent ARM compilers
+* Eliminate new `clang` warnings
+* Eliminate warnings about function pointers in latest XCode
+* Add documentation for `DisplayModesMenu`
+* Precision adjustments are now more consistent across decimal functions
+
+
 ## Release 0.9.3 "Transfigured" - Documentation, bug fixes
 
 This release keeps improving the documentation based on the original HP50G
@@ -10815,7 +10847,7 @@ Modes 'MyModes' STO
 32 Precision 28 Sig @ Need high precision for this one
 K=3.2e20_eV  m0='Ⓒmp'  Δx=100_km  Δtp='Δx/(299 792 457.99999 99999 99998 7113_m/s)'  Δtp=0.00033 35640 95198 15204 95755 781 s
 781_s
-@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458. m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
+@ Expecting [ E₀=1.50327 76180 2⁳⁻¹⁰ J γ=3.41052 60362 9⁳¹¹ β=1. v=299 792 458 m/s Δt=9.78042 95187 6⁳⁻¹⁶ s Δxp=2.93209 90057 2⁳⁻⁷ m ]
 'ROOT(ⒺUltrarelativistic Cases;[E₀;γ;β;v;Δt;Δxp];[1_J;1;1;1_(m/s);1_s;1_m])'
 ResetModes MyModes @ Restore initial state
 ```
@@ -12319,6 +12351,11 @@ Round a value based on a standard uncertainty, implementing [Rule 3](#rule-3).
 
 ```rpl
 -3.141592654_m  0.000045_m  StdRnd
+@ Expecting -3.14159 3 m
+```
+
+```rpl
+-3.141592654_m  0.000045  StdRnd
 @ Expecting -3.14159 3 m
 ```
 
@@ -14999,6 +15036,11 @@ DB50X has five display mode (one more than the HP48)s:
 
 DB50X also features digit [grouping and spacing](#display-grouping-and-spacing)
 
+
+## DisplayModesMenu
+
+The `DisplayModesMenu` is accessible through 🟨_O_ and gives a quick access to
+the various [display settings](#display-settings).
 
 ## StandardDisplay
 

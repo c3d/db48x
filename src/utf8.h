@@ -376,7 +376,9 @@ inline bool is_valid_in_function_name(unicode cp)
 //   Check if character is valid in a command name after the initial character
 // ----------------------------------------------------------------------------
 {
-    return cp == L'⁻' || is_valid_in_name(cp);
+    // Functions like ΣX² or sin⁻¹ are valid
+    return (cp == L'⁻' || cp == L'¹' || cp == L'²' || cp == L'³' ||
+            is_valid_in_name(cp));
 }
 
 

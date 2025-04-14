@@ -183,7 +183,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            regression_checks();
+            constants_menu();
 
 #if 0
         if (onlyCurrent & 2)
@@ -3240,6 +3240,14 @@ void tests::decimal_display_formats()
     test(CLEAR, "50000.", ENTER)       .expect("50 000.");
     test(CLEAR, "500000.", ENTER)      .expect("500 000.");
     test(CLEAR, "5000000.", ENTER)     .expect("5 000 000.");
+
+    step("Test display of very large exponents")
+        .test(CLEAR, "1E1234567890123456", ENTER,
+              ID_DisplayModesMenu, ID_SeparatorModesMenu)
+        .expect("1.⁳¹²³⁴⁵⁶⁷⁸⁹⁰¹²³⁴⁵⁶")
+        .test(ID_ClassicExponent)
+        .expect("1.E1234567890123456")
+        .test(ID_FancyExponent);
 }
 
 
@@ -3406,9 +3414,9 @@ void tests::decimal_numerical_functions()
     TFN(exp2).expect("1.249196125653376700521466782085807");
     TFN(erf).expect("0.3501442208200238235516032450502391");
     TFN(erfc).expect("0.6498557791799761764483967549497609");
-    TFN(tgamma).expect("2.786634540845446211390013619645449");
-    TFN(lgamma).expect("1.024834609957303812257253942202042");
-    TFN(gamma).expect("2.786634540845446211390013619645449");
+    TFN(tgamma).expect("2.786634540845472367950764212781773");
+    TFN(lgamma).expect("1.024834609957313198691092753834887");
+    TFN(gamma).expect("2.786634540845472367950764212781773");
     TFN(cbrt).expect("0.684702127757224161840927732646815");
     TFN(norm).expect("0.321");
 #undef TFN
@@ -3429,13 +3437,13 @@ void tests::decimal_numerical_functions()
         .expect("1.204875625152809234008669105495307 r");
     step("atan2 pos / neg quadrant")
         .test(CLEAR, "3.21 -1.23 atan2", ENTER)
-        .expect("1.9367170284369840044539742777841959 r");
+        .expect("1.936717028436984004453974277784196 r");
     step("atan2 neg / pos quadrant")
         .test(CLEAR, "-3.21 1.23 atan2", ENTER)
         .expect("-1.204875625152809234008669105495307 r");
     step("atan2 neg / neg quadrant")
         .test(CLEAR, "-3.21 -1.23 atan2", ENTER)
-        .expect("-1.9367170284369840044539742777841959 r");
+        .expect("-1.936717028436984004453974277784196 r");
 
     step("ln for very small value")
         .test(CLEAR, "1E-100 LN", ENTER)
@@ -3976,9 +3984,9 @@ void tests::high_precision_numerical_functions()
     TFN(exp2).expect("1.24919 61256 53376 70052 14667 82085 80659 83711 96789 11078 50872 03968 89639 54927 57400 23696 00219 70718 47302 80643 90803 89872 28867 485");
     TFN(erf).expect("0.35014 42208 20023 82355 16032 45050 23912 83120 71924 29072 35684 90423 15676 68631 26483 67740 59618 93127 36786 06239 23468 00013 58887 219");
     TFN(erfc).expect("0.64985 57791 79976 17644 83967 54949 76087 16879 28075 70927 64315 09576 84323 31368 73516 32259 40381 06872 63213 93760 76531 99986 41112 781");
-    TFN(tgamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16607 03231 08411 72385 14857 71635 68840 33879 04492 85639 28147 42453 43682 50364 207", 2000);
-    TFN(lgamma).expect("1.02483 46099 57313 19869 10927 53834 88666 18028 66769 43210 69015 44104 40692 40540 76847 15434 19659 48991 03165 49795 04087 64469 59538 319", 2000);
-    TFN(gamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16607 03231 08411 72385 14857 71635 68840 33879 04492 85639 28147 42453 43682 50364 207", 2000);
+    TFN(tgamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16602 55760 07828 51424 44941 90542 89306 12905 33223 77665 62678 93736 32221 42288 144", 2000);
+    TFN(lgamma).expect("1.02483 46099 57313 19869 10927 53834 88666 18028 66769 43209 08437 87004 46327 04911 25770 09539 00530 12325 23947 42518 21539 88411 28272 448", 2000);
+    TFN(gamma).expect("2.78663 45408 45472 36795 07642 12781 77275 03497 82995 16602 55760 07828 51424 44941 90542 89306 12905 33223 77665 62678 93736 32221 42288 144", 2000);
     TFN(cbrt).expect("0.68470 21277 57224 16184 09277 32646 81496 28057 14749 53139 45950 35873 52977 73009 35191 71304 84396 28932 73625 07589 02266 77954 73690 2353");
     TFN(norm).expect("0.321");
 #undef TFN
@@ -4408,18 +4416,124 @@ void tests::rounding_and_truncating()
 
     step("Rounding to decimal places")
         .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("1.")
+        .test(BSP, ENTER, "1", F5).expect("1.2")
+        .test(BSP, ENTER, "2", F5).expect("1.23")
+        .test(BSP, ENTER, "3", F5).expect("1.235")
+        .test(BSP, ENTER, "4", F5).expect("1.2346")
+        .test(BSP, ENTER, "5", F5).expect("1.23457")
+        .test(BSP, ENTER, "6", F5).expect("1.23456 8")
+        .test(BSP, ENTER, "7", F5).expect("1.23456 79")
+        .test(BSP, ENTER, "8", F5).expect("1.23456 789")
+        .test(BSP, ENTER, "9", F5).expect("1.23456 789")
+        .test(BSP, ENTER, "10", F5).expect("1.23456 789");
+    step("Rounding to decimal places with exponent")
+        .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("0.")
+        .test(BSP, ENTER, "1", F5).expect("0.")
+        .test(BSP, ENTER, "2", F5).expect("0.")
+        .test(BSP, ENTER, "3", F5).expect("0.001")
+        .test(BSP, ENTER, "4", F5).expect("0.0012")
+        .test(BSP, ENTER, "5", F5).expect("0.00123")
+        .test(BSP, ENTER, "6", F5).expect("0.00123 5")
+        .test(BSP, ENTER, "7", F5).expect("0.00123 46")
+        .test(BSP, ENTER, "8", F5).expect("0.00123 457")
+        .test(BSP, ENTER, "9", F5).expect("0.00123 4568")
+        .test(BSP, ENTER, "10", F5).expect("0.00123 45679");
+
+    step("Rounding negative number to decimal places")
+        .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("-10.")
+        .test(BSP, ENTER, "1", F5).expect("-9.9")
+        .test(BSP, ENTER, "2", F5).expect("-9.88")
+        .test(BSP, ENTER, "3", F5).expect("-9.877")
+        .test(BSP, ENTER, "4", F5).expect("-9.8765")
+        .test(BSP, ENTER, "5", F5).expect("-9.87654")
+        .test(BSP, ENTER, "6", F5).expect("-9.87654 3")
+        .test(BSP, ENTER, "7", F5).expect("-9.87654 32")
+        .test(BSP, ENTER, "8", F5).expect("-9.87654 321")
+        .test(BSP, ENTER, "9", F5).expect("-9.87654 321")
+        .test(BSP, ENTER, "10", F5).expect("-9.87654 321");
+    step("Rounding negative number to decimal places with exponent")
+        .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("0.")
+        .test(BSP, ENTER, "1", F5).expect("0.")
+        .test(BSP, ENTER, "2", F5).expect("-0.01")
+        .test(BSP, ENTER, "3", F5).expect("-0.01")
+        .test(BSP, ENTER, "4", F5).expect("-0.0099")
+        .test(BSP, ENTER, "5", F5).expect("-0.00988")
+        .test(BSP, ENTER, "6", F5).expect("-0.00987 7")
+        .test(BSP, ENTER, "7", F5).expect("-0.00987 65")
+        .test(BSP, ENTER, "8", F5).expect("-0.00987 654")
+        .test(BSP, ENTER, "9", F5).expect("-0.00987 6543")
+        .test(BSP, ENTER, "10", F5).expect("-0.00987 65432");
+
+    step("Rounding to significant digits")
+        .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "1", CHS, F5).expect("1.")
+        .test(BSP, ENTER, "2", CHS, F5).expect("1.2")
+        .test(BSP, ENTER, "3", CHS, F5).expect("1.23")
+        .test(BSP, ENTER, "4", CHS, F5).expect("1.235")
+        .test(BSP, ENTER, "5", CHS, F5).expect("1.2346")
+        .test(BSP, ENTER, "6", CHS, F5).expect("1.23457")
+        .test(BSP, ENTER, "7", CHS, F5).expect("1.23456 8")
+        .test(BSP, ENTER, "8", CHS, F5).expect("1.23456 79")
+        .test(BSP, ENTER, "9", CHS, F5).expect("1.23456 789")
+        .test(BSP, ENTER, "10", CHS, F5).expect("1.23456 789");
+    step("Rounding to decimal places with exponent")
+        .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "1", CHS, F5).expect("0.001")
+        .test(BSP, ENTER, "2", CHS, F5).expect("0.0012")
+        .test(BSP, ENTER, "3", CHS, F5).expect("0.00123")
+        .test(BSP, ENTER, "4", CHS, F5).expect("0.00123 5")
+        .test(BSP, ENTER, "5", CHS, F5).expect("0.00123 46")
+        .test(BSP, ENTER, "6", CHS, F5).expect("0.00123 457")
+        .test(BSP, ENTER, "7", CHS, F5).expect("0.00123 4568")
+        .test(BSP, ENTER, "8", CHS, F5).expect("0.00123 45679")
+        .test(BSP, ENTER, "9", CHS, F5).expect("0.00123 45678 9")
+        .test(BSP, ENTER, "10", CHS, F5).expect("0.00123 45678 9");
+
+    step("Rounding negative number to decimal places")
+        .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("-10.")
+        .test(BSP, ENTER, "1", F5).expect("-9.9")
+        .test(BSP, ENTER, "2", F5).expect("-9.88")
+        .test(BSP, ENTER, "3", F5).expect("-9.877")
+        .test(BSP, ENTER, "4", F5).expect("-9.8765")
+        .test(BSP, ENTER, "5", F5).expect("-9.87654")
+        .test(BSP, ENTER, "6", F5).expect("-9.87654 3")
+        .test(BSP, ENTER, "7", F5).expect("-9.87654 32")
+        .test(BSP, ENTER, "8", F5).expect("-9.87654 321")
+        .test(BSP, ENTER, "9", F5).expect("-9.87654 321")
+        .test(BSP, ENTER, "10", F5).expect("-9.87654 321");
+    step("Rounding negative number to decimal places with exponent")
+        .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
+        .test(BSP, ENTER, "0", F5).expect("0.")
+        .test(BSP, ENTER, "1", F5).expect("0.")
+        .test(BSP, ENTER, "2", F5).expect("-0.01")
+        .test(BSP, ENTER, "3", F5).expect("-0.01")
+        .test(BSP, ENTER, "4", F5).expect("-0.0099")
+        .test(BSP, ENTER, "5", F5).expect("-0.00988")
+        .test(BSP, ENTER, "6", F5).expect("-0.00987 7")
+        .test(BSP, ENTER, "7", F5).expect("-0.00987 65")
+        .test(BSP, ENTER, "8", F5).expect("-0.00987 654")
+        .test(BSP, ENTER, "9", F5).expect("-0.00987 6543")
+        .test(BSP, ENTER, "10", F5).expect("-0.00987 65432");
+
+    step("Truncating to decimal places")
+        .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "0", LSHIFT, F1).expect("1.")
         .test(BSP, ENTER, "1", LSHIFT, F1).expect("1.2")
         .test(BSP, ENTER, "2", LSHIFT, F1).expect("1.23")
-        .test(BSP, ENTER, "3", LSHIFT, F1).expect("1.235")
-        .test(BSP, ENTER, "4", LSHIFT, F1).expect("1.2346")
-        .test(BSP, ENTER, "5", LSHIFT, F1).expect("1.23457")
-        .test(BSP, ENTER, "6", LSHIFT, F1).expect("1.23456 8")
-        .test(BSP, ENTER, "7", LSHIFT, F1).expect("1.23456 79")
+        .test(BSP, ENTER, "3", LSHIFT, F1).expect("1.234")
+        .test(BSP, ENTER, "4", LSHIFT, F1).expect("1.2345")
+        .test(BSP, ENTER, "5", LSHIFT, F1).expect("1.23456")
+        .test(BSP, ENTER, "6", LSHIFT, F1).expect("1.23456 7")
+        .test(BSP, ENTER, "7", LSHIFT, F1).expect("1.23456 78")
         .test(BSP, ENTER, "8", LSHIFT, F1).expect("1.23456 789")
         .test(BSP, ENTER, "9", LSHIFT, F1).expect("1.23456 789")
         .test(BSP, ENTER, "10", LSHIFT, F1).expect("1.23456 789");
-    step("Rounding to decimal places with exponent")
+    step("Truncating to decimal places with exponent")
         .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "0", LSHIFT, F1).expect("0.")
         .test(BSP, ENTER, "1", LSHIFT, F1).expect("0.")
@@ -4427,18 +4541,18 @@ void tests::rounding_and_truncating()
         .test(BSP, ENTER, "3", LSHIFT, F1).expect("0.001")
         .test(BSP, ENTER, "4", LSHIFT, F1).expect("0.0012")
         .test(BSP, ENTER, "5", LSHIFT, F1).expect("0.00123")
-        .test(BSP, ENTER, "6", LSHIFT, F1).expect("0.00123 5")
-        .test(BSP, ENTER, "7", LSHIFT, F1).expect("0.00123 46")
-        .test(BSP, ENTER, "8", LSHIFT, F1).expect("0.00123 457")
-        .test(BSP, ENTER, "9", LSHIFT, F1).expect("0.00123 4568")
-        .test(BSP, ENTER, "10", LSHIFT, F1).expect("0.00123 45679");
+        .test(BSP, ENTER, "6", LSHIFT, F1).expect("0.00123 4")
+        .test(BSP, ENTER, "7", LSHIFT, F1).expect("0.00123 45")
+        .test(BSP, ENTER, "8", LSHIFT, F1).expect("0.00123 456")
+        .test(BSP, ENTER, "9", LSHIFT, F1).expect("0.00123 4567")
+        .test(BSP, ENTER, "10", LSHIFT, F1).expect("0.00123 45678");
 
-    step("Rounding negative number to decimal places")
+    step("Truncating negative number to decimal places")
         .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F1).expect("-10.")
-        .test(BSP, ENTER, "1", LSHIFT, F1).expect("-9.9")
-        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-9.88")
-        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-9.877")
+        .test(BSP, ENTER, "0", LSHIFT, F1).expect("-9.")
+        .test(BSP, ENTER, "1", LSHIFT, F1).expect("-9.8")
+        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-9.87")
+        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-9.876")
         .test(BSP, ENTER, "4", LSHIFT, F1).expect("-9.8765")
         .test(BSP, ENTER, "5", LSHIFT, F1).expect("-9.87654")
         .test(BSP, ENTER, "6", LSHIFT, F1).expect("-9.87654 3")
@@ -4446,51 +4560,51 @@ void tests::rounding_and_truncating()
         .test(BSP, ENTER, "8", LSHIFT, F1).expect("-9.87654 321")
         .test(BSP, ENTER, "9", LSHIFT, F1).expect("-9.87654 321")
         .test(BSP, ENTER, "10", LSHIFT, F1).expect("-9.87654 321");
-    step("Rounding negative number to decimal places with exponent")
+    step("Truncating negative number to decimal places with exponent")
         .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "0", LSHIFT, F1).expect("0.")
         .test(BSP, ENTER, "1", LSHIFT, F1).expect("0.")
-        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-0.01")
-        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-0.01")
-        .test(BSP, ENTER, "4", LSHIFT, F1).expect("-0.0099")
-        .test(BSP, ENTER, "5", LSHIFT, F1).expect("-0.00988")
-        .test(BSP, ENTER, "6", LSHIFT, F1).expect("-0.00987 7")
+        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-0.")
+        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-0.009")
+        .test(BSP, ENTER, "4", LSHIFT, F1).expect("-0.0098")
+        .test(BSP, ENTER, "5", LSHIFT, F1).expect("-0.00987")
+        .test(BSP, ENTER, "6", LSHIFT, F1).expect("-0.00987 6")
         .test(BSP, ENTER, "7", LSHIFT, F1).expect("-0.00987 65")
         .test(BSP, ENTER, "8", LSHIFT, F1).expect("-0.00987 654")
         .test(BSP, ENTER, "9", LSHIFT, F1).expect("-0.00987 6543")
         .test(BSP, ENTER, "10", LSHIFT, F1).expect("-0.00987 65432");
 
-    step("Rounding to significant digits")
+    step("Truncating to significant digits")
         .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "1", CHS, LSHIFT, F1).expect("1.")
         .test(BSP, ENTER, "2", CHS, LSHIFT, F1).expect("1.2")
         .test(BSP, ENTER, "3", CHS, LSHIFT, F1).expect("1.23")
-        .test(BSP, ENTER, "4", CHS, LSHIFT, F1).expect("1.235")
-        .test(BSP, ENTER, "5", CHS, LSHIFT, F1).expect("1.2346")
-        .test(BSP, ENTER, "6", CHS, LSHIFT, F1).expect("1.23457")
-        .test(BSP, ENTER, "7", CHS, LSHIFT, F1).expect("1.23456 8")
-        .test(BSP, ENTER, "8", CHS, LSHIFT, F1).expect("1.23456 79")
+        .test(BSP, ENTER, "4", CHS, LSHIFT, F1).expect("1.234")
+        .test(BSP, ENTER, "5", CHS, LSHIFT, F1).expect("1.2345")
+        .test(BSP, ENTER, "6", CHS, LSHIFT, F1).expect("1.23456")
+        .test(BSP, ENTER, "7", CHS, LSHIFT, F1).expect("1.23456 7")
+        .test(BSP, ENTER, "8", CHS, LSHIFT, F1).expect("1.23456 78")
         .test(BSP, ENTER, "9", CHS, LSHIFT, F1).expect("1.23456 789")
         .test(BSP, ENTER, "10", CHS, LSHIFT, F1).expect("1.23456 789");
-    step("Rounding to decimal places with exponent")
+    step("Truncating to decimal places with exponent")
         .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "1", CHS, LSHIFT, F1).expect("0.001")
         .test(BSP, ENTER, "2", CHS, LSHIFT, F1).expect("0.0012")
         .test(BSP, ENTER, "3", CHS, LSHIFT, F1).expect("0.00123")
-        .test(BSP, ENTER, "4", CHS, LSHIFT, F1).expect("0.00123 5")
-        .test(BSP, ENTER, "5", CHS, LSHIFT, F1).expect("0.00123 46")
-        .test(BSP, ENTER, "6", CHS, LSHIFT, F1).expect("0.00123 457")
-        .test(BSP, ENTER, "7", CHS, LSHIFT, F1).expect("0.00123 4568")
-        .test(BSP, ENTER, "8", CHS, LSHIFT, F1).expect("0.00123 45679")
+        .test(BSP, ENTER, "4", CHS, LSHIFT, F1).expect("0.00123 4")
+        .test(BSP, ENTER, "5", CHS, LSHIFT, F1).expect("0.00123 45")
+        .test(BSP, ENTER, "6", CHS, LSHIFT, F1).expect("0.00123 456")
+        .test(BSP, ENTER, "7", CHS, LSHIFT, F1).expect("0.00123 4567")
+        .test(BSP, ENTER, "8", CHS, LSHIFT, F1).expect("0.00123 45678")
         .test(BSP, ENTER, "9", CHS, LSHIFT, F1).expect("0.00123 45678 9")
         .test(BSP, ENTER, "10", CHS, LSHIFT, F1).expect("0.00123 45678 9");
 
-    step("Rounding negative number to decimal places")
+    step("Truncating negative number to decimal places")
         .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F1).expect("-10.")
-        .test(BSP, ENTER, "1", LSHIFT, F1).expect("-9.9")
-        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-9.88")
-        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-9.877")
+        .test(BSP, ENTER, "0", LSHIFT, F1).expect("-9.")
+        .test(BSP, ENTER, "1", LSHIFT, F1).expect("-9.8")
+        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-9.87")
+        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-9.876")
         .test(BSP, ENTER, "4", LSHIFT, F1).expect("-9.8765")
         .test(BSP, ENTER, "5", LSHIFT, F1).expect("-9.87654")
         .test(BSP, ENTER, "6", LSHIFT, F1).expect("-9.87654 3")
@@ -4498,125 +4612,19 @@ void tests::rounding_and_truncating()
         .test(BSP, ENTER, "8", LSHIFT, F1).expect("-9.87654 321")
         .test(BSP, ENTER, "9", LSHIFT, F1).expect("-9.87654 321")
         .test(BSP, ENTER, "10", LSHIFT, F1).expect("-9.87654 321");
-    step("Rounding negative number to decimal places with exponent")
+    step("Truncating negative number to decimal places with exponent")
         .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
         .test(BSP, ENTER, "0", LSHIFT, F1).expect("0.")
         .test(BSP, ENTER, "1", LSHIFT, F1).expect("0.")
-        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-0.01")
-        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-0.01")
-        .test(BSP, ENTER, "4", LSHIFT, F1).expect("-0.0099")
-        .test(BSP, ENTER, "5", LSHIFT, F1).expect("-0.00988")
-        .test(BSP, ENTER, "6", LSHIFT, F1).expect("-0.00987 7")
+        .test(BSP, ENTER, "2", LSHIFT, F1).expect("-0.")
+        .test(BSP, ENTER, "3", LSHIFT, F1).expect("-0.009")
+        .test(BSP, ENTER, "4", LSHIFT, F1).expect("-0.0098")
+        .test(BSP, ENTER, "5", LSHIFT, F1).expect("-0.00987")
+        .test(BSP, ENTER, "6", LSHIFT, F1).expect("-0.00987 6")
         .test(BSP, ENTER, "7", LSHIFT, F1).expect("-0.00987 65")
         .test(BSP, ENTER, "8", LSHIFT, F1).expect("-0.00987 654")
         .test(BSP, ENTER, "9", LSHIFT, F1).expect("-0.00987 6543")
         .test(BSP, ENTER, "10", LSHIFT, F1).expect("-0.00987 65432");
-
-    step("Truncating to decimal places")
-        .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("1.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("1.2")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("1.23")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("1.234")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("1.2345")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("1.23456")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("1.23456 7")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("1.23456 78")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("1.23456 789")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("1.23456 789")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("1.23456 789");
-    step("Truncating to decimal places with exponent")
-        .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("0.001")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("0.0012")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("0.00123")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("0.00123 4")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("0.00123 45")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("0.00123 456")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("0.00123 4567")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("0.00123 45678");
-
-    step("Truncating negative number to decimal places")
-        .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("-9.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("-9.8")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("-9.87")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("-9.876")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("-9.8765")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("-9.87654")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("-9.87654 3")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("-9.87654 32")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("-9.87654 321")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("-9.87654 321")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("-9.87654 321");
-    step("Truncating negative number to decimal places with exponent")
-        .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("-0.")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("-0.009")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("-0.0098")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("-0.00987")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("-0.00987 6")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("-0.00987 65")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("-0.00987 654")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("-0.00987 6543")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("-0.00987 65432");
-
-    step("Truncating to significant digits")
-        .test(CLEAR, "1.234567890", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "1", CHS, LSHIFT, F2).expect("1.")
-        .test(BSP, ENTER, "2", CHS, LSHIFT, F2).expect("1.2")
-        .test(BSP, ENTER, "3", CHS, LSHIFT, F2).expect("1.23")
-        .test(BSP, ENTER, "4", CHS, LSHIFT, F2).expect("1.234")
-        .test(BSP, ENTER, "5", CHS, LSHIFT, F2).expect("1.2345")
-        .test(BSP, ENTER, "6", CHS, LSHIFT, F2).expect("1.23456")
-        .test(BSP, ENTER, "7", CHS, LSHIFT, F2).expect("1.23456 7")
-        .test(BSP, ENTER, "8", CHS, LSHIFT, F2).expect("1.23456 78")
-        .test(BSP, ENTER, "9", CHS, LSHIFT, F2).expect("1.23456 789")
-        .test(BSP, ENTER, "10", CHS, LSHIFT, F2).expect("1.23456 789");
-    step("Truncating to decimal places with exponent")
-        .test(CLEAR, "1.234567890E-3", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "1", CHS, LSHIFT, F2).expect("0.001")
-        .test(BSP, ENTER, "2", CHS, LSHIFT, F2).expect("0.0012")
-        .test(BSP, ENTER, "3", CHS, LSHIFT, F2).expect("0.00123")
-        .test(BSP, ENTER, "4", CHS, LSHIFT, F2).expect("0.00123 4")
-        .test(BSP, ENTER, "5", CHS, LSHIFT, F2).expect("0.00123 45")
-        .test(BSP, ENTER, "6", CHS, LSHIFT, F2).expect("0.00123 456")
-        .test(BSP, ENTER, "7", CHS, LSHIFT, F2).expect("0.00123 4567")
-        .test(BSP, ENTER, "8", CHS, LSHIFT, F2).expect("0.00123 45678")
-        .test(BSP, ENTER, "9", CHS, LSHIFT, F2).expect("0.00123 45678 9")
-        .test(BSP, ENTER, "10", CHS, LSHIFT, F2).expect("0.00123 45678 9");
-
-    step("Truncating negative number to decimal places")
-        .test(CLEAR, "-9.876543210", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("-9.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("-9.8")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("-9.87")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("-9.876")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("-9.8765")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("-9.87654")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("-9.87654 3")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("-9.87654 32")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("-9.87654 321")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("-9.87654 321")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("-9.87654 321");
-    step("Truncating negative number to decimal places with exponent")
-        .test(CLEAR, "-9.876543210E-3", ENTER, RSHIFT, E, ENTER)
-        .test(BSP, ENTER, "0", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "1", LSHIFT, F2).expect("0.")
-        .test(BSP, ENTER, "2", LSHIFT, F2).expect("-0.")
-        .test(BSP, ENTER, "3", LSHIFT, F2).expect("-0.009")
-        .test(BSP, ENTER, "4", LSHIFT, F2).expect("-0.0098")
-        .test(BSP, ENTER, "5", LSHIFT, F2).expect("-0.00987")
-        .test(BSP, ENTER, "6", LSHIFT, F2).expect("-0.00987 6")
-        .test(BSP, ENTER, "7", LSHIFT, F2).expect("-0.00987 65")
-        .test(BSP, ENTER, "8", LSHIFT, F2).expect("-0.00987 654")
-        .test(BSP, ENTER, "9", LSHIFT, F2).expect("-0.00987 6543")
-        .test(BSP, ENTER, "10", LSHIFT, F2).expect("-0.00987 65432");
 }
 
 
@@ -4902,7 +4910,7 @@ void tests::complex_arithmetic()
         .test(CLEAR, LSHIFT, I, F2, F2, F3, F1, MUL, ID_pow)
         .expect("'e↑(ⅈ·π)'")
         .test(LSHIFT, KEY1)
-        .expect("1.∡180.°");
+        .expect("-1.");
 }
 
 
@@ -6569,7 +6577,7 @@ void tests::solver_testing()
         .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
         .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("-2.19049 50593 6⁳⁻¹³")
+        .expect("-2.19049 50614 3⁳⁻¹³")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver with slow slope")
@@ -6660,7 +6668,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-3.⁳⁻²²'");
+        .expect("'25=25.'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -9721,22 +9729,22 @@ void tests::insertion_of_variables_constants_and_units()
     step("Insert e value")
         .test(LSHIFT, F2).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028 »");
+                                 "2.71828 18284 59045 23536 029 »");
     step("Insert i value")
         .test(LSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1 »");
     step("Insert infinity value")
         .test(LSHIFT, F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1  "
                                  "9.99999⁳999999 »");
     step("Insert undefined value")
         .test(LSHIFT, F5).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
-                                 "2.71828 18284 59045 23536 028  "
+                                 "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1  "
                                  "9.99999⁳999999  "
                                  "Undefined »");
@@ -9931,6 +9939,23 @@ void tests::constants_menu()
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
 
+    step("Check that numerical constants are adjusted with precision")
+        .test(CLEAR,
+              ID_DisplayModesMenu, 60, ID_Sig,
+              NOSHIFT, F, ID_Precision, ENTER, ID_Purge,
+              ID_ConstantsMenu, F2, LSHIFT, F1)
+        .expect("3.14159 26535 89793 23846 264")
+        .test(LSHIFT, F2)
+        .expect("2.71828 18284 59045 23536 029")
+        .test(CLEAR,
+              ID_DisplayModesMenu, 60, ID_Precision,
+              ID_ConstantsMenu, F2, LSHIFT, F1)
+        .expect("3.14159 26535 89793 23846 26433 83279 50288 41971 69399 37510 58209 7494")
+        .test(LSHIFT, F2)
+        .expect("2.71828 18284 59045 23536 02874 71352 66249 77572 47093 69995 95749 6697")
+        .test(CLEAR, ID_DisplayModesMenu, ID_Std,
+              NOSHIFT, F, ID_Precision, ENTER, ID_Purge);
+
     step("Insert constant standard uncertainty from command line")
         .test(CLEAR, "Ⓢc", ENTER)
         .expect("Ⓢc")
@@ -9952,6 +9977,58 @@ void tests::constants_menu()
         .expect("Ⓡc")
         .test(ID_ToDecimal)
         .expect("0");
+
+    step("Standard rounding from command line")
+        .test(CLEAR, "5.36248084521_g 0.11_g StdRnd", ENTER)
+        .expect("5.36 g");
+    step("Standard rounding from menu")
+        .test(CLEAR, "5.36248084521_g 0.11_g", ENTER,
+              ID_PartsMenu, ID_StandardRound)
+        .expect("5.36 g");
+    step("Standard rounding with unit conversion")
+        .test(CLEAR, "5.36248084521_kg 0.11_g", ENTER,
+              ID_PartsMenu, ID_StandardRound)
+        .expect("5.36248 kg");
+    step("Standard rounding with invalid units")
+        .test(CLEAR, "5.36248084521_kg 0.11",
+              ID_PartsMenu, ID_StandardRound)
+        .expect("5.36 kg");
+    step("Standard rounding with invalid units")
+        .test(CLEAR, "5.36248084521_kg 0.11_cm", ENTER,
+              ID_PartsMenu, ID_StandardRound)
+        .error("Inconsistent units");
+
+    step("Relative rounding from command line")
+        .test(CLEAR, "5.36248084521_g 0.101 RelRnd", ENTER)
+        .expect("5.36 g");
+    step("Relative rounding from menu")
+        .test(CLEAR, "5.36248084521_g 0.101", ENTER,
+              ID_PartsMenu, ID_RelativeRound)
+        .expect("5.36 g");
+    step("Relative rounding with unit conversion")
+        .test(CLEAR, "5.36248084521_kg 0.101", ENTER,
+              ID_PartsMenu, ID_RelativeRound)
+        .expect("5.36 kg");
+    step("Relative rounding with invalid units")
+        .test(CLEAR, "5.36248084521_kg 0.11_g", ENTER,
+              ID_PartsMenu, ID_RelativeRound)
+        .error("Bad argument type");
+
+    step("Precision rounding from command line")
+        .test(CLEAR, "5.36248084521_g 0.101_g PrcRnd", ENTER)
+        .expect("5.362 g");
+    step("Precision rounding from menu")
+        .test(CLEAR, "5.36248084521_g 0.101_g", ENTER,
+              ID_PartsMenu, ID_PrecisionRound)
+        .expect("5.362 g");
+    step("Precision rounding with unit conversion")
+        .test(CLEAR, "5.36248084521_kg 0.101_g", ENTER,
+              ID_PartsMenu, ID_PrecisionRound)
+        .expect("5.36248 1 kg");
+    step("Precision rounding with invalid units")
+        .test(CLEAR, "5.36248084521_kg 0.11_cm", ENTER,
+              ID_PartsMenu, ID_StandardRound)
+        .error("Inconsistent units");
 
     step("Use Const command from command line")
         .test(CLEAR, "'c' CONST", ENTER, ID_ToDecimal)
@@ -10689,7 +10766,7 @@ void tests::probabilities()
         .expect("13 763 753 091 226 345 046 315 979 581 580 902 400 000 000");
     step("Factorial in program using Gamma")
         .test(CLEAR, "37.2 FACT", ENTER)
-        .expect("2.84300 06466 2⁳⁴³");
+        .expect("2.84300 02599 5⁳⁴³");
     step("Combinations in program, returning zero")
         .test(CLEAR, "37 42 COMB", ENTER)
         .expect("0");
@@ -10733,7 +10810,7 @@ void tests::probabilities()
         .expect("13 763 753 091 226 345 046 315 979 581 580 902 400 000 000");
     step("Factorial in menu using Gamma")
         .test(CLEAR, "37.2", NOSHIFT, F3)
-        .expect("2.84300 06466 2⁳⁴³");
+        .expect("2.84300 02599 5⁳⁴³");
     step("Combinations in menu, returning zero")
         .test(CLEAR, "37 42", NOSHIFT, F1)
         .expect("0");
@@ -11618,6 +11695,18 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Bug 1445: sqrt for perfect squares")
+        .test(CLEAR, "25 sqrt 5 -", ENTER).expect("0.")
+        .test(CLEAR, "36 sqrt 6 -", ENTER).expect("0.")
+        .test(CLEAR, "49 sqrt 7 -", ENTER).expect("0.");
+    step("Bug 1442: STOVX and RCLVX")
+        .test(CLEAR, "'Z' STOVX", ENTER).noerror()
+        .test(CLEAR, "RCLVX", ENTER).expect("Z")
+        .test(CLEAR, "'Ⓓ' RCL", ENTER).want("Directory { ⓧ Z }")
+        .test(CLEAR, "'AbCd' STOVX", ENTER).noerror()
+        .test(CLEAR, "RCLVX", ENTER).expect("AbCd")
+        .test(CLEAR, "'Ⓓ' RCL", ENTER).want("Directory { ⓧ AbCd }");
+
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
         .noerror();             // Bug was "Invalid Plot Data"
@@ -11655,7 +11744,7 @@ void tests::regression_checks()
         .expect("3.41528 61889 6⁳¹³⁰²⁸∡90°");
     test(CLEAR, "0+30000.ⅈ cos", ENTER)
         .expect("3.41528 61889 6⁳¹³⁰²⁸∡0°");
-    test(CLEAR, "0+30000.ⅈ tan", ENTER).expect("1.∡90°");
+    test(CLEAR, "0+30000.ⅈ tan", ENTER).expect("1∡90°");
 
     step("Bug 272: Type error on logical operations")
         .test(CLEAR, "{ x } #2134AF AND", ENTER).error("Bad argument type")

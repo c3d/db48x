@@ -404,12 +404,13 @@ SIZE = arm-none-eabi-size
 HEX = $(OBJCOPY) -O ihex
 BIN = $(OBJCOPY) -O binary -S
 CPUFLAGS += -mthumb -march=armv7e-m -mfloat-abi=hard -mfpu=fpv4-sp-d16
-PLATFORM_FLAGS = -Wno-packed-bitfield-compat -Wall -fdata-sections -ffunction-sections
+PLATFORM_FLAGS = -Wno-packed-bitfield-compat -Wall -fdata-sections -ffunction-sections -specs=nano.specs  -u _printf_float -specs=nosys.specs
 CXX_PLATFORM_FLAGS = -fno-rtti
 C_LIST_FLAGS = -Wa,-a,-ad,-alms=$(BUILD)/$(notdir $(<:.c=.lst))
 CXX_LIST_FLAGS = -Wa,-a,-ad,-alms=$(BUILD)/$(notdir $(<:.cc=.lst))
 ASM_SOURCES = $(SDK)/startup_pgm.s
 LINK_OPTS=					\
+    -specs=nano.specs -u _printf_float -specs=nosys.specs	\
 	-Wl,-Map=$(BUILD)/$(TARGET).map,--cref	\
 	-Wl,--gc-sections			\
 	-Wl,--wrap=_malloc_r

@@ -47,15 +47,16 @@ void draw_axes(const PlotParametersAccess &ppar)
 //   Draw axes
 // ----------------------------------------------------------------------------
 {
-    coord w = Screen.area().width();
-    coord h = Screen.area().height();
-    coord x = ppar.pixel_adjust(+ppar.xorigin, ppar.xmin, ppar.xmax, w);
-    coord y = ppar.pixel_adjust(+ppar.yorigin, ppar.ymax, ppar.ymin, h);
+    surface disp = display();
+    coord   w    = disp.width();
+    coord   h    = disp.height();
+    coord   x    = ppar.pixel_adjust(+ppar.xorigin, ppar.xmin, ppar.xmax, w);
+    coord   y    = ppar.pixel_adjust(+ppar.yorigin, ppar.ymax, ppar.ymin, h);
 
     // Draw axes proper
     pattern pat = Settings.Foreground();
-    Screen.fill(0, y, w, y, pat);
-    Screen.fill(x, 0, x, h, pat);
+    disp.fill(0, y, w, y, pat);
+    disp.fill(x, 0, x, h, pat);
 
     // Draw tick marks
     coord tx = ppar.size_adjust(+ppar.xticks, ppar.xmin, ppar.xmax, w);
@@ -63,23 +64,23 @@ void draw_axes(const PlotParametersAccess &ppar)
     if (tx > 0)
     {
         for (coord i = tx; x + i <= w; i += tx)
-            Screen.fill(x + i, y - 2, x + i, y + 2, pat);
+            disp.fill(x + i, y - 2, x + i, y + 2, pat);
         for (coord i = tx; x - i >= 0; i += tx)
-            Screen.fill(x - i, y - 2, x - i, y + 2, pat);
+            disp.fill(x - i, y - 2, x - i, y + 2, pat);
     }
     if (ty > 0)
     {
         for (coord i = ty; y + i <= h; i += ty)
-            Screen.fill(x - 2, y + i, x + 2, y + i, pat);
+            disp.fill(x - 2, y + i, x + 2, y + i, pat);
         for (coord i = ty; y - i >= 0; i += ty)
-            Screen.fill(x - 2, y - i, x + 2, y - i, pat);
+            disp.fill(x - 2, y - i, x + 2, y - i, pat);
     }
 
     // Draw arrows at end of axes
     for (uint i = 0; i < 4; i++)
     {
-        Screen.fill(w - 3*(i+1), y - i, w - 3*i, y + i, pat);
-        Screen.fill(x - i, 3*i, x + i, 3*(i+1), pat);
+        disp.fill(w - 3*(i+1), y - i, w - 3*i, y + i, pat);
+        disp.fill(x - i, 3*i, x + i, 3*(i+1), pat);
     }
 
     ui.draw_dirty(0, 0, w, h);
@@ -158,7 +159,7 @@ object::result draw_plot(object::id                  kind,
         max = ppar.imax;
         step = ppar.resolution;
         if (step->is_zero())
-            step = (max - min) / integer::make(ScreenWidth());
+            step = (max - min) / integer::make(display().width());
         dname = object::ID_Equation;
         break;
 
@@ -172,7 +173,7 @@ object::result draw_plot(object::id                  kind,
 
     step = ppar.resolution;
     if (step->is_zero())
-        step = (max - min) / integer::make(ScreenWidth());
+        step = (max - min) / integer::make(display().width());
 
     if (!to_plot)
     {
@@ -219,11 +220,12 @@ object::result draw_plot(object::id                  kind,
             return object::ERROR;
         }
 
+        size width = display().width();
         data = array_p(+to_plot);
         size_t items = data->items();
         data = array_p(+to_plot);
         step = (max - min) / integer::make(items);
-        bar_skip = items && items < ScreenWidth() ? ScreenWidth() / items : 1;
+        bar_skip = items && items < width ? width / items : 1;
         bar_width = bar_skip > 2 ? bar_skip - 2: bar_skip;
         it = data->begin();
         end = data->end();
@@ -263,6 +265,7 @@ object::result draw_plot(object::id                  kind,
                 break;
         }
 
+        surface disp = display();
         if (y)
         {
             switch(kind)
@@ -332,16 +335,16 @@ object::result draw_plot(object::id                  kind,
                 ry = ppar.pixel_y(ppar.yorigin);
                 if (ry < 0)
                     ry = 0;
-                else if (ry >= LCD_H)
-                    ry = LCD_H-1;
+                else if (ry >= coord(disp.height()))
+                    ry = disp.height()-1;
                 rect r(rx, ry - LCD_H/32, rx, ry + LCD_H/32);
-                Screen.fill(r, errbg);
+                disp.fill(r, errbg);
                 ui.draw_dirty(r);
             }
             if (!rt.error())
                 rt.invalid_function_error();
-            Screen.text(0, 0, rt.error(), ErrorFont,
-                        pattern::white, pattern::black);
+            disp.text(0, 0, rt.error(), ErrorFont,
+                      pattern::white, pattern::black);
             ui.draw_dirty(0, 0, LCD_W, ErrorFont->height());
             lx = ly = -1;
             rt.clear_error();

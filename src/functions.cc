@@ -1092,7 +1092,7 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
         algebraic_g v = u->value();
         algebraic_g x = u->uexpr();
         v = rnd_or_trnc(v, digits, func);
-        return unit::make(v, x);
+        return unit::simple(v, x);
     }
     case object::ID_tag:
     {
@@ -1215,23 +1215,36 @@ static algebraic_p uncertainty_rounding(algebraic_g args[], object::
 //  Compute standard or relative round
 // ----------------------------------------------------------------------------
 {
-    algebraic_g x  = args[1];
-    algebraic_g u  = args[0];
-    algebraic_g xv = x;
-    if (unit_p xu = unit::get(x))
-        xv = xu->value();
-    if (unit_p uu = unit::get(u))
+    algebraic_g x   = args[1];
+    algebraic_g u   = args[0];
+    algebraic_g xv  = x;
+    bool        rel = which == object::ID_RelativeRound;
+    bool        prc = which == object::ID_PrecisionRound;
+    unit_g      uu  = unit::get(u);
+    if (uu && rel)
     {
-        save<bool> ueval(unit::mode, true);
-        u = u->evaluate();
-        uu = unit::get(u);
+        u = uu->convert_to_real();
+        if (!u)
+        {
+            rt.type_error();
+            return nullptr;
+        }
+        uu = nullptr;
+    }
+    if (unit_p xu = unit::get(x))
+    {
+        xv = xu->value();
         if (uu)
-            u = uu->value();
+        {
+            if (!xu->convert(u))
+                return nullptr;
+            uu = unit::get(u);
+            if (uu)
+                u = uu->value();
+        }
     }
     if (arithmetic::decimal_promotion(xv, u))
     {
-        bool      prc = which == object::ID_PrecisionRound;
-        bool      rel = which == object::ID_RelativeRound;
         decimal_g xd = decimal_p(+xv);
         decimal_g ud = decimal_p(+u);
         if (rel)

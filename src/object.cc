@@ -354,6 +354,9 @@ retry:
                 case 'b':
                     r = grob::do_parse(p);
                     break;
+                case 'p':
+                    r = pixmap::do_parse(p);
+                    break;
                 default:
                     break;
                 }

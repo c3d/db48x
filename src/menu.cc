@@ -406,24 +406,40 @@ MENU(PartsMenu,
 // ----------------------------------------------------------------------------
      ID_abs,
      ID_sign,
+     ID_IntPart,
+     ID_FracPart,
+     ID_Round,
+
+     "Trunc",   ID_Truncate,
+     "Mant",    ID_mant,
+     "Xpon",    ID_xpon,
+     "Ceil",    ID_ceil,
+     "Floor",   ID_floor,
+
+     "→Int",    ID_ToInteger,
+     "→Q",      ID_ToFraction,
+     "SigDig",  ID_SigDig,
+     ID_Get,
+     ID_GetI,
+
      ID_re,
      ID_im,
      ID_arg,
-     ID_conj,
+     ID_Size,
+     "Obj→",    ID_Explode,
 
-     "Round",   ID_Round,
-     "Trunc",   ID_Truncate,
-     "IntPart", ID_IntPart,
-     "FrcPart", ID_FracPart,
-     "Mant",    ID_mant,
-     "Xpon",    ID_xpon,
+     "CstName", ID_ConstantName,
+     "CstValue",ID_ConstantValue,
+     "StdUnc",  ID_StandardUncertainty,
+     "RelUnc",  ID_RelativeUncertainty,
+     "Tag→",    ID_FromTag,
 
-     "Ceil",    ID_ceil,
-     "Floor",   ID_floor,
-     "→Int",    ID_ToInteger,
-     "→Q",      ID_ToFraction,
-     "Dim",     ID_Size,
-     "SigDig",  ID_SigDig);
+     "StdRnd",  ID_StandardRound,
+     "RelRnd",  ID_RelativeRound,
+     "→StdUnc", ID_ToStandardUncertainty,
+     "→RelRnd", ID_ToRelativeUncertainty,
+     "PrcRnd",  ID_PrecisionRound
+);
 
 
 MENU(NumbersMenu,

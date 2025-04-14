@@ -39,6 +39,8 @@
 
 
 GCP(grob);
+GCP(bitmap);
+GCP(pixmap);
 
 struct grob : object
 // ----------------------------------------------------------------------------
@@ -254,6 +256,191 @@ public:
     // PARSE_DECL(bitmap) is managed by grob class
     SIZE_DECL(bitmap);
     RENDER_DECL(bitmap);
+};
+
+
+struct pixmap : object
+// ----------------------------------------------------------------------------
+//   Representation of a pixel map, with any number of bits per pixel
+// ----------------------------------------------------------------------------
+{
+    using pixsize = blitter::size;
+
+    pixmap(id type, pixsize w, pixsize h, uint bpp, gcbytes bits): object(type)
+    // ------------------------------------------------------------------------
+    //   Pixmap constructor
+    // ------------------------------------------------------------------------
+    {
+        byte *p = (byte *) payload();
+        p = leb128(p, w);
+        p = leb128(p, h);
+        p = leb128(p, bpp);
+        size_t ds = datasize(type, w, h, bpp);
+        byte_p s = bits;
+        while (ds--)
+            *p++ = *s++;
+    }
+
+
+
+    pixmap(id type, pixsize w, pixsize h, uint bpp): object(type)
+    // ------------------------------------------------------------------------
+    //   Pixmap constructor
+    // ------------------------------------------------------------------------
+    {
+        byte *p = (byte *) payload();
+        p = leb128(p, w);
+        p = leb128(p, h);
+        p = leb128(p, bpp);
+        size_t ds = datasize(type, w, h, bpp);
+        while (ds--)
+            *p++ = 0;
+    }
+
+
+    static size_t required_memory(id type, pixsize w, pixsize h, uint bpp)
+    // ------------------------------------------------------------------------
+    //   Compute required pixmap memory for the given parameters
+    // ------------------------------------------------------------------------
+    {
+        size_t bodysize = bytesize(type, w, h, bpp);
+        return leb128size(type) + bodysize;
+    }
+
+
+    static size_t required_memory(id            type,
+                                  pixsize       w,
+                                  pixsize       h,
+                                  uint          bpp,
+                                  gcutf8 UNUSED bytes)
+    // ------------------------------------------------------------------------
+    //   Compute required pixmap memory for the given parameters
+    // ------------------------------------------------------------------------
+    {
+        size_t bs = bytesize(type, w, h, bpp);
+        return leb128size(type) + bs;
+    }
+
+
+    static pixmap_p make(pixsize w, pixsize h, uint bpp)
+    // ------------------------------------------------------------------------
+    //   Build a pixmap from the given parameters
+    // ------------------------------------------------------------------------
+    {
+        return rt.make<pixmap>(w, h, bpp);
+    }
+
+
+    static pixmap_p make(pixsize w, pixsize h, uint bpp, byte_p bits)
+    // ------------------------------------------------------------------------
+    //   Build a pixmap from the given parameters
+    // ------------------------------------------------------------------------
+    {
+        return rt.make<pixmap>(w, h, bpp, bits);
+    }
+
+
+    static size_t bytesize(id type, pixsize w, pixsize h, uint bpp)
+    // ------------------------------------------------------------------------
+    //   Compute the number of bytes required for a bitmap
+    // ------------------------------------------------------------------------
+    {
+        size_t ds = datasize(type, w, h, bpp);
+        return leb128size(w) + leb128size(h) + leb128size(bpp) + ds;
+    }
+
+
+    static size_t datasize(id type, pixsize w, pixsize h, uint bpp)
+    // ------------------------------------------------------------------------
+    //   Compute the number of bytes required for a bitmap
+    // ------------------------------------------------------------------------
+    {
+        return (w * h * bpp + 7) / 8;
+    }
+
+
+    pixsize width() const
+    // ------------------------------------------------------------------------
+    //   Return the width of a pixmap
+    // ------------------------------------------------------------------------
+    {
+        byte_p p = payload();
+        return leb128<pixsize>(p);
+    }
+
+
+    pixsize height() const
+    // ------------------------------------------------------------------------
+    //   Return the height of a pixmap
+    // ------------------------------------------------------------------------
+    {
+        byte_p p = payload();
+        p = leb128skip(p);      // Skip width
+        return leb128<pixsize>(p);
+    }
+
+
+    uint depth() const
+    // ------------------------------------------------------------------------
+    //   Return the bit depth of a pixmap (number of bits per pixel)
+    // ------------------------------------------------------------------------
+    {
+        byte_p p = payload();
+        p = leb128skip(p);      // Skip width
+        p = leb128skip(p);      // Skip height
+        return leb128<uint>(p);
+    }
+
+
+    byte_p pixels(pixsize *width, pixsize *height, uint *bpp,
+                  size_t *datalen = nullptr) const
+    // ------------------------------------------------------------------------
+    //   Return the byte pointer to the data in the pixmap
+    // ------------------------------------------------------------------------
+    {
+        byte_p  p   = payload();
+        pixsize w   = leb128<pixsize>(p);
+        pixsize h   = leb128<pixsize>(p);
+        uint    b   = leb128<uint>(p);
+        if (width)
+            *width = w;
+        if (height)
+            *height = h;
+        if (bpp)
+            *bpp = b;
+        if (datalen)
+            *datalen = datasize(type(), w, h, b);
+        return p;
+    }
+
+
+    surface pixels() const
+    // ------------------------------------------------------------------------
+    //   Return a blitter surface for the pixmap
+    // ------------------------------------------------------------------------
+    {
+        pixsize w        = 0;
+        pixsize h        = 0;
+        uint    bpp      = 0;
+        byte_p  bitmap   = pixels(&w, &h, &bpp);
+        pixsize scanline = w;
+        return bpp == surface::BPP
+            ? surface((pixword *) bitmap, w, h, scanline)
+            : surface(nullptr, 0, 0, 0);
+    }
+
+
+    // Extract a subimage
+    pixmap_p extract(object_r first, object_r last) const;
+    pixmap_p extract(coord x1, coord y1, coord x2, coord y2) const;
+
+
+public:
+    OBJECT_DECL(pixmap);
+    PARSE_DECL(pixmap);
+    SIZE_DECL(pixmap);
+    RENDER_DECL(pixmap);
+    GRAPH_DECL(pixmap);
 };
 
 
