@@ -421,22 +421,23 @@ struct blitter
         };
 
     public:
-        void clip(const rect &r)
+        surface &clip(const rect &r)
         // --------------------------------------------------------------------
         //    Limit drawing to the given rectangle
         // --------------------------------------------------------------------
         {
             drawable = r;
             drawable &= rect(w, h);
+            return *this;
         }
 
 
-        void clip(coord x1, coord y1, coord x2, coord y2)
+        surface &clip(coord x1, coord y1, coord x2, coord y2)
         // --------------------------------------------------------------------
         //   Clip an area given in coordinates
         // --------------------------------------------------------------------
         {
-            clip(rect(x1, y1, x2, y2));
+            return clip(rect(x1, y1, x2, y2));
         }
 
         const rect &clip() const
@@ -765,7 +766,6 @@ struct blitter
         // --------------------------------------------------------------------
         //   Draw a rounded rectangle between the given coordinates
         // --------------------------------------------------------------------
-
 
 
     protected:

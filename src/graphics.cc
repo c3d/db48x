@@ -446,7 +446,7 @@ coord PlotParametersAccess::pair_pixel_x(object_r pos) const
 // ----------------------------------------------------------------------------
 {
     if (object_g x = pos->child(0))
-        return pixel_adjust(x, xmin, xmax, Screen.width());
+        return pixel_adjust(x, xmin, xmax, display_width());
     return 0;
 }
 
@@ -457,7 +457,7 @@ coord PlotParametersAccess::pair_pixel_y(object_r pos) const
 // ----------------------------------------------------------------------------
 {
     if (object_g y = pos->child(1))
-        return pixel_adjust(y, ymax, ymin, Screen.height());
+        return pixel_adjust(y, ymax, ymin, display_height());
     return 0;
 }
 
@@ -468,7 +468,7 @@ coord PlotParametersAccess::pixel_x(algebraic_r x) const
 // ----------------------------------------------------------------------------
 {
     object_g xo = object_p(+x);
-    return pixel_adjust(xo, xmin, xmax, Screen.width());
+    return pixel_adjust(xo, xmin, xmax, display_width());
 }
 
 
@@ -478,9 +478,17 @@ coord PlotParametersAccess::pixel_y(algebraic_r y) const
 // ----------------------------------------------------------------------------
 {
     object_g yo = object_p(+y);
-    return pixel_adjust(yo, ymax, ymin, Screen.height());
+    return pixel_adjust(yo, ymax, ymin, display_height());
 }
 
+
+
+
+// ============================================================================
+//
+//   Commands
+//
+// ============================================================================
 
 COMMAND_BODY(Disp)
 // ----------------------------------------------------------------------------
@@ -506,8 +514,7 @@ COMMAND_BODY(Disp)
             bool                 erase  = true;
             bool                 invert = false;
             id                   ty     = pos->type();
-            surface              disp   = display();
-            blitter::size        width  = disp.width();
+            blitter::size        width  = display_width();
             algebraic_g          halign, valign;
 
             if (ty == ID_rectangular || ty == ID_polar ||
@@ -562,10 +569,10 @@ COMMAND_BODY(Disp)
             else if (text_p tr = todisp->as_text())
                 txt = tr->value(&len);
 
-            pattern bg   = Settings.Background();
-            pattern fg   = Settings.Foreground();
-            utf8    last = txt + len;
-            coord   x0   = x;
+            uint64_t bg   = Settings.Background();
+            uint64_t fg   = Settings.Foreground();
+            utf8     last = txt + len;
+            coord    x0   = x;
 
             if (invert)
                 std::swap(bg, fg);
@@ -630,9 +637,9 @@ COMMAND_BODY(Disp)
                 if (cp == '\t')
                     cp = ' ';
 
-                if (erase)
-                    disp.fill(x, y, x+w-1, y+h-1, bg);
-                disp.glyph(x, y, cp, font, fg);
+                DISPLAY(if (erase)
+                            display.fill(x, y, x+w-1, y+h-1, bg);
+                        display.glyph(x, y, cp, font, fg));
                 ui.draw_dirty(x, y , x+w-1, y+h-1);
                 x += w;
             }
@@ -1169,14 +1176,24 @@ object::result show(object_r obj)
 
         coord         x       = 0;
         coord         y       = 0;
-        grob::surface s       = graph->pixels();
         int           delta   = 8;
         bool          running = true;
         int           key     = 0;
         while (running)
         {
             Screen.fill(pattern::gray50);
-            Screen.copy(s, r, point(x,y));
+#if CONFIG_COLOR
+            if (pixmap_p pix = graph->as<pixmap>())
+            {
+                pixmap::surface s = pix->pixels();
+                Screen.copy(s, r, point(x,y));
+            }
+            else
+#endif // CONFIG_COLOR
+            {
+                grob::surface s = graph->pixels();
+                Screen.copy(s, r, point(x,y));
+            }
             ui.draw_dirty(0, 0, LCD_W-1, LCD_H-1);
             refresh_dirty();
 
@@ -1338,7 +1355,6 @@ static object::result draw_pixel(pattern color)
         {
             rt.drop();
 
-            surface       disp = display();
             blitter::size lw = Settings.LineWidth();
             if (!lw)
                 lw = 1;
@@ -1346,7 +1362,7 @@ static object::result draw_pixel(pattern color)
             blitter::size b = (lw + 1) / 2 - 1;
             rect r(x-a, y-a, x+b, y+b);
             ui.draw_graphics();
-            disp.fill(r, color);
+            DISPLAY(display.fill(r, color.bits));
             ui.draw_dirty(r);
             refresh_dirty();
             return object::OK;
@@ -1386,9 +1402,8 @@ static bool pixel_color(color &c)
         coord y = ppar.pair_pixel_y(p);
         if (!rt.error())
         {
-            surface disp = display();
-            c = disp.pixel_color(x, y);
-            return true;
+            DISPLAY(auto scol = display.pixel_color(x, y);
+                    c = color(scol.red(), scol.green(), scol.blue()));            return true;
         }
     }
     return false;
@@ -1448,11 +1463,11 @@ COMMAND_BODY(Line)
         coord y2 = ppar.pair_pixel_y(p2);
         if (!rt.error())
         {
-            surface       disp = display();
             blitter::size lw   = Settings.LineWidth();
+            uint64_t      fg   = Settings.Foreground();
             rt.drop(2);
             ui.draw_graphics();
-            disp.line(x1, y1, x2, y2, lw, Settings.Foreground());
+            DISPLAY(display.line(x1, y1, x2, y2, lw, fg));
             graphics_dirty(x1, y1, x2, y2, lw);
             return OK;
         }
@@ -1477,11 +1492,10 @@ COMMAND_BODY(Ellipse)
         coord y2 = ppar.pair_pixel_y(p2);
         if (!rt.error())
         {
-            surface       disp = display();
             blitter::size lw = Settings.LineWidth();
             rt.drop(2);
             ui.draw_graphics();
-            disp.ellipse(x1, y1, x2, y2, lw, Settings.Foreground());
+            DISPLAY(display.ellipse(x1, y1, x2, y2, lw, Settings.Foreground()));
             graphics_dirty(x1, y1, x2, y2, lw);
             return OK;
         }
@@ -1501,9 +1515,8 @@ COMMAND_BODY(Circle)
     {
         using size = blitter::size;
         PlotParametersAccess ppar;
-        surface disp   = display();
-        size    width  = disp.width();
-        size    height = disp.width();
+        size    width  = display_width();
+        size    height = display_height();
         coord   x      = ppar.pair_pixel_x(co);
         coord   y      = ppar.pair_pixel_y(co);
         coord   rx     = ppar.size_adjust(ro, ppar.xmin, ppar.xmax, 2 * width);
@@ -1514,14 +1527,15 @@ COMMAND_BODY(Circle)
             ry = -ry;
         if (!rt.error())
         {
-            size lw = Settings.LineWidth();
+            size     lw = Settings.LineWidth();
+            uint64_t fg = Settings.Foreground();
             rt.drop(2);
             coord x1 = x - rx/2;
             coord x2 = x + (rx-1)/2;
             coord y1 = y - ry/2;
             coord y2 = y + (ry-1)/2;
             ui.draw_graphics();
-            disp.ellipse(x1, y1, x2, y2, lw, Settings.Foreground());
+            DISPLAY(display.ellipse(x1, y1, x2, y2, lw, fg));
             graphics_dirty(x1, y1, x2, y2, lw);
             return OK;
         }
@@ -1546,11 +1560,11 @@ COMMAND_BODY(Rect)
         coord y2 = ppar.pair_pixel_y(p2);
         if (!rt.error())
         {
-            surface disp = display();
+            blitter::size lw = Settings.LineWidth();
+            uint64_t      fg = Settings.Foreground();
             rt.drop(2);
             ui.draw_graphics();
-            disp.rectangle(x1, y1, x2, y2,
-                           Settings.LineWidth(), Settings.Foreground());
+            DISPLAY(display.rectangle(x1, y1, x2, y2, lw, fg));
             ui.draw_dirty(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2));
             refresh_dirty();
             return OK;
@@ -1570,20 +1584,21 @@ COMMAND_BODY(RRect)
     object_g ro = rt.stack(0);
     if (p1 && p2 && ro)
     {
+        using size = blitter::size;
         PlotParametersAccess ppar;
-        surface disp = display();
+        size  w  = display_width();
         coord x1 = ppar.pair_pixel_x(p1);
         coord y1 = ppar.pair_pixel_y(p1);
         coord x2 = ppar.pair_pixel_x(p2);
         coord y2 = ppar.pair_pixel_y(p2);
-        coord r  = ppar.size_adjust(ro, ppar.xmin, ppar.xmax, 2*disp.width());
+        coord r  = ppar.size_adjust(ro, ppar.xmin, ppar.xmax, 2*w);
         if (!rt.error())
         {
             blitter::size lw = Settings.LineWidth();
+            uint64_t      fg = Settings.Foreground();
             rt.drop(3);
             ui.draw_graphics();
-            disp.rounded_rectangle(x1, y1, x2, y2,
-                                   r, lw, Settings.Foreground());
+            DISPLAY(display.rounded_rectangle(x1, y1, x2, y2, r, lw, fg));
             graphics_dirty(x1, y1, x2, y2, lw);
             return OK;
         }
@@ -1612,8 +1627,7 @@ COMMAND_BODY(Clip)
     {
         if (list_p parms = top->as<list>())
         {
-            surface disp = display();
-            rect    clip(disp.area());
+            rect    clip(0, 0, 1<<30, 1<<30);
             uint    index = 0;
             for (object_p parm : *parms)
             {
@@ -1629,8 +1643,10 @@ COMMAND_BODY(Clip)
                 default:        rt.value_error(); return ERROR;
                 }
             }
-            disp.clip(clip);
-            user_clip(clip);
+            if (user_display())
+                grob::clip = clip;
+            else
+                Screen.clip(clip);
             return OK;
         }
         else
@@ -1647,12 +1663,11 @@ COMMAND_BODY(CurrentClip)
 //   Retuyrn the current clipping rectangle
 // ----------------------------------------------------------------------------
 {
-    surface   disp = display();
-    rect      clip(disp.clip());
-    integer_g x1 = integer::make(clip.x1);
-    integer_g y1 = integer::make(clip.y1);
-    integer_g x2 = integer::make(clip.x2);
-    integer_g y2 = integer::make(clip.y2);
+    rect      clip = user_display() ? grob::clip : Screen.clip();
+    integer_g x1   = integer::make(clip.x1);
+    integer_g y1   = integer::make(clip.y1);
+    integer_g x2   = integer::make(clip.x2);
+    integer_g y2   = integer::make(clip.y2);
     if (x1 && y1 && x2 && y2)
     {
         list_g obj = list::make(x1, y1, x2, y2);
@@ -2165,50 +2180,36 @@ COMMAND_BODY(RGB)
 //
 // ============================================================================
 
-// Clipping rectangle for user graphics
-static rect user_clip_rectangle = { 0, 0, 1<<30, 1<<30 };
-
-rect user_clip()
-// ----------------------------------------------------------------------------
-//   Return user clipping rectangle
-// ----------------------------------------------------------------------------
-{
-    return user_clip_rectangle;
-}
-
-
-void user_clip(rect r)
-// ----------------------------------------------------------------------------
-//   Set user clipping rectangle
-// ----------------------------------------------------------------------------
-{
-    user_clip_rectangle = r;
-}
-
-
-pixmap_p user_display()
+grob_p user_display()
 // ----------------------------------------------------------------------------
 //   Return the GROB in the `Pict` variable if any, or nullptr
 // ----------------------------------------------------------------------------
 {
     object_p pict = object::static_object(object::ID_Pict);
     if (object_p obj = directory::recall_all(pict, false))
-        if (pixmap_p pix = obj->as<pixmap>())
-            return pix;
+        if (obj->is_graph())
+            return grob_p(obj);
     return nullptr;
 }
 
 
-surface display()
+blitter::size  display_width()
 // ----------------------------------------------------------------------------
-//   Return the surface in the `Pict` variable if any, or the screen
+//   Return width of display
 // ----------------------------------------------------------------------------
 {
-    if (pixmap_p user = user_display())
-    {
-        surface result = user->pixels();
-        result.clip(user_clip_rectangle);
-        return result;
-    }
-    return Screen;
+    if (grob_p pict = user_display())
+        return pict->width();
+    return Screen.width();
+}
+
+
+blitter::size  display_height()
+// ----------------------------------------------------------------------------
+//   Return height of display
+// ----------------------------------------------------------------------------
+{
+    if (grob_p pict = user_display())
+        return pict->height();
+    return Screen.height();
 }

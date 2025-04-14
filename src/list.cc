@@ -1126,6 +1126,9 @@ COMMAND_BODY(Size)
     case ID_text:
         size = text_p(obj)->utf8_characters(); break;
     case ID_grob:
+#if CONFIG_COLOR
+    case ID_pixmap:
+#endif // CONFIG_COLOR
     case ID_bitmap:
         if (grob_p gr = grob_p(obj))
         {

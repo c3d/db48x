@@ -35,6 +35,7 @@
 #include "expression.h"
 #include "functions.h"
 #include "graphics.h"
+#include "grob.h"
 #include "program.h"
 #include "stats.h"
 #include "sysmenu.h"
@@ -47,41 +48,42 @@ void draw_axes(const PlotParametersAccess &ppar)
 //   Draw axes
 // ----------------------------------------------------------------------------
 {
-    surface disp = display();
-    coord   w    = disp.width();
-    coord   h    = disp.height();
+    coord   w    = display_width();
+    coord   h    = display_height();
     coord   x    = ppar.pixel_adjust(+ppar.xorigin, ppar.xmin, ppar.xmax, w);
     coord   y    = ppar.pixel_adjust(+ppar.yorigin, ppar.ymax, ppar.ymin, h);
+    coord   tx   = ppar.size_adjust(+ppar.xticks, ppar.xmin, ppar.xmax, w);
+    coord   ty   = ppar.size_adjust(+ppar.yticks, ppar.ymin, ppar.ymax, h);
+    uint64_t pat = Settings.Foreground();
 
-    // Draw axes proper
-    pattern pat = Settings.Foreground();
-    disp.fill(0, y, w, y, pat);
-    disp.fill(x, 0, x, h, pat);
+    DISPLAY(
 
-    // Draw tick marks
-    coord tx = ppar.size_adjust(+ppar.xticks, ppar.xmin, ppar.xmax, w);
-    coord ty = ppar.size_adjust(+ppar.yticks, ppar.ymin, ppar.ymax, h);
-    if (tx > 0)
-    {
-        for (coord i = tx; x + i <= w; i += tx)
-            disp.fill(x + i, y - 2, x + i, y + 2, pat);
-        for (coord i = tx; x - i >= 0; i += tx)
-            disp.fill(x - i, y - 2, x - i, y + 2, pat);
-    }
-    if (ty > 0)
-    {
-        for (coord i = ty; y + i <= h; i += ty)
-            disp.fill(x - 2, y + i, x + 2, y + i, pat);
-        for (coord i = ty; y - i >= 0; i += ty)
-            disp.fill(x - 2, y - i, x + 2, y - i, pat);
-    }
+        // Draw axes proper
+        display.fill(0, y, w, y, pat);
+        display.fill(x, 0, x, h, pat);
 
-    // Draw arrows at end of axes
-    for (uint i = 0; i < 4; i++)
-    {
-        disp.fill(w - 3*(i+1), y - i, w - 3*i, y + i, pat);
-        disp.fill(x - i, 3*i, x + i, 3*(i+1), pat);
-    }
+        // Draw tick marks
+        if (tx > 0)
+        {
+            for (coord i = tx; x + i <= w; i += tx)
+                display.fill(x + i, y - 2, x + i, y + 2, pat);
+            for (coord i = tx; x - i >= 0; i += tx)
+                display.fill(x - i, y - 2, x - i, y + 2, pat);
+        }
+        if (ty > 0)
+        {
+            for (coord i = ty; y + i <= h; i += ty)
+                display.fill(x - 2, y + i, x + 2, y + i, pat);
+            for (coord i = ty; y - i >= 0; i += ty)
+                display.fill(x - 2, y - i, x + 2, y - i, pat);
+        }
+
+        // Draw arrows at end of axes
+        for (uint i = 0; i < 4; i++)
+        {
+            display.fill(w - 3*(i+1), y - i, w - 3*i, y + i, pat);
+            display.fill(x - i, 3*i, x + i, 3*(i+1), pat);
+        });
 
     ui.draw_dirty(0, 0, w, h);
 }
@@ -159,7 +161,7 @@ object::result draw_plot(object::id                  kind,
         max = ppar.imax;
         step = ppar.resolution;
         if (step->is_zero())
-            step = (max - min) / integer::make(display().width());
+            step = (max - min) / integer::make(display_width());
         dname = object::ID_Equation;
         break;
 
@@ -173,7 +175,7 @@ object::result draw_plot(object::id                  kind,
 
     step = ppar.resolution;
     if (step->is_zero())
-        step = (max - min) / integer::make(display().width());
+        step = (max - min) / integer::make(display_width());
 
     if (!to_plot)
     {
@@ -220,7 +222,7 @@ object::result draw_plot(object::id                  kind,
             return object::ERROR;
         }
 
-        size width = display().width();
+        size width = display_width();
         data = array_p(+to_plot);
         size_t items = data->items();
         data = array_p(+to_plot);
@@ -244,10 +246,10 @@ object::result draw_plot(object::id                  kind,
         if (Settings.DrawPlotAxes())
             draw_axes(ppar);
 
-    bool    split_points = Settings.NoCurveFilling();
-    size    lw           = Settings.LineWidth();
-    pattern fg           = Settings.Foreground();
-    pattern errbg        = Settings.PlotErrorBackground();
+    bool     split_points = Settings.NoCurveFilling();
+    size     lw           = Settings.LineWidth();
+    uint64_t fg           = Settings.Foreground();
+    uint64_t errbg        = Settings.PlotErrorBackground();
 
     while (!program::interrupted())
     {
@@ -265,7 +267,6 @@ object::result draw_plot(object::id                  kind,
                 break;
         }
 
-        surface disp = display();
         if (y)
         {
             switch(kind)
@@ -311,7 +312,7 @@ object::result draw_plot(object::id                  kind,
                     lx = rx;
                     ly = ry;
                 }
-                Screen.line(lx,ly,rx,ry, lw, fg);
+                DISPLAY(display.line(lx,ly,rx,ry, lw, fg));
             }
             else
             {
@@ -320,7 +321,7 @@ object::result draw_plot(object::id                  kind,
                 rx = lx + bar_width - 1;
                 if (ry < ly)
                     std::swap(ly, ry);
-                Screen.fill(lx, ly, rx, ry, fg);
+                DISPLAY(display.fill(lx, ly, rx, ry, fg));
                 bar_x += bar_skip;
             }
             ui.draw_dirty(lx, ly, rx, ry);
@@ -331,20 +332,22 @@ object::result draw_plot(object::id                  kind,
         {
             if (kind == object::ID_Function)
             {
+                size dh = display_height();
                 rx = ppar.pixel_x(x);
                 ry = ppar.pixel_y(ppar.yorigin);
                 if (ry < 0)
                     ry = 0;
-                else if (ry >= coord(disp.height()))
-                    ry = disp.height()-1;
+                else if (ry >= coord(dh))
+                    ry = dh - 1;
                 rect r(rx, ry - LCD_H/32, rx, ry + LCD_H/32);
-                disp.fill(r, errbg);
+                DISPLAY(display.fill(r, errbg));
                 ui.draw_dirty(r);
             }
             if (!rt.error())
                 rt.invalid_function_error();
-            disp.text(0, 0, rt.error(), ErrorFont,
-                      pattern::white, pattern::black);
+            uint64_t fg = Settings.Foreground();
+            uint64_t bg = Settings.Background();
+            DISPLAY(display.text(0, 0, rt.error(), ErrorFont, bg, fg));
             ui.draw_dirty(0, 0, LCD_W, ErrorFont->height());
             lx = ly = -1;
             rt.clear_error();

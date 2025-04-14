@@ -1572,12 +1572,14 @@ bool user_interface::draw_graphics(bool erase)
 {
     if (!graphics || erase)
     {
-        surface disp = display();
         draw_start(false);
         graphics = true;
-        disp.fill(pattern(Settings.Background()));
-        draw_dirty(0, 0, LCD_W-1, LCD_H-1);
-        return true;
+        if (erase || user_display() == nullptr)
+        {
+            DISPLAY(display.fill(display.area(), Settings.Background()));
+            draw_dirty(0, 0, LCD_W-1, LCD_H-1);
+            return true;
+        }
     }
     return false;
 }
@@ -2361,8 +2363,11 @@ bool user_interface::draw_idle()
     if (graphics)
     {
         record(tests_ui, "Waiting for key");
+        if (grob_p pict = user_display())
+            show(pict);
+        else
+            wait_for_key_press();
         graphics = false;
-        wait_for_key_press();
         record(tests_ui, "Redraw LCD");
         redraw_lcd(true);
     }

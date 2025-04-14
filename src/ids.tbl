@@ -115,7 +115,6 @@
 //
 // ============================================================================
 
-ID_RANGE(is_type,          directory,      bitmap)
 #if CONFIG_FIXED_BASED_OBJECTS
 ID_RANGE(is_integer,       hex_integer,    neg_integer)
 ID_RANGE(is_based,         hex_integer,    based_integer, hex_bignum, based_bignum)
@@ -150,7 +149,7 @@ ID_RANGE(is_immediate,     MainMenu,       SelfInsert)
 ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)
 ID_RANGE(is_program,       program,        funcall)
-ID_RANGE(is_graph,         grob,           pixmap)
+ID_RANGE(is_graph,         grob,           bitmap)
 ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,    IfErrThen, IfErrThenElse)
 ID_RANGE(is_menu,          MainMenu,       Catalog,     UnitMenu00, CharactersMenu99)
 
@@ -1526,8 +1525,10 @@ CMD(IfErrThenElse)              // Last programmable command
 // ============================================================================
 
 ID(grob)
-ID(bitmap)
-ID(pixmap)
+#if CONFIG_COLOR
+ID(pixmap)                      // 16 BPP
+#endif // CONFIG_COLOR
+ID(bitmap)                      // 1 BPP
 
 ID(font)
 ID(dense_font)

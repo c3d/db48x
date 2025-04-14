@@ -68,7 +68,6 @@ using point   = blitter::point;
 using pixword = blitter::pixword;
 
 extern surface Screen;
-extern surface display();
 
 
 // Soft menu tab size
