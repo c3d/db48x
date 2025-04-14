@@ -175,7 +175,8 @@ TAR_OPTS=$(TAR_OPTS_$(shell uname))
 TAR_OPTS_Darwin=--no-mac-metadata --no-fflags --no-xattrs --no-acls
 TAR_FILES=	$(TARGET).$(PGM)		\
 		$(TARGET)_qspi.bin		\
-		keymap.bin			\
+		$(TAR_FILES_$(INSTALL_PGM_ONLY))
+TAR_FILES_=	keymap.bin			\
 		help/$(TARGET).md		\
 		help/$(TARGET).idx		\
 		help/*.bmp help/*/*.bmp		\
