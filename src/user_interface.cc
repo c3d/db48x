@@ -6679,9 +6679,10 @@ void debug_printf(int row, cstring format, ...)
         coord y = row * h;
         coord x = Screen.text(0, y, utf8(buffer), HelpFont,
                               pattern::white, pattern::black);
-        Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
-        ui.draw_dirty(0, y, LCD_W, y + h - 1);
-        refresh_dirty();
+        Screen.fill(x, y, x+10, y + h, pattern::gray50);
+        for (uint r = y; r < y + h; r++)
+            bitblt24(0, 8, r, 0, BLT_XOR, BLT_NONE);
+        lcd_refresh();
     }
     debug_printf_row = row - 2;
 }
@@ -6706,8 +6707,9 @@ void debug_printf(cstring format, ...)
         coord x = Screen.text(0, y, utf8(buffer), HelpFont,
                               pattern::white, pattern::black);
         Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
-        ui.draw_dirty(0, y, LCD_W, y + h - 1);
-        refresh_dirty();
+        for (uint r = y; r < y + h; r++)
+            bitblt24(0, 8, r, 0, BLT_XOR, BLT_NONE);
+        lcd_refresh();
         ++debug_printf_row;
     }
 }
