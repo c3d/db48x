@@ -36,7 +36,7 @@ void beep(uint frequency, uint duration);
 void click(uint frequency = 4400);
 bool screenshot();
 bool exit_key_pressed();
-void power_check(bool running);
+void power_check(bool running, bool offimage = true);
 
 inline cstring strend(cstring s)        { return s + strlen(s); }
 inline char *  strend(char *s)          { return s + strlen(s); }

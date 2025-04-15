@@ -354,7 +354,7 @@ void program_init()
 }
 
 
-void power_check(bool running)
+void power_check(bool running, bool showimage)
 // ----------------------------------------------------------------------------
 //   Check power state, keep looping until it's safe to run
 // ----------------------------------------------------------------------------
@@ -397,7 +397,7 @@ void power_check(bool running)
                 else if (running)
                     ui.draw_message("Switched off to conserve battery",
                                     "Press the ON/EXIT key to resume");
-                else
+                else if (showimage)
                     draw_power_off_image(0);
 
                 sys_critical_start();

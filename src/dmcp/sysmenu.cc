@@ -810,7 +810,9 @@ void power_off()
 //   Power off the calculator
 // ----------------------------------------------------------------------------
 {
+    lcd_refresh_wait();
     SET_ST(STAT_PGM_END);
+    power_check(false, false);
 }
 
 
