@@ -1982,13 +1982,13 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               LSHIFT, F1, LSHIFT, F2, LSHIFT, F3, LSHIFT, F4, LSHIFT, F5,
               ENTER)
-        .expect("{ HomeDirectory DirectoryPath CurrentDirectory"
-                " GarbageCollect AvailableMemory }")
+        .expect("{ AvailableMemory Variables HomeDirectory"
+                " DirectoryPath GarbageCollect }")
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ FreeMemory SystemMemory PurgeAll "
-                "RuntimeStatistics Clone }")
+        .expect("{ FreeMemory TypedVariables PurgeAll"
+                " RuntimeStatistics GarbageCollectorStatistics }")
         .test(F6,
               RSHIFT, RUNSTOP,
               F1, F2, F3, F4, F5,
@@ -2001,7 +2001,16 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ ▶ Increment Decrement Variables TypedVariables }");
+        .expect("{ ▶ Clone Increment Decrement CurrentDirectory }")
+        .test(F6,
+              RSHIFT, RUNSTOP,
+              F1, F2, F3, F4, F5,
+              ENTER)
+        .expect("{ GarbageCollectorStatistics RuntimeStatistics"
+                " AvailableMemory SystemMemory Bytes }")
+        .test(RSHIFT, RUNSTOP,
+              LSHIFT, F1, LSHIFT, F2, ENTER)
+        .expect("{ GCStatsClearAfterRead RunStatsClearAfterRead }");
 
     step("Store in long-name global variable");
     test(CLEAR, "\"Hello World\"", ENTER, XEQ, "SomeLongVariable", ENTER, STO)

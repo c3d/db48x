@@ -34,6 +34,7 @@
 
 #include "menu.h"
 
+#include "object.h"
 #include "settings.h"
 #include "unit.h"
 #include "user_interface.h"
@@ -1646,17 +1647,17 @@ MENU(MemoryMenu,
      "CrDir",   ID_CrDir,
      "UpDir",   ID_UpDir,
 
+     "Avail",   ID_Mem,
+     "Vars",    ID_Vars,
      "Home",    ID_Home,
      "Path",    ID_Path,
-     "Current", ID_CurrentDirectory,
      "GC",      ID_GarbageCollect,
-     "Avail",   ID_Mem,
 
      "Free",    ID_FreeMemory,
-     "System",  ID_SystemMemory,
+     "TVars",   ID_TVars,
      "PgAll",   ID_PurgeAll,
-     "GCStats", ID_RuntimeStatistics,
-     "Clone",   ID_Clone,
+     "RunStats",ID_RuntimeStatistics,
+     "GCStats", ID_GarbageCollectorStatistics,
 
      "Store",   ID_Sto,
      "Store+",  ID_StoreAdd,
@@ -1671,10 +1672,20 @@ MENU(MemoryMenu,
      "Recall÷", ID_RecallDiv,
 
      "▶",       ID_Copy,
+     "Clone",   ID_Clone,
      "Incr",    ID_Increment,
      "Decr",    ID_Decrement,
-     "Vars",    ID_Vars,
-     "TVars",   ID_TVars);
+     "CurDir",  ID_CurrentDirectory,
+
+     "GCStats", ID_GarbageCollectorStatistics,
+     "RunStats",ID_RuntimeStatistics,
+     "Avail",   ID_Mem,
+     "System",  ID_SystemMemory,
+     "Bytes",   ID_Bytes,
+
+     "GC Clr", ID_GCStatsClearAfterRead,
+     "RT Clr", ID_RunStatsClearAfterRead
+);
 
 
 MENU(TimeMenu,
