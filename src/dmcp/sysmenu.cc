@@ -819,6 +819,8 @@ void system_setup()
 //   Invoke the system setup
 // ----------------------------------------------------------------------------
 {
+    sys_timer_disable(TIMER0);
+    sys_timer_disable(TIMER1);
     SET_ST(STAT_MENU);
     int ret = handle_menu(&application_menu, MENU_RESET, 0);
     CLR_ST(STAT_MENU);
