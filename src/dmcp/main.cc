@@ -381,6 +381,8 @@ void power_check(bool running)
             last_awake = then;
             program::sleeping_time += then - now;
             program::run_cycles++;
+            if (program::low_battery())
+                ui.draw_battery(false);
         }
         if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
         {

@@ -2093,8 +2093,8 @@ bool user_interface::draw_battery(bool now)
     // Experimentally, battery voltage below 2.6V cause calculator flakiness
     const uint vmax  = BATTERY_VMAX;
     const uint vmin  = Settings.MinimumBatteryVoltage();
-    const uint vlow  = (vmax + 3 * vmin) / 4;
-    const uint vhalf = (vmax + vmin) / 4;
+    const uint vlow  = (vmax + 7 * vmin) / 8;
+    const uint vhalf = (vmax + 3 * vmin) / 4;
 
     pattern    vpat  = usb          ? Settings.ChargingForeground()
                      : vdd <= vlow  ? Settings.LowBatteryForeground()
@@ -2154,7 +2154,12 @@ bool user_interface::draw_battery(bool now)
     }
 
     size batw = bat_body.width();
-    size w = int(vdd - vmin) * batw / (vmax - vmin);
+    float ratio = float(vdd - vmin) / (vmax - vmin);
+    ratio = 1-ratio;
+    ratio = ratio * ratio;
+    ratio = ratio * ratio;
+    ratio = 1 - ratio;
+    size w = size(ratio * batw);
     if (w > batw)
         w = batw;
     else if (w < 1)
