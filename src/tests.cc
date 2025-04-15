@@ -2692,22 +2692,31 @@ void tests::logical_operations()
 
     step("First bit set (integer)")
         .test(CLEAR, "16#147800 FirstBitSet", ENTER)
-        .expect("11");
+        .expect("11")
+        .test(CLEAR, "2 22 ^ FirstBitSet", ENTER)
+        .expect("22");
     step("First bit set (zero)")
         .test(CLEAR, "16#0 FirstBitSet", ENTER)
         .expect("-1");
     step("First bit set (bignum)")
         .test(CLEAR, "16#147800 75 SLC FirstBitSet", ENTER)
-        .expect("86");
+        .expect("86")
+        .test(CLEAR, "2 103 ^ FirstBitSet", ENTER)
+        .expect("103");;
     step("Last bit set (integer)")
         .test(CLEAR, "16#147800 LastBitSet", ENTER)
-        .expect("21");
+        .expect("20")
+        .test(CLEAR, "2 22 ^ LastBitSet", ENTER)
+        .expect("22");
     step("Last bit set (zero)")
         .test(CLEAR, "16#0 LastBitSet", ENTER)
         .expect("-1");
     step("Last bit set (bignum)")
         .test(CLEAR, "16#147800 75 SLC LastBitSet", ENTER)
-        .expect("96");
+        .expect("95")
+        .test(CLEAR, "2 102 ^ LastBitSet", ENTER)
+        .expect("102");
+;
     step("Count bits set (integer)")
         .test(CLEAR, "16#147800 CountBits", ENTER)
         .expect("6");
