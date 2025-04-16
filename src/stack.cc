@@ -166,7 +166,7 @@ uint stack::draw_stack()
         {
             graph  = nullptr;
             if (cached)
-                if (grob_p gr = cached->as_monochrome())
+                if (grob_p gr = cached->as_graph())
                     graph = gr;
 
             if (graph && !obj->is_graph() &&
@@ -228,9 +228,19 @@ uint stack::draw_stack()
         pattern bg = level == 0 ? rbg : sbg;
         if (graph)
         {
-            grob::surface s = graph->pixels();
-            Screen.draw(s, LCD_W - 2 - w, y, fg);
-            Screen.draw_background(s, LCD_W - 2 - w, y, bg);
+#if CONFIG_COLOR
+            if (pixmap_p pix = graph->as<pixmap>())
+            {
+                pixmap::surface s = pix->pixels();
+                Screen.copy(s, LCD_W - 2 - w, y);
+            }
+            else
+#endif // CONFIG_COLOR
+            {
+                grob::surface s = graph->pixels();
+                Screen.draw(s, LCD_W - 2 - w, y, fg);
+                Screen.draw_background(s, LCD_W - 2 - w, y, bg);
+            }
         }
         else
         {
