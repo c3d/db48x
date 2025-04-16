@@ -839,7 +839,17 @@ COMMAND_BODY(Off)
 //   Switch the calculator off
 // ----------------------------------------------------------------------------
 {
-    power_off();
+    power_off(false);
+    return OK;
+}
+
+
+COMMAND_BODY(OffWithImage)
+// ----------------------------------------------------------------------------
+//   Switch the calculator off drawing the off image
+// ----------------------------------------------------------------------------
+{
+    power_off(true);
     return OK;
 }
 

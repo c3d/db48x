@@ -249,10 +249,7 @@ bool program::interrupted()
     if (now - last_power_check >= Settings.BatteryRefresh())
     {
         if (low_battery())
-        {
-            power_off();
-            power_check(true);
-        }
+            power_off(false);
     }
     if (now - last_interrupted >= Settings.BusyIndicatorRefresh())
     {

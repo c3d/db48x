@@ -158,6 +158,7 @@ COMMAND_DECLARE(Bytes,1);               // Return bytes for object
 COMMAND_DECLARE(Type,1);                // Return the type of the object
 COMMAND_DECLARE(TypeName,1);            // Return the type name of the object
 COMMAND_DECLARE(Off,-1);                // Switch the calculator off
+COMMAND_DECLARE(OffWithImage,-1);       // ... and show off-images
 COMMAND_DECLARE(SaveState, -1);         // Save state to disk
 COMMAND_DECLARE(BatteryVoltage, 0);     // Return battery voltage
 COMMAND_DECLARE(PowerVoltage, 0);       // Return power voltage

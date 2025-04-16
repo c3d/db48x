@@ -1322,6 +1322,7 @@ CMD(Catalog)
 CMD(ToggleUserMode)
 CMD(Undo)                       // Immediate: do not save stack before Undo
 NAMED(Off, "PowerOff")
+NAMED(OffWithImage, "PowerOffWithImage")
 CMD(SystemSetup)
 
 

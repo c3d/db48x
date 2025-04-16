@@ -2186,10 +2186,7 @@ bool user_interface::draw_battery(bool now)
 
     // Power off if battery power is really low
     if (program::low_battery())
-    {
-        power_off();
-        power_check(true);
-    }
+        power_off(false);
 
     return true;
 }
@@ -5312,7 +5309,7 @@ static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_2,     command::ID_ToggleUserMode),
     OP2BYTES(KEY_3,     menu::ID_ProgramMenu),
     OP2BYTES(KEY_SUB,   menu::ID_ListMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_Off),
+    OP2BYTES(KEY_EXIT,  command::ID_OffWithImage),
     OP2BYTES(KEY_0,     command::ID_SystemSetup),
     OP2BYTES(KEY_DOT,   command::ID_Show),
     OP2BYTES(KEY_RUN,   0),

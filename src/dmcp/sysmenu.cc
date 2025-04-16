@@ -805,14 +805,13 @@ cstring menu_item_description(uint8_t menu_id, char *s, const int UNUSED len)
 }
 
 
-void power_off()
+void power_off(bool offimg)
 // ----------------------------------------------------------------------------
 //   Power off the calculator
 // ----------------------------------------------------------------------------
 {
-    lcd_refresh_wait();
     SET_ST(STAT_PGM_END);
-    power_check(false, false);
+    power_check(false, offimg);
 }
 
 

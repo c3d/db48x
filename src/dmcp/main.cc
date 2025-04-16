@@ -399,6 +399,8 @@ void power_check(bool running, bool showimage)
                                     "Press the ON/EXIT key to resume");
                 else if (showimage)
                     draw_power_off_image(0);
+                else
+                    lcd_refresh_wait();
 
                 sys_critical_start();
                 SET_ST(STAT_SUSPENDED);
