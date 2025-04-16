@@ -183,7 +183,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            constants_menu();
+            graphic_commands();
 
 #if 0
         if (onlyCurrent & 2)
@@ -12153,6 +12153,10 @@ void tests::graphic_commands()
         .test("{ 10#15 10#13 } { 10#70 10#24 }", ID_GraphicsMenu, ID_Extract)
         .image_noheader("num-grob-extracted2");
 
+    step("Send to LCD")
+        .test("→LCD", ENTER)
+        .image("tolcd");
+
     step("Clear LCD")
         .test(CLEAR, "ClearLCD", ENTER)
         .noerror()
@@ -12181,6 +12185,26 @@ void tests::graphic_commands()
               ENTER)
         .noerror()
         .image("walkman")
+        .test(EXIT);
+
+    step("Fetch from LCD")
+        .test(CLEAR, DIRECT(
+              "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
+              "PICT { 10#125 10#44 }"
+              "GROB 9 15 "
+              "E300140015001C001400E3008000C110AA00940090004100220014102800 "
+              "GXOR LCD→"), ENTER)
+        .image("lcdsource")
+        .test(EXIT, ENTER)
+#ifdef CONFIG_COLOR
+        .type(ID_pixmap)
+        .expect("Large pixmap (192006 bytes)")
+#else // CONFIG_COLOR
+        .type(ID_bitmap)
+        .expect("Large bitmap (12006 bytes)")
+#endif // CONFIG_COLOR
+        .test("{ 10#20 10#40 } { 10#380 10#123 } SUB", ENTER)
+        .image_noheader("fromlcd")
         .test(EXIT);
 
     step("Displaying text, compatibility mode");

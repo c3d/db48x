@@ -476,6 +476,8 @@ NAMED(Rect,             "DrawRectangle")
 NAMED(RRect,            "DrawRoundedRectangle")
 NAMED(Draw,             "DrawPlot")
 NAMED(Drax,             "DrawAxes")
+NAMED(ToLCD,            "→LCD")                 ALIAS(ToLCD, "→Screen")
+NAMED(FromLCD,          "LCD→")                 ALIAS(FromLCD, "Screen→")
 
 NAMED(Function,         "FunctionPlot")
 NAMED(Polar,            "PolarPlot")

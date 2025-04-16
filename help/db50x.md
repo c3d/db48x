@@ -13245,6 +13245,29 @@ contain a based number.
 Clear the LCD display, and block updates of the header or menu areas.
 
 
+## FromLCD
+
+Return the content of the screen as a graphic object that is put on the stack.
+
+For example, to extract the area of the screen that contains the battery
+indicator and voltage, use the following code:
+
+```rpl
+LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
+```
+
+## ToLCD
+
+Display a graphic object on the screen. If the graphic object is smaller than
+the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it shown in the top-left.
+
+For example, to draw an expression in the center of the screen, use:
+
+```rpl
+'X+(1/sqrt(X-1))' 3 →GROB →LCD
+```
+
+
 ## DrawText
 
 Draw the text or object in level 2 at the position indicated by level 1. A text

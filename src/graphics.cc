@@ -1325,6 +1325,92 @@ COMMAND_BODY(ToGrob)
 }
 
 
+COMMAND_BODY(ToLCD)
+// ----------------------------------------------------------------------------
+//   Send a graphic object to the screen
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+
+    size dw = display_width();
+    size dh = display_height();
+    object_p obj = rt.top();
+    if (grob_p pict = obj->as_monochrome())
+    {
+        grob::surface s      = pict->pixels();
+        size          width  = s.width();
+        size          height = s.height();
+        coord         scrx   = width < dw ? (dw - width) / 2 : 0;
+        coord         scry   = height < dh ? (dh - height) / 2 : 0;
+        rect          r(scrx, scry, scrx + width - 1, scry + height - 1);
+
+        ui.draw_graphics();
+        DISPLAY(display.fill(display.area(), pattern::gray50.bits);
+                display.copy(s, r));
+        rt.drop();
+        ui.draw_dirty(r);
+        refresh_dirty();
+        return OK;
+    }
+#if CONFIG_COLOR
+    else if (pixmap_p pict = obj->as<pixmap>())
+    {
+        pixmap::surface s      = pict->pixels();
+        size            width  = s.width();
+        size            height = s.height();
+        coord           scrx   = width < dw ? (dw - width) / 2 : 0;
+        coord           scry   = height < dh ? (dh - height) / 2 : 0;
+        rect            r(scrx, scry, scrx + width - 1, scry + height - 1);
+
+        ui.draw_graphics();
+        DISPLAY(display.fill(display.area(), pattern::gray50.bits);
+                display.copy(s, r));
+        rt.drop();
+        ui.draw_dirty(r);
+        refresh_dirty();
+        return OK;
+    }
+#endif
+
+    rt.type_error();
+    return ERROR;
+}
+
+
+COMMAND_BODY(FromLCD)
+// ----------------------------------------------------------------------------
+//   Turn the screen into a graphic object
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+
+    size width = Screen.width();
+    size height = Screen.height();
+
+#if CONFIG_COLOR
+    if (pixmap_p pict = pixmap::make(width, height))
+    {
+        pixmap::surface s = pict->pixels();
+        rect r(width, height);
+        s.copy(Screen, r);
+        if (rt.push(pict))
+            return OK;
+    }
+#else
+    if (bitmap_p pict = bitmap::make(width, height))
+    {
+        bitmap::surface s = pict->pixels();
+        rect r(width, height);
+        s.copy(Screen, r);
+        if (rt.push(pict))
+            return OK;
+    }
+#endif // CONFIG_COLOR
+
+    return ERROR;
+}
+
+
 static void graphics_dirty(coord x1, coord y1, coord x2, coord y2, size lw)
 // ----------------------------------------------------------------------------
 //   Mark region as dirty with extra size
