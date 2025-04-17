@@ -1325,6 +1325,179 @@ COMMAND_BODY(ToGrob)
 }
 
 
+static object::result to_graphic(bool compatible, bool colorized)
+// ----------------------------------------------------------------------------
+//   Convert an object to monochrome
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+    settings::SaveCompatibleGROBs scg(compatible);
+    object_g obj = rt.top();
+    if (!obj)
+        return object::ERROR;
+    (void) colorized;
+
+#if CONFIG_COLOR
+    if (pixmap_g pix = obj->as<pixmap>())
+    {
+        if (colorized)
+            return object::OK;  // No-op
+        size    w = pix->width();
+        size    h = pix->height();
+        grapher g(w, h);
+        if (grob_p  r = g.grob(w, h))
+        {
+            pixmap::surface src = pix->pixels();
+            grob::surface dst = r->pixels();
+            for (coord y = 0; y < h; y++)
+            {
+                for (coord x = 0; x < w; x++)
+                {
+                    pixmap::surface::color c = src.pixel_color(x, y);
+                    grob::surface::pattern p(c.red(), c.green(), c.blue());
+                    dst.fill(x, y, x, y, p);
+                }
+            }
+            if (rt.top(r))
+                return object::OK;
+        }
+        return object::ERROR;
+    }
+#endif // CONFIG_COLOR
+
+    if (grob_g pict = obj->as_monochrome())
+    {
+        if (pict->type() == (compatible ? object::ID_grob : object::ID_bitmap))
+            return object::OK;          // No-op
+        size    w = pict->width();
+        size    h = pict->height();
+        grapher g(w, h);
+#if CONFIG_COLOR
+        if (colorized)
+        {
+            if (pixmap_p r = g.pixmap(w, h))
+            {
+                grob::surface   src = pict->pixels();
+                pixmap::surface dst = r->pixels();
+                rect            area(w, h);
+                dst.copy(src, area);
+                if (rt.top(r))
+                    return object::OK;
+            }
+            return object::ERROR;
+        }
+#endif // CONFIG_COLOR
+        if (grob_p r = g.grob(w, h))
+        {
+            grob::surface src = pict->pixels();
+            grob::surface dst = r->pixels();
+            rect area(w ,h);
+            dst.copy(src, area);
+            if (rt.top(r))
+                return object::OK;
+        }
+        return object::ERROR;
+    }
+
+    grapher g(Settings.MaximumShowWidth(), Settings.MaximumShowHeight(),
+              Settings.ResultFont(),
+              Settings.Foreground(), Settings.Background(),
+              true, false, true);
+    if (grob_p r = obj->graph(g))
+    {
+#if CONFIG_COLOR
+        if (colorized)
+        {
+            size    w = r->width();
+            size    h = r->height();
+            grapher g(w, h);
+            if (pixmap_p pix = g.pixmap(w, h))
+            {
+                grob::surface   src = r->pixels();
+                pixmap::surface dst = pix->pixels();
+                rect            area(w, h);
+                dst.copy(src, area);
+                if (rt.top(r))
+                    return object::OK;
+            }
+            return object::ERROR;
+        }
+#endif // CONFIG_COLOR
+        if (rt.top(r))
+            return object::OK;
+    }
+
+    if (!rt.error())
+        rt.graph_does_not_fit_error();
+    return object::ERROR;
+}
+
+
+COMMAND_BODY(ToHPGrob)
+// ----------------------------------------------------------------------------
+//   Convert the stack object to an HP-compatible graphic object
+// ----------------------------------------------------------------------------
+{
+    return to_graphic(true, false);
+}
+
+
+COMMAND_BODY(ToBitmap)
+// ----------------------------------------------------------------------------
+//   Convert the stack object to a new style graphic object
+// ----------------------------------------------------------------------------
+{
+    return to_graphic(false, false);
+}
+
+
+#if CONFIG_COLOR
+COMMAND_BODY(ToPixmap)
+// ----------------------------------------------------------------------------
+//   Convert the stack object to a new style graphic object
+// ----------------------------------------------------------------------------
+{
+    return to_graphic(false, true);
+}
+#endif // CONFIG_COLOR
+
+
+COMMAND_BODY(BlankGraphic)
+// ----------------------------------------------------------------------------
+//   Generate a blank graphic object of the given size (background color)
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+    size w = rt.stack(1)->as_uint32(0, true);
+    size h = rt.stack(0)->as_uint32(0, true);
+    if (rt.error())
+        return ERROR;
+    grapher g(w, h);
+#if CONFIG_COLOR
+    if (!Settings.CompatibleGROBs())
+    {
+        if (pixmap_p result = g.pixmap(w, h))
+        {
+            pixmap::surface s = result->pixels();
+            s.fill(pixmap::pattern(Settings.Background()));
+            if (rt.drop() && rt.top(result))
+                return OK;
+        }
+        return ERROR;
+    }
+#endif // CONFIG_COLOR
+
+    if (grob_p result = g.grob(w, h))
+    {
+        grob::surface s = result->pixels();
+        s.fill(grob::pattern(Settings.Background()));
+        if (rt.drop() && rt.top(result))
+            return OK;
+    }
+    return ERROR;
+}
+
+
 COMMAND_BODY(ToLCD)
 // ----------------------------------------------------------------------------
 //   Send a graphic object to the screen

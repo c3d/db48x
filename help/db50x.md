@@ -13414,6 +13414,58 @@ The object to draw must fit in a bit map at most `MaxW`-pixels wide and
 next
 ```
 
+## ToHPGrob
+
+Turn an object into a graphic object in HP compatible format (GROB).
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+"Hello" →HPGrob
+```
+
+## ToBitmap
+
+Turn an object into a graphic object in DB48x `PackedBitmaps` format.
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Bitmap
+```
+
+## ToPixmap
+
+(This command is only available for color RPL)
+
+Turn an object into a color graphic object in DB50x format.
+When the input is a graphic object, its graphic format is adjusted.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Pixmap
+```
+
+
+## Blank
+
+Create a bla
+
+
 ## GXor
 
 Superimposes a source graphic object onto a destination graphic object, which
@@ -15706,6 +15758,19 @@ The `Type` command returns values as close to possible to the values documented
 on page 3-262 of the HP50G advanced reference manual. This is the opposite of
 [NativeTypes](#nativetypes).
 
+## CompatibleGROBs
+
+When this flag is set, graphic operations will generate HP48 compatible GROB
+objects. Note that HP-compatible objects take slightly more memory. This is the
+opposite of `PackedBitmaps`.
+
+## PackedBitmaps
+
+When this flag is set, graphic operations will generate DB48x graphic objects,
+which are slightly denser and more efficient than HP graphic objects, notably
+when the width is not a multiple of 8. For example, if you render the number 32
+in HP format, it takes 328 bytes, vs. only 281 bytes in DB48x format.  This is
+the opposite of `CompatibleGROBs`.
 
 ## NumberedVariables
 

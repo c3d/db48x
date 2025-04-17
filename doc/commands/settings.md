@@ -671,6 +671,19 @@ The `Type` command returns values as close to possible to the values documented
 on page 3-262 of the HP50G advanced reference manual. This is the opposite of
 [NativeTypes](#nativetypes).
 
+## CompatibleGROBs
+
+When this flag is set, graphic operations will generate HP48 compatible GROB
+objects. Note that HP-compatible objects take slightly more memory. This is the
+opposite of `PackedBitmaps`.
+
+## PackedBitmaps
+
+When this flag is set, graphic operations will generate DB48x graphic objects,
+which are slightly denser and more efficient than HP graphic objects, notably
+when the width is not a multiple of 8. For example, if you render the number 32
+in HP format, it takes 328 bytes, vs. only 281 bytes in DB48x format.  This is
+the opposite of `CompatibleGROBs`.
 
 ## NumberedVariables
 

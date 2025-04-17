@@ -493,7 +493,14 @@ NAMED(Gray,             "GrayPattern")          ALIAS(Gray,     "GreyPattern")
                                                 ALIAS(Gray,     "Grey")
 NAMED(RGB,              "RGBPattern")
 
-NAMED(ToGrob,           "→Graphic")             ALIAS(ToGrob, "→Grob")
+NAMED(ToGrob,           "→Grob")
+NAMED(ToHPGrob,         "→HPGrob")
+NAMED(ToBitmap,         "→Bitmap")
+#ifdef CONFIG_COLOR
+NAMED(ToPixmap,         "→Pixmap")
+#endif // CONFIG_COLOR
+CMD(BlankGraphic)                               ALIAS(BlankGraphic, "Blank")
+
 NAMED(GXor,             "GraphicXor")
 NAMED(GOr,              "GraphicOr")
 NAMED(GAnd,             "GraphicAnd")

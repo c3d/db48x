@@ -212,6 +212,58 @@ The object to draw must fit in a bit map at most `MaxW`-pixels wide and
 next
 ```
 
+## ToHPGrob
+
+Turn an object into a graphic object in HP compatible format (GROB).
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+"Hello" →HPGrob
+```
+
+## ToBitmap
+
+Turn an object into a graphic object in DB48x `PackedBitmaps` format.
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Bitmap
+```
+
+## ToPixmap
+
+(This command is only available for color RPL)
+
+Turn an object into a color graphic object in DB50x format.
+When the input is a graphic object, its graphic format is adjusted.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Pixmap
+```
+
+
+## Blank
+
+Create a bla
+
+
 ## GXor
 
 Superimposes a source graphic object onto a destination graphic object, which

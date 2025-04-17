@@ -226,17 +226,20 @@ GRAPH_BODY(grob)
 #if CONFIG_COLOR
      if (pixmap_g pix = o->as<pixmap>())
      {
-         pixmap_g  result = g.pixmap(width, height);
-         if (!result)
-             return nullptr;
-         pixmap::surface dst    = result->pixels();
-         pixmap::surface src    = pix->pixels();
-         rect            inside = dst.area();
-         inside.inset(2, 2);
-         dst.fill(pixmap::surface::pattern::gray50);
-         dst.fill(inside, g.background.bits);
-         dst.copy(src, inside);
-         return result;
+         if (!Settings.CompatibleGROBs())
+         {
+             pixmap_g  result = g.pixmap(width, height);
+             if (!result)
+                 return nullptr;
+             pixmap::surface dst    = result->pixels();
+             pixmap::surface src    = pix->pixels();
+             rect            inside = dst.area();
+             inside.inset(2, 2);
+             dst.fill(pixmap::surface::pattern::gray50);
+             dst.fill(inside, g.background.bits);
+             dst.copy(src, inside);
+             return result;
+         }
      }
 #endif // CONFIG_COLOR
 

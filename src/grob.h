@@ -370,7 +370,8 @@ struct grapher
     grob_p grob(size w, size h)
     {
         if (w <= maxw && h <= maxh && sys_current_ms() - start <= duration)
-            return bitmap::make(w, h);
+            return Settings.CompatibleGROBs() ? grob::make(w, h)
+                                              : bitmap::make(w, h);
         return nullptr;
     }
 

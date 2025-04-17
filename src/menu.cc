@@ -1627,15 +1627,24 @@ MENU(GraphicsMenu,
 
      "→LCD",    ID_ToLCD,
      "LCD→",    ID_FromLCD,
-     "Freeze",  ID_Freeze,
-     "Ratio",   ID_GraphicRatio,
-     "Root",    ID_GraphicRoot,
-     "Paren",   ID_GraphicParentheses,
-     "Norm",    ID_GraphicNorm,
+     "→HP",     ID_ToHPGrob,
+     "→Bitmap", ID_ToBitmap,
+#ifdef CONFIG_COLOR
+     "→Pixmap", ID_ToBitmap,
+#else
+     "→Pixmap", ID_Unimplemented,
+#endif // CONFIG_COLOR
 
-     "Sum",     ID_GraphicSum,
-     "Product", ID_GraphicProduct,
-     "Integral",ID_GraphicIntegral,
+     "Freeze",  ID_Freeze,
+     "Blank",   ID_BlankGraphic,
+     "√.",      ID_GraphicRoot,
+     "(.)",     ID_GraphicParentheses,
+     "|.|",     ID_GraphicNorm,
+
+     "÷",       ID_GraphicRatio,
+     "Σ",       ID_GraphicSum,
+     "∏",       ID_GraphicProduct,
+     "∫",       ID_GraphicIntegral,
      "Plot",    ID_PlotMenu);
 
 
