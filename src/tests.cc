@@ -12453,6 +12453,25 @@ void tests::graphic_commands()
         .image("rounded-rectangle-fill")
         .test(ENTER);
 
+    step("RGB colors")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH "
+              "0 1 for r"
+              "  0 1 for g"
+              "   0 1 for b"
+              "     r g b RGB Foreground"
+              "     r g 2 + * 4 * g 27 * b 360 * + R→P 0.2 Circle"
+              "   0.1 step"
+              " 0.1 step "
+              "0.1 step "
+              "'LineWidth' PURGE "
+              "1 0 0 RGB FOREGROUND \"Red\" 1 DISP "
+              "0 1 0 RGB FOREGROUND \"Green\" 2 DISP "
+              "0 0 1 RGB FOREGROUND \"Blue\" 3 DISP "),
+              LENGTHY(5000), ENTER).noerror()
+        .image("rgb-colors")
+        .test(ENTER);
+
     step("Clipping");
     test(CLEAR, DIRECT(
          "0 LineWidth CLLCD { 120 135 353 175 } Clip "
