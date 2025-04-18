@@ -897,8 +897,9 @@ MENU(ProgramMenu,
      "Cmp",     ID_CompareMenu,
      "Loop",    ID_LoopsMenu,
      "Base",    ID_BasesMenu,
-     "Stack",   ID_StackMenu,
+     "Eval",    ID_Eval,
 
+     "Stack",   ID_StackMenu,
      "Debug",   ID_DebugMenu,
      "Objects", ID_ObjectMenu,
      "List",    ID_ListMenu,
@@ -1589,63 +1590,83 @@ MENU(GraphicsMenu,
 // ----------------------------------------------------------------------------
 //   Graphics operations
 // ----------------------------------------------------------------------------
-     "Line",    ID_Line,
+     "Line",    ID_Line,        // Pixel graphics
      "Rect",    ID_Rect,
-     "Rounded", ID_RRect,
+     "RndRect", ID_RRect,
      "Ellipse", ID_Ellipse,
      "Circle",  ID_Circle,
 
-     "→Grob",   ID_ToGrob,
-     "GOr",     ID_GOr,
-     "GXor",    ID_GXor,
-     "GAnd",    ID_GAnd,
-     "Extract", ID_Extract,
-
      "RGB",     ID_RGB,
-     "LnWidth", ID_LineWidth,
-     "Pict",    ID_Pict,
-     "Clip",    ID_Clip,
-     "Current", ID_CurrentClip,
-
      "Gray",    ID_Gray,
      "Foregnd", ID_Foreground,
      "Bckgnd",  ID_Background,
-     "Disp",    ID_Disp,
-     "ClLCD",   ID_ClLCD,
+     "LnWidth", ID_LineWidth,
 
-     "Show",    ID_Show,
      "PixOn",   ID_PixOn,
      "PixOff",  ID_PixOff,
      "Pix?",    ID_PixTest,
      "PixCol?", ID_PixColor,
+     "Arc",     ID_Unimplemented,
 
+     "ClLCD",   ID_ClLCD,       // Display / UI
+     "Disp",    ID_Disp,
      "DispXY",  ID_DispXY,
-     "Append",  ID_GraphicAppend,
-     "Stack",   ID_GraphicStack,
-     "Sub",     ID_GraphicSubscript,
-     "Sup",     ID_GraphicExponent,
+     "Input",   ID_Input,
+     "Prompt",  ID_Prompt,
+
+     "Freeze",  ID_Freeze,
+     "Show",    ID_Show,
+     "→Grob",   ID_ToGrob,
+     MaximumShowWidth::label, ID_MaximumShowWidth,
+     MaximumShowHeight::label, ID_MaximumShowHeight,
 
      "→LCD",    ID_ToLCD,
      "LCD→",    ID_FromLCD,
-     "→HP",     ID_ToHPGrob,
+     "Pict",    ID_Pict,
+     "Clip",    ID_Clip,
+     "CurClip", ID_CurrentClip,
+
+     "GOr",     ID_GOr,         // Bitmap / pixmap operations
+     "GXor",    ID_GXor,
+     "GAnd",    ID_GAnd,
+     "Extract", ID_Extract,
+     "Append",  ID_GraphicAppend,
+
+     "(.)",     ID_GraphicParentheses,
+     "|.|",     ID_GraphicNorm,
+     "÷",       ID_GraphicRatio,
+     "√.",      ID_GraphicRoot,
+     "Stack",   ID_GraphicStack,
+
+     "Σ",       ID_GraphicSum,
+     "∏",       ID_GraphicProduct,
+     "∫",       ID_GraphicIntegral,
+     "Subscript", ID_GraphicSubscript,
+     "Exponent", ID_GraphicExponent,
+
+     "LCD→",    ID_FromLCD,     // Bitmap / pixmap conversions
+     "→LCD",    ID_ToLCD,
      "→Bitmap", ID_ToBitmap,
+     "→HPGrob", ID_ToHPGrob,
 #ifdef CONFIG_COLOR
      "→Pixmap", ID_ToBitmap,
 #else
      "→Pixmap", ID_Unimplemented,
 #endif // CONFIG_COLOR
 
-     "Freeze",  ID_Freeze,
+     "→Grob",   ID_ToGrob,
      "Blank",   ID_BlankGraphic,
-     "√.",      ID_GraphicRoot,
-     "(.)",     ID_GraphicParentheses,
-     "|.|",     ID_GraphicNorm,
+     "BlBitmap",ID_BlankBitmap,
+     "BlGrob",  ID_BlankGrob,
+#ifdef CONFIG_COLOR
+     "BlPixmap",ID_BlankBitmap,
+#else
+     "BlPixmap", ID_Unimplemented,
+#endif // CONFIG_COLOR
 
-     "÷",       ID_GraphicRatio,
-     "Σ",       ID_GraphicSum,
-     "∏",       ID_GraphicProduct,
-     "∫",       ID_GraphicIntegral,
-     "Plot",    ID_PlotMenu);
+     "Pict",    ID_Pict,
+     "Plot",	ID_PlotMenu
+);
 
 
 MENU(MemoryMenu,
