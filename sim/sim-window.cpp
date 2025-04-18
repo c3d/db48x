@@ -121,6 +121,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateAudioDevices);
     initializeAudio(devices->defaultAudioOutput(), 0);
 
+    std::setlocale(LC_ALL, "C");
+
     rpl.start();
     if (run_tests)
     {
