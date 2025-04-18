@@ -135,6 +135,7 @@ update-%:
 BAD_IMAGES=$(wildcard $(IMAGES)/bad/*.png)
 compare: $(BAD_IMAGES:$(IMAGES)/bad/%.png=cmp-%)
 update: $(BAD_IMAGES:$(IMAGES)/bad/%.png=update-%)
+.PHONY: compare update
 
 keyboard:				\
 	Keyboard-Layout.png 		\
