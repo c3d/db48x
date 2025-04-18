@@ -500,6 +500,11 @@ NAMED(ToBitmap,         "→Bitmap")
 NAMED(ToPixmap,         "→Pixmap")
 #endif // CONFIG_COLOR
 CMD(BlankGraphic)                               ALIAS(BlankGraphic, "Blank")
+CMD(BlankGrob)
+CMD(BlankBitmap)
+#ifdef CONFIG_COLOR
+CMD(BlankPixmap)
+#endif // CONFIG_COLOR
 
 NAMED(GXor,             "GraphicXor")
 NAMED(GOr,              "GraphicOr")

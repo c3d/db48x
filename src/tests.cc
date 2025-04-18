@@ -12620,6 +12620,32 @@ void tests::graphic_commands()
         .test(CLEAR, ID_GraphicsMenu,
               "123", ID_GraphicIntegral,EXIT)
         .image_noheader("graph-integral");
+
+    step("BlankGraphic")
+        .test(CLEAR, DIRECT("63 27 Blank "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGraphic "
+                            "'Background' PURGE"), ENTER)
+        .image_noheader("blank-graphic");
+    step("BlankBitmap")
+        .test(CLEAR, DIRECT("63 27 BlankBitmap "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankBitmap "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_bitmap)
+        .image_noheader("blank-bitmap");
+    step("BlankGrob")
+        .test(CLEAR, DIRECT("63 27 BlankGrob "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGrob "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_grob)
+        .image_noheader("blank-bitmap");
+#if CONFIG_COLOR
+    step("BlankPixmap")
+        .test(CLEAR, DIRECT("63 27 BlankPixmap "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankPixmap "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_pixmap)
+        .image_noheader("blank-pixmap");
+#endif // CONFIG_COLOR
 }
 
 

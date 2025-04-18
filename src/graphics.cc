@@ -1470,32 +1470,101 @@ COMMAND_BODY(BlankGraphic)
     using size = blitter::size;
     size w = rt.stack(1)->as_uint32(0, true);
     size h = rt.stack(0)->as_uint32(0, true);
-    if (rt.error())
-        return ERROR;
-    grapher g(w, h);
-#if CONFIG_COLOR
-    if (!Settings.CompatibleGROBs())
+    if (!rt.error())
     {
-        if (pixmap_p result = g.pixmap(w, h))
+#if CONFIG_COLOR
+        if (!Settings.CompatibleGROBs())
+        {
+            if (pixmap_p result = pixmap::make(w, h))
+            {
+                pixmap::surface s = result->pixels();
+                s.fill(pixmap::pattern(Settings.Background()));
+                if (rt.drop() && rt.top(result))
+                    return OK;
+            }
+        }
+#endif // CONFIG_COLOR
+
+        if (grob_p result = Settings.CompatibleGROBs()
+            ? grob::make(w, h)
+            : bitmap::make(w, h))
+        {
+            grob::surface s = result->pixels();
+            s.fill(grob::pattern(Settings.Background()));
+            if (rt.drop() && rt.top(result))
+                return OK;
+        }
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(BlankGrob)
+// ----------------------------------------------------------------------------
+//   Generate a blank HP-compatible GROB
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+    size w = rt.stack(1)->as_uint32(0, true);
+    size h = rt.stack(0)->as_uint32(0, true);
+    if (!rt.error())
+    {
+        if (grob_p result = grob::make(w, h))
+        {
+            grob::surface s = result->pixels();
+            s.fill(grob::pattern(Settings.Background()));
+            if (rt.drop() && rt.top(result))
+                return OK;
+        }
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(BlankBitmap)
+// ----------------------------------------------------------------------------
+//   Generate a blank DB48x bitmnap
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+    size w = rt.stack(1)->as_uint32(0, true);
+    size h = rt.stack(0)->as_uint32(0, true);
+    if (!rt.error())
+    {
+        if (bitmap_p result = bitmap::make(w, h))
+        {
+            bitmap::surface s = result->pixels();
+            s.fill(bitmap::pattern(Settings.Background()));
+            if (rt.drop() && rt.top(result))
+                return OK;
+        }
+    }
+    return ERROR;
+}
+
+
+#if CONFIG_COLOR
+COMMAND_BODY(BlankPixmap)
+// ----------------------------------------------------------------------------
+//   Generate a blank color pixmap
+// ----------------------------------------------------------------------------
+{
+    using size = blitter::size;
+    size w = rt.stack(1)->as_uint32(0, true);
+    size h = rt.stack(0)->as_uint32(0, true);
+    if (!rt.error())
+    {
+        if (pixmap_p result = pixmap::make(w, h))
         {
             pixmap::surface s = result->pixels();
             s.fill(pixmap::pattern(Settings.Background()));
             if (rt.drop() && rt.top(result))
                 return OK;
         }
-        return ERROR;
-    }
-#endif // CONFIG_COLOR
-
-    if (grob_p result = g.grob(w, h))
-    {
-        grob::surface s = result->pixels();
-        s.fill(grob::pattern(Settings.Background()));
-        if (rt.drop() && rt.top(result))
-            return OK;
     }
     return ERROR;
 }
+#endif // CONFIG_COLOR
 
 
 COMMAND_BODY(ToLCD)
