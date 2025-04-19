@@ -116,6 +116,7 @@ struct tests
     void plotting();
     void plotting_all_functions();
     void graphic_commands();
+    void offline_graphics();
     void user_input_commands();
     void hms_dms_operations();
     void date_operations();

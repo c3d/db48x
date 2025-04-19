@@ -138,6 +138,7 @@ TESTS(finance,          "Financial functions and solver");
 TESTS(regressions,      "Regression checks");
 TESTS(plotting,         "Plotting, graphing and charting");
 TESTS(graphics,         "Graphic commands");
+TESTS(offline,          "Off-line graphics");
 TESTS(input,            "User input");
 TESTS(help,             "On-line help");
 TESTS(gstack,           "Graphic stack rendering")
@@ -183,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            graphic_commands();
+            offline_graphics();
 
 #if 0
         if (onlyCurrent & 2)
@@ -12646,6 +12647,413 @@ void tests::graphic_commands()
         .type(ID_pixmap)
         .image_noheader("blank-pixmap");
 #endif // CONFIG_COLOR
+}
+
+
+void tests::offline_graphics()
+// ----------------------------------------------------------------------------
+//   Off-line graphics, i.e. graphics that are stored in a variable
+// ----------------------------------------------------------------------------
+{
+    BEGIN(offline);
+
+    step("Create 500x300 bitmap and store it in PICT")
+        .test(CLEAR, "500 300 BLANKBITMAP PICT STO", ENTER).noerror();
+
+    step("Send to LCD")
+        .test("35 42 BLANK →LCD", ENTER)
+        .image("tolcd-offline")
+        .test(KEY6)
+        .image("tolcd-offline2")
+        .test(KEY6)
+        .image("tolcd-offline3")
+        .test(KEY2)
+        .image("tolcd-offline4")
+        .test(KEY4)
+        .image("tolcd-offline5")
+        .test(KEY8)
+        .image("tolcd-offline6")
+        .test(EXIT);
+
+    step("Clear LCD")
+        .test(CLEAR, "ClearLCD", ENTER)
+        .noerror()
+        .image("cllcd")
+        .test(EXIT)
+        .test(CLEAR, "CLLCD 1 1 DISP CLLCD", ENTER)
+        .noerror()
+        .image("cllcd-offline")
+        .test(EXIT);
+
+    step("Draw graphic objects")
+        .test(CLEAR, DIRECT(
+              "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
+              "GROB 9 15 "
+              "E300140015001C001400E3008000C110AA00940090004100220014102800 "
+              "2 25 for i "
+              "PICT OVER "
+              "2.321 ⅈ * i * exp 4.44 0.08 i * + * Swap "
+              "GXor "
+              "PICT OVER "
+              "1.123 ⅈ * i * exp 4.33 0.08 i * + * Swap "
+              "GAnd "
+              "PICT OVER "
+              "4.12 ⅈ * i * exp 4.22 0.08 i * + * Swap "
+              "GOr "
+              "next"),
+              ENTER)
+        .noerror()
+        .image("walkman-offline")
+        .test(EXIT);
+
+    step("Displaying text, compatibility mode");
+    test(CLEAR,
+         DIRECT("\"Hello World\" 1 DISP "
+                "\"Compatibility mode\" 2 DISP"),
+         ENTER)
+        .noerror()
+        .image("text-compat-offline")
+        .test(EXIT);
+
+    step("Displaying text, fractional row");
+    test(CLEAR,
+         DIRECT("\"Gutentag\" 1.5 DrawText "
+                "\"Fractional row\" 3.8 DrawText"),
+         ENTER)
+        .noerror()
+        .image("text-frac-offline")
+        .test(EXIT);
+
+    step("Displaying text, pixel row");
+    test(CLEAR,
+         DIRECT("\"Bonjour tout le monde\" #5d DISP "
+                "\"Pixel row mode\" #125d DISP"),
+         ENTER)
+        .noerror()
+        .image("text-pixrow-offline")
+        .test(EXIT);
+
+    step("Displaying text, x-y coordinates");
+    test(CLEAR, DIRECT("\"Hello\" { 0 0 } DISP "), ENTER)
+        .noerror()
+        .image("text-xy-offline")
+        .test(EXIT);
+
+    step("Displaying text, x-y pixel coordinates");
+    test(CLEAR, DIRECT("\"Hello\" { #20d #20d } DISP"), ENTER)
+        .noerror()
+        .image("text-pixxy-offline")
+        .test(EXIT);
+
+    step("Displaying text, font ID");
+    test(CLEAR,
+         DIRECT("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
+         ENTER)
+        .noerror()
+        .image("text-font-offline")
+        .test(EXIT);
+
+    step("Displaying text, erase and invert");
+    test(CLEAR, DIRECT("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
+        .noerror()
+        .image("text-invert-offline")
+        .test(EXIT);
+
+    step("Displaying text, background and foreground");
+    test(CLEAR,
+         DIRECT("1 Gray Background cllcd "
+                "0.25 Gray Foreground 0.75 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
+         ENTER)
+        .noerror()
+        .image("text-gray-offline")
+        .test(EXIT);
+
+    step("Displaying text, restore background and foreground");
+    test(CLEAR,
+         DIRECT("0 Gray Foreground 1 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
+         ENTER)
+        .noerror()
+        .image("text-normal-offline")
+        .test(EXIT);
+
+    step("Displaying text, type check");
+    test(CLEAR, "\"Bad\" \"Hello\" DISP", ENTER).error("Bad argument type");
+
+    step("Displaying styled text");
+    test(CLEAR,
+         DIRECT("0 10 for i"
+                "  \"Hello\" { }"
+                "  i 135 * 321 mod 25 + R→B +"
+                "  i  51 * 200 mod  3 + R→B +"
+                "  i DISPXY "
+                "next"),
+         ENTER)
+        .noerror()
+        .image("text-dispxy-offline")
+        .test(EXIT);
+
+    step("Lines");
+    test(CLEAR,
+         DIRECT("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
+        .noerror()
+        .image("lines-offline")
+        .test(EXIT);
+
+    step("Line width");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ #000 } #0 i 20 * + + "
+         "{ #400 } #0 i 20 * + + "
+         "i LineWidth Line "
+         "next "
+         "1 LineWidth"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("line-width-offline")
+        .test(EXIT);
+
+    step("Line width, grayed");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ #000 } #0 i 20 * + + "
+         "{ #400 } #0 i 20 * + + "
+         "i 12 / gray foreground "
+         "i LineWidth Line "
+         "next "
+         "1 LineWidth 0 Gray Foreground"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("line-width-gray-offline")
+        .test(EXIT);
+
+    step("Circles");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ 0 0 } i Circle "
+         "{ 0 1 } i 0.25 * Circle "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-offline")
+        .test(EXIT);
+
+    step("Circles, complex coordinates");
+    test(CLEAR,
+         DIRECT("2 150 for i "
+                "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * + Circle "
+                "next"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-complex-offline")
+        .test(EXIT);
+
+    step("Circles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0053 * gray Foreground "
+         "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-fill-offline")
+        .test(EXIT);
+
+    step("Ellipses");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         " Ellipse "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("ellipses-offline")
+        .test(EXIT);
+
+    step("Ellipses, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         " Ellipse "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("ellipses-fill-offline")
+        .test(EXIT);
+
+    step("Rectangles");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         " Rect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rectangles-offline")
+        .test(EXIT);
+
+    step("Rectangles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         " Rect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rectangle-fill-offline")
+        .test(EXIT);
+
+    step("Rounded rectangles");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         "0.8 RRect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rounded-rectangle-offline")
+        .test(EXIT);
+
+    step("Rounded rectangles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         "0.8 RRect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rounded-rectangle-fill-offline")
+        .test(EXIT);
+
+    step("RGB colors")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH "
+              "0 1 for r"
+              "  0 1 for g"
+              "   0 1 for b"
+              "     r g b RGB Foreground"
+              "     r g 2 + * 4 * g 27 * b 360 * + R→P 0.2 Circle"
+              "   0.1 step"
+              " 0.1 step "
+              "0.1 step "
+              "'LineWidth' PURGE "
+              "1 0 0 RGB FOREGROUND \"Red\" 1 DISP "
+              "0 1 0 RGB FOREGROUND \"Green\" 2 DISP "
+              "0 0 1 RGB FOREGROUND \"Blue\" 3 DISP "),
+              LENGTHY(5000), ENTER).noerror()
+        .image("rgb-colors-offline")
+        .test(EXIT);
+
+    step("Clipping");
+    test(CLEAR, DIRECT(
+         "0 LineWidth CLLCD { 120 135 353 175 } Clip "
+         "2 150 for i "
+         "i 0.0053 * gray Foreground "
+         "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
+         "next "
+         "{} Clip"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("clip-circles-offline")
+        .test(EXIT);
+
+    step("Cleanup");
+    test(CLEAR, DIRECT(
+         "1 LineWidth 0 Gray Foreground 1 Gray Background "
+         "{ -1 -1 } { 3 2 } rect"),
+         ENTER)
+        .noerror()
+        .image("cleanup-offline")
+        .test(EXIT);
+
+    step("PixOn")
+        .test(CLEAR, DIRECT(
+              "0 "
+              "0 500 for i"
+              " 0.005 i * i 1.5 * R→P pixon "
+              " 0.005 i * i 1.5 * R→P pix? 1 - neg + "
+              "next"),
+              LENGTHY(15000), ENTER)
+        .test(KEY6)
+        .image("pixon-offline")
+        .test(EXIT)
+        .expect("501");
+    step("PixOff")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH { #0 #0 } { 10#400 10#240 } rect 3 LINEWIDTH "
+              "0 "
+              "0 500 for i"
+              " 0.002 i * i 1.5 * R→P pixoff "
+              " 0.002 i * i 1.5 * R→P pixelcolor + + + "
+              "next "
+              "1 LINEWIDTH"),
+              LENGTHY(15000), ENTER)
+        .test(KEY6)
+        .image("pixoff-offline")
+        .test(EXIT)
+        .expect("1 503");
+
+    step("PixTest")
+        .test(CLEAR, DIRECT(
+              "CLLCD "
+              "0 399 for i "
+              "{ } 10#0 i + + 10#100 + "
+              "if i 997.42 * sin 0 > then pixon else pixoff end "
+              "next "
+              "0 "
+              "0 399 for i "
+              "{ } 10#0 i + + 10#100 + "
+              "pix? i 997.42 * sin 0 > 0 1 IFTE - 1 + +  "
+              "next"),
+              LENGTHY(15000),
+              ENTER)
+        .image("pixtest-offline")
+        .test(EXIT)
+        .expect("400");
+
+    step("Function plot")
+        .test(CLEAR,
+              DIRECT("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
+        .image("function-offline")
+        .test(EXIT);
+    step("Expliti DRAX")
+        .test(CLEAR, DIRECT("DRAX"), ENTER)
+        .image("function+drax-offline")
+        .test(EXIT);
+    step("Second function superimposed")
+        .test(CLEAR, DIRECT("0.8 0.4 0.2 RGB FOREGROUND 3 LINEWIDTH"
+                            "'sin(150*x)' FUNCTIONPLOT"), ENTER)
+        .image("two-functions-offline")
+        .test(EXIT, DIRECT("{ FOREGROUND LINEWIDTH } PURGE"), ENTER).noerror();
 }
 
 
