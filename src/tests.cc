@@ -11548,13 +11548,16 @@ void tests::check_help_examples()
     uint        closecheck = 0;
     uint        expcheck   = 0;
     uint        failcheck  = 0;
+    uint        imgcheck   = 0;
     cstring     open       = "\n```rpl\n";
     cstring     close      = "\n```\n";
     cstring     expecting  = "@ Expecting ";
     cstring     failing    = "@ Failing ";
+    cstring     image      = "@ Image ";
     bool        hadcr      = false;
     bool        testing    = false;
     bool        inref      = false;
+    bool        inimg      = false;
     uint        line       = 1;
     uint        tidx       = 0;
     bool        intopic    = false;
@@ -11626,7 +11629,7 @@ void tests::check_help_examples()
                     bool keep =
                         ubuf.find("@ Keep") != ubuf.npos ||
                         ubuf.find("@ Save") != ubuf.npos;
-                    itest(DIRECT(ubuf));
+                    itest(CLEAR, EXIT, DIRECT(ubuf));
                     ubuf.clear();
 
                     size_t nfailures = failures.size();
@@ -11635,7 +11638,18 @@ void tests::check_help_examples()
                     if (rt.depth() && Stack.type() == object::ID_expression)
                         itest(LENGTHY(20000), RUNSTOP).noerror();
                     if (!ref.empty())
-                        want(ref.c_str());
+                    {
+                        if (inimg)
+                        {
+                            std::string imgname = ref+"-test-"+(topic+1);
+                            image_noheader(imgname.c_str());
+                            inimg = false;
+                        }
+                        else
+                        {
+                            want(ref.c_str());
+                        }
+                    }
                     bool fails = failures.size() > nfailures;
                     if (fails || skiptest)
                     {
@@ -11679,14 +11693,31 @@ void tests::check_help_examples()
             failcheck++;
             if (!failing[failcheck])
             {
-                skiptest = true;
+                failcheck = 0;
+                skiptest  = true;
+                inref     = true;
+                ref       = "";
+            }
+        }
+        else
+        {
+            failcheck = (c == failing[0]);
+        }
+
+        if (c == image[imgcheck])
+        {
+            imgcheck++;
+            if (!image[imgcheck])
+            {
+                imgcheck = 0;
+                inimg    = true;
                 inref    = true;
                 ref      = "";
             }
         }
         else
         {
-            failcheck = (c == failing[0]);
+            imgcheck = (c == image[0]);
         }
     }
     fclose(f);

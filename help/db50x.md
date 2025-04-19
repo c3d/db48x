@@ -13254,6 +13254,7 @@ indicator and voltage, use the following code:
 
 ```rpl
 LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
+@ Image extracted-battery
 ```
 
 ## ToLCD
@@ -13265,6 +13266,7 @@ For example, to draw an expression in the center of the screen, use:
 
 ```rpl
 'X+(1/sqrt(X-1))' 3 →GROB →LCD
+@ Image small-equation
 ```
 
 
@@ -13314,6 +13316,7 @@ erasing the background (the first `true`), in reverse colors (the second
 ```rpl
 "Hello" { #0 #0 3 true true } DrawText
 "World" { 10#400 10#240 3 true true -1 -1 } DrawText
+@ Image hello-world
 ```
 
 ## DrawStyledText
@@ -13347,6 +13350,11 @@ horizonal or vertical scrolling.
 The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
 [MaximumShowHeight](#maximumshowheight) settings.
+
+```rpl
+1.0 3 / Show
+@ Image many-decimals
+```
 
 ## DrawLine
 
@@ -13412,6 +13420,7 @@ The object to draw must fit in a bit map at most `MaxW`-pixels wide and
 0 7 for fontID
   "Font " fontID + fontID →Grob
 next
+@ Image fontsizes
 ```
 
 ## ToHPGrob
@@ -13442,6 +13451,7 @@ graphic object.
 
 ```rpl
 'sqrt(2*x)/y' →Bitmap
+@ Image sqrt
 ```
 
 ## ToPixmap
@@ -13458,6 +13468,7 @@ graphic object.
 
 ```rpl
 'sqrt(2*x)/y' →Pixmap
+@ Image sqrt
 ```
 
 
@@ -13547,6 +13558,7 @@ The two graphic objects are vertically centered with respect to one another.
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicAppend
+@ Image check
 ```
 
 
@@ -13560,6 +13572,7 @@ The two graphic objects are horizontally centered with respect to one another.
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicStack
+@ Image check
 ```
 
 ## GraphicSubscript
@@ -13571,6 +13584,7 @@ Combine two graphic objects with the second one in subscript position
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicSubscript
+@ Image check
 ```
 
 ## GraphicExponent
@@ -13582,6 +13596,7 @@ Combine two graphic objects with the second one in exponent position
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicExponent
+@ Image check
 ```
 
 ## GraphicRatio
@@ -13593,6 +13608,7 @@ Combine two graphic objects as if they were in a fraction
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicRatio
+@ Image check
 ```
 
 ## GraphicRoot
@@ -13603,6 +13619,7 @@ Generate a square root sign around a graphical object
 @ Square root sign
 "ABC" 4 →Grob
 GraphicRoot
+@ Image check
 ```
 
 ## GraphicParentheses
@@ -13613,6 +13630,7 @@ Generate parentheses around a graphical object
 @ Parentheses around graphic
 "ABC" 4 →Grob
 GraphicParentheses
+@ Image check
 ```
 
 ## GraphicNorm
@@ -13623,6 +13641,7 @@ Generate a norm (vertical bars) around a graphical object
 @ Norm around graphic
 "ABC" 4 →Grob
 GraphicNorm
+@ Image check
 ```
 
 
@@ -13633,6 +13652,7 @@ Generate a sum (capital Sigma) sign of the given size
 ```rpl
 @ 128-pixel Sigma sign
 128 GraphicSum
+@ Image check
 ```
 
 ## GraphicProduct
@@ -13642,6 +13662,7 @@ Generate a product (capital Pi) sign of the given size
 ```rpl
 @ 96-pixel Sigma sign
 96 GraphicProduct
+@ Image check
 ```
 
 ## GraphicIntegral
@@ -13651,6 +13672,7 @@ Generate an integral sign of the given size
 ```rpl
 @ 45-pixel Sigma sign
 45 GraphicIntegral
+@ Image check
 ```
 
 
