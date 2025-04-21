@@ -55,11 +55,13 @@ struct program : list
 
     static bool          interrupted(); // Program interrupted e.g. by EXIT key
     static bool          low_battery();
-    static void          read_battery();
+    static uint          read_battery();
+    static uint          read_time();
 
     static bool          running, halted, on_usb, battery_low;
     static uint          stepping;
 
+    static uint          ticks;
     static uint          battery_voltage;
     static uint          power_voltage;
     static uint          last_power_check;

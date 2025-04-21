@@ -1514,7 +1514,7 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
 {
     force = forceRedraw;
     nextRefresh = refresh;
-    time = sys_current_ms();
+    time = program::read_time();
     if (forceRedraw)
         graphics = false;
 }
@@ -2348,7 +2348,7 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
         font_p hdr_font = Settings.header_font();
         rect   clip        = Screen.clip();
         Screen.clip(busy);
-        time = sys_current_ms();
+        time = program::read_time();
         size  w = hdr_font->width('M');
         coord x = busy.x1 + time / 16 % (busy.width() - w);
         coord y = busy.y1;
@@ -3001,7 +3001,7 @@ bool user_interface::draw_stack()
     }
 
     draw_busy();
-    uint now = sys_current_ms();
+    uint now = program::read_time();
     uint top = stackTop + 1;
     uint bottom = Stack.draw_stack();
     if (object_p transient = transient_object())
@@ -3010,7 +3010,7 @@ bool user_interface::draw_stack()
     draw_idle();
     dirtyStack = false;
     dirtyCommand = true;
-    program::stack_display_time += sys_current_ms() - now;
+    program::stack_display_time += program::read_time() - now;
 
     return true;
 }

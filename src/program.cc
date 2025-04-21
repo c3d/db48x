@@ -245,7 +245,7 @@ bool program::interrupted()
 
     count_interrupted = 0;
     reset_auto_off();
-    uint now = sys_current_ms();
+    uint now = program::read_time();
     if (now - last_power_check >= Settings.BatteryRefresh())
     {
         if (low_battery())
@@ -280,8 +280,9 @@ bool program::interrupted()
 
 
 bool program::battery_low = false;
-uint program::battery_voltage = 3000;
-uint program::power_voltage = 3000;
+uint program::ticks = 0;
+uint program::battery_voltage = 999;
+uint program::power_voltage = 999;
 
 bool program::low_battery()
 // ----------------------------------------------------------------------------
@@ -290,7 +291,7 @@ bool program::low_battery()
 //    Experimentatlly get_lowbat_state() is not reliable
 //    Offer an adjustable "low battery" threshold
 {
-    uint now = sys_current_ms();
+    uint now = program::read_time();
     if (now - last_power_check >= Settings.BatteryRefresh())
         read_battery();
     uint vlow = Settings.MinimumBatteryVoltage();
@@ -299,7 +300,7 @@ bool program::low_battery()
 }
 
 
-void program::read_battery()
+uint program::read_battery()
 // ----------------------------------------------------------------------------
 //   Read battery information
 // ----------------------------------------------------------------------------
@@ -308,7 +309,26 @@ void program::read_battery()
     battery_low = get_lowbat_state();
     battery_voltage = get_vbat();
     power_voltage = read_power_voltage();
-    last_power_check = sys_current_ms();
+    last_power_check = program::read_time();
+    return battery_voltage;
+}
+
+
+uint program::read_time()
+// ----------------------------------------------------------------------------
+//   Read real-time clock time
+// ----------------------------------------------------------------------------
+//   The sys_current_ms() function stops running when timers are off.
+{
+    dt_t date;
+    tm_t time;
+    rtc_read(&time, &date);
+    int jd = julian_day(&date);
+    ticks = ((time.sec +
+             time.min * 60 +
+             time.hour * 3600 +
+              jd * 86400) * 100 + time.csec) * 10;
+    return ticks;
 }
 
 

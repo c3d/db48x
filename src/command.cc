@@ -665,7 +665,7 @@ COMMAND_BODY(Ticks)
 //   Return number of ticks
 // ----------------------------------------------------------------------------
 {
-    uint ticks = sys_current_ms();
+    uint ticks = program::read_time();
     if (integer_p ti = rt.make<integer>(ID_integer, ticks))
         if (rt.push(ti))
             return OK;
@@ -689,7 +689,7 @@ COMMAND_BODY(Wait)
             {
                 bool     negative = wtime->is_negative();
                 uint32_t msec     = negative ? 0 : wtime->as_uint32(1000, true);
-                uint32_t end      = sys_current_ms() + msec;
+                uint32_t end      = program::read_time() + msec;
                 bool     infinite = msec == 0 || negative;
                 int      key      = 0;
 
@@ -698,7 +698,9 @@ COMMAND_BODY(Wait)
                 while (!key)
                 {
                     // Sleep in chunks of one minute
-                    int remains = infinite ? 60000 : int(end - sys_current_ms());
+                    int remains = infinite
+                        ? 60000
+                        : int(end - program::read_time());
                     if (remains <= 0)
                         break;
                     set_timer(TIMER1, remains);
@@ -741,6 +743,8 @@ COMMAND_BODY(Wait)
                         key = 0;
                     }
                 }
+                sys_timer_disable(TIMER0);
+                sys_timer_disable(TIMER1);
                 if (infinite)
                 {
                     uint sp = ui.shift_plane();

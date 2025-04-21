@@ -182,9 +182,9 @@ void redraw_lcd(bool force)
 //   Redraw the whole LCD
 // ----------------------------------------------------------------------------
 {
-    uint now = sys_current_ms();
+    uint start = sys_current_ms();
 
-    record(main, "Begin redraw at %u", now);
+    record(main, "Begin redraw at %u", start);
 
     // Draw the various components handled by the user interface
     ui.draw_start(force);
@@ -207,14 +207,14 @@ void redraw_lcd(bool force)
     refresh_dirty();
 
     // Compute next refresh
-    uint then = sys_current_ms();
+    uint end = sys_current_ms();
     uint period = ui.draw_refresh();
     record(main,
-           "Refresh at %u (%u later), period %u", then, then - now, period);
+           "Refresh at %u (%u later), period %u", end, end - start, period);
 
     // Refresh screen moving elements after the requested period
     set_timer(TIMER1, period);
-    program::display_time += sys_current_ms() - now;
+    program::display_time += end - start;
 }
 
 
@@ -223,10 +223,10 @@ static void redraw_periodics()
 //   Redraw the elements that move
 // ----------------------------------------------------------------------------
 {
-    uint now         = sys_current_ms();
-    uint dawdle_time = now - last_keystroke_time;
+    uint start       = program::read_time();
+    uint dawdle_time = start - last_keystroke_time;
 
-    record(main, "Periodics %u", now);
+    record(main, "Periodics %u", start);
     ui.draw_start(false);
     ui.draw_header();
     ui.draw_battery();
@@ -253,13 +253,13 @@ static void redraw_periodics()
             period = 3000;
     }
 
-    uint then = sys_current_ms();
-    record(main, "Dawdling for %u at %u after %u", period, then, then-now);
+    uint end = program::read_time();
+    record(main, "Dawdling for %u at %u after %u", period, end, end-start);
 
     // Refresh screen moving elements after 0.1s
     set_timer(TIMER1, period);
 
-    program::display_time += sys_current_ms() - now;
+    program::display_time += end - start;
 }
 
 
@@ -395,13 +395,13 @@ void power_check(bool running, bool showimage)
         {
             CLR_ST(STAT_RUNNING);
             static uint last_awake = 0;
-            uint now = sys_current_ms();
+            uint tin = sys_current_ms();
             if (last_awake)
-                program::active_time += now - last_awake;
+                program::active_time += tin - last_awake;
             sys_sleep();
-            uint then = sys_current_ms();
-            last_awake = then;
-            program::sleeping_time += then - now;
+            uint tout = sys_current_ms();
+            last_awake = tout;
+            program::sleeping_time += tout - tin;
             program::run_cycles++;
         }
         if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
@@ -437,6 +437,8 @@ void power_check(bool running, bool showimage)
         {
             // Clock wakeup (once per second or per minute)
             CLR_ST(STAT_CLK_WKUP_FLAG);
+            if (running)
+                break;
             redraw_periodics();
         }
         else if (ST(STAT_POWER_CHANGE))
@@ -510,7 +512,7 @@ extern "C" void program_main()
     // Initialization
     program_init();
     redraw_lcd(true);
-    last_keystroke_time = sys_current_ms();
+    last_keystroke_time = program::read_time();
 
     // Main loop
     while (true)
@@ -598,7 +600,7 @@ extern "C" void program_main()
                 redraw_lcd(false);
 
             // Record the last keystroke
-            last_keystroke_time = sys_current_ms();
+            last_keystroke_time = program::read_time();
             record(main, "Last keystroke time %u", last_keystroke_time);
         }
         else

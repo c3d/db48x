@@ -1294,6 +1294,8 @@ object::result show(object_r obj)
 #endif // SIMULATOR && !WASM
             }
         }
+        sys_timer_disable(TIMER0);
+        sys_timer_disable(TIMER1);
         redraw_lcd(true);
     }
     return object::OK;

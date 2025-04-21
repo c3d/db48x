@@ -141,7 +141,7 @@ object::result draw_plot(object::id                  kind,
     object::result result = object::ERROR;
     coord          lx     = -1;
     coord          ly     = -1;
-    uint           then   = sys_current_ms();
+    uint           start  = sys_current_ms();
     algebraic_g    min, max, step;
     object::id     dname;
 
@@ -365,11 +365,11 @@ object::result draw_plot(object::id                  kind,
                     break;
             }
         }
-        uint now = sys_current_ms();
-        if (now - then >= Settings.PlotRefreshRate())
+        uint end = sys_current_ms();
+        if (end - start >= Settings.PlotRefreshRate())
         {
             refresh_dirty();
-            then = sys_current_ms();
+            start = sys_current_ms();
         }
     }
     result = object::OK;

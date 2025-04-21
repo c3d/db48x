@@ -29,6 +29,7 @@
 
 #include "dmcp.h"
 
+#include "datetime.h"
 #include "dmcp_fonts.c"
 #include "recorder.h"
 #include "sim-dmcp.h"
@@ -1089,6 +1090,12 @@ void rtc_write(tm_t * tm, dt_t *dt)
     record(dmcp_error, "Writing RTC %u/%u/%u %u:%u:%u (ignored)",
            dt->day, dt->month, dt->year,
            tm->hour, tm->min, tm->sec);
+}
+
+
+int julian_day(dt_t *dt)
+{
+    return julian_day_number(dt->day, dt->month, dt->year);
 }
 
 
