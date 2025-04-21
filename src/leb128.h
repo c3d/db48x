@@ -39,7 +39,7 @@
 #endif // DM42
 
 template <typename Int = uint, typename Data>
-inline Int leb128(Data *&p)
+NOINLINE Data *leb128(Int &res, Data *p)
 // ----------------------------------------------------------------------------
 //   Return the leb128 value at pointer
 // ----------------------------------------------------------------------------
@@ -53,9 +53,21 @@ inline Int leb128(Data *&p)
         result |= Int(*bp & 0x7F) << shift;
         shift += 7;
     } while (*bp++ & 0x80);
-    p = (Data *) bp;
+
     if (is_signed && (bp[-1] & 0x40))
         result |= Int(~0ULL << (shift - 1));
+    res = result;
+    return (Data *) bp;
+}
+
+template <typename Int = uint, typename Data>
+inline INLINE Int leb128(Data *&p)
+// ----------------------------------------------------------------------------
+//   Return the leb128 value at pointer
+// ----------------------------------------------------------------------------
+{
+    Int result;
+    p = leb128(result, p);
     return result;
 }
 
