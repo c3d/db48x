@@ -157,6 +157,26 @@ void refresh_dirty()
 }
 
 
+void set_timer(uint timerid, uint period)
+// ----------------------------------------------------------------------------
+//   Conditionally set a timer based on period
+// ----------------------------------------------------------------------------
+{
+    if (period >= 1000)
+    {
+        sys_timer_disable(timerid);
+        if (period >= 60000)
+            CLR_ST(STAT_CLK_WKUP_SECONDS);
+        else
+            SET_ST(STAT_CLK_WKUP_SECONDS);
+    }
+    else
+    {
+        sys_timer_start(timerid, period);
+    }
+}
+
+
 void redraw_lcd(bool force)
 // ----------------------------------------------------------------------------
 //   Redraw the whole LCD
@@ -193,8 +213,7 @@ void redraw_lcd(bool force)
            "Refresh at %u (%u later), period %u", then, then - now, period);
 
     // Refresh screen moving elements after the requested period
-    sys_timer_start(TIMER1, period);
-
+    set_timer(TIMER1, period);
     program::display_time += sys_current_ms() - now;
 }
 
@@ -238,7 +257,7 @@ static void redraw_periodics()
     record(main, "Dawdling for %u at %u after %u", period, then, then-now);
 
     // Refresh screen moving elements after 0.1s
-    sys_timer_start(TIMER1, period);
+    set_timer(TIMER1, period);
 
     program::display_time += sys_current_ms() - now;
 }
@@ -351,6 +370,9 @@ void program_init()
     // Check if we have a state file to load
     load_system_state();
     load_saved_keymap();
+
+    // Enable wakeup each minute (for clock update)
+    SET_ST(STAT_CLK_WKUP_ENABLE);
 }
 
 
@@ -381,8 +403,6 @@ void power_check(bool running, bool showimage)
             last_awake = then;
             program::sleeping_time += then - now;
             program::run_cycles++;
-            if (program::low_battery())
-                ui.draw_battery(false);
         }
         if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
         {
@@ -413,16 +433,21 @@ void power_check(bool running, bool showimage)
             // Already in OFF -> just continue to sleep above
         }
 
-        // Check power change or wakeup
         else if (ST(STAT_CLK_WKUP_FLAG))
         {
+            // Clock wakeup (once per second or per minute)
             CLR_ST(STAT_CLK_WKUP_FLAG);
+            redraw_periodics();
         }
         else if (ST(STAT_POWER_CHANGE))
         {
+            // Power state change (to/from USB)
             CLR_ST(STAT_POWER_CHANGE);
+            sys_timer_disable(TIMER0);
+            sys_timer_disable(TIMER1);
+            // Force reload battery with correct value at next clock refresh.
             ui.draw_battery(true);
-            refresh_dirty();
+            program::last_interrupted -= Settings.BatteryRefresh() - 1000;
         }
         else
         {
@@ -444,6 +469,7 @@ void power_check(bool running, bool showimage)
         CLR_ST(STAT_OFF);
 
         // Check if we need to redraw
+        program::read_battery();
         if (ui.showing_graphics())
             ui.draw_graphics(true);
         else

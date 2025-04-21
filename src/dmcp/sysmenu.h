@@ -83,7 +83,7 @@ void                  system_setup();
 void                  mark_dirty(uint row);
 void                  refresh_dirty();
 void                  redraw_lcd(bool force);
-
+void                  set_timer(uint timerid, uint period);
 #if SIMULATOR
 void                  process_test_key(int key);
 void                  process_test_commands();

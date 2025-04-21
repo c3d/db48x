@@ -231,9 +231,9 @@ object::result program::run_loop(size_t depth)
 }
 
 
-static uint last_interrupted = 0;
-static uint last_power_check = 0;
-static uint count_interrupted = 0;
+uint program::count_interrupted = 0;
+uint program::last_interrupted = 0;
+uint program::last_power_check = 1U << 31;
 
 bool program::interrupted()
 // ----------------------------------------------------------------------------

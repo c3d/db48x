@@ -62,6 +62,9 @@ struct program : list
 
     static uint          battery_voltage;
     static uint          power_voltage;
+    static uint          last_power_check;
+    static uint          count_interrupted;
+    static uint          last_interrupted;
     static ularge        run_cycles;
     static ularge        active_time;
     static ularge        sleeping_time;

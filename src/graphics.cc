@@ -1204,8 +1204,7 @@ object::result show(object_r obj)
                 int remains = 60;
 
                 // Refresh screen after the requested period
-                sys_timer_disable(TIMER1);
-                sys_timer_start(TIMER1, remains);
+                set_timer(TIMER1, remains);
 
                 // Do not switch off if on USB power
                 if (usb_powered())

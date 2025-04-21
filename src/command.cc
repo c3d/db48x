@@ -701,12 +701,7 @@ COMMAND_BODY(Wait)
                     int remains = infinite ? 60000 : int(end - sys_current_ms());
                     if (remains <= 0)
                         break;
-                    if (remains > 60000)
-                        remains = 60000;
-
-                    // Refresh screen moving elements after the requested period
-                    sys_timer_disable(TIMER1);
-                    sys_timer_start(TIMER1, remains);
+                    set_timer(TIMER1, remains);
 
                     // Do not switch off if on USB power
                     if (program::on_usb)

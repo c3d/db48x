@@ -118,7 +118,6 @@ user_interface::user_interface()
       menuDrawn(0),
       cursorDrawn(0),
       customHeaderDrawn(0),
-      batteryDrawn(0),
       day(0), month(0), year(0), dow(0),
       hour(0), minute(0), second(0),
       editing(),
@@ -1925,7 +1924,11 @@ bool user_interface::draw_header()
         }
     }
     if (!pgm && Settings.ShowTime())
+#if SIMULATOR
         draw_refresh(Settings.ShowSeconds() ? 1000 : 1000 * (60 - second));
+#else
+        draw_refresh(Settings.ShowSeconds() ? 1000 : 60000);
+#endif
 
     if (changed)
     {
@@ -2062,7 +2065,7 @@ bool user_interface::draw_battery(bool now)
 {
     if (freezeHeader || graphics)
     {
-        batteryDrawn = ~time;
+        program::last_power_check = ~time;
         return false;
     }
 
@@ -2071,21 +2074,21 @@ bool user_interface::draw_battery(bool now)
     coord       ann_y      = (h - ann_height) / 2;
 
     // Print battery voltage
-    uint        vdd        = program::power_voltage;
+    uint        vdd        = program::battery_voltage;
     bool        usb        = program::on_usb;
-    uint        delay      = time - batteryDrawn;
+    uint        delay      = time - program::last_power_check;
     uint        refresh    = Settings.BatteryRefresh();
-    if (now || delay > refresh)
+    const uint  usb_period = 1024;
+
+    if (now || delay >= refresh)
     {
         program::read_battery();
         batteryLow = program::low_battery();
-        vdd = program::power_voltage;
+        vdd = program::battery_voltage;
         usb = program::on_usb;
     }
-    else if (!force && !batteryLow)
+    else if (!force && !batteryLow && !usb)
     {
-        if (program::animated())
-            refresh -= delay;
         draw_refresh(refresh);
         return false;
     }
@@ -2157,7 +2160,6 @@ bool user_interface::draw_battery(bool now)
     float ratio = float(vdd - vmin) / (vmax - vmin);
     ratio = 1-ratio;
     ratio = ratio * ratio;
-    ratio = ratio * ratio;
     ratio = 1 - ratio;
     size w = size(ratio * batw);
     if (w > batw)
@@ -2165,6 +2167,11 @@ bool user_interface::draw_battery(bool now)
     else if (w < 1)
         w = 1;
     bat_body.x1 = bat_body.x2 - w;
+    if (usb)
+    {
+        bat_body.inset(-time / usb_period % 4);
+        refresh = std::min(refresh, usb_period);
+    }
     if (!blink)
         Screen.fill(bat_body, vpat);
 
@@ -2182,7 +2189,6 @@ bool user_interface::draw_battery(bool now)
     batteryLeft = x;
     draw_dirty(x, 0, LCD_W-1, h-1);
     draw_refresh(refresh);
-    batteryDrawn = time;
 
     // Power off if battery power is really low
     if (program::low_battery())
