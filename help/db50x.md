@@ -3687,6 +3687,66 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.5 "Everlasting" - Power management, offline graphics
+
+This release brings two major new features: vastly reduced power drain, and
+off-line persistent graphics.
+
+### New features
+
+* Off-line graphics are the ability to draw images in memory instead of directly
+  on screen. Like on HP calculators, this works by storing a graphic object in
+  `PICT`. Unlike HP calculators, `PICT` is an actual variable in the current
+  directory, meaning that you can have multiple `PICT`, although bitmaps use a
+  lot of memory. For example, running `500 300 BLANK 'PICT' STO` will create a
+  500x300 pixels off-line image in `PICT`, and all graphic commands after that
+  will draw in that off-line image instead of on screen. Off-line graphics are
+  not immediately shown on screen, but are displayed before returning to the
+  command line in a way similar to the `Show` command (i.e. centererd if smaller
+  than the screen, and with scrolling if larger). They are also persistent,
+  meaning that you need to explicitly `ClLCD` to erase them.
+* Add `Blank`, `BlankGrob`, `BlankBitmap` and `BlankPixmap` commands to create a
+  blank image with default format, in HP GROB format, in DB48x bitmap (Black and
+  white) format and in DB50x pixmap format (color RPL only).
+* Add `→HPGrob`, `→Bitmap`, `→Pixmap` commands which can be used to generate an
+  HP-compatible GROB format, a bitmap or a pixmap (color RPL only) from an
+  object. If the object is already a graphic, perform conversion. Note that
+  on color RPL, conversions between color and monochrome formats are supported.
+  Colors are converted to monochrome using grayscale patterns.
+* Add `→LCD` and `LCD→` commands to send an object to the current graphics, or
+  to create a graphic object from the current screen content.
+* The `Off` command can now be used in a program and will preserve what is on
+  screen. You can resume execution of the program by using the `ON` key.
+  Add `PowerOffWithImage` command to show off-images even from programs.
+
+### Bug fixes
+
+* Fix display of object `Info` in the interactive stack
+* Clear system timers before entering system menu, so that the self test menu
+  entry does not run a fast-paced loop.
+* Fix off-by-one error in result of `LastBitSet` (number bits starting at 0)
+* Correctly render color pixmaps when on the stack (color RPL only)
+
+### Improvements
+
+* Reduce power usage dramatically by disabling timers when going to sleep.
+  This manifests as a higher battery voltage being shown, which is closer to
+  what the DM32 firmware or integrated self-test would show. This will most
+  likely improve battery life for interactive uses of DB48x.
+* Reorganize the `MemoryMenu` to make both GC and runtime statistics available
+* Reorganize the `GraphicsMenu` by topics to accomodate the new commands
+* Add image checks in the test infrastructure for RPL code examples
+* Add tests for RGB colors
+* Repair `make compare` which was trying to build a binary from `compare.cc`
+* Make `Sub` a compatibility spelling for `Extract`, not the default one
+* Adjust low battery indications to avoid premature warnings
+* Make `debug_printf` use lower-level routines that can run earlier after boot
+* Add `make INSTALL_PGM_ONLY=y install` option for faster install
+* Generate DB48x bitmaps by default instead of HP-compatible GROBs. Bitmaps use
+  less memory when the width is not a multiple of 8.
+* Make test of pixel functions more reliable by increasing their timeout
+* Add help for `ModesMenu`, `SymbolicResults` and `NumericalResults`
+
 ## Release 0.9.4 "Face, meet palms" - Pixmaps, bug fixes
 
 This release fixes embarassing numerical bugs introduced in 0.9.3 and introduces
