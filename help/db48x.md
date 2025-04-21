@@ -15118,6 +15118,14 @@ The current preferences can be retrieved and saved using the `Modes` command.
 
 Returns a program that will restore the current settings. This program can be saved into a variable to quickly restore a carefully crafted set of preferences. Note that the calculator automatically restores the mode when it [loads a state](#States).
 
+## ModesMenu
+
+The `ModesMenu` controls the primary modes of the calculator.
+
+It includes commands to select [trigonometric angle units](#angle-settings), as
+well as submenus for mathematical (`MathModesMenu`), user interface
+(`UIModesMenu`) or display separators (`SeparatorModesMenu`) preferences .
+
 # Display settings
 
 The display mode controls how DB48X displays numbers. Regardless of the display
@@ -15463,7 +15471,12 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MathModesMenu
 
+The `MathModesMenu` controls settings related to mathematical computations.
+
+* `SymbolicResults`
+* `AutoSimplify`
 
 
 # Base settings
@@ -16676,6 +16689,19 @@ arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0`'
 or `X*1-B*0` will no longer be simplified during evaluation.
 
 The opposite setting is [AutoSimplify](#autosimplify)
+
+
+## SymbolicResults
+
+Enable the generation of symbolic results, as opposed to `NumericalResults`.
+For example, `2 3 /` gives exact result `2/3` as a result with
+`SymbolicResults`, as opposed to a numerical approximation like `0.66667`.
+
+## NumericalResults
+
+Enable the generation of symbolic results, as opposed to `SymbolicResults`.  For
+example, `2 3 /` gives the numerical approximation `0.66667` when this flag is
+set, as opposed to exact result `2/3`.
 
 
 ## FinalAlgebraResults
