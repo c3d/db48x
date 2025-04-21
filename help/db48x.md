@@ -744,7 +744,7 @@ https://github.com/c3d/db48x.
 
 ### Authors
 
-This software is (C) 2022-2023 Christophe de Dinechin and the DB48X team.
+This software is (C) 2022-2025 Christophe de Dinechin and the DB48X team.
 
 Additional contributors to the project include:
 
