@@ -1015,11 +1015,11 @@ void tests::data_types()
     test(CLEAR, "12", ENTER, "bytes", ENTER)
         .expect("2")
         .test(BSP)
-        .match("#C....");
+        .match("#C..₁₆");
     test(CLEAR, "129", ENTER, "bytes", ENTER)
         .expect("3")
         .test(BSP)
-        .match("#1 81....");
+        .match("#1 81..₁₆");
 
     step("Type command (direct mode)");
     test(CLEAR, "DetailedTypes", ENTER).noerror();
