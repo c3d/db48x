@@ -237,7 +237,8 @@ EVAL_BODY(locals)
     // Skip names to get to program
     for (uint n = 0; n < names; n++)
     {
-        size_t nlen = leb128<size_t>(+p);
+        size_t nlen;
+        p = leb128(nlen, +p);
         p += nlen;
     }
 
