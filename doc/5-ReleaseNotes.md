@@ -1,5 +1,18 @@
 # Release notes
 
+## Release 0.9.5.1 "Wait" - Emergency fix for Wait and Refresh
+
+Bug-fix only release for timing of `Wait` command
+
+## Bug fix
+
+The changes that improve battery life in 0.9.5 had an impact on commands that
+need absolute time, because the internal timer of the DM32/DM42 switches of when
+in deep sleep. As a result, `Wait` with durations longer than 1 second would
+wait much longer than expected, and long-duration `Refresh` settings
+e.g. `BatteryRefresh` would also wait longer than expected. Replace the use of
+the internal timer with a synthetic timer based on the real-time clock.
+
 ## Release 0.9.5 "Everlasting" - Power management, offline graphics
 
 This release brings two major new features: vastly reduced power drain, and
