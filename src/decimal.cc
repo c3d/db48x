@@ -37,6 +37,7 @@
 #include "runtime.h"
 #include "settings.h"
 #include "utf8.h"
+#include "util.h"
 
 #include <inttypes.h>
 
@@ -658,33 +659,19 @@ RENDER_BODY(decimal)
         {
             r.put(ds.ExponentSeparator());
             char expbuf[32];
-
-            // Manually write the exponent, because nano library has no %PRId64
-            char *end = expbuf + sizeof(expbuf);
-            char *ptr = end;
-            bool neg = dispexp < 0;
-            if (neg)
-                dispexp = -dispexp;
-            do
-            {
-                *--ptr = '0' + (dispexp % 10);
-                dispexp /= 10;
-            } while (dispexp);
-            if (neg)
-                *--ptr = '-';
-
+            char *end = render_i64(expbuf, dispexp);
             if (fancy)
             {
-                while (ptr < end)
+                for (char *ptr = expbuf; ptr < end; ptr++)
                 {
-                    char c = *ptr++;
+                    char c = *ptr;
                     unicode u = c == '-' ? L'⁻' : fancy_digit[c - '0'];
                     r.put(u);
                 }
             }
             else
             {
-                r.put(cstring(ptr), end - ptr);
+                r.put(cstring(expbuf), end - expbuf);
             }
         }
         return r.size();

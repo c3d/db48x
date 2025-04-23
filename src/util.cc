@@ -34,6 +34,8 @@
 #include "settings.h"
 #include "target.h"
 
+#include <algorithm>
+
 
 void invert_screen()
 // ----------------------------------------------------------------------------
@@ -121,4 +123,39 @@ void assertion_failed(const char *msg)
 // ----------------------------------------------------------------------------
 {
     record(assert_error, "Assertion failed: %s", msg);
+}
+
+
+char *render_u64(char *buffer, ularge value)
+// ----------------------------------------------------------------------------
+//   Render an unsigned long-long value in the buffer, returns end address
+// ----------------------------------------------------------------------------
+//   This is made necessary due to lack of support for %llu in nano-libc
+{
+    char *ptr = buffer;
+    do
+    {
+        *ptr++ = '0' + value % 10;
+        value /= 10;
+    } while (value);
+    char *last = ptr;
+    char *top = buffer;
+    while (ptr > top)
+        std::swap(*top++, *--ptr);
+    return last;
+}
+
+
+char *render_i64(char *buffer, large value)
+// ----------------------------------------------------------------------------
+//   Render an signed long-long value in the buffer, returns address
+// ----------------------------------------------------------------------------
+//   This is made necessary due to lack of support for %llu in nano-libc
+{
+    if (value < 0)
+    {
+        *buffer = '-';
+        return render_u64(buffer+1, ularge(-value));
+    }
+    return render_u64(buffer, ularge(value));
 }

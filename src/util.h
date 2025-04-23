@@ -40,6 +40,7 @@ void power_check(bool running, bool offimage = true);
 
 inline cstring strend(cstring s)        { return s + strlen(s); }
 inline char *  strend(char *s)          { return s + strlen(s); }
-
+char *render_u64(char *buffer, ularge value);
+char *render_i64(char *buffer, large value);
 
 #endif // UTIL_H
