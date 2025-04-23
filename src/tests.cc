@@ -184,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            offline_graphics();
+            vector_functions();
 
 #if 0
         if (onlyCurrent & 2)
@@ -6187,6 +6187,9 @@ void tests::vector_functions()
        .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]")
        .test("[ 4 5 6 ]", F6, ID_add)
        .expect("[ 12.44989 9598 54.46232 2208 ° 43.70578 41445 ° ]");
+   step("3D addition with angle as last coordinate (#1455)")
+       .test(CLEAR, "[ 3 2 1.7_° ] [2 1 2.5_° ] -", ENTER)
+       .expect("[ 1 1 -0.8 ° ]");
 
    step("2D addition after polar conversion")
        .test(CLEAR, "[ 1 2 ]", ENTER, NOSHIFT, A, F5)
