@@ -1479,7 +1479,7 @@ ularge polynomial::iterator::exponent()
 // ----------------------------------------------------------------------------
 {
     byte_p p = byte_p(poly) + offset;
-    uint exp = leb128<ularge>(p);
+    ularge exp = leb128<ularge>(p);
     offset = p - byte_p(poly);
     return exp;
 }

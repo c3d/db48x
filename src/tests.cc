@@ -184,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            vector_functions();
+            polynomials();
 
 #if 0
         if (onlyCurrent & 2)
@@ -11024,6 +11024,10 @@ void tests::polynomials()
         .expect("ⓅX-2·Y")
         .test(ID_neg)
         .expect("Ⓟ-X+2·Y");
+
+    step("Polynomial with large exponent")
+        .test(CLEAR, "'X^999999999999'", ENTER, ID_ToolsMenu, F4)
+        .expect("ⓅX↑999999999999");
 
     step("Restore default rendering for polynomials")
         .test(CLEAR, "'PrefixPolynomialRender' purge", ENTER)
