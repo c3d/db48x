@@ -2562,7 +2562,7 @@ COMMAND_BODY(FromVector)
 {
     if (object_g obj = rt.pop())
     {
-        if (array_p v = obj->as<array>())
+        if (array_g v = obj->as<array>())
         {
             if (v->is_2Dor3D(true))
                 return OK;
