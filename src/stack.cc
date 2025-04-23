@@ -158,6 +158,9 @@ uint stack::draw_stack()
         if (coord(y) <= top)
             break;
 
+        font = (interactive || level != 0) ? Settings.stack_font() : Settings.result_font();
+        lineHeight = font->height();
+
         obj        = rt.stack(level);
         cached     = rt.cached(level == 0, +obj);
         graph      = nullptr;
@@ -363,8 +366,6 @@ uint stack::draw_stack()
 
             if (level == 0)
                 yresult = y;
-
-            font = Settings.stack_font();
         }
 
         // If there was any error during rendering, draw it on top
@@ -397,8 +398,6 @@ uint stack::draw_stack()
                         Settings.StackLevelForeground());
         }
         Screen.clip(clip);
-
-        lineHeight = font->height();
     }
 
     Screen.clip(clip);
