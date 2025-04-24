@@ -1118,7 +1118,7 @@ GRAPH_BODY(object)
             rw += cw;
             if (sp)
             {
-                ww = 0;
+                ww = cw;
                 word = nullptr;
             }
             else
