@@ -37,6 +37,7 @@
 #include "functions.h"
 #include "integer.h"
 #include "menu.h"
+#include "program.h"
 #include "renderer.h"
 #include "symbol.h"
 #include "user_interface.h"
@@ -214,6 +215,21 @@ void settings::save(renderer &out, bool show_defaults)
         out.put('\n');
     }
 }
+
+
+settings::PrepareForProgramEvaluation::PrepareForProgramEvaluation()
+// ----------------------------------------------------------------------------
+//   Save settings in preparation for program evalution
+// ----------------------------------------------------------------------------
+    : saveLastArgs(false),
+      saveProgramLastArg(false),
+      saveLastStack(false),
+      saveDebugOnError(false),
+      saveStepping(program::stepping, 0),
+      saveHalted(program::halted, false)
+{
+}
+
 
 
 COMMAND_BODY(Modes)

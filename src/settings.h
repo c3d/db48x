@@ -257,13 +257,10 @@ public:
         SaveProgramLastArguments saveProgramLastArg;
         SaveSaveStack            saveLastStack;
         SaveDebugOnError         saveDebugOnError;
+        ::save<uint>             saveStepping;
+        ::save<bool>             saveHalted;
 
-        PrepareForProgramEvaluation()
-            : saveLastArgs(false),
-              saveProgramLastArg(false),
-              saveLastStack(false),
-              saveDebugOnError(false)
-        {}
+        PrepareForProgramEvaluation();
     };
     struct PrepareForSolveFunctionEvaluation : PrepareForProgramEvaluation
     {
