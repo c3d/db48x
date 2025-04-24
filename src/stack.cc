@@ -160,11 +160,11 @@ uint stack::draw_stack()
 
         obj        = rt.stack(level);
         cached     = rt.cached(level == 0, +obj);
+        graph      = nullptr;
 
-        size     w = 0;
-        if (!interactive && (level ? sgraph : sgraph))
+        size w     = 0;
+        if (!interactive && (level ? sgraph : rgraph))
         {
-            graph  = nullptr;
             if (cached)
                 if (grob_p gr = cached->as_graph())
                     graph = gr;

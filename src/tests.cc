@@ -184,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            polynomials();
+            graphic_stack_rendering();
 
 #if 0
         if (onlyCurrent & 2)
@@ -9682,6 +9682,19 @@ void tests::graphic_stack_rendering()
     step("Product")
         .test(CLEAR, "2 J 1.2 10.2 K * 'J+4' ∏ *", ENTER)
         .image_noheader("product-xgraph");
+
+    step("Graphics stack rendering settings")
+        .test(CLEAR, "'sqrt(x)' 1/2 3/4", ENTER, EXIT,
+              ID_UserInterfaceModesMenu)
+        .image_noheader("graph-stack-and-result-both")
+        .test(ID_GraphicStackDisplay)
+        .image_noheader("graph-stack-and-result-result-only")
+        .test(ID_GraphicResultDisplay)
+        .image_noheader("graph-stack-and-result-none")
+        .test(ID_GraphicStackDisplay)
+        .image_noheader("graph-stack-and-stack-only")
+        .test(ID_GraphicResultDisplay)
+        .image_noheader("graph-stack-and-result-both");
 }
 
 
