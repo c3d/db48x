@@ -3045,7 +3045,7 @@ procedure.
 'Nested' STO
 
 'X' 'Y' 'Z' 'T' 'U' Nested
-@ Expecting 'Z÷(X·Y+Z+T+U)-Z÷U'
+@ Expecting 'Z÷(X·Y+(Z+T+U))-Z÷U'
 ```
 
 In the following program excerpt, the defining procedure for local variables
@@ -3065,7 +3065,7 @@ global variable `P1`.
 'Nested' STO
 
 'X' 'Y' 'Z' 'T' 'U' 'V' 'W' Nested
-@ Expecting '(a+X)÷(X·Y+(a-b)·c)+U÷(Z·T+U+V+W)-a÷c-U÷W'
+@ Expecting '(a+X)÷(X·Y+(a-b)·c)-a÷c+U÷(Z·T+(U+V+W))-U÷W'
 ```
 
 The six local variables `a`, `b`, `c`, `d`, `e` and `f` are not available in
@@ -17433,7 +17433,7 @@ generated.
 
 ```rpl
 "2+3*ABC" Text→Expression
-@ Expecting '3·ABC+2'
+@ Expecting '2+3·ABC'
 ```
 
 This command is typically used for `Input` validation.
