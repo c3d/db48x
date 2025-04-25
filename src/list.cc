@@ -387,6 +387,7 @@ object::result list::list_parse(id      type,
                 objcount++;
 
                 size_t objsize = obj->size();
+                bool   done    = special && obj->type() == special;
 
                 // For expressions, copy only the payload unless we want it
                 // to be preserved as a symbolic expression
@@ -425,6 +426,8 @@ object::result list::list_parse(id      type,
                     obj = infix;
                     infix = nullptr;
                 }
+                if (done)
+                    special = ID_object;
             } while (obj);
 
             if (iswhere)
