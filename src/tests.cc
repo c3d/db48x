@@ -7916,6 +7916,10 @@ void tests::symbolic_differentiation()
     step("Derivative of unknown form")
         .test(CLEAR, "'IP(X)' 'X'", ID_Derivative)
         .error("Unknown derivative");
+
+    step("Derivative of unknown form in algebraic form")
+        .test(CLEAR, "'∂x(→Num(x))'", ENTER, ID_Run)
+        .error("Unknown derivative");
 }
 
 
@@ -8013,6 +8017,9 @@ void tests::symbolic_integration()
 
     step("Primitive of unknown form")
         .test(CLEAR, "'IP(X)' 'X'", ID_Primitive)
+        .error("Unknown primitive");
+    step("Primitive of unknown form in algebraic form")
+        .test(CLEAR, "'∫x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown primitive");
 }
 
