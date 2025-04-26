@@ -764,6 +764,10 @@ object_p object::at(object_p index) const
         return result;
     }
 
+    if (algebraic_p alg = index->as_extended_algebraic())
+        if (algebraic_p idalg = alg->evaluate())
+            index = idalg;
+
     size_t idx = index->as_uint32(1, true);
     if (!idx)
         rt.index_error();
@@ -802,6 +806,11 @@ object_p object::at(object_p index, object_p value) const
         head = idxlist->head();
         tail = idxlist->tail();
     }
+
+    if (algebraic_p alg = head->as_extended_algebraic())
+        if (algebraic_p idalg = alg->evaluate())
+            head = idalg;
+
     size_t idx = head->as_uint32(1, true);
     if (!idx)
         rt.index_error();

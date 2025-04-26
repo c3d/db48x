@@ -5475,32 +5475,39 @@ void tests::list_functions()
 {
     BEGIN(lists);
 
-    step("Integer index");
-    test(CLEAR, "{ A B C }", ENTER, "2 GET", ENTER)
+    step("Integer index")
+        .test(CLEAR, "{ A B C }", ENTER, "2 GET", ENTER)
         .expect("B");
-    step("Real index");
-    test(CLEAR, "{ A B C }", ENTER, "2.3 GET", ENTER)
+    step("Real index")
+        .test(CLEAR, "{ A B C }", ENTER, "2.3 GET", ENTER)
         .expect("B");
-    step("Bad index type");
-    test(CLEAR, "{ A B C }", ENTER, "\"A\" GET", ENTER)
+    step("Computed index")
+        .test(CLEAR, "{ A B C }", ENTER, "'1.3+1' GET", ENTER)
+        .expect("B");
+    step("Computed index with variable")
+        .test(CLEAR, "{ A B C } 1.3 'Z' STO", ENTER, "'Z+1' GET", ENTER)
+        .expect("B")
+        .test(CLEAR, "'Z' PURGE", ENTER).noerror();
+    step("Bad index type")
+        .test(CLEAR, "{ A B C }", ENTER, "\"A\" GET", ENTER)
         .error("Bad argument type");
-    step("Out-of-range index");
-    test(CLEAR, "{ A B C }", ENTER, "5 GET", ENTER)
+    step("Out-of-range index")
+        .test(CLEAR, "{ A B C }", ENTER, "5 GET", ENTER)
         .error("Index out of range");
-    step("Empty list index");
-    test(CLEAR, "{ A B C }", ENTER, "{} GET", ENTER)
+    step("Empty list index")
+        .test(CLEAR, "{ A B C }", ENTER, "{} GET", ENTER)
         .expect("{ A B C }");
-    step("Single element list index");
-    test(CLEAR, "{ A B C }", ENTER, "{2} GET", ENTER)
+    step("Single element list index")
+        .test(CLEAR, "{ A B C }", ENTER, "{2} GET", ENTER)
         .expect("B");
-    step("List index nested");
-    test(CLEAR, "{ A {D E F} C }", ENTER, "{2 3} GET", ENTER)
+    step("List index nested")
+        .test(CLEAR, "{ A {D E F} C }", ENTER, "{2 3} GET", ENTER)
         .expect("F");
-    step("List index, too many items");
-    test(CLEAR, "{ A B C }", ENTER, "{2 3} GET", ENTER)
+    step("List index, too many items")
+        .test(CLEAR, "{ A B C }", ENTER, "{2 3} GET", ENTER)
         .error("Bad argument type");
-    step("Character from array");
-    test(CLEAR, "\"Hello World\"", ENTER, "2 GET", ENTER)
+    step("Character from array")
+        .test(CLEAR, "\"Hello World\"", ENTER, "2 GET", ENTER)
         .expect("\"e\"");
     step("Deep nesting");
     test(CLEAR, "{ A { D E { 1 2 \"Hello World\" } F } 2 3 }", ENTER,
@@ -5576,6 +5583,11 @@ void tests::list_functions()
         .test(ENTER, "2", F1).expect("22")
         .test("3", MUL).expect("66")
         .test("2", NOSHIFT, M, F2).expect("{ 55 66 33 }");
+    step("Putting in a list with evaluation")
+        .test(CLEAR, "{ 11 22 33 } '3-2' 55 PUT", ENTER).expect("{ 55 22 33 }")
+        .test(ENTER, "2", F1).expect("22")
+        .test("3", MUL).expect("66")
+        .test("'4-2'", NOSHIFT, M, F2).expect("{ 55 66 33 }");
     step("Putting out of range")
         .test(CLEAR, "{ 11 22 33 } 4 55 PUT", ENTER)
         .error("Index out of range");
