@@ -3687,6 +3687,30 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.6 "Peace" - Bug fixes
+
+This release is mostly bug fixes
+
+### Bug fixes
+
+* Evaluate index in `get` and `put` like the HP50G
+* Avoid premature simplification during arithmetic operations
+* Do not wrap variables after `Copy`, e.g. in `'A+A▶A+A'`
+* Return errors for unknown primitives / derivatives in algebraics
+* Correctly use `GraphicReslutDisplay` for result stack level
+* Ensure pi and e display the same size at 60 digits precision
+* Fix bogus exponent truncation in polynomials
+* Fix issue in `+` and `-` on vectors with angles, e.g. `[ 3 2 1.7_° ]`
+* Fix possible garbage collection memory corruption in `FromVector`
+
+### Improvements
+
+* units: Make `BaseUnits`, `→Deg`, `→Rad`, `→Grad` and `→πr`  array-wise
+* Add `VectorMenu` on first page of `MatrixMenu`
+* Do not single-step or debug during plot/integration
+* Add routine to render u64 and i64
+
+
 ## Release 0.9.5.1 "Wait" - Emergency fix for Wait and Refresh
 
 Bug-fix only release for timing of `Wait` command
