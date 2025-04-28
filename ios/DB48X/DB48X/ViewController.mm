@@ -112,6 +112,7 @@ struct tapmap tapMap[] =
 
 extern "C" void program_main();
 
+NSString *theKeymapName = nullptr;
 ViewController *theViewController = nullptr;
 
 enum FileSelectorState
@@ -124,7 +125,6 @@ enum FileSelectorState
     FileSelectorCancelled,
     FileSelectorDidPick
 };
-
 
 
 @implementation ViewController
@@ -153,6 +153,12 @@ enum FileSelectorState
     theViewController = self;
     requests = 0;
     redraws = 0;
+    
+    if (theKeymapName)
+    {
+        [theViewController loadKeymap:[theKeymapName UTF8String]];
+        theKeymapName = nullptr;
+    }
 
 #if 0
     NSError * error;
@@ -806,4 +812,6 @@ void ui_load_keymap(cstring map)
 {
     if (theViewController)
         [theViewController loadKeymap:map];
+    else if (map)
+        theKeymapName = [NSString stringWithUTF8String:map];
 }
