@@ -288,7 +288,6 @@ protected:
     uint     menuDrawn;         // Last time the menu was drawn
     uint     cursorDrawn;       // Last time the cursor was drawn
     uint     customHeaderDrawn; // Last time the custom header was drawn
-    uint     batteryDrawn;      // Last time the battery
     uint     day, month, year;  // Date shown in header
     uint     dow;               // Day of week shown in header
     uint     hour, minute;      // Hour and minute shown

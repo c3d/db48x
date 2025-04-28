@@ -1831,27 +1831,27 @@ COMMAND_BODY(Convert)
 }
 
 
-COMMAND_BODY(UBase)
+FUNCTION_BODY(UBase)
 // ----------------------------------------------------------------------------
 //   Convert level 1 to the base SI units
 // ----------------------------------------------------------------------------
 {
-    object_g obj = rt.stack(0);
-    if (unit_p x = unit::get_after_evaluation(obj))
+    if (!x)
+        return nullptr;
+    if (unit_p u = unit::get_after_evaluation(x))
     {
-        algebraic_g r = x;
+        algebraic_g r = u;
         save<bool> ueval(unit::mode, true);
         r = r->evaluate();
-        if (r && rt.top(r))
-            return OK;
+        return r;
     }
 
     // No-op for numerical values
-    id ty = obj->type();
+    id ty = x->type();
     if (is_real(ty) || is_complex(ty) || ty == ID_symbol)
-        return OK;
+        return x;
 
-    if (expression_p expr = expression::get(obj))
+    if (expression_p expr = expression::get(x))
     {
         scribble scr;
         for (object_p lobj : *expr)
@@ -1864,17 +1864,16 @@ COMMAND_BODY(UBase)
                 lobj = r;
             }
             if (!rt.append(lobj))
-                return ERROR;
+                return nullptr;
 
         }
         list_p list = list::make(object::ID_expression,
                                  scr.scratch(), scr.growth());
-        if (list && rt.top(list))
-            return OK;
+        return list;
     }
     if (!rt.error())
         rt.type_error();
-    return ERROR;
+    return nullptr;
 }
 
 
@@ -2224,12 +2223,11 @@ COMMAND_BODY(ConvertToUnitPrefix)
 }
 
 
-static object::result toAngleUnit(cstring angleUnit)
+static algebraic_p toAngleUnit(algebraic_r x, cstring angleUnit)
 // ----------------------------------------------------------------------------
 //   Convert the value x to the given angle unit
 // ----------------------------------------------------------------------------
 {
-    object_g x = object::strip(rt.top());
     unit_g uobj = unit::get(x);
     if (uobj)
     {
@@ -2249,7 +2247,7 @@ static object::result toAngleUnit(cstring angleUnit)
         if (!amode)
         {
             rt.inconsistent_units_error();
-            return object::ERROR;
+            return nullptr;
         }
     }
     else
@@ -2257,7 +2255,7 @@ static object::result toAngleUnit(cstring angleUnit)
         if (!x->is_real())
         {
             rt.type_error();
-            return object::ERROR;
+            return nullptr;
         }
 
         cstring uname;
@@ -2275,9 +2273,9 @@ static object::result toAngleUnit(cstring angleUnit)
     }
 
     unit_g targetUnit = unit::make(integer::make(1), +symbol::make(angleUnit));
-    if (targetUnit && targetUnit->convert(uobj) && rt.top(uobj))
-        return object::OK;
-    return object::ERROR;
+    if (targetUnit && targetUnit->convert(uobj))
+        return uobj;
+    return nullptr;
 }
 
 
@@ -2292,39 +2290,39 @@ INSERT_BODY(ConvertToUnitPrefix)
 }
 
 
-COMMAND_BODY(ToDegrees)
+FUNCTION_BODY(ToDegrees)
 // ----------------------------------------------------------------------------
 //   Convert to degrees unit
 // ----------------------------------------------------------------------------
 {
-    return toAngleUnit("°");
+    return toAngleUnit(x, "°");
 }
 
 
-COMMAND_BODY(ToRadians)
+FUNCTION_BODY(ToRadians)
 // ----------------------------------------------------------------------------
 //   Convert to radians unit
 // ----------------------------------------------------------------------------
 {
-    return toAngleUnit("r");
+    return toAngleUnit(x, "r");
 }
 
 
-COMMAND_BODY(ToGrads)
+FUNCTION_BODY(ToGrads)
 // ----------------------------------------------------------------------------
 //   Convert to grads unit
 // ----------------------------------------------------------------------------
 {
-    return toAngleUnit("grad");
+    return toAngleUnit(x, "grad");
 }
 
 
-COMMAND_BODY(ToPiRadians)
+FUNCTION_BODY(ToPiRadians)
 // ----------------------------------------------------------------------------
 //   Convert to pi-radians unit
 // ----------------------------------------------------------------------------
 {
-    return toAngleUnit("πr");
+    return toAngleUnit(x, "πr");
 }
 
 

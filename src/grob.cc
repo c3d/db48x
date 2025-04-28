@@ -46,6 +46,8 @@
 //
 // ============================================================================
 
+rect grob::clip = { 0, 0, 1<<30, 1<<30 };
+
 SIZE_BODY(grob)
 // ----------------------------------------------------------------------------
 //   Compute the size of a graphic object
@@ -116,9 +118,18 @@ PARSE_BODY(grob)
     cstring e      = s + p.length;
     bool    grob   = strncasecmp(s, "grob ", 5) == 0;
     bool    bitmap = strncasecmp(s, "bitmap ", 7) == 0;
-    if (!grob && !bitmap)
+    bool    pixmap = strncasecmp(s, "pixmap ", 7) == 0;
+    if (!grob && !bitmap && !pixmap)
         return SKIP;
     s += grob ? 5 : 7;
+
+#ifndef CONFIG_COLOR
+    if (pixmap)
+    {
+        rt.invalid_pixmap_error();
+        return ERROR;
+    }
+#endif // CONFIG_COLOR
 
     pixsize w = strtoul(s, (char **) &s, 10);
     pixsize h = strtoul(s, (char **) &s, 10);
@@ -126,15 +137,21 @@ PARSE_BODY(grob)
     while (s < e && isspace(*s))
         s++;
 
-    grob_g g = grob ? grob::make(w, h) : bitmap::make(w, h);
+    grob_g g = bitmap ? bitmap::make(w, h)
+#ifdef CONFIG_COLOR
+             : pixmap ? pixmap::make(w, h)
+#endif // CONFIG_COLOR
+                      : grob::make(w, h);
+
     if (!g)
         return ERROR;
 
-    size_t len = grob::datasize(grob ? ID_grob : ID_bitmap, w, h);
-    byte   b   = 0;
-    byte * d = (byte *) g->pixels(nullptr, nullptr, nullptr);
-    byte * d0 = d;
-    bool write = true;
+    id     ty    = g->type();
+    size_t len   = grob::datasize(ty, w, h);
+    byte   b     = 0;
+    byte  *d     = (byte *) g->pixels(nullptr, nullptr, nullptr);
+    byte  *d0    = d;
+    bool   write = true;
 
     while (len && s < e)
     {
@@ -204,9 +221,29 @@ GRAPH_BODY(grob)
          return o;
 
      using pixsize  = blitter::size;
-     grob_g  gobj   = o;
      pixsize width = o->width() + 4;
      pixsize height = o->height() + 4;
+#if CONFIG_COLOR
+     if (pixmap_g pix = o->as<pixmap>())
+     {
+         if (!Settings.CompatibleGROBs())
+         {
+             pixmap_g  result = g.pixmap(width, height);
+             if (!result)
+                 return nullptr;
+             pixmap::surface dst    = result->pixels();
+             pixmap::surface src    = pix->pixels();
+             rect            inside = dst.area();
+             inside.inset(2, 2);
+             dst.fill(pixmap::surface::pattern::gray50);
+             dst.fill(inside, g.background.bits);
+             dst.copy(src, inside);
+             return result;
+         }
+     }
+#endif // CONFIG_COLOR
+
+     grob_g  gobj   = o;
      grob_g  result = g.grob(width, height);
      if (!result)
          return nullptr;
@@ -219,7 +256,7 @@ GRAPH_BODY(grob)
      dst.copy(src, inside);
 
      return result;
- }
+}
 
 
 
@@ -244,16 +281,38 @@ object::result grob::command(grob::blitop op)
 
         if (!rt.error())
         {
+            id   srcty = src->type();
+            id   dstty = dst->type();
             bool drawn = false;
             rect drect;
-            if (grob_p sg = src->as<grob>())
+            if (srcty == ID_grob || srcty == ID_bitmap)
             {
+                grob_p sg = grob_p(src);
                 grob::surface srcs = sg->pixels();
                 point p(0,0);
                 drect = srcs.area();
                 drect.offset(x,y);
-                if (grob_p dg = dst->as<grob>())
+                if (dstty == ID_Pict)
                 {
+                    if (grob_p pict = user_display())
+                    {
+                        dst = pict;
+                        dstty = pict->type();
+                        rt.drop();
+                    }
+                    else
+                    {
+                        ui.draw_graphics();
+                        rt.drop(3);
+                        blitter::blit<blitter::CLIP_ALL>(Screen, srcs,
+                                                         drect, p,
+                                                         op, pattern::white);
+                        drawn = true;
+                    }
+                }
+                if (dstty == ID_grob || dstty == ID_bitmap)
+                {
+                    grob_p dg = grob_p(dst);
                     grob::surface dsts = dg->pixels();
                     rt.drop(2);
                     blitter::blit<blitter::CLIP_ALL>(dsts, srcs,
@@ -261,44 +320,57 @@ object::result grob::command(grob::blitop op)
                                                      op, pattern::white);
                     drawn = true;
                 }
-                else if (dst->type() == ID_Pict)
+#if CONFIG_COLOR
+                else if (dstty == ID_pixmap)
                 {
-                    ::surface disp = display();
-                    ui.draw_graphics();
-                    rt.drop(3);
-                    blitter::blit<blitter::CLIP_ALL>(disp, srcs,
-                                                     drect, p,
-                                                     op, pattern::white);
-                    drawn = true;
-
-                }
-            }
-            else if (pixmap_p sg = src->as<pixmap>())
-            {
-                ::surface srcs = sg->pixels();
-                point p(0,0);
-                drect = srcs.area();
-                drect.offset(x,y);
-                if (pixmap_p dg = dst->as<pixmap>())
-                {
-                    ::surface dsts = dg->pixels();
+                    pixmap_p dg = pixmap_p(dst);
+                    pixmap::surface dsts = dg->pixels();
                     rt.drop(2);
                     blitter::blit<blitter::CLIP_ALL>(dsts, srcs,
                                                      drect, p,
                                                      op, pattern::white);
                     drawn = true;
                 }
-                else if (dst->type() == ID_Pict)
+#endif // CONFIG_COLOR
+            }
+#if CONFIG_COLOR
+            else if (srcty == ID_pixmap)
+            {
+                pixmap_p sg = src->as<pixmap>();
+                pixmap::surface srcs = sg->pixels();
+                point p(0,0);
+                drect = srcs.area();
+                drect.offset(x,y);
+                if (dstty == ID_Pict)
                 {
-                    ::surface disp = display();
-                    ui.draw_graphics();
-                    rt.drop(3);
-                    blitter::blit<blitter::CLIP_ALL>(disp, srcs,
+                    if (grob_p pict = user_display())
+                    {
+                        dst = pict;
+                        dstty = pict->type();
+                        rt.drop();
+                    }
+                    else
+                    {
+                        ui.draw_graphics();
+                        rt.drop(3);
+                        blitter::blit<blitter::CLIP_ALL>(Screen, srcs,
+                                                         drect, p,
+                                                         op, pattern::white);
+                        drawn = true;
+                    }
+                }
+                if (dstty == ID_pixmap)
+                {
+                    pixmap_p dg = pixmap_p(dst);
+                    pixmap::surface dsts = dg->pixels();
+                    rt.drop(2);
+                    blitter::blit<blitter::CLIP_ALL>(dsts, srcs,
                                                      drect, p,
                                                      op, pattern::white);
                     drawn = true;
                 }
             }
+#endif // CONFIG_COLOR
             if (drawn)
             {
                 ui.draw_dirty(drect);
@@ -319,7 +391,7 @@ object::result grob::command(grob::grob1_fn gfn)
 {
     if (object_p x = rt.top())
     {
-        grob_g gx = x->as<grob>();
+        grob_g gx = x->as_monochrome();
         if (gx)
         {
             gx = gfn(gx);
@@ -345,8 +417,8 @@ object::result grob::command(grob::grob2_fn gfn)
     {
         if (object_p y = rt.stack(1))
         {
-            grob_g gx = x->as<grob>();
-            grob_g gy = y->as<grob>();
+            grob_g gx = x->as_monochrome();
+            grob_g gy = y->as_monochrome();
             if (gx && gy)
             {
                 gx = gfn(gy, gx);
@@ -415,22 +487,40 @@ grob_p grob::extract(coord x1, coord y1, coord x2, coord y2) const
 //   Extract the given region
 // ----------------------------------------------------------------------------
 {
-    grob::surface src  = pixels();
+    id ty = type();
     if (x1 < 0)
         x1 = 0;
     if (y1 < 0)
         y1 = 0;
-    pixsize w = src.width();
-    pixsize h = src.height();
+    pixsize w = width();
+    pixsize h = height();
     if (pixsize(x2) > w)
         x2 = w;
     if (pixsize(y2) > h)
         y2 = h;
     w = x2 - x1;
     h = y2 - y1;
-    grob_p result = grob::make(w, h);
+
+    grob_g g = this;
+
+#if CONFIG_COLOR
+    if (ty == ID_pixmap)
+    {
+        pixmap_g result = pixmap::make(w, h);
+        if (result)
+        {
+            pixmap_p pix = pixmap_p(+g); // May have moved away from this if GC
+            pixmap::surface src = pix->pixels();
+            pixmap::surface dst = result->pixels();
+            dst.copy(src, -x1, -y1);
+        }
+        return result;
+    }
+#endif
+    grob_p result = ty == ID_bitmap ? bitmap::make(w, h) : grob::make(w, h);
     if (result)
     {
+        grob::surface src = g->pixels();
         grob::surface dst = result->pixels();
         dst.copy(src, -x1, -y1);
     }
@@ -453,7 +543,7 @@ SIZE_BODY(bitmap)
     byte_p  p = o->payload();
     pixsize w = leb128<pixsize>(p);
     pixsize h = leb128<pixsize>(p);
-    p += (w  * h + 7) / 8;
+    p += (w * h + 7) / 8;
     return ptrdiff(p, o);
 }
 
@@ -484,167 +574,49 @@ RENDER_BODY(bitmap)
 
 
 
+#ifdef CONFIG_COLOR
 // ============================================================================
 //
-//   Pixmap: Pixel map: graphical object matching the screen (e.g 16BPP)
+//   Pixmap: Pixel map: 16BPP color pixel map
 //
 // ============================================================================
 
 SIZE_BODY(pixmap)
 // ----------------------------------------------------------------------------
-//   Compute the size of a pixmap
+//   Compute the size of a packed pixmap
 // ----------------------------------------------------------------------------
 {
-    byte_p  p   = o->payload();
-    pixsize w   = leb128<pixsize>(p);
-    pixsize h   = leb128<pixsize>(p);
-    uint    bpp = leb128<pixsize>(p);
-    p += (w * h * bpp + 7) / 8;
+    byte_p  p = o->payload();
+    pixsize w = leb128<pixsize>(p);
+    pixsize h = leb128<pixsize>(p);
+    p += (w * h * 16 + 7) / 8;
     return ptrdiff(p, o);
-}
-
-
-PARSE_BODY(pixmap)
-// ----------------------------------------------------------------------------
-//  Parse a bitmap
-// ----------------------------------------------------------------------------
-{
-    utf8    src    = p.source;
-    cstring s      = cstring(src);
-    cstring e      = s + p.length;
-    bool    pixmap = strncasecmp(s, "pixmap ", 7) == 0;
-    if (!pixmap)
-        return SKIP;
-    s += 7;
-
-    pixsize w   = strtoul(s, (char **) &s, 10);
-    pixsize h   = strtoul(s, (char **) &s, 10);
-    pixsize bpp = strtoul(s, (char **) &s, 10);
-
-    while (s < e && isspace(*s))
-        s++;
-
-    pixmap_g g = pixmap::make(w, h, bpp);
-    if (!g)
-        return ERROR;
-
-    size_t len = pixmap::datasize(ID_pixmap, w, h, bpp);
-    byte   b   = 0;
-    byte  *d     = (byte *) g->pixels(nullptr, nullptr, nullptr);
-    bool   write = true;
-
-    while (len && s < e)
-    {
-        byte c = hex(*s++);
-        if (c == 0xFF)
-            break;
-        b = (b << 4) | c;
-        write = !write;
-        if (write)
-        {
-            *d++ = b;
-            b = 0;
-            len--;
-        }
-    }
-
-    p.length = s - cstring(src);
-    p.out    = +g;
-
-    return OK;
 }
 
 
 RENDER_BODY(pixmap)
 // ----------------------------------------------------------------------------
-//  Render the pixmap
+//  Render the graphic object
 // ----------------------------------------------------------------------------
 {
-    pixsize w    = 0;
-    pixsize h    = 0;
-    uint    bpp  = 0;
-    byte_p  data = o->pixels(&w, &h, &bpp);
+    pixsize w = 0;
+    pixsize h = 0;
+    byte_p data = o->pixels(&w, &h);
     if (r.stack())
     {
-        r.printf("Pixmap %u x %u with %u bpp", w, h, bpp);
+        r.printf("Pixmap %u x %u", w, h);
     }
     else
     {
         r.put(Settings.CommandDisplayMode(), utf8("pixmap"));
-        r.printf(" %u %u %u ", w, h, bpp);
+        r.printf(" %u %u ", w, h);
 
-        size_t len = (w * h * bpp + 7) / 8;
+        size_t len = (w * h * 16 + 7) / 8;
         while(len--)
             r.printf("%02X", *data++);
     }
     return r.size();
 }
-
-
-GRAPH_BODY(pixmap)
-// ----------------------------------------------------------------------------
-//   A pixmap cannot render as a black and white GROB
-// ----------------------------------------------------------------------------
-{
-    return nullptr;
-}
-
-
-
-// ============================================================================
-//
-//   Extracting a sub-image
-//
-// ============================================================================
-
-pixmap_p pixmap::extract(object_r first, object_r last) const
-// ----------------------------------------------------------------------------
-//   Extract a rectangle from a pixmap
-// ----------------------------------------------------------------------------
-{
-    PlotParametersAccess ppar;
-    coord xf = ppar.pair_pixel_x(first);
-    coord yf = ppar.pair_pixel_y(first);
-    coord xl = ppar.pair_pixel_x(last);
-    coord yl = ppar.pair_pixel_y(last);
-    if (rt.error())
-        return nullptr;
-    return extract(xf, yf, xl, yl);
-}
-
-
-pixmap_p pixmap::extract(coord x1, coord y1, coord x2, coord y2) const
-// ----------------------------------------------------------------------------
-//   Extract the given region from a pixmap
-// ----------------------------------------------------------------------------
-{
-    // The blitter is only compiled for current screen depth
-    uint bpp = depth();
-    if (bpp != BITS_PER_PIXEL)
-        return nullptr;
-
-    surface src  = pixels();
-    if (x1 < 0)
-        x1 = 0;
-    if (y1 < 0)
-        y1 = 0;
-    pixsize w   = src.width();
-    pixsize h   = src.height();
-    if (pixsize(x2) > w)
-        x2 = w;
-    if (pixsize(y2) > h)
-        y2 = h;
-    w = x2 - x1;
-    h = y2 - y1;
-    pixmap_p result = pixmap::make(w, h, bpp);
-    if (result)
-    {
-        surface dst = result->pixels();
-        dst.copy(src, -x1, -y1);
-    }
-    return result;
-}
-
 
 
 // ============================================================================
@@ -653,7 +625,6 @@ pixmap_p pixmap::extract(coord x1, coord y1, coord x2, coord y2) const
 //
 // ============================================================================
 
-#ifdef CONFIG_COLOR
 // Pre-built grob::patterns for shades of grey
 const grob::pattern grob::pattern::black   = grob::pattern(0, 0, 0);
 const grob::pattern grob::pattern::gray10  = grob::pattern(32, 32, 32);

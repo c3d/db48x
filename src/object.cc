@@ -352,10 +352,8 @@ retry:
                     break;
                 case 'g':
                 case 'b':
-                    r = grob::do_parse(p);
-                    break;
                 case 'p':
-                    r = pixmap::do_parse(p);
+                    r = grob::do_parse(p);
                     break;
                 default:
                     break;
@@ -766,6 +764,10 @@ object_p object::at(object_p index) const
         return result;
     }
 
+    if (algebraic_p alg = index->as_extended_algebraic())
+        if (algebraic_p idalg = alg->evaluate())
+            index = idalg;
+
     size_t idx = index->as_uint32(1, true);
     if (!idx)
         rt.index_error();
@@ -804,6 +806,11 @@ object_p object::at(object_p index, object_p value) const
         head = idxlist->head();
         tail = idxlist->tail();
     }
+
+    if (algebraic_p alg = head->as_extended_algebraic())
+        if (algebraic_p idalg = alg->evaluate())
+            head = idalg;
+
     size_t idx = head->as_uint32(1, true);
     if (!idx)
         rt.index_error();
@@ -1120,7 +1127,7 @@ GRAPH_BODY(object)
             rw += cw;
             if (sp)
             {
-                ww = 0;
+                ww = cw;
                 word = nullptr;
             }
             else

@@ -812,12 +812,13 @@ cstring menu_item_description(uint8_t menu_id, char *s, const int UNUSED len)
 }
 
 
-void power_off()
+void power_off(bool offimg)
 // ----------------------------------------------------------------------------
 //   Power off the calculator
 // ----------------------------------------------------------------------------
 {
     SET_ST(STAT_PGM_END);
+    power_check(false, offimg);
 }
 
 
@@ -826,6 +827,8 @@ void system_setup()
 //   Invoke the system setup
 // ----------------------------------------------------------------------------
 {
+    sys_timer_disable(TIMER0);
+    sys_timer_disable(TIMER1);
     SET_ST(STAT_MENU);
     int ret = handle_menu(&application_menu, MENU_RESET, 0);
     CLR_ST(STAT_MENU);

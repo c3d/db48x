@@ -744,7 +744,7 @@ https://github.com/c3d/db48x.
 
 ### Authors
 
-This software is (C) 2022-2023 Christophe de Dinechin and the DB48X team.
+This software is (C) 2022-2025 Christophe de Dinechin and the DB48X team.
 
 Additional contributors to the project include:
 
@@ -3037,7 +3037,7 @@ procedure.
 'Nested' STO
 
 'X' 'Y' 'Z' 'T' 'U' Nested
-@ Expecting 'Z÷(X·Y+Z+T+U)-Z÷U'
+@ Expecting 'Z÷(X·Y+(Z+T+U))-Z÷U'
 ```
 
 In the following program excerpt, the defining procedure for local variables
@@ -3057,7 +3057,7 @@ global variable `P1`.
 'Nested' STO
 
 'X' 'Y' 'Z' 'T' 'U' 'V' 'W' Nested
-@ Expecting '(a+X)÷(X·Y+(a-b)·c)+U÷(Z·T+U+V+W)-a÷c-U÷W'
+@ Expecting '(a+X)÷(X·Y+(a-b)·c)-a÷c+U÷(Z·T+(U+V+W))-U÷W'
 ```
 
 The six local variables `a`, `b`, `c`, `d`, `e` and `f` are not available in
@@ -3678,6 +3678,103 @@ third argument:
 To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.6 "Peace" - Bug fixes
+
+This release is mostly bug fixes
+
+### Bug fixes
+
+* Evaluate index in `get` and `put` like the HP50G
+* Avoid premature simplification during arithmetic operations
+* Do not wrap variables after `Copy`, e.g. in `'A+A▶A+A'`
+* Return errors for unknown primitives / derivatives in algebraics
+* Correctly use `GraphicReslutDisplay` for result stack level
+* Ensure pi and e display the same size at 60 digits precision
+* Fix bogus exponent truncation in polynomials
+* Fix issue in `+` and `-` on vectors with angles, e.g. `[ 3 2 1.7_° ]`
+* Fix possible garbage collection memory corruption in `FromVector`
+
+### Improvements
+
+* units: Make `BaseUnits`, `→Deg`, `→Rad`, `→Grad` and `→πr`  array-wise
+* Add `VectorMenu` on first page of `MatrixMenu`
+* Do not single-step or debug during plot/integration
+* Add routine to render u64 and i64
+
+
+## Release 0.9.5.1 "Wait" - Emergency fix for Wait and Refresh
+
+Bug-fix only release for timing of `Wait` command
+
+## Bug fix
+
+The changes that improve battery life in 0.9.5 had an impact on commands that
+need absolute time, because the internal timer of the DM32/DM42 switches of when
+in deep sleep. As a result, `Wait` with durations longer than 1 second would
+wait much longer than expected, and long-duration `Refresh` settings
+e.g. `BatteryRefresh` would also wait longer than expected. Replace the use of
+the internal timer with a synthetic timer based on the real-time clock.
+
+## Release 0.9.5 "Everlasting" - Power management, offline graphics
+
+This release brings two major new features: vastly reduced power drain, and
+off-line persistent graphics.
+
+### New features
+
+* Off-line graphics are the ability to draw images in memory instead of directly
+  on screen. Like on HP calculators, this works by storing a graphic object in
+  `PICT`. Unlike HP calculators, `PICT` is an actual variable in the current
+  directory, meaning that you can have multiple `PICT`, although bitmaps use a
+  lot of memory. For example, running `500 300 BLANK 'PICT' STO` will create a
+  500x300 pixels off-line image in `PICT`, and all graphic commands after that
+  will draw in that off-line image instead of on screen. Off-line graphics are
+  not immediately shown on screen, but are displayed before returning to the
+  command line in a way similar to the `Show` command (i.e. centererd if smaller
+  than the screen, and with scrolling if larger). They are also persistent,
+  meaning that you need to explicitly `ClLCD` to erase them.
+* Add `Blank`, `BlankGrob`, `BlankBitmap` and `BlankPixmap` commands to create a
+  blank image with default format, in HP GROB format, in DB48x bitmap (Black and
+  white) format and in DB50x pixmap format (color RPL only).
+* Add `→HPGrob`, `→Bitmap`, `→Pixmap` commands which can be used to generate an
+  HP-compatible GROB format, a bitmap or a pixmap (color RPL only) from an
+  object. If the object is already a graphic, perform conversion. Note that
+  on color RPL, conversions between color and monochrome formats are supported.
+  Colors are converted to monochrome using grayscale patterns.
+* Add `→LCD` and `LCD→` commands to send an object to the current graphics, or
+  to create a graphic object from the current screen content.
+* The `Off` command can now be used in a program and will preserve what is on
+  screen. You can resume execution of the program by using the `ON` key.
+  Add `PowerOffWithImage` command to show off-images even from programs.
+
+### Bug fixes
+
+* Fix display of object `Info` in the interactive stack
+* Clear system timers before entering system menu, so that the self test menu
+  entry does not run a fast-paced loop.
+* Fix off-by-one error in result of `LastBitSet` (number bits starting at 0)
+* Correctly render color pixmaps when on the stack (color RPL only)
+
+### Improvements
+
+* Reduce power usage dramatically by disabling timers when going to sleep.
+  This manifests as a higher battery voltage being shown, which is closer to
+  what the DM42 firmware or integrated self-test would show. This will most
+  likely improve battery life for interactive uses of DB48x.
+* Reorganize the `MemoryMenu` to make both GC and runtime statistics available
+* Reorganize the `GraphicsMenu` by topics to accomodate the new commands
+* Add image checks in the test infrastructure for RPL code examples
+* Add tests for RGB colors
+* Repair `make compare` which was trying to build a binary from `compare.cc`
+* Make `Sub` a compatibility spelling for `Extract`, not the default one
+* Adjust low battery indications to avoid premature warnings
+* Make `debug_printf` use lower-level routines that can run earlier after boot
+* Add `make INSTALL_PGM_ONLY=y install` option for faster install
+* Generate DB48x bitmaps by default instead of HP-compatible GROBs. Bitmaps use
+  less memory when the width is not a multiple of 8.
+* Make test of pixel functions more reliable by increasing their timeout
+* Add help for `ModesMenu`, `SymbolicResults` and `NumericalResults`
 
 ## Release 0.9.4 "Face, meet palms" - Pixmaps, bug fixes
 
@@ -13237,6 +13334,31 @@ contain a based number.
 Clear the LCD display, and block updates of the header or menu areas.
 
 
+## FromLCD
+
+Return the content of the screen as a graphic object that is put on the stack.
+
+For example, to extract the area of the screen that contains the battery
+indicator and voltage, use the following code:
+
+```rpl
+LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
+@ Image extracted-battery
+```
+
+## ToLCD
+
+Display a graphic object on the screen. If the graphic object is smaller than
+the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it shown in the top-left.
+
+For example, to draw an expression in the center of the screen, use:
+
+```rpl
+'X+(1/sqrt(X-1))' 3 →GROB →LCD
+@ Image small-equation
+```
+
+
 ## DrawText
 
 Draw the text or object in level 2 at the position indicated by level 1. A text
@@ -13283,6 +13405,7 @@ erasing the background (the first `true`), in reverse colors (the second
 ```rpl
 "Hello" { #0 #0 3 true true } DrawText
 "World" { 10#400 10#240 3 true true -1 -1 } DrawText
+@ Image hello-world
 ```
 
 ## DrawStyledText
@@ -13316,6 +13439,11 @@ horizonal or vertical scrolling.
 The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
 [MaximumShowHeight](#maximumshowheight) settings.
+
+```rpl
+1.0 3 / Show
+@ Image many-decimals
+```
 
 ## DrawLine
 
@@ -13381,7 +13509,62 @@ The object to draw must fit in a bit map at most `MaxW`-pixels wide and
 0 7 for fontID
   "Font " fontID + fontID →Grob
 next
+@ Image fontsizes
 ```
+
+## ToHPGrob
+
+Turn an object into a graphic object in HP compatible format (GROB).
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+"Hello" →HPGrob
+```
+
+## ToBitmap
+
+Turn an object into a graphic object in DB48x `PackedBitmaps` format.
+When the input is a graphic object, its graphic format is adjusted.
+If the input is a color graphic, it is dithered into black and white.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Bitmap
+@ Image sqrt
+```
+
+## ToPixmap
+
+(This command is only available for color RPL)
+
+Turn an object into a color graphic object in DB50x format.
+When the input is a graphic object, its graphic format is adjusted.
+
+Otherwise, the object is turned into a graphic object, where the font size and
+color settings are taken from the `ResultFont`, `Foreground` and `Background`
+settings. If the object is text, then the quotes are now shown in the resulting
+graphic object.
+
+```rpl
+'sqrt(2*x)/y' →Pixmap
+@ Image sqrt
+```
+
+
+## Blank
+
+Create a bla
+
 
 ## GXor
 
@@ -13464,6 +13647,7 @@ The two graphic objects are vertically centered with respect to one another.
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicAppend
+@ Image check
 ```
 
 
@@ -13477,6 +13661,7 @@ The two graphic objects are horizontally centered with respect to one another.
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicStack
+@ Image check
 ```
 
 ## GraphicSubscript
@@ -13488,6 +13673,7 @@ Combine two graphic objects with the second one in subscript position
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicSubscript
+@ Image check
 ```
 
 ## GraphicExponent
@@ -13499,6 +13685,7 @@ Combine two graphic objects with the second one in exponent position
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicExponent
+@ Image check
 ```
 
 ## GraphicRatio
@@ -13510,6 +13697,7 @@ Combine two graphic objects as if they were in a fraction
 "ABC" 4 →Grob
 "DEF" 2 →Grob
 GraphicRatio
+@ Image check
 ```
 
 ## GraphicRoot
@@ -13520,6 +13708,7 @@ Generate a square root sign around a graphical object
 @ Square root sign
 "ABC" 4 →Grob
 GraphicRoot
+@ Image check
 ```
 
 ## GraphicParentheses
@@ -13530,6 +13719,7 @@ Generate parentheses around a graphical object
 @ Parentheses around graphic
 "ABC" 4 →Grob
 GraphicParentheses
+@ Image check
 ```
 
 ## GraphicNorm
@@ -13540,6 +13730,7 @@ Generate a norm (vertical bars) around a graphical object
 @ Norm around graphic
 "ABC" 4 →Grob
 GraphicNorm
+@ Image check
 ```
 
 
@@ -13550,6 +13741,7 @@ Generate a sum (capital Sigma) sign of the given size
 ```rpl
 @ 128-pixel Sigma sign
 128 GraphicSum
+@ Image check
 ```
 
 ## GraphicProduct
@@ -13559,6 +13751,7 @@ Generate a product (capital Pi) sign of the given size
 ```rpl
 @ 96-pixel Sigma sign
 96 GraphicProduct
+@ Image check
 ```
 
 ## GraphicIntegral
@@ -13568,6 +13761,7 @@ Generate an integral sign of the given size
 ```rpl
 @ 45-pixel Sigma sign
 45 GraphicIntegral
+@ Image check
 ```
 
 
@@ -15021,6 +15215,14 @@ The current preferences can be retrieved and saved using the `Modes` command.
 
 Returns a program that will restore the current settings. This program can be saved into a variable to quickly restore a carefully crafted set of preferences. Note that the calculator automatically restores the mode when it [loads a state](#States).
 
+## ModesMenu
+
+The `ModesMenu` controls the primary modes of the calculator.
+
+It includes commands to select [trigonometric angle units](#angle-settings), as
+well as submenus for mathematical (`MathModesMenu`), user interface
+(`UIModesMenu`) or display separators (`SeparatorModesMenu`) preferences .
+
 # Display settings
 
 The display mode controls how DB48X displays numbers. Regardless of the display
@@ -15366,7 +15568,12 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MathModesMenu
 
+The `MathModesMenu` controls settings related to mathematical computations.
+
+* `SymbolicResults`
+* `AutoSimplify`
 
 
 # Base settings
@@ -15675,6 +15882,19 @@ The `Type` command returns values as close to possible to the values documented
 on page 3-262 of the HP50G advanced reference manual. This is the opposite of
 [NativeTypes](#nativetypes).
 
+## CompatibleGROBs
+
+When this flag is set, graphic operations will generate HP48 compatible GROB
+objects. Note that HP-compatible objects take slightly more memory. This is the
+opposite of `PackedBitmaps`.
+
+## PackedBitmaps
+
+When this flag is set, graphic operations will generate DB48x graphic objects,
+which are slightly denser and more efficient than HP graphic objects, notably
+when the width is not a multiple of 8. For example, if you render the number 32
+in HP format, it takes 328 bytes, vs. only 281 bytes in DB48x format.  This is
+the opposite of `CompatibleGROBs`.
 
 ## NumberedVariables
 
@@ -16568,6 +16788,19 @@ or `X*1-B*0` will no longer be simplified during evaluation.
 The opposite setting is [AutoSimplify](#autosimplify)
 
 
+## SymbolicResults
+
+Enable the generation of symbolic results, as opposed to `NumericalResults`.
+For example, `2 3 /` gives exact result `2/3` as a result with
+`SymbolicResults`, as opposed to a numerical approximation like `0.66667`.
+
+## NumericalResults
+
+Enable the generation of symbolic results, as opposed to `SymbolicResults`.  For
+example, `2 3 /` gives the numerical approximation `0.66667` when this flag is
+set, as opposed to exact result `2/3`.
+
+
 ## FinalAlgebraResults
 
 Evaluate algebraic rules on symbolic expressions repeatedly until no futher change results from applying them.
@@ -17208,7 +17441,7 @@ generated.
 
 ```rpl
 "2+3*ABC" Text→Expression
-@ Expecting '3·ABC+2'
+@ Expecting '2+3·ABC'
 ```
 
 This command is typically used for `Input` validation.

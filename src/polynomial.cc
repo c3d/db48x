@@ -36,6 +36,7 @@
 #include "leb128.h"
 #include "parser.h"
 #include "variables.h"
+#include "util.h"
 
 
 polynomial_p polynomial::make(algebraic_p value)
@@ -1234,7 +1235,9 @@ RENDER_BODY(polynomial)
                 if (exponent > 1)
                 {
                     r.put(unicode(L'↑'));
-                    r.printf("%llu", exponent);
+                    char exptxt[24];
+                    char *end = render_u64(exptxt, exponent);
+                    r.put(exptxt, end - exptxt);
                 }
             }
         }
@@ -1296,7 +1299,8 @@ GRAPH_BODY(polynomial)
                 if (exponent > 1)
                 {
                     char exptxt[24];
-                    snprintf(exptxt, sizeof(exptxt), "%llu", exponent);
+                    char *end = render_u64(exptxt, exponent);
+                    *end = 0;
                     termg = suscript(g, vt, termg, 0, exptxt);
                     if (!termg)
                         return nullptr;
@@ -1479,7 +1483,7 @@ ularge polynomial::iterator::exponent()
 // ----------------------------------------------------------------------------
 {
     byte_p p = byte_p(poly) + offset;
-    uint exp = leb128<ularge>(p);
+    ularge exp = leb128<ularge>(p);
     offset = p - byte_p(poly);
     return exp;
 }

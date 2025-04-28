@@ -34,6 +34,7 @@
 
 #include "menu.h"
 
+#include "object.h"
 #include "settings.h"
 #include "unit.h"
 #include "user_interface.h"
@@ -554,8 +555,8 @@ MENU(MatrixMenu,
      "RowNrm",  ID_RowNorm,
      "ColNrm",  ID_ColumnNorm,
      "CondNum", ID_Unimplemented,
-     "SpecRad", ID_Unimplemented,
      "Size",    ID_Size,
+     "Vector",  ID_VectorMenu,
 
      "Col+",    ID_AddColumn,
      "Col-",    ID_DeleteColumn,
@@ -573,7 +574,7 @@ MENU(MatrixMenu,
      "SVL",     ID_Unimplemented,
      "Diag→",   ID_Unimplemented,
      "→Diag",   ID_Unimplemented,
-     "Vector",  ID_VectorMenu,
+     "SpecRad", ID_Unimplemented,
 
      "Row+",    ID_AddRow,
      "Row-",    ID_DeleteRow,
@@ -896,8 +897,9 @@ MENU(ProgramMenu,
      "Cmp",     ID_CompareMenu,
      "Loop",    ID_LoopsMenu,
      "Base",    ID_BasesMenu,
-     "Stack",   ID_StackMenu,
+     "Eval",    ID_Eval,
 
+     "Stack",   ID_StackMenu,
      "Debug",   ID_DebugMenu,
      "Objects", ID_ObjectMenu,
      "List",    ID_ListMenu,
@@ -1588,52 +1590,83 @@ MENU(GraphicsMenu,
 // ----------------------------------------------------------------------------
 //   Graphics operations
 // ----------------------------------------------------------------------------
-     "Line",    ID_Line,
+     "Line",    ID_Line,        // Pixel graphics
      "Rect",    ID_Rect,
-     "Rounded", ID_RRect,
+     "RndRect", ID_RRect,
      "Ellipse", ID_Ellipse,
      "Circle",  ID_Circle,
 
-     "→Grob",   ID_ToGrob,
-     "GOr",     ID_GOr,
-     "GXor",    ID_GXor,
-     "GAnd",    ID_GAnd,
-     "Extract", ID_Extract,
-
      "RGB",     ID_RGB,
-     "LnWidth", ID_LineWidth,
-     "Pict",    ID_Pict,
-     "Clip",    ID_Clip,
-     "Current", ID_CurrentClip,
-
      "Gray",    ID_Gray,
      "Foregnd", ID_Foreground,
      "Bckgnd",  ID_Background,
-     "Disp",    ID_Disp,
-     "ClLCD",   ID_ClLCD,
+     "LnWidth", ID_LineWidth,
 
-     "Show",    ID_Show,
      "PixOn",   ID_PixOn,
      "PixOff",  ID_PixOff,
      "Pix?",    ID_PixTest,
      "PixCol?", ID_PixColor,
+     "Arc",     ID_Unimplemented,
 
+     "ClLCD",   ID_ClLCD,       // Display / UI
+     "Disp",    ID_Disp,
      "DispXY",  ID_DispXY,
-     "Append",  ID_GraphicAppend,
-     "Stack",   ID_GraphicStack,
-     "Sub",     ID_GraphicSubscript,
-     "Sup",     ID_GraphicExponent,
+     "Input",   ID_Input,
+     "Prompt",  ID_Prompt,
 
-     "Ratio",   ID_GraphicRatio,
-     "Root",    ID_GraphicRoot,
-     "Paren",   ID_GraphicParentheses,
-     "Norm",    ID_GraphicNorm,
      "Freeze",  ID_Freeze,
+     "Show",    ID_Show,
+     "→Grob",   ID_ToGrob,
+     MaximumShowWidth::label, ID_MaximumShowWidth,
+     MaximumShowHeight::label, ID_MaximumShowHeight,
 
-     "Sum",     ID_GraphicSum,
-     "Product", ID_GraphicProduct,
-     "Integral",ID_GraphicIntegral,
-     "Plot",    ID_PlotMenu);
+     "→LCD",    ID_ToLCD,
+     "LCD→",    ID_FromLCD,
+     "Pict",    ID_Pict,
+     "Clip",    ID_Clip,
+     "CurClip", ID_CurrentClip,
+
+     "GOr",     ID_GOr,         // Bitmap / pixmap operations
+     "GXor",    ID_GXor,
+     "GAnd",    ID_GAnd,
+     "Extract", ID_Extract,
+     "Append",  ID_GraphicAppend,
+
+     "(.)",     ID_GraphicParentheses,
+     "|.|",     ID_GraphicNorm,
+     "÷",       ID_GraphicRatio,
+     "√.",      ID_GraphicRoot,
+     "Stack",   ID_GraphicStack,
+
+     "Σ",       ID_GraphicSum,
+     "∏",       ID_GraphicProduct,
+     "∫",       ID_GraphicIntegral,
+     "Subscript", ID_GraphicSubscript,
+     "Exponent", ID_GraphicExponent,
+
+     "LCD→",    ID_FromLCD,     // Bitmap / pixmap conversions
+     "→LCD",    ID_ToLCD,
+     "→Bitmap", ID_ToBitmap,
+     "→HPGrob", ID_ToHPGrob,
+#ifdef CONFIG_COLOR
+     "→Pixmap", ID_ToBitmap,
+#else
+     "→Pixmap", ID_Unimplemented,
+#endif // CONFIG_COLOR
+
+     "→Grob",   ID_ToGrob,
+     "Blank",   ID_BlankGraphic,
+     "BlBitmap",ID_BlankBitmap,
+     "BlGrob",  ID_BlankGrob,
+#ifdef CONFIG_COLOR
+     "BlPixmap",ID_BlankBitmap,
+#else
+     "BlPixmap", ID_Unimplemented,
+#endif // CONFIG_COLOR
+
+     "Pict",    ID_Pict,
+     "Plot",	ID_PlotMenu
+);
 
 
 MENU(MemoryMenu,
@@ -1646,17 +1679,17 @@ MENU(MemoryMenu,
      "CrDir",   ID_CrDir,
      "UpDir",   ID_UpDir,
 
+     "Avail",   ID_Mem,
+     "Vars",    ID_Vars,
      "Home",    ID_Home,
      "Path",    ID_Path,
-     "Current", ID_CurrentDirectory,
      "GC",      ID_GarbageCollect,
-     "Avail",   ID_Mem,
 
      "Free",    ID_FreeMemory,
-     "System",  ID_SystemMemory,
+     "TVars",   ID_TVars,
      "PgAll",   ID_PurgeAll,
-     "GCStats", ID_RuntimeStatistics,
-     "Clone",   ID_Clone,
+     "RunStats",ID_RuntimeStatistics,
+     "GCStats", ID_GarbageCollectorStatistics,
 
      "Store",   ID_Sto,
      "Store+",  ID_StoreAdd,
@@ -1671,10 +1704,20 @@ MENU(MemoryMenu,
      "Recall÷", ID_RecallDiv,
 
      "▶",       ID_Copy,
+     "Clone",   ID_Clone,
      "Incr",    ID_Increment,
      "Decr",    ID_Decrement,
-     "Vars",    ID_Vars,
-     "TVars",   ID_TVars);
+     "CurDir",  ID_CurrentDirectory,
+
+     "GCStats", ID_GarbageCollectorStatistics,
+     "RunStats",ID_RuntimeStatistics,
+     "Avail",   ID_Mem,
+     "System",  ID_SystemMemory,
+     "Bytes",   ID_Bytes,
+
+     "GC Clr", ID_GCStatsClearAfterRead,
+     "RT Clr", ID_RunStatsClearAfterRead
+);
 
 
 MENU(TimeMenu,

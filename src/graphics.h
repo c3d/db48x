@@ -114,13 +114,41 @@ void           draw_prompt(text_r txt);
 //   Draw a prompt for `Prompt`, `Input`, `PromptStore`
 // ----------------------------------------------------------------------------
 
-surface        display();
-pixmap_p       user_display();
-rect           user_clip();
-void           user_clip(rect r);
+grob_p         user_display();
+blitter::size  display_width();
+blitter::size  display_height();
 // ----------------------------------------------------------------------------
-//   Return the current display, i.e. `Pict`
+//   Return the current display, i.e. content of `Pict` variable
 // ----------------------------------------------------------------------------
+
+
+#if CONFIG_COLOR
+#define DISPLAY(op)                                                     \
+do                                                                      \
+{                                                                       \
+    grob_p pict = user_display();                                       \
+    if (pict && pict->type() != object::ID_pixmap)                      \
+    {                                                                   \
+        grob::surface display = pict->pixels();                         \
+        op;                                                             \
+    }                                                                   \
+    else                                                                \
+    {                                                                   \
+        surface display = pict ? pixmap_p(pict)->pixels() : Screen;     \
+        op;                                                             \
+    }                                                                   \
+}                                                                       \
+while(0)
+#else // !CONFIG_COLOR
+#define DISPLAY(op)                                     \
+do                                                      \
+{                                                       \
+    grob_p pict = user_display();                       \
+    surface display = pict ? pict->pixels() : Screen;   \
+    op;                                                 \
+}                                                       \
+while(0)
+#endif // CONFIG_COLOR
 
 
 COMMAND_DECLARE(Disp,2);
@@ -143,6 +171,19 @@ COMMAND_DECLARE(Freeze,1);
 COMMAND_DECLARE(Header, 1);
 COMMAND_DECLARE(CurrentClip,0);
 COMMAND_DECLARE(ToGrob, 2);
+COMMAND_DECLARE(ToHPGrob, 1);
+COMMAND_DECLARE(ToBitmap, 1);
+#if CONFIG_COLOR
+COMMAND_DECLARE(ToPixmap, 1);
+#endif // CONFIG_COLOR
+COMMAND_DECLARE(BlankGraphic, 2);
+COMMAND_DECLARE(BlankGrob, 2);
+COMMAND_DECLARE(BlankBitmap, 2);
+#if CONFIG_COLOR
+COMMAND_DECLARE(BlankPixmap, 2);
+#endif // CONFIG_COLOR
+COMMAND_DECLARE(ToLCD, 1);
+COMMAND_DECLARE(FromLCD, 0);
 COMMAND_DECLARE(GXor,3);
 COMMAND_DECLARE(GOr,3);
 COMMAND_DECLARE(GAnd,3);

@@ -226,10 +226,10 @@ object::id array::is_2Dor3D(bool push) const
             r = (count == 2   ? (angles == 0 || angles == 3 ? ID_To2DVector
                                  : angles == 2              ? ID_ToPolar
                                                             : ID_object)
-                 : count == 3 ? (angles == 0 || angles == 7   ? ID_To3DVector
-                                 : angles == 2 || angles == 4 ? ID_ToCylindrical
-                                 : angles == 6                ? ID_ToSpherical
-                                                              : ID_object)
+                 : count == 3 ? (angles == 0 || angles == 7 ? ID_To3DVector
+                                 : angles == 2              ? ID_ToCylindrical
+                                 : angles == 6              ? ID_ToSpherical
+                                                            : ID_object)
                               : ID_object);
         }
 
@@ -1217,8 +1217,8 @@ algebraic_p array::dot(array_r &x, array_r &y)
     }
     else if (count == 3)
     {
-        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
-        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        bool xnonrect = (xangles == 2 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 6);
         if (xnonrect || ynonrect)
         {
             array_g xx = xnonrect ? x->to_rectangular() : +x;
@@ -1306,8 +1306,8 @@ array_p array::cross(array_r &x, array_r &y)
     }
     else if (vsize == 3)
     {
-        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
-        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        bool xnonrect = (xangles == 2 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 6);
         if (xnonrect || ynonrect)
         {
             array_g xx = xnonrect ? x->to_rectangular() : +x;
@@ -2562,7 +2562,7 @@ COMMAND_BODY(FromVector)
 {
     if (object_g obj = rt.pop())
     {
-        if (array_p v = obj->as<array>())
+        if (array_g v = obj->as<array>())
         {
             if (v->is_2Dor3D(true))
                 return OK;
@@ -2630,7 +2630,6 @@ COMMAND_BODY(TransConjugate)
 
 
 
-
 // ============================================================================
 //
 //    Arithmetic operations
@@ -2679,16 +2678,13 @@ array_p array::add_sub(array_r x, array_r y, bool sub)
         // Check if we have a 2D or 3D polar, cylindrical or spherical vector
         if (count < 3)
         {
-            if (xa->as<unit>())
-                if (algebraic::adjust_angle(xa))
+            if (algebraic_g xu = xa->as<unit>())
+                if (algebraic::adjust_angle(xu))
                     xangles |= (1 << count);
-            if (ya->as<unit>())
-                if (algebraic::adjust_angle(ya))
+            if (algebraic_g yu = ya->as<unit>())
+                if (algebraic::adjust_angle(yu))
                     yangles |= (1 << count);
         }
-        xa = sub ? xa - ya : xa + ya;
-        if (!xa || !rt.push(+xa))
-            return nullptr;
         count++;
     }
 
@@ -2702,7 +2698,6 @@ array_p array::add_sub(array_r x, array_r y, bool sub)
     // Check if we actually deal with polar or cylindrical or spherical vectors
     if (count == 2 && (xangles == 2 || yangles == 2))
     {
-        rt.drop(count);
         array_g xx = xangles == 2 ? x->to_rectangular() : +x;
         array_g yy = yangles == 2 ? y->to_rectangular() : +y;
         xx = add_sub(xx, yy, sub);
@@ -2712,20 +2707,33 @@ array_p array::add_sub(array_r x, array_r y, bool sub)
     }
     else if (count == 3)
     {
-        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
-        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        bool xnonrect = (xangles == 2 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 6);
         if (xnonrect || ynonrect)
         {
-            rt.drop(count);
             array_g xx = xnonrect ? x->to_rectangular() : +x;
             array_g yy = ynonrect ? y->to_rectangular() : +y;
             xx = add_sub(xx, yy, sub);
-            if (yangles == 2 || yangles == 4)
+            if (yangles == 2)
                 xx = xx->to_cylindrical();
             else if (yangles == 6)
                 xx = xx->to_spherical();
             return xx;
         }
+    }
+
+    // Non-cylindrical / rectangular case
+    xi = x->begin();
+    yi = y->begin();
+    for (uint i = 0; i < count; i++)
+    {
+        if (program::interrupted())
+            return nullptr;
+        xa = algebraic_p(object::strip(*xi++));
+        ya = algebraic_p(object::strip(*yi++));
+        xa = sub ? xa - ya : xa + ya;
+        if (!xa || !rt.push(+xa))
+            return nullptr;
     }
 
     // Normal rectangular case
@@ -2807,11 +2815,11 @@ array_p array::mul(array_r x, array_r y)
             // Check if 2D or 3D polar, cylindrical or spherical vector
             if (count < 3)
             {
-                if (xa->as<unit>())
-                    if (algebraic::adjust_angle(xa))
+                if (algebraic_g xu = xa->as<unit>())
+                    if (algebraic::adjust_angle(xu))
                         xangles |= (1 << count);
-                if (ya->as<unit>())
-                    if (algebraic::adjust_angle(ya))
+                if (algebraic_g yu = ya->as<unit>())
+                    if (algebraic::adjust_angle(yu))
                         yangles |= (1 << count);
             }
             xa = xa * ya;
@@ -2846,15 +2854,15 @@ array_p array::mul(array_r x, array_r y)
     }
     else if (count == 3)
     {
-        bool xnonrect = (xangles == 2 || xangles == 4 || xangles == 6);
-        bool ynonrect = (yangles == 2 || yangles == 4 || yangles == 6);
+        bool xnonrect = (xangles == 2 || xangles == 6);
+        bool ynonrect = (yangles == 2 || yangles == 6);
         if (xnonrect || ynonrect)
         {
             rt.drop(count);
             array_g xx = xnonrect ? x->to_rectangular() : +x;
             array_g yy = ynonrect ? y->to_rectangular() : +y;
             xx = mul(xx, yy);
-            if (yangles == 2 || yangles == 4)
+            if (yangles == 2)
                 xx = xx->to_cylindrical();
             else if (yangles == 6)
                 xx = xx->to_spherical();

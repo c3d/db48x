@@ -29,6 +29,7 @@
 
 #include "dmcp.h"
 
+#include "datetime.h"
 #include "dmcp_fonts.c"
 #include "recorder.h"
 #include "sim-dmcp.h"
@@ -131,6 +132,8 @@ uint32_t read_power_voltage()
 {
     const uint vmax = 3000;
     const uint vmin = 2600;
+    if (tests::running)
+        return 2777;
     return ui_battery() * (vmax - vmin) / 1000 + vmin;
 }
 
@@ -407,7 +410,7 @@ inline void lcd_set_pixel(int x, int y)
         }
         return;
     }
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::black);
 }
 
@@ -424,7 +427,7 @@ inline void lcd_clear_pixel(int x, int y)
         }
         return;
     }
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::white);
 }
 
@@ -1087,6 +1090,12 @@ void rtc_write(tm_t * tm, dt_t *dt)
     record(dmcp_error, "Writing RTC %u/%u/%u %u:%u:%u (ignored)",
            dt->day, dt->month, dt->year,
            tm->hour, tm->min, tm->sec);
+}
+
+
+int julian_day(dt_t *dt)
+{
+    return julian_day_number(dt->day, dt->month, dt->year);
 }
 
 

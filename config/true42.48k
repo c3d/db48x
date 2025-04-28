@@ -50,7 +50,7 @@ UILowercase			"⇄"		"±"		"∡"		UIDelete
 UILeft				"7"		"8"		"9"		"÷"
 UIRight				"4"		"5"		"6"		"×"
 UIRightShift			"1"		"2"		"3"		"-"
-Off				"0"		"."		"«	»"	"+"
+OffWithImage			"0"		"."		"«	»"	"+"
 ]
 
 @ PLANE 5: ALPHA RIGHT SHIFTED
@@ -62,7 +62,7 @@ Off				"0"		"."		"«	»"	"+"
 UIUp				"?"		"∫"		"["		"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
-Off				";"		"·"		"{	}"	"!'
+OffWithImage			";"		"·"		"{	}"	"!'
 ]
 
 @ PLANE 6: LOWERCASE UNSHIFTED
@@ -84,7 +84,7 @@ UINoAlpha			"M"		"N"		"O"		UIDelete
 UILeft				"P"		"Q"		"R"		"S"
 UIRight				"T"		"U"		"V"		"W"
 UIRightShift			"X"		"Y"		"Z"		"_"
-Off				":	:"	","		";"		"?"
+OffWithImage			":	:"	","		";"		"?"
 ]
 
 @ PLANE 8: LOWERCASE RIGHT SHIFTED
@@ -96,5 +96,5 @@ UINoAlpha			"Π"		"Σ"		"ω"		"
 UIUp				"?"		"∫"		"["		"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
-Off				";"		"·"		"{	}"	"!"
+OffWithImage			";"		"·"		"{	}"	"!"
 ]

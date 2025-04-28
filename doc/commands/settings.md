@@ -17,6 +17,14 @@ The current preferences can be retrieved and saved using the `Modes` command.
 
 Returns a program that will restore the current settings. This program can be saved into a variable to quickly restore a carefully crafted set of preferences. Note that the calculator automatically restores the mode when it [loads a state](#States).
 
+## ModesMenu
+
+The `ModesMenu` controls the primary modes of the calculator.
+
+It includes commands to select [trigonometric angle units](#angle-settings), as
+well as submenus for mathematical (`MathModesMenu`), user interface
+(`UIModesMenu`) or display separators (`SeparatorModesMenu`) preferences .
+
 # Display settings
 
 The display mode controls how DB48X displays numbers. Regardless of the display
@@ -362,7 +370,12 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MathModesMenu
 
+The `MathModesMenu` controls settings related to mathematical computations.
+
+* `SymbolicResults`
+* `AutoSimplify`
 
 
 # Base settings
@@ -671,6 +684,19 @@ The `Type` command returns values as close to possible to the values documented
 on page 3-262 of the HP50G advanced reference manual. This is the opposite of
 [NativeTypes](#nativetypes).
 
+## CompatibleGROBs
+
+When this flag is set, graphic operations will generate HP48 compatible GROB
+objects. Note that HP-compatible objects take slightly more memory. This is the
+opposite of `PackedBitmaps`.
+
+## PackedBitmaps
+
+When this flag is set, graphic operations will generate DB48x graphic objects,
+which are slightly denser and more efficient than HP graphic objects, notably
+when the width is not a multiple of 8. For example, if you render the number 32
+in HP format, it takes 328 bytes, vs. only 281 bytes in DB48x format.  This is
+the opposite of `CompatibleGROBs`.
 
 ## NumberedVariables
 

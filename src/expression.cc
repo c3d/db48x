@@ -4035,7 +4035,9 @@ PARSE_BODY(Derivative)
         return eres;
     algebraic_g expr = expression_p(+exprp.out);
 
-    expression_g res = expression::make(ID_Derivative, expr, name);
+    algebraic_g args[2] = { name, expr };
+    expression_g res = expression::make(ID_Derivative, args, 2,
+                                        ID_expression, true);
     p.out = +res;
     p.length = parsed + namep.length + exprp.length;
     return p.out ? OK : ERROR;
@@ -4235,7 +4237,9 @@ PARSE_BODY(Primitive)
         return eres;
     algebraic_g expr = expression_p(+exprp.out);
 
-    expression_g res = expression::make(ID_Primitive, expr, name);
+    algebraic_g args[2] = { name, expr };
+    expression_g res = expression::make(ID_Primitive, args, 2,
+                                        ID_expression, true);
     p.out = +res;
     p.length = parsed + namep.length + exprp.length;
     return p.out ? OK : ERROR;

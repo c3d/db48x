@@ -64,7 +64,7 @@ using std::min;
 // ============================================================================
 
 // Initialize the screen
-surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE);
+surface Screen((pixword *) lcd_line_addr(0), LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
 
 // Pre-built patterns for shades of grey
 const pattern pattern::black   = pattern(0, 0, 0);
@@ -157,14 +157,34 @@ void refresh_dirty()
 }
 
 
+void set_timer(uint timerid, uint period)
+// ----------------------------------------------------------------------------
+//   Conditionally set a timer based on period
+// ----------------------------------------------------------------------------
+{
+    if (period >= 1000)
+    {
+        sys_timer_disable(timerid);
+        if (period >= 60000)
+            CLR_ST(STAT_CLK_WKUP_SECONDS);
+        else
+            SET_ST(STAT_CLK_WKUP_SECONDS);
+    }
+    else
+    {
+        sys_timer_start(timerid, period);
+    }
+}
+
+
 void redraw_lcd(bool force)
 // ----------------------------------------------------------------------------
 //   Redraw the whole LCD
 // ----------------------------------------------------------------------------
 {
-    uint now = sys_current_ms();
+    uint start = sys_current_ms();
 
-    record(main, "Begin redraw at %u", now);
+    record(main, "Begin redraw at %u", start);
 
     // Draw the various components handled by the user interface
     ui.draw_start(force);
@@ -187,15 +207,14 @@ void redraw_lcd(bool force)
     refresh_dirty();
 
     // Compute next refresh
-    uint then = sys_current_ms();
+    uint end = sys_current_ms();
     uint period = ui.draw_refresh();
     record(main,
-           "Refresh at %u (%u later), period %u", then, then - now, period);
+           "Refresh at %u (%u later), period %u", end, end - start, period);
 
     // Refresh screen moving elements after the requested period
-    sys_timer_start(TIMER1, period);
-
-    program::display_time += sys_current_ms() - now;
+    set_timer(TIMER1, period);
+    program::display_time += end - start;
 }
 
 
@@ -204,10 +223,10 @@ static void redraw_periodics()
 //   Redraw the elements that move
 // ----------------------------------------------------------------------------
 {
-    uint now         = sys_current_ms();
-    uint dawdle_time = now - last_keystroke_time;
+    uint start       = program::read_time();
+    uint dawdle_time = start - last_keystroke_time;
 
-    record(main, "Periodics %u", now);
+    record(main, "Periodics %u", start);
     ui.draw_start(false);
     ui.draw_header();
     ui.draw_battery();
@@ -234,13 +253,13 @@ static void redraw_periodics()
             period = 3000;
     }
 
-    uint then = sys_current_ms();
-    record(main, "Dawdling for %u at %u after %u", period, then, then-now);
+    uint end = program::read_time();
+    record(main, "Dawdling for %u at %u after %u", period, end, end-start);
 
     // Refresh screen moving elements after 0.1s
-    sys_timer_start(TIMER1, period);
+    set_timer(TIMER1, period);
 
-    program::display_time += sys_current_ms() - now;
+    program::display_time += end - start;
 }
 
 
@@ -351,10 +370,13 @@ void program_init()
     // Check if we have a state file to load
     load_system_state();
     load_saved_keymap();
+
+    // Enable wakeup each minute (for clock update)
+    SET_ST(STAT_CLK_WKUP_ENABLE);
 }
 
 
-void power_check(bool running)
+void power_check(bool running, bool showimage)
 // ----------------------------------------------------------------------------
 //   Check power state, keep looping until it's safe to run
 // ----------------------------------------------------------------------------
@@ -373,13 +395,13 @@ void power_check(bool running)
         {
             CLR_ST(STAT_RUNNING);
             static uint last_awake = 0;
-            uint now = sys_current_ms();
+            uint tin = sys_current_ms();
             if (last_awake)
-                program::active_time += now - last_awake;
+                program::active_time += tin - last_awake;
             sys_sleep();
-            uint then = sys_current_ms();
-            last_awake = then;
-            program::sleeping_time += then - now;
+            uint tout = sys_current_ms();
+            last_awake = tout;
+            program::sleeping_time += tout - tin;
             program::run_cycles++;
         }
         if (ST(STAT_PGM_END) || ST(STAT_SUSPENDED))
@@ -395,8 +417,10 @@ void power_check(bool running)
                 else if (running)
                     ui.draw_message("Switched off to conserve battery",
                                     "Press the ON/EXIT key to resume");
-                else
+                else if (showimage)
                     draw_power_off_image(0);
+                else
+                    lcd_refresh_wait();
 
                 sys_critical_start();
                 SET_ST(STAT_SUSPENDED);
@@ -409,16 +433,23 @@ void power_check(bool running)
             // Already in OFF -> just continue to sleep above
         }
 
-        // Check power change or wakeup
         else if (ST(STAT_CLK_WKUP_FLAG))
         {
+            // Clock wakeup (once per second or per minute)
             CLR_ST(STAT_CLK_WKUP_FLAG);
+            if (running)
+                break;
+            redraw_periodics();
         }
         else if (ST(STAT_POWER_CHANGE))
         {
+            // Power state change (to/from USB)
             CLR_ST(STAT_POWER_CHANGE);
+            sys_timer_disable(TIMER0);
+            sys_timer_disable(TIMER1);
+            // Force reload battery with correct value at next clock refresh.
             ui.draw_battery(true);
-            refresh_dirty();
+            program::last_interrupted -= Settings.BatteryRefresh() - 1000;
         }
         else
         {
@@ -440,6 +471,7 @@ void power_check(bool running)
         CLR_ST(STAT_OFF);
 
         // Check if we need to redraw
+        program::read_battery();
         if (ui.showing_graphics())
             ui.draw_graphics(true);
         else
@@ -480,7 +512,7 @@ extern "C" void program_main()
     // Initialization
     program_init();
     redraw_lcd(true);
-    last_keystroke_time = sys_current_ms();
+    last_keystroke_time = program::read_time();
 
     // Main loop
     while (true)
@@ -568,7 +600,7 @@ extern "C" void program_main()
                 redraw_lcd(false);
 
             // Record the last keystroke
-            last_keystroke_time = sys_current_ms();
+            last_keystroke_time = program::read_time();
             record(main, "Last keystroke time %u", last_keystroke_time);
         }
         else

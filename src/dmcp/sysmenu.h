@@ -78,12 +78,12 @@ bool                  save_state_file(cstring path);
 bool                  load_system_state();
 bool                  save_system_state();
 bool                  load_saved_keymap(cstring name = nullptr);
-void                  power_off();
+void                  power_off(bool offimg);
 void                  system_setup();
 void                  mark_dirty(uint row);
 void                  refresh_dirty();
 void                  redraw_lcd(bool force);
-
+void                  set_timer(uint timerid, uint period);
 #if SIMULATOR
 void                  process_test_key(int key);
 void                  process_test_commands();

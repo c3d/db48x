@@ -387,6 +387,7 @@ object::result list::list_parse(id      type,
                 objcount++;
 
                 size_t objsize = obj->size();
+                bool   done    = special && obj->type() == special;
 
                 // For expressions, copy only the payload unless we want it
                 // to be preserved as a symbolic expression
@@ -425,6 +426,8 @@ object::result list::list_parse(id      type,
                     obj = infix;
                     infix = nullptr;
                 }
+                if (done)
+                    special = ID_object;
             } while (obj);
 
             if (iswhere)
@@ -888,7 +891,7 @@ grob_p list::graph(grapher &g, size_t rows, size_t cols, bool mat) const
     {
         object_p item = rt.stack(i);
         grob_g   grob = item->graph(g);
-        if (!grob || grob->type() != ID_grob)
+        if (!grob || !grob->is_monochrome())
         {
             // Ran into a problem with one rendering, e.g. out of memory
             // Fallback to rendering as text.
@@ -1126,6 +1129,9 @@ COMMAND_BODY(Size)
     case ID_text:
         size = text_p(obj)->utf8_characters(); break;
     case ID_grob:
+#if CONFIG_COLOR
+    case ID_pixmap:
+#endif // CONFIG_COLOR
     case ID_bitmap:
         if (grob_p gr = grob_p(obj))
         {
@@ -2589,8 +2595,23 @@ list_p list::substitute(list_r assignments) const
 // ----------------------------------------------------------------------------
 {
     list_g result = this;
+    symbol_g name;
     for (object_g obj : *assignments)
-        result = result->substitute(obj);
+    {
+        if (symbol_p n = obj->as<symbol>())
+        {
+            name = n;
+        }
+        else if (name)
+        {
+            result = result->substitute(name, obj);
+            name = nullptr;
+        }
+        else
+        {
+            result = result->substitute(obj);
+        }
+    }
     return result;
 }
 

@@ -31,6 +31,7 @@
 
 #include "arithmetic.h"
 #include "dmcp.h"
+#include "program.h"
 #include "renderer.h"
 #include "tag.h"
 #include "unit.h"
@@ -939,10 +940,10 @@ COMMAND_BODY(TimedEval)
 //   Evaluate and return the time it took
 // ----------------------------------------------------------------------------
 {
-    uint start = sys_current_ms();
+    uint start = program::read_time();
     if (result err = Eval::do_evaluate())
         return err;
-    uint end = sys_current_ms();
+    uint end = program::read_time();
     if (integer_g duration = integer::make(end - start))
         if (symbol_g ms = symbol::make("ms"))
             if (unit_g result = unit::make(+duration, +ms))

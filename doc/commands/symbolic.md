@@ -151,6 +151,19 @@ or `X*1-B*0` will no longer be simplified during evaluation.
 The opposite setting is [AutoSimplify](#autosimplify)
 
 
+## SymbolicResults
+
+Enable the generation of symbolic results, as opposed to `NumericalResults`.
+For example, `2 3 /` gives exact result `2/3` as a result with
+`SymbolicResults`, as opposed to a numerical approximation like `0.66667`.
+
+## NumericalResults
+
+Enable the generation of symbolic results, as opposed to `SymbolicResults`.  For
+example, `2 3 /` gives the numerical approximation `0.66667` when this flag is
+set, as opposed to exact result `2/3`.
+
+
 ## FinalAlgebraResults
 
 Evaluate algebraic rules on symbolic expressions repeatedly until no futher change results from applying them.

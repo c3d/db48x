@@ -415,6 +415,9 @@ COMMAND_BODY(Extract)
         break;
 
     case ID_grob:
+#ifdef CONFIG_COLOR
+    case ID_pixmap:
+#endif
     case ID_bitmap:
     case ID_Pict:
         value = grob_p(+value)->extract(start, end);

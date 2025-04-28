@@ -118,7 +118,6 @@ user_interface::user_interface()
       menuDrawn(0),
       cursorDrawn(0),
       customHeaderDrawn(0),
-      batteryDrawn(0),
       day(0), month(0), year(0), dow(0),
       hour(0), minute(0), second(0),
       editing(),
@@ -1515,7 +1514,7 @@ void user_interface::draw_start(bool forceRedraw, uint refresh)
 {
     force = forceRedraw;
     nextRefresh = refresh;
-    time = sys_current_ms();
+    time = program::read_time();
     if (forceRedraw)
         graphics = false;
 }
@@ -1572,12 +1571,14 @@ bool user_interface::draw_graphics(bool erase)
 {
     if (!graphics || erase)
     {
-        surface disp = display();
         draw_start(false);
         graphics = true;
-        disp.fill(pattern(Settings.Background()));
-        draw_dirty(0, 0, LCD_W-1, LCD_H-1);
-        return true;
+        if (erase || user_display() == nullptr)
+        {
+            DISPLAY(display.fill(display.area(), Settings.Background()));
+            draw_dirty(0, 0, LCD_W-1, LCD_H-1);
+            return true;
+        }
     }
     return false;
 }
@@ -1923,7 +1924,11 @@ bool user_interface::draw_header()
         }
     }
     if (!pgm && Settings.ShowTime())
+#if SIMULATOR
         draw_refresh(Settings.ShowSeconds() ? 1000 : 1000 * (60 - second));
+#else
+        draw_refresh(Settings.ShowSeconds() ? 1000 : 60000);
+#endif
 
     if (changed)
     {
@@ -2060,7 +2065,7 @@ bool user_interface::draw_battery(bool now)
 {
     if (freezeHeader || graphics)
     {
-        batteryDrawn = ~time;
+        program::last_power_check = ~time;
         return false;
     }
 
@@ -2069,21 +2074,21 @@ bool user_interface::draw_battery(bool now)
     coord       ann_y      = (h - ann_height) / 2;
 
     // Print battery voltage
-    uint        vdd        = program::power_voltage;
+    uint        vdd        = program::battery_voltage;
     bool        usb        = program::on_usb;
-    uint        delay      = time - batteryDrawn;
+    uint        delay      = time - program::last_power_check;
     uint        refresh    = Settings.BatteryRefresh();
-    if (now || delay > refresh)
+    const uint  usb_period = 1024;
+
+    if (now || delay >= refresh)
     {
         program::read_battery();
         batteryLow = program::low_battery();
-        vdd = program::power_voltage;
+        vdd = program::battery_voltage;
         usb = program::on_usb;
     }
-    else if (!force && !batteryLow)
+    else if (!force && !batteryLow && !usb)
     {
-        if (program::animated())
-            refresh -= delay;
         draw_refresh(refresh);
         return false;
     }
@@ -2091,8 +2096,8 @@ bool user_interface::draw_battery(bool now)
     // Experimentally, battery voltage below 2.6V cause calculator flakiness
     const uint vmax  = BATTERY_VMAX;
     const uint vmin  = Settings.MinimumBatteryVoltage();
-    const uint vlow  = (vmax + 3 * vmin) / 4;
-    const uint vhalf = (vmax + vmin) / 4;
+    const uint vlow  = (vmax + 7 * vmin) / 8;
+    const uint vhalf = (vmax + 3 * vmin) / 4;
 
     pattern    vpat  = usb          ? Settings.ChargingForeground()
                      : vdd <= vlow  ? Settings.LowBatteryForeground()
@@ -2152,12 +2157,21 @@ bool user_interface::draw_battery(bool now)
     }
 
     size batw = bat_body.width();
-    size w = int(vdd - vmin) * batw / (vmax - vmin);
+    float ratio = float(vdd - vmin) / (vmax - vmin);
+    ratio = 1-ratio;
+    ratio = ratio * ratio;
+    ratio = 1 - ratio;
+    size w = size(ratio * batw);
     if (w > batw)
         w = batw;
     else if (w < 1)
         w = 1;
     bat_body.x1 = bat_body.x2 - w;
+    if (usb)
+    {
+        bat_body.inset(-time / usb_period % 4);
+        refresh = std::min(refresh, usb_period);
+    }
     if (!blink)
         Screen.fill(bat_body, vpat);
 
@@ -2175,14 +2189,10 @@ bool user_interface::draw_battery(bool now)
     batteryLeft = x;
     draw_dirty(x, 0, LCD_W-1, h-1);
     draw_refresh(refresh);
-    batteryDrawn = time;
 
     // Power off if battery power is really low
     if (program::low_battery())
-    {
-        power_off();
-        power_check(true);
-    }
+        power_off(false);
 
     return true;
 }
@@ -2338,7 +2348,7 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
         font_p hdr_font = Settings.header_font();
         rect   clip        = Screen.clip();
         Screen.clip(busy);
-        time = sys_current_ms();
+        time = program::read_time();
         size  w = hdr_font->width('M');
         coord x = busy.x1 + time / 16 % (busy.width() - w);
         coord y = busy.y1;
@@ -2361,8 +2371,11 @@ bool user_interface::draw_idle()
     if (graphics)
     {
         record(tests_ui, "Waiting for key");
+        if (grob_p pict = user_display())
+            show(pict);
+        else
+            wait_for_key_press();
         graphics = false;
-        wait_for_key_press();
         record(tests_ui, "Redraw LCD");
         redraw_lcd(true);
     }
@@ -2988,7 +3001,7 @@ bool user_interface::draw_stack()
     }
 
     draw_busy();
-    uint now = sys_current_ms();
+    uint now = program::read_time();
     uint top = stackTop + 1;
     uint bottom = Stack.draw_stack();
     if (object_p transient = transient_object())
@@ -2997,7 +3010,7 @@ bool user_interface::draw_stack()
     draw_idle();
     dirtyStack = false;
     dirtyCommand = true;
-    program::stack_display_time += sys_current_ms() - now;
+    program::stack_display_time += program::read_time() - now;
 
     return true;
 }
@@ -4614,8 +4627,8 @@ bool user_interface::handle_editing(int key)
                     {
                         char sizebuf[40];
                         char valbuf[40];
-                        snprintf(sizebuf, sizeof(sizebuf), "%zu bytes %s",
-                                 size, obj->fancy());
+                        snprintf(sizebuf, sizeof(sizebuf), "%lu bytes %s",
+                                 (unsigned long) size, obj->fancy());
                         bin->render(valbuf, sizeof(valbuf));
                         draw_message("Object info", sizebuf, valbuf);
                         wait_for_key_press();
@@ -5302,7 +5315,7 @@ static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_2,     command::ID_ToggleUserMode),
     OP2BYTES(KEY_3,     menu::ID_ProgramMenu),
     OP2BYTES(KEY_SUB,   menu::ID_ListMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_Off),
+    OP2BYTES(KEY_EXIT,  command::ID_OffWithImage),
     OP2BYTES(KEY_0,     command::ID_SystemSetup),
     OP2BYTES(KEY_DOT,   command::ID_Show),
     OP2BYTES(KEY_RUN,   0),
@@ -6674,9 +6687,10 @@ void debug_printf(int row, cstring format, ...)
         coord y = row * h;
         coord x = Screen.text(0, y, utf8(buffer), HelpFont,
                               pattern::white, pattern::black);
-        Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
-        ui.draw_dirty(0, y, LCD_W, y + h - 1);
-        refresh_dirty();
+        Screen.fill(x, y, x+10, y + h, pattern::gray50);
+        for (uint r = y; r < y + h; r++)
+            bitblt24(0, 8, r, 0, BLT_XOR, BLT_NONE);
+        lcd_refresh();
     }
     debug_printf_row = row - 2;
 }
@@ -6701,8 +6715,9 @@ void debug_printf(cstring format, ...)
         coord x = Screen.text(0, y, utf8(buffer), HelpFont,
                               pattern::white, pattern::black);
         Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
-        ui.draw_dirty(0, y, LCD_W, y + h - 1);
-        refresh_dirty();
+        for (uint r = y; r < y + h; r++)
+            bitblt24(0, 8, r, 0, BLT_XOR, BLT_NONE);
+        lcd_refresh();
         ++debug_printf_row;
     }
 }

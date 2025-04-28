@@ -138,6 +138,7 @@ TESTS(finance,          "Financial functions and solver");
 TESTS(regressions,      "Regression checks");
 TESTS(plotting,         "Plotting, graphing and charting");
 TESTS(graphics,         "Graphic commands");
+TESTS(offline,          "Off-line graphics");
 TESTS(input,            "User input");
 TESTS(help,             "On-line help");
 TESTS(gstack,           "Graphic stack rendering")
@@ -183,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            constants_menu();
+            graphic_stack_rendering();
 
 #if 0
         if (onlyCurrent & 2)
@@ -764,7 +765,7 @@ void tests::keyboard_entry()
         .editor("«7 A B + + »");
     step("Space key in immediate mode evaluates")
         .test(ENTER).want("« 7 A B + + »")
-        .test(SPACE).expect("'A+B+7'");
+        .test(SPACE).expect("'7+(A+B)'");
     step("F key inserts equation")
         .test(CLEAR, F).editor("''")
         .test(KEY1).editor("'1'");
@@ -948,11 +949,11 @@ void tests::data_types()
          XEQ, "Y", ENTER, SHIFT, SQRT, XEQ, "Z", ENTER,
          "CUBED", ENTER, ADD, ADD)
         .type(ID_expression)
-        .expect("'X⁻¹+Y²+Z³'");
+        .expect("'X⁻¹+(Y²+Z³)'");
     step("Equation fancy parsing from editor");
     test(DOWN, SPACE, SPACE, SPACE,
          RSHIFT, DOWN, SHIFT, F3, " 1 +", ENTER)
-        .type(ID_expression).expect("'X⁻¹+Y²+Z³+1'");
+        .type(ID_expression).expect("'X⁻¹+(Y²+Z³)+1'");
     step("Parsing text in an algebraic expression")
         .test(CLEAR, "'SIZE(\"Hello\")'", ENTER)
         .expect("'Size \"Hello\"'")
@@ -1931,7 +1932,7 @@ void tests::global_variables()
         .test(RUNSTOP).expect("84");
     step("Copy precedence of target symbol")
         .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
-        .test(RUNSTOP).expect("'336'")
+        .test(RUNSTOP).expect("336")
         .test("A", ENTER).expect("168");
     step("Copy with external parentheses")
         .test("'(A+A▶A)+A'", ENTER).expect("'(A+A▶A)+A'")
@@ -1941,6 +1942,10 @@ void tests::global_variables()
         .test("'A+(A+1▶A)+A'", ENTER).expect("'A+(A+1▶A)+A'")
         .test(RUNSTOP).expect("1 010")
         .test("A", ENTER).expect("337");
+    step("Check precedence for Copy")
+        .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
+        .test(ID_ObjectMenu, ID_ToProgram)
+        .want("« A A + 'A' ▶ A + »");
 
     step("Assignment with simple value")
         .test(CLEAR, "A=42", ENTER).got("A=42")
@@ -1982,13 +1987,13 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               LSHIFT, F1, LSHIFT, F2, LSHIFT, F3, LSHIFT, F4, LSHIFT, F5,
               ENTER)
-        .expect("{ HomeDirectory DirectoryPath CurrentDirectory"
-                " GarbageCollect AvailableMemory }")
+        .expect("{ AvailableMemory Variables HomeDirectory"
+                " DirectoryPath GarbageCollect }")
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ FreeMemory SystemMemory PurgeAll "
-                "RuntimeStatistics Clone }")
+        .expect("{ FreeMemory TypedVariables PurgeAll"
+                " RuntimeStatistics GarbageCollectorStatistics }")
         .test(F6,
               RSHIFT, RUNSTOP,
               F1, F2, F3, F4, F5,
@@ -2001,7 +2006,16 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ ▶ Increment Decrement Variables TypedVariables }");
+        .expect("{ ▶ Clone Increment Decrement CurrentDirectory }")
+        .test(F6,
+              RSHIFT, RUNSTOP,
+              F1, F2, F3, F4, F5,
+              ENTER)
+        .expect("{ GarbageCollectorStatistics RuntimeStatistics"
+                " AvailableMemory SystemMemory Bytes }")
+        .test(RSHIFT, RUNSTOP,
+              LSHIFT, F1, LSHIFT, F2, ENTER)
+        .expect("{ GCStatsClearAfterRead RunStatsClearAfterRead }");
 
     step("Store in long-name global variable");
     test(CLEAR, "\"Hello World\"", ENTER, XEQ, "SomeLongVariable", ENTER, STO)
@@ -2692,22 +2706,31 @@ void tests::logical_operations()
 
     step("First bit set (integer)")
         .test(CLEAR, "16#147800 FirstBitSet", ENTER)
-        .expect("11");
+        .expect("11")
+        .test(CLEAR, "2 22 ^ FirstBitSet", ENTER)
+        .expect("22");
     step("First bit set (zero)")
         .test(CLEAR, "16#0 FirstBitSet", ENTER)
         .expect("-1");
     step("First bit set (bignum)")
         .test(CLEAR, "16#147800 75 SLC FirstBitSet", ENTER)
-        .expect("86");
+        .expect("86")
+        .test(CLEAR, "2 103 ^ FirstBitSet", ENTER)
+        .expect("103");;
     step("Last bit set (integer)")
         .test(CLEAR, "16#147800 LastBitSet", ENTER)
-        .expect("21");
+        .expect("20")
+        .test(CLEAR, "2 22 ^ LastBitSet", ENTER)
+        .expect("22");
     step("Last bit set (zero)")
         .test(CLEAR, "16#0 LastBitSet", ENTER)
         .expect("-1");
     step("Last bit set (bignum)")
         .test(CLEAR, "16#147800 75 SLC LastBitSet", ENTER)
-        .expect("96");
+        .expect("95")
+        .test(CLEAR, "2 102 ^ LastBitSet", ENTER)
+        .expect("102");
+;
     step("Count bits set (integer)")
         .test(CLEAR, "16#147800 CountBits", ENTER)
         .expect("6");
@@ -5452,32 +5475,39 @@ void tests::list_functions()
 {
     BEGIN(lists);
 
-    step("Integer index");
-    test(CLEAR, "{ A B C }", ENTER, "2 GET", ENTER)
+    step("Integer index")
+        .test(CLEAR, "{ A B C }", ENTER, "2 GET", ENTER)
         .expect("B");
-    step("Real index");
-    test(CLEAR, "{ A B C }", ENTER, "2.3 GET", ENTER)
+    step("Real index")
+        .test(CLEAR, "{ A B C }", ENTER, "2.3 GET", ENTER)
         .expect("B");
-    step("Bad index type");
-    test(CLEAR, "{ A B C }", ENTER, "\"A\" GET", ENTER)
+    step("Computed index")
+        .test(CLEAR, "{ A B C }", ENTER, "'1.3+1' GET", ENTER)
+        .expect("B");
+    step("Computed index with variable")
+        .test(CLEAR, "{ A B C } 1.3 'Z' STO", ENTER, "'Z+1' GET", ENTER)
+        .expect("B")
+        .test(CLEAR, "'Z' PURGE", ENTER).noerror();
+    step("Bad index type")
+        .test(CLEAR, "{ A B C }", ENTER, "\"A\" GET", ENTER)
         .error("Bad argument type");
-    step("Out-of-range index");
-    test(CLEAR, "{ A B C }", ENTER, "5 GET", ENTER)
+    step("Out-of-range index")
+        .test(CLEAR, "{ A B C }", ENTER, "5 GET", ENTER)
         .error("Index out of range");
-    step("Empty list index");
-    test(CLEAR, "{ A B C }", ENTER, "{} GET", ENTER)
+    step("Empty list index")
+        .test(CLEAR, "{ A B C }", ENTER, "{} GET", ENTER)
         .expect("{ A B C }");
-    step("Single element list index");
-    test(CLEAR, "{ A B C }", ENTER, "{2} GET", ENTER)
+    step("Single element list index")
+        .test(CLEAR, "{ A B C }", ENTER, "{2} GET", ENTER)
         .expect("B");
-    step("List index nested");
-    test(CLEAR, "{ A {D E F} C }", ENTER, "{2 3} GET", ENTER)
+    step("List index nested")
+        .test(CLEAR, "{ A {D E F} C }", ENTER, "{2 3} GET", ENTER)
         .expect("F");
-    step("List index, too many items");
-    test(CLEAR, "{ A B C }", ENTER, "{2 3} GET", ENTER)
+    step("List index, too many items")
+        .test(CLEAR, "{ A B C }", ENTER, "{2 3} GET", ENTER)
         .error("Bad argument type");
-    step("Character from array");
-    test(CLEAR, "\"Hello World\"", ENTER, "2 GET", ENTER)
+    step("Character from array")
+        .test(CLEAR, "\"Hello World\"", ENTER, "2 GET", ENTER)
         .expect("\"e\"");
     step("Deep nesting");
     test(CLEAR, "{ A { D E { 1 2 \"Hello World\" } F } 2 3 }", ENTER,
@@ -5553,6 +5583,11 @@ void tests::list_functions()
         .test(ENTER, "2", F1).expect("22")
         .test("3", MUL).expect("66")
         .test("2", NOSHIFT, M, F2).expect("{ 55 66 33 }");
+    step("Putting in a list with evaluation")
+        .test(CLEAR, "{ 11 22 33 } '3-2' 55 PUT", ENTER).expect("{ 55 22 33 }")
+        .test(ENTER, "2", F1).expect("22")
+        .test("3", MUL).expect("66")
+        .test("'4-2'", NOSHIFT, M, F2).expect("{ 55 66 33 }");
     step("Putting out of range")
         .test(CLEAR, "{ 11 22 33 } 4 55 PUT", ENTER)
         .error("Index out of range");
@@ -5616,7 +5651,7 @@ void tests::list_functions()
 
     step("DoList with explicit size in program")
         .test(CLEAR, "{ A B 3 } { D 5 6 } { E 8 F } 3 « + * » DOLIST", ENTER)
-        .expect("{ 'A·(D+E)' '13·B' '3·(F+6)' }")
+        .expect("{ 'A·(D+E)' 'B·13' '3·(6+F)' }")
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("DoList with explicit size from menu")
@@ -5627,7 +5662,7 @@ void tests::list_functions()
         .test(BSP).error("Too few arguments");
     step("DoList with implicit size in program")
         .test(CLEAR, "{ 3 A B } { 5 D 6 } { 8 F E } « + » DOLIST", ENTER)
-        .expect("{ 13 'D+F' 'E+6' }")
+        .expect("{ 13 'D+F' '6+E' }")
         .test(BSP)
         .expect("{ 3 A B }")
         .test(BSP).noerror()
@@ -5645,8 +5680,8 @@ void tests::list_functions()
 
     step("DoSubs with explicit size in program")
         .test(CLEAR, "{ A B 3 D 5 6 E 8 F } 3 « + * » DOSUBS", ENTER)
-        .expect("{ 'A·(B+3)' 'B·(D+3)' '3·(D+5)' "
-                "'11·D' '5·(E+6)' '6·(E+8)' 'E·(F+8)' }")
+        .expect("{ 'A·(B+3)' 'B·(3+D)' '3·(D+5)' 'D·11' '5·(6+E)' "
+                "'6·(E+8)' 'E·(8+F)' }")
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("DoSubs with explicit size from menu")
@@ -5657,7 +5692,7 @@ void tests::list_functions()
         .test(BSP).error("Too few arguments");
     step("DoSubs with implicit size in program")
         .test(CLEAR, "{ 3 A B 5 D 6 8 F E } « + » DOSUBS", ENTER)
-        .expect("{ 'A+3' 'A+B' 'B+5' 'D+5' 'D+6' 14 'F+8' 'F+E' }")
+        .expect("{ '3+A' 'A+B' 'B+5' '5+D' 'D+6' 14 '8+F' 'F+E' }")
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("DoSubs with implicit size in program from HP50G ARM")
@@ -5684,7 +5719,7 @@ void tests::list_functions()
     step("DoSubs with implicit size from menu")
         .test(CLEAR, "{ 1 2 A D 5 6 B 8 9 } « * »",
               ID_ProbabilitiesMenu, ID_ListMenu, F6, LSHIFT, F2)
-        .expect("{ 2 '2·A' 'A·D' '5·D' 30 '6·B' '8·B' 72 }")
+        .expect("{ 2 '2·A' 'A·D' 'D·5' 30 '6·B' 'B·8' 72 }")
         .test(BSP).noerror()
         .test(BSP).error("Too few arguments");
     step("DoSubs with bad arguments")
@@ -6168,6 +6203,9 @@ void tests::vector_functions()
        .expect("[ 2.23606 79775 63.43494 88229 ° 3 ]")
        .test("[ 4 5 6 ]", F6, ID_add)
        .expect("[ 12.44989 9598 54.46232 2208 ° 43.70578 41445 ° ]");
+   step("3D addition with angle as last coordinate (#1455)")
+       .test(CLEAR, "[ 3 2 1.7_° ] [2 1 2.5_° ] -", ENTER)
+       .expect("[ 1 1 -0.8 ° ]");
 
    step("2D addition after polar conversion")
        .test(CLEAR, "[ 1 2 ]", ENTER, NOSHIFT, A, F5)
@@ -6299,7 +6337,10 @@ void tests::matrix_functions()
         .want("[[ 3 ¹/₁₁ -4 ⁸/₁₁ -3 ¹⁰/₁₁ ] [ 335 ⁷/₁₀ -1 342 ⁷/₁₀ -1 643 ³/₁₀ ] [ -¹⁹/₂₂ 3 ⁹/₂₂ 5 ³/₂₂ ]]");
     step("Division (symbolic)");
     test(CLEAR, "[[a b][c d]][[e f][g h]] /", ENTER)
-        .want("[[ '(e⁻¹-f÷e·(-g)÷(e·h-g·f))·a+(-(f÷e·e÷(e·h-g·f)))·c' '(e⁻¹-f÷e·(-g)÷(e·h-g·f))·b+(-(f÷e·e÷(e·h-g·f)))·d' ] [ '(-g)÷(e·h-g·f)·a+e÷(e·h-g·f)·c' '(-g)÷(e·h-g·f)·b+e÷(e·h-g·f)·d' ]]");
+        .want("[[ '(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·a+(-(f÷e·e÷(e·h-g·f)))·c' "
+              "'(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·b+(-(f÷e·e÷(e·h-g·f)))·d' ] "
+              "[ '(-g)÷(e·h-g·f)·a+e÷(e·h-g·f)·c' "
+              "'(-g)÷(e·h-g·f)·b+e÷(e·h-g·f)·d' ]]");
     step("Addition of constant (extension)");
     test(CLEAR, "[[1 2] [3 4]] 3 +", ENTER)
         .want("[[ 4 5 ] [ 6 7 ]]");
@@ -6375,7 +6416,9 @@ void tests::matrix_functions()
               " [ 1 ²/₁₅ ¹/₁₅ -¹/₅ ]"
               " [ ¹/₁₀ -¹/₅ ¹/₁₀ ]]");
     test(CLEAR, "[[a b][c d]] INV", ENTER)
-        .want("[[ 'a⁻¹-b÷a·(-c)÷(a·d-c·b)' '-(b÷a·a÷(a·d-c·b))' ] [ '(-c)÷(a·d-c·b)' 'a÷(a·d-c·b)' ]]");
+        .want("[[ 'a⁻¹-b÷a·((-c)÷(a·d-c·b))' "
+              "'-(b÷a·a÷(a·d-c·b))' ] "
+              "[ '(-c)÷(a·d-c·b)' 'a÷(a·d-c·b)' ]]");
 
     step("Invert with zero determinant");       // HP48 gets this one wrong
     test(CLEAR, "[[1 2 3][4 5 6][7 8 9]] INV", ENTER)
@@ -7168,7 +7211,7 @@ void tests::auto_simplification()
 
     step("Limit number of iterations in polynomials (bug #1047)")
         .test(CLEAR, "X 3", ID_pow, KEY4, DIV, "X", ID_subtract, KEY1, ADD)
-        .expect("'X³÷4-X+1'");
+        .expect("'X↑3÷4-X+1'");
 
     step("X + 0 = X");
     test(CLEAR, "X 0 +", ENTER).expect("'X'");
@@ -7265,35 +7308,35 @@ void tests::auto_simplification()
 
     step("Fold constants: additions")
         .test(CLEAR, "'1+X+2'", ENTER).expect("'1+X+2'")
-        .test(RUNSTOP).expect("'X+3'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+3'");
     step("Fold constants: subtractions")
         .test(CLEAR, "'2+X-1'", ENTER).expect("'2+X-1'")
-        .test(RUNSTOP).expect("'X+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+1'");
     step("Fold constants: multiplications")
         .test(CLEAR, "'2*X*3'", ENTER).expect("'2·X·3'")
-        .test(RUNSTOP).expect("'6·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'6·X'");
     step("Fold constants: divisions")
         .test(CLEAR, "'4*X/2'", ENTER).expect("'4·X÷2'")
-        .test(RUNSTOP).expect("'2·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'2·X'");
     step("Fold constants: power")
         .test(CLEAR, "'X*2^3'", ENTER).expect("'X·2↑3'")
-        .test(RUNSTOP).expect("'8·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'8·X'");
     step("Fold constants: complicated expression")
         .test(CLEAR, "'X*2^3+3+2*X-1'", ENTER).expect("'X·2↑3+3+2·X-1'")
-        .test(RUNSTOP).expect("'10·X+2'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'10·X+2'");
 
     step("Zero elimination")
         .test(CLEAR, "'X-0+Y+0'", ENTER).expect("'X-0+Y+0'")
         .test(RUNSTOP).expect("'X+Y'");
     step("Adding to self")
         .test(CLEAR, "'(X+X)+(X+X)'", ENTER).expect("'X+X+(X+X)'")
-        .test(RUNSTOP).expect("'4·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'4·X'");
     step("Subtracting to self")
         .test(CLEAR, "'(X+X)-(X*2)'", ENTER).expect("'X+X-X·2'")
-        .test(RUNSTOP).expect("0");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'0'");
     step("Reordering terms")
         .test(CLEAR, "'(4+X+3)+2*3'", ENTER).expect("'4+X+3+2·3'")
-        .test(RUNSTOP).expect("'X+13'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+13'");
     step("Double-negation")
         .test(CLEAR, "'-(-(-((4+X+3)+2*3)))'", ENTER).expect("'-(-(-(4+X+3+2·3)))'")
         .test(RUNSTOP).expect("'-(X+13)'");
@@ -7302,19 +7345,19 @@ void tests::auto_simplification()
         .test(RUNSTOP).expect("'X'");
     step("Cancelled division")
         .test(CLEAR, "'7/(7/X)'", ENTER).expect("'7÷(7÷X)'")
-        .test(RUNSTOP).expect("'X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X'");
     step("Reversed division")
         .test(CLEAR, "'7/(3/X)'", ENTER).expect("'7÷(3÷X)'")
-        .test(RUNSTOP).expect("'⁷/₃·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'⁷/₃·X'");
     step("Factoring terms")
         .test(CLEAR, "'3*X+2*X-X+3*X+X'", ENTER).expect("'3·X+2·X-X+3·X+X'")
-        .test(RUNSTOP).expect("'8·X'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'8·X'");
     step("Auto-squaring and auto-cubing")
         .test(CLEAR, "'A*A*A+B*B'", ENTER).expect("'A·A·A+B·B'")
-        .test(RUNSTOP).expect("'A³+B²'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'A³+B²'");
     step("Auto-powers")
         .test(CLEAR, "'Z*(Z*Z*Z)*(Z*Z)*Z'", ENTER).expect("'Z·(Z·Z·Z)·(Z·Z)·Z'")
-        .test(RUNSTOP).expect("'Z↑7'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'Z↑7'");
     step("Auto-powers from square and cubed")
         .test(CLEAR, "'sq A * cubed B'", ENTER).expect("'A²·B³'")
         .test(RUNSTOP).expect("'A²·B³'");
@@ -7323,46 +7366,46 @@ void tests::auto_simplification()
         .test(RUNSTOP).expect("1");
     step("Power simplification")
         .test(CLEAR, "'X^3*X+Y*Y^5'", ENTER).expect("'X↑3·X+Y·Y↑5'")
-        .test(RUNSTOP).expect("'X↑4+Y↑6'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X↑4+Y↑6'");
     step("Power one and power zero")
         .test(CLEAR, "'X^0+Y^1'", ENTER).expect("'X↑0+Y↑1'")
-        .test(RUNSTOP).expect("'Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'Y+1'");
 
     step("sin simplification")
         .test(CLEAR, "'1+sin(asin(X))+asin(sin(Y))'", ENTER)
         .expect("'1+sin (sin⁻¹ X)+sin⁻¹ (sin Y)'")
-        .test(RUNSTOP).expect("'X+sin⁻¹ (sin Y)+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+sin⁻¹ (sin Y)+1'");
     step("cos simplification")
         .test(CLEAR, "'1+cos(acos(X))+acos(cos(Y))'", ENTER)
         .expect("'1+cos (cos⁻¹ X)+cos⁻¹ (cos Y)'")
-        .test(RUNSTOP).expect("'X+cos⁻¹ (cos Y)+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+cos⁻¹ (cos Y)+1'");
     step("tan simplification")
         .test(CLEAR, "'1+tan(atan(X))+atan(tan(Y))'", ENTER)
         .expect("'1+tan (tan⁻¹ X)+tan⁻¹ (tan Y)'")
-        .test(RUNSTOP).expect("'X+tan⁻¹ (tan Y)+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+tan⁻¹ (tan Y)+1'");
 
     step("sinh simplification")
         .test(CLEAR, "'1+sinh(asinh(X))+asinh(sinh(Y))'", ENTER)
         .expect("'1+sinh (sinh⁻¹ X)+sinh⁻¹ (sinh Y)'")
-        .test(RUNSTOP).expect("'X+Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+Y+1'");
     step("cosh simplification")
         .test(CLEAR, "'1+cosh(acosh(X))+acosh(cosh(Y))'", ENTER)
         .expect("'1+cosh (cosh⁻¹ X)+cosh⁻¹ (cosh Y)'")
-        .test(RUNSTOP).expect("'X+Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+Y+1'");
     step("tanh simplification")
         .test(CLEAR, "'1+tanh(atanh(X))+atanh(tanh(Y))'", ENTER)
         .expect("'1+tanh (tanh⁻¹ X)+tanh⁻¹ (tanh Y)'")
-        .test(RUNSTOP).expect("'X+Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'X+Y+1'");
 
     step("abs simplification")
         .test(CLEAR, "'1+abs(abs(X))+abs(-Y)'", ENTER)
         .expect("'1+abs (abs X)+abs(-Y)'")
-        .test(RUNSTOP).expect("'abs X+abs Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'abs X+abs Y+1'");
 
     step("sqrt simplification")
         .test(CLEAR, "'1+abs(abs(X))+abs(-Y)'", ENTER)
         .expect("'1+abs (abs X)+abs(-Y)'")
-        .test(RUNSTOP).expect("'abs X+abs Y+1'");
+        .test(ID_SymbolicMenu, ID_Simplify).expect("'abs X+abs Y+1'");
 
     step("Disable auto simplification");
     test(CLEAR, "NoAutoSimplify", ENTER).noerror();
@@ -7551,11 +7594,11 @@ void tests::symbolic_operations()
     step("Simple arithmetic - Symbol and constant")
         .test(CLEAR, "'A' 3 +", ENTER).expect("'A+3'")
         .test(CLEAR, "'A' 3 -", ENTER).expect("'A-3'")
-        .test(CLEAR, "'A' 3 *", ENTER).expect("'3·A'")
+        .test(CLEAR, "'A' 3 *", ENTER).expect("'A·3'")
         .test(CLEAR, "'A' 3 /", ENTER).expect("'A÷3'")
-        .test(CLEAR, "'A' 3 ↑", ENTER).expect("'A³'");
+        .test(CLEAR, "'A' 3 ↑", ENTER).expect("'A↑3'");
     step("Simple arithmetic - Constant and symbol")
-        .test(CLEAR, "3 'A' +", ENTER).expect("'A+3'")
+        .test(CLEAR, "3 'A' +", ENTER).expect("'3+A'")
         .test(CLEAR, "3 'A' -", ENTER).expect("'3-A'")
         .test(CLEAR, "3 'A' *", ENTER).expect("'3·A'")
         .test(CLEAR, "3 'A' /", ENTER).expect("'3÷A'")
@@ -7573,11 +7616,11 @@ void tests::symbolic_operations()
     step("Simple arithmetic on equations")
         .test(CLEAR, "'A=B' 3 +", ENTER).expect("'A+3=B+3'")
         .test(CLEAR, "'A=B' 3 -", ENTER).expect("'A-3=B-3'")
-        .test(CLEAR, "'A=B' 3 *", ENTER).expect("'3·A=3·B'")
+        .test(CLEAR, "'A=B' 3 *", ENTER).expect("'A·3=B·3'")
         .test(CLEAR, "'A=B' 3 /", ENTER).expect("'A÷3=B÷3'")
-        .test(CLEAR, "'A=B' 3 ↑", ENTER).expect("'A³=B³'");
+        .test(CLEAR, "'A=B' 3 ↑", ENTER).expect("'A↑3=B↑3'");
     step("Simple arithmetic - Constant and symbol")
-        .test(CLEAR, "3 'A=B' +", ENTER).expect("'A+3=B+3'")
+        .test(CLEAR, "3 'A=B' +", ENTER).expect("'3+A=3+B'")
         .test(CLEAR, "3 'A=B' -", ENTER).expect("'3-A=3-B'")
         .test(CLEAR, "3 'A=B' *", ENTER).expect("'3·A=3·B'")
         .test(CLEAR, "3 'A=B' /", ENTER).expect("'3÷A=3÷B'")
@@ -7678,22 +7721,25 @@ void tests::symbolic_operations()
         .test(CLEAR, "'X^2+3*X+7|X=Z+1'", ENTER)
         .expect("'X↑2+3·X+7|X=Z+1'")
         .test(RUNSTOP)
-        .expect("'(Z+1)²+3·(Z+1)+7'");
+        .expect("'(Z+1)↑2+3·(Z+1)+7'");
     step("Chained | operator")
         .test("'X^2+3*X+7|X=Z+1|Z=sin(A+B)|A=42'", ENTER)
         .expect("'X↑2+3·X+7|X=Z+1|Z=sin(A+B)|A=42'")
         .test(RUNSTOP)
-        .expect("'(sin(42+B)+1)²+3·(sin(42+B)+1)+7'");
+        .expect("'(sin(42+B)+1)↑2+3·(sin(42+B)+1)+7'");
     step("Chained | operator with HP syntax")
         .test("'X^2+3*X+7|(X=Z+1;Z=sin(A+B);A=42)'", ENTER)
         .expect("'X↑2+3·X+7|X=Z+1|Z=sin(A+B)|A=42'")
         .test(RUNSTOP)
-        .expect("'(sin(42+B)+1)²+3·(sin(42+B)+1)+7'");
+        .expect("'(sin(42+B)+1)↑2+3·(sin(42+B)+1)+7'");
     step("Where operator on library equations")
         .test("'ⒺRelativity Mass Energy|m=(1_g)'", ENTER)
         .expect("'Relativity Mass Energy:{E=m·c²}|m=1 g'")
         .test(RUNSTOP)
         .expect("{ 'E=¹/₁ ₀₀₀ kg·c²' }");
+    step("Where operator in non-algebraic form with list")
+        .test(CLEAR, "'x^y' { x 2 y 3 } |", ENTER)
+        .expect("'2↑3'");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
@@ -7894,6 +7940,10 @@ void tests::symbolic_differentiation()
     step("Derivative of unknown form")
         .test(CLEAR, "'IP(X)' 'X'", ID_Derivative)
         .error("Unknown derivative");
+
+    step("Derivative of unknown form in algebraic form")
+        .test(CLEAR, "'∂x(→Num(x))'", ENTER, ID_Run)
+        .error("Unknown derivative");
 }
 
 
@@ -7991,6 +8041,9 @@ void tests::symbolic_integration()
 
     step("Primitive of unknown form")
         .test(CLEAR, "'IP(X)' 'X'", ID_Primitive)
+        .error("Unknown primitive");
+    step("Primitive of unknown form in algebraic form")
+        .test(CLEAR, "'∫x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown primitive");
 }
 
@@ -9660,6 +9713,19 @@ void tests::graphic_stack_rendering()
     step("Product")
         .test(CLEAR, "2 J 1.2 10.2 K * 'J+4' ∏ *", ENTER)
         .image_noheader("product-xgraph");
+
+    step("Graphics stack rendering settings")
+        .test(CLEAR, "'sqrt(x)' 1/2 3/4", ENTER, EXIT,
+              ID_UserInterfaceModesMenu)
+        .image_noheader("graph-stack-and-result-both")
+        .test(ID_GraphicStackDisplay)
+        .image_noheader("graph-stack-and-result-result-only")
+        .test(ID_GraphicResultDisplay)
+        .image_noheader("graph-stack-and-result-none")
+        .test(ID_GraphicStackDisplay)
+        .image_noheader("graph-stack-and-stack-only")
+        .test(ID_GraphicResultDisplay)
+        .image_noheader("graph-stack-and-result-both");
 }
 
 
@@ -10871,30 +10937,26 @@ void tests::sum_and_product()
 
     step("Symbolic sum of integers")
         .test(CLEAR, "I 1 10 '(A+I)^3' Σ", ENTER)
-        .expect(
-            "'(A+1)³+(A+2)³+(A+3)³+(A+4)³+(A+5)³+"
-            "(A+6)³+(A+7)³+(A+8)³+(A+9)³+(A+10)³'");
+        .expect("'(A+1)↑3+(A+2)↑3+(A+3)↑3+(A+4)↑3+(A+5)↑3"
+                "+(A+6)↑3+(A+7)↑3+(A+8)↑3+(A+9)↑3+(A+10)↑3'");
     step("Symbolic product of integers")
         .test(CLEAR, "I 1 10 '(A+I)^3' ∏", ENTER)
-        .expect(
-            "'(A+1)³·(A+2)³·(A+3)³·(A+4)³·(A+5)³·"
-            "(A+6)³·(A+7)³·(A+8)³·(A+9)³·(A+10)³'");
+        .expect("'(A+1)↑3·(A+2)↑3·(A+3)↑3·(A+4)↑3·(A+5)↑3"
+                "·(A+6)↑3·(A+7)↑3·(A+8)↑3·(A+9)↑3·(A+10)↑3'");
     step("Symbolic sum of decimal")
         .test(CLEAR, "I 1.2 10.2 '(A+I)^3' Σ", ENTER)
-        .expect(
-            "'(A+1.2)³+(A+2.2)³+(A+3.2)³+(A+4.2)³+(A+5.2)³+"
-            "(A+6.2)³+(A+7.2)³+(A+8.2)³+(A+9.2)³+(A+10.2)³'");
+        .expect("'(A+1.2)↑3+(A+2.2)↑3+(A+3.2)↑3+(A+4.2)↑3+(A+5.2)↑3"
+                "+(A+6.2)↑3+(A+7.2)↑3+(A+8.2)↑3+(A+9.2)↑3+(A+10.2)↑3'");
     step("Symbolic product of decimal")
         .test(CLEAR, "I 1.2 10.2 '(A+I)^3' ∏", ENTER)
-        .expect(
-            "'(A+1.2)³·(A+2.2)³·(A+3.2)³·(A+4.2)³·(A+5.2)³·"
-            "(A+6.2)³·(A+7.2)³·(A+8.2)³·(A+9.2)³·(A+10.2)³'");
+        .expect("'(A+1.2)↑3·(A+2.2)↑3·(A+3.2)↑3·(A+4.2)↑3·(A+5.2)↑3"
+                "·(A+6.2)↑3·(A+7.2)↑3·(A+8.2)↑3·(A+9.2)↑3·(A+10.2)↑3'");
     step("Symbolic sum of fraction")
         .test(CLEAR, "I 1/3 10/3 '(A+I)^3' Σ", ENTER)
-        .expect("'(A+¹/₃)³+(A+⁴/₃)³+(A+⁷/₃)³+(A+¹⁰/₃)³'");
+        .expect("'(A+¹/₃)↑3+(A+⁴/₃)↑3+(A+⁷/₃)↑3+(A+¹⁰/₃)↑3'");
     step("Symbolic product of fraction")
         .test(CLEAR, "I 1/3 10/3 '(A+I)^3' ∏", ENTER)
-        .expect("'(A+¹/₃)³·(A+⁴/₃)³·(A+⁷/₃)³·(A+¹⁰/₃)³'");
+        .expect("'(A+¹/₃)↑3·(A+⁴/₃)↑3·(A+⁷/₃)↑3·(A+¹⁰/₃)↑3'");
 
     step("Empty sum").test(CLEAR, "I 10 1 'I^3' Σ", ENTER).expect("0");
     step("Empty product").test(CLEAR, "I 10 1 'I^3' ∏", ENTER).expect("1");
@@ -11002,6 +11064,10 @@ void tests::polynomials()
         .expect("ⓅX-2·Y")
         .test(ID_neg)
         .expect("Ⓟ-X+2·Y");
+
+    step("Polynomial with large exponent")
+        .test(CLEAR, "'X^999999999999'", ENTER, ID_ToolsMenu, F4)
+        .expect("ⓅX↑999999999999");
 
     step("Restore default rendering for polynomials")
         .test(CLEAR, "'PrefixPolynomialRender' purge", ENTER)
@@ -11529,13 +11595,16 @@ void tests::check_help_examples()
     uint        closecheck = 0;
     uint        expcheck   = 0;
     uint        failcheck  = 0;
+    uint        imgcheck   = 0;
     cstring     open       = "\n```rpl\n";
     cstring     close      = "\n```\n";
     cstring     expecting  = "@ Expecting ";
     cstring     failing    = "@ Failing ";
+    cstring     image      = "@ Image ";
     bool        hadcr      = false;
     bool        testing    = false;
     bool        inref      = false;
+    bool        inimg      = false;
     uint        line       = 1;
     uint        tidx       = 0;
     bool        intopic    = false;
@@ -11607,7 +11676,7 @@ void tests::check_help_examples()
                     bool keep =
                         ubuf.find("@ Keep") != ubuf.npos ||
                         ubuf.find("@ Save") != ubuf.npos;
-                    itest(DIRECT(ubuf));
+                    itest(CLEAR, EXIT, DIRECT(ubuf));
                     ubuf.clear();
 
                     size_t nfailures = failures.size();
@@ -11616,7 +11685,18 @@ void tests::check_help_examples()
                     if (rt.depth() && Stack.type() == object::ID_expression)
                         itest(LENGTHY(20000), RUNSTOP).noerror();
                     if (!ref.empty())
-                        want(ref.c_str());
+                    {
+                        if (inimg)
+                        {
+                            std::string imgname = ref+"-test-"+(topic+1);
+                            image_noheader(imgname.c_str());
+                            inimg = false;
+                        }
+                        else
+                        {
+                            want(ref.c_str());
+                        }
+                    }
                     bool fails = failures.size() > nfailures;
                     if (fails || skiptest)
                     {
@@ -11662,14 +11742,31 @@ void tests::check_help_examples()
             failcheck++;
             if (!failing[failcheck])
             {
-                skiptest = true;
+                failcheck = 0;
+                skiptest  = true;
+                inref     = true;
+                ref       = "";
+            }
+        }
+        else
+        {
+            failcheck = (c == failing[0]);
+        }
+
+        if (c == image[imgcheck])
+        {
+            imgcheck++;
+            if (!image[imgcheck])
+            {
+                imgcheck = 0;
+                inimg    = true;
                 inref    = true;
                 ref      = "";
             }
         }
         else
         {
-            failcheck = (c == failing[0]);
+            imgcheck = (c == image[0]);
         }
     }
     fclose(f);
@@ -12137,6 +12234,10 @@ void tests::graphic_commands()
         .test("{ 10#15 10#13 } { 10#70 10#24 }", ID_GraphicsMenu, ID_Extract)
         .image_noheader("num-grob-extracted2");
 
+    step("Send to LCD")
+        .test("→LCD", ENTER)
+        .image("tolcd");
+
     step("Clear LCD")
         .test(CLEAR, "ClearLCD", ENTER)
         .noerror()
@@ -12165,6 +12266,26 @@ void tests::graphic_commands()
               ENTER)
         .noerror()
         .image("walkman")
+        .test(EXIT);
+
+    step("Fetch from LCD")
+        .test(CLEAR, DIRECT(
+              "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
+              "PICT { 10#125 10#44 }"
+              "GROB 9 15 "
+              "E300140015001C001400E3008000C110AA00940090004100220014102800 "
+              "GXOR LCD→"), ENTER)
+        .image("lcdsource")
+        .test(EXIT, ENTER)
+#ifdef CONFIG_COLOR
+        .type(ID_pixmap)
+        .expect("Large pixmap (192006 bytes)")
+#else // CONFIG_COLOR
+        .type(ID_bitmap)
+        .expect("Large bitmap (12006 bytes)")
+#endif // CONFIG_COLOR
+        .test("{ 10#20 10#40 } { 10#380 10#123 } SUB", ENTER)
+        .image_noheader("fromlcd")
         .test(EXIT);
 
     step("Displaying text, compatibility mode");
@@ -12413,6 +12534,25 @@ void tests::graphic_commands()
         .image("rounded-rectangle-fill")
         .test(ENTER);
 
+    step("RGB colors")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH "
+              "0 1 for r"
+              "  0 1 for g"
+              "   0 1 for b"
+              "     r g b RGB Foreground"
+              "     r g 2 + * 4 * g 27 * b 360 * + R→P 0.2 Circle"
+              "   0.1 step"
+              " 0.1 step "
+              "0.1 step "
+              "'LineWidth' PURGE "
+              "1 0 0 RGB FOREGROUND \"Red\" 1 DISP "
+              "0 1 0 RGB FOREGROUND \"Green\" 2 DISP "
+              "0 0 1 RGB FOREGROUND \"Blue\" 3 DISP "),
+              LENGTHY(5000), ENTER).noerror()
+        .image("rgb-colors")
+        .test(ENTER);
+
     step("Clipping");
     test(CLEAR, DIRECT(
          "0 LineWidth CLLCD { 120 135 353 175 } Clip "
@@ -12442,7 +12582,7 @@ void tests::graphic_commands()
               " 0.005 i * i 1.5 * R→P pixon "
               " 0.005 i * i 1.5 * R→P pix? 1 - neg + "
               "next"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixon")
         .test(ENTER)
@@ -12456,7 +12596,7 @@ void tests::graphic_commands()
               " 0.002 i * i 1.5 * R→P pixelcolor + + + "
               "next "
               "1 LINEWIDTH"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixoff")
         .test(ENTER)
@@ -12474,7 +12614,7 @@ void tests::graphic_commands()
               "{ } 10#0 i + + 10#100 + "
               "pix? i 997.42 * sin 0 > 0 1 IFTE - 1 + +  "
               "next"),
-              LENGTHY(5000),
+              LENGTHY(15000),
               ENTER)
         .image("pixtest")
         .test(ENTER)
@@ -12561,6 +12701,439 @@ void tests::graphic_commands()
         .test(CLEAR, ID_GraphicsMenu,
               "123", ID_GraphicIntegral,EXIT)
         .image_noheader("graph-integral");
+
+    step("BlankGraphic")
+        .test(CLEAR, DIRECT("63 27 Blank "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGraphic "
+                            "'Background' PURGE"), ENTER)
+        .image_noheader("blank-graphic");
+    step("BlankBitmap")
+        .test(CLEAR, DIRECT("63 27 BlankBitmap "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankBitmap "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_bitmap)
+        .image_noheader("blank-bitmap");
+    step("BlankGrob")
+        .test(CLEAR, DIRECT("63 27 BlankGrob "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGrob "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_grob)
+        .image_noheader("blank-bitmap");
+#if CONFIG_COLOR
+    step("BlankPixmap")
+        .test(CLEAR, DIRECT("63 27 BlankPixmap "
+                            "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankPixmap "
+                            "'Background' PURGE"), ENTER)
+        .type(ID_pixmap)
+        .image_noheader("blank-pixmap");
+#endif // CONFIG_COLOR
+}
+
+
+void tests::offline_graphics()
+// ----------------------------------------------------------------------------
+//   Off-line graphics, i.e. graphics that are stored in a variable
+// ----------------------------------------------------------------------------
+{
+    BEGIN(offline);
+
+    step("Create 500x300 bitmap and store it in PICT")
+        .test(CLEAR, "500 300 BLANKBITMAP PICT STO", ENTER).noerror();
+
+    step("Send to LCD")
+        .test("35 42 BLANK →LCD", ENTER)
+        .image("tolcd-offline")
+        .test(KEY6)
+        .image("tolcd-offline2")
+        .test(KEY6)
+        .image("tolcd-offline3")
+        .test(KEY2)
+        .image("tolcd-offline4")
+        .test(KEY4)
+        .image("tolcd-offline5")
+        .test(KEY8)
+        .image("tolcd-offline6")
+        .test(EXIT);
+
+    step("Clear LCD")
+        .test(CLEAR, "ClearLCD", ENTER)
+        .noerror()
+        .image("cllcd")
+        .test(EXIT)
+        .test(CLEAR, "CLLCD 1 1 DISP CLLCD", ENTER)
+        .noerror()
+        .image("cllcd-offline")
+        .test(EXIT);
+
+    step("Draw graphic objects")
+        .test(CLEAR, DIRECT(
+              "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
+              "GROB 9 15 "
+              "E300140015001C001400E3008000C110AA00940090004100220014102800 "
+              "2 25 for i "
+              "PICT OVER "
+              "2.321 ⅈ * i * exp 4.44 0.08 i * + * Swap "
+              "GXor "
+              "PICT OVER "
+              "1.123 ⅈ * i * exp 4.33 0.08 i * + * Swap "
+              "GAnd "
+              "PICT OVER "
+              "4.12 ⅈ * i * exp 4.22 0.08 i * + * Swap "
+              "GOr "
+              "next"),
+              ENTER)
+        .noerror()
+        .image("walkman-offline")
+        .test(EXIT);
+
+    step("Displaying text, compatibility mode");
+    test(CLEAR,
+         DIRECT("\"Hello World\" 1 DISP "
+                "\"Compatibility mode\" 2 DISP"),
+         ENTER)
+        .noerror()
+        .image("text-compat-offline")
+        .test(EXIT);
+
+    step("Displaying text, fractional row");
+    test(CLEAR,
+         DIRECT("\"Gutentag\" 1.5 DrawText "
+                "\"Fractional row\" 3.8 DrawText"),
+         ENTER)
+        .noerror()
+        .image("text-frac-offline")
+        .test(EXIT);
+
+    step("Displaying text, pixel row");
+    test(CLEAR,
+         DIRECT("\"Bonjour tout le monde\" #5d DISP "
+                "\"Pixel row mode\" #125d DISP"),
+         ENTER)
+        .noerror()
+        .image("text-pixrow-offline")
+        .test(EXIT);
+
+    step("Displaying text, x-y coordinates");
+    test(CLEAR, DIRECT("\"Hello\" { 0 0 } DISP "), ENTER)
+        .noerror()
+        .image("text-xy-offline")
+        .test(EXIT);
+
+    step("Displaying text, x-y pixel coordinates");
+    test(CLEAR, DIRECT("\"Hello\" { #20d #20d } DISP"), ENTER)
+        .noerror()
+        .image("text-pixxy-offline")
+        .test(EXIT);
+
+    step("Displaying text, font ID");
+    test(CLEAR,
+         DIRECT("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
+         ENTER)
+        .noerror()
+        .image("text-font-offline")
+        .test(EXIT);
+
+    step("Displaying text, erase and invert");
+    test(CLEAR, DIRECT("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
+        .noerror()
+        .image("text-invert-offline")
+        .test(EXIT);
+
+    step("Displaying text, background and foreground");
+    test(CLEAR,
+         DIRECT("1 Gray Background cllcd "
+                "0.25 Gray Foreground 0.75 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
+         ENTER)
+        .noerror()
+        .image("text-gray-offline")
+        .test(EXIT);
+
+    step("Displaying text, restore background and foreground");
+    test(CLEAR,
+         DIRECT("0 Gray Foreground 1 Gray Background "
+                "\"Grayed\" { 0 0 } Disp"),
+         ENTER)
+        .noerror()
+        .image("text-normal-offline")
+        .test(EXIT);
+
+    step("Displaying text, type check");
+    test(CLEAR, "\"Bad\" \"Hello\" DISP", ENTER).error("Bad argument type");
+
+    step("Displaying styled text");
+    test(CLEAR,
+         DIRECT("0 10 for i"
+                "  \"Hello\" { }"
+                "  i 135 * 321 mod 25 + R→B +"
+                "  i  51 * 200 mod  3 + R→B +"
+                "  i DISPXY "
+                "next"),
+         ENTER)
+        .noerror()
+        .image("text-dispxy-offline")
+        .test(EXIT);
+
+    step("Lines");
+    test(CLEAR,
+         DIRECT("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
+        .noerror()
+        .image("lines-offline")
+        .test(EXIT);
+
+    step("Line width");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ #000 } #0 i 20 * + + "
+         "{ #400 } #0 i 20 * + + "
+         "i LineWidth Line "
+         "next "
+         "1 LineWidth"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("line-width-offline")
+        .test(EXIT);
+
+    step("Line width, grayed");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ #000 } #0 i 20 * + + "
+         "{ #400 } #0 i 20 * + + "
+         "i 12 / gray foreground "
+         "i LineWidth Line "
+         "next "
+         "1 LineWidth 0 Gray Foreground"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("line-width-gray-offline")
+        .test(EXIT);
+
+    step("Circles");
+    test(CLEAR, DIRECT(
+         "1 11 for i "
+         "{ 0 0 } i Circle "
+         "{ 0 1 } i 0.25 * Circle "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-offline")
+        .test(EXIT);
+
+    step("Circles, complex coordinates");
+    test(CLEAR,
+         DIRECT("2 150 for i "
+                "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * + Circle "
+                "next"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-complex-offline")
+        .test(EXIT);
+
+    step("Circles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0053 * gray Foreground "
+         "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("circles-fill-offline")
+        .test(EXIT);
+
+    step("Ellipses");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         " Ellipse "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("ellipses-offline")
+        .test(EXIT);
+
+    step("Ellipses, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         " Ellipse "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("ellipses-fill-offline")
+        .test(EXIT);
+
+    step("Rectangles");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         " Rect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rectangles-offline")
+        .test(EXIT);
+
+    step("Rectangles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         " Rect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rectangle-fill-offline")
+        .test(EXIT);
+
+    step("Rounded rectangles");
+    test(CLEAR, DIRECT(
+         "0 gray foreground 1 LineWidth "
+         "2 150 for i "
+         "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
+         "i 0.17 * ⅈ * exp 0.05 i * 0.75 + * "
+         "0.8 RRect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rounded-rectangle-offline")
+        .test(EXIT);
+
+    step("Rounded rectangles, fill and patterns");
+    test(CLEAR, DIRECT(
+         "0 LineWidth "
+         "2 150 for i "
+         "i 0.0047 * gray Foreground "
+         "0.23 ⅈ * exp 5.75 0.01 i * - * "
+         "1.27 ⅈ * exp 5.45 0.01 i * - * neg "
+         "0.8 RRect "
+         "next "),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("rounded-rectangle-fill-offline")
+        .test(EXIT);
+
+    step("RGB colors")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH "
+              "0 1 for r"
+              "  0 1 for g"
+              "   0 1 for b"
+              "     r g b RGB Foreground"
+              "     r g 2 + * 4 * g 27 * b 360 * + R→P 0.2 Circle"
+              "   0.1 step"
+              " 0.1 step "
+              "0.1 step "
+              "'LineWidth' PURGE "
+              "1 0 0 RGB FOREGROUND \"Red\" 1 DISP "
+              "0 1 0 RGB FOREGROUND \"Green\" 2 DISP "
+              "0 0 1 RGB FOREGROUND \"Blue\" 3 DISP "),
+              LENGTHY(5000), ENTER).noerror()
+        .image("rgb-colors-offline")
+        .test(EXIT);
+
+    step("Clipping");
+    test(CLEAR, DIRECT(
+         "0 LineWidth CLLCD { 120 135 353 175 } Clip "
+         "2 150 for i "
+         "i 0.0053 * gray Foreground "
+         "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.1 0.008 i * +  Circle "
+         "next "
+         "{} Clip"),
+         LENGTHY(5000),
+         ENTER)
+        .noerror()
+        .image("clip-circles-offline")
+        .test(EXIT);
+
+    step("Cleanup");
+    test(CLEAR, DIRECT(
+         "1 LineWidth 0 Gray Foreground 1 Gray Background "
+         "{ -1 -1 } { 3 2 } rect"),
+         ENTER)
+        .noerror()
+        .image("cleanup-offline")
+        .test(EXIT);
+
+    step("PixOn")
+        .test(CLEAR, DIRECT(
+              "0 "
+              "0 500 for i"
+              " 0.005 i * i 1.5 * R→P pixon "
+              " 0.005 i * i 1.5 * R→P pix? 1 - neg + "
+              "next"),
+              LENGTHY(15000), ENTER)
+        .test(KEY6)
+        .image("pixon-offline")
+        .test(EXIT)
+        .expect("501");
+    step("PixOff")
+        .test(CLEAR, DIRECT(
+              "0 LINEWIDTH { #0 #0 } { 10#400 10#240 } rect 3 LINEWIDTH "
+              "0 "
+              "0 500 for i"
+              " 0.002 i * i 1.5 * R→P pixoff "
+              " 0.002 i * i 1.5 * R→P pixelcolor + + + "
+              "next "
+              "1 LINEWIDTH"),
+              LENGTHY(15000), ENTER)
+        .test(KEY6)
+        .image("pixoff-offline")
+        .test(EXIT)
+        .expect("1 503");
+
+    step("PixTest")
+        .test(CLEAR, DIRECT(
+              "CLLCD "
+              "0 399 for i "
+              "{ } 10#0 i + + 10#100 + "
+              "if i 997.42 * sin 0 > then pixon else pixoff end "
+              "next "
+              "0 "
+              "0 399 for i "
+              "{ } 10#0 i + + 10#100 + "
+              "pix? i 997.42 * sin 0 > 0 1 IFTE - 1 + +  "
+              "next"),
+              LENGTHY(15000),
+              ENTER)
+        .image("pixtest-offline")
+        .test(EXIT)
+        .expect("400");
+
+    step("Function plot")
+        .test(CLEAR,
+              DIRECT("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
+        .image("function-offline")
+        .test(EXIT);
+    step("Expliti DRAX")
+        .test(CLEAR, DIRECT("DRAX"), ENTER)
+        .image("function+drax-offline")
+        .test(EXIT);
+    step("Second function superimposed")
+        .test(CLEAR, DIRECT("0.8 0.4 0.2 RGB FOREGROUND 3 LINEWIDTH"
+                            "'sin(150*x)' FUNCTIONPLOT"), ENTER)
+        .image("two-functions-offline")
+        .test(EXIT, DIRECT("{ FOREGROUND LINEWIDTH } PURGE"), ENTER).noerror();
 }
 
 

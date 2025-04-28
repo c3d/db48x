@@ -111,7 +111,7 @@ generated.
 
 ```rpl
 "2+3*ABC" Text→Expression
-@ Expecting '3·ABC+2'
+@ Expecting '2+3·ABC'
 ```
 
 This command is typically used for `Input` validation.

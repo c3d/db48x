@@ -121,7 +121,7 @@ struct unit_file : file
 #include "ids.tbl"
 
 COMMAND_DECLARE(Convert,2);
-COMMAND_DECLARE(UBase,1);
+FUNCTION(UBase);
 COMMAND_DECLARE(UFact,2);
 COMMAND_DECLARE_INSERT(ConvertToUnitPrefix,-1);
 FUNCTION(UVal);
@@ -131,9 +131,9 @@ COMMAND_DECLARE_INSERT(ConvertToUnit,1);
 COMMAND_DECLARE_INSERT(ApplyInverseUnit, 1);
 COMMAND_DECLARE(UnitsSIPrefixCycle, 1);
 
-COMMAND_DECLARE(ToDegrees,1);
-COMMAND_DECLARE(ToRadians,1);
-COMMAND_DECLARE(ToGrads,1);
-COMMAND_DECLARE(ToPiRadians,1);
+FUNCTION(ToDegrees);
+FUNCTION(ToRadians);
+FUNCTION(ToGrads);
+FUNCTION(ToPiRadians);
 
 #endif // UNIT_H

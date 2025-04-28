@@ -520,7 +520,7 @@ COMMAND_BODY(LastBitSet)
             }
             bit += 8;
         }
-        bit = 8 * sz - bit;
+        bit = 8 * sz - bit - 1;
     }
     else if (obj->is_integer())
     {
@@ -544,7 +544,7 @@ COMMAND_BODY(LastBitSet)
             }
             bit += 7;
         } while (b & 0x80);
-        bit = lst;
+        bit = lst - 1;
     }
     else
     {

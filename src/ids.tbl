@@ -115,7 +115,6 @@
 //
 // ============================================================================
 
-ID_RANGE(is_type,          directory,      bitmap)
 #if CONFIG_FIXED_BASED_OBJECTS
 ID_RANGE(is_integer,       hex_integer,    neg_integer)
 ID_RANGE(is_based,         hex_integer,    based_integer, hex_bignum, based_bignum)
@@ -150,7 +149,8 @@ ID_RANGE(is_immediate,     MainMenu,       SelfInsert)
 ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)
 ID_RANGE(is_program,       program,        funcall)
-ID_RANGE(is_graph,         grob,           pixmap)
+ID_RANGE(is_graph,         grob,           bitmap)
+ID_RANGE(is_monochrome,    grob,           grob,        bitmap, bitmap)
 ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,    IfErrThen, IfErrThenElse)
 ID_RANGE(is_menu,          MainMenu,       Catalog,     UnitMenu00, CharactersMenu99)
 
@@ -410,7 +410,7 @@ NAMED(PercentTotal,     "%Total")               ALIAS(PercentChange, "%T")
 CMD(Min)
 CMD(Max)
 
-NAMED(Extract, "Sub")
+CMD(Extract)                                    ALIAS(Extract, "Sub")
 CMD(NSub)
 CMD(EndSub)
 
@@ -476,6 +476,8 @@ NAMED(Rect,             "DrawRectangle")
 NAMED(RRect,            "DrawRoundedRectangle")
 NAMED(Draw,             "DrawPlot")
 NAMED(Drax,             "DrawAxes")
+NAMED(ToLCD,            "→LCD")                 ALIAS(ToLCD, "→Screen")
+NAMED(FromLCD,          "LCD→")                 ALIAS(FromLCD, "Screen→")
 
 NAMED(Function,         "FunctionPlot")
 NAMED(Polar,            "PolarPlot")
@@ -491,7 +493,19 @@ NAMED(Gray,             "GrayPattern")          ALIAS(Gray,     "GreyPattern")
                                                 ALIAS(Gray,     "Grey")
 NAMED(RGB,              "RGBPattern")
 
-NAMED(ToGrob,           "→Graphic")             ALIAS(ToGrob, "→Grob")
+NAMED(ToGrob,           "→Grob")
+NAMED(ToHPGrob,         "→HPGrob")
+NAMED(ToBitmap,         "→Bitmap")
+#ifdef CONFIG_COLOR
+NAMED(ToPixmap,         "→Pixmap")
+#endif // CONFIG_COLOR
+CMD(BlankGraphic)                               ALIAS(BlankGraphic, "Blank")
+CMD(BlankGrob)
+CMD(BlankBitmap)
+#ifdef CONFIG_COLOR
+CMD(BlankPixmap)
+#endif // CONFIG_COLOR
+
 NAMED(GXor,             "GraphicXor")
 NAMED(GOr,              "GraphicOr")
 NAMED(GAnd,             "GraphicAnd")
@@ -1160,7 +1174,7 @@ SETTING(ChargingForeground,     ularge(0), ~ularge(0), GRAY50(128, 192, 255))
 SETTING(CustomHeaderRefresh,    uint(100),  uint(3600000), uint(1000))
 SETTING(BusyIndicatorRefresh,   uint(5),    uint(3600000), uint(50))
 SETTING(BatteryRefresh,         uint(100),  uint(3600000), uint(60000))
-SETTING(MinimumBatteryVoltage,  uint(2000), uint(3000),    uint(2600))
+SETTING(MinimumBatteryVoltage,  uint(2000), uint(3000),    uint(2500))
 SETTING(GraphingTimeLimit,      uint(0),    uint(300000),  uint(2500))
 SETTING(ShowTimeLimit,          uint(0),    uint(300000),  uint(10000))
 SETTING(ResultGraphingTimeLimit,uint(0),    uint(300000),  uint(1500))
@@ -1322,6 +1336,7 @@ CMD(Catalog)
 CMD(ToggleUserMode)
 CMD(Undo)                       // Immediate: do not save stack before Undo
 NAMED(Off, "PowerOff")
+NAMED(OffWithImage, "PowerOffWithImage")
 CMD(SystemSetup)
 
 
@@ -1526,8 +1541,10 @@ CMD(IfErrThenElse)              // Last programmable command
 // ============================================================================
 
 ID(grob)
-ID(bitmap)
-ID(pixmap)
+#if CONFIG_COLOR
+ID(pixmap)                      // 16 BPP
+#endif // CONFIG_COLOR
+ID(bitmap)                      // 1 BPP
 
 ID(font)
 ID(dense_font)

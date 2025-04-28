@@ -113,7 +113,7 @@ ERROR(no_debugged_program,      "No program being debugged")
 ERROR(input_validation,         "Invalid input")
 ERROR(invalid_tvm_variable,     "Undefined TVM variable")
 ERROR(invalid_tvm_equation,     "Invalid TVM equation")
-ERROR(invalid_pixmap_depth,     "Invalid number of bits per pixel")
+ERROR(invalid_pixmap,           "Pixmaps require color support")
 
 // Filesystem errors
 #ifndef FRROR
