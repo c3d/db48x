@@ -7737,6 +7737,9 @@ void tests::symbolic_operations()
         .expect("'Relativity Mass Energy:{E=m·c²}|m=1 g'")
         .test(RUNSTOP)
         .expect("{ 'E=¹/₁ ₀₀₀ kg·c²' }");
+    step("Where operator in non-algebraic form with list")
+        .test(CLEAR, "'x^y' { x 2 y 3 } |", ENTER)
+        .expect("'2↑3'");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)

@@ -2595,8 +2595,23 @@ list_p list::substitute(list_r assignments) const
 // ----------------------------------------------------------------------------
 {
     list_g result = this;
+    symbol_g name;
     for (object_g obj : *assignments)
-        result = result->substitute(obj);
+    {
+        if (symbol_p n = obj->as<symbol>())
+        {
+            name = n;
+        }
+        else if (name)
+        {
+            result = result->substitute(name, obj);
+            name = nullptr;
+        }
+        else
+        {
+            result = result->substitute(obj);
+        }
+    }
     return result;
 }
 
