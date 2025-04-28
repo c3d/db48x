@@ -81,7 +81,7 @@ RECORDER(screenview, 256, "Screen view image generation");
     record(screenview, "%u: imageFromLCD", refreshed);
 
     size_t bytesPerRow = SIM_LCD_W * 4;
-    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE);
+    surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     pixword mask = ~(~0U << color::BPP);
     for (int y = 0; y < SIM_LCD_H; y++)
     {
