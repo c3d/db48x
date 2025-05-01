@@ -935,6 +935,16 @@ COMMAND_BODY(DateFromJulianDayNumber)
 }
 
 
+COMMAND_BODY(InsertHms)
+// ----------------------------------------------------------------------------
+//   Insert _hms in the editor, potentially replacing _dms
+// ----------------------------------------------------------------------------
+{
+    ui.replace(utf8("_dms"), utf8("_hms"));
+    return OK;
+}
+
+
 COMMAND_BODY(TimedEval)
 // ----------------------------------------------------------------------------
 //   Evaluate and return the time it took
