@@ -5096,16 +5096,25 @@ bool user_interface::handle_digits(int key)
                 size_t len = 0;
                 if (current_word(start, len))
                 {
-                    byte   *ed     = rt.editor();
-                    byte   *st     = (byte *) start;
-                    bool    ins    = true;
-                    bool    del    = false;
-                    utf8    cycle = utf8("kcmμMGTpn"); // Default cycle
+                    byte  *ed    = rt.editor();
+                    byte  *st    = (byte *) start;
+                    bool   ins   = true;
+                    bool   del   = false;
+                    utf8   cycle = utf8("kcmμMGTpn"); // Default cycle
                     size_t cylen = strlen(cstring(cycle));
                     if (object_p name = unit::si_prefixes_variable())
                         if (object_p si = directory::recall_all(name, false))
                             if (text_p txt = si->as<text>())
                                 cycle = txt->value(&cylen);
+
+                    if (len == 3 && st[1] == 'm' && st[2] == 's')
+                    {
+                        if (st[0] == 'd' || st[0] == 'h')
+                        {
+                            cylen = 0;
+                            st[0] = st[0] == 'd' ? 'h' : 'd';
+                        }
+                    }
 
                     if (cylen)
                     {

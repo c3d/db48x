@@ -184,7 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            graphic_stack_rendering();
+            hms_dms_operations();
 
 #if 0
         if (onlyCurrent & 2)
@@ -9112,6 +9112,16 @@ void tests::hms_dms_operations()
     step("Inserting zeros automatically")
         .test(CLEAR, DOT, DOT, KEY3, ENTER)
         .expect("0°00′03″");
+
+    step("Entering HMS using cycle key")
+        .test(CLEAR)
+        .test(1, DOT).editor("1.")
+        .test(2, DOT).editor("1°2′_dms")
+        .test(3).editor("1°2′3_dms")
+        .test(DOWN, EEX).editor("1°2′3_hms")
+        .test(EEX).editor("1°2′3_dms")
+        .test(DOWN, EEX).editor("1°2′3_hms")
+        .test(ENTER).expect("1:02:03");
 
     step("Converting DMS to HMS")
         .test(CLEAR)
