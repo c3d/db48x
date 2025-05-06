@@ -757,6 +757,7 @@ This software is (C) 2022-2025 Christophe de Dinechin and the DB50X team.
 Additional contributors to the project include:
 
 * Jean Wilson (Equation Library and associated documentation)
+* Philippe Martens (be.philippe@icloud.com)
 * Franco Trimboli (WASM port)
 * Jeff, aka spiff72 (keyboard overlay)
 * Camille Wormser (complex number fixes)
