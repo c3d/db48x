@@ -11417,7 +11417,6 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
-
 # Menus
 
 Menus display at the bottom of the screen, and can be activated using the keys
