@@ -184,7 +184,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            hms_dms_operations();
+        {
+            float_numerical_functions();
+            double_numerical_functions();
+        }
 
 #if 0
         if (onlyCurrent & 2)
@@ -3689,7 +3692,11 @@ void tests::float_numerical_functions()
         .test(CLEAR, "OverflowError", ENTER).noerror()
         .test("1E80", ID_sq)
         .error("Numerical overflow")
-        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();;
+        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
+
+    step("Check rounding to fraction(#1481)")
+        .test(CLEAR, DIRECT("10.25F ToFraction"), ENTER)
+        .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
@@ -3872,7 +3879,11 @@ void tests::double_numerical_functions()
         .test(CLEAR, "OverflowError", ENTER).noerror()
         .test("1E256", ID_sq)
         .error("Numerical overflow")
-        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();;
+        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
+
+    step("Check rounding to fraction(#1481)")
+        .test(CLEAR, DIRECT("10.25D ToFraction"), ENTER)
+        .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
