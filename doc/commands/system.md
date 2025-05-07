@@ -41,7 +41,7 @@ An HMS value can also be given, as returned by the `Time` command.
 Convert decimal time to `HH.MMSS` format.
 
 
-## FomHMS
+## FromHMS
 
 Convert time in `HH.MMSS` format to decimal time.
 
