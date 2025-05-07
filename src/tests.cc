@@ -8980,6 +8980,12 @@ void tests::hms_dms_operations()
 {
     BEGIN(hms);
 
+    step("Conversion should not round incorrectly (#1480)")
+        .test(CLEAR, DIRECT("10.3033 FromHMS ToHMS"), ENTER)
+        .expect("10:30:33")
+        .test(CLEAR, DIRECT("10.3033 FromDMS ToDMS"), ENTER)
+        .expect("10°30′33″");
+
     step("HMS data type")
         .test(CLEAR, "1.5_hms", ENTER).expect("1:30:00");
     step("DMS data type")
