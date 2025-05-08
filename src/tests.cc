@@ -184,10 +184,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-        {
-            float_numerical_functions();
-            double_numerical_functions();
-        }
+            hms_dms_operations();
 
 #if 0
         if (onlyCurrent & 2)
@@ -8256,7 +8253,7 @@ void tests::cycle_test()
     step("Cycle from decimal degrees to decimal pi-radians")
         .test(O).expect("0.00574 53703 7 πr");
     step("Cycle to decimal DMS")
-        .test(O).expect("1°02′02″1");
+        .test(O).expect("1°02′03″");
     step("Cycle back to fractional DMS")
         .test(O).expect("1°02′03″");
     step("Check that DMS produced the original pi-radians fraction")
@@ -8996,6 +8993,13 @@ void tests::hms_dms_operations()
         .expect("10:30:33")
         .test(CLEAR, DIRECT("10.3033 FromDMS ToDMS"), ENTER)
         .expect("10°30′33″");
+    step("Conversion should work OK in symbolic mode")
+        .test(CLEAR, DIRECT("NumericalResults 10.2555 FromHMS ToHMS"), ENTER)
+        .expect("10:25:55");
+    step("Conversion should use proper rounding")
+        .test(CLEAR, DIRECT("SymbolicResults 10.2555 FromHMS ToDecimal "
+                            "1_hms ToUnit"), ENTER)
+        .expect("10:25:55");
 
     step("HMS data type")
         .test(CLEAR, "1.5_hms", ENTER).expect("1:30:00");

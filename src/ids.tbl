@@ -126,6 +126,7 @@ ID_RANGE(is_bignum,        based_bignum,   neg_bignum)
 #endif // CONFIG_FIXED_BASED_OBJECTS
 ID_RANGE(is_fraction,      fraction,       neg_big_fraction)
 ID_RANGE(is_decimal,       decimal,        neg_decimal)
+ID_RANGE(is_fp,            hwfloat,        neg_decimal)
 ID_RANGE(is_real,          bignum,         neg_decimal)
 ID_RANGE(is_complex,       rectangular,    polar)
 ID_RANGE(is_algebraic_num, unit,           neg_decimal)

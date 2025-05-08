@@ -521,6 +521,10 @@ void render_time(renderer &r, algebraic_g &value,
     if (!value || !value->is_real())
         return;
     bool as_time = *hrs == ':';
+    settings::SaveNumericalResults snr(false);
+    settings::SaveFractionDigits sfd(12);
+    settings::SaveFractionIterations sfi(15);
+    algebraic::to_fraction(value);
     uint h = value->as_uint32(0, false);
     r.flush();
     r.printf("%u", h);
