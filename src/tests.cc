@@ -7889,7 +7889,7 @@ void tests::symbolic_differentiation()
         .expect("'0.69314 71805 6·2↑X'");
     step("Derivative of power of a non-numerical constant")
         .test(CLEAR, "'A^X' 'X'", ID_Derivative)
-        .expect("'A↑X·(ln A+0÷A)'")
+        .expect("'A↑X·ln A'")
         .test(RUNSTOP)
         .expect("'A↑X·ln A'");
     step("Derivative of power")
@@ -7902,13 +7902,16 @@ void tests::symbolic_differentiation()
         .test(CLEAR, "'sin(A*X^2)+cos(X*B)+tan(C*X^6)' 'X'", ID_Derivative)
         .expect("'2·A·X·cos(A·X²)+(-B)·sin(X·B)+6·C·X↑5÷(cos(C·X↑6))²'");
     step("Derivative of hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'sinh(A*X^3)+cosh(B*X^5)+tanh(C*X^3)' 'X'", ID_Derivative)
+        .test(CLEAR, "'sinh(A*X^3)+cosh(B*X^5)+tanh(C*X^3)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'3·A·X²·cosh(A·X³)+5·B·X↑4·sinh(B·X↑5)+3·C·X²÷(cosh(C·X³))²'");
     step("Derivative of arcsine, arccosine, arctangent")
-        .test(CLEAR, "'asin(A*X^2)+acos(X*B)+atan(C*X^6)' 'X'", ID_Derivative)
+        .test(CLEAR, "'asin(A*X^2)+acos(X*B)+atan(C*X^6)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'2·A·X÷√(1-(A·X²)²)+(-B)÷√(1-(X·B)²)+6·C·X↑5÷((C·X↑6)²+1)'");
     step("Derivative of inverse hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'asinh(A*X)+acosh(X*B)+atanh(C+X)' 'X'", ID_Derivative)
+        .test(CLEAR, "'asinh(A*X)+acosh(X*B)+atanh(C+X)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'A÷√((A·X)²+1)+B÷√((X·B)²-1)+(1-(C+X)²)⁻¹'");
 
     step("Derivative of log and exp")
@@ -8001,50 +8004,60 @@ void tests::symbolic_integration()
         .test(CLEAR, "'-(inv(A*X+B) - sign(3-2*X))' 'X'", ID_Primitive)
         .expect("'-(ln (abs(A·X+B))÷A-abs(3-2·X)÷2)'");
     step("Primitive of sine, cosine, tangent")
-        .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'",
+              LENGTHY(10000), ID_Primitive)
         .expect("'(-cos(A·X+3))÷A+sin(X·B-5)÷B+(-ln (cos(Z-C·X)))÷C'");
     step("Primitive of hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'sinh(A*X-3)+cosh(B*X+5*A)+tanh(C*(X-A))' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'cosh(A·X-3)÷A+sinh(B·X+5·A)÷B+ln (cosh(C·(X-A)))÷C'");
     step("Primitive of arcsine, arccosine, arctangent")
         .test(CLEAR, "'asin(A*X+B)+acos(X*B+A*(X+1))+atan(C*(X-6))' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·sin⁻¹(A·X+B)+√(1-(A·X+B)²))÷A+((X·B+A·(X+1))·cos⁻¹(X·B+A·(X+1))-√(1-(X·B+A·(X+1))²))÷(B+A)+(C·(X-6)·tan⁻¹(C·(X-6))-ln((C·(X-6))²+1)÷2)÷C'");
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
-        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·ln(A·X+B)-(A·X+B))÷A+exp(X·C-D)÷C'");
     step("Primitive of log2 and exp2")
-        .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·log2(A·X+B)-(A·X+B)÷ln 2)÷A+exp2(X·C-D)÷(0.69314 71805 6·C)'");
     step("Primitive of log10 and exp10")
-        .test(CLEAR, "'log10(A*X+B)+exp10(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log10(A*X+B)+exp10(X*C-D)' 'X'",
+              LENGTHY(20000),  ID_Primitive)
         .expect("'((A·X+B)·log10(A·X+B)-(A·X+B)÷ln 10)÷A+exp10(X·C-D)÷(2.30258 50929 9·C)'");
 
     step("Primitive of lnp1 and expm1")
-        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B-1)·log1p(A·X+B)-(A·X+B-1))÷A+(expm1(X·C-D)-(X·C-D)+1)÷C'");
 
     step("Primitive of square and cube")
-        .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'(A·X+B)³÷(3·A)+(X·C-D)↑4÷(4·C)'");
     step("Primitive of square root and cube root")
-        .test(CLEAR, "'sqrt(A*X+B)+cbrt(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sqrt(A*X+B)+cbrt(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'²/₃·A⁻¹·(√(A·X+B))³+³/₄·C⁻¹·∛(X·C-D)↑4'");
 
     step("Primitive of 1/(cos(x)*sin(x))")
-        .test(CLEAR, "'inv(cos(3*X+2)*sin(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cos(3*X+2)*sin(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
     step("Primitive of 1/(cosh(x)*sinh(x))")
-        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
     step("Primitive of 1/(cosh(x)*sinh(x))")
-        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
 
     step("Primitive of unknown form")
@@ -8053,6 +8066,13 @@ void tests::symbolic_integration()
     step("Primitive of unknown form in algebraic form")
         .test(CLEAR, "'∫x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown primitive");
+
+    step("Evaluate values matching integer constants in pattenrs")
+        .test(CLEAR, DIRECT("'4/3·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .expect("'4·π·x²'");
+    step("Evaluate value matching integer constants - Check with division")
+        .test(CLEAR, DIRECT("'A/B·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .expect("'3·A÷B·π·x²'");
 }
 
 

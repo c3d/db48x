@@ -51,7 +51,6 @@ RECORDER(expression_error,      16, "Errors with expressions");
 RECORDER(rewrites,              16, "Expression rewrites");
 RECORDER(rewrites_done,         16, "Successful expression rewrites");
 
-
 symbol_g *expression::independent                   = nullptr;
 object_g *expression::independent_value             = nullptr;
 symbol_g *expression::dependent                     = nullptr;
@@ -1021,6 +1020,27 @@ static size_t check_match(size_t eq, size_t eqsz,
                 if (!found->is_same_as(ftop))
                     return 0;
             }
+        }
+        else if (integer_g itop = ftop->as<integer>())
+        {
+            // If we have an integer in the pattern, need to evaluate arg
+            ftop = grab_arguments(eq, eqsz);
+            if (!ftop)
+                return 0;
+
+            size_t depth = rt.depth();
+            if (program::run(+ftop) != object::OK)
+                return 0;
+            if (rt.depth() != depth + 1)
+            {
+                if (rt.depth() > depth)
+                    rt.drop(rt.depth() - depth);
+                return 0;
+            }
+            ftop = rt.pop();
+            integer_g fval = ftop->as_quoted<integer>();
+            if (!fval || fval->value<ularge>() != itop->value<ularge>())
+                return 0;
         }
         else
         {
@@ -3934,12 +3954,19 @@ expression_p expression::derivative(symbol_r sym) const
         A^B,                    A^B,
         zero*X,                 zero,
         X*zero,                 zero,
+        zero/X,                 zero,
         zero+X,                 X,
         X+zero,                 X,
+        zero-X,                 -X,
+        X-zero,                 X,
         X*one,                  X,
         one*X,                  X,
+        X/one,                  X,
+        one/X,                  inv(X),
         X^zero,                 one,
+        zero^X,                 zero,
         X^one,                  X,
+        one^X,                  one,
 
         (X ^ E)>>indep,         (X^E)*((E>>indep)*log(X) + ((X>>indep)*E)/X),
 
