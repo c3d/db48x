@@ -236,7 +236,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     int              degraded    = 0;
 
     // Check if we can isolate the variable algebraically
-    if (Settings.SolveSymbolicallyThenNumerically())
+    if (Settings.SymbolicSolver())
     {
         if (expression_p eqeq = eq->as<expression>())
         {

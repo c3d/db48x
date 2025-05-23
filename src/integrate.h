@@ -42,8 +42,7 @@ NFUNCTION(Integrate, 4,
           static bool can_be_symbolic(uint a)
           {
               return
-                  Settings.IntegrateSymbolicallyThenNumerically() ||
-                  a == 0 || a == 1;
+                  Settings.SymbolicIntegration() || a == 0 || a == 1;
           }
     );
 

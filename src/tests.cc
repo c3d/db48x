@@ -6605,7 +6605,7 @@ void tests::solver_testing()
         .test(CLEAR, "'SLVTST' CRDIR SLVTST", ENTER);
 
     step("Select purely numerical solver")
-        .test(CLEAR, "SolveNumericallyOnly", ENTER).noerror();
+        .test(CLEAR, "NumericalSolver", ENTER).noerror();
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
@@ -6677,7 +6677,7 @@ void tests::solver_testing()
 
 
     step("Select algebraically-assisted solver")
-        .test(CLEAR, "SolveSymbolicallyThenNumerically", ENTER).noerror();
+        .test(CLEAR, "SymbolicSolver", ENTER).noerror();
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
@@ -7094,7 +7094,7 @@ void tests::numerical_integration()
     BEGIN(integrate);
 
     step("Disable symbolic integration")
-        .test(CLEAR, DIRECT("IntegrateNumericallyOnly"), ENTER);
+        .test(CLEAR, DIRECT("NumericalIntegration"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -7207,7 +7207,7 @@ void tests::numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X IntegrateNumericallyOnly }"),
+        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
               ID_ClearThingsMenu, ID_Purge);
 }
 
@@ -7220,7 +7220,7 @@ void tests::symbolic_numerical_integration()
     BEGIN(syminteg);
 
     step("Enable symbolic integration")
-        .test(CLEAR, DIRECT("IntegrateSymbolicallyThenNumerically"), ENTER);
+        .test(CLEAR, DIRECT("SymbolicIntegration"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -7333,7 +7333,7 @@ void tests::symbolic_numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X IntegrateNumericallyOnly }"),
+        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
               ID_ClearThingsMenu, ID_Purge);
 }
 

@@ -101,7 +101,7 @@ NFUNCTION_BODY(Integrate)
 
 
     // Check if we have symbolic evaluation
-    if (Settings.IntegrateSymbolicallyThenNumerically())
+    if (Settings.SymbolicIntegration())
     {
         if (expression_g eq = expression::get(+eqobj))
         {
