@@ -123,6 +123,7 @@ TESTS(cstlib,           "Built-in constants parsing");
 TESTS(equations,        "Built-in equations");
 TESTS(colnbeams,        "Columns and Beams equations in library");
 TESTS(integrate,        "Numerical integration");
+TESTS(syminteg,         "Numerical integration with symbolic primitive");
 TESTS(simplify,         "Auto-simplification of expressions");
 TESTS(rewrites,         "Equation rewrite engine");
 TESTS(symbolic,         "Symbolic operations");
@@ -184,7 +185,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            hms_dms_operations();
+            symbolic_integration();
 
 #if 0
         if (onlyCurrent & 2)
@@ -235,7 +236,8 @@ void tests::run(uint onlyCurrent)
         constants_parsing();
         eqnlib_parsing();
         eqnlib_columns_and_beams();
-        numerical_integration_testing();
+        numerical_integration();
+        symbolic_numerical_integration();
         text_functions();
         auto_simplification();
         rewrite_engine();
@@ -7084,13 +7086,15 @@ void tests::eqnlib_columns_and_beams()
 }
 
 
-void tests::numerical_integration_testing()
+void tests::numerical_integration()
 // ----------------------------------------------------------------------------
-//   Test that the numerica integartion function works as expected
+//   Test that the numerical integration function works as expected
 // ----------------------------------------------------------------------------
 {
     BEGIN(integrate);
 
+    step("Disable symbolic integration")
+        .test(CLEAR, DIRECT("IntegrateNumericallyOnly"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -7202,8 +7206,135 @@ void tests::numerical_integration_testing()
         .expect("'∫(0;π;exp X;X)'")
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
-    step("Cleanup")
-         .test(CLEAR, "'X'", ID_ClearThingsMenu, ID_Purge);
+    step("Cleanup & restore symbolic integration")
+        .test(CLEAR, DIRECT("{ X IntegrateNumericallyOnly }"),
+              ID_ClearThingsMenu, ID_Purge);
+}
+
+
+void tests::symbolic_numerical_integration()
+// ----------------------------------------------------------------------------
+//   Test symbolic-assisted numerical integration
+// ----------------------------------------------------------------------------
+{
+    BEGIN(syminteg);
+
+    step("Enable symbolic integration")
+        .test(CLEAR, DIRECT("IntegrateSymbolicallyThenNumerically"), ENTER);
+    step("Integrate with expression")
+        .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+    step("Integration through menu")
+        .test(CLEAR, 2, ENTER).expect("2")
+        .test(3, ENTER).expect("3")
+        .test("'sq(Z)+Z'", ENTER).expect("'Z²+Z'")
+        .test(F, ALPHA, Z, ENTER).expect("'Z'")
+        .test(ID_IntegrationMenu, ID_Integrate).expect("8 ⁵/₆", 350);
+    step("Integration with decimals")
+        .test(CLEAR, "2.", ENTER).expect("2.")
+        .test("3.", ENTER).expect("3.")
+        .test("'sq(Z)+Z'", ENTER).expect("'Z²+Z'")
+        .test(F, ALPHA, Z, ENTER).expect("'Z'")
+        .test(ID_IntegrationMenu, ID_Integrate).expect("8.83333 33333 3", 350);
+
+    step("Integrate with low precision")
+        .test(CLEAR, "18 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+    step("Integrate with high precision")
+        .test(CLEAR, "1 IntegrationImprecision  24 Sig", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .expect("0.69314 71805 59945 30941 7232");
+    step("Integrate with limited loops")
+        .test(CLEAR, "15 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 59945 30941 7232")
+        .test(KEY2, ID_log, ID_subtract).expect("0")
+        .test("5 IntegrationIterations", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .expect("0.69314 71805 59945 30941 7232");
+    step("Integrate with restored settings")
+        .test(CLEAR,
+              "{ IntegrationImprecision IntegrationIterations } Purge Std",
+              ENTER).noerror()
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+
+    step("Integrate with display-induced imprecision")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("1 2 '1/X' 'X' ∫", ENTER).expect("6.931⁳⁻¹")
+        .test(ID_DisplayModesMenu, ID_Std).expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+
+
+    step("Integration with error on low bound")
+        .test(CLEAR, "0 1 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .expect("0.01745 29971 57");
+    step("Integration with error on high bound")
+        .test(CLEAR, "1 0 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .expect("-0.01745 29971 57");
+    step("Integration with error on difference")
+        .test(CLEAR, "1_m 1_h 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .error("Inconsistent units");
+
+    step("Integrate with symbols")
+        .test(CLEAR, "A B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)-ln (abs A)'")
+        .test(DOWN)
+        .editor("'ln (abs B)-ln (abs A)'")
+        .test(ENTER)
+        .expect("'ln (abs B)-ln (abs A)'");
+    step("Integrate with one symbol")
+        .test(CLEAR, "1 B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)'")
+        .test(DOWN)
+        .editor("'ln (abs B)'")
+        .test(ENTER)
+        .expect("'ln (abs B)'");
+    step("Integrate with second symbol")
+        .test(CLEAR, "A 1 '1/X' 'X' ∫", ENTER)
+        .expect("'-ln (abs A)'")
+        .test(DOWN)
+        .editor("'-ln (abs A)'")
+        .test(ENTER)
+        .expect("'-ln (abs A)'");
+
+    step("Check evaluation with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF 3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check evaluation without NumericalResults flag clear")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'exp π-1.'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'exp π-1.'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Cleanup & restore symbolic integration")
+        .test(CLEAR, DIRECT("{ X IntegrateNumericallyOnly }"),
+              ID_ClearThingsMenu, ID_Purge);
 }
 
 

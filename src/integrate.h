@@ -41,7 +41,9 @@ algebraic_p integrate(program_g    eq,
 NFUNCTION(Integrate, 4,
           static bool can_be_symbolic(uint a)
           {
-              return a == 0 || a == 1;
+              return
+                  Settings.IntegrateSymbolicallyThenNumerically() ||
+                  a == 0 || a == 1;
           }
     );
 

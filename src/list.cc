@@ -2558,7 +2558,7 @@ list_p list::substitute(symbol_r name, object_r replobj, size_t replsz) const
 }
 
 
-list_p list::substitute(symbol_r name, object_r replobj) const
+list_p list::substitute(symbol_r name, object_p replobj) const
 // ----------------------------------------------------------------------------
 //  Substitute a name with an object, which can be an expression
 // ----------------------------------------------------------------------------
