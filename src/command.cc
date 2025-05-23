@@ -433,47 +433,55 @@ bool command::initialize_sorted_ids()
             }
             else
             {
-                bool shown[object::NUM_IDS] = { false };
-                for (size_t i = 0; i < sorted_ids_count; i++)
+                for (int pass = 0; pass < 3; pass++)
                 {
-                    auto s = spellings[sorted_ids[i]];
-                    if (!shown[s.type])
+                    cstring types[3] = { "DMNONE", "DM42", "DM32" };
+                    printf("<!--- %s --->\n", types[pass]);
+                    bool shown[object::NUM_IDS] = { false };
+                    for (size_t i = 0; i < sorted_ids_count; i++)
                     {
-                        size_t curlen = strlen(cstring(s.name));
-                        size_t shortest = curlen;
-                        for (size_t j = 0; j < sorted_ids_count; j++)
+                        auto s = spellings[sorted_ids[i]];
+                        if (!shown[s.type])
                         {
-                            auto a = spellings[sorted_ids[j]];
-                            if (a.type == s.type)
-                            {
-                                size_t len = strlen(cstring(a.name));
-                                if (len < shortest)
-                                    shortest = len;
-                            }
-                        }
-                        if (shortest == curlen)
-                        {
-                            int count = 0;
-                            shown[s.type] = true;
-                            printf("* `%s`", s.name);
+                            size_t curlen = strlen(cstring(s.name));
+                            size_t shortest = curlen;
                             for (size_t j = 0; j < sorted_ids_count; j++)
                             {
                                 auto a = spellings[sorted_ids[j]];
-                                if (a.type == s.type && j != i)
+                                if (a.type == s.type)
                                 {
-                                    count++;
-                                    if (count == 1)
-                                        printf(" (");
-                                    else
-                                        printf(", ");
-                                    printf("`%s`", a.name);
+                                    size_t len = strlen(cstring(a.name));
+                                    if (len < shortest)
+                                        shortest = len;
                                 }
                             }
-                            if (count)
-                                printf(")");
-                            printf("\n");
+                            if (shortest == curlen)
+                            {
+                                int count = 0;
+                                shown[s.type] = true;
+                                printf("* `%s`", s.name);
+                                for (size_t j = 0;
+                                     !pass && j < sorted_ids_count;
+                                     j++)
+                                {
+                                    auto a = spellings[sorted_ids[j]];
+                                    if (a.type == s.type && j != i)
+                                    {
+                                        count++;
+                                        if (count == 1)
+                                            printf(" (");
+                                        else
+                                            printf(", ");
+                                        printf("`%s`", a.name);
+                                    }
+                                }
+                                if (count)
+                                    printf(")");
+                                printf("\n");
+                            }
                         }
                     }
+                    printf("<!--- !%s --->\n", types[pass]);
                 }
             }
         }

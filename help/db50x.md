@@ -6674,31 +6674,31 @@ HP48 implementation.
 The following is an extensive list of DB48x commands, some with multiple
 spellings.
 
-* `!` (`fact`, `factorial`, `x!`)
-* `%` (`Percent`)
-* `%T` (`%Ch`, `%Change`, `PercentChange`)
-* `%Total` (`PercentTotal`)
-* `*` (`multiply`, `·`, `×`)
-* `+` (`add`)
-* `-` (`subtract`)
-* `/` (`divide`, `÷`)
-* `<` (`TestLT`)
-* `=` (`TestEQ`)
-* `==` (`TestSame`)
-* `>` (`TestGT`)
-* `^` (`pow`, `Power`, `↑`)
-* `abs` (`modulus`, `norm`)
-* `acos` (`arccos`, `cos⁻¹`)
-* `acosh` (`cosh⁻¹`)
+* `!`
+* `%`
+* `%T`
+* `%Total`
+* `*`
+* `+`
+* `-`
+* `/`
+* `<`
+* `=`
+* `==`
+* `>`
+* `^`
+* `abs`
+* `acos`
+* `acosh`
 * `AlarmMenu`
 * `AlgebraMenu`
 * `AllEquationVariables`
 * `AllSolutions`
-* `alog` (`exp10`)
+* `alog`
 * `AlphaForeground`
-* `Amort` (`TVMAmort`, `TVMAmortize`)
-* `AmortTable` (`AmortizationSchedule`, `TVMAmortizationTable`, `TVMAmortTable`)
-* `And`
+* `Amort`
+* `AmortTable`
+* `and`
 * `AngleMode`
 * `AnglesMenu`
 * `Apply`
@@ -6706,22 +6706,22 @@ spellings.
 * `ApplyUnit`
 * `arg`
 * `ArithmeticMenu`
-* `Arry→` (`Array→`, `FromArray`)
-* `asin` (`arcsin`, `sin⁻¹`)
-* `asinh` (`sinh⁻¹`)
-* `Asn` (`AssignKey`)
-* `ASR` (`ArithmeticShiftRight`)
-* `ASRB` (`ArithmeticShiftRightByte`)
-* `ASRC` (`ArithmeticShiftRightCount`)
-* `atan` (`arctan`, `tan⁻¹`)
-* `atanh` (`tanh⁻¹`)
+* `Arry→`
+* `asin`
+* `asinh`
+* `Asn`
+* `ASR`
+* `ASRB`
+* `ASRC`
+* `atan`
+* `atanh`
 * `Attach`
 * `AutomaticTemporariesCleanup`
 * `AutoScaleStack`
 * `AutoSimplify`
-* `Avg` (`Average`, `Mean`, `ΣMean`)
+* `Avg`
 * `Background`
-* `Bar` (`BarPlot`)
+* `Bar`
 * `Base`
 * `BasedDotOrComma`
 * `BasedSeparatorCommand`
@@ -6740,45 +6740,45 @@ spellings.
 * `BeepOn`
 * `BestFit`
 * `BigFractions`
-* `Bin` (`Binary`)
-* `Bins` (`FrequencyBins`)
+* `Bin`
+* `Bins`
 * `BitwiseLogicForIntegers`
-* `Blank` (`BlankGraphic`)
+* `Blank`
 * `BlankBitmap`
 * `BlankGrob`
 * `BlankPixmap`
 * `BusyIndicatorRefresh`
 * `Bytes`
-* `B→R` (`BinaryToReal`)
+* `B→R`
 * `CalculationMenu`
-* `Capitalized` (`CapitalizedCommands`)
-* `CapitalizedNames` (`CapitalizedSymbols`)
+* `Capitalized`
+* `CapitalizedNames`
 * `CarefulEvaluation`
 * `Catalog`
 * `ceil`
-* `Centr` (`Center`, `PlotCenter`)
-* `CF` (`ClearFlag`)
+* `Centr`
+* `CF`
 * `CharactersMenu`
 * `ChargingForeground`
-* `Chr` (`Code→Char`, `Code→Text`, `UnicodeToText`)
+* `Chr`
 * `ChronoTime`
-* `Circle` (`DrawCircle`)
+* `Circle`
 * `CircularMenu`
 * `ClassicExponent`
-* `Clear` (`ClearStack`)
+* `Clear`
 * `ClearBit`
 * `ClearThingsMenu`
 * `Clip`
-* `ClLCD` (`ClearLCD`)
-* `Clone` (`NewOb`, `NewObj`, `NewObject`)
-* `ClΣ` (`ClearData`, `ClearΣ`)
-* `CNrm` (`ColumnNorm`, `RNrm`)
-* `Col+` (`AddColumn`, `Column+`)
-* `Col-` (`Column-`, `DeleteColumn`)
+* `ClLCD`
+* `Clone`
+* `ClΣ`
+* `CNrm`
+* `Col+`
+* `Col-`
 * `Collect`
-* `ColΣ` (`DataColumns`, `ΣColumns`)
-* `Col→` (`ColumnsToMatrix`, `Columns→`)
-* `comb` (`Combinations`)
+* `ColΣ`
+* `Col→`
+* `comb`
 * `CommandBackground`
 * `CommandDisplayMode`
 * `CommandForeground`
@@ -6790,27 +6790,27 @@ spellings.
 * `ComplexIBeforeImaginary`
 * `ComplexMenu`
 * `ComplexResults`
-* `Con` (`ConstantArray`)
+* `Con`
 * `conj`
-* `ConLib` (`ConstantsLibrary`, `ConstantsMenu`)
-* `Const` (`LibraryConstant`)
+* `ConLib`
+* `Const`
 * `ConstantName`
 * `Constants`
 * `ConstantValue`
-* `cont` (`Continue`)
+* `cont`
 * `Convert`
 * `ConvertToUnit`
 * `ConvertToUnitPrefix`
-* `Corr` (`Correlation`)
+* `Corr`
 * `cos`
 * `cosh`
 * `CountBits`
-* `Cov` (`Covariance`)
-* `CrDir` (`CreateDirectory`, `MkDir`)
-* `Cst` (`CustomMenu`)
-* `CstRU` (`RelativeUncertainty`)
-* `CstSU` (`StandardUncertainty`)
-* `CSwp` (`ColumnSwap`)
+* `Cov`
+* `CrDir`
+* `Cst`
+* `CstRU`
+* `CstSU`
+* `CSwp`
 * `CurrentClip`
 * `CurrentDirectory`
 * `CurrentEquationVariables`
@@ -6827,9 +6827,9 @@ spellings.
 * `CurveFilling`
 * `CustomHeaderRefresh`
 * `Cycle`
-* `C→R` (`ComplexToReal`, `RectangularToReal`, `ℂ→ℝ`)
+* `C→R`
 * `Date`
-* `Date+` (`DateAdd`)
+* `Date+`
 * `DateDash`
 * `DateDot`
 * `DateForeground`
@@ -6839,49 +6839,49 @@ spellings.
 * `DateSpace`
 * `DateTime`
 * `DayBeforeMonth`
-* `dbug` (`Debug`)
-* `DDays` (`DateSub`)
+* `dbug`
+* `DDays`
 * `DebugMenu`
 * `DebugOnError`
-* `Dec` (`Decimal`)
+* `Dec`
 * `DecimalComma`
 * `DecimalDot`
-* `Decr` (`Decrement`)
-* `Deg` (`Degrees`)
-* `DelKeys` (`DeleteKeys`)
+* `Decr`
+* `Deg`
+* `DelKeys`
 * `Depth`
-* `det` (`Determinant`)
+* `det`
 * `Detach`
 * `DetailedTypes`
 * `DifferentialSolverMenu`
-* `Disp` (`DrawText`)
+* `Disp`
 * `DisplayDigits`
 * `DisplayMode`
 * `DisplayModesMenu`
-* `DispXY` (`DrawStyledText`)
+* `DispXY`
 * `DistinguishSymbolCase`
-* `Div2` (`IDiv2`, `QuoRem`, `QuotientRemainder`)
+* `Div2`
 * `DMCPDisplayRefresh`
 * `DMCPLowBattery`
-* `DMS+` (`DMSAdd`)
-* `DMS-` (`DMSSub`)
-* `DMS→` (`FromDMS`)
-* `doerr` (`DoError`)
+* `DMS+`
+* `DMS-`
+* `DMS→`
+* `doerr`
 * `DoList`
 * `DoSubs`
-* `dot` (`⋅`)
-* `Draw` (`DrawPlot`)
+* `dot`
+* `Draw`
 * `DrawPlotAxes`
-* `Drax` (`DrawAxes`)
+* `Drax`
 * `Drop`
 * `Drop2`
 * `DropN`
-* `DTag` (`DeleteTag`)
-* `Dup` (`Duplicate`)
-* `Dup2` (`Duplicate2`)
-* `DupDup` (`DuplicateTwice`)
-* `DupN` (`DuplicateN`)
-* `D→R` (`DegreesToRadians`, `Degrees→Radians`)
+* `DTag`
+* `Dup`
+* `Dup2`
+* `DupDup`
+* `DupN`
+* `D→R`
 * `Edit`
 * `EditMenu`
 * `EditorBackground`
@@ -6903,50 +6903,50 @@ spellings.
 * `EditorWordLeft`
 * `EditorWordRight`
 * `EditorWrapColumn`
-* `Ellipse` (`DrawEllipse`)
+* `Ellipse`
 * `EndSub`
-* `Eng` (`EngineeringDisplay`)
-* `Eq` (`Equation`)
-* `EqnLib` (`EquationsLibrary`, `EquationsMenu`)
+* `Eng`
+* `Eq`
+* `EqnLib`
 * `EquationName`
 * `EquationSolver`
 * `EquationValue`
-* `equiv`
+* `Equiv`
 * `erf`
 * `erfc`
-* `err0` (`ClearError`)
-* `errm` (`ErrorMessage`)
-* `errn` (`ErrorNumber`)
+* `err0`
+* `errm`
+* `errn`
 * `ErrorBackground`
 * `ErrorBeepDuration`
 * `ErrorBeepFrequency`
 * `ErrorBorder`
 * `ErrorForeground`
-* `Eval` (`Evaluate`)
-* `EvalEq` (`EvaluateEquation`)
+* `Eval`
+* `EvalEq`
 * `Excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
-* `exp2` (`alog2`)
-* `Expan` (`Expand`)
-* `ExpFit` (`ExponentialFit`)
+* `exp2`
+* `Expan`
+* `ExpFit`
 * `ExplicitWildcards`
 * `ExpLogIdentitiesMenu`
-* `ExpLogMenu` (`PowersMenu`)
-* `expm` (`expm1`)
+* `ExpLogMenu`
+* `expm`
 * `False`
 * `FancyExponent`
-* `FC?` (`TestFlagClear`)
-* `FC?C` (`TestFlagClearThenClear`)
-* `FC?S` (`TestFlagClearThenSet`)
-* `FF` (`FlipFlag`)
+* `FC?`
+* `FC?C`
+* `FC?S`
+* `FF`
 * `FilesMenu`
 * `Filter`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
-* `Fix` (`FixedDisplay`)
+* `Fix`
 * `FixedWidthDigits`
 * `FlagsMenu`
 * `FlatMenus`
@@ -6956,27 +6956,27 @@ spellings.
 * `FolderCornerForeground`
 * `Foreground`
 * `FourDigitYear`
-* `FP` (`FracPart`, `FractionalPart`)
+* `FP`
 * `FractionsMenu`
 * `FractionSpacing`
 * `FreeMemory`
 * `Freeze`
-* `FS?` (`TestFlagSet`)
-* `FS?C` (`TestFlagSetThenClear`)
-* `FS?S` (`TestFlagSetThenSet`)
-* `Function` (`FunctionPlot`)
-* `Gamma` (`tgamma`)
-* `GAnd` (`GraphicAnd`)
-* `GC` (`GarbageCollect`)
+* `FS?`
+* `FS?C`
+* `FS?S`
+* `Function`
+* `Gamma`
+* `GAnd`
+* `GC`
 * `GCIconForeground`
-* `GCStats` (`GarbageCollectorStatistics`)
+* `GCStats`
 * `GCStatsClearAfterRead`
 * `GCStatsKeepAfterRead`
 * `GCTemporariesCleanup`
 * `Get`
-* `GetI` (`GetIteration`)
-* `GOr` (`GraphicOr`)
-* `Grad` (`Grads`)
+* `GetI`
+* `GOr`
+* `Grad`
 * `GraphicAppend`
 * `GraphicExponent`
 * `GraphicIntegral`
@@ -6992,20 +6992,20 @@ spellings.
 * `GraphicSum`
 * `GraphingTimeLimit`
 * `GraphRenderingSizeLimit`
-* `Gray` (`GrayPattern`, `Grey`, `GreyPattern`)
-* `GrobAdd` (`GraphicStack`)
-* `GXor` (`GraphicXor`)
+* `Gray`
+* `GrobAdd`
+* `GXor`
 * `HalfBatteryForeground`
 * `Halt`
 * `HaltedIconForeground`
-* `Hdr` (`Header`)
+* `Hdr`
 * `Head`
 * `HeaderBackground`
 * `HeaderFont`
 * `HeaderForeground`
 * `Help`
-* `Hex` (`Hexadecimal`)
-* `HFP` (`HardFP`, `HardwareFloatingPoint`)
+* `Hex`
+* `HFP`
 * `HideBuiltinCharacters`
 * `HideBuiltinConstants`
 * `HideBuiltinEquations`
@@ -7019,24 +7019,24 @@ spellings.
 * `HideSeconds`
 * `HideTime`
 * `HideVoltage`
-* `HMS+` (`HMSAdd`)
-* `HMS-` (`HMSSub`)
-* `HMS→` (`FromHMS`)
-* `Home` (`HomeDirectory`)
+* `HMS+`
+* `HMS-`
+* `HMS→`
+* `Home`
 * `HorizontalLists`
 * `HorizontalProgramRendering`
 * `HorizontalVectors`
 * `HyperbolicMenu`
-* `Idn` (`IdentityMatrix`)
-* `IFT` (`IfThen`)
-* `IFTE` (`IfThenElse`)
+* `Idn`
+* `IFT`
+* `IFTE`
 * `IgnorePrecisionLoss`
 * `IgnoreSymbolCase`
 * `im`
 * `ImplicitWildcards`
-* `Implies`
+* `implies`
 * `ImproperFractions`
-* `Incr` (`Increment`)
+* `Incr`
 * `IndexDidNotWrap`
 * `IndexWrapped`
 * `InfiniteResultIndicator`
@@ -7045,73 +7045,73 @@ spellings.
 * `Input`
 * `IntegrationImprecision`
 * `IntegrationIterations`
-* `IntegrationMenu` (`DifferentiationMenu`)
+* `IntegrationMenu`
 * `Intercept`
-* `inv` (`Invert`, `x⁻¹`)
+* `inv`
 * `IOMenu`
-* `IP` (`IntegerPart`, `IntPart`)
-* `Isol` (`Isolate`)
-* `JDN` (`JulianDayNumber`)
-* `JDN→` (`DateFromJulianDayNumber`)
-* `Keys` (`KeyMap`)
+* `IP`
+* `Isol`
+* `JDN`
+* `JDN→`
+* `Keys`
 * `Kill`
 * `KillOnError`
-* `LastArg` (`LastArguments`)
+* `LastArg`
 * `LastBitSet`
 * `LastMenu`
 * `LastX`
 * `LaxArrayResizing`
 * `LazyEvaluation`
-* `LCD→` (`FromLCD`, `Screen→`)
+* `LCD→`
 * `LeadingZero`
 * `LeftShiftBackground`
 * `LeftShiftForeground`
-* `lgamma` (`LogGamma`)
-* `LibEq` (`LibraryEquation`)
+* `lgamma`
+* `LibEq`
 * `Library`
-* `Libs` (`Libraries`)
-* `Line` (`DrawLine`)
+* `Libs`
+* `Line`
 * `LinearFitSums`
 * `LinearSolverMenu`
 * `LineWidth`
-* `LinFit` (`LinearFit`)
+* `LinFit`
 * `ListAsData`
 * `ListAsProgram`
 * `ListMenu`
-* `List→` (`FromList`)
-* `ln` (`log`)
-* `LName` (`ListExpressionNames`)
-* `lnp1` (`log1p`)
+* `List→`
+* `ln`
+* `LName`
+* `lnp1`
 * `log10`
 * `log2`
-* `LogFit` (`LogarithmicFit`)
-* `LongForm` (`LongFormCommands`)
-* `LongFormNames` (`LongFormSymbols`)
+* `LogFit`
+* `LongForm`
+* `LongFormNames`
 * `LoopsMenu`
 * `LowBattery`
 * `LowBatteryForeground`
 * `LowerAlphaForeground`
-* `LowerCase` (`LowerCaseCommands`)
-* `LowerCaseNames` (`LowerCaseSymbols`)
-* `LR` (`LinearRegression`)
+* `LowerCase`
+* `LowerCaseNames`
+* `LR`
 * `MainMenu`
-* `mant` (`Mantissa`)
+* `mant`
 * `MantissaSpacing`
 * `Map`
-* `MatchUp` (`↑Match`)
+* `MatchUp`
 * `MathMenu`
 * `MathModesMenu`
 * `MatrixMenu`
 * `Max`
 * `MaxFlags`
-* `MaxH` (`MaximumShowHeight`)
+* `MaxH`
 * `MaximumDecimalExponent`
 * `MaxNumberBits`
 * `MaxRewrites`
-* `MaxW` (`MaximumShowWidth`)
-* `MaxΣ` (`MaxData`, `ΣMax`)
+* `MaxW`
+* `MaxΣ`
 * `Median`
-* `Mem` (`AvailableMemory`)
+* `Mem`
 * `MemoryMenu`
 * `Menu`
 * `MenuAppearance`
@@ -7119,16 +7119,16 @@ spellings.
 * `Min`
 * `MinimumBatteryVoltage`
 * `MinimumSignificantDigits`
-* `MinΣ` (`MinData`, `ΣMin`)
+* `MinΣ`
 * `MixedFractions`
 * `mod`
 * `ModernBasedNumbers`
 * `Modes`
 * `ModesMenu`
 * `MonthBeforeDay`
-* `MRoot` (`MultipleEquationsSolver`)
-* `MSlv` (`MultipleVariablesSolver`)
-* `MSolvr` (`SolverMenu`)
+* `MRoot`
+* `MSlv`
+* `MSolvr`
 * `MultilineCursorFont`
 * `MultilineEditorFont`
 * `MultiLineResult`
@@ -7137,11 +7137,11 @@ spellings.
 * `MultiSolverMenu`
 * `NameDisplayMode`
 * `nand`
-* `NDupN` (`NDuplicateN`)
+* `NDupN`
 * `NeedToClearErrors`
-* `neg` (`Negate`)
+* `neg`
 * `NegativeUnderflowIndicator`
-* `NextEq` (`NextEquation`)
+* `NextEq`
 * `Nip`
 * `NoAngleUnits`
 * `NoAutoSimplify`
@@ -7161,11 +7161,11 @@ spellings.
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
-* `Not`
+* `not`
 * `NoTrailingDecimal`
 * `NoUndefinedResult`
 * `NSub`
-* `Num` (`CharToUnicode`, `Char→Code`, `Codepoint`)
+* `Num`
 * `NumberDotOrComma`
 * `NumberedVariables`
 * `NumberSeparatorCommand`
@@ -7174,51 +7174,53 @@ spellings.
 * `NumberTicks`
 * `NumberUnderscore`
 * `NumericalConstants`
+* `NumericalIntegration`
 * `NumericalResults`
+* `NumericalSolver`
 * `NumericalSolverMenu`
-* `NΣ` (`DataSize`, `ΣSize`)
+* `NΣ`
 * `ObjectMenu`
-* `Obj→` (`Explode`, `FromObj`, `Object→`)
-* `Oct` (`Octal`)
-* `Off` (`PowerOff`)
-* `OffWithImage` (`PowerOffWithImage`)
+* `Obj→`
+* `Oct`
+* `Off`
+* `OffWithImage`
 * `OnesComplement`
-* `or`
+* `Or`
 * `Over`
 * `OverflowError`
 * `OverflowIndicator`
 * `OverflowValue`
 * `PackedBitmaps`
-* `Parametric` (`ParametricPlot`)
+* `Parametric`
 * `PartsMenu`
-* `Path` (`DirectoryPath`)
-* `PCov` (`PopulationCovariance`)
-* `perm` (`Permutations`)
-* `PgDir` (`PurgeDirectory`, `RmDir`)
+* `Path`
+* `PCov`
+* `perm`
+* `PgDir`
 * `Pick`
 * `Pick3`
-* `Pict` (`GraphicPicture`)
-* `PiRadians` (`πradians`)
-* `Pix?` (`PixelGrayLevel`, `PixTest`)
-* `PixC?` (`PixColor`, `PixelColor`)
-* `PixOff` (`DrawBackgroundPixel`)
-* `PixOn` (`DrawPixel`)
+* `Pict`
+* `PiRadians`
+* `Pix?`
+* `PixC?`
+* `PixOff`
+* `PixOn`
 * `PlotErrorBackground`
 * `PlotMenu`
 * `PlotRefreshRate`
-* `PMax` (`PlotMax`)
-* `PMin` (`PlotMin`)
-* `Polar` (`PolarPlot`)
+* `PMax`
+* `PMin`
+* `Polar`
 * `PolynomialsMenu`
 * `PolynomialSolverMenu`
-* `Poly→` (`FromPolynomial`, `Polynomial→`)
+* `Poly→`
 * `PositiveUnderflowIndicator`
 * `PowerVoltage`
-* `PPar` (`PlotParameters`)
-* `PrcRnd` (`PrecisionRound`)
-* `Prec` (`Precision`)
-* `PredX` (`PredictX`)
-* `PredY` (`PredictY`)
+* `PPar`
+* `PrcRnd`
+* `Prec`
+* `PredX`
+* `PredY`
 * `PrefixPolynomialRender`
 * `PrincipalSolution`
 * `PrintingMenu`
@@ -7226,41 +7228,41 @@ spellings.
 * `ProgramLastArguments`
 * `ProgramMenu`
 * `Prompt`
-* `PSDev` (`PopulationStandardDeviation`)
+* `PSDev`
 * `Purge`
 * `PurgeAll`
 * `PushEvaluatedAssignment`
 * `PushOriginalAssignment`
 * `Put`
-* `PutI` (`PutIteration`)
-* `PVar` (`PopulationVariance`)
-* `PwrFit` (`PowerFit`)
-* `P→R` (`PolarToReal`, `Polarℂ→ℝ`)
+* `PutI`
+* `PVar`
+* `PwrFit`
+* `P→R`
 * `QuickSort`
-* `Rad` (`Radians`)
-* `rand` (`RandomNumber`)
+* `Rad`
+* `rand`
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
-* `RanM` (`RandomArray`, `RandomMatrix`)
-* `RcEq` (`RecallEquation`)
-* `Rcl` (`Recall`)
-* `Rcl*` (`Rcl×`, `Recall*`, `RecallMul`, `Recall×`)
-* `Rcl+` (`Recall+`, `RecallAdd`)
-* `Rcl-` (`Recall-`, `RecallSub`)
-* `Rcl/` (`Rcl÷`, `Recall/`, `RecallDiv`, `Recall÷`)
-* `RclF` (`FlagsToBinary`)
-* `RclKeys` (`RecallKeys`)
-* `RclMenu` (`RecallMenu`)
-* `RclΣ` (`RecallData`, `RecallΣ`)
-* `rcws` (`RecallWordSize`)
-* `rdz` (`RandomSeed`)
+* `RanM`
+* `RcEq`
+* `Rcl`
+* `Rcl*`
+* `Rcl+`
+* `Rcl-`
+* `Rcl/`
+* `RclF`
+* `RclKeys`
+* `RclMenu`
+* `RclΣ`
+* `rcws`
+* `rdz`
 * `re`
 * `RealMenu`
 * `RealResults`
-* `Rect` (`DrawRectangle`)
-* `Reduce` (`Stream`)
-* `RelRnd` (`RelativeRound`)
+* `Rect`
+* `Reduce`
+* `RelRnd`
 * `rem`
 * `ReorderTerms`
 * `ReportPrecisionLoss`
@@ -7271,52 +7273,52 @@ spellings.
 * `ResultGraphingTimeLimit`
 * `ReverseQuickSort`
 * `ReverseSort`
-* `RevList` (`ReverseList`)
-* `RGB` (`RGBPattern`)
+* `RevList`
+* `RGB`
 * `RightShiftBackground`
 * `RightShiftForeground`
-* `Risch` (`Primitive`)
-* `RL` (`RotateLeft`)
-* `RLB` (`RotateLeftByte`)
-* `RLC` (`RotateLeftCount`)
-* `Rnd` (`Round`)
+* `Risch`
+* `RL`
+* `RLB`
+* `RLC`
+* `Rnd`
 * `Roll`
-* `RollD` (`RollDown`)
+* `RollD`
 * `Root`
 * `Rot`
 * `RoundedMenus`
 * `RoundMenuBackground`
 * `RoundMenuForeground`
-* `Row+` (`AddRow`)
-* `Row-` (`DeleteRow`)
+* `Row+`
+* `Row-`
 * `RowNorm`
-* `Row→` (`RowsToMatrix`, `Rows→`)
-* `RR` (`RotateRight`)
-* `RRB` (`RotateRightByte`)
-* `RRC` (`RotateRightCount`)
-* `RRect` (`DrawRoundedRectangle`)
-* `RSwp` (`RowSwap`)
+* `Row→`
+* `RR`
+* `RRB`
+* `RRC`
+* `RRect`
+* `RSwp`
 * `Run`
 * `RunningIconForeground`
-* `RunStats` (`RuntimeStatistics`)
+* `RunStats`
 * `RunStatsClearAfterRead`
 * `RunStatsKeepAfterRead`
-* `R→B` (`RealToBinary`)
-* `R→C` (`RealToComplex`, `RealToRectangular`, `ℝ→ℂ`)
-* `R→D` (`RadiansToDegrees`, `Radians→Degrees`)
-* `R→I` (`ToInteger`, `→Int`, `→Integer`)
-* `R→P` (`RealToPolar`, `ℝ→Polarℂ`)
+* `R→B`
+* `R→C`
+* `R→D`
+* `R→I`
+* `R→P`
 * `same`
 * `SaveLastArguments`
 * `SaveStack`
 * `SaveState`
-* `Scale` (`PlotScale`)
-* `ScaleH` (`PlotScaleX`, `ScaleX`, `XScale`)
-* `ScaleW` (`PlotScaleY`, `ScaleY`, `YScale`)
-* `Scatter` (`ScatterPlot`)
-* `Sci` (`ScientificDisplay`)
+* `Scale`
+* `ScaleH`
+* `ScaleW`
+* `Scatter`
+* `Sci`
 * `ScreenCapture`
-* `SDev` (`StandardDeviation`)
+* `SDev`
 * `SearchBackground`
 * `SearchForeground`
 * `SelectedMenuForeground`
@@ -7325,10 +7327,10 @@ spellings.
 * `SeparatorModesMenu`
 * `SetAngleUnits`
 * `SetBit`
-* `SetDate` (`→Date`)
-* `SetTime` (`→Time`)
-* `SF` (`SetFlag`)
-* `SFP` (`SoftFP`, `SoftwareFloatingPoint`)
+* `SetDate`
+* `SetTime`
+* `SF`
+* `SFP`
 * `Show`
 * `ShowBuiltinCharacters`
 * `ShowBuiltinConstants`
@@ -7344,8 +7346,8 @@ spellings.
 * `ShowTime`
 * `ShowTimeLimit`
 * `ShowVoltage`
-* `Sig` (`SignificantDisplay`)
-* `SigDig` (`SignificantDigits`)
+* `Sig`
+* `SigDig`
 * `sign`
 * `SignalProcessingMenu`
 * `SilentBeepOff`
@@ -7357,31 +7359,29 @@ spellings.
 * `SingleRowMenus`
 * `sinh`
 * `Size`
-* `SKey` (`StandardKey`)
+* `SKey`
 * `SkippedMenuBackground`
-* `SL` (`ShiftLeft`)
-* `SLB` (`ShiftLeftByte`)
-* `SLC` (`ShiftLeftCount`)
+* `SL`
+* `SLB`
+* `SLC`
 * `Slope`
 * `SmallFractions`
 * `SoftwareDisplayRefresh`
-* `SolveNumericallyOnly`
 * `SolverImprecision`
 * `SolverIterations`
-* `SolveSymbolicallyThenNumerically`
 * `SolvingMenu`
 * `SolvingMenuRecall`
 * `SolvingMenuSolve`
 * `SolvingMenuStore`
 * `Sort`
-* `sq` (`Square`, `x²`)
+* `sq`
 * `SquareMenuBackground`
 * `SquareMenuForeground`
 * `SquareMenus`
-* `SR` (`ShiftRight`)
-* `SRB` (`ShiftRightByte`)
-* `SRC` (`ShiftRightCount`)
-* `sst` (`SingleStep`)
+* `SR`
+* `SRB`
+* `SRC`
+* `sst`
 * `StackBackground`
 * `StackEditor`
 * `StackFont`
@@ -7394,55 +7394,57 @@ spellings.
 * `StandardExponent`
 * `StateNameForeground`
 * `StatisticsMenu`
-* `Std` (`StandardDisplay`)
-* `StdRnd` (`StandardRound`)
+* `Std`
+* `StdRnd`
 * `StepByStepAlgebraResults`
 * `StepOut`
 * `StepOver`
 * `SteppingIconForeground`
-* `StEq` (`StoreEquation`)
-* `Sto` (`Store`)
-* `Sto*` (`Store*`, `StoreMul`, `Store×`, `Sto×`)
-* `Sto+` (`Store+`, `StoreAdd`)
-* `Sto-` (`Store-`, `StoreSub`)
-* `Sto/` (`Store/`, `StoreDiv`, `Store÷`, `Sto÷`)
-* `StoF` (`BinaryToFlags`)
-* `StoKeys` (`StoreKeys`)
+* `StEq`
+* `Sto`
+* `Sto*`
+* `Sto+`
+* `Sto-`
+* `Sto/`
+* `StoF`
+* `StoKeys`
 * `StoreAtEnd`
 * `StoreAtStart`
-* `StoVX` (`StoreAlgebraVariable`, `Storeⓧ`)
-* `StoΣ` (`StoreData`, `StoreΣ`)
+* `StoVX`
+* `StoΣ`
 * `StrictArrayResizing`
-* `Str→` (`Compile`, `Text→`)
-* `stws` (`WordSize`)
-* `Sub` (`Extract`)
-* `Subst` (`Substitute`)
+* `Str→`
+* `stws`
+* `Sub`
+* `Subst`
 * `Swap`
 * `SymbolicConstants`
+* `SymbolicIntegration`
 * `SymbolicMenu`
 * `SymbolicResults`
+* `SymbolicSolver`
 * `SymbolicSolverMenu`
 * `SystemMemory`
 * `SystemSetup`
 * `TabWidth`
-* `Tag→` (`FromTag`)
+* `Tag→`
 * `Tail`
 * `tan`
 * `tanh`
 * `TestsMenu`
-* `TEval` (`TimedEval`)
+* `TEval`
 * `TextMenu`
 * `TextRenderingSizeLimit`
 * `TextResultDisplay`
 * `TextStackDisplay`
-* `Text→Algebraic` (`CompileToAlgebraic`)
-* `Text→Code` (`TextToUnicode`)
-* `Text→Expression` (`CompileToExpression`)
-* `Text→Integer` (`CompileToInteger`)
-* `Text→Number` (`CompileToNumber`)
-* `Text→Object` (`CompileToObject`)
-* `Text→Positive` (`CompileToPositive`)
-* `Text→Real` (`CompileToReal`)
+* `Text→Algebraic`
+* `Text→Code`
+* `Text→Expression`
+* `Text→Integer`
+* `Text→Number`
+* `Text→Object`
+* `Text→Positive`
+* `Text→Real`
 * `ThreeRowsMenus`
 * `Ticks`
 * `Time`
@@ -7450,47 +7452,47 @@ spellings.
 * `Time24H`
 * `TimeForeground`
 * `TimeMenu`
-* `TMenu` (`TemporaryMenu`)
-* `ToArray` (`→Array`, `→Arry`)
-* `ToBitmap` (`→Bitmap`)
-* `ToCylindrical` (`→Cylindrical`)
-* `ToDMS` (`→DMS`)
+* `TMenu`
+* `ToArray`
+* `ToBitmap`
+* `ToCylindrical`
+* `ToDMS`
 * `ToggleCustomMenu`
 * `ToggleUserMode`
-* `ToGrads` (`→Grad`, `→Grads`)
-* `ToGrob` (`→Grob`)
-* `ToHMS` (`→HMS`)
-* `ToHPGrob` (`→HPGrob`)
-* `ToLCD` (`→LCD`, `→Screen`)
-* `ToList` (`→List`)
+* `ToGrads`
+* `ToGrob`
+* `ToHMS`
+* `ToHPGrob`
+* `ToLCD`
+* `ToList`
 * `ToolsMenu`
 * `TooManyDigitsErrors`
-* `ToPixmap` (`→Pixmap`)
-* `ToPolar` (`→Polar`)
-* `ToSpherical` (`→Spherical`)
-* `ToStr` (`ToText`, `→Str`, `→Text`)
-* `Tot` (`DataTotal`, `ΣTotal`)
-* `ToTag` (`→Tag`)
-* `ToUnit` (`→Unit`)
+* `ToPixmap`
+* `ToPolar`
+* `ToSpherical`
+* `ToStr`
+* `Tot`
+* `ToTag`
+* `ToUnit`
 * `TrailingDecimal`
-* `Tran` (`Transpose`)
+* `Tran`
 * `TrigIdentitiesMenu`
-* `Trn` (`TransConjugate`)
-* `Trnc` (`Truncate`)
+* `Trn`
+* `Trnc`
 * `True`
 * `TruthLogicForIntegers`
-* `TVars` (`TypedVariables`)
-* `TVM` (`FinanceSolverMenu`)
-* `TVMBeg` (`TVMPayAtBeginningOfPeriod`)
-* `TVMEnd` (`TVMPayAtEndOfPeriod`)
+* `TVars`
+* `TVM`
+* `TVMBeg`
+* `TVMEnd`
 * `TVMEquation`
 * `TVMRoot`
 * `TwoDigitYear`
 * `TwosComplement`
 * `Type`
 * `TypeName`
-* `UBase` (`BaseUnits`)
-* `UFact` (`FactorUnit`)
+* `UBase`
+* `UFact`
 * `UIAlgebraic`
 * `UIAlpha`
 * `UIBackspace`
@@ -7521,9 +7523,9 @@ spellings.
 * `UnitsSIPrefixCycle`
 * `UnPick`
 * `UnRot`
-* `UpDir` (`UpDirectory`)
-* `UpperCase` (`UpperCaseCommands`)
-* `UpperCaseNames` (`UpperCaseSymbols`)
+* `UpDir`
+* `UpperCase`
+* `UpperCaseNames`
 * `USBPowered`
 * `UseCrossForMultiplication`
 * `UseDotForMultiplication`
@@ -7536,87 +7538,86 @@ spellings.
 * `UserModeMenu`
 * `UserModeOff`
 * `UserModeOnce`
-* `UVal` (`UnitValue`)
-* `Var` (`Variance`)
+* `UVal`
+* `Var`
 * `VariablesMenu`
 * `VariablesMenuExecute`
 * `VariablesMenuRecall`
 * `VariablesMenuStore`
 * `VariableWidthDigits`
-* `Vars` (`Variables`)
+* `Vars`
 * `VectorMenu`
 * `Version`
 * `VerticalLists`
 * `VerticalProgramRendering`
 * `VerticalVectors`
 * `VoltageForeground`
-* `VX` (`AlgebraVariable`, `RclVX`, `ⓧ`)
-* `V→` (`FromVector`, `Vector→`)
+* `VX`
+* `V→`
 * `Wait`
-* `XCol` (`IndependentColumn`)
-* `XLib` (`LibraryItem`)
+* `XCol`
+* `XLib`
 * `XlibName`
 * `XlibValue`
 * `Xor`
-* `xpon` (`Exponent`)
-* `XRng` (`PlotXRange`, `XRange`)
+* `xpon`
+* `XRng`
 * `xroot`
-* `XVars` (`ExpressionVariables`)
-* `x³` (`cubed`)
-* `YCol` (`DependentColumn`)
+* `XVars`
+* `x³`
+* `YCol`
 * `YearFirst`
 * `YearLast`
-* `YRng` (`PlotYRange`, `YRange`)
+* `YRng`
 * `ZeroOverZeroIsError`
 * `ZeroOverZeroIsUndefined`
 * `ZeroPowerZeroIsOne`
 * `ZeroPowerZeroIsUndefined`
-* `|` (`Where`)
-* `Σ` (`Sum`)
-* `Σ+` (`AddData`)
-* `Σ-` (`RemoveData`)
-* `ΣDat` (`StatsData`, `ΣData`)
-* `ΣLine` (`RegressionFormula`)
-* `ΣList` (`ListSum`)
-* `ΣPar` (`StatsParameters`, `ΣParameters`)
-* `ΣX` (`SumOfX`)
-* `ΣX2` (`SumOfXSquares`, `ΣX²`)
-* `ΣXY` (`SumOfXY`)
-* `ΣY` (`SumOfY`)
-* `ΣY2` (`SumOfYSquares`, `ΣY²`)
-* `→2D` (`To2DVector`, `→V2`)
-* `→3D` (`To3DVector`, `→V3`)
-* `→Cartesian` (`ToRectangular`, `→Rectangular`)
-* `→Col` (`MatrixToColumns`, `→Columns`)
-* `→Deg` (`ToDegrees`, `→Degrees`)
-* `→Num` (`ToDecimal`, `→Decimal`)
-* `→Poly` (`ToPolynomial`, `→Polynomial`)
-* `→Prg` (`ToProgram`, `→Program`)
-* `→Q` (`ToFraction`, `→Frac`, `→ℚ`)
-* `→QDigits` (`FractionDigits`)
-* `→QIterations` (`FractionIterations`)
-* `→Rad` (`ToRadians`, `→Radians`)
-* `→Row` (`MatrixToRows`, `→Rows`)
-* `→Ur` (`ToRelativeUncertainty`, `→RelUnc`)
-* `→Us` (`ToStandardUncertainty`, `→StdUnc`)
-* `→πr` (`ToPiRadians`, `→PiRadians`)
-* `↓Match` (`MatchDown`)
-* `∂` (`Derivative`)
-* `∆List` (`ListDifferences`)
-* `∏` (`Product`)
-* `∏List` (`ListProduct`)
-* `√` (`sqrt`, `SquareRoot`)
-* `∛` (`cbrt`, `CubeRoot`)
-* `∠` (`atan2`)
-* `∫` (`Integrate`)
-* `≠` (`TestNE`)
-* `≤` (`TestLE`)
-* `≥` (`TestGE`)
-* `⊿` (`hypot`, `Hypothenuse`)
-* `Ⓓ` (`AlgebraConfiguration`, `CASDir`)
-* `▶` (`Copy`)
-* `⨯` (`cross`)
-
+* `|`
+* `Σ`
+* `Σ+`
+* `Σ-`
+* `ΣDat`
+* `ΣLine`
+* `ΣList`
+* `ΣPar`
+* `ΣX`
+* `ΣX2`
+* `ΣXY`
+* `ΣY`
+* `ΣY2`
+* `→2D`
+* `→3D`
+* `→Cartesian`
+* `→Col`
+* `→Deg`
+* `→Num`
+* `→Poly`
+* `→Prg`
+* `→Q`
+* `→QDigits`
+* `→QIterations`
+* `→Rad`
+* `→Row`
+* `→Ur`
+* `→Us`
+* `→πr`
+* `↓Match`
+* `∂`
+* `∆List`
+* `∏`
+* `∏List`
+* `√`
+* `∛`
+* `∠`
+* `∫`
+* `≠`
+* `≤`
+* `≥`
+* `⊿`
+* `Ⓓ`
+* `▶`
+* `⨯`
 
 ## Unimplemented commands
 
@@ -16481,8 +16482,7 @@ you can use the following code:
 
 When possible, the numerical solver will attempt to use the `Isolate` command to
 find results more rapidly and accurately using an exact symbolic expression of
-the solution. This is controlled by the `SolvingSymbolicallyThenNumerically`
-flag.
+the solution. This is controlled by the `SymbolicSolver` flag.
 
 
 ### Unit management
@@ -16526,9 +16526,9 @@ For example, the following will find a "solution" to `1/x=0` once it reaches the
 desired precision:
 
 ```rpl
-SolveNumericallyOnly
+NumericalSolver
 'ROOT(1/x;x;1)' EVAL
-SolveSymbolicallyThenNumerically
+SymbolicSolver
 @Expect: :x:1.10008 77783 66101 93099 87⁳18
 ```
 
