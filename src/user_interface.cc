@@ -3566,6 +3566,8 @@ restart:
                     while (c != '\n' && c != unicode(EOF))
                         c = helpfile.get();
                 }
+                if (style > ITALIC)
+                    break;
                 skip = true;
                 break;
 
@@ -3577,6 +3579,8 @@ restart:
                     xleft   = r.x1 + 2 + font->width(utf8("● "));
                     break;
                 }
+                if (style > ITALIC)
+                    break;
                 // Fall-through
             case '_':
                 if (style != CODE)
