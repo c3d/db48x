@@ -212,7 +212,7 @@ struct expression : program
                 eq = eq->rewrite(expression_p(rewrites[i+0]),
                                  expression_p(rewrites[i+1]),
                                  expression_p(conds ? rewrites[i+2] : nullptr),
-                                 count, down);
+                                 count, down == DOWN);
                 if (!eq)
                     return nullptr;
                 intr = program::interrupted();
