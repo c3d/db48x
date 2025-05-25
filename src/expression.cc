@@ -1028,6 +1028,8 @@ static size_t check_match(size_t eq, size_t eqsz,
             if (!ftop)
                 return 0;
 
+            settings::SaveNumericalResults snr(true);
+            settings::SaveNumericalConstants snc(true);
             size_t depth = rt.depth();
             if (program::run(+ftop) != object::OK)
                 return 0;
