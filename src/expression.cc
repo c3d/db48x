@@ -4006,13 +4006,22 @@ expression_p expression::derivative(symbol_r sym) const
         cbrt(X)>>indep,         (X>>indep)/(three*(sq(cbrt(X))))
         );
 
-    if (+result == +eq)
+    bool unknown = +result == +eq;
+    if (result)
     {
-        rt.unknown_derivative_error();
-        return nullptr;
+        if (!unknown)
+        {
+            expression_g hasder = result->rewrites(X>>indep, X);
+            unknown = hasder && +hasder != +result;
+        }
+        if (unknown)
+        {
+            rt.unknown_derivative_error();
+            return nullptr;
+        }
+        if (Settings.AutoSimplify())
+            result = result->simplify();
     }
-    if (result && Settings.AutoSimplify())
-        result = result->simplify();
     return result;
 }
 
@@ -4207,13 +4216,22 @@ expression_p expression::primitive(symbol_r sym) const
         inv(cbrt(L))<<indep,            ((three/two)*sq(cbrt(L)))/A
         );
 
-    if (+result == +eq)
+    bool unknown = +result == +eq;
+    if (result)
     {
-        rt.unknown_primitive_error();
-        return nullptr;
+        if (!unknown)
+        {
+            expression_g hasprim = result->rewrites(X<<indep, X);
+            unknown = hasprim && +hasprim != +result;
+        }
+        if (unknown)
+        {
+            rt.unknown_primitive_error();
+            return nullptr;
+        }
+        if (Settings.AutoSimplify())
+            result = result->simplify();
     }
-    if (result && Settings.AutoSimplify())
-        result = result->simplify();
     return result;
 }
 
