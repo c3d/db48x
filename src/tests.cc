@@ -7879,6 +7879,9 @@ void tests::symbolic_operations()
     step("Where operator in non-algebraic form with list")
         .test(CLEAR, "'x^y' { x 2 y 3 } |", ENTER)
         .expect("'2↑3'");
+    step("Where operator with lists and names as replacement")
+        .test(CLEAR, DIRECT("'(A-2+sin(6*C))^J' {A V J 9} |"), ENTER)
+        .expect("'(V-2+sin(6·C))↑9'");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
