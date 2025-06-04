@@ -343,7 +343,7 @@ MENU(MainMenu,
 
      "Lib",     ID_Library,
      "Eqns",    ID_EquationsMenu,
-     "Csts",    ID_ConstantsMenu,
+     "Const",   ID_ConstantsMenu,
      "Time",    ID_TimeMenu,
      "I/O",     ID_IOMenu,
      "Chars",   ID_CharactersMenu);
