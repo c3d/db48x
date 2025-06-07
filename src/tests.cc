@@ -185,7 +185,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            symbolic_integration();
+            solver_testing();
 
 #if 0
         if (onlyCurrent & 2)
@@ -6764,6 +6764,21 @@ void tests::solver_testing()
         .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
         .expect("{ X=0.5 Y=0.86602 54037 84 }");
+
+    step("Solving when the variable is initialized with a constant")
+        .test(CLEAR, DIRECT("m=Ⓒme "
+                            "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
+                            "Eval Pick3 StEq SolvingMenu"), ENTER,
+              LSHIFT, F3)
+        .expect("9.10938 37139⁳⁻³¹ kg");
+    step("Solving with constant initializer, second case (#1418)")
+        .test(CLEAR, DIRECT(
+                  "θ=40_°  p=1e-23_kg*m/s m=Ⓒme n=2 "
+                  "'ROOT(ⒺDe Broglie Wave;[λ;K;v;d];[1_nm;1_eV;1_m/s;1_nm])'"),
+              ENTER, ID_Run,
+              DIRECT("ⒺDe Broglie Wave STEQ SolvingMenu NextEQ"), ENTER,
+              LSHIFT, F3)
+        .expect("m=9.10938 37139⁳⁻³¹ kg");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
