@@ -1030,6 +1030,7 @@ static size_t check_match(size_t eq, size_t eqsz,
 
             settings::SaveNumericalResults snr(true);
             settings::SaveNumericalConstants snc(true);
+            settings::SaveAutoSimplify sas(true);
             size_t depth = rt.depth();
             if (program::run(+ftop) != object::OK)
                 return 0;
@@ -3933,6 +3934,7 @@ expression_p expression::derivative(symbol_r sym) const
     save<symbol_g *>       sindep(independent, (symbol_g *) &sym);
     save<object_g *>       sindval(independent_value, nullptr);
     save<uint>             sconstant(constant_index, 0);
+    save<bool>             usave(unit::nodates, true);
     save<funcall_match_fn> smatch(funcall_match, derivative_funcall_match);
     save<funcall_build_fn> sbuild(funcall_build, derivative_funcall_build);
     expression_g           eq = this;
@@ -4107,6 +4109,7 @@ expression_p expression::primitive(symbol_r sym) const
     save<symbol_g *>       sindep(independent, (symbol_g *) &sym);
     save<object_g *>       sindval(independent_value, nullptr);
     save<uint>             sconstant(constant_index, 0);
+    save<bool>             usave(unit::nodates, true);
     expression_g           eq = this;
     eq = expression::make(ID_Primitive, algebraic_g(eq), algebraic_g(sym));
     expression_g result = eq->rewrites(

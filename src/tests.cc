@@ -185,7 +185,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            solver_testing();
+            symbolic_differentiation();
 
 #if 0
         if (onlyCurrent & 2)
@@ -8104,6 +8104,10 @@ void tests::symbolic_differentiation()
     step("Derivative of unknown form in algebraic form")
         .test(CLEAR, "'∂x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown derivative");
+
+    step("Derivative of function with angle (#1491)")
+        .test(CLEAR, DIRECT("'sin((0.5_r/s)·x)' 'x' ∂"), ENTER)
+        .expect("'0.5 r/s·cos(0.5 r/s·x)'");
 }
 
 
