@@ -46,14 +46,17 @@ spirit.
 
 ## State of the project
 
-This is currently **UNSTABLE** and **INCOMPLETE** software. Please only consider
-installing this if you are a developer and interested in contributing. Or else,
-have a paperclip at hand just in case you need to reset your calculator.
+DB48x is currently fairly usable, and probably one of the best scientific calculators in the world, even in its current unfinished state. It implements a large fraction of the features set of the latest HP RPL calculators (HP48SX, HP50G), with significant enhancements, such as variable-precision decimal numbers, an extensive built-in help, and an up-to-date and extended library of equations and constants.
 
-The detailed current status is described in the [STATUS file](STATUS.md).
+The detailed current status is described in the [STATUS file](STATUS.md) and in the [list of implemented commands](doc/0-Overview.md#implementation-status).
 
-[![Self-test in the simulator](http://img.youtube.com/vi/vT-I3UlROtA/0.jpg)](https://www.youtube.com/watch?v=vT-I3UlROtA "Self-test demo")
+## Installing the firmware
 
+The [INSTALL file](INSTALL.md) details the installation procedure on SwissMicros DM32 and DM42 calculators, which is outlined in the video below:
+
+[![Install v0.4.8](http://img.youtube.com/vi/rVWy4N0lBOI/0.jpg)](https://youtu.be/rVWy4N0lBOI?si=lD244TAWJMUmo1Fz)
+
+This video is part of a playlist that contains many other DB48x-related videos, and where you can find the evolution of the project over time, as well as demonistrations of some of the more recent features.
 
 ## How to build this project
 
