@@ -101,7 +101,32 @@ Once the distribution files have been copied on the calculator volume, you can e
 * `eject /path/to/calc` (Linux)
 * `hdiutil eject /path/to/calc` (macOS)
 
-If you copied the files at the correct position, ejecting the calculator volume causes the calculator to immediately install the keymap for DB48x or DB50x. Failure to install the keymap will simply cause a warning requiring confirmation every time you try to run the program.
+
+## Keymap installation
+
+If you copied the files at the correct position, ejecting the calculator volume causes the calculator to immediately install the keymap for DB48x or DB50x.
+
+Failure to install the keymap will simply cause a warning requiring confirmation every time you try to run the program, that the program is not targeted for this unit:
+
+```
+Currently loaded program is not
+targeted for this unit. It may not
+work properly. We recommend to
+start USB disk mode or DMCP menu
+to load another program
+1. Start DB50X Ayway (not safe)
+2. Activate USB Disk
+3. DMCP Menu
+```
+
+If this happens, it simply means you did not copy the `keymap.bin` file at the root of the USB disk. Select `Activate USB Disk` and copy the file. When you eject the disk, you will see:
+
+```
+New KEYMAP installed
+DB48x
+
+Press any key to continue
+```
 
 
 ## Load the QSPI file
@@ -126,7 +151,15 @@ In the *Setup* menu:
 
 ### QSPI / Program mismatch
 
-If you were running an earlier version of DB48x or DB50x, loading a new version of the QSPI may cause the program to display a warning indicating a mismatch btween the QSPI and the program. Simply hit the *ENTER* key, and proceed to the next step.
+If you were running an earlier version of DB48x or DB50x, loading a new version of the QSPI may cause the program to display a warning indicating a mismatch btween the QSPI and the program.
+
+```
+Incompatible DB48x build ID
+Please reload program and QSPI
+from the same build
+```
+
+Simply hit the *ENTER* key, and proceed to the next step.
 
 ## Load the Program file
 
