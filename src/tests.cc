@@ -1,3 +1,4 @@
+
 // ****************************************************************************
 //  tests.cc                                                      DB48X project
 // ****************************************************************************
@@ -6674,7 +6675,10 @@ void tests::solver_testing()
     step("Solving equation containing a zero side (#1179)")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
-
+    step("Solving Antoine's equation (#1495)")
+        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+                            "'P' 1000 ROOT"), ENTER)
+        .expect("P=1 276.71035 463");
 
     step("Select algebraically-assisted solver")
         .test(CLEAR, "SymbolicSolver", ENTER).noerror();
@@ -6747,6 +6751,10 @@ void tests::solver_testing()
     step("Solving equation containing a zero side (#1179)")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
+    step("Solving Antoine's equation (#1495)")
+        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+                            "'P' 1000 ROOT"), ENTER)
+        .expect("P=1 276.71035 463");
 
     step("Jacobian solver, linear case")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
@@ -7969,28 +7977,28 @@ void tests::symbolic_operations()
         .expect("'X=tanh A'");
     step("Isolate log")
         .test(CLEAR, "'A=log X' X", NOSHIFT, F3)
-        .expect("'X=exp X'");
+        .expect("'X=exp A'");
     step("Isolate exp")
         .test(CLEAR, "'A=exp X' X", NOSHIFT, F3)
-        .expect("'X-ln X=2·i1·π·ⅈ'");
+        .expect("'X=ln A+2·i1·π·ⅈ'");
     step("Isolate log2")
         .test(CLEAR, "'A=log2 X' X", NOSHIFT, F3)
-        .expect("'X=exp2 X'");
+        .expect("'X=exp2 A'");
     step("Isolate exp2")
         .test(CLEAR, "'A=exp2 X' X", NOSHIFT, F3)
-        .expect("'X-log2 X=2·i1·π·ⅈ÷ln 2'");
+        .expect("'X=log2 A+2·i1·π·ⅈ÷ln 2'");
     step("Isolate log10")
         .test(CLEAR, "'A=log10 X' X", NOSHIFT, F3)
-        .expect("'X=exp10 X'");
+        .expect("'X=exp10 A'");
     step("Isolate exp10")
         .test(CLEAR, "'A=exp10 X' X", NOSHIFT, F3)
-        .expect("'X-log10 X=2·i1·π·ⅈ÷ln 10'");
+        .expect("'X=log10 A+2·i1·π·ⅈ÷ln 10'");
     step("Isolate log1p")
         .test(CLEAR, "'A=log1p X' X", NOSHIFT, F3)
-        .expect("'X=expm1 X'");
+        .expect("'X=expm1 A'");
     step("Isolate expm1")
         .test(CLEAR, "'A=expm1 X' X", NOSHIFT, F3)
-        .expect("'X-log1p X=2·i1·π·ⅈ'");
+        .expect("'X=log1p A+2·i1·π·ⅈ'");
     step("Isolate sq")
         .test(CLEAR, "'A=sq X' X", NOSHIFT, F3)
         .expect("'X=s1·√ A'");
