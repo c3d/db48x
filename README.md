@@ -6,8 +6,9 @@ language with its rich set of data types and built-in functions, and
 [Lisp-level programming power](http://www.paulgraham.com/avg.html).
 
 The project in this repository is presently targeting the
-[SwissMicro DM42](https://www.swissmicros.com/product/dm42) and
-[DM32](https://www.swissmicros.com/product/dm42) calculators.
+[SwissMicro DM42](https://www.swissmicros.com/product/dm42),
+[DM32](https://www.swissmicros.com/product/model-dm32) and
+[DM42n](https://www.swissmicros.com/product/model-dm42n) calculators.
 You can [order keyboard overlays](https://www.hpmuseum.org/forum/thread-20113.html) to adjust the calculator's faceplates to DB48X.
 DB48X leverages SwissMicros's built-in software platform, known as
 [DMCP](https://technical.swissmicros.com/dmcp/doc/DMCP-ifc-html/).
@@ -52,7 +53,7 @@ The detailed current status is described in the [STATUS file](STATUS.md) and in 
 
 ## Installing the firmware
 
-The [INSTALL file](INSTALL.md) details the installation procedure on SwissMicros DM32 and DM42 calculators, which is outlined in the video below:
+The [INSTALL file](INSTALL.md) details the installation procedure on SwissMicros DM32, DM42 and DM42 calculators, which is outlined in the video below:
 
 [![Install v0.4.8](http://img.youtube.com/vi/rVWy4N0lBOI/0.jpg)](https://youtu.be/rVWy4N0lBOI?si=lD244TAWJMUmo1Fz)
 

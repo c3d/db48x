@@ -56,8 +56,7 @@ RPL commands in the HP50G and in DB48X into
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
 existing DM42 physical hardware.
-Ideally, DB48X should be fully usable without a
-keyboard overlay. though one is
+Ideally, DB48X should be fully usable without a keyboard overlay. though one is
 [being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
 
 Compared to the original HP48, the DM42 has a much larger screen, but no
