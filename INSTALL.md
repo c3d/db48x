@@ -9,7 +9,7 @@ The DB48x project firmware exists in two versions, named DB48x and DB50x, that t
 * DB48x can be installed on the SwissMicros [DM42](https://www.swissmicros.com/product/dm42).
 * DB50x can be installed on the SwissMicros [DM32](https://www.swissmicros.com/product/model-dm32) and [DM42n](https://www.swissmicros.com/product/model-dm42n).
 
-The two versions of the firmware are, functionally speaking, virtually identical as of this writing. The major difference is available memory, a little over 60K for DB48x on DM42, a little over 430K for DB50x on DM32 and DM42. In the future, it is possible that some features will only exist on DB50x.
+The two versions of the firmware are, functionally speaking, virtually identical as of this writing. The major difference is available memory, a little over 60K for DB48x on DM42, a little over 430K for DB50x on DM32 and DM42n. In the future, it is possible that some features will only exist on DB50x.
 
 
 ## Download the firmware
