@@ -3679,6 +3679,25 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.8 "Crowdfeeding" - Bug fixes
+
+This is a minor release with bug fixes.
+
+### Bug fixes
+
+* isolate: Fix patterns for exponentials and logs
+* doc: Fix list of currently supported models
+* derivation: Allow simplification when matching against constant
+* solver: Do not emit type error when guesses are constants
+* expressions: Correctly substitute names in list substitutions
+* menu: Fix label for `ConstantsMenu` in `MainMenu`
+
+### Improvements
+
+The [INSTALL.md](../INSTALL.md) file now describes the installation
+procedure.
+
+
 ## Release 0.9.7 "Home" - Symbolic integration and bug fixes
 
 This release focuses on symbolic integration and bug fixes.

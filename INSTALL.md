@@ -16,8 +16,8 @@ The two versions of the firmware are, functionally speaking, virtually identical
 
 First [download the latest release](https://github.com/c3d/db48x/releases) of the firmware from the [project's GitHub repository](https://github.com/c3d/db48x):
 
-* For a DM42, download the [DB48x distribution file, db48x-v0.9.7.tgz](https://github.com/c3d/db48x/releases/download/v0.9.7/db48x-v0.9.7.tgz) file.
-* For a DM32 or DM42n, download the [DB50x distribution file, db50x-v0.9.7.tgz](https://github.com/c3d/db48x/releases/download/v0.9.7/db50x-v0.9.7.tgz).
+* For a DM42, download the [DB48x distribution file, db48x-v0.9.8.tgz](https://github.com/c3d/db48x/releases/download/v0.9.8/db48x-v0.9.8.tgz) file.
+* For a DM32 or DM42n, download the [DB50x distribution file, db50x-v0.9.8.tgz](https://github.com/c3d/db48x/releases/download/v0.9.8/db50x-v0.9.8.tgz).
 
 There are also source code archives for each release, which are only necessary to rebuild the firwmare.
 
@@ -69,7 +69,7 @@ Depending on the operating system, this volume may show up in a variety of ways.
 Extract the content of the distribution `.tgz` file into the `/path/to/calc` directory. From a terminal window, you can extract the file using the following command:
 
 ```
-tar -C /path/to/calc -xvfz db48x-v0.9.7.tgz
+tar -C /path/to/calc -xvfz db48x-v0.9.8.tgz
 ```
 
 You can also extract the files in a folder by double-clicking on the downloaded distribution file, and then copying all the files at the root of `/path/to/calc`. However, beware that I have occasionally observed calculator filesystem corruptions using this method on macOS, which typically manifest as `HELP/` turning into a file (instead of a directory) and various I/O errors. Should this happens, you will need to reformat the calculator volume.
