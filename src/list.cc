@@ -2558,7 +2558,7 @@ list_p list::substitute(symbol_r name, object_r replobj, size_t replsz) const
 }
 
 
-list_p list::substitute(symbol_r name, object_r replobj) const
+list_p list::substitute(symbol_r name, object_p replobj) const
 // ----------------------------------------------------------------------------
 //  Substitute a name with an object, which can be an expression
 // ----------------------------------------------------------------------------
@@ -2598,14 +2598,14 @@ list_p list::substitute(list_r assignments) const
     symbol_g name;
     for (object_g obj : *assignments)
     {
-        if (symbol_p n = obj->as<symbol>())
-        {
-            name = n;
-        }
-        else if (name)
+        if (name)
         {
             result = result->substitute(name, obj);
             name = nullptr;
+        }
+        else if (symbol_p n = obj->as<symbol>())
+        {
+            name = n;
         }
         else
         {

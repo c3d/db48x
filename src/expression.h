@@ -212,7 +212,7 @@ struct expression : program
                 eq = eq->rewrite(expression_p(rewrites[i+0]),
                                  expression_p(rewrites[i+1]),
                                  expression_p(conds ? rewrites[i+2] : nullptr),
-                                 count, down);
+                                 count, down == DOWN);
                 if (!eq)
                     return nullptr;
                 intr = program::interrupted();
@@ -646,6 +646,8 @@ EQ_FUNCTION(conj);
 
 // Build a symbol out of a character
 template <byte c>       struct eq_symbol  : eq<object::ID_symbol,  1, c> {};
+template <byte c, byte d>
+struct eq_debug_symbol  : eq<object::ID_symbol,  2, c, d> {};
 
 // Build an integer constant
 template <uint c, std::enable_if_t<(c >= 0 && c < 128), bool> = true>

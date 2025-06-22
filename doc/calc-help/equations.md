@@ -1363,7 +1363,7 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a golf ball falling in water, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.5  ρ=1077,5_(kg/m^3)  ρf=1000_(kg/m^3)  d=4.282_cm  Ah=14.40068 68745_cm↑2  Vol=41.10916 07978_cm↑3  t=3e-2_s  fr=0.95
-@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=0.05502 64783 43 s xfr=0.01030 03495 63 m ]
+@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=0.05502 64783 43 s xfr=1.03003 49562 7⁳⁻² m ]
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
@@ -1932,7 +1932,7 @@ These equations for an NPN silicon bipolar transistor are based on large-signal 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
 IES=1e-5_nA  ICS=2e-5_nA  T=26.85_°C  αF=0.98  αR=0.49  IC=1_mA  VBC=-10_V
-@ Expecting [ VBE=0.63739 37623 73 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40835 27 mA IB=-0.48979 59164 73 mA VCEsat=-5.95264 29332 3 V ]
+@ Expecting [ VBE=0.63739 37622 77 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40816 27 mA IB=-0.48979 59183 73 mA VCEsat=-5.95264 29332 3 V ]
 'ROOT(ⒺBipolar Transistors;[VBE;IS;ICO;ICEO;IE;IB;VCEsat];[1_V;1_nA;1_nA;1_nA;1_mA;1_mA;1_V])'
 ```
 

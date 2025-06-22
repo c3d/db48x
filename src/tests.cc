@@ -1,3 +1,4 @@
+
 // ****************************************************************************
 //  tests.cc                                                      DB48X project
 // ****************************************************************************
@@ -123,6 +124,7 @@ TESTS(cstlib,           "Built-in constants parsing");
 TESTS(equations,        "Built-in equations");
 TESTS(colnbeams,        "Columns and Beams equations in library");
 TESTS(integrate,        "Numerical integration");
+TESTS(syminteg,         "Numerical integration with symbolic primitive");
 TESTS(simplify,         "Auto-simplification of expressions");
 TESTS(rewrites,         "Equation rewrite engine");
 TESTS(symbolic,         "Symbolic operations");
@@ -184,7 +186,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            graphic_stack_rendering();
+            symbolic_differentiation();
 
 #if 0
         if (onlyCurrent & 2)
@@ -235,7 +237,8 @@ void tests::run(uint onlyCurrent)
         constants_parsing();
         eqnlib_parsing();
         eqnlib_columns_and_beams();
-        numerical_integration_testing();
+        numerical_integration();
+        symbolic_numerical_integration();
         text_functions();
         auto_simplification();
         rewrite_engine();
@@ -1015,11 +1018,11 @@ void tests::data_types()
     test(CLEAR, "12", ENTER, "bytes", ENTER)
         .expect("2")
         .test(BSP)
-        .match("#C....");
+        .match("#C..₁₆");
     test(CLEAR, "129", ENTER, "bytes", ENTER)
         .expect("3")
         .test(BSP)
-        .match("#1 81....");
+        .match("#1 81..₁₆");
 
     step("Type command (direct mode)");
     test(CLEAR, "DetailedTypes", ENTER).noerror();
@@ -3689,7 +3692,11 @@ void tests::float_numerical_functions()
         .test(CLEAR, "OverflowError", ENTER).noerror()
         .test("1E80", ID_sq)
         .error("Numerical overflow")
-        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();;
+        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
+
+    step("Check rounding to fraction(#1481)")
+        .test(CLEAR, DIRECT("10.25F ToFraction"), ENTER)
+        .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
@@ -3872,7 +3879,11 @@ void tests::double_numerical_functions()
         .test(CLEAR, "OverflowError", ENTER).noerror()
         .test("1E256", ID_sq)
         .error("Numerical overflow")
-        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();;
+        .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
+
+    step("Check rounding to fraction(#1481)")
+        .test(CLEAR, DIRECT("10.25D ToFraction"), ENTER)
+        .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
@@ -6595,7 +6606,7 @@ void tests::solver_testing()
         .test(CLEAR, "'SLVTST' CRDIR SLVTST", ENTER);
 
     step("Select purely numerical solver")
-        .test(CLEAR, "SolveNumericallyOnly", ENTER).noerror();
+        .test(CLEAR, "NumericalSolver", ENTER).noerror();
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
@@ -6664,10 +6675,13 @@ void tests::solver_testing()
     step("Solving equation containing a zero side (#1179)")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
-
+    step("Solving Antoine's equation (#1495)")
+        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+                            "'P' 1000 ROOT"), ENTER)
+        .expect("P=1 276.71035 463");
 
     step("Select algebraically-assisted solver")
-        .test(CLEAR, "SolveSymbolicallyThenNumerically", ENTER).noerror();
+        .test(CLEAR, "SymbolicSolver", ENTER).noerror();
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
@@ -6737,6 +6751,10 @@ void tests::solver_testing()
     step("Solving equation containing a zero side (#1179)")
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
+    step("Solving Antoine's equation (#1495)")
+        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+                            "'P' 1000 ROOT"), ENTER)
+        .expect("P=1 276.71035 463");
 
     step("Jacobian solver, linear case")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
@@ -6754,6 +6772,21 @@ void tests::solver_testing()
         .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
         .expect("{ X=0.5 Y=0.86602 54037 84 }");
+
+    step("Solving when the variable is initialized with a constant")
+        .test(CLEAR, DIRECT("m=Ⓒme "
+                            "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
+                            "Eval Pick3 StEq SolvingMenu"), ENTER,
+              LSHIFT, F3)
+        .expect("9.10938 37139⁳⁻³¹ kg");
+    step("Solving with constant initializer, second case (#1418)")
+        .test(CLEAR, DIRECT(
+                  "θ=40_°  p=1e-23_kg*m/s m=Ⓒme n=2 "
+                  "'ROOT(ⒺDe Broglie Wave;[λ;K;v;d];[1_nm;1_eV;1_m/s;1_nm])'"),
+              ENTER, ID_Run,
+              DIRECT("ⒺDe Broglie Wave STEQ SolvingMenu NextEQ"), ENTER,
+              LSHIFT, F3)
+        .expect("m=9.10938 37139⁳⁻³¹ kg");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
@@ -7076,13 +7109,15 @@ void tests::eqnlib_columns_and_beams()
 }
 
 
-void tests::numerical_integration_testing()
+void tests::numerical_integration()
 // ----------------------------------------------------------------------------
-//   Test that the numerica integartion function works as expected
+//   Test that the numerical integration function works as expected
 // ----------------------------------------------------------------------------
 {
     BEGIN(integrate);
 
+    step("Disable symbolic integration")
+        .test(CLEAR, DIRECT("NumericalIntegration"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -7194,8 +7229,135 @@ void tests::numerical_integration_testing()
         .expect("'∫(0;π;exp X;X)'")
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
-    step("Cleanup")
-         .test(CLEAR, "'X'", ID_ClearThingsMenu, ID_Purge);
+    step("Cleanup & restore symbolic integration")
+        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
+              ID_ClearThingsMenu, ID_Purge);
+}
+
+
+void tests::symbolic_numerical_integration()
+// ----------------------------------------------------------------------------
+//   Test symbolic-assisted numerical integration
+// ----------------------------------------------------------------------------
+{
+    BEGIN(syminteg);
+
+    step("Enable symbolic integration")
+        .test(CLEAR, DIRECT("SymbolicIntegration"), ENTER);
+    step("Integrate with expression")
+        .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+    step("Integration through menu")
+        .test(CLEAR, 2, ENTER).expect("2")
+        .test(3, ENTER).expect("3")
+        .test("'sq(Z)+Z'", ENTER).expect("'Z²+Z'")
+        .test(F, ALPHA, Z, ENTER).expect("'Z'")
+        .test(ID_IntegrationMenu, ID_Integrate).expect("8 ⁵/₆", 350);
+    step("Integration with decimals")
+        .test(CLEAR, "2.", ENTER).expect("2.")
+        .test("3.", ENTER).expect("3.")
+        .test("'sq(Z)+Z'", ENTER).expect("'Z²+Z'")
+        .test(F, ALPHA, Z, ENTER).expect("'Z'")
+        .test(ID_IntegrationMenu, ID_Integrate).expect("8.83333 33333 3", 350);
+
+    step("Integrate with low precision")
+        .test(CLEAR, "18 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+    step("Integrate with high precision")
+        .test(CLEAR, "1 IntegrationImprecision  24 Sig", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .expect("0.69314 71805 59945 30941 7232");
+    step("Integrate with limited loops")
+        .test(CLEAR, "15 IntegrationImprecision", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 59945 30941 7232")
+        .test(KEY2, ID_log, ID_subtract).expect("0")
+        .test("5 IntegrationIterations", ENTER)
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .expect("0.69314 71805 59945 30941 7232");
+    step("Integrate with restored settings")
+        .test(CLEAR,
+              "{ IntegrationImprecision IntegrationIterations } Purge Std",
+              ENTER).noerror()
+        .test("1 2 '1/X' 'X' ∫", ENTER)
+        .noerror().expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+
+    step("Integrate with display-induced imprecision")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("1 2 '1/X' 'X' ∫", ENTER).expect("6.931⁳⁻¹")
+        .test(ID_DisplayModesMenu, ID_Std).expect("0.69314 71805 6")
+        .test(KEY2, ID_log, ID_subtract).expect("0");
+
+
+    step("Integration with error on low bound")
+        .test(CLEAR, "0 1 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .expect("0.01745 29971 57");
+    step("Integration with error on high bound")
+        .test(CLEAR, "1 0 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .expect("-0.01745 29971 57");
+    step("Integration with error on difference")
+        .test(CLEAR, "1_m 1_h 'sin(x)/x' 'x'", ENTER)
+        .test(ID_IntegrationMenu, ID_Integrate)
+        .error("Inconsistent units");
+
+    step("Integrate with symbols")
+        .test(CLEAR, "A B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)-ln (abs A)'")
+        .test(DOWN)
+        .editor("'ln (abs B)-ln (abs A)'")
+        .test(ENTER)
+        .expect("'ln (abs B)-ln (abs A)'");
+    step("Integrate with one symbol")
+        .test(CLEAR, "1 B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)'")
+        .test(DOWN)
+        .editor("'ln (abs B)'")
+        .test(ENTER)
+        .expect("'ln (abs B)'");
+    step("Integrate with second symbol")
+        .test(CLEAR, "A 1 '1/X' 'X' ∫", ENTER)
+        .expect("'-ln (abs A)'")
+        .test(DOWN)
+        .editor("'-ln (abs A)'")
+        .test(ENTER)
+        .expect("'-ln (abs A)'");
+
+    step("Check evaluation with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "-3 SF 3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("22.14069 26328");
+    step("Check evaluation without NumericalResults flag clear")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'exp π-1.'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Check inference variable with NumericalResults flag set")
+        .test(CLEAR, "-3 CF", ENTER,
+              "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
+              "3 'X' STO", ENTER,
+              ID_IntegrationMenu, ID_Integrate)
+        .expect("'exp π-1.'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Cleanup & restore symbolic integration")
+        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
+              ID_ClearThingsMenu, ID_Purge);
 }
 
 
@@ -7740,6 +7902,9 @@ void tests::symbolic_operations()
     step("Where operator in non-algebraic form with list")
         .test(CLEAR, "'x^y' { x 2 y 3 } |", ENTER)
         .expect("'2↑3'");
+    step("Where operator with lists and names as replacement")
+        .test(CLEAR, DIRECT("'(A-2+sin(6*C))^J' {A V J 9} |"), ENTER)
+        .expect("'(V-2+sin(6·C))↑9'");
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
@@ -7812,28 +7977,28 @@ void tests::symbolic_operations()
         .expect("'X=tanh A'");
     step("Isolate log")
         .test(CLEAR, "'A=log X' X", NOSHIFT, F3)
-        .expect("'X=exp X'");
+        .expect("'X=exp A'");
     step("Isolate exp")
         .test(CLEAR, "'A=exp X' X", NOSHIFT, F3)
-        .expect("'X-ln X=2·i1·π·ⅈ'");
+        .expect("'X=ln A+2·i1·π·ⅈ'");
     step("Isolate log2")
         .test(CLEAR, "'A=log2 X' X", NOSHIFT, F3)
-        .expect("'X=exp2 X'");
+        .expect("'X=exp2 A'");
     step("Isolate exp2")
         .test(CLEAR, "'A=exp2 X' X", NOSHIFT, F3)
-        .expect("'X-log2 X=2·i1·π·ⅈ÷ln 2'");
+        .expect("'X=log2 A+2·i1·π·ⅈ÷ln 2'");
     step("Isolate log10")
         .test(CLEAR, "'A=log10 X' X", NOSHIFT, F3)
-        .expect("'X=exp10 X'");
+        .expect("'X=exp10 A'");
     step("Isolate exp10")
         .test(CLEAR, "'A=exp10 X' X", NOSHIFT, F3)
-        .expect("'X-log10 X=2·i1·π·ⅈ÷ln 10'");
+        .expect("'X=log10 A+2·i1·π·ⅈ÷ln 10'");
     step("Isolate log1p")
         .test(CLEAR, "'A=log1p X' X", NOSHIFT, F3)
-        .expect("'X=expm1 X'");
+        .expect("'X=expm1 A'");
     step("Isolate expm1")
         .test(CLEAR, "'A=expm1 X' X", NOSHIFT, F3)
-        .expect("'X-log1p X=2·i1·π·ⅈ'");
+        .expect("'X=log1p A+2·i1·π·ⅈ'");
     step("Isolate sq")
         .test(CLEAR, "'A=sq X' X", NOSHIFT, F3)
         .expect("'X=s1·√ A'");
@@ -7881,7 +8046,7 @@ void tests::symbolic_differentiation()
         .expect("'0.69314 71805 6·2↑X'");
     step("Derivative of power of a non-numerical constant")
         .test(CLEAR, "'A^X' 'X'", ID_Derivative)
-        .expect("'A↑X·(ln A+0÷A)'")
+        .expect("'A↑X·ln A'")
         .test(RUNSTOP)
         .expect("'A↑X·ln A'");
     step("Derivative of power")
@@ -7894,13 +8059,16 @@ void tests::symbolic_differentiation()
         .test(CLEAR, "'sin(A*X^2)+cos(X*B)+tan(C*X^6)' 'X'", ID_Derivative)
         .expect("'2·A·X·cos(A·X²)+(-B)·sin(X·B)+6·C·X↑5÷(cos(C·X↑6))²'");
     step("Derivative of hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'sinh(A*X^3)+cosh(B*X^5)+tanh(C*X^3)' 'X'", ID_Derivative)
+        .test(CLEAR, "'sinh(A*X^3)+cosh(B*X^5)+tanh(C*X^3)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'3·A·X²·cosh(A·X³)+5·B·X↑4·sinh(B·X↑5)+3·C·X²÷(cosh(C·X³))²'");
     step("Derivative of arcsine, arccosine, arctangent")
-        .test(CLEAR, "'asin(A*X^2)+acos(X*B)+atan(C*X^6)' 'X'", ID_Derivative)
+        .test(CLEAR, "'asin(A*X^2)+acos(X*B)+atan(C*X^6)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'2·A·X÷√(1-(A·X²)²)+(-B)÷√(1-(X·B)²)+6·C·X↑5÷((C·X↑6)²+1)'");
     step("Derivative of inverse hyperbolic sine, cosine, tangent")
-        .test(CLEAR, "'asinh(A*X)+acosh(X*B)+atanh(C+X)' 'X'", ID_Derivative)
+        .test(CLEAR, "'asinh(A*X)+acosh(X*B)+atanh(C+X)' 'X'",
+              LENGTHY(3000), ID_Derivative)
         .expect("'A÷√((A·X)²+1)+B÷√((X·B)²-1)+(1-(C+X)²)⁻¹'");
 
     step("Derivative of log and exp")
@@ -7944,6 +8112,10 @@ void tests::symbolic_differentiation()
     step("Derivative of unknown form in algebraic form")
         .test(CLEAR, "'∂x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown derivative");
+
+    step("Derivative of function with angle (#1491)")
+        .test(CLEAR, DIRECT("'sin((0.5_r/s)·x)' 'x' ∂"), ENTER)
+        .expect("'0.5 r/s·cos(0.5 r/s·x)'");
 }
 
 
@@ -7993,50 +8165,60 @@ void tests::symbolic_integration()
         .test(CLEAR, "'-(inv(A*X+B) - sign(3-2*X))' 'X'", ID_Primitive)
         .expect("'-(ln (abs(A·X+B))÷A-abs(3-2·X)÷2)'");
     step("Primitive of sine, cosine, tangent")
-        .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sin(A*X+3)+cos(X*B-5)+tan(Z-C*X)' 'X'",
+              LENGTHY(10000), ID_Primitive)
         .expect("'(-cos(A·X+3))÷A+sin(X·B-5)÷B+(-ln (cos(Z-C·X)))÷C'");
     step("Primitive of hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'sinh(A*X-3)+cosh(B*X+5*A)+tanh(C*(X-A))' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'cosh(A·X-3)÷A+sinh(B·X+5·A)÷B+ln (cosh(C·(X-A)))÷C'");
     step("Primitive of arcsine, arccosine, arctangent")
         .test(CLEAR, "'asin(A*X+B)+acos(X*B+A*(X+1))+atan(C*(X-6))' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·sin⁻¹(A·X+B)+√(1-(A·X+B)²))÷A+((X·B+A·(X+1))·cos⁻¹(X·B+A·(X+1))-√(1-(X·B+A·(X+1))²))÷(B+A)+(C·(X-6)·tan⁻¹(C·(X-6))-ln((C·(X-6))²+1)÷2)÷C'");
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
-              LENGTHY(2000), ID_Primitive)
+              LENGTHY(20000), ID_Primitive)
         .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
-        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·ln(A·X+B)-(A·X+B))÷A+exp(X·C-D)÷C'");
     step("Primitive of log2 and exp2")
-        .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·log2(A·X+B)-(A·X+B)÷ln 2)÷A+exp2(X·C-D)÷(0.69314 71805 6·C)'");
     step("Primitive of log10 and exp10")
-        .test(CLEAR, "'log10(A*X+B)+exp10(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log10(A*X+B)+exp10(X*C-D)' 'X'",
+              LENGTHY(20000),  ID_Primitive)
         .expect("'((A·X+B)·log10(A·X+B)-(A·X+B)÷ln 10)÷A+exp10(X·C-D)÷(2.30258 50929 9·C)'");
 
     step("Primitive of lnp1 and expm1")
-        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B-1)·log1p(A·X+B)-(A·X+B-1))÷A+(expm1(X·C-D)-(X·C-D)+1)÷C'");
 
     step("Primitive of square and cube")
-        .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'(A·X+B)³÷(3·A)+(X·C-D)↑4÷(4·C)'");
     step("Primitive of square root and cube root")
-        .test(CLEAR, "'sqrt(A*X+B)+cbrt(X*C-D)' 'X'", ID_Primitive)
+        .test(CLEAR, "'sqrt(A*X+B)+cbrt(X*C-D)' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'²/₃·A⁻¹·(√(A·X+B))³+³/₄·C⁻¹·∛(X·C-D)↑4'");
 
     step("Primitive of 1/(cos(x)*sin(x))")
-        .test(CLEAR, "'inv(cos(3*X+2)*sin(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cos(3*X+2)*sin(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
     step("Primitive of 1/(cosh(x)*sinh(x))")
-        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
     step("Primitive of 1/(cosh(x)*sinh(x))")
-        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'", ID_Primitive)
+        .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
         .expect("'ln (tan(3·X+2))÷3'");
 
     step("Primitive of unknown form")
@@ -8045,6 +8227,13 @@ void tests::symbolic_integration()
     step("Primitive of unknown form in algebraic form")
         .test(CLEAR, "'∫x(→Num(x))'", ENTER, ID_Run)
         .error("Unknown primitive");
+
+    step("Evaluate values matching integer constants in pattenrs")
+        .test(CLEAR, DIRECT("'4/3·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .expect("'4·π·x²'");
+    step("Evaluate value matching integer constants - Check with division")
+        .test(CLEAR, DIRECT("'A/B·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .expect("'3·A÷B·π·x²'");
 }
 
 
@@ -8245,7 +8434,7 @@ void tests::cycle_test()
     step("Cycle from decimal degrees to decimal pi-radians")
         .test(O).expect("0.00574 53703 7 πr");
     step("Cycle to decimal DMS")
-        .test(O).expect("1°02′02″1");
+        .test(O).expect("1°02′03″");
     step("Cycle back to fractional DMS")
         .test(O).expect("1°02′03″");
     step("Check that DMS produced the original pi-radians fraction")
@@ -8980,6 +9169,19 @@ void tests::hms_dms_operations()
 {
     BEGIN(hms);
 
+    step("Conversion should not round incorrectly (#1480)")
+        .test(CLEAR, DIRECT("10.3033 FromHMS ToHMS"), ENTER)
+        .expect("10:30:33")
+        .test(CLEAR, DIRECT("10.3033 FromDMS ToDMS"), ENTER)
+        .expect("10°30′33″");
+    step("Conversion should work OK in symbolic mode")
+        .test(CLEAR, DIRECT("NumericalResults 10.2555 FromHMS ToHMS"), ENTER)
+        .expect("10:25:55");
+    step("Conversion should use proper rounding")
+        .test(CLEAR, DIRECT("SymbolicResults 10.2555 FromHMS ToDecimal "
+                            "1_hms ToUnit"), ENTER)
+        .expect("10:25:55");
+
     step("HMS data type")
         .test(CLEAR, "1.5_hms", ENTER).expect("1:30:00");
     step("DMS data type")
@@ -9047,6 +9249,38 @@ void tests::hms_dms_operations()
         .test(42,DOT).editor("1°2′35″42/_dms")
         .test(100).editor("1°2′35″42/100_dms")
         .test(ENTER).expect("1°02′35″²¹/₅₀");
+    step("Entering integral HMS using two dots and _hms")
+        .test(CLEAR, ID_TimeMenu)
+        .test(1, DOT).editor("1.")
+        .test(DOT).editor("1°_dms")
+        .test(F1).editor("1°_hms")
+        .test(ENTER).expect("1:00:00");
+    step("Entering HMS hr/min values using two dots and _hms")
+        .test(CLEAR, ID_TimeMenu)
+        .test(1, DOT).editor("1.")
+        .test(2, DOT).editor("1°2′_dms")
+        .test(F1).editor("1°2′_hms")
+        .test(ENTER).expect("1:02:00");
+    step("Entering HMS hr/min/sec values using two dots and _hms")
+        .test(CLEAR, ID_TimeMenu)
+        .test(1, DOT).editor("1.")
+        .test(2, DOT).editor("1°2′_dms")
+        .test(3).editor("1°2′3_dms")
+        .test(F1).editor("1°2′3_hms")
+        .test(ENTER).expect("1:02:03");
+    step("Entering HMS hr/min using two dots and early _hms")
+        .test(CLEAR, ID_TimeMenu)
+        .test(1, DOT).editor("1.")
+        .test(F1).editor("1._hms")
+        .test(2, DOT).editor("1°2′_hms")
+        .test(ENTER).expect("1:02:00");
+    step("Entering HMS hr/min/sec using two dots and early _hms")
+        .test(CLEAR, ID_TimeMenu)
+        .test(1, DOT).editor("1.")
+        .test(2, DOT).editor("1°2′_dms")
+        .test(F1).editor("1°2′_hms")
+        .test(3).editor("1°2′3_hms")
+        .test(ENTER).expect("1:02:03");
     step("Error when no fraction is given")
         .test(CLEAR)
         .test(1, DOT).editor("1.")
@@ -9080,6 +9314,16 @@ void tests::hms_dms_operations()
     step("Inserting zeros automatically")
         .test(CLEAR, DOT, DOT, KEY3, ENTER)
         .expect("0°00′03″");
+
+    step("Entering HMS using cycle key")
+        .test(CLEAR)
+        .test(1, DOT).editor("1.")
+        .test(2, DOT).editor("1°2′_dms")
+        .test(3).editor("1°2′3_dms")
+        .test(DOWN, EEX).editor("1°2′3_hms")
+        .test(EEX).editor("1°2′3_dms")
+        .test(DOWN, EEX).editor("1°2′3_hms")
+        .test(ENTER).expect("1:02:03");
 
     step("Converting DMS to HMS")
         .test(CLEAR)

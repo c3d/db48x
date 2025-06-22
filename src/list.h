@@ -336,7 +336,7 @@ struct list : text
     static algebraic_p where(algebraic_r expr, algebraic_r args);
     static object_p substitute(object_p expr, object_p args);
     list_p substitute(symbol_r name, object_r value, size_t len) const;
-    list_p substitute(symbol_r name, object_r value) const;
+    list_p substitute(symbol_r name, object_p value) const;
     list_p substitute(expression_r assign) const;
     list_p substitute(list_r assignments) const;
     list_p substitute(object_r repl) const;

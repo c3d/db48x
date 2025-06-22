@@ -37,6 +37,7 @@
 #include "functions.h"
 #include "integer.h"
 #include "recorder.h"
+#include "runtime.h"
 #include "settings.h"
 #include "symbol.h"
 #include "tag.h"
@@ -86,6 +87,39 @@ NFUNCTION_BODY(Integrate)
         rt.type_error();
         return nullptr;
     }
+
+    // Evaluate upper and lower bound for performance
+    {
+        error_save ers;
+        low = low->evaluate();
+        if (!low)
+            return nullptr;
+        high = high->evaluate();
+        if (!high)
+            return nullptr;
+    }
+
+
+    // Check if we have symbolic evaluation
+    if (Settings.SymbolicIntegration())
+    {
+        if (expression_g eq = expression::get(+eqobj))
+        {
+            error_save ers;
+            if (expression_g prim = eq->primitive(name))
+            {
+                algebraic_g lop = prim->substitute(name, low);
+                algebraic_g hip = prim->substitute(name, high);
+                if (algebraic_p diff = hip - lop)
+                    if (algebraic_p eval = diff->evaluate())
+                        return eval;
+            }
+            if (low->is_symbolic() || high->is_symbolic())
+                return expression::make(ID_Integrate,
+                                        args, arity, ID_expression, true);
+        }
+    }
+
 
     // Actual integration
     program_g  eq = program_p(+eqobj);

@@ -343,7 +343,7 @@ MENU(MainMenu,
 
      "Lib",     ID_Library,
      "Eqns",    ID_EquationsMenu,
-     "Csts",    ID_ConstantsMenu,
+     "Const",   ID_ConstantsMenu,
      "Time",    ID_TimeMenu,
      "I/O",     ID_IOMenu,
      "Chars",   ID_CharactersMenu);
@@ -754,8 +754,8 @@ MENU(StatisticsMenu,
      "BestFit", ID_BestFit,
      "LinFit",  ID_LinearFit,
      "ExpFit",  ID_ExponentialFit,
-     "LogFit",  ID_PowerFit,
-     "PwrFit",  ID_LogarithmicFit,
+     "LogFit",  ID_LogarithmicFit,
+     "PwrFit",  ID_PowerFit,
 
      "ΣX",      ID_SumOfX,
      "ΣY",      ID_SumOfY,
@@ -1724,7 +1724,7 @@ MENU(TimeMenu,
 // ----------------------------------------------------------------------------
 //   Time operations
 // ----------------------------------------------------------------------------
-     "_hms",    ID_SelfInsert,
+     "_hms",    ID_InsertHms,
      "Time",    ID_Time,
      "→HMS",    ID_ToHMS,
      "HMS→",    ID_FromHMS,

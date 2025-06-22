@@ -196,6 +196,7 @@ struct user_interface
                                cstring before, cstring after,
                                bool midcursor);
     size_t      remove(size_t offset, size_t len);
+    size_t      replace(utf8 oldData, utf8 newData);
 
     bool        do_edit();
     bool        do_enter();

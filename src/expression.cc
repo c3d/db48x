@@ -51,7 +51,6 @@ RECORDER(expression_error,      16, "Errors with expressions");
 RECORDER(rewrites,              16, "Expression rewrites");
 RECORDER(rewrites_done,         16, "Successful expression rewrites");
 
-
 symbol_g *expression::independent                   = nullptr;
 object_g *expression::independent_value             = nullptr;
 symbol_g *expression::dependent                     = nullptr;
@@ -1021,6 +1020,30 @@ static size_t check_match(size_t eq, size_t eqsz,
                 if (!found->is_same_as(ftop))
                     return 0;
             }
+        }
+        else if (integer_g itop = ftop->as<integer>())
+        {
+            // If we have an integer in the pattern, need to evaluate arg
+            ftop = grab_arguments(eq, eqsz);
+            if (!ftop)
+                return 0;
+
+            settings::SaveNumericalResults snr(true);
+            settings::SaveNumericalConstants snc(true);
+            settings::SaveAutoSimplify sas(true);
+            size_t depth = rt.depth();
+            if (program::run(+ftop) != object::OK)
+                return 0;
+            if (rt.depth() != depth + 1)
+            {
+                if (rt.depth() > depth)
+                    rt.drop(rt.depth() - depth);
+                return 0;
+            }
+            ftop = rt.pop();
+            integer_g fval = ftop->as_quoted<integer>();
+            if (!fval || fval->value<ularge>() != itop->value<ularge>())
+                return 0;
         }
         else
         {
@@ -3675,14 +3698,14 @@ expression_p expression::isolate(symbol_r sym) const
             acosh(N) == P,          N == cosh(P),
             atanh(N) == P,          N == tanh(P),
 
-            log(N) == P,            N == exp(N),
-            exp(N) == P,            N == log(N),
-            log2(N) == P,           N == exp2(N),
-            exp2(N) == P,           N == log2(N),
-            log10(N) == P,          N == exp10(N),
-            exp10(N) == P,          N == log10(N),
-            log1p(N) == P,          N == expm1(N),
-            expm1(N) == P,          N == log1p(N),
+            log(N) == P,            N == exp(P),
+            exp(N) == P,            N == log(P),
+            log2(N) == P,           N == exp2(P),
+            exp2(N) == P,           N == log2(P),
+            log10(N) == P,          N == exp10(P),
+            exp10(N) == P,          N == log10(P),
+            log1p(N) == P,          N == expm1(P),
+            expm1(N) == P,          N == log1p(P),
 
             sq(N) == P,             N == sqrt(P),
             sqrt(N) == P,           N == sq(P),
@@ -3738,14 +3761,14 @@ expression_p expression::isolate(symbol_r sym) const
             acosh(N) == P,          N == cosh(P),
             atanh(N) == P,          N == tanh(P),
 
-            log(N) == P,            N == exp(N),
-            exp(N) == P,            N == log(N) + two*intk*kpi*ki,
-            log2(N) == P,           N == exp2(N),
-            exp2(N) == P,           N == log2(N) + two*intk*kpi*ki/log(two),
-            log10(N) == P,          N == exp10(N),
-            exp10(N) == P,          N == log10(N) + two*intk*kpi*ki/log(ten),
-            log1p(N) == P,          N == expm1(N),
-            expm1(N) == P,          N == log1p(N) + two*intk*kpi*ki,
+            log(N) == P,            N == exp(P),
+            exp(N) == P,            N == log(P) + two*intk*kpi*ki,
+            log2(N) == P,           N == exp2(P),
+            exp2(N) == P,           N == log2(P) + two*intk*kpi*ki/log(two),
+            log10(N) == P,          N == exp10(P),
+            exp10(N) == P,          N == log10(P) + two*intk*kpi*ki/log(ten),
+            log1p(N) == P,          N == expm1(P),
+            expm1(N) == P,          N == log1p(P) + two*intk*kpi*ki,
 
             sq(N) == P,             N == signk*sqrt(P),
             sqrt(N) == P,           N == sq(P),
@@ -3911,6 +3934,7 @@ expression_p expression::derivative(symbol_r sym) const
     save<symbol_g *>       sindep(independent, (symbol_g *) &sym);
     save<object_g *>       sindval(independent_value, nullptr);
     save<uint>             sconstant(constant_index, 0);
+    save<bool>             usave(unit::nodates, true);
     save<funcall_match_fn> smatch(funcall_match, derivative_funcall_match);
     save<funcall_build_fn> sbuild(funcall_build, derivative_funcall_build);
     expression_g           eq = this;
@@ -3934,12 +3958,19 @@ expression_p expression::derivative(symbol_r sym) const
         A^B,                    A^B,
         zero*X,                 zero,
         X*zero,                 zero,
+        zero/X,                 zero,
         zero+X,                 X,
         X+zero,                 X,
+        zero-X,                 -X,
+        X-zero,                 X,
         X*one,                  X,
         one*X,                  X,
+        X/one,                  X,
+        one/X,                  inv(X),
         X^zero,                 one,
+        zero^X,                 zero,
         X^one,                  X,
+        one^X,                  one,
 
         (X ^ E)>>indep,         (X^E)*((E>>indep)*log(X) + ((X>>indep)*E)/X),
 
@@ -3977,13 +4008,22 @@ expression_p expression::derivative(symbol_r sym) const
         cbrt(X)>>indep,         (X>>indep)/(three*(sq(cbrt(X))))
         );
 
-    if (+result == +eq)
+    bool unknown = +result == +eq;
+    if (result)
     {
-        rt.unknown_derivative_error();
-        return nullptr;
+        if (!unknown)
+        {
+            expression_g hasder = result->rewrites(X>>indep, X);
+            unknown = hasder && +hasder != +result;
+        }
+        if (unknown)
+        {
+            rt.unknown_derivative_error();
+            return nullptr;
+        }
+        if (Settings.AutoSimplify())
+            result = result->simplify();
     }
-    if (result && Settings.AutoSimplify())
-        result = result->simplify();
     return result;
 }
 
@@ -4069,6 +4109,7 @@ expression_p expression::primitive(symbol_r sym) const
     save<symbol_g *>       sindep(independent, (symbol_g *) &sym);
     save<object_g *>       sindval(independent_value, nullptr);
     save<uint>             sconstant(constant_index, 0);
+    save<bool>             usave(unit::nodates, true);
     expression_g           eq = this;
     eq = expression::make(ID_Primitive, algebraic_g(eq), algebraic_g(sym));
     expression_g result = eq->rewrites(
@@ -4178,13 +4219,22 @@ expression_p expression::primitive(symbol_r sym) const
         inv(cbrt(L))<<indep,            ((three/two)*sq(cbrt(L)))/A
         );
 
-    if (+result == +eq)
+    bool unknown = +result == +eq;
+    if (result)
     {
-        rt.unknown_primitive_error();
-        return nullptr;
+        if (!unknown)
+        {
+            expression_g hasprim = result->rewrites(X<<indep, X);
+            unknown = hasprim && +hasprim != +result;
+        }
+        if (unknown)
+        {
+            rt.unknown_primitive_error();
+            return nullptr;
+        }
+        if (Settings.AutoSimplify())
+            result = result->simplify();
     }
-    if (result && Settings.AutoSimplify())
-        result = result->simplify();
     return result;
 }
 

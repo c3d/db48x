@@ -749,6 +749,7 @@ This software is (C) 2022-2025 Christophe de Dinechin and the DB50X team.
 Additional contributors to the project include:
 
 * Jean Wilson (Equation Library and associated documentation)
+* Philippe Martens (be.philippe@icloud.com)
 * Franco Trimboli (WASM port)
 * Jeff, aka spiff72 (keyboard overlay)
 * Camille Wormser (complex number fixes)
@@ -3678,6 +3679,76 @@ third argument:
 To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.8 "Crowdfeeding" - Bug fixes
+
+This is a minor release with bug fixes.
+
+### Bug fixes
+
+* isolate: Fix patterns for exponentials and logs
+* doc: Fix list of currently supported models
+* derivation: Allow simplification when matching against constant
+* solver: Do not emit type error when guesses are constants
+* expressions: Correctly substitute names in list substitutions
+* menu: Fix label for `ConstantsMenu` in `MainMenu`
+
+### Improvements
+
+The [INSTALL.md](../INSTALL.md) file now describes the installation
+procedure.
+
+
+## Release 0.9.7 "Home" - Symbolic integration and bug fixes
+
+This release focuses on symbolic integration and bug fixes.
+
+### New features
+
+* Symbolic evaluation of integrals when the primitive is known, for example
+  `'∫(A;B;X↑3-sin(X-3);X)'` now evaluates symbolically.
+* hms: Cycle between `hms` and `dms` units
+* datetime: `_hms` removes `_dms` if necessary
+* Non-algebraic form of `where`, with list as substitution input, for example
+  `« 'X-Y·Z' { X 3 Y '2·A' } | »` returns `'3-2·A·Z'`.
+
+### Bug fixes
+
+* Correctly render `*` and `<` in the built-in help render engine.
+* Optimized temporaries cleanup now correctly clears the command if temporary.
+* Fix rounding errors for decimal values in HMS and DMS
+* Do not give truncated result for `FromHMS`
+* Fix conversion of hardware floating-point values to fraction
+* Fix typo in `FromHMS` help entry
+* Allow screenshots with Shift-Disp in `Show`
+* Fix two tests that fail and should not
+* Correct hwfp entry with french locale.
+* stack: Correct font size for non-result stack levels
+* Swap logfit and powerfit menu entries (wrong label)
+
+
+### Improvements
+
+* Improve detection of unknown primitives and derivatives.
+* The rewrite engine was incorrectly rewriting "up" for integration and
+  differentiation, when rewriting "down" is much more efficient. This
+  accelerates symbolic integration and differentiation by more than an order of
+  magnitude in some cases.
+* Evaluate the bounds of integrals numerically ahead of time. This accelerates
+  numerical integration when the bounds are complex expressions.
+* In the rewrite engine, evaluate the sub-expressions that correspond to a
+  constant in the pattern before comparing. This notably solves some cases where
+  the derivative would contain leftover constants expressions that should have
+  been eliminated, such as `0*X`.
+* Automatically generate the list of implemented commands, and update the
+  implementation status.
+* Renamed the settings for numerical / symbolic integration and solver
+* Rename `6-Unimplemented.md` to `6-ImplementationStatus.md` and remove empty
+  `doc/calc-help/finances.md` file.
+* Support for recent compilers (GCC >= 12.2.1).
+* Update performance data for 0.9.6
+* Add Philippe Martens to the authors list
+
 
 ## Release 0.9.6 "Peace" - Bug fixes
 
@@ -6658,353 +6729,962 @@ HP48 implementation.
 * [Implemented](#implemented-commands)
 * [Not implemented](#unimplemented-commands)
 * [Unapplicable commands](#unapplicable-commands)
-* [Additional](#additional-commands)
 
 
-# Implemented commands
+## Implemented commands
 
-The following is a list of the HP50 RPL commands which are implemented in DB50X.
+The following is an extensive list of DB48x commands, some with multiple
+spellings.
 
-* `!` Factorial
-* `+` Addition
-* `<` Less than
-* `==` Object equality
-* `=` Mathematical equality
-* `>` Greater than
-* `ABS` Absolute value
-* `ACOSH` Inverse hyperbolic cosine
-* `ACOS` Arc cosine
-* `ADD` Addition (differs from the HP Add command)
-* `ALOG`
-* `AND`
-* `APPLY`
-* `ARG`
-* `ARRY→`
-* `→ARRY`
-* `ASINH`
-* `ASIN`
-* `ASN`
+* `!`
+* `%`
+* `%T`
+* `%Total`
+* `*`
+* `+`
+* `-`
+* `/`
+* `<`
+* `=`
+* `==`
+* `>`
+* `^`
+* `abs`
+* `acos`
+* `acosh`
+* `AlarmMenu`
+* `AlgebraMenu`
+* `AllEquationVariables`
+* `AllSolutions`
+* `alog`
+* `AlphaForeground`
+* `Amort`
+* `AmortTable`
+* `and`
+* `AngleMode`
+* `AnglesMenu`
+* `Apply`
+* `ApplyInverseUnit`
+* `ApplyUnit`
+* `arg`
+* `ArithmeticMenu`
+* `Arry→`
+* `asin`
+* `asinh`
+* `Asn`
 * `ASR`
+* `ASRB`
 * `ASRC`
-* `ATANH`
-* `ATAN`
-* `AXES`
-* `BARPLOT`
-* `BAR`
-* `BEEP`
-* `BESTFIT`
-* `BIN`
-* `BYTES`
+* `atan`
+* `atanh`
+* `Attach`
+* `AutomaticTemporariesCleanup`
+* `AutoScaleStack`
+* `AutoSimplify`
+* `Avg`
+* `Background`
+* `Bar`
+* `Base`
+* `BasedDotOrComma`
+* `BasedSeparatorCommand`
+* `BasedSpaces`
+* `BasedSpacing`
+* `BasedTicks`
+* `BasedUnderscore`
+* `BasesMenu`
+* `BatteryBackground`
+* `BatteryForeground`
+* `BatteryLevelForeground`
+* `BatteryRefresh`
+* `BatteryVoltage`
+* `Beep`
+* `BeepOff`
+* `BeepOn`
+* `BestFit`
+* `BigFractions`
+* `Bin`
+* `Bins`
+* `BitwiseLogicForIntegers`
+* `Blank`
+* `BlankBitmap`
+* `BlankGrob`
+* `BlankPixmap`
+* `BusyIndicatorRefresh`
+* `Bytes`
 * `B→R`
-* `CASE`
-* `CEIL`
+* `CalculationMenu`
+* `Capitalized`
+* `CapitalizedNames`
+* `CarefulEvaluation`
+* `Catalog`
+* `ceil`
+* `Centr`
 * `CF`
-* `%CH`
-* `CHR`
-* `CLEAR`
-* `CLLCD`
-* `CLΣ`
-* `COLLECT`
-* `COLΣ`
-* `COMB`
-* `CON`
-* `CONJ`
-* `CONLIB`
-* `CONST`
-* `CONSTANTS`
-* `CONT`
-* `CONVERT`
-* `COSH`
-* `COS`
-* `COV`
-* `CRDIR`
-* `CROSS`
+* `CharactersMenu`
+* `ChargingForeground`
+* `Chr`
+* `ChronoTime`
+* `Circle`
+* `CircularMenu`
+* `ClassicExponent`
+* `Clear`
+* `ClearBit`
+* `ClearThingsMenu`
+* `Clip`
+* `ClLCD`
+* `Clone`
+* `ClΣ`
+* `CNrm`
+* `Col+`
+* `Col-`
+* `Collect`
+* `ColΣ`
+* `Col→`
+* `comb`
+* `CommandBackground`
+* `CommandDisplayMode`
+* `CommandForeground`
+* `CompareMenu`
+* `CompatibleBasedNumbers`
+* `CompatibleGROBs`
+* `CompatibleTypes`
+* `ComplexIAfterImaginary`
+* `ComplexIBeforeImaginary`
+* `ComplexMenu`
+* `ComplexResults`
+* `Con`
+* `conj`
+* `ConLib`
+* `Const`
+* `ConstantName`
+* `Constants`
+* `ConstantValue`
+* `cont`
+* `Convert`
+* `ConvertToUnit`
+* `ConvertToUnitPrefix`
+* `Corr`
+* `cos`
+* `cosh`
+* `CountBits`
+* `Cov`
+* `CrDir`
+* `Cst`
+* `CstRU`
+* `CstSU`
+* `CSwp`
+* `CurrentClip`
+* `CurrentDirectory`
+* `CurrentEquationVariables`
+* `CurrentFitSums`
+* `CursorAlphaBackground`
+* `CursorAlphaBorder`
+* `CursorAlphaForeground`
+* `CursorBackground`
+* `CursorBlinkRate`
+* `CursorBorder`
+* `CursorFont`
+* `CursorForeground`
+* `CursorSelBackground`
+* `CurveFilling`
+* `CustomHeaderRefresh`
+* `Cycle`
 * `C→R`
-* `DATE`
-* `→DATE`
-* `DATE+`
-* `DDAYS`
-* `DBUG`
-* `DEC`
-* `DECR`
-* `DEDICACE`
-* `DEG`
-* `DEPTH`
-* `DET`
-* `DIR`
-* `DISP`
-* `DISPXY`
-* `DIV2`
-* `DO`
-* `DOERR`
-* `DOLIST`
-* `DOSUBS`
-* `DOT`
-* `DRAW`
-* `DRAX`
-* `DROP2`
-* `DROPN`
-* `DROP`
-* `DTAG`
-* `DUP2`
-* `DUPDUP`
-* `DUPN`
-* `DUP`
+* `Date`
+* `Date+`
+* `DateDash`
+* `DateDot`
+* `DateForeground`
+* `DateMenu`
+* `DateSeparatorCommand`
+* `DateSlash`
+* `DateSpace`
+* `DateTime`
+* `DayBeforeMonth`
+* `dbug`
+* `DDays`
+* `DebugMenu`
+* `DebugOnError`
+* `Dec`
+* `DecimalComma`
+* `DecimalDot`
+* `Decr`
+* `Deg`
+* `DelKeys`
+* `Depth`
+* `det`
+* `Detach`
+* `DetailedTypes`
+* `DifferentialSolverMenu`
+* `Disp`
+* `DisplayDigits`
+* `DisplayMode`
+* `DisplayModesMenu`
+* `DispXY`
+* `DistinguishSymbolCase`
+* `Div2`
+* `DMCPDisplayRefresh`
+* `DMCPLowBattery`
+* `DMS+`
+* `DMS-`
+* `DMS→`
+* `doerr`
+* `DoList`
+* `DoSubs`
+* `dot`
+* `Draw`
+* `DrawPlotAxes`
+* `Drax`
+* `Drop`
+* `Drop2`
+* `DropN`
+* `DTag`
+* `Dup`
+* `Dup2`
+* `DupDup`
+* `DupN`
 * `D→R`
-* `e`
-* `EDIT`
-* `ELSE`
-* `END`
-* `ENDSUB`
-* `ENG`
-* `EQNLIB`
-* `ERR0`
-* `ERRM`
-* `ERRN`
-* `EVAL`
-* `EXPAND`
-* `EXPAN`
-* `EXPFIT`
-* `EXPM`
-* `EXP`
-* `FACT`
-* `FC?C`
+* `Edit`
+* `EditMenu`
+* `EditorBackground`
+* `EditorBegin`
+* `EditorClear`
+* `EditorCopy`
+* `EditorCut`
+* `EditorEnd`
+* `EditorFlip`
+* `EditorFont`
+* `EditorForeground`
+* `EditorHistory`
+* `EditorHistoryBack`
+* `EditorLineForeground`
+* `EditorPaste`
+* `EditorReplace`
+* `EditorSearch`
+* `EditorSelect`
+* `EditorWordLeft`
+* `EditorWordRight`
+* `EditorWrapColumn`
+* `Ellipse`
+* `EndSub`
+* `Eng`
+* `Eq`
+* `EqnLib`
+* `EquationName`
+* `EquationSolver`
+* `EquationValue`
+* `Equiv`
+* `erf`
+* `erfc`
+* `err0`
+* `errm`
+* `errn`
+* `ErrorBackground`
+* `ErrorBeepDuration`
+* `ErrorBeepFrequency`
+* `ErrorBorder`
+* `ErrorForeground`
+* `Eval`
+* `EvalEq`
+* `Excludes`
+* `ExitClearsMenu`
+* `ExitKeepsMenu`
+* `exp`
+* `exp2`
+* `Expan`
+* `ExpFit`
+* `ExplicitWildcards`
+* `ExpLogIdentitiesMenu`
+* `ExpLogMenu`
+* `expm`
+* `False`
+* `FancyExponent`
 * `FC?`
-* `FIX`
-* `FLOOR`
-* `FOR`
+* `FC?C`
+* `FC?S`
+* `FF`
+* `FilesMenu`
+* `Filter`
+* `FinalAlgebraResults`
+* `FinanceRounding`
+* `FirstBitSet`
+* `Fix`
+* `FixedWidthDigits`
+* `FlagsMenu`
+* `FlatMenus`
+* `FlipBit`
+* `floor`
+* `FoldConstants`
+* `FolderCornerForeground`
+* `Foreground`
+* `FourDigitYear`
 * `FP`
-* `FREEZE`
-* `FS?C`
+* `FractionsMenu`
+* `FractionSpacing`
+* `FreeMemory`
+* `Freeze`
 * `FS?`
-* `FUNCTION`
-* `GAMMA`
-* `GET`
-* `GETI`
-* `GOR`
-* `GROB`
-* `→GROB`
-* `GROBADD`
-* `GXOR`
-* `HALT`
-* `HEAD`
-* `HELP` (Different meaning)
-* `HEX`
-* `HOME`
-* `HMS–`
+* `FS?C`
+* `FS?S`
+* `Function`
+* `Gamma`
+* `GAnd`
+* `GC`
+* `GCIconForeground`
+* `GCStats`
+* `GCStatsClearAfterRead`
+* `GCStatsKeepAfterRead`
+* `GCTemporariesCleanup`
+* `Get`
+* `GetI`
+* `GOr`
+* `Grad`
+* `GraphicAppend`
+* `GraphicExponent`
+* `GraphicIntegral`
+* `GraphicNorm`
+* `GraphicParentheses`
+* `GraphicProduct`
+* `GraphicRatio`
+* `GraphicResultDisplay`
+* `GraphicRoot`
+* `GraphicsMenu`
+* `GraphicStackDisplay`
+* `GraphicSubscript`
+* `GraphicSum`
+* `GraphingTimeLimit`
+* `GraphRenderingSizeLimit`
+* `Gray`
+* `GrobAdd`
+* `GXor`
+* `HalfBatteryForeground`
+* `Halt`
+* `HaltedIconForeground`
+* `Hdr`
+* `Head`
+* `HeaderBackground`
+* `HeaderFont`
+* `HeaderForeground`
+* `Help`
+* `Hex`
+* `HFP`
+* `HideBuiltinCharacters`
+* `HideBuiltinConstants`
+* `HideBuiltinEquations`
+* `HideBuiltinLibrary`
+* `HideBuiltinUnits`
+* `HideDate`
+* `HideDayOfWeek`
+* `HideEmptyMenu`
+* `HideEquationBody`
+* `HideMonthName`
+* `HideSeconds`
+* `HideTime`
+* `HideVoltage`
 * `HMS+`
+* `HMS-`
 * `HMS→`
-* `→HMS`
-* `IDN`
-* `IDIV2`
-* `IFERR`
-* `IFTE`
+* `Home`
+* `HorizontalLists`
+* `HorizontalProgramRendering`
+* `HorizontalVectors`
+* `HyperbolicMenu`
+* `Idn`
 * `IFT`
-* `IF`
-* `IM`
-* `INCR`
-* `INV`
+* `IFTE`
+* `IgnorePrecisionLoss`
+* `IgnoreSymbolCase`
+* `im`
+* `ImplicitWildcards`
+* `implies`
+* `ImproperFractions`
+* `Incr`
+* `IndexDidNotWrap`
+* `IndexWrapped`
+* `InfiniteResultIndicator`
+* `InfinityError`
+* `InfinityValue`
+* `Input`
+* `IntegrationImprecision`
+* `IntegrationIterations`
+* `IntegrationMenu`
+* `Intercept`
+* `inv`
+* `IOMenu`
 * `IP`
-* `ISOL`
-* `KILL`
-* `LASTARG`
-* `LINE`
-* `LINFIT`
-* `LIST→`
-* `∆LIST`
-* `ΠLIST`
-* `ΣLIST`
-* `LNP1`
-* `LN`
-* `LNAME`
-* `LOG`
-* `LOGFIT`
+* `Isol`
+* `JDN`
+* `JDN→`
+* `Keys`
+* `Kill`
+* `KillOnError`
+* `LastArg`
+* `LastBitSet`
+* `LastMenu`
+* `LastX`
+* `LaxArrayResizing`
+* `LazyEvaluation`
+* `LCD→`
+* `LeadingZero`
+* `LeftShiftBackground`
+* `LeftShiftForeground`
+* `lgamma`
+* `LibEq`
+* `Library`
+* `Libs`
+* `Line`
+* `LinearFitSums`
+* `LinearSolverMenu`
+* `LineWidth`
+* `LinFit`
+* `ListAsData`
+* `ListAsProgram`
+* `ListMenu`
+* `List→`
+* `ln`
+* `LName`
+* `lnp1`
+* `log10`
+* `log2`
+* `LogFit`
+* `LongForm`
+* `LongFormNames`
+* `LoopsMenu`
+* `LowBattery`
+* `LowBatteryForeground`
+* `LowerAlphaForeground`
+* `LowerCase`
+* `LowerCaseNames`
 * `LR`
-* `MAP`
-* `↓MATCH`
-* `↑MATCH`
-* `MAX`
-* `MAXΣ`
-* `MEAN`
-* `MEM`
-* `MENU`
-* `MIN`
-* `MINΣ`
-* `MOD`
-* `MROOT`
-* `NDUPN`
-* `NEG`
-* `NEWOB`
-* `NEXT`
-* `NIP`
-* `NOT`
-* `NSUB`
+* `MainMenu`
+* `mant`
+* `MantissaSpacing`
+* `Map`
+* `MatchUp`
+* `MathMenu`
+* `MathModesMenu`
+* `MatrixMenu`
+* `Max`
+* `MaxFlags`
+* `MaxH`
+* `MaximumDecimalExponent`
+* `MaxNumberBits`
+* `MaxRewrites`
+* `MaxW`
+* `MaxΣ`
+* `Median`
+* `Mem`
+* `MemoryMenu`
+* `Menu`
+* `MenuAppearance`
+* `MenuBackground`
+* `Min`
+* `MinimumBatteryVoltage`
+* `MinimumSignificantDigits`
+* `MinΣ`
+* `MixedFractions`
+* `mod`
+* `ModernBasedNumbers`
+* `Modes`
+* `ModesMenu`
+* `MonthBeforeDay`
+* `MRoot`
+* `MSlv`
+* `MSolvr`
+* `MultilineCursorFont`
+* `MultilineEditorFont`
+* `MultiLineResult`
+* `MultiLineStack`
+* `MultipleSteps`
+* `MultiSolverMenu`
+* `NameDisplayMode`
+* `nand`
+* `NDupN`
+* `NeedToClearErrors`
+* `neg`
+* `NegativeUnderflowIndicator`
+* `NextEq`
+* `Nip`
+* `NoAngleUnits`
+* `NoAutoSimplify`
+* `NoCurveFilling`
+* `NoErrorForTooManyDigits`
+* `NoInfiniteResult`
+* `NoLastArguments`
+* `NoLeadingZero`
+* `NoNeedToClearErrors`
+* `NoNegativeUnderflow`
+* `NoNumberedVariables`
+* `NoOverflow`
+* `NoPlotAxes`
+* `NoPositiveUnderflow`
+* `NoProgramLastArguments`
+* `nor`
+* `NormalPolynomialRender`
+* `NoStackAutoScale`
+* `NoStackSave`
+* `not`
+* `NoTrailingDecimal`
+* `NoUndefinedResult`
+* `NSub`
+* `Num`
+* `NumberDotOrComma`
+* `NumberedVariables`
+* `NumberSeparatorCommand`
+* `NumbersMenu`
+* `NumberSpaces`
+* `NumberTicks`
+* `NumberUnderscore`
+* `NumericalConstants`
+* `NumericalIntegration`
+* `NumericalResults`
+* `NumericalSolver`
+* `NumericalSolverMenu`
 * `NΣ`
-* `NUM`
-* `OBJ→`
-* `OCT`
-* `OFF`
-* `OR`
-* `OVER`
-* `PARAMETRIC`
-* `PATH`
-* `PCOV`
-* `PERM`
-* `PGDIR`
-* `PICK`
-* `PICK3`
-* `PICT`
-* `PIX?`
-* `PIXOFF`
-* `PIXON`
-* `POLAR`
-* `PMAX`
-* `PMIN`
-* `PURGE`
-* `PUT`
-* `PUTI`
-* `PVAR`
-* `PWRFIT`
-* `RAD`
-* `RAND`
-* `RANM`
-* `RCEQ`
-* `RCL`
-* `RCLKEYS`
-* `RCLMENU`
-* `RCLΣ`
-* `RCWS`
-* `RDZ`
-* `RE`
-* `RECT` (Different meaning: draws a rectangle)
-* `REPEAT`
-* `REVLIST`
-* `REWRITE` (Different meaning: performs a rewrite)
-* `RISCH`
-* `RND`
+* `ObjectMenu`
+* `Obj→`
+* `Oct`
+* `Off`
+* `OffWithImage`
+* `OnesComplement`
+* `Or`
+* `Over`
+* `OverflowError`
+* `OverflowIndicator`
+* `OverflowValue`
+* `PackedBitmaps`
+* `Parametric`
+* `PartsMenu`
+* `Path`
+* `PCov`
+* `perm`
+* `PgDir`
+* `Pick`
+* `Pick3`
+* `Pict`
+* `PiRadians`
+* `Pix?`
+* `PixC?`
+* `PixOff`
+* `PixOn`
+* `PlotErrorBackground`
+* `PlotMenu`
+* `PlotRefreshRate`
+* `PMax`
+* `PMin`
+* `Polar`
+* `PolynomialsMenu`
+* `PolynomialSolverMenu`
+* `Poly→`
+* `PositiveUnderflowIndicator`
+* `PowerVoltage`
+* `PPar`
+* `PrcRnd`
+* `Prec`
+* `PredX`
+* `PredY`
+* `PrefixPolynomialRender`
+* `PrincipalSolution`
+* `PrintingMenu`
+* `ProbabilitiesMenu`
+* `ProgramLastArguments`
+* `ProgramMenu`
+* `Prompt`
+* `PSDev`
+* `Purge`
+* `PurgeAll`
+* `PushEvaluatedAssignment`
+* `PushOriginalAssignment`
+* `Put`
+* `PutI`
+* `PVar`
+* `PwrFit`
+* `P→R`
+* `QuickSort`
+* `Rad`
+* `rand`
+* `Random`
+* `RandomGeneratorBits`
+* `RandomGeneratorOrder`
+* `RanM`
+* `RcEq`
+* `Rcl`
+* `Rcl*`
+* `Rcl+`
+* `Rcl-`
+* `Rcl/`
+* `RclF`
+* `RclKeys`
+* `RclMenu`
+* `RclΣ`
+* `rcws`
+* `rdz`
+* `re`
+* `RealMenu`
+* `RealResults`
+* `Rect`
+* `Reduce`
+* `RelRnd`
+* `rem`
+* `ReorderTerms`
+* `ReportPrecisionLoss`
+* `ResetModes`
+* `ResultBackground`
+* `ResultFont`
+* `ResultForeground`
+* `ResultGraphingTimeLimit`
+* `ReverseQuickSort`
+* `ReverseSort`
+* `RevList`
+* `RGB`
+* `RightShiftBackground`
+* `RightShiftForeground`
+* `Risch`
 * `RL`
 * `RLB`
 * `RLC`
-* `ROLLD`
-* `ROLL`
-* `ROOT`
-* `ROT`
+* `Rnd`
+* `Roll`
+* `RollD`
+* `Root`
+* `Rot`
+* `RoundedMenus`
+* `RoundMenuBackground`
+* `RoundMenuForeground`
+* `Row+`
+* `Row-`
+* `RowNorm`
+* `Row→`
 * `RR`
 * `RRB`
 * `RRC`
+* `RRect`
+* `RSwp`
+* `Run`
+* `RunningIconForeground`
+* `RunStats`
+* `RunStatsClearAfterRead`
+* `RunStatsKeepAfterRead`
 * `R→B`
 * `R→C`
 * `R→D`
-* `SAME`
-* `SCALE`
-* `SCALEH`
-* `SCALEW`
-* `SCI`
+* `R→I`
+* `R→P`
+* `same`
+* `SaveLastArguments`
+* `SaveStack`
+* `SaveState`
+* `Scale`
+* `ScaleH`
+* `ScaleW`
+* `Scatter`
+* `Sci`
+* `ScreenCapture`
+* `SDev`
+* `SearchBackground`
+* `SearchForeground`
+* `SelectedMenuForeground`
+* `SelectionBackground`
+* `SelectionForeground`
+* `SeparatorModesMenu`
+* `SetAngleUnits`
+* `SetBit`
+* `SetDate`
+* `SetTime`
 * `SF`
-* `SIGN`
-* `SINH`
-* `SIN`
+* `SFP`
+* `Show`
+* `ShowBuiltinCharacters`
+* `ShowBuiltinConstants`
+* `ShowBuiltinEquations`
+* `ShowBuiltinLibrary`
+* `ShowBuiltinUnits`
+* `ShowDate`
+* `ShowDayOfWeek`
+* `ShowEmptyMenu`
+* `ShowEquationBody`
+* `ShowMonthName`
+* `ShowSeconds`
+* `ShowTime`
+* `ShowTimeLimit`
+* `ShowVoltage`
+* `Sig`
+* `SigDig`
+* `sign`
+* `SignalProcessingMenu`
+* `SilentBeepOff`
+* `SilentBeepOn`
+* `Simplify`
+* `sin`
+* `SingleLineResult`
+* `SingleLineStack`
+* `SingleRowMenus`
+* `sinh`
+* `Size`
+* `SKey`
+* `SkippedMenuBackground`
 * `SL`
 * `SLB`
 * `SLC`
-* `SORT`
-* `SQ`
+* `Slope`
+* `SmallFractions`
+* `SoftwareDisplayRefresh`
+* `SolverImprecision`
+* `SolverIterations`
+* `SolvingMenu`
+* `SolvingMenuRecall`
+* `SolvingMenuSolve`
+* `SolvingMenuStore`
+* `Sort`
+* `sq`
+* `SquareMenuBackground`
+* `SquareMenuForeground`
+* `SquareMenus`
 * `SR`
 * `SRB`
-* `SST`
-* `SST↓`
-* `START`
-* `STD`
-* `STEP`
-* `STEQ`
-* `STOKEYS`
-* `STORE` (Different meaning: long form of STO)
-* `STO`
-* `STO+`
-* `STO–`
-* `STO*`
-* `STO/`
-* `STOΣ`
-* `STR→`
-* `STWS`
-* `SUBST`
-* `SWAP`
-* `%T`
-* `TAIL`
-* `TANH`
-* `TAN`
-* `TEVAL`
-* `THEN`
-* `TICKS`
-* `TIME`
-* `→TIME`
-* `TMENU`
-* `TOT`
-* `TRNC`
-* `TVARS`
-* `TYPE`
-* `UBASE`
-* `UFACT`
-* `UNPICK`
-* `UNROT`
-* `UNTIL`
-* `UPDIR`
-* `UVAL`
+* `SRC`
+* `sst`
+* `StackBackground`
+* `StackEditor`
+* `StackFont`
+* `StackForeground`
+* `StackGraphingTimeLimit`
+* `StackLevelBackground`
+* `StackLevelForeground`
+* `StackLineForeground`
+* `StackMenu`
+* `StandardExponent`
+* `StateNameForeground`
+* `StatisticsMenu`
+* `Std`
+* `StdRnd`
+* `StepByStepAlgebraResults`
+* `StepOut`
+* `StepOver`
+* `SteppingIconForeground`
+* `StEq`
+* `Sto`
+* `Sto*`
+* `Sto+`
+* `Sto-`
+* `Sto/`
+* `StoF`
+* `StoKeys`
+* `StoreAtEnd`
+* `StoreAtStart`
+* `StoVX`
+* `StoΣ`
+* `StrictArrayResizing`
+* `Str→`
+* `stws`
+* `Sub`
+* `Subst`
+* `Swap`
+* `SymbolicConstants`
+* `SymbolicIntegration`
+* `SymbolicMenu`
+* `SymbolicResults`
+* `SymbolicSolver`
+* `SymbolicSolverMenu`
+* `SystemMemory`
+* `SystemSetup`
+* `TabWidth`
+* `Tag→`
+* `Tail`
+* `tan`
+* `tanh`
+* `TestsMenu`
+* `TEval`
+* `TextMenu`
+* `TextRenderingSizeLimit`
+* `TextResultDisplay`
+* `TextStackDisplay`
+* `Text→Algebraic`
+* `Text→Code`
+* `Text→Expression`
+* `Text→Integer`
+* `Text→Number`
+* `Text→Object`
+* `Text→Positive`
+* `Text→Real`
+* `ThreeRowsMenus`
+* `Ticks`
+* `Time`
+* `Time12H`
+* `Time24H`
+* `TimeForeground`
+* `TimeMenu`
+* `TMenu`
+* `ToArray`
+* `ToBitmap`
+* `ToCylindrical`
+* `ToDMS`
+* `ToggleCustomMenu`
+* `ToggleUserMode`
+* `ToGrads`
+* `ToGrob`
+* `ToHMS`
+* `ToHPGrob`
+* `ToLCD`
+* `ToList`
+* `ToolsMenu`
+* `TooManyDigitsErrors`
+* `ToPixmap`
+* `ToPolar`
+* `ToSpherical`
+* `ToStr`
+* `Tot`
+* `ToTag`
+* `ToUnit`
+* `TrailingDecimal`
+* `Tran`
+* `TrigIdentitiesMenu`
+* `Trn`
+* `Trnc`
+* `True`
+* `TruthLogicForIntegers`
+* `TVars`
+* `TVM`
+* `TVMBeg`
+* `TVMEnd`
+* `TVMEquation`
+* `TVMRoot`
+* `TwoDigitYear`
+* `TwosComplement`
+* `Type`
+* `TypeName`
+* `UBase`
+* `UFact`
+* `UIAlgebraic`
+* `UIAlpha`
+* `UIBackspace`
+* `UIDecimal`
+* `UIDelete`
+* `UIDown`
+* `UIEnter`
+* `UIExit`
+* `UILeft`
+* `UILeftShift`
+* `UILowercase`
+* `UINoAlpha`
+* `UINoShift`
+* `UIRight`
+* `UIRightShift`
+* `UIText`
+* `UIUp`
+* `UndefinedError`
+* `UndefinedResultIndicator`
+* `UndefinedValue`
+* `UnderflowError`
+* `UnderflowValue`
+* `Undo`
+* `Unimplemented`
+* `UnimplementedForeground`
+* `UnitsConversionsMenu`
+* `UnitsMenu`
+* `UnitsSIPrefixCycle`
+* `UnPick`
+* `UnRot`
+* `UpDir`
+* `UpperCase`
+* `UpperCaseNames`
+* `USBPowered`
+* `UseCrossForMultiplication`
+* `UseDotForMultiplication`
+* `UserCommandBackground`
+* `UserCommandBorder`
+* `UserCommandForeground`
+* `UserInterfaceModesMenu`
+* `UserMode`
+* `UserModeLock`
+* `UserModeMenu`
+* `UserModeOff`
+* `UserModeOnce`
+* `UVal`
+* `Var`
+* `VariablesMenu`
+* `VariablesMenuExecute`
+* `VariablesMenuRecall`
+* `VariablesMenuStore`
+* `VariableWidthDigits`
+* `Vars`
+* `VectorMenu`
+* `Version`
+* `VerticalLists`
+* `VerticalProgramRendering`
+* `VerticalVectors`
+* `VoltageForeground`
+* `VX`
 * `V→`
-* `→V2`
-* `→V3`
-* `VAR`
-* `VARS`
-* `VERSION`
-* `WAIT`
-* `WHILE`
-* `XCOL`
-* `XOR`
-* `XPON`
-* `XRNG`
-* `XROOT`
-* `YRNG`
-* `YCOL`
-* `%`
-* `^` (Power)
-* `i`
-* `«»` (Program delimiters)
-* `×` (Multiply)
-* `÷` (Divide)
-* `Σ+`
-* `ΣXY`
-* `ΣX`
-* `ΣX²`
-* `ΣY`
-* `ΣY²`
-* `Σ–`
-* `π` (Pi)
-* `–` (Subtract)
-* `→LIST`
-* `→NUM`
-* `→Q`
-* `→STR`
-* `→TAG`
-* `→UNIT`
-* `?`
-* `|` (Where)
+* `Wait`
+* `XCol`
+* `XLib`
+* `XlibName`
+* `XlibValue`
+* `Xor`
+* `xpon`
+* `XRng`
+* `xroot`
+* `XVars`
+* `x³`
+* `YCol`
+* `YearFirst`
+* `YearLast`
+* `YRng`
+* `ZeroOverZeroIsError`
+* `ZeroOverZeroIsUndefined`
+* `ZeroPowerZeroIsOne`
+* `ZeroPowerZeroIsUndefined`
+* `|`
 * `Σ`
-* `→` (Create Local)
+* `Σ+`
+* `Σ-`
+* `ΣDat`
+* `ΣLine`
+* `ΣList`
+* `ΣPar`
+* `ΣX`
+* `ΣX2`
+* `ΣXY`
+* `ΣY`
+* `ΣY2`
+* `→2D`
+* `→3D`
+* `→Cartesian`
+* `→Col`
+* `→Deg`
+* `→Num`
+* `→Poly`
+* `→Prg`
+* `→Q`
+* `→QDigits`
+* `→QIterations`
+* `→Rad`
+* `→Row`
+* `→Ur`
+* `→Us`
+* `→πr`
+* `↓Match`
 * `∂`
-* `√` (Square root)
-* `∞`
-* `∫` (Integrate)
-* `≠` (Not equal)
-* `≤` (Less than or equal)
-* `≥` (Greater than or Equal)
-* `▶` (Store)
-* `＿` (Unit attachment)
+* `∆List`
+* `∏`
+* `∏List`
+* `√`
+* `∛`
+* `∠`
+* `∫`
+* `≠`
+* `≤`
+* `≥`
+* `⊿`
+* `Ⓓ`
+* `▶`
+* `⨯`
 
+## Unimplemented commands
 
-
-# Unimplemented commands
-
-The following is a list of unimplemented HP50 RPL commands which should be implemented by the time the project reaches version 1.0.
+The following is a list of unimplemented HP50G RPL commands which should be
+implemented by the time the project reaches version 1.0.
 
 * `ABCUV`
 * `ACK`
@@ -7013,7 +7693,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `ADDTMOD`
 * `ADDTOREAL`
 * `ALGB`
-* `AMORT`
 * `ANIMATE`
 * `ANS`
 * `ARC`
@@ -7031,12 +7710,10 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `AXQ`
 * `BASIS`
 * `BINS`
-* `BLANK`
 * `BOX`
 * `C2P`
 * `CASCFG`
 * `CASCMD`
-* `CENTR`
 * `CHINREM`
 * `CHOLESKY`
 * `CHOOSE`
@@ -7044,16 +7721,10 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `CLUSR`
 * `CLVAR`
 * `CMPLX`
-* `CNRM`
-* `→COL`
-* `COL→`
-* `COL–`
-* `COL+`
 * `COLCT`
 * `COND`
 * `CONIC`
 * `CORR`
-* `CSWP`
 * `CURL`
 * `CYCLOTOMIC`
 * `CYLIN`
@@ -7063,7 +7734,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `DEFINE`
 * `DEGREE`
 * `DELALARM`
-* `DELKEYS`
 * `DEPND`
 * `DERIV`
 * `DERVX`
@@ -7149,7 +7819,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `IMAGE`
 * `INDEP`
 * `INFORM`
-* `INPUT`
 * `INT`
 * `INTEGER`
 * `INTVX`
@@ -7168,8 +7837,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `LAP`
 * `LAPL`
 * `LAST`
-* `LCD→`
-* `→LCD`
 * `LCM`
 * `LCXM`
 * `LDEC`
@@ -7178,7 +7845,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `lim`
 * `LIMIT`
 * `LIN`
-* `ΣLINE`
 * `LININ`
 * `LINSOLVE`
 * `LNCOLLECT`
@@ -7189,7 +7855,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `LVAR`
 * `MAD`
 * `MAIN`
-* `MANT`
 * `MATHS`
 * `MATR`
 * `MAXR`
@@ -7237,11 +7902,8 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `POWEXPAND`
 * `POWMOD`
 * `PREDV`
-* `PREDX`
-* `PREDY`
 * `PREVAL`
 * `PREVPRIME`
-* `PROMPT`
 * `PROMPTSTO`
 * `PROOT`
 * `PROPFRAC`
@@ -7363,10 +8025,6 @@ The following is a list of unimplemented HP50 RPL commands which should be imple
 * `TRUTH`
 * `TSIMP`
 * `TSTR`
-* `TVM`
-* `TVMBEG`
-* `TVMEND`
-* `TVMROOT`
 * `UNASSIGN`
 * `UNASSUME`
 * `UNBIND`
@@ -7401,7 +8059,6 @@ for example because they are dealing with hardware details or system-level
 features that have no equivalent on the hardware DB50X runs on.
 As a result, they behave like normal names on DB50X.
 
-* `ATTACH`
 * `BAUD`
 * `BUFLEN`
 * `C$`
@@ -7410,7 +8067,6 @@ As a result, they behave like normal names on DB50X.
 * `CLOSEIO`
 * `CR`
 * `DELAY`
-* `DETACH`
 * `FILER`
 * `FINISH`
 * `FLASHEVAL`
@@ -7458,193 +8114,9 @@ As a result, they behave like normal names on DB50X.
 * `XRECV`
 * `XSEND`
 * `XSERV`
-
-
-## Additional commands
-
-The following commands are unique to DB50X and are not found in any
-Hewlett-Packard RPL implementation.
-
-* `atan2` Arc-tangent from two arguments
-* `AngleUnitsMenu`
-* `AnglesMenu`
-* `ApplyInverseUnit`
-* `ApplyUnit`
-* `AreaUnitsMenu`
-* `AutoSimplify` Automatically simplify expressions
-* `BASE` Select an arbitrary base for based numbers
-* `Background` Select background pattern for graphic operations
-* `BasedDotOrComma` Use dot or comma as based number digit separator
-* `BasedSpaces` Use thin spaces as based number digit separator
-* `BasedSpacing` Grouping of digits for based numbers
-* `BasedTicks` Use tick marsk `'` as based number digit separator
-* `BasedUnderscore` Use underscore `_` as based number digit separator
-* `BasesMenu`
-* `CBRT` Cube root
-* `CYCLE` Cycle between object representations
-* `Capitalized` Show commands capitalized
-* `Catalog` Present catalog of all functions with auto-completion
-* `CharsMenu`
-* `CircularMenu`
-* `ClassicExponent` Use E as exponent marker, e.g. 1.3E128
-* `ClearThingsMenu`
-* `CompareMenu`
-* `ComplexMenu`
-* `ComputerUnitsMenu`
-* `ConstantsMenu`
-* `ConvertToUnitPrefix`
-* `ConvertToUnit`
-* `CursorBlinkRate` Select cursor blink rate in milliseconds
-* `DebugMenu`
-* `DecimalComma` Select comma as decimal separator
-* `DecimalDot` Select dot as decimal separator
-* `DifferentialSolverMenu`
-* `DisplayModesMenu`
-* `EQUIV` Logical equivalence
-* `ERFC` Complementary error function
-* `ERF` Error function
-* `EXCLUDES` Logical exclusion
-* `EditMenu`
-* `EditorBegin`
-* `EditorClear`
-* `EditorCopy`
-* `EditorCut`
-* `EditorEnd`
-* `EditorFlip`
-* `EditorFontSize` Select font size for text editor
-* `EditorMultilineFontSize` Select font size for multi-line text editor
-* `EditorPaste`
-* `EditorReplace`
-* `EditorSearch`
-* `EditorSelect`
-* `EditorWordLeft`
-* `EditorWordRight`
-* `ElectricityUnitsMenu`
-* `EnergyUnitsMenu`
-* `EquationsMenu`
-* `ExpLogMenu`
-* `FancyExponent` Use power-of-ten rendering, e.g. 1.3×₁₀¹²⁸
-* `FilesMenu`
-* `FinanceSolverMenu`
-* `FlagsMenu`
-* `FlatMenus` Flatten menus (no use of shift)
-* `ForceUnitsMenu`
-* `Foreground` Select foreground pattern for graphic operations
-* `FractionSpacing` Grouping of digits for fractional part of numbers
-* `FractionsMenu`
-* `GAND` Graphical And
-* `GarbageCollect`
-* `GraphicsMenu`
-* `GraphicsStackDisplay` Select graphic display of the stack
-* `HYPOT` Hypothenuse
-* `HideBuiltinUnits`
-* `HyperbolicMenu`
-* `IMPLIES` Logical implication
-* `IOMenu`
-* `IntegrationMenu`
-* `LastMenu` Select last menu
-* `LastX` Return last X argument (for easier translation of RPN programs)
-* `LengthUnitsMenu`
-* `LibrariesMenu`
-* `LightUnitsMenu`
-* `LineWidth` Select line width for line drawing operations
-* `LinearSolverMenu`
-* `ListMenu`
-* `LongForm` Show commands in long form
-* `LoopsMenu`
-* `LowerCase` Show commands in lowercase
-* `MainMenu`
-* `MantissaSpacing` Grouping of digits for whole part of numbers
-* `MassUnitsMenu`
-* `MathMenu`
-* `MathModesMenu`
-* `MatrixMenu`
-* `MaxNumberBits` Maximum number of bits used by a number
-* `MaxRewrites` Maximum number of equation rewrites
-* `MemoryMenu`
-* `MenuFirstPage`
-* `MenuNextPage`
-* `MenuPreviousPage`
-* `MinimumSignificantDigits` adjustment of FIX mode switch to SCI
-* `ModesMenu`
-* `MultiSolverMenu`
-* `NAND` Not And
-* `NOR` Not Or
-* `NoAutoSimplify` Do not automatically simplify expressions
-* `NoTrailingDecimal` display 1.0 as 1
-* `NumberDotOrComma` Use dot or comma as digit group separator
-* `NumberSpaces` Use thin spaces as digit group separator
-* `NumberTicks` Use tick marks `'` as digit group separator
-* `NumberUnderscore` Use underscore `_` as digit group separator
-* `NumbersMenu`
-* `NumericResults` Produce numeric (decimal) results
-* `NumericalSolverMenu`
-* `ObjectMenu`
-* `PIRADIANS` Angle mode with multiples of pi
-* `PartsMenu`
-* `PlotMenu`
-* `PolynomialSolverMenu`
-* `PolynomialsMenu`
-* `PowerUnitsMenu`
-* `PowersMenu`
-* `Precision` Select decimal computing precision
-* `PressureUnitsMenu`
-* `PrintingMenu`
-* `ProbabilitiesMenu`
-* `ProgramMenu`
-* `REM` remainder
-* `RadiationUnitsMenu`
-* `RealMenu`
-* `ResultFontSize` Select font size to display level 1 of stack
-* `RoundedMenus` Select round menu style
-* `SIG` Significant digits mode
-* `SaveState` Save system state to current state file
-* `SelfInsert`
-* `SeparatorModesMenu`
-* `ShowBuiltinUnits`
-* `SignalProcessingMenu`
-* `SingleRowMenus` Display menus on single row
-* `SolverMenu`
-* `SpeedUnitsMenu`
-* `SquareMenus` Select square (C47-like) menu style
-* `StackFontSize` Select font size to display levels above 1 of stack
-* `StackMenu`
-* `StandardExponent` Display with standard exponent mode
-* `StatisticsMenu`
-* `SymbolicMenu`
-* `SymbolicResults` Produce symbolic results
-* `SymbolicSolverMenu`
-* `SystemMemory`
-* `SystemSetup` Enter DMCP system setup menu
-* `Tag→`
-* `TemperatureUnitsMenu`
-* `TestsMenu`
-* `TextMenu`
-* `TextStackDisplay` Select text-only display of the stack
-* `ThreeRowsMenus` Display menus on up to three rows
-* `TimeMenu`
-* `TimeUnitsMenu`
-* `ToFractionDigits` Required digits of precision for →Q
-* `ToFractionIterations` Max number of iterations for →Q
-* `ToolsMenu` Automatically select a menu based on context
-* `TrailingDecimal` display 1.0 with trailing decimal separator
-* `TypeName`
-* `Undo` Restore stack to state before command
-* `UnitsConversionsMenu`
-* `UnitsMenu`
-* `UpperCase` Show commands in uppercase
-* `UserInterfaceModesMenu`
-* `VariablesMenuExecute`
-* `VariablesMenuRecall`
-* `VariablesMenuStore`
-* `VariablesMenu`
-* `VectorMenu`
-* `ViscosityUnitsMenu`
-* `VolumeUnitsMenu`
 # Performance measurements
 
 This sections tracks some performance measurements across releases.
-
 
 # Constants library
 
@@ -9879,7 +10351,7 @@ Terminal velocity is the maximum speed attainable by an object as it falls throu
 * **Example 1**. For a golf ball falling in water, to calculate `[vt_m/s;v_m/s;tfr_s;xfr_m]` (Terminal velocity; Velocity at time `t`; Time required to reach the fraction `fr` of `vt`; Displacement during `tfr`) from 8 known variables:
 ```rpl
 Cd=0.5  ρ=1077,5_(kg/m^3)  ρf=1000_(kg/m^3)  d=4.282_cm  Ah=14.40068 68745_cm↑2  Vol=41.10916 07978_cm↑3  t=3e-2_s  fr=0.95
-@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=0.05502 64783 43 s xfr=0.01030 03495 63 m ]
+@ Expecting [ vt=0.29459 06011 51 m/s v=0.22419 40616 41 m/s tfr=0.05502 64783 43 s xfr=1.03003 49562 7⁳⁻² m ]
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
@@ -10448,7 +10920,7 @@ These equations for an NPN silicon bipolar transistor are based on large-signal 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
 IES=1e-5_nA  ICS=2e-5_nA  T=26.85_°C  αF=0.98  αR=0.49  IC=1_mA  VBC=-10_V
-@ Expecting [ VBE=0.63739 37623 73 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40835 27 mA IB=-0.48979 59164 73 mA VCEsat=-5.95264 29332 3 V ]
+@ Expecting [ VBE=0.63739 37622 77 V IS=0.00000 98 nA ICO=0.00001 0396 nA ICEO=0.00051 98 nA IE=-0.51020 40816 27 mA IB=-0.48979 59183 73 mA VCEsat=-5.95264 29332 3 V ]
 'ROOT(ⒺBipolar Transistors;[VBE;IS;ICO;ICEO;IE;IB;VCEsat];[1_V;1_nA;1_nA;1_nA;1_mA;1_mA;1_V])'
 ```
 
@@ -11409,7 +11881,6 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
-
 # Menus
 
 Menus display at the bottom of the screen, and can be activated using the keys
@@ -16073,8 +16544,7 @@ you can use the following code:
 
 When possible, the numerical solver will attempt to use the `Isolate` command to
 find results more rapidly and accurately using an exact symbolic expression of
-the solution. This is controlled by the `SolvingSymbolicallyThenNumerically`
-flag.
+the solution. This is controlled by the `SymbolicSolver` flag.
 
 
 ### Unit management
@@ -16118,9 +16588,9 @@ For example, the following will find a "solution" to `1/x=0` once it reaches the
 desired precision:
 
 ```rpl
-SolveNumericallyOnly
+NumericalSolver
 'ROOT(1/x;x;1)' EVAL
-SolveSymbolicallyThenNumerically
+SymbolicSolver
 @Expect: :x:1.10008 77783 66101 93099 87⁳18
 ```
 
@@ -16905,7 +17375,7 @@ An HMS value can also be given, as returned by the `Time` command.
 Convert decimal time to `HH.MMSS` format.
 
 
-## FomHMS
+## FromHMS
 
 Convert time in `HH.MMSS` format to decimal time.
 

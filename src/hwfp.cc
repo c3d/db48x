@@ -85,7 +85,7 @@ algebraic_p hwfp<hw>::to_fraction(uint count, uint prec) const
     uint maxdec = Settings.Precision() - 3;
     if (prec > maxdec)
         prec = maxdec;
-    hw eps = std::exp(-prec * M_LN10);
+    hw eps = std::exp(-hw(prec) * M_LN10);
 
     while (count--)
     {

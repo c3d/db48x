@@ -183,11 +183,11 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     // Check if low and hight are identical, if so pick hx=1.01*lx
     if (algebraic_p diff = hx - lx)
     {
-        if (diff->is_zero(true))
+        if (diff->is_zero(false))
         {
             algebraic_g delta =
                 +fraction::make(integer::make(1234), integer::make(997));
-            if (!hx->is_zero(true))
+            if (!hx->is_zero(false))
                 hx = hx * delta;
             else if (uexpr)
                 hx = unit::simple(delta, uexpr);
@@ -236,7 +236,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     int              degraded    = 0;
 
     // Check if we can isolate the variable algebraically
-    if (Settings.SolveSymbolicallyThenNumerically())
+    if (Settings.SymbolicSolver())
     {
         if (expression_p eqeq = eq->as<expression>())
         {
@@ -663,9 +663,10 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
     for (object_p obj : *guesses)
     {
         id ty = obj->type();
-        if (ty == ID_expression)
+        if (ty == ID_expression || ty == ID_constant || ty == ID_equation)
         {
-            obj = expression_p(obj)->evaluate();
+            settings::SaveNumericalResults snr(true);
+            obj = algebraic_p(obj)->evaluate();
             if (!obj)
                 return nullptr;
             ty = obj->type();

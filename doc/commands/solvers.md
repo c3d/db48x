@@ -74,8 +74,7 @@ you can use the following code:
 
 When possible, the numerical solver will attempt to use the `Isolate` command to
 find results more rapidly and accurately using an exact symbolic expression of
-the solution. This is controlled by the `SolvingSymbolicallyThenNumerically`
-flag.
+the solution. This is controlled by the `SymbolicSolver` flag.
 
 
 ### Unit management
@@ -119,9 +118,9 @@ For example, the following will find a "solution" to `1/x=0` once it reaches the
 desired precision:
 
 ```rpl
-SolveNumericallyOnly
+NumericalSolver
 'ROOT(1/x;x;1)' EVAL
-SolveSymbolicallyThenNumerically
+SymbolicSolver
 @Expect: :x:1.10008 77783 66101 93099 87⁳18
 ```
 

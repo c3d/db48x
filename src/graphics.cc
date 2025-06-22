@@ -1280,6 +1280,9 @@ object::result show(object_r obj)
                     update = true;
                     break;
                     }
+                case KEY_SCREENSHOT:
+                    screenshot();
+                    break;
                 case 0:
                     break;
 

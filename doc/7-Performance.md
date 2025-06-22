@@ -34,6 +34,8 @@ all times in milliseconds, best of 5 runs, on USB power, with presumably no GC.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.9.6   | 1280    | 647036    |  281020   | Lower power usage       |
+| 0.8.4   | 1183    | 601396    |  271220   | Temporaries cleaner     |
 | 0.8.4   | 1183    | 601396    |  271220   | Temporaries cleaner     |
 | 0.8.0   | 1247    | 574012    |  267284   | Back to -Oz             |
 | 0.7.0   | 1214    | 548204    |  223260   | Running at -O2          |
@@ -75,6 +77,7 @@ is not there.
 
 | Version | Time    | PGM Size  | QSPI Size | Note                    |
 |---------|---------|-----------|-----------|-------------------------|
+| 0.9.6   |  470    | 911812    |  284988   | Lower power usage       |
 | 0.8.4   |  446    | 853020    |  274964   | Temporaries cleaner     |
 | 0.8.0   |  444    | 467260    |  187948   |                         |
 | 0.7.0   |  449    | 611020    |  223692   | New DMCP runs at 160MHz |
@@ -114,6 +117,7 @@ Timing on 0.4.10 are:
 
 | Version | DM32 ms | DM42 ms | iPhone 12 | Notes                       |
 |---------|---------|---------|-----------|-----------------------------|
+| 0.9.6   | 27470   |  19950  |           | Lowe power usage            |
 | 0.8.4   | 25203   |  15616  |           | Temporaries cleaner         |
 | 0.7.0   | 25983   |  15061  |       287 | DM32 slower even at 160MHz  |
 | 0.6.0   | 26256   |  15355  |           |                             |
@@ -334,7 +338,7 @@ MatC = MatA * MatB.
 MatA and MatB are medium matrix size of dimension [25x25].
 Both matrix are pre-generated using a random generator, each element is forced to floating point by equivalent of  (-->Num(Ran#))/(-->Num(Ran#)). Furthermore, numerical arrays are used for HP48GX and HP50g.
 Garbage collection is done prior to each test case, (LastX cleared/minimized prior to start), and result dropped to avoid spending time on displaying it.
- 
+
 All timings in seconds.Typical lowest runtime in 3 runs.
 
 | Configuration | Time    | Version        | Comment                       |
@@ -350,16 +354,15 @@ All timings in seconds.Typical lowest runtime in 3 runs.
 | DM42n Battery |  1.87   | DB50X 0.8.6-10 |  HwFP  5 digits               |
 | DM42n USB     |  0.67   | DB50X 0.8.6-10 |  HwFP 15 digits               |
 | DM42n Battery |  2.33   | DB50X 0.8.6-10 |  HwFP 15 digits               |
-| DM42n USB     |  1.15   | DB50X 0.8.6-10 |  24 digits                     | 
-| DM42n Battery |  4.16   | DB50X 0.8.6-10 |  24 digits                    | 
-| DM42n USB     |  1.57   | DB50X 0.8.6-10 |  34 digits                    | 
-| DM42n Battery |  5.48   | DB50X 0.8.6-10 |  34 digits                    | 
+| DM42n USB     |  1.15   | DB50X 0.8.6-10 |  24 digits                     |
+| DM42n Battery |  4.16   | DB50X 0.8.6-10 |  24 digits                    |
+| DM42n USB     |  1.57   | DB50X 0.8.6-10 |  34 digits                    |
+| DM42n Battery |  5.48   | DB50X 0.8.6-10 |  34 digits                    |
 | DM42n USB     |  5.61   | DB50X 0.8.6-10 | c) 100 digits                 |
 
-a) matrix numerical only library in HPGCC3, using binary double, equiv. to 15-16 
-   decimal digits, calculator overclocked to 120 MHz.   
-b) almost all time spent in memory operations and GC.   
-c) 400 random bits used for ran# function.    
+a) matrix numerical only library in HPGCC3, using binary double, equiv. to 15-16
+   decimal digits, calculator overclocked to 120 MHz.
+b) almost all time spent in memory operations and GC.
+c) 400 random bits used for ran# function.
 
 <!--- !DMNONE --->
-

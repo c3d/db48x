@@ -97,5 +97,6 @@ COMMAND_DECLARE(DateAdd,2);     // Add a date and a number of days
 COMMAND_DECLARE(DateSub,2);     // Count days between two dates
 COMMAND_DECLARE(JulianDayNumber,1);// Return JDN for given date
 COMMAND_DECLARE(DateFromJulianDayNumber,1); // Date from JDN
+COMMAND_DECLARE(InsertHms,-1);  // Insert _hms, optionnaly replacing _dms
 
 #endif // DATETIME_H

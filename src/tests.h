@@ -98,7 +98,8 @@ struct tests
     void constants_parsing();
     void eqnlib_parsing();
     void eqnlib_columns_and_beams();
-    void numerical_integration_testing();
+    void numerical_integration();
+    void symbolic_numerical_integration();
     void text_functions();
     void auto_simplification();
     void rewrite_engine();

@@ -1,5 +1,75 @@
 # Release notes
 
+## Release 0.9.8 "Crowdfeeding" - Bug fixes
+
+This is a minor release with bug fixes.
+
+### Bug fixes
+
+* isolate: Fix patterns for exponentials and logs
+* doc: Fix list of currently supported models
+* derivation: Allow simplification when matching against constant
+* solver: Do not emit type error when guesses are constants
+* expressions: Correctly substitute names in list substitutions
+* menu: Fix label for `ConstantsMenu` in `MainMenu`
+
+### Improvements
+
+The [INSTALL.md](../INSTALL.md) file now describes the installation
+procedure.
+
+
+## Release 0.9.7 "Home" - Symbolic integration and bug fixes
+
+This release focuses on symbolic integration and bug fixes.
+
+### New features
+
+* Symbolic evaluation of integrals when the primitive is known, for example
+  `'∫(A;B;X↑3-sin(X-3);X)'` now evaluates symbolically.
+* hms: Cycle between `hms` and `dms` units
+* datetime: `_hms` removes `_dms` if necessary
+* Non-algebraic form of `where`, with list as substitution input, for example
+  `« 'X-Y·Z' { X 3 Y '2·A' } | »` returns `'3-2·A·Z'`.
+
+### Bug fixes
+
+* Correctly render `*` and `<` in the built-in help render engine.
+* Optimized temporaries cleanup now correctly clears the command if temporary.
+* Fix rounding errors for decimal values in HMS and DMS
+* Do not give truncated result for `FromHMS`
+* Fix conversion of hardware floating-point values to fraction
+* Fix typo in `FromHMS` help entry
+* Allow screenshots with Shift-Disp in `Show`
+* Fix two tests that fail and should not
+* Correct hwfp entry with french locale.
+* stack: Correct font size for non-result stack levels
+* Swap logfit and powerfit menu entries (wrong label)
+
+
+### Improvements
+
+* Improve detection of unknown primitives and derivatives.
+* The rewrite engine was incorrectly rewriting "up" for integration and
+  differentiation, when rewriting "down" is much more efficient. This
+  accelerates symbolic integration and differentiation by more than an order of
+  magnitude in some cases.
+* Evaluate the bounds of integrals numerically ahead of time. This accelerates
+  numerical integration when the bounds are complex expressions.
+* In the rewrite engine, evaluate the sub-expressions that correspond to a
+  constant in the pattern before comparing. This notably solves some cases where
+  the derivative would contain leftover constants expressions that should have
+  been eliminated, such as `0*X`.
+* Automatically generate the list of implemented commands, and update the
+  implementation status.
+* Renamed the settings for numerical / symbolic integration and solver
+* Rename `6-Unimplemented.md` to `6-ImplementationStatus.md` and remove empty
+  `doc/calc-help/finances.md` file.
+* Support for recent compilers (GCC >= 12.2.1).
+* Update performance data for 0.9.6
+* Add Philippe Martens to the authors list
+
+
 ## Release 0.9.6 "Peace" - Bug fixes
 
 This release is mostly bug fixes

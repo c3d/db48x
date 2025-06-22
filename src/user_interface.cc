@@ -3566,6 +3566,8 @@ restart:
                     while (c != '\n' && c != unicode(EOF))
                         c = helpfile.get();
                 }
+                if (style > ITALIC)
+                    break;
                 skip = true;
                 break;
 
@@ -3577,6 +3579,8 @@ restart:
                     xleft   = r.x1 + 2 + font->width(utf8("● "));
                     break;
                 }
+                if (style > ITALIC)
+                    break;
                 // Fall-through
             case '_':
                 if (style != CODE)
@@ -5096,16 +5100,25 @@ bool user_interface::handle_digits(int key)
                 size_t len = 0;
                 if (current_word(start, len))
                 {
-                    byte   *ed     = rt.editor();
-                    byte   *st     = (byte *) start;
-                    bool    ins    = true;
-                    bool    del    = false;
-                    utf8    cycle = utf8("kcmμMGTpn"); // Default cycle
+                    byte  *ed    = rt.editor();
+                    byte  *st    = (byte *) start;
+                    bool   ins   = true;
+                    bool   del   = false;
+                    utf8   cycle = utf8("kcmμMGTpn"); // Default cycle
                     size_t cylen = strlen(cstring(cycle));
                     if (object_p name = unit::si_prefixes_variable())
                         if (object_p si = directory::recall_all(name, false))
                             if (text_p txt = si->as<text>())
                                 cycle = txt->value(&cylen);
+
+                    if (len == 3 && st[1] == 'm' && st[2] == 's')
+                    {
+                        if (st[0] == 'd' || st[0] == 'h')
+                        {
+                            cylen = 0;
+                            st[0] = st[0] == 'd' ? 'h' : 'd';
+                        }
+                    }
 
                     if (cylen)
                     {
@@ -6076,7 +6089,8 @@ bool user_interface::do_decimal_separator()
                 size_t edlen = rt.editing();
                 ed = rt.editor();
                 if (cursor + 4 <= edlen &&
-                    memcmp(ed + cursor, "_dms", 4) == 0)
+                    (memcmp(ed + cursor, "_dms", 4) == 0 ||
+                        memcmp(ed + cursor, "_hms", 4) == 0))
                     remove(cursor, 4);
             }
             else
@@ -6100,7 +6114,8 @@ bool user_interface::do_decimal_separator()
             size_t edlen = rt.editing();
             ed = rt.editor();
             if (cursor + 4 > edlen ||
-                memcmp(ed + cursor, "_dms", 4) != 0)
+                (memcmp(ed + cursor, "_dms", 4) != 0 &&
+                    memcmp(ed + cursor, "_hms", 4) != 0))
             {
                 size_t add = insert(cursor, utf8("_dms"), 4);
                 cursor -= add;
@@ -6640,6 +6655,51 @@ size_t user_interface::remove(size_t offset, size_t len)
             cursor = offset;
     }
     return len;
+}
+
+
+size_t user_interface::replace(utf8 oldData, utf8 newData)
+// ----------------------------------------------------------------------------
+//   Remove data from the editor
+// ----------------------------------------------------------------------------
+{
+    const byte *ed    = rt.editor();
+    const byte *find  = ed + cursor;
+    bool        found = true;
+
+    size_t len = strlen(cstring(oldData));
+    for (uint f = 0; found && f < len; f = utf8_next(oldData, f, len))
+    {
+        unicode fc = utf8_codepoint(oldData + f);
+        unicode ec = utf8_codepoint(find + f);
+        found = towlower(fc) == towlower(ec);
+    }
+
+    // Also remove newData, to avoid duplicates
+    size_t newLen = strlen(cstring(newData));
+    if (!found)
+    {
+        found = true;
+        len = newLen;
+        for (uint f = 0; found && f < len; f = utf8_next(newData, f, len))
+        {
+            unicode fc = utf8_codepoint(newData + f);
+            unicode ec = utf8_codepoint(find + f);
+            found = towlower(fc) == towlower(ec);
+        }
+    }
+
+    size_t removed = 0;
+    if (found)
+    {
+        removed = remove(cursor, len);
+    }
+
+    dirtyEditor = true;
+    size_t added = insert(cursor, newData, newLen);
+    cursor -= added;
+
+    return added - removed;
 }
 
 

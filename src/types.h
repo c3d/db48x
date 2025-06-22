@@ -54,6 +54,7 @@ typedef unsigned           unicode;
 #define COMPILE_TIME_ASSERT(x)   extern int CompileTimeAssert(int[!!(x)-1])
 
 #define INLINE  __attribute__((always_inline))
+#define NOINLINE  __attribute__((noinline))
 
 template <typename value_type>
 struct save
