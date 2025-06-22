@@ -56,8 +56,7 @@ RPL commands in the HP50G and in DB50X into
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
 existing DM42 physical hardware.
-Ideally, DB50X should be fully usable without a
-keyboard overlay. though one is
+Ideally, DB50X should be fully usable without a keyboard overlay. though one is
 [being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
 
 Compared to the original HP48, the DM42 has a much larger screen, but no
@@ -937,7 +936,7 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB50X.
 
 DB50X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros DM32 calculator.
+SwissMicros DM42 calculator.
 This has [consequences on the design](#design-overview) of this particular
 implementation of RPL.
 
@@ -2844,7 +2843,7 @@ stores into the corresponding variable.
 
 It is convenient to create programs and other objects on a computer and then
 load them into the calculator. This is typically done by editing a text file
-with extension `.48s`, and then storing them on the internal storage of DM32.
+with extension `.48s`, and then storing them on the internal storage of DM42.
 The state files stored under `STATE` are such files, and example being the file
 named `STATE/Demo.48s` that comes with the DB48x distribution.
 
@@ -3781,7 +3780,7 @@ Bug-fix only release for timing of `Wait` command
 ## Bug fix
 
 The changes that improve battery life in 0.9.5 had an impact on commands that
-need absolute time, because the internal timer of the DM32/DM32 switches of when
+need absolute time, because the internal timer of the DM32/DM42 switches of when
 in deep sleep. As a result, `Wait` with durations longer than 1 second would
 wait much longer than expected, and long-duration `Refresh` settings
 e.g. `BatteryRefresh` would also wait longer than expected. Replace the use of
@@ -3831,7 +3830,7 @@ off-line persistent graphics.
 
 * Reduce power usage dramatically by disabling timers when going to sleep.
   This manifests as a higher battery voltage being shown, which is closer to
-  what the DM32 firmware or integrated self-test would show. This will most
+  what the DM42 firmware or integrated self-test would show. This will most
   likely improve battery life for interactive uses of DB48x.
 * Reorganize the `MemoryMenu` to make both GC and runtime statistics available
 * Reorganize the `GraphicsMenu` by topics to accomodate the new commands
@@ -17600,7 +17599,7 @@ The values returned by `Type` are negative, beginning at `-2`, in the order
 shown in the table for `TypeName` below. Commands each have their individual
 type number.  Returned values are not guaranteed from release to release, and
 they may differ depending on build options or hardware platform (e.g. the values
-on DM32 or DM32) may differ. The values for data types are not necessarily
+on DM32 or DM42) may differ. The values for data types are not necessarily
 contiguous either. For example, the `Type` for a tagged object may be `-1473` on
 version 0.9.1, and may change over time (the reason being that rarely used types
 have a two-byte type prefix).
@@ -17638,15 +17637,7 @@ spelling is what `TypeName` returns:
 * assignment (e.g. `X=3`)
 * rectangular (complex numbers such as `2+3ⅈ`)
 * polar (complex numbers such as `2∡30°`)
-* hex_integer (based number with enforced base 16)
-* dec_integer (based number with enforced base 10)
-* oct_integer (based number with enforced base 8)
-* bin_integer (based number with enforced base 2)
 * based_integer (based number with current base)
-* hex_bignum (large based number with enforced base 16)
-* dec_bignum (large based number with enforced base 10)
-* oct_bignum (large based number with enforced base 8)
-* bin_bignum (large based number with enforced base 2)
 * based_bignum (large based number with current base)
 * bignum (large integer, typically more than 64 bits)
 * neg_bignum (negative large integer)
