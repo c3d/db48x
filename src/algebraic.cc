@@ -41,6 +41,7 @@
 #include "hwfp.h"
 #include "integer.h"
 #include "parser.h"
+#include "range.h"
 #include "renderer.h"
 #include "runtime.h"
 #include "settings.h"
@@ -493,6 +494,26 @@ bool algebraic::to_fraction(algebraic_g &x)
         x = polar::make(mod, arg, object::ID_PiRadians);
         break;
     }
+    case ID_range:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (!to_fraction(lo) || !to_fraction(hi))
+            return false;
+        x = range::make(lo, hi);
+        break;
+    }
+    case ID_uncertain:
+    {
+        uncertain_p u = uncertain_p(+x);
+        algebraic_g a = u->average();
+        algebraic_g s = u->stddev();
+        if (!to_fraction(a) || !to_fraction(s))
+            return false;
+        x = uncertain::make(a, s);
+        break;
+    }
     case ID_unit:
     {
         unit_p ux = unit_p(+x);
@@ -574,6 +595,30 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         {
             x = polar::make(mod, arg, object::ID_PiRadians);
             return x;
+        }
+        break;
+    }
+    case ID_range:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (to_decimal(lo, weak) && to_decimal(hi, weak))
+        {
+            x = range::make(lo, hi);
+            return true;
+        }
+        break;
+    }
+    case ID_uncertain:
+    {
+        uncertain_p u = uncertain_p(+x);
+        algebraic_g a = u->average();
+        algebraic_g s = u->stddev();
+        if (to_decimal(a, weak) && to_decimal(s, weak))
+        {
+            x = uncertain::make(a, s);
+            return true;
         }
         break;
     }

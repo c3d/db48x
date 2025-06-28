@@ -1970,6 +1970,22 @@ object_p runtime::command() const
 }
 
 
+algebraic_p runtime::infinity(bool negative) const
+// ----------------------------------------------------------------------------
+//   Return a symbolic or numerical infinity
+// ----------------------------------------------------------------------------
+{
+    algebraic_g infinity = constant::lookup("∞");
+    if (!infinity)
+        return nullptr;
+    if (Settings.NumericalConstants() || Settings.NumericalResults())
+        infinity = constant_p(+infinity)->value();
+    if (negative)
+        infinity = -infinity;
+    return infinity;
+}
+
+
 algebraic_p runtime::zero_divide(bool negative) const
 // ----------------------------------------------------------------------------
 //   Return a zero divide or an infinity constant
@@ -1981,14 +1997,7 @@ algebraic_p runtime::zero_divide(bool negative) const
         return nullptr;
     }
     Settings.InfiniteResultIndicator(true);
-    algebraic_g infinity = constant::lookup("∞");
-    if (!infinity)
-        return nullptr;
-    if (Settings.NumericalConstants() || Settings.NumericalResults())
-        infinity = constant_p(+infinity)->value();
-    if (negative)
-        infinity = -infinity;
-    return infinity;
+    return infinity(negative);
 }
 
 
@@ -2003,14 +2012,7 @@ algebraic_p runtime::numerical_overflow(bool negative) const
         return nullptr;
     }
     Settings.OverflowIndicator(true);
-    algebraic_g infinity = constant::lookup("∞");
-    if (!infinity)
-        return nullptr;
-    if (Settings.NumericalConstants() || Settings.NumericalResults())
-        infinity = constant_p(+infinity)->value();
-    if (negative)
-        infinity = -infinity;
-    return infinity;
+    return infinity(negative);
 }
 
 

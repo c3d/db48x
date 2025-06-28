@@ -1107,6 +1107,7 @@ struct runtime
     // ========================================================================
 
     algebraic_p zero_divide(bool negative) const;
+    algebraic_p infinity(bool negative) const;
     algebraic_p numerical_overflow(bool negative) const;
     algebraic_p numerical_underflow(bool negative) const;
     algebraic_p undefined_result() const;

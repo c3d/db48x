@@ -129,7 +129,7 @@ ID_RANGE(is_decimal,       decimal,        neg_decimal)
 ID_RANGE(is_fp,            hwfloat,        neg_decimal)
 ID_RANGE(is_real,          bignum,         neg_decimal)
 ID_RANGE(is_complex,       rectangular,    polar)
-ID_RANGE(is_algebraic_num, unit,           neg_decimal)
+ID_RANGE(is_algebraic_num, unit,           neg_decimal,   range, uncertain)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
 ID_RANGE(is_command,       Drop,           ToFraction,    ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,
@@ -1206,6 +1206,11 @@ SETTING(ErrorBeepDuration,      0, 500,         50)
 SETTING(RandomGeneratorOrder, 10U,  256U,       32U)
 SETTING(RandomGeneratorBits,  32U, 4096U,      128U)
 
+SETTING_ENUM(RangeAsInterval,           "RangeDisplayX…Y",  RangeDisplayMode)
+SETTING_ENUM(RangeAsDelta,              "RangeDisplayX±Y",  RangeDisplayMode)
+SETTING_ENUM(RangeAsPercentage,         "RangeDisplayX±Y%", RangeDisplayMode)
+SETTING_BITS(RangeDisplayMode, id,   2,
+             ID_RangeAsInterval, ID_RangeAsPercentage, ID_RangeAsInterval)
 
 
 // ============================================================================
@@ -1265,6 +1270,7 @@ MENU(PartsMenu)
 MENU(FractionsMenu)
 MENU(PowersMenu)                ALIAS(PowersMenu, "ExpLogMenu")
 MENU(ComplexMenu)
+MENU(RangeMenu)
 MENU(VectorMenu)
 MENU(MatrixMenu)
 MENU(AnglesMenu)
@@ -1559,6 +1565,8 @@ ID(tag)
 ID(polynomial)
 ID(standard_uncertainty)
 ID(relative_uncertainty)
+ID(range)
+ID(uncertain)
 
 ID(conditional)
 ID(while_conditional)

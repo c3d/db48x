@@ -2256,6 +2256,21 @@ logarithms, exponential and hyperbolic functions, as well as a few specific
 functions such as `conj` or `arg`. These functions are available in
 the `ComplexMenu`.
 
+## Ranges
+
+Ranges (also called *intervals*) represent a range of numbers that show as `x…y`
+and represent any value that is known to be between `x` and `y`.
+
+A range can also display or parse as `a±Δ`, where `a` is `(x+y)/2` and `Δ`
+is `(y-x)/2`, or as `a±Δ%`, where the `Δ` is expressed as a percentage of the
+average.
+
+## Uncertain numbers
+
+Uncertainties represent a range of numbers that show as `a±σs` and represent a
+value using its average `a` and a standard deviation `s`. The difference with
+ranges is how the computation of the uncertainty is performed.
+
 
 ## Expressions
 

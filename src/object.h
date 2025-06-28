@@ -897,7 +897,7 @@ struct object
     }
 
 
-    object_p child(uint index = 0) const;
+    object_p child(uint index = 0, bool coordinate=true) const;
     // ------------------------------------------------------------------------
     //   Return a child for a complex, list or array
     // ------------------------------------------------------------------------

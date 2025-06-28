@@ -571,6 +571,8 @@ COMMAND_BODY(Explode)
     {
     case ID_rectangular:
     case ID_polar:
+    case ID_range:
+    case ID_uncertain:
     case ID_unit:
     {
         complex_p cplx = complex_p(obj);
@@ -1166,6 +1168,18 @@ COMMAND_BODY(Cycle)
             return OK;
         }
 #endif // CONFIG_FIXED_BASED_OBJECTS
+        case ID_range:
+        case ID_uncertain:
+            switch (Settings.RangeDisplayMode())
+            {
+            case ID_RangeAsDelta:
+                Settings.RangeDisplayMode(ID_RangeAsPercentage); break;
+            case ID_RangeAsPercentage:
+                Settings.RangeDisplayMode(ID_RangeAsInterval); break;
+            default:
+                Settings.RangeDisplayMode(ID_RangeAsDelta); break;
+            }
+            break;
         case ID_constant:
         case ID_equation:
         case ID_xlib:

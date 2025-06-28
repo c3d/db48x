@@ -42,6 +42,7 @@
 #include "list.h"
 #include "logical.h"
 #include "polynomial.h"
+#include "range.h"
 #include "solve.h"
 #include "tag.h"
 #include "unit.h"
@@ -1085,6 +1086,24 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
         re = rnd_or_trnc(re, digits, func);
         im = rnd_or_trnc(im, digits, func);
         return rectangular::make(re, im);
+    }
+    case object::ID_range:
+    {
+        range_p r = range_p(+value);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        lo = rnd_or_trnc(lo, digits, func);
+        hi = rnd_or_trnc(hi, digits, func);
+        return range::make(lo, hi);
+    }
+    case object::ID_uncertain:
+    {
+        uncertain_p u = uncertain_p(+value);
+        algebraic_g a = u->average();
+        algebraic_g s = u->stddev();
+        a = rnd_or_trnc(a, digits, func);
+        s = rnd_or_trnc(s, digits, func);
+        return uncertain::make(a, s);
     }
     case object::ID_unit:
     {
