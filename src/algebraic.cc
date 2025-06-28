@@ -495,23 +495,16 @@ bool algebraic::to_fraction(algebraic_g &x)
         break;
     }
     case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
     {
         range_p r = range_p(+x);
         algebraic_g lo = r->lo();
         algebraic_g hi = r->hi();
         if (!to_fraction(lo) || !to_fraction(hi))
             return false;
-        x = range::make(lo, hi);
-        break;
-    }
-    case ID_uncertain:
-    {
-        uncertain_p u = uncertain_p(+x);
-        algebraic_g a = u->average();
-        algebraic_g s = u->stddev();
-        if (!to_fraction(a) || !to_fraction(s))
-            return false;
-        x = uncertain::make(a, s);
+        x = range::make(r->type(), lo, hi);
         break;
     }
     case ID_unit:
@@ -605,7 +598,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         algebraic_g hi = r->hi();
         if (to_decimal(lo, weak) && to_decimal(hi, weak))
         {
-            x = range::make(lo, hi);
+            x = range::make(r->type(), lo, hi);
             return true;
         }
         break;

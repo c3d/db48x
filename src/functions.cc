@@ -1088,22 +1088,16 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
         return rectangular::make(re, im);
     }
     case object::ID_range:
+    case object::ID_drange:
+    case object::ID_prange:
+    case object::ID_uncertain:
     {
         range_p r = range_p(+value);
         algebraic_g lo = r->lo();
         algebraic_g hi = r->hi();
         lo = rnd_or_trnc(lo, digits, func);
         hi = rnd_or_trnc(hi, digits, func);
-        return range::make(lo, hi);
-    }
-    case object::ID_uncertain:
-    {
-        uncertain_p u = uncertain_p(+value);
-        algebraic_g a = u->average();
-        algebraic_g s = u->stddev();
-        a = rnd_or_trnc(a, digits, func);
-        s = rnd_or_trnc(s, digits, func);
-        return uncertain::make(a, s);
+        return range::make(r->type(), lo, hi);
     }
     case object::ID_unit:
     {

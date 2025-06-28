@@ -9,9 +9,9 @@
 //    Range arithmetic
 //
 //    This defines two range types:
-//    - range is an interval of numbers, showing as 1.245…1.267, or,
-//      alternatively, as 1.256±0.011 or 1.256±0.876%. All three forms are
-//      accepted as input.
+//    - range is an interval of numbers, showing as 1.245…1.267
+//    - drange is a "delta" range that shows as 1.256±0.011
+//    - prange is a "percent" range, shows as 1.256±0.876%
 //    - uncertain is mean and standard deviation, showing as 1.245±σ0.067
 //
 //
@@ -58,16 +58,16 @@ struct range : complex
     bool                is_zero() const;
     bool                is_one()  const;
 
-    static range_p      make(algebraic_r x, algebraic_r y)
+    static range_p      make(id type, algebraic_r x, algebraic_r y)
     {
         if (!x || !y)
             return nullptr;
-        return rt.make<range>(x, y);
+        return rt.make<range>(type, x, y);
     }
 
     static bool sort(algebraic_g &x, algebraic_g &y);
 
-    enum { INTERVAL_MARK = L'…', PLUSMINUS_MARK = L'±' };
+    enum { INTERVAL_MARK = L'…' };
 
 public:
     SIZE_DECL(range);
@@ -119,6 +119,33 @@ range_g operator+(range_r x, range_r y);
 range_g operator-(range_r x, range_r y);
 range_g operator*(range_r x, range_r y);
 range_g operator/(range_r x, range_r y);
+
+
+struct drange : range
+// ----------------------------------------------------------------------------
+//   Delta range, like 1.256±0.011
+// ----------------------------------------------------------------------------
+{
+    drange(id type, algebraic_r x, algebraic_r y);
+    enum { PLUSMINUS_MARK = L'±' };
+
+public:
+    OBJECT_DECL(drange);
+    RENDER_DECL(drange);
+};
+
+
+struct prange : drange
+// ----------------------------------------------------------------------------
+//   Percent range, like 1.256±0.876%
+// ----------------------------------------------------------------------------
+{
+    prange(id type, algebraic_r x, algebraic_r y);
+
+public:
+    OBJECT_DECL(prange);
+    RENDER_DECL(prange);
+};
 
 
 struct uncertain : range

@@ -1206,11 +1206,6 @@ SETTING(ErrorBeepDuration,      0, 500,         50)
 SETTING(RandomGeneratorOrder, 10U,  256U,       32U)
 SETTING(RandomGeneratorBits,  32U, 4096U,      128U)
 
-SETTING_ENUM(RangeAsInterval,           "RangeDisplayX…Y",  RangeDisplayMode)
-SETTING_ENUM(RangeAsDelta,              "RangeDisplayX±Y",  RangeDisplayMode)
-SETTING_ENUM(RangeAsPercentage,         "RangeDisplayX±Y%", RangeDisplayMode)
-SETTING_BITS(RangeDisplayMode, id,   2,
-             ID_RangeAsInterval, ID_RangeAsPercentage, ID_RangeAsInterval)
 
 
 // ============================================================================
@@ -1566,6 +1561,8 @@ ID(polynomial)
 ID(standard_uncertainty)
 ID(relative_uncertainty)
 ID(range)
+ID(drange)
+ID(prange)
 ID(uncertain)
 
 ID(conditional)

@@ -404,7 +404,7 @@ retry:
         bool maybe_fcall = p.precedence && (cp == '(' || utf8_whitespace(cp));
         bool maybe_asn   = !p.precedence && cp == '=';
         bool maybe_range = (cp == range::INTERVAL_MARK ||
-                            cp == range::PLUSMINUS_MARK);
+                            cp == drange::PLUSMINUS_MARK);
 
         if (maybe_rect || maybe_polar || maybe_unit ||
             maybe_fcall || maybe_asn  || maybe_range)

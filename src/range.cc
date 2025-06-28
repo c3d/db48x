@@ -107,7 +107,7 @@ PARSE_BODY(range)
     size_t  offs  = 0;
     unicode cp    = p.separator;
     bool    imark = cp == range::INTERVAL_MARK;
-    bool    pmark = cp == range::PLUSMINUS_MARK;
+    bool    pmark = cp == drange::PLUSMINUS_MARK;
     bool    smark = cp == uncertain::SIGMA_MARK;
     if (!imark && !pmark && !smark)
         return SKIP;
@@ -139,16 +139,23 @@ PARSE_BODY(range)
     }
     else
     {
+        id type = object::ID_range;
         if (cmark || pmark)
         {
-            algebraic_g div = integer::make(cmark ? 200 : 2);
-            div = xexpr * yexpr / div;
+            algebraic_g div = yexpr;
+            if (cmark)
+            {
+                div = integer::make(100);
+                div = xexpr * yexpr / div;
+                offs = utf8_next(p.source, offs, max);
+            }
             if (div->is_negative(false))
                 div = -div;
+            yexpr = xexpr + div;
             xexpr = xexpr - div;
-            yexpr = yexpr + div;
+            type = cmark ? ID_prange : ID_drange;
         }
-        p.out = range::make(xexpr, yexpr);
+        p.out = range::make(type, xexpr, yexpr);
     }
 
     p.length = offs;
@@ -164,33 +171,54 @@ RENDER_BODY(range)
     range_g     go = o;
     algebraic_g lo = go->lo();
     algebraic_g hi = go->hi();
-    object::id  dm = Settings.RangeDisplayMode();
-    if (dm != object::ID_RangeAsInterval)
-    {
-        algebraic_g two = integer::make(2);
-        algebraic_g disp = (lo + hi) / two;
-        if (disp)
-            disp->render(r);
-        r.put(unicode(range::PLUSMINUS_MARK));
-        algebraic_g delta = (hi - lo) / two;
-        if (dm == object::ID_RangeAsPercentage)
-        {
-            algebraic_g hundred = integer::make(100);
-            delta = delta * hundred;
-            delta->render(r);
-            r.put('%');
-        }
-        else
-        {
-            delta->render(r);
-        }
-    }
-    else
-    {
-        lo->render(r);
-        r.put(unicode(range::INTERVAL_MARK));
-        hi->render(r);
-    }
+    lo->render(r);
+    r.put(unicode(range::INTERVAL_MARK));
+    hi->render(r);
+    return r.size();
+}
+
+
+RENDER_BODY(drange)
+// ----------------------------------------------------------------------------
+//   Render a delta range
+// ----------------------------------------------------------------------------
+{
+    range_g     go   = o;
+    algebraic_g lo   = go->lo();
+    algebraic_g hi   = go->hi();
+    algebraic_g two  = integer::make(2);
+    algebraic_g disp = (lo + hi) / two;
+    if (disp)
+        disp->render(r);
+    r.put(unicode(drange::PLUSMINUS_MARK));
+    algebraic_g delta = (hi - lo) / two;
+    if (delta)
+        delta->render(r);
+    return r.size();
+}
+
+
+RENDER_BODY(prange)
+// ----------------------------------------------------------------------------
+//   Render a delta range
+// ----------------------------------------------------------------------------
+{
+    range_g     go   = o;
+    algebraic_g lo   = go->lo();
+    algebraic_g hi   = go->hi();
+    algebraic_g two  = integer::make(2);
+    algebraic_g disp = (lo + hi) / two;
+    if (disp)
+        disp->render(r);
+    r.put(unicode(drange::PLUSMINUS_MARK));
+    algebraic_g delta = (hi - disp) * integer::make(100);
+    if (!disp->is_zero(false))
+        delta = delta / disp;
+    if (delta->is_negative(true))
+        delta = -delta;
+    if (delta)
+        delta->render(r);
+    r.put('%');
     return r.size();
 }
 
@@ -204,7 +232,7 @@ RENDER_BODY(uncertain)
     algebraic_g a = go->average();
     algebraic_g s = go->stddev();
     a->render(r);
-    r.put(unicode(range::PLUSMINUS_MARK));
+    r.put(unicode(drange::PLUSMINUS_MARK));
     r.put(unicode(uncertain::SIGMA_MARK));
     s->render(r);
     return r.size();
@@ -258,7 +286,7 @@ range_g operator-(range_r x)
 {
     if (!x)
         return nullptr;
-    return range::make(-x->hi(), -x->lo());
+    return range::make(x->type(), -x->hi(), -x->lo());
 }
 
 
@@ -271,7 +299,7 @@ range_g operator+(range_r x, range_r y)
         return nullptr;
     algebraic_g lo = x->lo() + y->lo();
     algebraic_g hi = x->hi() + y->hi();
-    return range::make(lo, hi);
+    return range::make(y->type(), lo, hi);
 }
 
 
@@ -284,7 +312,7 @@ range_g operator-(range_r x, range_r y)
         return nullptr;
     algebraic_g lo = x->lo() - y->hi();
     algebraic_g hi = x->hi() - y->lo();
-    return range::make(lo, hi);
+    return range::make(y->type(), lo, hi);
 }
 
 
@@ -305,7 +333,7 @@ range_g operator*(range_r x, range_r y)
     range::sort(a, d);
     range::sort(b, d);
     range::sort(c, d);
-    return range::make(a, d);
+    return range::make(y->type(), a, d);
 }
 
 
@@ -326,7 +354,7 @@ range_g operator/(range_r x, range_r y)
     range::sort(a, d);
     range::sort(b, d);
     range::sort(c, d);
-    return range::make(a, d);
+    return range::make(y->type(), a, d);
 }
 
 
@@ -342,11 +370,12 @@ static range_p monotonic(algebraic_fn fn, range_r r, bool down = false)
 //   Compute monotonic functions
 // ----------------------------------------------------------------------------
 {
-    algebraic_g lo = r->lo();
-    algebraic_g hi = r->hi();
-    lo = fn(lo);
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    object::id  type = r->type();
+    lo               = fn(lo);
     hi = fn(hi);
-    return down ? range::make(hi, lo) : range::make(lo, hi);
+    return down ? range::make(type, hi, lo) : range::make(type, lo, hi);
 }
 
 
@@ -412,7 +441,7 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
             lo = integer::make(-1);
     }
 
-    return range::make(lo, hi);
+    return range::make(r->type(), lo, hi);
 }
 
 
@@ -492,7 +521,7 @@ RANGE_BODY(cosh)
     hi = cosh::evaluate(hi);
     range::sort(lo, hi);
     lo = integer::make(1);
-    return range::make(lo, hi);
+    return range::make(r->type(), lo, hi);
 }
 
 
@@ -655,7 +684,7 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
             range::sort(lo, hi);
         }
     }
-    return range::make(lo, hi);
+    return range::make(r->type(), lo, hi);
 }
 
 

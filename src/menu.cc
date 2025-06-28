@@ -527,9 +527,7 @@ MENU(RangeMenu,
      "…",       ID_SelfInsert,
      "±",       ID_SelfInsert,
      "±σ",      ID_SelfInsert,
-     "X…Y",     ID_RangeAsInterval,
-     "X±Y",     ID_RangeAsDelta,
-     "X±Y%",    ID_RangeAsPercentage);
+     "±_%",      ID_SelfInsert);
 
 MENU(VectorMenu,
 // ----------------------------------------------------------------------------
