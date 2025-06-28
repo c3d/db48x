@@ -1440,7 +1440,7 @@ MENU(SeparatorModesMenu,
      "1.2x10³²",        ID_FancyExponent,
      "1.2E32",          ID_ClassicExponent,
      "1.0→1.",          ID_TrailingDecimal,
-     "1.0→1",           ID_NoTrailingDecimal,
+     "1→1.0",           ID_ShowAsDecimal,
      "Fixed0",          ID_FixedWidthDigits);
 
 MENU(UserInterfaceModesMenu,

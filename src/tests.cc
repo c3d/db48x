@@ -185,10 +185,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-        {
-            vector_functions();
-            matrix_functions();
-        }
+            decimal_display_formats();
 
 #if 0
         if (onlyCurrent & 2)
@@ -3276,6 +3273,26 @@ void tests::decimal_display_formats()
         .test(ID_ClassicExponent)
         .expect("1.E1234567890123456")
         .test(ID_FancyExponent);
+
+    step("Display integers as decimal")
+        .test(CLEAR, "123", ENTER)
+        .expect("123")
+        .test(ID_DisplayModesMenu, ID_SeparatorModesMenu, ID_ShowAsDecimal)
+        .expect("123.")
+        .test("2 FIX", ENTER)
+        .expect("123.00")
+        .test(ID_ShowAsDecimal)
+        .expect("123");;
+
+    step("Display fractions as decimal")
+        .test(CLEAR, "5/2", ENTER)
+        .expect("2 ¹/₂")
+        .test(ID_DisplayModesMenu, ID_SeparatorModesMenu, ID_ShowAsDecimal)
+        .expect("2.50")
+        .test("2 FIX", ENTER)
+        .expect("2.50")
+        .test(ID_ShowAsDecimal).
+        expect("2 ¹/₂");
 }
 
 

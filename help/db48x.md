@@ -15829,6 +15829,20 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+## ShowAsDecimal
+
+Show integer numbers like `25` and fractions like `3/2` as decimal values.
+This enables formatting with `FIX` or `SCI` to apply to integer numbers and
+fractions. For example, if `25` is on the stack, after `2 FIX`, it will show on
+the stack as `25.00`.
+
+This is the opposite of `ShowIntegersAndFractions`.
+
+## ShowIntegersAndFractions
+
+Show integer numbers like `25` and fractions like `3/2` as is.
+With this setting in effect, `25` after `2 FIX` will show as `25` and not
+`25.00`.
 
 # Display Grouping and Spacing
 

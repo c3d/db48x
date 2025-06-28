@@ -1009,9 +1009,19 @@ size_t object::render(renderer &r) const
 // ------------------------------------------------------------------------
 {
     record(render, "Rendering %p into %p", this, &r);
-    size_t sz = size();
-    if (r.stack() && sz > Settings.TextRenderingSizeLimit())
-        return r.printf("Large %s (%lu bytes)", name(), sz);
+    if (r.stack())
+    {
+        if (Settings.ShowAsDecimal())
+            if (is_real() && !is_fp())
+                if (algebraic_g x = this->as_algebraic())
+                    if (algebraic::decimal_promotion(x))
+                        return decimal::do_render(decimal_p(+x), r);
+
+        size_t sz = size();
+        if (sz > Settings.TextRenderingSizeLimit())
+            return r.printf("Large %s (%lu bytes)", name(), sz);
+    }
+
     return ops().render(this, r);
 }
 
@@ -1023,8 +1033,16 @@ grob_p object::graph(grapher &g) const
 {
     record(render, "Graphing %+s %p into %p", name(), this, &g);
     size_t sz = size();
-    if (g.stack && !is_graph() && sz > Settings.GraphRenderingSizeLimit())
-        return nullptr;
+    if (g.stack)
+    {
+        if (Settings.ShowAsDecimal())
+            if (is_real() && !is_fp())
+                if (algebraic_g x = this->as_algebraic())
+                    if (algebraic::decimal_promotion(x))
+                        return decimal::do_graph(decimal_p(+x), g);
+        if (!is_graph() && sz > Settings.GraphRenderingSizeLimit())
+            return nullptr;
+    }
     return ops().graph(this, g);
 }
 
