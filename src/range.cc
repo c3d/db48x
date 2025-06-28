@@ -272,6 +272,16 @@ bool range::sort(algebraic_g &x, algebraic_g &y)
 }
 
 
+algebraic_p range::as_uncertain() const
+// ----------------------------------------------------------------------------
+//   Convert a range to an uncertainy representation
+// ----------------------------------------------------------------------------
+{
+    rt.unimplemented_error();
+    return this;
+}
+
+
 
 // ============================================================================
 //
@@ -729,4 +739,14 @@ bool uncertain::is_one() const
 {
     range_g o = this;
     return o->x()->is_one(false) && o->y()->is_zero(false);
+}
+
+
+algebraic_p uncertain::as_range(object::id type) const
+// ----------------------------------------------------------------------------
+//   Convert an uncertain number to a range
+// ----------------------------------------------------------------------------
+{
+    rt.unimplemented_error();
+    return this;
 }

@@ -310,6 +310,54 @@ bool algebraic::complex_promotion(algebraic_g &x, object::id type)
 }
 
 
+bool algebraic::range_promotion(algebraic_g &x, object::id type)
+// ----------------------------------------------------------------------------
+//   Promote the value x to the given range type
+// ----------------------------------------------------------------------------
+{
+    id xt = x->type();
+    if (xt == type)
+        return true;
+
+    record(algebraic, "Range promotion of %p from %+s to %+s",
+           (object_p) x, object::name(xt), object::name(type));
+
+    if (!is_range(type))
+    {
+        record(algebraic_error, "Range promotion to invalid type %+s",
+               object::name(type));
+        return false;
+    }
+
+    if (xt == ID_uncertain)
+    {
+        // Convert from uncertain to range
+        x = uncertain_p(+x)->as_range();
+        return +x;
+    }
+    else if (xt == ID_range || xt == ID_drange || xt == ID_prange)
+    {
+        // Convert from range to uncertain
+        x = range_p(+x)->as_uncertain();
+        return +x;
+    }
+    else if (is_symbolic(xt))
+    {
+        // Assume a symbolic value is complex for now
+        // TODO: Implement `REALASSUME`
+        return false;
+    }
+    else if (is_symbolic_arg(xt) || is_algebraic(xt))
+    {
+        algebraic_g zero = algebraic_p(integer::make(0));
+        x = range::make(type, x, x);
+        return +x;
+    }
+
+    return false;
+}
+
+
 object::id algebraic::bignum_promotion(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //   Promote the value x to the corresponding bignum

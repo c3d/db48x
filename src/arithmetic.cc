@@ -82,6 +82,32 @@ bool arithmetic::complex_promotion(algebraic_g &x, algebraic_g &y)
 }
 
 
+bool arithmetic::range_promotion(algebraic_g &x, algebraic_g &y)
+// ----------------------------------------------------------------------------
+//   Return true if one type is range and the other can be promoted
+// ----------------------------------------------------------------------------
+{
+    if (!x || !y)
+        return false;
+
+    id xt = x->type();
+    id yt = y->type();
+
+    // If both are ranges, we do not do anything
+    if (is_range(xt) && is_range(yt))
+        return true;
+
+    // Try to convert both types to the same range type
+    if (is_range(xt))
+        return range_promotion(y, xt);
+    if (is_range(yt))
+        return range_promotion(x, yt);
+
+    // Neither type is range, no point to promote
+    return false;
+}
+
+
 fraction_p arithmetic::fraction_promotion(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //  Check if we can promote the number to a fraction
@@ -310,6 +336,16 @@ bool add::complex_ok(complex_g &x, complex_g &y)
 }
 
 
+bool add::range_ok(range_g &x, range_g &y)
+// ----------------------------------------------------------------------------
+//   Add ranges if we have them
+// ----------------------------------------------------------------------------
+{
+    x = x + y;
+    return x;
+}
+
+
 template <>
 algebraic_p arithmetic::optimize<subtract>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
@@ -476,6 +512,16 @@ bool subtract::complex_ok(complex_g &x, complex_g &y)
 }
 
 
+bool subtract::range_ok(range_g &x, range_g &y)
+// ----------------------------------------------------------------------------
+//   Subtract ranges if we have them
+// ----------------------------------------------------------------------------
+{
+    x = x - y;
+    return x;
+}
+
+
 template <>
 algebraic_p arithmetic::optimize<multiply>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
@@ -635,6 +681,16 @@ bool multiply::fraction_ok(fraction_g &x, fraction_g &y)
 bool multiply::complex_ok(complex_g &x, complex_g &y)
 // ----------------------------------------------------------------------------
 //   Multiply complex numbers if we have them
+// ----------------------------------------------------------------------------
+{
+    x = x * y;
+    return x;
+}
+
+
+bool multiply::range_ok(range_g &x, range_g &y)
+// ----------------------------------------------------------------------------
+//   Multiply ranges if we have them
 // ----------------------------------------------------------------------------
 {
     x = x * y;
@@ -841,6 +897,16 @@ bool divide::complex_ok(complex_g &x, complex_g &y)
 }
 
 
+bool divide::range_ok(range_g &x, range_g &y)
+// ----------------------------------------------------------------------------
+//   Divide ranges if we have them
+// ----------------------------------------------------------------------------
+{
+    x = x / y;
+    return x;
+}
+
+
 template <>
 algebraic_p arithmetic::optimize<mod>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
@@ -939,6 +1005,15 @@ bool mod::complex_ok(complex_g &, complex_g &)
 }
 
 
+bool mod::range_ok(range_g &, range_g &)
+// ----------------------------------------------------------------------------
+//   No modulo on ranges
+// ----------------------------------------------------------------------------
+{
+    return false;
+}
+
+
 template <>
 algebraic_p arithmetic::optimize<rem>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
@@ -1010,6 +1085,15 @@ bool rem::fraction_ok(fraction_g &x, fraction_g &y)
 bool rem::complex_ok(complex_g &, complex_g &)
 // ----------------------------------------------------------------------------
 //   No remainder on complex numbers
+// ----------------------------------------------------------------------------
+{
+    return false;
+}
+
+
+bool rem::range_ok(range_g &, range_g &)
+// ----------------------------------------------------------------------------
+//   No remainder on ranges
 // ----------------------------------------------------------------------------
 {
     return false;
@@ -1173,6 +1257,16 @@ bool pow::complex_ok(complex_g &x, complex_g &y)
 }
 
 
+bool pow::range_ok(range_g &x, range_g &y)
+// ----------------------------------------------------------------------------
+//   Implement x^y as exp(y * log(x))
+// ----------------------------------------------------------------------------
+{
+    x = range::exp(y * range::log(x));
+    return x;
+}
+
+
 bool pow::fraction_ok(fraction_g &/* x */, fraction_g &/* y */)
 // ----------------------------------------------------------------------------
 //   Compute y^x, works if x >= 0
@@ -1220,6 +1314,15 @@ bool hypot::complex_ok(complex_g &, complex_g &)
 }
 
 
+bool hypot::range_ok(range_g &, range_g &)
+// ----------------------------------------------------------------------------
+//   No hypot on ranges yet
+// ----------------------------------------------------------------------------
+{
+    return false;
+}
+
+
 
 // ============================================================================
 //
@@ -1258,6 +1361,15 @@ bool atan2::fraction_ok(fraction_g &/* x */, fraction_g &/* y */)
 bool atan2::complex_ok(complex_g &, complex_g &)
 // ----------------------------------------------------------------------------
 //   No atan2 on complex numbers yet
+// ----------------------------------------------------------------------------
+{
+    return false;
+}
+
+
+bool atan2::range_ok(range_g &, range_g &)
+// ----------------------------------------------------------------------------
+//   No atan2 on ranges yet
 // ----------------------------------------------------------------------------
 {
     return false;
@@ -1476,6 +1588,21 @@ algebraic_p arithmetic::evaluate(id          op,
         }
     }
 
+    // Range data types
+    if (range_promotion(x, y))
+    {
+        range_g xr = range_p(algebraic_p(x));
+        range_g yr = range_p(algebraic_p(y));
+        if (ops.range_ok(xr, yr))
+        {
+            if (Settings.AutoSimplify())
+                if (algebraic_p diff = xr->hi() - xr->lo())
+                    if (diff->is_zero(false))
+                        return xr->hi();
+            return xr;
+        }
+    }
+
     if (!x || !y)
         return nullptr;
 
@@ -1649,6 +1776,7 @@ arithmetic::ops_t arithmetic::Ops()
         Op::bignum_ok,
         Op::fraction_ok,
         Op::complex_ok,
+        Op::range_ok,
         non_numeric<Op>
     };
     return result;

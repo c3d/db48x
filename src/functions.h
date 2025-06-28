@@ -49,6 +49,7 @@ struct function : algebraic
 
 public:
     typedef complex_g  (*complex_fn)(complex_r x);
+    typedef range_p    (*range_fn)(range_r x);
     typedef hwfloat_p  (*hwfloat_fn)(hwfloat_r x);
     typedef hwdouble_p (*hwdouble_fn)(hwdouble_r x);
 
@@ -59,6 +60,7 @@ public:
         hwfloat_fn    fop;
         hwdouble_fn   dop;
         complex_fn    zop;
+        range_fn      rop;
     };
     typedef const ops &ops_t;
 
@@ -125,6 +127,7 @@ struct derived : function                                               \
     static constexpr auto        fop   = hwfloat::derived;              \
     static constexpr auto        dop   = hwdouble::derived;             \
     static constexpr complex_fn  zop   = complex::derived;              \
+    static constexpr range_fn    rop   = range::derived;                \
                                                                         \
 public:                                                                 \
     OBJECT_DECL(derived);                                               \
@@ -147,7 +150,7 @@ public:                                                                 \
     {                                                                   \
         static const ops optable =                                      \
         {                                                               \
-            decop, hwfloat_fn(fop), hwdouble_fn(dop), zop               \
+            decop, hwfloat_fn(fop), hwdouble_fn(dop), zop, rop          \
         };                                                              \
         return function::evaluate(x, ID_##derived, optable);            \
     }                                                                   \

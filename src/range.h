@@ -57,6 +57,7 @@ struct range : complex
     algebraic_g         hi() const      { return y(); }
     bool                is_zero() const;
     bool                is_one()  const;
+    algebraic_p         as_uncertain() const;
 
     static range_p      make(id type, algebraic_r x, algebraic_r y)
     {
@@ -160,6 +161,8 @@ struct uncertain : range
     algebraic_g stddev()  const         { return y(); }
     bool        is_zero() const;
     bool        is_one()  const;
+    algebraic_p as_range(id type = ID_range) const;
+
 
     static uncertain_p make(algebraic_r a, algebraic_r s)
     {
@@ -176,13 +179,5 @@ public:
     RENDER_DECL(uncertain);
     HELP_DECL(uncertain);
 };
-
-
-uncertain_g operator-(uncertain_r x);
-uncertain_g operator+(uncertain_r x, uncertain_r y);
-uncertain_g operator-(uncertain_r x, uncertain_r y);
-uncertain_g operator*(uncertain_r x, uncertain_r y);
-uncertain_g operator/(uncertain_r x, uncertain_r y);
-
 
 #endif // RANGE_H

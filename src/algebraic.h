@@ -59,6 +59,9 @@ struct algebraic : command
     // Promotion of integer, real or fraction to complex
     static bool complex_promotion(algebraic_g &x, id type = ID_rectangular);
 
+    // Promotion of integer, real or fraction to range
+    static bool range_promotion(algebraic_g &x, id type = ID_range);
+
     // Promotion of integer to bignum
     static id   bignum_promotion(algebraic_g &x);
 

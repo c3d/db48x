@@ -1170,8 +1170,8 @@ COMMAND_BODY(Cycle)
 #endif // CONFIG_FIXED_BASED_OBJECTS
         case ID_range:          type = ID_drange;       break;
         case ID_drange:         type = ID_prange;       break;
-        case ID_prange:         type = ID_uncertain;    break;
-        case ID_uncertain:      type = ID_range;        break;
+        case ID_prange:         type = ID_range;        break;
+        case ID_uncertain:      break;
 
         case ID_constant:
         case ID_equation:
