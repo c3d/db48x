@@ -1,4 +1,3 @@
-
 // ****************************************************************************
 //  tests.cc                                                      DB48X project
 // ****************************************************************************
@@ -186,7 +185,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            symbolic_differentiation();
+        {
+            vector_functions();
+            matrix_functions();
+        }
 
 #if 0
         if (onlyCurrent & 2)
@@ -6045,6 +6047,18 @@ void tests::vector_functions()
     test(CLEAR, "[a b c][d e f] /", ENTER)
         .expect("[ 'd⁻¹·a' 'e⁻¹·b' 'f⁻¹·c' ]");
 
+    step("Power (extension)");
+    test(CLEAR, "[1 2  3 4 6][4 5 2 1 3] ^", ENTER)
+        .want("[[ 1 1 1 1 1 ]"
+              " [ 16 32 4 2 8 ]"
+              " [ 81 243 9 3 27 ]"
+              " [ 256 1 024 16 4 64 ]"
+              " [ 1 296 7 776 36 6 216 ]]");
+    test(CLEAR, "[a b c][d e f] ^", ENTER)
+        .want("[[ 'a↑d' 'a↑e' 'a↑f' ]"
+              " [ 'b↑d' 'b↑e' 'b↑f' ]"
+              " [ 'c↑d' 'c↑e' 'c↑f' ]]");
+
     step("Addition of constant (extension)");
     test(CLEAR, "[1 2 3] 3 +", ENTER)
         .expect("[ 4 5 6 ]");
@@ -6070,6 +6084,16 @@ void tests::vector_functions()
         .expect("[ 'a÷x' 'b÷x' 'c÷x' ]");
     test(CLEAR, "x [a b c] /", ENTER)
         .expect("[ 'x÷a' 'x÷b' 'x÷c' ]");
+
+    step("Power by constant (extension)");
+    test(CLEAR, "[a b c] x ^", ENTER)
+        .expect("[ 'a↑x' 'b↑x' 'c↑x' ]");
+    test(CLEAR, "x [a b c] ^", ENTER)
+        .expect("[ 'x↑a' 'x↑b' 'x↑c' ]");
+    test(CLEAR, "[a b c] 2 ^", ENTER)
+        .expect("[ 'a²' 'b²' 'c²' ]");
+    test(CLEAR, "2 [a b c] ^", ENTER)
+        .expect("[ '2↑a' '2↑b' '2↑c' ]");
 
     step("Invalid dimension for binary operations");
     test(CLEAR, "[1 2 3][1 2] +", ENTER)
@@ -6345,13 +6369,39 @@ void tests::matrix_functions()
     test(CLEAR,
          "[[5 12 1968][17 2 1969][30 3 1993]] "
          "[[16 5 1995][21 5 1999][28 5 2009]] /", ENTER)
-        .want("[[ 3 ¹/₁₁ -4 ⁸/₁₁ -3 ¹⁰/₁₁ ] [ 335 ⁷/₁₀ -1 342 ⁷/₁₀ -1 643 ³/₁₀ ] [ -¹⁹/₂₂ 3 ⁹/₂₂ 5 ³/₂₂ ]]");
+        .want("[[ 3 ¹/₁₁ -4 ⁸/₁₁ -3 ¹⁰/₁₁ ]"
+              " [ 335 ⁷/₁₀ -1 342 ⁷/₁₀ -1 643 ³/₁₀ ]"
+              " [ -¹⁹/₂₂ 3 ⁹/₂₂ 5 ³/₂₂ ]]");
     step("Division (symbolic)");
     test(CLEAR, "[[a b][c d]][[e f][g h]] /", ENTER)
         .want("[[ '(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·a+(-(f÷e·e÷(e·h-g·f)))·c' "
               "'(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·b+(-(f÷e·e÷(e·h-g·f)))·d' ] "
               "[ '(-g)÷(e·h-g·f)·a+e÷(e·h-g·f)·c' "
               "'(-g)÷(e·h-g·f)·b+e÷(e·h-g·f)·d' ]]");
+
+    step("Power")
+        .test(CLEAR,
+              "[[2 3][5 6]] "
+              "[[11 12][14 15]] ^", ENTER)
+        .want("[[[[ 2 048 4 096 ]"
+              "   [ 16 384 32 768 ]]"
+              "  [[ 177 147 531 441 ]"
+              "   [ 4 782 969 14 348 907 ]]]"
+              " [[[ 48 828 125 244 140 625 ]"
+              "   [ 6 103 515 625 30 517 578 125 ]]"
+              "  [[ 362 797 056 2 176 782 336 ]"
+              "   [ 78 364 164 096 470 184 984 576 ]]]]");
+    step("Power (symbolic)")
+        .test(CLEAR, "[[a b][c d]][[e f][g h]] ^", ENTER)
+        .want("[[[[ 'a↑e' 'a↑f' ]"
+              "   [ 'a↑g' 'a↑h' ]]"
+              "  [[ 'b↑e' 'b↑f' ]"
+              "   [ 'b↑g' 'b↑h' ]]]"
+              " [[[ 'c↑e' 'c↑f' ]"
+              "   [ 'c↑g' 'c↑h' ]]"
+              "  [[ 'd↑e' 'd↑f' ]"
+              "   [ 'd↑g' 'd↑h' ]]]]");
+
     step("Addition of constant (extension)");
     test(CLEAR, "[[1 2] [3 4]] 3 +", ENTER)
         .want("[[ 4 5 ] [ 6 7 ]]");
@@ -6375,6 +6425,21 @@ void tests::matrix_functions()
         .want("[[ 'a÷x' 'b÷x' ] [ 'c÷x' 'd÷x' ]]");
     test(CLEAR, "x [[a b] [c d]] /", ENTER)
         .want("[[ 'x÷a' 'x÷b' ] [ 'x÷c' 'x÷d' ]]");
+
+    step("Power by constant (extension)");
+    test(CLEAR, "[[a b] [c d]] x ^", ENTER)
+        .want("[[ 'a↑x' 'b↑x' ] [ 'c↑x' 'd↑x' ]]");
+    test(CLEAR, "[[a b] [c d]] 2 ^", ENTER)
+        .want("[[ 'a²+b·c' 'a·b+b·d' ]"
+              " [ 'c·a+d·c' 'c·b+d²' ]]");
+    test(CLEAR, "[[a b] [c d]] 2.0 ^", ENTER)
+        .want("[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]");
+    test(CLEAR, "x [[a b] [c d]] ^", ENTER)
+        .want("[[ 'x↑a' 'x↑b' ] [ 'x↑c' 'x↑d' ]]");
+    test(CLEAR, "2 [[a b] [c d]] ^", ENTER)
+        .want("[[ '2↑a' '2↑b' ] [ '2↑c' '2↑d' ]]");
+    test(CLEAR, "2.0 [[a b] [c d]] ^", ENTER)
+        .want("[[ '2.↑a' '2.↑b' ] [ '2.↑c' '2.↑d' ]]");
 
     step("Invalid dimension for addition (second is larger)")
         .test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] +", ENTER)

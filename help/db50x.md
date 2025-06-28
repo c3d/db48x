@@ -632,6 +632,12 @@ operate on these items when it makes sense. Therefore:
   similar to how these operations apply to lists on the HP50G (which seems to
   be undocumented).
 
+* The `^` operation performs matrix operations if given an integer value as the
+  right argument, but will perform element-wise otherwise. For example,
+  `[[a b][c d] 2 ^` is the same as multiplying the array by itself, in other
+  words it returns `[[ 'a²+b·c' 'a·b+b·d' ] [ 'c·a+d·c' 'c·b+d²' ]]`. However,
+  `[[a b][c d] 2. ^` performs the operation element-wise and returns
+  `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
 
 ### Mathematics
 

@@ -1077,6 +1077,21 @@ algebraic_p arithmetic::non_numeric<struct pow>(algebraic_r x, algebraic_r y)
     if (!x || !y)
         return nullptr;
 
+    // Deal with arrays
+    if (array_g xa = x->as<array>())
+    {
+        // The integer case is dealt with through optimize, and must not
+        // be treated as element-by-element, so that we can raise a matrix
+        // to the third power.
+        if (!y->is_integer())
+            return xa->map(pow::evaluate, y);
+    }
+    else if (array_g ya = y->as<array>())
+    {
+        return ya->map(x, pow::evaluate);
+    }
+
+
     // Deal with the case of units
     if (unit_p xu = unit::get(x))
     {
@@ -1090,6 +1105,7 @@ algebraic_p arithmetic::non_numeric<struct pow>(algebraic_r x, algebraic_r y)
         }
         return unit::simple(xv, xe);
     }
+
 
     return optimize<struct pow>(x, y);
 }
