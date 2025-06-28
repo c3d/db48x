@@ -495,6 +495,7 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
         QClipboard *clipboard = QApplication::clipboard();
         QString text = clipboard->text();
+        text.replace("\r\n", "\n");
         QByteArray ba = text.toUtf8();
         if (size_t sz = ba.size())
         {
