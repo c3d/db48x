@@ -345,6 +345,9 @@ object::id algebraic::based_promotion(algebraic_g &x)
 //   Promote the value x to a based number
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return object::ID_object;
+
     id xt = x->type();
 
     switch (xt)
@@ -395,19 +398,22 @@ bool algebraic::to_integer(algebraic_g &x)
 //  Check if we can convert the number to an integer (or big integer)
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return false;
+
     id ty = x->type();
     switch(ty)
     {
     case ID_hwfloat:
         x = hwfloat_p(+x)->to_integer();
-        return true;
+        break;
     case ID_hwdouble:
         x = hwdouble_p(+x)->to_integer();
-        return true;
+        break;
     case ID_decimal:
     case ID_neg_decimal:
         x = decimal_p(+x)->to_integer();
-        return true;
+        break;
 
     case ID_integer:
     case ID_neg_integer:
@@ -417,7 +423,7 @@ bool algebraic::to_integer(algebraic_g &x)
     case ID_neg_fraction:
     case ID_big_fraction:
     case ID_neg_big_fraction:
-        return true;
+        break;
 
     case ID_unit:
     {
@@ -427,14 +433,14 @@ bool algebraic::to_integer(algebraic_g &x)
         if (to_integer(v))
         {
             x = unit::simple(v, u);
-            return true;
+            break;
         }
-        break;
     }
+    // fallthrough
     default:
-        break;
+        return false;
     }
-    return false;
+    return x;                   // Need x to be non-null
 }
 
 
@@ -448,14 +454,14 @@ bool algebraic::to_fraction(algebraic_g &x)
     {
     case ID_hwfloat:
         x = hwfloat_p(+x)->to_fraction();
-        return true;
+        break;
     case ID_hwdouble:
         x = hwdouble_p(+x)->to_fraction();
-        return true;
+        break;
     case ID_decimal:
     case ID_neg_decimal:
         x = decimal_p(+x)->to_fraction();
-        return true;
+        break;
 
     case ID_integer:
     case ID_neg_integer:
@@ -465,7 +471,7 @@ bool algebraic::to_fraction(algebraic_g &x)
     case ID_neg_fraction:
     case ID_big_fraction:
     case ID_neg_big_fraction:
-        return true;
+        break;
 
     case ID_rectangular:
     {
@@ -475,7 +481,7 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (!to_fraction(re) || !to_fraction(im))
             return false;
         x = rectangular::make(re, im);
-        return true;
+        break;
     }
     case ID_polar:
     {
@@ -485,7 +491,7 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (!to_fraction(mod) || !to_fraction(arg))
             return false;
         x = polar::make(mod, arg, object::ID_PiRadians);
-        return true;
+        break;
     }
     case ID_unit:
     {
@@ -495,14 +501,14 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (to_fraction(v))
         {
             x = unit::simple(v, u);
-            return true;
+            break;
         }
-        break;
     }
+    // fallthrough
     default:
-        break;
+        return false;
     }
-    return false;
+    return x;                   // We need x to be non-null
 }
 
 
@@ -554,7 +560,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         if (to_decimal(re, weak) && to_decimal(im, weak))
         {
             x = rectangular::make(re, im);
-            return true;
+            return x;
         }
         break;
     }
@@ -567,7 +573,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
             (mod->is_fraction() || to_decimal(arg, weak)))
         {
             x = polar::make(mod, arg, object::ID_PiRadians);
-            return true;
+            return x;
         }
         break;
     }
@@ -579,7 +585,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         if (to_decimal(v, weak))
         {
             x = unit::simple(v, u);
-            return true;
+            return x;
         }
         break;
     }
