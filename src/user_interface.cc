@@ -4942,7 +4942,7 @@ bool user_interface::handle_alpha(int key)
 
     static const unicode shifted[] =
     {
-        L'Σ', '^', L'√', L'∂', L'ρ', '(',
+        L'Σ', '^', L'√', L'∂', L'σ', '(',
         L'▶', '%', L'π', '<', '=', '>',
         '_', L'⇄', L'±', L'∡', '_',
         '_', '7', '8', '9', L'÷',
