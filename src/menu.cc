@@ -526,8 +526,8 @@ MENU(RangeMenu,
 // ----------------------------------------------------------------------------
      "…",       ID_SelfInsert,
      "±",       ID_SelfInsert,
-     "±σ",      ID_SelfInsert,
-     "±_%",      ID_SelfInsert);
+     "±\tσ",    ID_SelfInsert,
+     "±\t%",    ID_SelfInsert);
 
 MENU(VectorMenu,
 // ----------------------------------------------------------------------------
