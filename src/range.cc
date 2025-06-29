@@ -146,7 +146,9 @@ PARSE_BODY(range)
             if (cmark)
             {
                 div = integer::make(100);
-                div = xexpr * yexpr / div;
+                div = yexpr / div;
+                if (!xexpr->is_zero(false))
+                    div = xexpr * div;
                 offs = utf8_next(p.source, offs, max);
             }
             if (div->is_negative(false))
