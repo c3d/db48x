@@ -5293,7 +5293,7 @@ void tests::range_types()
         .test(CLEAR, "5 1…3", NOSHIFT, ID_pow).expect("5.…125.");
 
 #define TFNA(name, arg)                                         \
-    step(#name).test(CLEAR, arg " " #name, ENTER)
+    step(#name " (interval)").test(CLEAR, arg " " #name, ENTER)
 #define TFN(name)  TFNA(name, "1…3")
 
     TFN(sqrt).expect("1.…1.73205 08075 7");
@@ -5327,6 +5327,149 @@ void tests::range_types()
 #undef TFN
 #undef TFNA
 
+    step("Add delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, ADD).expect("3±8");
+    step("Subtract delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, SUB).expect("-1±8");
+    step("Multiply delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, MUL).expect("7±21");
+    step("Divide delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("-¹/₃±1");
+    step("Power delta ranges")
+        .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
+    step("Invert delta ranges")
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("-¹/₈±³/₈");
+    step("Negate delta ranges")
+        .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
+
+    step("Add delta ranges with promotion")
+        .test(CLEAR, "1±3 5", NOSHIFT, ADD).expect("6±3");
+    step("Subtract delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, SUB).expect("-4±3");
+    step("Multiply delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, MUL).expect("5±15");
+    step("Divide delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, DIV).expect("¹/₅±³/₅");
+    step("Power delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, ID_pow).expect("256±768");
+
+    step("Add delta ranges with promotion")
+        .test(CLEAR, "5 1±3", NOSHIFT, ADD).expect("6±3");
+    step("Subtract delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, SUB).expect("4±3");
+    step("Multiply delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, MUL).expect("5±15");
+    step("Divide delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("-⁵/₈±1 ⁷/₈");
+    step("Power delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, ID_pow).expect("312.52±312.48");
+
+#define TFNA(name, arg)                                 \
+    step(#name " (delta range)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1±3")
+
+    TFNA(sqrt, "3±1").expect("1.70710 67811 9±0.29289 32188 13");
+    TFN(sin).expect("0.01742 84885 21±-0.05232 79852 23");
+    TFN(cos).expect("0.99847 74386 39±0.00091 33883 8");
+    TFN(tan).expect("0.01750 30212 26±0.05242 37907 18");
+    TFNA(asin, "0.25±0.1").expect("14.55712 08367 °±5.93019 42780 2 °");
+    TFNA(acos, "0.25±0.1").expect("75.44287 91633 °±5.93019 42780 2 °");
+    TFN(atan).expect("6.26440 38545 8 °±69.69935 26775 °");
+    TFN(sinh).expect("11.83152 83946±15.45838 88025");
+    TFN(cosh).expect("14.15411 6418±13.15411 6418");
+    TFN(tanh).expect("0.01765 08598 32±0.98167 84399 07");
+    TFN(asinh).expect("0.32553 85360 41±1.76917 40112 2");
+    TFNA(acosh, "1.321±0.025").expect("0.78058 71062 93±0.02898 78937 9");
+    TFNA(atanh, "0.321±0.025").expect("0.33301 11698 75±0.02788 14094 98");
+    TFNA(log1p, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
+    TFNA(lnp1, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
+    TFN(expm1).expect("26.36674 26582±27.23140 7375");
+    TFNA(log, "3±1").expect("1.03972 07708 4±0.34657 35902 8");
+    TFNA(log10, "3±1").expect("0.45154 49934 96±0.15051 49978 32");
+    TFN(exp).expect("27.36674 26582±27.23140 7375");
+    TFN(exp10).expect("5 000.005±4 999.995");
+    TFN(exp2).expect("8.125±7.875");
+    TFN(erf).expect("0.00233 88597 82±0.99766 11248 01");
+    TFN(erfc).expect("0.99766 11402 18±0.99766 11248 01");
+    TFNA(tgamma, "1.321±0.025").expect("0.89482 58872 58±-0.00326 05508 06");
+    TFNA(lgamma, "1.321±0.025").expect("-0.11113 27576 28±-0.00364 37985 12");
+    TFNA(gamma, "1.321±0.025").expect("0.89482 58872 58±-0.00326 05508 06");
+    TFN(cbrt).expect("0.16374 00010 37±1.42366 10509 3");
+    TFN(norm).expect("2±2");
+#undef TFN
+#undef TFNA
+
+    step("Add percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, ADD).expect("3±4 ¹/₃%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, SUB).expect("-1±13%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, MUL).expect("2 ³/₁ ₀₀₀±7 ¹ ⁹⁷⁹/₂ ₀₀₃%");
+    step("Divide percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, DIV).expect("² ⁰⁰³/₃ ₉₉₀±7 ¹ ⁹⁷⁹/₂ ₀₀₃%");
+    step("Power percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, ID_pow).expect("1.00103 94929 8±6.29356 18446 3%");
+    step("Invert percent ranges")
+        .test(CLEAR, "1±3%", NOSHIFT, ID_inv).expect("1 ⁹/₉ ₉₉₁±3%");
+    step("Negate percent ranges")
+        .test(CLEAR, "1±3%", ENTER, ID_neg).expect("-1±3%");
+
+    step("Add percent ranges with promotion")
+        .test(CLEAR, "1±3% 5", NOSHIFT, ADD).expect("6±¹/₂%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, SUB).expect("-4±³/₄%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, MUL).expect("5±3%");
+    step("Divide percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, DIV).expect("¹/₅±3%");
+    step("Power percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, ID_pow).expect("1 ¹⁸⁰ ⁰⁸¹/₂₀ ₀₀₀ ₀₀₀±14 ⁹⁰ ⁰⁹⁴ ⁵⁷³/₁₀₀ ₉₀₀ ₄₀₅%");
+
+    step("Add percent ranges with promotion")
+        .test(CLEAR, "5 1±3%", NOSHIFT, ADD).expect("6±¹/₂%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, SUB).expect("4±³/₄%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, MUL).expect("5±3%");
+    step("Divide percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, DIV).expect("5 ⁴⁵/₉ ₉₉₁±3%");
+    step("Power percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, ID_pow).expect("5.00582 92857 2±4.82456 52123 7%");
+
+#define TFNA(name, arg)                                 \
+    step(#name " (percent range)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1±3%")
+
+    TFN(sqrt).expect("0.99988 74683 44±1.50033 76519 6%");
+    TFN(sin).expect("0.01745 24040 45±2.99969 56505 2%");
+    TFN(cos).expect("0.99984 75580 99±0.00091 39451 46%");
+    TFN(tan).expect("0.01745 50697 15±3.00060 87730 3%");
+    TFNA(asin, "0.25±0.1%").expect("14.47751 26791 °±0.10218 40366%");
+    TFNA(acos, "0.25±0.1%").expect("75.52248 73209 °±0.01958 84793 78%");
+    TFN(atan).expect("44.98710 84505 °±1.91069 30918 4%");
+    TFN(sinh).expect("1.17573 00738 5±3.93792 45500 1%");
+    TFN(cosh).expect("1.54377 50731 8±2.28409 72797 9%");
+    TFN(tanh).expect("0.76130 63134 13±1.65531 61613 5%");
+    TFN(asinh).expect("0.88121 44969 49±2.40735 92360 4%");
+    TFNA(acosh, "1.321±0.025%").expect("0.78123 00931 78±0.04897 49317 72%");
+    TFNA(atanh, "0.321±0.025%").expect("0.33276 15910 51±0.02688 68087 85%");
+    TFN(log1p).expect("0.69303 46679 02±2.16455 62403 6%");
+    TFN(lnp1).expect("0.69303 46679 02±2.16455 62403 6%");
+    TFN(expm1).expect("1.71950 51470 3±4.74326 51081 9%");
+    TFN(log).expect("-0.00045 02026 22±6 665.66639 654%");
+    TFN(log10).expect("-0.00019 55205 14±6 665.66639 654%");
+    TFN(exp).expect("2.71950 51470 3±2.99910 03238 8%");
+    TFN(exp10).expect("10.02386 80302±6.89678 89453 7%");
+    TFN(exp2).expect("2.00043 24232 9±2.07914 18713 2%");
+    TFN(erf).expect("0.84232 72522 45±1.47887 40570 9%");
+    TFN(erfc).expect("0.15767 27477 55±7.90051 50773 4%");
+    TFN(tgamma).expect("1.00089 09463 2±1.73255 59622 8%");
+    TFN(lgamma).expect("0.00074 04396 24±2 340.13590 506%");
+    TFN(gamma).expect("1.00089 09463 2±1.73255 59622 8%");
+    TFN(cbrt).expect("0.99989 99666 5±1.00026 68000 8%");
+    TFN(norm).expect("1±3%");
+#undef TFN
+#undef TFNA
 
 }
 
