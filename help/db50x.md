@@ -2259,11 +2259,30 @@ the `ComplexMenu`.
 ## Ranges
 
 Ranges (also called *intervals*) represent a range of numbers that show as `x…y`
-and represent any value that is known to be between `x` and `y`.
+and represent any value that is known to be between `x` and `y`. There are three range types that differ in the way they display:
 
-A range can also display or parse as `a±Δ`, where `a` is `(x+y)/2` and `Δ`
-is `(y-x)/2`, or as `a±Δ%`, where the `Δ` is expressed as a percentage of the
-average.
+* Explicit ranges show the lower and upper bounds, e.g. `2…4` to represent
+  the range of numbers between `2` and `4`.
+* Delta ranges show the middle point and the distance between that middle point
+  and the lower or upper bounds. For example `3±1` also represents values
+  between `2` and `4`.
+* Percent ranges show the middle point and a percentage of that middle value to
+  the lower and upper bound. For example, `2±50%` represents values between `1`
+  and `3`, the distance between `1` and `2` being `50%` of `2`. Note that if the
+  central value is `0`, the percentage will be shown relative to `1` and not
+  `0`, so that `-3…3` will show as `0±300%`
+
+The `Cycle` command (bound to the _EEX_ key) will cycle between the three range
+formats.
+
+Operations on ranges will compute the upper and lower bound of the result to
+create a new range. This applies to arithmetic operations:
+
+```rpl
+1…3 2…6 ÷
+@ Expecting ¹/₆…1 ¹/₂
+```
+
 
 ## Uncertain numbers
 
