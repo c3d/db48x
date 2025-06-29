@@ -400,9 +400,11 @@ public:
     }
 
     tests &match(cstring regexp, uint extrawait = 0);
-    tests &image(cstring name, int x=0, int y=0, int w=LCD_W, int h=LCD_H,
-                 uint extrawait = 0);
+    tests &image(cstring name, int x, int y, int w, int h, uint extrawait = 0);
+    tests &image(cstring name, uint extrawait=0);
     tests &image_noheader(cstring name, uint ignoremenus=0,
+                          uint extrawait = 0);
+    tests &image_nomenus(cstring name, uint ignoremenus=3,
                           uint extrawait = 0);
     tests &image_menus(cstring name, uint menus=3, uint extrawait = 0);
     tests &type(id ty, uint extrawait = 0);

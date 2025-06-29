@@ -185,7 +185,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            decimal_display_formats();
+            graphic_commands();
 
 #if 0
         if (onlyCurrent & 2)
@@ -12130,7 +12130,8 @@ void tests::regression_checks()
 
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
-        .noerror();             // Bug was "Invalid Plot Data"
+        .noerror()              // Bug was "Invalid Plot Data"
+        .test("'PPAR' PURGE", ENTER);
     step("Bug 1440: Conversion of integer to decimal may lose precision")
         .test("987654321 SQ ToDecimal 987654321 2 ^ ToDecimal -", ENTER)
         .expect("0");
@@ -12406,7 +12407,8 @@ void tests::plotting()
         .test(ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-yrng");
-    step("Restoring plot parameters").test(NOSHIFT, M, "'PPAR'", NOSHIFT, G);
+    step("Restoring plot parameters")
+        .test(ID_Swap, "'PPAR'", ID_Sto);
 
     step("Parametric plot: Program");
     test(CLEAR,
@@ -12547,15 +12549,21 @@ void tests::graphic_commands()
 {
     BEGIN(graphics);
 
+    step("Cleanup environment")
+        .test("'PPAR'", ID_ClearThingsMenu, ID_Purge)
+        .test("{} CLIP", ENTER);
+
     step("Extract graphic element")
-        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob)
+        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
         .image_noheader("num-grob")
-        .test("{ 10#5 10#3 } { 10#40 10#240 }", ID_GraphicsMenu, ID_Extract)
+        .test("{ 10#5 10#3 } { 10#40 10#240 }",
+              ID_GraphicsMenu, F6, F6, ID_Extract, EXIT)
         .image_noheader("num-grob-extracted");
     step("Extract graphic element")
-        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob)
+        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
         .image_noheader("num-grob")
-        .test("{ 10#15 10#13 } { 10#70 10#24 }", ID_GraphicsMenu, ID_Extract)
+        .test("{ 10#15 10#13 } { 10#70 10#24 }",
+              ID_GraphicsMenu, F6, F6, ID_Extract, EXIT)
         .image_noheader("num-grob-extracted2");
 
     step("Send to LCD")
@@ -12970,59 +12978,62 @@ void tests::graphic_commands()
         .noerror();
 
     step("GraphicAppend")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 4", ID_ToGrob,
               "DEFGH 2", ID_ToGrob,
-              ID_GraphicAppend, EXIT)
+              F6, ID_GraphicAppend, EXIT)
         .image_noheader("graph-append");
     step("GraphicStack")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 2", ID_ToGrob,
               "DEFGH 4", ID_ToGrob,
-              ID_GraphicStack, EXIT)
+              F6, ID_GraphicStack, EXIT)
         .image_noheader("graph-stack");
     step("GraphicSubscript")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 0", ID_ToGrob,
               "DEFGH 1", ID_ToGrob,
-              ID_GraphicSubscript, EXIT)
+              F6, ID_GraphicSubscript, EXIT)
         .image_noheader("graph-subscript");
     step("GraphicExponent")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 4", ID_ToGrob,
               "DEFGH 3", ID_ToGrob,
-              ID_GraphicExponent, EXIT)
+              F6, ID_GraphicExponent, EXIT)
         .image_noheader("graph-exponent");
     step("GraphicRatio")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 3", ID_ToGrob,
               "DEFGH 0", ID_ToGrob,
-              ID_GraphicRatio, EXIT)
+              F6, ID_GraphicRatio, EXIT)
         .image_noheader("graph-ratio");
 
     step("GraphicRoot")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 0", ID_GraphicRoot, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
+              "ABC 0", ID_ToGrob,
+              F6, ID_GraphicRoot, EXIT)
         .image_noheader("graph-root");
     step("GraphicParentheses")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 2.1", ID_ToGrob, ID_GraphicParentheses, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6,
+              "ABC 2.1", ID_ToGrob,
+              F6, ID_GraphicParentheses, EXIT)
         .image_noheader("graph-paren");
     step("GraphicNorm")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 3.5", ID_GraphicNorm, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6,
+              "ABC 3.5", ID_ToGrob,
+              F6, ID_GraphicNorm, EXIT)
         .image_noheader("graph-norm");
 
     step("GraphicSum")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicSum, EXIT)
         .image_noheader("graph-sum");
     step("GraphicProduct")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicProduct, EXIT)
         .image_noheader("graph-product");
     step("GraphicIntegral")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicIntegral,EXIT)
         .image_noheader("graph-integral");
 
@@ -13469,19 +13480,21 @@ void tests::user_input_commands()
     BEGIN(input);
 
     step("Prompt with single-line display")
-        .test(CLEAR, EXIT, "\"Enter value\" PROMPT 1 +", ENTER)
-        .image("prompt-display")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" PROMPT 1 +",
+              ENTER)
+        .image("prompt-display", 2000)
         .test("123")
-        .image("prompt-entry")
+        .image("prompt-entry", 2000)
         .test(ENTER)
         .expect("123")
         .test(RUNSTOP)
         .expect("124");
     step("Prompt with 2 lines display")
         .test(CLEAR, EXIT, "123 456 \"Enter value\nNow!\" PROMPT 1 +", ENTER)
-        .image("prompt2-display")
+        .image("prompt2-display", 2000)
         .test("123")
-        .image("prompt2-entry")
+        .image("prompt2-entry", 2000)
         .test(ENTER)
         .expect("123")
         .test(RUNSTOP)
@@ -13490,33 +13503,33 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter first value\" PROMPT "
               "\"Enter second value\" PROMPT +", ENTER)
-        .image("prompts-display1")
+        .image("prompts-display1", 2000)
         .test("123", ENTER)
         .expect("123")
         .test(RUNSTOP, "456")
-        .image("prompts-display2")
+        .image("prompts-display2", 2000)
         .test(ENTER, RUNSTOP)
         .got("579");
 
     step("Input command with text")
-        .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +",ENTER)
-        .image("input-display")
+        .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +", ENTER)
+        .image("input-display", 2000)
         .test("123")
-        .image("input-display-123")
+        .image("input-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
 
     step("Input command with list")
-        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +",ENTER)
-        .image("input-list-display")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +", ENTER)
+        .image("input-list-display", 2000)
         .test("123")
         .image("input-list-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
 
     step("Input command with list and position")
-        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 2000)
         .test("123")
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
@@ -13524,17 +13537,17 @@ void tests::user_input_commands()
 
     step("Input command for text")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 text } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 text } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 20000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image("input-pos2-display-123", 20000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for alpha")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 2000)
         .test("123")
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
@@ -13542,39 +13555,39 @@ void tests::user_input_commands()
 
     step("Input command text")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +", ENTER)
+        .image_nomenus("input-pos2-alpha-display", 3, 2000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image_nomenus("input-pos2-alpha-display-123", 3, 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for alg")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +", ENTER)
+        .image_nomenus("input-pos2-alg-display", 2000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image_nomenus("input-pos2-alg-display-123", 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for algebraic")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 algebraic } INPUT",ENTER)
+              "\"Enter value\" { \"Data\" 3 algebraic } INPUT", ENTER)
         .test("123", ENTER)
         .type(ID_symbol)
         .got("Da123ta");
 
     step("Input command for expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"Data\" 3 expression } INPUT", ENTER)
         .test("123", ENTER)
         .type(ID_expression)
         .got("'Da123ta'");
 
     step("Input command with for algebraic number")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 algebraic } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 algebraic } INPUT", ENTER)
         .test("123+").editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
@@ -13582,7 +13595,7 @@ void tests::user_input_commands()
 
     step("Input command for expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
         .test("123+").editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
@@ -13590,7 +13603,7 @@ void tests::user_input_commands()
 
     step("Input command for arithmetic expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
         .test("123+X").editor("123+X")
         .test(ENTER).type(ID_expression).got("'123+X'");
 
@@ -15023,19 +15036,34 @@ tests &tests::image(cstring file, int x, int y, int w, int h, uint extrawait)
 }
 
 
-tests &tests::image_noheader(cstring name, uint ignoremenus, uint extrawait)
+tests &tests::image(cstring name, uint extrawait)
+// ----------------------------------------------------------------------------
+//   Image, waiting some extra time
+// ----------------------------------------------------------------------------
+{
+    return image(name, 0, 0, LCD_W, LCD_H, extrawait);
+}
+
+
+tests &tests::image_noheader(cstring name, uint ignoremenus, uint xtrawait)
 // ----------------------------------------------------------------------------
 //   Image, skipping the header area
 // ----------------------------------------------------------------------------
 {
     const int header_h = 23;
     const int menu_h   = 25 * ignoremenus;
-    return image(name,
-                 0,
-                 header_h,
-                 LCD_W,
-                 LCD_H - header_h - menu_h,
-                 extrawait);
+    return image(name, 0, header_h, LCD_W, LCD_H - header_h - menu_h, xtrawait);
+}
+
+
+tests &tests::image_nomenus(cstring name, uint ignoremenus, uint xtrawait)
+// ----------------------------------------------------------------------------
+//   Image, skipping the menus area
+// ----------------------------------------------------------------------------
+{
+    const int header_h = 0;
+    const int menu_h   = 25 * ignoremenus;
+    return image(name, 0, header_h, LCD_W, LCD_H - header_h - menu_h, xtrawait);
 }
 
 
