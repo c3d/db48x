@@ -108,7 +108,7 @@ PARSE_BODY(range)
     unicode cp    = p.separator;
     bool    imark = cp == range::INTERVAL_MARK;
     bool    pmark = cp == drange::PLUSMINUS_MARK;
-    bool    smark = cp == uncertain::SIGMA_MARK;
+    bool    smark = p.precedence != PARENTHESES && cp == uncertain::SIGMA_MARK;
     if (!imark && !pmark && !smark)
         return SKIP;
     offs = utf8_next(p.source, offs, max);

@@ -112,6 +112,7 @@ TESTS(ctypes,           "Complex types");
 TESTS(carith,           "Complex arithmetic");
 TESTS(cfunctions,       "Complex functions");
 TESTS(autocplx,         "Automatic complex promotion");
+TESTS(ranges,           "Range types");
 TESTS(units,            "Units and conversions");
 TESTS(lists,            "List operations");
 TESTS(sorting,          "Sorting operations");
@@ -185,7 +186,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            graphic_commands();
+            range_types();
 
 #if 0
         if (onlyCurrent & 2)
@@ -227,6 +228,7 @@ void tests::run(uint onlyCurrent)
         complex_arithmetic();
         complex_functions();
         complex_promotion();
+        range_types();
         units_and_conversions();
         list_functions();
         sorting_functions();
@@ -5222,6 +5224,73 @@ void tests::complex_promotion()
     step("Restore complex mode")
         .test(CLEAR, "'ComplexResults' purge", ENTER).noerror()
         .test("-103 FS?", ENTER).expect("False");
+}
+
+
+void tests::range_types()
+// ----------------------------------------------------------------------------
+//   Ranges (intervals, delta and percentage) data typess
+// ----------------------------------------------------------------------------
+{
+    BEGIN(ranges);
+
+    step("Interval form")
+        .test(CLEAR, "1…3", ENTER).type(ID_range).expect("1…3");
+    step("Delta form")
+        .test(CLEAR, "1±3", ENTER).type(ID_drange).expect("1±3");
+    step("Percentage form")
+        .test(CLEAR, "1±300%", ENTER).type(ID_prange).expect("1±300%");
+    step("Uncertain (sigma at end)")
+        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±3σ");
+    step("Uncertain (sigma at beginning)")
+        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+    step("Uncertain (sigma in the middle)")
+        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+
+    step("Cycle")
+        .test(CLEAR, "1…3", ENTER).expect("1…3")
+        .test(EEX).expect("2±1")
+        .test(EEX).expect("2±50%")
+        .test(EEX).expect("1…3")
+        .test(EEX).expect("2±1")
+        .test(EEX).expect("2±50%");
+
+    step("Add intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
+    step("Subtract intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, SUB).expect("-4…1");
+    step("Multiply intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, MUL).expect("2…15");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
+    step("Power intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, ID_pow).expect("1.…243.");
+    step("Invert intervals")
+        .test(CLEAR, "1…3", NOSHIFT, ID_inv).expect("¹/₃…1");
+    step("Negate intervals")
+        .test(CLEAR, "1…3", ENTER, ID_neg).expect("-3…-1");
+
+    step("Add intervals with promotion")
+        .test(CLEAR, "1…3 5", NOSHIFT, ADD).expect("6…8");
+    step("Subtract intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, SUB).expect("-4…-2");
+    step("Multiply intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, MUL).expect("5…15");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, DIV).expect("¹/₅…³/₅");
+    step("Power intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, ID_pow).expect("1…243");
+
+    step("Add intervals with promotion")
+        .test(CLEAR, "5 1…3", NOSHIFT, ADD).expect("6…8");
+    step("Subtract intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, SUB).expect("2…4");
+    step("Multiply intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, MUL).expect("5…15");
+    step("Divide intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, DIV).expect("1 ²/₃…5");
+    step("Power intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, ID_pow).expect("5.…125.");
 }
 
 
@@ -14523,7 +14592,7 @@ tests &tests::itest(cstring txt)
         case L'↓': k = I;           alpha = true; xshift = true; break;
         case L'ⅈ': k = G; fn = F1;  alpha = false; shift = true; break;
         case L'∡': k = G; fn = F2;  alpha = false; shift = true; break;
-        case L'ρ': k = E;           alpha = true;  shift = true; break;
+        case L'σ': k = E;           alpha = true;  shift = true; break;
         case L'θ': k = E;           alpha = true; xshift = true; break;
         case L'π': k = I;           alpha = true;  shift = true; break;
         case L'Σ': k = A;           alpha = true;  shift = true; break;
@@ -14535,6 +14604,8 @@ tests &tests::itest(cstring txt)
         case L'≥': k = L;           alpha = true; xshift = true; break;
         case L'√': k = C;           alpha = true;  shift = true; break;
         case L'∫': k = KEY8;        alpha = true; xshift = true; break;
+        case L'…': k = SUB;         alpha = true; xshift = true; break;
+        case L'±': k = N;           alpha = true;  shift = true; break;
 
             // Special characters that require the characters menu
 #define NEXT        itest(ID_ToolsMenu); k = RESERVED2; break
@@ -14595,7 +14666,7 @@ tests &tests::itest(cstring txt)
         case L'ν': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F3); NEXT;
         case L'ξ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F4); NEXT;
         case L'ο': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F5); NEXT;
-        case L'σ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F3); NEXT;
+        case L'ρ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F2); NEXT;
         case L'τ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F4); NEXT;
         case L'υ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F5); NEXT;
         case L'φ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F6, F1); NEXT;
