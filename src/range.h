@@ -112,6 +112,8 @@ public:
     RANGE_FUNCTION(erfc);
     RANGE_FUNCTION(tgamma);
     RANGE_FUNCTION(lgamma);
+
+    RANGE_FUNCTION(abs);
 };
 
 

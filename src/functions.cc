@@ -565,7 +565,14 @@ FUNCTION_BODY(neg)
         return polar::make(-polar_p(+x)->mod(),
                            polar_p(+x)->arg(object::ID_PiRadians),
                            object::ID_PiRadians);
-
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_g r = range_p(+x);
+        return -r;
+    }
     case ID_unit:
         return unit::simple(neg::run(unit_p(+x)->value()),
                             unit_p(+x)->uexpr());
@@ -635,6 +642,15 @@ FUNCTION_BODY(abs)
     case ID_rectangular:
     case ID_polar:
         return complex_p(+x)->mod();
+
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_g r = range_p(+x);
+        return range::abs(r);
+    }
 
     case ID_unit:
         return unit::simple(abs::run(unit_p(+x)->value()),

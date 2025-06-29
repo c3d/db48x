@@ -706,12 +706,39 @@ RANGE_BODY(tgamma)
     return gamma(tgamma::evaluate, r, false);
 }
 
+
 RANGE_BODY(lgamma)
 // ----------------------------------------------------------------------------
 //   Range implementation of lgamma
 // ----------------------------------------------------------------------------
 {
     return gamma(lgamma::evaluate, r, true);
+}
+
+
+RANGE_BODY(abs)
+// ----------------------------------------------------------------------------
+//   Range implementation of abs
+// ----------------------------------------------------------------------------
+{
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    bool        lneg = lo->is_negative(false);
+    bool        hneg = hi->is_negative(false);
+    if (lneg)
+        lo = -lo;
+    if (hneg)
+        hi = -hi;
+    if (lneg != hneg)
+    {
+        range::sort(lo, hi);
+        lo = integer::make(0);
+    }
+    else if (lneg)
+    {
+        std::swap(lo, hi);
+    }
+    return range::make(r->type(), lo, hi);
 }
 
 
