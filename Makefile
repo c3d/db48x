@@ -131,10 +131,16 @@ cmp-% compare-%:
 update-%:
 	mv $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
 	rm -f $*.png
+updates-%:
+	$(MAKE) update-$* color-update-$*
+cmps-% compares-%:
+	$(MAKE) compare-$* color-compare-$*
 
 BAD_IMAGES=$(wildcard $(IMAGES)/bad/*.png)
 compare: $(BAD_IMAGES:$(IMAGES)/bad/%.png=cmp-%)
 update: $(BAD_IMAGES:$(IMAGES)/bad/%.png=update-%)
+updates: update color-update
+compares: compare color-compare
 .PHONY: compare update
 
 keyboard:				\
