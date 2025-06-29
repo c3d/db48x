@@ -1159,6 +1159,8 @@ void ui_load_keymap(cstring name)
 }
 
 
+RECORDER(image_check,       16, "Comparison of images in Qt");
+
 bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 // ----------------------------------------------------------------------------
 //   Check if the screen matches a given file
@@ -1179,7 +1181,8 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
         img.save(name, "PNG");
         return true;
     }
-    bool ok = data.toImage() == img.toImage();
+    bool ok         = data.toImage() == img.toImage();
+    uint mismatched = 0;
     if (!ok)
     {
         // Workaround for what appears to be a Qt bug, seen on Input test
@@ -1201,12 +1204,14 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
                 for (int y = 0; y < rh; y++)
                 {
                     QRgb rc = r.pixel(x, y);
-                    QRgb ic = r.pixel(x, y);
+                    QRgb ic = i.pixel(x, y);
                     if (rc != ic)
-                        ok = false;
+                        mismatched++;
                 }
             }
+            ok = mismatched < 5;
         }
+        record(image_check, "%+s: %u mismatched", file, mismatched);
     }
     return ok;
 }
