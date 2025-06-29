@@ -389,6 +389,8 @@ static range_p monotonic(algebraic_fn fn, range_r r, bool down = false)
 //   Compute monotonic functions
 // ----------------------------------------------------------------------------
 {
+    if (!r)
+        return nullptr;
     algebraic_g lo   = r->lo();
     algebraic_g hi   = r->hi();
     object::id  type = r->type();
@@ -421,6 +423,8 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
 //   Compute interval for a sin or a cos
 // ----------------------------------------------------------------------------
 {
+    if (!r)
+        return nullptr;
     algebraic_g lo    = r->lo();
     algebraic_g hi    = r->hi();
     object::id  amode = Settings.AngleMode();
@@ -530,6 +534,8 @@ RANGE_BODY(cosh)
 //   Range implementation of cosh
 // ----------------------------------------------------------------------------
 {
+    if (!r)
+        return nullptr;
     algebraic_g lo   = r->lo();
     algebraic_g hi   = r->hi();
     bool        lneg = lo->is_negative(false);
@@ -673,6 +679,8 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
 //   Range implementation of gamma and lgamm
 // ----------------------------------------------------------------------------
 {
+    if (!r)
+        return nullptr;
     algebraic_g lo   = r->lo();
     algebraic_g hi   = r->hi();
     bool        lneg = lo->is_negative(false);
