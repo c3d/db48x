@@ -155,6 +155,7 @@ PARSE_BODY(range)
             xexpr = xexpr - div;
             type = cmark ? ID_prange : ID_drange;
         }
+        range::sort(xexpr, yexpr);
         p.out = range::make(type, xexpr, yexpr);
     }
 
