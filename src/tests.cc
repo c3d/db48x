@@ -5291,6 +5291,43 @@ void tests::range_types()
         .test(CLEAR, "5 1…3", NOSHIFT, DIV).expect("1 ²/₃…5");
     step("Power intervals")
         .test(CLEAR, "5 1…3", NOSHIFT, ID_pow).expect("5.…125.");
+
+#define TFNA(name, arg)                                         \
+    step(#name).test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1…3")
+
+    TFN(sqrt).expect("1.…1.73205 08075 7");
+    TFN(sin).expect("0.05233 59562 43…0.01745 24064 37");
+    TFN(cos).expect("0.99862 95347 55…0.99984 76951 56");
+    TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
+    TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
+    TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
+    TFN(atan).expect("45. °…71.56505 11771 °");
+    TFN(sinh).expect("1.17520 11936 4…10.01787 49274");
+    TFN(cosh).expect("1.54308 06348 2…10.06766 19958");
+    TFN(tanh).expect("0.76159 41559 56…0.99505 47536 87");
+    TFN(asinh).expect("0.88137 35870 2…1.81844 64592 3");
+    TFNA(acosh, "1.321…1.325").expect("0.78123 02051 96…0.78584 80192 36");
+    TFNA(atanh, "0.321…0.325").expect("0.33276 15884 82…0.33722 75237 74");
+    TFN(log1p).expect("0.69314 71805 6…1.38629 43611 2");
+    TFN(lnp1).expect("0.69314 71805 6…1.38629 43611 2");
+    TFN(expm1).expect("1.71828 18284 6…19.08553 69232");
+    TFN(log).expect("0.…1.09861 22886 7");
+    TFN(log10).expect("0.…0.47712 12547 2");
+    TFN(exp).expect("2.71828 18284 6…20.08553 69232");
+    TFN(exp10).expect("10.…1 000.");
+    TFN(exp2).expect("2.…8.");
+    TFN(erf).expect("0.84270 07929 5…0.99997 79095 03");
+    TFN(erfc).expect("0.00002 20904 97…0.15729 92070 5");
+    TFN(tgamma).expect("1.…2.");
+    TFN(lgamma).expect("0.…0.69314 71805 6");
+    TFN(gamma).expect("1.…2.");
+    TFN(cbrt).expect("1.…1.44224 95703 1");
+    TFN(norm).expect("1…3");
+#undef TFN
+#undef TFNA
+
+
 }
 
 
