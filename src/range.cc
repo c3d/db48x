@@ -132,6 +132,12 @@ PARSE_BODY(range)
     // Check if we give a percentage
     cp = !smark && offs < max ? utf8_codepoint(p.source + offs) : 0;
     bool cmark = cp == '%';
+    if (!smark)
+    {
+        smark = cp == uncertain::SIGMA_MARK;
+        if (smark)
+            offs = utf8_next(p.source, offs, max);
+    }
 
     if (smark)
     {
@@ -236,8 +242,8 @@ RENDER_BODY(uncertain)
     algebraic_g s = go->stddev();
     a->render(r);
     r.put(unicode(drange::PLUSMINUS_MARK));
-    r.put(unicode(uncertain::SIGMA_MARK));
     s->render(r);
+    r.put(unicode(uncertain::SIGMA_MARK));
     return r.size();
 }
 
