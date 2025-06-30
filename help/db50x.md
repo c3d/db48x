@@ -3728,6 +3728,40 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.9 "Headrest" - Ranges
+
+This release introduces four range types to perform computations on ranges, and
+fixes serious graphical regressions that remained undetected by the test suite.
+
+### New features
+
+* Three range types, known as _interval_ (`1…3`), _delta range_ (`2±1`) and
+  _percent range_ (`2±50%`), for which arithmetic and most operations have been
+  implemented.
+* An uncertain type (`2±3σ`), for which arithmetic and operations are not
+  implemented yet.
+* A new flag, `ShowAsDecimal`, presents integers and fractions using a decimal
+  format. This is useful for people working in banking, who can use `2 FIX` mode
+  for all values. In that mode, `50` will display as `50.00`, and `3/4` will
+  display as `0.75`. The `Show` command still shows the original value.
+* The simulator now strips CR/LF when pasting on Windows.
+* The `^` operator now operates on arrays
+
+### Bug fixes
+
+* The image comparison code has been broken since January. As a result,
+  various regression regarding graphical output remained undetected.
+* One particular case is the generation of incorrect BMP files after the default
+  format for graphic objects was switched to `bitmap`.
+* A possible crash was eliminated when converting a number to integer, to
+  fraction or to decimal.
+
+### Improvements
+
+* The `σ` (used for uncertain numbers) replaces `ρ` (unused at the moment) on
+  the keyboard in alpha mode.
+
+
 ## Release 0.9.8 "Crowdfeeding" - Bug fixes
 
 This is a minor release with bug fixes.
