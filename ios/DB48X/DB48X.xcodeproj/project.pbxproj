@@ -738,6 +738,20 @@
 		6F0FDDE02C7934E500C8357F /* TorsionalPendulum.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3B12C63E4FA00C8357F /* TorsionalPendulum.bmp */; };
 		6F0FDDE12C7934E500C8357F /* Triangle.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3C92C63E4FB00C8357F /* Triangle.bmp */; };
 		6F0FDDE22C7934E500C8357F /* VoltageDivider.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3892C63E4F700C8357F /* VoltageDivider.bmp */; };
+		6F0FF8802E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8812E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8822E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8832E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8842E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8852E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8862E142A100023F6CC /* range.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF87F2E142A100023F6CC /* range.cc */; };
+		6F0FF8892E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88A2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88B2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88C2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88D2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88E2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
+		6F0FF88F2E142B360023F6CC /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F0FF8882E142B360023F6CC /* finance.cc */; };
 		6F10E0722CE24B0E00C8357F /* keymap.cfg in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
 		6F10E0732CE24B0E00C8357F /* 42style.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06D2CE24B0E00C8357F /* 42style.48k */; };
 		6F10E0742CE24B0E00C8357F /* db48x.48k in Resources */ = {isa = PBXBuildFile; fileRef = 6F10E06E2CE24B0E00C8357F /* db48x.48k */; };
@@ -808,13 +822,6 @@
 		6F10E0B52CE24B8600C8357F /* keymap.cfg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E06F2CE24B0E00C8357F /* keymap.cfg */; };
 		6F10E0B62CE24B8600C8357F /* legacy.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0702CE24B0E00C8357F /* legacy.48k */; };
 		6F10E0B72CE24B8600C8357F /* true42.48k in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F10E0712CE24B0E00C8357F /* true42.48k */; };
-		6F11C9752D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C9762D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C9772D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C9782D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C9792D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C97A2D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
-		6F11C97B2D6F76BC008AE248 /* finance.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F11C9742D6F76BC008AE248 /* finance.cc */; };
 		6F18F27F2C2DAC3400C8357F /* polynomial.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6F18F27D2C2DAC3400C8357F /* polynomial.cc */; };
 		6F2AC36D2C63640C00C8357F /* shifts.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35B2C63640C00C8357F /* shifts.bmp */; };
 		6F2AC36E2C63640C00C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
@@ -2614,13 +2621,15 @@
 		6F0FDC592C7934DF00C8357F /* DB40X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB40X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0FDD1A2C7934E300C8357F /* DB48X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB48X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0FDDE62C7934E500C8357F /* DB50X release.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DB50X release.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6F0FF87E2E142A100023F6CC /* range.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = range.h; path = "/Users/ddd/Work/calc/db48x-ios/src/range.h"; sourceTree = "<absolute>"; };
+		6F0FF87F2E142A100023F6CC /* range.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = range.cc; path = "/Users/ddd/Work/calc/db48x-ios/src/range.cc"; sourceTree = "<absolute>"; };
+		6F0FF8872E142B360023F6CC /* finance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = finance.h; path = "/Users/ddd/Work/calc/db48x-ios/src/finance.h"; sourceTree = "<absolute>"; };
+		6F0FF8882E142B360023F6CC /* finance.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = finance.cc; path = "/Users/ddd/Work/calc/db48x-ios/src/finance.cc"; sourceTree = "<absolute>"; };
 		6F10E06D2CE24B0E00C8357F /* 42style.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = 42style.48k; sourceTree = "<group>"; };
 		6F10E06E2CE24B0E00C8357F /* db48x.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = db48x.48k; sourceTree = "<group>"; };
 		6F10E06F2CE24B0E00C8357F /* keymap.cfg */ = {isa = PBXFileReference; lastKnownFileType = text; path = keymap.cfg; sourceTree = "<group>"; };
 		6F10E0702CE24B0E00C8357F /* legacy.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = legacy.48k; sourceTree = "<group>"; };
 		6F10E0712CE24B0E00C8357F /* true42.48k */ = {isa = PBXFileReference; lastKnownFileType = text; path = true42.48k; sourceTree = "<group>"; };
-		6F11C9732D6F76BC008AE248 /* finance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = finance.h; sourceTree = "<group>"; };
-		6F11C9742D6F76BC008AE248 /* finance.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = finance.cc; sourceTree = "<group>"; };
 		6F18F27D2C2DAC3400C8357F /* polynomial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polynomial.cc; path = ../../../src/polynomial.cc; sourceTree = "<group>"; };
 		6F18F27E2C2DAC3400C8357F /* polynomial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polynomial.h; path = ../../../src/polynomial.h; sourceTree = "<group>"; };
 		6F2AC35B2C63640C00C8357F /* shifts.bmp */ = {isa = PBXFileReference; lastKnownFileType = image.bmp; path = shifts.bmp; sourceTree = "<group>"; };
@@ -3630,137 +3639,139 @@
 		6FE7EFE12B95E2F600C8357F /* Runtime */ = {
 			isa = PBXGroup;
 			children = (
-				6F11C9732D6F76BC008AE248 /* finance.h */,
-				6F11C9742D6F76BC008AE248 /* finance.cc */,
-				6FE7F0142B95E37300C8357F /* algebraic.cc */,
 				6FE7F0082B95E37300C8357F /* algebraic.h */,
-				6FE7F0372B95E37400C8357F /* arithmetic.cc */,
+				6FE7F0142B95E37300C8357F /* algebraic.cc */,
 				6FE7F0132B95E37300C8357F /* arithmetic.h */,
-				6FE7EFFC2B95E37200C8357F /* array.cc */,
+				6FE7F0372B95E37400C8357F /* arithmetic.cc */,
 				6FE7F0402B95E37400C8357F /* array.h */,
+				6FE7EFFC2B95E37200C8357F /* array.cc */,
 				6F4528CE2B9C0F4E00C8357F /* beep.h */,
-				6FE7F0542B95E37400C8357F /* bignum.cc */,
 				6FE7F0262B95E37300C8357F /* bignum.h */,
+				6FE7F0542B95E37400C8357F /* bignum.cc */,
 				6FE7F0012B95E37200C8357F /* blitter.h */,
-				6FCEDA962B95F28F00C8357F /* catalog.cc */,
 				6F4528C92B9C0F4E00C8357F /* catalog.h */,
-				6FD555822B995F8800C8357F /* characters.cc */,
+				6FCEDA962B95F28F00C8357F /* catalog.cc */,
 				6FD555832B995F8900C8357F /* characters.h */,
-				6FE7F0302B95E37400C8357F /* command.cc */,
+				6FD555822B995F8800C8357F /* characters.cc */,
 				6FE7F0552B95E37400C8357F /* command.h */,
-				6FE7F02C2B95E37300C8357F /* comment.cc */,
+				6FE7F0302B95E37400C8357F /* command.cc */,
 				6F4528CF2B9C0F4E00C8357F /* comment.h */,
-				6FE7F0152B95E37300C8357F /* compare.cc */,
+				6FE7F02C2B95E37300C8357F /* comment.cc */,
 				6F4528CD2B9C0F4E00C8357F /* compare.h */,
-				6FE7F0322B95E37400C8357F /* complex.cc */,
+				6FE7F0152B95E37300C8357F /* compare.cc */,
 				6FE7F0342B95E37400C8357F /* complex.h */,
-				6FE7EFFD2B95E37200C8357F /* conditionals.cc */,
+				6FE7F0322B95E37400C8357F /* complex.cc */,
 				6F4528C82B9C0F4E00C8357F /* conditionals.h */,
-				6F87878D2CA9E25500C8357F /* library */,
+				6FE7EFFD2B95E37200C8357F /* conditionals.cc */,
 				6FE7750B2B97966E00C8357F /* config */,
-				6FE7F01D2B95E37300C8357F /* constants.cc */,
 				6FE7EFEB2B95E37200C8357F /* constants.h */,
+				6FE7F01D2B95E37300C8357F /* constants.cc */,
 				6FC83CA42CC63BDE00C8357F /* custom.h */,
 				6FC83CA52CC63BDE00C8357F /* custom.cc */,
-				6FE7F0392B95E37400C8357F /* datetime.cc */,
 				6FE7F0522B95E37400C8357F /* datetime.h */,
+				6FE7F0392B95E37400C8357F /* datetime.cc */,
+				6FE7F03D2B95E37400C8357F /* decimal.h */,
+				6FE7EFEC2B95E37200C8357F /* decimal.cc */,
 				6FE7F0362B95E37400C8357F /* decimal-e.h */,
 				6F4528C72B9C0F4E00C8357F /* decimal-e.txt */,
 				6FE7EFE92B95E37200C8357F /* decimal-pi.h */,
 				6F4528CC2B9C0F4E00C8357F /* decimal-pi.txt */,
-				6FE7EFEC2B95E37200C8357F /* decimal.cc */,
-				6FE7F03D2B95E37400C8357F /* decimal.h */,
 				6F2AC5E82C64195700C8357F /* dm32 */,
 				6F2AC5E22C6418CC00C8357F /* dm42 */,
 				6FE7F0472B95E37400C8357F /* dmcp */,
-				6F4528C52B9C0F4E00C8357F /* equations.cc */,
 				6F4528C62B9C0F4E00C8357F /* equations.h */,
+				6F4528C52B9C0F4E00C8357F /* equations.cc */,
 				6FE7EFE22B95E37200C8357F /* errors.tbl */,
-				6FE7EFFB2B95E37200C8357F /* expression.cc */,
 				6FE7F0272B95E37300C8357F /* expression.h */,
-				6FE7F0512B95E37400C8357F /* file.cc */,
+				6FE7EFFB2B95E37200C8357F /* expression.cc */,
 				6FE7F00D2B95E37300C8357F /* file.h */,
-				6FE7F00C2B95E37300C8357F /* files.cc */,
+				6FE7F0512B95E37400C8357F /* file.cc */,
 				6FE7F0112B95E37300C8357F /* files.h */,
-				6FE7F0122B95E37300C8357F /* font.cc */,
+				6FE7F00C2B95E37300C8357F /* files.cc */,
+				6F0FF8872E142B360023F6CC /* finance.h */,
+				6F0FF8882E142B360023F6CC /* finance.cc */,
 				6FE7F0022B95E37200C8357F /* font.h */,
+				6FE7F0122B95E37300C8357F /* font.cc */,
 				6FCEDA592B95ED9600C8357F /* fonts */,
-				6FE7F00B2B95E37300C8357F /* fraction.cc */,
 				6FE7F01E2B95E37300C8357F /* fraction.h */,
-				6FE7EFFA2B95E37200C8357F /* functions.cc */,
+				6FE7F00B2B95E37300C8357F /* fraction.cc */,
 				6FE7EFF72B95E37200C8357F /* functions.h */,
-				6FE7F01F2B95E37300C8357F /* graphics.cc */,
+				6FE7EFFA2B95E37200C8357F /* functions.cc */,
 				6FE7F00E2B95E37300C8357F /* graphics.h */,
-				6FE7F03B2B95E37400C8357F /* grob.cc */,
+				6FE7F01F2B95E37300C8357F /* graphics.cc */,
 				6FE7F0282B95E37300C8357F /* grob.h */,
+				6FE7F03B2B95E37400C8357F /* grob.cc */,
 				6FE7750E2B97966E00C8357F /* help */,
-				6FE7F03A2B95E37400C8357F /* hwfp.cc */,
 				6FE7F02D2B95E37300C8357F /* hwfp.h */,
+				6FE7F03A2B95E37400C8357F /* hwfp.cc */,
 				6FE7F0382B95E37400C8357F /* ids.tbl */,
 				6FE7EFF62B95E37200C8357F /* ignored_help.csv */,
 				6FE7F01C2B95E37300C8357F /* ignored_menus.csv */,
-				6FE7F00F2B95E37300C8357F /* integer.cc */,
 				6FE7F0092B95E37300C8357F /* integer.h */,
-				6FE7F0532B95E37400C8357F /* integrate.cc */,
+				6FE7F00F2B95E37300C8357F /* integer.cc */,
 				6FE7EFE62B95E37200C8357F /* integrate.h */,
+				6FE7F0532B95E37400C8357F /* integrate.cc */,
 				6FE7F0072B95E37300C8357F /* leb128.h */,
-				6F4528CA2B9C0F4E00C8357F /* library.cc */,
 				6F4528CB2B9C0F4E00C8357F /* library.h */,
-				6FE7F01A2B95E37300C8357F /* list.cc */,
+				6F87878D2CA9E25500C8357F /* library */,
+				6F4528CA2B9C0F4E00C8357F /* library.cc */,
 				6FE7F0312B95E37400C8357F /* list.h */,
-				6FE7F0002B95E37200C8357F /* locals.cc */,
+				6FE7F01A2B95E37300C8357F /* list.cc */,
 				6FE7F0332B95E37400C8357F /* locals.h */,
-				6FE7F0172B95E37300C8357F /* logical.cc */,
+				6FE7F0002B95E37200C8357F /* locals.cc */,
 				6FE7F04E2B95E37400C8357F /* logical.h */,
-				6FE7EFFE2B95E37200C8357F /* loops.cc */,
+				6FE7F0172B95E37300C8357F /* logical.cc */,
 				6FE7EFF32B95E37200C8357F /* loops.h */,
-				6FE7F0422B95E37400C8357F /* menu.cc */,
+				6FE7EFFE2B95E37200C8357F /* loops.cc */,
 				6FE7EFF52B95E37200C8357F /* menu.h */,
-				6FE7EFE32B95E37200C8357F /* object.cc */,
+				6FE7F0422B95E37400C8357F /* menu.cc */,
 				6FE7F0162B95E37300C8357F /* object.h */,
+				6FE7EFE32B95E37200C8357F /* object.cc */,
 				6FE7F0032B95E37200C8357F /* parser.h */,
-				6FE7EFFF2B95E37200C8357F /* plot.cc */,
 				6FE7EFEA2B95E37200C8357F /* plot.h */,
-				6F18F27D2C2DAC3400C8357F /* polynomial.cc */,
+				6FE7EFFF2B95E37200C8357F /* plot.cc */,
 				6F18F27E2C2DAC3400C8357F /* polynomial.h */,
+				6F18F27D2C2DAC3400C8357F /* polynomial.cc */,
 				6FE7EFF42B95E37200C8357F /* precedence.h */,
-				6FE7F0182B95E37300C8357F /* program.cc */,
 				6FE7F02A2B95E37300C8357F /* program.h */,
-				6FCECEF62B95E4BE00C8357F /* recorder */,
+				6FE7F0182B95E37300C8357F /* program.cc */,
+				6F0FF87E2E142A100023F6CC /* range.h */,
+				6F0FF87F2E142A100023F6CC /* range.cc */,
 				6FE7F0052B95E37300C8357F /* recorder.h */,
-				6FE7F02E2B95E37300C8357F /* renderer.cc */,
+				6FCECEF62B95E4BE00C8357F /* recorder */,
 				6FE7EFE72B95E37200C8357F /* renderer.h */,
-				6FE7F03C2B95E37400C8357F /* runtime.cc */,
+				6FE7F02E2B95E37300C8357F /* renderer.cc */,
 				6FE7F02F2B95E37400C8357F /* runtime.h */,
-				6FE7F0502B95E37400C8357F /* settings.cc */,
+				6FE7F03C2B95E37400C8357F /* runtime.cc */,
 				6FE7EFF82B95E37200C8357F /* settings.h */,
+				6FE7F0502B95E37400C8357F /* settings.cc */,
 				6FCED99E2B95E51E00C8357F /* sim */,
-				6FE7F0452B95E37400C8357F /* solve.cc */,
 				6FE7F01B2B95E37300C8357F /* solve.h */,
-				6FE7F02B2B95E37300C8357F /* stack-cmds.h */,
-				6FE7EFE82B95E37200C8357F /* stack.cc */,
+				6FE7F0452B95E37400C8357F /* solve.cc */,
 				6FE7F0462B95E37400C8357F /* stack.h */,
+				6FE7EFE82B95E37200C8357F /* stack.cc */,
+				6FE7F02B2B95E37300C8357F /* stack-cmds.h */,
 				6FF873992B97BA1E00C8357F /* state */,
-				6FE7F04F2B95E37400C8357F /* stats.cc */,
 				6FE7F03F2B95E37400C8357F /* stats.h */,
-				6FE7F0252B95E37300C8357F /* symbol.cc */,
+				6FE7F04F2B95E37400C8357F /* stats.cc */,
 				6FE7EFEE2B95E37200C8357F /* symbol.h */,
-				6FE7F03E2B95E37400C8357F /* tag.cc */,
+				6FE7F0252B95E37300C8357F /* symbol.cc */,
 				6FE7F0292B95E37300C8357F /* tag.h */,
-				6FE7F0432B95E37400C8357F /* tests.cc */,
+				6FE7F03E2B95E37400C8357F /* tag.cc */,
 				6FE7EFED2B95E37200C8357F /* tests.h */,
-				6FE7EFE42B95E37200C8357F /* text.cc */,
+				6FE7F0432B95E37400C8357F /* tests.cc */,
 				6FE7F0042B95E37200C8357F /* text.h */,
+				6FE7EFE42B95E37200C8357F /* text.cc */,
 				6FE7EFF92B95E37200C8357F /* types.h */,
-				6FE7F0412B95E37400C8357F /* unit.cc */,
 				6FE7EFE52B95E37200C8357F /* unit.h */,
-				6FE7F0442B95E37400C8357F /* user_interface.cc */,
+				6FE7F0412B95E37400C8357F /* unit.cc */,
 				6FE7F0192B95E37300C8357F /* user_interface.h */,
+				6FE7F0442B95E37400C8357F /* user_interface.cc */,
 				6FE7F0352B95E37400C8357F /* utf8.h */,
-				6FE7F00A2B95E37300C8357F /* util.cc */,
 				6FE7F0062B95E37300C8357F /* util.h */,
-				6FE7F0242B95E37300C8357F /* variables.cc */,
+				6FE7F00A2B95E37300C8357F /* util.cc */,
 				6FE7F0102B95E37300C8357F /* variables.h */,
+				6FE7F0242B95E37300C8357F /* variables.cc */,
 			);
 			name = Runtime;
 			sourceTree = "<group>";
@@ -4441,7 +4452,6 @@
 				6FCEDA972B95F28F00C8357F /* catalog.cc in Sources */,
 				6FE7F0672B95E37400C8357F /* integer.cc in Sources */,
 				6FE7F05E2B95E37400C8357F /* expression.cc in Sources */,
-				6F11C97A2D6F76BC008AE248 /* finance.cc in Sources */,
 				6FE7F06A2B95E37400C8357F /* compare.cc in Sources */,
 				6FE7F0592B95E37400C8357F /* stack.cc in Sources */,
 				6FE7F0832B95E37400C8357F /* solve.cc in Sources */,
@@ -4458,6 +4468,7 @@
 				6FE7F05A2B95E37400C8357F /* decimal.cc in Sources */,
 				6FBC10382BC0482F00C8357F /* ScreenView.mm in Sources */,
 				6FE7F0862B95E37400C8357F /* target.cc in Sources */,
+				6F0FF88B2E142B360023F6CC /* finance.cc in Sources */,
 				6FE7F08B2B95E37400C8357F /* bignum.cc in Sources */,
 				6FE7F0772B95E37400C8357F /* complex.cc in Sources */,
 				6FE7F07C2B95E37400C8357F /* grob.cc in Sources */,
@@ -4500,6 +4511,7 @@
 				6FE7F0852B95E37400C8357F /* sysmenu.cc in Sources */,
 				6FCED49D2B95E4C000C8357F /* recorder_ring.c in Sources */,
 				6FE7F0812B95E37400C8357F /* tests.cc in Sources */,
+				6F0FF8802E142A100023F6CC /* range.cc in Sources */,
 				6F4528D22B9C0F4E00C8357F /* library.cc in Sources */,
 				6FCEDA872B95ED9600C8357F /* HelpFont.cc in Sources */,
 				6FE7F07D2B95E37400C8357F /* runtime.cc in Sources */,
@@ -4536,7 +4548,6 @@
 				6F0FDB982C7934DF00C8357F /* catalog.cc in Sources */,
 				6F0FDB992C7934DF00C8357F /* integer.cc in Sources */,
 				6F0FDB9A2C7934DF00C8357F /* expression.cc in Sources */,
-				6F11C9772D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDB9B2C7934DF00C8357F /* compare.cc in Sources */,
 				6F0FDB9C2C7934DF00C8357F /* stack.cc in Sources */,
 				6F0FDB9D2C7934DF00C8357F /* solve.cc in Sources */,
@@ -4553,6 +4564,7 @@
 				6F0FDBA82C7934DF00C8357F /* decimal.cc in Sources */,
 				6F0FDBA92C7934DF00C8357F /* ScreenView.mm in Sources */,
 				6F0FDBAA2C7934DF00C8357F /* target.cc in Sources */,
+				6F0FF88F2E142B360023F6CC /* finance.cc in Sources */,
 				6F0FDBAB2C7934DF00C8357F /* bignum.cc in Sources */,
 				6F0FDBAC2C7934DF00C8357F /* complex.cc in Sources */,
 				6F0FDBAD2C7934DF00C8357F /* grob.cc in Sources */,
@@ -4595,6 +4607,7 @@
 				6F0FDBD12C7934DF00C8357F /* sysmenu.cc in Sources */,
 				6F0FDBD22C7934DF00C8357F /* recorder_ring.c in Sources */,
 				6F0FDBD32C7934DF00C8357F /* tests.cc in Sources */,
+				6F0FF8852E142A100023F6CC /* range.cc in Sources */,
 				6F0FDBD42C7934DF00C8357F /* library.cc in Sources */,
 				6F0FDBD52C7934DF00C8357F /* HelpFont.cc in Sources */,
 				6F0FDBD62C7934DF00C8357F /* runtime.cc in Sources */,
@@ -4615,7 +4628,6 @@
 				6F0FDC642C7934E300C8357F /* catalog.cc in Sources */,
 				6F0FDC652C7934E300C8357F /* integer.cc in Sources */,
 				6F0FDC662C7934E300C8357F /* expression.cc in Sources */,
-				6F11C97B2D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDC672C7934E300C8357F /* compare.cc in Sources */,
 				6F0FDC682C7934E300C8357F /* stack.cc in Sources */,
 				6F0FDC692C7934E300C8357F /* solve.cc in Sources */,
@@ -4632,6 +4644,7 @@
 				6F0FDC742C7934E300C8357F /* decimal.cc in Sources */,
 				6F0FDC752C7934E300C8357F /* ScreenView.mm in Sources */,
 				6F0FDC762C7934E300C8357F /* target.cc in Sources */,
+				6F0FF88C2E142B360023F6CC /* finance.cc in Sources */,
 				6F0FDC772C7934E300C8357F /* bignum.cc in Sources */,
 				6F0FDC782C7934E300C8357F /* complex.cc in Sources */,
 				6F0FDC792C7934E300C8357F /* grob.cc in Sources */,
@@ -4674,6 +4687,7 @@
 				6F0FDC9D2C7934E300C8357F /* sysmenu.cc in Sources */,
 				6F0FDC9E2C7934E300C8357F /* recorder_ring.c in Sources */,
 				6F0FDC9F2C7934E300C8357F /* tests.cc in Sources */,
+				6F0FF8842E142A100023F6CC /* range.cc in Sources */,
 				6F0FDCA02C7934E300C8357F /* library.cc in Sources */,
 				6F0FDCA12C7934E300C8357F /* HelpFont.cc in Sources */,
 				6F0FDCA22C7934E300C8357F /* runtime.cc in Sources */,
@@ -4694,7 +4708,6 @@
 				6F0FDD252C7934E500C8357F /* catalog.cc in Sources */,
 				6F0FDD262C7934E500C8357F /* integer.cc in Sources */,
 				6F0FDD272C7934E500C8357F /* expression.cc in Sources */,
-				6F11C9762D6F76BC008AE248 /* finance.cc in Sources */,
 				6F0FDD282C7934E500C8357F /* compare.cc in Sources */,
 				6F0FDD292C7934E500C8357F /* stack.cc in Sources */,
 				6F0FDD2A2C7934E500C8357F /* solve.cc in Sources */,
@@ -4711,6 +4724,7 @@
 				6F0FDD352C7934E500C8357F /* decimal.cc in Sources */,
 				6F0FDD362C7934E500C8357F /* ScreenView.mm in Sources */,
 				6F0FDD372C7934E500C8357F /* target.cc in Sources */,
+				6F0FF88A2E142B360023F6CC /* finance.cc in Sources */,
 				6F0FDD382C7934E500C8357F /* bignum.cc in Sources */,
 				6F0FDD392C7934E500C8357F /* complex.cc in Sources */,
 				6F0FDD3A2C7934E500C8357F /* grob.cc in Sources */,
@@ -4753,6 +4767,7 @@
 				6F0FDD5E2C7934E500C8357F /* sysmenu.cc in Sources */,
 				6F0FDD5F2C7934E500C8357F /* recorder_ring.c in Sources */,
 				6F0FDD602C7934E500C8357F /* tests.cc in Sources */,
+				6F0FF8862E142A100023F6CC /* range.cc in Sources */,
 				6F0FDD612C7934E500C8357F /* library.cc in Sources */,
 				6F0FDD622C7934E500C8357F /* HelpFont.cc in Sources */,
 				6F0FDD632C7934E500C8357F /* runtime.cc in Sources */,
@@ -4773,7 +4788,6 @@
 				6F2AC4302C64105F00C8357F /* catalog.cc in Sources */,
 				6F2AC4312C64105F00C8357F /* integer.cc in Sources */,
 				6F2AC4322C64105F00C8357F /* expression.cc in Sources */,
-				6F11C9752D6F76BC008AE248 /* finance.cc in Sources */,
 				6F2AC4332C64105F00C8357F /* compare.cc in Sources */,
 				6F2AC4342C64105F00C8357F /* stack.cc in Sources */,
 				6F2AC4352C64105F00C8357F /* solve.cc in Sources */,
@@ -4790,6 +4804,7 @@
 				6F2AC4402C64105F00C8357F /* decimal.cc in Sources */,
 				6F2AC4412C64105F00C8357F /* ScreenView.mm in Sources */,
 				6F2AC4422C64105F00C8357F /* target.cc in Sources */,
+				6F0FF88D2E142B360023F6CC /* finance.cc in Sources */,
 				6F2AC4432C64105F00C8357F /* bignum.cc in Sources */,
 				6F2AC4442C64105F00C8357F /* complex.cc in Sources */,
 				6F2AC4452C64105F00C8357F /* grob.cc in Sources */,
@@ -4832,6 +4847,7 @@
 				6F2AC4692C64105F00C8357F /* sysmenu.cc in Sources */,
 				6F2AC46A2C64105F00C8357F /* recorder_ring.c in Sources */,
 				6F2AC46B2C64105F00C8357F /* tests.cc in Sources */,
+				6F0FF8812E142A100023F6CC /* range.cc in Sources */,
 				6F2AC46C2C64105F00C8357F /* library.cc in Sources */,
 				6F2AC46D2C64105F00C8357F /* HelpFont.cc in Sources */,
 				6F2AC46E2C64105F00C8357F /* runtime.cc in Sources */,
@@ -4852,7 +4868,6 @@
 				6F2AC50A2C6410F700C8357F /* catalog.cc in Sources */,
 				6F2AC50B2C6410F700C8357F /* integer.cc in Sources */,
 				6F2AC50C2C6410F700C8357F /* expression.cc in Sources */,
-				6F11C9792D6F76BC008AE248 /* finance.cc in Sources */,
 				6F2AC50D2C6410F700C8357F /* compare.cc in Sources */,
 				6F2AC50E2C6410F700C8357F /* stack.cc in Sources */,
 				6F2AC50F2C6410F700C8357F /* solve.cc in Sources */,
@@ -4869,6 +4884,7 @@
 				6F2AC51A2C6410F700C8357F /* decimal.cc in Sources */,
 				6F2AC51B2C6410F700C8357F /* ScreenView.mm in Sources */,
 				6F2AC51C2C6410F700C8357F /* target.cc in Sources */,
+				6F0FF8892E142B360023F6CC /* finance.cc in Sources */,
 				6F2AC51D2C6410F700C8357F /* bignum.cc in Sources */,
 				6F2AC51E2C6410F700C8357F /* complex.cc in Sources */,
 				6F2AC51F2C6410F700C8357F /* grob.cc in Sources */,
@@ -4911,6 +4927,7 @@
 				6F2AC5432C6410F700C8357F /* sysmenu.cc in Sources */,
 				6F2AC5442C6410F700C8357F /* recorder_ring.c in Sources */,
 				6F2AC5452C6410F700C8357F /* tests.cc in Sources */,
+				6F0FF8832E142A100023F6CC /* range.cc in Sources */,
 				6F2AC5462C6410F700C8357F /* library.cc in Sources */,
 				6F2AC5472C6410F700C8357F /* HelpFont.cc in Sources */,
 				6F2AC5482C6410F700C8357F /* runtime.cc in Sources */,
@@ -4931,7 +4948,6 @@
 				6FE3997B2C793FE300C8357F /* catalog.cc in Sources */,
 				6FE3997C2C793FE300C8357F /* integer.cc in Sources */,
 				6FE3997D2C793FE300C8357F /* expression.cc in Sources */,
-				6F11C9782D6F76BC008AE248 /* finance.cc in Sources */,
 				6FE3997E2C793FE300C8357F /* compare.cc in Sources */,
 				6FE3997F2C793FE300C8357F /* stack.cc in Sources */,
 				6FE399802C793FE300C8357F /* solve.cc in Sources */,
@@ -4948,6 +4964,7 @@
 				6FE3998B2C793FE300C8357F /* decimal.cc in Sources */,
 				6FE3998C2C793FE300C8357F /* ScreenView.mm in Sources */,
 				6FE3998D2C793FE300C8357F /* target.cc in Sources */,
+				6F0FF88E2E142B360023F6CC /* finance.cc in Sources */,
 				6FE3998E2C793FE300C8357F /* bignum.cc in Sources */,
 				6FE3998F2C793FE300C8357F /* complex.cc in Sources */,
 				6FE399902C793FE300C8357F /* grob.cc in Sources */,
@@ -4990,6 +5007,7 @@
 				6FE399B42C793FE300C8357F /* sysmenu.cc in Sources */,
 				6FE399B52C793FE300C8357F /* recorder_ring.c in Sources */,
 				6FE399B62C793FE300C8357F /* tests.cc in Sources */,
+				6F0FF8822E142A100023F6CC /* range.cc in Sources */,
 				6FE399B72C793FE300C8357F /* library.cc in Sources */,
 				6FE399B82C793FE300C8357F /* HelpFont.cc in Sources */,
 				6FE399B92C793FE300C8357F /* runtime.cc in Sources */,
@@ -5193,7 +5211,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5288,7 +5306,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5317,7 +5335,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5347,7 +5365,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5375,7 +5393,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5407,7 +5425,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5437,7 +5455,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5469,7 +5487,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5498,7 +5516,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5529,7 +5547,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5558,7 +5576,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5590,7 +5608,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5619,7 +5637,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.8;
+				MARKETING_VERSION = 0.9.9;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
