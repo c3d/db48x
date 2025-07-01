@@ -35,6 +35,7 @@
 #include "decimal.h"
 #include "fraction.h"
 #include "hwfp.h"
+#include "range.h"
 #include "runtime.h"
 
 
@@ -90,6 +91,11 @@ struct arithmetic : algebraic
         return algebraic::complex_promotion(x, type);
     }
     static bool complex_promotion(algebraic_g &x, algebraic_g &y);
+    static bool range_promotion(algebraic_g &x, id type = ID_range)
+    {
+        return algebraic::range_promotion(x, type);
+    }
+    static bool range_promotion(algebraic_g &x, algebraic_g &y);
     static fraction_p fraction_promotion(algebraic_g &x);
     static algebraic_p zero_divide(algebraic_r y, algebraic_r x);
 
@@ -102,6 +108,7 @@ protected:
     typedef bool (*bignum_fn)(bignum_g &x, bignum_g &y);
     typedef bool (*fraction_fn)(fraction_g &x, fraction_g &y);
     typedef bool (*complex_fn)(complex_g &x, complex_g &y);
+    typedef bool (*range_fn)(range_g &x, range_g &y);
 
     // Function pointers used by generic evaluation code
     typedef hwfloat_p (*hwfloat_fn)(hwfloat_r, hwfloat_r y);
@@ -119,6 +126,7 @@ protected:
         bignum_fn     bignum_ok;
         fraction_fn   fraction_ok;
         complex_fn    complex_ok;
+        range_fn      range_ok;
         arithmetic_fn non_numeric;
     };
     typedef const ops &ops_t;
@@ -173,6 +181,7 @@ struct derived : arithmetic                                             \
     static bool bignum_ok(bignum_g &x, bignum_g &y);                    \
     static bool fraction_ok(fraction_g &x, fraction_g &y);              \
     static bool complex_ok(complex_g &x, complex_g &y);                 \
+    static bool range_ok(range_g &x, range_g &y);                       \
     static constexpr decimal_fn decop = decimal::derived;               \
                                                                         \
     static algebraic_p arith_float(algebraic_r x, algebraic_r y)        \

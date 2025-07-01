@@ -1,4 +1,3 @@
-
 // ****************************************************************************
 //  tests.cc                                                      DB48X project
 // ****************************************************************************
@@ -113,6 +112,7 @@ TESTS(ctypes,           "Complex types");
 TESTS(carith,           "Complex arithmetic");
 TESTS(cfunctions,       "Complex functions");
 TESTS(autocplx,         "Automatic complex promotion");
+TESTS(ranges,           "Range types");
 TESTS(units,            "Units and conversions");
 TESTS(lists,            "List operations");
 TESTS(sorting,          "Sorting operations");
@@ -186,7 +186,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            symbolic_differentiation();
+            range_types();
 
 #if 0
         if (onlyCurrent & 2)
@@ -228,6 +228,7 @@ void tests::run(uint onlyCurrent)
         complex_arithmetic();
         complex_functions();
         complex_promotion();
+        range_types();
         units_and_conversions();
         list_functions();
         sorting_functions();
@@ -3274,6 +3275,26 @@ void tests::decimal_display_formats()
         .test(ID_ClassicExponent)
         .expect("1.E1234567890123456")
         .test(ID_FancyExponent);
+
+    step("Display integers as decimal")
+        .test(CLEAR, "123", ENTER)
+        .expect("123")
+        .test(ID_DisplayModesMenu, ID_SeparatorModesMenu, ID_ShowAsDecimal)
+        .expect("123.")
+        .test("2 FIX", ENTER)
+        .expect("123.00")
+        .test(ID_ShowAsDecimal)
+        .expect("123");;
+
+    step("Display fractions as decimal")
+        .test(CLEAR, "5/2", ENTER)
+        .expect("2 ¹/₂")
+        .test(ID_DisplayModesMenu, ID_SeparatorModesMenu, ID_ShowAsDecimal)
+        .expect("2.50")
+        .test("2 FIX", ENTER)
+        .expect("2.50")
+        .test(ID_ShowAsDecimal).
+        expect("2 ¹/₂");
 }
 
 
@@ -5206,6 +5227,253 @@ void tests::complex_promotion()
 }
 
 
+void tests::range_types()
+// ----------------------------------------------------------------------------
+//   Ranges (intervals, delta and percentage) data typess
+// ----------------------------------------------------------------------------
+{
+    BEGIN(ranges);
+
+    step("Interval form")
+        .test(CLEAR, "1…3", ENTER).type(ID_range).expect("1…3");
+    step("Delta form")
+        .test(CLEAR, "1±3", ENTER).type(ID_drange).expect("1±3");
+    step("Percentage form")
+        .test(CLEAR, "1±300%", ENTER).type(ID_prange).expect("1±300%");
+    step("Uncertain (sigma at end)")
+        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±3σ");
+    step("Uncertain (sigma at beginning)")
+        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+    step("Uncertain (sigma in the middle)")
+        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+
+    step("Cycle")
+        .test(CLEAR, "1…3", ENTER).expect("1…3")
+        .test(EEX).expect("2±1")
+        .test(EEX).expect("2±50%")
+        .test(EEX).expect("1…3")
+        .test(EEX).expect("2±1")
+        .test(EEX).expect("2±50%");
+
+    step("Add intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
+    step("Subtract intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, SUB).expect("-4…1");
+    step("Multiply intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, MUL).expect("2…15");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
+    step("Power intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, ID_pow).expect("1.…243.");
+    step("Invert intervals")
+        .test(CLEAR, "1…3", NOSHIFT, ID_inv).expect("¹/₃…1");
+    step("Negate intervals")
+        .test(CLEAR, "1…3", ENTER, ID_neg).expect("-3…-1");
+
+    step("Add intervals with promotion")
+        .test(CLEAR, "1…3 5", NOSHIFT, ADD).expect("6…8");
+    step("Subtract intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, SUB).expect("-4…-2");
+    step("Multiply intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, MUL).expect("5…15");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, DIV).expect("¹/₅…³/₅");
+    step("Power intervals")
+        .test(CLEAR, "1…3 5", NOSHIFT, ID_pow).expect("1…243");
+
+    step("Add intervals with promotion")
+        .test(CLEAR, "5 1…3", NOSHIFT, ADD).expect("6…8");
+    step("Subtract intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, SUB).expect("2…4");
+    step("Multiply intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, MUL).expect("5…15");
+    step("Divide intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, DIV).expect("1 ²/₃…5");
+    step("Power intervals")
+        .test(CLEAR, "5 1…3", NOSHIFT, ID_pow).expect("5.…125.");
+
+#define TFNA(name, arg)                                         \
+    step(#name " (interval)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1…3")
+
+    TFN(sqrt).expect("1.…1.73205 08075 7");
+    TFN(sin).expect("0.05233 59562 43…0.01745 24064 37");
+    TFN(cos).expect("0.99862 95347 55…0.99984 76951 56");
+    TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
+    TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
+    TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
+    TFN(atan).expect("45. °…71.56505 11771 °");
+    TFN(sinh).expect("1.17520 11936 4…10.01787 49274");
+    TFN(cosh).expect("1.54308 06348 2…10.06766 19958");
+    TFN(tanh).expect("0.76159 41559 56…0.99505 47536 87");
+    TFN(asinh).expect("0.88137 35870 2…1.81844 64592 3");
+    TFNA(acosh, "1.321…1.325").expect("0.78123 02051 96…0.78584 80192 36");
+    TFNA(atanh, "0.321…0.325").expect("0.33276 15884 82…0.33722 75237 74");
+    TFN(log1p).expect("0.69314 71805 6…1.38629 43611 2");
+    TFN(lnp1).expect("0.69314 71805 6…1.38629 43611 2");
+    TFN(expm1).expect("1.71828 18284 6…19.08553 69232");
+    TFN(log).expect("0.…1.09861 22886 7");
+    TFN(log10).expect("0.…0.47712 12547 2");
+    TFN(exp).expect("2.71828 18284 6…20.08553 69232");
+    TFN(exp10).expect("10.…1 000.");
+    TFN(exp2).expect("2.…8.");
+    TFN(erf).expect("0.84270 07929 5…0.99997 79095 03");
+    TFN(erfc).expect("0.00002 20904 97…0.15729 92070 5");
+    TFN(tgamma).expect("1.…2.");
+    TFN(lgamma).expect("0.…0.69314 71805 6");
+    TFN(gamma).expect("1.…2.");
+    TFN(cbrt).expect("1.…1.44224 95703 1");
+    TFN(norm).expect("1…3");
+#undef TFN
+#undef TFNA
+
+    step("Add delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, ADD).expect("3±8");
+    step("Subtract delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, SUB).expect("-1±8");
+    step("Multiply delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, MUL).expect("7±21");
+    step("Divide delta ranges")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("-¹/₃±1");
+    step("Power delta ranges")
+        .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
+    step("Invert delta ranges")
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("-¹/₈±³/₈");
+    step("Negate delta ranges")
+        .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
+
+    step("Add delta ranges with promotion")
+        .test(CLEAR, "1±3 5", NOSHIFT, ADD).expect("6±3");
+    step("Subtract delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, SUB).expect("-4±3");
+    step("Multiply delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, MUL).expect("5±15");
+    step("Divide delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, DIV).expect("¹/₅±³/₅");
+    step("Power delta ranges")
+        .test(CLEAR, "1±3 5", NOSHIFT, ID_pow).expect("256±768");
+
+    step("Add delta ranges with promotion")
+        .test(CLEAR, "5 1±3", NOSHIFT, ADD).expect("6±3");
+    step("Subtract delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, SUB).expect("4±3");
+    step("Multiply delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, MUL).expect("5±15");
+    step("Divide delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("-⁵/₈±1 ⁷/₈");
+    step("Power delta ranges")
+        .test(CLEAR, "5 1±3", NOSHIFT, ID_pow).expect("312.52±312.48");
+
+#define TFNA(name, arg)                                 \
+    step(#name " (delta range)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1±3")
+
+    TFNA(sqrt, "3±1").expect("1.70710 67811 9±0.29289 32188 13");
+    TFN(sin).expect("0.01742 84885 21±-0.05232 79852 23");
+    TFN(cos).expect("0.99847 74386 39±0.00091 33883 8");
+    TFN(tan).expect("0.01750 30212 26±0.05242 37907 18");
+    TFNA(asin, "0.25±0.1").expect("14.55712 08367 °±5.93019 42780 2 °");
+    TFNA(acos, "0.25±0.1").expect("75.44287 91633 °±5.93019 42780 2 °");
+    TFN(atan).expect("6.26440 38545 8 °±69.69935 26775 °");
+    TFN(sinh).expect("11.83152 83946±15.45838 88025");
+    TFN(cosh).expect("14.15411 6418±13.15411 6418");
+    TFN(tanh).expect("0.01765 08598 32±0.98167 84399 07");
+    TFN(asinh).expect("0.32553 85360 41±1.76917 40112 2");
+    TFNA(acosh, "1.321±0.025").expect("0.78058 71062 93±0.02898 78937 9");
+    TFNA(atanh, "0.321±0.025").expect("0.33301 11698 75±0.02788 14094 98");
+    TFNA(log1p, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
+    TFNA(lnp1, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
+    TFN(expm1).expect("26.36674 26582±27.23140 7375");
+    TFNA(log, "3±1").expect("1.03972 07708 4±0.34657 35902 8");
+    TFNA(log10, "3±1").expect("0.45154 49934 96±0.15051 49978 32");
+    TFN(exp).expect("27.36674 26582±27.23140 7375");
+    TFN(exp10).expect("5 000.005±4 999.995");
+    TFN(exp2).expect("8.125±7.875");
+    TFN(erf).expect("0.00233 88597 82±0.99766 11248 01");
+    TFN(erfc).expect("0.99766 11402 18±0.99766 11248 01");
+    TFNA(tgamma, "1.321±0.025").expect("0.89482 58872 58±-0.00326 05508 06");
+    TFNA(lgamma, "1.321±0.025").expect("-0.11113 27576 28±-0.00364 37985 12");
+    TFNA(gamma, "1.321±0.025").expect("0.89482 58872 58±-0.00326 05508 06");
+    TFN(cbrt).expect("0.16374 00010 37±1.42366 10509 3");
+    TFN(norm).expect("2±2");
+#undef TFN
+#undef TFNA
+
+    step("Add percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, ADD).expect("3±4 ¹/₃%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, SUB).expect("-1±13%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, MUL).expect("2 ³/₁ ₀₀₀±7 ¹ ⁹⁷⁹/₂ ₀₀₃%");
+    step("Divide percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, DIV).expect("² ⁰⁰³/₃ ₉₉₀±7 ¹ ⁹⁷⁹/₂ ₀₀₃%");
+    step("Power percent ranges")
+        .test(CLEAR, "1±3% 2±5%", NOSHIFT, ID_pow).expect("1.00103 94929 8±6.29356 18446 3%");
+    step("Invert percent ranges")
+        .test(CLEAR, "1±3%", NOSHIFT, ID_inv).expect("1 ⁹/₉ ₉₉₁±3%");
+    step("Negate percent ranges")
+        .test(CLEAR, "1±3%", ENTER, ID_neg).expect("-1±3%");
+
+    step("Add percent ranges with promotion")
+        .test(CLEAR, "1±3% 5", NOSHIFT, ADD).expect("6±¹/₂%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, SUB).expect("-4±³/₄%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, MUL).expect("5±3%");
+    step("Divide percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, DIV).expect("¹/₅±3%");
+    step("Power percent ranges")
+        .test(CLEAR, "1±3% 5", NOSHIFT, ID_pow).expect("1 ¹⁸⁰ ⁰⁸¹/₂₀ ₀₀₀ ₀₀₀±14 ⁹⁰ ⁰⁹⁴ ⁵⁷³/₁₀₀ ₉₀₀ ₄₀₅%");
+
+    step("Add percent ranges with promotion")
+        .test(CLEAR, "5 1±3%", NOSHIFT, ADD).expect("6±¹/₂%");
+    step("Subtract percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, SUB).expect("4±³/₄%");
+    step("Multiply percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, MUL).expect("5±3%");
+    step("Divide percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, DIV).expect("5 ⁴⁵/₉ ₉₉₁±3%");
+    step("Power percent ranges")
+        .test(CLEAR, "5 1±3%", NOSHIFT, ID_pow).expect("5.00582 92857 2±4.82456 52123 7%");
+
+#define TFNA(name, arg)                                 \
+    step(#name " (percent range)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1±3%")
+
+    TFN(sqrt).expect("0.99988 74683 44±1.50033 76519 6%");
+    TFN(sin).expect("0.01745 24040 45±2.99969 56505 2%");
+    TFN(cos).expect("0.99984 75580 99±0.00091 39451 46%");
+    TFN(tan).expect("0.01745 50697 15±3.00060 87730 3%");
+    TFNA(asin, "0.25±0.1%").expect("14.47751 26791 °±0.10218 40366%");
+    TFNA(acos, "0.25±0.1%").expect("75.52248 73209 °±0.01958 84793 78%");
+    TFN(atan).expect("44.98710 84505 °±1.91069 30918 4%");
+    TFN(sinh).expect("1.17573 00738 5±3.93792 45500 1%");
+    TFN(cosh).expect("1.54377 50731 8±2.28409 72797 9%");
+    TFN(tanh).expect("0.76130 63134 13±1.65531 61613 5%");
+    TFN(asinh).expect("0.88121 44969 49±2.40735 92360 4%");
+    TFNA(acosh, "1.321±0.025%").expect("0.78123 00931 78±0.04897 49317 72%");
+    TFNA(atanh, "0.321±0.025%").expect("0.33276 15910 51±0.02688 68087 85%");
+    TFN(log1p).expect("0.69303 46679 02±2.16455 62403 6%");
+    TFN(lnp1).expect("0.69303 46679 02±2.16455 62403 6%");
+    TFN(expm1).expect("1.71950 51470 3±4.74326 51081 9%");
+    TFN(log).expect("-0.00045 02026 22±6 665.66639 654%");
+    TFN(log10).expect("-0.00019 55205 14±6 665.66639 654%");
+    TFN(exp).expect("2.71950 51470 3±2.99910 03238 8%");
+    TFN(exp10).expect("10.02386 80302±6.89678 89453 7%");
+    TFN(exp2).expect("2.00043 24232 9±2.07914 18713 2%");
+    TFN(erf).expect("0.84232 72522 45±1.47887 40570 9%");
+    TFN(erfc).expect("0.15767 27477 55±7.90051 50773 4%");
+    TFN(tgamma).expect("1.00089 09463 2±1.73255 59622 8%");
+    TFN(lgamma).expect("0.00074 04396 24±2 340.13590 506%");
+    TFN(gamma).expect("1.00089 09463 2±1.73255 59622 8%");
+    TFN(cbrt).expect("0.99989 99666 5±1.00026 68000 8%");
+    TFN(norm).expect("1±3%");
+#undef TFN
+#undef TFNA
+
+}
+
+
 void tests::units_and_conversions()
 // ----------------------------------------------------------------------------
 //   Unit types and data conversions
@@ -6045,6 +6313,18 @@ void tests::vector_functions()
     test(CLEAR, "[a b c][d e f] /", ENTER)
         .expect("[ 'd⁻¹·a' 'e⁻¹·b' 'f⁻¹·c' ]");
 
+    step("Power (extension)");
+    test(CLEAR, "[1 2  3 4 6][4 5 2 1 3] ^", ENTER)
+        .want("[[ 1 1 1 1 1 ]"
+              " [ 16 32 4 2 8 ]"
+              " [ 81 243 9 3 27 ]"
+              " [ 256 1 024 16 4 64 ]"
+              " [ 1 296 7 776 36 6 216 ]]");
+    test(CLEAR, "[a b c][d e f] ^", ENTER)
+        .want("[[ 'a↑d' 'a↑e' 'a↑f' ]"
+              " [ 'b↑d' 'b↑e' 'b↑f' ]"
+              " [ 'c↑d' 'c↑e' 'c↑f' ]]");
+
     step("Addition of constant (extension)");
     test(CLEAR, "[1 2 3] 3 +", ENTER)
         .expect("[ 4 5 6 ]");
@@ -6070,6 +6350,16 @@ void tests::vector_functions()
         .expect("[ 'a÷x' 'b÷x' 'c÷x' ]");
     test(CLEAR, "x [a b c] /", ENTER)
         .expect("[ 'x÷a' 'x÷b' 'x÷c' ]");
+
+    step("Power by constant (extension)");
+    test(CLEAR, "[a b c] x ^", ENTER)
+        .expect("[ 'a↑x' 'b↑x' 'c↑x' ]");
+    test(CLEAR, "x [a b c] ^", ENTER)
+        .expect("[ 'x↑a' 'x↑b' 'x↑c' ]");
+    test(CLEAR, "[a b c] 2 ^", ENTER)
+        .expect("[ 'a²' 'b²' 'c²' ]");
+    test(CLEAR, "2 [a b c] ^", ENTER)
+        .expect("[ '2↑a' '2↑b' '2↑c' ]");
 
     step("Invalid dimension for binary operations");
     test(CLEAR, "[1 2 3][1 2] +", ENTER)
@@ -6345,13 +6635,39 @@ void tests::matrix_functions()
     test(CLEAR,
          "[[5 12 1968][17 2 1969][30 3 1993]] "
          "[[16 5 1995][21 5 1999][28 5 2009]] /", ENTER)
-        .want("[[ 3 ¹/₁₁ -4 ⁸/₁₁ -3 ¹⁰/₁₁ ] [ 335 ⁷/₁₀ -1 342 ⁷/₁₀ -1 643 ³/₁₀ ] [ -¹⁹/₂₂ 3 ⁹/₂₂ 5 ³/₂₂ ]]");
+        .want("[[ 3 ¹/₁₁ -4 ⁸/₁₁ -3 ¹⁰/₁₁ ]"
+              " [ 335 ⁷/₁₀ -1 342 ⁷/₁₀ -1 643 ³/₁₀ ]"
+              " [ -¹⁹/₂₂ 3 ⁹/₂₂ 5 ³/₂₂ ]]");
     step("Division (symbolic)");
     test(CLEAR, "[[a b][c d]][[e f][g h]] /", ENTER)
         .want("[[ '(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·a+(-(f÷e·e÷(e·h-g·f)))·c' "
               "'(e⁻¹-f÷e·((-g)÷(e·h-g·f)))·b+(-(f÷e·e÷(e·h-g·f)))·d' ] "
               "[ '(-g)÷(e·h-g·f)·a+e÷(e·h-g·f)·c' "
               "'(-g)÷(e·h-g·f)·b+e÷(e·h-g·f)·d' ]]");
+
+    step("Power")
+        .test(CLEAR,
+              "[[2 3][5 6]] "
+              "[[11 12][14 15]] ^", ENTER)
+        .want("[[[[ 2 048 4 096 ]"
+              "   [ 16 384 32 768 ]]"
+              "  [[ 177 147 531 441 ]"
+              "   [ 4 782 969 14 348 907 ]]]"
+              " [[[ 48 828 125 244 140 625 ]"
+              "   [ 6 103 515 625 30 517 578 125 ]]"
+              "  [[ 362 797 056 2 176 782 336 ]"
+              "   [ 78 364 164 096 470 184 984 576 ]]]]");
+    step("Power (symbolic)")
+        .test(CLEAR, "[[a b][c d]][[e f][g h]] ^", ENTER)
+        .want("[[[[ 'a↑e' 'a↑f' ]"
+              "   [ 'a↑g' 'a↑h' ]]"
+              "  [[ 'b↑e' 'b↑f' ]"
+              "   [ 'b↑g' 'b↑h' ]]]"
+              " [[[ 'c↑e' 'c↑f' ]"
+              "   [ 'c↑g' 'c↑h' ]]"
+              "  [[ 'd↑e' 'd↑f' ]"
+              "   [ 'd↑g' 'd↑h' ]]]]");
+
     step("Addition of constant (extension)");
     test(CLEAR, "[[1 2] [3 4]] 3 +", ENTER)
         .want("[[ 4 5 ] [ 6 7 ]]");
@@ -6375,6 +6691,21 @@ void tests::matrix_functions()
         .want("[[ 'a÷x' 'b÷x' ] [ 'c÷x' 'd÷x' ]]");
     test(CLEAR, "x [[a b] [c d]] /", ENTER)
         .want("[[ 'x÷a' 'x÷b' ] [ 'x÷c' 'x÷d' ]]");
+
+    step("Power by constant (extension)");
+    test(CLEAR, "[[a b] [c d]] x ^", ENTER)
+        .want("[[ 'a↑x' 'b↑x' ] [ 'c↑x' 'd↑x' ]]");
+    test(CLEAR, "[[a b] [c d]] 2 ^", ENTER)
+        .want("[[ 'a²+b·c' 'a·b+b·d' ]"
+              " [ 'c·a+d·c' 'c·b+d²' ]]");
+    test(CLEAR, "[[a b] [c d]] 2.0 ^", ENTER)
+        .want("[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]");
+    test(CLEAR, "x [[a b] [c d]] ^", ENTER)
+        .want("[[ 'x↑a' 'x↑b' ] [ 'x↑c' 'x↑d' ]]");
+    test(CLEAR, "2 [[a b] [c d]] ^", ENTER)
+        .want("[[ '2↑a' '2↑b' ] [ '2↑c' '2↑d' ]]");
+    test(CLEAR, "2.0 [[a b] [c d]] ^", ENTER)
+        .want("[[ '2.↑a' '2.↑b' ] [ '2.↑c' '2.↑d' ]]");
 
     step("Invalid dimension for addition (second is larger)")
         .test(CLEAR, "[[1 2] [3 4]][[1 2][3 4][5 6]] +", ENTER)
@@ -12050,7 +12381,8 @@ void tests::regression_checks()
 
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
-        .noerror();             // Bug was "Invalid Plot Data"
+        .noerror()              // Bug was "Invalid Plot Data"
+        .test("'PPAR' PURGE", ENTER);
     step("Bug 1440: Conversion of integer to decimal may lose precision")
         .test("987654321 SQ ToDecimal 987654321 2 ^ ToDecimal -", ENTER)
         .expect("0");
@@ -12326,7 +12658,8 @@ void tests::plotting()
         .test(ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-yrng");
-    step("Restoring plot parameters").test(NOSHIFT, M, "'PPAR'", NOSHIFT, G);
+    step("Restoring plot parameters")
+        .test(ID_Swap, "'PPAR'", ID_Sto);
 
     step("Parametric plot: Program");
     test(CLEAR,
@@ -12467,15 +12800,21 @@ void tests::graphic_commands()
 {
     BEGIN(graphics);
 
+    step("Cleanup environment")
+        .test("'PPAR'", ID_ClearThingsMenu, ID_Purge)
+        .test("{} CLIP", ENTER);
+
     step("Extract graphic element")
-        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob)
+        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
         .image_noheader("num-grob")
-        .test("{ 10#5 10#3 } { 10#40 10#240 }", ID_GraphicsMenu, ID_Extract)
+        .test("{ 10#5 10#3 } { 10#40 10#240 }",
+              ID_GraphicsMenu, F6, F6, ID_Extract, EXIT)
         .image_noheader("num-grob-extracted");
     step("Extract graphic element")
-        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob)
+        .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
         .image_noheader("num-grob")
-        .test("{ 10#15 10#13 } { 10#70 10#24 }", ID_GraphicsMenu, ID_Extract)
+        .test("{ 10#15 10#13 } { 10#70 10#24 }",
+              ID_GraphicsMenu, F6, F6, ID_Extract, EXIT)
         .image_noheader("num-grob-extracted2");
 
     step("Send to LCD")
@@ -12890,59 +13229,62 @@ void tests::graphic_commands()
         .noerror();
 
     step("GraphicAppend")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 4", ID_ToGrob,
               "DEFGH 2", ID_ToGrob,
-              ID_GraphicAppend, EXIT)
+              F6, ID_GraphicAppend, EXIT)
         .image_noheader("graph-append");
     step("GraphicStack")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 2", ID_ToGrob,
               "DEFGH 4", ID_ToGrob,
-              ID_GraphicStack, EXIT)
+              F6, ID_GraphicStack, EXIT)
         .image_noheader("graph-stack");
     step("GraphicSubscript")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 0", ID_ToGrob,
               "DEFGH 1", ID_ToGrob,
-              ID_GraphicSubscript, EXIT)
+              F6, ID_GraphicSubscript, EXIT)
         .image_noheader("graph-subscript");
     step("GraphicExponent")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 4", ID_ToGrob,
               "DEFGH 3", ID_ToGrob,
-              ID_GraphicExponent, EXIT)
+              F6, ID_GraphicExponent, EXIT)
         .image_noheader("graph-exponent");
     step("GraphicRatio")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6,
               "ABC 3", ID_ToGrob,
               "DEFGH 0", ID_ToGrob,
-              ID_GraphicRatio, EXIT)
+              F6, ID_GraphicRatio, EXIT)
         .image_noheader("graph-ratio");
 
     step("GraphicRoot")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 0", ID_GraphicRoot, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
+              "ABC 0", ID_ToGrob,
+              F6, ID_GraphicRoot, EXIT)
         .image_noheader("graph-root");
     step("GraphicParentheses")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 2.1", ID_ToGrob, ID_GraphicParentheses, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6,
+              "ABC 2.1", ID_ToGrob,
+              F6, ID_GraphicParentheses, EXIT)
         .image_noheader("graph-paren");
     step("GraphicNorm")
-        .test(CLEAR, ID_GraphicsMenu,
-              "ABC 3.5", ID_GraphicNorm, EXIT)
+        .test(CLEAR, ID_GraphicsMenu, F6,
+              "ABC 3.5", ID_ToGrob,
+              F6, ID_GraphicNorm, EXIT)
         .image_noheader("graph-norm");
 
     step("GraphicSum")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicSum, EXIT)
         .image_noheader("graph-sum");
     step("GraphicProduct")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicProduct, EXIT)
         .image_noheader("graph-product");
     step("GraphicIntegral")
-        .test(CLEAR, ID_GraphicsMenu,
+        .test(CLEAR, ID_GraphicsMenu, F6, F6,
               "123", ID_GraphicIntegral,EXIT)
         .image_noheader("graph-integral");
 
@@ -13389,19 +13731,21 @@ void tests::user_input_commands()
     BEGIN(input);
 
     step("Prompt with single-line display")
-        .test(CLEAR, EXIT, "\"Enter value\" PROMPT 1 +", ENTER)
-        .image("prompt-display")
+        .test(CLEAR, EXIT,
+              "\"Enter value\" PROMPT 1 +",
+              ENTER)
+        .image("prompt-display", 2000)
         .test("123")
-        .image("prompt-entry")
+        .image("prompt-entry", 2000)
         .test(ENTER)
         .expect("123")
         .test(RUNSTOP)
         .expect("124");
     step("Prompt with 2 lines display")
         .test(CLEAR, EXIT, "123 456 \"Enter value\nNow!\" PROMPT 1 +", ENTER)
-        .image("prompt2-display")
+        .image("prompt2-display", 2000)
         .test("123")
-        .image("prompt2-entry")
+        .image("prompt2-entry", 2000)
         .test(ENTER)
         .expect("123")
         .test(RUNSTOP)
@@ -13410,33 +13754,33 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter first value\" PROMPT "
               "\"Enter second value\" PROMPT +", ENTER)
-        .image("prompts-display1")
+        .image("prompts-display1", 2000)
         .test("123", ENTER)
         .expect("123")
         .test(RUNSTOP, "456")
-        .image("prompts-display2")
+        .image("prompts-display2", 2000)
         .test(ENTER, RUNSTOP)
         .got("579");
 
     step("Input command with text")
-        .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +",ENTER)
-        .image("input-display")
+        .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +", ENTER)
+        .image("input-display", 2000)
         .test("123")
-        .image("input-display-123")
+        .image("input-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
 
     step("Input command with list")
-        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +",ENTER)
-        .image("input-list-display")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +", ENTER)
+        .image("input-list-display", 2000)
         .test("123")
         .image("input-list-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
 
     step("Input command with list and position")
-        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+        .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 2000)
         .test("123")
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
@@ -13444,17 +13788,17 @@ void tests::user_input_commands()
 
     step("Input command for text")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 text } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 text } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 20000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image("input-pos2-display-123", 20000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for alpha")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +", ENTER)
+        .image("input-pos2-display", 2000)
         .test("123")
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
@@ -13462,39 +13806,39 @@ void tests::user_input_commands()
 
     step("Input command text")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +", ENTER)
+        .image_nomenus("input-pos2-alpha-display", 3, 2000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image_nomenus("input-pos2-alpha-display-123", 3, 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for alg")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +",ENTER)
-        .image("input-pos2-display")
+              "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +", ENTER)
+        .image_nomenus("input-pos2-alg-display", 2000)
         .test("123")
-        .image("input-pos2-display-123", 2000)
+        .image_nomenus("input-pos2-alg-display-123", 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command for algebraic")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 algebraic } INPUT",ENTER)
+              "\"Enter value\" { \"Data\" 3 algebraic } INPUT", ENTER)
         .test("123", ENTER)
         .type(ID_symbol)
         .got("Da123ta");
 
     step("Input command for expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"Data\" 3 expression } INPUT", ENTER)
         .test("123", ENTER)
         .type(ID_expression)
         .got("'Da123ta'");
 
     step("Input command with for algebraic number")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 algebraic } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 algebraic } INPUT", ENTER)
         .test("123+").editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
@@ -13502,7 +13846,7 @@ void tests::user_input_commands()
 
     step("Input command for expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
         .test("123+").editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
@@ -13510,7 +13854,7 @@ void tests::user_input_commands()
 
     step("Input command for arithmetic expression")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"\" 3 expression } INPUT",ENTER)
+              "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
         .test("123+X").editor("123+X")
         .test(ENTER).type(ID_expression).got("'123+X'");
 
@@ -14435,7 +14779,7 @@ tests &tests::itest(cstring txt)
         case L'↓': k = I;           alpha = true; xshift = true; break;
         case L'ⅈ': k = G; fn = F1;  alpha = false; shift = true; break;
         case L'∡': k = G; fn = F2;  alpha = false; shift = true; break;
-        case L'ρ': k = E;           alpha = true;  shift = true; break;
+        case L'σ': k = E;           alpha = true;  shift = true; break;
         case L'θ': k = E;           alpha = true; xshift = true; break;
         case L'π': k = I;           alpha = true;  shift = true; break;
         case L'Σ': k = A;           alpha = true;  shift = true; break;
@@ -14447,6 +14791,8 @@ tests &tests::itest(cstring txt)
         case L'≥': k = L;           alpha = true; xshift = true; break;
         case L'√': k = C;           alpha = true;  shift = true; break;
         case L'∫': k = KEY8;        alpha = true; xshift = true; break;
+        case L'…': k = SUB;         alpha = true; xshift = true; break;
+        case L'±': k = N;           alpha = true;  shift = true; break;
 
             // Special characters that require the characters menu
 #define NEXT        itest(ID_ToolsMenu); k = RESERVED2; break
@@ -14507,7 +14853,7 @@ tests &tests::itest(cstring txt)
         case L'ν': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F3); NEXT;
         case L'ξ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F4); NEXT;
         case L'ο': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F5); NEXT;
-        case L'σ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F3); NEXT;
+        case L'ρ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F2); NEXT;
         case L'τ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F4); NEXT;
         case L'υ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F5); NEXT;
         case L'φ': itest(ID_CharactersMenu, LSHIFT, F1, F6, F6, F6, F6, F1); NEXT;
@@ -14948,19 +15294,34 @@ tests &tests::image(cstring file, int x, int y, int w, int h, uint extrawait)
 }
 
 
-tests &tests::image_noheader(cstring name, uint ignoremenus, uint extrawait)
+tests &tests::image(cstring name, uint extrawait)
+// ----------------------------------------------------------------------------
+//   Image, waiting some extra time
+// ----------------------------------------------------------------------------
+{
+    return image(name, 0, 0, LCD_W, LCD_H, extrawait);
+}
+
+
+tests &tests::image_noheader(cstring name, uint ignoremenus, uint xtrawait)
 // ----------------------------------------------------------------------------
 //   Image, skipping the header area
 // ----------------------------------------------------------------------------
 {
     const int header_h = 23;
     const int menu_h   = 25 * ignoremenus;
-    return image(name,
-                 0,
-                 header_h,
-                 LCD_W,
-                 LCD_H - header_h - menu_h,
-                 extrawait);
+    return image(name, 0, header_h, LCD_W, LCD_H - header_h - menu_h, xtrawait);
+}
+
+
+tests &tests::image_nomenus(cstring name, uint ignoremenus, uint xtrawait)
+// ----------------------------------------------------------------------------
+//   Image, skipping the menus area
+// ----------------------------------------------------------------------------
+{
+    const int header_h = 0;
+    const int menu_h   = 25 * ignoremenus;
+    return image(name, 0, header_h, LCD_W, LCD_H - header_h - menu_h, xtrawait);
 }
 
 

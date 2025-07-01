@@ -250,6 +250,8 @@ COMMAND_BODY(ToolsMenu)
             case ID_neg_big_fraction:   menu = ID_FractionsMenu; break;
             case ID_polar:
             case ID_rectangular:        menu = ID_ComplexMenu; break;
+            case ID_range:
+            case ID_uncertain:          menu = ID_RangeMenu; break;
 #if CONFIG_FIXED_BASED_OBJECTS
             case ID_hex_integer:
             case ID_dec_integer:
@@ -358,13 +360,13 @@ MENU(MathMenu,
      "Trig",    ID_CircularMenu,
      "Powers",  ID_PowersMenu,
      "Matrix",  ID_MatrixMenu,
-     "Const",   ID_ConstantsMenu,
+     "Ranges",  ID_RangeMenu,
 
      "Hyper",   ID_HyperbolicMenu,
      "Proba",   ID_ProbabilitiesMenu,
      "Stats",   ID_StatisticsMenu,
      "Solver",  ID_SolverMenu,
-     "Vector",  ID_VectorMenu,
+     "Const",   ID_ConstantsMenu,
      "Eqns",    ID_EquationsMenu,
 
      "Signal",  ID_SignalProcessingMenu,
@@ -517,6 +519,15 @@ MENU(ComplexMenu,
      "ℂ→ℝ∡ℝ",   ID_PolarToReal,
      "Auto ℂ",  ID_ComplexResults,
      "Angles",  ID_AnglesMenu);
+
+MENU(RangeMenu,
+// ----------------------------------------------------------------------------
+//   Operation on ranges and uncertain numbers
+// ----------------------------------------------------------------------------
+     "…",       ID_SelfInsert,
+     "±",       ID_SelfInsert,
+     "±\tσ",    ID_SelfInsert,
+     "±\t%",    ID_SelfInsert);
 
 MENU(VectorMenu,
 // ----------------------------------------------------------------------------
@@ -1440,7 +1451,7 @@ MENU(SeparatorModesMenu,
      "1.2x10³²",        ID_FancyExponent,
      "1.2E32",          ID_ClassicExponent,
      "1.0→1.",          ID_TrailingDecimal,
-     "1.0→1",           ID_NoTrailingDecimal,
+     "1→1.0",           ID_ShowAsDecimal,
      "Fixed0",          ID_FixedWidthDigits);
 
 MENU(UserInterfaceModesMenu,

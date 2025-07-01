@@ -50,7 +50,7 @@ struct complex : algebraic
 {
     complex(id type, algebraic_r x, algebraic_r y): algebraic(type)
     {
-        byte *p = (byte *) payload(this);
+        byte *p = (byte *) this + leb128size(type);
         size_t xs = x->size();
         size_t ys = y->size();
         memcpy(p, byte_p(x), xs);

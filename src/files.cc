@@ -32,6 +32,7 @@
 #include "array.h"
 #include "dmcp.h"
 #include "file.h"
+#include "graphics.h"
 #include "grob.h"
 #include "list.h"
 #include "program.h"
@@ -808,6 +809,14 @@ bool files::store_grob(text_p name, grob_p value) const
         file f(filename(name, true), file::WRITING);
         if (f.valid())
         {
+            // The bitmap grob only works with HP-compatible GROBs
+            if (value->type() != ID_grob)
+                if (rt.push(value))
+                    if (run<ToHPGrob>() == object::OK)
+                        if (object_p obj = rt.pop())
+                            if (grob_p asgrob = obj->as<grob>())
+                                value = asgrob;
+
             bmsize  width      = 0;
             bmsize  height     = 0;
             size_t  datalen    = 0;

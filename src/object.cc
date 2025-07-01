@@ -64,6 +64,7 @@
 #include "plot.h"
 #include "polynomial.h"
 #include "program.h"
+#include "range.h"
 #include "renderer.h"
 #include "runtime.h"
 #include "settings.h"
@@ -402,8 +403,12 @@ retry:
         bool maybe_unit  = cp == '_' || cp == settings::SPACE_UNIT;
         bool maybe_fcall = p.precedence && (cp == '(' || utf8_whitespace(cp));
         bool maybe_asn   = !p.precedence && cp == '=';
+        bool maybe_range = (cp == range::INTERVAL_MARK   ||
+                            cp == drange::PLUSMINUS_MARK ||
+                            cp == uncertain::SIGMA_MARK);
 
-        if (maybe_rect || maybe_polar || maybe_unit || maybe_fcall || maybe_asn)
+        if (maybe_rect || maybe_polar || maybe_unit ||
+            maybe_fcall || maybe_asn  || maybe_range)
         {
             if (p.out->is_algebraic() || (maybe_asn &&
                                           p.out->is_extended_algebraic()))
@@ -424,6 +429,8 @@ retry:
                     r2 = funcall::do_parse(p);
                 else if (maybe_asn)
                     r2 = assignment::do_parse(p);
+                else if (maybe_range)
+                    r2 = range::do_parse(p);
 
                 // Check if we found the second part
                 if (r2 == OK)
@@ -1009,9 +1016,19 @@ size_t object::render(renderer &r) const
 // ------------------------------------------------------------------------
 {
     record(render, "Rendering %p into %p", this, &r);
-    size_t sz = size();
-    if (r.stack() && sz > Settings.TextRenderingSizeLimit())
-        return r.printf("Large %s (%lu bytes)", name(), sz);
+    if (r.stack())
+    {
+        if (Settings.ShowAsDecimal())
+            if (is_real() && !is_fp())
+                if (algebraic_g x = this->as_algebraic())
+                    if (algebraic::decimal_promotion(x))
+                        return decimal::do_render(decimal_p(+x), r);
+
+        size_t sz = size();
+        if (sz > Settings.TextRenderingSizeLimit())
+            return r.printf("Large %s (%lu bytes)", name(), sz);
+    }
+
     return ops().render(this, r);
 }
 
@@ -1023,8 +1040,16 @@ grob_p object::graph(grapher &g) const
 {
     record(render, "Graphing %+s %p into %p", name(), this, &g);
     size_t sz = size();
-    if (g.stack && !is_graph() && sz > Settings.GraphRenderingSizeLimit())
-        return nullptr;
+    if (g.stack)
+    {
+        if (Settings.ShowAsDecimal())
+            if (is_real() && !is_fp())
+                if (algebraic_g x = this->as_algebraic())
+                    if (algebraic::decimal_promotion(x))
+                        return decimal::do_graph(decimal_p(+x), g);
+        if (!is_graph() && sz > Settings.GraphRenderingSizeLimit())
+            return nullptr;
+    }
     return ops().graph(this, g);
 }
 
@@ -1388,6 +1413,8 @@ int object::as_truth(bool error) const
     case ID_neg_decimal:
     case ID_polar:
     case ID_rectangular:
+    case ID_range:
+    case ID_uncertain:
     case ID_unit:
         return !is_zero(error);
 
@@ -1477,6 +1504,10 @@ bool object::is_zero(bool error) const
         return polar_p(this)->is_zero();
     case ID_rectangular:
         return rectangular_p(this)->is_zero();
+    case ID_range:
+        return range_p(this)->is_zero();
+    case ID_uncertain:
+        return uncertain_p(this)->is_zero();
     case ID_unit:
         return unit_p(this)->value()->is_zero(error);
 
@@ -1526,6 +1557,10 @@ bool object::is_one(bool error) const
         return polar_p(this)->is_one();
     case ID_rectangular:
         return rectangular_p(this)->is_one();
+    case ID_range:
+        return range_p(this)->is_one();
+    case ID_uncertain:
+        return uncertain_p(this)->is_one();
     case ID_neg_integer:
     case ID_neg_bignum:
     case ID_neg_fraction:
@@ -1636,7 +1671,7 @@ int object::compare_to(object_p other) const
 }
 
 
-object_p object::child(uint index) const
+object_p object::child(uint index, bool coordinate) const
 // ----------------------------------------------------------------------------
 //    For a complex, list or array, return nth element
 // ----------------------------------------------------------------------------
@@ -1644,10 +1679,15 @@ object_p object::child(uint index) const
     id ty = type();
     switch (ty)
     {
-    case ID_rectangular:
-        return index ? rectangular_p(this)->im() : rectangular_p(this)->re();
     case ID_polar:
-        return index ? polar_p(this)->im() : polar_p(this)->re();
+        if (coordinate)
+            return index ? polar_p(this)->im() : polar_p(this)->re();
+        // fallthrough
+    case ID_rectangular:
+    case ID_range:
+    case ID_uncertain:
+    case ID_unit:
+        return index ? complex_p(this)->y() : complex_p(this)->x();
 
     case ID_list:
     case ID_array:
@@ -1713,6 +1753,8 @@ bool object::is_big() const
 
     case ID_rectangular:
     case ID_polar:
+    case ID_range:
+    case ID_uncertain:
         return complex_p(this)->x()->is_big() || complex_p(this)->y()->is_big();
     case ID_unit:
         return unit_p(this)->value()->is_big();

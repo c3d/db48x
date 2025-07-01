@@ -41,6 +41,7 @@
 #include "hwfp.h"
 #include "integer.h"
 #include "parser.h"
+#include "range.h"
 #include "renderer.h"
 #include "runtime.h"
 #include "settings.h"
@@ -309,6 +310,54 @@ bool algebraic::complex_promotion(algebraic_g &x, object::id type)
 }
 
 
+bool algebraic::range_promotion(algebraic_g &x, object::id type)
+// ----------------------------------------------------------------------------
+//   Promote the value x to the given range type
+// ----------------------------------------------------------------------------
+{
+    id xt = x->type();
+    if (xt == type)
+        return true;
+
+    record(algebraic, "Range promotion of %p from %+s to %+s",
+           (object_p) x, object::name(xt), object::name(type));
+
+    if (!is_range(type))
+    {
+        record(algebraic_error, "Range promotion to invalid type %+s",
+               object::name(type));
+        return false;
+    }
+
+    if (xt == ID_uncertain)
+    {
+        // Convert from uncertain to range
+        x = uncertain_p(+x)->as_range();
+        return +x;
+    }
+    else if (xt == ID_range || xt == ID_drange || xt == ID_prange)
+    {
+        // Convert from range to uncertain
+        x = range_p(+x)->as_uncertain();
+        return +x;
+    }
+    else if (is_symbolic(xt))
+    {
+        // Assume a symbolic value is complex for now
+        // TODO: Implement `REALASSUME`
+        return false;
+    }
+    else if (is_symbolic_arg(xt) || is_algebraic(xt))
+    {
+        algebraic_g zero = algebraic_p(integer::make(0));
+        x = range::make(type, x, x);
+        return +x;
+    }
+
+    return false;
+}
+
+
 object::id algebraic::bignum_promotion(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //   Promote the value x to the corresponding bignum
@@ -345,6 +394,9 @@ object::id algebraic::based_promotion(algebraic_g &x)
 //   Promote the value x to a based number
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return object::ID_object;
+
     id xt = x->type();
 
     switch (xt)
@@ -395,19 +447,22 @@ bool algebraic::to_integer(algebraic_g &x)
 //  Check if we can convert the number to an integer (or big integer)
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return false;
+
     id ty = x->type();
     switch(ty)
     {
     case ID_hwfloat:
         x = hwfloat_p(+x)->to_integer();
-        return true;
+        break;
     case ID_hwdouble:
         x = hwdouble_p(+x)->to_integer();
-        return true;
+        break;
     case ID_decimal:
     case ID_neg_decimal:
         x = decimal_p(+x)->to_integer();
-        return true;
+        break;
 
     case ID_integer:
     case ID_neg_integer:
@@ -417,7 +472,7 @@ bool algebraic::to_integer(algebraic_g &x)
     case ID_neg_fraction:
     case ID_big_fraction:
     case ID_neg_big_fraction:
-        return true;
+        break;
 
     case ID_unit:
     {
@@ -427,14 +482,14 @@ bool algebraic::to_integer(algebraic_g &x)
         if (to_integer(v))
         {
             x = unit::simple(v, u);
-            return true;
+            break;
         }
-        break;
     }
+    // fallthrough
     default:
-        break;
+        return false;
     }
-    return false;
+    return x;                   // Need x to be non-null
 }
 
 
@@ -448,14 +503,14 @@ bool algebraic::to_fraction(algebraic_g &x)
     {
     case ID_hwfloat:
         x = hwfloat_p(+x)->to_fraction();
-        return true;
+        break;
     case ID_hwdouble:
         x = hwdouble_p(+x)->to_fraction();
-        return true;
+        break;
     case ID_decimal:
     case ID_neg_decimal:
         x = decimal_p(+x)->to_fraction();
-        return true;
+        break;
 
     case ID_integer:
     case ID_neg_integer:
@@ -465,7 +520,7 @@ bool algebraic::to_fraction(algebraic_g &x)
     case ID_neg_fraction:
     case ID_big_fraction:
     case ID_neg_big_fraction:
-        return true;
+        break;
 
     case ID_rectangular:
     {
@@ -475,7 +530,7 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (!to_fraction(re) || !to_fraction(im))
             return false;
         x = rectangular::make(re, im);
-        return true;
+        break;
     }
     case ID_polar:
     {
@@ -485,7 +540,20 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (!to_fraction(mod) || !to_fraction(arg))
             return false;
         x = polar::make(mod, arg, object::ID_PiRadians);
-        return true;
+        break;
+    }
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (!to_fraction(lo) || !to_fraction(hi))
+            return false;
+        x = range::make(r->type(), lo, hi);
+        break;
     }
     case ID_unit:
     {
@@ -495,14 +563,14 @@ bool algebraic::to_fraction(algebraic_g &x)
         if (to_fraction(v))
         {
             x = unit::simple(v, u);
-            return true;
+            break;
         }
-        break;
     }
+    // fallthrough
     default:
-        break;
+        return false;
     }
-    return false;
+    return x;                   // We need x to be non-null
 }
 
 
@@ -554,7 +622,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         if (to_decimal(re, weak) && to_decimal(im, weak))
         {
             x = rectangular::make(re, im);
-            return true;
+            return x;
         }
         break;
     }
@@ -567,6 +635,30 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
             (mod->is_fraction() || to_decimal(arg, weak)))
         {
             x = polar::make(mod, arg, object::ID_PiRadians);
+            return x;
+        }
+        break;
+    }
+    case ID_range:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (to_decimal(lo, weak) && to_decimal(hi, weak))
+        {
+            x = range::make(r->type(), lo, hi);
+            return true;
+        }
+        break;
+    }
+    case ID_uncertain:
+    {
+        uncertain_p u = uncertain_p(+x);
+        algebraic_g a = u->average();
+        algebraic_g s = u->stddev();
+        if (to_decimal(a, weak) && to_decimal(s, weak))
+        {
+            x = uncertain::make(a, s);
             return true;
         }
         break;
@@ -579,7 +671,7 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         if (to_decimal(v, weak))
         {
             x = unit::simple(v, u);
-            return true;
+            return x;
         }
         break;
     }

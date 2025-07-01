@@ -42,6 +42,7 @@
 #include "list.h"
 #include "logical.h"
 #include "polynomial.h"
+#include "range.h"
 #include "solve.h"
 #include "tag.h"
 #include "unit.h"
@@ -325,6 +326,8 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 
     if (is_complex(xt))
         return algebraic_p(ops.zop(complex_g(complex_p(+x))));
+    if (is_range(xt))
+        return algebraic_p(ops.rop(range_g(range_p(+x))));
 
     // Check if need to promote integer values to decimal
     if (is_integer(xt))
@@ -562,7 +565,14 @@ FUNCTION_BODY(neg)
         return polar::make(-polar_p(+x)->mod(),
                            polar_p(+x)->arg(object::ID_PiRadians),
                            object::ID_PiRadians);
-
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_g r = range_p(+x);
+        return -r;
+    }
     case ID_unit:
         return unit::simple(neg::run(unit_p(+x)->value()),
                             unit_p(+x)->uexpr());
@@ -632,6 +642,15 @@ FUNCTION_BODY(abs)
     case ID_rectangular:
     case ID_polar:
         return complex_p(+x)->mod();
+
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_g r = range_p(+x);
+        return range::abs(r);
+    }
 
     case ID_unit:
         return unit::simple(abs::run(unit_p(+x)->value()),
@@ -1085,6 +1104,18 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
         re = rnd_or_trnc(re, digits, func);
         im = rnd_or_trnc(im, digits, func);
         return rectangular::make(re, im);
+    }
+    case object::ID_range:
+    case object::ID_drange:
+    case object::ID_prange:
+    case object::ID_uncertain:
+    {
+        range_p r = range_p(+value);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        lo = rnd_or_trnc(lo, digits, func);
+        hi = rnd_or_trnc(hi, digits, func);
+        return range::make(r->type(), lo, hi);
     }
     case object::ID_unit:
     {

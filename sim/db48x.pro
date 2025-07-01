@@ -78,6 +78,7 @@ SOURCES +=                                      \
         ../src/plot.cc                          \
         ../src/polynomial.cc                    \
         ../src/program.cc                       \
+        ../src/range.cc                         \
         ../src/renderer.cc                      \
         ../src/runtime.cc                       \
         ../src/settings.cc                      \

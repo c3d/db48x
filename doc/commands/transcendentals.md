@@ -109,7 +109,12 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
-## LOG
+## LN
+
+Compute the natural logarithm
+
+## LOG10
+
 Compute logarithm in base 10
 
 

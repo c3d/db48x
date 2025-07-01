@@ -623,6 +623,12 @@ operate on these items when it makes sense. Therefore:
   similar to how these operations apply to lists on the HP50G (which seems to
   be undocumented).
 
+* The `^` operation performs matrix operations if given an integer value as the
+  right argument, but will perform element-wise otherwise. For example,
+  `[[a b][c d] 2 ^` is the same as multiplying the array by itself, in other
+  words it returns `[[ 'a²+b·c' 'a·b+b·d' ] [ 'c·a+d·c' 'c·b+d²' ]]`. However,
+  `[[a b][c d] 2. ^` performs the operation element-wise and returns
+  `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
 
 ### Mathematics
 
@@ -2241,6 +2247,40 @@ logarithms, exponential and hyperbolic functions, as well as a few specific
 functions such as `conj` or `arg`. These functions are available in
 the `ComplexMenu`.
 
+## Ranges
+
+Ranges (also called *intervals*) represent a range of numbers that show as `x…y`
+and represent any value that is known to be between `x` and `y`. There are three range types that differ in the way they display:
+
+* Explicit ranges show the lower and upper bounds, e.g. `2…4` to represent
+  the range of numbers between `2` and `4`.
+* Delta ranges show the middle point and the distance between that middle point
+  and the lower or upper bounds. For example `3±1` also represents values
+  between `2` and `4`.
+* Percent ranges show the middle point and a percentage of that middle value to
+  the lower and upper bound. For example, `2±50%` represents values between `1`
+  and `3`, the distance between `1` and `2` being `50%` of `2`. Note that if the
+  central value is `0`, the percentage will be shown relative to `1` and not
+  `0`, so that `-3…3` will show as `0±300%`
+
+The `Cycle` command (bound to the _EEX_ key) will cycle between the three range
+formats.
+
+Operations on ranges will compute the upper and lower bound of the result to
+create a new range. This applies to arithmetic operations:
+
+```rpl
+1…3 2…6 ÷
+@ Expecting ¹/₆…1 ¹/₂
+```
+
+
+## Uncertain numbers
+
+Uncertainties represent a range of numbers that show as `a±σs` and represent a
+value using its average `a` and a standard deviation `s`. The difference with
+ranges is how the computation of the uncertainty is performed.
+
 
 ## Expressions
 
@@ -3678,6 +3718,40 @@ third argument:
 To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.9 "Headrest" - Ranges
+
+This release introduces four range types to perform computations on ranges, and
+fixes serious graphical regressions that remained undetected by the test suite.
+
+### New features
+
+* Three range types, known as _interval_ (`1…3`), _delta range_ (`2±1`) and
+  _percent range_ (`2±50%`), for which arithmetic and most operations have been
+  implemented.
+* An uncertain type (`2±3σ`), for which arithmetic and operations are not
+  implemented yet.
+* A new flag, `ShowAsDecimal`, presents integers and fractions using a decimal
+  format. This is useful for people working in banking, who can use `2 FIX` mode
+  for all values. In that mode, `50` will display as `50.00`, and `3/4` will
+  display as `0.75`. The `Show` command still shows the original value.
+* The simulator now strips CR/LF when pasting on Windows.
+* The `^` operator now operates on arrays
+
+### Bug fixes
+
+* The image comparison code has been broken since January. As a result,
+  various regression regarding graphical output remained undetected.
+* One particular case is the generation of incorrect BMP files after the default
+  format for graphic objects was switched to `bitmap`.
+* A possible crash was eliminated when converting a number to integer, to
+  fraction or to decimal.
+
+### Improvements
+
+* The `σ` (used for uncertain numbers) replaces `ρ` (unused at the moment) on
+  the keyboard in alpha mode.
+
 
 ## Release 0.9.8 "Crowdfeeding" - Bug fixes
 
@@ -15823,6 +15897,20 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+## ShowAsDecimal
+
+Show integer numbers like `25` and fractions like `3/2` as decimal values.
+This enables formatting with `FIX` or `SCI` to apply to integer numbers and
+fractions. For example, if `25` is on the stack, after `2 FIX`, it will show on
+the stack as `25.00`.
+
+This is the opposite of `ShowIntegersAndFractions`.
+
+## ShowIntegersAndFractions
+
+Show integer numbers like `25` and fractions like `3/2` as is.
+With this setting in effect, `25` after `2 FIX` will show as `25` and not
+`25.00`.
 
 # Display Grouping and Spacing
 
@@ -18091,7 +18179,12 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
-## LOG
+## LN
+
+Compute the natural logarithm
+
+## LOG10
+
 Compute logarithm in base 10
 
 
