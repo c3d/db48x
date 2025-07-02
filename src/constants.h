@@ -123,10 +123,11 @@ struct constant : algebraic
     }
     algebraic_p value() const
     {
+        uint index = value_index();
         algebraic_p val = specification();
         if (val)
             if (array_p spec = val->as<array>())
-                if (object_p obj = spec->at(value_index()))
+                if (object_p obj = spec->at(index))
                     if (algebraic_p alg = obj->as_extended_algebraic())
                         val = alg;
         return val;
