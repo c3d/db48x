@@ -137,6 +137,21 @@ HELP_BODY(constant)
 }
 
 
+algebraic_p constant::numerical_value() const
+// ----------------------------------------------------------------------------
+//   Evaluate a constant as a numerical value
+// ----------------------------------------------------------------------------
+{
+    save<bool> nodates(unit::nodates, true);
+    if (algebraic_g a = value())
+    {
+        to_decimal(a, true);
+        return a;
+    }
+    return nullptr;
+}
+
+
 MENU_BODY(constant_menu)
 // ----------------------------------------------------------------------------
 //   Build a constants menu
@@ -1474,6 +1489,7 @@ object_p constant::cache() const
             if (!rt.constants(idx+1))
                 return nullptr;;
 
+        save<bool> nodates(unit::nodates, true);
         value = cst->do_value(constants);
         rt.constant(idx, value);
 

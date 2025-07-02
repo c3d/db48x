@@ -131,15 +131,7 @@ struct constant : algebraic
                         val = alg;
         return val;
     }
-    algebraic_p numerical_value() const
-    {
-        if (algebraic_g a = value())
-        {
-            to_decimal(a, true);
-            return a;
-        }
-        return nullptr;
-    }
+    algebraic_p numerical_value() const;
     uint value_index() const
     {
         switch (type())
