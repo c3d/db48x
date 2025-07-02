@@ -690,6 +690,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
     case ID_hwdouble:
     case ID_decimal:
     case ID_neg_decimal:
+    case ID_True:
+    case ID_False:
         return decimal_promotion(x);
     case ID_constant:
     case ID_standard_uncertainty:

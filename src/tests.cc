@@ -2766,6 +2766,10 @@ void tests::logical_operations()
         .test(CLEAR, "10#42 10#7 XOR", ENTER)
         .expect("#45₁₀")
         .test(CLEAR, "'TruthLogicForIntegers' Purge", ENTER).noerror();
+
+    step("Convert True and False to decimal")
+        .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
+        .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
 }
 
 
