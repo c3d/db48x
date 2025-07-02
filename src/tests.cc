@@ -186,7 +186,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            range_types();
+            constants_parsing();
 
 #if 0
         if (onlyCurrent & 2)
@@ -7140,6 +7140,8 @@ void tests::constants_parsing()
         {
             istep(cst[i]);
             test(CLEAR, DIRECT(cst[i+1]), ENTER).noerror();
+            test(DIRECT("if dup typename \"array\" = "
+                        "then →Num else Run end"), ENTER).noerror();
         }
         else
         {

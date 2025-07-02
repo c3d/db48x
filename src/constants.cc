@@ -658,7 +658,7 @@ static const cstring basic_constants[] =
                 "  'ⓇG/2' ]",
     // *Planck energy - Calculation from measurement
     "Epl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc^5/ⒸG);1_GeV);XPON(UVAL(ⓇEpl*√(Ⓒℏ*Ⓒc^5/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc^5/ⒸG)))-2)' "
-                "  'ROUND(CONVERT(ROUND(UBASE(ⓇEpl*Epl);-2);1_GeV);-2)' "
+                "  'ROUND(CONVERT(ROUND(UBASE(ⓇEpl*ⒸEpl);-2);1_GeV);-2)' "
                 "  'ⓇG/2' ]",
     // *Planck temperature - Calculation from measurement
     "T°pl",     "[ 'ROUND(CONVERT(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk;1_K);XPON(UVAL(ⓇT°pl*√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-XPON(UVAL(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-2)' "
