@@ -124,7 +124,7 @@ EVAL_BODY(constant)
     if (!Settings.NumericalConstants() && !Settings.NumericalResults())
         return rt.push(o) ? OK : ERROR;
     object_p value = o->numerical_value();
-    return rt.push(value) ? OK : ERROR;
+    return value && rt.push(value) ? OK : ERROR;
 }
 
 
