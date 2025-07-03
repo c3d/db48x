@@ -150,9 +150,9 @@ Assemble a list from results of sequential procedure
 
 Return the sum of a list or array.
 
-- The `ListSum` command calculates the sum of all elements in a list or array.
-- It uses the `+` operation to add all elements together.
-- The result is a single value representing the sum of all elements.
+ * The `ListSum` command calculates the sum of all elements in a list or array.
+ * It uses the `+` operation to add all elements together.
+ * The result is a single value representing the sum of all elements.
 
 *This command is defined as `ListSum` in the code and as `ΣList` on the calculator.*
 
@@ -160,9 +160,9 @@ Return the sum of a list or array.
 
 Return the product of a list or array.
 
-- The `ListProduct` command calculates the product of all elements in a list or array.
-- It uses the `×` operation to multiply all elements together.
-- The result is a single value representing the product of all elements.
+ * The `ListProduct` command calculates the product of all elements in a list or array.
+ * It uses the `×` operation to multiply all elements together.
+ * The result is a single value representing the product of all elements.
 
 *This command is defined as `ListProduct` in the code and as `∏List` on the calculator.*
 
@@ -170,8 +170,8 @@ Return the product of a list or array.
 
 Return the differences between successive elements in a list or array.
 
-- The `ListDifferences` command calculates the differences between consecutive elements in a list or array.
-- It uses the `-` operation to subtract each element from the next one.
-- The result is a list with one fewer element than the input, containing the differences.
+ * The `ListDifferences` command calculates the differences between consecutive elements in a list or array.
+ * It uses the `-` operation to subtract each element from the next one.
+ * The result is a list with one fewer element than the input, containing the differences.
 
 *This command is defined as `ListDifferences` in the code and as `∆List` on the calculator.*

@@ -230,10 +230,10 @@ Apply certain assumptions about a variable to an expression.
 
 Recall the current algebra configuration directory.
 
-- The `AlgebraConfiguration` command provides access to the directory that stores the current Computer Algebra System (CAS) configuration.
-- This directory contains settings and variables used for symbolic computations.
-- If no configuration directory exists, one will be created when needed.
-- The configuration directory is stored in the global variable `Ⓓ` (CASDir).
+ * The `AlgebraConfiguration` command provides access to the directory that stores the current Computer Algebra System (CAS) configuration.
+ * This directory contains settings and variables used for symbolic computations.
+ * If no configuration directory exists, one will be created when needed.
+ * The configuration directory is stored in the global variable `Ⓓ` (CASDir).
 
 *This command is defined as `AlgebraConfiguration` in the code and as `Ⓓ` on the calculator.*
 
@@ -241,9 +241,9 @@ Recall the current algebra configuration directory.
 
 Recall the current algebra variable, defaults to `X`.
 
-- The `AlgebraVariable` command returns the current variable used for polynomial evaluation and symbolic computations.
-- If no variable is set, it defaults to `X`.
-- The variable is stored in the algebra configuration directory.
+ * The `AlgebraVariable` command returns the current variable used for polynomial evaluation and symbolic computations.
+ * If no variable is set, it defaults to `X`.
+ * The variable is stored in the algebra configuration directory.
 
 *This command is defined as `AlgebraVariable` in the code and as `ⓧ` on the calculator.*
 
@@ -251,9 +251,9 @@ Recall the current algebra variable, defaults to `X`.
 
 Store the current algebra variable.
 
-- The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
-- The variable must be a quoted symbol (e.g., `'X'`).
-- The variable is stored in the algebra configuration directory.
+ * The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+ * The variable must be a quoted symbol (e.g., `'X'`).
+ * The variable is stored in the algebra configuration directory.
 
 *This command is defined as `StoreAlgebraVariable` in the code and as `Storeⓧ` on the calculator.*
 
@@ -261,10 +261,10 @@ Store the current algebra variable.
 
 Store expression in `Equation` variable.
 
-- The `StEq` command stores an expression, polynomial, or equation in the reserved `Equation` variable.
-- The stored equation can be a single equation or a list of equations.
-- All stored equations must be of type expression, polynomial, or equation.
-- The stored equation is used by the solving menu and other equation-related commands.
+ * The `StEq` command stores an expression, polynomial, or equation in the reserved `Equation` variable.
+ * The stored equation can be a single equation or a list of equations.
+ * All stored equations must be of type expression, polynomial, or equation.
+ * The stored equation is used by the solving menu and other equation-related commands.
 
 *This command is defined as `StEq` in the code and as `StoreEquation` on the calculator.*
 
@@ -272,9 +272,9 @@ Store expression in `Equation` variable.
 
 Recall expression from `Equation` variable.
 
-- The `RcEq` command recalls the currently stored equation from the `Equation` variable.
-- If no equation is stored, it returns an error.
-- The recalled equation can be used for further manipulation or solving.
+ * The `RcEq` command recalls the currently stored equation from the `Equation` variable.
+ * If no equation is stored, it returns an error.
+ * The recalled equation can be used for further manipulation or solving.
 
 *This command is defined as `RcEq` in the code and as `RecallEquation` on the calculator.*
 
@@ -282,9 +282,9 @@ Recall expression from `Equation` variable.
 
 Cycle equations in the `Equation` variable if it's a list.
 
-- The `NextEq` command cycles through equations if the `Equation` variable contains a list of equations.
-- It rotates the equations in the list, making the next equation the current one.
-- This is useful when working with multiple equations and wanting to solve them one by one.
+ * The `NextEq` command cycles through equations if the `Equation` variable contains a list of equations.
+ * It rotates the equations in the list, making the next equation the current one.
+ * This is useful when working with multiple equations and wanting to solve them one by one.
 
 *This command is defined as `NextEq` in the code and as `NextEquation` on the calculator.*
 
@@ -292,10 +292,10 @@ Cycle equations in the `Equation` variable if it's a list.
 
 Evaluate the current equation.
 
-- The `EvalEq` command evaluates the currently stored equation.
-- For equations (expressions with `=`), it evaluates both sides and returns the difference.
-- For other expressions, it evaluates the expression normally.
-- The evaluation is done in function evaluation mode with dates disabled.
+ * The `EvalEq` command evaluates the currently stored equation.
+ * For equations (expressions with `=`), it evaluates both sides and returns the difference.
+ * For other expressions, it evaluates the expression normally.
+ * The evaluation is done in function evaluation mode with dates disabled.
 
 *This command is defined as `EvalEq` in the code and as `EvaluateEquation` on the calculator.*
 
@@ -303,9 +303,9 @@ Evaluate the current equation.
 
 Perform a substitution and evaluate the resulting expression.
 
-- The `Where` command performs symbolic substitution in expressions.
-- It takes an expression and a substitution rule (or list of rules) and applies the substitution.
-- The substitution can be a single equation (e.g., `'X=Z+1'`) or a list of equations.
-- The result is the expression with the substitutions applied and evaluated.
+ * The `Where` command performs symbolic substitution in expressions.
+ * It takes an expression and a substitution rule (or list of rules) and applies the substitution.
+ * The substitution can be a single equation (e.g., `'X=Z+1'`) or a list of equations.
+ * The result is the expression with the substitutions applied and evaluated.
 
 *This command is defined as `Where` in the code and as `|` on the calculator.*
