@@ -290,9 +290,9 @@ CMD(cos)
 CMD(tan)                        // WARNING: order used in function.cc
 
 // Exp and log
-NAMED(log, "ln")                ALIAS(log, "ln")
+CMD(ln)
 CMD(exp)
-CMD(log10)
+CMD(log10)                      ALIAS(log10, "log")
 CMD(exp10)                      ALIAS(exp10, "alog")
 
 // Conversions
@@ -371,7 +371,7 @@ CMD(sinh)
 CMD(cosh)
 CMD(tanh)
 
-CMD(log1p)      ALIAS(log1p, "lnp1")            // HP48 compatibility
+CMD(ln1p)       ALIAS(ln1p, "lnp1")             // HP48 compatibility
 CMD(expm1)      ALIAS(expm1, "expm")            // HP48 compatibility
 CMD(log2)
 CMD(exp2)       ALIAS(exp2, "alog2")

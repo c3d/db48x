@@ -586,12 +586,12 @@ RANGE_BODY(atanh)
 }
 
 
-RANGE_BODY(log1p)
+RANGE_BODY(ln1p)
 // ----------------------------------------------------------------------------
-//   Range implementation of log1p
+//   Range implementation of ln1p
 // ----------------------------------------------------------------------------
 {
-    return monotonic(log1p::evaluate, r);
+    return monotonic(ln1p::evaluate, r);
 }
 
 RANGE_BODY(expm1)
@@ -603,12 +603,12 @@ RANGE_BODY(expm1)
 }
 
 
-RANGE_BODY(log)
+RANGE_BODY(ln)
 // ----------------------------------------------------------------------------
 //   Range implementation of log
 // ----------------------------------------------------------------------------
 {
-    return monotonic(log::evaluate, r);
+    return monotonic(ln::evaluate, r);
 }
 
 RANGE_BODY(log10)

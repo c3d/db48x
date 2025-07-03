@@ -464,9 +464,9 @@ struct eq
     EQ_FUNCTION(acosh);
     EQ_FUNCTION(atanh);
 
-    EQ_FUNCTION(log1p);
+    EQ_FUNCTION(ln1p);
     EQ_FUNCTION(expm1);
-    EQ_FUNCTION(log);
+    EQ_FUNCTION(ln);
     EQ_FUNCTION(log10);
     EQ_FUNCTION(log2);
     EQ_FUNCTION(exp);
@@ -612,9 +612,9 @@ EQ_FUNCTION(asinh);
 EQ_FUNCTION(acosh);
 EQ_FUNCTION(atanh);
 
-EQ_FUNCTION(log1p);
+EQ_FUNCTION(ln1p);
 EQ_FUNCTION(expm1);
-EQ_FUNCTION(log);
+EQ_FUNCTION(ln);
 EQ_FUNCTION(log10);
 EQ_FUNCTION(log2);
 EQ_FUNCTION(exp);

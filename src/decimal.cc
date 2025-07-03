@@ -2133,7 +2133,7 @@ decimal_p decimal::pow(decimal_r x, decimal_r y)
         return nullptr;
     pow::remember(target<pow>);
     precision_adjust prec;
-    return prec(exp(y * log(x)));
+    return prec(exp(y * ln(x)));
 }
 
 
@@ -2614,7 +2614,7 @@ decimal_p decimal::asinh(decimal_r x)
 {
     precision_adjust prec;
     decimal_g one = make(1);
-    return prec(log(x + decimal_g(sqrt(x*x + one))));
+    return prec(ln(x + decimal_g(sqrt(x*x + one))));
 }
 
 
@@ -2625,7 +2625,7 @@ decimal_p decimal::acosh(decimal_r x)
 {
     precision_adjust prec;
     decimal_g one = make(1);
-    return prec(log(x + decimal_g(sqrt(x*x - one))));
+    return prec(ln(x + decimal_g(sqrt(x*x - one))));
 }
 
 
@@ -2637,11 +2637,11 @@ decimal_p decimal::atanh(decimal_r x)
     precision_adjust prec;
     decimal_g one = make(1);
     decimal_g half = make(5, -1);
-    return prec(half * log((one + x) / (one - x)));
+    return prec(half * ln((one + x) / (one - x)));
 }
 
 
-decimal_p decimal::log1p(decimal_r x)
+decimal_p decimal::ln1p(decimal_r x)
 // ----------------------------------------------------------------------------
 //   ln(1+x)
 // ----------------------------------------------------------------------------
@@ -2817,7 +2817,7 @@ decimal_p decimal::expm1(decimal_r x)
 }
 
 
-decimal_p decimal::log(decimal_r x)
+decimal_p decimal::ln(decimal_r x)
 // ----------------------------------------------------------------------------
 //   Compute natural logarithm of x
 // ----------------------------------------------------------------------------
@@ -2836,12 +2836,12 @@ decimal_p decimal::log(decimal_r x)
     if (negln)
     {
         decimal_g scaled = one / x - one;
-        scaled = log1p(scaled);
+        scaled = ln1p(scaled);
         scaled = -scaled;
         return prec(scaled);
     }
     decimal_g scaled = x - one;
-    scaled = log1p(scaled);
+    scaled = ln1p(scaled);
     return prec(scaled);
 }
 
@@ -2867,7 +2867,7 @@ decimal_p decimal::log10(decimal_r x)
         fp = make(1, -exp10);
         fp = fp * x;
     }
-    decimal_g lnx = log(fp);
+    decimal_g lnx = ln(fp);
     decimal_g ln10 = constants().ln10();
     ln10 = lnx / ln10;
     if (exp10)
@@ -2885,7 +2885,7 @@ decimal_p decimal::log2(decimal_r x)
 // ----------------------------------------------------------------------------
 {
     precision_adjust prec;
-    decimal_g lnx = log(x);
+    decimal_g lnx = ln(x);
     decimal_g ln2 = constants().ln2();
     return prec(lnx / ln2);
 }
@@ -3171,7 +3171,7 @@ decimal_p decimal::lgamma_internal(decimal_r x)
             fp = make(1);
             ip = ip - fp;
             ip = fact(ip);
-            return log(ip);
+            return ln(ip);
         }
     }
 
@@ -3180,7 +3180,7 @@ decimal_p decimal::lgamma_internal(decimal_r x)
         // gamma(x) = pi/(asin(pi*x) * gamma(1-x))
         ip = x + x;
         ip = sin_fracpi(0, ip);
-        ip = log(ip);
+        ip = ln(ip);
         fp = make(1);
         fp = lgamma_internal(fp - x);
         fp = fp + ip;
@@ -3251,14 +3251,14 @@ decimal_p decimal::lgamma_internal(decimal_r x)
         record(decimal, "%u: sum=%t", i, +sum);
     }
 
-    sum = log(sum);
+    sum = ln(sum);
 
     // Add first term
     tmp = x + a;
     z = make(5, -1);
     z = x + z;
-    a = log(x);
-    tmp = log(tmp) * z - tmp - a;
+    a = ln(x);
+    tmp = ln(tmp) * z - tmp - a;
     sum = sum + tmp;
 
     return sum;
@@ -3484,7 +3484,7 @@ decimal_r decimal::ccache::ln10()
     if (!log10)
     {
         decimal_g ten = make(10);
-        log10 = log(ten);
+        log10 = ln(ten);
         cleaner::disable();
     }
     return log10;
@@ -3499,7 +3499,7 @@ decimal_r decimal::ccache::ln2()
     if (!log2)
     {
         decimal_g two = make(2);
-        log2 = log(two);
+        log2 = ln(two);
         cleaner::disable();
     }
     return log2;
@@ -3513,7 +3513,7 @@ decimal_r decimal::ccache::lnpi()
 {
     if (!lpi)
     {
-        lpi = log(pi);
+        lpi = ln(pi);
         cleaner::disable();
     }
     return lpi;

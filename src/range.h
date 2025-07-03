@@ -100,9 +100,9 @@ public:
     RANGE_FUNCTION(acosh);
     RANGE_FUNCTION(atanh);
 
-    RANGE_FUNCTION(log1p);
+    RANGE_FUNCTION(ln1p);
     RANGE_FUNCTION(expm1);
-    RANGE_FUNCTION(log);
+    RANGE_FUNCTION(ln);
     RANGE_FUNCTION(log10);
     RANGE_FUNCTION(log2);
     RANGE_FUNCTION(exp);

@@ -558,9 +558,9 @@ struct decimal : algebraic
     static decimal_p acosh(decimal_r x);
     static decimal_p atanh(decimal_r x);
 
-    static decimal_p log1p(decimal_r x);
+    static decimal_p ln1p(decimal_r x);
     static decimal_p expm1(decimal_r x);
-    static decimal_p log(decimal_r x);
+    static decimal_p ln(decimal_r x);
     static decimal_p log10(decimal_r x);
     static decimal_p log2(decimal_r x);
     static decimal_p exp(decimal_r x);

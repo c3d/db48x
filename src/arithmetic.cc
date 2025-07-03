@@ -1252,7 +1252,7 @@ bool pow::complex_ok(complex_g &x, complex_g &y)
 //   Implement x^y as exp(y * log(x))
 // ----------------------------------------------------------------------------
 {
-    x = complex::exp(y * complex::log(x));
+    x = complex::exp(y * complex::ln(x));
     return x;
 }
 
@@ -1262,7 +1262,7 @@ bool pow::range_ok(range_g &x, range_g &y)
 //   Implement x^y as exp(y * log(x))
 // ----------------------------------------------------------------------------
 {
-    x = range::exp(y * range::log(x));
+    x = range::exp(y * range::ln(x));
     return x;
 }
 
