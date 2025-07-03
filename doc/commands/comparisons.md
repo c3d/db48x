@@ -124,10 +124,10 @@ Check if the first value is greater than or equal to the second value.
 
 Test if two objects are strictly identical (same type and value).
 
-- The `TestSame` command (operator `==`) compares two objects for strict identity.
-- It evaluates names (symbols and locals) before comparison.
-- Returns `True` if the objects are identical, `False` otherwise.
-- This is different from `same` which does not evaluate names.
+ * The `TestSame` command (operator `==`) compares two objects for strict identity.
+ * It evaluates names (symbols and locals) before comparison.
+ * Returns `True` if the objects are identical, `False` otherwise.
+ * This is different from `same` which does not evaluate names.
 
 *This command is defined as `TestSame` in the code and as `==` on the calculator.*
 
@@ -135,9 +135,9 @@ Test if two objects are strictly identical (same type and value).
 
 Test if the first value is less than the second value.
 
-- The `TestLT` command (operator `<`) compares two values.
-- Returns `True` if the first value is less than the second value.
-- Returns `False` otherwise.
+ * The `TestLT` command (operator `<`) compares two values.
+ * Returns `True` if the first value is less than the second value.
+ * Returns `False` otherwise.
 
 *This command is defined as `TestLT` in the code and as `<` on the calculator.*
 
@@ -145,9 +145,9 @@ Test if the first value is less than the second value.
 
 Test if two values are equal.
 
-- The `TestEQ` command (operator `=`) compares two values for equality.
-- Returns `True` if the values are equal.
-- Returns `False` otherwise.
+ * The `TestEQ` command (operator `=`) compares two values for equality.
+ * Returns `True` if the values are equal.
+ * Returns `False` otherwise.
 
 *This command is defined as `TestEQ` in the code and as `=` on the calculator.*
 
@@ -155,9 +155,9 @@ Test if two values are equal.
 
 Test if the first value is greater than the second value.
 
-- The `TestGT` command (operator `>`) compares two values.
-- Returns `True` if the first value is greater than the second value.
-- Returns `False` otherwise.
+ * The `TestGT` command (operator `>`) compares two values.
+ * Returns `True` if the first value is greater than the second value.
+ * Returns `False` otherwise.
 
 *This command is defined as `TestGT` in the code and as `>` on the calculator.*
 
@@ -165,9 +165,9 @@ Test if the first value is greater than the second value.
 
 Test if the first value is less than or equal to the second value.
 
-- The `TestLE` command (operator `≤`) compares two values.
-- Returns `True` if the first value is less than or equal to the second value.
-- Returns `False` otherwise.
+ * The `TestLE` command (operator `≤`) compares two values.
+ * Returns `True` if the first value is less than or equal to the second value.
+ * Returns `False` otherwise.
 
 *This command is defined as `TestLE` in the code and as `≤` on the calculator.*
 
@@ -175,9 +175,9 @@ Test if the first value is less than or equal to the second value.
 
 Test if two values are not equal.
 
-- The `TestNE` command (operator `≠`) compares two values for inequality.
-- Returns `True` if the values are not equal.
-- Returns `False` if the values are equal.
+ * The `TestNE` command (operator `≠`) compares two values for inequality.
+ * Returns `True` if the values are not equal.
+ * Returns `False` if the values are equal.
 
 *This command is defined as `TestNE` in the code and as `≠` on the calculator.*
 
@@ -185,8 +185,8 @@ Test if two values are not equal.
 
 Test if the first value is greater than or equal to the second value.
 
-- The `TestGE` command (operator `≥`) compares two values.
-- Returns `True` if the first value is greater than or equal to the second value.
-- Returns `False` otherwise.
+ * The `TestGE` command (operator `≥`) compares two values.
+ * Returns `True` if the first value is greater than or equal to the second value.
+ * Returns `False` otherwise.
 
 *This command is defined as `TestGE` in the code and as `≥` on the calculator.*

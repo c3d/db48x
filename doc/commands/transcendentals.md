@@ -148,8 +148,8 @@ Compute 2^x
 
 Calculate the hypotenuse given two values (x, y), i.e., sqrt(x^2 + y^2).
 
-- Only works for numeric types (not integers, big integers, fractions, or complex numbers yet).
-- Not optimized for special integer cases (e.g., 3-4-5 triangle).
-- Not implemented for ranges or complex numbers (to be defined as sqrt(x^2 + y^2)).
+ * Only works for numeric types (not integers, big integers, fractions, or complex numbers yet).
+ * Not optimized for special integer cases (e.g., 3-4-5 triangle).
+ * Not implemented for ranges or complex numbers (to be defined as sqrt(x^2 + y^2)).
 
 *This command is defined as `hypot` in the code and as `⊿` on the calculator.*

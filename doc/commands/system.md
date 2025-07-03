@@ -455,9 +455,9 @@ This should be used for debugging purpose only.
 
 Addition of HMS values.
 
-- The `HMSAdd` command adds two HMS (Hours, Minutes, Seconds) values together.
-- Both arguments are converted to decimal format, added, and then converted back to HMS format.
-- The result is returned as a unit object with the `_hms` unit.
+ * The `HMSAdd` command adds two HMS (Hours, Minutes, Seconds) values together.
+ * Both arguments are converted to decimal format, added, and then converted back to HMS format.
+ * The result is returned as a unit object with the `_hms` unit.
 
 *This command is defined as `HMSAdd` in the code and as `HMS+` on the calculator.*
 
@@ -465,9 +465,9 @@ Addition of HMS values.
 
 Subtraction of HMS values.
 
-- The `HMSSub` command subtracts one HMS (Hours, Minutes, Seconds) value from another.
-- Both arguments are converted to decimal format, subtracted, and then converted back to HMS format.
-- The result is returned as a unit object with the `_hms` unit.
+ * The `HMSSub` command subtracts one HMS (Hours, Minutes, Seconds) value from another.
+ * Both arguments are converted to decimal format, subtracted, and then converted back to HMS format.
+ * The result is returned as a unit object with the `_hms` unit.
 
 *This command is defined as `HMSSub` in the code and as `HMS-` on the calculator.*
 
@@ -475,9 +475,9 @@ Subtraction of HMS values.
 
 Convert value to DMS format.
 
-- The `ToDMS` command converts a decimal value to DMS (Degrees, Minutes, Seconds) format.
-- The input is interpreted as decimal degrees and converted to the DMS format.
-- The result is returned as a unit object with the `_dms` unit.
+ * The `ToDMS` command converts a decimal value to DMS (Degrees, Minutes, Seconds) format.
+ * The input is interpreted as decimal degrees and converted to the DMS format.
+ * The result is returned as a unit object with the `_dms` unit.
 
 *This command is defined as `ToDMS` in the code and as `→DMS` on the calculator.*
 
@@ -485,9 +485,9 @@ Convert value to DMS format.
 
 Convert value from DMS format.
 
-- The `FromDMS` command converts a DMS (Degrees, Minutes, Seconds) value to decimal format.
-- The input must be a unit object with the `_dms` unit.
-- The result is returned as a decimal value representing degrees.
+ * The `FromDMS` command converts a DMS (Degrees, Minutes, Seconds) value to decimal format.
+ * The input must be a unit object with the `_dms` unit.
+ * The result is returned as a decimal value representing degrees.
 
 *This command is defined as `FromDMS` in the code and as `DMS→` on the calculator.*
 
@@ -495,9 +495,9 @@ Convert value from DMS format.
 
 Addition of DMS values.
 
-- The `DMSAdd` command adds two DMS (Degrees, Minutes, Seconds) values together.
-- Both arguments are converted to decimal format, added, and then converted back to DMS format.
-- The result is returned as a unit object with the `_dms` unit.
+ * The `DMSAdd` command adds two DMS (Degrees, Minutes, Seconds) values together.
+ * Both arguments are converted to decimal format, added, and then converted back to DMS format.
+ * The result is returned as a unit object with the `_dms` unit.
 
 *This command is defined as `DMSAdd` in the code and as `DMS+` on the calculator.*
 
@@ -505,9 +505,9 @@ Addition of DMS values.
 
 Subtraction of DMS values.
 
-- The `DMSSub` command subtracts one DMS (Degrees, Minutes, Seconds) value from another.
-- Both arguments are converted to decimal format, subtracted, and then converted back to DMS format.
-- The result is returned as a unit object with the `_dms` unit.
+ * The `DMSSub` command subtracts one DMS (Degrees, Minutes, Seconds) value from another.
+ * Both arguments are converted to decimal format, subtracted, and then converted back to DMS format.
+ * The result is returned as a unit object with the `_dms` unit.
 
 *This command is defined as `DMSSub` in the code and as `DMS-` on the calculator.*
 
@@ -515,9 +515,9 @@ Subtraction of DMS values.
 
 Add a date to a number of days.
 
-- The `DateAdd` command adds a number of days to a date.
-- The first argument is the date, and the second argument is the number of days to add.
-- The result is a new date.
+ * The `DateAdd` command adds a number of days to a date.
+ * The first argument is the date, and the second argument is the number of days to add.
+ * The result is a new date.
 
 *This command is defined as `DateAdd` in the code and as `Date+` on the calculator.*
 
@@ -525,8 +525,8 @@ Add a date to a number of days.
 
 Compute the number of days between two dates.
 
-- The `DateSub` command calculates the number of days between two dates.
-- The result is the difference in days between the two dates.
+ * The `DateSub` command calculates the number of days between two dates.
+ * The result is the difference in days between the two dates.
 
 *This command is defined as `DateSub` in the code and as `DDays` on the calculator.*
 
@@ -534,8 +534,8 @@ Compute the number of days between two dates.
 
 Return the date for a given Julian day number.
 
-- The `DateFromJulianDayNumber` command converts a Julian day number to a date.
-- The input is a Julian day number, and the result is the corresponding date.
+ * The `DateFromJulianDayNumber` command converts a Julian day number to a date.
+ * The input is a Julian day number, and the result is the corresponding date.
 
 *This command is defined as `DateFromJulianDayNumber` in the code and as `JDN→` on the calculator.*
 
@@ -543,8 +543,8 @@ Return the date for a given Julian day number.
 
 Convert radians to degrees.
 
-- The `RadiansToDegrees` command converts a value from radians to degrees.
-- The input is interpreted as radians, and the result is in degrees.
+ * The `RadiansToDegrees` command converts a value from radians to degrees.
+ * The input is interpreted as radians, and the result is in degrees.
 
 *This command is defined as `RadiansToDegrees` in the code and as `Radians→Degrees` on the calculator.*
 
@@ -552,7 +552,7 @@ Convert radians to degrees.
 
 Convert degrees to radians.
 
-- The `DegreesToRadians` command converts a value from degrees to radians.
-- The input is interpreted as degrees, and the result is in radians.
+ * The `DegreesToRadians` command converts a value from degrees to radians.
+ * The input is interpreted as degrees, and the result is in radians.
 
 *This command is defined as `DegreesToRadians` in the code and as `Degrees→Radians` on the calculator.*

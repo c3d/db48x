@@ -300,10 +300,10 @@ Set both the independent and dependent data columns in the reserved variable
 
 Access and manage the statistics data array (ΣData).
 
-- The `StatsData` command provides access to the reserved variable `ΣData` which stores statistical data.
-- The data must be a rectangular array with only numerical values (real or complex).
-- Each row can be either a single number or an array of numbers.
-- All rows must have the same number of columns.
-- The data is automatically saved when the access object is destroyed.
+ * The `StatsData` command provides access to the reserved variable `ΣData` which stores statistical data.
+ * The data must be a rectangular array with only numerical values (real or complex).
+ * Each row can be either a single number or an array of numbers.
+ * All rows must have the same number of columns.
+ * The data is automatically saved when the access object is destroyed.
 
 *This command is defined as `StatsData` in the code and as `ΣData` on the calculator.*

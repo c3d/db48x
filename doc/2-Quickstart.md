@@ -333,9 +333,9 @@ Press the shift key twice (🟦) to access the second shifted function. With the
 ### The shift annunciator
 
 The current shift state is displayed in the annunciator area at the top of the screen. You'll see indicators for:
-- No shift: Normal operation
-- 🟨: First shift (yellow functions)
-- 🟦: Second shift (blue functions)
+ * No shift: Normal operation
+ * 🟨: First shift (yellow functions)
+ * 🟦: Second shift (blue functions)
 
 This helps you keep track of which shift level is active and what functions are available.
 
@@ -392,10 +392,10 @@ When a state file is loaded, its name appears in the annunciator area. This help
 ### Future direction
 
 The annunciator area is designed to be expandable, with plans to include additional status indicators such as:
-- Current angle mode (degrees, radians, grads)
-- Active flags and settings
-- Memory usage indicators
-- Network connectivity status (if applicable)
+ * Current angle mode (degrees, radians, grads)
+ * Active flags and settings
+ * Memory usage indicators
+ * Network connectivity status (if applicable)
 
 
 ## Decimal values
@@ -688,8 +688,8 @@ When in Alpha mode, the cursor changes to white to indicate that you're entering
 ### C and L cursor indicators in text
 
 The cursor shows different indicators when editing text:
-- 'C' indicates command mode
-- 'L' indicates line editing mode
+ * 'C' indicates command mode
+ * 'L' indicates line editing mode
 
 These indicators help you understand the current editing context and available operations.
 
@@ -747,8 +747,8 @@ Press 🟦 _ENTER_ to enter text mode. This allows you to type text that will be
 ### The C and L cursors
 
 When editing text, the cursor shows different indicators:
-- 'C' indicates you're in command mode
-- 'L' indicates you're in line editing mode
+ * 'C' indicates you're in command mode
+ * 'L' indicates you're in line editing mode
 
 These help you understand the current editing context.
 
@@ -1090,9 +1090,9 @@ The command line history can be used to recall and modify previous program entri
 ### The three roles of the R/S key: Space, =, EVAL
 
 The R/S key serves multiple functions:
-- As a space character in text entry
-- As the equals sign (=) in algebraic expressions
-- As the Evaluate function for programs and expressions
+ * As a space character in text entry
+ * As the equals sign (=) in algebraic expressions
+ * As the Evaluate function for programs and expressions
 
 
 ## Storing values in global variables
@@ -1442,13 +1442,13 @@ UNTIL loops continue until a condition becomes true, providing an alternative wa
 
 Congratulations! You've now learned the fundamentals of using DB48X. This powerful calculator combines the best features of traditional RPL calculators with modern enhancements, providing you with:
 
-- **Exact arithmetic** with fractions and symbolic computation
-- **Multiple input modes** including RPN and algebraic notation
-- **Comprehensive scientific functions** for mathematics, physics, and engineering
-- **Advanced programming capabilities** with RPL
-- **Flexible display options** and user interface customization
-- **Powerful graphing and visualization** tools
-- **Extensive unit support** for dimensional analysis
+ * **Exact arithmetic** with fractions and symbolic computation
+ * **Multiple input modes** including RPN and algebraic notation
+ * **Comprehensive scientific functions** for mathematics, physics, and engineering
+ * **Advanced programming capabilities** with RPL
+ * **Flexible display options** and user interface customization
+ * **Powerful graphing and visualization** tools
+ * **Extensive unit support** for dimensional analysis
 
 The more you use DB48X, the more you'll discover its capabilities. Don't hesitate to explore the built-in help system, experiment with different features, and create your own programs to automate repetitive calculations.
 
