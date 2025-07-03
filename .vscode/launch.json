@@ -123,6 +123,46 @@
                     "ignoreFailures": true
                 }
             ]
+        },
+        {
+            "name": "Test DB48X Qt Simulator (-Tall)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "args": ["-Tall"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Test DB50X Qt Simulator (-Tall)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": ["-Tall"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }
