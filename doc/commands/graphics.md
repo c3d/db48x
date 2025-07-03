@@ -42,6 +42,22 @@ contain a based number.
 
 Clear the LCD display, and block updates of the header or menu areas.
 
+## BlankGraphic
+
+Create a blank graphic object with the specified dimensions.
+
+## PixTest
+
+Test the pixel at the specified coordinates and return its gray level.
+
+## PixColor
+
+Test the pixel at the specified coordinates and return its color.
+
+## Gray
+
+Create a gray pattern for graphics operations.
+
 
 ## FromLCD
 

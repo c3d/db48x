@@ -178,6 +178,14 @@ Solve the system of equations for the given variable.
 
 Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
+## MultipleEquationsSolver
+
+Solve a system of multiple equations simultaneously.
+
+## MultipleVariablesSolver
+
+Solve for multiple variables in a system of equations.
+
 ## MSlv
 
 On HP50G, a special command is dedicated to solving systems of equations.

@@ -16,10 +16,12 @@ Mapped to the _ +/- _ key
 
 `X` ▶ `0-X`
 
-## Invert
+## Inv
 
 Invert the value in level 1
 
 Mapped to the _ 1/X _ key
 
 `X` ▶ `1/X`
+
+

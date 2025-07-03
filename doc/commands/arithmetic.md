@@ -99,12 +99,12 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart
+## IntPart
 
 Integer part of a number
 
 
-## FractionalPart
+## FracPart
 
 Fractional part of a number
 
@@ -151,7 +151,8 @@ Square of the input
 Smallest prime number larger than the input
 
 
-## FACTORIAL
+## Fact
+
 Factorial of a number
 
 

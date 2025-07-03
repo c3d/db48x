@@ -1,5 +1,9 @@
 # Numerical integration
 
+## Equation
+
+Define an equation for use in solving or integration operations.
+
 ## Integrate
 
 Perform a numerical integration of a function for a specified variable on a

@@ -92,7 +92,7 @@ Examples:
 ## Isolate
 
 Isolate variable: Returns an expression that rearranges an expression given in
-stack level 2 to “isolate” a variable specified in stack level 1.
+stack level 2 to "isolate" a variable specified in stack level 1.
 
 For example, `A+1=sin(X+B)+C' 'X' ISOL` will produce `X=sin⁻¹(A-C+1)+2·i1·π-B`.
 
@@ -137,7 +137,7 @@ its derivative.
 ## AutoSimplify
 
 Enable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `AutoSimplify` `'X+0`' will evaluate as `'X'`
+arithmetic rules. After evaluating `AutoSimplify` `'X+0'` will evaluate as `'X'`
 and '`X*1-B*0'` witll evaluate as `'X'`.
 
 The opposite setting is [NoAutoSimplify](#noautosimplify)
@@ -145,7 +145,7 @@ The opposite setting is [NoAutoSimplify](#noautosimplify)
 ## NoAutoSimplify
 
 Disable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0`'
+arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0'`
 or `X*1-B*0` will no longer be simplified during evaluation.
 
 The opposite setting is [AutoSimplify](#autosimplify)
@@ -225,3 +225,87 @@ Create a case-list of integers in the given range.
 
 ## ASSUME
 Apply certain assumptions about a variable to an expression.
+
+## AlgebraConfiguration
+
+Recall the current algebra configuration directory.
+
+- The `AlgebraConfiguration` command provides access to the directory that stores the current Computer Algebra System (CAS) configuration.
+- This directory contains settings and variables used for symbolic computations.
+- If no configuration directory exists, one will be created when needed.
+- The configuration directory is stored in the global variable `Ⓓ` (CASDir).
+
+*This command is defined as `AlgebraConfiguration` in the code and as `Ⓓ` on the calculator.*
+
+## AlgebraVariable
+
+Recall the current algebra variable, defaults to `X`.
+
+- The `AlgebraVariable` command returns the current variable used for polynomial evaluation and symbolic computations.
+- If no variable is set, it defaults to `X`.
+- The variable is stored in the algebra configuration directory.
+
+*This command is defined as `AlgebraVariable` in the code and as `ⓧ` on the calculator.*
+
+## StoreAlgebraVariable
+
+Store the current algebra variable.
+
+- The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+- The variable must be a quoted symbol (e.g., `'X'`).
+- The variable is stored in the algebra configuration directory.
+
+*This command is defined as `StoreAlgebraVariable` in the code and as `Storeⓧ` on the calculator.*
+
+## StEq
+
+Store expression in `Equation` variable.
+
+- The `StEq` command stores an expression, polynomial, or equation in the reserved `Equation` variable.
+- The stored equation can be a single equation or a list of equations.
+- All stored equations must be of type expression, polynomial, or equation.
+- The stored equation is used by the solving menu and other equation-related commands.
+
+*This command is defined as `StEq` in the code and as `StoreEquation` on the calculator.*
+
+## RcEq
+
+Recall expression from `Equation` variable.
+
+- The `RcEq` command recalls the currently stored equation from the `Equation` variable.
+- If no equation is stored, it returns an error.
+- The recalled equation can be used for further manipulation or solving.
+
+*This command is defined as `RcEq` in the code and as `RecallEquation` on the calculator.*
+
+## NextEq
+
+Cycle equations in the `Equation` variable if it's a list.
+
+- The `NextEq` command cycles through equations if the `Equation` variable contains a list of equations.
+- It rotates the equations in the list, making the next equation the current one.
+- This is useful when working with multiple equations and wanting to solve them one by one.
+
+*This command is defined as `NextEq` in the code and as `NextEquation` on the calculator.*
+
+## EvalEq
+
+Evaluate the current equation.
+
+- The `EvalEq` command evaluates the currently stored equation.
+- For equations (expressions with `=`), it evaluates both sides and returns the difference.
+- For other expressions, it evaluates the expression normally.
+- The evaluation is done in function evaluation mode with dates disabled.
+
+*This command is defined as `EvalEq` in the code and as `EvaluateEquation` on the calculator.*
+
+## Where
+
+Perform a substitution and evaluate the resulting expression.
+
+- The `Where` command performs symbolic substitution in expressions.
+- It takes an expression and a substitution rule (or list of rules) and applies the substitution.
+- The substitution can be a single equation (e.g., `'X=Z+1'`) or a list of equations.
+- The result is the expression with the substitutions applied and evaluated.
+
+*This command is defined as `Where` in the code and as `|` on the calculator.*

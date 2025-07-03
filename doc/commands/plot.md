@@ -121,3 +121,16 @@ Set scale to render graphics
 
 ## VIEWALL
 
+
+## PlotMin
+
+Set the minimum value for the current plot range.
+
+## PlotMax
+
+Set the maximum value for the current plot range.
+
+## XRange
+
+Set the X-axis range for the current plot.
+
