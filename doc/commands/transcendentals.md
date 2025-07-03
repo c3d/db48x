@@ -15,7 +15,7 @@ Many of them also have a symbolic primitive for symbolic integration.
 
 [Analytic function](#analytic-functions) returning the sine of the argument.
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `sin` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -32,7 +32,7 @@ part is in radians.
 
 [Analytic function](#analytic-functions) returning the cosine of the argument
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `cos` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -47,7 +47,7 @@ the specified angular unit overrides the angle mode to determine the result.
 
 [Analytic function](#analytic-functions) returning the tangent of the argument
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `tan` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -109,16 +109,11 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
-## LN
-
-Compute the natural logarithm
-
 ## LOG10
-
 Compute logarithm in base 10
 
 
-## ALOG
+## EXP10
 Compute anti-logarithm in base 10
 
 
@@ -135,3 +130,26 @@ Compute exp(x)-1
 
 ## LNP1
 Compute ln(x+1)
+
+
+## Ln1p
+Compute ln(x+1)
+
+
+## Expm1
+Compute exp(x)-1
+
+
+## Exp2
+Compute 2^x
+
+
+## HYPOT
+
+Calculate the hypotenuse given two values (x, y), i.e., sqrt(x^2 + y^2).
+
+- Only works for numeric types (not integers, big integers, fractions, or complex numbers yet).
+- Not optimized for special integer cases (e.g., 3-4-5 triangle).
+- Not implemented for ranges or complex numbers (to be defined as sqrt(x^2 + y^2)).
+
+*This command is defined as `hypot` in the code and as `⊿` on the calculator.*
