@@ -55,7 +55,7 @@ keys) evaluates the expression, to get the result `59.6`.
 <video src="https://github.com/c3d/db48x/assets/1695924/ba81f9f0-ec4d-4619-bf95-c56c14210fc3"></video>
 
 Algebraic and reverse-polish computations are equivalent, and can be mixed and
-matched during computations. Using one or the other is stricly a matter of
+matched during computations. Using one or the other is strictly a matter of
 preference. Algebraic data entry makes it easier to view the entire
 expression. Reverse-polish makes it easier to see intermediate results.
 
@@ -97,7 +97,7 @@ grouped 5 by 5.
 In algebraic mode, we can type the following sequence:
 _'()_, _1_, _0_, _0_, _0_, _×_, _√x_,
 _2_, _x²_ (🟨 _C_), _+_, _3_, _x²_, _ENTER_. The mathematical
-expresssion shows up on the stack graphically. It can then be evaluated using
+expression shows up on the stack graphically. It can then be evaluated using
 the _=_ key, and shows the same result as for RPL mode.
 
 

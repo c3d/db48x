@@ -36,7 +36,7 @@ features appear to work somewhat reliably, but that some features are still
 being added with each new release. This is **NOT PRODUCTION READY** and should
 not be used for any mission-critical computation.
 
-At this point in time, you should only installing this if you are interested in
+At this point in time, you should only install this if you are interested in
 contributing to the project, whether it is in the form of code, feedback or
 documentation changes. Please refer to the web site of the project on GitHub or
 GitLab for details and updates. The best way to
@@ -63,7 +63,7 @@ Ideally, DB48X should be fully usable without a keyboard overlay. though one is
 Compared to the original HP48, the DM42 has a much larger screen, but no
 annunciators (it is a fully bitmap screen). It has a keyboard with dedicated
 soft-menu (function) keys, but only one shift key (whereas the HP48 has two),
-lacks a dedicated alpha key, does not provides left or right arrow keys (only up
+lacks a dedicated alpha key, does not provide left or right arrow keys (only up
 and down), and has no space key (_SPC_ on the HP48).
 <!--- !DM42 --->
 <!--- DM32 --->
@@ -112,7 +112,7 @@ calculator compared to the HP48:
   shown as 🟦 in the documentation, and activates functions shown in blue in the
   keyboard overlay. On the screen, the shift state is indicated in the header
   area. When a [soft menu](#soft-menus) is visible on the screen, the selected
-  row of functions is highlighed.
+row of functions is highlighted.
 
 In the rest of this document, the shift key is referred to as 🟨, and pressing
 it twice is referred to as 🟦, irrespective of the appearance of the physical

@@ -8,7 +8,7 @@ stack and headers will no longer be updated.
 DB48X recognizes the following types of coordinates
 
 * *Pixel coordinates* are specified using based numbers such as `#0`, and
-  correspond to exact pixels on the screen, and . Pixels are counted starting
+  correspond to exact pixels on the screen. Pixels are counted starting
   from the top-left corner of the screen, with the horizontal coordinate going
   from `10#0` to `10#399`, and the vertical coordinate going from `10#0` to
   `10#239`.
@@ -19,7 +19,7 @@ DB48X recognizes the following types of coordinates
 * *Text coordinates* are given on a square grid with a size corresponding to the
   height of a text line in the selected font. They can be fractional.
 
-Coordinates can be given using one the following object types:
+Coordinates can be given using one of the following object types:
 
 * A complex number, where the real part represents the horizontal coordinate and
   the imaginary part represents the vertical coordinate.
@@ -30,7 +30,7 @@ Coordinates can be given using one the following object types:
 
 For some operations, the list or vector can contain additional parameters beyond
 the coordinates. The selection of unit or pixel coordinates is done on a per
-coordinate basis. For exmaple, `{ 0 0 }` will be the origin in user coordinates,
+coordinate basis. For example, `{ 0 0 }` will be the origin in user coordinates,
 in the center of the screen if no `PPAR` or `PlotParameters` variable is
 present.
 
@@ -74,7 +74,7 @@ LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
 ## ToLCD
 
 Display a graphic object on the screen. If the graphic object is smaller than
-the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it shown in the top-left.
+the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it is shown in the top-left.
 
 For example, to draw an expression in the center of the screen, use:
 
@@ -93,7 +93,7 @@ If the position in level 1 is an integer, fraction or real number, it is
 interpreted as a line number starting at 1 for the top of the screen. For
 example, `"Hello" 1 disp` will draw `Hello` at the top of the screen.
 If the position is a based number, it is a row number in pixels. For example,
-`"Hello" #120d disp` will show the test in the middle of the screen.
+`"Hello" #120d disp` will show the text in the middle of the screen.
 
 If the position in level 1 is a complex number or a list, it is interpreted as
 specifying both the horizontal or vertical coordinates, in either pixel or unit
@@ -114,7 +114,7 @@ provide:
 * An *invert* flag (default false) which, if set, will swap the foreground and
   background patterns.
 
-* An *horizontal align* value, where -1 means align left, 1 means align right,
+* A *horizontal align* value, where -1 means align left, 1 means align right,
   and 0 means center the text. Note that fractional values or values below -1 or
   above 1 are allowed for special effects.
 
@@ -159,7 +159,7 @@ Display the first level of the stack using the entire screen, with a possible
 scroll using the 4, 8, 6 and 2 keys if the object is larger than fits on screen.
 This makes it possible to comfortably examine very large objects, like `300!`, a
 large program or a complicated equation. Arrow keys can also be used for
-horizonal or vertical scrolling.
+horizontal or vertical scrolling.
 
 The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
