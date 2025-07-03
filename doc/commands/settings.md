@@ -48,7 +48,7 @@ the various [display settings](#display-settings).
 
 ## StandardDisplay
 
-Display numbers using full precision. All significant digts to the right of the
+Display numbers using full precision. All significant digits to the right of the
 decimal separator are shown, up to 34 digits.
 
 ## FixedDisplay
@@ -63,14 +63,14 @@ shows the specified number of decimal places.
 
 ## EngineeringDisplay
 
-Display nunmbers as a mantissa with a sepcified number of digits, followed by an
+Display numbers as a mantissa with a specified number of digits, followed by an
 exponent that is a multiple of 3.
 
 ## SignificantDisplay
 
 Display up to the given number of digits without trailing zero. This mode is
 useful because DB48X can compute with large precision, and it may be useful to
-not see all digits. `StndardDisplay` is equivalent to `34 SignificantDisplay`,
+not see all digits. `StandardDisplay` is equivalent to `34 SignificantDisplay`,
 while `12 SignificantDisplay` should approximate the HP48 standard mode using
 12 significant digits.
 

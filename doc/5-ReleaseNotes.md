@@ -188,7 +188,7 @@ off-line persistent graphics.
   what the DM42 firmware or integrated self-test would show. This will most
   likely improve battery life for interactive uses of DB48x.
 * Reorganize the `MemoryMenu` to make both GC and runtime statistics available
-* Reorganize the `GraphicsMenu` by topics to accomodate the new commands
+* Reorganize the `GraphicsMenu` by topics to accommodate the new commands
 * Add image checks in the test infrastructure for RPL code examples
 * Add tests for RGB colors
 * Repair `make compare` which was trying to build a binary from `compare.cc`
@@ -1152,7 +1152,7 @@ library, and optimizing the garbage collector.
   the command-line before being evaluated again from the key.
 
 * Avoid a rare crash when an equation was too big to be rendered
-  graphically and a garbage collection cycle occured between graphic
+  graphically and a garbage collection cycle occurred between graphic
   rendering and text rendering.
 
 * Do not emit error message from `Vec→` for vectors containing

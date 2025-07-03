@@ -1391,7 +1391,7 @@ Mp=1.5E23_lb  R=5000_mi
 The 40 variables in the Optics section are:
 
 * `Δα`: Phase difference between top and bottom rays of light from a single slit (dim.: angle, in SI: r)
-* `Δφ`: Phase difference between two rays of light seperated by an angle θ (dim.: angle, in SI: r)
+* `Δφ`: Phase difference between two rays of light separated by an angle θ (dim.: angle, in SI: r)
 * `Δyint`: Distance between bright fringes on the interference screen
 * `Δydiff`: Width of the central maximum of diffraction
 * `λ`: Light wavelength
@@ -1538,7 +1538,7 @@ If lineraly polarized light is incident on a perfect linear polarizer the transm
 
 #### 2 Slits Young Interference
 
-* To calculate `[Δφ_r;I_(W/m^2);y_m;Δyint_m]` (Phase difference between two rays of light seperated by an angle θ; Irradiance of emitted light; Distance between two image points on the observation screen, Distance between bright fringes) from 5 known variables:
+* To calculate `[Δφ_r;I_(W/m^2);y_m;Δyint_m]` (Phase difference between two rays of light separated by an angle θ; Irradiance of emitted light; Distance between two image points on the observation screen, Distance between bright fringes) from 5 known variables:
 ```rpl
 L=2_m  d=800._μm  λ=600_nm  θ='ASIN(0.6*(λ_nm)/(d_μm))'  Imax=10_(W/m^2)
 @ Expecting [ Δφ=3.76991 11843 1 r I=6.54508 49718 7 W/m↑2 y=9.00000 09112 5⁳⁻⁴ m Δyint=0.0015 m ]
