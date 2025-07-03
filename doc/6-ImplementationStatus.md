@@ -87,7 +87,6 @@ spellings.
 * `Blank` (`BlankGraphic`)
 * `BlankBitmap`
 * `BlankGrob`
-* `BlankPixmap`
 * `BusyIndicatorRefresh`
 * `Bytes`
 * `B→R` (`BinaryToReal`)
@@ -252,7 +251,7 @@ spellings.
 * `EquationName`
 * `EquationSolver`
 * `EquationValue`
-* `Equiv`
+* `equiv`
 * `erf`
 * `erfc`
 * `err0` (`ClearError`)
@@ -265,7 +264,7 @@ spellings.
 * `ErrorForeground`
 * `Eval` (`Evaluate`)
 * `EvalEq` (`EvaluateEquation`)
-* `Excludes`
+* `excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
@@ -375,7 +374,7 @@ spellings.
 * `IgnoreSymbolCase`
 * `im`
 * `ImplicitWildcards`
-* `implies`
+* `Implies`
 * `ImproperFractions`
 * `Incr` (`Increment`)
 * `IndexDidNotWrap`
@@ -420,10 +419,10 @@ spellings.
 * `ListAsProgram`
 * `ListMenu`
 * `List→` (`FromList`)
-* `ln` (`log`)
+* `ln`
+* `ln1p` (`lnp1`)
 * `LName` (`ListExpressionNames`)
-* `lnp1` (`log1p`)
-* `log10`
+* `log` (`log10`)
 * `log2`
 * `LogFit` (`LogarithmicFit`)
 * `LongForm` (`LongFormCommands`)
@@ -477,7 +476,7 @@ spellings.
 * `MultipleSteps`
 * `MultiSolverMenu`
 * `NameDisplayMode`
-* `nand`
+* `NAnd`
 * `NDupN` (`NDuplicateN`)
 * `NeedToClearErrors`
 * `neg` (`Negate`)
@@ -498,7 +497,7 @@ spellings.
 * `NoPlotAxes`
 * `NoPositiveUnderflow`
 * `NoProgramLastArguments`
-* `nor`
+* `NOr`
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
@@ -526,7 +525,7 @@ spellings.
 * `Off` (`PowerOff`)
 * `OffWithImage` (`PowerOffWithImage`)
 * `OnesComplement`
-* `Or`
+* `or`
 * `Over`
 * `OverflowError`
 * `OverflowIndicator`
@@ -585,6 +584,7 @@ spellings.
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
+* `RangeMenu`
 * `RanM` (`RandomArray`, `RandomMatrix`)
 * `RcEq` (`RecallEquation`)
 * `Rcl` (`Recall`)
@@ -673,6 +673,7 @@ spellings.
 * `SF` (`SetFlag`)
 * `SFP` (`SoftFP`, `SoftwareFloatingPoint`)
 * `Show`
+* `ShowAsDecimal`
 * `ShowBuiltinCharacters`
 * `ShowBuiltinConstants`
 * `ShowBuiltinEquations`
@@ -682,6 +683,7 @@ spellings.
 * `ShowDayOfWeek`
 * `ShowEmptyMenu`
 * `ShowEquationBody`
+* `ShowIntegersAndFractions`
 * `ShowMonthName`
 * `ShowSeconds`
 * `ShowTime`
@@ -808,7 +810,6 @@ spellings.
 * `ToList` (`→List`)
 * `ToolsMenu`
 * `TooManyDigitsErrors`
-* `ToPixmap` (`→Pixmap`)
 * `ToPolar` (`→Polar`)
 * `ToSpherical` (`→Spherical`)
 * `ToStr` (`ToText`, `→Str`, `→Text`)
@@ -1033,7 +1034,6 @@ spellings.
 * `Blank`
 * `BlankBitmap`
 * `BlankGrob`
-* `BlankPixmap`
 * `BusyIndicatorRefresh`
 * `Bytes`
 * `B→R`
@@ -1198,7 +1198,7 @@ spellings.
 * `EquationName`
 * `EquationSolver`
 * `EquationValue`
-* `Equiv`
+* `equiv`
 * `erf`
 * `erfc`
 * `err0`
@@ -1211,7 +1211,7 @@ spellings.
 * `ErrorForeground`
 * `Eval`
 * `EvalEq`
-* `Excludes`
+* `excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
@@ -1321,7 +1321,7 @@ spellings.
 * `IgnoreSymbolCase`
 * `im`
 * `ImplicitWildcards`
-* `implies`
+* `Implies`
 * `ImproperFractions`
 * `Incr`
 * `IndexDidNotWrap`
@@ -1367,9 +1367,9 @@ spellings.
 * `ListMenu`
 * `List→`
 * `ln`
+* `ln1p`
 * `LName`
-* `lnp1`
-* `log10`
+* `log`
 * `log2`
 * `LogFit`
 * `LongForm`
@@ -1423,7 +1423,7 @@ spellings.
 * `MultipleSteps`
 * `MultiSolverMenu`
 * `NameDisplayMode`
-* `nand`
+* `NAnd`
 * `NDupN`
 * `NeedToClearErrors`
 * `neg`
@@ -1444,7 +1444,7 @@ spellings.
 * `NoPlotAxes`
 * `NoPositiveUnderflow`
 * `NoProgramLastArguments`
-* `nor`
+* `NOr`
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
@@ -1472,7 +1472,7 @@ spellings.
 * `Off`
 * `OffWithImage`
 * `OnesComplement`
-* `Or`
+* `or`
 * `Over`
 * `OverflowError`
 * `OverflowIndicator`
@@ -1531,6 +1531,7 @@ spellings.
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
+* `RangeMenu`
 * `RanM`
 * `RcEq`
 * `Rcl`
@@ -1619,6 +1620,7 @@ spellings.
 * `SF`
 * `SFP`
 * `Show`
+* `ShowAsDecimal`
 * `ShowBuiltinCharacters`
 * `ShowBuiltinConstants`
 * `ShowBuiltinEquations`
@@ -1628,6 +1630,7 @@ spellings.
 * `ShowDayOfWeek`
 * `ShowEmptyMenu`
 * `ShowEquationBody`
+* `ShowIntegersAndFractions`
 * `ShowMonthName`
 * `ShowSeconds`
 * `ShowTime`
@@ -1754,7 +1757,6 @@ spellings.
 * `ToList`
 * `ToolsMenu`
 * `TooManyDigitsErrors`
-* `ToPixmap`
 * `ToPolar`
 * `ToSpherical`
 * `ToStr`
@@ -1979,7 +1981,6 @@ spellings.
 * `Blank`
 * `BlankBitmap`
 * `BlankGrob`
-* `BlankPixmap`
 * `BusyIndicatorRefresh`
 * `Bytes`
 * `B→R`
@@ -2144,7 +2145,7 @@ spellings.
 * `EquationName`
 * `EquationSolver`
 * `EquationValue`
-* `Equiv`
+* `equiv`
 * `erf`
 * `erfc`
 * `err0`
@@ -2157,7 +2158,7 @@ spellings.
 * `ErrorForeground`
 * `Eval`
 * `EvalEq`
-* `Excludes`
+* `excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
@@ -2267,7 +2268,7 @@ spellings.
 * `IgnoreSymbolCase`
 * `im`
 * `ImplicitWildcards`
-* `implies`
+* `Implies`
 * `ImproperFractions`
 * `Incr`
 * `IndexDidNotWrap`
@@ -2313,9 +2314,9 @@ spellings.
 * `ListMenu`
 * `List→`
 * `ln`
+* `ln1p`
 * `LName`
-* `lnp1`
-* `log10`
+* `log`
 * `log2`
 * `LogFit`
 * `LongForm`
@@ -2369,7 +2370,7 @@ spellings.
 * `MultipleSteps`
 * `MultiSolverMenu`
 * `NameDisplayMode`
-* `nand`
+* `NAnd`
 * `NDupN`
 * `NeedToClearErrors`
 * `neg`
@@ -2390,7 +2391,7 @@ spellings.
 * `NoPlotAxes`
 * `NoPositiveUnderflow`
 * `NoProgramLastArguments`
-* `nor`
+* `NOr`
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
@@ -2418,7 +2419,7 @@ spellings.
 * `Off`
 * `OffWithImage`
 * `OnesComplement`
-* `Or`
+* `or`
 * `Over`
 * `OverflowError`
 * `OverflowIndicator`
@@ -2477,6 +2478,7 @@ spellings.
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
+* `RangeMenu`
 * `RanM`
 * `RcEq`
 * `Rcl`
@@ -2565,6 +2567,7 @@ spellings.
 * `SF`
 * `SFP`
 * `Show`
+* `ShowAsDecimal`
 * `ShowBuiltinCharacters`
 * `ShowBuiltinConstants`
 * `ShowBuiltinEquations`
@@ -2574,6 +2577,7 @@ spellings.
 * `ShowDayOfWeek`
 * `ShowEmptyMenu`
 * `ShowEquationBody`
+* `ShowIntegersAndFractions`
 * `ShowMonthName`
 * `ShowSeconds`
 * `ShowTime`
@@ -2700,7 +2704,6 @@ spellings.
 * `ToList`
 * `ToolsMenu`
 * `TooManyDigitsErrors`
-* `ToPixmap`
 * `ToPolar`
 * `ToSpherical`
 * `ToStr`
@@ -2850,8 +2853,7 @@ spellings.
 * `⊿`
 * `Ⓓ`
 * `▶`
-* `⨯`
-<!--- !DM32 --->
+
 
 ## Unimplemented commands
 

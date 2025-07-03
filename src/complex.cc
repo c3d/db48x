@@ -1093,7 +1093,7 @@ COMPLEX_BODY(asin)
     sq = complex::sqrt(one - sq);
     complex_g i = complex::make(0, 1);
     complex_g iz = i * z;
-    return i * complex::log(sq - iz);
+    return i * complex::ln(sq - iz);
 }
 
 
@@ -1107,7 +1107,7 @@ COMPLEX_BODY(acos)
     complex_g one = complex::make(1,0);
     sq = complex::sqrt(one - sq);
     complex_g ni = complex::make(0,-1);
-    return ni * complex::log(z - ni* sq);
+    return ni * complex::ln(z - ni* sq);
 }
 
 
@@ -1118,7 +1118,7 @@ COMPLEX_BODY(atan)
 {
     // atan(z) = -i/2 ln((i-z) / (i + z))
     complex_g i = complex::make(0,1);
-    return complex::log((i - z) / (i + z)) / complex_g(complex::make(0,2));
+    return complex::ln((i - z) / (i + z)) / complex_g(complex::make(0,2));
 }
 
 
@@ -1162,7 +1162,7 @@ COMPLEX_BODY(asinh)
 {
     // asinh(z) = ln(z + sqrt(z^2 + 1))
     complex_g one = complex::make(1, 0);
-    return complex::log(z + complex::sqrt(z*z + one));
+    return complex::ln(z + complex::sqrt(z*z + one));
 }
 
 
@@ -1173,7 +1173,7 @@ COMPLEX_BODY(acosh)
 {
     // asinh(z) = ln(z + sqrt(z^2 - 1))
     complex_g one = complex::make(1, 0);
-    return complex::log(z + complex::sqrt(z*z - one));
+    return complex::ln(z + complex::sqrt(z*z - one));
 }
 
 
@@ -1185,17 +1185,17 @@ COMPLEX_BODY(atanh)
     // atanh(z) = 1/2 ln((1+z) / (1-z))
     complex_g one = complex::make(1, 0);
     complex_g two = complex::make(2, 0);
-    return complex::log((one + z) / (one - z)) / two;
+    return complex::ln((one + z) / (one - z)) / two;
 }
 
 
-COMPLEX_BODY(log1p)
+COMPLEX_BODY(ln1p)
 // ----------------------------------------------------------------------------
 //   Complex implementation of log1p
 // ----------------------------------------------------------------------------
 {
-    rt.type_error();
-    return z;
+    complex_g one = complex::make(1, 0);
+    return ln(one + z);
 }
 
 COMPLEX_BODY(expm1)
@@ -1203,12 +1203,12 @@ COMPLEX_BODY(expm1)
 //   Complex implementation of expm1
 // ----------------------------------------------------------------------------
 {
-    rt.type_error();
-    return z;
+    complex_g one = complex::make(1, 0);
+    return exp(z - one);
 }
 
 
-COMPLEX_BODY(log)
+COMPLEX_BODY(ln)
 // ----------------------------------------------------------------------------
 //   Complex implementation of log
 // ----------------------------------------------------------------------------
@@ -1216,7 +1216,7 @@ COMPLEX_BODY(log)
     // log(a.exp(ib)) = log(a) + i b
     algebraic_g mod = z->mod();
     algebraic_g arg = z->arg(ID_Rad);
-    return rectangular::make(log::run(mod), arg);
+    return rectangular::make(ln::run(mod), arg);
 }
 
 COMPLEX_BODY(log10)
@@ -1226,8 +1226,8 @@ COMPLEX_BODY(log10)
 {
     algebraic_g ten = integer::make(10);
     algebraic_g zero = integer::make(0);
-    complex_g logten = rectangular::make(log::run(ten), zero);
-    return complex::log(z) / logten;
+    complex_g logten = rectangular::make(ln::run(ten), zero);
+    return complex::ln(z) / logten;
 }
 
 
@@ -1238,8 +1238,8 @@ COMPLEX_BODY(log2)
 {
     algebraic_g two = integer::make(2);
     algebraic_g zero = integer::make(0);
-    complex_g logtwo = rectangular::make(log::run(two), zero);
-    return complex::log(z) / logtwo;
+    complex_g logtwo = rectangular::make(ln::run(two), zero);
+    return complex::ln(z) / logtwo;
 }
 
 
@@ -1262,7 +1262,7 @@ COMPLEX_BODY(exp10)
 {
     algebraic_g ten = integer::make(10);
     algebraic_g zero = integer::make(0);
-    complex_g logten = rectangular::make(log::run(ten), zero);
+    complex_g logten = rectangular::make(ln::run(ten), zero);
     return complex::exp(logten * z);
 }
 
@@ -1274,7 +1274,7 @@ COMPLEX_BODY(exp2)
 {
     algebraic_g two = integer::make(2);
     algebraic_g zero = integer::make(0);
-    complex_g logtwo = rectangular::make(log::run(two), zero);
+    complex_g logtwo = rectangular::make(ln::run(two), zero);
     return complex::exp(logtwo * z);
 }
 

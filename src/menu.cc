@@ -1309,12 +1309,12 @@ MENU(PowersMenu,
 // ----------------------------------------------------------------------------
 //   Menu with the common powers
 // ----------------------------------------------------------------------------
-     ID_exp,    ID_log,
+     ID_exp,    ID_ln,
      ID_exp10,  ID_log10,
      ID_sq,     ID_sqrt,
 
      ID_exp2,   ID_log2,
-     ID_expm1,  ID_log1p,
+     ID_expm1,  ID_ln1p,
      ID_cubed,  ID_cbrt,
 
      ID_pow, ID_xroot,

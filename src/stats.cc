@@ -482,7 +482,7 @@ algebraic_p StatsAccess::fit_transform(algebraic_r x, uint col) const
     case object::ID_PowerFit:       dolog = col == xcol || col == ycol; break;
     }
     if (dolog)
-        return log::evaluate(x);
+        return ln::evaluate(x);
     return x;
 }
 
@@ -1134,7 +1134,7 @@ algebraic_p StatsAccess::regression_formula() const
     {
     default:
     case object::ID_LinearFit:          x = a * x + b; break;
-    case object::ID_LogarithmicFit:     x = a * log::run(x) + b; break;
+    case object::ID_LogarithmicFit:     x = a * ln::run(x) + b; break;
     case object::ID_ExponentialFit:     x = b * exp::run(a * x); break;
     case object::ID_PowerFit:           x = b * pow(x, a); break;
     }
@@ -1155,7 +1155,7 @@ algebraic_p StatsAccess::regression_formula_inverse() const
     default:
     case object::ID_LinearFit:          x = (x - b) / a; break;
     case object::ID_LogarithmicFit:     x = exp::run((x - b) / a); break;
-    case object::ID_ExponentialFit:     x = log::run(x / b) / a; break;
+    case object::ID_ExponentialFit:     x = ln::run(x / b) / a; break;
     case object::ID_PowerFit:           x = pow(x / b, inv::run(a)); break;
     }
     return x;
