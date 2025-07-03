@@ -7567,8 +7567,7 @@ void tests::numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
-              ID_ClearThingsMenu, ID_Purge);
+        .test(CLEAR, DIRECT("{ X NumericalIntegration } Purge", ENTER);
 }
 
 
@@ -7693,8 +7692,7 @@ void tests::symbolic_numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
-              ID_ClearThingsMenu, ID_Purge);
+        .test(CLEAR, DIRECT("{ X NumericalIntegration } PURGE", ENTER);
 }
 
 
@@ -12805,8 +12803,7 @@ void tests::graphic_commands()
     BEGIN(graphics);
 
     step("Cleanup environment")
-        .test("'PPAR'", ID_ClearThingsMenu, ID_Purge)
-        .test("{} CLIP", ENTER);
+        .test(DIRECT("'PPAR' PURGE {} CLIP"), ENTER);
 
     step("Extract graphic element")
         .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
