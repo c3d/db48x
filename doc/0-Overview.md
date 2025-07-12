@@ -809,17 +809,18 @@ https://github.com/c3d/db48x.
 
 This software is (C) 2022-2025 Christophe de Dinechin and the DB48X team.
 
-Additional contributors to the project include:
+Additional contributors to the project include (in order of appearance):
 
-* Jean Wilson (Equation Library and associated documentation)
-* Philippe Martens (be.philippe@icloud.com)
-* Franco Trimboli (WASM port)
 * Jeff, aka spiff72 (keyboard overlay)
 * Camille Wormser (complex number fixes)
 * Conrado Seibel (help file fix)
 * Kjell Christenson (simulator fix)
 * Václav Kadlčík (documentation fix)
+* Franco Trimboli (WASM port)
+* Jean Wilson (Equation Library and associated documentation)
 * GitHub user mipa83 (Windows documentation)
+* Philippe Martens (be.philippe@icloud.com)
+* LdBeth <andpuke@foxmail.com> (Fixes)
 
 The authors would like to acknowledge
 
