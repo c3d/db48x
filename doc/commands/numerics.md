@@ -1,11 +1,5 @@
 # Numerical integration
 
-## Equation
-
-Define an equation for use in solving or integration operations.
-This is generally used as the name of a variable, and can manipulated using the `RcEQ` (recall equation) and `StEQ` (store equation) commands.
-
-
 ## Integrate
 
 Perform a numerical integration of a function for a specified variable on a

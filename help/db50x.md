@@ -16105,12 +16105,6 @@ Return the last menu entry, or `0` if there is no current menu. The returned
 value can be used as an argument to `Menu` or `TMenu`.
 # Numerical integration
 
-## Equation
-
-Define an equation for use in solving or integration operations.
-This is generally used as the name of a variable, and can manipulated using the `RcEQ` (recall equation) and `StEQ` (store equation) commands.
-
-
 ## Integrate
 
 Perform a numerical integration of a function for a specified variable on a
@@ -18269,87 +18263,123 @@ Apply certain assumptions about a variable to an expression.
 
 ## AlgebraConfiguration
 
-Recall the current algebra configuration directory.
+Name reserved for the current algebra configuration directory.
 
- * The `AlgebraConfiguration` command provides access to the directory that stores the current Computer Algebra System (CAS) configuration.
- * This directory contains settings and variables used for symbolic computations.
- * If no configuration directory exists, one will be created when needed.
- * The configuration directory is stored in the global variable `Ⓓ` (CASDir).
-
-*This command is defined as `AlgebraConfiguration` in the code and as `Ⓓ` on the calculator.*
+The `AlgebraConfiguration` command provides access to the directory that stores
+the current Computer Algebra System (CAS) configuration.
+This directory contains settings and variables used for symbolic computations.
+If no configuration directory exists, one will be created when needed.
+The configuration directory is stored in the global variable with the name
+`AlgebraConfiguration`.
 
 ## AlgebraVariable
 
-Recall the current algebra variable, defaults to `X`.
+Recall the current algebra variable.
 
- * The `AlgebraVariable` command returns the current variable used for polynomial evaluation and symbolic computations.
- * If no variable is set, it defaults to `X`.
- * The variable is stored in the algebra configuration directory.
-
-*This command is defined as `AlgebraVariable` in the code and as `ⓧ` on the calculator.*
+The `AlgebraVariable` command returns the current variable used for polynomial
+evaluation and symbolic computations.
+If no variable is set, it defaults to `X`.
+The variable is stored in the algebra configuration directory.
 
 ## StoreAlgebraVariable
 
 Store the current algebra variable.
 
- * The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
- * The variable must be a quoted symbol (e.g., `'X'`).
- * The variable is stored in the algebra configuration directory.
+The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+The variable must be a quoted symbol (e.g., `'X'`).
+The variable is stored in the algebra configuration directory.
 
-*This command is defined as `StoreAlgebraVariable` in the code and as `Storeⓧ` on the calculator.*
+## Equation
+
+Define an equation for use in solving or integration operations.
+This is generally used as the name of a variable, and can manipulated using the `RcEQ` (recall equation) and `StEQ` (store equation) commands.
+
 
 ## StEq
 
 Store expression in `Equation` variable.
 
- * The `StEq` command stores an expression, polynomial, or equation in the reserved `Equation` variable.
- * The stored equation can be a single equation or a list of equations.
- * All stored equations must be of type expression, polynomial, or equation.
- * The stored equation is used by the solving menu and other equation-related commands.
-
-*This command is defined as `StEq` in the code and as `StoreEquation` on the calculator.*
+The `StEq` command stores an expression, polynomial, or equation in the reserved
+`Equation` variable.
+The stored equation can be a single equation or a list of equations.
+All stored equations must be of type expression, polynomial, or equation.
+The stored equation is used by the solving menu and other equation-related
+commands.
 
 ## RcEq
 
 Recall expression from `Equation` variable.
 
- * The `RcEq` command recalls the currently stored equation from the `Equation` variable.
- * If no equation is stored, it returns an error.
- * The recalled equation can be used for further manipulation or solving.
-
-*This command is defined as `RcEq` in the code and as `RecallEquation` on the calculator.*
+The `RcEq` command recalls the currently stored equation from the `Equation`
+variable.
+If no equation is stored, it returns an error, `EQ variable not found`.
+The recalled equation can be used for further manipulation or solving.
 
 ## NextEq
 
-Cycle equations in the `Equation` variable if it's a list.
+Cycle equations in the `Equation` variable if it is a list.
 
- * The `NextEq` command cycles through equations if the `Equation` variable contains a list of equations.
- * It rotates the equations in the list, making the next equation the current one.
- * This is useful when working with multiple equations and wanting to solve them one by one.
-
-*This command is defined as `NextEq` in the code and as `NextEquation` on the calculator.*
+The `NextEq` command cycles through equations if the `Equation` variable
+contains a list of equations.
+It rotates the equations in the list, making the next equation the current one.
+This is useful when working with multiple equations and wanting to solve them
+one by one, see `MultipleEquationsSolver`.
 
 ## EvalEq
 
 Evaluate the current equation.
 
- * The `EvalEq` command evaluates the currently stored equation.
- * For equations (expressions with `=`), it evaluates both sides and returns the difference.
- * For other expressions, it evaluates the expression normally.
- * The evaluation is done in function evaluation mode with dates disabled.
+The `EvalEq` command evaluates the currently stored equation.
 
-*This command is defined as `EvalEq` in the code and as `EvaluateEquation` on the calculator.*
+For equations (expressions with `=`), it evaluates both sides and returns an
+equation evaluating both sides, where the right-hand side may be a sum to adjust
+it to the left-hand side:
+
+```rpl
+'A+1=B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { '4=16-12' }
+```
+
+For other expressions, it evaluates the expression normally:
+
+```rpl
+'A+1-B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { -12 }
+```
 
 ## Where
 
 Perform a substitution and evaluate the resulting expression.
 
- * The `Where` command performs symbolic substitution in expressions.
- * It takes an expression and a substitution rule (or list of rules) and applies the substitution.
- * The substitution can be a single equation (e.g., `'X=Z+1'`) or a list of equations.
- * The result is the expression with the substitutions applied and evaluated.
+The `Where` command performs symbolic substitution in expressions.
+It takes an expression and a substitution rule (or list of rules) and applies
+the substitution.
+Substitutions can be expressed as equations or as a list .
 
-*This command is defined as `Where` in the code and as `|` on the calculator.*
+In equation form, variables matching the left-hand side of the equation are
+replaced by the expression on the rigth of the equation:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' 'Z=3-A' Where {} +
+@ Expecting { 'sin(3-A)=2·(3-A-1)↑2' }
+```
+
+Equations can be used in algebraic form and chained easily:
+
+```rpl
+'sin(Z)=2*(Z-A)^2|Z=3-A|A=B^3-1'
+@ Expecting 'sin(3-(B↑3-1))=2·(3-(B↑3-1)-(B↑3-1))↑2'
+```
+
+In list form, variables given in odd positions in the list are replaced by the
+expression given in the following even position in the list:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' { Z '3-A' A 'B^3' } Where {} +
+@ Expecting { 'sin(3-B↑3)=2·(3-B↑3-1)↑2' }
+```
 # Time, Alarms and System Commands
 
 ## Date format
