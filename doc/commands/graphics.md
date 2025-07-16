@@ -45,6 +45,51 @@ Clear the LCD display, and block updates of the header or menu areas.
 ## BlankGraphic
 
 Create a blank graphic object with the specified dimensions.
+The graphic is optimized for the model of calculator running the program.
+On color RPL models, it will produce a color pixmap.
+On black-and-white RPL models it will produce a color pixmap.
+
+To create a blank graphic 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGraphic
+```
+
+
+## BlankGROB
+
+Create a blank HP48-compatible graphic object (GROB) with the specified dimensions.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGROB
+@ Expecting Graphic 20 x 30
+```
+
+## BlankBitmap
+
+Create a blank packed bitmap graphic object with the specified dimensions.
+This object is always a black-and-white pixmap even on color RPL models.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankBitmap
+@ Expecting Bitmap 20 x 30
+```
+
+## BlankPixmap
+
+Create a color pixmap graphic object with the specified dimensions.
+THis command only exists on color RPL models.
+
+To create a color pixmap that is pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankPixmap
+```
+
 
 ## PixTest
 
@@ -284,11 +329,6 @@ graphic object.
 'sqrt(2*x)/y' →Pixmap
 @ Image sqrt
 ```
-
-
-## Blank
-
-Create a bla
 
 
 ## GXor

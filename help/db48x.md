@@ -12304,12 +12304,12 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntPart
+## IntegerPart
 
 Integer part of a number
 
 
-## FracPart
+## FractionalPart
 
 Fractional part of a number
 
@@ -12356,8 +12356,7 @@ Square of the input
 Smallest prime number larger than the input
 
 
-## Fact
-
+## Factorial
 Factorial of a number
 
 
@@ -12801,7 +12800,7 @@ Check if two values are mathematically different. This is the opposite of `=`.
 ## ==
 
 Checks if two objects are identical after evaluating names
-(contrary to `same`).
+(contrary to `same` which does not evaluate names).
 
 ```rpl
 A=1
@@ -12876,77 +12875,6 @@ Check if the first value is greater than or equal to the second value.
 { 1 2 3 } { 1 2 4 } ≥ + { 1 2 3 } { 1 2 3 } ≥ +
 @ Expecting { False True False False False True }
 ```
-
-## TestSame
-
-Test if two objects are strictly identical (same type and value).
-
- * The `TestSame` command (operator `==`) compares two objects for strict identity.
- * It evaluates names (symbols and locals) before comparison.
- * Returns `True` if the objects are identical, `False` otherwise.
- * This is different from `same` which does not evaluate names.
-
-*This command is defined as `TestSame` in the code and as `==` on the calculator.*
-
-## TestLT
-
-Test if the first value is less than the second value.
-
- * The `TestLT` command (operator `<`) compares two values.
- * Returns `True` if the first value is less than the second value.
- * Returns `False` otherwise.
-
-*This command is defined as `TestLT` in the code and as `<` on the calculator.*
-
-## TestEQ
-
-Test if two values are equal.
-
- * The `TestEQ` command (operator `=`) compares two values for equality.
- * Returns `True` if the values are equal.
- * Returns `False` otherwise.
-
-*This command is defined as `TestEQ` in the code and as `=` on the calculator.*
-
-## TestGT
-
-Test if the first value is greater than the second value.
-
- * The `TestGT` command (operator `>`) compares two values.
- * Returns `True` if the first value is greater than the second value.
- * Returns `False` otherwise.
-
-*This command is defined as `TestGT` in the code and as `>` on the calculator.*
-
-## TestLE
-
-Test if the first value is less than or equal to the second value.
-
- * The `TestLE` command (operator `≤`) compares two values.
- * Returns `True` if the first value is less than or equal to the second value.
- * Returns `False` otherwise.
-
-*This command is defined as `TestLE` in the code and as `≤` on the calculator.*
-
-## TestNE
-
-Test if two values are not equal.
-
- * The `TestNE` command (operator `≠`) compares two values for inequality.
- * Returns `True` if the values are not equal.
- * Returns `False` if the values are equal.
-
-*This command is defined as `TestNE` in the code and as `≠` on the calculator.*
-
-## TestGE
-
-Test if the first value is greater than or equal to the second value.
-
- * The `TestGE` command (operator `≥`) compares two values.
- * Returns `True` if the first value is greater than or equal to the second value.
- * Returns `False` otherwise.
-
-*This command is defined as `TestGE` in the code and as `≥` on the calculator.*
 # Operations with Complex Numbers
 
 ## Re
@@ -13943,14 +13871,6 @@ Test if a flag is set
 
 Test if a flag is clear
 
-## Round
-
-Round a number to the given number of figures
-
-## Truncate
-
-Truncate a number to the given number of figures
-
 ## TestFlagClearThenClear
 
 Test if a flag is clear, then clear it
@@ -14107,6 +14027,51 @@ Clear the LCD display, and block updates of the header or menu areas.
 ## BlankGraphic
 
 Create a blank graphic object with the specified dimensions.
+The graphic is optimized for the model of calculator running the program.
+On color RPL models, it will produce a color pixmap.
+On black-and-white RPL models it will produce a color pixmap.
+
+To create a blank graphic 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGraphic
+```
+
+
+## BlankGROB
+
+Create a blank HP48-compatible graphic object (GROB) with the specified dimensions.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGROB
+@ Expecting Graphic 20 x 30
+```
+
+## BlankBitmap
+
+Create a blank packed bitmap graphic object with the specified dimensions.
+This object is always a black-and-white pixmap even on color RPL models.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankBitmap
+@ Expecting Bitmap 20 x 30
+```
+
+## BlankPixmap
+
+Create a color pixmap graphic object with the specified dimensions.
+THis command only exists on color RPL models.
+
+To create a color pixmap that is pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankPixmap
+```
+
 
 ## PixTest
 
@@ -14346,11 +14311,6 @@ graphic object.
 'sqrt(2*x)/y' →Pixmap
 @ Image sqrt
 ```
-
-
-## Blank
-
-Create a bla
 
 
 ## GXor
