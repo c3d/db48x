@@ -150,28 +150,60 @@ Assemble a list from results of sequential procedure
 
 Return the sum of a list or array.
 
- * The `ListSum` command calculates the sum of all elements in a list or array.
- * It uses the `+` operation to add all elements together.
- * The result is a single value representing the sum of all elements.
+The `ListSum` command calculates the sum of all elements in a list or array.
+It uses the `+` operation to add all elements together.
+The result is a single value representing the sum of all elements.
 
-*This command is defined as `ListSum` in the code and as `ΣList` on the calculator.*
+In the following example, values `1`, `3` and `5` are added, which gives `9`.
+Then the vector `[ 1 2 3 ]` is added to `9`, which gives another vector with
+value `[ 10 11 12 ]`. Finally, this vector is added to the `"ABC"` text,
+resulting in a text containing `"[ 10 11 12 ]ABC|`:
+
+```rpl
+{ 1 3 5 [ 1 2 3 ] "ABC" } ΣList
+@ Expecting "[ 10 11 12 ]ABC"
+```
 
 ## ListProduct
 
 Return the product of a list or array.
 
- * The `ListProduct` command calculates the product of all elements in a list or array.
- * It uses the `×` operation to multiply all elements together.
- * The result is a single value representing the product of all elements.
+The `ListProduct` command calculates the product of all elements in a list or array.
+It uses the `×` operation to multiply all elements together.
+The result is a single value representing the product of all elements.
 
-*This command is defined as `ListProduct` in the code and as `∏List` on the calculator.*
+In the following example, we multiply values `1`, `3`, `6`, `42` and
+finally the complex value `2+3ⅈ`:
+
+```rpl
+[ 1 3 6 42 2+3ⅈ ] ∏List
+@ Expecting 1 512+2 268ⅈ
+```
 
 ## ListDifferences
 
 Return the differences between successive elements in a list or array.
 
- * The `ListDifferences` command calculates the differences between consecutive elements in a list or array.
- * It uses the `-` operation to subtract each element from the next one.
- * The result is a list with one fewer element than the input, containing the differences.
+The `ListDifferences` command calculates the differences between consecutive
+elements in a list or array.
+It uses the `-` operation to subtract each element from the previous one.
+The result is a list with one fewer element than the input, containing the
+pairwise differences.
 
-*This command is defined as `ListDifferences` in the code and as `∆List` on the calculator.*
+For example to compute the increase in value between successive elements in a
+vector, you can use:
+
+```rpl
+[ 1 3 4 7 9 ] ∆List
+@ Expecting [ 2 1 3 2 ]
+```
+
+Note that on HP calculators, this command only works with lists and not with vectors. On DB48x, it works both with list and arrays.
+    Matrices are seen as arrays of vectors, as illustrated below:
+
+```rpl
+[[ 1 2 3 ]
+ [ 4 5 6 ]
+ [ 7 9 0 ]] ∆List
+@ Expecting [[ 3 3 3 ] [ 3 4 -6 ]]
+```
