@@ -16,12 +16,12 @@ Generate a random real number between 0 and 1, 1 being excluded.
 
 DB48X uses an additive congruential random number generator (ACORN), which is
 configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
-[RandomGeneratorBits](#randomgeneratorbits).
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
 
 ## Random
 
-Generate a random number between two bounds.
+Generate a pseudo-random number between two bounds.
 
 If the two bounds are integers, then the result is an integer, and the upper
 bound is included. For example, `2 4 Random` can generate `2`, `3` or `4`.
@@ -30,16 +30,18 @@ Otherwise, the upper bound is excluded. For example, `2. 4. Random` can generate
 any number between `2.0` and `4.0`, but the upper bound `4.0` cannot be
 generated.
 
-The resulting number is
+DB48X uses an additive congruential random number generator (ACORN), which is
+configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
-## ΣData (ΣDAT)
+## ΣData
 
 The `ΣData` variable contains the statistics data, in the form of a matrix.
 
 *Note*: The `ΣData` name is considered a command internally, and as such,
 is subject to `CommandDisplayMode` and not `NamesDisplayMode`.
 
-## ΣParameters (ΣPAR)
+## ΣParameters
 
 The `ΣParameters` variable contains the statistics parameters, as a list with
 five elements:
@@ -295,15 +297,3 @@ Set both the independent and dependent data columns in the reserved variable
 `ΣParameters`.
 
 `XCol` `YCol` ▶ (Update `ΣParameters`)
-
-## StatsData
-
-Access and manage the statistics data array (ΣData).
-
- * The `StatsData` command provides access to the reserved variable `ΣData` which stores statistical data.
- * The data must be a rectangular array with only numerical values (real or complex).
- * Each row can be either a single number or an array of numbers.
- * All rows must have the same number of columns.
- * The data is automatically saved when the access object is destroyed.
-
-*This command is defined as `StatsData` in the code and as `ΣData` on the calculator.*
