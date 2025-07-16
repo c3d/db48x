@@ -122,11 +122,11 @@ This operation creates a bitmap pattern on black-and-white devices,
 and a pixmap with the gray level on color devices.
 
 ```rpl
-0 LINEWIDTH 'PPAR' PURGE
+0 LINEWIDTH
 0 1 FOR G
 	G GRAY FOREGROUND 0 0 R→C 5 1 G - * CIRCLE
 0.1 STEP
-{ Foreground PPAR LineWidth } PURGE
+{ Foreground LineWidth } PURGE
 @ Image gray-circles
 ```
 
@@ -139,7 +139,7 @@ This operation creates a bitmap pattern on black-and-white devices,
 and a pixmap with the given color on color devices.
 
 ```rpl
-0 LINEWIDTH 'PPAR' PURGE
+0 LINEWIDTH
 0 1 FOR R
 	0 1 FOR G
 		0 1 FOR B
@@ -147,7 +147,7 @@ and a pixmap with the given color on color devices.
 		0.1 STEP
    0.1 STEP
 0.1 STEP
-{ Foreground PPAR LineWidth } PURGE
+{ Foreground LineWidth } PURGE
 @ Image color-circles
 ```
 
