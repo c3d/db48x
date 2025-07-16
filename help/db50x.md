@@ -14519,14 +14519,28 @@ To create a color pixmap that is pixels wide and 30 pixels high, use:
 20 30 BlankPixmap
 ```
 
-
 ## PixTest
 
 Test the pixel at the specified coordinates and return its gray level.
 
+```rpl
+{ 0 0 } PixTest
+@ Expecting 1
+```
+
 ## PixColor
 
-Test the pixel at the specified coordinates and return its color.
+Test the pixel at the specified coordinates and return its color as a three
+component values for the red, green and blue levels, each represented as a
+decimal value between 0 and 1.
+
+This commands works both in Color RPL and regular RPL, but only Color RPL may
+return distinct values for the red, green and blue components.
+
+```rpl
+{ 0 0 } PixColor →V3
+@ Expecting [ 1 1 1 ]
+```
 
 ## Gray
 
