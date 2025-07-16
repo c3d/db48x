@@ -17740,20 +17740,6 @@ Get the depth of the undo stack
 
 ## STKNEW
 Push a snapshot of the current stack on the undo stack and clears the current stack
-
-## StoreAdd
-
-Adds a value to the contents of a variable and stores the result back in the variable.
-
- * Usage: Provide the variable name and the value to add. The command retrieves the current value, adds the new value, and stores the result.
- * Equivalent to: `var value Store+` (or `Sto+`)
-
-## RecallAdd
-
-Adds the contents of a variable to the value on the stack, leaving the result on the stack.
-
- * Usage: Provide the variable name and a value on the stack. The command retrieves the variable's value, adds it to the stack value, and leaves the result on the stack.
- * Equivalent to: `var value Recall+` (or `Rcl+`)
 # Statistics
 
 ## RDZ
