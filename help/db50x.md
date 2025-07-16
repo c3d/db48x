@@ -12751,12 +12751,12 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart
+## IntPart
 
 Integer part of a number
 
 
-## FractionalPart
+## FracPart
 
 Fractional part of a number
 
@@ -14474,9 +14474,9 @@ Clear the LCD display, and block updates of the header or menu areas.
 ## BlankGraphic
 
 Create a blank graphic object with the specified dimensions.
-The graphic is optimized for the model of calculator running the program.
-On color RPL models, it will produce a color pixmap.
-On black-and-white RPL models it will produce a color pixmap.
+The graphic is optimized for the device running the program.
+On color RPL devices, it will produce a color pixmap.
+On black-and-white RPL devices it will produce a color pixmap.
 
 To create a blank graphic 20 pixels wide and 30 pixels high, use:
 
@@ -14499,7 +14499,7 @@ To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
 ## BlankBitmap
 
 Create a blank packed bitmap graphic object with the specified dimensions.
-This object is always a black-and-white pixmap even on color RPL models.
+This object is always a black-and-white pixmap even on color RPL devices.
 
 To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
 
@@ -14511,7 +14511,7 @@ To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
 ## BlankPixmap
 
 Create a color pixmap graphic object with the specified dimensions.
-THis command only exists on color RPL models.
+THis command only exists on color RPL devices.
 
 To create a color pixmap that is pixels wide and 30 pixels high, use:
 
@@ -14544,7 +14544,41 @@ return distinct values for the red, green and blue components.
 
 ## Gray
 
-Create a gray pattern for graphics operations.
+Create a gray pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the gray level on color devices.
+
+```rpl
+0 LINEWIDTH 'PPAR' PURGE
+0 1 FOR G
+	G GRAY FOREGROUND 0 0 R→C 5 1 G - * CIRCLE
+0.1 STEP
+{ Foreground PPAR LineWidth } PURGE
+@ Image gray-circles
+```
+
+## RGB
+
+Create a color pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the given color on color devices.
+
+```rpl
+0 LINEWIDTH 'PPAR' PURGE
+0 1 FOR R
+	0 1 FOR G
+		0 1 FOR B
+			R G B RGB FOREGROUND R 14 * 7 - G 10 * 5 - R→C 1 B - 0.5 * CIRCLE
+		0.1 STEP
+   0.1 STEP
+0.1 STEP
+{ Foreground PPAR LineWidth } PURGE
+@ Image color-circles
+```
 
 
 ## FromLCD
