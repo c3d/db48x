@@ -15242,48 +15242,6 @@ Column norm (one norm) of a matrix
 Row norm (infinity norm) of a matrix
 
 
-## MatrixToColumns
-
-Convert a matrix to a list of column vectors.
-
-## MatrixToRows
-
-Convert a matrix to a list of row vectors.
-
-## ColumnsToMatrix
-
-Convert a list of column vectors to a matrix.
-
-## RowsToMatrix
-
-Convert a list of row vectors to a matrix.
-
-
-## AddColumn
-
-Add a column to a matrix.
-
-## AddRow
-
-Add a row to a matrix.
-
-## DeleteColumn
-
-Delete a column from a matrix.
-
-## DeleteRow
-
-Delete a row from a matrix.
-
-## ColumnSwap
-
-Swap two columns in a matrix.
-
-## RowSwap
-
-Swap two rows in a matrix.
-
-
 ## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
