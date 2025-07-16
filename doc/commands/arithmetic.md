@@ -151,8 +151,7 @@ Square of the input
 Smallest prime number larger than the input
 
 
-## Fact
-
+## Factorial
 Factorial of a number
 
 
