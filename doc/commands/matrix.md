@@ -588,10 +588,6 @@ Change dimensions of an array
 Reduce matrix to echelon form (upper triangular form)
 
 
-## RNRM
-Row norm (infinity norm) of a matrix
-
-
 ## RREF
 Fully reduce to row-reduced echelon form
 
