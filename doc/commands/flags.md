@@ -36,14 +36,6 @@ Test if a flag is set
 
 Test if a flag is clear
 
-## Round
-
-Round a number to the given number of figures
-
-## Truncate
-
-Truncate a number to the given number of figures
-
 ## TestFlagClearThenClear
 
 Test if a flag is clear, then clear it
