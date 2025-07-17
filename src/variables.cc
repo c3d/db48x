@@ -645,14 +645,15 @@ size_t directory::purge(object_p name)
 }
 
 
-size_t directory::purge_all(object_p name)
+size_t directory::purge_all(object_p namep)
 // ----------------------------------------------------------------------------
 //   Purge objects from
 // ----------------------------------------------------------------------------
 {
+    object_g   name   = namep;
     size_t     result = 0;
     directory *dir    = nullptr;
-    for (uint depth = 0; (dir = rt.variables(depth)); depth++)
+    for (uint depth = 0; !rt.error() && (dir = rt.variables(depth)); depth++)
         result += dir->purge(name);
     return result;
 }
@@ -940,8 +941,10 @@ COMMAND_BODY(Purge)
     // Purge the object (HP48 doesn't error out if name does not exist)
     if (directory *dir = rt.variables(0))
         dir->purge(name);
+    else
+        rt.no_directory_error();
     rt.drop();
-    return OK;
+    return rt.error() ? ERROR : OK;
 }
 
 
@@ -950,23 +953,15 @@ COMMAND_BODY(PurgeAll)
 //   Purge a global variable from current directory and enclosing directories
 // ----------------------------------------------------------------------------
 {
-    object_p x = rt.stack(0);
-    if (!x)
-        return ERROR;
-    symbol_g name = x->as_quoted<symbol>();
+    object_p name = rt.stack(0);
     if (!name)
-    {
-        rt.invalid_name_error();
         return ERROR;
-    }
-    rt.pop();
-
-    // Lookup all directorys, starting with innermost one, and purge there
-    directory *dir = nullptr;
-    for (uint depth = 0; (dir = rt.variables(depth)); depth++)
-        dir->purge(name);
-
-    return OK;
+    if (object_p quoted = name->as_quoted(ID_object))
+        name = quoted;
+    record(directory_error, "PurgeAll %t", name);
+    directory::purge_all(name);
+    rt.drop();
+    return rt.error() ? ERROR : OK;
 }
 
 
