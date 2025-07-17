@@ -2795,21 +2795,21 @@ void tests::command_display_formats()
     step("Lower case");
     test("lowercase", ENTER)
         .want("« 1 1. + - * / ^ √ sq inv neg sin cos tan asin acos atan "
-              "lowercase purgeall prec "
+              "lowercase pgall prec "
               "start  step next start  step for i  next for i  step "
               "while  repeat  end do  until  end »");
 
     step("Upper case");
     test("UPPERCASE", ENTER)
         .want("« 1 1. + - * / ^ √ SQ INV NEG SIN COS TAN ASIN ACOS ATAN "
-              "LOWERCASE PURGEALL PREC "
+              "LOWERCASE PGALL PREC "
               "START  STEP next START  STEP FOR i  NEXT FOR i  STEP "
               "WHILE  REPEAT  END DO  UNTIL  END »");
 
     step("Capitalized");
     test("Capitalized", ENTER)
         .want("« 1 1. + - * / ^ √ Sq Inv Neg Sin Cos Tan Asin Acos Atan "
-              "LowerCase PurgeAll Prec "
+              "LowerCase PgAll Prec "
               "Start  Step next Start  Step For i  Next For i  Step "
               "While  Repeat  End Do  Until  End »");
 

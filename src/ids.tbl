@@ -548,7 +548,7 @@ CMD(RecallMenu)                                 ALIAS(RecallMenu, "RclMenu")
 // ============================================================================
 
 // Memory management
-CMD(PurgeAll)
+CMD(PurgeAll)                   ALIAS(PurgeAll, "PgAll")
 CMD(GarbageCollect)             ALIAS(GarbageCollect, "GC")
 NAMED(Mem, "AvailableMemory")
 CMD(FreeMemory)
@@ -784,16 +784,15 @@ CMD(Help)
 
 // Debugging
 CMD(Halt)
-CMD(Debug)
-ALIAS(Debug, "dbug")
-CMD(SingleStep)
-ALIAS(SingleStep, "sst")
+CMD(Debug)                              ALIAS(Debug, "dbug")
+CMD(SingleStep)                         ALIAS(SingleStep, "sst")
 CMD(StepOver)
 CMD(StepOut)
 CMD(MultipleSteps)
-CMD(Continue)
-ALIAS(Continue, "cont")
+CMD(Continue)                           ALIAS(Continue, "cont")
 CMD(Kill)
+
+// Input and prompting
 CMD(Input)
 CMD(Prompt)
 CMD(Run)
