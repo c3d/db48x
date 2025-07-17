@@ -2053,17 +2053,19 @@ void tests::global_variables()
     test(CLEAR, "'StatsData' RCL", ENTER).expect("[ 1 2 3 ]");
     test(CLEAR, "'ΣData' PURGE", ENTER).noerror();
 
-    step("Store and recall to StatsParameters");
-    test(CLEAR, "{0} 'ΣParameters' STO", ENTER).noerror();
-    test(CLEAR, "'ΣPar' RCL", ENTER).expect("{ 0 }");
-    test(CLEAR, "'StatsParameters' RCL", ENTER).expect("{ 0 }");
-    test(CLEAR, "'ΣPar' purge", ENTER).noerror();
+    step("Store and recall to StatsParameters")
+        .test(CLEAR, "{0} 'ΣParameters' STO", ENTER).noerror()
+        .test("'ΣPar' RCL", ENTER).expect("{ 0 }")
+        .test("'StatsParameters' RCL", ENTER).expect("{ 0 }")
+        .test("'ΣPar' purge", ENTER).noerror()
+        .test("'StatsParameters' RCL", ENTER).error("Undefined name");
 
-    step("Store and recall to PlotParameters");
-    test(CLEAR, "{1} 'PPAR' STO", ENTER).noerror();
-    test(CLEAR, "'PlotParameters' RCL", ENTER).expect("{ 1 }");
-    test(CLEAR, "'ppar' RCL", ENTER).expect("{ 1 }");
-    test(CLEAR, "'PPAR' purge", ENTER).noerror();
+    step("Store and recall to PlotParameters")
+        .test(CLEAR, "{1} 'PPAR' STO", ENTER).noerror()
+        .test("'PlotParameters' RCL", ENTER).expect("{ 1 }")
+        .test("'ppar' RCL", ENTER).expect("{ 1 }")
+        .test("'PPAR' PGALL", ENTER).noerror()
+        .test("'PlotParameters' RCL", ENTER).error("Undefined name");
 
     step("Numbered store and recall should fail by default");
     test(CLEAR, 5678, ENTER, 1234, ENTER, "STO", ENTER).error("Invalid name");
