@@ -173,6 +173,7 @@ void tests::run(uint onlyCurrent)
 // ----------------------------------------------------------------------------
 {
     save<bool> markRunning(running, true);
+    rpl_command(START_TEST);
 
     tindex = sindex = cindex = count = 0;
     failures.clear();

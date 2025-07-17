@@ -695,6 +695,10 @@ void process_test_commands()
     {
         record(tests_rpl, "Key sync requested");
     }
+    else if (test_command == tests::START_TEST)
+    {
+        program::read_battery();
+    }
     if (!ui.showing_graphics())
         redraw_lcd(true);
     record(tests_rpl, "Done redrawing LCD after command %u, last=%d",
