@@ -12163,6 +12163,8 @@ void tests::check_help_examples()
         .test(CLEAR, "11 MinimumSignificantDigits", ENTER).noerror();
     step("Set higher rendering limit for text")
         .test(CLEAR, "2048 TextRenderingSizeLimit", ENTER).noerror();
+    step("Purge plot parameters")
+        .test(CLEAR, "'PPAR' PGALL", ENTER).noerror();
 
     step("Opening help file").test(CLEAR);
     FILE *f = fopen(HELPFILE_NAME, "r");
@@ -12390,7 +12392,7 @@ void tests::regression_checks()
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
         .noerror()              // Bug was "Invalid Plot Data"
-        .test("'PPAR' PURGE", ENTER);
+        .test("'PPAR' PGALL", ENTER);
     step("Bug 1440: Conversion of integer to decimal may lose precision")
         .test("987654321 SQ ToDecimal 987654321 2 ^ ToDecimal -", ENTER)
         .expect("0");
@@ -12640,7 +12642,8 @@ void tests::plotting()
         .test(ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-zoomx");
-    step("Saving plot parameters").test("PPAR", ENTER, NOSHIFT, M);
+    step("Saving plot parameters")
+        .test("PPAR", ENTER, NOSHIFT, M);
     step("Polar plot: Select min point with PMIN");
     test(EXIT, "-3-4ⅈ PMIN", ENTER)
         .noerror()
@@ -12715,7 +12718,8 @@ void tests::plotting()
         .image("scatterplot");
 
     step("Reset drawing parameters");
-    test(CLEAR, "1 LineWidth 0 GRAY Foreground", ENTER).noerror();
+    test(CLEAR, DIRECT("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
+        .noerror();
 }
 
 
@@ -12731,7 +12735,7 @@ void tests::plotting_all_functions()
     step("Select 24-digit precision").test(CLEAR, SHIFT, O, 24, F6).noerror();
 
     step("Purge the `PlotParameters` variable")
-        .test(CLEAR, "'PPAR' purge", ENTER)
+        .test(CLEAR, "'PPAR' pgall", ENTER)
         .noerror();
 
     step("Select plotting menu").test(CLEAR, RSHIFT, O).noerror();
@@ -12809,7 +12813,7 @@ void tests::graphic_commands()
     BEGIN(graphics);
 
     step("Cleanup environment")
-        .test(DIRECT("'PPAR' PURGE {} CLIP"), ENTER);
+        .test(DIRECT("'PPAR' PGALL {} CLIP"), ENTER);
 
     step("Extract graphic element")
         .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
