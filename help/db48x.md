@@ -14268,29 +14268,6 @@ The width of the line is specified by [LineWidth](#linewidth). The line is drawn
 using the [foreground](#foreground) pattern.
 
 
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-
-* *Upper Right* coordinates as a complex (default `10+6i`)
-
-* *Independent variable* name (default `x`)
-
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-
-* *Type* of plot (default `function`)
-
-* *Dependent variable* name (default `y`)
-
-
 ## Pict
 
 `Pict` is the name given to the graphics shown on the calculator's screen.
@@ -15810,126 +15787,31 @@ Convert an object into a program.
   Note that this applies to programs as well.
 # Scalable plots and graphics
 
-## BEGINPLOT
-Initialize a new current plot object
-
-
-## EDITPLOT
-Set the current plot object to the given graphic
-
-
-## ENDPLOT
-Finish current plot object and leave it on the stack
-
-
-## STROKECOL
-Change the current stroke color
-
-
-## STROKETYPE
-Change current stroke type
-
-
-## FILLCOL
-Change the current fill color
-
-
-## FILLTYPE
-Change the current fill type
-
-
-## FILL
-Fill the last polygon
-
-
-## STROKE
-Draw the outline of the last polygon
-
-
-## FILLSTROKE
-Draw the outline and fill the last polygon
-
-
-## MOVETO
-Move current coordinates
-
-
-## LINETO
-Draw a line
-
-
-## CIRCLE
-Draw a circle
-
-
-## RECTANG
-Draw a rectangle
-
-
-## CTLNODE
-Add a control node to the current polygon
-
-
-## CURVE
-Draw a curve using all previous control points
-
-
-## BGROUP
-
-
-## EGROUP
-
-
-## DOGROUP
-
-
-## BASEPT
-
-
-## TRANSLATE
-
-
-## ROTATE
-
-
-## SCALE
-
-
-## CLEARTRANSF
-
-
-## SETFONT
-
-
-## TEXTHEIGHT
-
-
-## TEXTOUT
-
-
-## INITRENDER
-Set which library will be used as default renderer
-
-
-## DORENDER
-Render a graphics object using the current renderer
-
-
-## PANVIEW
-Shift the center of viewport to render graphics
-
-
-## ROTVIEW
-
-
-## SCLVIEW
-Set scale to render graphics
-
-
-## VIEWPORT
-
-
-## VIEWALL
+Graphics are rendered on the screen based on a coordinate systems defined in the
+`PlotParameters` variables.
+
+## PlotParameters
+
+The `PlotParameters` reserved variable defines the plot parameters, as a list,
+with the following elements:
+
+* *Lower Left* coordinates as a complex (default `-10-6i`)
+* *Upper Right* coordinates as a complex (default `10+6i`)
+* *Independent variable* name (default `x`)
+* *Resolution* specifying the interval between values of the independent
+  variable (default `0`). A binary numnber specifies a resolution in pixels.
+* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
+  or a list containing the origin, the tick mark specification, and the names of
+  the axes.
+* *Type* of plot (default `function`)
+* *Dependent variable* name (default `y`)
+
+To reset the `PlotParameters` to the default values, it is necessary to purge
+the current directory as well as the parents from any `PlotParameters` value:
+
+```rpl
+'PPAR' PGALL
+```
 
 
 ## PlotMin

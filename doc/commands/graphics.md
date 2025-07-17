@@ -271,29 +271,6 @@ The width of the line is specified by [LineWidth](#linewidth). The line is drawn
 using the [foreground](#foreground) pattern.
 
 
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-
-* *Upper Right* coordinates as a complex (default `10+6i`)
-
-* *Independent variable* name (default `x`)
-
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-
-* *Type* of plot (default `function`)
-
-* *Dependent variable* name (default `y`)
-
-
 ## Pict
 
 `Pict` is the name given to the graphics shown on the calculator's screen.
