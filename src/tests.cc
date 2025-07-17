@@ -12291,7 +12291,10 @@ void tests::check_help_examples()
                     ref      = "";
                     skiptest = false;
                     if (!keep)
-                        itest(DIRECT("variables purge"), ENTER);
+                        itest(CLEARERR, CLEAR, EXIT,
+                              DIRECT("variables "
+                                     "{ Foreground Background LineWidth } + "
+                                     "purge"), ENTER);
                 }
             }
         }
