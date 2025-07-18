@@ -1414,6 +1414,8 @@ int object::as_truth(bool error) const
     case ID_polar:
     case ID_rectangular:
     case ID_range:
+    case ID_drange:
+    case ID_prange:
     case ID_uncertain:
     case ID_unit:
         return !is_zero(error);
@@ -1505,6 +1507,8 @@ bool object::is_zero(bool error) const
     case ID_rectangular:
         return rectangular_p(this)->is_zero();
     case ID_range:
+    case ID_drange:
+    case ID_prange:
         return range_p(this)->is_zero();
     case ID_uncertain:
         return uncertain_p(this)->is_zero();
@@ -1558,6 +1562,8 @@ bool object::is_one(bool error) const
     case ID_rectangular:
         return rectangular_p(this)->is_one();
     case ID_range:
+    case ID_drange:
+    case ID_prange:
         return range_p(this)->is_one();
     case ID_uncertain:
         return uncertain_p(this)->is_one();
@@ -1685,6 +1691,8 @@ object_p object::child(uint index, bool coordinate) const
         // fallthrough
     case ID_rectangular:
     case ID_range:
+    case ID_drange:
+    case ID_prange:
     case ID_uncertain:
     case ID_unit:
         return index ? complex_p(this)->y() : complex_p(this)->x();
@@ -1754,6 +1762,8 @@ bool object::is_big() const
     case ID_rectangular:
     case ID_polar:
     case ID_range:
+    case ID_prange:
+    case ID_drange:
     case ID_uncertain:
         return complex_p(this)->x()->is_big() || complex_p(this)->y()->is_big();
     case ID_unit:

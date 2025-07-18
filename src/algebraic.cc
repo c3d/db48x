@@ -640,6 +640,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         break;
     }
     case ID_range:
+    case ID_prange:
+    case ID_drange:
     {
         range_p r = range_p(+x);
         algebraic_g lo = r->lo();

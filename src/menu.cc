@@ -251,6 +251,8 @@ COMMAND_BODY(ToolsMenu)
             case ID_polar:
             case ID_rectangular:        menu = ID_ComplexMenu; break;
             case ID_range:
+            case ID_drange:
+            case ID_prange:
             case ID_uncertain:          menu = ID_RangeMenu; break;
 #if CONFIG_FIXED_BASED_OBJECTS
             case ID_hex_integer:
