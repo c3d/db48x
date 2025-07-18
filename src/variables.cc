@@ -815,19 +815,15 @@ COMMAND_BODY(Copy)
 //   Arithmetic copy operation
 // ----------------------------------------------------------------------------
 {
-    if (object_p nobj = rt.top())
+    if (object_p name = rt.top())
     {
-        if (symbol_p name = nobj->as_quoted<symbol>())
-        {
-            if (object_g value = rt.stack(1))
-                if (object_p stored = directory::store_here(name, value))
-                    if (rt.drop() && rt.top(stored))
-                        return OK;
-        }
-        else
-        {
-            rt.invalid_name_error();
-        }
+        while (object_p quoted = name->as_quoted(ID_object))
+            name = quoted;
+
+        if (object_g value = rt.stack(1))
+            if (object_p stored = directory::store_here(name, value))
+                if (rt.drop() && rt.top(stored))
+                    return OK;
     }
     return ERROR;
 }

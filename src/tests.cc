@@ -1951,6 +1951,9 @@ void tests::global_variables()
         .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
         .test(ID_ObjectMenu, ID_ToProgram)
         .want("« A A + 'A' ▶ A + »");
+    step("Check that we can copy to a local variable")
+        .test("5 2 3 → a b h « 'a·b+1▶h' EVAL 2 * h →V2 »", ENTER)
+        .expect("[ 22 11 ]");
 
     step("Assignment with simple value")
         .test(CLEAR, "A=42", ENTER).got("A=42")
