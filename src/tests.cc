@@ -187,7 +187,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            constants_parsing();
+            range_types();
 
 #if 0
         if (onlyCurrent & 2)
@@ -5481,6 +5481,15 @@ void tests::range_types()
 #undef TFN
 #undef TFNA
 
+    step("Exploding range objects")
+        .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)
+        .got("3", "1");
+    step("Exploding delta range objects")
+        .test(CLEAR, "1±3", ID_ObjectMenu, ID_Explode)
+        .got("4", "-2");
+    step("Exploding percent range objects")
+        .test(CLEAR, "1±200%", ID_ObjectMenu, ID_Explode)
+        .got("3", "-1");
 }
 
 
