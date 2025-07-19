@@ -95,7 +95,8 @@ struct algebraic : command
     // Convert between angle units
     static algebraic_p  convert_angle(algebraic_r arg,
                                       angle_unit from, angle_unit to,
-                                      bool negmod = false);
+                                      bool negmod = false,
+                                      bool domodulo = true);
 
     // Generate a fraction of a turn in the given unit
     static algebraic_p exact_angle(int num, int denom, angle_unit aunit);

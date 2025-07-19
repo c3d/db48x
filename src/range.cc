@@ -418,37 +418,56 @@ RANGE_BODY(cbrt)
 }
 
 
+static inline bool increasing(int h)
+// ----------------------------------------------------------------------------
+//   Check if a quarter denotes an increasing or decreasing region
+// ----------------------------------------------------------------------------
+{
+    return h & 1;
+}
+
+
 static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
 // ----------------------------------------------------------------------------
 //   Compute interval for a sin or a cos
 // ----------------------------------------------------------------------------
+//   The `cos` function is monotonically decreasing between 0° and 180°,
+//   and then monotonically increasing between 180° and 360°, and then again.
+//   If we are in a monotonic region, we can just compute low and high.
+//   If the range covers more than one 180° peak, then the result is -1..1
+//   If the range only covers one peak, then the min is -1 or the max is 1.
+//   For sin/tan, everything is shifted left by 90° to get back to `cos`
 {
     if (!r)
         return nullptr;
     algebraic_g lo    = r->lo();
     algebraic_g hi    = r->hi();
     object::id  amode = Settings.AngleMode();
-    algebraic_g hpi = algebraic::convert_angle(lo, amode,
-                                               object::ID_PiRadians, false);
-    algebraic_g lpi = algebraic::convert_angle(hi, amode,
-                                               object::ID_PiRadians, false);
+    algebraic_g lpi = algebraic::convert_angle(lo, amode, object::ID_PiRadians,
+                                               false, false);
+    algebraic_g hpi = algebraic::convert_angle(hi, amode, object::ID_PiRadians,
+                                               false, false);
 
     // Compute numbers of quadrants (90 degrees quarters)
     lpi = lpi + lpi;
     hpi = hpi + hpi;
-    int32_t lip = lpi->as_int32(0, true) - issin;
-    int32_t hip = hpi->as_int32(0, true) - issin;
+    lpi = floor::run(lpi);
+    hpi = floor::run(hpi);
+    int32_t lq = lpi->as_int32(0, true) - issin;
+    int32_t hq = hpi->as_int32(0, true) - issin;
+    int32_t lh = (lq - (lq < 2)) / 2;
+    int32_t hh = (hq - (hq < 2)) / 2;
 
     // Check if monotonic case or not
-    if (hip / 2 == lip / 2)
+    if (hh == lh)
     {
         // Monotonic section
         lo = fn(lo);
         hi = fn(hi);
-        if (!istan && lip / 2 % 2 == 0)
+        if (!istan && !increasing(lh))
             std::swap(lo, hi);
     }
-    else if (istan || hip/2 - lip/2 > 1)
+    else if (istan || hh - lh > 1)
     {
         lo = istan ? rt.infinity(true)  : integer::make(-1);
         hi = istan ? rt.infinity(false) : integer::make( 1);
@@ -458,10 +477,10 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
         lo = fn(lo);
         hi = fn(hi);
         range::sort(lo, hi);
-        if (lip / 2 % 2)
-            hi = integer::make(1);
+        if (increasing(lh))
+            hi = istan ? rt.infinity(false) : integer::make( 1);
         else
-            lo = integer::make(-1);
+            lo = istan ? rt.infinity(true)  : integer::make(-1);
     }
 
     return range::make(r->type(), lo, hi);
@@ -688,8 +707,8 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
     if (!lneg && !hneg)
         return monotonic(fn, r);
 
-    int32_t lip = lo->as_int32(0, true);
-    if (lip == 0)
+    int32_t lq = lo->as_int32(0, true);
+    if (lq == 0)
     {
         lo = tgamma::evaluate(lo);
         hi = tgamma::evaluate(hi);
@@ -698,8 +717,8 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
     }
     else
     {
-        int32_t hip = hi->as_int32(0, true);
-        if (hip != lip)
+        int32_t hq = hi->as_int32(0, true);
+        if (hq != lq)
         {
             lo = rt.infinity(true);
             hi = rt.infinity(false);

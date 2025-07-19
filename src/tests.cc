@@ -5307,9 +5307,54 @@ void tests::range_types()
 #define TFN(name)  TFNA(name, "1…3")
 
     TFN(sqrt).expect("1.…1.73205 08075 7");
-    TFN(sin).expect("0.05233 59562 43…0.01745 24064 37");
+    TFN(sin).expect("0.01745 24064 37…0.05233 59562 43");
+    TFNA(sin, "-45…45").expect("-0.70710 67811 87…0.70710 67811 87");
+    TFNA(sin, "-45…90").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…120").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…180").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…270").expect("-1…1");
+    TFNA(sin, " 45…270").expect("-1…1");
+    TFNA(sin, "135…270").expect("-1…0.70710 67811 87");
+    TFNA(sin, "150…190").expect("-0.17364 81776 67…¹/₂");
+    TFNA(sin, "170…210").expect("-¹/₂…0.17364 81776 67");
+    TFNA(sin, "240…280").expect("-1…-0.86602 54037 84");
+    TFNA(sin, "260…300").expect("-1…-0.86602 54037 84");
+    TFNA(sin, "240…360").expect("-1…0");
+    TFNA(sin, "-45…360").expect("-1…1");
+    TFNA(sin, "-45…480").expect("-1…1");
+    TFNA(sin, "120…480").expect("-1…1");
     TFN(cos).expect("0.99862 95347 55…0.99984 76951 56");
+    TFNA(cos, "-45…45").expect("0.70710 67811 87…1");
+    TFNA(cos, "-45…90").expect("0…1");
+    TFNA(cos, "-45…120").expect("-¹/₂…1");
+    TFNA(cos, "-45…180").expect("-1…1");
+    TFNA(cos, "-45…270").expect("-1…1");
+    TFNA(cos, " 45…270").expect("-1…0.70710 67811 87");
+    TFNA(cos, "135…270").expect("-1…0");
+    TFNA(cos, "150…190").expect("-1…-0.86602 54037 84");
+    TFNA(cos, "170…210").expect("-1…-0.86602 54037 84");
+    TFNA(cos, "240…280").expect("-¹/₂…0.17364 81776 67");
+    TFNA(cos, "260…300").expect("-0.17364 81776 67…¹/₂");
+    TFNA(cos, "240…360").expect("-¹/₂…1");
+    TFNA(cos, "-45…360").expect("-1…1");
+    TFNA(cos, "-45…480").expect("-1…1");
+    TFNA(cos, "120…480").expect("-1…1");
     TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
+    TFNA(tan, "-45…45").expect("-1…1");
+    TFNA(tan, "-45…90").expect("'-∞'…∞");
+    TFNA(tan, "-45…120").expect("'-∞'…∞");
+    TFNA(tan, "-45…180").expect("'-∞'…∞");
+    TFNA(tan, "-45…270").expect("'-∞'…∞");
+    TFNA(tan, " 45…270").expect("'-∞'…∞");
+    TFNA(tan, "135…270").expect("'-∞'…∞");
+    TFNA(tan, "150…190").expect("-0.57735 02691 9…0.17632 69807 08");
+    TFNA(tan, "170…210").expect("-0.17632 69807 08…0.57735 02691 9");
+    TFNA(tan, "240…280").expect("'-∞'…∞");
+    TFNA(tan, "260…300").expect("'-∞'…∞");
+    TFNA(tan, "240…360").expect("'-∞'…∞");
+    TFNA(tan, "-45…360").expect("'-∞'…∞");
+    TFNA(tan, "-45…480").expect("'-∞'…∞");
+    TFNA(tan, "120…480").expect("'-∞'…∞");
     TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
     TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
     TFN(atan).expect("45. °…71.56505 11771 °");
@@ -5379,8 +5424,8 @@ void tests::range_types()
 #define TFN(name)  TFNA(name, "1±3")
 
     TFNA(sqrt, "3±1").expect("1.70710 67811 9±0.29289 32188 13");
-    TFN(sin).expect("0.01742 84885 21±-0.05232 79852 23");
-    TFN(cos).expect("0.99847 74386 39±0.00091 33883 8");
+    TFN(sin).expect("0.01742 84885 21±0.05232 79852 23");
+    TFN(cos).expect("0.99878 20251 3±0.00121 79748 7");
     TFN(tan).expect("0.01750 30212 26±0.05242 37907 18");
     TFNA(asin, "0.25±0.1").expect("14.55712 08367 °±5.93019 42780 2 °");
     TFNA(acos, "0.25±0.1").expect("75.44287 91633 °±5.93019 42780 2 °");
