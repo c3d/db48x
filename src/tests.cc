@@ -5341,20 +5341,20 @@ void tests::range_types()
     TFNA(cos, "120…480").expect("-1…1");
     TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
     TFNA(tan, "-45…45").expect("-1…1");
-    TFNA(tan, "-45…90").expect("'-∞'…∞");
-    TFNA(tan, "-45…120").expect("'-∞'…∞");
-    TFNA(tan, "-45…180").expect("'-∞'…∞");
-    TFNA(tan, "-45…270").expect("'-∞'…∞");
-    TFNA(tan, " 45…270").expect("'-∞'…∞");
-    TFNA(tan, "135…270").expect("'-∞'…∞");
+    TFNA(tan, "-45…90").expect("−∞…∞");
+    TFNA(tan, "-45…120").expect("−∞…∞");
+    TFNA(tan, "-45…180").expect("−∞…∞");
+    TFNA(tan, "-45…270").expect("−∞…∞");
+    TFNA(tan, " 45…270").expect("−∞…∞");
+    TFNA(tan, "135…270").expect("−∞…∞");
     TFNA(tan, "150…190").expect("-0.57735 02691 9…0.17632 69807 08");
     TFNA(tan, "170…210").expect("-0.17632 69807 08…0.57735 02691 9");
-    TFNA(tan, "240…280").expect("'-∞'…∞");
-    TFNA(tan, "260…300").expect("'-∞'…∞");
-    TFNA(tan, "240…360").expect("'-∞'…∞");
-    TFNA(tan, "-45…360").expect("'-∞'…∞");
-    TFNA(tan, "-45…480").expect("'-∞'…∞");
-    TFNA(tan, "120…480").expect("'-∞'…∞");
+    TFNA(tan, "240…280").expect("−∞…∞");
+    TFNA(tan, "260…300").expect("−∞…∞");
+    TFNA(tan, "240…360").expect("−∞…∞");
+    TFNA(tan, "-45…360").expect("−∞…∞");
+    TFNA(tan, "-45…480").expect("−∞…∞");
+    TFNA(tan, "120…480").expect("−∞…∞");
     TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
     TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
     TFN(atan).expect("45. °…71.56505 11771 °");
@@ -9993,22 +9993,22 @@ void tests::infinity_and_undefined()
     step("Divide by zero as symbolic infinity (negative integer)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (decimal)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1.0 0.0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (bignum)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("2 100 ^ NEG 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (fractions)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1/3 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
 
     step("Setting numerical constants flag")

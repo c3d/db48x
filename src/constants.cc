@@ -351,6 +351,7 @@ static const cstring basic_constants[] =
     "rad",      "1_r",                  // One radian
     "twoπ",     "'2*Ⓒπ'_r",            // Two pi radian
     "angl",     "180_°",                // Half turn
+    "−∞",       "-9.99999E999999",      // A small version of infinity
 
 
     // ------------------------------------------------------------------------
