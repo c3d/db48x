@@ -1620,6 +1620,8 @@ bool object::is_negative(bool error) const
         return decimal_p(this)->is_negative();
     case ID_unit:
         return unit_p(this)->value()->is_negative(error);
+    case ID_constant:
+        return constant_p(this)->value()->is_negative(error);
 
     default:
         if (error)
