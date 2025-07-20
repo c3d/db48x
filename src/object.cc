@@ -1631,6 +1631,22 @@ bool object::is_negative(bool error) const
 }
 
 
+int object::is_infinity() const
+// ----------------------------------------------------------------------------
+//   Check if the object is a constant with a name like ∞ or −∞
+// ----------------------------------------------------------------------------
+{
+    if (constant_p cst = as<constant>())
+    {
+        if (cst->matches("∞"))
+            return 1;
+        else if (cst->matches("−∞"))
+            return -1;
+    }
+    return 0;
+}
+
+
 bool object::is_simplifiable() const
 // ----------------------------------------------------------------------------
 //   Return true if auto-simplification does not apply - This may GC!

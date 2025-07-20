@@ -195,6 +195,8 @@ RENDER_BODY(drange)
     range_g     go   = o;
     algebraic_g lo   = go->lo();
     algebraic_g hi   = go->hi();
+    if (lo->is_infinity() || hi->is_infinity())
+        return range::do_render(o, r);
     algebraic_g two  = integer::make(2);
     algebraic_g disp = (lo + hi) / two;
     if (disp)
@@ -215,6 +217,8 @@ RENDER_BODY(prange)
     range_g     go   = o;
     algebraic_g lo   = go->lo();
     algebraic_g hi   = go->hi();
+    if (lo->is_infinity() || hi->is_infinity())
+        return range::do_render(o, r);
     algebraic_g two  = integer::make(2);
     algebraic_g disp = (lo + hi) / two;
     if (disp)
