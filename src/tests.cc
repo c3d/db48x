@@ -5389,11 +5389,13 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "1±3 2±5", NOSHIFT, MUL).expect("7±21");
     step("Divide delta ranges")
-        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("-¹/₃±1");
+        .test(CLEAR, "10±3 20±5", NOSHIFT, DIV).expect("⁴³/₇₅±²²/₇₅")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("−∞…∞");
     step("Power delta ranges")
         .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
     step("Invert delta ranges")
-        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("-¹/₈±³/₈");
+        .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁")
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("−∞…∞");
     step("Negate delta ranges")
         .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
 
@@ -5415,7 +5417,8 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, MUL).expect("5±15");
     step("Divide delta ranges")
-        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("-⁵/₈±1 ⁷/₈");
+        .test(CLEAR, "5 10±3", NOSHIFT, DIV).expect("⁵⁰/₉₁±¹⁵/₉₁")
+        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("−∞…∞");
     step("Power delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, ID_pow).expect("312.52±312.48");
 

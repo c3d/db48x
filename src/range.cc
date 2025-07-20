@@ -346,10 +346,14 @@ range_g operator*(range_r x, range_r y)
 {
     if (!x|| !y)
         return nullptr;
-    algebraic_g a = x->lo() * y->lo();
-    algebraic_g b = x->lo() * y->hi();
-    algebraic_g c = x->hi() * y->lo();
-    algebraic_g d = x->hi() * y->hi();
+    algebraic_g xlo = x->lo();
+    algebraic_g xhi = x->hi();
+    algebraic_g ylo = y->lo();
+    algebraic_g yhi = y->hi();
+    algebraic_g a = xlo * ylo;
+    algebraic_g b = xlo * yhi;
+    algebraic_g c = xhi * ylo;
+    algebraic_g d = xhi * yhi;
 
     range::sort(a, b);
     range::sort(a, c);
@@ -367,10 +371,21 @@ range_g operator/(range_r x, range_r y)
 {
     if (!x|| !y)
         return nullptr;
-    algebraic_g a = x->lo() / y->lo();
-    algebraic_g b = x->lo() / y->hi();
-    algebraic_g c = x->hi() / y->lo();
-    algebraic_g d = x->hi() / y->hi();
+    algebraic_g xlo = x->lo();
+    algebraic_g xhi = x->hi();
+    algebraic_g ylo = y->lo();
+    algebraic_g yhi = y->hi();
+    if (ylo->is_zero(false) || yhi->is_zero(false) ||
+        ylo->is_negative(false) != yhi->is_negative())
+    {
+        ylo = rt.infinity(true);
+        yhi = rt.infinity(false);
+        return range::make(y->type(), ylo, yhi);
+    }
+    algebraic_g a = xlo / ylo;
+    algebraic_g b = xlo / yhi;
+    algebraic_g c = xhi / ylo;
+    algebraic_g d = xhi / yhi;
 
     range::sort(a, b);
     range::sort(a, c);
