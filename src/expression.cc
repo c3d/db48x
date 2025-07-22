@@ -4002,6 +4002,9 @@ expression_p expression::derivative(symbol_r sym) const
         ln1p(X)>>indep,         (X>>indep)/(X+one),
         expm1(X)>>indep,        (X>>indep)*exp(X),
 
+        erf(X)>>indep,          (X>>indep)*two/sqrt(kpi)*exp(-sq(X)),
+        erfc(X)>>indep,         -(X>>indep)*two/sqrt(kpi)*exp(-sq(X)),
+
         sq(X)>>indep,           two*X*(X>>indep),
         sqrt(X)>>indep,         (X>>indep)/(two * sqrt(X)),
         cubed(X)>>indep,        three*sq(X)*(X>>indep),

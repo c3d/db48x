@@ -8507,6 +8507,10 @@ void tests::symbolic_differentiation()
         .test(CLEAR, "'ln1p(A*X+B)+expm1(X*C-D)' 'X'", ID_Derivative)
         .expect("'A÷(A·X+B+1)+C·exp(X·C-D)'");
 
+    step("Derivative of erf and erfc")
+        .test(CLEAR, "'erf(A*X+B)+erfc(X*C-D)' 'X'", ID_Derivative)
+        .expect("'2·A÷√ π·exp(-(A·X+B)²)+2·(-C)÷√ π·exp(-(X·C-D)²)'");
+
     step("Derivative of square and cube")
         .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'", ID_Derivative)
         .expect("'2·(A·X+B)·A+3·(X·C-D)²·C'");
