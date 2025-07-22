@@ -378,6 +378,12 @@ range_g operator/(range_r x, range_r y)
     if (ylo->is_zero(false) || yhi->is_zero(false) ||
         ylo->is_negative(false) != yhi->is_negative())
     {
+        if (Settings.InfinityError())
+        {
+            rt.zero_divide_error();
+            return nullptr;
+        }
+        Settings.InfiniteResultIndicator(true);
         ylo = rt.infinity(true);
         yhi = rt.infinity(false);
         return range::make(y->type(), ylo, yhi);

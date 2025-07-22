@@ -5389,13 +5389,29 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "1±3 2±5", NOSHIFT, MUL).expect("7±21");
     step("Divide delta ranges")
-        .test(CLEAR, "10±3 20±5", NOSHIFT, DIV).expect("⁴³/₇₅±²²/₇₅")
-        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("−∞…∞");
+        .test(CLEAR, "10±3 20±5", NOSHIFT, DIV).expect("⁴³/₇₅±²²/₇₅");
+    step("Divide delta ranges divide by zero")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide delta range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-26 FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
     step("Power delta ranges")
         .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
     step("Invert delta ranges")
-        .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁")
-        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("−∞…∞");
+        .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁");
+    step("Invert delta ranges divide by zero")
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero");
+    step("Invert delta range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "-22 SF", ENTER).noerror()
+        .test(CLEAR, "1±3", ID_inv).expect("−∞…∞")
+        .test(CLEAR, "'InfiniteResultIndicator' FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
     step("Negate delta ranges")
         .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
 
@@ -5417,8 +5433,12 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, MUL).expect("5±15");
     step("Divide delta ranges")
-        .test(CLEAR, "5 10±3", NOSHIFT, DIV).expect("⁵⁰/₉₁±¹⁵/₉₁")
-        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("−∞…∞");
+        .test(CLEAR, "5 10±3", NOSHIFT, DIV).expect("⁵⁰/₉₁±¹⁵/₉₁");
+    step("Divide delta ranges: zero divide error")
+        .test(CLEAR, "5 1±3", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide delta ranges: Infinite results")
+        .test(CLEAR, "InfinityValue 5 1±3", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-22 CF -26 FS?C", ENTER).expect("True");
     step("Power delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, ID_pow).expect("312.52±312.48");
 
