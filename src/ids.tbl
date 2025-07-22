@@ -679,6 +679,13 @@ OP(ToRadians,   "→Radians")             ALIAS(ToRadians, "→Rad")
 OP(ToGrads,     "→Grads")               ALIAS(ToGrads,   "→Grad")
 OP(ToPiRadians, "→PiRadians")           ALIAS(ToPiRadians, "→πr")
 
+// Ranges
+NAMED(ToRange,        "→Range")         ALIAS(ToRange,     "→Interval")
+NAMED(ToDeltaRange,   "→∆Range")
+NAMED(ToPercentRange, "→%Range")
+NAMED(ToUncertain,    "→σRange")        ALIAS(ToUncertain, "→Uncertain")
+                                        ALIAS(ToUncertain, "→Un")
+
 // Timing and system commands
 CMD(Type)
 CMD(TypeName)

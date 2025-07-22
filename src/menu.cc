@@ -500,7 +500,7 @@ MENU(AnglesMenu,
 
 MENU(ComplexMenu,
 // ----------------------------------------------------------------------------
-//   Operation on complex numbers
+//   Operations on complex numbers
 // ----------------------------------------------------------------------------
      "ⅈ",       ID_SelfInsert,
      "∡",       ID_SelfInsert,
@@ -524,12 +524,20 @@ MENU(ComplexMenu,
 
 MENU(RangeMenu,
 // ----------------------------------------------------------------------------
-//   Operation on ranges and uncertain numbers
+//   Operations on ranges and uncertain numbers
 // ----------------------------------------------------------------------------
      "…",       ID_SelfInsert,
      "±",       ID_SelfInsert,
+     "±\t%",    ID_SelfInsert,
      "±\tσ",    ID_SelfInsert,
-     "±\t%",    ID_SelfInsert);
+     "Range→",  ID_Explode,
+     "Size",    ID_Size,
+
+     "→Range",  ID_ToRange,
+     "→∆Range", ID_ToDeltaRange,
+     "→%Range", ID_ToPercentRange,
+     "→Uncert", ID_ToUncertain);
+
 
 MENU(VectorMenu,
 // ----------------------------------------------------------------------------

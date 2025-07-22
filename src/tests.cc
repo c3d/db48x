@@ -5265,6 +5265,12 @@ void tests::range_types()
         .test(EEX).expect("2±1")
         .test(EEX).expect("2±50%");
 
+    step("Data entry from range menu")
+        .test(CLEAR, ID_RangeMenu, "1", F1, "3", ENTER).expect("1…3")
+        .test(CLEAR, ID_RangeMenu, "1", F2, "3", ENTER).expect("1±3")
+        .test(CLEAR, ID_RangeMenu, "1", F3, "3", ENTER).expect("1±3%")
+        .test(CLEAR, ID_RangeMenu, "1", F4, "3", ENTER).expect("1±3σ");
+
     step("Add intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
     step("Subtract intervals")
@@ -5560,8 +5566,17 @@ void tests::range_types()
         .test(CLEAR, "1±3", ID_ObjectMenu, ID_Explode)
         .got("4", "-2");
     step("Exploding percent range objects")
-        .test(CLEAR, "1±200%", ID_ObjectMenu, ID_Explode)
+        .test(CLEAR, "1±200%", ID_RangeMenu, ID_Explode)
         .got("3", "-1");
+    step("Size range objects")
+        .test(CLEAR, "1…3", ID_RangeMenu, ID_Size)
+        .got("2");
+    step("Size delta range objects")
+        .test(CLEAR, "1±3", ID_RangeMenu, ID_Size)
+        .got("6");
+    step("Size percent range objects")
+        .test(CLEAR, "1±200%", ID_RangeMenu, ID_Size)
+        .got("4");
 }
 
 

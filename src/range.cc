@@ -838,3 +838,69 @@ algebraic_p uncertain::as_range(object::id type) const
     rt.unimplemented_error();
     return this;
 }
+
+
+
+// ============================================================================
+//
+//   Commands implementing the ranges
+//
+// ============================================================================
+
+static object::result to_range(object::id ty)
+// ----------------------------------------------------------------------------
+//   Build a range of the given type
+// ----------------------------------------------------------------------------
+{
+    algebraic_g lo = algebraic_p(object::strip(rt.stack(1)));
+    algebraic_g hi = algebraic_p(object::strip(rt.stack(0)));
+    if (!lo || !hi)
+        return object::ERROR;
+    if (!(lo->is_real() || lo->is_symbolic()) ||
+        !(hi->is_real() || hi->is_symbolic()))
+    {
+        rt.type_error();
+        return object::ERROR;
+    }
+    range::sort(lo, hi);
+    range_g r = range::make(ty, lo, hi);
+    if (!r|| !rt.drop() || !rt.top(r))
+        return object::ERROR;
+    return object::OK;
+}
+
+
+COMMAND_BODY(ToRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_range);
+}
+
+
+COMMAND_BODY(ToDeltaRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a delta range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_drange);
+}
+
+
+COMMAND_BODY(ToPercentRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a percent range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_prange);
+}
+
+
+COMMAND_BODY(ToUncertain)
+// ----------------------------------------------------------------------------
+//  Take two values and turn them into an uncertain number
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_uncertain);
+}
