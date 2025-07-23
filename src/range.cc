@@ -121,7 +121,7 @@ PARSE_BODY(range)
     }
 
     size_t   ysz  = max - offs;
-    object_p yobj = parse(p.source + offs, ysz, PARENTHESES);
+    object_p yobj = parse(p.source + offs, ysz, PARENTHESES, p.separator);
     if (!yobj)
         return ERROR;
     algebraic_g yexpr = yobj->as_algebraic();
