@@ -536,7 +536,7 @@ MENU(RangeMenu,
      "→Range",  ID_ToRange,
      "→∆Range", ID_ToDeltaRange,
      "→%Range", ID_ToPercentRange,
-     "→Uncert", ID_ToUncertain,
+     "→σRange", ID_ToUncertain,
      "∪",       ID_RangeUnion,
      "∩",       ID_RangeIntersect);
 
