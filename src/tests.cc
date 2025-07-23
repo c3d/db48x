@@ -5599,6 +5599,12 @@ void tests::range_types()
     step("Intersection (percent)")
         .test(CLEAR, "1±3% 2±6% ", ID_RangeMenu, ID_RangeIntersect)
         .expect("1 ³/₁₀₀±0%");
+
+    step("Range with unit")
+        .test(CLEAR, "1…3_km 2…6_m", NOSHIFT, ADD)
+        .expect("1 002…3 006 m")
+        .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
+        .expect("2…18 km/s");
 }
 
 
