@@ -186,5 +186,7 @@ COMMAND_DECLARE(ToRange, 2);
 COMMAND_DECLARE(ToDeltaRange, 2);
 COMMAND_DECLARE(ToPercentRange, 2);
 COMMAND_DECLARE(ToUncertain, 2);
+COMMAND_DECLARE(RangeUnion, 2);
+COMMAND_DECLARE(RangeIntersect, 2);
 
 #endif // RANGE_H

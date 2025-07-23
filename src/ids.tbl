@@ -685,6 +685,8 @@ NAMED(ToDeltaRange,   "→∆Range")
 NAMED(ToPercentRange, "→%Range")
 NAMED(ToUncertain,    "→σRange")        ALIAS(ToUncertain, "→Uncertain")
                                         ALIAS(ToUncertain, "→Un")
+NAMED(RangeUnion,       "∪")            ALIAS(RangeUnion, "Union")
+NAMED(RangeIntersect,   "∩")            ALIAS(RangeIntersect, "Intersect")
 
 // Timing and system commands
 CMD(Type)

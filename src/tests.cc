@@ -5577,6 +5577,28 @@ void tests::range_types()
     step("Size percent range objects")
         .test(CLEAR, "1±200%", ID_RangeMenu, ID_Size)
         .got("4");
+
+    step("Union (ranges)")
+        .test(CLEAR, "1…3 2…6 ", ID_RangeMenu, ID_RangeUnion)
+        .expect("1…6");
+    step("Union (delta)")
+        .test(CLEAR, "10±3 2±6 ", ID_RangeMenu, ID_RangeUnion)
+        .expect("4 ¹/₂±8 ¹/₂");
+    step("Union (percent)")
+        .test(CLEAR, "1±3% 2±6% ", ID_RangeMenu, ID_RangeUnion)
+        .expect("1 ¹⁰⁹/₂₀₀±37 ⁶⁷/₃₀₉%");
+    step("Intersection (ranges)")
+        .test(CLEAR, "1…3 2…6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("2…3");
+    step("Intersection (ranges, empty)")
+        .test(CLEAR, "1…3 4…6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("3…3");
+    step("Intersection (delta)")
+        .test(CLEAR, "1±3 2±6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("1±3");
+    step("Intersection (percent)")
+        .test(CLEAR, "1±3% 2±6% ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("1 ³/₁₀₀±0%");
 }
 
 

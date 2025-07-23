@@ -864,7 +864,7 @@ static object::result to_range(object::id ty)
     }
     range::sort(lo, hi);
     range_g r = range::make(ty, lo, hi);
-    if (!r|| !rt.drop() || !rt.top(r))
+    if (!r || !rt.drop() || !rt.top(r))
         return object::ERROR;
     return object::OK;
 }
@@ -903,4 +903,53 @@ COMMAND_BODY(ToUncertain)
 // ----------------------------------------------------------------------------
 {
     return to_range(ID_uncertain);
+}
+
+
+static object::result range_op(bool intersect)
+// ----------------------------------------------------------------------------
+//   Shared code for union and intersection
+// ----------------------------------------------------------------------------
+{
+    range_g a = range_p(object::strip(rt.stack(1)));
+    range_g b = range_p(object::strip(rt.stack(0)));
+    if (!a || !b)
+        return object::ERROR;
+    if (!a->is_range() || !b->is_range())
+    {
+        rt.type_error();
+        return object::ERROR;
+    }
+    algebraic_g alo = a->lo();
+    algebraic_g ahi = a->hi();
+    algebraic_g blo = b->lo();
+    algebraic_g bhi = b->hi();
+    range::sort(alo, blo);
+    range::sort(ahi, bhi);
+    if (intersect && range::sort(blo, ahi))
+        ahi = blo;
+    range_g r = range::make(a->type(),
+                            intersect ? blo : alo,
+                            intersect ? ahi : bhi);
+    if (!r || !rt.drop() || !rt.top(r))
+        return object::ERROR;
+    return object::OK;
+}
+
+
+COMMAND_BODY(RangeUnion)
+// ----------------------------------------------------------------------------
+//  Perform union between two ranges
+// ----------------------------------------------------------------------------
+{
+    return range_op(false);
+}
+
+
+COMMAND_BODY(RangeIntersect)
+// ----------------------------------------------------------------------------
+//  Perform intersection between two ranges
+// ----------------------------------------------------------------------------
+{
+    return range_op(true);
 }

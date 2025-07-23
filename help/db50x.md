@@ -16447,6 +16447,26 @@ components for the low and high value.
 1 2 →σRange
 @ Expecting 1±2σ
 ```
+
+
+## RangeUnion
+
+Perform the union of two ranges
+
+```rpl
+1…3 2…6 ∪
+@ Expecting 1…6
+```
+
+
+## RangeIntersect
+
+Perform the intersection of two ranges
+
+```rpl
+1…3 2…6 ∩
+@ Expecting 2…3
+```
 # SD Card
 
 ## SDRESET
