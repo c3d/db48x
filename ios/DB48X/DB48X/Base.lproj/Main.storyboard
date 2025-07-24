@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -16,15 +16,15 @@
                         <viewControllerLayoutGuide type="top" id="3ge-3E-7cO"/>
                         <viewControllerLayoutGuide type="bottom" id="0iR-uu-Fzh"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="88m-4O-eCX">
+                    <view key="view" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88m-4O-eCX" userLabel="Outer  View">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
+                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
                                 <rect key="frame" x="0.0" y="61" width="393" height="730"/>
                                 <subviews>
-                                    <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="VyD-TD-Hcr" customClass="ScreenView">
+                                    <mtkView contentMode="scaleToFill" ambiguous="YES" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" id="VyD-TD-Hcr" customClass="ScreenView">
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="235.66666666666666"/>
+                                        <autoresizingMask key="autoresizingMask"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VyD-TD-Hcr" secondAttribute="height" multiplier="5:3" id="TEg-nX-cri"/>
@@ -33,8 +33,8 @@
                                             <outletCollection property="gestureRecognizers" destination="Gsa-Ry-57p" appends="YES" id="r8o-Es-G5i"/>
                                         </connections>
                                     </mtkView>
-                                    <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
-                                        <rect key="frame" x="0.0" y="235.66666666666671" width="393" height="494.33333333333326"/>
+                                    <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
+                                        <rect key="frame" x="0.0" y="235.66666666666674" width="393" height="494.33333333333326"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VeI-TE-aJE" secondAttribute="height" multiplier="698:878" id="Pzg-fD-vL7"/>
@@ -85,6 +85,7 @@
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="3ge-3E-7cO" secondAttribute="bottom" id="BZ8-AK-8P5"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="height" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="height" id="KpM-bY-cVQ"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="width" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="width" id="OX4-VZ-sZt"/>
+                            <constraint firstItem="0iR-uu-Fzh" firstAttribute="top" relation="greaterThanOrEqual" secondItem="R4Q-96-XuB" secondAttribute="bottom" id="bHU-aR-8Pm"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="centerY" secondItem="88m-4O-eCX" secondAttribute="centerY" id="evN-7t-HjV"/>
                         </constraints>
                     </view>
@@ -113,7 +114,7 @@
                         <viewControllerLayoutGuide type="bottom" id="9R9-mV-wfN"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Z70-Fw-xQi" userLabel="settings">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DB48X Logo" translatesAutoresizingMaskIntoConstraints="NO" id="H54-Ng-o74">
@@ -128,21 +129,21 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="204" id="ree-VL-cJC"/>
                                 </constraints>
-                                <mutableString key="text">A modern and improved implementation of Reverse Polish Lisp (RPL), in the spirit of the iconic HP48 and HP50 calculators,
+                                <string key="text">A modern and improved implementation of Reverse Polish Lisp (RPL), in the spirit of the iconic HP48 and HP50 calculators,
 
 and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often known as HP)
 
 © 2024 Christophe de Dinechin
-Ⓟ Carlo Acutis</mutableString>
+Ⓟ Carlo Acutis</string>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yHc-0x-2dG" userLabel="scroll">
-                                <rect key="frame" x="16" y="332" width="361" height="410"/>
+                                <rect key="frame" x="16" y="332" width="361" height="317"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jj3-Zw-DY9" userLabel="scrollcontents">
-                                        <rect key="frame" x="0.0" y="0.0" width="361" height="410"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="317"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jkK-bL-IOv" userLabel="savestateonexit">
                                                 <rect key="frame" x="0.0" y="0.0" width="361" height="31"/>
@@ -228,7 +229,7 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                                                 </constraints>
                                             </view>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gll-Rn-e7C">
-                                                <rect key="frame" x="0.0" y="370" width="361" height="40"/>
+                                                <rect key="frame" x="0.0" y="277" width="361" height="40"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="40" id="oOV-aL-1hV"/>
                                                 </constraints>
@@ -239,7 +240,7 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Trc-CY-fCD">
-                                                <rect key="frame" x="0.0" y="322" width="361" height="40"/>
+                                                <rect key="frame" x="0.0" y="229" width="361" height="40"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="40" id="Fpe-62-WNR"/>
                                                 </constraints>
@@ -285,7 +286,7 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                                 <viewLayoutGuide key="frameLayoutGuide" id="s7F-Lb-RML"/>
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hsy-SF-nTx">
-                                <rect key="frame" x="36" y="782" width="321" height="40"/>
+                                <rect key="frame" x="36" y="689" width="321" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="uzV-fJ-f8A"/>
                                 </constraints>

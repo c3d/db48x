@@ -285,7 +285,6 @@
 		6F0FDBFB2C7934DF00C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6F0FDBFC2C7934DF00C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6F0FDBFD2C7934DF00C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6F0FDBFF2C7934DF00C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F0FDC002C7934DF00C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6F0FDC022C7934DF00C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
 		6F0FDC032C7934DF00C8357F /* 1DElastiCollisions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3852C63E4F700C8357F /* 1DElastiCollisions.bmp */; };
@@ -474,7 +473,6 @@
 		6F0FDCC72C7934E300C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6F0FDCC82C7934E300C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6F0FDCC92C7934E300C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6F0FDCCB2C7934E300C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F0FDCCC2C7934E300C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6F0FDCCE2C7934E300C8357F /* IsentropicFlow.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3A82C63E4F900C8357F /* IsentropicFlow.bmp */; };
 		6F0FDCCF2C7934E300C8357F /* BernouilliEquation.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3912C63E4F800C8357F /* BernouilliEquation.bmp */; };
@@ -652,7 +650,6 @@
 		6F0FDD882C7934E500C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6F0FDD892C7934E500C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6F0FDD8A2C7934E500C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6F0FDD8C2C7934E500C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F0FDD8D2C7934E500C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6F0FDD8F2C7934E500C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
 		6F0FDD902C7934E500C8357F /* 1DElastiCollisions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3852C63E4F700C8357F /* 1DElastiCollisions.bmp */; };
@@ -982,7 +979,6 @@
 		6F2AC4932C64105F00C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6F2AC4942C64105F00C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6F2AC4952C64105F00C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6F2AC4972C64105F00C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F2AC4982C64105F00C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6F2AC5032C6410F700C8357F /* graphics.cc in Sources */ = {isa = PBXBuildFile; fileRef = 6FE7F01F2B95E37300C8357F /* graphics.cc */; };
 		6F2AC5042C6410F700C8357F /* Screen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6FE7EFDE2B95DDF100C8357F /* Screen.cpp */; };
@@ -1070,7 +1066,6 @@
 		6F2AC56D2C6410F700C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6F2AC56E2C6410F700C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6F2AC56F2C6410F700C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6F2AC5712C6410F700C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6F2AC5722C6410F700C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6F3215DC2D528D360063178B /* B_Field_In_Finite_Solenoid.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D62D528D360063178B /* B_Field_In_Finite_Solenoid.bmp */; };
 		6F3215DD2D528D360063178B /* E_Field_Finite_Line.bmp in Resources */ = {isa = PBXBuildFile; fileRef = 6F3215D92D528D360063178B /* E_Field_Finite_Line.bmp */; };
@@ -1384,7 +1379,6 @@
 		6FE399DE2C793FE300C8357F /* characters.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FD555852B995FA500C8357F /* characters.csv */; };
 		6FE399DF2C793FE300C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6FE399E02C793FE300C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6FE399E22C793FE300C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6FE399E32C793FE300C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 		6FE399E52C793FE300C8357F /* 1-arithmetic-rpl.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC35C2C63640C00C8357F /* 1-arithmetic-rpl.bmp */; };
 		6FE399E62C793FE300C8357F /* 1DElastiCollisions.bmp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6F2AC3852C63E4F700C8357F /* 1DElastiCollisions.bmp */; };
@@ -1526,7 +1520,6 @@
 		6FF873942B97B84D00C8357F /* db48x.md in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE775112B97966E00C8357F /* db48x.md */; };
 		6FF873972B97B87400C8357F /* units.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750C2B97966E00C8357F /* units.csv */; };
 		6FF873982B97B87400C8357F /* constants.csv in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FE7750D2B97966E00C8357F /* constants.csv */; };
-		6FF8739F2B97BAB200C8357F /* Test.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739A2B97BA1E00C8357F /* Test.48S */; };
 		6FF873A02B97BAB200C8357F /* Demo.48S in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6FF8739B2B97BA1E00C8357F /* Demo.48S */; };
 /* End PBXBuildFile section */
 
@@ -1585,7 +1578,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6F0FDBFF2C7934DF00C8357F /* Test.48S in CopyFiles */,
 				6F0FDC002C7934DF00C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1724,7 +1716,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6F0FDCCB2C7934E300C8357F /* Test.48S in CopyFiles */,
 				6F0FDCCC2C7934E300C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1863,7 +1854,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6F0FDD8C2C7934E500C8357F /* Test.48S in CopyFiles */,
 				6F0FDD8D2C7934E500C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2107,7 +2097,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6F2AC4972C64105F00C8357F /* Test.48S in CopyFiles */,
 				6F2AC4982C64105F00C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2254,7 +2243,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6F2AC5712C6410F700C8357F /* Test.48S in CopyFiles */,
 				6F2AC5722C6410F700C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2456,7 +2444,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6FE399E22C793FE300C8357F /* Test.48S in CopyFiles */,
 				6FE399E32C793FE300C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2595,7 +2582,6 @@
 			dstPath = state;
 			dstSubfolderSpec = 7;
 			files = (
-				6FF8739F2B97BAB200C8357F /* Test.48S in CopyFiles */,
 				6FF873A02B97BAB200C8357F /* Demo.48S in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2907,7 +2893,6 @@
 		6FE7F0552B95E37400C8357F /* command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = command.h; path = ../../../src/command.h; sourceTree = "<group>"; };
 		6FEF5C6F2BAA151400C8357F /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
 		6FEF5C772BAC7CB800C8357F /* sim-dmcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sim-dmcp.h"; sourceTree = "<group>"; };
-		6FF8739A2B97BA1E00C8357F /* Test.48S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Test.48S; sourceTree = "<group>"; };
 		6FF8739B2B97BA1E00C8357F /* Demo.48S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Demo.48S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -3794,7 +3779,6 @@
 		6FF873992B97BA1E00C8357F /* state */ = {
 			isa = PBXGroup;
 			children = (
-				6FF8739A2B97BA1E00C8357F /* Test.48S */,
 				6FF8739B2B97BA1E00C8357F /* Demo.48S */,
 			);
 			name = state;
@@ -5211,7 +5195,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5306,7 +5290,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5335,7 +5319,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5365,7 +5349,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5393,7 +5377,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB48X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB48XPrecompiledHeaders";
@@ -5425,7 +5409,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5455,7 +5439,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5487,7 +5471,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5516,7 +5500,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5547,7 +5531,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5576,7 +5560,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB40X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB40XPrecompiledHeaders";
@@ -5608,7 +5592,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
@@ -5637,7 +5621,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9.9;
+				MARKETING_VERSION = 0.9.10;
 				PRODUCT_BUNDLE_IDENTIFIER = org.dinechin.DB50X;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SHARED_PRECOMPS_DIR = "$(OBJROOT)/DB50XPrecompiledHeaders";
