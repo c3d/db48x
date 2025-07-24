@@ -12,7 +12,7 @@ The first implementation of RPL accessible by the user was on the HP28C, circa
 HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB48X.
 
-DB48X is a fresh implementation of RPL on ARM, initially targetting the
+DB48X is a fresh implementation of RPL on ARM, initially targeting the
 SwissMicros DM42 calculator.
 This has [consequences on the design](#design-overview) of this particular
 implementation of RPL.
@@ -41,7 +41,7 @@ using the following synthetic stack diagram:
 ## Algebraic mode
 
 Unlike earlier RPN calculators from Hewlett-Packard, RPL calculators from HP
-includes complete support for algebraic objects written using the standard
+include complete support for algebraic objects written using the standard
 precedence rules in mathematics. This gives you the best of both worlds,
 i.e. the keyboard efficiency of RPN, requiring less keystrokes for a given
 operation, as well as the mathematical readability of the algebraic

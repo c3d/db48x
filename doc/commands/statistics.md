@@ -16,12 +16,12 @@ Generate a random real number between 0 and 1, 1 being excluded.
 
 DB48X uses an additive congruential random number generator (ACORN), which is
 configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
-[RandomGeneratorBits](#randomgeneratorbits).
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
 
 ## Random
 
-Generate a random number between two bounds.
+Generate a pseudo-random number between two bounds.
 
 If the two bounds are integers, then the result is an integer, and the upper
 bound is included. For example, `2 4 Random` can generate `2`, `3` or `4`.
@@ -30,16 +30,18 @@ Otherwise, the upper bound is excluded. For example, `2. 4. Random` can generate
 any number between `2.0` and `4.0`, but the upper bound `4.0` cannot be
 generated.
 
-The resulting number is
+DB48X uses an additive congruential random number generator (ACORN), which is
+configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
-## ΣData (ΣDAT)
+## ΣData
 
 The `ΣData` variable contains the statistics data, in the form of a matrix.
 
 *Note*: The `ΣData` name is considered a command internally, and as such,
 is subject to `CommandDisplayMode` and not `NamesDisplayMode`.
 
-## ΣParameters (ΣPAR)
+## ΣParameters
 
 The `ΣParameters` variable contains the statistics parameters, as a list with
 five elements:

@@ -343,7 +343,7 @@ struct hwfp : hwfp_base
     }
 
 
-    static hwfp_p log1p(hwfp_r x)
+    static hwfp_p ln1p(hwfp_r x)
     {
         return make(std::log1p(x->value()));
     }
@@ -353,7 +353,7 @@ struct hwfp : hwfp_base
         return make(std::expm1(x->value()));
     }
 
-    static hwfp_p log(hwfp_r x)
+    static hwfp_p ln(hwfp_r x)
     {
         return make(std::log(x->value()));
     }

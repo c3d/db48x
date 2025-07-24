@@ -290,9 +290,9 @@ CMD(cos)
 CMD(tan)                        // WARNING: order used in function.cc
 
 // Exp and log
-NAMED(log, "ln")                ALIAS(log, "ln")
+CMD(ln)
 CMD(exp)
-CMD(log10)
+CMD(log10)                      ALIAS(log10, "log")
 CMD(exp10)                      ALIAS(exp10, "alog")
 
 // Conversions
@@ -371,7 +371,7 @@ CMD(sinh)
 CMD(cosh)
 CMD(tanh)
 
-CMD(log1p)      ALIAS(log1p, "lnp1")            // HP48 compatibility
+CMD(ln1p)       ALIAS(ln1p, "lnp1")             // HP48 compatibility
 CMD(expm1)      ALIAS(expm1, "expm")            // HP48 compatibility
 CMD(log2)
 CMD(exp2)       ALIAS(exp2, "alog2")
@@ -408,7 +408,7 @@ NAMED(xpon,             "Exponent")
 NAMED(SigDig,           "SignificantDigits")
 OP(Percent,             "%")
 NAMED(PercentChange,    "%Change")              ALIAS(PercentChange, "%Ch")
-NAMED(PercentTotal,     "%Total")               ALIAS(PercentChange, "%T")
+NAMED(PercentTotal,     "%Total")               ALIAS(PercentTotal, "%T")
 CMD(Min)
 CMD(Max)
 
@@ -548,7 +548,7 @@ CMD(RecallMenu)                                 ALIAS(RecallMenu, "RclMenu")
 // ============================================================================
 
 // Memory management
-CMD(PurgeAll)
+CMD(PurgeAll)                   ALIAS(PurgeAll, "PgAll")
 CMD(GarbageCollect)             ALIAS(GarbageCollect, "GC")
 NAMED(Mem, "AvailableMemory")
 CMD(FreeMemory)
@@ -666,7 +666,8 @@ OP(FromDMS,     "DMS→")
 OP(DMSAdd,      "DMS+")
 OP(DMSSub,      "DMS-")
 OP(DateAdd,     "Date+")
-OP(DateSub,     "DDays")
+OP(DateSub,     "DDays")                ALIAS(DateSub, "Date-")
+                                        ALIAS(DateSub, "DaysBetweenDates")
 OP(JulianDayNumber, "JDN")
 OP(DateFromJulianDayNumber, "JDN→")
 
@@ -677,6 +678,15 @@ OP(ToDegrees,   "→Degrees")             ALIAS(ToDegrees, "→Deg")
 OP(ToRadians,   "→Radians")             ALIAS(ToRadians, "→Rad")
 OP(ToGrads,     "→Grads")               ALIAS(ToGrads,   "→Grad")
 OP(ToPiRadians, "→PiRadians")           ALIAS(ToPiRadians, "→πr")
+
+// Ranges
+NAMED(ToRange,        "→Range")         ALIAS(ToRange,     "→Interval")
+NAMED(ToDeltaRange,   "→∆Range")
+NAMED(ToPercentRange, "→%Range")
+NAMED(ToUncertain,    "→σRange")        ALIAS(ToUncertain, "→Uncertain")
+                                        ALIAS(ToUncertain, "→Un")
+NAMED(RangeUnion,       "∪")            ALIAS(RangeUnion, "Union")
+NAMED(RangeIntersect,   "∩")            ALIAS(RangeIntersect, "Intersect")
 
 // Timing and system commands
 CMD(Type)
@@ -784,16 +794,15 @@ CMD(Help)
 
 // Debugging
 CMD(Halt)
-CMD(Debug)
-ALIAS(Debug, "dbug")
-CMD(SingleStep)
-ALIAS(SingleStep, "sst")
+CMD(Debug)                              ALIAS(Debug, "dbug")
+CMD(SingleStep)                         ALIAS(SingleStep, "sst")
 CMD(StepOver)
 CMD(StepOut)
 CMD(MultipleSteps)
-CMD(Continue)
-ALIAS(Continue, "cont")
+CMD(Continue)                           ALIAS(Continue, "cont")
 CMD(Kill)
+
+// Input and prompting
 CMD(Input)
 CMD(Prompt)
 CMD(Run)

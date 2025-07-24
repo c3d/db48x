@@ -807,13 +807,7 @@ bool divide::integer_ok(object::id &xt, object::id &yt,
 //   Check if dividing two integers works or if we need to promote to real
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero (defensive coding: optimize<divide> should have done it
-    if (yv == 0)
-    {
-        ASSERT(!"integer_ok divide by zero, optimize<divide> failed?");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(yv != 0 && "integer_ok divide by zero, optimize<divide> failed?");
 
     // If one of the two objects is a based number, always used integer div
     if (!is_real(xt) || !is_real(yt))
@@ -842,12 +836,8 @@ bool divide::bignum_ok(bignum_g &x, bignum_g &y)
 //   Division works if there is no remainder
 // ----------------------------------------------------------------------------
 {
-    if (!y)
-    {
-        ASSERT(!"bignum divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(y && "bignum divide by zero, optimize<divide> failed");
+
     bignum_g q = nullptr;
     bignum_g r = nullptr;
     id type = bignum::product_type(x->type(), y->type());
@@ -870,12 +860,8 @@ bool divide::fraction_ok(fraction_g &x, fraction_g &y)
 //   Division of fractions, except division by zero
 // ----------------------------------------------------------------------------
 {
-    if (!y->numerator())
-    {
-        ASSERT(!"fraction divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT (!y->is_zero() &&
+            "fraction divide by zero, optimize<divide> failed");
     x = x / y;
     return x;
 }
@@ -886,12 +872,7 @@ bool divide::complex_ok(complex_g &x, complex_g &y)
 //   Divide complex numbers if we have them
 // ----------------------------------------------------------------------------
 {
-    if (y->is_zero())
-    {
-        ASSERT(!"complex divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(!y->is_zero() && "complex divide by zero, optimize<divide> failed");
     x = x / y;
     return x;
 }
@@ -936,13 +917,7 @@ bool mod::integer_ok(object::id &xt, object::id &yt,
 //   The modulo of two integers is always an integer
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero
-    if (yv == 0)
-    {
-        ASSERT(!"integer mod divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(yv != 0 && "integer mod divide by zero, optimize<mod> failed");
 
     // If one of the two objects is a based number, always used integer mod
     if (!is_real(xt) || !is_real(yt))
@@ -983,12 +958,8 @@ bool mod::fraction_ok(fraction_g &x, fraction_g &y)
 //   Modulo of fractions, except division by zero
 // ----------------------------------------------------------------------------
 {
-    if (!y->numerator())
-    {
-        ASSERT(!"fraction mod divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(!y->is_zero() &&
+           "fraction mod divide by zero, optimize<mod> failed");
     x = x % y;
     if (x->is_negative() && !x->is_zero())
         x = y->is_negative() ? x - y : x + y;
@@ -1043,13 +1014,7 @@ bool rem::integer_ok(object::id &/* xt */, object::id &/* yt */,
 //   The reminder of two integers is always an integer
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero
-    if (yv == 0)
-    {
-        ASSERT(!"integer rem divide by zero, optimize<divide> failed");
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(yv != 0 && "integer rem divide by zero, optimize<rem> failed");
 
     // The type of the result is always the type of x
     xv = xv % yv;
@@ -1072,11 +1037,8 @@ bool rem::fraction_ok(fraction_g &x, fraction_g &y)
 //   Modulo of fractions, except division by zero
 // ----------------------------------------------------------------------------
 {
-    if (!y->numerator())
-    {
-        rt.zero_divide_error();
-        return false;
-    }
+    ASSERT(!y->is_zero() &&
+           "fraction rem divide by zero, optimize<rem> failed");
     x = x % y;
     return x;
 }
@@ -1252,7 +1214,7 @@ bool pow::complex_ok(complex_g &x, complex_g &y)
 //   Implement x^y as exp(y * log(x))
 // ----------------------------------------------------------------------------
 {
-    x = complex::exp(y * complex::log(x));
+    x = complex::exp(y * complex::ln(x));
     return x;
 }
 
@@ -1262,7 +1224,7 @@ bool pow::range_ok(range_g &x, range_g &y)
 //   Implement x^y as exp(y * log(x))
 // ----------------------------------------------------------------------------
 {
-    x = range::exp(y * range::log(x));
+    x = range::exp(y * range::ln(x));
     return x;
 }
 
@@ -1831,6 +1793,7 @@ algebraic_p arithmetic::zero_divide(algebraic_r num, algebraic_r den)
     bool negative = (num && num->is_negative(false)) != den->is_negative(false);
     return rt.zero_divide(negative);
 }
+
 
 
 // ============================================================================

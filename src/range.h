@@ -100,9 +100,9 @@ public:
     RANGE_FUNCTION(acosh);
     RANGE_FUNCTION(atanh);
 
-    RANGE_FUNCTION(log1p);
+    RANGE_FUNCTION(ln1p);
     RANGE_FUNCTION(expm1);
-    RANGE_FUNCTION(log);
+    RANGE_FUNCTION(ln);
     RANGE_FUNCTION(log10);
     RANGE_FUNCTION(log2);
     RANGE_FUNCTION(exp);
@@ -181,5 +181,12 @@ public:
     RENDER_DECL(uncertain);
     HELP_DECL(uncertain);
 };
+
+COMMAND_DECLARE(ToRange, 2);
+COMMAND_DECLARE(ToDeltaRange, 2);
+COMMAND_DECLARE(ToPercentRange, 2);
+COMMAND_DECLARE(ToUncertain, 2);
+COMMAND_DECLARE(RangeUnion, 2);
+COMMAND_DECLARE(RangeIntersect, 2);
 
 #endif // RANGE_H

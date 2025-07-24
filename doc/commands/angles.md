@@ -1,34 +1,49 @@
 # Operations with Angles
 
-## ToDegrees
+## →Degrees
 Convert a number or angle to an angle in degrees.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRadians
+## →Radians
 Convert a number or angle to an angle in radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToGrads
+## →Grads
 Convert a number or angle to an angle in grads.
 If given a number, that number is interpreted using the current angle mode.
 
-## ToPiRadians
+## →PiRadians
 Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRectangular
+## →Rectangular
 
 Convert vector or complex to cartesian coordinates
 
 
-## ToPolar
+## →Polar
 
 Convert vector or complex to polar coordinates
 
 
-## ToSpherical
+## →Spherical
 
 Convert vector or complex to spherical coordinates
+
+## R→D
+
+Convert radians to degrees.
+
+The `RadiansToDegrees` command converts a value from radians to degrees.
+The input is interpreted as radians, and the result is in degrees.
+
+
+## D→R
+
+Convert degrees to radians.
+
+The `DegreesToRadians` command converts a value from degrees to radians.
+The input is interpreted as degrees, and the result is in radians.

@@ -1,13 +1,18 @@
-This software was brought to you by the DB48X authors below:
+This software was brought to you by the DB48X authors below
+(in order of appearance):
 
 - Christophe de Dinechin <christophe@dinechin.org>
-- Camille Wormser <cwormser@google.com> (complex number fixes)
 - spiff72 <mgobluevictor@gmail.com> (keyboard overlay)
+- Camille Wormser <cwormser@google.com> (complex number fixes)
 - Conrado Seibel <conrado.seibel@novatechautomation.com> (help file fix)
 - Kjell Christenson <kjell.christenson@gmail.com> (simulator fix)
 - Václav Kadlčík <vkadlcik@redhat.com> (documentation fix)
 - Franco Trimboli <sunpazed@gmail.com> (WASM port)
+- Jean Wilson (Equation Library and associated documentation)
+- GitHub user mipa83 (Windows documentation)
+- Philippe Martens (be.philippe@icloud.com)
+- LdBeth <andpuke@foxmail.com> (Fixes)
 
-Copyright (c) 2022-2024, the DB48X authors
+Copyright (c) 2022-2025, the DB48X authors
 
 Thank you!

@@ -640,6 +640,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         break;
     }
     case ID_range:
+    case ID_prange:
+    case ID_drange:
     {
         range_p r = range_p(+x);
         algebraic_g lo = r->lo();
@@ -690,6 +692,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
     case ID_hwdouble:
     case ID_decimal:
     case ID_neg_decimal:
+    case ID_True:
+    case ID_False:
         return decimal_promotion(x);
     case ID_constant:
     case ID_standard_uncertainty:
@@ -808,7 +812,8 @@ bool algebraic::add_angle(algebraic_g &x)
 algebraic_p algebraic::convert_angle(algebraic_r ra,
                                      angle_unit  from,
                                      angle_unit  to,
-                                     bool        negmod)
+                                     bool        negmod,
+                                     bool        domodulo)
 // ----------------------------------------------------------------------------
 //   Convert to angle in current angle mode.
 // ----------------------------------------------------------------------------
@@ -854,12 +859,15 @@ algebraic_p algebraic::convert_angle(algebraic_r ra,
         // Bring the result between -1 and 1
         algebraic_g one = integer::make(1);
         algebraic_g two = integer::make(2);
-        a = (one - a) % two;
-        if (!a)
-            return nullptr;
-        if (a->is_negative(false))
-            a = a + two;
-        a = one - a;
+        if (domodulo)
+        {
+            a = (one - a) % two;
+            if (!a)
+                return nullptr;
+            if (a->is_negative(false))
+                a = a + two;
+            a = one - a;
+        }
 
         switch (to)
         {

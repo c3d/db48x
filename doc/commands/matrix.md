@@ -337,6 +337,10 @@ Perform Cholesky decomposition on a matrix
 Column norm (one norm) of a matrix
 
 
+## RowNorm
+Row norm (infinity norm) of a matrix
+
+
 ## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
@@ -540,10 +544,6 @@ Change dimensions of an array
 
 ## REF
 Reduce matrix to echelon form (upper triangular form)
-
-
-## RNRM
-Row norm (infinity norm) of a matrix
 
 
 ## RREF

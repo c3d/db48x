@@ -100,6 +100,7 @@ struct arithmetic : algebraic
     static algebraic_p zero_divide(algebraic_r y, algebraic_r x);
 
 
+
     // We do not insert parentheses for algebraic values
     INSERT_DECL(arithmetic);
 

@@ -522,7 +522,7 @@ moment of an electron resulting from its intrinsic properties of spin
 and electric charge. Its angular momentum comes from two types of
 rotation: spin and orbital motion. Therefore an external magnetic field
 exerts a torque on the electron magnetic moment revealing its existence.
-It's a mearured quantity.
+It's a measured quantity.
 
 ### μp constant
 

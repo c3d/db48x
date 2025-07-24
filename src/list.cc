@@ -1145,6 +1145,15 @@ COMMAND_BODY(Size)
             }
         }
         return ERROR;
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+        if (algebraic_g lo = range_p(obj)->x())
+            if (algebraic_g hi = range_p(obj)->y())
+                if (algebraic_g sz = hi - lo)
+                    if (sz && rt.top(+sz))
+                        return OK;
+        return ERROR;
     default:
         break;
     }

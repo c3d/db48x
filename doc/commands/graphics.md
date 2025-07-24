@@ -8,7 +8,7 @@ stack and headers will no longer be updated.
 DB48X recognizes the following types of coordinates
 
 * *Pixel coordinates* are specified using based numbers such as `#0`, and
-  correspond to exact pixels on the screen, and . Pixels are counted starting
+  correspond to exact pixels on the screen. Pixels are counted starting
   from the top-left corner of the screen, with the horizontal coordinate going
   from `10#0` to `10#399`, and the vertical coordinate going from `10#0` to
   `10#239`.
@@ -19,7 +19,7 @@ DB48X recognizes the following types of coordinates
 * *Text coordinates* are given on a square grid with a size corresponding to the
   height of a text line in the selected font. They can be fractional.
 
-Coordinates can be given using one the following object types:
+Coordinates can be given using one of the following object types:
 
 * A complex number, where the real part represents the horizontal coordinate and
   the imaginary part represents the vertical coordinate.
@@ -30,7 +30,7 @@ Coordinates can be given using one the following object types:
 
 For some operations, the list or vector can contain additional parameters beyond
 the coordinates. The selection of unit or pixel coordinates is done on a per
-coordinate basis. For exmaple, `{ 0 0 }` will be the origin in user coordinates,
+coordinate basis. For example, `{ 0 0 }` will be the origin in user coordinates,
 in the center of the screen if no `PPAR` or `PlotParameters` variable is
 present.
 
@@ -41,6 +41,115 @@ contain a based number.
 ## ClearLCD
 
 Clear the LCD display, and block updates of the header or menu areas.
+
+## BlankGraphic
+
+Create a blank graphic object with the specified dimensions.
+The graphic is optimized for the device running the program.
+On color RPL devices, it will produce a color pixmap.
+On black-and-white RPL devices it will produce a color pixmap.
+
+To create a blank graphic 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGraphic
+```
+
+
+## BlankGROB
+
+Create a blank HP48-compatible graphic object (GROB) with the specified dimensions.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGROB
+@ Expecting Graphic 20 x 30
+```
+
+## BlankBitmap
+
+Create a blank packed bitmap graphic object with the specified dimensions.
+This object is always a black-and-white pixmap even on color RPL devices.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankBitmap
+@ Expecting Bitmap 20 x 30
+```
+
+## BlankPixmap
+
+Create a color pixmap graphic object with the specified dimensions.
+THis command only exists on color RPL devices.
+
+To create a color pixmap that is pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankPixmap
+```
+
+## PixTest
+
+Test the pixel at the specified coordinates and return its gray level.
+
+```rpl
+{ 0 0 } PixTest
+@ Expecting 1
+```
+
+## PixColor
+
+Test the pixel at the specified coordinates and return its color as a three
+component values for the red, green and blue levels, each represented as a
+decimal value between 0 and 1.
+
+This commands works both in Color RPL and regular RPL, but only Color RPL may
+return distinct values for the red, green and blue components.
+
+```rpl
+{ 0 0 } PixColor →V3
+@ Expecting [ 1 1 1 ]
+```
+
+## Gray
+
+Create a gray pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the gray level on color devices.
+
+```rpl
+0 LINEWIDTH
+0 1 FOR G
+	G GRAY FOREGROUND 0 0 R→C 5 1 G - * CIRCLE
+0.1 STEP
+{ Foreground LineWidth } PURGE
+@ Image gray-circles
+```
+
+## RGB
+
+Create a color pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the given color on color devices.
+
+```rpl
+0 LINEWIDTH
+0 1 FOR R
+	0 1 FOR G
+		0 1 FOR B
+			R G B RGB FOREGROUND R 14 * 7 - G 10 * 5 - R→C 1 B - 0.5 * CIRCLE
+		0.1 STEP
+   0.1 STEP
+0.1 STEP
+{ Foreground LineWidth } PURGE
+@ Image color-circles
+```
 
 
 ## FromLCD
@@ -58,7 +167,7 @@ LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
 ## ToLCD
 
 Display a graphic object on the screen. If the graphic object is smaller than
-the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it shown in the top-left.
+the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it is shown in the top-left.
 
 For example, to draw an expression in the center of the screen, use:
 
@@ -77,7 +186,7 @@ If the position in level 1 is an integer, fraction or real number, it is
 interpreted as a line number starting at 1 for the top of the screen. For
 example, `"Hello" 1 disp` will draw `Hello` at the top of the screen.
 If the position is a based number, it is a row number in pixels. For example,
-`"Hello" #120d disp` will show the test in the middle of the screen.
+`"Hello" #120d disp` will show the text in the middle of the screen.
 
 If the position in level 1 is a complex number or a list, it is interpreted as
 specifying both the horizontal or vertical coordinates, in either pixel or unit
@@ -98,7 +207,7 @@ provide:
 * An *invert* flag (default false) which, if set, will swap the foreground and
   background patterns.
 
-* An *horizontal align* value, where -1 means align left, 1 means align right,
+* A *horizontal align* value, where -1 means align left, 1 means align right,
   and 0 means center the text. Note that fractional values or values below -1 or
   above 1 are allowed for special effects.
 
@@ -143,7 +252,7 @@ Display the first level of the stack using the entire screen, with a possible
 scroll using the 4, 8, 6 and 2 keys if the object is larger than fits on screen.
 This makes it possible to comfortably examine very large objects, like `300!`, a
 large program or a complicated equation. Arrow keys can also be used for
-horizonal or vertical scrolling.
+horizontal or vertical scrolling.
 
 The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
@@ -160,29 +269,6 @@ Draw a line between two points specified by level 1 and level 2 of the stack.
 
 The width of the line is specified by [LineWidth](#linewidth). The line is drawn
 using the [foreground](#foreground) pattern.
-
-
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-
-* *Upper Right* coordinates as a complex (default `10+6i`)
-
-* *Independent variable* name (default `x`)
-
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-
-* *Type* of plot (default `function`)
-
-* *Dependent variable* name (default `y`)
 
 
 ## Pict
@@ -268,11 +354,6 @@ graphic object.
 'sqrt(2*x)/y' →Pixmap
 @ Image sqrt
 ```
-
-
-## Blank
-
-Create a bla
 
 
 ## GXor

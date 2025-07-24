@@ -10,7 +10,7 @@ Add two values.
   expected numerical addition. For example, `1 2 +` is `3`.
 * For equations and symbols, build a sum, eliminating zero additions if
   [autosimplify](#autosimplify) is active.
-* For lists, concatenate lists, or add objets to a list. For example, `{ A } { B
+* For lists, concatenate lists, or add objects to a list. For example, `{ A } { B
   } +` is `{ A B }`, and `{ A B C } "D" +` is `{ A B C "D" }`.
 * For text, concatenate text, or concatenate the text representation of an
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
@@ -45,7 +45,7 @@ Multiply two values.
   For example, `[ 1 2 3 ] [ 4 5 6 ] +` is `[ 4 10 18 ]`.
 * For matrices, perform a matrix multiplication.
 * For a matrix and a vector, apply the matrix to the vector.
-* For equations and symbols, build a product, eliminating mulitplication by 1
+* For equations and symbols, build a product, eliminating multiplication by 1
   or 0 when [autosimplify](#autosimplify) is active.
 * For a list and a positive integer, repeat the list For example, `{ A } 3 *`
   is `{ A A A }`.
@@ -55,7 +55,7 @@ Multiply two values.
 
 ## Divide
 
-Divide two values two values
+Divide two values
 
 `Y` `X` ▶ `Y÷X`
 
@@ -78,7 +78,7 @@ Raise to the power
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.
 * For vectors, raise individual elements in the first vector to the power of the
   corresponding element in the second vector.
-* For equations and synbols, build an expression, eliminating special cases
+* For equations and symbols, build an expression, eliminating special cases
   when [autosimplify](#autosimplify) is active.
 
 
@@ -99,19 +99,19 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart
+## IntPart
 
 Integer part of a number
 
 
-## FractionalPart
+## FracPart
 
 Fractional part of a number
 
 
 ## Abs
 
-Return the absolute value for a real numner.
+Return the absolute value for a real number.
 Return the Euclidean norm for a complex number, vector or matrix.
 
 
@@ -151,7 +151,7 @@ Square of the input
 Smallest prime number larger than the input
 
 
-## FACTORIAL
+## Factorial
 Factorial of a number
 
 

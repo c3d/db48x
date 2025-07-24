@@ -92,7 +92,7 @@ Examples:
 ## Isolate
 
 Isolate variable: Returns an expression that rearranges an expression given in
-stack level 2 to “isolate” a variable specified in stack level 1.
+stack level 2 to "isolate" a variable specified in stack level 1.
 
 For example, `A+1=sin(X+B)+C' 'X' ISOL` will produce `X=sin⁻¹(A-C+1)+2·i1·π-B`.
 
@@ -137,7 +137,7 @@ its derivative.
 ## AutoSimplify
 
 Enable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `AutoSimplify` `'X+0`' will evaluate as `'X'`
+arithmetic rules. After evaluating `AutoSimplify` `'X+0'` will evaluate as `'X'`
 and '`X*1-B*0'` witll evaluate as `'X'`.
 
 The opposite setting is [NoAutoSimplify](#noautosimplify)
@@ -145,7 +145,7 @@ The opposite setting is [NoAutoSimplify](#noautosimplify)
 ## NoAutoSimplify
 
 Disable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0`'
+arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0'`
 or `X*1-B*0` will no longer be simplified during evaluation.
 
 The opposite setting is [AutoSimplify](#autosimplify)
@@ -225,3 +225,123 @@ Create a case-list of integers in the given range.
 
 ## ASSUME
 Apply certain assumptions about a variable to an expression.
+
+## AlgebraConfiguration
+
+Name reserved for the current algebra configuration directory.
+
+The `AlgebraConfiguration` command provides access to the directory that stores
+the current Computer Algebra System (CAS) configuration.
+This directory contains settings and variables used for symbolic computations.
+If no configuration directory exists, one will be created when needed.
+The configuration directory is stored in the global variable with the name
+`AlgebraConfiguration`.
+
+## AlgebraVariable
+
+Recall the current algebra variable.
+
+The `AlgebraVariable` command returns the current variable used for polynomial
+evaluation and symbolic computations.
+If no variable is set, it defaults to `X`.
+The variable is stored in the algebra configuration directory.
+
+## StoreAlgebraVariable
+
+Store the current algebra variable.
+
+The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+The variable must be a quoted symbol (e.g., `'X'`).
+The variable is stored in the algebra configuration directory.
+
+## Equation
+
+Define an equation for use in solving or integration operations.
+This is generally used as the name of a variable, and can manipulated using the `RcEQ` (recall equation) and `StEQ` (store equation) commands.
+
+
+## StEq
+
+Store expression in `Equation` variable.
+
+The `StEq` command stores an expression, polynomial, or equation in the reserved
+`Equation` variable.
+The stored equation can be a single equation or a list of equations.
+All stored equations must be of type expression, polynomial, or equation.
+The stored equation is used by the solving menu and other equation-related
+commands.
+
+## RcEq
+
+Recall expression from `Equation` variable.
+
+The `RcEq` command recalls the currently stored equation from the `Equation`
+variable.
+If no equation is stored, it returns an error, `EQ variable not found`.
+The recalled equation can be used for further manipulation or solving.
+
+## NextEq
+
+Cycle equations in the `Equation` variable if it is a list.
+
+The `NextEq` command cycles through equations if the `Equation` variable
+contains a list of equations.
+It rotates the equations in the list, making the next equation the current one.
+This is useful when working with multiple equations and wanting to solve them
+one by one, see `MultipleEquationsSolver`.
+
+## EvalEq
+
+Evaluate the current equation.
+
+The `EvalEq` command evaluates the currently stored equation.
+
+For equations (expressions with `=`), it evaluates both sides and returns an
+equation evaluating both sides, where the right-hand side may be a sum to adjust
+it to the left-hand side:
+
+```rpl
+'A+1=B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { '4=16-12' }
+```
+
+For other expressions, it evaluates the expression normally:
+
+```rpl
+'A+1-B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { -12 }
+```
+
+## Where
+
+Perform a substitution and evaluate the resulting expression.
+
+The `Where` command performs symbolic substitution in expressions.
+It takes an expression and a substitution rule (or list of rules) and applies
+the substitution.
+Substitutions can be expressed as equations or as a list .
+
+In equation form, variables matching the left-hand side of the equation are
+replaced by the expression on the rigth of the equation:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' 'Z=3-A' Where {} +
+@ Expecting { 'sin(3-A)=2·(3-A-1)↑2' }
+```
+
+Equations can be used in algebraic form and chained easily:
+
+```rpl
+'sin(Z)=2*(Z-A)^2|Z=3-A|A=B^3-1'
+@ Expecting 'sin(3-(B↑3-1))=2·(3-(B↑3-1)-(B↑3-1))↑2'
+```
+
+In list form, variables given in odd positions in the list are replaced by the
+expression given in the following even position in the list:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' { Z '3-A' A 'B^3' } Where {} +
+@ Expecting { 'sin(3-B↑3)=2·(3-B↑3-1)↑2' }
+```

@@ -48,7 +48,8 @@ Find the position of an element, starting from the end
 Find the position from the end, starting at index N
 
 
-## SUB
+## Extract
+
 Extract a group of elements from a composite
 
 

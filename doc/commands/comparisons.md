@@ -44,7 +44,7 @@ Check if two values are mathematically different. This is the opposite of `=`.
 ## ==
 
 Checks if two objects are identical after evaluating names
-(contrary to `same`).
+(contrary to `same` which does not evaluate names).
 
 ```rpl
 A=1

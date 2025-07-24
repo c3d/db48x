@@ -419,6 +419,25 @@ retry:
                 p.source += parsed;
                 p.separator = cp;
 
+                if (maybe_range)
+                {
+                    r2 = range::do_parse(p);
+                    if (r2 == OK)
+                    {
+                        parsed = p.length;
+                        length -= parsed;
+                        p.length = length;
+                        p.source += parsed;
+                        size += parsed;
+                        cp = length
+                            ? utf8_codepoint(p.source)
+                            : 0;
+                        maybe_unit = cp == '_' || cp == settings::SPACE_UNIT;
+                        if (maybe_unit)
+                            p.separator = cp;
+                        r2 = SKIP;
+                    }
+                }
                 if (maybe_rect)
                     r2 = rectangular::do_parse(p);
                 else if (maybe_polar)
@@ -429,8 +448,6 @@ retry:
                     r2 = funcall::do_parse(p);
                 else if (maybe_asn)
                     r2 = assignment::do_parse(p);
-                else if (maybe_range)
-                    r2 = range::do_parse(p);
 
                 // Check if we found the second part
                 if (r2 == OK)
@@ -1414,6 +1431,8 @@ int object::as_truth(bool error) const
     case ID_polar:
     case ID_rectangular:
     case ID_range:
+    case ID_drange:
+    case ID_prange:
     case ID_uncertain:
     case ID_unit:
         return !is_zero(error);
@@ -1505,6 +1524,8 @@ bool object::is_zero(bool error) const
     case ID_rectangular:
         return rectangular_p(this)->is_zero();
     case ID_range:
+    case ID_drange:
+    case ID_prange:
         return range_p(this)->is_zero();
     case ID_uncertain:
         return uncertain_p(this)->is_zero();
@@ -1558,6 +1579,8 @@ bool object::is_one(bool error) const
     case ID_rectangular:
         return rectangular_p(this)->is_one();
     case ID_range:
+    case ID_drange:
+    case ID_prange:
         return range_p(this)->is_one();
     case ID_uncertain:
         return uncertain_p(this)->is_one();
@@ -1614,12 +1637,30 @@ bool object::is_negative(bool error) const
         return decimal_p(this)->is_negative();
     case ID_unit:
         return unit_p(this)->value()->is_negative(error);
+    case ID_constant:
+        return constant_p(this)->value()->is_negative(error);
 
     default:
         if (error)
             rt.type_error();
     }
     return false;
+}
+
+
+int object::is_infinity() const
+// ----------------------------------------------------------------------------
+//   Check if the object is a constant with a name like ∞ or −∞
+// ----------------------------------------------------------------------------
+{
+    if (constant_p cst = as<constant>())
+    {
+        if (cst->matches("∞"))
+            return 1;
+        else if (cst->matches("−∞"))
+            return -1;
+    }
+    return 0;
 }
 
 
@@ -1685,6 +1726,8 @@ object_p object::child(uint index, bool coordinate) const
         // fallthrough
     case ID_rectangular:
     case ID_range:
+    case ID_drange:
+    case ID_prange:
     case ID_uncertain:
     case ID_unit:
         return index ? complex_p(this)->y() : complex_p(this)->x();
@@ -1754,6 +1797,8 @@ bool object::is_big() const
     case ID_rectangular:
     case ID_polar:
     case ID_range:
+    case ID_prange:
+    case ID_drange:
     case ID_uncertain:
         return complex_p(this)->x()->is_big() || complex_p(this)->y()->is_big();
     case ID_unit:

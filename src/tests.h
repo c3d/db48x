@@ -240,6 +240,7 @@ struct tests
         LONGPRESS  = 105,       // Force long press
         EXIT_PGM   = 106,       // Exiting program
         SAVE_PGM   = 107,       // Save program on the RPL thread
+        START_TEST = 108,       // Start test (Synchronize battery)
 
         // Reaching a specific shift state
         NOSHIFT    = 110,       // Clear shifts

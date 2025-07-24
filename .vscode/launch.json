@@ -1,0 +1,168 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch DB48X Qt Simulator",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Launch DB48X Qt Simulator (Debug)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-simulator-debug",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Launch DB50X Qt Simulator",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Launch DB50X Qt Simulator (Debug)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-simulator-debug",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Launch DB50X Color Qt Simulator",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-color-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Launch DB50X Color Qt Simulator (Debug)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-color-simulator-debug",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Test DB48X Qt Simulator (-Tall)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "args": ["-Tall"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Test DB50X Qt Simulator (-Tall)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "args": ["-Tall"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "build-db50x-simulator",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

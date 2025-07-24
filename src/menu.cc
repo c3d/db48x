@@ -251,6 +251,8 @@ COMMAND_BODY(ToolsMenu)
             case ID_polar:
             case ID_rectangular:        menu = ID_ComplexMenu; break;
             case ID_range:
+            case ID_drange:
+            case ID_prange:
             case ID_uncertain:          menu = ID_RangeMenu; break;
 #if CONFIG_FIXED_BASED_OBJECTS
             case ID_hex_integer:
@@ -498,7 +500,7 @@ MENU(AnglesMenu,
 
 MENU(ComplexMenu,
 // ----------------------------------------------------------------------------
-//   Operation on complex numbers
+//   Operations on complex numbers
 // ----------------------------------------------------------------------------
      "ⅈ",       ID_SelfInsert,
      "∡",       ID_SelfInsert,
@@ -522,12 +524,22 @@ MENU(ComplexMenu,
 
 MENU(RangeMenu,
 // ----------------------------------------------------------------------------
-//   Operation on ranges and uncertain numbers
+//   Operations on ranges and uncertain numbers
 // ----------------------------------------------------------------------------
      "…",       ID_SelfInsert,
      "±",       ID_SelfInsert,
+     "±\t%",    ID_SelfInsert,
      "±\tσ",    ID_SelfInsert,
-     "±\t%",    ID_SelfInsert);
+     "Range→",  ID_Explode,
+     "Size",    ID_Size,
+
+     "→Range",  ID_ToRange,
+     "→∆Range", ID_ToDeltaRange,
+     "→%Range", ID_ToPercentRange,
+     "→σRange", ID_ToUncertain,
+     "∪",       ID_RangeUnion,
+     "∩",       ID_RangeIntersect);
+
 
 MENU(VectorMenu,
 // ----------------------------------------------------------------------------
@@ -1309,12 +1321,12 @@ MENU(PowersMenu,
 // ----------------------------------------------------------------------------
 //   Menu with the common powers
 // ----------------------------------------------------------------------------
-     ID_exp,    ID_log,
+     ID_exp,    ID_ln,
      ID_exp10,  ID_log10,
      ID_sq,     ID_sqrt,
 
      ID_exp2,   ID_log2,
-     ID_expm1,  ID_log1p,
+     ID_expm1,  ID_ln1p,
      ID_cubed,  ID_cbrt,
 
      ID_pow, ID_xroot,

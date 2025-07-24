@@ -121,7 +121,7 @@ PARSE_BODY(range)
     }
 
     size_t   ysz  = max - offs;
-    object_p yobj = parse(p.source + offs, ysz, PARENTHESES);
+    object_p yobj = parse(p.source + offs, ysz, PARENTHESES, p.separator);
     if (!yobj)
         return ERROR;
     algebraic_g yexpr = yobj->as_algebraic();
@@ -195,6 +195,8 @@ RENDER_BODY(drange)
     range_g     go   = o;
     algebraic_g lo   = go->lo();
     algebraic_g hi   = go->hi();
+    if (lo->is_infinity() || hi->is_infinity())
+        return range::do_render(o, r);
     algebraic_g two  = integer::make(2);
     algebraic_g disp = (lo + hi) / two;
     if (disp)
@@ -215,6 +217,8 @@ RENDER_BODY(prange)
     range_g     go   = o;
     algebraic_g lo   = go->lo();
     algebraic_g hi   = go->hi();
+    if (lo->is_infinity() || hi->is_infinity())
+        return range::do_render(o, r);
     algebraic_g two  = integer::make(2);
     algebraic_g disp = (lo + hi) / two;
     if (disp)
@@ -342,10 +346,14 @@ range_g operator*(range_r x, range_r y)
 {
     if (!x|| !y)
         return nullptr;
-    algebraic_g a = x->lo() * y->lo();
-    algebraic_g b = x->lo() * y->hi();
-    algebraic_g c = x->hi() * y->lo();
-    algebraic_g d = x->hi() * y->hi();
+    algebraic_g xlo = x->lo();
+    algebraic_g xhi = x->hi();
+    algebraic_g ylo = y->lo();
+    algebraic_g yhi = y->hi();
+    algebraic_g a = xlo * ylo;
+    algebraic_g b = xlo * yhi;
+    algebraic_g c = xhi * ylo;
+    algebraic_g d = xhi * yhi;
 
     range::sort(a, b);
     range::sort(a, c);
@@ -363,10 +371,27 @@ range_g operator/(range_r x, range_r y)
 {
     if (!x|| !y)
         return nullptr;
-    algebraic_g a = x->lo() / y->lo();
-    algebraic_g b = x->lo() / y->hi();
-    algebraic_g c = x->hi() / y->lo();
-    algebraic_g d = x->hi() / y->hi();
+    algebraic_g xlo = x->lo();
+    algebraic_g xhi = x->hi();
+    algebraic_g ylo = y->lo();
+    algebraic_g yhi = y->hi();
+    if (ylo->is_zero(false) || yhi->is_zero(false) ||
+        ylo->is_negative(false) != yhi->is_negative())
+    {
+        if (Settings.InfinityError())
+        {
+            rt.zero_divide_error();
+            return nullptr;
+        }
+        Settings.InfiniteResultIndicator(true);
+        ylo = rt.infinity(true);
+        yhi = rt.infinity(false);
+        return range::make(y->type(), ylo, yhi);
+    }
+    algebraic_g a = xlo / ylo;
+    algebraic_g b = xlo / yhi;
+    algebraic_g c = xhi / ylo;
+    algebraic_g d = xhi / yhi;
 
     range::sort(a, b);
     range::sort(a, c);
@@ -418,37 +443,56 @@ RANGE_BODY(cbrt)
 }
 
 
+static inline bool increasing(int h)
+// ----------------------------------------------------------------------------
+//   Check if a quarter denotes an increasing or decreasing region
+// ----------------------------------------------------------------------------
+{
+    return h & 1;
+}
+
+
 static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
 // ----------------------------------------------------------------------------
 //   Compute interval for a sin or a cos
 // ----------------------------------------------------------------------------
+//   The `cos` function is monotonically decreasing between 0° and 180°,
+//   and then monotonically increasing between 180° and 360°, and then again.
+//   If we are in a monotonic region, we can just compute low and high.
+//   If the range covers more than one 180° peak, then the result is -1..1
+//   If the range only covers one peak, then the min is -1 or the max is 1.
+//   For sin/tan, everything is shifted left by 90° to get back to `cos`
 {
     if (!r)
         return nullptr;
     algebraic_g lo    = r->lo();
     algebraic_g hi    = r->hi();
     object::id  amode = Settings.AngleMode();
-    algebraic_g hpi = algebraic::convert_angle(lo, amode,
-                                               object::ID_PiRadians, false);
-    algebraic_g lpi = algebraic::convert_angle(hi, amode,
-                                               object::ID_PiRadians, false);
+    algebraic_g lpi = algebraic::convert_angle(lo, amode, object::ID_PiRadians,
+                                               false, false);
+    algebraic_g hpi = algebraic::convert_angle(hi, amode, object::ID_PiRadians,
+                                               false, false);
 
     // Compute numbers of quadrants (90 degrees quarters)
     lpi = lpi + lpi;
     hpi = hpi + hpi;
-    int32_t lip = lpi->as_int32(0, true) - issin;
-    int32_t hip = hpi->as_int32(0, true) - issin;
+    lpi = floor::run(lpi);
+    hpi = floor::run(hpi);
+    int32_t lq = lpi->as_int32(0, true) - issin;
+    int32_t hq = hpi->as_int32(0, true) - issin;
+    int32_t lh = (lq - (lq < 2)) / 2;
+    int32_t hh = (hq - (hq < 2)) / 2;
 
     // Check if monotonic case or not
-    if (hip / 2 == lip / 2)
+    if (hh == lh)
     {
         // Monotonic section
         lo = fn(lo);
         hi = fn(hi);
-        if (!istan && lip / 2 % 2 == 0)
+        if (!istan && !increasing(lh))
             std::swap(lo, hi);
     }
-    else if (istan || hip/2 - lip/2 > 1)
+    else if (istan || hh - lh > 1)
     {
         lo = istan ? rt.infinity(true)  : integer::make(-1);
         hi = istan ? rt.infinity(false) : integer::make( 1);
@@ -458,10 +502,10 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
         lo = fn(lo);
         hi = fn(hi);
         range::sort(lo, hi);
-        if (lip / 2 % 2)
-            hi = integer::make(1);
+        if (increasing(lh))
+            hi = istan ? rt.infinity(false) : integer::make( 1);
         else
-            lo = integer::make(-1);
+            lo = istan ? rt.infinity(true)  : integer::make(-1);
     }
 
     return range::make(r->type(), lo, hi);
@@ -586,12 +630,12 @@ RANGE_BODY(atanh)
 }
 
 
-RANGE_BODY(log1p)
+RANGE_BODY(ln1p)
 // ----------------------------------------------------------------------------
-//   Range implementation of log1p
+//   Range implementation of ln1p
 // ----------------------------------------------------------------------------
 {
-    return monotonic(log1p::evaluate, r);
+    return monotonic(ln1p::evaluate, r);
 }
 
 RANGE_BODY(expm1)
@@ -603,12 +647,12 @@ RANGE_BODY(expm1)
 }
 
 
-RANGE_BODY(log)
+RANGE_BODY(ln)
 // ----------------------------------------------------------------------------
 //   Range implementation of log
 // ----------------------------------------------------------------------------
 {
-    return monotonic(log::evaluate, r);
+    return monotonic(ln::evaluate, r);
 }
 
 RANGE_BODY(log10)
@@ -688,8 +732,8 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
     if (!lneg && !hneg)
         return monotonic(fn, r);
 
-    int32_t lip = lo->as_int32(0, true);
-    if (lip == 0)
+    int32_t lq = lo->as_int32(0, true);
+    if (lq == 0)
     {
         lo = tgamma::evaluate(lo);
         hi = tgamma::evaluate(hi);
@@ -698,8 +742,8 @@ static range_p gamma(algebraic_fn fn, range_r r, bool aslog)
     }
     else
     {
-        int32_t hip = hi->as_int32(0, true);
-        if (hip != lip)
+        int32_t hq = hi->as_int32(0, true);
+        if (hq != lq)
         {
             lo = rt.infinity(true);
             hi = rt.infinity(false);
@@ -793,4 +837,119 @@ algebraic_p uncertain::as_range(object::id type) const
 {
     rt.unimplemented_error();
     return this;
+}
+
+
+
+// ============================================================================
+//
+//   Commands implementing the ranges
+//
+// ============================================================================
+
+static object::result to_range(object::id ty)
+// ----------------------------------------------------------------------------
+//   Build a range of the given type
+// ----------------------------------------------------------------------------
+{
+    algebraic_g lo = algebraic_p(object::strip(rt.stack(1)));
+    algebraic_g hi = algebraic_p(object::strip(rt.stack(0)));
+    if (!lo || !hi)
+        return object::ERROR;
+    if (!(lo->is_real() || lo->is_symbolic()) ||
+        !(hi->is_real() || hi->is_symbolic()))
+    {
+        rt.type_error();
+        return object::ERROR;
+    }
+    range::sort(lo, hi);
+    range_g r = range::make(ty, lo, hi);
+    if (!r || !rt.drop() || !rt.top(r))
+        return object::ERROR;
+    return object::OK;
+}
+
+
+COMMAND_BODY(ToRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_range);
+}
+
+
+COMMAND_BODY(ToDeltaRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a delta range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_drange);
+}
+
+
+COMMAND_BODY(ToPercentRange)
+// ----------------------------------------------------------------------------
+//   Take two values and turn them into a percent range
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_prange);
+}
+
+
+COMMAND_BODY(ToUncertain)
+// ----------------------------------------------------------------------------
+//  Take two values and turn them into an uncertain number
+// ----------------------------------------------------------------------------
+{
+    return to_range(ID_uncertain);
+}
+
+
+static object::result range_op(bool intersect)
+// ----------------------------------------------------------------------------
+//   Shared code for union and intersection
+// ----------------------------------------------------------------------------
+{
+    range_g a = range_p(object::strip(rt.stack(1)));
+    range_g b = range_p(object::strip(rt.stack(0)));
+    if (!a || !b)
+        return object::ERROR;
+    if (!a->is_range() || !b->is_range())
+    {
+        rt.type_error();
+        return object::ERROR;
+    }
+    algebraic_g alo = a->lo();
+    algebraic_g ahi = a->hi();
+    algebraic_g blo = b->lo();
+    algebraic_g bhi = b->hi();
+    range::sort(alo, blo);
+    range::sort(ahi, bhi);
+    if (intersect && range::sort(blo, ahi))
+        ahi = blo;
+    range_g r = range::make(a->type(),
+                            intersect ? blo : alo,
+                            intersect ? ahi : bhi);
+    if (!r || !rt.drop() || !rt.top(r))
+        return object::ERROR;
+    return object::OK;
+}
+
+
+COMMAND_BODY(RangeUnion)
+// ----------------------------------------------------------------------------
+//  Perform union between two ranges
+// ----------------------------------------------------------------------------
+{
+    return range_op(false);
+}
+
+
+COMMAND_BODY(RangeIntersect)
+// ----------------------------------------------------------------------------
+//  Perform intersection between two ranges
+// ----------------------------------------------------------------------------
+{
+    return range_op(true);
 }

@@ -173,6 +173,7 @@ void tests::run(uint onlyCurrent)
 // ----------------------------------------------------------------------------
 {
     save<bool> markRunning(running, true);
+    rpl_command(START_TEST);
 
     tindex = sindex = cindex = count = 0;
     failures.clear();
@@ -1950,6 +1951,9 @@ void tests::global_variables()
         .test("'A+A▶A+A'", ENTER).expect("'(A+A▶A)+A'")
         .test(ID_ObjectMenu, ID_ToProgram)
         .want("« A A + 'A' ▶ A + »");
+    step("Check that we can copy to a local variable")
+        .test("5 2 3 → a b h « 'a·b+1▶h' EVAL 2 * h →V2 »", ENTER)
+        .expect("[ 22 11 ]");
 
     step("Assignment with simple value")
         .test(CLEAR, "A=42", ENTER).got("A=42")
@@ -2052,17 +2056,19 @@ void tests::global_variables()
     test(CLEAR, "'StatsData' RCL", ENTER).expect("[ 1 2 3 ]");
     test(CLEAR, "'ΣData' PURGE", ENTER).noerror();
 
-    step("Store and recall to StatsParameters");
-    test(CLEAR, "{0} 'ΣParameters' STO", ENTER).noerror();
-    test(CLEAR, "'ΣPar' RCL", ENTER).expect("{ 0 }");
-    test(CLEAR, "'StatsParameters' RCL", ENTER).expect("{ 0 }");
-    test(CLEAR, "'ΣPar' purge", ENTER).noerror();
+    step("Store and recall to StatsParameters")
+        .test(CLEAR, "{0} 'ΣParameters' STO", ENTER).noerror()
+        .test("'ΣPar' RCL", ENTER).expect("{ 0 }")
+        .test("'StatsParameters' RCL", ENTER).expect("{ 0 }")
+        .test("'ΣPar' purge", ENTER).noerror()
+        .test("'StatsParameters' RCL", ENTER).error("Undefined name");
 
-    step("Store and recall to PlotParameters");
-    test(CLEAR, "{1} 'PPAR' STO", ENTER).noerror();
-    test(CLEAR, "'PlotParameters' RCL", ENTER).expect("{ 1 }");
-    test(CLEAR, "'ppar' RCL", ENTER).expect("{ 1 }");
-    test(CLEAR, "'PPAR' purge", ENTER).noerror();
+    step("Store and recall to PlotParameters")
+        .test(CLEAR, "{1} 'PPAR' STO", ENTER).noerror()
+        .test("'PlotParameters' RCL", ENTER).expect("{ 1 }")
+        .test("'ppar' RCL", ENTER).expect("{ 1 }")
+        .test("'PPAR' PGALL", ENTER).noerror()
+        .test("'PlotParameters' RCL", ENTER).error("Undefined name");
 
     step("Numbered store and recall should fail by default");
     test(CLEAR, 5678, ENTER, 1234, ENTER, "STO", ENTER).error("Invalid name");
@@ -2766,6 +2772,10 @@ void tests::logical_operations()
         .test(CLEAR, "10#42 10#7 XOR", ENTER)
         .expect("#45₁₀")
         .test(CLEAR, "'TruthLogicForIntegers' Purge", ENTER).noerror();
+
+    step("Convert True and False to decimal")
+        .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
+        .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
 }
 
 
@@ -2791,21 +2801,21 @@ void tests::command_display_formats()
     step("Lower case");
     test("lowercase", ENTER)
         .want("« 1 1. + - * / ^ √ sq inv neg sin cos tan asin acos atan "
-              "lowercase purgeall prec "
+              "lowercase pgall prec "
               "start  step next start  step for i  next for i  step "
               "while  repeat  end do  until  end »");
 
     step("Upper case");
     test("UPPERCASE", ENTER)
         .want("« 1 1. + - * / ^ √ SQ INV NEG SIN COS TAN ASIN ACOS ATAN "
-              "LOWERCASE PURGEALL PREC "
+              "LOWERCASE PGALL PREC "
               "START  STEP next START  STEP FOR i  NEXT FOR i  STEP "
               "WHILE  REPEAT  END DO  UNTIL  END »");
 
     step("Capitalized");
     test("Capitalized", ENTER)
         .want("« 1 1. + - * / ^ √ Sq Inv Neg Sin Cos Tan Asin Acos Atan "
-              "LowerCase PurgeAll Prec "
+              "LowerCase PgAll Prec "
               "Start  Step next Start  Step For i  Next For i  Step "
               "While  Repeat  End Do  Until  End »");
 
@@ -3104,7 +3114,7 @@ void tests::decimal_display_formats()
     step("FIX 24 mode");
     test(CLEAR, "24 FIX", ENTER).noerror();
     test(CLEAR, "1.01", ENTER).expect("1.01000 00000 00000 00000 0000");
-    test(CLEAR, "1.0123 log", ENTER)
+    test(CLEAR, "1.0123 ln", ENTER)
         .expect("0.01222 49696 22568 97092 2453");
 
     step("SCI 3 mode");
@@ -3451,10 +3461,10 @@ void tests::decimal_numerical_functions()
     TFN(asinh).expect("0.3157282658293796179108945471020638");
     TFNA(acosh, 1.321).expect("0.7812302051962526147422171616034349");
     TFN(atanh).expect("0.3327615884818145958017641705087511");
-    TFN(log1p).expect("0.278389025540188266771628342111551");
+    TFN(ln1p).expect("0.278389025540188266771628342111551");
     TFN(lnp1).expect("0.278389025540188266771628342111551");
     TFN(expm1).expect("0.3785055808937538954474307074914123");
-    TFN(log).expect("-1.13631415585212118735433031010729");
+    TFN(ln).expect("-1.13631415585212118735433031010729");
     TFN(log10).expect("-0.493494967595127921870430857283449");
     TFN(exp).expect("1.378505580893753895447430707491412");
     TFN(exp10).expect("2.094112455850892670519881985846254");
@@ -3661,10 +3671,10 @@ void tests::float_numerical_functions()
     TFN(asinh).expect("0.31572 8F");
     TFNA(acosh, 1.321).expect("0.78123F");
     TFN(atanh).expect("0.33276 2F");
-    TFN(log1p).expect("0.27838 9F");
+    TFN(ln1p).expect("0.27838 9F");
     TFN(lnp1).expect("0.27838 9F");
     TFN(expm1).expect("0.37850 6F");
-    TFN(log).expect("-1.13631F");
+    TFN(ln).expect("-1.13631F");
     TFN(log10).expect("-0.49349 5F");
     TFN(exp).expect("1.37851F");
     TFN(exp10).expect("2.09411F");
@@ -3848,10 +3858,10 @@ void tests::double_numerical_functions()
     TFN(asinh).expect("0.31572 82658 2938D");
     TFNA(acosh, 1.321).expect("0.78123 02051 96253D");
     TFN(atanh).expect("0.33276 15884 81815D");
-    TFN(log1p).expect("0.27838 90255 40188D");
+    TFN(ln1p).expect("0.27838 90255 40188D");
     TFN(lnp1).expect("0.27838 90255 40188D");
     TFN(expm1).expect("0.37850 55808 93754D");
-    TFN(log).expect("-1.13631 41558 5212D");
+    TFN(ln).expect("-1.13631 41558 5212D");
     TFN(log10).expect("-0.49349 49675 95128D");
     TFN(exp).expect("1.37850 55808 9375D");
     TFN(exp10).expect("2.09411 24558 5089D");
@@ -4029,10 +4039,10 @@ void tests::high_precision_numerical_functions()
     TFN(asinh).expect("0.31572 82658 29379 61791 08945 47102 06380 00526 27320 40054 59952 39850 65785 93616 95975 70753 88242 69995 19084 50283 99306 71224 23629 0976");
     TFNA(acosh, 1.321).expect("0.78123 02051 96252 61474 22171 61603 43488 77028 85612 70883 33986 53192 83139 13864 10921 83081 88302 58903 47353 53634 04169 89742 02815 2852");
     TFN(atanh).expect("0.33276 15884 81814 59580 17641 70508 75106 43974 10006 34850 01665 72697 61781 57932 14419 67812 59706 77324 50200 63307 05966 90651 74209 3097");
-    TFN(log1p).expect("0.27838 90255 40188 26677 16283 42111 55094 94375 15179 05132 39494 81036 05142 66257 54337 55520 43633 04277 35736 38433 06042 83576 22139 6359");
+    TFN(ln1p).expect("0.27838 90255 40188 26677 16283 42111 55094 94375 15179 05132 39494 81036 05142 66257 54337 55520 43633 04277 35736 38433 06042 83576 22139 6359");
     TFN(lnp1).expect("0.27838 90255 40188 26677 16283 42111 55094 94375 15179 05132 39494 81036 05142 66257 54337 55520 43633 04277 35736 38433 06042 83576 22139 6359");
     TFN(expm1).expect("0.37850 55808 93753 89544 74307 07491 41233 20571 72641 03364 97968 05333 18108 98772 58256 72784 28319 13246 66682 04200 00162 72067 10690 0258");
-    TFN(log).expect("-1.13631 41558 52121 18735 43303 10107 28991 65926 67631 93216 19228 05172 65001 85061 66283 45581 72770 57156 95345 21563 26917 04911 30388 598");
+    TFN(ln).expect("-1.13631 41558 52121 18735 43303 10107 28991 65926 67631 93216 19228 05172 65001 85061 66283 45581 72770 57156 95345 21563 26917 04911 30388 598");
     TFN(log10).expect("-0.49349 49675 95127 92187 04308 57283 44904 46730 54244 17528 47831 88472 35123 39989 07607 74010 64305 99151 74781 24152 01829 22941 99221 5485");
     TFN(exp).expect("1.37850 55808 93753 89544 74307 07491 41233 20571 72641 03364 97968 05333 18108 98772 58256 72784 28319 13246 66682 04200 00162 72067 10690 026");
     TFN(exp10).expect("2.09411 24558 50892 67051 98819 85846 25435 50121 44808 82328 80597 04327 54118 26943 97658 88916 82284 18499 99928 85620 51265 40190 16492 158");
@@ -5024,7 +5034,7 @@ void tests::complex_functions()
         .expect("7.61577 31058 63908 2857∡-0.92849 05618 83382 29639ʳ");
 
     step("Logarithm");
-    test(CLEAR, "12+14ⅈ", ID_log)
+    test(CLEAR, "12+14ⅈ", ID_ln)
         .expect("2.91447 28088 05103 5368+0.86217 00546 67226 34884ⅈ");
     step("Exponential");
     test(ID_exp)
@@ -5218,7 +5228,7 @@ void tests::complex_promotion()
         .test(CLEAR, "-2 atanh", ENTER)
         .expect("-0.54930 61443 34+1.57079 63267 9ⅈ");
     step("log(-2) succeeds in complex mode")
-        .test(CLEAR, "-2 log", ENTER)
+        .test(CLEAR, "-2 ln", ENTER)
         .expect("0.69314 71805 6+3.14159 26535 9ⅈ");
 
     step("Restore complex mode")
@@ -5254,6 +5264,12 @@ void tests::range_types()
         .test(EEX).expect("1…3")
         .test(EEX).expect("2±1")
         .test(EEX).expect("2±50%");
+
+    step("Data entry from range menu")
+        .test(CLEAR, ID_RangeMenu, "1", F1, "3", ENTER).expect("1…3")
+        .test(CLEAR, ID_RangeMenu, "1", F2, "3", ENTER).expect("1±3")
+        .test(CLEAR, ID_RangeMenu, "1", F3, "3", ENTER).expect("1±3%")
+        .test(CLEAR, ID_RangeMenu, "1", F4, "3", ENTER).expect("1±3σ");
 
     step("Add intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
@@ -5297,9 +5313,54 @@ void tests::range_types()
 #define TFN(name)  TFNA(name, "1…3")
 
     TFN(sqrt).expect("1.…1.73205 08075 7");
-    TFN(sin).expect("0.05233 59562 43…0.01745 24064 37");
+    TFN(sin).expect("0.01745 24064 37…0.05233 59562 43");
+    TFNA(sin, "-45…45").expect("-0.70710 67811 87…0.70710 67811 87");
+    TFNA(sin, "-45…90").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…120").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…180").expect("-0.70710 67811 87…1");
+    TFNA(sin, "-45…270").expect("-1…1");
+    TFNA(sin, " 45…270").expect("-1…1");
+    TFNA(sin, "135…270").expect("-1…0.70710 67811 87");
+    TFNA(sin, "150…190").expect("-0.17364 81776 67…¹/₂");
+    TFNA(sin, "170…210").expect("-¹/₂…0.17364 81776 67");
+    TFNA(sin, "240…280").expect("-1…-0.86602 54037 84");
+    TFNA(sin, "260…300").expect("-1…-0.86602 54037 84");
+    TFNA(sin, "240…360").expect("-1…0");
+    TFNA(sin, "-45…360").expect("-1…1");
+    TFNA(sin, "-45…480").expect("-1…1");
+    TFNA(sin, "120…480").expect("-1…1");
     TFN(cos).expect("0.99862 95347 55…0.99984 76951 56");
+    TFNA(cos, "-45…45").expect("0.70710 67811 87…1");
+    TFNA(cos, "-45…90").expect("0…1");
+    TFNA(cos, "-45…120").expect("-¹/₂…1");
+    TFNA(cos, "-45…180").expect("-1…1");
+    TFNA(cos, "-45…270").expect("-1…1");
+    TFNA(cos, " 45…270").expect("-1…0.70710 67811 87");
+    TFNA(cos, "135…270").expect("-1…0");
+    TFNA(cos, "150…190").expect("-1…-0.86602 54037 84");
+    TFNA(cos, "170…210").expect("-1…-0.86602 54037 84");
+    TFNA(cos, "240…280").expect("-¹/₂…0.17364 81776 67");
+    TFNA(cos, "260…300").expect("-0.17364 81776 67…¹/₂");
+    TFNA(cos, "240…360").expect("-¹/₂…1");
+    TFNA(cos, "-45…360").expect("-1…1");
+    TFNA(cos, "-45…480").expect("-1…1");
+    TFNA(cos, "120…480").expect("-1…1");
     TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
+    TFNA(tan, "-45…45").expect("-1…1");
+    TFNA(tan, "-45…90").expect("−∞…∞");
+    TFNA(tan, "-45…120").expect("−∞…∞");
+    TFNA(tan, "-45…180").expect("−∞…∞");
+    TFNA(tan, "-45…270").expect("−∞…∞");
+    TFNA(tan, " 45…270").expect("−∞…∞");
+    TFNA(tan, "135…270").expect("−∞…∞");
+    TFNA(tan, "150…190").expect("-0.57735 02691 9…0.17632 69807 08");
+    TFNA(tan, "170…210").expect("-0.17632 69807 08…0.57735 02691 9");
+    TFNA(tan, "240…280").expect("−∞…∞");
+    TFNA(tan, "260…300").expect("−∞…∞");
+    TFNA(tan, "240…360").expect("−∞…∞");
+    TFNA(tan, "-45…360").expect("−∞…∞");
+    TFNA(tan, "-45…480").expect("−∞…∞");
+    TFNA(tan, "120…480").expect("−∞…∞");
     TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
     TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
     TFN(atan).expect("45. °…71.56505 11771 °");
@@ -5309,10 +5370,10 @@ void tests::range_types()
     TFN(asinh).expect("0.88137 35870 2…1.81844 64592 3");
     TFNA(acosh, "1.321…1.325").expect("0.78123 02051 96…0.78584 80192 36");
     TFNA(atanh, "0.321…0.325").expect("0.33276 15884 82…0.33722 75237 74");
-    TFN(log1p).expect("0.69314 71805 6…1.38629 43611 2");
+    TFN(ln1p).expect("0.69314 71805 6…1.38629 43611 2");
     TFN(lnp1).expect("0.69314 71805 6…1.38629 43611 2");
     TFN(expm1).expect("1.71828 18284 6…19.08553 69232");
-    TFN(log).expect("0.…1.09861 22886 7");
+    TFN(ln).expect("0.…1.09861 22886 7");
     TFN(log10).expect("0.…0.47712 12547 2");
     TFN(exp).expect("2.71828 18284 6…20.08553 69232");
     TFN(exp10).expect("10.…1 000.");
@@ -5334,11 +5395,29 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "1±3 2±5", NOSHIFT, MUL).expect("7±21");
     step("Divide delta ranges")
-        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("-¹/₃±1");
+        .test(CLEAR, "10±3 20±5", NOSHIFT, DIV).expect("⁴³/₇₅±²²/₇₅");
+    step("Divide delta ranges divide by zero")
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide delta range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-26 FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
     step("Power delta ranges")
         .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
     step("Invert delta ranges")
-        .test(CLEAR, "1±3", NOSHIFT, ID_inv).expect("-¹/₈±³/₈");
+        .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁");
+    step("Invert delta ranges divide by zero")
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero");
+    step("Invert delta range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "-22 SF", ENTER).noerror()
+        .test(CLEAR, "1±3", ID_inv).expect("−∞…∞")
+        .test(CLEAR, "'InfiniteResultIndicator' FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
     step("Negate delta ranges")
         .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
 
@@ -5360,7 +5439,12 @@ void tests::range_types()
     step("Multiply delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, MUL).expect("5±15");
     step("Divide delta ranges")
-        .test(CLEAR, "5 1±3", NOSHIFT, DIV).expect("-⁵/₈±1 ⁷/₈");
+        .test(CLEAR, "5 10±3", NOSHIFT, DIV).expect("⁵⁰/₉₁±¹⁵/₉₁");
+    step("Divide delta ranges: zero divide error")
+        .test(CLEAR, "5 1±3", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide delta ranges: Infinite results")
+        .test(CLEAR, "InfinityValue 5 1±3", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-22 CF -26 FS?C", ENTER).expect("True");
     step("Power delta ranges")
         .test(CLEAR, "5 1±3", NOSHIFT, ID_pow).expect("312.52±312.48");
 
@@ -5369,9 +5453,11 @@ void tests::range_types()
 #define TFN(name)  TFNA(name, "1±3")
 
     TFNA(sqrt, "3±1").expect("1.70710 67811 9±0.29289 32188 13");
-    TFN(sin).expect("0.01742 84885 21±-0.05232 79852 23");
-    TFN(cos).expect("0.99847 74386 39±0.00091 33883 8");
+    TFN(sin).expect("0.01742 84885 21±0.05232 79852 23");
+    TFN(cos).expect("0.99878 20251 3±0.00121 79748 7");
     TFN(tan).expect("0.01750 30212 26±0.05242 37907 18");
+    TFNA(tan, "0±45").expect("0±1");
+    TFNA(tan, "30±60").expect("−∞…∞");
     TFNA(asin, "0.25±0.1").expect("14.55712 08367 °±5.93019 42780 2 °");
     TFNA(acos, "0.25±0.1").expect("75.44287 91633 °±5.93019 42780 2 °");
     TFN(atan).expect("6.26440 38545 8 °±69.69935 26775 °");
@@ -5381,10 +5467,10 @@ void tests::range_types()
     TFN(asinh).expect("0.32553 85360 41±1.76917 40112 2");
     TFNA(acosh, "1.321±0.025").expect("0.78058 71062 93±0.02898 78937 9");
     TFNA(atanh, "0.321±0.025").expect("0.33301 11698 75±0.02788 14094 98");
-    TFNA(log1p, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
+    TFNA(ln1p, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
     TFNA(lnp1, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
     TFN(expm1).expect("26.36674 26582±27.23140 7375");
-    TFNA(log, "3±1").expect("1.03972 07708 4±0.34657 35902 8");
+    TFNA(ln, "3±1").expect("1.03972 07708 4±0.34657 35902 8");
     TFNA(log10, "3±1").expect("0.45154 49934 96±0.15051 49978 32");
     TFN(exp).expect("27.36674 26582±27.23140 7375");
     TFN(exp10).expect("5 000.005±4 999.995");
@@ -5444,6 +5530,8 @@ void tests::range_types()
     TFN(sin).expect("0.01745 24040 45±2.99969 56505 2%");
     TFN(cos).expect("0.99984 75580 99±0.00091 39451 46%");
     TFN(tan).expect("0.01745 50697 15±3.00060 87730 3%");
+    TFNA(tan, "0±4500%").expect("0±100%");
+    TFNA(tan, "30±200%").expect("−∞…∞");
     TFNA(asin, "0.25±0.1%").expect("14.47751 26791 °±0.10218 40366%");
     TFNA(acos, "0.25±0.1%").expect("75.52248 73209 °±0.01958 84793 78%");
     TFN(atan).expect("44.98710 84505 °±1.91069 30918 4%");
@@ -5453,10 +5541,10 @@ void tests::range_types()
     TFN(asinh).expect("0.88121 44969 49±2.40735 92360 4%");
     TFNA(acosh, "1.321±0.025%").expect("0.78123 00931 78±0.04897 49317 72%");
     TFNA(atanh, "0.321±0.025%").expect("0.33276 15910 51±0.02688 68087 85%");
-    TFN(log1p).expect("0.69303 46679 02±2.16455 62403 6%");
+    TFN(ln1p).expect("0.69303 46679 02±2.16455 62403 6%");
     TFN(lnp1).expect("0.69303 46679 02±2.16455 62403 6%");
     TFN(expm1).expect("1.71950 51470 3±4.74326 51081 9%");
-    TFN(log).expect("-0.00045 02026 22±6 665.66639 654%");
+    TFN(ln).expect("-0.00045 02026 22±6 665.66639 654%");
     TFN(log10).expect("-0.00019 55205 14±6 665.66639 654%");
     TFN(exp).expect("2.71950 51470 3±2.99910 03238 8%");
     TFN(exp10).expect("10.02386 80302±6.89678 89453 7%");
@@ -5471,6 +5559,52 @@ void tests::range_types()
 #undef TFN
 #undef TFNA
 
+    step("Exploding range objects")
+        .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)
+        .got("3", "1");
+    step("Exploding delta range objects")
+        .test(CLEAR, "1±3", ID_ObjectMenu, ID_Explode)
+        .got("4", "-2");
+    step("Exploding percent range objects")
+        .test(CLEAR, "1±200%", ID_RangeMenu, ID_Explode)
+        .got("3", "-1");
+    step("Size range objects")
+        .test(CLEAR, "1…3", ID_RangeMenu, ID_Size)
+        .got("2");
+    step("Size delta range objects")
+        .test(CLEAR, "1±3", ID_RangeMenu, ID_Size)
+        .got("6");
+    step("Size percent range objects")
+        .test(CLEAR, "1±200%", ID_RangeMenu, ID_Size)
+        .got("4");
+
+    step("Union (ranges)")
+        .test(CLEAR, "1…3 2…6 ", ID_RangeMenu, ID_RangeUnion)
+        .expect("1…6");
+    step("Union (delta)")
+        .test(CLEAR, "10±3 2±6 ", ID_RangeMenu, ID_RangeUnion)
+        .expect("4 ¹/₂±8 ¹/₂");
+    step("Union (percent)")
+        .test(CLEAR, "1±3% 2±6% ", ID_RangeMenu, ID_RangeUnion)
+        .expect("1 ¹⁰⁹/₂₀₀±37 ⁶⁷/₃₀₉%");
+    step("Intersection (ranges)")
+        .test(CLEAR, "1…3 2…6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("2…3");
+    step("Intersection (ranges, empty)")
+        .test(CLEAR, "1…3 4…6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("3…3");
+    step("Intersection (delta)")
+        .test(CLEAR, "1±3 2±6 ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("1±3");
+    step("Intersection (percent)")
+        .test(CLEAR, "1±3% 2±6% ", ID_RangeMenu, ID_RangeIntersect)
+        .expect("1 ³/₁₀₀±0%");
+
+    step("Range with unit")
+        .test(CLEAR, "1…3_km 2…6_m", NOSHIFT, ADD)
+        .expect("1 002…3 006 m")
+        .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
+        .expect("2…18 km/s");
 }
 
 
@@ -7140,6 +7274,8 @@ void tests::constants_parsing()
         {
             istep(cst[i]);
             test(CLEAR, DIRECT(cst[i+1]), ENTER).noerror();
+            test(DIRECT("if dup typename \"array\" = "
+                        "then →Num else Run end"), ENTER).noerror();
         }
         else
         {
@@ -7452,7 +7588,7 @@ void tests::numerical_integration()
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
+        .test(KEY2, ID_ln, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
     step("Integration through menu")
         .test(CLEAR, 2, ENTER).expect("2")
         .test(3, ENTER).expect("3")
@@ -7470,7 +7606,7 @@ void tests::numerical_integration()
         .test(CLEAR, "18 IntegrationImprecision", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 63")
-        .test(KEY2, ID_log, ID_subtract).expect("3.25558 45962 2⁳⁻¹²");
+        .test(KEY2, ID_ln, ID_subtract).expect("3.25558 45962 2⁳⁻¹²");
     step("Integrate with high precision")
         .test(CLEAR, "1 IntegrationImprecision  24 Sig", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
@@ -7479,7 +7615,7 @@ void tests::numerical_integration()
         .test(CLEAR, "15 IntegrationImprecision", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 59937 67585 3282")
-        .test(KEY2, ID_log, ID_subtract).expect("-7.63356 395⁳⁻¹⁵")
+        .test(KEY2, ID_ln, ID_subtract).expect("-7.63356 395⁳⁻¹⁵")
         .test("5 IntegrationIterations", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .error("Numerical precision lost");
@@ -7489,13 +7625,13 @@ void tests::numerical_integration()
               ENTER).noerror()
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
+        .test(KEY2, ID_ln, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
 
     step("Integrate with display-induced imprecision")
         .test(CLEAR, "3 FIX", ENTER).noerror()
         .test("1 2 '1/X' 'X' ∫", ENTER).expect("6.931⁳⁻¹")
         .test(ID_DisplayModesMenu, ID_Std).expect("0.69314 56549 79")
-        .test(KEY2, ID_log, ID_subtract).expect("-0.00000 15255 81");
+        .test(KEY2, ID_ln, ID_subtract).expect("-0.00000 15255 81");
 
 
     step("Integration with error on low bound")
@@ -7561,8 +7697,7 @@ void tests::numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
-              ID_ClearThingsMenu, ID_Purge);
+        .test(CLEAR, DIRECT("{ X NumericalIntegration } Purge"), ENTER);
 }
 
 
@@ -7578,7 +7713,7 @@ void tests::symbolic_numerical_integration()
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("0");
+        .test(KEY2, ID_ln, ID_subtract).expect("0");
     step("Integration through menu")
         .test(CLEAR, 2, ENTER).expect("2")
         .test(3, ENTER).expect("3")
@@ -7596,7 +7731,7 @@ void tests::symbolic_numerical_integration()
         .test(CLEAR, "18 IntegrationImprecision", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("0");
+        .test(KEY2, ID_ln, ID_subtract).expect("0");
     step("Integrate with high precision")
         .test(CLEAR, "1 IntegrationImprecision  24 Sig", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
@@ -7605,7 +7740,7 @@ void tests::symbolic_numerical_integration()
         .test(CLEAR, "15 IntegrationImprecision", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 59945 30941 7232")
-        .test(KEY2, ID_log, ID_subtract).expect("0")
+        .test(KEY2, ID_ln, ID_subtract).expect("0")
         .test("5 IntegrationIterations", ENTER)
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .expect("0.69314 71805 59945 30941 7232");
@@ -7615,13 +7750,13 @@ void tests::symbolic_numerical_integration()
               ENTER).noerror()
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("0");
+        .test(KEY2, ID_ln, ID_subtract).expect("0");
 
     step("Integrate with display-induced imprecision")
         .test(CLEAR, "3 FIX", ENTER).noerror()
         .test("1 2 '1/X' 'X' ∫", ENTER).expect("6.931⁳⁻¹")
         .test(ID_DisplayModesMenu, ID_Std).expect("0.69314 71805 6")
-        .test(KEY2, ID_log, ID_subtract).expect("0");
+        .test(KEY2, ID_ln, ID_subtract).expect("0");
 
 
     step("Integration with error on low bound")
@@ -7687,8 +7822,7 @@ void tests::symbolic_numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration }"),
-              ID_ClearThingsMenu, ID_Purge);
+        .test(CLEAR, DIRECT("{ X NumericalIntegration } PURGE"), ENTER);
 }
 
 
@@ -8307,7 +8441,7 @@ void tests::symbolic_operations()
         .test(CLEAR, "'A=atanh X' X", NOSHIFT, F3)
         .expect("'X=tanh A'");
     step("Isolate log")
-        .test(CLEAR, "'A=log X' X", NOSHIFT, F3)
+        .test(CLEAR, "'A=ln X' X", NOSHIFT, F3)
         .expect("'X=exp A'");
     step("Isolate exp")
         .test(CLEAR, "'A=exp X' X", NOSHIFT, F3)
@@ -8324,12 +8458,12 @@ void tests::symbolic_operations()
     step("Isolate exp10")
         .test(CLEAR, "'A=exp10 X' X", NOSHIFT, F3)
         .expect("'X=log10 A+2·i1·π·ⅈ÷ln 10'");
-    step("Isolate log1p")
-        .test(CLEAR, "'A=log1p X' X", NOSHIFT, F3)
+    step("Isolate ln1p")
+        .test(CLEAR, "'A=ln1p X' X", NOSHIFT, F3)
         .expect("'X=expm1 A'");
     step("Isolate expm1")
         .test(CLEAR, "'A=expm1 X' X", NOSHIFT, F3)
-        .expect("'X=log1p A+2·i1·π·ⅈ'");
+        .expect("'X=ln1p A+2·i1·π·ⅈ'");
     step("Isolate sq")
         .test(CLEAR, "'A=sq X' X", NOSHIFT, F3)
         .expect("'X=s1·√ A'");
@@ -8403,7 +8537,7 @@ void tests::symbolic_differentiation()
         .expect("'A÷√((A·X)²+1)+B÷√((X·B)²-1)+(1-(C+X)²)⁻¹'");
 
     step("Derivative of log and exp")
-        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'", ID_Derivative)
+        .test(CLEAR, "'ln(A*X+B)+exp(X*C-D)' 'X'", ID_Derivative)
         .expect("'A÷(A·X+B)+C·exp(X·C-D)'");
     step("Derivative of log2 and exp2")
         .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'", ID_Derivative)
@@ -8413,8 +8547,12 @@ void tests::symbolic_differentiation()
         .expect("'A÷(ln 10·(A·X+B))+ln 10·C·exp10(X·C-D)'");
 
     step("Derivative of lnp1 and expm1")
-        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'", ID_Derivative)
+        .test(CLEAR, "'ln1p(A*X+B)+expm1(X*C-D)' 'X'", ID_Derivative)
         .expect("'A÷(A·X+B+1)+C·exp(X·C-D)'");
+
+    step("Derivative of erf and erfc")
+        .test(CLEAR, "'erf(A*X+B)+erfc(X*C-D)' 'X'", ID_Derivative)
+        .expect("'2·A÷√ π·exp(-(A·X+B)²)+2·(-C)÷√ π·exp(-(X·C-D)²)'");
 
     step("Derivative of square and cube")
         .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'", ID_Derivative)
@@ -8513,7 +8651,7 @@ void tests::symbolic_integration()
         .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
-        .test(CLEAR, "'log(A*X+B)+exp(X*C-D)' 'X'",
+        .test(CLEAR, "'ln(A*X+B)+exp(X*C-D)' 'X'",
               LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·ln(A·X+B)-(A·X+B))÷A+exp(X·C-D)÷C'");
     step("Primitive of log2 and exp2")
@@ -8526,9 +8664,9 @@ void tests::symbolic_integration()
         .expect("'((A·X+B)·log10(A·X+B)-(A·X+B)÷ln 10)÷A+exp10(X·C-D)÷(2.30258 50929 9·C)'");
 
     step("Primitive of lnp1 and expm1")
-        .test(CLEAR, "'log1p(A*X+B)+expm1(X*C-D)' 'X'",
+        .test(CLEAR, "'ln1p(A*X+B)+expm1(X*C-D)' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'((A·X+B-1)·log1p(A·X+B)-(A·X+B-1))÷A+(expm1(X·C-D)-(X·C-D)+1)÷C'");
+        .expect("'((A·X+B-1)·ln1p(A·X+B)-(A·X+B-1))÷A+(expm1(X·C-D)-(X·C-D)+1)÷C'");
 
     step("Primitive of square and cube")
         .test(CLEAR, "'sq(A*X+B)+cubed(X*C-D)' 'X'",
@@ -9929,22 +10067,22 @@ void tests::infinity_and_undefined()
     step("Divide by zero as symbolic infinity (negative integer)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (decimal)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1.0 0.0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (bignum)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("2 100 ^ NEG 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
     step("Divide by zero as symbolic infinity (fractions)")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test("-1/3 0", ENTER, ID_divide)
-        .expect("'-∞'")
+        .expect("−∞")
         .test("-26 FS?C", ENTER).expect("True");
 
     step("Setting numerical constants flag")
@@ -10198,21 +10336,21 @@ void tests::graphic_stack_rendering()
 
     step("Draw expression")
         .test(CLEAR, EXIT, EXIT)
-        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_log,
+        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_ln,
               "3 X 3", ID_pow, ID_multiply, ID_add)
         .test(ALPHA, X, NOSHIFT, ID_sin, ID_cos, ID_tan, ID_add)
         .image_noheader("expression");
 
     step("Two levels of stack")
         .test(CLEAR, EXIT, EXIT)
-        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_log,
+        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_ln,
               "3 X 3", ID_pow, ID_multiply, ID_add)
         .test(ALPHA, X, NOSHIFT, ID_sin, ID_cos, ID_tan)
         .image_noheader("two-levels");
 
     step("Automatic reduction of size")
         .test(CLEAR, EXIT, EXIT)
-        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_log,
+        .test("1 'X' +", ENTER, ID_inv, ID_sqrt, ID_ln,
               "3 X 3", ID_pow, ID_multiply, ID_add)
         .test(ALPHA, X, NOSHIFT, ID_sin, ID_cos, ID_tan, ID_add,
               ID_sqrt, ID_inv, ID_sqrt, ID_inv)
@@ -12156,6 +12294,8 @@ void tests::check_help_examples()
         .test(CLEAR, "11 MinimumSignificantDigits", ENTER).noerror();
     step("Set higher rendering limit for text")
         .test(CLEAR, "2048 TextRenderingSizeLimit", ENTER).noerror();
+    step("Purge plot parameters")
+        .test(CLEAR, "'PPAR' PGALL", ENTER).noerror();
 
     step("Opening help file").test(CLEAR);
     FILE *f = fopen(HELPFILE_NAME, "r");
@@ -12288,7 +12428,10 @@ void tests::check_help_examples()
                     ref      = "";
                     skiptest = false;
                     if (!keep)
-                        itest(DIRECT("variables purge"), ENTER);
+                        itest(CLEARERR, CLEAR, EXIT,
+                              DIRECT("variables "
+                                     "{ Foreground Background LineWidth } + "
+                                     "purge"), ENTER);
                 }
             }
         }
@@ -12382,7 +12525,7 @@ void tests::regression_checks()
     step("Bug 1439: PPar premature range checking")
         .test(CLEAR, "20 30 XRange", ENTER)
         .noerror()              // Bug was "Invalid Plot Data"
-        .test("'PPAR' PURGE", ENTER);
+        .test("'PPAR' PGALL", ENTER);
     step("Bug 1440: Conversion of integer to decimal may lose precision")
         .test("987654321 SQ ToDecimal 987654321 2 ^ ToDecimal -", ENTER)
         .expect("0");
@@ -12632,7 +12775,8 @@ void tests::plotting()
         .test(ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-zoomx");
-    step("Saving plot parameters").test("PPAR", ENTER, NOSHIFT, M);
+    step("Saving plot parameters")
+        .test("PPAR", ENTER, NOSHIFT, M);
     step("Polar plot: Select min point with PMIN");
     test(EXIT, "-3-4ⅈ PMIN", ENTER)
         .noerror()
@@ -12707,7 +12851,8 @@ void tests::plotting()
         .image("scatterplot");
 
     step("Reset drawing parameters");
-    test(CLEAR, "1 LineWidth 0 GRAY Foreground", ENTER).noerror();
+    test(CLEAR, DIRECT("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
+        .noerror();
 }
 
 
@@ -12723,7 +12868,7 @@ void tests::plotting_all_functions()
     step("Select 24-digit precision").test(CLEAR, SHIFT, O, 24, F6).noerror();
 
     step("Purge the `PlotParameters` variable")
-        .test(CLEAR, "'PPAR' purge", ENTER)
+        .test(CLEAR, "'PPAR' pgall", ENTER)
         .noerror();
 
     step("Select plotting menu").test(CLEAR, RSHIFT, O).noerror();
@@ -12757,9 +12902,9 @@ void tests::plotting_all_functions()
     FUNCTION(acosh);
     FUNCTION(atanh);
 
-    FUNCTION(log1p);
+    FUNCTION(ln1p);
     FUNCTION(expm1);
-    FUNCTION(log);
+    FUNCTION(ln);
     FUNCTION(log10);
     FUNCTION(log2);
     FUNCTION(exp);
@@ -12801,8 +12946,7 @@ void tests::graphic_commands()
     BEGIN(graphics);
 
     step("Cleanup environment")
-        .test("'PPAR'", ID_ClearThingsMenu, ID_Purge)
-        .test("{} CLIP", ENTER);
+        .test(DIRECT("'PPAR' PGALL {} CLIP"), ENTER);
 
     step("Extract graphic element")
         .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)

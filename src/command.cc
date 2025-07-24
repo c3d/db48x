@@ -572,8 +572,6 @@ COMMAND_BODY(Explode)
     {
     case ID_rectangular:
     case ID_polar:
-    case ID_range:
-    case ID_uncertain:
     case ID_unit:
     {
         complex_p cplx = complex_p(obj);
@@ -581,6 +579,19 @@ COMMAND_BODY(Explode)
             return OK;
         break;
     }
+    case ID_range:
+    case ID_prange:
+    case ID_drange:
+    case ID_uncertain:
+    {
+        // Like the above, but with 2-byte IDs so need range::x() and range::y()
+        range_p r = range_p(obj);
+        if (rt.top(r->x()) && rt.push(+r->y()))
+            return OK;
+        break;
+    }
+
+
     case ID_program:
     case ID_expression:
     case ID_list:

@@ -882,6 +882,12 @@ struct object
     // ------------------------------------------------------------------------
 
 
+    int is_infinity() const;
+    // ------------------------------------------------------------------------
+    //   Return -1 for negative infinity, +1 for positive infinity, 0 otherwise
+    // ------------------------------------------------------------------------
+
+
     int compare_to(object_p other) const;
     // ------------------------------------------------------------------------
     //   Compare two objects and return a signed comparison

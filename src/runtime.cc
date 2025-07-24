@@ -1975,13 +1975,11 @@ algebraic_p runtime::infinity(bool negative) const
 //   Return a symbolic or numerical infinity
 // ----------------------------------------------------------------------------
 {
-    algebraic_g infinity = constant::lookup("∞");
+    algebraic_g infinity = constant::lookup(negative ? "−∞" : "∞");
     if (!infinity)
         return nullptr;
     if (Settings.NumericalConstants() || Settings.NumericalResults())
         infinity = constant_p(+infinity)->value();
-    if (negative)
-        infinity = -infinity;
     return infinity;
 }
 

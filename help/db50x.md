@@ -36,7 +36,7 @@ features appear to work somewhat reliably, but that some features are still
 being added with each new release. This is **NOT PRODUCTION READY** and should
 not be used for any mission-critical computation.
 
-At this point in time, you should only installing this if you are interested in
+At this point in time, you should only install this if you are interested in
 contributing to the project, whether it is in the form of code, feedback or
 documentation changes. Please refer to the web site of the project on GitHub or
 GitLab for details and updates. The best way to
@@ -84,7 +84,7 @@ calculator compared to the HP48:
   shown as 🟦 in the documentation, and activates functions shown in blue in the
   keyboard overlay. On the screen, the shift state is indicated in the header
   area. When a [soft menu](#soft-menus) is visible on the screen, the selected
-  row of functions is highlighed.
+row of functions is highlighted.
 
 In the rest of this document, the shift key is referred to as 🟨, and pressing
 it twice is referred to as 🟦, irrespective of the appearance of the physical
@@ -751,17 +751,18 @@ https://github.com/c3d/db48x.
 
 This software is (C) 2022-2025 Christophe de Dinechin and the DB50X team.
 
-Additional contributors to the project include:
+Additional contributors to the project include (in order of appearance):
 
-* Jean Wilson (Equation Library and associated documentation)
-* Philippe Martens (be.philippe@icloud.com)
-* Franco Trimboli (WASM port)
 * Jeff, aka spiff72 (keyboard overlay)
 * Camille Wormser (complex number fixes)
 * Conrado Seibel (help file fix)
 * Kjell Christenson (simulator fix)
 * Václav Kadlčík (documentation fix)
+* Franco Trimboli (WASM port)
+* Jean Wilson (Equation Library and associated documentation)
 * GitHub user mipa83 (Windows documentation)
+* Philippe Martens (be.philippe@icloud.com)
+* LdBeth <andpuke@foxmail.com> (Fixes)
 
 The authors would like to acknowledge
 
@@ -941,8 +942,8 @@ The first implementation of RPL accessible by the user was on the HP28C, circa
 HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB50X.
 
-DB50X is a fresh implementation of RPL on ARM, initially targetting the
-SwissMicros DM42 calculator.
+DB50X is a fresh implementation of RPL on ARM, initially targeting the
+SwissMicros DM32 calculator.
 This has [consequences on the design](#design-overview) of this particular
 implementation of RPL.
 
@@ -970,7 +971,7 @@ using the following synthetic stack diagram:
 ## Algebraic mode
 
 Unlike earlier RPN calculators from Hewlett-Packard, RPL calculators from HP
-includes complete support for algebraic objects written using the standard
+include complete support for algebraic objects written using the standard
 precedence rules in mathematics. This gives you the best of both worlds,
 i.e. the keyboard efficiency of RPN, requiring less keystrokes for a given
 operation, as well as the mathematical readability of the algebraic
@@ -1087,7 +1088,7 @@ keys) evaluates the expression, to get the result `59.6`.
 <video src="https://github.com/c3d/db48x/assets/1695924/ba81f9f0-ec4d-4619-bf95-c56c14210fc3"></video>
 
 Algebraic and reverse-polish computations are equivalent, and can be mixed and
-matched during computations. Using one or the other is stricly a matter of
+matched during computations. Using one or the other is strictly a matter of
 preference. Algebraic data entry makes it easier to view the entire
 expression. Reverse-polish makes it easier to see intermediate results.
 
@@ -1129,7 +1130,7 @@ grouped 5 by 5.
 In algebraic mode, we can type the following sequence:
 _'()_, _1_, _0_, _0_, _0_, _×_, _√x_,
 _2_, _x²_ (🟨 _C_), _+_, _3_, _x²_, _ENTER_. The mathematical
-expresssion shows up on the stack graphically. It can then be evaluated using
+expression shows up on the stack graphically. It can then be evaluated using
 the _=_ key, and shows the same result as for RPL mode.
 
 
@@ -1315,596 +1316,1176 @@ does not have a `NXT` key unlike HP calculators. Instead, when necessary, the
 
 [![Demo of v0.4.8](https://img.youtube.com/vi/tT5az2CIcnk/maxresdefault.jpg)](https://www.youtube.com/watch?v=tT5az2CIcnk&list=PLz1qkflzABy-Cs1R07zGB8A9K5Yjolmlf)
 
+DB50X supports exact arithmetic on whole numbers, allowing you to perform calculations with arbitrary precision without rounding errors.
 
 ### Entering whole numbers
 
+Whole numbers are entered directly using the numeric keys. For example, type _1_, _2_, _3_, _ENTER_ to enter the number 123. Large numbers can be entered without any special notation - DB50X handles them automatically.
+
 ### Arithmetic on integers
+
+Basic arithmetic operations work exactly as you'd expect. Type _1_, _2_, _3_, _ENTER_, _4_, _5_, _6_, _+_ to add 123 and 456, giving you 579. The result is always exact when working with integers.
 
 ### Changing the sign of a number with +/-
 
+Use the _+/-_ key to change the sign of a number. Type _1_, _2_, _3_, _ENTER_, then _+/-_ to get -123. This works on any number type, including integers, fractions, and decimals.
+
 ### Exact division
+
+When you divide two integers, DB50X creates a fraction by default. Type _1_, _0_, _ENTER_, _3_, _÷_ to get `3¹/₃` (3 and 1/3). This preserves exact arithmetic without rounding errors.
 
 ### Computing on large numbers: 2^40, 25!
 
+DB50X can handle very large numbers. Type _2_, _ENTER_, _4_, _0_, _↑_ to compute 2^40, which gives you 1,099,511,627,776. For factorials, type _2_, _5_, _ENTER_, then use the factorial function (🟨 _F3_ in the Math menu) to compute 25!, which is approximately 1.551121×10^25.
+
 ### Separators to make large numbers more readable
 
+Large numbers are automatically formatted with separators for readability. The number 1,099,511,627,776 is displayed with commas or spaces separating groups of digits, making it easier to read.
+
 ### Built-in functions: example of 1/x
+
+Many mathematical functions work on integers. Type _2_, _ENTER_, then _1/x_ (🟨 _F1_) to get `¹/₂` (1/2). This maintains exact arithmetic by creating fractions rather than decimal approximations.
 
 
 ## Using the shift key
 
+The shift key on DB50X provides access to multiple functions on each key. Understanding how the shift key works is essential for efficient use of the calculator.
+
 ### Primary function: 1/x
+
+The primary function is accessed without pressing the shift key. For example, the _1/x_ key directly performs the reciprocal operation. Type _2_, _ENTER_, then _1/x_ to get `¹/₂`.
 
 ### First shifted function: y^x and square
 
+Press the shift key once (🟨) to access the first shifted function. For example, with the _1/x_ key, pressing 🟨 _1/x_ gives you the power function (y^x). Type _2_, _ENTER_, _3_, then 🟨 _1/x_ to compute 2^3 = 8.
+
 ### Second shifted function: Help
 
+Press the shift key twice (🟦) to access the second shifted function. With the _1/x_ key, pressing 🟦 _1/x_ provides help about the reciprocal function. This is a quick way to get context-sensitive help for any function.
+
 ### The shift annunciator
+
+The current shift state is displayed in the annunciator area at the top of the screen. You'll see indicators for:
+ * No shift: Normal operation
+ * 🟨: First shift (yellow functions)
+ * 🟦: Second shift (blue functions)
+
+This helps you keep track of which shift level is active and what functions are available.
 
 
 ## Invoking the on-line Help
 
+DB50X provides comprehensive built-in help that can be accessed in multiple ways. The help system is context-sensitive and provides detailed information about functions, commands, and features.
+
 ### Long-press on a function key
+
+The easiest way to get help is to long-press any function key. Hold down a key for about half a second, and the help for that function will appear. For example, long-press the _SIN_ key to see help about the sine function.
 
 ### Moving up and down
 
+Once in the help system, use the arrow keys _◀︎_ and _▶︎_ to navigate through the help text. These keys move the cursor up and down through the help content, allowing you to read through longer help entries.
+
 ### Following links
+
+Help entries often contain links to related topics. Use the _ENTER_ key to follow a link, which will take you to the help for that related function or concept. This creates a web-like navigation experience within the help system.
 
 ### Navigating back to a previous topic
 
+Use the _EXIT_ key to go back to the previous help topic you were viewing. This allows you to retrace your steps through the help system and return to earlier topics.
+
 ### Exiting the on-line help
 
+Press _EXIT_ when you're done reading help to return to the calculator's normal operation. The help system preserves your current stack state, so you can continue your calculations exactly where you left off.
+
 ### Contextual help
+
+The help system is context-sensitive, meaning it provides relevant information based on what you're currently doing. For example, if you're working with complex numbers, the help will include information about complex number operations.
 
 
 ## The annunciator area
 
+The annunciator area at the top of the screen provides important status information about the calculator's current state and operation.
+
 ### Battery level
+
+The battery level is displayed as a battery icon in the annunciator area. The icon shows the current charge level and indicates when the battery is low. When the battery is critically low, a warning will appear.
 
 ### USB vs. battery power
 
+When the calculator is connected to USB power, a USB icon appears in the annunciator area. This indicates that the calculator is being powered by USB rather than the internal battery, which can affect performance and power management.
+
 ### Showing or hiding the date and time
+
+The current date and time are displayed in the annunciator area by default. You can hide this information using the settings menu if you prefer a cleaner display. The time format can also be customized.
 
 ### Current state file name
 
+When a state file is loaded, its name appears in the annunciator area. This helps you keep track of which state file is currently active, especially when working with multiple saved states.
+
 ### Future direction
+
+The annunciator area is designed to be expandable, with plans to include additional status indicators such as:
+ * Current angle mode (degrees, radians, grads)
+ * Active flags and settings
+ * Memory usage indicators
+ * Network connectivity status (if applicable)
 
 
 ## Decimal values
 
+DB50X supports decimal arithmetic with high precision, allowing you to work with real numbers efficiently while maintaining accuracy.
+
 ### Entering a decimal number
+
+To enter a decimal number, type the digits, press the decimal point key _._, then continue with the fractional digits. For example, type _3_, _._, _1_, _4_, _1_, _5_, _9_, _ENTER_ to enter π as a decimal approximation.
 
 ### Entering a number in scientific notation with _×10ⁿ_
 
+For very large or small numbers, use scientific notation. Type the mantissa, then press _×10ⁿ_ (🟨 _F4_), then enter the exponent. For example, type _1_, _._, _5_, _×10ⁿ_, _2_, _3_, _ENTER_ to enter 1.5×10^23.
+
 ### Arithmetic on decimal values
+
+Decimal arithmetic works exactly like integer arithmetic. Type _3_, _._, _1_, _4_, _ENTER_, _2_, _._, _7_, _1_, _+_ to add 3.14 and 2.71, giving you 5.85. All standard arithmetic operations are supported.
 
 ### Arithmetic on fractions
 
+Fractions are handled automatically. Type _1_, _ENTER_, _3_, _÷_ to get `¹/₃`, then _2_, _×_ to multiply by 2, giving you `²/₃`. DB50X maintains exact arithmetic with fractions.
+
 ### Cycling between decimal and fraction with _×10ⁿ_
+
+Use the _×10ⁿ_ key to cycle between different representations of the same number. For example, with `²/₃` on the stack, press _×10ⁿ_ to convert to decimal (0.666666666667), press it again to return to fraction form.
 
 ### Separators for the fractional part
 
+Large decimal numbers are automatically formatted with separators for readability. For example, 1234567.890123 is displayed as 1,234,567.890123, making it easier to read.
+
 ### Live separators during number editing
+
+When entering numbers, separators appear in real-time as you type, helping you keep track of the number's magnitude. This is especially useful when entering very large or very small numbers.
 
 
 ## Soft keys and menus
 
+DB50X uses a menu system with soft keys that provide quick access to functions and commands. Understanding how to navigate menus efficiently is key to using the calculator effectively.
+
 ### Soft keys
+
+The six function keys (_F1_ through _F6_) at the top of the keyboard are soft keys that change their function based on the current menu. The labels for these keys appear on the screen above each key, showing you what function each key will perform.
 
 ### The DISP menu
 
+Press 🟨 _O_ to access the Display menu (DISP). This menu provides quick access to display mode settings like FIX, SCI, ENG, and SIG. Each soft key corresponds to a different display mode, making it easy to switch between them.
+
 ### Effect of shift state on the menu
+
+The shift state affects which menu is displayed. Pressing 🟨 cycles through different menu levels, each with different functions available on the soft keys. This multiplies the number of functions accessible through the menu system.
 
 ### Submenus
 
+Many menus have submenus that provide additional functions. For example, the DISP menu might have submenus for different categories of display settings. Use the arrow keys or soft keys to navigate between submenus.
+
 ### Menu history (Last Menu)
+
+DB50X remembers the last menu you were using. You can quickly return to the previous menu using the _EXIT_ key or by pressing the appropriate menu key again. This makes it easy to switch between related functions.
 
 
 ## Displaying decimal values
 
+DB50X offers multiple display modes to suit different types of calculations and user preferences. Each mode has specific advantages for different scenarios.
+
 ### Standard display mode
+
+Standard mode (STD) displays numbers using full precision. All significant digits are shown, up to the calculator's maximum precision. This is the default mode and is ideal for most calculations.
 
 ### FIX display mode
 
+Fixed mode (FIX) displays a specified number of decimal places. Press _3_, _FIX_ to show 3 decimal places. For example, π displays as 3.142. This mode is useful when you need consistent decimal precision.
+
 ### Switching to scientific mode
+
+Scientific mode (SCI) displays numbers in scientific notation with a specified number of decimal places. Press _3_, _SCI_ to show 3 decimal places in scientific notation. For example, 1234.567 displays as 1.235×10^3.
 
 ### Digits to show for small values
 
+The minimum significant digits setting controls when to switch to scientific notation for small values. With 3 minimum digits, 0.00123 displays as 1.23×10^-3 instead of 0.001.
+
 ### SCI display mode
+
+Scientific mode is ideal for very large or very small numbers. It automatically adjusts the exponent to keep the mantissa between 1 and 10, making it easy to compare magnitudes.
 
 ### ENG display mode
 
+Engineering mode (ENG) is similar to scientific mode but uses exponents that are multiples of 3. This makes it easier to work with engineering units like kilo, mega, milli, etc.
+
 ### SIG display mode
 
+Significant digits mode (SIG) shows a specified number of significant digits. Press _4_, _SIG_ to show 4 significant digits. For example, 123.456 displays as 123.5.
+
 ### Emulating HP48 standard display
+
+DB50X can emulate the HP48's standard display mode by setting significant digits to 12. This provides compatibility with HP48 programs and user expectations.
 
 
 ## Scientific functions
 
+DB50X provides a comprehensive set of scientific functions for mathematical calculations. These functions are accessible both directly from the keyboard and through menus.
+
 ### Square and power
+
+Use _x²_ (🟨 _C_) to square a number. Type _5_, _ENTER_, then _x²_ to get 25. For other powers, use _↑_ (🟨 _1/x_). Type _2_, _ENTER_, _3_, _↑_ to compute 2^3 = 8.
 
 ### Square root and xroot
 
+Use _√x_ (_C_) to compute the square root. Type _1_, _6_, _ENTER_, then _√x_ to get 4. For other roots, use _xroot_. Type _8_, _ENTER_, _3_, _xroot_ to compute the cube root of 8 = 2.
+
 ### Exponential and Log
+
+Use _EXP_ (_E_) to compute e^x. Type _1_, _ENTER_, then _EXP_ to get e ≈ 2.718. Use _LN_ (_L_) for the natural logarithm. Type _2_, _ENTER_, then _LN_ to get ln(2) ≈ 0.693.
 
 ### Exponential and log in base 10
 
-### DM42 layout difference: EXP LN instead of LOG LN
+Use _EXP10_ (🟨 _E_) to compute 10^x. Type _2_, _ENTER_, then _EXP10_ to get 100. Use _LOG10_ (🟨 _L_) for the base-10 logarithm. Type _1_, _0_, _0_, _ENTER_, then _LOG10_ to get 2.
+
+### DM32 layout difference: EXP LN instead of LOG LN
+
+The DB50X layout uses EXP and LN keys instead of the traditional LOG and LN arrangement. This provides more direct access to the most commonly used exponential and logarithmic functions.
 
 ### Trigonometric functions and their inverse
 
+Use _SIN_, _COS_, and _TAN_ for trigonometric functions. Type _3_, _0_, _ENTER_, then _SIN_ to get sin(30°) = 0.5. For inverse functions, use _sin⁻¹_ (🟨 _J_), _cos⁻¹_ (🟨 _K_), and _tan⁻¹_ (🟨 _L_).
+
 ### Functions in menus: example of hyperbolic functions
+
+Hyperbolic functions are available through menus. Press _MATH_ (🟨 _F3_) to access the Math menu, then use the soft keys to access hyperbolic functions like sinh, cosh, and tanh.
 
 
 ## Using an infinite stack
 
+Unlike traditional calculators with limited stack depth, DB50X provides an unlimited stack that can hold as many values as memory allows. This enables complex calculations and program execution.
+
 ### Showing multiple stack levels
+
+The stack display shows multiple levels simultaneously. You can see the top few levels of the stack at all times, making it easy to track your calculations. Use the arrow keys to scroll through more stack levels if needed.
 
 ### Result vs. other levels
 
+The result of a calculation appears in level 1 (the top of the stack), while the previous values are pushed down. This allows you to see both the result and the values that led to it, making it easier to verify your work.
+
 ### When a result is too large
 
+When a result is too large to display completely, DB50X shows a truncated version with an indicator. You can use the _Show_ command to view the complete result in a full-screen display.
 
 ### An example of complicated calculation - The Mach number benchmark
 
-### How to proceeed with that computation
+The Mach number calculation demonstrates the power of the infinite stack. This complex calculation involves multiple intermediate results that can all be kept on the stack simultaneously.
+
+### How to proceed with that computation
+
+For complex calculations, work step by step, keeping intermediate results on the stack. Use _Duplicate_ to copy values you'll need later, and use _Drop_ to remove values you no longer need.
 
 ### Correcting an error in the middle
 
+If you make an error in the middle of a calculation, you can use _Undo_ to restore the previous stack state. This is much more convenient than starting over from the beginning.
+
 ### Saving results for later with Duplicate
+
+Use _Duplicate_ (🟨 _ENTER_) to copy the top value on the stack. This is useful when you need a value for multiple calculations or want to preserve it for later use.
 
 ### Dropping results and cleaning up with Drop
 
+Use _Drop_ (_EXIT_) to remove the top value from the stack. This helps keep the stack organized and prevents it from becoming cluttered with intermediate results.
+
 ### LastArg to recall last arguments
 
+Use _LastArg_ (🟦 _ENTER_) to recall the arguments of the last operation. This is useful when you want to repeat a calculation with different parameters.
+
 ### Undo to restore previous stack state
+
+Use _Undo_ (🟦 _EXIT_) to restore the stack to its previous state. This is invaluable for recovering from mistakes or exploring different calculation paths.
 
 
 ## The command line
 
+The command line in DB50X provides powerful text editing capabilities for entering expressions, commands, and data. Understanding how to use it effectively will greatly improve your productivity.
+
 ### Editing an object on the stack with Right key
+
+Press the _Right_ arrow key to edit the top object on the stack. This opens the command line with the object's text representation, allowing you to modify it before re-entering it.
 
 ### Moving left and right on the command line
 
+Use the _Left_ and _Right_ arrow keys to move the cursor within the command line. This allows you to position the cursor anywhere in the text for editing or insertion.
+
 ### Repeating keys: Insert, left, right, delete
+
+Hold down keys like _Insert_, _Left_, _Right_, or _Delete_ to repeat their actions. This is useful for moving quickly through text or deleting multiple characters at once.
 
 ### Inserting characters in the middle
 
+Position the cursor where you want to insert text, then type the new characters. They will be inserted at the cursor position, pushing existing text to the right.
+
 ### Deleting characters left and right
+
+Use _Delete_ to remove the character to the right of the cursor, or _Backspace_ to remove the character to the left. This allows precise editing of text.
 
 ### Space key on R/S
 
+The _Space_ key (R/S) can be used to insert spaces in the command line. This is useful when entering expressions or commands that require spacing.
+
 ### Command line: entering three numbers at once
+
+You can enter multiple numbers on a single command line by separating them with spaces. For example, type "1 2 3" and press _ENTER_ to enter three numbers at once.
 
 
 ## The editor menu
 
+The editor menu provides advanced text editing capabilities that go beyond basic command line editing. These features are essential for working with complex expressions and programs.
+
 ### Selecting the editor menu
+
+Press _EDIT_ (🟨 _F6_) to access the editor menu. This provides access to advanced editing functions like text selection, cut/copy/paste, and search operations.
 
 ### Moving word by word
 
+Use _Word Left_ and _Word Right_ to move the cursor word by word instead of character by character. This makes navigation much faster when editing long expressions or text.
+
 ### Moving to beginning and end
+
+Use _Home_ and _End_ keys to jump to the beginning or end of the current line. This is useful for quickly positioning the cursor at the start or end of text.
 
 ### Selecting text
 
+Hold down _Shift_ while using arrow keys to select text. Selected text is highlighted, allowing you to perform operations on the entire selection.
+
 ### Cut, copy and paste
+
+Use _Cut_ to remove selected text and store it in the clipboard, _Copy_ to duplicate selected text, and _Paste_ to insert clipboard content at the cursor position.
 
 ### Incremental search
 
+Use _Find_ to search for text within the current line. The search is incremental, meaning it finds matches as you type, making it easy to locate specific text quickly.
+
 ### Search and replace
+
+Use _Replace_ to find and replace text. You can replace individual occurrences or all occurrences at once, making bulk editing operations efficient.
 
 
 ## Command line history
 
+DB50X maintains a history of your command line entries, making it easy to recall and reuse previous commands or expressions.
+
 ### Recalling a previous command line
+
+Use the _Up_ arrow key to recall previous command line entries. Each press of _Up_ goes further back in your history. Use _Down_ to move forward in the history.
 
 ### Optimization of command-line space
 
+The command line history is optimized to use memory efficiently. Older entries may be automatically removed to preserve memory for current calculations and programs.
+
 ### Exiting the command line
+
+Press _EXIT_ to cancel the current command line entry and return to normal calculator operation. The current entry is discarded and not added to history.
 
 ## Entering letters and symbols
 
+DB50X provides multiple ways to enter letters and symbols, making it easy to work with text, variable names, and symbolic expressions.
+
 ### Alpha mode with Shift Enter
+
+Press _Shift_ + _ENTER_ to enter Alpha mode. In this mode, the numeric keys produce letters instead of numbers. For example, pressing _2_ produces 'A', _3_ produces 'D', etc.
 
 ### Alpha mode with Long Shift
 
+Hold down _Shift_ for a longer time to enter a temporary Alpha mode. This allows you to enter a few letters without permanently switching to Alpha mode.
+
 ### Transient Alpha mode, upper and lowercase
+
+Use _Shift_ + _Alpha_ to toggle between uppercase and lowercase letters. This is useful when entering variable names that follow different naming conventions.
 
 ### Shift on digits and operations while in Alpha mode
 
+While in Alpha mode, you can still access numbers and operations by using the shift key. This allows you to mix letters and numbers in your input.
+
 ### Shifted characters
+
+Many keys have shifted characters available. For example, pressing _Shift_ + _1_ might produce '!', _Shift_ + _2_ might produce '@', etc.
 
 ### 2nd shifted characters
 
+Some keys have second-level shifted characters accessed with the second shift key. These provide additional symbols and special characters.
+
 ### White cursor for Alpha mode
 
+When in Alpha mode, the cursor changes to white to indicate that you're entering text rather than numbers. This visual feedback helps you know the current input mode.
+
 ### C and L cursor indicators in text
+
+The cursor shows different indicators when editing text:
+ * 'C' indicates command mode
+ * 'L' indicates line editing mode
+
+These indicators help you understand the current editing context and available operations.
 
 
 ## Entering names
 
+DB50X allows you to execute commands by typing their names directly. This provides quick access to hundreds of functions without memorizing key combinations.
+
 ### Executing a command by typing its name
+
+Simply type the name of any command and press _ENTER_ to execute it. For example, type "SIN" and press _ENTER_ to execute the sine function on the top value of the stack.
 
 ### Catalog with + key
 
+Press _+_ to access the catalog of all available commands. This shows a searchable list of commands, making it easy to find and execute functions you might not remember.
+
 ### Auto-completion
+
+As you type command names, DB50X provides auto-completion suggestions. This helps you find the right command quickly and reduces typing errors.
 
 ### Example: VERSION
 
+Type "VERSION" and press _ENTER_ to display the current version of DB50X. This is a simple example of how command names work.
+
 ### What happens if the name is not a command
+
+If you type a name that doesn't correspond to a command, DB50X will create a variable with that name and store the current stack value in it. This is useful for creating custom variables.
 
 
 ## Multi-line text editor
 
+DB50X includes a powerful multi-line text editor for working with longer text, programs, and complex expressions.
+
 ### Multi-line Text editor
+
+Press _EDIT_ (🟨 _F6_) to access the multi-line editor. This provides a full-screen editing environment for working with text that spans multiple lines.
 
 ### Up and down by shifting
 
+Use the _Up_ and _Down_ arrow keys to navigate between lines in the multi-line editor. This allows you to move through longer documents efficiently.
+
 ### Repeat up and down by holding key
+
+Hold down the _Up_ or _Down_ arrow keys to scroll through multiple lines quickly. This is useful for navigating through long programs or text documents.
 
 
 ## Entering text
 
+DB50X provides comprehensive text handling capabilities, allowing you to work with strings, labels, and text-based data.
+
 ### Entering text with 2nd shift ENTER
+
+Press 🟦 _ENTER_ to enter text mode. This allows you to type text that will be treated as a string object rather than a command or expression.
 
 ### The C and L cursors
 
+When editing text, the cursor shows different indicators:
+ * 'C' indicates you're in command mode
+ * 'L' indicates you're in line editing mode
+
+These help you understand the current editing context.
+
 ### Mixed operations, e.g. adding text
 
+You can perform operations on text objects. For example, you can concatenate strings by adding them together, or extract substrings using various text functions.
+
 ### Multiplying text by a number
+
+You can repeat text by multiplying it by a number. For example, if you have the text "Hello" and multiply it by 3, you get "HelloHelloHello".
 
 
 ## Entering an algebraic expression
 
+DB50X supports algebraic notation, allowing you to enter mathematical expressions in a natural, readable format similar to traditional mathematical notation.
+
 ### The `' ()` key
+
+Press the _'()_ key to begin entering an algebraic expression. This opens the algebraic editor with quotes and parentheses, ready for you to type your expression.
 
 ### Entering an expression
 
+Type your mathematical expression using standard notation. For example, type _2_, _×_, _3_, _+_, _4_ to create the expression `'2×3+4'`. The expression appears between quotes to indicate it's algebraic.
+
 ### Evaluating an expression with `=`
+
+Press the _=_ key (or _SPC_ or _EVAL_) to evaluate the algebraic expression. The result appears on the stack, and the expression is replaced by its computed value.
 
 ### Cursor in algebraic mode
 
+When in algebraic mode, the cursor shows an 'A' indicator, letting you know you're entering an algebraic expression rather than RPN operations.
+
 ### Comparing the `sin` key in direct and algebraic mode
+
+In direct mode, pressing _SIN_ immediately computes the sine of the top stack value. In algebraic mode, pressing _SIN_ inserts the sine function into your expression, which is evaluated later when you press _=_.
 
 ### Entering parentheses
 
+Use the _'()_ key to insert parentheses within an algebraic expression. This allows you to control the order of operations and create complex nested expressions.
+
 ### Automatic elimination of parentheses
+
+DB50X automatically simplifies expressions by removing unnecessary parentheses. For example, `'((2+3))'` becomes `'(2+3)'` when you press _ENTER_.
 
 ### Symbolic algebraic expressions
 
+Algebraic expressions can contain variables and symbolic elements. For example, you can enter `'x^2 + 2*x + 1'` as a symbolic expression that can be manipulated or evaluated for specific values of x.
+
 ### Performing RPN operations on algebraic expressions
 
+You can perform RPN operations on algebraic expressions. For example, you can add two expressions together, or apply functions to expressions before evaluating them.
+
 ### Automatic simplification of `0+x`, `1*x`, etc.
+
+DB50X automatically simplifies expressions by removing trivial operations. For example, `'0+x'` becomes `'x'`, and `'1*x'` becomes `'x'`. This makes expressions cleaner and more readable.
 
 
 ## The Tools menu
 
+The Tools menu (⚙️) provides context-sensitive access to functions and operations that are relevant to the current data type on the stack.
+
 ### Tools menu on empty stack
+
+When the stack is empty, the Tools menu shows general system functions like settings, help, and system information. This provides access to calculator-wide features.
 
 ### Tools menu for a decimal value
 
+When a decimal number is on the stack, the Tools menu shows mathematical functions like rounding, absolute value, sign, and number formatting options.
+
 ### Tools menu for an integer
+
+For integers, the Tools menu provides functions like factorization, primality testing, and base conversion operations.
 
 ### Tools menu for a text
 
+When text is on the stack, the Tools menu offers string manipulation functions like case conversion, length calculation, and text formatting options.
+
 ### Tools menu for an expression
+
+For algebraic expressions, the Tools menu provides symbolic manipulation functions like expansion, factoring, and simplification tools.
 
 
 ## Computations on complex numbers
 
+DB50X provides comprehensive support for complex number arithmetic and functions, supporting both rectangular and polar forms.
+
 ### The complex menu
+
+Press _CPLX_ (🟨 _G_) to access the complex number menu. This provides quick access to complex number operations and conversions.
 
 ### Entering numbers in rectangular form
 
+Use _F1_ in the complex menu to enter numbers in rectangular form (a + bi). Type the real part, press _F1_, then type the imaginary part.
+
 ### Entering numbers in polar form
+
+Use _F2_ in the complex menu to enter numbers in polar form (r∠θ). Type the magnitude, press _F2_, then type the angle in the current angle mode.
 
 ### Switching between polar and rectangular with Cycle key
 
+Use the _×10ⁿ_ key to cycle between polar and rectangular representations of complex numbers. This allows you to view the same complex number in different forms.
+
 ### Arithmetic on complex numbers
+
+All standard arithmetic operations work on complex numbers. Addition, subtraction, multiplication, and division are performed using complex arithmetic rules.
 
 ### Exact angles and exact computations: 2<45 * 3<90 ^ 8
 
+DB50X can perform exact computations with complex numbers. For example, `2∠45° × 3∠90°` gives an exact result, and you can raise complex numbers to powers while maintaining exact arithmetic.
+
 ### Functions on complex numbers, e.g. `sin` and `log`.
 
+Most mathematical functions work on complex numbers. Trigonometric functions, logarithms, exponentials, and others are extended to the complex domain.
+
 ### Effect of angle mode on display in polar form
+
+The current angle mode (degrees, radians, grads) affects how angles are displayed in polar form. The angle is always shown in the current mode for consistency.
 
 
 ## Computations on vectors
 
+DB50X supports vector operations, allowing you to work with mathematical vectors for physics, engineering, and mathematical applications.
+
 ### Entering a vector
+
+Use the _VECTOR_ key or menu to enter vectors. You can enter vectors as lists of components, or create them using vector-specific functions.
 
 ### The M cursor
 
+When working with vectors, the cursor shows an 'M' indicator to indicate you're in matrix/vector mode. This helps you understand the current data type context.
+
 ### Adding and subtracting vectors
+
+Vectors can be added and subtracted component-wise. The vectors must have the same dimensions for these operations to work.
 
 ### Component-wise multiplication and division
 
+Use component-wise operations to multiply or divide corresponding elements of vectors. This is useful for scaling vectors or applying transformations.
+
 ### Operations between vector and a constant
+
+You can perform operations between a vector and a scalar constant. For example, multiplying a vector by a scalar scales all components.
 
 ### Component-wise functions: 1/x
 
+Many functions can be applied component-wise to vectors. For example, taking the reciprocal of a vector applies 1/x to each component.
+
 ### The tools menu on vectors
+
+When a vector is on the stack, the Tools menu provides vector-specific functions like norm calculation, dot product, cross product, and vector manipulation tools.
 
 ### Computing the norm of a vector
 
+Use the _NORM_ function to compute the magnitude (length) of a vector. This is the square root of the sum of the squared components.
+
 ### The Matrix menu
+
+Press _MATRIX_ to access the matrix menu, which provides functions for matrix operations, vector operations, and linear algebra computations.
 
 
 ## Computations on matrices
 
+DB50X provides comprehensive matrix operations for linear algebra, engineering calculations, and mathematical modeling.
+
 ### Entering a matrix
+
+Use the _MATRIX_ menu to enter matrices. You can specify the dimensions and then enter the elements row by row, or create matrices using matrix construction functions.
 
 ### Adding and subtracting matrices
 
+Matrices can be added and subtracted element-wise, provided they have the same dimensions. The result is a matrix with the same dimensions.
+
 ### Multiplication and division by a constant
+
+You can multiply or divide a matrix by a scalar constant. This scales all elements of the matrix by the same factor.
 
 ### Multiplying square matrices
 
+Matrix multiplication is performed using the standard mathematical rules. For square matrices, this involves computing dot products of rows and columns.
+
 ### Multiplying a matrix and a vector
+
+You can multiply a matrix by a vector (or vice versa) to perform linear transformations. The dimensions must be compatible for the operation to succeed.
 
 ### Computing a determinant
 
+Use the _DET_ function to compute the determinant of a square matrix. This is useful for determining if a matrix is invertible and for solving systems of equations.
+
 ### Computing an inverse with 1/x
+
+Use the _1/x_ function on a square matrix to compute its inverse. This is equivalent to matrix division and is useful for solving matrix equations.
 
 
 ## Advanced matrix operations
 
+DB50X supports advanced matrix operations that go beyond basic arithmetic, including complex matrices and symbolic manipulation.
+
 ### Matrix of complex numbers
+
+Matrices can contain complex numbers as elements. This is useful for electrical engineering, quantum mechanics, and other applications where complex-valued matrices are needed.
 
 ### Symbolic matrix
 
+You can create matrices with symbolic elements (variables) instead of numeric values. This allows for symbolic matrix algebra and manipulation of matrix expressions.
+
 ### Inverse and determinant of 2x2 symbolic matrix
+
+For symbolic matrices, DB50X can compute exact symbolic expressions for determinants and inverses. For example, a 2×2 symbolic matrix will have its determinant and inverse expressed in terms of the symbolic elements.
 
 
 ## Entering data in lists
 
+DB50X supports list operations, allowing you to work with collections of data efficiently for statistical analysis, data processing, and programming.
+
 ### Entering a list
+
+Use the _LIST_ key or menu to create lists. You can enter lists by specifying the elements, or create them using list construction functions.
 
 ### Adding elements to a list
 
+You can add elements to existing lists using list manipulation functions. This allows you to build lists dynamically as you collect data.
+
 ### Applying a function to a list
+
+Many functions can be applied to lists, operating on each element. For example, applying a mathematical function to a list applies it to each element individually.
 
 ### Repeating a list (multiply)
 
+You can repeat a list by multiplying it by a number. This creates a new list with the original elements repeated the specified number of times.
+
 ### Lists containing lists
+
+Lists can contain other lists as elements, creating nested data structures. This is useful for representing complex data relationships and hierarchical information.
 
 
 ## Computations with based numbers
 
+DB50X supports number systems in different bases, making it useful for computer science, digital electronics, and programming applications.
+
 ### Entering based numbers
+
+Use the _BASE_ menu to enter numbers in different bases. You can specify the base and then enter the digits in that base.
 
 ### Entering hexadecimal directly with A-F
 
+You can enter hexadecimal numbers directly using the A-F keys. The calculator automatically recognizes these as hexadecimal digits when in hexadecimal mode.
+
 ### Logical operations
+
+Based numbers support logical operations like AND, OR, XOR, and NOT. These operations are performed bit-wise on the binary representation of the numbers.
 
 ### Setting the word size
 
+You can set the word size for based number operations. This determines how many bits are used to represent numbers and affects the range of values.
+
 ### Changing to common bases (2, 8, 10, 16)
 
-### Changing to an arbitray base
+Quick access is provided for common bases: binary (2), octal (8), decimal (10), and hexadecimal (16). These are the most frequently used bases in computing.
+
+### Changing to an arbitrary base
+
+You can work with numbers in any base from 2 to 36. This allows for specialized applications and educational purposes.
 
 ### Entering number in arbitrary base
 
+When in a specific base mode, you can enter numbers directly in that base. The calculator automatically interprets the digits according to the current base.
+
 ### The tools menu on based number
+
+When a based number is on the stack, the Tools menu provides base-specific functions like base conversion, bit manipulation, and logical operations.
 
 ### Binary operations
 
+Binary numbers support specialized operations like bit shifting, rotation, and bit counting. These are essential for low-level programming and digital design.
+
 ### Emulating a 16-bit or 256-bit CPU
+
+You can set the word size to emulate different CPU architectures. This is useful for understanding how different processors handle numbers.
 
 ### The Cycle key on based numbers
 
+Use the _×10ⁿ_ key to cycle between different representations of the same number in various bases. This provides quick conversion between number systems.
+
 ### Adding a suffix to force a base (DM32 only)
+
+On the DM32, you can add suffixes to numbers to force interpretation in a specific base, regardless of the current base setting.
 
 
 ## Unit objects
 
+DB50X supports physical units, making it ideal for engineering, physics, and scientific calculations where dimensional analysis is important.
+
 ### Entering a value with a unit
+
+You can enter values with units using the _UNIT_ menu. Type the numeric value, then select the appropriate unit from the menu to attach it to the value.
 
 ### The units menus
 
+The units system is organized into categories like Length, Mass, Time, etc. Each category contains relevant units, making it easy to find the unit you need.
+
 ### Applying a unit
+
+You can apply units to existing values using the unit conversion functions. This allows you to add units to dimensionless numbers or change units.
 
 ### Converting to a unit
 
+Use the conversion functions to change from one unit to another within the same category. For example, convert meters to feet or kilograms to pounds.
+
 ### Dividing by a unit
+
+You can divide by a unit to remove it from a value, leaving just the numeric part. This is useful for extracting the magnitude from a unit object.
 
 
 
 ## Entering a program
 
+DB50X supports RPL programming, allowing you to create custom functions and automate complex calculations.
+
 ### Computing a VAT
+
+As an example, let's create a program to compute VAT (Value Added Tax). Enter the program editor and type the sequence of operations needed to calculate VAT on a given amount.
 
 ### Evaluating a program with `Evaluate`
 
+Use the _Evaluate_ function to run a program. This executes the program with the current stack contents as input and places the result on the stack.
+
 ### Modifying a program with LastArg
+
+Use _LastArg_ to recall the arguments of the last operation, which is useful when debugging or modifying programs to work with different inputs.
 
 ### Modifying a program with Undo
 
+Use _Undo_ to restore the previous state when testing program modifications. This allows you to experiment with changes without losing your work.
+
 ### Modifying a program with command-line history
 
+The command line history can be used to recall and modify previous program entries, making it easier to iterate on program development.
+
 ### The three roles of the R/S key: Space, =, EVAL
+
+The R/S key serves multiple functions:
+ * As a space character in text entry
+ * As the equals sign (=) in algebraic expressions
+ * As the Evaluate function for programs and expressions
 
 
 ## Storing values in global variables
 
+DB50X allows you to store values in variables for later use, making complex calculations more manageable and programs more readable.
+
 ### Storing a value in a new variable 'VATRate'
+
+To store a value in a variable, first put the value on the stack, then use the _STO_ command followed by the variable name. For example, store 0.20 in a variable called 'VATRate'.
 
 ### Evaluating a variable
 
+To retrieve a variable's value, use the _RCL_ command followed by the variable name. This places the variable's value on the stack.
+
 ### Case insensitivity
+
+Variable names are case-insensitive, so 'VATRate', 'vatrate', and 'VatRate' all refer to the same variable.
 
 ### Naming a variable on the command line
 
+You can type variable names directly on the command line. If the name doesn't correspond to a command, DB50X will create a variable with that name.
+
 ### Using quotes to avoid evaluation
+
+Use quotes around variable names to prevent immediate evaluation. This is useful when you want to work with the variable name as text rather than its value.
 
 ### Overwriting a variable value
 
+You can overwrite an existing variable's value by storing a new value with the same name. The old value is replaced with the new one.
+
 ### Expressions containing variables
+
+Algebraic expressions can contain variables. When evaluated, the variables are replaced with their current values, allowing for dynamic calculations.
 
 
 ## Storing and modifying programs
 
+DB50X allows you to store programs as named functions, making them easily accessible and reusable.
+
 ### Creating a new `VAT` command
+
+Create a program to compute VAT and store it with the name 'VAT'. This creates a custom command that you can call by name, just like built-in functions.
 
 ### Evaluating a program by name
 
-### Evaluting a program from variables menu
+Once stored, you can execute a program by typing its name and pressing _ENTER_. This is the same way you execute built-in commands.
+
+### Evaluating a program from variables menu
+
+You can also execute programs from the variables menu, which shows all your stored variables and programs in an organized list.
 
 ### Taking input and computing output
+
+Programs can take input from the stack and produce output on the stack. This makes them work seamlessly with the RPL paradigm and other functions.
 
 
 ## The variables menu
 
+The variables menu provides quick access to all your stored variables and programs, making it easy to manage and use your custom functions.
+
 ### Showing the variables menu
+
+Press _VARS_ (🟨 _F5_) to display the variables menu. This shows all your stored variables and programs in an organized list.
 
 ### Evaluating a variable with F1
 
+Press _F1_ to evaluate (execute) the selected variable or program. This places the result on the stack or executes the program.
+
 ### Recalling a variable with shift F1
+
+Press 🟨 _F1_ to recall the selected variable's value without evaluating it. This is useful when you want to see the variable's contents.
 
 ### Storing in an existing variable with xshift F1
 
+Press 🟦 _F1_ to store the current stack value in the selected variable. This overwrites the variable's previous value.
+
 ### Rationale for the difference with HP48
 
+The DB50X variables menu differs from the HP48 to provide more intuitive access to variables and better integration with the modern interface.
+
 ### Using variables menu while editing a program
+
+You can access the variables menu while editing a program to insert variable references or program calls into your code.
 
 
 ## Menus with too many entries
 
+When menus have more entries than can fit on the screen, DB50X provides navigation controls to access all available options.
+
 ### Adding more variables overflows
+
+As you add more variables and programs, they may exceed the space available on a single menu screen. When this happens, navigation controls appear.
 
 ### Going from 6 to 7 entries
 
+When you have more than 6 entries in a menu, the display automatically shows navigation options to access additional entries.
+
 ### No next key, using F6 and shift F6 for next and previous
+
+Instead of a dedicated NEXT key, DB50X uses _F6_ to go to the next page and 🟨 _F6_ to go to the previous page. This keeps the interface consistent and efficient.
 
 
 ## Saving your state to disk
 
+DB50X allows you to save your current state (variables, programs, settings) to disk for later restoration or backup purposes.
+
 ### The system menu
+
+Access the system menu through the setup options to manage state files and system operations.
 
 ### Saving the calculator state
 
+Use the save state function to store your current calculator state, including all variables, programs, and settings, to a file on the calculator's storage.
+
 ### Restoring another state
+
+You can load a previously saved state file to restore your calculator to a previous configuration, including all variables and programs that were saved.
 
 ### Merging states
 
+The merge state function allows you to combine the contents of a saved state file with your current state, adding new variables and programs without overwriting existing ones.
+
 ### Returning to the calculator
 
+After performing state operations, you can return to normal calculator operation to continue your work with the restored or merged state.
+
 ### Saving state quickly with xshift-EXIT
+
+Use 🟦 _EXIT_ as a quick shortcut to save the current state without going through the full menu system.
 
 
 ## Plotting a function
 
+DB50X includes powerful graphing capabilities for visualizing mathematical functions and data.
+
 ### Plotting a wave function sin(x * a) * cos(x * b)
+
+You can plot complex functions like wave combinations. Enter the function in algebraic form and use the plotting functions to display it on the calculator's screen.
 
 ### Plotting a polar function
 
-### Plotting a parameteric function
+Polar functions can be plotted to show relationships in polar coordinates. This is useful for circular and spiral patterns.
+
+### Plotting a parametric function
+
+Parametric functions allow you to plot curves defined by x and y as functions of a parameter t. This enables plotting of complex curves and shapes.
 
 ### Drawing two functions on the same screen
 
+You can plot multiple functions simultaneously on the same graph, making it easy to compare different functions or see their relationships.
+
 ### Changing line width
 
-### Changing line patterm
+The line width can be adjusted to make plots more visible or to distinguish between different functions on the same graph.
+
+### Changing line pattern
+
+Different line patterns (solid, dashed, dotted) can be used to distinguish between multiple functions plotted on the same screen.
 
 
 ## The numerical solver
 
+DB50X includes a powerful numerical solver that can find solutions to equations and systems of equations.
+
 ### Solving an equation
+
+Use the solver to find numerical solutions to equations. Enter the equation in algebraic form and specify which variable to solve for.
 
 ### Expressions that must be zero
 
+The solver works by finding values that make an expression equal to zero. You can enter any expression, and the solver will find where it equals zero.
+
 ### Equations A=B
 
+For equations in the form A=B, you can rewrite them as A-B=0 and use the solver to find where this expression equals zero.
+
 ### Solving for different variables
+
+You can solve for any variable in an equation. The solver will find values of the specified variable that satisfy the equation.
 
 
 ## Numerical integration
 
+DB50X provides numerical integration capabilities for computing definite integrals of functions.
+
 ### Integrating x^2 from 0 to 1 (exact results)
+
+For simple functions like x², DB50X can compute exact results. The integral of x² from 0 to 1 gives the exact result 1/3.
 
 ### What happens with 0.0 to 1.0
 
+When using decimal bounds (0.0 to 1.0 instead of 0 to 1), the integration uses numerical methods and may give approximate results.
+
 ### Integration 1/x from 2 to 22
 
+For functions like 1/x, numerical integration gives approximate results. The integral from 2 to 22 gives ln(22) - ln(2) ≈ 2.3979.
+
 ### Comparing with LN(2) - LN(2)
+
+You can verify integration results by comparing them with known analytical solutions. For example, the integral of 1/x from a to b equals ln(b) - ln(a).
 
 
 ## Symbolic expression manipulation
 
+DB50X includes symbolic algebra capabilities for manipulating mathematical expressions without evaluating them numerically.
+
 ### Collecting terms
+
+Use the collect function to combine like terms in an expression. For example, x + 2x + 3x becomes 6x.
 
 ### Expanding terms
 
+Use the expand function to multiply out expressions. For example, (x + 2)(x + 3) becomes x² + 5x + 6.
+
 ### General expression rewriting facility
+
+DB50X provides a general expression rewriting system that can simplify, factor, and transform mathematical expressions using algebraic rules.
 
 
 ## Adding Local variables
 
+Local variables provide a way to store temporary values within programs and expressions without affecting global variables.
+
 ### Why use local variables
+
+Local variables are useful for storing intermediate results in programs without cluttering the global variable space. They are automatically cleaned up when the program finishes.
 
 ### Inserting local variables in a program
 
+Use the local variable syntax within programs to create variables that exist only during program execution. This keeps programs self-contained and prevents variable name conflicts.
+
 ### Inserting local variables in equations
+
+Local variables can also be used in algebraic expressions to store intermediate values during complex calculations.
 
 
 ## Localized number display preferences
 
+DB50X allows you to customize number display to match your regional preferences and conventions.
+
 ### Changing the decimal separator
+
+You can change the decimal separator from a period (.) to a comma (,) to match European number formatting conventions.
 
 ### Changing the spacing for numbers
 
+The spacing used to group digits in large numbers can be customized. You can choose between different grouping patterns or disable grouping entirely.
+
 ### Changing the character used for spacing
+
+You can select which character is used for digit grouping, such as spaces, commas, or periods, depending on your regional preferences.
 
 
 ## User interface preferences
 
+DB50X provides extensive customization options for the user interface to suit different preferences and usage patterns.
+
 ### Square and rounded menu styles
+
+You can choose between square and rounded menu styles to match your visual preferences. This affects the appearance of menu borders and buttons.
 
 ### 3-level, 1-level and flat menu styles
 
+Menu organization can be customized with different levels of hierarchy. You can choose between 3-level menus (with multiple shift states), 1-level menus, or flat menus for simpler navigation.
+
 ### Changing result font size
+
+The font size used to display calculation results can be adjusted to improve readability or fit more information on the screen.
 
 ### Changing stack font size
 
+The font size for stack display can be customized independently of result display, allowing you to optimize the layout for your needs.
+
 ### Changing editor font size
 
+The font size in the command line editor can be adjusted to make text entry more comfortable or to fit longer expressions.
+
 ### Changing multi-line editor font size
+
+The multi-line editor font size can be set independently to optimize the display of longer text and programs.
 
 
 
 ## Comparisons and tests
 
+DB50X provides comprehensive comparison and logical operations for programming and conditional calculations.
+
 ### Truth: True, False, 0, 1
+
+DB50X uses 1 to represent true and 0 to represent false. These values can be used in logical operations and conditional statements.
 
 ### Equality tests
 
+Use equality operators to compare values. The result is 1 (true) if the values are equal, 0 (false) otherwise.
+
 ### Differences between = and ==
+
+The = operator is used for assignment and algebraic equality, while == is used for comparison testing. Understanding this distinction is important for programming.
 
 ### Relational operators
 
+Use relational operators like <, >, ≤, ≥ to compare values. These return 1 for true and 0 for false, making them useful in conditional expressions.
+
 ### Logical operations (AND, OR, NOT)
+
+Logical operations combine boolean values. AND returns 1 only if both operands are 1, OR returns 1 if either operand is 1, and NOT inverts the truth value.
 
 
 ## More sophisticated programming
 
+DB50X provides advanced programming constructs for creating complex algorithms and automated calculations.
+
 ### Testing with IF THEN ELSE END
+
+Use IF-THEN-ELSE-END structures for conditional execution. This allows programs to make decisions based on test conditions.
 
 ### Conditional expression with IFTE
 
+IFTE (If-Then-Else) is a compact conditional expression that returns one value if a condition is true, another if it's false.
+
 ### Counted loop with START NEXT
+
+Use START-NEXT loops for counted iterations. This executes a block of code a specified number of times.
 
 ### Stepping loop with START STEP
 
+START-STEP loops allow you to specify a step size for iterations, useful for creating sequences with non-unit increments.
+
 ### Named loop with FOR NEXT
+
+FOR-NEXT loops provide named loop variables that can be used within the loop body, making it easier to track iteration progress.
 
 ### Named loop with FOR STEP
 
+FOR-STEP loops combine named variables with custom step sizes, providing maximum flexibility for loop control.
+
 ### WHILE conditional loop
+
+WHILE loops continue executing as long as a condition remains true, useful for loops where the number of iterations is not known in advance.
 
 ### UNTIL conditional loop
 
+UNTIL loops continue until a condition becomes true, providing an alternative way to express conditional looping.
+
 
 ## Enjoy the calculator!
+
+Congratulations! You've now learned the fundamentals of using DB50X. This powerful calculator combines the best features of traditional RPL calculators with modern enhancements, providing you with:
+
+ * **Exact arithmetic** with fractions and symbolic computation
+ * **Multiple input modes** including RPN and algebraic notation
+ * **Comprehensive scientific functions** for mathematics, physics, and engineering
+ * **Advanced programming capabilities** with RPL
+ * **Flexible display options** and user interface customization
+ * **Powerful graphing and visualization** tools
+ * **Extensive unit support** for dimensional analysis
+
+The more you use DB50X, the more you'll discover its capabilities. Don't hesitate to explore the built-in help system, experiment with different features, and create your own programs to automate repetitive calculations.
+
+Happy calculating!
 
 
 
@@ -3719,6 +4300,57 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.10  "Best" - Ranges and documentation
+
+This release is primarily a refinement of ranges and a documentation update.
+
+### New features
+
+* Always display infinity ranges with range notation
+* Add constant for `-∞`
+* Add support for ranges in `Explode` / `Obj→`
+* Add support for delta and percent ranges in `ToDecimal`
+* Allow `Copy` to target a local variable or setting
+* Support `True` and `False` in  `→Num`
+
+### Bug fixes
+
+* Replace `log` with `ln`, make `log` be base-10 logarithm
+* Check zero-divide in ranges
+* Fix the implementation of trig functions for ranges
+* Fix incorrect command associated to the `%T` alias (should be `%Total`)
+* Adjust help for `log10` and `ln`
+* Avoid pushing a null pointer on the stack on error evaluating constants
+* Add missing `Ⓒ` sign in uncertainty for `Epl`
+* Fix constant evaluation referencing `this` after it may have moved
+* Report missing current directory in `Purge`
+* Report errors when purging invalid objects in `Purge` and `PurgeAll`
+* Avoid `ClearThingsMenu` in tests, the key maps to forward delete in editor
+
+### Improvements
+
+* keyboard: Update layout to include `σ` character
+* Remove the `state/Test.48S` file, it's not longer relevant
+* Add `constant` case to `object::is_negative`
+* Add `DATE-` as an alias for `DDAYS`
+* Add `PgAll` as an alias for `PurgeAll`
+* More systematic purging of environment and variables between tests
+* Add check in test suite that we actually purged special variables
+* Refresh authors list
+* Move documentation for `PPAR` to `plot.md`
+* Avoid date conversions during constant evaluation
+* Accelerate and improve the display of constant values in menus
+* Add `launch.json` and `tasks.json` build configuration generated by Cursor
+* Send a `START_TEST` command at start of test, refresh simulated battery
+* Cursor-assisted review of missing command documentation
+* Cursor-assisted generation of content in the Quickstart guide
+* Cursor-assisted improvements to grammar and spelling
+* Documentation and examples for `Blank` variants
+* Documentation and examples for `Gray` and `RGB`
+* Documentation and examples for `PMIN`, `PMAX`, `XRNG`, `YRNG`
+* Documentation and examples for `Eq` and equations
+* Add examples for list sum, product and difference commands
+
 ## Release 0.9.9 "Headrest" - Ranges
 
 This release introduces four range types to perform computations on ranges, and
@@ -3907,7 +4539,7 @@ off-line persistent graphics.
   what the DM42 firmware or integrated self-test would show. This will most
   likely improve battery life for interactive uses of DB48x.
 * Reorganize the `MemoryMenu` to make both GC and runtime statistics available
-* Reorganize the `GraphicsMenu` by topics to accomodate the new commands
+* Reorganize the `GraphicsMenu` by topics to accommodate the new commands
 * Add image checks in the test infrastructure for RPL code examples
 * Add tests for RGB colors
 * Repair `make compare` which was trying to build a binary from `compare.cc`
@@ -4871,7 +5503,7 @@ library, and optimizing the garbage collector.
   the command-line before being evaluated again from the key.
 
 * Avoid a rare crash when an equation was too big to be rendered
-  graphically and a garbage collection cycle occured between graphic
+  graphically and a garbage collection cycle occurred between graphic
   rendering and text rendering.
 
 * Do not emit error message from `Vec→` for vectors containing
@@ -6881,7 +7513,6 @@ spellings.
 * `Blank`
 * `BlankBitmap`
 * `BlankGrob`
-* `BlankPixmap`
 * `BusyIndicatorRefresh`
 * `Bytes`
 * `B→R`
@@ -7046,7 +7677,7 @@ spellings.
 * `EquationName`
 * `EquationSolver`
 * `EquationValue`
-* `Equiv`
+* `equiv`
 * `erf`
 * `erfc`
 * `err0`
@@ -7059,7 +7690,7 @@ spellings.
 * `ErrorForeground`
 * `Eval`
 * `EvalEq`
-* `Excludes`
+* `excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
@@ -7169,7 +7800,7 @@ spellings.
 * `IgnoreSymbolCase`
 * `im`
 * `ImplicitWildcards`
-* `implies`
+* `Implies`
 * `ImproperFractions`
 * `Incr`
 * `IndexDidNotWrap`
@@ -7215,9 +7846,9 @@ spellings.
 * `ListMenu`
 * `List→`
 * `ln`
+* `ln1p`
 * `LName`
-* `lnp1`
-* `log10`
+* `log`
 * `log2`
 * `LogFit`
 * `LongForm`
@@ -7271,7 +7902,7 @@ spellings.
 * `MultipleSteps`
 * `MultiSolverMenu`
 * `NameDisplayMode`
-* `nand`
+* `NAnd`
 * `NDupN`
 * `NeedToClearErrors`
 * `neg`
@@ -7292,7 +7923,7 @@ spellings.
 * `NoPlotAxes`
 * `NoPositiveUnderflow`
 * `NoProgramLastArguments`
-* `nor`
+* `NOr`
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
@@ -7320,7 +7951,7 @@ spellings.
 * `Off`
 * `OffWithImage`
 * `OnesComplement`
-* `Or`
+* `or`
 * `Over`
 * `OverflowError`
 * `OverflowIndicator`
@@ -7379,6 +8010,7 @@ spellings.
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
+* `RangeMenu`
 * `RanM`
 * `RcEq`
 * `Rcl`
@@ -7467,6 +8099,7 @@ spellings.
 * `SF`
 * `SFP`
 * `Show`
+* `ShowAsDecimal`
 * `ShowBuiltinCharacters`
 * `ShowBuiltinConstants`
 * `ShowBuiltinEquations`
@@ -7476,6 +8109,7 @@ spellings.
 * `ShowDayOfWeek`
 * `ShowEmptyMenu`
 * `ShowEquationBody`
+* `ShowIntegersAndFractions`
 * `ShowMonthName`
 * `ShowSeconds`
 * `ShowTime`
@@ -7602,7 +8236,6 @@ spellings.
 * `ToList`
 * `ToolsMenu`
 * `TooManyDigitsErrors`
-* `ToPixmap`
 * `ToPolar`
 * `ToSpherical`
 * `ToStr`
@@ -7752,7 +8385,7 @@ spellings.
 * `⊿`
 * `Ⓓ`
 * `▶`
-* `⨯`
+
 
 ## Unimplemented commands
 
@@ -8715,7 +9348,7 @@ moment of an electron resulting from its intrinsic properties of spin
 and electric charge. Its angular momentum comes from two types of
 rotation: spin and orbital motion. Therefore an external magnetic field
 exerts a torque on the electron magnetic moment revealing its existence.
-It's a mearured quantity.
+It's a measured quantity.
 
 ### μp constant
 
@@ -10452,7 +11085,7 @@ Mp=1.5E23_lb  R=5000_mi
 The 40 variables in the Optics section are:
 
 * `Δα`: Phase difference between top and bottom rays of light from a single slit (dim.: angle, in SI: r)
-* `Δφ`: Phase difference between two rays of light seperated by an angle θ (dim.: angle, in SI: r)
+* `Δφ`: Phase difference between two rays of light separated by an angle θ (dim.: angle, in SI: r)
 * `Δyint`: Distance between bright fringes on the interference screen
 * `Δydiff`: Width of the central maximum of diffraction
 * `λ`: Light wavelength
@@ -10599,7 +11232,7 @@ If lineraly polarized light is incident on a perfect linear polarizer the transm
 
 #### 2 Slits Young Interference
 
-* To calculate `[Δφ_r;I_(W/m^2);y_m;Δyint_m]` (Phase difference between two rays of light seperated by an angle θ; Irradiance of emitted light; Distance between two image points on the observation screen, Distance between bright fringes) from 5 known variables:
+* To calculate `[Δφ_r;I_(W/m^2);y_m;Δyint_m]` (Phase difference between two rays of light separated by an angle θ; Irradiance of emitted light; Distance between two image points on the observation screen, Distance between bright fringes) from 5 known variables:
 ```rpl
 L=2_m  d=800._μm  λ=600_nm  θ='ASIN(0.6*(λ_nm)/(d_μm))'  Imax=10_(W/m^2)
 @ Expecting [ Δφ=3.76991 11843 1 r I=6.54508 49718 7 W/m↑2 y=9.00000 09112 5⁳⁻⁴ m Δyint=0.0015 m ]
@@ -12027,38 +12660,53 @@ stack.
 The `LastMenu` function (🟨 _A_), returns back in the history of past visited menus. The history contains up to 8 entries.
 # Operations with Angles
 
-## ToDegrees
+## →Degrees
 Convert a number or angle to an angle in degrees.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRadians
+## →Radians
 Convert a number or angle to an angle in radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToGrads
+## →Grads
 Convert a number or angle to an angle in grads.
 If given a number, that number is interpreted using the current angle mode.
 
-## ToPiRadians
+## →PiRadians
 Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## ToRectangular
+## →Rectangular
 
 Convert vector or complex to cartesian coordinates
 
 
-## ToPolar
+## →Polar
 
 Convert vector or complex to polar coordinates
 
 
-## ToSpherical
+## →Spherical
 
 Convert vector or complex to spherical coordinates
+
+## R→D
+
+Convert radians to degrees.
+
+The `RadiansToDegrees` command converts a value from radians to degrees.
+The input is interpreted as radians, and the result is in degrees.
+
+
+## D→R
+
+Convert degrees to radians.
+
+The `DegreesToRadians` command converts a value from degrees to radians.
+The input is interpreted as degrees, and the result is in radians.
 # Arithmetic
 
 ## Add
@@ -12071,7 +12719,7 @@ Add two values.
   expected numerical addition. For example, `1 2 +` is `3`.
 * For equations and symbols, build a sum, eliminating zero additions if
   [autosimplify](#autosimplify) is active.
-* For lists, concatenate lists, or add objets to a list. For example, `{ A } { B
+* For lists, concatenate lists, or add objects to a list. For example, `{ A } { B
   } +` is `{ A B }`, and `{ A B C } "D" +` is `{ A B C "D" }`.
 * For text, concatenate text, or concatenate the text representation of an
   object to an existing text. For example `"X" "Y" + ` gives `"XY"`, and
@@ -12106,7 +12754,7 @@ Multiply two values.
   For example, `[ 1 2 3 ] [ 4 5 6 ] +` is `[ 4 10 18 ]`.
 * For matrices, perform a matrix multiplication.
 * For a matrix and a vector, apply the matrix to the vector.
-* For equations and symbols, build a product, eliminating mulitplication by 1
+* For equations and symbols, build a product, eliminating multiplication by 1
   or 0 when [autosimplify](#autosimplify) is active.
 * For a list and a positive integer, repeat the list For example, `{ A } 3 *`
   is `{ A A A }`.
@@ -12116,7 +12764,7 @@ Multiply two values.
 
 ## Divide
 
-Divide two values two values
+Divide two values
 
 `Y` `X` ▶ `Y÷X`
 
@@ -12139,7 +12787,7 @@ Raise to the power
   value in level 2 to the value in level 1. For example, `2 3 ↑` is `8`.
 * For vectors, raise individual elements in the first vector to the power of the
   corresponding element in the second vector.
-* For equations and synbols, build an expression, eliminating special cases
+* For equations and symbols, build an expression, eliminating special cases
   when [autosimplify](#autosimplify) is active.
 
 
@@ -12160,19 +12808,19 @@ Largest integer less than the input
 Smallest integer larger than the input
 
 
-## IntegerPart
+## IntPart
 
 Integer part of a number
 
 
-## FractionalPart
+## FracPart
 
 Fractional part of a number
 
 
 ## Abs
 
-Return the absolute value for a real numner.
+Return the absolute value for a real number.
 Return the Euclidean norm for a complex number, vector or matrix.
 
 
@@ -12212,7 +12860,7 @@ Square of the input
 Smallest prime number larger than the input
 
 
-## FACTORIAL
+## Factorial
 Factorial of a number
 
 
@@ -12427,13 +13075,15 @@ Mapped to the _ +/- _ key
 
 `X` ▶ `0-X`
 
-## Invert
+## Inv
 
 Invert the value in level 1
 
 Mapped to the _ 1/X _ key
 
 `X` ▶ `1/X`
+
+
 # Bitwise operations
 
 Bitwise operations represent bit-manipulation operations such as rotations and
@@ -12654,7 +13304,7 @@ Check if two values are mathematically different. This is the opposite of `=`.
 ## ==
 
 Checks if two objects are identical after evaluating names
-(contrary to `same`).
+(contrary to `same` which does not evaluate names).
 
 ```rpl
 A=1
@@ -12825,7 +13475,8 @@ Find the position of an element, starting from the end
 Find the position from the end, starting at index N
 
 
-## SUB
+## Extract
+
 Extract a group of elements from a composite
 
 
@@ -13843,7 +14494,7 @@ stack and headers will no longer be updated.
 DB50X recognizes the following types of coordinates
 
 * *Pixel coordinates* are specified using based numbers such as `#0`, and
-  correspond to exact pixels on the screen, and . Pixels are counted starting
+  correspond to exact pixels on the screen. Pixels are counted starting
   from the top-left corner of the screen, with the horizontal coordinate going
   from `10#0` to `10#399`, and the vertical coordinate going from `10#0` to
   `10#239`.
@@ -13854,7 +14505,7 @@ DB50X recognizes the following types of coordinates
 * *Text coordinates* are given on a square grid with a size corresponding to the
   height of a text line in the selected font. They can be fractional.
 
-Coordinates can be given using one the following object types:
+Coordinates can be given using one of the following object types:
 
 * A complex number, where the real part represents the horizontal coordinate and
   the imaginary part represents the vertical coordinate.
@@ -13865,7 +14516,7 @@ Coordinates can be given using one the following object types:
 
 For some operations, the list or vector can contain additional parameters beyond
 the coordinates. The selection of unit or pixel coordinates is done on a per
-coordinate basis. For exmaple, `{ 0 0 }` will be the origin in user coordinates,
+coordinate basis. For example, `{ 0 0 }` will be the origin in user coordinates,
 in the center of the screen if no `PPAR` or `PlotParameters` variable is
 present.
 
@@ -13876,6 +14527,115 @@ contain a based number.
 ## ClearLCD
 
 Clear the LCD display, and block updates of the header or menu areas.
+
+## BlankGraphic
+
+Create a blank graphic object with the specified dimensions.
+The graphic is optimized for the device running the program.
+On color RPL devices, it will produce a color pixmap.
+On black-and-white RPL devices it will produce a color pixmap.
+
+To create a blank graphic 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGraphic
+```
+
+
+## BlankGROB
+
+Create a blank HP48-compatible graphic object (GROB) with the specified dimensions.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankGROB
+@ Expecting Graphic 20 x 30
+```
+
+## BlankBitmap
+
+Create a blank packed bitmap graphic object with the specified dimensions.
+This object is always a black-and-white pixmap even on color RPL devices.
+
+To create a blank HP48-compatible GROB 20 pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankBitmap
+@ Expecting Bitmap 20 x 30
+```
+
+## BlankPixmap
+
+Create a color pixmap graphic object with the specified dimensions.
+THis command only exists on color RPL devices.
+
+To create a color pixmap that is pixels wide and 30 pixels high, use:
+
+```rpl
+20 30 BlankPixmap
+```
+
+## PixTest
+
+Test the pixel at the specified coordinates and return its gray level.
+
+```rpl
+{ 0 0 } PixTest
+@ Expecting 1
+```
+
+## PixColor
+
+Test the pixel at the specified coordinates and return its color as a three
+component values for the red, green and blue levels, each represented as a
+decimal value between 0 and 1.
+
+This commands works both in Color RPL and regular RPL, but only Color RPL may
+return distinct values for the red, green and blue components.
+
+```rpl
+{ 0 0 } PixColor →V3
+@ Expecting [ 1 1 1 ]
+```
+
+## Gray
+
+Create a gray pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the gray level on color devices.
+
+```rpl
+0 LINEWIDTH
+0 1 FOR G
+	G GRAY FOREGROUND 0 0 R→C 5 1 G - * CIRCLE
+0.1 STEP
+{ Foreground LineWidth } PURGE
+@ Image gray-circles
+```
+
+## RGB
+
+Create a color pattern for graphics operations. The resulting pattern can be
+given as input to commands such as `Foreground` or `Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the given color on color devices.
+
+```rpl
+0 LINEWIDTH
+0 1 FOR R
+	0 1 FOR G
+		0 1 FOR B
+			R G B RGB FOREGROUND R 14 * 7 - G 10 * 5 - R→C 1 B - 0.5 * CIRCLE
+		0.1 STEP
+   0.1 STEP
+0.1 STEP
+{ Foreground LineWidth } PURGE
+@ Image color-circles
+```
 
 
 ## FromLCD
@@ -13893,7 +14653,7 @@ LCD→ { #315₁₀ #0₁₀ } { #400₁₀ #22₁₀ } Extract
 ## ToLCD
 
 Display a graphic object on the screen. If the graphic object is smaller than
-the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it shown in the top-left.
+the screen, it is centered on the screen, surrounded by gray. Note that this is different from HP calculators where it is shown in the top-left.
 
 For example, to draw an expression in the center of the screen, use:
 
@@ -13912,7 +14672,7 @@ If the position in level 1 is an integer, fraction or real number, it is
 interpreted as a line number starting at 1 for the top of the screen. For
 example, `"Hello" 1 disp` will draw `Hello` at the top of the screen.
 If the position is a based number, it is a row number in pixels. For example,
-`"Hello" #120d disp` will show the test in the middle of the screen.
+`"Hello" #120d disp` will show the text in the middle of the screen.
 
 If the position in level 1 is a complex number or a list, it is interpreted as
 specifying both the horizontal or vertical coordinates, in either pixel or unit
@@ -13933,7 +14693,7 @@ provide:
 * An *invert* flag (default false) which, if set, will swap the foreground and
   background patterns.
 
-* An *horizontal align* value, where -1 means align left, 1 means align right,
+* A *horizontal align* value, where -1 means align left, 1 means align right,
   and 0 means center the text. Note that fractional values or values below -1 or
   above 1 are allowed for special effects.
 
@@ -13978,7 +14738,7 @@ Display the first level of the stack using the entire screen, with a possible
 scroll using the 4, 8, 6 and 2 keys if the object is larger than fits on screen.
 This makes it possible to comfortably examine very large objects, like `300!`, a
 large program or a complicated equation. Arrow keys can also be used for
-horizonal or vertical scrolling.
+horizontal or vertical scrolling.
 
 The maximum size of the graphic object is defined by the
 [MaximumShowWidth](#maximumshowwidth) and
@@ -13995,29 +14755,6 @@ Draw a line between two points specified by level 1 and level 2 of the stack.
 
 The width of the line is specified by [LineWidth](#linewidth). The line is drawn
 using the [foreground](#foreground) pattern.
-
-
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-
-* *Upper Right* coordinates as a complex (default `10+6i`)
-
-* *Independent variable* name (default `x`)
-
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-
-* *Type* of plot (default `function`)
-
-* *Dependent variable* name (default `y`)
 
 
 ## Pict
@@ -14103,11 +14840,6 @@ graphic object.
 'sqrt(2*x)/y' →Pixmap
 @ Image sqrt
 ```
-
-
-## Blank
-
-Create a bla
 
 
 ## GXor
@@ -14586,6 +15318,68 @@ Add elements to a list, keep only the last N elements
 
 ## SEQ
 Assemble a list from results of sequential procedure
+
+## ListSum
+
+Return the sum of a list or array.
+
+The `ListSum` command calculates the sum of all elements in a list or array.
+It uses the `+` operation to add all elements together.
+The result is a single value representing the sum of all elements.
+
+In the following example, values `1`, `3` and `5` are added, which gives `9`.
+Then the vector `[ 1 2 3 ]` is added to `9`, which gives another vector with
+value `[ 10 11 12 ]`. Finally, this vector is added to the `"ABC"` text,
+resulting in a text containing `"[ 10 11 12 ]ABC|`:
+
+```rpl
+{ 1 3 5 [ 1 2 3 ] "ABC" } ΣList
+@ Expecting "[ 10 11 12 ]ABC"
+```
+
+## ListProduct
+
+Return the product of a list or array.
+
+The `ListProduct` command calculates the product of all elements in a list or array.
+It uses the `×` operation to multiply all elements together.
+The result is a single value representing the product of all elements.
+
+In the following example, we multiply values `1`, `3`, `6`, `42` and
+finally the complex value `2+3ⅈ`:
+
+```rpl
+[ 1 3 6 42 2+3ⅈ ] ∏List
+@ Expecting 1 512+2 268ⅈ
+```
+
+## ListDifferences
+
+Return the differences between successive elements in a list or array.
+
+The `ListDifferences` command calculates the differences between consecutive
+elements in a list or array.
+It uses the `-` operation to subtract each element from the previous one.
+The result is a list with one fewer element than the input, containing the
+pairwise differences.
+
+For example to compute the increase in value between successive elements in a
+vector, you can use:
+
+```rpl
+[ 1 3 4 7 9 ] ∆List
+@ Expecting [ 2 1 3 2 ]
+```
+
+Note that on HP calculators, this command only works with lists and not with vectors. On DB48x, it works both with list and arrays.
+    Matrices are seen as arrays of vectors, as illustrated below:
+
+```rpl
+[[ 1 2 3 ]
+ [ 4 5 6 ]
+ [ 7 9 0 ]] ∆List
+@ Expecting [[ 3 3 3 ] [ 3 4 -6 ]]
+```
 # Operations with Matrices and vectors
 
 ## →Array
@@ -14925,6 +15719,10 @@ Perform Cholesky decomposition on a matrix
 Column norm (one norm) of a matrix
 
 
+## RowNorm
+Row norm (infinity norm) of a matrix
+
+
 ## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
@@ -15128,10 +15926,6 @@ Change dimensions of an array
 
 ## REF
 Reduce matrix to echelon form (upper triangular form)
-
-
-## RNRM
-Row norm (infinity norm) of a matrix
 
 
 ## RREF
@@ -15482,127 +16276,188 @@ Convert an object into a program.
   Note that this applies to programs as well.
 # Scalable plots and graphics
 
-## BEGINPLOT
-Initialize a new current plot object
+Graphics are rendered on the screen based on a coordinate systems defined in the
+`PlotParameters` variables.
 
+## PlotParameters
 
-## EDITPLOT
-Set the current plot object to the given graphic
+The `PlotParameters` reserved variable defines the plot parameters, as a list,
+with the following elements:
 
+* *Lower Left* coordinates as a complex (default `-10-6i`)
+* *Upper Right* coordinates as a complex (default `10+6i`)
+* *Independent variable* name (default `x`)
+* *Resolution* specifying the interval between values of the independent
+  variable (default `0`). A binary numnber specifies a resolution in pixels.
+* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
+  or a list containing the origin, the tick mark specification, and the names of
+  the axes.
+* *Type* of plot (default `function`)
+* *Dependent variable* name (default `y`)
 
-## ENDPLOT
-Finish current plot object and leave it on the stack
+To reset the `PlotParameters` to the default values, it is necessary to purge
+the current directory as well as the parents from any `PlotParameters` value:
 
+```rpl
+'PPAR' PGALL
+```
 
-## STROKECOL
-Change the current stroke color
 
+## PlotMin
 
-## STROKETYPE
-Change current stroke type
+Set the minimum value for the current plot range.
 
+The `PMin` value is typically a complex number giving the coordinates of the
+point that will show as the bottom-left corner of the screen.
 
-## FILLCOL
-Change the current fill color
+The following code draws a circle centered on `(0;0)` and with radius `1`, first
+with the default coordinates, where it appears centered, then after using `PMin`
+to ensure that the lower-left corner of the screen corresponds to coordinates
+`(-1;-1)`, which brings the circle closer to the lower-left corner:
 
+```rpl
+(0;0) 1 CIRCLE
+(-1;-1) PMIN
+(0;0) 1 CIRCLE
+@ Image plotmin-circle
+```
 
-## FILLTYPE
-Change the current fill type
+## PlotMax
 
+Set the maximum value for the current plot range.
 
-## FILL
-Fill the last polygon
+The `PMax` value is typically a complex number giving the coordinates of the
+point that will show as the top-right corner of the screen.
 
+The following code draws a circle centered on `(0;0)` and with radius `1`, first
+with the default coordinates, where it appears centered, then after using `PMax`
+to ensure that the lower-left corner of the screen corresponds to coordinates
+`(3;2)`, which brings the circle closer to the top-right corner:
 
-## STROKE
-Draw the outline of the last polygon
+```rpl
+(0;0) 1 CIRCLE
+(3;2) PMAX
+(0;0) 1 CIRCLE
+@ Image plotmax-circle
+```
 
 
-## FILLSTROKE
-Draw the outline and fill the last polygon
+## XRange
 
+Set the X-axis range for the current plot.
 
-## MOVETO
-Move current coordinates
+The following code draws a circle centered on `(0;0)` and with radius `1`, first
+with the default coordinates, where it appears centered, then after using
+`XRange` to ensure that the horizontal range is between `-1.5` and `1.5`, which
+causes the circle to be elongated horizontally:
 
+```rpl
+(0;0) 1 CIRCLE
+-1.5 1.5 XRNG
+(0;0) 1 CIRCLE
+@ Image xrange-circle
+```
 
-## LINETO
-Draw a line
+## YRange
 
+Set the Y-axis range for the current plot.
 
-## CIRCLE
-Draw a circle
+The following code draws a circle centered on `(0;0)` and with radius `1`, first
+with the default coordinates, where it appears centered, then after using
+`YRange` to ensure that the horizontal range is between `-1.5` and `1.5`, which
+causes the circle to be elongated vertically:
 
+```rpl
+(0;0) 1 CIRCLE
+-1.5 1.5 YRNG
+(0;0) 1 CIRCLE
+@ Image yrange-circle
+```
+# Operations with Ranges
 
-## RECTANG
-Draw a rectangle
+Operations on ranges include traditional mathematical operations such as `+` or
+`sin`, standard object operations such as `Obj→`, as well as specific operations
+listed below.
 
+## →Range
 
-## CTLNODE
-Add a control node to the current polygon
+Build a range (interval in the form `a…b`) out of two individual components for
+the low and high value.
 
+```rpl
+2 3 →Range
+@ Expecting 2…3
+```
 
-## CURVE
-Draw a curve using all previous control points
+Input values are sorted so that the range is normalized:
 
+```rpl
+3 2 →Range
+@ Expecting 2…3
+```
 
-## BGROUP
+## →∆Range
 
+Build a delta range (range of the form `a±b`) out of two individual components
+for the low and high value.
 
-## EGROUP
+```rpl
+4 6 →∆Range
+@ Expecting 5±1
+```
 
+Input values are sorted so that the range is normalized.
 
-## DOGROUP
+```rpl
+6 4 →∆Range
+@ Expecting 5±1
+```
 
+## →%Range
 
-## BASEPT
+Build a percentage range (range of the form `a±b%`) out of two individual
+components for the low and high value.
 
+```rpl
+0 2 →%Range
+@ Expecting 1±100%
+```
 
-## TRANSLATE
+Input values are sorted so that the range is normalized.
 
+```rpl
+2 0 →%Range
+@ Expecting 1±100%
+```
+## →σRange
 
-## ROTATE
+Build an uncertain number ( `a±b%`) out of two individual
+components for the low and high value.
 
+```rpl
+1 2 →σRange
+@ Expecting 1±2σ
+```
 
-## SCALE
 
+## RangeUnion
 
-## CLEARTRANSF
+Perform the union of two ranges
 
+```rpl
+1…3 2…6 ∪
+@ Expecting 1…6
+```
 
-## SETFONT
 
+## RangeIntersect
 
-## TEXTHEIGHT
+Perform the intersection of two ranges
 
-
-## TEXTOUT
-
-
-## INITRENDER
-Set which library will be used as default renderer
-
-
-## DORENDER
-Render a graphics object using the current renderer
-
-
-## PANVIEW
-Shift the center of viewport to render graphics
-
-
-## ROTVIEW
-
-
-## SCLVIEW
-Set scale to render graphics
-
-
-## VIEWPORT
-
-
-## VIEWALL
-
+```rpl
+1…3 2…6 ∩
+@ Expecting 2…3
+```
 # SD Card
 
 ## SDRESET
@@ -15790,7 +16645,7 @@ the various [display settings](#display-settings).
 
 ## StandardDisplay
 
-Display numbers using full precision. All significant digts to the right of the
+Display numbers using full precision. All significant digits to the right of the
 decimal separator are shown, up to 34 digits.
 
 ## FixedDisplay
@@ -15805,14 +16660,14 @@ shows the specified number of decimal places.
 
 ## EngineeringDisplay
 
-Display nunmbers as a mantissa with a sepcified number of digits, followed by an
+Display numbers as a mantissa with a specified number of digits, followed by an
 exponent that is a multiple of 3.
 
 ## SignificantDisplay
 
 Display up to the given number of digits without trailing zero. This mode is
 useful because DB50X can compute with large precision, and it may be useful to
-not see all digits. `StndardDisplay` is equivalent to `34 SignificantDisplay`,
+not see all digits. `StandardDisplay` is equivalent to `34 SignificantDisplay`,
 while `12 SignificantDisplay` should approximate the HP48 standard mode using
 12 significant digits.
 
@@ -16735,6 +17590,14 @@ Solve the system of equations for the given variable.
 
 Recall the current value of a variable in a system of equations. The value is returned as an assignment.
 
+## MultipleEquationsSolver
+
+Solve a system of multiple equations simultaneously.
+
+## MultipleVariablesSolver
+
+Solve for multiple variables in a system of equations.
+
 ## MSlv
 
 On HP50G, a special command is dedicated to solving systems of equations.
@@ -16913,12 +17776,12 @@ Generate a random real number between 0 and 1, 1 being excluded.
 
 DB50X uses an additive congruential random number generator (ACORN), which is
 configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
-[RandomGeneratorBits](#randomgeneratorbits).
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
 
 ## Random
 
-Generate a random number between two bounds.
+Generate a pseudo-random number between two bounds.
 
 If the two bounds are integers, then the result is an integer, and the upper
 bound is included. For example, `2 4 Random` can generate `2`, `3` or `4`.
@@ -16927,16 +17790,18 @@ Otherwise, the upper bound is excluded. For example, `2. 4. Random` can generate
 any number between `2.0` and `4.0`, but the upper bound `4.0` cannot be
 generated.
 
-The resulting number is
+DB50X uses an additive congruential random number generator (ACORN), which is
+configured by two settings, [RandomGeneratorOrder](#randomgeneratororder) and
+[RandomGeneratorBits](#randomgeneratorbits), and uses a seed provided by `RDZ`.
 
-## ΣData (ΣDAT)
+## ΣData
 
 The `ΣData` variable contains the statistics data, in the form of a matrix.
 
 *Note*: The `ΣData` name is considered a command internally, and as such,
 is subject to `CommandDisplayMode` and not `NamesDisplayMode`.
 
-## ΣParameters (ΣPAR)
+## ΣParameters
 
 The `ΣParameters` variable contains the statistics parameters, as a list with
 five elements:
@@ -17286,7 +18151,7 @@ Examples:
 ## Isolate
 
 Isolate variable: Returns an expression that rearranges an expression given in
-stack level 2 to “isolate” a variable specified in stack level 1.
+stack level 2 to "isolate" a variable specified in stack level 1.
 
 For example, `A+1=sin(X+B)+C' 'X' ISOL` will produce `X=sin⁻¹(A-C+1)+2·i1·π-B`.
 
@@ -17331,7 +18196,7 @@ its derivative.
 ## AutoSimplify
 
 Enable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `AutoSimplify` `'X+0`' will evaluate as `'X'`
+arithmetic rules. After evaluating `AutoSimplify` `'X+0'` will evaluate as `'X'`
 and '`X*1-B*0'` witll evaluate as `'X'`.
 
 The opposite setting is [NoAutoSimplify](#noautosimplify)
@@ -17339,7 +18204,7 @@ The opposite setting is [NoAutoSimplify](#noautosimplify)
 ## NoAutoSimplify
 
 Disable automatic reduction of numeric subexpressions according to usual
-arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0`'
+arithmetic rules. After evaluating `NoAutoSimplify`, equations such as`'X+0'`
 or `X*1-B*0` will no longer be simplified during evaluation.
 
 The opposite setting is [AutoSimplify](#autosimplify)
@@ -17419,7 +18284,127 @@ Create a case-list of integers in the given range.
 
 ## ASSUME
 Apply certain assumptions about a variable to an expression.
-# Time, Alarms and System Commands
+
+## AlgebraConfiguration
+
+Name reserved for the current algebra configuration directory.
+
+The `AlgebraConfiguration` command provides access to the directory that stores
+the current Computer Algebra System (CAS) configuration.
+This directory contains settings and variables used for symbolic computations.
+If no configuration directory exists, one will be created when needed.
+The configuration directory is stored in the global variable with the name
+`AlgebraConfiguration`.
+
+## AlgebraVariable
+
+Recall the current algebra variable.
+
+The `AlgebraVariable` command returns the current variable used for polynomial
+evaluation and symbolic computations.
+If no variable is set, it defaults to `X`.
+The variable is stored in the algebra configuration directory.
+
+## StoreAlgebraVariable
+
+Store the current algebra variable.
+
+The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+The variable must be a quoted symbol (e.g., `'X'`).
+The variable is stored in the algebra configuration directory.
+
+## Equation
+
+Define an equation for use in solving or integration operations.
+This is generally used as the name of a variable, and can manipulated using the `RcEQ` (recall equation) and `StEQ` (store equation) commands.
+
+
+## StEq
+
+Store expression in `Equation` variable.
+
+The `StEq` command stores an expression, polynomial, or equation in the reserved
+`Equation` variable.
+The stored equation can be a single equation or a list of equations.
+All stored equations must be of type expression, polynomial, or equation.
+The stored equation is used by the solving menu and other equation-related
+commands.
+
+## RcEq
+
+Recall expression from `Equation` variable.
+
+The `RcEq` command recalls the currently stored equation from the `Equation`
+variable.
+If no equation is stored, it returns an error, `EQ variable not found`.
+The recalled equation can be used for further manipulation or solving.
+
+## NextEq
+
+Cycle equations in the `Equation` variable if it is a list.
+
+The `NextEq` command cycles through equations if the `Equation` variable
+contains a list of equations.
+It rotates the equations in the list, making the next equation the current one.
+This is useful when working with multiple equations and wanting to solve them
+one by one, see `MultipleEquationsSolver`.
+
+## EvalEq
+
+Evaluate the current equation.
+
+The `EvalEq` command evaluates the currently stored equation.
+
+For equations (expressions with `=`), it evaluates both sides and returns an
+equation evaluating both sides, where the right-hand side may be a sum to adjust
+it to the left-hand side:
+
+```rpl
+'A+1=B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { '4=16-12' }
+```
+
+For other expressions, it evaluates the expression normally:
+
+```rpl
+'A+1-B^2' STEQ
+A=3 B=4 EVALEQ {} +
+@ Expecting { -12 }
+```
+
+## Where
+
+Perform a substitution and evaluate the resulting expression.
+
+The `Where` command performs symbolic substitution in expressions.
+It takes an expression and a substitution rule (or list of rules) and applies
+the substitution.
+Substitutions can be expressed as equations or as a list .
+
+In equation form, variables matching the left-hand side of the equation are
+replaced by the expression on the rigth of the equation:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' 'Z=3-A' Where {} +
+@ Expecting { 'sin(3-A)=2·(3-A-1)↑2' }
+```
+
+Equations can be used in algebraic form and chained easily:
+
+```rpl
+'sin(Z)=2*(Z-A)^2|Z=3-A|A=B^3-1'
+@ Expecting 'sin(3-(B↑3-1))=2·(3-(B↑3-1)-(B↑3-1))↑2'
+```
+
+In list form, variables given in odd positions in the list are replaced by the
+expression given in the following even position in the list:
+
+```rpl
+'sin(Z)=2*(Z-1)^2' { Z '3-A' A 'B^3' } Where {} +
+@ Expecting { 'sin(3-B↑3)=2·(3-B↑3-1)↑2' }
+```
+mple# Time, Alarms and System Commands
 
 ## Date format
 
@@ -17447,7 +18432,19 @@ Note: the date format is intentionally different from the format on the HP-48.
 
 ## Date+
 
-Add days to a [date](#date). The date format is `YYYYMMDD`, with an optional fractional part defining the time, as in `YYYYMMDD.HHMMSS`, and an optional unit, as in `YYYMMDD_date`.
+Add days to a [date](#date). The date format is `YYYYMMDD`, with an optional
+fractional part defining the time, as in `YYYYMMDD.HHMMSS`, and an optional
+unit, as in `YYYMMDD_date`. The unit enables special rendering as a date.
+
+For example, to compute the date corresponding to 22222 days in the life of some
+anonymous programmer, you can use the following code:
+
+```rpl
+19681205 22222 DATE+
+@ Expecting Mon 8/Oct/2029
+```
+
+The opposite commands to compute the difference between dates is `DDays`.
 
 
 ## SetTime
@@ -17457,25 +18454,78 @@ Set current time from a stack value `HH.MMSSCC`.
 An HMS value can also be given, as returned by the `Time` command.
 
 
-## ToHMS
+## →HMS
 
-Convert decimal time to `HH.MMSS` format.
+Convert decimal time to `HH.MMSS` (Hours, Minutes, Seconds) format.
+
+For example, twelve hours and a half are converted to twelve hours and thirty
+minutes as follows:
+
+```rpl
+12.5 →HMS
+@ Expecting 12:30:00
+```
 
 
-## FromHMS
+## HMS→
 
-Convert time in `HH.MMSS` format to decimal time.
+Convert time in `HH.MMSS` (Hours, Minutes, Seconds) format to numerical time.
+
+DB48x converts the time as a fraction to keep the result exact:
+
+```rpl
+12.30 HMS→
+@ Expecting 12 ¹/₂
+```
 
 
 ## HMS+
 
 Add time in `HH.MMSS` format.
 
+```rpl
+10.30 2.40 HMS+
+@ Expecting 13:10:00
+```
+
 
 ## HMS-
 
 Subtract time in `HH.MMSS` format
 
+
+```rpl
+10.30 2.40 HMS-
+@ Expecting 7:50:00
+```
+
+## →DMS
+
+Convert value to DMS format.
+
+The `→DMS` command converts a decimal value to DMS (Degrees, Minutes, Seconds)
+format.
+The input is interpreted as decimal degrees and converted to the DMS format.
+The result is returned as a unit object with the `_dms` unit.
+
+```rpl
+12.5 →DMS
+@ Expecting 12°30′00″
+```
+
+## DMS→
+
+Convert value from DMS format.
+
+The `DMS→` command converts a DMS (Degrees, Minutes, Seconds) value to
+decimal format.
+The input can be a unit object with the `_dms` unit.
+The result is returned as a decimal value representing degrees.
+
+```rpl
+12.30 DMS→
+@ Expecting 12 ¹/₂
+```
 
 ## Ticks
 
@@ -17503,18 +18553,40 @@ to what is shown in the header, e.g. `23/Feb/2024` or `2024-02-23`.
 
 Number of days between dates.
 
+To compute the number of days in 2024, use:
+```rpl
+20250101 20240101 DDAYS
+@ Expecting 366 d
+```
 
 ## Time
 
 Return the current system time as a unit object in the form `HH.MMSS_hms`.
 This displays on the stack as `HH:MM:SS`.
 
-## TSTR
-
 
 ## JulianDayNumber
 
 Return the Julian day number for the given date and time
+
+To compute the Julian Day Number for the first day of the millenium:
+```rpl
+20000101 JDN
+@ Expecting 2 451 545
+```
+
+## DateFromJulianDayNumber
+
+Return the date for a given Julian day number.
+
+The `DateFromJulianDayNumber` command converts a Julian day number to a date.
+The input is a Julian day number, and the result is the corresponding date.
+It is the opposite of the `JDN` command.
+
+```rpl
+2451545 JDN→
+@ Expecting Sat 1/Jan/2000
+```
 
 ## ACK
 Acknowledge oldest alarm (dismiss)
@@ -17900,6 +18972,14 @@ List all code points in a Utf8 string
 
 Convert an object to its text representation.
 
+## ToDecimal
+
+Convert an object to its decimal representation.
+
+## ToFraction
+
+Convert an object to its fractional representation.
+
 ## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.
@@ -18085,7 +19165,7 @@ Many of them also have a symbolic primitive for symbolic integration.
 
 [Analytic function](#analytic-functions) returning the sine of the argument.
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `sin` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -18102,7 +19182,7 @@ part is in radians.
 
 [Analytic function](#analytic-functions) returning the cosine of the argument
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `cos` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -18117,7 +19197,7 @@ the specified angular unit overrides the angle mode to determine the result.
 
 [Analytic function](#analytic-functions) returning the tangent of the argument
 
-For real arguments, the current angle mode determines the number’s units, unless
+For real arguments, the current angle mode determines the number's units, unless
 angular units are specified. If the argument for `tan` is a unit object, then
 the specified angular unit overrides the angle mode to determine the result.
 
@@ -18179,16 +19259,11 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
-## LN
-
-Compute the natural logarithm
-
 ## LOG10
-
 Compute logarithm in base 10
 
 
-## ALOG
+## EXP10
 Compute anti-logarithm in base 10
 
 
@@ -18205,6 +19280,29 @@ Compute exp(x)-1
 
 ## LNP1
 Compute ln(x+1)
+
+
+## Ln1p
+Compute ln(x+1)
+
+
+## Expm1
+Compute exp(x)-1
+
+
+## Exp2
+Compute 2^x
+
+
+## HYPOT
+
+Calculate the hypotenuse given two values (x, y), i.e., sqrt(x^2 + y^2).
+
+ * Only works for numeric types (not integers, big integers, fractions, or complex numbers yet).
+ * Not optimized for special integer cases (e.g., 3-4-5 triangle).
+ * Not implemented for ranges or complex numbers (to be defined as sqrt(x^2 + y^2)).
+
+*This command is defined as `hypot` in the code and as `⊿` on the calculator.*
 # User Interface
 
 ## EditorCopy
