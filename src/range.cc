@@ -92,20 +92,35 @@ PARSE_BODY(range)
 // ----------------------------------------------------------------------------
 //   We accept the following formats: a…b, a±b and a±b%
 {
-    // Check if we have a first expression
-    algebraic_g xexpr = algebraic_p(+p.out);
-    if (!xexpr)
-        return ERROR;
-    if (!xexpr->is_real())
-        return SKIP;
-
     size_t max = p.length;
     if (!max)
         return SKIP;
-
-    // First character must be compatible with a range
     size_t  offs  = 0;
     unicode cp    = p.separator;
+
+    // Check if we have a first expression
+    algebraic_g xexpr = algebraic_p(+p.out);
+    bool        xisinf = false;
+
+    // Check if we start with −∞
+    if (!xexpr && !cp)
+    {
+        const size_t refsz = sizeof("−∞") - 1;
+        if (max < refsz || memcmp(+p.source, "−∞", refsz) != 0)
+            return SKIP;
+        offs += refsz;
+        p.separator = cp = utf8_codepoint(p.source + offs);
+        xexpr = rt.infinity(true);
+        xisinf = true;
+    }
+
+    if (!xexpr)
+        return ERROR;
+    if (!xisinf && !xexpr->is_real())
+        return SKIP;
+
+
+    // First character must be compatible with a range
     bool    imark = cp == range::INTERVAL_MARK;
     bool    pmark = cp == drange::PLUSMINUS_MARK;
     bool    smark = p.precedence != PARENTHESES && cp == uncertain::SIGMA_MARK;
@@ -120,12 +135,15 @@ PARSE_BODY(range)
             offs = utf8_next(p.source, offs, max);
     }
 
-    size_t   ysz  = max - offs;
-    object_p yobj = parse(p.source + offs, ysz, PARENTHESES, p.separator);
+    size_t   ysz    = max - offs;
+    bool     yisinf = utf8_codepoint(p.source + offs) == L'∞';
+    object_p yobj = yisinf
+        ? rt.infinity(false)
+        : parse(p.source + offs, ysz, PARENTHESES, p.separator);
     if (!yobj)
         return ERROR;
     algebraic_g yexpr = yobj->as_algebraic();
-    if (!yexpr || !yexpr->is_real())
+    if (!yexpr || (!yisinf && !yexpr->is_real()))
         return SKIP;
     offs += ysz;
 
@@ -180,9 +198,15 @@ RENDER_BODY(range)
     range_g     go = o;
     algebraic_g lo = go->lo();
     algebraic_g hi = go->hi();
-    lo->render(r);
+    if (lo->is_infinity())
+        r.put("−∞");
+    else
+        lo->render(r);
     r.put(unicode(range::INTERVAL_MARK));
-    hi->render(r);
+    if (hi->is_infinity())
+        r.put("∞");
+    else
+        hi->render(r);
     return r.size();
 }
 

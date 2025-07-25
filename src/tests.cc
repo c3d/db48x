@@ -5282,10 +5282,17 @@ void tests::range_types()
         .test(CLEAR, "1 3", ENTER, ID_ToUncertain).expect("1±3σ");
 
     step("Building range with infinity input")
+        .test(CLEAR, "−∞…∞", ENTER).expect("−∞…∞")
+        .test(DOWN).editor("−∞…∞").test(ENTER).expect("−∞…∞")
+        .test(CLEAR, "−∞…42", ENTER).expect("−∞…42")
+        .test(DOWN).editor("−∞…42").test(ENTER).expect("−∞…42")
+        .test(CLEAR, "42…∞", ENTER).expect("42…∞")
+        .test(DOWN).editor("42…∞").test(ENTER).expect("42…∞");
+    step("Building range from stack with infinity input")
         .test(CLEAR, "Ⓒ−∞ Ⓒ∞", ENTER, ID_ToRange).expect("−∞…∞")
         .test(CLEAR, "1 Ⓒ∞", ENTER, ID_ToRange).expect("1…∞")
         .test(CLEAR, "42 Ⓒ−∞", ENTER, ID_ToRange).expect("−∞…42");
-    step("Building range with invalid infinity input")
+    step("Building range from stack with invalid infinity input")
         .test(CLEAR, "Ⓒ−∞ Ⓒ−∞", ENTER, ID_ToRange)
         .error("Bad argument type")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞", ENTER, ID_ToRange)

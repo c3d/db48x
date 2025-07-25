@@ -317,6 +317,10 @@ retry:
     case L'∫':
         r = Primitive::do_parse(p);
         break;
+    case L'−':
+        r = range::do_parse(p);
+        if (r == OK)
+            break;
 
     default:
         // Symbols and commands
