@@ -5279,6 +5279,8 @@ void tests::range_types()
         .test(CLEAR, "1…3 2…5", NOSHIFT, MUL).expect("2…15");
     step("Divide intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
     step("Power intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, ID_pow).expect("1.…243.");
     step("Invert intervals")
@@ -5296,6 +5298,18 @@ void tests::range_types()
         .test(CLEAR, "1…3 5", NOSHIFT, DIV).expect("¹/₅…³/₅");
     step("Power intervals")
         .test(CLEAR, "1…3 5", NOSHIFT, ID_pow).expect("1…243");
+    step("Divide ranges divide by zero")
+        .test(CLEAR, "1…3 -2…5", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1…3 -2…5", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-26 FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
+    step("Invert ranges divide by zero")
+        .test(CLEAR, "-1…3", NOSHIFT, ID_inv).error("Divide by zero")
+        .test(EXIT).got("-1…3");
 
     step("Add intervals with promotion")
         .test(CLEAR, "5 1…3", NOSHIFT, ADD).expect("6…8");
@@ -5410,7 +5424,8 @@ void tests::range_types()
     step("Invert delta ranges")
         .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁");
     step("Invert delta ranges divide by zero")
-        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero");
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero")
+        .test(EXIT).got("1±3");
     step("Invert delta range with infinity result")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test(CLEAR, "-22 SF", ENTER).noerror()

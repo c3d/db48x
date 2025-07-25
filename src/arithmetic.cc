@@ -1548,6 +1548,7 @@ algebraic_p arithmetic::evaluate(id          op,
                     return re;
             return xc;
         }
+        return nullptr;
     }
 
     // Range data types
@@ -1563,6 +1564,7 @@ algebraic_p arithmetic::evaluate(id          op,
                         return xr->hi();
             return xr;
         }
+        return nullptr;
     }
 
     if (!x || !y)
