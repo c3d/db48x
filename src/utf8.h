@@ -396,7 +396,7 @@ inline bool is_valid_in_constant_name(unicode cp)
 //   In constants, we accept a few additional characters
 // ----------------------------------------------------------------------------
 {
-    return cp == L'ⅈ' || is_valid_in_name(cp);
+    return cp == L'ⅈ' || cp == L'−' || is_valid_in_name(cp);
 }
 
 
