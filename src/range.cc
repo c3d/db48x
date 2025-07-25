@@ -856,8 +856,9 @@ static object::result to_range(object::id ty)
     algebraic_g hi = algebraic_p(object::strip(rt.stack(0)));
     if (!lo || !hi)
         return object::ERROR;
-    if (!(lo->is_real() || lo->is_infinity() == -1) ||
-        !(hi->is_real() || hi->is_infinity() ==  1))
+    if (!(lo->is_real() || lo->is_infinity()) ||
+        !(hi->is_real() || hi->is_infinity()) ||
+        (lo->is_infinity() && lo->is_infinity() == hi->is_infinity()))
     {
         rt.type_error();
         return object::ERROR;
