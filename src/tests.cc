@@ -5271,6 +5271,44 @@ void tests::range_types()
         .test(CLEAR, ID_RangeMenu, "1", F3, "3", ENTER).expect("1±3%")
         .test(CLEAR, ID_RangeMenu, "1", F4, "3", ENTER).expect("1±3σ");
 
+    step("Building range from components")
+        .test(CLEAR, ID_RangeMenu, "1 3", ENTER, ID_ToRange)
+        .expect("1…3");
+    step("Building delta range from components")
+        .test(CLEAR, ID_RangeMenu, "1 3", ENTER, ID_ToDeltaRange)
+        .expect("2±1");
+    step("Building percent range from components")
+        .test(CLEAR, ID_RangeMenu, "1 3", ENTER, ID_ToPercentRange)
+        .expect("2±50%");
+    step("Building uncertain number from components")
+        .test(CLEAR, ID_RangeMenu, "1 3", ENTER, ID_ToUncertain)
+        .expect("1±3σ");
+
+    step("Building range from invalid components")
+        .test(CLEAR, ID_RangeMenu, "a 3", ENTER, ID_ToRange)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "1 b", ENTER, ID_ToRange)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "(0;1) (2;3)", ENTER, ID_ToRange)
+        .error("Bad argument type");
+    step("Building delta range from invalid components")
+        .test(CLEAR, ID_RangeMenu, "a 3", ENTER, ID_ToDeltaRange)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "1 'b+c'", ENTER, ID_ToDeltaRange)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "\"A\" 1", ENTER, ID_ToDeltaRange)
+        .error("Bad argument type");
+    step("Building percent range from invalid components")
+        .test(CLEAR, ID_RangeMenu, "a 3", ENTER, ID_ToDeltaRange)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "1 b", ENTER, ID_ToDeltaRange)
+        .error("Bad argument type");
+    step("Building uncertain number from invalid components")
+        .test(CLEAR, ID_RangeMenu, "a 3", ENTER, ID_ToUncertain)
+        .error("Bad argument type")
+        .test(CLEAR, ID_RangeMenu, "1 b", ENTER, ID_ToUncertain)
+        .error("Bad argument type");
+
     step("Add intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
     step("Subtract intervals")

@@ -856,8 +856,8 @@ static object::result to_range(object::id ty)
     algebraic_g hi = algebraic_p(object::strip(rt.stack(0)));
     if (!lo || !hi)
         return object::ERROR;
-    if (!(lo->is_real() || lo->is_symbolic()) ||
-        !(hi->is_real() || hi->is_symbolic()))
+    if (!(lo->is_real() || lo->is_infinity() == -1) ||
+        !(hi->is_real() || hi->is_infinity() ==  1))
     {
         rt.type_error();
         return object::ERROR;

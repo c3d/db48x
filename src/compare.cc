@@ -71,6 +71,23 @@ bool comparison::compare(int *cmp, algebraic_r x, algebraic_r y)
     id xt = x->type();
     id yt = y->type();
 
+    // Check infinities
+    if (xt == ID_constant || yt == ID_constant)
+    {
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
+        {
+            if (is_real(xt) || is_real(yt) || xinf != yinf)
+            {
+                *cmp = xinf - yinf;
+                return true;
+            }
+            // Compare two identical infinities: can't compare
+            return false;
+        }
+    }
+
     /* Integer types */
     if (is_integer(xt) && is_integer(yt))
     {
