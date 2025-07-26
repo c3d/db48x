@@ -10070,7 +10070,7 @@ The 38 variables in the Gases section are:
 * `P`: Pressure, or Flow pressure ([Isentropic Flow](#Isentropic Flow)) (dim.: force/area, in SI: pascal, Pa)
 * `P0`: Stagnation pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pc`: Pseudocritical pressure (dim.: force/area, in SI: pascal, Pa)
-* `Pi`: Initial pressure (dim.: force/area, in SI: pascal, Pa)
+* `Pin`: Initial pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pf`: Final pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pr`: Reduced pressure
 * `Pri`: Initial reduced ressure
@@ -10105,7 +10105,7 @@ T=16.85_°C  P=1_atm  V=25_l  MW=36_g/mol
 
 * To calculate `[Vf_l]` (Volume final) from 5 known variables:
 ```rpl
-Pi=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=100_°C  Tf=373.15_K
+Pin=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=100_°C  Tf=373.15_K
 @ Expecting [ Vf=2. l ]
 'ROOT(ⒺIdeal Gas Law Change;[Vf];[1_l])'
 ```
@@ -10127,7 +10127,7 @@ These equations describe a reversible pressure-volume change of an ideal gas suc
 
 * To calculate `[n_1;Tf_°F]` (Polytropic number; Final temperature) from 5 known variables:
 ```rpl
-Pi=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
+Pin=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
 @ Expecting [ n=1.22239 24213 4 Tf=303.98333 3333 K ]
 'ROOT(ⒺPolytropic Processes;[n;Tf];[1;1_K])'
 ```
@@ -10162,7 +10162,7 @@ This equation adapts the ideal gas state-change equation to emulate real-gas beh
 
 * To calculate `[Zi_1;Zf_1;Vf_l]` (Initial & Final gas compressibility correction factor; Final volume) from 7 known variables:
 ```rpl
-Pc=48_atm  Pi=100_kPa  Pf=50_kPa  Ti=348.15_K  Tc=298_K  Vi=10_l  Tf=523.15_K
+Pc=48_atm  Pin=100_kPa  Pf=50_kPa  Ti=348.15_K  Tc=298_K  Vi=10_l  Tf=523.15_K
 @ Expecting [ Zi=0.99550 62096 36 Zf=0.99938 68303 14 Vf=30.17028 92973 l ]
 'ROOT(ⒺReal Gas State Change;[Zi;Zf;Vf];[1;1;1_l])'
 ```
@@ -13064,6 +13064,58 @@ the `EquationsMenu` or the `LibEq` command.
 Library items are defined by the `config/library.csv`, and accessed using the
 `Library` command or the `XLib` command.
 
+
+## pi
+
+Return the π constant (approximately 3.14159).
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+pi →Num
+@ Expecting 3.14159 26535 9
+```
+
+## EulerianNumber
+
+Return the value of Euler's number (approximately 2.71828)
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+℮ →Num
+@ Expecting 2.71828 18284 6
+```
+
+## Infinity
+
+Return a positive infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+infinity
+@ Expecting ∞
+```
+
+## NegativeInfinity
+
+Return a negative infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+NegativeInfinity
+@ Expecting −∞
+```
 
 ## Constant
 

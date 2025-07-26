@@ -197,6 +197,62 @@ utf8 constant_menu::name(id type, size_t &len)
 }
 
 
+COMMAND_BODY(Pi)
+// ----------------------------------------------------------------------------
+//   Return the value of constant pi
+// ----------------------------------------------------------------------------
+{
+    if (algebraic_p pi = constant::lookup("π"))
+    {
+        if (Settings.NumericalConstants() || Settings.NumericalResults())
+            pi = constant_p(pi)->value();
+        if (pi && rt.push(pi))
+            return OK;
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(EulerianNumber)
+// ----------------------------------------------------------------------------
+//   Return the value of constant e
+// ----------------------------------------------------------------------------
+{
+    if (algebraic_p e = constant::lookup("e"))
+    {
+        if (Settings.NumericalConstants() || Settings.NumericalResults())
+            e = constant_p(e)->value();
+        if (e && rt.push(e))
+            return OK;
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(Infinity)
+// ----------------------------------------------------------------------------
+//   Return the value of positive infinity
+// ----------------------------------------------------------------------------
+{
+    if (object_p inf = rt.infinity(false))
+        if (rt.push(inf))
+            return OK;
+    return ERROR;
+}
+
+
+COMMAND_BODY(NegativeInfinity)
+// ----------------------------------------------------------------------------
+//   Return the value of negative infinity
+// ----------------------------------------------------------------------------
+{
+    if (object_p inf = rt.infinity(true))
+        if (rt.push(inf))
+            return OK;
+    return ERROR;
+}
+
+
 COMMAND_BODY(ConstantName)
 // ----------------------------------------------------------------------------
 //   Put the name of a constant on the stack

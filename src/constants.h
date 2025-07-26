@@ -220,6 +220,10 @@ public:
 #define CONSTANT_MENU(ConstantMenu)     struct ConstantMenu : constant_menu {};
 #include "ids.tbl"
 
+COMMAND_DECLARE(Pi, 0);
+COMMAND_DECLARE(EulerianNumber, 0);
+COMMAND_DECLARE(Infinity, 0);
+COMMAND_DECLARE(NegativeInfinity, 0);
 COMMAND_DECLARE_INSERT_HELP(ConstantName,-1);
 COMMAND_DECLARE_INSERT_HELP(ConstantValue,-1);
 COMMAND_DECLARE(Const, 1);

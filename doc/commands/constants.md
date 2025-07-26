@@ -10,6 +10,58 @@ Library items are defined by the `config/library.csv`, and accessed using the
 `Library` command or the `XLib` command.
 
 
+## pi
+
+Return the π constant (approximately 3.14159).
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+pi →Num
+@ Expecting 3.14159 26535 9
+```
+
+## EulerianNumber
+
+Return the value of Euler's number (approximately 2.71828)
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+℮ →Num
+@ Expecting 2.71828 18284 6
+```
+
+## Infinity
+
+Return a positive infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+infinity
+@ Expecting ∞
+```
+
+## NegativeInfinity
+
+Return a negative infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+NegativeInfinity
+@ Expecting −∞
+```
+
 ## Constant
 
 Returns the value of a constant from the constants library.

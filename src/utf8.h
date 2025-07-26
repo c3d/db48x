@@ -420,7 +420,7 @@ inline bool is_valid_as_name_initial(unicode cp)
     for (utf8 p = invalid; *p; p = utf8_next(p))
         if (cp == utf8_codepoint(p))
             return false;
-    return is_valid_in_name(cp);
+    return cp == L'−' || is_valid_in_name(cp);
 }
 
 

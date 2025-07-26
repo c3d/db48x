@@ -187,7 +187,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            range_types();
+            constants_menu();
 
 #if 0
         if (onlyCurrent & 2)
@@ -10774,6 +10774,22 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
+    step("Insert pi constant")
+        .test(CLEAR, "pi", ENTER).type(ID_constant).expect("π")
+        .test(ID_ToDecimal).expect("3.14159 26535 9")
+        .test(CLEAR, "π", ENTER).type(ID_constant).expect("π")
+        .test(ID_ToDecimal).expect("3.14159 26535 9");
+    step("Insert Euler's number")
+        .test(CLEAR, "EulerianNumber", ENTER).type(ID_constant).expect("e")
+        .test(ID_ToDecimal).expect("2.71828 18284 6")
+        .test(CLEAR, DIRECT("℮"), ENTER).type(ID_constant).expect("e")
+        .test(ID_ToDecimal).expect("2.71828 18284 6");
+    step("Insert positive infinity")
+        .test(CLEAR, "Infinity", ENTER).type(ID_constant).expect("∞")
+        .test(CLEAR, DIRECT("∞"), ENTER).type(ID_constant).expect("∞");
+    step("Insert negative infinity")
+        .test(CLEAR, "NegativeInfinity", ENTER).type(ID_constant).expect("−∞")
+        .test(CLEAR, DIRECT("−∞"), ENTER).type(ID_constant).expect("−∞");
 
     step("Check that numerical constants are adjusted with precision")
         .test(CLEAR,
@@ -10895,10 +10911,10 @@ void tests::constants_menu()
     step("i")
         .test(CLEAR, NOSHIFT, F3).expect("ⅈ")
         .test(LSHIFT, F3).expect("0+1ⅈ");
-    step("Undefined")
+    step("Infinity")
         .test(CLEAR, NOSHIFT, F4).expect("∞")
         .test(LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
-    step("Infinity")
+    step("Undefined")
         .test(CLEAR, NOSHIFT, F5).expect("?")
         .test(LSHIFT, F5).expect("Undefined");
     step("j")

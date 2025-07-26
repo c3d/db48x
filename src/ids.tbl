@@ -819,6 +819,10 @@ CMD(ApplyInverseUnit)
 CMD(ConvertToUnitPrefix)
 
 // Constants, equations and program library
+NAMED(Pi, "π")
+NAMED(EulerianNumber, "℮")
+NAMED(Infinity, "∞")
+NAMED(NegativeInfinity, "−∞")
 NAMED(Const, "LibraryConstant")
 CMD(ConstantName)
 CMD(ConstantValue)
