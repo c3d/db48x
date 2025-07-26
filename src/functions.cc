@@ -912,8 +912,13 @@ FUNCTION_BODY(inv)
     if (!x)
         return nullptr;
     if (x->is_symbolic())
+    {
+        if (Settings.AutoSimplify() && x->is_infinity())
+            return integer::make(0);
         return symbolic(ID_inv, x);
-    else if (x->type() == ID_array)
+    }
+
+    if (x->type() == ID_array)
         return array_p(+x)->invert();
 
     if (x->is_decimal())

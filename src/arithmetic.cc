@@ -141,12 +141,28 @@ algebraic_p arithmetic::optimize<add>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 {
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
+    if (Settings.AutoSimplify())
     {
-        if (x->is_zero(false) && !x->is_based()) // 0 + X = X
-            return y;
-        if (y->is_zero(false) && !y->is_based()) // X + 0 = X
-            return x;
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
+        {
+            if (xinf && yinf)
+            {
+                if (xinf == yinf)
+                    return x;
+                rt.undefined_operation_error();
+                return nullptr;
+            }
+            return xinf ? x : y;
+        }
+        if  (x->is_simplifiable() && y->is_simplifiable())
+        {
+            if (x->is_zero(false) && !x->is_based()) // 0 + X = X
+                return y;
+            if (y->is_zero(false) && !y->is_based()) // X + 0 = X
+                return x;
+        }
     }
     return nullptr;
 }
@@ -352,14 +368,31 @@ algebraic_p arithmetic::optimize<subtract>(algebraic_r x, algebraic_r y)
 //   Optimizations for subtractions
 // ----------------------------------------------------------------------------
 {
-    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
+    // Deal with basic auto-simplifications rules
+    if (Settings.AutoSimplify())
     {
-        if (y->is_zero(false) && !y->is_based())                  // X - 0 = X
-            return x;
-        if (x->is_same_as(y))                   // X - X = 0
-            return integer::make(0);
-        if (x->is_zero(false) && !x->is_based() && y->is_symbolic())
-            return neg::run(y);                 // 0 - X = -X
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
+        {
+            if (xinf && yinf)
+            {
+                if (xinf != yinf)
+                    return x;
+                rt.undefined_operation_error();
+                return nullptr;
+            }
+            return xinf ? +x : rt.infinity(yinf > 0);
+        }
+        if  (x->is_simplifiable() && y->is_simplifiable())
+        {
+            if (y->is_zero(false) && !y->is_based()) // X - 0 = X
+                return x;
+            if (x->is_same_as(y))                   // X - X = 0
+                return integer::make(0);
+            if (x->is_zero(false) && !x->is_based() && y->is_symbolic())
+                return neg::run(y);                 // 0 - X = -X
+        }
     }
 
     // Not yet implemented
@@ -529,22 +562,39 @@ algebraic_p arithmetic::optimize<multiply>(algebraic_r x, algebraic_r y)
 // ----------------------------------------------------------------------------
 {
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
+    if (Settings.AutoSimplify())
     {
-        if (x->is_zero(false) && !x->is_based()) // 0 * X = 0
-            return x;
-        if (y->is_zero(false) && !y->is_based()) // X * 0 = Y
-            return y;
-        if (x->is_one(false) && !x->is_based()) // 1 * X = X
-            return y;
-        if (y->is_one(false) && !y->is_based()) // X * 1 = X
-            return x;
-        if (x->is_symbolic() && x->is_same_as(y))
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
         {
-            if (constant_p cst = x->as<constant>())
-                if (cst->is_imaginary_unit())
-                    return integer::make(-1);
-            return sq::run(x);                  // X * X = X²
+            if (xinf && yinf)
+                return rt.infinity(xinf * yinf < 0);
+            if (x->is_zero(false) || y->is_zero(false))
+            {
+                rt.undefined_operation_error();
+                return nullptr;
+            }
+            return rt.infinity(x->is_negative() ^ y->is_negative());
+        }
+
+        if (x->is_simplifiable() && y->is_simplifiable())
+        {
+            if (x->is_zero(false) && !x->is_based()) // 0 * X = 0
+                return x;
+            if (y->is_zero(false) && !y->is_based()) // X * 0 = Y
+                return y;
+            if (x->is_one(false) && !x->is_based()) // 1 * X = X
+                return y;
+            if (y->is_one(false) && !y->is_based()) // X * 1 = X
+                return x;
+            if (x->is_symbolic() && x->is_same_as(y))
+            {
+                if (constant_p cst = x->as<constant>())
+                    if (cst->is_imaginary_unit())
+                        return integer::make(-1);
+                return sq::run(x);                  // X * X = X²
+            }
         }
     }
 
@@ -709,16 +759,34 @@ algebraic_p arithmetic::optimize<divide>(algebraic_r x, algebraic_r y)
         return zero_divide(x, y);
 
     // Deal with basic auto-simplifications rules
-    if (Settings.AutoSimplify() && x->is_simplifiable() && y->is_simplifiable())
+    if (Settings.AutoSimplify())
     {
-        if (x->is_zero(false) && !x->is_based()) // 0 / X = 0
-            return x;
-        if (y->is_one(false) && !y->is_based()) // X / 1 = X
-            return x;
-        if (x->is_one(false) && y->is_symbolic())
-            return inv::run(y);                 // 1 / X = X⁻¹
-        if (x->is_same_as(y))
-            return integer::make(1);            // X / X = 1
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
+        {
+            if (xinf && yinf)
+            {
+                rt.undefined_operation_error();
+                return nullptr;
+            }
+            if (yinf && x->is_real())
+                return integer::make(0);            // 1 / ∞ = 0
+            if (xinf && y->is_real())
+                return rt.infinity((xinf < 0) ^ y->is_negative());
+        }
+
+        if (x->is_simplifiable() && y->is_simplifiable())
+        {
+            if (x->is_zero(false) && !x->is_based()) // 0 / X = 0
+                return x;
+            if (y->is_one(false) && !y->is_based()) // X / 1 = X
+                return x;
+            if (x->is_one(false) && y->is_symbolic())
+                return inv::run(y);                 // 1 / X = X⁻¹
+            if (x->is_same_as(y))
+                return integer::make(1);            // X / X = 1
+        }
     }
 
     // Not yet implemented
@@ -1076,6 +1144,24 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
         if (Settings.ZeroPowerZeroIsUndefined())
             return rt.undefined_result();
         return integer::make(1);
+    }
+
+    int xinf = x->is_infinity();
+    int yinf = y->is_infinity();
+    if (xinf || yinf)
+    {
+        if (xinf > 0 && yinf > 0)
+            return rt.infinity(false);
+        if (xinf > 0 && y->is_real() && !y->is_zero())
+            return y->is_negative()
+                ? algebraic_p(integer::make(0))
+                : +x;
+        if (x->is_real() && !x->is_negative() && !x->is_zero() && yinf)
+            return yinf < 0
+                ? algebraic_p(integer::make(0))
+                : rt.infinity(false);
+        rt.undefined_operation_error();
+        return nullptr;
     }
 
     // Deal with X^N where N is a positive  or negative integer
