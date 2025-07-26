@@ -433,7 +433,8 @@ PARSE_BODY(rectangular)
     }
     bool     sp    = utf8_whitespace(cp);
     size_t   imsz  = max - offs;
-    object_p imobj = sp ? nullptr : parse(p.source + offs, imsz, PARENTHESES);
+    object_p imobj = sp ? nullptr : parse(p.source + offs, imsz,
+                                          PARENTHESES, p.separator);
     if (!imobj)
     {
         rt.clear_error();

@@ -424,29 +424,29 @@ retry:
                 p.separator = cp;
 
                 if (maybe_range)
-                {
                     r2 = range::do_parse(p);
-                    if (r2 == OK)
-                    {
-                        parsed = p.length;
-                        length -= parsed;
-                        p.length = length;
-                        p.source += parsed;
-                        size += parsed;
-                        cp = length
-                            ? utf8_codepoint(p.source)
-                            : 0;
-                        maybe_unit = cp == '_' || cp == settings::SPACE_UNIT;
-                        if (maybe_unit)
-                            p.separator = cp;
-                        r2 = SKIP;
-                    }
-                }
-                if (maybe_rect)
+                else if (maybe_rect)
                     r2 = rectangular::do_parse(p);
                 else if (maybe_polar)
                     r2 = polar::do_parse(p);
-                else if (maybe_unit)
+
+                if (r2 == OK)
+                {
+                    parsed = p.length;
+                    length -= parsed;
+                    p.length = length;
+                    p.source += parsed;
+                    size += parsed;
+                    cp = length
+                        ? utf8_codepoint(p.source)
+                        : 0;
+                    maybe_unit = cp == '_' || cp == settings::SPACE_UNIT;
+                    if (maybe_unit)
+                        p.separator = cp;
+                    r2 = SKIP;
+                }
+
+                if (maybe_unit)
                     r2 = unit::do_parse(p);
                 else if (maybe_fcall)
                     r2 = funcall::do_parse(p);

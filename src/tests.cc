@@ -4866,6 +4866,9 @@ void tests::complex_types()
     step("Syntax error for empty phase")
         .test(CLEAR, "1∡", ENTER)
         .error("Syntax error");
+
+    step("Add units to complex number")
+        .test(CLEAR, "3.5ⅈ4.2_Ω", ENTER).expect("3.5+4.2ⅈ Ω");
 }
 
 
