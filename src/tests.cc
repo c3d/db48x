@@ -10790,6 +10790,10 @@ void tests::constants_menu()
     step("Insert negative infinity")
         .test(CLEAR, "NegativeInfinity", ENTER).type(ID_constant).expect("−∞")
         .test(CLEAR, DIRECT("−∞"), ENTER).type(ID_constant).expect("−∞");
+    step("Negate infinities")
+        .test(CLEAR, DIRECT("∞"), ENTER).expect("∞")
+        .test(CHS).expect("−∞")
+        .test(CHS).expect("∞");
 
     step("Check that numerical constants are adjusted with precision")
         .test(CLEAR,

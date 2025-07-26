@@ -505,6 +505,8 @@ FUNCTION_BODY(neg)
     case ID_local:
     case ID_symbol:
     case ID_constant:
+        if (int inf = x->is_infinity())
+            return rt.infinity(inf > 0);
         return symbolic(ID_neg, x);
     case ID_polynomial:
     {
