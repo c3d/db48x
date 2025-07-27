@@ -326,8 +326,10 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 
     if (is_complex(xt))
         return algebraic_p(ops.zop(complex_g(complex_p(+x))));
-    if (is_range(xt))
+    if (is_strict_range(xt))
         return algebraic_p(ops.rop(range_g(range_p(+x))));
+    if (xt == ID_uncertain)
+        return algebraic_p(ops.uop(uncertain_g(uncertain_p(+x))));
 
     // Check if need to promote integer values to decimal
     if (is_integer(xt))

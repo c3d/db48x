@@ -1162,3 +1162,299 @@ uncertain_p operator^(uncertain_r x, uncertain_r y)
 {
     return bivariate(x, y, pow::evaluate, pow_dfdx, pow_dfdy);
 }
+
+
+
+// ============================================================================
+//
+//   Functions on uncertain numbers
+//
+// ============================================================================
+
+static algebraic_p approx_dfdx(algebraic_r x, algebraic_fn f)
+// ----------------------------------------------------------------------------
+//   Approximate differentiation when no symbolic differential exists
+// ----------------------------------------------------------------------------
+{
+    algebraic_g eps = decimal::make(1,-6);
+    algebraic_g h = x * eps;
+    algebraic_g h2 = h + h;
+    algebraic_g fp = f(x + h);
+    algebraic_g fn = f(x - h);
+    algebraic_g df = fp - fn;
+    algebraic_g fp2 = f(x + h2);
+    algebraic_g fn2 = f(x - h2);
+    algebraic_g df2 = fp2 - fn2;
+    df = df + df;               // x2
+    df = df + df;               // x4
+    df = df + df;               // x8
+    df = df2 - df;
+    h = h + h2;                 // x3
+    h = h + h;                  // x6
+    h = h + h;                  // x12
+
+    return df / h;
+}
+
+
+static uncertain_p univariate(algebraic_fn f,
+                              uncertain_r   x,
+                              algebraic_fn dfdx = nullptr)
+// ----------------------------------------------------------------------------
+//   Unary functions
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    algebraic_g xs = x->stddev();
+    algebraic_g xa = x->average();
+
+    algebraic_g fa = f(xa);
+    algebraic_g dxv = dfdx ? dfdx(xa) : approx_dfdx(xa, f);
+    algebraic_g fs = abs::evaluate(dxv * xs);
+
+    if (!fa || !fs)
+        return nullptr;
+    return uncertain::make(fa, fs);
+}
+
+
+
+UNCERTAIN_BODY(sqrt)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of sqrt (monotonic)
+// ----------------------------------------------------------------------------
+{
+    return univariate(sqrt::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(cbrt)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of cbrt (monotonic)
+// ----------------------------------------------------------------------------
+{
+    return univariate(cbrt::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(sin)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of sin
+// ----------------------------------------------------------------------------
+{
+    return univariate(sin::evaluate, u);
+}
+
+UNCERTAIN_BODY(cos)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of cos
+// ----------------------------------------------------------------------------
+{
+    return univariate(cos::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(tan)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of tan
+// ----------------------------------------------------------------------------
+{
+    return univariate(tan::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(asin)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of asin
+// ----------------------------------------------------------------------------
+{
+    return univariate(asin::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(acos)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of acos
+// ----------------------------------------------------------------------------
+{
+    return univariate(acos::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(atan)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of atan
+// ----------------------------------------------------------------------------
+{
+    return univariate(atan::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(sinh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of sinh
+// ----------------------------------------------------------------------------
+{
+    return univariate(sinh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(cosh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of cosh
+// ----------------------------------------------------------------------------
+{
+    return univariate(cosh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(tanh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of tanh
+// ----------------------------------------------------------------------------
+{
+    return univariate(tanh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(asinh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of asinh
+// ----------------------------------------------------------------------------
+{
+    return univariate(asinh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(acosh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of acosh
+// ----------------------------------------------------------------------------
+{
+    return univariate(acosh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(atanh)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of atanh
+// ----------------------------------------------------------------------------
+{
+    return univariate(atanh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(ln1p)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of ln1p
+// ----------------------------------------------------------------------------
+{
+    return univariate(ln1p::evaluate, u);
+}
+
+UNCERTAIN_BODY(expm1)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of expm1
+// ----------------------------------------------------------------------------
+{
+    return univariate(expm1::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(ln)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of log
+// ----------------------------------------------------------------------------
+{
+    return univariate(ln::evaluate, u);
+}
+
+UNCERTAIN_BODY(log10)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of log10
+// ----------------------------------------------------------------------------
+{
+    return univariate(log10::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(log2)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of log2
+// ----------------------------------------------------------------------------
+{
+    return univariate(log2::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(exp)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of exp
+// ----------------------------------------------------------------------------
+{
+    return univariate(exp::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(exp10)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of exp10
+// ----------------------------------------------------------------------------
+{
+    return univariate(exp10::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(exp2)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of exp2
+// ----------------------------------------------------------------------------
+{
+    return univariate(exp2::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(erf)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of erf
+// ----------------------------------------------------------------------------
+{
+    return univariate(erf::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(erfc)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of erfc
+// ----------------------------------------------------------------------------
+{
+    return univariate(erfc::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(tgamma)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of tgamma
+// ----------------------------------------------------------------------------
+{
+    return univariate(tgamma::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(lgamma)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of lgamma
+// ----------------------------------------------------------------------------
+{
+    return univariate(lgamma::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(abs)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of abs
+// ----------------------------------------------------------------------------
+{
+    return univariate(abs::evaluate, u);
+}

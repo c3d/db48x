@@ -176,6 +176,42 @@ struct uncertain : range
 
     enum { SIGMA_MARK = L'σ' };
 
+    // Uncertain number implementation for main functions
+#define UNCERTAIN_FUNCTION(name)    static uncertain_p name(uncertain_r u)
+
+#define UNCERTAIN_BODY(name)        uncertain_p uncertain::name(uncertain_r u)
+
+    UNCERTAIN_FUNCTION(sqrt);
+    UNCERTAIN_FUNCTION(cbrt);
+
+    UNCERTAIN_FUNCTION(sin);
+    UNCERTAIN_FUNCTION(cos);
+    UNCERTAIN_FUNCTION(tan);
+    UNCERTAIN_FUNCTION(asin);
+    UNCERTAIN_FUNCTION(acos);
+    UNCERTAIN_FUNCTION(atan);
+
+    UNCERTAIN_FUNCTION(sinh);
+    UNCERTAIN_FUNCTION(cosh);
+    UNCERTAIN_FUNCTION(tanh);
+    UNCERTAIN_FUNCTION(asinh);
+    UNCERTAIN_FUNCTION(acosh);
+    UNCERTAIN_FUNCTION(atanh);
+
+    UNCERTAIN_FUNCTION(ln1p);
+    UNCERTAIN_FUNCTION(expm1);
+    UNCERTAIN_FUNCTION(ln);
+    UNCERTAIN_FUNCTION(log10);
+    UNCERTAIN_FUNCTION(log2);
+    UNCERTAIN_FUNCTION(exp);
+    UNCERTAIN_FUNCTION(exp10);
+    UNCERTAIN_FUNCTION(exp2);
+    UNCERTAIN_FUNCTION(erf);
+    UNCERTAIN_FUNCTION(erfc);
+    UNCERTAIN_FUNCTION(tgamma);
+    UNCERTAIN_FUNCTION(lgamma);
+
+    UNCERTAIN_FUNCTION(abs);
 
 public:
     OBJECT_DECL(uncertain);

@@ -5734,87 +5734,40 @@ void tests::uncertain_operations()
     step("Power uncertain numbers")
         .test(CLEAR, "5 1±σ3", NOSHIFT, ID_pow).expect("5±σ24.14156 86865");
 
-#if 0
 #define TFNA(name, arg)                                         \
     step(#name " (uncertain number)").test(CLEAR, arg " " #name, ENTER)
 #define TFN(name)  TFNA(name, "1±σ3")
 
-    TFN(sqrt).expect("1.…1.73205 08075 7");
-    TFN(sin).expect("0.01745 24064 37…0.05233 59562 43");
-    TFNA(sin, "-45…45").expect("-0.70710 67811 87…0.70710 67811 87");
-    TFNA(sin, "-45…90").expect("-0.70710 67811 87…1");
-    TFNA(sin, "-45…120").expect("-0.70710 67811 87…1");
-    TFNA(sin, "-45…180").expect("-0.70710 67811 87…1");
-    TFNA(sin, "-45…270").expect("-1…1");
-    TFNA(sin, " 45…270").expect("-1…1");
-    TFNA(sin, "135…270").expect("-1…0.70710 67811 87");
-    TFNA(sin, "150…190").expect("-0.17364 81776 67…¹/₂");
-    TFNA(sin, "170…210").expect("-¹/₂…0.17364 81776 67");
-    TFNA(sin, "240…280").expect("-1…-0.86602 54037 84");
-    TFNA(sin, "260…300").expect("-1…-0.86602 54037 84");
-    TFNA(sin, "240…360").expect("-1…0");
-    TFNA(sin, "-45…360").expect("-1…1");
-    TFNA(sin, "-45…480").expect("-1…1");
-    TFNA(sin, "120…480").expect("-1…1");
-    TFN(cos).expect("0.99862 95347 55…0.99984 76951 56");
-    TFNA(cos, "-45…45").expect("0.70710 67811 87…1");
-    TFNA(cos, "-45…90").expect("0…1");
-    TFNA(cos, "-45…120").expect("-¹/₂…1");
-    TFNA(cos, "-45…180").expect("-1…1");
-    TFNA(cos, "-45…270").expect("-1…1");
-    TFNA(cos, " 45…270").expect("-1…0.70710 67811 87");
-    TFNA(cos, "135…270").expect("-1…0");
-    TFNA(cos, "150…190").expect("-1…-0.86602 54037 84");
-    TFNA(cos, "170…210").expect("-1…-0.86602 54037 84");
-    TFNA(cos, "240…280").expect("-¹/₂…0.17364 81776 67");
-    TFNA(cos, "260…300").expect("-0.17364 81776 67…¹/₂");
-    TFNA(cos, "240…360").expect("-¹/₂…1");
-    TFNA(cos, "-45…360").expect("-1…1");
-    TFNA(cos, "-45…480").expect("-1…1");
-    TFNA(cos, "120…480").expect("-1…1");
-    TFN(tan).expect("0.01745 50649 28…0.05240 77792 83");
-    TFNA(tan, "-45…45").expect("-1…1");
-    TFNA(tan, "-45…90").expect("−∞…∞");
-    TFNA(tan, "-45…120").expect("−∞…∞");
-    TFNA(tan, "-45…180").expect("−∞…∞");
-    TFNA(tan, "-45…270").expect("−∞…∞");
-    TFNA(tan, " 45…270").expect("−∞…∞");
-    TFNA(tan, "135…270").expect("−∞…∞");
-    TFNA(tan, "150…190").expect("-0.57735 02691 9…0.17632 69807 08");
-    TFNA(tan, "170…210").expect("-0.17632 69807 08…0.57735 02691 9");
-    TFNA(tan, "240…280").expect("−∞…∞");
-    TFNA(tan, "260…300").expect("−∞…∞");
-    TFNA(tan, "240…360").expect("−∞…∞");
-    TFNA(tan, "-45…360").expect("−∞…∞");
-    TFNA(tan, "-45…480").expect("−∞…∞");
-    TFNA(tan, "120…480").expect("−∞…∞");
-    TFNA(asin, "0.25…0.5").expect("14.47751 21859 °…30. °");
-    TFNA(acos, "0.25…0.5").expect("60. °…75.52248 78141 °");
-    TFN(atan).expect("45. °…71.56505 11771 °");
-    TFN(sinh).expect("1.17520 11936 4…10.01787 49274");
-    TFN(cosh).expect("1.54308 06348 2…10.06766 19958");
-    TFN(tanh).expect("0.76159 41559 56…0.99505 47536 87");
-    TFN(asinh).expect("0.88137 35870 2…1.81844 64592 3");
-    TFNA(acosh, "1.321…1.325").expect("0.78123 02051 96…0.78584 80192 36");
-    TFNA(atanh, "0.321…0.325").expect("0.33276 15884 82…0.33722 75237 74");
-    TFN(ln1p).expect("0.69314 71805 6…1.38629 43611 2");
-    TFN(lnp1).expect("0.69314 71805 6…1.38629 43611 2");
-    TFN(expm1).expect("1.71828 18284 6…19.08553 69232");
-    TFN(ln).expect("0.…1.09861 22886 7");
-    TFN(log10).expect("0.…0.47712 12547 2");
-    TFN(exp).expect("2.71828 18284 6…20.08553 69232");
-    TFN(exp10).expect("10.…1 000.");
-    TFN(exp2).expect("2.…8.");
-    TFN(erf).expect("0.84270 07929 5…0.99997 79095 03");
-    TFN(erfc).expect("0.00002 20904 97…0.15729 92070 5");
-    TFN(tgamma).expect("1.…2.");
-    TFN(lgamma).expect("0.…0.69314 71805 6");
-    TFN(gamma).expect("1.…2.");
-    TFN(cbrt).expect("1.…1.44224 95703 1");
-    TFN(norm).expect("1…3");
+    TFN(sqrt).expect("1.±σ1.5");
+    TFN(sin).expect("0.01745 24064 37±σ0.05235 19028 97");
+    TFN(cos).expect("0.99984 76951 56±σ0.00091 38058 64");
+    TFN(tan).expect("0.01745 50649 28±σ0.05237 58305 3");
+    TFNA(asin, "0.25±σ0.5").expect("14.47751 21859 °±σ29.58741 3315 °");
+    TFNA(acos, "0.25±σ0.5").expect("75.52248 78141 °±σ29.58741 3315 °");
+    TFN(atan).expect("45. °±σ85.94366 92696 °");
+    TFN(sinh).expect("1.17520 11936 4±σ4.62924 19044 5");
+    TFN(cosh).expect("1.54308 06348 2±σ3.52560 35809 3");
+    TFN(tanh).expect("0.76159 41559 56±σ1.25992 30248 4");
+    TFN(asinh).expect("0.88137 35870 2±σ2.12132 03435 6");
+    TFNA(acosh, "1.321±σ1.325").expect("0.78123 02051 96±σ1.53506 15435");
+    TFNA(atanh, "0.321±σ0.325").expect("0.33276 15884 82±σ0.36233 54021 76");
+    TFN(ln1p).expect("0.69314 71805 6±σ1.5");
+    TFN(lnp1).expect("0.69314 71805 6±σ1.5");
+    TFN(expm1).expect("1.71828 18284 6±σ8.15484 54853 8");
+    TFN(ln).expect("0.±σ3.");
+    TFN(log10).expect("0.±σ1.30288 34457 1");
+    TFN(exp).expect("2.71828 18284 6±σ8.15484 54853 8");
+    TFN(exp10).expect("10.±σ69.07755 27898");
+    TFN(exp2).expect("2.±σ4.15888 30833 6");
+    TFN(erf).expect("0.84270 07929 5±σ1.24532 24922 6");
+    TFN(erfc).expect("0.15729 92070 5±σ1.24532 24922 6");
+    TFN(tgamma).expect("1.±σ1.73164 69947");
+    TFN(lgamma).expect("0.±σ1.73164 69947");
+    TFN(gamma).expect("1.±σ1.73164 69947");
+    TFN(cbrt).expect("1.±σ1.");
+    TFN(norm).expect("1±σ3");
 #undef TFN
 #undef TFNA
-#endif
 
     step("Exploding uncertain numbers")
         .test(CLEAR, "1±σ3", ID_ObjectMenu, ID_Explode)
