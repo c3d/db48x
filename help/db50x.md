@@ -4332,6 +4332,44 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.11 "Prayer" - Uncertain number
+
+This release implements arithmetic and basic functions on uncertain numbers.
+This propagates uncertainty using quadradic superposition, in a way similar to
+OpenRPNCalc, with a generalization for correlated variables.
+
+### New features
+
+* Arithmetic and basic functions on uncertain numbers
+* Add support for complex-valued unit objects, e.g. `5+3ⅈ Ω`
+* Add support for range-valued unit objects, e.g. `1…3 Ω`
+* Support arithmetic operation on infinities, e.g. `∞ 42 +`
+* Add commands to generate mathematical constants (π, ℮, ∞ and −∞)
+* Parsing and editing of ranges containing infinities
+* Accept infinities in `→Range` and variants
+* Comparison of infinite values and finite values
+* Add union and intersection commands for ranges
+* Add operations to build ranges and uncertain numbers from components
+* Add derivative for `erf` and `erfc`
+
+### Bug fixes
+
+* Do not leave bad expressions behind after errors on ranges
+* Obey the `InfinityError` flag when detecting divide-by-zero in ranges
+* Avoid crash pushing null pointer after unit evaluation error
+* Avoid spurious inconsistent units error due to date computations
+* Null-protection in variadic `list::make`, fixes null-deref crash
+
+### Improvements
+
+* Accelerate error exit from arithmetic operations
+* Render uncertain numbers as `110±σ15` instead of `110±15σ`
+* Accept `−` as valid input in constants (for `−∞`)
+* Record performance data for iPhone 16
+* Change spelling to `→σRange` in `RangeMenu`
+* Use `ASSERT` for divide by zero inner checks (remove dead code)
+
+
 ## Release 0.9.10  "Best" - Ranges and documentation
 
 This release is primarily a refinement of ranges and a documentation update.
