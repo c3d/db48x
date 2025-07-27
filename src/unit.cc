@@ -329,7 +329,7 @@ EVAL_BODY(unit)
         }
         value = unit::simple(value, uexpr);
     }
-    return rt.push(+value) ? OK : ERROR;
+    return (value && rt.push(+value)) ? OK : ERROR;
 }
 
 
