@@ -16497,7 +16497,7 @@ components for the low and high value.
 
 ```rpl
 1 2 →σRange
-@ Expecting 1±2σ
+@ Expecting 1±σ2
 ```
 
 

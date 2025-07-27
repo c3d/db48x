@@ -5254,11 +5254,11 @@ void tests::range_types()
     step("Percentage form")
         .test(CLEAR, "1±300%", ENTER).type(ID_prange).expect("1±300%");
     step("Uncertain (sigma at end)")
-        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±3σ");
+        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±σ3");
     step("Uncertain (sigma at beginning)")
-        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±σ3");
     step("Uncertain (sigma in the middle)")
-        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±3σ");
+        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±σ3");
 
     step("Cycle")
         .test(CLEAR, "1…3", ENTER).expect("1…3")
@@ -5273,7 +5273,7 @@ void tests::range_types()
         .test(CLEAR, "1", F1, "3", ENTER).expect("1…3")
         .test(CLEAR, "1", F2, "3", ENTER).expect("1±3")
         .test(CLEAR, "1", F3, "3", ENTER).expect("1±3%")
-        .test(CLEAR, "1", F4, "3", ENTER).expect("1±3σ");
+        .test(CLEAR, "1", F4, "3", ENTER).expect("1±σ3");
 
     step("Building range from components")
         .test(CLEAR, "1 3", ENTER, ID_ToRange).expect("1…3");
@@ -5282,7 +5282,7 @@ void tests::range_types()
     step("Building percent range from components")
         .test(CLEAR, "1 3", ENTER, ID_ToPercentRange).expect("2±50%");
     step("Building uncertain number from components")
-        .test(CLEAR, "1 3", ENTER, ID_ToUncertain).expect("1±3σ");
+        .test(CLEAR, "1 3", ENTER, ID_ToUncertain).expect("1±σ3");
 
     step("Building range with infinity input")
         .test(CLEAR, "−∞…∞", ENTER).expect("−∞…∞")

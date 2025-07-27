@@ -270,8 +270,8 @@ RENDER_BODY(uncertain)
     algebraic_g s = go->stddev();
     a->render(r);
     r.put(unicode(drange::PLUSMINUS_MARK));
-    s->render(r);
     r.put(unicode(uncertain::SIGMA_MARK));
+    s->render(r);
     return r.size();
 }
 
