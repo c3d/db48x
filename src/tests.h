@@ -90,6 +90,7 @@ struct tests
     void complex_functions();
     void complex_promotion();
     void range_types();
+    void uncertain_operations();
     void units_and_conversions();
     void list_functions();
     void sorting_functions();

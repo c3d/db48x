@@ -117,11 +117,12 @@ public:
 };
 
 
-range_g operator-(range_r x);
-range_g operator+(range_r x, range_r y);
-range_g operator-(range_r x, range_r y);
-range_g operator*(range_r x, range_r y);
-range_g operator/(range_r x, range_r y);
+range_p operator-(range_r x);
+range_p operator+(range_r x, range_r y);
+range_p operator-(range_r x, range_r y);
+range_p operator*(range_r x, range_r y);
+range_p operator/(range_r x, range_r y);
+range_p operator^(range_r x, range_r y);
 
 
 struct drange : range
@@ -181,6 +182,14 @@ public:
     RENDER_DECL(uncertain);
     HELP_DECL(uncertain);
 };
+
+uncertain_p operator-(uncertain_r x);
+uncertain_p operator+(uncertain_r x, uncertain_r y);
+uncertain_p operator-(uncertain_r x, uncertain_r y);
+uncertain_p operator*(uncertain_r x, uncertain_r y);
+uncertain_p operator/(uncertain_r x, uncertain_r y);
+uncertain_p operator^(uncertain_r x, uncertain_r y);
+
 
 COMMAND_DECLARE(ToRange, 2);
 COMMAND_DECLARE(ToDeltaRange, 2);

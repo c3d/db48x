@@ -570,10 +570,14 @@ FUNCTION_BODY(neg)
     case ID_range:
     case ID_drange:
     case ID_prange:
-    case ID_uncertain:
     {
         range_g r = range_p(+x);
         return -r;
+    }
+    case ID_uncertain:
+    {
+        uncertain_g u = uncertain_p(+x);
+        return -u;
     }
     case ID_unit:
         return unit::simple(neg::run(unit_p(+x)->value()),

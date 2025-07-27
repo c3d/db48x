@@ -352,13 +352,32 @@ bool add::complex_ok(complex_g &x, complex_g &y)
 }
 
 
+static bool range_binary(range_g &x, range_g &y,
+                         range_p (*rfn)(range_r, range_r),
+                         uncertain_p (*ufn)(uncertain_r, uncertain_r))
+// ----------------------------------------------------------------------------
+//   Check if we deal with an uncertain number or with regular ranges
+// ----------------------------------------------------------------------------
+{
+    if (x->type() == object::ID_uncertain)
+    {
+        if (y->type() == object::ID_uncertain)
+        {
+            x = ufn((uncertain_r) x, (uncertain_r) y);
+            return x;
+        }
+    }
+    x = rfn(x, y);
+    return x;
+}
+
+
 bool add::range_ok(range_g &x, range_g &y)
 // ----------------------------------------------------------------------------
 //   Add ranges if we have them
 // ----------------------------------------------------------------------------
 {
-    x = x + y;
-    return x;
+    return range_binary(x, y, operator+, operator+);
 }
 
 
@@ -550,8 +569,7 @@ bool subtract::range_ok(range_g &x, range_g &y)
 //   Subtract ranges if we have them
 // ----------------------------------------------------------------------------
 {
-    x = x - y;
-    return x;
+    return range_binary(x, y, operator-, operator-);
 }
 
 
@@ -743,8 +761,7 @@ bool multiply::range_ok(range_g &x, range_g &y)
 //   Multiply ranges if we have them
 // ----------------------------------------------------------------------------
 {
-    x = x * y;
-    return x;
+    return range_binary(x, y, operator*, operator*);
 }
 
 
@@ -951,8 +968,7 @@ bool divide::range_ok(range_g &x, range_g &y)
 //   Divide ranges if we have them
 // ----------------------------------------------------------------------------
 {
-    x = x / y;
-    return x;
+    return range_binary(x, y, operator/, operator/);
 }
 
 
@@ -1184,7 +1200,7 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
         }
 
         // Do not expand X^3 or integers when y>=0
-        if (x->is_symbolic())
+        if (x->is_symbolic() || x->type() == ID_uncertain)
             return nullptr;
 
         // Deal with X^N where N is a positive integer
@@ -1310,8 +1326,7 @@ bool pow::range_ok(range_g &x, range_g &y)
 //   Implement x^y as exp(y * log(x))
 // ----------------------------------------------------------------------------
 {
-    x = range::exp(y * range::ln(x));
-    return x;
+    return range_binary(x, y, operator^, operator^);
 }
 
 
@@ -1636,7 +1651,7 @@ algebraic_p arithmetic::evaluate(id          op,
         return nullptr;
     }
 
-    // Range data types
+    // Range data types and uncertain numbers
     if (range_promotion(x, y))
     {
         range_g xr = range_p(algebraic_p(x));
@@ -1644,9 +1659,19 @@ algebraic_p arithmetic::evaluate(id          op,
         if (ops.range_ok(xr, yr))
         {
             if (Settings.AutoSimplify())
-                if (algebraic_p diff = xr->hi() - xr->lo())
-                    if (diff->is_zero(false))
-                        return xr->hi();
+            {
+                if (uncertain_p xu = xr->as<uncertain>())
+                {
+                    if (xu->stddev()->is_zero(false))
+                        return xu->average();
+                }
+                else
+                {
+                    if (algebraic_p diff = xr->hi() - xr->lo())
+                        if (diff->is_zero(false))
+                            return xr->hi();
+                }
+            }
             return xr;
         }
         return nullptr;

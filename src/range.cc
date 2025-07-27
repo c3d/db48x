@@ -38,6 +38,8 @@
 #include "tag.h"
 #include "unit.h"
 #include "utf8.h"
+#include "variables.h"
+
 
 
 // ============================================================================
@@ -326,7 +328,7 @@ algebraic_p range::as_uncertain() const
 //
 // ============================================================================
 
-range_g operator-(range_r x)
+range_p operator-(range_r x)
 // ----------------------------------------------------------------------------
 //  Unary minus for ranges
 // ----------------------------------------------------------------------------
@@ -337,7 +339,7 @@ range_g operator-(range_r x)
 }
 
 
-range_g operator+(range_r x, range_r y)
+range_p operator+(range_r x, range_r y)
 // ----------------------------------------------------------------------------
 //   Range addition
 // ----------------------------------------------------------------------------
@@ -350,7 +352,7 @@ range_g operator+(range_r x, range_r y)
 }
 
 
-range_g operator-(range_r x, range_r y)
+range_p operator-(range_r x, range_r y)
 // ----------------------------------------------------------------------------
 //   Range subtraction
 // ----------------------------------------------------------------------------
@@ -363,7 +365,7 @@ range_g operator-(range_r x, range_r y)
 }
 
 
-range_g operator*(range_r x, range_r y)
+range_p operator*(range_r x, range_r y)
 // ----------------------------------------------------------------------------
 //   Range multiplication - Here we need to compare things
 // ----------------------------------------------------------------------------
@@ -388,7 +390,7 @@ range_g operator*(range_r x, range_r y)
 }
 
 
-range_g operator/(range_r x, range_r y)
+range_p operator/(range_r x, range_r y)
 // ----------------------------------------------------------------------------
 //   Range division - Here we need to compare things too
 // ----------------------------------------------------------------------------
@@ -423,6 +425,15 @@ range_g operator/(range_r x, range_r y)
     range::sort(b, d);
     range::sort(c, d);
     return range::make(y->type(), a, d);
+}
+
+
+range_p operator^(range_r x, range_r y)
+// ----------------------------------------------------------------------------
+//   Power operator
+// ----------------------------------------------------------------------------
+{
+    return range::exp(y * range::ln(x));
 }
 
 
@@ -940,7 +951,7 @@ static object::result range_op(bool intersect)
     range_g b = range_p(object::strip(rt.stack(0)));
     if (!a || !b)
         return object::ERROR;
-    if (!a->is_range() || !b->is_range())
+    if (!a->is_strict_range() || !b->is_strict_range())
     {
         rt.type_error();
         return object::ERROR;
@@ -977,4 +988,177 @@ COMMAND_BODY(RangeIntersect)
 // ----------------------------------------------------------------------------
 {
     return range_op(true);
+}
+
+
+// ============================================================================
+//
+//   Arithmetic on uncertain numbers
+//
+// ============================================================================
+
+static algebraic_p rho()
+// ----------------------------------------------------------------------------
+//   Return the value of the correlation coefficient ρ variable
+// ----------------------------------------------------------------------------
+{
+    if (symbol_p name = symbol::make("ρ"))
+        if (object_p value = directory::recall_all(name, false))
+            if (value->is_real())
+                return algebraic_p(value);
+    return nullptr;
+}
+
+
+static uncertain_p bivariate(uncertain_r x, uncertain_r y,
+                             arithmetic_fn f,
+                             arithmetic_fn dfdx = nullptr,
+                             arithmetic_fn dfdy = nullptr)
+// ----------------------------------------------------------------------------
+//   Compute bivariate function
+// ----------------------------------------------------------------------------
+//   If !dfdx or !dfdy, then the value is assumed to be 1
+{
+    if (!x || !y)
+        return nullptr;
+    algebraic_g xs = x->stddev();
+    algebraic_g ys = y->stddev();
+    algebraic_g xa = x->average();
+    algebraic_g ya = y->average();
+
+    algebraic_g fa = f(xa, ya);
+    algebraic_g dxv = dfdx ? dfdx(xa, ya) : nullptr;
+    algebraic_g dyv = dfdy ? dfdy(xa, ya) : nullptr;
+    dxv = dxv ? dxv * xs : xs;
+    dyv = dyv ? dyv * ys : ys;
+    algebraic_g fs = dxv * dxv + dyv * dyv;
+    if (algebraic_g r = rho())
+    {
+        algebraic_g cov = dxv * dyv * r;
+        fs = fs + (cov + cov);
+    }
+    if (fs && !fs->is_infinity())
+        fs = sqrt::run(fs);
+    if (!fa || !fs)
+        return nullptr;
+    return uncertain::make(fa, fs);
+}
+
+
+uncertain_p operator-(uncertain_r x)
+// ----------------------------------------------------------------------------
+//  Unary minus for uncertains
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    return uncertain::make(-x->average(), x->stddev());
+}
+
+
+uncertain_p operator+(uncertain_r x, uncertain_r y)
+// ----------------------------------------------------------------------------
+//   Uncertain addition
+// ----------------------------------------------------------------------------
+{
+    return bivariate(x, y, add::evaluate);
+}
+
+
+static algebraic_p subtract_dfdy(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   Return -1
+// ----------------------------------------------------------------------------
+{
+    return integer::make(-1);
+}
+
+uncertain_p operator-(uncertain_r x, uncertain_r y)
+// ----------------------------------------------------------------------------
+//   Uncertain subtraction
+// ----------------------------------------------------------------------------
+{
+    return bivariate(x, y, subtract::evaluate, nullptr, subtract_dfdy);
+}
+
+
+static algebraic_p mul_dfdx(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x*y)/dx = y
+// ----------------------------------------------------------------------------
+{
+    return y;
+}
+
+
+static algebraic_p mul_dfdy(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x*y)/dy = x
+// ----------------------------------------------------------------------------
+{
+    return x;
+}
+
+
+uncertain_p operator*(uncertain_r x, uncertain_r y)
+// ----------------------------------------------------------------------------
+//   Uncertain multiplication
+// ----------------------------------------------------------------------------
+{
+    return bivariate(x, y, multiply::evaluate, mul_dfdx, mul_dfdy);
+}
+
+
+static algebraic_p div_dfdx(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x/y)/dx = 1/y
+// ----------------------------------------------------------------------------
+{
+    return inv::evaluate(y);
+}
+
+
+static algebraic_p div_dfdy(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x/y)/dy = -x/y^2
+// ----------------------------------------------------------------------------
+{
+    return -x / (y*y);
+}
+
+
+uncertain_p operator/(uncertain_r x, uncertain_r y)
+// ----------------------------------------------------------------------------
+//   Uncertain division
+// ----------------------------------------------------------------------------
+{
+    return bivariate(x, y, divide::evaluate, div_dfdx, div_dfdy);
+}
+
+
+static algebraic_p pow_dfdx(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x^y)/dx = y*x^(y-1)
+// ----------------------------------------------------------------------------
+{
+    algebraic_g one = integer::make(1);
+    return y * pow::run(x, y - one);
+}
+
+
+static algebraic_p pow_dfdy(algebraic_r x, algebraic_r y)
+// ----------------------------------------------------------------------------
+//   d(x/y)/dy = ln(x) * x^y
+// ----------------------------------------------------------------------------
+{
+    return ln::run(x) * pow::run(x, y);
+}
+
+
+uncertain_p operator^(uncertain_r x, uncertain_r y)
+// ----------------------------------------------------------------------------
+//   Power operator for uncertain numbers
+// ----------------------------------------------------------------------------
+{
+    return bivariate(x, y, pow::evaluate, pow_dfdx, pow_dfdy);
 }
