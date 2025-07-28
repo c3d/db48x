@@ -188,7 +188,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            uncertain_operations();
+            complex_types();
 
 #if 0
         if (onlyCurrent & 2)
@@ -4788,6 +4788,8 @@ void tests::complex_types()
     test(CLEAR, "1.2 3.4", ID_ComplexMenu, F3)
         .type(ID_rectangular)
         .expect("1.2+3.4ⅈ");
+    test(CLEAR, "1.2_m 3.4_km", ID_ComplexMenu, F3)
+        .expect("1.2+3 400.ⅈ m");
 
     step("Convert rectangular to real");
     test(CLEAR, "1ⅈ2", ID_ComplexMenu, F4)
@@ -4802,6 +4804,10 @@ void tests::complex_types()
         .test(NOSHIFT, BSP)
         .type(ID_tag)
         .expect("re:1.2");
+    test(CLEAR, "1.2ⅈ3.4_s", ID_ComplexMenu, F4)
+        .expect("im:3.4 s")
+        .test(NOSHIFT, BSP)
+        .expect("re:1.2 s");
 
     step("Convert real to rectangular and back (strip tags)");
     test(CLEAR, "1 2", ID_ComplexMenu, F3)
@@ -4823,6 +4829,8 @@ void tests::complex_types()
     test(CLEAR, "1.2 3.4", ID_ComplexMenu, RSHIFT, F2)
         .type(ID_polar)
         .expect("1.2∡3.4°");
+    test(CLEAR, "1.2_m 3.4", ID_ComplexMenu, RSHIFT, F2)
+        .expect("1.2∡3.4° m");
 
     step("Convert polar to real");
     test(CLEAR, "1∡2", ID_ComplexMenu, RSHIFT, F3)
@@ -4837,6 +4845,12 @@ void tests::complex_types()
         .test(NOSHIFT, BSP)
         .type(ID_tag)
         .expect("mod:1.2");
+    test(CLEAR, "1.2∡3.4_km", ID_ComplexMenu, RSHIFT, F3)
+        .type(ID_tag)
+        .expect("arg:3.4 °")
+        .test(NOSHIFT, BSP)
+        .type(ID_tag)
+        .expect("mod:1.2 km");
 
     step("Convert real to polar and back (add units, strip tags)");
     test(CLEAR, ID_ModesMenu, F1).noerror();
@@ -4871,6 +4885,9 @@ void tests::complex_types()
 
     step("Add units to complex number")
         .test(CLEAR, "3.5ⅈ4.2_Ω", ENTER).expect("3.5+4.2ⅈ Ω");
+    step("Cycle complex units")
+        .test(ID_Cycle).expect("5.46717 47731 3∡50.19442 89077° Ω")
+        .test(ID_Cycle).expect("3.5+4.2ⅈ Ω");
 }
 
 
@@ -4903,6 +4920,26 @@ void tests::complex_arithmetic()
     step("Power");
     test("5", ID_pow)
         .type(ID_rectangular).expect("44 403-10 072ⅈ");
+
+    step("Addition with unit");
+    test(CLEAR, "1ⅈ2 Ω", ENTER, "3+ⅈ4 Ω", ENTER, ADD)
+        .expect("4+6ⅈ Ω");
+    step("Subtraction with unit");
+    test("1-2ⅈ Ω", SUB)
+        .expect("3+8ⅈ Ω");
+    step("Multiplication with unit");
+    test("7+8ⅈ Ω", MUL)
+        .expect("-43+80ⅈ Ω↑2");
+    step("Division with unit");
+    test("7+8ⅈ", DIV)
+        .expect("3+8ⅈ Ω↑2");
+    test("2+3ⅈ", DIV)
+        .expect("2 ⁴/₁₃+⁷/₁₃ⅈ Ω↑2");
+    test("2+3ⅈ", MUL)
+        .expect("3+8ⅈ Ω↑2");
+    step("Power");
+    test("5", ID_pow)
+        .expect("44 403-10 072ⅈ Ω↑10");
 
     step("Symbolic addition");
     test(CLEAR, "a+bⅈ", ENTER, "c+dⅈ", ADD)

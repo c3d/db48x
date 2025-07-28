@@ -1668,6 +1668,18 @@ int object::is_infinity() const
 }
 
 
+bool object::is_number() const
+// ----------------------------------------------------------------------------
+//   Return true for real or complex numerical values
+// ----------------------------------------------------------------------------
+{
+    return is_real() ||
+        (is_complex() &&
+         complex_p(this)->x()->is_real() &&
+         complex_p(this)->y()->is_real());
+}
+
+
 bool object::is_simplifiable() const
 // ----------------------------------------------------------------------------
 //   Return true if auto-simplification does not apply - This may GC!

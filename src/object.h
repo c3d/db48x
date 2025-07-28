@@ -645,6 +645,12 @@ struct object
     // ------------------------------------------------------------------------
 
 
+    bool is_number() const;
+    // -------------------------------------------------------------------------
+    //   Check if an object is a number (real or complex with number values)
+    // -------------------------------------------------------------------------
+
+
     static bool is_fractionable(id ty)
     // -------------------------------------------------------------------------
     //   Check if a type is a fraction or a non-based integer
