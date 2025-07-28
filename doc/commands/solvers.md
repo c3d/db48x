@@ -141,7 +141,7 @@ compared to HP implementations of RPL.
 For example, you can find a complex root for the following equation:
 ```rpl
 'ROOT((X-5)²+3;X;0+0ⅈ)'
-@ Expecting X=5+1.73205 08075 7ⅈ
+@ Expecting X=5.+1.73205 08075 7ⅈ
 ```
 
 ### Differences with HP calculators

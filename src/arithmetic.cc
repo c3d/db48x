@@ -1494,13 +1494,12 @@ algebraic_p arithmetic::evaluate(id          op,
 //   Shared code for all forms of evaluation, does not use the RPL stack
 // ----------------------------------------------------------------------------
 {
-    if (!xr || !yr)
+    if (!xr || !yr || rt.error())
         return nullptr;
 
     record(arithmetic, "Op %u x=%t y=%t", op, +xr, +yr);
     algebraic_g x   = xr;
     algebraic_g y   = yr;
-    utf8        err = rt.error();
 
     // Convert arguments to numeric if necessary
     if (Settings.NumericalResults())
@@ -1517,7 +1516,7 @@ algebraic_p arithmetic::evaluate(id          op,
     // All non-numeric cases, e.g. string concatenation
     if (algebraic_p result = ops.non_numeric(x, y))
         return result;
-    if (rt.error() != err)
+    if (rt.error())
         return nullptr;
 
     // Integer types
@@ -1741,7 +1740,7 @@ algebraic_p arithmetic::evaluate(id          op,
     }
 
     // Default error is "Bad argument type", unless we got something else
-    if (rt.error() == err)
+    if (!rt.error())
         rt.type_error();
     return nullptr;
 }
