@@ -85,6 +85,7 @@ struct complex : algebraic
 
     polar_g             as_polar() const;
     rectangular_g       as_rectangular() const;
+    complex_p           cycle() const;
 
     static complex_p    make(id type,
                              algebraic_r x, algebraic_r y,

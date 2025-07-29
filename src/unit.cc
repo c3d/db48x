@@ -329,7 +329,7 @@ EVAL_BODY(unit)
         }
         value = unit::simple(value, uexpr);
     }
-    return rt.push(+value) ? OK : ERROR;
+    return (value && rt.push(+value)) ? OK : ERROR;
 }
 
 
@@ -1214,6 +1214,13 @@ unit_p unit::cycle() const
 {
     unit_g      u       = this; // GC may move this
     algebraic_g uexpr   = u->uexpr();
+    algebraic_g value   = u->value();
+
+    if (value->is_complex())
+    {
+        value = complex_p(+value)->cycle();
+        return unit::make(value, uexpr);
+    }
 
     if (symbol_p sym = uexpr->as_quoted<symbol>())
     {
@@ -1281,7 +1288,6 @@ unit_p unit::cycle() const
     }
 
     // Otherwise cycle through SI prefixes
-    algebraic_g value   = u->value();
     int         max     = sizeof(si_prefixes) / sizeof(si_prefixes[0]);
     bool        decimal = value->is_decimal();
     bool        frac    = value->is_real() && !decimal;

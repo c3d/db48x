@@ -2859,9 +2859,32 @@ create a new range. This applies to arithmetic operations:
 ## Uncertain numbers
 
 Uncertainties represent a range of numbers that show as `a±σs` and represent a
-value using its average `a` and a standard deviation `s`. The difference with
-ranges is how the computation of the uncertainty is performed.
+value using its average `a` and a standard deviation `s`.
 
+Computations on uncertain numbers will [propagate uncertainty](https://en.wikipedia.org/wiki/Propagation_of_uncertainty) using generalized quadratic superposition.
+
+The value of the variable `ρ` determines the correlation between the two
+variables. If the variable is not set, a value of `0` is assumed
+(no correlation):
+
+```rpl
+4±σ3 7±σ5 *
+@ Expecting 28±σ29.
+```
+
+When `ρ` is set to 1, we have correlation:
+
+```rpl
+ρ=1 4±σ3 7±σ5 *
+@ Expecting 28±σ41.
+```
+
+When `ρ` is set to -1, we have anti-correlation:
+
+```rpl
+ρ=-1 4±σ3 7±σ5 *
+@ Expecting 28±σ1.
+```
 
 ## Expressions
 
@@ -4299,6 +4322,44 @@ third argument:
 To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.11 "Prayer" - Uncertain number
+
+This release implements arithmetic and basic functions on uncertain numbers.
+This propagates uncertainty using quadradic superposition, in a way similar to
+OpenRPNCalc, with a generalization for correlated variables.
+
+### New features
+
+* Arithmetic and basic functions on uncertain numbers
+* Add support for complex-valued unit objects, e.g. `5+3ⅈ Ω`
+* Add support for range-valued unit objects, e.g. `1…3 Ω`
+* Support arithmetic operation on infinities, e.g. `∞ 42 +`
+* Add commands to generate mathematical constants (π, ℮, ∞ and −∞)
+* Parsing and editing of ranges containing infinities
+* Accept infinities in `→Range` and variants
+* Comparison of infinite values and finite values
+* Add union and intersection commands for ranges
+* Add operations to build ranges and uncertain numbers from components
+* Add derivative for `erf` and `erfc`
+
+### Bug fixes
+
+* Do not leave bad expressions behind after errors on ranges
+* Obey the `InfinityError` flag when detecting divide-by-zero in ranges
+* Avoid crash pushing null pointer after unit evaluation error
+* Avoid spurious inconsistent units error due to date computations
+* Null-protection in variadic `list::make`, fixes null-deref crash
+
+### Improvements
+
+* Accelerate error exit from arithmetic operations
+* Render uncertain numbers as `110±σ15` instead of `110±15σ`
+* Accept `−` as valid input in constants (for `−∞`)
+* Record performance data for iPhone 16
+* Change spelling to `→σRange` in `RangeMenu`
+* Use `ASSERT` for divide by zero inner checks (remove dead code)
+
 
 ## Release 0.9.10  "Best" - Ranges and documentation
 
@@ -10070,7 +10131,7 @@ The 38 variables in the Gases section are:
 * `P`: Pressure, or Flow pressure ([Isentropic Flow](#Isentropic Flow)) (dim.: force/area, in SI: pascal, Pa)
 * `P0`: Stagnation pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pc`: Pseudocritical pressure (dim.: force/area, in SI: pascal, Pa)
-* `Pi`: Initial pressure (dim.: force/area, in SI: pascal, Pa)
+* `Pin`: Initial pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pf`: Final pressure (dim.: force/area, in SI: pascal, Pa)
 * `Pr`: Reduced pressure
 * `Pri`: Initial reduced ressure
@@ -10105,7 +10166,7 @@ T=16.85_°C  P=1_atm  V=25_l  MW=36_g/mol
 
 * To calculate `[Vf_l]` (Volume final) from 5 known variables:
 ```rpl
-Pi=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=100_°C  Tf=373.15_K
+Pin=1.5_kPa  Pf=1.5_kPa  Vi=2_l  Ti=100_°C  Tf=373.15_K
 @ Expecting [ Vf=2. l ]
 'ROOT(ⒺIdeal Gas Law Change;[Vf];[1_l])'
 ```
@@ -10127,7 +10188,7 @@ These equations describe a reversible pressure-volume change of an ideal gas suc
 
 * To calculate `[n_1;Tf_°F]` (Polytropic number; Final temperature) from 5 known variables:
 ```rpl
-Pi=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
+Pin=15_psi  Pf=35_psi  Vi=1_ft^3  Vf=0.50_ft^3  Ti=75_°F
 @ Expecting [ n=1.22239 24213 4 Tf=303.98333 3333 K ]
 'ROOT(ⒺPolytropic Processes;[n;Tf];[1;1_K])'
 ```
@@ -10162,7 +10223,7 @@ This equation adapts the ideal gas state-change equation to emulate real-gas beh
 
 * To calculate `[Zi_1;Zf_1;Vf_l]` (Initial & Final gas compressibility correction factor; Final volume) from 7 known variables:
 ```rpl
-Pc=48_atm  Pi=100_kPa  Pf=50_kPa  Ti=348.15_K  Tc=298_K  Vi=10_l  Tf=523.15_K
+Pc=48_atm  Pin=100_kPa  Pf=50_kPa  Ti=348.15_K  Tc=298_K  Vi=10_l  Tf=523.15_K
 @ Expecting [ Zi=0.99550 62096 36 Zf=0.99938 68303 14 Vf=30.17028 92973 l ]
 'ROOT(ⒺReal Gas State Change;[Zi;Zf;Vf];[1;1;1_l])'
 ```
@@ -13064,6 +13125,58 @@ the `EquationsMenu` or the `LibEq` command.
 Library items are defined by the `config/library.csv`, and accessed using the
 `Library` command or the `XLib` command.
 
+
+## pi
+
+Return the π constant (approximately 3.14159).
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+pi →Num
+@ Expecting 3.14159 26535 9
+```
+
+## EulerianNumber
+
+Return the value of Euler's number (approximately 2.71828)
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+℮ →Num
+@ Expecting 2.71828 18284 6
+```
+
+## Infinity
+
+Return a positive infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+infinity
+@ Expecting ∞
+```
+
+## NegativeInfinity
+
+Return a negative infinity
+
+By default, this command returns a symbolic constant. The numerical value can be
+obtained using `→Num`, or by setting the `NumericalConstants` or
+`NumericalResults` flags.
+
+```rpl
+NegativeInfinity
+@ Expecting −∞
+```
 
 ## Constant
 
@@ -15998,7 +16111,7 @@ components for the low and high value.
 
 ```rpl
 1 2 →σRange
-@ Expecting 1±2σ
+@ Expecting 1±σ2
 ```
 
 
@@ -17115,7 +17228,7 @@ compared to HP implementations of RPL.
 For example, you can find a complex root for the following equation:
 ```rpl
 'ROOT((X-5)²+3;X;0+0ⅈ)'
-@ Expecting X=5+1.73205 08075 7ⅈ
+@ Expecting X=5.+1.73205 08075 7ⅈ
 ```
 
 ### Differences with HP calculators

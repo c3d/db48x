@@ -396,7 +396,7 @@ inline bool is_valid_in_constant_name(unicode cp)
 //   In constants, we accept a few additional characters
 // ----------------------------------------------------------------------------
 {
-    return cp == L'ⅈ' || is_valid_in_name(cp);
+    return cp == L'ⅈ' || cp == L'−' || is_valid_in_name(cp);
 }
 
 
@@ -420,7 +420,7 @@ inline bool is_valid_as_name_initial(unicode cp)
     for (utf8 p = invalid; *p; p = utf8_next(p))
         if (cp == utf8_codepoint(p))
             return false;
-    return is_valid_in_name(cp);
+    return cp == L'−' || is_valid_in_name(cp);
 }
 
 

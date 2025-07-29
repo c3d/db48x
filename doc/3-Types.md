@@ -244,9 +244,32 @@ create a new range. This applies to arithmetic operations:
 ## Uncertain numbers
 
 Uncertainties represent a range of numbers that show as `a±σs` and represent a
-value using its average `a` and a standard deviation `s`. The difference with
-ranges is how the computation of the uncertainty is performed.
+value using its average `a` and a standard deviation `s`.
 
+Computations on uncertain numbers will [propagate uncertainty](https://en.wikipedia.org/wiki/Propagation_of_uncertainty) using generalized quadratic superposition.
+
+The value of the variable `ρ` determines the correlation between the two
+variables. If the variable is not set, a value of `0` is assumed
+(no correlation):
+
+```rpl
+4±σ3 7±σ5 *
+@ Expecting 28±σ29.
+```
+
+When `ρ` is set to 1, we have correlation:
+
+```rpl
+ρ=1 4±σ3 7±σ5 *
+@ Expecting 28±σ41.
+```
+
+When `ρ` is set to -1, we have anti-correlation:
+
+```rpl
+ρ=-1 4±σ3 7±σ5 *
+@ Expecting 28±σ1.
+```
 
 ## Expressions
 

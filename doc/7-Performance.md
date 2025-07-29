@@ -210,6 +210,16 @@ intermediate computations were not made with increased precision.
 
 The iPhone 12 HW16 is the same as the Nintendo New 2DS XL
 
+1 million loops, test performed on 0.9.10 on iOS 18.5
+
+| Version        | Time (ms) | Result                                      |
+|----------------|-----------|---------------------------------------------|
+| iPhone 16 VP36 |  378500   | 1'395'612.15871'64937'20245'87199'88346'3251|
+| iPhone 16 VP24 |  215040   | 1'395'612.15872'64937'18502'81              |
+| iPhone 16 VP12 |  113400   | 1'395'611.19553                             |
+| iPhone 16 HW16 |    5940   | 1'395'612.15873D                            |
+| iPhone 16 HW7  |    5780   | 1'387'348.25F                               |
+
 
 ## Drawing `sin X` with `FunctionPlot`
 

@@ -412,7 +412,7 @@ static const cstring basic_equations[] =
     "}",
 
     "Ideal Gas Law Change",  "{ "
-    "'((Pf_Pa)*(Vf_l))/UBASE(Tf_K)=((Pi_Pa)*(Vi_l))/UBASE(Ti_K)' "
+    "'((Pf_Pa)*(Vf_l))/UBASE(Tf_K)=((Pin_Pa)*(Vi_l))/UBASE(Ti_K)' "
     "}",
     // Change all occurrences of gmol by mol
     "Isothermal Expansion",  "{ "
@@ -421,8 +421,8 @@ static const cstring basic_equations[] =
     "}",
 
     "Polytropic Processes",  "{ "
-    "'(Pf_atm)/(Pi_atm)=((Vf_(ft^3))/(Vi_(ft^3)))^(-n)' "
-    "'(Tf_°C)/(Ti_°C)=((Pf_atm)/(Pi_atm))^((n-1)/n)' "
+    "'(Pf_atm)/(Pin_atm)=((Vf_(ft^3))/(Vi_(ft^3)))^(-n)' "
+    "'(Tf_°C)/(Ti_°C)=((Pf_atm)/(Pin_atm))^((n-1)/n)' "
     "}",
 
     "Isentropic Flow",  "{ "
@@ -439,17 +439,17 @@ static const cstring basic_equations[] =
     //"'Pr=(P_Pa)/(Pc_Pa)' "
     //"'ρr=0.27*(Pr/(Z*Tr))' "
     //"'Z=1+(0.31506237-1.04670990/Tr-0.57832729/Tr^3)*ρr+(0.53530771-0.61232032/Tr)*ρr²+0.61232032*0.10488813*ρr^5/Tr+0.68157001*ρr²/Tr^3*(1+0.68446549*ρr²)*exp(-0.68446549*ρr²)' "
-    // change Ti for T and Pi for P in the following
+    // change Ti for T and Pin for P in the following
       "'Z=1+(0.31506237-1.04670990/(UBASE(T_K)/UBASE(Tc_K))-0.57832729/(UBASE(T_K)/UBASE(Tc_K))^3)*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))+(0.53530771-0.61232032/(UBASE(T_K)/UBASE(Tc_K)))*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))²+0.61232032*0.10488813*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))^5/(UBASE(T_K)/UBASE(Tc_K))+0.68157001*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))²/(UBASE(T_K)/UBASE(Tc_K))^3*(1+0.68446549*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))²)*exp(-0.68446549*(0.27*(((P_Pa)/(Pc_Pa))/(Z*(UBASE(T_K)/UBASE(Tc_K)))))²)' "
     "}",
     // Change all °C for K in eqn 1
     "Real Gas State Change",  "{ "
-    "'((Pf_atm)*(Vf_l))/(Zf*UBASE(Tf_K))=((Pi_atm)*(Vi_l))/(Zi*UBASE(Ti_K))' "
+    "'((Pf_atm)*(Vf_l))/(Zf*UBASE(Tf_K))=((Pin_atm)*(Vi_l))/(Zi*UBASE(Ti_K))' "
     //"'Tri=UBASE(Ti_K)/UBASE(Tc_K)' " These 3 eqns will be substitute in a closed form for Zi
-    //"'Pri=(Pi_Pa)/(Pc_Pa)' "
+    //"'Pri=(Pin_Pa)/(Pc_Pa)' "
     //"'ρri=0.27*(Pri/(Zi*Tri))' "
     //"'Zi=1+(0.31506237-1.04670990/Tri-0.57832729/Tri^3)*ρri+(0.53530771-0.61232032/Tri)*ρri²+0.61232032*0.10488813*ρri^5/Tri+0.68157001*ρri²/Tri^3*(1+0.68446549*ρri²)*exp(-0.68446549*ρri²)' "
-    "'Zi=1+(0.31506237-1.04670990/(UBASE(Ti_K)/UBASE(Tc_K))-0.57832729/(UBASE(Ti_K)/UBASE(Tc_K))^3)*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))+(0.53530771-0.61232032/(UBASE(Ti_K)/UBASE(Tc_K)))*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²+0.61232032*0.10488813*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))^5/(UBASE(Ti_K)/UBASE(Tc_K))+0.68157001*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²/(UBASE(Ti_K)/UBASE(Tc_K))^3*(1+0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²)*exp(-0.68446549*(0.27*(((Pi_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²)' "
+    "'Zi=1+(0.31506237-1.04670990/(UBASE(Ti_K)/UBASE(Tc_K))-0.57832729/(UBASE(Ti_K)/UBASE(Tc_K))^3)*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))+(0.53530771-0.61232032/(UBASE(Ti_K)/UBASE(Tc_K)))*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²+0.61232032*0.10488813*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))^5/(UBASE(Ti_K)/UBASE(Tc_K))+0.68157001*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²/(UBASE(Ti_K)/UBASE(Tc_K))^3*(1+0.68446549*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²)*exp(-0.68446549*(0.27*(((Pin_Pa)/(Pc_Pa))/(Zi*(UBASE(Ti_K)/UBASE(Tc_K)))))²)' "
     //"'Trf=UBASE(Tf_K)/UBASE(Tc_K)' " These 3 eqns will be substitute in a closed form for Zf
     //"'Prf=(Pf_Pa)/(Pc_Pa)' "
     //"'ρrf= 0.27*(Prf/(Zf*Trf))' "

@@ -332,6 +332,8 @@ object::result draw_plot(object::id                  kind,
         {
             if (kind == object::ID_Function)
             {
+                error_save ers;
+                rt.clear_error();
                 size dh = display_height();
                 rx = ppar.pixel_x(x);
                 ry = ppar.pixel_y(ppar.yorigin);

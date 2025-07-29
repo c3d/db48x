@@ -113,6 +113,7 @@ TESTS(carith,           "Complex arithmetic");
 TESTS(cfunctions,       "Complex functions");
 TESTS(autocplx,         "Automatic complex promotion");
 TESTS(ranges,           "Range types");
+TESTS(uncertain,        "Uncertain (quadratic superposition) operations");
 TESTS(units,            "Units and conversions");
 TESTS(lists,            "List operations");
 TESTS(sorting,          "Sorting operations");
@@ -187,7 +188,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            range_types();
+            complex_types();
 
 #if 0
         if (onlyCurrent & 2)
@@ -230,6 +231,7 @@ void tests::run(uint onlyCurrent)
         complex_functions();
         complex_promotion();
         range_types();
+        uncertain_operations();
         units_and_conversions();
         list_functions();
         sorting_functions();
@@ -4786,6 +4788,8 @@ void tests::complex_types()
     test(CLEAR, "1.2 3.4", ID_ComplexMenu, F3)
         .type(ID_rectangular)
         .expect("1.2+3.4ⅈ");
+    test(CLEAR, "1.2_m 3.4_km", ID_ComplexMenu, F3)
+        .expect("1.2+3 400.ⅈ m");
 
     step("Convert rectangular to real");
     test(CLEAR, "1ⅈ2", ID_ComplexMenu, F4)
@@ -4800,6 +4804,10 @@ void tests::complex_types()
         .test(NOSHIFT, BSP)
         .type(ID_tag)
         .expect("re:1.2");
+    test(CLEAR, "1.2ⅈ3.4_s", ID_ComplexMenu, F4)
+        .expect("im:3.4 s")
+        .test(NOSHIFT, BSP)
+        .expect("re:1.2 s");
 
     step("Convert real to rectangular and back (strip tags)");
     test(CLEAR, "1 2", ID_ComplexMenu, F3)
@@ -4821,6 +4829,8 @@ void tests::complex_types()
     test(CLEAR, "1.2 3.4", ID_ComplexMenu, RSHIFT, F2)
         .type(ID_polar)
         .expect("1.2∡3.4°");
+    test(CLEAR, "1.2_m 3.4", ID_ComplexMenu, RSHIFT, F2)
+        .expect("1.2∡3.4° m");
 
     step("Convert polar to real");
     test(CLEAR, "1∡2", ID_ComplexMenu, RSHIFT, F3)
@@ -4835,6 +4845,12 @@ void tests::complex_types()
         .test(NOSHIFT, BSP)
         .type(ID_tag)
         .expect("mod:1.2");
+    test(CLEAR, "1.2∡3.4_km", ID_ComplexMenu, RSHIFT, F3)
+        .type(ID_tag)
+        .expect("arg:3.4 °")
+        .test(NOSHIFT, BSP)
+        .type(ID_tag)
+        .expect("mod:1.2 km");
 
     step("Convert real to polar and back (add units, strip tags)");
     test(CLEAR, ID_ModesMenu, F1).noerror();
@@ -4866,6 +4882,12 @@ void tests::complex_types()
     step("Syntax error for empty phase")
         .test(CLEAR, "1∡", ENTER)
         .error("Syntax error");
+
+    step("Add units to complex number")
+        .test(CLEAR, "3.5ⅈ4.2_Ω", ENTER).expect("3.5+4.2ⅈ Ω");
+    step("Cycle complex units")
+        .test(ID_Cycle).expect("5.46717 47731 3∡50.19442 89077° Ω")
+        .test(ID_Cycle).expect("3.5+4.2ⅈ Ω");
 }
 
 
@@ -4898,6 +4920,26 @@ void tests::complex_arithmetic()
     step("Power");
     test("5", ID_pow)
         .type(ID_rectangular).expect("44 403-10 072ⅈ");
+
+    step("Addition with unit");
+    test(CLEAR, "1ⅈ2 Ω", ENTER, "3+ⅈ4 Ω", ENTER, ADD)
+        .expect("4+6ⅈ Ω");
+    step("Subtraction with unit");
+    test("1-2ⅈ Ω", SUB)
+        .expect("3+8ⅈ Ω");
+    step("Multiplication with unit");
+    test("7+8ⅈ Ω", MUL)
+        .expect("-43+80ⅈ Ω↑2");
+    step("Division with unit");
+    test("7+8ⅈ", DIV)
+        .expect("3+8ⅈ Ω↑2");
+    test("2+3ⅈ", DIV)
+        .expect("2 ⁴/₁₃+⁷/₁₃ⅈ Ω↑2");
+    test("2+3ⅈ", MUL)
+        .expect("3+8ⅈ Ω↑2");
+    step("Power");
+    test("5", ID_pow)
+        .expect("44 403-10 072ⅈ Ω↑10");
 
     step("Symbolic addition");
     test(CLEAR, "a+bⅈ", ENTER, "c+dⅈ", ADD)
@@ -5250,12 +5292,6 @@ void tests::range_types()
         .test(CLEAR, "1±3", ENTER).type(ID_drange).expect("1±3");
     step("Percentage form")
         .test(CLEAR, "1±300%", ENTER).type(ID_prange).expect("1±300%");
-    step("Uncertain (sigma at end)")
-        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±3σ");
-    step("Uncertain (sigma at beginning)")
-        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±3σ");
-    step("Uncertain (sigma in the middle)")
-        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±3σ");
 
     step("Cycle")
         .test(CLEAR, "1…3", ENTER).expect("1…3")
@@ -5266,10 +5302,46 @@ void tests::range_types()
         .test(EEX).expect("2±50%");
 
     step("Data entry from range menu")
-        .test(CLEAR, ID_RangeMenu, "1", F1, "3", ENTER).expect("1…3")
-        .test(CLEAR, ID_RangeMenu, "1", F2, "3", ENTER).expect("1±3")
-        .test(CLEAR, ID_RangeMenu, "1", F3, "3", ENTER).expect("1±3%")
-        .test(CLEAR, ID_RangeMenu, "1", F4, "3", ENTER).expect("1±3σ");
+        .test(CLEAR, ID_MathMenu, ID_RangeMenu)
+        .test(CLEAR, "1", F1, "3", ENTER).expect("1…3")
+        .test(CLEAR, "1", F2, "3", ENTER).expect("1±3")
+        .test(CLEAR, "1", F3, "3", ENTER).expect("1±3%");
+
+    step("Building range from components")
+        .test(CLEAR, "1 3", ENTER, ID_ToRange).expect("1…3");
+    step("Building delta range from components")
+        .test(CLEAR, "1 3", ENTER, ID_ToDeltaRange).expect("2±1");
+    step("Building percent range from components")
+        .test(CLEAR, "1 3", ENTER, ID_ToPercentRange).expect("2±50%");
+
+    step("Building range with infinity input")
+        .test(CLEAR, "−∞…∞", ENTER).expect("−∞…∞")
+        .test(DOWN).editor("−∞…∞").test(ENTER).expect("−∞…∞")
+        .test(CLEAR, "−∞…42", ENTER).expect("−∞…42")
+        .test(DOWN).editor("−∞…42").test(ENTER).expect("−∞…42")
+        .test(CLEAR, "42…∞", ENTER).expect("42…∞")
+        .test(DOWN).editor("42…∞").test(ENTER).expect("42…∞");
+    step("Building range from stack with infinity input")
+        .test(CLEAR, "Ⓒ−∞ Ⓒ∞", ENTER, ID_ToRange).expect("−∞…∞")
+        .test(CLEAR, "1 Ⓒ∞", ENTER, ID_ToRange).expect("1…∞")
+        .test(CLEAR, "42 Ⓒ−∞", ENTER, ID_ToRange).expect("−∞…42");
+    step("Building range from stack with invalid infinity input")
+        .test(CLEAR, "Ⓒ−∞ Ⓒ−∞", ENTER, ID_ToRange)
+        .error("Bad argument type")
+        .test(CLEAR, "Ⓒ∞ Ⓒ∞", ENTER, ID_ToRange)
+        .error("Bad argument type");
+
+    step("Building range from invalid components")
+        .test(CLEAR, "a 3", ENTER, ID_ToRange).error("Bad argument type")
+        .test(CLEAR, "1 b", ENTER, ID_ToRange).error("Bad argument type")
+        .test(CLEAR, "1 2ⅈ3", ENTER, ID_ToRange).error("Bad argument type");
+    step("Building delta range from invalid components")
+        .test(CLEAR, "a 3", ENTER, ID_ToDeltaRange).error("Bad argument type")
+        .test(CLEAR, "1 b", ENTER, ID_ToDeltaRange).error("Bad argument type")
+        .test(CLEAR, "a 1", ENTER, ID_ToDeltaRange).error("Bad argument type");
+    step("Building percent range from invalid components")
+        .test(CLEAR, "a 3", ENTER, ID_ToDeltaRange).error("Bad argument type")
+        .test(CLEAR, "1 b", ENTER, ID_ToDeltaRange).error("Bad argument type");
 
     step("Add intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, ADD).expect("3…8");
@@ -5277,6 +5349,8 @@ void tests::range_types()
         .test(CLEAR, "1…3 2…5", NOSHIFT, SUB).expect("-4…1");
     step("Multiply intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, MUL).expect("2…15");
+    step("Divide intervals")
+        .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
     step("Divide intervals")
         .test(CLEAR, "1…3 2…5", NOSHIFT, DIV).expect("¹/₅…1 ¹/₂");
     step("Power intervals")
@@ -5296,6 +5370,18 @@ void tests::range_types()
         .test(CLEAR, "1…3 5", NOSHIFT, DIV).expect("¹/₅…³/₅");
     step("Power intervals")
         .test(CLEAR, "1…3 5", NOSHIFT, ID_pow).expect("1…243");
+    step("Divide ranges divide by zero")
+        .test(CLEAR, "1…3 -2…5", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1…3 -2…5", NOSHIFT, DIV).expect("−∞…∞")
+        .test(CLEAR, "-26 FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
+    step("Invert ranges divide by zero")
+        .test(CLEAR, "-1…3", NOSHIFT, ID_inv).error("Divide by zero")
+        .test(EXIT).got("-1…3");
 
     step("Add intervals with promotion")
         .test(CLEAR, "5 1…3", NOSHIFT, ADD).expect("6…8");
@@ -5410,7 +5496,8 @@ void tests::range_types()
     step("Invert delta ranges")
         .test(CLEAR, "10±3", NOSHIFT, ID_inv).expect("¹⁰/₉₁±³/₉₁");
     step("Invert delta ranges divide by zero")
-        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero");
+        .test(CLEAR, "1±3", NOSHIFT, ID_inv).error("Divide by zero")
+        .test(EXIT).got("1±3");
     step("Invert delta range with infinity result")
         .test(CLEAR, "-26 FS?", ENTER).expect("False")
         .test(CLEAR, "-22 SF", ENTER).noerror()
@@ -5605,6 +5692,139 @@ void tests::range_types()
         .expect("1 002…3 006 m")
         .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
         .expect("2…18 km/s");
+}
+
+
+void tests::uncertain_operations()
+// ----------------------------------------------------------------------------
+//   Uncertain operations (quadratic superposition)
+// ----------------------------------------------------------------------------
+// See https://en.wikipedia.org/wiki/Propagation_of_uncertainty for principles
+{
+    BEGIN(uncertain);
+
+    step("Uncertain (sigma at end)")
+        .test(CLEAR, "1±3σ", ENTER).type(ID_uncertain).expect("1±σ3");
+    step("Uncertain (sigma at beginning)")
+        .test(CLEAR, "1±σ3", ENTER).type(ID_uncertain).expect("1±σ3");
+    step("Uncertain (sigma in the middle)")
+        .test(CLEAR, "1σ3", ENTER).type(ID_uncertain).expect("1±σ3");
+
+    step("Data entry from range menu")
+        .test(CLEAR, ID_MathMenu, ID_RangeMenu)
+        .test(CLEAR, "1", F4, "3", ENTER).expect("1±σ3");
+    step("Building uncertain number from components")
+        .test(CLEAR, "1 3", ENTER, ID_ToUncertain).expect("1±σ3");
+    step("Building uncertain number from invalid components")
+        .test(CLEAR, "a 3", ENTER, ID_ToUncertain).error("Bad argument type")
+        .test(CLEAR, "1 b", ENTER, ID_ToUncertain).error("Bad argument type");
+
+    step("Add uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, ADD).expect("3±σ5.83095 18948 5");
+    step("Subtract uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, SUB).expect("-1±σ5.83095 18948 5");
+    step("Multiply uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, MUL).expect("2±σ7.81024 96759 1");
+    step("Divide uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, DIV).expect("¹/₂±σ1.95256 24189 8");
+    step("Divide uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, DIV).expect("¹/₂±σ1.95256 24189 8");
+    step("Power uncertain numbers")
+        .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, ID_pow).expect("1±σ6.");
+    step("Invert uncertain numbers")
+        .test(CLEAR, "1±σ3", NOSHIFT, ID_inv).expect("1±σ3.")
+        .test(CLEAR, "2±σ3", NOSHIFT, ID_inv).expect("¹/₂±σ0.75");
+    step("Negate uncertain numbers")
+        .test(CLEAR, "1±σ3", ENTER, ID_neg).expect("-1±σ3");
+
+    step("Add uncertain numbers with promotion")
+        .test(CLEAR, "1±σ3 5", NOSHIFT, ADD).expect("6±σ3.");
+    step("Subtract uncertain numbers")
+        .test(CLEAR, "1±σ3 5", NOSHIFT, SUB).expect("-4±σ3.");
+    step("Multiply uncertain numbers")
+        .test(CLEAR, "1±σ3 5", NOSHIFT, MUL).expect("5±σ15.");
+    step("Divide uncertain numbers")
+        .test(CLEAR, "1±σ3 5", NOSHIFT, DIV).expect("¹/₅±σ0.6");
+    step("Power uncertain numbers")
+        .test(CLEAR, "1±σ3 5", NOSHIFT, ID_pow).expect("1±σ15.");
+    step("Divide ranges divide by zero")
+        .test(CLEAR, "1±σ3 0±σ5", NOSHIFT, DIV).error("Divide by zero");
+    step("Divide range with infinity result")
+        .test(CLEAR, "-26 FS?", ENTER).expect("False")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1±σ3 0±σ5", NOSHIFT, DIV).expect("∞±σ∞")
+        .test(CLEAR, "-26 FS?", ENTER).expect("True")
+        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+              ENTER).noerror();
+    step("Invert ranges divide by zero")
+        .test(CLEAR, "0±σ3", NOSHIFT, ID_inv).error("Divide by zero")
+        .test(EXIT).got("0±σ3");
+
+    step("Add uncertain numbers with promotion")
+        .test(CLEAR, "5 2±σ3", NOSHIFT, ADD).expect("7±σ3.");
+    step("Subtract uncertain numbers")
+        .test(CLEAR, "5 2±σ3", NOSHIFT, SUB).expect("3±σ3.");
+    step("Multiply uncertain numbers")
+        .test(CLEAR, "5 2±σ3", NOSHIFT, MUL).expect("10±σ15.");
+    step("Divide uncertain numbers")
+        .test(CLEAR, "5 2±σ3", NOSHIFT, DIV).expect("2 ¹/₂±σ3.75");
+    step("Power uncertain numbers")
+        .test(CLEAR, "5 1±σ3", NOSHIFT, ID_pow).expect("5±σ24.14156 86865");
+
+#define TFNA(name, arg)                                         \
+    step(#name " (uncertain number)").test(CLEAR, arg " " #name, ENTER)
+#define TFN(name)  TFNA(name, "1±σ3")
+
+    TFN(sqrt).expect("1.±σ1.5");
+    TFN(sin).expect("0.01745 24064 37±σ0.05235 19028 97");
+    TFN(cos).expect("0.99984 76951 56±σ0.00091 38058 64");
+    TFN(tan).expect("0.01745 50649 28±σ0.05237 58305 3");
+    TFNA(asin, "0.25±σ0.5").expect("14.47751 21859 °±σ29.58741 3315 °");
+    TFNA(acos, "0.25±σ0.5").expect("75.52248 78141 °±σ29.58741 3315 °");
+    TFN(atan).expect("45. °±σ85.94366 92696 °");
+    TFN(sinh).expect("1.17520 11936 4±σ4.62924 19044 5");
+    TFN(cosh).expect("1.54308 06348 2±σ3.52560 35809 3");
+    TFN(tanh).expect("0.76159 41559 56±σ1.25992 30248 4");
+    TFN(asinh).expect("0.88137 35870 2±σ2.12132 03435 6");
+    TFNA(acosh, "1.321±σ1.325").expect("0.78123 02051 96±σ1.53506 15435");
+    TFNA(atanh, "0.321±σ0.325").expect("0.33276 15884 82±σ0.36233 54021 76");
+    TFN(ln1p).expect("0.69314 71805 6±σ1.5");
+    TFN(lnp1).expect("0.69314 71805 6±σ1.5");
+    TFN(expm1).expect("1.71828 18284 6±σ8.15484 54853 8");
+    TFN(ln).expect("0.±σ3.");
+    TFN(log10).expect("0.±σ1.30288 34457 1");
+    TFN(exp).expect("2.71828 18284 6±σ8.15484 54853 8");
+    TFN(exp10).expect("10.±σ69.07755 27898");
+    TFN(exp2).expect("2.±σ4.15888 30833 6");
+    TFN(erf).expect("0.84270 07929 5±σ1.24532 24922 6");
+    TFN(erfc).expect("0.15729 92070 5±σ1.24532 24922 6");
+    TFN(tgamma).expect("1.±σ1.73164 69947");
+    TFN(lgamma).expect("0.±σ1.73164 69947");
+    TFN(gamma).expect("1.±σ1.73164 69947");
+    TFN(cbrt).expect("1.±σ1.");
+    TFN(norm).expect("1±σ3");
+#undef TFN
+#undef TFNA
+
+    step("Exploding uncertain numbers")
+        .test(CLEAR, "1±σ3", ID_ObjectMenu, ID_Explode)
+        .got("3", "1");
+    step("Size range objects")
+        .test(CLEAR, "1±σ3", ID_RangeMenu, ID_Size)
+        .got("3");
+
+    step("Union (uncertain numbers)")
+        .test(CLEAR, "1±σ3 2±σ6 ", ID_RangeMenu, ID_RangeUnion)
+        .error("Bad argument type");
+    step("Intersection (uncertain numbers)")
+        .test(CLEAR, "1±σ3 2±σ6 ", ID_RangeMenu, ID_RangeIntersect)
+        .error("Bad argument type");
+
+    step("Uncertain numbers with unit")
+        .test(CLEAR, "1±σ3_km 2±σ6_m", NOSHIFT, ADD)
+        .expect("1 002±σ3 000.00599 999 m")
+        .test(CLEAR, "1±σ3_km 2±σ6_1/s", ENTER, MUL)
+        .expect("2±σ8.48528 13742 4 km/s");
 }
 
 
@@ -7917,21 +8137,21 @@ void tests::auto_simplification()
     test(CLEAR, "{ 1 2 3 } 0 +", ENTER)
         .expect("{ 1 2 3 0 }");
 
-    step("Do not apply to infinities")
+    step("Simplification of infinities")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞ +", ENTER)
-        .expect("'∞+∞'")
+        .expect("∞")
         .test(CLEAR, "0 Ⓒ∞ +", ENTER)
-        .expect("'0+∞'")
+        .expect("∞")
         .test(CLEAR, "Ⓒ∞ 0 +", ENTER)
-        .expect("'∞+0'")
+        .expect("∞")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞ -", ENTER)
-        .expect("'∞-∞'")
+        .error("Undefined operation")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞ *", ENTER)
-        .expect("'∞·∞'")
+        .expect("∞")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞ /", ENTER)
-        .expect("'∞÷∞'")
+        .error("Undefined operation")
         .test(CLEAR, "Ⓒ∞ Ⓒ∞ NEG /", ENTER)
-        .expect("'∞÷(-∞)'");
+        .error("Undefined operation");
 
     step("Fold constants: additions")
         .test(CLEAR, "'1+X+2'", ENTER).expect("'1+X+2'")
@@ -10717,6 +10937,98 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
+    step("Insert pi constant")
+        .test(CLEAR, "pi", ENTER).type(ID_constant).expect("π")
+        .test(ID_ToDecimal).expect("3.14159 26535 9")
+        .test(CLEAR, "π", ENTER).type(ID_constant).expect("π")
+        .test(ID_ToDecimal).expect("3.14159 26535 9");
+    step("Insert Euler's number")
+        .test(CLEAR, "EulerianNumber", ENTER).type(ID_constant).expect("e")
+        .test(ID_ToDecimal).expect("2.71828 18284 6")
+        .test(CLEAR, DIRECT("℮"), ENTER).type(ID_constant).expect("e")
+        .test(ID_ToDecimal).expect("2.71828 18284 6");
+    step("Insert positive infinity")
+        .test(CLEAR, "Infinity", ENTER).type(ID_constant).expect("∞")
+        .test(CLEAR, DIRECT("∞"), ENTER).type(ID_constant).expect("∞");
+    step("Insert negative infinity")
+        .test(CLEAR, "NegativeInfinity", ENTER).type(ID_constant).expect("−∞")
+        .test(CLEAR, DIRECT("−∞"), ENTER).type(ID_constant).expect("−∞");
+    step("Negate infinities")
+        .test(CLEAR, DIRECT("∞"), ENTER).expect("∞")
+        .test(CHS).expect("−∞")
+        .test(CHS).expect("∞");
+    step("Invert infinities")
+        .test(CLEAR, DIRECT("∞"), ENTER).expect("∞")
+        .test(INV).expect("0");
+    step("Add infinities")
+        .test(CLEAR, DIRECT("∞ 42 +"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ 42 +"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("42 ∞ +"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("42 −∞ +"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("−∞ −∞ +"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ ∞ +"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ ∞ +"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ −∞ +"), ENTER).error("Undefined operation");
+    step("Subtract infinities")
+        .test(CLEAR, DIRECT("∞ 42 -"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ 42 -"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("42 ∞ -"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("42 −∞ -"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ ∞ -"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ −∞ -"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ −∞ -"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ ∞ -"), ENTER).error("Undefined operation");
+    step("Multiply infinities")
+        .test(CLEAR, DIRECT("∞ 42 *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ 42 *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ -42 *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("−∞ -42 *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("42 ∞ *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("42 −∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("-42 ∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("-42 −∞ *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ ∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ −∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ ∞ *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ −∞ *"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("∞ 0 *"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ 0 *"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("0 ∞ *"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("0 −∞ *"), ENTER).error("Undefined operation");
+    step("Divide infinities")
+        .test(CLEAR, DIRECT("∞ 42 /"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ 42 /"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("∞ -42 /"), ENTER).expect("−∞")
+        .test(CLEAR, DIRECT("−∞ -42 /"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("42 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("42 −∞ /"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("-42 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("-42 −∞ /"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("−∞ ∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ −∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ ∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ −∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ 0 /"), ENTER).error("Divide by zero")
+        .test(CLEAR, DIRECT("−∞ 0 /"), ENTER).error("Divide by zero")
+        .test(CLEAR, DIRECT("0 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("0 −∞ /"), ENTER).expect("0");
+    step("Power infinities")
+        .test(CLEAR, DIRECT("∞ 42 ^"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ -42 ^"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("42 ∞ ^"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("42 −∞ ^"), ENTER).expect("0")
+        .test(CLEAR, DIRECT("-42 ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("-42 −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ ∞ ^"), ENTER).expect("∞")
+        .test(CLEAR, DIRECT("−∞ −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("∞ 0 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ 0 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("0 ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("0 −∞ ^"), ENTER).error("Undefined operation");
 
     step("Check that numerical constants are adjusted with precision")
         .test(CLEAR,
@@ -10838,10 +11150,10 @@ void tests::constants_menu()
     step("i")
         .test(CLEAR, NOSHIFT, F3).expect("ⅈ")
         .test(LSHIFT, F3).expect("0+1ⅈ");
-    step("Undefined")
+    step("Infinity")
         .test(CLEAR, NOSHIFT, F4).expect("∞")
         .test(LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
-    step("Infinity")
+    step("Undefined")
         .test(CLEAR, NOSHIFT, F5).expect("?")
         .test(LSHIFT, F5).expect("Undefined");
     step("j")
@@ -15037,6 +15349,7 @@ tests &tests::itest(cstring txt)
         case L'⊕': itest(ID_CharactersMenu, F4, F6, F6, F6, F6, F6, LSHIFT, F3); NEXT;
         case L'⊖': itest(ID_CharactersMenu, F4, F6, F6, F6, F6, F6, LSHIFT, F4); NEXT;
         case '\t': itest(ID_CharactersMenu, F6, RSHIFT, F6); NEXT;
+        case L'−': itest(ID_CharactersMenu, F4, F6,F6,F6,F6, RSHIFT, F5); NEXT;
 
         case L' ': continue; // Number space: just ignore
 #undef NEXT

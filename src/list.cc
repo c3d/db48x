@@ -1154,6 +1154,11 @@ COMMAND_BODY(Size)
                     if (sz && rt.top(+sz))
                         return OK;
         return ERROR;
+    case ID_uncertain:
+        if (algebraic_g s = uncertain_p(obj)->stddev())
+            if (s && rt.top(+s))
+                return OK;
+        return ERROR;
     default:
         break;
     }

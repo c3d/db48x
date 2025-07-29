@@ -329,28 +329,26 @@ bool algebraic::range_promotion(algebraic_g &x, object::id type)
         return false;
     }
 
-    if (xt == ID_uncertain)
-    {
-        // Convert from uncertain to range
-        x = uncertain_p(+x)->as_range();
-        return +x;
-    }
-    else if (xt == ID_range || xt == ID_drange || xt == ID_prange)
-    {
-        // Convert from range to uncertain
-        x = range_p(+x)->as_uncertain();
-        return +x;
-    }
-    else if (is_symbolic(xt))
-    {
-        // Assume a symbolic value is complex for now
-        // TODO: Implement `REALASSUME`
+    // Can convert between ranges but not to/from uncertain
+    if (is_range(xt))
+        return (xt == ID_uncertain) == (type == ID_uncertain);
+
+    // Symbolic values cannot be promoted to ranges
+    if (is_symbolic(xt))
         return false;
-    }
-    else if (is_symbolic_arg(xt) || is_algebraic(xt))
+
+    // Convert numerical values to uncertain range
+    if (is_symbolic_arg(xt) || is_algebraic(xt))
     {
-        algebraic_g zero = algebraic_p(integer::make(0));
-        x = range::make(type, x, x);
+        if (type == ID_uncertain)
+        {
+            algebraic_g zero = integer::make(0);
+            x = uncertain::make(x, zero);
+        }
+        else
+        {
+            x = range::make(type, x, x);
+        }
         return +x;
     }
 

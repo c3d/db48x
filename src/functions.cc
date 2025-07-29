@@ -326,8 +326,10 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 
     if (is_complex(xt))
         return algebraic_p(ops.zop(complex_g(complex_p(+x))));
-    if (is_range(xt))
+    if (is_strict_range(xt))
         return algebraic_p(ops.rop(range_g(range_p(+x))));
+    if (xt == ID_uncertain)
+        return algebraic_p(ops.uop(uncertain_g(uncertain_p(+x))));
 
     // Check if need to promote integer values to decimal
     if (is_integer(xt))
@@ -505,6 +507,8 @@ FUNCTION_BODY(neg)
     case ID_local:
     case ID_symbol:
     case ID_constant:
+        if (int inf = x->is_infinity())
+            return rt.infinity(inf > 0);
         return symbolic(ID_neg, x);
     case ID_polynomial:
     {
@@ -568,10 +572,14 @@ FUNCTION_BODY(neg)
     case ID_range:
     case ID_drange:
     case ID_prange:
-    case ID_uncertain:
     {
         range_g r = range_p(+x);
         return -r;
+    }
+    case ID_uncertain:
+    {
+        uncertain_g u = uncertain_p(+x);
+        return -u;
     }
     case ID_unit:
         return unit::simple(neg::run(unit_p(+x)->value()),
@@ -910,8 +918,13 @@ FUNCTION_BODY(inv)
     if (!x)
         return nullptr;
     if (x->is_symbolic())
+    {
+        if (Settings.AutoSimplify() && x->is_infinity())
+            return integer::make(0);
         return symbolic(ID_inv, x);
-    else if (x->type() == ID_array)
+    }
+
+    if (x->type() == ID_array)
         return array_p(+x)->invert();
 
     if (x->is_decimal())

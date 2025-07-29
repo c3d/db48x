@@ -1280,6 +1280,10 @@ expression_p expression::rewrite(expression_r from,
 //   to is `B + A`, then the output will be `sin(Y + X) + 3`.
 //
 {
+    // Do not keep going if we got an error along the way (e.g. out of memory)
+    if (!from || !to || rt.error())
+        return nullptr;
+
     // Remember the current stack depth and locals
     size_t       locals   = rt.locals();
     size_t       depth    = rt.depth();

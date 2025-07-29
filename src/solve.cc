@@ -461,7 +461,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                         // Very weak slope: Avoid going deep into the woods
                         record(solve, "[%u] Slow moving from %t scale %t",
                                i, +x, + sy);
-                        sy = sy && sy->is_negative() ? -two : two;
+                        sy = sy && sy->is_negative(false) ? -two : two;
                     }
                     x = lx - sy * dx;
                     record(solve, "[%u] Moved to %t [%t, %t]", i, +x, +lx, +hx);

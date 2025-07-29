@@ -312,6 +312,18 @@ rectangular_g complex::as_rectangular() const
 }
 
 
+complex_p complex::cycle() const
+// ----------------------------------------------------------------------------
+//   Switch between rectangular and polar forms
+// ----------------------------------------------------------------------------
+{
+    if (type() == ID_polar)
+        return as_rectangular();
+    else
+        return as_polar();
+}
+
+
 
 // ============================================================================
 //
@@ -433,7 +445,8 @@ PARSE_BODY(rectangular)
     }
     bool     sp    = utf8_whitespace(cp);
     size_t   imsz  = max - offs;
-    object_p imobj = sp ? nullptr : parse(p.source + offs, imsz, PARENTHESES);
+    object_p imobj = sp ? nullptr : parse(p.source + offs, imsz,
+                                          PARENTHESES, p.separator);
     if (!imobj)
     {
         rt.clear_error();
@@ -800,17 +813,30 @@ COMMAND_BODY(RealToRectangular)
     object_g im = strip(rt.stack(0));
     if (!re || !im)
         return ERROR;
+
+    algebraic_g uexpr;
+    if (unit_g ure = unit::get(re))
+    {
+        if (unit_g uim = unit::get(im))
+        {
+            if (!ure->convert(uim))
+                return ERROR;
+            uexpr = uim->uexpr();
+            re = ure->value();
+            im = uim->value();
+        }
+    }
+
     if (!(re->is_real() || re->is_symbolic()) ||
         !(im->is_real() || im->is_symbolic()))
     {
         rt.type_error();
         return ERROR;
     }
-    complex_g z = rectangular::make(algebraic_p(+re),
-                                    algebraic_p(+im));
-    if (!z|| !rt.drop())
-        return ERROR;
-    if (!rt.top(z))
+    algebraic_g z = rectangular::make(algebraic_p(+re), algebraic_p(+im));
+    if (uexpr)
+        z = unit::make(+z, uexpr);
+    if (!z || !rt.drop() || !rt.top(z))
         return ERROR;
     return OK;
 }
@@ -825,6 +851,13 @@ COMMAND_BODY(RealToPolar)
     object_g arg = strip(rt.stack(0));
     if (!mod || !arg)
         return ERROR;
+
+    algebraic_g uexpr;
+    if (unit_g umod = unit::get(mod))
+    {
+        uexpr = umod->uexpr();
+        mod = umod->value();
+    }
 
     algebraic::angle_unit amode = Settings.AngleMode();
     if (algebraic_g arga = arg->as_algebraic())
@@ -842,10 +875,10 @@ COMMAND_BODY(RealToPolar)
         rt.type_error();
         return ERROR;
     }
-    complex_g z = polar::make(algebraic_p(+mod), algebraic_p(+arg), amode);
-    if (!z|| !rt.drop())
-        return ERROR;
-    if (!rt.top(z))
+    algebraic_g z = polar::make(algebraic_p(+mod), algebraic_p(+arg), amode);
+    if (uexpr)
+        z = unit::make(z, uexpr);
+    if (!z|| !rt.drop() || !rt.top(z))
         return ERROR;
     return OK;
 }
@@ -859,6 +892,12 @@ COMMAND_BODY(RectangularToReal)
     object_g z = strip(rt.top());
     if (!z)
         return ERROR;
+    algebraic_g uexpr;
+    if (unit_p uz = unit::get(z))
+    {
+        uexpr = uz->uexpr();
+        z = uz->value();
+    }
     if (!z->is_complex())
     {
         rt.type_error();
@@ -869,6 +908,11 @@ COMMAND_BODY(RectangularToReal)
     object_g im = +zz->im();
     if (!re || !im)
         return ERROR;
+    if (uexpr)
+    {
+        re = unit::make(algebraic_p(+re), uexpr);
+        im = unit::make(algebraic_p(+im), uexpr);
+    }
     re = +tag::make("re", re);
     im = +tag::make("im", im);
     if (!re || !im || !rt.top(re) || !rt.push(im))
@@ -885,6 +929,12 @@ COMMAND_BODY(PolarToReal)
     object_g z = strip(rt.top());
     if (!z)
         return ERROR;
+    algebraic_g uexpr;
+    if (unit_p uz = unit::get(z))
+    {
+        uexpr = uz->uexpr();
+        z = uz->value();
+    }
     if (!z->is_complex())
     {
         rt.type_error();
@@ -897,6 +947,8 @@ COMMAND_BODY(PolarToReal)
         return ERROR;
     if (!complex::add_angle(arg))
         return ERROR;
+    if (uexpr)
+        mod = unit::make(mod, uexpr);
     object_g modobj = +tag::make("mod", +mod);
     object_g argobj = +tag::make("arg", +arg);
     if (!modobj || !argobj || !rt.top(modobj) || !rt.push(argobj))
@@ -922,7 +974,13 @@ COMMAND_BODY(ToRectangular)
             rt.type_error();
         return ERROR;
     }
-    else if (!x->is_complex())
+    algebraic_g uexpr;
+    if (unit_p ux = unit::get(x))
+    {
+        x = ux->value();
+        uexpr = ux->uexpr();
+    }
+    if (!x->is_complex())
     {
         rt.type_error();
         return ERROR;
@@ -930,6 +988,8 @@ COMMAND_BODY(ToRectangular)
     if (polar_p zp = x->as<polar>())
     {
         x = +zp->as_rectangular();
+        if (uexpr)
+            x = unit::make(algebraic_p(+x), uexpr);
         if (!x|| !rt.top(x))
             return ERROR;
     }
@@ -953,7 +1013,13 @@ COMMAND_BODY(ToPolar)
         rt.type_error();
         return ERROR;
     }
-    else if (!x->is_complex())
+    algebraic_g uexpr;
+    if (unit_p ux = unit::get(x))
+    {
+        x = ux->value();
+        uexpr = ux->uexpr();
+    }
+    if (!x->is_complex())
     {
         rt.type_error();
         return ERROR;
@@ -961,6 +1027,8 @@ COMMAND_BODY(ToPolar)
     if (rectangular_p zr = x->as<rectangular>())
     {
         x = +zr->as_polar();
+        if (uexpr)
+            x = unit::make(algebraic_p(+x), uexpr);
         if (!x|| !rt.top(x))
             return ERROR;
     }

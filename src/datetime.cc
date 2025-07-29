@@ -181,10 +181,8 @@ algebraic_p to_days(object_p dobj, bool error)
     if (unit_g u = unit::get(dobj))
     {
         unit_g day = unit::make(integer::make(1), +symbol::make("d"));
-        if (day->convert(u))
+        if (day->convert(u, false))
             dval = u->value();
-        else if (!error)
-            rt.clear_error();
     }
     if (!dval)
     {

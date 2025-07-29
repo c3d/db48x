@@ -317,6 +317,10 @@ retry:
     case L'∫':
         r = Primitive::do_parse(p);
         break;
+    case L'−':
+        r = range::do_parse(p);
+        if (r == OK)
+            break;
 
     default:
         // Symbols and commands
@@ -420,29 +424,29 @@ retry:
                 p.separator = cp;
 
                 if (maybe_range)
-                {
                     r2 = range::do_parse(p);
-                    if (r2 == OK)
-                    {
-                        parsed = p.length;
-                        length -= parsed;
-                        p.length = length;
-                        p.source += parsed;
-                        size += parsed;
-                        cp = length
-                            ? utf8_codepoint(p.source)
-                            : 0;
-                        maybe_unit = cp == '_' || cp == settings::SPACE_UNIT;
-                        if (maybe_unit)
-                            p.separator = cp;
-                        r2 = SKIP;
-                    }
-                }
-                if (maybe_rect)
+                else if (maybe_rect)
                     r2 = rectangular::do_parse(p);
                 else if (maybe_polar)
                     r2 = polar::do_parse(p);
-                else if (maybe_unit)
+
+                if (r2 == OK)
+                {
+                    parsed = p.length;
+                    length -= parsed;
+                    p.length = length;
+                    p.source += parsed;
+                    size += parsed;
+                    cp = length
+                        ? utf8_codepoint(p.source)
+                        : 0;
+                    maybe_unit = cp == '_' || cp == settings::SPACE_UNIT;
+                    if (maybe_unit)
+                        p.separator = cp;
+                    r2 = SKIP;
+                }
+
+                if (maybe_unit)
                     r2 = unit::do_parse(p);
                 else if (maybe_fcall)
                     r2 = funcall::do_parse(p);
@@ -1661,6 +1665,18 @@ int object::is_infinity() const
             return -1;
     }
     return 0;
+}
+
+
+bool object::is_number() const
+// ----------------------------------------------------------------------------
+//   Return true for real or complex numerical values
+// ----------------------------------------------------------------------------
+{
+    return is_real() ||
+        (is_complex() &&
+         complex_p(this)->x()->is_real() &&
+         complex_p(this)->y()->is_real());
 }
 
 
