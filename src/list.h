@@ -85,13 +85,25 @@ struct list : text
     template<typename ...Args>
     static list_p make(id ty, const gcp<Args> &...args)
     {
-        return rt.make<list>(ty, args...);
+        return non_null(args...) ? rt.make<list>(ty, args...) : nullptr;
     }
 
     template<typename ...Args>
     static list_p make(const gcp<Args> &...args)
     {
-        return rt.make<list>(ID_list, args...);
+        return non_null(args...) ? rt.make<list>(ID_list, args...) : nullptr;
+    }
+
+    template <typename Arg>
+    static bool non_null(const gcp<Arg> &arg)
+    {
+        return +arg;
+    }
+
+    template <typename Arg, typename ...Args>
+    static bool non_null(const gcp<Arg> &arg, const gcp<Args> &...args)
+    {
+        return +arg && non_null(args...);
     }
 
     template <typename Arg>
