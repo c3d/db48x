@@ -10499,6 +10499,49 @@ void tests::infinity_and_undefined()
         .test(CLEAR, "1/3 0", ENTER, ID_divide)
         .error("Divide by zero");
 
+
+    step("Infinity with complex add")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_add)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_add)
+        .expect("∞");
+    step("Infinity with complex sub")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_subtract)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_subtract)
+        .expect("−∞");
+    step("Infinity with complex multiply")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_multiply)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_multiply)
+        .expect("∞");
+    step("Infinity with complex divide")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_divide)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_divide)
+        .expect("0");
+
+    step("Infinity with arithmetic add")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_add)
+        .expect("'∞+(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_add)
+        .expect("'12+43+∞'");
+    step("Infinity with arithmetic sub")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_subtract)
+        .expect("'∞-(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_subtract)
+        .expect("'12+43-∞'");
+    step("Infinity with arithmetic multiply")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_multiply)
+        .expect("'∞·(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_multiply)
+        .expect("'(12+43)·∞'");
+    step("Infinity with arithmetic divide")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_divide)
+        .expect("'∞÷(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_divide)
+        .expect("'(12+43)÷∞'");
+
     test(CLEAR);
 }
 
@@ -11090,9 +11133,9 @@ void tests::constants_menu()
         .test(CLEAR, DIRECT("0 −∞ /"), ENTER).expect("0");
     step("Power infinities")
         .test(CLEAR, DIRECT("∞ 42 ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).expect("∞")
         .test(CLEAR, DIRECT("∞ -42 ^"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).expect("0")
         .test(CLEAR, DIRECT("42 ∞ ^"), ENTER).expect("∞")
         .test(CLEAR, DIRECT("42 −∞ ^"), ENTER).expect("0")
         .test(CLEAR, DIRECT("-42 ∞ ^"), ENTER).error("Undefined operation")
