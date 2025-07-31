@@ -1167,12 +1167,12 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
     if (Settings.AutoSimplify()) {
         int xinf = x->is_infinity();
         int yinf = y->is_infinity();
-        if (x->is_negative() && yinf) {
+        if (x->is_negative(false) && yinf) {
             rt.undefined_operation_error();
             return nullptr;
         }
         if (xinf) {
-            if (yinf < 0 || y->is_negative())
+            if (yinf < 0 || y->is_negative(false))
                 return algebraic_p(integer::make(0));
             if (y->is_real() && !y->is_zero()) {
                 if (xinf > 0) {
@@ -1185,7 +1185,7 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
                     return nullptr;
                 }
             }
-        } else if (x->is_real() && !x->is_zero() && yinf)
+        } else if (yinf && x->is_real() && !x->is_zero())
             return yinf < 0
                 ? algebraic_p(integer::make(0))
                 : rt.infinity(false);
