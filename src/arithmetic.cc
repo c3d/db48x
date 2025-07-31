@@ -1167,24 +1167,24 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
     if (Settings.AutoSimplify()) {
         int xinf = x->is_infinity();
         int yinf = y->is_infinity();
-        if (xinf || yinf)
-        {
-            if (xinf && yinf)
-                return rt.infinity(false);
-            if (xinf && y->is_real() && !(y->is_zero()))
-                return y->is_negative()
-                    ? algebraic_p(integer::make(0))
-                    : +x;
-            if (x->is_real() && yinf) {
-                if (x->is_negative()) {
-                    rt.undefined_operation_error();
-                    return nullptr;
-                }
-                else return yinf < 0
-                         ? algebraic_p(integer::make(0))
-                         : rt.infinity(false);
-            }
+        if (x->is_negative() && yinf) {
+            rt.undefined_operation_error();
+            return nullptr;
         }
+        if (xinf) {
+            if (y->is_negative())
+                return algebraic_p(integer::make(0));
+            if (xinf > 0) {
+                if ((yinf > 0) || (y->is_real() && !y->is_zero()))
+                    return +y;
+            } else {
+                // TODO if odd(y) +inf else -inf
+                return nullptr;
+            }
+        } else if (x->is_real() && !x->is_zero() && yinf)
+            return yinf < 0
+                ? algebraic_p(integer::make(0))
+                : rt.infinity(false);
     }
 
     // Deal with X^N where N is a positive  or negative integer
