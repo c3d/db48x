@@ -1172,14 +1172,18 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
             return nullptr;
         }
         if (xinf) {
-            if (y->is_negative())
+            if (yinf < 0 || y->is_negative())
                 return algebraic_p(integer::make(0));
-            if (xinf > 0) {
-                if ((yinf > 0) || (y->is_real() && !y->is_zero()))
-                    return +y;
-            } else {
-                // TODO if odd(y) +inf else -inf
-                return nullptr;
+            if (y->is_real() && !y->is_zero()) {
+                if (xinf > 0) {
+                    return +x;
+                } else if (integer_g yval = y->as<integer>()) {
+                    ularge yi = yval->value<ularge>();
+                    return rt.infinity(yi % 2);
+                } else {
+                    rt.undefined_operation_error();
+                    return nullptr;
+                }
             }
         } else if (x->is_real() && !x->is_zero() && yinf)
             return yinf < 0
