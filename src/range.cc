@@ -898,7 +898,7 @@ static object::result to_range(object::id ty)
         rt.type_error();
         return object::ERROR;
     }
-    range::sort(lo, hi);
+    if (ty != object::ID_uncertain) range::sort(lo, hi);
     range_g r = range::make(ty, lo, hi);
     if (!r || !rt.drop() || !rt.top(r))
         return object::ERROR;
