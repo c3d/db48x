@@ -3506,7 +3506,6 @@ expression_p expression::simplify() const
         atanh(tanh(X)), X,
         abs(abs(X)),    abs(X),
         abs(-X),        abs(X),
-        sqrt(abs(X)),   sqrt(X),
         sqrt(sq(X)),    abs(X),
         sq(sqrt(X)),    X,
         sq(X^Y),        X^(two*Y),
