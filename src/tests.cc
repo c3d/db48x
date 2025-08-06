@@ -188,7 +188,7 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            complex_types();
+            exact_trig_cases();
 
 #if 0
         if (onlyCurrent & 2)
@@ -4264,6 +4264,16 @@ void tests::exact_trig_cases()
     step("Conversion from non-standard units")
         .test(CLEAR, "1/8_turn COS", ENTER)
         .expect("0.70710 67811 87");
+
+    step("Argument reduction for large integer")
+        .test(CLEAR, DIRECT("DEG 10 60 ^ DUPDUP 10 - DUP"), ENTER, ID_sin)
+        .expect("-1")
+        .test(BSP, ID_cos)
+        .expect("0")
+        .test(BSP, ID_sin)
+        .expect("-0.98480 77530 12")
+        .test(BSP, ID_cos)
+        .expect("0.17364 81776 67");
 
     step("Cleaning up")
         .test(CLEAR, "SmallFractions DEG", ENTER).noerror();
