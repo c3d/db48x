@@ -14,12 +14,14 @@ The two versions of the firmware are, functionally speaking, virtually identical
 
 ## Download the firmware
 
-First [download the latest release](https://github.com/c3d/db48x/releases) of the firmware from the [project's GitHub repository](https://github.com/c3d/db48x):
+First download the installation files for [the latest release](https://github.com/c3d/db48x/releases) of the firmware from the [project's GitHub repository](https://github.com/c3d/db48x).
 
-* For a DM42, download the [DB48x distribution file, db48x-v0.9.8.tgz](https://github.com/c3d/db48x/releases/download/v0.9.8/db48x-v0.9.8.tgz) file.
-* For a DM32 or DM42n, download the [DB50x distribution file, db50x-v0.9.8.tgz](https://github.com/c3d/db48x/releases/download/v0.9.8/db50x-v0.9.8.tgz).
+Immediatly below the version specific release notes there is an Assets section (click the arrow to unfold the list):
 
-There are also source code archives for each release, which are only necessary to rebuild the firwmare.
+* For a DM42, download the db48x-....tgz file.
+* For a DM32 or DM42n, download the db50x-v0.9.8....tgz file.
+
+There are also source code archives for the release, which are only necessary to rebuild the firwmare.
 
 
 ## Connect the calculator to the computer
