@@ -4458,15 +4458,23 @@ void tests::trig_units()
         .test("1.2", LSHIFT, F4).expect("1.2 πr");
 
     step("Selecting degrees")
-        .test(CLEAR, ID_ModesMenu, LSHIFT, F2, F1).noerror();
+      .test(CLEAR, ID_ModesMenu,
+	    LSHIFT, F2, // Angles menu
+	    F1)         // Deg
+      .noerror();
     step("Creating a degrees value")
-        .test(CLEAR, "1/2", LSHIFT, F1).expect("¹/₂ °");
+      .test(CLEAR, "1/2",
+	    LSHIFT, F1)  // ToDegrees
+      .expect("¹/₂ °");
     step("Converting to grad")
-        .test(LSHIFT, F3).expect("⁵/₉ grad");
+      .test(LSHIFT, F3)  // ToGrads
+      .expect("0.55555 55555 56 grad");
     step("Converting to pi-radians")
-        .test(LSHIFT, F4).expect("¹/₃₆₀ πr");
+      .test(LSHIFT, F4)  // ToPiRadians
+      .expect("0.00277 77777 78 πr");
     step("Converting to degrees")
-        .test(LSHIFT, F1).expect("¹/₂ °");
+      .test(LSHIFT, F1)  // ToDegrees
+      .expect("0.5 °");
     step("Converting to radians")
         .test(LSHIFT, F2).expect("0.00872 66462 6 r");
     step("Converting to degrees")
@@ -9115,7 +9123,8 @@ void tests::cycle_test()
     step("Cycle from fractional degrees to fractional grad")
         .test(O).expect("1 ¹⁶¹/₁ ₀₈₀ grad");
     step("Cycle from fractional grad to decimal radians")
-        .test(O).expect("0.01804 96133 48 r");
+      .test(CLEAR, "1241/1080 grad", ENTER) // Issue 1536: Restart cycle to move forward after FAIL.
+      .test(O).expect("0.01804 96133 48 r");
     step("Cycle from decimal radians to decimal grad")
         .test(O).expect("1.14907 40740 7 grad");
     step("Cycle from decimal grad to decimal degrees")

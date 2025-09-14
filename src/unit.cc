@@ -732,10 +732,10 @@ static const cstring basic_units[] =
     // ------------------------------------------------------------------------
     "Angle",    nullptr,
 
-    "turn",     "1_turn",               // Full turns
+    "turn",     "'2*Ⓒπ'_r",             // Full turns
     "°",        "1/360_turn",           // Degree
     "grad",     "1/400_turn",           // Grad
-    "r",        "'0.5/Ⓒπ'_turn",       // Radian
+    "r",        "1_r",                  // Radian
     "πr",       "1/2_turn",             // Pi radians
 
     "dms",      "1_°",                  // Degrees shown as DMS
