@@ -169,7 +169,7 @@ This displays on the stack as `HH:MM:SS`.
 
 Return the Julian day number for the given date and time.
 
-For dates the Gregorian calendar is assumed. The Gregorian calendar jumps from 1582-10-04 to 1582-10-15. This command ignores that gap. So the Julian day number given by this command for dates on or before 1582-10-14 may devite from other converters. 
+For dates the Gregorian calendar is assumed. The Gregorian calendar jumps from 1582-10-04 to 1582-10-15. This command ignores that gap. So the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters. 
 
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
