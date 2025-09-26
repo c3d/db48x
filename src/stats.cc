@@ -985,10 +985,13 @@ algebraic_p StatsAccess::standard_deviation() const
 //   Compute the standard deviation
 // ----------------------------------------------------------------------------
 {
-    algebraic_g var = variance();
-    if (array_p vara = var->as<array>())
-        return vara->map(sqrt::evaluate);
-    return sqrt::evaluate(var);
+    if (algebraic_g var = variance())
+    {
+        if (array_p vara = var->as<array>())
+            return vara->map(sqrt::evaluate);
+        return sqrt::evaluate(var);
+    }
+    return nullptr;
 }
 
 
@@ -1271,10 +1274,13 @@ algebraic_p StatsAccess::population_standard_deviation() const
 //   Compute the population variance
 // ----------------------------------------------------------------------------
 {
-    algebraic_g pvar = population_variance();
-    if (array_p pvara = pvar->as<array>())
-        return pvara->map(sqrt::evaluate);
-    return sqrt::evaluate(pvar);
+    if (algebraic_g pvar = population_variance())
+    {
+        if (array_p pvara = pvar->as<array>())
+            return pvara->map(sqrt::evaluate);
+        return sqrt::evaluate(pvar);
+    }
+    return nullptr;
 }
 
 
