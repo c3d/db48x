@@ -4633,7 +4633,8 @@ bool user_interface::handle_editing(int key)
                         char valbuf[40];
                         snprintf(sizebuf, sizeof(sizebuf), "%lu bytes %s",
                                  (unsigned long) size, obj->fancy());
-                        bin->render(valbuf, sizeof(valbuf));
+                        size_t len = bin->render(valbuf, sizeof(valbuf) - 1);
+                        valbuf[len] = 0;
                         draw_message("Object info", sizebuf, valbuf);
                         wait_for_key_press();
                     }
