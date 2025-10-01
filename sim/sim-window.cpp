@@ -107,7 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
                      highlight, SLOT(keyResizeSlot(const QRect &)));
 
 #ifdef ANDROID
-    adjustSize(QApplication::primaryScreen()->availableSize());
+    adjustSize();
 #else
     if (userScaling != 1.0)
     {
@@ -121,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateAudioDevices);
     initializeAudio(devices->defaultAudioOutput(), 0);
 
-    std::setlocale(LC_ALL, "C");
+    setlocale(LC_ALL, "C");
 
     rpl.start();
     if (run_tests)
