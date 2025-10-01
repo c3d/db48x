@@ -262,10 +262,8 @@ ularge julian_day_number(int d, int m, int y)
   // To stay in sync with the references the date must be > 1582-10-14.
   // Working with dates <= 1582-10-14 can be ok, depending on the intend.
 
-  // I added the above comments as part of investigating and fixing a bug:
+  // The above comments added as part of investigating and fixing a bug:
   // https://github.com/c3d/db48x/issues/1538
-  
-  // Ed van Gasteren, 2025-09-19 (Gregorian date; ISO 8601 format).
   
     int rm = (m-14)/12;
     ularge jdn = ((1461 * (y + 4800 + rm)) / 4
@@ -308,10 +306,8 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
 	// "1976 B.C." = -1975. So the year matches but month and day are different.
 	// The difference is due to the Gregorian start 10 day advance and leap years.
 
-	// I added the above comments as part of investigating and fixing a bug:
+	// The above comments added as part of investigating and fixing a bug:
 	// https://github.com/c3d/db48x/issues/1538
-  
-	// Ed van Gasteren, 2025-09-19 (Gregorian date; ISO 8601 format).
 
         enum
         {

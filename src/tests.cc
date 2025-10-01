@@ -10103,10 +10103,10 @@ void tests::date_operations()
               "TEVAL", LENGTHY(1500), ENTER).noerror()
         .match("duration:[1-3]?[0-9][0-9] ms");
 
-    step("Converting to a Julian day number")
+    step("Converting from a dateto a Julian day number")
       .test(CLEAR, "20250919_date", ENTER, ID_JulianDayNumber)
       .expect("2 460 938");
-    step("Converting from a Julian day number")
+    step("Converting from a Julian day number to a date")
       .test(CLEAR, "1 000 000", ENTER, ID_DateFromJulianDayNumber)
       .expect("-Tue 21/Oct/1975");
 }
