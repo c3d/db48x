@@ -199,7 +199,6 @@ private:
 
 private slots:
     void        updateAudioDevices();
-
 };
 
 

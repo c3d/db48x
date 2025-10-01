@@ -141,6 +141,7 @@ clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
 clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-cxx-extension
 
 OBJECTS_DIR=db48x-build
+android:        OBJECT_DIR=db48x-android-build
 
 ICON = db48x.icns
 

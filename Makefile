@@ -29,6 +29,14 @@ EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
 PRODUCT_NAME=$(shell echo $(TARGET) | tr "[:lower:]" "[:upper:]")
 PRODUCT_MACHINE=$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]")
 
+# Android build
+ANDROID_SDK_ROOT?=/opt/homebrew/share/android-commandlinetools
+ANDROID_NDK_ROOT?=/opt/homebrew/share/android-commandlinetools/ndk/26.1.10909125
+ANDROID_QT_BASE?=/Volumes/Qt/6.8.1
+ANDROID_QT?=$(ANDROID_QT_BASE)/android_arm64_v8a
+ANDROID_QT_BIN?=$(ANDROID_QT)/bin
+ANDROID_DEPLOY_QT?=$(ANDROID_QT_BASE)/macos/bin/androiddeployqt
+
 
 #######################################
 # Pathes
@@ -84,6 +92,28 @@ sim/$(TARGET).mak:	sim/$(TARGET).pro	\
 			Makefile		\
 			$(VERSION_H)
 	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
+
+# Android build target
+android: android/$(TARGET).apk help/$(TARGET).idx
+	@echo "# Android APK built: android/$(TARGET).apk"
+
+android/$(TARGET).apk: sim/$(TARGET).pro Makefile $(VERSION_H)	\
+					sim/config.qrc		\
+					sim/state.qrc		\
+					sim/library.qrc		\
+					sim/help.qrc		\
+					sim/help/img.qrc	\
+					sim/android/AndroidManifest.xml	\
+					sim/android/build.gradle
+	@echo "# Building Android APK for $(TARGET)"
+	cd sim && \
+		export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) && \
+		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) && \
+		$(ANDROID_QT_BIN)/qmake -spec android-clang $(TARGET).pro && \
+		$(MAKE) VARIANT=android && \
+		$(ANDROID_DEPLOY_QT) \
+			--input android-$(TARGET)-deployment-settings.json \
+			--output ../android --gradle
 
 sim/%.qrc: Makefile
 	mkdir -p $(@D)

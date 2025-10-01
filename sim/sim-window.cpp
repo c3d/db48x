@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
       devices(new QMediaDevices(this)),
 #endif
-      generator(), audio()
+      audio(), generator()
 {
     mainWindow = this;
 
@@ -105,6 +105,7 @@ MainWindow::MainWindow(QWidget *parent)
         pageLayout->setParent(nullptr);
         delete pageLayout;
     }
+
     ui.centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
     ui.centralWidget->layout()->setSpacing(0);
 
@@ -126,7 +127,27 @@ MainWindow::MainWindow(QWidget *parent)
                      highlight, SLOT(keyResizeSlot(const QRect &)));
 
 #ifdef ANDROID
+    // On Android, center the stacked widget within the central widget
+    ui.centralWidget->setStyleSheet("background-color: black;");
+
+    ui.stackedWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+    // Set the layout to center its content horizontally
+    QLayout *layout = ui.centralWidget->layout();
+    if (layout)
+        layout->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    layout = this->layout();
+    if (layout)
+        layout->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+
     adjustSize();
+
+    QSize osz = size();
+    QSize isz = ui.centralWidget->size();
+    int x = (osz.width() - isz.width()) / 2;
+    int y = (osz.height() - isz.height()) / 2;
+    ui.centralWidget->move(x, y);
+
 #else
     if (userScaling != 1.0)
     {
@@ -222,7 +243,9 @@ void MainWindow::resizeEvent(QResizeEvent * event)
             nw = nh * r;
         record(sim_window, "Resizing dir=%d w=%d h=%d",
                resizeDirection, nw, nh);
+#ifndef ANDROID
         QMainWindow::resize(nw, nh);
+#endif
     }
 
     int   sw = ui.screen->screen_width;
@@ -251,13 +274,28 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     }
 
     // Set screen ratio and geometry (full width, at top)
-    QRect sframe(0, 0, scaledSW, scaledSH);
+    int x = 0;
+    int y = 0;
+#ifdef ANDROID
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen)
+    {
+        // Or get the available geometry (excludes system UI like status bar)
+        QRect availableGeometry = screen->availableGeometry();
+        int availableWidth = availableGeometry.width();
+        int availableHeight = availableGeometry.height();
+        x = (availableWidth - nw) / 2;
+        y = (availableHeight - nh) / 2;
+    }
+#endif
+
+    QRect sframe(x + (nw - scaledSW) / 2, y, scaledSW, scaledSH);
     ui.screen->setGeometry(sframe);
     ui.screen->setScale(sr);
 
     // Set keyboard size (centered horizontally, with spacing from screen)
     qreal spacing = (nh - scaledSH - kh) / 2;
-    QRect kframe((nw - kw) / 2, scaledSH + spacing, kw, kh);
+    QRect kframe(x + (nw - kw) / 2, y + scaledSH + spacing, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
 
@@ -1054,6 +1092,7 @@ void MainWindow::updateAudioDevices()
     initializeAudio(QAudioDeviceInfo::defaultOutputDevice(), generator->frequency());
 #endif
 }
+
 
 
 // ============================================================================

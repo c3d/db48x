@@ -41,6 +41,7 @@ INCLUDEPATH -= ../src/dm42
 INCLUDEPATH += ../src/dm32
 
 OBJECTS_DIR=db50x-build
+android:        OBJECT_DIR=db50x-android-build
 
 ICON = db50x.icns
 

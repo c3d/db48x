@@ -2,5 +2,8 @@
 <resources>
     <style name="splashScreenTheme">
         <item name="android:windowBackground">@drawable/splashscreen</item>
+        <item name="android:colorBackground">#000000</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>
