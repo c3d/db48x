@@ -230,7 +230,42 @@ ularge julian_day_number(int d, int m, int y)
 //   Compute the Julian day number given day, month and year
 // ----------------------------------------------------------------------------
 {
-    uint rm = (m-14)/12;
+  // The algorithm below seems to come from:
+  // https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_day_number.
+  // That seems to be based on the "Fliegel and van Flandern" algorithms:
+  // https://aa.usno.navy.mil/faq/JD_formula --> JD.
+  // With a little bit of algebra this function can be shown to be equivalent.
+
+  // Note wikpedia mentions: Divisions are integer divisions towards zero.
+  // Different versions of C++ standards and implementations are not 100 % unambiguous about this.
+  // This needs m = 1, 2 --> rm = -1; m = 3 ... 12 --> rm = 0.
+  // With the db48x simulator on Fedora = 42, that seems to be the case.
+  // I did not verify the other parts. I assume them to work the same. 
+
+  // JDN (reference):
+  //  a) https://aa.usno.navy.mil/data/JulianDate, specify date with 12:00;
+  //  b) https://ssd.jpl.nasa.gov/tools/jdc/#/cd, specify date with 12:00.
+  //
+  // Gregorian date, JDN (this), JDN a),        JDN b)
+  // 2025-09-18      2460937     2460937        2460937
+  // 1582-10-15      2299161     2299161        2299161
+  // 1582-10-14      2299160     invalid date   2299160 *, **
+  // 1582-10-05      2299151     invalid date   2299151 *
+  // 1582-10-04      2299150     2299160        2299160 **
+  //
+  // * Note the difference between the submitted and resulting Calendar Date/Time.
+  // ** Note the same JDN value.
+  //
+  // According to https://en.wikipedia.org/wiki/Gregorian_calendar
+  // "Thursday 4 October 1582 was followed by Friday 15 October 1582"
+  // This function doesn't do the 10 day advance.
+  // To stay in sync with the references the date must be > 1582-10-14.
+  // Working with dates <= 1582-10-14 can be ok, depending on the intend.
+
+  // The above comments are added as part of investigating and fixing a bug:
+  // https://github.com/c3d/db48x/issues/1538
+
+    int rm = (m-14)/12;
     ularge jdn = ((1461 * (y + 4800 + rm)) / 4
                   + (367 * (m - 2 - 12 * rm)) / 12
                   - (3 * ((y + 4900 + rm) / 100)) / 4
@@ -242,7 +277,7 @@ ularge julian_day_number(int d, int m, int y)
 
 algebraic_p date_from_julian_day(object_p jdn, bool error)
 // ----------------------------------------------------------------------------
-//   Create a day from a Julian day object
+//   Create a date from a Julian day object
 // ----------------------------------------------------------------------------
 {
     if (!jdn)
@@ -251,6 +286,28 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
     if (algebraic_g jval = jdn->as_real())
     {
         large jdn = jval->as_int64(0, error);
+
+	// See also the comments in the julian_day_number function.
+
+	// The algorithm below seems to come from:
+	// https://en.wikipedia.org/wiki/Julian_day#Julian_or_Gregorian_calendar_from_Julian_day_number
+	// That seems to be based on the "Fliegel and van Flandern" algorithms:
+	// https://aa.usno.navy.mil/faq/JD_formula --> GDATE.
+	// I tried (hard, but failed) with algebra to establish the equivalence.
+
+	// Note wikipedia mentions: integer division.
+	// No mention of "towards zero" here, but probably implied.
+
+	// jdn = 1000000 (now; with fixes) gives "-Tue 21/Oct/1975"
+	// https://aa.usno.navy.mil/data/JulianDate
+	// JDN = 1000000 gives "Tuesday 1976 B.C. November 7".
+	// https://ssd.jpl.nasa.gov/tools/jdc/#/jd
+	// JDN = 1000000 gives "-1975-11-07 12:00:00".
+	// "1976 B.C." = -1975. So the year matches but month and day are different.
+	// The difference is due to the Gregorian start 10 day advance and leap years.
+
+	// The above comments are added as part of investigating and fixing a bug:
+	// https://github.com/c3d/db48x/issues/1538
 
         enum
         {
@@ -274,7 +331,12 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
         large h = u * g + w;
         uint day = (h % s) / u + 1;
         uint month = (h / s + m ) % n + 1;
-        uint year = e / p - y + (n + m - month) / n;
+        int year = e / p - y + (n + m - month) / n;
+
+	bool negativeYear = year < 0;
+	if (negativeYear)
+	  year = - year;
+
         ularge dval = year * 10000 + month * 100 + day;
 
         algebraic_g date = integer::make(dval);
@@ -293,6 +355,10 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
                                  integer::make(1000000));
             date = date + fp;
         }
+
+	if (negativeYear)
+	  date = - date;
+
         date = unit::make(date, +symbol::make("date"));
         return date;
     }
