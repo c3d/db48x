@@ -1,4 +1,10 @@
-mple# Time, Alarms and System Commands
+# Time, Date, Alarms and System Commands
+
+## DateMenu
+This command activates the corresponding menu.
+## TimeMenu
+This command activates the corresponding menu.
+
 
 ## Date format
 
@@ -161,7 +167,9 @@ This displays on the stack as `HH:MM:SS`.
 
 ## JulianDayNumber
 
-Return the Julian day number for the given date and time
+Return the Julian day number for the given date and time.
+
+For dates the Gregorian calendar is assumed. The Gregorian calendar jumps from 1582-10-04 to 1582-10-15. This command ignores that gap. So the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters like [JD Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
 
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
@@ -169,12 +177,11 @@ To compute the Julian Day Number for the first day of the millenium:
 @ Expecting 2 451 545
 ```
 
-## DateFromJulianDayNumber
+## Datefromjuliandaynumber
 
 Return the date for a given Julian day number.
 
-The `DateFromJulianDayNumber` command converts a Julian day number to a date.
-The input is a Julian day number, and the result is the corresponding date.
+This command converts a Julian day number to a (Gregorian calendar) date.
 It is the opposite of the `JDN` command.
 
 ```rpl
