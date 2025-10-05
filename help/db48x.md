@@ -762,7 +762,9 @@ Additional contributors to the project include (in order of appearance):
 * Jean Wilson (Equation Library and associated documentation)
 * GitHub user mipa83 (Windows documentation)
 * Philippe Martens (be.philippe@icloud.com)
-* LdBeth <andpuke@foxmail.com> (Fixes)
+* LdBeth (andpuke@foxmail.com) (Bug fixes)
+* Thomas Eberhardt (sneakywumpus@gmail.com) (Bug fixes)
+* Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
 
 The authors would like to acknowledge
 
