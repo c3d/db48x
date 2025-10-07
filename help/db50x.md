@@ -7510,8 +7510,8 @@ HP48 implementation.
 
 ## Implemented commands
 
-The following is an extensive list of DB48x commands, some with multiple
-spellings.
+
+The following is an extensive list of commands.
 
 * `!`
 * `%`
@@ -8457,7 +8457,7 @@ spellings.
 * `⊿`
 * `Ⓓ`
 * `▶`
-
+* `⨯`
 
 ## Unimplemented commands
 
