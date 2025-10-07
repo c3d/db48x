@@ -11,10 +11,10 @@ HP48 implementation.
 
 ## Implemented commands
 
+<!--- DMNONE --->
 The following is an extensive list of DB48x commands, some with multiple
 spellings.
 
-<!--- DMNONE --->
 * `!` (`fact`, `factorial`, `x!`)
 * `%` (`Percent`)
 * `%T` (`%Ch`, `%Change`, `PercentChange`)
@@ -961,7 +961,10 @@ spellings.
 * `▶` (`Copy`)
 * `⨯` (`cross`)
 <!--- !DMNONE --->
+
 <!--- DM42 --->
+The following is an extensive list of commands.
+
 * `!`
 * `%`
 * `%T`
@@ -1909,6 +1912,8 @@ spellings.
 * `⨯`
 <!--- !DM42 --->
 <!--- DM32 --->
+The following is an extensive list of commands.
+
 * `!`
 * `%`
 * `%T`
@@ -2853,7 +2858,8 @@ spellings.
 * `⊿`
 * `Ⓓ`
 * `▶`
-
+* `⨯`
+<!--- !DM32 --->
 
 ## Unimplemented commands
 
