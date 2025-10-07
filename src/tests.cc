@@ -5902,7 +5902,11 @@ void tests::units_and_conversions()
         .editor("1_km/h")
         .test(ENTER)
         .type(ID_unit).expect("1 km/h")
-        .test(KEY1, F1, SHIFT, KEY5, SHIFT, F1, RSHIFT, F2)
+        .test(KEY1,        // 1
+              F1,          // in
+              SHIFT, KEY5, // UNIT menu
+              SHIFT, F2,   // Time menu
+              RSHIFT, F2)  // inverse(min)
         .editor("1_in/(min)")
         .test(ENTER)
         .type(ID_unit).expect("1 in/min")
@@ -5914,18 +5918,48 @@ void tests::units_and_conversions()
         .test(ENTER).expect("42 km/h")
         .test(RSHIFT, KEY5, F5).expect("37 km/h");
     step("Factoring out a unit")
-        .test(CLEAR, KEY3, SHIFT, KEY5, SHIFT, F6, F2, ENTER).expect("3 kW")
-        .test(KEY1, SHIFT, KEY5, SHIFT, F4, F1, ENTER).expect("1 N")
+        .test(CLEAR,
+              KEY3,        // 3
+              SHIFT, KEY5, // UNIT menu
+              RSHIFT, F2,  // Power menu
+              F2,          // kW
+              ENTER)
+        .expect("3 kW")
+        .test(KEY1,        // 1
+              SHIFT, KEY5, // UNIT menu
+              SHIFT, F5,   // Force menu
+              F1,          // N
+              ENTER)
+        .expect("1 N")
         .test(RSHIFT, KEY5, F4).expect("3 000 N·m/s");
     step("Orders of magnitude")
-        .test(CLEAR, KEY3, SHIFT, KEY5, SHIFT, F6, F2, ENTER).expect("3 kW")
+        .test(CLEAR,
+              KEY3,        // 3
+              SHIFT, KEY5, // UNIT menu
+              RSHIFT, F2,  // Power menu
+              F2,          // kW
+              ENTER)
+        .expect("3 kW")
         .test(RSHIFT, KEY5, SHIFT, F2).expect("300 000 cW")
         .test(LSHIFT, F3).expect("3 kW")
         .test(LSHIFT, F4).expect("³/₁ ₀₀₀ MW");
     step("Unit simplification (same unit)")
-        .test(CLEAR, KEY3, SHIFT, KEY5, SHIFT, F6, F2, ENTER).expect("3 kW")
-        .test(SHIFT, KEY5, SHIFT, F4, F1).expect("3 kW·N")
-        .test(SHIFT, KEY5, SHIFT, F6, RSHIFT, F2, ENTER).expect("3 N");
+        .test(CLEAR,
+              KEY3,        // 3
+              SHIFT, KEY5, // UNIT menu
+              RSHIFT, F2,  // Power menu
+              F2,          // kW
+              ENTER)
+        .expect("3 kW")
+        .test(SHIFT, KEY5, // UNIT menu
+              SHIFT, F5,   // Force menu
+              F1)          // N
+        .expect("3 kW·N")
+        .test(SHIFT, KEY5, // UNIT menu
+              RSHIFT, F2,  // Power menu
+              RSHIFT, F2,  // inverse(kW)
+              ENTER)
+        .expect("3 N");
     step("Arithmetic on units")
         .test(CLEAR, KEY3, KEY7, SHIFT, KEY5, F2, F4, ENTER).expect("37 mph")
         .test(SHIFT, KEY5, KEY4, KEY2, F2, F3, ENTER).expect("42 km/h")
@@ -5996,7 +6030,7 @@ void tests::units_and_conversions()
         .expect("⁴⁵ ³⁵⁹ ²³⁷/₅₀ ₀₀₀ ₀₀₀ kg")
         .test(CLEAR,
               LSHIFT, KEY5,     // Units menu
-              LSHIFT, F3,       // Select Mass
+              LSHIFT, F4,       // Select Mass
               KEY2, F6, F1,     // Enter 2_lb
               LSHIFT, F6,       // Previous page
               LSHIFT, F1)       // Convert to kg
