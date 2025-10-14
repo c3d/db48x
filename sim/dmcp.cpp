@@ -523,7 +523,15 @@ int lcd_fontWidth(disp_stat_t * ds)
 }
 int lcd_for_calc(int what)
 {
-    record(dmcp_notyet, "lcd_for_calc %d not implemented", what);
+    font_p font = LibMonoFont14x22;
+    coord x = 0;
+    coord y = 0;
+    size  h = font->height();
+    Screen.text(x, y, utf8("About"), font);
+    Screen.invert(x, y, LCD_W, h);
+    y += 3*h/2;
+    Screen.text(x, y, utf8("DMCP Simulator"), font);
+
     return 0;
 }
 int lcd_get_buf_cleared()
