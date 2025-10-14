@@ -297,8 +297,8 @@ CMD(log10)                      ALIAS(log10, "log")
 CMD(exp10)                      ALIAS(exp10, "alog")
 
 // Conversions
-NAMED(ToDecimal, "→Num")
-ALIAS(ToDecimal, "→Decimal")
+NAMED(ToDecimal, "→Decimal")
+ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
                                 ALIAS(ToFraction, "→Q") // Last algebr.
 
