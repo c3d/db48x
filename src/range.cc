@@ -898,7 +898,13 @@ static object::result to_range(object::id ty)
         rt.type_error();
         return object::ERROR;
     }
-    range::sort(lo, hi);
+    // The calculator user may put the lo(w) and hi(gh) values for a range in the wrong order.
+    // As a nice gesture they are sorted. That's convenient for most range types.
+    // But for an uncertain number they aren't lo(w) and hi(gh) values.
+    // They are mean and standard deviation.
+    // Sorting those is very likely incorrect. It should not be done.
+    if(! (ty == uncertain::ID_uncertain))
+        range::sort(lo, hi);
     range_g r = range::make(ty, lo, hi);
     if (!r || !rt.drop() || !rt.top(r))
         return object::ERROR;
