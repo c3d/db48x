@@ -16108,12 +16108,14 @@ Input values are sorted so that the range is normalized.
 ```
 ## →σRange
 
-Build an uncertain number ( `a±b%`) out of two individual
-components for the low and high value.
+Build an uncertain number (range of the form `a±σb`) out of two individual
+components for the mean and standard deviation value.
+
+Input values are not sorted (a large mean may have a smaller standard deviation).
 
 ```rpl
-1 2 →σRange
-@ Expecting 1±σ2
+100 2 →σRange
+@ Expecting 100±σ2
 ```
 
 
