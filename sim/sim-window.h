@@ -144,6 +144,9 @@ class MainWindow : public QMainWindow
     int                            keyboard_width;
     int                            keyboard_height;
 
+    // Keep resize direction to preserve aspect ratio
+    int                            resizeDirection;
+
     // Audio support
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QMediaDevices                 *devices = nullptr;
@@ -177,7 +180,7 @@ public:
     void                stopBuzzer();
     bool                buzzerPlaying() { return playing; }
 
-  protected:
+protected:
     virtual void keyPressEvent(QKeyEvent *ev);
     virtual void keyReleaseEvent(QKeyEvent *ev);
     bool         eventFilter(QObject *obj, QEvent *ev);

@@ -66,8 +66,9 @@
 #endif // WASM
 
 
-RECORDER(sim_keys, 16, "Recorder keys from the simulator");
-RECORDER(sim_audio, 16, "Recorder keys from the simulator");
+RECORDER(sim_window, 16, "Window management for the simulator");
+RECORDER(sim_keys, 16, "Keys from the simulator");
+RECORDER(sim_audio, 16, "Audio for the simulator");
 
 extern bool run_tests;
 extern bool shift_held;
@@ -84,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
 // ----------------------------------------------------------------------------
     : QMainWindow(parent), ui(), rpl(this), tests(this), highlight(),
       keyboard_width(698), keyboard_height(878),
+      resizeDirection(0),
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
       devices(new QMediaDevices(this)),
 #endif
@@ -95,6 +97,16 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setApplicationName(PROGRAM_NAME);
 
     ui.setupUi(this);
+
+    // Disable automatic layout management for manual control
+    QLayout *pageLayout = ui.stackedWidget->widget(0)->layout();
+    if (pageLayout)
+    {
+        pageLayout->setParent(nullptr);
+        delete pageLayout;
+    }
+    ui.centralWidget->layout()->setContentsMargins(0, 0, 0, 0);
+    ui.centralWidget->layout()->setSpacing(0);
 
     ui.keyboard->setAttribute(Qt::WA_AcceptTouchEvents);
     ui.keyboard->installEventFilter(this);
@@ -134,6 +146,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     setlocale(LC_ALL, "C");
 
+    // Set initial geometry manually since we disabled layout management
+    QResizeEvent initialResize(size(), size());
+    resizeEvent(&initialResize);
+
     rpl.start();
     if (run_tests)
     {
@@ -158,42 +174,90 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 //   Resizing the window
 // ----------------------------------------------------------------------------
 {
-    int   sw = ui.screen->screen_width;
-    int   sh = ui.screen->screen_height + 5;
-    qreal rw = event->size().width();
-    qreal rh = event->size().height();
+    // Compute size adjustment
+    QSize  oldSize = event->oldSize();
+    QSize  delta   = (oldSize.width() >= 0 && oldSize.height() >= 0)
+                       ? event->size() - oldSize
+                       : QSize(0, 0);
+    int    dw      = delta.width();
+    int    dh      = delta.height();
 
-    // Screen scaling ratio as an integer value
-    qreal sr = qMax(floor(rw / sw), 1.0);
+    // Compute new size
+    QSize  newSize = size();
+    QPoint newPos  = pos();
+    int    nx      = newPos.x();
+    int    ny      = newPos.y();
+    int    nw      = newSize.width();
+    int    nh      = newSize.height();
 
-    // Remaining space for the keyboard if screen at full scale
-    qreal kh = rh - sr * sh;
-    if (kh < 0.0)
+    record(sim_window,
+           "Resize   x=%d y=%d w=%d h=%d dw=%d dh=%d",
+           nx, ny, nw, nh, dw, dh);
+
+    // Preserve aspect ratio (420:800)
+    const qreal r      = 420.0 / 800.0;
+    bool        resize = false;
+    if (nw > nh * r * 1.01)
     {
-        // Not enough space at full scale, try at scale 1.0
-        kh = rh - sh;
-        sr = 1.0;
+        if (!resizeDirection)
+            resizeDirection = 2 - (dw > 0 || dh > 0);
+        resize = true;
+        record(sim_window, "Wide     x=%d y=%d w=%d h=%d dw=%d dh=%d",
+               nx, ny, nw, nh, dw, dh);
+    }
+    else if (nw < nh * r * 0.99)
+    {
+        if (!resizeDirection)
+            resizeDirection = 1 + (dh > 0 || dw > 0);
+        resize = true;
+        record(sim_window, "Narrow   x=%d y=%d w=%d h=%d dw=%d dh=%d",
+               nx, ny, nw, nh, dw, dh);
     }
 
-    // Ratio for keyboard
+    if (resize && resizeDirection)
+    {
+        if (resizeDirection == 1)
+            nh = nw / r;
+        else if (resizeDirection == 2)
+            nw = nh * r;
+        record(sim_window, "Resizing dir=%d w=%d h=%d",
+               resizeDirection, nw, nh);
+        QMainWindow::resize(nw, nh);
+    }
+
+    int   sw = ui.screen->screen_width;
+    int   sh = ui.screen->screen_height + 5;
+
+    // Screen uses full window width
+    qreal sr = qreal(nw) / sw;
+
+    // Calculate scaled screen dimensions
+    qreal scaledSW = nw;  // Full width
+    qreal scaledSH = sh * sr;
+
+    // Remaining space for the keyboard
+    qreal kh = nh - scaledSH;
+
+    // Scale keyboard proportionally to fill remaining height
     qreal kr = kh / keyboard_height;
     qreal kw = keyboard_width * kr;
-    if (kw >= rw)
+
+    // If keyboard is too wide, scale it down to window width
+    if (kw > nw)
     {
-        kr *= rw / kw;
-        kw = rw;
+        kr = qreal(nw) / keyboard_width;
+        kw = nw;
         kh = keyboard_height * kr;
     }
 
-    // Set screen ratio and geometry
-    ui.screen->setScale(sr);
-    sw = int(sw * sr);
-    sh = int(sh * sr);
-    QRect sframe((rw - sw) / 2, 0, sw, sh);
+    // Set screen ratio and geometry (full width, at top)
+    QRect sframe(0, 0, scaledSW, scaledSH);
     ui.screen->setGeometry(sframe);
+    ui.screen->setScale(sr);
 
-    // Set keyboard size
-    QRect kframe((rw - kw) / 2, rh - kh - (rh - kh - sh) / 4, kw, kh);
+    // Set keyboard size (centered horizontally, with spacing from screen)
+    qreal spacing = (nh - scaledSH - kh) / 2;
+    QRect kframe((nw - kw) / 2, scaledSH + spacing, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
 
@@ -559,7 +623,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent * ev)
 //   Released a key - Send a 0 to the simulator
 // ----------------------------------------------------------------------------
 {
-    if(ev->isAutoRepeat()) {
+    if (ev->isAutoRepeat())
+    {
         ev->accept();
         return;
     }
@@ -591,7 +656,18 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 //  Filter mouse / keyboard events
 // ----------------------------------------------------------------------------
 {
-    if(obj == ui.keyboard) {
+    if (ev->type() != QEvent::Resize &&
+        ev->type() != QEvent::Move &&
+        !QApplication::mouseButtons())
+    {
+        record(sim_window, "Clearing resize direction %d buttons %x",
+               int(ev->type()),
+               QApplication::mouseButtons());
+        resizeDirection = 0;
+    }
+
+    if (obj == ui.keyboard)
+    {
         if ((ev->type() == QEvent::TouchBegin) ||
             (ev->type() == QEvent::TouchUpdate) ||
             (ev->type() == QEvent::TouchEnd) ||
@@ -822,7 +898,7 @@ void AudioGenerator::generateData(const QAudioFormat &format,
     // Qt5 uses sampleSize() and sampleType() instead of sampleFormat()
     int sampleSize = format.sampleSize();
     QAudioFormat::SampleType sampleType = format.sampleType();
-    
+
     if (sampleType == QAudioFormat::UnSignedInt && sampleSize == 8)
     {
         generate<quint8>(start, frames, channels, freq, sampleRate, 255./2, 255./2);
