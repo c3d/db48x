@@ -8,6 +8,7 @@ SDK = dmcp/dmcp
 PGM = pgm
 PGM_TARGET = $(TARGET).$(PGM)
 BUILD_ID = $(shell tools/build_id)
+QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
 
 ######################################
 # Building variables
@@ -71,12 +72,12 @@ color-%:
 sim: sim/$(TARGET).mak help/$(TARGET).idx
 	cd sim; $(MAKE) -f $(<F) TARGET=$(shell awk '/^TARGET/ { print $$3; }' sim/$(TARGET).mak)
 sim/$(TARGET).mak: sim/$(TARGET).pro Makefile $(VERSION_H)	\
-					sim/config.qrc		\
-					sim/state.qrc		\
-					sim/library.qrc		\
-					sim/help.qrc		\
-					sim/help/img.qrc
-	cd sim; qmake $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
+ 				sim/config.qrc		\
+				sim/state.qrc		\
+				sim/library.qrc		\
+				sim/help.qrc		\
+				sim/help/img.qrc
+	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
 sim/%.qrc: Makefile
 	mkdir -p $(@D)
