@@ -45,15 +45,19 @@
 #include "sim-rpl.h"
 #include "ui_sim-window.h"
 #include <iostream>
-#include <QAudioDevice>
 #include <QAudioFormat>
-#include <QAudioOutput>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QAudioDevice>
 #include <QAudioSink>
+#include <QMediaDevices>
+#else
+#include <QAudioOutput>
+#include <QAudioDeviceInfo>
+#endif
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QKeyEvent>
-#include <QMediaDevices>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QtCore>
@@ -80,7 +84,10 @@ MainWindow::MainWindow(QWidget *parent)
 // ----------------------------------------------------------------------------
     : QMainWindow(parent), ui(), rpl(this), tests(this), highlight(),
       keyboard_width(698), keyboard_height(878),
-      devices(new QMediaDevices(this)), generator(), audio()
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      devices(new QMediaDevices(this)),
+#endif
+      generator(), audio()
 {
     mainWindow = this;
 
@@ -117,9 +124,13 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
 
     // Audio setup
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     connect(devices, &QMediaDevices::audioOutputsChanged,
             this, &MainWindow::updateAudioDevices);
     initializeAudio(devices->defaultAudioOutput(), 0);
+#else
+    initializeAudio(QAudioDeviceInfo::defaultOutputDevice(), 0);
+#endif
 
     setlocale(LC_ALL, "C");
 
@@ -784,11 +795,12 @@ void AudioGenerator::generateData(const QAudioFormat &format,
     qint64 frames       = format.framesForDuration(durationUs);
     size_t bytes        = frames * frameBytes;
     int    sampleRate   = format.sampleRate();
-    auto   sampleFormat = format.sampleFormat();
 
     buffer.resize(bytes);
     char *start = buffer.data();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto   sampleFormat = format.sampleFormat();
     switch (sampleFormat)
     {
     default:
@@ -806,6 +818,34 @@ void AudioGenerator::generateData(const QAudioFormat &format,
         generate<float>(start, frames, channels, freq, sampleRate, 1.0, 0.0);
         break;
     }
+#else
+    // Qt5 uses sampleSize() and sampleType() instead of sampleFormat()
+    int sampleSize = format.sampleSize();
+    QAudioFormat::SampleType sampleType = format.sampleType();
+    
+    if (sampleType == QAudioFormat::UnSignedInt && sampleSize == 8)
+    {
+        generate<quint8>(start, frames, channels, freq, sampleRate, 255./2, 255./2);
+    }
+    else if (sampleType == QAudioFormat::SignedInt && sampleSize == 16)
+    {
+        generate<qint16>(start, frames, channels, freq, sampleRate, 32767, 0);
+    }
+    else if (sampleType == QAudioFormat::SignedInt && sampleSize == 32)
+    {
+        generate<qint32>(start, frames, channels, freq, sampleRate,
+                     std::numeric_limits<qint32>::max(), 0);
+    }
+    else if (sampleType == QAudioFormat::Float)
+    {
+        generate<float>(start, frames, channels, freq, sampleRate, 1.0, 0.0);
+    }
+    else
+    {
+        // Default fallback
+        generate<qint16>(start, frames, channels, freq, sampleRate, 32767, 0);
+    }
+#endif
 }
 
 
@@ -850,7 +890,11 @@ qint64 AudioGenerator::bytesAvailable() const
 }
 
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void MainWindow::initializeAudio(const QAudioDevice &deviceInfo, uint freq)
+#else
+void MainWindow::initializeAudio(const QAudioDeviceInfo &deviceInfo, uint freq)
+#endif
 // ----------------------------------------------------------------------------
 //   Audio setup for the simulator
 // ----------------------------------------------------------------------------
@@ -858,7 +902,11 @@ void MainWindow::initializeAudio(const QAudioDevice &deviceInfo, uint freq)
     QAudioFormat format = deviceInfo.preferredFormat();
     const int    durationUs = 1000000 /* microseconds */;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     audio.reset(new QAudioSink(deviceInfo, format));
+#else
+    audio.reset(new QAudioOutput(deviceInfo, format));
+#endif
     generator.reset(new AudioGenerator(format, durationUs, freq));
     generator->start();
     audio->setVolume(0);
@@ -874,7 +922,11 @@ void MainWindow::startBuzzer(uint frequency)
     record(sim_audio, "Start buzzer %d.%02d Hz, creating samples",
            frequency / 100, frequency % 100);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     initializeAudio(devices->defaultAudioOutput(), frequency);
+#else
+    initializeAudio(QAudioDeviceInfo::defaultOutputDevice(), frequency);
+#endif
     audio->setVolume(1);
     switch (audio->state())
     {
@@ -920,7 +972,11 @@ void MainWindow::updateAudioDevices()
 //   Audio devices changed, restart without changing the frequency
 // ----------------------------------------------------------------------------
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     initializeAudio(devices->defaultAudioOutput(), generator->frequency());
+#else
+    initializeAudio(QAudioDeviceInfo::defaultOutputDevice(), generator->frequency());
+#endif
 }
 
 
