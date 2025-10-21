@@ -94,7 +94,7 @@ algebraic_p unit::parse_uexpr(gcutf8 source, size_t &plen)
     save<bool> save(unit::mode, true);
     uint       parens = 0;
     size_t     len    = plen;
-    for (size_t offs = 0; offs < len; offs = utf8_next(source, offs))
+    for (size_t offs = 0; offs < len; offs = utf8_next(source, offs, len))
     {
         unicode cp = utf8_codepoint(+source + offs);
         if (cp == '(')
