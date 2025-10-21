@@ -1,13 +1,5 @@
 # Operations with Units
 
-## UDEFINE
-Create a user-defined unit
-
-
-## UPURGE
-Delete a user-defined unit
-
-
 ## UnitValue
 
 Return the numeric part of a unit object.
