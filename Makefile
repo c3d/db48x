@@ -239,8 +239,6 @@ help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
-help/$(TARGET).md: help/$(TARGET)-images
-help/$(TARGET)-images:
 	rsync -av --delete doc/img/*.bmp help/img/
 
 help/$(TARGET).idx: help/$(TARGET).md
