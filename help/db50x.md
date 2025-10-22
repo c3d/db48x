@@ -13729,8 +13729,8 @@ DB50X has five display mode (one more than the HP48)s:
 * [Standard mode](#StandardDisplay)
 * [Fixed mode](#FixedDisplay)
 * [Scientific mode](#ScientificDisplay)
-* [Engineering mode](#EngineeringDisplay))
-* [Significant digits mode](#SignificantDisplay))
+* [Engineering mode](#EngineeringDisplay)
+* [Significant digits mode](#SignificantDisplay)
 
 DB50X also features digit [grouping and spacing](#display-grouping-and-spacing)
 
