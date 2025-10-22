@@ -24,7 +24,7 @@ else
 fi
 
 nsz=`filesize $q`
-ncrc=0x`crc32 $q`
+ncrc=0x`tools/crc32/crc32 $q`
 
 if [ $sz != $nsz -o $crc != $ncrc ]; then
 	cat << OI

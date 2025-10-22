@@ -43,6 +43,9 @@ TOOLS = tools
 # CRC adjustment
 CRCFIX = $(TOOLS)/forcecrc32/forcecrc32
 
+# CRC32 computation
+CRC32 = $(TOOLS)/crc32/crc32
+
 # Decimal mantissa encoding
 DECIMIZE = $(TOOLS)/decimize/decimize
 
@@ -516,7 +519,7 @@ $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
 	@echo Build ID $(BUILD_ID)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ \
 		-DBUILD_ID=$(BUILD_ID) src/dmcp/qspi_check.c
-$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX)
+$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX) $(CRC32)
 	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
 	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)
 	$(OBJCOPY) --only-section   .qspi -O binary  $<  $(QSPI)
@@ -551,6 +554,8 @@ $(BUILD)/.exists:
 
 $(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
 	cd $(dir $(CRCFIX)); $(MAKE)
+$(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
+	cd $(dir $(CRC32)); $(MAKE) TARGET=opt
 $(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
 	cd $(dir $(DECIMIZE)); $(MAKE) TARGET=opt
 
