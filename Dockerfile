@@ -1,5 +1,3 @@
-# syntax = docker/dockerfile:1.4.0
-
 FROM ubuntu:24.04
 WORKDIR /
 USER root
