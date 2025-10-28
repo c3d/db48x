@@ -128,6 +128,7 @@ user_interface::user_interface()
       xshift(false),
       alpha(false),
       transalpha(false),
+      talphaLowerc(false),
       lowercase(false),
       userOnce(false),
       shiftDrawn(false),
@@ -4321,7 +4322,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 
                 last = key;
                 repeat = true;
-                lowercase = key == KEY_DOWN;
+                talphaLowerc = key == KEY_DOWN;
                 return true;
             }
             else if (key)
@@ -4329,6 +4330,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
                 // A non-arrow key was pressed while arrows are down
                 alpha = true;
                 transalpha = true;
+                lowercase = talphaLowerc;
                 last = 0;
                 return false;
             }
