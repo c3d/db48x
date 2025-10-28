@@ -13700,7 +13700,65 @@ The current preferences can be retrieved and saved using the `Modes` command.
 
 ## Modes
 
-Returns a program that will restore the current settings. This program can be saved into a variable to quickly restore a carefully crafted set of preferences. Note that the calculator automatically restores the mode when it [loads a state](#States).
+Returns a program that will restore the current settings.
+This program can be saved into a variable to quickly restore user settings.
+Use this command along with `ResetModes` to restore settings, as shown in the
+example below, which displays `1.3` in `FIX` mode with 2 digits, then restores
+the settings and displays `1.3` again using the user's initial settings:
+
+```rpl
+«
+    Modes
+    → M
+    «
+        @ Fixed mode
+        2 FixedDisplay
+        1.3 1 DrawText
+
+        @ Restore standard mode
+        ResetModes M Evaluate
+        1.3 2 DrawText
+    »
+»
+```
+
+Note that the calculator automatically restores the mode when it
+[loads a state](#States).
+
+## ResetModes
+
+Reset all the settings to their default value.
+
+This can be used in combination with a stored value from the `Modes` command in
+order to save and restore user preferences that a program may modify.
+
+The following code creates a `SaveModes` program that evaluates a program on the stack and restores the settings to what they were before:
+
+```rpl
+«
+    Modes
+    → P M
+    «
+        P ResetModes M Evaluate
+    »
+» 'SafeRun' STO
+
+
+@ Example of use: change display mode twice, restore it afterwards
+1.3
+«
+    6 ENG
+    «
+        2 FIX
+        1.3 1 DISP
+    »
+    SafeRun
+
+    1.3 2 DISP
+» SafeRun
+
+@ Expecting: 1.3
+```
 
 ## ModesMenu
 
