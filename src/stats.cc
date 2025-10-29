@@ -35,6 +35,7 @@
 #include "dmcp.h"
 #include "expression.h"
 #include "integer.h"
+#include "recorder.h"
 #include "tag.h"
 #include "variables.h"
 
@@ -1303,6 +1304,137 @@ object::result StatsAccess::evaluate(eval_fn op, bool two_columns)
 }
 
 
+bool StatsAccess::frequency_bins(algebraic_r xmin,
+                                 algebraic_r xwidth,
+                                 algebraic_r nbins,
+                                 array_g    &bins,
+                                 array_g    &outliers)
+// ----------------------------------------------------------------------------
+//   Compute frequency bins from statistical data
+// ----------------------------------------------------------------------------
+{
+    return frequency_bins(data, xcol, xmin, xwidth, nbins, bins, outliers);
+}
+
+
+bool StatsAccess::frequency_bins(array_r     data,
+                                 size_t      xcol,
+                                 algebraic_r xmin,
+                                 algebraic_r xwidth,
+                                 algebraic_r nbins,
+                                 array_g    &bins,
+                                 array_g    &outliers)
+// ----------------------------------------------------------------------------
+//   Compute frequency bins from statistical data
+// ----------------------------------------------------------------------------
+{
+    // We need some input data
+    if (!data)
+    {
+        rt.invalid_stats_data_error();
+        return false;
+    }
+
+    // Check that the width is a strictly positive real
+    if (!xwidth -> is_real())
+    {
+        rt.type_error();
+        return false;
+    }
+    if (xwidth->is_zero(true) || xwidth->is_negative(true))
+    {
+        rt.value_error();
+        return false;
+    }
+
+    // Save stack depth before pushing temporary bin counters
+    stack_depth_restore sdr;
+
+    // Create array to store bin counts (nbins + 2 for underflow/overflow)
+    uint count = nbins->as_uint32(0, true);
+    integer_g zero = integer::make(0);
+    if (!zero || rt.error())
+        return false;
+    for (uint i = 0; i < count + 2; i++)
+        if (!rt.push(+zero))
+            return false;
+
+    // Create integer 1 for incrementing bins (reuse in loop)
+    algebraic_g one = integer::make(1);
+    algebraic_g nb = integer::make(count);
+    if (!one || !nb)
+        return false;
+
+    // Process each data point in the independent column
+    for (object_p robj : *data)
+    {
+        algebraic_g value;
+
+        // Handle different data formats
+        if (robj->is_real() || robj->is_complex())
+        {
+            // Single value - use it directly if xcol is 1
+            if (xcol == 1)
+                value = algebraic_p(robj);
+        }
+        else if (robj->type() == object::ID_array)
+        {
+            // Row array - extract the xcol-th element
+            array_p row = array_p(robj);
+            uint col = 1;
+            for (object_p cobj : *row)
+            {
+                if (col == xcol)
+                {
+                    if (cobj->is_real() || cobj->is_complex())
+                        value = algebraic_p(cobj);
+                    break;
+                }
+                col++;
+            }
+        }
+
+        if (!value)
+            continue;
+
+        // Determine which bin this value falls into
+        algebraic_g bin = (value - xmin) / xwidth;
+        if (!bin)
+            return false;
+        int ibin = bin->is_negative(true) ? -1 : bin->as_int32(0, true);
+        if (rt.error())
+            return false;
+
+        // Check if we are in outliers
+        if (ibin >= int(count))
+            ibin = count + 1;
+        else if (ibin < 0)
+            ibin = count;
+        else
+            ibin = count + ~ibin;
+
+        // Increment the corresponding bin
+        bin = rt.stack(ibin)->as_algebraic();
+        if (!bin)
+        {
+            ASSERT(bin && "Bin value became non-algebraic");
+            rt.internal_error();
+            return false;
+        }
+        bin = bin + one;
+        if (!bin)
+            return false;
+        rt.stack(ibin, +bin);
+    }
+
+    // Build result array for normal bins
+    bins = array::from_stack(count, 1, false);
+    outliers = array::from_stack(2, 0, false);
+
+    return bins && outliers;
+}
+
+
 
 // ============================================================================
 //
@@ -1484,10 +1616,27 @@ COMMAND_BODY(PopulationCovariance)
 
 COMMAND_BODY(FrequencyBins)
 // ----------------------------------------------------------------------------
-//  Compute frequency bits for the independent column in the data
+//  Compute frequency bins for the independent column in the data
 // ----------------------------------------------------------------------------
+//  Stack: xmin xwidth nbins -> [[n1 ... nn]] [nlow nhigh]
 {
-    rt.unimplemented_error();
+    // Get the three parameters from the stack
+    if (!rt.args(3))
+        return ERROR;
+
+    algebraic_g xmin   = algebraic_p(rt.stack(2));
+    algebraic_g xwidth = algebraic_p(rt.stack(1));
+    algebraic_g nbins  = algebraic_p(rt.stack(0));
+    if (!xmin || !xwidth || !nbins)
+        return ERROR;
+
+    StatsAccess stats;
+    array_g bins, outliers;
+    if (stats.frequency_bins(xmin, xwidth,nbins, bins, outliers)        &&
+        rt.drop()                                                       &&
+        rt.stack(1, +bins)                                              &&
+        rt.stack(0, +outliers))
+        return OK;
     return ERROR;
 }
 

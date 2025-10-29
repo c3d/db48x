@@ -359,6 +359,7 @@ spellings.
 * `HideSeconds`
 * `HideTime`
 * `HideVoltage`
+* `Histogram` (`HistogramPlot`)
 * `HMS+` (`HMSAdd`)
 * `HMS-` (`HMSSub`)
 * `HMS→` (`FromHMS`)

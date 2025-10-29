@@ -142,6 +142,19 @@ struct StatsAccess : StatsParameters::Access, StatsData::Access
     algebraic_p         slope_value() const             { return slope; }
     bool                linear_regression();
 
+    bool                frequency_bins(algebraic_r xmin,
+                                       algebraic_r xwidth,
+                                       algebraic_r nbins,
+                                       array_g    &bins,
+                                       array_g    &outliers);
+    static bool         frequency_bins(array_r     data,
+                                       size_t      xcol,
+                                       algebraic_r xmin,
+                                       algebraic_r xwidth,
+                                       algebraic_r nbins,
+                                       array_g    &bins,
+                                       array_g    &outliers);
+
     typedef algebraic_p (StatsAccess::*eval_fn)() const;
     static object::result evaluate(eval_fn op, bool two_columns);
 
@@ -171,6 +184,7 @@ COMMAND_DECLARE(RecallData,0);
 COMMAND_DECLARE(StoreData,1);
 COMMAND_DECLARE(ClearData,0);
 COMMAND_DECLARE(DataSize,0);
+COMMAND_DECLARE(DataTotal,0);
 COMMAND_DECLARE(Average,0);
 COMMAND_DECLARE(Median,0);
 COMMAND_DECLARE(MinData,0);
@@ -188,7 +202,7 @@ COMMAND_DECLARE(PopulationVariance,0);
 COMMAND_DECLARE(PopulationStandardDeviation,0);
 COMMAND_DECLARE(PopulationCovariance,0);
 COMMAND_DECLARE(FrequencyBins,3);
-COMMAND_DECLARE(DataTotal,0);
+
 COMMAND_DECLARE(IndependentColumn,1);
 COMMAND_DECLARE(DependentColumn,1);
 COMMAND_DECLARE(DataColumns,2);

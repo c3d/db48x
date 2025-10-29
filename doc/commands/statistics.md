@@ -240,17 +240,36 @@ Select power fit, i.e. try to model data with an equation `y = x^a * b`.
 
 ## FrequencyBins
 
+Sort into frequency bins.
+
 Sorts the elements of the independent column (`XCol`) of the current statistics
-matrix (the reserved variable `ΣDat`) into (`nbins + 2`) bins, where the left
+matrix (the reserved variable `ΣData`) into `nbins + 2` bins, where the left
 edge of bin 1 starts at value `xmin` and each bin has width `xwidth`.
 
 `FrequencyBins` returns a matrix containing the frequency of occurrences in each
 bin, and a 2-element array containing the frequency of occurrences falling below
-or above the defined range of x-values. The array can be stored into the
-reserved variable `ΣData` and used to plot a bar histogram of the bin data, for
-example, by executing `BarPlot`.
+or above the defined range of x-values.
+
+*Note*: The array can be stored into the reserved variable `ΣData` and used to
+plot a bar histogram of the bin data, for example, by executing `BarPlot`,
+as suggested in the *HP50G Advanced Reference Manual*. However, this binning is
+performed directly by the `HistogramPlot` command.
 
 `xmin` `xwidth` `nbins` ▶ `[[ n1 .. n2 ]]` `[ nlow nhigh ]`
+
+In the following example, the data is sorted into 5 bins of width 2, starting at
+x-value of 1 and ending at x-value 11. The first element of the resulting matrix
+shows that 5 x-values (namelly 2, 1, 1, 1 and 2) fell in bin 1, where bin 1
+ranges from x-value `1` inclusive through value `3` exclusive. The outliers
+vectors shows that one x-value was less than the minimum 1, and one was greater
+than the maximum value 13.
+
+```rpl
+[ 7 2 3 1 4 6 9 0 1 1 3 5 13 2 6 9 5 8 5 ] StoΣ
+1 2 5 BINS
+2 ToList
+@ Expecting { [[ 5 ] [ 3 ] [ 5 ] [ 2 ] [ 2 ]] [ 1 1 ] }
+```
 
 
 ## PopulationVariance
