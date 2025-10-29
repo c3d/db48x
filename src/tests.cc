@@ -13206,6 +13206,28 @@ void tests::plotting()
         .noerror()
         .image("scatterplot");
 
+    step("Reset graphics")
+        .test(CLEAR, "{ LineWidth Foreground } PURGE", ENTER).noerror();
+    step("Low resolution")
+        .test(CLEAR, "0.5 Res", ENTER).noerror()
+        .test("'sin(200/(x+0.42))/x' FunctionPlot", LENGTHY(500), ENTER)
+        .noerror()
+        .image("low-resolution");
+    step("Read low resolution")
+        .test(CLEAR, "'Res' RCL", ENTER)
+        .expect("0.5");
+    step("High resolution")
+        .test(CLEAR, "0.005 'Res' STO", ENTER).noerror()
+        .test("'sin(200/(x+0.42))/x' FunctionPlot", LENGTHY(5000), ENTER)
+        .noerror()
+        .image("high-resolution");
+    step("Read high resolution")
+        .test(CLEAR, "'Res' RCL", ENTER)
+        .expect("0.005");
+    step("Purge resolution")
+        .test(CLEAR, "'Resolution' PURGE", ENTER).noerror()
+        .test("'Res' RCL", ENTER).expect("0");
+
     step("Reset drawing parameters");
     test(CLEAR, DIRECT("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
         .noerror();

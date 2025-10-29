@@ -534,6 +534,7 @@ NAMED(Scale,            "PlotScale")
 NAMED(XScale,           "PlotScaleX")           ALIAS(XScale, "ScaleX") ALIAS(XScale, "ScaleH")
 NAMED(YScale,           "PlotScaleY")           ALIAS(YScale, "ScaleY") ALIAS(YScale, "ScaleW")
 NAMED(Center,           "PlotCenter")           ALIAS(Center, "Centr")
+NAMED(Res,              "Resolution")
 
 CMD(Beep)
 

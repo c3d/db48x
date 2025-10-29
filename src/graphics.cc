@@ -2432,6 +2432,30 @@ COMMAND_BODY(Center)
 }
 
 
+COMMAND_BODY(Res)
+// ----------------------------------------------------------------------------
+//   Setup the resolution
+// ----------------------------------------------------------------------------
+{
+    object_p res = rt.top();
+    if (res && res->is_real())
+    {
+        PlotParametersAccess ppar;
+        ppar.resolution = algebraic_p(res);
+        if (ppar.write())
+        {
+            rt.drop();
+            return OK;
+        }
+    }
+    else
+    {
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
 COMMAND_BODY(Gray)
 // ----------------------------------------------------------------------------
 //   Create a pattern from a gray level

@@ -35,6 +35,7 @@
 #include "decimal.h"
 #include "font.h"
 #include "functions.h"
+#include "graphics.h"
 #include "integer.h"
 #include "menu.h"
 #include "program.h"
@@ -430,6 +431,7 @@ bool settings::store(object::id name, object_p value)
 #define ID(n)
 #define SETTING(Name, Low, High, Init)          case ID_##Name:
 #include "ids.tbl"
+    case ID_Res:
         if (rt.push(value))
             return command::static_object(name)->evaluate() == object::OK;
         return false;
@@ -503,6 +505,12 @@ object_p settings::recall(object::id name)
             break;
 #include "ids.tbl"
 
+    case ID_Res:
+    {
+        PlotParametersAccess ppar;
+        return ppar.resolution;
+    }
+
     default:
         return nullptr;
     }
@@ -532,6 +540,12 @@ bool settings::purge(object::id name)
         Settings.Disable(true);                 \
         break;
 #include "ids.tbl"
+
+    case ID_Res:
+        if (rt.push(integer::make(0)))
+            if (Res::evaluate() == object::OK)
+                return true;
+        return false;
 
     default:
         return false;
