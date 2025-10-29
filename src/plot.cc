@@ -117,11 +117,11 @@ uint draw_data(array::iterator &it, array::iterator &end,
                 xx = algebraic_p(cdata);
             if (col == ycol)
                 yy = algebraic_p(cdata);
-            if (xx && yy)
+            if ((xx || xcol == 0) && (yy || ycol == 0))
             {
                 x = xx;
                 y = yy;
-                return 2;
+                return xx && yy ? 2 : 1;
             }
             col++;
         }
@@ -130,10 +130,11 @@ uint draw_data(array::iterator &it, array::iterator &end,
 }
 
 
-
 object::result draw_plot(object::id                  kind,
                          const PlotParametersAccess &ppar,
-                         object_g                    to_plot = nullptr)
+                         object_g                    to_plot,
+                         size_t                      xcol = 1,
+                         size_t                      ycol = 2)
 // ----------------------------------------------------------------------------
 //  Draw an equation that takes input from the stack
 // ----------------------------------------------------------------------------
@@ -159,41 +160,41 @@ object::result draw_plot(object::id                  kind,
     case object::ID_Parametric:
         min = ppar.imin;
         max = ppar.imax;
-        step = ppar.resolution;
-        if (step->is_zero())
-            step = (max - min) / integer::make(display_width());
         dname = object::ID_Equation;
         break;
 
     case object::ID_Scatter:
     case object::ID_Bar:
+    case object::ID_Histogram:
         min = ppar.xmin;
         max = ppar.xmax;
         dname = object::ID_StatsData;
         break;
     }
 
+    // If the default resolution is zero, pick up a default resolution
     step = ppar.resolution;
     if (step->is_zero())
-        step = (max - min) / integer::make(display_width());
-
-    if (!to_plot)
     {
-        to_plot = directory::recall_all(command::static_object(dname), false);
-        if (!to_plot)
-        {
-            if (dname == object::ID_Equation)
-                rt.no_equation_error();
-            else
-                rt.no_data_error();
-            return object::ERROR;
-        }
+        const uint stbins = Settings.StatsPlotRenderingBins();
+        uint nbins = dname == object::ID_StatsData ? stbins : display_width();
+        step = (max - min) / integer::make(nbins);
     }
+
+    // If the resolution is a based number, it is a number of pixels
+    else if (step->is_based())
+    {
+        size pixels = step->as_uint32(0, true);
+        step = (max - min)
+            * integer::make(pixels)
+            / integer::make(display_width());
+    }
+    if (!step)
+        return object::ERROR;
 
     program_g       eq;
     array_g         data;
     array::iterator it, end;
-    size_t          xcol = 0, ycol = 0;
     size            bar_width = 0, bar_skip = 0;
     size            bar_x = 0;
     coord           yzero = 0;
@@ -222,18 +223,40 @@ object::result draw_plot(object::id                  kind,
             return object::ERROR;
         }
 
+        // For Histogram mode: automatically bin the data
+        if (kind == object::ID_Histogram)
+        {
+            array_g bins = to_plot->as<array>();
+            if (!bins)
+            {
+                rt.type_error();
+                return object::ERROR;
+            }
+            array_g outliers;
+            if (!StatsAccess::frequency_bins(bins, 1,
+                                             min, step, (max - min) / step,
+                                             bins, outliers))
+                return object::ERROR;
+            data = bins;
+            xcol = 0;
+            ycol = 1;
+        }
+        else
+        {
+            // For Bar and Scatter: use data as-is
+            data = array_p(+to_plot);
+        }
+
         size width = display_width();
-        data = array_p(+to_plot);
         size_t items = data->items();
-        data = array_p(+to_plot);
         step = (max - min) / integer::make(items);
         bar_skip = items && items < width ? width / items : 1;
-        bar_width = bar_skip > 2 ? bar_skip - 2: bar_skip;
+
+        // Make histogram bars closer than bar plot
+        uint space = kind == object::ID_Histogram ? 1 : 2;
+        bar_width = bar_skip > space ? bar_skip - space : bar_skip;
         it = data->begin();
         end = data->end();
-        StatsParameters::Access stats;
-        xcol = stats.xcol;
-        ycol = stats.ycol;
         yzero = ppar.pixel_y(integer::make(0));
     }
 
@@ -297,6 +320,7 @@ object::result draw_plot(object::id                  kind,
 
             case object::ID_Scatter:
             case object::ID_Bar:
+            case object::ID_Histogram:
                 rx = ppar.pixel_x(x);
                 ry = ppar.pixel_y(y);
                 break;
@@ -305,7 +329,7 @@ object::result draw_plot(object::id                  kind,
 
         if (y)
         {
-            if (kind != object::ID_Bar)
+            if (kind != object::ID_Bar && kind != object::ID_Histogram)
             {
                 if (lx < 0 || split_points)
                 {
@@ -358,7 +382,7 @@ object::result draw_plot(object::id                  kind,
         if (kind != object::ID_Scatter)
         {
             x = x + step;
-            if (kind != object::ID_Bar)
+            if (kind != object::ID_Bar && kind != object::ID_Histogram)
             {
                 algebraic_g cmp = x > max;
                 if (!cmp)
@@ -379,6 +403,35 @@ object::result draw_plot(object::id                  kind,
 err:
     refresh_dirty();
     return result;
+}
+
+
+object::result draw_plot(object::id                  kind,
+                         const PlotParametersAccess &ppar,
+                         object::id                  dname,
+                         size_t                      xcol = 1,
+                         size_t                      ycol = 2)
+// ----------------------------------------------------------------------------
+//  Plot from EQ or StatsData rather than from stack
+// ----------------------------------------------------------------------------
+{
+    object_p name = command::static_object(dname);
+    object_p to_plot = directory::recall_all(name, false);
+    if (!to_plot)
+    {
+        if (dname == object::ID_Equation)
+            rt.no_equation_error();
+        else
+            rt.no_data_error();
+        return object::ERROR;
+    }
+    if (dname == object::ID_StatsData)
+    {
+        StatsAccess stats;
+        xcol = stats.xcol;
+        ycol = stats.ycol;
+    }
+    return draw_plot(kind, ppar, to_plot, xcol, ycol);
 }
 
 
@@ -441,9 +494,18 @@ COMMAND_BODY(Bar)
 }
 
 
+COMMAND_BODY(Histogram)
+// ----------------------------------------------------------------------------
+//   Draw histogram plot from data on the stack
+// ----------------------------------------------------------------------------
+{
+    return draw_plot(ID_Histogram);
+}
+
+
 COMMAND_BODY(Draw)
 // ----------------------------------------------------------------------------
-//   Draw plot in EQ according to PPAR
+//   Draw plot in EQ or StatsData according to PPAR
 // ----------------------------------------------------------------------------
 {
     PlotParametersAccess ppar;
@@ -453,7 +515,11 @@ COMMAND_BODY(Draw)
     case ID_Function:
     case ID_Parametric:
     case ID_Polar:
-        return draw_plot(ppar.type, ppar);
+        return draw_plot(ppar.type, ppar, ID_Equation);
+    case ID_Scatter:
+    case ID_Bar:
+    case ID_Histogram:
+        return draw_plot(ppar.type, ppar, ID_StatsData);
     }
     rt.invalid_plot_type_error();
     return ERROR;

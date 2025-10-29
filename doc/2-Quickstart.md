@@ -1252,6 +1252,13 @@ The line width can be adjusted to make plots more visible or to distinguish betw
 
 Different line patterns (solid, dashed, dotted) can be used to distinguish between multiple functions plotted on the same screen.
 
+## Plotting data
+
+In addition to plotting functions, DB48x can also plot data:
+* `ScatterPlot` draw points in an array from x and y coordinates
+* `BarPlot` plots a vector of values as a series of bars
+* `HistogramPlot` shows the distribution of values along the x axis.
+
 
 ## The numerical solver
 

@@ -1371,7 +1371,7 @@ MENU(PlotMenu,
      "Param",   ID_Parametric,
      "Scatter", ID_Scatter,
      "Bar",     ID_Bar,
-     "Axes",    ID_Drax,
+     "Histogrm",ID_Histogram,
 
      "Foregnd", ID_Foreground,
      "LineWdth",ID_LineWidth,
@@ -1382,7 +1382,8 @@ MENU(PlotMenu,
 
      "Backgnd", ID_Background,
      "Clear",   ID_ClLCD,
-     "Freeze",  ID_Freeze);
+     "Freeze",  ID_Freeze,
+     "DrAxes",  ID_Drax);
 
 MENU(ClearThingsMenu,
 // ----------------------------------------------------------------------------

@@ -2296,6 +2296,13 @@ The line width can be adjusted to make plots more visible or to distinguish betw
 
 Different line patterns (solid, dashed, dotted) can be used to distinguish between multiple functions plotted on the same screen.
 
+## Plotting data
+
+In addition to plotting functions, DB48x can also plot data:
+* `ScatterPlot` draw points in an array from x and y coordinates
+* `BarPlot` plots a vector of values as a series of bars
+* `HistogramPlot` shows the distribution of values along the x axis.
+
 
 ## The numerical solver
 
@@ -13374,6 +13381,14 @@ Convert an object into a program.
 Graphics are rendered on the screen based on a coordinate systems defined in the
 `PlotParameters` variables.
 
+DB50X supports multiple plotting modes:
+* **Function** - Standard y=f(x) plots
+* **Polar** - Polar coordinate plots
+* **Parametric** - Parametric curve plots
+* **Scatter** - Scatter plots from data
+* **Bar** - Bar charts from data
+* **Histogram** - Histogram plots for frequency distributions
+
 ## PlotParameters
 
 The `PlotParameters` reserved variable defines the plot parameters, as a list,
@@ -13467,6 +13482,99 @@ causes the circle to be elongated vertically:
 -1.5 1.5 YRNG
 (0;0) 1 CIRCLE
 @ Image yrange-circle
+```
+
+
+## FunctionPlot
+
+Plot a function in the form y=f(x). The function is taken from the stack.
+
+```rpl
+'tan(13*x) * sin(500*x)' FunctionPlot
+@ Image fnplot-example
+```
+
+
+## PolarPlot
+
+Plot a function in polar coordinates, where r=f(θ).
+
+```rpl
+'6*sin(15*x)*sin(113*x)' PolarPlot
+@ Image polarplot-example
+```
+
+
+## ParametricPlot
+
+Plot a parametric curve where x and y are both functions of a parameter.
+
+The input function returns a complex number where the real part is interpreted
+as the position along the x axis and the imaginary part is interpreted as the
+position along the y axis.
+
+
+```rpl
+'exp((0.25+4.5ⅈ)*x)' ParametricPlot
+@ Image parametricplot-example
+```
+
+
+## ScatterPlot
+
+Create a scatter plot from the first two columns of a matrix, the first column
+representing the horizontal axis, the second column representing the vertical
+axis.
+
+```rpl
+[ [ -5 -5 ]
+  [ -3  0 ]
+  [ -5  5 ]
+  [  0  3 ]
+  [  5  5 ]
+  [  3  0 ]
+  [  5 -5 ]
+  [  0 -3 ]
+  [ -5 -5 ] ]
+ScatterPlot
+@ Image scatterplot-example
+```
+
+## BarPlot
+
+Create a bar chart from a vector of values.
+
+The size of the vector defines the number of bars being displayed.
+Unlike other plotting commands, the `xrange` setting is not taken into account
+when positioning the bars horizontally. However, the `yrange` setting is used to
+determine the vertical position of the bars.
+
+```rpl
+[1 2 3 4 3 2 1 -1 -3 -5 3 5 1 2 3 ]
+BarPlot
+@ Image barplot-example
+```
+
+
+## HistogramPlot
+
+Create a histogram from a data vector on the stack.
+
+The `PPar` variable defines the horizontal range (as defined by `xrange`) and
+the vertical range (as defined by `yrange`). The resolution parameter in `PPar`
+defines the size of the bins. With the default value of `0`, the range is
+subdivided into 25 bins.
+
+```rpl
+1 RDZ
+ClΣ
+1 1000 for i
+  RAND 20 * 10 - Σ+
+next
+RclΣ
+-1 100 YRANGE
+HistogramPlot
+@ Image histogramplot-example
 ```
 # Operations with Ranges
 
