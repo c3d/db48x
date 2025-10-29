@@ -1303,6 +1303,10 @@ struct stack_depth_restore
     stack_depth_restore(): depth(rt.depth()) {}
     ~stack_depth_restore()
     {
+        clear();
+    }
+    void clear()
+    {
         size_t now = rt.depth();
         if (now > depth)
             rt.drop(now - depth);
