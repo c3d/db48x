@@ -130,6 +130,48 @@ uint draw_data(array::iterator &it, array::iterator &end,
 }
 
 
+static void color_wheel_to_rgb(coord hue, coord saturation, coord value,
+                               uint &r, uint &g, uint &b)
+// ----------------------------------------------------------------------------
+//   Ad-hoc conversion from color wheel to RGB
+// ----------------------------------------------------------------------------
+{
+    // Normalize hue to 0..359
+    hue %= 360;
+    if (hue < 0)
+        hue += 360;
+
+    // Normalize hue to [0, 6)
+    float h = hue / 60.0f;
+    int   i = int(floor(h));
+    float f = h - i;
+
+    // Clamp saturation and value to 0..1
+    float v = std::max(0.0f, std::min(1.0f, value / 255.0f));
+    float s = std::max(0.0f, std::min(1.0f, saturation / 255.0f));
+
+    float p = v * (1.0f - s);
+    float q = v * (1.0f - s * f);
+    float t = v * (1.0f - s * (1.0f - f));
+
+    float rf, gf, bf;
+    switch (i % 6)
+    {
+    case 0: rf = v; gf = t; bf = p; break;
+    case 1: rf = q; gf = v; bf = p; break;
+    case 2: rf = p; gf = v; bf = t; break;
+    case 3: rf = p; gf = q; bf = v; break;
+    case 4: rf = t; gf = p; bf = v; break;
+    case 5: rf = v; gf = p; bf = q; break;
+    default: rf = gf = bf = 0.0f; break;
+    }
+
+    r = uint(rf * 255.0f);
+    g = uint(gf * 255.0f);
+    b = uint(bf * 255.0f);
+}
+
+
 object::result draw_plot(object::id                  kind,
                          const PlotParametersAccess &ppar,
                          object_g                    to_plot,
@@ -142,6 +184,7 @@ object::result draw_plot(object::id                  kind,
     object::result result = object::ERROR;
     coord          lx     = -1;
     coord          ly     = -1;
+    bool           xyplot = kind == object::ID_Truth;
     uint           start  = sys_current_ms();
     algebraic_g    min, max, step;
     object::id     dname;
@@ -151,6 +194,7 @@ object::result draw_plot(object::id                  kind,
     {
     default:
     case object::ID_Function:
+    case object::ID_Truth:
         min = ppar.xmin;
         max = ppar.xmax;
         dname = object::ID_Equation;
@@ -176,9 +220,12 @@ object::result draw_plot(object::id                  kind,
     step = ppar.resolution;
     if (step->is_zero())
     {
-        const uint stbins = Settings.StatsPlotRenderingBins();
-        uint nbins = dname == object::ID_StatsData ? stbins : display_width();
-        step = (max - min) / integer::make(nbins);
+        const uint stbins = Settings.StatsPlotBins();
+        const uint xybins = Settings.XYPlotBins();
+        uint       nbins   = xyplot                        ? xybins
+                           : dname == object::ID_StatsData ? stbins
+                                                           : display_width();
+        step       = (max - min) / integer::make(nbins);
     }
 
     // If the resolution is a based number, it is a number of pixels
@@ -261,23 +308,133 @@ object::result draw_plot(object::id                  kind,
     }
 
     algebraic_g      x = min;
-    algebraic_g      y;
+    algebraic_g      y = ppar.ymin;
     save<symbol_g *> iref(expression::independent,
                           (symbol_g *) &ppar.independent);
+    save<symbol_g *> dref(expression::dependent,
+                          (symbol_g *) &ppar.dependent);
     settings::PrepareForFunctionEvaluation willEvaluateFunction;
     if (ui.draw_graphics())
         if (Settings.DrawPlotAxes())
             draw_axes(ppar);
 
-    bool     split_points = Settings.NoCurveFilling();
-    size     lw           = Settings.LineWidth();
-    uint64_t fg           = Settings.Foreground();
-    uint64_t errbg        = Settings.PlotErrorBackground();
+    bool     split  = Settings.NoCurveFilling();
+    size     lw     = Settings.LineWidth();
+    uint64_t fg     = Settings.Foreground();
+    uint64_t errbg  = Settings.PlotErrorBackground();
+    coord    rx     = 0;
+    coord    ry     = 0;
 
-    while (!program::interrupted())
+    if (xyplot)
     {
-        coord rx     = 0;
-        coord ry     = 0;
+        uint        shift = 1;
+        algebraic_g div   = integer::make(1UL << shift);
+        algebraic_g dx    = (ppar.xmax - ppar.xmin) / div;
+        algebraic_g dy    = (ppar.ymax - ppar.ymin) / div;
+        size        w     = 2*display_width();
+        size        h     = 2*display_height();
+        size        sx    = lw;
+        size        sy    = lw;
+        algebraic_g r;
+
+        if (!split)
+        {
+            sx = ppar.size_adjust(+dx, ppar.xmin, ppar.xmax, w);
+            sy = ppar.size_adjust(+dy, ppar.ymin, ppar.ymax, h);
+        }
+
+        x = ppar.xmin + dx;
+        while (!program::interrupted())
+        {
+
+            // Incremental movement
+            y = y + dy;
+            if (algebraic::compare(y, ppar.ymax) >= 0)
+            {
+                y = ppar.ymin + dy;
+                x = x + dx;
+
+                if (algebraic::compare(x, ppar.xmax) >= 0)
+                {
+                    if (!sx && !sy)
+                        break;
+                    if (algebraic::compare(dx, step) < 0 ||
+                        algebraic::compare(dy, step) < 0)
+                        break;
+                    shift++;
+                    div = integer::make(1UL << shift);
+                    dx = (ppar.xmax - ppar.xmin) / div;
+                    dy = (ppar.ymax - ppar.ymin) / div;
+                    x = ppar.xmin + dx;
+                    y = ppar.ymin + dy;
+                    if (!split)
+                    {
+                        sx = ppar.size_adjust(+dx, ppar.xmin, ppar.xmax, w);
+                        sy = ppar.size_adjust(+dy, ppar.ymin, ppar.ymax, h);
+                    }
+                }
+            }
+            if (!x || !y)
+                return object::ERROR;
+            rx = ppar.pixel_x(x);
+            ry = ppar.pixel_y(y);
+            r = algebraic::evaluate_function(eq, x, y);
+            if (!r)
+                return object::ERROR;
+
+            // Compute color from returned value
+            object::id ty = r->type();
+            if (ty == object::ID_True)
+            {
+                fg = Settings.Foreground();
+            }
+            else if (ty == object::ID_False)
+            {
+                fg = Settings.Background();
+            }
+            else if (object::is_real(ty))
+            {
+                r = r * integer::make(255);
+                int level = r->as_int32(0, true);
+                if (rt.error())
+                    continue;
+                if (level < 0)
+                    level = 0;
+                else if (level > 255)
+                    level = 255;
+                pattern pat = pattern(level, level, level);
+                fg = pat.bits;
+            }
+            else if (object::is_complex(ty))
+            {
+                algebraic_g a = complex_p(+r)->arg(object::ID_Deg);
+                r = complex_p(+r)->mod() * integer::make(255);
+                coord hue = a->as_int32(0, true);
+                coord val = r->as_int32(0, true);
+                uint rr, gg, bb;
+                color_wheel_to_rgb(hue, 255, val, rr, gg, bb);
+                pattern pat = pattern(rr, gg, bb);
+                fg = pat.bits;
+            }
+
+            coord x1 = rx - sx/2;
+            coord x2 = x1 + sx - 1;
+            coord y1 = ry - sy/2;
+            coord y2 = y1 + sy - 1;
+            DISPLAY(display.fill(x1, y1, x2, y2, fg));
+
+            uint end = sys_current_ms();
+            if (end - start >= Settings.PlotRefreshRate())
+            {
+                ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
+                refresh_dirty();
+                start = sys_current_ms();
+            }
+        }
+    }
+
+    else while (!program::interrupted())
+    {
         uint  dcount = 1;
         if (dname == object::ID_Equation)
         {
@@ -331,7 +488,7 @@ object::result draw_plot(object::id                  kind,
         {
             if (kind != object::ID_Bar && kind != object::ID_Histogram)
             {
-                if (lx < 0 || split_points)
+                if (lx < 0 || split)
                 {
                     lx = rx;
                     ly = ry;
@@ -394,10 +551,13 @@ object::result draw_plot(object::id                  kind,
         uint end = sys_current_ms();
         if (end - start >= Settings.PlotRefreshRate())
         {
+            ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
             refresh_dirty();
             start = sys_current_ms();
         }
     }
+    ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
+    refresh_dirty();
     result = object::OK;
 
 err:
@@ -476,6 +636,15 @@ COMMAND_BODY(Polar)
 }
 
 
+COMMAND_BODY(Truth)
+// ----------------------------------------------------------------------------
+//   Draw truth plot from function on the stack
+// ----------------------------------------------------------------------------
+{
+    return draw_plot(ID_Truth);
+}
+
+
 COMMAND_BODY(Scatter)
 // ----------------------------------------------------------------------------
 //   Draw scatter plot from data on the stack
@@ -515,6 +684,7 @@ COMMAND_BODY(Draw)
     case ID_Function:
     case ID_Parametric:
     case ID_Polar:
+    case ID_Truth:
         return draw_plot(ppar.type, ppar, ID_Equation);
     case ID_Scatter:
     case ID_Bar:

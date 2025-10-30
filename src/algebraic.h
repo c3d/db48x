@@ -111,6 +111,8 @@ struct algebraic : command
         algebraic_g x = this;
         return evaluate_function(eq, x);
     }
+    static algebraic_p evaluate_function(program_r eq,
+                                         algebraic_r x, algebraic_r y);
 
     // Evaluate an algebraic as an algebraic
     algebraic_p evaluate() const;

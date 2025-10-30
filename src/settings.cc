@@ -732,6 +732,10 @@ cstring setting::label(object::id ty)
         return printf("Txt%uB", s.TextRenderingSizeLimit());
     case ID_GraphRenderingSizeLimit:
         return printf("Grph%uB", s.GraphRenderingSizeLimit());
+    case ID_XYPlotBins:
+        return printf("XYBins %u", s.XYPlotBins());
+    case ID_StatsPlotBins:
+        return printf("StBins %u", s.StatsPlotBins());
     case ID_PlotRefreshRate:
         return printf("Plot%ums", s.PlotRefreshRate());
     default:

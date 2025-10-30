@@ -12155,37 +12155,6 @@ calculator operations.
 « TIME " " PATH TAIL TOTEXT + + "
 " + DATE + " Mem: " + MEM + » HEADER
 ```
-
-
-## GraphingTimeLimit
-
-Maximum number of milliseconds that can be spent rendering an object
-graphically. The default is 250ms.
-
-## ShowTimeLimit
-
-Maximum number of milliseconds that can be spent rendering an object for the
-`Show` command. The default is 10000 (10s)
-
-## ResultGraphingTimeLimit
-
-Maximum amount of time that can be spent rendering the result (level 1 of the
-stack) graphically. The default value is 1500 (1.5s)
-
-## StackGraphingTimeLimit
-
-Maximum amount of time that can be spent rendering the levels of the stack above
-level 1. The default value is 250ms.
-
-## TextRenderingSizeLimit
-
-Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
-`Large text (399 bytes)`.
-
-## GraphRenderingSizeLimit
-
-Limit in bytes for the size of objects to be rendered on the stack
-graphically. Objects that are larger than this size are text.
 # Library Management
 
 DB48x features a [library](#library) that can contain arbitary RPL code,
@@ -13380,29 +13349,6 @@ DB48X supports multiple plotting modes:
 * **Bar** - Bar charts from data
 * **Histogram** - Histogram plots for frequency distributions
 
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-* *Upper Right* coordinates as a complex (default `10+6i`)
-* *Independent variable* name (default `x`)
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-* *Type* of plot (default `function`)
-* *Dependent variable* name (default `y`)
-
-To reset the `PlotParameters` to the default values, it is necessary to purge
-the current directory as well as the parents from any `PlotParameters` value:
-
-```rpl
-'PPAR' PGALL
-```
-
 
 ## PlotMin
 
@@ -13476,6 +13422,29 @@ causes the circle to be elongated vertically:
 ```
 
 
+## PlotParameters
+
+The `PlotParameters` reserved variable defines the plot parameters, as a list,
+with the following elements:
+
+* *Lower Left* coordinates as a complex (default `-10-6i`)
+* *Upper Right* coordinates as a complex (default `10+6i`)
+* *Independent variable* name (default `x`)
+* *Resolution* specifying the interval between values of the independent
+  variable (default `0`). A binary numnber specifies a resolution in pixels.
+* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
+  or a list containing the origin, the tick mark specification, and the names of
+  the axes.
+* *Type* of plot (default `function`)
+* *Dependent variable* name (default `y`)
+
+To reset the `PlotParameters` to the default values, it is necessary to purge
+the current directory as well as the parents from any `PlotParameters` value:
+
+```rpl
+'PPAR' PGALL
+```
+
 ## FunctionPlot
 
 Plot a function in the form y=f(x). The function is taken from the stack.
@@ -13510,6 +13479,49 @@ position along the y axis.
 @ Image parametricplot-example
 ```
 
+## TruthPlot
+
+Plot a curve where an expression in `x` and `y` is tested.
+
+The input function can return one of:
+* A truth value `True` or `False`
+* A real value between `0.0` and `1.0`
+* A complex value that represents a color on the color wheel
+
+When `Res` is at the default value `0`, the number of bins along the X and Y
+axis is set by `XYPlotBins`.
+
+### Truth plot with a truth value
+
+The following example illustrates the use of the `TruthPlot` with a truth value:
+
+```rpl
+'x²-2·y²>1.9+38·sin(21·x·y)' TruthPlot
+@ Image truthplot
+```
+
+### Truth plot with a real value
+
+The following example illustrates the use of the `TruthPlot` with a real value:
+
+```rpl
+'sin(21·x·y)' TruthPlot
+@ Image truthplot-real
+```
+
+### Truth plot with a complex value
+
+The following example illustrates the use of the `TruthPlot` with a real value:
+
+```rpl
+« x y RealToComplex 0.15 * »  TruthPlot
+@ Image truthplot-complex
+```
+
+Note that if `AutoSimplify` is enabled, this graph will show a white horizontal
+line corresponding to the real axis. This is because the multiplication by
+`0.15` auto-simplifies the result as a real number if the imaginary part is
+zero.
 
 ## ScatterPlot
 
@@ -13546,6 +13558,9 @@ BarPlot
 @ Image barplot-example
 ```
 
+When `Res` is at the default value `0`, the number of bins along the X and Y
+axis is set by `StatsPlotBins`.
+
 
 ## HistogramPlot
 
@@ -13560,13 +13575,16 @@ subdivided into 25 bins.
 1 RDZ
 ClΣ
 1 1000 for i
-  RAND 20 * 10 - Σ+
+  RAND 21 * 10 - Σ+
 next
 RclΣ
 -1 100 YRANGE
 HistogramPlot
 @ Image histogramplot-example
 ```
+
+When `Res` is at the default value `0`, the number of bins along the X and Y
+axis is set by `StatsPlotBins`.
 # Operations with Ranges
 
 Operations on ranges include traditional mathematical operations such as `+` or
@@ -14626,6 +14644,7 @@ The opposite setting is `TruthLogicForIntegers`.
 
 # Evaluation settings
 
+The following settings are related to evaluation of programs and objects.
 
 ## SaveLastArguments
 
@@ -14651,7 +14670,51 @@ If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
 
 
+# Plot settings
 
+The following settings are related to plotting
+
+## GraphingTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object
+graphically. The default is 250ms.
+
+## ShowTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object for the
+`Show` command. The default is 10000 (10s)
+
+## ResultGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the result (level 1 of the
+stack) graphically. The default value is 1500 (1.5s)
+
+## StackGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the levels of the stack above
+level 1. The default value is 250ms.
+
+## TextRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
+`Large text (399 bytes)`.
+
+## GraphRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack
+graphically. Objects that are larger than this size are text.
+
+
+## XYPlotBins
+
+Number of bins used to draw XY plots (e.g. `TruthPlot`) when the `Resolution` is
+at its default value of `0`.
+
+
+## StatsPlotBins
+
+Number of bins used to draw statistical plots (e.g. `BarPlot`) when the
+`Resolution` is at its default value of `0`.
 
 
 # States

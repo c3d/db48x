@@ -188,7 +188,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            exact_trig_cases();
+        {
+            plotting();
+            user_input_commands();
+        }
 
 #if 0
         if (onlyCurrent & 2)
@@ -13185,14 +13188,27 @@ void tests::plotting()
         .noerror()
         .image("pplot-eq");
 
+    step("Truth plot")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))>0.5' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot");
+    step("Truth plot with real value")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))-0.5' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot-real");
+    step("Truth plot with complex value")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))-0.5ⅈ' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot-complex");
+
     step("Bar plot");
     test(CLEAR,
          "[[ 1 -1 ][2 -2][3 -3][4 -4][5 -6][7 -8][9 -10]]",
          LENGTHY(200), ENTER,
-         33, MUL, K, 2, MUL, RSHIFT,
-         O,
+         33, MUL, K, 2, MUL,
+         RSHIFT, O,
          LENGTHY(200),
-         F5)
+         F6, F1)
         .noerror()
         .image("barplot");
 

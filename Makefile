@@ -74,12 +74,15 @@ color-%:
 
 sim: sim/$(TARGET).mak help/$(TARGET).idx
 	cd sim; $(MAKE) -f $(<F) TARGET=$(shell awk '/^TARGET/ { print $$3; }' sim/$(TARGET).mak)
-sim/$(TARGET).mak: sim/$(TARGET).pro Makefile $(VERSION_H)	\
- 				sim/config.qrc		\
-				sim/state.qrc		\
-				sim/library.qrc		\
-				sim/help.qrc		\
-				sim/help/img.qrc
+sim/$(TARGET).mak:	sim/$(TARGET).pro	\
+			sim/config.qrc		\
+			sim/state.qrc		\
+			sim/library.qrc		\
+			sim/help.qrc		\
+			sim/help/img.qrc	\
+						\
+			Makefile		\
+			$(VERSION_H)
 	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
 sim/%.qrc: Makefile

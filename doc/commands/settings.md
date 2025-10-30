@@ -833,6 +833,7 @@ The opposite setting is `TruthLogicForIntegers`.
 
 # Evaluation settings
 
+The following settings are related to evaluation of programs and objects.
 
 ## SaveLastArguments
 
@@ -858,7 +859,51 @@ If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
 
 
+# Plot settings
 
+The following settings are related to plotting
+
+## GraphingTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object
+graphically. The default is 250ms.
+
+## ShowTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object for the
+`Show` command. The default is 10000 (10s)
+
+## ResultGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the result (level 1 of the
+stack) graphically. The default value is 1500 (1.5s)
+
+## StackGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the levels of the stack above
+level 1. The default value is 250ms.
+
+## TextRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
+`Large text (399 bytes)`.
+
+## GraphRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack
+graphically. Objects that are larger than this size are text.
+
+
+## XYPlotBins
+
+Number of bins used to draw XY plots (e.g. `TruthPlot`) when the `Resolution` is
+at its default value of `0`.
+
+
+## StatsPlotBins
+
+Number of bins used to draw statistical plots (e.g. `BarPlot`) when the
+`Resolution` is at its default value of `0`.
 
 
 # States
