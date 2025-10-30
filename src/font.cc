@@ -211,6 +211,15 @@ struct font_cache
         return last;
     }
 
+
+    void clear()
+    // ------------------------------------------------------------------------
+    //   Clear the font cache when we have a change in settings
+    // ------------------------------------------------------------------------
+    {
+        size = 0;
+    }
+
 private:
     data  *cache;
     size_t size;
@@ -563,4 +572,13 @@ bool dmcp_font::glyph(unicode utf8cp, glyph_info &g) const
     g.height = height;
 
     return true;
+}
+
+
+void font::clear_cache()
+// ----------------------------------------------------------------------------
+//   Clear the font cache when changing settings
+// ----------------------------------------------------------------------------
+{
+    FontCache.clear();
 }

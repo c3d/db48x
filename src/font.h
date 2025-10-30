@@ -93,6 +93,8 @@ struct font : object
     }
     fuint height() const;
 
+    static void clear_cache();
+
 public:
     SIZE_DECL(font)
     {

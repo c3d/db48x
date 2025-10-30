@@ -150,6 +150,7 @@ uint stack::draw_stack()
     if (hash != settingsHash)
     {
         rt.uncache();
+        font::clear_cache();
         settingsHash = hash;
     }
 
