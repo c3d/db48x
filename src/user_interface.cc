@@ -768,6 +768,7 @@ void user_interface::toggle_user()
     {
         Settings.UserMode(false);
     }
+    menu_refresh(menu::ID_UserModeMenu);
 }
 
 
@@ -5583,7 +5584,11 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         utf8 txt = direct->value(&sz);
         bool result = insert(txt, sz, TEXT) == object::OK;
         if (userOnce)
+        {
+            userOnce = false;
             Settings.UserMode(false);
+            menu_refresh(menu::ID_UserModeMenu);
+        }
         return result;
     }
 
@@ -5724,7 +5729,11 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
     shift = false;
 
     if (userOnce && usr == Settings.UserMode())
+    {
+        userOnce = false;
         Settings.UserMode(false);
+        menu_refresh(menu::ID_UserModeMenu);
+    }
     return true;
 }
 
