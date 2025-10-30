@@ -127,8 +127,11 @@ user_interface::user_interface()
       shift(false),
       xshift(false),
       alpha(false),
-      transalpha(false),
       lowercase(false),
+      transalpha(false),
+      taLowercase(false),
+      taPrevAlpha(false),
+      taPrevLowerc(false),
       userOnce(false),
       shiftDrawn(false),
       xshiftDrawn(false),
@@ -4331,14 +4334,17 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 
                 last = key;
                 repeat = true;
-                lowercase = key == KEY_DOWN;
+                taLowercase = key == KEY_DOWN;
                 return true;
             }
             else if (key)
             {
                 // A non-arrow key was pressed while arrows are down
-                alpha = true;
                 transalpha = true;
+                taPrevAlpha = alpha;
+                taPrevLowerc = lowercase;
+                alpha = true;
+                lowercase = taLowercase;
                 last = 0;
                 return false;
             }
@@ -4364,8 +4370,8 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         {
             // We released the up/down key
             transalpha = false;
-            alpha = false;
-            lowercase = false;
+            alpha = taPrevAlpha;
+            lowercase = taPrevLowerc;
             key = 0;
             last = 0;
             return true;

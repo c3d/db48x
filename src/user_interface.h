@@ -303,8 +303,11 @@ protected:
     bool     shift        : 1;  // Normal shift active
     bool     xshift       : 1;  // Extended shift active (simulate Right)
     bool     alpha        : 1;  // Alpha mode active
-    bool     transalpha   : 1;  // Transitory alpha (up or down key)
     bool     lowercase    : 1;  // Lowercase
+    bool     transalpha   : 1;  // Transitory alpha (up or down key)
+    bool     taLowercase  : 1;  // Lowercase transitory alpha
+    bool     taPrevAlpha  : 1;  // Alpha mode before transitory alpha
+    bool     taPrevLowerc : 1;  // Lowercase before transitory alpha
     bool     userOnce     : 1;  // User mode should be reset
     bool     shiftDrawn   : 1;  // Cache of drawn annunciators
     bool     xshiftDrawn  : 1;  // Cache
