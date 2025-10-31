@@ -957,7 +957,7 @@ COMMAND_BODY(PurgeAll)
         return ERROR;
     if (object_p quoted = name->as_quoted(ID_object))
         name = quoted;
-    record(directory_error, "PurgeAll %t", name);
+    record(directory, "PurgeAll %t", name);
     directory::purge_all(name);
     rt.drop();
     return rt.error() ? ERROR : OK;

@@ -13180,7 +13180,7 @@ void tests::plotting()
         .noerror()
         .image("pplot-deg");
     step("Parametric plot: Equation");
-    test(CLEAR,
+    test(EXIT, CLEAR,
          "3 LINEWIDTH 0.25 GRAY FOREGROUND "
          "'exp((0.17ⅈ5.27)*x+(1.5ⅈ8))' ParametricPlot",
          LENGTHY(200),

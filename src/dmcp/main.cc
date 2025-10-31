@@ -57,6 +57,8 @@
 using std::max;
 using std::min;
 
+
+
 // ============================================================================
 //
 // Those are put in the same file to guarantee initialization order
@@ -132,13 +134,14 @@ void refresh_dirty()
 #ifndef SIMULATOR
     if (ST(STAT_OFF))
         return;
+
     if (Settings.DMCPDisplayRefresh())
     {
         lcd_refresh();
     }
     else
     {
-        for (uint row = 0; row < LCD_H; row++)
+        for (uint row = row_min; row <= row_max; row++)
         {
             if (lcd_buffer[52 * row - 2])
             {
@@ -411,16 +414,37 @@ void power_check(bool running, bool showimage)
             {
                 bool lowbat = !program::on_usb && program::low_battery();
                 if (lowbat)
+                {
                     ui.draw_message("Switched off due to low power",
                                     "Connect to USB to avoid losing memory",
                                     "Replace the battery as soon as possible");
+                }
+                else if (ui.showing_graphics())
+                {
+                    // Preserve (most of) the graphics being shown
+                    for (uint i = 0; i < 4; i++)
+                    {
+                        coord x = (i & 1) ? 10 : LCD_W - 11;
+                        coord y = (i & 2) ? 10 : LCD_H - 11;
+                        Screen.circle(x, y, 12, 0, pattern::black);
+                        Screen.circle(x, y,  8, 0, pattern::white);
+                        Screen.circle(x, y,  4, 0, pattern::black);
+                    }
+                    lcd_refresh_wait();
+                }
                 else if (running)
+                {
                     ui.draw_message("Switched off to conserve battery",
                                     "Press the ON/EXIT key to resume");
+                }
                 else if (showimage)
+                {
                     draw_power_off_image(0);
+                }
                 else
+                {
                     lcd_refresh_wait();
+                }
 
                 sys_critical_start();
                 SET_ST(STAT_SUSPENDED);
@@ -439,7 +463,8 @@ void power_check(bool running, bool showimage)
             CLR_ST(STAT_CLK_WKUP_FLAG);
             if (running)
                 break;
-            redraw_periodics();
+            if (!ui.showing_graphics())
+                redraw_periodics();
         }
         else if (ST(STAT_POWER_CHANGE))
         {
@@ -470,12 +495,17 @@ void power_check(bool running, bool showimage)
 
         CLR_ST(STAT_OFF);
 
-        // Check if we need to redraw
+        // Redraw the LCD content
         program::read_battery();
         if (ui.showing_graphics())
-            ui.draw_graphics(true);
+        {
+            ui.show_graphics(false);
+            ui.draw_graphics(false);
+        }
         else
+        {
             redraw_lcd(true);
+        }
     }
 
     // We definitely reached active state, clear suspended flag
@@ -572,7 +602,6 @@ extern "C" void program_main()
                     break;
                 }
             }
-
         }
         bool repeating = key > 0
             && sys_timer_active(TIMER0)
@@ -583,21 +612,37 @@ extern "C" void program_main()
             record(main, "Repeating key %d", key);
         }
 
+        // Check if we are displaying a graphic image - If so wait for key
+        bool graphics = ui.showing_graphics();
+        if (graphics && hadKey)
+        {
+            if (key > 0)
+            {
+                record(tests_rpl, "Clearing graphics from key %d", key);
+                ui.show_graphics(false);
+                redraw_lcd(true);
+            }
+        }
+
         // Fetch the key (<0: no key event, >0: key pressed, 0: key released)
         record(main, "Testing key %d (%+s)", key, hadKey ? "had" : "nope");
         if (key >= 0 && hadKey)
         {
 #if SIMULATOR && !WASM
-            process_test_key(key);
+            if (process_test_key(key))
+                graphics = false;
 #endif // SIMULATOR && !WASM
 
-            record(main, "Handle key %d last %d", key, last_key);
-            handle_key(key, repeating, transalpha);
-            record(main, "Did key %d last %d", key, last_key);
+            if (!graphics)
+            {
+                record(main, "Handle key %d last %d", key, last_key);
+                handle_key(key, repeating, transalpha);
+                record(main, "Did key %d last %d", key, last_key);
 
-            // Redraw the LCD unless there is some type-ahead
-            if (key_empty())
-                redraw_lcd(false);
+                // Redraw the LCD unless there is some type-ahead
+                if (key_empty() && !ui.showing_graphics())
+                    redraw_lcd(false);
+            }
 
             // Record the last keystroke
             last_keystroke_time = program::read_time();
@@ -606,7 +651,7 @@ extern "C" void program_main()
         else
         {
             // Blink the cursor
-            if (sys_timer_timeout(TIMER1))
+            if (!graphics && sys_timer_timeout(TIMER1))
                 redraw_periodics();
             if (!key)
                 sys_timer_disable(TIMER0);
@@ -655,7 +700,7 @@ int ui_init()
 
 
 #if SIMULATOR
-void process_test_key(int key)
+bool process_test_key(int key)
 // ----------------------------------------------------------------------------
 //   Process commands from the test harness
 // ----------------------------------------------------------------------------
@@ -667,6 +712,7 @@ void process_test_key(int key)
     else if (last_key > 0)
         last_key = -last_key;
     record(tests_rpl, "Set last_key to %d for key %d", last_key, key);
+    return key >= tests::TEST_KEYS;
 }
 
 
@@ -690,6 +736,11 @@ void process_test_commands()
         ui.clear_editor();
         rt.drop(rt.depth());
         while (rt.run_next(0));
+        if (ui.showing_graphics())
+        {
+            ui.show_graphics(false);
+            redraw_lcd(true);
+        }
     }
     else if (test_command == tests::KEYSYNC)
     {

@@ -208,7 +208,6 @@ uint stack::draw_stack()
 #ifdef SIMULATOR
                 if (level == 0)
                 {
-                    extern int last_key;
                     bool     ml = level ? sml : rml;
                     renderer r(nullptr, ~0U, true, ml);
                     size_t   len = obj->render(r);
@@ -278,7 +277,6 @@ uint stack::draw_stack()
 #ifdef SIMULATOR
             if (level == 0)
             {
-                extern int last_key;
                 int key = last_key;
                 output(key, obj->type(), out, len);
                 record(tests_rpl,

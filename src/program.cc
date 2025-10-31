@@ -267,7 +267,6 @@ bool program::interrupted()
         }
 #if SIMULATOR
         int key = key_pop();
-        extern int last_key;
         record(tests_rpl,
                "Program runner popped key %d, last=%d", key, last_key);
         process_test_key(key);

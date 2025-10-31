@@ -316,7 +316,10 @@ int key_pop()
 int key_tail()
 {
     if (keyrd != keywr)
-        return keys[(keyrd + nkeys - 1) % nkeys];
+    {
+        int key = keys[(keyrd + nkeys - 1) % nkeys];
+        return key;
+    }
     return -1;
 }
 
@@ -325,7 +328,10 @@ int key_pop_last()
     if (keywr - keyrd > 1)
         keyrd = keywr - 1;
     if (keyrd != keywr)
-        return keys[keyrd++ % nkeys];
+    {
+        int key = keys[keyrd++ % nkeys];
+        return key;
+    }
     return -1;
 }
 

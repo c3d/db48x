@@ -2368,17 +2368,26 @@ bool user_interface::draw_idle()
 {
     if (freezeHeader)
         return false;
+
     if (graphics)
     {
         record(tests_ui, "Waiting for key");
         if (grob_p pict = user_display())
+        {
+            // Show has its own power loop, deal with movement keys
             show(pict);
+            graphics = false;
+            record(tests_ui, "Redraw LCD");
+            redraw_lcd(true);
+        }
         else
-            wait_for_key_press();
-        graphics = false;
-        record(tests_ui, "Redraw LCD");
-        redraw_lcd(true);
+        {
+            // Wait for key in the main loop to exit graphic mode
+            return false;
+        }
     }
+
+
     draw_busy(0, pattern::black);
     alphaDrawn = !alphaDrawn;
     shiftDrawn = !shift;

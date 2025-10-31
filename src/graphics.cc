@@ -1217,7 +1217,6 @@ object::result show(object_r obj)
                 {
                     key = key_pop();
 #if SIMULATOR
-                    extern int last_key;
                     record(tests_rpl,
                            "Show cmd popped key %d, last=%d", key, last_key);
                     process_test_key(key);
