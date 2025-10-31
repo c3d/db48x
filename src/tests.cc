@@ -14358,7 +14358,7 @@ void tests::user_input_commands()
         .type(ID_expression)
         .got("'Da123ta'");
 
-    step("Input command with for algebraic number")
+    step("Input command for algebraic number")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"\" 3 algebraic } INPUT", ENTER)
         .test("123+").editor("123+")

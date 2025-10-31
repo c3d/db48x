@@ -1095,6 +1095,7 @@ struct runtime
     {
         Error = nullptr;
         ErrorSource = nullptr;
+        ErrorSrcLen = 0;
         ErrorCommand = nullptr;
     }
 
