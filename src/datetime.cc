@@ -897,18 +897,10 @@ COMMAND_BODY(DateAdd)
 // ----------------------------------------------------------------------------
 {
     if (object_p d1 = rt.stack(1))
-    {
         if (object_p d2 = rt.stack(0))
-        {
             if (algebraic_p daf = days_after(d1, d2))
                 if (rt.drop() && rt.top(daf))
                     return OK;
-            if (algebraic_p daf = days_after(d2, d1))
-                if (rt.drop() && rt.top(daf))
-                    return OK;
-        }
-    }
-
     return ERROR;
 }
 
