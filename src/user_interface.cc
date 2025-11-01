@@ -570,7 +570,7 @@ bool user_interface::editor_history(bool back)
             rt.edit(+ed, sz);
             cursor = 0;
             select = ~0U;
-            alpha = xshift = shift = false;
+            alpha = lowercase = xshift = shift = false;
             edRows = 0;
             dirtyEditor = true;
             break;
@@ -2266,7 +2266,7 @@ bool user_interface::draw_annunciators()
                 "", "ABC", "abc", "abc",
                 "USR", "αUS", "usr", "αus",
                 "", "ABC", "abc", "abc",
-                "1US", "α1U", "1u", "α1u"
+                "1US", "α1U", "1us", "α1u"
             };
             utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*userOnce]);
             pattern apat = lowercase
@@ -4117,7 +4117,7 @@ bool user_interface::handle_screen_capture(int key)
     {
         if (key == KEY_SCREENSHOT)
         {
-            shift = xshift = alpha = longpress = repeat = false;
+            shift = xshift = alpha = lowercase = longpress = repeat = false;
             last = 0;
             draw_annunciators();
             refresh_dirty();
@@ -4370,8 +4370,13 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         {
             // We released the up/down key
             transalpha = false;
-            alpha = taPrevAlpha;
-            lowercase = taPrevLowerc;
+            // Restore alpha/lowercase mode unless alpha mode was exited
+            // while in trans-alpha mode
+            if (alpha)
+            {
+                alpha = taPrevAlpha;
+                lowercase = taPrevLowerc;
+            }
             key = 0;
             last = 0;
             return true;
@@ -4432,8 +4437,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         else
         {
-            alpha     = true;
-            lowercase = false;
+            alpha = true;
         }
         consumed = true;
         shift = false;
@@ -5739,7 +5743,10 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
     draw_idle();
     dirtyStack = true;
     if (!imm && (!validate_input || mode != TEXT))
+    {
         alpha = false;
+        lowercase = false;
+    }
     xshift = false;
     shift = false;
 
@@ -6445,7 +6452,7 @@ bool user_interface::do_search(unicode with, bool restart)
 
 bool user_interface::editor_search()
 // ----------------------------------------------------------------------------
-//   Start or repeat a search a search
+//   Start or repeat a search
 // ----------------------------------------------------------------------------
 {
     if (~select && cursor != select)
@@ -6463,7 +6470,6 @@ bool user_interface::editor_search()
         // Start search
         searching = select = cursor;
         alpha = true;
-        lowercase = false;
         shift = xshift = false;
     }
     return true;
