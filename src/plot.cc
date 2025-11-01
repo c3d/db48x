@@ -130,48 +130,6 @@ uint draw_data(array::iterator &it, array::iterator &end,
 }
 
 
-static void color_wheel_to_rgb(coord hue, coord saturation, coord value,
-                               uint &r, uint &g, uint &b)
-// ----------------------------------------------------------------------------
-//   Ad-hoc conversion from color wheel to RGB
-// ----------------------------------------------------------------------------
-{
-    // Normalize hue to 0..359
-    hue %= 360;
-    if (hue < 0)
-        hue += 360;
-
-    // Normalize hue to [0, 6)
-    float h = hue / 60.0f;
-    int   i = int(floor(h));
-    float f = h - i;
-
-    // Clamp saturation and value to 0..1
-    float v = std::max(0.0f, std::min(1.0f, value / 255.0f));
-    float s = std::max(0.0f, std::min(1.0f, saturation / 255.0f));
-
-    float p = v * (1.0f - s);
-    float q = v * (1.0f - s * f);
-    float t = v * (1.0f - s * (1.0f - f));
-
-    float rf, gf, bf;
-    switch (i % 6)
-    {
-    case 0: rf = v; gf = t; bf = p; break;
-    case 1: rf = q; gf = v; bf = p; break;
-    case 2: rf = p; gf = v; bf = t; break;
-    case 3: rf = p; gf = q; bf = v; break;
-    case 4: rf = t; gf = p; bf = v; break;
-    case 5: rf = v; gf = p; bf = q; break;
-    default: rf = gf = bf = 0.0f; break;
-    }
-
-    r = uint(rf * 255.0f);
-    g = uint(gf * 255.0f);
-    b = uint(bf * 255.0f);
-}
-
-
 object::result draw_plot(object::id                  kind,
                          const PlotParametersAccess &ppar,
                          object_g                    to_plot,
@@ -383,40 +341,7 @@ object::result draw_plot(object::id                  kind,
                 return object::ERROR;
 
             // Compute color from returned value
-            object::id ty = r->type();
-            if (ty == object::ID_True)
-            {
-                fg = Settings.Foreground();
-            }
-            else if (ty == object::ID_False)
-            {
-                fg = Settings.Background();
-            }
-            else if (object::is_real(ty))
-            {
-                r = r * integer::make(255);
-                int level = r->as_int32(0, true);
-                if (rt.error())
-                    continue;
-                if (level < 0)
-                    level = 0;
-                else if (level > 255)
-                    level = 255;
-                pattern pat = pattern(level, level, level);
-                fg = pat.bits;
-            }
-            else if (object::is_complex(ty))
-            {
-                algebraic_g a = complex_p(+r)->arg(object::ID_Deg);
-                r = complex_p(+r)->mod() * integer::make(255);
-                coord hue = a->as_int32(0, true);
-                coord val = r->as_int32(0, true);
-                uint rr, gg, bb;
-                color_wheel_to_rgb(hue, 255, val, rr, gg, bb);
-                pattern pat = pattern(rr, gg, bb);
-                fg = pat.bits;
-            }
-
+            fg = color_pattern(r).bits;
             coord x1 = rx - sx/2;
             coord x2 = x1 + sx - 1;
             coord y1 = ry - sy/2;

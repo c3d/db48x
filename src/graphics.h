@@ -121,6 +121,12 @@ blitter::size  display_height();
 //   Return the current display, i.e. content of `Pict` variable
 // ----------------------------------------------------------------------------
 
+pattern         color_pattern(object_p obj);
+// ----------------------------------------------------------------------------
+//   Create a color pattern from an object
+// ----------------------------------------------------------------------------
+
+
 
 #if CONFIG_COLOR
 #define DISPLAY(op)                                                     \

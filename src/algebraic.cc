@@ -991,7 +991,7 @@ algebraic_p algebraic::evaluate_function(program_r   eq,
         object_p indep  = rt.pop();
         if (indep != +x || dep != +y)
             rt.invalid_function_error();
-        else if (!result->is_algebraic())
+        else if (!result->is_extended_algebraic())
             rt.type_error();
         else
             return algebraic_p(result);

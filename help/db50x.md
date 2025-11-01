@@ -13492,13 +13492,20 @@ position along the y axis.
 
 Plot a curve where an expression in `x` and `y` is tested.
 
-The input function can return one of:
-* A truth value `True` or `False`
-* A real value between `0.0` and `1.0`
-* A complex value that represents a color on the color wheel
+The input function can return:
 
-When `Res` is at the default value `0`, the number of bins along the X and Y
-axis is set by `XYPlotBins`.
+* Truth value `True` or `False` for foreground and background color
+* Real values between `0.0` and `1.0` for grayscales
+* Complex values representing saturated HSV (colorwheel) colors
+* 3-element vectors representing HSV (colorwheel) colors
+* 3-element lists representing RGB colors
+* Names or symbols representing common color names
+
+Drawing is done incrementally, by splitting the horizontal and vertical
+coordinate space again and again. When `Res` is at the default value `0`, the
+maximum number of bins along the X and Y axis is set by `XYPlotBins`. Otherwise
+`Res` defines the minimum size of bins.
+
 
 ### Truth plot with a truth value
 
@@ -13531,6 +13538,51 @@ Note that if `AutoSimplify` is enabled, this graph will show a white horizontal
 line corresponding to the real axis. This is because the multiplication by
 `0.15` auto-simplifies the result as a real number if the imaginary part is
 zero.
+
+### Truth plot with a vector
+
+The following example illustrates the use of the `TruthPlot` with a vector of
+components to generate arbitrary hue-saturation-values between 0 and 1.
+
+```rpl
+«
+    x y atan2 0 + 90 / 1 REM
+    x y HYPOT
+    DUP 300 * SIN
+    SWAP 10 /
+    →3D
+»  TruthPlot
+@ Image truthplot-vector
+```
+
+### Truth plot with a list
+
+The following example illustrates the use of the `TruthPlot` with a list of
+color components specifying red, green and blue values between 0 and 1.
+
+```rpl
+«
+    {} x 36 * COS + y 45 * COS + x y HYPOT 100 * COS +
+»  TruthPlot
+@ Image truthplot-list
+```
+
+### Truth plot with a name
+
+The following example illustrates the use of the `TruthPlot` with names for
+colours.
+
+```rpl
+«
+    case
+        x -3.4 < THEN "Red"     END
+        x  3.4 < THEN "White"   END
+                      "NavyBlue"
+    end
+»  TruthPlot
+@ Image truthplot-list
+```
+
 
 ## ScatterPlot
 
