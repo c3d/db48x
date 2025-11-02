@@ -11720,8 +11720,9 @@ and a pixmap with the gray level on color devices.
 
 ## RGB
 
-Create a color pattern for graphics operations. The resulting pattern can be
-given as input to commands such as `Foreground` or `Background`.
+Create an RGB (red-green-blue) color pattern for graphics operations. The
+resulting pattern can be given as input to commands such as `Foreground` or
+`Background`.
 
 This operation creates a bitmap pattern on black-and-white devices,
 and a pixmap with the given color on color devices.
@@ -11737,6 +11738,55 @@ and a pixmap with the given color on color devices.
 0.1 STEP
 { Foreground LineWidth } PURGE
 @ Image color-circles
+```
+
+
+## HSV
+
+Create an HSV (hue-saturation-value) color pattern for graphics operations. The
+resulting pattern can be given as input to commands such as `Foreground` or
+`Background`.
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the given color on color devices.
+
+```rpl
+0 LINEWIDTH
+0 1 FOR H
+	0 1 FOR S
+		0 1 FOR V
+			H S V HSV FOREGROUND H 14 * 7 - S 10 * 5 - R→C 1 V - 0.5 * CIRCLE
+		0.1 STEP
+   0.1 STEP
+0.1 STEP
+{ Foreground LineWidth } PURGE
+@ Image hsv-circles
+```
+
+## Color
+
+Create color pattern for graphics operations. The resulting pattern can be given
+as input to commands such as `Foreground` or `Background`.
+
+The operation takes an object as input and produces a color pattern that depends on the type of input, using the same convention as for `TruthPlot`:
+
+* Truth value `True` or `False` for foreground and background color
+* Real values between `0.0` and `1.0` for grayscales
+* Complex values representing saturated HSV (colorwheel) colors
+* 3-element vectors representing HSV (colorwheel) colors
+* 3-element lists representing RGB colors
+* Names or symbols representing common color names
+
+This operation creates a bitmap pattern on black-and-white devices,
+and a pixmap with the given color on color devices.
+
+```rpl
+0 LINEWIDTH
+"NavyBlue" Color Foreground 0+0ⅈ 3 Circle
+{ 1 1 1 } Color Foreground 0+0ⅈ 2 Circle
+[ 0 1 1 ] Color Foreground 0+0ⅈ 1 Circle
+{ Foreground LineWidth } PURGE
+@ Image named-circles
 ```
 
 

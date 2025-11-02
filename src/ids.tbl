@@ -497,6 +497,8 @@ CMD(CurrentClip)
 NAMED(Gray,             "GrayPattern")          ALIAS(Gray,     "GreyPattern")
                                                 ALIAS(Gray,     "Grey")
 NAMED(RGB,              "RGBPattern")
+NAMED(HSV,              "HSVPattern")
+NAMED(Color,            "ColorPattern")
 
 NAMED(ToGrob,           "→Grob")
 NAMED(ToHPGrob,         "→HPGrob")

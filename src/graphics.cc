@@ -2486,14 +2486,56 @@ COMMAND_BODY(Gray)
 }
 
 
-COMMAND_BODY(RGB)
+static void hsv_to_rgb(uint hue, uint saturation, uint value,
+                       uint &red, uint &green, uint &blue)
 // ----------------------------------------------------------------------------
-//   Create a pattern from RGB levels
+//   Ad-hoc conversion from HSV (color wheel) to RGB
 // ----------------------------------------------------------------------------
 {
-    algebraic_g red   = algebraic_p(rt.stack(2));
-    algebraic_g green = algebraic_p(rt.stack(1));
-    algebraic_g blue  = algebraic_p(rt.stack(0));
+    // Normalize hue to 0..359
+    hue %= 360;
+    if (hue < 0)
+        hue += 360;
+
+    // Normalize hue to [0, 6)
+    float h = hue / 60.0f;
+    int   i = int(floor(h));
+    float f = h - i;
+
+    // Clamp saturation and value to 0..1
+    float v = std::max(0.0f, std::min(1.0f, value / 255.0f));
+    float s = std::max(0.0f, std::min(1.0f, saturation / 255.0f));
+
+    float p = v * (1.0f - s);
+    float q = v * (1.0f - s * f);
+    float t = v * (1.0f - s * (1.0f - f));
+
+    float rf, gf, bf;
+    switch (i % 6)
+    {
+    case 0: rf = v; gf = t; bf = p; break;
+    case 1: rf = q; gf = v; bf = p; break;
+    case 2: rf = p; gf = v; bf = t; break;
+    case 3: rf = p; gf = q; bf = v; break;
+    case 4: rf = t; gf = p; bf = v; break;
+    case 5: rf = v; gf = p; bf = q; break;
+    default: rf = gf = bf = 0.0f; break;
+    }
+
+    red = uint(rf * 255.0f);
+    green = uint(gf * 255.0f);
+    blue = uint(bf * 255.0f);
+}
+
+
+static bool color_pattern(bool hsv)
+// ----------------------------------------------------------------------------
+//   Build a color pattern from 3 values on the stack
+// ----------------------------------------------------------------------------
+{
+    algebraic_g red   = algebraic_p(rt.stack(2)); // hue in hsv mode
+    algebraic_g green = algebraic_p(rt.stack(1)); // sat in hsv mode
+    algebraic_g blue  = algebraic_p(rt.stack(0)); // val in hsv mode
     if (red->is_real() && green->is_real() && blue->is_real())
     {
         algebraic_g scale = integer::make(255);
@@ -2504,13 +2546,15 @@ COMMAND_BODY(RGB)
         uint gl = green->as_uint32(0, true);
         uint bl = blue->as_uint32(0, true);
         if (rt.error())
-            return ERROR;
+            return false;
         if (rl > 255)
             rl = 255;
         if (gl > 255)
             gl = 255;
         if (bl > 255)
             bl = 255;
+        if (hsv)
+            hsv_to_rgb(rl, gl, bl, rl, gl, bl);
         pattern pat = pattern(rl, gl, bl);
 #if CONFIG_FIXED_BASED_OBJECTS
         integer_p bits = rt.make<hex_integer>(pat.bits);
@@ -2518,11 +2562,49 @@ COMMAND_BODY(RGB)
         integer_p bits = rt.make<based_integer>(pat.bits);
 #endif
         if (bits && rt.drop(2) && rt.top(bits))
-            return OK;
+            return true;
     }
     else
     {
         rt.type_error();
+    }
+    return false;
+}
+
+
+COMMAND_BODY(RGB)
+// ----------------------------------------------------------------------------
+//   Create a pattern from RGB levels
+// ----------------------------------------------------------------------------
+{
+    return color_pattern(false) ? OK : ERROR;
+}
+
+
+COMMAND_BODY(HSV)
+// ----------------------------------------------------------------------------
+//   Create a pattern from HSV levels
+// ----------------------------------------------------------------------------
+{
+    return color_pattern(true) ? OK : ERROR;
+}
+
+
+COMMAND_BODY(Color)
+// ----------------------------------------------------------------------------
+//   Create a pattern from color object levels
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        pattern pat = color_pattern(obj);
+#if CONFIG_FIXED_BASED_OBJECTS
+        integer_p bits = rt.make<hex_integer>(pat.bits);
+#else
+        integer_p bits = rt.make<based_integer>(pat.bits);
+#endif
+        if (bits && rt.top(bits))
+            return OK;
     }
     return ERROR;
 }
@@ -2584,48 +2666,6 @@ blitter::size  display_height()
 //   - Complex:         HSV with saturation at 1
 //   - List/array:      RGB value (positive), HSV (negative)
 //   - Text/Symbol:     Named color
-
-static void hsv_to_rgb(uint hue, uint saturation, uint value,
-                       uint &red, uint &green, uint &blue)
-// ----------------------------------------------------------------------------
-//   Ad-hoc conversion from HSV (color wheel) to RGB
-// ----------------------------------------------------------------------------
-{
-    // Normalize hue to 0..359
-    hue %= 360;
-    if (hue < 0)
-        hue += 360;
-
-    // Normalize hue to [0, 6)
-    float h = hue / 60.0f;
-    int   i = int(floor(h));
-    float f = h - i;
-
-    // Clamp saturation and value to 0..1
-    float v = std::max(0.0f, std::min(1.0f, value / 255.0f));
-    float s = std::max(0.0f, std::min(1.0f, saturation / 255.0f));
-
-    float p = v * (1.0f - s);
-    float q = v * (1.0f - s * f);
-    float t = v * (1.0f - s * (1.0f - f));
-
-    float rf, gf, bf;
-    switch (i % 6)
-    {
-    case 0: rf = v; gf = t; bf = p; break;
-    case 1: rf = q; gf = v; bf = p; break;
-    case 2: rf = p; gf = v; bf = t; break;
-    case 3: rf = p; gf = q; bf = v; break;
-    case 4: rf = t; gf = p; bf = v; break;
-    case 5: rf = v; gf = p; bf = q; break;
-    default: rf = gf = bf = 0.0f; break;
-    }
-
-    red = uint(rf * 255.0f);
-    green = uint(gf * 255.0f);
-    blue = uint(bf * 255.0f);
-}
-
 
 static const struct { uint r; uint g; uint b; cstring name; } color_names[] =
 // ----------------------------------------------------------------------------
