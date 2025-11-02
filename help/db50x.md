@@ -4341,6 +4341,42 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.13 "Saints" - Truth plot, colors, and bug fixes
+
+This release focuses on graphics and a few user-reported bug fixes
+
+### New features
+
+* `bins` computes frequency bins from statistics data
+* `Res` sets the resolution when plotting
+* `HistogramPlot` draws a histogram (frequency) plot from an array
+* `HSV` generates a color pattern from hue, saturation and value
+* `Color` generates a color pattern from an object, including names
+* `TruthPlot` renders a truth value plot, with grayscale and color options
+* Add a new `XYPlots` demo illustrating `TruthPlot` variants
+
+### Bug fixes
+
+* Update the screen in `Show` when `Pict` is set
+* Fix crash in `Date+` when adding invalid dates
+* Correctly update the `UserModeMenu` and annunciator when changing User mode
+* The `STO` operation now works sensibly on flags
+* Fixed a rare on-startup crash running tests in the debugger
+* Invalidate the font cache when changing settings (notably `FixedWidthDigits`)
+* Fix transient `Input` validation errors after text-editor errors
+* Remove two extra parentheses in the documentation for settings
+
+### Improvements
+
+* Transient Alpha now preserves existing Alpha / Lowercase mode
+* Remove dependency on external `crc32` utility, now use a local implementation
+* Remove dependency on `tac`, replace it with `tail -r`
+* Rendered graphics are now preserved in case of auto-power-off
+* Avoid transient build errors on missing help directory
+* Add documentation for `ResetModes` and usage example for `Modes`
+* Negative dates now show as `BC` instead of with a minus sign
+
+
 ## Release 0.9.12 "Alive" - Return to active duty
 
 This release focuses on simulator improvements, bug fixes, and enhanced
