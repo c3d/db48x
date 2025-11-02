@@ -1164,6 +1164,7 @@ object::result show(object_r obj)
             return object::ERROR;
         }
 
+        save<bool> disable_user(user_display_enable, false);
         ui.draw_graphics();
 
         using size     = grob::pixsize;
@@ -2617,15 +2618,21 @@ COMMAND_BODY(Color)
 //
 // ============================================================================
 
+bool user_display_enable = true;
+
+
 grob_p user_display()
 // ----------------------------------------------------------------------------
 //   Return the GROB in the `Pict` variable if any, or nullptr
 // ----------------------------------------------------------------------------
 {
-    object_p pict = object::static_object(object::ID_Pict);
-    if (object_p obj = directory::recall_all(pict, false))
-        if (obj->is_graph())
-            return grob_p(obj);
+    if (user_display_enable)
+    {
+        object_p pict = object::static_object(object::ID_Pict);
+        if (object_p obj = directory::recall_all(pict, false))
+            if (obj->is_graph())
+                return grob_p(obj);
+    }
     return nullptr;
 }
 

@@ -102,21 +102,22 @@ struct PlotParametersAccess
 };
 
 
-object::result show(object_r obj);
+object::result  show(object_r obj);
 // ----------------------------------------------------------------------------
 //   Show the given object full screen
 // ----------------------------------------------------------------------------
 
 
-void           draw_prompt(utf8 text, size_t len);
-void           draw_prompt(text_r txt);
+void            draw_prompt(utf8 text, size_t len);
+void            draw_prompt(text_r txt);
 // ----------------------------------------------------------------------------
 //   Draw a prompt for `Prompt`, `Input`, `PromptStore`
 // ----------------------------------------------------------------------------
 
-grob_p         user_display();
-blitter::size  display_width();
-blitter::size  display_height();
+extern bool     user_display_enable;
+grob_p          user_display();
+blitter::size   display_width();
+blitter::size   display_height();
 // ----------------------------------------------------------------------------
 //   Return the current display, i.e. content of `Pict` variable
 // ----------------------------------------------------------------------------
