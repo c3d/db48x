@@ -121,6 +121,8 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
     algebraic_g factor = integer::make(100);
     algebraic_g time = integer::make(1);
     time = date % time;
+    if (!date || !time)
+        return 0;
 
     uint d = date->as_uint32(0, false) % 100;
     date = date / factor;
@@ -130,7 +132,7 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
 
     const uint days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     bool bisext = m == 2 && y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
-    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext)
+    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext || y == 0)
     {
         if (error)
             rt.invalid_date_error();
@@ -602,26 +604,31 @@ size_t render_dms(renderer &r, algebraic_g value,
 
 size_t render_date(renderer &r, algebraic_g date)
 // ----------------------------------------------------------------------------
-//   Render a number as "degrees / minutes / seconds"
+//   Render a date according to DMCP settings
 // ----------------------------------------------------------------------------
 {
     if (!date || !date->is_real())
         return 0;
     bool neg = date->is_negative();
     if (neg)
-    {
-        r.put('-');
         date = -date;
-    }
 
     algebraic_g factor = integer::make(100);
     algebraic_g time = integer::make(1);
     time = date % time;
+    if (!date || !time)
+        return 0;
+
     uint day = date->as_uint32(0, false) % 100;
     date = date / factor;
     uint month = date->as_uint32(0, false) % 100;
     date = date / factor;
     uint year = date->as_uint32(0, false);
+    if (year == 0)
+    {
+        rt.invalid_date_error();
+        return 0;
+    }
 
     char mname[4];
     if (Settings.ShowMonthName() && month >=1 && month <= 12)
@@ -629,15 +636,16 @@ size_t render_date(renderer &r, algebraic_g date)
     else
         snprintf(mname, 4, "%u", month);
 
-    char ytext[6];
+    char ytext[16];
     if (Settings.TwoDigitYear())
-        snprintf(ytext, 6, "%02u", year % 100);
+        snprintf(ytext, sizeof(ytext), "%02u", year % 100);
     else
-        snprintf(ytext, 6, "%u", year);
+        snprintf(ytext, sizeof(ytext), "%u", year);
 
     if (Settings.ShowDayOfWeek())
     {
-        ularge jdn = julian_day_number(day, month, year);
+        int syear = neg ? -int(year) : year;
+        ularge jdn = julian_day_number(day, month, syear);
         uint dow = jdn % 7;
         r.printf("%s ", get_wday_shortcut(dow));
     }
@@ -651,6 +659,8 @@ size_t render_date(renderer &r, algebraic_g date)
     case 2: r.printf("%s%c%u%c%s", ytext, sep, day,   sep, mname); break;
     case 3: r.printf("%s%c%s%c%u", ytext, sep, mname, sep, day);   break;
     }
+    if (neg)
+        r.printf(" BC");
 
     if (time && !time->is_zero())
     {
@@ -903,6 +913,7 @@ COMMAND_BODY(DateAdd)
             if (algebraic_p daf = days_after(d1, d2))
                 if (rt.drop() && rt.top(daf))
                     return OK;
+            rt.clear_error();
             if (algebraic_p daf = days_after(d2, d1))
                 if (rt.drop() && rt.top(daf))
                     return OK;

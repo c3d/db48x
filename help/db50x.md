@@ -15922,6 +15922,10 @@ anonymous programmer, you can use the following code:
 
 The opposite commands to compute the difference between dates is `DDays`.
 
+The command accepts the inputs in any order. However, if both inputs can be
+intepreted as dates, then the first one is a date and the second one a number of
+days.
+
 
 ## SetTime
 
