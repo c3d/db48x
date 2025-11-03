@@ -1918,8 +1918,8 @@ bool user_interface::draw_header()
             changed = !rt.editing() && time - customHeaderDrawn > period;
             if (changed)
                 customHeaderDrawn = time;
-            if (time - last < remaining)
-                remaining -= time - last;
+            if (time - customHeaderDrawn < remaining)
+                remaining -= time - customHeaderDrawn;
             draw_refresh(remaining);
         }
     }
