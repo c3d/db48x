@@ -4310,7 +4310,10 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             {
                 // Let menu and normal keys go through
                 if (xshift)
+                {
+                    last = key;
                     return false;
+                }
 
                 // Delay processing of up or down until after delay
                 if (longpress)
@@ -4342,6 +4345,9 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         else if (!key && (last == KEY_UP || last == KEY_DOWN))
         {
+            if (xshift)
+                return false;
+
             if (!longpress)
                 key = last;
             last = 0;
