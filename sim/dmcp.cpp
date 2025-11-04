@@ -877,13 +877,18 @@ static struct timer
 void sys_sleep()
 {
     uint32_t entry = sys_current_ms();
+    uint32_t max = ST(STAT_CLK_WKUP_SECONDS) ? 1000 : 60000;
     while (!test_command && key_empty())
     {
         uint32_t now = sys_current_ms();
+        if (now - entry >= 1000)
+        {
+            SET_ST(STAT_CLK_WKUP_FLAG);
+            goto done;
+        }
         for (int i = 0; i < 4; i++)
             if (timers[i].enabled &&
-                int(timers[i].deadline - now) < 0 &&
-                int(timers[i].deadline - entry) >= 0)
+                int(timers[i].deadline - now) < 0)
                 goto done;
         ui_ms_sleep(tests::running ? 1 : 20);
     }
