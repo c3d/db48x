@@ -8,6 +8,7 @@ SDK = dmcp/dmcp
 PGM = pgm
 PGM_TARGET = $(TARGET).$(PGM)
 BUILD_ID = $(shell tools/build_id)
+QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
 
 ######################################
 # Building variables
@@ -42,6 +43,9 @@ TOOLS = tools
 # CRC adjustment
 CRCFIX = $(TOOLS)/forcecrc32/forcecrc32
 
+# CRC32 computation
+CRC32 = $(TOOLS)/crc32/crc32
+
 # Decimal mantissa encoding
 DECIMIZE = $(TOOLS)/decimize/decimize
 
@@ -70,13 +74,16 @@ color-%:
 
 sim: sim/$(TARGET).mak help/$(TARGET).idx
 	cd sim; $(MAKE) -f $(<F) TARGET=$(shell awk '/^TARGET/ { print $$3; }' sim/$(TARGET).mak)
-sim/$(TARGET).mak: sim/$(TARGET).pro Makefile $(VERSION_H)	\
-					sim/config.qrc		\
-					sim/state.qrc		\
-					sim/library.qrc		\
-					sim/help.qrc		\
-					sim/help/img.qrc
-	cd sim; qmake $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
+sim/$(TARGET).mak:	sim/$(TARGET).pro	\
+			sim/config.qrc		\
+			sim/state.qrc		\
+			sim/library.qrc		\
+			sim/help.qrc		\
+			sim/help/img.qrc	\
+						\
+			Makefile		\
+			$(VERSION_H)
+	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
 sim/%.qrc: Makefile
 	mkdir -p $(@D)
@@ -235,8 +242,6 @@ help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
-help/$(TARGET).md: help/$(TARGET)-images
-help/$(TARGET)-images:
 	rsync -av --delete doc/img/*.bmp help/img/
 
 help/$(TARGET).idx: help/$(TARGET).md
@@ -367,6 +372,7 @@ DEFINES_fast=NDEBUG
 DEFINES_faster=NDEBUG
 DEFINES_fastes=NDEBUG
 DEFINES_dm32 = 	DM32 				\
+		LGAMMA_CRASHES			\
 		CONFIG_FIXED_BASED_OBJECTS	\
 		DEOPTIMIZE_CATALOG		\
 		MEMORY=500
@@ -514,7 +520,7 @@ $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
 	@echo Build ID $(BUILD_ID)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ \
 		-DBUILD_ID=$(BUILD_ID) src/dmcp/qspi_check.c
-$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX)
+$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX) $(CRC32)
 	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
 	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)
 	$(OBJCOPY) --only-section   .qspi -O binary  $<  $(QSPI)
@@ -549,6 +555,8 @@ $(BUILD)/.exists:
 
 $(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
 	cd $(dir $(CRCFIX)); $(MAKE)
+$(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
+	cd $(dir $(CRC32)); $(MAKE) TARGET=opt
 $(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
 	cd $(dir $(DECIMIZE)); $(MAKE) TARGET=opt
 

@@ -15,7 +15,65 @@ The current preferences can be retrieved and saved using the `Modes` command.
 
 ## Modes
 
-Returns a program that will restore the current settings. This program can be saved into a variable to quickly restore a carefully crafted set of preferences. Note that the calculator automatically restores the mode when it [loads a state](#States).
+Returns a program that will restore the current settings.
+This program can be saved into a variable to quickly restore user settings.
+Use this command along with `ResetModes` to restore settings, as shown in the
+example below, which displays `1.3` in `FIX` mode with 2 digits, then restores
+the settings and displays `1.3` again using the user's initial settings:
+
+```rpl
+«
+    Modes
+    → M
+    «
+        @ Fixed mode
+        2 FixedDisplay
+        1.3 1 DrawText
+
+        @ Restore standard mode
+        ResetModes M Evaluate
+        1.3 2 DrawText
+    »
+»
+```
+
+Note that the calculator automatically restores the mode when it
+[loads a state](#States).
+
+## ResetModes
+
+Reset all the settings to their default value.
+
+This can be used in combination with a stored value from the `Modes` command in
+order to save and restore user preferences that a program may modify.
+
+The following code creates a `SaveModes` program that evaluates a program on the stack and restores the settings to what they were before:
+
+```rpl
+«
+    Modes
+    → P M
+    «
+        P ResetModes M Evaluate
+    »
+» 'SafeRun' STO
+
+
+@ Example of use: change display mode twice, restore it afterwards
+1.3
+«
+    6 ENG
+    «
+        2 FIX
+        1.3 1 DISP
+    »
+    SafeRun
+
+    1.3 2 DISP
+» SafeRun
+
+@ Expecting: 1.3
+```
 
 ## ModesMenu
 
@@ -35,8 +93,8 @@ DB48X has five display mode (one more than the HP48)s:
 * [Standard mode](#StandardDisplay)
 * [Fixed mode](#FixedDisplay)
 * [Scientific mode](#ScientificDisplay)
-* [Engineering mode](#EngineeringDisplay))
-* [Significant digits mode](#SignificantDisplay))
+* [Engineering mode](#EngineeringDisplay)
+* [Significant digits mode](#SignificantDisplay)
 
 DB48X also features digit [grouping and spacing](#display-grouping-and-spacing)
 
@@ -775,6 +833,7 @@ The opposite setting is `TruthLogicForIntegers`.
 
 # Evaluation settings
 
+The following settings are related to evaluation of programs and objects.
 
 ## SaveLastArguments
 
@@ -800,7 +859,51 @@ If `SaveLastArguments` is set, arguments to interactive commands will still be
 saved.
 
 
+# Plot settings
 
+The following settings are related to plotting
+
+## GraphingTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object
+graphically. The default is 250ms.
+
+## ShowTimeLimit
+
+Maximum number of milliseconds that can be spent rendering an object for the
+`Show` command. The default is 10000 (10s)
+
+## ResultGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the result (level 1 of the
+stack) graphically. The default value is 1500 (1.5s)
+
+## StackGraphingTimeLimit
+
+Maximum amount of time that can be spent rendering the levels of the stack above
+level 1. The default value is 250ms.
+
+## TextRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack. Objects that are larger than this size are shown on the stack as something like
+`Large text (399 bytes)`.
+
+## GraphRenderingSizeLimit
+
+Limit in bytes for the size of objects to be rendered on the stack
+graphically. Objects that are larger than this size are text.
+
+
+## XYPlotBins
+
+Number of bins used to draw XY plots (e.g. `TruthPlot`) when the `Resolution` is
+at its default value of `0`.
+
+
+## StatsPlotBins
+
+Number of bins used to draw statistical plots (e.g. `BarPlot`) when the
+`Resolution` is at its default value of `0`.
 
 
 # States

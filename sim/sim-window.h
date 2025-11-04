@@ -37,7 +37,13 @@
 
 #include <QAbstractEventDispatcher>
 #include <QAudio>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QAudioSink>
+#include <QMediaDevices>
+#else
+#include <QAudioOutput>
+#include <QAudioDeviceInfo>
+#endif
 #include <QBuffer>
 #include <QByteArray>
 #include <QComboBox>
@@ -45,7 +51,6 @@
 #include <QIODevice>
 #include <QLabel>
 #include <QMainWindow>
-#include <QMediaDevices>
 #include <QObject>
 #include <QPushButton>
 #include <QScopedPointer>
@@ -139,10 +144,17 @@ class MainWindow : public QMainWindow
     int                            keyboard_width;
     int                            keyboard_height;
 
+    // Keep resize direction to preserve aspect ratio
+    int                            resizeDirection;
+
     // Audio support
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QMediaDevices                 *devices = nullptr;
-    QScopedPointer<AudioGenerator> generator;
     QScopedPointer<QAudioSink>     audio;
+#else
+    QScopedPointer<QAudioOutput>   audio;
+#endif
+    QScopedPointer<AudioGenerator> generator;
     volatile bool                  playing;
 
     enum { SAMPLE_RATE = 20000, SAMPLE_COUNT = SAMPLE_RATE };
@@ -168,7 +180,7 @@ public:
     void                stopBuzzer();
     bool                buzzerPlaying() { return playing; }
 
-  protected:
+protected:
     virtual void keyPressEvent(QKeyEvent *ev);
     virtual void keyReleaseEvent(QKeyEvent *ev);
     bool         eventFilter(QObject *obj, QEvent *ev);
@@ -179,7 +191,11 @@ signals:
 
 private:
     // Audio support
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void        initializeAudio(const QAudioDevice &deviceInfo, uint freq);
+#else
+    void        initializeAudio(const QAudioDeviceInfo &deviceInfo, uint freq);
+#endif
 
 private slots:
     void        updateAudioDevices();

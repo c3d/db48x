@@ -434,10 +434,13 @@ public:
     {
         if (explanation.length())
             explanation += "\n";
-        explanation += file;
-        explanation += ":";
-        explanation += std::to_string(line);
-        explanation += ":    ";
+        if (file)
+        {
+            explanation += file;
+            explanation += ":";
+            explanation += std::to_string(line);
+            explanation += ":    ";
+        }
         return explain_more(args...);
     }
 

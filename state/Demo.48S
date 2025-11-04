@@ -693,6 +693,35 @@ Patterns
 
 @@ ---------------------------------------------------------------------------
 @@
+@@	 Real and complex Truth plot
+@@
+@@ ---------------------------------------------------------------------------
+
+XYPlots
+«
+    1 3 for i
+        { 32 128 64 } i Get XYPlotBins
+
+        « 'sin(100*(sq(x)+sq(y)+sin(20*(x-y))))<0.5' Truth » TEval
+        "Truth: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
+        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
+
+        « '0.5*(sin(25*(x*y+x+2*y))+1)' Truth » TEval
+        "Real: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
+        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
+
+        « « x y ℝ→ℂ 0.1∡31 × » Truth » TEval
+        "Complex: " SWAP + " for " + 'XYPlotBins' RCL + " XYPlotBins" +
+        Dup { 10#200 10#60 0 true true  0  0 } Disp 5 Wait
+    next
+    9 →List
+    1000 0.1 BEEP
+»
+
+
+
+@@ ---------------------------------------------------------------------------
+@@
 @@	 Random number test
 @@
 @@ ---------------------------------------------------------------------------

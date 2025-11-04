@@ -40,86 +40,60 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <widget class="QWidget" name="page">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item alignment="Qt::AlignmentFlag::AlignHCenter">
-         <widget class="SimScreen" name="screen">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>240</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>4000</width>
-            <height>2400</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>400</width>
-            <height>240</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::FocusPolicy::NoFocus</enum>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Shadow::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="keyboard">
-          <property name="minimumSize">
-           <size>
-            <width>400</width>
-            <height>504</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>4000</width>
-            <height>5040</height>
-           </size>
-          </property>
-          <property name="baseSize">
-           <size>
-            <width>400</width>
-            <height>504</height>
-           </size>
-          </property>
-          <property name="focusPolicy">
-           <enum>Qt::FocusPolicy::NoFocus</enum>
-          </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">border-image: url(:/bitmap/keyboard.png) 0 0 0 0 stretch stretch;
+       <widget class="SimScreen" name="screen">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>400</width>
+          <height>240</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="keyboard">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>240</y>
+          <width>400</width>
+          <height>504</height>
+         </rect>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-image: url(:/bitmap/keyboard.png) 0 0 0 0 stretch stretch;
 border-width: 0px;</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_2">
        <layout class="QGridLayout" name="gridLayout">

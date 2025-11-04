@@ -102,24 +102,31 @@ struct PlotParametersAccess
 };
 
 
-object::result show(object_r obj);
+object::result  show(object_r obj);
 // ----------------------------------------------------------------------------
 //   Show the given object full screen
 // ----------------------------------------------------------------------------
 
 
-void           draw_prompt(utf8 text, size_t len);
-void           draw_prompt(text_r txt);
+void            draw_prompt(utf8 text, size_t len);
+void            draw_prompt(text_r txt);
 // ----------------------------------------------------------------------------
 //   Draw a prompt for `Prompt`, `Input`, `PromptStore`
 // ----------------------------------------------------------------------------
 
-grob_p         user_display();
-blitter::size  display_width();
-blitter::size  display_height();
+extern bool     user_display_enable;
+grob_p          user_display();
+blitter::size   display_width();
+blitter::size   display_height();
 // ----------------------------------------------------------------------------
 //   Return the current display, i.e. content of `Pict` variable
 // ----------------------------------------------------------------------------
+
+pattern         color_pattern(object_p obj);
+// ----------------------------------------------------------------------------
+//   Create a color pattern from an object
+// ----------------------------------------------------------------------------
+
 
 
 #if CONFIG_COLOR
@@ -201,6 +208,8 @@ COMMAND_DECLARE(GraphicProduct,1);
 COMMAND_DECLARE(GraphicIntegral,1);
 COMMAND_DECLARE(Gray,1);
 COMMAND_DECLARE(RGB,3);
+COMMAND_DECLARE(HSV,3);
+COMMAND_DECLARE(Color,1);
 
 COMMAND_DECLARE(PlotMin,1);
 COMMAND_DECLARE(PlotMax,1);
@@ -210,6 +219,7 @@ COMMAND_DECLARE(Scale,2);
 COMMAND_DECLARE(XScale,1);
 COMMAND_DECLARE(YScale,1);
 COMMAND_DECLARE(Center,1);
+COMMAND_DECLARE(Res,1);
 
 COMMAND_DECLARE(CompileToAlgebraic,  1);
 COMMAND_DECLARE(CompileToNumber,  1);

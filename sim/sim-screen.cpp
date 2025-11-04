@@ -88,6 +88,7 @@ SimScreen::SimScreen(QWidget *parent)
     mainPixmap.fill(bgColor);
     mainScreen = screen.addPixmap(mainPixmap);
     mainScreen->setOffset(0.0, 0.0);
+    mainScreen->setTransformationMode(Qt::SmoothTransformation);
 
     setScene(&screen);
     setSceneRect(0, -5, screen_width, screen_height + 5);

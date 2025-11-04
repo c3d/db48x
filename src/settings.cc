@@ -35,6 +35,7 @@
 #include "decimal.h"
 #include "font.h"
 #include "functions.h"
+#include "graphics.h"
 #include "integer.h"
 #include "menu.h"
 #include "program.h"
@@ -426,10 +427,22 @@ bool settings::store(object::id name, object_p value)
 {
     switch(name)
     {
-        // For all settings, 'store' is much like running it
+#define ID(n)
+#define SETTING(Name, Low, High, Init)
+#define FLAG(Enable,Disable) case ID_##Enable: case ID_##Disable:
+#include "ids.tbl"
+        {
+            int dval = value->as_truth(true);
+            if (dval >= 0)
+                return flag(name, dval);
+        }
+        break;
+
 #define ID(n)
 #define SETTING(Name, Low, High, Init)          case ID_##Name:
+#define FLAG(Enable,Disable)
 #include "ids.tbl"
+    case ID_Res:
         if (rt.push(value))
             return command::static_object(name)->evaluate() == object::OK;
         return false;
@@ -503,6 +516,12 @@ object_p settings::recall(object::id name)
             break;
 #include "ids.tbl"
 
+    case ID_Res:
+    {
+        PlotParametersAccess ppar;
+        return ppar.resolution;
+    }
+
     default:
         return nullptr;
     }
@@ -532,6 +551,12 @@ bool settings::purge(object::id name)
         Settings.Disable(true);                 \
         break;
 #include "ids.tbl"
+
+    case ID_Res:
+        if (rt.push(integer::make(0)))
+            if (Res::evaluate() == object::OK)
+                return true;
+        return false;
 
     default:
         return false;
@@ -718,6 +743,10 @@ cstring setting::label(object::id ty)
         return printf("Txt%uB", s.TextRenderingSizeLimit());
     case ID_GraphRenderingSizeLimit:
         return printf("Grph%uB", s.GraphRenderingSizeLimit());
+    case ID_XYPlotBins:
+        return printf("XYBins %u", s.XYPlotBins());
+    case ID_StatsPlotBins:
+        return printf("StBins %u", s.StatsPlotBins());
     case ID_PlotRefreshRate:
         return printf("Plot%ums", s.PlotRefreshRate());
     default:

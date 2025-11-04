@@ -25,7 +25,7 @@ checkutils() {
 toint() {
 	local x
 	x=`printf "%08x" "0x$1" |
-		sed -e 's|\(..\)|\1@|g' | tr '@' '\012' | tac | tr -d '\012' |
+		sed -e 's|\(..\)|\1@|g' | tr '@' '\012' | tail -r | tr -d '\012' |
 		sed -e 's|\(..\)|@\1|g' | sed -e 's|@|\\\x|g'`
 	printf "$x"
 }
@@ -48,7 +48,7 @@ dumppgm() {
 
 # -- MAIN ------------------
 
-checkutils sha1sum sed tac dd printf find type wc
+checkutils sha1sum sed tail dd printf find type wc
 
 if [ ! -f "$bin" ]; then
 	echo "ERROR: Cannot find program binary '$bin'"

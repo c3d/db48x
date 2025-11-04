@@ -398,10 +398,16 @@ struct hwfp : hwfp_base
         return make(std::tgamma(x->value()));
     }
 
+#if LGAMMA_CRASHES
+    // Implemented in hwfp.cc using local lgamma/lgammaf due to bug #1532
+    // (crash in the default implementation of lgamma/lgammaf on DM32)
+    static hwfp_p lgamma(hwfp_r x);
+#else
     static hwfp_p lgamma(hwfp_r x)
     {
         return make(std::lgamma(x->value()));
     }
+#endif // LGAMMA_CRASHES
 
     static hwfp_p abs(hwfp_r x)
     {

@@ -181,15 +181,19 @@ bool function::exact_trig(id op, algebraic_g &x)
     }
 
     ularge angle = 42;      // Not a special case...
+
+    // Perform exact reduction if possible
+    if (degrees->is_bignum() || degrees->is_fraction())
+    {
+        algebraic_g turn = integer::make(360);
+        degrees = mod::evaluate(degrees, turn);
+        if (bignum_p reduced = degrees->as<bignum>())
+            degrees = integer::make(reduced->value<ularge>());
+    }
     if (integer_p posint = degrees->as<integer>())
-        angle = posint->value<ularge>();
+        angle = posint->value<ularge>() % 360;
     else if (const neg_integer *negint = degrees->as<neg_integer>())
         angle = 360 - negint->value<ularge>() % 360;
-    else if (bignum_p posint = degrees->as<bignum>())
-        angle = posint->value<ularge>();
-    else if (const neg_bignum *negint = degrees->as<neg_bignum>())
-        angle = 360 - negint->value<ularge>() % 360;
-    angle %= 360;
 
     switch(op)
     {
@@ -200,7 +204,8 @@ bool function::exact_trig(id op, algebraic_g &x)
         switch(angle)
         {
         case 0:
-        case 180:       x = integer::make(0);  return true;
+        case 180:
+        case 360:       x = integer::make(0);  return true;
         case 270:       x = integer::make(-1); return true;
         case 90:        x = integer::make(1);  return true;
         case 30:
@@ -212,19 +217,37 @@ bool function::exact_trig(id op, algebraic_g &x)
                                             integer::make(2));
                         return true;
         }
-        return false;
+        break;
     case ID_tan:
         switch(angle)
         {
         case 0:
-        case 180:       x = integer::make(0);  return true;
+        case 180:
+        case 360:       x = integer::make(0);  return true;
         case 45:
         case 225:       x = integer::make(1);  return true;
         case 135:
         case 315:       x = integer::make(-1); return true;
         }
+        break;
     default:
         break;
+    }
+
+    if (degrees->is_fractionable())
+    {
+        switch(amode)
+        {
+        case object::ID_Grad:
+            x = degrees * integer::make(100) / integer::make(90);
+            break;
+        case object::ID_PiRadians:
+            x = degrees / integer::make(180);
+            break;
+        default:
+            x = degrees;
+            break;
+        }
     }
 
     return false;

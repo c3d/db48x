@@ -930,34 +930,86 @@ algebraic_p algebraic::evaluate_function(program_r eq, algebraic_r x)
         return nullptr;
     rt.clear_error();
     save<object_g *> ival(expression::independent_value, (object_g *) &x);
-    size_t   depth  = rt.depth();
-    result   err    = eq->run();
+    size_t           depth  = rt.depth();
+    result           err    = eq->run();
+    if (err != OK)
+        return nullptr;
+
     size_t   dnow   = rt.depth();
-    object_p result = rt.pop();
     if (dnow == depth + 1)
     {
-        object_p indep = rt.pop();
-        dnow--;
+        // Case where we evaluated from indep without consuming the stack
+        object_p result = rt.pop();
+        object_p indep  = rt.pop();
         if (indep != +x)
-        {
             rt.invalid_function_error();
-            err = ERROR;
-        }
+        else if (!result->is_algebraic())
+            rt.type_error();
+        else
+            return algebraic_p(result);
     }
-    if (!result || !result->is_algebraic())
+    else if (dnow == depth)
     {
-        rt.type_error();
-        err = ERROR;
+        // Case where we consumed the value and left it in place
+        object_p result = rt.pop();
+        if (!result->is_algebraic())
+            rt.type_error();
+        else
+            return algebraic_p(result);
     }
-    if (err != OK || (dnow != depth && dnow != depth + 1))
+    else
     {
-        if (dnow > depth)
-            rt.drop(dnow - depth);
-        if (err == OK)
-            rt.invalid_function_error();
+        rt.invalid_function_error();
+    }
+    return nullptr;
+}
+
+
+algebraic_p algebraic::evaluate_function(program_r   eq,
+                                         algebraic_r x,
+                                         algebraic_r y)
+// ----------------------------------------------------------------------------
+//   Evaluate the eq object as a function of two variables
+// ----------------------------------------------------------------------------
+{
+    if (!rt.push(+x) || !rt.push(+y))
         return nullptr;
+    rt.clear_error();
+    save<object_g *> ival(expression::independent_value, (object_g *) &x);
+    save<object_g *> dval(expression::dependent_value, (object_g *) &y);
+    size_t           depth  = rt.depth();
+    result           err    = eq->run();
+    if (err != OK)
+        return nullptr;
+
+    size_t dnow   = rt.depth();
+    if (dnow == depth + 1)
+    {
+        // Case where we evaluated from indep without consuming the stack
+        object_p result = rt.pop();
+        object_p dep  = rt.pop();
+        object_p indep  = rt.pop();
+        if (indep != +x || dep != +y)
+            rt.invalid_function_error();
+        else if (!result->is_extended_algebraic())
+            rt.type_error();
+        else
+            return algebraic_p(result);
     }
-    return algebraic_p(result);
+    else if (dnow == depth - 1)
+    {
+        // Case where we consumed the value and left it in place
+        object_p result = rt.pop();
+        if (!result->is_algebraic())
+            rt.type_error();
+        else
+            return algebraic_p(result);
+    }
+    else
+    {
+        rt.invalid_function_error();
+    }
+    return nullptr;
 }
 
 

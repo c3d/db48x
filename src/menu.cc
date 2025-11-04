@@ -1370,19 +1370,26 @@ MENU(PlotMenu,
      "Polar",   ID_Polar,
      "Param",   ID_Parametric,
      "Scatter", ID_Scatter,
-     "Bar",     ID_Bar,
-     "Axes",    ID_Drax,
+     "Truth",   ID_Truth,
 
      "Foregnd", ID_Foreground,
+     "Backgnd", ID_Background,
      "LineWdth",ID_LineWidth,
-     "Lines",   ID_CurveFilling,
-     "Axes",    ID_DrawPlotAxes,
      "Xrange",  ID_XRange,
      "Yrange",  ID_YRange,
 
-     "Backgnd", ID_Background,
+     "Lines",   ID_CurveFilling,
+     "Axes",    ID_DrawPlotAxes,
+     StatsPlotBins::label,     ID_StatsPlotBins,
+     XYPlotBins::label,        ID_XYPlotBins,
+     PlotRefreshRate::label,    ID_PlotRefreshRate,
+
+     "Bar",     ID_Bar,
+     "Histogrm",ID_Histogram,
      "Clear",   ID_ClLCD,
-     "Freeze",  ID_Freeze);
+     "Freeze",  ID_Freeze,
+     "DrAxes",  ID_Drax
+);
 
 MENU(ClearThingsMenu,
 // ----------------------------------------------------------------------------

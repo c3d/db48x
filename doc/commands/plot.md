@@ -3,28 +3,13 @@
 Graphics are rendered on the screen based on a coordinate systems defined in the
 `PlotParameters` variables.
 
-## PlotParameters
-
-The `PlotParameters` reserved variable defines the plot parameters, as a list,
-with the following elements:
-
-* *Lower Left* coordinates as a complex (default `-10-6i`)
-* *Upper Right* coordinates as a complex (default `10+6i`)
-* *Independent variable* name (default `x`)
-* *Resolution* specifying the interval between values of the independent
-  variable (default `0`). A binary numnber specifies a resolution in pixels.
-* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
-  or a list containing the origin, the tick mark specification, and the names of
-  the axes.
-* *Type* of plot (default `function`)
-* *Dependent variable* name (default `y`)
-
-To reset the `PlotParameters` to the default values, it is necessary to purge
-the current directory as well as the parents from any `PlotParameters` value:
-
-```rpl
-'PPAR' PGALL
-```
+DB48X supports multiple plotting modes:
+* **Function** - Standard y=f(x) plots
+* **Polar** - Polar coordinate plots
+* **Parametric** - Parametric curve plots
+* **Scatter** - Scatter plots from data
+* **Bar** - Bar charts from data
+* **Histogram** - Histogram plots for frequency distributions
 
 
 ## PlotMin
@@ -97,3 +82,220 @@ causes the circle to be elongated vertically:
 (0;0) 1 CIRCLE
 @ Image yrange-circle
 ```
+
+
+## PlotParameters
+
+The `PlotParameters` reserved variable defines the plot parameters, as a list,
+with the following elements:
+
+* *Lower Left* coordinates as a complex (default `-10-6i`)
+* *Upper Right* coordinates as a complex (default `10+6i`)
+* *Independent variable* name (default `x`)
+* *Resolution* specifying the interval between values of the independent
+  variable (default `0`). A binary numnber specifies a resolution in pixels.
+* *Axes* which can be a complex giving the origin of the axes (default `0+0i`),
+  or a list containing the origin, the tick mark specification, and the names of
+  the axes.
+* *Type* of plot (default `function`)
+* *Dependent variable* name (default `y`)
+
+To reset the `PlotParameters` to the default values, it is necessary to purge
+the current directory as well as the parents from any `PlotParameters` value:
+
+```rpl
+'PPAR' PGALL
+```
+
+## FunctionPlot
+
+Plot a function in the form y=f(x). The function is taken from the stack.
+
+```rpl
+'tan(13*x) * sin(500*x)' FunctionPlot
+@ Image fnplot-example
+```
+
+
+## PolarPlot
+
+Plot a function in polar coordinates, where r=f(θ).
+
+```rpl
+'6*sin(15*x)*sin(113*x)' PolarPlot
+@ Image polarplot-example
+```
+
+
+## ParametricPlot
+
+Plot a parametric curve where x and y are both functions of a parameter.
+
+The input function returns a complex number where the real part is interpreted
+as the position along the x axis and the imaginary part is interpreted as the
+position along the y axis.
+
+
+```rpl
+'exp((0.25+4.5ⅈ)*x)' ParametricPlot
+@ Image parametricplot-example
+```
+
+## TruthPlot
+
+Plot a curve where an expression in `x` and `y` is tested.
+
+The input function can return:
+
+* Truth value `True` or `False` for foreground and background color
+* Real values between `0.0` and `1.0` for grayscales
+* Complex values representing saturated HSV (colorwheel) colors
+* 3-element vectors representing HSV (colorwheel) colors
+* 3-element lists representing RGB colors
+* Names or symbols representing common color names
+
+Drawing is done incrementally, by splitting the horizontal and vertical
+coordinate space again and again. When `Res` is at the default value `0`, the
+maximum number of bins along the X and Y axis is set by `XYPlotBins`. Otherwise
+`Res` defines the minimum size of bins.
+
+
+### Truth plot with a truth value
+
+The following example illustrates the use of the `TruthPlot` with a truth value:
+
+```rpl
+'x²-2·y²>1.9+38·sin(21·x·y)' TruthPlot
+@ Image truthplot
+```
+
+### Truth plot with a real value
+
+The following example illustrates the use of the `TruthPlot` with a real value:
+
+```rpl
+'sin(21·x·y)' TruthPlot
+@ Image truthplot-real
+```
+
+### Truth plot with a complex value
+
+The following example illustrates the use of the `TruthPlot` with a real value:
+
+```rpl
+« x y RealToComplex 0.15 * »  TruthPlot
+@ Image truthplot-complex
+```
+
+Note that if `AutoSimplify` is enabled, this graph will show a white horizontal
+line corresponding to the real axis. This is because the multiplication by
+`0.15` auto-simplifies the result as a real number if the imaginary part is
+zero.
+
+### Truth plot with a vector
+
+The following example illustrates the use of the `TruthPlot` with a vector of
+components to generate arbitrary hue-saturation-values between 0 and 1.
+
+```rpl
+«
+    x y atan2 0 + 90 / 1 REM
+    x y HYPOT
+    DUP 300 * SIN
+    SWAP 10 /
+    →3D
+»  TruthPlot
+@ Image truthplot-vector
+```
+
+### Truth plot with a list
+
+The following example illustrates the use of the `TruthPlot` with a list of
+color components specifying red, green and blue values between 0 and 1.
+
+```rpl
+«
+    {} x 36 * COS + y 45 * COS + x y HYPOT 100 * COS +
+»  TruthPlot
+@ Image truthplot-list
+```
+
+### Truth plot with a name
+
+The following example illustrates the use of the `TruthPlot` with names for
+colours.
+
+```rpl
+«
+    case
+        x -3.4 < THEN "Red"     END
+        x  3.4 < THEN "White"   END
+                      "NavyBlue"
+    end
+»  TruthPlot
+@ Image truthplot-list
+```
+
+
+## ScatterPlot
+
+Create a scatter plot from the first two columns of a matrix, the first column
+representing the horizontal axis, the second column representing the vertical
+axis.
+
+```rpl
+[ [ -5 -5 ]
+  [ -3  0 ]
+  [ -5  5 ]
+  [  0  3 ]
+  [  5  5 ]
+  [  3  0 ]
+  [  5 -5 ]
+  [  0 -3 ]
+  [ -5 -5 ] ]
+ScatterPlot
+@ Image scatterplot-example
+```
+
+## BarPlot
+
+Create a bar chart from a vector of values.
+
+The size of the vector defines the number of bars being displayed.
+Unlike other plotting commands, the `xrange` setting is not taken into account
+when positioning the bars horizontally. However, the `yrange` setting is used to
+determine the vertical position of the bars.
+
+```rpl
+[1 2 3 4 3 2 1 -1 -3 -5 3 5 1 2 3 ]
+BarPlot
+@ Image barplot-example
+```
+
+When `Res` is at the default value `0`, the number of bins along the X and Y
+axis is set by `StatsPlotBins`.
+
+
+## HistogramPlot
+
+Create a histogram from a data vector on the stack.
+
+The `PPar` variable defines the horizontal range (as defined by `xrange`) and
+the vertical range (as defined by `yrange`). The resolution parameter in `PPar`
+defines the size of the bins. With the default value of `0`, the range is
+subdivided into 25 bins.
+
+```rpl
+1 RDZ
+ClΣ
+1 1000 for i
+  RAND 21 * 10 - Σ+
+next
+RclΣ
+-1 100 YRANGE
+HistogramPlot
+@ Image histogramplot-example
+```
+
+When `Res` is at the default value `0`, the number of bins along the X and Y
+axis is set by `StatsPlotBins`.

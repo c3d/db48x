@@ -188,7 +188,10 @@ void tests::run(uint onlyCurrent)
     {
         here().begin("Current");
         if (onlyCurrent & 1)
-            complex_types();
+        {
+            plotting();
+            user_input_commands();
+        }
 
 #if 0
         if (onlyCurrent & 2)
@@ -4264,6 +4267,16 @@ void tests::exact_trig_cases()
     step("Conversion from non-standard units")
         .test(CLEAR, "1/8_turn COS", ENTER)
         .expect("0.70710 67811 87");
+
+    step("Argument reduction for large integer")
+        .test(CLEAR, DIRECT("DEG 10 60 ^ DUPDUP 10 - DUP"), ENTER, ID_sin)
+        .expect("-1")
+        .test(BSP, ID_cos)
+        .expect("0")
+        .test(BSP, ID_sin)
+        .expect("-0.98480 77530 12")
+        .test(BSP, ID_cos)
+        .expect("0.17364 81776 67");
 
     step("Cleaning up")
         .test(CLEAR, "SmallFractions DEG", ENTER).noerror();
@@ -10102,6 +10115,16 @@ void tests::date_operations()
               "0 1 10 FOR i i + 0.01 WAIT NEXT", ENTER,
               "TEVAL", LENGTHY(1500), ENTER).noerror()
         .match("duration:[1-3]?[0-9][0-9] ms");
+
+    step("Converting from a date to a Julian day number")
+        .test(CLEAR, "20250919_date", ENTER, ID_JulianDayNumber)
+        .expect("2 460 938");
+    step("Converting from a Julian day number to a date")
+        .test(CLEAR, "1 000 000", ENTER, ID_DateFromJulianDayNumber)
+        .expect("Tue 21/Oct/1975 BC");
+    step("Adding invalid dates")
+        .test(CLEAR, "1 2 DATE+", ENTER)
+        .error("Invalid date");
 }
 
 
@@ -11683,165 +11706,194 @@ void tests::statistics()
 {
     BEGIN(statistics);
 
-    step("Clear statistics")
-        .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
-        .test(CLEAR, ID_DataSize).expect("0")
-        .test(CLEAR, ID_RecallData).expect("[ ]");
-
-    step("1-variable add data");
-    for (uint i = 0; i < 10; i++)
-        test(i * i + 3 * i + 21, ID_AddData);
-    step("1-variable size")
-        .test(CLEAR, ID_DataSize).expect("10");
-    step("1-variable total")
-        .test(CLEAR, ID_DataTotal).expect("630");
-    step("1-variable average")
-        .test(CLEAR, ID_Average).expect("63");
-    step("1-variable minimum")
-        .test(CLEAR, ID_MinData).expect("21");
-    step("1-variable maximum")
-        .test(CLEAR, ID_MaxData).expect("129");
-    step("1-variable median")
-        .test(CLEAR, ID_Median).expect("55");
-    step("1-variable standard deviation")
-        .test(CLEAR, ID_StandardDeviation).expect("37.13040 08417");
-    step("1-variable LinearRegression")
-        .test(CLEAR, ID_LinearRegression)
-        .error("Invalid ΣParameters").clear_error();
-    step("1-variable RclΣ")
-        .test(CLEAR, "RclΣ", ENTER)
-        .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
-              " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]")
-        .clear();
-    char buffer[80];
-    step("1-variable remove data");
-    for (uint j = 0; j < 10; j++)
+    for (uint dir = 0; dir < 2; dir++)
     {
-        uint i = 9-j;
-        snprintf(buffer, sizeof(buffer), "[ %u ]", i * i + 3 * i + 21);
-        test(CLEAR, ID_RemoveData).expect(buffer);
-    }
-    test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
-    step("2-variables StoΣ")
-        .test(CLEAR, "[1 2 3 4] StoΣ", ENTER).noerror()
-        .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
+        if (dir)
+            step("Entering directory")
+                .test(CLEAR, "Test CRDIR", ENTER).noerror()
+                .test(CLEAR, "Test", ENTER).noerror();
 
-    step("Clear statistics for 2-variable tests")
-        .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
-        .test(CLEAR, ID_DataSize).expect("0")
-        .test(CLEAR, ID_RecallData).expect("[ ]");
+        step("Clear statistics")
+            .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
+            .test(CLEAR, ID_DataSize).expect("0")
+            .test(CLEAR, ID_RecallData).expect("[ ]");
 
-    step("2-variables add data");
-    for (uint i = 1; i <= 10; i++)
-    {
-        snprintf(buffer, sizeof(buffer),
-                 "[ %u %u %u %u ] Σ+", i, 2*i+3, 2*i*i*i, 3<<i);
-        test(CLEAR, DIRECT(cstring(buffer)), ENTER);
+        step("1-variable add data");
+        for (uint i = 0; i < 10; i++)
+            test(i * i + 3 * i + 21, ID_AddData);
+        step("1-variable size")
+            .test(CLEAR, ID_DataSize).expect("10");
+        step("1-variable total")
+            .test(CLEAR, ID_DataTotal).expect("630");
+        step("1-variable average")
+            .test(CLEAR, ID_Average).expect("63");
+        step("1-variable minimum")
+            .test(CLEAR, ID_MinData).expect("21");
+        step("1-variable maximum")
+            .test(CLEAR, ID_MaxData).expect("129");
+        step("1-variable median")
+            .test(CLEAR, ID_Median).expect("55");
+        step("1-variable standard deviation")
+            .test(CLEAR, ID_StandardDeviation).expect("37.13040 08417");
+        step("1-variable LinearRegression")
+            .test(CLEAR, ID_LinearRegression)
+            .error("Invalid ΣParameters").clear_error();
+        step("1-variable RclΣ")
+            .test(CLEAR, "RclΣ", ENTER)
+            .want("[[ 21 ] [ 25 ] [ 31 ] [ 39 ] [ 49 ]"
+                  " [ 61 ] [ 75 ] [ 91 ] [ 109 ] [ 129 ]]")
+            .clear();
+        step("1-variable Bins")
+            .test(CLEAR, "30 45 6 BINS", ENTER)
+            .want("[ 0 2 ]")
+            .test(BSP)
+            .want("[[ 4 ] [ 3 ] [ 1 ] [ 0 ] [ 0 ] [ 0 ]]");
+        char buffer[80];
+        step("1-variable remove data");
+        for (uint j = 0; j < 10; j++)
+        {
+            uint i = 9-j;
+            snprintf(buffer, sizeof(buffer), "[ %u ]", i * i + 3 * i + 21);
+            test(CLEAR, ID_RemoveData).expect(buffer);
+        }
+        test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
+        step("2-variables StoΣ")
+            .test(CLEAR, "[1 2 3 4] StoΣ", ENTER).noerror()
+            .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
+
+        step("Clear statistics for 2-variable tests")
+            .test(CLEAR, ID_StatisticsMenu, ID_ClearData).noerror()
+            .test(CLEAR, ID_DataSize).expect("0")
+            .test(CLEAR, ID_RecallData).expect("[ ]");
+
+        step("2-variables add data");
+        for (uint i = 1; i <= 10; i++)
+        {
+            snprintf(buffer, sizeof(buffer),
+                     "[ %u %u %u %u ] Σ+", i, 2*i+3, 2*i*i*i, 3<<i);
+            test(CLEAR, DIRECT(cstring(buffer)), ENTER);
+        }
+        step("2-variables size")
+            .test(CLEAR, ID_DataSize).expect("10");
+        step("2-variables total")
+            .test(CLEAR, ID_DataTotal).expect("[ 55 140 6 050 6 138 ]");
+        step("2-variables average")
+            .test(CLEAR, ID_Average).expect("[ 5 ¹/₂ 14 605 613 ⁴/₅ ]");
+        step("2-variables minimum")
+            .test(CLEAR, ID_MinData).expect("[ 1 5 2 6 ]");
+        step("2-variables maximum")
+            .test(CLEAR, ID_MaxData).expect("[ 10 23 2 000 3 072 ]");
+        step("2-variables median")
+            .test(CLEAR, ID_Median).expect("[ 5 ¹/₂ 14 341 144 ]");
+        step("2-variables standard deviation")
+            .test(CLEAR, ID_StandardDeviation)
+            .expect("[ 3.02765 03541 6.05530 07081 9 687.45666 5301 989.69106 2908 ]");
+        step("2-variables RclΣ")
+            .test(CLEAR, "RclΣ", ENTER)
+            .want("[[ 1 5 2 6 ]"
+                  " [ 2 7 16 12 ]"
+                  " [ 3 9 54 24 ]"
+                  " [ 4 11 128 48 ]"
+                  " [ 5 13 250 96 ]"
+                  " [ 6 15 432 192 ]"
+                  " [ 7 17 686 384 ]"
+                  " [ 8 19 1 024 768 ]"
+                  " [ 9 21 1 458 1 536 ]"
+                  " [ 10 23 2 000 3 072 ]]")
+            .clear();
+        step("2-variable Bins")
+            .test(CLEAR, "0 4 6 BINS", ENTER)
+            .want("[ 0 0 ]")
+            .test(BSP)
+            .want("[[ 3 ] [ 4 ] [ 3 ] [ 0 ] [ 0 ] [ 0 ]]");
+        step("2-variable Bins from second column")
+            .test("2 XCOL 8.2 12.5 8 BINS", ENTER)
+            .want("[ 0 2 ]")
+            .test(BSP)
+            .want("[[ 6 ] [ 2 ] [ 0 ] [ 0 ] [ 0 ] [ 0 ] [ 0 ] [ 0 ]]")
+            .test("1 XCOL", ENTER).noerror();
+        step("2-variable LinearRegression")
+            .test(CLEAR, ID_LinearRegression)
+            .got("Slope:2", "Intercept:3");
+        step("2-variable ΣLine")
+            .test(CLEAR, ID_RegressionFormula)
+            .expect("'2·x+3'");
+        step("PredX")
+            .test(CLEAR, "3", ID_PredictX)
+            .expect("0")
+            .test(CLEAR, "7", ID_PredictX)
+            .expect("2");
+        step("PredY")
+            .test(CLEAR, "4", ID_PredictY)
+            .expect("11")
+            .test(CLEAR, "6", ID_PredictY)
+            .expect("15");
+        step("Column 3: Power law")
+            .test(CLEAR, "3", ID_DependentColumn)
+            .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+            .expect("'2.·x↑3.'");
+        step("PredX")
+            .test(CLEAR, "54", ID_PredictX)
+            .expect("3.")
+            .test(CLEAR, "16", ID_PredictX)
+            .expect("2.");
+        step("PredY")
+            .test(CLEAR, "4", ID_PredictY)
+            .expect("128.")
+            .test(CLEAR, "6", ID_PredictY)
+            .expect("432.");
+        step("Column 4: Exponential law")
+            .test(CLEAR, "4", ID_DependentColumn)
+            .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+            .expect("'3.·exp(0.69314 71805 6·x)'");
+        step("PredX")
+            .test(CLEAR, "3", ID_PredictX)
+            .expect("5.77078 01635 6⁳⁻²³")
+            .test(CLEAR, "24", ID_PredictX)
+            .expect("3.");
+        step("PredY")
+            .test(CLEAR, "4", ID_PredictY)
+            .expect("48.")
+            .test(CLEAR, "6", ID_PredictY)
+            .expect("192.");
+        step("Column 4 and 1 reversed: Log law")
+            .test(CLEAR, "4", ID_IndependentColumn)
+            .test(CLEAR, "1", ID_DependentColumn)
+            .test(CLEAR, ID_BestFit, ID_RegressionFormula)
+            .expect("'1.44269 50408 9·ln x+-1.58496 25007 2'");
+        step("PredX")
+            .test(CLEAR, "3", ID_PredictX)
+            .expect("24.")
+            .test(CLEAR, "7", ID_PredictX)
+            .expect("384.");
+        step("PredY")
+            .test(CLEAR, "768", ID_PredictY)
+            .expect("8.")
+            .test(CLEAR, "6", ID_PredictY)
+            .expect("1.");
+        step("2-variables remove data");
+        test("0 MantissaSpacing", ENTER); // sprintf does not add spacing ;-)
+        for (uint j = 0; j < 10; j++)
+        {
+            uint i = 10-j;
+            snprintf(buffer, sizeof(buffer),
+                     "[ %u %u %u %u ]", i, 2*i+3, 2*i*i*i, 3<<i);
+            test(CLEAR, ID_RemoveData).want(buffer);
+        }
+        test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
+        test("'MantissaSpacing' PURGE", ENTER);
+        step("2-variables StoΣ")
+            .test("[1 2 3 4] StoΣ", ENTER).noerror()
+            .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
+        step("Cleanup")
+            .test(CLEAR, "{ ΣPar ΣDat } PURGE", ENTER).noerror();
+
+        if (dir)
+            step("Exiting directory")
+                .test(CLEAR, "Updir", ENTER).noerror()
+                .test("'Test' Purge", ENTER).noerror();
     }
-    step("2-variables size")
-        .test(CLEAR, ID_DataSize).expect("10");
-    step("2-variables total")
-        .test(CLEAR, ID_DataTotal).expect("[ 55 140 6 050 6 138 ]");
-    step("2-variables average")
-        .test(CLEAR, ID_Average).expect("[ 5 ¹/₂ 14 605 613 ⁴/₅ ]");
-    step("2-variables minimum")
-        .test(CLEAR, ID_MinData).expect("[ 1 5 2 6 ]");
-    step("2-variables maximum")
-        .test(CLEAR, ID_MaxData).expect("[ 10 23 2 000 3 072 ]");
-    step("2-variables median")
-        .test(CLEAR, ID_Median).expect("[ 5 ¹/₂ 14 341 144 ]");
-    step("2-variables standard deviation")
-        .test(CLEAR, ID_StandardDeviation)
-        .expect("[ 3.02765 03541 6.05530 07081 9 687.45666 5301 989.69106 2908 ]");
-    step("2-variables RclΣ")
-        .test(CLEAR, "RclΣ", ENTER)
-        .want("[[ 1 5 2 6 ]"
-              " [ 2 7 16 12 ]"
-              " [ 3 9 54 24 ]"
-              " [ 4 11 128 48 ]"
-              " [ 5 13 250 96 ]"
-              " [ 6 15 432 192 ]"
-              " [ 7 17 686 384 ]"
-              " [ 8 19 1 024 768 ]"
-              " [ 9 21 1 458 1 536 ]"
-              " [ 10 23 2 000 3 072 ]]")
-        .clear();
-    step("2-variable LinearRegression")
-        .test(CLEAR, ID_LinearRegression)
-        .got("Slope:2", "Intercept:3");
-    step("2-variable ΣLine")
-        .test(CLEAR, ID_RegressionFormula)
-        .expect("'2·x+3'");
-    step("PredX")
-        .test(CLEAR, "3", ID_PredictX)
-        .expect("0")
-        .test(CLEAR, "7", ID_PredictX)
-        .expect("2");
-    step("PredY")
-        .test(CLEAR, "4", ID_PredictY)
-        .expect("11")
-        .test(CLEAR, "6", ID_PredictY)
-        .expect("15");
-    step("Column 3: Power law")
-        .test(CLEAR, "3", ID_DependentColumn)
-        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
-        .expect("'2.·x↑3.'");
-    step("PredX")
-        .test(CLEAR, "54", ID_PredictX)
-        .expect("3.")
-        .test(CLEAR, "16", ID_PredictX)
-        .expect("2.");
-    step("PredY")
-        .test(CLEAR, "4", ID_PredictY)
-        .expect("128.")
-        .test(CLEAR, "6", ID_PredictY)
-        .expect("432.");
-    step("Column 4: Exponential law")
-        .test(CLEAR, "4", ID_DependentColumn)
-        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
-        .expect("'3.·exp(0.69314 71805 6·x)'");
-    step("PredX")
-        .test(CLEAR, "3", ID_PredictX)
-        .expect("5.77078 01635 6⁳⁻²³")
-        .test(CLEAR, "24", ID_PredictX)
-        .expect("3.");
-    step("PredY")
-        .test(CLEAR, "4", ID_PredictY)
-        .expect("48.")
-        .test(CLEAR, "6", ID_PredictY)
-        .expect("192.");
-    step("Column 4 and 1 reversed: Log law")
-        .test(CLEAR, "4", ID_IndependentColumn)
-        .test(CLEAR, "1", ID_DependentColumn)
-        .test(CLEAR, ID_BestFit, ID_RegressionFormula)
-        .expect("'1.44269 50408 9·ln x+-1.58496 25007 2'");
-    step("PredX")
-        .test(CLEAR, "3", ID_PredictX)
-        .expect("24.")
-        .test(CLEAR, "7", ID_PredictX)
-        .expect("384.");
-    step("PredY")
-        .test(CLEAR, "768", ID_PredictY)
-        .expect("8.")
-        .test(CLEAR, "6", ID_PredictY)
-        .expect("1.");
-    step("2-variables remove data");
-    test("0 MantissaSpacing", ENTER); // sprintf does not add spacing ;-)
-    for (uint j = 0; j < 10; j++)
-    {
-        uint i = 10-j;
-        snprintf(buffer, sizeof(buffer),
-                 "[ %u %u %u %u ]", i, 2*i+3, 2*i*i*i, 3<<i);
-        test(CLEAR, ID_RemoveData).want(buffer);
-    }
-    test(CLEAR, ID_RemoveData).error("Invalid ΣData").clear_error();
-    test("'MantissaSpacing' PURGE", ENTER);
-    step("2-variables StoΣ")
-        .test("[1 2 3 4] StoΣ", ENTER).noerror()
-        .test(CLEAR, "AVG", ENTER).expect("2 ¹/₂");
 }
-
-
 void tests::probabilities()
 // ----------------------------------------------------------------------------
 //   Probabilities functions and probabilities menu
@@ -13133,7 +13185,7 @@ void tests::plotting()
         .noerror()
         .image("pplot-deg");
     step("Parametric plot: Equation");
-    test(CLEAR,
+    test(EXIT, CLEAR,
          "3 LINEWIDTH 0.25 GRAY FOREGROUND "
          "'exp((0.17ⅈ5.27)*x+(1.5ⅈ8))' ParametricPlot",
          LENGTHY(200),
@@ -13141,14 +13193,27 @@ void tests::plotting()
         .noerror()
         .image("pplot-eq");
 
+    step("Truth plot")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))>0.5' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot");
+    step("Truth plot with real value")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))-0.5' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot-real");
+    step("Truth plot with complex value")
+        .test(CLEAR, "'sin(20*(sq(x)+sq(y)))-0.5ⅈ' TRUTH",
+              LENGTHY(6000), ENTER)
+        .image("truthplot-complex");
+
     step("Bar plot");
     test(CLEAR,
          "[[ 1 -1 ][2 -2][3 -3][4 -4][5 -6][7 -8][9 -10]]",
          LENGTHY(200), ENTER,
-         33, MUL, K, 2, MUL, RSHIFT,
-         O,
+         33, MUL, K, 2, MUL,
+         RSHIFT, O,
          LENGTHY(200),
-         F5)
+         F6, F1)
         .noerror()
         .image("barplot");
 
@@ -13161,6 +13226,28 @@ void tests::plotting()
          ENTER)
         .noerror()
         .image("scatterplot");
+
+    step("Reset graphics")
+        .test(CLEAR, "{ LineWidth Foreground } PURGE", ENTER).noerror();
+    step("Low resolution")
+        .test(CLEAR, "0.5 Res", ENTER).noerror()
+        .test("'sin(200/(x+0.42))/x' FunctionPlot", LENGTHY(500), ENTER)
+        .noerror()
+        .image("low-resolution");
+    step("Read low resolution")
+        .test(CLEAR, "'Res' RCL", ENTER)
+        .expect("0.5");
+    step("High resolution")
+        .test(CLEAR, "0.005 'Res' STO", ENTER).noerror()
+        .test("'sin(200/(x+0.42))/x' FunctionPlot", LENGTHY(5000), ENTER)
+        .noerror()
+        .image("high-resolution");
+    step("Read high resolution")
+        .test(CLEAR, "'Res' RCL", ENTER)
+        .expect("0.005");
+    step("Purge resolution")
+        .test(CLEAR, "'Resolution' PURGE", ENTER).noerror()
+        .test("'Res' RCL", ENTER).expect("0");
 
     step("Reset drawing parameters");
     test(CLEAR, DIRECT("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
@@ -14292,7 +14379,7 @@ void tests::user_input_commands()
         .type(ID_expression)
         .got("'Da123ta'");
 
-    step("Input command with for algebraic number")
+    step("Input command for algebraic number")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"\" 3 algebraic } INPUT", ENTER)
         .test("123+").editor("123+")

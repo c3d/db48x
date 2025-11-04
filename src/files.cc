@@ -476,7 +476,7 @@ list_p files::recall_list(text_p name, bool as_array) const
             nonsp++;
         if (sepok && (c == ',' || c == ';' || c == '\n'))
         {
-            text_p parsed = rt.close_editor(true);
+            text_p parsed = rt.close_editor(true, false);
             size_t len    = 0;
             utf8   txt    = parsed->value(&len);
             if (nonsp)

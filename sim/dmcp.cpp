@@ -316,7 +316,10 @@ int key_pop()
 int key_tail()
 {
     if (keyrd != keywr)
-        return keys[(keyrd + nkeys - 1) % nkeys];
+    {
+        int key = keys[(keyrd + nkeys - 1) % nkeys];
+        return key;
+    }
     return -1;
 }
 
@@ -325,7 +328,10 @@ int key_pop_last()
     if (keywr - keyrd > 1)
         keyrd = keywr - 1;
     if (keyrd != keywr)
-        return keys[keyrd++ % nkeys];
+    {
+        int key = keys[keyrd++ % nkeys];
+        return key;
+    }
     return -1;
 }
 
@@ -523,7 +529,15 @@ int lcd_fontWidth(disp_stat_t * ds)
 }
 int lcd_for_calc(int what)
 {
-    record(dmcp_notyet, "lcd_for_calc %d not implemented", what);
+    font_p font = LibMonoFont14x22;
+    coord x = 0;
+    coord y = 0;
+    size  h = font->height();
+    Screen.text(x, y, utf8("About"), font);
+    Screen.invert(x, y, LCD_W, h);
+    y += 3*h/2;
+    Screen.text(x, y, utf8("DMCP Simulator"), font);
+
     return 0;
 }
 int lcd_get_buf_cleared()

@@ -85,8 +85,9 @@ void                  refresh_dirty();
 void                  redraw_lcd(bool force);
 void                  set_timer(uint timerid, uint period);
 #if SIMULATOR
-void                  process_test_key(int key);
+bool                  process_test_key(int key);
 void                  process_test_commands();
+extern int            last_key;
 #endif
 
 #endif // SYSMENU_H

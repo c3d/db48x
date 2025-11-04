@@ -159,6 +159,7 @@ struct user_interface
     int         menu_screen_bottom()    { return menuHeight; }
     bool        showing_help()          { return help + 1 != 0; }
     bool        showing_graphics()      { return graphics; }
+    void        show_graphics(bool b)   { graphics = b; }
     uint        cursor_position()       { return cursor; }
     void        cursor_position(uint p) { cursor = p; dirtyEditor = true; edRows = 0; }
     bool        current_word(size_t &start, size_t &size);
@@ -302,8 +303,11 @@ protected:
     bool     shift        : 1;  // Normal shift active
     bool     xshift       : 1;  // Extended shift active (simulate Right)
     bool     alpha        : 1;  // Alpha mode active
-    bool     transalpha   : 1;  // Transitory alpha (up or down key)
     bool     lowercase    : 1;  // Lowercase
+    bool     transalpha   : 1;  // Transitory alpha (up or down key)
+    bool     taLowercase  : 1;  // Lowercase transitory alpha
+    bool     taPrevAlpha  : 1;  // Alpha mode before transitory alpha
+    bool     taPrevLowerc : 1;  // Lowercase before transitory alpha
     bool     userOnce     : 1;  // User mode should be reset
     bool     shiftDrawn   : 1;  // Cache of drawn annunciators
     bool     xshiftDrawn  : 1;  // Cache

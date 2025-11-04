@@ -246,6 +246,7 @@ object_p directory::store(object_g name, object_g value)
     case ID_##Enable:                           \
     case ID_##Disable:
 #include "ids.tbl"
+    case ID_Res:
         return settings::store(nty, value) ? value : nullptr;
 
     case ID_integer:
@@ -503,6 +504,7 @@ object_p directory::recall_all(object_p name, bool report_missing)
     case ID_##Enable:                           \
     case ID_##Disable:
 #include "ids.tbl"
+    case ID_Res:
         return settings::recall(nty);
 
     case ID_integer:
@@ -586,6 +588,7 @@ size_t directory::purge(object_p name)
     case ID_##Enable:                           \
     case ID_##Disable:
 #include "ids.tbl"
+    case ID_Res:
         return settings::purge(nty);
 
     case ID_list:
@@ -954,7 +957,7 @@ COMMAND_BODY(PurgeAll)
         return ERROR;
     if (object_p quoted = name->as_quoted(ID_object))
         name = quoted;
-    record(directory_error, "PurgeAll %t", name);
+    record(directory, "PurgeAll %t", name);
     directory::purge_all(name);
     rt.drop();
     return rt.error() ? ERROR : OK;

@@ -1,4 +1,33 @@
-mple# Time, Alarms and System Commands
+# Time, Date, Alarms and System Commands
+
+## DateMenu
+
+Show a softkey menu for date-related commands, including:
+
+* `Date`
+* `DateTime`
+* `DateAdd`
+* `DateSub`
+* `SetDate`
+* `JulianDayNumber`
+* `DateFromJulianDayNumber`
+
+## TimeMenu
+
+Show a softkey menu for time-related commands:
+
+* `Time`
+* `ToHMS`
+* `FromHMS`
+* `HMSAdd`
+* `HMSSub`
+* `ChronoTime`
+* `Ticks`
+* `DateTime`
+* `Wait`
+* `TimedEval`
+* `SetTime`
+
 
 ## Date format
 
@@ -39,6 +68,10 @@ anonymous programmer, you can use the following code:
 ```
 
 The opposite commands to compute the difference between dates is `DDays`.
+
+The command accepts the inputs in any order. However, if both inputs can be
+intepreted as dates, then the first one is a date and the second one a number of
+days.
 
 
 ## SetTime
@@ -161,7 +194,12 @@ This displays on the stack as `HH:MM:SS`.
 
 ## JulianDayNumber
 
-Return the Julian day number for the given date and time
+Return the Julian day number for the given date and time.
+
+For dates the Gregorian calendar is assumed.
+The Gregorian calendar jumps from 1582-10-04 to 1582-10-15.
+This command ignores that gap, so the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters like
+[The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
 
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
@@ -169,12 +207,11 @@ To compute the Julian Day Number for the first day of the millenium:
 @ Expecting 2 451 545
 ```
 
-## DateFromJulianDayNumber
+## Datefromjuliandaynumber
 
 Return the date for a given Julian day number.
 
-The `DateFromJulianDayNumber` command converts a Julian day number to a date.
-The input is a Julian day number, and the result is the corresponding date.
+This command converts a Julian day number to a date in the Gregorian calendar.
 It is the opposite of the `JDN` command.
 
 ```rpl

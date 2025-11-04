@@ -127,8 +127,11 @@ user_interface::user_interface()
       shift(false),
       xshift(false),
       alpha(false),
-      transalpha(false),
       lowercase(false),
+      transalpha(false),
+      taLowercase(false),
+      taPrevAlpha(false),
+      taPrevLowerc(false),
       userOnce(false),
       shiftDrawn(false),
       xshiftDrawn(false),
@@ -567,7 +570,7 @@ bool user_interface::editor_history(bool back)
             rt.edit(+ed, sz);
             cursor = 0;
             select = ~0U;
-            alpha = xshift = shift = false;
+            alpha = lowercase = xshift = shift = false;
             edRows = 0;
             dirtyEditor = true;
             break;
@@ -768,6 +771,7 @@ void user_interface::toggle_user()
     {
         Settings.UserMode(false);
     }
+    menu_refresh(menu::ID_UserModeMenu);
 }
 
 
@@ -2262,7 +2266,7 @@ bool user_interface::draw_annunciators()
                 "", "ABC", "abc", "abc",
                 "USR", "αUS", "usr", "αus",
                 "", "ABC", "abc", "abc",
-                "1US", "α1U", "1u", "α1u"
+                "1US", "α1U", "1us", "α1u"
             };
             utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*userOnce]);
             pattern apat = lowercase
@@ -2368,17 +2372,26 @@ bool user_interface::draw_idle()
 {
     if (freezeHeader)
         return false;
+
     if (graphics)
     {
         record(tests_ui, "Waiting for key");
         if (grob_p pict = user_display())
+        {
+            // Show has its own power loop, deal with movement keys
             show(pict);
+            graphics = false;
+            record(tests_ui, "Redraw LCD");
+            redraw_lcd(true);
+        }
         else
-            wait_for_key_press();
-        graphics = false;
-        record(tests_ui, "Redraw LCD");
-        redraw_lcd(true);
+        {
+            // Wait for key in the main loop to exit graphic mode
+            return false;
+        }
     }
+
+
     draw_busy(0, pattern::black);
     alphaDrawn = !alphaDrawn;
     shiftDrawn = !shift;
@@ -4104,7 +4117,7 @@ bool user_interface::handle_screen_capture(int key)
     {
         if (key == KEY_SCREENSHOT)
         {
-            shift = xshift = alpha = longpress = repeat = false;
+            shift = xshift = alpha = lowercase = longpress = repeat = false;
             last = 0;
             draw_annunciators();
             refresh_dirty();
@@ -4321,14 +4334,17 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 
                 last = key;
                 repeat = true;
-                lowercase = key == KEY_DOWN;
+                taLowercase = key == KEY_DOWN;
                 return true;
             }
             else if (key)
             {
                 // A non-arrow key was pressed while arrows are down
-                alpha = true;
                 transalpha = true;
+                taPrevAlpha = alpha;
+                taPrevLowerc = lowercase;
+                alpha = true;
+                lowercase = taLowercase;
                 last = 0;
                 return false;
             }
@@ -4354,8 +4370,13 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         {
             // We released the up/down key
             transalpha = false;
-            alpha = false;
-            lowercase = false;
+            // Restore alpha/lowercase mode unless alpha mode was exited
+            // while in trans-alpha mode
+            if (alpha)
+            {
+                alpha = taPrevAlpha;
+                lowercase = taPrevLowerc;
+            }
             key = 0;
             last = 0;
             return true;
@@ -4416,8 +4437,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         else
         {
-            alpha     = true;
-            lowercase = false;
+            alpha = true;
         }
         consumed = true;
         shift = false;
@@ -4633,7 +4653,8 @@ bool user_interface::handle_editing(int key)
                         char valbuf[40];
                         snprintf(sizebuf, sizeof(sizebuf), "%lu bytes %s",
                                  (unsigned long) size, obj->fancy());
-                        bin->render(valbuf, sizeof(valbuf));
+                        size_t len = bin->render(valbuf, sizeof(valbuf) - 1);
+                        valbuf[len] = 0;
                         draw_message("Object info", sizebuf, valbuf);
                         wait_for_key_press();
                     }
@@ -5582,7 +5603,11 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         utf8 txt = direct->value(&sz);
         bool result = insert(txt, sz, TEXT) == object::OK;
         if (userOnce)
+        {
+            userOnce = false;
             Settings.UserMode(false);
+            menu_refresh(menu::ID_UserModeMenu);
+        }
         return result;
     }
 
@@ -5718,12 +5743,19 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
     draw_idle();
     dirtyStack = true;
     if (!imm && (!validate_input || mode != TEXT))
+    {
         alpha = false;
+        lowercase = false;
+    }
     xshift = false;
     shift = false;
 
     if (userOnce && usr == Settings.UserMode())
+    {
+        userOnce = false;
         Settings.UserMode(false);
+        menu_refresh(menu::ID_UserModeMenu);
+    }
     return true;
 }
 
@@ -6420,7 +6452,7 @@ bool user_interface::do_search(unicode with, bool restart)
 
 bool user_interface::editor_search()
 // ----------------------------------------------------------------------------
-//   Start or repeat a search a search
+//   Start or repeat a search
 // ----------------------------------------------------------------------------
 {
     if (~select && cursor != select)
@@ -6438,7 +6470,6 @@ bool user_interface::editor_search()
         // Start search
         searching = select = cursor;
         alpha = true;
-        lowercase = false;
         shift = xshift = false;
     }
     return true;
