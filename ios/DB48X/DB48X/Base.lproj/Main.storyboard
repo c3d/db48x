@@ -16,14 +16,14 @@
                         <viewControllerLayoutGuide type="top" id="3ge-3E-7cO"/>
                         <viewControllerLayoutGuide type="bottom" id="0iR-uu-Fzh"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88m-4O-eCX" userLabel="Outer  View">
+                    <view key="view" contentMode="scaleToFill" placeholderIntrinsicWidth="393" placeholderIntrinsicHeight="852" preservesSuperviewLayoutMargins="YES" layoutMarginsFollowReadableWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88m-4O-eCX" userLabel="Outer  View">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <subviews>
                             <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
-                                <rect key="frame" x="0.0" y="61" width="393" height="730"/>
+                                <rect key="frame" x="16" y="90.666666666666686" width="361" height="670.66666666666652"/>
                                 <subviews>
                                     <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="VyD-TD-Hcr" customClass="ScreenView">
-                                        <rect key="frame" x="0.0" y="0.0" width="393" height="235.66666666666666"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="216.66666666666666"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VyD-TD-Hcr" secondAttribute="height" multiplier="5:3" id="TEg-nX-cri"/>
@@ -33,7 +33,7 @@
                                         </connections>
                                     </mtkView>
                                     <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
-                                        <rect key="frame" x="0.0" y="235.66666666666671" width="393" height="494.33333333333326"/>
+                                        <rect key="frame" x="0.0" y="216.66666666666663" width="361" height="454"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VeI-TE-aJE" secondAttribute="height" multiplier="698:878" id="Pzg-fD-vL7"/>
@@ -49,7 +49,7 @@
                                         </accessibility>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mcR-Hw-POX">
-                                        <rect key="frame" x="178.66666666666666" y="0.0" width="36" height="16"/>
+                                        <rect key="frame" x="162.66666666666666" y="0.0" width="36" height="16"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="16" id="jGR-Wh-2T9"/>
                                         </constraints>
@@ -81,12 +81,11 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="centerX" secondItem="88m-4O-eCX" secondAttribute="centerX" id="3Rm-Q7-5qi"/>
-                            <constraint firstItem="R4Q-96-XuB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="3ge-3E-7cO" secondAttribute="bottom" id="BZ8-AK-8P5"/>
-                            <constraint firstItem="R4Q-96-XuB" firstAttribute="height" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="height" id="KpM-bY-cVQ"/>
-                            <constraint firstItem="R4Q-96-XuB" firstAttribute="width" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="width" id="OX4-VZ-sZt"/>
-                            <constraint firstItem="R4Q-96-XuB" firstAttribute="top" secondItem="3ge-3E-7cO" secondAttribute="bottom" constant="2" id="UH9-se-rMc"/>
-                            <constraint firstItem="0iR-uu-Fzh" firstAttribute="top" relation="greaterThanOrEqual" secondItem="R4Q-96-XuB" secondAttribute="bottom" id="bHU-aR-8Pm"/>
+                            <constraint firstItem="R4Q-96-XuB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="3ge-3E-7cO" secondAttribute="bottom" constant="2" id="BZ8-AK-8P5"/>
+                            <constraint firstItem="R4Q-96-XuB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="leadingMargin" id="RjL-a2-Wjb"/>
+                            <constraint firstItem="0iR-uu-Fzh" firstAttribute="top" relation="greaterThanOrEqual" secondItem="R4Q-96-XuB" secondAttribute="bottom" constant="2" id="bHU-aR-8Pm"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="centerY" secondItem="88m-4O-eCX" secondAttribute="centerY" id="evN-7t-HjV"/>
+                            <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="R4Q-96-XuB" secondAttribute="trailing" id="kb0-NA-8Ai"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="h7R-eR-U1G"/>

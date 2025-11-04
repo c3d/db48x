@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -20,15 +20,15 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="DB48X startup screen" translatesAutoresizingMaskIntoConstraints="NO" id="xEW-oZ-irn">
-                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                                <rect key="frame" x="16" y="118" width="361" height="666"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="xb3-aO-Qok" firstAttribute="top" secondItem="xEW-oZ-irn" secondAttribute="bottom" id="IUt-LX-I1S"/>
                             <constraint firstItem="xEW-oZ-irn" firstAttribute="top" secondItem="Llm-lL-Icb" secondAttribute="bottom" id="aVT-ob-ZeY"/>
-                            <constraint firstAttribute="trailing" secondItem="xEW-oZ-irn" secondAttribute="trailing" id="kM0-wT-peK"/>
-                            <constraint firstItem="xEW-oZ-irn" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="u48-82-7lZ"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="xEW-oZ-irn" secondAttribute="trailing" id="kM0-wT-peK"/>
+                            <constraint firstItem="xEW-oZ-irn" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leadingMargin" id="u48-82-7lZ"/>
                         </constraints>
                     </view>
                 </viewController>
