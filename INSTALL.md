@@ -16,8 +16,8 @@ The two versions of the firmware are, functionally speaking, virtually identical
 
 First download the installation files for the [latest release](https://github.com/c3d/db48x/releases) of the firmware from the [project's GitHub repository](https://github.com/c3d/db48x):
 
-* For a DM42, download the [DB48x distribution file](https://github.com/c3d/db48x/releases/download/v0.9.12/db48x-v0.9.12.tgz) file.
-* For a DM32 or DM42n, download the [DB50x distribution file](https://github.com/c3d/db48x/releases/download/v0.9.12/db50x-v0.9.12.tgz).
+* For a DM42, download the [DB48x distribution file](https://github.com/c3d/db48x/releases/download/v0.9.13/db48x-v0.9.13.tgz) file.
+* For a DM32 or DM42n, download the [DB50x distribution file](https://github.com/c3d/db48x/releases/download/v0.9.13/db50x-v0.9.13.tgz).
 
 There are also source code archives for each release, which are only necessary to rebuild the firwmare.
 

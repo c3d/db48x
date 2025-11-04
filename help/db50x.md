@@ -1,13 +1,13 @@
 # Overview
 
-## DB50X on DM32
+## DB50X on DM42
 
 The DB50X project intends to rebuild and improve the user experience of the
 legendary HP48 family of calculators, notably their *"Reverse Polish Lisp"*
  [(RPL)](#Introduction-to-RPL)
 language with its rich set of data types and built-in functions.
 
-This project is presently targeting the **SwissMicro DM32 calculator**
+This project is presently targeting the **SwissMicro DM42 calculator**
 and leveraging its built-in software platform, known as **DMCP**. This is
 presumably the calculator you are currently running this software on.
 You can also [try it in your browser](http://48calc.org).
@@ -55,17 +55,15 @@ RPL commands in the HP50G and in DB50X into
 ## Design overview
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
-existing DM32 physical hardware.
-The DM32 keyboard layout is really different compared to the DB50X expected
-layout. For example, the DM32 does not have unshifted arrow keys, and has two
-shift keys. For that reason, when running DB50X on a DM32, it is highly
-recommended to use a
-[keyboard overlay](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
+existing DM42 physical hardware.
+Ideally, DB50X should be fully usable without a keyboard overlay. though one is
+[being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
 
-Compared to the original HP48, the DM32 has a much larger screen, but no
+Compared to the original HP48, the DM42 has a much larger screen, but no
 annunciators (it is a fully bitmap screen). It has a keyboard with dedicated
-soft-menu (function) keys, but no arrow keys (whereas the HP48 has four),
-lacks a dedicated alpha key, and has no space key (_SPC_ on the HP48).
+soft-menu (function) keys, but only one shift key (whereas the HP48 has two),
+lacks a dedicated alpha key, does not provide left or right arrow keys (only up
+and down), and has no space key (_SPC_ on the HP48).
 
 
 
@@ -74,17 +72,12 @@ lacks a dedicated alpha key, and has no space key (_SPC_ on the HP48).
 The keyboard differences force us to revisit the user interaction with the
 calculator compared to the HP48:
 
+* When running DB50X on the DM42, the single yellow shift key cycles between
+  three states, *Shift* (shown in the documentation as 🟨), *Right Shift* (shown
+  in the documentation as 🟦), and no shift.  This double-shift shortcut appears
+  necessary because RPL calculators like the HP48 have a rather full keyboard
+  even with two shift keys.
 
-* When running DB50X on the DM32, the blue shift key cycles between three
-  states, *Shift* (shown in the documentation as 🟨), *Right Shift* (shown in
-  the documentation as 🟦) and no shift. The physical yellow shift key is
-  actually used as a down/right cursor key, and will be shown as _▶︎_ in the rest
-  of this document. Similarly, the _XEQ_ key is used as an up/left cursor key,
-  and will be shown as _◀︎_ in the rest of this document. This remapping of keys
-  appears necessary because RPL calculators like the HP48 are command-line
-  oriented and absolutely need at least two unshifted cursor keys. Sacrificing a
-  physical shift key while preserving two shifted function seems like the best
-  compromise.
 
 * A first press on the shift key is shown as 🟨 in the documentation, and
   activates functions shown in yellow in the keyboard overlay. A second press is
@@ -106,6 +99,10 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
   accessible seems important, so there are
   [three distinct ways to activate it](#alpha-mode).
 
+* The _▲_ and _▼_ keys move the cursor *left* and *right* while editing
+  instead of *up* and *down*. These cursor movements are much more useful for a
+  text-based program editing as found in RPL. In the rest of this document,
+  they are described as _◀︎_ and _▶︎_ respectively.
 
 * Using 🟨 _◀︎_ and 🟨 _▶︎_ moves the cursor up and down.  When not editing, _◀︎_
   and _▶︎_ behave like _▲_ and _▼_ on the HP48, i.e. _◀︎_ enters the *interactive
@@ -122,7 +119,7 @@ Other aspects of the keyboard interaction are fine-tuned for RPL usage:
 ### Alpha mode
 
 Entering alphabetic characters is done using *Alpha* mode. These alphabetic
-characters are labeled on the right of each key on the DM32's keyboard.
+characters are labeled on the right of each key on the DM42's keyboard.
 
 When *Alpha* mode is active, an _ABC_ indicator shows up in the annunciator area
 at the top of the screen. For lowercase entry, the indicator changes to
@@ -131,7 +128,7 @@ _abc_.
 There are three ways to enter *Alpha* mode:
 
 * The first method is to use 🟨 _ENTER_ as indicated by the _ALPHA_ yellow label
-  on the DM32 ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
+  on the DM42 ENTER key. This cycles between *Alpha* _ABC_, *Lowercase* _abc_
   and *Normal* entry modes.
 
 * The second method is to hold 🟨 for more than half a second. This cycles
@@ -149,7 +146,7 @@ or by holding 🟨).
 
 Alpha mode is cancelled when pressing _ENTER_ or _EXIT_.
 
-Since the DM32's alphabetic keys overlap with the numeric keys (unlike the
+Since the DM42's alphabetic keys overlap with the numeric keys (unlike the
 HP48), as well as with operations such as _×_ and _÷_, using 🟨 in Alpha mode
 brings back numbers. This means 🟨 cannot be used for lowercase, but as
 indicated above, there are two other methods to enter lowercase
@@ -181,21 +178,23 @@ In some cases, the label between parentheses may refer to another calculator
 model, which will be indicated as follows. For example, the _A_ key can be
 described as _A_ (_⚙️_, DM-42 _Σ+_, DM-32 _√x_).
 
+However, if you are using DB50X on a DM42, it is possible to do it without a
+keyboard overlay, because great care was taken to have the DB50X keboard layout
+remain close to that of the DM42, in order to preserve muscle memory. New
+features were positioned on the keyboard at positions that are close to what is
+familiar in the original DM42 firmware.
 
-Using DB50X with the DM32 is quite difficult without a keyboard overlay.
+A few keys that have little use in RPL are reassigned to features that you
+should be able to quickly remember. For example, the DM-42 _RCL_ key is used for
+the DB50X _VAR_ key, which invokes the [VariablesMenu](#VariablesMenu).
 
-In particular, an unfortunate difference between the DM32 and the keyboard
-layout used by DB50X is that the placement of all letters after `M` is shifted
-by one position on the keyboard, and the first row of scientific functions
-(starting with square root and ending with _Σ+_) is inconsistent. The reason is
-that the layout for DB50X is heavily based on the DM-42 model.
+Note that the _LOG_ and _e^x_ keys are swapped relative to the DM-42. The HP42
+has _LOG_ and _LN_ with shifted _10^x_ and _e^x_. DB50X has _e^x_ and _LN_
+with shifted _10^X_ and _LOG_, so that the more frequently used mathematical
+functions are available without shifting. Note that in the future, full
+keyboard remapping similar to the HP41 or HP48 will allow you to change that
+if you prefer.
 
-Also, while the DM32 has two shift keys, a blue and a yellow one, it lacks
-dedicated cursor movement arrow keys, a limitation that is visible in the
-calculator's firmware menus.  While the two arrow shift keys would be welcome,
-not having arrow keys for cursor movement is just not an option. As a result,
-only the blue shift key is kept as a shift key, and the yellow shift key is
-converted to an arrow key, along with the DM32 _XEQ_ key.
 
 Here are a few of the interesting RPL-specific key mappings:
 
@@ -285,7 +284,7 @@ Here are a few of the interesting RPL-specific key mappings:
 
 ## Soft menus
 
-The DM32 has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
+The DM42 has 6 dedicated soft-menu keys at the top of the keyboard. Most of the
 advanced features of DB50X can be accessed through these soft menus. Soft menu
 keys have no label on the physical calculator, but in this documentation, they
 may sometimes be referred to as _F1_ through _F6_.
@@ -457,14 +456,6 @@ unintentional differences, since the implementation is completely new.
   numerical operations. In addition, it supports 32-bit and 64-bit
   hardware-accelerated binary floating-point.
 
-* Based numbers with an explicit base, like `#123h` keep their base, which makes
-  it possible to show on stack binary and decimal numbers side by side. Mixed
-  operations convert to the base in stack level X, so that `#10d #A0h +`
-  evaluates as `#AAh`. Based numbers without an explicit base change base
-  depending on the [base](#base) setting, much like based numbers on the HP48,
-  but with the option to any base between 2 and 36. In addition to the
-  HP-compatible trailing letter syntax (e.g. `#1Ah`), the base can be given
-  before the number (e.g. `16#1A`), which works for all supported bases.
 
 ### Representation of objects
 
@@ -516,7 +507,7 @@ unintentional differences, since the implementation is completely new.
   queried with `SF?` and `CF?`. For example, `'HideDate' CF` will clear the
   `HideDate` flag, meaning that the date will show in the header.
 
-* The DB50X also provides full-screen setup menus, taking advantage of the DM32
+* The DB50X also provides full-screen setup menus, taking advantage of the DM42
   existing system menus. It is likely that the same menu objects used for
   softkey menus will be able to control system menus, with a different function
   to start the interaction.
@@ -719,7 +710,7 @@ corresponding to a valid help topic, this topic will be shown in the help
 viewer. Otherwise, a help topic corresponding to the type of data in the stack
 will be selected.
 
-The DB50X help viewer works roughly similarly to the DM32's, but with history
+The DB50X help viewer works roughly similarly to the DM42's, but with history
 tracking and the ability to directly access help about a given function by
 holding a key for more than half a second.
 
@@ -870,7 +861,7 @@ DB50X inherits many ideas from newRPL, including, but not limited to:
 A first iteration of DB50X started as a
 [branch of newRPL](https://github.com/c3d/db48x/), although the
 current implementation had to restart from scratch due to heavy space
-constraints on the DM32.
+constraints on the DM42.
 
 
 ### WP43 and C47 projects
@@ -879,19 +870,19 @@ The DB50X took several ideas and some inspiration from the
 [WP43](https://gitlab.com/rpncalculators/wp43) and
 [C47](https://47calc.com) projects.
 
-Walter Bonin initiated the WP43 firwmare for the DM32 as a "superset of the
+Walter Bonin initiated the WP43 firwmare for the DM42 as a "superset of the
 legendary HP42S RPN Scientific".
 
 C47 (initially called C43) is a variant of that firmware initiated by Jaco
-Mostert, which focuses on compatibility with the existing DM32, notably with
+Mostert, which focuses on compatibility with the existing DM42, notably with
 respect to keyboard layout.
 
 DB50X borrowed at least the following from these projects:
 
-* The very idea of writing a new firmware for the DM32
+* The very idea of writing a new firmware for the DM42
 * The idea of converting standard Unicode TrueType fonts into bitmaps
   (with some additional contributions from newRPL)
-* How to recompute the CRC for QSPI images so that the DM32 loads them,
+* How to recompute the CRC for QSPI images so that the DM42 loads them,
   thanks to Ben Titmus
 * At least some aspects of the double-shift logic and three-level menus
 * The original keyboard layout template and styling, with special thanks
@@ -902,13 +893,13 @@ DB50X borrowed at least the following from these projects:
 
 [SwissMicros](https://www.swissmicros.com/products) offers a range of
 RPN calculators that emulate well-known models from Hewlett-Packard.
-This includes the [DM32](https://www.swissmicros.com/product/dm42),
+This includes the [DM42](https://www.swissmicros.com/product/dm42),
 which is currently the primary target for the DB50X firmware.
 
 Special thanks and kudos to Michael Steinmann and his team for keeping
 the shining spirit of HP RPN calculators alive.
 
-The DM32 version of the DB50X software relies on
+The DM42 version of the DB50X software relies on
 [SwissMicro's DMCP SDK](https://github.com/swissmicros/SDKdemo), which
 is released under the following BSD 3-Clause License:
 
@@ -954,7 +945,7 @@ HP50g) run through a Saturn emulation layer on an ARM based processor. These
 ARM-based HP calculators would be good targets for a long-term port of DB50X.
 
 DB50X is a fresh implementation of RPL on ARM, initially targeting the
-SwissMicros DM32 calculator.
+SwissMicros DM42 calculator.
 This has [consequences on the design](#design-overview) of this particular
 implementation of RPL.
 
@@ -1557,7 +1548,7 @@ Use _EXP_ (_E_) to compute e^x. Type _1_, _ENTER_, then _EXP_ to get e ≈ 2.718
 
 Use _EXP10_ (🟨 _E_) to compute 10^x. Type _2_, _ENTER_, then _EXP10_ to get 100. Use _LOG10_ (🟨 _L_) for the base-10 logarithm. Type _1_, _0_, _0_, _ENTER_, then _LOG10_ to get 2.
 
-### DM32 layout difference: EXP LN instead of LOG LN
+### DM42 layout difference: EXP LN instead of LOG LN
 
 The DB50X layout uses EXP and LN keys instead of the traditional LOG and LN arrangement. This provides more direct access to the most commonly used exponential and logarithmic functions.
 
@@ -2524,9 +2515,9 @@ You can download pre-built versions of the firmware from the releases page of
 the project (https://github.com/c3d/db48x/releases), or alternatively,
 you can download the source code and build it yourself.
 
+The pre-built firmware for the DM-42 is split into two components, `db48x.pgm`
+and `db48x_qspi.bin`. The built-in help is stored in a file called `db50x.md`.
 
-The pre-built firmware for the DM-32 is split into two components, `db50x.pg5`
-and `db50x_qspi.bin`. The built-in help is stored in a file called `db50x.md`.
 
 In addition, a file called `Demo.48s` contains a few sample RPL programs to
 illustrate the capabilities of this new firmware, two comma-separated values
@@ -2535,14 +2526,14 @@ respectively.
 
 ### Connecting the calculator to a computer
 
+The DM-42 calculator connects to your computer using a standard micro-USB cable.
 
-The DM-32 calculator connects to your computer using a standard USB-C cable.
 
 
 ### System menu
 
 The `Setup` menu is displayed by using 🟨 _0_. This key combination is the same
-on the stock DM32 firmware and on the new DB50X firmware, and it contains
+on the stock DM42 firmware and on the new DB50X firmware, and it contains
 similar entries. However, the setup menu entries are not necessarily in the same
 order.
 
@@ -2569,18 +2560,18 @@ from your computer as an external disk.
 
 The files should be copied as follows:
 
-
-* `db50x.pg5` and `db50x_qspi.bin` in the root directory of the calculator's USB
+* `db48x.pgm` and `db48x_qspi.bin` in the root directory of the calculator's USB
   disk.
 
 * `db50x.md` should be placed in a directory called `help`.
+
 
 * `units.csv` and `constants.csv` should be placed in a directory called
   `config`. You can customize these files to add your own [units](#units) and
   [constants](#constants).
 
 
-### Copying DM32 installation files
+### Copying DM42 installation files
 
 Refer to the SwissMicros installation instructions to install or reinstall the
 original calculator firmware.
@@ -2605,10 +2596,10 @@ After loading the DB50X program, the firmware loaded asks you to press a key,
 and the new firmware automatically runs.
 
 
-## Switching between DM32 and DB50X
+## Switching between DM42 and DB50X
 
 Early releases of the DB50X firmware produced a QSPI image file that was capable
-of running the stock DM32 program file. Unfortunately, this is no longer the
+of running the stock DM42 program file. Unfortunately, this is no longer the
 case due to space constraints.
 
 Unfortunately, the installation procedure for the QSPI file erases the file
@@ -3505,7 +3496,7 @@ stores into the corresponding variable.
 
 It is convenient to create programs and other objects on a computer and then
 load them into the calculator. This is typically done by editing a text file
-with extension `.48s`, and then storing them on the internal storage of DM32.
+with extension `.48s`, and then storing them on the internal storage of DM42.
 The state files stored under `STATE` are such files, and example being the file
 named `STATE/Demo.48s` that comes with the DB48x distribution.
 
@@ -4391,7 +4382,7 @@ maintenance after the hiatus caused by Christophe de Dinechin's move.
 ### Bug fixes
 
 * Compute Julian day number conversion with negative Gregorian years
-* Fixed crash in `lgamma` function on DM32 / DM32n platforms
+* Fixed crash in `lgamma` function on DM32 / DM42n platforms
 * Fixed undefined symbol issue in WASM builds
 * Fixed platform-specific compilation errors on Android
 * Fixed incorrect simplification for `sqrt` function
@@ -16279,7 +16270,7 @@ The values returned by `Type` are negative, beginning at `-2`, in the order
 shown in the table for `TypeName` below. Commands each have their individual
 type number.  Returned values are not guaranteed from release to release, and
 they may differ depending on build options or hardware platform (e.g. the values
-on DM32 or DM32) may differ. The values for data types are not necessarily
+on DM32 or DM42) may differ. The values for data types are not necessarily
 contiguous either. For example, the `Type` for a tagged object may be `-1473` on
 version 0.9.1, and may change over time (the reason being that rarely used types
 have a two-byte type prefix).
@@ -16317,15 +16308,7 @@ spelling is what `TypeName` returns:
 * assignment (e.g. `X=3`)
 * rectangular (complex numbers such as `2+3ⅈ`)
 * polar (complex numbers such as `2∡30°`)
-* hex_integer (based number with enforced base 16)
-* dec_integer (based number with enforced base 10)
-* oct_integer (based number with enforced base 8)
-* bin_integer (based number with enforced base 2)
 * based_integer (based number with current base)
-* hex_bignum (large based number with enforced base 16)
-* dec_bignum (large based number with enforced base 10)
-* oct_bignum (large based number with enforced base 8)
-* bin_bignum (large based number with enforced base 2)
 * based_bignum (large based number with current base)
 * bignum (large integer, typically more than 64 bits)
 * neg_bignum (negative large integer)
@@ -16429,7 +16412,7 @@ This setting defines the minimum battery voltage in millivolts where the
 calculator will automatically switch off to preserve battery. The default
 value is 2600mV, which appears to be safe even with no-brand batteries.
 
-Experimentally, the DM32 can operate at much lower voltages than 2.4V, but some
+Experimentally, the DM42 can operate at much lower voltages than 2.4V, but some
 operations become unreliable or even cause a reset. Notably, the calculator may
 not be able to wake up without rebooting, losing user data in the process.
 
