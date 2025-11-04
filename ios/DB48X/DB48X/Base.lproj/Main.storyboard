@@ -19,12 +19,11 @@
                     <view key="view" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" translatesAutoresizingMaskIntoConstraints="NO" id="88m-4O-eCX" userLabel="Outer  View">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <subviews>
-                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
+                            <view multipleTouchEnabled="YES" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="R4Q-96-XuB">
                                 <rect key="frame" x="0.0" y="61" width="393" height="730"/>
                                 <subviews>
-                                    <mtkView contentMode="scaleToFill" ambiguous="YES" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" id="VyD-TD-Hcr" customClass="ScreenView">
+                                    <mtkView contentMode="scaleToFill" colorPixelFormat="BGRA8Unorm" depthStencilPixelFormat="Depth32Float" translatesAutoresizingMaskIntoConstraints="NO" id="VyD-TD-Hcr" customClass="ScreenView">
                                         <rect key="frame" x="0.0" y="0.0" width="393" height="235.66666666666666"/>
-                                        <autoresizingMask key="autoresizingMask"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VyD-TD-Hcr" secondAttribute="height" multiplier="5:3" id="TEg-nX-cri"/>
@@ -33,8 +32,8 @@
                                             <outletCollection property="gestureRecognizers" destination="Gsa-Ry-57p" appends="YES" id="r8o-Es-G5i"/>
                                         </connections>
                                     </mtkView>
-                                    <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
-                                        <rect key="frame" x="0.0" y="235.66666666666674" width="393" height="494.33333333333326"/>
+                                    <imageView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="keyboard-db48x.png" translatesAutoresizingMaskIntoConstraints="NO" id="VeI-TE-aJE" customClass="KeyboardView">
+                                        <rect key="frame" x="0.0" y="235.66666666666671" width="393" height="494.33333333333326"/>
                                         <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="VeI-TE-aJE" secondAttribute="height" multiplier="698:878" id="Pzg-fD-vL7"/>
@@ -85,6 +84,7 @@
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="top" relation="greaterThanOrEqual" secondItem="3ge-3E-7cO" secondAttribute="bottom" id="BZ8-AK-8P5"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="height" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="height" id="KpM-bY-cVQ"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="width" relation="lessThanOrEqual" secondItem="88m-4O-eCX" secondAttribute="width" id="OX4-VZ-sZt"/>
+                            <constraint firstItem="R4Q-96-XuB" firstAttribute="top" secondItem="3ge-3E-7cO" secondAttribute="bottom" constant="2" id="UH9-se-rMc"/>
                             <constraint firstItem="0iR-uu-Fzh" firstAttribute="top" relation="greaterThanOrEqual" secondItem="R4Q-96-XuB" secondAttribute="bottom" id="bHU-aR-8Pm"/>
                             <constraint firstItem="R4Q-96-XuB" firstAttribute="centerY" secondItem="88m-4O-eCX" secondAttribute="centerY" id="evN-7t-HjV"/>
                         </constraints>
@@ -337,16 +337,16 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <wkWebView multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" allowsBackForwardNavigationGestures="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qnB-0R-JJR">
-                                <rect key="frame" x="16" y="0.0" width="361" height="686"/>
+                            <wkWebView multipleTouchEnabled="YES" contentMode="scaleToFill" allowsBackForwardNavigationGestures="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qnB-0R-JJR">
+                                <rect key="frame" x="16" y="59" width="361" height="659"/>
                                 <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <wkWebViewConfiguration key="configuration" allowsInlineMediaPlayback="YES">
                                     <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" audio="YES" video="YES"/>
                                     <wkPreferences key="preferences"/>
                                 </wkWebViewConfiguration>
                             </wkWebView>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="scI-tD-1SL">
-                                <rect key="frame" x="16" y="694" width="361" height="40"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="scI-tD-1SL">
+                                <rect key="frame" x="16" y="718" width="361" height="40"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Done">
                                     <fontDescription key="titleFontDescription" style="UICTFontTextStyleTitle2"/>
                                 </buttonConfiguration>
@@ -354,8 +354,8 @@ and a tribute to Dave Packard and Bill Hewlett (the DB in DB48X, more often know
                                     <segue destination="GeX-EI-msh" kind="presentation" identifier="" modalTransitionStyle="flipHorizontal" id="NZ2-Ra-0I8"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XMA-vJ-M9t">
-                                <rect key="frame" x="16" y="751" width="361" height="40"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XMA-vJ-M9t">
+                                <rect key="frame" x="16" y="758" width="361" height="40"/>
                                 <buttonConfiguration key="configuration" style="plain" title="Open in Browser">
                                     <fontDescription key="titleFontDescription" style="UICTFontTextStyleTitle2"/>
                                 </buttonConfiguration>
