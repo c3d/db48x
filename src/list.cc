@@ -2813,7 +2813,7 @@ list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
         if (!rt.push(item))
             return nullptr;
 
-    size_t count = sdr.count();
+    size_t count = sdr.extra_depth();
     if (cmp)
         qsort(rt.stack_base(), count, sizeof(object_p), cmp);
 

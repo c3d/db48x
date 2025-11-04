@@ -13272,9 +13272,11 @@ void tests::plotting_all_functions()
 
     uint dur = 1500;
 
-#define FUNCTION(name)       \
-    step("Plotting " #name); \
-    test(CLEAR, "'" #name "(x)'", LENGTHY(dur), F1).image("fnplot-" #name, dur)
+#define FUNCTION(name)                                          \
+    step("Plotting " #name)                                     \
+        .test(CLEAR, "'" #name "(x)'", LENGTHY(dur), F1)        \
+        .image("fnplot-" #name, dur)                            \
+        .test(CLEAR, DIRECT("DEPTH"), ENTER).expect("0")
 
     FUNCTION(sqrt);
     FUNCTION(cbrt);
