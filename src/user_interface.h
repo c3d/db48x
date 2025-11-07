@@ -308,6 +308,7 @@ protected:
     bool     taLowercase  : 1;  // Lowercase transitory alpha
     bool     taPrevAlpha  : 1;  // Alpha mode before transitory alpha
     bool     taPrevLowerc : 1;  // Lowercase before transitory alpha
+    bool     delayedArrow : 1;  // Wait until key release for arrow key report
     bool     userOnce     : 1;  // User mode should be reset
     bool     shiftDrawn   : 1;  // Cache of drawn annunciators
     bool     xshiftDrawn  : 1;  // Cache
