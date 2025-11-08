@@ -5323,9 +5323,22 @@ void tests::range_types()
     step("Building range from components")
         .test(CLEAR, "1 3", ENTER, ID_ToRange).expect("1…3");
     step("Building delta range from components")
-        .test(CLEAR, "1 3", ENTER, ID_ToDeltaRange).expect("2±1");
+        .test(CLEAR, "1 3", ENTER, ID_ToDeltaRange).expect("1±3");
     step("Building percent range from components")
-        .test(CLEAR, "1 3", ENTER, ID_ToPercentRange).expect("2±50%");
+        .test(CLEAR, "1 3", ENTER, ID_ToPercentRange).expect("1±3%");
+
+    step("Converting ranges to ranges")
+        .test(CLEAR, "1…3", ENTER, ID_ToRange).expect("1…3")
+        .test(CLEAR, "2±1", ENTER, ID_ToRange).expect("1…3")
+        .test(CLEAR, "2±100%", ENTER, ID_ToRange).expect("0…4");
+    step("Converting ranges to delta ranges")
+        .test(CLEAR, "1…3", ENTER, ID_ToDeltaRange).expect("2±1")
+        .test(CLEAR, "2±1", ENTER, ID_ToDeltaRange).expect("2±1")
+        .test(CLEAR, "2±100%", ENTER, ID_ToDeltaRange).expect("2±2");
+    step("Converting ranges to percent ranges")
+        .test(CLEAR, "1…3", ENTER, ID_ToPercentRange).expect("2±50%")
+        .test(CLEAR, "2±1", ENTER, ID_ToPercentRange).expect("2±50%")
+        .test(CLEAR, "2±100%", ENTER, ID_ToPercentRange).expect("2±100%");
 
     step("Building range with infinity input")
         .test(CLEAR, "−∞…∞", ENTER).expect("−∞…∞")

@@ -68,6 +68,8 @@ struct range : complex
 
     static bool sort(algebraic_g &x, algebraic_g &y);
 
+    static bool adjust_input(id ty, algebraic_g &x, algebraic_g &y);
+
     enum { INTERVAL_MARK = L'…' };
 
 public:
@@ -227,10 +229,10 @@ uncertain_p operator/(uncertain_r x, uncertain_r y);
 uncertain_p operator^(uncertain_r x, uncertain_r y);
 
 
-COMMAND_DECLARE(ToRange, 2);
-COMMAND_DECLARE(ToDeltaRange, 2);
-COMMAND_DECLARE(ToPercentRange, 2);
-COMMAND_DECLARE(ToUncertain, 2);
+COMMAND_DECLARE(ToRange, ~2);
+COMMAND_DECLARE(ToDeltaRange, ~2);
+COMMAND_DECLARE(ToPercentRange, ~2);
+COMMAND_DECLARE(ToUncertain, ~2);
 COMMAND_DECLARE(RangeUnion, 2);
 COMMAND_DECLARE(RangeIntersect, 2);
 

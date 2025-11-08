@@ -165,24 +165,11 @@ PARSE_BODY(range)
     }
     else
     {
-        id type = object::ID_range;
-        if (cmark || pmark)
-        {
-            algebraic_g div = yexpr;
-            if (cmark)
-            {
-                div = integer::make(100);
-                div = yexpr / div;
-                if (!xexpr->is_zero(false))
-                    div = xexpr * div;
-                offs = utf8_next(p.source, offs, max);
-            }
-            if (div->is_negative(false))
-                div = -div;
-            yexpr = xexpr + div;
-            xexpr = xexpr - div;
-            type = cmark ? ID_prange : ID_drange;
-        }
+        id type = cmark ? ID_prange : pmark ? ID_drange : ID_range;
+        if (!adjust_input(type, xexpr, yexpr))
+            return ERROR;
+        if (type == ID_prange)
+            offs = utf8_next(p.source, offs, max);
         range::sort(xexpr, yexpr);
         p.out = range::make(type, xexpr, yexpr);
     }
@@ -308,6 +295,30 @@ bool range::sort(algebraic_g &x, algebraic_g &y)
     if (result)
         std::swap(x, y);
     return result;
+}
+
+
+bool range::adjust_input(id ty, algebraic_g &xexpr, algebraic_g &yexpr)
+// ----------------------------------------------------------------------------
+//   Perform value adjustments for inputs
+// ----------------------------------------------------------------------------
+{
+    if (ty == ID_drange || ty == ID_prange)
+    {
+        algebraic_g div = yexpr;
+        if (ty == ID_prange)
+        {
+            div = integer::make(100);
+            div = yexpr / div;
+            if (!xexpr->is_zero(false))
+                div = xexpr * div;
+        }
+        if (div && div->is_negative(false))
+            div = -div;
+        yexpr = xexpr + div;
+        xexpr = xexpr - div;
+    }
+    return xexpr && yexpr;
 }
 
 
@@ -887,8 +898,34 @@ static object::result to_range(object::id ty)
 //   Build a range of the given type
 // ----------------------------------------------------------------------------
 {
-    algebraic_g lo = algebraic_p(object::strip(rt.stack(1)));
     algebraic_g hi = algebraic_p(object::strip(rt.stack(0)));
+    if (!hi)
+        return object::ERROR;
+
+    object::id sty = hi->type();
+    bool rng = object::is_range(sty);
+    algebraic_g lo;
+    if (hi && rng)
+    {
+        if (sty == ty)
+            return object::OK;
+        if (!rt.args(1))
+            return object::ERROR;
+        if (!object::is_strict_range(sty) || !object::is_strict_range(ty))
+        {
+            // Cannot mathematically convert from standard deviation
+            rt.type_error();
+            return object::ERROR;
+        }
+        lo = range_p(+hi)->lo();
+        hi = range_p(+hi)->hi();
+    }
+    else
+    {
+        if (!rt.args(2))
+            return object::ERROR;
+        lo = algebraic_p(object::strip(rt.stack(1)));
+    }
     if (!lo || !hi)
         return object::ERROR;
     if (!(lo->is_real() || lo->is_infinity()) ||
@@ -898,12 +935,16 @@ static object::result to_range(object::id ty)
         rt.type_error();
         return object::ERROR;
     }
+
+    if (!rng && !range::adjust_input(ty, lo, hi))
+        return object::ERROR;
+
     // Sort real ranges, but do not sort uncertain numbers (#1515) where
     // the two values are a mean and a standard deviation (must not be sorted)
     if (ty != uncertain::ID_uncertain)
         range::sort(lo, hi);
     range_g r = range::make(ty, lo, hi);
-    if (!r || !rt.drop() || !rt.top(r))
+    if (!r || (!rng && !rt.drop()) || !rt.top(r))
         return object::ERROR;
     return object::OK;
 }
