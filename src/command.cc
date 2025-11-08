@@ -829,7 +829,7 @@ COMMAND_BODY(Wait)
                     ui.draw_start(false);
                     ui.draw_annunciators();
                     ui.draw_battery();
-                    refresh_dirty();
+                    ui.refresh();
                     if (object_p keyid = compatible_key_id(key))
                         if (rt.push(keyid))
                             return OK;

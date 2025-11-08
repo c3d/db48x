@@ -644,7 +644,7 @@ COMMAND_BODY(Disp)
                 x += w;
             }
 
-            refresh_dirty();
+            ui.refresh();
             return OK;
         }
     }
@@ -738,8 +738,7 @@ void draw_prompt(utf8 txt, size_t len)
     uint    bot  = ui.stack_screen_bottom();
     Screen.fill(0, top, LCD_W-1, bot, bg);
     ui.draw_dirty(0, top, LCD_W-1, bot);
-
-    refresh_dirty();
+    ui.refresh();
 }
 
 
@@ -1149,6 +1148,116 @@ COMMAND_BODY(Show)
 }
 
 
+static coord show_x       = 0;
+static coord show_y       = 0;
+static coord show_delta   = 8;
+
+
+void show_grob(grob_p graph)
+// ----------------------------------------------------------------------------
+//   Show a graphical object at the
+// ----------------------------------------------------------------------------
+{
+    size    width  = graph->width();
+    size    height = graph->height();
+
+    coord   scrx   = width < LCD_W ? (LCD_W - width) / 2 : 0;
+    coord   scry   = height < LCD_H ? (LCD_H - height) / 2 : 0;
+    rect    r(scrx, scry, scrx + width - 1, scry + height - 1);
+
+    if (width < LCD_W || height < LCD_H)
+        Screen.fill(pattern::gray50);
+#if CONFIG_COLOR
+    if (pixmap_p pix = graph->as<pixmap>())
+    {
+        pixmap::surface s = pix->pixels();
+        Screen.copy(s, r, point(show_x, show_y));
+    }
+    else
+#endif // CONFIG_COLOR
+    {
+        grob::surface s = graph->pixels();
+        Screen.copy(s, r, point(show_x,show_y));
+    }
+    mark_dirty(0, 0, LCD_W-1, LCD_H-1);
+    refresh_dirty();
+}
+
+
+int show_grob_keyboard_movements(int key, size width, size height)
+// ----------------------------------------------------------------------------
+//   Keyboard movements in the show command
+// ----------------------------------------------------------------------------
+{
+    int update = false;
+    switch(key)
+    {
+    case KEY_EXIT:
+        update = -2;
+        break;
+    case KEY_ENTER:
+    case KEY_BSP:
+        update = -1;
+        break;
+    case KEY_SHIFT:
+        show_delta = show_delta == 1 ? 8 : show_delta == 8 ? 32 : 1;
+        break;
+    case KEY_DOWN:
+        if (width <= LCD_W)
+        {
+        case KEY_2:
+            if (show_y + show_delta + LCD_H < coord(height))
+                show_y += show_delta;
+            else if (height > LCD_H)
+                show_y = height - LCD_H;
+            else
+                show_y = 0;
+            update = true;
+            break;
+        }
+        else
+        {
+            case KEY_6:
+                if (show_x + show_delta + LCD_W < coord(width))
+                    show_x += show_delta;
+                else if (width > LCD_W)
+                    show_x = width - LCD_W;
+                else
+                    show_x = 0;
+                update = true;
+                break;
+        }
+    case KEY_UP:
+        if (width <= LCD_W)
+        {
+        case KEY_8:
+            if (show_y > show_delta)
+                show_y -= show_delta;
+            else
+                show_y = 0;
+            update = true;
+            break;
+        }
+        else
+        {
+            case KEY_4:
+                if (show_x > show_delta)
+                    show_x -= show_delta;
+                else
+                    show_x = 0;
+                update = true;
+                break;
+        }
+    case KEY_SCREENSHOT:
+        screenshot();
+        break;
+    case 0:
+        break;
+    }
+    return update;
+}
+
+
 object::result show(object_r obj)
 // ----------------------------------------------------------------------------
 //   Draw an obejct
@@ -1167,36 +1276,14 @@ object::result show(object_r obj)
         save<bool> disable_user(user_display_enable, false);
         ui.draw_graphics();
 
-        using size     = grob::pixsize;
-        size    width  = graph->width();
-        size    height = graph->height();
-
-        coord   scrx   = width < LCD_W ? (LCD_W - width) / 2 : 0;
-        coord   scry   = height < LCD_H ? (LCD_H - height) / 2 : 0;
-        rect    r(scrx, scry, scrx + width - 1, scry + height - 1);
-
-        coord         x       = 0;
-        coord         y       = 0;
-        int           delta   = 8;
-        bool          running = true;
-        int           key     = 0;
+        using size   = grob::pixsize;
+        size width   = graph->width();
+        size height  = graph->height();
+        bool running = true;
+        int  key     = 0;
         while (running)
         {
-            Screen.fill(pattern::gray50);
-#if CONFIG_COLOR
-            if (pixmap_p pix = graph->as<pixmap>())
-            {
-                pixmap::surface s = pix->pixels();
-                Screen.copy(s, r, point(x,y));
-            }
-            else
-#endif // CONFIG_COLOR
-            {
-                grob::surface s = graph->pixels();
-                Screen.copy(s, r, point(x,y));
-            }
-            ui.draw_dirty(0, 0, LCD_W-1, LCD_H-1);
-            refresh_dirty();
+            show_grob(graph);
 
             bool update = false;
             while (!update)
@@ -1223,74 +1310,15 @@ object::result show(object_r obj)
                     process_test_key(key);
 #endif // SIMULATOR
                 }
-                switch(key)
+                int moved = show_grob_keyboard_movements(key, width, height);
+                if (key && !moved)
                 {
-                case KEY_EXIT:
-                case KEY_ENTER:
-                case KEY_BSP:
-                    running = false;
-                    update = true;
-                    break;
-                case KEY_SHIFT:
-                    delta = delta == 1 ? 8 : delta == 8 ? 32 : 1;
-                    break;
-                case KEY_DOWN:
-                    if (width <= LCD_W)
-                    {
-                case KEY_2:
-                        if (y + delta + LCD_H < coord(height))
-                            y += delta;
-                        else if (height > LCD_H)
-                            y = height - LCD_H;
-                        else
-                            y = 0;
-                        update = true;
-                        break;
-                    }
-                    else
-                    {
-                case KEY_6:
-                        if (x + delta + LCD_W < coord(width))
-                            x += delta;
-                        else if (width > LCD_W)
-                            x = width - LCD_W;
-                        else
-                            x = 0;
-                        update = true;
-                        break;
-                    }
-                case KEY_UP:
-                    if (width <= LCD_W)
-                    {
-                case KEY_8:
-                        if (y > delta)
-                            y -= delta;
-                        else
-                            y = 0;
-                        update = true;
-                        break;
-                    }
-                    else
-                    {
-                case KEY_4:
-                    if (x > delta)
-                        x -= delta;
-                    else
-                        x = 0;
-                    update = true;
-                    break;
-                    }
-                case KEY_SCREENSHOT:
-                    screenshot();
-                    break;
-                case 0:
-                    break;
-
-                default:
                     key = 0;
                     beep(440, 20);
-                    break;
                 }
+                update = moved;
+                running = moved >= 0;
+
 #if SIMULATOR && !WASM
                 if (tests::running && test_command && key_empty())
                     process_test_commands();
@@ -1595,7 +1623,7 @@ COMMAND_BODY(ToLCD)
                 display.copy(s, r));
         rt.drop();
         ui.draw_dirty(r);
-        refresh_dirty();
+        ui.refresh();
         return OK;
     }
 #if CONFIG_COLOR
@@ -1669,7 +1697,7 @@ static void graphics_dirty(coord x1, coord y1, coord x2, coord y2, size lw)
     size a = lw/2;
     size b = (lw+1)/2 - 1;
     ui.draw_dirty(x1 - a, y1 - a, x2 + b, y2 + b);
-    refresh_dirty();
+    ui.refresh();
 }
 
 
@@ -1696,7 +1724,7 @@ static object::result draw_pixel(pattern color)
             ui.draw_graphics();
             DISPLAY(display.fill(r, color.bits));
             ui.draw_dirty(r);
-            refresh_dirty();
+            ui.refresh();
             return object::OK;
         }
     }
@@ -1898,7 +1926,7 @@ COMMAND_BODY(Rect)
             ui.draw_graphics();
             DISPLAY(display.rectangle(x1, y1, x2, y2, lw, fg));
             ui.draw_dirty(min(x1,x2), min(y1,y2), max(x1,x2), max(y1,y2));
-            refresh_dirty();
+            ui.refresh();
             return OK;
         }
     }
@@ -1945,7 +1973,7 @@ COMMAND_BODY(ClLCD)
 // ----------------------------------------------------------------------------
 {
     ui.draw_graphics(true);
-    refresh_dirty();
+    ui.refresh();
     return OK;
 }
 

@@ -81,6 +81,7 @@ bool                  load_saved_keymap(cstring name = nullptr);
 void                  power_off(bool offimg);
 void                  system_setup();
 void                  mark_dirty(uint row);
+void                  mark_dirty(int x1, int y1, int x2, int y2);
 void                  refresh_dirty();
 void                  redraw_lcd(bool force);
 void                  set_timer(uint timerid, uint period);

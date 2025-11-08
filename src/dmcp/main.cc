@@ -125,6 +125,30 @@ void mark_dirty(uint row)
 }
 
 
+void mark_dirty(int x1, int y1, int x2, int y2)
+// ----------------------------------------------------------------------------
+//   Mark a screen rectangle as dirty
+// ----------------------------------------------------------------------------
+{
+    (void) (x1 + x2);
+    if (y1 > y2)
+        std::swap(y1, y2);
+    if (y1 < 0)
+        y1 = 0;
+    else if (y1 >= LCD_H)
+        y1 = LCD_H - 1;
+    if (y2 < 0)
+        y2 = 0;
+    else if (y2 >= LCD_H)
+        y2 = LCD_H - 1;
+
+    record(refresh, "Refreshing rows %d..%d", y1, y2);
+    for (uint y = uint(y1); y <= uint(y2); y++)
+        mark_dirty(y);
+    record(refresh, "Refreshed  rows %d..%d", y1, y2);
+}
+
+
 void refresh_dirty()
 // ----------------------------------------------------------------------------
 //  Send an LCD refresh request for the area dirtied by drawing
@@ -207,7 +231,7 @@ void redraw_lcd(bool force)
     ui.draw_error();
 
     // Refresh the screen
-    refresh_dirty();
+    ui.refresh();
 
     // Compute next refresh
     uint end = sys_current_ms();
@@ -238,7 +262,7 @@ static void redraw_periodics()
         ui.draw_cursor(false, ui.cursor_position());
         ui.draw_menus();
     }
-    refresh_dirty();
+    ui.refresh();
 
     // Slow things down if inactive for long enough
     uint period = ui.draw_refresh();

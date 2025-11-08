@@ -352,7 +352,7 @@ object::result draw_plot(object::id                  kind,
             if (end - start >= Settings.PlotRefreshRate())
             {
                 ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
-                refresh_dirty();
+                ui.refresh();
                 start = sys_current_ms();
             }
         }
@@ -477,16 +477,16 @@ object::result draw_plot(object::id                  kind,
         if (end - start >= Settings.PlotRefreshRate())
         {
             ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
-            refresh_dirty();
+            ui.refresh();
             start = sys_current_ms();
         }
     }
     ui.draw_dirty(0, 0, LCD_H-1, LCD_W-1);
-    refresh_dirty();
+    ui.refresh();
     result = object::OK;
 
 err:
-    refresh_dirty();
+    ui.refresh();
     return result;
 }
 
@@ -630,7 +630,7 @@ COMMAND_BODY(Drax)
 
     PlotParametersAccess ppar;
     draw_axes(ppar);
-    refresh_dirty();
+    ui.refresh();
 
     return OK;
 }

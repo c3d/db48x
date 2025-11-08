@@ -1539,23 +1539,7 @@ void user_interface::draw_dirty(coord x1, coord y1, coord x2, coord y2)
 //   Indicates that a component dirtied a given area of the screen
 // ----------------------------------------------------------------------------
 {
-    if (!graphics || !user_display())
-    {
-        (void) (x1 + x2);
-        if (y1 > y2)
-            std::swap(y1, y2);
-        if (y1 < 0)
-            y1 = 0;
-        else if (y1 >= LCD_H)
-            y1 = LCD_H - 1;
-        if (y2 < 0)
-            y2 = 0;
-        else if (y2 >= LCD_H)
-            y2 = LCD_H - 1;
-
-        for (coord y = y1; y <= y2; y++)
-            mark_dirty(y);
-    }
+    mark_dirty(x1, y1, x2, y2);
 }
 
 
@@ -1568,23 +1552,49 @@ void user_interface::draw_dirty(const rect &r)
 }
 
 
+void user_interface::refresh()
+// ----------------------------------------------------------------------------
+//   Refresh the display
+// ----------------------------------------------------------------------------
+{
+    grob_p pict = user_display();
+    if (graphics && pict)
+    {
+        show_grob(pict);
+        if (!key_empty())
+        {
+            auto w = pict->width();
+            auto h = pict->height();
+            int rc = show_grob_keyboard_movements(key_pop(), w, h);
+            if (rc == -2)
+            {
+                program::halted = true;
+                program::stepping = 0;
+            }
+        }
+    }
+    refresh_dirty();
+}
+
+
 bool user_interface::draw_graphics(bool erase)
 // ----------------------------------------------------------------------------
 //   Start graphics mode
 // ----------------------------------------------------------------------------
 {
+    bool started = false;
     if (!graphics || erase)
     {
+        started = true;
         draw_start(false);
         graphics = true;
         if (erase || user_display() == nullptr)
         {
             DISPLAY(display.fill(display.area(), Settings.Background()));
             draw_dirty(0, 0, LCD_W-1, LCD_H-1);
-            return true;
         }
     }
-    return false;
+    return started;
 }
 
 

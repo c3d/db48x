@@ -374,7 +374,7 @@ object::result grob::command(grob::blitop op)
             if (drawn)
             {
                 ui.draw_dirty(drect);
-                refresh_dirty();
+                ui.refresh();
                 return OK;
             }
             rt.type_error();

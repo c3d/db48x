@@ -103,6 +103,8 @@ struct PlotParametersAccess
 
 
 object::result  show(object_r obj);
+void            show_grob(grob_p obj);
+int             show_grob_keyboard_movements(int key, size width, size height);
 // ----------------------------------------------------------------------------
 //   Show the given object full screen
 // ----------------------------------------------------------------------------
