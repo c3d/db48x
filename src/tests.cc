@@ -5674,13 +5674,13 @@ void tests::range_types()
 
     step("Exploding range objects")
         .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)
-        .got("3", "1");
+        .got("1", "3");
     step("Exploding delta range objects")
         .test(CLEAR, "1±3", ID_ObjectMenu, ID_Explode)
-        .got("4", "-2");
+        .got("1", "3");
     step("Exploding percent range objects")
         .test(CLEAR, "1±200%", ID_RangeMenu, ID_Explode)
-        .got("3", "-1");
+        .got("1", "200");
     step("Size range objects")
         .test(CLEAR, "1…3", ID_RangeMenu, ID_Size)
         .got("2");
@@ -5834,7 +5834,7 @@ void tests::uncertain_operations()
 
     step("Exploding uncertain numbers")
         .test(CLEAR, "1±σ3", ID_ObjectMenu, ID_Explode)
-        .got("3", "1");
+        .got("1", "3");
     step("Size range objects")
         .test(CLEAR, "1±σ3", ID_RangeMenu, ID_Size)
         .got("3");

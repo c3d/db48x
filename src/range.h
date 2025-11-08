@@ -58,6 +58,7 @@ struct range : complex
     bool                is_zero() const;
     bool                is_one()  const;
     algebraic_p         as_uncertain() const;
+    bool                explode() const;
 
     static range_p      make(id type, algebraic_r x, algebraic_r y)
     {
@@ -69,6 +70,7 @@ struct range : complex
     static bool sort(algebraic_g &x, algebraic_g &y);
 
     static bool adjust_input(id ty, algebraic_g &x, algebraic_g &y);
+    static bool adjust_output(id ty, algebraic_g &x, algebraic_g &y);
 
     enum { INTERVAL_MARK = L'…' };
 

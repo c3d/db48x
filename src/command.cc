@@ -582,14 +582,13 @@ COMMAND_BODY(Explode)
     case ID_prange:
     case ID_drange:
     case ID_uncertain:
-    {
-        // Like the above, but with 2-byte IDs so need range::x() and range::y()
-        range_p r = range_p(obj);
-        if (rt.top(r->x()) && rt.push(+r->y()))
-            return OK;
+        if (rt.drop())
+        {
+            // Explode components of a range
+            range_p r = range_p(obj);
+            return r->explode() ? OK : ERROR;
+        }
         break;
-    }
-
 
     case ID_program:
     case ID_expression:

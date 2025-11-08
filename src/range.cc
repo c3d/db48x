@@ -181,7 +181,7 @@ PARSE_BODY(range)
 
 RENDER_BODY(range)
 // ----------------------------------------------------------------------------
-//   Render a range
+//   Render a range a…b
 // ----------------------------------------------------------------------------
 {
     range_g     go = o;
@@ -200,52 +200,41 @@ RENDER_BODY(range)
 }
 
 
-RENDER_BODY(drange)
+static size_t drange_render(range_p o, renderer &r,
+                            object::id ty, unicode mid, unicode last)
 // ----------------------------------------------------------------------------
-//   Render a delta range
+//   Render a percentage or delta range
 // ----------------------------------------------------------------------------
 {
     range_g     go   = o;
     algebraic_g lo   = go->lo();
     algebraic_g hi   = go->hi();
-    if (lo->is_infinity() || hi->is_infinity())
+    if (!range::adjust_output(ty, lo, hi))
         return range::do_render(o, r);
-    algebraic_g two  = integer::make(2);
-    algebraic_g disp = (lo + hi) / two;
-    if (disp)
-        disp->render(r);
-    r.put(unicode(drange::PLUSMINUS_MARK));
-    algebraic_g delta = (hi - lo) / two;
-    if (delta)
-        delta->render(r);
+    lo->render(r);
+    r.put(mid);
+    hi->render(r);
+    if (last)
+        r.put(last);
     return r.size();
+}
+
+
+RENDER_BODY(drange)
+// ----------------------------------------------------------------------------
+//   Render a delta range a±b
+// ----------------------------------------------------------------------------
+{
+    return drange_render(o, r, ID_drange, drange::PLUSMINUS_MARK, 0);
 }
 
 
 RENDER_BODY(prange)
 // ----------------------------------------------------------------------------
-//   Render a delta range
+//   Render a percentage range  a±b%
 // ----------------------------------------------------------------------------
 {
-    range_g     go   = o;
-    algebraic_g lo   = go->lo();
-    algebraic_g hi   = go->hi();
-    if (lo->is_infinity() || hi->is_infinity())
-        return range::do_render(o, r);
-    algebraic_g two  = integer::make(2);
-    algebraic_g disp = (lo + hi) / two;
-    if (disp)
-        disp->render(r);
-    r.put(unicode(drange::PLUSMINUS_MARK));
-    algebraic_g delta = (hi - disp) * integer::make(100);
-    if (!disp->is_zero(false))
-        delta = delta / disp;
-    if (delta->is_negative(true))
-        delta = -delta;
-    if (delta)
-        delta->render(r);
-    r.put('%');
-    return r.size();
+    return drange_render(o, r, ID_prange, drange::PLUSMINUS_MARK, '%');
 }
 
 
@@ -298,27 +287,74 @@ bool range::sort(algebraic_g &x, algebraic_g &y)
 }
 
 
-bool range::adjust_input(id ty, algebraic_g &xexpr, algebraic_g &yexpr)
+bool range::adjust_input(id ty, algebraic_g &x, algebraic_g &y)
 // ----------------------------------------------------------------------------
 //   Perform value adjustments for inputs
 // ----------------------------------------------------------------------------
 {
     if (ty == ID_drange || ty == ID_prange)
     {
-        algebraic_g div = yexpr;
+        algebraic_g div = y;
         if (ty == ID_prange)
         {
             div = integer::make(100);
-            div = yexpr / div;
-            if (!xexpr->is_zero(false))
-                div = xexpr * div;
+            div = y / div;
+            if (!x->is_zero(false))
+                div = x * div;
         }
         if (div && div->is_negative(false))
             div = -div;
-        yexpr = xexpr + div;
-        xexpr = xexpr - div;
+        y = x + div;
+        x = x - div;
     }
-    return xexpr && yexpr;
+    return x && y;
+}
+
+
+bool range::adjust_output(id ty, algebraic_g &x, algebraic_g &y)
+// ----------------------------------------------------------------------------
+//   Perform value adjustments for inputs
+// ----------------------------------------------------------------------------
+{
+    if (x->is_infinity() && y->is_infinity())
+        return false;
+
+    if (ty == ID_drange || ty == ID_prange)
+    {
+        algebraic_g two  = integer::make(2);
+        algebraic_g center = (y + x) / two;
+        algebraic_g delta = (y - x) / two;
+        if (ty == ID_prange)
+        {
+            delta = delta * integer::make(100);
+            if (center && !center->is_zero(false))
+            {
+                delta = delta / center;
+                if (delta && delta->is_negative(false))
+                    delta = -delta;
+            }
+        }
+        if (center && delta)
+        {
+            x = center;
+            y = delta;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+bool range::explode() const
+// ----------------------------------------------------------------------------
+//   Explode a range into its components as displayed
+// ----------------------------------------------------------------------------
+{
+    range_g     r = this;
+    algebraic_g x = r->x();
+    algebraic_g y = r->y();
+    adjust_output(r->type(), x, y);
+    return x && y && rt.push(+y) && rt.push(+x);
 }
 
 
