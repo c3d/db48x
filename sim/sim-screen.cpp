@@ -80,6 +80,8 @@ SimScreen::SimScreen(QWidget *parent)
       bgPen(bgColor),
       fgPen(fgColor),
       mainPixmap(SIM_LCD_W, SIM_LCD_H),
+      pixmapWidth(SIM_LCD_W),
+      contentXOffset(0),
       redraws(0)
 {
     screen.clear();
@@ -112,6 +114,45 @@ SimScreen::~SimScreen()
 }
 
 
+void SimScreen::setPixmapGeometry(int totalWidth, int xOffset)
+// ----------------------------------------------------------------------------
+//   Set the pixmap geometry for Android (wider pixmap with black bars)
+// ----------------------------------------------------------------------------
+{
+    // Ensure pixmap is wide enough to contain LCD content and black bars
+    int requiredWidth = xOffset + SIM_LCD_W;
+    if (totalWidth < requiredWidth)
+        totalWidth = requiredWidth;
+
+    if (totalWidth != pixmapWidth || xOffset != contentXOffset)
+    {
+        pixmapWidth = totalWidth;
+        contentXOffset = xOffset;
+
+        // Create a new wider pixmap filled with black bars
+        QPixmap newPixmap(pixmapWidth, SIM_LCD_H);
+        newPixmap.fill(Qt::black);
+
+        // Draw the LCD content area with the background color
+        QPainter painter(&newPixmap);
+        painter.fillRect(contentXOffset, 0, SIM_LCD_W, SIM_LCD_H, bgColor);
+        painter.end();
+
+        // Replace the pixmap
+        mainPixmap = newPixmap;
+        mainScreen->setPixmap(mainPixmap);
+
+        // Update scene rect to match new pixmap width
+        setSceneRect(0, 0, pixmapWidth, screen_height);
+        centerOn(qreal(pixmapWidth) / 2, qreal(screen_height) / 2);
+
+        // Force redraw of all LCD content
+        for (size_t i = 0; i < sizeof(lcd_copy) / sizeof(*lcd_copy); i++)
+            lcd_copy[i] = ~lcd_buffer[i];
+    }
+}
+
+
 void SimScreen::setScale(qreal sf)
 // ----------------------------------------------------------------------------
 //   Adjust the scaling factor
@@ -135,6 +176,10 @@ void SimScreen::updatePixmap()
 {
     // Monochrome screen
     QPainter pt(&mainPixmap);
+#ifdef ANDROID
+    // On Android, set clip rect to only allow drawing in the LCD content area
+    pt.setClipRect(contentXOffset, 0, SIM_LCD_W, SIM_LCD_H);
+#endif
     pixword mask = ~(~0U << color::BPP);
     surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     for (int y = 0; y < SIM_LCD_H; y++)
@@ -161,7 +206,11 @@ void SimScreen::updatePixmap()
                         coord yy = y;
                         s.horizontal_adjust(xx, xx);
                         s.vertical_adjust(yy, yy);
+#ifdef ANDROID
+                        pt.drawPoint(xx + contentXOffset, yy);
+#else
                         pt.drawPoint(xx, yy);
+#endif
                     }
                 }
                 lcd_copy[woffs] = lcd_buffer[woffs];

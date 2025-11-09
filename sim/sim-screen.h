@@ -57,21 +57,24 @@ public:
     QGraphicsPixmapItem *mainScreen;
     QPixmap              mainPixmap;
 
+    uint                 pixmapWidth;
+    uint                 contentXOffset;
     uint                 redraws;
 
     static SimScreen    *theScreen;
 
-  public:
+public:
     explicit SimScreen(QWidget *parent = 0);
     ~SimScreen();
 
-  public:
+public:
     void        setScale(qreal _scale);
     void        updatePixmap();
     void        refreshScreen();
     static void update_pixmap() { theScreen->updatePixmap(); }
     static void refresh_lcd()   { theScreen->refreshScreen(); }
     static uint redraw_count()  { return theScreen->redraws; }
+    void        setPixmapGeometry(int totalWidth, int xOffset);
 };
 
 #endif // WASM

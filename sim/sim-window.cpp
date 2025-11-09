@@ -273,29 +273,46 @@ void MainWindow::resizeEvent(QResizeEvent * event)
         kh = keyboard_height * kr;
     }
 
-    // Set screen ratio and geometry (full width, at top)
-    int x = 0;
-    int y = 0;
+    // Set screen ratio and geometry
+    int xOffset      = (nw - scaledSW) / 2;
+    int yOffset      = (nh - scaledSH - kh) / 2;
+    int screenWidth  = scaledSW;
+    int screenHeight = scaledSH;
+
 #ifdef ANDROID
+    // On Android: use a wider pixmap with black bars and position at x=0
+    // This is because the primary screen needs to be at x=0, otherwise
+    // we observe really weird refresh delays on the leftmost columns
     QScreen *screen = QGuiApplication::primaryScreen();
     if (screen)
     {
-        // Or get the available geometry (excludes system UI like status bar)
         QRect availableGeometry = screen->availableGeometry();
         int availableWidth = availableGeometry.width();
-        int availableHeight = availableGeometry.height();
-        x = (availableWidth - nw) / 2;
-        y = (availableHeight - nh) / 2;
-    }
-#endif
+        xOffset = (availableWidth - nw) / 2;
 
-    QRect sframe(x + (nw - scaledSW) / 2, y, scaledSW, scaledSH);
+        // Calculate where LCD content should be drawn within the pixmap
+        int unscaledPixmapWidth = availableWidth / sr;
+        int unscaledContentX = (xOffset + (nw - scaledSW) / 2) / sr;
+
+        // Ensure pixmap is wide enough
+        int requiredPixmapWidth = unscaledContentX + ui.screen->screen_width;
+        if (unscaledPixmapWidth < requiredPixmapWidth)
+            unscaledPixmapWidth = requiredPixmapWidth;
+
+        // Set the pixmap to span the full width with black bars
+        ui.screen->setPixmapGeometry(unscaledPixmapWidth, unscaledContentX);
+        screenWidth = unscaledPixmapWidth * sr;
+        xOffset = 0;
+        nw = availableWidth;
+    }
+#endif // ANDROID
+
+    // Position the screen view (always at x=0 on Android)
+    QRect sframe(xOffset, yOffset, screenWidth, screenHeight);
     ui.screen->setGeometry(sframe);
     ui.screen->setScale(sr);
 
-    // Set keyboard size (centered horizontally, with spacing from screen)
-    qreal spacing = (nh - scaledSH - kh) / 2;
-    QRect kframe(x + (nw - kw) / 2, y + scaledSH + spacing, kw, kh);
+    QRect kframe((nw - kw) / 2, yOffset + screenHeight, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
 
