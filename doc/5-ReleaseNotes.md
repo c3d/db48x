@@ -1,5 +1,24 @@
 # Release notes
 
+## Release 0.9.14 "Latran" - Android preparation
+
+This is a very minor release with bug fixes notably for Android
+
+### New features
+
+* The screen updates when rendering and `PICT` is set
+
+### Bug fixes
+
+* `Wait` for durations longer than 1 second now works in simulator
+* `→%Range`, `→∆Range` and `Range→` now use displayed values
+* 0.9.13 regression, leftover input value after error during plotting
+
+### Improvements
+
+* Semi-working Android build
+
+
 ## Release 0.9.13 "Saints" - Truth plot, colors, and bug fixes
 
 This release focuses on graphics and a few user-reported bug fixes

@@ -835,7 +835,7 @@ The authors would like to acknowledge
 * [SwissMicro's DMCP](#swissmicros-dmcp)
 
 This work was placed by Christophe de Dinechin under the patronage of
-[Carlo Acutis](http://www.miracolieucaristici.org/en/Liste/list.html)
+[Saint Carlo Acutis](http://www.miracolieucaristici.org/en/Liste/list.html)
 
 
 ### Hewlett and Packard

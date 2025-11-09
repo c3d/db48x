@@ -786,7 +786,7 @@ The authors would like to acknowledge
 * [SwissMicro's DMCP](#swissmicros-dmcp)
 
 This work was placed by Christophe de Dinechin under the patronage of
-[Carlo Acutis](http://www.miracolieucaristici.org/en/Liste/list.html)
+[Saint Carlo Acutis](http://www.miracolieucaristici.org/en/Liste/list.html)
 
 
 ### Hewlett and Packard
@@ -4340,6 +4340,25 @@ third argument:
 To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
+
+## Release 0.9.14 "Latran" - Android preparation
+
+This is a very minor release with bug fixes notably for Android
+
+### New features
+
+* The screen updates when rendering and `PICT` is set
+
+### Bug fixes
+
+* `Wait` for durations longer than 1 second now works in simulator
+* `→%Range`, `→∆Range` and `Range→` now use displayed values
+* 0.9.13 regression, leftover input value after error during plotting
+
+### Improvements
+
+* Semi-working Android build
+
 
 ## Release 0.9.13 "Saints" - Truth plot, colors, and bug fixes
 
