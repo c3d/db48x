@@ -93,27 +93,32 @@ sim/$(TARGET).mak:	sim/$(TARGET).pro	\
 			$(VERSION_H)
 	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
-# Android build target
-android: android/$(TARGET).apk help/$(TARGET).idx
-	@echo "# Android APK built: android/$(TARGET).apk"
+# Android build target - builds App Bundle for Google Play
+android: android/$(TARGET).aab help/$(TARGET).idx
+	@echo "# Android App Bundle built: android/$(TARGET).aab"
 
-android/$(TARGET).apk: sim/$(TARGET).pro Makefile $(VERSION_H)	\
-					sim/config.qrc		\
-					sim/state.qrc		\
-					sim/library.qrc		\
-					sim/help.qrc		\
-					sim/help/img.qrc	\
-					sim/android/AndroidManifest.xml	\
-					sim/android/build.gradle
-	@echo "# Building Android APK for $(TARGET)"
+android/$(TARGET).aab: sim/$(TARGET).pro Makefile $(VERSION_H)	\
+				sim/config.qrc		\
+				sim/state.qrc		\
+				sim/library.qrc		\
+				sim/help.qrc		\
+				sim/help/img.qrc	\
+				sim/android/AndroidManifest.xml	\
+				sim/android/build.gradle	\
+				$(HOME)/.local/android_release.keystore
+	@echo "# Building Android App Bundle for $(TARGET)"
+	@echo "# Using keystore: $(HOME)/.local/android_release.keystore"
 	cd sim && \
 		export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) && \
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) && \
+		export KEYSTORE_PATH=$(HOME)/.local/android_release.keystore && \
 		$(ANDROID_QT_BIN)/qmake -spec android-clang $(TARGET).pro && \
 		$(MAKE) VARIANT=android && \
 		$(ANDROID_DEPLOY_QT) \
 			--input android-$(TARGET)-deployment-settings.json \
-			--output ../android --gradle
+			--output ../android --gradle --aab \
+			--sign $(HOME)/.local/android_release.keystore db48x \
+			--storepass '$(ANDROID_KEYSTORE_PASS)'
 
 sim/%.qrc: Makefile
 	mkdir -p $(@D)

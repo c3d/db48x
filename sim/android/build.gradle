@@ -79,7 +79,26 @@ android {
     defaultConfig {
         resConfig "en"
         minSdkVersion qtMinSdkVersion
-        targetSdkVersion qtTargetSdkVersion
+        // Use Qt's target SDK, but ensure minimum of 35 for Google Play Store (Android 15)
+        targetSdkVersion Math.max(qtTargetSdkVersion as Integer, 35)
         ndk.abiFilters = qtTargetAbiList.split(",")
+    }
+
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv("KEYSTORE_PATH") ?: System.getProperty("user.home") + "/.local/android_release.keystore"
+            storeFile file(keystorePath)
+            storePassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
+            keyAlias "db48x"
+            keyPassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
