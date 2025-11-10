@@ -138,10 +138,10 @@ macx:    LIBS += -framework CoreFoundation -framework IOKit
 macx:    QMAKE_CFLAGS += -fsanitize=address
 macx:    LIBS += -fsanitize=address
 clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
-clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-cxx-extension
+clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-extension
 
 OBJECTS_DIR=db48x-build
-android:        OBJECT_DIR=db48x-android-build
+android:        OBJECTS_DIR=db48x-android-build
 
 ICON = db48x.icns
 
