@@ -4096,7 +4096,7 @@ bool user_interface::noHelpForKey(int key)
 
     if (editing)
     {
-        // No help for ENTER or BSP key while editing
+        // No help for ENTER, BSP, UP, DOWN and RUN keys while editing
         if (key == KEY_ENTER || key == KEY_BSP ||
             key == KEY_UP || key == KEY_DOWN || key == KEY_RUN)
             return true;
@@ -4108,9 +4108,15 @@ bool user_interface::noHelpForKey(int key)
 
     // No help for digits entry
     if (!shift && !xshift)
-        if (key > KEY_ENTER && key < KEY_ADD &&
+    {
+        // Show help for Negate and Cycle only if not editing
+        if (key == KEY_CHS || key == KEY_E)
+            return editing;
+
+        if (key > KEY_SWAP && key < KEY_ADD &&
             key != KEY_SUB && key != KEY_MUL && key != KEY_DIV && key != KEY_RUN)
             return true;
+    }
 
     // Other cases are regular functions, we can display help
     return false;
@@ -4202,7 +4208,7 @@ bool user_interface::handle_help(int &key)
         {
             if (!noHelpForKey(last))
                 key = last;     // Time to evaluate
-            last    = 0;
+            last = 0;
         }
 
         // Help keyboard movements only applies when help is shown
