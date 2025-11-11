@@ -354,7 +354,7 @@ bool range::explode() const
     algebraic_g x = r->x();
     algebraic_g y = r->y();
     adjust_output(r->type(), x, y);
-    return x && y && rt.push(+y) && rt.push(+x);
+    return x && y && rt.push(+x) && rt.push(+y);
 }
 
 
