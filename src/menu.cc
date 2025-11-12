@@ -530,7 +530,7 @@ MENU(RangeMenu,
      "±",       ID_SelfInsert,
      "±\t%",    ID_SelfInsert,
      "±σ",      ID_SelfInsert,
-     "Range→",  ID_Explode,
+     "Range→",  ID_FromRange,
      "Size",    ID_Size,
 
      "→Range",  ID_ToRange,
