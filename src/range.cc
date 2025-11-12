@@ -369,6 +369,7 @@ algebraic_p range::as_uncertain() const
 }
 
 
+
 // ============================================================================
 //
 //   Arithmetic on ranges
@@ -956,7 +957,12 @@ static object::result to_range(object::id ty)
         }
         lo  = range_p(+hi)->lo();
         hi  = range_p(+hi)->hi();
-        ulo = uhi;
+        if (uhi)
+        {
+            ulo = unit::make(lo, uhi->uexpr());
+            if (sty != object::ID_prange)
+                uhi = unit::make(hi, uhi->uexpr());
+        }
     }
     else
     {
@@ -971,7 +977,7 @@ static object::result to_range(object::id ty)
     {
         if (ty == object::ID_prange)
         {
-            if (uhi)
+            if (uhi && !rng)
             {
                 hi = uhi->convert_to_real();
                 if (!hi)
@@ -1017,6 +1023,35 @@ static object::result to_range(object::id ty)
     if (!r || (!rng && !rt.drop()) || !rt.top(r))
         return object::ERROR;
     return object::OK;
+}
+
+
+COMMAND_BODY(FromRange)
+// ----------------------------------------------------------------------------
+//   Take a range value (or unit containing a range) and turn it into values
+// ----------------------------------------------------------------------------
+{
+    object_g obj = rt.top();
+    unit_g u = unit::get(+obj);
+    if (u)
+        obj = u->value();
+    if (obj->is_range())
+    {
+        range_g r = range_p(+obj);
+        algebraic_g x = r->x();
+        algebraic_g y = r->y();
+        id ty = r->type();
+        range::adjust_output(ty, x, y);
+        if (u)
+        {
+            x = unit::make(x, u->uexpr());
+            if (ty != ID_prange)
+                y = unit::make(y, u->uexpr());
+        }
+        if (x && y && rt.top(+x) && rt.push(+y))
+            return OK;
+    }
+    return ERROR;
 }
 
 

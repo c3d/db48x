@@ -189,8 +189,7 @@ void tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            plotting();
-            user_input_commands();
+            range_types();
         }
 
 #if 0
@@ -5299,6 +5298,39 @@ void tests::range_types()
 {
     BEGIN(ranges);
 
+
+    step("Create range with unit")
+        .test(CLEAR, "103_m 2_km", ENTER, ID_RangeMenu, ID_ToRange)
+        .expect("103…2 000 m");
+    step("Create range with unit")
+        .test(CLEAR, "103…2 000 m", ENTER, ID_RangeMenu, ID_FromRange)
+        .got("2 000 m", "103 m");
+    step("Create range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToRange)
+        .error("Inconsistent units");
+    step("Create delta range with unit")
+        .test(CLEAR, "2_km 1000_m ", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .expect("2±1 km");
+    step("Create delta range with unit")
+        .test(CLEAR, "2_km 1000_m ", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .test(ID_FromRange)
+        .got("1 km", "2 km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .error("Inconsistent units");
+    step("Create percent range with unit")
+        .test(CLEAR, "2_km 100_m ", ENTER, ID_RangeMenu, ID_ToPercentRange)
+        .error("Inconsistent units");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "2_km 100 ", ENTER, ID_RangeMenu, ID_ToPercentRange)
+        .expect("2±100% km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "2±100%_km", ENTER, ID_RangeMenu, ID_FromRange)
+        .got("100", "2 km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .error("Inconsistent units");
+
     step("Interval form")
         .test(CLEAR, "1…3", ENTER).type(ID_range).expect("1…3");
     step("Delta form")
@@ -5718,6 +5750,7 @@ void tests::range_types()
         .expect("1 002…3 006 m")
         .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
         .expect("2…18 km/s");
+
 }
 
 

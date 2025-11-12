@@ -231,6 +231,7 @@ uncertain_p operator/(uncertain_r x, uncertain_r y);
 uncertain_p operator^(uncertain_r x, uncertain_r y);
 
 
+COMMAND_DECLARE(FromRange, 1);
 COMMAND_DECLARE(ToRange, ~2);
 COMMAND_DECLARE(ToDeltaRange, ~2);
 COMMAND_DECLARE(ToPercentRange, ~2);
