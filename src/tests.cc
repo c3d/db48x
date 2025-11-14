@@ -11370,16 +11370,16 @@ void tests::constants_menu()
         .test(CLEAR, LSHIFT, I, LSHIFT, F1);
     step("Classical electron radius")
         .test(CLEAR, NOSHIFT, F1).expect("re")
-        .test(LSHIFT, F1).expect("2.81794 03204 6 fm");
+        .test(LSHIFT, F1).expect("2.81794 03205 fm");
     step("Proton charge radius")
         .test(CLEAR, NOSHIFT, F2).expect("rp")
-        .test(LSHIFT, F2).expect("8.4075");
+        .test(LSHIFT, F2).expect("8.4075⁳⁻¹⁶ m");
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F3).expect("a0")
         .test(LSHIFT, F3).expect("0.05291 77210 54 nm");
     step("Thomson cross-section")
         .test(CLEAR, NOSHIFT, F4).expect("σe")
-        .test(LSHIFT, F4).expect("6.65245 87051⁳⁻²⁹ m↑2");
+        .test(LSHIFT, F4).expect("6.65245 87052⁳⁻²⁹ m↑2");
 
     // ------------------------------------------------------------------------
     step("Scattering constants")

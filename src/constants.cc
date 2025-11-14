@@ -646,14 +646,15 @@ static const cstring basic_constants[] =
     "Size",     nullptr,
 
     // *Classical electron radius - Calculation from measurement
-    "re",       "[ 'CONVERT(Ⓒα²*Ⓒa0;1_fm)' "
-                "  'ROUND(Ⓡre*Ⓒre;-2)' "
-                "  'ROUND(3*Ⓢα/α;-2)' "
+    "re",       "[ 'ROUND(CONVERT(Ⓒα^2*Ⓒa0; 1_fm); XPON(Ⓡre*Ⓒα^2*Ⓒa0) - XPON(Ⓒα^2*Ⓒa0) - 2)' "
+                "  'ROUND(Ⓡre*Ⓒre; -2)' "
+                "  'ROUND(3*Ⓢα/Ⓒα; -2)' "
                 "  2.818 fm ]",
     // *Proton charge radius - Measurement
-    "rp",       "[ 8.4075-16_m "
-                "  0.0064-16_m "
-                "  'ROUND(Ⓢrp/Ⓒrp;-2)' ]",
+    "rp",       "[ 8.4075⁳-16_m "
+                "  0.0064⁳-16_m "
+                "  'ROUND(Ⓢrp/Ⓒrp;-2)' "
+                "  0.841 fm ]",
     // *Bohr radius - Calculation from measurement
     "a0",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²);1_nm);XPON(UVAL(Ⓡa0*4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-XPON(UVAL(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓢα/Ⓒα*Ⓒa0);-2);1_nm)' "
@@ -663,7 +664,7 @@ static const cstring basic_constants[] =
     "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
                 "  'ROUND(6*Ⓢα/Ⓒα;-2)' "
-                "  6.652⁳⁻²⁹ m↑2 ]",
+                "  6.652⁳⁻²⁹ m² ]",
 
 
     // ------------------------------------------------------------------------
