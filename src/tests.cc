@@ -11333,7 +11333,7 @@ void tests::constants_menu()
         .test(LSHIFT, F1).expect("2.81794 03204 6 fm");
     step("Proton charge radius")
         .test(CLEAR, NOSHIFT, F2).expect("rp")
-        .test(LSHIFT, F2).expect("8.4075");
+        .test(LSHIFT, F2).expect("8.4075⁳⁻¹⁶ m");
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F3).expect("a0")
         .test(LSHIFT, F3).expect("0.05291 77210 54 nm");
