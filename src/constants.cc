@@ -646,9 +646,9 @@ static const cstring basic_constants[] =
     "Size",     nullptr,
 
     // *Classical electron radius - Calculation from measurement
-    "re",       "[ 'CONVERT(Ⓒα²*Ⓒa0;1_fm)' "
-                "  'ROUND(Ⓡre*Ⓒre;-2)' "
-                "  'ROUND(3*Ⓢα/Ⓒα;-2)' "
+    "re",       "[ 'ROUND(CONVERT(Ⓒα^2*Ⓒa0; 1_fm); XPON(Ⓡre*Ⓒα^2*Ⓒa0) - XPON(Ⓒα^2*Ⓒa0) - 2)' "
+                "  'ROUND(Ⓡre*Ⓒre; -2)' "
+                "  'ROUND(3*Ⓢα/Ⓒα; -2)' "
                 "  2.818 fm ]",
     // *Proton charge radius - Measurement
     "rp",       "[ 8.4075⁳-16_m "
