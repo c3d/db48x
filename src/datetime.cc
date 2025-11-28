@@ -655,7 +655,7 @@ size_t render_date(renderer &r, algebraic_g date)
     case 3: r.printf("%s%c%s%c%u", ytext, sep, mname, sep, day);   break;
     }
     if (neg)
-        r.printf(" BC");
+        r.printf(" BCE");
 
     if (time && !time->is_zero())
     {
