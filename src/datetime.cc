@@ -132,7 +132,7 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
 
     const uint days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     bool bisext = m == 2 && y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
-    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext || y == 0)
+    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext)
     {
         if (error)
             rt.invalid_date_error();
@@ -624,11 +624,6 @@ size_t render_date(renderer &r, algebraic_g date)
     uint month = date->as_uint32(0, false) % 100;
     date = date / factor;
     uint year = date->as_uint32(0, false);
-    if (year == 0)
-    {
-        rt.invalid_date_error();
-        return 0;
-    }
 
     char mname[4];
     if (Settings.ShowMonthName() && month >=1 && month <= 12)
