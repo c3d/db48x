@@ -609,8 +609,9 @@ size_t render_date(renderer &r, algebraic_g date)
 {
     if (!date || !date->is_real())
         return 0;
-    bool neg = date->is_negative();
-    if (neg)
+    
+    bool negativeDate = date->is_negative();
+    if (negativeDate)
         date = -date;
 
     algebraic_g factor = integer::make(100);
@@ -623,7 +624,15 @@ size_t render_date(renderer &r, algebraic_g date)
     date = date / factor;
     uint month = date->as_uint32(0, false) % 100;
     date = date / factor;
-    uint year = date->as_uint32(0, false);
+    int year = date->as_uint32(0, false);
+
+    if (Settings.ShowDayOfWeek())
+    {
+        int syear = negativeDate ? -int(year) : year;
+        ularge jdn = julian_day_number(day, month, syear);
+        uint dow = jdn % 7;
+        r.printf("%s ", get_wday_shortcut(dow));
+    }
 
     char mname[4];
     if (Settings.ShowMonthName() && month >=1 && month <= 12)
@@ -631,19 +640,17 @@ size_t render_date(renderer &r, algebraic_g date)
     else
         snprintf(mname, 4, "%u", month);
 
+    bool zeroYear = year == 0;
+    if ((negativeDate || zeroYear) && Settings.BCECEyearNumbering())
+        year = year + 1;
+    if (negativeDate && Settings.AstronomicalYearNumbering())
+        year = - year;
+    
     char ytext[16];
     if (Settings.TwoDigitYear())
-        snprintf(ytext, sizeof(ytext), "%02u", year % 100);
+        snprintf(ytext, sizeof(ytext), "%02i", year % 100);
     else
-        snprintf(ytext, sizeof(ytext), "%u", year);
-
-    if (Settings.ShowDayOfWeek())
-    {
-        int syear = neg ? -int(year) : year;
-        ularge jdn = julian_day_number(day, month, syear);
-        uint dow = jdn % 7;
-        r.printf("%s ", get_wday_shortcut(dow));
-    }
+        snprintf(ytext, sizeof(ytext), "%i", year);
 
     char sep   = Settings.DateSeparator();
     uint index = 2 * Settings.YearFirst() + Settings.MonthBeforeDay();
@@ -654,8 +661,13 @@ size_t render_date(renderer &r, algebraic_g date)
     case 2: r.printf("%s%c%u%c%s", ytext, sep, day,   sep, mname); break;
     case 3: r.printf("%s%c%s%c%u", ytext, sep, mname, sep, day);   break;
     }
-    if (neg)
-        r.printf(" BCE");
+    if (Settings.BCECEyearNumbering())
+    {
+        r.printf(" ");
+        if (negativeDate || zeroYear)
+	    r.printf("B");
+        r.printf("CE");
+    }
 
     if (time && !time->is_zero())
     {
