@@ -1,6 +1,9 @@
+
 # Time, Date, Alarms and System Commands
 
 ## DateMenu
+
+Activated from the [Time](##TimeMenu) menu.
 
 Show a softkey menu for date-related commands, including:
 
@@ -14,7 +17,9 @@ Show a softkey menu for date-related commands, including:
 
 ## TimeMenu
 
-Show a softkey menu for time-related commands:
+Activated by the 🟦 _V_ (_TIME_) key.
+
+Show a softkey menu for time-related commands, including:
 
 * `Time`
 * `ToHMS`
@@ -28,13 +33,60 @@ Show a softkey menu for time-related commands:
 * `TimedEval`
 * `SetTime`
 
+## Time, Date related flags
 
-## Date format
+* `HideDate` / `ShowDate`
+* `HideTime` / `ShowTime`
+* `ShowSeconds` / `HideSeconds`
+* `Time12H` / `Time24H`
+* `HideMonthName` / `ShowMonthName`
+* `MonthBeforeDay` / `DayBeforeMonth`
+* `YearFirst` / `YearLast`
+* `TwoDigitYear` / `FourDigitYear`
+* `HideDayOfWeek` / `ShowDayOfWeek`
+* `BCECEyearNumbering` / `AstronomicalYearNumbering`
 
-The date format is `YYYYMMDD`, with an optional fractional part defining the
-time, as in `YYYYMMDD.HHMMSS`.
+## Time, Date related settings
+
+* `DateSlash` / `DateDash` / `DateDot` / `DateSpace`
+
+## BCECEyearNumbering
+
+Activate the B(efore) C(ommon) E(ra) / C(ommon) E(ra) suffix of the year in the display of a date on the stack.
+Activate the related year numbering which jumps from 1 BCE to 1 CE. So negative years are shifted.
+See: [Proleptic Gregorian calendar](https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar)
+
+## AstronomicalYearNumbering
+
+Activate the Astronomical year numbering. This uses a uniform timeline including a year = 0.
+Display negative years on the stack with a minus sign.
+See: [Astronomical year numbering](https://en.wikipedia.org/wiki/Astronomical_year_numbering)
+
+## Date entry / edit format
+
+A whole number with a `_date` unit attached is interpreted as a date according to the customary format `YYYYMMDD`.
+The year need not be a 4 digit number.
+It can a smaller, bigger, zero, even a negative number and leading zeros can be ommitted
+(as such it need not fit the `YYYY` format).
 
 Note: the date format is intentionally different from the format on the HP-48.
+
+## Date display format
+
+By default a Date is displayed on the stack like `Sun 30/Nov/2025`.
+The format can be adjusted by changing the [Time, Date related flags](## Time, Date related flags) or
+[Time, Date related settings](## Time, Date related settings)
+
+## Date+Time entry / edit format
+
+A real number with a `_date` unit attached is interpreted as a Date + Time
+according to the format `YYYYMMDD.HHMMSS` 
+
+## Date+Time display format
+
+By default a Date+Time is displayed on the stack like `Sun 30/Nov/2025, 16:43:10`.
+The format can be adjusted by changing the [Time, Date related flags](## Time, Date related flags) or / and
+[Time, Date related settings](## Time, Date related settings).
 
 ## Time format
 
