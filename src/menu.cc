@@ -1771,7 +1771,7 @@ MENU(TimeMenu,
      "→Time",   ID_SetTime,
      "→Date",   ID_SetDate,
      "ClkAdj",  ID_Unimplemented,
-     "Dates",   ID_DateMenu,
+     "Date",    ID_DateMenu,
      "Alarms",  ID_AlarmMenu);
 
 
