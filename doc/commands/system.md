@@ -3,7 +3,7 @@
 
 ## DateMenu
 
-Activated from the [Time](##TimeMenu) menu.
+Activated from the [Time](#TimeMenu) menu.
 
 Show a softkey menu for date-related commands, including:
 
@@ -74,7 +74,7 @@ Note: the date format is intentionally different from the format on the HP-48.
 ## Date display format
 
 By default a Date is displayed on the stack like `Sun 30/Nov/2025`.
-The format can be adjusted by changing the [Time, Date related flags](## Time, Date related flags) or
+The format can be adjusted by changing the [Time, Date related flags](#"Time, Date related flags") or
 [Time, Date related settings](## Time, Date related settings)
 
 ## Date+Time entry / edit format
@@ -85,7 +85,7 @@ according to the format `YYYYMMDD.HHMMSS`
 ## Date+Time display format
 
 By default a Date+Time is displayed on the stack like `Sun 30/Nov/2025, 16:43:10`.
-The format can be adjusted by changing the [Time, Date related flags](## Time, Date related flags) or / and
+The format can be adjusted by changing the [Time, Date related flags](#"Time, Date related flags") or / and
 [Time, Date related settings](## Time, Date related settings).
 
 ## Time format
