@@ -68,6 +68,8 @@ A whole number with a `_date` unit attached is interpreted as a date according t
 The year need not be a 4 digit number.
 It can a smaller, bigger, zero, even a negative number and leading zeros can be ommitted
 (as such it need not fit the `YYYY` format).
+In case of a negative number only the year is treated as such.
+Months and days, even in a negative year, run from low (positive numbers) to high.
 
 Note: the date format is intentionally different from the format on the HP-48.
 
@@ -80,13 +82,13 @@ The format can be adjusted by changing the [Time, Date related flags](#time-date
 ## Date+Time entry / edit format
 
 A real number with a `_date` unit attached is interpreted as a Date + Time
-according to the format `YYYYMMDD.HHMMSS` 
+according to the format `YYYYMMDD.HHMMSS`.
 
 ## Date+Time display format
 
 By default a Date+Time is displayed on the stack like `Sun 30/Nov/2025, 16:43:10`.
-The format can be adjusted by changing the [Time, Date related flags](#"Time, Date related flags") or / and
-[Time, Date related settings](## Time, Date related settings).
+The format can be adjusted by changing the [Time, Date related flags](#time-date-related-flags) or / and
+[Time, Date related settings](#time-date-related-settings).
 
 ## Time format
 
