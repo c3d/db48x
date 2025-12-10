@@ -996,8 +996,8 @@ DB48X keyboard overlay, this key is also marked as `=` for that reason.
 
 Since introducing the first scientific pocket calculator, the HP-35, in 1972,
 and with it the reverse polish notation (RPN), Hewlett-Packard perfected its
-line-up for decades. This led to such powerhouses pocket computers such as as
-the HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
+line-up for decades. This led to such powerhouse pocket computers such as the
+HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
 of these calculators, including the models we just cited, were capable of
 advanced mathematics, including dealing with complex numbers, matrix operations,
 root finding or numeric integration.
@@ -2589,8 +2589,8 @@ program file.
 
 ### Installing the DB48X program file
 
-To install the program file file, [select the system menu](#system-menu) and
-then select the `Load program` menu entry.
+To install the program file, [select the system menu](#system-menu) and then
+select the `Load program` menu entry.
 
 After loading the DB48X program, the firmware loaded asks you to press a key,
 and the new firmware automatically runs.
@@ -2799,7 +2799,7 @@ numbers. For example, `0.2` cannot be represented exactly using a binary format.
 
 This command disables accelerated binary floating point, and ensures that the
 variable-precision decimal floating-point format is used even for `Precision`
-values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
+values below 16. This setting is the opposite of `HardwareFloatingPoint`.
 
 
 ## Based numbers
@@ -3156,7 +3156,7 @@ If the `UndefinedValue` flag is set, such operations return the constant
 `?`, and further operations on the value will keep returning the same undefined
 result.
 
-If the `UndefinedValue` flag is is clear, which corresponds to `UndefinedError`
+If the `UndefinedValue` flag is clear, which corresponds to `UndefinedError`
 being set, such operations will generate an `Undefined operation` error.
 
 
@@ -3315,7 +3315,7 @@ third method is often the easiest to write, read, and debug.
 
 ### Efficiency vs. readability
 
-Programmers should be be aware that the DB48x implementation of local variables
+Programmers should be aware that the DB48x implementation of local variables
 makes accessing them as efficient as accessing a stack value. Furthermore, using
 local variables often makes it possible to avoid stack manipulation commands.
 
@@ -3577,14 +3577,14 @@ For example, if the stack contains `10` in level 3, `6` in level 2 and `20` in
 level 1, then:
 
 * `→ a « a a ^ »` or `→ a 'a^a'` will execute with `a` containing `20`, and then
-  compute evaluate `20^20`, i.e. `104 857 600 000 000 000 000 000 000`.
+  compute `20^20`, i.e. `104 857 600 000 000 000 000 000 000`.
 
 * `→ a b « a b ^ »` or `→ a b 'a^b'` will execute with `a` containing `6`, and
-  `b` containing `20`, then compute evaluate `6^20`, i.e.
+  `b` containing `20`, then compute `6^20`, i.e.
   `3 656 158 440 062 976`.
 
 * `→ a b c « a b ^ c + »` or `→ a b c 'a^b+c'` will execute with `a` containing
-  `10`, `b` containing `6` and `c` containing `20`, then compute evaluate
+  `10`, `b` containing `6` and `c` containing `20`, then compute
   `10^6+20`, i.e.  `1 000 020`.
 
 ### Advantages of Local Variables
@@ -8455,7 +8455,7 @@ E₀=E
 
 #### Driven Damped Oscillations
 
-We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
+We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophe when the structure is overcome (see fig)
 
 ![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
 
@@ -8930,7 +8930,7 @@ Tair=-20_°C  u=2200_km/h
 
 #### String Standing Waves
 
-A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being being fixed at one end and free at the other end admits only all odd integer harmonics.
+A string fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string fixed (or free) at both ends admits all integer harmonics. A string fixed at one end and free at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Ts_N;y_m;ffixedfixed_Hz;ffixedfree_Hz]` (Propagation speed of waves, Wave number; Angular frequency; Tension; Frequency of harmonics on a string fixed at both ends; Frequency of harmonics on a string fixed at one end and free at the other end) from 9 known variables:
 ```rpl
@@ -8941,7 +8941,7 @@ A string being fixed or free at its ends admits only discrete harmonics as stand
 
 #### Sound Wave Harmonics
 
-A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being being open at one end and closed at the other end admits only all odd integer harmonics.
+A tube open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube open (or closed) at both ends admits all integer harmonics. A tube open at one end and closed at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Tair_°C;s_m;fopenopen_Hz;fopenclose_Hz]` (Propagation speed of sound waves; Wave number; Angular frequency, Temperature; Frequency of harmonics in a tube open at both ends; Frequency of harmonics in a tube open at one end and close at the other end) from 8 known variables:
 ```rpl
@@ -9403,7 +9403,7 @@ The 43 variables in the Modern Physics section are :
 
 #### Planck & Wien Comparison
 
-In this section, two comparisons are done between the Planck and Wien spectral distributiona. Based on a incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distribution differs notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, For the Planck distribution, one can choose any other values for `fa` & `fb` and compute the corresponding `FrPlab`, `ebfafb` and `q`.
+In this section, two comparisons are done between the Planck and Wien spectral distributions. Based on an incomplete thermodynamic argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distributions differ notably or agree. The asymptotic agreement for large frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding emissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, for the Planck distribution, one can choose any other values for `fa` & `fb` and compute the corresponding `FrPlab`, `ebfafb` and `q`.
 
 ![Planck & Wien Comparison](img/Planck_and_Wien_Distributions.bmp)
 
@@ -9416,7 +9416,7 @@ T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964�
 
 #### Planck & Rayleigh-Jeans Comparison
 
-In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, For the Planck distribution, one could choose any other values for `fa` & `fb` and computes the corresponding `FrPlab`, `ebfafb` and `q`.
+In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributions. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distributions agree or differ considerably, leading to a divergence called UV catastrophe corresponding to unphysical fractions greater than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding emissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, for the Planck distribution, one could choose any other values for `fa` & `fb` and compute the corresponding `FrPlab`, `ebfafb` and `q`.
 
 ![Planck & Rayleigh-Jeans Comparison](img/Planck_and_Rayleigh-Jeans_Distributions.bmp)
 
@@ -9429,7 +9429,7 @@ T=1273.15_K  A=100_cm^2  fa=2.65281 41636 9⁳¹⁰ Hz  fb=7.48475 43283
 
 #### Photoelectric Effect
 
-Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy `E` of the incident photon is greather or equal to the work function `φ` of the material. A simple energy budget equation determines the maximum kinetic energy `Kmax` of the photoelectron.
+Einstein explained the photoelectric effect with the energy quantification of the electromagnetic wave. The photoelectron is then emitted only if the energy `E` of the incident photon is greater or equal to the work function `φ` of the material. A simple energy budget equation determines the maximum kinetic energy `Kmax` of the photoelectron.
 
 * To calculate `[f_THz;Eph_eV;f0_THz;λ0_nm;Kmax_eV;Vo_V;vmax_m/s]` (Frequency, Photon energy; Threshold frequency; Threshold wavelength; Maximum kinetic energy of photoelectron; Stoping potential; Maximum speed of photoelectron) from 2 known variables:
 ```rpl
@@ -14957,7 +14957,7 @@ If equations can be solved one at a time, then the `Root` command will use the
 multiple equation solver to solve them in turn.
 
 For example, in the following code, the multiple equation solver can first solve
-for `y` using the second equation, the solve for `x`. In both cases, it can use
+for `y` using the second equation, then solve for `x`. In both cases, it can use
 the `Isolate` command to get an exact expression for the solution.
 
 ```rpl
@@ -14969,7 +14969,7 @@ the `Isolate` command to get an exact expression for the solution.
 
 If equations cannot be solved one at a time, then the `Root` command will
 compute the Jacobian of the equations given as input, and use that to solve the
-systerm iteratively. This is necessary when there is "crosstalk" between
+system iteratively. This is necessary when there is "crosstalk" between
 variables across equations.
 
 For example, to find the coordinates of the intersection between two circles,
@@ -16945,7 +16945,7 @@ the command line, or a list containing up to three elements:
 * The object defining the initial content of the command line
 * A cursor position on the command line, the index starting at 1, where 0 is the
   end of the command-line; or a list or array containing the row and column,
-  starting at 1, where 0 indicates the end of of the row or the last column.
+  starting at 1, where 0 indicates the end of the row or the last column.
 * A validation object
 
 The validation object indicates how the input is validated. If the validation
@@ -16955,7 +16955,7 @@ case-insensitive):
 * `α`, `alpha` or `text` selects text mode and enable alpha mode. The
   value is retured as text.
 * `alg`, `algebraic` or `expression` selects algebraic mode, which can be used
-  to to enter an expression. The value is returned as text for `alg` (for
+  to enter an expression. The value is returned as text for `alg` (for
   compatibility with HP), as an algebraic value (including numbers) if
   `algebraic` is used, as an expression object for `expression` is used.
 * `value` or `object` checks that the command line describes a single valid RPL
