@@ -60,7 +60,8 @@ DECIMIZE = $(TOOLS)/decimize/decimize
 FLASH=$(BUILD)/$(TARGET)_flash.bin
 QSPI =$(BUILD)/$(TARGET)_qspi.bin
 
-VERSION=$(shell git describe --dirty=Z --abbrev=4 | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
+#VERSION=$(shell git describe --dirty=Z --abbrev=4 | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
+VERSION=jpcano
 VERSION_H=src/$(PLATFORM)/version.h
 
 
@@ -435,7 +436,8 @@ CFLAGS += 	-O3 -pthread
 LDFLAGS +=	-s MODULARIZE=0				\
 		-s RESERVED_FUNCTION_POINTERS=20	\
 		-s PTHREAD_POOL_SIZE=4			\
-		--bind -pthread
+		--bind -pthread \
+		-sASYNCIFY # Used to be able to sleep withing a webassembly context
 
 #------------------------------------------------------------------------------
 else

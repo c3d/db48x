@@ -1459,7 +1459,7 @@ void ui_ms_sleep(uint ms_delay)
 //   Suspend the current thread for the given interval in milliseconds
 // ----------------------------------------------------------------------------
 {
-
+    emscripten_sleep(ms_delay);
 }
 
 
