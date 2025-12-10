@@ -10995,7 +10995,7 @@ The format of the file depends on how the name ends:
 
 * `.48b`: the value is stored in version-specific binary format. This format is only guaranteed to be readable by the same firmware version that wrote it, but it is more compact, faster and energy efficient than the source format.
 
-* `.csv`: The value is stored in comma-separated values format. This is mostly interesting for arrays and lists, which can be echanged with spreadsheets and other PC applications that can input or output CSV files.
+* `.csv`: The value is stored in comma-separated values format. This is mostly interesting for arrays and lists, which can be exchanged with spreadsheets and other PC applications that can input or output CSV files.
 
 
 ## STO+
