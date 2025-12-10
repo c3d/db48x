@@ -1573,8 +1573,8 @@ program file.
 
 ### Installing the DB48X program file
 
-To install the program file file, [select the system menu](#system-menu) and
-then select the `Load program` menu entry.
+To install the program file, [select the system menu](#system-menu) and then
+select the `Load program` menu entry.
 
 After loading the DB48X program, the firmware loaded asks you to press a key,
 and the new firmware automatically runs.

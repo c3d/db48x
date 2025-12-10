@@ -64,8 +64,8 @@ DB48X keyboard overlay, this key is also marked as `=` for that reason.
 
 Since introducing the first scientific pocket calculator, the HP-35, in 1972,
 and with it the reverse polish notation (RPN), Hewlett-Packard perfected its
-line-up for decades. This led to such powerhouses pocket computers such as as
-the HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
+line-up for decades. This led to such powerhouse pocket computers such as the
+HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
 of these calculators, including the models we just cited, were capable of
 advanced mathematics, including dealing with complex numbers, matrix operations,
 root finding or numeric integration.

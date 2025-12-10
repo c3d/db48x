@@ -131,7 +131,7 @@ third method is often the easiest to write, read, and debug.
 
 ### Efficiency vs. readability
 
-Programmers should be be aware that the DB48x implementation of local variables
+Programmers should be aware that the DB48x implementation of local variables
 makes accessing them as efficient as accessing a stack value. Furthermore, using
 local variables often makes it possible to avoid stack manipulation commands.
 

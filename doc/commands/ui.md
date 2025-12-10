@@ -85,7 +85,7 @@ the command line, or a list containing up to three elements:
 * The object defining the initial content of the command line
 * A cursor position on the command line, the index starting at 1, where 0 is the
   end of the command-line; or a list or array containing the row and column,
-  starting at 1, where 0 indicates the end of of the row or the last column.
+  starting at 1, where 0 indicates the end of the row or the last column.
 * A validation object
 
 The validation object indicates how the input is validated. If the validation
@@ -95,7 +95,7 @@ case-insensitive):
 * `α`, `alpha` or `text` selects text mode and enable alpha mode. The
   value is retured as text.
 * `alg`, `algebraic` or `expression` selects algebraic mode, which can be used
-  to to enter an expression. The value is returned as text for `alg` (for
+  to enter an expression. The value is returned as text for `alg` (for
   compatibility with HP), as an algebraic value (including numbers) if
   `algebraic` is used, as an expression object for `expression` is used.
 * `value` or `object` checks that the command line describes a single valid RPL

@@ -46,7 +46,7 @@ If equations can be solved one at a time, then the `Root` command will use the
 multiple equation solver to solve them in turn.
 
 For example, in the following code, the multiple equation solver can first solve
-for `y` using the second equation, the solve for `x`. In both cases, it can use
+for `y` using the second equation, then solve for `x`. In both cases, it can use
 the `Isolate` command to get an exact expression for the solution.
 
 ```rpl
@@ -58,7 +58,7 @@ the `Isolate` command to get an exact expression for the solution.
 
 If equations cannot be solved one at a time, then the `Root` command will
 compute the Jacobian of the equations given as input, and use that to solve the
-systerm iteratively. This is necessary when there is "crosstalk" between
+system iteratively. This is necessary when there is "crosstalk" between
 variables across equations.
 
 For example, to find the coordinates of the intersection between two circles,

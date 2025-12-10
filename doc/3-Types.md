@@ -175,7 +175,7 @@ numbers. For example, `0.2` cannot be represented exactly using a binary format.
 
 This command disables accelerated binary floating point, and ensures that the
 variable-precision decimal floating-point format is used even for `Precision`
-values below 16.. This setting is the opposite of `HardwareFloatingPoint`.
+values below 16. This setting is the opposite of `HardwareFloatingPoint`.
 
 
 ## Based numbers
@@ -532,7 +532,7 @@ If the `UndefinedValue` flag is set, such operations return the constant
 `?`, and further operations on the value will keep returning the same undefined
 result.
 
-If the `UndefinedValue` flag is is clear, which corresponds to `UndefinedError`
+If the `UndefinedValue` flag is clear, which corresponds to `UndefinedError`
 being set, such operations will generate an `Undefined operation` error.
 
 
