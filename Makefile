@@ -561,7 +561,7 @@ $(WASM_TARGET): $(OBJECTS) Makefile
 else
 
 $(WASM_TARGET): $(SOURCES) Makefile
-	(source emsdk/emsdk_env.sh && \
+	(. emsdk/emsdk_env.sh && \
 	 make VARIANT=wasm PGM=js PGM_TARGET=wasm/$(TARGET).js SDK=sim )
 
 $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
