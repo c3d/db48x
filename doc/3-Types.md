@@ -358,11 +358,11 @@ implements, and differ from the HP RPL implementation in the following ways:
 
 * In order to support the computer-related units better, also recognize the
   [power-of-two variants](https://en.wikipedia.org/wiki/Kilobyte),
-  e.g. `1_kiB` is `1024_B`. Also recogize the `K` prefix in addition to `k`.
+  e.g. `1_kiB` is `1024_B`. Also recognize the `K` prefix in addition to `k`.
 
 ### Units file
 
-The built-in units can be overriden by your own set of units, which is defined
+The built-in units can be overridden by your own set of units, which is defined
 in a CSV file called `config/units.csv` in the calculator. CSV stands for "Comma
 separated values, and is a common interchange format for spreadsheet data.
 
@@ -385,10 +385,10 @@ to convert between various monetary units:
 * Rows in a file containing a single value denote unit menus, unless the value
   begins with an `=` sign.
 
-* Rows in a file containing two ore more values denote unit menu entries, which
+* Rows in a file containing two or more values denote unit menu entries, which
   will be added to the previous menu.
 
-* The first column in these rows give the name of the unit as shown in the menu.
+* The first column in these rows gives the name of the unit as shown in the menu.
 
 * The second column in these rows gives the definition of the unit.
 
@@ -398,17 +398,17 @@ to convert between various monetary units:
   standard "kilo" unit prefix, and `h` is an existing unit.
 
 A unit where the value is `1` of the same unit is a base unit. This is the case
-for `USD` in the example above, which is considered the base units for monetary
+for `USD` in the example above, which is considered the base unit for monetary
 exchanges. Units that refer to the same base unit can be converted with one
 another. For example, you can convert between `GBP` and `AUD` because they both
 have the same `USD` base unit.
 
 The commands `ShowBuiltinUnits` and `HideBuiltinUnits` indicate if the built-in
-uits should be shown after the units loaded from the file. The default is that
+units should be shown after the units loaded from the file. The default is that
 when a units file is present, the built-in units are hidden. This only affects
 the menus. Built-in units can always be used in expressions if they are typed
 manually. However, units loaded from file will be looked up first, so that a
-built-in unit can be overriden by the units file, which can be useful if a
+built-in unit can be overridden by the units file, which can be useful if a
 definition changes like the US Survey foot changed on January 1st, 2023.
 
 If you build a units file, it is recommended that you do not exceed 17 unit

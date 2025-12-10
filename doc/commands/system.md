@@ -313,7 +313,7 @@ power, because of additional animations or more expensive graphical rendering.
 ## Bytes
 
 Return the size of the object and a hash of its value. On classic RPL systems,
-teh hash is a 5-nibbles CRC32. On DB48X, the hash is a based integer of the
+the hash is a 5-nibbles CRC32. On DB48X, the hash is an integer based on the
 current [wordsize](#stws) corresponding to the binary representation of the
 object.
 
@@ -327,7 +327,7 @@ value of the integer, and `xx` represents the integer type, as returned by the
 ## Type
 
 Return the type of the object as a numerical value. The value is not guaranteed
-to be portable across versions of DB48X (and pretty much is guarantteed to _not_
+to be portable across versions of DB48X (and pretty much is guaranteed to _not_
 be portable at the current stage of development).
 
 ### HP-compatible types

@@ -1,12 +1,12 @@
 # Library Management
 
-DB48x features a [library](#library) that can contain arbitary RPL code,
+DB48x features a [library](#library) that can contain arbitrary RPL code,
 which is made readily available for use in your programs.
 
 References to library functions are efficient both in terms of memory usage and
 execution speed.  Typically, a reference to a library item takes 2 or 3 bytes,
 and evaluating it is as fast as if it was on the stack, and faster than if
-storedin a global variable.
+stored in a global variable.
 
 Library items are also shared across DB48x states.
 
@@ -14,13 +14,13 @@ A key aspect of the execution speed for library items is that they are loaded
 from disk only once, and then cached in compiled form in memory. This is how the
 next uses of that library item can be as fast as if it was on the stack.
 
- Library items that are currently loaded in memory can be identified using
-`Libs`. The `Attach` commadn can be used to load items ahead of time. The
+Library items that are currently loaded in memory can be identified using
+`Libs`. The `Attach` command can be used to load items ahead of time. The
 `Detach` command can be used to evacuate library elements that are no longer
 used.
 
 When you modify the content of the library, you can use the following sequence
-to make sure that the new version of thelibrary items are reloaded from disk:
+to make sure that the new version of the library items are reloaded from disk:
 
 ```rpl
 LIBS DUP DETACH ATTACH

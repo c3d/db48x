@@ -2982,11 +2982,11 @@ implements, and differ from the HP RPL implementation in the following ways:
 
 * In order to support the computer-related units better, also recognize the
   [power-of-two variants](https://en.wikipedia.org/wiki/Kilobyte),
-  e.g. `1_kiB` is `1024_B`. Also recogize the `K` prefix in addition to `k`.
+  e.g. `1_kiB` is `1024_B`. Also recognize the `K` prefix in addition to `k`.
 
 ### Units file
 
-The built-in units can be overriden by your own set of units, which is defined
+The built-in units can be overridden by your own set of units, which is defined
 in a CSV file called `config/units.csv` in the calculator. CSV stands for "Comma
 separated values, and is a common interchange format for spreadsheet data.
 
@@ -3009,7 +3009,7 @@ to convert between various monetary units:
 * Rows in a file containing a single value denote unit menus, unless the value
   begins with an `=` sign.
 
-* Rows in a file containing two ore more values denote unit menu entries, which
+* Rows in a file containing two or more values denote unit menu entries, which
   will be added to the previous menu.
 
 * The first column in these rows give the name of the unit as shown in the menu.
@@ -3028,11 +3028,11 @@ another. For example, you can convert between `GBP` and `AUD` because they both
 have the same `USD` base unit.
 
 The commands `ShowBuiltinUnits` and `HideBuiltinUnits` indicate if the built-in
-uits should be shown after the units loaded from the file. The default is that
+units should be shown after the units loaded from the file. The default is that
 when a units file is present, the built-in units are hidden. This only affects
 the menus. Built-in units can always be used in expressions if they are typed
 manually. However, units loaded from file will be looked up first, so that a
-built-in unit can be overriden by the units file, which can be useful if a
+built-in unit can be overridden by the units file, which can be useful if a
 definition changes like the US Survey foot changed on January 1st, 2023.
 
 If you build a units file, it is recommended that you do not exceed 17 unit
@@ -12262,13 +12262,13 @@ calculator operations.
 ```
 # Library Management
 
-DB48x features a [library](#library) that can contain arbitary RPL code,
+DB48x features a [library](#library) that can contain arbitrary RPL code,
 which is made readily available for use in your programs.
 
 References to library functions are efficient both in terms of memory usage and
 execution speed.  Typically, a reference to a library item takes 2 or 3 bytes,
 and evaluating it is as fast as if it was on the stack, and faster than if
-storedin a global variable.
+stored in a global variable.
 
 Library items are also shared across DB48x states.
 
@@ -12276,13 +12276,13 @@ A key aspect of the execution speed for library items is that they are loaded
 from disk only once, and then cached in compiled form in memory. This is how the
 next uses of that library item can be as fast as if it was on the stack.
 
- Library items that are currently loaded in memory can be identified using
-`Libs`. The `Attach` commadn can be used to load items ahead of time. The
+Library items that are currently loaded in memory can be identified using
+`Libs`. The `Attach` command can be used to load items ahead of time. The
 `Detach` command can be used to evacuate library elements that are no longer
 used.
 
 When you modify the content of the library, you can use the following sequence
-to make sure that the new version of thelibrary items are reloaded from disk:
+to make sure that the new version of the library items are reloaded from disk:
 
 ```rpl
 LIBS DUP DETACH ATTACH
@@ -16237,7 +16237,7 @@ power, because of additional animations or more expensive graphical rendering.
 ## Bytes
 
 Return the size of the object and a hash of its value. On classic RPL systems,
-teh hash is a 5-nibbles CRC32. On DB48X, the hash is a based integer of the
+the hash is a 5-nibbles CRC32. On DB48X, the hash is an integer based on the
 current [wordsize](#stws) corresponding to the binary representation of the
 object.
 
@@ -16251,7 +16251,7 @@ value of the integer, and `xx` represents the integer type, as returned by the
 ## Type
 
 Return the type of the object as a numerical value. The value is not guaranteed
-to be portable across versions of DB48X (and pretty much is guarantteed to _not_
+to be portable across versions of DB48X (and pretty much is guaranteed to _not_
 be portable at the current stage of development).
 
 ### HP-compatible types
@@ -17178,14 +17178,14 @@ When `UserModeLock` is selected, each use toggles user mode on or off.
 ## KeyMap
 
 Key assignments on DB48x are not global, unlike what happens with `ASN` on HP
-claculators. Instead, assignments are stored in a special variable (really a
+calculators. Instead, assignments are stored in a special variable (really a
 directory containing numbered variables) called `KeyMap`. This approach makes it
 possible to have per-directory key assignments, and to use normal tools such as
 `Store` and `Recall` to manipulate key assignments.
 
 If a `KeyMap` is present in the current directory, it overrides assignments
 while you are in that directory. However, key assignments from the enclosing
-directories are still considered when they are not overriden. In other words,
+directories are still considered when they are not overridden. In other words,
 key assignments are a hierarchy. When no key assignment is found in any of the
 `KeyMap` variables in any of the enclosing directories, then the default key
 binding for that key applies.

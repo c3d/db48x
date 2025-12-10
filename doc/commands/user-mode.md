@@ -13,14 +13,14 @@ When `UserModeLock` is selected, each use toggles user mode on or off.
 ## KeyMap
 
 Key assignments on DB48x are not global, unlike what happens with `ASN` on HP
-claculators. Instead, assignments are stored in a special variable (really a
+calculators. Instead, assignments are stored in a special variable (really a
 directory containing numbered variables) called `KeyMap`. This approach makes it
 possible to have per-directory key assignments, and to use normal tools such as
 `Store` and `Recall` to manipulate key assignments.
 
 If a `KeyMap` is present in the current directory, it overrides assignments
 while you are in that directory. However, key assignments from the enclosing
-directories are still considered when they are not overriden. In other words,
+directories are still considered when they are not overridden. In other words,
 key assignments are a hierarchy. When no key assignment is found in any of the
 `KeyMap` variables in any of the enclosing directories, then the default key
 binding for that key applies.
