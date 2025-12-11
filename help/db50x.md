@@ -618,11 +618,11 @@ operate on these items when it makes sense. Therefore:
   produces a matrix with infinities. DB50X by default produces a `Divide by
   zero` error.
 
-* DB50X accept matrices and vectors as input to algebraic functions, and returns
+* DB50X accepts matrices and vectors as input to algebraic functions, and returns
   a matrix or vector with the function applied to all elements. For example,
   `[a b c] sin ` returns `[ 'sin a' 'sin b' 'sin c' ]`.
 
-* Similarly, DB50X accept operations between a constant and a vector or matrix.
+* Similarly, DB50X accepts operations between a constant and a vector or matrix.
   This applies the same binary operation to all components of the vector or
   matrix. `[ a b c ] x +` returns `[ 'a+x' 'b+x' 'c+x' ]`. Consistent with that
   logic, `inv` works on vectors, and inverts each component, so that
@@ -742,7 +742,7 @@ To navigate the help on the calculator, use the following keys:
   next link respectively. The keys _÷_ and _9_ also select the previous
   link, while the keys _×_ and _3_ can also be used to select the next link.
 
-* The _F6_ key correspond to the `←Menu` label, and returns one step back in
+* The _F6_ key corresponds to the `←Menu` label, and returns one step back in
   the help history. The _←_ key achieves the same effect.
 
 * To follow a highlighted link, click on the _ENTER_ key.
@@ -11353,7 +11353,7 @@ TVM
 
 ## FinanceRounding
 
-This setting defines the number of digits values returned by finance values will be rounded two. The default avalue is `2`.
+This setting defines how many digits finance values are rounded to. The default value is `2`.
 
 ```rpl
 @ Set finance rounding to 10 digits
@@ -16970,7 +16970,7 @@ object is a text or symbol, it can be one of the following (the comparison being
 case-insensitive):
 
 * `α`, `alpha` or `text` selects text mode and enable alpha mode. The
-  value is retured as text.
+  value is returned as text.
 * `alg`, `algebraic` or `expression` selects algebraic mode, which can be used
   to enter an expression. The value is returned as text for `alg` (for
   compatibility with HP), as an algebraic value (including numbers) if

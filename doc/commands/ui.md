@@ -93,7 +93,7 @@ object is a text or symbol, it can be one of the following (the comparison being
 case-insensitive):
 
 * `α`, `alpha` or `text` selects text mode and enable alpha mode. The
-  value is retured as text.
+  value is returned as text.
 * `alg`, `algebraic` or `expression` selects algebraic mode, which can be used
   to enter an expression. The value is returned as text for `alg` (for
   compatibility with HP), as an algebraic value (including numbers) if

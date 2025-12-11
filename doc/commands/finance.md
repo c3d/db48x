@@ -18,7 +18,7 @@ TVM
 
 ## FinanceRounding
 
-This setting defines the number of digits values returned by finance values will be rounded two. The default avalue is `2`.
+This setting defines how many digits finance values are rounded to. The default value is `2`.
 
 ```rpl
 @ Set finance rounding to 10 digits
