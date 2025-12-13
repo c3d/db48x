@@ -453,8 +453,9 @@ LDFLAGS +=	-s MODULARIZE=0				\
 		-s RESERVED_FUNCTION_POINTERS=20	\
 		-s PTHREAD_POOL_SIZE=4			\
 		--bind -pthread \
-		-sASYNCIFY # Used to be able to sleep within a webassembly context
-
+		--embed-file config \
+		--embed-file help \
+		-sASYNCIFY # Used to be able to sleep within a webassembly conte
 #------------------------------------------------------------------------------
 else
 #------------------------------------------------------------------------------
