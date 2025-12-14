@@ -147,7 +147,7 @@ sim:	recorder/config.h	\
 	keyboard		\
 	.ALWAYS
 
-WASM_TARGET=wasm/$(TARGET).js
+WASM_TARGET=wasm/public/$(TARGET).js
 wasm: emsdk $(WASM_TARGET) $(WASM_HTML)
 
 emsdk: emsdk/emsdk
@@ -543,7 +543,7 @@ else
 
 $(WASM_TARGET): $(SOURCES) Makefile
 	(source emsdk/emsdk_env.sh && \
-	 make VARIANT=wasm PGM=js PGM_TARGET=wasm/$(TARGET).js SDK=sim )
+	make VARIANT=wasm PGM=js PGM_TARGET=wasm/public/$(TARGET).js SDK=sim )
 
 $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
 	@tools/build_id -u

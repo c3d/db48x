@@ -1545,6 +1545,7 @@ void ui_start_buzzer(uint frequency)
 //   Start buzzer at given frequency
 // ----------------------------------------------------------------------------
 {
+    MAIN_THREAD_EM_ASM({ buzzer.shortBeep($0 / 1000); }, frequency);
 }
 
 

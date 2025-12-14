@@ -1,468 +1,624 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>DB48X</title>
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=0.9, maximum-scale=1.0" />
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="apple-touch-icon" href="./logo.png">
-    <link rel="icon" type="image/png" href="/user/themes/quark/images/favicon.png" />
+<!doctype html>
+<html lang="en">
 
-    <link href="/user/plugins/markdown-notices/assets/notices.css" type="text/css" rel="stylesheet">
-<link href="/user/plugins/form/assets/form-styles.css" type="text/css" rel="stylesheet">
-<link href="/user/themes/quark/css-compiled/spectre.min.css" type="text/css" rel="stylesheet">
-<link href="/user/themes/quark/css-compiled/theme.min.css" type="text/css" rel="stylesheet">
-<link href="/user/themes/quark/css/custom.css" type="text/css" rel="stylesheet">
-<link href="/user/themes/quark/css/line-awesome.min.css" type="text/css" rel="stylesheet">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.png" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DB48X App</title>
+  <style>
+    #generic-container {
+      max-width: 550px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
 
-    <script src="/system/assets/jquery/jquery-3.x.min.js"></script>
+    button {
+      white-space: nowrap;
+    }
 
-    <script src="coi-serviceworker.js"></script>
-    <script src="db48x.js"></script>
-    <style>
-      canvas {
-        display: block;
-        margin: 0 auto;
-      }
+    #app-db48x {
+      position: relative;
+      background-color: #2E2E2E;
+      padding: 4% 3% 2% 3%;
+      box-sizing: border-box;
+      border-radius: 2%;
 
-      #keyCanvas {
-        background-image: url('keyboard-db48x.png');
-        background-repeat: no-repeat;
-        background-size: 100% 100%;
-        margin: 0 auto;
-        align-self: center;
+      #lcd-bezel {
+        position: relative;
         width: 100%;
+        background-color: black;
+        padding: 8% 8% 4%;
+        box-sizing: border-box;
+        border-top-left-radius: 4%;
+        border-top-right-radius: 4%;
+        margin-bottom: 2%;
+
+
+        #lcd {
+          width: 100%;
+        }
       }
 
-      #lcdCanvas {
-        align-self: center;
+      #keyboard {
+        position: relative;
         width: 100%;
-        /* IE, only works on <img> tags */
-        -ms-interpolation-mode: nearest-neighbor;
-        /* Firefox */
-        image-rendering: crisp-edges;
-        /* Chromium + Safari */
-        image-rendering: pixelated;
-      }
-      #calcContainer {
-        margin: auto;
-        grid-column: 1 / 1;
-        grid-row: 2;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-items: center;
-        width: 420px;
-      }
+        user-select: none;
+        border-top-left-radius: 2%;
+        border-top-right-radius: 2%;
 
-    </style>
-
-  </head>
-  <body id="top" class="title-center title-h1h2 header-fixed header-animated sticky-footer">>
-    <div id="page-wrapper">
-      <section id="header" class="section">
-        <section class="container grid-lg">
-          <nav class="navbar">
-            <section class="navbar-section logo">
-              <a href="/" class="navbar-brand mr-10">
-                <img src="/user/themes/quark/images/logo/DB48X-MiniLogo.png" alt="DB48X" />
-            </a>                    </section>
-            <section class="navbar-section desktop-menu">
-
-              <nav class="dropmenu animated">
-
-                <ul >
-                  <li>
-                    <a href="/" class="active">
-                      Home
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/project" class="">
-                      Project
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/download" class="">
-                      Download
-                    </a>
-                  </li>
-                  <li>
-                    <a href="/documentation" class="">
-                      Documentation
-                    </a>
-                  </li>
-
-                </ul>
-              </nav>
-
-
-            </section>
-          </nav>
-        </section>
-      </section>
-      <div class="mobile-menu">
-        <div class="button_container" id="toggle">
-          <span class="top"></span>
-          <span class="middle"></span>
-          <span class="bottom"></span>
-        </div>
-      </div>
-
-      <section id="start">
-        <section id="body-wrapper" class="section">
-          <section class="container grid-lg">
-
-            <h1>DB48X</h1>
-            <h2>A modern tribute to Hewlett-Packard RPL Calculators</h2>
-            <p>
-              DB48X is a modern scientific calculator in the spirit of the
-              Hewlett-Packard HP48X, featuring a complete, from-scratch
-              reimplementation of the Reverse Polish Lisp (RPL) programming
-              language.
-            </p>
-            <p>You can try the calculator directly in your browser below (you may need to click on image):</p>
-
-            <div id="calcContainer">
-              <canvas id="lcdCanvas"></canvas>
-              <canvas id="keyCanvas"></canvas>
-            </div>
-          </section>
-        </section>
-      </section>
-
-    </div>
-
-    <section id="footer" class="section bg-gray">
-      <section class="container grid-lg">
-        <p><a href="http://48calc.org">DB48X</a> was <i class="fa fa-code"></i> with <i class="fa fa-heart-o pulse "></i> by <a href="https://c3d.github.io">Christophe de Dinechin</a>.</p>
-      </section>
-    </section>
-
-    <div class="mobile-container">
-      <div class="overlay" id="overlay">
-        <div class="mobile-logo">
-          <a href="/" class="navbar-brand mr-10">
-            <img src="/user/themes/quark/images/logo/DB48X-MiniLogo.png" alt="DB48X" />
-          </a>
-        </div>
-        <nav class="overlay-menu">
-
-          <ul class="tree">
-            <li>
-              <a href="/" class="active">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="/project" class="">
-                Project
-              </a>
-            </li>
-
-          </ul>
-        </nav>
-      </div>
-    </div>
-
-    <script src="/user/themes/quark/js/jquery.treemenu.js"></script>
-    <script src="/user/themes/quark/js/site.js"></script>
-
-<script>
-document.getElementsByTagName('body')[0].onscroll = function(event) {
-    event.preventDefault();
-};
-
-const DEBUG = false;
-const SIM_LCD_H = 240; // Height of the LCD
-const SIM_LCD_SCANLINE = 416; // Width of the LCD scanline
-const SIM_LCD_OFFSET = 16;
-const SIM_LCD_W = SIM_LCD_SCANLINE - SIM_LCD_OFFSET;
-const BPP = 1; // Bits per pixel
-const WORD_SIZE = 32; // Size of the word in bits
-const MASK = (1 << BPP) - 1; // Mask to extract BPP bits
-const KB_RATIO = 1.3; // Keyboard aspect ratio
-let keyBuffer = []; // keyBuffer
-let threadSince = 0;
-let threadInterval = 50; // 50ms
-
-// Keyboard mapping with key areas
-const key_map = [
-    [ 38, 0.03,  0.15,  0.03,  0.10  ], // Qt::Key_F1,
-    [ 39, 0.20,  0.32,  0.03,  0.10  ], // Qt::Key_F2,
-    [ 40, 0.345, 0.47,  0.03,  0.10  ], // Qt::Key_F3,
-    [ 41, 0.52,  0.63,  0.03,  0.10  ], // Qt::Key_F4,
-    [ 42, 0.68,  0.80,  0.03,  0.10  ], // Qt::Key_F5,
-    [ 43, 0.83,  0.95,  0.03,  0.10  ], // Qt::Key_F6,
-
-    [  1, 0.03,  0.15,  0.15,  0.22  ], // Qt::Key_A,
-    [  2, 0.20,  0.32,  0.15,  0.22  ], // Qt::Key_B,
-    [  3, 0.345, 0.47,  0.15,  0.22  ], // Qt::Key_C,
-    [  4, 0.52,  0.63,  0.15,  0.22  ], // Qt::Key_D,
-    [  5, 0.68,  0.80,  0.15,  0.22  ], // Qt::Key_E,
-    [  6, 0.83,  0.95,  0.15,  0.22  ], // Qt::Key_F,
-
-    [  7, 0.03,  0.15,  0.275, 0.345 ], // Qt::Key_G,
-    [  8, 0.20,  0.32,  0.275, 0.345 ], // Qt::Key_H,
-    [  9, 0.345, 0.47,  0.275, 0.345 ], // Qt::Key_I,
-    [ 10, 0.52,  0.63,  0.275, 0.345 ], // Qt::Key_J,
-    [ 11, 0.68,  0.80,  0.275, 0.345 ], // Qt::Key_K,
-    [ 12, 0.83,  0.95,  0.275, 0.345 ], // Qt::Key_L,
-
-    [ 13, 0.03,  0.32,  0.40,  0.47  ], // Qt::Key_Return,
-    [ 14, 0.345, 0.47,  0.40,  0.47  ], // Qt::Key_M,
-    [ 15, 0.51,  0.64,  0.40,  0.47  ], // Qt::Key_N,
-    [ 16, 0.68,  0.80,  0.40,  0.47  ], // Qt::Key_O,
-    [ 17, 0.83,  0.95,  0.40,  0.47  ], // Qt::Key_Backspace
-
-    [ 18, 0.03,  0.15,  0.52,  0.59  ], // Qt::Key_Up,
-    [ 19, 0.23,  0.36,  0.52,  0.59  ], // Qt::Key_7,
-    [ 20, 0.42,  0.56,  0.52,  0.59  ], // Qt::Key_8,
-    [ 21, 0.62,  0.75,  0.52,  0.59  ], // Qt::Key_9,
-    [ 22, 0.81,  0.95,  0.52,  0.59  ], // Qt::Key_Slash,
-
-    [ 23, 0.03,  0.15,  0.645, 0.715 ], // Qt::Key_Down,
-    [ 24, 0.23,  0.36,  0.645, 0.715 ], // Qt::Key_4,
-    [ 25, 0.42,  0.56,  0.645, 0.715 ], // Qt::Key_5,
-    [ 26, 0.62,  0.75,  0.645, 0.715 ], // Qt::Key_6,
-    [ 27, 0.81,  0.95,  0.645, 0.715 ], // Qt::Key_Asterisk,
-
-    [ 28, 0.028, 0.145, 0.77,  0.84  ], // Qt::Key_Control,
-    [ 29, 0.23,  0.36,  0.77,  0.84  ], // Qt::Key_1,
-    [ 30, 0.42,  0.56,  0.77,  0.84  ], // Qt::Key_2,
-    [ 31, 0.62,  0.75,  0.77,  0.84  ], // Qt::Key_3,
-    [ 32, 0.81,  0.95,  0.77,  0.84  ], // Qt::Key_Minus,
-
-    [ 33, 0.03,  0.15,  0.89,  0.97  ], // Qt::Key_Escape,
-    [ 34, 0.23,  0.36,  0.89,  0.97  ], // Qt::Key_0,
-    [ 35, 0.42,  0.55,  0.89,  0.97  ], // Qt::Key_Period,
-    [ 36, 0.62,  0.74,  0.89,  0.97  ], // Qt::Key_Question,
-    [ 37, 0.81,  0.95,  0.89,  0.97  ], // Qt::Key_Plus,
-];
-
-const keystroke_map = {
-    "0": 34,
-    "1": 29,
-    "2": 30,
-    "3": 31,
-    "4": 24,
-    "5": 25,
-    "6": 26,
-    "7": 19,
-    "8": 20,
-    "9": 21,
-    ".": 35,
-    "+": 37,
-    "-": 32,
-    "*": 27,
-    "/": 22,
-    "'": 6,
-    "=": 36,
-    " ": 36,
-    "`": 1,
-    "Alt": 1,
-    "Meta": 1,
-    "Enter": 13,
-    "Backspace": 17,
-    "Escape": 33,
-    "F1": 38,
-    "F2": 39,
-    "F3": 40,
-    "F4": 41,
-    "F5": 42,
-    "F6": 43,
-    "Up": 18,
-    "Down": 23,
-    "Shift": 28,
-    "Control": 28,
-    "Tab": 28,
-    "a": 1,
-    "b": 2,
-    "c": 3,
-    "d": 4,
-    "e": 5,
-    "f": 6,
-    "g": 7,
-    "h": 8,
-    "i": 9,
-    "j": 10,
-    "k": 11,
-    "l": 12,
-    "m": 14,
-    "n": 15,
-    "o": 16,
-    "p": 19,
-    "q": 20,
-    "r": 21,
-    "s": 22,
-    "t": 24,
-    "u": 25,
-    "v": 26,
-    "w": 27,
-    "x": 29,
-    "y": 30,
-    "z": 31,
-    "ArrowLeft": 18,
-    "ArrowRight": 23,
-    "ArrowUp": 18,
-    "ArrowDown": 23,
-};
-
-// canvas for the keyboard
-const canvas_key = document.getElementById('keyCanvas');
-const KEY_H = SIM_LCD_SCANLINE * KB_RATIO;
-const KEY_W = SIM_LCD_W;
-canvas_key.width  = KEY_W;
-canvas_key.height = KEY_H;
-const ctx_key = canvas_key.getContext('2d');
-ctx_key.clearRect( 0, 0, KEY_W, KEY_H);
-// debug presses
-if (DEBUG) {
-    ctx_key.strokeStyle = "red";
-    for (let i=0; i<key_map.length; i++) {
-        ctx_key.beginPath();
-        ctx_key.moveTo(key_map[i][1]*KEY_W, key_map[i][3]*KEY_H);
-        ctx_key.lineTo(key_map[i][1]*KEY_W, key_map[i][4]*KEY_H);
-        ctx_key.lineTo(key_map[i][2]*KEY_W, key_map[i][4]*KEY_H);
-        ctx_key.lineTo(key_map[i][2]*KEY_W, key_map[i][3]*KEY_H);
-        ctx_key.lineTo(key_map[i][1]*KEY_W, key_map[i][3]*KEY_H);
-        ctx_key.stroke();
-    }
-}
-
-// get the mouse/touch position
-const getMousePosition = function(canvas, event) {
-    let rect = canvas.getBoundingClientRect();
-    let x = (event.clientX - rect.left) / rect.width;
-    let y = (event.clientY - rect.top) / rect.height;
-    let xx = x * canvas.width;
-    let yy = y * canvas.height;
-    if (DEBUG) {
-        console.log("clicked x: " + x, " y: " + y + " xx:" + xx + " yy: " + yy);
-    }
-
-    // should use html elements for the keys in future
-    for (let i=0; i<key_map.length; i++) {
-        if (x > key_map[i][1] && x < key_map[i][2] &&
-            y > key_map[i][3] && y < key_map[i][4]) {
-            if (DEBUG) {
-                console.log("clicked:", key_map[i][0]);
-            }
-            keyBuffer.push(key_map[i][0]);
+        img {
+          width: 100%;
+          height: auto;
+          border-top-left-radius: 1%;
+          border-top-right-radius: 1%;
+          border: black 1px solid;
         }
-    }
-}
 
-const processKey = function() {
-    if (keyBuffer.length > 0) {
-        let key = keyBuffer.shift();
-        if (DEBUG) {
-            console.log("processed key:", key);
+        svg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: auto;
         }
-        Module.ui_push_key(key);
+      }
+    }
+  </style>
+  <script src="/coi-serviceworker.js"></script>
+  <script src="/db48x.js"></script>
+</head>
+
+<body>
+  <div id="generic-container">
+    <div id="app-db48x">
+      <div id="lcd-bezel">
+        <canvas id="lcd"></canvas>
+      </div>
+      <div id="keyboard">
+        <img src="/keyboard-db48x.png" alt="Keyboard Image" />
+
+        <!-- Start: Verbatim content of the Plain SVG exported from Inkscape -->
+
+        <svg width="184.67917mm" height="232.30417mm" viewBox="0 0 184.67917 232.30417" version="1.1" id="svg5"
+          xml:space="preserve" inkscape:export-filename="keyboard.svg" inkscape:export-xdpi="96"
+          inkscape:export-ydpi="96" inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+          sodipodi:docname="keyboard-inkscape.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+          xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg"
+          xmlns:svg="http://www.w3.org/2000/svg">
+          <sodipodi:namedview id="namedview7" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25"
+            inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0"
+            inkscape:deskcolor="#d1d1d1" inkscape:document-units="mm" showgrid="false" inkscape:zoom="0.52787981"
+            inkscape:cx="363.71916" inkscape:cy="560.7337" inkscape:window-width="1920" inkscape:window-height="1008"
+            inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1"
+            inkscape:current-layer="keyboardLayer" />
+          <defs id="defs2" />
+          <g inkscape:label="Keyboard Layer" inkscape:groupmode="layer" id="keyboardLayer"
+            transform="translate(65.783943,-12.944952)">
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_5" width="24.88475" height="15.005065" x="14.423682" y="164.62379" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_6" width="25.423571" height="15.098732" x="50.338211" y="164.4142" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_MUL" width="24.602079" height="15.344953" x="87.188934" y="164.32671" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_9" width="24.88475" height="15.005065" x="50.677582" y="136.04222" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_DIV" width="24.88475" height="15.005065" x="87.111687" y="136.05933" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F1" width="21.976686" height="17.060881" x="-58.661366" y="20.825016" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_A" width="21.216841" height="14.226752" x="-58.186142" y="51.681232" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_G" width="21.216841" height="14.226752" x="-58.34116" y="79.92984" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_H" width="21.216841" height="14.226752" x="-28.374376" y="79.829002" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_I" width="21.216841" height="14.226752" x="1.9563695" y="79.825394" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_M" width="21.168461" height="15.491737" x="1.5777965" y="107.4718" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_N" width="21.168461" height="15.491737" x="31.080317" y="107.33698" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_O" width="21.168461" height="15.491737" x="60.975292" y="107.10172" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_BKS" width="21.168461" height="15.491737" x="90.619995" y="107.16476" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_UP" width="21.168461" height="15.491737" x="-58.402779" y="135.93872" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_DN" width="21.168461" height="15.491737" x="-58.334911" y="164.32822" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_7" width="25.416538" height="15.019792" x="-21.961615" y="136.16838" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_4" width="25.416538" height="15.019792" x="-21.957836" y="164.3586" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_1" width="25.528608" height="15.755841" x="-22.003839" y="192.76839" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_0" width="25.528608" height="15.755841" x="-22.086254" y="220.89647" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_DOT" width="25.528608" height="15.755841" x="14.011739" y="220.92342" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_RUNSTOP" width="25.528608" height="15.755841" x="50.367065" y="220.81215" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_2" width="25.528608" height="15.755841" x="13.906031" y="192.63812" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_3" width="25.528608" height="15.755841" x="50.347942" y="192.56465" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_SUB" width="24.994146" height="15.621908" x="87.069572" y="192.77882" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_8" width="25.416538" height="15.019792" x="14.360666" y="136.02649" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_J" width="21.216841" height="14.226752" x="31.182127" y="79.836281" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_K" width="21.216841" height="14.226752" x="60.878952" y="79.930969" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_L" width="21.216841" height="14.226752" x="90.450951" y="79.91069" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_ENT" width="51.367584" height="15.234546" x="-58.962303" y="107.42451" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_B" width="21.216841" height="14.226752" x="-28.010019" y="51.590042" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_C" width="21.216841" height="14.226752" x="1.9459903" y="51.898685" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_D" width="21.216841" height="14.226752" x="31.334547" y="51.765778" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_E" width="21.216841" height="14.226752" x="61.144909" y="51.772141" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F" width="21.216841" height="14.226752" x="90.470589" y="51.681122" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F2" width="21.976686" height="17.060881" x="-28.89249" y="20.840902" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F3" width="21.976686" height="17.060881" x="1.2681491" y="20.996138" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F4" width="21.976686" height="17.060881" x="30.669128" y="20.971701" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F5" width="21.976686" height="17.060881" x="60.569214" y="20.907089" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_F6" width="21.976686" height="17.060881" x="90.375778" y="20.734203" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_SHIFT" width="21.381649" height="15.230365" x="-58.398373" y="192.78773" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_ESC" width="21.015976" height="15.885136" x="-58.026569" y="220.90498" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+            <rect style="fill:#ff0000;fill-opacity:0.189315;stroke:#ff0000;stroke-width:0.965;stroke-dasharray:none"
+              id="KB_ADD" width="24.88475" height="15.005065" x="87.13372" y="221.3121" onclick=""
+              onmousedown="keyboard.onMouseDownHandler(this.id);" onmouseup="keyboard.onMouseUpHandler(this.id);" />
+          </g>
+        </svg>
+
+        <!-- End: Verbatim content of the Plain SVG exported from Inkscape -->
+
+      </div> <!-- keyboard -->
+    </div> <!-- app-db48x -->
+    <div>
+      <button id="debug-btn" onclick="debugBtnHandler(!CONFIG.debug);"></button>
+      <button id="buzzer-btn" onclick="buzzerBtnHandler(!CONFIG.buzzer);"></button>
+    </div>
+  </div> <!-- generic-container -->
+
+  <script>
+
+    const CONFIG = {
+      debug: false,
+      buzzer: true,
+      FPS: 30,
+      lcd_bg_color: { r: 154, g: 156, b: 155 },
+      lcd_fg_color: { r: 23, g: 21, b: 34 },
+    }
+
+    if (CONFIG.debug) {
+      console.log("loading wasm...");
+    }
+
+    class Keyboard {
+      static #KB_CMD = {
+        "KB_ALPHA": 28,         //! Alpha
+        "KB_ON": 33,         //! ON
+        "KB_ESC": 33,         //! Exit
+        "KB_DOT": 35,         //! Dot
+        "KB_SPC": 36,         //! Space (on R/S)
+        "KB_RUNSTOP": 36,         //! R/S
+        "KB_QUESTION": 36,         //! ?
+        "KB_SHIFT": 28,         //! Shift
+        "KB_LSHIFT": 28,         //! Left shift
+        "KB_RSHIFT": 28,         //! Right shift
+
+        "KB_ADD": 37,         //! +
+        "KB_SUB": 32,         //! -
+        "KB_MUL": 27,         //! *
+        "KB_DIV": 22,         //! /
+
+        "KB_ENT": 13,         //! ENTER
+        "KB_BKS": 17,         //! backspace
+        "KB_UP": 18,         //! up arrow
+        "KB_DN": 23,         //! down arrow
+        "KB_LF": 18,         //! left arrow
+        "KB_RT": 23,         //! right arrow
+        "KB_F1": 38,         //! Function key 1
+        "KB_F2": 39,         //! Function key 2
+        "KB_F3": 40,         //! Function key 3
+        "KB_F4": 41,         //! Function key 4
+        "KB_F5": 42,         //! Function key 5
+        "KB_F6": 43,         //! Function key 6
+
+        "KB_0": 34,         //! 0
+        "KB_1": 29,         //! 1
+        "KB_2": 30,         //! 2
+        "KB_3": 31,         //! 3
+        "KB_4": 24,         //! 4
+        "KB_5": 25,         //! 5
+        "KB_6": 26,         //! 6
+        "KB_7": 19,         //! 7
+        "KB_8": 20,         //! 8
+        "KB_9": 21,         //! 9
+
+        "KB_A": 1,         //! A
+        "KB_B": 2,         //! B
+        "KB_C": 3,         //! C
+        "KB_D": 4,         //! D
+        "KB_E": 5,         //! E
+        "KB_F": 6,         //! F
+        "KB_G": 7,         //! G
+        "KB_H": 8,         //! H
+        "KB_I": 9,         //! I
+        "KB_J": 10,         //! J
+        "KB_K": 11,         //! K
+        "KB_L": 12,         //! L
+        "KB_M": 14,         //! M
+        "KB_N": 15,         //! N
+        "KB_O": 16,         //! O
+        "KB_P": 19,         //! P
+        "KB_Q": 20,         //! Q
+        "KB_R": 21,         //! R
+        "KB_S": 22,         //! S
+        "KB_T": 24,         //! T
+        "KB_U": 25,         //! U
+        "KB_V": 26,         //! V
+        "KB_W": 27,         //! W
+        "KB_X": 29,         //! X
+        "KB_Y": 30,         //! Y
+        "KB_Z": 31,         //! Z
+      };
+
+      static #KEYMAP = {
+        "Tab": this.#KB_CMD.KB_ALPHA,
+        "PrintScreen": this.#KB_CMD.KB_ON,
+        "Escape": this.#KB_CMD.KB_ESC,
+        ".": this.#KB_CMD.KB_DOT,
+        "Space": this.#KB_CMD.KB_SPC,
+        "?": this.#KB_CMD.KB_QUESTION,
+        "Meta": this.#KB_CMD.KB_SHIFT,
+
+        "+": this.#KB_CMD.KB_ADD,
+        "-": this.#KB_CMD.KB_SUB,
+        "*": this.#KB_CMD.KB_MUL,
+        "/": this.#KB_CMD.KB_DIV,
+
+        "Enter": this.#KB_CMD.KB_ENT,
+        "Backspace": this.#KB_CMD.KB_BKS,
+        "ArrowUp": this.#KB_CMD.KB_UP,
+        "ArrowDown": this.#KB_CMD.KB_DN,
+        "ArrowLeft": this.#KB_CMD.KB_LF,
+        "ArrowRight": this.#KB_CMD.KB_RT,
+
+        "F1": this.#KB_CMD.KB_F1,
+        "F2": this.#KB_CMD.KB_F2,
+        "F3": this.#KB_CMD.KB_F3,
+        "F4": this.#KB_CMD.KB_F4,
+        "F5": this.#KB_CMD.KB_F5,
+        "F6": this.#KB_CMD.KB_F6,
+
+        "0": this.#KB_CMD.KB_0,
+        "1": this.#KB_CMD.KB_1,
+        "2": this.#KB_CMD.KB_2,
+        "3": this.#KB_CMD.KB_3,
+        "4": this.#KB_CMD.KB_4,
+        "5": this.#KB_CMD.KB_5,
+        "6": this.#KB_CMD.KB_6,
+        "7": this.#KB_CMD.KB_7,
+        "8": this.#KB_CMD.KB_8,
+        "9": this.#KB_CMD.KB_9,
+
+        "a": this.#KB_CMD.KB_A,
+        "b": this.#KB_CMD.KB_B,
+        "c": this.#KB_CMD.KB_C,
+        "d": this.#KB_CMD.KB_D,
+        "e": this.#KB_CMD.KB_E,
+        "f": this.#KB_CMD.KB_F,
+        "g": this.#KB_CMD.KB_G,
+        "h": this.#KB_CMD.KB_H,
+        "i": this.#KB_CMD.KB_I,
+        "j": this.#KB_CMD.KB_J,
+        "k": this.#KB_CMD.KB_K,
+        "l": this.#KB_CMD.KB_L,
+        "m": this.#KB_CMD.KB_M,
+        "n": this.#KB_CMD.KB_N,
+        "o": this.#KB_CMD.KB_O,
+        "p": this.#KB_CMD.KB_P,
+        "q": this.#KB_CMD.KB_Q,
+        "r": this.#KB_CMD.KB_R,
+        "s": this.#KB_CMD.KB_S,
+        "t": this.#KB_CMD.KB_T,
+        "u": this.#KB_CMD.KB_U,
+        "v": this.#KB_CMD.KB_V,
+        "w": this.#KB_CMD.KB_W,
+        "x": this.#KB_CMD.KB_X,
+        "y": this.#KB_CMD.KB_Y,
+        "z": this.#KB_CMD.KB_Z,
+      };
+
+      #pressedKeys = [];
+      #kb_layer;
+
+      constructor(layer_name, debug) {
+        this.#kb_layer = document.getElementById(layer_name);
+        this.highlightKeys(debug);
+        this.#registerKeyboardListeners();
+      }
+
+      sendKeycode(keycode) {
+        Module.ui_push_key(keycode);
+        if (CONFIG.debug) {
+          console.log("keydown (calc): ", keycode);
+        }
+      }
+
+      sendRelease(keycode) {
         Module.ui_push_key(0);
-        return true;
-    }
-    return false;
-}
-
-// add an event listener to the canvas so we can parse the key presses
-canvas_key.addEventListener("mousedown", function (e) {
-    getMousePosition(canvas_key, e);
-});
-
-// add an event listener to the canvas so we can parse the key presses
-document.addEventListener("keyup", (event)=>{
-    // check that event.key matches a key in the keystroke_map
-    if (Object.keys(keystroke_map).includes(event.key)) {
-        keyBuffer.push(keystroke_map[event.key]);
-    } else {
-        if (DEBUG) {
-            console.log("Key not found in keystroke_map: ", event.key);
+        if (CONFIG.debug) {
+          console.log("keyup (calc): ", keycode);
         }
+      }
+
+      highlightKeys(bool) {
+        // Hide or show SVG key highlights based on debug mode
+        const keys_svg = this.#kb_layer.children;
+        for (var i = 0; i < keys_svg.length; i++) {
+          const svg = keys_svg[i];
+          svg.style["fill-opacity"] = '0';
+          if (bool) {
+            svg.style["stroke-opacity"] = '1';
+          } else {
+            svg.style["stroke-opacity"] = '0';
+          }
+        }
+      }
+
+      #registerKeyboardListeners() {
+        document.addEventListener("keydown", (event) => {
+          if (CONFIG.debug) {
+            console.log("keydown (keyboard): ", event.key);
+          }
+          if (event.key in Keyboard.#KEYMAP && this.#pressedKeys.indexOf(event.key) === -1) {
+            this.#pressedKeys.push(event.key);
+            this.sendKeycode(Keyboard.#KEYMAP[event.key]);
+          }
+        })
+
+        document.addEventListener("keyup", (event) => {
+          if (CONFIG.debug) {
+            console.log("keyup (keyboard): ", event.key);
+          }
+          if (!(event.key in Keyboard.#KEYMAP)) {
+            return;
+          }
+          this.#pressedKeys.splice(this.#pressedKeys.indexOf(event.key), 1);
+          this.sendRelease(Keyboard.#KEYMAP[event.key]);
+        })
+      }
+      onMouseDownHandler(cmd) {
+        this.sendKeycode(Keyboard.#KB_CMD[cmd]);
+      }
+      onMouseUpHandler(cmd) {
+        this.sendRelease(Keyboard.#KB_CMD[cmd]);
+      }
     }
-});
 
-// draw the LCD panel
-const canvas = document.getElementById('lcdCanvas');
-canvas.width = SIM_LCD_W;
-canvas.height = SIM_LCD_H;
-const ctx = canvas.getContext('2d');
-const imgData = ctx.createImageData(canvas.width, canvas.height);
+    class Display {
+      #LCD_W = 416;
+      #LCD_H = 240;
+      #LCD_W_OFFSET = 16;
+      #ctx;
+      #imagedata;
+      #fg_color;
+      #bg_color;
 
-// parse the LCD data and draw to the canvas
-const drawBitmap = function(canvasId, dataArray, width, height) {
-    const canvas = document.getElementById(canvasId);
-    const ctx = canvas.getContext('2d');
+      constructor(canvasId, fg_color, bg_color) {
+        const lcd_canvas = document.getElementById(canvasId);
+        lcd_canvas.width = this.#LCD_W - this.#LCD_W_OFFSET;
+        lcd_canvas.height = this.#LCD_H;
+        this.#ctx = lcd_canvas.getContext("2d");
+        this.#imagedata = this.#ctx.createImageData(this.#LCD_W, this.#LCD_H);
+        this.#fg_color = fg_color;
+        this.#bg_color = bg_color;
+      }
 
-    canvas.width = SIM_LCD_W;
-    canvas.height = SIM_LCD_H;
-
-    const imageData = ctx.createImageData(width, height);
-    const data = imageData.data;
-
-    for (let i = 0; i < dataArray.length; i++) {
-        const bitmask = dataArray[i];
-        for (let bit = 0; bit < 32; bit++) {
+      drawBitmap(lcd_ptr) {
+        const lcd_buffer = this.#getLCDBuffer(lcd_ptr);
+        for (let i = 0; i < lcd_buffer.length; i++) {
+          const bitmask = lcd_buffer[i];
+          for (let bit = 0; bit < 32; bit++) {
             const value = (bitmask >> bit) & 1;
             const pixelIndex = i * 32 + bit;
-            const x = pixelIndex % width;
-            const y = Math.floor(pixelIndex / width);
-            const mirroredX = width - 1 - x; // Mirroring the x position
-            const index = (y * width + mirroredX) * 4;
+            const x = pixelIndex % this.#LCD_W;
+            const y = Math.floor(pixelIndex / this.#LCD_W);
+            const mirroredX = this.#LCD_W - 1 - x; // Mirroring the x position
+            const index = (y * this.#LCD_W + mirroredX) * 4;
             // const index = (y * width + x) * 4;
-
-            const color = value === 1 ? 213 : 0;
-            data[index] = color;
-            data[index + 1] = color;
-            data[index + 2] = color;
-            data[index + 3] = 255; // Alpha channel
+            const color = value === 1 ? this.#bg_color : this.#fg_color;
+            this.#imagedata.data[index] = color.r;
+            this.#imagedata.data[index + 1] = color.g;
+            this.#imagedata.data[index + 2] = color.b;
+            this.#imagedata.data[index + 3] = 255; // Alpha channel
+          }
         }
+        this.#ctx.putImageData(this.#imagedata, -this.#LCD_W_OFFSET, 0);
+      }
+
+      #getLCDBuffer(lcd_ptr) {
+        const lcd_buffer = [];
+        for (let i = 0; i < this.#LCD_W * this.#LCD_H / Int32Array.BYTES_PER_ELEMENT; i++) {
+          const index = lcd_ptr / Int32Array.BYTES_PER_ELEMENT + i;
+          const word = Module.HEAP32[index]
+          lcd_buffer.push(word)
+        }
+        return lcd_buffer;
+      }
     }
 
-    // offset -16 pixels to the left
-    ctx.putImageData(imageData, -SIM_LCD_OFFSET, 0);
-}
+    class Buzzer {
+      #context;
+      #oscillator;
+      #start;
+      #enabled = false
+
+      constructor() {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.#context = new AudioContext();
+        this.#oscillator = null;
+      }
+
+      enable(bool) {
+        this.#enabled = bool;
+      }
+
+      shortBeep(frequency) {
+        if (!this.#enabled)
+          return;
+        this.#play(frequency);
+        setTimeout(() => {
+          this.#stop();
+        }, 150);
+      }
+
+      #play(frequency) {
+        if (!this.#enabled)
+          return;
+        if (!this.#oscillator) {
+          this.#oscillator = this.#context.createOscillator();
+          this.#oscillator.type = 'square';
+          this.#oscillator.frequency.setValueAtTime(frequency, this.#context.currentTime);
+          this.#oscillator.connect(this.#context.destination);
+          this.#oscillator.start();
+        }
+      }
+
+      #stop() {
+        if (!this.#enabled)
+          return;
+        if (this.#oscillator) {
+          this.#oscillator.stop();
+          this.#oscillator.disconnect();
+          this.#oscillator = null;
+        }
+      }
+    }
+
+    // ============================================================================
+    //
+    //   handlers
+    //
+    // ============================================================================
 
 
-Module.onRuntimeInitialized = function() {
+    const debugBtnHandler = (bool) => {
+      CONFIG.debug = bool;
+      keyboard.highlightKeys(bool);
+      document.getElementById("debug-btn").innerHTML = bool ? "Debug: On" : "Debug: Off";
+    }
 
-    // initialise the calculator
-    console.log("loaded wasm...");
-    var init = Module.ui_init();
-    console.log("ui_init()", init);
-    var rpl_lcd = 0;
+    const buzzerBtnHandler = (bool) => {
+      CONFIG.buzzer = bool
+      buzzer.enable(CONFIG.buzzer);
+      document.getElementById("buzzer-btn").innerHTML = bool ? "Buzzer: On" : "Buzzer: Off";
+    }
 
-    const redraw = function() {
-        if (rpl_lcd) {
-            if (DEBUG)
-                console.log("Display changed");
-            var lcd_buffer = [];
-            for (let v=0; v < (13*240); v++) {
-                var index = rpl_lcd/Int32Array.BYTES_PER_ELEMENT+v;
-                var word = Module.HEAP32[index]
-                lcd_buffer.push(word)
+    // ============================================================================
+    //
+    //   main()
+    //
+    // ============================================================================
+
+    const buzzer = new Buzzer(); // instance created to be used by the C++ code
+    const display = new Display("lcd", CONFIG.lcd_fg_color, CONFIG.lcd_bg_color);
+    const keyboard = new Keyboard("keyboardLayer", CONFIG.debug);
+
+    // Called to initialize buttons
+    debugBtnHandler(CONFIG.debug);
+    buzzerBtnHandler(CONFIG.buzzer);
+
+    Module.onRuntimeInitialized = () => {
+      var init = Module.ui_init();
+
+      if (CONFIG.debug) {
+        console.log("loaded wasm...");
+        console.log("ui_init() returned with value: ", init);
+      }
+
+      // Calculator's display Read-Print-Loop
+      const rpl_loop = () => {
+        const lcd_ptr = Module.ui_lcd_buffer();
+        if (lcd_ptr)
+          window.requestAnimationFrame(() => {
+            if (CONFIG.debug) {
+              var startTime = performance.now();
             }
-            rpl_lcd = 0
-            drawBitmap('lcdCanvas',
-                       lcd_buffer, SIM_LCD_SCANLINE, SIM_LCD_H);
-        }
+            display.drawBitmap(lcd_ptr);
+            if (CONFIG.debug) {
+              console.log(`Frame rendered in ${performance.now() - startTime} ms`);
+            }
+          });
+        window.setTimeout(rpl_loop, 1000 / CONFIG.FPS);
+      }
+      window.requestAnimationFrame(rpl_loop);
     }
 
-    // fetch and display the RPL display
-    const checkRPL = function() {
-        if (!rpl_lcd)
-            rpl_lcd = Module.ui_lcd_buffer();
-        if (processKey() || rpl_lcd)
-            window.requestAnimationFrame(redraw)
-        window.setTimeout(checkRPL, 50);
-    }
+  </script>
 
-    window.requestAnimationFrame(checkRPL);
-}
-    </script>
+</body>
 
-  </body>
 </html>
