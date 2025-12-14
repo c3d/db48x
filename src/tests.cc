@@ -10079,7 +10079,7 @@ void tests::date_operations()
         .expect("Mon 17/Feb/1969, 3:55:01.97");
     step("Displaying invalid date and time")
         .test(CLEAR, "999999999.99999999_date", ENTER)
-        .expect("Sat 99/99/99999, 99:99:99.99");
+        .expect("Tue 99/99/99999, 99:99:99.99");
 
     step("Difference between two dates using DDays")
         .test(CLEAR, "20230908", ENTER)
@@ -10131,13 +10131,13 @@ void tests::date_operations()
 
     step("Converting from a date to a Julian day number")
         .test(CLEAR, "20250919_date", ENTER, ID_JulianDayNumber)
-        .expect("2 460 938");
+        .expect("2 460 937 ¹/₂");
     step("Converting from a Julian day number to a date")
         .test(CLEAR, "1 000 000", ENTER, ID_DateFromJulianDayNumber)
-        .expect("Tue 21/Oct/-1975");
+        .expect("Tue 21/Oct/-1975, 12:00:00");
     step("Change to BCECE representation")
         .test(ID_BCECEyearNumbering)
-        .expect("Tue 21/Oct/1976 BCE");
+        .expect("Tue 21/Oct/1976 BCE, 12:00:00");
     step("Adding invalid dates")
         .test(CLEAR, "1 2 DATE+", ENTER)
         .error("Invalid date");

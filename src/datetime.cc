@@ -201,9 +201,14 @@ algebraic_p julian_day_number(const dt_t &dt, const tm_t &tm)
 //   Compute julian day number for a dt_t structure
 // ----------------------------------------------------------------------------
 {
+    double jdn_value = julian_day_number(dt.day, dt.month, dt.year);
+    long jdn_day = long(jdn_value);
+    long jdn_fraction_of_day = long((jdn_value - jdn_day) * 8640000);
+
     ularge csecs = (tm.hour * 3600 + tm.min * 60 + tm.sec) * 100 + tm.csec;
-    ularge jval = julian_day_number(dt.day, dt.month, dt.year);
-    algebraic_g jdn = integer::make(jval);
+    algebraic_g jdn = integer::make(jdn_day);
+
+    csecs += jdn_fraction_of_day;
     if (csecs)
     {
         algebraic_g frac = +fraction::make(integer::make(csecs),
@@ -227,27 +232,20 @@ algebraic_p julian_day_number(algebraic_p dtobj, bool error)
 }
 
 
-ularge julian_day_number(int d, int m, int y)
+double julian_day_number(int d, int m, int y)
 // ----------------------------------------------------------------------------
 //   Compute the Julian day number given day, month and year
 // ----------------------------------------------------------------------------
-// The algorithm below follows the description in
-// https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_day_number
-// which itself seems to be based on the "Fliegel and van Flandern" algorithms:
-// https://aa.usno.navy.mil/faq/JD_formula --> JD.
-// With a little bit of algebra this function can be shown to be equivalent.
-//
-// According to https://en.wikipedia.org/wiki/Gregorian_calendar
-// "Thursday 4 October 1582 was followed by Friday 15 October 1582"
-// This function doesn't do the 10 day advance.
 {
-    int rm = (m-14)/12;
-    ularge jdn = ((1461 * (y + 4800 + rm)) / 4
-                  + (367 * (m - 2 - 12 * rm)) / 12
-                  - (3 * ((y + 4900 + rm) / 100)) / 4
-                  + d
-                  - 32075);
-    return jdn;
+    int result;
+    double djm0, djm;
+
+    result = iauCal2jd(y, m, d, &djm0, &djm);
+    if (result < 0)
+    {
+        // ToDo: handle errors.
+    }
+    return (djm0 + djm);
 }
 
 
@@ -255,63 +253,63 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
 // ----------------------------------------------------------------------------
 //   Create a date from a Julian day object
 // ----------------------------------------------------------------------------
-// See comments in julian_day_number
 {
     if (!jdn)
         return nullptr;
 
     if (algebraic_g jval = jdn->as_real())
     {
-        large jdn = jval->as_int64(0, error);
+        double dj1, dj2 = 0.0;
+        int year, month, day;
+        double jdn_fraction_of_day;
+        int result;
 
-        enum
+        // How on earth do I get the real or double value out of jval?
         {
-            y = 4716,
-            j = 1401,
-            m = 2,
-            n = 12,
-            r = 4,
-            p = 1461,
-            v = 3,
-            u = 5,
-            s = 153,
-            w = 2,
-            B = 274277,
-            C = -38
-        };
-
-        large f = jdn + j + (((4 * jdn + B) / 146097) * 3) / 4 + C;
-        large e = r * f + v;
-        large g = (e % p) / r;
-        large h = u * g + w;
-        uint day = (h % s) / u + 1;
-        uint month = (h / s + m ) % n + 1;
-        int year = e / p - y + (n + m - month) / n;
-
-	bool negativeYear = year < 0;
-	if (negativeYear)
-            year = -year;
-
-        ularge dval = year * 10000 + month * 100 + day;
-
-        algebraic_g date = integer::make(dval);
-        algebraic_g fp = integer::make(1);
-        fp = jval % fp;
-        if (!fp->is_zero())
-        {
-            algebraic_g factor = integer::make(86400);
-            fp = fp * factor;
-            ularge hval = fp->as_uint64(0, false);
-            uint hour = hval / 3600;
-            uint min = (hval / 60) % 60;
-            uint sec = hval % 60;
-            hval = hour * 10000 + min * 100 + sec;
-            fp = +fraction::make(integer::make(hval),
-                                 integer::make(1000000));
-            date = date + fp;
+	    // Format hhmmsscc, thus cc is hundreds of a second.
+	    const long scale_to_cc = 100 * 100 * 100 * 100;
+            algebraic_g scale = integer::make(scale_to_cc);
+            algebraic_g j = jval * scale;
+            dj1 = double(j->as_uint64(0, false)) / scale_to_cc;
         }
 
-	if (negativeYear)
+        result = iauJd2cal(dj1, dj2, &year, &month, &day, &jdn_fraction_of_day);
+        if (result < 0)
+	{
+	    // ToDo: handle errors.
+	}
+
+        bool negative_year = year < 0;
+        if (negative_year)
+            year = -year;
+
+        algebraic_g date_part = nullptr;
+        {
+          int date = (((year * 100) + month) * 100) + day;
+          date_part = integer::make(date);
+        }
+
+        algebraic_g time_part = nullptr;
+        {
+            const long scale_to_cc = 24 * 60 * 60 * 100;
+            const long scale_from_cc = 100 * 100 * 100 * 100;
+            int d = round(jdn_fraction_of_day * scale_to_cc);
+            int cc = d % 100;
+            d = d / 100;
+            int seconds = d % 60;
+            d = d / 60;
+            int minutes = d % 60;
+            d = d / 60;
+            int hours = d % 24;
+
+            int time = ((hours * 100 + minutes) * 100 + seconds) * 100 + cc;
+            time_part = +fraction::make(integer::make(time),
+                                        +integer::make(scale_from_cc));
+        }
+
+        algebraic_g date = date_part + time_part;
+
+        if (negative_year)
             date = -date;
 
         date = unit::make(date, +symbol::make("date"));
@@ -498,9 +496,6 @@ COMMAND_BODY(ChronoTime)
 }
 
 
-
-
-
 static bool setTime(object_p tobj)
 // ----------------------------------------------------------------------------
 //   Set the system date based on input
@@ -527,7 +522,6 @@ COMMAND_BODY(SetTime)
                 return OK;
     return ERROR;
 }
-
 
 
 void render_time(renderer &r, algebraic_g &value,
@@ -610,8 +604,8 @@ size_t render_date(renderer &r, algebraic_g date)
     if (!date || !date->is_real())
         return 0;
     
-    bool negativeDate = date->is_negative();
-    if (negativeDate)
+    bool negative_date = date->is_negative();
+    if (negative_date)
         date = -date;
 
     algebraic_g factor = integer::make(100);
@@ -628,9 +622,9 @@ size_t render_date(renderer &r, algebraic_g date)
 
     if (Settings.ShowDayOfWeek())
     {
-        int syear = negativeDate ? -int(year) : year;
+        int syear = negative_date ? -int(year) : year;
         ularge jdn = julian_day_number(day, month, syear);
-        uint dow = jdn % 7;
+        uint dow = (jdn + 1) % 7;
         r.printf("%s ", get_wday_shortcut(dow));
     }
 
@@ -640,10 +634,10 @@ size_t render_date(renderer &r, algebraic_g date)
     else
         snprintf(mname, 4, "%u", month);
 
-    bool zeroYear = year == 0;
-    if ((negativeDate || zeroYear) && Settings.BCECEyearNumbering())
+    bool zero_year = year == 0;
+    if ((negative_date || zero_year) && Settings.BCECEyearNumbering())
         year = year + 1;
-    if (negativeDate && Settings.AstronomicalYearNumbering())
+    if (negative_date && Settings.AstronomicalYearNumbering())
         year = - year;
     
     char ytext[16];
@@ -664,7 +658,7 @@ size_t render_date(renderer &r, algebraic_g date)
     if (Settings.BCECEyearNumbering())
     {
         r.printf(" ");
-        if (negativeDate || zeroYear)
+        if (negative_date || zero_year)
 	    r.printf("B");
         r.printf("CE");
     }
@@ -678,7 +672,6 @@ size_t render_date(renderer &r, algebraic_g date)
 
     return r.size();
 }
-
 
 
 // ============================================================================
@@ -1000,4 +993,467 @@ COMMAND_BODY(TimedEval)
                     if (rt.push(+tval))
                         return OK;
     return ERROR;
+}
+
+
+// ****************************************************************************
+// Functions:
+//  iauCal2jd
+//  iauJd2cal
+//
+// Taken from the Standards Of Fundamental Astronomy (SOFA) Libraries,
+// issue 2023-10-11.
+//
+// Inserted jd2cal.c
+// Commented out some includes.
+//
+// Inserted cal2jd.c
+// Commented out its includes.
+//
+// ****************************************************************************
+
+// #include "sofa.h"
+// #include "sofam.h"
+#include <float.h>
+
+int iauJd2cal(double dj1, double dj2,
+              int *iy, int *im, int *id, double *fd)
+/*
+**  - - - - - - - - - -
+**   i a u J d 2 c a l
+**  - - - - - - - - - -
+**
+**  Julian Date to Gregorian year, month, day, and fraction of a day.
+**
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
+**
+**  Status:  support function.
+**
+**  Given:
+**     dj1,dj2   double   Julian Date (Notes 1, 2)
+**
+**  Returned (arguments):
+**     iy        int      year
+**     im        int      month
+**     id        int      day
+**     fd        double   fraction of day
+**
+**  Returned (function value):
+**               int      status:
+**                           0 = OK
+**                          -1 = unacceptable date (Note 1)
+**
+**  Notes:
+**
+**  1) The earliest valid date is -68569.5 (-4900 March 1).  The
+**     largest value accepted is 1e9.
+**
+**  2) The Julian Date is apportioned in any convenient way between
+**     the arguments dj1 and dj2.  For example, JD=2450123.7 could
+**     be expressed in any of these ways, among others:
+**
+**            dj1             dj2
+**
+**         2450123.7           0.0       (JD method)
+**         2451545.0       -1421.3       (J2000 method)
+**         2400000.5       50123.2       (MJD method)
+**         2450123.5           0.2       (date & time method)
+**
+**     Separating integer and fraction uses the "compensated summation"
+**     algorithm of Kahan-Neumaier to preserve as much precision as
+**     possible irrespective of the jd1+jd2 apportionment.
+**
+**  3) In early eras the conversion is from the "proleptic Gregorian
+**     calendar";  no account is taken of the date(s) of adoption of
+**     the Gregorian calendar, nor is the AD/BC numbering convention
+**     observed.
+**
+**  References:
+**
+**     Explanatory Supplement to the Astronomical Almanac,
+**     P. Kenneth Seidelmann (ed), University Science Books (1992),
+**     Section 12.92 (p604).
+**
+**     Klein, A., A Generalized Kahan-Babuska-Summation-Algorithm.
+**     Computing, 76, 279-293 (2006), Section 3.
+**
+**  This revision:  2021 May 11
+**
+**  SOFA release 2023-10-11
+**
+**  Copyright (C) 2023 IAU SOFA Board.  See notes at end.
+*/
+{
+/* Minimum and maximum allowed JD */
+   const double DJMIN = -68569.5;
+   const double DJMAX = 1e9;
+
+   long jd, i, l, n, k;
+   double dj, f1, f2, d, s, cs, v[2], x, t, f;
+
+
+/* Verify date is acceptable. */
+   dj = dj1 + dj2;
+   if (dj < DJMIN || dj > DJMAX) return -1;
+
+/* Separate day and fraction (where -0.5 <= fraction < 0.5). */
+   d = dnint(dj1);
+   f1 = dj1 - d;
+   jd = (long) d;
+   d = dnint(dj2);
+   f2 = dj2 - d;
+   jd += (long) d;
+
+/* Compute f1+f2+0.5 using compensated summation (Klein 2006). */
+   s = 0.5;
+   cs = 0.0;
+   v[0] = f1;
+   v[1] = f2;
+   for ( i = 0; i < 2; i++ ) {
+      x = v[i];
+      t = s + x;
+      cs += fabs(s) >= fabs(x) ? (s-t) + x : (x-t) + s;
+      s = t;
+      if ( s >= 1.0 ) {
+         jd++;
+         s -= 1.0;
+      }
+   }
+   f = s + cs;
+   cs = f - s;
+
+/* Deal with negative f. */
+   if ( f < 0.0 ) {
+
+   /* Compensated summation: assume that |s| <= 1.0. */
+      f = s + 1.0;
+      cs += (1.0-f) + s;
+      s  = f;
+      f = s + cs;
+      cs = f - s;
+      jd--;
+   }
+
+/* Deal with f that is 1.0 or more (when rounded to double). */
+   if ( (f-1.0) >= -DBL_EPSILON/4.0 ) {
+
+   /* Compensated summation: assume that |s| <= 1.0. */
+      t = s - 1.0;
+      cs += (s-t) - 1.0;
+      s = t;
+      f = s + cs;
+      if ( -DBL_EPSILON/2.0 < f ) {
+         jd++;
+         f = gmax(f, 0.0);
+      }
+   }
+
+/* Express day in Gregorian calendar. */
+   l = jd + 68569L;
+   n = (4L * l) / 146097L;
+   l -= (146097L * n + 3L) / 4L;
+   i = (4000L * (l + 1L)) / 1461001L;
+   l -= (1461L * i) / 4L - 31L;
+   k = (80L * l) / 2447L;
+   *id = (int) (l - (2447L * k) / 80L);
+   l = k / 11L;
+   *im = (int) (k + 2L - 12L * l);
+   *iy = (int) (100L * (n - 49L) + i + l);
+   *fd = f;
+
+/* Success. */
+   return 0;
+
+/* Finished. */
+
+/*----------------------------------------------------------------------
+**
+**  Copyright (C) 2023
+**  Standards of Fundamental Astronomy Board
+**  of the International Astronomical Union.
+**
+**  =====================
+**  SOFA Software License
+**  =====================
+**
+**  NOTICE TO USER:
+**
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
+**
+**  1. The Software is owned by the IAU SOFA Board ("SOFA").
+**
+**  2. Permission is granted to anyone to use the SOFA software for any
+**     purpose, including commercial applications, free of charge and
+**     without payment of royalties, subject to the conditions and
+**     restrictions listed below.
+**
+**  3. You (the user) may copy and distribute SOFA source code to others,
+**     and use and adapt its code and algorithms in your own software,
+**     on a world-wide, royalty-free basis.  That portion of your
+**     distribution that does not consist of intact and unchanged copies
+**     of SOFA source code files is a "derived work" that must comply
+**     with the following requirements:
+**
+**     a) Your work shall be marked or carry a statement that it
+**        (i) uses routines and computations derived by you from
+**        software provided by SOFA under license to you; and
+**        (ii) does not itself constitute software provided by and/or
+**        endorsed by SOFA.
+**
+**     b) The source code of your derived work must contain descriptions
+**        of how the derived work is based upon, contains and/or differs
+**        from the original SOFA software.
+**
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
+**
+**     d) The origin of the SOFA components of your derived work must
+**        not be misrepresented;  you must not claim that you wrote the
+**        original software, nor file a patent application for SOFA
+**        software or algorithms embedded in the SOFA software.
+**
+**     e) These requirements must be reproduced intact in any source
+**        distribution and shall apply to anyone to whom you have
+**        granted a further right to modify the source code of your
+**        derived work.
+**
+**     Note that, as originally distributed, the SOFA software is
+**     intended to be a definitive implementation of the IAU standards,
+**     and consequently third-party modifications are discouraged.  All
+**     variations, no matter how minor, must be explicitly marked as
+**     such, as explained above.
+**
+**  4. You shall not cause the SOFA software to be brought into
+**     disrepute, either by misuse, or use for inappropriate tasks, or
+**     by inappropriate modification.
+**
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
+**     as to its use or performance.   SOFA does not and cannot warrant
+**     the performance or results which the user may obtain by using the
+**     SOFA software.  SOFA makes no warranties, express or implied, as
+**     to non-infringement of third party rights, merchantability, or
+**     fitness for any particular purpose.  In no event will SOFA be
+**     liable to the user for any consequential, incidental, or special
+**     damages, including any lost profits or lost savings, even if a
+**     SOFA representative has been advised of such damages, or for any
+**     claim by any third party.
+**
+**  6. The provision of any version of the SOFA software under the terms
+**     and conditions specified herein does not imply that future
+**     versions will also be made available under the same terms and
+**     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
+**
+**  Correspondence concerning SOFA software should be addressed as
+**  follows:
+**
+**      By email:  sofa@ukho.gov.uk
+**      By post:   IAU SOFA Center
+**                 HM Nautical Almanac Office
+**                 UK Hydrographic Office
+**                 Admiralty Way, Taunton
+**                 Somerset, TA1 2DN
+**                 United Kingdom
+**
+**--------------------------------------------------------------------*/
+}
+
+// ****************************************************************************
+// #include "sofa.h"
+// #include "sofam.h"
+
+int iauCal2jd(int iy, int im, int id, double *djm0, double *djm)
+/*
+**  - - - - - - - - - -
+**   i a u C a l 2 j d
+**  - - - - - - - - - -
+**
+**  Gregorian Calendar to Julian Date.
+**
+**  This function is part of the International Astronomical Union's
+**  SOFA (Standards of Fundamental Astronomy) software collection.
+**
+**  Status:  support function.
+**
+**  Given:
+**     iy,im,id  int     year, month, day in Gregorian calendar (Note 1)
+**
+**  Returned:
+**     djm0      double  MJD zero-point: always 2400000.5
+**     djm       double  Modified Julian Date for 0 hrs
+**
+**  Returned (function value):
+**               int     status:
+**                           0 = OK
+**                          -1 = bad year   (Note 3: JD not computed)
+**                          -2 = bad month  (JD not computed)
+**                          -3 = bad day    (JD computed)
+**
+**  Notes:
+**
+**  1) The algorithm used is valid from -4800 March 1, but this
+**     implementation rejects dates before -4799 January 1.
+**
+**  2) The Julian Date is returned in two pieces, in the usual SOFA
+**     manner, which is designed to preserve time resolution.  The
+**     Julian Date is available as a single number by adding djm0 and
+**     djm.
+**
+**  3) In early eras the conversion is from the "Proleptic Gregorian
+**     Calendar";  no account is taken of the date(s) of adoption of
+**     the Gregorian Calendar, nor is the AD/BC numbering convention
+**     observed.
+**
+**  Reference:
+**
+**     Explanatory Supplement to the Astronomical Almanac,
+**     P. Kenneth Seidelmann (ed), University Science Books (1992),
+**     Section 12.92 (p604).
+**
+**  This revision:  2021 May 11
+**
+**  SOFA release 2023-10-11
+**
+**  Copyright (C) 2023 IAU SOFA Board.  See notes at end.
+*/
+{
+   int j, ly, my;
+   long iypmy;
+
+/* Earliest year allowed (4800BC) */
+   const int IYMIN = -4799;
+
+/* Month lengths in days */
+   static const int mtab[]
+                     = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+
+/* Preset status. */
+   j = 0;
+
+/* Validate year and month. */
+   if (iy < IYMIN) return -1;
+   if (im < 1 || im > 12) return -2;
+
+/* If February in a leap year, 1, otherwise 0. */
+   ly = ((im == 2) && !(iy%4) && (iy%100 || !(iy%400)));
+
+/* Validate day, taking into account leap years. */
+   if ( (id < 1) || (id > (mtab[im-1] + ly))) j = -3;
+
+/* Return result. */
+   my = (im - 14) / 12;
+   iypmy = (long) (iy + my);
+   *djm0 = DJM0;
+   *djm = (double)((1461L * (iypmy + 4800L)) / 4L
+                 + (367L * (long) (im - 2 - 12 * my)) / 12L
+                 - (3L * ((iypmy + 4900L) / 100L)) / 4L
+                 + (long) id - 2432076L);
+
+/* Return status. */
+   return j;
+
+/* Finished. */
+
+/*----------------------------------------------------------------------
+**
+**  Copyright (C) 2023
+**  Standards of Fundamental Astronomy Board
+**  of the International Astronomical Union.
+**
+**  =====================
+**  SOFA Software License
+**  =====================
+**
+**  NOTICE TO USER:
+**
+**  BY USING THIS SOFTWARE YOU ACCEPT THE FOLLOWING SIX TERMS AND
+**  CONDITIONS WHICH APPLY TO ITS USE.
+**
+**  1. The Software is owned by the IAU SOFA Board ("SOFA").
+**
+**  2. Permission is granted to anyone to use the SOFA software for any
+**     purpose, including commercial applications, free of charge and
+**     without payment of royalties, subject to the conditions and
+**     restrictions listed below.
+**
+**  3. You (the user) may copy and distribute SOFA source code to others,
+**     and use and adapt its code and algorithms in your own software,
+**     on a world-wide, royalty-free basis.  That portion of your
+**     distribution that does not consist of intact and unchanged copies
+**     of SOFA source code files is a "derived work" that must comply
+**     with the following requirements:
+**
+**     a) Your work shall be marked or carry a statement that it
+**        (i) uses routines and computations derived by you from
+**        software provided by SOFA under license to you; and
+**        (ii) does not itself constitute software provided by and/or
+**        endorsed by SOFA.
+**
+**     b) The source code of your derived work must contain descriptions
+**        of how the derived work is based upon, contains and/or differs
+**        from the original SOFA software.
+**
+**     c) The names of all routines in your derived work shall not
+**        include the prefix "iau" or "sofa" or trivial modifications
+**        thereof such as changes of case.
+**
+**     d) The origin of the SOFA components of your derived work must
+**        not be misrepresented;  you must not claim that you wrote the
+**        original software, nor file a patent application for SOFA
+**        software or algorithms embedded in the SOFA software.
+**
+**     e) These requirements must be reproduced intact in any source
+**        distribution and shall apply to anyone to whom you have
+**        granted a further right to modify the source code of your
+**        derived work.
+**
+**     Note that, as originally distributed, the SOFA software is
+**     intended to be a definitive implementation of the IAU standards,
+**     and consequently third-party modifications are discouraged.  All
+**     variations, no matter how minor, must be explicitly marked as
+**     such, as explained above.
+**
+**  4. You shall not cause the SOFA software to be brought into
+**     disrepute, either by misuse, or use for inappropriate tasks, or
+**     by inappropriate modification.
+**
+**  5. The SOFA software is provided "as is" and SOFA makes no warranty
+**     as to its use or performance.   SOFA does not and cannot warrant
+**     the performance or results which the user may obtain by using the
+**     SOFA software.  SOFA makes no warranties, express or implied, as
+**     to non-infringement of third party rights, merchantability, or
+**     fitness for any particular purpose.  In no event will SOFA be
+**     liable to the user for any consequential, incidental, or special
+**     damages, including any lost profits or lost savings, even if a
+**     SOFA representative has been advised of such damages, or for any
+**     claim by any third party.
+**
+**  6. The provision of any version of the SOFA software under the terms
+**     and conditions specified herein does not imply that future
+**     versions will also be made available under the same terms and
+**     conditions.
+*
+**  In any published work or commercial product which uses the SOFA
+**  software directly, acknowledgement (see www.iausofa.org) is
+**  appreciated.
+**
+**  Correspondence concerning SOFA software should be addressed as
+**  follows:
+**
+**      By email:  sofa@ukho.gov.uk
+**      By post:   IAU SOFA Center
+**                 HM Nautical Almanac Office
+**                 UK Hydrographic Office
+**                 Admiralty Way, Taunton
+**                 Somerset, TA1 2DN
+**                 United Kingdom
+**
+**--------------------------------------------------------------------*/
 }

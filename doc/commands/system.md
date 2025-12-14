@@ -258,7 +258,7 @@ This command ignores that gap, so the Julian day number given by this command fo
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
 20000101 JDN
-@ Expecting 2 451 545
+@ Expecting 2 451 544 ¹/₂
 ```
 
 ## Datefromjuliandaynumber
@@ -270,7 +270,7 @@ It is the opposite of the `JDN` command.
 
 ```rpl
 2451545 JDN→
-@ Expecting Sat 1/Jan/2000
+@ Expecting Sat 1/Jan/2000, 12:00:00
 ```
 
 ## ACK
