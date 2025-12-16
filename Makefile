@@ -589,11 +589,11 @@ $(BUILD)/.exists:
 
 
 $(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
-	cd $(dir $(CRCFIX)); $(MAKE)
+	cd $(dir $(CRCFIX)) && unset TARGET && $(MAKE) TARGET=opt
 $(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
-	cd $(dir $(CRC32)); $(MAKE) TARGET=opt
+	cd $(dir $(CRC32)) && unset TARGET && $(MAKE) TARGET=opt
 $(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
-	cd $(dir $(DECIMIZE)); $(MAKE) TARGET=opt
+	cd $(dir $(DECIMIZE)) && unset TARGET && $(MAKE) TARGET=opt
 
 
 #######################################

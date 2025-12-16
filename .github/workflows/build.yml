@@ -1,0 +1,371 @@
+name: Build DB48X
+
+on:
+  push:
+    branches: [ stable, dev ]
+  pull_request:
+    branches: [ stable, dev ]
+  workflow_dispatch:
+
+jobs:
+  build-simulator-macos:
+    name: Build Simulator (macOS)
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qtmultimedia'
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-macos
+        path: |
+          sim/db48x.app
+          help/
+
+  build-simulator-linux:
+    name: Build Simulator (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.5.3'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-linux
+        path: |
+          sim/db48x
+          help/
+
+  build-simulator-windows:
+    name: Build Simulator (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+
+    - name: Build simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make sim
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-windows
+        path: |
+          sim/db48x.exe
+          sim/*.dll
+          help/
+
+  build-color-simulator-macos:
+    name: Build Color DM32 Simulator (macOS)
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qtmultimedia'
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-macos
+        path: |
+          sim/db50x.app
+          help/
+
+  build-color-simulator-linux:
+    name: Build Color DM32 Simulator (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.5.3'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-linux
+        path: |
+          sim/db50x
+          help/
+
+  build-color-simulator-windows:
+    name: Build Color DM32 Simulator (Windows)
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+
+    - name: Build color DM32 simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make color-dm32-sim
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-windows
+        path: |
+          sim/db50x.exe
+          sim/*.dll
+          help/
+
+  build-wasm:
+    name: Build WebAssembly
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: 'latest'
+
+    - name: Verify Emscripten
+      run: |
+        emcc --version
+
+    - name: Build WASM
+      shell: bash
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make SHELL=/bin/bash wasm
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-wasm
+        path: |
+          wasm/db48x.js
+          wasm/db48x.wasm
+          wasm/*.html
+          help/
+
+  build-dm42-firmware:
+    name: Build DM42 Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM42 firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make all || make all
+
+    - name: Upload DM42 firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-dm42-firmware
+        path: |
+          db48x.pgm
+          db48x_qspi.bin
+          help/db48x.md
+          help/db48x.idx
+
+  build-dm32-firmware:
+    name: Build DM32 Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM32 firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make dm32-all || make dm32-all
+
+    - name: Upload DM32 firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-dm32-firmware
+        path: |
+          db50x.pg5
+          db50x_qspi.bin
+          help/db50x.md
+          help/db50x.idx
+
+  build-release-package:
+    name: Create Release Package
+    runs-on: ubuntu-latest
+    needs: [
+      build-simulator-macos,
+      build-simulator-linux,
+      build-simulator-windows,
+      build-color-simulator-macos,
+      build-color-simulator-linux,
+      build-color-simulator-windows,
+      build-wasm,
+      build-dm42-firmware,
+      build-dm32-firmware
+    ]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/stable' || github.ref == 'refs/heads/dev')
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Create release archives
+      run: |
+        cd db48x-dm42-firmware
+        tar czf ../db48x-dm42-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-dm32-firmware
+        tar czf ../db50x-dm32-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db48x-wasm
+        tar czf ../db48x-wasm-${GITHUB_SHA:0:8}.tar.gz *
+        cd ..
+
+    - name: Upload release packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-packages
+        path: |
+          db48x-dm42-*.tar.gz
+          db50x-dm32-*.tar.gz
+          db48x-wasm-*.tar.gz
