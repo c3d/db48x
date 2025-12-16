@@ -42,6 +42,13 @@
 #include <regex.h>
 #include <stdio.h>
 
+// Windows compatibility for POSIX random number functions
+#ifdef _WIN32
+#include <cstdlib>
+inline void srand48(long seed) { srand((unsigned int)seed); }
+inline long lrand48() { return ((long)rand() << 16) | rand(); }
+#endif
+
 extern bool run_tests;
 volatile uint test_command = 0;
 

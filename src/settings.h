@@ -318,6 +318,9 @@ template <>
 int setting_value<int>(object_p obj, int init);
 
 template <>
+int16_t setting_value<int16_t>(object_p obj, int16_t init);
+
+template <>
 object::id setting_value<object::id>(object_p obj, object::id init);
 
 
