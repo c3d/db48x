@@ -1,0 +1,223 @@
+stages:
+  - build
+  - package
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# macOS Simulator Builds
+build-simulator-macos:
+  stage: build
+  tags:
+    - macos
+  before_script:
+    - brew install qt@6
+    - export PATH="/usr/local/opt/qt@6/bin:$PATH"
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make sim
+  artifacts:
+    name: "db48x-simulator-macos-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db48x.app
+      - help/
+    expire_in: 30 days
+
+build-color-simulator-macos:
+  stage: build
+  tags:
+    - macos
+  before_script:
+    - brew install qt@6
+    - export PATH="/usr/local/opt/qt@6/bin:$PATH"
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make color-dm32-sim
+  artifacts:
+    name: "db50x-color-simulator-macos-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db50x.app
+      - help/
+    expire_in: 30 days
+
+# Linux Simulator Builds
+build-simulator-linux:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git python3 python3-pip libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel pkgconfig xcb-util-wm-devel xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel
+    - python3 -m pip install aqtinstall
+    - python3 -m aqt install-qt linux desktop 6.5.3 --outputdir /opt/Qt --modules qtmultimedia
+    - export PATH="/opt/Qt/6.5.3/gcc_64/bin:$PATH"
+    - export QT_QPA_PLATFORM=offscreen
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make sim
+  artifacts:
+    name: "db48x-simulator-linux-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db48x
+      - help/
+    expire_in: 30 days
+
+build-color-simulator-linux:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git python3 python3-pip libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel pkgconfig xcb-util-wm-devel xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel
+    - python3 -m pip install aqtinstall
+    - python3 -m aqt install-qt linux desktop 6.5.3 --outputdir /opt/Qt --modules qtmultimedia
+    - export PATH="/opt/Qt/6.5.3/gcc_64/bin:$PATH"
+    - export QT_QPA_PLATFORM=offscreen
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make color-dm32-sim
+  artifacts:
+    name: "db50x-color-simulator-linux-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db50x
+      - help/
+    expire_in: 30 days
+
+# Windows Simulator Builds
+build-simulator-windows:
+  stage: build
+  tags:
+    - windows
+  cache:
+    key: msys2-packages-v1
+    paths:
+      - C:\tools\msys64\var\cache\pacman\pkg\
+  before_script:
+    - choco install -y msys2
+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-freetype mingw-w64-x86_64-pkg-config mingw-w64-x86_64-libgnurx mingw-w64-x86_64-qt6-base mingw-w64-x86_64-qt6-declarative mingw-w64-x86_64-qt6-multimedia"
+    - $env:PATH = "C:\tools\msys64\mingw64\bin;$env:PATH"
+  script:
+    - echo $env:CI_PIPELINE_IID > .build_id
+    - mingw32-make sim
+  artifacts:
+    name: "db48x-simulator-windows-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db48x.exe
+      - sim/*.dll
+      - help/
+    expire_in: 30 days
+
+build-color-simulator-windows:
+  stage: build
+  tags:
+    - windows
+  cache:
+    key: msys2-packages-v1
+    paths:
+      - C:\tools\msys64\var\cache\pacman\pkg\
+  before_script:
+    - choco install -y msys2
+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm git mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-freetype mingw-w64-x86_64-pkg-config mingw-w64-x86_64-libgnurx mingw-w64-x86_64-qt6-base mingw-w64-x86_64-qt6-declarative mingw-w64-x86_64-qt6-multimedia"
+    - $env:PATH = "C:\tools\msys64\mingw64\bin;$env:PATH"
+  script:
+    - echo $env:CI_PIPELINE_IID > .build_id
+    - mingw32-make color-dm32-sim
+  artifacts:
+    name: "db50x-color-simulator-windows-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - sim/db50x.exe
+      - sim/*.dll
+      - help/
+    expire_in: 30 days
+
+# WebAssembly Build
+build-wasm:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git python3 curl freetype-devel pkgconfig
+    - git clone https://github.com/emscripten-core/emsdk.git
+    - cd emsdk
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - cd ..
+  script:
+    - source emsdk/emsdk_env.sh
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make SHELL=/bin/bash wasm
+  artifacts:
+    name: "db48x-wasm-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - wasm/db48x.js
+      - wasm/db48x.wasm
+      - wasm/*.html
+      - help/
+    expire_in: 30 days
+
+# DM42 Firmware Build
+build-dm42-firmware:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git arm-none-eabi-gcc-cs arm-none-eabi-binutils-cs arm-none-eabi-newlib freetype-devel pkgconfig
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make all || make all
+  artifacts:
+    name: "db48x-dm42-firmware-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - db48x.pgm
+      - db48x_qspi.bin
+      - help/db48x.md
+      - help/db48x.idx
+    expire_in: 30 days
+
+# DM32 Firmware Build
+build-dm32-firmware:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git arm-none-eabi-gcc-cs arm-none-eabi-binutils-cs arm-none-eabi-newlib freetype-devel pkgconfig
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make dm32-all || make dm32-all
+  artifacts:
+    name: "db50x-dm32-firmware-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - db50x.pg5
+      - db50x_qspi.bin
+      - help/db50x.md
+      - help/db50x.idx
+    expire_in: 30 days
+
+# Release Package
+build-release-package:
+  stage: package
+  image: fedora:latest
+  tags:
+    - docker
+  dependencies:
+    - build-dm42-firmware
+    - build-dm32-firmware
+    - build-wasm
+  script:
+    - tar czf db48x-dm42-${CI_COMMIT_SHORT_SHA}.tar.gz db48x.pgm db48x_qspi.bin help/db48x.md help/db48x.idx
+    - tar czf db50x-dm32-${CI_COMMIT_SHORT_SHA}.tar.gz db50x.pg5 db50x_qspi.bin help/db50x.md help/db50x.idx
+    - tar czf db48x-wasm-${CI_COMMIT_SHORT_SHA}.tar.gz wasm/
+  artifacts:
+    name: "release-packages-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - db48x-dm42-*.tar.gz
+      - db50x-dm32-*.tar.gz
+      - db48x-wasm-*.tar.gz
+    expire_in: 90 days
+  only:
+    - stable
+    - dev
+
