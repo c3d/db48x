@@ -40,7 +40,6 @@
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
-#include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
