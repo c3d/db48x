@@ -121,11 +121,44 @@ build-simulator-windows:
   script:
     - echo $env:CI_PIPELINE_IID > .build_id
     - mingw32-make sim
+    - cd sim/debug
+    - windeployqt6 db48x.exe
+    - |
+      # Copy MinGW runtime and MSYS2 dependencies
+      Copy-Item C:\tools\msys64\mingw64\bin\libgcc_s_seh-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libstdc++-6.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libwinpthread-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libsystre-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libtre-5.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libintl-8.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libiconv-2.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libb2-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libdouble-conversion.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicuin*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicuuc*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicudt*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpcre2-16-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\zlib1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libzstd.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libfreetype-6.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libharfbuzz-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libmd4c.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpng16-16.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbrotlidec.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbrotlicommon.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbz2-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libglib-2.0-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libgraphite2.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpcre2-8-0.dll .
+    - cd ../..
   artifacts:
     name: "db48x-simulator-windows-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/release/db48x.exe
-      - sim/release/*.dll
+      - sim/debug/db48x.exe
+      - sim/debug/*.dll
+      - sim/debug/platforms/
+      - sim/debug/imageformats/
+      - sim/debug/tls/
       - help/
     expire_in: 30 days
 
@@ -144,11 +177,44 @@ build-color-simulator-windows:
   script:
     - echo $env:CI_PIPELINE_IID > .build_id
     - mingw32-make color-dm32-sim
+    - cd sim/debug
+    - windeployqt6 db50x.exe
+    - |
+      # Copy MinGW runtime and MSYS2 dependencies
+      Copy-Item C:\tools\msys64\mingw64\bin\libgcc_s_seh-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libstdc++-6.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libwinpthread-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libsystre-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libtre-5.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libintl-8.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libiconv-2.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libb2-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libdouble-conversion.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicuin*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicuuc*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libicudt*.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpcre2-16-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\zlib1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libzstd.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libfreetype-6.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libharfbuzz-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libmd4c.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpng16-16.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbrotlidec.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbrotlicommon.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libbz2-1.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libglib-2.0-0.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libgraphite2.dll .
+      Copy-Item C:\tools\msys64\mingw64\bin\libpcre2-8-0.dll .
+    - cd ../..
   artifacts:
     name: "db50x-color-simulator-windows-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/release/db50x.exe
-      - sim/release/*.dll
+      - sim/debug/db50x.exe
+      - sim/debug/*.dll
+      - sim/debug/platforms/
+      - sim/debug/imageformats/
+      - sim/debug/tls/
       - help/
     expire_in: 30 days
 
@@ -175,6 +241,111 @@ build-wasm:
       - wasm/db48x.js
       - wasm/db48x.wasm
       - wasm/*.html
+      - help/
+    expire_in: 30 days
+
+# Android Builds
+build-android:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git java-17-openjdk-devel wget unzip freetype-devel pkgconfig
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    - export PATH=$JAVA_HOME/bin:$PATH
+    # Install Android SDK
+    - wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+    - mkdir -p $HOME/android-sdk/cmdline-tools
+    - unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
+    - mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+    - export ANDROID_SDK_ROOT=$HOME/android-sdk
+    - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+    - yes | sdkmanager --licenses || true
+    - sdkmanager --install "ndk;26.1.10909125" "platforms;android-35" "build-tools;35.0.0"
+    - export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/26.1.10909125
+    # Install Qt for Android
+    - python3 -m pip install aqtinstall
+    - python3 -m aqt install-qt linux android 6.8.1 android_arm64_v8a --outputdir $HOME/Qt --modules qtmultimedia
+    - python3 -m aqt install-qt linux desktop 6.8.1 gcc_64 --outputdir $HOME/Qt
+    - export Qt6_DIR=$HOME/Qt/6.8.1/android_arm64_v8a
+    - export QT_HOST_PATH=$HOME/Qt/6.8.1/gcc_64
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make src/dmcp/version.h
+    - make sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
+    - cd recorder && make TARGET=opt && cd ..
+    - |
+      if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+        mkdir -p $HOME/.local
+        echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
+        make android
+      else
+        cd sim && \
+          $Qt6_DIR/bin/qmake -spec android-clang db48x.pro && \
+          make VARIANT=android && \
+          mkdir -p ../android/libs/arm64-v8a && \
+          cp libdb48x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
+          $QT_HOST_PATH/bin/androiddeployqt \
+            --input android-db48x-deployment-settings.json \
+            --output ../android --gradle --aab
+      fi
+  artifacts:
+    name: "db48x-android-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - android/*.aab
+      - help/
+    expire_in: 30 days
+
+build-color-android:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git java-17-openjdk-devel wget unzip freetype-devel pkgconfig
+    - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+    - export PATH=$JAVA_HOME/bin:$PATH
+    # Install Android SDK
+    - wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+    - mkdir -p $HOME/android-sdk/cmdline-tools
+    - unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
+    - mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+    - export ANDROID_SDK_ROOT=$HOME/android-sdk
+    - export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+    - yes | sdkmanager --licenses || true
+    - sdkmanager --install "ndk;26.1.10909125" "platforms;android-35" "build-tools;35.0.0"
+    - export ANDROID_NDK_ROOT=$ANDROID_SDK_ROOT/ndk/26.1.10909125
+    # Install Qt for Android
+    - python3 -m pip install aqtinstall
+    - python3 -m aqt install-qt linux android 6.8.1 android_arm64_v8a --outputdir $HOME/Qt --modules qtmultimedia
+    - python3 -m aqt install-qt linux desktop 6.8.1 gcc_64 --outputdir $HOME/Qt
+    - export Qt6_DIR=$HOME/Qt/6.8.1/android_arm64_v8a
+    - export QT_HOST_PATH=$HOME/Qt/6.8.1/gcc_64
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make src/dmcp/version.h
+    - make COLOR=color sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
+    - cd recorder && make TARGET=opt && cd ..
+    - |
+      if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+        mkdir -p $HOME/.local
+        echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
+        make color-android
+      else
+        cd sim && \
+          $Qt6_DIR/bin/qmake -spec android-clang db50x.pro && \
+          make VARIANT=android && \
+          mkdir -p ../android/libs/arm64-v8a && \
+          cp libdb50x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
+          $QT_HOST_PATH/bin/androiddeployqt \
+            --input android-db50x-deployment-settings.json \
+            --output ../android --gradle --aab
+      fi
+  artifacts:
+    name: "db50x-android-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - android/*.aab
       - help/
     expire_in: 30 days
 
@@ -223,19 +394,24 @@ build-release-package:
   dependencies:
     - build-dm42-firmware
     - build-dm32-firmware
+    - build-android
+    - build-color-android
     - build-wasm
   script:
     - tar czf db48x-dm42-${CI_COMMIT_SHORT_SHA}.tar.gz db48x.pgm db48x_qspi.bin help/db48x.md help/db48x.idx
     - tar czf db50x-dm32-${CI_COMMIT_SHORT_SHA}.tar.gz db50x.pg5 db50x_qspi.bin help/db50x.md help/db50x.idx
+    - tar czf db48x-android-${CI_COMMIT_SHORT_SHA}.tar.gz android/*.aab
+    - tar czf db50x-android-${CI_COMMIT_SHORT_SHA}.tar.gz android/*.aab
     - tar czf db48x-wasm-${CI_COMMIT_SHORT_SHA}.tar.gz wasm/
   artifacts:
     name: "release-packages-$CI_COMMIT_SHORT_SHA"
     paths:
       - db48x-dm42-*.tar.gz
       - db50x-dm32-*.tar.gz
+      - db48x-android-*.tar.gz
+      - db50x-android-*.tar.gz
       - db48x-wasm-*.tar.gz
     expire_in: 90 days
   only:
     - stable
     - dev
-
