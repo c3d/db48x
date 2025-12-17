@@ -87,16 +87,22 @@ android {
     signingConfigs {
         release {
             def keystorePath = System.getenv("KEYSTORE_PATH") ?: System.getProperty("user.home") + "/.local/android_release.keystore"
-            storeFile file(keystorePath)
-            storePassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
-            keyAlias "db48x"
-            keyPassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
+            def keystoreFile = file(keystorePath)
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
+                keyAlias "db48x"
+                keyPassword System.getenv("ANDROID_KEYSTORE_PASS") ?: ""
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            def keystorePath = System.getenv("KEYSTORE_PATH") ?: System.getProperty("user.home") + "/.local/android_release.keystore"
+            if (file(keystorePath).exists()) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

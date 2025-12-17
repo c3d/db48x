@@ -65,28 +65,44 @@ Main build workflow that runs on every push and pull request to main/master/deve
    - Build ID: Uses GitHub Actions run number
    - Artifacts: `db48x.js`, `db48x.wasm`, HTML files, help files
 
-8. **build-dm42-firmware** - Builds DM42 firmware
+8. **build-android** - Builds Android app for db48x
+   - Platform: Ubuntu Linux (latest)
+   - Requirements: JDK 17, Qt 6.8.1 for Android, Android SDK/NDK, libfreetype6-dev, pkg-config
+   - Target: `make android` (signed) or direct qmake/androiddeployqt (unsigned)
+   - Build ID: Uses GitHub Actions run number
+   - Artifacts: `.aab` Android App Bundle, help files
+   - Optional: Signing with Android keystore (if `ANDROID_KEYSTORE_DATA` secret is configured)
+
+9. **build-color-android** - Builds Android app for db50x
+   - Platform: Ubuntu Linux (latest)
+   - Requirements: JDK 17, Qt 6.8.1 for Android, Android SDK/NDK, libfreetype6-dev, pkg-config
+   - Target: `make color-android` (signed) or direct qmake/androiddeployqt (unsigned)
+   - Build ID: Uses GitHub Actions run number
+   - Artifacts: `.aab` Android App Bundle, help files
+   - Optional: Signing with Android keystore (if `ANDROID_KEYSTORE_DATA` secret is configured)
+
+10. **build-dm42-firmware** - Builds DM42 firmware
    - Platform: Ubuntu Linux (latest)
    - Requirements: ARM GCC toolchain (gcc-arm-none-eabi), libfreetype6-dev, pkg-config
    - Target: `make all` (runs twice for CRC verification)
    - Build ID: Uses GitHub Actions run number
-   - Artifacts: `db48x.pgm`, `db48x_qspi.bin`, help files
+   - Artifacts: Distribution tarball (`db48x-v*.tgz`) with `.pgm`, `_qspi.bin`, help files
 
-9. **build-dm32-firmware** - Builds DM32 firmware
+11. **build-dm32-firmware** - Builds DM32 firmware
    - Platform: Ubuntu Linux (latest)
    - Requirements: ARM GCC toolchain (gcc-arm-none-eabi), libfreetype6-dev, pkg-config
    - Target: `make dm32-all` (runs twice for CRC verification)
    - Build ID: Uses GitHub Actions run number
-   - Artifacts: `db50x.pg5`, `db50x_qspi.bin`, help files
+   - Artifacts: Distribution tarball (`db50x-v*.tgz`) with `.pg5`, `_qspi.bin`, help files
 
-10. **build-release-package** - Creates release packages
+12. **build-release-package** - Creates release packages
     - Runs only on pushes to main/master
     - Depends on all other build jobs
     - Creates `.tar.gz` archives of firmware builds
 
 ## Code Signing
 
-The workflows support **optional** code signing for macOS and Windows builds:
+The workflows support **optional** code signing for macOS, Windows, and Android builds:
 
 ### macOS
 - **With Apple Developer certificate**: Uses [lando/code-sign-action](https://github.com/lando/code-sign-action) for proper signing and notarization
@@ -95,6 +111,10 @@ The workflows support **optional** code signing for macOS and Windows builds:
 ### Windows
 - **With code signing certificate**: Uses [lando/code-sign-action](https://github.com/lando/code-sign-action) for proper signing
 - **Without certificate**: Executables remain unsigned (still functional)
+
+### Android
+- **With Android keystore**: Produces signed AAB ready for Google Play Store
+- **Without keystore**: Produces unsigned AAB (can be signed later)
 
 ### Setup
 To enable proper code signing, add these secrets to your repository:
@@ -110,17 +130,22 @@ To enable proper code signing, add these secrets to your repository:
 - `WINDOWS_CERT_DATA` - Base64 encoded .pfx certificate
 - `WINDOWS_CERT_PASSWORD` - Certificate password
 
-See [CODE_SIGNING.md](CODE_SIGNING.md) for detailed setup instructions.
+**For Android:**
+- `ANDROID_KEYSTORE_DATA` - Base64 encoded .keystore or .jks file
+- `ANDROID_KEYSTORE_PASS` - Keystore password
+
+See [CODE_SIGNING.md](CODE_SIGNING.md) and [../ANDROID_BUILD.md](../ANDROID_BUILD.md) for detailed setup instructions.
 
 ## Artifacts
 
 Build artifacts are automatically uploaded and can be downloaded from the Actions tab in GitHub:
 
-- **macOS simulators**: `.app` bundles ready to run
+- **macOS simulators**: `.app` bundles ready to run (signed or ad-hoc)
 - **Linux simulators**: Native binaries
-- **Windows simulators**: `.exe` executables with required DLLs
+- **Windows simulators**: `.exe` executables with required DLLs (signed or unsigned)
+- **Android apps**: `.aab` Android App Bundles for Google Play (signed or unsigned)
 - **WASM builds**: `.js`, `.wasm`, and HTML files for web deployment
-- **Firmware builds**: `.pgm`/`.pg5` and `_qspi.bin` files
+- **Firmware builds**: Distribution tarballs (`.tgz`) with `.pgm`/`.pg5` and `_qspi.bin` files
 - **Help files**: `.md` and `.idx` included with all builds
 
 ## Manual Triggering
