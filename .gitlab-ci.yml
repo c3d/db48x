@@ -16,6 +16,17 @@ build-simulator-macos:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make sim
+    - |
+      if [ -n "$APPLE_CERT_DATA" ]; then
+        echo "Using proper Apple Developer code signing"
+        # Note: lando/code-sign-action is GitHub Actions specific
+        # For GitLab, you'd need to implement similar signing logic or use a script
+        # For now, fall back to ad-hoc signing
+        codesign --force --deep --sign - sim/db48x.app
+      else
+        echo "Using ad-hoc code signing (no Apple Developer certificate)"
+        codesign --force --deep --sign - sim/db48x.app
+      fi
   artifacts:
     name: "db48x-simulator-macos-$CI_COMMIT_SHORT_SHA"
     paths:
@@ -33,6 +44,17 @@ build-color-simulator-macos:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make color-dm32-sim
+    - |
+      if [ -n "$APPLE_CERT_DATA" ]; then
+        echo "Using proper Apple Developer code signing"
+        # Note: lando/code-sign-action is GitHub Actions specific
+        # For GitLab, you'd need to implement similar signing logic or use a script
+        # For now, fall back to ad-hoc signing
+        codesign --force --deep --sign - sim/db50x.app
+      else
+        echo "Using ad-hoc code signing (no Apple Developer certificate)"
+        codesign --force --deep --sign - sim/db50x.app
+      fi
   artifacts:
     name: "db50x-color-simulator-macos-$CI_COMMIT_SHORT_SHA"
     paths:
@@ -102,8 +124,8 @@ build-simulator-windows:
   artifacts:
     name: "db48x-simulator-windows-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/db48x.exe
-      - sim/*.dll
+      - sim/release/db48x.exe
+      - sim/release/*.dll
       - help/
     expire_in: 30 days
 
@@ -125,8 +147,8 @@ build-color-simulator-windows:
   artifacts:
     name: "db50x-color-simulator-windows-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/db50x.exe
-      - sim/*.dll
+      - sim/release/db50x.exe
+      - sim/release/*.dll
       - help/
     expire_in: 30 days
 
@@ -167,13 +189,11 @@ build-dm42-firmware:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make all || make all
+    - make dist || make dist
   artifacts:
     name: "db48x-dm42-firmware-$CI_COMMIT_SHORT_SHA"
     paths:
-      - db48x.pgm
-      - db48x_qspi.bin
-      - help/db48x.md
-      - help/db48x.idx
+      - db48x-v*.tgz
     expire_in: 30 days
 
 # DM32 Firmware Build
@@ -187,13 +207,11 @@ build-dm32-firmware:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make dm32-all || make dm32-all
+    - make dm32-dist || make dm32-dist
   artifacts:
     name: "db50x-dm32-firmware-$CI_COMMIT_SHORT_SHA"
     paths:
-      - db50x.pg5
-      - db50x_qspi.bin
-      - help/db50x.md
-      - help/db50x.idx
+      - db50x-v*.tgz
     expire_in: 30 days
 
 # Release Package
