@@ -32,6 +32,27 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make sim
 
+    - name: Code sign macOS app (with Apple Developer certificate)
+      if: ${{ env.APPLE_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/db48x.app
+        certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+        certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+        apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+        apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+        apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+        apple-product-id: org.db48x.simulator
+      env:
+        APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+
+    - name: Code sign macOS app (ad-hoc fallback)
+      if: ${{ env.APPLE_CERT_DATA == '' }}
+      run: |
+        codesign --force --deep --sign - sim/db48x.app
+      env:
+        APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v4
       with:
@@ -109,13 +130,23 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make sim
 
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/release/db48x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+      env:
+        WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v4
       with:
         name: db48x-simulator-windows
         path: |
-          sim/db48x.exe
-          sim/*.dll
+          sim/release/db48x.exe
+          sim/release/*.dll
           help/
 
   build-color-simulator-macos:
@@ -141,6 +172,27 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
+
+    - name: Code sign macOS app (with Apple Developer certificate)
+      if: ${{ env.APPLE_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/db50x.app
+        certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+        certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+        apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+        apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+        apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+        apple-product-id: org.db48x.color-simulator
+      env:
+        APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+
+    - name: Code sign macOS app (ad-hoc fallback)
+      if: ${{ env.APPLE_CERT_DATA == '' }}
+      run: |
+        codesign --force --deep --sign - sim/db50x.app
+      env:
+        APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v4
@@ -219,13 +271,23 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make color-dm32-sim
 
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/release/db50x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+      env:
+        WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v4
       with:
         name: db50x-color-simulator-windows
         path: |
-          sim/db50x.exe
-          sim/*.dll
+          sim/release/db50x.exe
+          sim/release/*.dll
           help/
 
   build-wasm:
@@ -287,16 +349,13 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make all || make all
+        make dist || make dist
 
     - name: Upload DM42 firmware artifacts
       uses: actions/upload-artifact@v4
       with:
         name: db48x-dm42-firmware
-        path: |
-          db48x.pgm
-          db48x_qspi.bin
-          help/db48x.md
-          help/db48x.idx
+        path: db48x-v*.tgz
 
   build-dm32-firmware:
     name: Build DM32 Firmware
@@ -317,16 +376,13 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         make dm32-all || make dm32-all
+        make dm32-dist || make dm32-dist
 
     - name: Upload DM32 firmware artifacts
       uses: actions/upload-artifact@v4
       with:
         name: db50x-dm32-firmware
-        path: |
-          db50x.pg5
-          db50x_qspi.bin
-          help/db50x.md
-          help/db50x.idx
+        path: db50x-v*.tgz
 
   build-release-package:
     name: Create Release Package

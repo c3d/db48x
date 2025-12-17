@@ -84,6 +84,34 @@ Main build workflow that runs on every push and pull request to main/master/deve
     - Depends on all other build jobs
     - Creates `.tar.gz` archives of firmware builds
 
+## Code Signing
+
+The workflows support **optional** code signing for macOS and Windows builds:
+
+### macOS
+- **With Apple Developer certificate**: Uses [lando/code-sign-action](https://github.com/lando/code-sign-action) for proper signing and notarization
+- **Without certificate**: Falls back to ad-hoc signing (works for personal use)
+
+### Windows
+- **With code signing certificate**: Uses [lando/code-sign-action](https://github.com/lando/code-sign-action) for proper signing
+- **Without certificate**: Executables remain unsigned (still functional)
+
+### Setup
+To enable proper code signing, add these secrets to your repository:
+
+**For macOS:**
+- `APPLE_CERT_DATA` - Base64 encoded .p12 certificate
+- `APPLE_CERT_PASSWORD` - Certificate password
+- `APPLE_TEAM_ID` - Your Apple Team ID
+- `APPLE_NOTARY_USER` - Apple ID email
+- `APPLE_NOTARY_PASSWORD` - App-specific password
+
+**For Windows:**
+- `WINDOWS_CERT_DATA` - Base64 encoded .pfx certificate
+- `WINDOWS_CERT_PASSWORD` - Certificate password
+
+See [CODE_SIGNING.md](CODE_SIGNING.md) for detailed setup instructions.
+
 ## Artifacts
 
 Build artifacts are automatically uploaded and can be downloaded from the Actions tab in GitHub:
