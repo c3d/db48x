@@ -385,10 +385,29 @@ build-dm32-firmware:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make dm32-all || make dm32-all
     - make dm32-dist || make dm32-dist
+    - mv db50x-v*.tgz db50x-dm32-firmware.tgz
   artifacts:
     name: "db50x-dm32-firmware-$CI_COMMIT_SHORT_SHA"
     paths:
-      - db50x-v*.tgz
+      - db50x-dm32-firmware.tgz
+    expire_in: 30 days
+
+build-dm42n-firmware:
+  stage: build
+  image: fedora:latest
+  tags:
+    - docker
+  before_script:
+    - dnf install -y @development-tools git arm-none-eabi-gcc-cs arm-none-eabi-binutils-cs arm-none-eabi-newlib freetype-devel pkgconfig
+  script:
+    - echo "$CI_PIPELINE_IID" > .build_id
+    - make dm42n-all || make dm42n-all
+    - make dm42n-dist || make dm42n-dist
+    - mv db50x-v*.tgz db50x-dm42n-firmware.tgz
+  artifacts:
+    name: "db50x-dm42n-firmware-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - db50x-dm42n-firmware.tgz
     expire_in: 30 days
 
 # Release Package
@@ -400,20 +419,23 @@ build-release-package:
   dependencies:
     - build-dm42-firmware
     - build-dm32-firmware
+    - build-dm42n-firmware
     - build-android
     - build-color-android
     - build-wasm
   script:
-    - tar czf db48x-dm42-${CI_COMMIT_SHORT_SHA}.tar.gz db48x.pgm db48x_qspi.bin help/db48x.md help/db48x.idx
-    - tar czf db50x-dm32-${CI_COMMIT_SHORT_SHA}.tar.gz db50x.pg5 db50x_qspi.bin help/db50x.md help/db50x.idx
-    - tar czf db48x-android-${CI_COMMIT_SHORT_SHA}.tar.gz android/*.aab
-    - tar czf db50x-android-${CI_COMMIT_SHORT_SHA}.tar.gz android/*.aab
-    - tar czf db48x-wasm-${CI_COMMIT_SHORT_SHA}.tar.gz wasm/
+    - cd db48x-dm42-firmware && tar czf ../db48x-dm42-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
+    - cd db50x-dm32-firmware && tar czf ../db50x-dm32-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
+    - cd db50x-dm42n-firmware && tar czf ../db50x-dm42n-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
+    - cd db48x-android && tar czf ../db48x-android-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
+    - cd db50x-android && tar czf ../db50x-android-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
+    - cd db48x-wasm && tar czf ../db48x-wasm-${CI_COMMIT_SHORT_SHA}.tar.gz * && cd ..
   artifacts:
     name: "release-packages-$CI_COMMIT_SHORT_SHA"
     paths:
       - db48x-dm42-*.tar.gz
       - db50x-dm32-*.tar.gz
+      - db50x-dm42n-*.tar.gz
       - db48x-android-*.tar.gz
       - db50x-android-*.tar.gz
       - db48x-wasm-*.tar.gz

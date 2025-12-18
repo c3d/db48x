@@ -616,17 +616,44 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
 
-    - name: Build DM32 and DM42n firmware
+    - name: Build DM32 firmware
       run: |
         echo "${{ github.run_number }}" > .build_id
         make dm32-dist || make dm32-dist
-        mv db50x-v*.tgz db50x-dm32-dm42n-firmware.tgz
+        mv db50x-v*.tgz db50x-dm32-firmware.tgz
 
-    - name: Upload DM32 and DM42n firmware artifacts
+    - name: Upload DM32 firmware artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: db50x-dm32-dm42n-firmware
-        path: db50x-dm32-dm42n-firmware.tgz
+        name: db50x-dm32-firmware
+        path: db50x-dm32-firmware.tgz
+
+  build-dm42n-firmware:
+    name: Build DM42n Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM42n firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make dm42n-dist || make dm42n-dist
+        mv db50x-v*.tgz db50x-dm42n-firmware.tgz
+
+    - name: Upload DM42n firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-dm42n-firmware
+        path: db50x-dm42n-firmware.tgz
 
   build-release-package:
     name: Create Release Package
@@ -642,7 +669,8 @@ jobs:
       build-color-android,
       build-wasm,
       build-dm42-firmware,
-      build-dm32-firmware
+      build-dm32-firmware,
+      build-dm42n-firmware
     ]
     if: github.event_name == 'push' && (github.ref == 'refs/heads/stable' || github.ref == 'refs/heads/dev')
 
@@ -657,8 +685,10 @@ jobs:
       run: |
         cd db48x-dm42-firmware
         tar czf ../db48x-dm42-${GITHUB_SHA:0:8}.tar.gz *
-        cd ../db50x-dm32-dm42n-firmware
-        tar czf ../db50x-dm32-dm42n-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-dm32-firmware
+        tar czf ../db50x-dm32-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-dm42n-firmware
+        tar czf ../db50x-dm42n-${GITHUB_SHA:0:8}.tar.gz *
         cd ../db48x-android
         tar czf ../db48x-android-${GITHUB_SHA:0:8}.tar.gz *
         cd ../db50x-android
@@ -676,7 +706,8 @@ jobs:
         name: release-packages
         path: |
           db48x-dm42-*.tar.gz
-          db50x-dm32-dm42n-*.tar.gz
+          db50x-dm32-*.tar.gz
+          db50x-dm42n-*.tar.gz
           db48x-android-*.tar.gz
           db50x-android-*.tar.gz
           db48x-wasm-*.tar.gz

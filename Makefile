@@ -27,7 +27,10 @@ OPT=release
 MOUNTPOINT=/Volumes/$(VARIANT)/
 EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
 PRODUCT_NAME=$(shell echo $(TARGET) | tr "[:lower:]" "[:upper:]")
-PRODUCT_MACHINE=$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]")
+# For DM42n, use special case with lowercase 'n'
+PRODUCT_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42n,$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]"))
+# For DM42n, select DM42 sections but brand as DM42n
+HELP_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42,$(PRODUCT_MACHINE))
 
 # Android build
 ANDROID_SDK_ROOT?=/opt/homebrew/share/android-commandlinetools
@@ -77,6 +80,9 @@ all: $(PGM_TARGET) help/$(TARGET).md help/$(TARGET).idx
 dm32:	dm32-all
 dm32-%:
 	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm32 TARGET=db50x $*
+dm42n:	dm42n-all
+dm42n-%:
+	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm42n TARGET=db50x $*
 color-%:
 	$(MAKE) COLOR=color $*
 
@@ -267,7 +273,7 @@ fonts/HelpFont.cc: $(TTF2FONT) $(BASE_FONT)
 help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	mkdir -p help && \
 	cat $^ | \
-	sed -e '/<!--- $(PRODUCT_MACHINE) --->/,/<!--- !$(PRODUCT_MACHINE) --->/s/$(PRODUCT_MACHINE)/KEEP_IT/g' \
+	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
 	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
 	    -e '/<!--- KEEP_IT --->/d' \
 	    -e '/<!--- !KEEP_IT --->/d' \
@@ -412,6 +418,12 @@ DEFINES_dm32 = 	DM32 				\
 		DEOPTIMIZE_CATALOG		\
 		MEMORY=500
 
+DEFINES_dm42n = DM42N 				\
+		LGAMMA_CRASHES			\
+		CONFIG_FIXED_BASED_OBJECTS	\
+		DEOPTIMIZE_CATALOG		\
+		MEMORY=500
+
 DEFINES_dm42 = DM42 MEMORY=100
 DEFINES_wasm = $(DEFINES_dm32) SIMULATOR WASM
 
@@ -492,6 +504,7 @@ CFLAGS_debug += -Os -DDEBUG
 CFLAGS_release += $(CFLAGS_release_$(VARIANT))
 CFLAGS_release_dm42 = -Os
 CFLAGS_release_dm32 = -O2
+CFLAGS_release_dm42n = -O2
 CFLAGS_small += -Os
 CFLAGS_fast += -O2
 CFLAGS_faster += -O3
