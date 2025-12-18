@@ -55,13 +55,18 @@ jobs:
       run: |
         codesign --force --deep --sign - sim/db48x.app
 
+    - name: Create macOS archive
+      run: |
+        cd sim
+        cp ../allow-db48x-macos.sh .
+        chmod +x allow-db48x-macos.sh
+        zip -r db48x-macos.zip db48x.app allow-db48x-macos.sh
+
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v4
       with:
         name: db48x-simulator-macos
-        path: |
-          sim/db48x.app
-          help/
+        path: sim/db48x-macos.zip
 
   build-simulator-linux:
     name: Build Simulator (Linux)
@@ -234,13 +239,18 @@ jobs:
       run: |
         codesign --force --deep --sign - sim/db50x.app
 
+    - name: Create macOS archive
+      run: |
+        cd sim
+        cp ../allow-db50x-macos.sh .
+        chmod +x allow-db50x-macos.sh
+        zip -r db50x-macos.zip db50x.app allow-db50x-macos.sh
+
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v4
       with:
         name: db50x-color-simulator-macos
-        path: |
-          sim/db50x.app
-          help/
+        path: sim/db50x-macos.zip
 
   build-color-simulator-linux:
     name: Build Color DM32 Simulator (Linux)
@@ -656,6 +666,9 @@ jobs:
         cd ../db48x-wasm
         tar czf ../db48x-wasm-${GITHUB_SHA:0:8}.tar.gz *
         cd ..
+        # macOS simulators are already zipped, just rename them
+        cp db48x-simulator-macos/db48x-macos.zip db48x-simulator-macos-${GITHUB_SHA:0:8}.zip
+        cp db50x-color-simulator-macos/db50x-macos.zip db50x-color-simulator-macos-${GITHUB_SHA:0:8}.zip
 
     - name: Upload release packages
       uses: actions/upload-artifact@v4
@@ -667,3 +680,5 @@ jobs:
           db48x-android-*.tar.gz
           db50x-android-*.tar.gz
           db48x-wasm-*.tar.gz
+          db48x-simulator-macos-*.zip
+          db50x-color-simulator-macos-*.zip

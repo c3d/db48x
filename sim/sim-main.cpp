@@ -47,7 +47,7 @@ RECORDER(options, 32, "Information about command line options");
 RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
 
 bool   run_tests   = false;
-bool   no_copy     = false;
+bool   install     = false;
 bool   noisy_tests = false;
 bool   no_beep     = false;
 uint   memory_size = MEMORY; // Memory size in kilobytes
@@ -185,13 +185,12 @@ int main(int argc, char *argv[])
                 no_beep = true;
                 break;
 
-            case 'c':
-                no_copy = true;
+            case 'I':
+                install = true;
                 break;
 
             case 'T':
                 run_tests = true;
-                no_copy = true;
                 // fall-through
             case 'O':
                 if (as[2])
@@ -316,15 +315,13 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("48calc.org");
     QCoreApplication::setApplicationName("DB48X");
 
-    if (getenv("DB48X_NOCOPY") || strstr(argv[0], "sim/"))
-        no_copy = true;
-    if (!no_copy)
-    {
-        QString files =
-            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString files =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (getenv("DB48X_INSTALL") || !QDir(files).exists())
+        install = true;
+    if (install)
         copy(":/", files);
-        QDir::setCurrent(files);
-    }
+    QDir::setCurrent(files);
 
     QApplication a(argc, argv);
     MainWindow w;

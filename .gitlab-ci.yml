@@ -28,11 +28,13 @@ build-simulator-macos:
         echo "Using ad-hoc code signing (no Apple Developer certificate)"
         codesign --force --deep --sign - sim/db48x.app
       fi
+    - cp allow-db48x-macos.sh sim/
+    - chmod +x sim/allow-db48x-macos.sh
+    - cd sim && zip -r db48x-macos.zip db48x.app allow-db48x-macos.sh && cd ..
   artifacts:
     name: "db48x-simulator-macos-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/db48x.app
-      - help/
+      - sim/db48x-macos.zip
     expire_in: 30 days
 
 build-color-simulator-macos:
@@ -57,11 +59,13 @@ build-color-simulator-macos:
         echo "Using ad-hoc code signing (no Apple Developer certificate)"
         codesign --force --deep --sign - sim/db50x.app
       fi
+    - cp allow-db50x-macos.sh sim/
+    - chmod +x sim/allow-db50x-macos.sh
+    - cd sim && zip -r db50x-macos.zip db50x.app allow-db50x-macos.sh && cd ..
   artifacts:
     name: "db50x-color-simulator-macos-$CI_COMMIT_SHORT_SHA"
     paths:
-      - sim/db50x.app
-      - help/
+      - sim/db50x-macos.zip
     expire_in: 30 days
 
 # Linux Simulator Builds
