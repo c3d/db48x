@@ -16,6 +16,7 @@ build-simulator-macos:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make sim
+    - macdeployqt sim/db48x.app
     - |
       if [ -n "$APPLE_CERT_DATA" ]; then
         echo "Using proper Apple Developer code signing"
@@ -44,6 +45,7 @@ build-color-simulator-macos:
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
     - make color-dm32-sim
+    - macdeployqt sim/db50x.app
     - |
       if [ -n "$APPLE_CERT_DATA" ]; then
         echo "Using proper Apple Developer code signing"
