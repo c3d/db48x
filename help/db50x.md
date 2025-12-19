@@ -4342,6 +4342,46 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.15 "Myriam" - GitHub automation, portability
+
+This release focused on GitHub and GitLab automation
+
+### New features
+
+* GitHub automation automatically builds various packages
+* Preparation for GitLab automation (still largely untested)
+* Windows simulator
+* Android package
+* WebAssembly application (WASM) now has help and configuration files
+* DM32n build (differs from DM32 only in the help files)
+* Dockerfile to create a container with the simulator
+* Add `ρ` in `RangesMenu`
+* Accept units when creating a range from components
+* Add `Range→` command that expands ranges with units
+
+### Bug fixes
+
+* Corrected typos in some builtin constants
+* Spelling and grammar fixes in documentation
+* Build failure for wasm due to use of `source`, a `bash`-only syntax
+* WebAssembly application no longer uses 100% CPU
+* The simulator can now be launched from any directory
+* The macOS simulator correctly launches from the Finder or Dock
+* Portability bug fixes in the DMCP emulation
+* The Settings menu is now correctly refreshed after `ResetModes`
+* Fix double-shifted arrow keys
+* Correctly show help for `Swap`, `Negate`, and `Cycle`
+* Fix order on stack for `Explode` on a range value
+* Android build bug fixes
+
+### Enhancements
+
+* Add osx program in lauch.json
+* The simulator no longer overwrites configuration files by default
+* Builds that use `gcc` now enable more warnings
+* Simplify shift-handling logic
+
+
 ## Release 0.9.14 "Latran" - Android preparation
 
 This is a very minor release with bug fixes notably for Android
@@ -5929,6 +5969,209 @@ As a result, they behave like normal names on DB50X.
 # Performance measurements
 
 This sections tracks some performance measurements across releases.
+
+# DB50X Documentation Review
+
+## Summary
+This document contains a comprehensive review of the DB50X documentation for grammar, spelling, technical accuracy, and stylistic consistency.
+
+## Critical Issues
+
+### 1. Inconsistent Product Naming
+
+**Issue**: The documentation inconsistently refers to "DM32" vs "DM-42" and "DM32" vs "DM-32" throughout.
+
+**Current usage**:
+- `0-Overview.md` line 10: "SwissMicro DM32 calculator" (no hyphen)
+- `0-Overview.md` line 196: "DM-42 and DM-32" (with hyphens)  
+- `0-Overview.md` line 212: "DB50X on a DM32" (no hyphen)
+- `7-Performance.md`: Consistently uses "DM32" and "DM32" (no hyphens)
+
+**Recommendation**: 
+- Use **DM32**, **DM32**, and **DM32n** (no hyphens) consistently throughout
+- Exception: When referring to physical key labels on the calculator, use "DM-42 _RCL_" format to clarify it's about the physical hardware
+
+**Locations to fix**:
+- `0-Overview.md`: lines 196, 208, 209, 219, and many others
+- Search for "DM-" and replace with "DM" except in key label contexts
+
+### 2. Missing "DM32n" References
+
+**Issue**: The new DM32n variant is not mentioned in the documentation.
+
+**Recommendation**:
+- Add DM32n to product lists in `0-Overview.md` section "DB50X on DM32"
+- Update keyboard interaction sections to include DM32n
+- Add DM32n to performance tables in `7-Performance.md`
+
+### 3. Grammar Issues
+
+#### 3.1 `0-Overview.md` line 257
+**Current**: "giving indicrect access"  
+**Fix**: "giving **indirect** access"
+
+#### 3.2 `0-Overview.md` line 363
+**Current**: "access global varibales"  
+**Fix**: "access global **variables**"
+
+#### 3.3 `0-Overview.md` line 512
+**Current**: "Based numbers with an explicit base, like `#123h` keep their base"  
+**Fix**: "Based numbers with an explicit base, like `#123h`**,** keep their base" (add comma)
+
+#### 3.4 `0-Overview.md` line 933
+**Current**: "Walter Bonin initiated the WP43 firwmare"  
+**Fix**: "Walter Bonin initiated the WP43 **firmware**"
+
+#### 3.5 `1-introduction.md` line 4
+**Current**: "implemented by Hewlett Packard"  
+**Fix**: "implemented by Hewlett-Packard" (company name uses hyphen)
+
+### 4. Technical Consistency Issues
+
+#### 4.1 Key Reference Format
+
+**Issue**: Inconsistent formatting for key references.
+
+**Current mixed usage**:
+- "_SIN_" (italic with underscores)
+- `SIN` (code format)
+- _SIN_ (just italic)
+
+**Recommendation**: Use **_SIN_** (italic with underscores) consistently for physical keys, as established in line 203 of `0-Overview.md`.
+
+#### 4.2 Stack Level Names
+
+**Issue**: Sometimes uses X, Y, Z, T without formatting.
+
+**Recommendation**: Use backticks for stack level names: `X`, `Y`, `Z`, `T` (already done in most places, but check consistency).
+
+#### 4.3 Menu Command Names
+
+**Issue**: Inconsistent capitalization and formatting of menu names.
+
+**Examples**:
+- "VariablesMenu" vs "Variables menu"
+- "MainMenu" vs "main menu"
+
+**Recommendation**: Use **PascalCase** with "Menu" suffix for all menu references: `VariablesMenu`, `MainMenu`, `StackMenu`, etc.
+
+### 5. Style and Readability
+
+#### 5.1 Unicode Arrows
+
+**Current**: Uses both `▶︎` and `▶` inconsistently.
+
+**Recommendation**: Choose one arrow style and use consistently:
+- For navigation: ◀︎ and ▶︎ (with variation selector)
+- For stack diagrams: `X` ▶ `Y+X`
+
+#### 5.2 Shift Key Notation
+
+**Current**: Uses 🟨 and 🟦 consistently (good!).
+
+**Recommendation**: Keep this consistent. Always explain the meaning on first use in each major section.
+
+#### 5.3 Long Lines
+
+**Issue**: Many lines exceed 80 characters, making diffs harder to read.
+
+**Recommendation**: Consider wrapping at 80 columns where practical (this is a minor style issue, not critical).
+
+### 6. Technical Accuracy Issues
+
+#### 6.1 `0-Overview.md` line 507-516 (DM32-specific section)
+
+**Issue**: This entire section is marked as DM32-specific:
+```markdown
+* Based numbers with an explicit base...
+```
+
+**Problem**: This content applies to **all platforms**, not just DM32. Based numbers work the same on DM32, DM32, and DM32n.
+
+
+#### 6.2 Complex Number Representations
+
+**Current** (`0-Overview.md` line 495-500): States that DB50X has two distinct representations (polar and rectangular).
+
+**Note**: Verify this is still accurate. Check if DM32n has any differences in complex number handling.
+
+### 7. Missing Sections
+
+#### 7.1 DM32n-Specific Information
+
+**Missing**: No dedicated section explaining:
+- What is DM32n?
+- Differences between DM32 and DM32n
+- When to choose DM32n vs DM32
+
+**Recommendation**: Add a section "Choosing Your Calculator" that explains the differences between DM32, DM32, and DM32n.
+
+#### 7.2 Build/Installation for DM32n
+
+**Missing**: Installation instructions don't mention DM32n.
+
+**Recommendation**: Update installation documentation to include DM32n-specific instructions.
+
+### 8. Spelling/Typos Summary
+
+Complete list of spelling errors found:
+- `indicrect` → `indirect` (line 257)
+- `varibales` → `variables` (line 363)
+- `firwmare` → `firmware` (line 933)
+
+### 9. Formatting Issues
+
+#### 9.1 Code Block Formatting
+
+**Issue**: Some inline code uses single backticks while blocks use triple backticks inconsistently.
+
+**Recommendation**: 
+- Use single backticks for inline code: `dup`
+- Use triple backticks with language tag for code blocks:
+  ```rpl
+  « code here »
+  ```
+
+#### 9.2 List Formatting
+
+**Issue**: Some nested lists use inconsistent indentation.
+
+**Recommendation**: Use 2-space indentation for nested lists consistently.
+
+## Priority Recommendations
+
+### High Priority (Fix Now)
+1. Fix spelling errors (indicrect, varibales, firwmare)
+2. Standardize DM32/DM32/DM32n naming (remove hyphens except for key labels)
+3. Add DM32n to product documentation
+4. Fix DM32-only marker on based numbers section
+
+### Medium Priority (Next Update)
+5. Standardize key reference format (_KEY_)
+6. Add "Choosing Your Calculator" section
+7. Verify all technical claims are still accurate
+
+### Low Priority (Polish)
+8. Consider line length limits for better diffs
+9. Standardize Unicode arrow usage
+10. Review all menu name capitalizations
+
+## Files Requiring Most Attention
+
+1. **`0-Overview.md`** - Core documentation, most consistency issues
+2. **`5-ReleaseNotes.md`** - Check for DM32n references
+3. **`7-Performance.md`** - Add DM32n performance data
+4. **Installation docs** (if they exist) - Add DM32n instructions
+
+## Conclusion
+
+The documentation is generally well-written and comprehensive. The main issues are:
+1. Inconsistent product naming conventions
+2. Missing coverage of the new DM32n variant  
+3. A handful of spelling errors
+4. Some technical sections marked incorrectly as platform-specific
+
+These are all straightforward to fix and would significantly improve consistency and accuracy.
 
 # Constants library
 

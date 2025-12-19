@@ -1,5 +1,45 @@
 # Release notes
 
+## Release 0.9.15 "Myriam" - GitHub automation, portability
+
+This release focused on GitHub and GitLab automation
+
+### New features
+
+* GitHub automation automatically builds various packages
+* Preparation for GitLab automation (still largely untested)
+* Windows simulator
+* Android package
+* WebAssembly application (WASM) now has help and configuration files
+* DM42n build (differs from DM32 only in the help files)
+* Dockerfile to create a container with the simulator
+* Add `ρ` in `RangesMenu`
+* Accept units when creating a range from components
+* Add `Range→` command that expands ranges with units
+
+### Bug fixes
+
+* Corrected typos in some builtin constants
+* Spelling and grammar fixes in documentation
+* Build failure for wasm due to use of `source`, a `bash`-only syntax
+* WebAssembly application no longer uses 100% CPU
+* The simulator can now be launched from any directory
+* The macOS simulator correctly launches from the Finder or Dock
+* Portability bug fixes in the DMCP emulation
+* The Settings menu is now correctly refreshed after `ResetModes`
+* Fix double-shifted arrow keys
+* Correctly show help for `Swap`, `Negate`, and `Cycle`
+* Fix order on stack for `Explode` on a range value
+* Android build bug fixes
+
+### Enhancements
+
+* Add osx program in lauch.json
+* The simulator no longer overwrites configuration files by default
+* Builds that use `gcc` now enable more warnings
+* Simplify shift-handling logic
+
+
 ## Release 0.9.14 "Latran" - Android preparation
 
 This is a very minor release with bug fixes notably for Android
