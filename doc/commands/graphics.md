@@ -299,7 +299,7 @@ In addition to this HP50G-compatible usage, `DispXY` will also accept:
 ## Show
 
 Display the first level of the stack using the entire screen, with a possible
-scroll using the 4, 8, 6 and 2 keys if the object is larger than fits on screen.
+scroll using the 4, 8, 6 and 2 keys if the object is larger than the screen.
 This makes it possible to comfortably examine very large objects, like `300!`, a
 large program or a complicated equation. Arrow keys can also be used for
 horizontal or vertical scrolling.

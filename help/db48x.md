@@ -56,7 +56,7 @@ RPL commands in the HP50G and in DB48X into
 
 The objective is to re-create an RPL-like experience, but to optimize it for the
 existing DM42 physical hardware.
-Ideally, DB48X should be fully usable without a keyboard overlay. though one is
+Ideally, DB48X should be fully usable without a keyboard overlay, though one is
 [being worked on](https://github.com/c3d/db48x/blob/stable/Keyboard-Layout.png).
 
 Compared to the original HP48, the DM42 has a much larger screen, but no
@@ -199,14 +199,14 @@ if you prefer.
 Here are a few of the interesting RPL-specific key mappings:
 
 * _A_ (_⚙️_, DM-42 _Σ+_, DM-32 _√x_) is used to invoke a context-sensitive
-  [ToolsMenu](#ToolsMenu), which select a softkey menu based on what is on the
+  [ToolsMenu](#ToolsMenu), which selects a softkey menu based on what is on the
   stack and other context.
 
 * 🟨 _A_ (_←MENU_, DM-42 _Σ-_, DM-32 _x²_) selects the [LastMenu](#LastMenu)
   command, which displays the previously selected menu.
 
 * 🟦 _A_ (_MAIN_, DM-32 _PARTS_) selects the [MainMenu](#MainMenu), a top-level
-  menu giving indicrect access to all other menus and features in DB48X (see
+  menu giving indirect access to all other menus and features in DB48X (see
   also the [Catalog](#Catalog) feature).
 
 * _F_ (_' ()_, DM-42 _XEQ_, DM-32 _Σ+_) opens an algebraic expression, i.e. it
@@ -312,7 +312,7 @@ a `▶︎`, and 🟨 _F6_ turns into `◀`︎. These keys can be used to
 navigate across the available menu entries. This replaces the _NXT_ and _PREV_
 keys on HP calculators.
 
-The [VariablesMenu](#VariablesMenu) is used to access global varibales. It is
+The [VariablesMenu](#VariablesMenu) is used to access global variables. It is
 invoked using the _H_ key, which is labeled _RCL_ on SwissMicros hardware. This
 menu is special in the sense that:
 
@@ -609,11 +609,11 @@ operate on these items when it makes sense. Therefore:
   produces a matrix with infinities. DB48X by default produces a `Divide by
   zero` error.
 
-* DB48X accept matrices and vectors as input to algebraic functions, and returns
+* DB48X accepts matrices and vectors as input to algebraic functions, and returns
   a matrix or vector with the function applied to all elements. For example,
   `[a b c] sin ` returns `[ 'sin a' 'sin b' 'sin c' ]`.
 
-* Similarly, DB48X accept operations between a constant and a vector or matrix.
+* Similarly, DB48X accepts operations between a constant and a vector or matrix.
   This applies the same binary operation to all components of the vector or
   matrix. `[ a b c ] x +` returns `[ 'a+x' 'b+x' 'c+x' ]`. Consistent with that
   logic, `inv` works on vectors, and inverts each component, so that
@@ -733,7 +733,7 @@ To navigate the help on the calculator, use the following keys:
   next link respectively. The keys _÷_ and _9_ also select the previous
   link, while the keys _×_ and _3_ can also be used to select the next link.
 
-* The _F6_ key correspond to the `←Menu` label, and returns one step back in
+* The _F6_ key corresponds to the `←Menu` label, and returns one step back in
   the help history. The _←_ key achieves the same effect.
 
 * To follow a highlighted link, click on the _ENTER_ key.
@@ -765,7 +765,7 @@ Additional contributors to the project include (in order of appearance):
 * LdBeth (andpuke@foxmail.com) (Bug fixes)
 * Thomas Eberhardt (sneakywumpus@gmail.com) (Bug fixes)
 * Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
-- Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
+* Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
 
 The authors would like to acknowledge
 
@@ -783,13 +783,13 @@ This work was placed by Christophe de Dinechin under the patronage of
 
 ### Hewlett and Packard
 
-Hand-held scientific calculators changed forever when Hewlett and Packard asked
+Hand-held scientific calculators changed forever when Bill Hewlett and Dave Packard asked
 their engineers to design and produce the HP35, then again when their company
 introduced the first programmable hand-held calculator with the HP65, and
 finally when they introduced the RPL programming language with the HP28.
 
 Christophe de Dinechin, the primary author of DB48X, was lucky enough to meet
-both Hewlett and Packard in person, and this was a truly inspiring experience.
+both Bill Hewlett and Dave Packard in person, and this was a truly inspiring experience.
 Launching the Silicon Valley is certainly no small achievement, but this pales
 in comparison to bringing RPN and RPL to the world.
 
@@ -871,7 +871,7 @@ The DB48X took several ideas and some inspiration from the
 [WP43](https://gitlab.com/rpncalculators/wp43) and
 [C47](https://47calc.com) projects.
 
-Walter Bonin initiated the WP43 firwmare for the DM42 as a "superset of the
+Walter Bonin initiated the WP43 firmware for the DM42 as a "superset of the
 legendary HP42S RPN Scientific".
 
 C47 (initially called C43) is a variant of that firmware initiated by Jaco
@@ -934,7 +934,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Introduction to RPL
 
 The original RPL (*Reverse Polish Lisp*) programming language was designed and
-implemented by Hewlett Packard for their calculators from the mid-1980s until
+implemented by Hewlett-Packard for their calculators from the mid-1980s until
 2015 (the year the HP50g was discontinued). It is based on older calculators
 that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size
 of 4, RPL has a stack size only limited by memory and also incorporates
@@ -997,7 +997,7 @@ DB48X keyboard overlay, this key is also marked as `=` for that reason.
 
 Since introducing the first scientific pocket calculator, the HP-35, in 1972,
 and with it the reverse polish notation (RPN), Hewlett-Packard perfected its
-line-up for decades. This led to such powerhouses pocket computers such as as
+line-up for decades. This led to such powerhouse pocket computers as
 the HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
 of these calculators, including the models we just cited, were capable of
 advanced mathematics, including dealing with complex numbers, matrix operations,

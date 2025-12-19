@@ -200,14 +200,14 @@ converted to an arrow key, along with the DM32 _XEQ_ key.
 Here are a few of the interesting RPL-specific key mappings:
 
 * _A_ (_⚙️_, DM-42 _Σ+_, DM-32 _√x_) is used to invoke a context-sensitive
-  [ToolsMenu](#ToolsMenu), which select a softkey menu based on what is on the
+  [ToolsMenu](#ToolsMenu), which selects a softkey menu based on what is on the
   stack and other context.
 
 * 🟨 _A_ (_←MENU_, DM-42 _Σ-_, DM-32 _x²_) selects the [LastMenu](#LastMenu)
   command, which displays the previously selected menu.
 
 * 🟦 _A_ (_MAIN_, DM-32 _PARTS_) selects the [MainMenu](#MainMenu), a top-level
-  menu giving indicrect access to all other menus and features in DB50X (see
+  menu giving indirect access to all other menus and features in DB50X (see
   also the [Catalog](#Catalog) feature).
 
 * _F_ (_' ()_, DM-42 _XEQ_, DM-32 _Σ+_) opens an algebraic expression, i.e. it
@@ -313,7 +313,7 @@ a `▶︎`, and 🟨 _F6_ turns into `◀`︎. These keys can be used to
 navigate across the available menu entries. This replaces the _NXT_ and _PREV_
 keys on HP calculators.
 
-The [VariablesMenu](#VariablesMenu) is used to access global varibales. It is
+The [VariablesMenu](#VariablesMenu) is used to access global variables. It is
 invoked using the _H_ key, which is labeled _RCL_ on SwissMicros hardware. This
 menu is special in the sense that:
 
@@ -457,7 +457,7 @@ unintentional differences, since the implementation is completely new.
   numerical operations. In addition, it supports 32-bit and 64-bit
   hardware-accelerated binary floating-point.
 
-* Based numbers with an explicit base, like `#123h` keep their base, which makes
+* Based numbers with an explicit base, like `#123h`, keep their base, which makes
   it possible to show on stack binary and decimal numbers side by side. Mixed
   operations convert to the base in stack level X, so that `#10d #A0h +`
   evaluates as `#AAh`. Based numbers without an explicit base change base
@@ -618,11 +618,11 @@ operate on these items when it makes sense. Therefore:
   produces a matrix with infinities. DB50X by default produces a `Divide by
   zero` error.
 
-* DB50X accept matrices and vectors as input to algebraic functions, and returns
+* DB50X accepts matrices and vectors as input to algebraic functions, and returns
   a matrix or vector with the function applied to all elements. For example,
   `[a b c] sin ` returns `[ 'sin a' 'sin b' 'sin c' ]`.
 
-* Similarly, DB50X accept operations between a constant and a vector or matrix.
+* Similarly, DB50X accepts operations between a constant and a vector or matrix.
   This applies the same binary operation to all components of the vector or
   matrix. `[ a b c ] x +` returns `[ 'a+x' 'b+x' 'c+x' ]`. Consistent with that
   logic, `inv` works on vectors, and inverts each component, so that
@@ -742,7 +742,7 @@ To navigate the help on the calculator, use the following keys:
   next link respectively. The keys _÷_ and _9_ also select the previous
   link, while the keys _×_ and _3_ can also be used to select the next link.
 
-* The _F6_ key correspond to the `←Menu` label, and returns one step back in
+* The _F6_ key corresponds to the `←Menu` label, and returns one step back in
   the help history. The _←_ key achieves the same effect.
 
 * To follow a highlighted link, click on the _ENTER_ key.
@@ -774,7 +774,7 @@ Additional contributors to the project include (in order of appearance):
 * LdBeth (andpuke@foxmail.com) (Bug fixes)
 * Thomas Eberhardt (sneakywumpus@gmail.com) (Bug fixes)
 * Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
-- Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
+* Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
 
 The authors would like to acknowledge
 
@@ -792,13 +792,13 @@ This work was placed by Christophe de Dinechin under the patronage of
 
 ### Hewlett and Packard
 
-Hand-held scientific calculators changed forever when Hewlett and Packard asked
+Hand-held scientific calculators changed forever when Bill Hewlett and Dave Packard asked
 their engineers to design and produce the HP35, then again when their company
 introduced the first programmable hand-held calculator with the HP65, and
 finally when they introduced the RPL programming language with the HP28.
 
 Christophe de Dinechin, the primary author of DB50X, was lucky enough to meet
-both Hewlett and Packard in person, and this was a truly inspiring experience.
+both Bill Hewlett and Dave Packard in person, and this was a truly inspiring experience.
 Launching the Silicon Valley is certainly no small achievement, but this pales
 in comparison to bringing RPN and RPL to the world.
 
@@ -880,7 +880,7 @@ The DB50X took several ideas and some inspiration from the
 [WP43](https://gitlab.com/rpncalculators/wp43) and
 [C47](https://47calc.com) projects.
 
-Walter Bonin initiated the WP43 firwmare for the DM32 as a "superset of the
+Walter Bonin initiated the WP43 firmware for the DM32 as a "superset of the
 legendary HP42S RPN Scientific".
 
 C47 (initially called C43) is a variant of that firmware initiated by Jaco
@@ -943,7 +943,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Introduction to RPL
 
 The original RPL (*Reverse Polish Lisp*) programming language was designed and
-implemented by Hewlett Packard for their calculators from the mid-1980s until
+implemented by Hewlett-Packard for their calculators from the mid-1980s until
 2015 (the year the HP50g was discontinued). It is based on older calculators
 that used RPN (*Reverse Polish Notation*). Whereas RPN had a limited stack size
 of 4, RPL has a stack size only limited by memory and also incorporates
@@ -1006,7 +1006,7 @@ DB50X keyboard overlay, this key is also marked as `=` for that reason.
 
 Since introducing the first scientific pocket calculator, the HP-35, in 1972,
 and with it the reverse polish notation (RPN), Hewlett-Packard perfected its
-line-up for decades. This led to such powerhouses pocket computers such as as
+line-up for decades. This led to such powerhouse pocket computers as
 the HP-41C series, or tiny wonders of pocket efficiency such as the HP-15C. Many
 of these calculators, including the models we just cited, were capable of
 advanced mathematics, including dealing with complex numbers, matrix operations,
@@ -8940,7 +8940,7 @@ Tair=-20_°C  u=2200_km/h
 
 #### String Standing Waves
 
-A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being being fixed at one end and free at the other end admits only all odd integer harmonics.
+A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being fixed at one end and free at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Ts_N;y_m;ffixedfixed_Hz;ffixedfree_Hz]` (Propagation speed of waves, Wave number; Angular frequency; Tension; Frequency of harmonics on a string fixed at both ends; Frequency of harmonics on a string fixed at one end and free at the other end) from 9 known variables:
 ```rpl
@@ -8951,7 +8951,7 @@ A string being fixed or free at its ends admits only discrete harmonics as stand
 
 #### Sound Wave Harmonics
 
-A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being being open at one end and closed at the other end admits only all odd integer harmonics.
+A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being open at one end and closed at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Tair_°C;s_m;fopenopen_Hz;fopenclose_Hz]` (Propagation speed of sound waves; Wave number; Angular frequency, Temperature; Frequency of harmonics in a tube open at both ends; Frequency of harmonics in a tube open at one end and close at the other end) from 8 known variables:
 ```rpl
@@ -9495,7 +9495,7 @@ The 52 variables in the Nuclear Physics section are:
 * `λ`: Decay constant (Radioactivity) (dim.: 1/time, in SI: s^-1)
 * `Δm`: Mass default
 * `A`: Total activity at time `t` ([Radioactivity](#Radioactivity)) (dim.: number of decay/time, in SI: becquerel, Bq), or Mass number ([Nuclear Physics](#Nuclear Physics))
-* `abdaughter`: Abondance of the daughter nuclide
+* `abdaughter`: Abundance of the daughter nuclide
 * `abparent`: Abondance of the parent radionuclide
 * `abtot`: Total abondance of the nuclide
 * `AY1`: Mass number of the first nuclide `Y1` produced by a fission
@@ -9594,7 +9594,7 @@ A=239  Z=94  AXα=239  ZXα=94  mX=239.052157_u  mY=235.043924_u
 
 #### β⊖ Decay
 
-The β⊖ Decay reaction has 3 products: the daughter nuclide, an electron & an antineutrino having a negligeable mass. Due to their weak masses, the resulting kinetic energy is essentially splitted between the last two particles. The energy spectrum of the antineutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted elevtron.
+The β⊖ Decay reaction has 3 products: the daughter nuclide, an electron & an antineutrino having a negligible mass. Due to their weak masses, the resulting kinetic energy is essentially split between the last two particles. The energy spectrum of the antineutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted electron.
 
 * **Example 1** For the β⊖ decay of Th234 into Pa234, to calculate `[N;Δm_u;Qβ⊖_MeV;Kmax_MeV;γmax;βmax;AYβ⊖;ZYβ⊖]` (Number of neutron of Th234; Mass default; Reaction energy; Maximum kinetic energy of the electron, Maximum Lorentz factor; Maximum relativistic speed ratio; Mass number & Proton number of the daughter nuclide) from 6 known variables:
 ```rpl
@@ -9611,7 +9611,7 @@ A=14  Z=6  AXβ⊖=14  ZXβ⊖=6  mX=14.0032419884_u  mY=14.00307400443_u
 
 #### β⊕ Decay
 
-The β⊕ Decay reaction has 3 products: the daughter nuclide, a positron & a neutrino having a negligeable mass. Due to their weak masses, the resulting kinetic energy is essentially splitted between the last two particles. The energy spectrum of the neutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted positron.
+The β⊕ Decay reaction has 3 products: the daughter nuclide, a positron & a neutrino having a negligible mass. Due to their weak masses, the resulting kinetic energy is essentially split between the last two particles. The energy spectrum of the neutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted positron.
 
 * For the β⊕ decay of K40 (present in bananas) into Ar40, to calculate `[N;Δm_u;Qβ⊕_MeV;Kmax_MeV;γmax;βmax;AYβ⊕;ZYβ⊕]` (Number of neutron of K40; Mass default; Reaction energy; Maximum kinetic energy of the electron, Maximum Lorentz factor; Maximum relativistic speed ratio; Mass number & Proton number of the daughter nuclide) from 6 known variables:
 ```rpl
@@ -11943,7 +11943,7 @@ In addition to this HP50G-compatible usage, `DispXY` will also accept:
 ## Show
 
 Display the first level of the stack using the entire screen, with a possible
-scroll using the 4, 8, 6 and 2 keys if the object is larger than fits on screen.
+scroll using the 4, 8, 6 and 2 keys if the object is larger than the screen.
 This makes it possible to comfortably examine very large objects, like `300!`, a
 large program or a complicated equation. Arrow keys can also be used for
 horizontal or vertical scrolling.
@@ -12287,7 +12287,7 @@ from disk only once, and then cached in compiled form in memory. This is how the
 next uses of that library item can be as fast as if it was on the stack.
 
  Library items that are currently loaded in memory can be identified using
-`Libs`. The `Attach` commadn can be used to load items ahead of time. The
+`Libs`. The `Attach` command can be used to load items ahead of time. The
 `Detach` command can be used to evacuate library elements that are no longer
 used.
 
@@ -16247,7 +16247,7 @@ power, because of additional animations or more expensive graphical rendering.
 ## Bytes
 
 Return the size of the object and a hash of its value. On classic RPL systems,
-teh hash is a 5-nibbles CRC32. On DB50X, the hash is a based integer of the
+the hash is a 5-nibbles CRC32. On DB50X, the hash is a based integer of the
 current [wordsize](#stws) corresponding to the binary representation of the
 object.
 
