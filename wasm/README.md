@@ -11,7 +11,7 @@ make wasm
 
 ## Production deployment
 
-There is no build step for app, just serve all the files inside `public/` + the file `index.html` with any web server. Be sure to place all the files in the same directory level.
+There is no build step for this app, just serve all the files inside `public/` + the file `index.html` with any web server. Be sure to place all the files in the same directory level.
 
 ## Development
 
