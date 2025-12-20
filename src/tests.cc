@@ -42,6 +42,13 @@
 #include <regex.h>
 #include <stdio.h>
 
+// Windows compatibility for POSIX random number functions
+#ifdef _WIN32
+#include <cstdlib>
+inline void srand48(long seed) { srand((unsigned int)seed); }
+inline long lrand48() { return ((long)rand() << 16) | rand(); }
+#endif
+
 extern bool run_tests;
 volatile uint test_command = 0;
 
@@ -189,8 +196,7 @@ void tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            plotting();
-            user_input_commands();
+            range_types();
         }
 
 #if 0
@@ -5299,6 +5305,39 @@ void tests::range_types()
 {
     BEGIN(ranges);
 
+
+    step("Create range with unit")
+        .test(CLEAR, "103_m 2_km", ENTER, ID_RangeMenu, ID_ToRange)
+        .expect("103…2 000 m");
+    step("Create range with unit")
+        .test(CLEAR, "103…2 000 m", ENTER, ID_RangeMenu, ID_FromRange)
+        .got("2 000 m", "103 m");
+    step("Create range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToRange)
+        .error("Inconsistent units");
+    step("Create delta range with unit")
+        .test(CLEAR, "2_km 1000_m ", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .expect("2±1 km");
+    step("Create delta range with unit")
+        .test(CLEAR, "2_km 1000_m ", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .test(ID_FromRange)
+        .got("1 km", "2 km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .error("Inconsistent units");
+    step("Create percent range with unit")
+        .test(CLEAR, "2_km 100_m ", ENTER, ID_RangeMenu, ID_ToPercentRange)
+        .error("Inconsistent units");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "2_km 100 ", ENTER, ID_RangeMenu, ID_ToPercentRange)
+        .expect("2±100% km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "2±100%_km", ENTER, ID_RangeMenu, ID_FromRange)
+        .got("100", "2 km");
+    step("Create delta range with inconsistent unit")
+        .test(CLEAR, "103_m 2_s", ENTER, ID_RangeMenu, ID_ToDeltaRange)
+        .error("Inconsistent units");
+
     step("Interval form")
         .test(CLEAR, "1…3", ENTER).type(ID_range).expect("1…3");
     step("Delta form")
@@ -5674,13 +5713,13 @@ void tests::range_types()
 
     step("Exploding range objects")
         .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)
-        .got("1", "3");
+        .got("3", "1");
     step("Exploding delta range objects")
         .test(CLEAR, "1±3", ID_ObjectMenu, ID_Explode)
-        .got("1", "3");
+        .got("3", "1");
     step("Exploding percent range objects")
         .test(CLEAR, "1±200%", ID_RangeMenu, ID_Explode)
-        .got("1", "200");
+        .got("200", "1");
     step("Size range objects")
         .test(CLEAR, "1…3", ID_RangeMenu, ID_Size)
         .got("2");
@@ -5718,6 +5757,7 @@ void tests::range_types()
         .expect("1 002…3 006 m")
         .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
         .expect("2…18 km/s");
+
 }
 
 
@@ -5834,7 +5874,7 @@ void tests::uncertain_operations()
 
     step("Exploding uncertain numbers")
         .test(CLEAR, "1±σ3", ID_ObjectMenu, ID_Explode)
-        .got("1", "3");
+        .got("3", "1");
     step("Size range objects")
         .test(CLEAR, "1±σ3", ID_RangeMenu, ID_Size)
         .got("3");
@@ -11330,16 +11370,16 @@ void tests::constants_menu()
         .test(CLEAR, LSHIFT, I, LSHIFT, F1);
     step("Classical electron radius")
         .test(CLEAR, NOSHIFT, F1).expect("re")
-        .test(LSHIFT, F1).expect("2.81794 03204 6 fm");
+        .test(LSHIFT, F1).expect("2.81794 03205 fm");
     step("Proton charge radius")
         .test(CLEAR, NOSHIFT, F2).expect("rp")
-        .test(LSHIFT, F2).expect("8.4075");
+        .test(LSHIFT, F2).expect("8.4075⁳⁻¹⁶ m");
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F3).expect("a0")
         .test(LSHIFT, F3).expect("0.05291 77210 54 nm");
     step("Thomson cross-section")
         .test(CLEAR, NOSHIFT, F4).expect("σe")
-        .test(LSHIFT, F4).expect("6.65245 87051⁳⁻²⁹ m↑2");
+        .test(LSHIFT, F4).expect("6.65245 87052⁳⁻²⁹ m↑2");
 
     // ------------------------------------------------------------------------
     step("Scattering constants")

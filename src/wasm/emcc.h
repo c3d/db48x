@@ -1,5 +1,6 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
+#include <emscripten.h>
 using namespace emscripten;
 
 extern uintptr_t wasm_updated_screen;

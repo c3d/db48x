@@ -27,7 +27,10 @@ OPT=release
 MOUNTPOINT=/Volumes/$(VARIANT)/
 EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
 PRODUCT_NAME=$(shell echo $(TARGET) | tr "[:lower:]" "[:upper:]")
-PRODUCT_MACHINE=$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]")
+# For DM42n, use special case with lowercase 'n'
+PRODUCT_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42n,$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]"))
+# For DM42n, select DM42 sections but brand as DM42n
+HELP_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42,$(PRODUCT_MACHINE))
 
 # Android build
 ANDROID_SDK_ROOT?=/opt/homebrew/share/android-commandlinetools
@@ -77,6 +80,9 @@ all: $(PGM_TARGET) help/$(TARGET).md help/$(TARGET).idx
 dm32:	dm32-all
 dm32-%:
 	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm32 TARGET=db50x $*
+dm42n:	dm42n-all
+dm42n-%:
+	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm42n TARGET=db50x $*
 color-%:
 	$(MAKE) COLOR=color $*
 
@@ -93,27 +99,32 @@ sim/$(TARGET).mak:	sim/$(TARGET).pro	\
 			$(VERSION_H)
 	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
-# Android build target
-android: android/$(TARGET).apk help/$(TARGET).idx
-	@echo "# Android APK built: android/$(TARGET).apk"
+# Android build target - builds App Bundle for Google Play
+android: android/$(TARGET).aab help/$(TARGET).idx
+	@echo "# Android App Bundle built: android/$(TARGET).aab"
 
-android/$(TARGET).apk: sim/$(TARGET).pro Makefile $(VERSION_H)	\
-					sim/config.qrc		\
-					sim/state.qrc		\
-					sim/library.qrc		\
-					sim/help.qrc		\
-					sim/help/img.qrc	\
-					sim/android/AndroidManifest.xml	\
-					sim/android/build.gradle
-	@echo "# Building Android APK for $(TARGET)"
+android/$(TARGET).aab: sim/$(TARGET).pro Makefile $(VERSION_H)	\
+				sim/config.qrc		\
+				sim/state.qrc		\
+				sim/library.qrc		\
+				sim/help.qrc		\
+				sim/help/img.qrc	\
+				sim/android/AndroidManifest.xml	\
+				sim/android/build.gradle	\
+				$(HOME)/.local/android_release.keystore
+	@echo "# Building Android App Bundle for $(TARGET)"
+	@echo "# Using keystore: $(HOME)/.local/android_release.keystore"
 	cd sim && \
 		export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) && \
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) && \
+		export KEYSTORE_PATH=$(HOME)/.local/android_release.keystore && \
 		$(ANDROID_QT_BIN)/qmake -spec android-clang $(TARGET).pro && \
 		$(MAKE) VARIANT=android && \
 		$(ANDROID_DEPLOY_QT) \
 			--input android-$(TARGET)-deployment-settings.json \
-			--output ../android --gradle
+			--output ../android --gradle --aab \
+			--sign $(HOME)/.local/android_release.keystore db48x \
+			--storepass '$(ANDROID_KEYSTORE_PASS)'
 
 sim/%.qrc: Makefile
 	mkdir -p $(@D)
@@ -262,7 +273,7 @@ fonts/HelpFont.cc: $(TTF2FONT) $(BASE_FONT)
 help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	mkdir -p help && \
 	cat $^ | \
-	sed -e '/<!--- $(PRODUCT_MACHINE) --->/,/<!--- !$(PRODUCT_MACHINE) --->/s/$(PRODUCT_MACHINE)/KEEP_IT/g' \
+	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
 	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
 	    -e '/<!--- KEEP_IT --->/d' \
 	    -e '/<!--- !KEEP_IT --->/d' \
@@ -407,6 +418,12 @@ DEFINES_dm32 = 	DM32 				\
 		DEOPTIMIZE_CATALOG		\
 		MEMORY=500
 
+DEFINES_dm42n = DM42N 				\
+		LGAMMA_CRASHES			\
+		CONFIG_FIXED_BASED_OBJECTS	\
+		DEOPTIMIZE_CATALOG		\
+		MEMORY=500
+
 DEFINES_dm42 = DM42 MEMORY=100
 DEFINES_wasm = $(DEFINES_dm32) SIMULATOR WASM
 
@@ -435,8 +452,10 @@ CFLAGS += 	-O3 -pthread
 LDFLAGS +=	-s MODULARIZE=0				\
 		-s RESERVED_FUNCTION_POINTERS=20	\
 		-s PTHREAD_POOL_SIZE=4			\
-		--bind -pthread
-
+		--bind -pthread \
+		--embed-file config \
+		--embed-file help \
+		-sASYNCIFY # Used to be able to sleep within a webassembly conte
 #------------------------------------------------------------------------------
 else
 #------------------------------------------------------------------------------
@@ -487,6 +506,7 @@ CFLAGS_debug += -Os -DDEBUG
 CFLAGS_release += $(CFLAGS_release_$(VARIANT))
 CFLAGS_release_dm42 = -Os
 CFLAGS_release_dm32 = -O2
+CFLAGS_release_dm42n = -O2
 CFLAGS_small += -Os
 CFLAGS_fast += -O2
 CFLAGS_faster += -O3
@@ -542,8 +562,8 @@ $(WASM_TARGET): $(OBJECTS) Makefile
 else
 
 $(WASM_TARGET): $(SOURCES) Makefile
-	(source emsdk/emsdk_env.sh && \
-	make VARIANT=wasm PGM=js PGM_TARGET=wasm/public/$(TARGET).js SDK=sim )
+	(. emsdk/emsdk_env.sh && \
+	 make VARIANT=wasm PGM=js PGM_TARGET=wasm/public/$(TARGET).js SDK=sim )
 
 $(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
 	@tools/build_id -u
@@ -584,11 +604,11 @@ $(BUILD)/.exists:
 
 
 $(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
-	cd $(dir $(CRCFIX)); $(MAKE)
+	cd $(dir $(CRCFIX)) && unset TARGET && $(MAKE) TARGET=opt
 $(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
-	cd $(dir $(CRC32)); $(MAKE) TARGET=opt
+	cd $(dir $(CRC32)) && unset TARGET && $(MAKE) TARGET=opt
 $(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
-	cd $(dir $(DECIMIZE)); $(MAKE) TARGET=opt
+	cd $(dir $(DECIMIZE)) && unset TARGET && $(MAKE) TARGET=opt
 
 
 #######################################

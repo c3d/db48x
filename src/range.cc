@@ -41,7 +41,6 @@
 #include "variables.h"
 
 
-
 // ============================================================================
 //
 //   Generic range operations
@@ -81,7 +80,6 @@ HELP_BODY(uncertain)
 }
 
 
-
 // ============================================================================
 //
 //   Specific code for uncertain form
@@ -97,11 +95,11 @@ PARSE_BODY(range)
     size_t max = p.length;
     if (!max)
         return SKIP;
-    size_t  offs  = 0;
-    unicode cp    = p.separator;
+    size_t      offs   = 0;
+    unicode     cp     = p.separator;
 
     // Check if we have a first expression
-    algebraic_g xexpr = algebraic_p(+p.out);
+    algebraic_g xexpr  = algebraic_p(+p.out);
     bool        xisinf = false;
 
     // Check if we start with −∞
@@ -112,8 +110,8 @@ PARSE_BODY(range)
             return SKIP;
         offs += refsz;
         p.separator = cp = utf8_codepoint(p.source + offs);
-        xexpr = rt.infinity(true);
-        xisinf = true;
+        xexpr            = rt.infinity(true);
+        xisinf           = true;
     }
 
     if (!xexpr)
@@ -123,15 +121,15 @@ PARSE_BODY(range)
 
 
     // First character must be compatible with a range
-    bool    imark = cp == range::INTERVAL_MARK;
-    bool    pmark = cp == drange::PLUSMINUS_MARK;
-    bool    smark = p.precedence != PARENTHESES && cp == uncertain::SIGMA_MARK;
+    bool imark = cp == range::INTERVAL_MARK;
+    bool pmark = cp == drange::PLUSMINUS_MARK;
+    bool smark = p.precedence != PARENTHESES && cp == uncertain::SIGMA_MARK;
     if (!imark && !pmark && !smark)
         return SKIP;
     offs = utf8_next(p.source, offs, max);
     if (!smark && offs < max)
     {
-        cp = utf8_codepoint(p.source + offs);
+        cp    = utf8_codepoint(p.source + offs);
         smark = cp == uncertain::SIGMA_MARK;
         if (smark)
             offs = utf8_next(p.source, offs, max);
@@ -139,9 +137,9 @@ PARSE_BODY(range)
 
     size_t   ysz    = max - offs;
     bool     yisinf = utf8_codepoint(p.source + offs) == L'∞';
-    object_p yobj = yisinf
-        ? rt.infinity(false)
-        : parse(p.source + offs, ysz, PARENTHESES, p.separator);
+    object_p yobj   = yisinf
+                        ? rt.infinity(false)
+                        : parse(p.source + offs, ysz, PARENTHESES, p.separator);
     if (!yobj)
         return ERROR;
     algebraic_g yexpr = yobj->as_algebraic();
@@ -150,7 +148,7 @@ PARSE_BODY(range)
     offs += ysz;
 
     // Check if we give a percentage
-    cp = !smark && offs < max ? utf8_codepoint(p.source + offs) : 0;
+    cp         = !smark && offs < max ? utf8_codepoint(p.source + offs) : 0;
     bool cmark = cp == '%';
     if (!smark)
     {
@@ -200,15 +198,18 @@ RENDER_BODY(range)
 }
 
 
-static size_t drange_render(range_p o, renderer &r,
-                            object::id ty, unicode mid, unicode last)
+static size_t drange_render(range_p    o,
+                            renderer  &r,
+                            object::id ty,
+                            unicode    mid,
+                            unicode    last)
 // ----------------------------------------------------------------------------
 //   Render a percentage or delta range
 // ----------------------------------------------------------------------------
 {
-    range_g     go   = o;
-    algebraic_g lo   = go->lo();
-    algebraic_g hi   = go->hi();
+    range_g     go = o;
+    algebraic_g lo = go->lo();
+    algebraic_g hi = go->hi();
     if (!range::adjust_output(ty, lo, hi))
         return range::do_render(o, r);
     lo->render(r);
@@ -243,9 +244,9 @@ RENDER_BODY(uncertain)
 //   Render an uncertain number
 // ----------------------------------------------------------------------------
 {
-    uncertain_g     go = o;
-    algebraic_g a = go->average();
-    algebraic_g s = go->stddev();
+    uncertain_g go = o;
+    algebraic_g a  = go->average();
+    algebraic_g s  = go->stddev();
     a->render(r);
     r.put(unicode(drange::PLUSMINUS_MARK));
     r.put(unicode(uncertain::SIGMA_MARK));
@@ -279,7 +280,7 @@ bool range::sort(algebraic_g &x, algebraic_g &y)
 //   Swap x and y if x > y
 // ----------------------------------------------------------------------------
 {
-    int cmp = 0;
+    int  cmp    = 0;
     bool result = comparison::compare(&cmp, x, y) && cmp > 0;
     if (result)
         std::swap(x, y);
@@ -321,9 +322,9 @@ bool range::adjust_output(id ty, algebraic_g &x, algebraic_g &y)
 
     if (ty == ID_drange || ty == ID_prange)
     {
-        algebraic_g two  = integer::make(2);
+        algebraic_g two    = integer::make(2);
         algebraic_g center = (y + x) / two;
-        algebraic_g delta = (y - x) / two;
+        algebraic_g delta  = (y - x) / two;
         if (ty == ID_prange)
         {
             delta = delta * integer::make(100);
@@ -354,7 +355,7 @@ bool range::explode() const
     algebraic_g x = r->x();
     algebraic_g y = r->y();
     adjust_output(r->type(), x, y);
-    return x && y && rt.push(+y) && rt.push(+x);
+    return x && y && rt.push(+x) && rt.push(+y);
 }
 
 
@@ -391,7 +392,7 @@ range_p operator+(range_r x, range_r y)
 //   Range addition
 // ----------------------------------------------------------------------------
 {
-    if (!x|| !y)
+    if (!x || !y)
         return nullptr;
     algebraic_g lo = x->lo() + y->lo();
     algebraic_g hi = x->hi() + y->hi();
@@ -404,7 +405,7 @@ range_p operator-(range_r x, range_r y)
 //   Range subtraction
 // ----------------------------------------------------------------------------
 {
-    if (!x|| !y)
+    if (!x || !y)
         return nullptr;
     algebraic_g lo = x->lo() - y->hi();
     algebraic_g hi = x->hi() - y->lo();
@@ -417,16 +418,16 @@ range_p operator*(range_r x, range_r y)
 //   Range multiplication - Here we need to compare things
 // ----------------------------------------------------------------------------
 {
-    if (!x|| !y)
+    if (!x || !y)
         return nullptr;
     algebraic_g xlo = x->lo();
     algebraic_g xhi = x->hi();
     algebraic_g ylo = y->lo();
     algebraic_g yhi = y->hi();
-    algebraic_g a = xlo * ylo;
-    algebraic_g b = xlo * yhi;
-    algebraic_g c = xhi * ylo;
-    algebraic_g d = xhi * yhi;
+    algebraic_g a   = xlo * ylo;
+    algebraic_g b   = xlo * yhi;
+    algebraic_g c   = xhi * ylo;
+    algebraic_g d   = xhi * yhi;
 
     range::sort(a, b);
     range::sort(a, c);
@@ -442,7 +443,7 @@ range_p operator/(range_r x, range_r y)
 //   Range division - Here we need to compare things too
 // ----------------------------------------------------------------------------
 {
-    if (!x|| !y)
+    if (!x || !y)
         return nullptr;
     algebraic_g xlo = x->lo();
     algebraic_g xhi = x->hi();
@@ -484,7 +485,6 @@ range_p operator^(range_r x, range_r y)
 }
 
 
-
 // ============================================================================
 //
 //   Implementation of range functions
@@ -502,7 +502,7 @@ static range_p monotonic(algebraic_fn fn, range_r r, bool down = false)
     algebraic_g hi   = r->hi();
     object::id  type = r->type();
     lo               = fn(lo);
-    hi = fn(hi);
+    hi               = fn(hi);
     return down ? range::make(type, hi, lo) : range::make(type, lo, hi);
 }
 
@@ -550,16 +550,16 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
     algebraic_g lo    = r->lo();
     algebraic_g hi    = r->hi();
     object::id  amode = Settings.AngleMode();
-    algebraic_g lpi = algebraic::convert_angle(lo, amode, object::ID_PiRadians,
-                                               false, false);
-    algebraic_g hpi = algebraic::convert_angle(hi, amode, object::ID_PiRadians,
-                                               false, false);
+    algebraic_g lpi =
+        algebraic::convert_angle(lo, amode, object::ID_PiRadians, false, false);
+    algebraic_g hpi =
+        algebraic::convert_angle(hi, amode, object::ID_PiRadians, false, false);
 
     // Compute numbers of quadrants (90 degrees quarters)
-    lpi = lpi + lpi;
-    hpi = hpi + hpi;
-    lpi = floor::run(lpi);
-    hpi = floor::run(hpi);
+    lpi        = lpi + lpi;
+    hpi        = hpi + hpi;
+    lpi        = floor::run(lpi);
+    hpi        = floor::run(hpi);
     int32_t lq = lpi->as_int32(0, true) - issin;
     int32_t hq = hpi->as_int32(0, true) - issin;
     int32_t lh = (lq - (lq < 2)) / 2;
@@ -576,8 +576,8 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
     }
     else if (istan || hh - lh > 1)
     {
-        lo = istan ? rt.infinity(true)  : integer::make(-1);
-        hi = istan ? rt.infinity(false) : integer::make( 1);
+        lo = istan ? rt.infinity(true) : integer::make(-1);
+        hi = istan ? rt.infinity(false) : integer::make(1);
     }
     else
     {
@@ -585,9 +585,9 @@ static range_p trig(algebraic_fn fn, range_p r, int issin, int istan)
         hi = fn(hi);
         range::sort(lo, hi);
         if (increasing(lh))
-            hi = istan ? rt.infinity(false) : integer::make( 1);
+            hi = istan ? rt.infinity(false) : integer::make(1);
         else
-            lo = istan ? rt.infinity(true)  : integer::make(-1);
+            lo = istan ? rt.infinity(true) : integer::make(-1);
     }
 
     return range::make(r->type(), lo, hi);
@@ -885,7 +885,6 @@ RANGE_BODY(abs)
 }
 
 
-
 // ============================================================================
 //
 //   Uncertain numbers
@@ -922,7 +921,6 @@ algebraic_p uncertain::as_range(object::id type) const
 }
 
 
-
 // ============================================================================
 //
 //   Commands implementing the ranges
@@ -938,8 +936,12 @@ static object::result to_range(object::id ty)
     if (!hi)
         return object::ERROR;
 
-    object::id sty = hi->type();
-    bool rng = object::is_range(sty);
+    unit_g uhi = unit::get(+hi);
+    unit_g ulo;
+    if (uhi)
+        hi = uhi->value();
+    object::id  sty = hi->type();
+    bool        rng = object::is_range(sty);
     algebraic_g lo;
     if (hi && rng)
     {
@@ -953,14 +955,50 @@ static object::result to_range(object::id ty)
             rt.type_error();
             return object::ERROR;
         }
-        lo = range_p(+hi)->lo();
-        hi = range_p(+hi)->hi();
+        lo  = range_p(+hi)->lo();
+        hi  = range_p(+hi)->hi();
+        if (uhi)
+        {
+            ulo = unit::make(lo, uhi->uexpr());
+            if (sty != object::ID_prange)
+                uhi = unit::make(hi, uhi->uexpr());
+        }
     }
     else
     {
         if (!rt.args(2))
             return object::ERROR;
-        lo = algebraic_p(object::strip(rt.stack(1)));
+        lo  = algebraic_p(object::strip(rt.stack(1)));
+        ulo = unit::get(+lo);
+        if (ulo)
+            lo = ulo->value();
+    }
+    if (ulo || uhi)
+    {
+        if (ty == object::ID_prange)
+        {
+            if (uhi && !rng)
+            {
+                hi = uhi->convert_to_real();
+                if (!hi)
+                    rt.inconsistent_units_error();
+            }
+        }
+        else if (!ulo || !uhi)
+        {
+            if (!ulo)
+                hi = uhi->convert_to_real();
+            else
+                lo = ulo->convert_to_real();
+            if (!lo || !hi)
+                rt.inconsistent_units_error();
+        }
+        else
+        {
+            if (!ulo->convert(uhi, true))
+                return object::ERROR;
+            hi = uhi->value();
+        }
     }
     if (!lo || !hi)
         return object::ERROR;
@@ -979,10 +1017,41 @@ static object::result to_range(object::id ty)
     // the two values are a mean and a standard deviation (must not be sorted)
     if (ty != uncertain::ID_uncertain)
         range::sort(lo, hi);
-    range_g r = range::make(ty, lo, hi);
+    algebraic_g r = range::make(ty, lo, hi);
+    if (ulo)
+        r = unit::make(r, ulo->uexpr());
     if (!r || (!rng && !rt.drop()) || !rt.top(r))
         return object::ERROR;
     return object::OK;
+}
+
+
+COMMAND_BODY(FromRange)
+// ----------------------------------------------------------------------------
+//   Take a range value (or unit containing a range) and turn it into values
+// ----------------------------------------------------------------------------
+{
+    object_g obj = rt.top();
+    unit_g u = unit::get(+obj);
+    if (u)
+        obj = u->value();
+    if (obj->is_range())
+    {
+        range_g r = range_p(+obj);
+        algebraic_g x = r->x();
+        algebraic_g y = r->y();
+        id ty = r->type();
+        range::adjust_output(ty, x, y);
+        if (u)
+        {
+            x = unit::make(x, u->uexpr());
+            if (ty != ID_prange)
+                y = unit::make(y, u->uexpr());
+        }
+        if (x && y && rt.top(+x) && rt.push(+y))
+            return OK;
+    }
+    return ERROR;
 }
 
 
@@ -1044,9 +1113,8 @@ static object::result range_op(bool intersect)
     range::sort(ahi, bhi);
     if (intersect && range::sort(blo, ahi))
         ahi = blo;
-    range_g r = range::make(a->type(),
-                            intersect ? blo : alo,
-                            intersect ? ahi : bhi);
+    range_g r =
+        range::make(a->type(), intersect ? blo : alo, intersect ? ahi : bhi);
     if (!r || !rt.drop() || !rt.top(r))
         return object::ERROR;
     return object::OK;
@@ -1090,7 +1158,8 @@ static algebraic_p rho()
 }
 
 
-static uncertain_p bivariate(uncertain_r x, uncertain_r y,
+static uncertain_p bivariate(uncertain_r   x,
+                             uncertain_r   y,
                              arithmetic_fn f,
                              arithmetic_fn dfdx = nullptr,
                              arithmetic_fn dfdy = nullptr)
@@ -1101,21 +1170,21 @@ static uncertain_p bivariate(uncertain_r x, uncertain_r y,
 {
     if (!x || !y)
         return nullptr;
-    algebraic_g xs = x->stddev();
-    algebraic_g ys = y->stddev();
-    algebraic_g xa = x->average();
-    algebraic_g ya = y->average();
+    algebraic_g xs  = x->stddev();
+    algebraic_g ys  = y->stddev();
+    algebraic_g xa  = x->average();
+    algebraic_g ya  = y->average();
 
-    algebraic_g fa = f(xa, ya);
+    algebraic_g fa  = f(xa, ya);
     algebraic_g dxv = dfdx ? dfdx(xa, ya) : nullptr;
     algebraic_g dyv = dfdy ? dfdy(xa, ya) : nullptr;
-    dxv = dxv ? dxv * xs : xs;
-    dyv = dyv ? dyv * ys : ys;
-    algebraic_g fs = dxv * dxv + dyv * dyv;
+    dxv             = dxv ? dxv * xs : xs;
+    dyv             = dyv ? dyv * ys : ys;
+    algebraic_g fs  = dxv * dxv + dyv * dyv;
     if (algebraic_g r = rho())
     {
         algebraic_g cov = dxv * dyv * r;
-        fs = fs + (cov + cov);
+        fs              = fs + (cov + cov);
     }
     if (fs && !fs->is_infinity())
         fs = sqrt::run(fs);
@@ -1203,7 +1272,7 @@ static algebraic_p div_dfdy(algebraic_r x, algebraic_r y)
 //   d(x/y)/dy = -x/y^2
 // ----------------------------------------------------------------------------
 {
-    return -x / (y*y);
+    return -x / (y * y);
 }
 
 
@@ -1244,7 +1313,6 @@ uncertain_p operator^(uncertain_r x, uncertain_r y)
 }
 
 
-
 // ============================================================================
 //
 //   Functions on uncertain numbers
@@ -1256,29 +1324,29 @@ static algebraic_p approx_dfdx(algebraic_r x, algebraic_fn f)
 //   Approximate differentiation when no symbolic differential exists
 // ----------------------------------------------------------------------------
 {
-    algebraic_g eps = decimal::make(1,-6);
-    algebraic_g h = x * eps;
-    algebraic_g h2 = h + h;
-    algebraic_g fp = f(x + h);
-    algebraic_g fn = f(x - h);
-    algebraic_g df = fp - fn;
+    algebraic_g eps = decimal::make(1, -6);
+    algebraic_g h   = x * eps;
+    algebraic_g h2  = h + h;
+    algebraic_g fp  = f(x + h);
+    algebraic_g fn  = f(x - h);
+    algebraic_g df  = fp - fn;
     algebraic_g fp2 = f(x + h2);
     algebraic_g fn2 = f(x - h2);
     algebraic_g df2 = fp2 - fn2;
-    df = df + df;               // x2
-    df = df + df;               // x4
-    df = df + df;               // x8
-    df = df2 - df;
-    h = h + h2;                 // x3
-    h = h + h;                  // x6
-    h = h + h;                  // x12
+    df              = df + df; // x2
+    df              = df + df; // x4
+    df              = df + df; // x8
+    df              = df2 - df;
+    h               = h + h2; // x3
+    h               = h + h;  // x6
+    h               = h + h;  // x12
 
     return df / h;
 }
 
 
 static uncertain_p univariate(algebraic_fn f,
-                              uncertain_r   x,
+                              uncertain_r  x,
                               algebraic_fn dfdx = nullptr)
 // ----------------------------------------------------------------------------
 //   Unary functions
@@ -1286,18 +1354,17 @@ static uncertain_p univariate(algebraic_fn f,
 {
     if (!x)
         return nullptr;
-    algebraic_g xs = x->stddev();
-    algebraic_g xa = x->average();
+    algebraic_g xs  = x->stddev();
+    algebraic_g xa  = x->average();
 
-    algebraic_g fa = f(xa);
+    algebraic_g fa  = f(xa);
     algebraic_g dxv = dfdx ? dfdx(xa) : approx_dfdx(xa, f);
-    algebraic_g fs = abs::evaluate(dxv * xs);
+    algebraic_g fs  = abs::evaluate(dxv * xs);
 
     if (!fa || !fs)
         return nullptr;
     return uncertain::make(fa, fs);
 }
-
 
 
 UNCERTAIN_BODY(sqrt)

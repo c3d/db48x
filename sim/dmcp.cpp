@@ -40,7 +40,6 @@
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
-#include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
@@ -1087,7 +1086,11 @@ void rtc_read(tm_t * tm, dt_t *dt)
     time(&now);
 
     struct tm utm;
+#ifdef _WIN32
+    localtime_s(&utm, &now);
+#else
     localtime_r(&now, &utm);
+#endif
 
     struct timeval tv;
     gettimeofday(&tv, nullptr);
@@ -1141,7 +1144,11 @@ int check_create_dir(const char * dir)
     if (stat(dir, &st) == 0)
         if (st.st_mode & S_IFDIR)
             return 0;
+#ifdef _WIN32
+    return mkdir(dir);
+#else
     return mkdir(dir, 0777);
+#endif
 }
 
 

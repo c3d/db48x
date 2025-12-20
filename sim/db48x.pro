@@ -131,17 +131,19 @@ color:DEFINES += CONFIG_COLOR
 # Additional external library HIDAPI linked statically into the code
 INCLUDEPATH += ../src/dm42 ../src/dmcp ../src
 
-win32:   LIBS += -lsetupapi
+win32:   LIBS += -lsetupapi -lgnurx
 android: LIBS +=
 freebsd: LIBS += -lthr -liconv
 macx:    LIBS += -framework CoreFoundation -framework IOKit
 macx:    QMAKE_CFLAGS += -fsanitize=address
 macx:    LIBS += -fsanitize=address
 clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
-clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-cxx-extension
+clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-extension
+gcc:     QMAKE_CFLAGS   += -Wall -Wno-packed-bitfield-compat
+gcc:     QMAKE_CXXFLAGS += -Wall -Wno-packed-bitfield-compat
 
 OBJECTS_DIR=db48x-build
-android:        OBJECT_DIR=db48x-android-build
+android:        OBJECTS_DIR=db48x-android-build
 
 ICON = db48x.icns
 

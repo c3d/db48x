@@ -15,7 +15,7 @@ from disk only once, and then cached in compiled form in memory. This is how the
 next uses of that library item can be as fast as if it was on the stack.
 
  Library items that are currently loaded in memory can be identified using
-`Libs`. The `Attach` commadn can be used to load items ahead of time. The
+`Libs`. The `Attach` command can be used to load items ahead of time. The
 `Detach` command can be used to evacuate library elements that are no longer
 used.
 

@@ -530,15 +530,17 @@ MENU(RangeMenu,
      "±",       ID_SelfInsert,
      "±\t%",    ID_SelfInsert,
      "±σ",      ID_SelfInsert,
-     "Range→",  ID_Explode,
-     "Size",    ID_Size,
+     "Range→",  ID_FromRange,
+     "ρ",       ID_SelfInsert,
 
      "→Range",  ID_ToRange,
      "→∆Range", ID_ToDeltaRange,
      "→%Range", ID_ToPercentRange,
      "→σRange", ID_ToUncertain,
      "∪",       ID_RangeUnion,
-     "∩",       ID_RangeIntersect);
+     "∩",       ID_RangeIntersect,
+
+     "Size",    ID_Size);
 
 
 MENU(VectorMenu,
