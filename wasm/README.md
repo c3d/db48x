@@ -1,20 +1,28 @@
 # DB48x WebAssembly App
 
 A WebAssembly port of the DB48x calculator.
-## Running
 
-In the parent directory execute:
+
+Before continuing, build the wasm binary, just go the parent directory and execute:
+
 ```
 make wasm
 ```
 
-In the current directory execute:
+## Production deployment
+
+There is no build step for app, just serve all the files inside `public/` + the file `index.html` with any web server. Be sure to place all the files in the same directory level.
+
+## Development
+
+Just for development purposes, a hot reload development server can be started with the following command:
+
 ```shell
 npm install
 npm run dev
 ```
 
-Open the url [http://localhost:5173](http://localhost:5173) with a web browser.
+Then open the url [http://localhost:5173](http://localhost:5173) with a web browser.
 
 ## Modify keyboard skin or key placement
 
