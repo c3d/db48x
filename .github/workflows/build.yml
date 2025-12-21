@@ -1,0 +1,717 @@
+name: Build DB48X
+
+on:
+  push:
+    branches: [ stable, dev ]
+  pull_request:
+    branches: [ stable, dev ]
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+jobs:
+  build-simulator-macos:
+    name: Build Simulator (macOS)
+    runs-on: macos-latest
+    env:
+      APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qtmultimedia'
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Deploy Qt dependencies
+      run: |
+        macdeployqt sim/db48x.app
+
+    - name: Code sign macOS app (with Apple Developer certificate)
+      if: ${{ env.APPLE_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/db48x.app
+        certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+        certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+        apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+        apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+        apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+        apple-product-id: org.db48x.simulator
+
+    - name: Code sign macOS app (ad-hoc fallback)
+      if: ${{ env.APPLE_CERT_DATA == '' }}
+      run: |
+        codesign --force --deep --sign - sim/db48x.app
+
+    - name: Create macOS archive
+      run: |
+        cd sim
+        cp ../allow-db48x-macos.sh .
+        chmod +x allow-db48x-macos.sh
+        zip -r db48x-macos.zip db48x.app allow-db48x-macos.sh
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-macos
+        path: sim/db48x-macos.zip
+
+  build-simulator-linux:
+    name: Build Simulator (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.5.3'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-linux
+        path: |
+          sim/db48x
+          help/
+
+  build-simulator-windows:
+    name: Build Simulator (Windows)
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+
+    - name: Build simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make sim
+
+    - name: Deploy Qt dependencies
+      shell: msys2 {0}
+      run: |
+        cd sim/debug
+        windeployqt6 db48x.exe
+        # Copy MinGW runtime and MSYS2 dependencies
+        cp /mingw64/bin/libgcc_s_seh-1.dll .
+        cp /mingw64/bin/libstdc++-6.dll .
+        cp /mingw64/bin/libwinpthread-1.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libintl-8.dll .
+        cp /mingw64/bin/libiconv-2.dll .
+        # Copy all Qt dependency DLLs
+        cp /mingw64/bin/libb2-1.dll .
+        cp /mingw64/bin/libdouble-conversion.dll .
+        cp /mingw64/bin/libicuin*.dll .
+        cp /mingw64/bin/libicuuc*.dll .
+        cp /mingw64/bin/libicudt*.dll .
+        cp /mingw64/bin/libpcre2-16-0.dll .
+        cp /mingw64/bin/zlib1.dll .
+        cp /mingw64/bin/libzstd.dll .
+        cp /mingw64/bin/libfreetype-6.dll .
+        cp /mingw64/bin/libharfbuzz-0.dll .
+        cp /mingw64/bin/libmd4c.dll .
+        cp /mingw64/bin/libpng16-16.dll .
+        cp /mingw64/bin/libbrotlidec.dll .
+        cp /mingw64/bin/libbrotlicommon.dll .
+        cp /mingw64/bin/libbz2-1.dll .
+        cp /mingw64/bin/libglib-2.0-0.dll .
+        cp /mingw64/bin/libgraphite2.dll .
+        cp /mingw64/bin/libpcre2-8-0.dll .
+
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/debug/db48x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-simulator-windows
+        path: |
+          sim/debug/db48x.exe
+          sim/debug/*.dll
+          sim/debug/platforms/
+          sim/debug/imageformats/
+          sim/debug/tls/
+          help/
+
+  build-color-simulator-macos:
+    name: Build Color DM32 Simulator (macOS)
+    runs-on: macos-latest
+    env:
+      APPLE_CERT_DATA: ${{ secrets.APPLE_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'mac'
+        target: 'desktop'
+        arch: 'clang_64'
+        modules: 'qtmultimedia'
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Deploy Qt dependencies
+      run: |
+        macdeployqt sim/db50x.app
+
+    - name: Code sign macOS app (with Apple Developer certificate)
+      if: ${{ env.APPLE_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/db50x.app
+        certificate-data: ${{ secrets.APPLE_CERT_DATA }}
+        certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
+        apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
+        apple-notary-user: ${{ secrets.APPLE_NOTARY_USER }}
+        apple-notary-password: ${{ secrets.APPLE_NOTARY_PASSWORD }}
+        apple-product-id: org.db48x.color-simulator
+
+    - name: Code sign macOS app (ad-hoc fallback)
+      if: ${{ env.APPLE_CERT_DATA == '' }}
+      run: |
+        codesign --force --deep --sign - sim/db50x.app
+
+    - name: Create macOS archive
+      run: |
+        cd sim
+        cp ../allow-db50x-macos.sh .
+        chmod +x allow-db50x-macos.sh
+        zip -r db50x-macos.zip db50x.app allow-db50x-macos.sh
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-macos
+        path: sim/db50x-macos.zip
+
+  build-color-simulator-linux:
+    name: Build Color DM32 Simulator (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-cursor0 libgl1-mesa-dev libxkbcommon-x11-0 libfreetype6-dev pkg-config
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.5.3'
+        host: 'linux'
+        target: 'desktop'
+        modules: 'qtmultimedia'
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-linux
+        path: |
+          sim/db50x
+          help/
+
+  build-color-simulator-windows:
+    name: Build Color DM32 Simulator (Windows)
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+
+    - name: Build color DM32 simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make color-dm32-sim
+
+    - name: Deploy Qt dependencies
+      shell: msys2 {0}
+      run: |
+        cd sim/debug
+        windeployqt6 db50x.exe
+        # Copy MinGW runtime and MSYS2 dependencies
+        cp /mingw64/bin/libgcc_s_seh-1.dll .
+        cp /mingw64/bin/libstdc++-6.dll .
+        cp /mingw64/bin/libwinpthread-1.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libintl-8.dll .
+        cp /mingw64/bin/libiconv-2.dll .
+        # Copy all Qt dependency DLLs
+        cp /mingw64/bin/libb2-1.dll .
+        cp /mingw64/bin/libdouble-conversion.dll .
+        cp /mingw64/bin/libicuin*.dll .
+        cp /mingw64/bin/libicuuc*.dll .
+        cp /mingw64/bin/libicudt*.dll .
+        cp /mingw64/bin/libpcre2-16-0.dll .
+        cp /mingw64/bin/zlib1.dll .
+        cp /mingw64/bin/libzstd.dll .
+        cp /mingw64/bin/libfreetype-6.dll .
+        cp /mingw64/bin/libharfbuzz-0.dll .
+        cp /mingw64/bin/libmd4c.dll .
+        cp /mingw64/bin/libpng16-16.dll .
+        cp /mingw64/bin/libbrotlidec.dll .
+        cp /mingw64/bin/libbrotlicommon.dll .
+        cp /mingw64/bin/libbz2-1.dll .
+        cp /mingw64/bin/libglib-2.0-0.dll .
+        cp /mingw64/bin/libgraphite2.dll .
+        cp /mingw64/bin/libpcre2-8-0.dll .
+
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: sim/debug/db50x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-color-simulator-windows
+        path: |
+          sim/debug/db50x.exe
+          sim/debug/*.dll
+          sim/debug/platforms/
+          sim/debug/imageformats/
+          sim/debug/tls/
+          help/
+
+  build-wasm:
+    name: Build WebAssembly
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Setup Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: 'latest'
+
+    - name: Verify Emscripten
+      run: |
+        emcc --version
+
+    - name: Build WASM
+      shell: bash
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make SHELL=/bin/bash wasm
+
+    - name: Upload WASM artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-wasm
+        path: |
+          wasm/db48x.js
+          wasm/db48x.wasm
+          wasm/*.html
+          help/
+
+  build-android:
+    name: Build Android App (db48x)
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Qt for Android
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'linux'
+        target: 'android'
+        arch: 'android_arm64_v8a'
+        modules: 'qtmultimedia'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Android NDK
+      run: |
+        sdkmanager --install "ndk;26.1.10909125"
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Build Android App Bundle
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        # Generate version.h, qrc files, and recorder config
+        make src/dmcp/version.h
+        make sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
+        cd recorder && make TARGET=opt && cd ..
+        # Build Android app (signed if keystore available, unsigned otherwise)
+        if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+          mkdir -p $HOME/.local
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
+          make android
+        else
+          cd sim && \
+            $QT_ROOT_DIR/bin/qmake -spec android-clang db48x.pro && \
+            make VARIANT=android && \
+            mkdir -p ../android/libs/arm64-v8a && \
+            cp libdb48x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
+            $QT_HOST_PATH/bin/androiddeployqt \
+              --input android-db48x-deployment-settings.json \
+              --output ../android --gradle --aab
+        fi
+      env:
+        ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+
+    - name: List generated AAB files
+      run: |
+        echo "Looking for AAB files in android directory:"
+        find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-android
+        path: |
+          android/**/*.aab
+          help/
+
+  build-color-android:
+    name: Build Android App (db50x)
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_DATA: ${{ secrets.ANDROID_KEYSTORE_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Qt for Android
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.1'
+        host: 'linux'
+        target: 'android'
+        arch: 'android_arm64_v8a'
+        modules: 'qtmultimedia'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Android NDK
+      run: |
+        sdkmanager --install "ndk;26.1.10909125"
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libfreetype6-dev pkg-config
+
+    - name: Build Android App Bundle
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        export ANDROID_SDK_ROOT=$ANDROID_HOME
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        # Generate version.h, qrc files, and recorder config
+        make src/dmcp/version.h
+        make COLOR=color sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
+        cd recorder && make TARGET=opt && cd ..
+        # Build Android app (signed if keystore available, unsigned otherwise)
+        if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
+          mkdir -p $HOME/.local
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
+          make color-android
+        else
+          cd sim && \
+            $QT_ROOT_DIR/bin/qmake -spec android-clang db50x.pro && \
+            make VARIANT=android && \
+            mkdir -p ../android/libs/arm64-v8a && \
+            cp libdb50x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
+            $QT_HOST_PATH/bin/androiddeployqt \
+              --input android-db50x-deployment-settings.json \
+              --output ../android --gradle --aab
+        fi
+      env:
+        ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+
+    - name: List generated AAB files
+      run: |
+        echo "Looking for AAB files in android directory:"
+        find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-android
+        path: |
+          android/**/*.aab
+          help/
+
+  build-dm42-firmware:
+    name: Build DM42 Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM42 firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make dist || make dist
+        mv db48x-v*.tgz db48x-dm42-firmware.tgz
+
+    - name: Upload DM42 firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db48x-dm42-firmware
+        path: db48x-dm42-firmware.tgz
+
+  build-dm32-firmware:
+    name: Build DM32 Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM32 firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make dm32-dist || make dm32-dist
+        mv db50x-v*.tgz db50x-dm32-firmware.tgz
+
+    - name: Upload DM32 firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-dm32-firmware
+        path: db50x-dm32-firmware.tgz
+
+  build-dm42n-firmware:
+    name: Build DM42n Firmware
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi binutils-arm-none-eabi libfreetype6-dev pkg-config
+
+    - name: Build DM42n firmware
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make dm42n-dist || make dm42n-dist
+        mv db50x-v*.tgz db50x-dm42n-firmware.tgz
+
+    - name: Upload DM42n firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: db50x-dm42n-firmware
+        path: db50x-dm42n-firmware.tgz
+
+  build-release-package:
+    name: Create Release Package
+    runs-on: ubuntu-latest
+    needs: [
+      build-simulator-macos,
+      build-simulator-linux,
+      build-simulator-windows,
+      build-color-simulator-macos,
+      build-color-simulator-linux,
+      build-color-simulator-windows,
+      build-android,
+      build-color-android,
+      build-wasm,
+      build-dm42-firmware,
+      build-dm32-firmware,
+      build-dm42n-firmware
+    ]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/stable' || github.ref == 'refs/heads/dev')
+
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Display structure of downloaded files
+      run: ls -R
+
+    - name: Create release archives
+      run: |
+        cd db48x-dm42-firmware
+        tar czf ../db48x-dm42-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-dm32-firmware
+        tar czf ../db50x-dm32-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-dm42n-firmware
+        tar czf ../db50x-dm42n-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db48x-android
+        tar czf ../db48x-android-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db50x-android
+        tar czf ../db50x-android-${GITHUB_SHA:0:8}.tar.gz *
+        cd ../db48x-wasm
+        tar czf ../db48x-wasm-${GITHUB_SHA:0:8}.tar.gz *
+        cd ..
+        # macOS simulators are already zipped, just rename them
+        cp db48x-simulator-macos/db48x-macos.zip db48x-simulator-macos-${GITHUB_SHA:0:8}.zip
+        cp db50x-color-simulator-macos/db50x-macos.zip db50x-color-simulator-macos-${GITHUB_SHA:0:8}.zip
+
+    - name: Upload release packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-packages
+        path: |
+          db48x-dm42-*.tar.gz
+          db50x-dm32-*.tar.gz
+          db50x-dm42n-*.tar.gz
+          db48x-android-*.tar.gz
+          db50x-android-*.tar.gz
+          db48x-wasm-*.tar.gz
+          db48x-simulator-macos-*.zip
+          db50x-color-simulator-macos-*.zip

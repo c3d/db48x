@@ -367,7 +367,7 @@ power, because of additional animations or more expensive graphical rendering.
 ## Bytes
 
 Return the size of the object and a hash of its value. On classic RPL systems,
-teh hash is a 5-nibbles CRC32. On DB48X, the hash is a based integer of the
+the hash is a 5-nibbles CRC32. On DB48X, the hash is a based integer of the
 current [wordsize](#stws) corresponding to the binary representation of the
 object.
 

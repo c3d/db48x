@@ -258,6 +258,7 @@ COMMAND_BODY(ResetModes)
 // ----------------------------------------------------------------------------
 {
     Settings = settings();
+    ui.menu_refresh();
     return OK;
 }
 

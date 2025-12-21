@@ -8,7 +8,7 @@
             "name": "Launch DB48X Qt Simulator",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "program": "${workspaceFolder}/sim/db48x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -22,13 +22,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            }
         },
         {
             "name": "Launch DB48X Qt Simulator (Debug)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "program": "${workspaceFolder}/sim/db48x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -42,13 +45,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            }
         },
         {
             "name": "Launch DB50X Qt Simulator",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "program": "${workspaceFolder}/sim/db50x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -62,13 +68,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            }
         },
         {
             "name": "Launch DB50X Qt Simulator (Debug)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "program": "${workspaceFolder}/sim/db50x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -82,13 +91,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            }            
         },
         {
             "name": "Launch DB50X Color Qt Simulator",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "program": "${workspaceFolder}/sim/db50x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -102,13 +114,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            }            
         },
         {
             "name": "Launch DB50X Color Qt Simulator (Debug)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "program": "${workspaceFolder}/sim/db50x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -122,13 +137,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            }            
         },
         {
             "name": "Test DB48X Qt Simulator (-Tall)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            "program": "${workspaceFolder}/sim/db48x",
             "args": ["-Tall"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -142,13 +160,16 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db48x.app/Contents/MacOS/db48x",
+            }
         },
         {
             "name": "Test DB50X Qt Simulator (-Tall)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            "program": "${workspaceFolder}/sim/db50x",
             "args": ["-Tall"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -162,7 +183,10 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "osx":{
+                "program": "${workspaceFolder}/sim/db50x.app/Contents/MacOS/db50x",
+            }
         }
     ]
 }

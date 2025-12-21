@@ -132,6 +132,7 @@ user_interface::user_interface()
       taLowercase(false),
       taPrevAlpha(false),
       taPrevLowerc(false),
+      delayedArrow(false),
       userOnce(false),
       shiftDrawn(false),
       xshiftDrawn(false),
@@ -570,7 +571,7 @@ bool user_interface::editor_history(bool back)
             rt.edit(+ed, sz);
             cursor = 0;
             select = ~0U;
-            alpha = lowercase = xshift = shift = false;
+            alpha = lowercase = shift = xshift = false;
             edRows = 0;
             dirtyEditor = true;
             break;
@@ -4096,7 +4097,7 @@ bool user_interface::noHelpForKey(int key)
 
     if (editing)
     {
-        // No help for ENTER or BSP key while editing
+        // No help for ENTER, BSP, UP, DOWN and RUN keys while editing
         if (key == KEY_ENTER || key == KEY_BSP ||
             key == KEY_UP || key == KEY_DOWN || key == KEY_RUN)
             return true;
@@ -4108,9 +4109,15 @@ bool user_interface::noHelpForKey(int key)
 
     // No help for digits entry
     if (!shift && !xshift)
-        if (key > KEY_ENTER && key < KEY_ADD &&
+    {
+        // Show help for Negate and Cycle only if not editing
+        if (key == KEY_CHS || key == KEY_E)
+            return editing;
+
+        if (key > KEY_SWAP && key < KEY_ADD &&
             key != KEY_SUB && key != KEY_MUL && key != KEY_DIV && key != KEY_RUN)
             return true;
+    }
 
     // Other cases are regular functions, we can display help
     return false;
@@ -4202,7 +4209,7 @@ bool user_interface::handle_help(int &key)
         {
             if (!noHelpForKey(last))
                 key = last;     // Time to evaluate
-            last    = 0;
+            last = 0;
         }
 
         // Help keyboard movements only applies when help is shown
@@ -4333,18 +4340,20 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             {
                 // Let menu and normal keys go through
                 if (xshift)
-                    return false;
-
-                // Delay processing of up or down until after delay
-                if (longpress)
                 {
-                    repeat = true;
+                    last = key;
                     return false;
                 }
 
-                last = key;
                 repeat = true;
+
+                // Delay processing of up or down until after delay
+                if (longpress)
+                    return false;
+
                 taLowercase = key == KEY_DOWN;
+                delayedArrow = true;
+                last = key;
                 return true;
             }
             else if (key)
@@ -4366,8 +4375,9 @@ bool user_interface::handle_shifts(int &key, bool talpha)
                 return true;
             }
         }
-        else if (!key && (last == KEY_UP || last == KEY_DOWN))
+        else if (!key && delayedArrow)
         {
+            delayedArrow = false;
             if (!longpress)
                 key = last;
             last = 0;
@@ -4406,34 +4416,31 @@ bool user_interface::handle_shifts(int &key, bool talpha)
     {
         if (longpress)
         {
-            alpha = !alpha;
-            lowercase = false;
-            xshift = 0;
-            shift = 0;
-        }
-        else if (xshift)
-        {
+            if (alpha)
+                alpha = lowercase = false;
+            else
+                alpha = true;
+            shift = false;
             xshift = false;
         }
         else
         {
-            xshift = false;
-#define SHM(d, x, s) ((d << 2) | (x << 1) | (s << 0))
-#define SHD(d, x, s) (1 << SHM(d, x, s))
-            // Double shift toggles xshift
-            bool dshift = last == KEY_SHIFT;
-            int  plane  = SHM(dshift, xshift, shift);
-            const unsigned nextShift =
-                SHD(0, 0, 0) | SHD(0, 1, 0) | SHD(1, 0, 0);
-            const unsigned nextXShift =
-                SHD(0, 0, 1) | SHD(0, 1, 0) | SHD(0, 1, 1) | SHD(1, 0, 1);
-            shift  = (nextShift  & (1 << plane)) != 0;
-            xshift  = (nextXShift & (1 << plane)) != 0;
+            if (xshift)
+            {
+                xshift = false;
+            }
+            else if (shift)
+            {
+                shift = false;
+                xshift = true;
+            }
+            else
+            {
+                shift = true;
+            }
             repeat = true;
         }
         consumed = true;
-#undef SHM
-#undef SHD
     }
     else if (shift && key == KEY_ENTER)
     {
@@ -5757,8 +5764,8 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         alpha = false;
         lowercase = false;
     }
-    xshift = false;
     shift = false;
+    xshift = false;
 
     if (userOnce && usr == Settings.UserMode())
     {

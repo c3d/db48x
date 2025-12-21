@@ -2140,7 +2140,7 @@ Tair=-20_°C  u=2200_km/h
 
 #### String Standing Waves
 
-A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being being fixed at one end and free at the other end admits only all odd integer harmonics.
+A string being fixed or free at its ends admits only discrete harmonics as standing waves on the string. A string being fixed (or free) at both ends admits all integer harmonics. A string being fixed at one end and free at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Ts_N;y_m;ffixedfixed_Hz;ffixedfree_Hz]` (Propagation speed of waves, Wave number; Angular frequency; Tension; Frequency of harmonics on a string fixed at both ends; Frequency of harmonics on a string fixed at one end and free at the other end) from 9 known variables:
 ```rpl
@@ -2151,7 +2151,7 @@ A string being fixed or free at its ends admits only discrete harmonics as stand
 
 #### Sound Wave Harmonics
 
-A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being being open at one end and closed at the other end admits only all odd integer harmonics.
+A tube being open or closed at its ends admits only discrete harmonics as standing waves of the sound in the air within the tube. A tube being open (or closed) at both ends admits all integer harmonics. A tube being open at one end and closed at the other end admits only all odd integer harmonics.
 
 * To calculate `[v_m/s;k_(r/m);ω_(r/s);Tair_°C;s_m;fopenopen_Hz;fopenclose_Hz]` (Propagation speed of sound waves; Wave number; Angular frequency, Temperature; Frequency of harmonics in a tube open at both ends; Frequency of harmonics in a tube open at one end and close at the other end) from 8 known variables:
 ```rpl
@@ -2695,7 +2695,7 @@ The 52 variables in the Nuclear Physics section are:
 * `λ`: Decay constant (Radioactivity) (dim.: 1/time, in SI: s^-1)
 * `Δm`: Mass default
 * `A`: Total activity at time `t` ([Radioactivity](#Radioactivity)) (dim.: number of decay/time, in SI: becquerel, Bq), or Mass number ([Nuclear Physics](#Nuclear Physics))
-* `abdaughter`: Abondance of the daughter nuclide
+* `abdaughter`: Abundance of the daughter nuclide
 * `abparent`: Abondance of the parent radionuclide
 * `abtot`: Total abondance of the nuclide
 * `AY1`: Mass number of the first nuclide `Y1` produced by a fission
@@ -2794,7 +2794,7 @@ A=239  Z=94  AXα=239  ZXα=94  mX=239.052157_u  mY=235.043924_u
 
 #### β⊖ Decay
 
-The β⊖ Decay reaction has 3 products: the daughter nuclide, an electron & an antineutrino having a negligeable mass. Due to their weak masses, the resulting kinetic energy is essentially splitted between the last two particles. The energy spectrum of the antineutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted elevtron.
+The β⊖ Decay reaction has 3 products: the daughter nuclide, an electron & an antineutrino having a negligible mass. Due to their weak masses, the resulting kinetic energy is essentially split between the last two particles. The energy spectrum of the antineutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted electron.
 
 * **Example 1** For the β⊖ decay of Th234 into Pa234, to calculate `[N;Δm_u;Qβ⊖_MeV;Kmax_MeV;γmax;βmax;AYβ⊖;ZYβ⊖]` (Number of neutron of Th234; Mass default; Reaction energy; Maximum kinetic energy of the electron, Maximum Lorentz factor; Maximum relativistic speed ratio; Mass number & Proton number of the daughter nuclide) from 6 known variables:
 ```rpl
@@ -2811,7 +2811,7 @@ A=14  Z=6  AXβ⊖=14  ZXβ⊖=6  mX=14.0032419884_u  mY=14.00307400443_u
 
 #### β⊕ Decay
 
-The β⊕ Decay reaction has 3 products: the daughter nuclide, a positron & a neutrino having a negligeable mass. Due to their weak masses, the resulting kinetic energy is essentially splitted between the last two particles. The energy spectrum of the neutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted positron.
+The β⊕ Decay reaction has 3 products: the daughter nuclide, a positron & a neutrino having a negligible mass. Due to their weak masses, the resulting kinetic energy is essentially split between the last two particles. The energy spectrum of the neutrino being continuous and possibly very small, the energy reaction can therefore be the maximum kinetic energy `Kmax` of the emitted positron.
 
 * For the β⊕ decay of K40 (present in bananas) into Ar40, to calculate `[N;Δm_u;Qβ⊕_MeV;Kmax_MeV;γmax;βmax;AYβ⊕;ZYβ⊕]` (Number of neutron of K40; Mass default; Reaction energy; Maximum kinetic energy of the electron, Maximum Lorentz factor; Maximum relativistic speed ratio; Mass number & Proton number of the daughter nuclide) from 6 known variables:
 ```rpl
