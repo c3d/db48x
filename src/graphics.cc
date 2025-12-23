@@ -1157,6 +1157,12 @@ static void draw_show_horizontal_arrow(coord tipx, coord tipy,
                                        bool right, pattern fc, pattern bc)
 // ----------------------------------------------------------------------------
 //   Draw a left/right pointing arrow with tip at (tipx, tipy)
+//   tipx, tipy: Arrow tip coordinates on screen (assuming the padding is 0)
+//   size:       Arrow size in pixels
+//   padding:    Extra pixels around the arrow body
+//   right:      true for a right arrow, false for a left arrow
+//   fc:         Foreground pattern for the arrow
+//   bc:         Background pattern behind the arrow
 // ----------------------------------------------------------------------------
 {
     Screen.fill(right ? tipx - size - 2*padding: tipx, 
@@ -1179,6 +1185,12 @@ static void draw_show_vertical_arrow(coord tipx, coord tipy,
                                      bool down, pattern fc, pattern bc)
 // ----------------------------------------------------------------------------
 //   Draw an up/down pointing arrow with tip at (tipx, tipy)
+//   tipx, tipy: Arrow tip coordinates on screen (assuming padding is 0)
+//   size:       Arrow size in pixels
+//   padding:    Extra pixels around the arrow body
+//   down:       true for a down arrow, false for an up arrow
+//   fc:         Foreground pattern for the arrow
+//   bc:         Background pattern behind the arrow
 // ----------------------------------------------------------------------------
 {
     Screen.fill(tipx - size - padding, 
@@ -1197,7 +1209,8 @@ static void draw_show_vertical_arrow(coord tipx, coord tipy,
 
 static void draw_show_arrows(grob::pixsize width, grob::pixsize height)
 // ----------------------------------------------------------------------------
-//   Indicate available scroll directions
+//   Render navigation arrows if the grob object is bigger than the display
+//   width, height: Size of the full grob being shown
 // ----------------------------------------------------------------------------
 {
     auto         fc                = Settings.Foreground();
