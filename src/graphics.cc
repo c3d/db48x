@@ -1152,6 +1152,75 @@ static coord show_x       = 0;
 static coord show_y       = 0;
 static coord show_delta   = 8;
 
+static void draw_show_horizontal_arrow(coord tipx, coord tipy,
+                                       coord size, coord padding, 
+                                       bool right, pattern fc, pattern bc)
+// ----------------------------------------------------------------------------
+//   Draw a left/right pointing arrow with tip at (tipx, tipy)
+// ----------------------------------------------------------------------------
+{
+    Screen.fill(right ? tipx - size - 2*padding: tipx, 
+                tipy - size - padding, 
+                right ? tipx : tipx + size + 2*padding, 
+                tipy + size + padding,
+                bc);
+    for (coord offset = 0; offset < size; offset++)
+    {
+        coord span = offset + 1;
+        coord x = right ? tipx - offset - padding : tipx + offset + padding;
+        Screen.fill(x, tipy - span + 1, x, tipy + span - 1, fc);
+    }
+}
+
+
+
+static void draw_show_vertical_arrow(coord tipx, coord tipy,
+                                     coord size, coord padding,
+                                     bool down, pattern fc, pattern bc)
+// ----------------------------------------------------------------------------
+//   Draw an up/down pointing arrow with tip at (tipx, tipy)
+// ----------------------------------------------------------------------------
+{
+    Screen.fill(tipx - size - padding, 
+                down ? tipy - size - 2*padding : tipy, 
+                tipx + size + padding, 
+                down ? tipy : tipy + size + 2*padding,
+                bc);
+    for (coord offset = 0; offset < size; offset++)
+    {
+        coord span = offset + 1;
+        coord y = down ? tipy - offset - padding : tipy + offset + padding;
+        Screen.fill(tipx - span + 1, y, tipx + span - 1, y, fc);
+    }
+}
+
+
+static void draw_show_arrows(grob::pixsize width, grob::pixsize height)
+// ----------------------------------------------------------------------------
+//   Indicate available scroll directions
+// ----------------------------------------------------------------------------
+{
+    auto         fc                = Settings.Foreground();
+    auto         bc                = pattern::gray90;
+    constexpr coord arrow_size     = 6;
+    constexpr coord arrow_padding  = 2;
+    coord        midx              = LCD_W / 2;
+    coord        midy              = LCD_H / 2;
+
+    if (show_x > 0)
+        draw_show_horizontal_arrow(0, midy, arrow_size, arrow_padding, 
+                                   false, fc, bc);
+    if (show_x + LCD_W < coord(width))
+        draw_show_horizontal_arrow(LCD_W - 1, midy, arrow_size, arrow_padding, 
+                                   true, fc, bc);
+    if (show_y > 0)
+        draw_show_vertical_arrow(midx, 0, arrow_size, arrow_padding, 
+                                 false, fc, bc);
+    if (show_y + LCD_H < coord(height))
+        draw_show_vertical_arrow(midx, LCD_H - 1, arrow_size, arrow_padding,
+                                 true, fc, bc);
+}
+
 
 void show_grob(grob_p graph)
 // ----------------------------------------------------------------------------
@@ -1179,6 +1248,7 @@ void show_grob(grob_p graph)
         grob::surface s = graph->pixels();
         Screen.copy(s, r, point(show_x,show_y));
     }
+    draw_show_arrows(width, height);
     mark_dirty(0, 0, LCD_W-1, LCD_H-1);
     refresh_dirty();
 }
