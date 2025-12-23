@@ -99,28 +99,4 @@ COMMAND_DECLARE(JulianDayNumber,1);// Return JDN for given date
 COMMAND_DECLARE(DateFromJulianDayNumber,1); // Date from JDN
 COMMAND_DECLARE(InsertHms,-1);  // Insert _hms, optionnaly replacing _dms
 
-
-// ****************************************************************************
-// Minimal needed stuff taken from:
-//  sofam.h
-//
-// of the Standards Of Fundamental Astronomy (SOFA) Libraries,
-// issue 2023-10-11.
-
-/* dnint(A) - round to nearest whole number (double) */
-#define dnint(A) (fabs(A)<0.5?0.0\
-                                :((A)<0.0?ceil((A)-0.5):floor((A)+0.5)))
-
-/* max(A,B) - larger (most +ve) of two numbers (generic) */
-#define gmax(A,B) (((A)>(B))?(A):(B))
-
-/* Julian Date of Modified Julian Date zero */
-#define DJM0 (2400000.5)
-
-
-int iauCal2jd(int iy, int im, int id, double *djm0, double *djm);
-int iauJd2cal(double dj1, double dj2,
-              int *iy, int *im, int *id, double *fd);
-// ****************************************************************************
-
 #endif // DATETIME_H
