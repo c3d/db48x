@@ -1,9 +1,80 @@
 
-# Time, Date, Alarms and System Commands
+# Date, Time
+
+
+## Date entry / edit format
+
+A whole number with a `_date` unit attached is interpreted as a date according to the customary format `YYYYMMDD`.
+However, the year need not be a 4 digit number.
+It can a smaller, bigger, zero, even a negative number and leading zeros can be ommitted
+(as such it need not fit the `YYYY` format).
+In case of a negative number only the year is treated as such.
+Months and days, even in a negative year, run from low (positive numbers) to high within the year.
+
+Note: the date format is intentionally different from the format on the HP-48.
+
+Note: not all commands can handle a negative year.
+The underlying platform DMCP of the SwissMicros calculators handles only positive years.
+That bubbles up to several commands.
+
+
+## Date display format
+
+By default a Date is displayed on the stack like `Sun 30/Nov/2025`.
+The format can be adjusted by changing the [Date, Time flags](#date-time-flags) or
+[Date, Time settings](#date-time-settings).
+
+
+## Date+Time entry / edit format
+
+A real number with a `_date` unit attached is interpreted as a Date + Time
+according to the format `YYYYMMDD.HHMMSS`.
+
+
+## Date+Time display format
+
+By default a Date+Time is displayed on the stack like `Sun 30/Nov/2025, 16:43:10`.
+The format can be adjusted by changing the [Date, Time flags](#date-time-flags) or
+[Date, Time settings](#date-time-settings).
+
+
+## Time entry format
+
+Enter the hours, a '.' to end the hours an begin the minutes.
+After the minutes enter a second '.' to end the minutes and begin the seconds.
+The display will change to `<hours>°<minutes>′_dms`, assuming you are entering an angle.
+Proceed with the seconds.
+Optionally you can give a third '.' followed by a fraction of a second.
+Enter the fraction as numerator '.' (yes, a fourth; not a '/') denominator.
+Finally change the unit from `_dms` to `_hms`.
+With the cursor positioned before the unit you can just attach the `_hms` unit (it replaces the `_dms`).
+Or you can use the `→HMS` command.
+That pushes the value on the stack.
+Both the `_hms` unit and the `→HMS` command can be found in the [TimeMenu](#timemenu).
+Or, in alpha mode, you can change the 'd' in an 'h'.
+
+A second way to enter a time is as `<hours>.<decimal fraction of an hour>_hms`.
+
+
+## Time edit format
+
+In edit mode a time wil show as `HH°MM′SS″<fraction of a second>_hms`.
+A leading zero of the hours will be left out.
+If the fraction of a second is zero it will be left out.
+
+
+## Time display format
+
+On the stack a time wil show as `HH:MM:SS.<decimal fraction of a second>`.
+A leading zero of the hours will be left out.
+Note the ':' as separator.
+If the fraction of a second is zero the '.' and the fraction will be left out.
+The `_hms` unit will not show.
+
 
 ## DateMenu
 
-Activated from the [Time](#TimeMenu) menu.
+Access: [Time](#TimeMenu) menu.
 
 Show a softkey menu for date-related commands, including:
 
@@ -15,9 +86,10 @@ Show a softkey menu for date-related commands, including:
 * `JulianDayNumber`
 * `DateFromJulianDayNumber`
 
+
 ## TimeMenu
 
-Activated by the 🟦 _V_ (_TIME_) key.
+Access: 🟦 _V_ (_TIME_) key.
 
 Show a softkey menu for time-related commands, including:
 
@@ -33,7 +105,8 @@ Show a softkey menu for time-related commands, including:
 * `TimedEval`
 * `SetTime`
 
-## Time, Date related flags
+
+## Date, Time flags
 
 * `HideDate` / `ShowDate`
 * `HideTime` / `ShowTime`
@@ -46,54 +119,51 @@ Show a softkey menu for time-related commands, including:
 * `HideDayOfWeek` / `ShowDayOfWeek`
 * `BCECEyearNumbering` / `AstronomicalYearNumbering`
 
-## Time, Date related settings
+
+## Date, Time settings
 
 * `DateSlash` / `DateDash` / `DateDot` / `DateSpace`
+* `DateSeparatorCommand`
+
 
 ## BCECEyearNumbering
 
-Activate the B(efore) C(ommon) E(ra) / C(ommon) E(ra) suffix of the year in the display of a date on the stack.
-Activate the related year numbering which jumps from 1 BCE to 1 CE. So negative years are shifted.
+Access: 
+
+Activate the B(efore) C(ommon) E(ra) / C(ommon) E(ra) year numbering.
+
+Display years on the stack with a BCE (for negative years) or CE (for positive years) suffix.
+This uses a non uniform timeline without a year = 0.
+The year numbering jumps from 1 BCE to 1 CE. So negative years are shifted.
 See: [Proleptic Gregorian calendar](https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar)
+
 
 ## AstronomicalYearNumbering
 
-Activate the Astronomical year numbering. This uses a uniform timeline including a year = 0.
+Access: 
+
+Activate the Astronomical year numbering.
+
 Display negative years on the stack with a minus sign.
+This uses a uniform timeline including a year = 0.
 See: [Astronomical year numbering](https://en.wikipedia.org/wiki/Astronomical_year_numbering)
 
-## Date entry / edit format
 
-A whole number with a `_date` unit attached is interpreted as a date according to the customary format `YYYYMMDD`.
-The year need not be a 4 digit number.
-It can a smaller, bigger, zero, even a negative number and leading zeros can be ommitted
-(as such it need not fit the `YYYY` format).
-In case of a negative number only the year is treated as such.
-Months and days, even in a negative year, run from low (positive numbers) to high.
+## DateSlash
+## DateDash
+## DateDot
+## DateSpace
 
-Note: the date format is intentionally different from the format on the HP-48.
+Access: 
 
-## Date display format
+Activate the corresponding date separator.
 
-By default a Date is displayed on the stack like `Sun 30/Nov/2025`.
-The format can be adjusted by changing the [Time, Date related flags](#time-date-related-flags) or
-[Time, Date related settings](#time-date-related-settings)
 
-## Date+Time entry / edit format
+## DateSeparatorCommand
 
-A real number with a `_date` unit attached is interpreted as a Date + Time
-according to the format `YYYYMMDD.HHMMSS`.
+Access:
 
-## Date+Time display format
-
-By default a Date+Time is displayed on the stack like `Sun 30/Nov/2025, 16:43:10`.
-The format can be adjusted by changing the [Time, Date related flags](#time-date-related-flags) or / and
-[Time, Date related settings](#time-date-related-settings).
-
-## Time format
-
-The time format is `HH.MMSS` with optional hundredths of a second as
-in `HH.MMSSCC`.
+Return the most recent used or default date separator command.
 
 
 ## SetDate
@@ -248,12 +318,18 @@ This displays on the stack as `HH:MM:SS`.
 
 ## JulianDayNumber
 
-Return the Julian day number for the given date and time.
+Access: [Date](#DateMenu) menu.
+
+Convert a date to its Julian day number.
 
 For dates the Gregorian calendar is assumed.
 The Gregorian calendar jumps from 1582-10-04 to 1582-10-15.
-This command ignores that gap, so the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters like
-[The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
+This command ignores that gap.
+The Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters
+like [The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
+
+The conversion uses software from the
+[Standards of Fundamental Astronomy of the International Astronomical Union](https://www.iausofa.org/).
 
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
@@ -261,17 +337,24 @@ To compute the Julian Day Number for the first day of the millenium:
 @ Expecting 2 451 544 ¹/₂
 ```
 
-## Datefromjuliandaynumber
+## DateFromJulianDayNumber
 
-Return the date for a given Julian day number.
+Access: [Date](#DateMenu) menu.
+
+Convert a Julian day number to its date.
 
 This command converts a Julian day number to a date in the Gregorian calendar.
 It is the opposite of the `JDN` command.
+
+The conversion uses software from the
+[Standards of Fundamental Astronomy of the International Astronomical Union](https://www.iausofa.org/).
 
 ```rpl
 2451545 JDN→
 @ Expecting Sat 1/Jan/2000, 12:00:00
 ```
+
+# Alarms and System Commands
 
 ## ACK
 Acknowledge oldest alarm (dismiss)
