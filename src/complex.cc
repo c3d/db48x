@@ -1266,13 +1266,14 @@ COMPLEX_BODY(ln1p)
     return ln(one + z);
 }
 
+
 COMPLEX_BODY(expm1)
 // ----------------------------------------------------------------------------
 //   Complex implementation of expm1
 // ----------------------------------------------------------------------------
 {
     complex_g one = complex::make(1, 0);
-    return exp(z - one);
+    return exp(z) - one;
 }
 
 

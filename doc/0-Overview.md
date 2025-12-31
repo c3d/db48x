@@ -825,6 +825,7 @@ Additional contributors to the project include (in order of appearance):
 * Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
 * Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
 * Jesus Cano (jcanovel@gmail.com) (bug fixes)
+* Riccardo Lucatuorto (gnuduncan@gmail.com)
 
 The authors would like to acknowledge
 
