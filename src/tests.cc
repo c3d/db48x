@@ -5101,6 +5101,18 @@ void tests::complex_functions()
     test(ID_exp)
         .expect("18.43908 89145 85774 62∡0.86217 00546 67226 34884ʳ");
 
+    step("Complex exponential minus 1 (zero)");
+    test(CLEAR, "0+0ⅈ expm1", ENTER)
+        .expect("0+0ⅈ");  // expm1(0) = e^0 - 1 = 0
+
+    step("Complex exponential minus 1 (real)");
+    test(CLEAR, "1+0ⅈ expm1", ENTER)
+        .match("1\\.71828.*\\+0ⅈ");  // e - 1
+
+    step("Complex exponential minus 1 (imaginary)");
+    test(CLEAR, "0+3.14159265358979323846ⅈ expm1", ENTER)
+        .match("-2\\..*ⅈ");  // expm1(πi) ≈ -2 (with tiny floating point error)
+
     step("Power");
     test(CLEAR, "3+7ⅈ", ENTER, "2-3ⅈ", ID_pow)
         .expect("1 916.30979 15541 96293 8∡2.52432 98723 79583 8639ʳ");

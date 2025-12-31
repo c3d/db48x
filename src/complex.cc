@@ -1272,7 +1272,7 @@ COMPLEX_BODY(expm1)
 // ----------------------------------------------------------------------------
 {
     complex_g one = complex::make(1, 0);
-    return exp(z - one);
+    return exp(z) - one;
 }
 
 
