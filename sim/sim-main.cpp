@@ -322,6 +322,7 @@ int main(int argc, char *argv[])
     if (install)
         copy(":/", files);
     QDir::setCurrent(files);
+    QDir::current().mkdir("screens");
 
     QApplication a(argc, argv);
     MainWindow w;

@@ -823,13 +823,17 @@ void MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
 //   Save a simulator screenshot under the "SCREEN" directory
 // ----------------------------------------------------------------------------
 {
-    QPixmap &screen = MainWindow::theScreen();
-    QPixmap img = screen.copy(x, y, w, h);
+    QString   name  = basename;
     QDateTime today = QDateTime::currentDateTime();
-    QString name = basename;
     name += today.toString("yyyyMMdd-hhmmss");
     name += ".png";
-    img.save(name, "PNG");
+
+    QPixmap &screen = MainWindow::theScreen();
+    QPixmap img = screen.copy(x, y, w, h);
+    bool ok = img.save(name, "PNG");
+    record(sim_window, "Screen capture %+s for %s",
+           ok ? "succeeded" : "failed",
+           name.toUtf8().constData());
 }
 
 
