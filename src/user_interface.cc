@@ -75,6 +75,7 @@ RECORDER(menus,         16, "Menu operations");
 RECORDER(help,          16, "On-line help");
 RECORDER(help_search,   16, "On-line help topic search");
 RECORDER(tests_ui,      16, "Test interaction with user interface");
+RECORDER(shifts,        16, "Shift logic (including transient alpha)");
 RECORDER(keymap_warning, 8, "Warnings about invalid keymaps");
 
 #define NUM_TOPICS      (sizeof(topics) / sizeof(topics[0]))
@@ -4330,6 +4331,12 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 {
     bool consumed = false;
 
+    record(shifts, "Key %d%+s%+s%+s",
+           key,
+           talpha       ? " talpha"    : "",
+           delayedArrow ? " delayed"   : "",
+           longpress    ? " longpress" : "");
+
     // Transient alpha management
     if (!transalpha)
     {
@@ -4338,13 +4345,6 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         {
             if (key == KEY_UP || key == KEY_DOWN)
             {
-                // Let menu and normal keys go through
-                if (xshift)
-                {
-                    last = key;
-                    return false;
-                }
-
                 repeat = true;
 
                 // Delay processing of up or down until after delay
@@ -4383,6 +4383,10 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             last = 0;
             return false;
         }
+        else
+        {
+            delayedArrow = false;
+        }
     }
     else
     {
@@ -4399,6 +4403,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             }
             key = 0;
             last = 0;
+            delayedArrow = false;
             return true;
         }
         else if (key == KEY_UP || key == KEY_DOWN || key == 0)
