@@ -6173,6 +6173,7 @@ The documentation is generally well-written and comprehensive. The main issues a
 
 These are all straightforward to fix and would significantly improve consistency and accuracy.
 
+
 # Constants library
 
 The DB50X calculator features a library of constants covering mathematics,
