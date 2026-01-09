@@ -10118,8 +10118,10 @@ void tests::date_operations()
         .test(CLEAR, "19690217.03550197_date", ENTER)
         .expect("Mon 17/Feb/1969, 3:55:01.97");
     step("Displaying invalid date and time")
+        .test(ID_HideDayOfWeek, ENTER)
         .test(CLEAR, "999999999.99999999_date", ENTER)
-        .expect("Tue 99/99/99999, 99:99:99.99");
+        .expect("99/99/99999, 99:99:99.99")
+        .test(ID_ShowDayOfWeek, ENTER);
 
     step("Difference between two dates using DDays")
         .test(CLEAR, "20230908", ENTER)

@@ -245,7 +245,8 @@ double julian_day_number(int d, int m, int y)
     result = iauCal2jd(y, m, d, &djm0, &djm);
     if (result < 0)
     {
-        // ToDo: handle errors.
+        rt.invalid_date_error();
+        return 0.0;
     }
     return (djm0 + djm);
 }
@@ -278,7 +279,9 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
         result = iauJd2cal(dj1, dj2, &year, &month, &day, &jdn_fraction_of_day);
         if (result < 0)
 	{
-	    // ToDo: handle errors.
+            if (error)
+	        rt.invalid_date_error();
+            return nullptr;
 	}
 
         bool negative_year = year < 0;
