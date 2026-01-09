@@ -5,6 +5,7 @@
 ## Date entry / edit format
 
 A whole number with a `_date` unit attached is interpreted as a date according to the customary format `YYYYMMDD`.
+
 However, the year need not be a 4 digit number.
 It can a smaller, bigger, zero, even a negative number and leading zeros can be ommitted
 (as such it need not fit the `YYYY` format).
@@ -40,12 +41,12 @@ The format can be adjusted by changing the [Date, Time flags](#date-time-flags) 
 
 ## Time entry format
 
-Enter the hours, a '.' to end the hours an begin the minutes.
+Enter the hours, a '.' to end the hours and begin the minutes.
 After the minutes enter a second '.' to end the minutes and begin the seconds.
 The display will change to `<hours>°<minutes>′_dms`, assuming you are entering an angle.
 Proceed with the seconds.
 Optionally you can give a third '.' followed by a fraction of a second.
-Enter the fraction as numerator '.' (yes, a fourth; not a '/') denominator.
+Enter the fraction as numerator '.' (yes, a fourth '.'; not a '/') denominator.
 Finally change the unit from `_dms` to `_hms`.
 With the cursor positioned before the unit you can just attach the `_hms` unit (it replaces the `_dms`).
 Or you can use the `→HMS` command.
@@ -154,7 +155,7 @@ See: [Astronomical year numbering](https://en.wikipedia.org/wiki/Astronomical_ye
 ## DateDot
 ## DateSpace
 
-Access: 
+Access: trough the `Date separator` entry in the `Status bar` menu.
 
 Activate the corresponding date separator.
 
@@ -164,6 +165,7 @@ Activate the corresponding date separator.
 Access:
 
 Return the most recent used or default date separator command.
+There is no DateSeparator variable to Recall.
 
 
 ## SetDate
