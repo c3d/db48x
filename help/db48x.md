@@ -768,6 +768,7 @@ Additional contributors to the project include (in order of appearance):
 * Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
 * Jesus Cano (jcanovel@gmail.com) (bug fixes)
 * Riccardo Lucatuorto (gnuduncan@gmail.com)
+* Ralf Ahlbrink (raprism@users.noreply.github.com)
 
 The authors would like to acknowledge
 
