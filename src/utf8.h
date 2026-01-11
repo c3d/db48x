@@ -308,7 +308,7 @@ inline bool utf8_whitespace(unicode cp)
 //   Check if something is a whitespace
 // ----------------------------------------------------------------------------
 {
-    return cp == ' ' || cp == '\n' || cp == '\t';
+    return cp == ' ' || cp == '\n' || cp == '\r' || cp == '\t';
 }
 
 
