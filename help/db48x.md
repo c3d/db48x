@@ -5408,6 +5408,7 @@ The following is an extensive list of commands.
 * `UIExit`
 * `UILeft`
 * `UILeftShift`
+* `UINewLine`
 * `UILowercase`
 * `UINoAlpha`
 * `UINoShift`
