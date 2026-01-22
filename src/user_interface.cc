@@ -659,13 +659,13 @@ bool user_interface::key(int key, bool repeating, bool talpha)
     }
 
     // Handle keys
-    bool result =
+    bool result  =
         handle_shifts(key, talpha)      ||
         handle_help(key)                ||
         handle_user(key)                ||
         handle_editing(key)             ||
-        handle_alpha(key)               ||
-        handle_digits(key)              ||
+        //handle_alpha(key)               || //TO-DO
+        //handle_digits(key)              || //TO-DO
         handle_functions(key)           ||
         key == 0;
 
@@ -4159,7 +4159,7 @@ bool user_interface::handle_help(int &key)
 //   Handle help keys when showing help
 // ----------------------------------------------------------------------------
 {
-    if (!showing_help())
+	if (!showing_help())
     {
         // Exit if we are editing or entering digits
         if (last == KEY_SHIFT || Stack.interactive)
@@ -5222,10 +5222,10 @@ bool user_interface::handle_digits(int key)
             return true;
 
         }
-    }
+    }    
     if (key > KEY_CHS && key < KEY_F1)
     {
-        unicode c = numbers[key - 1];
+		unicode c = numbers[key - 1];
         if (~searching)
         {
             bool found = false;
@@ -5261,196 +5261,196 @@ bool user_interface::handle_digits(int key)
 
 
 
-// ============================================================================
-//
-//   Tables with the default assignments
-//
-// ============================================================================
+																			   
+  
+										
+  
+																			   
 
-static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
-// ----------------------------------------------------------------------------
-//   RPL code for the commands assigned by default to each key
-// ----------------------------------------------------------------------------
-//   All the default-assigned commands fit in one or two bytes
-{
-#define OP2BYTES(key, id)                                              \
-    [2*(key) - 2] = (id) < 0x80 ? (id) & 0x7F : ((id) & 0x7F) | 0x80,  \
-    [2*(key) - 1] = (id) < 0x80 ?           0 : ((id) >> 7)
+																	   
+																			   
+															  
+																			   
+															  
+ 
+																		
+																		
+														   
 
-    OP2BYTES(KEY_SIGMA, menu::ID_ToolsMenu),
-    OP2BYTES(KEY_INV,   function::ID_inv),
-    OP2BYTES(KEY_SQRT,  function::ID_sqrt),
-    OP2BYTES(KEY_LOG,   function::ID_pow),
-    OP2BYTES(KEY_LN,    function::ID_MathMenu),
-    OP2BYTES(KEY_XEQ,   0),
-    OP2BYTES(KEY_STO,   command::ID_Sto),
-    OP2BYTES(KEY_RCL,   command::ID_ToggleCustomMenu),
-    OP2BYTES(KEY_RDN,   menu::ID_StackMenu),
-    OP2BYTES(KEY_SIN,   function::ID_sin),
-    OP2BYTES(KEY_COS,   function::ID_cos),
-    OP2BYTES(KEY_TAN,   function::ID_tan),
-    OP2BYTES(KEY_ENTER, function::ID_Dup),
-    OP2BYTES(KEY_SWAP,  function::ID_Swap),
-    OP2BYTES(KEY_CHS,   function::ID_neg),
-    OP2BYTES(KEY_E,     function::ID_Cycle),
-    OP2BYTES(KEY_BSP,   command::ID_Drop),
-    OP2BYTES(KEY_UP,    0),
-    OP2BYTES(KEY_7,     0),
-    OP2BYTES(KEY_8,     0),
-    OP2BYTES(KEY_9,     0),
-    OP2BYTES(KEY_DIV,   arithmetic::ID_divide),
-    OP2BYTES(KEY_DOWN,  0),
-    OP2BYTES(KEY_4,     0),
-    OP2BYTES(KEY_5,     0),
-    OP2BYTES(KEY_6,     0),
-    OP2BYTES(KEY_MUL,   arithmetic::ID_multiply),
-    OP2BYTES(KEY_SHIFT, 0),
-    OP2BYTES(KEY_1,     0),
-    OP2BYTES(KEY_2,     0),
-    OP2BYTES(KEY_3,     0),
-    OP2BYTES(KEY_SUB,   command::ID_subtract),
-    OP2BYTES(KEY_EXIT,  0),
-    OP2BYTES(KEY_0,     0),
-    OP2BYTES(KEY_DOT,   0),
-    OP2BYTES(KEY_RUN,   command::ID_Run),
-    OP2BYTES(KEY_ADD,   command::ID_add),
+											
+										  
+										   
+										  
+											   
+						   
+										 
+													  
+											
+										  
+										  
+										  
+										  
+										   
+										  
+											
+										  
+						   
+						   
+						   
+						   
+											   
+						   
+						   
+						   
+						   
+												 
+						   
+						   
+						   
+						   
+											  
+						   
+						   
+						   
+										 
+										 
 
-    OP2BYTES(KEY_F1,    0),
-    OP2BYTES(KEY_F2,    0),
-    OP2BYTES(KEY_F3,    0),
-    OP2BYTES(KEY_F4,    0),
-    OP2BYTES(KEY_F5,    0),
-    OP2BYTES(KEY_F6,    0),
+						   
+						   
+						   
+						   
+						   
+						   
 
-    OP2BYTES(KEY_SCREENSHOT, command::ID_ScreenCapture),
-    OP2BYTES(KEY_SH_UP,  0),
-    OP2BYTES(KEY_SH_DOWN, 0),
-};
-
-
-static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
-// ----------------------------------------------------------------------------
-//   RPL code for the commands assigned by default to shifted keys
-// ----------------------------------------------------------------------------
-//   All the default assigned commands fit in one or two bytes
-{
-    OP2BYTES(KEY_SIGMA, menu::ID_LastMenu),
-    OP2BYTES(KEY_INV,   arithmetic::ID_exp),
-    OP2BYTES(KEY_SQRT,  arithmetic::ID_sq),
-    OP2BYTES(KEY_LOG,   function::ID_abs),
-    OP2BYTES(KEY_LN,    function::ID_PowersMenu),
-    OP2BYTES(KEY_XEQ,   menu::ID_EquationsMenu),
-    OP2BYTES(KEY_STO,   menu::ID_ComplexMenu),
-    OP2BYTES(KEY_RCL,   menu::ID_MemoryMenu),
-    OP2BYTES(KEY_RDN,   menu::ID_ConstantsMenu),
-    OP2BYTES(KEY_SIN,   function::ID_asin),
-    OP2BYTES(KEY_COS,   function::ID_acos),
-    OP2BYTES(KEY_TAN,   function::ID_atan),
-    OP2BYTES(KEY_ENTER, 0),     // Alpha
-    OP2BYTES(KEY_SWAP,  menu::ID_LastArg),
-    OP2BYTES(KEY_CHS,   menu::ID_ModesMenu),
-    OP2BYTES(KEY_E,     menu::ID_DisplayModesMenu),
-    OP2BYTES(KEY_BSP,   menu::ID_ClearThingsMenu),
-    OP2BYTES(KEY_UP,    0),
-    OP2BYTES(KEY_7,     menu::ID_SolverMenu),
-    OP2BYTES(KEY_8,     menu::ID_IntegrationMenu),
-    OP2BYTES(KEY_9,     0),     // Insert []
-    OP2BYTES(KEY_DIV,   menu::ID_StatisticsMenu),
-    OP2BYTES(KEY_DOWN,  0),
-    OP2BYTES(KEY_4,     menu::ID_BasesMenu),
-    OP2BYTES(KEY_5,     menu::ID_UnitsMenu),
-    OP2BYTES(KEY_6,     menu::ID_FlagsMenu),
-    OP2BYTES(KEY_MUL,   menu::ID_ProbabilitiesMenu),
-    OP2BYTES(KEY_SHIFT, 0),
-    OP2BYTES(KEY_1,     function::ID_ToDecimal),
-    OP2BYTES(KEY_2,     command::ID_ToggleUserMode),
-    OP2BYTES(KEY_3,     menu::ID_ProgramMenu),
-    OP2BYTES(KEY_SUB,   menu::ID_ListMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_OffWithImage),
-    OP2BYTES(KEY_0,     command::ID_SystemSetup),
-    OP2BYTES(KEY_DOT,   command::ID_Show),
-    OP2BYTES(KEY_RUN,   0),
-    OP2BYTES(KEY_ADD,   menu::ID_Catalog),
-
-    OP2BYTES(KEY_F1,    0),
-    OP2BYTES(KEY_F2,    0),
-    OP2BYTES(KEY_F3,    0),
-    OP2BYTES(KEY_F4,    0),
-    OP2BYTES(KEY_F5,    0),
-    OP2BYTES(KEY_F6,    0),
-
-    OP2BYTES(KEY_SCREENSHOT, command::ID_ScreenCapture),
-    OP2BYTES(KEY_SH_UP, 0),
-    OP2BYTES(KEY_SH_DOWN, 0),
-};
+														
+							
+							 
+  
 
 
-static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
-// ----------------------------------------------------------------------------
-//   RPL code for the commands assigned by default to long-shifted keys
-// ----------------------------------------------------------------------------
-//   All the default assigned commands fit in one or two bytes
-{
-    OP2BYTES(KEY_SIGMA, menu::ID_MainMenu),
-    OP2BYTES(KEY_INV,   command::ID_ln),
-    OP2BYTES(KEY_SQRT,  menu::ID_xroot),
-    OP2BYTES(KEY_LOG,   menu::ID_AlgebraMenu),
-    OP2BYTES(KEY_LN,    menu::ID_PartsMenu),
-    OP2BYTES(KEY_XEQ,   menu::ID_CharactersMenu),
-    OP2BYTES(KEY_STO,   menu::ID_RealMenu),
-    OP2BYTES(KEY_RCL,   menu::ID_Library),
-    OP2BYTES(KEY_RDN,   menu::ID_FractionsMenu),
-    OP2BYTES(KEY_SIN,   menu::ID_HyperbolicMenu),
-    OP2BYTES(KEY_COS,   menu::ID_CircularMenu),
-    OP2BYTES(KEY_TAN,   menu::ID_AnglesMenu),
-    OP2BYTES(KEY_ENTER, 0),     // Text
-    OP2BYTES(KEY_SWAP,  function::ID_Undo),
-    OP2BYTES(KEY_CHS,   menu::ID_UserInterfaceModesMenu),
-    OP2BYTES(KEY_E,     menu::ID_PlotMenu),
-    OP2BYTES(KEY_BSP,   function::ID_UpDir),
-    OP2BYTES(KEY_UP,    0),
-    OP2BYTES(KEY_7,     menu::ID_SymbolicMenu),
-    OP2BYTES(KEY_8,     menu::ID_PolynomialsMenu),
-    OP2BYTES(KEY_9,     menu::ID_MatrixMenu),
-    OP2BYTES(KEY_DIV,   menu::ID_FinanceSolverMenu),
-    OP2BYTES(KEY_DOWN,  menu::ID_EditMenu),
-    OP2BYTES(KEY_4,     menu::ID_TextMenu),
-    OP2BYTES(KEY_5,     menu::ID_UnitsConversionsMenu),
-    OP2BYTES(KEY_6,     menu::ID_TimeMenu),
-    OP2BYTES(KEY_MUL,   menu::ID_NumbersMenu),
-    OP2BYTES(KEY_SHIFT, 0),
-    OP2BYTES(KEY_1,     menu::ID_DebugMenu),
-    OP2BYTES(KEY_2,     menu::ID_LoopsMenu),
-    OP2BYTES(KEY_3,     menu::ID_TestsMenu),
-    OP2BYTES(KEY_SUB,   menu::ID_IOMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_SaveState),
-    OP2BYTES(KEY_0,     menu::ID_FilesMenu),
-    OP2BYTES(KEY_DOT,   menu::ID_GraphicsMenu),
-    OP2BYTES(KEY_RUN,   0),
-    OP2BYTES(KEY_ADD,   command::ID_Help),
+																	 
+																			   
+																  
+																			   
+															  
+ 
+										   
+											
+										   
+										  
+												 
+												
+											  
+											 
+												
+										   
+										   
+										   
+										
+										  
+											
+												   
+												  
+						   
+											 
+												  
+											
+												 
+						   
+											
+											
+											
+													
+						   
+												
+													
+											  
+										   
+												  
+												 
+										  
+						   
+										  
 
-    OP2BYTES(KEY_F1,    0),
-    OP2BYTES(KEY_F2,    0),
-    OP2BYTES(KEY_F3,    0),
-    OP2BYTES(KEY_F4,    0),
-    OP2BYTES(KEY_F5,    0),
-    OP2BYTES(KEY_F6,    0),
+						   
+						   
+						   
+						   
+						   
+						   
 
-    OP2BYTES(KEY_SCREENSHOT, command::ID_ScreenCapture),
-    OP2BYTES(KEY_SH_UP, 0),
-    OP2BYTES(KEY_SH_DOWN, 0),
-};
+														
+						   
+							 
+  
 
 
-static const byte *const defaultCommand[user_interface::NUM_PLANES] =
-// ----------------------------------------------------------------------------
-//   Pointers to the default commands
-// ----------------------------------------------------------------------------
-{
-    defaultUnshiftedCommand,
-    defaultShiftedCommand,
-    defaultSecondShiftedCommand,
-};
+																		   
+																			   
+																	   
+																			   
+															  
+ 
+										   
+										
+										
+											  
+											
+												 
+										   
+										  
+												
+												 
+											   
+											 
+									   
+										   
+														 
+										   
+											
+						   
+											   
+												  
+											 
+													
+										   
+										   
+													   
+										   
+											  
+						   
+											
+											
+											
+										 
+											   
+											
+											   
+						   
+										  
+
+						   
+						   
+						   
+						   
+						   
+						   
+
+														
+						   
+							 
+  
+
+
+																	 
+																			   
+									 
+																			   
+ 
+							
+						  
+								
+  
 
 
 bool user_interface::load_keymap(cstring name)
@@ -5472,13 +5472,16 @@ bool user_interface::load_keymap(cstring name)
     scribble    scr;
     bool        quoted = false;
     list_g      result;
-
+    unicode c;
+    unicode d = ' '; 
+    bool e = false;
     while (kmap.valid())
     {
-        unicode c = kmap.get();
-        if (c == '@')
+        c = d;
+        d = kmap.get();
+        if (c == '/' && d == '/' && !quoted)
         {
-            do { c = kmap.get(); } while (c && c != '\n');
+            do { d = kmap.get(); } while (d != '\n');
             continue;
         }
         if (c == '"')
@@ -5567,9 +5570,9 @@ object_p user_interface::object_for_key(int key)
                 if (object_p keyobj = plane->at(key-1))
                     return keyobj;
 
-    const byte *ptr = defaultCommand[plane] + 2 * (key - 1);
-    if (*ptr)
-        obj = (object_p) ptr;
+															
+			 
+							 
     return obj;
 }
 
@@ -5595,7 +5598,7 @@ bool user_interface::handle_user(int key)
 //   Check if we have one of the user-defined functions
 // ----------------------------------------------------------------------------
 {
-    if (!key || !Settings.UserMode())
+	if (!key || !Settings.UserMode())
         return false;
 
     bool result = false;
@@ -6066,6 +6069,15 @@ bool user_interface::do_delete(bool forward)
     if (!rt.editing())
         insert(' ', DIRECT);
     last = 0;
+    return true;
+}
+
+bool user_interface::do_new_line()
+// ----------------------------------------------------------------------------
+//   Insert New Line
+// ----------------------------------------------------------------------------
+{
+    insert('\n', DIRECT);
     return true;
 }
 
