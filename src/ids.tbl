@@ -1393,6 +1393,7 @@ CMD(UIUp)
 CMD(UIDown)
 CMD(UIBackspace)
 CMD(UIDelete)
+CMD(UINewLine)
 
 CMD(EditorSelect)
 CMD(EditorWordLeft)
