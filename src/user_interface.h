@@ -211,6 +211,7 @@ struct user_interface
     bool        do_up();
     bool        do_down();
     bool        do_delete(bool forward);
+    bool        do_new_line();
 
     text_p      editor_save(text_r ed, bool rewinding = false);
     text_p      editor_save(bool rewinding = false);
