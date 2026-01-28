@@ -5473,8 +5473,7 @@ bool user_interface::load_keymap(cstring name)
     bool        quoted = false;
     list_g      result;
     unicode c;
-    unicode d = ' '; 
-    bool e = false;
+    unicode d = ' ';
     while (kmap.valid())
     {
         c = d;
