@@ -212,5 +212,6 @@ COMMAND_DECLARE(UIUp,-1);               // Actions related to up key
 COMMAND_DECLARE(UIDown,-1);             // Actions related to down key
 COMMAND_DECLARE(UIBackspace,-1);        // Actions related to backspace
 COMMAND_DECLARE(UIDelete,-1);           // Action related to delete
+COMMAND_DECLARE(UINewLine,-1);          // Action related to new line
 
 #endif // COMMAND_H
