@@ -1760,3 +1760,11 @@ COMMAND_BODY(UIDelete)
 {
     return ui.do_delete(true) ? OK : ERROR;
 }
+
+COMMAND_BODY(UINewLine)
+// ----------------------------------------------------------------------------
+//   Insert new line 
+// ----------------------------------------------------------------------------
+{
+    return ui.do_new_line() ? OK : ERROR;
+}
