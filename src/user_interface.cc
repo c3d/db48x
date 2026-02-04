@@ -5476,7 +5476,7 @@ bool user_interface::load_keymap(cstring name)
     while (kmap.valid())
     {
         unicode c = kmap.get();
-        if (c == '@')
+        if (c == '@'  && !quoted)
         {
             do { c = kmap.get(); } while (c && c != '\n');
             continue;

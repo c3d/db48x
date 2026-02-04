@@ -71,7 +71,7 @@ OffWithImage			"0"		"."		"«	»"	"+"
 UIUp				"?"		"∫"		"["		"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
-OffWithImage			";"		"·"		"{	}"	"!'
+OffWithImage			";"		"·"		"{	}"	"!"
 ]
 
 @ Plane 7: lowercase alpha mode (mode activated with ALPHA ALPHA).
