@@ -556,9 +556,7 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
         static cstring keyboards[] =
         {
             "config/db48x.48k",
-            "config/legacy.48k",
-            "config/42style.48k",
-            "config/true42.48k",
+            "config/legacy.48k",								
         };
 
         // HACK - Not thread safe, don't do that while running
