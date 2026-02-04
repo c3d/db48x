@@ -88,7 +88,7 @@ struct user_interface
     using coord  = blitter::coord;
     using size   = blitter::size;
     using rect   = blitter::rect;
-
+	
     bool        key(int key, bool repeating, bool transalpha);
     bool        repeating()     { return repeat; }
     object_p    assign(int keyid, object_p code);
@@ -178,7 +178,7 @@ struct user_interface
     void        clear_shift()       { xshift = shift = false; }
     void        clear_help();
     void        clear_menu();
-    object_p    object_for_key(int key);
+	object_p    object_for_key(int key, uint plane, uint alpha_plane);
     int         evaluating_function_key() const;
     bool        end_edit();
     void        clear_editor();
@@ -243,11 +243,12 @@ protected:
     bool        handle_help(int &key);
     bool        handle_editing(int key);
     bool        handle_editing_command(object::id lower, object::id higher);
-    bool        handle_alpha(int key);
+    bool        handle_search(int key);
     bool        handle_user(int key);
     bool        handle_functions(int key);
     bool        handle_functions(int key, object_p obj, bool user);
-    bool        handle_digits(int key);
+	bool        handle_BASED(int key);
+    bool        handle_CHS_EEX(int key);
     bool        noHelpForKey(int key);
     bool        do_search(unicode with = 0, bool restart = false);
 
