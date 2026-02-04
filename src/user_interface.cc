@@ -673,7 +673,7 @@ bool user_interface::key(int key, bool repeating, bool talpha)
     if (rt.editing())
         update_mode();
 
-    if (!skey && last != KEY_SHIFT)
+    if (!skey && last != KEY_SHIFT && !transalpha)
     {
         shift = false;
         xshift = false;
@@ -4119,6 +4119,10 @@ bool user_interface::noHelpForKey(int key)
             key != KEY_SUB && key != KEY_MUL && key != KEY_DIV && key != KEY_RUN)
             return true;
     }
+
+    // No help for shifted UP/DOWN (history, edit, etc)
+    if (key == KEY_UP || key == KEY_DOWN)
+        return true;
 
     // Other cases are regular functions, we can display help
     return false;
