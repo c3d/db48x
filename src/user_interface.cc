@@ -658,18 +658,20 @@ bool user_interface::key(int key, bool repeating, bool talpha)
         }
     }
 
-    // Handle keys
     bool result  =
         handle_shifts(key, talpha)      ||
         handle_help(key)                ||
+        handle_search(key)              ||
+		handle_editing(key)             ||       
+        handle_BASED(key)				||
+		handle_CHS_EEX(key)             ||
         handle_user(key)                ||
-        handle_editing(key)             ||
-        //handle_alpha(key)               || //TO-DO
-        //handle_digits(key)              || //TO-DO
         handle_functions(key)           ||
         key == 0;
+        
+		menu_refresh(object::ID_Catalog, true);
 
-    if (rt.editing())
+	if (rt.editing())
         update_mode();
 
     if (!skey && last != KEY_SHIFT)
@@ -1169,7 +1171,7 @@ bool user_interface::replace_character_left_of_cursor(unicode code)
 
 bool user_interface::replace_character_left_of_cursor(symbol_p sym)
 // ----------------------------------------------------------------------------
-//    Replace the character left of cursor with teh symbol
+//    Replace the character left of cursor with the symbol
 // ----------------------------------------------------------------------------
 {
     size_t len = 0;
@@ -4159,7 +4161,7 @@ bool user_interface::handle_help(int &key)
 //   Handle help keys when showing help
 // ----------------------------------------------------------------------------
 {
-	if (!showing_help())
+    if (!showing_help())
     {
         // Exit if we are editing or entering digits
         if (last == KEY_SHIFT || Stack.interactive)
@@ -4174,7 +4176,18 @@ bool user_interface::handle_help(int &key)
             record(help,
                    "Looking for help topic for key %d, long = %d shift=%d\n",
                    key, longpress, shift_plane());
-            if (object_p obj = object_for_key(key))
+            uint kc = platform_keyid(key,
+                shift, xshift,
+                             alpha, lowercase, transalpha);
+            object_p obj;
+            bool objOk = false;    
+            if (Settings.UserMode())
+            {
+                if (obj= assigned(kc)) objOk = true;
+            }    
+            if (!objOk) 
+                if ( obj = object_for_key(key,shift_plane(),alpha_plane())) objOk = true;
+            if (objOk)
             {
                 record(help, "Looking for help topic for key %d\n", key);
                 save<int> seval(evaluating, key);
@@ -4772,12 +4785,6 @@ bool user_interface::handle_editing(int key)
                 last = 0;
                 return true;
             }
-            else if (xshift)
-            {
-                insert('{', PROGRAM);
-                last = 0;
-                return true;
-            }
             else if (isEditing)
             {
                 // Stick to space role while editing, do not EVAL, repeat
@@ -4792,15 +4799,6 @@ bool user_interface::handle_editing(int key)
             }
             break;
 
-        case KEY_9:
-            if (shift)
-            {
-                // Shift-9 enters a matrix
-                insert('[', MATRIX);
-                last = 0;
-                return true;
-            }
-            break;
         }
     }
 
@@ -4829,12 +4827,12 @@ bool user_interface::handle_editing(int key)
 
     if (isEditing)
     {
-        record(user_interface, "Editing key %d", key);
+		record(user_interface, "Editing key %d", key);
         switch (key)
         {
-        case KEY_BSP:
-            if (xshift)
-                return false;
+        case KEY_BSP:   
+			if (xshift)
+                return do_new_line();
             return do_delete(shift);
         case KEY_ENTER:
         {
@@ -4847,7 +4845,6 @@ bool user_interface::handle_editing(int key)
             // Clear error if there is one, else clear editor
             if (shift || xshift)
                 return false;
-
             return do_exit();
 
         case KEY_UP:
@@ -4944,130 +4941,83 @@ bool user_interface::handle_editing_command(object::id lo, object::id hi)
 }
 
 
-bool user_interface::handle_alpha(int key)
+bool user_interface::handle_search(int key)
 // ----------------------------------------------------------------------------
-//    Handle alphabetic user_interface
+//    Handle keys in search mode
 // ----------------------------------------------------------------------------
 {
-    // Things that we never handle in alpha mode
-    if (!key || (key >= KEY_F1 && key <= KEY_F6) || key == KEY_EXIT)
-        return false;
-
-    // Allow "alpha" mode for keys A-F in based number mode
-    // xshift-ENTER inserts quotes, xshift-BSP inserts \n
-    bool editing = rt.editing();
-    bool hex = editing && !alpha && mode == BASED && key >= KB_A && key <= KB_F;
-    bool special = xshift && (key == KEY_ENTER || (key == KEY_BSP && editing));
-    if (!alpha && !hex && !special)
-        return false;
-
-    static const char upper[] =
-        "ABCDEF"
-        "GHIJKL"
-        "_MNO_"
-        "_PQRS"
-        "_TUVW"
-        "_XYZ_"
-        "_:, ;";
-    static const char lower[] =
-        "abcdef"
-        "ghijkl"
-        "_mno_"
-        "_pqrs"
-        "_tuvw"
-        "_xyz_"
-        "_:, ;";
-
-    static const unicode shifted[] =
-    {
-        L'Σ', '^', L'√', L'∂', L'σ', '(',
-        L'▶', '%', L'π', '<', '=', '>',
-        '_', L'⇄', L'±', L'∡', '_',
-        '_', '7', '8', '9', L'÷',
-        '_', '4', '5', '6', L'×',
-        '_', '1', '2', '3', '-',
-        '_', '0', '.',  L'«', '+'
-    };
-
-    static const  unicode xshifted[] =
-    {
-        L'∏', L'∆', L'↑', L'μ', L'θ', '\'',
-        L'→', L'←', L'↓', L'≤', L'≠', L'≥',
-        '"',  '~', L'°', L'ε', '\n',
-        '_',  '?', L'∫',   '[',  '/',
-        '_',  '#',  L'∞', '|' , '*',
-        '_',  '&',   '@', '$',  L'…',
-        '_',  ';',  L'·', '{',  '!'
-    };
-
-    // Special case: + in alpha mode shows the catalog
-    if (key == KEY_ADD && !shift && !xshift)
-    {
-        object_p cat = command::static_object(menu::ID_Catalog);
-        cat->evaluate();
-        return true;
-    }
-
-    key--;
-    unicode c =
-        hex       ? upper[key]    :
-        xshift    ? xshifted[key] :
-        shift     ? shifted[key]  :
-        lowercase ? lower[key]    :
-        upper[key];
-    if (~searching)
-    {
-        if (!do_search(c))
-            beep(2400, 100);
-    }
-    else
-    {
-        if (menu_p m = menu())
+	if (!key || !~searching)
+		return false;
+    if (key == KEY_F4) // to SEARCH next
+		return false;
+    switch (key)
         {
-            menu::id mid = m->type();
-            if (mid >= menu::ID_CharactersMenu00 &&
-                mid <= menu::ID_CharactersMenu99)
-            {
-                character_menu_p cm = character_menu_p(m);
-                if (cm->transliterate(c))
-                {
-                    size_t edlen = rt.editing();
-                    utf8   ed    = rt.editor();
-                    if (ed && edlen)
-                    {
-                        uint ppos = utf8_previous(ed, cursor);
-                        if (ppos != cursor)
-                            remove(ppos, cursor - ppos);
-                    }
-                }
-            }
+		case KEY_BSP:   
+			return do_delete(shift);
+        case KEY_ENTER:
+			return do_enter();
+        case KEY_EXIT:
+            return do_enter();
         }
-        insert(c, DIRECT);
-        if (c == '"')
-            alpha = true;
-        repeat = true;
-        menu_refresh(object::ID_Catalog, true);
-    }
-    return true;
+    unicode c = '_';
+    uint kc = platform_keyid(key,
+                             shift, xshift,
+                             alpha, lowercase, transalpha);
+    object_p obj;
+    bool objOk = false;    
+	if (Settings.UserMode())
+	{
+		if (obj= assigned(kc)) objOk = true;
+	}    
+	if (!objOk) 
+		if ( obj = object_for_key(key,shift_plane(),alpha_plane())) objOk = true;
+	if (objOk) 
+	{
+		if (text_p direct = obj->as<text>())
+		{
+			size_t sz = 0;
+			utf8 txt = direct->value(&sz);
+			if (sz == 1) // use, if only one size large
+			{
+				c = direct->value(&sz)[0]; 
+			}
+		}
+	}
+	if (!do_search(c))
+	{
+		beep(2400, 100);
+	}
+	return true;
 }
 
 
-bool user_interface::handle_digits(int key)
+bool user_interface::handle_BASED(int key)
 // ----------------------------------------------------------------------------
-//    Handle alphabetic user_interface
+//    Handle insert of based numbers (A-F)
+// ----------------------------------------------------------------------------
+{
+	if (!key || mode != BASED)
+		return false;
+	if (key >= KB_A && key <= KB_F)
+	{
+		uint plane = 0;
+		uint alpha_plane = 1;
+		record(user_interface,
+           "Handle function for key %d (plane %d) ", key, plane);
+		if (object_p obj = object_for_key(key,plane,alpha_plane))
+			return handle_functions(key, obj, false);
+	}
+	return false; 
+}
+
+
+bool user_interface::handle_CHS_EEX(int key)
+// ----------------------------------------------------------------------------
+//    Handle change sign +/- and enter exponent EEX: prefix cylce mode with units
 // ----------------------------------------------------------------------------
 {
     if (alpha || shift || xshift || !key)
         return false;
-
-    static const char numbers[] =
-        "______"
-        "______"
-        "__-__"
-        "_789_"
-        "_456_"
-        "_123_"
-        "_0.__";
 
     if (rt.editing())
     {
@@ -5223,234 +5173,8 @@ bool user_interface::handle_digits(int key)
 
         }
     }    
-    if (key > KEY_CHS && key < KEY_F1)
-    {
-		unicode c = numbers[key - 1];
-        if (~searching)
-        {
-            bool found = false;
-            switch (key)
-            {
-            case KEY_ADD:       found = do_search('+'); break;
-            case KEY_SUB:       found = do_search('-'); break;
-            case KEY_MUL:       found = do_search('*')||do_search(L'×')
-                                                      ||do_search(L'·'); break;
-            case KEY_DIV:       found = do_search('/')||do_search(L'÷'); break;
-            case KEY_DOT:       found = do_search('.')||do_search(L','); break;
-            case KEY_E:         found = do_search('E')||do_search(L'⁳'); break;
-            default:
-                if (c == '_')
-                    return false;
-                found = do_search(c);
-                break;
-            }
-            if (!found)
-                beep(2400, 100);
-            return true;
-        }
-        if (c == '_')
-            return false;
-        if (c == '.' && mode != TEXT)
-            return do_decimal_separator();
-        insert(c, DIRECT);
-        repeat = true;
-        return true;
-    }
     return false;
 }
-
-
-
-																			   
-  
-										
-  
-																			   
-
-																	   
-																			   
-															  
-																			   
-															  
- 
-																		
-																		
-														   
-
-											
-										  
-										   
-										  
-											   
-						   
-										 
-													  
-											
-										  
-										  
-										  
-										  
-										   
-										  
-											
-										  
-						   
-						   
-						   
-						   
-											   
-						   
-						   
-						   
-						   
-												 
-						   
-						   
-						   
-						   
-											  
-						   
-						   
-						   
-										 
-										 
-
-						   
-						   
-						   
-						   
-						   
-						   
-
-														
-							
-							 
-  
-
-
-																	 
-																			   
-																  
-																			   
-															  
- 
-										   
-											
-										   
-										  
-												 
-												
-											  
-											 
-												
-										   
-										   
-										   
-										
-										  
-											
-												   
-												  
-						   
-											 
-												  
-											
-												 
-						   
-											
-											
-											
-													
-						   
-												
-													
-											  
-										   
-												  
-												 
-										  
-						   
-										  
-
-						   
-						   
-						   
-						   
-						   
-						   
-
-														
-						   
-							 
-  
-
-
-																		   
-																			   
-																	   
-																			   
-															  
- 
-										   
-										
-										
-											  
-											
-												 
-										   
-										  
-												
-												 
-											   
-											 
-									   
-										   
-														 
-										   
-											
-						   
-											   
-												  
-											 
-													
-										   
-										   
-													   
-										   
-											  
-						   
-											
-											
-											
-										 
-											   
-											
-											   
-						   
-										  
-
-						   
-						   
-						   
-						   
-						   
-						   
-
-														
-						   
-							 
-  
-
-
-																	 
-																			   
-									 
-																			   
- 
-							
-						  
-								
-  
 
 
 bool user_interface::load_keymap(cstring name)
@@ -5548,13 +5272,12 @@ bool user_interface::load_keymap(cstring name)
 }
 
 
-object_p user_interface::object_for_key(int key)
+object_p user_interface::object_for_key(int key,uint plane, uint alpha_plane)
 // ----------------------------------------------------------------------------
 //    Return the object for a given key
 // ----------------------------------------------------------------------------
 {
-    object_p obj = nullptr;
-    uint plane = shift_plane();
+    object_p obj = nullptr;							   
     if (key >= KEY_F1 && key <= KEY_F6)
     {
         uint fplane = plane < menu_planes() ? plane : 0;
@@ -5562,16 +5285,11 @@ object_p user_interface::object_for_key(int key)
         if (obj)
             return obj;
     }
-
     if (keymap && key > 0 && key <= NUM_KEYS)
-        if (object_p planeobj = keymap->at(plane + NUM_PLANES * alpha_plane()))
+        if (object_p planeobj = keymap->at(plane + NUM_PLANES * alpha_plane))
             if (list_p plane = planeobj->as_array_or_list())
                 if (object_p keyobj = plane->at(key-1))
-                    return keyobj;
-
-															
-			 
-							 
+                    return keyobj;                          
     return obj;
 }
 
@@ -5586,7 +5304,7 @@ bool user_interface::handle_functions(int key)
 
     record(user_interface,
            "Handle function for key %d (plane %d) ", key, shift_plane());
-    if (object_p obj = object_for_key(key))
+    if (object_p obj = object_for_key(key,shift_plane(),alpha_plane()))
         return handle_functions(key, obj, false);
     return false;
 }
@@ -5597,14 +5315,14 @@ bool user_interface::handle_user(int key)
 //   Check if we have one of the user-defined functions
 // ----------------------------------------------------------------------------
 {
-	if (!key || !Settings.UserMode())
+    if (!key || !Settings.UserMode())
         return false;
 
     bool result = false;
     uint kc = platform_keyid(key,
                              shift, xshift,
                              alpha, lowercase, transalpha);
-    if (object_p binding = assigned(kc))
+if (object_p binding = assigned(kc))
         result = handle_functions(key, binding, true);
     return result;
 }
@@ -6003,21 +5721,19 @@ bool user_interface::do_delete(bool forward)
 //   Delete what is right of cursor
 // ----------------------------------------------------------------------------
 {
-    if (~searching)
+    
+	if (~searching)
     {
         utf8 ed = rt.editor();
         if (cursor > select)
             cursor = utf8_previous(ed, cursor);
-        else if (~select)
+		else if (~select)
             select = utf8_previous(ed, select);
-        if (cursor == select)
-            cursor = select = searching;
-        else
-            do_search(0, true);
+        do_search(0, true);
     }
     else
     {
-        utf8 ed = rt.editor();
+		utf8 ed = rt.editor();
         size_t edlen = rt.editing();
 
         if (~select && select != cursor)
@@ -6064,9 +5780,6 @@ bool user_interface::do_delete(bool forward)
         menu_refresh(object::ID_Catalog, true);
     }
 
-    // Do not stop editing if we delete last character
-    if (!rt.editing())
-        insert(' ', DIRECT);
     last = 0;
     return true;
 }
@@ -6387,24 +6100,29 @@ bool user_interface::do_search(unicode with, bool restart)
         return false;
     if (!~select)
         select = cursor;
-
-    bool   forward  = cursor >= select;
+	
+	bool   forward  = cursor >= select;
     size_t selected = forward ? cursor - select : select - cursor;
-    if (selected > max)
+    if (selected >= max)
     {
         selected = 0;
         select = cursor;
     }
-    size_t found  = ~0;
+	if ((with == 0) && (selected==0)) 
+	{
+		edRows = 0;
+        dirtyEditor = true;
+		return false;
+	}
+	size_t found  = ~0;
     uint   ref    = forward ? select : cursor;
     uint   start  = restart ? searching : ref;
     uint   search = start;
-
-    // Skip current location (search next) or not (incremental search)
+	// Skip current location (search next) or not (incremental search)
     bool   skip   = with == 0;
-
+	
     // Loop until we either find a new spot or we wrap around
-    for (uint count = 0; !~found && count < max; count++)
+    for (uint count = 0; !~found && count <= max; count++)
     {
         if (skip)
         {
@@ -6454,7 +6172,6 @@ bool user_interface::do_search(unicode with, bool restart)
             break;
         }
     }
-
     if (~found)
     {
         if (with)
