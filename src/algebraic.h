@@ -83,6 +83,10 @@ struct algebraic : command
         return x && (!x->is_big() || to_decimal(x));
     }
 
+    // Convert to hw floating point if possible
+    static bool to_hwfloat(algebraic_g &x);
+    static bool to_hwdouble(algebraic_g &x);
+
     // Marking that we are talking about angle units
     typedef id angle_unit;
 
@@ -120,11 +124,12 @@ struct algebraic : command
     // Function pointers used by generic evaluation code
     typedef decimal_p (*decimal_fn)(decimal_r x);
 
-    template<typename value>
+    template <typename value>
     static algebraic_p as_hwfp(value x);
     // -------------------------------------------------------------------------
     //   Return a hardware floating-point value if possible
     // -------------------------------------------------------------------------
+
 
     bool is_numeric_constant() const;
     algebraic_p as_numeric_constant() const;
