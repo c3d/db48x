@@ -1,3 +1,12 @@
+@ See "Keyboard interaction" in the Help / Documentation.
+@ See "Key positions" in the Help / Documentation for the Plane titles.
+
+@ Each Plane is an Array or List.
+@ There should be 9 planes.
+@ Each plane should define 37 Mappings, separated by whitespace.
+@ A mapping is either a command or a double quoted string.
+@ An unquoted @ character starts a comment. A comment ends with the next newline.
+
 @ Note that the menu / function keys are excluded from the mappings.
 
 @ Plane 1: unshifted.
@@ -45,12 +54,13 @@ UIEnter				"M"		"N"		"O"		UIBackspace
 UILeft				"P"		"Q"		"R"		"S"
 UIRight				"T"		"U"		"V"		"W"
 UILeftShift			"X"		"Y"		"Z"		"_"
-UIExit				":	:"	","		" "		";"
+UIExit				":	:"	","		" "		Catalog
 ]
 
 @ plane 5: uppercase alfa mode, left shifted.
 @ The command indicated to the right of the key, in yellow.
-@ Keys without such a yellow indication, default to a convenient command, mostly what is on the key, in white.
+@ Keys without such a yellow indication, the numerics and basic number operations,
+@ default to what is on the key, in white.
 [
 "Σ"		"^"		"√"		"∂"		"ρ"		"("
 "▶"		"%"		"π"		"<"		"="		">"
@@ -58,7 +68,7 @@ UILowercase			"⇄"		"±"		"∡"		UIDelete
 UILeft				"7"		"8"		"9"		"÷"
 UIRight				"4"		"5"		"6"		"×"
 UIRightShift			"1"		"2"		"3"		"-"
-OffWithImage			"0"		"."		"«	»"	"+"
+OffWithImage			"0"		UIDecimal	"="		"+"
 ]
 
 @ Plane 6: uppercase alfa mode, right shifted.
@@ -83,7 +93,7 @@ UIEnter				"m"		"n"		"o"		UIBackspace
 UILeft				"p"		"q"		"r"		"s"
 UIRight				"t"		"u"		"v"		"w"
 UILeftShift			"x"		"y"		"z"		"_"
-UIExit				":	:"	","		" "		";"
+UIExit				":	:"	","		" "		Catalog
 ]
 
 @ Plane 8: lowercase alpha mode, left shifted.
