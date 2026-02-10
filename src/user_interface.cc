@@ -4996,7 +4996,7 @@ bool user_interface::handle_BASED(int key)
 //    Handle insert of based numbers (A-F)
 // ----------------------------------------------------------------------------
 {
-	if (!key || mode != BASED)
+	if (!key || mode != BASED || !rt.editing())
 		return false;
 	if (key >= KB_A && key <= KB_F)
 	{
@@ -5080,7 +5080,7 @@ bool user_interface::handle_CHS_EEX(int key)
             dirtyEditor = true;
             return true;
         }
-        else if (key == KEY_E && !~searching)
+        else if (key == KEY_E)
         {
             if (mode == UNIT)
             {
