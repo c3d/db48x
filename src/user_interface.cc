@@ -6148,7 +6148,7 @@ bool user_interface::do_decimal_separator()
                 ed = rt.editor();
                 if (cursor + 4 <= edlen &&
                     (memcmp(ed + cursor, "_dms", 4) == 0 ||
-                        memcmp(ed + cursor, "_hms", 4) == 0))
+                     memcmp(ed + cursor, "_hms", 4) == 0))
                     remove(cursor, 4);
             }
             else
@@ -6173,7 +6173,7 @@ bool user_interface::do_decimal_separator()
             ed = rt.editor();
             if (cursor + 4 > edlen ||
                 (memcmp(ed + cursor, "_dms", 4) != 0 &&
-                    memcmp(ed + cursor, "_hms", 4) != 0))
+                 memcmp(ed + cursor, "_hms", 4) != 0))
             {
                 size_t add = insert(cursor, utf8("_dms"), 4);
                 cursor -= add;
