@@ -62,7 +62,7 @@ UIExit				":	:"	","		" "		Catalog
 @ Keys without such a yellow indication, the numerics and basic number operations,
 @ default to what is on the key, in white.
 [
-"Σ"		"^"		"√"		"∂"		"ρ"		"("
+"Σ"		"^"		"√"		"∂"		"σ"		"("
 "▶"		"%"		"π"		"<"		"="		">"
 UILowercase			"⇄"		"±"		"∡"		UIDelete
 UILeft				"7"		"8"		"9"		"÷"
