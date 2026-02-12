@@ -1,5 +1,7 @@
 # Building the DB48X project
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/c3d/db48x)
+
 The DB48X project can be built in two variants:
 
 * A simulator that uses Qt to approximately simulate the DM42 platform. There is
