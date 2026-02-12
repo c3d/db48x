@@ -532,6 +532,9 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
     int k = ev->key();
     record(sim_keys, "Key press %d", k);
 
+    if (k == Qt::Key_F16)
+        recorder_dump_for(tests::dump_on_fail);
+
     if (k == Qt::Key_F13 || k == Qt::Key_F14 || k == Qt::Key_F15 ||
         k == Qt::Key_F11 || k == Qt::Key_F12)
     {
