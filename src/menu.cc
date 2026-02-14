@@ -468,8 +468,8 @@ MENU(NumbersMenu,
 
      "→Int",    ID_ToInteger,
      "IsPrime", ID_IsPrime,
-     "NextPr",  ID_Unimplemented,
-     "PrevPr",  ID_Unimplemented);
+     "NextPr",  ID_NextPrime,
+     "PrevPr",  ID_PreviousPrime);
 
 
 MENU(AnglesMenu,
