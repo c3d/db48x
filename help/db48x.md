@@ -769,6 +769,7 @@ Additional contributors to the project include (in order of appearance):
 * Jesus Cano (jcanovel@gmail.com) (bug fixes)
 * Riccardo Lucatuorto (gnuduncan@gmail.com)
 * Ralf Ahlbrink (raprism@users.noreply.github.com)
+* Mikael Djurfeldt (mikael@djurfeldt.com)
 
 The authors would like to acknowledge
 
