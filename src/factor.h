@@ -1,0 +1,126 @@
+#ifndef FACTOR_H
+#define FACTOR_H
+// ****************************************************************************
+//  factor.h                                                     DB48X project
+// ****************************************************************************
+//
+//   File Description:
+//
+//      Prime factorization and primality testing for bignum integers
+//
+//      Uses a multi-stage approach:
+//        1. Trial division by small primes (up to ~10000)
+//        2. Miller-Rabin primality test
+//        3. Pollard's Rho with Brent's cycle detection + GCD batching
+//
+//      Memory usage: O(1) beyond the factor list itself
+//      Time complexity: O(n^{1/4}) for each factor via Pollard Rho
+//
+//      High-level functions:
+//        - IsPrime(n)  → bool
+//        - Factors(n)  → list of { prime, exponent } pairs
+//
+// ****************************************************************************
+//   This software is licensed under the terms outlined in LICENSE.txt
+// ****************************************************************************
+
+#include "bignum.h"
+
+
+// ============================================================================
+//
+//   Factor result storage
+//
+// ============================================================================
+
+struct prime_factor
+// ----------------------------------------------------------------------------
+//   A single prime factor with its multiplicity
+// ----------------------------------------------------------------------------
+{
+    bignum_g    prime;
+    unsigned    exponent;
+};
+
+
+// Maximum number of distinct prime factors we can store.
+// For a 256+ bit number, the theoretical max of distinct prime factors
+// is ~85 (product of first 85 primes exceeds 2^256), but in practice
+// it's far fewer. 128 is very generous.
+static const size_t MAX_FACTORS = 128;
+
+struct factor_result
+// ----------------------------------------------------------------------------
+//   Collect all prime factors
+// ----------------------------------------------------------------------------
+{
+    prime_factor factors[MAX_FACTORS];
+    size_t       count;
+
+    factor_result() : count(0) {}
+
+    // Add a prime factor (increments exponent if already present)
+    bool add(bignum_g p);
+};
+
+
+// ============================================================================
+//
+//   Small primes table for trial division
+//
+// ============================================================================
+
+extern const uint16_t small_primes[];
+extern const size_t   NUM_SMALL_PRIMES;
+
+
+// ============================================================================
+//
+//   Low-level API
+//
+// ============================================================================
+
+// Modular arithmetic on bignums
+bignum_g bn_gcd(bignum_g a, bignum_g b);
+bignum_g bn_mulmod(bignum_g a, bignum_g b, bignum_g m);
+bignum_g bn_addmod(bignum_g a, bignum_g b, bignum_g m);
+bignum_g bn_submod(bignum_g a, bignum_g b, bignum_g m);
+bignum_g bn_abs_diff(bignum_g a, bignum_g b);
+bignum_g bn_powmod(bignum_g base, bignum_g exp, bignum_g mod);
+
+// Primality test (Miller-Rabin, deterministic for < ~82 bits)
+bool     is_probably_prime(bignum_g n);
+
+// Pollard Rho (Brent variant with GCD batching)
+bignum_g pollard_rho_brent(bignum_g n);
+
+// Full factorization — fills result with prime factors and exponents
+bool     factorize(bignum_g n, factor_result &result);
+
+
+// ============================================================================
+//
+//   High-level functions for calculator commands
+//
+// ============================================================================
+
+// IsPrime: test if n is a small integer or bignum that is prime.
+//   For small integers (integer_p), promotes to bignum internally.
+//   Also handles trial division for small values before Miller-Rabin.
+//   Returns:  1 = prime,  0 = composite,  -1 = error (invalid input)
+int      do_isprime(bignum_g n);
+
+COMMAND_DECLARE(IsPrime, 1);
+
+// Factors: decompose n into prime factors.
+//   Returns true on success, fills result with the factorization.
+//   The caller is responsible for converting the result to whatever
+//   representation is needed (RPL list, array, stack objects, etc.)
+//
+//   For n < 2, returns success with an empty result.
+//   Negative inputs: the caller should handle the sign and pass |n|.
+bool     do_factors(bignum_g n, factor_result &result);
+
+COMMAND_DECLARE(Factors, 1);
+
+#endif // FACTOR_H

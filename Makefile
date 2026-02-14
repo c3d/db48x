@@ -357,7 +357,8 @@ CXX_SOURCES +=				\
 	src/decimal.cc			\
 	src/equations.cc		\
 	src/expression.cc		\
-	src/file.cc			\
+	src/factor.cc			\
+	src/file.cc				\
 	src/files.cc			\
 	src/finance.cc			\
 	src/font.cc			\
