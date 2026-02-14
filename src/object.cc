@@ -45,6 +45,7 @@
 #include "decimal.h"
 #include "equations.h"
 #include "expression.h"
+#include "factor.h"
 #include "finance.h"
 #include "font.h"
 #include "fraction.h"

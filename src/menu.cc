@@ -455,7 +455,7 @@ MENU(NumbersMenu,
      "Σ",       ID_Sum,
      "∏",       ID_Product,
      "QuoRem",  ID_Div2,
-     "Factors", ID_Unimplemented,
+     "Factors", ID_Factors,
      "Ran#",    ID_RandomNumber,
      "Random",  ID_Random,
 
@@ -467,7 +467,7 @@ MENU(NumbersMenu,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,
 
      "→Int",    ID_ToInteger,
-     "IsPrime", ID_Unimplemented,
+     "IsPrime", ID_IsPrime,
      "NextPr",  ID_Unimplemented,
      "PrevPr",  ID_Unimplemented);
 

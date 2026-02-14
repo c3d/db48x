@@ -712,6 +712,9 @@ CMD(Bytes)
 CMD(ScreenCapture)
 
 // Special arithmetic
+CMD(Factors)
+CMD(IsPrime)
+
 NAMED(Div2, "QuoRem")                   ALIAS(Div2, "IDiv2")
                                         ALIAS(Div2, "QuotientRemainder")
 
