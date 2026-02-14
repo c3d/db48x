@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.screen->setAttribute(Qt::WA_AcceptTouchEvents);
     ui.screen->installEventFilter(this);
     ui.keyboard->setStyleSheet("border-image: "
-                               "url(:/bitmap/keyboard-db48x.png) "
+                               "url(:/bitmap/keymap.png) "
                                "0 0 0 0 stretch stretch;");
 
     highlight = new Highlight(ui.keyboard);
