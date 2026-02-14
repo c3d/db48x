@@ -123,4 +123,13 @@ bool     do_factors(bignum_g n, factor_result &result);
 
 COMMAND_DECLARE(Factors, 1);
 
+// NextPrime / PreviousPrime: find adjacent primes.
+//   Returns the next/previous prime strictly greater/less than n.
+//   Returns nullptr on error or if no previous prime exists (n <= 2).
+bignum_g do_next_prime(bignum_g n);
+bignum_g do_prev_prime(bignum_g n);
+
+COMMAND_DECLARE(NextPrime, 1);
+COMMAND_DECLARE(PreviousPrime, 1);
+
 #endif // FACTOR_H

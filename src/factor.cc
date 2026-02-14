@@ -711,6 +711,165 @@ int do_isprime(bignum_g n)
     return is_probably_prime(n) ? 1 : 0;
 }
 
+
+// ============================================================================
+//
+//   NextPrime / PreviousPrime
+//
+// ============================================================================
+
+static bignum_g do_adjacent_prime(bignum_g n, bool next)
+// ----------------------------------------------------------------------------
+//   Find the next (next=true) or previous (next=false) prime relative to n
+// ----------------------------------------------------------------------------
+{
+    bignum_g one = bignum::make(1);
+    bignum_g two = bignum::make(2);
+    if (!one || !two)
+        return nullptr;
+
+    // candidate = n + 1  or  n - 1
+    bignum_g cand = next ? (n + one) : (n - one);
+    if (!cand)
+        return nullptr;
+
+    // No prime <= 1
+    if (!next && (cand->is_zero() || cand->is_one()))
+        return nullptr;
+
+    // Handle the only even prime: 2
+    if (next)
+    {
+        // If candidate == 2, it's prime
+        if (bignum::compare(cand, two) == 0)
+            return cand;
+
+        // If candidate is even, advance to the next odd number
+        {
+            size_t sz  = 0;
+            byte_p raw = cand->value(&sz);
+            if (sz > 0 && !(raw[0] & 1))
+            {
+                cand = cand + one;
+                if (!cand)
+                    return nullptr;
+            }
+        }
+    }
+    else
+    {
+        // Going backward: if candidate == 2 it's prime, return it
+        if (bignum::compare(cand, two) == 0)
+            return cand;
+
+        // If candidate is even, step back to the previous odd number
+        {
+            size_t sz  = 0;
+            byte_p raw = cand->value(&sz);
+            if (sz > 0 && !(raw[0] & 1))
+            {
+                cand = cand - one;
+                if (!cand || cand->is_one())
+                    return nullptr;
+                // cand == 2 after stepping back?
+                if (bignum::compare(cand, two) == 0)
+                    return cand;
+            }
+        }
+    }
+
+    // Walk through odd numbers until we find a prime
+    static const unsigned MAX_SEARCH = 1 << 20;
+    for (unsigned iter = 0; iter < MAX_SEARCH; iter++)
+    {
+        if (do_isprime(cand) == 1)
+            return cand;
+
+        // Step by 2 (stay in odd numbers)
+        cand = next ? (cand + two) : (cand - two);
+        if (!cand)
+            return nullptr;
+
+        // Going backward: stop if we've gone below 2
+        if (!next && (cand->is_zero() || cand->is_one()))
+            return nullptr;
+    }
+
+    return nullptr; // search limit reached
+}
+
+
+bignum_g do_next_prime(bignum_g n)
+// ----------------------------------------------------------------------------
+//   Return the smallest prime strictly greater than n
+// ----------------------------------------------------------------------------
+{
+    return do_adjacent_prime(n, true);
+}
+
+
+bignum_g do_prev_prime(bignum_g n)
+// ----------------------------------------------------------------------------
+//   Return the largest prime strictly less than n, or nullptr if none
+// ----------------------------------------------------------------------------
+{
+    return do_adjacent_prime(n, false);
+}
+
+
+COMMAND_BODY(NextPrime)
+{
+    object_p xo = strip(rt.stack(0));
+    if (!xo)
+        return ERROR;
+
+    if (!is_integer(xo->type()))
+    {
+        rt.type_error();
+        return ERROR;
+    }
+
+    bignum_g xi = bignum::promote(xo);
+    if (!xi)
+        return ERROR;
+
+    bignum_g r = do_next_prime(xi);
+    if (!r || !rt.top(r))
+        return ERROR;
+
+    return OK;
+}
+
+
+COMMAND_BODY(PreviousPrime)
+{
+    object_p xo = strip(rt.stack(0));
+    if (!xo)
+        return ERROR;
+
+    if (!is_integer(xo->type()))
+    {
+        rt.type_error();
+        return ERROR;
+    }
+
+    bignum_g xi = bignum::promote(xo);
+    if (!xi)
+        return ERROR;
+
+    bignum_g r = do_prev_prime(xi);
+    if (!r)
+    {
+        rt.value_error();
+        return ERROR;
+    }
+    if (!rt.top(r))
+        return ERROR;
+
+    return OK;
+}
+
+
 COMMAND_BODY(IsPrime)
 {
     object_p xo = strip(rt.stack(0));
