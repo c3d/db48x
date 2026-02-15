@@ -1,5 +1,5 @@
 
-# Date, Time
+# Date and Time
 
 
 ## Date entry / edit format
@@ -15,8 +15,8 @@ Months and days, even in a negative year, run from low (positive numbers) to hig
 Note: the date format is intentionally different from the format on the HP-48.
 
 Note: not all commands can handle a negative year.
-The underlying platform DMCP of the SwissMicros calculators handles only positive years.
-That bubbles up to several commands.
+The DMCP platform for SwissMicros calculators only handles positive years.
+This restriction bubbles up to several DB48x commands.
 
 
 ## Date display format
@@ -28,7 +28,7 @@ The format can be adjusted by changing the [Date, Time flags](#date-time-flags) 
 
 ## Date+Time entry / edit format
 
-A real number with a `_date` unit attached is interpreted as a Date + Time
+A decimal number with a `_date` unit attached is interpreted as a Date + Time
 according to the format `YYYYMMDD.HHMMSS`.
 
 
@@ -41,18 +41,28 @@ The format can be adjusted by changing the [Date, Time flags](#date-time-flags) 
 
 ## Time entry format
 
-Enter the hours, a '.' to end the hours and begin the minutes.
-After the minutes enter a second '.' to end the minutes and begin the seconds.
-The display will change to `<hours>°<minutes>′_dms`, assuming you are entering an angle.
+This is based on the DB48x feature to quickly enter an angle value,
+with repeated use of the _,_ (_._) key.
+For example to enter, `2°03′05″`, 
+you can enter the sequence _2.3.5_.
+
+After the minutes, the second '.' will change the display to `<hours>°<minutes>′_dms`,
+assuming you are entering an angle.
 Proceed with the seconds.
 Optionally you can give a third '.' followed by a fraction of a second.
 Enter the fraction as numerator '.' (yes, a fourth '.'; not a '/') denominator.
-Finally change the unit from `_dms` to `_hms`.
-With the cursor positioned before the unit you can just attach the `_hms` unit (it replaces the `_dms`).
-Or you can use the `→HMS` command.
-That pushes the value on the stack.
-Both the `_hms` unit and the `→HMS` command can be found in the [TimeMenu](#timemenu).
-Or, in alpha mode, you can change the 'd' in an 'h'.
+
+Finally change the unit from `_dms` to `_hms`:
+- With the cursor positioned between the last digit and the unit separator (`_`)
+you can use the `_hms` menu button (it replaces the `_dms`).
+- With the cursor positioned after the the unit separator (`_`)
+you can use the _O_ (_x10n_, DM32/42/42n _E_) key (bound to the Cycle command)
+to alternate between `_dms` and `_hms`.
+- Or you can use the `→HMS` command.
+But, that also pushes the value on the stack.
+- Or, in alpha mode, you can change the 'd' in an 'h'.
+
+The `_hms` (InsertHms) and the `→HMS` (ToHMS) commands can be found in the [TimeMenu](#timemenu).
 
 A second way to enter a time is as `<hours>.<decimal fraction of an hour>_hms`.
 
@@ -73,9 +83,7 @@ If the fraction of a second is zero the '.' and the fraction will be left out.
 The `_hms` unit will not show.
 
 
-## DateMenu
-
-Access: [Time](#TimeMenu) menu.
+## DatesMenu
 
 Show a softkey menu for date-related commands, including:
 
@@ -87,10 +95,10 @@ Show a softkey menu for date-related commands, including:
 * `JulianDayNumber`
 * `DateFromJulianDayNumber`
 
+**Access:** [Time](#TimeMenu) menu.
+
 
 ## TimeMenu
-
-Access: 🟦 _V_ (_TIME_) key.
 
 Show a softkey menu for time-related commands, including:
 
@@ -106,6 +114,8 @@ Show a softkey menu for time-related commands, including:
 * `TimedEval`
 * `SetTime`
 
+**Access:** 🟦 _V_ (_TIME_) key.
+
 
 ## Date, Time flags
 
@@ -120,16 +130,18 @@ Show a softkey menu for time-related commands, including:
 * `HideDayOfWeek` / `ShowDayOfWeek`
 * `BCECEyearNumbering` / `AstronomicalYearNumbering`
 
+**Access:** 
+
 
 ## Date, Time settings
 
 * `DateSlash` / `DateDash` / `DateDot` / `DateSpace`
 * `DateSeparatorCommand`
 
+**Access:** 
+
 
 ## BCECEyearNumbering
-
-Access: 
 
 Activate the B(efore) C(ommon) E(ra) / C(ommon) E(ra) year numbering.
 
@@ -138,10 +150,10 @@ This uses a non uniform timeline without a year = 0.
 The year numbering jumps from 1 BCE to 1 CE. So negative years are shifted.
 See: [Proleptic Gregorian calendar](https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar)
 
+**Access:** 
+
 
 ## AstronomicalYearNumbering
-
-Access: 
 
 Activate the Astronomical year numbering.
 
@@ -149,23 +161,25 @@ Display negative years on the stack with a minus sign.
 This uses a uniform timeline including a year = 0.
 See: [Astronomical year numbering](https://en.wikipedia.org/wiki/Astronomical_year_numbering)
 
+**Access:** 
+
 
 ## DateSlash
 ## DateDash
 ## DateDot
 ## DateSpace
 
-Access: trough the `Date separator` entry in the `Status bar` menu.
-
 Activate the corresponding date separator.
+
+**Access:** trough the `Date separator` entry in the `Status bar` menu.
 
 
 ## DateSeparatorCommand
 
-Access:
-
 Return the most recent used or default date separator command.
 There is no DateSeparator variable to Recall.
+
+**Access:**
 
 
 ## SetDate
@@ -320,8 +334,6 @@ This displays on the stack as `HH:MM:SS`.
 
 ## JulianDayNumber
 
-Access: [Date](#DateMenu) menu.
-
 Convert a date to its Julian day number.
 
 For dates the Gregorian calendar is assumed.
@@ -333,6 +345,8 @@ like [The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
 The conversion uses software from the
 [Standards of Fundamental Astronomy of the International Astronomical Union](https://www.iausofa.org/).
 
+**Access:** [Date](#DatesMenu) menu.
+
 To compute the Julian Day Number for the first day of the millenium:
 ```rpl
 20000101 JDN
@@ -341,8 +355,6 @@ To compute the Julian Day Number for the first day of the millenium:
 
 ## DateFromJulianDayNumber
 
-Access: [Date](#DateMenu) menu.
-
 Convert a Julian day number to its date.
 
 This command converts a Julian day number to a date in the Gregorian calendar.
@@ -350,6 +362,8 @@ It is the opposite of the `JDN` command.
 
 The conversion uses software from the
 [Standards of Fundamental Astronomy of the International Astronomical Union](https://www.iausofa.org/).
+
+**Access:** [Date](#DatesMenu) menu.
 
 ```rpl
 2451545 JDN→
