@@ -164,6 +164,7 @@ TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
 TESTS(quorem,           "Quotient and remainder");
+TESTS(primes,           "Prime number tests");
 TESTS(expr,             "Operations on expressions");
 TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
@@ -284,6 +285,7 @@ void tests::run(uint onlyCurrent)
         sum_and_product();
         polynomials();
         quotient_and_remainder();
+        prime_number_tests();
         expression_operations();
         random_number_generation();
         object_structure();
@@ -12248,6 +12250,141 @@ void tests::quotient_and_remainder()
         .expect("R:0")
         .test(BSP)
         .expect("Q:X↑2+X+1");
+}
+
+
+void tests::prime_number_tests()
+// ----------------------------------------------------------------------------
+//   Tests for IsPrime, Factors, NextPrime, PreviousPrime
+// ----------------------------------------------------------------------------
+{
+    BEGIN(primes);
+
+    // -------------------------------------------------------------------------
+    // IsPrime — small primes (trial-division path)
+    // -------------------------------------------------------------------------
+    step("IsPrime: 2 is prime")
+        .test(CLEAR, "2", ENTER, ID_IsPrime).expect("1");
+    step("IsPrime: 3 is prime")
+        .test(CLEAR, "3", ENTER, ID_IsPrime).expect("1");
+    step("IsPrime: 7919 is prime (1000th prime)")
+        .test(CLEAR, "7919", ENTER, ID_IsPrime).expect("1");
+
+    // -------------------------------------------------------------------------
+    // IsPrime — Mersenne primes (Miller-Rabin path, increasing size)
+    // -------------------------------------------------------------------------
+    // M31 = 2^31 - 1  (10 digits)
+    step("IsPrime: M31 = 2 147 483 647")
+        .test(CLEAR, "2147483647", ENTER, ID_IsPrime).expect("1");
+    // M61 = 2^61 - 1  (19 digits)
+    step("IsPrime: M61 = 2 305 843 009 213 693 951")
+        .test(CLEAR, "2305843009213693951", ENTER, ID_IsPrime).expect("1");
+    // M89 = 2^89 - 1  (27 digits)
+    step("IsPrime: M89 = 618 970 019 642 690 137 449 562 111")
+        .test(CLEAR, "618970019642690137449562111", ENTER, ID_IsPrime)
+        .expect("1");
+    // M107 = 2^107 - 1  (33 digits)
+    step("IsPrime: M107 = 162 259 276 829 213 363 391 578 010 288 127")
+        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_IsPrime)
+        .expect("1");
+    // M127 = 2^127 - 1  (39 digits, largest Mersenne prime known to Lucas, 1876)
+    step("IsPrime: M127 = 170 141 183 460 469 231 731 687 303 715 884 105 727")
+        .test(CLEAR, "170141183460469231731687303715884105727",
+              ENTER, ID_IsPrime)
+        .expect("1");
+    
+    // -------------------------------------------------------------------------
+    // IsPrime — composite numbers (must return 0)
+    // -------------------------------------------------------------------------
+    step("IsPrime: 1 is not prime")
+        .test(CLEAR, "1", ENTER, ID_IsPrime).expect("0");
+    step("IsPrime: 4 is not prime")
+        .test(CLEAR, "4", ENTER, ID_IsPrime).expect("0");
+    // 561 = 3 × 11 × 17 — smallest Carmichael number
+    step("IsPrime: 561 (Carmichael) is not prime")
+        .test(CLEAR, "561", ENTER, ID_IsPrime).expect("0");
+    // 1729 = 7 × 13 × 19 — Hardy-Ramanujan, second Carmichael number
+    step("IsPrime: 1729 (Carmichael) is not prime")
+        .test(CLEAR, "1729", ENTER, ID_IsPrime).expect("0");
+    // 2^31 + 1 = 2 147 483 649 = 3 × 715 827 883
+    step("IsPrime: 2^31+1 = 2 147 483 649 is not prime")
+        .test(CLEAR, "2147483649", ENTER, ID_IsPrime).expect("0");
+    // 2^128 - 1  (39 digits, composite: 3 × 5 × 17 × 257 × … )
+    step("IsPrime: 2^128-1 (39 digits) is not prime")
+        .test(CLEAR, "340282366920938463463374607431768211455",
+              ENTER, ID_IsPrime)
+        .expect("0");
+    // M61 × M89  (~46 digits, product of two large primes)
+    step("IsPrime: M61 × M89 is not prime")
+        .test(CLEAR,
+              "2305843009213693951", ENTER,
+              "618970019642690137449562111", ENTER,
+              MUL, ID_IsPrime)
+        .expect("0");
+
+    // -------------------------------------------------------------------------
+    // NextPrime
+    // -------------------------------------------------------------------------
+    step("NextPrime(1) = 2")
+        .test(CLEAR, "1", ENTER, ID_NextPrime).expect("2");
+    step("NextPrime(2) = 3")
+        .test(CLEAR, "2", ENTER, ID_NextPrime).expect("3");
+    step("NextPrime(10) = 11")
+        .test(CLEAR, "10", ENTER, ID_NextPrime).expect("11");
+    // U+205F (medium mathematical space) is the thousands separator in DB48X
+#define SP " "
+    step("NextPrime(M31-1) = M31")
+        .test(CLEAR, "2147483646", ENTER, ID_NextPrime)
+        .expect("2" SP "147" SP "483" SP "647");
+
+    // -------------------------------------------------------------------------
+    // PreviousPrime
+    // -------------------------------------------------------------------------
+    step("PreviousPrime(3) = 2")
+        .test(CLEAR, "3", ENTER, ID_PreviousPrime).expect("2");
+    step("PreviousPrime(12) = 11")
+        .test(CLEAR, "12", ENTER, ID_PreviousPrime).expect("11");
+    step("PreviousPrime(M31+1) = M31")
+        .test(CLEAR, "2147483648", ENTER, ID_PreviousPrime)
+        .expect("2" SP "147" SP "483" SP "647");
+    step("PreviousPrime(2) gives error (no prime < 2)")
+        .test(CLEAR, "2", ENTER, ID_PreviousPrime)
+        .error("Bad argument value");
+
+    // -------------------------------------------------------------------------
+    // Factors
+    // -------------------------------------------------------------------------
+    step("Factors(12) = { 2 2 3 1 }")
+        .test(CLEAR, "12", ENTER, ID_Factors)
+        .expect("{ 2 2 3 1 }");
+    step("Factors(100) = { 2 2 5 2 }")
+        .test(CLEAR, "100", ENTER, ID_Factors)
+        .expect("{ 2 2 5 2 }");
+    step("Factors(M31) = { M31 1 }  (large prime)")
+        .test(CLEAR, "2147483647", ENTER, ID_Factors)
+        .expect("{ 2" SP "147" SP "483" SP "647 1 }");
+
+    // -------------------------------------------------------------------------
+    // Factors — large number (31 digits: 9973 × M89)
+    // -------------------------------------------------------------------------
+    // 9973 is the 1229th prime (trial division); M89 is a 27-digit Mersenne prime.
+    // Their product has 31 digits, which forces the bignum path throughout.
+    step("Factors(9973 * M89) = { 9973 1 M89 1 }  (31-digit semiprime)")
+        .test(CLEAR,
+              "9973", ENTER,
+              "618970019642690137449562111", ENTER,
+              MUL, ID_Factors)
+        .expect("{ 9" SP "973 1 618" SP "970" SP "019" SP "642" SP "690"
+                SP "137" SP "449" SP "562" SP "111 1 }", 10000);
+
+    // Verify both prime factors are actually prime.
+    // The list { 9973 1 M89 1 } has primes at indices 1 and 3.
+    step("Both prime factors of 9973*M89 are prime")
+        .test("→ lst "
+              "« lst 1 GET IsPrime lst 3 GET IsPrime AND »",
+              ENTER)
+        .expect("1", 10000);
+#undef SP
 }
 
 
