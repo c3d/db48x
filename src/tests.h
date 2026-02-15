@@ -135,6 +135,7 @@ struct tests
     void sum_and_product();
     void polynomials();
     void quotient_and_remainder();
+    void prime_number_tests();
     void expression_operations();
     void random_number_generation();
     void object_structure();
