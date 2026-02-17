@@ -647,6 +647,29 @@ bool factorize(bignum_g n, factor_result &result)
 
 // ============================================================================
 //
+//   Range limit: Mersenne number M_m = 2^m - 1
+//
+// ============================================================================
+
+static bool above_m(bignum_r n, int m = 127)
+// ----------------------------------------------------------------------------
+//   Return true if n > M_m = 2^m - 1, i.e. n >= 2^m
+// ----------------------------------------------------------------------------
+//   Bit m is at byte index m/8, bit position m%8 (LSB-first storage).
+//   n >= 2^m iff the bignum has more than m/8+1 bytes, or the byte at
+//   index m/8 has bit m%8 set.
+{
+    size_t sz      = 0;
+    byte_p data    = n->value(&sz);
+    size_t byte_idx = size_t(m) / 8;
+    int    bit_idx  = m % 8;
+    return sz > byte_idx + 1
+        || (sz == byte_idx + 1 && (data[byte_idx] >> bit_idx) != 0);
+}
+
+
+// ============================================================================
+//
 //   High-level: IsPrime
 //
 // ============================================================================

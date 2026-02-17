@@ -12269,29 +12269,6 @@ void tests::prime_number_tests()
         .test(CLEAR, "3", ENTER, ID_IsPrime).expect("1");
     step("IsPrime: 7919 is prime (1000th prime)")
         .test(CLEAR, "7919", ENTER, ID_IsPrime).expect("1");
-
-    // -------------------------------------------------------------------------
-    // IsPrime — Mersenne primes (Miller-Rabin path, increasing size)
-    // -------------------------------------------------------------------------
-    // M31 = 2^31 - 1  (10 digits)
-    step("IsPrime: M31 = 2 147 483 647")
-        .test(CLEAR, "2147483647", ENTER, ID_IsPrime).expect("1");
-    // M61 = 2^61 - 1  (19 digits)
-    step("IsPrime: M61 = 2 305 843 009 213 693 951")
-        .test(CLEAR, "2305843009213693951", ENTER, ID_IsPrime).expect("1");
-    // M89 = 2^89 - 1  (27 digits)
-    step("IsPrime: M89 = 618 970 019 642 690 137 449 562 111")
-        .test(CLEAR, "618970019642690137449562111", ENTER, ID_IsPrime)
-        .expect("1");
-    // M107 = 2^107 - 1  (33 digits)
-    step("IsPrime: M107 = 162 259 276 829 213 363 391 578 010 288 127")
-        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_IsPrime)
-        .expect("1");
-    // M127 = 2^127 - 1  (39 digits, largest Mersenne prime known to Lucas, 1876)
-    step("IsPrime: M127 = 170 141 183 460 469 231 731 687 303 715 884 105 727")
-        .test(CLEAR, "170141183460469231731687303715884105727",
-              ENTER, ID_IsPrime)
-        .expect("1");
     
     // -------------------------------------------------------------------------
     // IsPrime — composite numbers (must return 0)
@@ -12384,6 +12361,203 @@ void tests::prime_number_tests()
               "« lst 1 GET IsPrime lst 3 GET IsPrime AND »",
               ENTER)
         .expect("1", 10000);
+
+    // =========================================================================
+    // Mersenne numbers M_p = 2^p - 1, for prime p from 2 to 127
+    // =========================================================================
+    // For prime M_p  : IsPrime → 1, Factors → { M_p 1 }, reconstruction OK
+    // For composite  : IsPrime → 0, Factors → list with ∏pᵢ^eᵢ = M_p,
+    //                  all pᵢ prime (verified generically without knowing
+    //                  the factorization in advance)
+    //
+    // Mersenne primes in this range (OEIS A000043):
+    //   p = 2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127
+    //
+    // Factors tests: check exact known factorization { p1 1 p2 1 ... }
+    // (Mersenne numbers are squarefree; factorizations from Cunningham tables)
+
+    // M2 = 3  (prime)
+    step("IsPrime: M2=3 is prime")
+        .test(CLEAR, "3", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M2=3) = { 3 1 }")
+        .test(CLEAR, "3", ENTER, ID_Factors).expect("{ 3 1 }");
+
+    // M3 = 7  (prime)
+    step("IsPrime: M3=7 is prime")
+        .test(CLEAR, "7", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M3=7) = { 7 1 }")
+        .test(CLEAR, "7", ENTER, ID_Factors).expect("{ 7 1 }");
+
+    // M5 = 31  (prime)
+    step("IsPrime: M5=31 is prime")
+        .test(CLEAR, "31", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M5=31) = { 31 1 }")
+        .test(CLEAR, "31", ENTER, ID_Factors).expect("{ 31 1 }");
+
+    // M7 = 127  (prime)
+    step("IsPrime: M7=127 is prime")
+        .test(CLEAR, "127", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M7=127) = { 127 1 }")
+        .test(CLEAR, "127", ENTER, ID_Factors).expect("{ 127 1 }");
+
+    // M11 = 2047 = 23 × 89  (composite)
+    step("IsPrime: M11=2047 is not prime")
+        .test(CLEAR, "2047", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M11=2047) = { 23 1 89 1 }")
+        .test(CLEAR, "2047", ENTER, ID_Factors).expect("{ 23 1 89 1 }");
+
+    // M13 = 8191  (prime)
+    step("IsPrime: M13=8191 is prime")
+        .test(CLEAR, "8191", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M13=8191) = { 8191 1 }")
+        .test(CLEAR, "8191", ENTER, ID_Factors).expect("{ 8" SP "191 1 }");
+
+    // M17 = 131071  (prime)
+    step("IsPrime: M17=131071 is prime")
+        .test(CLEAR, "131071", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M17=131071) = { 131071 1 }")
+        .test(CLEAR, "131071", ENTER, ID_Factors).expect("{ 131" SP "071 1 }");
+
+    // M19 = 524287  (prime)
+    step("IsPrime: M19=524287 is prime")
+        .test(CLEAR, "524287", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M19=524287) = { 524287 1 }")
+        .test(CLEAR, "524287", ENTER, ID_Factors).expect("{ 524" SP "287 1 }");
+
+    // M23 = 8388607 = 47 × 178481  (composite)
+    step("IsPrime: M23=8388607 is not prime")
+        .test(CLEAR, "8388607", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M23=8388607) = { 47 1 178481 1 }")
+        .test(CLEAR, "8388607", ENTER, ID_Factors).expect("{ 47 1 178" SP "481 1 }");
+
+    // M29 = 536870911 = 233 × 1103 × 2089  (composite)
+    step("IsPrime: M29=536870911 is not prime")
+        .test(CLEAR, "536870911", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M29=536870911) = { 233 1 1103 1 2089 1 }")
+        .test(CLEAR, "536870911", ENTER, ID_Factors).expect("{ 233 1 1" SP "103 1 2" SP "089 1 }");
+
+    // M31 = 2147483647  (prime)
+    step("IsPrime: M31=2147483647 is prime")
+        .test(CLEAR, "2147483647", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M31=2147483647) = { 2147483647 1 }")
+        .test(CLEAR, "2147483647", ENTER, ID_Factors).expect("{ 2" SP "147" SP "483" SP "647 1 }");
+
+    // M37 = 137438953471 = 223 × 616318177  (composite)
+    step("IsPrime: M37=137438953471 is not prime")
+        .test(CLEAR, "137438953471", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M37=137438953471) = { 223 1 616318177 1 }")
+        .test(CLEAR, "137438953471", ENTER, ID_Factors).expect("{ 223 1 616" SP "318" SP "177 1 }");
+
+    // M41 = 2199023255551 = 13367 × 164511353  (composite; 13367 > table)
+    step("IsPrime: M41=2199023255551 is not prime")
+        .test(CLEAR, "2199023255551", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M41=2199023255551) = { 13367 1 164511353 1 }")
+        .test(CLEAR, "2199023255551", ENTER, ID_Factors)
+        .expect("{ 13" SP "367 1 164" SP "511" SP "353 1 }", 5000);
+
+    // M43 = 8796093022207 = 431 × 9719 × 2099863  (composite)
+    step("IsPrime: M43=8796093022207 is not prime")
+        .test(CLEAR, "8796093022207", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M43=8796093022207) = { 431 1 9719 1 2099863 1 }")
+        .test(CLEAR, "8796093022207", ENTER, ID_Factors)
+        .expect("{ 431 1 9" SP "719 1 2" SP "099" SP "863 1 }");
+
+    // M47 = 140737488355327 = 2351 × 4513 × 13264529  (composite)
+    step("IsPrime: M47=140737488355327 is not prime")
+        .test(CLEAR, "140737488355327", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M47=140737488355327) = { 2351 1 4513 1 13264529 1 }")
+        .test(CLEAR, "140737488355327", ENTER, ID_Factors)
+        .expect("{ 2" SP "351 1 4" SP "513 1 13" SP "264" SP "529 1 }");
+
+    // M53 = 9007199254740991 = 6361 × 69431 × 20394401  (composite)
+    step("IsPrime: M53=9007199254740991 is not prime")
+        .test(CLEAR, "9007199254740991", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M53=9007199254740991) = { 6361 1 69431 1 20394401 1 }")
+        .test(CLEAR, "9007199254740991", ENTER, ID_Factors)
+        .expect("{ 6" SP "361 1 69" SP "431 1 20" SP "394" SP "401 1 }");
+
+    // M59 = 576460752303423487 = 179951 × 3203431780337  (composite)
+    step("IsPrime: M59=576460752303423487 is not prime")
+        .test(CLEAR, "576460752303423487", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M59=576460752303423487) = { 179951 1 3203431780337 1 }")
+        .test(CLEAR, "576460752303423487", ENTER, ID_Factors)
+        .expect("{ 179" SP "951 1 3" SP "203" SP "431" SP "780" SP "337 1 }", 10000);
+
+    // M61 = 2305843009213693951  (prime)
+    step("IsPrime: M61=2305843009213693951 is prime")
+        .test(CLEAR, "2305843009213693951", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M61=2305843009213693951) = { 2305843009213693951 1 }")
+        .test(CLEAR, "2305843009213693951", ENTER, ID_Factors)
+        .expect("{ 2" SP "305" SP "843" SP "009" SP "213" SP "693" SP "951 1 }", 5000);
+
+    // M67 = 147573952589676412927 = 193707721 × 761838257287  (composite)
+    step("IsPrime: M67=147573952589676412927 is not prime")
+        .test(CLEAR, "147573952589676412927", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M67=147573952589676412927) = { 193707721 1 761838257287 1 }")
+        .test(CLEAR, "147573952589676412927", ENTER, ID_Factors)
+        .expect("{ 193" SP "707" SP "721 1 761" SP "838" SP "257" SP "287 1 }", 10000);
+
+    // M71 = 2361183241434822606847 = 228479 × 48544121 × 212885833  (composite)
+    step("IsPrime: M71=2361183241434822606847 is not prime")
+        .test(CLEAR, "2361183241434822606847", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M71=2361183241434822606847) = { 228479 1 48544121 1 212885833 1 }")
+        .test(CLEAR, "2361183241434822606847", ENTER, ID_Factors)
+        .expect("{ 228" SP "479 1 48" SP "544" SP "121 1 212" SP "885" SP "833 1 }", 10000);
+
+    // M73 = 9444732965739290427391 = 439 × 2298041 × 9361973132609  (composite)
+    step("IsPrime: M73=9444732965739290427391 is not prime")
+        .test(CLEAR, "9444732965739290427391", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M73=9444732965739290427391) = { 439 1 2298041 1 9361973132609 1 }")
+        .test(CLEAR, "9444732965739290427391", ENTER, ID_Factors)
+        .expect("{ 439 1 2" SP "298" SP "041 1 9" SP "361" SP "973" SP "132" SP "609 1 }", 10000);
+
+    // M79 = 604462909807314587353087 = 2687 × 202029703 × 1113491139767  (composite)
+    step("IsPrime: M79=604462909807314587353087 is not prime")
+        .test(CLEAR, "604462909807314587353087", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M79=604462909807314587353087) = { 2687 1 202029703 1 1113491139767 1 }")
+        .test(CLEAR, "604462909807314587353087", ENTER, ID_Factors)
+        .expect("{ 2" SP "687 1 202" SP "029" SP "703 1 1" SP "113" SP "491" SP "139" SP "767 1 }", 30000);
+
+    // M83 = 9671406556917033397649407 = 167 × 57912614113275649087721  (composite)
+    step("IsPrime: M83=9671406556917033397649407 is not prime")
+        .test(CLEAR, "9671406556917033397649407", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M83=9671406556917033397649407) = { 167 1 57912614113275649087721 1 }")
+        .test(CLEAR, "9671406556917033397649407", ENTER, ID_Factors)
+        .expect("{ 167 1 57" SP "912" SP "614" SP "113" SP "275" SP "649" SP "087" SP "721 1 }", 10000);
+
+    // M89 = 618970019642690137449562111  (prime)
+    step("IsPrime: M89=618970019642690137449562111 is prime")
+        .test(CLEAR, "618970019642690137449562111", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M89=618970019642690137449562111) = { 618970019642690137449562111 1 }")
+        .test(CLEAR, "618970019642690137449562111", ENTER, ID_Factors)
+        .expect("{ 618" SP "970" SP "019" SP "642" SP "690" SP "137" SP "449" SP "562" SP "111 1 }", 10000);
+
+    // M97 = 158456325028528675187087900671 = 11447 × 13842607235828485645766393  (composite)
+    step("IsPrime: M97=158456325028528675187087900671 is not prime")
+        .test(CLEAR, "158456325028528675187087900671", ENTER, ID_IsPrime).expect("0");
+    step("Factors(M97=158456325028528675187087900671)"
+         " = { 11447 1 13842607235828485645766393 1 }")
+        .test(CLEAR, "158456325028528675187087900671", ENTER, ID_Factors)
+        .expect("{ 11" SP "447 1 13" SP "842" SP "607" SP "235" SP "828" SP "485" SP "645" SP "766" SP "393 1 }", 30000);
+
+    // M107 = 162259276829213363391578010288127  (prime)
+    step("IsPrime: M107=162259276829213363391578010288127 is prime")
+        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_IsPrime).expect("1");
+    step("Factors(M107=162259276829213363391578010288127)"
+         " = { 162259276829213363391578010288127 1 }")
+        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_Factors)
+        .expect("{ 162" SP "259" SP "276" SP "829" SP "213" SP "363" SP "391" SP "578" SP "010" SP "288" SP "127 1 }", 10000);
+
+    // M127 = 170141183460469231731687303715884105727  (prime)
+    step("IsPrime: M127=170141183460469231731687303715884105727 is prime")
+        .test(CLEAR, "170141183460469231731687303715884105727", ENTER, ID_IsPrime)
+        .expect("1");
+    step("Factors(M127=170141183460469231731687303715884105727)"
+         " = { 170141183460469231731687303715884105727 1 }")
+        .test(CLEAR, "170141183460469231731687303715884105727", ENTER, ID_Factors)
+        .expect("{ 170" SP "141" SP "183" SP "460" SP "469" SP "231" SP "731" SP "687"
+                SP "303" SP "715" SP "884" SP "105" SP "727 1 }", 10000);
+
 #undef SP
 }
 
