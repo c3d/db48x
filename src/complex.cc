@@ -1269,11 +1269,28 @@ COMPLEX_BODY(ln1p)
 
 COMPLEX_BODY(expm1)
 // ----------------------------------------------------------------------------
-//   Complex implementation of expm1
+//   Complex implementation of expm1, avoiding cancellation for small z
 // ----------------------------------------------------------------------------
+//   expm1(a+bi) = (expm1(a)*cos(b) - 2*sin(b/2)^2) + i*(exp(a)*sin(b))
 {
-    complex_g one = complex::make(1, 0);
-    return exp(z) - one;
+    algebraic_g a = z->re();
+    algebraic_g b = z->im();
+
+    // Real part: expm1(a)*cos(b) - 2*sin(b/2)^2
+    algebraic_g em1   = expm1::run(a);
+    algebraic_g cosb  = cos::run(b);
+    algebraic_g two   = integer::make(2);
+    algebraic_g bh    = b / two;
+    algebraic_g sinbh = sin::run(bh);
+    algebraic_g re    = em1 * cosb - two * sinbh * sinbh;
+
+    // Imaginary part: (expm1(a)+1)*sin(b), reusing em1 to avoid a second exp call
+    algebraic_g one  = integer::make(1);
+    algebraic_g ea   = em1 + one;
+    algebraic_g sinb = sin::run(b);
+    algebraic_g im   = ea * sinb;
+
+    return rectangular::make(re, im);
 }
 
 
