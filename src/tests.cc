@@ -5140,15 +5140,45 @@ void tests::complex_functions()
 
     step("Complex exponential minus 1 (zero)");
     test(CLEAR, "0+0ⅈ expm1", ENTER)
-        .expect("0+0ⅈ");  // expm1(0) = e^0 - 1 = 0
+        .expect("0.+0ⅈ");  // expm1(0) = e^0 - 1 = 0
 
-    step("Complex exponential minus 1 (real)");
-    test(CLEAR, "1+0ⅈ expm1", ENTER)
-        .match("1\\.71828.*\\+0ⅈ");  // e - 1
+    step("Complex expm1 real axis (full precision)")
+        .test(CLEAR, "1+0ⅈ expm1", ENTER)
+        .expect("1.71828 18284 59045 2354+0ⅈ");
 
-    step("Complex exponential minus 1 (imaginary)");
-    test(CLEAR, "0+3.14159265358979323846ⅈ expm1", ENTER)
-        .match("-2\\..*ⅈ");  // expm1(πi) ≈ -2 (with tiny floating point error)
+    step("Complex expm1 purely imaginary pi")
+        .test(CLEAR, "0+3.14159265358979323846ⅈ expm1", ENTER)
+        .expect("-2.+2.64338 32795 02884 2017⁳⁻²¹ⅈ");
+
+    step("Complex expm1 purely imaginary small")
+        .test(CLEAR, "0+0.001ⅈ expm1", ENTER)
+        .expect("-0.00000 04999 99958 33333+0.00099 99998 33333 34167ⅈ");
+
+    step("Complex expm1 small value (precision)")
+        .test(CLEAR, "0.001+0.001ⅈ expm1", ENTER)
+        .expect("0.00099 99996 66499 96667+0.00100 10003 33333 29999ⅈ");
+
+    step("Complex expm1 very small value")
+        .test(CLEAR, "1E-10+1E-10ⅈ expm1", ENTER)
+        .expect("1.⁳⁻¹⁰+1.00000 00001⁳⁻¹⁰ⅈ");
+
+    step("Complex expm1 negative real")
+        .test(CLEAR, "-20+0.5ⅈ expm1", ENTER)
+        .expect("-0.99999 99981 91167 52357+9.88169 68558 36096 6132⁳⁻¹⁰ⅈ");
+
+    step("Complex expm1 high precision")
+        .test(CLEAR, "200 PRECISION 100 SIG", ENTER,
+              "1E-40+1E-40ⅈ expm1", ENTER)
+        .expect("9.99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99996 66666 66666 66666 6667⁳⁻⁴¹+1.00000 00000 00000 00000 00000 00000 00000 00001 00000 00000 00000 00000 00000 00000 00000 00000 33333 33333 33333 3333⁳⁻⁴⁰ⅈ");
+
+    step("Complex expm1 restore precision")
+        .test(CLEAR, "34 PRECISION 20 SIG", ENTER).noerror();
+
+    step("Complex expm1 halving identity")
+        .test(CLEAR,
+              "0.3+0.7ⅈ DUP expm1 SWAP 2 / expm1 DUP 2 + * -",
+              ENTER)
+        .expect("-1.19⁳⁻³⁴+7.7⁳⁻³⁵ⅈ");
 
     step("Power");
     test(CLEAR, "3+7ⅈ", ENTER, "2-3ⅈ", ID_pow)
