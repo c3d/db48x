@@ -3199,7 +3199,7 @@ implemented by the time the project reaches version 1.0.
 * `TRIG`
 * `TRIGCOS`
 * `TRIGO`
-* `TRIGSIN`
+* ~~`TRIGSIN`~~ **Implemented**
 * `TRIGTAN`
 * `TRN`
 * `TRUNC`

@@ -8774,6 +8774,32 @@ void tests::symbolic_operations()
     step("Isolate cbrt")
         .test(CLEAR, "'A=cbrt X' X", NOSHIFT, F3)
         .expect("'X=A³'");
+
+    step("TrigSin: cos(X)^2 replaced by 1-sin(X)^2");
+    test(CLEAR, "'cos(X)^2' TrigSin", ENTER)
+        .expect("'1-(sin X)²'");
+    step("TrigSin: sq(cos(X)) replaced by 1-sq(sin(X))");
+    test(CLEAR, "'sq(cos(X))' TrigSin", ENTER)
+        .expect("'1-(sin X)²'");
+    step("TrigSin: nested argument");
+    test(CLEAR, "'cos(A+B)^2' TrigSin", ENTER)
+        .expect("'1-(sin(A+B))²'");
+    step("TrigSin: non-expression passthrough");
+    test(CLEAR, "42 TrigSin", ENTER)
+        .expect("42");
+
+    step("TrigSin: cos² inside arithmetic expression");
+    test(CLEAR, "'3*cos(X)^2+1' TrigSin", ENTER)
+        .expect("'3·(1-(sin X)²)+1'");
+    step("TrigSin: multiple cos² terms both replaced");
+    test(CLEAR, "'cos(X)^2+cos(Y)^2' TrigSin", ENTER)
+        .expect("'1-(sin X)²+(1-(sin Y)²)'");
+    step("TrigSin: cos³ does not match cos² rule");
+    test(CLEAR, "'cos(X)^3' TrigSin", ENTER)
+        .expect("'cos X↑3'");
+    step("TrigSin: cos without square passes through");
+    test(CLEAR, "'cos(X)+1' TrigSin", ENTER)
+        .expect("'cos X+1'");
 }
 
 

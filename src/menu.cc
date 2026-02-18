@@ -892,7 +892,7 @@ MENU(TrigIdentitiesMenu,
      "Tan→SinCos²",     ID_Unimplemented,
      "TExpand",         ID_Unimplemented,
      "TLin",            ID_Unimplemented,
-     "Trig",            ID_Unimplemented,
+     "TrigSin",         ID_TrigSin,
      "Symb",            ID_SymbolicMenu);
 
 MENU(ExpLogIdentitiesMenu,
