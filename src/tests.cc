@@ -5101,6 +5101,43 @@ void tests::complex_functions()
     test(ID_exp)
         .expect("18.43908 89145 85774 62∡0.86217 00546 67226 34884ʳ");
 
+    step("Complex ln1p (zero)");
+    test(CLEAR, "0+0ⅈ ln1p", ENTER)
+        .expect("0.+0.ⅈ");
+
+    step("Complex ln1p (real axis)");
+    test(CLEAR, "1+0ⅈ ln1p", ENTER)
+        .expect("0.69314 71805 59945 30942+0.ⅈ");  // ln(2)
+
+    step("Complex ln1p (purely imaginary)");
+    test(CLEAR, "0+3.14159265358979323846ⅈ ln1p", ENTER)
+        .expect("1.19298 51534 13410 0491+1.26262 72556 78911 6834ⅈ");
+
+    step("Complex ln1p (small imaginary)");
+    test(CLEAR, "0+0.001ⅈ ln1p", ENTER)
+        .expect("0.00000 04999 99750 00017+0.00099 99996 66666 86667ⅈ");
+
+    step("Complex ln1p (small mixed)");
+    test(CLEAR, "0.001+0.001ⅈ ln1p", ENTER)
+        .expect("0.00099 99993 34332 53333+0.00099 90006 66665 868ⅈ");
+
+    step("Complex ln1p (very small)");
+    test(CLEAR, "1E-10+1E-10ⅈ ln1p", ENTER)
+        .expect("9.99999 99999 99999 9999⁳⁻¹¹+9.99999 99990 00000 0001⁳⁻¹¹ⅈ");
+
+    step("Complex ln1p (negative real)");
+    test(CLEAR, "-0.5+0.5ⅈ ln1p", ENTER)
+        .expect("-0.34657 35902 79972 65471+0.78539 81633 97448 30962ⅈ");
+
+    step("Complex ln1p (high precision)");
+    test(CLEAR, "200 PRECISION 100 SIG 1E-40+1E-40ⅈ ln1p", ENTER)
+        .match("9\\.99999.*3333⁳⁻⁴¹\\+9\\.99999.*6667⁳⁻⁴¹ⅈ");
+
+    step("Complex ln1p/expm1 identity");
+    test(CLEAR, "24 PRECISION 12 SIG 0.3+0.4ⅈ expm1 ln1p", ENTER)
+        .expect("0.3+0.4ⅈ");
+    test(CLEAR, "34 PRECISION 20 SIG", ENTER).noerror();
+
     step("Complex exponential minus 1 (zero)");
     test(CLEAR, "0+0ⅈ expm1", ENTER)
         .expect("0+0ⅈ");  // expm1(0) = e^0 - 1 = 0
