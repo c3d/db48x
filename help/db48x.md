@@ -5385,6 +5385,7 @@ The following is an extensive list of commands.
 * `TrailingDecimal`
 * `Tran`
 * `TrigIdentitiesMenu`
+* `TRIGSIN`
 * `Trn`
 * `Trnc`
 * `True`
@@ -5864,7 +5865,6 @@ implemented by the time the project reaches version 1.0.
 * `TRIG`
 * `TRIGCOS`
 * `TRIGO`
-* `TRIGSIN`
 * `TRIGTAN`
 * `TRN`
 * `TRUNC`
@@ -15830,7 +15830,14 @@ Match and apply a rule to an expression only once
 
 
 ## TRIGSIN
-Simplify replacing cos(x)^2+sin(x)^2=1
+Simplify replacing `cos(x)²` with `1-sin(x)²`
+
+This command applies the Pythagorean identity to rewrite expressions so that
+cosine squares are replaced by sine squares. This favors the use of `sin` over
+`cos` in the expression.
+
+`'cos(X)^2'` ▶ `'1-(sin X)²'`
+`'cos(A+B)^2'` ▶ `'1-(sin(A+B))²'`
 
 
 ## ALLROOTS

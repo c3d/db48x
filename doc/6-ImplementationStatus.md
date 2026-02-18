@@ -1770,6 +1770,7 @@ The following is an extensive list of commands.
 * `TrailingDecimal`
 * `Tran`
 * `TrigIdentitiesMenu`
+* `TRIGSIN`
 * `Trn`
 * `Trnc`
 * `True`
@@ -3199,7 +3200,6 @@ implemented by the time the project reaches version 1.0.
 * `TRIG`
 * `TRIGCOS`
 * `TRIGO`
-* `TRIGSIN`
 * `TRIGTAN`
 * `TRN`
 * `TRUNC`

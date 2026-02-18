@@ -3522,6 +3522,19 @@ expression_p expression::simplify() const
 }
 
 
+expression_p expression::trig_sin() const
+// ----------------------------------------------------------------------------
+//   Replace cos(x)^2 with 1-sin(x)^2 (favor sine over cosine)
+// ----------------------------------------------------------------------------
+{
+    return rewrites<DOWN>(
+        // Pythagorean identity: cos²→1-sin²
+        sq(cos(X)),     one - sq(sin(X)),
+        cos(X)^two,     one - sq(sin(X))
+        );
+}
+
+
 // ============================================================================
 //
 //   User-level expression rewrite commands
@@ -3587,6 +3600,15 @@ FUNCTION_BODY(Simplify)
 // ----------------------------------------------------------------------------
 {
     return do_rewrite(x, &expression::simplify);
+}
+
+
+FUNCTION_BODY(TrigSin)
+// ----------------------------------------------------------------------------
+//   Replace cos(x)^2 with 1-sin(x)^2
+// ----------------------------------------------------------------------------
+{
+    return do_rewrite(x, &expression::trig_sin);
 }
 
 
