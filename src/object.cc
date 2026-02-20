@@ -40,6 +40,7 @@
 #include "complex.h"
 #include "conditionals.h"
 #include "constants.h"
+#include "continued-fraction.h"
 #include "custom.h"
 #include "datetime.h"
 #include "decimal.h"

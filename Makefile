@@ -352,6 +352,7 @@ CXX_SOURCES +=				\
 	src/complex.cc			\
 	src/conditionals.cc		\
 	src/constants.cc		\
+	src/continued-fraction.cc \
 	src/custom.cc		 	\
 	src/datetime.cc			\
 	src/decimal.cc			\
