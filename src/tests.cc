@@ -108,6 +108,7 @@ TESTS(fformat,          "Fraction display formats");
 TESTS(dformat,          "Decimal display formats");
 TESTS(ifunctions,       "Integer functions");
 TESTS(dfunctions,       "Decimal functions");
+TESTS(dfc,              "Continued fraction")
 TESTS(float,            "Hardware-accelerated 7-digit (float)")
 TESTS(double,           "Hardware-accelerated 16-digit (double)")
 TESTS(highp,            "High-precision computations (60 digits)")
@@ -229,6 +230,7 @@ void tests::run(uint onlyCurrent)
         decimal_display_formats();
         integer_numerical_functions();
         decimal_numerical_functions();
+        cfraction();
         float_numerical_functions();
         double_numerical_functions();
         high_precision_numerical_functions();
@@ -4352,6 +4354,116 @@ void tests::fraction_decimal_conversions()
 
     step("Restoring small fraction mode")
         .test(CLEAR, "SmallFractions MixedFractions", ENTER).noerror();
+}
+
+void tests::cfraction()
+// ----------------------------------------------------------------------------
+//   Tests for DFC (Décomposition en Fraction Continue)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(dfc);
+
+    // -------------------------------------------------------------------------
+    // Integers: DFC(n) = { n }
+    // -------------------------------------------------------------------------
+    step("DFC(0) = { 0 }")
+        .test(CLEAR, "0", ENTER, ID_DFC).expect("{ 0 }");
+    step("DFC(1) = { 1 }")
+        .test(CLEAR, "1", ENTER, ID_DFC).expect("{ 1 }");
+    step("DFC(5) = { 5 }")
+        .test(CLEAR, "5", ENTER, ID_DFC).expect("{ 5 }");
+    step("DFC(-3) = { -3 }")
+        .test(CLEAR, "-3", ENTER, ID_DFC).expect("{ -3 }");
+
+    // -------------------------------------------------------------------------
+    // Rationals: exact continued fraction expansion
+    // -------------------------------------------------------------------------
+    // 1/2 = [0; 2]
+    step("DFC(1/2) = { 0 2 }")
+        .test(CLEAR, "1/2", ENTER, ID_DFC).expect("{ 0 2 }");
+    // 3/7 = [0; 2, 3]
+    step("DFC(3/7) = { 0 2 3 }")
+        .test(CLEAR, "3/7", ENTER, ID_DFC).expect("{ 0 2 3 }");
+    // 7/5 = [1; 2, 2]
+    step("DFC(7/5) = { 1 2 2 }")
+        .test(CLEAR, "7/5", ENTER, ID_DFC).expect("{ 1 2 2 }");
+    // 22/7 = [3; 7]
+    step("DFC(22/7) = { 3 7 }")
+        .test(CLEAR, "22/7", ENTER, ID_DFC).expect("{ 3 7 }");
+    // 355/113 = [3; 7, 16]
+    step("DFC(355/113) = { 3 7 16 }")
+        .test(CLEAR, "355/113", ENTER, ID_DFC).expect("{ 3 7 16 }");
+    // -5/3 = [-2; 3]  (floor(-5/3) = -2, residual = 1/3)
+    step("DFC(-5/3) = { -2 3 }")
+        .test(CLEAR, "-5/3", ENTER, ID_DFC).expect("{ -2 3 }");
+
+    // -------------------------------------------------------------------------
+    // Algebraic numbers: verify first few partial quotients
+    // -------------------------------------------------------------------------
+    // sqrt(2) = [1; 2, 2, 2, 2, ...]
+    step("DFC(sqrt 2): a0 = 1")
+        .test(CLEAR, "2 sqrt DFC 1 GET", ENTER).expect("1");
+    step("DFC(sqrt 2): a1 = 2")
+        .test(CLEAR, "2 sqrt DFC 2 GET", ENTER).expect("2");
+    step("DFC(sqrt 2): a2 = 2")
+        .test(CLEAR, "2 sqrt DFC 3 GET", ENTER).expect("2");
+    step("DFC(sqrt 2): a3 = 2")
+        .test(CLEAR, "2 sqrt DFC 4 GET", ENTER).expect("2");
+
+    // sqrt(3) = [1; 1, 2, 1, 2, ...]
+    step("DFC(sqrt 3): a0 = 1")
+        .test(CLEAR, "3 sqrt DFC 1 GET", ENTER).expect("1");
+    step("DFC(sqrt 3): a1 = 1")
+        .test(CLEAR, "3 sqrt DFC 2 GET", ENTER).expect("1");
+    step("DFC(sqrt 3): a2 = 2")
+        .test(CLEAR, "3 sqrt DFC 3 GET", ENTER).expect("2");
+    step("DFC(sqrt 3): a3 = 1")
+        .test(CLEAR, "3 sqrt DFC 4 GET", ENTER).expect("1");
+
+    // phi = (1+sqrt(5))/2 = [1; 1, 1, 1, 1, ...]  (golden ratio)
+    step("DFC(phi): a0 = 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC 1 GET", ENTER).expect("1");
+    step("DFC(phi): a1 = 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC 2 GET", ENTER).expect("1");
+    step("DFC(phi): a2 = 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC 3 GET", ENTER).expect("1");
+    step("DFC(phi): a3 = 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC 4 GET", ENTER).expect("1");
+
+    // -------------------------------------------------------------------------
+    // Transcendental numbers: verify first partial quotients
+    // -------------------------------------------------------------------------
+    // pi = [3; 7, 15, 1, 292, ...]
+    step("DFC(pi): a0 = 3")
+        .test(CLEAR, "pi DFC 1 GET", ENTER).expect("3");
+    step("DFC(pi): a1 = 7")
+        .test(CLEAR, "pi DFC 2 GET", ENTER).expect("7");
+    step("DFC(pi): a2 = 15")
+        .test(CLEAR, "pi DFC 3 GET", ENTER).expect("15");
+    step("DFC(pi): a3 = 1")
+        .test(CLEAR, "pi DFC 4 GET", ENTER).expect("1");
+    step("DFC(pi): a4 = 292")
+        .test(CLEAR, "pi DFC 5 GET", ENTER).expect("292");
+
+    // e = [2; 1, 2, 1, 1, 4, 1, 1, 6, ...]
+    step("DFC(e): a0 = 2")
+        .test(CLEAR, "EulerianNumber DFC 1 GET", ENTER).expect("2");
+    step("DFC(e): a1 = 1")
+        .test(CLEAR, "EulerianNumber DFC 2 GET", ENTER).expect("1");
+    step("DFC(e): a2 = 2")
+        .test(CLEAR, "EulerianNumber DFC 3 GET", ENTER).expect("2");
+    step("DFC(e): a3 = 1")
+        .test(CLEAR, "EulerianNumber DFC 4 GET", ENTER).expect("1");
+    step("DFC(e): a4 = 1")
+        .test(CLEAR, "EulerianNumber DFC 5 GET", ENTER).expect("1");
+    step("DFC(e): a5 = 4")
+        .test(CLEAR, "EulerianNumber DFC 6 GET", ENTER).expect("4");
+    step("DFC(e): a6 = 1")
+        .test(CLEAR, "EulerianNumber DFC 7 GET", ENTER).expect("1");
+    step("DFC(e): a7 = 1")
+        .test(CLEAR, "EulerianNumber DFC 8 GET", ENTER).expect("1");
+    step("DFC(e): a8 = 6")
+        .test(CLEAR, "EulerianNumber DFC 9 GET", ENTER).expect("6");
 }
 
 
