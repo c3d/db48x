@@ -4373,6 +4373,16 @@ void tests::cfraction()
     step("DFC(-3) = { -3 }")
         .test(CLEAR, "-3", ENTER, ID_DFC).expect("{ -3 }");
 
+    // Inverse: DFC2F(DFC(n)) = n  (exact round-trip for integers)
+    step("DFC2F(DFC(0)) = 0")
+        .test(CLEAR, "0 DFC DFC2F", ENTER).expect("0");
+    step("DFC2F(DFC(1)) = 1")
+        .test(CLEAR, "1 DFC DFC2F", ENTER).expect("1");
+    step("DFC2F(DFC(5)) = 5")
+        .test(CLEAR, "5 DFC DFC2F", ENTER).expect("5");
+    step("DFC2F(DFC(-3)) = -3")
+        .test(CLEAR, "-3 DFC DFC2F", ENTER).expect("-3");
+
     // -------------------------------------------------------------------------
     // Rationals: exact continued fraction expansion
     // -------------------------------------------------------------------------
@@ -4394,6 +4404,26 @@ void tests::cfraction()
     // -5/3 = [-2; 3]  (floor(-5/3) = -2, residual = 1/3)
     step("DFC(-5/3) = { -2 3 }")
         .test(CLEAR, "-5/3", ENTER, ID_DFC).expect("{ -2 3 }");
+
+    // Inverse: DFC2F(DFC(p/q)) = p/q  (exact round-trip, tested via subtraction)
+    step("DFC2F(DFC(1/2)) = 1/2")
+        .test(CLEAR, "1/2 DFC DFC2F 1/2 -", ENTER).expect("0");
+    step("DFC2F(DFC(3/7)) = 3/7")
+        .test(CLEAR, "3/7 DFC DFC2F 3/7 -", ENTER).expect("0");
+    step("DFC2F(DFC(7/5)) = 7/5")
+        .test(CLEAR, "7/5 DFC DFC2F 7/5 -", ENTER).expect("0");
+    step("DFC2F(DFC(22/7)) = 22/7")
+        .test(CLEAR, "22/7 DFC DFC2F 22/7 -", ENTER).expect("0");
+    step("DFC2F(DFC(355/113)) = 355/113")
+        .test(CLEAR, "355/113 DFC DFC2F 355/113 -", ENTER).expect("0");
+    step("DFC2F(DFC(-5/3)) = -5/3")
+        .test(CLEAR, "-5/3 DFC DFC2F -5/3 -", ENTER).expect("0");
+
+    // DFC2F on a hand-crafted list: { 3 7 } = 22/7
+    step("DFC2F({ 3 7 }) = 22/7")
+        .test(CLEAR, "{ 3 7 } DFC2F 22/7 -", ENTER).expect("0");
+    step("DFC2F({ 3 7 16 }) = 355/113")
+        .test(CLEAR, "{ 3 7 16 } DFC2F 355/113 -", ENTER).expect("0");
 
     // -------------------------------------------------------------------------
     // Algebraic numbers: verify first few partial quotients
@@ -4427,6 +4457,19 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC 3 GET", ENTER).expect("1");
     step("DFC(phi): a3 = 1")
         .test(CLEAR, "1 5 sqrt + 2 / DFC 4 GET", ENTER).expect("1");
+
+    // Inverse: DFC2F(DFC(x)) ≈ x for algebraic irrationals.
+    // ToDecimal converts the DFC2F fraction result to decimal before comparison:
+    // without it, "fraction - decimal" may overflow 64-bit integer denominators.
+    // The tolerance adapts to the current precision: with threshold ≈ 10^(Prec/2),
+    // the convergent error is ≈ 10^(-Prec), so 10^(2-Prec) gives safe margin.
+    // In RPL: "10 2 Precision - ^" computes 10^(2-Precision).
+    step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2")
+        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(sqrt 3)) ≈ sqrt 3")
+        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(phi)) ≈ phi")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
 
     // -------------------------------------------------------------------------
     // Transcendental numbers: verify first partial quotients
@@ -4462,6 +4505,35 @@ void tests::cfraction()
         .test(CLEAR, "EulerianNumber DFC 8 GET", ENTER).expect("1");
     step("DFC(e): a8 = 6")
         .test(CLEAR, "EulerianNumber DFC 9 GET", ENTER).expect("6");
+
+    // Inverse: DFC2F(DFC(x)) ≈ x for transcendentals
+    // ToDecimal forces numeric evaluation so "fraction - pi" doesn't stay symbolic
+    step("DFC2F(DFC(pi)) ≈ pi")
+        .test(CLEAR, "pi DFC DFC2F pi ToDecimal - ABS 1E-30 <", ENTER).expect("True");
+    step("DFC2F(DFC(e)) ≈ e")
+        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+
+    // -------------------------------------------------------------------------
+    // List length and last-coefficient quality checks.
+    // The stopping criterion cuts the list just before the decimal's precision
+    // boundary: all coefficients must be "safe" (equal to the true CF value),
+    // with no large garbage coefficient at the end.
+    // -------------------------------------------------------------------------
+    // sqrt(2) = [1; 2, 2, 2, ...]: every coefficient after a0 must be 2.
+    // DUP SIZE GET retrieves the last element; it must equal 2 (not garbage).
+    step("DFC(sqrt 2) last coefficient is 2")
+        .test(CLEAR, "2 sqrt DFC DUP SIZE GET 2 -", ENTER).expect("0");
+    // phi = [1; 1, 1, 1, ...]: every coefficient must be 1.
+    step("DFC(phi) last coefficient is 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DUP SIZE GET 1 -", ENTER).expect("0");
+    // DFC(pi) list length: precision-limited, not the full Euclidean expansion.
+    step("DFC(pi) list length < 51")
+        .test(CLEAR, "pi DFC SIZE 51 <", ENTER).expect("True");
+    step("DFC(pi) list length > 9")
+        .test(CLEAR, "pi DFC SIZE 9 >", ENTER).expect("True");
+    // DFC(e) similarly bounded.
+    step("DFC(e) list length < 51")
+        .test(CLEAR, "EulerianNumber DFC SIZE 51 <", ENTER).expect("True");
 }
 
 

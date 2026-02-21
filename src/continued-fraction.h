@@ -30,4 +30,10 @@
 //   the precision of the input (based on significant decimal digits).
 COMMAND_DECLARE(DFC, 1);
 
+// DFC2F: reconstruct a real number from its continued fraction list.
+//   Input:  a list { a0, a1, ..., an } of integers
+//   Output: a0 + 1/(a1 + 1/(a2 + ... + 1/an))
+//   Exact rational result when all coefficients are integers.
+COMMAND_DECLARE(DFC2F, 1);
+
 #endif // CONTINUED_FRACTION_H
