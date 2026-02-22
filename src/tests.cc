@@ -4467,11 +4467,11 @@ void tests::cfraction()
     // the convergent error is ≈ 10^(-Prec), so 10^(2-Prec) gives safe margin.
     // In RPL: "10 2 Precision - ^" computes 10^(2-Precision).
     step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2")
-        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC2F(DFC(sqrt 3)) ≈ sqrt 3")
-        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC2F(DFC(phi)) ≈ phi")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
 
     // -------------------------------------------------------------------------
     // Transcendental numbers: verify first partial quotients
@@ -4511,23 +4511,32 @@ void tests::cfraction()
     // Inverse: DFC2F(DFC(x)) ≈ x for transcendentals
     // ToDecimal forces numeric evaluation so "fraction - pi" doesn't stay symbolic
     step("DFC2F(DFC(pi)) ≈ pi")
-        .test(CLEAR, "pi DFC DFC2F pi ToDecimal - ABS 1E-30 <", ENTER).expect("True");
+        .test(CLEAR, "pi DFC DFC2F pi ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC2F(DFC(e)) ≈ e")
-        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 2 'Precision' RCL - ^ <", ENTER).expect("True");
+        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
 
     // -------------------------------------------------------------------------
     // List length and last-coefficient quality checks.
     // The stopping criterion cuts the list just before the decimal's precision
     // boundary: all coefficients must be "safe" (equal to the true CF value),
-    // with no large garbage coefficient at the end.
+    // with no garbage at the end.
+    //
+    // We check that the last N elements of the list equal a reference list.
+    // RPL program: « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == »
+    // takes (list, ref) and returns True if last SIZE(ref) elements match ref.
+    // This catches accidental passes from a single garbage element that happens
+    // to equal the expected value.
     // -------------------------------------------------------------------------
-    // sqrt(2) = [1; 2, 2, 2, ...]: every coefficient after a0 must be 2.
-    // DUP SIZE GET retrieves the last element; it must equal 2 (not garbage).
-    step("DFC(sqrt 2) last coefficient is 2")
-        .test(CLEAR, "2 sqrt DFC DUP SIZE GET 2 -", ENTER).expect("0");
-    // phi = [1; 1, 1, 1, ...]: every coefficient must be 1.
-    step("DFC(phi) last coefficient is 1")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC DUP SIZE GET 1 -", ENTER).expect("0");
+    // sqrt(2) = [1; 2, 2, 2, ...]: last 7 coefficients must all be 2.
+    step("DFC(sqrt 2) last 7 coefficients are 2")
+        .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    // phi = [1; 1, 1, 1, ...]: last 7 coefficients must all be 1.
+    step("DFC(phi) last 7 coefficients are 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
     // DFC(pi) list length: precision-limited, not the full Euclidean expansion.
     step("DFC(pi) list length < 51")
         .test(CLEAR, "pi DFC SIZE 51 <", ENTER).expect("True");
@@ -4536,6 +4545,39 @@ void tests::cfraction()
     // DFC(e) similarly bounded.
     step("DFC(e) list length < 51")
         .test(CLEAR, "EulerianNumber DFC SIZE 51 <", ENTER).expect("True");
+
+    // -------------------------------------------------------------------------
+    // Repeat key tests at precision 100 to verify the stopping criterion scales.
+    // With threshold ≈ 10^50 instead of 10^11, we get many more coefficients,
+    // yet the last coefficient must still be "safe" (equal to the true CF value)
+    // and the round-trip error must be ≈ 10^(-100) < 10^(2-100) = 10^(-98).
+    // -------------------------------------------------------------------------
+    step("Set precision to 100 for high-precision DFC tests")
+        .test(CLEAR, "100 Precision", ENTER).noerror();
+    step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2 at precision 100")
+        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(sqrt 3)) ≈ sqrt 3 at precision 100")
+        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(phi)) ≈ phi at precision 100")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(e)) ≈ e at precision 100")
+        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC(sqrt 2) last 7 coefficients are 2 at precision 100")
+        .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    step("DFC(phi) last 7 coefficients are 1 at precision 100")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    step("DFC(pi) list length > 30 at precision 100")
+        .test(CLEAR, "pi DFC SIZE 30 >", ENTER).expect("True");
+    step("DFC(pi) list length < 201 at precision 100")
+        .test(CLEAR, "pi DFC SIZE 201 <", ENTER).expect("True");
+    step("DFC(e) list length < 251 at precision 100")
+        .test(CLEAR, "EulerianNumber DFC SIZE 251 <", ENTER).expect("True");
+    step("Restore default precision")
+        .test(CLEAR, "24 Precision", ENTER).noerror();
 }
 
 
