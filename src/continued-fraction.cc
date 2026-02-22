@@ -197,10 +197,13 @@ COMMAND_BODY(DFC)
         if (neg && !rem->is_zero())
         {
             // floor(-p/q) = -(quot+1),  fractional part = (q−rem)/q
-            bignum_g one1  = bignum::make(1);
-            bignum_g quot1 = quot + one1;
+            bignum_g one1   = bignum::make(1);
+            bignum_g quot1  = quot + one1;
             bignum_g neg_q1 = -quot1;
-            a0     = algebraic_p(+neg_q1);
+            if (integer_p small = (+neg_q1)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+neg_q1);
             next_p = q - rem;
             next_q = q;
         }
@@ -208,13 +211,19 @@ COMMAND_BODY(DFC)
         {
             // Exact negative integer
             bignum_g neg_q = -quot;
-            a0     = algebraic_p(+neg_q);
+            if (integer_p small = (+neg_q)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+neg_q);
             next_p = bignum::make(0);
             next_q = bignum::make(1);
         }
         else
         {
-            a0     = algebraic_p(+quot);
+            if (integer_p small = (+quot)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+quot);
             next_p = rem;
             next_q = q;
         }
@@ -232,7 +241,16 @@ COMMAND_BODY(DFC)
         bignum_g Q_prev = bignum::make(0);   // Q_{-1} = 0
         bignum_g Q_curr = bignum::make(1);   // Q_0 = 1
         bignum_g thresh = bignum::make(1);
-        size_t   tlim   = (denom_exp > 0) ? (size_t)(denom_exp / 2) : 0;
+        // Use significant_digits() rather than nkigits*3 so that the threshold
+        // sqrt(effective_denominator) is based on the actual precision P, not
+        // on the kigit-padded digit count.  When P is not a multiple of 3 the
+        // last kigit has trailing zero digits that make the kigit-based
+        // denom_exp larger than the effective denominator exponent (sd − xe),
+        // causing the threshold to exceed the CF breakdown boundary and
+        // admitting spurious "garbage" coefficients at the end of the list.
+        unsigned sd      = dec->significant_digits();
+        large    eff_exp = (large) sd - xe;  // effective denominator exponent
+        size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
         for (size_t ti = 0; ti < tlim; ti++)
             thresh = thresh * k10;
 
@@ -242,16 +260,25 @@ COMMAND_BODY(DFC)
         {
             bignum_g ai_big = p / q;
             bignum_g r      = p % q;
-            algebraic_g ai  = algebraic_p(+ai_big);
-            if (!ai || !rt.append(ai))
-                return ERROR;
-            // Q_{k+1} = a_k * Q_k + Q_{k-1}
+            // Q_{k+1} = a_k * Q_k + Q_{k-1}.
+            // Check BEFORE appending: coefficients whose convergent denominator
+            // Q_{k+1} > sqrt(q) = thresh may belong to the finite-decimal
+            // approximation rather than the true irrational.  Stopping before
+            // such a coefficient avoids spurious trailing terms.
             bignum_g tmp   = ai_big * Q_curr;
             bignum_g Q_new = tmp + Q_prev;
+            if (Q_new > thresh)
+                break;
+            // Normalise to small integer when it fits (so that == on lists works).
+            algebraic_g ai;
+            if (integer_p small = (+ai_big)->as_integer())
+                ai = algebraic_p(small);
+            else
+                ai = algebraic_p(+ai_big);
+            if (!ai || !rt.append(ai))
+                return ERROR;
             Q_prev = Q_curr;
             Q_curr = Q_new;
-            if (Q_curr > thresh)
-                break;
             p = q;
             q = r;
         }
@@ -329,20 +356,29 @@ COMMAND_BODY(DFC)
             bignum_g one1   = bignum::make(1);
             bignum_g quot1  = quot + one1;
             bignum_g neg_q1 = -quot1;
-            a0     = algebraic_p(+neg_q1);
+            if (integer_p small = (+neg_q1)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+neg_q1);
             next_p = q - rem;
             next_q = q;
         }
         else if (neg)
         {
             bignum_g neg_q = -quot;
-            a0     = algebraic_p(+neg_q);
+            if (integer_p small = (+neg_q)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+neg_q);
             next_p = bignum::make(0);
             next_q = bignum::make(1);
         }
         else
         {
-            a0     = algebraic_p(+quot);
+            if (integer_p small = (+quot)->as_integer())
+                a0 = algebraic_p(small);
+            else
+                a0 = algebraic_p(+quot);
             next_p = rem;
             next_q = q;
         }
@@ -350,11 +386,14 @@ COMMAND_BODY(DFC)
             return ERROR;
 
         // Same precision-limited stopping criterion as fast path 3:
-        // stop when Q_curr > 10^(denom_exp/2) = sqrt(denominator).
-        bignum_g Q_prev = bignum::make(0);
-        bignum_g Q_curr = bignum::make(1);
-        bignum_g thresh = bignum::make(1);
-        size_t   tlim   = (denom_exp > 0) ? (size_t)(denom_exp / 2) : 0;
+        // use significant_digits()-based effective exponent to avoid
+        // admitting garbage coefficients from kigit trailing-zero padding.
+        bignum_g Q_prev  = bignum::make(0);
+        bignum_g Q_curr  = bignum::make(1);
+        bignum_g thresh  = bignum::make(1);
+        unsigned sd2     = dec->significant_digits();
+        large    eff_exp2 = (large) sd2 - xe;
+        size_t   tlim    = (eff_exp2 > 0) ? (size_t)(eff_exp2 / 2) : 0;
         for (size_t ti = 0; ti < tlim; ti++)
             thresh = thresh * k10;
 
@@ -364,15 +403,20 @@ COMMAND_BODY(DFC)
         {
             bignum_g ai_big = p / q;
             bignum_g r      = p % q;
-            algebraic_g ai  = algebraic_p(+ai_big);
-            if (!ai || !rt.append(ai))
-                return ERROR;
+            // Check BEFORE appending (same reason as fast path 3).
             bignum_g tmp   = ai_big * Q_curr;
             bignum_g Q_new = tmp + Q_prev;
+            if (Q_new > thresh)
+                break;
+            algebraic_g ai;
+            if (integer_p small = (+ai_big)->as_integer())
+                ai = algebraic_p(small);
+            else
+                ai = algebraic_p(+ai_big);
+            if (!ai || !rt.append(ai))
+                return ERROR;
             Q_prev = Q_curr;
             Q_curr = Q_new;
-            if (Q_curr > thresh)
-                break;
             p = q;
             q = r;
         }
