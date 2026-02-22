@@ -10,19 +10,16 @@
 //       x = a0 + 1/(a1 + 1/(a2 + 1/...))
 //     and returns the list of coefficients [a0, a1, a2, ...].
 //
-//     Algorithm for integers and fractions (exact):
-//       Standard Euclidean algorithm on the numerator and denominator.
-//
-//     Algorithm for decimals and other reals:
-//       1. Split x into integer part ip (truncated toward zero) and fp = x - ip
-//       2. For negative non-integer x, adjust so fp stays in [0, 1):
-//            ip = floor(x) = truncate(x) - 1
-//            fp = 1 + fractional_part   (which is 1 - |fractional_part|)
-//       3. Append ip as a0.
-//       4. Iterate: next = 1/fp, ip = floor(next), fp = next - ip.
-//          Append ip as next coefficient.
-//       5. Stop when fp is zero or when |fp| < 10^(-sdigs)
-//          where sdigs = significant_digits(input).
+//     Algorithm for integers:   trivial – one-element list.
+//     Algorithm for fractions:  exact Euclidean algorithm on numerator/denominator.
+//     Algorithm for decimals:   exact bignum Euclidean algorithm.
+//       The decimal x is converted to an exact rational mant/10^denom_exp,
+//       and the standard Euclidean GCD algorithm is applied.  Iteration stops
+//       (before appending) when the next convergent denominator Q_{k+1} would
+//       exceed 10^(eff_exp/2), where eff_exp = significant_digits(x) − xe is
+//       the effective denominator exponent.  Coefficients beyond that threshold
+//       belong to the finite decimal approximation, not the true mathematical
+//       value, and are discarded.
 //
 // ****************************************************************************
 //   This software is licensed under the terms outlined in LICENSE.txt
@@ -38,16 +35,143 @@
 #include "integer.h"
 #include "list.h"
 
+
+// ----------------------------------------------------------------------------
+//   Convert a bignum coefficient to integer when it fits, bignum otherwise.
+//   Required because == does byte-level comparison: bignum(2) ≠ integer(2).
+// ----------------------------------------------------------------------------
+static algebraic_g bignum_to_algebraic(bignum_g n)
+{
+    if (integer_p small = (+n)->as_integer())
+        return algebraic_p(small);
+    return algebraic_p(+n);
+}
+
+
+// ----------------------------------------------------------------------------
+//   Core DFC algorithm for a decimal value.
+//   Appends CF coefficients [a0, a1, …] to the current scribble area.
+//   Returns object::OK or object::ERROR.
+// ----------------------------------------------------------------------------
+static object::result
+dfc_decimal(decimal_g dec, bool neg)
+{
+    // Build the mantissa integer from kigits.
+    // Re-fetch shape() each iteration: bignum allocations can trigger GC and
+    // move the decimal object (dec is a GC root so +dec stays valid, but a
+    // locally cached xi.base pointer would go stale).
+    decimal::info xi    = (+dec)->shape();
+    size_t        xs    = xi.nkigits;
+    large         xe    = xi.exponent;
+    bignum_g      mant  = bignum::make(0);
+    bignum_g      k1000 = bignum::make(1000);
+    bignum_g      k10   = bignum::make(10);
+    for (size_t i = 0; i < xs; i++)
+    {
+        decimal::info xi_now = (+dec)->shape();
+        bignum_g      kbig   = bignum::make(decimal::kigit(xi_now.base, i));
+        bignum_g      prod   = mant * k1000;
+        mant = prod + kbig;
+    }
+
+    // Represent value as exact rational mant / 10^denom_exp.
+    bignum_g p, q;
+    large denom_exp = (large)(3 * xs) - xe;
+    if (denom_exp > 0)
+    {
+        q = bignum::make(1);
+        for (large i = 0; i < denom_exp; i++)
+            q = q * k10;
+        p = mant;
+    }
+    else
+    {
+        p = mant;
+        for (large i = 0; i < -denom_exp; i++)
+            p = p * k10;
+        q = bignum::make(1);
+    }
+
+    // First coefficient a0 = floor(±p/q), keeping fp = fractional part ≥ 0.
+    bignum_g    quot  = p / q;
+    bignum_g    rem   = p % q;
+    algebraic_g a0;
+    bignum_g    next_p, next_q;
+    if (neg && !rem->is_zero())
+    {
+        // floor(-p/q) = −(quot+1);  fractional part = (q − rem)/q
+        bignum_g one   = bignum::make(1);
+        bignum_g quot1 = quot + one;
+        bignum_g neg_a = -quot1;
+        a0     = bignum_to_algebraic(neg_a);
+        next_p = q - rem;
+        next_q = q;
+    }
+    else if (neg)
+    {
+        // Exact negative integer
+        bignum_g neg_a = -quot;
+        a0     = bignum_to_algebraic(neg_a);
+        next_p = bignum::make(0);
+        next_q = bignum::make(1);
+    }
+    else
+    {
+        a0     = bignum_to_algebraic(quot);
+        next_p = rem;
+        next_q = q;
+    }
+    if (!a0 || !rt.append(a0))
+        return object::ERROR;
+
+    // Stopping threshold: 10^(eff_exp/2).
+    // eff_exp = significant_digits(x) − xe is the exponent of the effective
+    // denominator (after cancelling trailing kigit-padding zeros from the
+    // mantissa).  When precision P is not a multiple of 3, kigit alignment
+    // adds trailing zeros, making the kigit-based denom_exp too large; using
+    // significant_digits() corrects this and prevents garbage coefficients.
+    bignum_g thresh  = bignum::make(1);
+    large    eff_exp = (large) dec->significant_digits() - xe;
+    size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
+    for (size_t ti = 0; ti < tlim; ti++)
+        thresh = thresh * k10;
+
+    // Euclidean loop.  Q_prev = Q_{k-1}, Q_curr = Q_k are the convergent
+    // denominators.  Stop BEFORE appending a_k when Q_{k+1} > thresh: such
+    // coefficients belong to the finite decimal approximation, not to the
+    // true mathematical value.
+    bignum_g Q_prev = bignum::make(0);
+    bignum_g Q_curr = bignum::make(1);
+    p = next_q;
+    q = next_p;
+    while (!q->is_zero())
+    {
+        bignum_g ai_big = p / q;
+        bignum_g r      = p % q;
+        bignum_g tmp    = ai_big * Q_curr;
+        bignum_g Q_new  = tmp + Q_prev;
+        if (Q_new > thresh)
+            break;
+        algebraic_g ai = bignum_to_algebraic(ai_big);
+        if (!ai || !rt.append(ai))
+            return object::ERROR;
+        Q_prev = Q_curr;
+        Q_curr = Q_new;
+        p = q;
+        q = r;
+    }
+    return object::OK;
+}
+
+
 COMMAND_BODY(DFC)
 // ----------------------------------------------------------------------------
 //   Decompose a real number into its continued fraction coefficients
 // ----------------------------------------------------------------------------
 {
-    // Fetch the input from the stack
     algebraic_g xo = algebraic_p(strip(rt.stack(0)));
     if (!xo)
         return ERROR;
-
     object::id ty = xo->type();
 
     // -----------------------------------------------------------------------
@@ -65,64 +189,57 @@ COMMAND_BODY(DFC)
     }
 
     // -----------------------------------------------------------------------
-    // Fast path 2: small fraction → exact Euclidean algorithm
-    //   Only for ID_fraction / ID_neg_fraction (numerator and denominator
-    //   both fit in ularge).  Big fractions fall through to the decimal path.
+    // Fast path 2: small fraction → exact Euclidean (native integer arithmetic)
+    //   Only for ID_fraction / ID_neg_fraction (num and denom fit in ularge).
+    //   Big fractions fall through to the decimal path below.
     // -----------------------------------------------------------------------
     if (ty == object::ID_fraction || ty == object::ID_neg_fraction)
     {
-        fraction_p frac  = fraction_p(+xo);
-        ularge     p     = frac->numerator_value();   // absolute value
-        ularge     q     = frac->denominator_value(); // always positive
-        bool       neg   = (ty == object::ID_neg_fraction);
+        fraction_p frac   = fraction_p(+xo);
+        ularge     p      = frac->numerator_value();
+        ularge     q      = frac->denominator_value();
+        bool       neg    = (ty == object::ID_neg_fraction);
+        scribble   scr;
 
-        scribble scr;
-
-        // First coefficient: floor(±p/q) with correct sign handling
-        ularge    quot0 = p / q;
-        ularge    rem0  = p % q;
+        ularge    quot  = p / q;
+        ularge    rem   = p % q;
         ularge    next_p, next_q;
         integer_g a0i;
-
-        if (neg && rem0 != 0)
+        if (neg && rem != 0)
         {
-            // floor(-p/q) = -(p/q + 1); fractional part = (q - rem0)/q
-            a0i    = rt.make<neg_integer>(quot0 + 1);
-            next_p = q - rem0;
+            // floor(−p/q) = −(quot+1);  fractional part = (q − rem)/q
+            a0i    = rt.make<neg_integer>(quot + 1);
+            next_p = q - rem;
             next_q = q;
         }
         else if (neg)
         {
-            // Exact negative integer: floor(-p/q) = -(p/q), fp = 0
-            a0i    = rt.make<neg_integer>(quot0);
+            a0i    = rt.make<neg_integer>(quot);
             next_p = 0;
             next_q = 1;
         }
         else
         {
-            // Non-negative: floor(p/q) = p/q
-            a0i    = rt.make<integer>(quot0);
-            next_p = rem0;
+            a0i    = rt.make<integer>(quot);
+            next_p = rem;
             next_q = q;
         }
         if (!a0i || !rt.append(a0i))
             return ERROR;
 
-        // Remaining coefficients via the Euclidean algorithm.
-        // The fractional part is next_p/next_q; its reciprocal is next_q/next_p.
+        // Remaining coefficients: reciprocal swap then standard GCD steps.
         p = next_q;
         q = next_p;
         while (q != 0)
         {
-            ularge    a_val = p / q;
-            ularge    r     = p % q;
-            integer_g ai    = rt.make<integer>(a_val);
+            ularge    a  = p / q;
+            ularge    r  = p % q;
+            integer_g ai = rt.make<integer>(a);
             if (!ai || !rt.append(ai))
                 return ERROR;
             p = q;
             q = r;
         }
-
         list_g lst = list::make(scr.scratch(), scr.growth());
         if (!lst || !rt.top(lst))
             return ERROR;
@@ -130,302 +247,34 @@ COMMAND_BODY(DFC)
     }
 
     // -----------------------------------------------------------------------
-    // Fast path 3: decimal input → exact Euclidean algorithm
+    // Decimal and general path: ensure we have a decimal, then apply the
+    // exact bignum Euclidean algorithm via dfc_decimal().
     //
-    //   The floating-point iterative algorithm is numerically unstable for
-    //   slowly-converging CFs (e.g. sqrt(2) = [1;2,2,2,…]) because the CF
-    //   map x→1/x−floor(1/x) amplifies errors by 1/fp² ≈ 5.83 per step.
-    //   After about 30 steps with 34-digit arithmetic the result is garbage.
-    //
-    //   Instead we convert the decimal exactly to a bignum fraction
-    //     value = mantissa_integer × 10^(exponent − 3×nkigits)
-    //   and apply the same Euclidean GCD algorithm used for ID_fraction.
-    //   This gives a perfectly stable, terminating CF with zero rounding
-    //   error, so DFC2F(DFC(x)) == x for any decimal x.
+    //   The floating-point iterative approach (x → 1/fp − floor(1/fp)) is
+    //   numerically unstable: the CF map amplifies errors by 1/fp² ≈ 5.83
+    //   per step, so after ~30 steps with 34-digit arithmetic the result is
+    //   garbage.  Converting to an exact bignum rational first avoids this.
     // -----------------------------------------------------------------------
-    if (ty == object::ID_decimal || ty == object::ID_neg_decimal)
+    if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
     {
-        decimal_g dec = decimal_p(+xo);
-        decimal::info xi = (+dec)->shape();
-        size_t xs  = xi.nkigits;
-        large  xe  = xi.exponent;
-        bool   neg = (ty == object::ID_neg_decimal);
-
-        // Build the mantissa integer: mant = kigit(0)×1000^(xs-1) + … + kigit(xs-1)
-        // kigit(0) is the most-significant (value × 10^xe).
-        // We re-fetch shape() inside the loop because bignum allocations can
-        // trigger GC, which may move the decimal object (dec is GC-tracked,
-        // so +dec is always updated; xi.base would become stale after a GC).
-        bignum_g mant  = bignum::make(0);
-        bignum_g k1000 = bignum::make(1000);
-        bignum_g k10   = bignum::make(10);
-        for (size_t i = 0; i < xs; i++)
+        if (!algebraic::to_decimal(xo))
         {
-            decimal::info    xi_now = (+dec)->shape();
-            decimal::kint    xk     = decimal::kigit(xi_now.base, i);
-            bignum_g         kbig   = bignum::make(xk);
-            bignum_g         prod   = mant * k1000;
-            mant = prod + kbig;
-        }
-
-        // Exact value = mant / 10^(3×xs − xe)   (denominator side)
-        //             = mant × 10^(xe − 3×xs)    (numerator side, if xe > 3×xs)
-        bignum_g p, q;
-        large denom_exp = (large)(3 * xs) - xe; // positive → denominator = 10^denom_exp
-        if (denom_exp > 0)
-        {
-            q = bignum::make(1);
-            for (large i = 0; i < denom_exp; i++)
-                q = q * k10;
-            p = mant;
-        }
-        else
-        {
-            p = mant;
-            for (large i = 0; i < -denom_exp; i++)
-                p = p * k10;
-            q = bignum::make(1);
-        }
-
-        // First coefficient: floor(±p/q) with correct sign handling
-        scribble scr;
-        bignum_g  quot   = p / q;
-        bignum_g  rem    = p % q;
-        algebraic_g a0;
-        bignum_g next_p, next_q;
-
-        if (neg && !rem->is_zero())
-        {
-            // floor(-p/q) = -(quot+1),  fractional part = (q−rem)/q
-            bignum_g one1   = bignum::make(1);
-            bignum_g quot1  = quot + one1;
-            bignum_g neg_q1 = -quot1;
-            if (integer_p small = (+neg_q1)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+neg_q1);
-            next_p = q - rem;
-            next_q = q;
-        }
-        else if (neg)
-        {
-            // Exact negative integer
-            bignum_g neg_q = -quot;
-            if (integer_p small = (+neg_q)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+neg_q);
-            next_p = bignum::make(0);
-            next_q = bignum::make(1);
-        }
-        else
-        {
-            if (integer_p small = (+quot)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+quot);
-            next_p = rem;
-            next_q = q;
-        }
-        if (!a0 || !rt.append(a0))
+            rt.type_error();
             return ERROR;
-
-        // Remaining coefficients: Euclidean GCD on (next_q, next_p).
-        // Track convergent denominators Q_prev/Q_curr: stop when Q_curr
-        // exceeds 10^(denom_exp/2).  The CF of the decimal rational p/q
-        // agrees with the CF of the true value x only while
-        //   Q_k < sqrt(q)  =  10^(denom_exp/2),
-        // beyond that the coefficients are garbage (specific to the finite
-        // decimal approximation).  Using denom_exp/2, not 3*xs/2, correctly
-        // accounts for the actual denominator exponent (xe shifts the boundary).
-        bignum_g Q_prev = bignum::make(0);   // Q_{-1} = 0
-        bignum_g Q_curr = bignum::make(1);   // Q_0 = 1
-        bignum_g thresh = bignum::make(1);
-        // Use significant_digits() rather than nkigits*3 so that the threshold
-        // sqrt(effective_denominator) is based on the actual precision P, not
-        // on the kigit-padded digit count.  When P is not a multiple of 3 the
-        // last kigit has trailing zero digits that make the kigit-based
-        // denom_exp larger than the effective denominator exponent (sd − xe),
-        // causing the threshold to exceed the CF breakdown boundary and
-        // admitting spurious "garbage" coefficients at the end of the list.
-        unsigned sd      = dec->significant_digits();
-        large    eff_exp = (large) sd - xe;  // effective denominator exponent
-        size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
-        for (size_t ti = 0; ti < tlim; ti++)
-            thresh = thresh * k10;
-
-        p = next_q;
-        q = next_p;
-        while (!q->is_zero())
-        {
-            bignum_g ai_big = p / q;
-            bignum_g r      = p % q;
-            // Q_{k+1} = a_k * Q_k + Q_{k-1}.
-            // Check BEFORE appending: coefficients whose convergent denominator
-            // Q_{k+1} > sqrt(q) = thresh may belong to the finite-decimal
-            // approximation rather than the true irrational.  Stopping before
-            // such a coefficient avoids spurious trailing terms.
-            bignum_g tmp   = ai_big * Q_curr;
-            bignum_g Q_new = tmp + Q_prev;
-            if (Q_new > thresh)
-                break;
-            // Normalise to small integer when it fits (so that == on lists works).
-            algebraic_g ai;
-            if (integer_p small = (+ai_big)->as_integer())
-                ai = algebraic_p(small);
-            else
-                ai = algebraic_p(+ai_big);
-            if (!ai || !rt.append(ai))
-                return ERROR;
-            Q_prev = Q_curr;
-            Q_curr = Q_new;
-            p = q;
-            q = r;
         }
-
-        list_g lst = list::make(scr.scratch(), scr.growth());
-        if (!lst || !rt.top(lst))
-            return ERROR;
-        return OK;
+        ty = xo->type();
+        xo = algebraic_p(+xo);
     }
 
-    // -----------------------------------------------------------------------
-    // General path: convert to decimal, then use the exact Euclidean algorithm.
-    // This handles symbolic constants (pi, e, …) and any other type that can
-    // be evaluated numerically.  Converting to decimal first, then applying
-    // the exact bignum Euclidean algorithm, avoids the floating-point
-    // instability of the iterative 1/fp approach.
-    // -----------------------------------------------------------------------
-    if (!algebraic::to_decimal(xo))
-    {
-        rt.type_error();
+    scribble  scr;
+    decimal_g dec = decimal_p(+xo);
+    result r = dfc_decimal(dec, ty == object::ID_neg_decimal);
+    if (r != OK)
+        return r;
+    list_g lst = list::make(scr.scratch(), scr.growth());
+    if (!lst || !rt.top(lst))
         return ERROR;
-    }
-
-    // Re-read the type and fall through to the exact decimal path below.
-    // We reuse fast path 3's logic directly on the converted decimal.
-    ty  = xo->type();
-    xo  = algebraic_p(+xo);
-
-    // Intentional fall-through: the decimal case (fast path 3) handles this.
-    // For clarity the code is repeated here rather than introducing a goto.
-    {
-        decimal_g dec = decimal_p(+xo);
-        decimal::info xi = (+dec)->shape();
-        size_t xs  = xi.nkigits;
-        large  xe  = xi.exponent;
-        bool   neg = (ty == object::ID_neg_decimal);
-
-        bignum_g mant  = bignum::make(0);
-        bignum_g k1000 = bignum::make(1000);
-        bignum_g k10   = bignum::make(10);
-        for (size_t i = 0; i < xs; i++)
-        {
-            decimal::info    xi_now = (+dec)->shape();
-            decimal::kint    xk     = decimal::kigit(xi_now.base, i);
-            bignum_g         kbig   = bignum::make(xk);
-            bignum_g         prod   = mant * k1000;
-            mant = prod + kbig;
-        }
-
-        bignum_g p, q;
-        large denom_exp = (large)(3 * xs) - xe;
-        if (denom_exp > 0)
-        {
-            q = bignum::make(1);
-            for (large i = 0; i < denom_exp; i++)
-                q = q * k10;
-            p = mant;
-        }
-        else
-        {
-            p = mant;
-            for (large i = 0; i < -denom_exp; i++)
-                p = p * k10;
-            q = bignum::make(1);
-        }
-
-        scribble scr;
-        bignum_g  quot   = p / q;
-        bignum_g  rem    = p % q;
-        algebraic_g a0;
-        bignum_g next_p, next_q;
-
-        if (neg && !rem->is_zero())
-        {
-            bignum_g one1   = bignum::make(1);
-            bignum_g quot1  = quot + one1;
-            bignum_g neg_q1 = -quot1;
-            if (integer_p small = (+neg_q1)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+neg_q1);
-            next_p = q - rem;
-            next_q = q;
-        }
-        else if (neg)
-        {
-            bignum_g neg_q = -quot;
-            if (integer_p small = (+neg_q)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+neg_q);
-            next_p = bignum::make(0);
-            next_q = bignum::make(1);
-        }
-        else
-        {
-            if (integer_p small = (+quot)->as_integer())
-                a0 = algebraic_p(small);
-            else
-                a0 = algebraic_p(+quot);
-            next_p = rem;
-            next_q = q;
-        }
-        if (!a0 || !rt.append(a0))
-            return ERROR;
-
-        // Same precision-limited stopping criterion as fast path 3:
-        // use significant_digits()-based effective exponent to avoid
-        // admitting garbage coefficients from kigit trailing-zero padding.
-        bignum_g Q_prev  = bignum::make(0);
-        bignum_g Q_curr  = bignum::make(1);
-        bignum_g thresh  = bignum::make(1);
-        unsigned sd2     = dec->significant_digits();
-        large    eff_exp2 = (large) sd2 - xe;
-        size_t   tlim    = (eff_exp2 > 0) ? (size_t)(eff_exp2 / 2) : 0;
-        for (size_t ti = 0; ti < tlim; ti++)
-            thresh = thresh * k10;
-
-        p = next_q;
-        q = next_p;
-        while (!q->is_zero())
-        {
-            bignum_g ai_big = p / q;
-            bignum_g r      = p % q;
-            // Check BEFORE appending (same reason as fast path 3).
-            bignum_g tmp   = ai_big * Q_curr;
-            bignum_g Q_new = tmp + Q_prev;
-            if (Q_new > thresh)
-                break;
-            algebraic_g ai;
-            if (integer_p small = (+ai_big)->as_integer())
-                ai = algebraic_p(small);
-            else
-                ai = algebraic_p(+ai_big);
-            if (!ai || !rt.append(ai))
-                return ERROR;
-            Q_prev = Q_curr;
-            Q_curr = Q_new;
-            p = q;
-            q = r;
-        }
-
-        list_g lst = list::make(scr.scratch(), scr.growth());
-        if (!lst || !rt.top(lst))
-            return ERROR;
-        return OK;
-    }
+    return OK;
 }
 
 
@@ -440,7 +289,6 @@ COMMAND_BODY(DFC2F)
 //     x = a0 + 1/x
 // ----------------------------------------------------------------------------
 {
-    // Fetch the list from the stack
     object_p obj = strip(rt.stack(0));
     if (!obj)
         return ERROR;
@@ -457,12 +305,10 @@ COMMAND_BODY(DFC2F)
         return ERROR;
     }
 
-    // Start with the last coefficient
     algebraic_g x = algebraic_p(lst->at(n - 1));
     if (!x)
         return ERROR;
 
-    // Process right to left: x = a_i + 1/x
     algebraic_g one = integer::make(1);
     if (!one)
         return ERROR;
