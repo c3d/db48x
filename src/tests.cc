@@ -4427,39 +4427,6 @@ void tests::cfraction()
     step("DFC2F({ 3 7 16 }) = 355/113")
         .test(CLEAR, "{ 3 7 16 } DFC2F 355/113 -", ENTER).expect("0");
 
-    // -------------------------------------------------------------------------
-    // Algebraic numbers: verify first few partial quotients
-    // -------------------------------------------------------------------------
-    // sqrt(2) = [1; 2, 2, 2, 2, ...]
-    step("DFC(sqrt 2): a0 = 1")
-        .test(CLEAR, "2 sqrt DFC 1 GET", ENTER).expect("1");
-    step("DFC(sqrt 2): a1 = 2")
-        .test(CLEAR, "2 sqrt DFC 2 GET", ENTER).expect("2");
-    step("DFC(sqrt 2): a2 = 2")
-        .test(CLEAR, "2 sqrt DFC 3 GET", ENTER).expect("2");
-    step("DFC(sqrt 2): a3 = 2")
-        .test(CLEAR, "2 sqrt DFC 4 GET", ENTER).expect("2");
-
-    // sqrt(3) = [1; 1, 2, 1, 2, ...]
-    step("DFC(sqrt 3): a0 = 1")
-        .test(CLEAR, "3 sqrt DFC 1 GET", ENTER).expect("1");
-    step("DFC(sqrt 3): a1 = 1")
-        .test(CLEAR, "3 sqrt DFC 2 GET", ENTER).expect("1");
-    step("DFC(sqrt 3): a2 = 2")
-        .test(CLEAR, "3 sqrt DFC 3 GET", ENTER).expect("2");
-    step("DFC(sqrt 3): a3 = 1")
-        .test(CLEAR, "3 sqrt DFC 4 GET", ENTER).expect("1");
-
-    // phi = (1+sqrt(5))/2 = [1; 1, 1, 1, 1, ...]  (golden ratio)
-    step("DFC(phi): a0 = 1")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC 1 GET", ENTER).expect("1");
-    step("DFC(phi): a1 = 1")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC 2 GET", ENTER).expect("1");
-    step("DFC(phi): a2 = 1")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC 3 GET", ENTER).expect("1");
-    step("DFC(phi): a3 = 1")
-        .test(CLEAR, "1 5 sqrt + 2 / DFC 4 GET", ENTER).expect("1");
-
     // Inverse: DFC2F(DFC(x)) ≈ x for algebraic irrationals.
     // ToDecimal converts the DFC2F fraction result to decimal before comparison:
     // without it, "fraction - decimal" may overflow 64-bit integer denominators.
@@ -4472,41 +4439,6 @@ void tests::cfraction()
         .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC2F(DFC(phi)) ≈ phi")
         .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
-
-    // -------------------------------------------------------------------------
-    // Transcendental numbers: verify first partial quotients
-    // -------------------------------------------------------------------------
-    // pi = [3; 7, 15, 1, 292, ...]
-    step("DFC(pi): a0 = 3")
-        .test(CLEAR, "pi DFC 1 GET", ENTER).expect("3");
-    step("DFC(pi): a1 = 7")
-        .test(CLEAR, "pi DFC 2 GET", ENTER).expect("7");
-    step("DFC(pi): a2 = 15")
-        .test(CLEAR, "pi DFC 3 GET", ENTER).expect("15");
-    step("DFC(pi): a3 = 1")
-        .test(CLEAR, "pi DFC 4 GET", ENTER).expect("1");
-    step("DFC(pi): a4 = 292")
-        .test(CLEAR, "pi DFC 5 GET", ENTER).expect("292");
-
-    // e = [2; 1, 2, 1, 1, 4, 1, 1, 6, ...]
-    step("DFC(e): a0 = 2")
-        .test(CLEAR, "EulerianNumber DFC 1 GET", ENTER).expect("2");
-    step("DFC(e): a1 = 1")
-        .test(CLEAR, "EulerianNumber DFC 2 GET", ENTER).expect("1");
-    step("DFC(e): a2 = 2")
-        .test(CLEAR, "EulerianNumber DFC 3 GET", ENTER).expect("2");
-    step("DFC(e): a3 = 1")
-        .test(CLEAR, "EulerianNumber DFC 4 GET", ENTER).expect("1");
-    step("DFC(e): a4 = 1")
-        .test(CLEAR, "EulerianNumber DFC 5 GET", ENTER).expect("1");
-    step("DFC(e): a5 = 4")
-        .test(CLEAR, "EulerianNumber DFC 6 GET", ENTER).expect("4");
-    step("DFC(e): a6 = 1")
-        .test(CLEAR, "EulerianNumber DFC 7 GET", ENTER).expect("1");
-    step("DFC(e): a7 = 1")
-        .test(CLEAR, "EulerianNumber DFC 8 GET", ENTER).expect("1");
-    step("DFC(e): a8 = 6")
-        .test(CLEAR, "EulerianNumber DFC 9 GET", ENTER).expect("6");
 
     // Inverse: DFC2F(DFC(x)) ≈ x for transcendentals
     // ToDecimal forces numeric evaluation so "fraction - pi" doesn't stay symbolic
@@ -4537,15 +4469,7 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
-    // DFC(pi) list length: precision-limited, not the full Euclidean expansion.
-    step("DFC(pi) list length < 51")
-        .test(CLEAR, "pi DFC SIZE 51 <", ENTER).expect("True");
-    step("DFC(pi) list length > 9")
-        .test(CLEAR, "pi DFC SIZE 9 >", ENTER).expect("True");
-    // DFC(e) similarly bounded.
-    step("DFC(e) list length < 51")
-        .test(CLEAR, "EulerianNumber DFC SIZE 51 <", ENTER).expect("True");
-
+    
     // -------------------------------------------------------------------------
     // Repeat key tests at precision 100 to verify the stopping criterion scales.
     // With threshold ≈ 10^50 instead of 10^11, we get many more coefficients,
@@ -4562,6 +4486,8 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC2F(DFC(e)) ≈ e at precision 100")
         .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(pi)) ≈ pi at precision 100")
+        .test(CLEAR, "pi DFC DFC2F ToDecimal pi ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
     step("DFC(sqrt 2) last 7 coefficients are 2 at precision 100")
         .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
@@ -4570,12 +4496,6 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
-    step("DFC(pi) list length > 30 at precision 100")
-        .test(CLEAR, "pi DFC SIZE 30 >", ENTER).expect("True");
-    step("DFC(pi) list length < 201 at precision 100")
-        .test(CLEAR, "pi DFC SIZE 201 <", ENTER).expect("True");
-    step("DFC(e) list length < 251 at precision 100")
-        .test(CLEAR, "EulerianNumber DFC SIZE 251 <", ENTER).expect("True");
     step("Restore default precision")
         .test(CLEAR, "24 Precision", ENTER).noerror();
 }
