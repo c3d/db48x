@@ -283,6 +283,7 @@ spellings.
 * `FF` (`FlipFlag`)
 * `FilesMenu`
 * `Filter`
+* `Factors`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
@@ -389,6 +390,7 @@ spellings.
 * `IntegrationMenu` (`DifferentiationMenu`)
 * `Intercept`
 * `inv` (`Invert`, `x⁻¹`)
+* `IsPrime`
 * `IOMenu`
 * `IP` (`IntegerPart`, `IntPart`)
 * `Isol` (`Isolate`)
@@ -483,6 +485,7 @@ spellings.
 * `neg` (`Negate`)
 * `NegativeUnderflowIndicator`
 * `NextEq` (`NextEquation`)
+* `NextPr`
 * `Nip`
 * `NoAngleUnits`
 * `NoAutoSimplify`
@@ -562,6 +565,7 @@ spellings.
 * `Prec` (`Precision`)
 * `PredX` (`PredictX`)
 * `PredY` (`PredictY`)
+* `PrevPr`
 * `PrefixPolynomialRender`
 * `PrincipalSolution`
 * `PrintingMenu`
@@ -1234,6 +1238,7 @@ The following is an extensive list of commands.
 * `FF`
 * `FilesMenu`
 * `Filter`
+* `Factors`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
@@ -1433,6 +1438,7 @@ The following is an extensive list of commands.
 * `neg`
 * `NegativeUnderflowIndicator`
 * `NextEq`
+* `NextPr`
 * `Nip`
 * `NoAngleUnits`
 * `NoAutoSimplify`
@@ -1512,6 +1518,7 @@ The following is an extensive list of commands.
 * `Prec`
 * `PredX`
 * `PredY`
+* `PrevPr`
 * `PrefixPolynomialRender`
 * `PrincipalSolution`
 * `PrintingMenu`
@@ -2184,6 +2191,7 @@ The following is an extensive list of commands.
 * `FF`
 * `FilesMenu`
 * `Filter`
+* `Factors`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
@@ -2383,6 +2391,7 @@ The following is an extensive list of commands.
 * `neg`
 * `NegativeUnderflowIndicator`
 * `NextEq`
+* `NextPr`
 * `Nip`
 * `NoAngleUnits`
 * `NoAutoSimplify`
@@ -2462,6 +2471,7 @@ The following is an extensive list of commands.
 * `Prec`
 * `PredX`
 * `PredY`
+* `PrevPr`
 * `PrefixPolynomialRender`
 * `PrincipalSolution`
 * `PrintingMenu`
@@ -2955,7 +2965,6 @@ implemented by the time the project reaches version 1.0.
 * `F0λ`
 * `FACTOR`
 * `FACTORMOD`
-* `FACTORS`
 * `FANNING`
 * `FAST3D`
 * `FCOEF`
@@ -3008,7 +3017,6 @@ implemented by the time the project reaches version 1.0.
 * `IQUOT`
 * `IREMAINDER`
 * `ISOM`
-* `ISPRIME?`
 * `I→R`
 * `JORDAN`
 * `KER`
@@ -3057,7 +3065,6 @@ implemented by the time the project reaches version 1.0.
 * `MULTMOD`
 * `MUSER`
 * `NDIST`
-* `NEXTPRIME`
 * `NOVAL`
 * `NUMX`
 * `NUMY`
@@ -3085,7 +3092,6 @@ implemented by the time the project reaches version 1.0.
 * `POWMOD`
 * `PREDV`
 * `PREVAL`
-* `PREVPRIME`
 * `PROMPTSTO`
 * `PROOT`
 * `PROPFRAC`

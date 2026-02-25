@@ -117,7 +117,9 @@ Return the Euclidean norm for a complex number, vector or matrix.
 
 # Integer arithmetic and polynomials
 
-This section documents newRPL commands that are not implemented yet in DB48X.
+This section documents integer arithmetic commands, including prime-related
+operations. Some commands (e.g. MODSTO, GETPREC) are planned but not yet
+implemented in DB48X.
 
 ## SETPREC
 Set the current system precision
@@ -147,16 +149,8 @@ Remainder of the integer division
 Square of the input
 
 
-## NEXTPRIME
-Smallest prime number larger than the input
-
-
 ## Factorial
 Factorial of a number
-
-
-## ISPRIME
-Return true/false (1/0) if a number is prime or not
 
 
 ## MANT
@@ -342,9 +336,50 @@ Extract digits from a real number
 All roots of a polynomial
 
 
-## PREVPRIME
-Largest prime smaller than the input
+## IsPrime
+
+Test whether an integer is prime.
+
+`n` ▶ `1` or `0`
+
+* Returns `1` if the integer `n` is prime, `0` if composite.
+* Accepts positive integers including bignums.
+* Uses trial division for small factors, then Miller-Rabin for larger values.
+  Deterministic for numbers up to about 82 bits; probabilistic beyond that with
+  negligible error probability.
 
 
-## FACTORS
-Factorize a polynomial or number
+## Factors
+
+Decompose an integer into its prime factorization.
+
+`n` ▶ `{ p₁ e₁ p₂ e₂ … }`
+
+* Returns a list of alternating prime-exponent pairs: each prime factor followed
+  by its multiplicity.
+* Accepts positive integers including bignums. Negative inputs use the absolute
+  value; zero and one return an empty list.
+* Uses trial division by small primes, then Pollard's Rho for larger factors.
+* The product of all `pᵢ^eᵢ` equals the original number.
+
+
+## NextPr
+
+Return the smallest prime strictly greater than the input.
+
+`n` ▶ `p`
+
+* Returns the next prime number after `n`. For example, `7 NextPr` gives `11`.
+* Accepts integers ≥ 1. If no prime exists (e.g. search limit reached), returns
+  an error.
+
+
+## PrevPr
+
+Return the largest prime strictly smaller than the input.
+
+`n` ▶ `p`
+
+* Returns the previous prime number before `n`. For example, `11 PrevPr` gives `7`.
+* Accepts integers > 2 (no prime exists below 2). If no prime exists or the
+  search limit is reached, returns an error.
