@@ -28,6 +28,8 @@ bool factor_result::add(bignum_g p)
 //   Add a prime factor (increments exponent if already present)
 // ----------------------------------------------------------------------------
 {
+    if (!p)
+        return false;
     for (size_t i = 0; i < count; i++)
     {
         if (bignum::compare(factors[i].prime, p) == 0)
@@ -192,6 +194,8 @@ bignum_g bn_gcd(bignum_g a, bignum_g b)
 //   Compute GCD using Euclidean algorithm
 // ----------------------------------------------------------------------------
 {
+    if (!a || !b)
+        return nullptr;
     while (!b->is_zero())
     {
         bignum_g t = a % b;
@@ -209,6 +213,8 @@ bignum_g bn_mulmod(bignum_g a, bignum_g b, bignum_g m)
 //   Compute (a * b) % m
 // ----------------------------------------------------------------------------
 {
+    if (!a || !b || !m)
+        return nullptr;
     bignum_g prod = a * b;
     if (!prod)
         return nullptr;
@@ -221,6 +227,8 @@ bignum_g bn_addmod(bignum_g a, bignum_g b, bignum_g m)
 //   Compute (a + b) % m
 // ----------------------------------------------------------------------------
 {
+    if (!a || !b || !m)
+        return nullptr;
     bignum_g sum = a + b;
     if (!sum)
         return nullptr;
@@ -233,6 +241,8 @@ bignum_g bn_submod(bignum_g a, bignum_g b, bignum_g m)
 //   Compute (a - b) % m, ensuring positive result
 // ----------------------------------------------------------------------------
 {
+    if (!a || !b || !m)
+        return nullptr;
     if (bignum::compare(a, b) < 0)
     {
         bignum_g t = a + m;
@@ -252,6 +262,8 @@ bignum_g bn_abs_diff(bignum_g a, bignum_g b)
 //   Compute |a - b| for unsigned bignums
 // ----------------------------------------------------------------------------
 {
+    if (!a || !b)
+        return nullptr;
     if (bignum::compare(a, b) >= 0)
         return a - b;
     else
@@ -264,6 +276,8 @@ bignum_g bn_powmod(bignum_g base, bignum_g exp, bignum_g mod)
 //   Modular exponentiation: base^exp mod mod  (binary right-to-left)
 // ----------------------------------------------------------------------------
 {
+    if (!base || !exp || !mod)
+        return nullptr;
     bignum_g one = bignum::make(1);
     if (!one)
         return nullptr;
@@ -659,6 +673,8 @@ static bool above_m(bignum_r n, int m = 127)
 //   n >= 2^m iff the bignum has more than m/8+1 bytes, or the byte at
 //   index m/8 has bit m%8 set.
 {
+    if (!n)
+        return false;
     size_t sz      = 0;
     byte_p data    = n->value(&sz);
     size_t byte_idx = size_t(m) / 8;
@@ -746,6 +762,8 @@ static bignum_g do_adjacent_prime(bignum_g n, bool next)
 //   Find the next (next=true) or previous (next=false) prime relative to n
 // ----------------------------------------------------------------------------
 {
+    if (!n)
+        return nullptr;
     bignum_g one = bignum::make(1);
     bignum_g two = bignum::make(2);
     if (!one || !two)
@@ -857,7 +875,12 @@ COMMAND_BODY(NextPrime)
         return ERROR;
 
     bignum_g r = do_next_prime(xi);
-    if (!r || !rt.top(r))
+    if (!r)
+    {
+        rt.value_error();
+        return ERROR;
+    }
+    if (!rt.top(r))
         return ERROR;
 
     return OK;
@@ -992,11 +1015,11 @@ COMMAND_BODY(Factors)
     for (size_t i = 0; i < result.count; i++)
     {
         bignum_g p = result.factors[i].prime;
-        if (!rt.append(p))
+        if (!p || !rt.append(p))
             return ERROR;
 
         bignum_g e = bignum::make(result.factors[i].exponent);
-        if (!rt.append(e))
+        if (!e || !rt.append(e))
             return ERROR;
     }
 
