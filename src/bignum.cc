@@ -1168,3 +1168,20 @@ bignum_p bignum::promote(object_p obj)
     }
     return nullptr;
 }
+
+
+bool bignum::more_bits_than(uint m) const
+// ----------------------------------------------------------------------------
+//   Return true if n > M_m = 2^m - 1, i.e. n >= 2^m
+// ----------------------------------------------------------------------------
+//   Bit m is at byte index m/8, bit position m%8 (LSB-first storage).
+//   n >= 2^m iff the bignum has more than m/8+1 bytes, or the byte at
+//   index m/8 has bit m%8 set.
+{
+    size_t sz      = 0;
+    byte_p data    = value(&sz);
+    size_t byte_idx = size_t(m) / 8;
+    size_t bit_idx  = m % 8;
+    return sz > byte_idx + 1
+        || (sz == byte_idx + 1 && (data[byte_idx] >> bit_idx) != 0);
+}

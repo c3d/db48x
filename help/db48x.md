@@ -10191,7 +10191,8 @@ Test whether an integer is prime.
 `n` ▶ `True` or `False`
 
 * Returns `True` if the integer `n` is prime, `False` if composite.
-* Accepts positive integers including bignums.
+* Accepts positive integers including bignums. The maximum size is controlled
+  by the [MaxFactorsBits](settings#maxfactorsbits) setting.
 * Uses trial division for small factors, then Miller-Rabin for larger values.
   Deterministic for numbers up to about 82 bits; probabilistic beyond that with
   negligible error probability.
@@ -10206,7 +10207,8 @@ Decompose an integer into its prime factorization.
 * Returns a list of alternating prime-exponent pairs: each prime factor followed
   by its multiplicity.
 * Accepts positive integers including bignums. Negative inputs use the absolute
-  value; zero and one return an empty list.
+  value; zero and one return an empty list. The maximum size is controlled by
+  the [MaxFactorsBits](settings#maxfactorsbits) setting.
 * Uses trial division by small primes, then Pollard's Rho for larger factors.
 * The product of all `pᵢ^eᵢ` equals the original number.
 
@@ -10218,8 +10220,9 @@ Return the smallest prime strictly greater than the input.
 `n` ▶ `p`
 
 * Returns the next prime number after `n`. For example, `7 NextPr` gives `11`.
-* Accepts integers ≥ 1. If no prime exists (e.g. search limit reached), returns
-  an error.
+* Accepts integers ≥ 1. The maximum input size is controlled by the
+  [MaxFactorsBits](settings#maxfactorsbits) setting.
+* If no prime exists (e.g. search limit reached), returns an error.
 
 
 ## PrevPr
@@ -10229,8 +10232,9 @@ Return the largest prime strictly smaller than the input.
 `n` ▶ `p`
 
 * Returns the previous prime number before `n`. For example, `11 PrevPr` gives `7`.
-* Accepts integers > 2 (no prime exists below 2). If no prime exists or the
-  search limit is reached, returns an error.
+* Accepts integers > 2 (no prime exists below 2). The maximum input size is
+  controlled by the [MaxFactorsBits](settings#maxfactorsbits) setting.
+* If no prime exists or the search limit is reached, returns an error.
 # Base functions
 
 ## Evaluate
@@ -14512,6 +14516,17 @@ applies separately for the numerator and denominator in a fraction, or for the
 real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
+
+## MaxFactorsBits
+
+Maximum number of bits for integers accepted by prime-related commands:
+[IsPrime](arithmetic#isprime), [Factors](arithmetic#factors),
+[NextPr](arithmetic#nextpr), and [PrevPr](arithmetic#prevpr).
+
+The value can range from 64 to 1024 bits (default 160). Integers exceeding this
+limit trigger a `Number is too big` error. Raising the value allows factoring
+larger numbers but increases memory use and computation time for Pollard's Rho
+and Miller-Rabin. Lowering it can prevent excessive CPU usage on large inputs.
 
 ## MathModesMenu
 

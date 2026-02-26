@@ -446,6 +446,7 @@ spellings.
 * `MathModesMenu`
 * `MatrixMenu`
 * `Max`
+* `MaxFactorsBits`
 * `MaxFlags`
 * `MaxH` (`MaximumShowHeight`)
 * `MaximumDecimalExponent`
