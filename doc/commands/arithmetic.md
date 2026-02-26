@@ -340,9 +340,9 @@ All roots of a polynomial
 
 Test whether an integer is prime.
 
-`n` ▶ `1` or `0`
+`n` ▶ `True` or `False`
 
-* Returns `1` if the integer `n` is prime, `0` if composite.
+* Returns `True` if the integer `n` is prime, `False` if composite.
 * Accepts positive integers including bignums.
 * Uses trial division for small factors, then Miller-Rabin for larger values.
   Deterministic for numbers up to about 82 bits; probabilistic beyond that with
