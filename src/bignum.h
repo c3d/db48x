@@ -174,6 +174,14 @@ public:
     // Arithmetic internal routines
     static int compare(bignum_r x, bignum_r y, bool magnitude = false);
 
+    // Modular arithmetic and helpers (used by factor, fraction)
+    static bignum_p gcd(bignum_r a, bignum_r b);
+    static bignum_p mulmod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p addmod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p submod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p abs_diff(bignum_r a, bignum_r b);
+    static bignum_p powmod(bignum_r base, bignum_r exp, bignum_r mod);
+
     static size_t wordsize(id type);
     size_t wordsize() const             { return wordsize(type()); }
     static id opposite_type(id type);

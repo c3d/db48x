@@ -298,21 +298,6 @@ bignum_p big_fraction::denominator() const
 }
 
 
-static inline bignum_p gcd(bignum_g a, bignum_g b)
-// ----------------------------------------------------------------------------
-//   Compute the greatest common denominator between a and b
-// ----------------------------------------------------------------------------
-{
-    while (b && !b->is_zero())
-    {
-        bignum_g na = b;
-        b = a % b;
-        a = na;
-    }
-    return a;
-}
-
-
 fraction_p big_fraction::make(bignum_r nn, bignum_r dd)
 // ----------------------------------------------------------------------------
 //   Create a reduced fraction from n and d
@@ -320,7 +305,7 @@ fraction_p big_fraction::make(bignum_r nn, bignum_r dd)
 {
     bignum_g n = nn;
     bignum_g d = dd;
-    bignum_g cd = gcd(n, d);
+    bignum_g cd = bignum::gcd(n, d);
     if (!cd)
         return nullptr;
     if (!cd->is(1))

@@ -185,140 +185,6 @@ const size_t NUM_SMALL_PRIMES =
 
 // ============================================================================
 //
-//   Modular arithmetic helpers
-//
-// ============================================================================
-
-bignum_g bn_gcd(bignum_g a, bignum_g b)
-// ----------------------------------------------------------------------------
-//   Compute GCD using Euclidean algorithm
-// ----------------------------------------------------------------------------
-{
-    if (!a || !b)
-        return nullptr;
-    while (!b->is_zero())
-    {
-        bignum_g t = a % b;
-        if (!t)
-            return nullptr;
-        a = b;
-        b = t;
-    }
-    return a;
-}
-
-
-bignum_g bn_mulmod(bignum_g a, bignum_g b, bignum_g m)
-// ----------------------------------------------------------------------------
-//   Compute (a * b) % m
-// ----------------------------------------------------------------------------
-{
-    if (!a || !b || !m)
-        return nullptr;
-    bignum_g prod = a * b;
-    if (!prod)
-        return nullptr;
-    return prod % m;
-}
-
-
-bignum_g bn_addmod(bignum_g a, bignum_g b, bignum_g m)
-// ----------------------------------------------------------------------------
-//   Compute (a + b) % m
-// ----------------------------------------------------------------------------
-{
-    if (!a || !b || !m)
-        return nullptr;
-    bignum_g sum = a + b;
-    if (!sum)
-        return nullptr;
-    return sum % m;
-}
-
-
-bignum_g bn_submod(bignum_g a, bignum_g b, bignum_g m)
-// ----------------------------------------------------------------------------
-//   Compute (a - b) % m, ensuring positive result
-// ----------------------------------------------------------------------------
-{
-    if (!a || !b || !m)
-        return nullptr;
-    if (bignum::compare(a, b) < 0)
-    {
-        bignum_g t = a + m;
-        if (!t)
-            return nullptr;
-        a = t;
-    }
-    bignum_g diff = a - b;
-    if (!diff)
-        return nullptr;
-    return diff % m;
-}
-
-
-bignum_g bn_abs_diff(bignum_g a, bignum_g b)
-// ----------------------------------------------------------------------------
-//   Compute |a - b| for unsigned bignums
-// ----------------------------------------------------------------------------
-{
-    if (!a || !b)
-        return nullptr;
-    if (bignum::compare(a, b) >= 0)
-        return a - b;
-    else
-        return b - a;
-}
-
-
-bignum_g bn_powmod(bignum_g base, bignum_g exp, bignum_g mod)
-// ----------------------------------------------------------------------------
-//   Modular exponentiation: base^exp mod mod  (binary right-to-left)
-// ----------------------------------------------------------------------------
-{
-    if (!base || !exp || !mod)
-        return nullptr;
-    bignum_g one = bignum::make(1);
-    if (!one)
-        return nullptr;
-
-    base = base % mod;
-    if (!base)
-        return nullptr;
-
-    bignum_g result = one;
-
-    while (!exp->is_zero())
-    {
-        size_t   sz  = 0;
-        byte_p   raw = exp->value(&sz);
-        bool     odd = (sz > 0) && (raw[0] & 1);
-
-        if (odd)
-        {
-            result = bn_mulmod(result, base, mod);
-            if (!result)
-                return nullptr;
-        }
-
-        exp = exp >> 1u;
-        if (!exp)
-            return nullptr;
-
-        if (!exp->is_zero())
-        {
-            base = bn_mulmod(base, base, mod);
-            if (!base)
-                return nullptr;
-        }
-    }
-
-    return result;
-}
-
-
-// ============================================================================
-//
 //   Miller-Rabin primality test
 //
 // ============================================================================
@@ -333,7 +199,7 @@ static bool miller_rabin_witness(bignum_g a, bignum_g d, unsigned r, bignum_g n)
     if (!one || !n_m1)
         return false;
 
-    bignum_g x = bn_powmod(a, d, n);
+    bignum_g x = bignum::powmod(a, d, n);
     if (!x)
         return false;
 
@@ -342,7 +208,7 @@ static bool miller_rabin_witness(bignum_g a, bignum_g d, unsigned r, bignum_g n)
 
     for (unsigned i = 0; i < r - 1; i++)
     {
-        x = bn_mulmod(x, x, n);
+        x = bignum::mulmod(x, x, n);
         if (!x)
             return false;
 
@@ -464,10 +330,10 @@ bignum_g pollard_rho_brent(bignum_g n)
             x = y;
             for (unsigned i = 0; i < lam; i++)
             {
-                y = bn_mulmod(y, y, n);
+                y = bignum::mulmod(y, y, n);
                 if (!y)
                     return nullptr;
-                y = bn_addmod(y, c, n);
+                y = bignum::addmod(y, c, n);
                 if (!y)
                     return nullptr;
             }
@@ -481,22 +347,22 @@ bignum_g pollard_rho_brent(bignum_g n)
                 unsigned batch = std::min(BATCH_SIZE, lam - k);
                 for (unsigned j = 0; j < batch; j++)
                 {
-                    y = bn_mulmod(y, y, n);
+                    y = bignum::mulmod(y, y, n);
                     if (!y)
                         return nullptr;
-                    y = bn_addmod(y, c, n);
+                    y = bignum::addmod(y, c, n);
                     if (!y)
                         return nullptr;
 
-                    bignum_g diff = bn_abs_diff(x, y);
+                    bignum_g diff = bignum::abs_diff(x, y);
                     if (!diff || diff->is_zero())
                         continue;
-                    accum = bn_mulmod(accum, diff, n);
+                    accum = bignum::mulmod(accum, diff, n);
                     if (!accum)
                         return nullptr;
                 }
 
-                d = bn_gcd(accum, n);
+                d = bignum::gcd(accum, n);
                 if (!d)
                     return nullptr;
 
@@ -509,17 +375,17 @@ bignum_g pollard_rho_brent(bignum_g n)
                     y = ys;
                     for (unsigned j = 0; j < batch; j++)
                     {
-                        y = bn_mulmod(y, y, n);
+                        y = bignum::mulmod(y, y, n);
                         if (!y)
                             return nullptr;
-                        y = bn_addmod(y, c, n);
+                        y = bignum::addmod(y, c, n);
                         if (!y)
                             return nullptr;
 
-                        bignum_g diff = bn_abs_diff(x, y);
+                        bignum_g diff = bignum::abs_diff(x, y);
                         if (!diff || diff->is_zero())
                             continue;
-                        d = bn_gcd(diff, n);
+                        d = bignum::gcd(diff, n);
                         if (!d)
                             return nullptr;
                         if (bignum::compare(d, one) != 0)

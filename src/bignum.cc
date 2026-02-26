@@ -329,6 +329,143 @@ int bignum::compare(bignum_r xg, bignum_r yg, bool magnitude)
 }
 
 
+// ============================================================================
+//
+//   Modular arithmetic and helpers (gcd, mulmod, powmod, etc.)
+//
+// ============================================================================
+
+bignum_p bignum::gcd(bignum_r a, bignum_r b)
+// ----------------------------------------------------------------------------
+//   Compute GCD using Euclidean algorithm
+// ----------------------------------------------------------------------------
+{
+    if (!a || !b)
+        return nullptr;
+    bignum_g x = a;
+    bignum_g y = b;
+    while (!y->is_zero())
+    {
+        bignum_g t = x % y;
+        if (!t)
+            return nullptr;
+        x = y;
+        y = t;
+    }
+    return x;
+}
+
+
+bignum_p bignum::mulmod(bignum_r a, bignum_r b, bignum_r m)
+// ----------------------------------------------------------------------------
+//   Compute (a * b) % m
+// ----------------------------------------------------------------------------
+{
+    if (!a || !b || !m)
+        return nullptr;
+    bignum_g prod = a * b;
+    if (!prod)
+        return nullptr;
+    return prod % m;
+}
+
+
+bignum_p bignum::addmod(bignum_r a, bignum_r b, bignum_r m)
+// ----------------------------------------------------------------------------
+//   Compute (a + b) % m
+// ----------------------------------------------------------------------------
+{
+    if (!a || !b || !m)
+        return nullptr;
+    bignum_g sum = a + b;
+    if (!sum)
+        return nullptr;
+    return sum % m;
+}
+
+
+bignum_p bignum::submod(bignum_r a, bignum_r b, bignum_r m)
+// ----------------------------------------------------------------------------
+//   Compute (a - b) % m, ensuring positive result
+// ----------------------------------------------------------------------------
+{
+    if (!a || !b || !m)
+        return nullptr;
+    bignum_g x = a;
+    if (compare(a, b) < 0)
+    {
+        bignum_g t = a + m;
+        if (!t)
+            return nullptr;
+        x = t;
+    }
+    bignum_g diff = x - b;
+    if (!diff)
+        return nullptr;
+    return diff % m;
+}
+
+
+bignum_p bignum::abs_diff(bignum_r a, bignum_r b)
+// ----------------------------------------------------------------------------
+//   Compute |a - b| for unsigned bignums
+// ----------------------------------------------------------------------------
+{
+    if (!a || !b)
+        return nullptr;
+    if (compare(a, b) >= 0)
+        return a - b;
+    else
+        return b - a;
+}
+
+
+bignum_p bignum::powmod(bignum_r base, bignum_r exp, bignum_r mod)
+// ----------------------------------------------------------------------------
+//   Modular exponentiation: base^exp mod mod  (binary right-to-left)
+// ----------------------------------------------------------------------------
+{
+    if (!base || !exp || !mod)
+        return nullptr;
+    bignum_g one = make(1);
+    if (!one)
+        return nullptr;
+
+    bignum_g b = base % mod;
+    if (!b)
+        return nullptr;
+
+    bignum_g result = one;
+    bignum_g e      = exp;
+
+    while (!e->is_zero())
+    {
+        size_t   sz  = 0;
+        byte_p   raw = e->value(&sz);
+        bool     odd = (sz > 0) && (raw[0] & 1);
+
+        if (odd)
+        {
+            result = mulmod(result, b, mod);
+            if (!result)
+                return nullptr;
+        }
+
+        e = e >> 1u;
+        if (!e)
+            return nullptr;
+
+        if (!e->is_zero())
+        {
+            b = mulmod(b, b, mod);
+            if (!b)
+                return nullptr;
+        }
+    }
+
+    return result;
+}
+
 
 // ============================================================================
 //
