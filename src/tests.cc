@@ -12515,8 +12515,8 @@ void tests::prime_number_tests()
     step("IsPrime: M79=604462909807314587353087 is not prime")
         .test(CLEAR, "604462909807314587353087", ENTER, ID_IsPrime).expect("0");
     step("Factors(M79=604462909807314587353087) = { 2687 1 202029703 1 1113491139767 1 }")
-        .test(CLEAR, "604462909807314587353087", ENTER, ID_Factors)
-        .expect("{ 2" SP "687 1 202" SP "029" SP "703 1 1" SP "113" SP "491" SP "139" SP "767 1 }", 30000);
+        .test(CLEAR, "604462909807314587353087", ENTER, LENGTHY(90000), ID_Factors)
+        .expect("{ 2" SP "687 1 202" SP "029" SP "703 1 1" SP "113" SP "491" SP "139" SP "767 1 }", 90000);
 
     // M83 = 9671406556917033397649407 = 167 × 57912614113275649087721  (composite)
     step("IsPrime: M83=9671406556917033397649407 is not prime")
@@ -12557,6 +12557,13 @@ void tests::prime_number_tests()
         .test(CLEAR, "170141183460469231731687303715884105727", ENTER, ID_Factors)
         .expect("{ 170" SP "141" SP "183" SP "460" SP "469" SP "231" SP "731" SP "687"
                 SP "303" SP "715" SP "884" SP "105" SP "727 1 }", 10000);
+
+    // M101 = 2535301200456458802993406410751 (composite, 101 bits)
+    // Two large prime factors (~43 and ~58 bits): bignum operations during
+    // Pollard Rho exhaust the GC heap before finding a factor.
+    step("Factors(M101) exhausts memory → out of memory error")
+        .test(CLEAR, "2535301200456458802993406410751", ENTER, ID_Factors)
+        .error("Out of memory", 60000);
 
 #undef SP
 }

@@ -57,6 +57,7 @@ SOURCES +=                                      \
         ../src/dmcp/target.cc                   \
         ../src/equations.cc                     \
         ../src/expression.cc                    \
+        ../src/factor.cc                        \
         ../src/file.cc                          \
         ../src/files.cc                         \
         ../src/finance.cc                       \

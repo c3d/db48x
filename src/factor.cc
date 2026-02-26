@@ -16,6 +16,8 @@
 
 #include <algorithm>
 
+static const size_t MIN_MEM = 512;
+
 
 // ============================================================================
 //
@@ -28,6 +30,8 @@ bool factor_result::add(bignum_g p)
 //   Add a prime factor (increments exponent if already present)
 // ----------------------------------------------------------------------------
 {
+    if (!p)
+        return false;
     for (size_t i = 0; i < count; i++)
     {
         if (bignum::compare(factors[i].prime, p) == 0)
@@ -37,7 +41,10 @@ bool factor_result::add(bignum_g p)
         }
     }
     if (count >= MAX_FACTORS)
+    {
+        rt.number_too_big_error();
         return false;
+    }
     factors[count].prime    = p;
     factors[count].exponent = 1;
     count++;
@@ -424,8 +431,7 @@ bignum_g pollard_rho_brent(bignum_g n)
 //   Find a non-trivial factor of n
 // ----------------------------------------------------------------------------
 {
-    static const unsigned BATCH_SIZE = 128;
-    static const unsigned MAX_ITERS  = 1 << 22;
+    static const unsigned BATCH_SIZE   = 128;
 
     bignum_g one = bignum::make(1);
     bignum_g two = bignum::make(2);
@@ -434,6 +440,13 @@ bignum_g pollard_rho_brent(bignum_g n)
 
     for (unsigned c_val = 1; c_val <= 20; c_val++)
     {
+        // Memory check at the start of each new constant trial
+        if (rt.available() < MIN_MEM)
+        {
+            rt.out_of_memory_error();
+            return nullptr;
+        }
+
         bignum_g c = bignum::make(c_val);
         if (!c)
             return nullptr;
@@ -482,6 +495,13 @@ bignum_g pollard_rho_brent(bignum_g n)
                         return nullptr;
                 }
 
+                // Memory check after each batch of bignum operations
+                if (rt.available() < MIN_MEM)
+                {
+                    rt.out_of_memory_error();
+                    return nullptr;
+                }
+
                 d = bn_gcd(accum, n);
                 if (!d)
                     return nullptr;
@@ -518,9 +538,6 @@ bignum_g pollard_rho_brent(bignum_g n)
                     }
                 }
             }
-
-            if (iters > MAX_ITERS)
-                break;
 
             lam *= 2;
         }
@@ -584,12 +601,21 @@ static bool factorize_recursive(bignum_g n, factor_result &result)
     if (!n || n->is_zero() || n->is_one())
         return true;
 
+    if (rt.available() < MIN_MEM)
+    {
+        rt.out_of_memory_error();
+        return false;
+    }
+
     if (is_probably_prime(n))
         return result.add(n);
 
     bignum_g factor = pollard_rho_brent(n);
     if (!factor)
+    {
+        rt.out_of_memory_error();
         return false;
+    }
 
     bignum_g cofactor = n / factor;
     if (!cofactor)
@@ -597,6 +623,7 @@ static bool factorize_recursive(bignum_g n, factor_result &result)
 
     if (!factorize_recursive(factor, result))
         return false;
+
     return factorize_recursive(cofactor, result);
 }
 
@@ -983,20 +1010,25 @@ COMMAND_BODY(Factors)
 
     factor_result result;
     if (!do_factors(xi, result))
+        return ERROR;
+
+    // Build the output list { p1 e1 p2 e2 ... }
+    // Each pair needs roughly 2 bignums + overhead; check memory first
+    if (rt.available() < MIN_MEM)
     {
+        rt.out_of_memory_error();
         return ERROR;
     }
 
-    // Construire la liste { p1 e1 p2 e2 ... }
     scribble scr;
     for (size_t i = 0; i < result.count; i++)
     {
         bignum_g p = result.factors[i].prime;
-        if (!rt.append(p))
+        if (!p || !rt.append(p))
             return ERROR;
 
         bignum_g e = bignum::make(result.factors[i].exponent);
-        if (!rt.append(e))
+        if (!e || !rt.append(e))
             return ERROR;
     }
 
