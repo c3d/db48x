@@ -2954,7 +2954,6 @@ implemented by the time the project reaches version 1.0.
 * `F0λ`
 * `FACTOR`
 * `FACTORMOD`
-* `FACTORS`
 * `FANNING`
 * `FAST3D`
 * `FCOEF`
@@ -3007,7 +3006,6 @@ implemented by the time the project reaches version 1.0.
 * `IQUOT`
 * `IREMAINDER`
 * `ISOM`
-* `ISPRIME?`
 * `I→R`
 * `JORDAN`
 * `KER`
@@ -3056,7 +3054,6 @@ implemented by the time the project reaches version 1.0.
 * `MULTMOD`
 * `MUSER`
 * `NDIST`
-* `NEXTPRIME`
 * `NOVAL`
 * `NUMX`
 * `NUMY`
@@ -3084,7 +3081,6 @@ implemented by the time the project reaches version 1.0.
 * `POWMOD`
 * `PREDV`
 * `PREVAL`
-* `PREVPRIME`
 * `PROMPTSTO`
 * `PROOT`
 * `PROPFRAC`

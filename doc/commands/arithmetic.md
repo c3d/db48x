@@ -23,7 +23,7 @@ Add two values.
 
 ## Subtract
 
-Subtract two values
+Subtract two values.
 
 `Y` `X` ▶ `Y-X`
 
@@ -42,12 +42,12 @@ Multiply two values.
 * For integer, fractional, decimal or complex numbers, this performs the
   expected numerical multiplication. For example, `3 2 *` is `6`.
 * For vectors, multiply individual elements (this is a deviation from HP48).
-  For example, `[ 1 2 3 ] [ 4 5 6 ] +` is `[ 4 10 18 ]`.
+  For example, `[ 1 2 3 ] [ 4 5 6 ] *` is `[ 4 10 18 ]`.
 * For matrices, perform a matrix multiplication.
 * For a matrix and a vector, apply the matrix to the vector.
 * For equations and symbols, build a product, eliminating multiplication by 1
   or 0 when [autosimplify](#autosimplify) is active.
-* For a list and a positive integer, repeat the list For example, `{ A } 3 *`
+* For a list and a positive integer, repeat the list. For example, `{ A } 3 *`
   is `{ A A A }`.
 * For a text and a positive integer, repeat the text. For example `"X" 3 * `
   gives `"XXX"`.
@@ -55,7 +55,7 @@ Multiply two values.
 
 ## Divide
 
-Divide two values
+Divide two values.
 
 `Y` `X` ▶ `Y÷X`
 
@@ -70,7 +70,7 @@ Divide two values
 
 ## Pow
 
-Raise to the power
+Raise to the power.
 
 `Y` `X` ▶ `Y^X`
 
@@ -84,35 +84,114 @@ Raise to the power
 
 ## xroot
 
-Raise to the inverse power. `X Y xroot` is equivalent to `X Y inv pow`.
+Compute the X-th root of Y. `Y X xroot` is equivalent to `Y (1/X) pow`.
 
 `Y` `X` ▶ `Y↑(1/X)`
+
+```rpl
+8 3 xroot
+@ Expecting 2
+```
 
 
 ## Floor
 
-Largest integer less than the input
+Return the largest integer less than or equal to the input. This rounds toward
+negative infinity.
+
+`X` ▶ `⌊X⌋`
+
+```rpl
+3.7 Floor
+@ Expecting 3
+```
+
+```rpl
+-3.2 Floor
+@ Expecting -4
+```
+
+For complex numbers, `Floor` is applied independently to the real and imaginary
+parts. For example, `(3.7,−2.1) Floor` gives `(3,−3)`.
 
 
 ## Ceil
 
-Smallest integer larger than the input
+Return the smallest integer greater than or equal to the input. This rounds
+toward positive infinity.
+
+`X` ▶ `⌈X⌉`
+
+```rpl
+3.2 Ceil
+@ Expecting 4
+```
+
+```rpl
+-3.7 Ceil
+@ Expecting -3
+```
+
+For complex numbers, `Ceil` is applied independently to the real and imaginary
+parts.
 
 
 ## IntPart
 
-Integer part of a number
+Return the integer part of a number, truncating toward zero. This differs from
+[Floor](#floor) for negative numbers.
+
+Also known as `IntegerPart` or `IP`.
+
+`X` ▶ `IP(X)`
+
+```rpl
+3.7 IntPart
+@ Expecting 3
+```
+
+```rpl
+-3.7 IntPart
+@ Expecting -3
+```
 
 
 ## FracPart
 
-Fractional part of a number
+Return the fractional part of a number, defined as `X - IntPart(X)`, so that
+`IntPart(X) + FracPart(X) = X`. The result has the same sign as the input.
+
+Also known as `FractionalPart` or `FP`.
+
+`X` ▶ `X - IP(X)`
+
+```rpl
+3.7 FracPart
+@ Expecting 0.7
+```
+
+```rpl
+-3.7 FracPart
+@ Expecting -0.7
+```
 
 
 ## Abs
 
-Return the absolute value for a real number.
-Return the Euclidean norm for a complex number, vector or matrix.
+Return the absolute value of a real number, or the magnitude (Euclidean norm)
+of a complex number, vector or matrix.
+
+`X` ▶ `|X|`
+
+* For a real number, returns the non-negative value. For example, `−5 Abs`
+  gives `5`.
+* For a complex number `(a,b)`, returns `√(a²+b²)`. For example, `(3,4) Abs`
+  gives `5`.
+* For a vector, returns the Euclidean norm (square root of the sum of squares
+  of the elements). For example, `[ 3 4 ] Abs` gives `5`.
+* For a matrix, returns the Frobenius norm.
+
+Also accessible as `norm`, `modulus`, or `abs`.
 
 
 # Integer arithmetic and polynomials
@@ -140,23 +219,146 @@ Power operator MOD the current system modulo
 
 
 ## MOD
-Remainder of the integer division
+
+Remainder of the integer division. Returns the remainder with the same sign as
+the divisor (floor division convention). For real numbers, this is equivalent to
+`X - Floor(X/Y) * Y`.
+
+`Y` `X` ▶ `Y mod X`
+
+```rpl
+17 5 mod
+@ Expecting 2
+```
+
+```rpl
+-7 3 mod
+@ Expecting 2
+```
 
 
 ## SQ
-Square of the input
+
+Square of the input. Equivalent to `X X *` or `X 2 ↑`, but more efficient.
+
+Also accessible as `x²` or `Square`.
+
+`X` ▶ `X²`
+
+```rpl
+7 sq
+@ Expecting 49
+```
+
+```rpl
+(3,4) sq
+@ Expecting (−7,24)
+```
 
 
 ## NEXTPRIME
-Smallest prime number larger than the input
+
+Return the smallest prime number strictly greater than the input. Also
+accessible as `NextPr`.
+
+`N` ▶ `next_prime(N)`
+
+```rpl
+10 NextPrime
+@ Expecting 11
+```
+
+```rpl
+2 NextPrime
+@ Expecting 3
+```
+
+For large integers, uses the [Miller-Rabin primality test](#isprime-1).
 
 
 ## Factorial
-Factorial of a number
+
+Compute the factorial of a non-negative integer `n`, defined as `n! = 1×2×…×n`,
+with `0! = 1`.
+
+Also accessible as `x!` or `!`.
+
+`N` ▶ `N!`
+
+```rpl
+5 fact
+@ Expecting 120
+```
+
+For large integers, the result is an exact big integer. For example, `50 fact`
+returns a 65-digit number.
+
+
+## FACTORS
+
+Decompose an integer into its prime factors. Returns a list alternating prime
+factors and their exponents, sorted in ascending order of the prime.
+
+`N` ▶ `{ p₁ e₁ p₂ e₂ … }`
+
+```rpl
+12 Factors
+@ Expecting { 2 2 3 1 }
+```
+
+```rpl
+100 Factors
+@ Expecting { 2 2 5 2 }
+```
+
+```rpl
+2147483647 Factors
+@ Expecting { 2 147 483 647 1 }
+```
+
+For large semiprime numbers (products of two large primes), the algorithm uses
+Pollard's Rho method with Brent's cycle detection, which runs in O(n^¼) time.
+
+If the factorization would require too much memory or too many iterations,
+`Factors` returns an error instead of running indefinitely.
 
 
 ## ISPRIME
-Return true/false (1/0) if a number is prime or not
+
+Test whether the input is a prime number. Returns `1` (true) if the number is
+prime, `0` (false) if it is composite, or an error for invalid input (negative
+numbers, non-integers).
+
+`N` ▶ `0` or `1`
+
+```rpl
+17 IsPrime
+@ Expecting 1
+```
+
+```rpl
+15 IsPrime
+@ Expecting 0
+```
+
+```rpl
+2147483647 IsPrime
+@ Expecting 1
+```
+
+For small numbers, trial division against a table of small primes is used.
+For larger numbers, a deterministic [Miller-Rabin](#miller-rabin) test with
+carefully chosen witnesses is used, giving correct results for all integers up
+to at least 3.3 × 10²⁴. For even larger numbers, a probabilistic version is
+used that is extremely unlikely to give a wrong answer.
+
+Carmichael numbers (pseudoprimes for naive tests) are correctly identified as
+composite:
+
+```rpl
+561 IsPrime
+@ Expecting 0
+```
 
 
 ## MANT
@@ -187,39 +389,92 @@ Number of significant digits in a real number
 
 ## Sign
 
-Sign of a number, -1, 0 or 1.
+Return the sign of a number: `−1`, `0` or `1`.
 
-For complex numbers, returns a unit number on the unit circle with the same
-argument as the original number.
+For complex numbers, returns the unit complex number with the same argument
+(i.e. the number divided by its absolute value).
+
+`X` ▶ `sign(X)`
+
+```rpl
+-42 sign
+@ Expecting -1
+```
+
+```rpl
+0 sign
+@ Expecting 0
+```
+
+```rpl
+(3,4) sign
+@ Expecting (3/5,4/5)
+```
 
 
 ## Percent
 
-Percentage of a number
+Compute a percentage of a base value. Returns `Y × (X ÷ 100)`.
 
 `Y` `X` ▶ `Y×(X÷100)`
+
+```rpl
+200 15 %
+@ Expecting 30
+```
 
 
 ## PercentChange
 
-Percentage of change on a number
+Compute the percentage change from a base to a new value. Returns `(X÷Y−1)×100`.
 
-`Y` `X` ▶ `(X÷Y-1)×100`
+`Y` `X` ▶ `(X÷Y−1)×100`
+
+```rpl
+200 250 %Change
+@ Expecting 25
+```
 
 
 ## PercentTotal
 
-Get percentage of a total
+Compute what percentage of a total a value represents. Returns `(X÷Y)×100`.
 
 `Y` `X` ▶ `(X÷Y)×100`
 
+```rpl
+200 50 %Total
+@ Expecting 25
+```
+
 
 ## GCD
-Greatest common divisor
+
+Greatest common divisor of two integers.
+
+`Y` `X` ▶ `GCD(Y, X)`
+
+```rpl
+48 36 GCD
+@ Expecting 12
+```
+
+```rpl
+100 75 GCD
+@ Expecting 25
+```
 
 
 ## LCM
-Least common multiple
+
+Least common multiple of two integers.
+
+`Y` `X` ▶ `LCM(Y, X)`
+
+```rpl
+12 8 LCM
+@ Expecting 24
+```
 
 
 ## IDIV2
@@ -319,19 +574,70 @@ Subtraction of polynomials as coefficient vector
 
 
 ## Min
-Smallest of 2 objects
+
+Return the smaller of two values.
+
+`Y` `X` ▶ `min(Y, X)`
+
+```rpl
+3 5 Min
+@ Expecting 3
+```
+
+Works with integers, decimals, fractions, and text (lexicographic order).
 
 
 ## Max
-Largest of 2 objects
+
+Return the larger of two values.
+
+`Y` `X` ▶ `max(Y, X)`
+
+```rpl
+3 5 Max
+@ Expecting 5
+```
+
+Works with integers, decimals, fractions, and text (lexicographic order).
 
 
 ## RND
-Round a number to the given number of figures
+
+Round a number to the specified number of decimal places or significant figures,
+depending on the display mode. Also accessible as `Round` or `Rnd`.
+
+`X` `N` ▶ `round(X, N)`
+
+In `FIX` mode, `N` specifies the number of digits after the decimal point.
+In `SCI` or `ENG` mode, `N` specifies the number of significant digits.
+
+```rpl
+3.14159 2 Round
+@ Expecting 3.14
+```
+
+```rpl
+3.14159 4 Round
+@ Expecting 3.1416
+```
 
 
 ## TRNC
-Truncate a number to the given number of figures
+
+Truncate a number to the specified number of decimal places, discarding the
+remaining digits without rounding. Also accessible as `Truncate` or `Trnc`.
+
+`X` `N` ▶ `trunc(X, N)`
+
+```rpl
+3.14159 2 Truncate
+@ Expecting 3.14
+```
+
+```rpl
+3.99999 2 Truncate
+@ Expecting 3.99
+```
 
 
 ## DIGITS
@@ -342,9 +648,24 @@ Extract digits from a real number
 All roots of a polynomial
 
 
-## PREVPRIME
-Largest prime smaller than the input
+## PREVIOUSPRIME
 
+Return the largest prime number strictly less than the input. Also accessible
+as `PrevPr`.
 
-## FACTORS
-Factorize a polynomial or number
+`N` ▶ `prev_prime(N)`
+
+```rpl
+10 PreviousPrime
+@ Expecting 7
+```
+
+```rpl
+3 PreviousPrime
+@ Expecting 2
+```
+
+Returns an error if there is no prime smaller than the input (i.e. for inputs
+≤ 2).
+
+For large integers, uses the [Miller-Rabin primality test](#isprime-1).
