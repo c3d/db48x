@@ -2279,8 +2279,7 @@ bool user_interface::draw_annunciators()
             static cstring lbls[] = {
                 "  ", " A", " a",
 				"U ", "UA", "Ua",
-				"1 ", "1A", "1a",
-											
+				"1 ", "1A", "1a",									
             };
             uint kc =  1 * alpha + 1 * (lowercase && alpha);
 			if (user) kc +=3;
@@ -4465,25 +4464,6 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         consumed = true;
     }
-									   
-	 
-										
-				  
-		 
-						  
-										  
-				
-								 
-		 
-			
-		 
-						 
-		 
-						
-					  
-					   
-	 
-
     if (key)
         last = key;
     return consumed;
@@ -4773,45 +4753,6 @@ bool user_interface::handle_editing(int key)
         return true;
     }
 
-															  
-			   
-	 
-				   
-		 
-					 
-																
-								  
-								   
-								
-				  
-					 
-					  
-			 
-														   
-																			
-										   
-					
-										   
-						 
-							
-			 
-							   
-			 
-																		 
-										
-											 
-										   
-										   
-					
-										 
-							  
-							
-			 
-				  
-
-		 
-	 
-
     // Transient alpha editor keys (bring up the editor if needed)
     switch(key)
     {
@@ -4845,25 +4786,21 @@ bool user_interface::handle_editing(int key)
                 return do_new_line();
             return do_delete(shift);
         case KEY_ENTER:
-		 
             // Finish editing and parse the result
             if (!shift && !xshift)
                 return do_enter();
             return false;
-		 
         case KEY_EXIT:
             // Clear error if there is one, else clear editor
             if (shift || xshift)
                 return false;
             return do_exit();
-
         case KEY_UP:
             if (shift)
                 return do_up();
             if (xshift)
                 return editor_history();
             return do_left();
-
         case KEY_DOWN:
             if (shift)
                 return do_down();
@@ -4885,53 +4822,9 @@ bool user_interface::handle_editing(int key)
         case 0:
             return false;
         }
-    }
-		
-	 
-				   
-		 
-					   
-					   
-								 
-				  
-					  
-								
-    return false;
-						  
-							  
-										  
-							 
-						
-					  
-													
-											
-							  
-								
-				  
-					
-					   
-			 
-								 
-							
+    }					
+    return false;				
 }
-							
-			 
-										
-				 
-														 
-													   
-									  
-									 
-				 
-							
-			 
-				  
-
-		 
-	 
-
-					
- 
 
 
 bool user_interface::handle_editing_command(object::id lo, object::id hi)
@@ -4996,11 +4889,7 @@ bool user_interface::handle_search(int key)
     case KEY_RUN:
 		if (!shift && !xshift) c =' ';
 		break;
-	}
-					
-								 
-										   
-														   
+	}													   
     object_p obj;
     bool found = false;
     bool objOk = false;
@@ -5072,173 +4961,7 @@ bool user_interface::handle_based(int key)
 		if (object_p obj = object_for_key(key,plane,alpha_plane))
 			return handle_functions(key, obj, false);
 	}
-			   
- 
-
-
-											
-																			   
-																				 
-																			   
- 
-										 
-					 
-
-					 
-	 
-						   
-		 
-											  
-											  
-											  
-										  
-													
-															  
-															 
-															
-										
-									
-			 
-											  
-									  
-																	 
-				 
-									   
-												 
-					 
-											 
-					 
-						
-					 
-								  
-													  
-											  
-					 
-				 
-																			   
-				 
-										 
-				 
-			 
-
-					   
-						   
-																		  
-									   
-
-							
-			 
-										 
-									   
-					
-											
-			 
-							  
-			 
-								  
-			 
-				
-			 
-										
-			 
-					 
-							   
-						
-		 
-							  
-		 
-							 
-			 
-									 
-							   
-											 
-				 
-											   
-												  
-										
-										 
-																	   
-														  
-																	 
-																			 
-															
-														   
-
-																 
-					 
-														 
-						 
-									  
-															 
-						 
-					 
-
-							  
-					 
-															   
-											
-									
-						 
-																  
-															 
-									   
-												 
-							 
-															   
-																	  
-								 
-													   
-																		
-										
-												   
-																   
-												
-										  
-								 
-											   
-							 
-						 
-
-								  
-																 
-													
-						 
-													  
-						 
-							
-						 
-																			   
-																   
-							 
-										   
-															   
-							 
-									
-							 
-														
-							 
-								
-							 
-														  
-														
-							 
-						 
-					 
-				 
-			 
-				
-			 
-							  
-																		   
-										
-			 
-					 
-							   
-						
-
-		 
-		 
-	return false;
+    return false;
 }
 
 
@@ -5361,12 +5084,7 @@ object_p user_interface::object_for_key(int key,uint plane, uint alpha_plane)
         obj = function[fplane][key - KEY_F1];
         if (obj)
             return obj;
-    }
-											 
-																			 
-															
-													   
-															
+    }														
     return obj;
 }
 
@@ -5616,13 +5334,11 @@ bool user_interface::current_word(utf8 &start, size_t &size)
 }
 
 
-
 // ============================================================================
 //
 //   User interface commands, which can be invoked from keymap
 //
 // ============================================================================
-
 bool user_interface::do_edit()
 // ----------------------------------------------------------------------------
 //   Edit lowest-level on the stack
@@ -5807,7 +5523,6 @@ bool user_interface::do_delete(bool forward)
 //   selection: delete selection
 // ----------------------------------------------------------------------------
 {
-	
 	if (~searching)
     {
         utf8 ed = rt.editor();
@@ -5978,6 +5693,8 @@ bool user_interface::editing_chs()
     }
     return false;
 }
+
+
 bool user_interface::editing_eex_or_cycle_prefixes()
 // ----------------------------------------------------------------------------
 //   Magic key to EEX enter exponent or cycle trough SI prefixes (units)
@@ -6036,7 +5753,6 @@ bool user_interface::editing_eex_or_cycle_prefixes()
                             cycle = ncycle;
                         }
                     }
-
                     if (del &&
                         size_t(st - ed + 1) < rt.editing() &&
                         is_valid_in_name(start))
@@ -6167,6 +5883,8 @@ bool user_interface::editing_eex_or_cycle_prefixes()
     }
     return false;
 }
+
+
 bool user_interface::editing_spc_equal_semicolon()
 // ----------------------------------------------------------------------------
 //   Magic key to enter space or equal or semicolon
@@ -6281,13 +5999,11 @@ bool user_interface::do_decimal_separator()
 }
 
 
-
 // ============================================================================
 //
 //   Editor menu commands
 //
 // ============================================================================
-
 bool user_interface::editor_select()
 // ----------------------------------------------------------------------------
 //   Set selection to current cursor position
@@ -6383,6 +6099,7 @@ bool user_interface::editor_word_right()
     }
     return true;
 }
+
 
 bool user_interface::editor_begin()
 // ----------------------------------------------------------------------------
@@ -6499,12 +6216,10 @@ bool user_interface::do_search(unicode with, bool restart)
                     search = 0;
             }
             else
-            {
-												   
+            {											   
                 if (search == 0)
                     search = max;
 				search = utf8_previous(ed, search);
-
             }
         }
         else
@@ -6663,6 +6378,7 @@ size_t user_interface::adjust_cursor(size_t offset, size_t len)
         record(runtime_error, "Cursor %u > %u", cursor, rt.editing());
     return len;
 }
+
 
 size_t user_interface::insert(size_t offset, utf8 data, size_t len)
 // ----------------------------------------------------------------------------
