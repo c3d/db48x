@@ -1,3 +1,7 @@
+// Note: THIS plans show the commands that are executed when NOT in the editing mode.
+// Following keys have diffente functino in editing mode: 
+// KEY_BSP, KEY_ENTER, KEY_EXIT, KEY_UP, KEY_DOWN, KEY_CHS, KEY_E (EEX),KEY_RUN
+
 //  PLANE 1: UNSHIFTED
 [
 ToolsMenu	inv		sqrt		pow		MathMenu	UIAlgebraic
@@ -32,9 +36,9 @@ SaveState			FilesMenu	GraphicsMenu	"{	}"	Help
 [
 "A"		"B"		"C"		"D"		"E"		"F"
 "G"		"H"		"I"		"J"		"K"		"L"
-UIEnter				"M"		"N"		"O"		UIBackspace
-UILeft				"P"		"Q"		"R"		"S"
-UIRight				"T"		"U"		"V"		"W"
+Duplicate			"M"		"N"		"O"		""
+StackEditor				"P"		"Q"		"R"		"S"
+Edit				"T"		"U"		"V"		"W"
 UILeftShift			"X"		"Y"		"Z"		"_"
 UIExit				":	:"	","		Run		Catalog
 ]
@@ -42,9 +46,9 @@ UIExit				":	:"	","		Run		Catalog
 [
 "Σ"		"^"		"√"		"∂"		"ρ"		"(	)"
 "▶"		"%"		"π"		"<"		"="		">"
-UILowercase			"⇄"		"±"		"∡"		UIDelete
-UILeft				"7"		"8"		"9"		"÷"
-UIRight				"4"		"5"		"6"		"×"
+UILowercase			"⇄"		"±"		"∡"		""
+EditorHistory					"7"		"8"		"9"		"÷"
+EditMenu				"4"		"5"		"6"		"×"
 UIRightShift		"1"		"2"		"3"		"-"
 OffWithImage		"0"		UIDecimal	"«	»"	"+"
 ]
@@ -52,9 +56,9 @@ OffWithImage		"0"		UIDecimal	"«	»"	"+"
 [
 "∏"		"∆"		"↑"		"μ"		"θ"		"'	'"
 "→"		"←"		"↓"		"≤"		"≠"		"≥"
-UIText			"~"		 "°"		"ε"		UINewLine
-UIUp				"?"		"∫"		"["		"/"
-UIDown				"#"		"∞"		"|"		"*"
+UIText			"~"		 "°"		"ε"		""
+EditorHistory		"?"		"∫"		"["		"/"
+EditMenu			"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
 SaveState			";"		"·"		"{	}"	"!"
 ]
@@ -62,9 +66,9 @@ SaveState			";"		"·"		"{	}"	"!"
 [
 "a"		"b"		"c"		"d"		"e"		"f"
 "g"		"h"		"i"		"j"		"k"		"l"
-UIEnter				"m"		"n"		"o"		UIBackspace
-UILeft				"p"		"q"		"r"		"s"
-UIRight				"t"		"u"		"v"		"w"
+Duplicate				"m"		"n"		"o"		""
+StackEditor				"p"		"q"		"r"		"s"
+Edit				"t"		"u"		"v"		"w"
 UILeftShift			"x"		"y"		"z"		"_"
 UIExit				":	:"	","		Run		Catalog
 ]
@@ -72,9 +76,9 @@ UIExit				":	:"	","		Run		Catalog
 [
 "Σ"		"^"		"√"		"∂"		"ρ"		"(	)"
 "▶"		"%"		"π"		"<"		"="		">"
-UINoAlpha			"⇄"		"±"		"∡"		UIDelete
-UILeft				"7"		"8"		"9"		"÷"
-UIRight				"4"		"5"		"6"		"×"
+UINoAlpha			"⇄"		"±"		"∡"		""
+EditorHistory		"7"		"8"		"9"		"÷"
+EditMenu			"4"		"5"		"6"		"×"
 UIRightShift		"1"		"2"		"3"		"-"
 OffWithImage		"0"		UIDecimal	"«	»"	"+"
 ]
@@ -82,9 +86,9 @@ OffWithImage		"0"		UIDecimal	"«	»"	"+"
 [
 "∏"		"∆"		"↑"		"μ"		"θ"		"'	'"
 "→"		"←"		"↓"		"≤"		"≠"		"≥"
-UIText			"~"		 "°"		"ε"		UINewLine
-UIUp				"?"		"∫"		"["		"/"
-UIDown				"#"		"∞"		"|"		"*"
-UINoShift			"&"		"@"		"$"		"…"
-SaveState			";"		"·"		"{	}"	"!"
+UIText			"~"		"°"		"ε"		""
+EditorHistory	"?"		"∫"		"["		"/"
+EditMenu		"#"		"∞"		"|"		"*"
+UINoShift		"&"		"@"		"$"		"…"
+SaveState		";"		"·"		"{	}"	"!"
 ]
