@@ -12,6 +12,7 @@
 
 #include "factor.h"
 
+#include "command.h"
 #include "list.h"
 
 #include <algorithm>
@@ -725,6 +726,9 @@ bignum_g do_prev_prime(bignum_g n)
 
 
 COMMAND_BODY(NextPrime)
+// ----------------------------------------------------------------------------
+//   Returns the next prime after the given number
+// ----------------------------------------------------------------------------
 {
     object_p xo = strip(rt.stack(0));
     if (!xo)
@@ -754,6 +758,9 @@ COMMAND_BODY(NextPrime)
 
 
 COMMAND_BODY(PreviousPrime)
+// ----------------------------------------------------------------------------
+//  Return the previous prime before current number
+// ----------------------------------------------------------------------------
 {
     object_p xo = strip(rt.stack(0));
     if (!xo)
@@ -783,6 +790,9 @@ COMMAND_BODY(PreviousPrime)
 
 
 COMMAND_BODY(IsPrime)
+// ----------------------------------------------------------------------------
+//   Test if a number is prime or not
+// ----------------------------------------------------------------------------
 {
     object_p xo = strip(rt.stack(0));
     if (!xo)
@@ -803,7 +813,7 @@ COMMAND_BODY(IsPrime)
     if (res < 0)
         return ERROR;
 
-    integer_g r = integer::make(res);   // 1 si premier, 0 sinon
+    object_p r = command::static_object(res ? ID_True : ID_False);
     if (!r || !rt.top(r))
         return ERROR;
 
@@ -895,4 +905,3 @@ COMMAND_BODY(Factors)
 
     return OK;
 }
-
