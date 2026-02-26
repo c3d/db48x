@@ -658,17 +658,18 @@ bool user_interface::key(int key, bool repeating, bool talpha)
         }
     }
 
+    
     bool result  =
         handle_shifts(key, talpha)      ||
         handle_help(key)                ||
         handle_search(key)              ||
-		handle_editing(key)             ||       
-        handle_BASED(key)				||
-		handle_CHS_EEX(key)             ||
+        handle_editing(key)             ||
+        handle_based(key)               ||
+									
         handle_user(key)                ||
         handle_functions(key)           ||
         key == 0;
-        
+
 		menu_refresh(object::ID_Catalog, true);
 
 	if (rt.editing())
@@ -2276,12 +2277,15 @@ bool user_interface::draw_annunciators()
         if (alpha || user)
         {
             static cstring lbls[] = {
-                "", "ABC", "abc", "abc",
-                "USR", "αUS", "usr", "αus",
-                "", "ABC", "abc", "abc",
-                "1US", "α1U", "1us", "α1u"
+                "  ", " A", " a",
+				"U ", "UA", "Ua",
+				"1 ", "1A", "1a",
+											
             };
-            utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*userOnce]);
+            uint kc =  1 * alpha + 1 * (lowercase && alpha);
+			if (user) kc +=3;
+			if (userOnce) kc +=3;
+			utf8 label = utf8(lbls[kc]);
             pattern apat = lowercase
                 ? Settings.LowerAlphaForeground()
                 : Settings.AlphaForeground();
@@ -4176,16 +4180,19 @@ bool user_interface::handle_help(int &key)
             record(help,
                    "Looking for help topic for key %d, long = %d shift=%d\n",
                    key, longpress, shift_plane());
-            uint kc = platform_keyid(key,
-                shift, xshift,
-                             alpha, lowercase, transalpha);
+										 
+							  
+														   
             object_p obj;
-            bool objOk = false;    
+            bool objOk = false;
             if (Settings.UserMode())
             {
-                if (obj= assigned(kc)) objOk = true;
-            }    
-            if (!objOk) 
+                uint kc = platform_keyid(key,
+                shift, xshift,
+                             alpha, lowercase, transalpha);
+				if (obj= assigned(kc)) objOk = true;
+            }
+            if (!objOk)
                 if ( obj = object_for_key(key,shift_plane(),alpha_plane())) objOk = true;
             if (objOk)
             {
@@ -4194,11 +4201,11 @@ bool user_interface::handle_help(int &key)
                 if (utf8 htopic = obj->help())
                 {
                     record(help, "Help topic is %s\n", htopic);
-                    if (!rt.editing())
-                    {
-                        command = htopic;
-                        dirtyCommand = true;
-                    }
+									  
+					 
+                    command = htopic;
+                    dirtyCommand = true;
+					 
                     if (longpress)
                     {
                         rt.command(command::static_object(object::ID_Help));
@@ -4221,8 +4228,11 @@ bool user_interface::handle_help(int &key)
         else
         {
             if (!noHelpForKey(last))
+			{
                 key = last;     // Time to evaluate
-            last = 0;
+				dirtyStack  = true;
+			}
+			last = 0;
         }
 
         // Help keyboard movements only applies when help is shown
@@ -4455,24 +4465,24 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         consumed = true;
     }
-    else if (shift && key == KEY_ENTER)
-    {
-        // Cycle ABC -> abc -> non alpha
-        if (alpha)
-        {
-            if (lowercase)
-                alpha = lowercase = false;
-            else
-                lowercase = true;
-        }
-        else
-        {
-            alpha = true;
-        }
-        consumed = true;
-        shift = false;
-        key = last = 0;
-    }
+									   
+	 
+										
+				  
+		 
+						  
+										  
+				
+								 
+		 
+			
+		 
+						 
+		 
+						
+					  
+					   
+	 
 
     if (key)
         last = key;
@@ -4485,8 +4495,8 @@ bool user_interface::handle_editing(int key)
 //   Some keys always deal with editing
 // ----------------------------------------------------------------------------
 {
-    bool   consumed = false;
-    size_t isEditing  = rt.editing();
+    bool   editing  = rt.editing();
+									 
 
     if (uint interactive = Stack.interactive)
     {
@@ -4763,44 +4773,44 @@ bool user_interface::handle_editing(int key)
         return true;
     }
 
-    // Some editing keys that do not depend on data entry mode
-    if (!alpha)
-    {
-        switch(key)
-        {
-        case KEY_XEQ:
-            // XEQ is used to enter algebraic / equation objects
-            if (!shift && !xshift)
-                if (do_algebraic())
-                    return true;
-            break;
-        case KEY_RUN:
-            if (shift)
-            {
-                // Shift R/S = PRGM enters a program symbol
-                if (isEditing && (mode == ALGEBRAIC || mode == PARENTHESES))
-                    insert('=', ALGEBRAIC);
-                else
-                    insert(L'«', PROGRAM);
-                last = 0;
-                return true;
-            }
-            else if (isEditing)
-            {
-                // Stick to space role while editing, do not EVAL, repeat
-                if (mode == PARENTHESES)
-                    insert(';', PARENTHESES);
-                else if (mode == ALGEBRAIC)
-                    insert('=', ALGEBRAIC);
-                else
-                    insert(' ', PROGRAM);
-                repeat = true;
-                return true;
-            }
-            break;
+															  
+			   
+	 
+				   
+		 
+					 
+																
+								  
+								   
+								
+				  
+					 
+					  
+			 
+														   
+																			
+										   
+					
+										   
+						 
+							
+			 
+							   
+			 
+																		 
+										
+											 
+										   
+										   
+					
+										 
+							  
+							
+			 
+				  
 
-        }
-    }
+		 
+	 
 
     // Transient alpha editor keys (bring up the editor if needed)
     switch(key)
@@ -4825,22 +4835,22 @@ bool user_interface::handle_editing(int key)
                                       EditMenu::ID_EditorClear);
     }
 
-    if (isEditing)
+    if (editing)
     {
-		record(user_interface, "Editing key %d", key);
+        record(user_interface, "Editing key %d", key);
         switch (key)
         {
-        case KEY_BSP:   
-			if (xshift)
+        case KEY_BSP:
+            if (xshift)
                 return do_new_line();
             return do_delete(shift);
         case KEY_ENTER:
-        {
+		 
             // Finish editing and parse the result
             if (!shift && !xshift)
                 return do_enter();
             return false;
-        }
+		 
         case KEY_EXIT:
             // Clear error if there is one, else clear editor
             if (shift || xshift)
@@ -4860,56 +4870,68 @@ bool user_interface::handle_editing(int key)
             if (xshift)
                 return false;
             return do_right();
+        case KEY_CHS:
+            if (!shift && !xshift && !alpha)
+                return editing_chs();
+            return false;
+        case KEY_E:
+            if (!shift && !xshift && !alpha)
+                return editing_eex_or_cycle_prefixes();
+            return false;
+        case KEY_RUN:
+            if (!shift && !xshift)
+                return editing_spc_equal_semicolon();
+            return false;
         case 0:
             return false;
         }
     }
-    else
-    {
-        switch(key)
-        {
-        case KEY_ENTER:
-            if (xshift)
-                return do_text();
-            break;
-        case KEY_EXIT:
-            if (shift || xshift)
-                return false;
-            alpha = false;
-            lowercase = false;
-            if (Settings.ExitClearsMenu())
-                clear_menu();
-            return true;
-        case KEY_DOWN:
-            // Key down to edit last object on stack
-            if (!shift && !xshift && !alpha)
-                if (do_edit())
-                    return true;
-            break;
-        case KEY_UP:
-            if (xshift)
-            {
-                editor_history();
-                return true;
-            }
-            else if (!shift)
-            {
-                if (rt.args(rt.depth()))
-                {
-                    if (++Stack.interactive > rt.depth())
-                        Stack.interactive = rt.depth();
-                    dirtyStack = true;
-                    dirtyMenu = true;
-                }
-                return true;
-            }
-            break;
-
-        }
-    }
-
-    return consumed;
+		
+	 
+				   
+		 
+					   
+					   
+								 
+				  
+					  
+								
+    return false;
+						  
+							  
+										  
+							 
+						
+					  
+													
+											
+							  
+								
+				  
+					
+					   
+			 
+								 
+							
 }
+							
+			 
+										
+				 
+														 
+													   
+									  
+									 
+				 
+							
+			 
+				  
+
+		 
+	 
+
+					
+ 
 
 
 bool user_interface::handle_editing_command(object::id lo, object::id hi)
@@ -4946,52 +4968,95 @@ bool user_interface::handle_search(int key)
 //    Handle keys in search mode
 // ----------------------------------------------------------------------------
 {
+	if (key >= KEY_F1 && key <= KEY_F6)
+    	return false;
 	if (!key || !~searching)
 		return false;
-    if (key == KEY_F4) // to SEARCH next
-		return false;
-    switch (key)
-        {
-		case KEY_BSP:   
-			return do_delete(shift);
-        case KEY_ENTER:
-			return do_enter();
-        case KEY_EXIT:
-            return do_enter();
-        }
-    unicode c = '_';
-    uint kc = platform_keyid(key,
-                             shift, xshift,
-                             alpha, lowercase, transalpha);
+    unicode c = 0;
+	switch (key)
+    {
+    case KEY_BSP:
+		if (xshift) { c='\n'; break; }
+		return do_delete(shift);
+    case KEY_ENTER:
+		if (xshift) { c='\"'; break; }
+        return false;
+    case KEY_EXIT:
+        return do_enter();
+    case KEY_UP:
+        return false;
+    case KEY_DOWN:
+        return false;
+	case KEY_E:
+		if (!alpha && !shift && !xshift) c=Settings.ExponentSeparator();
+		break;
+	case KEY_DOT:
+    	if (!shift && !xshift) c ='.';
+		break;
+    case KEY_RUN:
+		if (!shift && !xshift) c =' ';
+		break;
+	}
+					
+								 
+										   
+														   
     object_p obj;
-    bool objOk = false;    
-	if (Settings.UserMode())
+    bool found = false;
+    bool objOk = false;
+	utf8 txt;
+	if (c == 0)
 	{
-		if (obj= assigned(kc)) objOk = true;
-	}    
-	if (!objOk) 
-		if ( obj = object_for_key(key,shift_plane(),alpha_plane())) objOk = true;
-	if (objOk) 
-	{
-		if (text_p direct = obj->as<text>())
+		if (Settings.UserMode())
 		{
-			size_t sz = 0;
-			utf8 txt = direct->value(&sz);
-			if (sz == 1) // use, if only one size large
+			uint kc = platform_keyid(key,shift,xshift,alpha,lowercase,transalpha);
+			if (obj = assigned(kc)) objOk = true;
+		}
+		if (!objOk)
+			if ( obj = object_for_key(key,shift_plane(),alpha_plane())) objOk = true;
+		if (objOk)
+		{
+			bool usetxt = false;
+			size_t len = 0;
+			if (text_p direct = obj->as_text())
 			{
-				c = direct->value(&sz)[0]; 
+				 
+				txt = direct->value(&len);
+				usetxt = true;
+			}
+			if (usetxt)
+			{
+				c  = utf8_codepoint(txt);
+				found = true;
+				for(int i=0;i<len;i++)
+				{
+                    if (i>0 && c=='\"') break;
+					if (found)
+                        if (!do_search(c))
+                        {
+                            fprintf(stderr,"(beep)");
+                            found = false;
+                        }
+					fprintf(stderr,"%c",c);
+					txt = utf8_next(txt);
+					c  = utf8_codepoint(txt);
+				}
+				fprintf(stderr," ");
 			}
 		}
 	}
-	if (!do_search(c))
+	else
 	{
-		beep(2400, 100);
+		if (do_search(c))
+			found = true;
 	}
-	return true;
+	if (!found)
+        beep(2400, 100); //not found sound
+    return true;
 }
 
 
-bool user_interface::handle_BASED(int key)
+bool user_interface::handle_based(int key)
 // ----------------------------------------------------------------------------
 //    Handle insert of based numbers (A-F)
 // ----------------------------------------------------------------------------
@@ -5007,173 +5072,173 @@ bool user_interface::handle_BASED(int key)
 		if (object_p obj = object_for_key(key,plane,alpha_plane))
 			return handle_functions(key, obj, false);
 	}
-	return false; 
-}
+			   
+ 
 
 
-bool user_interface::handle_CHS_EEX(int key)
-// ----------------------------------------------------------------------------
-//    Handle change sign +/- and enter exponent EEX: prefix cylce mode with units
-// ----------------------------------------------------------------------------
-{
-    if (alpha || shift || xshift || !key)
-        return false;
+											
+																			   
+																				 
+																			   
+ 
+										 
+					 
 
-    if (rt.editing())
-    {
-        if (key == KEY_CHS)
-        {
-            // Special case for change of sign
-            byte   *ed          = rt.editor();
-            byte   *p           = ed + cursor;
-            utf8    found       = nullptr;
-            unicode c           = utf8_codepoint(p);
-            unicode dm          = Settings.DecimalSeparator();
-            unicode ns          = Settings.NumberSeparator();
-            unicode hs          = Settings.BasedSeparator();
-            bool    had_complex = false;
-            while (p > ed && !found)
-            {
-                p = (byte *) utf8_previous(p);
-                c = utf8_codepoint(p);
-                if (c == complex::I_MARK || c == complex::ANGLE_MARK)
-                {
-                    had_complex = true;
-                    if (c == complex::ANGLE_MARK)
-                    {
-                        found = utf8_next(p);
-                    }
-                    else
-                    {
-                        found = p;
-                        p = (byte *) utf8_previous(p);
-                        c = utf8_codepoint(p);
-                    }
-                }
-                else if ((c < '0' || c > '9') && c != dm && c != ns && c != hs)
-                {
-                    found = utf8_next(p);
-                }
-            }
+					 
+	 
+						   
+		 
+											  
+											  
+											  
+										  
+													
+															  
+															 
+															
+										
+									
+			 
+											  
+									  
+																	 
+				 
+									   
+												 
+					 
+											 
+					 
+						
+					 
+								  
+													  
+											  
+					 
+				 
+																			   
+				 
+										 
+				 
+			 
 
-            if (!found)
-                found = ed;
-            if (c == 'e' || c == 'E' || c == Settings.ExponentSeparator())
-                c  = utf8_codepoint(p);
+					   
+						   
+																		  
+									   
 
-            if (had_complex)
-            {
-                if (c == '+' || c == '-')
-                    *p = '+' + '-' - c;
-                else
-                    insert(found - ed, '-');
-            }
-            else if (c == '-')
-            {
-                remove(p - ed, 1);
-            }
-            else
-            {
-                insert(found - ed, '-');
-            }
-            last = 0;
-            dirtyEditor = true;
-            return true;
-        }
-        else if (key == KEY_E)
-        {
-            if (mode == UNIT)
-            {
-                utf8 start = nullptr;
-                size_t len = 0;
-                if (current_word(start, len))
-                {
-                    byte  *ed    = rt.editor();
-                    byte  *st    = (byte *) start;
-                    bool   ins   = true;
-                    bool   del   = false;
-                    utf8   cycle = utf8("kcmμMGTpn"); // Default cycle
-                    size_t cylen = strlen(cstring(cycle));
-                    if (object_p name = unit::si_prefixes_variable())
-                        if (object_p si = directory::recall_all(name, false))
-                            if (text_p txt = si->as<text>())
-                                cycle = txt->value(&cylen);
+							
+			 
+										 
+									   
+					
+											
+			 
+							  
+			 
+								  
+			 
+				
+			 
+										
+			 
+					 
+							   
+						
+		 
+							  
+		 
+							 
+			 
+									 
+							   
+											 
+				 
+											   
+												  
+										
+										 
+																	   
+														  
+																	 
+																			 
+															
+														   
 
-                    if (len == 3 && st[1] == 'm' && st[2] == 's')
-                    {
-                        if (st[0] == 'd' || st[0] == 'h')
-                        {
-                            cylen = 0;
-                            st[0] = st[0] == 'd' ? 'h' : 'd';
-                        }
-                    }
+																 
+					 
+														 
+						 
+									  
+															 
+						 
+					 
 
-                    if (cylen)
-                    {
-                        unicode prefix = utf8_codepoint(cycle);
-                        size_t toremove = 1;
-                        if (len > 1)
-                        {
-                            unicode existing = utf8_codepoint(st);
-                            utf8    cyend    = cycle + cylen;
-                            ins = true;
-                            while (cycle < cyend)
-                            {
-                                utf8 ncycle = utf8_next(cycle);
-                                if (existing == utf8_codepoint(cycle))
-                                {
-                                    if (ncycle < cyend)
-                                        prefix = utf8_codepoint(ncycle);
-                                    else
-                                        del = true;
-                                    toremove = utf8_size(existing);
-                                    ins = false;
-                                    break;
-                                }
-                                cycle = ncycle;
-                            }
-                        }
+							  
+					 
+															   
+											
+									
+						 
+																  
+															 
+									   
+												 
+							 
+															   
+																	  
+								 
+													   
+																		
+										
+												   
+																   
+												
+										  
+								 
+											   
+							 
+						 
 
-                        if (del &&
-                            size_t(st - ed + 1) < rt.editing() &&
-                            is_valid_in_name(start))
-                        {
-                            remove(st - ed, toremove);
-                        }
-                        else
-                        {
-                            if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
-                                         !is_valid_in_name(start)))
-                            {
-                                ins = true;
-                                prefix = utf8_codepoint(cycle);
-                            }
-                            if (ins)
-                            {
-                                insert(st - ed, prefix);
-                            }
-                            else
-                            {
-                                remove(st - ed, toremove);
-                                insert(st - ed, prefix);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                byte   buf[4];
-                size_t sz = utf8_encode(Settings.ExponentSeparator(), buf);
-                insert(cursor, buf, sz);
-            }
-            last = 0;
-            dirtyEditor = true;
-            return true;
+								  
+																 
+													
+						 
+													  
+						 
+							
+						 
+																			   
+																   
+							 
+										   
+															   
+							 
+									
+							 
+														
+							 
+								
+							 
+														  
+														
+							 
+						 
+					 
+				 
+			 
+				
+			 
+							  
+																		   
+										
+			 
+					 
+							   
+						
 
-        }
-    }    
-    return false;
+		 
+		 
+	return false;
 }
 
 
@@ -5202,9 +5267,10 @@ bool user_interface::load_keymap(cstring name)
     {
         c = d;
         d = kmap.get();
-        if (c == '/' && d == '/' && !quoted)
+        if (c == '/' && d == '/' && !quoted) //skip comments (//) till newline arrives.
         {
             do { d = kmap.get(); } while (d != '\n');
+			d = kmap.get();
             continue;
         }
         if (c == '"')
@@ -5277,7 +5343,18 @@ object_p user_interface::object_for_key(int key,uint plane, uint alpha_plane)
 //    Return the object for a given key
 // ----------------------------------------------------------------------------
 {
-    object_p obj = nullptr;							   
+    object_p obj = nullptr;
+    if (keymap && key > 0 && key <= NUM_KEYS)
+        if (object_p planeobj = keymap->at(plane + NUM_PLANES * alpha_plane))
+        {
+            if (list_p plane = planeobj->as_array_or_list())
+            {
+                if (object_p keyobj = plane->at(key-1))
+                {
+                    return keyobj;
+                }
+            }
+        }
     if (key >= KEY_F1 && key <= KEY_F6)
     {
         uint fplane = plane < menu_planes() ? plane : 0;
@@ -5285,11 +5362,11 @@ object_p user_interface::object_for_key(int key,uint plane, uint alpha_plane)
         if (obj)
             return obj;
     }
-    if (keymap && key > 0 && key <= NUM_KEYS)
-        if (object_p planeobj = keymap->at(plane + NUM_PLANES * alpha_plane))
-            if (list_p plane = planeobj->as_array_or_list())
-                if (object_p keyobj = plane->at(key-1))
-                    return keyobj;                          
+											 
+																			 
+															
+													   
+															
     return obj;
 }
 
@@ -5322,7 +5399,7 @@ bool user_interface::handle_user(int key)
     uint kc = platform_keyid(key,
                              shift, xshift,
                              alpha, lowercase, transalpha);
-if (object_p binding = assigned(kc))
+    if (object_p binding = assigned(kc))
         result = handle_functions(key, binding, true);
     return result;
 }
@@ -5438,7 +5515,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
             [[fallthrough]];
 
         default:
-            if (validate_input)
+			if (validate_input)
                 goto insert_object;
 
             // If we have the editor open, need to close it
@@ -5615,6 +5692,13 @@ bool user_interface::do_exit()
             dirtyEditor = true;
             dirtyStack = true;
         }
+        else
+        {
+            alpha = false;
+            lowercase = false;
+            if (Settings.ExitClearsMenu())
+                clear_menu();
+        }
     }
     return true;
 }
@@ -5718,18 +5802,31 @@ bool user_interface::do_down()
 
 bool user_interface::do_delete(bool forward)
 // ----------------------------------------------------------------------------
-//   Delete what is right of cursor
+//   Search: reduce selection by one element right/left
+//   no selection: Delete what is right/left of cursor
+//   selection: delete selection
 // ----------------------------------------------------------------------------
 {
-    
+	
 	if (~searching)
     {
         utf8 ed = rt.editor();
-        if (cursor > select)
-            cursor = utf8_previous(ed, cursor);
-		else if (~select)
-            select = utf8_previous(ed, select);
-        do_search(0, true);
+        if (forward)
+        {
+            if (cursor < select)
+                cursor = utf8_next(ed, cursor);
+            else if (cursor > select)
+                select = utf8_next(ed, select);
+        }
+        else
+        {
+            if (cursor > select)
+                cursor = utf8_previous(ed, cursor);
+            else if (cursor < select)
+                select = utf8_previous(ed, select);
+						   
+        }
+        dirtyEditor = true;
     }
     else
     {
@@ -5780,6 +5877,9 @@ bool user_interface::do_delete(bool forward)
         menu_refresh(object::ID_Catalog, true);
     }
 
+    // Do not stop editing if we delete last character
+    if (!rt.editing())
+        insert(' ', DIRECT);
     last = 0;
     return true;
 }
@@ -5788,8 +5888,9 @@ bool user_interface::do_new_line()
 // ----------------------------------------------------------------------------
 //   Insert New Line
 // ----------------------------------------------------------------------------
-{
-    insert('\n', DIRECT);
+{    
+	insert('\n', DIRECT);
+	edRows = 0;
     return true;
 }
 
@@ -5799,16 +5900,16 @@ bool user_interface::do_algebraic()
 //   Magic key to enter algebraic objects
 // ----------------------------------------------------------------------------
 {
-    bool editing = rt.editing();
-    if (!editing || mode != BASED)
-    {
-        bool is_eqn = editing && is_algebraic(mode);
+								
+								  
+	 
+        bool is_eqn = rt.editing() && is_algebraic(mode);
         insert(is_eqn ? '(' : '\'', ALGEBRAIC);
         last = 0;
         return true;
-    }
-    return false;
-}
+ }
+				 
+ 
 
 
 bool user_interface::do_text()
@@ -5818,8 +5919,272 @@ bool user_interface::do_text()
 {
     // Insert quotes and begin editing
     insert('\"', TEXT);
-    alpha = true;
+    if (!lowercase) alpha = true;
     return true;
+}
+
+
+bool user_interface::editing_chs()
+// ----------------------------------------------------------------------------
+//   Magic key to change sign +/- (editing)
+// ----------------------------------------------------------------------------
+{
+    if (rt.editing())
+    {
+        // Special case for change of sign
+        byte   *ed          = rt.editor();
+        byte   *p           = ed + cursor;
+        utf8    found       = nullptr;
+        unicode c           = utf8_codepoint(p);
+        unicode dm          = Settings.DecimalSeparator();
+        unicode ns          = Settings.NumberSeparator();
+        unicode hs          = Settings.BasedSeparator();
+        bool    had_complex = false;
+        while (p > ed && !found)
+        {
+            p = (byte *) utf8_previous(p);
+            c = utf8_codepoint(p);
+            if (c == complex::I_MARK || c == complex::ANGLE_MARK)
+            {
+                had_complex = true;
+                if (c == complex::ANGLE_MARK)
+                {
+                    found = utf8_next(p);
+                }
+                else
+                {
+                    found = p;
+                    p = (byte *) utf8_previous(p);
+                    c = utf8_codepoint(p);
+                }
+            }
+            else if ((c < '0' || c > '9') && c != dm && c != ns && c != hs)
+            {
+                found = utf8_next(p);
+            }
+        }
+
+        if (!found)
+            found = ed;
+        if (c == 'e' || c == 'E' || c == Settings.ExponentSeparator())
+            c  = utf8_codepoint(p);
+		if (c == '+' || c == '-')
+			*p = '+' + '-' - c;
+		else
+			insert(found - ed, '-');
+        last = 0;
+        dirtyEditor = true;
+        return true;
+    }
+    return false;
+}
+bool user_interface::editing_eex_or_cycle_prefixes()
+// ----------------------------------------------------------------------------
+//   Magic key to EEX enter exponent or cycle trough SI prefixes (units)
+// ----------------------------------------------------------------------------
+{
+    if (rt.editing())
+    {
+        if (mode == UNIT)
+        {
+            utf8 start = nullptr;
+            size_t len = 0;
+            if (current_word(start, len))
+            {
+                byte  *ed    = rt.editor();
+                byte  *st    = (byte *) start;
+                bool   ins   = true;
+                bool   del   = false;
+                utf8   cycle = utf8("kcmμMGTpn"); // Default cycle
+                size_t cylen = strlen(cstring(cycle));
+                if (object_p name = unit::si_prefixes_variable())
+                    if (object_p si = directory::recall_all(name, false))
+                        if (text_p txt = si->as<text>())
+                            cycle = txt->value(&cylen);
+
+                if (len == 3 && st[1] == 'm' && st[2] == 's')
+                {
+                    if (st[0] == 'd' || st[0] == 'h')
+                    {
+                        cylen = 0;
+                        st[0] = st[0] == 'd' ? 'h' : 'd';
+                    }
+                }
+
+                if (cylen)
+                {
+                    unicode prefix = utf8_codepoint(cycle);
+                    size_t toremove = 1;
+                    if (len > 1)
+                    {
+                        unicode existing = utf8_codepoint(st);
+                        utf8    cyend    = cycle + cylen;
+                        ins = true;
+                        while (cycle < cyend)
+                        {
+                            utf8 ncycle = utf8_next(cycle);
+                            if (existing == utf8_codepoint(cycle))
+                            {
+                                if (ncycle < cyend)
+                                    prefix = utf8_codepoint(ncycle);
+                                else
+                                    del = true;
+                                toremove = utf8_size(existing);
+                                ins = false;
+                                break;
+                            }
+                            cycle = ncycle;
+                        }
+                    }
+
+                    if (del &&
+                        size_t(st - ed + 1) < rt.editing() &&
+                        is_valid_in_name(start))
+                    {
+                        remove(st - ed, toremove);
+                    }
+                    else
+                    {
+                        if (!ins && (size_t(st - ed + 1) >= rt.editing() ||
+                                     !is_valid_in_name(start)))
+                        {
+                            ins = true;
+                            prefix = utf8_codepoint(cycle);
+                        }
+                        if (ins)
+                        {
+                            insert(st - ed, prefix);
+                        }
+                        else
+                        {
+                            remove(st - ed, toremove);
+                            insert(st - ed, prefix);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+
+            // Special case for EEX
+			byte   *ed          = rt.editor();
+			byte   *p           = ed + cursor;
+			byte    cursor_move  = 0;
+			bool firstN = false;
+			bool firstS = false;
+			bool secondN = false;
+			bool secondS = false;
+			bool thirdN = false;
+			bool thirdS = false;
+			bool found = false;
+			unicode c           = utf8_codepoint(p);
+			unicode dm          = Settings.DecimalSeparator();
+			unicode ns          = Settings.NumberSeparator();
+			unicode hs          = Settings.BasedSeparator();
+            // E    --> use old E   criteria: 1=0,2=0,3=0
+            // E-   --> use old E   criteria: 1=S,2=0,3=0
+            // E8   --> use old E   criteria: 1=N,2=0,3=0
+            // E-8  --> use old E   criteria: 1=N,2=S,3=0
+            // E8-   --> new E      criteria: 1=S,2=N,3=0
+            // E-8-  --> new E      criteria: 1=S,2=N,3=S
+            // E8-7  --> new E      criteria: 1=N,2=S,3=N
+            // E8-7  --> new E      criteria: 1=N,2=S,3=N
+            while (p > ed)
+            {
+                p = (byte *) utf8_previous(p);
+                c = utf8_codepoint(p);
+                if (c== '-' || c=='+')
+                {
+                    if (!firstN && !firstS) firstS=true;
+                    if (firstN) secondS=true;
+                    if (secondN) thirdS=true;
+                    cursor_move++;
+                    continue;
+                }
+                if ((c >= '0' && c <= '9') || c == dm || c == ns || c == hs)
+                {
+                    if (!firstN && !firstS) firstN=true;
+                    if (firstS) secondN=true;
+                    if (secondS) thirdN=true;
+                    cursor_move++;
+                    continue;
+                }
+                if (c == 'e' || c == 'E' || c == Settings.ExponentSeparator())
+                {
+                    if ((!firstS && !firstN) || (!secondS && !secondN) || (firstN && secondS && !thirdN && !thirdS))
+                    {
+                        found = true;
+                        beep(2400, 100);
+                        for(int i=0;i<cursor_move;i++)
+                            cursor = utf8_previous(ed, cursor);
+                    }
+                    break;
+                }
+                break;
+            }
+            // '(c)8.888887-8 cursor at beginning --> jump to end of Number, new E: 8.888887E(c)-8
+            // '(c)8.888887E-8 cursor at beginning --> jump to end of Number, use old E: 8.888887E(c)-8
+            if(!found)
+            {
+                cursor_move  = 0;
+                p           = (byte *)  ed + cursor;
+                byte   *ende           = ed + rt.editing();
+                while(p < ende)
+                {
+                    c = utf8_codepoint(p);
+                    p = (byte *) utf8_next(p);
+                    if ((c >= '0' && c <= '9') || c == dm || c == ns || c == hs)
+                    {
+                        cursor_move++;
+                        cursor = utf8_next(ed, cursor);
+                        continue;
+                    }
+                    if (c == 'e' || c == 'E' || c == Settings.ExponentSeparator())
+                    {
+                        found = true;
+                        cursor = utf8_next(ed, cursor);
+                        beep(2400, 100);
+                    }
+                    break;
+                }
+            }
+			if (!found)
+			{
+				p = (byte *)  ed + cursor;
+				p = (byte *) utf8_previous(p);
+				c = utf8_codepoint(p);
+				if (!((c >= '0' && c <= '9') || c == dm || c == ns || c == hs))
+                    insert(cursor, utf8("1"), 1);
+				byte   buf[4];
+				size_t sz = utf8_encode(Settings.ExponentSeparator(), buf);
+				insert(cursor, buf, sz);
+			}
+        }
+        last = 0;
+        dirtyEditor = true;
+        return true;
+    }
+    return false;
+}
+bool user_interface::editing_spc_equal_semicolon()
+// ----------------------------------------------------------------------------
+//   Magic key to enter space or equal or semicolon
+// ----------------------------------------------------------------------------
+{
+    if (rt.editing())
+    {
+            if (mode == PARENTHESES)
+                insert(';', PARENTHESES);
+            else if (mode == ALGEBRAIC)
+                insert('=', ALGEBRAIC);
+            else
+                insert(' ', PROGRAM);
+            last = 0;
+            dirtyEditor = true;
+            return true;
+    }
+    return false;
 }
 
 
@@ -6100,7 +6465,7 @@ bool user_interface::do_search(unicode with, bool restart)
         return false;
     if (!~select)
         select = cursor;
-	
+
 	bool   forward  = cursor >= select;
     size_t selected = forward ? cursor - select : select - cursor;
     if (selected >= max)
@@ -6108,7 +6473,7 @@ bool user_interface::do_search(unicode with, bool restart)
         selected = 0;
         select = cursor;
     }
-	if ((with == 0) && (selected==0)) 
+	if ((with == 0) && (selected==0))
 	{
 		edRows = 0;
         dirtyEditor = true;
@@ -6120,7 +6485,7 @@ bool user_interface::do_search(unicode with, bool restart)
     uint   search = start;
 	// Skip current location (search next) or not (incremental search)
     bool   skip   = with == 0;
-	
+
     // Loop until we either find a new spot or we wrap around
     for (uint count = 0; !~found && count <= max; count++)
     {
@@ -6135,9 +6500,11 @@ bool user_interface::do_search(unicode with, bool restart)
             }
             else
             {
-                search = utf8_previous(ed, search);
+												   
                 if (search == 0)
-                    search = utf8_previous(ed, max);
+                    search = max;
+				search = utf8_previous(ed, search);
+
             }
         }
         else
@@ -6189,7 +6556,7 @@ bool user_interface::do_search(unicode with, bool restart)
         }
         edRows = 0;
         dirtyEditor = true;
-        return true;
+		return true;
     }
     return false;
 }
