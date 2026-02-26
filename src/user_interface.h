@@ -88,7 +88,7 @@ struct user_interface
     using coord  = blitter::coord;
     using size   = blitter::size;
     using rect   = blitter::rect;
-	
+
     bool        key(int key, bool repeating, bool transalpha);
     bool        repeating()     { return repeat; }
     object_p    assign(int keyid, object_p code);
@@ -212,6 +212,9 @@ struct user_interface
     bool        do_down();
     bool        do_delete(bool forward);
     bool        do_new_line();
+    bool        editing_chs();
+    bool        editing_eex_or_cycle_prefixes();
+    bool        editing_spc_equal_semicolon();
 
     text_p      editor_save(text_r ed, bool rewinding = false);
     text_p      editor_save(bool rewinding = false);
@@ -247,8 +250,7 @@ protected:
     bool        handle_user(int key);
     bool        handle_functions(int key);
     bool        handle_functions(int key, object_p obj, bool user);
-	bool        handle_BASED(int key);
-    bool        handle_CHS_EEX(int key);
+	bool        handle_based(int key);																				
     bool        noHelpForKey(int key);
     bool        do_search(unicode with = 0, bool restart = false);
 
