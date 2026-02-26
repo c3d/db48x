@@ -140,6 +140,11 @@ There are three ways to enter *Alpha* mode:
   as soon as the arrow key is released. Using _◀︎_ enters uppercase characters,
   while _▶︎_ uses lowercase characters.
 
+  Simulator:
+  hold Shift key ⇧ istead of _◀︎_,
+  hold Alt key ⎇ istead of _▶︎_
+  
+
 There is no equivalent of the HP48's "single-Alpha" mode. Alpha mode is either
 _transient_ (when you hold one of the arrow keys) or _sticky_ (with 🟨 _ENTER_
 or by holding 🟨).
@@ -1600,12 +1605,11 @@ Use _Drop_ (_EXIT_) to remove the top value from the stack. This helps keep the 
 
 ### LastArg to recall last arguments
 
-Use _LastArg_ (🟦 _ENTER_) to recall the arguments of the last operation. This is useful when you want to repeat a calculation with different parameters.
+Use _LastArg_ (🟨 _M_) to recall the arguments of the last operation. This is useful when you want to repeat a calculation with different parameters.
 
 ### Undo to restore previous stack state
 
-Use _Undo_ (🟦 _EXIT_) to restore the stack to its previous state. This is invaluable for recovering from mistakes or exploring different calculation paths.
-
+Use _Undo_ (🟦 _M_) to restore the stack to its previous state. This is invaluable for recovering from mistakes or exploring different calculation paths.
 
 ## The command line
 
