@@ -173,6 +173,7 @@ struct bignum : text
 public:
     // Arithmetic internal routines
     static int compare(bignum_r x, bignum_r y, bool magnitude = false);
+    bool more_bits_than(uint bits) const;
 
     // Modular arithmetic and helpers (used by factor, fraction)
     static bignum_p gcd(bignum_r a, bignum_r b);

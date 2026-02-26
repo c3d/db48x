@@ -24,7 +24,7 @@
 //
 // ============================================================================
 
-bool factor_result::add(bignum_g p)
+bool factor_result::add(bignum_r p)
 // ----------------------------------------------------------------------------
 //   Add a prime factor (increments exponent if already present)
 // ----------------------------------------------------------------------------
@@ -54,8 +54,9 @@ bool factor_result::add(bignum_g p)
 //
 // ============================================================================
 
-const uint16_t small_primes[] = {
-       3,    5,    7,   11,   13,   17,   19,   23,   29,   31,
+const uint16_t small_primes[] =
+{
+   2,  3,    5,    7,   11,   13,   17,   19,   23,   29,   31,
       37,   41,   43,   47,   53,   59,   61,   67,   71,   73,
       79,   83,   89,   97,  101,  103,  107,  109,  113,  127,
      131,  137,  139,  149,  151,  157,  163,  167,  173,  179,
@@ -180,8 +181,8 @@ const uint16_t small_primes[] = {
     9907, 9923, 9929, 9931, 9941, 9949, 9967, 9973,
 };
 
-const size_t NUM_SMALL_PRIMES =
-    sizeof(small_primes) / sizeof(small_primes[0]);
+const size_t NUM_SMALL_PRIMES = sizeof(small_primes) / sizeof(small_primes[0]);
+
 
 
 // ============================================================================
@@ -190,7 +191,7 @@ const size_t NUM_SMALL_PRIMES =
 //
 // ============================================================================
 
-static bool miller_rabin_witness(bignum_g a, bignum_g d, unsigned r, bignum_g n)
+static bool miller_rabin_witness(bignum_r a, bignum_r d, unsigned r, bignum_r n)
 // ----------------------------------------------------------------------------
 //   Test a single Miller-Rabin witness 'a' against n, where n-1 = d * 2^r
 // ----------------------------------------------------------------------------
@@ -223,7 +224,7 @@ static bool miller_rabin_witness(bignum_g a, bignum_g d, unsigned r, bignum_g n)
 }
 
 
-bool is_probably_prime(bignum_g n)
+bool is_probably_prime(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Miller-Rabin primality test
 // ----------------------------------------------------------------------------
@@ -300,7 +301,7 @@ bool is_probably_prime(bignum_g n)
 //
 // ============================================================================
 
-bignum_g pollard_rho_brent(bignum_g n)
+bignum_p pollard_rho_brent(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Find a non-trivial factor of n
 // ----------------------------------------------------------------------------
@@ -420,7 +421,7 @@ bignum_g pollard_rho_brent(bignum_g n)
 //
 // ============================================================================
 
-static bool extract_small_factor(bignum_g &n, bignum_g p,
+static bool extract_small_factor(bignum_g &n, bignum_r p,
                                  factor_result &result)
 // ----------------------------------------------------------------------------
 //   Divide out all copies of prime p from n, record in result
@@ -457,7 +458,7 @@ static bool extract_small_factor(bignum_g &n, bignum_g p,
 }
 
 
-static bool factorize_recursive(bignum_g n, factor_result &result)
+static bool factorize_recursive(bignum_r n, factor_result &result)
 // ----------------------------------------------------------------------------
 //   Recursively factorize n, adding prime factors to result
 // ----------------------------------------------------------------------------
@@ -481,6 +482,7 @@ static bool factorize_recursive(bignum_g n, factor_result &result)
     return factorize_recursive(cofactor, result);
 }
 
+
 bool factorize(bignum_g n, factor_result &result)
 // ----------------------------------------------------------------------------
 //   Full factorization of a bignum n into prime factors
@@ -492,18 +494,7 @@ bool factorize(bignum_g n, factor_result &result)
     if (n->is_one())
         return true;
 
-    // Phase 1: trial division by 2
-    {
-        bignum_g two = bignum::make(2);
-        if (!two)
-            return false;
-        if (!extract_small_factor(n, two, result))
-            return false;
-        if (n->is_one())
-            return true;
-    }
-
-    // Phase 2: trial division by odd small primes
+    // Phase 1: trial division by small primes
     for (size_t i = 0; i < NUM_SMALL_PRIMES; i++)
     {
         bignum_g p = bignum::make(small_primes[i]);
@@ -521,34 +512,10 @@ bool factorize(bignum_g n, factor_result &result)
             return result.add(n);
     }
 
-    // Phase 3: Miller-Rabin + Pollard Rho
+    // Phase 2: Miller-Rabin + Pollard Rho
     return factorize_recursive(n, result);
 }
 
-
-// ============================================================================
-//
-//   Range limit: Mersenne number M_m = 2^m - 1
-//
-// ============================================================================
-
-static bool above_m(bignum_r n, int m = 127)
-// ----------------------------------------------------------------------------
-//   Return true if n > M_m = 2^m - 1, i.e. n >= 2^m
-// ----------------------------------------------------------------------------
-//   Bit m is at byte index m/8, bit position m%8 (LSB-first storage).
-//   n >= 2^m iff the bignum has more than m/8+1 bytes, or the byte at
-//   index m/8 has bit m%8 set.
-{
-    if (!n)
-        return false;
-    size_t sz      = 0;
-    byte_p data    = n->value(&sz);
-    size_t byte_idx = size_t(m) / 8;
-    int    bit_idx  = m % 8;
-    return sz > byte_idx + 1
-        || (sz == byte_idx + 1 && (data[byte_idx] >> bit_idx) != 0);
-}
 
 
 // ============================================================================
@@ -557,7 +524,7 @@ static bool above_m(bignum_r n, int m = 127)
 //
 // ============================================================================
 
-int do_isprime(bignum_g n)
+int isprime(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Test if n is prime
 // ----------------------------------------------------------------------------
@@ -618,13 +585,14 @@ int do_isprime(bignum_g n)
 }
 
 
+
 // ============================================================================
 //
 //   NextPrime / PreviousPrime
 //
 // ============================================================================
 
-static bignum_g do_adjacent_prime(bignum_g n, bool next)
+static bignum_p adjacent_prime(bignum_r n, bool next)
 // ----------------------------------------------------------------------------
 //   Find the next (next=true) or previous (next=false) prime relative to n
 // ----------------------------------------------------------------------------
@@ -690,7 +658,7 @@ static bignum_g do_adjacent_prime(bignum_g n, bool next)
     static const unsigned MAX_SEARCH = 1 << 20;
     for (unsigned iter = 0; iter < MAX_SEARCH; iter++)
     {
-        if (do_isprime(cand) == 1)
+        if (isprime(cand) == 1)
             return cand;
 
         // Step by 2 (stay in odd numbers)
@@ -707,21 +675,48 @@ static bignum_g do_adjacent_prime(bignum_g n, bool next)
 }
 
 
-bignum_g do_next_prime(bignum_g n)
+static bignum_p factorable_value_from_stack()
 // ----------------------------------------------------------------------------
-//   Return the smallest prime strictly greater than n
+//   Check if we have a valid input for prime checking
 // ----------------------------------------------------------------------------
 {
-    return do_adjacent_prime(n, true);
+    object_p xo = object::strip(rt.stack(0));
+    if (!xo)
+        return nullptr;
+
+    if (!object::is_integer(xo->type()))
+    {
+        rt.type_error();
+        return nullptr;
+    }
+
+    bignum_p xi = bignum::promote(xo);
+    if (!xi)
+        return nullptr;
+    if (xi->more_bits_than(Settings.MaxFactorsBits()))
+    {
+        rt.number_too_big_error();
+        return nullptr;
+    }
+    return xi;
 }
 
 
-bignum_g do_prev_prime(bignum_g n)
+static object::result adjacent_prime_command(bool next)
 // ----------------------------------------------------------------------------
-//   Return the largest prime strictly less than n, or nullptr if none
+//   Command for adjacent prime number
 // ----------------------------------------------------------------------------
 {
-    return do_adjacent_prime(n, false);
+    bignum_g xi = factorable_value_from_stack();
+    if (xi)
+    {
+        xi = adjacent_prime(xi, next);
+        if (!xi)
+            rt.value_error();
+        else if (rt.top(+xi))
+            return object::OK;
+    }
+    return object::ERROR;
 }
 
 
@@ -730,30 +725,7 @@ COMMAND_BODY(NextPrime)
 //   Returns the next prime after the given number
 // ----------------------------------------------------------------------------
 {
-    object_p xo = strip(rt.stack(0));
-    if (!xo)
-        return ERROR;
-
-    if (!is_integer(xo->type()))
-    {
-        rt.type_error();
-        return ERROR;
-    }
-
-    bignum_g xi = bignum::promote(xo);
-    if (!xi)
-        return ERROR;
-
-    bignum_g r = do_next_prime(xi);
-    if (!r)
-    {
-        rt.value_error();
-        return ERROR;
-    }
-    if (!rt.top(r))
-        return ERROR;
-
-    return OK;
+    return adjacent_prime_command(true);
 }
 
 
@@ -762,30 +734,7 @@ COMMAND_BODY(PreviousPrime)
 //  Return the previous prime before current number
 // ----------------------------------------------------------------------------
 {
-    object_p xo = strip(rt.stack(0));
-    if (!xo)
-        return ERROR;
-
-    if (!is_integer(xo->type()))
-    {
-        rt.type_error();
-        return ERROR;
-    }
-
-    bignum_g xi = bignum::promote(xo);
-    if (!xi)
-        return ERROR;
-
-    bignum_g r = do_prev_prime(xi);
-    if (!r)
-    {
-        rt.value_error();
-        return ERROR;
-    }
-    if (!rt.top(r))
-        return ERROR;
-
-    return OK;
+    return adjacent_prime_command(false);
 }
 
 
@@ -794,32 +743,19 @@ COMMAND_BODY(IsPrime)
 //   Test if a number is prime or not
 // ----------------------------------------------------------------------------
 {
-    object_p xo = strip(rt.stack(0));
-    if (!xo)
-        return ERROR;
-
-    id xty = xo->type();
-    if (!is_integer(xty))
+    bignum_g xi = factorable_value_from_stack();
+    if (xi)
     {
-        rt.type_error();
-        return ERROR;
+        int res = isprime(xi);
+        if (res >= 0)
+        {
+            object_p r = command::static_object(res ? ID_True : ID_False);
+            if (r && rt.top(r))
+                return OK;
+        }
     }
-
-    bignum_g xi = bignum::promote(xo);
-    if (!xi)
-        return ERROR;
-
-    int res = do_isprime(xi);
-    if (res < 0)
-        return ERROR;
-
-    object_p r = command::static_object(res ? ID_True : ID_False);
-    if (!r || !rt.top(r))
-        return ERROR;
-
-    return OK;
+    return ERROR;
 }
-
 
 
 
@@ -829,7 +765,7 @@ COMMAND_BODY(IsPrime)
 //
 // ============================================================================
 
-bool do_factors(bignum_g n, factor_result &result)
+bool factors(bignum_r n, factor_result &result)
 // ----------------------------------------------------------------------------
 //   Decompose n into prime factors
 // ----------------------------------------------------------------------------
@@ -843,7 +779,7 @@ bool do_factors(bignum_g n, factor_result &result)
 //   Usage example:
 //     bignum_g n = bignum::make(12345678901234567LL);
 //     factor_result res;
-//     if (do_factors(n, res))
+//     if (factors(n, res))
 //         for (size_t i = 0; i < res.count; i++)
 //             printf("%s ^ %u\n", ..., res.factors[i].exponent);
 {
@@ -863,38 +799,31 @@ bool do_factors(bignum_g n, factor_result &result)
     return factorize(n, result);
 }
 
+
 COMMAND_BODY(Factors)
+// ----------------------------------------------------------------------------
+//  Factorize the input
+// ----------------------------------------------------------------------------
 {
-    object_p xo = strip(rt.stack(0));
-    if (!xo)
-        return ERROR;
-
-    id xty = xo->type();
-    if (!is_integer(xty))
-    {
-        rt.type_error();
-        return ERROR;
-    }
-
-    bignum_g xi = bignum::promote(xo);
+    bignum_g xi = factorable_value_from_stack();
     if (!xi)
         return ERROR;
 
     factor_result result;
-    if (!do_factors(xi, result))
+    if (!factors(xi, result))
     {
         return ERROR;
     }
 
-    // Construire la liste { p1 e1 p2 e2 ... }
+    // Build list of results { p1 e1 p2 e2 ... }
     scribble scr;
     for (size_t i = 0; i < result.count; i++)
     {
-        bignum_g p = result.factors[i].prime;
+        bignum_p p = result.factors[i].prime;
         if (!p || !rt.append(p))
             return ERROR;
 
-        bignum_g e = bignum::make(result.factors[i].exponent);
+        bignum_p e = bignum::make(result.factors[i].exponent);
         if (!e || !rt.append(e))
             return ERROR;
     }

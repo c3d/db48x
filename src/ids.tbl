@@ -1129,6 +1129,7 @@ SETTING(IntegrationIterations,  1U, 32U,                12U)
 SETTING(IntegrationImprecision, 1U, DB48X_MAXDIGITS,    6U)
 SETTING(MaximumDecimalExponent, 10ULL, ularge(1ULL << 61), ularge(1ULL << 60))
 SETTING(FinanceRounding,        0U, 9999U, 2U)
+SETTING(MaxFactorsBits,         64U, 1024U,             160U)
 
 SETTING_ENUM(SingleRowMenus,    nullptr,        MenuAppearance)
 SETTING_ENUM(FlatMenus,         nullptr,        MenuAppearance)

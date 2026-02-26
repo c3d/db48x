@@ -60,8 +60,9 @@ struct factor_result
     factor_result() : count(0) {}
 
     // Add a prime factor (increments exponent if already present)
-    bool add(bignum_g p);
+    bool add(bignum_r p);
 };
+
 
 
 // ============================================================================
@@ -81,10 +82,10 @@ extern const size_t   NUM_SMALL_PRIMES;
 // ============================================================================
 
 // Primality test (Miller-Rabin, deterministic for < ~82 bits)
-bool     is_probably_prime(bignum_g n);
+bool     is_probably_prime(bignum_r n);
 
 // Pollard Rho (Brent variant with GCD batching)
-bignum_g pollard_rho_brent(bignum_g n);
+bignum_p pollard_rho_brent(bignum_r n);
 
 // Full factorization — fills result with prime factors and exponents
 bool     factorize(bignum_g n, factor_result &result);
@@ -92,7 +93,7 @@ bool     factorize(bignum_g n, factor_result &result);
 
 // ============================================================================
 //
-//   High-level functions for calculator commands
+//   Calculator commands: IsPrime, Factors, NextPrime, PreviousPrime
 //
 // ============================================================================
 
@@ -100,7 +101,7 @@ bool     factorize(bignum_g n, factor_result &result);
 //   For small integers (integer_p), promotes to bignum internally.
 //   Also handles trial division for small values before Miller-Rabin.
 //   Returns:  1 = prime,  0 = composite,  -1 = error (invalid input)
-int      do_isprime(bignum_g n);
+int      isprime(bignum_r n);
 
 COMMAND_DECLARE(IsPrime, 1);
 
@@ -111,15 +112,15 @@ COMMAND_DECLARE(IsPrime, 1);
 //
 //   For n < 2, returns success with an empty result.
 //   Negative inputs: the caller should handle the sign and pass |n|.
-bool     do_factors(bignum_g n, factor_result &result);
+bool     factors(bignum_r n, factor_result &result);
 
 COMMAND_DECLARE(Factors, 1);
 
 // NextPrime / PreviousPrime: find adjacent primes.
 //   Returns the next/previous prime strictly greater/less than n.
 //   Returns nullptr on error or if no previous prime exists (n <= 2).
-bignum_g do_next_prime(bignum_g n);
-bignum_g do_prev_prime(bignum_g n);
+bignum_p next_prime(bignum_r n);
+bignum_p prev_prime(bignum_r n);
 
 COMMAND_DECLARE(NextPrime, 1);
 COMMAND_DECLARE(PreviousPrime, 1);

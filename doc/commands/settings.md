@@ -442,6 +442,17 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MaxFactorsBits
+
+Maximum number of bits for integers accepted by prime-related commands:
+[IsPrime](arithmetic#isprime), [Factors](arithmetic#factors),
+[NextPr](arithmetic#nextpr), and [PrevPr](arithmetic#prevpr).
+
+The value can range from 64 to 1024 bits (default 160). Integers exceeding this
+limit trigger a `Number is too big` error. Raising the value allows factoring
+larger numbers but increases memory use and computation time for Pollard's Rho
+and Miller-Rabin. Lowering it can prevent excessive CPU usage on large inputs.
+
 ## MathModesMenu
 
 The `MathModesMenu` controls settings related to mathematical computations.

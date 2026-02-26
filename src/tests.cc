@@ -12748,8 +12748,7 @@ void tests::prime_number_tests()
               "170141183460469231731687303715884105727",
               ENTER, ID_IsPrime)
         .expect("True");
-    step(
-        "Factors(M127=170141183460469231731687303715884105727)"
+    step("Factors(M127=170141183460469231731687303715884105727)"
         " = { 170141183460469231731687303715884105727 1 }")
         .test(CLEAR,
               "170141183460469231731687303715884105727",
@@ -12757,6 +12756,10 @@ void tests::prime_number_tests()
               ID_Factors)
         .expect("{ 170 141 183 460 469 231 731 687 303 715 884 105 727 1 }",
                 10000);
+
+    step("Factors of large number")
+        .test(CLEAR, "2 255", ID_pow, ID_Factors)
+        .error("Number is too big");
 }
 
 
