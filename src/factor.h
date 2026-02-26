@@ -80,14 +80,6 @@ extern const size_t   NUM_SMALL_PRIMES;
 //
 // ============================================================================
 
-// Modular arithmetic on bignums
-bignum_g bn_gcd(bignum_g a, bignum_g b);
-bignum_g bn_mulmod(bignum_g a, bignum_g b, bignum_g m);
-bignum_g bn_addmod(bignum_g a, bignum_g b, bignum_g m);
-bignum_g bn_submod(bignum_g a, bignum_g b, bignum_g m);
-bignum_g bn_abs_diff(bignum_g a, bignum_g b);
-bignum_g bn_powmod(bignum_g base, bignum_g exp, bignum_g mod);
-
 // Primality test (Miller-Rabin, deterministic for < ~82 bits)
 bool     is_probably_prime(bignum_g n);
 

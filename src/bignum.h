@@ -192,6 +192,14 @@ public:
 
     static bignum_p promote(object_p ival);
 
+    // Modular arithmetic
+    static bignum_g gcd(bignum_g a, bignum_g b);
+    static bignum_g mulmod(bignum_g a, bignum_g b, bignum_g m);
+    static bignum_g addmod(bignum_g a, bignum_g b, bignum_g m);
+    static bignum_g submod(bignum_g a, bignum_g b, bignum_g m);
+    static bignum_g abs_diff(bignum_g a, bignum_g b);
+    static bignum_g powmod(bignum_g base, bignum_g exp, bignum_g mod);
+
 public:
     OBJECT_DECL(bignum);
     RENDER_DECL(bignum);
