@@ -89,6 +89,7 @@ bignum_p pollard_rho_brent(bignum_r n);
 
 // Full factorization — fills result with prime factors and exponents
 bool     factorize(bignum_g n, factor_result &result);
+int      is_prime(bignum_r n);
 
 
 // ============================================================================
@@ -101,8 +102,6 @@ bool     factorize(bignum_g n, factor_result &result);
 //   For small integers (integer_p), promotes to bignum internally.
 //   Also handles trial division for small values before Miller-Rabin.
 //   Returns:  1 = prime,  0 = composite,  -1 = error (invalid input)
-int      isprime(bignum_r n);
-
 COMMAND_DECLARE(IsPrime, 1);
 
 // Factors: decompose n into prime factors.
@@ -112,16 +111,11 @@ COMMAND_DECLARE(IsPrime, 1);
 //
 //   For n < 2, returns success with an empty result.
 //   Negative inputs: the caller should handle the sign and pass |n|.
-bool     factors(bignum_r n, factor_result &result);
-
 COMMAND_DECLARE(Factors, 1);
 
 // NextPrime / PreviousPrime: find adjacent primes.
 //   Returns the next/previous prime strictly greater/less than n.
 //   Returns nullptr on error or if no previous prime exists (n <= 2).
-bignum_p next_prime(bignum_r n);
-bignum_p prev_prime(bignum_r n);
-
 COMMAND_DECLARE(NextPrime, 1);
 COMMAND_DECLARE(PreviousPrime, 1);
 

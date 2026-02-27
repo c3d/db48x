@@ -14,6 +14,7 @@
 
 #include "command.h"
 #include "list.h"
+#include "settings.h"
 
 #include <algorithm>
 
@@ -307,7 +308,6 @@ bignum_p pollard_rho_brent(bignum_r n)
 // ----------------------------------------------------------------------------
 {
     static const unsigned BATCH_SIZE = 128;
-    static const unsigned MAX_ITERS  = 1 << 22;
 
     bignum_g one = bignum::make(1);
     bignum_g two = bignum::make(2);
@@ -401,8 +401,11 @@ bignum_p pollard_rho_brent(bignum_r n)
                 }
             }
 
-            if (iters > MAX_ITERS)
-                break;
+            if (iters > Settings.MaxFactorIterations())
+            {
+                rt.number_too_big_error();
+                return nullptr;
+            }
 
             lam *= 2;
         }
@@ -524,7 +527,7 @@ bool factorize(bignum_g n, factor_result &result)
 //
 // ============================================================================
 
-int isprime(bignum_r n)
+int is_prime(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Test if n is prime
 // ----------------------------------------------------------------------------
@@ -658,7 +661,7 @@ static bignum_p adjacent_prime(bignum_r n, bool next)
     static const unsigned MAX_SEARCH = 1 << 20;
     for (unsigned iter = 0; iter < MAX_SEARCH; iter++)
     {
-        if (isprime(cand) == 1)
+        if (is_prime(cand) == 1)
             return cand;
 
         // Step by 2 (stay in odd numbers)
@@ -746,7 +749,7 @@ COMMAND_BODY(IsPrime)
     bignum_g xi = factorable_value_from_stack();
     if (xi)
     {
-        int res = isprime(xi);
+        int res = is_prime(xi);
         if (res >= 0)
         {
             object_p r = command::static_object(res ? ID_True : ID_False);
@@ -811,9 +814,7 @@ COMMAND_BODY(Factors)
 
     factor_result result;
     if (!factors(xi, result))
-    {
         return ERROR;
-    }
 
     // Build list of results { p1 e1 p2 e2 ... }
     scribble scr;

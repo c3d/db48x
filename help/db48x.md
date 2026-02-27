@@ -10192,7 +10192,7 @@ Test whether an integer is prime.
 
 * Returns `True` if the integer `n` is prime, `False` if composite.
 * Accepts positive integers including bignums. The maximum size is controlled
-  by the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  by the `MaxFactorsBits` setting.
 * Uses trial division for small factors, then Miller-Rabin for larger values.
   Deterministic for numbers up to about 82 bits; probabilistic beyond that with
   negligible error probability.
@@ -10208,8 +10208,10 @@ Decompose an integer into its prime factorization.
   by its multiplicity.
 * Accepts positive integers including bignums. Negative inputs use the absolute
   value; zero and one return an empty list. The maximum size is controlled by
-  the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  the `MaxFactorsBits` setting.
 * Uses trial division by small primes, then Pollard's Rho for larger factors.
+* The `MaxFactorIterations` setting limits Pollard's
+  Rho iterations per attempt; lowering it can avoid long runs on hard semiprimes.
 * The product of all `pᵢ^eᵢ` equals the original number.
 
 
@@ -10221,7 +10223,7 @@ Return the smallest prime strictly greater than the input.
 
 * Returns the next prime number after `n`. For example, `7 NextPr` gives `11`.
 * Accepts integers ≥ 1. The maximum input size is controlled by the
-  [MaxFactorsBits](settings#maxfactorsbits) setting.
+  `MaxFactorsBits` setting.
 * If no prime exists (e.g. search limit reached), returns an error.
 
 
@@ -10233,7 +10235,7 @@ Return the largest prime strictly smaller than the input.
 
 * Returns the previous prime number before `n`. For example, `11 PrevPr` gives `7`.
 * Accepts integers > 2 (no prime exists below 2). The maximum input size is
-  controlled by the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  controlled by the `MaxFactorsBits` setting.
 * If no prime exists or the search limit is reached, returns an error.
 # Base functions
 
@@ -14520,13 +14522,24 @@ this setting.
 ## MaxFactorsBits
 
 Maximum number of bits for integers accepted by prime-related commands:
-[IsPrime](arithmetic#isprime), [Factors](arithmetic#factors),
-[NextPr](arithmetic#nextpr), and [PrevPr](arithmetic#prevpr).
+`IsPrime`, `Factors`, `NextPr`, and `PrevPr`.
 
 The value can range from 64 to 1024 bits (default 160). Integers exceeding this
 limit trigger a `Number is too big` error. Raising the value allows factoring
 larger numbers but increases memory use and computation time for Pollard's Rho
 and Miller-Rabin. Lowering it can prevent excessive CPU usage on large inputs.
+
+## MaxFactorIterations
+
+Maximum number of Pollard's Rho iterations per attempt when factoring integers
+with `Factors`.
+
+The value can range from 1024 to 16,777,216 (default 4,194,304). If no factor
+is found within this limit for a given Rho attempt, the algorithm tries the
+next random starting point. Exhausting all attempts yields a `Bad argument
+value` error. Lowering the value speeds up failure detection for numbers that
+are hard to factor (e.g. products of two large primes); raising it allows
+factoring tougher semiprimes at the cost of longer run time.
 
 ## MathModesMenu
 

@@ -344,7 +344,7 @@ Test whether an integer is prime.
 
 * Returns `True` if the integer `n` is prime, `False` if composite.
 * Accepts positive integers including bignums. The maximum size is controlled
-  by the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  by the `MaxFactorsBits` setting.
 * Uses trial division for small factors, then Miller-Rabin for larger values.
   Deterministic for numbers up to about 82 bits; probabilistic beyond that with
   negligible error probability.
@@ -360,8 +360,10 @@ Decompose an integer into its prime factorization.
   by its multiplicity.
 * Accepts positive integers including bignums. Negative inputs use the absolute
   value; zero and one return an empty list. The maximum size is controlled by
-  the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  the `MaxFactorsBits` setting.
 * Uses trial division by small primes, then Pollard's Rho for larger factors.
+* The `MaxFactorIterations` setting limits Pollard's
+  Rho iterations per attempt; lowering it can avoid long runs on hard semiprimes.
 * The product of all `pᵢ^eᵢ` equals the original number.
 
 
@@ -373,7 +375,7 @@ Return the smallest prime strictly greater than the input.
 
 * Returns the next prime number after `n`. For example, `7 NextPr` gives `11`.
 * Accepts integers ≥ 1. The maximum input size is controlled by the
-  [MaxFactorsBits](settings#maxfactorsbits) setting.
+  `MaxFactorsBits` setting.
 * If no prime exists (e.g. search limit reached), returns an error.
 
 
@@ -385,5 +387,5 @@ Return the largest prime strictly smaller than the input.
 
 * Returns the previous prime number before `n`. For example, `11 PrevPr` gives `7`.
 * Accepts integers > 2 (no prime exists below 2). The maximum input size is
-  controlled by the [MaxFactorsBits](settings#maxfactorsbits) setting.
+  controlled by the `MaxFactorsBits` setting.
 * If no prime exists or the search limit is reached, returns an error.

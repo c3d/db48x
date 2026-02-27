@@ -12699,10 +12699,16 @@ void tests::prime_number_tests()
     step("IsPrime: M79=604462909807314587353087 is not prime")
         .test(CLEAR, "604462909807314587353087", ENTER, ID_IsPrime)
         .expect("False", 10000);
+    step("Factors(M79=604462909807314587353087) fails with defaults")
+        .test(CLEAR, "604462909807314587353087", ENTER,
+              LENGTHY(10000), ID_Factors)
+        .error("Number is too big");
     step("Factors(M79=604462909807314587353087) ="
          " { 2687 1 202029703 1 1113491139767 1 }")
-        .test(CLEAR, "604462909807314587353087", ENTER, ID_Factors)
-        .expect("{ 2 687 1 202 029 703 1 1 113 491 139 767 1 }", 30000);
+        .test(CLEAR, "200000 MaxFactorIterations", ENTER).noerror()
+        .test("604462909807314587353087", ENTER, LENGTHY(10000), ID_Factors)
+        .expect("{ 2 687 1 202 029 703 1 1 113 491 139 767 1 }", 30000)
+        .test(CLEAR, "{ MaxFactorIterations } Purge", ENTER).noerror();
 
     // M83 = 9671406556917033397649407 =
     //   167 × 57912614113275649087721  (composite)
@@ -12760,6 +12766,24 @@ void tests::prime_number_tests()
     step("Factors of large number")
         .test(CLEAR, "2 255", ID_pow, ID_Factors)
         .error("Number is too big");
+
+    // MaxFactorIterations setting
+    step("MaxFactorIterations: set and recall")
+        .test(CLEAR, "2000 MaxFactorIterations", ENTER).noerror()
+        .test("'MaxFactorIterations' RCL", ENTER).expect("2 000");
+    step("MaxFactorIterations: Factors(12) with low limit (trial division)")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("12", ENTER, ID_Factors).expect("{ 2 2 3 1 }");
+    step("MaxFactorIterations: Factors(M67) fails with 1024 iters")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("147573952589676412927", ENTER,
+              LENGTHY(10000), ID_Factors)
+        .error("Number is too big", 5000);
+    step("MaxFactorIterations: Factors(M67) succeeds with default")
+        .test(CLEAR,
+              "{ MaxFactorIterations } Purge Std", ENTER).noerror()
+        .test("147573952589676412927", ENTER, ID_Factors)
+        .expect("{ 193 707 721 1 761 838 257 287 1 }", 10000);
 }
 
 

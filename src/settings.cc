@@ -726,6 +726,8 @@ cstring setting::label(object::id ty)
         return printf("Slv~%u", s.SolverImprecision());
     case ID_SolverIterations:
         return printf("Slv#%u", s.SolverIterations());
+    case ID_MaxFactorIterations:
+        return printf("Fac#%u", s.MaxFactorIterations());
     case ID_CustomHeaderRefresh:
         return printf("HdrRefrsh %ums", s.CustomHeaderRefresh());
     case ID_BusyIndicatorRefresh:
