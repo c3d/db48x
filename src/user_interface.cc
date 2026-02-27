@@ -657,21 +657,16 @@ bool user_interface::key(int key, bool repeating, bool talpha)
             return true;
         }
     }
-
     
     bool result  =
         handle_shifts(key, talpha)      ||
         handle_help(key)                ||
         handle_search(key)              ||
-        handle_editing(key)             ||
-        handle_based(key)               ||
-									
+        handle_based(key)               ||							
         handle_user(key)                ||
+        handle_editing(key)             ||
         handle_functions(key)           ||
         key == 0;
-
-		menu_refresh(object::ID_Catalog, true);
-
 	if (rt.editing())
         update_mode();
 
