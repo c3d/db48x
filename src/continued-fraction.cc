@@ -1,5 +1,5 @@
 // ****************************************************************************
-//  ContinuedFraction.cc                                         DB48X project
+//  continued-fraction.cc                                         DB48X project
 // ****************************************************************************
 //
 //   File Description:
@@ -10,8 +10,26 @@
 //       x = a0 + 1/(a1 + 1/(a2 + 1/...))
 //     and returns the list of coefficients [a0, a1, a2, ...].
 //
+//
+//
+//
+//
+// ****************************************************************************
+//   (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
+//   This software is licensed under the terms outlined in LICENSE.txt
+// ****************************************************************************
+//   This file is part of DB48X.
+//
+//   DB48X is free software: you can redistribute it and/or modify
+//   it under the terms outlined in the LICENSE.txt file
+//
+//   DB48X is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// ****************************************************************************
+//
 //     Algorithm for integers:   trivial – one-element list.
-//     Algorithm for fractions:  exact Euclidean algorithm on numerator/denominator.
+//     Algorithm for fractions:  exact Euclidean algorithm on num/denominator.
 //     Algorithm for decimals:   exact bignum Euclidean algorithm.
 //       The decimal x is converted to an exact rational mant/10^denom_exp,
 //       and the standard Euclidean GCD algorithm is applied.  Iteration stops
@@ -20,10 +38,6 @@
 //       the effective denominator exponent.  Coefficients beyond that threshold
 //       belong to the finite decimal approximation, not the true mathematical
 //       value, and are discarded.
-//
-// ****************************************************************************
-//   This software is licensed under the terms outlined in LICENSE.txt
-// ****************************************************************************
 
 #include "continued-fraction.h"
 
@@ -36,31 +50,28 @@
 #include "list.h"
 
 
+static algebraic_p bignum_to_algebraic(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Convert a bignum coefficient to integer when it fits, bignum otherwise.
-//   Required because == does byte-level comparison: bignum(2) ≠ integer(2).
 // ----------------------------------------------------------------------------
-static algebraic_g bignum_to_algebraic(bignum_g n)
+//   Required because == does byte-level comparison: bignum(2) ≠ integer(2).
 {
-    if (integer_p small = (+n)->as_integer())
+    if (integer_p small = n->as_integer())
         return algebraic_p(small);
     return algebraic_p(+n);
 }
 
 
+static object::result dfc_decimal(decimal_r dec, bool neg)
 // ----------------------------------------------------------------------------
-//   Core DFC algorithm for a decimal value.
-//   Appends CF coefficients [a0, a1, …] to the current scribble area.
-//   Returns object::OK or object::ERROR.
+//  Core DFC algorithm for a decimal value
 // ----------------------------------------------------------------------------
-static object::result
-dfc_decimal(decimal_g dec, bool neg)
 {
     // Build the mantissa integer from kigits.
     // Re-fetch shape() each iteration: bignum allocations can trigger GC and
     // move the decimal object (dec is a GC root so +dec stays valid, but a
     // locally cached xi.base pointer would go stale).
-    decimal::info xi    = (+dec)->shape();
+    decimal::info xi    = dec->shape();
     size_t        xs    = xi.nkigits;
     large         xe    = xi.exponent;
     bignum_g      mant  = bignum::make(0);
@@ -174,9 +185,7 @@ COMMAND_BODY(DFC)
         return ERROR;
     object::id ty = xo->type();
 
-    // -----------------------------------------------------------------------
     // Fast path 1: integer input → { n }
-    // -----------------------------------------------------------------------
     if (object::is_integer(ty))
     {
         scribble scr;
@@ -188,11 +197,9 @@ COMMAND_BODY(DFC)
         return OK;
     }
 
-    // -----------------------------------------------------------------------
     // Fast path 2: small fraction → exact Euclidean (native integer arithmetic)
     //   Only for ID_fraction / ID_neg_fraction (num and denom fit in ularge).
     //   Big fractions fall through to the decimal path below.
-    // -----------------------------------------------------------------------
     if (ty == object::ID_fraction || ty == object::ID_neg_fraction)
     {
         fraction_p frac   = fraction_p(+xo);
@@ -246,7 +253,6 @@ COMMAND_BODY(DFC)
         return OK;
     }
 
-    // -----------------------------------------------------------------------
     // Decimal and general path: ensure we have a decimal, then apply the
     // exact bignum Euclidean algorithm via dfc_decimal().
     //
@@ -254,7 +260,6 @@ COMMAND_BODY(DFC)
     //   numerically unstable: the CF map amplifies errors by 1/fp² ≈ 5.83
     //   per step, so after ~30 steps with 34-digit arithmetic the result is
     //   garbage.  Converting to an exact bignum rational first avoids this.
-    // -----------------------------------------------------------------------
     if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
     {
         if (!algebraic::to_decimal(xo))
@@ -287,7 +292,6 @@ COMMAND_BODY(DFC2F)
 //     x = a_{n-1} + 1/x
 //     ...
 //     x = a0 + 1/x
-// ----------------------------------------------------------------------------
 {
     object_p obj = strip(rt.stack(0));
     if (!obj)

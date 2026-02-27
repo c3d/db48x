@@ -4363,9 +4363,7 @@ void tests::cfraction()
 {
     BEGIN(dfc);
 
-    // -------------------------------------------------------------------------
     // Integers: DFC(n) = { n }
-    // -------------------------------------------------------------------------
     step("DFC(0) = { 0 }")
         .test(CLEAR, "0", ENTER, ID_DFC).expect("{ 0 }");
     step("DFC(1) = { 1 }")
@@ -4385,9 +4383,7 @@ void tests::cfraction()
     step("DFC2F(DFC(-3)) = -3")
         .test(CLEAR, "-3 DFC DFC2F", ENTER).expect("-3");
 
-    // -------------------------------------------------------------------------
     // Rationals: exact continued fraction expansion
-    // -------------------------------------------------------------------------
     // 1/2 = [0; 2]
     step("DFC(1/2) = { 0 2 }")
         .test(CLEAR, "1/2", ENTER, ID_DFC).expect("{ 0 2 }");
@@ -4407,7 +4403,7 @@ void tests::cfraction()
     step("DFC(-5/3) = { -2 3 }")
         .test(CLEAR, "-5/3", ENTER, ID_DFC).expect("{ -2 3 }");
 
-    // Inverse: DFC2F(DFC(p/q)) = p/q  (exact round-trip, tested via subtraction)
+    // Inverse: DFC2F(DFC(p/q)) = p/q (exact round-trip, tested via subtraction)
     step("DFC2F(DFC(1/2)) = 1/2")
         .test(CLEAR, "1/2 DFC DFC2F 1/2 -", ENTER).expect("0");
     step("DFC2F(DFC(3/7)) = 3/7")
@@ -4447,7 +4443,6 @@ void tests::cfraction()
     step("DFC2F(DFC(e)) ≈ e")
         .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
 
-    // -------------------------------------------------------------------------
     // List length and last-coefficient quality checks.
     // The stopping criterion cuts the list just before the decimal's precision
     // boundary: all coefficients must be "safe" (equal to the true CF value),
@@ -4458,7 +4453,7 @@ void tests::cfraction()
     // takes (list, ref) and returns True if last SIZE(ref) elements match ref.
     // This catches accidental passes from a single garbage element that happens
     // to equal the expected value.
-    // -------------------------------------------------------------------------
+    //
     // sqrt(2) = [1; 2, 2, 2, ...]: last 7 coefficients must all be 2.
     step("DFC(sqrt 2) last 7 coefficients are 2")
         .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
@@ -4469,13 +4464,11 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
-    
-    // -------------------------------------------------------------------------
+
     // Repeat key tests at precision 100 to verify the stopping criterion scales.
     // With threshold ≈ 10^50 instead of 10^11, we get many more coefficients,
     // yet the last coefficient must still be "safe" (equal to the true CF value)
     // and the round-trip error must be ≈ 10^(-100) < 10^(2-100) = 10^(-98).
-    // -------------------------------------------------------------------------
     step("Set precision to 100 for high-precision DFC tests")
         .test(CLEAR, "100 Precision", ENTER).noerror();
     step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2 at precision 100")
