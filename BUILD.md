@@ -1,4 +1,4 @@
-# Building the DB48X project
+<img width="503" height="21" alt="grafik" src="https://github.com/user-attachments/assets/270cbef4-3025-4015-9485-37830b849d2c" /># Building the DB48X project
 
 The DB48X project can be built in two variants:
 
@@ -112,17 +112,19 @@ Rember your password!!!
 Run fedora and enter:
 
 ```bash
+sudo dnf upgrade --refresh
 sudo dnf install make
 sudo dnf install arm-none-eabi-gcc arm-none-eabi-gcc-cs-c++ arm-none-eabi-newlib
 sudo dnf install qt-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel
 sudo dnf install freetype-devel
 sudo dnf install rsync
+sudo dnf install git
 sudo dnf upgrade --refresh
 ```
 
 ## Install and build DB48x
 
-Run fedora and enter:
+Run fedora by opening Windows PowerShell and entering wsl. Then :
 
 ```bash
 git clone https://github.com/c3d/db48x.git
@@ -140,14 +142,12 @@ need to run it from the top-level directory if you want the built-in help files
 and the configuration files to be found:
 
 ```bash
-`./sim/db48x
+./sim/db48x
 ```
 
 DB48x should run now :-)
 
 ## Update DB48x
-
-Run fedora and enter:
 
 ```bash
 cd db48x
@@ -161,6 +161,15 @@ Run fedora and enter:
 ```bash
 git reset --hard HEAD~1
 ```
+
+## Clean up local changes
+
+```bash
+git clean -f
+git checkout .
+git restore .
+```
+
 
 ## Add Shortcut to Windows (Start-Menu):
 
