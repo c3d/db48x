@@ -43,3 +43,7 @@
 /sim/db50x.app/
 /sim/db50x.mak
 /help/*.idx
+/wasm/node_modules/
+/wasm/public/db48x.js
+/wasm/public/db48x.worker.js
+/wasm/public/db48x.wasm

@@ -1,0 +1,16 @@
+{
+    "name": "DB48X",
+    "short_name": "DB48X",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "black",
+    "background_color": "white",
+    "description": "A modern scientific calculator in the spirit of the Hewlett-Packard HP48X, featuring a complete, from-scratch reimplementation of the Reverse Polish Lisp (RPL) programming language",
+    "icons": [
+        {
+            "src": "./logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
