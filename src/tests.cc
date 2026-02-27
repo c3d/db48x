@@ -12760,6 +12760,25 @@ void tests::prime_number_tests()
     step("Factors of large number")
         .test(CLEAR, "2 255", ID_pow, ID_Factors)
         .error("Number is too big");
+
+    // -------------------------------------------------------------------------
+    // MaxFactorIterations setting
+    // -------------------------------------------------------------------------
+    step("MaxFactorIterations: set and recall")
+        .test(CLEAR, "2000 MaxFactorIterations", ENTER).noerror()
+        .test("'MaxFactorIterations' RCL", ENTER).expect("2000");
+    step("MaxFactorIterations: Factors(12) with low limit (trial division)")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("12", ENTER, ID_Factors).expect("{ 2 2 3 1 }");
+    step("MaxFactorIterations: Factors(M67) fails with 1024 iters")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("147573952589676412927", ENTER, ID_Factors)
+        .error("Bad argument value", 5000);
+    step("MaxFactorIterations: Factors(M67) succeeds with default")
+        .test(CLEAR,
+              "{ MaxFactorIterations } Purge Std", ENTER).noerror()
+        .test("147573952589676412927", ENTER, ID_Factors)
+        .expect("{ 193 707 721 1 761 838 257 287 1 }", 10000);
 }
 
 

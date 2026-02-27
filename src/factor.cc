@@ -14,6 +14,7 @@
 
 #include "command.h"
 #include "list.h"
+#include "settings.h"
 
 #include <algorithm>
 
@@ -307,7 +308,6 @@ bignum_p pollard_rho_brent(bignum_r n)
 // ----------------------------------------------------------------------------
 {
     static const unsigned BATCH_SIZE = 128;
-    static const unsigned MAX_ITERS  = 1 << 22;
 
     bignum_g one = bignum::make(1);
     bignum_g two = bignum::make(2);
@@ -401,7 +401,7 @@ bignum_p pollard_rho_brent(bignum_r n)
                 }
             }
 
-            if (iters > MAX_ITERS)
+            if (iters > Settings.MaxFactorIterations())
                 break;
 
             lam *= 2;
