@@ -56,6 +56,8 @@ static algebraic_p bignum_to_algebraic(bignum_r n)
 // ----------------------------------------------------------------------------
 //   Required because == does byte-level comparison: bignum(2) ≠ integer(2).
 {
+    if (!n)
+        return nullptr;
     if (integer_p small = n->as_integer())
         return algebraic_p(small);
     return algebraic_p(+n);
@@ -67,6 +69,8 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
 //  Core DFC algorithm for a decimal value
 // ----------------------------------------------------------------------------
 {
+    if (!dec)
+        return object::ERROR;
     // Build the mantissa integer from kigits.
     // Re-fetch shape() each iteration: bignum allocations can trigger GC and
     // move the decimal object (dec is a GC root so +dec stays valid, but a
@@ -77,12 +81,16 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     bignum_g      mant  = bignum::make(0);
     bignum_g      k1000 = bignum::make(1000);
     bignum_g      k10   = bignum::make(10);
+    if (!mant || !k1000 || !k10)
+        return object::ERROR;
     for (size_t i = 0; i < xs; i++)
     {
         decimal::info xi_now = (+dec)->shape();
         bignum_g      kbig   = bignum::make(decimal::kigit(xi_now.base, i));
         bignum_g      prod   = mant * k1000;
         mant = prod + kbig;
+        if (!kbig || !prod || !mant)
+            return object::ERROR;
     }
 
     // Represent value as exact rational mant / 10^denom_exp.
@@ -92,20 +100,24 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     {
         q = bignum::make(1);
         for (large i = 0; i < denom_exp; i++)
-            q = q * k10;
+            q = q ? (q * k10) : nullptr;
         p = mant;
     }
     else
     {
         p = mant;
         for (large i = 0; i < -denom_exp; i++)
-            p = p * k10;
+            p = p ? (p * k10) : nullptr;
         q = bignum::make(1);
     }
+    if (!p || !q || q->is_zero())
+        return object::ERROR;
 
     // First coefficient a0 = floor(±p/q), keeping fp = fractional part ≥ 0.
     bignum_g    quot  = p / q;
     bignum_g    rem   = p % q;
+    if (!quot || !rem)
+        return object::ERROR;
     algebraic_g a0;
     bignum_g    next_p, next_q;
     if (neg && !rem->is_zero())
@@ -113,18 +125,24 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
         // floor(-p/q) = −(quot+1);  fractional part = (q − rem)/q
         bignum_g one   = bignum::make(1);
         bignum_g quot1 = quot + one;
-        bignum_g neg_a = -quot1;
+        bignum_g neg_a = quot1 ? (-quot1) : nullptr;
+        if (!one || !quot1 || !neg_a)
+            return object::ERROR;
         a0     = bignum_to_algebraic(neg_a);
         next_p = q - rem;
         next_q = q;
+        if (!next_p || !next_q)
+            return object::ERROR;
     }
     else if (neg)
     {
         // Exact negative integer
         bignum_g neg_a = -quot;
-        a0     = bignum_to_algebraic(neg_a);
         next_p = bignum::make(0);
         next_q = bignum::make(1);
+        if (!neg_a || !next_p || !next_q)
+            return object::ERROR;
+        a0     = bignum_to_algebraic(neg_a);
     }
     else
     {
@@ -145,7 +163,9 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     large    eff_exp = (large) dec->significant_digits() - xe;
     size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
     for (size_t ti = 0; ti < tlim; ti++)
-        thresh = thresh * k10;
+        thresh = thresh ? (thresh * k10) : nullptr;
+    if (!thresh)
+        return object::ERROR;
 
     // Euclidean loop.  Q_prev = Q_{k-1}, Q_curr = Q_k are the convergent
     // denominators.  Stop BEFORE appending a_k when Q_{k+1} > thresh: such
@@ -153,14 +173,20 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     // true mathematical value.
     bignum_g Q_prev = bignum::make(0);
     bignum_g Q_curr = bignum::make(1);
+    if (!Q_prev || !Q_curr)
+        return object::ERROR;
     p = next_q;
     q = next_p;
-    while (!q->is_zero())
+    while (q && !q->is_zero())
     {
         bignum_g ai_big = p / q;
         bignum_g r      = p % q;
+        if (!ai_big || !r)
+            return object::ERROR;
         bignum_g tmp    = ai_big * Q_curr;
         bignum_g Q_new  = tmp + Q_prev;
+        if (!tmp || !Q_new)
+            return object::ERROR;
         if (Q_new > thresh)
             break;
         algebraic_g ai = bignum_to_algebraic(ai_big);
@@ -273,6 +299,8 @@ COMMAND_BODY(DFC)
 
     scribble  scr;
     decimal_g dec = decimal_p(+xo);
+    if (!dec)
+        return ERROR;
     result r = dfc_decimal(dec, ty == object::ID_neg_decimal);
     if (r != OK)
         return r;
