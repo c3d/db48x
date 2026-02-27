@@ -921,6 +921,27 @@ bignum_p bignum::pow(bignum_r yr, bignum_r xr)
 }
 
 
+bignum_p bignum::pow(bignum_r yr, ularge x)
+// ----------------------------------------------------------------------------
+//    Compute y^abs(x)
+// ----------------------------------------------------------------------------
+//   Note that the case where x is negative should be filtered by caller
+{
+    if (!yr)
+        return nullptr;
+    bignum_g r  = bignum::make(1);
+    bignum_g y  = yr;
+    while (x)
+    {
+        if (x & 1)
+            r = r * y;
+        x /= 2;
+        y = y * y;
+    }
+    return r;
+}
+
+
 static size_t fraction_render(big_fraction_p o, renderer &r, bool negative)
 // ----------------------------------------------------------------------------
 //   Common code for positive and negative fractions

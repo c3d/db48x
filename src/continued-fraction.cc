@@ -81,11 +81,12 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     bignum_g      mant  = bignum::make(0);
     bignum_g      k1000 = bignum::make(1000);
     bignum_g      k10   = bignum::make(10);
-    if (!mant || !k1000 || !k10)
+    bignum_g      one   = bignum::make(1);
+    if (!mant || !k1000 || !k10 || !one)
         return object::ERROR;
     for (size_t i = 0; i < xs; i++)
     {
-        decimal::info xi_now = (+dec)->shape();
+        decimal::info xi_now = dec->shape();
         bignum_g      kbig   = bignum::make(decimal::kigit(xi_now.base, i));
         bignum_g      prod   = mant * k1000;
         mant = prod + kbig;
@@ -95,37 +96,32 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
 
     // Represent value as exact rational mant / 10^denom_exp.
     bignum_g p, q;
-    large denom_exp = (large)(3 * xs) - xe;
-    if (denom_exp > 0)
+    large    denom_exp = (large) (3 * xs) - xe;
+    if (denom_exp < 0)
     {
-        q = bignum::make(1);
-        for (large i = 0; i < denom_exp; i++)
-            q = q ? (q * k10) : nullptr;
-        p = mant;
+        p = bignum::pow(k10, -denom_exp);
+        p = mant * p;
+        q = one;
     }
     else
     {
         p = mant;
-        for (large i = 0; i < -denom_exp; i++)
-            p = p ? (p * k10) : nullptr;
-        q = bignum::make(1);
+        q = bignum::pow(k10, denom_exp);
     }
     if (!p || !q || q->is_zero())
         return object::ERROR;
 
     // First coefficient a0 = floor(±p/q), keeping fp = fractional part ≥ 0.
-    bignum_g    quot  = p / q;
-    bignum_g    rem   = p % q;
-    if (!quot || !rem)
+    bignum_g quot, rem;
+    if (!bignum::quorem(p, q, bignum::ID_bignum, &quot, &rem))
         return object::ERROR;
     algebraic_g a0;
     bignum_g    next_p, next_q;
     if (neg && !rem->is_zero())
     {
         // floor(-p/q) = −(quot+1);  fractional part = (q − rem)/q
-        bignum_g one   = bignum::make(1);
         bignum_g quot1 = quot + one;
-        bignum_g neg_a = quot1 ? (-quot1) : nullptr;
+        bignum_g neg_a = -quot1;
         if (!one || !quot1 || !neg_a)
             return object::ERROR;
         a0     = bignum_to_algebraic(neg_a);
@@ -159,11 +155,9 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     // mantissa).  When precision P is not a multiple of 3, kigit alignment
     // adds trailing zeros, making the kigit-based denom_exp too large; using
     // significant_digits() corrects this and prevents garbage coefficients.
-    bignum_g thresh  = bignum::make(1);
     large    eff_exp = (large) dec->significant_digits() - xe;
     size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
-    for (size_t ti = 0; ti < tlim; ti++)
-        thresh = thresh ? (thresh * k10) : nullptr;
+    bignum_g thresh  = bignum::pow(k10, tlim);
     if (!thresh)
         return object::ERROR;
 
@@ -179,8 +173,9 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     q = next_p;
     while (q && !q->is_zero())
     {
-        bignum_g ai_big = p / q;
-        bignum_g r      = p % q;
+        bignum_g ai_big, r;
+        if (!bignum::quorem(p, q, bignum::ID_bignum, &ai_big, &r))
+            return object::ERROR;
         if (!ai_big || !r)
             return object::ERROR;
         bignum_g tmp    = ai_big * Q_curr;
