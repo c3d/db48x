@@ -1,4 +1,4 @@
-<img width="503" height="21" alt="grafik" src="https://github.com/user-attachments/assets/270cbef4-3025-4015-9485-37830b849d2c" /># Building the DB48X project
+# Building the DB48X project
 
 The DB48X project can be built in two variants:
 
