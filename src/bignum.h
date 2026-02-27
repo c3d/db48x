@@ -197,6 +197,7 @@ public:
     static bignum_p multiply(bignum_r y, bignum_r x, id ty);
     static bool quorem(bignum_r y, bignum_r x, id ty, bignum_g *q, bignum_g *r);
     static bignum_p pow(bignum_r y, bignum_r x);
+    static bignum_p pow(bignum_r y, ularge x);
     static bignum_p shift(bignum_r x, int bits, bool rotate, bool arith);
 
     static bignum_p promote(object_p ival);
