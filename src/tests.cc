@@ -1902,6 +1902,9 @@ void tests::arithmetic()
         .test(CLEAR,
               "ZeroPowerZeroIsOne", ENTER,
               "0 0 ^", ENTER).noerror().expect("1");
+    step("Check that power is right associative")
+        .test(CLEAR, "'3^3^3'", ENTER, ID_ToDecimal)
+        .expect("7 625 597 484 987");
 
     step("xroot");
     test(CLEAR, "8 3 xroot", ENTER).expect("2.");

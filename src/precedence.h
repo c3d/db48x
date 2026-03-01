@@ -31,19 +31,20 @@
 
 enum precedence
 // ----------------------------------------------------------------------------
-// Precedence for the various operators
+//   Precedence for the various operators
 // ----------------------------------------------------------------------------
+//   Odd precedences indicate right-associativity
 {
     NONE                = 0,    // No precedence
     LOWEST              = 1,    // Lowest precedence (when parsing parentheses)
-    WHERE               = 3,    // | (where) operator
-    COMPLEX             = 5,    // Complex numbers
+    WHERE               = 4,    // | (where) operator
+    COMPLEX             = 6,    // Complex numbers
 
     LOGICAL             = 10,    // and, or, xor
     RELATIONAL          = 12,    // <, >, =, etc
     ADDITIVE            = 14,    // +, -
     MULTIPLICATIVE      = 16,    // *, /
-    POWER               = 28,    // ^
+    POWER               = 29,    // ^ (right associative)
 
     FUNCTIONAL          = 30,   // Unknown operator
     FUNCTION            = 40,   // Functions, e.g. f(x)

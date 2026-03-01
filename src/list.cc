@@ -142,7 +142,7 @@ object::result list::list_parse(id      type,
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
                 if (parenthese || infix || prefix || alist)
                 {
-                    int childp = infix      ? int(infix->precedence() + 1)
+                    int childp = infix      ? int(infix->precedence() | 1)
                                : parenthese ? int(LOWEST)
                                : alist      ? int(LOWEST)
                                             : int(SYMBOL);
