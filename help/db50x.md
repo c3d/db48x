@@ -4346,6 +4346,41 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.16 - Factorization, precision fixes, and documentation
+
+This release adds prime and factorization features, improves numeric precision,
+and expands simulator and user documentation.
+
+### New features
+
+* Add `IsPrime`, `Factors`, `PrevPrime` and `NextPrime` commands
+* Add `MaxFactorsBits` and `MaxFactorIterations` settings for factorization
+* Add `TRIGSIN` command for Pythagorean identity rewrites
+* Add a Unix man page and simulator documentation
+* Add simulator recorder dump on `F16`; move demo playback to `F13`-`F15`
+* Paint navigation arrows in `SHOW`
+* Accept `CR/LF` line endings when reading Windows files
+
+### Bug fixes
+
+* Fix `expm1` precision loss for small arguments, including complex values
+* Fix `ln1p` precision loss for small arguments
+* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Reset `show_x` and `show_y` when exiting `SHOW`
+* Ensure the simulator creates the `screens` directory when needed
+* Fix an infinity optimization regression in arithmetic
+* Add missing null-dereference checks in factorization code
+
+### Enhancements
+
+* Refactor and optimize the decimal factorization code path, with expanded tests
+* Add conversion support to `float` and `double` in algebraic code
+* Update to recorder v1.2.3
+* Add documentation updates (DeepWiki reference, legal notice updates)
+* Add build preparation for upcoming make-it-quick integration
+* Welcome several new authors to the team, see AUTHORS file
+* Add LEGAL-NOTICE.md about compliance with California and Colorado laws
+
 ## Release 0.9.15 "Myriam" - GitHub automation, portability
 
 This release focused on GitHub and GitLab automation
