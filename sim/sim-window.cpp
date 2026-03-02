@@ -339,8 +339,8 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
     {
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)
-        extern bool save_system_state();
-        save_system_state();
+        extern bool save_system_state_silent();
+        save_system_state_silent();
 
         record(sim_window, "Android auto-save triggered");
 
