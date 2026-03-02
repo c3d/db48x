@@ -442,7 +442,7 @@ MENU(PartsMenu,
      "StdRnd",  ID_StandardRound,
      "RelRnd",  ID_RelativeRound,
      "→StdUnc", ID_ToStandardUncertainty,
-     "→RelRnd", ID_ToRelativeUncertainty,
+     "→RelUnc", ID_ToRelativeUncertainty,
      "PrcRnd",  ID_PrecisionRound
 );
 
