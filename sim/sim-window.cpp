@@ -45,6 +45,9 @@
 #include "sim-rpl.h"
 #include "ui_sim-window.h"
 #include <iostream>
+#ifdef ANDROID
+#include <atomic>
+#endif
 #include <QAudioFormat>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QAudioDevice>
@@ -324,11 +327,18 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 
 
 #ifdef ANDROID
+static std::atomic<bool> is_dialog_open{false};
+
 void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 // ----------------------------------------------------------------------------
 //   Trigger background auto-save when Android suspends the app
 // ----------------------------------------------------------------------------
 {
+    // If a native dialog is currently open, the user is actively managing state.
+    // Abort the background auto-save to prevent recursive Intents.
+    if (is_dialog_open)
+        return;
+  
     static bool isSaved = false;
 
     if (state == Qt::ApplicationActive) {
@@ -1218,6 +1228,13 @@ int ui_file_selector(const char *title,
 //  File selector function
 // ----------------------------------------------------------------------------
 {
+#ifdef ANDROID
+    // Engage the lock. If it was already true (e.g. touch bounce), safely abort.
+    if (is_dialog_open.exchange(true)) {
+        return MRET_EXIT;
+    }
+#endif
+
     QString path;
     bool done = false;
 
