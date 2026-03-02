@@ -45,6 +45,9 @@
 #include "sim-rpl.h"
 #include "ui_sim-window.h"
 #include <iostream>
+#ifdef ANDROID
+#include <atomic>
+#endif
 #include <QAudioFormat>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QAudioDevice>
@@ -59,6 +62,7 @@
 #include <QFileInfo>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QGuiApplication>
 #include <QStandardPaths>
 #include <QtCore>
 #include <QtGui>
@@ -170,6 +174,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Set initial geometry manually since we disabled layout management
     QResizeEvent initialResize(size(), size());
     resizeEvent(&initialResize);
+
+#ifdef ANDROID
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+            this, &MainWindow::handleAppStateChange);
+#endif
 
     rpl.start();
     if (run_tests)
@@ -315,6 +324,40 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     QRect kframe((nw - kw) / 2, yOffset + screenHeight, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
+
+
+#ifdef ANDROID
+static std::atomic<bool> is_dialog_open{false};
+
+void MainWindow::handleAppStateChange(Qt::ApplicationState state)
+// ----------------------------------------------------------------------------
+//   Trigger background auto-save when Android suspends the app
+// ----------------------------------------------------------------------------
+{
+    // If a native dialog is currently open, the user is actively managing state.
+    // Abort the background auto-save to prevent recursive Intents.
+    if (is_dialog_open)
+        return;
+
+    static bool isSaved = false;
+
+    if (state == Qt::ApplicationActive) {
+        isSaved = false;
+    }
+    else if ((state == Qt::ApplicationSuspended || state == Qt::ApplicationHidden)
+             && !isSaved) // Check both suspend and hidden + avoid double save
+    {
+        // Call the core DB48X save function directly
+        // (This function is defined in sysmenu.cc)
+        extern bool save_system_state_silent();
+        save_system_state_silent();
+
+        record(sim_window, "Android auto-save triggered");
+
+	isSaved = true;
+    }
+}
+#endif
 
 
 const int keyMap[] =
@@ -1185,23 +1228,41 @@ int ui_file_selector(const char *title,
 //  File selector function
 // ----------------------------------------------------------------------------
 {
+#ifdef ANDROID
+    // Engage the lock. If it was already true (e.g. touch bounce), safely abort.
+    if (is_dialog_open.exchange(true)) {
+        return MRET_EXIT;
+    }
+#endif
+
     QString path;
     bool done = false;
+
+#ifdef ANDROID
+    // Android SAF rejects absolute Linux paths like "/state".
+    // We must use an empty string so the OS opens its default safe location.
+    QString initial_dir = "";
+    // Android requires a valid parent context to launch the intent.
+    QWidget* parent_widget = MainWindow::theMainWindow();
+#else
+    QString initial_dir = base_dir;
+    QWidget* parent_widget = nullptr;
+#endif
 
     postToThread([&]{ // the functor captures parent and text by value
         path =
             disp_new
-            ? QFileDialog::getSaveFileName(nullptr,
+            ? QFileDialog::getSaveFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext),
                                            nullptr,
                                            overwrite_check
                                            ? QFileDialog::Options()
                                            : QFileDialog::DontConfirmOverwrite)
-            : QFileDialog::getOpenFileName(nullptr,
+            : QFileDialog::getOpenFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext));
         std::cout << "Selected path: " << path.toStdString() << "\n";
         done = true;
@@ -1217,6 +1278,44 @@ int ui_file_selector(const char *title,
         QString suffix = fi.suffix(); // On Linux we don't get the extension
         QString name = fi.fileName();
         path = fi.absoluteFilePath();
+#ifdef ANDROID
+        // Create a persistent, private sandbox path that standard C++ can read/write
+        // This requires no permissions and survives app restarts.
+        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(sandboxDir); // Ensure the directory exists
+        QString sandboxPath = sandboxDir + "/" + name;
+
+        if (!disp_new)
+        {
+            // LOADING (Import): The user selected a file via the Android picker.
+            // Use Qt to copy the Android URI data into our POSIX sandbox file.
+            QFile::remove(sandboxPath);
+            QFile::copy(path, sandboxPath);
+
+            // Tell the DB48X engine to load from the sandbox.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+        }
+        else
+        {
+            // SAVING (Export): Tell DB48X to save its state to the POSIX sandbox file.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+
+            // If the DB48X engine succeeded, use Qt to copy the sandbox file
+            // out to the public Android URI the user selected.
+            if (ret == MRET_EXIT) {
+                QFile targetFile(path);
+                if (targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                    QFile internalFile(sandboxPath);
+                    if (internalFile.open(QIODevice::ReadOnly)) {
+                        targetFile.write(internalFile.readAll());
+                        internalFile.close();
+                    }
+                    targetFile.close();
+                }
+            }
+        }
+#else
+        // --- Desktop Behavior ---
         if (QFileInfo("." + suffix) != QFileInfo(ext))
         {
             path += ext;
@@ -1230,7 +1329,13 @@ int ui_file_selector(const char *title,
         ret = callback(path.toStdString().c_str(),
                        name.toStdString().c_str(),
                        data);
+#endif
     }
+
+#ifdef ANDROID
+    is_dialog_open = false; // Release the lock
+#endif
+
     return ret;
 }
 
