@@ -11495,6 +11495,9 @@ void tests::constants_menu()
         .test(CLEAR, "5.36248084521_kg 0.11_cm", ENTER,
               ID_PartsMenu, ID_StandardRound)
         .error("Inconsistent units");
+    step("Parts menu uncertainty labels")
+        .test(CLEAR, ID_PartsMenu, F6)
+        .image_menus("parts-menu-labels", 2);
 
     step("Use Const command from command line")
         .test(CLEAR, "'c' CONST", ENTER, ID_ToDecimal)
