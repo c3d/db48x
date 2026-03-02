@@ -59,6 +59,7 @@
 #include <QFileInfo>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QGuiApplication>
 #include <QStandardPaths>
 #include <QtCore>
 #include <QtGui>
@@ -170,6 +171,11 @@ MainWindow::MainWindow(QWidget *parent)
     // Set initial geometry manually since we disabled layout management
     QResizeEvent initialResize(size(), size());
     resizeEvent(&initialResize);
+
+#ifdef ANDROID
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+            this, &MainWindow::handleAppStateChange);
+#endif
 
     rpl.start();
     if (run_tests)
@@ -315,6 +321,33 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     QRect kframe((nw - kw) / 2, yOffset + screenHeight, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
+
+
+#ifdef ANDROID
+void MainWindow::handleAppStateChange(Qt::ApplicationState state)
+// ----------------------------------------------------------------------------
+//   Trigger background auto-save when Android suspends the app
+// ----------------------------------------------------------------------------
+{
+    static bool isSaved = false;
+
+    if (state == Qt::ApplicationActive) {
+        isSaved = false;
+    }
+    else if ((state == Qt::ApplicationSuspended || state == Qt::ApplicationHidden)
+             && !isSaved) // Check both suspend and hidden + avoid double save
+    {
+        // Call the core DB48X save function directly
+        // (This function is defined in sysmenu.cc)
+        extern bool save_system_state();
+        save_system_state();
+
+        record(sim_window, "Android auto-save triggered");
+
+	isSaved = true;
+    }
+}
+#endif
 
 
 const int keyMap[] =
