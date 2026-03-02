@@ -338,7 +338,7 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
     // Abort the background auto-save to prevent recursive Intents.
     if (is_dialog_open)
         return;
-  
+
     static bool isSaved = false;
 
     if (state == Qt::ApplicationActive) {
@@ -1238,20 +1238,31 @@ int ui_file_selector(const char *title,
     QString path;
     bool done = false;
 
+#ifdef ANDROID
+    // Android SAF rejects absolute Linux paths like "/state".
+    // We must use an empty string so the OS opens its default safe location.
+    QString initial_dir = "";
+    // Android requires a valid parent context to launch the intent.
+    QWidget* parent_widget = MainWindow::theMainWindow();
+#else
+    QString initial_dir = base_dir;
+    QWidget* parent_widget = nullptr;
+#endif
+
     postToThread([&]{ // the functor captures parent and text by value
         path =
             disp_new
-            ? QFileDialog::getSaveFileName(nullptr,
+            ? QFileDialog::getSaveFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext),
                                            nullptr,
                                            overwrite_check
                                            ? QFileDialog::Options()
                                            : QFileDialog::DontConfirmOverwrite)
-            : QFileDialog::getOpenFileName(nullptr,
+            : QFileDialog::getOpenFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext));
         std::cout << "Selected path: " << path.toStdString() << "\n";
         done = true;
