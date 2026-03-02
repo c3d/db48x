@@ -1250,6 +1250,44 @@ int ui_file_selector(const char *title,
         QString suffix = fi.suffix(); // On Linux we don't get the extension
         QString name = fi.fileName();
         path = fi.absoluteFilePath();
+#ifdef ANDROID
+        // 1. Create a persistent, private sandbox path that standard C++ can read/write
+        // This requires no permissions and survives app restarts.
+        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(sandboxDir); // Ensure the directory exists
+        QString sandboxPath = sandboxDir + "/" + name;
+
+        if (!disp_new)
+        {
+            // LOADING (Import): The user selected a file via the Android picker.
+            // Use Qt to copy the Android URI data into our POSIX sandbox file.
+            QFile::remove(sandboxPath);
+            QFile::copy(path, sandboxPath);
+
+            // Tell the DB48X engine to load from the sandbox.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+        }
+        else
+        {
+            // SAVING (Export): Tell DB48X to save its state to the POSIX sandbox file.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+
+            // If the DB48X engine succeeded, use Qt to copy the sandbox file
+            // out to the public Android URI the user selected.
+            if (ret == MRET_EXIT) {
+                QFile targetFile(path);
+                if (targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                    QFile internalFile(sandboxPath);
+                    if (internalFile.open(QIODevice::ReadOnly)) {
+                        targetFile.write(internalFile.readAll());
+                        internalFile.close();
+                    }
+                    targetFile.close();
+                }
+            }
+        }
+#else
+        // --- Desktop Behavior ---
         if (QFileInfo("." + suffix) != QFileInfo(ext))
         {
             path += ext;
@@ -1263,6 +1301,7 @@ int ui_file_selector(const char *title,
         ret = callback(path.toStdString().c_str(),
                        name.toStdString().c_str(),
                        data);
+#endif
     }
     return ret;
 }
