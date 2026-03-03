@@ -1833,7 +1833,7 @@ object_p object::static_object(id i)
 //   Return a pointer to a static object representing the command
 // ----------------------------------------------------------------------------
 {
-    static byte cmds[] =
+    static const byte cmds[] =
     {
 #define ID(id)                                                \
     object::ID_##id < 0x80 ? (object::ID_##id & 0x7F) | 0x00  \
