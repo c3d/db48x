@@ -3356,6 +3356,10 @@ void user_interface::draw_help_access_paths(id cmd,
 //    Draw possible keyboard access paths for a command in help
 // ----------------------------------------------------------------------------
 {
+    record(help, "draw_help_access_paths cmd=%u", uint(cmd));
+    if (!cmd)
+        return;
+
     struct access_cache_entry
     {
         id        cmd;
@@ -3468,6 +3472,131 @@ void user_interface::draw_help_access_paths(id cmd,
         return obj && id(obj->type()) == cmd;
     };
 
+    // Find the first keyboard path to reach a given command or menu.
+    // Searches keymap/built-in bindings, then recursively menus if depth > 0.
+    // Returns true if a path was appended, false if nothing found.
+    auto append_cmd_path =
+        [&](auto &self, id target,
+            char *dst, size_t cap, size_t &dlen, uint depth) -> bool
+    {
+        // Search keymap or built-in bindings for target
+        if (keymap)
+        {
+            uint shplane = 0;
+            for (object_p plobj : *keymap)
+            {
+                list_p plane = plobj->as_array_or_list();
+                if (!plane) { shplane++; continue; }
+                uint sp = shplane % NUM_PLANES;
+                uint ap = shplane / NUM_PLANES;
+                for (uint key = 1; key <= NUM_KEYS; key++)
+                {
+                    if (find_type_match(plane->at(key - 1), target))
+                    {
+                        append_mods(dst, cap, dlen,
+                                    sp == 1, sp == 2,
+                                    ap > 0, ap > 1, false);
+                        append_text(dst, cap, dlen, key_label(key));
+                        return true;
+                    }
+                }
+                shplane++;
+            }
+        }
+        else
+        {
+            for (uint p = 0; p < NUM_PLANES; p++)
+            {
+                for (uint key = 1; key <= NUM_KEYS; key++)
+                {
+                    const byte *ptr = defaultCommand[p] + 2 * (key - 1);
+                    if (*ptr && find_type_match((object_p) ptr, target))
+                    {
+                        append_mods(dst, cap, dlen,
+                                    p == 1, p == 2, false, false, false);
+                        append_text(dst, cap, dlen, key_label(key));
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Recursively search in menus if allowed
+        if (depth > 0)
+        {
+            object_p sFn[NUM_PLANES][NUM_SOFTKEYS];
+            for (uint p = 0; p < NUM_PLANES; p++)
+                for (uint f = 0; f < NUM_SOFTKEYS; f++)
+                    sFn[p][f] = function[p][f];
+            uint sPage  = menuPage;
+            uint sPages = menuPages;
+
+            bool hit = false;
+            for (id mty = object::ID_MainMenu;
+                 mty <= object::ID_EditMenu && !hit;
+                 mty = id(uint(mty) + 1))
+            {
+                if (!object::is_menu(mty))
+                    continue;
+                menu_p m = menu_p(menu::static_object(mty));
+                if (!m)
+                    continue;
+                menuPage = 0;
+                menu_info mi(0);
+                if (!m->ops().menu(m, mi))
+                    continue;
+                uint npages = menuPages;
+                for (uint pg = 0; pg < npages && !hit; pg++)
+                {
+                    if (pg > 0)
+                    {
+                        menu_info pmi(pg);
+                        m->ops().menu(m, pmi);
+                    }
+                    for (uint p = 0; p < NUM_PLANES && !hit; p++)
+                    {
+                        for (uint f = 0; f < NUM_SOFTKEYS && !hit; f++)
+                        {
+                            if (find_type_match(function[p][f], target))
+                            {
+                                size_t before = dlen;
+                                if (self(self, mty, dst, cap, dlen,
+                                         depth - 1))
+                                {
+                                    append_text(dst, cap, dlen, " ");
+                                    if (p == 1)
+                                        append_text(dst, cap, dlen, "🟨");
+                                    if (p == 2)
+                                        append_text(dst, cap, dlen, "🟦");
+                                    append_text(dst, cap, dlen,
+                                                key_label(KEY_F1 + f));
+                                    hit = true;
+                                }
+                                else
+                                {
+                                    dlen = before;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (uint p = 0; p < NUM_PLANES; p++)
+                for (uint f = 0; f < NUM_SOFTKEYS; f++)
+                    function[p][f] = sFn[p][f];
+            menuPage  = sPage;
+            menuPages = sPages;
+
+            if (hit)
+                return true;
+        }
+
+        // Fallback: use fancy name
+        append_text(dst, cap, dlen, cstring(object::fancy(target)));
+        return true;
+    };
+
     uintptr_t menuSig = uintptr_t(menuStack[0]) ^ (uintptr_t(menuPage) << 16);
     for (uint p = 0; p < NUM_PLANES; p++)
         for (uint f = 0; f < NUM_SOFTKEYS; f++)
@@ -3488,6 +3617,7 @@ void user_interface::draw_help_access_paths(id cmd,
             e.menuSig == menuSig &&
             e.userSig == userSig)
         {
+            record(help, "  Cache hit for cmd %u", uint(cmd));
             accessText = e.text;
             break;
         }
@@ -3495,30 +3625,18 @@ void user_interface::draw_help_access_paths(id cmd,
 
     if (!accessText)
     {
+        record(help, "  Cache miss for cmd %u, building", uint(cmd));
         char   built[HELP_ACCESS_LINE_SIZE] = {};
         size_t blen      = 0;
         bool   any       = false;
         uint   found     = 0;
         uint   limit     = 8;
 
-        // Source 1: currently visible soft-menu bindings.
-        for (uint p = 0; p < NUM_PLANES && found < limit; p++)
-        {
-            for (uint f = 0; f < NUM_SOFTKEYS && found < limit; f++)
-            {
-                if (find_type_match(function[p][f], cmd))
-                {
-                    append_access(built, sizeof(built), blen, "", any,
-                                  p == 1, p == 2, false, false, false,
-                                  KEY_F1 + f);
-                    found++;
-                }
-            }
-        }
-
+        // Source 1: direct key bindings (keymap or built-in).
+        record(help, "Source 1: keymap scan, keymap=%p", (void *) keymap);
         if (keymap)
         {
-            // Source 2a: keymap loaded from file, e.g. db48x.48k.
+            // Source 1a: keymap loaded from file, e.g. db48x.48k.
             uint shplane = 0;
             for (object_p plobj : *keymap)
             {
@@ -3545,7 +3663,7 @@ void user_interface::draw_help_access_paths(id cmd,
         }
         else
         {
-            // Source 2b: built-in keyboard mappings.
+            // Source 1b: built-in keyboard mappings.
             for (uint p = 0; p < NUM_PLANES && found < limit; p++)
             {
                 for (uint key = 1; key <= NUM_KEYS && found < limit; key++)
@@ -3562,7 +3680,8 @@ void user_interface::draw_help_access_paths(id cmd,
             }
         }
 
-        // Source 3: user-defined key assignments (ASSIGN).
+        // Source 2: user-defined key assignments (ASSIGN).
+        record(help, "Source 2: user-assigned keys scan");
         struct usermods { bool ls, rs, al, lc, tr; };
         static const usermods mods[] =
         {
@@ -3596,6 +3715,132 @@ void user_interface::draw_help_access_paths(id cmd,
                 break;
         }
 
+        // Source 3a: currently visible soft-menu bindings.
+        for (uint p = 0; p < NUM_PLANES && found < limit; p++)
+        {
+            for (uint f = 0; f < NUM_SOFTKEYS && found < limit; f++)
+            {
+                if (find_type_match(function[p][f], cmd))
+                {
+                    append_access(built, sizeof(built), blen, "", any,
+                                  p == 1, p == 2, false, false, false,
+                                  KEY_F1 + f);
+                    found++;
+                }
+            }
+        }
+
+        // Source 3b: scan all system menus across all pages.
+        // Save UI menu state that do_menu clobbers.
+        object_p saveFn[NUM_PLANES][NUM_SOFTKEYS];
+        cstring  saveLbl[NUM_PLANES][NUM_SOFTKEYS];
+        uint16_t saveMrk[NUM_PLANES][NUM_SOFTKEYS];
+        bool     saveMrkA[NUM_PLANES][NUM_SOFTKEYS];
+        for (uint p = 0; p < NUM_PLANES; p++)
+        {
+            for (uint f = 0; f < NUM_SOFTKEYS; f++)
+            {
+                saveFn[p][f]   = function[p][f];
+                saveLbl[p][f]  = menuLabel[p][f];
+                saveMrk[p][f]  = menuMarker[p][f];
+                saveMrkA[p][f] = menuMarkerAlign[p][f];
+            }
+        }
+        id   saveMenuId    = menuStack[0];
+        uint saveMenuPage  = menuPage;
+        uint saveMenuPages = menuPages;
+        bool saveDirty     = dirtyMenu;
+
+        record(help, "Menu scan for cmd %u, MainMenu..EditMenu",
+               uint(cmd));
+        for (id mty = object::ID_MainMenu;
+             mty <= object::ID_EditMenu && found < limit;
+             mty = id(uint(mty) + 1))
+        {
+            if (!object::is_menu(mty))
+                continue;
+            if (mty == saveMenuId)
+                continue;
+
+            menu_p m = menu_p(menu::static_object(mty));
+            if (!m)
+                continue;
+
+            record(help, "  Scanning menu %+s (%u)",
+                   object::name(mty), uint(mty));
+
+            menuPage = 0;
+            menu_info mi(0);
+            if (!m->ops().menu(m, mi))
+            {
+                record(help, "  Menu %+s populate failed", object::name(mty));
+                continue;
+            }
+
+            uint npages = menuPages;
+            if (npages > 100)
+            {
+                record(help, "  Menu %+s claims %u pages, clamping",
+                       object::name(mty), npages);
+                npages = 100;
+            }
+            record(help, "  Menu %+s has %u pages", object::name(mty), npages);
+            for (uint pg = 0; pg < npages && found < limit; pg++)
+            {
+                if (pg > 0)
+                {
+                    menu_info pmi(pg);
+                    record(help, "  Menu %+s page %u/%u",
+                           object::name(mty), pg, npages);
+                    m->ops().menu(m, pmi);
+                }
+
+                for (uint p = 0; p < NUM_PLANES && found < limit; p++)
+                {
+                    for (uint f = 0; f < NUM_SOFTKEYS && found < limit; f++)
+                    {
+                        if (find_type_match(function[p][f], cmd))
+                        {
+                            record(help, "  Found in %+s plane %u key F%u",
+                                   object::name(mty), p, f + 1);
+                            append_text(built, sizeof(built), blen,
+                                        any ? ";" : "Keys: ");
+                            append_cmd_path(append_cmd_path, mty,
+                                            built, sizeof(built), blen, 1);
+                            append_text(built, sizeof(built), blen, " ");
+                            if (p == 1)
+                                append_text(built, sizeof(built), blen, "🟨");
+                            if (p == 2)
+                                append_text(built, sizeof(built), blen, "🟦");
+                            append_text(built, sizeof(built), blen,
+                                        key_label(KEY_F1 + f));
+                            any = true;
+                            found++;
+                        }
+                    }
+                }
+            }
+        }
+        record(help, "Menu scan done, found %u matches", found);
+
+        // Restore saved UI menu state.
+        for (uint p = 0; p < NUM_PLANES; p++)
+        {
+            for (uint f = 0; f < NUM_SOFTKEYS; f++)
+            {
+                function[p][f]       = saveFn[p][f];
+                menuLabel[p][f]      = saveLbl[p][f];
+                menuMarker[p][f]     = saveMrk[p][f];
+                menuMarkerAlign[p][f] = saveMrkA[p][f];
+            }
+        }
+        menuStack[0] = saveMenuId;
+        menuPage     = saveMenuPage;
+        menuPages    = saveMenuPages;
+        dirtyMenu    = saveDirty;
+
+        record(help, "Access path build done: found=%u len=%zu",
+               found, blen);
         access_cache_entry &slot = accessCache[accessCacheNext];
         slot.cmd       = cmd;
         slot.keymapGen = help_keymap_generation;
@@ -3612,6 +3857,8 @@ void user_interface::draw_help_access_paths(id cmd,
             (sizeof(accessCache) / sizeof(accessCache[0]));
     }
 
+    record(help, "  accessText=%p [%+s]",
+           accessText, accessText ? accessText : "null");
     if (accessText && *accessText)
     {
         font_p af = HelpFont;
@@ -3653,6 +3900,7 @@ void user_interface::draw_help_access_paths(id cmd,
             x = xleft;
         }
     }
+    record(help, "draw_help_access_paths done for cmd=%u", uint(cmd));
 }
 
 
@@ -3662,6 +3910,8 @@ bool user_interface::draw_help()
 // ----------------------------------------------------------------------------
 {
 restart:
+    record(help, "draw_help entry force=%u dirty=%u stack=%u freeze=%u",
+           force, dirtyHelp, dirtyStack, freezeStack);
     if ((!force && !dirtyHelp && !dirtyStack) || freezeStack)
         return false;
     dirtyHelp = false;
@@ -3898,6 +4148,7 @@ restart:
                         emit = true;
                         if (hadTitle)
                             y += height;
+                        hadTitle = false;
                     }
                 }
                 skip = true;
@@ -4322,7 +4573,7 @@ restart:
         // Check if we need to draw the image
         if (imdsp)
         {
-            if (image)
+            if (image && draw)
             {
                 grob::surface srcs = image->pixels();
                 rect drect = srcs.area();
@@ -4350,7 +4601,9 @@ restart:
         // Check if we want to draw the possible keys to access a command
         if (hadCmd)
         {
-            draw_help_access_paths(hadCmd, x, y, xleft, xright, ybot, height);
+            if (draw)
+                draw_help_access_paths(hadCmd, x, y,
+                                       xleft, xright, ybot, height);
             hadCmd = id(0);
         }
 
