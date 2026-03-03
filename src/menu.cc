@@ -494,8 +494,8 @@ MENU(AnglesMenu,
      "DMS→",    ID_FromDMS,
      "DMS+",    ID_DMSAdd,
      "DMS-",    ID_DMSSub,
-     "Math",    ID_MathModesMenu,
-     "Modes",   ID_ModesMenu);
+     "Hypot",   ID_hypot,
+     "Atan2",   ID_atan2);
 
 
 MENU(ComplexMenu,
@@ -559,7 +559,10 @@ MENU(VectorMenu,
      "Vec→",    ID_FromVector,
      "→Cylind", ID_ToCylindrical,
      "Complex", ID_ComplexMenu,
-     "Matrix",  ID_MatrixMenu);
+     "Matrix",  ID_MatrixMenu,
+
+     "Hypot",   ID_hypot,
+     "Atan2",   ID_atan2);
 
 MENU(MatrixMenu,
 // ----------------------------------------------------------------------------
