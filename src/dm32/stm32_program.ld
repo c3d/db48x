@@ -50,20 +50,6 @@ SECTIONS
     *(.qspi)           /* .qspi sections */
     *(.qspi*)          /* .qspi* sections */
 /* ==== Symbols to QSPI - in direct order === */
-    *(.rodata.__bid_mod10_18_tbl)
-    *(.rodata.__bid_convert_table)
-    *(.rodata.bid_log_table_1)
-    *(.rodata.bid_log_table_2)
-    *(.rodata.bid_decimal128_moduli)
-    *(.rodata.bid_exponents_bid64)
-    *(.rodata.bid_exponents_binary128)
-    *(.rodata.bid_breakpoints_binary128)
-    *(.rodata.bid_breakpoints_bid64)
-    *(.rodata.bid_multipliers1_binary128)
-    *(.rodata.bid_multipliers2_bid64)
-    *(.rodata.bid_multipliers1_bid64)
-    *(.rodata.bid_multipliers2_binary128)
-/* ===== Addition by c3d =================== */
     *(.fonts)
     *(.rodata._Z*)
 /* ======================== */
@@ -83,27 +69,6 @@ SECTIONS
 
     /* Constants declared non const in intel library */
     . = ALIGN(16);
-    *(.data.BID128_1*)
-    *(.data.BID128_DEC_PI)
-    *(.data.BID128_POSHALF)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_SHIFTER)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_N15000)
-    *(.data.BID128_EXP_M11000)
-    *(.data.bid_coeff_2)
-    *(.data.bid_coeff_3)
-    *(.data.bid_coeff_4)
-    *(.data.BID128_POSHALF)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_INF)
-    *(.data.BID128_SHIFTER)
-    *(.data.BID128_NEGHALF)
-    *(.data.BID128_LOG_2PI_OVER_2)
-    *(.data.BID128_HALF)
-    *(.data.BID128_ZERO)
-    *(.bss.BID128_ZERO)
-
     *(.data.__global_locale)
     . = ALIGN(8);
   } >FLASH
