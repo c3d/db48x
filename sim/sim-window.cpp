@@ -1355,6 +1355,7 @@ void ui_load_keymap(cstring name)
 
 
 RECORDER(image_check,       16, "Comparison of images in Qt");
+RECORDER(image_check_error, 16, "Error comparing images in Qt");
 
 bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 // ----------------------------------------------------------------------------
@@ -1373,8 +1374,10 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
     QFileInfo reference(name);
     if (force || !reference.exists() || !data.load(name, "PNG"))
     {
-        img.save(name, "PNG");
-        return true;
+        bool result = img.save(name, "PNG");
+        if (!result)
+            record(image_check_error, "Can't save image: %s", strerror(errno));
+        return result;
     }
     bool ok         = data.toImage() == img.toImage();
     uint mismatched = 0;
