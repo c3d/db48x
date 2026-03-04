@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.screen->setAttribute(Qt::WA_AcceptTouchEvents);
     ui.screen->installEventFilter(this);
     ui.keyboard->setStyleSheet("border-image: "
-                               "url(:/bitmap/keyboard-db48x.png) "
+                               "url(:/bitmap/keymap.png) "
                                "0 0 0 0 stretch stretch;");
 
     highlight = new Highlight(ui.keyboard);
@@ -532,15 +532,18 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
     int k = ev->key();
     record(sim_keys, "Key press %d", k);
 
-    if (k == Qt::Key_F7 || k == Qt::Key_F8 || k == Qt::Key_F9 ||
+    if (k == Qt::Key_F16)
+        recorder_dump_for(tests::dump_on_fail);
+
+    if (k == Qt::Key_F13 || k == Qt::Key_F14 || k == Qt::Key_F15 ||
         k == Qt::Key_F11 || k == Qt::Key_F12)
     {
         if (!tests.isRunning())
         {
             tests.onlyCurrent = k == Qt::Key_F11;
-            tests.demo1 = k == Qt::Key_F7;
-            tests.demo2 = k == Qt::Key_F8;
-            tests.demo3 = k == Qt::Key_F9;
+            tests.demo1 = k == Qt::Key_F13;
+            tests.demo2 = k == Qt::Key_F14;
+            tests.demo3 = k == Qt::Key_F15;
             tests.start();
         }
         else
@@ -823,13 +826,17 @@ void MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
 //   Save a simulator screenshot under the "SCREEN" directory
 // ----------------------------------------------------------------------------
 {
-    QPixmap &screen = MainWindow::theScreen();
-    QPixmap img = screen.copy(x, y, w, h);
+    QString   name  = basename;
     QDateTime today = QDateTime::currentDateTime();
-    QString name = basename;
     name += today.toString("yyyyMMdd-hhmmss");
     name += ".png";
-    img.save(name, "PNG");
+
+    QPixmap &screen = MainWindow::theScreen();
+    QPixmap img = screen.copy(x, y, w, h);
+    bool ok = img.save(name, "PNG");
+    record(sim_window, "Screen capture %+s for %s",
+           ok ? "succeeded" : "failed",
+           name.toUtf8().constData());
 }
 
 

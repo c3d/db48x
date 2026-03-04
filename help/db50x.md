@@ -775,6 +775,10 @@ Additional contributors to the project include (in order of appearance):
 * Thomas Eberhardt (sneakywumpus@gmail.com) (Bug fixes)
 * Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
 * Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
+* Jesus Cano (jcanovel@gmail.com) (bug fixes)
+* Riccardo Lucatuorto (gnuduncan@gmail.com)
+* Ralf Ahlbrink (raprism@users.noreply.github.com)
+* Mikael Djurfeldt (mikael@djurfeldt.com)
 
 The authors would like to acknowledge
 
@@ -4342,6 +4346,44 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.16 - Factorization, precision fixes, and documentation
+
+This release adds prime and factorization features, improves numeric precision,
+and expands simulator and user documentation.
+
+### New features
+
+* Add `IsPrime`, `Factors`, `PrevPrime` and `NextPrime` commands
+* Add `MaxFactorsBits` and `MaxFactorIterations` settings for factorization
+* Add `TRIGSIN` command for Pythagorean identity rewrites
+* Add a Unix man page and simulator documentation
+* Add simulator recorder dump on `F16`; move demo playback to `F13`-`F15`
+* Paint navigation arrows in `SHOW`
+* Accept `CR/LF` line endings when reading Windows files
+* Display keyboard access paths in help for commands
+
+### Bug fixes
+
+* Fix `expm1` precision loss for small arguments, including complex values
+* Fix `ln1p` precision loss for small arguments
+* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Reset `show_x` and `show_y` when exiting `SHOW`
+* Ensure the simulator creates the `screens` directory when needed
+* Fix an infinity optimization regression in arithmetic
+* Add missing null-dereference checks in factorization code
+* Treat `^` as right-associative like on the HP50G
+
+### Enhancements
+
+* Refactor and optimize the decimal factorization code path, with expanded tests
+* Add conversion support to `float` and `double` in algebraic code
+* Update to recorder v1.2.3
+* Add documentation updates (DeepWiki reference, legal notice updates)
+* Add build preparation for upcoming make-it-quick integration
+* Welcome several new authors to the team, see AUTHORS file
+* Add LEGAL-NOTICE.md about compliance with California and Colorado laws
+* Add menu entries for `hypot` and `atan2`
+
 ## Release 0.9.15 "Myriam" - GitHub automation, portability
 
 This release focused on GitHub and GitLab automation
@@ -4855,6 +4897,7 @@ The following is an extensive list of commands.
 * `FF`
 * `FilesMenu`
 * `Filter`
+* `Factors`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
@@ -5054,6 +5097,7 @@ The following is an extensive list of commands.
 * `neg`
 * `NegativeUnderflowIndicator`
 * `NextEq`
+* `NextPr`
 * `Nip`
 * `NoAngleUnits`
 * `NoAutoSimplify`
@@ -5133,6 +5177,7 @@ The following is an extensive list of commands.
 * `Prec`
 * `PredX`
 * `PredY`
+* `PrevPr`
 * `PrefixPolynomialRender`
 * `PrincipalSolution`
 * `PrintingMenu`
@@ -5625,7 +5670,6 @@ implemented by the time the project reaches version 1.0.
 * `F0λ`
 * `FACTOR`
 * `FACTORMOD`
-* `FACTORS`
 * `FANNING`
 * `FAST3D`
 * `FCOEF`
@@ -5678,7 +5722,6 @@ implemented by the time the project reaches version 1.0.
 * `IQUOT`
 * `IREMAINDER`
 * `ISOM`
-* `ISPRIME?`
 * `I→R`
 * `JORDAN`
 * `KER`
@@ -5727,7 +5770,6 @@ implemented by the time the project reaches version 1.0.
 * `MULTMOD`
 * `MUSER`
 * `NDIST`
-* `NEXTPRIME`
 * `NOVAL`
 * `NUMX`
 * `NUMY`
@@ -5755,7 +5797,6 @@ implemented by the time the project reaches version 1.0.
 * `POWMOD`
 * `PREDV`
 * `PREVAL`
-* `PREVPRIME`
 * `PROMPTSTO`
 * `PROOT`
 * `PROPFRAC`
@@ -5870,7 +5911,6 @@ implemented by the time the project reaches version 1.0.
 * `TRIG`
 * `TRIGCOS`
 * `TRIGO`
-* `TRIGSIN`
 * `TRIGTAN`
 * `TRN`
 * `TRUNC`
@@ -5969,209 +6009,6 @@ As a result, they behave like normal names on DB50X.
 # Performance measurements
 
 This sections tracks some performance measurements across releases.
-
-# DB50X Documentation Review
-
-## Summary
-This document contains a comprehensive review of the DB50X documentation for grammar, spelling, technical accuracy, and stylistic consistency.
-
-## Critical Issues
-
-### 1. Inconsistent Product Naming
-
-**Issue**: The documentation inconsistently refers to "DM32" vs "DM-42" and "DM32" vs "DM-32" throughout.
-
-**Current usage**:
-- `0-Overview.md` line 10: "SwissMicro DM32 calculator" (no hyphen)
-- `0-Overview.md` line 196: "DM-42 and DM-32" (with hyphens)  
-- `0-Overview.md` line 212: "DB50X on a DM32" (no hyphen)
-- `7-Performance.md`: Consistently uses "DM32" and "DM32" (no hyphens)
-
-**Recommendation**: 
-- Use **DM32**, **DM32**, and **DM32n** (no hyphens) consistently throughout
-- Exception: When referring to physical key labels on the calculator, use "DM-42 _RCL_" format to clarify it's about the physical hardware
-
-**Locations to fix**:
-- `0-Overview.md`: lines 196, 208, 209, 219, and many others
-- Search for "DM-" and replace with "DM" except in key label contexts
-
-### 2. Missing "DM32n" References
-
-**Issue**: The new DM32n variant is not mentioned in the documentation.
-
-**Recommendation**:
-- Add DM32n to product lists in `0-Overview.md` section "DB50X on DM32"
-- Update keyboard interaction sections to include DM32n
-- Add DM32n to performance tables in `7-Performance.md`
-
-### 3. Grammar Issues
-
-#### 3.1 `0-Overview.md` line 257
-**Current**: "giving indicrect access"  
-**Fix**: "giving **indirect** access"
-
-#### 3.2 `0-Overview.md` line 363
-**Current**: "access global varibales"  
-**Fix**: "access global **variables**"
-
-#### 3.3 `0-Overview.md` line 512
-**Current**: "Based numbers with an explicit base, like `#123h` keep their base"  
-**Fix**: "Based numbers with an explicit base, like `#123h`**,** keep their base" (add comma)
-
-#### 3.4 `0-Overview.md` line 933
-**Current**: "Walter Bonin initiated the WP43 firwmare"  
-**Fix**: "Walter Bonin initiated the WP43 **firmware**"
-
-#### 3.5 `1-introduction.md` line 4
-**Current**: "implemented by Hewlett Packard"  
-**Fix**: "implemented by Hewlett-Packard" (company name uses hyphen)
-
-### 4. Technical Consistency Issues
-
-#### 4.1 Key Reference Format
-
-**Issue**: Inconsistent formatting for key references.
-
-**Current mixed usage**:
-- "_SIN_" (italic with underscores)
-- `SIN` (code format)
-- _SIN_ (just italic)
-
-**Recommendation**: Use **_SIN_** (italic with underscores) consistently for physical keys, as established in line 203 of `0-Overview.md`.
-
-#### 4.2 Stack Level Names
-
-**Issue**: Sometimes uses X, Y, Z, T without formatting.
-
-**Recommendation**: Use backticks for stack level names: `X`, `Y`, `Z`, `T` (already done in most places, but check consistency).
-
-#### 4.3 Menu Command Names
-
-**Issue**: Inconsistent capitalization and formatting of menu names.
-
-**Examples**:
-- "VariablesMenu" vs "Variables menu"
-- "MainMenu" vs "main menu"
-
-**Recommendation**: Use **PascalCase** with "Menu" suffix for all menu references: `VariablesMenu`, `MainMenu`, `StackMenu`, etc.
-
-### 5. Style and Readability
-
-#### 5.1 Unicode Arrows
-
-**Current**: Uses both `▶︎` and `▶` inconsistently.
-
-**Recommendation**: Choose one arrow style and use consistently:
-- For navigation: ◀︎ and ▶︎ (with variation selector)
-- For stack diagrams: `X` ▶ `Y+X`
-
-#### 5.2 Shift Key Notation
-
-**Current**: Uses 🟨 and 🟦 consistently (good!).
-
-**Recommendation**: Keep this consistent. Always explain the meaning on first use in each major section.
-
-#### 5.3 Long Lines
-
-**Issue**: Many lines exceed 80 characters, making diffs harder to read.
-
-**Recommendation**: Consider wrapping at 80 columns where practical (this is a minor style issue, not critical).
-
-### 6. Technical Accuracy Issues
-
-#### 6.1 `0-Overview.md` line 507-516 (DM32-specific section)
-
-**Issue**: This entire section is marked as DM32-specific:
-```markdown
-* Based numbers with an explicit base...
-```
-
-**Problem**: This content applies to **all platforms**, not just DM32. Based numbers work the same on DM32, DM32, and DM32n.
-
-
-#### 6.2 Complex Number Representations
-
-**Current** (`0-Overview.md` line 495-500): States that DB50X has two distinct representations (polar and rectangular).
-
-**Note**: Verify this is still accurate. Check if DM32n has any differences in complex number handling.
-
-### 7. Missing Sections
-
-#### 7.1 DM32n-Specific Information
-
-**Missing**: No dedicated section explaining:
-- What is DM32n?
-- Differences between DM32 and DM32n
-- When to choose DM32n vs DM32
-
-**Recommendation**: Add a section "Choosing Your Calculator" that explains the differences between DM32, DM32, and DM32n.
-
-#### 7.2 Build/Installation for DM32n
-
-**Missing**: Installation instructions don't mention DM32n.
-
-**Recommendation**: Update installation documentation to include DM32n-specific instructions.
-
-### 8. Spelling/Typos Summary
-
-Complete list of spelling errors found:
-- `indicrect` → `indirect` (line 257)
-- `varibales` → `variables` (line 363)
-- `firwmare` → `firmware` (line 933)
-
-### 9. Formatting Issues
-
-#### 9.1 Code Block Formatting
-
-**Issue**: Some inline code uses single backticks while blocks use triple backticks inconsistently.
-
-**Recommendation**: 
-- Use single backticks for inline code: `dup`
-- Use triple backticks with language tag for code blocks:
-  ```rpl
-  « code here »
-  ```
-
-#### 9.2 List Formatting
-
-**Issue**: Some nested lists use inconsistent indentation.
-
-**Recommendation**: Use 2-space indentation for nested lists consistently.
-
-## Priority Recommendations
-
-### High Priority (Fix Now)
-1. Fix spelling errors (indicrect, varibales, firwmare)
-2. Standardize DM32/DM32/DM32n naming (remove hyphens except for key labels)
-3. Add DM32n to product documentation
-4. Fix DM32-only marker on based numbers section
-
-### Medium Priority (Next Update)
-5. Standardize key reference format (_KEY_)
-6. Add "Choosing Your Calculator" section
-7. Verify all technical claims are still accurate
-
-### Low Priority (Polish)
-8. Consider line length limits for better diffs
-9. Standardize Unicode arrow usage
-10. Review all menu name capitalizations
-
-## Files Requiring Most Attention
-
-1. **`0-Overview.md`** - Core documentation, most consistency issues
-2. **`5-ReleaseNotes.md`** - Check for DM32n references
-3. **`7-Performance.md`** - Add DM32n performance data
-4. **Installation docs** (if they exist) - Add DM32n instructions
-
-## Conclusion
-
-The documentation is generally well-written and comprehensive. The main issues are:
-1. Inconsistent product naming conventions
-2. Missing coverage of the new DM32n variant  
-3. A handful of spelling errors
-4. Some technical sections marked incorrectly as platform-specific
-
-These are all straightforward to fix and would significantly improve consistency and accuracy.
 
 # Constants library
 
@@ -10175,7 +10012,9 @@ Return the Euclidean norm for a complex number, vector or matrix.
 
 # Integer arithmetic and polynomials
 
-This section documents newRPL commands that are not implemented yet in DB50X.
+This section documents integer arithmetic commands, including prime-related
+operations. Some commands (e.g. MODSTO, GETPREC) are planned but not yet
+implemented in DB50X.
 
 ## SETPREC
 Set the current system precision
@@ -10205,16 +10044,8 @@ Remainder of the integer division
 Square of the input
 
 
-## NEXTPRIME
-Smallest prime number larger than the input
-
-
 ## Factorial
 Factorial of a number
-
-
-## ISPRIME
-Return true/false (1/0) if a number is prime or not
 
 
 ## MANT
@@ -10400,12 +10231,104 @@ Extract digits from a real number
 All roots of a polynomial
 
 
-## PREVPRIME
-Largest prime smaller than the input
+## IsPrime
+
+Test whether an integer is prime.
+
+`n` ▶ `True` or `False`
+
+* Returns `True` if the integer `n` is prime, `False` if composite.
+* Accepts integer inputs, including bignums. The maximum size is controlled by
+  the `MaxFactorsBits` setting.
+* Uses trial division by small primes first, then Miller-Rabin for larger
+  values.
+* Deterministic for numbers up to about 82 bits; probabilistic beyond that with
+  negligible error probability.
+
+```rpl
+17 IsPrime
+@ Expecting True
+```
+
+```rpl
+15 IsPrime
+@ Expecting False
+```
+
+```rpl
+561 IsPrime
+@ Expecting False
+```
 
 
-## FACTORS
-Factorize a polynomial or number
+## Factors
+
+Decompose an integer into its prime factorization.
+
+`n` ▶ `{ p₁ e₁ p₂ e₂ … }`
+
+* Returns a list of alternating prime-exponent pairs: each prime factor followed
+  by its multiplicity.
+* Accepts integer inputs, including bignums. Zero and one return an empty list.
+  The maximum size is controlled by the `MaxFactorsBits` setting.
+* Uses trial division by small primes, then Pollard's Rho for larger factors.
+* The `MaxFactorIterations` setting limits Pollard's
+  Rho iterations per attempt; lowering it can avoid long runs on hard semiprimes.
+* The product of all `pᵢ^eᵢ` equals the original number.
+
+```rpl
+12 Factors
+@ Expecting { 2 2 3 1 }
+```
+
+```rpl
+100 Factors
+@ Expecting { 2 2 5 2 }
+```
+
+
+## NextPr
+
+Return the smallest prime strictly greater than the input.
+
+`n` ▶ `p`
+
+* Returns the next prime number after `n`.
+* Accepts integers ≥ 1. The maximum input size is controlled by the
+  `MaxFactorsBits` setting.
+* If no prime exists (e.g. search limit reached), returns an error.
+
+```rpl
+10 NextPrime
+@ Expecting 11
+```
+
+```rpl
+2 NextPrime
+@ Expecting 3
+```
+
+
+## PrevPr
+
+Return the largest prime strictly smaller than the input.
+
+`n` ▶ `p`
+
+* Returns the previous prime number before `n`.
+* Accepts integers > 2 (no prime exists below 2). The maximum input size is
+  controlled by the `MaxFactorsBits` setting.
+* If no prime exists or the search limit is reached, returns an error.
+
+```rpl
+10 PreviousPrime
+@ Expecting 7
+```
+
+```rpl
+3 PreviousPrime
+@ Expecting 2
+```
 # Base functions
 
 ## Evaluate
@@ -14688,6 +14611,28 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MaxFactorsBits
+
+Maximum number of bits for integers accepted by prime-related commands:
+`IsPrime`, `Factors`, `NextPr`, and `PrevPr`.
+
+The value can range from 64 to 1024 bits (default 160). Integers exceeding this
+limit trigger a `Number is too big` error. Raising the value allows factoring
+larger numbers but increases memory use and computation time for Pollard's Rho
+and Miller-Rabin. Lowering it can prevent excessive CPU usage on large inputs.
+
+## MaxFactorIterations
+
+Maximum number of Pollard's Rho iterations per attempt when factoring integers
+with `Factors`.
+
+The value can range from 1024 to 16,777,216 (default 4,194,304). If no factor
+is found within this limit for a given Rho attempt, the algorithm tries the
+next random starting point. Exhausting all attempts yields a `Bad argument
+value` error. Lowering the value speeds up failure detection for numbers that
+are hard to factor (e.g. products of two large primes); raising it allows
+factoring tougher semiprimes at the cost of longer run time.
+
 ## MathModesMenu
 
 The `MathModesMenu` controls settings related to mathematical computations.
@@ -16039,7 +15984,14 @@ Match and apply a rule to an expression only once
 
 
 ## TRIGSIN
-Simplify replacing cos(x)^2+sin(x)^2=1
+Simplify replacing `cos(x)²` with `1-sin(x)²`
+
+This command applies the Pythagorean identity to rewrite expressions so that
+cosine squares are replaced by sine squares. This favors the use of `sin` over
+`cos` in the expression.
+
+`'cos(X)^2'` ▶ `'1-(sin X)²'`
+`'cos(A+B)^2'` ▶ `'1-(sin(A+B))²'`
 
 
 ## ALLROOTS

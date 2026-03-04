@@ -455,7 +455,7 @@ MENU(NumbersMenu,
      "Σ",       ID_Sum,
      "∏",       ID_Product,
      "QuoRem",  ID_Div2,
-     "Factors", ID_Unimplemented,
+     "Factors", ID_Factors,
      "Ran#",    ID_RandomNumber,
      "Random",  ID_Random,
 
@@ -467,9 +467,9 @@ MENU(NumbersMenu,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,
 
      "→Int",    ID_ToInteger,
-     "IsPrime", ID_Unimplemented,
-     "NextPr",  ID_Unimplemented,
-     "PrevPr",  ID_Unimplemented);
+     "IsPrime", ID_IsPrime,
+     "NextPr",  ID_NextPrime,
+     "PrevPr",  ID_PreviousPrime);
 
 
 MENU(AnglesMenu,
@@ -494,8 +494,8 @@ MENU(AnglesMenu,
      "DMS→",    ID_FromDMS,
      "DMS+",    ID_DMSAdd,
      "DMS-",    ID_DMSSub,
-     "Math",    ID_MathModesMenu,
-     "Modes",   ID_ModesMenu);
+     "Hypot",   ID_hypot,
+     "Atan2",   ID_atan2);
 
 
 MENU(ComplexMenu,
@@ -559,7 +559,10 @@ MENU(VectorMenu,
      "Vec→",    ID_FromVector,
      "→Cylind", ID_ToCylindrical,
      "Complex", ID_ComplexMenu,
-     "Matrix",  ID_MatrixMenu);
+     "Matrix",  ID_MatrixMenu,
+
+     "Hypot",   ID_hypot,
+     "Atan2",   ID_atan2);
 
 MENU(MatrixMenu,
 // ----------------------------------------------------------------------------
@@ -892,7 +895,7 @@ MENU(TrigIdentitiesMenu,
      "Tan→SinCos²",     ID_Unimplemented,
      "TExpand",         ID_Unimplemented,
      "TLin",            ID_Unimplemented,
-     "Trig",            ID_Unimplemented,
+     "TrigSin",         ID_TrigSin,
      "Symb",            ID_SymbolicMenu);
 
 MENU(ExpLogIdentitiesMenu,

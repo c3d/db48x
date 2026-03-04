@@ -824,6 +824,10 @@ Additional contributors to the project include (in order of appearance):
 * Thomas Eberhardt (sneakywumpus@gmail.com) (Bug fixes)
 * Ed van Gasteren (Ed@vanGasteren.net) (Bug fixes)
 * Jerome Ibanes (jibanes@gmail.com) (Dockerfile)
+* Jesus Cano (jcanovel@gmail.com) (bug fixes)
+* Riccardo Lucatuorto (gnuduncan@gmail.com)
+* Ralf Ahlbrink (raprism@users.noreply.github.com)
+* Mikael Djurfeldt (mikael@djurfeldt.com)
 
 The authors would like to acknowledge
 

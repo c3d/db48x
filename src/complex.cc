@@ -1259,20 +1259,50 @@ COMPLEX_BODY(atanh)
 
 COMPLEX_BODY(ln1p)
 // ----------------------------------------------------------------------------
-//   Complex implementation of log1p
+//   Complex implementation of log1p, avoiding cancellation for small z
 // ----------------------------------------------------------------------------
+//   ln1p(a+bi) = 0.5*ln1p(a*(2+a)+b*b) + i*atan2(b, 1+a)
 {
-    complex_g one = complex::make(1, 0);
-    return ln(one + z);
+    algebraic_g a = z->re();
+    algebraic_g b = z->im();
+
+    // Real part: 0.5 * ln1p(a*(2+a) + b*b)
+    algebraic_g two = integer::make(2);
+    algebraic_g re  = ln1p::run(a * (two + a) + b * b) / two;
+
+    // Imaginary part: atan2(b, 1+a) — suppress angle unit on result
+    settings::SaveSetAngleUnits ssau(false);
+    algebraic_g one = integer::make(1);
+    algebraic_g im  = atan2::evaluate(b, one + a);
+
+    return rectangular::make(re, im);
 }
+
 
 COMPLEX_BODY(expm1)
 // ----------------------------------------------------------------------------
-//   Complex implementation of expm1
+//   Complex implementation of expm1, avoiding cancellation for small z
 // ----------------------------------------------------------------------------
+//   expm1(a+bi) = (expm1(a)*cos(b) - 2*sin(b/2)^2) + i*(exp(a)*sin(b))
 {
-    complex_g one = complex::make(1, 0);
-    return exp(z - one);
+    algebraic_g a = z->re();
+    algebraic_g b = z->im();
+
+    // Real part: expm1(a)*cos(b) - 2*sin(b/2)^2
+    algebraic_g em1   = expm1::run(a);
+    algebraic_g cosb  = cos::run(b);
+    algebraic_g two   = integer::make(2);
+    algebraic_g bh    = b / two;
+    algebraic_g sinbh = sin::run(bh);
+    algebraic_g re    = em1 * cosb - two * sinbh * sinbh;
+
+    // Imaginary part: (expm1(a)+1)*sin(b), reusing em1 to avoid a second exp call
+    algebraic_g one  = integer::make(1);
+    algebraic_g ea   = em1 + one;
+    algebraic_g sinb = sin::run(b);
+    algebraic_g im   = ea * sinb;
+
+    return rectangular::make(re, im);
 }
 
 

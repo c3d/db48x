@@ -154,7 +154,9 @@ algebraic_p arithmetic::optimize<add>(algebraic_r x, algebraic_r y)
                 rt.undefined_operation_error();
                 return nullptr;
             }
-            return xinf ? x : y;
+            if ((xinf && y->is_algebraic_num()) ||
+                (yinf && x->is_algebraic_num()))
+                return xinf ? x : y;
         }
         if  (x->is_simplifiable() && y->is_simplifiable())
         {
@@ -401,7 +403,8 @@ algebraic_p arithmetic::optimize<subtract>(algebraic_r x, algebraic_r y)
                 rt.undefined_operation_error();
                 return nullptr;
             }
-            return xinf ? +x : rt.infinity(yinf > 0);
+            if (x->is_algebraic_num() || y->is_algebraic_num())
+              return xinf ? +x : rt.infinity(yinf > 0);
         }
         if  (x->is_simplifiable() && y->is_simplifiable())
         {
@@ -593,7 +596,8 @@ algebraic_p arithmetic::optimize<multiply>(algebraic_r x, algebraic_r y)
                 rt.undefined_operation_error();
                 return nullptr;
             }
-            return rt.infinity(x->is_negative() ^ y->is_negative());
+            if (x->is_algebraic_num() || y->is_algebraic_num())
+              return rt.infinity(x->is_negative(false) ^ y->is_negative(false));
         }
 
         if (x->is_simplifiable() && y->is_simplifiable())
@@ -787,10 +791,10 @@ algebraic_p arithmetic::optimize<divide>(algebraic_r x, algebraic_r y)
                 rt.undefined_operation_error();
                 return nullptr;
             }
-            if (yinf && x->is_real())
+            if (yinf && x->is_algebraic_num())
                 return integer::make(0);            // 1 / ∞ = 0
-            if (xinf && y->is_real())
-                return rt.infinity((xinf < 0) ^ y->is_negative());
+            if (xinf && y->is_algebraic_num())
+                return rt.infinity((xinf < 0) ^ y->is_negative(false));
         }
 
         if (x->is_simplifiable() && y->is_simplifiable())
@@ -1162,22 +1166,51 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
         return integer::make(1);
     }
 
-    int xinf = x->is_infinity();
-    int yinf = y->is_infinity();
-    if (xinf || yinf)
+    if (Settings.AutoSimplify())
     {
-        if (xinf > 0 && yinf > 0)
-            return rt.infinity(false);
-        if (xinf > 0 && y->is_real() && !y->is_zero())
-            return y->is_negative()
-                ? algebraic_p(integer::make(0))
-                : +x;
-        if (x->is_real() && !x->is_negative() && !x->is_zero() && yinf)
-            return yinf < 0
-                ? algebraic_p(integer::make(0))
-                : rt.infinity(false);
-        rt.undefined_operation_error();
-        return nullptr;
+        int xinf = x->is_infinity();
+        int yinf = y->is_infinity();
+        if (xinf || yinf)
+        {
+            if ((x->is_negative(false) && yinf) ||
+                (yinf < 0 && (xinf || x->is_zero(false))))
+            {
+                rt.undefined_operation_error();
+                return nullptr;
+            }
+            if (xinf && yinf)
+                return rt.infinity(false);
+            if (y->is_negative(false))
+                return algebraic_p(integer::make(0));
+            if (y->is_algebraic_num())
+            {
+                bool yzero = y->is_zero();
+                if (xinf > 0 && !yzero)
+                {
+                    return +x;
+                }
+                else if (y->is_integer() && !yzero)
+                {
+                    large yi = y->as_int64(0, false);
+                    return rt.infinity(yi % 2);
+                }
+                else
+                {
+                    rt.undefined_operation_error();
+                    return nullptr;
+                }
+            }
+            else if (yinf && x->is_algebraic_num())
+            {
+                if (x->is_zero())
+                {
+                    rt.undefined_operation_error();
+                    return nullptr;
+                }
+                return yinf < 0 ? algebraic_p(integer::make(0))
+                    : rt.infinity(false);
+            }
+        }
     }
 
     // Deal with X^N where N is a positive  or negative integer

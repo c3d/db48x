@@ -1,18 +1,58 @@
-#######################################
-# Target
-######################################
-TARGET = db48x
+#******************************************************************************
+# Makefile                                                        DB48X project
+#******************************************************************************
+#
+#  File Description:
+#
+#    Makefile for DB48x and all variants
+#
+#
+#
+#
+#
+#
+#
+#
+#******************************************************************************
+#  (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
+#  This software is licensed under the terms outlined in LICENSE.txt
+#******************************************************************************
+#  This file is part of DB48X.
+#
+#  DB48X is free software: you can redistribute it and/or modify
+#  it under the terms outlined in the LICENSE.txt file
+#
+#  DB48X is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#******************************************************************************
+
+# This variant uses make-it-quick
+TOP=./
+MIQ=$(TOP)recorder/make-it-quick/
+
+# Package information
+PACKAGE_NAME=db48x
+PACKAGE_VERSION=0.9.16
+PACKAGE_DESCRIPTION=A modern implementation of RPL in the spirit of the HP48
+PACKAGE_URL=http://48calc.org
+PACKAGE_VERSION:=$(shell git describe 2> /dev/null || echo "unkown-version")
+PACKAGE_BUGS=christophe@dinechin.org
+
+
+#------------------------------------------------------------------------------
+# Target configuration
+#------------------------------------------------------------------------------
+
+NAME = db48x
 PLATFORM = dmcp
 VARIANT = dm42
 SDK = dmcp/dmcp
 PGM = pgm
-PGM_TARGET = $(TARGET).$(PGM)
+PGM_NAME = $(NAME).$(PGM)
 BUILD_ID = $(shell tools/build_id)
-QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
 
-######################################
-# Building variables
-######################################
+# Optimization level
 OPT=release
 # Alternatives (on the command line)
 # OPT=debug	-g
@@ -23,14 +63,19 @@ OPT=release
 # Experimentally, O2 performs best on DM42
 # (see https://github.com/c3d/db48x/issues/66)
 
-# Warning: macOSX only
-MOUNTPOINT=/Volumes/$(VARIANT)/
-EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
-PRODUCT_NAME=$(shell echo $(TARGET) | tr "[:lower:]" "[:upper:]")
+# Product name and help file
+PRODUCT_NAME=$(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
 # For DM42n, use special case with lowercase 'n'
 PRODUCT_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42n,$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]"))
 # For DM42n, select DM42 sections but brand as DM42n
 HELP_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42,$(PRODUCT_MACHINE))
+
+#------------------------------------------------------------------------------
+# Platform / OS-specific variables
+#------------------------------------------------------------------------------
+# macOSX installation helper
+MOUNTPOINT=/Volumes/$(VARIANT)/
+EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
 
 # Android build
 ANDROID_SDK_ROOT?=/opt/homebrew/share/android-commandlinetools
@@ -41,30 +86,143 @@ ANDROID_QT_BIN?=$(ANDROID_QT)/bin
 ANDROID_DEPLOY_QT?=$(ANDROID_QT_BASE)/macos/bin/androiddeployqt
 
 
-#######################################
-# Pathes
-#######################################
+#------------------------------------------------------------------------------
+# Paths and tool locations
+#------------------------------------------------------------------------------
+
 # Build path
 BUILD = build/$(VARIANT)/$(OPT)
 
-# Path to aux build scripts (including trailing /)
-# Leave empty for scripts in PATH
+QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
+
+# Path to aux build scripts
 TOOLS = tools
 
-# CRC adjustment
+# CRC adjustment for DMCP QSPI check
 CRCFIX = $(TOOLS)/forcecrc32/forcecrc32
 
 # CRC32 computation
 CRC32 = $(TOOLS)/crc32/crc32
 
-# Decimal mantissa encoding
+# Decimal mantissa encoding (to encode hard-coded values of pi and e)
 DECIMIZE = $(TOOLS)/decimize/decimize
 
-FLASH=$(BUILD)/$(TARGET)_flash.bin
-QSPI =$(BUILD)/$(TARGET)_qspi.bin
+# Location of binary files
+FLASH=$(BUILD)/$(NAME)_flash.bin
+QSPI =$(BUILD)/$(NAME)_qspi.bin
 
+# Version embedded in the binary
 VERSION=$(shell git describe --dirty=Z --abbrev=4 | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
 VERSION_H=src/$(PLATFORM)/version.h
+
+
+#==============================================================================
+#
+#  Sources
+#
+#==============================================================================
+
+SOURCES=$(C_SOURCES) $(CXX_SOURCES)
+
+# Includes
+C_INCLUDES += -Isrc/$(VARIANT) -Isrc/$(PLATFORM) -Isrc
+
+# C sources
+C_SOURCES +=
+
+# C++ sources
+CXX_SOURCES +=				\
+	src/$(PLATFORM)/target.cc	\
+	src/$(PLATFORM)/sysmenu.cc	\
+	src/$(PLATFORM)/main.cc		\
+	fonts/EditorFont.cc		\
+	fonts/HelpFont.cc		\
+	fonts/ReducedFont.cc		\
+	fonts/StackFont.cc		\
+	src/algebraic.cc		\
+	src/arithmetic.cc		\
+	src/array.cc			\
+	src/bignum.cc			\
+	src/catalog.cc			\
+	src/characters.cc		\
+	src/command.cc			\
+	src/comment.cc		        \
+	src/compare.cc			\
+	src/complex.cc			\
+	src/conditionals.cc		\
+	src/constants.cc		\
+	src/continued-fraction.cc \
+	src/custom.cc		 	\
+	src/datetime.cc			\
+	src/decimal.cc			\
+	src/equations.cc		\
+	src/expression.cc		\
+	src/factor.cc			\
+	src/file.cc				\
+	src/files.cc			\
+	src/finance.cc			\
+	src/font.cc			\
+	src/fraction.cc			\
+	src/functions.cc		\
+	src/graphics.cc			\
+	src/grob.cc			\
+	src/hwfp.cc			\
+	src/integer.cc			\
+	src/integrate.cc		\
+	src/library.cc			\
+	src/list.cc			\
+	src/locals.cc			\
+	src/logical.cc			\
+	src/loops.cc			\
+	src/menu.cc			\
+	src/object.cc			\
+	src/plot.cc			\
+	src/polynomial.cc		\
+	src/program.cc			\
+	src/range.cc			\
+	src/renderer.cc			\
+	src/runtime.cc			\
+	src/settings.cc			\
+	src/solve.cc			\
+	src/stack.cc			\
+	src/stats.cc			\
+	src/symbol.cc			\
+	src/tag.cc			\
+	src/text.cc		        \
+	src/unit.cc			\
+	src/user_interface.cc		\
+	src/util.cc			\
+	src/variables.cc		\
+	$(PLATFORM_SOURCES)
+
+# Defined preprocessor symbols
+DEFINES +=					\
+	$(DEFINES_$(OPT))			\
+	$(DEFINES_$(VARIANT))			\
+	HELPFILE_NAME=\"/help/$(NAME).md\"	\
+	HELPINDEX_NAME=\"/help/$(NAME).idx\"
+DEFINES_debug=DEBUG
+DEFINES_release=NDEBUG
+DEFINES_small=NDEBUG
+DEFINES_fast=NDEBUG
+DEFINES_faster=NDEBUG
+DEFINES_fastes=NDEBUG
+DEFINES_dm32 = 	DM32 				\
+		LGAMMA_CRASHES			\
+		CONFIG_FIXED_BASED_OBJECTS	\
+		DEOPTIMIZE_CATALOG		\
+		MEMORY=500
+
+DEFINES_dm42n = DM42N 				\
+		LGAMMA_CRASHES			\
+		CONFIG_FIXED_BASED_OBJECTS	\
+		DEOPTIMIZE_CATALOG		\
+		MEMORY=500
+
+DEFINES_dm42 = DM42 MEMORY=100
+DEFINES_wasm = $(DEFINES_dm32) SIMULATOR WASM
+
+C_DEFS += $(DEFINES:%=-D%)
 
 
 #==============================================================================
@@ -74,21 +232,21 @@ VERSION_H=src/$(PLATFORM)/version.h
 #==============================================================================
 
 # default action: build all
-all: $(PGM_TARGET) help/$(TARGET).md help/$(TARGET).idx
+all: $(PGM_NAME) help/$(NAME).md help/$(NAME).idx
 	@echo "# Built $(VERSION), build ID is now $(BUILD_ID)"
 
 dm32:	dm32-all
 dm32-%:
-	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm32 TARGET=db50x $*
+	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm32 NAME=db50x $*
 dm42n:	dm42n-all
 dm42n-%:
-	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm42n TARGET=db50x $*
+	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm42n NAME=db50x $*
 color-%:
 	$(MAKE) COLOR=color $*
 
-sim: sim/$(TARGET).mak help/$(TARGET).idx
-	cd sim; $(MAKE) -f $(<F) TARGET=$(shell awk '/^TARGET/ { print $$3; }' sim/$(TARGET).mak)
-sim/$(TARGET).mak:	sim/$(TARGET).pro	\
+sim: sim/$(NAME).mak help/$(NAME).idx
+	cd sim; $(MAKE) -f $(<F) NAME=$(shell awk '/^NAME/ { print $$3; }' sim/$(NAME).mak)
+sim/$(NAME).mak:	sim/$(NAME).pro	\
 			sim/config.qrc		\
 			sim/state.qrc		\
 			sim/library.qrc		\
@@ -100,10 +258,10 @@ sim/$(TARGET).mak:	sim/$(TARGET).pro	\
 	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
 
 # Android build target - builds App Bundle for Google Play
-android: android/$(TARGET).aab help/$(TARGET).idx
-	@echo "# Android App Bundle built: android/$(TARGET).aab"
+android: android/$(NAME).aab help/$(NAME).idx
+	@echo "# Android App Bundle built: android/$(NAME).aab"
 
-android/$(TARGET).aab: sim/$(TARGET).pro Makefile $(VERSION_H)	\
+android/$(NAME).aab: sim/$(NAME).pro Makefile $(VERSION_H)	\
 				sim/config.qrc		\
 				sim/state.qrc		\
 				sim/library.qrc		\
@@ -112,16 +270,16 @@ android/$(TARGET).aab: sim/$(TARGET).pro Makefile $(VERSION_H)	\
 				sim/android/AndroidManifest.xml	\
 				sim/android/build.gradle	\
 				$(HOME)/.local/android_release.keystore
-	@echo "# Building Android App Bundle for $(TARGET)"
+	@echo "# Building Android App Bundle for $(NAME)"
 	@echo "# Using keystore: $(HOME)/.local/android_release.keystore"
 	cd sim && \
 		export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) && \
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) && \
 		export KEYSTORE_PATH=$(HOME)/.local/android_release.keystore && \
-		$(ANDROID_QT_BIN)/qmake -spec android-clang $(TARGET).pro && \
+		$(ANDROID_QT_BIN)/qmake -spec android-clang $(NAME).pro && \
 		$(MAKE) VARIANT=android && \
 		$(ANDROID_DEPLOY_QT) \
-			--input android-$(TARGET)-deployment-settings.json \
+			--input android-$(NAME)-deployment-settings.json \
 			--output ../android --gradle --aab \
 			--sign $(HOME)/.local/android_release.keystore db48x \
 			--storepass '$(ANDROID_KEYSTORE_PASS)'
@@ -139,12 +297,12 @@ sim/%.qrc: Makefile
 	> $@
 
 sim/help.qrc:			\
-	help/$(TARGET).md	\
-	help/$(TARGET).idx
+	help/$(NAME).md	\
+	help/$(NAME).idx
 
 
 QRC_EXT_config=*.csv *.cfg *.48k
-QRC_EXT_help=$(TARGET).md $(TARGET).idx
+QRC_EXT_help=$(NAME).md $(NAME).idx
 QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
 QRC_EXT_library=*.48[sS]
@@ -158,8 +316,8 @@ sim:	recorder/config.h	\
 	keyboard		\
 	.ALWAYS
 
-WASM_TARGET=wasm/$(TARGET).js
-wasm: emsdk $(WASM_TARGET) $(WASM_HTML)
+WASM_NAME=wasm/$(NAME).js
+wasm: emsdk $(WASM_NAME) $(WASM_HTML)
 
 emsdk: emsdk/emsdk
 	emcc --version > /dev/null || \
@@ -168,8 +326,8 @@ emsdk: emsdk/emsdk
 emsdk/emsdk:
 	git submodule update --init --recursive
 
-clangdb: sim/$(TARGET).mak .ALWAYS
-	cd sim && rm -f *.o && compiledb make -f $(TARGET).mak && mv compile_commands.json ..
+clangdb: sim/$(NAME).mak .ALWAYS
+	cd sim && rm -f *.o && compiledb make -f $(NAME).mak && mv compile_commands.json ..
 
 IMAGES=$(COLOR:%=color-)images
 cmp-% compare-%:
@@ -224,16 +382,16 @@ QMAKE_fastest=release
 
 TTF2FONT=$(TOOLS)/ttf2font/ttf2font
 $(TTF2FONT): $(TTF2FONT).cpp $(TOOLS)/ttf2font/Makefile src/ids.tbl
-	cd $(TOOLS)/ttf2font; $(MAKE) TARGET=opt
+	cd $(TOOLS)/ttf2font; $(MAKE) NAME=opt
 
 TAR_OPTS=$(TAR_OPTS_$(shell uname))
 TAR_OPTS_Darwin=--no-mac-metadata --no-fflags --no-xattrs --no-acls
-TAR_FILES=	$(TARGET).$(PGM)		\
-		$(TARGET)_qspi.bin		\
+TAR_FILES=	$(NAME).$(PGM)		\
+		$(NAME)_qspi.bin		\
 		$(TAR_FILES_$(INSTALL_PGM_ONLY))
 TAR_FILES_=	keymap.bin			\
-		help/$(TARGET).md		\
-		help/$(TARGET).idx		\
+		help/$(NAME).md		\
+		help/$(NAME).idx		\
 		help/*.bmp help/*/*.bmp		\
 		state/*.48[sSbB]		\
 		config/*.csv			\
@@ -244,14 +402,14 @@ TAR_FILES_=	keymap.bin			\
 # installation steps
 COPY=cp
 install: all
-	cp $(BUILD)/$(TARGET)_qspi.bin  .
+	cp $(BUILD)/$(NAME)_qspi.bin  .
 	tar cf - $(TAR_OPTS) $(TAR_FILES) | tar xvf - -C $(MOUNTPOINT)
 	$(EJECT)
 	@echo "# Installed $(VERSION)"
 
 dist: all
-	cp $(BUILD)/$(TARGET)_qspi.bin  .
-	tar cvfz $(TARGET)-v$(VERSION).tgz $(TAR_OPTS) $(TAR_FILES)
+	cp $(BUILD)/$(NAME)_qspi.bin  .
+	tar cvfz $(NAME)-v$(VERSION).tgz $(TAR_OPTS) $(TAR_FILES)
 	@echo "# Distributing $(VERSION)"
 
 $(VERSION_H): $(BUILD)/version-$(VERSION).h
@@ -270,7 +428,7 @@ fonts/ReducedFont.cc: $(TTF2FONT) $(BASE_FONT)
 	$(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
 fonts/HelpFont.cc: $(TTF2FONT) $(BASE_FONT)
 	$(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
-help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
+help/$(NAME).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	mkdir -p help && \
 	cat $^ | \
 	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
@@ -279,19 +437,19 @@ help/$(TARGET).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	    -e '/<!--- !KEEP_IT --->/d' \
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
 	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
-	    -e 's/db48x.md/$(TARGET).md/g' \
+	    -e 's/db48x.md/$(NAME).md/g' \
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
 	rsync -av --delete doc/img/*.bmp help/img/
 
-help/$(TARGET).idx: help/$(TARGET).md
+help/$(NAME).idx: help/$(NAME).md
 	grep -b '^#\|^\* `[^`]*`' $< 		|	\
 	sed -e 's/:\(\* `[^`]*`\).*/:\1/g'   	|	\
 	sort -k2 -t: > $@
 	[ "$$(cat $@ | wc -L)" -lt 80 ]
 
-check-ids: help/$(TARGET).md
+check-ids: help/$(NAME).md
 	@for I in $$(cpp -xc++ -D'ID(n)=n' src/ids.tbl | 		\
 		   sed -e 's/##//g' | sed -e 's/^#.*//g');		\
 	do								\
@@ -300,7 +458,7 @@ check-ids: help/$(TARGET).md
 	      echo "$$I not in menus";					\
 	  fi;								\
 	  if  ! grep -q $$I src/ignored_help.csv ; then			\
-	    grep -q "^#.*[[:<:]]$$I[[:>:]]" help/$(TARGET).md ||	\
+	    grep -q "^#.*[[:<:]]$$I[[:>:]]" help/$(NAME).md ||	\
 	      echo "$$I not in help";					\
 	  fi;								\
 	done
@@ -319,127 +477,19 @@ fastest-%:
 	$(MAKE) $* OPT=fastest
 
 
-#######################################
-# Custom section
-#######################################
+#------------------------------------------------------------------------------
+# Dependency-related rules
+#------------------------------------------------------------------------------
 
-SOURCES=$(C_SOURCES) $(CXX_SOURCES)
-
-# Includes
-C_INCLUDES += -Isrc/$(VARIANT) -Isrc/$(PLATFORM) -Isrc
-
-# C sources
-C_SOURCES +=
-
-# C++ sources
-CXX_SOURCES +=				\
-	src/$(PLATFORM)/target.cc	\
-	src/$(PLATFORM)/sysmenu.cc	\
-	src/$(PLATFORM)/main.cc		\
-	fonts/EditorFont.cc		\
-	fonts/HelpFont.cc		\
-	fonts/ReducedFont.cc		\
-	fonts/StackFont.cc		\
-	src/algebraic.cc		\
-	src/arithmetic.cc		\
-	src/array.cc			\
-	src/bignum.cc			\
-	src/catalog.cc			\
-	src/characters.cc		\
-	src/command.cc			\
-	src/comment.cc		        \
-	src/compare.cc			\
-	src/complex.cc			\
-	src/conditionals.cc		\
-	src/constants.cc		\
-	src/custom.cc		 	\
-	src/datetime.cc			\
-	src/decimal.cc			\
-	src/equations.cc		\
-	src/expression.cc		\
-	src/file.cc			\
-	src/files.cc			\
-	src/finance.cc			\
-	src/font.cc			\
-	src/fraction.cc			\
-	src/functions.cc		\
-	src/graphics.cc			\
-	src/grob.cc			\
-	src/hwfp.cc			\
-	src/integer.cc			\
-	src/integrate.cc		\
-	src/library.cc			\
-	src/list.cc			\
-	src/locals.cc			\
-	src/logical.cc			\
-	src/loops.cc			\
-	src/menu.cc			\
-	src/object.cc			\
-	src/plot.cc			\
-	src/polynomial.cc		\
-	src/program.cc			\
-	src/range.cc			\
-	src/renderer.cc			\
-	src/runtime.cc			\
-	src/settings.cc			\
-	src/solve.cc			\
-	src/stack.cc			\
-	src/stats.cc			\
-	src/symbol.cc			\
-	src/tag.cc			\
-	src/text.cc		        \
-	src/unit.cc			\
-	src/user_interface.cc		\
-	src/util.cc			\
-	src/variables.cc		\
-	$(PLATFORM_SOURCES)
-
-# ASM sources
-#ASM_SOURCES += src/xxx.s
-
-# Additional defines
-#C_DEFS += -DXXX
-
-# Defines for the code
-DEFINES +=					\
-	$(DEFINES_$(OPT))			\
-	$(DEFINES_$(VARIANT))			\
-	HELPFILE_NAME=\"/help/$(TARGET).md\"	\
-	HELPINDEX_NAME=\"/help/$(TARGET).idx\"
-DEFINES_debug=DEBUG
-DEFINES_release=NDEBUG
-DEFINES_small=NDEBUG
-DEFINES_fast=NDEBUG
-DEFINES_faster=NDEBUG
-DEFINES_fastes=NDEBUG
-DEFINES_dm32 = 	DM32 				\
-		LGAMMA_CRASHES			\
-		CONFIG_FIXED_BASED_OBJECTS	\
-		DEOPTIMIZE_CATALOG		\
-		MEMORY=500
-
-DEFINES_dm42n = DM42N 				\
-		LGAMMA_CRASHES			\
-		CONFIG_FIXED_BASED_OBJECTS	\
-		DEOPTIMIZE_CATALOG		\
-		MEMORY=500
-
-DEFINES_dm42 = DM42 MEMORY=100
-DEFINES_wasm = $(DEFINES_dm32) SIMULATOR WASM
-
-C_DEFS += $(DEFINES:%=-D%)
-
-# Recorder and dependencies
+# Recorder
 recorder/config.h: recorder/recorder.h recorder/Makefile
 	cd recorder && $(MAKE) TARGET=opt
 $(BUILD)/recorder.o $(BUILD)/recorder_ring.o: recorder/config.h
 
-# ---
 
-
-#######################################
-# binaries
-#######################################
+#------------------------------------------------------------------------------
+#  Compiler flags
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 ifeq ($(VARIANT),wasm)
@@ -475,7 +525,7 @@ CXX_LIST_FLAGS = -Wa,-a,-ad,-alms=$(BUILD)/$(notdir $(<:.cc=.lst))
 ASM_SOURCES = $(SDK)/startup_pgm.s
 LINK_OPTS=					\
     -specs=nano.specs -u _printf_float -specs=nosys.specs	\
-	-Wl,-Map=$(BUILD)/$(TARGET).map,--cref	\
+	-Wl,-Map=$(BUILD)/$(NAME).map,--cref	\
 	-Wl,--gc-sections			\
 	-Wl,--wrap=_malloc_r
 
@@ -487,9 +537,8 @@ C_SOURCES += $(SDK)/sys/pgm_syscalls.c
 endif
 #------------------------------------------------------------------------------
 
-#######################################
+
 # CFLAGS
-#######################################
 # macros for gcc
 AS_DEFS =
 C_DEFS += -D__weak="__attribute__((weak))" -D__packed="__attribute__((__packed__))"
@@ -518,18 +567,14 @@ LDFLAGS += $(DBGFLAGS)
 # Generate dependency information
 CFLAGS += -MD -MP -MF .dep/$(@F).d
 
-#######################################
 # LDFLAGS
-#######################################
 # link script
 LDSCRIPT = src/$(VARIANT)/stm32_program.ld
 LIBDIR =
 LDFLAGS += $(CPUFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) $(LINK_OPTS)
 
 
-#######################################
 # build the application
-#######################################
 # list of objects
 OBJECTS = $(addprefix $(BUILD)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
@@ -556,28 +601,28 @@ $(BUILD)/%.o: %.s Makefile | $(BUILD)/.exists
 
 ifeq ($(VARIANT),wasm)
 
-$(WASM_TARGET): $(OBJECTS) Makefile
+$(WASM_NAME): $(OBJECTS) Makefile
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 
 else
 
-$(WASM_TARGET): $(SOURCES) Makefile
+$(WASM_NAME): $(SOURCES) Makefile
 	(. emsdk/emsdk_env.sh && \
-	 make VARIANT=wasm PGM=js PGM_TARGET=wasm/$(TARGET).js SDK=sim )
+	 make VARIANT=wasm PGM=js PGM_NAME=wasm/$(NAME).js SDK=sim )
 
-$(BUILD)/$(TARGET).elf: $(OBJECTS) Makefile
+$(BUILD)/$(NAME).elf: $(OBJECTS) Makefile
 	@tools/build_id -u
 	@echo Build ID $(BUILD_ID)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ \
 		-DBUILD_ID=$(BUILD_ID) src/dmcp/qspi_check.c
-$(TARGET).$(PGM): $(BUILD)/$(TARGET).elf Makefile $(CRCFIX) $(CRC32)
+$(NAME).$(PGM): $(BUILD)/$(NAME).elf Makefile $(CRCFIX) $(CRC32)
 	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
 	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)
 	$(OBJCOPY) --only-section   .qspi -O binary  $<  $(QSPI)
 	$(OBJCOPY) --only-section   .qspi -O ihex    $<  $(QSPI:.bin=.hex)
 	$(TOOLS)/adjust_crc $(CRCFIX) $(QSPI)
-	$(TOOLS)/check_qspi_crc $(TARGET) $(BUILD)/$(TARGET)_qspi.bin src/$(VARIANT)/qspi_crc.h || ( rm -rf build/$(VARIANT) && exit 1)
-	$(TOOLS)/add_pgm_chsum $(BUILD)/$(TARGET)_flash.bin $@
+	$(TOOLS)/check_qspi_crc $(NAME) $(BUILD)/$(NAME)_qspi.bin src/$(VARIANT)/qspi_crc.h || ( rm -rf build/$(VARIANT) && exit 1)
+	$(TOOLS)/add_pgm_chsum $(BUILD)/$(NAME)_flash.bin $@
 	$(SIZE) $<
 	wc -c $@
 
@@ -604,23 +649,24 @@ $(BUILD)/.exists:
 
 
 $(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
-	cd $(dir $(CRCFIX)) && unset TARGET && $(MAKE) TARGET=opt
+	cd $(dir $(CRCFIX)) && unset NAME && $(MAKE) NAME=opt
 $(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
-	cd $(dir $(CRC32)) && unset TARGET && $(MAKE) TARGET=opt
+	cd $(dir $(CRC32)) && unset NAME && $(MAKE) NAME=opt
 $(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
-	cd $(dir $(DECIMIZE)) && unset TARGET && $(MAKE) TARGET=opt
+	cd $(dir $(DECIMIZE)) && unset NAME && $(MAKE) NAME=opt
 
 
-#######################################
-# clean up
-#######################################
+#------------------------------------------------------------------------------
+# Clean up
+#------------------------------------------------------------------------------
 clean:
 	-rm -fR .dep build sim/*.o sim/*/*.o
 
 
-#######################################
-# dependencies
-#######################################
+#------------------------------------------------------------------------------
+# Dependencies
+#------------------------------------------------------------------------------
+
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
 .PHONY: clean all

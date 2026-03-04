@@ -108,6 +108,7 @@ TESTS(fformat,          "Fraction display formats");
 TESTS(dformat,          "Decimal display formats");
 TESTS(ifunctions,       "Integer functions");
 TESTS(dfunctions,       "Decimal functions");
+TESTS(dfc,              "Continued fraction")
 TESTS(float,            "Hardware-accelerated 7-digit (float)")
 TESTS(double,           "Hardware-accelerated 16-digit (double)")
 TESTS(highp,            "High-precision computations (60 digits)")
@@ -164,6 +165,7 @@ TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
 TESTS(quorem,           "Quotient and remainder");
+TESTS(primes,           "Prime number tests");
 TESTS(expr,             "Operations on expressions");
 TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
@@ -228,6 +230,7 @@ void tests::run(uint onlyCurrent)
         decimal_display_formats();
         integer_numerical_functions();
         decimal_numerical_functions();
+        cfraction();
         float_numerical_functions();
         double_numerical_functions();
         high_precision_numerical_functions();
@@ -284,6 +287,7 @@ void tests::run(uint onlyCurrent)
         sum_and_product();
         polynomials();
         quotient_and_remainder();
+        prime_number_tests();
         expression_operations();
         random_number_generation();
         object_structure();
@@ -1898,6 +1902,9 @@ void tests::arithmetic()
         .test(CLEAR,
               "ZeroPowerZeroIsOne", ENTER,
               "0 0 ^", ENTER).noerror().expect("1");
+    step("Check that power is right associative")
+        .test(CLEAR, "'3^3^3'", ENTER, ID_ToDecimal)
+        .expect("7 625 597 484 987");
 
     step("xroot");
     test(CLEAR, "8 3 xroot", ENTER).expect("2.");
@@ -4352,6 +4359,143 @@ void tests::fraction_decimal_conversions()
         .test(CLEAR, "SmallFractions MixedFractions", ENTER).noerror();
 }
 
+void tests::cfraction()
+// ----------------------------------------------------------------------------
+//   Tests for DFC (Décomposition en Fraction Continue)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(dfc);
+
+    // Integers: DFC(n) = { n }
+    step("DFC(0) = { 0 }")
+        .test(CLEAR, "0", ENTER, ID_DFC).expect("{ 0 }");
+    step("DFC(1) = { 1 }")
+        .test(CLEAR, "1", ENTER, ID_DFC).expect("{ 1 }");
+    step("DFC(5) = { 5 }")
+        .test(CLEAR, "5", ENTER, ID_DFC).expect("{ 5 }");
+    step("DFC(-3) = { -3 }")
+        .test(CLEAR, "-3", ENTER, ID_DFC).expect("{ -3 }");
+
+    // Inverse: DFC2F(DFC(n)) = n  (exact round-trip for integers)
+    step("DFC2F(DFC(0)) = 0")
+        .test(CLEAR, "0 DFC DFC2F", ENTER).expect("0");
+    step("DFC2F(DFC(1)) = 1")
+        .test(CLEAR, "1 DFC DFC2F", ENTER).expect("1");
+    step("DFC2F(DFC(5)) = 5")
+        .test(CLEAR, "5 DFC DFC2F", ENTER).expect("5");
+    step("DFC2F(DFC(-3)) = -3")
+        .test(CLEAR, "-3 DFC DFC2F", ENTER).expect("-3");
+
+    // Rationals: exact continued fraction expansion
+    // 1/2 = [0; 2]
+    step("DFC(1/2) = { 0 2 }")
+        .test(CLEAR, "1/2", ENTER, ID_DFC).expect("{ 0 2 }");
+    // 3/7 = [0; 2, 3]
+    step("DFC(3/7) = { 0 2 3 }")
+        .test(CLEAR, "3/7", ENTER, ID_DFC).expect("{ 0 2 3 }");
+    // 7/5 = [1; 2, 2]
+    step("DFC(7/5) = { 1 2 2 }")
+        .test(CLEAR, "7/5", ENTER, ID_DFC).expect("{ 1 2 2 }");
+    // 22/7 = [3; 7]
+    step("DFC(22/7) = { 3 7 }")
+        .test(CLEAR, "22/7", ENTER, ID_DFC).expect("{ 3 7 }");
+    // 355/113 = [3; 7, 16]
+    step("DFC(355/113) = { 3 7 16 }")
+        .test(CLEAR, "355/113", ENTER, ID_DFC).expect("{ 3 7 16 }");
+    // -5/3 = [-2; 3]  (floor(-5/3) = -2, residual = 1/3)
+    step("DFC(-5/3) = { -2 3 }")
+        .test(CLEAR, "-5/3", ENTER, ID_DFC).expect("{ -2 3 }");
+
+    // Inverse: DFC2F(DFC(p/q)) = p/q (exact round-trip, tested via subtraction)
+    step("DFC2F(DFC(1/2)) = 1/2")
+        .test(CLEAR, "1/2 DFC DFC2F 1/2 -", ENTER).expect("0");
+    step("DFC2F(DFC(3/7)) = 3/7")
+        .test(CLEAR, "3/7 DFC DFC2F 3/7 -", ENTER).expect("0");
+    step("DFC2F(DFC(7/5)) = 7/5")
+        .test(CLEAR, "7/5 DFC DFC2F 7/5 -", ENTER).expect("0");
+    step("DFC2F(DFC(22/7)) = 22/7")
+        .test(CLEAR, "22/7 DFC DFC2F 22/7 -", ENTER).expect("0");
+    step("DFC2F(DFC(355/113)) = 355/113")
+        .test(CLEAR, "355/113 DFC DFC2F 355/113 -", ENTER).expect("0");
+    step("DFC2F(DFC(-5/3)) = -5/3")
+        .test(CLEAR, "-5/3 DFC DFC2F -5/3 -", ENTER).expect("0");
+
+    // DFC2F on a hand-crafted list: { 3 7 } = 22/7
+    step("DFC2F({ 3 7 }) = 22/7")
+        .test(CLEAR, "{ 3 7 } DFC2F 22/7 -", ENTER).expect("0");
+    step("DFC2F({ 3 7 16 }) = 355/113")
+        .test(CLEAR, "{ 3 7 16 } DFC2F 355/113 -", ENTER).expect("0");
+
+    // Inverse: DFC2F(DFC(x)) ≈ x for algebraic irrationals.
+    // ToDecimal converts the DFC2F fraction result to decimal before comparison:
+    // without it, "fraction - decimal" may overflow 64-bit integer denominators.
+    // The tolerance adapts to the current precision: with threshold ≈ 10^(Prec/2),
+    // the convergent error is ≈ 10^(-Prec), so 10^(2-Prec) gives safe margin.
+    // In RPL: "10 2 Precision - ^" computes 10^(2-Precision).
+    step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2")
+        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(sqrt 3)) ≈ sqrt 3")
+        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(phi)) ≈ phi")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+
+    // Inverse: DFC2F(DFC(x)) ≈ x for transcendentals
+    // ToDecimal forces numeric evaluation so "fraction - pi" doesn't stay symbolic
+    step("DFC2F(DFC(pi)) ≈ pi")
+        .test(CLEAR, "pi DFC DFC2F pi ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(e)) ≈ e")
+        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+
+    // List length and last-coefficient quality checks.
+    // The stopping criterion cuts the list just before the decimal's precision
+    // boundary: all coefficients must be "safe" (equal to the true CF value),
+    // with no garbage at the end.
+    //
+    // We check that the last N elements of the list equal a reference list.
+    // RPL program: « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == »
+    // takes (list, ref) and returns True if last SIZE(ref) elements match ref.
+    // This catches accidental passes from a single garbage element that happens
+    // to equal the expected value.
+    //
+    // sqrt(2) = [1; 2, 2, 2, ...]: last 7 coefficients must all be 2.
+    step("DFC(sqrt 2) last 7 coefficients are 2")
+        .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    // phi = [1; 1, 1, 1, ...]: last 7 coefficients must all be 1.
+    step("DFC(phi) last 7 coefficients are 1")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+
+    // Repeat key tests at precision 100 to verify the stopping criterion scales.
+    // With threshold ≈ 10^50 instead of 10^11, we get many more coefficients,
+    // yet the last coefficient must still be "safe" (equal to the true CF value)
+    // and the round-trip error must be ≈ 10^(-100) < 10^(2-100) = 10^(-98).
+    step("Set precision to 100 for high-precision DFC tests")
+        .test(CLEAR, "100 Precision", ENTER).noerror();
+    step("DFC2F(DFC(sqrt 2)) ≈ sqrt 2 at precision 100")
+        .test(CLEAR, "2 sqrt DFC DFC2F ToDecimal 2 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(sqrt 3)) ≈ sqrt 3 at precision 100")
+        .test(CLEAR, "3 sqrt DFC DFC2F ToDecimal 3 sqrt - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(phi)) ≈ phi at precision 100")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC DFC2F ToDecimal 1 5 sqrt + 2 / - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(e)) ≈ e at precision 100")
+        .test(CLEAR, "EulerianNumber DFC DFC2F ToDecimal EulerianNumber ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC2F(DFC(pi)) ≈ pi at precision 100")
+        .test(CLEAR, "pi DFC DFC2F ToDecimal pi ToDecimal - ABS 10 3 'Precision' RCL - ^ <", ENTER).expect("True");
+    step("DFC(sqrt 2) last 7 coefficients are 2 at precision 100")
+        .test(CLEAR, "2 sqrt DFC { 2 2 2 2 2 2 2 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    step("DFC(phi) last 7 coefficients are 1 at precision 100")
+        .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
+              " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
+              ENTER).expect("True");
+    step("Restore default precision")
+        .test(CLEAR, "24 Precision", ENTER).noerror();
+}
+
 
 void tests::trig_units()
 // ----------------------------------------------------------------------------
@@ -5100,6 +5244,85 @@ void tests::complex_functions()
     step("Exponential");
     test(ID_exp)
         .expect("18.43908 89145 85774 62∡0.86217 00546 67226 34884ʳ");
+
+    step("Complex ln1p (zero)");
+    test(CLEAR, "0+0ⅈ ln1p", ENTER)
+        .expect("0.+0.ⅈ");
+
+    step("Complex ln1p (real axis)");
+    test(CLEAR, "1+0ⅈ ln1p", ENTER)
+        .expect("0.69314 71805 59945 30942+0.ⅈ");  // ln(2)
+
+    step("Complex ln1p (purely imaginary)");
+    test(CLEAR, "0+3.14159265358979323846ⅈ ln1p", ENTER)
+        .expect("1.19298 51534 13410 0491+1.26262 72556 78911 6834ⅈ");
+
+    step("Complex ln1p (small imaginary)");
+    test(CLEAR, "0+0.001ⅈ ln1p", ENTER)
+        .expect("0.00000 04999 99750 00017+0.00099 99996 66666 86667ⅈ");
+
+    step("Complex ln1p (small mixed)");
+    test(CLEAR, "0.001+0.001ⅈ ln1p", ENTER)
+        .expect("0.00099 99993 34332 53333+0.00099 90006 66665 868ⅈ");
+
+    step("Complex ln1p (very small)");
+    test(CLEAR, "1E-10+1E-10ⅈ ln1p", ENTER)
+        .expect("9.99999 99999 99999 9999⁳⁻¹¹+9.99999 99990 00000 0001⁳⁻¹¹ⅈ");
+
+    step("Complex ln1p (negative real)");
+    test(CLEAR, "-0.5+0.5ⅈ ln1p", ENTER)
+        .expect("-0.34657 35902 79972 65471+0.78539 81633 97448 30962ⅈ");
+
+    step("Complex ln1p (high precision)");
+    test(CLEAR, "200 PRECISION 100 SIG 1E-40+1E-40ⅈ ln1p", ENTER)
+        .match("9\\.99999.*3333⁳⁻⁴¹\\+9\\.99999.*6667⁳⁻⁴¹ⅈ");
+
+    step("Complex ln1p/expm1 identity");
+    test(CLEAR, "24 PRECISION 12 SIG 0.3+0.4ⅈ expm1 ln1p", ENTER)
+        .expect("0.3+0.4ⅈ");
+    test(CLEAR, "34 PRECISION 20 SIG", ENTER).noerror();
+
+    step("Complex exponential minus 1 (zero)");
+    test(CLEAR, "0+0ⅈ expm1", ENTER)
+        .expect("0.+0ⅈ");  // expm1(0) = e^0 - 1 = 0
+
+    step("Complex expm1 real axis (full precision)")
+        .test(CLEAR, "1+0ⅈ expm1", ENTER)
+        .expect("1.71828 18284 59045 2354+0ⅈ");
+
+    step("Complex expm1 purely imaginary pi")
+        .test(CLEAR, "0+3.14159265358979323846ⅈ expm1", ENTER)
+        .expect("-2.+2.64338 32795 02884 2017⁳⁻²¹ⅈ");
+
+    step("Complex expm1 purely imaginary small")
+        .test(CLEAR, "0+0.001ⅈ expm1", ENTER)
+        .expect("-0.00000 04999 99958 33333+0.00099 99998 33333 34167ⅈ");
+
+    step("Complex expm1 small value (precision)")
+        .test(CLEAR, "0.001+0.001ⅈ expm1", ENTER)
+        .expect("0.00099 99996 66499 96667+0.00100 10003 33333 29999ⅈ");
+
+    step("Complex expm1 very small value")
+        .test(CLEAR, "1E-10+1E-10ⅈ expm1", ENTER)
+        .expect("1.⁳⁻¹⁰+1.00000 00001⁳⁻¹⁰ⅈ");
+
+    step("Complex expm1 negative real")
+        .test(CLEAR, "-20+0.5ⅈ expm1", ENTER)
+        .expect("-0.99999 99981 91167 52357+9.88169 68558 36096 6132⁳⁻¹⁰ⅈ");
+
+    step("Complex expm1 high precision")
+        .test(CLEAR, "200 PRECISION 100 SIG", ENTER,
+              "1E-40+1E-40ⅈ expm1", ENTER)
+        .expect("9.99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99999 99996 66666 66666 66666 6667⁳⁻⁴¹+1.00000 00000 00000 00000 00000 00000 00000 00001 00000 00000 00000 00000 00000 00000 00000 00000 33333 33333 33333 3333⁳⁻⁴⁰ⅈ");
+
+    step("Complex expm1 restore precision")
+        .test(CLEAR, "34 PRECISION 20 SIG", ENTER).noerror();
+
+    step("Complex expm1 halving identity")
+        .test(CLEAR,
+              "0.3+0.7ⅈ DUP expm1 SWAP 2 / expm1 DUP 2 + * -",
+              ENTER)
+        .expect("-1.19⁳⁻³⁴+7.7⁳⁻³⁵ⅈ");
 
     step("Power");
     test(CLEAR, "3+7ⅈ", ENTER, "2-3ⅈ", ID_pow)
@@ -8762,6 +8985,32 @@ void tests::symbolic_operations()
     step("Isolate cbrt")
         .test(CLEAR, "'A=cbrt X' X", NOSHIFT, F3)
         .expect("'X=A³'");
+
+    step("TrigSin: cos(X)^2 replaced by 1-sin(X)^2");
+    test(CLEAR, "'cos(X)^2' TrigSin", ENTER)
+        .expect("'1-(sin X)²'");
+    step("TrigSin: sq(cos(X)) replaced by 1-sq(sin(X))");
+    test(CLEAR, "'sq(cos(X))' TrigSin", ENTER)
+        .expect("'1-(sin X)²'");
+    step("TrigSin: nested argument");
+    test(CLEAR, "'cos(A+B)^2' TrigSin", ENTER)
+        .expect("'1-(sin(A+B))²'");
+    step("TrigSin: non-expression passthrough");
+    test(CLEAR, "42 TrigSin", ENTER)
+        .expect("42");
+
+    step("TrigSin: cos² inside arithmetic expression");
+    test(CLEAR, "'3*cos(X)^2+1' TrigSin", ENTER)
+        .expect("'3·(1-(sin X)²)+1'");
+    step("TrigSin: multiple cos² terms both replaced");
+    test(CLEAR, "'cos(X)^2+cos(Y)^2' TrigSin", ENTER)
+        .expect("'1-(sin X)²+(1-(sin Y)²)'");
+    step("TrigSin: cos³ does not match cos² rule");
+    test(CLEAR, "'cos(X)^3' TrigSin", ENTER)
+        .expect("'cos X↑3'");
+    step("TrigSin: cos without square passes through");
+    test(CLEAR, "'cos(X)+1' TrigSin", ENTER)
+        .expect("'cos X+1'");
 }
 
 
@@ -10499,6 +10748,49 @@ void tests::infinity_and_undefined()
         .test(CLEAR, "1/3 0", ENTER, ID_divide)
         .error("Divide by zero");
 
+
+    step("Infinity with complex add")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_add)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_add)
+        .expect("∞");
+    step("Infinity with complex sub")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_subtract)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_subtract)
+        .expect("−∞");
+    step("Infinity with complex multiply")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_multiply)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_multiply)
+        .expect("∞");
+    step("Infinity with complex divide")
+        .test(CLEAR, "Ⓒ∞ 2+3ⅈ", ENTER, ID_divide)
+        .expect("∞")
+        .test(CLEAR, "2+3ⅈ Ⓒ∞ ", ENTER, ID_divide)
+        .expect("0");
+
+    step("Infinity with arithmetic add")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_add)
+        .expect("'∞+(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_add)
+        .expect("'12+43+∞'");
+    step("Infinity with arithmetic sub")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_subtract)
+        .expect("'∞-(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_subtract)
+        .expect("'12+43-∞'");
+    step("Infinity with arithmetic multiply")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_multiply)
+        .expect("'∞·(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_multiply)
+        .expect("'(12+43)·∞'");
+    step("Infinity with arithmetic divide")
+        .test(CLEAR, "Ⓒ∞ '12+43'", ENTER, ID_divide)
+        .expect("'∞÷(12+43)'")
+        .test(CLEAR, "'12+43' Ⓒ∞ ", ENTER, ID_divide)
+        .expect("'(12+43)÷∞'");
+
     test(CLEAR);
 }
 
@@ -11090,9 +11382,9 @@ void tests::constants_menu()
         .test(CLEAR, DIRECT("0 −∞ /"), ENTER).expect("0");
     step("Power infinities")
         .test(CLEAR, DIRECT("∞ 42 ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).expect("∞")
         .test(CLEAR, DIRECT("∞ -42 ^"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).expect("0")
         .test(CLEAR, DIRECT("42 ∞ ^"), ENTER).expect("∞")
         .test(CLEAR, DIRECT("42 −∞ ^"), ENTER).expect("0")
         .test(CLEAR, DIRECT("-42 ∞ ^"), ENTER).error("Undefined operation")
@@ -12248,6 +12540,392 @@ void tests::quotient_and_remainder()
         .expect("R:0")
         .test(BSP)
         .expect("Q:X↑2+X+1");
+}
+
+
+void tests::prime_number_tests()
+// ----------------------------------------------------------------------------
+//   Tests for IsPrime, Factors, NextPrime, PreviousPrime
+// ----------------------------------------------------------------------------
+{
+    BEGIN(primes);
+
+    // -------------------------------------------------------------------------
+    // IsPrime — small primes (trial-division path)
+    // -------------------------------------------------------------------------
+    step("IsPrime: 2 is prime")
+        .test(CLEAR, "2", ENTER, ID_IsPrime).expect("True");
+    step("IsPrime: 3 is prime")
+        .test(CLEAR, "3", ENTER, ID_IsPrime).expect("True");
+    step("IsPrime: 7919 is prime (1000th prime)")
+        .test(CLEAR, "7919", ENTER, ID_IsPrime).expect("True");
+
+    // -------------------------------------------------------------------------
+    // IsPrime — composite numbers (must return 0)
+    // -------------------------------------------------------------------------
+    step("IsPrime: 1 is not prime")
+        .test(CLEAR, "1", ENTER, ID_IsPrime).expect("False");
+    step("IsPrime: 4 is not prime")
+        .test(CLEAR, "4", ENTER, ID_IsPrime).expect("False");
+    // 561 = 3 × 11 × 17 — smallest Carmichael number
+    step("IsPrime: 561 (Carmichael) is not prime")
+        .test(CLEAR, "561", ENTER, ID_IsPrime).expect("False");
+    // 1729 = 7 × 13 × 19 — Hardy-Ramanujan, second Carmichael number
+    step("IsPrime: 1729 (Carmichael) is not prime")
+        .test(CLEAR, "1729", ENTER, ID_IsPrime).expect("False");
+    // 2^31 + 1 = 2 147 483 649 = 3 × 715 827 883
+    step("IsPrime: 2^31+1 = 2 147 483 649 is not prime")
+        .test(CLEAR, "2147483649", ENTER, ID_IsPrime).expect("False");
+    // 2^128 - 1  (39 digits, composite: 3 × 5 × 17 × 257 × … )
+    step("IsPrime: 2^128-1 (39 digits) is not prime")
+        .test(CLEAR, "340282366920938463463374607431768211455",
+              ENTER, ID_IsPrime)
+        .expect("False");
+    // M61 × M89  (~46 digits, product of two large primes)
+    step("IsPrime: M61 × M89 is not prime")
+        .test(CLEAR,
+              "2305843009213693951", ENTER,
+              "618970019642690137449562111", ENTER,
+              MUL, ID_IsPrime)
+        .expect("False");
+
+    // -------------------------------------------------------------------------
+    // NextPrime
+    // -------------------------------------------------------------------------
+    step("NextPrime(1) = 2")
+        .test(CLEAR, "1", ENTER, ID_NextPrime).expect("2");
+    step("NextPrime(2) = 3")
+        .test(CLEAR, "2", ENTER, ID_NextPrime).expect("3");
+    step("NextPrime(10) = 11")
+        .test(CLEAR, "10", ENTER, ID_NextPrime).expect("11");
+
+    step("NextPrime(M31-1) = M31")
+        .test(CLEAR, "2147483646", ENTER, ID_NextPrime)
+        .expect("2 147 483 647");
+
+    // -------------------------------------------------------------------------
+    // PreviousPrime
+    // -------------------------------------------------------------------------
+    step("PreviousPrime(3) = 2")
+        .test(CLEAR, "3", ENTER, ID_PreviousPrime).expect("2");
+    step("PreviousPrime(12) = 11")
+        .test(CLEAR, "12", ENTER, ID_PreviousPrime).expect("11");
+    step("PreviousPrime(M31+1) = M31")
+        .test(CLEAR, "2147483648", ENTER, ID_PreviousPrime)
+        .expect("2 147 483 647");
+    step("PreviousPrime(2) gives error (no prime < 2)")
+        .test(CLEAR, "2", ENTER, ID_PreviousPrime)
+        .error("Bad argument value");
+
+    // -------------------------------------------------------------------------
+    // Factors
+    // -------------------------------------------------------------------------
+    step("Factors(12) = { 2 2 3 1 }")
+        .test(CLEAR, "12", ENTER, ID_Factors)
+        .expect("{ 2 2 3 1 }");
+    step("Factors(100) = { 2 2 5 2 }")
+        .test(CLEAR, "100", ENTER, ID_Factors)
+        .expect("{ 2 2 5 2 }");
+    step("Factors(M31) = { M31 1 }  (large prime)")
+        .test(CLEAR, "2147483647", ENTER, ID_Factors)
+        .expect("{ 2 147 483 647 1 }");
+
+    // -------------------------------------------------------------------------
+    // Factors — large number (31 digits: 9973 × M89)
+    // -------------------------------------------------------------------------
+    // 9973 is the 1229th prime (trial division); M89 is a 27-digit Mersenne prime.
+    // Their product has 31 digits, which forces the bignum path throughout.
+    step("Factors(9973 * M89) = { 9973 1 M89 1 }  (31-digit semiprime)")
+        .test(CLEAR,
+              "9973", ENTER,
+              "618970019642690137449562111", ENTER,
+              MUL, ID_Factors)
+        .expect("{ 9 973 1 618 970 019 642 690 137 449 562 111 1 }", 10000);
+
+    // Verify both prime factors are actually prime.
+    // The list { 9973 1 M89 1 } has primes at indices 1 and 3.
+    step("Both prime factors of 9973*M89 are prime")
+        .test("→ lst "
+              "« lst 1 GET IsPrime lst 3 GET IsPrime AND »",
+              ENTER)
+        .expect("True", 10000);
+
+    // =========================================================================
+    // Mersenne numbers M_p = 2^p - 1, for prime p from 2 to 127
+    // =========================================================================
+    // For prime M_p  : IsPrime → True, Factors → { M_p 1 }, reconstruction OK
+    // For composite  : IsPrime → False, Factors → list with ∏pᵢ^eᵢ = M_p,
+    //                  all pᵢ prime (verified generically without knowing
+    //                  the factorization in advance)
+    //
+    // Mersenne primes in this range (OEIS A000043):
+    //   p = 2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127
+    //
+    // Factors tests: check exact known factorization { p1 1 p2 1 ... }
+    // (Mersenne numbers are squarefree; factorizations from Cunningham tables)
+
+    // M2 = 3  (prime)
+    step("IsPrime: M2=3 is prime")
+        .test(CLEAR, "3", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M2=3) = { 3 1 }")
+        .test(CLEAR, "3", ENTER, ID_Factors)
+        .expect("{ 3 1 }");
+
+    // M3 = 7  (prime)
+    step("IsPrime: M3=7 is prime")
+        .test(CLEAR, "7", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M3=7) = { 7 1 }")
+        .test(CLEAR, "7", ENTER, ID_Factors)
+        .expect("{ 7 1 }");
+
+    // M5 = 31  (prime)
+    step("IsPrime: M5=31 is prime")
+        .test(CLEAR, "31", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M5=31) = { 31 1 }")
+        .test(CLEAR, "31", ENTER, ID_Factors)
+        .expect("{ 31 1 }");
+
+    // M7 = 127  (prime)
+    step("IsPrime: M7=127 is prime")
+        .test(CLEAR, "127", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M7=127) = { 127 1 }")
+        .test(CLEAR, "127", ENTER, ID_Factors)
+        .expect("{ 127 1 }");
+
+    // M11 = 2047 = 23 × 89  (composite)
+    step("IsPrime: M11=2047 is not prime")
+        .test(CLEAR, "2047", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M11=2047) = { 23 1 89 1 }")
+        .test(CLEAR, "2047", ENTER, ID_Factors)
+        .expect("{ 23 1 89 1 }");
+
+    // M13 = 8191  (prime)
+    step("IsPrime: M13=8191 is prime")
+        .test(CLEAR, "8191", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M13=8191) = { 8191 1 }")
+        .test(CLEAR, "8191", ENTER, ID_Factors)
+        .expect("{ 8 191 1 }");
+
+    // M17 = 131071  (prime)
+    step("IsPrime: M17=131071 is prime")
+        .test(CLEAR, "131071", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M17=131071) = { 131071 1 }")
+        .test(CLEAR, "131071", ENTER, ID_Factors)
+        .expect("{ 131 071 1 }");
+
+    // M19 = 524287  (prime)
+    step("IsPrime: M19=524287 is prime")
+        .test(CLEAR, "524287", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M19=524287) = { 524287 1 }")
+        .test(CLEAR, "524287", ENTER, ID_Factors)
+        .expect("{ 524 287 1 }");
+
+    // M23 = 8388607 = 47 × 178481  (composite)
+    step("IsPrime: M23=8388607 is not prime")
+        .test(CLEAR, "8388607", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M23=8388607) = { 47 1 178481 1 }")
+        .test(CLEAR, "8388607", ENTER, ID_Factors)
+        .expect("{ 47 1 178 481 1 }");
+
+    // M29 = 536870911 = 233 × 1103 × 2089  (composite)
+    step("IsPrime: M29=536870911 is not prime")
+        .test(CLEAR, "536870911", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M29=536870911) = { 233 1 1103 1 2089 1 }")
+        .test(CLEAR, "536870911", ENTER, ID_Factors)
+        .expect("{ 233 1 1 103 1 2 089 1 }");
+
+    // M31 = 2147483647  (prime)
+    step("IsPrime: M31=2147483647 is prime")
+        .test(CLEAR, "2147483647", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M31=2147483647) = { 2147483647 1 }")
+        .test(CLEAR, "2147483647", ENTER, ID_Factors)
+        .expect("{ 2 147 483 647 1 }");
+
+    // M37 = 137438953471 = 223 × 616318177  (composite)
+    step("IsPrime: M37=137438953471 is not prime")
+        .test(CLEAR, "137438953471", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M37=137438953471) = { 223 1 616318177 1 }")
+        .test(CLEAR, "137438953471", ENTER, ID_Factors)
+        .expect("{ 223 1 616 318 177 1 }");
+
+    // M41 = 2199023255551 = 13367 × 164511353  (composite; 13367 > table)
+    step("IsPrime: M41=2199023255551 is not prime")
+        .test(CLEAR, "2199023255551", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M41=2199023255551) = { 13367 1 164511353 1 }")
+        .test(CLEAR, "2199023255551", ENTER, ID_Factors)
+
+        .expect("{ 13 367 1 164 511 353 1 }", 5000);
+
+    // M43 = 8796093022207 = 431 × 9719 × 2099863  (composite)
+    step("IsPrime: M43=8796093022207 is not prime")
+        .test(CLEAR, "8796093022207", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M43=8796093022207) = { 431 1 9719 1 2099863 1 }")
+        .test(CLEAR, "8796093022207", ENTER, ID_Factors)
+        .expect("{ 431 1 9 719 1 2 099 863 1 }");
+
+    // M47 = 140737488355327 = 2351 × 4513 × 13264529  (composite)
+    step("IsPrime: M47=140737488355327 is not prime")
+        .test(CLEAR, "140737488355327", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M47=140737488355327) = { 2351 1 4513 1 13264529 1 }")
+        .test(CLEAR, "140737488355327", ENTER, ID_Factors)
+        .expect("{ 2 351 1 4 513 1 13 264 529 1 }");
+
+    // M53 = 9007199254740991 = 6361 × 69431 × 20394401  (composite)
+    step("IsPrime: M53=9007199254740991 is not prime")
+        .test(CLEAR, "9007199254740991", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M53=9007199254740991) = { 6361 1 69431 1 20394401 1 }")
+        .test(CLEAR, "9007199254740991", ENTER, ID_Factors)
+        .expect("{ 6 361 1 69 431 1 20 394 401 1 }");
+
+    // M59 = 576460752303423487 = 179951 × 3203431780337  (composite)
+    step("IsPrime: M59=576460752303423487 is not prime")
+        .test(CLEAR, "576460752303423487", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M59=576460752303423487) = { 179951 1 3203431780337 1 }")
+        .test(CLEAR, "576460752303423487", ENTER, ID_Factors)
+        .expect("{ 179 951 1 3 203 431 780 337 1 }", 10000);
+
+    // M61 = 2305843009213693951  (prime)
+    step("IsPrime: M61=2305843009213693951 is prime")
+        .test(CLEAR, "2305843009213693951", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M61=2305843009213693951) = { 2305843009213693951 1 }")
+        .test(CLEAR, "2305843009213693951", ENTER, ID_Factors)
+        .expect("{ 2 305 843 009 213 693 951 1 }", 5000);
+
+    // M67 = 147573952589676412927 = 193707721 × 761838257287  (composite)
+    step("IsPrime: M67=147573952589676412927 is not prime")
+        .test(CLEAR, "147573952589676412927", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M67=147573952589676412927) = { 193707721 1 761838257287 1 }")
+        .test(CLEAR, "147573952589676412927", ENTER, ID_Factors)
+        .expect("{ 193 707 721 1 761 838 257 287 1 }", 10000);
+
+    // M71 = 2361183241434822606847 = 228479 × 48544121 × 212885833  (composite)
+    step("IsPrime: M71=2361183241434822606847 is not prime")
+        .test(CLEAR, "2361183241434822606847", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M71=2361183241434822606847) ="
+         " { 228479 1 48544121 1 212885833 1 }")
+        .test(CLEAR, "2361183241434822606847", ENTER, ID_Factors)
+        .expect("{ 228 479 1 48 544 121 1 212 885 833 1 }", 10000);
+
+    // M73 = 9444732965739290427391 =
+    //   439 × 2298041 × 9361973132609  (composite)
+    step("IsPrime: M73=9444732965739290427391 is not prime")
+        .test(CLEAR, "9444732965739290427391", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M73=9444732965739290427391) ="
+         " { 439 1 2298041 1 9361973132609 1 }")
+        .test(CLEAR, "9444732965739290427391", ENTER, ID_Factors)
+        .expect("{ 439 1 2 298 041 1 9 361 973 132 609 1 }", 10000);
+
+    // M79 = 604462909807314587353087 =
+    //   2687 × 202029703 × 1113491139767  (composite)
+    step("IsPrime: M79=604462909807314587353087 is not prime")
+        .test(CLEAR, "604462909807314587353087", ENTER, ID_IsPrime)
+        .expect("False", 10000);
+    step("Factors(M79=604462909807314587353087) fails with defaults")
+        .test(CLEAR, "604462909807314587353087", ENTER,
+              LENGTHY(10000), ID_Factors)
+        .error("Number is too big");
+    step("Factors(M79=604462909807314587353087) ="
+         " { 2687 1 202029703 1 1113491139767 1 }")
+        .test(CLEAR, "200000 MaxFactorIterations", ENTER).noerror()
+        .test("604462909807314587353087", ENTER, LENGTHY(10000), ID_Factors)
+        .expect("{ 2 687 1 202 029 703 1 1 113 491 139 767 1 }", 30000)
+        .test(CLEAR, "{ MaxFactorIterations } Purge", ENTER).noerror();
+
+    // M83 = 9671406556917033397649407 =
+    //   167 × 57912614113275649087721  (composite)
+    step("IsPrime: M83=9671406556917033397649407 is not prime")
+        .test(CLEAR, "9671406556917033397649407", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M83=9671406556917033397649407) ="
+         " { 167 1 57912614113275649087721 1 }")
+        .test(CLEAR, "9671406556917033397649407", ENTER, ID_Factors)
+        .expect("{ 167 1 57 912 614 113 275 649 087 721 1 }", 10000);
+
+    // M89 = 618970019642690137449562111  (prime)
+    step("IsPrime: M89=618970019642690137449562111 is prime")
+        .test(CLEAR, "618970019642690137449562111", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M89=618970019642690137449562111) ="
+         " { 618970019642690137449562111 1 }")
+        .test(CLEAR, "618970019642690137449562111", ENTER, ID_Factors)
+        .expect("{ 618 970 019 642 690 137 449 562 111 1 }", 10000);
+
+    // M97 = 158456325028528675187087900671 =
+    //  11447 × 13842607235828485645766393  (composite)
+    step("IsPrime: M97=158456325028528675187087900671 is not prime")
+        .test(CLEAR, "158456325028528675187087900671", ENTER, ID_IsPrime)
+        .expect("False");
+    step("Factors(M97=158456325028528675187087900671)"
+         " = { 11447 1 13842607235828485645766393 1 }")
+        .test(CLEAR, "158456325028528675187087900671", ENTER, ID_Factors)
+        .expect("{ 11 447 1 13 842 607 235 828 485 645 766 393 1 }", 30000);
+
+    // M107 = 162259276829213363391578010288127  (prime)
+    step("IsPrime: M107=162259276829213363391578010288127 is prime")
+        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M107=162259276829213363391578010288127)"
+         " = { 162259276829213363391578010288127 1 }")
+        .test(CLEAR, "162259276829213363391578010288127", ENTER, ID_Factors)
+        .expect("{ 162 259 276 829 213 363 391 578 010 288 127 1 }", 10000);
+
+    // M127 = 170141183460469231731687303715884105727  (prime)
+    step("IsPrime: M127=170141183460469231731687303715884105727 is prime")
+        .test(CLEAR,
+              "170141183460469231731687303715884105727",
+              ENTER, ID_IsPrime)
+        .expect("True");
+    step("Factors(M127=170141183460469231731687303715884105727)"
+        " = { 170141183460469231731687303715884105727 1 }")
+        .test(CLEAR,
+              "170141183460469231731687303715884105727",
+              ENTER,
+              ID_Factors)
+        .expect("{ 170 141 183 460 469 231 731 687 303 715 884 105 727 1 }",
+                10000);
+
+    step("Factors of large number")
+        .test(CLEAR, "2 255", ID_pow, ID_Factors)
+        .error("Number is too big");
+
+    // MaxFactorIterations setting
+    step("MaxFactorIterations: set and recall")
+        .test(CLEAR, "2000 MaxFactorIterations", ENTER).noerror()
+        .test("'MaxFactorIterations' RCL", ENTER).expect("2 000");
+    step("MaxFactorIterations: Factors(12) with low limit (trial division)")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("12", ENTER, ID_Factors).expect("{ 2 2 3 1 }");
+    step("MaxFactorIterations: Factors(M67) fails with 1024 iters")
+        .test(CLEAR, "1024 MaxFactorIterations", ENTER).noerror()
+        .test("147573952589676412927", ENTER,
+              LENGTHY(10000), ID_Factors)
+        .error("Number is too big", 5000);
+    step("MaxFactorIterations: Factors(M67) succeeds with default")
+        .test(CLEAR,
+              "{ MaxFactorIterations } Purge Std", ENTER).noerror()
+        .test("147573952589676412927", ENTER, ID_Factors)
+        .expect("{ 193 707 721 1 761 838 257 287 1 }", 10000);
 }
 
 

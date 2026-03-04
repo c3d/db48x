@@ -245,9 +245,15 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
                     op = symbol::make(' ') + op;
                     op = op + symbol::make(' ');
                 }
-                if (lprec < prec)
+
+                // Odd precedences are right-associative: A^B^C = A^(B^C)
+                // (A^B)^C: paren on left       29 <= 29
+                // (A*B)*C: no paren on left    !(17 <= 16)
+                if ((lprec | 1) <= prec)
                     ltxt = parentheses(ltxt);
-                if (rprec <= prec)
+                // A^(B^C), no paren on right   !(29 < 29)
+                // A*(B*C): paren on right      16 < 17
+                if (rprec < (prec | 1))
                     rtxt = parentheses(rtxt);
                 precedence = prec;
                 return ltxt + op + rtxt;
@@ -2336,12 +2342,14 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
             if ((oid != ID_divide || unit::mode) && oid != ID_xroot &&
                 oid != ID_comb && oid != ID_perm)
             {
-                if (lprec < prec)
+                // Odd precedences are right-associative: A^B^C = A^(B^C)
+                // (A^B)^C: paren on left       29 <= 29
+                // (A*B)*C: no paren on left    !(17 <= 16)
+                if ((lprec | 1) <= prec)
                     lg = parentheses(g, lg);
-                if (oid != ID_pow &&
-                    (rprec < prec ||
-                     (rprec == prec &&
-                      (oid == ID_subtract || oid == ID_divide))))
+                // A^(B^C), no paren on right   !(29 < 29)
+                // A*(B*C): paren on right      16 < 17
+                if (rprec < (prec | 1))
                     rg = parentheses(g, rg);
             }
             precedence = prec;
@@ -3522,6 +3530,19 @@ expression_p expression::simplify() const
 }
 
 
+expression_p expression::trig_sin() const
+// ----------------------------------------------------------------------------
+//   Replace cos(x)^2 with 1-sin(x)^2 (favor sine over cosine)
+// ----------------------------------------------------------------------------
+{
+    return rewrites<DOWN>(
+        // Pythagorean identity: cos²→1-sin²
+        sq(cos(X)),     one - sq(sin(X)),
+        cos(X)^two,     one - sq(sin(X))
+        );
+}
+
+
 // ============================================================================
 //
 //   User-level expression rewrite commands
@@ -3587,6 +3608,15 @@ FUNCTION_BODY(Simplify)
 // ----------------------------------------------------------------------------
 {
     return do_rewrite(x, &expression::simplify);
+}
+
+
+FUNCTION_BODY(TrigSin)
+// ----------------------------------------------------------------------------
+//   Replace cos(x)^2 with 1-sin(x)^2
+// ----------------------------------------------------------------------------
+{
+    return do_rewrite(x, &expression::trig_sin);
 }
 
 

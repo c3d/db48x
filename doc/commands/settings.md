@@ -442,6 +442,28 @@ real and imaginary part in a complex number. A complex number made of two
 fractions can therefore take up to four times the number of bits specified by
 this setting.
 
+## MaxFactorsBits
+
+Maximum number of bits for integers accepted by prime-related commands:
+`IsPrime`, `Factors`, `NextPr`, and `PrevPr`.
+
+The value can range from 64 to 1024 bits (default 160). Integers exceeding this
+limit trigger a `Number is too big` error. Raising the value allows factoring
+larger numbers but increases memory use and computation time for Pollard's Rho
+and Miller-Rabin. Lowering it can prevent excessive CPU usage on large inputs.
+
+## MaxFactorIterations
+
+Maximum number of Pollard's Rho iterations per attempt when factoring integers
+with `Factors`.
+
+The value can range from 1024 to 16,777,216 (default 4,194,304). If no factor
+is found within this limit for a given Rho attempt, the algorithm tries the
+next random starting point. Exhausting all attempts yields a `Bad argument
+value` error. Lowering the value speeds up failure detection for numbers that
+are hard to factor (e.g. products of two large primes); raising it allows
+factoring tougher semiprimes at the cost of longer run time.
+
 ## MathModesMenu
 
 The `MathModesMenu` controls settings related to mathematical computations.

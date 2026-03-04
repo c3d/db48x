@@ -173,6 +173,15 @@ struct bignum : text
 public:
     // Arithmetic internal routines
     static int compare(bignum_r x, bignum_r y, bool magnitude = false);
+    bool more_bits_than(uint bits) const;
+
+    // Modular arithmetic and helpers (used by factor, fraction)
+    static bignum_p gcd(bignum_r a, bignum_r b);
+    static bignum_p mulmod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p addmod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p submod(bignum_r a, bignum_r b, bignum_r m);
+    static bignum_p abs_diff(bignum_r a, bignum_r b);
+    static bignum_p powmod(bignum_r base, bignum_r exp, bignum_r mod);
 
     static size_t wordsize(id type);
     size_t wordsize() const             { return wordsize(type()); }
@@ -188,6 +197,7 @@ public:
     static bignum_p multiply(bignum_r y, bignum_r x, id ty);
     static bool quorem(bignum_r y, bignum_r x, id ty, bignum_g *q, bignum_g *r);
     static bignum_p pow(bignum_r y, bignum_r x);
+    static bignum_p pow(bignum_r y, ularge x);
     static bignum_p shift(bignum_r x, int bits, bool rotate, bool arith);
 
     static bignum_p promote(object_p ival);

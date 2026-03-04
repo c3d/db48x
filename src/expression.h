@@ -249,6 +249,7 @@ struct expression : program
     expression_p fold_constants() const;
     expression_p reorder_terms() const;
     expression_p simplify() const;
+    expression_p trig_sin() const;
     expression_p as_difference_for_solve() const; // Transform A=B into A-B
     bool         split_equation(expression_g &left, expression_g &right) const;
     bool         split(id ty, expression_g &left, expression_g &right) const;
@@ -680,6 +681,7 @@ FUNCTION(Collect);
 FUNCTION(FoldConstants);
 FUNCTION(ReorderTerms);
 FUNCTION(Simplify);
+FUNCTION(TrigSin);
 
 COMMAND_DECLARE(Apply, 2);
 COMMAND_DECLARE(Isolate, 2);

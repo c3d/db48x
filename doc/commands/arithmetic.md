@@ -117,7 +117,9 @@ Return the Euclidean norm for a complex number, vector or matrix.
 
 # Integer arithmetic and polynomials
 
-This section documents newRPL commands that are not implemented yet in DB48X.
+This section documents integer arithmetic commands, including prime-related
+operations. Some commands (e.g. MODSTO, GETPREC) are planned but not yet
+implemented in DB48X.
 
 ## SETPREC
 Set the current system precision
@@ -147,16 +149,8 @@ Remainder of the integer division
 Square of the input
 
 
-## NEXTPRIME
-Smallest prime number larger than the input
-
-
 ## Factorial
 Factorial of a number
-
-
-## ISPRIME
-Return true/false (1/0) if a number is prime or not
 
 
 ## MANT
@@ -342,9 +336,101 @@ Extract digits from a real number
 All roots of a polynomial
 
 
-## PREVPRIME
-Largest prime smaller than the input
+## IsPrime
+
+Test whether an integer is prime.
+
+`n` ▶ `True` or `False`
+
+* Returns `True` if the integer `n` is prime, `False` if composite.
+* Accepts integer inputs, including bignums. The maximum size is controlled by
+  the `MaxFactorsBits` setting.
+* Uses trial division by small primes first, then Miller-Rabin for larger
+  values.
+* Deterministic for numbers up to about 82 bits; probabilistic beyond that with
+  negligible error probability.
+
+```rpl
+17 IsPrime
+@ Expecting True
+```
+
+```rpl
+15 IsPrime
+@ Expecting False
+```
+
+```rpl
+561 IsPrime
+@ Expecting False
+```
 
 
-## FACTORS
-Factorize a polynomial or number
+## Factors
+
+Decompose an integer into its prime factorization.
+
+`n` ▶ `{ p₁ e₁ p₂ e₂ … }`
+
+* Returns a list of alternating prime-exponent pairs: each prime factor followed
+  by its multiplicity.
+* Accepts integer inputs, including bignums. Zero and one return an empty list.
+  The maximum size is controlled by the `MaxFactorsBits` setting.
+* Uses trial division by small primes, then Pollard's Rho for larger factors.
+* The `MaxFactorIterations` setting limits Pollard's
+  Rho iterations per attempt; lowering it can avoid long runs on hard semiprimes.
+* The product of all `pᵢ^eᵢ` equals the original number.
+
+```rpl
+12 Factors
+@ Expecting { 2 2 3 1 }
+```
+
+```rpl
+100 Factors
+@ Expecting { 2 2 5 2 }
+```
+
+
+## NextPr
+
+Return the smallest prime strictly greater than the input.
+
+`n` ▶ `p`
+
+* Returns the next prime number after `n`.
+* Accepts integers ≥ 1. The maximum input size is controlled by the
+  `MaxFactorsBits` setting.
+* If no prime exists (e.g. search limit reached), returns an error.
+
+```rpl
+10 NextPrime
+@ Expecting 11
+```
+
+```rpl
+2 NextPrime
+@ Expecting 3
+```
+
+
+## PrevPr
+
+Return the largest prime strictly smaller than the input.
+
+`n` ▶ `p`
+
+* Returns the previous prime number before `n`.
+* Accepts integers > 2 (no prime exists below 2). The maximum input size is
+  controlled by the `MaxFactorsBits` setting.
+* If no prime exists or the search limit is reached, returns an error.
+
+```rpl
+10 PreviousPrime
+@ Expecting 7
+```
+
+```rpl
+3 PreviousPrime
+@ Expecting 2
+```
