@@ -1356,6 +1356,7 @@ void ui_load_keymap(cstring name)
 
 RECORDER(image_check,       16, "Comparison of images in Qt");
 RECORDER(image_check_error, 16, "Error comparing images in Qt");
+extern QDir testDirectory;
 
 bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 // ----------------------------------------------------------------------------
@@ -1370,7 +1371,8 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
     name += ".png";
 #ifdef CONFIG_COLOR
     name = "color-" + name;
-#endif // CONFIG_COLOR
+#  endif // CONFIG_COLOR
+    name = testDirectory.filePath(name);
     QFileInfo reference(name);
     if (force || !reference.exists() || !data.load(name, "PNG"))
     {
