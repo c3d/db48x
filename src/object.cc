@@ -45,6 +45,7 @@
 #include "datetime.h"
 #include "decimal.h"
 #include "equations.h"
+#include "exact-quotient.h"
 #include "expression.h"
 #include "factor.h"
 #include "finance.h"

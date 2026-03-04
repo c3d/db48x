@@ -156,6 +156,7 @@ CXX_SOURCES +=				\
 	src/datetime.cc			\
 	src/decimal.cc			\
 	src/equations.cc		\
+	src/exact-quotient.cc		\
 	src/expression.cc		\
 	src/factor.cc			\
 	src/file.cc				\

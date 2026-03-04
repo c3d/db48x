@@ -137,6 +137,7 @@ struct tests
     void polynomials();
     void quotient_and_remainder();
     void prime_number_tests();
+    void exact_quotient();
     void expression_operations();
     void random_number_generation();
     void object_structure();

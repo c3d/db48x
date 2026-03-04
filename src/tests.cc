@@ -170,6 +170,7 @@ TESTS(expr,             "Operations on expressions");
 TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
 TESTS(examples,         "On-line help examples");
+TESTS(xq,               "Exact quotient (XQ command)");
 
 EXTRA(plotfns,          "Plot all functions");
 EXTRA(sysflags,         "Enable/disable every RPL flag");
@@ -288,6 +289,7 @@ void tests::run(uint onlyCurrent)
         polynomials();
         quotient_and_remainder();
         prime_number_tests();
+        exact_quotient();
         expression_operations();
         random_number_generation();
         object_structure();
@@ -16879,3 +16881,124 @@ tests &tests::source(cstring ref, uint extrawait)
     fail();
     return *this;
 }
+
+
+void tests::exact_quotient()
+// ----------------------------------------------------------------------------
+//   Tests for XQ (exact quotient — simplest symbolic representation)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(xq);
+
+    // -------------------------------------------------------------------------
+    // Pass-through: integers and fractions are already in exact form
+    // -------------------------------------------------------------------------
+    step("XQ(1) = 1 (integer pass-through)")
+        .test(CLEAR, "1 XQ", ENTER).expect("1");
+    step("XQ(1/3) = 1/3 (fraction pass-through)")
+        .test(CLEAR, "1/3 XQ", ENTER).expect("¹/₃");
+
+    // -------------------------------------------------------------------------
+    // XQ_RATIONAL template: plain decimal → p/q
+    // -------------------------------------------------------------------------
+    step("XQ(0.5) = 1/2")
+        .test(CLEAR, "0.5 XQ", ENTER).expect("¹/₂");
+    step("XQ(1/3 ToDecimal) = 1/3")
+        .test(CLEAR, "1/3 ToDecimal XQ", ENTER).expect("¹/₃");
+    step("XQ(-0.5) = -1/2")
+        .test(CLEAR, "-0.5 XQ", ENTER).expect("-¹/₂");
+
+    // -------------------------------------------------------------------------
+    // XQ_SQRT template: √(p/q)
+    // -------------------------------------------------------------------------
+    step("XQ(√2) = '√ 2'")
+        .test(CLEAR, "2 sqrt XQ", ENTER).expect("'√ 2'");
+    step("XQ(√3) = '√ 3'")
+        .test(CLEAR, "3 sqrt XQ", ENTER).expect("'√ 3'");
+    step("XQ(√(1/3)) = '√(¹/₃)'")
+        .test(CLEAR, "1/3 ToDecimal sqrt XQ", ENTER).expect("'√(¹/₃)'");
+    step("XQ(-√2) = '-√ 2'")
+        .test(CLEAR, "2 sqrt neg XQ", ENTER).expect("'-√ 2'");
+
+    // -------------------------------------------------------------------------
+    // XQ_PI template: p/q × π (or π when p=1, q=1)
+    // -------------------------------------------------------------------------
+    step("XQ(π) = π")
+        .test(CLEAR, "pi XQ", ENTER).expect("π");
+    step("XQ(π/3) = '¹/₃·π'")
+        .test(CLEAR, "pi 3 / XQ", ENTER).expect("'¹/₃·π'");
+    step("XQ(2π) = '2·π'")
+        .test(CLEAR, "pi 2 * XQ", ENTER).expect("'2·π'");
+    step("XQ(-π/3) = '-(¹/₃·π)'")
+        .test(CLEAR, "pi 3 / neg XQ", ENTER).expect("'-(¹/₃·π)'");
+
+    // -------------------------------------------------------------------------
+    // XQ_LN template: ln(p/q)
+    // -------------------------------------------------------------------------
+    step("XQ(ln 2) = 'ln 2'")
+        .test(CLEAR, "2 ln XQ", ENTER).expect("'ln 2'");
+    step("XQ(ln(1/3)) = '-ln 3' (since ln(1/3) = -ln(3))")
+        .test(CLEAR, "1/3 ToDecimal ln XQ", ENTER).expect("'-ln 3'");
+
+    // -------------------------------------------------------------------------
+    // XQ_EXP template: exp(p/q)
+    // -------------------------------------------------------------------------
+    step("XQ(exp(1/3)) = 'exp(¹/₃)'")
+        .test(CLEAR, "1/3 ToDecimal exp XQ", ENTER).expect("'exp(¹/₃)'");
+    step("XQ(exp(2)) = 'exp 2'")
+        .test(CLEAR, "2 exp XQ", ENTER).expect("'exp 2'");
+
+    // -------------------------------------------------------------------------
+    // XQ_SQRT_PI template: √(p/q) × π
+    // -------------------------------------------------------------------------
+    step("XQ(√2 × π) = '√ 2·π'")
+        .test(CLEAR, "2 sqrt pi * XQ", ENTER).expect("'√ 2·π'");
+    step("XQ(√3 × π) = '√ 3·π'")
+        .test(CLEAR, "3 sqrt pi * XQ", ENTER).expect("'√ 3·π'");
+
+    // -------------------------------------------------------------------------
+    // XQ_SQRT_PIARG template: √(p/q × π)
+    // This is the original motivating case: XQ(√(π/2)) = √(½ × π)
+    // -------------------------------------------------------------------------
+    step("XQ(√(π/2)) = '√(¹/₂·π)'")
+        .test(CLEAR, "pi 2 / sqrt XQ", ENTER).expect("'√(¹/₂·π)'");
+    step("XQ(√(π/3)) = '√(¹/₃·π)'")
+        .test(CLEAR, "pi 3 / sqrt XQ", ENTER).expect("'√(¹/₃·π)'");
+
+    // -------------------------------------------------------------------------
+    // XQ_LN_PI template: ln(p/q) × π
+    // -------------------------------------------------------------------------
+    step("XQ(ln 2 × π) = 'ln 2·π'")
+        .test(CLEAR, "2 ln pi * XQ", ENTER).expect("'ln 2·π'");
+
+    // -------------------------------------------------------------------------
+    // XQ_EXP_PI template: exp(p/q) × π
+    // -------------------------------------------------------------------------
+    step("XQ(exp(1/3) × π) = 'exp(¹/₃)·π'")
+        .test(CLEAR, "1/3 ToDecimal exp pi * XQ", ENTER).expect("'exp(¹/₃)·π'");
+
+    // -------------------------------------------------------------------------
+    // List support: XQ applied element-wise
+    // -------------------------------------------------------------------------
+    step("XQ on list { 0.5 }")
+        .test(CLEAR, "{ 0.5 } XQ", ENTER).expect("{ ¹/₂ }");
+    step("XQ on list { 0.5, √2 }")
+        .test(CLEAR, "0.5 2 sqrt 2 →List XQ", ENTER)
+        .expect("{ ¹/₂ '√ 2' }");
+
+    // -------------------------------------------------------------------------
+    // Round-trip accuracy: XQ result evaluates back to original value
+    // -------------------------------------------------------------------------
+    step("XQ(√2) round-trips: √2 XQ ToDecimal ≈ √2")
+        .test(CLEAR,
+              "2 sqrt XQ ToDecimal 2 sqrt - ABS"
+              " 10 3 'Precision' RCL - ^ <",
+              ENTER).expect("True");
+    step("XQ(π/3) round-trips: π/3 XQ ToDecimal ≈ π/3")
+        .test(CLEAR,
+              "pi 3 / XQ ToDecimal pi ToDecimal 3 / - ABS"
+              " 10 3 'Precision' RCL - ^ <",
+              ENTER).expect("True");
+
+}
+

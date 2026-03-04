@@ -461,7 +461,7 @@ MENU(NumbersMenu,
 
      "→Num",    ID_ToDecimal,
      "→Q",      ID_ToFraction,
-     "→Qπ",     ID_Unimplemented,
+     "→Qπ",     ID_QPI,
      "R#Seed",  ID_RandomSeed,
      RandomGeneratorBits::label,        ID_RandomGeneratorBits,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,
@@ -469,7 +469,8 @@ MENU(NumbersMenu,
      "→Int",    ID_ToInteger,
      "IsPrime", ID_IsPrime,
      "NextPr",  ID_NextPrime,
-     "PrevPr",  ID_PreviousPrime);
+     "PrevPr",  ID_PreviousPrime,
+	 "XQ",      ID_XQ);
 
 
 MENU(AnglesMenu,

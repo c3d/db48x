@@ -57,6 +57,7 @@ SOURCES +=                                      \
         ../src/dmcp/sysmenu.cc                  \
         ../src/dmcp/target.cc                   \
         ../src/equations.cc                     \
+        ../src/exact-quotient.cc                \
         ../src/expression.cc                    \
         ../src/factor.cc                        \
         ../src/file.cc                          \
