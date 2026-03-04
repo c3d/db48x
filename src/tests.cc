@@ -1226,7 +1226,14 @@ void tests::editor_operations()
         .expect("799 498 575.637 (cm↑3)⁻¹");
 
     step("Implicit multiplication")
-        .test(CLEAR, "'2X'", ENTER).expect("'2·X'");
+        .test(CLEAR, "'2X'", ENTER).expect("'2·X'")
+        .test(CLEAR, "'3x²+2x-5'", ENTER).expect("'3·x²+2·x-5'")
+        .test(CLEAR, "'(A+B)(A-B)'", ENTER).expect("'(A+B)·(A-B)'")
+        .test(CLEAR, "'A(A-B)'", ENTER).expect("'A(A-B)'") // funcall
+        .test(CLEAR, "'(A)(A-B)'", ENTER).expect("'A·(A-B)'") // not funcall
+        .test(CLEAR, "'A²(A-B)'", ENTER).expect("'A²·(A-B)'")
+        .test(CLEAR, "'(A+B)ln(C)(A-B)'", ENTER).expect("'(A+B)·(ln C·(A-B))'")
+        .test(CLEAR, "'(A)(B)(C)'", ENTER).expect("'A·(B·C)'");
 
     step("Graphical rendering of integrals - Simple expression")
         .test(CLEAR, "'integrate(A;B;sin(X);X)'", ENTER, EXIT)
