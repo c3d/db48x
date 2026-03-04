@@ -799,7 +799,7 @@ bool list::expand() const
 
 bool list::expand_deep(uint32_t which) const
 // ----------------------------------------------------------------------------
-//   Expand list content, expending inner expressions/programs/lists
+//   Expand list content, expanding inner expressions/programs/lists
 // ----------------------------------------------------------------------------
 {
     for (object_p obj : *this)
@@ -1415,12 +1415,23 @@ error:
 }
 
 
+static inline
+object::result map_reduce_filter(list_p (list::*cmd)(object_p) const)
+// ----------------------------------------------------------------------------
+//  There are two signatures for member functions
+// ----------------------------------------------------------------------------
+{
+    auto listcmd = reinterpret_cast<object_p (list::*)(object_p) const>(cmd);
+    return map_reduce_filter(listcmd);
+}
+
+
 COMMAND_BODY(Map)
 // ----------------------------------------------------------------------------
 //   Apply unary function in level 1 to all elements in level 2
 // ----------------------------------------------------------------------------
 {
-    return map_reduce_filter(&list::map_as_object);
+    return map_reduce_filter(&list::map);
 }
 
 
@@ -1438,7 +1449,7 @@ COMMAND_BODY(Filter)
 //   Filter the function in level 1 to all elements in level 2
 // ----------------------------------------------------------------------------
 {
-    return map_reduce_filter(&list::filter_as_object);
+    return map_reduce_filter(&list::filter);
 }
 
 
@@ -1538,7 +1549,37 @@ list_p list::tail() const
 }
 
 
-list_p list::map(object_p prgobj) const
+list_p list::map(object_p prg) const
+// ----------------------------------------------------------------------------
+//   High-level map operation depending on ListRecursionDepth
+// ----------------------------------------------------------------------------
+{
+    // If set to zero, this wraps around to max size_t
+    return map(prg, Settings.ListRecursionDepth() - 1);
+}
+
+
+object_p list::reduce(object_p prg) const
+// ----------------------------------------------------------------------------
+//   High-level reduce operation depending on ListRecursionDepth
+// ----------------------------------------------------------------------------
+{
+    // If set to zero, this wraps around to max size_t
+    return reduce(prg, Settings.ListRecursionDepth() - 1);
+}
+
+
+list_p list::filter(object_p prg) const
+// ----------------------------------------------------------------------------
+//   High-level filter operation depending on ListRecursionDepth
+// ----------------------------------------------------------------------------
+{
+    // If set to zero, this wraps around to max size_t
+    return filter(prg, Settings.ListRecursionDepth() - 1);
+}
+
+
+list_p list::map(object_p prgobj, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Apply an RPL object (nominally a program) on all elements in the list
 // ----------------------------------------------------------------------------
@@ -1550,9 +1591,9 @@ list_p list::map(object_p prgobj) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && recurse > 0)
         {
-            list_g sub = list_p(obj)->map(prg);
+            list_g sub = list_p(obj)->map(prg, recurse-1);
             obj = +sub;
         }
         else
@@ -1585,16 +1626,23 @@ error:
 }
 
 
-object_p list::reduce(object_p prgobj) const
+object_p list::reduce(object_p prgobj, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Apply an RPL object (nominally a program) on pairs of list elements
 // ----------------------------------------------------------------------------
 {
+    object_g result = nullptr;
     object_g prg    = prgobj;
     size_t   depth  = rt.depth();
-    object_g result = nullptr;
     for (object_p obj : *this)
     {
+        id oty = obj->type();
+        if (is_array_or_list(oty) && recurse > 0)
+        {
+            obj = list_p(obj)->reduce(prgobj, recurse - 1);
+            if (!obj)
+                continue;
+        }
         if (!rt.push(obj))
             goto error;
         if (!result)
@@ -1623,7 +1671,7 @@ error:
 }
 
 
-list_p list::filter(object_p prgobj) const
+list_p list::filter(object_p prgobj, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Apply an RPL object (nominally a program) to filter elements in a list
 // ----------------------------------------------------------------------------
@@ -1634,12 +1682,11 @@ list_p list::filter(object_p prgobj) const
     scribble scr;
     for (object_g obj : *this)
     {
-        id   oty  = obj->type();
         bool keep = false;
-        if (is_array_or_list(oty))
+        id oty = obj->type();
+        if (is_array_or_list(oty) && recurse > 0)
         {
-            object_g sub = list_p(+obj)->filter(prg);
-            obj = +sub;
+            obj = list_p(+obj)->filter(prg, recurse - 1);
             keep = true;
         }
         else
@@ -1658,7 +1705,6 @@ list_p list::filter(object_p prgobj) const
             if (rt.error())
                 goto error;
         }
-
         if (keep && !rt.append(obj))
             goto error;
     }
@@ -1711,7 +1757,7 @@ error:
 }
 
 
-list_p list::map(algebraic_fn fn) const
+list_p list::map(algebraic_fn fn, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Apply an algebraic function on all elements in the list
 // ----------------------------------------------------------------------------
@@ -1721,9 +1767,9 @@ list_p list::map(algebraic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && recurse > 0)
         {
-            list_g sub = list_p(obj)->map(fn);
+            list_g sub = list_p(obj)->map(fn, recurse-1);
             obj = +sub;
         }
         else
@@ -1749,7 +1795,7 @@ list_p list::map(algebraic_fn fn) const
 }
 
 
-list_p list::map(arithmetic_fn fn, algebraic_r y) const
+list_p list::map(arithmetic_fn fn, algebraic_r y, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Right-apply an arithmtic function on all elements in the list
 // ----------------------------------------------------------------------------
@@ -1759,9 +1805,9 @@ list_p list::map(arithmetic_fn fn, algebraic_r y) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && recurse > 0)
         {
-            list_g sub = list_p(obj)->map(fn, y);
+            list_g sub = list_p(obj)->map(fn, y, recurse-1);
             obj = +sub;
         }
         else
@@ -1787,7 +1833,7 @@ list_p list::map(arithmetic_fn fn, algebraic_r y) const
 }
 
 
-list_p list::map(algebraic_r x, arithmetic_fn fn) const
+list_p list::map(algebraic_r x, arithmetic_fn fn, size_t recurse) const
 // ----------------------------------------------------------------------------
 //   Left-apply an arithmtic function on all elements in the list
 // ----------------------------------------------------------------------------
@@ -1797,9 +1843,9 @@ list_p list::map(algebraic_r x, arithmetic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && recurse > 0)
         {
-            list_g sub = list_p(obj)->map(x, fn);
+            list_g sub = list_p(obj)->map(x, fn, recurse-1);
             obj = +sub;
             if (!obj)
                 return nullptr;

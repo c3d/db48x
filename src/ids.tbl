@@ -1058,6 +1058,8 @@ FLAG(TVMPayAtBeginningOfPeriod, TVMPayAtEndOfPeriod)
 FLAG(TruthLogicForIntegers,     BitwiseLogicForIntegers)
 FLAG(LaxArrayResizing,          StrictArrayResizing)
 
+SETTING_BITS(ListRecursionDepth, uint, 16, 0U, 65535U,    1U)
+
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
 ALIAS(SoftwareFloatingPoint,    "SFP")

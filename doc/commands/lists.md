@@ -46,12 +46,34 @@ first level of the stack should take one argument and return a single value.
 
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
 
-The operation applies recursively to inner lists.
+
+```rpl
+{ 1 2 A 42.2 [ 1 2 3 ]} « →STR » MAP
+@ Expecting { "1" "2" "A" "42.2" "[ 1 2 3 ]" }
+```
+
+Unlike on HP calculators, `Map` does not apply recursively to inner lists by default.
 
 ```rpl
 { 1 2 { 3 4 } } « →STR » MAP
-@ Expecting { "1" "2" { "3" "4" } }
+@ Expecting { "1" "2" "{ 3 4 }" }
+```
 
+This can be changed by setting `ListRecursionDepth` to `0`.
+
+```rpl
+0 ListRecursionDepth
+{ 1 2 { 3 4 } }  « →STR » MAP
+@ Expecting { "1" "2" { "3" "4" } }
+```
+
+`Map` can also be constrained to a given depth.
+
+```rpl
+2 ListRecursionDepth
+{ 1 2 { 3 { 4 { 5 } } } }  « →STR » MAP
+@ Expecting { "1" "2" { "3" "{ 4 { 5 } }" } }
+'ListRecursionDepth' Purge
 ```
 
 ## Reduce
@@ -63,6 +85,22 @@ operation to all elements.
 
 `{ A B ... }` `F` ▶ `F(F(A, B), ...)`
 
+For example, to sum all the elements in a list as text, one can use:
+
+```rpl
+{ X Y Z T 12 { Hello World } } « →STR + » REDUCE
+@ Expecting "XYZT12{ Hello World }"
+```
+
+Reduce obeys the `ListRecursionDepth` setting:
+
+```rpl
+0 ListRecursionDepth
+{ X Y Z T 12 { Hello World } } « →STR + » REDUCE
+@ Expecting "XYZT12HelloWorld"
+'ListRecursionDepth' Purge
+```
+
 
 ## Filter
 
@@ -71,6 +109,22 @@ level 1 of the stack takes a value as argument, and returns a truth values. The
 resulting list is built with all elements where the predicate is true.
 
 `{ A B ... }` `P` ▶ `{ A ... }` if `P(A)` is true and `P(B)` is false.
+
+For example, to filter all odd numbers in an array, one can use:
+
+```rpl
+[ 1 2 3 4 5 6 42 ] « 2 MOD 0 = » FILTER
+@ Expecting [ 2 4 6 42 ]
+```
+
+`Filter` obeys the `ListRecursionDepth` setting:
+
+```rpl
+0 ListRecursionDepth
+{ 1 2 3 4 { 5 6 { 42 } } } « 2 MOD 0 = » FILTER
+@ Expecting { 2 4 { 6 { 42 } } }
+'ListRecursionDepth' Purge
+```
 
 
 ## Get

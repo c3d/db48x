@@ -296,23 +296,27 @@ struct list : text
     //   Return the head and tail of a list
     // ------------------------------------------------------------------------
 
+    // Map, reduce and filter operations
+    list_p        map(object_p prg) const;
+    object_p      reduce(object_p prg) const;
+    list_p        filter(object_p prg) const;
 
     // Apply an algebraic function to all elements in list
-    list_p map(object_p prg) const;
-    list_p map(algebraic_fn fn) const;
-    list_p map(arithmetic_fn fn, algebraic_r y) const;
-    list_p map(algebraic_r x, arithmetic_fn fn) const;
-    static list_p map(algebraic_fn fn, list_r x)
+    list_p        map(object_p prg, size_t recurse) const;
+    list_p        map(algebraic_fn fn, size_t r = ~0U) const;
+    list_p        map(arithmetic_fn fn, algebraic_r y, size_t r = ~0U) const;
+    list_p        map(algebraic_r x, arithmetic_fn fn, size_t r = ~0U) const;
+    static list_p map(algebraic_fn fn, list_r x, size_t recurse = ~0U)
     {
-        return x->map(fn);
+        return x->map(fn, recurse);
     }
-    static list_p map(arithmetic_fn fn, list_r x, algebraic_r y)
+    static list_p map(arithmetic_fn fn, list_r x, algebraic_r y, size_t r = ~0U)
     {
-        return x->map(fn, y);
+        return x->map(fn, y, r);
     }
-    static list_p map(arithmetic_fn fn, algebraic_r x, list_r y)
+    static list_p map(arithmetic_fn fn, algebraic_r x, list_r y, size_t r = ~0U)
     {
-        return y->map(x, fn);
+        return y->map(x, fn, r);
     }
 
     static object::result push_list_from_stack(uint depth, id ty = ID_list);
@@ -335,14 +339,12 @@ struct list : text
     // Swap two elements in the array
     list_p swap(size_t first, size_t second) const;
 
-    // Reduce and filter operations
-    object_p reduce(object_p prg) const;
-    list_p   filter(object_p prg) const;
+    // Reduce and filter implementations
+    object_p reduce(object_p prg, size_t recurse) const;
+    list_p   filter(object_p prg, size_t recurse) const;
 
     // Build a list by combining two subsequent items
     list_p   pair_map(object_p prg) const;
-    object_p map_as_object(object_p prg) const          { return map(prg);    }
-    object_p filter_as_object(object_p prg) const       { return filter(prg); }
 
     // Element substitution
     static algebraic_p where(algebraic_r expr, algebraic_r args);

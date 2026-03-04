@@ -636,6 +636,9 @@ operate on these items when it makes sense. Therefore:
 * As indicated [earlier](#representation-of-objects), quoted names in lists
   remain quoted, whereas on HP calculators, the quotes are removed.
 
+* The `MAP` operation on the HP50G recurses on inner lists. On DB48x, it does
+  not by default. This is controlled by the `ListDepthIteration` setting.
+  A value of `0` restores HP50G-style infinite recursion.
 
 ### Vectors and matrices differences
 

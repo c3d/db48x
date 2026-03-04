@@ -864,6 +864,17 @@ from the HP implementations of RPL.
 
 The opposite setting is `TruthLogicForIntegers`.
 
+## ListRecursionDepth
+
+This setting selects the depth of recursion for `Map`, `Reduce` or `Filter`.
+By default, it is set to `1`, indicating that recursion only applies to the
+top-level of the list. This matches the way `Map`, `Reduce` and `Filter` work in
+most programming languages.
+
+A value larger than `1` can be used to recurse beyond the first level.
+On the HP50G, `Map` applies recursively to all levels. This can be achieved by
+setting `ListRecursionDepth` to `0`.
+
 
 # Evaluation settings
 
