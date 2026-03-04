@@ -1279,7 +1279,7 @@ int ui_file_selector(const char *title,
         QString name = fi.fileName();
         path = fi.absoluteFilePath();
 #ifdef ANDROID
-        // 1. Create a persistent, private sandbox path that standard C++ can read/write
+        // Create a persistent, private sandbox path that standard C++ can read/write
         // This requires no permissions and survives app restarts.
         QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir().mkpath(sandboxDir); // Ensure the directory exists
@@ -1331,6 +1331,11 @@ int ui_file_selector(const char *title,
                        data);
 #endif
     }
+
+#ifdef ANDROID
+    is_dialog_open = false; // Release the lock
+#endif
+
     return ret;
 }
 
