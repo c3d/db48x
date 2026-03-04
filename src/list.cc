@@ -786,7 +786,7 @@ bool list::expand() const
 
 bool list::expand_deep(uint32_t which) const
 // ----------------------------------------------------------------------------
-//   Expand list content, expending inner expressions/programs/lists
+//   Expand list content, expanding inner expressions/programs/lists
 // ----------------------------------------------------------------------------
 {
     for (object_p obj : *this)
@@ -1536,25 +1536,16 @@ list_p list::map(object_p prgobj) const
     scribble scr;
     for (object_p obj : *this)
     {
-        id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (!rt.push(obj))
+            goto error;
+        if (program::run(prg, true) != OK)
+            goto error;
+        if (rt.depth() != depth + 1)
         {
-            list_g sub = list_p(obj)->map(prg);
-            obj = +sub;
+            rt.misbehaving_program_error();
+            goto error;
         }
-        else
-        {
-            if (!rt.push(obj))
-                goto error;
-            if (program::run(prg, true) != OK)
-                goto error;
-            if (rt.depth() != depth + 1)
-            {
-                rt.misbehaving_program_error();
-                goto error;
-            }
-            obj = rt.pop();
-        }
+        obj = rt.pop();
         if (!obj)
             goto error;
 
@@ -1621,31 +1612,20 @@ list_p list::filter(object_p prgobj) const
     scribble scr;
     for (object_g obj : *this)
     {
-        id   oty  = obj->type();
         bool keep = false;
-        if (is_array_or_list(oty))
+        if (!rt.push(obj))
+            goto error;
+        if (program::run(prg, true) != OK)
+            goto error;
+        if (rt.depth() != depth + 1)
         {
-            object_g sub = list_p(+obj)->filter(prg);
-            obj = +sub;
-            keep = true;
+            rt.misbehaving_program_error();
+            goto error;
         }
-        else
-        {
-            if (!rt.push(obj))
-                goto error;
-            if (program::run(prg, true) != OK)
-                goto error;
-            if (rt.depth() != depth + 1)
-            {
-                rt.misbehaving_program_error();
-                goto error;
-            }
-            object_p test = rt.pop();
-            keep = test->as_truth(true);
-            if (rt.error())
-                goto error;
-        }
-
+        object_p test = rt.pop();
+        keep = test->as_truth(true);
+        if (rt.error())
+            goto error;
         if (keep && !rt.append(obj))
             goto error;
     }
