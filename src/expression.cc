@@ -2349,7 +2349,7 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
                     lg = parentheses(g, lg);
                 // A^(B^C), no paren on right   !(29 < 29)
                 // A*(B*C): paren on right      16 < 17
-                if (rprec < (prec | 1))
+                if (oid != ID_pow && rprec < (prec | 1))
                     rg = parentheses(g, rg);
             }
             precedence = prec;
