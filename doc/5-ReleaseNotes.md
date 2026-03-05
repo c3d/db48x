@@ -1,5 +1,27 @@
 # Release notes
 
+## Release 0.9.17 - Rational approximation, parsing and rendering fixes
+
+### New features
+
+* Add `→Qπ` command for rational approximation with π, √n, ln(n) and e
+
+### Bug fixes
+
+* Fix parentheses around exponents in graph rendering of `'(a+b)^(c+d)'`
+* Fix label for `ToRelativeUncertainty`, `→RelRnd` instead of `→RelUnc`
+* Improve parsing of implicit multiplication for a number of edge cases
+* Fix `utf8_next` for garbage bytes following ASCII characters
+* Fix unsatisfied symbol errors with gcc/emcc in the WASM build
+
+### Enhancements
+
+* Save approximately 3.4K of RAM on physical devices
+* Restore image testing functionality in the test framework
+* Updated test images that had become obsolete
+* Report errors when saving reference files in tests
+
+
 ## Release 0.9.16 - Factorization, precision fixes, and documentation
 
 This release adds prime and factorization features, improves numeric precision,
@@ -20,7 +42,7 @@ and expands simulator and user documentation.
 
 * Fix `expm1` precision loss for small arguments, including complex values
 * Fix `ln1p` precision loss for small arguments
-* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Fix shift behavior after transient alpha, support shift/xshift for transalpha
 * Reset `show_x` and `show_y` when exiting `SHOW`
 * Ensure the simulator creates the `screens` directory when needed
 * Fix an infinity optimization regression in arithmetic
