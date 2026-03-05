@@ -115,6 +115,7 @@ TESTS(highp,            "High-precision computations (60 digits)")
 TESTS(trigoptim,        "Special trigonometry optimzations");
 TESTS(trigunits,        "Trigonometric units");
 TESTS(dfrac,            "Simple conversion to decimal and back");
+TESTS(toqpi,            "Conversion to fraction with pi factors");
 TESTS(round,            "Rounding and truncating");
 TESTS(ctypes,           "Complex types");
 TESTS(carith,           "Complex arithmetic");
@@ -237,6 +238,7 @@ void tests::run(uint onlyCurrent)
         exact_trig_cases();
         trig_units();
         fraction_decimal_conversions();
+        fraction_pi_conversions();
         rounding_and_truncating();
         complex_types();
         complex_arithmetic();
@@ -4365,6 +4367,127 @@ void tests::fraction_decimal_conversions()
     step("Restoring small fraction mode")
         .test(CLEAR, "SmallFractions MixedFractions", ENTER).noerror();
 }
+
+
+void tests::fraction_pi_conversions()
+// ----------------------------------------------------------------------------
+//   Exercise the →Qπ command
+// ----------------------------------------------------------------------------
+{
+    BEGIN(toqpi);
+
+    step("Setup display mode")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER).noerror();
+
+    step("Set FractionLargestPrime for sqrt tests")
+        .test(CLEAR, "10000 FractionLargestPrime", ENTER).noerror();
+
+    step("Pi itself")
+        .test(CLEAR, "pi →Num", ENTER, ID_ToFractionPi)
+        .expect("'π'");
+
+    step("Half pi")
+        .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToFractionPi)
+        .expect("'1/2·π'");
+
+    step("Two pi")
+        .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToFractionPi)
+        .expect("'2·π'");
+
+    step("Square root of 2")
+        .test(CLEAR, "2 √", ENTER, ID_ToFractionPi)
+        .expect("'√ 2'");
+
+    step("Square root of 3")
+        .test(CLEAR, "3 √", ENTER, ID_ToFractionPi)
+        .expect("'√ 3'");
+
+    step("Euler e")
+        .test(CLEAR, "1 exp", ENTER, ID_ToFractionPi)
+        .expect("'e'");
+
+    step("e squared")
+        .test(CLEAR, "2 exp", ENTER, ID_ToFractionPi)
+        .expect("'exp 2'");
+
+    step("sqrt of e")
+        .test(CLEAR, "0.5 exp", ENTER, ID_ToFractionPi)
+        .expect("'exp(1/2)'");
+
+    step("sqrt(142)/27 should give square root form")
+        .test(CLEAR, "142 √ 27 /", ENTER, ID_ToFractionPi)
+        .expect("'1/27·√ 142'");
+
+    step("Negative value with sqrt factor")
+        .test(CLEAR, "2 √ neg", ENTER, ID_ToFractionPi)
+        .expect("'-√ 2'");
+
+    step("Plain fraction should still work")
+        .test(CLEAR, "0.25", ENTER, ID_ToFractionPi)
+        .expect("1/4");
+
+    step("Integer should pass through")
+        .test(CLEAR, "3", ENTER, ID_ToFractionPi)
+        .expect("3");
+
+    step("Large prime radicand with fraction: 17*sqrt(997)/3")
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToFractionPi)
+        .expect("'17/3·√ 997'");
+
+    step("Reducible radicand: 17*sqrt(12)/6 -> 17/3*sqrt(3)")
+        .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToFractionPi)
+        .expect("'17/3·√ 3'");
+
+    step("Reciprocal of sqrt: 1/sqrt(7) -> sqrt(7)/7")
+        .test(CLEAR, "7 √ inv", ENTER, ID_ToFractionPi)
+        .expect("'1/7·√ 7'");
+
+    step("Large perfect square factor: sqrt(72) -> 6*sqrt(2)")
+        .test(CLEAR, "72 √", ENTER, ID_ToFractionPi)
+        .expect("'6·√ 2'");
+
+    step("Negative sqrt with fraction: -5*sqrt(13)/4")
+        .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToFractionPi)
+        .expect("'-5/4·√ 13'");
+
+    step("Pi with larger denominator: 7*pi/11")
+        .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToFractionPi)
+        .expect("'7/11·π'");
+
+    step("Ln(2) factor: 3*ln(2)/7")
+        .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToFractionPi)
+        .expect("'3/7·ln 2'");
+
+    step("Ln(10) factor: 5*ln(10)/3")
+        .test(CLEAR, "10 ln 5 * 3 /", ENTER, ID_ToFractionPi)
+        .expect("'5/3·ln 10'");
+
+    step("Fractional exponent: e^(3/4)")
+        .test(CLEAR, "0.75 exp", ENTER, ID_ToFractionPi)
+        .expect("'exp(3/4)'");
+
+    step("Negative exponent: e^(-1) = 1/e or e⁻¹")
+        .test(CLEAR, "1. neg exp", ENTER, ID_ToFractionPi)
+        .expect("'e⁻¹'");
+
+    step("Fractional exponent: e^(2/3)")
+        .test(CLEAR, "2. 3 / exp", ENTER, ID_ToFractionPi)
+        .expect("'exp(2/3)'");
+
+    step("355/113 close to pi but should stay rational")
+        .test(CLEAR, "355. 113 /", ENTER, ID_ToFractionPi)
+        .expect("355/113");
+
+    step("Restore default settings")
+        .test(CLEAR,
+              DIRECT("{ FractionLargestPrime BigFraction ImproperFraction } "
+                     "Purge Std"), ENTER).noerror();
+
+    step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToFractionPi)
+        .expect("'17/3·√ 997'");
+}
+
 
 void tests::cfraction()
 // ----------------------------------------------------------------------------
@@ -13712,12 +13835,14 @@ void tests::regression_checks()
         .expect("'→N'");
 
     step("Bug 822: Fraction iteration")
-        .test(CLEAR, ID_FractionsMenu, 100, RSHIFT, F3, 20, RSHIFT, F4)
+        .test(CLEAR, ID_FractionsMenu,
+              100, ID_FractionIterations,
+              20, ID_FractionDigits)
         .test("1968.1205", F6)
         .expect("1 968 ²⁴¹/₂ ₀₀₀")
         .test("1968.0512", F6)
         .expect("1 968 ³²/₆₂₅")
-        .test(ID_ModesMenu, RSHIFT, F4); // Reset modes
+        .test(ID_ModesMenu, ID_ResetModes);
 
     step("Bug 906: mod and rem should have spaces during editing")
         .test(CLEAR, "X Y mod", ENTER)

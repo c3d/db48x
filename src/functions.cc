@@ -1649,6 +1649,22 @@ FUNCTION_BODY(ToFraction)
 }
 
 
+FUNCTION_BODY(ToFractionPi)
+// ----------------------------------------------------------------------------
+//   Convert numbers to fractions with π, √n, ln(n) or e factored out
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    algebraic_g xg = x;
+    if (arithmetic::to_fraction_pi(xg))
+        return xg;
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
+}
+
+
 FUNCTION_BODY(ToInteger)
 // ----------------------------------------------------------------------------
 //   Convert numbers to integer

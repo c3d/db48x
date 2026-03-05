@@ -5822,7 +5822,6 @@ implemented by the time the project reaches version 1.0.
 * `PUSH`
 * `PVIEW`
 * `PX→C`
-* `→Qπ`
 * `qr`
 * `QR`
 * `QUAD`
@@ -13542,6 +13541,30 @@ The precision of the conversion in digits is defined by
 [→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
 conversion is defined by [→FracDigits](#ToFractionIterations)
 
+## →Qπ
+
+Convert decimal values to a rational form, or a rational form with π, square
+roots, natural logs, or the Euler constant *e* factored out, whichever yields
+the smaller denominator.
+
+The rational result is a "best guess", since there might be more than one
+rational expression consistent with the argument. `→Qπ` finds a quotient of
+integers that agrees with the argument to the number of decimal places specified
+by the display format mode.
+
+For example, `3.14159265359 →Qπ` gives `π`, `1.4142135624 →Qπ` gives `√2`,
+and `0.346573590280 →Qπ` gives `ln 2/2`.
+
+For a complex argument, the real or imaginary part (or both) can have a constant
+factor.
+
+The [→QπMaxPrime](#→qπmaxprime) setting (default 100, max 10000)
+limits which primes are tried when factoring squares for √*n* detection. Lower
+values speed up conversion on resource-constrained hardware.
+
+The algorithm attempts: π; any √*n* (by squaring and factoring); ln 2, ln 3,
+ln 5, ln 7, ln 10; *e*; *e*^(p/q); and combined factors π·√2, π·√3.
+
 ## →Integer
 
 Convert decimal values to integers. For example `1. →Integer` gives `1`.
@@ -14727,6 +14750,16 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
+
+## →QπMaxPrime
+
+Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
+conversion. When converting a decimal to a rational form with π, √*n*, ln, or *e*
+factors, the algorithm squares the value, converts to a fraction, then factors out
+perfect squares from the numerator and denominator. This setting limits which
+primes are tried (2 to 10000, default 100). Lower values speed up conversion on
+DM32/DM42 at the cost of missing some √*n* simplifications for numbers whose
+square has large prime factors.
 
 
 # User interface
@@ -16749,10 +16782,6 @@ Convert an object to its text representation.
 ## ToDecimal
 
 Convert an object to its decimal representation.
-
-## ToFraction
-
-Convert an object to its fractional representation.
 
 ## Compile
 

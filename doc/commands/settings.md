@@ -545,6 +545,16 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
 
+## →QπMaxPrime
+
+Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
+conversion. When converting a decimal to a rational form with π, √*n*, ln, or *e*
+factors, the algorithm squares the value, converts to a fraction, then factors out
+perfect squares from the numerator and denominator. This setting limits which
+primes are tried (2 to 10000, default 100). Lower values speed up conversion on
+DM32/DM42 at the cost of missing some √*n* simplifications for numbers whose
+square has large prime factors.
+
 
 # User interface
 

@@ -30,6 +30,8 @@
 #include "algebraic.h"
 
 #include "arithmetic.h"
+#include "factor.h"
+#include "list.h"
 #include "array.h"
 #include "bignum.h"
 #include "compare.h"
@@ -484,6 +486,390 @@ bool algebraic::to_fraction(algebraic_g &x)
         return false;
     }
     return x;                   // We need x to be non-null
+}
+
+
+static ularge fraction_denominator(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Return the denominator of a fraction result, or 1 for integers
+// ----------------------------------------------------------------------------
+{
+    object::id ty = x->type();
+    if (object::is_integer(ty))
+        return 1;
+    if (object::is_fraction(ty))
+        return fraction_p(+x)->denominator_value();
+    return ~ularge(0);
+}
+
+
+static void extract_square_factor(ularge n, ularge &sq, ularge &rem)
+// ----------------------------------------------------------------------------
+//   Factor n as sq²·rem where rem is square-free
+// ----------------------------------------------------------------------------
+{
+    sq = 1;
+    rem = n;
+    ularge max_prime = Settings.FractionLargestPrime();
+    for (size_t i = 0; i < NUM_SMALL_PRIMES; i++)
+    {
+        ularge p = small_primes[i];
+        ularge pp = p * p;
+        if (p == 0 || p > max_prime || rem < pp)
+            return;
+        while (rem % pp == 0)
+        {
+            rem /= pp;
+            sq *= p;
+            if (rem == 0)
+                return;
+        }
+    }
+}
+
+
+static algebraic_p fraction_times_symbolic(algebraic_r frac, algebraic_r sym)
+// ----------------------------------------------------------------------------
+//   Build result as frac * symbolic, simplifying 1*X and (-1)*X
+// ----------------------------------------------------------------------------
+{
+    if (frac->is_one(false))
+        return expression::make(sym);
+    algebraic_g nfrac = -frac;
+    if (nfrac && nfrac->is_one(false))
+        return expression::make(object::ID_neg, sym);
+    return expression::make(object::ID_multiply, frac, sym);
+}
+
+
+static algebraic_p wrap_symbolic(algebraic_r sym)
+// ----------------------------------------------------------------------------
+//   Wrap a value in an expression if not already one
+// ----------------------------------------------------------------------------
+{
+    if (sym->type() == object::ID_expression)
+        return algebraic_p(sym);
+    return expression::make(sym);
+}
+
+
+static algebraic_p to_fraction_pi_map_fn(algebraic_r a)
+// ----------------------------------------------------------------------------
+//   Wrapper for list::map to apply to_fraction_pi to expression elements
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ag = a;
+    algebraic::to_fraction_pi(ag);
+    return +ag;
+}
+
+
+bool algebraic::to_fraction_pi(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//   Convert to fraction, trying π, √n, ln(n), and e as factors
+// ----------------------------------------------------------------------------
+//   Returns a rational form or a rational times a constant factor,
+//   whichever yields the smaller denominator.
+//   For √n factors, squares x and divides by n to avoid computing √n.
+//   For exponentials, takes ln(x) and checks if the result is rational.
+{
+    id ty = x->type();
+    switch(ty)
+    {
+    case ID_hwfloat:
+    case ID_hwdouble:
+    case ID_decimal:
+    case ID_neg_decimal:
+    {
+        algebraic_g val = x;
+        algebraic_g plain = val;
+        if (!to_fraction(plain))
+            return false;
+
+        ularge      best_denom = fraction_denominator(plain);
+        algebraic_g best_result = plain;
+        record(algebraic, "→Qπ plain fraction denom %u type %+s",
+               best_denom, object::name(plain->type()));
+
+        if (best_denom <= 1)
+            break;
+
+        constant_p  pi_sym  = constant::lookup("π", false);
+        constant_p  e_sym   = constant::lookup("e", false);
+        algebraic_g pi_val  = pi();
+
+        if (!pi_val)
+            return false;
+
+        auto try_factor = [&](algebraic_r num_val, algebraic_r sym)
+        {
+            if (!num_val || !sym || rt.error())
+                return;
+            algebraic_g divided = val / num_val;
+            if (!divided || rt.error())
+            {
+                rt.clear_error();
+                return;
+            }
+            algebraic_g frac = divided;
+            if (!to_fraction(frac))
+            {
+                rt.clear_error();
+                return;
+            }
+            ularge d = fraction_denominator(frac);
+            if (d < best_denom)
+            {
+                best_denom = d;
+                best_result = fraction_times_symbolic(frac, sym);
+            }
+        };
+
+        // Try x = (p/q) · π
+        if (pi_sym)
+            try_factor(pi_val, pi_sym);
+        if (best_denom <= 1)
+            goto done;
+
+        // Try x = (p/q) · √n by squaring x and factoring out perfect squares
+        // If x² = a/b (reduced), factor a = sa²·ra, b = sb²·rb (square-free).
+        // Then x = (sa / (sb·rb)) · √(ra·rb), denominator = sb·rb.
+        {
+            bool        neg = val->is_negative(false);
+            algebraic_g val_sq = val * val;
+            if (val_sq && !rt.error())
+            {
+                algebraic_g frac = val_sq;
+                if (to_fraction(frac))
+                {
+                    ularge num = 0, den = 1;
+                    object::id fty = frac->type();
+                    if (object::is_bignum(fty))
+                        num = bignum_p(+frac)->value<ularge>();
+                    else if (object::is_integer(fty))
+                        num = integer_p(+frac)->value<ularge>();
+                    else if (object::is_fraction(fty))
+                    {
+                        // Note: big_fraction with huge bignums may truncate
+                        // in ularge; overflow check below guards sqrt_part
+                        num = fraction_p(+frac)->numerator_value();
+                        den = fraction_p(+frac)->denominator_value();
+                    }
+                    record(algebraic,
+                           "Sqrt factoring x²→frac %+s num %u den %u",
+                           object::name(fty), num, den);
+
+                    if (num > 0)
+                    {
+                        ularge sq_num, free_num, sq_den, free_den;
+                        extract_square_factor(num, sq_num, free_num);
+                        extract_square_factor(den, sq_den, free_den);
+
+                        // Avoid overflow: free_num * free_den may exceed ularge
+                        constexpr ularge ulmax = ~ularge(0);
+                        ularge sqrt_part = 0;
+                        if (free_den > 0 && free_num <= ulmax / free_den)
+                            sqrt_part = free_num * free_den;
+                        record(algebraic,
+                               "Sqrt factors sq=%u free=%u / sq=%u free=%u"
+                               " → √%u denom %u (best %u)",
+                               sq_num, free_num, sq_den, free_den,
+                               sqrt_part, sq_den * free_den, best_denom);
+                        if (sqrt_part > 1)
+                        {
+                            ularge rational_den = sq_den * free_den;
+                            if (rational_den < best_denom)
+                            {
+                                algebraic_g p = integer::make(sq_num);
+                                algebraic_g q =
+                                    integer::make(rational_den);
+                                algebraic_g rf = (rational_den == 1)
+                                    ? p
+                                    : fraction::make(
+                                          integer_p(+p), integer_p(+q));
+                                if (neg)
+                                    rf = -rf;
+                                algebraic_g sv =
+                                    integer::make(sqrt_part);
+                                algebraic_g ssym =
+                                    expression::make(ID_sqrt, sv);
+                                best_denom = rational_den;
+                                best_result =
+                                    fraction_times_symbolic(rf, ssym);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    rt.clear_error();
+                }
+            }
+            else
+            {
+                rt.clear_error();
+            }
+        }
+        if (best_denom <= 1)
+            goto done;
+
+        // Try x = (p/q) · ln(n)
+        static const uint ln_factors[] = { 2, 3, 5, 7, 10 };
+        for (uint n : ln_factors)
+        {
+            algebraic_g nval = integer::make(n);
+            algebraic_g lval = ln::run(nval);
+            algebraic_g lsym = expression::make(ID_ln, nval);
+            try_factor(lval, lsym);
+        }
+        if (best_denom <= 1)
+            goto done;
+
+        // Try x = (p/q) · e
+        if (e_sym)
+        {
+            algebraic_g e_val = decimal::e();
+            if (e_val)
+                try_factor(e_val, e_sym);
+        }
+        if (best_denom <= 1)
+            goto done;
+
+        // Try x = (p/q) · π·√n for common combinations
+        if (pi_sym)
+        {
+            static const uint pi_sqrt_n[] = { 2, 3 };
+            for (uint n : pi_sqrt_n)
+            {
+                algebraic_g nval = integer::make(n);
+                algebraic_g sqrt_n = expression::make(ID_sqrt, nval);
+                algebraic_g prod = pi_val * sqrt_n;
+                algebraic_g sym =
+                    expression::make(ID_multiply, pi_sym, sqrt_n);
+                if (prod && sym)
+                    try_factor(prod, sym);
+            }
+        }
+        if (best_denom <= 1)
+            goto done;
+
+        // Try x = e^(p/q) by checking if ln(x) is rational
+        if (e_sym && !val->is_negative(false) && !val->is_zero(false))
+        {
+            algebraic_g lx = ln::run(val);
+            if (lx && !rt.error())
+            {
+                algebraic_g frac = lx;
+                if (to_fraction(frac))
+                {
+                    ularge d = fraction_denominator(frac);
+                    if (d < best_denom)
+                    {
+                        best_denom = d;
+                        if (frac->is_one(false))
+                        {
+                            best_result = wrap_symbolic(e_sym);
+                        }
+                        else
+                        {
+                            algebraic_g nfrac = -frac;
+                            if (nfrac && nfrac->is_one(false))
+                            {
+                                // Prefer 1/e over exp(-1)
+                                best_result = expression::make(ID_inv, e_sym);
+                            }
+                            else
+                            {
+                                best_result = expression::make(ID_exp, frac);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    rt.clear_error();
+                }
+            }
+            else
+            {
+                rt.clear_error();
+            }
+        }
+
+done:
+        x = best_result;
+        break;
+    }
+
+    case ID_integer:
+    case ID_neg_integer:
+    case ID_bignum:
+    case ID_neg_bignum:
+    case ID_fraction:
+    case ID_neg_fraction:
+    case ID_big_fraction:
+    case ID_neg_big_fraction:
+        break;
+
+    case ID_rectangular:
+    {
+        rectangular_p z = rectangular_p(+x);
+        algebraic_g re = z->re();
+        algebraic_g im = z->im();
+        if (!to_fraction_pi(re) || !to_fraction_pi(im))
+            return false;
+        x = rectangular::make(re, im);
+        break;
+    }
+    case ID_polar:
+    {
+        polar_p z = polar_p(+x);
+        algebraic_g mod = z->mod();
+        algebraic_g arg = z->pifrac();
+        if (!to_fraction_pi(mod) || !to_fraction_pi(arg))
+            return false;
+        x = polar::make(mod, arg, ID_PiRadians);
+        break;
+    }
+    case ID_range:
+    case ID_drange:
+    case ID_prange:
+    case ID_uncertain:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (!to_fraction_pi(lo) || !to_fraction_pi(hi))
+            return false;
+        x = range::make(r->type(), lo, hi);
+        break;
+    }
+    case ID_expression:
+    case ID_equation:
+    {
+        list_g mapped = list_p(+x)->map(to_fraction_pi_map_fn);
+        if (!mapped)
+            return false;
+        x = algebraic_g(mapped);
+        break;
+    }
+
+    case ID_unit:
+    {
+        unit_p ux = unit_p(+x);
+        algebraic_g v = ux->value();
+        algebraic_g u = ux->uexpr();
+        if (to_fraction_pi(v))
+        {
+            x = unit::simple(v, u);
+            break;
+        }
+    }
+    // fallthrough
+    default:
+        return false;
+    }
+    return x;
 }
 
 

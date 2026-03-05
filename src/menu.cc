@@ -388,7 +388,7 @@ MENU(RealMenu,
      ID_mod,
      ID_abs,
      "→Num",    ID_ToDecimal,
-     "→Frac",   ID_ToFraction,
+     "→Q",      ID_ToFraction,
 
      "Ceil",    ID_ceil,
      "Floor",   ID_floor,
@@ -423,9 +423,9 @@ MENU(PartsMenu,
 
      "→Int",    ID_ToInteger,
      "→Q",      ID_ToFraction,
+     "→Qπ",     ID_ToFractionPi,
      "SigDig",  ID_SigDig,
      ID_Get,
-     ID_GetI,
 
      ID_re,
      ID_im,
@@ -461,7 +461,7 @@ MENU(NumbersMenu,
 
      "→Num",    ID_ToDecimal,
      "→Q",      ID_ToFraction,
-     "→Qπ",     ID_Unimplemented,
+     "→Qπ",     ID_ToFractionPi,
      "R#Seed",  ID_RandomSeed,
      RandomGeneratorBits::label,        ID_RandomGeneratorBits,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,
@@ -1359,11 +1359,11 @@ MENU(FractionsMenu,
      "HMS→",    ID_FromHMS,
 
      "Frac→",   ID_Explode,
-     "Cycle",   ID_Cycle,
-     FractionIterations::label,         ID_FractionIterations,
-     FractionDigits::label,             ID_FractionDigits,
      "1 1/2",   ID_MixedFractions,
-     "¹/₃",     ID_SmallFractions
+     "¹/₃",     ID_SmallFractions,
+     FractionIterations::label,         ID_FractionIterations,
+     FractionLargestPrime::label,       ID_FractionLargestPrime,
+     FractionDigits::label,             ID_FractionDigits
 );
 
 
