@@ -1882,9 +1882,9 @@ COMMAND_BODY(PixColor)
     if (pixel_color(c))
     {
         algebraic_g scale = integer::make(255);
-        algebraic_g red = algebraic_g(integer::make(c.red())) / scale;
-        algebraic_g green = algebraic_g(integer::make(c.green())) / scale;
-        algebraic_g blue = algebraic_g(integer::make(c.blue())) / scale;
+        algebraic_g red   = integer::make(c.red()) / scale;
+        algebraic_g green = integer::make(c.green()) / scale;
+        algebraic_g blue  = integer::make(c.blue()) / scale;
         if (scale && rt.top(+red) && rt.push(+green) && rt.push(+blue))
             return object::OK;
     }

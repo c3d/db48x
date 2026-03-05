@@ -1476,9 +1476,9 @@ NFUNCTION_BODY(comb)
             ularge mi = mval->value<ularge>();
             n = integer::make(ni < mi ? 0 : 1);
             for (ularge i = ni - mi + 1; i <= ni && n; i++)
-                n = n * algebraic_g(integer::make(i));
+                n = n * integer::make(i);
             for (ularge i = 2; i <= mi && n; i++)
-                n = n / algebraic_g(integer::make(i));
+                n = n / integer::make(i);
             return n;
         }
     }
@@ -1502,7 +1502,7 @@ NFUNCTION_BODY(perm)
             ularge mi = mval->value<ularge>();
             n = integer::make(ni < mi ? 0 : 1);
             for (ularge i = ni - mi + 1; i <= ni && n; i++)
-                n = n * algebraic_g(integer::make(i));
+                n = n * integer::make(i);
             return n;
         }
     }
