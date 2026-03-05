@@ -18,7 +18,7 @@ The simulator uses the [recorder](https://github.com/c3d/recorder) subsystem to 
 | Variable | Description |
 | --- | --- |
 | DB48X_TRACES | A trace filter value for the recorder. Default = ".*(error\|warn(ing)?)s?" |
-| DB48X_INSTALL | Setting this variable is equivalent to setting the `-I` option. |
+| DB48X_INSTALL | Setting this variable is equivalent to using the `-I` option. |
 
 
 ## Options
@@ -27,16 +27,16 @@ The simulator can be started with the command-line options listed in the table b
 
 | Option | Description |
 | --- | --- |
-| -d[[`<whitespace>`]`<integer>`] | Set key delay time in milliseconds to slow down tests. Default = 0ms. |
-| -i[[`<whitespace>`]`<integer>`] | Set the maximum time waiting for an image to match the expected image during testing. Default is 500ms. |
+| -d[[`<whitespace>`]`<integer>`] | Set key delay time in milliseconds to slow down tests. Default = 0 ms. |
+| -i[[`<whitespace>`]`<integer>`] | Set the maximum time waiting for an image to match the expected image during testing. Default = 500 ms. |
 | -k[[`<whitespace>`]`<argument>`] | Load a saved keymap to change keyboard layout. |
 | -K | Simulate typing of individual keys during tests. |
 | -m[[`<whitespace>`]`<integer>`] | Set the memory size available to the calculator in megabytes. |
 | -n | Enable beeps while running the test suite (noisy testing). |
-| -r[[`<whitespace>`]`<integer>`] | Set the time to wait for a screen update in milliseconds. Default = 20ms. |
+| -r[[`<whitespace>`]`<integer>`] | Set the time to wait for a screen update in milliseconds. Default = 20 ms. |
 | -s[[`<whitespace>`]`<real>`] | Scale the application window by the given floating-point scaling factor. |
 | -t`<trace>` | Enable the named recorder trace. Multiple traces can be enabled by using multiple `-t` options, or by using a regular expression as an argument to `-t`. |
-| -w[[`<whitespace>`]`<integer>`] | Set the default time the test suite waits for a command to complete, in milliseconds. You can increase this to run the test suite on a very slow machine. The default is 1000ms. |
+| -w[[`<whitespace>`]`<integer>`] | Set the default time the test suite waits for a command to complete, in milliseconds. You can increase this to run the test suite on a very slow machine. The default = 1000 ms. |
 | -D[[`<whitespace>`]`<argument>`] | Set the pattern of recorder traces to show when a test fails. |
 | -I | Initialize the user's environment. WARNING: This may overwrite user configuration with defaults. |
 | -N | Disable beeps. Use this if you get error messages about audio drivers. |
@@ -77,10 +77,10 @@ The majority of the keys map directly to calculator keys.
 | Backspace | ← |
 | Enter | _ENTER_ |
 | Tab | Shift (yellow) key |
-| Up Down Left Right | ◀ ▶︎ ◀︎ ▶︎ (the DM42/DM32 only have left and right keys) |
+| Up Down Left Right | ◀ ▶︎ ◀︎ ▶︎ (the DM42(n) / DM32 only have up and down keys) |
 | Esc | _EXIT_ |
 | Space | _=_ (also serves as the space or `RUN` key depending on context) |
-| F1-F6 | Simulates DM42 / DM32 softmenu keys from left to right |
+| F1-F6 | Simulates DM42(n) / DM32 softmenu keys from left to right |
 | A-Z | Corresponding key on calculator, e.g. _J_ maps to `SIN` |
 
 ### Alpha modes
@@ -89,6 +89,8 @@ Alphabetic keys map directly to the corresponding calculator key. To cycle throu
 
 In addition, the simulator emulates _transient alpha_ mode using Shift or Alt:
 
+| Key(s) | Description |
+| --- | --- |
 | Shift + Alpha | Uppercase Alpha |
 | Alt + Alpha | Lowercase Alpha |
 
@@ -98,10 +100,12 @@ For example, you can quickly type `Hello` by holding Shift-H, followed by Alt-e-
 
 Some keyboard shortcuts are specific to the simulator.
 
+| Key(s) | Description |
+| --- | --- |
 | Ctrl + C | Copy the top of the stack or edit line to the clipboard. |
 | Ctrl + Shift + C | Copy the screen contents to the clipboard |
 | Ctrl + V | Paste the clipboard to the edit line. |
-| F8 | Save program (`SAVE_PGM`) |
+| F8 | Save state  (`SaveState`) |
 | F9 | Take a screenshot snapshot (saved in `screens/`) |
 | F10 | Load another keyboard map. Cycle through db48x, legacy, 42style, and true42. |
 | F11 | Run / Interrupt the current test. |
