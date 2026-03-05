@@ -4359,13 +4359,55 @@ void tests::fraction_decimal_conversions()
     test("→Num", ENTER).expect("[ 0.25-0.5ⅈ 0.75 ]");
     test("→Q", ENTER).expect("[ 1/4-1/2ⅈ 3/4 ]");
 
+    step("→Q with range");
+    test(CLEAR, "1.5 2.5", ENTER, ID_RangeMenu, ID_ToRange).noerror()
+        .test("→Q", ENTER).want("3/2…5/2");
+
+    step("→Q with list");
+    test(CLEAR, "{ 0.25 0.5 0.75 }", ENTER).noerror()
+        .test("→Num", ENTER).expect("{ 0.25 0.5 0.75 }")
+        .test("→Q", ENTER).expect("{ 1/4 1/2 3/4 }");
+
+    step("→Q with negative values");
+    test(CLEAR, "1.5 neg", ENTER).noerror()
+        .test("→Q", ENTER).expect("-3/2");
+    test(CLEAR, "2.6 neg", ENTER).noerror()
+        .test("→Q", ENTER).expect("-13/5");
+    test(CLEAR, "{ -1.5 2.3 }", ENTER).noerror()
+        .test("→Q", ENTER).expect("{ -3/2 23/10 }");
+
+    step("→Q with matrix");
+    test(CLEAR, "[ [ 0.25 0.5 ] [ 0.75 1 ] ]", ENTER).noerror()
+        .test("→Q", ENTER)
+        .expect("[[ 1/4 1/2 ]\n  [ 3/4 1 ]]");
+
     step("Expressions");
     test(CLEAR, "355 113 /",
          LSHIFT, I, F2, F1, "-", ENTER) .expect("'355/113-π'");
     test("→Num", ENTER).expect("0.00000 02667 64");
 
+    step("→Q with algebraic expression");
+    test(CLEAR, "'355/113'", ENTER).noerror()
+        .test("→Q", ENTER).expect("355/113");
+    test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER).noerror()
+        .test("→Q", ENTER)
+        .want("'5/2·X^(exp 2)-√ 3+ln 2·Y'");
+
+    // HP50G limits fraction precision to FIX mode.
+    step("ToFraction respects DisplayDigits (STD, FIX 8, 6, 4, 2)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("pi →Num ToFraction", ENTER).expect("5 419 351/1 725 033")
+        .test(CLEAR, "8 FIX", ENTER).noerror()
+        .test("pi →Num ToFraction", ENTER).expect("103 993/33 102")
+        .test(CLEAR, "6 FIX", ENTER).noerror()
+        .test("pi →Num ToFraction", ENTER).expect("103 993/33 102")
+        .test(CLEAR, "4 FIX", ENTER).noerror()
+        .test("pi →Num ToFraction", ENTER).expect("355/113")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("pi →Num ToFraction", ENTER).expect("333/106");
+
     step("Restoring small fraction mode")
-        .test(CLEAR, "SmallFractions MixedFractions", ENTER).noerror();
+        .test(CLEAR, "SmallFractions MixedFractions Std", ENTER).noerror();
 }
 
 
@@ -4477,6 +4519,61 @@ void tests::fraction_pi_conversions()
     step("355/113 close to pi but should stay rational")
         .test(CLEAR, "355. 113 /", ENTER, ID_ToFractionPi)
         .expect("355/113");
+
+    step("→Qπ at lower precision (FIX 2, 3, 4)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("2 √ →Num", ENTER, ID_ToFractionPi).expect("'√ 2'")
+        .test(CLEAR, "Std", ENTER).noerror();
+
+    // π+0.001 and √2+0.001 are not the constants; verify we get something other than π/√2
+    step("→Qπ cutoff: π+0.001 gives non-π form (not mistaken for π)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .expect("'exp(150/131)'")  // e^(150/131) ≈ 3.1426, not π
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .expect("'123/43·ln 3'")   // ln 3 factor, not π
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .expect("'1/4·√ 158'")    // √ factor, not π
+        .test(CLEAR, "Std", ENTER).noerror();
+
+    step("→Qπ cutoff: √2+0.001 gives non-√2 form (not mistaken for √2)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .expect("'8/11·ln 7'")   // ln 7 factor, not √2
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .expect("'8/11·ln 7'")
+        .test(CLEAR, "Std", ENTER).noerror();
+
+    step("→Qπ with complex")
+        .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToFractionPi)
+        .expect("1/4+1/2ⅈ")
+        .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToFractionPi)
+        .expect("1/4-1/2ⅈ");
+
+    step("→Qπ with range")
+        .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
+        .test(ID_ToFractionPi)
+        .expect("'π'…'3/921 970·√ 932 754 283 090'");
+
+    step("→Qπ with vector")
+        .test(CLEAR, "[ 0.25 '√2' ] →Num", ENTER, ID_ToFractionPi)
+        .want("[ 1/4 '√ 2' ]");
+
+    step("→Qπ with algebraic expression (multiple variables and functions)")
+        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToFractionPi)
+        .want("'5/2·X^(exp 2)-√ 3+ln 2·Y'");
 
     step("Restore default settings")
         .test(CLEAR,
