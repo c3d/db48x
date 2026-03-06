@@ -406,7 +406,7 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 }
 
 
-object::result function::evaluate(algebraic_fn op, bool mat)
+object::result function::evaluate(algebraic_fn op, uint seqtypes)
 // ----------------------------------------------------------------------------
 //   Perform the operation from the stack, using a C++ operation
 // ----------------------------------------------------------------------------
@@ -436,13 +436,12 @@ object::result function::evaluate(algebraic_fn op, bool mat)
             }
             topty = top ? top->type() : ID_expression;
         }
-        if (topty == ID_list || (topty == ID_array && !mat))
+        if (topty == ID_list ||
+            (topty == ID_array && (seqtypes & (1UL << topty)) == 0))
         {
             top = list_p(top)->map(op);
         }
-        else if (is_algebraic(topty)            ||
-                 (topty == ID_array && mat)     ||
-                 (is_integer(topty) && op == algebraic_fn(neg::evaluate)))
+        else if (is_algebraic(topty) || (seqtypes & (1UL << topty)))
         {
             algebraic_g x = algebraic_p(top);
             x = op(x);

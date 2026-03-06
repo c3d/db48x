@@ -38,6 +38,7 @@
 #include "complex.h"
 #include "constants.h"
 #include "decimal.h"
+#include "equations.h"
 #include "expression.h"
 #include "functions.h"
 #include "hwfp.h"
@@ -408,6 +409,18 @@ bool algebraic::to_integer(algebraic_g &x)
 }
 
 
+static algebraic_p to_fraction_map_fn(algebraic_r a)
+// ----------------------------------------------------------------------------
+//   Wrapper for list::map to apply to_fraction to expression elements
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ag = a;
+    if (ag->is_algebraic_num())
+        algebraic::to_fraction(ag);
+    return +ag;
+}
+
+
 bool algebraic::to_fraction(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //  Check if we can promote the number to a fraction
@@ -480,8 +493,28 @@ bool algebraic::to_fraction(algebraic_g &x)
             x = unit::simple(v, u);
             break;
         }
+        return false;
     }
-    // fallthrough
+    case ID_equation:
+    {
+        object_p inner = equation_p(+x)->value();
+        if (!inner || !inner->is_algebraic())
+            return false;
+        x = algebraic_p(inner);
+        // fall through - reuse expression handling below
+    }
+    case ID_array:
+    case ID_list:
+    case ID_expression:
+    {
+        list_g mapped = list_p(+x)->map(to_fraction_map_fn);
+        if (!mapped)
+            return false;
+        record(algebraic, "to_fraction mapped %p type %+s size %u",
+               +mapped, object::name(mapped->type()), mapped->size());
+        x = +mapped;
+        break;
+    }
     default:
         return false;
     }
@@ -559,7 +592,8 @@ static algebraic_p to_fraction_pi_map_fn(algebraic_r a)
 // ----------------------------------------------------------------------------
 {
     algebraic_g ag = a;
-    algebraic::to_fraction_pi(ag);
+    if (ag->is_algebraic_num())
+        algebraic::to_fraction_pi(ag);
     return +ag;
 }
 
@@ -844,13 +878,22 @@ done:
         x = range::make(r->type(), lo, hi);
         break;
     }
-    case ID_expression:
     case ID_equation:
+    {
+        object_p inner = equation_p(+x)->value();
+        if (!inner || !inner->is_algebraic())
+            return false;
+        x = algebraic_p(inner);
+        // fall through - reuse expression handling below
+    }
+    case ID_array:
+    case ID_list:
+    case ID_expression:
     {
         list_g mapped = list_p(+x)->map(to_fraction_pi_map_fn);
         if (!mapped)
             return false;
-        x = algebraic_g(mapped);
+        x = +mapped;
         break;
     }
 

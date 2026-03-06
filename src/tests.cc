@@ -4387,11 +4387,12 @@ void tests::fraction_decimal_conversions()
     test("→Num", ENTER).expect("0.00000 02667 64");
 
     step("→Q with algebraic expression");
-    test(CLEAR, "'355/113'", ENTER).noerror()
-        .test("→Q", ENTER).expect("355/113");
+    test(CLEAR, "'35.5/11.3'", ENTER).noerror()
+        .test("→Q", ENTER).want("'71/2÷(113/10)'")
+        .test(ID_Run).expect("355/113");
     test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER).noerror()
         .test("→Q", ENTER)
-        .want("'5/2·X^(exp 2)-√ 3+ln 2·Y'");
+        .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
 
     // HP50G limits fraction precision to FIX mode.
     step("ToFraction respects DisplayDigits (STD, FIX 8, 6, 4, 2)")
@@ -4568,21 +4569,21 @@ void tests::fraction_pi_conversions()
         .expect("'π'…'3/921 970·√ 932 754 283 090'");
 
     step("→Qπ with vector")
-        .test(CLEAR, "[ 0.25 '√2' ] →Num", ENTER, ID_ToFractionPi)
-        .want("[ 1/4 '√ 2' ]");
+        .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToFractionPi)
+        .expect("[ 1/4 '2·√ 10' ]");
 
     step("→Qπ with algebraic expression (multiple variables and functions)")
         .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToFractionPi)
-        .want("'5/2·X^(exp 2)-√ 3+ln 2·Y'");
+        .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
 
     step("Restore default settings")
         .test(CLEAR,
-              DIRECT("{ FractionLargestPrime BigFraction ImproperFraction } "
+              DIRECT("{ FractionLargestPrime BigFractions ImproperFractions } "
                      "Purge Std"), ENTER).noerror();
 
     step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
         .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToFractionPi)
-        .expect("'17/3·√ 997'");
+        .expect("'¹⁷/₃·√ 997'");
 }
 
 
