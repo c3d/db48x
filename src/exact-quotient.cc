@@ -6,15 +6,19 @@
 //
 //     XQ: find the simplest symbolic representation of a real number.
 //
-//     Algorithm:
-//       For each template T ∈ { OPR(p/q · c), c · OPR(p/q) }
-//         with OPR ∈ { id, √, ln, exp } and c ∈ { 1, π, … }:
-//         1. Compute v = OPR⁻¹(x) / c  [Form A, c_inside]
-//            or      v = OPR⁻¹(x / c)  [Form B, c_outside]
-//         2. Find the best rational approximation p/q ≈ v using
-//            decimal::to_fraction() (continued-fraction convergents).
-//         3. Build the symbolic expression.
-//       Select the template yielding the expression with fewest bytes.
+//     Algorithm ported and adapted from QPI 4.3 for the HP 48G/GX
+//     by Mika Heiskanen & Andre Schoorl, re-implemented by Han Duong
+//     for the HP Prime, then ported to DB48X.
+//
+//     Given a decimal number, XQ tries to express it as one of:
+//       1. p/q              — rational fraction
+//       2. a/b × √(c/d)    — rational multiple of a square root
+//       3. p/q × π         — rational multiple of pi
+//       4. ln(p/q)         — natural log of a rational
+//       5. e^(p/q)         — exponential of a rational
+//     The representation with the smallest denominator that matches
+//     the input within the current precision is returned.
+//
 //
 // ****************************************************************************
 //   (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
@@ -33,11 +37,13 @@
 #include "exact-quotient.h"
 
 #include "algebraic.h"
+#include "arithmetic.h"
 #include "bignum.h"
 #include "constants.h"
 #include "decimal.h"
 #include "expression.h"
 #include "fraction.h"
+#include "functions.h"
 #include "integer.h"
 #include "list.h"
 #include "settings.h"
@@ -49,378 +55,539 @@
 //
 // ============================================================================
 
-static bool xq_best_approx(decimal_r dec, bignum_g &out_p, bignum_g &out_q)
+static bool xq_approx(decimal_r dec, bignum_g &p_out, bignum_g &q_out)
 // ----------------------------------------------------------------------------
-//   Find smallest-denominator p/q ≈ dec using decimal::to_fraction().
-//   dec must be positive (absolute value).  Returns false if none found.
+//   Find best rational p/q ≈ abs(dec) within current precision.
+//   Delegates to decimal::to_fraction with precision-based stopping criterion,
+//   then extracts p (numerator) and q (denominator) as bignums.
 // ----------------------------------------------------------------------------
-//   We use a tolerance of (Precision − 4) digits.  The four-digit slack
-//   absorbs the ULP-level rounding that accumulates in derived quantities such
-//   as (x/π)² or x²/π, where straightforward decimal arithmetic loses ~1–2
-//   digits relative to the true algebraic value.  (DB48X stores mantissa ×
-//   10^exp with mantissa ∈ [0.001, 1), so a remainder of 10^{-N} has exp =
-//   -(N-1); the strict inequality -exp > decimals then requires decimals ≤ N-2,
-//   hence prec-4 rather than prec-2.)
 {
     if (!dec)
         return false;
-    uint        prec     = Settings.Precision();
-    uint        prec_tol = prec > 4 ? prec - 4 : 1;
-    decimal_g   num      = dec;         // GC root: dec is a raw pointer
-    algebraic_g frac     = num->to_fraction(prec, prec_tol);
-    if (!frac)
+
+    // Special case: zero.
+    if (dec->is_zero())
+    {
+        p_out = bignum::make(0);
+        q_out = bignum::make(1);
+        return p_out && q_out;
+    }
+
+    uint prec = Settings.Precision();
+    uint tol  = (prec >= 4) ? prec - 4 : 0;
+
+    // to_fraction(count, decimals): runs CF, stops when |remainder| < 10^(-decimals).
+    // We allow up to prec iterations and stop when the residual is below our
+    // accuracy floor, matching the precision-based threshold used for XQ.
+    algebraic_g result = dec->to_fraction(prec, tol);
+    if (!result)
         return false;
-    object::id ty = frac->type();
-    if (object::is_integer(ty) || object::is_bignum(ty))
+
+    bignum_g one = bignum::make(1);
+    if (!one)
+        return false;
+
+    object::id ty = result->type();
+    if (ty == object::ID_big_fraction)
     {
-        out_p = bignum::promote(+frac);
-        out_q = bignum::make(1);
-        return out_p && out_q;
+        big_fraction_p bf = big_fraction_p(+result);
+        p_out = bf->numerator();
+        q_out = bf->denominator();
     }
-    if (ty == object::ID_fraction || ty == object::ID_big_fraction)
+    else if (ty == object::ID_fraction)
     {
-        fraction_p f = fraction_p(+frac);
-        out_p = f->numerator();
-        out_q = f->denominator();
-        return out_p && out_q;
+        fraction_p f = fraction_p(+result);
+        p_out = f->numerator();    // bignum_p overload
+        q_out = f->denominator();  // bignum_p overload
     }
-    return false;
+    else if (object::is_bignum(ty))
+    {
+        p_out = bignum_p(+result);
+        q_out = one;
+    }
+    else if (object::is_integer(ty))
+    {
+        p_out = bignum::make(integer_p(+result)->value<ularge>());
+        q_out = one;
+    }
+    else
+    {
+        return false;
+    }
+
+    return p_out && q_out;
+}
+
+
+static bool xq_approx_of(decimal_p d, bignum_g &p, bignum_g &q)
+// ----------------------------------------------------------------------------
+//   Approx of absolute value of d. Returns false on failure.
+// ----------------------------------------------------------------------------
+{
+    if (!d)
+        return false;
+    decimal_g abs_d = decimal::abs(d);
+    if (!abs_d)
+        return false;
+    return xq_approx(abs_d, p, q);
 }
 
 
 // ============================================================================
 //
-//   Template table
-//
-// ============================================================================
-//
-// Each template describes one symbolic form to probe.  Two forms exist:
-//
-//   Form A (c_inside = true):  OPR(p/q · c) = |x|
-//   Form B (c_inside = false): c · OPR(p/q) = |x|
-//
-// For identity OPR both forms are equivalent; only one row per constant is
-// needed.  The inverse computations are:
-//
-//   OPR   |  OPR⁻¹
-//   ------+---------
-//   id    |  id
-//   √     |  (·)²
-//   ln    |  exp
-//   exp   |  ln
-//
-// To add a new operator: insert rows with its object::id and add its inverse
-// in the switch inside xq_inv_arg.
-// To add a new constant: insert rows with its name as recognised by
-// constant::lookup.
-
-struct xq_tmpl
-{
-    object::id  opr;      // ID_sqrt / ID_ln / ID_exp; ID_object = identity
-    const char *c_name;   // constant name ("π"…) or nullptr (c = 1)
-    bool        c_inside; // true → Form A: OPR(p/q·c); false → Form B: c·OPR(p/q)
-};
-
-static const xq_tmpl xq_templates[] =
-{
-    // identity
-    { object::ID_object, nullptr, false },  // p/q
-    { object::ID_object, "π",    false },   // p/q · π
-    // square root
-    { object::ID_sqrt,   nullptr, false },  // √(p/q)
-    { object::ID_sqrt,   "π",    true  },   // √(p/q · π)
-    { object::ID_sqrt,   "π",    false },   // √(p/q) · π
-    // natural logarithm
-    { object::ID_ln,     nullptr, false },  // ln(p/q)
-    { object::ID_ln,     "π",    true  },   // ln(p/q · π)
-    { object::ID_ln,     "π",    false },   // ln(p/q) · π
-    // exponential
-    { object::ID_exp,    nullptr, false },  // exp(p/q)
-    { object::ID_exp,    "π",    true  },   // exp(p/q · π)
-    { object::ID_exp,    "π",    false },   // exp(p/q) · π
-};
-
-
-// ============================================================================
-//
-//   Inverse computation and expression builder
+//   Helper: build algebraic from bignums
 //
 // ============================================================================
 
-static algebraic_p bignum_to_alg(bignum_r n)
+static algebraic_p make_number(bignum_r p, bignum_r q)
 // ----------------------------------------------------------------------------
-//   Return an integer if the bignum fits, else the bignum itself
+//   Build algebraic p/q from two non-negative bignums (p ≥ 0, q ≥ 1).
+//   Returns integer when q==1, fraction otherwise.
+// ----------------------------------------------------------------------------
+{
+    if (!p || !q)
+        return nullptr;
+    if (q->is_one())
+    {
+        if (integer_p i = p->as_integer())
+            return algebraic_p(i);
+        return algebraic_p(+p);
+    }
+    return algebraic_p(big_fraction::make(p, q));
+}
+
+
+static algebraic_p make_neg_number(bignum_r p, bignum_r q)
+// ----------------------------------------------------------------------------
+//   Build algebraic -(p/q) from non-negative bignums.
+// ----------------------------------------------------------------------------
+{
+    if (!p || !q)
+        return nullptr;
+    bignum_g np = bignum_p(-p);
+    if (!np)
+        return nullptr;
+    if (q->is_one())
+    {
+        if (integer_p i = np->as_integer())
+            return algebraic_p(i);
+        return algebraic_p(+np);
+    }
+    return algebraic_p(big_fraction::make(np, q));
+}
+
+
+// ============================================================================
+//
+//   Perfect-square factoring: n = a^2 * b (b square-free)
+//   Ported from qpi_asqrtb() in Han Duong's HP Prime QPI.
+//
+// ============================================================================
+
+static bool xq_asqrtb(bignum_r n, bignum_g &a_out, bignum_g &b_out)
+// ----------------------------------------------------------------------------
+//   Factor n = a² × b where b is square-free, so √n = a × √b.
+//   Returns {1, n} when n is too large to factor efficiently.
 // ----------------------------------------------------------------------------
 {
     if (!n)
-        return nullptr;
-    if (integer_p small = n->as_integer())
-        return algebraic_p(small);
-    return algebraic_p(+n);
-}
+        return false;
 
-
-static decimal_g xq_inv_arg(decimal_r x, decimal_r c, object::id opr, bool c_inside)
-// ----------------------------------------------------------------------------
-//   Compute the rational value v = p/q to approximate for a given template.
-//   Form A (c_inside): OPR(p/q·c)=x  →  v = OPR⁻¹(x) / c
-//   Form B:            c·OPR(p/q)=x  →  v = OPR⁻¹(x/c)
-//   Returns nullptr when the result is not a positive real.
-// ----------------------------------------------------------------------------
-{
-    decimal_g v = x;        // GC root
-    if (!v)
-        return nullptr;
-
-    if (c_inside)
+    // Only bother for small n; beyond ~10^12 the expression is too ugly anyway.
+    if (n->more_bits_than(42)) // 2^42 ≈ 4×10^12
     {
-        // Form A: apply OPR⁻¹ first, then divide by c
-        switch (opr)
-        {
-        case object::ID_sqrt:  v = v * v;            break;
-        case object::ID_ln:    v = decimal::exp(v);  break;
-        case object::ID_exp:   v = decimal::ln(v);   break;
-        default:               /* identity */         break;
-        }
-        if (c && v)
-            v = v / c;
-    }
-    else
-    {
-        // Form B: divide by c first, then apply OPR⁻¹
-        if (c && v)
-            v = v / c;
-        switch (opr)
-        {
-        case object::ID_sqrt:  v = v * v;            break;
-        case object::ID_ln:    v = decimal::exp(v);  break;
-        case object::ID_exp:   v = decimal::ln(v);   break;
-        default:               /* identity */         break;
-        }
+        a_out = bignum::make(1);
+        b_out = +n;
+        return a_out && b_out;
     }
 
-    // Reject non-positive results (e.g. ln of value < 1 yields neg_decimal)
-    if (!v || v->type() != object::ID_decimal)
-        return nullptr;
-    return v;
-}
+    bignum_g a   = bignum::make(1);
+    bignum_g rem = +n;
+    bignum_g one = bignum::make(1);
+    bignum_g two = bignum::make(2);
+    if (!a || !rem || !one || !two)
+        return false;
 
+    // Try divisors k² = 4, 9, 16, 25, ...  (k = 2, 3, 4, 5, ...)
+    // encoded as: den=4, nodd=3; increment nodd by 2 each time den fails,
+    // den += nodd after increment (so den = 4, 9, 16, 25, ...).
+    bignum_g nodd = bignum::make(3);
+    bignum_g den  = bignum::make(4);
+    if (!nodd || !den)
+        return false;
 
-static algebraic_p xq_build(bignum_r p, bignum_r q, const xq_tmpl &tmpl, bool neg)
-// ----------------------------------------------------------------------------
-//   Build the symbolic expression OPR(p/q·c) or c·OPR(p/q), negated if needed.
-// ----------------------------------------------------------------------------
-{
-    bignum_g pn = p, qn = q;       // GC roots
-
-    // Build p/q (or plain integer p when q = 1).
-    // For a plain rational (identity OPR, no constant), fold the sign into the
-    // numerator so we produce a proper negative fraction (-1/2) rather than the
-    // expression form (-(1/2)), which renders with unwanted parentheses.
-    if (tmpl.opr == object::ID_object && !tmpl.c_name)
+    while (true)
     {
-        algebraic_g result;
-        if (qn->is_one())
+        bignum_g quo, r;
+        if (!bignum::quorem(rem, den, bignum::ID_bignum, &quo, &r))
+            break;
+
+        if (r->is_zero())
         {
-            result = bignum_to_alg(pn);
-            if (neg && result)
-                result = expression::make(object::ID_neg, result);
+            // rem is divisible by den = k²; extract factor k.
+            // k = IP(nodd/2) + 1  (nodd = 2k-1, so IP((2k-1)/2) + 1 = k)
+            bignum_g half, ignore;
+            if (!bignum::quorem(nodd, two, bignum::ID_bignum, &half, &ignore))
+                break;
+            bignum_g k   = half + one;
+            bignum_g atmp = a * k;
+            if (!k || !atmp)
+                break;
+            a   = atmp;
+            rem = quo;
+            // Do NOT advance nodd/den: try the same divisor again.
         }
         else
         {
-            bignum_g signed_p = neg ? bignum_g(-pn) : pn;
-            fraction_p frac = big_fraction::make(signed_p, qn);
-            if (!frac)
-                return nullptr;
-            result = frac;
+            // Not divisible: advance to next square.
+            bignum_g nodd2 = nodd + two;
+            bignum_g den2  = den + nodd2;
+            if (!nodd2 || !den2)
+                break;
+            nodd = nodd2;
+            den  = den2;
         }
-        return +result;
+
+        // Stop when quotient is 0 (rem < den) or den got huge.
+        if (quo->is_zero() || den->more_bits_than(42))
+            break;
     }
 
-    algebraic_g pq;
-    if (qn->is_one())
-        pq = bignum_to_alg(pn);
-    else
-    {
-        fraction_p frac = big_fraction::make(pn, qn);
-        if (!frac)
-            return nullptr;
-        pq = frac;
-    }
-    if (!pq)
+    a_out = a;
+    b_out = rem;
+    return a_out && b_out;
+}
+
+
+// ============================================================================
+//
+//   Expression builders
+//
+// ============================================================================
+
+static algebraic_p build_sqrt(bignum_r p, bignum_r q, bool neg)
+// ----------------------------------------------------------------------------
+//   Build ±(a1/a2)*√(b1/b2) where p = a1²*b1, q = a2²*b2.
+//   p and q are the numerator and denominator of r² approximation.
+// ----------------------------------------------------------------------------
+{
+    bignum_g a1, b1, a2, b2;
+    if (!xq_asqrtb(p, a1, b1) || !xq_asqrtb(q, a2, b2))
         return nullptr;
 
-    // Get constant symbol (nullptr when c = 1)
-    algebraic_g c_sym;
-    if (tmpl.c_name)
-    {
-        c_sym = constant::lookup(tmpl.c_name);
-        if (!c_sym)
-            return nullptr;
-    }
+    // Inner argument: b1/b2 (auto-reduced by big_fraction::make).
+    algebraic_g inner = make_number(b1, b2);
+    if (!inner)
+        return nullptr;
 
-    // Build the OPR argument: p/q, or p/q·c (simplifying 1·c → c)
-    algebraic_g arg;
-    if (c_sym && tmpl.c_inside)
-    {
-        if (pn->is_one() && qn->is_one())
-            arg = c_sym;
-        else
-            arg = expression::make(object::ID_multiply, pq, c_sym);
-        if (!arg)
-            return nullptr;
-    }
-    else
-    {
-        arg = pq;
-    }
+    // Sqrt expression: √(b1/b2).
+    algebraic_g sqrtexpr = algebraic_p(
+        expression::make(object::ID_sqrt, inner));
+    if (!sqrtexpr)
+        return nullptr;
 
-    // Apply OPR (identity leaves arg unchanged)
+    // Rational prefix (a1/a2); omit when it equals 1 (a1 == a2).
     algebraic_g result;
-    if (tmpl.opr == object::ID_object)
-        result = arg;
+    if (bignum::compare(a1, a2) == 0)
+    {
+        // a1 == a2: prefix is 1, just return ±√(b1/b2).
+        result = sqrtexpr;
+    }
+    else if (a1->is_one())
+    {
+        // a1 == 1: build √(b1/b2) ÷ a2 (HP-style: √p÷q rather than (1/q)·√p).
+        bignum_g one = bignum::make(1);
+        algebraic_g denom = make_number(a2, one);
+        if (!denom)
+            return nullptr;
+        result = algebraic_p(
+            expression::make(object::ID_divide, sqrtexpr, denom));
+    }
     else
     {
-        result = expression::make(tmpl.opr, arg);
-        if (!result)
+        algebraic_g coeff = make_number(a1, a2);
+        if (!coeff)
             return nullptr;
+        result = algebraic_p(
+            expression::make(object::ID_multiply, coeff, sqrtexpr));
     }
 
-    // Multiply by c when c goes outside (simplifying 1·c → c)
-    if (c_sym && !tmpl.c_inside)
-    {
-        if (tmpl.opr == object::ID_object && pn->is_one() && qn->is_one())
-            result = c_sym;
-        else
-            result = expression::make(object::ID_multiply, result, c_sym);
-        if (!result)
-            return nullptr;
-    }
+    if (!result)
+        return nullptr;
 
     if (neg)
-        result = expression::make(object::ID_neg, result);
+        result = algebraic_p(expression::make(object::ID_neg, result));
 
     return +result;
 }
 
 
-// ============================================================================
-//
-//   Generic XQ engine
-//
-// ============================================================================
-
-static algebraic_p xq_one(algebraic_r xo, const xq_tmpl *tmpls, size_t count)
+static algebraic_p build_pi_mult(bignum_r p, bignum_r q, bool neg)
 // ----------------------------------------------------------------------------
-//   Apply templates to a single value; return best match or xo unchanged.
-//   Returns nullptr only on type error (non-numeric input).
+//   Build ±(p/q)*π.  p and q must be positive (sign handled via neg).
 // ----------------------------------------------------------------------------
 {
-    if (!xo)
+    algebraic_g pi = constant::lookup("π");
+    if (!pi)
         return nullptr;
 
-    // Integer or fraction: already exact, return unchanged
-    object::id ty = xo->type();
-    if (object::is_integer(ty) || object::is_fraction(ty))
-        return +xo;
-
-    // Convert to decimal
-    algebraic_g xg = xo;
-    if (!algebraic::to_decimal(xg))
+    if (q->is_one() && p->is_one())
     {
-        rt.type_error();
-        return nullptr;
-    }
-    if (!xg)
-        return nullptr;
-
-    // Work with |x|, remember sign
-    bool      neg  = xg->type() == object::ID_neg_decimal;
-    decimal_g adec = decimal_p(+xg);
-    if (neg)
-        adec = decimal::abs(adec);
-    if (!adec)
-        return nullptr;
-
-    // Try every template; keep the expression with the smallest byte count
-    algebraic_g best    = nullptr;
-    size_t      best_sz = SIZE_MAX;
-
-    for (size_t i = 0; i < count; i++)
-    {
-        const xq_tmpl &tmpl = tmpls[i];
-
-        // Resolve constant to its decimal value via →NUM (nullptr when c = 1)
-        decimal_g c_dec;
-        if (tmpl.c_name)
-        {
-            algebraic_g c_alg = constant::lookup(tmpl.c_name);
-            if (!c_alg || !algebraic::to_decimal(c_alg))
-                continue;
-            c_dec = decimal_p(+c_alg);
-            if (!c_dec)
-                continue;
-        }
-
-        // Compute the rational value to approximate for this template
-        decimal_g arg = xq_inv_arg(adec, c_dec, tmpl.opr, tmpl.c_inside);
-        if (!arg)
-            continue;
-
-        // Find best rational p/q ≈ arg
-        bignum_g p, q;
-        if (!xq_best_approx(arg, p, q))
-            continue;
-
-        // Build the expression and track the smallest
-        algebraic_g expr = xq_build(p, q, tmpl, neg);
-        if (!expr)
-            continue;
-
-        size_t sz = expr->size();
-        if (sz < best_sz)
-        {
-            best_sz = sz;
-            best    = expr;
-        }
+        // Just ±π.
+        if (neg)
+            return algebraic_p(expression::make(object::ID_neg, pi));
+        return +pi;
     }
 
-    // No simple form found: return original value unchanged
-    return best ? +best : +xo;
+    algebraic_g coeff = neg ? make_neg_number(p, q) : make_number(p, q);
+    if (!coeff)
+        return nullptr;
+
+    return algebraic_p(expression::make(object::ID_multiply, coeff, pi));
 }
 
 
-static object::result xq_run(const xq_tmpl *tmpls, size_t count,
-                              algebraic_fn   map_fn)
+static algebraic_p build_ln(bignum_r p, bignum_r q)
 // ----------------------------------------------------------------------------
-//   Find the simplest symbolic representation of the stack top.
-//   map_fn is the algebraic_fn adapter used when the stack top is a list.
+//   Build LN(p/q).  Sign is implicit: if p/q < 1 the result is negative.
 // ----------------------------------------------------------------------------
 {
-    object_p top = object::strip(rt.stack(0));
-    if (!top)
-        return object::ERROR;
+    algebraic_g arg = make_number(p, q);
+    if (!arg)
+        return nullptr;
+    return algebraic_p(expression::make(object::ID_ln, arg));
+}
 
-    // List: apply element-wise
-    if (top->type() == object::ID_list)
+
+static algebraic_p build_exp(bignum_r p, bignum_r q)
+// ----------------------------------------------------------------------------
+//   Build e^(p/q).
+// ----------------------------------------------------------------------------
+{
+    algebraic_g arg = make_number(p, q);
+    if (!arg)
+        return nullptr;
+    return algebraic_p(expression::make(object::ID_exp, arg));
+}
+
+
+// ============================================================================
+//
+//   XQ main logic — ported from Han Duong's HP Prime QPI algorithm
+//
+// ============================================================================
+
+// Threshold constants (matching HP Prime QPI behaviour):
+static const ularge XQ_DIRECT  = 100;       // Output directly as rational if q < this
+static const ularge XQ_TRYALT  = 10000000;  // Try alternatives if alt_q < this
+static const ularge XQ_DIRECT2 = 10;        // Output alternative directly if q < this
+static const ularge XQ_EXPLN   = 100;       // Max denominator for LN/EXP forms
+
+static bool q_fits(bignum_r q, ularge limit)
+// ----------------------------------------------------------------------------
+//   True if q < limit (limit fits in a single ularge word).
+// ----------------------------------------------------------------------------
+{
+    return !q->more_bits_than(63) && q->value<ularge>() < limit;
+}
+
+static bool q_le(bignum_r q1, bignum_r q2)
+// ----------------------------------------------------------------------------
+//   True if q1 <= q2 (both non-negative bignums).
+// ----------------------------------------------------------------------------
+{
+    return !(q1 > q2);
+}
+
+
+static algebraic_p xq_decimal(decimal_r dec, bool neg, bool pi_only)
+// ----------------------------------------------------------------------------
+//   Core XQ algorithm.  dec is the absolute value of the input (no sign info).
+//   neg carries the sign of the original input.
+//   pi_only restricts output to pi-multiple and rational forms only (QPI).
+// ----------------------------------------------------------------------------
+{
+    // Step 1: rational approximation of dec (= |r|).
+    bignum_g p, q;
+    if (!xq_approx(dec, p, q))
+        return nullptr;
+
+    // Step 1a: if q is tiny, return p/q directly (unless pi_only).
+    if (!pi_only && q_fits(q, XQ_DIRECT))
     {
-        list_p result = list_p(top)->map(map_fn);
-        if (!result || !rt.top(result))
-            return object::ERROR;
-        return object::OK;
+        algebraic_g frac = neg ? make_neg_number(p, q) : make_number(p, q);
+        return +frac;
     }
 
-    algebraic_g xo    = algebraic_p(top);
-    algebraic_g result = xq_one(xo, tmpls, count);
-    if (!result)
-        return object::ERROR;
+    // Working "best denominator" tracks the best alternative found so far.
+    bignum_g    best_q      = q;
+    algebraic_g sqrt_result;
+    algebraic_g pi_result;
+    algebraic_g ln_result;
+    algebraic_g exp_result;
 
-    // Replace stack top only if the value changed
-    if (+result != top)
-        if (!rt.top(+result))
-            return object::ERROR;
+    // ---- Step 2: try r² → √ form ----------------------------------------
+    if (!pi_only)
+    {
+        decimal_g r2 = decimal::multiply(dec, dec);
+        bignum_g  sq_p, sq_q;
+        if (r2 && xq_approx_of(r2, sq_p, sq_q))
+        {
+            if (q_fits(sq_q, XQ_TRYALT) && q_le(sq_q, best_q))
+            {
+                if (q_fits(sq_q, XQ_DIRECT2))
+                    return build_sqrt(sq_p, sq_q, neg);
+                // Potentially nice: remember and keep trying.
+                best_q      = sq_q;
+                sqrt_result = build_sqrt(sq_p, sq_q, neg);
+            }
+        }
+    }
 
-    return object::OK;
+    // ---- Step 3: try r/π → (p/q)*π form ---------------------------------
+    {
+        decimal_g pi_dec    = decimal::pi();
+        decimal_g r_ov_pi  = pi_dec ? decimal::divide(dec, pi_dec) : decimal_p(nullptr);
+
+        bignum_g pi_p, pi_q;
+        // is_magnitude_less_than(100, 3): checks |value| < 100/1000 × 10^3 = 100
+        if (r_ov_pi && r_ov_pi->is_magnitude_less_than(100, 3)
+                    && xq_approx_of(r_ov_pi, pi_p, pi_q))
+        {
+            if (q_fits(pi_q, XQ_TRYALT) && q_le(pi_q, best_q))
+            {
+                if (q_fits(pi_q, XQ_DIRECT2))
+                    return build_pi_mult(pi_p, pi_q, neg);
+                best_q    = pi_q;
+                pi_result = build_pi_mult(pi_p, pi_q, neg);
+            }
+        }
+    }
+
+    if (pi_only)
+    {
+        // QPI: only pi forms are allowed; fall back to rational otherwise.
+        if (pi_result)
+            return +pi_result;
+        algebraic_g frac = neg ? make_neg_number(p, q) : make_number(p, q);
+        return +frac;
+    }
+
+    // ---- Step 4: try r = ±LN(p/q) → check e^|r| -----------------------
+    // Use e^|r| (absolute value): for r = -ln(q), e^|r| = q, giving build_ln(q,1).
+    // The sign is handled by negating the ln expression when neg=true.
+    // is_magnitude_less_than(100, 4): checks |value| < 100/1000 × 10^4 = 1000
+    {
+        decimal_g er = decimal::exp(dec);  // e^|r|
+        bignum_g  ln_p, ln_q;
+        if (er && er->is_magnitude_less_than(100, 4)
+               && xq_approx_of(er, ln_p, ln_q))
+        {
+            // Exclude trivial case: e^|r| ≈ 1 (r ≈ 0, already handled above).
+            bool trivial = ln_p->is_one() && ln_q->is_one();
+            if (!trivial && q_fits(ln_q, XQ_EXPLN) && q_le(ln_q, best_q))
+            {
+                algebraic_g ln_expr = build_ln(ln_p, ln_q);
+                if (neg && ln_expr)
+                    ln_expr = algebraic_p(
+                        expression::make(object::ID_neg, ln_expr));
+                if (q_fits(ln_q, XQ_DIRECT2))
+                    return +ln_expr;
+                best_q    = ln_q;
+                ln_result = ln_expr;
+            }
+        }
+    }
+
+    // ---- Step 5: try r = e^(p/q) → check LN(r) -------------------------
+    if (!neg) // LN is only defined for r > 0.
+    {
+        decimal_g lnr = decimal::ln(dec);
+        bignum_g  exp_p, exp_q;
+        if (lnr && xq_approx_of(lnr, exp_p, exp_q))
+        {
+            if (q_fits(exp_q, XQ_EXPLN) && q_le(exp_q, best_q))
+                exp_result = build_exp(exp_p, exp_q);
+        }
+    }
+
+    // ---- Step 6: return the best result found ---------------------------
+    // Priority: exp > ln > pi > sqrt > rational.
+    if (exp_result)
+        return +exp_result;
+    if (ln_result)
+        return +ln_result;
+    if (pi_result)
+        return +pi_result;
+    if (sqrt_result)
+        return +sqrt_result;
+
+    // Fallback: return the rational approximation.
+    algebraic_g frac = neg ? make_neg_number(p, q) : make_number(p, q);
+    return +frac;
+}
+
+
+// ============================================================================
+//
+//   Per-element helpers (for list mapping)
+//
+// ============================================================================
+
+static algebraic_p xq_one(algebraic_r x, bool pi_only)
+// ----------------------------------------------------------------------------
+//   Apply XQ or QPI logic to a single algebraic value; used for list mapping.
+// ----------------------------------------------------------------------------
+{
+    algebraic_g xo = x;
+    if (!xo)
+        return nullptr;
+
+    object::id ty = xo->type();
+
+    if (!pi_only)
+    {
+        // XQ: if already exact, return unchanged.
+        if (object::is_integer(ty) || object::is_bignum(ty) ||
+            ty == object::ID_fraction || ty == object::ID_neg_fraction ||
+            ty == object::ID_big_fraction || ty == object::ID_neg_big_fraction)
+            return +xo;
+    }
+
+    // Convert to decimal if needed.
+    if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
+    {
+        if (!algebraic::to_decimal(xo))
+            return nullptr;
+        ty = xo->type();
+        xo = algebraic_p(+xo);
+    }
+
+    bool      neg = (ty == object::ID_neg_decimal);
+    decimal_g dec = decimal_p(+xo);
+    if (!dec)
+        return nullptr;
+
+    if (dec->is_zero())
+        return integer::make(0);
+
+    decimal_g abs_dec = decimal::abs(dec);
+    if (!abs_dec)
+        return nullptr;
+
+    return xq_decimal(abs_dec, neg, pi_only);
+}
+
+
+static algebraic_p xq_apply(algebraic_r x)
+{
+    return xq_one(x, false);
+}
+
+
+static algebraic_p qpi_apply(algebraic_r x)
+{
+    return xq_one(x, true);
 }
 
 
@@ -430,50 +597,134 @@ static object::result xq_run(const xq_tmpl *tmpls, size_t count,
 //
 // ============================================================================
 
-static algebraic_p xq_map_xq(algebraic_r x)
-{
-    return xq_one(x, xq_templates, std::size(xq_templates));
-}
 
 COMMAND_BODY(XQ)
 // ----------------------------------------------------------------------------
 //   Find the simplest symbolic representation of a real number
 // ----------------------------------------------------------------------------
 {
-    return xq_run(xq_templates, std::size(xq_templates), xq_map_xq);
+    algebraic_g xo = algebraic_p(strip(rt.stack(0)));
+    if (!xo)
+        return ERROR;
+
+    object::id ty = xo->type();
+
+    // List: apply element-wise.
+    if (ty == object::ID_list)
+    {
+        list_g lst = list_p(+xo)->map(xq_apply);
+        if (!lst || !rt.top(lst))
+            return ERROR;
+        return OK;
+    }
+
+    // If already exact, return unchanged.
+    if (object::is_integer(ty) || object::is_bignum(ty) ||
+        ty == object::ID_fraction || ty == object::ID_neg_fraction ||
+        ty == object::ID_big_fraction || ty == object::ID_neg_big_fraction)
+        return OK;
+
+    // Convert to decimal if needed.
+    if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
+    {
+        if (!algebraic::to_decimal(xo))
+        {
+            rt.type_error();
+            return ERROR;
+        }
+        ty = xo->type();
+        xo = algebraic_p(+xo);
+    }
+
+    bool      neg = (ty == object::ID_neg_decimal);
+    decimal_g dec = decimal_p(+xo);
+    if (!dec)
+        return ERROR;
+
+    if (dec->is_zero())
+    {
+        algebraic_g zero = integer::make(0);
+        if (!zero || !rt.top(zero))
+            return ERROR;
+        return OK;
+    }
+
+    // Pass absolute value to xq_decimal; neg carries the sign.
+    decimal_g abs_dec = decimal::abs(dec);
+    if (!abs_dec)
+        return ERROR;
+
+    algebraic_g result = xq_decimal(abs_dec, neg, false);
+    if (!result)
+        return ERROR;
+
+    if (!rt.top(result))
+        return ERROR;
+    return OK;
 }
 
 
 // ============================================================================
 //
-//   →Qπ command
+//   →Qπ command (QPI)
 //
 // ============================================================================
 
-static const xq_tmpl qpi_templates[] =
-{
-    // identity
-    { object::ID_object, "π",    false },   // p/q · π
-    // square root
-    { object::ID_sqrt,   "π",    true  },   // √(p/q · π)
-    { object::ID_sqrt,   "π",    false },   // √(p/q) · π
-    // natural logarithm
-    { object::ID_ln,     "π",    true  },   // ln(p/q · π)
-    { object::ID_ln,     "π",    false },   // ln(p/q) · π
-    // exponential
-    { object::ID_exp,    "π",    true  },   // exp(p/q · π)
-    { object::ID_exp,    "π",    false },   // exp(p/q) · π
-};
-
-static algebraic_p xq_map_qpi(algebraic_r x)
-{
-    return xq_one(x, qpi_templates, std::size(qpi_templates));
-}
 
 COMMAND_BODY(QPI)
 // ----------------------------------------------------------------------------
-//   Find the simplest symbolic representation of a real number
+//   Find the simplest symbolic representation involving π
 // ----------------------------------------------------------------------------
 {
-    return xq_run(qpi_templates, std::size(qpi_templates), xq_map_qpi);
+    algebraic_g xo = algebraic_p(strip(rt.stack(0)));
+    if (!xo)
+        return ERROR;
+
+    object::id ty = xo->type();
+
+    // List: apply element-wise.
+    if (ty == object::ID_list)
+    {
+        list_g lst = list_p(+xo)->map(qpi_apply);
+        if (!lst || !rt.top(lst))
+            return ERROR;
+        return OK;
+    }
+
+    // Convert to decimal if needed.
+    if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
+    {
+        if (!algebraic::to_decimal(xo))
+        {
+            rt.type_error();
+            return ERROR;
+        }
+        ty = xo->type();
+        xo = algebraic_p(+xo);
+    }
+
+    bool      neg = (ty == object::ID_neg_decimal);
+    decimal_g dec = decimal_p(+xo);
+    if (!dec)
+        return ERROR;
+
+    if (dec->is_zero())
+    {
+        algebraic_g zero = integer::make(0);
+        if (!zero || !rt.top(zero))
+            return ERROR;
+        return OK;
+    }
+
+    decimal_g abs_dec = decimal::abs(dec);
+    if (!abs_dec)
+        return ERROR;
+
+    algebraic_g result = xq_decimal(abs_dec, neg, true);
+    if (!result)
+        return ERROR;
+
+    if (!rt.top(result))
+        return ERROR;
+    return OK;
 }

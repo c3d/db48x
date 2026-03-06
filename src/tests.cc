@@ -16929,8 +16929,8 @@ void tests::exact_quotient()
         .test(CLEAR, "pi 3 / XQ", ENTER).expect("'¹/₃·π'");
     step("XQ(2π) = '2·π'")
         .test(CLEAR, "pi 2 * XQ", ENTER).expect("'2·π'");
-    step("XQ(-π/3) = '-(¹/₃·π)'")
-        .test(CLEAR, "pi 3 / neg XQ", ENTER).expect("'-(¹/₃·π)'");
+    step("XQ(-π/3) = '-¹/₃·π'")
+        .test(CLEAR, "pi 3 / neg XQ", ENTER).expect("'-¹/₃·π'");
 
     // -------------------------------------------------------------------------
     // XQ_LN template: ln(p/q)
@@ -16948,34 +16948,14 @@ void tests::exact_quotient()
     step("XQ(exp(2)) = 'exp 2'")
         .test(CLEAR, "2 exp XQ", ENTER).expect("'exp 2'");
 
+    
     // -------------------------------------------------------------------------
-    // XQ_SQRT_PI template: √(p/q) × π
+    // Perfect-square simplification: √(p/q²) → √p / q
     // -------------------------------------------------------------------------
-    step("XQ(√2 × π) = '√ 2·π'")
-        .test(CLEAR, "2 sqrt pi * XQ", ENTER).expect("'√ 2·π'");
-    step("XQ(√3 × π) = '√ 3·π'")
-        .test(CLEAR, "3 sqrt pi * XQ", ENTER).expect("'√ 3·π'");
-
-    // -------------------------------------------------------------------------
-    // XQ_SQRT_PIARG template: √(p/q × π)
-    // This is the original motivating case: XQ(√(π/2)) = √(½ × π)
-    // -------------------------------------------------------------------------
-    step("XQ(√(π/2)) = '√(¹/₂·π)'")
-        .test(CLEAR, "pi 2 / sqrt XQ", ENTER).expect("'√(¹/₂·π)'");
-    step("XQ(√(π/3)) = '√(¹/₃·π)'")
-        .test(CLEAR, "pi 3 / sqrt XQ", ENTER).expect("'√(¹/₃·π)'");
-
-    // -------------------------------------------------------------------------
-    // XQ_LN_PI template: ln(p/q) × π
-    // -------------------------------------------------------------------------
-    step("XQ(ln 2 × π) = 'ln 2·π'")
-        .test(CLEAR, "2 ln pi * XQ", ENTER).expect("'ln 2·π'");
-
-    // -------------------------------------------------------------------------
-    // XQ_EXP_PI template: exp(p/q) × π
-    // -------------------------------------------------------------------------
-    step("XQ(exp(1/3) × π) = 'exp(¹/₃)·π'")
-        .test(CLEAR, "1/3 ToDecimal exp pi * XQ", ENTER).expect("'exp(¹/₃)·π'");
+    step("XQ(√2/789) = '√ 2÷789'")
+        .test(CLEAR, "2 sqrt 789 / XQ", ENTER).expect("'√ 2÷789'");
+    step("XQ(-√3/5) = '-(√ 3÷5)'")
+        .test(CLEAR, "3 sqrt 5 / neg XQ", ENTER).expect("'-(√ 3÷5)'");
 
     // -------------------------------------------------------------------------
     // List support: XQ applied element-wise
