@@ -16981,11 +16981,11 @@ void tests::exact_quotient()
               ENTER).expect("True");
 
     // -------------------------------------------------------------------------
-    // Original HP Prime examples (qpiDIGITS=9 → Precision=13)
+    // Original HP Prime examples (qpiDIGITS=9 → FractionDigits=9)
     // XQ is the DB48X equivalent of HP Prime's QPI/→Qπ command
     // -------------------------------------------------------------------------
-    step("Set precision to 13 for HP Prime QPI examples")
-        .test(CLEAR, "13 Precision", ENTER).noerror();
+    step("Set FractionDigits to 9 for HP Prime QPI examples")
+        .test(CLEAR, "9 FractionDigits", ENTER).noerror();
     step("HP Prime QPI(1.23) = 1 ²³/₁₀₀")
         .test(CLEAR, "1.23 XQ", ENTER)
         .expect("1\xe2\x81\x9f²³/₁₀₀");  // U+205F medium mathematical space
@@ -16998,8 +16998,8 @@ void tests::exact_quotient()
         .test(CLEAR, "1.10517091808 XQ", ENTER).expect("'exp(¹/₁₀)'");
     step("HP Prime QPI(.405465108108) = 'ln(³/₂)'")
         .test(CLEAR, ".405465108108 XQ", ENTER).expect("'ln(³/₂)'");
-    step("Restore precision to 24 after HP Prime examples")
-        .test(CLEAR, "24 Precision", ENTER).noerror();
+    step("Restore FractionDigits to 12 after HP Prime examples")
+        .test(CLEAR, "12 FractionDigits", ENTER).noerror();
 
 }
 

@@ -61,7 +61,7 @@ static bool xq_approx(decimal_r dec, bignum_g &p_out, bignum_g &q_out)
 //   Uses bignum exact arithmetic on the decimal kigits, then runs the
 //   standard CF algorithm with the HP-Prime accuracy stopping condition:
 //     accuracy × |inum×Q - iden×P| < iden×P
-//   where accuracy = 10^(prec-4).
+//   where accuracy = 10^FractionDigits (HP Prime's qpiDIGITS, default 12).
 //   This correctly identifies convergents like 2/622521 for values that are
 //   close to (but not exactly equal to) the target fraction, unlike the
 //   to_fraction remainder-based condition which can miss them.
@@ -119,9 +119,8 @@ static bool xq_approx(decimal_r dec, bignum_g &p_out, bignum_g &q_out)
         return p_out && q_out;
     }
 
-    // Accuracy threshold: 10^(prec-4).
-    uint     prec     = Settings.Precision();
-    uint     tol      = (prec >= 4) ? prec - 4 : 0;
+    // Accuracy threshold: 10^FractionDigits (HP Prime's qpiDIGITS).
+    uint     tol      = Settings.FractionDigits();
     bignum_g accuracy = bignum::pow(k10, tol);
     if (!accuracy)
         return false;

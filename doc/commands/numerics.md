@@ -51,3 +51,40 @@ conversion is defined by [→FracDigits](#ToFractionIterations)
 Convert decimal values to integers. For example `1. →Integer` gives `1`.
 This command intentionally fails with `Bad argument value` if the input contains
 a non-zero fractional part.
+
+## XQ
+
+Find the simplest symbolic representation of a real number. Given a decimal
+value, `XQ` returns the expression with the smallest denominator that matches
+the input within the precision defined by [→QDigits](#ToFractionDigits). It
+tries the following forms in order of preference:
+
+* **rational** `p/q`: e.g. `1.25 XQ` gives `5/4`
+* **square root** `√(p/q)`: e.g. `1.41421356237 XQ` gives `√2`
+* **pi multiple** `p/q·π`: e.g. `4.71238898038 XQ` gives `3/2·π`
+* **natural logarithm** `ln(p/q)`: e.g. `0.405465108108 XQ` gives `ln(3/2)`
+* **exponential** `e^(p/q)`: e.g. `1.10517091808 XQ` gives `e^(1/10)`
+
+If no symbolic form is found within the precision threshold, `XQ` returns the
+best rational approximation `p/q`.
+
+`XQ` accepts integers, fractions (returned unchanged), decimals, and lists
+(applied element-wise). It is the DB48X equivalent of HP Prime's `QPI`/`→Qπ`
+command.
+
+The accuracy of the recognition is controlled by [→QDigits](#ToFractionDigits)
+(default 12), which corresponds to HP Prime's `qpiDIGITS` parameter.
+
+## →Qπ
+
+Find the simplest symbolic representation of a real number involving a multiple
+of π. This command behaves like [XQ](#XQ) but restricts the output to π
+multiples (`p/q·π`) or plain rational forms. Exponential, logarithm and square
+root forms are not considered.
+
+For example, `4.71238898038 →Qπ` gives `3/2·π`, and `1.23 →Qπ` gives
+`123/100` (falling back to rational since no π-multiple matches).
+
+This command is the DB48X form of the HP 48 `→Qπ` command. For the full
+symbolic simplification including square roots, logarithms and exponentials,
+use [XQ](#XQ) instead.
