@@ -69,11 +69,7 @@ If no symbolic form is found within the precision threshold, `XQ` returns the
 best rational approximation `p/q`.
 
 `XQ` accepts integers, fractions (returned unchanged), decimals, and lists
-(applied element-wise). It is the DB48X equivalent of HP Prime's `QPI`/`→Qπ`
-command.
-
-The accuracy of the recognition is controlled by [→QDigits](#ToFractionDigits)
-(default 12), which corresponds to HP Prime's `qpiDIGITS` parameter.
+(applied element-wise).
 
 ## →Qπ
 
@@ -85,6 +81,5 @@ root forms are not considered.
 For example, `4.71238898038 →Qπ` gives `3/2·π`, and `1.23 →Qπ` gives
 `123/100` (falling back to rational since no π-multiple matches).
 
-This command is the DB48X form of the HP 48 `→Qπ` command. For the full
-symbolic simplification including square roots, logarithms and exponentials,
+For the fullsymbolic simplification including square roots, logarithms and exponentials,
 use [XQ](#XQ) instead.
