@@ -1983,6 +1983,66 @@ void tests::global_variables()
         .test("5 2 3 → a b h « 'a·b+1▶h' EVAL 2 * h →V2 »", ENTER)
         .expect("[ 22 11 ]");
 
+    step("Store to list element L(n) with STO")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(1)' STO", ENTER).noerror()
+        .test("L", ENTER).want("{ 42 20 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(2)' STO", ENTER).noerror()
+        .test("L", ENTER).want("{ 10 42 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(3)' STO", ENTER).noerror()
+        .test("L", ENTER).want("{ 10 20 42 }");
+
+    step("Copy to list element L(n) in RPL")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(1)' ▶", ENTER).noerror().expect("42")
+        .test("L", ENTER).want("{ 42 20 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(2)' ▶", ENTER).noerror().expect("42")
+        .test("L", ENTER).want("{ 10 42 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("42 'L(3)' ▶", ENTER).noerror().expect("42")
+        .test("L", ENTER).want("{ 10 20 42 }");
+
+    step("Copy to list element L(n) in algebraic")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("'42▶L(1)'", ENTER).expect("'42▶L(1)'")
+        .test(RUNSTOP).expect("42")
+        .test("L", ENTER).want("{ 42 20 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("'42▶L(2)'", ENTER).expect("'42▶L(2)'")
+        .test(RUNSTOP).expect("42")
+        .test("L", ENTER).want("{ 10 42 30 }")
+        .test(CLEAR, "{ 10 20 30 } 'L' STO", ENTER).noerror()
+        .test("'42▶L(3)'", ENTER).expect("'42▶L(3)'")
+        .test(RUNSTOP).expect("42")
+        .test("L", ENTER).want("{ 10 20 42 }");
+
+    step("Store to list element L(n) with STO (local variable)")
+        .test(CLEAR, "{ 10 20 30 } → L « 42 'L(1)' STO L »", ENTER)
+        .noerror().got("{ 42 20 30 }")
+        .test(CLEAR, "{ 10 20 30 } → L « 42 'L(2)' STO L »", ENTER)
+        .noerror().got("{ 10 42 30 }")
+        .test(CLEAR, "{ 10 20 30 } → L « 42 'L(3)' STO L »", ENTER)
+        .noerror().got("{ 10 20 42 }");
+
+    step("Copy to list element L(n) in RPL (local variable)")
+        .test(CLEAR, "{ 10 20 30 } → L « 42 'L(1)' ▶ L »", ENTER)
+        .noerror().want("{ 42 20 30 }")
+        .test(CLEAR, "[ 10 20 30 ] → L « '42▶L(2)' EVAL L 'X' * + »", ENTER)
+        .noerror().want("[ '42+10·X' '42+42·X' '42+30·X' ]")
+        .test(CLEAR, "{ 10 20 30 } → L « '42▶L(3)' EVAL L »", ENTER)
+        .noerror().got("{ 10 20 42 }", "42");
+
+    step("Copy to list element L(n) in algebraic (local variable)")
+        .test(CLEAR, "{ 10 20 30 } → L « '42▶L(1)' EVAL L + »", ENTER)
+        .noerror().want("{ 42 42 20 30 }")
+        .test(CLEAR, "[ 10 20 30 ] → L « '42▶L(2)' EVAL L 'X' * - »", ENTER)
+        .noerror().want("[ '42-10·X' '42-42·X' '42-30·X' ]")
+        .test(CLEAR, "{ 10 20 30 } → L « '42▶L(3)' EVAL L »", ENTER)
+        .noerror().got("{ 10 20 42 }", "42");
+
     step("Assignment with simple value")
         .test(CLEAR, "A=42", ENTER).got("A=42")
         .test(CLEAR, "A", ENTER).got("42");
@@ -6974,6 +7034,9 @@ void tests::list_functions()
         .test(CLEAR, "[ A B C D E ] [ 1 6 3 ] [ 2 4 ]",
               ID_ListMenu, ID_Extract)
         .error("Invalid dimension");
+
+    step("Cleanup")
+        .test(CLEAR, "{ M L } Purge", ENTER).noerror();
 }
 
 

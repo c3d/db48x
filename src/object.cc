@@ -831,7 +831,7 @@ object_p object::at(object_p index, object_p value) const
     list_g   tail = nullptr;
     object_g item = value;
 
-    if (list_p idxlist = index->as<list>())
+    if (list_p idxlist = index->as_array_or_list())
     {
         head = idxlist->head();
         tail = idxlist->tail();
