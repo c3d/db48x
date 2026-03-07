@@ -16980,5 +16980,26 @@ void tests::exact_quotient()
               " 10 3 'Precision' RCL - ^ <",
               ENTER).expect("True");
 
+    // -------------------------------------------------------------------------
+    // Original HP Prime examples (qpiDIGITS=9 → Precision=13)
+    // XQ is the DB48X equivalent of HP Prime's QPI/→Qπ command
+    // -------------------------------------------------------------------------
+    step("Set precision to 13 for HP Prime QPI examples")
+        .test(CLEAR, "13 Precision", ENTER).noerror();
+    step("HP Prime QPI(1.23) = 1 ²³/₁₀₀")
+        .test(CLEAR, "1.23 XQ", ENTER)
+        .expect("1\xe2\x81\x9f²³/₁₀₀");  // U+205F medium mathematical space
+    step("HP Prime QPI(1.41421356237) = '√ 2'")
+        .test(CLEAR, "1.41421356237 XQ", ENTER).expect("'√ 2'");
+    step("HP Prime QPI(4.71238898038) = '³/₂·π'")
+        .test(CLEAR, "4.71238898038 XQ", ENTER).expect("'³/₂·π'");
+    // HP Prime QPI(2.1+5.7i) = 21/10+(57/10)*i : complex not yet supported
+    step("HP Prime QPI(1.10517091808) = 'exp(¹/₁₀)'")
+        .test(CLEAR, "1.10517091808 XQ", ENTER).expect("'exp(¹/₁₀)'");
+    step("HP Prime QPI(.405465108108) = 'ln(³/₂)'")
+        .test(CLEAR, ".405465108108 XQ", ENTER).expect("'ln(³/₂)'");
+    step("Restore precision to 24 after HP Prime examples")
+        .test(CLEAR, "24 Precision", ENTER).noerror();
+
 }
 

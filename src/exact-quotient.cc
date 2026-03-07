@@ -65,6 +65,10 @@ static bool xq_approx(decimal_r dec, bignum_g &p_out, bignum_g &q_out)
 //   This correctly identifies convergents like 2/622521 for values that are
 //   close to (but not exactly equal to) the target fraction, unlike the
 //   to_fraction remainder-based condition which can miss them.
+//
+//   DFC shares the same kigit extraction but tracks only Q (no P), appends
+//   all CF coefficients, and stops when Q > 10^(sig/2) — not the HP accuracy
+//   condition. We need a single convergent p/q with the HP criterion here.
 // ----------------------------------------------------------------------------
 {
     if (!dec)
@@ -720,7 +724,7 @@ COMMAND_BODY(XQ)
     if (!abs_dec)
         return ERROR;
 
-    algebraic_g result = xq_decimal(abs_dec, neg, false);
+    algebraic_g result = xq_decimal(abs_dec, neg, false);  // XQ: all forms
     if (!result)
         return ERROR;
 
@@ -786,7 +790,7 @@ COMMAND_BODY(QPI)
     if (!abs_dec)
         return ERROR;
 
-    algebraic_g result = xq_decimal(abs_dec, neg, true);
+    algebraic_g result = xq_decimal(abs_dec, neg, true);   // QPI: π forms only
     if (!result)
         return ERROR;
 
