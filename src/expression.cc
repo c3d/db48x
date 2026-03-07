@@ -36,6 +36,8 @@
 #include "functions.h"
 #include "grob.h"
 #include "integer.h"
+#include "locals.h"
+#include "object.h"
 #include "parser.h"
 #include "polynomial.h"
 #include "precedence.h"
@@ -2885,6 +2887,29 @@ EVAL_BODY(funcall)
 //   Function calls get evaluated immediately
 // ----------------------------------------------------------------------------
 {
+    // Check syntax L(I) for arrays or lists
+    if (array_g fcall = o->args())
+    {
+        if (object_g callee = fcall->head())
+        {
+            if (symbol_p sym = callee->as<symbol>())
+                callee = directory::recall_all(sym, false);
+            else if (local_p loc = callee->as<local>())
+                callee = loc->recall();
+            if (callee)
+            {
+                if (list_g items = callee->as_array_or_list())
+                {
+                    if (list_g index = fcall->tail())
+                        if (object_g value = object_p(+items)->at(+index))
+                            if (rt.push(value))
+                                return OK;
+                    return ERROR;
+                }
+            }
+        }
+    }
+
     return o->run(true);
 }
 

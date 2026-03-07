@@ -6716,6 +6716,36 @@ void tests::list_functions()
          "[ 2 3 3 5 ] GET", ENTER)
         .expect("\"o\"");
 
+    step("List indexing in equation L(1)")
+        .test(CLEAR, "{ X Y Z } 'L' STO", ENTER).noerror()
+        .test("'L(1)'", ENTER).expect("'L(1)'")
+        .test(ID_Run).expect("X")
+        .test("'L(2)'", ENTER).test(ID_Run).expect("Y")
+        .test("'L(3)'", ENTER).test(ID_Run).expect("Z");
+    step("Array indexing in equation M(2)")
+        .test(CLEAR, "[ A B C ] 'M' STO", ENTER).noerror()
+        .test("'M(2)'", ENTER).test(ID_Run).expect("B");
+    step("Nested list indexing in equation L(2;3)")
+        .test(CLEAR, "{ A { D E F } C } 'L' STO", ENTER).noerror()
+        .test("'L(2;3)'", ENTER).test(ID_Run).expect("F");
+    step("Partial list indexing in equation L(2)")
+        .test(CLEAR, "{ A { D E F } C } 'L' STO", ENTER).noerror()
+        .test("'L(2)'", ENTER).test(ID_Run).expect("{ D E F }");
+
+    step("List indexing in equation L(1) with local L")
+        .test(CLEAR, "{ X Y Z } → L 'L(1)'", ENTER).expect("X")
+        .test(CLEAR, "{ X Y Z } → L « 'L(2)' 1 + RUN » ", ENTER)
+        .expect("'Y+1'")
+        .test(CLEAR, "{ X Y Z } → L 'L(3)'", ENTER).expect("Z");
+    step("Array indexing in equation M(2)")
+        .test(CLEAR, "[ A B C ] → M 'M(2)'", ENTER).expect("B");
+    step("Nested list indexing in equation L(2;3)")
+        .test(CLEAR, "{ A { D E F } C } → L 'L(2;3)'", ENTER)
+        .expect("F");
+    step("Partial list indexing in equation L(2)")
+        .test(CLEAR, "{ A { D E F } C }  → L 'L(2;3)'", ENTER)
+        .expect("F");
+
     step("Variable access with GET")
         .test(CLEAR, "{ 11 22 33 44 } 'L' STO", ENTER).noerror()
         .test("'L' 1 GET", ENTER).expect("11")
