@@ -224,6 +224,10 @@ int main(int argc, char *argv[])
                 else if (a < argc)
                     load_saved_keymap(argv[++a]);
                 break;
+            case 'K':
+                tests::simulate_typing = true;
+                break;
+
             case 'w':
                 if (as[2])
                     tests::default_wait_time = atoi(as+2);

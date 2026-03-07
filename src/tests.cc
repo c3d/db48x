@@ -62,6 +62,7 @@ uint    tests::refresh_delay_time = 20;
 uint    tests::image_wait_time    = 500;
 cstring tests::dump_on_fail       = nullptr;
 bool    tests::running            = false;
+bool    tests::simulate_typing    = false;
 
 #define TEST_CATEGORY(name, enabled, descr)                     \
     RECORDER_TWEAK_DEFINE(est_##name, enabled, "Test " descr);  \
@@ -755,24 +756,24 @@ void tests::keyboard_entry()
 
     step("Uppercase entry");
     cstring entry = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    test(CLEAR, entry).editor(entry);
+    test(CLEAR, KEYTYPE(entry)).editor(entry);
 
     step("Lowercase entry");
     cstring lowercase = "abcdefghijklmnopqrstuvwxyz0123456789";
-    test(CLEAR, lowercase).editor(lowercase);
+    test(CLEAR, KEYTYPE(lowercase)).editor(lowercase);
 
     step("Special characters");
     cstring special = "X+-*/!? #_";
-    test(CLEAR, special).editor(special);
+    test(CLEAR, KEYTYPE(special)).editor(special);
 
     step("Separators");
     cstring seps = "\"Hello [A] (B) {C} 'Test' D\"";
-    test(CLEAR, seps).editor(seps);
+    test(CLEAR, KEYTYPE(seps)).editor(seps);
 
     step("Separators with auto-spacing");
     cstring seps2     = "{}()[]";
     cstring seps2auto = "{} () []";
-    test(CLEAR, seps2).editor(seps2auto);
+    test(CLEAR, KEYTYPE(seps2)).editor(seps2auto);
 
     step("Key repeat");
     test(CLEAR, LONGPRESS, SHIFT, LONGPRESS, A)
@@ -3753,7 +3754,7 @@ void tests::float_numerical_functions()
         .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
 
     step("Check rounding to fraction(#1481)")
-        .test(CLEAR, DIRECT("10.25F ToFraction"), ENTER)
+        .test(CLEAR, ("10.25F ToFraction"), ENTER)
         .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
@@ -3940,7 +3941,7 @@ void tests::double_numerical_functions()
         .test(CLEAR, "'OverflowError' Purge", ENTER).noerror();
 
     step("Check rounding to fraction(#1481)")
-        .test(CLEAR, DIRECT("10.25D ToFraction"), ENTER)
+        .test(CLEAR, ("10.25D ToFraction"), ENTER)
         .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
@@ -4291,7 +4292,7 @@ void tests::exact_trig_cases()
         .expect("0.70710 67811 87");
 
     step("Argument reduction for large integer")
-        .test(CLEAR, DIRECT("DEG 10 60 ^ DUPDUP 10 - DUP"), ENTER, ID_sin)
+        .test(CLEAR, ("DEG 10 60 ^ DUPDUP 10 - DUP"), ENTER, ID_sin)
         .expect("-1")
         .test(BSP, ID_cos)
         .expect("0")
@@ -4578,7 +4579,7 @@ void tests::fraction_pi_conversions()
 
     step("Restore default settings")
         .test(CLEAR,
-              DIRECT("{ FractionLargestPrime BigFractions ImproperFractions } "
+              ("{ FractionLargestPrime BigFractions ImproperFractions } "
                      "Purge Std"), ENTER).noerror();
 
     step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
@@ -5893,7 +5894,7 @@ void tests::range_types()
         .test(CLEAR, "InfinityValue", ENTER).noerror()
         .test(CLEAR, "1…3 -2…5", NOSHIFT, DIV).expect("−∞…∞")
         .test(CLEAR, "-26 FS?", ENTER).expect("True")
-        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+        .test(CLEAR, ("{ InfinityError InfiniteResultIndicator} Purge"),
               ENTER).noerror();
     step("Invert ranges divide by zero")
         .test(CLEAR, "-1…3", NOSHIFT, ID_inv).error("Divide by zero")
@@ -6005,7 +6006,7 @@ void tests::range_types()
         .test(CLEAR, "InfinityValue", ENTER).noerror()
         .test(CLEAR, "1±3 2±5", NOSHIFT, DIV).expect("−∞…∞")
         .test(CLEAR, "-26 FS?", ENTER).expect("True")
-        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+        .test(CLEAR, ("{ InfinityError InfiniteResultIndicator} Purge"),
               ENTER).noerror();
     step("Power delta ranges")
         .test(CLEAR, "2±1 5±2", NOSHIFT, ID_pow).expect("1 094.±1 093.");
@@ -6019,7 +6020,7 @@ void tests::range_types()
         .test(CLEAR, "-22 SF", ENTER).noerror()
         .test(CLEAR, "1±3", ID_inv).expect("−∞…∞")
         .test(CLEAR, "'InfiniteResultIndicator' FS?", ENTER).expect("True")
-        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+        .test(CLEAR, ("{ InfinityError InfiniteResultIndicator} Purge"),
               ENTER).noerror();
     step("Negate delta ranges")
         .test(CLEAR, "1±3", ENTER, ID_neg).expect("-1±3");
@@ -6271,7 +6272,7 @@ void tests::uncertain_operations()
         .test(CLEAR, "InfinityValue", ENTER).noerror()
         .test(CLEAR, "1±σ3 0±σ5", NOSHIFT, DIV).expect("∞±σ∞")
         .test(CLEAR, "-26 FS?", ENTER).expect("True")
-        .test(CLEAR, DIRECT("{ InfinityError InfiniteResultIndicator} Purge"),
+        .test(CLEAR, ("{ InfinityError InfiniteResultIndicator} Purge"),
               ENTER).noerror();
     step("Invert ranges divide by zero")
         .test(CLEAR, "0±σ3", NOSHIFT, ID_inv).error("Divide by zero")
@@ -6575,14 +6576,14 @@ void tests::units_and_conversions()
 
     step("Convert arguments to add")
         .test(CLEAR,
-              DIRECT("'1_m/s+(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
+              ("'1_m/s+(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
               ENTER)
         .expect("'1 m/s+1 A÷(8.5⁳²⁸ (m↑3)⁻¹·qe·π·0.01 cm↑2)'")
         .test(ID_Run)
         .expect("0.00010 00023 37 A·m↑3/(C·cm↑2)");
     step("Convert arguments to sub")
         .test(CLEAR,
-              DIRECT("'1_m/s-(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
+              ("'1_m/s-(1_A)÷((8.5⁳28_(m↑3)⁻¹)·Ⓒqe·Ⓒπ·(0.01_cm↑2))'"),
               ENTER)
         .expect("'1 m/s-1 A÷(8.5⁳²⁸ (m↑3)⁻¹·qe·π·0.01 cm↑2)'")
         .test(ID_Run)
@@ -7464,37 +7465,37 @@ void tests::matrix_functions()
         .want("[[ \"ABC\" 'X' ] 1 ¹/₂ [ 4 [ 5 ] [ 6 7 ] ] ]");
 
     step("Insert single row in vector")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 0 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 0 ROW+"), ENTER)
         .error("Bad argument value")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 1 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 1 ROW+"), ENTER)
         .want("[ 4 1 2 3 ]")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 2 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 2 ROW+"), ENTER)
         .want("[ 1 4 2 3 ]")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 3 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 3 ROW+"), ENTER)
         .want("[ 1 2 4 3 ]")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 4 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 4 ROW+"), ENTER)
         .want("[ 1 2 3 4 ]")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 5 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 5 ROW+"), ENTER)
         .error("Bad argument value");
 
     step("Insert multiple rows in vector")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] [ 4 5 ] 2 ROW+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] [ 4 5 ] 2 ROW+"), ENTER)
         .want("[ 1 4 5 2 3 ]");
 
     step("Insert single column in vector")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] 4 2 COL+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] 4 2 COL+"), ENTER)
         .want("[ 1 4 2 3 ]");
 
     step("Insert multiple column in vector")
-        .test(CLEAR, DIRECT("[ 1 2 3 ] [ 4 5 ] 2 COL+"), ENTER)
+        .test(CLEAR, ("[ 1 2 3 ] [ 4 5 ] 2 COL+"), ENTER)
         .want("[ 1 4 5 2 3 ]");
 
     step("Insert rows in list vector")
-        .test(CLEAR, DIRECT("{ 1 2 3 } 4 1 ROW+"), ENTER)
+        .test(CLEAR, ("{ 1 2 3 } 4 1 ROW+"), ENTER)
         .error("Bad argument type")
-        .test(CLEAR, DIRECT("LaxArrayResizing { 1 2 3 } 4 1 ROW+"), ENTER)
+        .test(CLEAR, ("LaxArrayResizing { 1 2 3 } 4 1 ROW+"), ENTER)
         .want("{ 4 1 2 3 }")
-        .test(CLEAR, DIRECT("'LaxArrayResizing' PURGE "
+        .test(CLEAR, ("'LaxArrayResizing' PURGE "
                             "{ 1 2 3 } 4 1 ROW+"), ENTER)
         .error("Bad argument type");
 
@@ -7908,7 +7909,7 @@ void tests::solver_testing()
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
     step("Solving Antoine's equation (#1495)")
-        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+        .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
 
@@ -7984,7 +7985,7 @@ void tests::solver_testing()
         .test(CLEAR, "'-3*expm1(-x)-x=0' 'x' 2 ROOT", ENTER)
         .expect("x=2.82143 93721 2");
     step("Solving Antoine's equation (#1495)")
-        .test(CLEAR, DIRECT("'log10(P)=6.90565-1211.033/(98+220.73)' "
+        .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
 
@@ -8006,17 +8007,17 @@ void tests::solver_testing()
         .expect("{ X=0.5 Y=0.86602 54037 84 }");
 
     step("Solving when the variable is initialized with a constant")
-        .test(CLEAR, DIRECT("m=Ⓒme "
+        .test(CLEAR, ("m=Ⓒme "
                             "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
                             "Eval Pick3 StEq SolvingMenu"), ENTER,
               LSHIFT, F3)
         .expect("9.10938 37139⁳⁻³¹ kg");
     step("Solving with constant initializer, second case (#1418)")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
                   "θ=40_°  p=1e-23_kg*m/s m=Ⓒme n=2 "
                   "'ROOT(ⒺDe Broglie Wave;[λ;K;v;d];[1_nm;1_eV;1_m/s;1_nm])'"),
               ENTER, ID_Run,
-              DIRECT("ⒺDe Broglie Wave STEQ SolvingMenu NextEQ"), ENTER,
+              ("ⒺDe Broglie Wave STEQ SolvingMenu NextEQ"), ENTER,
               LSHIFT, F3)
         .expect("m=9.10938 37139⁳⁻³¹ kg");
 
@@ -8040,8 +8041,8 @@ void tests::constants_parsing()
         if (cst[i+1])
         {
             istep(cst[i]);
-            test(CLEAR, DIRECT(cst[i+1]), ENTER).noerror();
-            test(DIRECT("if dup typename \"array\" = "
+            test(CLEAR, (cst[i+1]), ENTER).noerror();
+            test(("if dup typename \"array\" = "
                         "then →Num else Run end"), ENTER).noerror();
         }
         else
@@ -8072,7 +8073,7 @@ void tests::eqnlib_parsing()
         if (eq[i+1])
         {
             istep(eq[i]);
-            test(CLEAR, DIRECT(eq[i+1]), ENTER).noerror();
+            test(CLEAR, (eq[i+1]), ENTER).noerror();
         }
         else
         {
@@ -8351,7 +8352,7 @@ void tests::numerical_integration()
     BEGIN(integrate);
 
     step("Disable symbolic integration")
-        .test(CLEAR, DIRECT("NumericalIntegration"), ENTER);
+        .test(CLEAR, ("NumericalIntegration"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -8464,7 +8465,7 @@ void tests::numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration } Purge"), ENTER);
+        .test(CLEAR, ("{ X NumericalIntegration } Purge"), ENTER);
 }
 
 
@@ -8476,7 +8477,7 @@ void tests::symbolic_numerical_integration()
     BEGIN(syminteg);
 
     step("Enable symbolic integration")
-        .test(CLEAR, DIRECT("SymbolicIntegration"), ENTER);
+        .test(CLEAR, ("SymbolicIntegration"), ENTER);
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
@@ -8589,7 +8590,7 @@ void tests::symbolic_numerical_integration()
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
-        .test(CLEAR, DIRECT("{ X NumericalIntegration } PURGE"), ENTER);
+        .test(CLEAR, ("{ X NumericalIntegration } PURGE"), ENTER);
 }
 
 
@@ -9135,7 +9136,7 @@ void tests::symbolic_operations()
         .test(CLEAR, "'x^y' { x 2 y 3 } |", ENTER)
         .expect("'2↑3'");
     step("Where operator with lists and names as replacement")
-        .test(CLEAR, DIRECT("'(A-2+sin(6*C))^J' {A V J 9} |"), ENTER)
+        .test(CLEAR, ("'(A-2+sin(6*C))^J' {A V J 9} |"), ENTER)
         .expect("'(V-2+sin(6·C))↑9'");
 
     step("Isolate a single variable, simple case")
@@ -9376,7 +9377,7 @@ void tests::symbolic_differentiation()
         .error("Unknown derivative");
 
     step("Derivative of function with angle (#1491)")
-        .test(CLEAR, DIRECT("'sin((0.5_r/s)·x)' 'x' ∂"), ENTER)
+        .test(CLEAR, ("'sin((0.5_r/s)·x)' 'x' ∂"), ENTER)
         .expect("'0.5 r/s·cos(0.5 r/s·x)'");
 }
 
@@ -9491,10 +9492,10 @@ void tests::symbolic_integration()
         .error("Unknown primitive");
 
     step("Evaluate values matching integer constants in pattenrs")
-        .test(CLEAR, DIRECT("'4/3·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .test(CLEAR, ("'4/3·Ⓒπ·x³' 'x' ∂"), ENTER)
         .expect("'4·π·x²'");
     step("Evaluate value matching integer constants - Check with division")
-        .test(CLEAR, DIRECT("'A/B·Ⓒπ·x³' 'x' ∂"), ENTER)
+        .test(CLEAR, ("'A/B·Ⓒπ·x³' 'x' ∂"), ENTER)
         .expect("'3·A÷B·π·x²'");
 }
 
@@ -9680,7 +9681,7 @@ void tests::cycle_test()
         .test(O).expect("1. kN");
 
     step("Cycle angle units")
-        .test(CLEAR, "1.2.3", ENTER).expect("1°02′03″");
+        .test(CLEAR, KEYTYPE("1.2.3"), ENTER).expect("1°02′03″");
     step("Cycle from DMS to fractional pi-radians")
         .test(O).expect("¹ ²⁴¹/₂₁₆ ₀₀₀ πr");
     step("Cycle from fractional pi-radians to fractional degrees")
@@ -10350,24 +10351,24 @@ void tests::flags_by_name()
 #define ID(id)
 #define FLAG(Enable, Disable)                                           \
     step("Clearing flag " #Disable " (default)")                        \
-        .test(CLEAR, DIRECT(#Disable), ENTER).noerror()                 \
-        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
-        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");      \
+        .test(CLEAR, (#Disable), ENTER).noerror()                 \
+        .test(("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(("'" #Disable "' RCL"), ENTER).expect("True");      \
     step("Setting flag " #Enable)                                       \
-        .test(CLEAR, DIRECT(#Enable), ENTER).noerror()                  \
-        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("True")        \
-        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("False");     \
+        .test(CLEAR, (#Enable), ENTER).noerror()                  \
+        .test(("'" #Enable "' RCL"), ENTER).expect("True")        \
+        .test(("'" #Disable "' RCL"), ENTER).expect("False");     \
     step("Purging flag " #Enable " (return to default)")                \
-        .test(CLEAR, DIRECT("'" #Disable "' PURGE"), ENTER).noerror()   \
-        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
-        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");      \
+        .test(CLEAR, ("'" #Disable "' PURGE"), ENTER).noerror()   \
+        .test(("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(("'" #Disable "' RCL"), ENTER).expect("True");      \
     step("Purging flag " #Disable " (return to default)")               \
-        .test(CLEAR, DIRECT("'" #Enable "' PURGE"), ENTER).noerror()    \
-        .test(DIRECT("'" #Enable "' RCL"), ENTER).expect("False")       \
-        .test(DIRECT("'" #Disable "' RCL"), ENTER).expect("True");
+        .test(CLEAR, ("'" #Enable "' PURGE"), ENTER).noerror()    \
+        .test(("'" #Enable "' RCL"), ENTER).expect("False")       \
+        .test(("'" #Disable "' RCL"), ENTER).expect("True");
 #define SETTING(Name, Low, High, Init)                                  \
     step("Purging " #Name " to revert it to default " #Init)            \
-        .test(CLEAR, DIRECT("'" #Name "' PURGE"), ENTER).noerror();
+        .test(CLEAR, ("'" #Name "' PURGE"), ENTER).noerror();
 #include "ids.tbl"
 
     step("Clear DebugOnError for testing")
@@ -10386,10 +10387,10 @@ void tests::settings_by_name()
 #define FLAG(Enable, Disable)
 #define SETTING(Name, Low, High, Init)                  \
     step("Getting " #Name " current value")             \
-        .test(DIRECT("'" #Name "' RCL"), ENTER)         \
+        .test(("'" #Name "' RCL"), ENTER)         \
         .noerror();                                     \
     step("Setting " #Name " to its current value")      \
-        .test(DIRECT("" #Name ""), ENTER)               \
+        .test(("" #Name ""), ENTER)               \
         .noerror();
 #include "ids.tbl"
 }
@@ -10409,11 +10410,11 @@ void tests::parsing_commands_by_name()
         {                                                               \
             step("Parsing " #name " for " #ty);                         \
             test(CLEAR,                                                 \
-                 DIRECT("{ " + std::string(name) + " } 1 GET"),         \
+                 ("{ " + std::string(name) + " } 1 GET"),         \
                  ENTER)                                                 \
                 .type(ID_##ty);                                         \
             test(CLEAR,                                                 \
-                 DIRECT("\"{ \" " #name " + \" }\" + Str→ 1 GET"),      \
+                 ("\"{ \" " #name " + \" }\" + Str→ 1 GET"),      \
                  ENTER)                                                 \
                 .type(ID_##ty);                                         \
         }                                                               \
@@ -10432,15 +10433,15 @@ void tests::hms_dms_operations()
     BEGIN(hms);
 
     step("Conversion should not round incorrectly (#1480)")
-        .test(CLEAR, DIRECT("10.3033 FromHMS ToHMS"), ENTER)
+        .test(CLEAR, ("10.3033 FromHMS ToHMS"), ENTER)
         .expect("10:30:33")
-        .test(CLEAR, DIRECT("10.3033 FromDMS ToDMS"), ENTER)
+        .test(CLEAR, ("10.3033 FromDMS ToDMS"), ENTER)
         .expect("10°30′33″");
     step("Conversion should work OK in symbolic mode")
-        .test(CLEAR, DIRECT("NumericalResults 10.2555 FromHMS ToHMS"), ENTER)
+        .test(CLEAR, ("NumericalResults 10.2555 FromHMS ToHMS"), ENTER)
         .expect("10:25:55");
     step("Conversion should use proper rounding")
-        .test(CLEAR, DIRECT("SymbolicResults 10.2555 FromHMS ToDecimal "
+        .test(CLEAR, ("SymbolicResults 10.2555 FromHMS ToDecimal "
                             "1_hms ToUnit"), ENTER)
         .expect("10:25:55");
 
@@ -11571,90 +11572,90 @@ void tests::constants_menu()
     step("Insert Euler's number")
         .test(CLEAR, "EulerianNumber", ENTER).type(ID_constant).expect("e")
         .test(ID_ToDecimal).expect("2.71828 18284 6")
-        .test(CLEAR, DIRECT("℮"), ENTER).type(ID_constant).expect("e")
+        .test(CLEAR, ("℮"), ENTER).type(ID_constant).expect("e")
         .test(ID_ToDecimal).expect("2.71828 18284 6");
     step("Insert positive infinity")
         .test(CLEAR, "Infinity", ENTER).type(ID_constant).expect("∞")
-        .test(CLEAR, DIRECT("∞"), ENTER).type(ID_constant).expect("∞");
+        .test(CLEAR, ("∞"), ENTER).type(ID_constant).expect("∞");
     step("Insert negative infinity")
         .test(CLEAR, "NegativeInfinity", ENTER).type(ID_constant).expect("−∞")
-        .test(CLEAR, DIRECT("−∞"), ENTER).type(ID_constant).expect("−∞");
+        .test(CLEAR, ("−∞"), ENTER).type(ID_constant).expect("−∞");
     step("Negate infinities")
-        .test(CLEAR, DIRECT("∞"), ENTER).expect("∞")
+        .test(CLEAR, ("∞"), ENTER).expect("∞")
         .test(CHS).expect("−∞")
         .test(CHS).expect("∞");
     step("Invert infinities")
-        .test(CLEAR, DIRECT("∞"), ENTER).expect("∞")
+        .test(CLEAR, ("∞"), ENTER).expect("∞")
         .test(INV).expect("0");
     step("Add infinities")
-        .test(CLEAR, DIRECT("∞ 42 +"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 +"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("42 ∞ +"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("42 −∞ +"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("−∞ −∞ +"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ ∞ +"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ ∞ +"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ −∞ +"), ENTER).error("Undefined operation");
+        .test(CLEAR, ("∞ 42 +"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ 42 +"), ENTER).expect("−∞")
+        .test(CLEAR, ("42 ∞ +"), ENTER).expect("∞")
+        .test(CLEAR, ("42 −∞ +"), ENTER).expect("−∞")
+        .test(CLEAR, ("−∞ −∞ +"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ ∞ +"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ ∞ +"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ −∞ +"), ENTER).error("Undefined operation");
     step("Subtract infinities")
-        .test(CLEAR, DIRECT("∞ 42 -"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 -"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("42 ∞ -"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("42 −∞ -"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ ∞ -"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ −∞ -"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ −∞ -"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ ∞ -"), ENTER).error("Undefined operation");
+        .test(CLEAR, ("∞ 42 -"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ 42 -"), ENTER).expect("−∞")
+        .test(CLEAR, ("42 ∞ -"), ENTER).expect("−∞")
+        .test(CLEAR, ("42 −∞ -"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ ∞ -"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ −∞ -"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ −∞ -"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ ∞ -"), ENTER).error("Undefined operation");
     step("Multiply infinities")
-        .test(CLEAR, DIRECT("∞ 42 *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ -42 *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("−∞ -42 *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("42 ∞ *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("42 −∞ *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("-42 ∞ *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("-42 −∞ *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ ∞ *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ −∞ *"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ ∞ *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ −∞ *"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("∞ 0 *"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("−∞ 0 *"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("0 ∞ *"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("0 −∞ *"), ENTER).error("Undefined operation");
+        .test(CLEAR, ("∞ 42 *"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ 42 *"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ -42 *"), ENTER).expect("−∞")
+        .test(CLEAR, ("−∞ -42 *"), ENTER).expect("∞")
+        .test(CLEAR, ("42 ∞ *"), ENTER).expect("∞")
+        .test(CLEAR, ("42 −∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, ("-42 ∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, ("-42 −∞ *"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ ∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ −∞ *"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ ∞ *"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ −∞ *"), ENTER).expect("∞")
+        .test(CLEAR, ("∞ 0 *"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("−∞ 0 *"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("0 ∞ *"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("0 −∞ *"), ENTER).error("Undefined operation");
     step("Divide infinities")
-        .test(CLEAR, DIRECT("∞ 42 /"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 /"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("∞ -42 /"), ENTER).expect("−∞")
-        .test(CLEAR, DIRECT("−∞ -42 /"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("42 ∞ /"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("42 −∞ /"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("-42 ∞ /"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("-42 −∞ /"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("−∞ ∞ /"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ −∞ /"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ ∞ /"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("−∞ −∞ /"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ 0 /"), ENTER).error("Divide by zero")
-        .test(CLEAR, DIRECT("−∞ 0 /"), ENTER).error("Divide by zero")
-        .test(CLEAR, DIRECT("0 ∞ /"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("0 −∞ /"), ENTER).expect("0");
+        .test(CLEAR, ("∞ 42 /"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ 42 /"), ENTER).expect("−∞")
+        .test(CLEAR, ("∞ -42 /"), ENTER).expect("−∞")
+        .test(CLEAR, ("−∞ -42 /"), ENTER).expect("∞")
+        .test(CLEAR, ("42 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, ("42 −∞ /"), ENTER).expect("0")
+        .test(CLEAR, ("-42 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, ("-42 −∞ /"), ENTER).expect("0")
+        .test(CLEAR, ("−∞ ∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ −∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ ∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("−∞ −∞ /"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ 0 /"), ENTER).error("Divide by zero")
+        .test(CLEAR, ("−∞ 0 /"), ENTER).error("Divide by zero")
+        .test(CLEAR, ("0 ∞ /"), ENTER).expect("0")
+        .test(CLEAR, ("0 −∞ /"), ENTER).expect("0");
     step("Power infinities")
-        .test(CLEAR, DIRECT("∞ 42 ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ 42 ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("∞ -42 ^"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("−∞ -42 ^"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("42 ∞ ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("42 −∞ ^"), ENTER).expect("0")
-        .test(CLEAR, DIRECT("-42 ∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("-42 −∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("−∞ ∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ −∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ ∞ ^"), ENTER).expect("∞")
-        .test(CLEAR, DIRECT("−∞ −∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("∞ 0 ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("−∞ 0 ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("0 ∞ ^"), ENTER).error("Undefined operation")
-        .test(CLEAR, DIRECT("0 −∞ ^"), ENTER).error("Undefined operation");
+        .test(CLEAR, ("∞ 42 ^"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ 42 ^"), ENTER).expect("∞")
+        .test(CLEAR, ("∞ -42 ^"), ENTER).expect("0")
+        .test(CLEAR, ("−∞ -42 ^"), ENTER).expect("0")
+        .test(CLEAR, ("42 ∞ ^"), ENTER).expect("∞")
+        .test(CLEAR, ("42 −∞ ^"), ENTER).expect("0")
+        .test(CLEAR, ("-42 ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("-42 −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("−∞ ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ ∞ ^"), ENTER).expect("∞")
+        .test(CLEAR, ("−∞ −∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("∞ 0 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("−∞ 0 ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("0 ∞ ^"), ENTER).error("Undefined operation")
+        .test(CLEAR, ("0 −∞ ^"), ENTER).error("Undefined operation");
 
     step("Check that numerical constants are adjusted with precision")
         .test(CLEAR,
@@ -12298,7 +12299,8 @@ void tests::character_menu()
         .editor("\"a\"");
     step("Générons un peu de français")
         .test(CLEAR, RSHIFT, ENTER, ADD,
-              "Ge", F5, "ne", F5, "rons un peu de franc", F4, "ais")
+              KEYTYPE("Ge"), F5, KEYTYPE("ne"), F5,
+              KEYTYPE("rons un peu de franc"), F4, KEYTYPE("ais"))
         .editor("\"Générons un peu de français\"")
         .test(ENTER)
         .expect("\"Générons un peu de français\"");
@@ -12377,7 +12379,7 @@ void tests::statistics()
         {
             snprintf(buffer, sizeof(buffer),
                      "[ %u %u %u %u ] Σ+", i, 2*i+3, 2*i*i*i, 3<<i);
-            test(CLEAR, DIRECT(cstring(buffer)), ENTER);
+            test(CLEAR, (cstring(buffer)), ENTER);
         }
         step("2-variables size")
             .test(CLEAR, ID_DataSize).expect("10");
@@ -13747,7 +13749,7 @@ void tests::check_help_examples()
                     bool keep =
                         ubuf.find("@ Keep") != ubuf.npos ||
                         ubuf.find("@ Save") != ubuf.npos;
-                    itest(CLEAR, EXIT, DIRECT(ubuf));
+                    itest(CLEAR, EXIT, (ubuf));
                     ubuf.clear();
 
                     size_t nfailures = failures.size();
@@ -13783,7 +13785,7 @@ void tests::check_help_examples()
                     skiptest = false;
                     if (!keep)
                         itest(CLEARERR, CLEAR, EXIT,
-                              DIRECT("variables "
+                              ("variables "
                                      "{ Foreground Background LineWidth } + "
                                      "purge"), ENTER);
                 }
@@ -14242,7 +14244,7 @@ void tests::plotting()
         .test("'Res' RCL", ENTER).expect("0");
 
     step("Reset drawing parameters");
-    test(CLEAR, DIRECT("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
+    test(CLEAR, ("1 LineWidth 0 GRAY Foreground 'PPAR' PGALL"), ENTER)
         .noerror();
 }
 
@@ -14270,7 +14272,7 @@ void tests::plotting_all_functions()
     step("Plotting " #name)                                     \
         .test(CLEAR, "'" #name "(x)'", LENGTHY(dur), F1)        \
         .image("fnplot-" #name, dur)                            \
-        .test(CLEAR, DIRECT("DEPTH"), ENTER).expect("0")
+        .test(CLEAR, ("DEPTH"), ENTER).expect("0")
 
     FUNCTION(sqrt);
     FUNCTION(cbrt);
@@ -14339,7 +14341,7 @@ void tests::graphic_commands()
     BEGIN(graphics);
 
     step("Cleanup environment")
-        .test(DIRECT("'PPAR' PGALL {} CLIP"), ENTER);
+        .test(("'PPAR' PGALL {} CLIP"), ENTER);
 
     step("Extract graphic element")
         .test(CLEAR, "123 0", ID_ObjectMenu, ID_ToGrob, EXIT)
@@ -14368,7 +14370,7 @@ void tests::graphic_commands()
         .image("cllcd");
 
     step("Draw graphic objects")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
               "GROB 9 15 "
               "E300140015001C001400E3008000C110AA00940090004100220014102800 "
@@ -14389,7 +14391,7 @@ void tests::graphic_commands()
         .test(EXIT);
 
     step("Fetch from LCD")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
               "PICT { 10#125 10#44 }"
               "GROB 9 15 "
@@ -14410,7 +14412,7 @@ void tests::graphic_commands()
 
     step("Displaying text, compatibility mode");
     test(CLEAR,
-         DIRECT("\"Hello World\" 1 DISP "
+         ("\"Hello World\" 1 DISP "
                 "\"Compatibility mode\" 2 DISP"),
          ENTER)
         .noerror()
@@ -14419,7 +14421,7 @@ void tests::graphic_commands()
 
     step("Displaying text, fractional row");
     test(CLEAR,
-         DIRECT("\"Gutentag\" 1.5 DrawText "
+         ("\"Gutentag\" 1.5 DrawText "
                 "\"Fractional row\" 3.8 DrawText"),
          ENTER)
         .noerror()
@@ -14428,7 +14430,7 @@ void tests::graphic_commands()
 
     step("Displaying text, pixel row");
     test(CLEAR,
-         DIRECT("\"Bonjour tout le monde\" #5d DISP "
+         ("\"Bonjour tout le monde\" #5d DISP "
                 "\"Pixel row mode\" #125d DISP"),
          ENTER)
         .noerror()
@@ -14436,34 +14438,34 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Displaying text, x-y coordinates");
-    test(CLEAR, DIRECT("\"Hello\" { 0 0 } DISP "), ENTER)
+    test(CLEAR, ("\"Hello\" { 0 0 } DISP "), ENTER)
         .noerror()
         .image("text-xy")
         .test(ENTER);
 
     step("Displaying text, x-y pixel coordinates");
-    test(CLEAR, DIRECT("\"Hello\" { #20d #20d } DISP"), ENTER)
+    test(CLEAR, ("\"Hello\" { #20d #20d } DISP"), ENTER)
         .noerror()
         .image("text-pixxy")
         .test(ENTER);
 
     step("Displaying text, font ID");
     test(CLEAR,
-         DIRECT("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
+         ("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
          ENTER)
         .noerror()
         .image("text-font")
         .test(ENTER);
 
     step("Displaying text, erase and invert");
-    test(CLEAR, DIRECT("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
+    test(CLEAR, ("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
         .noerror()
         .image("text-invert")
         .test(ENTER);
 
     step("Displaying text, background and foreground");
     test(CLEAR,
-         DIRECT("1 Gray Background cllcd "
+         ("1 Gray Background cllcd "
                 "0.25 Gray Foreground 0.75 Gray Background "
                 "\"Grayed\" { 0 0 } Disp"),
          ENTER)
@@ -14473,7 +14475,7 @@ void tests::graphic_commands()
 
     step("Displaying text, restore background and foreground");
     test(CLEAR,
-         DIRECT("0 Gray Foreground 1 Gray Background "
+         ("0 Gray Foreground 1 Gray Background "
                 "\"Grayed\" { 0 0 } Disp"),
          ENTER)
         .noerror()
@@ -14485,7 +14487,7 @@ void tests::graphic_commands()
 
     step("Displaying styled text");
     test(CLEAR,
-         DIRECT("0 10 for i"
+         ("0 10 for i"
                 "  \"Hello\" { }"
                 "  i 135 * 321 mod 25 + R→B +"
                 "  i  51 * 200 mod  3 + R→B +"
@@ -14497,13 +14499,13 @@ void tests::graphic_commands()
 
     step("Lines");
     test(CLEAR,
-         DIRECT("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
+         ("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
         .noerror()
         .image("lines")
         .test(ENTER);
 
     step("Line width");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
@@ -14517,7 +14519,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Line width, grayed");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
@@ -14532,7 +14534,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Circles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ 0 0 } i Circle "
          "{ 0 1 } i 0.25 * Circle "
@@ -14545,7 +14547,7 @@ void tests::graphic_commands()
 
     step("Circles, complex coordinates");
     test(CLEAR,
-         DIRECT("2 150 for i "
+         ("2 150 for i "
                 "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * + Circle "
                 "next"),
          LENGTHY(5000),
@@ -14555,7 +14557,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Circles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
@@ -14568,7 +14570,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Ellipses");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -14582,7 +14584,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Ellipses, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -14597,7 +14599,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rectangles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -14611,7 +14613,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rectangles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -14626,7 +14628,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rounded rectangles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -14640,7 +14642,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Rounded rectangles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -14655,7 +14657,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("RGB colors")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 LINEWIDTH "
               "0 1 for r"
               "  0 1 for g"
@@ -14674,7 +14676,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Clipping");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth CLLCD { 120 135 353 175 } Clip "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
@@ -14688,7 +14690,7 @@ void tests::graphic_commands()
         .test(ENTER);
 
     step("Cleanup");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 LineWidth 0 Gray Foreground 1 Gray Background "
          "{ -1 -1 } { 3 2 } rect"),
          ENTER)
@@ -14696,7 +14698,7 @@ void tests::graphic_commands()
         .image("cleanup");
 
     step("PixOn")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 "
               "0 5000 for i"
               " 0.005 i * i 1.5 * R→P pixon "
@@ -14708,7 +14710,7 @@ void tests::graphic_commands()
         .test(ENTER)
         .expect("5 001");
     step("PixOff")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 LINEWIDTH { #0 #0 } { 10#400 10#240 } rect 3 LINEWIDTH "
               "0 "
               "0 5000 for i"
@@ -14723,7 +14725,7 @@ void tests::graphic_commands()
         .expect("12 429");
 
     step("PixTest")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "CLLCD "
               "0 399 for i "
               "{ } 10#0 i + + 10#100 + "
@@ -14741,7 +14743,7 @@ void tests::graphic_commands()
         .expect("400");
 
     step("Convert to graph")
-        .test(CLEAR, DIRECT("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
+        .test(CLEAR, ("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
               ENTER, EXIT)
         .image_noheader("eq-xgraph")
         .test("0 →Grob", ENTER)
@@ -14750,10 +14752,10 @@ void tests::graphic_commands()
         .image_noheader("eq-graph");
 
     step("Pattern in graph conversion")
-        .test(CLEAR, DIRECT("0.85 GRAY FOREGROUND 0.15 GRAY BACKGROUND"),
+        .test(CLEAR, ("0.85 GRAY FOREGROUND 0.15 GRAY BACKGROUND"),
               ENTER)
         .noerror()
-        .test(CLEAR, DIRECT("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
+        .test(CLEAR, ("'X+Y' cbrt inv 1 + sqrt dup 1 + 2 * /"),
               ENTER, EXIT)
         .image_noheader("pat-eq-xgraph")
         .test("2 →Grob", ENTER)
@@ -14826,25 +14828,25 @@ void tests::graphic_commands()
         .image_noheader("graph-integral");
 
     step("BlankGraphic")
-        .test(CLEAR, DIRECT("63 27 Blank "
+        .test(CLEAR, ("63 27 Blank "
                             "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGraphic "
                             "'Background' PURGE"), ENTER)
         .image_noheader("blank-graphic");
     step("BlankBitmap")
-        .test(CLEAR, DIRECT("63 27 BlankBitmap "
+        .test(CLEAR, ("63 27 BlankBitmap "
                             "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankBitmap "
                             "'Background' PURGE"), ENTER)
         .type(ID_bitmap)
         .image_noheader("blank-bitmap");
     step("BlankGrob")
-        .test(CLEAR, DIRECT("63 27 BlankGrob "
+        .test(CLEAR, ("63 27 BlankGrob "
                             "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankGrob "
                             "'Background' PURGE"), ENTER)
         .type(ID_grob)
         .image_noheader("blank-bitmap");
 #if CONFIG_COLOR
     step("BlankPixmap")
-        .test(CLEAR, DIRECT("63 27 BlankPixmap "
+        .test(CLEAR, ("63 27 BlankPixmap "
                             "0.2 0.4 0.7 RGB BACKGROUND 24 32 BlankPixmap "
                             "'Background' PURGE"), ENTER)
         .type(ID_pixmap)
@@ -14889,7 +14891,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Draw graphic objects")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "13 LineWidth { 0 0 } 5 Circle 1 LineWidth "
               "GROB 9 15 "
               "E300140015001C001400E3008000C110AA00940090004100220014102800 "
@@ -14911,7 +14913,7 @@ void tests::offline_graphics()
 
     step("Displaying text, compatibility mode");
     test(CLEAR,
-         DIRECT("\"Hello World\" 1 DISP "
+         ("\"Hello World\" 1 DISP "
                 "\"Compatibility mode\" 2 DISP"),
          ENTER)
         .noerror()
@@ -14920,7 +14922,7 @@ void tests::offline_graphics()
 
     step("Displaying text, fractional row");
     test(CLEAR,
-         DIRECT("\"Gutentag\" 1.5 DrawText "
+         ("\"Gutentag\" 1.5 DrawText "
                 "\"Fractional row\" 3.8 DrawText"),
          ENTER)
         .noerror()
@@ -14929,7 +14931,7 @@ void tests::offline_graphics()
 
     step("Displaying text, pixel row");
     test(CLEAR,
-         DIRECT("\"Bonjour tout le monde\" #5d DISP "
+         ("\"Bonjour tout le monde\" #5d DISP "
                 "\"Pixel row mode\" #125d DISP"),
          ENTER)
         .noerror()
@@ -14937,34 +14939,34 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Displaying text, x-y coordinates");
-    test(CLEAR, DIRECT("\"Hello\" { 0 0 } DISP "), ENTER)
+    test(CLEAR, ("\"Hello\" { 0 0 } DISP "), ENTER)
         .noerror()
         .image("text-xy-offline")
         .test(EXIT);
 
     step("Displaying text, x-y pixel coordinates");
-    test(CLEAR, DIRECT("\"Hello\" { #20d #20d } DISP"), ENTER)
+    test(CLEAR, ("\"Hello\" { #20d #20d } DISP"), ENTER)
         .noerror()
         .image("text-pixxy-offline")
         .test(EXIT);
 
     step("Displaying text, font ID");
     test(CLEAR,
-         DIRECT("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
+         ("\"Hello\" { 0 1 2 } DISP \"World\" { 0 -1 3 } DISP"),
          ENTER)
         .noerror()
         .image("text-font-offline")
         .test(EXIT);
 
     step("Displaying text, erase and invert");
-    test(CLEAR, DIRECT("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
+    test(CLEAR, ("\"Inverted\" { 0 0 3 true true } DISP"), ENTER)
         .noerror()
         .image("text-invert-offline")
         .test(EXIT);
 
     step("Displaying text, background and foreground");
     test(CLEAR,
-         DIRECT("1 Gray Background cllcd "
+         ("1 Gray Background cllcd "
                 "0.25 Gray Foreground 0.75 Gray Background "
                 "\"Grayed\" { 0 0 } Disp"),
          ENTER)
@@ -14974,7 +14976,7 @@ void tests::offline_graphics()
 
     step("Displaying text, restore background and foreground");
     test(CLEAR,
-         DIRECT("0 Gray Foreground 1 Gray Background "
+         ("0 Gray Foreground 1 Gray Background "
                 "\"Grayed\" { 0 0 } Disp"),
          ENTER)
         .noerror()
@@ -14986,7 +14988,7 @@ void tests::offline_graphics()
 
     step("Displaying styled text");
     test(CLEAR,
-         DIRECT("0 10 for i"
+         ("0 10 for i"
                 "  \"Hello\" { }"
                 "  i 135 * 321 mod 25 + R→B +"
                 "  i  51 * 200 mod  3 + R→B +"
@@ -14999,13 +15001,13 @@ void tests::offline_graphics()
 
     step("Lines");
     test(CLEAR,
-         DIRECT("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
+         ("3 50 for i ⅈ i * exp i 2 + ⅈ * exp 5 * Line next"), ENTER)
         .noerror()
         .image("lines-offline")
         .test(EXIT);
 
     step("Line width");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
@@ -15019,7 +15021,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Line width, grayed");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ #000 } #0 i 20 * + + "
          "{ #400 } #0 i 20 * + + "
@@ -15034,7 +15036,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Circles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 11 for i "
          "{ 0 0 } i Circle "
          "{ 0 1 } i 0.25 * Circle "
@@ -15047,7 +15049,7 @@ void tests::offline_graphics()
 
     step("Circles, complex coordinates");
     test(CLEAR,
-         DIRECT("2 150 for i "
+         ("2 150 for i "
                 "ⅈ i 0.12 * * exp 0.75 0.05 i * + * 0.4 0.003 i * + Circle "
                 "next"),
          LENGTHY(5000),
@@ -15057,7 +15059,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Circles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
@@ -15070,7 +15072,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Ellipses");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -15084,7 +15086,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Ellipses, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -15099,7 +15101,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Rectangles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -15113,7 +15115,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Rectangles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -15128,7 +15130,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Rounded rectangles");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 gray foreground 1 LineWidth "
          "2 150 for i "
          "i 0.12 * ⅈ * exp 0.05 i * 0.75 + * "
@@ -15142,7 +15144,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Rounded rectangles, fill and patterns");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth "
          "2 150 for i "
          "i 0.0047 * gray Foreground "
@@ -15157,7 +15159,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("RGB colors")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 LINEWIDTH "
               "0 1 for r"
               "  0 1 for g"
@@ -15176,7 +15178,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Clipping");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "0 LineWidth CLLCD { 120 135 353 175 } Clip "
          "2 150 for i "
          "i 0.0053 * gray Foreground "
@@ -15190,7 +15192,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("Cleanup");
-    test(CLEAR, DIRECT(
+    test(CLEAR, (
          "1 LineWidth 0 Gray Foreground 1 Gray Background "
          "{ -1 -1 } { 3 2 } rect"),
          ENTER)
@@ -15199,7 +15201,7 @@ void tests::offline_graphics()
         .test(EXIT);
 
     step("PixOn")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 "
               "0 500 for i"
               " 0.005 i * i 1.5 * R→P pixon "
@@ -15211,7 +15213,7 @@ void tests::offline_graphics()
         .test(EXIT)
         .expect("501");
     step("PixOff")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "0 LINEWIDTH { #0 #0 } { 10#400 10#240 } rect 3 LINEWIDTH "
               "0 "
               "0 500 for i"
@@ -15226,7 +15228,7 @@ void tests::offline_graphics()
         .expect("1 503");
 
     step("PixTest")
-        .test(CLEAR, DIRECT(
+        .test(CLEAR, (
               "CLLCD "
               "0 399 for i "
               "{ } 10#0 i + + 10#100 + "
@@ -15245,18 +15247,18 @@ void tests::offline_graphics()
 
     step("Function plot")
         .test(CLEAR,
-              DIRECT("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
+              ("CLLCD 'sin(1000*x)*(sq(x)/12)' FunctionPlot"), ENTER)
         .image("function-offline")
         .test(EXIT);
     step("Expliti DRAX")
-        .test(CLEAR, DIRECT("DRAX"), ENTER)
+        .test(CLEAR, ("DRAX"), ENTER)
         .image("function+drax-offline")
         .test(EXIT);
     step("Second function superimposed")
-        .test(CLEAR, DIRECT("0.8 0.4 0.2 RGB FOREGROUND 3 LINEWIDTH"
+        .test(CLEAR, ("0.8 0.4 0.2 RGB FOREGROUND 3 LINEWIDTH"
                             "'sin(150*x)' FUNCTIONPLOT"), ENTER)
         .image("two-functions-offline")
-        .test(EXIT, DIRECT("{ FOREGROUND LINEWIDTH } PURGE"), ENTER).noerror();
+        .test(EXIT, ("{ FOREGROUND LINEWIDTH } PURGE"), ENTER).noerror();
 }
 
 
@@ -15268,11 +15270,9 @@ void tests::user_input_commands()
     BEGIN(input);
 
     step("Prompt with single-line display")
-        .test(CLEAR, EXIT,
-              "\"Enter value\" PROMPT 1 +",
-              ENTER)
+        .test(CLEAR, EXIT, "\"Enter value\" PROMPT 1 +", ENTER)
         .image("prompt-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("prompt-entry", 2000)
         .test(ENTER)
         .expect("123")
@@ -15281,7 +15281,7 @@ void tests::user_input_commands()
     step("Prompt with 2 lines display")
         .test(CLEAR, EXIT, "123 456 \"Enter value\nNow!\" PROMPT 1 +", ENTER)
         .image("prompt2-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("prompt2-entry", 2000)
         .test(ENTER)
         .expect("123")
@@ -15292,9 +15292,9 @@ void tests::user_input_commands()
               "\"Enter first value\" PROMPT "
               "\"Enter second value\" PROMPT +", ENTER)
         .image("prompts-display1", 2000)
-        .test("123", ENTER)
+        .test(KEYTYPE("123"), ENTER)
         .expect("123")
-        .test(RUNSTOP, "456")
+        .test(RUNSTOP, KEYTYPE("456"))
         .image("prompts-display2", 2000)
         .test(ENTER, RUNSTOP)
         .got("579");
@@ -15302,7 +15302,7 @@ void tests::user_input_commands()
     step("Input command with text")
         .test(CLEAR, EXIT, "\"Enter value\" \"Data\" INPUT 4 +", ENTER)
         .image("input-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("input-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
@@ -15310,7 +15310,7 @@ void tests::user_input_commands()
     step("Input command with list")
         .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" } INPUT 4 +", ENTER)
         .image("input-list-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("input-list-display-123", 2000)
         .test(ENTER)
         .got("\"Data1234\"");
@@ -15318,7 +15318,7 @@ void tests::user_input_commands()
     step("Input command with list and position")
         .test(CLEAR, EXIT, "\"Enter value\" { \"Data\" 3 } INPUT 4 +", ENTER)
         .image("input-pos2-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
@@ -15327,7 +15327,7 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"Data\" 3 text } INPUT 4 +", ENTER)
         .image("input-pos2-display", 20000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("input-pos2-display-123", 20000)
         .test(ENTER)
         .got("\"Da123ta4\"");
@@ -15336,16 +15336,16 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"Data\" 3 alpha } INPUT 4 +", ENTER)
         .image("input-pos2-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image("input-pos2-display-123", 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
 
     step("Input command text")
         .test(CLEAR, EXIT,
-              "\"Enter value\" { \"Data\" 3 α } INPUT 4 +", ENTER)
+              KEYTYPE("\"Enter value\" { \"Data\" 3 α } INPUT 4 +"), ENTER)
         .image_nomenus("input-pos2-alpha-display", 3, 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image_nomenus("input-pos2-alpha-display-123", 3, 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
@@ -15354,7 +15354,7 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"Data\" 3 alg } INPUT 4 +", ENTER)
         .image_nomenus("input-pos2-alg-display", 2000)
-        .test("123")
+        .test(KEYTYPE("123"))
         .image_nomenus("input-pos2-alg-display-123", 2000)
         .test(ENTER)
         .got("\"Da123ta4\"");
@@ -15362,21 +15362,21 @@ void tests::user_input_commands()
     step("Input command for algebraic")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"Data\" 3 algebraic } INPUT", ENTER)
-        .test("123", ENTER)
+        .test(KEYTYPE("123"), ENTER)
         .type(ID_symbol)
         .got("Da123ta");
 
     step("Input command for expression")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"Data\" 3 expression } INPUT", ENTER)
-        .test("123", ENTER)
+        .test(KEYTYPE("123"), ENTER)
         .type(ID_expression)
         .got("'Da123ta'");
 
     step("Input command for algebraic number")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"\" 3 algebraic } INPUT", ENTER)
-        .test("123+").editor("123+")
+        .test(KEYTYPE("123+")).editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
         .test(ENTER).type(ID_decimal).got("123.4");
@@ -15384,7 +15384,7 @@ void tests::user_input_commands()
     step("Input command for expression")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
-        .test("123+").editor("123+")
+        .test(KEYTYPE("123+")).editor("123+")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ".4").editor("123.4")
         .test(ENTER).type(ID_expression).got("'123.4'");
@@ -15392,13 +15392,13 @@ void tests::user_input_commands()
     step("Input command for arithmetic expression")
         .test(CLEAR, EXIT,
               "\"Enter value\" { \"\" 3 expression } INPUT", ENTER)
-        .test("123+X").editor("123+X")
+        .test(KEYTYPE("123+X")).editor("123+X")
         .test(ENTER).type(ID_expression).got("'123+X'");
 
     step("Input command for single object with text")
         .test(CLEAR, EXIT,
               "\"Enter object\" { \"\"\"He\"\"\" 4 object } INPUT", ENTER)
-        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(KEYTYPE("llo\"\""), BSP, KEYTYPE(" ")).editor("\"Hello\" \"")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, LSHIFT, BSP).editor("\"Hello\"")
         .test(ENTER).type(ID_text).got("\"Hello\"");
@@ -15416,9 +15416,10 @@ void tests::user_input_commands()
     step("Input command for multiple objects with text")
         .test(CLEAR, EXIT,
               "\"Enter object\" { \"\"\"He\"\"\" 4 objects } INPUT", ENTER)
-        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(KEYTYPE("llo\"\""), BSP, KEYTYPE(" ")).editor("\"Hello\" \"")
         .test(ENTER).error("Invalid input")
-        .test(BSP, BSP, LSHIFT, BSP, " World").editor("\"Hello\" World")
+        .test(BSP, BSP, LSHIFT, BSP, KEYTYPE(" World"))
+        .editor("\"Hello\" World")
         .test(ENTER).type(ID_text).got("\"\"\"Hello\"\" World\"");
 
     step("Input command for multiple object with list")
@@ -15430,9 +15431,10 @@ void tests::user_input_commands()
     step("Input command for program with text")
         .test(CLEAR, EXIT,
               "\"Enter object\" { \"\"\"He\"\"\" 4 program } INPUT", ENTER)
-        .test("llo\"\"", BSP, " ").editor("\"Hello\" \"")
+        .test(KEYTYPE("llo\"\""), BSP, KEYTYPE(" ")).editor("\"Hello\" \"")
         .test(ENTER).error("Invalid input")
-        .test(BSP, BSP, LSHIFT, BSP, " World").editor("\"Hello\" World")
+        .test(BSP, BSP, LSHIFT, BSP, KEYTYPE(" World"))
+        .editor("\"Hello\" World")
         .test(ENTER).type(ID_program).want("« \"Hello\" World »");
 
     step("Input command for program with list")
@@ -15453,7 +15455,7 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter object\" { 123.45 0 n } INPUT", ENTER)
         .editor("123.45")
-        .test("45+", ENTER).error("Invalid input")
+        .test(KEYTYPE("45+"), ENTER).error("Invalid input")
         .test(BSP, BSP).editor("123.4545")
         .test(ENTER).type(ID_decimal).got("123.4545");
 
@@ -15461,7 +15463,7 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter object\" { 123.45 0 i } INPUT", ENTER)
         .editor("123.45")
-        .test("45+", ENTER).error("Invalid input")
+        .test(KEYTYPE("45+"), ENTER).error("Invalid input")
         .test(BSP, BSP).editor("123.4545")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, BSP, BSP, BSP, BSP).editor("123")
@@ -15471,13 +15473,13 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter object\" { 123 1 i } INPUT", ENTER)
         .editor("123")
-        .test("-", ENTER).type(ID_neg_integer).got("-123");
+        .test(KEYTYPE("-"), ENTER).type(ID_neg_integer).got("-123");
 
     step("Input command for real with decimal")
         .test(CLEAR, EXIT,
               "\"Enter object\" { 123.45 0 r } INPUT", ENTER)
         .editor("123.45")
-        .test("45+", ENTER).error("Invalid input")
+        .test(KEYTYPE("45+"), ENTER).error("Invalid input")
         .test(BSP, BSP).editor("123.4545")
         .test(ENTER).type(ID_decimal).got("123.4545");
 
@@ -15485,7 +15487,7 @@ void tests::user_input_commands()
         .test(CLEAR, EXIT,
               "\"Enter object\" { 123 1 positive } INPUT", ENTER)
         .editor("123")
-        .test("-").editor("-123")
+        .test(KEYTYPE("-")).editor("-123")
         .test(ENTER).error("Invalid input")
         .test(BSP, BSP, ENTER).type(ID_integer).got("123");
 
@@ -15494,7 +15496,7 @@ void tests::user_input_commands()
               "\"Enter 42\" { 123 0 « if \"42\" = then 55 end » } INPUT", ENTER)
         .editor("123")
         .test(ENTER).error("Invalid input")
-        .test(BSP, "42", UP, UP, BSP, BSP, BSP, ENTER)
+        .test(BSP, KEYTYPE("42"), UP, UP, BSP, BSP, BSP, ENTER)
         .type(ID_integer).got("55");
 }
 
@@ -16166,7 +16168,30 @@ void tests::flush()
 
 tests &tests::itest(cstring txt)
 // ----------------------------------------------------------------------------
-//   Type the string on the calculator's keyboard
+//   Insert text directly (fast path, default)
+// ----------------------------------------------------------------------------
+{
+    nokeys(2000);
+    if (simulate_typing)
+        type_keys(txt);
+    else
+        ui.insert(utf8(txt), strlen(txt), ui.TEXT);
+    return *this;
+}
+
+
+tests &tests::itest(const std::string &s)
+// ----------------------------------------------------------------------------
+//   Insert text directly from std::string (e.g. concatenated expressions)
+// ----------------------------------------------------------------------------
+{
+    return itest(s.c_str());
+}
+
+
+tests &tests::type_keys(cstring txt)
+// ----------------------------------------------------------------------------
+//   Type the string one key at a time (for data entry tests)
 // ----------------------------------------------------------------------------
 {
     utf8 u = utf8(txt);
@@ -16512,16 +16537,13 @@ tests &tests::itest(tests::WAIT delay)
 }
 
 
-tests &tests::itest(tests::DIRECT direct)
+tests &tests::itest(tests::KEYTYPE kt)
 // ----------------------------------------------------------------------------
-//   Insert some text directly into the editor
+//   Type the string one key at a time (for data entry tests)
 // ----------------------------------------------------------------------------
 {
-    nokeys(2000);
-    ui.insert(utf8(direct.text.c_str()), direct.text.size(), ui.TEXT);
-    return *this;
+    return type_keys(kt.text.c_str());
 }
-
 
 
 // ============================================================================

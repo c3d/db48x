@@ -315,9 +315,9 @@ public:
         uint length;
     };
 
-    struct DIRECT
+    struct KEYTYPE
     {
-        DIRECT(std::string text): text(text) {}
+        KEYTYPE(std::string text): text(text) {}
         std::string text;
     };
 
@@ -349,8 +349,11 @@ public:
     tests &itest(long long value);
     tests &itest(char c);
     tests &itest(cstring alpha);
+    tests &itest(const std::string &s);
     tests &itest(WAIT delay);
-    tests &itest(DIRECT direct);
+    tests &itest(KEYTYPE keytype);
+
+    tests &type_keys(cstring txt);
 
     template <typename... Args>
     tests &itest(LENGTHY length, Args... args)
@@ -498,6 +501,7 @@ public:
     static uint          image_wait_time;
     static cstring       dump_on_fail;
     static bool          running;
+    static bool          simulate_typing;
 };
 
 #define here()          position(__FILE__, __LINE__)
