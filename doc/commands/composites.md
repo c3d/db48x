@@ -1,27 +1,11 @@
 # Lists, Matrix and String commands
 
-## PUT
-Replace an item in a composite
-
-
 ## PUTI
 Replace an item and increase index
 
 
-## GET
-Extract an item from a composite
-
-
 ## GETI
 Extract an item and increase index
-
-
-## HEAD
-Extract the first item in a composite
-
-
-## TAIL
-Removes the first item in a composite
 
 
 ## OBJDECOMP
