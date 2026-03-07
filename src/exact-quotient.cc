@@ -58,63 +58,129 @@
 static bool xq_approx(decimal_r dec, bignum_g &p_out, bignum_g &q_out)
 // ----------------------------------------------------------------------------
 //   Find best rational p/q ≈ abs(dec) within current precision.
-//   Delegates to decimal::to_fraction with precision-based stopping criterion,
-//   then extracts p (numerator) and q (denominator) as bignums.
+//   Uses bignum exact arithmetic on the decimal kigits, then runs the
+//   standard CF algorithm with the HP-Prime accuracy stopping condition:
+//     accuracy × |inum×Q - iden×P| < iden×P
+//   where accuracy = 10^(prec-4).
+//   This correctly identifies convergents like 2/622521 for values that are
+//   close to (but not exactly equal to) the target fraction, unlike the
+//   to_fraction remainder-based condition which can miss them.
 // ----------------------------------------------------------------------------
 {
     if (!dec)
         return false;
 
-    // Special case: zero.
-    if (dec->is_zero())
-    {
-        p_out = bignum::make(0);
-        q_out = bignum::make(1);
-        return p_out && q_out;
-    }
-
-    uint prec = Settings.Precision();
-    uint tol  = (prec >= 4) ? prec - 4 : 0;
-
-    // to_fraction(count, decimals): runs CF, stops when |remainder| < 10^(-decimals).
-    // We allow up to prec iterations and stop when the residual is below our
-    // accuracy floor, matching the precision-based threshold used for XQ.
-    algebraic_g result = dec->to_fraction(prec, tol);
-    if (!result)
+    // Build exact rational inum/iden from decimal kigits.
+    decimal::info xi    = dec->shape();
+    size_t        xs    = xi.nkigits;
+    large         xe    = xi.exponent;
+    bignum_g      mant  = bignum::make(0);
+    bignum_g      k1000 = bignum::make(1000);
+    bignum_g      k10   = bignum::make(10);
+    bignum_g      one   = bignum::make(1);
+    if (!mant || !k1000 || !k10 || !one)
         return false;
+    for (size_t i = 0; i < xs; i++)
+    {
+        decimal::info xi_now = dec->shape();
+        bignum_g      kbig   = bignum::make(decimal::kigit(xi_now.base, i));
+        bignum_g      prod   = mant * k1000;
+        mant = prod + kbig;
+        if (!kbig || !prod || !mant)
+            return false;
+    }
 
-    bignum_g one = bignum::make(1);
-    if (!one)
-        return false;
-
-    object::id ty = result->type();
-    if (ty == object::ID_big_fraction)
+    // Represent abs(dec) as exact rational inum/iden.
+    bignum_g inum, iden;
+    large    denom_exp = (large)(3 * xs) - xe;
+    if (denom_exp < 0)
     {
-        big_fraction_p bf = big_fraction_p(+result);
-        p_out = bf->numerator();
-        q_out = bf->denominator();
-    }
-    else if (ty == object::ID_fraction)
-    {
-        fraction_p f = fraction_p(+result);
-        p_out = f->numerator();    // bignum_p overload
-        q_out = f->denominator();  // bignum_p overload
-    }
-    else if (object::is_bignum(ty))
-    {
-        p_out = bignum_p(+result);
-        q_out = one;
-    }
-    else if (object::is_integer(ty))
-    {
-        p_out = bignum::make(integer_p(+result)->value<ularge>());
-        q_out = one;
+        iden = bignum::pow(k10, -denom_exp);
+        inum = mant * iden;
+        iden = one;
     }
     else
     {
+        inum = mant;
+        iden = bignum::pow(k10, denom_exp);
+    }
+    if (!inum || !iden || iden->is_zero())
         return false;
+
+    // Special case: zero.
+    if (inum->is_zero())
+    {
+        p_out = bignum::make(0);
+        q_out = one;
+        return p_out && q_out;
     }
 
+    // Accuracy threshold: 10^(prec-4).
+    uint     prec     = Settings.Precision();
+    uint     tol      = (prec >= 4) ? prec - 4 : 0;
+    bignum_g accuracy = bignum::pow(k10, tol);
+    if (!accuracy)
+        return false;
+
+    // Standard CF algorithm on inum/iden.
+    // Convergent recurrence: p_k = a_k × p_{k-1} + p_{k-2}
+    //                        q_k = a_k × q_{k-1} + q_{k-2}
+    bignum_g P_pp = bignum::make(0), P_p = bignum::make(1);
+    bignum_g Q_pp = bignum::make(1), Q_p = bignum::make(0);
+    bignum_g num  = inum, den = iden;
+    if (!P_pp || !P_p || !Q_pp || !Q_p)
+        return false;
+
+    while (den && !den->is_zero())
+    {
+        bignum_g ai, r;
+        if (!bignum::quorem(num, den, bignum::ID_bignum, &ai, &r))
+            break;
+
+        bignum_g P_tmp = ai * P_p;
+        bignum_g P_c   = P_tmp + P_pp;
+        bignum_g Q_tmp = ai * Q_p;
+        bignum_g Q_c   = Q_tmp + Q_pp;
+        if (!P_c || !Q_c)
+            break;
+
+        // HP-Prime accuracy condition: accuracy × |inum×Q_c - iden×P_c| < iden×P_c
+        if (!P_c->is_zero())
+        {
+            bignum_g lq     = inum * Q_c;
+            bignum_g rp     = iden * P_c;
+            if (lq && rp)
+            {
+                bignum_g diff   = (lq > rp) ? lq - rp : rp - lq;
+                bignum_g scaled = diff * accuracy;
+                if (diff && scaled && scaled < rp)
+                {
+                    p_out = P_c;
+                    q_out = Q_c;
+                    return true;
+                }
+            }
+        }
+
+        // Safety cap: stop before denominators exceed ~2^80.
+        if (Q_c->more_bits_than(80))
+        {
+            p_out = P_c;
+            q_out = Q_c;
+            return true;
+        }
+
+        P_pp = P_p; P_p = P_c;
+        Q_pp = Q_p; Q_p = Q_c;
+        num  = den;
+        den  = r;
+    }
+
+    // CF terminated: last convergent is exact.
+    p_out = P_p;
+    q_out = Q_p;
+    if (!q_out || q_out->is_zero())
+        q_out = one;
     return p_out && q_out;
 }
 
