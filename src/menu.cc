@@ -433,8 +433,6 @@ MENU(PartsMenu,
      ID_Size,
      "Obj→",    ID_Explode,
 
-     "CstName", ID_ConstantName,
-     "CstValue",ID_ConstantValue,
      "StdUnc",  ID_StandardUncertainty,
      "RelUnc",  ID_RelativeUncertainty,
      "Tag→",    ID_FromTag,
