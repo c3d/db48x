@@ -45,9 +45,6 @@
 #include "sim-rpl.h"
 #include "ui_sim-window.h"
 #include <iostream>
-#ifdef ANDROID
-#include <atomic>
-#endif
 #include <QAudioFormat>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QAudioDevice>
@@ -67,6 +64,15 @@
 #include <QtCore>
 #include <QtGui>
 #include <QtMath>
+#ifdef ANDROID
+#include <QDir>
+#include <QSettings>
+#include <atomic>
+#include "version.h"
+
+void extract_android_assets();
+
+#endif // ANDROID
 #endif // WASM
 
 
@@ -176,6 +182,8 @@ MainWindow::MainWindow(QWidget *parent)
     resizeEvent(&initialResize);
 
 #ifdef ANDROID
+    extract_android_assets();
+
     connect(qGuiApp, &QGuiApplication::applicationStateChanged,
             this, &MainWindow::handleAppStateChange);
 #endif
@@ -327,6 +335,44 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 
 
 #ifdef ANDROID
+void extract_android_assets()
+{
+    QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(sandboxDir);
+
+    QSettings settings("DB48X", "Emulator");
+    QString currentAssetVersion = DB48X_VERSION;
+    QString savedAssetVersion = settings.value("AssetVersion", "").toString();
+
+    if (savedAssetVersion != currentAssetVersion) {
+        QStringList filesToExtract = {"db48x.idx", "db48x.md"};
+
+        for (const QString& fileName : filesToExtract) {
+            QString assetPath = ":/help/" + fileName; // Check your Qt resource prefix
+            QString targetPath = sandboxDir + "/help/" + fileName;
+
+            if (QFile::exists(targetPath)) {
+                QFile::remove(targetPath);
+            }
+
+	    // Create the directory structure if it doesn't exist
+	    QFileInfo targetInfo(targetPath);
+	    QDir().mkpath(targetInfo.absolutePath());
+
+            QFile assetFile(assetPath);
+            if (assetFile.copy(targetPath)) {
+                QFile::setPermissions(targetPath,
+                    QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser);
+            }
+        }
+
+	settings.setValue("AssetVersion", currentAssetVersion);
+    }
+
+    QDir::setCurrent(sandboxDir);
+}
+
+
 static std::atomic<bool> is_dialog_open{false};
 
 void MainWindow::handleAppStateChange(Qt::ApplicationState state)
