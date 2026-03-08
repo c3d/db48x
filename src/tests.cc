@@ -56,7 +56,7 @@ RECORDER(tests, 256, "Information about tests");
 RECORDER_TWEAK_DEFINE(snapshots, 0, "Record snapshots for failing tests");
 RECORDER_DECLARE(errors);
 
-uint    tests::default_wait_time  = 1000;
+uint    tests::default_wait_time  = 2000;
 uint    tests::key_delay_time     = 0;
 uint    tests::refresh_delay_time = 20;
 uint    tests::image_wait_time    = 500;
