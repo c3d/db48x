@@ -153,9 +153,15 @@ ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)
 ID_RANGE(is_program,       program,        funcall)
 ID_RANGE(is_graph,         grob,           bitmap)
-ID_RANGE(is_monochrome,    grob,           grob,        bitmap, bitmap)
-ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,    IfErrThen, IfErrThenElse)
-ID_RANGE(is_menu,          MainMenu,       Catalog,     UnitMenu00, CharactersMenu99)
+ID_RANGE(is_monochrome,    grob,           grob,
+                           bitmap,         bitmap)
+ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,
+                           IfErrThen,      IfErrThenElse)
+ID_RANGE(is_menu,          MainMenu,       Catalog,
+                           UnitMenu00, CharactersMenu99)
+ID_RANGE(is_constant,      constant,       xlib,
+                           standard_uncertainty, relative_uncertainty)
+ID_RANGE(is_constant_menu, constant_menu_name, library_menu_value)
 
 
 // ============================================================================
@@ -840,8 +846,10 @@ NAMED(EulerianNumber, "℮")
 NAMED(Infinity, "∞")
 NAMED(NegativeInfinity, "−∞")
 NAMED(Const, "LibraryConstant")
-CMD(ConstantName)
-CMD(ConstantValue)
+CMD(ConstantName)                       ALIAS(ConstantName, "EquationName")
+                                        ALIAS(ConstantName, "XLibName")
+CMD(ConstantValue)                      ALIAS(ConstantName, "EquationValue")
+                                        ALIAS(ConstantName, "XLibValue")
 CMD(StandardUncertainty)                ALIAS(StandardUncertainty, "CstSU")
 CMD(RelativeUncertainty)                ALIAS(RelativeUncertainty, "CstRU")
 NAMED(ToStandardUncertainty, "→Us")     ALIAS(ToStandardUncertainty, "→StdUnc")
@@ -851,12 +859,7 @@ NAMED(RelativeRound, "RelRnd")
 NAMED(PrecisionRound, "PrcRnd")
 
 NAMED(LibEq, "LibraryEquation")
-CMD(EquationName)
-CMD(EquationValue)
-CMD(EquationSolver)
 NAMED(XLib, "LibraryItem")
-CMD(XlibName)
-CMD(XlibValue)
 CMD(Constants)
 CMD(Attach)
 CMD(Detach)
@@ -1614,6 +1617,14 @@ ID(case_when_conditional)
 ID(case_skip_conditional)
 ID(case_end_conditional)
 ID(need_conditional)
+
+ID(constant_menu_name)
+ID(constant_menu_value)
+ID(equation_menu_name)
+ID(equation_menu_value)
+ID(equation_menu_solver)
+ID(library_menu_name)
+ID(library_menu_value)
 
 #undef ID
 #undef OP

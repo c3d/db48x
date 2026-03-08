@@ -64,7 +64,7 @@ static inline void solver_command_error()
 //   Report `EquationSolver` as the failing command
 // ----------------------------------------------------------------------------
 {
-    rt.command(object::static_object(object::ID_EquationSolver));
+    rt.command(object::static_object(object::ID_equation_menu_solver));
 }
 
 

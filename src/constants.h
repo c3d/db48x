@@ -216,6 +216,32 @@ public:
 };
 
 
+struct constant_menu_name : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a constant name
+// ----------------------------------------------------------------------------
+{
+    constant_menu_name(id type) : object(type) {}
+    OBJECT_DECL(constant_menu_name);
+    EVAL_DECL(constant_menu_name);
+    INSERT_DECL(constant_menu_name);
+    HELP_DECL(constant_menu_name);
+};
+
+
+struct constant_menu_value : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a constant value
+// ----------------------------------------------------------------------------
+{
+    constant_menu_value(id type) : object(type) {}
+    OBJECT_DECL(constant_menu_value);
+    EVAL_DECL(constant_menu_value);
+    INSERT_DECL(constant_menu_value);
+    HELP_DECL(constant_menu_value);
+};
+
+
 #define ID(i)
 #define CONSTANT_MENU(ConstantMenu)     struct ConstantMenu : constant_menu {};
 #include "ids.tbl"
@@ -224,8 +250,8 @@ COMMAND_DECLARE(Pi, 0);
 COMMAND_DECLARE(EulerianNumber, 0);
 COMMAND_DECLARE(Infinity, 0);
 COMMAND_DECLARE(NegativeInfinity, 0);
-COMMAND_DECLARE_INSERT_HELP(ConstantName,-1);
-COMMAND_DECLARE_INSERT_HELP(ConstantValue,-1);
+COMMAND_DECLARE(ConstantName,1);
+COMMAND_DECLARE(ConstantValue,1);
 COMMAND_DECLARE(Const, 1);
 COMMAND_DECLARE(StandardUncertainty, 1);
 COMMAND_DECLARE(RelativeUncertainty, 1);
@@ -264,6 +290,5 @@ struct relative_uncertainty : constant
 public:
     static const config relative;
 };
-
 
 #endif // CONSTANT_H

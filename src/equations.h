@@ -105,14 +105,49 @@ struct equation_menu : constant_menu
 };
 
 
+struct equation_menu_name : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a constant name
+// ----------------------------------------------------------------------------
+{
+    equation_menu_name(id type) : object(type) {}
+    OBJECT_DECL(equation_menu_name);
+    EVAL_DECL(equation_menu_name);
+    INSERT_DECL(equation_menu_name);
+    HELP_DECL(equation_menu_name);
+};
+
+
+struct equation_menu_value : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a constant value
+// ----------------------------------------------------------------------------
+{
+    equation_menu_value(id type) : object(type) {}
+    OBJECT_DECL(equation_menu_value);
+    EVAL_DECL(equation_menu_value);
+    INSERT_DECL(equation_menu_value);
+    HELP_DECL(equation_menu_value);
+};
+
+
+struct equation_menu_solver : object
+// ----------------------------------------------------------------------------
+//    A menu entry that builds a solver for the equation
+// ----------------------------------------------------------------------------
+{
+    equation_menu_solver(id type) : object(type) {}
+    OBJECT_DECL(equation_menu_solver);
+    EVAL_DECL(equation_menu_solver);
+    INSERT_DECL(equation_menu_solver);
+    HELP_DECL(equation_menu_solver);
+};
+
 
 #define ID(i)
 #define EQUATION_MENU(EquationMenu)     struct EquationMenu : equation_menu {};
 #include "ids.tbl"
 
-COMMAND_DECLARE_INSERT_HELP(EquationName,-1);
-COMMAND_DECLARE_INSERT_HELP(EquationValue,-1);
-COMMAND_DECLARE_INSERT_HELP(EquationSolver,-1);
 COMMAND_DECLARE(LibEq, 1);
 
 

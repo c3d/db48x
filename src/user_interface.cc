@@ -6251,7 +6251,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
                 menu_refresh(menu::ID_Catalog, true);
                 ac = false;
             }
-            else if (ty == object::ID_ConstantName)
+            else if (ty == object::ID_constant_menu_name)
             {
                 unicode lc = character_left_of_cursor();
                 if (lc == L'Ⓒ' || lc == L'Ⓡ' || lc == L'Ⓢ')
@@ -6290,7 +6290,9 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         case PROGRAM:
         case MATRIX:
         insert_object:
-            if (object::is_program_cmd(ty) || object::is_algebraic(ty) || user)
+            if (user ||
+                object::is_program_cmd(ty) || object::is_algebraic(ty) ||
+                object::is_constant_menu(ty))
             {
                 dirtyEditor = true;
                 edRows = 0;

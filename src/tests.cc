@@ -11622,6 +11622,25 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
+    step("Check constant name from command line")
+        .test(CLEAR, "Ⓒc CONSTANTNAME", ENTER)
+        .expect("\"c\"");
+    step("Check constant value from command line")
+        .test(CLEAR, "Ⓒc CONSTANTVALUE", ENTER)
+        .expect("299 792 458 m/s");
+    step("Check constant name from menu")
+        .test(CLEAR, "Ⓒc", ENTER)
+        .expect("c")
+        .test(ID_PartsMenu, F6, ID_ConstantName)
+        .expect("\"c\"");
+    step("Check constant value from menu")
+        .test(CLEAR, "Ⓒc", ENTER)
+        .expect("c")
+        .test(ID_PartsMenu, F6, ID_ConstantValue)
+        .expect("299 792 458 m/s");
+    step("Check constant value from command line")
+        .test(CLEAR, "Ⓒc CONSTANTVALUE", ENTER)
+        .expect("299 792 458 m/s");
     step("Insert constant from constants menu")
         .test(CLEAR, ID_ConstantsMenu, RSHIFT, F1, "c", ENTER)
         .expect("c")

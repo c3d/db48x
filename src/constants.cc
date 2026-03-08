@@ -32,11 +32,13 @@
 #include "algebraic.h"
 #include "arithmetic.h"
 #include "compare.h"
+#include "equations.h"
 #include "expression.h"
 #include "file.h"
 #include "files.h"
 #include "functions.h"
 #include "grob.h"
+#include "library.h"
 #include "parser.h"
 #include "renderer.h"
 #include "settings.h"
@@ -170,6 +172,91 @@ HELP_BODY(constant_menu)
 }
 
 
+EVAL_BODY(constant_menu_name)
+// ----------------------------------------------------------------------------
+//   Put the name of a constant on the stack
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    unicode pfx = ui.character_left_of_cursor();
+    const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
+                                : pfx == L'Ⓢ' ? standard_uncertainty::standard
+                                              : constant::constants;
+    if (object_p cstobj = constant::do_key(cfg, key))
+        if (constant_p cst = cstobj->as<constant>())
+            if (rt.push(cst))
+                return OK;
+    if (!rt.error())
+        rt.type_error();
+    return ERROR;
+}
+
+
+INSERT_BODY(constant_menu_name)
+// ----------------------------------------------------------------------------
+//   Put the name of a constant in the editor
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    unicode prefix = ui.character_left_of_cursor();
+    bool noprefix = prefix == L'Ⓒ' || prefix == L'Ⓡ' || prefix == L'Ⓢ';
+    return ui.insert_softkey(key, noprefix ? "" : " Ⓒ", " ", false);
+}
+
+
+HELP_BODY(constant_menu_name)
+// ----------------------------------------------------------------------------
+//   Put the help for a given constant name
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    if (object_p cstobj = constant::do_key(constant::constants, key))
+        if (constant_p cst = cstobj->as<constant>())
+            return cst->help();
+    return utf8("Constants");
+}
+
+
+EVAL_BODY(constant_menu_value)
+// ----------------------------------------------------------------------------
+//   Put the value of a constant on the stack
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    if (object_p cstobj = constant::do_key(constant::constants, key))
+        if (constant_p cst = cstobj->as<constant>())
+            if (algebraic_p value = cst->numerical_value())
+                if (rt.push(value))
+                    return OK;
+    if (!rt.error())
+        rt.type_error();
+    return ERROR;
+}
+
+
+INSERT_BODY(constant_menu_value)
+// ----------------------------------------------------------------------------
+//   Insert the value of a constant
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    if (object_p cstobj = constant::do_key(constant::constants, key))
+        if (constant_p cst = cstobj->as<constant>())
+            if (object_p value = cst->numerical_value())
+                return ui.insert_object(value, " ", " ");
+    return ERROR;
+}
+
+
+HELP_BODY(constant_menu_value)
+// ----------------------------------------------------------------------------
+//   Put the help for a given constant name
+// ----------------------------------------------------------------------------
+{
+    return constant_menu_name::do_help(nullptr);
+}
+
+
 MENU_BODY(ConstantsMenu)
 // ----------------------------------------------------------------------------
 //   The constants menu is dynamically populated
@@ -258,43 +345,31 @@ COMMAND_BODY(ConstantName)
 //   Put the name of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    unicode pfx = ui.character_left_of_cursor();
-    const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
-                                : pfx == L'Ⓢ' ? standard_uncertainty::standard
-                                              : constant::constants;
-    if (object_p cstobj = constant::do_key(cfg, key))
-        if (constant_p cst = cstobj->as<constant>())
-            if (rt.push(cst))
-                return OK;
-    if (!rt.error())
-        rt.type_error();
+    if (object_p cst = rt.top())
+    {
+        utf8   name = nullptr;
+        size_t sz   = 0;
+        switch (cst->type())
+        {
+        case ID_constant: name = constant_p(cst)->name(&sz); break;
+        case ID_equation: name = equation_p(cst)->name(&sz); break;
+        case ID_xlib:     name = xlib_p    (cst)->name(&sz); break;
+        case ID_standard_uncertainty:
+            name = standard_uncertainty_p(cst)->name(&sz);
+            break;
+        case ID_relative_uncertainty:
+            name = relative_uncertainty_p(cst)->name(&sz);
+            break;
+        default:
+            rt.type_error();
+        }
+
+        if (name)
+            if (text_p sym = text::make(name, sz))
+                if (rt.top(sym))
+                    return OK;
+    }
     return ERROR;
-}
-
-
-INSERT_BODY(ConstantName)
-// ----------------------------------------------------------------------------
-//   Put the name of a constant in the editor
-// ----------------------------------------------------------------------------
-{
-    int key = ui.evaluating;
-    unicode prefix = ui.character_left_of_cursor();
-    bool noprefix = prefix == L'Ⓒ' || prefix == L'Ⓡ' || prefix == L'Ⓢ';
-    return ui.insert_softkey(key, noprefix ? "" : " Ⓒ", " ", false);
-}
-
-
-HELP_BODY(ConstantName)
-// ----------------------------------------------------------------------------
-//   Put the help for a given constant name
-// ----------------------------------------------------------------------------
-{
-    int key = ui.evaluating;
-    if (object_p cstobj = constant::do_key(constant::constants, key))
-        if (constant_p cst = cstobj->as<constant>())
-            return cst->help();
-    return utf8("Constants");
 }
 
 
@@ -303,38 +378,29 @@ COMMAND_BODY(ConstantValue)
 //   Put the value of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    if (object_p cstobj = constant::do_key(constant::constants, key))
-        if (constant_p cst = cstobj->as<constant>())
-            if (algebraic_p value = cst->numerical_value())
-                if (rt.push(value))
-                    return OK;
-    if (!rt.error())
-        rt.type_error();
+    if (object_p cst = rt.top())
+    {
+        object_p value = nullptr;
+        switch (cst->type())
+        {
+        case ID_constant: value = constant_p(cst)->value(); break;
+        case ID_equation: value = equation_p(cst)->value(); break;
+        case ID_xlib:     value = xlib_p    (cst)->value(); break;
+        case ID_standard_uncertainty:
+            value = standard_uncertainty_p(cst)->value();
+            break;
+        case ID_relative_uncertainty:
+            value = relative_uncertainty_p(cst)->value();
+            break;
+        default:
+            rt.type_error();
+        }
+
+        if (value)
+            if (rt.top(value))
+                return OK;
+    }
     return ERROR;
-}
-
-
-INSERT_BODY(ConstantValue)
-// ----------------------------------------------------------------------------
-//   Insert the value of a constant
-// ----------------------------------------------------------------------------
-{
-    int key = ui.evaluating;
-    if (object_p cstobj = constant::do_key(constant::constants, key))
-        if (constant_p cst = cstobj->as<constant>())
-            if (object_p value = cst->numerical_value())
-                return ui.insert_object(value, " ", " ");
-    return ERROR;
-}
-
-
-HELP_BODY(ConstantValue)
-// ----------------------------------------------------------------------------
-//   Put the help for a given constant name
-// ----------------------------------------------------------------------------
-{
-    return ConstantName::do_help(nullptr);
 }
 
 
@@ -969,8 +1035,8 @@ const constant::config constant::constants =
     .type          = ID_constant,
     .first_menu    = ID_ConstantsMenu00,
     .last_menu     = ID_ConstantsMenu99,
-    .name          = ID_ConstantName,
-    .value         = ID_ConstantValue,
+    .name          = ID_constant_menu_name,
+    .value         = ID_constant_menu_value,
     .command       = ID_object,
     .file          = "config/constants.csv",
     .library       = "library",
@@ -1684,8 +1750,8 @@ const constant::config standard_uncertainty::standard =
     .type           = ID_standard_uncertainty,
     .first_menu     = ID_ConstantsMenu00,
     .last_menu      = ID_ConstantsMenu99,
-    .name           = ID_ConstantName,
-    .value          = ID_ConstantValue,
+    .name           = ID_constant_menu_name,
+    .value          = ID_constant_menu_value,
     .command        = ID_object,
     .file           = "config/constants.csv",
     .library        = "library",
@@ -1738,8 +1804,8 @@ const constant::config relative_uncertainty::relative =
     .type           = ID_relative_uncertainty,
     .first_menu     = ID_ConstantsMenu00,
     .last_menu      = ID_ConstantsMenu99,
-    .name           = ID_ConstantName,
-    .value          = ID_ConstantValue,
+    .name           = ID_constant_menu_name,
+    .value          = ID_constant_menu_value,
     .command        = ID_object,
     .file           = "config/constants.csv",
     .library        = "library",

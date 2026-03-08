@@ -10854,6 +10854,31 @@ The name can be given as a symbol or as text.
 `'Dedicace'"` ▶ `"À tous ceux qui se souviennent de Maubert électronique"`
 
 
+## ConstantName
+
+Return the name for a given constant, as text
+
+```rpl
+Ⓒπ ConstantName
+@ Expecting "π"
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
+
+
+## ConstantValue
+
+Return the value for a given constant
+
+```rpl
+Ⓒπ ConstantValue
+@ Expecting 3.14159 26535 9
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
+
 # Precision control
 
 Scientific calculations lead to the numerical evaluation of expressions whose
