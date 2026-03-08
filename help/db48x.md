@@ -10812,6 +10812,24 @@ The name can be given as a symbol or as text.
 `'c'` ▶ `299792458_m/s`
 
 
+## StandardUncertainty
+
+Returns the standard uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the absolute
+uncertainty (denoted Ⓢ*X* in expressions) conforming to CODATA.
+
+`'c'` `StandardUncertainty` ▶ `0_m/s`
+
+
+## RelativeUncertainty
+
+Returns the relative uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the relative
+uncertainty (denoted Ⓡ*X* in expressions) conforming to CODATA.
+
+`'c'` `RelativeUncertainty` ▶ `0`
+
+
 ## LibraryEquation
 
 Returns the value of a library equation from the equation library.
