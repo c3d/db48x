@@ -1757,34 +1757,31 @@ COMMAND_BODY(BinaryToFlags)
 //   Store a binary value into the flags
 // ----------------------------------------------------------------------------
 {
-    if (rt.args(1))
+    object_p value = rt.top();
+    if (value->is_integer())
     {
-        object_p value = rt.top();
-        if (value->is_integer())
-        {
-            bignum_g big;
-            if (value->is_bignum())
-                big = bignum_p(value);
-            else
-                big = rt.make<bignum>(integer_g(integer_p(value)));
-            size_t sz = 0;
-            byte_p data = big->value(&sz);
-            size_t maxflags = Settings.MaxFlags();
-            if (sz * 8 > maxflags)
-                sz = (maxflags + 7) / 8;
-
-            if (!init_flags())
-                return object::ERROR;
-            memcpy(flags, data, sz);
-            if (sz < maxflags / 8)
-                memset(flags + sz, 0, (maxflags + 7) / 8 - sz);
-            if (rt.drop())
-                return OK;
-        }
+        bignum_g big;
+        if (value->is_bignum())
+            big = bignum_p(value);
         else
-        {
-            rt.type_error();
-        }
+            big = rt.make<bignum>(integer_g(integer_p(value)));
+        size_t sz = 0;
+        byte_p data = big->value(&sz);
+        size_t maxflags = Settings.MaxFlags();
+        if (sz * 8 > maxflags)
+            sz = (maxflags + 7) / 8;
+
+        if (!init_flags())
+            return object::ERROR;
+        memcpy(flags, data, sz);
+        if (sz < maxflags / 8)
+            memset(flags + sz, 0, (maxflags + 7) / 8 - sz);
+        if (rt.drop())
+            return OK;
+    }
+    else
+    {
+        rt.type_error();
     }
     return ERROR;
 }
