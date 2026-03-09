@@ -13952,6 +13952,12 @@ void tests::regression_checks()
 
     Settings = settings();
 
+    step("Crash in MSLV")
+        .test(CLEAR, "'A+B=3' { A B } { 0 1 } MSLV", ENTER)
+        .error("Unable to solve for all variables")
+        .test(CLEAR, "{ 'A+B=3' 'A-B=2' } { A B } { 0 1 } MSLV", ENTER)
+        .expect("{ A=2.5 B=0.5 }");
+
     step("Bug 1445: sqrt for perfect squares")
         .test(CLEAR, "25 sqrt 5 -", ENTER).expect("0.")
         .test(CLEAR, "36 sqrt 6 -", ENTER).expect("0.")

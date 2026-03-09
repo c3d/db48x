@@ -1098,7 +1098,7 @@ COMMAND_BODY(MultipleVariablesSolver)
         algebraic_g result = Root::solve(eqs, vars, guesses);
         if (!result)
             solver_command_error();
-        if (rt.top(+result))
+        else if (rt.top(+result))
             return OK;
     }
     else
