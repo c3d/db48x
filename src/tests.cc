@@ -4695,6 +4695,10 @@ void tests::cfraction()
     step("DFC(-5/3) = { -2 3 }")
         .test(CLEAR, "-5/3", ENTER, ID_DFC).expect("{ -2 3 }");
 
+    // Decimal: 2.3 = 23/10 = [2; 3, 3] (HP Prime gives [2 3 2 1] which equals [2 3 3])
+    step("DFC(2.3) = { 2 3 3 }")
+        .test(CLEAR, "2.3", ENTER, ID_DFC).expect("{ 2 3 3 }");
+
     // Inverse: DFC2F(DFC(p/q)) = p/q (exact round-trip, tested via subtraction)
     step("DFC2F(DFC(1/2)) = 1/2")
         .test(CLEAR, "1/2 DFC DFC2F 1/2 -", ENTER).expect("0");
