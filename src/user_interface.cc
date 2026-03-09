@@ -3201,7 +3201,7 @@ void user_interface::load_help(utf8 topic, size_t len)
                     }
                     refidx = 0;
                 }
-                else
+                else if (refidx < sizeof(ref) - 1)
                 {
                     ref[refidx++] = c;
                 }
@@ -3260,7 +3260,8 @@ void user_interface::load_help(utf8 topic, size_t len)
             }
             else
             {
-                ref[refidx] = 0;
+                if (refidx < sizeof(ref))
+                    ref[refidx] = 0;
                 record(help_search, "Checking %u: %s", level, ref);
 
                 // For regular topics, just to a string comparison
