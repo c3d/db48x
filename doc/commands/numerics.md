@@ -95,15 +95,50 @@ best rational approximation `p/q`.
 `XQ` accepts integers, fractions (returned unchanged), decimals, and lists
 (applied element-wise).
 
-## →Qπ
 
-Find the simplest symbolic representation of a real number involving a multiple
-of π. This command behaves like [XQ](#XQ) but restricts the output to π
-multiples (`p/q·π`) or plain rational forms. Exponential, logarithm and square
-root forms are not considered.
+# Continued fractions
 
-For example, `4.71238898038 →Qπ` gives `3/2·π`, and `1.23 →Qπ` gives
-`123/100` (falling back to rational since no π-multiple matches).
+A continued fraction represents a real number as a sequence of integers
+`{ a0, a1, a2, ... }` such that:
 
-For the fullsymbolic simplification including square roots, logarithms and exponentials,
-use [XQ](#XQ) instead.
+    x = a0 + 1/(a1 + 1/(a2 + 1/...))
+
+The integer part `a0` may be negative; all remaining coefficients `a1, a2, ...`
+are positive. Rational numbers produce finite sequences; irrational numbers
+produce infinite (periodic for quadratic surds) sequences that are truncated at
+the current precision.
+
+## DFC
+
+Decompose a real number into its continued fraction coefficients. Returns a list
+`{ a0, a1, a2, ... }` of integers satisfying the continued fraction expansion
+above.
+
+For exact inputs (integers, fractions), the result is the exact finite CF:
+
+* `3/7 DFC` gives `{ 0 2 3 }` since 3/7 = 0 + 1/(2 + 1/3)
+* `22/7 DFC` gives `{ 3 7 }` since 22/7 = 3 + 1/7
+* `355/113 DFC` gives `{ 3 7 16 }`
+
+For decimal inputs, the sequence is truncated when the remaining denominator
+exceeds 10^(Precision/2), giving convergents that match the input to the
+available precision:
+
+* `π DFC` begins `{ 3 7 15 1 292 1 1 1 2 ... }`
+* `√2 DFC` begins `{ 1 2 2 2 2 2 2 2 2 ... }` (periodic)
+* `φ DFC` begins `{ 1 1 1 1 1 1 1 1 1 ... }` (golden ratio, all 1s)
+
+## DFC2F
+
+Reconstruct a number from a continued fraction coefficient list. Given a list
+`{ a0, a1, ..., an }`, evaluates the finite continued fraction from the inside
+out: `a0 + 1/(a1 + 1/(... + 1/an))`.
+
+When all coefficients are integers the result is an exact fraction:
+
+* `{ 0 2 3 } DFC2F` gives `3/7`
+* `{ 3 7 } DFC2F` gives `22/7`
+* `{ 3 7 16 } DFC2F` gives `355/113`
+
+`DFC` and `DFC2F` are inverses: `DFC2F(DFC(x))` recovers `x` exactly for
+rational inputs and to full precision for decimals.

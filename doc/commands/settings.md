@@ -536,6 +536,8 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
 
+Controls also the fraction of [XQ](##XQ) command.
+
 ## →QπMaxPrime
 
 Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
