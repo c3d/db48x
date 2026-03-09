@@ -46,6 +46,14 @@ first level of the stack should take one argument and return a single value.
 
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
 
+The operation applies recursively to inner lists.
+
+```rpl
+{ 1 2 { 3 4 } } « →STR » MAP
+@ Expecting { "1" "2" { "3" "4" } }
+
+```
+
 ## Reduce
 
 Apply a cumulative pairwise operation on all elements in a list or array.
