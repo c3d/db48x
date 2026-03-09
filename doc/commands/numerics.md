@@ -32,6 +32,37 @@ integrate as the previous one, so the maximum number of samples taken is in the
 order of `2^IntegrationIterations`.
 
 
+# Continued fractions
+
+## DFC
+
+Decompose a real number into its continued fraction coefficients (Décomposition
+en Fraction Continue).
+
+`X` ▶ `{ a0 a1 a2 … }`
+
+Returns a list of integers such that *X* ≈ a₀ + 1/(a₁ + 1/(a₂ + …)). For
+integers the result is a single-element list. For rationals the expansion is
+exact and finite. For decimals and irrationals (π, *e*, √2, etc.), the expansion
+stops when the next convergent would exceed the precision of the input.
+
+Examples: `22/7 DFC` → `{ 3 7 }`, `2 √ DFC` → `{ 1 2 2 2 … }`.
+
+The inverse `DFC2F` reconstructs the value from the coefficient list.
+
+## DFC2F
+
+Reconstruct a real number from its continued fraction coefficient list.
+
+`{ a0 a1 … an }` ▶ `a0 + 1/(a1 + 1/(… + 1/an))`
+
+Evaluates the list right-to-left to produce a rational or decimal result.
+`DFC2F(DFC(x))` gives an exact round-trip for integers and fractions, and an
+approximate round-trip for irrationals within the current precision.
+
+Example: `{ 3 7 } DFC2F` → `22/7`.
+
+
 # Numerical conversions
 
 ## →Num
