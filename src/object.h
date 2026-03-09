@@ -793,6 +793,35 @@ struct object
     }
 
 
+    static bool is_sequence(id ty)
+    // ------------------------------------------------------------------------
+    //   Check if we have a sequence of objects (array, list, program, expr, …)
+    // ------------------------------------------------------------------------
+    {
+        return ty == ID_array || ty == ID_list || is_program(ty);
+    }
+
+
+    bool is_sequence() const
+    // ------------------------------------------------------------------------
+    //   Return true if this is a sequence of objects
+    // ------------------------------------------------------------------------
+    {
+        return is_sequence(type());
+    }
+
+
+    list_p as_sequence() const
+    // ------------------------------------------------------------------------
+    //   Convert to list if this is a sequence (array, list, program, expr, …)
+    // ------------------------------------------------------------------------
+    {
+        if (is_sequence())
+            return list_p(this);
+        return nullptr;
+    }
+
+
     algebraic_p as_extended_algebraic() const
     // ------------------------------------------------------------------------
     //   Return an object as an algebraic if possible, or nullptr

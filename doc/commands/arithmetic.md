@@ -216,12 +216,6 @@ Greatest common divisor
 Least common multiple
 
 
-## IDIV2
-Integer division, get quotient and remainder.
-On DB48X, this is an alias for [div2](#div2).
-
-`Y` `X` ▶ `IP(Y/X)` `Y rem X`
-
 ## IQUOT
 Quotient of the integer division
 

@@ -215,6 +215,20 @@ object_p directory::store(object_g name, object_g value)
         // Deal with local variables
         return rt.local(local_p(+name)->index(), value);
 
+    case ID_funcall:
+    {
+        if (array_g fcall = funcall_p(+name)->args())
+            if (object_g name = fcall->head())
+                if (object_g items = recall_all(name, false))
+                    if (list_g index = fcall->tail())
+                        if (object_g upd = items->at(+index, value))
+                            if (object_g o = directory::update(name, upd))
+                                return value;
+        if (!rt.error())
+            rt.value_error();
+        return nullptr;;
+    }
+
     case ID_text:
     {
         // Deal with storing to file
@@ -431,27 +445,11 @@ object_p directory::lookup(object_p ref) const
 }
 
 
-object_p directory::recall(object_p ref) const
+object_p directory::recall(object_p name) const
 // ----------------------------------------------------------------------------
 //   If the referenced object exists in directory, return associated value
 // ----------------------------------------------------------------------------
 {
-    if (object_p found = lookup(ref))
-        // The value follows the name
-        return found->skip();
-    return nullptr;
-}
-
-
-object_p directory::recall_all(object_p name, bool report_missing)
-// ----------------------------------------------------------------------------
-//   If the referenced object exists in directory, return associated value
-// ----------------------------------------------------------------------------
-{
-    // Strip quote if any
-    if (object_p quoted = name->as_quoted(ID_object))
-        name = quoted;
-
     // Deal with all special cases
     id nty = name->type();
     switch (nty)
@@ -516,11 +514,27 @@ object_p directory::recall_all(object_p name, bool report_missing)
         return nullptr;
     }
 
+    if (object_p found = lookup(name))
+        // The value follows the name
+        return found->skip();
+    return nullptr;
+}
+
+
+object_p directory::recall_all(object_p name, bool report_missing)
+// ----------------------------------------------------------------------------
+//   If the referenced object exists in directory, return associated value
+// ----------------------------------------------------------------------------
+{
+    // Strip quote if any
+    if (object_p quoted = name->as_quoted(ID_object))
+        name = quoted;
+
     directory *dir = nullptr;
     for (uint depth = 0; (dir = rt.variables(depth)); depth++)
         if (object_p value = dir->recall(name))
             return value;
-    if (report_missing)
+    if (report_missing && !rt.error())
         rt.undefined_name_error();
     return nullptr;
 }

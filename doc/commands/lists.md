@@ -25,17 +25,6 @@ at the deepest level in the stack. This is the opposite of [→List](#tolist). T
 
 `{ A B ... }` ▶ `A` `B` ... `Count`
 
-
-## List→
-
-Expand a list on the stack and return the number of elements. After executing
-the command, level 1 contains the number of elements, and a corresponding number
-of stack levels contain individual elements of the list, the first element being
-at the deepest level in the stack. This is the opposite of [→List](#tolist). The
-[Obj→](#fromobj) command performs the same operation when applied to a list.
-
-`{ A B ... }` ▶ `A` `B` ... `Count`
-
 ## Head
 
 Return the first element of a list, or an `Invalid dimension` error if the list

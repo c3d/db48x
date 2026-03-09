@@ -86,15 +86,18 @@ algebraic_p hwfp<hw>::to_fraction(uint count, uint prec) const
     uint maxdec = Settings.Precision() - 3;
     if (prec > maxdec)
         prec = maxdec;
+
+    // Limit fraction precision to displayed digits (DisplayDigits) like HP50G
+    uint dispdig = Settings.DisplayDigits();
+    if (dispdig > 0 && prec > dispdig)
+        prec = dispdig;
+
     hw eps = std::exp(-hw(prec) * M_LN10);
 
     while (count--)
     {
         // Check if the decimal part is small enough
         if (decimal_part == 0.0)
-            break;
-
-        if (decimal_part < eps)
             break;
 
         hw next = 1.0 / decimal_part;
@@ -107,6 +110,14 @@ algebraic_p hwfp<hw>::to_fraction(uint count, uint prec) const
         s = v1den;
         v1den = whole_part * v1den + v2den;
         v2den = s;
+
+        // Check convergence: break when |num - n/d| < 10^(-prec)
+        hw convergent = v1num / v1den;
+        hw err = num - convergent;
+        if (err < 0)
+            err = -err;
+        if (err < eps)
+            break;
 
         decimal_part = next - whole_part;
     }

@@ -19,20 +19,6 @@ Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## →Rectangular
-
-Convert vector or complex to cartesian coordinates
-
-
-## →Polar
-
-Convert vector or complex to polar coordinates
-
-
-## →Spherical
-
-Convert vector or complex to spherical coordinates
-
 ## R→D
 
 Convert radians to degrees.

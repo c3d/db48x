@@ -392,15 +392,15 @@ Display comands using the long form, for example `Store`.
 
 Display names using the short form in lower case, for example `varName` will show as `varname`.
 
-## UpperCase
+## UpperCaseNames
 
 Display names using the short form in upper case, for example `varName` will show as `VARNAME`.
 
-## Capitalized
+## CapitalizedNames
 
 Display names using the short form capitalized, for example `varName` will show as `VarName`.
 
-## LongForm
+## LongFormNames
 
 Display names using the long form, for example `varName` will show as `varName`.
 
@@ -511,15 +511,6 @@ bits is limited only by memory and performance.
 
 Return the current [word size](#wordsize) in bits.
 
-## STWS
-
-`STWS` is a compatibility spelling for the [WordSize](#wordsize) command.
-
-## RCWS
-
-`RCWS` is a compatibility spelling for the [RecallWordSize](#recallwordsize)
-command.
-
 
 # Command tuning
 
@@ -545,6 +536,16 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
 
+## →QπMaxPrime
+
+Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
+conversion. When converting a decimal to a rational form with π, √*n*, ln, or *e*
+factors, the algorithm squares the value, converts to a fraction, then factors out
+perfect squares from the numerator and denominator. This setting limits which
+primes are tried (2 to 10000, default 100). Lower values speed up conversion on
+DM32/DM42 at the cost of missing some √*n* simplifications for numbers whose
+square has large prime factors.
+
 
 # User interface
 
@@ -555,9 +556,20 @@ labels, rounded or square.
 
 ## Header
 
-This command can be used to define a program that is evaluated when drawing the
-header, i.e. what is shown above the stack. The header should be returned as a
-text, and leave room for the battery to display.
+The `Header` command updates a special variable also called `Header`.
+
+When that variable is present, it must evaluate to something that can render
+graphically, either directly a graphic object or a (possibly multi-line) text.
+
+When a header is provided, the normal content of the header, i.e. date, time and
+name of the state file, is no longer shown.  However, annunciators and battery
+status are still overimposed.
+
+It is the responsibility of the programmer to ensure that the header program
+does not draw important data at these locations, and also to make sure that the
+header program is "well behaved", i.e. does not leave things on stack. If the
+header program generates an error, then that error may get in the way of normal
+calculator operations.
 
 For example, the following shows the current time, the current path, the date
 and free memory in a two-line header, with a 10 second `CustomHeaderRefresh`.
@@ -587,7 +599,7 @@ Display menus on a single row, with labels changing using shift.
 
 Display menus on a single row, flattened across multiple pages.
 
-## RoundedMenu
+## RoundedMenus
 
 Display menus using rounded black or white tabs.
 
@@ -657,9 +669,9 @@ rendering.
 
 This is the opposite of [TextStackDisplay](#textstackdisplay)
 
-## TextStacktDisplay
+## TextStackDisplay
 
-Display the stack levels above the first one using a text-only representations.
+Display the stack levels above the first one using a text-only representation.
 
 This is the opposite of [GraphicStackDisplay](#graphicstackdisplay)
 
@@ -713,7 +725,7 @@ editing.
 Show empty menu entries. For example, when selecting the `VariablesMenu` and
 there is no variable defined, an empty menu shows up.
 
-## HideEmptyMenu.
+## HideEmptyMenu
 
 Restore the default behaviour where empty menus entries are not shown, leaving
 more space for the stack display.
@@ -815,9 +827,9 @@ This is the way RPL in HP calculators works.
 
 When this setting is set, DB48X behaves like the HP48S and later HP devices and
 evaluates lists as if they were programs. For example, `{ 1 2 + } EVAL` returns
-`3`. The default is [ListsAsData](#listsasdata).
+`3`. The default is [ListAsData](#listasdata).
 
-## ListsAsData
+## ListAsData
 
 When this setting is set, DB48X behaves like the HP28 and evaluates lists as
 data. For example, `{ 1 2 + } EVAL` returns `{ 1 2 + }`.

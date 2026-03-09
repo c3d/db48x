@@ -1,0 +1,6 @@
+---
+description: DB48X calculator firmware project conventions, build system, and architecture
+alwaysApply: true
+---
+
+Read and follow the project guide in `AGENTS.md` at the repository root.

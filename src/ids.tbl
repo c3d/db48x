@@ -133,10 +133,10 @@ ID_RANGE(is_range,         range,          uncertain)
 ID_RANGE(is_strict_range,  range,          prange)
 ID_RANGE(is_algebraic_num, unit,           neg_decimal,   range, uncertain)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
-ID_RANGE(is_command,       Drop,           ToFraction,    ToList, LastMenu)
+ID_RANGE(is_command,       Drop,           ToFractionPi,  ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,
                            polynomial,     relative_uncertainty)
-ID_RANGE(is_algebraic_fn,  Rcl,            ToFraction,
+ID_RANGE(is_algebraic_fn,  Rcl,            ToFractionPi,
                            TestFlagSet,    det,
                            Get,            IFTE,
                            CurrentClip,    GraphicIntegral,
@@ -302,7 +302,8 @@ ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 CMD(XQ)
 NAMED(QPI, "→Qπ")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
-                                ALIAS(ToFraction, "→Q") // Last algebr.
+                                ALIAS(ToFraction, "→Q")
+NAMED(ToFractionPi, "→Qπ")     ALIAS(ToFractionPi, "→QP") // Last algeb.
 
 // ============================================================================
 //
@@ -431,7 +432,7 @@ OP(dot, "⋅")
 OP(cross, "⨯")
 NAMED(det, "Determinant")
 CMD(ColumnNorm)         ALIAS(ColumnNorm,       "CNrm")
-CMD(RowNorm)            ALIAS(ColumnNorm,       "RNrm")
+CMD(RowNorm)            ALIAS(RowNorm,          "RNrm")
 CMD(MatrixToColumns)    ALIAS(MatrixToColumns,  "→Columns")
                         ALIAS(MatrixToColumns,  "→Col")
 CMD(MatrixToRows)       ALIAS(MatrixToRows,     "→Rows")
@@ -1124,6 +1125,8 @@ SETTING(MaxFlags,               8U, 32768U,             128U)
 SETTING(MaxRewrites,            1U, 10000U,             100U)
 SETTING(FractionIterations,     1U, 10000U,             15U)
 ALIAS(FractionIterations,       "→QIterations")
+SETTING(FractionLargestPrime,   2U, 10000U,            100U)
+ALIAS(FractionLargestPrime,     "→QπMaxPrime")
 SETTING_BITS(FractionDigits,  uint, 6,1U, DB48X_MAXDIGITS, 12U)
 ALIAS(FractionDigits,           "→QDigits")
 SETTING(SolverIterations,       1U, 10000U,             256U)

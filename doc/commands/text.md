@@ -13,14 +13,6 @@ List all code points in a Utf8 string
 
 Convert an object to its text representation.
 
-## ToDecimal
-
-Convert an object to its decimal representation.
-
-## ToFraction
-
-Convert an object to its fractional representation.
-
 ## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.

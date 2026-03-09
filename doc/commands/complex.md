@@ -25,16 +25,16 @@ Extract modulus and argument from a complex number in polar form
 Make a complex number in polar form from argument and modulus
 
 ## ToRectangular
-Convert a complex number to rectangular form
+Convert a complex number or vector to rectangular (cartesian) form.
 
 ## ToPolar
-Convert a complex number or a 2D or 3D vector to polar form
+Convert a complex number or a 2D or 3D vector to polar form.
 
 ## ToCylindrical
 Convert a 3D vector to cylindrical form
 
 ## ToSpherical
-Convert a 3D vector to spherical form
+Convert a 3D vector to spherical form.
 
 ## To2DVector
 Make a 2D vector from two components
