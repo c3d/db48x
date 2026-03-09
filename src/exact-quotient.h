@@ -45,7 +45,7 @@
 //   If no template matches within precision, the original value is returned.
 COMMAND_DECLARE(XQ, 1);
 
-// QPI (→Qπ): like XQ but restricted to templates involving π.
-COMMAND_DECLARE(QPI, 1);
+// ToFractionPi (→Qπ): like XQ but restricted to templates involving π.
+COMMAND_DECLARE(ToFractionPi, 1);
 
 #endif // EXACT_QUOTIENT_H

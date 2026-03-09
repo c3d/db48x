@@ -300,7 +300,7 @@ CMD(exp10)                      ALIAS(exp10, "alog")
 NAMED(ToDecimal, "→Decimal")
 ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 CMD(XQ)
-NAMED(QPI, "→Qπ")
+NAMED(ToFractionPi, "→Qπ")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
                                 ALIAS(ToFraction, "→Q")
 NAMED(ToFractionPi, "→Qπ")     ALIAS(ToFractionPi, "→QP") // Last algeb.
