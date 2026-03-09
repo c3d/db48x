@@ -6292,7 +6292,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         insert_object:
             if (user ||
                 object::is_program_cmd(ty) || object::is_algebraic(ty) ||
-                object::is_constant_menu(ty))
+                object::is_special_menu(ty))
             {
                 dirtyEditor = true;
                 edRows = 0;

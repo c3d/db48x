@@ -1337,7 +1337,7 @@ static bool evaluate_variable(object_p name, object_p value, void *arg)
     menu::info &mi = *((menu::info *) arg);
     if (value->type() == object::ID_directory)
         mi.marker = L'◥';
-    menu::items(mi, disp, menu::ID_VariablesMenuExecute);
+    menu::items(mi, disp, menu::ID_variable_menu_execute);
 
     return true;
 }
@@ -1353,7 +1353,7 @@ static bool recall_variable(object_p name, object_p UNUSED value, void *arg)
     if (!disp)
         disp = name->as_symbol(true);
     menu::info &mi = *((menu::info *) arg);
-    menu::items(mi, disp, menu::ID_VariablesMenuRecall);
+    menu::items(mi, disp, menu::ID_variable_menu_recall);
     return true;
 }
 
@@ -1367,7 +1367,7 @@ static bool store_variable(object_p name, object_p UNUSED value, void *arg)
     if (!disp)
         disp = name->as_symbol(true);
     menu::info &mi = *((menu::info *) arg);
-    menu::items(mi, disp, menu::ID_VariablesMenuStore);
+    menu::items(mi, disp, menu::ID_variable_menu_store);
     return true;
 }
 
@@ -1408,11 +1408,12 @@ void VariablesMenu::list_variables(info &mi)
 }
 
 
-COMMAND_BODY(VariablesMenuExecute)
+EVAL_BODY(variable_menu_execute)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Run));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1437,7 +1438,7 @@ COMMAND_BODY(VariablesMenuExecute)
 }
 
 
-INSERT_BODY(VariablesMenuExecute)
+INSERT_BODY(variable_menu_execute)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable
 // ----------------------------------------------------------------------------
@@ -1447,11 +1448,21 @@ INSERT_BODY(VariablesMenuExecute)
 }
 
 
-COMMAND_BODY(VariablesMenuRecall)
+HELP_BODY(variable_menu_execute)
+// ----------------------------------------------------------------------------
+//   Point to the "Run" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Run");
+}
+
+
+EVAL_BODY(variable_menu_recall)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Rcl));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1468,7 +1479,7 @@ COMMAND_BODY(VariablesMenuRecall)
 }
 
 
-INSERT_BODY(VariablesMenuRecall)
+INSERT_BODY(variable_menu_recall)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Recall` after it
 // ----------------------------------------------------------------------------
@@ -1478,34 +1489,56 @@ INSERT_BODY(VariablesMenuRecall)
 }
 
 
-COMMAND_BODY(VariablesMenuStore)
+HELP_BODY(variable_menu_recall)
+// ----------------------------------------------------------------------------
+//   Point to the "Recall" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Recall");
+}
+
+
+EVAL_BODY(variable_menu_store)
 // ----------------------------------------------------------------------------
 //   Store a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    if (key >= KEY_F1 && key <= KEY_F6)
+    rt.command(static_object(ID_Sto));
+    if (rt.args(1))
     {
-        if (directory *dir = rt.variables(0))
+        int key = ui.evaluating;
+        if (key >= KEY_F1 && key <= KEY_F6)
         {
-            uint index = key - KEY_F1 + 5 * ui.page();
-            if (object_p name = dir->name(index))
-                if (object_p value = rt.pop())
-                    if (dir->store(name, value))
-                        return OK;
+            if (directory *dir = rt.variables(0))
+            {
+                uint index = key - KEY_F1 + 5 * ui.page();
+                if (object_p name = dir->name(index))
+                    if (object_p value = rt.pop())
+                        if (dir->store(name, value))
+                            return OK;
+            }
         }
     }
     return ERROR;
 }
 
 
-INSERT_BODY(VariablesMenuStore)
+INSERT_BODY(variable_menu_store)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Store` after it
 // ----------------------------------------------------------------------------
 {
     int key = ui.evaluating;
     return ui.insert_softkey(key, " '", "' Store ", false);
+}
+
+
+HELP_BODY(variable_menu_store)
+// ----------------------------------------------------------------------------
+//   Point to the "Store" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Store");
 }
 
 

@@ -161,7 +161,7 @@ ID_RANGE(is_menu,          MainMenu,       Catalog,
                            UnitMenu00, CharactersMenu99)
 ID_RANGE(is_constant,      constant,       xlib,
                            standard_uncertainty, relative_uncertainty)
-ID_RANGE(is_constant_menu, constant_menu_name, library_menu_value)
+ID_RANGE(is_special_menu, constant_menu_name, solving_menu_recall)
 
 
 // ============================================================================
@@ -1279,14 +1279,6 @@ CMD(LowBattery)
 
 CMD(Unimplemented)              // Last command in catalog
 
-CMD(VariablesMenuExecute)
-CMD(VariablesMenuRecall)
-CMD(VariablesMenuStore)
-
-CMD(SolvingMenuStore)
-CMD(SolvingMenuSolve)
-CMD(SolvingMenuRecall)
-
 
 
 // ============================================================================
@@ -1625,6 +1617,12 @@ ID(equation_menu_value)
 ID(equation_menu_solver)
 ID(library_menu_name)
 ID(library_menu_value)
+ID(variable_menu_execute)
+ID(variable_menu_recall)
+ID(variable_menu_store)
+ID(solving_menu_store)
+ID(solving_menu_solve)
+ID(solving_menu_recall)
 
 #undef ID
 #undef OP

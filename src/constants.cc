@@ -177,6 +177,7 @@ EVAL_BODY(constant_menu_name)
 //   Put the name of a constant on the stack
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_ConstantName));
     int key = ui.evaluating;
     unicode pfx = ui.character_left_of_cursor();
     const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
@@ -222,6 +223,7 @@ EVAL_BODY(constant_menu_value)
 //   Put the value of a constant on the stack
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_ConstantValue));
     int key = ui.evaluating;
     if (object_p cstobj = constant::do_key(constant::constants, key))
         if (constant_p cst = cstobj->as<constant>())
