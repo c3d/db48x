@@ -1656,7 +1656,7 @@ FUNCTION_BODY(ToQuotient)
     if (!x)
         return nullptr;
     algebraic_g xg = x;
-    if (arithmetic::to_fraction_pi(xg))
+    if (arithmetic::to_quotient(xg))
         return xg;
     if (!rt.error())
         rt.type_error();

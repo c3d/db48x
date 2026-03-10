@@ -84,7 +84,6 @@ struct tests
     void exact_trig_cases();
     void trig_units();
     void fraction_decimal_conversions();
-    void fraction_pi_conversions();
     void cfraction();
     void rounding_and_truncating();
     void complex_types();
@@ -138,6 +137,7 @@ struct tests
     void polynomials();
     void quotient_and_remainder();
     void prime_number_tests();
+    void exact_quotient();
     void expression_operations();
     void random_number_generation();
     void object_structure();

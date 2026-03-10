@@ -411,7 +411,7 @@ bool algebraic::to_integer(algebraic_g &x)
 
 // ============================================================================
 //
-//   to_fraction / to_fraction_pi shared dispatch
+//   to_fraction / to_quotient shared dispatch
 //
 // ============================================================================
 
@@ -539,6 +539,10 @@ static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
         x = +mapped;
         break;
     }
+    case object::ID_constant:
+        // Leave constants as is
+        return true;
+
     default:
         return false;
     }
@@ -632,19 +636,19 @@ static algebraic_p wrap_symbolic(algebraic_r sym)
 }
 
 
-static algebraic_p to_fraction_pi_map_fn(algebraic_r a)
+static algebraic_p to_quotient_map_fn(algebraic_r a)
 // ----------------------------------------------------------------------------
-//   Wrapper for list::map to apply to_fraction_pi to expression elements
+//   Wrapper for list::map to apply to_quotient to expression elements
 // ----------------------------------------------------------------------------
 {
     algebraic_g ag = a;
     if (ag->is_algebraic_num())
-        algebraic::to_fraction_pi(ag);
+        algebraic::to_quotient(ag);
     return +ag;
 }
 
 
-static bool to_fraction_pi_real(algebraic_g &x)
+static bool to_quotient_real(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //   Convert real to fraction with π, √n, ln(n), e factors (→Qπ)
 // ----------------------------------------------------------------------------
@@ -745,19 +749,35 @@ static bool to_fraction_pi_real(algebraic_g &x)
                         ularge rational_den = sq_den * free_den;
                         if (rational_den < best_denom)
                         {
-                            algebraic_g p = integer::make(sq_num);
-                            algebraic_g q = integer::make(rational_den);
-                            algebraic_g rf = (rational_den == 1)
-                                ? p
-                                : fraction::make(
-                                      integer_p(+p), integer_p(+q));
-                            if (neg)
-                                rf = -rf;
                             algebraic_g sv = integer::make(sqrt_part);
                             algebraic_g ssym = expression::make(object::ID_sqrt, sv);
+                            if (sq_num == 1)
+                            {
+                                // Prefer √n/q over (1/q)·√n for readability
+                                algebraic_g div = (rational_den == 1)
+                                    ? ssym
+                                    : expression::make(
+                                          object::ID_divide, ssym,
+                                          integer::make(rational_den));
+                                best_result = neg ? expression::make(
+                                                   object::ID_neg, div)
+                                                  : div;
+                            }
+                            else
+                            {
+                                algebraic_g p = integer::make(sq_num);
+                                algebraic_g q = integer::make(rational_den);
+                                algebraic_g rf =
+                                    (rational_den == 1)
+                                        ? p
+                                        : fraction::make(
+                                              integer_p(+p), integer_p(+q));
+                                if (neg)
+                                    rf = -rf;
+                                best_result =
+                                    fraction_times_symbolic(rf, ssym);
+                            }
                             best_denom = rational_den;
-                            best_result =
-                                fraction_times_symbolic(rf, ssym);
                         }
                     }
                 }
@@ -865,12 +885,12 @@ done:
 }
 
 
-bool algebraic::to_fraction_pi(algebraic_g &x)
+bool algebraic::to_quotient(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //   Convert to fraction, trying π, √n, ln(n), and e as factors
 // ----------------------------------------------------------------------------
 {
-    to_fraction_context ctx = { to_fraction_pi_real, to_fraction_pi_map_fn };
+    to_fraction_context ctx = { to_quotient_real, to_quotient_map_fn };
     return to_fraction_dispatch(x, ctx);
 }
 
