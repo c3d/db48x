@@ -1536,16 +1536,25 @@ list_p list::map(object_p prgobj) const
     scribble scr;
     for (object_p obj : *this)
     {
-        if (!rt.push(obj))
-            goto error;
-        if (program::run(prg, true) != OK)
-            goto error;
-        if (rt.depth() != depth + 1)
+        id oty = obj->type();
+        if (is_array_or_list(oty) && Settings.MapRecursive())
         {
-            rt.misbehaving_program_error();
-            goto error;
+            list_g sub = list_p(obj)->map(prg);
+            obj = +sub;
         }
-        obj = rt.pop();
+        else
+        {
+            if (!rt.push(obj))
+                goto error;
+            if (program::run(prg, true) != OK)
+                goto error;
+            if (rt.depth() != depth + 1)
+            {
+                rt.misbehaving_program_error();
+                goto error;
+            }
+            obj = rt.pop();
+        }
         if (!obj)
             goto error;
 
@@ -1688,7 +1697,7 @@ list_p list::map(algebraic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && Settings.MapRecursive())
         {
             list_g sub = list_p(obj)->map(fn);
             obj = +sub;
@@ -1726,7 +1735,7 @@ list_p list::map(arithmetic_fn fn, algebraic_r y) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && Settings.MapRecursive())
         {
             list_g sub = list_p(obj)->map(fn, y);
             obj = +sub;
@@ -1764,7 +1773,7 @@ list_p list::map(algebraic_r x, arithmetic_fn fn) const
     for (object_p obj : *this)
     {
         id oty = obj->type();
-        if (is_array_or_list(oty))
+        if (is_array_or_list(oty) && Settings.MapRecursive())
         {
             list_g sub = list_p(obj)->map(x, fn);
             obj = +sub;

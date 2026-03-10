@@ -1049,6 +1049,7 @@ FLAG(NumericalIntegration,      SymbolicIntegration)
 FLAG(TVMPayAtBeginningOfPeriod, TVMPayAtEndOfPeriod)
 FLAG(TruthLogicForIntegers,     BitwiseLogicForIntegers)
 FLAG(LaxArrayResizing,          StrictArrayResizing)
+FLAG(MapOneLevel,               MapRecursive)
 
 ALIAS(HardwareFloatingPoint,    "HFP")
 ALIAS(HardwareFloatingPoint,    "HardFP")
