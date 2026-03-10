@@ -4487,154 +4487,154 @@ void tests::fraction_pi_conversions()
         .test(CLEAR, "10000 FractionLargestPrime", ENTER).noerror();
 
     step("Pi itself")
-        .test(CLEAR, "pi →Num", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "pi →Num", ENTER, ID_ToQuotient)
         .expect("'π'");
 
     step("Half pi")
-        .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToQuotient)
         .expect("'1/2·π'");
 
     step("Two pi")
-        .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToQuotient)
         .expect("'2·π'");
 
     step("Square root of 2")
-        .test(CLEAR, "2 √", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "2 √", ENTER, ID_ToQuotient)
         .expect("'√ 2'");
 
     step("Square root of 3")
-        .test(CLEAR, "3 √", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "3 √", ENTER, ID_ToQuotient)
         .expect("'√ 3'");
 
     step("Euler e")
-        .test(CLEAR, "1 exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "1 exp", ENTER, ID_ToQuotient)
         .expect("'e'");
 
     step("e squared")
-        .test(CLEAR, "2 exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "2 exp", ENTER, ID_ToQuotient)
         .expect("'exp 2'");
 
     step("sqrt of e")
-        .test(CLEAR, "0.5 exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "0.5 exp", ENTER, ID_ToQuotient)
         .expect("'exp(1/2)'");
 
     step("sqrt(142)/27 should give square root form")
-        .test(CLEAR, "142 √ 27 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "142 √ 27 /", ENTER, ID_ToQuotient)
         .expect("'1/27·√ 142'");
 
     step("Negative value with sqrt factor")
-        .test(CLEAR, "2 √ neg", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "2 √ neg", ENTER, ID_ToQuotient)
         .expect("'-√ 2'");
 
     step("Plain fraction should still work")
-        .test(CLEAR, "0.25", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "0.25", ENTER, ID_ToQuotient)
         .expect("1/4");
 
     step("Integer should pass through")
-        .test(CLEAR, "3", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "3", ENTER, ID_ToQuotient)
         .expect("3");
 
     step("Large prime radicand with fraction: 17*sqrt(997)/3")
-        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
         .expect("'17/3·√ 997'");
 
     step("Reducible radicand: 17*sqrt(12)/6 -> 17/3*sqrt(3)")
-        .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToQuotient)
         .expect("'17/3·√ 3'");
 
     step("Reciprocal of sqrt: 1/sqrt(7) -> sqrt(7)/7")
-        .test(CLEAR, "7 √ inv", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "7 √ inv", ENTER, ID_ToQuotient)
         .expect("'1/7·√ 7'");
 
     step("Large perfect square factor: sqrt(72) -> 6*sqrt(2)")
-        .test(CLEAR, "72 √", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "72 √", ENTER, ID_ToQuotient)
         .expect("'6·√ 2'");
 
     step("Negative sqrt with fraction: -5*sqrt(13)/4")
-        .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToQuotient)
         .expect("'-5/4·√ 13'");
 
     step("Pi with larger denominator: 7*pi/11")
-        .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToQuotient)
         .expect("'7/11·π'");
 
     step("Ln(2) factor: 3*ln(2)/7")
-        .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToQuotient)
         .expect("'3/7·ln 2'");
 
     step("Ln(10) factor: 5*ln(10)/3")
-        .test(CLEAR, "10 ln 5 * 3 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "10 ln 5 * 3 /", ENTER, ID_ToQuotient)
         .expect("'5/3·ln 10'");
 
     step("Fractional exponent: e^(3/4)")
-        .test(CLEAR, "0.75 exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "0.75 exp", ENTER, ID_ToQuotient)
         .expect("'exp(3/4)'");
 
     step("Negative exponent: e^(-1) = 1/e or e⁻¹")
-        .test(CLEAR, "1. neg exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "1. neg exp", ENTER, ID_ToQuotient)
         .expect("'e⁻¹'");
 
     step("Fractional exponent: e^(2/3)")
-        .test(CLEAR, "2. 3 / exp", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "2. 3 / exp", ENTER, ID_ToQuotient)
         .expect("'exp(2/3)'");
 
     step("355/113 close to pi but should stay rational")
-        .test(CLEAR, "355. 113 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "355. 113 /", ENTER, ID_ToQuotient)
         .expect("355/113");
 
     step("→Qπ at lower precision (FIX 2, 3, 4)")
         .test(CLEAR, "Std", ENTER).noerror()
         .test("4 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
         .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
         .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToFractionPi).expect("'π'")
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
         .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("2 √ →Num", ENTER, ID_ToFractionPi).expect("'√ 2'")
+        .test("2 √ →Num", ENTER, ID_ToQuotient).expect("'√ 2'")
         .test(CLEAR, "Std", ENTER).noerror();
 
     // π+0.001 and √2+0.001 are not the constants; verify we get something other than π/√2
     step("→Qπ cutoff: π+0.001 gives non-π form (not mistaken for π)")
         .test(CLEAR, "Std", ENTER).noerror()
         .test("4 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
         .expect("'exp(150/131)'")  // e^(150/131) ≈ 3.1426, not π
         .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
         .expect("'123/43·ln 3'")   // ln 3 factor, not π
         .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
         .expect("'1/4·√ 158'")    // √ factor, not π
         .test(CLEAR, "Std", ENTER).noerror();
 
     step("→Qπ cutoff: √2+0.001 gives non-√2 form (not mistaken for √2)")
         .test(CLEAR, "Std", ENTER).noerror()
         .test("4 FIX", ENTER).noerror()
-        .test("2 √ →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
         .expect("'8/11·ln 7'")   // ln 7 factor, not √2
         .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("2 √ →Num 0.001 +", ENTER, ID_ToFractionPi)
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
         .expect("'8/11·ln 7'")
         .test(CLEAR, "Std", ENTER).noerror();
 
     step("→Qπ with complex")
-        .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToQuotient)
         .expect("1/4+1/2ⅈ")
-        .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToFractionPi)
+        .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToQuotient)
         .expect("1/4-1/2ⅈ");
 
     step("→Qπ with range")
         .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
-        .test(ID_ToFractionPi)
+        .test(ID_ToQuotient)
         .expect("'π'…'3/921 970·√ 932 754 283 090'");
 
     step("→Qπ with vector")
-        .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToQuotient)
         .expect("[ 1/4 '2·√ 10' ]");
 
     step("→Qπ with algebraic expression (multiple variables and functions)")
-        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToQuotient)
         .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
 
     step("Restore default settings")
@@ -4643,7 +4643,7 @@ void tests::fraction_pi_conversions()
                      "Purge Std"), ENTER).noerror();
 
     step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
-        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToFractionPi)
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
         .expect("'¹⁷/₃·√ 997'");
 }
 

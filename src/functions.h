@@ -278,7 +278,7 @@ FUNCTION_EXT(ToDecimal,
              static const uint seqtypes = (1UL << ID_expression););
 FUNCTION_EXT(ToFraction,
              static const uint seqtypes = (1UL << ID_expression););
-FUNCTION_EXT(ToFractionPi,
+FUNCTION_EXT(ToQuotient,
              static const uint seqtypes = (1UL << ID_expression););
 FUNCTION(ToInteger);
 FUNCTION(RadiansToDegrees);

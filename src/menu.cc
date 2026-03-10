@@ -423,7 +423,7 @@ MENU(PartsMenu,
 
      "→Int",    ID_ToInteger,
      "→Q",      ID_ToFraction,
-     "→Qπ",     ID_ToFractionPi,
+     "→Qπ",     ID_ToQuotient,
      "SigDig",  ID_SigDig,
      ID_Get,
 
@@ -461,7 +461,7 @@ MENU(NumbersMenu,
 
      "→Num",    ID_ToDecimal,
      "→Q",      ID_ToFraction,
-     "→Qπ",     ID_ToFractionPi,
+     "→Qπ",     ID_ToQuotient,
      "R#Seed",  ID_RandomSeed,
      RandomGeneratorBits::label,        ID_RandomGeneratorBits,
      RandomGeneratorOrder::label,       ID_RandomGeneratorOrder,

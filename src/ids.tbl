@@ -133,10 +133,10 @@ ID_RANGE(is_range,         range,          uncertain)
 ID_RANGE(is_strict_range,  range,          prange)
 ID_RANGE(is_algebraic_num, unit,           neg_decimal,   range, uncertain)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
-ID_RANGE(is_command,       Drop,           ToFractionPi,  ToList, LastMenu)
+ID_RANGE(is_command,       Drop,           ToQuotient,  ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,
                            polynomial,     relative_uncertainty)
-ID_RANGE(is_algebraic_fn,  Rcl,            ToFractionPi,
+ID_RANGE(is_algebraic_fn,  Rcl,            ToQuotient,
                            TestFlagSet,    det,
                            Get,            IFTE,
                            CurrentClip,    GraphicIntegral,
@@ -307,7 +307,9 @@ NAMED(ToDecimal, "→Decimal")
 ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
                                 ALIAS(ToFraction, "→Q")
-NAMED(ToFractionPi, "→Qπ")     ALIAS(ToFractionPi, "→QP") // Last algeb.
+NAMED(ToQuotient, "→Qπ")        ALIAS(ToQuotient, "→QP") // Last algeb.
+                                ALIAS(ToQuotient, "XQ")
+
 
 
 // ============================================================================

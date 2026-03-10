@@ -944,7 +944,7 @@ spellings.
 * `→Poly` (`ToPolynomial`, `→Polynomial`)
 * `→Prg` (`ToProgram`, `→Program`)
 * `→Q` (`ToFraction`, `→Frac`, `→ℚ`)
-* `→Qπ` (`ToFractionPi`, `→QP`)
+* `→Qπ` (`ToQuotient`, `→QP`)
 * `→QDigits` (`FractionDigits`)
 * `→QIterations` (`FractionIterations`)
 * `→Rad` (`ToRadians`, `→Radians`)

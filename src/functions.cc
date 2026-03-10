@@ -1648,7 +1648,7 @@ FUNCTION_BODY(ToFraction)
 }
 
 
-FUNCTION_BODY(ToFractionPi)
+FUNCTION_BODY(ToQuotient)
 // ----------------------------------------------------------------------------
 //   Convert numbers to fractions with π, √n, ln(n) or e factored out
 // ----------------------------------------------------------------------------
