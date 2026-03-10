@@ -679,33 +679,19 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
     if (k == Qt::Key_C && (ev->modifiers() & Qt::ControlModifier))
     {
-        // HACK: Not thread safe at all!
-        extern user_interface ui;
-        ui.clear_shift();
-
         QClipboard *clipboard = QApplication::clipboard();
         if (ev->modifiers() & Qt::ShiftModifier)
         {
             QPixmap &screen = MainWindow::theScreen();
             clipboard->setPixmap(screen);
         }
-        else if (size_t sz = rt.editing())
+        else
         {
-            utf8 data = rt.editor();
-            QByteArray ba(cstring(data), sz);
-            QString text(ba);
-            clipboard->setText(text);
-        }
-        else if (!ST(STAT_RUNNING))
-        {
-            if (object_p obj = rt.top())
+            char buf[4096];
+            if (size_t sz = ui_clipboard_copy(buf, sizeof(buf)))
             {
-                text_p sym = obj->as_text();
-                size_t sz = 0;
-                utf8 data = sym->value(&sz);
-                QByteArray ba(cstring(data), sz);
-                QString text(ba);
-                clipboard->setText(text);
+                QByteArray ba(buf, sz);
+                clipboard->setText(QString::fromUtf8(ba));
             }
         }
         ev->accept();
@@ -714,23 +700,11 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
     if (k == Qt::Key_V && (ev->modifiers() & Qt::ControlModifier))
     {
-        // HACK: Not thread safe at all!
-        extern user_interface ui;
-        ui.clear_shift();
-
-        QClipboard *clipboard = QApplication::clipboard();
-        QString text = clipboard->text();
+        QString text = QApplication::clipboard()->text();
         text.replace("\r\n", "\n");
         QByteArray ba = text.toUtf8();
-        if (size_t sz = ba.size())
-        {
-            if (!ST(STAT_RUNNING))
-            {
-                uint pos = ui.cursor_position();
-                size_t ins = ui.insert(pos, utf8(ba.data()), sz);
-                ui.cursor_position(pos+ins);
-            }
-        }
+        if (ba.size())
+            ui_clipboard_paste(ba.constData(), ba.size());
         ev->accept();
         return;
     }
