@@ -1049,6 +1049,9 @@ static size_t check_match(size_t eq, size_t eqsz,
                 return 0;
             }
             ftop = rt.pop();
+            if (bignum_p big = ftop->as_quoted<bignum>())
+                if (integer_p ival = big->as_integer())
+                    ftop = ival;
             integer_g fval = ftop->as_quoted<integer>();
             if (!fval || fval->value<ularge>() != itop->value<ularge>())
                 return 0;
@@ -3099,74 +3102,74 @@ template <byte ...args>
 constexpr byte eq<args...>::object_data[sizeof...(args)+2];
 
 // Wildcards used to build patterns (type based on initial letter, see above)
-static eq_symbol<'a'>     a;    // Numerical constants
-static eq_symbol<'b'>     b;
-static eq_symbol<'c'>     c;
-static eq_symbol<'d'>     d;    // Non-constant expressions
-static eq_symbol<'e'>     e;
-static eq_symbol<'f'>     f;
-static eq_symbol<'i'>     i;    // Positive or zero integer values
-static eq_symbol<'j'>     j;
-static eq_symbol<'k'>     k;    // Positive non-zero integers
-static eq_symbol<'l'>     l;
-static eq_symbol<'m'>     m;
-static eq_symbol<'n'>     n;    // Contains independent variable
-static eq_symbol<'o'>     o;
-static eq_symbol<'p'>     p;    // Other, does not contain independent variable
-static eq_symbol<'q'>     q;
-static eq_symbol<'r'>     r;
-static eq_symbol<'s'>     s;    // Symbols
-static eq_symbol<'t'>     t;
-static eq_symbol<'u'>     u;    // Unique subexpressions
-static eq_symbol<'v'>     v;
-static eq_symbol<'w'>     w;
-static eq_symbol<'x'>     x;    // Any subexpression
-static eq_symbol<'y'>     y;
-static eq_symbol<'z'>     z;
+static const eq_symbol<'a'>     a;    // Numerical constants
+static const eq_symbol<'b'>     b;
+static const eq_symbol<'c'>     c;
+static const eq_symbol<'d'>     d;    // Non-constant expressions
+static const eq_symbol<'e'>     e;
+static const eq_symbol<'f'>     f;
+static const eq_symbol<'i'>     i;    // Positive or zero integer values
+static const eq_symbol<'j'>     j;
+static const eq_symbol<'k'>     k;    // Positive non-zero integers
+static const eq_symbol<'l'>     l;
+static const eq_symbol<'m'>     m;
+static const eq_symbol<'n'>     n;    // Contains independent variable
+static const eq_symbol<'o'>     o;
+static const eq_symbol<'p'>     p;    // Other, does not contain independent variable
+static const eq_symbol<'q'>     q;
+static const eq_symbol<'r'>     r;
+static const eq_symbol<'s'>     s;    // Symbols
+static const eq_symbol<'t'>     t;
+static const eq_symbol<'u'>     u;    // Unique subexpressions
+static const eq_symbol<'v'>     v;
+static const eq_symbol<'w'>     w;
+static const eq_symbol<'x'>     x;    // Any subexpression
+static const eq_symbol<'y'>     y;
+static const eq_symbol<'z'>     z;
 
 // Wildcards that need not be sorted (e.g. matches if A<B or A>B)
-static eq_symbol<'A'>     A;    // Numerical constants
-static eq_symbol<'B'>     B;
-static eq_symbol<'C'>     C;
-static eq_symbol<'D'>     D;    // Non-constant expressions
-static eq_symbol<'E'>     E;
-static eq_symbol<'F'>     F;
-static eq_symbol<'I'>     I;    // Positive or zero integer values
-static eq_symbol<'J'>     J;
-static eq_symbol<'K'>     K;    // Positive non-zero integers
-static eq_symbol<'L'>     L;
-static eq_symbol<'M'>     M;
-static eq_symbol<'N'>     N;    // Contains independent variable
-static eq_symbol<'O'>     O;
-static eq_symbol<'P'>     P;    // Other, does not contain independent variable
-static eq_symbol<'Q'>     Q;
-static eq_symbol<'R'>     R;
-static eq_symbol<'S'>     S;    // Symbols
-static eq_symbol<'T'>     T;
-static eq_symbol<'U'>     U;    // Unique subexpressions
-static eq_symbol<'V'>     V;
-static eq_symbol<'W'>     W;
-static eq_symbol<'X'>     X;    // Any subexpression
-static eq_symbol<'Y'>     Y;
-static eq_symbol<'Z'>     Z;
+static const eq_symbol<'A'>     A;    // Numerical constants
+static const eq_symbol<'B'>     B;
+static const eq_symbol<'C'>     C;
+static const eq_symbol<'D'>     D;    // Non-constant expressions
+static const eq_symbol<'E'>     E;
+static const eq_symbol<'F'>     F;
+static const eq_symbol<'I'>     I;    // Positive or zero integer values
+static const eq_symbol<'J'>     J;
+static const eq_symbol<'K'>     K;    // Positive non-zero integers
+static const eq_symbol<'L'>     L;
+static const eq_symbol<'M'>     M;
+static const eq_symbol<'N'>     N;    // Contains independent variable
+static const eq_symbol<'O'>     O;
+static const eq_symbol<'P'>     P;    // Other, does not contain independent variable
+static const eq_symbol<'Q'>     Q;
+static const eq_symbol<'R'>     R;
+static const eq_symbol<'S'>     S;    // Symbols
+static const eq_symbol<'T'>     T;
+static const eq_symbol<'U'>     U;    // Unique subexpressions
+static const eq_symbol<'V'>     V;
+static const eq_symbol<'W'>     W;
+static const eq_symbol<'X'>     X;    // Any subexpression
+static const eq_symbol<'Y'>     Y;
+static const eq_symbol<'Z'>     Z;
 
 // Numerical constants
-static eq_integer<0>      zero;
-static eq_neg_integer<-1> mone;
-static eq_integer<1>      one;
-static eq_integer<2>      two;
-static eq_integer<3>      three;
-static eq_integer<4>      four;
-static eq_integer<10>     ten;
-static eq_always          always;
+static const eq_integer<0>      zero;
+static const eq_neg_integer<-1> mone;
+static const eq_integer<1>      one;
+static const eq_integer<2>      two;
+static const eq_integer<3>      three;
+static const eq_integer<4>      four;
+static const eq_integer<10>     ten;
+static const eq_always          always;
 
 // Sign and integer value for non-princpal solutions, see some_index() function
-static eq_symbol<'#'>     intk;
-static eq_symbol<'+'>     natk;
-static eq_symbol<'-'>     signk;
-static eq_symbol<'@'>     kpi;
-static eq_symbol<'!'>     ki;
-static eq_symbol<'='>     indep;
+static const eq_symbol<'#'>     intk;
+static const eq_symbol<'+'>     natk;
+static const eq_symbol<'-'>     signk;
+static const eq_symbol<'@'>     kpi;
+static const eq_symbol<'!'>     ki;
+static const eq_symbol<'='>     indep;
 
 
 bool expression::split_equation(expression_g &left, expression_g &right) const
@@ -3400,11 +3403,11 @@ expression_p expression::fold_constants() const
         -A,          -A,
 
         // Group terms
-        v + u,       u + v,
-        X + v + u,   X + u + v,
+        u + v,       v + u,
+        X + u + v,   X + v + u,
         A + X,       X + A,
-        v * u,       u * v,
-        X * v * u,   X * u * v,
+        u * v,       v * u,
+        X * u * v,   X * v * u,
         X * A,       A * X,
 
         // Additive simplifications

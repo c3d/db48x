@@ -91,6 +91,8 @@ bignum_p pollard_rho_brent(bignum_r n);
 bool     factorize(bignum_g n, factor_result &result);
 int      is_prime(bignum_r n);
 
+void     extract_square_factor(ularge n, ularge &sq, ularge &rem);
+
 
 // ============================================================================
 //

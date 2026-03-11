@@ -95,6 +95,11 @@ struct fraction : algebraic
     }
 
     static fraction_p make(integer_r n, integer_r d);
+    static algebraic_p make(ularge n, ularge d)
+    {
+        return d == 1 ? algebraic_p(integer::make(n))
+                      : algebraic_p(make(integer::make(n), integer::make(d)));
+    }
 
 public:
     OBJECT_DECL(fraction);

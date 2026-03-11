@@ -124,6 +124,7 @@ ID_RANGE(is_integer,       based_integer,  neg_integer)
 ID_RANGE(is_based,         based_integer,  based_integer, based_bignum, based_bignum)
 ID_RANGE(is_bignum,        based_bignum,   neg_bignum)
 #endif // CONFIG_FIXED_BASED_OBJECTS
+ID_RANGE(is_small_integer, integer,        neg_integer)
 ID_RANGE(is_fraction,      fraction,       neg_big_fraction)
 ID_RANGE(is_decimal,       decimal,        neg_decimal)
 ID_RANGE(is_fp,            hwfloat,        neg_decimal)
@@ -307,9 +308,8 @@ NAMED(ToDecimal, "→Decimal")
 ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
                                 ALIAS(ToFraction, "→Q")
-NAMED(ToQuotient, "→Qπ")        ALIAS(ToQuotient, "→QP") // Last algeb.
+NAMED(ToQuotient, "→Qπ")        ALIAS(ToQuotient, "→QPi") // Last algeb.
                                 ALIAS(ToQuotient, "XQ")
-
 
 
 // ============================================================================

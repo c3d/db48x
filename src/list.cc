@@ -2532,13 +2532,14 @@ object_p list::substitute(object_p source, object_p args)
 }
 
 
-list_p list::substitute(symbol_r name, object_r replobj, size_t replsz) const
+list_p list::substitute(symbol_r name, object_p repl, size_t replsz) const
 // ----------------------------------------------------------------------------
 //  Substitute a single name with some other object
 // ----------------------------------------------------------------------------
 {
     scribble scr;
-    id ltype = type();
+    object_g replobj = repl;
+    id       ltype   = type();
     for (object_p obj : *this)
     {
         object_p tobj = obj;

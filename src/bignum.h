@@ -150,6 +150,15 @@ struct bignum : text
 
     // Creating a small integer from a bignum, or return nullptr
     integer_p as_integer() const;
+    static algebraic_p smaller(bignum_p big)
+    {
+        if (big)
+            if (integer_p small = big->as_integer())
+                return small;
+        return big;
+    }
+
+
 
     // Check if it matches a given value
     bool is_zero() const        { return length() == 0; }

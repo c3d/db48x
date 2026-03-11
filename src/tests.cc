@@ -15437,6 +15437,9 @@ void tests::exact_quotient()
     step("Half pi")
         .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToQuotient)
         .expect("'1/2·π'");
+    step("Three quarters pi")
+        .test(CLEAR, "pi →Num 3 * 4 /", ENTER, ID_ToQuotient)
+        .expect("'3·π÷4'");
     step("Two pi")
         .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToQuotient)
         .expect("'2·π'");
@@ -15448,7 +15451,7 @@ void tests::exact_quotient()
         .expect("'√ 3'");
     step("Euler e")
         .test(CLEAR, "1 exp", ENTER, ID_ToQuotient)
-        .expect("'e'");
+        .expect("'exp 1'");
     step("e squared")
         .test(CLEAR, "2 exp", ENTER, ID_ToQuotient)
         .expect("'exp 2'");
@@ -15457,7 +15460,7 @@ void tests::exact_quotient()
         .expect("'exp(1/2)'");
     step("sqrt(142)/27 should give square root form")
         .test(CLEAR, "142 √ 27 /", ENTER, ID_ToQuotient)
-        .expect("'√ 142÷27'");
+        .expect("'1/27·√ 142'");
     step("Negative value with sqrt factor")
         .test(CLEAR, "2 √ neg", ENTER, ID_ToQuotient)
         .expect("'-√ 2'");
@@ -15472,19 +15475,19 @@ void tests::exact_quotient()
         .expect("'17/3·√ 997'");
     step("Reducible radicand: 17*sqrt(12)/6 -> 17/3*sqrt(3)")
         .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToQuotient)
-        .expect("'17/3·√ 3'");
+        .expect("'17·√(1/3)'");
     step("Reciprocal of sqrt: 1/sqrt(7) -> sqrt(7)/7")
         .test(CLEAR, "7 √ inv", ENTER, ID_ToQuotient)
-        .expect("'√ 7÷7'");
+        .expect("'√(1/7)'");
     step("Large perfect square factor: sqrt(72) -> 6*sqrt(2)")
         .test(CLEAR, "72 √", ENTER, ID_ToQuotient)
         .expect("'6·√ 2'");
     step("Negative sqrt with fraction: -5*sqrt(13)/4")
         .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToQuotient)
-        .expect("'-5/4·√ 13'");
+        .expect("'-(5/4·√ 13)'");
     step("Pi with larger denominator: 7*pi/11")
         .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToQuotient)
-        .expect("'7/11·π'");
+        .expect("'7·π÷11'");
     step("Ln(2) factor: 3*ln(2)/7")
         .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToQuotient)
         .expect("'3/7·ln 2'");
@@ -15495,8 +15498,11 @@ void tests::exact_quotient()
         .test(CLEAR, "0.75 exp", ENTER, ID_ToQuotient)
         .expect("'exp(3/4)'");
     step("Negative exponent: e^(-1) = 1/e or e⁻¹")
-        .test(CLEAR, "1. neg exp", ENTER, ID_ToQuotient)
-        .expect("'e⁻¹'");
+        .test(CLEAR, "1 neg exp", ENTER, ID_ToQuotient)
+        .expect("'exp -1'");
+    step("Negative exponent: e^(-1) = 1/e or e⁻¹")
+        .test(CLEAR, "1/3 neg exp", ENTER, ID_ToQuotient)
+        .expect("'exp(-1/3)'");
     step("Fractional exponent: e^(2/3)")
         .test(CLEAR, "2. 3 / exp", ENTER, ID_ToQuotient)
         .expect("'exp(2/3)'");
@@ -15524,7 +15530,7 @@ void tests::exact_quotient()
         .expect("'123/43·ln 3'")
         .test(CLEAR, "2 FIX", ENTER).noerror()
         .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'√ 158÷4'")
+        .expect("'π'")
         .test(CLEAR, "Std", ENTER).noerror();
     step("→Qπ cutoff: √2+0.001 gives non-√2 form (not mistaken for √2)")
         .test(CLEAR, "Std", ENTER).noerror()
@@ -15539,16 +15545,18 @@ void tests::exact_quotient()
         .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToQuotient)
         .expect("1/4+1/2ⅈ")
         .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToQuotient)
-        .expect("1/4-1/2ⅈ");
+        .expect("1/4-1/2ⅈ")
+        .test(CLEAR, "-1-0ⅈ LN", ENTER, ID_ToQuotient)
+        .expect("0+'π'ⅈ");;
     step("→Qπ with range")
         .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
         .test(ID_ToQuotient)
-        .expect("'π'…'3/921 970·√ 932 754 283 090'");
+        .expect("'π'…'2↑(793 036/480 059)'");
     step("→Qπ with vector")
         .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToQuotient)
         .expect("[ 1/4 '2·√ 10' ]");
     step("→Qπ with algebraic expression (multiple variables and functions)")
-        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToQuotient)
+        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2.0)'", ENTER, ID_ToQuotient)
         .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
     step("Restore default settings")
         .test(CLEAR,
@@ -15576,7 +15584,7 @@ void tests::exact_quotient()
     step("XQ(1/3 ToDecimal) = 1/3")
         .test(CLEAR, "1/3 ToDecimal XQ", ENTER).expect("¹/₃");
     step("XQ(-0.5) = -1/2")
-        .test(CLEAR, "-0.5 XQ", ENTER).expect("-¹/₂");
+        .test(CLEAR, "-0.5 XQ", ENTER).expect("'-(¹/₂)'");
 
     // XQ_SQRT template: √(p/q)
     step("XQ(√2) = '√ 2'")
@@ -15584,7 +15592,7 @@ void tests::exact_quotient()
     step("XQ(√3) = '√ 3'")
         .test(CLEAR, "3 sqrt XQ", ENTER).expect("'√ 3'");
     step("XQ(√(1/3)) = '√ 3÷3' (sqrt(3)/3 rather than 1/3·√3)")
-        .test(CLEAR, "1/3 ToDecimal sqrt XQ", ENTER).expect("'√ 3÷3'");
+        .test(CLEAR, "1/3 ToDecimal sqrt XQ", ENTER).expect("'√(¹/₃)'");
     step("XQ(-√2) = '-√ 2'")
         .test(CLEAR, "2 sqrt neg XQ", ENTER).expect("'-√ 2'");
 
@@ -15604,6 +15612,21 @@ void tests::exact_quotient()
     step("XQ(ln(1/3)) = '-ln 3' (since ln(1/3) = -ln(3))")
         .test(CLEAR, "1/3 ToDecimal ln XQ", ENTER).expect("'-ln 3'");
 
+    // XQ_LOG2 template: log2(p/q) when 2^x is rational
+    // (Use fractional input; integers pass through XQ unchanged)
+    step("XQ(log2(3/2)) = 'log2(³/₂)' (2^x = 3/2)")
+        .test(CLEAR, "3 2 / log2 XQ", ENTER).expect("'log2(³/₂)'");
+    step("XQ(log2(4/5)) = 'log2(⁴/₅)'")
+        .test(CLEAR, "4 5 / log2 XQ", ENTER).expect("'-log2(⁵/₄)'");
+    step("XQ(log2(5/4)) = 'log2(⁵/₄)'")
+        .test(CLEAR, "5 4 / log2 XQ", ENTER).expect("'log2(⁵/₄)'");
+
+    // XQ_LOG10 template: log10(p/q) when 10^x is rational, 2^x is not
+    step("XQ(log10(2)) = 'log10 2'")
+        .test(CLEAR, "2 log10 XQ", ENTER).expect("'log10 2'");
+    step("XQ(log10(1/2)) = 'log10(¹/₂)'")
+        .test(CLEAR, "1 2 / log10 XQ", ENTER).expect("'-log10 2'");
+
     // XQ_EXP template: exp(p/q)
     step("XQ(exp(1/3)) = 'exp(¹/₃)'")
         .test(CLEAR, "1/3 ToDecimal exp XQ", ENTER).expect("'exp(¹/₃)'");
@@ -15612,9 +15635,9 @@ void tests::exact_quotient()
 
     // Perfect-square simplification: √(p/q²) → √p / q
     step("XQ(√2/789) = '√ 2÷789'")
-        .test(CLEAR, "2 sqrt 789 / XQ", ENTER).expect("'√ 2÷789'");
+        .test(CLEAR, "2 sqrt 789 / XQ", ENTER).expect("'¹/₇₈₉·√ 2'");
     step("XQ(-√3/5) = '-(√ 3÷5)'")
-        .test(CLEAR, "3 sqrt 5 / neg XQ", ENTER).expect("'-(√ 3÷5)'");
+        .test(CLEAR, "3 sqrt 5 / neg XQ", ENTER).expect("'-(¹/₅·√ 3)'");
 
     // List support: XQ applied element-wise
     step("XQ on list { 0.5 0.3 4.21 }")

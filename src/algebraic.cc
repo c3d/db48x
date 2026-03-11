@@ -31,6 +31,7 @@
 
 #include "arithmetic.h"
 #include "factor.h"
+#include "fraction.h"
 #include "list.h"
 #include "array.h"
 #include "bignum.h"
@@ -59,6 +60,7 @@
 
 RECORDER(algebraic,       16, "RPL Algebraics");
 RECORDER(algebraic_error, 16, "Errors processing a algebraic");
+RECORDER(quotient,        16, "Quotient computations");
 
 
 INSERT_BODY(algebraic)
@@ -443,6 +445,15 @@ static bool to_fraction_real(algebraic_g &x)
     case object::ID_neg_decimal:
         x = decimal_p(+x)->to_fraction();
         break;
+    case object::ID_integer:
+    case object::ID_neg_integer:
+    case object::ID_bignum:
+    case object::ID_neg_bignum:
+    case object::ID_fraction:
+    case object::ID_neg_fraction:
+    case object::ID_big_fraction:
+    case object::ID_neg_big_fraction:
+        return true;
     default:
         return false;
     }
@@ -572,316 +583,228 @@ bool algebraic::to_fraction(algebraic_g &x)
 }
 
 
-static ularge fraction_denominator(algebraic_r x)
-// ----------------------------------------------------------------------------
-//   Return the denominator of a fraction result, or 1 for integers
-// ----------------------------------------------------------------------------
-{
-    object::id ty = x->type();
-    if (object::is_integer(ty))
-        return 1;
-    if (object::is_fraction(ty))
-        return fraction_p(+x)->denominator_value();
-    return ~ularge(0);
-}
 
 
-static void extract_square_factor(ularge n, ularge &sq, ularge &rem)
-// ----------------------------------------------------------------------------
-//   Factor n as sq²·rem where rem is square-free
-// ----------------------------------------------------------------------------
+// ============================================================================
+//
+//    Exact quotient
+//
+// ============================================================================
+
+template <byte ...args>
+constexpr byte eq<args...>::object_data[sizeof...(args)+2];
+
+static const eq_symbol<'x'>     x;
+static const eq_symbol<'p'>     p;
+static const eq_symbol<'q'>     q;
+static const eq_symbol<'s'>     s;
+static const eq_symbol<'t'>     t;
+static const eq_integer<0>      k0;
+static const eq_integer<1>      k1;
+static const eq_integer<2>      k2;
+static const eq_integer<3>      k3;
+static const eq_integer<5>      k5;
+static const eq_integer<7>      k7;
+static const eq_integer<10>     k10;
+static const eq_pi              pi;
+static const eq_e               e;
+
+static algebraic_p        check_quotient_patterns(algebraic_r value,
+                                                  algebraic_g &bestq,
+                                                  size_t       npats,
+                                                  const byte_p patterns[])
+// ------------------------------------------------------------------------
+//   Try to apply the patterns in order, find the one with lowest p/q
+// ------------------------------------------------------------------------
 {
-    sq = 1;
-    rem = n;
-    ularge max_prime = Settings.FractionLargestPrime();
-    for (size_t i = 0; i < NUM_SMALL_PRIMES; i++)
+    symbol_g    xx      = expression_p(x.as_bytes())->as_quoted<symbol>();
+    symbol_g    pp      = expression_p(p.as_bytes())->as_quoted<symbol>();
+    symbol_g    qq      = expression_p(q.as_bytes())->as_quoted<symbol>();
+    symbol_g    ss      = expression_p(s.as_bytes())->as_quoted<symbol>();
+    symbol_g    tt      = expression_p(t.as_bytes())->as_quoted<symbol>();
+    algebraic_g best    = value;
+    algebraic_g p       = nullptr;
+    algebraic_g q       = nullptr;
+    algebraic_g one     = integer::make(1);
+    algebraic_g s       = one;
+    algebraic_g t       = one;
+
+    record(quotient, ">Check patterns for %t", +value);
+
+    for (size_t i = 0; i < npats; i += 2)
     {
-        ularge p = small_primes[i];
-        ularge pp = p * p;
-        if (p == 0 || p > max_prime || rem < pp)
-            return;
-        while (rem % pp == 0)
+        expression_p src = expression_p(patterns[i + 0]);
+        if (algebraic_g val = expression_p(src->substitute(xx, +value)))
         {
-            rem /= pp;
-            sq *= p;
-            if (rem == 0)
-                return;
+            record(quotient, "Pattern %t value %t", src, +val);
+            if (algebraic::to_decimal(val, true))
+            {
+                if (to_fraction_real(val))
+                {
+                    if (val->is_fraction())
+                    {
+                        fraction_p frac = fraction_p(+val);
+                        p               = bignum::smaller(frac->numerator());
+                        q               = bignum::smaller(frac->denominator());
+                        record(quotient, "Fraction %t = %t/%t", +val, +p, +q);
+                    }
+                    else
+                    {
+                        if (val->is_bignum())
+                            val = bignum::smaller(bignum_p(+val));
+                        p = val;
+                        q = one;
+                        record(quotient, "Non-fraction %t", +val);
+                    }
+                    if (!p || !q)
+                        return nullptr;
+
+                    integer_p ip = p->as_small_integer();
+                    integer_p iq = q->as_small_integer();
+                    if (!ip || !iq)
+                    {
+                        record(quotient,
+                               "Skipping, p is %+s, q is %+s",
+                               object::fancy(p->type()),
+                               object::fancy(q->type()));
+                        continue;
+                    }
+
+                    expression_p dst       = expression_p(patterns[i + 1]);
+                    bool         squares   = dst->contains(ss);
+                    bool         fractions = dst->contains(pp);
+                    if (squares)
+                    {
+                        ularge pv = ip->value<ularge>();
+                        ularge qv = iq->value<ularge>();
+                        ularge ps, pr, qs, qr;
+                        extract_square_factor(pv, ps, pr);
+                        extract_square_factor(qv, qs, qr);
+                        s = fraction::make(ps, qs);
+                        t = fraction::make(pr, qr);
+                        q = integer::make(std::max(qr, qs));
+                        record(quotient,
+                               "Squares: p=%t s=%t q=%t t=%t", +p, +s, +q, +t);
+                    }
+
+                    if (!bestq || algebraic::compare(bestq, q) > 0)
+                    {
+                        record(quotient, "Replace with %t (%+s)", dst,
+                               squares ? "has squares" : "no squares");
+                        val = squares
+                            ? expression_p(dst->substitute(ss, +s, tt, +t))
+                            : fractions
+                            ? expression_p(dst->substitute(pp, +p, qq, +q))
+                            : expression_p(dst->substitute(xx, +val));
+                        record(quotient, "After substitution %t", +val);
+                        if (val)
+                        {
+                            if (object_p qo = expression_p(+val)->quoted())
+                                if (algebraic_p qa = qo->as_algebraic())
+                                    val = qa;
+                            best  = +val;
+                            record(quotient, "Best is %t", +best);
+                            bestq = q;
+                            if (p->is_zero() || p->is_one() ||
+                                q->is_zero() || q->is_one())
+                                break;
+                        }
+                    }
+                }
+            }
         }
     }
+
+    record(quotient, "<Got best match %t", +best);
+    return +best;
 }
 
 
-static algebraic_p fraction_times_symbolic(algebraic_r frac, algebraic_r sym)
+template <typename... args>
+algebraic_p check_quotient_patterns(algebraic_r value,
+                                    algebraic_g &bestq,
+                                    args... rest)
 // ----------------------------------------------------------------------------
-//   Build result as frac * symbolic, simplifying 1*X and (-1)*X
+//   Check a series of patterns and stop at the first one
 // ----------------------------------------------------------------------------
 {
-    if (frac->is_one(false))
-        return expression::make(sym);
-    algebraic_g nfrac = -frac;
-    if (nfrac && nfrac->is_one(false))
-        return expression::make(object::ID_neg, sym);
-    return expression::make(object::ID_multiply, frac, sym);
+    static constexpr byte_p rwdata[] = { rest.as_bytes()... };
+    return check_quotient_patterns(value, bestq, sizeof...(rest), rwdata);
 }
 
 
-static algebraic_p wrap_symbolic(algebraic_r sym)
+static bool to_quotient_real(algebraic_g &value)
 // ----------------------------------------------------------------------------
-//   Wrap a value in an expression if not already one
+//   Convert real to fraction with π, √n, ln(n), e factors (→Qπ)
 // ----------------------------------------------------------------------------
 {
-    if (sym->type() == object::ID_expression)
-        return algebraic_p(sym);
-    return expression::make(sym);
+    if (!value)
+        return false;
+    bool neg = value->is_negative();
+    if (neg)
+        value = -value;
+    algebraic_g bestq = nullptr;
+    algebraic_g r = check_quotient_patterns(value, bestq,
+                                            x,          x,
+                                            x/pi,       x*pi,
+                                            x*pi,       p/(q*pi),
+                                            pi/x,       q*pi/p,
+                                            x/ln(k2),   x*ln(k2),
+                                            x/ln(k3),   x*ln(k3),
+                                            x/ln(k5),   x*ln(k5),
+                                            x/ln(k7),   x*ln(k7),
+                                            x/ln(k10),  x*ln(k10),
+                                            x*ln(k2),   x/ln(k2),
+                                            x*ln(k3),   x/ln(k3),
+                                            x*ln(k5),   x/ln(k5),
+                                            x*ln(k7),   x/ln(k7),
+                                            x*ln(k10),  x/ln(k10),
+                                            sq(x),      s*sqrt(t),
+                                            exp(x),     ln(x),
+                                            k2^x,       log2(x),
+                                            k10^x,      log10(x),
+                                            ln(x),      exp(x),
+                                            log2(x),    k2^x,
+                                            log10(x),   k10^x);
+    if (r)
+    {
+        if (expression_p expr = r->as<expression>())
+            r = expr->rewrites<expression::DOWN>(
+                // Multiplicative simplifications
+                k0 * x,    k0,
+                k1 * x,     x,
+                x * k0,    k0,
+                x * k1,     x,
+                k0 / x,    k0,
+                x / k1,     x,
+                x / x,       k1,
+                x * (p/q),   x*p/q,
+
+                // Power simplifications
+                sqrt(k1/x), sqrt(x)/x,
+                sqrt(k1),   k1,
+                sqrt(k0),  k0,
+                k0^x,      k0,
+                k1^x,       k1,
+                x^k0,      k1,
+                x^k1,       x);
+        record(quotient, "Simplifies as %t", +r);
+        if (r)
+            value = neg ? expression::make(object::ID_neg, r) : r;
+    }
+    return r;
 }
 
 
 static algebraic_p to_quotient_map_fn(algebraic_r a)
 // ----------------------------------------------------------------------------
-//   Wrapper for list::map to apply to_quotient to expression elements
+//   Map callback for list::map in to_quotient
 // ----------------------------------------------------------------------------
 {
     algebraic_g ag = a;
     if (ag->is_algebraic_num())
         algebraic::to_quotient(ag);
     return +ag;
-}
-
-
-static bool to_quotient_real(algebraic_g &x)
-// ----------------------------------------------------------------------------
-//   Convert real to fraction with π, √n, ln(n), e factors (→Qπ)
-// ----------------------------------------------------------------------------
-{
-    algebraic_g val = x;
-    algebraic_g plain = val;
-    if (!algebraic::to_fraction(plain))
-        return false;
-
-    ularge      best_denom = fraction_denominator(plain);
-    algebraic_g best_result = plain;
-    record(algebraic, "→Qπ plain fraction denom %u type %+s",
-           best_denom, object::name(plain->type()));
-
-    if (best_denom <= 1)
-    {
-        x = best_result;
-        return x;
-    }
-
-    constant_p  pi_sym  = constant::lookup("π", false);
-    constant_p  e_sym   = constant::lookup("e", false);
-    algebraic_g pi_val  = algebraic::pi();
-    if (!pi_val)
-        return false;
-
-    auto try_factor = [&](algebraic_r num_val, algebraic_r sym)
-    {
-        if (!num_val || !sym || rt.error())
-            return;
-        algebraic_g divided = val / num_val;
-        if (!divided || rt.error())
-        {
-            rt.clear_error();
-            return;
-        }
-        algebraic_g frac = divided;
-        if (!algebraic::to_fraction(frac))
-        {
-            rt.clear_error();
-            return;
-        }
-        ularge d = fraction_denominator(frac);
-        if (d < best_denom)
-        {
-            best_denom = d;
-            best_result = fraction_times_symbolic(frac, sym);
-        }
-    };
-
-    // Try x = (p/q) · π
-    if (pi_sym)
-        try_factor(pi_val, pi_sym);
-    if (best_denom <= 1)
-        goto done;
-
-    // Try x = (p/q) · √n by squaring x and factoring out perfect squares
-    {
-        bool        neg = val->is_negative(false);
-        algebraic_g val_sq = val * val;
-        if (val_sq && !rt.error())
-        {
-            algebraic_g frac = val_sq;
-            if (algebraic::to_fraction(frac))
-            {
-                ularge num = 0, den = 1;
-                object::id fty = frac->type();
-                if (object::is_bignum(fty))
-                    num = bignum_p(+frac)->value<ularge>();
-                else if (object::is_integer(fty))
-                    num = integer_p(+frac)->value<ularge>();
-                else if (object::is_fraction(fty))
-                {
-                    num = fraction_p(+frac)->numerator_value();
-                    den = fraction_p(+frac)->denominator_value();
-                }
-                record(algebraic,
-                       "Sqrt factoring x²→frac %+s num %u den %u",
-                       object::name(fty), num, den);
-
-                if (num > 0)
-                {
-                    ularge sq_num, free_num, sq_den, free_den;
-                    extract_square_factor(num, sq_num, free_num);
-                    extract_square_factor(den, sq_den, free_den);
-
-                    constexpr ularge ulmax = ~ularge(0);
-                    ularge sqrt_part = 0;
-                    if (free_den > 0 && free_num <= ulmax / free_den)
-                        sqrt_part = free_num * free_den;
-                    record(algebraic,
-                           "Sqrt factors sq=%u free=%u / sq=%u free=%u"
-                           " → √%u denom %u (best %u)",
-                           sq_num, free_num, sq_den, free_den,
-                           sqrt_part, sq_den * free_den, best_denom);
-                    if (sqrt_part > 1)
-                    {
-                        ularge rational_den = sq_den * free_den;
-                        if (rational_den < best_denom)
-                        {
-                            algebraic_g sv = integer::make(sqrt_part);
-                            algebraic_g ssym = expression::make(object::ID_sqrt, sv);
-                            if (sq_num == 1)
-                            {
-                                // Prefer √n/q over (1/q)·√n for readability
-                                algebraic_g div = (rational_den == 1)
-                                    ? ssym
-                                    : expression::make(
-                                          object::ID_divide, ssym,
-                                          integer::make(rational_den));
-                                best_result = neg ? expression::make(
-                                                   object::ID_neg, div)
-                                                  : div;
-                            }
-                            else
-                            {
-                                algebraic_g p = integer::make(sq_num);
-                                algebraic_g q = integer::make(rational_den);
-                                algebraic_g rf =
-                                    (rational_den == 1)
-                                        ? p
-                                        : fraction::make(
-                                              integer_p(+p), integer_p(+q));
-                                if (neg)
-                                    rf = -rf;
-                                best_result =
-                                    fraction_times_symbolic(rf, ssym);
-                            }
-                            best_denom = rational_den;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                rt.clear_error();
-            }
-        }
-        else
-        {
-            rt.clear_error();
-        }
-    }
-    if (best_denom <= 1)
-        goto done;
-
-    // Try x = (p/q) · ln(n)
-    static const uint ln_factors[] = { 2, 3, 5, 7, 10 };
-    for (uint n : ln_factors)
-    {
-        algebraic_g nval = integer::make(n);
-        algebraic_g lval = ln::run(nval);
-        algebraic_g lsym = expression::make(object::ID_ln, nval);
-        try_factor(lval, lsym);
-    }
-    if (best_denom <= 1)
-        goto done;
-
-    // Try x = (p/q) · e
-    if (e_sym)
-    {
-        algebraic_g e_val = decimal::e();
-        if (e_val)
-            try_factor(e_val, e_sym);
-    }
-    if (best_denom <= 1)
-        goto done;
-
-    // Try x = (p/q) · π·√n for common combinations
-    if (pi_sym)
-    {
-        static const uint pi_sqrt_n[] = { 2, 3 };
-        for (uint n : pi_sqrt_n)
-        {
-            algebraic_g nval = integer::make(n);
-            algebraic_g sqrt_n = expression::make(object::ID_sqrt, nval);
-            algebraic_g prod = pi_val * sqrt_n;
-            algebraic_g sym =
-                expression::make(object::ID_multiply, pi_sym, sqrt_n);
-            if (prod && sym)
-                try_factor(prod, sym);
-        }
-    }
-    if (best_denom <= 1)
-        goto done;
-
-    // Try x = e^(p/q) by checking if ln(x) is rational
-    if (e_sym && !val->is_negative(false) && !val->is_zero(false))
-    {
-        algebraic_g lx = ln::run(val);
-        if (lx && !rt.error())
-        {
-            algebraic_g frac = lx;
-            if (algebraic::to_fraction(frac))
-            {
-                ularge d = fraction_denominator(frac);
-                if (d < best_denom)
-                {
-                    best_denom = d;
-                    if (frac->is_one(false))
-                    {
-                        best_result = wrap_symbolic(e_sym);
-                    }
-                    else
-                    {
-                        algebraic_g nfrac = -frac;
-                        if (nfrac && nfrac->is_one(false))
-                        {
-                            best_result =
-                                expression::make(object::ID_inv, e_sym);
-                        }
-                        else
-                        {
-                            best_result =
-                                expression::make(object::ID_exp, frac);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                rt.clear_error();
-            }
-        }
-        else
-        {
-            rt.clear_error();
-        }
-    }
-
-done:
-    x = best_result;
-    return x;
 }
 
 

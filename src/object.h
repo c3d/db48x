@@ -111,6 +111,7 @@ RECORDER_DECLARE(run);
 RECORDER_DECLARE(object_errors);
 
 struct algebraic;
+struct integer;
 struct menu_info;
 struct object;
 struct parser;
@@ -125,6 +126,7 @@ struct list;
 struct user_interface;
 
 typedef const algebraic *algebraic_p;
+typedef const integer   *integer_p;
 typedef const object    *object_p;
 typedef const program   *program_p;
 typedef const symbol    *symbol_p;
@@ -403,6 +405,15 @@ struct object
     // ------------------------------------------------------------------------
     {
         return is_real() ? algebraic_p(this) : nullptr;
+    }
+
+
+    integer_p as_small_integer() const
+    // ------------------------------------------------------------------------
+    //   Return the object as a small integer (positive or negative)
+    // ------------------------------------------------------------------------
+    {
+        return is_small_integer() ? integer_p(this) : nullptr;
     }
 
 

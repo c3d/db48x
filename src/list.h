@@ -347,11 +347,18 @@ struct list : text
     // Element substitution
     static algebraic_p where(algebraic_r expr, algebraic_r args);
     static object_p substitute(object_p expr, object_p args);
-    list_p substitute(symbol_r name, object_r value, size_t len) const;
+    list_p substitute(symbol_r name, object_p value, size_t len) const;
     list_p substitute(symbol_r name, object_p value) const;
     list_p substitute(expression_r assign) const;
     list_p substitute(list_r assignments) const;
     list_p substitute(object_r repl) const;
+    template<typename... args>
+    list_p substitute(symbol_r name, object_p value, args... rest) const
+    {
+        if (list_p result = substitute(name, value))
+            return result->substitute(rest...);
+        return nullptr;
+    }
 
     // Extract a sublist
     list_p extract(object_r first, object_r last) const;
