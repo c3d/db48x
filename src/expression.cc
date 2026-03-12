@@ -1467,7 +1467,7 @@ algebraic_p expression::factor_out(algebraic_g expr,
 
     // Loop on all items in the equation, factoring out as we go
     algebraic_g x, y, xs, xe, ys, ye;
-    algebraic_g one = integer::make(1);
+    algebraic_g one_val = integer::make(1);
     for (object_p obj : *eq)
     {
         id ty = obj->type();
@@ -3102,74 +3102,86 @@ template <byte ...args>
 constexpr byte eq<args...>::object_data[sizeof...(args)+2];
 
 // Wildcards used to build patterns (type based on initial letter, see above)
-static const eq_symbol<'a'>     a;    // Numerical constants
-static const eq_symbol<'b'>     b;
-static const eq_symbol<'c'>     c;
-static const eq_symbol<'d'>     d;    // Non-constant expressions
-static const eq_symbol<'e'>     e;
-static const eq_symbol<'f'>     f;
-static const eq_symbol<'i'>     i;    // Positive or zero integer values
-static const eq_symbol<'j'>     j;
-static const eq_symbol<'k'>     k;    // Positive non-zero integers
-static const eq_symbol<'l'>     l;
-static const eq_symbol<'m'>     m;
-static const eq_symbol<'n'>     n;    // Contains independent variable
-static const eq_symbol<'o'>     o;
-static const eq_symbol<'p'>     p;    // Other, does not contain independent variable
-static const eq_symbol<'q'>     q;
-static const eq_symbol<'r'>     r;
-static const eq_symbol<'s'>     s;    // Symbols
-static const eq_symbol<'t'>     t;
-static const eq_symbol<'u'>     u;    // Unique subexpressions
-static const eq_symbol<'v'>     v;
-static const eq_symbol<'w'>     w;
-static const eq_symbol<'x'>     x;    // Any subexpression
-static const eq_symbol<'y'>     y;
-static const eq_symbol<'z'>     z;
+namespace eq_wildcards {
+
+const eq_symbol<'a'>     a;    // Numerical constants
+const eq_symbol<'b'>     b;
+const eq_symbol<'c'>     c;
+const eq_symbol<'d'>     d;    // Non-constant expressions
+const eq_symbol<'e'>     e;
+const eq_symbol<'f'>     f;
+const eq_symbol<'i'>     i;    // Positive or zero integer values
+const eq_symbol<'j'>     j;
+const eq_symbol<'k'>     k;    // Positive non-zero integers
+const eq_symbol<'l'>     l;
+const eq_symbol<'m'>     m;
+const eq_symbol<'n'>     n;    // Contains independent variable
+const eq_symbol<'o'>     o;
+const eq_symbol<'p'>     p;    // Other, does not contain independent variable
+const eq_symbol<'q'>     q;
+const eq_symbol<'r'>     r;
+const eq_symbol<'s'>     s;    // Symbols
+const eq_symbol<'t'>     t;
+const eq_symbol<'u'>     u;    // Unique subexpressions
+const eq_symbol<'v'>     v;
+const eq_symbol<'w'>     w;
+const eq_symbol<'x'>     x;    // Any subexpression
+const eq_symbol<'y'>     y;
+const eq_symbol<'z'>     z;
 
 // Wildcards that need not be sorted (e.g. matches if A<B or A>B)
-static const eq_symbol<'A'>     A;    // Numerical constants
-static const eq_symbol<'B'>     B;
-static const eq_symbol<'C'>     C;
-static const eq_symbol<'D'>     D;    // Non-constant expressions
-static const eq_symbol<'E'>     E;
-static const eq_symbol<'F'>     F;
-static const eq_symbol<'I'>     I;    // Positive or zero integer values
-static const eq_symbol<'J'>     J;
-static const eq_symbol<'K'>     K;    // Positive non-zero integers
-static const eq_symbol<'L'>     L;
-static const eq_symbol<'M'>     M;
-static const eq_symbol<'N'>     N;    // Contains independent variable
-static const eq_symbol<'O'>     O;
-static const eq_symbol<'P'>     P;    // Other, does not contain independent variable
-static const eq_symbol<'Q'>     Q;
-static const eq_symbol<'R'>     R;
-static const eq_symbol<'S'>     S;    // Symbols
-static const eq_symbol<'T'>     T;
-static const eq_symbol<'U'>     U;    // Unique subexpressions
-static const eq_symbol<'V'>     V;
-static const eq_symbol<'W'>     W;
-static const eq_symbol<'X'>     X;    // Any subexpression
-static const eq_symbol<'Y'>     Y;
-static const eq_symbol<'Z'>     Z;
+const eq_symbol<'A'>     A;    // Numerical constants
+const eq_symbol<'B'>     B;
+const eq_symbol<'C'>     C;
+const eq_symbol<'D'>     D;    // Non-constant expressions
+const eq_symbol<'E'>     E;
+const eq_symbol<'F'>     F;
+const eq_symbol<'I'>     I;    // Positive or zero integer values
+const eq_symbol<'J'>     J;
+const eq_symbol<'K'>     K;    // Positive non-zero integers
+const eq_symbol<'L'>     L;
+const eq_symbol<'M'>     M;
+const eq_symbol<'N'>     N;    // Contains independent variable
+const eq_symbol<'O'>     O;
+const eq_symbol<'P'>     P;    // Other, does not contain independent variable
+const eq_symbol<'Q'>     Q;
+const eq_symbol<'R'>     R;
+const eq_symbol<'S'>     S;    // Symbols
+const eq_symbol<'T'>     T;
+const eq_symbol<'U'>     U;    // Unique subexpressions
+const eq_symbol<'V'>     V;
+const eq_symbol<'W'>     W;
+const eq_symbol<'X'>     X;    // Any subexpression
+const eq_symbol<'Y'>     Y;
+const eq_symbol<'Z'>     Z;
 
 // Numerical constants
-static const eq_integer<0>      zero;
-static const eq_neg_integer<-1> mone;
-static const eq_integer<1>      one;
-static const eq_integer<2>      two;
-static const eq_integer<3>      three;
-static const eq_integer<4>      four;
-static const eq_integer<10>     ten;
-static const eq_always          always;
+const eq_integer<0>      k0;
+const eq_neg_integer<-1> kn1;
+const eq_integer<1>      k1;
+const eq_integer<2>      k2;
+const eq_integer<3>      k3;
+const eq_integer<4>      k4;
+const eq_integer<5>      k5;
+const eq_integer<7>      k7;
+const eq_integer<10>     k10;
+const eq_always          always;
 
 // Sign and integer value for non-princpal solutions, see some_index() function
-static const eq_symbol<'#'>     intk;
-static const eq_symbol<'+'>     natk;
-static const eq_symbol<'-'>     signk;
-static const eq_symbol<'@'>     kpi;
-static const eq_symbol<'!'>     ki;
-static const eq_symbol<'='>     indep;
+const eq_symbol<'#'>     intk;
+const eq_symbol<'+'>     natk;
+const eq_symbol<'-'>     signk;
+const eq_symbol<'@'>     kpi;
+const eq_symbol<'!'>     ki;
+const eq_symbol<'='>     indep;
+
+// Constants
+const eq_pi pi;
+const eq_e euler;
+
+} // namespace eq_wildcards
+
+using namespace eq_wildcards;
 
 
 bool expression::split_equation(expression_g &left, expression_g &right) const
@@ -3251,11 +3263,11 @@ expression_p expression::expand() const
         -A,             -A,
 
         // Expand bult-in functions
-        inv(x),         one/x,
-        sq(x),          x^two,
-        cubed(x),       x^three,
-        sqrt(x),        x^(one/two),
-        cbrt(x),        x^(one/three),
+        inv(x),         k1/x,
+        sq(x),          x^k2,
+        cubed(x),       x^k3,
+        sqrt(x),        x^(k1/k2),
+        cbrt(x),        x^(k1/k3),
 
         // Distribute additions
         (X+Y)*Z,        X*Z+Y*Z,
@@ -3281,7 +3293,7 @@ expression_p expression::expand() const
         X - (-Y),       X + Y,
         X * (-Y),       -(X*Y),
         X / (-Y),       -(X/Y),
-        X ^ (-Y),       one / (X^Y),
+        X ^ (-Y),       k1 / (X^Y),
 
         (-X) + Y,       Y - X,
         (-X) - Y,       -(X + Y),
@@ -3289,27 +3301,27 @@ expression_p expression::expand() const
         (-X) / Y,       -(X / Y),
 
         // Additive simplifications
-        X + zero,       X,
-        X + X,          two * X,
-        X - X,          zero,
-        X - zero,       X,
-        zero - X,       -X,
-        A * X + X,      (A + one) * X,
-        X + A * X,      (A + one) * X,
+        X + k0,         X,
+        X + X,          k2 * X,
+        X - X,          k0,
+        X - k0,         X,
+        k0 - X,         -X,
+        A * X + X,      (A + k1) * X,
+        X + A * X,      (A + k1) * X,
         A*X + B*X,      (A + B) * X,
 
         // Multiplicative simplifications
-        zero * X,       zero,
-        one * X,        X,
-        zero / X,       zero,
-        X / one,        X,
+        k0 * X,         k0,
+        k1 * X,         X,
+        k0 / X,         k0,
+        X / k1,         X,
 
         // Power simplifications
-        X^zero,         one,
-        X^one,          X,
+        X^k0,           k1,
+        X^k1,           X,
 
         // Expansion of powers
-        X^K,            (X^(K-one))*X);
+        X^K,            (X^(K-k1))*X);
 }
 
 
@@ -3320,29 +3332,29 @@ expression_p expression::collect() const
 {
     return rewrites<UP>(
         // Collection of powers
-        (X^K)*X,        X^(K+one),
-        X*(X^K),        X^(K+one),
+        (X^K)*X,        X^(K+k1),
+        X*(X^K),        X^(K+k1),
         (X^A)*(X^B),    X^(A+B),
 
         // Power simplifications
-        X^one,          X,
-        X^zero,         one,
+        X^k1,           X,
+        X^k0,           k1,
 
         // Multiplicative simplifications
-        X / one,        X,
-        zero / X,       zero,
-        one * X,        X,
-        zero * X,       zero,
+        X / k1,         X,
+        k0 / X,         k0,
+        k1 * X,         X,
+        k0 * X,         k0,
 
         // Additive simplifications
         A*X + B*X,      (A + B) * X,
-        X + A * X,      (A + one) * X,
-        A * X + X,      (A + one) * X,
-        zero - X,       -X,
-        X - zero,       X,
-        X - X,          zero,
-        X + X,          two * X,
-        X + zero,       X,
+        X + A * X,      (A + k1) * X,
+        A * X + X,      (A + k1) * X,
+        k0 - X,         -X,
+        X - k0,         X,
+        X - X,          k0,
+        X + X,          k2 * X,
+        X + k0,         X,
 
         // Sign change simplifications
         (-X) / Y,       -(X / Y),
@@ -3350,7 +3362,7 @@ expression_p expression::collect() const
         (-X) - Y,       -(X + Y),
         (-X) + Y,       Y - X,
 
-        X ^ (-Y),       one / (X^Y),
+        X ^ (-Y),       k1 / (X^Y),
         x / (-Y),       -(X/Y),
         X * (-Y),       -(X*Y),
         X - (-Y),       X + Y,
@@ -3376,7 +3388,7 @@ expression_p expression::collect() const
         X*Z+Y*Z,        (X+Y)*Z,
 
         // Generate initial powers (must be last)
-        X*X,            X^two,
+        X*X,            X^k2,
 
         // Compute constants
         -A,          -A,
@@ -3411,24 +3423,24 @@ expression_p expression::fold_constants() const
         X * A,       A * X,
 
         // Additive simplifications
-        X + zero,    X,
-        X + X,       two * X,
-        X - X,       zero,
-        X - zero,    X,
-        zero - X,    -X,
-        A * X + X,   (A + one) * X,
-        X + A * X,   (A + one) * X,
+        X + k0,      X,
+        X + X,       k2 * X,
+        X - X,       k0,
+        X - k0,      X,
+        k0 - X,      -X,
+        A * X + X,   (A + k1) * X,
+        X + A * X,   (A + k1) * X,
         A*X + B*X,   (A + B) * X,
 
         // Multiplicative simplifications
-        zero * X,    zero,
-        one * X,     X,
-        zero / X,    zero,
-        X / one,     X,
+        k0 * X,      k0,
+        k1 * X,      X,
+        k0 / X,      k0,
+        X / k1,      X,
 
         // Power simplifications
-        X^zero,      one,
-        X^one,       X);
+        X^k0,        k1,
+        X^k1,        X);
 }
 
 
@@ -3469,16 +3481,16 @@ expression_p expression::simplify() const
 
         // Addition simplifications
         A+E,            E+A,
-        X+zero,         X,
-        X+X,            two*X,
+        X+k0,           X,
+        X+X,            k2*X,
         X+(Y+Z),        (X+Y)+Z,
         X+A+B,          X+(A+B),
         (X+A)+E,        (X+E)+A,
 
         // Subtraction simplifications
-        X-zero,         X,
-        zero-X,         -X,
-        X-X,            zero,
+        X-k0,           X,
+        k0-X,           -X,
+        X-X,            k0,
         X+Y-Y,          X,
         X-Y+Y,          X,
         X+(Y-Z),        (X+Y)-Z,
@@ -3491,44 +3503,44 @@ expression_p expression::simplify() const
 
         // Multiplication simplification
         X*A,            A*X,
-        zero*X,         zero,
-        one*X,          X,
-        A*X+X,          (A+one)*X,
-        X+A*X,          (A+one)*X,
+        k0*X,           k0,
+        k1*X,           X,
+        A*X+X,          (A+k1)*X,
+        X+A*X,          (A+k1)*X,
         A*X+B*X,        (A+B)*X,
         A*X-B*X,        (A-B)*X,
-        A*X-X,          (A-one)*X,
-        X-A*X,          (one-A)*X,
+        A*X-X,          (A-k1)*X,
+        X-A*X,          (k1-A)*X,
         X*(Y*Z),        (X*Y)*Z,
         X*X*X,          cubed(X),
         X*X,            sq(X),
         sq(X)*X,        cubed(X),
         X*sq(X),        cubed(X),
-        cubed(X)*X,     X^four,
-        X*cubed(X),     X^four,
-        sq(X)*sq(X),    X^four,
-        sq(sq(X)),      X^four,
+        cubed(X)*X,     X^k4,
+        X*cubed(X),     X^k4,
+        sq(X)*sq(X),    X^k4,
+        sq(sq(X)),      X^k4,
 
         // Division simplification
         X*(Y/Z),        (X*Y)/Z,
         A*X/B,          (A/B)*X,
-        X/X,            one,
+        X/X,            k1,
         A/(B/X),        (A/B)*X,
-        one/X,          inv(X),
+        k1/X,           inv(X),
         inv(inv(X)),    X,
 
         // Power simplifications
-        (X^A)*X,        X^(A+one),
-        X*(X^A),        X^(A+one),
-        sq(X)*(X^A),    X^(A+two),
-        (X^A)*sq(X),    X^(A+two),
-        cubed(X)*(X^A), X^(A+three),
-        (X^A)*cubed(X), X^(A+three),
+        (X^A)*X,        X^(A+k1),
+        X*(X^A),        X^(A+k1),
+        sq(X)*(X^A),    X^(A+k2),
+        (X^A)*sq(X),    X^(A+k2),
+        cubed(X)*(X^A), X^(A+k3),
+        (X^A)*cubed(X), X^(A+k3),
         (X^A)*(X^B),    X^(A+B),
-        X^three,        cubed(X),
-        X^two,          sq(X),
-        X^one,          X,
-        X^zero,         one,
+        X^k3,           cubed(X),
+        X^k2,           sq(X),
+        X^k1,           X,
+        X^k0,           k1,
 
         // Function simplifications
         sin(asin(X)),   X,
@@ -3544,10 +3556,10 @@ expression_p expression::simplify() const
         abs(-X),        abs(X),
         sqrt(sq(X)),    abs(X),
         sq(sqrt(X)),    X,
-        sq(X^Y),        X^(two*Y),
-        sqrt(X^Y),      X^(Y/two),
-        cubed(X^Y),     X^(three*Y),
-        cbrt(X^Y),      X^(Y/three),
+        sq(X^Y),        X^(k2*Y),
+        sqrt(X^Y),      X^(Y/k2),
+        cubed(X^Y),     X^(k3*Y),
+        cbrt(X^Y),      X^(Y/k3),
         cbrt(cubed(X)), X,
         cubed(cbrt(X)), X,
         ln(exp(X)),     X,
@@ -3565,8 +3577,8 @@ expression_p expression::trig_sin() const
 {
     return rewrites<DOWN>(
         // Pythagorean identity: cos²→1-sin²
-        sq(cos(X)),     one - sq(sin(X)),
-        cos(X)^two,     one - sq(sin(X))
+        sq(cos(X)),     k1 - sq(sin(X)),
+        cos(X)^k2,      k1 - sq(sin(X))
         );
 }
 
@@ -3697,13 +3709,13 @@ expression_p expression::isolate(symbol_r sym) const
         if (!split_equation(left, right))
         {
             algebraic_g l = +eq;
-            algebraic_g r = zero.as_expression();
+            algebraic_g r = k0.as_expression();
             eq = expression::make(ID_TestEQ, l, r);
         }
         if (left)
             if (symbol_p lsym = left->as_quoted<symbol>())
                 if (lsym->is_same_as(sym))
-                    if (eq->rewrites(N==P, one) != eq)
+                    if (eq->rewrites(N==P, k1) != eq)
                         return eq;
     }
     if (!eq)
@@ -3735,13 +3747,13 @@ expression_p expression::isolate(symbol_r sym) const
             (Q ^ N) == P,           N == ln(P) / ln(Q),
 
             // Basic simplifications
-            N + N == P,             N == P / two,
-            N + Q*N == P,           N == P / (one + Q),
-            Q*N + N == P,           N == P / (one + Q),
+            N + N == P,             N == P / k2,
+            N + Q*N == P,           N == P / (k1 + Q),
+            Q*N + N == P,           N == P / (k1 + Q),
             Q*N + R*N == P,         N == P / (Q+R),
-            N - N == P,             zero == P,
-            N - Q*N == P,           N == P / (one - Q),
-            Q*N - N == P,           N == P / (Q - one),
+            N - N == P,             k0 == P,
+            N - Q*N == P,           N == P / (k1 - Q),
+            Q*N - N == P,           N == P / (Q - k1),
             Q*N - R*N == P,         N == P / (Q-R),
 
             // Reversible functions
@@ -3798,22 +3810,22 @@ expression_p expression::isolate(symbol_r sym) const
             (Q ^ N) == P,           N == ln(P) / ln(Q),
 
             // Basic simplifications
-            N + N == P,             N == P / two,
-            N + X*N == P,           N == P / (one + X),
-            X*N + N == P,           N == P / (one + X),
+            N + N == P,             N == P / k2,
+            N + X*N == P,           N == P / (k1 + X),
+            X*N + N == P,           N == P / (k1 + X),
             X*N + Y*N == P,         N == P / (X+Y),
-            N - N == P,             zero == P,
-            N - Q*N == P,           N == P / (one - Q),
-            Q*N - N == P,           N == P / (Q - one),
+            N - N == P,             k0 == P,
+            N - Q*N == P,           N == P / (k1 - Q),
+            Q*N - N == P,           N == P / (Q - k1),
             Q*N - R*N == P,         N == P / (Q-R),
 
             // Reversible functions
             inv(N) == P,            N == inv(P),
-            sin(N) == P,            N == asin(P) + two*intk*kpi,
-            cos(N) == P,            N == acos(P) + two*intk*kpi,
+            sin(N) == P,            N == asin(P) + k2*intk*kpi,
+            cos(N) == P,            N == acos(P) + k2*intk*kpi,
             tan(N) == P,            N == atan(P) + intk*kpi,
-            sinh(N) == P,           N == asinh(P) + two*intk*kpi*ki,
-            cosh(N) == P,           N == acosh(P) + two*intk*kpi*ki,
+            sinh(N) == P,           N == asinh(P) + k2*intk*kpi*ki,
+            cosh(N) == P,           N == acosh(P) + k2*intk*kpi*ki,
             tanh(N) == P,           N == atanh(P) + intk*kpi*ki,
             asin(N) == P,           N == sin(P),
             acos(N) == P,           N == cos(P),
@@ -3823,17 +3835,17 @@ expression_p expression::isolate(symbol_r sym) const
             atanh(N) == P,          N == tanh(P),
 
             ln(N) == P,             N == exp(P),
-            exp(N) == P,            N == ln(P) + two*intk*kpi*ki,
+            exp(N) == P,            N == ln(P) + k2*intk*kpi*ki,
             log2(N) == P,           N == exp2(P),
-            exp2(N) == P,           N == log2(P) + two*intk*kpi*ki/ln(two),
+            exp2(N) == P,           N == log2(P) + k2*intk*kpi*ki/ln(k2),
             log10(N) == P,          N == exp10(P),
-            exp10(N) == P,          N == log10(P) + two*intk*kpi*ki/ln(ten),
+            exp10(N) == P,          N == log10(P) + k2*intk*kpi*ki/ln(k10),
             ln1p(N) == P,           N == expm1(P),
-            expm1(N) == P,          N == ln1p(P) + two*intk*kpi*ki,
+            expm1(N) == P,          N == ln1p(P) + k2*intk*kpi*ki,
 
             sq(N) == P,             N == signk*sqrt(P),
             sqrt(N) == P,           N == sq(P),
-            cubed(N) == P,          N == cbrt(P) + exp(intk*kpi*ki/three),
+            cubed(N) == P,          N == cbrt(P) + exp(intk*kpi*ki/k3),
             cbrt(N) == P,           N == cubed(P)
             );
 
@@ -4001,44 +4013,44 @@ expression_p expression::derivative(symbol_r sym) const
     expression_g           eq = this;
     eq = expression::make(ID_Derivative, algebraic_g(eq), algebraic_g(sym));
     expression_g result = eq->rewrites(
-        P>>indep,               zero, // Expression not containing the variable
+        P>>indep,               k0, // Expression not containing the variable
 
         (S(X))>>indep,          S(X), // Special handling for this form
 
-        indep>>indep,           one,
+        indep>>indep,           k1,
         (X + Y)>>indep,         (X>>indep)+(Y>>indep),
         (X - Y)>>indep,         (X>>indep)-(Y>>indep),
         (X * Y)>>indep,         X*(Y>>indep) + (X>>indep)*Y,
         (X / Y)>>indep,         ((X>>indep)*Y-X*(Y>>indep))/sq(Y),
-        (X ^ A)>>indep,         A*(X^(A-one)) * (X>>indep),
+        (X ^ A)>>indep,         A*(X^(A-k1)) * (X>>indep),
 
         A+B,                    A+B,
         A-B,                    A-B,
         A*B,                    A*B,
         A/B,                    A/B,
         A^B,                    A^B,
-        zero*X,                 zero,
-        X*zero,                 zero,
-        zero/X,                 zero,
-        zero+X,                 X,
-        X+zero,                 X,
-        zero-X,                 -X,
-        X-zero,                 X,
-        X*one,                  X,
-        one*X,                  X,
-        X/one,                  X,
-        one/X,                  inv(X),
-        X^zero,                 one,
-        zero^X,                 zero,
-        X^one,                  X,
-        one^X,                  one,
+        k0*X,                   k0,
+        X*k0,                   k0,
+        k0/X,                   k0,
+        k0+X,                   X,
+        X+k0,                   X,
+        k0-X,                   -X,
+        X-k0,                   X,
+        X*k1,                   X,
+        k1*X,                   X,
+        X/k1,                   X,
+        k1/X,                   inv(X),
+        X^k0,                   k1,
+        k0^X,                   k0,
+        X^k1,                   X,
+        k1^X,                   k1,
 
         (X ^ E)>>indep,         (X^E)*((E>>indep)*ln(X) + ((X>>indep)*E)/X),
 
         (-X)>>indep,            -(X>>indep),
         inv(X)>>indep,          -(X>>indep) / sq(X),
         abs(X)>>indep,          (X>>indep)*sign(X),
-        sign(X)>>indep,         zero,
+        sign(X)>>indep,         k0,
 
         sin(X)>>indep,          (X>>indep)*cos(X),
         cos(X)>>indep,          -(X>>indep)*sin(X),
@@ -4047,29 +4059,29 @@ expression_p expression::derivative(symbol_r sym) const
         cosh(X)>>indep,         (X>>indep)*sinh(X),
         tanh(X)>>indep,         (X>>indep)/sq(cosh(X)),
 
-        asin(X)>>indep,         (X>>indep)/sqrt(one-sq(X)),
-        acos(X)>>indep,         -(X>>indep)/sqrt(one-sq(X)),
-        atan(X)>>indep,         (X>>indep)/(one+sq(X)),
-        asinh(X)>>indep,        (X>>indep)/sqrt(one+sq(X)),
-        acosh(X)>>indep,        (X>>indep)/sqrt(sq(X)-one),
-        atanh(X)>>indep,        (X>>indep)/(one-sq(X)),
+        asin(X)>>indep,         (X>>indep)/sqrt(k1-sq(X)),
+        acos(X)>>indep,         -(X>>indep)/sqrt(k1-sq(X)),
+        atan(X)>>indep,         (X>>indep)/(k1+sq(X)),
+        asinh(X)>>indep,        (X>>indep)/sqrt(k1+sq(X)),
+        acosh(X)>>indep,        (X>>indep)/sqrt(sq(X)-k1),
+        atanh(X)>>indep,        (X>>indep)/(k1-sq(X)),
 
         ln(X)>>indep,           (X>>indep)/X,
         exp(X)>>indep,          (X>>indep)*exp(X),
-        log2(X)>>indep,         (X>>indep)/(ln(two)*X),
-        exp2(X)>>indep,         ln(two)*(X>>indep)*exp2(X),
-        log10(X)>>indep,        (X>>indep)/(ln(ten)*X),
-        exp10(X)>>indep,        ln(ten)*(X>>indep)*exp10(X),
-        ln1p(X)>>indep,         (X>>indep)/(X+one),
+        log2(X)>>indep,         (X>>indep)/(ln(k2)*X),
+        exp2(X)>>indep,         ln(k2)*(X>>indep)*exp2(X),
+        log10(X)>>indep,        (X>>indep)/(ln(k10)*X),
+        exp10(X)>>indep,        ln(k10)*(X>>indep)*exp10(X),
+        ln1p(X)>>indep,         (X>>indep)/(X+k1),
         expm1(X)>>indep,        (X>>indep)*exp(X),
 
-        erf(X)>>indep,          (X>>indep)*two/sqrt(kpi)*exp(-sq(X)),
-        erfc(X)>>indep,         -(X>>indep)*two/sqrt(kpi)*exp(-sq(X)),
+        erf(X)>>indep,          (X>>indep)*k2/sqrt(kpi)*exp(-sq(X)),
+        erfc(X)>>indep,         -(X>>indep)*k2/sqrt(kpi)*exp(-sq(X)),
 
-        sq(X)>>indep,           two*X*(X>>indep),
-        sqrt(X)>>indep,         (X>>indep)/(two * sqrt(X)),
-        cubed(X)>>indep,        three*sq(X)*(X>>indep),
-        cbrt(X)>>indep,         (X>>indep)/(three*(sq(cbrt(X))))
+        sq(X)>>indep,           k2*X*(X>>indep),
+        sqrt(X)>>indep,         (X>>indep)/(k2 * sqrt(X)),
+        cubed(X)>>indep,        k3*sq(X)*(X>>indep),
+        cbrt(X)>>indep,         (X>>indep)/(k3*(sq(cbrt(X))))
         );
 
     bool unknown = +result == +eq;
@@ -4179,15 +4191,15 @@ expression_p expression::primitive(symbol_r sym) const
     expression_g result = eq->rewrites(
         P<<indep,               P*indep,
 
-        indep<<indep,                   sq(indep)/two,
+        indep<<indep,                   sq(indep)/k2,
         (-X)<<indep,                    -(X<<indep),
         (X + Y)<<indep,                 (X<<indep)+(Y<<indep),
         (X - Y)<<indep,                 (X<<indep)-(Y<<indep),
         (P * X)<<indep,                 P*(X<<indep),
         (X * P)<<indep,                 P*(X<<indep),
         (X / P)<<indep,                 (X<<indep)/P,
-        (indep ^ mone)<<indep,          ln(indep),
-        (indep ^ P)<<indep,             (indep^(P+one)) / (P+one),
+        (indep ^ kn1)<<indep,           ln(indep),
+        (indep ^ P)<<indep,             (indep^(P+k1)) / (P+k1),
 
         A+B,                            A+B,
         A-B,                            A-B,
@@ -4199,52 +4211,52 @@ expression_p expression::primitive(symbol_r sym) const
         P*(N*Q),                        (P*Q)*N,
         P*N/Q,                          (P/Q)*N,
         P*(N/Q),                        (P/Q)*N,
-        zero*X,                         zero,
-        X*zero,                         zero,
-        zero+X,                         X,
-        X+zero,                         X,
-        X*one,                          X,
-        X/one,                          X,
-        one*X,                          X,
-        one/X,                          inv(X),
-        X^mone,                         inv(X),
+        k0*X,                           k0,
+        X*k0,                           k0,
+        k0+X,                           X,
+        X+k0,                           X,
+        X*k1,                           X,
+        X/k1,                           X,
+        k1*X,                           X,
+        k1/X,                           inv(X),
+        X^kn1,                          inv(X),
         A/X,                            A*inv(X),
-        X^zero,                         one,
-        X^one,                          X,
+        X^k0,                           k1,
+        X^k1,                           X,
         inv(X^A),                       X^-A,
         (X^A)^B,                        X^(A*B),
         X*X*X,                          cubed(X),
         X*sq(X),                        cubed(X),
         sq(X)*X,                        cubed(X),
         X*X,                            sq(X),
-        X^two,                          sq(X),
-        X^three,                        cubed(X),
+        X^k2,                           sq(X),
+        X^k3,                           cubed(X),
 
         // Patterns below in the order of section E-2 of HP50G ARM
-        acos(L)<<indep,                 (L*acos(L)-sqrt(one-sq(L)))/A,
-        acosh(L)<<indep,                (L*acosh(L)-sqrt(sq(L)-one))/A,
-        asin(L)<<indep,                 (L*asin(L)+sqrt(one-sq(L)))/A,
-        asinh(L)<<indep,                (L*asinh(L)-sqrt(one+sq(L)))/A,
-        atan(L)<<indep,                 (L*atan(L)-ln(one+sq(L))/two)/A,
-        atanh(L)<<indep,                (L*atan(L)-ln(one-sq(L))/two)/A,
+        acos(L)<<indep,                 (L*acos(L)-sqrt(k1-sq(L)))/A,
+        acosh(L)<<indep,                (L*acosh(L)-sqrt(sq(L)-k1))/A,
+        asin(L)<<indep,                 (L*asin(L)+sqrt(k1-sq(L)))/A,
+        asinh(L)<<indep,                (L*asinh(L)-sqrt(k1+sq(L)))/A,
+        atan(L)<<indep,                 (L*atan(L)-ln(k1+sq(L))/k2)/A,
+        atanh(L)<<indep,                (L*atan(L)-ln(k1-sq(L))/k2)/A,
         cos(L)<<indep,                  sin(L)/A,
         inv(cos(L))<<indep,             ln(abs(tan(L)+inv(cos(L))))/A,
         inv(cosh(L))<<indep,            atan(sinh(L))/A,
-        inv(sin(L))<<indep,             ln(abs(tan(L/two)))/A,
-        inv(sinh(L))<<indep,            ln(abs(tanh(L/two)))/A,
+        inv(sin(L))<<indep,             ln(abs(tan(L/k2)))/A,
+        inv(sinh(L))<<indep,             ln(abs(tanh(L/k2)))/A,
         inv(cos(L)*sin(L))<<indep,      ln(tan(L))/A,
         cosh(L)<<indep,                 sinh(L)/A,
         inv(cosh(L)*sinh(L))<<indep,    ln(tan(L))/A,
         inv(sinh(L)*cosh(L))<<indep,    ln(tan(L))/A,
         inv(sq(cosh(L)))<<indep,        tanh(L)/A,
         exp(L)<<indep,                  exp(L)/A,
-        exp10(L)<<indep,                exp10(L)/(A*ln(ten)),
-        exp2(L)<<indep,                 exp2(L)/(A*ln(two)),
-        expm1(L)<<indep,                (expm1(L)-L+one)/A,
+        exp10(L)<<indep,                exp10(L)/(A*ln(k10)),
+        exp2(L)<<indep,                 exp2(L)/(A*ln(k2)),
+        expm1(L)<<indep,                (expm1(L)-L+k1)/A,
         ln(L)<<indep,                   (L*ln(L)-L)/A,
-        log10(L)<<indep,                (L*log10(L)-L/ln(ten))/A,
-        log2(L)<<indep,                 (L*log2(L)-L/ln(two))/A,
-        ln1p(L)<<indep,                 ((L-one)*ln1p(L)-(L-one))/A,
+        log10(L)<<indep,                (L*log10(L)-L/ln(k10))/A,
+        log2(L)<<indep,                 (L*log2(L)-L/ln(k2))/A,
+        ln1p(L)<<indep,                 ((L-k1)*ln1p(L)-(L-k1))/A,
         sign(L)<<indep,                 abs(L)/A,
         sin(L)<<indep,                  -cos(L)/A,
         inv(sin(L)*cos(L))<<indep,      ln(tan(L))/A,
@@ -4262,25 +4274,25 @@ expression_p expression::primitive(symbol_r sym) const
         (tanh(L)/cosh(L))<<indep,       inv(cosh(L))/A,
         inv(tanh(L))<<indep,            ln(sinh(L))/A,
         inv(tanh(L)*sinh(L))<<indep,    -inv(sinh(L))/A,
-        (L^zero)<<indep,                L/A,
+        (L^k0)<<indep,                  L/A,
         (P/L)<<indep,                   P*ln(abs(L))/A,
         ((P+N)/L)<<indep,               P*ln(abs(L))/A+((N/L)<<indep),
         ((N+P)/L)<<indep,               P*ln(abs(L))/A+((N/L)<<indep),
         ((P*indep)/L)<<indep,           (P*(A*indep+B-B*ln(abs(A*indep+B))))/sq(A),
         (P^L)<<indep,                   (P^L)/(A*ln(P)),
         inv(L)<<indep,                  ln(abs(L))/A,
-        inv(one-(sq(L)))<<indep,        atanh(L)/A,
-        inv(one+(sq(L)))<<indep,        atan(L)/A,
-        inv(sqrt((sq(L))-one))<<indep,  acosh(L)/A,
-        inv(sqrt(one-(sq(L))))<<indep,  asin(L)/A,
-        inv(sqrt(one+(sq(L))))<<indep,  asinh(L)/A,
-        inv((sqrt(sq(L))+one))<<indep,  asinh(L)/A,
-        sq(L)<<indep,                   cubed(L)/(three*A),
-        cubed(L)<<indep,                (L^four)/(four*A),
-        sqrt(L)<<indep,                 ((two/three)*cubed(sqrt(L)))/A,
-        inv(sqrt(L))<<indep,            two*sqrt(L)/A,
-        cbrt(L)<<indep,                 ((three/four)*(cbrt(L)^four))/A,
-        inv(cbrt(L))<<indep,            ((three/two)*sq(cbrt(L)))/A
+        inv(k1-(sq(L)))<<indep,         atanh(L)/A,
+        inv(k1+(sq(L)))<<indep,         atan(L)/A,
+        inv(sqrt((sq(L))-k1))<<indep,   acosh(L)/A,
+        inv(sqrt(k1-(sq(L))))<<indep,   asin(L)/A,
+        inv(sqrt(k1+(sq(L))))<<indep,  asinh(L)/A,
+        inv((sqrt(sq(L))+k1))<<indep,   asinh(L)/A,
+        sq(L)<<indep,                   cubed(L)/(k3*A),
+        cubed(L)<<indep,                (L^k4)/(k4*A),
+        sqrt(L)<<indep,                 ((k2/k3)*cubed(sqrt(L)))/A,
+        inv(sqrt(L))<<indep,            k2*sqrt(L)/A,
+        cbrt(L)<<indep,                 ((k3/k4)*(cbrt(L)^k4))/A,
+        inv(cbrt(L))<<indep,            ((k3/k2)*sq(cbrt(L)))/A
         );
 
     bool unknown = +result == +eq;

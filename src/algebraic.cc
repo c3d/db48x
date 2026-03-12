@@ -57,6 +57,8 @@
 #include <cmath>
 #include <cstdio>
 
+using namespace eq_wildcards;
+
 
 RECORDER(algebraic,       16, "RPL Algebraics");
 RECORDER(algebraic_error, 16, "Errors processing a algebraic");
@@ -594,21 +596,6 @@ bool algebraic::to_fraction(algebraic_g &x)
 template <byte ...args>
 constexpr byte eq<args...>::object_data[sizeof...(args)+2];
 
-static const eq_symbol<'x'>     x;
-static const eq_symbol<'p'>     p;
-static const eq_symbol<'q'>     q;
-static const eq_symbol<'s'>     s;
-static const eq_symbol<'t'>     t;
-static const eq_integer<0>      k0;
-static const eq_integer<1>      k1;
-static const eq_integer<2>      k2;
-static const eq_integer<3>      k3;
-static const eq_integer<5>      k5;
-static const eq_integer<7>      k7;
-static const eq_integer<10>     k10;
-static const eq_pi              pi;
-static const eq_e               e;
-
 static algebraic_p        check_quotient_patterns(algebraic_r value,
                                                   algebraic_g &bestq,
                                                   size_t       npats,
@@ -622,12 +609,12 @@ static algebraic_p        check_quotient_patterns(algebraic_r value,
     symbol_g    qq      = expression_p(q.as_bytes())->as_quoted<symbol>();
     symbol_g    ss      = expression_p(s.as_bytes())->as_quoted<symbol>();
     symbol_g    tt      = expression_p(t.as_bytes())->as_quoted<symbol>();
-    algebraic_g best    = value;
-    algebraic_g p       = nullptr;
-    algebraic_g q       = nullptr;
-    algebraic_g one     = integer::make(1);
-    algebraic_g s       = one;
-    algebraic_g t       = one;
+    algebraic_g best   = value;
+    algebraic_g numer  = nullptr;
+    algebraic_g denom  = nullptr;
+    algebraic_g unity  = integer::make(1);
+    algebraic_g sq_s   = unity;
+    algebraic_g sq_t   = unity;
 
     record(quotient, ">Check patterns for %t", +value);
 
@@ -644,29 +631,29 @@ static algebraic_p        check_quotient_patterns(algebraic_r value,
                     if (val->is_fraction())
                     {
                         fraction_p frac = fraction_p(+val);
-                        p               = bignum::smaller(frac->numerator());
-                        q               = bignum::smaller(frac->denominator());
-                        record(quotient, "Fraction %t = %t/%t", +val, +p, +q);
+                        numer           = bignum::smaller(frac->numerator());
+                        denom           = bignum::smaller(frac->denominator());
+                        record(quotient, "Fraction %t = %t/%t", +val, +numer, +denom);
                     }
                     else
                     {
                         if (val->is_bignum())
                             val = bignum::smaller(bignum_p(+val));
-                        p = val;
-                        q = one;
+                        numer = val;
+                        denom = unity;
                         record(quotient, "Non-fraction %t", +val);
                     }
-                    if (!p || !q)
+                    if (!numer || !denom)
                         return nullptr;
 
-                    integer_p ip = p->as_small_integer();
-                    integer_p iq = q->as_small_integer();
+                    integer_p ip = numer->as_small_integer();
+                    integer_p iq = denom->as_small_integer();
                     if (!ip || !iq)
                     {
                         record(quotient,
                                "Skipping, p is %+s, q is %+s",
-                               object::fancy(p->type()),
-                               object::fancy(q->type()));
+                               object::fancy(numer->type()),
+                               object::fancy(denom->type()));
                         continue;
                     }
 
@@ -680,21 +667,21 @@ static algebraic_p        check_quotient_patterns(algebraic_r value,
                         ularge ps, pr, qs, qr;
                         extract_square_factor(pv, ps, pr);
                         extract_square_factor(qv, qs, qr);
-                        s = fraction::make(ps, qs);
-                        t = fraction::make(pr, qr);
-                        q = integer::make(std::max(qr, qs));
+                        sq_s = fraction::make(ps, qs);
+                        sq_t = fraction::make(pr, qr);
+                        denom = integer::make(std::max(qr, qs));
                         record(quotient,
-                               "Squares: p=%t s=%t q=%t t=%t", +p, +s, +q, +t);
+                               "Squares: p=%t s=%t q=%t t=%t", +numer, +sq_s, +denom, +sq_t);
                     }
 
-                    if (!bestq || algebraic::compare(bestq, q) > 0)
+                    if (!bestq || algebraic::compare(bestq, denom) > 0)
                     {
                         record(quotient, "Replace with %t (%+s)", dst,
                                squares ? "has squares" : "no squares");
                         val = squares
-                            ? expression_p(dst->substitute(ss, +s, tt, +t))
+                            ? expression_p(dst->substitute(ss, +sq_s, tt, +sq_t))
                             : fractions
-                            ? expression_p(dst->substitute(pp, +p, qq, +q))
+                            ? expression_p(dst->substitute(pp, +numer, qq, +denom))
                             : expression_p(dst->substitute(xx, +val));
                         record(quotient, "After substitution %t", +val);
                         if (val)
@@ -704,9 +691,9 @@ static algebraic_p        check_quotient_patterns(algebraic_r value,
                                     val = qa;
                             best  = +val;
                             record(quotient, "Best is %t", +best);
-                            bestq = q;
-                            if (p->is_zero() || p->is_one() ||
-                                q->is_zero() || q->is_one())
+                            bestq = denom;
+                            if (numer->is_zero() || numer->is_one() ||
+                                denom->is_zero() || denom->is_one())
                                 break;
                         }
                     }
@@ -771,23 +758,23 @@ static bool to_quotient_real(algebraic_g &value)
         if (expression_p expr = r->as<expression>())
             r = expr->rewrites<expression::DOWN>(
                 // Multiplicative simplifications
-                k0 * x,    k0,
-                k1 * x,     x,
-                x * k0,    k0,
-                x * k1,     x,
-                k0 / x,    k0,
-                x / k1,     x,
-                x / x,       k1,
-                x * (p/q),   x*p/q,
+                k0 * x, k0,
+                k1 * x, x,
+                x * k0, k0,
+                x * k1, x,
+                k0 / x, k0,
+                x / k1, x,
+                x / x,   k1,
+                x * (p/q), x*p/q,
 
                 // Power simplifications
                 sqrt(k1/x), sqrt(x)/x,
-                sqrt(k1),   k1,
-                sqrt(k0),  k0,
-                k0^x,      k0,
-                k1^x,       k1,
-                x^k0,      k1,
-                x^k1,       x);
+                sqrt(k1), k1,
+                sqrt(k0), k0,
+                k0^x, k0,
+                k1^x, k1,
+                x^k0, k1,
+                x^k1, x);
         record(quotient, "Simplifies as %t", +r);
         if (r)
             value = neg ? expression::make(object::ID_neg, r) : r;
