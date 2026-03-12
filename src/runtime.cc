@@ -178,10 +178,10 @@ void runtime::reset()
 //
 // ============================================================================
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 size_t runtime::available()
 // ----------------------------------------------------------------------------
@@ -705,9 +705,9 @@ void runtime::move_globals(object_p to, object_p from)
     uncache(from, moving);
 }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 
 
@@ -1659,10 +1659,10 @@ bool runtime::constants(size_t nentries)
 //
 // ============================================================================
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 bool runtime::run_conditionals(object_p truecase, object_p falsecase, bool xeq)
 // ----------------------------------------------------------------------------
@@ -1948,9 +1948,9 @@ void runtime::call_stack_drop()
         s[0] = s[-CALLS_BLOCK];
 }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 
 // ============================================================================

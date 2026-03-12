@@ -43,6 +43,7 @@
 #include <string>
 #include <vector>
 
+#undef RELEASE
 
 struct tests
 // ----------------------------------------------------------------------------

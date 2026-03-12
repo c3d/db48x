@@ -14185,6 +14185,7 @@ void tests::plotting_all_functions()
 
     uint dur = 1500;
 
+    #undef FUNCTION
 #define FUNCTION(name)                                          \
     step("Plotting " #name)                                     \
         .test(CLEAR, "'" #name "(x)'", LENGTHY(dur), F1)        \

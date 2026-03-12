@@ -236,7 +236,7 @@ struct object
     }
 
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif // DM42
@@ -364,7 +364,7 @@ struct object
     //   Render like for the `Show` command
     // ------------------------------------------------------------------------
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif
 
@@ -576,7 +576,7 @@ struct object
     //
     // ========================================================================
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif
@@ -884,7 +884,7 @@ struct object
         return nullptr;
     }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif
 
@@ -1025,7 +1025,7 @@ struct object
 protected:
     static const dispatch   handler[NUM_IDS];
 
-#if DEBUG
+#if SIMULATOR
 public:
     cstring debug() const;
 #endif
