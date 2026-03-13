@@ -49,7 +49,7 @@ If the list or array contains (nested) lists or arrays then these are recursivel
 depending on the setting of the MapOneLevel / MapRecursive flag.
 On the HP 50g the command works recursively (See the "HP 50g advanced user's reference manual").
 With DB48x rpl the default is MapRecursive also.
-I can be set to MapOneLevel to get the behaviour of with most programming languages.
+It can be set to MapOneLevel to get the behaviour of most programming languages.
 
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
 
