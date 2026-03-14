@@ -258,15 +258,31 @@ COMMAND_BODY(ConstantName)
 //   Put the name of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    unicode pfx = ui.character_left_of_cursor();
-    const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
-                                : pfx == L'Ⓢ' ? standard_uncertainty::standard
-                                              : constant::constants;
-    if (object_p cstobj = constant::do_key(cfg, key))
-        if (constant_p cst = cstobj->as<constant>())
-            if (rt.push(cst))
-                return OK;
+    if (int key = ui.evaluating_function_key())
+    {
+        unicode pfx = ui.character_left_of_cursor();
+        const constant::config &cfg =
+            pfx == L'Ⓡ' ? relative_uncertainty::relative
+          : pfx == L'Ⓢ' ? standard_uncertainty::standard
+                         : constant::constants;
+        if (object_p cstobj = constant::do_key(cfg, key))
+            if (constant_p cst = cstobj->as<constant>())
+                if (rt.push(cst))
+                    return OK;
+    }
+    else if (object_p top = rt.top())
+    {
+        id ty = top->type();
+        if (ty == ID_constant ||
+            ty == ID_standard_uncertainty ||
+            ty == ID_relative_uncertainty)
+        {
+            constant_p cst = constant_p(top);
+            if (constant_p name = constant::make(ID_constant, cst->index()))
+                if (rt.top(name))
+                    return OK;
+        }
+    }
     if (!rt.error())
         rt.type_error();
     return ERROR;
@@ -303,12 +319,27 @@ COMMAND_BODY(ConstantValue)
 //   Put the value of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    if (object_p cstobj = constant::do_key(constant::constants, key))
-        if (constant_p cst = cstobj->as<constant>())
+    if (int key = ui.evaluating_function_key())
+    {
+        if (object_p cstobj = constant::do_key(constant::constants, key))
+            if (constant_p cst = cstobj->as<constant>())
+                if (algebraic_p value = cst->numerical_value())
+                    if (rt.push(value))
+                        return OK;
+    }
+    else if (object_p top = rt.top())
+    {
+        id ty = top->type();
+        if (ty == ID_constant ||
+            ty == ID_standard_uncertainty ||
+            ty == ID_relative_uncertainty)
+        {
+            constant_p cst = constant_p(top);
             if (algebraic_p value = cst->numerical_value())
-                if (rt.push(value))
+                if (rt.top(value))
                     return OK;
+        }
+    }
     if (!rt.error())
         rt.type_error();
     return ERROR;
