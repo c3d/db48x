@@ -305,49 +305,45 @@ COMMAND_BODY(AddData)
 //   Add data to the stats data
 // ----------------------------------------------------------------------------
 {
-    if (rt.args(1))
+    if (object_p value = rt.top())
     {
-        if (object_p value = rt.top())
+        size_t columns = 1;
+        if (array_p row = value->as<array>())
         {
-            size_t columns = 1;
-            if (array_p row = value->as<array>())
+            columns = 0;
+            for (object_p item : *row)
             {
-                columns = 0;
-                for (object_p item : *row)
+                columns++;
+                if (!item->is_real() && !item->is_complex())
                 {
-                    columns++;
-                    if (!item->is_real() && !item->is_complex())
-                    {
-                        rt.invalid_stats_data_error();
-                        return ERROR;
-                    }
+                    rt.invalid_stats_data_error();
+                    return ERROR;
                 }
             }
-            else if (value->is_real() || value->is_complex())
-            {
-                value = array::wrap(value);
-            }
-            else
-            {
-                rt.type_error();
-                return ERROR;
-            }
-
-            StatsData::Access stats;
-            if (stats.rows && columns != stats.columns)
-            {
-                rt.invalid_stats_data_error();
-                return ERROR;
-            }
-
-            if (!stats.data)
-                stats.data = array_p(array::make(ID_array, nullptr, 0));
-            stats.data = stats.data->append(value);
-            rt.drop();
-            return OK;
         }
-    }
+        else if (value->is_real() || value->is_complex())
+        {
+            value = array::wrap(value);
+        }
+        else
+        {
+            rt.type_error();
+            return ERROR;
+        }
 
+        StatsData::Access stats;
+        if (stats.rows && columns != stats.columns)
+        {
+            rt.invalid_stats_data_error();
+            return ERROR;
+        }
+
+        if (!stats.data)
+            stats.data = array_p(array::make(ID_array, nullptr, 0));
+        stats.data = stats.data->append(value);
+        rt.drop();
+        return OK;
+    }
     return ERROR;
 }
 
@@ -1620,10 +1616,6 @@ COMMAND_BODY(FrequencyBins)
 // ----------------------------------------------------------------------------
 //  Stack: xmin xwidth nbins -> [[n1 ... nn]] [nlow nhigh]
 {
-    // Get the three parameters from the stack
-    if (!rt.args(3))
-        return ERROR;
-
     algebraic_g xmin   = algebraic_p(rt.stack(2));
     algebraic_g xwidth = algebraic_p(rt.stack(1));
     algebraic_g nbins  = algebraic_p(rt.stack(0));

@@ -37,6 +37,9 @@
 	"Recursion", "="
 	"UnitsBenchmark", "="
 
+"Examples"
+        "InteractiveMenu", "="
+
 "Configs"
 
 	"Cst",		"=/config/constants.csv"

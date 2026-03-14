@@ -104,12 +104,36 @@ struct library_menu : constant_menu
 };
 
 
+struct library_menu_name : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a library name
+// ----------------------------------------------------------------------------
+{
+    library_menu_name(id type) : object(type) {}
+    OBJECT_DECL(library_menu_name);
+    EVAL_DECL(library_menu_name);
+    INSERT_DECL(library_menu_name);
+    HELP_DECL(library_menu_name);
+};
+
+
+struct library_menu_value : object
+// ----------------------------------------------------------------------------
+//    A menu entry that inserts a library value
+// ----------------------------------------------------------------------------
+{
+    library_menu_value(id type) : object(type) {}
+    OBJECT_DECL(library_menu_value);
+    EVAL_DECL(library_menu_value);
+    INSERT_DECL(library_menu_value);
+    HELP_DECL(library_menu_value);
+};
+
+
 #define ID(i)
 #define LIBRARY_MENU(LibMenu)           struct LibMenu : library_menu {};
 #include "ids.tbl"
 
-COMMAND_DECLARE_INSERT_HELP(XlibName,-1);
-COMMAND_DECLARE_INSERT_HELP(XlibValue,-1);
 COMMAND_DECLARE(XLib, 1);
 
 COMMAND_DECLARE(Attach, 1);

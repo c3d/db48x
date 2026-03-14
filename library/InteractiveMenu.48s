@@ -1,0 +1,12 @@
+«
+   'C=SQRT(A^2+B^2)' STEQ SOLVINGMENU
+   HALT
+   @Hit RUN key (=) to resume when done
+   "A=" A + 1 DISP
+   "B=" B + 2 DISP
+   "C=" C + 3 DISP
+   { A B C } PURGE
+   "Variables purged" 5 DISP
+   "Press a key to continue" 6.5 DISP
+   -1 WAIT
+»

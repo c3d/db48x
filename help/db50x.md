@@ -4346,6 +4346,49 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.17 - Rational approximation, indexing, Android fixes
+
+This incremental release delivers new features and fixes a number of bugs.
+
+### New features
+
+* Add `→Qπ` command for rational approximation with π, √n, ln(n) and e
+* Apply `→Q` and `→Qπ` to numbers in expressions
+* Add array/list indexing support in algebraic expressions e.g. `'L(1)'`
+* Add ability to `Store` / `Copy` to `L(1)`
+* Add "real" `ConstantName` and `ConstantValue` commands
+
+### Bug fixes
+
+* Fix parentheses around exponents in graph rendering of `'(a+b)^(c+d)'`
+* Fix label for `ToRelativeUncertainty`, `→RelRnd` instead of `→RelUnc`
+* Fix command alias mapping for `RNrm`
+* Improve parsing of implicit multiplication for a number of edge cases
+* Fix `utf8_next` for garbage bytes following ASCII characters
+* Fix unsatisfied symbol errors with gcc/emcc in the WASM build
+* Save Android system state when app is suspended or hidden
+* Ensure Android help resources are extracted and available at runtime
+* Restore image testing functionality in the test framework
+* Updated test images that had become obsolete
+* Report errors when saving reference files in tests
+* Avoid stack corruption / crash when parsing malformed help index
+* Fix computation of `DFC(2.3)`
+* Fix null-pointer crash if the multiple equation solver fails
+
+
+### Enhancements
+
+* Constrain `→Q` and `→Qπ` behavior to FIX/SCI/ENG setting (like HPs)
+* Minor optimization for `program::run`
+* Save about 3.4K of RAM on physical devices
+* Speed up test runs while increasing default wait time for stability
+* Documentation cleanup and additions, add more RPL examples
+* Add clear build-time error message when a help topic exceeds 80 characters
+* Add demo for interactive menu use
+* Optimize away redundant argument checking
+* Documentation for DCF and DCF2F
+
+
 ## Release 0.9.16 - Factorization, precision fixes, and documentation
 
 This release adds prime and factorization features, improves numeric precision,
@@ -4360,16 +4403,18 @@ and expands simulator and user documentation.
 * Add simulator recorder dump on `F16`; move demo playback to `F13`-`F15`
 * Paint navigation arrows in `SHOW`
 * Accept `CR/LF` line endings when reading Windows files
+* Display keyboard access paths in help for commands
 
 ### Bug fixes
 
 * Fix `expm1` precision loss for small arguments, including complex values
 * Fix `ln1p` precision loss for small arguments
-* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Fix shift behavior after transient alpha, support shift/xshift for transalpha
 * Reset `show_x` and `show_y` when exiting `SHOW`
 * Ensure the simulator creates the `screens` directory when needed
 * Fix an infinity optimization regression in arithmetic
 * Add missing null-dereference checks in factorization code
+* Treat `^` as right-associative like on the HP50G
 
 ### Enhancements
 
@@ -4380,6 +4425,7 @@ and expands simulator and user documentation.
 * Add build preparation for upcoming make-it-quick integration
 * Welcome several new authors to the team, see AUTHORS file
 * Add LEGAL-NOTICE.md about compliance with California and Colorado laws
+* Add menu entries for `hypot` and `atan2`
 
 ## Release 0.9.15 "Myriam" - GitHub automation, portability
 
@@ -5805,7 +5851,6 @@ implemented by the time the project reaches version 1.0.
 * `PUSH`
 * `PVIEW`
 * `PX→C`
-* `→Qπ`
 * `qr`
 * `QR`
 * `QUAD`
@@ -9862,20 +9907,6 @@ Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## →Rectangular
-
-Convert vector or complex to cartesian coordinates
-
-
-## →Polar
-
-Convert vector or complex to polar coordinates
-
-
-## →Spherical
-
-Convert vector or complex to spherical coordinates
-
 ## R→D
 
 Convert radians to degrees.
@@ -10107,12 +10138,6 @@ Greatest common divisor
 ## LCM
 Least common multiple
 
-
-## IDIV2
-Integer division, get quotient and remainder.
-On DB50X, this is an alias for [div2](#div2).
-
-`Y` `X` ▶ `IP(Y/X)` `Y rem X`
 
 ## IQUOT
 Quotient of the integer division
@@ -10675,16 +10700,16 @@ Extract modulus and argument from a complex number in polar form
 Make a complex number in polar form from argument and modulus
 
 ## ToRectangular
-Convert a complex number to rectangular form
+Convert a complex number or vector to rectangular (cartesian) form.
 
 ## ToPolar
-Convert a complex number or a 2D or 3D vector to polar form
+Convert a complex number or a 2D or 3D vector to polar form.
 
 ## ToCylindrical
 Convert a 3D vector to cylindrical form
 
 ## ToSpherical
-Convert a 3D vector to spherical form
+Convert a 3D vector to spherical form.
 
 ## To2DVector
 Make a 2D vector from two components
@@ -10696,28 +10721,12 @@ Make a 3D vector from three components
 Expand a vector into its individual components
 # Lists, Matrix and String commands
 
-## PUT
-Replace an item in a composite
-
-
 ## PUTI
 Replace an item and increase index
 
 
-## GET
-Extract an item from a composite
-
-
 ## GETI
 Extract an item and increase index
-
-
-## HEAD
-Extract the first item in a composite
-
-
-## TAIL
-Removes the first item in a composite
 
 
 ## OBJDECOMP
@@ -10832,6 +10841,24 @@ The name can be given as a symbol or as text.
 `'c'` ▶ `299792458_m/s`
 
 
+## StandardUncertainty
+
+Returns the standard uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the absolute
+uncertainty (denoted Ⓢ*X* in expressions) conforming to CODATA.
+
+`'c'` `StandardUncertainty` ▶ `0_m/s`
+
+
+## RelativeUncertainty
+
+Returns the relative uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the relative
+uncertainty (denoted Ⓡ*X* in expressions) conforming to CODATA.
+
+`'c'` `RelativeUncertainty` ▶ `0`
+
+
 ## LibraryEquation
 
 Returns the value of a library equation from the equation library.
@@ -10847,6 +10874,31 @@ The name can be given as a symbol or as text.
 
 `'Dedicace'"` ▶ `"À tous ceux qui se souviennent de Maubert électronique"`
 
+
+## ConstantName
+
+Return the name for a given constant, as text
+
+```rpl
+Ⓒπ ConstantName
+@ Expecting "π"
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
+
+
+## ConstantValue
+
+Return the value for a given constant
+
+```rpl
+Ⓒπ ConstantValue
+@ Expecting 3.14159 26535 9
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
 
 # Precision control
 
@@ -12410,29 +12462,6 @@ Generate an integral sign of the given size
 45 GraphicIntegral
 @ Image check
 ```
-
-
-## Header
-
-The `Header` command updates a special variable also called `Header`.
-
-When that variable is present, it must evaluate to something that can render
-graphically, either directly a graphic object or a (possibly multi-line) text.
-
-When a header is provided, the normal content of the header, i.e. date, time and
-name of the state file, is no longer shown.  However, annunciators and battery
-status are still overimposed.
-
-It is the responsibility of the programmer to ensure that the header program
-does not draw important data at these locations, and also to make sure that the
-header program is "well behaved", i.e. does not leave things on stack. If the
-header program generates an error, then that error may get in the way of normal
-calculator operations.
-
-```rpl
-« TIME " " PATH TAIL TOTEXT + + "
-" + DATE + " Mem: " + MEM + » HEADER
-```
 # Library Management
 
 DB48x features a [library](#library) that can contain arbitary RPL code,
@@ -12538,17 +12567,6 @@ at the deepest level in the stack. This is the opposite of [→List](#tolist). T
 
 `{ A B ... }` ▶ `A` `B` ... `Count`
 
-
-## List→
-
-Expand a list on the stack and return the number of elements. After executing
-the command, level 1 contains the number of elements, and a corresponding number
-of stack levels contain individual elements of the list, the first element being
-at the deepest level in the stack. This is the opposite of [→List](#tolist). The
-[Obj→](#fromobj) command performs the same operation when applied to a list.
-
-`{ A B ... }` ▶ `A` `B` ... `Count`
-
 ## Head
 
 Return the first element of a list, or an `Invalid dimension` error if the list
@@ -12569,6 +12587,14 @@ Apply an operation on all elements in a list or array. The operation on the
 first level of the stack should take one argument and return a single value.
 
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
+
+The operation applies recursively to inner lists.
+
+```rpl
+{ 1 2 { 3 4 } } « →STR » MAP
+@ Expecting { "1" "2" { "3" "4" } }
+
+```
 
 ## Reduce
 
@@ -13511,6 +13537,37 @@ integrate as the previous one, so the maximum number of samples taken is in the
 order of `2^IntegrationIterations`.
 
 
+# Continued fractions
+
+## DFC
+
+Decompose a real number into its continued fraction coefficients (Décomposition
+en Fraction Continue).
+
+`X` ▶ `{ a0 a1 a2 … }`
+
+Returns a list of integers such that *X* ≈ a₀ + 1/(a₁ + 1/(a₂ + …)). For
+integers the result is a single-element list. For rationals the expansion is
+exact and finite. For decimals and irrationals (π, *e*, √2, etc.), the expansion
+stops when the next convergent would exceed the precision of the input.
+
+Examples: `22/7 DFC` → `{ 3 7 }`, `2 √ DFC` → `{ 1 2 2 2 … }`.
+
+The inverse `DFC2F` reconstructs the value from the coefficient list.
+
+## DFC2F
+
+Reconstruct a real number from its continued fraction coefficient list.
+
+`{ a0 a1 … an }` ▶ `a0 + 1/(a1 + 1/(… + 1/an))`
+
+Evaluates the list right-to-left to produce a rational or decimal result.
+`DFC2F(DFC(x))` gives an exact round-trip for integers and fractions, and an
+approximate round-trip for irrationals within the current precision.
+
+Example: `{ 3 7 } DFC2F` → `22/7`.
+
+
 # Numerical conversions
 
 ## →Num
@@ -13524,6 +13581,30 @@ Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
 The precision of the conversion in digits is defined by
 [→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
 conversion is defined by [→FracDigits](#ToFractionIterations)
+
+## →Qπ
+
+Convert decimal values to a rational form, or a rational form with π, square
+roots, natural logs, or the Euler constant *e* factored out, whichever yields
+the smaller denominator.
+
+The rational result is a "best guess", since there might be more than one
+rational expression consistent with the argument. `→Qπ` finds a quotient of
+integers that agrees with the argument to the number of decimal places specified
+by the display format mode.
+
+For example, `3.14159265359 →Qπ` gives `π`, `1.4142135624 →Qπ` gives `√2`,
+and `0.346573590280 →Qπ` gives `ln 2/2`.
+
+For a complex argument, the real or imaginary part (or both) can have a constant
+factor.
+
+The [→QπMaxPrime](#→qπmaxprime) setting (default 100, max 10000)
+limits which primes are tried when factoring squares for √*n* detection. Lower
+values speed up conversion on resource-constrained hardware.
+
+The algorithm attempts: π; any √*n* (by squaring and factoring); ln 2, ln 3,
+ln 5, ln 7, ln 10; *e*; *e*^(p/q); and combined factors π·√2, π·√3.
 
 ## →Integer
 
@@ -14558,15 +14639,15 @@ Display comands using the long form, for example `Store`.
 
 Display names using the short form in lower case, for example `varName` will show as `varname`.
 
-## UpperCase
+## UpperCaseNames
 
 Display names using the short form in upper case, for example `varName` will show as `VARNAME`.
 
-## Capitalized
+## CapitalizedNames
 
 Display names using the short form capitalized, for example `varName` will show as `VarName`.
 
-## LongForm
+## LongFormNames
 
 Display names using the long form, for example `varName` will show as `varName`.
 
@@ -14677,15 +14758,6 @@ bits is limited only by memory and performance.
 
 Return the current [word size](#wordsize) in bits.
 
-## STWS
-
-`STWS` is a compatibility spelling for the [WordSize](#wordsize) command.
-
-## RCWS
-
-`RCWS` is a compatibility spelling for the [RecallWordSize](#recallwordsize)
-command.
-
 
 # Command tuning
 
@@ -14711,6 +14783,16 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
 
+## →QπMaxPrime
+
+Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
+conversion. When converting a decimal to a rational form with π, √*n*, ln, or *e*
+factors, the algorithm squares the value, converts to a fraction, then factors out
+perfect squares from the numerator and denominator. This setting limits which
+primes are tried (2 to 10000, default 100). Lower values speed up conversion on
+DM32/DM32 at the cost of missing some √*n* simplifications for numbers whose
+square has large prime factors.
+
 
 # User interface
 
@@ -14721,9 +14803,20 @@ labels, rounded or square.
 
 ## Header
 
-This command can be used to define a program that is evaluated when drawing the
-header, i.e. what is shown above the stack. The header should be returned as a
-text, and leave room for the battery to display.
+The `Header` command updates a special variable also called `Header`.
+
+When that variable is present, it must evaluate to something that can render
+graphically, either directly a graphic object or a (possibly multi-line) text.
+
+When a header is provided, the normal content of the header, i.e. date, time and
+name of the state file, is no longer shown.  However, annunciators and battery
+status are still overimposed.
+
+It is the responsibility of the programmer to ensure that the header program
+does not draw important data at these locations, and also to make sure that the
+header program is "well behaved", i.e. does not leave things on stack. If the
+header program generates an error, then that error may get in the way of normal
+calculator operations.
 
 For example, the following shows the current time, the current path, the date
 and free memory in a two-line header, with a 10 second `CustomHeaderRefresh`.
@@ -14753,7 +14846,7 @@ Display menus on a single row, with labels changing using shift.
 
 Display menus on a single row, flattened across multiple pages.
 
-## RoundedMenu
+## RoundedMenus
 
 Display menus using rounded black or white tabs.
 
@@ -14823,9 +14916,9 @@ rendering.
 
 This is the opposite of [TextStackDisplay](#textstackdisplay)
 
-## TextStacktDisplay
+## TextStackDisplay
 
-Display the stack levels above the first one using a text-only representations.
+Display the stack levels above the first one using a text-only representation.
 
 This is the opposite of [GraphicStackDisplay](#graphicstackdisplay)
 
@@ -14879,7 +14972,7 @@ editing.
 Show empty menu entries. For example, when selecting the `VariablesMenu` and
 there is no variable defined, an empty menu shows up.
 
-## HideEmptyMenu.
+## HideEmptyMenu
 
 Restore the default behaviour where empty menus entries are not shown, leaving
 more space for the stack display.
@@ -14981,9 +15074,9 @@ This is the way RPL in HP calculators works.
 
 When this setting is set, DB50X behaves like the HP48S and later HP devices and
 evaluates lists as if they were programs. For example, `{ 1 2 + } EVAL` returns
-`3`. The default is [ListsAsData](#listsasdata).
+`3`. The default is [ListAsData](#listasdata).
 
-## ListsAsData
+## ListAsData
 
 When this setting is set, DB50X behaves like the HP28 and evaluates lists as
 data. For example, `{ 1 2 + } EVAL` returns `{ 1 2 + }`.
@@ -15276,13 +15369,20 @@ END
 As an extension to the HP implementation, `ROOT` can solve systems of equations
 and multiple variables by solving them one equation at a time, a programmatic version of what the HP50G Advanced Reference Manual calls the Multiple Equation Solver (`MINIT`, `MITM` and `MSOLVR` commands).
 
-## SolvingMenuSolve
+## Solving Menu Solve Key
 
-Solve the system of equations for the given variable.
+A variable name followed by "?" will solve the system of equations for the given
+variable.
 
-## SolvingMenuRecall
+## Solving Menu Recall Key
 
-Recall the current value of a variable in a system of equations. The value is returned as an assignment.
+A variable name followed by ▶ will recall the value of the given equation. The
+value is returned as an assignment.
+
+## Solving Menu Store Key
+
+A variable name preceded by ▶ will store the value of the given equation. The
+stored value is placed on the stack as an assignment.
 
 ## MultipleEquationsSolver
 
@@ -15292,13 +15392,9 @@ Solve a system of multiple equations simultaneously.
 
 Solve for multiple variables in a system of equations.
 
-## MSlv
-
-On HP50G, a special command is dedicated to solving systems of equations.
-
-On DB48x, the `MSlv` command is provided for comptability. It behaves almost
-exactly like `Root`, except that it leaves the equations and variable lists on
-the stack in addition to the result.
+On HP50G, `MSlv` is dedicated to solving systems of equations.
+On DB48x, it behaves almost exactly like `Root`, except that it
+leaves the equations and variable lists on the stack in addition to the result.
 
 ```rpl
 RAD
@@ -16737,14 +16833,6 @@ List all code points in a Utf8 string
 
 Convert an object to its text representation.
 
-## ToDecimal
-
-Convert an object to its decimal representation.
-
-## ToFraction
-
-Convert an object to its fractional representation.
-
 ## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.
@@ -17039,20 +17127,12 @@ Compute the square root
 Compute the cube root
 
 
-## EXPM
+## Expm1
 Compute exp(x)-1
-
-
-## LNP1
-Compute ln(x+1)
 
 
 ## Ln1p
 Compute ln(x+1)
-
-
-## Expm1
-Compute exp(x)-1
 
 
 ## Exp2

@@ -119,7 +119,9 @@ object::result list::list_parse(id      type,
         }
         if (precedence && (cp == '\'' || cp == ')' ||
                            (!alist && (cp == ';' || cp == '}' || cp == ']'))))
+        {
             break;
+        }
         if (utf8_whitespace(cp) || (cp == ';' && alist))
         {
             s = utf8_next(s);
@@ -136,13 +138,29 @@ object::result list::list_parse(id      type,
         // For algebraic objects, check if we have or need parentheses
         if (precedence && length)
         {
+            // Implicit multiplication
+            if (!infix && precedence < 0 &&
+                (cp == '(' || is_valid_as_name_initial(cp)))
+            {
+                infix = static_object(ID_multiply);
+                if (is_valid_as_name_initial(cp))
+                {
+                    size_t cmdlen = length;
+                    if (id cmd = command::lookup(s, cmdlen, true))
+                        if (object::handler[cmd].arity == 2)
+                            infix = nullptr;
+                }
+                if (infix)
+                    precedence = MULTIPLICATIVE;
+            }
+
             if (precedence > 0)
             {
                 // Check if we see parentheses, or if we have `sin sin X`
                 bool parenthese = (cp == '(' || arity > 1) && !infix;
                 if (parenthese || infix || prefix || alist)
                 {
-                    int childp = infix      ? int(infix->precedence() + 1)
+                    int childp = infix      ? int(infix->precedence() | 1)
                                : parenthese ? int(LOWEST)
                                : alist      ? int(LOWEST)
                                             : int(SYMBOL);
@@ -354,14 +372,9 @@ object::result list::list_parse(id      type,
                     break;
                 if (objprec < FUNCTIONAL)
                 {
-                    infix = obj;
-                    precedence = -objprec;
-                    obj = nullptr;
-                }
-                else if (!infix)
-                {
-                    // Implicit multiplication
-                    infix = static_object(ID_multiply);
+                    infix        = obj;
+                    precedence   = -objprec;
+                    obj          = nullptr;
                 }
             }
             else

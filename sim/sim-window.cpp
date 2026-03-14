@@ -59,10 +59,20 @@
 #include <QFileInfo>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <QGuiApplication>
 #include <QStandardPaths>
 #include <QtCore>
 #include <QtGui>
 #include <QtMath>
+#ifdef ANDROID
+#include <QDir>
+#include <QSettings>
+#include <atomic>
+#include "version.h"
+
+void extract_android_assets();
+
+#endif // ANDROID
 #endif // WASM
 
 
@@ -170,6 +180,13 @@ MainWindow::MainWindow(QWidget *parent)
     // Set initial geometry manually since we disabled layout management
     QResizeEvent initialResize(size(), size());
     resizeEvent(&initialResize);
+
+#ifdef ANDROID
+    extract_android_assets();
+
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged,
+            this, &MainWindow::handleAppStateChange);
+#endif
 
     rpl.start();
     if (run_tests)
@@ -315,6 +332,81 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     QRect kframe((nw - kw) / 2, yOffset + screenHeight, kw, kh);
     ui.keyboard->setGeometry(kframe);
 }
+
+
+#ifdef ANDROID
+void extract_android_assets()
+// ----------------------------------------------------------------------------
+//   On Android, the online help needs to be put in assets
+// ----------------------------------------------------------------------------
+{
+    QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(sandboxDir);
+
+    QSettings settings("DB48X", "Emulator");
+    QString currentAssetVersion = DB48X_VERSION;
+    QString savedAssetVersion = settings.value("AssetVersion", "").toString();
+
+    if (savedAssetVersion != currentAssetVersion) {
+        QStringList filesToExtract = {"db48x.idx", "db48x.md"};
+
+        for (const QString& fileName : filesToExtract) {
+            QString assetPath = ":/help/" + fileName; // Check your Qt resource prefix
+            QString targetPath = sandboxDir + "/help/" + fileName;
+
+            if (QFile::exists(targetPath)) {
+                QFile::remove(targetPath);
+            }
+
+	    // Create the directory structure if it doesn't exist
+	    QFileInfo targetInfo(targetPath);
+	    QDir().mkpath(targetInfo.absolutePath());
+
+            QFile assetFile(assetPath);
+            if (assetFile.copy(targetPath)) {
+                QFile::setPermissions(targetPath,
+                    QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser);
+            }
+        }
+
+	settings.setValue("AssetVersion", currentAssetVersion);
+    }
+
+    QDir::setCurrent(sandboxDir);
+}
+
+
+static std::atomic<bool> is_dialog_open{false};
+
+void MainWindow::handleAppStateChange(Qt::ApplicationState state)
+// ----------------------------------------------------------------------------
+//   Trigger background auto-save when Android suspends the app
+// ----------------------------------------------------------------------------
+{
+    // If a native dialog is currently open, the user is actively managing state.
+    // Abort the background auto-save to prevent recursive Intents.
+    if (is_dialog_open)
+        return;
+
+    static bool isSaved = false;
+
+    if (state == Qt::ApplicationActive) {
+        isSaved = false;
+    }
+    else if ((state == Qt::ApplicationSuspended || state == Qt::ApplicationHidden)
+             && !isSaved) // Check both suspend and hidden + avoid double save
+    {
+        // Call the core DB48X save function directly
+        // (This function is defined in sysmenu.cc)
+        extern bool save_system_state_silent();
+        save_system_state_silent();
+
+        record(sim_window, "Android auto-save triggered");
+
+	isSaved = true;
+    }
+}
+#endif
 
 
 const int keyMap[] =
@@ -587,33 +679,19 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
     if (k == Qt::Key_C && (ev->modifiers() & Qt::ControlModifier))
     {
-        // HACK: Not thread safe at all!
-        extern user_interface ui;
-        ui.clear_shift();
-
         QClipboard *clipboard = QApplication::clipboard();
         if (ev->modifiers() & Qt::ShiftModifier)
         {
             QPixmap &screen = MainWindow::theScreen();
             clipboard->setPixmap(screen);
         }
-        else if (size_t sz = rt.editing())
+        else
         {
-            utf8 data = rt.editor();
-            QByteArray ba(cstring(data), sz);
-            QString text(ba);
-            clipboard->setText(text);
-        }
-        else if (!ST(STAT_RUNNING))
-        {
-            if (object_p obj = rt.top())
+            char buf[4096];
+            if (size_t sz = ui_clipboard_copy(buf, sizeof(buf)))
             {
-                text_p sym = obj->as_text();
-                size_t sz = 0;
-                utf8 data = sym->value(&sz);
-                QByteArray ba(cstring(data), sz);
-                QString text(ba);
-                clipboard->setText(text);
+                QByteArray ba(buf, sz);
+                clipboard->setText(QString::fromUtf8(ba));
             }
         }
         ev->accept();
@@ -622,23 +700,11 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 
     if (k == Qt::Key_V && (ev->modifiers() & Qt::ControlModifier))
     {
-        // HACK: Not thread safe at all!
-        extern user_interface ui;
-        ui.clear_shift();
-
-        QClipboard *clipboard = QApplication::clipboard();
-        QString text = clipboard->text();
+        QString text = QApplication::clipboard()->text();
         text.replace("\r\n", "\n");
         QByteArray ba = text.toUtf8();
-        if (size_t sz = ba.size())
-        {
-            if (!ST(STAT_RUNNING))
-            {
-                uint pos = ui.cursor_position();
-                size_t ins = ui.insert(pos, utf8(ba.data()), sz);
-                ui.cursor_position(pos+ins);
-            }
-        }
+        if (ba.size())
+            ui_clipboard_paste(ba.constData(), ba.size());
         ev->accept();
         return;
     }
@@ -1185,23 +1251,41 @@ int ui_file_selector(const char *title,
 //  File selector function
 // ----------------------------------------------------------------------------
 {
+#ifdef ANDROID
+    // Engage the lock. If it was already true (e.g. touch bounce), safely abort.
+    if (is_dialog_open.exchange(true)) {
+        return MRET_EXIT;
+    }
+#endif
+
     QString path;
     bool done = false;
+
+#ifdef ANDROID
+    // Android SAF rejects absolute Linux paths like "/state".
+    // We must use an empty string so the OS opens its default safe location.
+    QString initial_dir = "";
+    // Android requires a valid parent context to launch the intent.
+    QWidget* parent_widget = MainWindow::theMainWindow();
+#else
+    QString initial_dir = base_dir;
+    QWidget* parent_widget = nullptr;
+#endif
 
     postToThread([&]{ // the functor captures parent and text by value
         path =
             disp_new
-            ? QFileDialog::getSaveFileName(nullptr,
+            ? QFileDialog::getSaveFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext),
                                            nullptr,
                                            overwrite_check
                                            ? QFileDialog::Options()
                                            : QFileDialog::DontConfirmOverwrite)
-            : QFileDialog::getOpenFileName(nullptr,
+            : QFileDialog::getOpenFileName(parent_widget,
                                            title,
-                                           base_dir,
+                                           initial_dir,
                                            QString("*") + QString(ext));
         std::cout << "Selected path: " << path.toStdString() << "\n";
         done = true;
@@ -1217,6 +1301,44 @@ int ui_file_selector(const char *title,
         QString suffix = fi.suffix(); // On Linux we don't get the extension
         QString name = fi.fileName();
         path = fi.absoluteFilePath();
+#ifdef ANDROID
+        // Create a persistent, private sandbox path that standard C++ can read/write
+        // This requires no permissions and survives app restarts.
+        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(sandboxDir); // Ensure the directory exists
+        QString sandboxPath = sandboxDir + "/" + name;
+
+        if (!disp_new)
+        {
+            // LOADING (Import): The user selected a file via the Android picker.
+            // Use Qt to copy the Android URI data into our POSIX sandbox file.
+            QFile::remove(sandboxPath);
+            QFile::copy(path, sandboxPath);
+
+            // Tell the DB48X engine to load from the sandbox.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+        }
+        else
+        {
+            // SAVING (Export): Tell DB48X to save its state to the POSIX sandbox file.
+            ret = callback(sandboxPath.toStdString().c_str(), name.toStdString().c_str(), data);
+
+            // If the DB48X engine succeeded, use Qt to copy the sandbox file
+            // out to the public Android URI the user selected.
+            if (ret == MRET_EXIT) {
+                QFile targetFile(path);
+                if (targetFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                    QFile internalFile(sandboxPath);
+                    if (internalFile.open(QIODevice::ReadOnly)) {
+                        targetFile.write(internalFile.readAll());
+                        internalFile.close();
+                    }
+                    targetFile.close();
+                }
+            }
+        }
+#else
+        // --- Desktop Behavior ---
         if (QFileInfo("." + suffix) != QFileInfo(ext))
         {
             path += ext;
@@ -1230,7 +1352,13 @@ int ui_file_selector(const char *title,
         ret = callback(path.toStdString().c_str(),
                        name.toStdString().c_str(),
                        data);
+#endif
     }
+
+#ifdef ANDROID
+    is_dialog_open = false; // Release the lock
+#endif
+
     return ret;
 }
 
@@ -1355,6 +1483,8 @@ void ui_load_keymap(cstring name)
 
 
 RECORDER(image_check,       16, "Comparison of images in Qt");
+RECORDER(image_check_error, 16, "Error comparing images in Qt");
+extern QDir testDirectory;
 
 bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 // ----------------------------------------------------------------------------
@@ -1369,12 +1499,15 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
     name += ".png";
 #ifdef CONFIG_COLOR
     name = "color-" + name;
-#endif // CONFIG_COLOR
+#  endif // CONFIG_COLOR
+    name = testDirectory.filePath(name);
     QFileInfo reference(name);
     if (force || !reference.exists() || !data.load(name, "PNG"))
     {
-        img.save(name, "PNG");
-        return true;
+        bool result = img.save(name, "PNG");
+        if (!result)
+            record(image_check_error, "Can't save image: %s", strerror(errno));
+        return result;
     }
     bool ok         = data.toImage() == img.toImage();
     uint mismatched = 0;
