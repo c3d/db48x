@@ -470,7 +470,8 @@ MENU(NumbersMenu,
      "IsPrime", ID_IsPrime,
      "NextPr",  ID_NextPrime,
      "PrevPr",  ID_PreviousPrime,
-	 "XQ",      ID_XQ);
+	"XQ",      ID_XQ,
+     "DFC",     ID_DFC);
 
 
 MENU(AnglesMenu,
