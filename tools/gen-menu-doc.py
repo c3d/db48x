@@ -309,8 +309,8 @@ def render_button(display, url, kind):
 
     Visual conventions (closest achievable in plain Markdown/GitHub):
 
-      Menu button   →  bold + link         **[Label](#anchor)**
-      Ext. menu     →  bold italic + link   ***[Label](#anchor)***
+      Menu button   →  visible brackets     [Label](#anchor) with escaped brackets
+      Ext. menu     →  visible brackets     same
       Command       →  link                 [Label](path#anchor)
       No link cmd   →  plain                Label
       Unimplemented →  italic               *Label*
@@ -322,19 +322,15 @@ def render_button(display, url, kind):
     if not disp:
         return '&nbsp;'
 
-    def linked(text, url):
-        return f'[{text}]({url})' if url else text
-
     if kind == 'selfinsert':
         return f'`{disp}`'
     if kind == 'unimplemented':
-        return f'*{linked(disp, url)}*' if url else f'*{disp}*'
-    if kind == 'menu':
-        return f'**{linked(disp, url)}**'
-    if kind == 'external':
-        return f'***{linked(disp, url)}***'
+        return f'<font color="gray">{disp}</font>'
+    if kind in ('menu', 'external'):
+        inner = f'[{disp}]({url})' if url else disp
+        return f'\\[{inner}\\]'
     # command
-    return linked(disp, url)
+    return f'[{disp}]({url})' if url else disp
 
 
 # ─────────────────────── table generation ───────────────────────────────────
@@ -350,31 +346,49 @@ def menu_table(menu_name, items, name_map, doc_index, menu_names):
         buttons.append(render_button(disp, url, kind))
 
     n = len(buttons)
-    # Multi-page menus: > SOFTKEYS*PLANES items  →  note it
-    pages = (n + SOFTKEYS * PLANES - 1) // (SOFTKEYS * PLANES)
+
+    # Single-page: ≤ 18 items use all 6 columns (no navigation).
+    # Multi-page : > 18 items → 15 items/page (5 cols × 3 rows);
+    #   F6 is reserved: bottom row = ▶ next, middle row = ◀ prev, top row = empty.
+    single_page_max = SOFTKEYS * PLANES          # 18
+    multi_page_size = (SOFTKEYS - 1) * PLANES    # 15
+
+    multipage = n > single_page_max
+    page_size = multi_page_size if multipage else single_page_max
+    cols      = SOFTKEYS - 1   if multipage else SOFTKEYS
+    pages     = (n + page_size - 1) // page_size
 
     lines = []
-    if pages > 1:
+    if multipage:
         lines.append(f'*{pages} pages · {n} items total*\n')
 
-    # Header row with plane labels
     hdr = '| ' + ' | '.join(f'F{k+1}' for k in range(SOFTKEYS)) + ' |'
     sep = '|' + '|'.join(':--:' for _ in range(SOFTKEYS)) + '|'
 
-    page_size = SOFTKEYS * PLANES
     for page in range(pages):
-        if pages > 1:
+        if multipage:
             lines.append(f'**Page {page+1}**\n')
         lines.append(hdr)
         lines.append(sep)
-        base = page * page_size
+
+        base      = page * page_size
         page_btns = buttons[base : base + page_size]
-        # Rows are stored bottom-first in menu.cc (plane 0 = primary/bottom row).
-        # Display top-to-bottom: plane 2 (top) → plane 1 (middle) → plane 0 (bottom).
+
+        # Navigation buttons for F6 (only for multi-page menus).
+        # Navigation is cyclic: every page shows both ▶ (next) and ◀ (prev).
+        # Plane 0 (bottom): ▶ next, plane 1 (middle): ◀ prev, plane 2 (top): empty.
+        nav = ['&nbsp;', '&nbsp;', '&nbsp;']
+        if multipage:
+            nav[0] = '▶'
+            nav[1] = '◀'
+
+        # Rows stored bottom-first; display top-to-bottom (plane 2 → 1 → 0).
         for row in reversed(range(PLANES)):
-            row_btns = page_btns[row*SOFTKEYS : (row+1)*SOFTKEYS]
-            while len(row_btns) < SOFTKEYS:
+            row_btns = page_btns[row * cols : (row + 1) * cols]
+            while len(row_btns) < cols:
                 row_btns.append('&nbsp;')
+            if multipage:
+                row_btns.append(nav[row])
             lines.append('| ' + ' | '.join(row_btns) + ' |')
         lines.append('')
 
@@ -406,11 +420,10 @@ def main():
     out.append(
         '| Style | Meaning |\n'
         '|:------|:--------|\n'
-        '| **[Menu]** | Opens a sub-menu (defined in this document) |\n'
-        '| ***[Ext]*** | Opens an external menu (Constants, Units, …) |\n'
-        '| [Command] | Executes a command — link leads to the reference doc |\n'
+        '| \\[Menu\\] | Opens a sub-menu (defined in this document) |\n'
+        '| [Command](commands/symbolic.md) | Executes a command — link leads to the reference doc |\n'
         '| Command | Command with no documentation entry found |\n'
-        '| *Unimplemented* | Not yet implemented |\n'
+        '| <font color="gray">Unimplemented</font> | Not yet implemented |\n'
         '| `text` | Inserts literal text in the command line |\n'
     )
     out.append('---\n')
