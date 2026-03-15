@@ -325,7 +325,7 @@ menu is special in the sense that:
 ### Menu Tree
 
 The complete hierarchy of all built-in menus is documented in the
-[Menu Tree](menus-tree.md).
+[Menu Tree](#db48x-menu-tree).
 
 
 ## Differences with other RPLs
