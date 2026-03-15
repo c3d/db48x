@@ -3,14 +3,14 @@
 #  tools/gen-menu-doc.py                                        DB48X project
 # ****************************************************************************
 #
-#   Generate doc/menus-tree.md — a full description of the soft-menu
+#   Generate doc/8-menus-tree.md — a full description of the soft-menu
 #   hierarchy, formatted to resemble the calculator's 3-row × 6-button
 #   display.
 #
 #   Source of truth:   src/menu.cc   (MENU macros)
 #   Name lookup:       src/ids.tbl   (CMD / NAMED / ALIAS entries)
 #   Link targets:      doc/commands/*.md  (## headings)
-#   Output:            doc/menus-tree.md
+#   Output:            doc/8-menus-tree.md
 #
 # ****************************************************************************
 #   (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
@@ -25,7 +25,7 @@ ROOT      = Path(__file__).resolve().parent.parent
 MENU_CC   = ROOT / 'src'  / 'menu.cc'
 IDS_TBL   = ROOT / 'src'  / 'ids.tbl'
 DOC_CMDS  = ROOT / 'doc'  / 'commands'
-OUTPUT    = ROOT / 'doc'  / 'menus-tree.md'
+OUTPUT    = ROOT / 'doc'  / '8-menus-tree.md'
 
 SOFTKEYS  = 6   # buttons per row
 PLANES    = 3   # rows per page
@@ -295,8 +295,8 @@ def resolve(label, id_name, name_map, doc_index, menu_names):
 
     for k in keys:
         if k in doc_index:
-            path, anchor = doc_index[k]
-            return display, f'{path}#{anchor}', 'command'
+            _path, anchor = doc_index[k]
+            return display, f'#{anchor}', 'command'
 
     return display, None, 'command'
 
@@ -320,12 +320,12 @@ def render_button(display, url, kind):
     disp = re.sub(r'^\[(.+)\]$', r'\1', display)
     disp = disp.replace('|', '\\|').strip()
     if not disp:
-        return '&nbsp;'
+        return ' '
 
     if kind == 'selfinsert':
         return f'`{disp}`'
     if kind == 'unimplemented':
-        return f'<font color="gray">{disp}</font>'
+        return f'_{disp}_'
     if kind in ('menu', 'external'):
         inner = f'[{disp}]({url})' if url else disp
         return f'\\[{inner}\\]'
@@ -377,7 +377,7 @@ def menu_table(menu_name, items, name_map, doc_index, menu_names):
         # Navigation buttons for F6 (only for multi-page menus).
         # Navigation is cyclic: every page shows both ▶ (next) and ◀ (prev).
         # Plane 0 (bottom): ▶ next, plane 1 (middle): ◀ prev, plane 2 (top): empty.
-        nav = ['&nbsp;', '&nbsp;', '&nbsp;']
+        nav = [' ', ' ', ' ']
         if multipage:
             nav[0] = '▶'
             nav[1] = '◀'
@@ -386,7 +386,7 @@ def menu_table(menu_name, items, name_map, doc_index, menu_names):
         for row in reversed(range(PLANES)):
             row_btns = page_btns[row * cols : (row + 1) * cols]
             while len(row_btns) < cols:
-                row_btns.append('&nbsp;')
+                row_btns.append(' ')
             if multipage:
                 row_btns.append(nav[row])
             lines.append('| ' + ' | '.join(row_btns) + ' |')
@@ -428,7 +428,7 @@ def main():
         '| \\[Menu\\] | Opens a sub-menu (defined in this document) |\n'
         '| [Command](commands/symbolic.md) | Executes a command — link leads to the reference doc |\n'
         '| Command | Command with no documentation entry found |\n'
-        '| <font color="gray">Unimplemented</font> | Not yet implemented |\n'
+        '| _Unimplemented_ | Not yet implemented |\n'
         '| `text` | Inserts literal text in the command line |\n'
     )
     out.append('---\n')
@@ -445,7 +445,7 @@ def main():
 
     # ── one section per menu ─────────────────────────────────────────────────
     for name, items in sorted_menus.items():
-        out.append(f'## {name}\n')
+        out.append(f'### {name}\n')
         out.append(menu_table(name, items, name_map, doc_index, menu_names))
 
     OUTPUT.write_text('\n'.join(out) + '\n')

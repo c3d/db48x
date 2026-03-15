@@ -428,7 +428,7 @@ fonts/ReducedFont.cc: $(TTF2FONT) $(BASE_FONT)
 	$(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
 fonts/HelpFont.cc: $(TTF2FONT) $(BASE_FONT)
 	$(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
-help/$(NAME).md: doc/menus-tree.md $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
+help/$(NAME).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	mkdir -p help && \
 	cat $^ | \
 	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
@@ -438,13 +438,13 @@ help/$(NAME).md: doc/menus-tree.md $(wildcard doc/*.md doc/calc-help/*.md doc/co
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
 	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
 	    -e 's/db48x.md/$(NAME).md/g' \
-	    -e 's/](menus-tree\.md)/](#$(NAME)-menu-tree)/g' \
+	    -e 's/](8-menus-tree\.md)/](#$(NAME)-menu-tree)/g' \
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
 	rsync -av --delete doc/img/*.bmp help/img/
 
-doc/menus-tree.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
+doc/8-menus-tree.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
 	python3 tools/gen-menu-doc.py
 
 help/$(NAME).idx: help/$(NAME).md
