@@ -537,7 +537,6 @@ FUNCTION_BODY(neg)
         polynomial_g p = polynomial_p(+x);
         return polynomial::neg(p);
     }
-
     case ID_integer:
     case ID_bignum:
     case ID_fraction:
@@ -551,7 +550,6 @@ FUNCTION_BODY(neg)
         *tp = negty;
         return clone;
     }
-
     case ID_neg_integer:
     case ID_neg_bignum:
     case ID_neg_fraction:
@@ -565,7 +563,6 @@ FUNCTION_BODY(neg)
         *tp = negty;
         return clone;
     }
-
 #if CONFIG_FIXED_BASED_OBJECTS
     case ID_hex_integer:
     case ID_dec_integer:
@@ -583,7 +580,6 @@ FUNCTION_BODY(neg)
         z = z - x;
         return z;
     }
-
     case ID_rectangular:
         return rectangular::make(-rectangular_p(+x)->re(),
                                  -rectangular_p(+x)->im());
@@ -611,7 +607,6 @@ FUNCTION_BODY(neg)
         algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic();
         return evaluate(tagged);
     }
-
     case ID_array:
     case ID_list:
         return list_p(+x)->map(neg::evaluate);
@@ -624,7 +619,6 @@ FUNCTION_BODY(neg)
     default:
         break;
     }
-
     rt.type_error();
     return nullptr;
 }
@@ -638,7 +632,6 @@ FUNCTION_BODY(abs)
 {
     if (!x)
         return nullptr;
-
     id xt = x->type();
     switch(xt)
     {
@@ -647,14 +640,12 @@ FUNCTION_BODY(abs)
     case ID_symbol:
     case ID_constant:
         return symbolic(ID_abs, x);
-
     case ID_integer:
     case ID_bignum:
     case ID_fraction:
     case ID_big_fraction:
     case ID_decimal:
         return x;
-
     case ID_neg_integer:
     case ID_neg_bignum:
     case ID_neg_fraction:
@@ -668,11 +659,9 @@ FUNCTION_BODY(abs)
         *tp = absty;
         return clone;
     }
-
     case ID_rectangular:
     case ID_polar:
         return complex_p(+x)->mod();
-
     case ID_range:
     case ID_drange:
     case ID_prange:
@@ -681,7 +670,6 @@ FUNCTION_BODY(abs)
         range_g r = range_p(+x);
         return range::abs(r);
     }
-
     case ID_unit:
         return unit::simple(abs::run(unit_p(+x)->value()),
                             unit_p(+x)->uexpr());
@@ -690,21 +678,17 @@ FUNCTION_BODY(abs)
         algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
         return evaluate(tagged);
     }
-
     case ID_array:
         return array_p(+x)->norm();
     case ID_list:
         return list_p(+x)->map(abs::evaluate);
-
     case ID_hwfloat:
         return hwfloat::abs((hwfloat::hwfp_r) x);
     case ID_hwdouble:
         return hwdouble::abs((hwdouble::hwfp_r) x);
-
     default:
         break;
     }
-
     rt.type_error();
     return nullptr;
 }
@@ -715,27 +699,67 @@ FUNCTION_BODY(arg)
 //   Implementation of the complex argument (0 for non-complex values)
 // ----------------------------------------------------------------------------
 {
-    if (!x)
+	if (!x)
         return nullptr;
-
     id xt = x->type();
-    if (should_be_symbolic(xt))
+    switch(xt)
+    {
+    case ID_expression:
+    case ID_local:
+    case ID_symbol:
+    case ID_constant:
         return symbolic(ID_arg, x);
-    auto angle_mode = Settings.AngleMode();
-    algebraic_g a;
-    if (is_complex(xt))
+    case ID_integer:
+    case ID_bignum:
+    case ID_fraction:
+    case ID_big_fraction:
+    case ID_decimal:
+	{
+		algebraic_g a;
+		a = integer::make(0);
+		if (a && Settings.SetAngleUnits())
+			add_angle(a);
+		return a;
+	}
+	case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+    case ID_neg_big_fraction:
+    case ID_neg_decimal:
     {
-        a = complex_p(algebraic_p(x))->arg(angle_mode);
-    }
-    else
+		auto angle_mode = Settings.AngleMode();
+		algebraic_g a;
+		a = integer::make(0);
+		a = complex::convert_angle(a, angle_mode, angle_mode, true);
+		if (a && Settings.SetAngleUnits())
+			add_angle(a);
+		return a;
+	}	
+	case ID_rectangular:
+    case ID_polar:
+    {    
+		auto angle_mode = Settings.AngleMode();
+		algebraic_g a;
+		a = complex_p(algebraic_p(x))->arg(angle_mode);
+		if (a && Settings.SetAngleUnits())
+			add_angle(a);
+		return a;	
+	}
+    case ID_unit:
+        return arg::run(unit_p(+x)->value());
+    case ID_tag:
     {
-        bool negative = x->is_negative(false);
-        a = integer::make(0);
-        a = complex::convert_angle(a, angle_mode, angle_mode, negative);
+        algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
+        return evaluate(tagged);
+    }	
+	case ID_array:
+	case ID_list:
+        return list_p(+x)->map(arg::evaluate);
+	default:
+        break;
     }
-    if (a && Settings.SetAngleUnits() && a->is_real())
-        add_angle(a);
-    return a;
+    rt.type_error();
+    return nullptr;
 }
 
 
@@ -746,15 +770,44 @@ FUNCTION_BODY(re)
 {
     if (!x)
         return nullptr;
-
     id xt = x->type();
-    if (should_be_symbolic(xt))
+    switch(xt)
+    {
+    case ID_expression:
+    case ID_local:
+    case ID_symbol:
+    case ID_constant:
         return symbolic(ID_re, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->re();
-    if (!is_real(xt))
-        rt.type_error();
-    return x;
+    case ID_integer:
+    case ID_bignum:
+    case ID_fraction:
+    case ID_big_fraction:
+    case ID_decimal:
+    case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+    case ID_neg_big_fraction:
+    case ID_neg_decimal:
+		return x;
+    case ID_rectangular:
+    case ID_polar:
+        return complex_p(+x)->re();   
+    case ID_unit:
+        return unit::simple(re::run(unit_p(+x)->value()),
+                            unit_p(+x)->uexpr());
+    case ID_tag:
+    {
+        algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
+        return evaluate(tagged);
+    }
+    case ID_array:
+    case ID_list:
+        return list_p(+x)->map(re::evaluate);
+    default:
+        break;
+    }
+    rt.type_error();
+    return nullptr;
 }
 
 
@@ -765,15 +818,47 @@ FUNCTION_BODY(im)
 {
     if (!x)
         return nullptr;
-
     id xt = x->type();
-    if (should_be_symbolic(xt))
+    switch(xt)
+    {
+    case ID_expression:
+    case ID_local:
+    case ID_symbol:
+    case ID_constant:
         return symbolic(ID_im, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->im();
-    if (!is_real(xt))
-        rt.type_error();
-    return integer::make(0);
+    case ID_integer:
+    case ID_bignum:
+    case ID_fraction:
+    case ID_big_fraction:
+    case ID_decimal:
+    case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+    case ID_neg_big_fraction:
+    case ID_neg_decimal:
+		return integer::make(0);
+    case ID_rectangular:
+    case ID_polar:
+	{
+        return complex_p(+x)->im();
+	}
+    case ID_unit:
+        return unit::simple(im::run(unit_p(+x)->value()),
+                            unit_p(+x)->uexpr());
+    case ID_tag:
+    {
+        algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
+        return evaluate(tagged);
+    }
+
+    case ID_array:
+    case ID_list:
+        return list_p(+x)->map(im::evaluate);
+    default:
+        break;
+    }
+    rt.type_error();
+    return nullptr;
 }
 
 
@@ -782,51 +867,118 @@ FUNCTION_BODY(conj)
 //   Compute the conjugate of input
 // ----------------------------------------------------------------------------
 {
-    if (!x)
+	if (!x)
         return nullptr;
 
     id xt = x->type();
-    if (should_be_symbolic(xt))
+    switch(xt)
+    {
+    case ID_expression:
+    case ID_local:
+    case ID_symbol:
+    case ID_constant:
         return symbolic(ID_conj, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->conjugate();
-    if (!is_real(xt))
-        rt.type_error();
-    return x;
+    case ID_integer:
+    case ID_bignum:
+    case ID_fraction:
+    case ID_big_fraction:
+    case ID_decimal:
+	case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+    case ID_neg_big_fraction:
+    case ID_neg_decimal:
+        return x;
+	case ID_rectangular:
+    case ID_polar:
+    {    
+		return complex_p(algebraic_p(x))->conjugate();	
+	}
+    case ID_unit:
+        return unit::simple(conj::run(unit_p(+x)->value()),
+                            unit_p(+x)->uexpr());
+    case ID_tag:
+    {
+        algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
+        return evaluate(tagged);
+    }
+	case ID_array:
+	case ID_list:
+        return list_p(+x)->map(conj::evaluate);
+    default:
+        break;
+    }
+    rt.type_error();
+    return nullptr;
 }
 
 
-FUNCTION_BODY(sign)
+
+
+FUNCTION_BODY(sign) 
 // ----------------------------------------------------------------------------
 //   Implementation of 'sign'
 // ----------------------------------------------------------------------------
 {
-    if (!x)
+	if (!x)
         return nullptr;
-
     id xt = x->type();
-    if (should_be_symbolic(xt))
+    switch(xt)
+    {
+    case ID_expression:
+    case ID_local:
+    case ID_symbol:
+    case ID_constant:
         return symbolic(ID_sign, x);
-
-    if (x->is_negative(false))
+    case ID_integer:
+    case ID_bignum:
+    case ID_fraction:
+    case ID_big_fraction:
+    case ID_decimal:
+	{	 
+		if (x->is_zero(false))
+		{
+			return integer::make(0);
+		}																			  	 
+		return integer::make(1);
+	}
+	case ID_neg_integer:
+    case ID_neg_bignum:
+    case ID_neg_fraction:
+    case ID_neg_big_fraction:
+    case ID_neg_decimal:
     {
-        return integer::make(-1);
-    }
-    else if (x->is_zero(false))
-    {
-        return integer::make(0);
-    }
-    else if (is_integer(xt) || is_bignum(xt) || is_fraction(xt) || is_real(xt))
-    {
-        return integer::make(1);
-    }
-    else if (is_complex(xt))
-    {
-        return polar::make(integer::make(1),
+		if (x->is_zero(false))
+		{
+			return integer::make(0);
+		}
+		return integer::make(-1);
+	}
+	
+	case ID_rectangular:
+    case ID_polar:
+    {    
+		return polar::make(integer::make(1),
                            complex_p(algebraic_p(x))->pifrac(),
-                           object::ID_PiRadians);
+                           object::ID_PiRadians);	
+	}
+    case ID_unit:
+        return sign::run(unit_p(+x)->value());
+    case ID_tag:
+    {
+        algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
+        return evaluate(tagged);
     }
-
+	case ID_array:
+	case ID_list:
+        return list_p(+x)->map(sign::evaluate);
+    case ID_hwfloat:
+        return hwfloat::sign((hwfloat::hwfp_r) x);
+    case ID_hwdouble:
+        return hwdouble::sign((hwdouble::hwfp_r) x);
+	default:
+        break;
+    }
     rt.type_error();
     return nullptr;
 }
