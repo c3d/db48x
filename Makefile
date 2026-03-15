@@ -438,6 +438,7 @@ help/$(NAME).md: doc/menus-tree.md $(wildcard doc/*.md doc/calc-help/*.md doc/co
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
 	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
 	    -e 's/db48x.md/$(NAME).md/g' \
+	    -e 's/](menus-tree\.md)/](#$(NAME)-menu-tree)/g' \
             -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	cp doc/*.png help/
 	mkdir -p help/img
