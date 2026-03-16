@@ -97,9 +97,12 @@ BUILDENV ?= auto
 
 # Mount base on a per-OS basis
 HOST_OS_NAME:=$(shell uname -s)
-MOUNTBASE = $(MOUNTBASE_$(HOST_OS_NAME))
+MOUNTBASE ?= $(MOUNTBASE_$(HOST_OS_NAME))
 MOUNTBASE_Darwin = /Volumes
 MOUNTBASE_Linux = /run/media/$(USER)
+DISK_NAME_dm32  ?= DM32
+DISK_NAME_dm42  ?= DM42
+DISK_NAME_dm42n ?= DM42N
 
 # Host tools (built via recursive make; each tool has its own Makefile)
 TTF2FONT = tools/ttf2font/ttf2font
@@ -689,7 +692,8 @@ $(QSPI_HEX): $(ELF_FILE)
 #  Firmware install on physical calculators
 #------------------------------------------------------------------------------
 
-MOUNTPOINT=$(MOUNTBASE)/$(MODEL)
+MOUNTPOINT ?= $(MOUNTBASE)/$(DISK_NAME)
+DISK_NAME ?= $(DISK_NAME_$(MODEL))
 
 SYNC=sync; sync; sync
 EJECT = $(EJECT_$(HOST_OS_NAME))
