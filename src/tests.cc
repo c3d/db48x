@@ -116,7 +116,6 @@ TESTS(highp,            "High-precision computations (60 digits)")
 TESTS(trigoptim,        "Special trigonometry optimzations");
 TESTS(trigunits,        "Trigonometric units");
 TESTS(dfrac,            "Simple conversion to decimal and back");
-TESTS(toqpi,            "Conversion to fraction with pi factors");
 TESTS(round,            "Rounding and truncating");
 TESTS(ctypes,           "Complex types");
 TESTS(carith,           "Complex arithmetic");
@@ -172,6 +171,7 @@ TESTS(expr,             "Operations on expressions");
 TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
 TESTS(examples,         "On-line help examples");
+TESTS(xq,               "Exact quotient (XQ command)");
 
 EXTRA(plotfns,          "Plot all functions");
 EXTRA(sysflags,         "Enable/disable every RPL flag");
@@ -239,7 +239,6 @@ void tests::run(uint onlyCurrent)
         exact_trig_cases();
         trig_units();
         fraction_decimal_conversions();
-        fraction_pi_conversions();
         rounding_and_truncating();
         complex_types();
         complex_arithmetic();
@@ -291,6 +290,7 @@ void tests::run(uint onlyCurrent)
         polynomials();
         quotient_and_remainder();
         prime_number_tests();
+        exact_quotient();
         expression_operations();
         random_number_generation();
         object_structure();
@@ -4470,181 +4470,6 @@ void tests::fraction_decimal_conversions()
 
     step("Restoring small fraction mode")
         .test(CLEAR, "SmallFractions MixedFractions Std", ENTER).noerror();
-}
-
-
-void tests::fraction_pi_conversions()
-// ----------------------------------------------------------------------------
-//   Exercise the →Qπ command
-// ----------------------------------------------------------------------------
-{
-    BEGIN(toqpi);
-
-    step("Setup display mode")
-        .test(CLEAR, "BigFractions ImproperFractions", ENTER).noerror();
-
-    step("Set FractionLargestPrime for sqrt tests")
-        .test(CLEAR, "10000 FractionLargestPrime", ENTER).noerror();
-
-    step("Pi itself")
-        .test(CLEAR, "pi →Num", ENTER, ID_ToQuotient)
-        .expect("'π'");
-
-    step("Half pi")
-        .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToQuotient)
-        .expect("'1/2·π'");
-
-    step("Two pi")
-        .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToQuotient)
-        .expect("'2·π'");
-
-    step("Square root of 2")
-        .test(CLEAR, "2 √", ENTER, ID_ToQuotient)
-        .expect("'√ 2'");
-
-    step("Square root of 3")
-        .test(CLEAR, "3 √", ENTER, ID_ToQuotient)
-        .expect("'√ 3'");
-
-    step("Euler e")
-        .test(CLEAR, "1 exp", ENTER, ID_ToQuotient)
-        .expect("'e'");
-
-    step("e squared")
-        .test(CLEAR, "2 exp", ENTER, ID_ToQuotient)
-        .expect("'exp 2'");
-
-    step("sqrt of e")
-        .test(CLEAR, "0.5 exp", ENTER, ID_ToQuotient)
-        .expect("'exp(1/2)'");
-
-    step("sqrt(142)/27 should give square root form")
-        .test(CLEAR, "142 √ 27 /", ENTER, ID_ToQuotient)
-        .expect("'1/27·√ 142'");
-
-    step("Negative value with sqrt factor")
-        .test(CLEAR, "2 √ neg", ENTER, ID_ToQuotient)
-        .expect("'-√ 2'");
-
-    step("Plain fraction should still work")
-        .test(CLEAR, "0.25", ENTER, ID_ToQuotient)
-        .expect("1/4");
-
-    step("Integer should pass through")
-        .test(CLEAR, "3", ENTER, ID_ToQuotient)
-        .expect("3");
-
-    step("Large prime radicand with fraction: 17*sqrt(997)/3")
-        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
-        .expect("'17/3·√ 997'");
-
-    step("Reducible radicand: 17*sqrt(12)/6 -> 17/3*sqrt(3)")
-        .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToQuotient)
-        .expect("'17/3·√ 3'");
-
-    step("Reciprocal of sqrt: 1/sqrt(7) -> sqrt(7)/7")
-        .test(CLEAR, "7 √ inv", ENTER, ID_ToQuotient)
-        .expect("'1/7·√ 7'");
-
-    step("Large perfect square factor: sqrt(72) -> 6*sqrt(2)")
-        .test(CLEAR, "72 √", ENTER, ID_ToQuotient)
-        .expect("'6·√ 2'");
-
-    step("Negative sqrt with fraction: -5*sqrt(13)/4")
-        .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToQuotient)
-        .expect("'-5/4·√ 13'");
-
-    step("Pi with larger denominator: 7*pi/11")
-        .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToQuotient)
-        .expect("'7/11·π'");
-
-    step("Ln(2) factor: 3*ln(2)/7")
-        .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToQuotient)
-        .expect("'3/7·ln 2'");
-
-    step("Ln(10) factor: 5*ln(10)/3")
-        .test(CLEAR, "10 ln 5 * 3 /", ENTER, ID_ToQuotient)
-        .expect("'5/3·ln 10'");
-
-    step("Fractional exponent: e^(3/4)")
-        .test(CLEAR, "0.75 exp", ENTER, ID_ToQuotient)
-        .expect("'exp(3/4)'");
-
-    step("Negative exponent: e^(-1) = 1/e or e⁻¹")
-        .test(CLEAR, "1. neg exp", ENTER, ID_ToQuotient)
-        .expect("'e⁻¹'");
-
-    step("Fractional exponent: e^(2/3)")
-        .test(CLEAR, "2. 3 / exp", ENTER, ID_ToQuotient)
-        .expect("'exp(2/3)'");
-
-    step("355/113 close to pi but should stay rational")
-        .test(CLEAR, "355. 113 /", ENTER, ID_ToQuotient)
-        .expect("355/113");
-
-    step("→Qπ at lower precision (FIX 2, 3, 4)")
-        .test(CLEAR, "Std", ENTER).noerror()
-        .test("4 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
-        .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
-        .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
-        .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("2 √ →Num", ENTER, ID_ToQuotient).expect("'√ 2'")
-        .test(CLEAR, "Std", ENTER).noerror();
-
-    // π+0.001 and √2+0.001 are not the constants; verify we get something other than π/√2
-    step("→Qπ cutoff: π+0.001 gives non-π form (not mistaken for π)")
-        .test(CLEAR, "Std", ENTER).noerror()
-        .test("4 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'exp(150/131)'")  // e^(150/131) ≈ 3.1426, not π
-        .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'123/43·ln 3'")   // ln 3 factor, not π
-        .test(CLEAR, "2 FIX", ENTER).noerror()
-        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'1/4·√ 158'")    // √ factor, not π
-        .test(CLEAR, "Std", ENTER).noerror();
-
-    step("→Qπ cutoff: √2+0.001 gives non-√2 form (not mistaken for √2)")
-        .test(CLEAR, "Std", ENTER).noerror()
-        .test("4 FIX", ENTER).noerror()
-        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'8/11·ln 7'")   // ln 7 factor, not √2
-        .test(CLEAR, "3 FIX", ENTER).noerror()
-        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
-        .expect("'8/11·ln 7'")
-        .test(CLEAR, "Std", ENTER).noerror();
-
-    step("→Qπ with complex")
-        .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToQuotient)
-        .expect("1/4+1/2ⅈ")
-        .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToQuotient)
-        .expect("1/4-1/2ⅈ");
-
-    step("→Qπ with range")
-        .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
-        .test(ID_ToQuotient)
-        .expect("'π'…'3/921 970·√ 932 754 283 090'");
-
-    step("→Qπ with vector")
-        .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToQuotient)
-        .expect("[ 1/4 '2·√ 10' ]");
-
-    step("→Qπ with algebraic expression (multiple variables and functions)")
-        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER, ID_ToQuotient)
-        .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
-
-    step("Restore default settings")
-        .test(CLEAR,
-              ("{ FractionLargestPrime BigFractions ImproperFractions } "
-                     "Purge Std"), ENTER).noerror();
-
-    step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
-        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
-        .expect("'¹⁷/₃·√ 997'");
 }
 
 
@@ -14360,6 +14185,7 @@ void tests::plotting_all_functions()
 
     uint dur = 1500;
 
+    #undef FUNCTION
 #define FUNCTION(name)                                          \
     step("Plotting " #name)                                     \
         .test(CLEAR, "'" #name "(x)'", LENGTHY(dur), F1)        \
@@ -15590,6 +15416,267 @@ void tests::user_input_commands()
         .test(ENTER).error("Invalid input")
         .test(BSP, KEYTYPE("42"), UP, UP, BSP, BSP, BSP, ENTER)
         .type(ID_integer).got("55");
+}
+
+
+void tests::exact_quotient()
+// ----------------------------------------------------------------------------
+//   Tests for XQ / →Qπ (exact quotient — simplest symbolic representation)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(xq);
+
+    step("Setup display mode")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER).noerror();
+    step("Set FractionLargestPrime for sqrt tests")
+        .test(CLEAR, "10000 FractionLargestPrime", ENTER).noerror();
+
+    // →Qπ basics: π, √n, e, ln factors
+    step("Pi itself")
+        .test(CLEAR, "pi →Num", ENTER, ID_ToQuotient)
+        .expect("'π'");
+    step("Half pi")
+        .test(CLEAR, "pi →Num 2 /", ENTER, ID_ToQuotient)
+        .expect("'1/2·π'");
+    step("Three quarters pi")
+        .test(CLEAR, "pi →Num 3 * 4 /", ENTER, ID_ToQuotient)
+        .expect("'3·π÷4'");
+    step("Two pi")
+        .test(CLEAR, "pi →Num 2 *", ENTER, ID_ToQuotient)
+        .expect("'2·π'");
+    step("Square root of 2")
+        .test(CLEAR, "2 √", ENTER, ID_ToQuotient)
+        .expect("'√ 2'");
+    step("Square root of 3")
+        .test(CLEAR, "3 √", ENTER, ID_ToQuotient)
+        .expect("'√ 3'");
+    step("Euler e")
+        .test(CLEAR, "1 exp", ENTER, ID_ToQuotient)
+        .expect("'exp 1'");
+    step("e squared")
+        .test(CLEAR, "2 exp", ENTER, ID_ToQuotient)
+        .expect("'exp 2'");
+    step("sqrt of e")
+        .test(CLEAR, "0.5 exp", ENTER, ID_ToQuotient)
+        .expect("'exp(1/2)'");
+    step("sqrt(142)/27 should give square root form")
+        .test(CLEAR, "142 √ 27 /", ENTER, ID_ToQuotient)
+        .expect("'1/27·√ 142'");
+    step("Negative value with sqrt factor")
+        .test(CLEAR, "2 √ neg", ENTER, ID_ToQuotient)
+        .expect("'-√ 2'");
+    step("Plain fraction should still work")
+        .test(CLEAR, "0.25", ENTER, ID_ToQuotient)
+        .expect("1/4");
+    step("Integer should pass through")
+        .test(CLEAR, "3", ENTER, ID_ToQuotient)
+        .expect("3");
+    step("Large prime radicand with fraction: 17*sqrt(997)/3")
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
+        .expect("'17/3·√ 997'");
+    step("Reducible radicand: 17*sqrt(12)/6 -> 17/3*sqrt(3)")
+        .test(CLEAR, "17 12 √ * 6 /", ENTER, ID_ToQuotient)
+        .expect("'17·√(1/3)'");
+    step("Reciprocal of sqrt: 1/sqrt(7) -> sqrt(7)/7")
+        .test(CLEAR, "7 √ inv", ENTER, ID_ToQuotient)
+        .expect("'√(1/7)'");
+    step("Large perfect square factor: sqrt(72) -> 6*sqrt(2)")
+        .test(CLEAR, "72 √", ENTER, ID_ToQuotient)
+        .expect("'6·√ 2'");
+    step("Negative sqrt with fraction: -5*sqrt(13)/4")
+        .test(CLEAR, "5 13 √ * neg 4 /", ENTER, ID_ToQuotient)
+        .expect("'-(5/4·√ 13)'");
+    step("Pi with larger denominator: 7*pi/11")
+        .test(CLEAR, "pi →Num 7 * 11 /", ENTER, ID_ToQuotient)
+        .expect("'7·π÷11'");
+    step("Ln(2) factor: 3*ln(2)/7")
+        .test(CLEAR, "2 ln 3 * 7 /", ENTER, ID_ToQuotient)
+        .expect("'3/7·ln 2'");
+    step("Ln(10) factor: 5*ln(10)/3")
+        .test(CLEAR, "10 ln 5 * 3 /", ENTER, ID_ToQuotient)
+        .expect("'5/3·ln 10'");
+    step("Fractional exponent: e^(3/4)")
+        .test(CLEAR, "0.75 exp", ENTER, ID_ToQuotient)
+        .expect("'exp(3/4)'");
+    step("Negative exponent: e^(-1) = 1/e or e⁻¹")
+        .test(CLEAR, "1 neg exp", ENTER, ID_ToQuotient)
+        .expect("'exp -1'");
+    step("Negative exponent: e^(-1) = 1/e or e⁻¹")
+        .test(CLEAR, "1/3 neg exp", ENTER, ID_ToQuotient)
+        .expect("'exp(-1/3)'");
+    step("Fractional exponent: e^(2/3)")
+        .test(CLEAR, "2. 3 / exp", ENTER, ID_ToQuotient)
+        .expect("'exp(2/3)'");
+    step("355/113 close to pi but should stay rational")
+        .test(CLEAR, "355. 113 /", ENTER, ID_ToQuotient)
+        .expect("355/113");
+    step("→Qπ at lower precision (FIX 2, 3, 4)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("pi →Num", ENTER, ID_ToQuotient).expect("'π'")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("2 √ →Num", ENTER, ID_ToQuotient).expect("'√ 2'")
+        .test(CLEAR, "Std", ENTER).noerror();
+    step("→Qπ cutoff: π+0.001 gives non-π form (not mistaken for π)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
+        .expect("'exp(150/131)'")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
+        .expect("'123/43·ln 3'")
+        .test(CLEAR, "2 FIX", ENTER).noerror()
+        .test("pi →Num 0.001 +", ENTER, ID_ToQuotient)
+        .expect("'π'")
+        .test(CLEAR, "Std", ENTER).noerror();
+    step("→Qπ cutoff: √2+0.001 gives non-√2 form (not mistaken for √2)")
+        .test(CLEAR, "Std", ENTER).noerror()
+        .test("4 FIX", ENTER).noerror()
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
+        .expect("'8/11·ln 7'")
+        .test(CLEAR, "3 FIX", ENTER).noerror()
+        .test("2 √ →Num 0.001 +", ENTER, ID_ToQuotient)
+        .expect("'8/11·ln 7'")
+        .test(CLEAR, "Std", ENTER).noerror();
+    step("→Qπ with complex")
+        .test(CLEAR, "0.25+0.5ⅈ", ENTER, ID_ToQuotient)
+        .expect("1/4+1/2ⅈ")
+        .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToQuotient)
+        .expect("1/4-1/2ⅈ")
+        .test(CLEAR, "-1-0ⅈ LN", ENTER, ID_ToQuotient)
+        .expect("0+'π'ⅈ");;
+    step("→Qπ with range")
+        .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
+        .test(ID_ToQuotient)
+        .expect("'π'…'2↑(793 036/480 059)'");
+    step("→Qπ with vector")
+        .test(CLEAR, "[ 0.25 '√ 40' ] →Num", ENTER, ID_ToQuotient)
+        .expect("[ 1/4 '2·√ 10' ]");
+    step("→Qπ with algebraic expression (multiple variables and functions)")
+        .test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2.0)'", ENTER, ID_ToQuotient)
+        .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
+    step("Restore default settings")
+        .test(CLEAR,
+              ("{ FractionLargestPrime BigFractions ImproperFractions } "
+               "Purge Std"), ENTER).noerror();
+    step("Large prime radicand with fraction and 100 max: 17*sqrt(997)/3")
+        .test(CLEAR, "17 997 √ * 3 /", ENTER, ID_ToQuotient)
+        .expect("'¹⁷/₃·√ 997'");
+
+    // XQ pass-through: integers and fractions are already in exact form
+    step("XQ(1) = 1 (integer pass-through)")
+        .test(CLEAR, "1 XQ", ENTER).expect("1");
+    step("XQ(1/3) = 1/3 (fraction pass-through)")
+        .test(CLEAR, "1/3 XQ", ENTER).expect("¹/₃");
+    step("XQ(π) = π (constant pass-through)")
+        .test(CLEAR, "PI XQ", ENTER).expect("π");
+    step("XQ(e) = e (constant pass-through)")
+        .test(CLEAR, "Ⓒe XQ", ENTER).expect("e");
+    step("XQ(c) = c (constant pass-through)")
+        .test(CLEAR, "Ⓒc XQ", ENTER).expect("c");
+
+    // XQ_RATIONAL template: plain decimal → p/q
+    step("XQ(0.5) = 1/2")
+        .test(CLEAR, "0.5 XQ", ENTER).expect("¹/₂");
+    step("XQ(1/3 ToDecimal) = 1/3")
+        .test(CLEAR, "1/3 ToDecimal XQ", ENTER).expect("¹/₃");
+    step("XQ(-0.5) = -1/2")
+        .test(CLEAR, "-0.5 XQ", ENTER).expect("'-(¹/₂)'");
+
+    // XQ_SQRT template: √(p/q)
+    step("XQ(√2) = '√ 2'")
+        .test(CLEAR, "2 sqrt XQ", ENTER).expect("'√ 2'");
+    step("XQ(√3) = '√ 3'")
+        .test(CLEAR, "3 sqrt XQ", ENTER).expect("'√ 3'");
+    step("XQ(√(1/3)) = '√ 3÷3' (sqrt(3)/3 rather than 1/3·√3)")
+        .test(CLEAR, "1/3 ToDecimal sqrt XQ", ENTER).expect("'√(¹/₃)'");
+    step("XQ(-√2) = '-√ 2'")
+        .test(CLEAR, "2 sqrt neg XQ", ENTER).expect("'-√ 2'");
+
+    // XQ_PI template: p/q × π (or π when p=1, q=1)
+    step("XQ(π) = π")
+        .test(CLEAR, "pi XQ", ENTER).expect("π");
+    step("XQ(π/3) = '¹/₃·π'")
+        .test(CLEAR, "pi 3 / XQ", ENTER).expect("'π÷3'");
+    step("XQ(2π) = '2·π'")
+        .test(CLEAR, "pi 2 * XQ", ENTER).expect("'π·2'");
+    step("XQ(-π/3) = '-¹/₃·π'")
+        .test(CLEAR, "pi 3 / neg XQ", ENTER).expect("'-(π÷3)'");
+
+    // XQ_LN template: ln(p/q)
+    step("XQ(ln 2) = 'ln 2'")
+        .test(CLEAR, "2 ln XQ", ENTER).expect("'ln 2'");
+    step("XQ(ln(1/3)) = '-ln 3' (since ln(1/3) = -ln(3))")
+        .test(CLEAR, "1/3 ToDecimal ln XQ", ENTER).expect("'-ln 3'");
+
+    // XQ_LOG2 template: log2(p/q) when 2^x is rational
+    // (Use fractional input; integers pass through XQ unchanged)
+    step("XQ(log2(3/2)) = 'log2(³/₂)' (2^x = 3/2)")
+        .test(CLEAR, "3 2 / log2 XQ", ENTER).expect("'log2(³/₂)'");
+    step("XQ(log2(4/5)) = 'log2(⁴/₅)'")
+        .test(CLEAR, "4 5 / log2 XQ", ENTER).expect("'-log2(⁵/₄)'");
+    step("XQ(log2(5/4)) = 'log2(⁵/₄)'")
+        .test(CLEAR, "5 4 / log2 XQ", ENTER).expect("'log2(⁵/₄)'");
+
+    // XQ_LOG10 template: log10(p/q) when 10^x is rational, 2^x is not
+    step("XQ(log10(2)) = 'log10 2'")
+        .test(CLEAR, "2 log10 XQ", ENTER).expect("'log10 2'");
+    step("XQ(log10(1/2)) = 'log10(¹/₂)'")
+        .test(CLEAR, "1 2 / log10 XQ", ENTER).expect("'-log10 2'");
+
+    // XQ_EXP template: exp(p/q)
+    step("XQ(exp(1/3)) = 'exp(¹/₃)'")
+        .test(CLEAR, "1/3 ToDecimal exp XQ", ENTER).expect("'exp(¹/₃)'");
+    step("XQ(exp(2)) = 'exp 2'")
+        .test(CLEAR, "2 exp XQ", ENTER).expect("'exp 2'");
+
+    // Perfect-square simplification: √(p/q²) → √p / q
+    step("XQ(√2/789) = '√ 2÷789'")
+        .test(CLEAR, "2 sqrt 789 / XQ", ENTER).expect("'¹/₇₈₉·√ 2'");
+    step("XQ(-√3/5) = '-(√ 3÷5)'")
+        .test(CLEAR, "3 sqrt 5 / neg XQ", ENTER).expect("'-(¹/₅·√ 3)'");
+
+    // List support: XQ applied element-wise
+    step("XQ on list { 0.5 0.3 4.21 }")
+        .test(CLEAR, "{ 0.5 0.3 4.21 } XQ", ENTER)
+        .expect("{ ¹/₂ ³/₁₀ 4 ²¹/₁₀₀ }");
+    step("XQ on list { 0.5, √2 }")
+        .test(CLEAR, "0.5 2 sqrt 2 →List XQ", ENTER)
+        .expect("{ ¹/₂ '√ 2' }");
+
+    // Round-trip accuracy: XQ result evaluates back to original value
+    step("XQ(√2) round-trips: √2 XQ ToDecimal ≈ √2")
+        .test(CLEAR,
+              "2 sqrt XQ ToDecimal 2 sqrt - ABS"
+              " 10 3 'Precision' RCL - ^ <",
+              ENTER).expect("True");
+    step("XQ(π/3) round-trips: π/3 XQ ToDecimal ≈ π/3")
+        .test(CLEAR,
+              "pi 3 / XQ ToDecimal pi ToDecimal 3 / - ABS"
+              " 10 3 'Precision' RCL - ^ <",
+              ENTER).expect("True");
+
+    // Original HP Prime examples (qpiDIGITS=9 → FractionDigits=9)
+    step("Set FractionDigits to 9 for HP Prime QPI examples")
+        .test(CLEAR, "9 FractionDigits", ENTER).noerror();
+    step("HP Prime QPI(1.23) = 1 ²³/₁₀₀")
+        .test(CLEAR, "1.23 XQ", ENTER)
+        .expect("1\xe2\x81\x9f²³/₁₀₀");  // U+205F medium mathematical space
+    step("HP Prime QPI(1.41421356237) = '√ 2'")
+        .test(CLEAR, "1.41421356237 XQ", ENTER).expect("'√ 2'");
+    step("HP Prime QPI(4.71238898038) = '³/₂·π'")
+        .test(CLEAR, "4.71238898038 XQ", ENTER).expect("'³/₂·π'");
+    // HP Prime QPI(2.1+5.7i) = 21/10+(57/10)*i : complex not yet supported
+    step("HP Prime QPI(1.10517091808) = 'exp(¹/₁₀)'")
+        .test(CLEAR, "1.10517091808 XQ", ENTER).expect("'exp(¹/₁₀)'");
+    step("HP Prime QPI(.405465108108) = 'ln(³/₂)'")
+        .test(CLEAR, ".405465108108 XQ", ENTER).expect("'ln(³/₂)'");
+    step("Restore FractionDigits after HP Prime examples")
+        .test(CLEAR, "{ FractionDigits } Purge", ENTER).noerror();
 }
 
 

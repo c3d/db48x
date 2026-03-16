@@ -1382,8 +1382,8 @@ algebraic_p decimal::to_fraction(uint count, uint decimals) const
     }
 
     algebraic_g result = d1->is_one()
-                           ? algebraic_p(+n1)
-                           : algebraic_p(+big_fraction::make(n1, d1));
+        ? algebraic_p(+n1)
+        : algebraic_p(+big_fraction::make(n1, d1));
     if (neg)
         result = -result;
     return +result;

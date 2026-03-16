@@ -56,6 +56,9 @@ bool factor_result::add(bignum_r p)
 // ============================================================================
 
 const uint16_t small_primes[] =
+// ----------------------------------------------------------------------------
+//   All the primes we need for quick factorization
+// ----------------------------------------------------------------------------
 {
    2,  3,    5,    7,   11,   13,   17,   19,   23,   29,   31,
       37,   41,   43,   47,   53,   59,   61,   67,   71,   73,
@@ -834,4 +837,28 @@ COMMAND_BODY(Factors)
         return ERROR;
 
     return OK;
+}
+
+
+void extract_square_factor(ularge n, ularge &sq, ularge &rem)
+// ----------------------------------------------------------------------------
+//   Factor n as sq²·rem where rem is square-free
+// ----------------------------------------------------------------------------
+{
+    sq = 1;
+    rem = n;
+    for (size_t i = 0; i < NUM_SMALL_PRIMES; i++)
+    {
+        ularge p = small_primes[i];
+        ularge pp = p * p;
+        if (rem < pp)
+            return;
+        while (rem % pp == 0)
+        {
+            rem /= pp;
+            sq *= p;
+            if (rem == 0)
+                return;
+        }
+    }
 }

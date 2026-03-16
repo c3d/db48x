@@ -75,7 +75,7 @@ struct algebraic : command
     static bool to_fraction(algebraic_g &x);
 
     // Convert to a fraction with π, √n, ln(n) or e factored out
-    static bool to_fraction_pi(algebraic_g &x);
+    static bool to_quotient(algebraic_g &x);
 
     // Convert to decimal number
     static bool to_decimal(algebraic_g &x, bool weak = false);

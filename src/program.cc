@@ -107,10 +107,10 @@ program_p program::parse(utf8 source, size_t size)
 }
 
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 object::result program::run(bool synchronous) const
 // ----------------------------------------------------------------------------
@@ -167,9 +167,9 @@ object::result program::run(algebraic_p obj, bool sync)
     return ok;
 }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 
 object::result program::run_loop(size_t depth)

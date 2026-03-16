@@ -566,7 +566,7 @@ struct runtime
     //
     // ========================================================================
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif // DM42
@@ -639,7 +639,7 @@ struct runtime
     ;
 #endif // OBJECT_H
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif // DM42
 
