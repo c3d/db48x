@@ -419,7 +419,6 @@ $(NAME).aab:	sim/$(NAME).pro				\
 		--sign $(HOME)/.local/android_release.keystore $(NAME) \
 		--storepass '$(ANDROID_KEYSTORE_PASS)'
 
-
 # ------------------------------------------------------------------------------
 # Building the tools
 # ------------------------------------------------------------------------------

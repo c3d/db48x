@@ -2508,6 +2508,11 @@ Happy calculating!
 
 
 
+<!-- ====================================================================== -->
+<!--                                                                        -->
+<!--   Installation guide                                                   -->
+<!--                                                                        -->
+<!-- ====================================================================== -->
 
 ## Installation
 
@@ -6043,795 +6048,6 @@ As a result, they behave like normal names on DB48X.
 # Performance measurements
 
 This sections tracks some performance measurements across releases.
-
-# DB48X Menu Tree
-
-
-Soft-menu hierarchy of the DB48X calculator.
-Buttons are shown as they appear on the calculator screen:
-**6 columns** (F1–F6) and **3 rows** per page.
-
-**Legend**
-
-| Style | Meaning |
-|:------|:--------|
-| \[Menu\] | Opens a sub-menu (defined in this document) |
-| [Command](commands/symbolic.md) | Executes a command — link leads to the reference doc |
-| Command | Command with no documentation entry found |
-| _Unimplemented_ | Not yet implemented |
-| `text` | Inserts literal text in the command line |
-
----
-
-## Contents
-
-- [AlarmMenu](#alarmmenu)
-- [AlgebraMenu](#algebramenu)
-- [AnglesMenu](#anglesmenu)
-- [ArithmeticMenu](#arithmeticmenu)
-- [BasesMenu](#basesmenu)
-- [CalculationMenu](#calculationmenu)
-- [CircularMenu](#circularmenu)
-- [ClearThingsMenu](#clearthingsmenu)
-- [CompareMenu](#comparemenu)
-- [ComplexMenu](#complexmenu)
-- [DateMenu](#datemenu)
-- [DebugMenu](#debugmenu)
-- [DifferentialSolverMenu](#differentialsolvermenu)
-- [DisplayModesMenu](#displaymodesmenu)
-- [EditMenu](#editmenu)
-- [ExpLogIdentitiesMenu](#explogidentitiesmenu)
-- [FilesMenu](#filesmenu)
-- [FlagsMenu](#flagsmenu)
-- [FractionsMenu](#fractionsmenu)
-- [GraphicsMenu](#graphicsmenu)
-- [HyperbolicMenu](#hyperbolicmenu)
-- [IntegrationMenu](#integrationmenu)
-- [IOMenu](#iomenu)
-- [LinearSolverMenu](#linearsolvermenu)
-- [ListMenu](#listmenu)
-- [LoopsMenu](#loopsmenu)
-- [MainMenu](#mainmenu)
-- [MathMenu](#mathmenu)
-- [MathModesMenu](#mathmodesmenu)
-- [MatrixMenu](#matrixmenu)
-- [MemoryMenu](#memorymenu)
-- [ModesMenu](#modesmenu)
-- [MultiSolverMenu](#multisolvermenu)
-- [NumbersMenu](#numbersmenu)
-- [NumericalSolverMenu](#numericalsolvermenu)
-- [ObjectMenu](#objectmenu)
-- [PartsMenu](#partsmenu)
-- [PlotMenu](#plotmenu)
-- [PolynomialsMenu](#polynomialsmenu)
-- [PolynomialSolverMenu](#polynomialsolvermenu)
-- [PowersMenu](#powersmenu)
-- [PrintingMenu](#printingmenu)
-- [ProbabilitiesMenu](#probabilitiesmenu)
-- [ProgramMenu](#programmenu)
-- [RangeMenu](#rangemenu)
-- [RealMenu](#realmenu)
-- [SeparatorModesMenu](#separatormodesmenu)
-- [SignalProcessingMenu](#signalprocessingmenu)
-- [SolverMenu](#solvermenu)
-- [StackMenu](#stackmenu)
-- [StatisticsMenu](#statisticsmenu)
-- [SymbolicMenu](#symbolicmenu)
-- [SymbolicSolverMenu](#symbolicsolvermenu)
-- [TestsMenu](#testsmenu)
-- [TextMenu](#textmenu)
-- [TimeMenu](#timemenu)
-- [TrigIdentitiesMenu](#trigidentitiesmenu)
-- [UnitsConversionsMenu](#unitsconversionsmenu)
-- [UserInterfaceModesMenu](#userinterfacemodesmenu)
-- [UserModeMenu](#usermodemenu)
-- [VectorMenu](#vectormenu)
-
----
-
-### AlarmMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| _AckAll_ | \[[Time](#timemenu)\] | \[[Date](#datemenu)\] |   |   |   |
-| _Alarm_ | _Ack_ | _→Alarm_ | _Alarm→_ | _FindAlm_ | _DelAlm_ |
-
-### AlgebraMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Ⓓ](#algebraconfiguration) | [ⓧ](#algebravariable) | [Stoⓧ](#storealgebravariable) | [Final](#finalalgebraresults) | &Wild | \[[Symb](#symbolicmenu)\] |
-| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _→Qπ_ |
-| [↓Match](#match-1) | [↑Match](#match) | [Isolate](#isolate) | Apply | Subst | [\|](#where) |
-
-### AnglesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [→DMS](#dms) | [DMS→](#dms-1) | DMS+ | DMS- | [Hypot](#hypot) | [Atan2](#atan2) |
-| →Deg | →Rad | →Grad | →πr | [→Polar](#topolar) | [→Rect](#torectangular) |
-| Deg | Rad | Grad | [πr](#piradians) | [D→R](#dr) | [R→D](#rd) |
-
-### ArithmeticMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| _Show_ | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
-| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
-
-### BasesMenu
-
-*3 pages · 45 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [WordSize](#wordsize) | [NAnd](#nand) | [NOr](#nor) | [Implies](#implies) | [Excludes](#excludes) |   |
-| [Base](#base) | Bin | Oct | Dec | Hex | ◀ |
-| `#` | [And](#and) | [Or](#or) | [Xor](#xor) | [Not](#not) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [SLC](#shiftleftcount) | [SRC](#shiftrightcount) | [ASRC](#arithmeticshiftrightcount) | [RLC](#rotateleftcount) | [RRC](#rotaterightcount) |   |
-| [SLB](#shiftleftbyte) | [SRB](#shiftrightbyte) | [ASRB](#arithmeticshiftrightbyte) | [RLB](#rotateleftbyte) | [RRB](#rotaterightbyte) | ◀ |
-| [SL](#shiftleft) | [SR](#shiftright) | [ASR](#arithmeticshiftright) | [RL](#rotateleft) | [RR](#rotateright) | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| CntBits | 1-comp | 2-comp | [Modern](#modernbasednumbers) | [TruthLogicForIntegers](#truthlogicforintegers) |   |
-| SetBit | ClrBit | FlipBit | FstSet | LstSet | ◀ |
-| `#` | R→B | B→R | [Base](#base) | [WordSize](#wordsize) | ▶ |
-
-### CalculationMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| _Limit_ | _Serie_ | _Taylor_ | \[[Symb](#symbolicmenu)\] |   |   |
-| [LName](#listexpressionnames) | [XVars](#expressionvariables) | _Deriv_ | _DerivX_ | _IBF_ | _IntVX_ |
-
-### CircularMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| _sec_ | _csc_ | _cot_ | _sec⁻¹_ | _csc⁻¹_ | _cot⁻¹_ |
-| [sin](#sin) | [cos](#cos) | [tan](#tan) | [sin⁻¹](#asin) | [cos⁻¹](#acos) | [tan⁻¹](#atan) |
-
-### ClearThingsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Stack](#clearstack) | [Purge](#purge) | Stats | _Mem_ | Error | [LCD](#clearlcd) |
-
-### CompareMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [true](#true) | [false](#false) | \[[Tests](#testsmenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |   |
-| [and](#and) | [or](#or) | [xor](#xor) | [not](#not) | [==](#-2) | _Unimplemented_ |
-| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
-
-### ComplexMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| 2+i3 | [ℝ∡ℝ→ℂ](#realtopolar) | [ℂ→ℝ∡ℝ](#polartoreal) | Auto ℂ | \[[Angles](#anglesmenu)\] |   |
-| [→Rect](#torectangular) | [→Polar](#topolar) | [conj](#conj) | [sign](#sign) | [\|z\|](#abs) | [arg](#arg) |
-| `ⅈ` | `∡` | [ℝ→ℂ](#realtorectangular) | [ℂ→ℝ](#rectangulartoreal) | [re](#re) | [im](#im) |
-
-### DateMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| [→Time](#settime) | [→Date](#setdate) | [JDN](#juliandaynumber) | [JDN→](#datefromjuliandaynumber) | \[[Time](#timemenu)\] | \[[Alarms](#alarmmenu)\] |
-| `_date` | `_d` | [Date](#date-1) | [Dt+Tm](#datetime) | ∆Date | [Date+](#date) |
-
-### DebugMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] |   |   |   |
-| [Halt](#halt) | [Step↑](#stepout) | DoErr | ErrMsg | ErrNum | ClrErr |
-| [Debug](#debug) | [Step](#step) | [Over](#over) | [Steps](#multiplesteps) | [Continue](#continue) | [Kill](#kill) |
-
-### DifferentialSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
-
-### DisplayModesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu)\] |
-| [MantissaSpacing](#mantissaspacing) | [FractionSpacing](#fractionspacing) | [BasedSpacing](#basedspacing) | [StandardExponent](#standardexponent) | [MinimumSignificantDigits](#minimumsignificantdigits) | \[[Seps](#separatormodesmenu)\] |
-| Std | Fix | Sci | Eng | Sig | [Precision](#precision) |
-
-### EditMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| Stack | Hist↑ | Hist↓ |   |   |   |
-| Csr⇄Sel | \|← | →\| | Replace | [Copy](#copy) | Clear |
-| Select | ←Word | Word→ | [Search](#editorsearch) | [Cut](#editorcut) | [Paste](#editorpaste) |
-
-### ExpLogIdentitiesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| _ExpLn_ | _Lin_ | _LnCollect_ | _SinCos_ | _TExpand_ | \[[Symb](#symbolicmenu)\] |
-
-### FilesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| _Seek_ | _Dir_ |   |   |   |   |
-| _Save_ | _Load_ | _Open_ | _Close_ | _Read_ | _Write_ |
-| [Libs](#libs) | [Attach](#attach) | [Detach](#detach) | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
-
-### FlagsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu)\] |   |   |   |
-| [F→Bin](#flagstobinary) | [Bin→F](#binarytoflags) | \[[Tests](#testsmenu)\] | [Flip](#flipflag) | [Set?Set](#testflagsetthenset) | [Clr?Set](#testflagclearthenset) |
-| [Set](#setflag) | [Clear](#clearflag) | [Set?](#testflagset) | [Clear?](#testflagclear) | [Set?Clr](#testflagsetthenclear) | [Clr?Clr](#testflagclearthenclear) |
-
-### FractionsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Frac→](#explode) | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) | FractionIterations | FractionLargestPrime | FractionDigits |
-| [%Total](#percenttotal) | [%Chg](#percentchange) | DMS+ | DMS- | [→HMS](#hms) | [HMS→](#hms-1) |
-| `/` | [%](#percent) | [→DMS](#dms) | [DMS→](#dms-1) | [→Num](#num) | →Frac |
-
-### GraphicsMenu
-
-*4 pages · 59 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| PixOn | PixOff | [Pix?](#pixtest) | [PixCol?](#pixcolor) | _Arc_ |   |
-| [RGB](#rgb) | [Gray](#gray) | Foregnd | Bckgnd | LnWidth | ◀ |
-| [Line](#drawline) | Rect | RndRect | Ellipse | Circle | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [→LCD](#tolcd) | [LCD→](#fromlcd) | [Pict](#pict) | Clip | CurClip |   |
-| Freeze | [Show](#show) | [→Grob](#togrob) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ◀ |
-| [ClLCD](#clearlcd) | [Disp](#drawtext) | [DispXY](#drawstyledtext) | [Input](#input) | [Prompt](#prompt) | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Σ](#graphicsum) | [∏](#graphicproduct) | [∫](#graphicintegral) | [Subscript](#graphicsubscript) | [Exponent](#graphicexponent) |   |
-| [(.)](#graphicparentheses) | [\|.\|](#graphicnorm) | [÷](#graphicratio) | [√.](#graphicroot) | [Stack](#graphicstack) | ◀ |
-| [GOr](#gor) | [GXor](#gxor) | [GAnd](#gand) | [Extract](#extract) | [Append](#graphicappend) | ▶ |
-
-**Page 4**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [BlankBitmap](#blankbitmap) | _Unimplemented_ | [GraphicPicture](#pict) | \[[Plot](#plotmenu)\] |   |   |
-| _Unimplemented_ | [→Grob](#togrob) | [Blank](#blankgraphic) | [BlBitmap](#blankbitmap) | [BlGrob](#blankgrob) | ◀ |
-| [LCD→](#fromlcd) | [→LCD](#tolcd) | [→Bitmap](#tobitmap) | [→HPGrob](#tohpgrob) | [→Bitmap](#tobitmap) | ▶ |
-
-### HyperbolicMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| \[[Powers](#powersmenu)\] |   |   |   |   |   |
-| [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
-
-### IntegrationMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| Σ | ∏ |   |   |   |   |
-| [∂](#derivative) | ∫ | [Num ∫](#integrate) | Symb ∫ | [Eq](#equation) | _Indep_ |
-
-### IOMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| _Save_ | [MinimumBatteryVoltage](#minimumbatteryvoltage) |   |   |   |   |
-| _Save_ | _Load_ | _Print_ | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
-
-### LinearSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
-
-### ListMenu
-
-*2 pages · 30 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Sort](#sort) | [RSort](#reversesort) | [Map](#map) | [Reduce](#reduce) | [Filter](#filter) |   |
-| [QSort](#quicksort) | [RQSort](#reversequicksort) | [∑List](#listsum) | [∏List](#listproduct) | [∆List](#listdifferences) | ◀ |
-| [→List](#list) | [List→](#list-1) | [Size](#size) | [Head](#head) | [Tail](#tail) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Obj→](#explode) | _Find_ | \[[Objects](#objectmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Vector](#vectormenu)\] |   |
-| DoList | DoSubs | NSub | EndSub | [Extract](#extract) | ◀ |
-| [Get](#get) | [Put](#put) | [GetI](#geti) | [PutI](#puti) | [Reverse](#reverselist) | ▶ |
-
-### LoopsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| \[[Compare](#testsmenu)\] | \[[Prog](#programmenu)\] | _Label_ | _Goto_ | _Gosub_ | _Return_ |
-| [Start](#start) | StStep | [For](#for) | ForStep | [Until](#until) | [While](#while) |
-
-### MainMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Lib](#library)\] | \[[Eqns](#equationsmenu)\] | \[[Const](#constantsmenu)\] | \[[Time](#timemenu)\] | \[[I/O](#iomenu)\] | \[[Chars](#charactersmenu)\] |
-| [Cat](#catalog) | \[[Real](#realmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Stack](#stackmenu)\] | \[[UI](#userinterfacemodesmenu)\] |
-| Help | \[[Math](#mathmenu)\] | \[[Prog](#programmenu)\] | \[[Plot](#plotmenu)\] | \[[Solve](#solvermenu)\] | \[[Modes](#modesmenu)\] |
-
-### MathMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Signal](#signalprocessingmenu)\] | \[[Bases](#basesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Frac](#fractionsmenu)\] |
-| \[[Hyper](#hyperbolicmenu)\] | \[[Proba](#probabilitiesmenu)\] | \[[Stats](#statisticsmenu)\] | \[[Solver](#solvermenu)\] | \[[Const](#constantsmenu)\] | \[[Eqns](#equationsmenu)\] |
-| \[[Real](#realmenu)\] | \[[Cmplx](#complexmenu)\] | \[[Trig](#circularmenu)\] | \[[Powers](#powersmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Ranges](#rangemenu)\] |
-
-### MathModesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu)\] |
-| [MaxNumberBits](#maxnumberbits) | [MaxRewrites](#maxrewrites) | FractionIterations | FractionDigits | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) |
-| [Sym](#symbolicresults) | [Simpl](#autosimplify) | 0^0=1 | HwFP | Auto ℂ | Princ |
-
-### MatrixMenu
-
-*3 pages · 35 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [RowNrm](#rownorm) | [ColNrm](#columnnorm) | _CondNum_ | [Size](#size) | \[[Vector](#vectormenu)\] |   |
-| [Det](#determinant) | [Norm](#abs) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
-| `[]` | [Idnty](#identitymatrix) | [Const](#constantarray) | Transp | TrConj | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| _SVD_ | _SVL_ | _Diag→_ | _→Diag_ | _SpecRad_ |   |
-| _LU_ | _LQ_ | _QR_ | _Schur_ | _Cholesky_ | ◀ |
-| [Col+](#col) | [Col-](#col-) | →Col | Col→ | ColSwp | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   | ◀ |
-| [Row+](#row) | [Row-](#row-) | →Row | Row→ | RowSwp | ▶ |
-
-### MemoryMenu
-
-*3 pages · 37 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | [RunStats](#runtimestatistics) | [GCStats](#garbagecollectorstatistics) |   |
-| [Avail](#availablememory) | [Vars](#variables) | [Home](#homedirectory) | [Path](#directorypath) | [GC](#garbagecollect) | ◀ |
-| [Store](#store) | [Recall](#recall) | [Purge](#purge) | [CrDir](#createdirectory) | [UpDir](#updirectory) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | CurDir |   |
-| [Recall](#recall) | Recall+ | Recall- | Recall× | Recall÷ | ◀ |
-| [Store](#store) | Store+ | Store- | Store× | Store÷ | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| GC Clr | RT Clr |   |   |   | ◀ |
-| [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
-
-### ModesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Modes](#modes) | [Reset](#resetmodes) | [System](#systemsetup) |   |   |   |
-| Grad | \[[Angles](#anglesmenu)\] | Beep | Flash | \[[Display](#displaymodesmenu)\] | \[[Seps](#separatormodesmenu)\] |
-| Deg | Rad | [n×π](#piradians) | \[[Math](#mathmodesmenu)\] | \[[User](#usermodemenu)\] | \[[UI](#userinterfacemodesmenu)\] |
-
-### MultiSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| _Eqs_ | _Indeps_ | _MRoot_ | \[[SolverMenu](#solvermenu)\] |   |   |
-
-### NumbersMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) |   |   |
-| [→Num](#num) | [→Q](#q) | [→Qπ](#q-1) | R#Seed | [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |
-| Σ | ∏ | QuoRem | [Factors](#factors) | Ran# | [Random](#random) |
-
-### NumericalSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
-
-### ObjectMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Eval](#evaluate) | [Run](#run) | Clone | [DTag](#deletetag) | [Tag→](#tag-1) | \[[Tools](#toolsmenu)\] |
-| [→List](#list) | [→Text](#totext) | [→Tag](#tag) | [→Graph](#togrob) | [→Prog](#program) | [→Array](#array) |
-| [Bytes](#bytes) | [Type](#type) | [TypeName](#typename) | [Obj→](#explode) | [→Num](#num) | →Frac |
-
-### PartsMenu
-
-*2 pages · 30 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| →Int | [→Q](#q) | [→Qπ](#q-1) | [SigDig](#sigdig) | [Get](#get) |   |
-| Trunc | [Mant](#mant) | [Xpon](#xpon) | [Ceil](#ceil) | [Floor](#floor) | ◀ |
-| [abs](#abs) | [sign](#sign) | [IntegerPart](#intpart) | [FractionalPart](#fracpart) | Round | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) |   |
-| [CstName](#constantname) | [CstValue](#constantvalue) | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | [Tag→](#tag-1) | ◀ |
-| [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Obj→](#explode) | ▶ |
-
-### PlotMenu
-
-*2 pages · 20 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| Lines | Axes | [StatsPlotBins](#statsplotbins) | [XYPlotBins](#xyplotbins) | PlotRefreshRate |   |
-| Foregnd | Backgnd | LineWdth | [Xrange](#xrange) | [Yrange](#yrange) | ◀ |
-| [Function](#functionplot) | [Polar](#polarplot) | [Param](#parametricplot) | [Scatter](#scatterplot) | [Truth](#truthplot) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   | ◀ |
-| [Bar](#barplot) | [Histogrm](#histogramplot) | [Clear](#clearlcd) | Freeze | DrAxes | ▶ |
-
-### PolynomialsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| _Solve_ | _TVMRoot_ | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
-| _FRoots_ | _MRoot_ | _MSolvr_ | _PCoef_ | _PRoot_ | [Root](#root) |
-| `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
-
-### PolynomialSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
-
-### PowersMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [pow](#pow) | [xroot](#xroot) | _FstSet_ | _LstSet_ | _popcnt_ | \[[Hyper](#hyperbolicmenu)\] |
-| [exp2](#exp2) | log2 | [expm1](#expm1) | [ln1p](#ln1p) | x³ | [∛](#cbrt) |
-| [exp](#exp) | [ln](#ln) | [exp10](#exp10) | [log10](#log10) | [x²](#sq) | [√](#sqrt) |
-
-### PrintingMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| _Print_ | _Screen_ | _Disk_ | _IR_ |   |   |
-
-### ProbabilitiesMenu
-
-*2 pages · 22 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| _Normal_ | _Student_ | _Chi²_ | _F-Distr_ | _FFT_ |   |
-| Γ | ln(Γ) | erf | erfc | RSeed | ◀ |
-| Comb | Perm | x! | Ran# | [Random](#random) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |   |   |   | ◀ |
-| _Normal⁻¹_ | _Studnt⁻¹_ | _Chi²⁻¹_ | _F-Dist⁻¹_ | _FFT⁻¹_ | ▶ |
-
-### ProgramMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
-| \[[Mem](#memorymenu)\] | \[[Test](#testsmenu)\] | \[[Cmp](#comparemenu)\] | \[[Loop](#loopsmenu)\] | \[[Base](#basesmenu)\] | [Eval](#evaluate) |
-| `«»` | `{}` | `[]` | `→  «»` | `→  ''` | [Run](#run) |
-
-### RangeMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Size](#size) |   |   |   |   |   |
-| [→Range](#range) | [→∆Range](#range-1) | [→%Range](#range-2) | [→σRange](#range-3) | [∪](#rangeunion) | [∩](#rangeintersect) |
-| `…` | `±` | `±%` | `±σ` | Range→ | `ρ` |
-
-### RealMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Trig](#circularmenu)\] | \[[Hyper](#hyperbolicmenu)\] | \[[Powers](#powersmenu)\] | \[[Prob](#probabilitiesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Parts](#partsmenu)\] |
-| [Ceil](#ceil) | [Floor](#floor) | rem | [%](#percent) | [%Chg](#percentchange) | [%Total](#percenttotal) |
-| [Min](#min) | [Max](#max) | [mod](#mod) | [abs](#abs) | [→Num](#num) | [→Q](#q) |
-
-### SeparatorModesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [1.2x10³²](#fancyexponent) | [1.2E32](#classicexponent) | [1.0→1.](#trailingdecimal) | [1→1.0](#showasdecimal) | Fixed0 |   |
-| #1 000 | #1.000 | #1'000 | #1_000 | \[[Disp](#displaymodesmenu)\] | \[[Modes](#modesmenu)\] |
-| [1 000](#numberspaces) | [1.000,](#numberdotorcomma) | [1'000](#numberticks) | [1_000](#numberunderscore) | [2.3](#decimaldot) | [2,3](#decimalcomma) |
-
-### SignalProcessingMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| _FFT_ | _InvFFT_ |   |   |   |   |
-
-### SolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
-| [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
-| [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
-
-### StackMenu
-
-*2 pages · 22 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [DupN](#duplicaten) | [DropN](#dropn) | [Depth](#depth) | [Nip](#nip) | [Pick3](#pick3) |   |
-| [Dup2](#duplicate2) | [Drop2](#drop2) | [Rot↓](#unrot) | [Roll↓](#rolld) | [Pick](#pick) | ◀ |
-| [Dup](#duplicate) | [Drop](#drop) | [Rot↑](#rot) | [Roll↑](#roll) | [Over](#over) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| [NDupN](#ndupn) | [DupDup](#duplicatetwice) |   |   |   | ◀ |
-| [Swap](#swap) | [LastArg](#lastarguments) | [LastX](#lastx) | [Undo](#undo) | [ClrStk](#clearstack) | ▶ |
-
-### StatisticsMenu
-
-*3 pages · 35 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| StoΣ | RclΣ | ClrΣ | \[[Proba](#probabilitiesmenu)\] | \[[Plot](#plotmenu)\] |   |
-| [XCol](#independentcolumn) | [YCol](#dependentcolumn) | [MinΣ](#min) | [MaxΣ](#max) | [ΣSize](#size) | ◀ |
-| [Σ+](#) | [Σ-](#-) | Total | [Mean](#average) | [StdDev](#standarddeviation) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [ΣX](#x) | [ΣY](#y) | [ΣXY](#xy) | [ΣX²](#x-1) | [ΣY²](#y-1) |   |
-| [BestFit](#bestfit) | [LinFit](#linearfit) | [ExpFit](#exponentialfit) | [LogFit](#logarithmicfit) | [PwrFit](#powerfit) | ◀ |
-| [LR](#linearregression) | ΣLine | PredX | PredY | [Corr](#correlation) | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   | ◀ |
-| [Median](#median) | [Bins](#frequencybins) | [PopVar](#populationvariance) | [PopSDev](#populationstandarddeviation) | [PCovar](#populationcovariance) | ▶ |
-
-### SymbolicMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
-| \[[Arith](#arithmeticmenu)\] | \[[Calc](#calculationmenu)\] | \[[Trig](#trigidentitiesmenu)\] | \[[Exp/Ln](#explogidentitiesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Graph](#plotmenu)\] |
-| Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
-
-### SymbolicSolverMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
-
-### TestsMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Case](#case) | Then | When | \[[Compare](#comparemenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |
-| IfThen | IfElse | [IfErr](#iferr) | IfErrElse | [IFT](#ift) | [IFTE](#ifte) |
-| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
-
-### TextMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [T→Real](#compiletoreal) | [T→Expr](#compiletoexpression) | [T→Int](#compiletointeger) | [T→Pos](#compiletopositive) |   |   |
-| [T→Code](#textcode) | [Code→T](#codetext) | [Extract](#extract) | [T→Obj](#compiletoobject) | [T→Alg](#compiletoalgebraic) | [T→Num](#compiletonumber) |
-| [→Text](#totext) | [Text→](#compile) | [Length](#size) | [Append](#add) | [Repeat](#repeat) | [C→Code](#charcode) |
-
-### TimeMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu)\] | \[[Alarms](#alarmmenu)\] |   |
-| Chrono | [Ticks](#ticks) | [Dt+Tm](#datetime) | [T→Str](#totext) | [Wait](#wait) | [TEval](#teval) |
-| _hms | [Time](#time) | [→HMS](#hms) | [HMS→](#hms-1) | [HMS+](#hms-2) | [HMS-](#hms-) |
-
-### TrigIdentitiesMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| \[[Symb](#symbolicmenu)\] |   |   |   |   |   |
-| _HalfTan_ | _Tan→SinCos_ | _Tan→SinCos²_ | _TExpand_ | _TLin_ | [TrigSin](#trigsin) |
-
-### UnitsConversionsMenu
-
-*3 pages · 36 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| µ (-6) | n (-9) | p (-12) | T (+12) | P (+15) |   |
-| m (-3) | c (-2) | k (+3) | M (+6) | G (+9) | ◀ |
-| [Convert](#convert) | [Base](#base) | [Value](#unitvalue) | [Factor](#factorunit) | [→Unit](#unit) | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| Ki | Mi | Gi | Ti | [Pi](#pi) |   |
-| y (-24) | z (-21) | a (-18) | Z (+21) | Y (+24) | ◀ |
-| f (-15) | d (-1) | da (+1) | h (+2) | E (+18) | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| [SIPfx](#unitssiprefixcycle) |   |   |   |   | ◀ |
-| Ei | Zi | Yi | Ri | Qi | ▶ |
-
-### UserInterfaceModesMenu
-
-*4 pages · 47 items total*
-
-**Page 1**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [3-lines](#threerowsmenus) | [1-line](#singlerowmenus) | [Flat](#flatmenus) | [Round](#roundedmenus) | \[[Hide](#hideemptymenu)\] |   |
-| ResultFont | StackFont | EditorFont | MultilineEditorFont | [CursorBlinkRate](#cursorblinkrate) | ◀ |
-| [GrRes](#graphicresultdisplay) | [GrStk](#graphicstackdisplay) | Beep | Flash | \[[User](#usermodemenu)\] | ▶ |
-
-**Page 2**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| Fixed0 | VProg | BusyIndicatorRefresh | \[[ExitMenu](#exitclearsmenu)\] | [ListEval](#listasprogram) |   |
-| [EditorWrapColumn](#editorwrapcolumn) | [TabWidth](#tabwidth) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ErrorBeepFrequency | ◀ |
-| [cmd](#lowercase) | [CMD](#uppercase) | [Cmd](#capitalized) | [Command](#longform) | ErrorBeepDuration | ▶ |
-
-**Page 3**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [TextRenderingSizeLimit](#textrenderingsizelimit) | [GraphRenderingSizeLimit](#graphrenderingsizelimit) | PlotRefreshRate | AllVars | [SIPrefixCycle](#unitssiprefixcycle) |   |
-| [ResultGraphingTimeLimit](#resultgraphingtimelimit) | [StackGraphingTimeLimit](#stackgraphingtimelimit) | [GraphingTimeLimit](#graphingtimelimit) | [ShowTimeLimit](#showtimelimit) | [MinimumBatteryVoltage](#minimumbatteryvoltage) | ◀ |
-| [Units](#showbuiltinunits) | Const | Eqns | [Libs](#libs) | Chars | ▶ |
-
-**Page 4**
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-|   |   |   |   |   | ◀ |
-| [Header](#header) | [CustomHeaderRefresh](#customheaderrefresh) |   |   |   | ▶ |
-
-### UserModeMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-|   |   |   |   |   |   |
-| [DelKeys](#deletekeys) | [KeyMap](#keymap) |   |   |   |   |
-| [Toggle](#toggleusermode) | [User](#usermode) | [Lock](#usermodelock) | [RclKeys](#recallkeys) | [StoKeys](#storekeys) | [Assign](#assignkey) |
-
-### VectorMenu
-
-| F1 | F2 | F3 | F4 | F5 | F6 |
-|:--:|:--:|:--:|:--:|:--:|:--:|
-| [Hypot](#hypot) | [Atan2](#atan2) |   |   |   |   |
-| [→Vec2](#to2dvector) | [→Vec3](#to3dvector) | [Vec→](#fromvector) | [→Cylind](#tocylindrical) | \[[Complex](#complexmenu)\] | \[[Matrix](#matrixmenu)\] |
-| [Norm](#abs) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
 
 # Constants library
 
@@ -18396,3 +17612,792 @@ automatically be disabled after the first operation. The opposite setting is
 
 Enable temporary user mode, where the first activation of `ToggleUserMode` only
 enables user mode for a single operation. The oppsite setting is `UserModeLock`.
+# DB48X Menu Tree
+
+
+Soft-menu hierarchy of the DB48X calculator.
+Buttons are shown as they appear on the calculator screen:
+**6 columns** (F1–F6) and **3 rows** per page.
+
+**Legend**
+
+| Style | Meaning |
+|:------|:--------|
+| \[Menu\] | Opens a sub-menu (defined in this document) |
+| [Command](#add) | Executes a command — link leads to the reference doc |
+| Command | Command with no documentation entry found |
+| _Unimplemented_ | Not yet implemented |
+| `text` | Inserts literal text in the command line |
+
+---
+
+## Contents
+
+- [AlarmMenu](#alarmmenu)
+- [AlgebraMenu](#algebramenu)
+- [AnglesMenu](#anglesmenu)
+- [ArithmeticMenu](#arithmeticmenu)
+- [BasesMenu](#basesmenu)
+- [CalculationMenu](#calculationmenu)
+- [CircularMenu](#circularmenu)
+- [ClearThingsMenu](#clearthingsmenu)
+- [CompareMenu](#comparemenu)
+- [ComplexMenu](#complexmenu)
+- [DateMenu](#datemenu)
+- [DebugMenu](#debugmenu)
+- [DifferentialSolverMenu](#differentialsolvermenu)
+- [DisplayModesMenu](#displaymodesmenu)
+- [EditMenu](#editmenu)
+- [ExpLogIdentitiesMenu](#explogidentitiesmenu)
+- [FilesMenu](#filesmenu)
+- [FlagsMenu](#flagsmenu)
+- [FractionsMenu](#fractionsmenu)
+- [GraphicsMenu](#graphicsmenu)
+- [HyperbolicMenu](#hyperbolicmenu)
+- [IntegrationMenu](#integrationmenu)
+- [IOMenu](#iomenu)
+- [LinearSolverMenu](#linearsolvermenu)
+- [ListMenu](#listmenu)
+- [LoopsMenu](#loopsmenu)
+- [MainMenu](#mainmenu)
+- [MathMenu](#mathmenu)
+- [MathModesMenu](#mathmodesmenu)
+- [MatrixMenu](#matrixmenu)
+- [MemoryMenu](#memorymenu)
+- [ModesMenu](#modesmenu)
+- [MultiSolverMenu](#multisolvermenu)
+- [NumbersMenu](#numbersmenu)
+- [NumericalSolverMenu](#numericalsolvermenu)
+- [ObjectMenu](#objectmenu)
+- [PartsMenu](#partsmenu)
+- [PlotMenu](#plotmenu)
+- [PolynomialsMenu](#polynomialsmenu)
+- [PolynomialSolverMenu](#polynomialsolvermenu)
+- [PowersMenu](#powersmenu)
+- [PrintingMenu](#printingmenu)
+- [ProbabilitiesMenu](#probabilitiesmenu)
+- [ProgramMenu](#programmenu)
+- [RangeMenu](#rangemenu)
+- [RealMenu](#realmenu)
+- [SeparatorModesMenu](#separatormodesmenu)
+- [SignalProcessingMenu](#signalprocessingmenu)
+- [SolverMenu](#solvermenu)
+- [StackMenu](#stackmenu)
+- [StatisticsMenu](#statisticsmenu)
+- [SymbolicMenu](#symbolicmenu)
+- [SymbolicSolverMenu](#symbolicsolvermenu)
+- [TestsMenu](#testsmenu)
+- [TextMenu](#textmenu)
+- [TimeMenu](#timemenu)
+- [TrigIdentitiesMenu](#trigidentitiesmenu)
+- [UnitsConversionsMenu](#unitsconversionsmenu)
+- [UserInterfaceModesMenu](#userinterfacemodesmenu)
+- [UserModeMenu](#usermodemenu)
+- [VectorMenu](#vectormenu)
+
+---
+
+### AlarmMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _AckAll_ | \[[Time](#timemenu)\] | \[[Date](#datemenu)\] |   |   |   |
+| _Alarm_ | _Ack_ | _→Alarm_ | _Alarm→_ | _FindAlm_ | _DelAlm_ |
+
+### AlgebraMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Ⓓ](#algebraconfiguration) | [ⓧ](#algebravariable) | [Stoⓧ](#storealgebravariable) | [Final](#finalalgebraresults) | &Wild | \[[Symb](#symbolicmenu)\] |
+| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _→Qπ_ |
+| [↓Match](#match-1) | [↑Match](#match) | [Isolate](#isolate) | Apply | Subst | [\|](#where) |
+
+### AnglesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→DMS](#dms) | [DMS→](#dms-1) | DMS+ | DMS- | [Hypot](#hypot) | [Atan2](#atan2) |
+| →Deg | →Rad | →Grad | →πr | [→Polar](#topolar) | [→Rect](#torectangular) |
+| Deg | Rad | Grad | [πr](#piradians) | [D→R](#dr) | [R→D](#rd) |
+
+### ArithmeticMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Show_ | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
+| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
+
+### BasesMenu
+
+*3 pages · 45 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [WordSize](#wordsize) | [NAnd](#nand) | [NOr](#nor) | [Implies](#implies) | [Excludes](#excludes) |   |
+| [Base](#base) | Bin | Oct | Dec | Hex | ◀ |
+| `#` | [And](#and) | [Or](#or) | [Xor](#xor) | [Not](#not) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [SLC](#shiftleftcount) | [SRC](#shiftrightcount) | [ASRC](#arithmeticshiftrightcount) | [RLC](#rotateleftcount) | [RRC](#rotaterightcount) |   |
+| [SLB](#shiftleftbyte) | [SRB](#shiftrightbyte) | [ASRB](#arithmeticshiftrightbyte) | [RLB](#rotateleftbyte) | [RRB](#rotaterightbyte) | ◀ |
+| [SL](#shiftleft) | [SR](#shiftright) | [ASR](#arithmeticshiftright) | [RL](#rotateleft) | [RR](#rotateright) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| CntBits | 1-comp | 2-comp | [Modern](#modernbasednumbers) | [TruthLogicForIntegers](#truthlogicforintegers) |   |
+| SetBit | ClrBit | FlipBit | FstSet | LstSet | ◀ |
+| `#` | R→B | B→R | [Base](#base) | [WordSize](#wordsize) | ▶ |
+
+### CalculationMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Limit_ | _Serie_ | _Taylor_ | \[[Symb](#symbolicmenu)\] |   |   |
+| [LName](#listexpressionnames) | [XVars](#expressionvariables) | _Deriv_ | _DerivX_ | _IBF_ | _IntVX_ |
+
+### CircularMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _sec_ | _csc_ | _cot_ | _sec⁻¹_ | _csc⁻¹_ | _cot⁻¹_ |
+| [sin](#sin) | [cos](#cos) | [tan](#tan) | [sin⁻¹](#asin) | [cos⁻¹](#acos) | [tan⁻¹](#atan) |
+
+### ClearThingsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Stack](#clearstack) | [Purge](#purge) | Stats | _Mem_ | Error | [LCD](#clearlcd) |
+
+### CompareMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [true](#true) | [false](#false) | \[[Tests](#testsmenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |   |
+| [and](#and) | [or](#or) | [xor](#xor) | [not](#not) | [==](#-2) | _Unimplemented_ |
+| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
+
+### ComplexMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| 2+i3 | [ℝ∡ℝ→ℂ](#realtopolar) | [ℂ→ℝ∡ℝ](#polartoreal) | Auto ℂ | \[[Angles](#anglesmenu)\] |   |
+| [→Rect](#torectangular) | [→Polar](#topolar) | [conj](#conj) | [sign](#sign) | [\|z\|](#abs) | [arg](#arg) |
+| `ⅈ` | `∡` | [ℝ→ℂ](#realtorectangular) | [ℂ→ℝ](#rectangulartoreal) | [re](#re) | [im](#im) |
+
+### DateMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [→Time](#settime) | [→Date](#setdate) | [JDN](#juliandaynumber) | [JDN→](#datefromjuliandaynumber) | \[[Time](#timemenu)\] | \[[Alarms](#alarmmenu)\] |
+| `_date` | `_d` | [Date](#date-1) | [Dt+Tm](#datetime) | ∆Date | [Date+](#date) |
+
+### DebugMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] |   |   |   |
+| [Halt](#halt) | [Step↑](#stepout) | DoErr | ErrMsg | ErrNum | ClrErr |
+| [Debug](#debug) | [Step](#step) | [Over](#over) | [Steps](#multiplesteps) | [Continue](#continue) | [Kill](#kill) |
+
+### DifferentialSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### DisplayModesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu)\] |
+| [MantissaSpacing](#mantissaspacing) | [FractionSpacing](#fractionspacing) | [BasedSpacing](#basedspacing) | [StandardExponent](#standardexponent) | [MinimumSignificantDigits](#minimumsignificantdigits) | \[[Seps](#separatormodesmenu)\] |
+| Std | Fix | Sci | Eng | Sig | [Precision](#precision) |
+
+### EditMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Stack | Hist↑ | Hist↓ |   |   |   |
+| Csr⇄Sel | \|← | →\| | Replace | [Copy](#copy) | Clear |
+| Select | ←Word | Word→ | [Search](#editorsearch) | [Cut](#editorcut) | [Paste](#editorpaste) |
+
+### ExpLogIdentitiesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _ExpLn_ | _Lin_ | _LnCollect_ | _SinCos_ | _TExpand_ | \[[Symb](#symbolicmenu)\] |
+
+### FilesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Seek_ | _Dir_ |   |   |   |   |
+| _Save_ | _Load_ | _Open_ | _Close_ | _Read_ | _Write_ |
+| [Libs](#libs) | [Attach](#attach) | [Detach](#detach) | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
+
+### FlagsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu)\] |   |   |   |
+| [F→Bin](#flagstobinary) | [Bin→F](#binarytoflags) | \[[Tests](#testsmenu)\] | [Flip](#flipflag) | [Set?Set](#testflagsetthenset) | [Clr?Set](#testflagclearthenset) |
+| [Set](#setflag) | [Clear](#clearflag) | [Set?](#testflagset) | [Clear?](#testflagclear) | [Set?Clr](#testflagsetthenclear) | [Clr?Clr](#testflagclearthenclear) |
+
+### FractionsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Frac→](#explode) | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) | FractionIterations | FractionLargestPrime | FractionDigits |
+| [%Total](#percenttotal) | [%Chg](#percentchange) | DMS+ | DMS- | [→HMS](#hms) | [HMS→](#hms-1) |
+| `/` | [%](#percent) | [→DMS](#dms) | [DMS→](#dms-1) | [→Num](#num) | →Frac |
+
+### GraphicsMenu
+
+*4 pages · 59 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| PixOn | PixOff | [Pix?](#pixtest) | [PixCol?](#pixcolor) | _Arc_ |   |
+| [RGB](#rgb) | [Gray](#gray) | Foregnd | Bckgnd | LnWidth | ◀ |
+| [Line](#drawline) | Rect | RndRect | Ellipse | Circle | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→LCD](#tolcd) | [LCD→](#fromlcd) | [Pict](#pict) | Clip | CurClip |   |
+| Freeze | [Show](#show) | [→Grob](#togrob) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ◀ |
+| [ClLCD](#clearlcd) | [Disp](#drawtext) | [DispXY](#drawstyledtext) | [Input](#input) | [Prompt](#prompt) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Σ](#graphicsum) | [∏](#graphicproduct) | [∫](#graphicintegral) | [Subscript](#graphicsubscript) | [Exponent](#graphicexponent) |   |
+| [(.)](#graphicparentheses) | [\|.\|](#graphicnorm) | [÷](#graphicratio) | [√.](#graphicroot) | [Stack](#graphicstack) | ◀ |
+| [GOr](#gor) | [GXor](#gxor) | [GAnd](#gand) | [Extract](#extract) | [Append](#graphicappend) | ▶ |
+
+**Page 4**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [BlankBitmap](#blankbitmap) | _Unimplemented_ | [GraphicPicture](#pict) | \[[Plot](#plotmenu)\] |   |   |
+| _Unimplemented_ | [→Grob](#togrob) | [Blank](#blankgraphic) | [BlBitmap](#blankbitmap) | [BlGrob](#blankgrob) | ◀ |
+| [LCD→](#fromlcd) | [→LCD](#tolcd) | [→Bitmap](#tobitmap) | [→HPGrob](#tohpgrob) | [→Bitmap](#tobitmap) | ▶ |
+
+### HyperbolicMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Powers](#powersmenu)\] |   |   |   |   |   |
+| [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
+
+### IntegrationMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| Σ | ∏ |   |   |   |   |
+| [∂](#derivative) | ∫ | [Num ∫](#integrate) | Symb ∫ | [Eq](#equation) | _Indep_ |
+
+### IOMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Save_ | [MinimumBatteryVoltage](#minimumbatteryvoltage) |   |   |   |   |
+| _Save_ | _Load_ | _Print_ | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
+
+### LinearSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### ListMenu
+
+*2 pages · 30 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Sort](#sort) | [RSort](#reversesort) | [Map](#map) | [Reduce](#reduce) | [Filter](#filter) |   |
+| [QSort](#quicksort) | [RQSort](#reversequicksort) | [∑List](#listsum) | [∏List](#listproduct) | [∆List](#listdifferences) | ◀ |
+| [→List](#list) | [List→](#list-1) | [Size](#size) | [Head](#head) | [Tail](#tail) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Obj→](#explode) | _Find_ | \[[Objects](#objectmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Vector](#vectormenu)\] |   |
+| DoList | DoSubs | NSub | EndSub | [Extract](#extract) | ◀ |
+| [Get](#get) | [Put](#put) | [GetI](#geti) | [PutI](#puti) | [Reverse](#reverselist) | ▶ |
+
+### LoopsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Compare](#testsmenu)\] | \[[Prog](#programmenu)\] | _Label_ | _Goto_ | _Gosub_ | _Return_ |
+| [Start](#start) | StStep | [For](#for) | ForStep | [Until](#until) | [While](#while) |
+
+### MainMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Lib](#library)\] | \[[Eqns](#equationsmenu)\] | \[[Const](#constantsmenu)\] | \[[Time](#timemenu)\] | \[[I/O](#iomenu)\] | \[[Chars](#charactersmenu)\] |
+| [Cat](#catalog) | \[[Real](#realmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Stack](#stackmenu)\] | \[[UI](#userinterfacemodesmenu)\] |
+| Help | \[[Math](#mathmenu)\] | \[[Prog](#programmenu)\] | \[[Plot](#plotmenu)\] | \[[Solve](#solvermenu)\] | \[[Modes](#modesmenu)\] |
+
+### MathMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Signal](#signalprocessingmenu)\] | \[[Bases](#basesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Frac](#fractionsmenu)\] |
+| \[[Hyper](#hyperbolicmenu)\] | \[[Proba](#probabilitiesmenu)\] | \[[Stats](#statisticsmenu)\] | \[[Solver](#solvermenu)\] | \[[Const](#constantsmenu)\] | \[[Eqns](#equationsmenu)\] |
+| \[[Real](#realmenu)\] | \[[Cmplx](#complexmenu)\] | \[[Trig](#circularmenu)\] | \[[Powers](#powersmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Ranges](#rangemenu)\] |
+
+### MathModesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu)\] |
+| [MaxNumberBits](#maxnumberbits) | [MaxRewrites](#maxrewrites) | FractionIterations | FractionDigits | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) |
+| [Sym](#symbolicresults) | [Simpl](#autosimplify) | 0^0=1 | HwFP | Auto ℂ | Princ |
+
+### MatrixMenu
+
+*3 pages · 35 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [RowNrm](#rownorm) | [ColNrm](#columnnorm) | _CondNum_ | [Size](#size) | \[[Vector](#vectormenu)\] |   |
+| [Det](#determinant) | [Norm](#abs) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
+| `[]` | [Idnty](#identitymatrix) | [Const](#constantarray) | Transp | TrConj | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _SVD_ | _SVL_ | _Diag→_ | _→Diag_ | _SpecRad_ |   |
+| _LU_ | _LQ_ | _QR_ | _Schur_ | _Cholesky_ | ◀ |
+| [Col+](#col) | [Col-](#col-) | →Col | Col→ | ColSwp | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Row+](#row) | [Row-](#row-) | →Row | Row→ | RowSwp | ▶ |
+
+### MemoryMenu
+
+*3 pages · 37 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | [RunStats](#runtimestatistics) | [GCStats](#garbagecollectorstatistics) |   |
+| [Avail](#availablememory) | [Vars](#variables) | [Home](#homedirectory) | [Path](#directorypath) | [GC](#garbagecollect) | ◀ |
+| [Store](#store) | [Recall](#recall) | [Purge](#purge) | [CrDir](#createdirectory) | [UpDir](#updirectory) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | CurDir |   |
+| [Recall](#recall) | Recall+ | Recall- | Recall× | Recall÷ | ◀ |
+| [Store](#store) | Store+ | Store- | Store× | Store÷ | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| GC Clr | RT Clr |   |   |   | ◀ |
+| [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
+
+### ModesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Modes](#modes) | [Reset](#resetmodes) | [System](#systemsetup) |   |   |   |
+| Grad | \[[Angles](#anglesmenu)\] | Beep | Flash | \[[Display](#displaymodesmenu)\] | \[[Seps](#separatormodesmenu)\] |
+| Deg | Rad | [n×π](#piradians) | \[[Math](#mathmodesmenu)\] | \[[User](#usermodemenu)\] | \[[UI](#userinterfacemodesmenu)\] |
+
+### MultiSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _Eqs_ | _Indeps_ | _MRoot_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### NumbersMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) |   |   |
+| [→Num](#num) | [→Q](#q) | [→Qπ](#q-1) | R#Seed | [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |
+| Σ | ∏ | QuoRem | [Factors](#factors) | Ran# | [Random](#random) |
+
+### NumericalSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### ObjectMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Eval](#evaluate) | [Run](#run) | Clone | [DTag](#deletetag) | [Tag→](#tag-1) | \[[Tools](#toolsmenu)\] |
+| [→List](#list) | [→Text](#totext) | [→Tag](#tag) | [→Graph](#togrob) | [→Prog](#program) | [→Array](#array) |
+| [Bytes](#bytes) | [Type](#type) | [TypeName](#typename) | [Obj→](#explode) | [→Num](#num) | →Frac |
+
+### PartsMenu
+
+*2 pages · 30 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| →Int | [→Q](#q) | [→Qπ](#q-1) | [SigDig](#sigdig) | [Get](#get) |   |
+| Trunc | [Mant](#mant) | [Xpon](#xpon) | [Ceil](#ceil) | [Floor](#floor) | ◀ |
+| [abs](#abs) | [sign](#sign) | [IntegerPart](#intpart) | [FractionalPart](#fracpart) | Round | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) |   |
+| [CstName](#constantname) | [CstValue](#constantvalue) | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | [Tag→](#tag-1) | ◀ |
+| [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Obj→](#explode) | ▶ |
+
+### PlotMenu
+
+*2 pages · 20 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Lines | Axes | [StatsPlotBins](#statsplotbins) | [XYPlotBins](#xyplotbins) | PlotRefreshRate |   |
+| Foregnd | Backgnd | LineWdth | [Xrange](#xrange) | [Yrange](#yrange) | ◀ |
+| [Function](#functionplot) | [Polar](#polarplot) | [Param](#parametricplot) | [Scatter](#scatterplot) | [Truth](#truthplot) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Bar](#barplot) | [Histogrm](#histogramplot) | [Clear](#clearlcd) | Freeze | DrAxes | ▶ |
+
+### PolynomialsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Solve_ | _TVMRoot_ | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
+| _FRoots_ | _MRoot_ | _MSolvr_ | _PCoef_ | _PRoot_ | [Root](#root) |
+| `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
+
+### PolynomialSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### PowersMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [pow](#pow) | [xroot](#xroot) | _FstSet_ | _LstSet_ | _popcnt_ | \[[Hyper](#hyperbolicmenu)\] |
+| [exp2](#exp2) | log2 | [expm1](#expm1) | [ln1p](#ln1p) | x³ | [∛](#cbrt) |
+| [exp](#exp) | [ln](#ln) | [exp10](#exp10) | [log10](#log10) | [x²](#sq) | [√](#sqrt) |
+
+### PrintingMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _Print_ | _Screen_ | _Disk_ | _IR_ |   |   |
+
+### ProbabilitiesMenu
+
+*2 pages · 22 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Normal_ | _Student_ | _Chi²_ | _F-Distr_ | _FFT_ |   |
+| Γ | ln(Γ) | erf | erfc | RSeed | ◀ |
+| Comb | Perm | x! | Ran# | [Random](#random) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |   |   |   | ◀ |
+| _Normal⁻¹_ | _Studnt⁻¹_ | _Chi²⁻¹_ | _F-Dist⁻¹_ | _FFT⁻¹_ | ▶ |
+
+### ProgramMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
+| \[[Mem](#memorymenu)\] | \[[Test](#testsmenu)\] | \[[Cmp](#comparemenu)\] | \[[Loop](#loopsmenu)\] | \[[Base](#basesmenu)\] | [Eval](#evaluate) |
+| `«»` | `{}` | `[]` | `→  «»` | `→  ''` | [Run](#run) |
+
+### RangeMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Size](#size) |   |   |   |   |   |
+| [→Range](#range) | [→∆Range](#range-1) | [→%Range](#range-2) | [→σRange](#range-3) | [∪](#rangeunion) | [∩](#rangeintersect) |
+| `…` | `±` | `±%` | `±σ` | Range→ | `ρ` |
+
+### RealMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Trig](#circularmenu)\] | \[[Hyper](#hyperbolicmenu)\] | \[[Powers](#powersmenu)\] | \[[Prob](#probabilitiesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Parts](#partsmenu)\] |
+| [Ceil](#ceil) | [Floor](#floor) | rem | [%](#percent) | [%Chg](#percentchange) | [%Total](#percenttotal) |
+| [Min](#min) | [Max](#max) | [mod](#mod) | [abs](#abs) | [→Num](#num) | [→Q](#q) |
+
+### SeparatorModesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [1.2x10³²](#fancyexponent) | [1.2E32](#classicexponent) | [1.0→1.](#trailingdecimal) | [1→1.0](#showasdecimal) | Fixed0 |   |
+| #1 000 | #1.000 | #1'000 | #1_000 | \[[Disp](#displaymodesmenu)\] | \[[Modes](#modesmenu)\] |
+| [1 000](#numberspaces) | [1.000,](#numberdotorcomma) | [1'000](#numberticks) | [1_000](#numberunderscore) | [2.3](#decimaldot) | [2,3](#decimalcomma) |
+
+### SignalProcessingMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _FFT_ | _InvFFT_ |   |   |   |   |
+
+### SolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
+| [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
+| [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
+
+### StackMenu
+
+*2 pages · 22 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [DupN](#duplicaten) | [DropN](#dropn) | [Depth](#depth) | [Nip](#nip) | [Pick3](#pick3) |   |
+| [Dup2](#duplicate2) | [Drop2](#drop2) | [Rot↓](#unrot) | [Roll↓](#rolld) | [Pick](#pick) | ◀ |
+| [Dup](#duplicate) | [Drop](#drop) | [Rot↑](#rot) | [Roll↑](#roll) | [Over](#over) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [NDupN](#ndupn) | [DupDup](#duplicatetwice) |   |   |   | ◀ |
+| [Swap](#swap) | [LastArg](#lastarguments) | [LastX](#lastx) | [Undo](#undo) | [ClrStk](#clearstack) | ▶ |
+
+### StatisticsMenu
+
+*3 pages · 35 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| StoΣ | RclΣ | ClrΣ | \[[Proba](#probabilitiesmenu)\] | \[[Plot](#plotmenu)\] |   |
+| [XCol](#independentcolumn) | [YCol](#dependentcolumn) | [MinΣ](#min) | [MaxΣ](#max) | [ΣSize](#size) | ◀ |
+| [Σ+](#) | [Σ-](#-) | Total | [Mean](#average) | [StdDev](#standarddeviation) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [ΣX](#x) | [ΣY](#y) | [ΣXY](#xy) | [ΣX²](#x-1) | [ΣY²](#y-1) |   |
+| [BestFit](#bestfit) | [LinFit](#linearfit) | [ExpFit](#exponentialfit) | [LogFit](#logarithmicfit) | [PwrFit](#powerfit) | ◀ |
+| [LR](#linearregression) | ΣLine | PredX | PredY | [Corr](#correlation) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Median](#median) | [Bins](#frequencybins) | [PopVar](#populationvariance) | [PopSDev](#populationstandarddeviation) | [PCovar](#populationcovariance) | ▶ |
+
+### SymbolicMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
+| \[[Arith](#arithmeticmenu)\] | \[[Calc](#calculationmenu)\] | \[[Trig](#trigidentitiesmenu)\] | \[[Exp/Ln](#explogidentitiesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Graph](#plotmenu)\] |
+| Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
+
+### SymbolicSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
+
+### TestsMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Case](#case) | Then | When | \[[Compare](#comparemenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |
+| IfThen | IfElse | [IfErr](#iferr) | IfErrElse | [IFT](#ift) | [IFTE](#ifte) |
+| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
+
+### TextMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [T→Real](#compiletoreal) | [T→Expr](#compiletoexpression) | [T→Int](#compiletointeger) | [T→Pos](#compiletopositive) |   |   |
+| [T→Code](#textcode) | [Code→T](#codetext) | [Extract](#extract) | [T→Obj](#compiletoobject) | [T→Alg](#compiletoalgebraic) | [T→Num](#compiletonumber) |
+| [→Text](#totext) | [Text→](#compile) | [Length](#size) | [Append](#add) | [Repeat](#repeat) | [C→Code](#charcode) |
+
+### TimeMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu)\] | \[[Alarms](#alarmmenu)\] |   |
+| Chrono | [Ticks](#ticks) | [Dt+Tm](#datetime) | [T→Str](#totext) | [Wait](#wait) | [TEval](#teval) |
+| _hms | [Time](#time) | [→HMS](#hms) | [HMS→](#hms-1) | [HMS+](#hms-2) | [HMS-](#hms-) |
+
+### TrigIdentitiesMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Symb](#symbolicmenu)\] |   |   |   |   |   |
+| _HalfTan_ | _Tan→SinCos_ | _Tan→SinCos²_ | _TExpand_ | _TLin_ | [TrigSin](#trigsin) |
+
+### UnitsConversionsMenu
+
+*3 pages · 36 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| µ (-6) | n (-9) | p (-12) | T (+12) | P (+15) |   |
+| m (-3) | c (-2) | k (+3) | M (+6) | G (+9) | ◀ |
+| [Convert](#convert) | [Base](#base) | [Value](#unitvalue) | [Factor](#factorunit) | [→Unit](#unit) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Ki | Mi | Gi | Ti | [Pi](#pi) |   |
+| y (-24) | z (-21) | a (-18) | Z (+21) | Y (+24) | ◀ |
+| f (-15) | d (-1) | da (+1) | h (+2) | E (+18) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [SIPfx](#unitssiprefixcycle) |   |   |   |   | ◀ |
+| Ei | Zi | Yi | Ri | Qi | ▶ |
+
+### UserInterfaceModesMenu
+
+*4 pages · 47 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [3-lines](#threerowsmenus) | [1-line](#singlerowmenus) | [Flat](#flatmenus) | [Round](#roundedmenus) | \[[Hide](#hideemptymenu)\] |   |
+| ResultFont | StackFont | EditorFont | MultilineEditorFont | [CursorBlinkRate](#cursorblinkrate) | ◀ |
+| [GrRes](#graphicresultdisplay) | [GrStk](#graphicstackdisplay) | Beep | Flash | \[[User](#usermodemenu)\] | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Fixed0 | VProg | BusyIndicatorRefresh | \[[ExitMenu](#exitclearsmenu)\] | [ListEval](#listasprogram) |   |
+| [EditorWrapColumn](#editorwrapcolumn) | [TabWidth](#tabwidth) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ErrorBeepFrequency | ◀ |
+| [cmd](#lowercase) | [CMD](#uppercase) | [Cmd](#capitalized) | [Command](#longform) | ErrorBeepDuration | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [TextRenderingSizeLimit](#textrenderingsizelimit) | [GraphRenderingSizeLimit](#graphrenderingsizelimit) | PlotRefreshRate | AllVars | [SIPrefixCycle](#unitssiprefixcycle) |   |
+| [ResultGraphingTimeLimit](#resultgraphingtimelimit) | [StackGraphingTimeLimit](#stackgraphingtimelimit) | [GraphingTimeLimit](#graphingtimelimit) | [ShowTimeLimit](#showtimelimit) | [MinimumBatteryVoltage](#minimumbatteryvoltage) | ◀ |
+| [Units](#showbuiltinunits) | Const | Eqns | [Libs](#libs) | Chars | ▶ |
+
+**Page 4**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Header](#header) | [CustomHeaderRefresh](#customheaderrefresh) |   |   |   | ▶ |
+
+### UserModeMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [DelKeys](#deletekeys) | [KeyMap](#keymap) |   |   |   |   |
+| [Toggle](#toggleusermode) | [User](#usermode) | [Lock](#usermodelock) | [RclKeys](#recallkeys) | [StoKeys](#storekeys) | [Assign](#assignkey) |
+
+### VectorMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Hypot](#hypot) | [Atan2](#atan2) |   |   |   |   |
+| [→Vec2](#to2dvector) | [→Vec3](#to3dvector) | [Vec→](#fromvector) | [→Cylind](#tocylindrical) | \[[Complex](#complexmenu)\] | \[[Matrix](#matrixmenu)\] |
+| [Norm](#abs) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
+
