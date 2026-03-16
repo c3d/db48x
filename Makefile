@@ -309,7 +309,7 @@ fw-%:
 	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi
 ifneq ($(KIND),sim)
 sim-%:
-	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim BUILDENV=auto RECURSE=.config
+	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim RECURSE=.config
 endif
 android-%:
 	$(PRINT_COMMAND) $(MAKE) $* KIND=android
@@ -433,7 +433,7 @@ tools/%:
 # Generated sources: fonts, decimals, version (after .recurse so tools exist)
 # ------------------------------------------------------------------------------
 
-HELP_SOURCES = $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
+HELP_SOURCES = $(filter-out doc/8-menus-tree.md,$(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)) doc/8-menus-tree.md
 PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
 PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
