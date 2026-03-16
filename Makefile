@@ -306,7 +306,7 @@ sim:		sim-$(TARGET)
 android:	android-$(TARGET)
 
 fw-%:
-	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi
+	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi MODEL=$(MODEL) NAME=$(NAME) SDK=$(SDK)
 ifneq ($(KIND),sim)
 sim-%:
 	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim RECURSE=.config
@@ -505,9 +505,12 @@ ELF_FILE = $(MIQ_OUTEXE)
 BUILD_ID = $(shell $(TOP)tools/build_id 2>/dev/null || echo 0)
 LDSCRIPT = src/$(MODEL)/stm32_program.ld
 LDFLAGS += -T$(LDSCRIPT) -Wl,-Map=$(MIQ_OBJDIR)$(NAME).map,--cref
+# OUTPUT=$(TOP)=./ is normalized by make to empty, so .mkdir-only has no dir prefix
+# and doesn't match %/.mkdir-only; output goes in current dir which always exists
+.mkdir-only:
 
 src/dmcp/qspi_check.c: .buildid
-DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
+DEFINES_src/dmcp/qspi_check = BUILD_ID=$$($(TOP)tools/build_id)
 .goodbye: .show-buildid
 .buildid:
 	@$(TOP)tools/build_id -u >/dev/null 2>&1 || true
