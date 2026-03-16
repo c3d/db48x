@@ -433,6 +433,7 @@ help/$(NAME).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
 	cat $^ | \
 	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
 	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
+	    -e '/^<!--.*-->$$/d' \
 	    -e '/<!--- KEEP_IT --->/d' \
 	    -e '/<!--- !KEEP_IT --->/d' \
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
