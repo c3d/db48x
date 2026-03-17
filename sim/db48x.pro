@@ -144,8 +144,7 @@ clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-extension
 gcc:     QMAKE_CFLAGS   += -Wall -Wno-unknown-warning-option -Wno-packed-bitfield-compat
 gcc:     QMAKE_CXXFLAGS += -Wall -Wno-unknown-warning-option -Wno-packed-bitfield-compat
 
-OBJECTS_DIR=db48x-build
-android:        OBJECTS_DIR=db48x-android-build
+isEmpty(OBJECTS_DIR): OBJECTS_DIR=db48x-build
 
 ICON = db48x.icns
 

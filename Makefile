@@ -46,9 +46,10 @@
 #------------------------------------------------------------------------------
 
 # all: dm32 dm42 dm42-sim color-dm32-sim dm42-android color-dm32-android
-all:	fw sims
-sims:	dm42-sim color-dm32-sim
-fw:	dm32 dm42
+all:		fw sims androids
+sims:		dm42-sim color-dm32-sim
+fw:		dm32 dm42
+androids:	android color-dm32-android
 
 # ------------------------------------------------------------------------------
 # Package
@@ -116,7 +117,7 @@ ifdef KIND
 PRODUCTS ?= $(NAME)$(EXT_$(KIND))
 EXT_fw = .exe
 EXT_sim = .lib
-EXT_android = .aab
+EXT_android = .exe
 
 CONFIG=$(CONFIG_$(KIND))
 CONFIG_sim=							\
@@ -311,8 +312,11 @@ ifneq ($(KIND),sim)
 sim-%:
 	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim BUILDENV=auto RECURSE=.config
 endif
+ifneq ($(KIND),android)
 android-%:
-	$(PRINT_COMMAND) $(MAKE) $* KIND=android
+	$(PRINT_COMMAND) $(MAKE) android-$* KIND=android RECURSE=.build
+endif
+
 color-%:
 	$(PRINT_COMMAND) $(MAKE) $* COLOR=color
 
@@ -332,6 +336,9 @@ QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
 QMAKE_opt = release
 QMAKE_release = release
 QMAKE_debug = debug
+QMAKEFILE=sim/$(NAME)-$(KIND)-$(TARGET).mak
+
+# Qt resource files
 QRC_FILES=		sim/config.qrc		\
 			sim/state.qrc		\
 			sim/library.qrc		\
@@ -339,25 +346,37 @@ QRC_FILES=		sim/config.qrc		\
 			sim/help/img.qrc
 
 # Build Qt simulator directly with qmake
-qt-$(TARGET): sim/$(NAME)-$(TARGET).mak .config
+qt-$(TARGET): $(QMAKEFILE) $(VERSION_H) .config
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F)
-qt-%: sim/$(NAME)-$(TARGET).mak .config
+qt-%: $(QMAKEFILE) .config
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
 
-sim/$(NAME)-$(TARGET).mak: sim/$(NAME).pro $(VERSION_H) $(QRC_FILES) $(MIQ_MAKEDEPS)
-	$(PRINT_COMMAND) (cd $(@D) && $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(TARGET)) CONFIG+=silent)
+$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)
+	$(PRINT_COMMAND) 				\
+		DESTDIR="$(abspath $(or $(OUTPUT),.))";	\
+		cd sim &&				\
+		$(QMAKE_ENV)				\
+		$(QMAKE) $(<F) -o $(@F) 		\
+		$(QMAKE_SPECS:%=-spec %) 		\
+		CONFIG+=silent		 		\
+		CONFIG+=$(QMAKE_$(TARGET)) 		\
+		DESTDIR="$$DESTDIR"			\
+		OBJECTS_DIR=$(abspath $(MIQ_OBJDIR))	\
+		RCC_DIR=$(abspath $(MIQ_OBJDIR))	\
+		MOC_DIR=$(abspath $(MIQ_OBJDIR))	\
+		UI_DIR=$(abspath $(MIQ_OBJDIR))
 
 # Generation of Qt resource files
 sim/%.qrc: $(MIQ_MAKEDEPS)
 	@mkdir -p $(@D)
-	$(PRINT_GENERATE) (echo '<RCC>';								\
-	 echo ' <qresource prefix="/'$*'">';					\
-	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do				\
-		J=$$(basename $$I);						\
+	$(PRINT_GENERATE) (echo '<RCC>';			\
+	 echo ' <qresource prefix="/'$*'">';			\
+	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
+		J=$$(basename $$I);				\
 		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$*'/'$$J'</file>';	\
-	 done;									\
-	 echo ' </qresource>';							\
-	 echo '</RCC>')								\
+	 done;							\
+	 echo ' </qresource>';					\
+	 echo '</RCC>')						\
 	> $@
 
 sim/help.qrc: help/$(NAME).md help/$(NAME).idx
@@ -394,30 +413,47 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 # Android App Bundle for Google Play (requires ANDROID_KEYSTORE_PASS env)
 #------------------------------------------------------------------------------
 
+ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
 ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
 ANDROID_QT_BASE ?= /Volumes/Qt/6.8.1
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
 ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/macos/bin/androiddeployqt
+ANDROID_KEYSTORE ?= $(HOME)/.local/android_release.keystore
+ANDROID_JAVA_HOME ?= $(shell /usr/libexec/java_home -v 17 2>/dev/null || \
+                             /usr/libexec/java_home -v 21 2>/dev/null || \
+                             true)
+QMAKE = $(ANDROID_QT_BIN)/qmake
+QMAKE_SPECS = android-clang
+QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
+		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
+		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
+		export JAVA_HOME=$(ANDROID_JAVA_HOME) ;
+AAB_FILE=$(OUTPUT:%=%/)$(NAME).aab
 
-android: $(NAME).aab
-$(NAME).aab:	sim/$(NAME).pro				\
-		$(QRC_FILES)				\
-		sim/android/AndroidManifest.xml		\
-		sim/android/build.gradle
-	$(PRINT_COMMAND) $(MAKE) NAME=$(NAME) MODEL=$(MODEL) .prebuild
-	cd sim &&							\
-	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) &&			\
-	export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) &&			\
-	export KEYSTORE_PATH=$(HOME)/.local/android_release.keystore && \
-	$(ANDROID_QT_BIN)/qmake -spec android-clang $(NAME).pro &&	\
-	$(MAKE)  &&							\
-	$(ANDROID_DEPLOY_QT) \
-		--input android-$(NAME)-deployment-settings.json \
-		--output ../android --gradle --aab \
-		--sign $(HOME)/.local/android_release.keystore $(NAME) \
-		--storepass '$(ANDROID_KEYSTORE_PASS)'
+android-$(TARGET): $(AAB_FILE)
+android-%: qt-%
+
+# Additional dependencies for Android build
+$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
+
+# Deploy and sign the AAB via androiddeployqt. androiddeployqt expects the .so
+# at <output>/libs/arm64-v8a/; the qmake build puts it in DESTDIR, so we must
+# run make install INSTALL_ROOT=<output> first.
+$(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
+	$(PRINT_COMMAND) 						\
+		AAB="$(abspath $@)";					\
+		cd sim && 						\
+		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$AAB" &&	\
+		$(QMAKE_ENV)						\
+		$(ANDROID_DEPLOY_QT)					\
+		  --input android-$(NAME)-deployment-settings.json	\
+		  --output "$$AAB" --gradle --aab			\
+		  --sign $(ANDROID_KEYSTORE) $(NAME)			\
+		  --storepass '$(ANDROID_KEYSTORE_PASS)'
+
+endif
 
 
 # ------------------------------------------------------------------------------
@@ -513,9 +549,9 @@ DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
 
 FLASH_BIN = $(MIQ_OBJDIR)$(NAME)_flash.bin
 FLASH_HEX = $(FLASH_BIN:.bin=.hex)
-QSPI_BIN  = $(NAME)_qspi.bin
+QSPI_BIN  = $(OUTPUT:%=%/)$(NAME)_qspi.bin
 QSPI_HEX  = $(MIQ_OBJDIR)$(NAME)_qspi.hex
-PGM_FILE  = $(NAME).$(PGM)
+PGM_FILE  = $(OUTPUT:%=%/)$(NAME).$(PGM)
 QSPI_CRC  = src/$(MODEL)/qspi_crc.h
 
 .postbuild: $(PGM_FILE) $(QSPI_BIN) $(QSPI_HEX) $(FLASH_BIN) $(FLASH_HEX)
@@ -582,4 +618,5 @@ do-fwdist: $(TAR_FILES)
 else
 install: dm32-fw-fwinstall dm42-fw-fwinstall
 dist: dm32-fw-fwdist dm42-fw-fwdist
+clean: sim-clean
 endif
