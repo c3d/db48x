@@ -8,6 +8,10 @@
   is clean and a git operation would make it easy to restore the earlier state,
   then making extra changes is OK. Otherwise, add ideas to the todo list to
   be done later in a separate commit.
+- **Avoid overwriting the user's edits.** When making changes, the user may have
+  adjusted files themselves. Read the current file state before editing; prefer
+  minimal, targeted edits that accomplish the goal without clobbering unrelated
+  changes the user has made.
 
 ## Build System
 
