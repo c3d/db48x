@@ -306,10 +306,10 @@ sim:		sim-$(TARGET)
 android:	android-$(TARGET)
 
 fw-%:
-	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi MODEL=$(MODEL) NAME=$(NAME) SDK=$(SDK)
+	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi
 ifneq ($(KIND),sim)
 sim-%:
-	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim RECURSE=.config
+	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim BUILDENV=auto RECURSE=.config
 endif
 android-%:
 	$(PRINT_COMMAND) $(MAKE) $* KIND=android
@@ -419,6 +419,7 @@ $(NAME).aab:	sim/$(NAME).pro				\
 		--sign $(HOME)/.local/android_release.keystore $(NAME) \
 		--storepass '$(ANDROID_KEYSTORE_PASS)'
 
+
 # ------------------------------------------------------------------------------
 # Building the tools
 # ------------------------------------------------------------------------------
@@ -481,13 +482,13 @@ help/$(NAME).md: $(HELP_SOURCES)
 	    -e '/<!--- !KEEP_IT --->/d' \
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
 	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
+		-e 's/](8-menus-tree\.md)/](#$(NAME)-menu-tree)/g' \
 	    -e 's/db48x.md/$(NAME).md/g' \
-      -e 's/](8-menus-tree\.md)/](#$(NAME)-menu-tree)/g' \
 	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
 	@cp doc/*.png help/ 2>/dev/null || true
 	@mkdir -p help/img
 	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
-
+	
 doc/8-menus-tree.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
 	python3 tools/gen-menu-doc.py
 
@@ -505,12 +506,9 @@ ELF_FILE = $(MIQ_OUTEXE)
 BUILD_ID = $(shell $(TOP)tools/build_id 2>/dev/null || echo 0)
 LDSCRIPT = src/$(MODEL)/stm32_program.ld
 LDFLAGS += -T$(LDSCRIPT) -Wl,-Map=$(MIQ_OBJDIR)$(NAME).map,--cref
-# OUTPUT=$(TOP)=./ is normalized by make to empty, so .mkdir-only has no dir prefix
-# and doesn't match %/.mkdir-only; output goes in current dir which always exists
-.mkdir-only:
 
 src/dmcp/qspi_check.c: .buildid
-DEFINES_src/dmcp/qspi_check = BUILD_ID=$$($(TOP)tools/build_id)
+DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
 .goodbye: .show-buildid
 .buildid:
 	@$(TOP)tools/build_id -u >/dev/null 2>&1 || true
