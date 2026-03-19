@@ -46,7 +46,7 @@
 #------------------------------------------------------------------------------
 
 # all: dm32 dm42 dm42-sim color-dm32-sim dm42-android color-dm32-android
-all:		fw sims androids
+all:		fw sims
 sims:		dm42-sim color-dm32-sim
 fw:		dm32 dm42
 androids:	android color-dm32-android
@@ -268,6 +268,8 @@ DEFINES_android=ANDROID					\
 
 TOP ?= ./
 MIQ ?= $(TOP)recorder/make-it-quick/
+$(MIQ)rules.mk:
+	@git submodule update --init --recursive
 
 # A little gmake trick to avoid mixing output from multiple rules at -j
 GROUP_TARGETS ?= -Otarget
