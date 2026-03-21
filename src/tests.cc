@@ -7744,6 +7744,9 @@ void tests::solver_testing()
               "{ X Y } { 0 0 } ROOT", ENTER)
         .expect("{ X=0.5 Y=0.86602 54037 84 }");
 
+    step("Jacobian solver, circle and line with singular initial Jacobian")
+        .test(CLEAR, "{ 'X^2+Y^2=1' 'X+Y=0' } { X Y } { 0 0 } ROOT", ENTER)
+        .expect("{ X=-0.70710 67811 87 Y=0.70710 67811 87 }");
     step("Solving when the variable is initialized with a constant")
         .test(CLEAR, DIRECT("m=Ⓒme "
                             "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "

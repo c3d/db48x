@@ -810,6 +810,28 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
 }
 
 
+static array_g jacobi_escape_singular(size_t      n,
+                                      algebraic_r step,
+                                      list_r      guesses)
+// ----------------------------------------------------------------------------
+//  Perturb guesses to escape a degenerate (singular-Jacobian) starting point
+// ----------------------------------------------------------------------------
+//  Returns the perturbed guesses array, or null on failure.
+{
+    for (size_t col = 0; col < n; col++)
+    {
+        algebraic_g pw = step * decimal::make(col + 1);
+        if (!pw || !rt.push(+pw))
+            return nullptr;
+    }
+    array_g perturb = array::from_stack(n, 0);
+    array_g v = array_p(+guesses);
+    v = v + perturb;
+    record(jsolve, "Singular Jacobian, perturbed guesses to %t", +v);
+    return v;
+}
+
+
 bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
 // ----------------------------------------------------------------------------
 //  Compute a Jacobian when there is cross-talk between variables
@@ -826,9 +848,10 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
     int            impr  = Settings.SolverImprecision();
     algebraic_g    eps   = algebraic::epsilon(impr);
     algebraic_g    oeps  = decimal::make(101,-2);
-    uint           max   = Settings.SolverIterations();
-    uint           iter  = 0;
-    int            errs  = 0;
+    uint           max          = Settings.SolverIterations();
+    uint           iter         = 0;
+    int            errs         = 0;
+    int            singular_errs = 0;
     bool           back  = false; // Go backwards
     array_g        j, v, d;
     algebraic_g    magnitude, last, forward;
@@ -845,20 +868,19 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
 
         // Set all variables to current value of guesses
         list::iterator gi = guesses->begin();
+        algebraic_g shuffle;
+        if (errs)
+        {
+            // Shuffle slightly around current position (same for all variables)
+            shuffle = pow(oeps, errs) + eps;
+            if (!shuffle)
+                goto error;
+        }
         for (object_p varo : *vars)
         {
             object_p valo = *gi;
-            if (errs)
-            {
-                if (algebraic_g valg = valo->as_algebraic())
-                {
-                    // Shuffle slightly around current position
-                    algebraic_g pw = pow(oeps, errs) + eps;
-                    if (!pw)
-                        goto error;
-                    valo = pw;
-                }
-            }
+            if (errs && valo->as_algebraic())
+                valo = shuffle;
             if (!directory::store_here(varo, valo))
                 goto error;
             ++gi;
@@ -979,13 +1001,27 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         j = array::from_stack(n, n, true);
         v = array::from_stack(n, 0);
         d = v / j;
-        record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
-        v = array_p(+guesses);
-        v = v - d;
+        if (!d)
+        {
+            if (++singular_errs >= 5)
+                goto error;
+            rt.clear_error();
+            algebraic_g step = pow(oeps, singular_errs);
+            if (!step)
+                goto error;
+            v = jacobi_escape_singular(n, step, guesses);
+            last = nullptr;
+            back = false;
+        }
+        else
+        {
+            singular_errs = 0;
+            record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
+            v = array_p(+guesses);
+            v = v - d;
+        }
         if (!v)
             goto error;
-
-        // This is the new guesses
         guesses = +v;
     } // while (iter < max)
 
