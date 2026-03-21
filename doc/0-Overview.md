@@ -373,7 +373,7 @@ menu is special in the sense that:
 ### Menu Tree
 
 The complete hierarchy of all built-in menus is documented in the
-[Menu Tree](8-menus-tree.md).
+[Menu Tree](#soft-menus-tree).
 
 
 ## Differences with other RPLs

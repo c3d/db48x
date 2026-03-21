@@ -3,20 +3,21 @@
 #  tools/gen-menu-doc.py                                        DB48X project
 # ****************************************************************************
 #
-#   Generate doc/8-menus-tree.md — a full description of the soft-menu
+#   Generate doc/8-menus-tree-<model>.md — a full description of the soft-menu
 #   hierarchy, formatted to resemble the calculator's 3-row × 6-button
 #   display.
 #
 #   Source of truth:   src/menu.cc   (MENU macros)
 #   Name lookup:       src/ids.tbl   (CMD / NAMED / ALIAS entries)
 #   Link targets:      doc/commands/*.md  (## headings)
-#   Output:            doc/8-menus-tree.md
+#   Output:            doc/8-menus-tree-{dm42,dm32}.md
 #
 # ****************************************************************************
 #   (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
 #   This software is licensed under the terms outlined in LICENSE.txt
 # ****************************************************************************
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -26,29 +27,61 @@ MENU_CC   = ROOT / 'src'  / 'menu.cc'
 UI_CC     = ROOT / 'src'  / 'user_interface.cc'
 IDS_TBL   = ROOT / 'src'  / 'ids.tbl'
 DOC_CMDS  = ROOT / 'doc'  / 'commands'
-OUTPUT    = ROOT / 'doc'  / '8-menus-tree.md'
 
 SOFTKEYS  = 6   # buttons per row
 PLANES    = 3   # rows per page
 
-# Physical key labels (DM42 / DM42N keyboard)
+# Physical key labels per calculator model
 KEY_LABELS = {
-    'KEY_SIGMA': 'Σ+',  'KEY_INV':   '1/x', 'KEY_SQRT':  '√x',
-    'KEY_LOG':   'LOG',  'KEY_LN':    'LN',   'KEY_XEQ':   'XEQ',
-    'KEY_STO':   'STO',  'KEY_RCL':   'RCL',  'KEY_RDN':   'R↓',
-    'KEY_SIN':   'SIN',  'KEY_COS':   'COS',  'KEY_TAN':   'TAN',
-    'KEY_ENTER': 'ENTER','KEY_SWAP':  'x⇆y', 'KEY_CHS':   '+/-',
-    'KEY_E':     'EEX',  'KEY_BSP':   '⌫',   'KEY_UP':    '▲',
-    'KEY_7':     '7',    'KEY_8':     '8',    'KEY_9':     '9',
-    'KEY_DIV':   '÷',   'KEY_DOWN':  '▼',   'KEY_4':     '4',
-    'KEY_5':     '5',    'KEY_6':     '6',    'KEY_MUL':   '×',
-    'KEY_SHIFT': 'SHIFT','KEY_1':     '1',    'KEY_2':     '2',
-    'KEY_3':     '3',    'KEY_SUB':   '-',    'KEY_EXIT':  'EXIT',
-    'KEY_0':     '0',    'KEY_DOT':   '.',    'KEY_RUN':   'R/S',
-    'KEY_ADD':   '+',
+    'dm42': {
+        'KEY_SIGMA': 'Σ+',  'KEY_INV':   '1/x', 'KEY_SQRT':  '√x',
+        'KEY_LOG':   'LOG',  'KEY_LN':    'LN',   'KEY_XEQ':   'XEQ',
+        'KEY_STO':   'STO',  'KEY_RCL':   'RCL',  'KEY_RDN':   'R↓',
+        'KEY_SIN':   'SIN',  'KEY_COS':   'COS',  'KEY_TAN':   'TAN',
+        'KEY_ENTER': 'ENTER','KEY_SWAP':  'x⇆y', 'KEY_CHS':   '+/-',
+        'KEY_E':     'EEX',  'KEY_BSP':   '⌫',   'KEY_UP':    '▲',
+        'KEY_7':     '7',    'KEY_8':     '8',    'KEY_9':     '9',
+        'KEY_DIV':   '÷',   'KEY_DOWN':  '▼',   'KEY_4':     '4',
+        'KEY_5':     '5',    'KEY_6':     '6',    'KEY_MUL':   '×',
+        'KEY_SHIFT': '🟨',  'KEY_1':     '1',    'KEY_2':     '2',
+        'KEY_3':     '3',    'KEY_SUB':   '-',    'KEY_EXIT':  'EXIT',
+        'KEY_0':     '0',    'KEY_DOT':   '.',    'KEY_RUN':   'R/S',
+        'KEY_ADD':   '+',
+    },
+    'dm32': {
+        # Row 1 is reordered vs DM42: √x eˣ 10ˣ yˣ 1/x Σ+
+        'KEY_SIGMA': '√x',  'KEY_INV':   'eˣ',  'KEY_SQRT':  '10ˣ',
+        'KEY_LOG':   'yˣ',  'KEY_LN':    '1/x',  'KEY_XEQ':   'Σ+',
+        'KEY_STO':   'STO',  'KEY_RCL':   'RCL',  'KEY_RDN':   'R↓',
+        'KEY_SIN':   'SIN',  'KEY_COS':   'COS',  'KEY_TAN':   'TAN',
+        'KEY_ENTER': 'ENTER','KEY_SWAP':  'x⇆y', 'KEY_CHS':   '+/-',
+        'KEY_E':     'EEX',  'KEY_BSP':   '⌫',   'KEY_UP':    '▲',
+        'KEY_7':     '7',    'KEY_8':     '8',    'KEY_9':     '9',
+        'KEY_DIV':   '÷',   'KEY_DOWN':  '▼',   'KEY_4':     '4',
+        'KEY_5':     '5',    'KEY_6':     '6',    'KEY_MUL':   '×',
+        'KEY_SHIFT': '🟦',  'KEY_1':     '1',    'KEY_2':     '2',
+        'KEY_3':     '3',    'KEY_SUB':   '-',    'KEY_EXIT':  'ON',
+        'KEY_0':     '0',    'KEY_DOT':   '.',    'KEY_RUN':   'R/S',
+        'KEY_ADD':   '+',
+    },
+}
+KEY_LABELS['dm42n'] = KEY_LABELS['dm42']   # DM42N shares DM42 key labels
+
+# Alpha letter assigned to each physical key (from user_interface.cc key_label)
+# Same for all models — letters are logical, not physical
+KEY_LETTERS = {
+    'KEY_SIGMA': 'A', 'KEY_INV':  'B', 'KEY_SQRT': 'C',
+    'KEY_LOG':   'D', 'KEY_LN':   'E', 'KEY_XEQ':  'F',
+    'KEY_STO':   'G', 'KEY_RCL':  'H', 'KEY_RDN':  'I',
+    'KEY_SIN':   'J', 'KEY_COS':  'K', 'KEY_TAN':  'L',
+    'KEY_SWAP':  'M', 'KEY_CHS':  'N', 'KEY_E':    'O',
+    'KEY_7':     'P', 'KEY_8':    'Q', 'KEY_9':    'R',
+    'KEY_DIV':   'S', 'KEY_4':    'T', 'KEY_5':    'U',
+    'KEY_6':     'V', 'KEY_MUL':  'W', 'KEY_1':    'X',
+    'KEY_2':     'Y', 'KEY_3':    'Z',
 }
 
-SHIFT_SYMBOLS = ['', '🟨 ', '🟦🟦 ']   # plane 0/1/2
+SHIFT_SYMBOLS = ['', '🟨 ', '🟦 ']   # plane 0/1/2
 
 
 # ─────────────────────────── helpers ────────────────────────────────────────
@@ -226,12 +259,12 @@ def _gh_anchor(heading):
 
 def build_conflicts(doc_root, menu_names):
     """
-    Scan all doc/**/*.md (except 8-menus-tree.md) for headings that match
+    Scan all doc/**/*.md (except 8-menus-tree-*.md) for headings that match
     a menu name.  Returns dict: menu_name → existing_anchor.
     """
     conflicts = {}
     for md in sorted(doc_root.glob('**/*.md')):
-        if md.name == '8-menus-tree.md':
+        if md.name.startswith('8-menus-tree-'):
             continue
         for m in re.finditer(r'^#{1,3} (.+)$', md.read_text(), re.MULTILINE):
             h = m.group(1).strip()
@@ -499,9 +532,10 @@ def item_key_str(idx, total):
     return f'{prefix}{SHIFT_SYMBOLS[row]}F{col + 1}'
 
 
-def format_access_line(menu_name, direct_keys, parents, menus, conflicts=None):
+def format_access_line(menu_name, direct_keys, parents, menus,
+                       key_labels, conflicts=None):
     """
-    Return the '_Access: …_\\n' markdown line, or '' if none found.
+    Return the 'Access: …\\n' markdown line, or '' if none found.
 
     Shows direct keyboard shortcuts first, then immediate parent menus
     as '[ParentMenu] Fk' (no full chain).
@@ -509,9 +543,14 @@ def format_access_line(menu_name, direct_keys, parents, menus, conflicts=None):
     parts = []
 
     # Direct keyboard shortcuts (shortest first)
+    def fmt_key(p, k):
+        label  = key_labels.get(k, k)
+        letter = KEY_LETTERS.get(k)
+        key    = f'{letter} ({label})' if letter else f'({label})'
+        return f'{SHIFT_SYMBOLS[p]}{key}'
+
     direct = sorted(
-        {f'{SHIFT_SYMBOLS[p]}{KEY_LABELS.get(k, k)}'
-         for p, k in direct_keys.get(menu_name, [])},
+        {fmt_key(p, k) for p, k in direct_keys.get(menu_name, [])},
         key=lambda s: (s.count(' '), s)
     )
     parts.extend(direct)
@@ -526,12 +565,22 @@ def format_access_line(menu_name, direct_keys, parents, menus, conflicts=None):
 
     if not parts:
         return ''
-    return '_Access: ' + ' · '.join(parts) + '_\n'
+    return 'Access: ' + '; '.join(parts) + '\n'
 
 
 # ─────────────────────────── main ───────────────────────────────────────────
 
 def main():
+    parser = argparse.ArgumentParser(
+        description='Generate DB48X menu tree documentation')
+    parser.add_argument('--model', choices=list(KEY_LABELS), default='dm42',
+                        help='Calculator model (default: dm42)')
+    args = parser.parse_args()
+
+    model      = args.model
+    key_labels = KEY_LABELS[model]
+    output     = ROOT / 'doc' / f'8-menus-tree-{model}.md'
+
     print(f'Reading {IDS_TBL.relative_to(ROOT)} …',  file=sys.stderr)
     name_map = parse_ids_tbl(IDS_TBL)
 
@@ -549,11 +598,12 @@ def main():
 
     # ── file header ──────────────────────────────────────────────────────────
     out = []
-    out.append('# DB48X Menu Tree\n')
+    out.append('# Soft Menus Tree\n')
     out.append('<!--- DM.WARNING: Auto-generated by tools/gen-menu-doc.py — do not edit manually. --->\n')
     out.append('<!--- !DM.WARNING --->\n')
     out.append(
-        'Soft-menu hierarchy of the DB48X calculator.\n'
+        f'Soft-menu hierarchy of the DB48X calculator for {model} keyboard\n'
+        '\n'
         'Buttons are shown as they appear on the calculator screen:\n'
         '**6 columns** (F1–F6) and **3 rows** per page.\n'
     )
@@ -567,7 +617,7 @@ def main():
         '| _Unimplemented_ | Not yet implemented |\n'
         '| `text` | Inserts literal text in the command line |\n'
         '| 🟨 KEY | Press the yellow shift key once, then KEY |\n'
-        '| 🟦🟦 KEY | Press the yellow shift key twice, then KEY |\n'
+        '| 🟦 KEY | Press the yellow shift key twice, then KEY |\n'
         '| ▶ Fn | Navigate to next page, then press Fn |\n'
     )
     out.append('---\n')
@@ -587,16 +637,17 @@ def main():
     for name, items in sorted_menus.items():
         if name in conflicts:
             out.append(f'### {name} Reference\n')
-            out.append(f'_See also: [{name} user documentation](#{conflicts[name]})_\n')
+            out.append(f'See also: [{name} user documentation](#{conflicts[name]})\n')
         else:
             out.append(f'### {name}\n')
-        access = format_access_line(name, direct_keys, parents, menus, conflicts)
+        access = format_access_line(name, direct_keys, parents, menus,
+                                    key_labels, conflicts)
         if access:
             out.append(access)
         out.append(menu_table(name, items, name_map, doc_index, menu_names, conflicts))
 
-    OUTPUT.write_text('\n'.join(out) + '\n')
-    print(f'→ {OUTPUT.relative_to(ROOT)}  ({len(menus)} menus)', file=sys.stderr)
+    output.write_text('\n'.join(out) + '\n')
+    print(f'→ {output.relative_to(ROOT)}  ({len(menus)} menus)', file=sys.stderr)
 
 
 if __name__ == '__main__':
