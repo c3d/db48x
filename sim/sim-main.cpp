@@ -51,6 +51,7 @@ bool   install     = false;
 bool   noisy_tests = false;
 bool   no_beep     = false;
 uint   memory_size = MEMORY; // Memory size in kilobytes
+QDir   testDirectory;
 
 size_t recorder_render_object(intptr_t tracing,
                               const char *UNUSED /* format */,
@@ -164,6 +165,7 @@ int main(int argc, char *argv[])
             object::name(object::id(128)),
             uint(object::NUM_IDS),
             HELPFILE_NAME);
+    testDirectory = QDir::current();
 
     record(options,
            "Simulator invoked as %+s with %d arguments", argv[0], argc-1);
@@ -222,6 +224,10 @@ int main(int argc, char *argv[])
                 else if (a < argc)
                     load_saved_keymap(argv[++a]);
                 break;
+            case 'K':
+                tests::simulate_typing = true;
+                break;
+
             case 'w':
                 if (as[2])
                     tests::default_wait_time = atoi(as+2);

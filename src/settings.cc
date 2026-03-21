@@ -678,6 +678,8 @@ cstring setting::label(object::id ty)
         return printf("%u bits", s.WordSize());
     case ID_FractionIterations:
         return printf("→QIt %u", s.FractionIterations());
+    case ID_FractionLargestPrime:
+        return printf("→QπP %u", s.FractionLargestPrime());
     case ID_FractionDigits:
         return printf("→QPr %u", s.FractionDigits());
     case ID_Precision:

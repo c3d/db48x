@@ -239,9 +239,9 @@ public:
     MENU_DECL(VariablesMenu);
 };
 
-COMMAND_DECLARE_INSERT(VariablesMenuExecute,~0);
-COMMAND_DECLARE_INSERT(VariablesMenuRecall,0);
-COMMAND_DECLARE_INSERT(VariablesMenuStore,1);
+SPECIAL_MENU_DECLARE(variable_menu_execute);
+SPECIAL_MENU_DECLARE(variable_menu_recall);
+SPECIAL_MENU_DECLARE(variable_menu_store);
 
 
 

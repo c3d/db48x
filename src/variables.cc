@@ -215,6 +215,20 @@ object_p directory::store(object_g name, object_g value)
         // Deal with local variables
         return rt.local(local_p(+name)->index(), value);
 
+    case ID_funcall:
+    {
+        if (array_g fcall = funcall_p(+name)->args())
+            if (object_g name = fcall->head())
+                if (object_g items = recall_all(name, false))
+                    if (list_g index = fcall->tail())
+                        if (object_g upd = items->at(+index, value))
+                            if (object_g o = directory::update(name, upd))
+                                return value;
+        if (!rt.error())
+            rt.value_error();
+        return nullptr;;
+    }
+
     case ID_text:
     {
         // Deal with storing to file
@@ -431,27 +445,11 @@ object_p directory::lookup(object_p ref) const
 }
 
 
-object_p directory::recall(object_p ref) const
+object_p directory::recall(object_p name) const
 // ----------------------------------------------------------------------------
 //   If the referenced object exists in directory, return associated value
 // ----------------------------------------------------------------------------
 {
-    if (object_p found = lookup(ref))
-        // The value follows the name
-        return found->skip();
-    return nullptr;
-}
-
-
-object_p directory::recall_all(object_p name, bool report_missing)
-// ----------------------------------------------------------------------------
-//   If the referenced object exists in directory, return associated value
-// ----------------------------------------------------------------------------
-{
-    // Strip quote if any
-    if (object_p quoted = name->as_quoted(ID_object))
-        name = quoted;
-
     // Deal with all special cases
     id nty = name->type();
     switch (nty)
@@ -516,11 +514,27 @@ object_p directory::recall_all(object_p name, bool report_missing)
         return nullptr;
     }
 
+    if (object_p found = lookup(name))
+        // The value follows the name
+        return found->skip();
+    return nullptr;
+}
+
+
+object_p directory::recall_all(object_p name, bool report_missing)
+// ----------------------------------------------------------------------------
+//   If the referenced object exists in directory, return associated value
+// ----------------------------------------------------------------------------
+{
+    // Strip quote if any
+    if (object_p quoted = name->as_quoted(ID_object))
+        name = quoted;
+
     directory *dir = nullptr;
     for (uint depth = 0; (dir = rt.variables(depth)); depth++)
         if (object_p value = dir->recall(name))
             return value;
-    if (report_missing)
+    if (report_missing && !rt.error())
         rt.undefined_name_error();
     return nullptr;
 }
@@ -1323,7 +1337,7 @@ static bool evaluate_variable(object_p name, object_p value, void *arg)
     menu::info &mi = *((menu::info *) arg);
     if (value->type() == object::ID_directory)
         mi.marker = L'◥';
-    menu::items(mi, disp, menu::ID_VariablesMenuExecute);
+    menu::items(mi, disp, menu::ID_variable_menu_execute);
 
     return true;
 }
@@ -1339,7 +1353,7 @@ static bool recall_variable(object_p name, object_p UNUSED value, void *arg)
     if (!disp)
         disp = name->as_symbol(true);
     menu::info &mi = *((menu::info *) arg);
-    menu::items(mi, disp, menu::ID_VariablesMenuRecall);
+    menu::items(mi, disp, menu::ID_variable_menu_recall);
     return true;
 }
 
@@ -1353,7 +1367,7 @@ static bool store_variable(object_p name, object_p UNUSED value, void *arg)
     if (!disp)
         disp = name->as_symbol(true);
     menu::info &mi = *((menu::info *) arg);
-    menu::items(mi, disp, menu::ID_VariablesMenuStore);
+    menu::items(mi, disp, menu::ID_variable_menu_store);
     return true;
 }
 
@@ -1394,11 +1408,12 @@ void VariablesMenu::list_variables(info &mi)
 }
 
 
-COMMAND_BODY(VariablesMenuExecute)
+EVAL_BODY(variable_menu_execute)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Run));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1423,7 +1438,7 @@ COMMAND_BODY(VariablesMenuExecute)
 }
 
 
-INSERT_BODY(VariablesMenuExecute)
+INSERT_BODY(variable_menu_execute)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable
 // ----------------------------------------------------------------------------
@@ -1433,11 +1448,21 @@ INSERT_BODY(VariablesMenuExecute)
 }
 
 
-COMMAND_BODY(VariablesMenuRecall)
+HELP_BODY(variable_menu_execute)
+// ----------------------------------------------------------------------------
+//   Point to the "Run" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Run");
+}
+
+
+EVAL_BODY(variable_menu_recall)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Rcl));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1454,7 +1479,7 @@ COMMAND_BODY(VariablesMenuRecall)
 }
 
 
-INSERT_BODY(VariablesMenuRecall)
+INSERT_BODY(variable_menu_recall)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Recall` after it
 // ----------------------------------------------------------------------------
@@ -1464,34 +1489,56 @@ INSERT_BODY(VariablesMenuRecall)
 }
 
 
-COMMAND_BODY(VariablesMenuStore)
+HELP_BODY(variable_menu_recall)
+// ----------------------------------------------------------------------------
+//   Point to the "Recall" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Recall");
+}
+
+
+EVAL_BODY(variable_menu_store)
 // ----------------------------------------------------------------------------
 //   Store a variable from the VariablesMenu
 // ----------------------------------------------------------------------------
 {
-    int key = ui.evaluating;
-    if (key >= KEY_F1 && key <= KEY_F6)
+    rt.command(static_object(ID_Sto));
+    if (rt.args(1))
     {
-        if (directory *dir = rt.variables(0))
+        int key = ui.evaluating;
+        if (key >= KEY_F1 && key <= KEY_F6)
         {
-            uint index = key - KEY_F1 + 5 * ui.page();
-            if (object_p name = dir->name(index))
-                if (object_p value = rt.pop())
-                    if (dir->store(name, value))
-                        return OK;
+            if (directory *dir = rt.variables(0))
+            {
+                uint index = key - KEY_F1 + 5 * ui.page();
+                if (object_p name = dir->name(index))
+                    if (object_p value = rt.pop())
+                        if (dir->store(name, value))
+                            return OK;
+            }
         }
     }
     return ERROR;
 }
 
 
-INSERT_BODY(VariablesMenuStore)
+INSERT_BODY(variable_menu_store)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Store` after it
 // ----------------------------------------------------------------------------
 {
     int key = ui.evaluating;
     return ui.insert_softkey(key, " '", "' Store ", false);
+}
+
+
+HELP_BODY(variable_menu_store)
+// ----------------------------------------------------------------------------
+//   Point to the "Store" command
+// ----------------------------------------------------------------------------
+{
+    return utf8("Store");
 }
 
 
@@ -1710,34 +1757,31 @@ COMMAND_BODY(BinaryToFlags)
 //   Store a binary value into the flags
 // ----------------------------------------------------------------------------
 {
-    if (rt.args(1))
+    object_p value = rt.top();
+    if (value->is_integer())
     {
-        object_p value = rt.top();
-        if (value->is_integer())
-        {
-            bignum_g big;
-            if (value->is_bignum())
-                big = bignum_p(value);
-            else
-                big = rt.make<bignum>(integer_g(integer_p(value)));
-            size_t sz = 0;
-            byte_p data = big->value(&sz);
-            size_t maxflags = Settings.MaxFlags();
-            if (sz * 8 > maxflags)
-                sz = (maxflags + 7) / 8;
-
-            if (!init_flags())
-                return object::ERROR;
-            memcpy(flags, data, sz);
-            if (sz < maxflags / 8)
-                memset(flags + sz, 0, (maxflags + 7) / 8 - sz);
-            if (rt.drop())
-                return OK;
-        }
+        bignum_g big;
+        if (value->is_bignum())
+            big = bignum_p(value);
         else
-        {
-            rt.type_error();
-        }
+            big = rt.make<bignum>(integer_g(integer_p(value)));
+        size_t sz = 0;
+        byte_p data = big->value(&sz);
+        size_t maxflags = Settings.MaxFlags();
+        if (sz * 8 > maxflags)
+            sz = (maxflags + 7) / 8;
+
+        if (!init_flags())
+            return object::ERROR;
+        memcpy(flags, data, sz);
+        if (sz < maxflags / 8)
+            memset(flags + sz, 0, (maxflags + 7) / 8 - sz);
+        if (rt.drop())
+            return OK;
+    }
+    else
+    {
+        rt.type_error();
     }
     return ERROR;
 }

@@ -36,6 +36,8 @@
 #include "functions.h"
 #include "grob.h"
 #include "integer.h"
+#include "locals.h"
+#include "object.h"
 #include "parser.h"
 #include "polynomial.h"
 #include "precedence.h"
@@ -245,9 +247,15 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
                     op = symbol::make(' ') + op;
                     op = op + symbol::make(' ');
                 }
-                if (lprec < prec)
+
+                // Odd precedences are right-associative: A^B^C = A^(B^C)
+                // (A^B)^C: paren on left       29 <= 29
+                // (A*B)*C: no paren on left    !(17 <= 16)
+                if ((lprec | 1) <= prec)
                     ltxt = parentheses(ltxt);
-                if (rprec <= prec)
+                // A^(B^C), no paren on right   !(29 < 29)
+                // A*(B*C): paren on right      16 < 17
+                if (rprec < (prec | 1))
                     rtxt = parentheses(rtxt);
                 precedence = prec;
                 return ltxt + op + rtxt;
@@ -2336,12 +2344,14 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
             if ((oid != ID_divide || unit::mode) && oid != ID_xroot &&
                 oid != ID_comb && oid != ID_perm)
             {
-                if (lprec < prec)
+                // Odd precedences are right-associative: A^B^C = A^(B^C)
+                // (A^B)^C: paren on left       29 <= 29
+                // (A*B)*C: no paren on left    !(17 <= 16)
+                if ((lprec | 1) <= prec)
                     lg = parentheses(g, lg);
-                if (oid != ID_pow &&
-                    (rprec < prec ||
-                     (rprec == prec &&
-                      (oid == ID_subtract || oid == ID_divide))))
+                // A^(B^C), no paren on right   !(29 < 29)
+                // A*(B*C): paren on right      16 < 17
+                if (oid != ID_pow && rprec < (prec | 1))
                     rg = parentheses(g, rg);
             }
             precedence = prec;
@@ -2877,6 +2887,29 @@ EVAL_BODY(funcall)
 //   Function calls get evaluated immediately
 // ----------------------------------------------------------------------------
 {
+    // Check syntax L(I) for arrays or lists
+    if (array_g fcall = o->args())
+    {
+        if (object_g callee = fcall->head())
+        {
+            if (symbol_p sym = callee->as<symbol>())
+                callee = directory::recall_all(sym, false);
+            else if (local_p loc = callee->as<local>())
+                callee = loc->recall();
+            if (callee)
+            {
+                if (list_g items = callee->as_array_or_list())
+                {
+                    if (list_g index = fcall->tail())
+                        if (object_g value = object_p(+items)->at(+index))
+                            if (rt.push(value))
+                                return OK;
+                    return ERROR;
+                }
+            }
+        }
+    }
+
     return o->run(true);
 }
 

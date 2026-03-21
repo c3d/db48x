@@ -64,7 +64,7 @@ static inline void solver_command_error()
 //   Report `EquationSolver` as the failing command
 // ----------------------------------------------------------------------------
 {
-    rt.command(object::static_object(object::ID_EquationSolver));
+    rt.command(object::static_object(object::ID_Root));
 }
 
 
@@ -1134,7 +1134,7 @@ COMMAND_BODY(MultipleVariablesSolver)
         algebraic_g result = Root::solve(eqs, vars, guesses);
         if (!result)
             solver_command_error();
-        if (rt.top(+result))
+        else if (rt.top(+result))
             return OK;
     }
     else
@@ -1301,7 +1301,7 @@ bool SolvingMenu::build(menu_info &mi, list_p expr, bool withcmds)
         menu::items(mi, "EvalEq", ID_EvalEq);
     for (auto name : *vars)
         if (symbol_p sym = name->as<symbol>())
-            menu::items(mi, sym, menu::ID_SolvingMenuStore);
+            menu::items(mi, sym, menu::ID_solving_menu_store);
 
     // Second row: Solve for variables
     mi.plane  = 1;
@@ -1312,7 +1312,7 @@ bool SolvingMenu::build(menu_info &mi, list_p expr, bool withcmds)
         menu::items(mi, "NextEq", ID_NextEq);
     for (auto name : *vars)
         if (symbol_p sym = name->as<symbol>())
-            menu::items(mi, sym, menu::ID_SolvingMenuSolve);
+            menu::items(mi, sym, menu::ID_solving_menu_solve);
 
     // Third row: Recall variable
     mi.plane  = 2;
@@ -1331,7 +1331,7 @@ bool SolvingMenu::build(menu_info &mi, list_p expr, bool withcmds)
                 value = symbol::make("?");
             if (value)
                 sym = value->as_symbol(false);
-            menu::items(mi, sym, menu::ID_SolvingMenuRecall);
+            menu::items(mi, sym, menu::ID_solving_menu_recall);
         }
     }
 
@@ -1398,11 +1398,12 @@ static uint solver_menu_index(int key)
 }
 
 
-COMMAND_BODY(SolvingMenuRecall)
+EVAL_BODY(solving_menu_recall)
 // ----------------------------------------------------------------------------
 //   Recall a variable from the SolvingMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Rcl));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1419,7 +1420,16 @@ COMMAND_BODY(SolvingMenuRecall)
 }
 
 
-INSERT_BODY(SolvingMenuRecall)
+HELP_BODY(solving_menu_recall)
+// ----------------------------------------------------------------------------
+//   Find the topic for the recall feature in a solver menu
+// ----------------------------------------------------------------------------
+{
+    return utf8("Solving Menu Recall Key");
+}
+
+
+INSERT_BODY(solving_menu_recall)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Recall` after it
 // ----------------------------------------------------------------------------
@@ -1443,11 +1453,12 @@ static bool assign(symbol_r name, algebraic_p value)
 }
 
 
-COMMAND_BODY(SolvingMenuStore)
+EVAL_BODY(solving_menu_store)
 // ----------------------------------------------------------------------------
 //   Store a variable from the SolvingMenu
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_Sto));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1506,7 +1517,7 @@ COMMAND_BODY(SolvingMenuStore)
 }
 
 
-INSERT_BODY(SolvingMenuStore)
+INSERT_BODY(solving_menu_store)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable with `Store` after it
 // ----------------------------------------------------------------------------
@@ -1516,7 +1527,7 @@ INSERT_BODY(SolvingMenuStore)
 }
 
 
-HELP_BODY(SolvingMenuStore)
+HELP_BODY(solving_menu_store)
 // ----------------------------------------------------------------------------
 //   Help for storing in a solver variable
 // ----------------------------------------------------------------------------
@@ -1532,11 +1543,12 @@ HELP_BODY(SolvingMenuStore)
 }
 
 
-COMMAND_BODY(SolvingMenuSolve)
+EVAL_BODY(solving_menu_solve)
 // ----------------------------------------------------------------------------
 //  Solve for a given variable
 // ----------------------------------------------------------------------------
 {
+    rt.command(static_object(ID_MultipleVariablesSolver));
     int key = ui.evaluating;
     if (key >= KEY_F1 && key <= KEY_F6)
     {
@@ -1560,11 +1572,20 @@ COMMAND_BODY(SolvingMenuSolve)
 }
 
 
-INSERT_BODY(SolvingMenuSolve)
+INSERT_BODY(solving_menu_solve)
 // ----------------------------------------------------------------------------
 //   Insert the name of a variable
 // ----------------------------------------------------------------------------
 {
     int key = ui.evaluating;
     return ui.insert_softkey(key, " EQ '", "'  0 Root ", false);
+}
+
+
+HELP_BODY(solving_menu_solve)
+// ----------------------------------------------------------------------------
+//   Find the topic for the recall feature in a solver menu
+// ----------------------------------------------------------------------------
+{
+    return utf8("Solving Menu Solve Key");
 }
