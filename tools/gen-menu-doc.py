@@ -23,12 +23,32 @@ from pathlib import Path
 
 ROOT      = Path(__file__).resolve().parent.parent
 MENU_CC   = ROOT / 'src'  / 'menu.cc'
+UI_CC     = ROOT / 'src'  / 'user_interface.cc'
 IDS_TBL   = ROOT / 'src'  / 'ids.tbl'
 DOC_CMDS  = ROOT / 'doc'  / 'commands'
 OUTPUT    = ROOT / 'doc'  / '8-menus-tree.md'
 
 SOFTKEYS  = 6   # buttons per row
 PLANES    = 3   # rows per page
+
+# Physical key labels (DM42 / DM42N keyboard)
+KEY_LABELS = {
+    'KEY_SIGMA': 'Σ+',  'KEY_INV':   '1/x', 'KEY_SQRT':  '√x',
+    'KEY_LOG':   'LOG',  'KEY_LN':    'LN',   'KEY_XEQ':   'XEQ',
+    'KEY_STO':   'STO',  'KEY_RCL':   'RCL',  'KEY_RDN':   'R↓',
+    'KEY_SIN':   'SIN',  'KEY_COS':   'COS',  'KEY_TAN':   'TAN',
+    'KEY_ENTER': 'ENTER','KEY_SWAP':  'x⇆y', 'KEY_CHS':   '+/-',
+    'KEY_E':     'EEX',  'KEY_BSP':   '⌫',   'KEY_UP':    '▲',
+    'KEY_7':     '7',    'KEY_8':     '8',    'KEY_9':     '9',
+    'KEY_DIV':   '÷',   'KEY_DOWN':  '▼',   'KEY_4':     '4',
+    'KEY_5':     '5',    'KEY_6':     '6',    'KEY_MUL':   '×',
+    'KEY_SHIFT': 'SHIFT','KEY_1':     '1',    'KEY_2':     '2',
+    'KEY_3':     '3',    'KEY_SUB':   '-',    'KEY_EXIT':  'EXIT',
+    'KEY_0':     '0',    'KEY_DOT':   '.',    'KEY_RUN':   'R/S',
+    'KEY_ADD':   '+',
+}
+
+SHIFT_SYMBOLS = ['', '🟨 ', '🟦🟦 ']   # plane 0/1/2
 
 
 # ─────────────────────────── helpers ────────────────────────────────────────
@@ -395,6 +415,100 @@ def menu_table(menu_name, items, name_map, doc_index, menu_names):
     return '\n'.join(lines)
 
 
+# ────────────────────── keymap parsing ──────────────────────────────────────
+
+def parse_keymap(path):
+    """
+    Parse the three default keymap tables in user_interface.cc.
+    Returns dict: id_name → list[(plane, key_const)]
+    plane: 0=unshifted, 1=🟨, 2=🟦
+    """
+    text = path.read_text()
+    table_names = [
+        'defaultUnshiftedCommand',
+        'defaultShiftedCommand',
+        'defaultSecondShiftedCommand',
+    ]
+    result = {}
+    for plane, tname in enumerate(table_names):
+        start = text.find(tname + '[')
+        if start < 0:
+            continue
+        brace = text.find('{', start)
+        end   = text.find('};', brace)
+        if brace < 0 or end < 0:
+            continue
+        block = text[brace:end]
+        for m in re.finditer(
+            r'OP2BYTES\s*\(\s*(KEY_\w+)\s*,\s*(?:\w+::)?ID_(\w+)\s*\)',
+            block
+        ):
+            result.setdefault(m.group(2), []).append((plane, m.group(1)))
+    return result
+
+
+# ────────────────────── parent map ──────────────────────────────────────────
+
+def build_parents(menus):
+    """
+    Return dict: child_menu_name → list[(parent_menu_name, item_index)]
+    item_index is the 0-based position in the parent's items list.
+    """
+    parents = {}
+    for parent_name, items in menus.items():
+        for idx, (_lbl, id_name) in enumerate(items):
+            if id_name in menus or id_name in EXTERNAL_MENUS:
+                parents.setdefault(id_name, []).append((parent_name, idx))
+    return parents
+
+
+# ────────────────────── access path computation ─────────────────────────────
+
+def item_key_str(idx, total):
+    """
+    Return the key press string to select item at position *idx* in a
+    menu with *total* items: e.g. 'F3', '🟨 F2', '▶ 🟦 F1'.
+    """
+    multipage = total > SOFTKEYS * PLANES
+    cols      = SOFTKEYS - 1 if multipage else SOFTKEYS
+    page_size = cols * PLANES
+    page   = idx // page_size
+    within = idx % page_size
+    row    = within // cols   # 0=bottom(unshifted), 1=middle(🟨), 2=top(🟦)
+    col    = within % cols
+    prefix = '' if page == 0 else ('▶ ' if page == 1 else f'▶×{page} ')
+    return f'{prefix}{SHIFT_SYMBOLS[row]}F{col + 1}'
+
+
+def format_access_line(menu_name, direct_keys, parents, menus):
+    """
+    Return the '_Access: …_\\n' markdown line, or '' if none found.
+
+    Shows direct keyboard shortcuts first, then immediate parent menus
+    as '[ParentMenu] Fk' (no full chain).
+    """
+    parts = []
+
+    # Direct keyboard shortcuts (shortest first)
+    direct = sorted(
+        {f'{SHIFT_SYMBOLS[p]}{KEY_LABELS.get(k, k)}'
+         for p, k in direct_keys.get(menu_name, [])},
+        key=lambda s: (s.count(' '), s)
+    )
+    parts.extend(direct)
+
+    # Immediate parent menus
+    for parent_name, idx in sorted(parents.get(menu_name, []),
+                                   key=lambda t: t[0].lower()):
+        total = len(menus.get(parent_name, []))
+        step  = item_key_str(idx, total)
+        parts.append(f'[{parent_name}](#{parent_name.lower()}) {step}')
+
+    if not parts:
+        return ''
+    return '_Access: ' + ' · '.join(parts) + '_\n'
+
+
 # ─────────────────────────── main ───────────────────────────────────────────
 
 def main():
@@ -404,6 +518,10 @@ def main():
     print(f'Reading {MENU_CC.relative_to(ROOT)} …',  file=sys.stderr)
     menus    = parse_menu_cc(MENU_CC)
     menu_names = set(menus) | EXTERNAL_MENUS
+
+    print(f'Reading {UI_CC.relative_to(ROOT)} …',    file=sys.stderr)
+    direct_keys = parse_keymap(UI_CC)
+    parents     = build_parents(menus)
 
     print(f'Indexing {DOC_CMDS.relative_to(ROOT)}/ …', file=sys.stderr)
     doc_index = build_doc_index(DOC_CMDS)
@@ -427,6 +545,9 @@ def main():
         '| Command | Command with no documentation entry found |\n'
         '| _Unimplemented_ | Not yet implemented |\n'
         '| `text` | Inserts literal text in the command line |\n'
+        '| 🟨 KEY | Press the yellow shift key once, then KEY |\n'
+        '| 🟦🟦 KEY | Press the yellow shift key twice, then KEY |\n'
+        '| ▶ Fn | Navigate to next page, then press Fn |\n'
     )
     out.append('---\n')
 
@@ -443,6 +564,9 @@ def main():
     # ── one section per menu ─────────────────────────────────────────────────
     for name, items in sorted_menus.items():
         out.append(f'### {name}\n')
+        access = format_access_line(name, direct_keys, parents, menus)
+        if access:
+            out.append(access)
         out.append(menu_table(name, items, name_map, doc_index, menu_names))
 
     OUTPUT.write_text('\n'.join(out) + '\n')

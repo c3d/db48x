@@ -17628,6 +17628,9 @@ Buttons are shown as they appear on the calculator screen:
 | Command | Command with no documentation entry found |
 | _Unimplemented_ | Not yet implemented |
 | `text` | Inserts literal text in the command line |
+| 🟨 KEY | Press the yellow shift key once, then KEY |
+| 🟦🟦 KEY | Press the yellow shift key twice, then KEY |
+| ▶ Fn | Navigate to next page, then press Fn |
 
 ---
 
@@ -17699,6 +17702,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### AlarmMenu
 
+_Access: [DateMenu](#datemenu) 🟨 F6 · [TimeMenu](#timemenu) 🟦🟦 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17706,6 +17711,8 @@ Buttons are shown as they appear on the calculator screen:
 | _Alarm_ | _Ack_ | _→Alarm_ | _Alarm→_ | _FindAlm_ | _DelAlm_ |
 
 ### AlgebraMenu
+
+_Access: 🟦🟦 LOG · [SymbolicMenu](#symbolicmenu) F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17715,6 +17722,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### AnglesMenu
 
+_Access: 🟦🟦 TAN · [ComplexMenu](#complexmenu) 🟦🟦 F5 · [MathMenu](#mathmenu) 🟦🟦 F3 · [ModesMenu](#modesmenu) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [→DMS](#dms) | [DMS→](#dms-1) | DMS+ | DMS- | [Hypot](#hypot) | [Atan2](#atan2) |
@@ -17723,6 +17732,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ArithmeticMenu
 
+_Access: [SymbolicMenu](#symbolicmenu) 🟨 F1_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17730,6 +17741,8 @@ Buttons are shown as they appear on the calculator screen:
 | [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
 
 ### BasesMenu
+
+_Access: 🟨 4 · [MathMenu](#mathmenu) 🟦🟦 F2 · [ProgramMenu](#programmenu) 🟨 F5_
 
 *3 pages · 45 items total*
 
@@ -17759,6 +17772,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### CalculationMenu
 
+_Access: [SymbolicMenu](#symbolicmenu) 🟨 F2_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17766,6 +17781,8 @@ Buttons are shown as they appear on the calculator screen:
 | [LName](#listexpressionnames) | [XVars](#expressionvariables) | _Deriv_ | _DerivX_ | _IBF_ | _IntVX_ |
 
 ### CircularMenu
+
+_Access: 🟦🟦 COS · [MathMenu](#mathmenu) F3 · [RealMenu](#realmenu) 🟦🟦 F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17775,6 +17792,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ClearThingsMenu
 
+_Access: 🟨 ⌫_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17782,6 +17801,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Stack](#clearstack) | [Purge](#purge) | Stats | _Mem_ | Error | [LCD](#clearlcd) |
 
 ### CompareMenu
+
+_Access: [ProgramMenu](#programmenu) 🟨 F3 · [TestsMenu](#testsmenu) 🟦🟦 F4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17791,6 +17812,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ComplexMenu
 
+_Access: 🟨 STO · [MathMenu](#mathmenu) F2 · [VectorMenu](#vectormenu) 🟨 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | 2+i3 | [ℝ∡ℝ→ℂ](#realtopolar) | [ℂ→ℝ∡ℝ](#polartoreal) | Auto ℂ | \[[Angles](#anglesmenu)\] |   |
@@ -17798,6 +17821,8 @@ Buttons are shown as they appear on the calculator screen:
 | `ⅈ` | `∡` | [ℝ→ℂ](#realtorectangular) | [ℂ→ℝ](#rectangulartoreal) | [re](#re) | [im](#im) |
 
 ### DateMenu
+
+_Access: [AlarmMenu](#alarmmenu) 🟨 F3 · [TimeMenu](#timemenu) 🟦🟦 F4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17807,6 +17832,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### DebugMenu
 
+_Access: 🟦🟦 1 · [ProgramMenu](#programmenu) 🟦🟦 F2_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] |   |   |   |
@@ -17814,6 +17841,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Debug](#debug) | [Step](#step) | [Over](#over) | [Steps](#multiplesteps) | [Continue](#continue) | [Kill](#kill) |
 
 ### DifferentialSolverMenu
+
+_Access: [SolverMenu](#solvermenu) 🟨 F4 · [SymbolicMenu](#symbolicmenu) 🟦🟦 F2_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17823,6 +17852,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### DisplayModesMenu
 
+_Access: 🟨 EEX · [MathModesMenu](#mathmodesmenu) 🟦🟦 F6 · [ModesMenu](#modesmenu) 🟨 F5 · [SeparatorModesMenu](#separatormodesmenu) 🟨 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu)\] |
@@ -17830,6 +17861,8 @@ Buttons are shown as they appear on the calculator screen:
 | Std | Fix | Sci | Eng | Sig | [Precision](#precision) |
 
 ### EditMenu
+
+_Access: 🟦🟦 ▼_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17839,6 +17872,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ExpLogIdentitiesMenu
 
+_Access: [SymbolicMenu](#symbolicmenu) 🟨 F4_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17846,6 +17881,8 @@ Buttons are shown as they appear on the calculator screen:
 | _ExpLn_ | _Lin_ | _LnCollect_ | _SinCos_ | _TExpand_ | \[[Symb](#symbolicmenu)\] |
 
 ### FilesMenu
+
+_Access: 🟦🟦 0_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17855,6 +17892,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### FlagsMenu
 
+_Access: 🟨 6 · [ProgramMenu](#programmenu) 🟦🟦 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu)\] |   |   |   |
@@ -17863,6 +17902,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### FractionsMenu
 
+_Access: 🟦🟦 R↓ · [MathMenu](#mathmenu) 🟦🟦 F6_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Frac→](#explode) | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) | FractionIterations | FractionLargestPrime | FractionDigits |
@@ -17870,6 +17911,8 @@ Buttons are shown as they appear on the calculator screen:
 | `/` | [%](#percent) | [→DMS](#dms) | [DMS→](#dms-1) | [→Num](#num) | →Frac |
 
 ### GraphicsMenu
+
+_Access: 🟦🟦 ._
 
 *4 pages · 59 items total*
 
@@ -17907,6 +17950,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### HyperbolicMenu
 
+_Access: 🟦🟦 SIN · [MathMenu](#mathmenu) 🟨 F1 · [PowersMenu](#powersmenu) 🟦🟦 F6 · [RealMenu](#realmenu) 🟦🟦 F2_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17914,6 +17959,8 @@ Buttons are shown as they appear on the calculator screen:
 | [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
 
 ### IntegrationMenu
+
+_Access: 🟨 8 · [SymbolicMenu](#symbolicmenu) 🟦🟦 F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17923,6 +17970,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### IOMenu
 
+_Access: 🟦🟦 - · [MainMenu](#mainmenu) 🟦🟦 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17931,6 +17980,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### LinearSolverMenu
 
+_Access: [SolverMenu](#solvermenu) 🟨 F6_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17938,6 +17989,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### ListMenu
+
+_Access: 🟨 - · [ProgramMenu](#programmenu) 🟦🟦 F4_
 
 *2 pages · 30 items total*
 
@@ -17959,6 +18012,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### LoopsMenu
 
+_Access: 🟦🟦 2 · [CompareMenu](#comparemenu) 🟦🟦 F4 · [FlagsMenu](#flagsmenu) 🟦🟦 F2 · [ProgramMenu](#programmenu) 🟨 F4 · [TestsMenu](#testsmenu) 🟦🟦 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -17966,6 +18021,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Start](#start) | StStep | [For](#for) | ForStep | [Until](#until) | [While](#while) |
 
 ### MainMenu
+
+_Access: 🟦🟦 Σ+_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17975,6 +18032,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### MathMenu
 
+_Access: LN · [MainMenu](#mainmenu) F2_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Signal](#signalprocessingmenu)\] | \[[Bases](#basesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Frac](#fractionsmenu)\] |
@@ -17983,6 +18042,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### MathModesMenu
 
+_Access: [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F6 · [ModesMenu](#modesmenu) F4_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu)\] |
@@ -17990,6 +18051,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Sym](#symbolicresults) | [Simpl](#autosimplify) | 0^0=1 | HwFP | Auto ℂ | Princ |
 
 ### MatrixMenu
+
+_Access: 🟦🟦 9 · [ListMenu](#listmenu) ▶ 🟦🟦 F4 · [MainMenu](#mainmenu) 🟨 F3 · [MathMenu](#mathmenu) F5 · [VectorMenu](#vectormenu) 🟨 F6_
 
 *3 pages · 35 items total*
 
@@ -18019,6 +18082,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### MemoryMenu
 
+_Access: 🟨 RCL · [ProgramMenu](#programmenu) 🟨 F1_
+
 *3 pages · 37 items total*
 
 **Page 1**
@@ -18047,6 +18112,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ModesMenu
 
+_Access: 🟨 +/- · [FlagsMenu](#flagsmenu) 🟦🟦 F3 · [MainMenu](#mainmenu) F6 · [SeparatorModesMenu](#separatormodesmenu) 🟨 F6_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Modes](#modes) | [Reset](#resetmodes) | [System](#systemsetup) |   |   |   |
@@ -18055,6 +18122,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### MultiSolverMenu
 
+_Access: [SolverMenu](#solvermenu) 🟦🟦 F1_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -18062,6 +18131,8 @@ Buttons are shown as they appear on the calculator screen:
 | _Eqs_ | _Indeps_ | _MRoot_ | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### NumbersMenu
+
+_Access: 🟦🟦 ×_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18079,6 +18150,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ObjectMenu
 
+_Access: [ListMenu](#listmenu) ▶ 🟦🟦 F3 · [ProgramMenu](#programmenu) 🟦🟦 F3_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Eval](#evaluate) | [Run](#run) | Clone | [DTag](#deletetag) | [Tag→](#tag-1) | \[[Tools](#toolsmenu)\] |
@@ -18086,6 +18159,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Bytes](#bytes) | [Type](#type) | [TypeName](#typename) | [Obj→](#explode) | [→Num](#num) | →Frac |
 
 ### PartsMenu
+
+_Access: 🟦🟦 LN · [RealMenu](#realmenu) 🟦🟦 F6_
 
 *2 pages · 30 items total*
 
@@ -18107,6 +18182,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### PlotMenu
 
+_Access: 🟦🟦 EEX · [GraphicsMenu](#graphicsmenu) ▶×3 🟦🟦 F4 · [MainMenu](#mainmenu) F4 · [SolverMenu](#solvermenu) 🟦🟦 F3 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F5 · [SymbolicMenu](#symbolicmenu) 🟨 F6_
+
 *2 pages · 20 items total*
 
 **Page 1**
@@ -18127,6 +18204,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### PolynomialsMenu
 
+_Access: 🟦🟦 8 · [MathMenu](#mathmenu) 🟦🟦 F4 · [SymbolicMenu](#symbolicmenu) 🟨 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | _Solve_ | _TVMRoot_ | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
@@ -18135,6 +18214,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### PolynomialSolverMenu
 
+_Access: [SolverMenu](#solvermenu) 🟨 F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -18142,6 +18223,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### PowersMenu
+
+_Access: 🟨 LN · [HyperbolicMenu](#hyperbolicmenu) 🟨 F1 · [MathMenu](#mathmenu) F4 · [RealMenu](#realmenu) 🟦🟦 F3_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18158,6 +18241,8 @@ Buttons are shown as they appear on the calculator screen:
 | _Print_ | _Screen_ | _Disk_ | _IR_ |   |   |
 
 ### ProbabilitiesMenu
+
+_Access: 🟨 × · [MathMenu](#mathmenu) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F4 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F4_
 
 *2 pages · 22 items total*
 
@@ -18179,6 +18264,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### ProgramMenu
 
+_Access: 🟨 3 · [CompareMenu](#comparemenu) 🟦🟦 F5 · [DebugMenu](#debugmenu) 🟦🟦 F3 · [FlagsMenu](#flagsmenu) 🟦🟦 F1 · [LoopsMenu](#loopsmenu) 🟨 F2 · [MainMenu](#mainmenu) F3 · [TestsMenu](#testsmenu) 🟦🟦 F6_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
@@ -18186,6 +18273,8 @@ Buttons are shown as they appear on the calculator screen:
 | `«»` | `{}` | `[]` | `→  «»` | `→  ''` | [Run](#run) |
 
 ### RangeMenu
+
+_Access: [MathMenu](#mathmenu) F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18195,6 +18284,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### RealMenu
 
+_Access: 🟦🟦 STO · [MainMenu](#mainmenu) 🟨 F2 · [MathMenu](#mathmenu) F1_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Trig](#circularmenu)\] | \[[Hyper](#hyperbolicmenu)\] | \[[Powers](#powersmenu)\] | \[[Prob](#probabilitiesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Parts](#partsmenu)\] |
@@ -18202,6 +18293,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Min](#min) | [Max](#max) | [mod](#mod) | [abs](#abs) | [→Num](#num) | [→Q](#q) |
 
 ### SeparatorModesMenu
+
+_Access: [DisplayModesMenu](#displaymodesmenu) 🟨 F6 · [ModesMenu](#modesmenu) 🟨 F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18211,6 +18304,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### SignalProcessingMenu
 
+_Access: [MathMenu](#mathmenu) 🟦🟦 F1_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -18219,6 +18314,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### SolverMenu
 
+_Access: 🟨 7 · [DifferentialSolverMenu](#differentialsolvermenu) F4 · [LinearSolverMenu](#linearsolvermenu) F4 · [MainMenu](#mainmenu) F5 · [MathMenu](#mathmenu) 🟨 F4 · [MultiSolverMenu](#multisolvermenu) F4 · [NumericalSolverMenu](#numericalsolvermenu) F4 · [PolynomialSolverMenu](#polynomialsolvermenu) F4 · [SymbolicSolverMenu](#symbolicsolvermenu) F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
@@ -18226,6 +18323,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
 
 ### StackMenu
+
+_Access: R↓ · [MainMenu](#mainmenu) 🟨 F5 · [ProgramMenu](#programmenu) 🟦🟦 F1_
 
 *2 pages · 22 items total*
 
@@ -18246,6 +18345,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Swap](#swap) | [LastArg](#lastarguments) | [LastX](#lastx) | [Undo](#undo) | [ClrStk](#clearstack) | ▶ |
 
 ### StatisticsMenu
+
+_Access: 🟨 ÷ · [MathMenu](#mathmenu) 🟨 F3_
 
 *3 pages · 35 items total*
 
@@ -18275,6 +18376,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### SymbolicMenu
 
+_Access: 🟦🟦 7 · [AlgebraMenu](#algebramenu) 🟦🟦 F6 · [ArithmeticMenu](#arithmeticmenu) 🟨 F6 · [CalculationMenu](#calculationmenu) 🟨 F4 · [ExpLogIdentitiesMenu](#explogidentitiesmenu) F6 · [MainMenu](#mainmenu) 🟨 F4 · [MathMenu](#mathmenu) 🟦🟦 F5 · [TrigIdentitiesMenu](#trigidentitiesmenu) 🟨 F1_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
@@ -18282,6 +18385,8 @@ Buttons are shown as they appear on the calculator screen:
 | Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
 
 ### SymbolicSolverMenu
+
+_Access: [SolverMenu](#solvermenu) 🟨 F3_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18291,6 +18396,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### TestsMenu
 
+_Access: 🟦🟦 3 · [CompareMenu](#comparemenu) 🟦🟦 F3 · [FlagsMenu](#flagsmenu) 🟨 F3 · [LoopsMenu](#loopsmenu) 🟨 F1 · [ProgramMenu](#programmenu) 🟨 F2_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Case](#case) | Then | When | \[[Compare](#comparemenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |
@@ -18298,6 +18405,8 @@ Buttons are shown as they appear on the calculator screen:
 | [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
 
 ### TextMenu
+
+_Access: 🟦🟦 4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18307,6 +18416,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### TimeMenu
 
+_Access: 🟦🟦 6 · [AlarmMenu](#alarmmenu) 🟨 F2 · [DateMenu](#datemenu) 🟨 F5 · [MainMenu](#mainmenu) 🟦🟦 F4_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu)\] | \[[Alarms](#alarmmenu)\] |   |
@@ -18315,6 +18426,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### TrigIdentitiesMenu
 
+_Access: [SymbolicMenu](#symbolicmenu) 🟨 F3_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -18322,6 +18435,8 @@ Buttons are shown as they appear on the calculator screen:
 | _HalfTan_ | _Tan→SinCos_ | _Tan→SinCos²_ | _TExpand_ | _TLin_ | [TrigSin](#trigsin) |
 
 ### UnitsConversionsMenu
+
+_Access: 🟦🟦 5_
 
 *3 pages · 36 items total*
 
@@ -18350,6 +18465,8 @@ Buttons are shown as they appear on the calculator screen:
 | Ei | Zi | Yi | Ri | Qi | ▶ |
 
 ### UserInterfaceModesMenu
+
+_Access: 🟦🟦 +/- · [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F5 · [MainMenu](#mainmenu) 🟨 F6 · [ModesMenu](#modesmenu) F6_
 
 *4 pages · 47 items total*
 
@@ -18387,6 +18504,8 @@ Buttons are shown as they appear on the calculator screen:
 
 ### UserModeMenu
 
+_Access: [ModesMenu](#modesmenu) F5 · [UserInterfaceModesMenu](#userinterfacemodesmenu) F5_
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
@@ -18394,6 +18513,8 @@ Buttons are shown as they appear on the calculator screen:
 | [Toggle](#toggleusermode) | [User](#usermode) | [Lock](#usermodelock) | [RclKeys](#recallkeys) | [StoKeys](#storekeys) | [Assign](#assignkey) |
 
 ### VectorMenu
+
+_Access: [ListMenu](#listmenu) ▶ 🟦🟦 F5 · [MatrixMenu](#matrixmenu) 🟦🟦 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
