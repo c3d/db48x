@@ -464,6 +464,20 @@ value` error. Lowering the value speeds up failure detection for numbers that
 are hard to factor (e.g. products of two large primes); raising it allows
 factoring tougher semiprimes at the cost of longer run time.
 
+## SolverIterations
+
+Number of times the solver will try to find a solution.
+
+## SolverImprecision
+
+Relative imprecision that is tolerated by the solver
+
+## SolverShuffles
+
+Number of times the solver will shuffle the test vector around errors and
+singularities.
+
+
 ## MathModesMenu
 
 The `MathModesMenu` controls settings related to mathematical computations.

@@ -823,13 +823,14 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
     size_t depth = rt.depth();
 
     // Compute the desired precision
-    int            impr  = Settings.SolverImprecision();
-    algebraic_g    eps   = algebraic::epsilon(impr);
-    algebraic_g    oeps  = decimal::make(101,-2);
-    uint           max   = Settings.SolverIterations();
-    uint           iter  = 0;
-    int            errs  = 0;
-    bool           back  = false; // Go backwards
+    int            impr          = Settings.SolverImprecision();
+    algebraic_g    eps           = algebraic::epsilon(impr);
+    algebraic_g    oeps          = decimal::make(101, -2);
+    uint           max           = Settings.SolverIterations();
+    uint           maxerrs       = Settings.SolverShuffles();
+    uint           iter          = 0;
+    int            errs          = 0;
+    bool           back          = false; // Go backwards
     array_g        j, v, d;
     algebraic_g    magnitude, last, forward;
 
@@ -845,18 +846,27 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
 
         // Set all variables to current value of guesses
         list::iterator gi = guesses->begin();
-        for (object_p varo : *vars)
+        algebraic_g    shuffle;
+        if (errs)
         {
+            // Shuffle slightly around current position (same for all variables)
+            shuffle = pow(oeps, errs) + eps;
+            if (!shuffle)
+                goto error;
+        }
+        size_t varidx = 0;
+        for (object_g varo : *vars)
+        {
+            varidx++;
             object_p valo = *gi;
             if (errs)
             {
                 if (algebraic_g valg = valo->as_algebraic())
                 {
-                    // Shuffle slightly around current position
-                    algebraic_g pw = pow(oeps, errs) + eps;
-                    if (!pw)
-                        goto error;
-                    valo = pw;
+                    valg = valg * shuffle;
+                    if ((errs * varidx) & 1)
+                        valg = -valg;
+                    valo = valg;
                 }
             }
             if (!directory::store_here(varo, valo))
@@ -865,8 +875,10 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         }
 
         // Evaluate all equations at current values of variables
-        size_t neqs = 0;
-        magnitude = nullptr;
+        size_t neqs    = 0;
+        bool   errored = false;
+        magnitude      = nullptr;
+
         for (object_p eqo : *eqs)
         {
             expression_p eq = expression::get(eqo);
@@ -876,8 +888,9 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
             if (!value)
             {
                 // Possibly a transient domain error, try shuffling around
-                if (errs++ == 0)
+                if (!errored)
                 {
+                    errored = true;
                     if (last)
                     {
                         // Return to a known good position
@@ -885,10 +898,12 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
                         guesses = +v;
                     }
                 }
-                // Try shuffling around the known good position a few times
-                if (errs < 5)
-                    continue;
             }
+
+            // Try shuffling around the known good position a few times
+            if (errored && errs++ < maxerrs)
+                continue;
+
             if (!value || !(neqs >= n || rt.push(value)))
                 goto error;
             while (unit_p u = value->as<unit>())
@@ -979,13 +994,26 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
         j = array::from_stack(n, n, true);
         v = array::from_stack(n, 0);
         d = v / j;
-        record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
-        v = array_p(+guesses);
-        v = v - d;
+        if (!d)
+        {
+            record(jsolve, "Jacobian error %u: %s", errs, rt.error());
+            if (errs++ >= maxerrs)
+                goto error;
+            rt.clear_error();
+            last = nullptr;
+            back = false;
+        }
+        else
+        {
+            errs = 0;
+            record(jsolve, "Jacobian %t values %t delta %t", +j, +v, +d);
+            v = array_p(+guesses);
+            v = v - d;
+        }
         if (!v)
             goto error;
 
-        // This is the new guesses
+        // The values in v are the new guesses for next iteration
         guesses = +v;
     } // while (iter < max)
 
