@@ -224,6 +224,22 @@ def _gh_anchor(heading):
     return s
 
 
+def build_conflicts(doc_root, menu_names):
+    """
+    Scan all doc/**/*.md (except 8-menus-tree.md) for headings that match
+    a menu name.  Returns dict: menu_name → existing_anchor.
+    """
+    conflicts = {}
+    for md in sorted(doc_root.glob('**/*.md')):
+        if md.name == '8-menus-tree.md':
+            continue
+        for m in re.finditer(r'^#{1,3} (.+)$', md.read_text(), re.MULTILINE):
+            h = m.group(1).strip()
+            if h in menu_names and h not in conflicts:
+                conflicts[h] = _gh_anchor(h)
+    return conflicts
+
+
 def build_doc_index(doc_dir):
     """
     Scan doc/commands/*.md; return dict  key → (rel_path, anchor).
@@ -264,7 +280,7 @@ EXTERNAL_MENUS = {
 }
 
 
-def resolve(label, id_name, name_map, doc_index, menu_names):
+def resolve(label, id_name, name_map, doc_index, menu_names, conflicts=None):
     """
     Return  (display_text, url_or_None, kind)
     kind ∈ {'menu', 'command', 'unimplemented', 'selfinsert', 'external'}
@@ -292,8 +308,11 @@ def resolve(label, id_name, name_map, doc_index, menu_names):
 
     # Menu reference
     if is_menu:
-        anchor = id_name.lower()
-        kind   = 'external' if id_name in EXTERNAL_MENUS else 'menu'
+        if conflicts and id_name in conflicts:
+            anchor = id_name.lower() + '-reference'
+        else:
+            anchor = id_name.lower()
+        kind = 'external' if id_name in EXTERNAL_MENUS else 'menu'
         return display, f'#{anchor}', kind
 
     # Command: try several lookup keys
@@ -355,14 +374,14 @@ def render_button(display, url, kind):
 
 # ─────────────────────── table generation ───────────────────────────────────
 
-def menu_table(menu_name, items, name_map, doc_index, menu_names):
+def menu_table(menu_name, items, name_map, doc_index, menu_names, conflicts=None):
     """Return a markdown table string for one menu."""
     if not items:
         return '*empty*\n'
 
     buttons = []
     for lbl, idn in items:
-        disp, url, kind = resolve(lbl, idn, name_map, doc_index, menu_names)
+        disp, url, kind = resolve(lbl, idn, name_map, doc_index, menu_names, conflicts)
         buttons.append(render_button(disp, url, kind))
 
     n = len(buttons)
@@ -480,7 +499,7 @@ def item_key_str(idx, total):
     return f'{prefix}{SHIFT_SYMBOLS[row]}F{col + 1}'
 
 
-def format_access_line(menu_name, direct_keys, parents, menus):
+def format_access_line(menu_name, direct_keys, parents, menus, conflicts=None):
     """
     Return the '_Access: …_\\n' markdown line, or '' if none found.
 
@@ -500,9 +519,10 @@ def format_access_line(menu_name, direct_keys, parents, menus):
     # Immediate parent menus
     for parent_name, idx in sorted(parents.get(menu_name, []),
                                    key=lambda t: t[0].lower()):
-        total = len(menus.get(parent_name, []))
-        step  = item_key_str(idx, total)
-        parts.append(f'[{parent_name}](#{parent_name.lower()}) {step}')
+        total  = len(menus.get(parent_name, []))
+        step   = item_key_str(idx, total)
+        anchor = parent_name.lower() + ('-reference' if conflicts and parent_name in conflicts else '')
+        parts.append(f'[{parent_name}](#{anchor}) {step}')
 
     if not parts:
         return ''
@@ -524,7 +544,8 @@ def main():
     parents     = build_parents(menus)
 
     print(f'Indexing {DOC_CMDS.relative_to(ROOT)}/ …', file=sys.stderr)
-    doc_index = build_doc_index(DOC_CMDS)
+    doc_index  = build_doc_index(DOC_CMDS)
+    conflicts  = build_conflicts(ROOT / 'doc', menu_names)
 
     # ── file header ──────────────────────────────────────────────────────────
     out = []
@@ -557,17 +578,22 @@ def main():
     # ── table of contents ────────────────────────────────────────────────────
     out.append('## Contents\n')
     for name in sorted_menus:
-        out.append(f'- [{name}](#{name.lower()})')
+        anchor = name.lower() + ('-reference' if name in conflicts else '')
+        out.append(f'- [{name}](#{anchor})')
     out.append('')
     out.append('---\n')
 
     # ── one section per menu ─────────────────────────────────────────────────
     for name, items in sorted_menus.items():
-        out.append(f'### {name}\n')
-        access = format_access_line(name, direct_keys, parents, menus)
+        if name in conflicts:
+            out.append(f'### {name} Reference\n')
+            out.append(f'_See also: [{name} user documentation](#{conflicts[name]})_\n')
+        else:
+            out.append(f'### {name}\n')
+        access = format_access_line(name, direct_keys, parents, menus, conflicts)
         if access:
             out.append(access)
-        out.append(menu_table(name, items, name_map, doc_index, menu_names))
+        out.append(menu_table(name, items, name_map, doc_index, menu_names, conflicts))
 
     OUTPUT.write_text('\n'.join(out) + '\n')
     print(f'→ {OUTPUT.relative_to(ROOT)}  ({len(menus)} menus)', file=sys.stderr)

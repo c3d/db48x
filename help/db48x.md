@@ -17646,10 +17646,10 @@ Buttons are shown as they appear on the calculator screen:
 - [ClearThingsMenu](#clearthingsmenu)
 - [CompareMenu](#comparemenu)
 - [ComplexMenu](#complexmenu)
-- [DateMenu](#datemenu)
-- [DebugMenu](#debugmenu)
+- [DateMenu](#datemenu-reference)
+- [DebugMenu](#debugmenu-reference)
 - [DifferentialSolverMenu](#differentialsolvermenu)
-- [DisplayModesMenu](#displaymodesmenu)
+- [DisplayModesMenu](#displaymodesmenu-reference)
 - [EditMenu](#editmenu)
 - [ExpLogIdentitiesMenu](#explogidentitiesmenu)
 - [FilesMenu](#filesmenu)
@@ -17662,12 +17662,12 @@ Buttons are shown as they appear on the calculator screen:
 - [LinearSolverMenu](#linearsolvermenu)
 - [ListMenu](#listmenu)
 - [LoopsMenu](#loopsmenu)
-- [MainMenu](#mainmenu)
-- [MathMenu](#mathmenu)
-- [MathModesMenu](#mathmodesmenu)
+- [MainMenu](#mainmenu-reference)
+- [MathMenu](#mathmenu-reference)
+- [MathModesMenu](#mathmodesmenu-reference)
 - [MatrixMenu](#matrixmenu)
 - [MemoryMenu](#memorymenu)
-- [ModesMenu](#modesmenu)
+- [ModesMenu](#modesmenu-reference)
 - [MultiSolverMenu](#multisolvermenu)
 - [NumbersMenu](#numbersmenu)
 - [NumericalSolverMenu](#numericalsolvermenu)
@@ -17682,7 +17682,7 @@ Buttons are shown as they appear on the calculator screen:
 - [ProgramMenu](#programmenu)
 - [RangeMenu](#rangemenu)
 - [RealMenu](#realmenu)
-- [SeparatorModesMenu](#separatormodesmenu)
+- [SeparatorModesMenu](#separatormodesmenu-reference)
 - [SignalProcessingMenu](#signalprocessingmenu)
 - [SolverMenu](#solvermenu)
 - [StackMenu](#stackmenu)
@@ -17691,23 +17691,23 @@ Buttons are shown as they appear on the calculator screen:
 - [SymbolicSolverMenu](#symbolicsolvermenu)
 - [TestsMenu](#testsmenu)
 - [TextMenu](#textmenu)
-- [TimeMenu](#timemenu)
+- [TimeMenu](#timemenu-reference)
 - [TrigIdentitiesMenu](#trigidentitiesmenu)
 - [UnitsConversionsMenu](#unitsconversionsmenu)
 - [UserInterfaceModesMenu](#userinterfacemodesmenu)
-- [UserModeMenu](#usermodemenu)
+- [UserModeMenu](#usermodemenu-reference)
 - [VectorMenu](#vectormenu)
 
 ---
 
 ### AlarmMenu
 
-_Access: [DateMenu](#datemenu) 🟨 F6 · [TimeMenu](#timemenu) 🟦🟦 F5_
+_Access: [DateMenu](#datemenu-reference) 🟨 F6 · [TimeMenu](#timemenu-reference) 🟦🟦 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| _AckAll_ | \[[Time](#timemenu)\] | \[[Date](#datemenu)\] |   |   |   |
+| _AckAll_ | \[[Time](#timemenu-reference)\] | \[[Date](#datemenu-reference)\] |   |   |   |
 | _Alarm_ | _Ack_ | _→Alarm_ | _Alarm→_ | _FindAlm_ | _DelAlm_ |
 
 ### AlgebraMenu
@@ -17722,7 +17722,7 @@ _Access: 🟦🟦 LOG · [SymbolicMenu](#symbolicmenu) F6_
 
 ### AnglesMenu
 
-_Access: 🟦🟦 TAN · [ComplexMenu](#complexmenu) 🟦🟦 F5 · [MathMenu](#mathmenu) 🟦🟦 F3 · [ModesMenu](#modesmenu) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F5_
+_Access: 🟦🟦 TAN · [ComplexMenu](#complexmenu) 🟦🟦 F5 · [MathMenu](#mathmenu-reference) 🟦🟦 F3 · [ModesMenu](#modesmenu-reference) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17742,7 +17742,7 @@ _Access: [SymbolicMenu](#symbolicmenu) 🟨 F1_
 
 ### BasesMenu
 
-_Access: 🟨 4 · [MathMenu](#mathmenu) 🟦🟦 F2 · [ProgramMenu](#programmenu) 🟨 F5_
+_Access: 🟨 4 · [MathMenu](#mathmenu-reference) 🟦🟦 F2 · [ProgramMenu](#programmenu) 🟨 F5_
 
 *3 pages · 45 items total*
 
@@ -17782,7 +17782,7 @@ _Access: [SymbolicMenu](#symbolicmenu) 🟨 F2_
 
 ### CircularMenu
 
-_Access: 🟦🟦 COS · [MathMenu](#mathmenu) F3 · [RealMenu](#realmenu) 🟦🟦 F1_
+_Access: 🟦🟦 COS · [MathMenu](#mathmenu-reference) F3 · [RealMenu](#realmenu) 🟦🟦 F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17812,7 +17812,7 @@ _Access: [ProgramMenu](#programmenu) 🟨 F3 · [TestsMenu](#testsmenu) 🟦🟦
 
 ### ComplexMenu
 
-_Access: 🟨 STO · [MathMenu](#mathmenu) F2 · [VectorMenu](#vectormenu) 🟨 F5_
+_Access: 🟨 STO · [MathMenu](#mathmenu-reference) F2 · [VectorMenu](#vectormenu) 🟨 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17820,17 +17820,21 @@ _Access: 🟨 STO · [MathMenu](#mathmenu) F2 · [VectorMenu](#vectormenu) 🟨 
 | [→Rect](#torectangular) | [→Polar](#topolar) | [conj](#conj) | [sign](#sign) | [\|z\|](#abs) | [arg](#arg) |
 | `ⅈ` | `∡` | [ℝ→ℂ](#realtorectangular) | [ℂ→ℝ](#rectangulartoreal) | [re](#re) | [im](#im) |
 
-### DateMenu
+### DateMenu Reference
 
-_Access: [AlarmMenu](#alarmmenu) 🟨 F3 · [TimeMenu](#timemenu) 🟦🟦 F4_
+_See also: [DateMenu user documentation](#datemenu)_
+
+_Access: [AlarmMenu](#alarmmenu) 🟨 F3 · [TimeMenu](#timemenu-reference) 🟦🟦 F4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| [→Time](#settime) | [→Date](#setdate) | [JDN](#juliandaynumber) | [JDN→](#datefromjuliandaynumber) | \[[Time](#timemenu)\] | \[[Alarms](#alarmmenu)\] |
+| [→Time](#settime) | [→Date](#setdate) | [JDN](#juliandaynumber) | [JDN→](#datefromjuliandaynumber) | \[[Time](#timemenu-reference)\] | \[[Alarms](#alarmmenu)\] |
 | `_date` | `_d` | [Date](#date-1) | [Dt+Tm](#datetime) | ∆Date | [Date+](#date) |
 
-### DebugMenu
+### DebugMenu Reference
+
+_See also: [DebugMenu user documentation](#debugmenu)_
 
 _Access: 🟦🟦 1 · [ProgramMenu](#programmenu) 🟦🟦 F2_
 
@@ -17850,14 +17854,16 @@ _Access: [SolverMenu](#solvermenu) 🟨 F4 · [SymbolicMenu](#symbolicmenu) 🟦
 |   |   |   |   |   |   |
 | [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
 
-### DisplayModesMenu
+### DisplayModesMenu Reference
 
-_Access: 🟨 EEX · [MathModesMenu](#mathmodesmenu) 🟦🟦 F6 · [ModesMenu](#modesmenu) 🟨 F5 · [SeparatorModesMenu](#separatormodesmenu) 🟨 F5_
+_See also: [DisplayModesMenu user documentation](#displaymodesmenu)_
+
+_Access: 🟨 EEX · [MathModesMenu](#mathmodesmenu-reference) 🟦🟦 F6 · [ModesMenu](#modesmenu-reference) 🟨 F5 · [SeparatorModesMenu](#separatormodesmenu-reference) 🟨 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu)\] |
-| [MantissaSpacing](#mantissaspacing) | [FractionSpacing](#fractionspacing) | [BasedSpacing](#basedspacing) | [StandardExponent](#standardexponent) | [MinimumSignificantDigits](#minimumsignificantdigits) | \[[Seps](#separatormodesmenu)\] |
+| [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu-reference)\] |
+| [MantissaSpacing](#mantissaspacing) | [FractionSpacing](#fractionspacing) | [BasedSpacing](#basedspacing) | [StandardExponent](#standardexponent) | [MinimumSignificantDigits](#minimumsignificantdigits) | \[[Seps](#separatormodesmenu-reference)\] |
 | Std | Fix | Sci | Eng | Sig | [Precision](#precision) |
 
 ### EditMenu
@@ -17896,13 +17902,13 @@ _Access: 🟨 6 · [ProgramMenu](#programmenu) 🟦🟦 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu)\] |   |   |   |
+| \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu-reference)\] |   |   |   |
 | [F→Bin](#flagstobinary) | [Bin→F](#binarytoflags) | \[[Tests](#testsmenu)\] | [Flip](#flipflag) | [Set?Set](#testflagsetthenset) | [Clr?Set](#testflagclearthenset) |
 | [Set](#setflag) | [Clear](#clearflag) | [Set?](#testflagset) | [Clear?](#testflagclear) | [Set?Clr](#testflagsetthenclear) | [Clr?Clr](#testflagclearthenclear) |
 
 ### FractionsMenu
 
-_Access: 🟦🟦 R↓ · [MathMenu](#mathmenu) 🟦🟦 F6_
+_Access: 🟦🟦 R↓ · [MathMenu](#mathmenu-reference) 🟦🟦 F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17950,7 +17956,7 @@ _Access: 🟦🟦 ._
 
 ### HyperbolicMenu
 
-_Access: 🟦🟦 SIN · [MathMenu](#mathmenu) 🟨 F1 · [PowersMenu](#powersmenu) 🟦🟦 F6 · [RealMenu](#realmenu) 🟦🟦 F2_
+_Access: 🟦🟦 SIN · [MathMenu](#mathmenu-reference) 🟨 F1 · [PowersMenu](#powersmenu) 🟦🟦 F6 · [RealMenu](#realmenu) 🟦🟦 F2_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -17970,7 +17976,7 @@ _Access: 🟨 8 · [SymbolicMenu](#symbolicmenu) 🟦🟦 F1_
 
 ### IOMenu
 
-_Access: 🟦🟦 - · [MainMenu](#mainmenu) 🟦🟦 F5_
+_Access: 🟦🟦 - · [MainMenu](#mainmenu-reference) 🟦🟦 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18020,39 +18026,45 @@ _Access: 🟦🟦 2 · [CompareMenu](#comparemenu) 🟦🟦 F4 · [FlagsMenu](#f
 | \[[Compare](#testsmenu)\] | \[[Prog](#programmenu)\] | _Label_ | _Goto_ | _Gosub_ | _Return_ |
 | [Start](#start) | StStep | [For](#for) | ForStep | [Until](#until) | [While](#while) |
 
-### MainMenu
+### MainMenu Reference
+
+_See also: [MainMenu user documentation](#mainmenu)_
 
 _Access: 🟦🟦 Σ+_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Lib](#library)\] | \[[Eqns](#equationsmenu)\] | \[[Const](#constantsmenu)\] | \[[Time](#timemenu)\] | \[[I/O](#iomenu)\] | \[[Chars](#charactersmenu)\] |
+| \[[Lib](#library-reference)\] | \[[Eqns](#equationsmenu)\] | \[[Const](#constantsmenu-reference)\] | \[[Time](#timemenu-reference)\] | \[[I/O](#iomenu)\] | \[[Chars](#charactersmenu-reference)\] |
 | [Cat](#catalog) | \[[Real](#realmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Stack](#stackmenu)\] | \[[UI](#userinterfacemodesmenu)\] |
-| Help | \[[Math](#mathmenu)\] | \[[Prog](#programmenu)\] | \[[Plot](#plotmenu)\] | \[[Solve](#solvermenu)\] | \[[Modes](#modesmenu)\] |
+| Help | \[[Math](#mathmenu-reference)\] | \[[Prog](#programmenu)\] | \[[Plot](#plotmenu)\] | \[[Solve](#solvermenu)\] | \[[Modes](#modesmenu-reference)\] |
 
-### MathMenu
+### MathMenu Reference
 
-_Access: LN · [MainMenu](#mainmenu) F2_
+_See also: [MathMenu user documentation](#mathmenu)_
+
+_Access: LN · [MainMenu](#mainmenu-reference) F2_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Signal](#signalprocessingmenu)\] | \[[Bases](#basesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Frac](#fractionsmenu)\] |
-| \[[Hyper](#hyperbolicmenu)\] | \[[Proba](#probabilitiesmenu)\] | \[[Stats](#statisticsmenu)\] | \[[Solver](#solvermenu)\] | \[[Const](#constantsmenu)\] | \[[Eqns](#equationsmenu)\] |
+| \[[Hyper](#hyperbolicmenu)\] | \[[Proba](#probabilitiesmenu)\] | \[[Stats](#statisticsmenu)\] | \[[Solver](#solvermenu)\] | \[[Const](#constantsmenu-reference)\] | \[[Eqns](#equationsmenu)\] |
 | \[[Real](#realmenu)\] | \[[Cmplx](#complexmenu)\] | \[[Trig](#circularmenu)\] | \[[Powers](#powersmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Ranges](#rangemenu)\] |
 
-### MathModesMenu
+### MathModesMenu Reference
 
-_Access: [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F6 · [ModesMenu](#modesmenu) F4_
+_See also: [MathModesMenu user documentation](#mathmodesmenu)_
+
+_Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟦🟦 F6 · [ModesMenu](#modesmenu-reference) F4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu)\] |
+| Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu-reference)\] |
 | [MaxNumberBits](#maxnumberbits) | [MaxRewrites](#maxrewrites) | FractionIterations | FractionDigits | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) |
 | [Sym](#symbolicresults) | [Simpl](#autosimplify) | 0^0=1 | HwFP | Auto ℂ | Princ |
 
 ### MatrixMenu
 
-_Access: 🟦🟦 9 · [ListMenu](#listmenu) ▶ 🟦🟦 F4 · [MainMenu](#mainmenu) 🟨 F3 · [MathMenu](#mathmenu) F5 · [VectorMenu](#vectormenu) 🟨 F6_
+_Access: 🟦🟦 9 · [ListMenu](#listmenu) ▶ 🟦🟦 F4 · [MainMenu](#mainmenu-reference) 🟨 F3 · [MathMenu](#mathmenu-reference) F5 · [VectorMenu](#vectormenu) 🟨 F6_
 
 *3 pages · 35 items total*
 
@@ -18110,15 +18122,17 @@ _Access: 🟨 RCL · [ProgramMenu](#programmenu) 🟨 F1_
 | GC Clr | RT Clr |   |   |   | ◀ |
 | [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
 
-### ModesMenu
+### ModesMenu Reference
 
-_Access: 🟨 +/- · [FlagsMenu](#flagsmenu) 🟦🟦 F3 · [MainMenu](#mainmenu) F6 · [SeparatorModesMenu](#separatormodesmenu) 🟨 F6_
+_See also: [ModesMenu user documentation](#modesmenu)_
+
+_Access: 🟨 +/- · [FlagsMenu](#flagsmenu) 🟦🟦 F3 · [MainMenu](#mainmenu-reference) F6 · [SeparatorModesMenu](#separatormodesmenu-reference) 🟨 F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Modes](#modes) | [Reset](#resetmodes) | [System](#systemsetup) |   |   |   |
-| Grad | \[[Angles](#anglesmenu)\] | Beep | Flash | \[[Display](#displaymodesmenu)\] | \[[Seps](#separatormodesmenu)\] |
-| Deg | Rad | [n×π](#piradians) | \[[Math](#mathmodesmenu)\] | \[[User](#usermodemenu)\] | \[[UI](#userinterfacemodesmenu)\] |
+| Grad | \[[Angles](#anglesmenu)\] | Beep | Flash | \[[Display](#displaymodesmenu-reference)\] | \[[Seps](#separatormodesmenu-reference)\] |
+| Deg | Rad | [n×π](#piradians) | \[[Math](#mathmodesmenu-reference)\] | \[[User](#usermodemenu-reference)\] | \[[UI](#userinterfacemodesmenu)\] |
 
 ### MultiSolverMenu
 
@@ -18182,7 +18196,7 @@ _Access: 🟦🟦 LN · [RealMenu](#realmenu) 🟦🟦 F6_
 
 ### PlotMenu
 
-_Access: 🟦🟦 EEX · [GraphicsMenu](#graphicsmenu) ▶×3 🟦🟦 F4 · [MainMenu](#mainmenu) F4 · [SolverMenu](#solvermenu) 🟦🟦 F3 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F5 · [SymbolicMenu](#symbolicmenu) 🟨 F6_
+_Access: 🟦🟦 EEX · [GraphicsMenu](#graphicsmenu) ▶×3 🟦🟦 F4 · [MainMenu](#mainmenu-reference) F4 · [SolverMenu](#solvermenu) 🟦🟦 F3 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F5 · [SymbolicMenu](#symbolicmenu) 🟨 F6_
 
 *2 pages · 20 items total*
 
@@ -18204,7 +18218,7 @@ _Access: 🟦🟦 EEX · [GraphicsMenu](#graphicsmenu) ▶×3 🟦🟦 F4 · [Ma
 
 ### PolynomialsMenu
 
-_Access: 🟦🟦 8 · [MathMenu](#mathmenu) 🟦🟦 F4 · [SymbolicMenu](#symbolicmenu) 🟨 F5_
+_Access: 🟦🟦 8 · [MathMenu](#mathmenu-reference) 🟦🟦 F4 · [SymbolicMenu](#symbolicmenu) 🟨 F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18224,7 +18238,7 @@ _Access: [SolverMenu](#solvermenu) 🟨 F5_
 
 ### PowersMenu
 
-_Access: 🟨 LN · [HyperbolicMenu](#hyperbolicmenu) 🟨 F1 · [MathMenu](#mathmenu) F4 · [RealMenu](#realmenu) 🟦🟦 F3_
+_Access: 🟨 LN · [HyperbolicMenu](#hyperbolicmenu) 🟨 F1 · [MathMenu](#mathmenu-reference) F4 · [RealMenu](#realmenu) 🟦🟦 F3_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18242,7 +18256,7 @@ _Access: 🟨 LN · [HyperbolicMenu](#hyperbolicmenu) 🟨 F1 · [MathMenu](#mat
 
 ### ProbabilitiesMenu
 
-_Access: 🟨 × · [MathMenu](#mathmenu) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F4 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F4_
+_Access: 🟨 × · [MathMenu](#mathmenu-reference) 🟨 F2 · [RealMenu](#realmenu) 🟦🟦 F4 · [StatisticsMenu](#statisticsmenu) 🟦🟦 F4_
 
 *2 pages · 22 items total*
 
@@ -18264,17 +18278,17 @@ _Access: 🟨 × · [MathMenu](#mathmenu) 🟨 F2 · [RealMenu](#realmenu) 🟦�
 
 ### ProgramMenu
 
-_Access: 🟨 3 · [CompareMenu](#comparemenu) 🟦🟦 F5 · [DebugMenu](#debugmenu) 🟦🟦 F3 · [FlagsMenu](#flagsmenu) 🟦🟦 F1 · [LoopsMenu](#loopsmenu) 🟨 F2 · [MainMenu](#mainmenu) F3 · [TestsMenu](#testsmenu) 🟦🟦 F6_
+_Access: 🟨 3 · [CompareMenu](#comparemenu) 🟦🟦 F5 · [DebugMenu](#debugmenu-reference) 🟦🟦 F3 · [FlagsMenu](#flagsmenu) 🟦🟦 F1 · [LoopsMenu](#loopsmenu) 🟨 F2 · [MainMenu](#mainmenu-reference) F3 · [TestsMenu](#testsmenu) 🟦🟦 F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
+| \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu-reference)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
 | \[[Mem](#memorymenu)\] | \[[Test](#testsmenu)\] | \[[Cmp](#comparemenu)\] | \[[Loop](#loopsmenu)\] | \[[Base](#basesmenu)\] | [Eval](#evaluate) |
 | `«»` | `{}` | `[]` | `→  «»` | `→  ''` | [Run](#run) |
 
 ### RangeMenu
 
-_Access: [MathMenu](#mathmenu) F6_
+_Access: [MathMenu](#mathmenu-reference) F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18284,7 +18298,7 @@ _Access: [MathMenu](#mathmenu) F6_
 
 ### RealMenu
 
-_Access: 🟦🟦 STO · [MainMenu](#mainmenu) 🟨 F2 · [MathMenu](#mathmenu) F1_
+_Access: 🟦🟦 STO · [MainMenu](#mainmenu-reference) 🟨 F2 · [MathMenu](#mathmenu-reference) F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18292,19 +18306,21 @@ _Access: 🟦🟦 STO · [MainMenu](#mainmenu) 🟨 F2 · [MathMenu](#mathmenu) 
 | [Ceil](#ceil) | [Floor](#floor) | rem | [%](#percent) | [%Chg](#percentchange) | [%Total](#percenttotal) |
 | [Min](#min) | [Max](#max) | [mod](#mod) | [abs](#abs) | [→Num](#num) | [→Q](#q) |
 
-### SeparatorModesMenu
+### SeparatorModesMenu Reference
 
-_Access: [DisplayModesMenu](#displaymodesmenu) 🟨 F6 · [ModesMenu](#modesmenu) 🟨 F6_
+_See also: [SeparatorModesMenu user documentation](#separatormodesmenu)_
+
+_Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟨 F6 · [ModesMenu](#modesmenu-reference) 🟨 F6_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [1.2x10³²](#fancyexponent) | [1.2E32](#classicexponent) | [1.0→1.](#trailingdecimal) | [1→1.0](#showasdecimal) | Fixed0 |   |
-| #1 000 | #1.000 | #1'000 | #1_000 | \[[Disp](#displaymodesmenu)\] | \[[Modes](#modesmenu)\] |
+| #1 000 | #1.000 | #1'000 | #1_000 | \[[Disp](#displaymodesmenu-reference)\] | \[[Modes](#modesmenu-reference)\] |
 | [1 000](#numberspaces) | [1.000,](#numberdotorcomma) | [1'000](#numberticks) | [1_000](#numberunderscore) | [2.3](#decimaldot) | [2,3](#decimalcomma) |
 
 ### SignalProcessingMenu
 
-_Access: [MathMenu](#mathmenu) 🟦🟦 F1_
+_Access: [MathMenu](#mathmenu-reference) 🟦🟦 F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18314,7 +18330,7 @@ _Access: [MathMenu](#mathmenu) 🟦🟦 F1_
 
 ### SolverMenu
 
-_Access: 🟨 7 · [DifferentialSolverMenu](#differentialsolvermenu) F4 · [LinearSolverMenu](#linearsolvermenu) F4 · [MainMenu](#mainmenu) F5 · [MathMenu](#mathmenu) 🟨 F4 · [MultiSolverMenu](#multisolvermenu) F4 · [NumericalSolverMenu](#numericalsolvermenu) F4 · [PolynomialSolverMenu](#polynomialsolvermenu) F4 · [SymbolicSolverMenu](#symbolicsolvermenu) F5_
+_Access: 🟨 7 · [DifferentialSolverMenu](#differentialsolvermenu) F4 · [LinearSolverMenu](#linearsolvermenu) F4 · [MainMenu](#mainmenu-reference) F5 · [MathMenu](#mathmenu-reference) 🟨 F4 · [MultiSolverMenu](#multisolvermenu) F4 · [NumericalSolverMenu](#numericalsolvermenu) F4 · [PolynomialSolverMenu](#polynomialsolvermenu) F4 · [SymbolicSolverMenu](#symbolicsolvermenu) F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18324,7 +18340,7 @@ _Access: 🟨 7 · [DifferentialSolverMenu](#differentialsolvermenu) F4 · [Line
 
 ### StackMenu
 
-_Access: R↓ · [MainMenu](#mainmenu) 🟨 F5 · [ProgramMenu](#programmenu) 🟦🟦 F1_
+_Access: R↓ · [MainMenu](#mainmenu-reference) 🟨 F5 · [ProgramMenu](#programmenu) 🟦🟦 F1_
 
 *2 pages · 22 items total*
 
@@ -18346,7 +18362,7 @@ _Access: R↓ · [MainMenu](#mainmenu) 🟨 F5 · [ProgramMenu](#programmenu) �
 
 ### StatisticsMenu
 
-_Access: 🟨 ÷ · [MathMenu](#mathmenu) 🟨 F3_
+_Access: 🟨 ÷ · [MathMenu](#mathmenu-reference) 🟨 F3_
 
 *3 pages · 35 items total*
 
@@ -18376,7 +18392,7 @@ _Access: 🟨 ÷ · [MathMenu](#mathmenu) 🟨 F3_
 
 ### SymbolicMenu
 
-_Access: 🟦🟦 7 · [AlgebraMenu](#algebramenu) 🟦🟦 F6 · [ArithmeticMenu](#arithmeticmenu) 🟨 F6 · [CalculationMenu](#calculationmenu) 🟨 F4 · [ExpLogIdentitiesMenu](#explogidentitiesmenu) F6 · [MainMenu](#mainmenu) 🟨 F4 · [MathMenu](#mathmenu) 🟦🟦 F5 · [TrigIdentitiesMenu](#trigidentitiesmenu) 🟨 F1_
+_Access: 🟦🟦 7 · [AlgebraMenu](#algebramenu) 🟦🟦 F6 · [ArithmeticMenu](#arithmeticmenu) 🟨 F6 · [CalculationMenu](#calculationmenu) 🟨 F4 · [ExpLogIdentitiesMenu](#explogidentitiesmenu) F6 · [MainMenu](#mainmenu-reference) 🟨 F4 · [MathMenu](#mathmenu-reference) 🟦🟦 F5 · [TrigIdentitiesMenu](#trigidentitiesmenu) 🟨 F1_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -18414,13 +18430,15 @@ _Access: 🟦🟦 4_
 | [T→Code](#textcode) | [Code→T](#codetext) | [Extract](#extract) | [T→Obj](#compiletoobject) | [T→Alg](#compiletoalgebraic) | [T→Num](#compiletonumber) |
 | [→Text](#totext) | [Text→](#compile) | [Length](#size) | [Append](#add) | [Repeat](#repeat) | [C→Code](#charcode) |
 
-### TimeMenu
+### TimeMenu Reference
 
-_Access: 🟦🟦 6 · [AlarmMenu](#alarmmenu) 🟨 F2 · [DateMenu](#datemenu) 🟨 F5 · [MainMenu](#mainmenu) 🟦🟦 F4_
+_See also: [TimeMenu user documentation](#timemenu)_
+
+_Access: 🟦🟦 6 · [AlarmMenu](#alarmmenu) 🟨 F2 · [DateMenu](#datemenu-reference) 🟨 F5 · [MainMenu](#mainmenu-reference) 🟦🟦 F4_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu)\] | \[[Alarms](#alarmmenu)\] |   |
+| [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu-reference)\] | \[[Alarms](#alarmmenu)\] |   |
 | Chrono | [Ticks](#ticks) | [Dt+Tm](#datetime) | [T→Str](#totext) | [Wait](#wait) | [TEval](#teval) |
 | _hms | [Time](#time) | [→HMS](#hms) | [HMS→](#hms-1) | [HMS+](#hms-2) | [HMS-](#hms-) |
 
@@ -18466,7 +18484,7 @@ _Access: 🟦🟦 5_
 
 ### UserInterfaceModesMenu
 
-_Access: 🟦🟦 +/- · [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F5 · [MainMenu](#mainmenu) 🟨 F6 · [ModesMenu](#modesmenu) F6_
+_Access: 🟦🟦 +/- · [DisplayModesMenu](#displaymodesmenu-reference) 🟦🟦 F5 · [MainMenu](#mainmenu-reference) 🟨 F6 · [ModesMenu](#modesmenu-reference) F6_
 
 *4 pages · 47 items total*
 
@@ -18476,7 +18494,7 @@ _Access: 🟦🟦 +/- · [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F5 · [M
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [3-lines](#threerowsmenus) | [1-line](#singlerowmenus) | [Flat](#flatmenus) | [Round](#roundedmenus) | \[[Hide](#hideemptymenu)\] |   |
 | ResultFont | StackFont | EditorFont | MultilineEditorFont | [CursorBlinkRate](#cursorblinkrate) | ◀ |
-| [GrRes](#graphicresultdisplay) | [GrStk](#graphicstackdisplay) | Beep | Flash | \[[User](#usermodemenu)\] | ▶ |
+| [GrRes](#graphicresultdisplay) | [GrStk](#graphicstackdisplay) | Beep | Flash | \[[User](#usermodemenu-reference)\] | ▶ |
 
 **Page 2**
 
@@ -18502,9 +18520,11 @@ _Access: 🟦🟦 +/- · [DisplayModesMenu](#displaymodesmenu) 🟦🟦 F5 · [M
 |   |   |   |   |   | ◀ |
 | [Header](#header) | [CustomHeaderRefresh](#customheaderrefresh) |   |   |   | ▶ |
 
-### UserModeMenu
+### UserModeMenu Reference
 
-_Access: [ModesMenu](#modesmenu) F5 · [UserInterfaceModesMenu](#userinterfacemodesmenu) F5_
+_See also: [UserModeMenu user documentation](#usermodemenu)_
+
+_Access: [ModesMenu](#modesmenu-reference) F5 · [UserInterfaceModesMenu](#userinterfacemodesmenu) F5_
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
