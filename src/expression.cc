@@ -894,8 +894,18 @@ static size_t check_match(size_t eq, size_t eqsz,
                 bool want_var = must_be_non_constant(cat);
                 if (want_cst || want_int || want_var)
                 {
-                    // At this point, if we have a numerical value, it was
-                    // wrapped in an equation by grab_arguments.
+                    // Wildcard naming convention: the first letter of the name
+                    // determines the category. Letters a-c (or A-C) match numeric
+                    // constants; letters i-k (or I-K) match integers. For constant
+                    // patterns (a-c), reject symbolic expressions like √(2) without
+                    // evaluating them — otherwise program::run would compute √(2) to
+                    // 1.41421... and let it match as a constant, incorrectly folding
+                    // '48·√2' into a decimal. Integer patterns (i-k) still allow
+                    // evaluation, because expressions like K-1 need to be reduced to
+                    // verify they produce an integer result (e.g. in 'X^K → X*X^(K-1)').
+                    if (want_cst && object::is_symbolic(ftop->type()))
+                        return 0;
+
                     size_t depth = rt.depth();
                     if (program::run(+ftop) != object::OK)
                         return 0;
