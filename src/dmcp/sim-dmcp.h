@@ -102,6 +102,10 @@ int       ui_wrap_io(file_sel_fn callback,
                      bool        writing);
 void      ui_load_keymap(const char *path);
 
+// Clipboard (skipping screen copy on iOS; use system screenshot instead)
+size_t    ui_clipboard_copy(char *buf, size_t maxlen);
+void      ui_clipboard_paste(const char *text, size_t len);
+
 #if WASM
 int       ui_init();
 uintptr_t ui_lcd_buffer();

@@ -434,8 +434,10 @@ struct eq
     }
 
     // Negation operation
-    eq<args..., leb(object::ID_neg)>
-    operator-()         { return eq<args..., leb(object::ID_neg)>(); }
+    eq<args..., leb(object::ID_neg)> operator-() const
+    {
+        return eq<args..., leb(object::ID_neg)>();
+    }
 
     template <uint ty>
     using fntype = typename std::conditional<(ty < 128),
@@ -494,99 +496,153 @@ struct eq
 #undef EQ_FUNCTION
 
     // Arithmetic
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_add)>
-    operator+(eq<y...>) { return eq<args..., y..., leb(object::ID_add)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_add)> operator+(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_add)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_subtract)>
-    operator-(eq<y...>) { return eq<args..., y..., leb(object::ID_subtract)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_subtract)> operator-(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_subtract)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_multiply)>
-    operator*(eq<y...>) { return eq<args..., y..., leb(object::ID_multiply)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_multiply)> operator*(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_multiply)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_divide)>
-    operator/(eq<y...>) { return eq<args..., y..., leb(object::ID_divide)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_divide)> operator/(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_divide)>();
+    }
 
     template<byte ...y>
     eq<args..., y..., leb(object::ID_mod)>
-    operator%(eq<y...>) { return eq<args..., y..., leb(object::ID_mod)>(); }
+    operator%(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_mod)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_rem)>
-    rem(eq<y...>) { return eq<args..., y..., leb(object::ID_rem)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_rem)> rem(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_rem)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_pow)>
-    operator^(eq<y...>) { return eq<args..., y..., leb(object::ID_pow)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_pow)> operator^(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_pow)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_pow)>
-    pow(eq<y...>) { return eq<args..., y..., leb(object::ID_pow)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_pow)> pow(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_pow)>();
+    }
 
-    template<byte ...y>
+    template <byte... y>
     eq<args..., y..., lb(object::ID_Derivative), hb(object::ID_Derivative)>
-    deriv(eq<y...>) { return eq<args..., y...,
-                                lb(object::ID_Derivative),
-                                hb(object::ID_Derivative)>(); }
-    template<byte ...y>
+    deriv(eq<y...>) const
+    {
+        return eq<args...,
+                  y...,
+                  lb(object::ID_Derivative),
+                  hb(object::ID_Derivative)>();
+    }
+    template <byte... y>
     eq<args..., y..., lb(object::ID_Derivative), hb(object::ID_Derivative)>
-    operator>>(eq<y...>) { return eq<args..., y...,
-                                     lb(object::ID_Derivative),
-                                     hb(object::ID_Derivative)>(); }
-    template<byte ...y>
+    operator>>(eq<y...>) const
+    {
+        return eq<args...,
+                  y...,
+                  lb(object::ID_Derivative),
+                  hb(object::ID_Derivative)>();
+    }
+    template <byte... y>
     eq<args..., y..., lb(object::ID_Primitive), hb(object::ID_Primitive)>
-    prim(eq<y...>) { return eq<args..., y...,
-                               lb(object::ID_Primitive),
-                               hb(object::ID_Primitive)>(); }
-    template<byte ...y>
+        prim(eq<y...>) const
+    {
+        return eq<args...,
+                  y...,
+                  lb(object::ID_Primitive),
+                  hb(object::ID_Primitive)>();
+    }
+    template <byte... y>
     eq<args..., y..., lb(object::ID_Primitive), hb(object::ID_Primitive)>
-    operator<<(eq<y...>) { return eq<args..., y...,
-                                     lb(object::ID_Primitive),
-                                     hb(object::ID_Primitive)>(); }
+    operator<<(eq<y...>) const
+    {
+        return eq<args...,
+                  y...,
+                  lb(object::ID_Primitive),
+                  hb(object::ID_Primitive)>();
+    }
 
-    template<byte ...y>
+    template <byte... y>
     eq<leb(object::ID_funcall),
        leb(sizeof...(args) + sizeof...(y)),
-       y..., args...>
-    call(eq<y...>) { return eq<leb(object::ID_funcall),
-                               leb(sizeof...(args)+sizeof...(y)),
-                               y..., args...>(); }
-    template<byte ...y>
+       y...,
+       args...>
+    call(eq<y...>) const
+    {
+        return eq<leb(object::ID_funcall),
+                  leb(sizeof...(args) + sizeof...(y)),
+                  y...,
+                  args...>();
+    }
+    template <byte... y>
     eq<leb(object::ID_funcall),
        leb(sizeof...(args) + sizeof...(y)),
-       y..., args...>
-    operator()(eq<y...>) { return eq<leb(object::ID_funcall),
-                                     leb(sizeof...(args)+sizeof...(y)),
-                                     y..., args...>(); }
+       y...,
+       args...>
+    operator()(eq<y...>) const
+    {
+        return eq<leb(object::ID_funcall),
+                  leb(sizeof...(args) + sizeof...(y)),
+                  y...,
+                  args...>();
+    }
 
     // Comparisons
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestLT)>
-    operator<(eq<y...>) { return eq<args..., y..., leb(object::ID_TestLT)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestLT)> operator<(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestLT)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestEQ)>
-    operator==(eq<y...>) { return eq<args..., y..., leb(object::ID_TestEQ)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestEQ)> operator==(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestEQ)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestGT)>
-    operator>(eq<y...>) { return eq<args..., y..., leb(object::ID_TestGT)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestGT)> operator>(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestGT)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestLE)>
-    operator<=(eq<y...>) { return eq<args..., y..., leb(object::ID_TestLE)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestLE)> operator<=(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestLE)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestNE)>
-    operator!=(eq<y...>) { return eq<args..., y..., leb(object::ID_TestNE)>(); }
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestNE)> operator!=(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestNE)>();
+    }
 
-    template<byte ...y>
-    eq<args..., y..., leb(object::ID_TestGE)>
-    operator>=(eq<y...>) { return eq<args..., y..., leb(object::ID_TestGE)>(); }
-
+    template <byte... y>
+    eq<args..., y..., leb(object::ID_TestGE)> operator>=(eq<y...>) const
+    {
+        return eq<args..., y..., leb(object::ID_TestGE)>();
+    }
 };
 
 
@@ -642,13 +698,20 @@ EQ_FUNCTION(conj);
 
 #undef EQ_FUNCTION
 
-// Pi constant
-// struct eq_pi : eq<object::ID_pi> {};
+// Pi and e constants
+#define EQ_TWO_BYTES(x)  eq<byte(((x) & 0x7F) | 0x80), byte((x) >> 7)>
+struct eq_pi : EQ_TWO_BYTES(object::ID_Pi) {};
+struct eq_e  : EQ_TWO_BYTES(object::ID_EulerianNumber) {};
 
 // Build a symbol out of a character
-template <byte c>       struct eq_symbol  : eq<object::ID_symbol,  1, c> {};
+template <byte c>
+struct eq_symbol  : eq<object::ID_symbol,  1, c> {};
 template <byte c, byte d>
 struct eq_debug_symbol  : eq<object::ID_symbol,  2, c, d> {};
+
+// Build a local variable reference
+template <byte c>
+struct eq_local : eq<object::ID_local, c> {};
 
 // Build an integer constant
 template <uint c, std::enable_if_t<(c >= 0 && c < 128), bool> = true>

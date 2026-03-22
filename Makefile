@@ -1,17 +1,31 @@
 #******************************************************************************
-# Makefile                                                        DB48X project
+# Makefile.miq                                                    DB48X project
 #******************************************************************************
 #
 #  File Description:
 #
-#    Makefile for DB48x and all variants
+#     Build for all variants of DB48x, using make-it-quick
 #
 #
 #
-#
-#
-#
-#
+## Targets for DB48x:
+##    make                : Build everything
+##    make all            : Same
+##    make dm42           : Build for SwissMicros DM42
+##    make dm42n          : Build for SwissMicros DM42n (called db50x)
+##    make dm32           : Build for SwissMicros DM32 (called db50x)
+##    make android        : Build Android App Bundle for Google Play
+##    make tools          : Build the tools (decimize, crc32, etc)
+##    make help           : List all targets
+##
+## Optimization levels:
+##    make opt            : Build optimized
+##    make release        : Build for release
+##    make debug          : Build for debugging
+##
+## Target prefix can be used to combine configurations:
+##    make color-dm32-sim : Build color simulator for dm32 (db50x)
+##    make sim-debug      : Build debug simulator
 #
 #******************************************************************************
 #  (C) 2026 Christophe de Dinechin <christophe@dinechin.org>
@@ -27,279 +41,347 @@
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #******************************************************************************
 
-# This variant uses make-it-quick
-TOP=./
-MIQ=$(TOP)recorder/make-it-quick/
+#------------------------------------------------------------------------------
+#  Default targets
+#------------------------------------------------------------------------------
 
-# Package information
-PACKAGE_NAME=db48x
-PACKAGE_VERSION=0.9.16
-PACKAGE_DESCRIPTION=A modern implementation of RPL in the spirit of the HP48
-PACKAGE_URL=http://48calc.org
-PACKAGE_VERSION:=$(shell git describe 2> /dev/null || echo "unkown-version")
-PACKAGE_BUGS=christophe@dinechin.org
+# all: dm32 dm42 dm42-sim color-dm32-sim dm42-android color-dm32-android
+all:		fw sims
+sims:		dm42-sim color-dm32-sim
+fw:		dm32 dm42
+androids:	android color-dm32-android
+
+# ------------------------------------------------------------------------------
+# Package
+# ------------------------------------------------------------------------------
+
+PACKAGE_NAME ?= $(NAME)
+PACKAGE_VERSION := $(shell git describe 2>/dev/null || echo "unknown")
+PACKAGE_DESCRIPTION = A modern implementation of RPL in the spirit of the HP48
+PACKAGE_URL = http://48calc.org
+PACKAGE_BUGS = christophe@dinechin.org
+
+# ------------------------------------------------------------------------------
+# Build configuration
+# ------------------------------------------------------------------------------
+
+# Product name: db48x or db50x
+NAME ?= db48x
+
+# Build target: release, opt or debug
+TARGET ?= release
+
+# Build kind: fw, sim or android
+KIND ?=
+
+# Calculator model: dm32, dm42 or dm42n
+MODEL ?= dm42
+
+# Platform: dmcp
+PLATFORM ?= dmcp
+
+# SDK: dmcp or dmcp5
+SDK ?= dmcp
+
+# Program extension: pgm (DM42) or pg5 (DM32/DM42)
+PGM ?= $(PGM_$(SDK))
+PGM_dmcp = pgm
+PGM_dmcp5 = pg5
+
+# The variant as shown in teh top-level makefile
+VARIANT=$(COLOR:%=%-)$(MODEL)$(KIND:%=-%)
+
+# By default, auto-select build environment
+BUILDENV ?= auto
+
+# Mount base on a per-OS basis
+HOST_OS_NAME:=$(shell uname -s)
+MOUNTBASE = $(MOUNTBASE_$(HOST_OS_NAME))
+MOUNTBASE_Darwin = /Volumes
+MOUNTBASE_Linux = /run/media/$(USER)
+
+# Host tools (built via recursive make; each tool has its own Makefile)
+TTF2FONT = tools/ttf2font/ttf2font
+DECIMIZE = tools/decimize/decimize
+CRCFIX = tools/forcecrc32/forcecrc32
+CRC32 = tools/crc32/crc32
+BASE_FONT = fonts/FogSans-ddd.ttf
+
+# ------------------------------------------------------------------------------
+# Sources and products
+# ------------------------------------------------------------------------------
+
+CXX_STD = gnu++17
+
+ifdef KIND
+PRODUCTS ?= $(NAME)$(EXT_$(KIND))
+EXT_fw = .exe
+EXT_sim = .lib
+EXT_android = .exe
+
+CONFIG=$(CONFIG_$(KIND))
+CONFIG_sim=							\
+	sigaction						\
+	<regex.h>						\
+	<sys/mman.h>						\
+	<signal.h>						\
+	drand48							\
+	libregex						\
+	setlinebuf						\
+	sigstksz						\
+	strsignal
+
+SOURCES =							\
+	src/$(PLATFORM)/target.cc				\
+	src/$(PLATFORM)/sysmenu.cc				\
+	src/$(PLATFORM)/main.cc					\
+	fonts/EditorFont.cc					\
+	fonts/HelpFont.cc					\
+	fonts/ReducedFont.cc					\
+	fonts/StackFont.cc					\
+	src/algebraic.cc					\
+	src/arithmetic.cc					\
+	src/array.cc						\
+	src/bignum.cc						\
+	src/catalog.cc						\
+	src/characters.cc					\
+	src/command.cc						\
+	src/comment.cc						\
+	src/compare.cc						\
+	src/complex.cc						\
+	src/conditionals.cc					\
+	src/constants.cc					\
+	src/continued-fraction.cc				\
+	src/custom.cc						\
+	src/datetime.cc						\
+	src/decimal.cc						\
+	src/equations.cc					\
+	src/expression.cc					\
+	src/factor.cc						\
+	src/file.cc						\
+	src/files.cc						\
+	src/finance.cc						\
+	src/font.cc						\
+	src/fraction.cc						\
+	src/functions.cc					\
+	src/graphics.cc						\
+	src/grob.cc						\
+	src/hwfp.cc						\
+	src/integer.cc						\
+	src/integrate.cc					\
+	src/library.cc						\
+	src/list.cc						\
+	src/locals.cc						\
+	src/logical.cc						\
+	src/loops.cc						\
+	src/menu.cc						\
+	src/object.cc						\
+	src/plot.cc						\
+	src/polynomial.cc					\
+	src/program.cc						\
+	src/range.cc						\
+	src/renderer.cc						\
+	src/runtime.cc						\
+	src/settings.cc						\
+	src/solve.cc						\
+	src/stack.cc						\
+	src/stats.cc						\
+	src/symbol.cc						\
+	src/tag.cc						\
+	src/text.cc						\
+	src/unit.cc						\
+	src/user_interface.cc					\
+	src/util.cc						\
+	src/variables.cc					\
+	$(SOURCES_$(KIND))
+
+SOURCES_fw =							\
+	src/$(PLATFORM)/qspi_check.c				\
+	$(SDK)/$(PLATFORM)/sys/pgm_syscalls.c			\
+	$(SDK)/$(PLATFORM)/startup_pgm.s
+
+SOURCES_sim =							\
+	src/tests.cc						\
+	recorder/recorder.c					\
+	recorder/recorder_ring.c
+
+endif
+
+# ------------------------------------------------------------------------------
+# Includes and defines
+# ------------------------------------------------------------------------------
+
+INCLUDES ?= 	$(KIND)			\
+		src/$(MODEL)		\
+		src/$(PLATFORM) 	\
+		src 			\
+		$(SDK) 			\
+		$(SDK)/$(PLATFORM)	\
+		sim			\
+		.
+
+DEFINES =							\
+	$(DEFINES_$(MODEL))					\
+	$(DEFINES_$(TARGET))					\
+	$(DEFINES_$(KIND))					\
+	$(DEFINES_$(PLATFORM))
+
+DEFINES_debug = DEBUG
+DEFINES_release = NDEBUG OPTIMIZED
+DEFINES_opt = NDEBUG
+DEFINES_small = NDEBUG
+DEFINES_fast = NDEBUG
+DEFINES_faster = NDEBUG
+DEFINES_profile = NDEBUG
+
+DEFINES_dm42 =	DM42					\
+		MEMORY=100
+DEFINES_dm32 = 	DM32					\
+		LGAMMA_CRASHES				\
+		CONFIG_FIXED_BASED_OBJECTS		\
+		DEOPTIMIZE_CATALOG			\
+		MEMORY=500
+DEFINES_dm42n = DM42N					\
+		LGAMMA_CRASHES				\
+		CONFIG_FIXED_BASED_OBJECTS		\
+		DEOPTIMIZE_CATALOG			\
+		MEMORY=500
+DEFINES_sim =	SIMULATOR				\
+		USE_QT					\
+		__packed=""				\
+		HELPFILE_NAME=\"help/$(NAME).md\"	\
+		HELPINDEX_NAME=\"help/$(NAME).idx\"
+DEFINES_fw =	FIRMWARE				\
+		__weak="__attribute__((weak))" 		\
+		__packed="__attribute__((__packed__))"	\
+		HELPFILE_NAME=\"/help/$(NAME).md\"	\
+		HELPINDEX_NAME=\"/help/$(NAME).idx\"
+DEFINES_android=ANDROID					\
+		USE_QT					\
+		HELPFILE_NAME=\"help/$(NAME).md\"	\
+		HELPINDEX_NAME=\"help/$(NAME).idx\"
+
+
+# ------------------------------------------------------------------------------
+# Include make-it-quick (first include; defines default targets)
+# ------------------------------------------------------------------------------
+
+TOP ?= ./
+MIQ ?= $(TOP)recorder/make-it-quick/
+$(MIQ)rules.mk:
+	@git submodule update --init --recursive
+
+# A little gmake trick to avoid mixing output from multiple rules at -j
+GROUP_TARGETS ?= -Otarget
+MAKEFLAGS += $(GROUP_TARGET) --no-print-directory
+
+# We override installation
+override DO_INSTALL=
+override MIQ_TARBALL=
+
+include $(MIQ)rules.mk
+
+# We override installation
+override DO_INSTALL=
+override MIQ_TARBALL=
 
 
 #------------------------------------------------------------------------------
-# Target configuration
+#  make-it-quick settings overrides
 #------------------------------------------------------------------------------
 
-NAME = db48x
-PLATFORM = dmcp
-VARIANT = dm42
-SDK = dmcp/dmcp
-PGM = pgm
-PGM_NAME = $(NAME).$(PGM)
-BUILD_ID = $(shell tools/build_id)
+# Disable build time display
+TIME=
 
-# Optimization level
-OPT=release
-# Alternatives (on the command line)
-# OPT=debug	-g
-# OPT=small	-Os
-# OPT=fast	-O2
-# OPT=faster	-O3
-# OPT=fastest	-O4 -Ofast
-# Experimentally, O2 performs best on DM42
-# (see https://github.com/c3d/db48x/issues/66)
-
-# Product name and help file
-PRODUCT_NAME=$(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
-# For DM42n, use special case with lowercase 'n'
-PRODUCT_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42n,$(shell echo $(VARIANT) | tr "[:lower:]" "[:upper:]"))
-# For DM42n, select DM42 sections but brand as DM42n
-HELP_MACHINE=$(if $(filter dm42n,$(VARIANT)),DM42,$(PRODUCT_MACHINE))
-
-#------------------------------------------------------------------------------
-# Platform / OS-specific variables
-#------------------------------------------------------------------------------
-# macOSX installation helper
-MOUNTPOINT=/Volumes/$(VARIANT)/
-EJECT=sync; sync; sync; hdiutil eject $(MOUNTPOINT)
-
-# Android build
-ANDROID_SDK_ROOT?=/opt/homebrew/share/android-commandlinetools
-ANDROID_NDK_ROOT?=/opt/homebrew/share/android-commandlinetools/ndk/26.1.10909125
-ANDROID_QT_BASE?=/Volumes/Qt/6.8.1
-ANDROID_QT?=$(ANDROID_QT_BASE)/android_arm64_v8a
-ANDROID_QT_BIN?=$(ANDROID_QT)/bin
-ANDROID_DEPLOY_QT?=$(ANDROID_QT_BASE)/macos/bin/androiddeployqt
+# Suppress VLA warning for sim; must come after -Wall
+CXXFLAGS_TARGET_$(TARGET) += $(CXXFLAGS_$(KIND))
+CXXFLAGS_sim = -Wno-vla-cxx-extension
 
 
-#------------------------------------------------------------------------------
-# Paths and tool locations
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Default and variant targets
+# ------------------------------------------------------------------------------
 
-# Build path
-BUILD = build/$(VARIANT)/$(OPT)
+dm42:		dm42-fw-$(TARGET)
+dm32:		dm32-fw-$(TARGET)
+dm42n:		dm42n-fw-$(TARGET)
+sim:		sim-$(TARGET)
+android:	android-$(TARGET)
+
+fw-%:
+	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi
+ifneq ($(KIND),sim)
+sim-%:
+	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim BUILDENV=auto RECURSE=.config
+endif
+ifneq ($(KIND),android)
+android-%:
+	$(PRINT_COMMAND) $(MAKE) android-$* KIND=android RECURSE=.build
+endif
+
+color-%:
+	$(PRINT_COMMAND) $(MAKE) $* COLOR=color
+
+dm42-%:
+	$(PRINT_COMMAND) $(MAKE) $* MODEL=dm42 NAME=db48x SDK=dmcp
+dm32-%:
+	$(PRINT_COMMAND) $(MAKE) $* MODEL=dm32 NAME=db50x SDK=dmcp5
+dm42n-%:
+	$(PRINT_COMMAND) $(MAKE) $* MODEL=dm42n NAME=db50x SDK=dmcp5
+
+
+# ------------------------------------------------------------------------------
+#  Qt-hosted builds - Library built here, Qt-based app in sim/db48x.pro
+# ------------------------------------------------------------------------------
 
 QMAKE ?= $(shell which qmake6 2>/dev/null || which qmake)
+QMAKE_opt = release
+QMAKE_release = release
+QMAKE_debug = debug
+QMAKEFILE=sim/$(NAME)-$(KIND)-$(TARGET).mak
 
-# Path to aux build scripts
-TOOLS = tools
-
-# CRC adjustment for DMCP QSPI check
-CRCFIX = $(TOOLS)/forcecrc32/forcecrc32
-
-# CRC32 computation
-CRC32 = $(TOOLS)/crc32/crc32
-
-# Decimal mantissa encoding (to encode hard-coded values of pi and e)
-DECIMIZE = $(TOOLS)/decimize/decimize
-
-# Location of binary files
-FLASH=$(BUILD)/$(NAME)_flash.bin
-QSPI =$(BUILD)/$(NAME)_qspi.bin
-
-# Version embedded in the binary
-VERSION=$(shell git describe --dirty=Z --abbrev=4 | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
-VERSION_H=src/$(PLATFORM)/version.h
-
-
-#==============================================================================
-#
-#  Sources
-#
-#==============================================================================
-
-SOURCES=$(C_SOURCES) $(CXX_SOURCES)
-
-# Includes
-C_INCLUDES += -Isrc/$(VARIANT) -Isrc/$(PLATFORM) -Isrc
-
-# C sources
-C_SOURCES +=
-
-# C++ sources
-CXX_SOURCES +=				\
-	src/$(PLATFORM)/target.cc	\
-	src/$(PLATFORM)/sysmenu.cc	\
-	src/$(PLATFORM)/main.cc		\
-	fonts/EditorFont.cc		\
-	fonts/HelpFont.cc		\
-	fonts/ReducedFont.cc		\
-	fonts/StackFont.cc		\
-	src/algebraic.cc		\
-	src/arithmetic.cc		\
-	src/array.cc			\
-	src/bignum.cc			\
-	src/catalog.cc			\
-	src/characters.cc		\
-	src/command.cc			\
-	src/comment.cc		        \
-	src/compare.cc			\
-	src/complex.cc			\
-	src/conditionals.cc		\
-	src/constants.cc		\
-	src/continued-fraction.cc \
-	src/custom.cc		 	\
-	src/datetime.cc			\
-	src/decimal.cc			\
-	src/equations.cc		\
-	src/expression.cc		\
-	src/factor.cc			\
-	src/file.cc				\
-	src/files.cc			\
-	src/finance.cc			\
-	src/font.cc			\
-	src/fraction.cc			\
-	src/functions.cc		\
-	src/graphics.cc			\
-	src/grob.cc			\
-	src/hwfp.cc			\
-	src/integer.cc			\
-	src/integrate.cc		\
-	src/library.cc			\
-	src/list.cc			\
-	src/locals.cc			\
-	src/logical.cc			\
-	src/loops.cc			\
-	src/menu.cc			\
-	src/object.cc			\
-	src/plot.cc			\
-	src/polynomial.cc		\
-	src/program.cc			\
-	src/range.cc			\
-	src/renderer.cc			\
-	src/runtime.cc			\
-	src/settings.cc			\
-	src/solve.cc			\
-	src/stack.cc			\
-	src/stats.cc			\
-	src/symbol.cc			\
-	src/tag.cc			\
-	src/text.cc		        \
-	src/unit.cc			\
-	src/user_interface.cc		\
-	src/util.cc			\
-	src/variables.cc		\
-	$(PLATFORM_SOURCES)
-
-# Defined preprocessor symbols
-DEFINES +=					\
-	$(DEFINES_$(OPT))			\
-	$(DEFINES_$(VARIANT))			\
-	HELPFILE_NAME=\"/help/$(NAME).md\"	\
-	HELPINDEX_NAME=\"/help/$(NAME).idx\"
-DEFINES_debug=DEBUG
-DEFINES_release=NDEBUG
-DEFINES_small=NDEBUG
-DEFINES_fast=NDEBUG
-DEFINES_faster=NDEBUG
-DEFINES_fastes=NDEBUG
-DEFINES_dm32 = 	DM32 				\
-		LGAMMA_CRASHES			\
-		CONFIG_FIXED_BASED_OBJECTS	\
-		DEOPTIMIZE_CATALOG		\
-		MEMORY=500
-
-DEFINES_dm42n = DM42N 				\
-		LGAMMA_CRASHES			\
-		CONFIG_FIXED_BASED_OBJECTS	\
-		DEOPTIMIZE_CATALOG		\
-		MEMORY=500
-
-DEFINES_dm42 = DM42 MEMORY=100
-DEFINES_wasm = $(DEFINES_dm32) SIMULATOR WASM
-
-C_DEFS += $(DEFINES:%=-D%)
-
-
-#==============================================================================
-#
-#  Primary build rules
-#
-#==============================================================================
-
-# default action: build all
-all: $(PGM_NAME) help/$(NAME).md help/$(NAME).idx
-	@echo "# Built $(VERSION), build ID is now $(BUILD_ID)"
-
-dm32:	dm32-all
-dm32-%:
-	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm32 NAME=db50x $*
-dm42n:	dm42n-all
-dm42n-%:
-	$(MAKE) PLATFORM=dmcp SDK=dmcp5/dmcp PGM=pg5 VARIANT=dm42n NAME=db50x $*
-color-%:
-	$(MAKE) COLOR=color $*
-
-sim: sim/$(NAME).mak help/$(NAME).idx
-	cd sim; $(MAKE) -f $(<F) NAME=$(shell awk '/^NAME/ { print $$3; }' sim/$(NAME).mak)
-sim/$(NAME).mak:	sim/$(NAME).pro	\
-			sim/config.qrc		\
+# Qt resource files
+QRC_FILES=		sim/config.qrc		\
 			sim/state.qrc		\
 			sim/library.qrc		\
 			sim/help.qrc		\
-			sim/help/img.qrc	\
-						\
-			Makefile		\
-			$(VERSION_H)
-	cd sim; $(QMAKE) $(<F) -o $(@F) CONFIG+=$(QMAKE_$(OPT)) $(COLOR:%=CONFIG+=color)
+			sim/help/img.qrc
 
-# Android build target - builds App Bundle for Google Play
-android: android/$(NAME).aab help/$(NAME).idx
-	@echo "# Android App Bundle built: android/$(NAME).aab"
+# Build Qt simulator directly with qmake
+qt-$(TARGET): $(QMAKEFILE) $(VERSION_H) .config
+	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F)
+qt-%: $(QMAKEFILE) .config
+	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
 
-android/$(NAME).aab: sim/$(NAME).pro Makefile $(VERSION_H)	\
-				sim/config.qrc		\
-				sim/state.qrc		\
-				sim/library.qrc		\
-				sim/help.qrc		\
-				sim/help/img.qrc	\
-				sim/android/AndroidManifest.xml	\
-				sim/android/build.gradle	\
-				$(HOME)/.local/android_release.keystore
-	@echo "# Building Android App Bundle for $(NAME)"
-	@echo "# Using keystore: $(HOME)/.local/android_release.keystore"
-	cd sim && \
-		export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) && \
-		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) && \
-		export KEYSTORE_PATH=$(HOME)/.local/android_release.keystore && \
-		$(ANDROID_QT_BIN)/qmake -spec android-clang $(NAME).pro && \
-		$(MAKE) VARIANT=android && \
-		$(ANDROID_DEPLOY_QT) \
-			--input android-$(NAME)-deployment-settings.json \
-			--output ../android --gradle --aab \
-			--sign $(HOME)/.local/android_release.keystore db48x \
-			--storepass '$(ANDROID_KEYSTORE_PASS)'
+$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)
+	$(PRINT_COMMAND) 				\
+		DESTDIR="$(abspath $(or $(OUTPUT),.))";	\
+		cd sim &&				\
+		$(QMAKE_ENV)				\
+		$(QMAKE) $(<F) -o $(@F) 		\
+		$(QMAKE_SPECS:%=-spec %) 		\
+		CONFIG+=silent		 		\
+		CONFIG+=$(QMAKE_$(TARGET)) 		\
+		DESTDIR="$$DESTDIR"			\
+		OBJECTS_DIR=$(abspath $(MIQ_OBJDIR))	\
+		RCC_DIR=$(abspath $(MIQ_OBJDIR))	\
+		MOC_DIR=$(abspath $(MIQ_OBJDIR))	\
+		UI_DIR=$(abspath $(MIQ_OBJDIR))
 
-sim/%.qrc: Makefile
-	mkdir -p $(@D)
-	(echo '<RCC>';								\
-	 echo ' <qresource prefix="/'$*'">';					\
-	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do				\
-		J=$$(basename $$I);						\
+# Generation of Qt resource files
+sim/%.qrc: $(MIQ_MAKEDEPS)
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) (echo '<RCC>';			\
+	 echo ' <qresource prefix="/'$*'">';			\
+	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
+		J=$$(basename $$I);				\
 		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$*'/'$$J'</file>';	\
-	 done;									\
-	 echo ' </qresource>';							\
-	 echo '</RCC>')								\
+	 done;							\
+	 echo ' </qresource>';					\
+	 echo '</RCC>')						\
 	> $@
 
-sim/help.qrc:			\
-	help/$(NAME).md	\
-	help/$(NAME).idx
-
+sim/help.qrc: help/$(NAME).md help/$(NAME).idx
 
 QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx
@@ -307,47 +389,6 @@ QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
 QRC_EXT_library=*.48[sS]
 QRC_EXT_state=*.48[sS]
-
-sim:	recorder/config.h	\
-	fonts/EditorFont.cc	\
-	fonts/StackFont.cc	\
-	fonts/ReducedFont.cc	\
-	fonts/HelpFont.cc	\
-	keyboard		\
-	.ALWAYS
-
-WASM_NAME=wasm/$(NAME).js
-wasm: emsdk $(WASM_NAME) $(WASM_HTML)
-
-emsdk: emsdk/emsdk
-	emcc --version > /dev/null || \
-	(cd emsdk && ./emsdk install latest && ./emsdk activate latest)
-
-emsdk/emsdk:
-	git submodule update --init --recursive
-
-clangdb: sim/$(NAME).mak .ALWAYS
-	cd sim && rm -f *.o && compiledb make -f $(NAME).mak && mv compile_commands.json ..
-
-IMAGES=$(COLOR:%=color-)images
-cmp-% compare-%:
-	compare $(IMAGES)/$*.png $(IMAGES)/bad/$*.png -compose src $*.png || true
-	open $*.png $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
-	echo mv -f $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
-update-%:
-	mv $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
-	rm -f $*.png
-updates-%:
-	$(MAKE) update-$* color-update-$*
-cmps-% compares-%:
-	$(MAKE) compare-$* color-compare-$*
-
-BAD_IMAGES=$(wildcard $(IMAGES)/bad/*.png)
-compare: $(BAD_IMAGES:$(IMAGES)/bad/%.png=cmp-%)
-update: $(BAD_IMAGES:$(IMAGES)/bad/%.png=update-%)
-updates: update color-update
-compares: compare color-compare
-.PHONY: compare update
 
 keyboard:				\
 	Keyboard-Layout.png 		\
@@ -358,318 +399,226 @@ keyboard:				\
 	help/keyboard.png		\
 	doc/keyboard.png
 Keyboard-Layout.png: DB48X-Keys/DB48X-Keys.001.png
-	cp $< $@
+	$(PRINT_COPY) cp $< $@
 Keyboard-Cutout.png: DB48X-Keys/DB48X-Keys.002.png
-	cp $< $@
+	$(PRINT_COPY) cp $< $@
 sim/keyboard-db48x.png: DB48X-Keys/DB48X-Keys.001.png
-	magick $< -crop 698x878+151+138 $@
+	$(PRINT_GENERATE) magick $< -crop 698x878+151+138 $@
 sim/keyboard-db48x-42like.png: DB48X-Keys/DB48X-Keys.003.png
-	magick $< -crop 698x878+151+138 $@
+	$(PRINT_GENERATE) magick $< -crop 698x878+151+138 $@
 sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
-	magick $< -crop 698x878+151+138 $@
+	$(PRINT_GENERATE) magick $< -crop 698x878+151+138 $@
 %/keyboard.png: sim/keyboard-db48x.png
-	cp $< $@
+	$(PRINT_COPY) cp $< $@
 
-# Magick conversion of a BMP with dithering:
-# magick  $F -colors 2 +dither -type bilevel BMP3:${F/png/bmp}
+#------------------------------------------------------------------------------
+# Android App Bundle for Google Play (requires ANDROID_KEYSTORE_PASS env)
+#------------------------------------------------------------------------------
 
-QMAKE_debug=debug
-QMAKE_release=release
-QMAKE_small=release
-QMAKE_fast=release
-QMAKE_faster=release
-QMAKE_fastest=release
+ifeq ($(KIND),android)
+ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
+ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
+ANDROID_QT_BASE ?= /Volumes/Qt/6.8.1
+ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
+ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
+ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/macos/bin/androiddeployqt
+ANDROID_KEYSTORE ?= $(HOME)/.local/android_release.keystore
+ANDROID_JAVA_HOME ?= $(shell /usr/libexec/java_home -v 17 2>/dev/null || \
+                             /usr/libexec/java_home -v 21 2>/dev/null || \
+                             true)
+QMAKE = $(ANDROID_QT_BIN)/qmake
+QMAKE_SPECS = android-clang
+QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
+		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
+		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
+		export JAVA_HOME=$(ANDROID_JAVA_HOME) ;
+AAB_FILE=$(OUTPUT:%=%/)$(NAME).aab
 
-TTF2FONT=$(TOOLS)/ttf2font/ttf2font
-$(TTF2FONT): $(TTF2FONT).cpp $(TOOLS)/ttf2font/Makefile src/ids.tbl
-	cd $(TOOLS)/ttf2font; $(MAKE) NAME=opt
+android-$(TARGET): $(AAB_FILE)
+android-%: qt-%
 
-TAR_OPTS=$(TAR_OPTS_$(shell uname))
-TAR_OPTS_Darwin=--no-mac-metadata --no-fflags --no-xattrs --no-acls
-TAR_FILES=	$(NAME).$(PGM)		\
-		$(NAME)_qspi.bin		\
-		$(TAR_FILES_$(INSTALL_PGM_ONLY))
-TAR_FILES_=	keymap.bin			\
-		help/$(NAME).md		\
-		help/$(NAME).idx		\
-		help/*.bmp help/*/*.bmp		\
-		state/*.48[sSbB]		\
-		config/*.csv			\
-		config/*.48k			\
-		config/*.cfg			\
-		library/*.48[sSbB]
+# Additional dependencies for Android build
+$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
 
-# installation steps
-COPY=cp
-install: all
-	cp $(BUILD)/$(NAME)_qspi.bin  .
-	tar cf - $(TAR_OPTS) $(TAR_FILES) | tar xvf - -C $(MOUNTPOINT)
-	$(EJECT)
-	@echo "# Installed $(VERSION)"
+# Deploy and sign the AAB via androiddeployqt. androiddeployqt expects the .so
+# at <output>/libs/arm64-v8a/; the qmake build puts it in DESTDIR, so we must
+# run make install INSTALL_ROOT=<output> first.
+$(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
+	$(PRINT_COMMAND) 						\
+		AAB="$(abspath $@)";					\
+		cd sim && 						\
+		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$AAB" &&	\
+		$(QMAKE_ENV)						\
+		$(ANDROID_DEPLOY_QT)					\
+		  --input android-$(NAME)-deployment-settings.json	\
+		  --output "$$AAB" --gradle --aab			\
+		  --sign $(ANDROID_KEYSTORE) $(NAME)			\
+		  --storepass '$(ANDROID_KEYSTORE_PASS)'
 
-dist: all
-	cp $(BUILD)/$(NAME)_qspi.bin  .
-	tar cvfz $(NAME)-v$(VERSION).tgz $(TAR_OPTS) $(TAR_FILES)
-	@echo "# Distributing $(VERSION)"
-
-$(VERSION_H): $(BUILD)/version-$(VERSION).h
-	cp $< $@
-$(BUILD)/version-$(VERSION).h: $(BUILD)/.exists Makefile
-	echo "#define DB48X_VERSION \"$(VERSION)\"" > $@
+endif
 
 
-#BASE_FONT=fonts/C43StandardFont.ttf
-BASE_FONT=fonts/FogSans-ddd.ttf
-fonts/EditorFont.cc: $(TTF2FONT) $(BASE_FONT)
-	$(TTF2FONT) -s 48 -S 80 -y -10 EditorFont $(BASE_FONT) $@
-fonts/StackFont.cc: $(TTF2FONT) $(BASE_FONT)
-	$(TTF2FONT) -s 32 -S 80 -y -8 StackFont $(BASE_FONT) $@
-fonts/ReducedFont.cc: $(TTF2FONT) $(BASE_FONT)
-	$(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
-fonts/HelpFont.cc: $(TTF2FONT) $(BASE_FONT)
-	$(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
-help/$(NAME).md: $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
-	mkdir -p help && \
-	cat $^ | \
-	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
+# ------------------------------------------------------------------------------
+# Building the tools
+# ------------------------------------------------------------------------------
+
+TOOLS_BUILDS=$(dir $(wildcard tools/*/Makefile))
+TOOLS=$(foreach t,$(TOOLS_BUILDS),$t$(notdir $(t:%/=%)))
+tools: $(TOOLS)
+tools/%:
+	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D)
+
+# ------------------------------------------------------------------------------
+# Generated sources: fonts, decimals, version (after .recurse so tools exist)
+# ------------------------------------------------------------------------------
+
+HELP_SOURCES = $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
+PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
+PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
+HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
+VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
+VERSION_H = src/$(PLATFORM)/version.h
+
+FONTS=Editor Help Reduced Stack
+
+.prebuild:	$(FONTS:%=fonts/%Font.cc)			\
+		src/decimal-pi.h src/decimal-e.h		\
+		$(VERSION_H)
+
+fonts/EditorFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 48 -S 80 -y -10 EditorFont $(BASE_FONT) $@
+fonts/StackFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 32 -S 80 -y -8 StackFont $(BASE_FONT) $@
+fonts/ReducedFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
+fonts/HelpFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
+
+src/decimal-pi.h: src/decimal-pi.txt | $(DECIMIZE)
+	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_pi
+src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
+	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
+
+VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
+$(VERSION_H): $(VERSION_GIT_H)
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) cp $< $@
+$(VERSION_GIT_H):
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) echo '#define DB48X_VERSION "$(VERSION)"' > $@
+
+# ------------------------------------------------------------------------------
+# Help generation (lifted from Makefile)
+# ------------------------------------------------------------------------------
+
+.prebuild: help/$(NAME).md help/$(NAME).idx
+help/$(NAME).md: $(HELP_SOURCES)
+	@mkdir -p help
+	@cat $^ | sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
 	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
 	    -e '/<!--- KEEP_IT --->/d' \
 	    -e '/<!--- !KEEP_IT --->/d' \
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
 	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
 	    -e 's/db48x.md/$(NAME).md/g' \
-            -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
-	cp doc/*.png help/
-	mkdir -p help/img
-	rsync -av --delete doc/img/*.bmp help/img/
+	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
+	@cp doc/*.png help/ 2>/dev/null || true
+	@mkdir -p help/img
+	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
 
 help/$(NAME).idx: help/$(NAME).md
-	grep -b '^#\|^\* `[^`]*`' $< 		|	\
-	sed -e 's/:\(\* `[^`]*`\).*/:\1/g'   	|	\
-	sort -k2 -t: > $@
-	[ "$$(cat $@ | wc -L)" -lt 80 ]
+	@grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
+	@[ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
 
-check-ids: help/$(NAME).md
-	@for I in $$(cpp -xc++ -D'ID(n)=n' src/ids.tbl | 		\
-		   sed -e 's/##//g' | sed -e 's/^#.*//g');		\
-	do								\
-	  if  ! grep -q $$I src/ignored_menus.csv ; then		\
-	    grep -q "ID_$$I" src/menu.cc || 				\
-	      echo "$$I not in menus";					\
-	  fi;								\
-	  if  ! grep -q $$I src/ignored_help.csv ; then			\
-	    grep -q "^#.*[[:<:]]$$I[[:>:]]" help/$(NAME).md ||	\
-	      echo "$$I not in help";					\
-	  fi;								\
-	done
 
-debug-%:
-	$(MAKE) $* OPT=debug
-release-%:
-	$(MAKE) $* OPT=release
-small-%:
-	$(MAKE) $* OPT=small
-fast-%:
-	$(MAKE) $* OPT=fast
-faster-%:
-	$(MAKE) $* OPT=faster
-fastest-%:
-	$(MAKE) $* OPT=fastest
+# ------------------------------------------------------------------------------
+#   DMCP Custom link and post-build (override MIQ product rule)
+# ------------------------------------------------------------------------------
+
+ifeq ($(KIND),fw)
+ELF_FILE = $(MIQ_OUTEXE)
+BUILD_ID = $(shell $(TOP)tools/build_id 2>/dev/null || echo 0)
+LDSCRIPT = src/$(MODEL)/stm32_program.ld
+LDFLAGS += -T$(LDSCRIPT) -Wl,-Map=$(MIQ_OBJDIR)$(NAME).map,--cref
+
+src/dmcp/qspi_check.c: .buildid
+DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
+.goodbye: .show-buildid
+.buildid:
+	@$(TOP)tools/build_id -u >/dev/null 2>&1 || true
+.show-buildid: .product
+	$(PRINT_COMMAND) $(INFO) "[BUILD ID]" "$(shell $(TOP)tools/build_id)"
+
+FLASH_BIN = $(MIQ_OBJDIR)$(NAME)_flash.bin
+FLASH_HEX = $(FLASH_BIN:.bin=.hex)
+QSPI_BIN  = $(OUTPUT:%=%/)$(NAME)_qspi.bin
+QSPI_HEX  = $(MIQ_OBJDIR)$(NAME)_qspi.hex
+PGM_FILE  = $(OUTPUT:%=%/)$(NAME).$(PGM)
+QSPI_CRC  = src/$(MODEL)/qspi_crc.h
+
+.postbuild: $(PGM_FILE) $(QSPI_BIN) $(QSPI_HEX) $(FLASH_BIN) $(FLASH_HEX)
+
+$(PGM_FILE): $(FLASH_BIN)
+	$(PRINT_GENERATE)$(INFO_NONL_CMD) "[SHA]" ; $(TOP)tools/add_pgm_chsum $< $@ | tee $(MIQ_BUILDLOG).sha1
+	$(PRINT_COMMAND) $(INFO_NONL_CMD) "[BYTES]"; echo $$(cat $@ | wc -c)
+	$(PRINT_COMMAND) $(INFO) "[SIZE]" "$(shell $(SIZE) $(ELF_FILE) | tail -1 | sed -e 's/^ //g')"
+
+$(FLASH_BIN): $(ELF_FILE)
+	$(PRINT_GENERATE) $(OBJCOPY) --remove-section .qspi -O binary $< $@
+
+$(QSPI_BIN): $(ELF_FILE) | $(CRCFIX) $(CRC32)
+	$(PRINT_GENERATE) $(OBJCOPY) --only-section .qspi -O binary   $< $@
+	$(PRINT_COMMAND) $(INFO) "[PATCH CRC]" "$(QSPI_BIN)"; $(TOP)tools/adjust_crc $(CRCFIX) $(QSPI_BIN) > $(MIQ_BUILDLOG).crc
+	$(PRINT_COMMAND) $(INFO) "[CHECK CRC]" "$(QSPI_CRC)"; $(TOP)tools/check_qspi_crc "$(NAME)" "$@" "$(QSPI_CRC)" || ( echo "QSPI CRC changed, rebuilding" && $(MAKE) )
+
+$(FLASH_HEX): $(ELF_FILE)
+	$(PRINT_GENERATE) $(OBJCOPY) --remove-section .qspi -O ihex   $< $@
+
+$(QSPI_HEX): $(ELF_FILE)
+	$(PRINT_GENERATE) $(OBJCOPY) --only-section .qspi -O ihex     $< $@
 
 
 #------------------------------------------------------------------------------
-# Dependency-related rules
+#  Firmware install on physical calculators
 #------------------------------------------------------------------------------
 
-# Recorder
-recorder/config.h: recorder/recorder.h recorder/Makefile
-	cd recorder && $(MAKE) TARGET=opt
-$(BUILD)/recorder.o $(BUILD)/recorder_ring.o: recorder/config.h
+MOUNTPOINT=$(MOUNTBASE)/$(MODEL)
 
+SYNC=sync; sync; sync
+EJECT = $(EJECT_$(HOST_OS_NAME))
+EJECT_Darwin = hdiutil eject $(MOUNTPOINT)
+EJECT_Linux = umount $(MOUNTPOINT)
 
-#------------------------------------------------------------------------------
-#  Compiler flags
-#------------------------------------------------------------------------------
+TAR_OPTS = $(TAR_OPTS_$(HOST_OS_NAME))
+TAR_OPTS_Darwin = --no-mac-metadata --no-fflags --no-xattrs --no-acls
+TAR_FILES = $(PGM_FILE)					\
+	    $(QSPI_BIN)					\
+	    keymap.bin					\
+	    help/$(NAME).md help/$(NAME).idx		\
+	    help/*.bmp help/*/*.bmp			\
+	    state/*.48[sSbB]				\
+	    config/*.csv config/*.48k config/*.cfg	\
+	    library/*.48[sSbB]
 
-#------------------------------------------------------------------------------
-ifeq ($(VARIANT),wasm)
-#------------------------------------------------------------------------------
-CC = emcc
-CXX = emcc -x c++ -std=gnu++17
-PLATFORM_SOURCES=src/wasp/dmcp.cc src/wasm/sim-screen.cc src/wasm/sim-window.cc
-C_SOURCES += recorder/recorder.c recorder/recorder_ring.c
-CFLAGS += 	-O3 -pthread
-LDFLAGS +=	-s MODULARIZE=0				\
-		-s RESERVED_FUNCTION_POINTERS=20	\
-		-s PTHREAD_POOL_SIZE=4			\
-		--bind -pthread \
-		--embed-file config \
-		--embed-file help \
-		-sASYNCIFY # Used to be able to sleep within a webassembly conte
-#------------------------------------------------------------------------------
-else
-#------------------------------------------------------------------------------
-CC = arm-none-eabi-gcc
-CXX = arm-none-eabi-g++
-AS = arm-none-eabi-gcc -x assembler-with-cpp
-OBJCOPY = arm-none-eabi-objcopy
-AR = arm-none-eabi-ar
-SIZE = arm-none-eabi-size
-HEX = $(OBJCOPY) -O ihex
-BIN = $(OBJCOPY) -O binary -S
-CPUFLAGS += -mthumb -march=armv7e-m -mfloat-abi=hard -mfpu=fpv4-sp-d16
-PLATFORM_FLAGS = -Wno-packed-bitfield-compat -Wall -fdata-sections -ffunction-sections -specs=nano.specs  -u _printf_float -specs=nosys.specs
-CXX_PLATFORM_FLAGS = -fno-rtti
-C_LIST_FLAGS = -Wa,-a,-ad,-alms=$(BUILD)/$(notdir $(<:.c=.lst))
-CXX_LIST_FLAGS = -Wa,-a,-ad,-alms=$(BUILD)/$(notdir $(<:.cc=.lst))
-ASM_SOURCES = $(SDK)/startup_pgm.s
-LINK_OPTS=					\
-    -specs=nano.specs -u _printf_float -specs=nosys.specs	\
-	-Wl,-Map=$(BUILD)/$(NAME).map,--cref	\
-	-Wl,--gc-sections			\
-	-Wl,--wrap=_malloc_r
+PRINT_INSTALL=$(PRINT_COMMAND) $(INFO) "[INSTALL]" "$(NAME) => $(MOUNTPOINT)/" $(COLOR_FILTER);
+PRINT_PACKAGE=$(PRINT_COMMAND) $(INFO) "[PACKAGE]" "$(NAME)-$(VERSION)" $(COLOR_FILTER);
 
-# System sources
-C_INCLUDES += -I$(SDK)
-C_SOURCES += $(SDK)/sys/pgm_syscalls.c
+fwinstall:
+	$(PRINT_COMMAND) $(MAKE) MAKEFLAGS=-Onone RECURSE=.build do-fwinstall $(COLOR_FILTER)
+do-fwinstall: $(TAR_FILES)
+	$(PRINT_INSTALL) $(TAR) cf - $(TAR_OPTS) $(TAR_FILES) | $(TAR) xvf - -C $(MOUNTPOINT)
+	$(PRINT_COMMAND) $(INFO) "[SYNC]" "$(MOUNTPOINT)" ; $(SYNC)  $(COLOR_FILTER)
+	$(PRINT_COMMAND) $(INFO) "[EJECT]" "$(MOUNTPOINT)"; $(EJECT) $(COLOR_FILTER)
+	$(PRINT_COMMAND) $(INFO) "[INSTALLED]" "$(VERSION)"          $(COLOR_FILTER)
 
-#------------------------------------------------------------------------------
-endif
-#------------------------------------------------------------------------------
-
-
-# CFLAGS
-# macros for gcc
-AS_DEFS =
-C_DEFS += -D__weak="__attribute__((weak))" -D__packed="__attribute__((__packed__))"
-AS_INCLUDES =
-
-# compile gcc flags
-ASFLAGS = $(CPUFLAGS) $(PLATFORM_FLAGS) $(AS_DEFS) $(AS_INCLUDES) $(ASFLAGS_$(OPT))
-CFLAGS += $(CPUFLAGS) $(PLATFORM_FLAGS)  $(C_DEFS) $(C_INCLUDES) $(CFLAGS_$(OPT))
-CFLAGS += -Wno-misleading-indentation
-DBGFLAGS = $(DBGFLAGS_$(OPT))
-DBGFLAGS_debug = -g
-
-CFLAGS_debug += -Os -DDEBUG
-CFLAGS_release += $(CFLAGS_release_$(VARIANT))
-CFLAGS_release_dm42 = -Os
-CFLAGS_release_dm32 = -O2
-CFLAGS_release_dm42n = -O2
-CFLAGS_small += -Os
-CFLAGS_fast += -O2
-CFLAGS_faster += -O3
-CFLAGS_fastest += -O4
-
-CFLAGS  += $(DBGFLAGS)
-LDFLAGS += $(DBGFLAGS)
-
-# Generate dependency information
-CFLAGS += -MD -MP -MF .dep/$(@F).d
-
-# LDFLAGS
-# link script
-LDSCRIPT = src/$(VARIANT)/stm32_program.ld
-LIBDIR =
-LDFLAGS += $(CPUFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) $(LINK_OPTS)
-
-
-# build the application
-# list of objects
-OBJECTS = $(addprefix $(BUILD)/,$(notdir $(C_SOURCES:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES)))
-# C++ sources
-OBJECTS += $(addprefix $(BUILD)/,$(notdir $(CXX_SOURCES:.cc=.o)))
-vpath %.cc $(sort $(dir $(CXX_SOURCES)))
-# list of ASM program objects
-OBJECTS += $(addprefix $(BUILD)/,$(notdir $(ASM_SOURCES:.s=.o)))
-vpath %.s $(sort $(dir $(ASM_SOURCES)))
-
-CXXFLAGS = $(CFLAGS) -fno-exceptions $(CXX_PLATFORM_FLAGS)
-
-$(BUILD)/%.o: %.c Makefile | $(BUILD)/.exists
-	$(CC) -c $(CFLAGS) $(C_LIST_FLAGS) $< -o $@
-
-$(BUILD)/%.o: %.cc Makefile | $(BUILD)/.exists
-	$(CXX) -c $(CXXFLAGS) $(CXX_LIST_FLAGS) $< -o $@
-
-$(BUILD)/%.o: %.cpp Makefile | $(BUILD)/.exists
-	$(CXX) -c $(CXXFLAGS) $(CXX_LIST_FLAGS) $< -o $@
-
-$(BUILD)/%.o: %.s Makefile | $(BUILD)/.exists
-	$(AS) -c $(CFLAGS) $< -o $@
-
-ifeq ($(VARIANT),wasm)
-
-$(WASM_NAME): $(OBJECTS) Makefile
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+fwdist:
+	$(PRINT_COMMAND) $(MAKE) MAKEFLAGS=-Onone RECURSE=.build do-fwdist $(COLOR_FILTER)
+do-fwdist: $(TAR_FILES)
+	$(PRINT_PACKAGE) tar cvfz $(NAME)-v$(VERSION).tgz $(TAR_OPTS) $(TAR_FILES)
+	$(PRINT_COMMAND) $(INFO) "[PACKAGED]" "$(NAME)-$(VERSION)" $(COLOR_FILTER)
 
 else
-
-$(WASM_NAME): $(SOURCES) Makefile
-	(. emsdk/emsdk_env.sh && \
-	 make VARIANT=wasm PGM=js PGM_NAME=wasm/$(NAME).js SDK=sim )
-
-$(BUILD)/$(NAME).elf: $(OBJECTS) Makefile
-	@tools/build_id -u
-	@echo Build ID $(BUILD_ID)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ \
-		-DBUILD_ID=$(BUILD_ID) src/dmcp/qspi_check.c
-$(NAME).$(PGM): $(BUILD)/$(NAME).elf Makefile $(CRCFIX) $(CRC32)
-	$(OBJCOPY) --remove-section .qspi -O binary  $<  $(FLASH)
-	$(OBJCOPY) --remove-section .qspi -O ihex    $<  $(FLASH:.bin=.hex)
-	$(OBJCOPY) --only-section   .qspi -O binary  $<  $(QSPI)
-	$(OBJCOPY) --only-section   .qspi -O ihex    $<  $(QSPI:.bin=.hex)
-	$(TOOLS)/adjust_crc $(CRCFIX) $(QSPI)
-	$(TOOLS)/check_qspi_crc $(NAME) $(BUILD)/$(NAME)_qspi.bin src/$(VARIANT)/qspi_crc.h || ( rm -rf build/$(VARIANT) && exit 1)
-	$(TOOLS)/add_pgm_chsum $(BUILD)/$(NAME)_flash.bin $@
-	$(SIZE) $<
-	wc -c $@
-
+install: dm32-fw-fwinstall dm42-fw-fwinstall
+dist: dm32-fw-fwdist dm42-fw-fwdist
+clean: sim-clean
 endif
-
-DECIMAL_CONSTANTS=pi e
-DECIMAL_SOURCES=$(DECIMAL_CONSTANTS:%=src/decimal-%.h)
-src/decimal-%.h: src/decimal-%.txt $(DECIMIZE)
-	$(DECIMIZE) < $< > $@ decimal_$*
-
-$(OBJECTS): $(DECIMAL_SOURCES) $(VERSION_H)
-
-all sim: $(DECIMAL_SOURCES)
-
-$(BUILD)/%.hex: $(BUILD)/%.elf | $(BUILD)
-	$(HEX) $< $@
-
-$(BUILD)/%.bin: $(BUILD)/%.elf | $(BUILD)
-	$(BIN) $< $@
-
-$(BUILD)/.exists:
-	mkdir -p $(@D)
-	touch $@
-
-
-$(CRCFIX): $(CRCFIX).c $(dir $(CRCFIX))/Makefile
-	cd $(dir $(CRCFIX)) && unset NAME && $(MAKE) NAME=opt
-$(CRC32): $(CRC32).c $(dir $(CRC32))/Makefile
-	cd $(dir $(CRC32)) && unset NAME && $(MAKE) NAME=opt
-$(DECIMIZE): $(DECIMIZE).cpp $(dir $(DECIMIZE))/Makefile
-	cd $(dir $(DECIMIZE)) && unset NAME && $(MAKE) NAME=opt
-
-
-#------------------------------------------------------------------------------
-# Clean up
-#------------------------------------------------------------------------------
-clean:
-	-rm -fR .dep build sim/*.o sim/*/*.o
-
-
-#------------------------------------------------------------------------------
-# Dependencies
-#------------------------------------------------------------------------------
-
--include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
-
-.PHONY: clean all
-.ALWAYS:
-
-# *** EOF ***

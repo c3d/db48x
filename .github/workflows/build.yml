@@ -3,11 +3,16 @@ name: Build DB48X
 on:
   push:
     branches: [ stable, dev ]
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]'
   pull_request:
     branches: [ stable, dev ]
   workflow_dispatch:
   release:
     types: [ published ]
+
+permissions:
+  contents: write
 
 jobs:
   build-simulator-macos:
@@ -715,3 +720,88 @@ jobs:
           db48x-wasm-*.tar.gz
           db48x-simulator-macos-*.zip
           db50x-color-simulator-macos-*.zip
+
+  create-release:
+    name: Create Release and Upload Assets
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [
+      build-simulator-macos,
+      build-simulator-linux,
+      build-simulator-windows,
+      build-color-simulator-macos,
+      build-color-simulator-linux,
+      build-color-simulator-windows,
+      build-android,
+      build-color-android,
+      build-wasm,
+      build-dm42-firmware,
+      build-dm32-firmware,
+      build-dm42n-firmware
+    ]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for tag access
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
+
+    - name: Zip Linux artifacts  # Zip for consistency (macOS is already zipped)
+      run: |
+        mkdir -p releases
+        cd artifacts/db48x-simulator-linux
+        zip -r ../../releases/db48x-linux.zip *
+        cd ../db50x-color-simulator-linux
+        zip -r ../../releases/db50x-linux.zip *
+
+    - name: Zip Windows artifacts
+      run: |
+        cd artifacts/db48x-simulator-windows
+        zip -r ../../releases/db48x-windows.zip *
+        cd ../db50x-color-simulator-windows
+        zip -r ../../releases/db50x-windows.zip *
+
+    - name: Move macOS artifacts (already zipped)
+      run: |
+        mv artifacts/db48x-simulator-macos/db48x-macos.zip releases/
+        mv artifacts/db50x-color-simulator-macos/db50x-macos.zip releases/
+
+    - name: Move DM32, DM42 and DM42n firmware artifacts
+      run: |
+        mv artifacts/db48x-dm42-*.tar.gz releases/db48x-dm42.tar.gz
+        mv artifacts/db50x-dm32-*.tar.gz releases/db50x-dm32.tar.gz
+        mv artifacts/db50x-dm42n-*.tar.gz releases/db50x-dm42n.tar.gz
+
+    - name: Move Android artifacts
+      run: |
+        mv artifacts/db48x-android-*.tar.gz releases/db48x-android.tar.gz
+        mv artifacts/db50x-android-*.tar.gz releases/db50x-android.tar.gz
+
+    - name: Extract tag message for release body
+      run: |
+        git fetch --tags
+        git tag -l --format='%(contents)' "${{ github.ref_name }}" > release_notes.md
+
+    - name: Create Release and Upload Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ${{ github.ref_name }}
+        body_path: release_notes.md
+        files: |
+          releases/db48x-macos.zip
+          releases/db48x-linux.zip
+          releases/db48x-windows.zip
+          releases/db50x-macos.zip
+          releases/db50x-linux.zip
+          releases/db50x-windows.zip
+          releases/db48x-dm32.tar.gz
+          releases/db48x-dm42.tar.gz
+          releases/db48x-dm42n.tar.gz
+          releases/db48x-android.tar.gz
+          releases/db50x-android.tar.gz

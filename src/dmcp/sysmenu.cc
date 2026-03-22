@@ -48,6 +48,10 @@
 #include <cstring>
 #include <errno.h>
 
+// --- I/O Operation Modes ---
+#define STATE_IO_INTERACTIVE ((void *) 1)
+#define STATE_IO_SILENT      ((void *) 2)
+
 
 
 // ============================================================================
@@ -234,13 +238,16 @@ static bool state_save_variable(object_p name, object_p obj, void *renderer_ptr)
 }
 
 
-static int state_save_callback(cstring fpath, cstring fname, void *)
+static int state_save_callback(cstring fpath, cstring fname, void *data)
 // ----------------------------------------------------------------------------
 //   Callback when a file is selected
 // ----------------------------------------------------------------------------
 {
     // Display the name of the file being saved
-    ui.draw_message("Saving state...", fname);
+    if (data != STATE_IO_SILENT)
+    {
+      ui.draw_message("Saving state...", fname);
+    }
 
     // Open save file name
     file prog(fpath, file::WRITING);
@@ -309,7 +316,7 @@ static int state_save()
 
     bool display_new = true;
     bool overwrite_check = true;
-    void *user_data = NULL;
+    void *user_data = STATE_IO_INTERACTIVE;
     int ret = file_selection_screen("Save state",
                                     "/state", ".48S",
                                     state_save_callback,
@@ -350,12 +357,15 @@ static bool danger_will_robinson(cstring header,
 }
 
 
-static int state_load_callback(cstring path, cstring name, void *merge)
+static int state_load_callback(cstring path, cstring name, void *data)
 // ----------------------------------------------------------------------------
 //   Callback when a file is selected for loading
 // ----------------------------------------------------------------------------
 {
-    if (!merge)
+    bool is_silent = (data == STATE_IO_SILENT);
+    bool is_merge = (data != NULL);
+
+    if (!is_merge)
     {
         // Check before erasing state
         if (!danger_will_robinson("Loading DB48X state",
@@ -374,8 +384,11 @@ static int state_load_callback(cstring path, cstring name, void *merge)
     }
 
     // Display the name of the file being saved
-    ui.draw_message(merge ? "Merge state" : "Load state",
-                    "Loading state...", name);
+    if (!is_silent)
+    {
+        ui.draw_message(is_merge ? "Merge state" : "Load state",
+			"Loading state...", name);
+    }
 
     // Store the state file name
     {
@@ -455,7 +468,7 @@ static int state_load_callback(cstring path, cstring name, void *merge)
         }
     }
 
-    if (!merge)
+    if (!is_merge)
         set_reset_state_file(path);
 
     // Exit with success
@@ -614,7 +627,16 @@ bool load_state_file(cstring path)
 //   Load the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_load_callback, path, (void *) 1, false) == 0;
+    return ui_wrap_io(state_load_callback, path, STATE_IO_INTERACTIVE, false) == 0;
+}
+
+
+bool load_state_file_silent(cstring path)
+// ----------------------------------------------------------------------------
+//   Load the state file directly
+// ----------------------------------------------------------------------------
+{
+    return ui_wrap_io(state_load_callback, path, STATE_IO_SILENT, false) == 0;
 }
 
 
@@ -623,7 +645,16 @@ bool save_state_file(cstring path)
 //   Save the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_save_callback, path, (void *) 1, true) == 0;
+    return ui_wrap_io(state_save_callback, path, STATE_IO_INTERACTIVE, true) == 0;
+}
+
+
+bool save_state_file_silent(cstring path)
+// ----------------------------------------------------------------------------
+//   Save the state file directly
+// ----------------------------------------------------------------------------
+{
+    return ui_wrap_io(state_save_callback, path, STATE_IO_SILENT, true) == 0;
 }
 
 
@@ -639,13 +670,13 @@ bool load_system_state()
         // legitimately return a .f42 file if we just switched from DM42.
         char *state = get_reset_state_file();
         if (is_valid_state_file(state))
-            return load_state_file(state);
+            return load_state_file_silent(state);
     }
     return false;
 }
 
 
-bool save_system_state()
+bool save_system_state(void *mode)
 // ----------------------------------------------------------------------------
 //   Save the default system state file
 // ----------------------------------------------------------------------------
@@ -657,11 +688,31 @@ bool save_system_state()
         // legitimately return a .f42 file if we just switched from DM42.
         char *state = get_reset_state_file();
         if (is_valid_state_file(state))
-            return save_state_file(state);
+  	    return (mode == STATE_IO_INTERACTIVE
+		    ? save_state_file(state)
+		    : save_state_file_silent(state));
         else
             return state_save() == 0;
     }
     return false;
+}
+
+
+bool save_system_state()
+// ----------------------------------------------------------------------------
+//   Save the default system state file
+// ----------------------------------------------------------------------------
+{
+    return save_system_state(STATE_IO_INTERACTIVE);
+}
+
+
+bool save_system_state_silent()
+// ----------------------------------------------------------------------------
+//   Save the default system state file without display a window
+// ----------------------------------------------------------------------------
+{
+    return save_system_state(STATE_IO_SILENT);
 }
 
 

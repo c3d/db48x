@@ -406,7 +406,7 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
 }
 
 
-object::result function::evaluate(algebraic_fn op, bool mat)
+object::result function::evaluate(algebraic_fn op, uint seqtypes)
 // ----------------------------------------------------------------------------
 //   Perform the operation from the stack, using a C++ operation
 // ----------------------------------------------------------------------------
@@ -436,13 +436,12 @@ object::result function::evaluate(algebraic_fn op, bool mat)
             }
             topty = top ? top->type() : ID_expression;
         }
-        if (topty == ID_list || (topty == ID_array && !mat))
+        if (topty == ID_list ||
+            (topty == ID_array && (seqtypes & (1UL << topty)) == 0))
         {
             top = list_p(top)->map(op);
         }
-        else if (is_algebraic(topty)            ||
-                 (topty == ID_array && mat)     ||
-                 (is_integer(topty) && op == algebraic_fn(neg::evaluate)))
+        else if (is_algebraic(topty) || (seqtypes & (1UL << topty)))
         {
             algebraic_g x = algebraic_p(top);
             x = op(x);
@@ -1476,9 +1475,9 @@ NFUNCTION_BODY(comb)
             ularge mi = mval->value<ularge>();
             n = integer::make(ni < mi ? 0 : 1);
             for (ularge i = ni - mi + 1; i <= ni && n; i++)
-                n = n * algebraic_g(integer::make(i));
+                n = n * integer::make(i);
             for (ularge i = 2; i <= mi && n; i++)
-                n = n / algebraic_g(integer::make(i));
+                n = n / integer::make(i);
             return n;
         }
     }
@@ -1502,7 +1501,7 @@ NFUNCTION_BODY(perm)
             ularge mi = mval->value<ularge>();
             n = integer::make(ni < mi ? 0 : 1);
             for (ularge i = ni - mi + 1; i <= ni && n; i++)
-                n = n * algebraic_g(integer::make(i));
+                n = n * integer::make(i);
             return n;
         }
     }
@@ -1642,6 +1641,22 @@ FUNCTION_BODY(ToFraction)
         return nullptr;
     algebraic_g xg = x;
     if (arithmetic::to_fraction(xg))
+        return xg;
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
+}
+
+
+FUNCTION_BODY(ToQuotient)
+// ----------------------------------------------------------------------------
+//   Convert numbers to fractions with π, √n, ln(n) or e factored out
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    algebraic_g xg = x;
+    if (arithmetic::to_quotient(xg))
         return xg;
     if (!rt.error())
         rt.type_error();

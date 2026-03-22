@@ -95,11 +95,9 @@ inline uint utf8_next(utf8 text, uint position, size_t len)
 // ----------------------------------------------------------------------------
 {
     if (position < len)
-    {
-        position++;
-        while (position < len && is_utf8_next(text[position]))
-            position++;
-    }
+        if (is_utf8_first(text[position++]))
+            while (position < len && is_utf8_next(text[position]))
+                position++;
     return position;
 }
 
@@ -118,9 +116,9 @@ inline utf8 utf8_next(utf8 text)
 //   Find the next position in the text, assumed to be UTF-8
 // ----------------------------------------------------------------------------
 {
-    text++;
-    while (*text && is_utf8_next(*text))
-        text++;
+    if (is_utf8_first(*text++))
+        while (*text && is_utf8_next(*text))
+            text++;
     return text;
 }
 

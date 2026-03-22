@@ -65,7 +65,7 @@ hexsz=`printf "%08x" $pgmsz`
 
 sha=`dumppgm | sha1sum | tr -d ' -'`
 
-echo "SHA1: $sha"
+echo "SHA1 for $2: $sha"
 
 (
 	dumppgm

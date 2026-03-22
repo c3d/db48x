@@ -249,6 +249,10 @@ protected:
     bool        handle_digits(int key);
     bool        noHelpForKey(int key);
     bool        do_search(unicode with = 0, bool restart = false);
+    void        draw_help_access_paths(id cmd,
+                                       coord &x, coord &y,
+                                       coord xleft, coord xright,
+                                       coord ybot, coord height);
 
 
 public:

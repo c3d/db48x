@@ -170,13 +170,20 @@ END
 As an extension to the HP implementation, `ROOT` can solve systems of equations
 and multiple variables by solving them one equation at a time, a programmatic version of what the HP50G Advanced Reference Manual calls the Multiple Equation Solver (`MINIT`, `MITM` and `MSOLVR` commands).
 
-## SolvingMenuSolve
+## Solving Menu Solve Key
 
-Solve the system of equations for the given variable.
+A variable name followed by "?" will solve the system of equations for the given
+variable.
 
-## SolvingMenuRecall
+## Solving Menu Recall Key
 
-Recall the current value of a variable in a system of equations. The value is returned as an assignment.
+A variable name followed by ▶ will recall the value of the given equation. The
+value is returned as an assignment.
+
+## Solving Menu Store Key
+
+A variable name preceded by ▶ will store the value of the given equation. The
+stored value is placed on the stack as an assignment.
 
 ## MultipleEquationsSolver
 
@@ -186,13 +193,9 @@ Solve a system of multiple equations simultaneously.
 
 Solve for multiple variables in a system of equations.
 
-## MSlv
-
-On HP50G, a special command is dedicated to solving systems of equations.
-
-On DB48x, the `MSlv` command is provided for comptability. It behaves almost
-exactly like `Root`, except that it leaves the equations and variable lists on
-the stack in addition to the result.
+On HP50G, `MSlv` is dedicated to solving systems of equations.
+On DB48x, it behaves almost exactly like `Root`, except that it
+leaves the equations and variable lists on the stack in addition to the result.
 
 ```rpl
 RAD

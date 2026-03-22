@@ -831,7 +831,7 @@ object_p object::at(object_p index, object_p value) const
     list_g   tail = nullptr;
     object_g item = value;
 
-    if (list_p idxlist = index->as<list>())
+    if (list_p idxlist = index->as_array_or_list())
     {
         head = idxlist->head();
         tail = idxlist->tail();
@@ -1833,7 +1833,7 @@ object_p object::static_object(id i)
 //   Return a pointer to a static object representing the command
 // ----------------------------------------------------------------------------
 {
-    static byte cmds[] =
+    static const byte cmds[] =
     {
 #define ID(id)                                                \
     object::ID_##id < 0x80 ? (object::ID_##id & 0x7F) | 0x00  \
@@ -1917,7 +1917,7 @@ int object::type_value(id ty)
 }
 
 
-#if DEBUG
+#if SIMULATOR
 cstring object::debug() const
 // ----------------------------------------------------------------------------
 //   Render an object from the debugger
@@ -1981,4 +1981,4 @@ cstring debug()
 {
     return debug(0U);
 }
-#endif // SIMULATOR
+#endif

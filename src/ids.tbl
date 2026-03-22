@@ -124,6 +124,7 @@ ID_RANGE(is_integer,       based_integer,  neg_integer)
 ID_RANGE(is_based,         based_integer,  based_integer, based_bignum, based_bignum)
 ID_RANGE(is_bignum,        based_bignum,   neg_bignum)
 #endif // CONFIG_FIXED_BASED_OBJECTS
+ID_RANGE(is_small_integer, integer,        neg_integer)
 ID_RANGE(is_fraction,      fraction,       neg_big_fraction)
 ID_RANGE(is_decimal,       decimal,        neg_decimal)
 ID_RANGE(is_fp,            hwfloat,        neg_decimal)
@@ -133,10 +134,10 @@ ID_RANGE(is_range,         range,          uncertain)
 ID_RANGE(is_strict_range,  range,          prange)
 ID_RANGE(is_algebraic_num, unit,           neg_decimal,   range, uncertain)
 ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
-ID_RANGE(is_command,       Drop,           ToFraction,    ToList, LastMenu)
+ID_RANGE(is_command,       Drop,           ToQuotient,  ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,
                            polynomial,     relative_uncertainty)
-ID_RANGE(is_algebraic_fn,  Rcl,            ToFraction,
+ID_RANGE(is_algebraic_fn,  Rcl,            ToQuotient,
                            TestFlagSet,    det,
                            Get,            IFTE,
                            CurrentClip,    GraphicIntegral,
@@ -153,9 +154,15 @@ ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)
 ID_RANGE(is_program,       program,        funcall)
 ID_RANGE(is_graph,         grob,           bitmap)
-ID_RANGE(is_monochrome,    grob,           grob,        bitmap, bitmap)
-ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,    IfErrThen, IfErrThenElse)
-ID_RANGE(is_menu,          MainMenu,       Catalog,     UnitMenu00, CharactersMenu99)
+ID_RANGE(is_monochrome,    grob,           grob,
+                           bitmap,         bitmap)
+ID_RANGE(is_forced_entry,  IfThen,         CaseWhen,
+                           IfErrThen,      IfErrThenElse)
+ID_RANGE(is_menu,          MainMenu,       Catalog,
+                           UnitMenu00, CharactersMenu99)
+ID_RANGE(is_constant,      constant,       xlib,
+                           standard_uncertainty, relative_uncertainty)
+ID_RANGE(is_special_menu, constant_menu_name, solving_menu_recall)
 
 
 // ============================================================================
@@ -300,7 +307,9 @@ CMD(exp10)                      ALIAS(exp10, "alog")
 NAMED(ToDecimal, "→Decimal")
 ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
-                                ALIAS(ToFraction, "→Q") // Last algebr.
+                                ALIAS(ToFraction, "→Q")
+NAMED(ToQuotient, "→Qπ")        ALIAS(ToQuotient, "→QPi") // Last algeb.
+                                ALIAS(ToQuotient, "XQ")
 
 
 // ============================================================================
@@ -412,8 +421,8 @@ NAMED(PercentChange,    "%Change")              ALIAS(PercentChange, "%Ch")
 NAMED(PercentTotal,     "%Total")               ALIAS(PercentTotal, "%T")
 CMD(Min)
 CMD(Max)
-CMD(DFC)
-CMD(DFC2F)
+NAMED(DFC,              "ContinuedFraction")
+NAMED(DFC2F,            "ContinuedFractionToFraction")
 
 CMD(Extract)                                    ALIAS(Extract, "Sub")
 CMD(NSub)
@@ -430,7 +439,7 @@ OP(dot, "⋅")
 OP(cross, "⨯")
 NAMED(det, "Determinant")
 CMD(ColumnNorm)         ALIAS(ColumnNorm,       "CNrm")
-CMD(RowNorm)            ALIAS(ColumnNorm,       "RNrm")
+CMD(RowNorm)            ALIAS(RowNorm,          "RNrm")
 CMD(MatrixToColumns)    ALIAS(MatrixToColumns,  "→Columns")
                         ALIAS(MatrixToColumns,  "→Col")
 CMD(MatrixToRows)       ALIAS(MatrixToRows,     "→Rows")
@@ -839,8 +848,10 @@ NAMED(EulerianNumber, "℮")
 NAMED(Infinity, "∞")
 NAMED(NegativeInfinity, "−∞")
 NAMED(Const, "LibraryConstant")
-CMD(ConstantName)
-CMD(ConstantValue)
+CMD(ConstantName)                       ALIAS(ConstantName, "EquationName")
+                                        ALIAS(ConstantName, "XLibName")
+CMD(ConstantValue)                      ALIAS(ConstantName, "EquationValue")
+                                        ALIAS(ConstantName, "XLibValue")
 CMD(StandardUncertainty)                ALIAS(StandardUncertainty, "CstSU")
 CMD(RelativeUncertainty)                ALIAS(RelativeUncertainty, "CstRU")
 NAMED(ToStandardUncertainty, "→Us")     ALIAS(ToStandardUncertainty, "→StdUnc")
@@ -850,12 +861,7 @@ NAMED(RelativeRound, "RelRnd")
 NAMED(PrecisionRound, "PrcRnd")
 
 NAMED(LibEq, "LibraryEquation")
-CMD(EquationName)
-CMD(EquationValue)
-CMD(EquationSolver)
 NAMED(XLib, "LibraryItem")
-CMD(XlibName)
-CMD(XlibValue)
 CMD(Constants)
 CMD(Attach)
 CMD(Detach)
@@ -1123,6 +1129,8 @@ SETTING(MaxFlags,               8U, 32768U,             128U)
 SETTING(MaxRewrites,            1U, 10000U,             100U)
 SETTING(FractionIterations,     1U, 10000U,             15U)
 ALIAS(FractionIterations,       "→QIterations")
+SETTING(FractionLargestPrime,   2U, 10000U,            100U)
+ALIAS(FractionLargestPrime,     "→QπMaxPrime")
 SETTING_BITS(FractionDigits,  uint, 6,1U, DB48X_MAXDIGITS, 12U)
 ALIAS(FractionDigits,           "→QDigits")
 SETTING(SolverIterations,       1U, 10000U,             256U)
@@ -1272,14 +1280,6 @@ CMD(DMCPLowBattery)
 CMD(LowBattery)
 
 CMD(Unimplemented)              // Last command in catalog
-
-CMD(VariablesMenuExecute)
-CMD(VariablesMenuRecall)
-CMD(VariablesMenuStore)
-
-CMD(SolvingMenuStore)
-CMD(SolvingMenuSolve)
-CMD(SolvingMenuRecall)
 
 
 
@@ -1611,6 +1611,20 @@ ID(case_when_conditional)
 ID(case_skip_conditional)
 ID(case_end_conditional)
 ID(need_conditional)
+
+ID(constant_menu_name)
+ID(constant_menu_value)
+ID(equation_menu_name)
+ID(equation_menu_value)
+ID(equation_menu_solver)
+ID(library_menu_name)
+ID(library_menu_value)
+ID(variable_menu_execute)
+ID(variable_menu_recall)
+ID(variable_menu_store)
+ID(solving_menu_store)
+ID(solving_menu_solve)
+ID(solving_menu_recall)
 
 #undef ID
 #undef OP

@@ -124,20 +124,12 @@ Compute the square root
 Compute the cube root
 
 
-## EXPM
+## Expm1
 Compute exp(x)-1
-
-
-## LNP1
-Compute ln(x+1)
 
 
 ## Ln1p
 Compute ln(x+1)
-
-
-## Expm1
-Compute exp(x)-1
 
 
 ## Exp2

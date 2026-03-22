@@ -31,12 +31,18 @@
 
 #include "datetime.h"
 #include "dmcp_fonts.c"
+#include "object.h"
 #include "recorder.h"
+#include "runtime.h"
 #include "sim-dmcp.h"
+#include "sysmenu.h"
 #include "target.h"
 #include "tests.h"
+#include "text.h"
 #include "types.h"
+#include "user_interface.h"
 
+#include <cstring>
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
@@ -1159,4 +1165,71 @@ void bitblt24(uint32_t x,
               int      blt_op,
               int      fill)
 {
+}
+
+
+
+size_t ui_clipboard_copy(char *buf, size_t maxlen)
+// ----------------------------------------------------------------------------
+//   Copy from clipboard
+// ----------------------------------------------------------------------------
+{
+    if (!buf || maxlen == 0)
+        return 0;
+
+    extern user_interface ui;
+    ui.clear_shift();
+
+    if (size_t sz = rt.editing())
+    {
+        utf8 data = rt.editor();
+        size_t copy = sz < maxlen ? sz : maxlen - 1;
+        memcpy(buf, data, copy);
+        buf[copy] = '\0';
+        return copy;
+    }
+
+    if (!ST(STAT_RUNNING) && rt.depth() > 0)
+    {
+        if (object_p obj = rt.top())
+        {
+            if (text_p sym = obj->as_text())
+            {
+                size_t sz = 0;
+                utf8 data = sym->value(&sz);
+                size_t copy = sz < maxlen ? sz : maxlen - 1;
+                memcpy(buf, data, copy);
+                buf[copy] = '\0';
+                return copy;
+            }
+            size_t rendered = obj->render(buf, maxlen - 1);
+            if (rendered > 0)
+            {
+                buf[rendered] = '\0';
+                return rendered;
+            }
+        }
+    }
+    return 0;
+}
+
+
+void ui_clipboard_paste(const char *text, size_t len)
+// ----------------------------------------------------------------------------
+//   Past clipboard
+// ----------------------------------------------------------------------------
+{
+    if (!text || len == 0)
+        return;
+
+    extern user_interface ui;
+    ui.clear_shift();
+
+    if (!ST(STAT_RUNNING))
+    {
+        uint pos = ui.cursor_position();
+        size_t ins = ui.insert(pos, utf8(text), len);
+        ui.cursor_position(pos + ins);
+        redraw_lcd(false);
+    }
 }

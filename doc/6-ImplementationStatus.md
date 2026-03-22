@@ -944,6 +944,7 @@ spellings.
 * `→Poly` (`ToPolynomial`, `→Polynomial`)
 * `→Prg` (`ToProgram`, `→Program`)
 * `→Q` (`ToFraction`, `→Frac`, `→ℚ`)
+* `→Qπ` (`ToQuotient`, `→QP`)
 * `→QDigits` (`FractionDigits`)
 * `→QIterations` (`FractionIterations`)
 * `→Rad` (`ToRadians`, `→Radians`)
@@ -3105,7 +3106,6 @@ implemented by the time the project reaches version 1.0.
 * `PUSH`
 * `PVIEW`
 * `PX→C`
-* `→Qπ`
 * `qr`
 * `QR`
 * `QUAD`

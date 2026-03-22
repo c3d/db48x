@@ -107,22 +107,23 @@ program_p program::parse(utf8 source, size_t size)
 }
 
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 object::result program::run(bool synchronous) const
 // ----------------------------------------------------------------------------
 //   Execute a program
 // ----------------------------------------------------------------------------
 {
-    size_t   depth     = rt.call_depth();
-    bool     outer     = depth == 0 && !running;
-    object_p first     = objects();
-    object_p end       = skip();
+    size_t   depth = rt.call_depth();
+    bool     outer = depth == 0 && !running;
+    size_t   size  = 0;
+    object_p first = objects(&size);
+    object_p end   = first + size;
 
-    record(program, "Run %p (%p-%p) %+s",
+    record(program, "Run %t (%p-%p) %+s",
            this, first, end, outer ? "outer" : "inner");
 
     if (!rt.run_push(first, end))
@@ -166,9 +167,9 @@ object::result program::run(algebraic_p obj, bool sync)
     return ok;
 }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
-#endif // DM42
+#endif // DM42 && FIRMWARE
 
 
 object::result program::run_loop(size_t depth)
