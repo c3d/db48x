@@ -9299,7 +9299,7 @@ void tests::symbolic_differentiation()
         .expect("'X↑(A+2)·(A+2)÷X'");
     step("Derivative of power of a numerical constant")
         .test(CLEAR, "'2^X' 'X'", ID_Derivative)
-        .expect("'0.69314 71805 6·2↑X'");
+        .expect("'2↑X·ln 2'");
     step("Derivative of power of a non-numerical constant")
         .test(CLEAR, "'A^X' 'X'", ID_Derivative)
         .expect("'A↑X·ln A'")
@@ -9412,7 +9412,7 @@ void tests::symbolic_integration()
         .expect("'X↑(A+3)÷(A+3)'");
     step("Primitive of power of a numerical constant")
         .test(CLEAR, "'2^X' 'X'", ID_Primitive)
-        .expect("'2↑X÷0.69314 71805 6'");
+        .expect("'2↑X÷ln 2'");
     step("Primitive of power of a non-numerical constant")
         .test(CLEAR, "'A^X' 'X'", ID_Primitive)
         .expect("'A↑X÷ln A'")
@@ -9448,11 +9448,11 @@ void tests::symbolic_integration()
     step("Primitive of log2 and exp2")
         .test(CLEAR, "'log2(A*X+B)+exp2(X*C-D)' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'((A·X+B)·log2(A·X+B)-(A·X+B)÷ln 2)÷A+exp2(X·C-D)÷(0.69314 71805 6·C)'");
+        .expect("'((A·X+B)·log2(A·X+B)-(A·X+B)÷ln 2)÷A+exp2(X·C-D)÷(C·ln 2)'");
     step("Primitive of log10 and exp10")
         .test(CLEAR, "'log10(A*X+B)+exp10(X*C-D)' 'X'",
               LENGTHY(20000),  ID_Primitive)
-        .expect("'((A·X+B)·log10(A·X+B)-(A·X+B)÷ln 10)÷A+exp10(X·C-D)÷(2.30258 50929 9·C)'");
+        .expect("'((A·X+B)·log10(A·X+B)-(A·X+B)÷ln 10)÷A+exp10(X·C-D)÷(C·ln 10)'");
 
     step("Primitive of lnp1 and expm1")
         .test(CLEAR, "'ln1p(A*X+B)+expm1(X*C-D)' 'X'",
@@ -13958,6 +13958,19 @@ void tests::regression_checks()
 
     step("Bug 279: 0/0 should error out");
     test(CLEAR, "0 0 /", ENTER).error("Divide by zero");
+
+    step("Bug 1620: AutoSimplify must not evaluate √(2) as a numeric constant in rewrites");
+    test(CLEAR,
+         "118", ENTER,
+         "48",  ENTER,
+         F,                  // Open algebraic editor ('()' key)
+         C,                  // √x in editor → √(
+         KEY2,               // type 2 → √(2
+         ENTER,              // confirm → '√(2)' on stack
+         MUL,                // 48 × '√(2)'
+         SUB,                // 118 − 48×√(2)
+         C)                  // √(118 − 48×√(2))
+        .expect("'√(118-48·√ 2)'");
 
     step("Bug 695: Putting program separators in names");
     test(CLEAR,

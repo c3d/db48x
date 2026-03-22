@@ -904,6 +904,12 @@ static size_t check_match(size_t eq, size_t eqsz,
                 {
                     // At this point, if we have a numerical value, it was
                     // wrapped in an equation by grab_arguments.
+
+                    // // Do not evaluate symbolic expression like `sqrt(2)`
+                    // // if we wnat a constant value.
+                    if (want_cst && object::is_symbolic(ftop->type()))
+                        return 0;
+
                     size_t depth = rt.depth();
                     if (program::run(+ftop) != object::OK)
                         return 0;
