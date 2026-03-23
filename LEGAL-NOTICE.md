@@ -1,12 +1,12 @@
 # Important notice to residents of California and Colorado
 
 As a consequence of recent legislative activity in [California][cal],
-[Colororado][col], [New-York][ny] and [Brazil][bz]:
+[Colorado][col], [New-York][ny] and [Brazil][bz]:
 
 * Brazil residents may no longer use DB48x after March 17, 2026.
 * California residents may no longer use DB48x after Jan 1st, 2027.
 * Colorado residents may no longer use DB48x after Jan 1st, 2028.
-* New-York residents may no longer use DB48x at some point in the future
+* New-York residents may no longer use DB48x at some point in the future.
 
 DB48x is probably an operating system under these laws. However, it does not,
 cannot and will not implement age verification.
