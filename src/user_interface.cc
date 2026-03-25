@@ -3201,7 +3201,7 @@ void user_interface::load_help(utf8 topic, size_t len)
                     }
                     refidx = 0;
                 }
-                else
+                else if (refidx < sizeof(ref) - 1)
                 {
                     ref[refidx++] = c;
                 }
@@ -3260,7 +3260,8 @@ void user_interface::load_help(utf8 topic, size_t len)
             }
             else
             {
-                ref[refidx] = 0;
+                if (refidx < sizeof(ref))
+                    ref[refidx] = 0;
                 record(help_search, "Checking %u: %s", level, ref);
 
                 // For regular topics, just to a string comparison
@@ -6250,7 +6251,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
                 menu_refresh(menu::ID_Catalog, true);
                 ac = false;
             }
-            else if (ty == object::ID_ConstantName)
+            else if (ty == object::ID_constant_menu_name)
             {
                 unicode lc = character_left_of_cursor();
                 if (lc == L'Ⓒ' || lc == L'Ⓡ' || lc == L'Ⓢ')
@@ -6289,7 +6290,9 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         case PROGRAM:
         case MATRIX:
         insert_object:
-            if (object::is_program_cmd(ty) || object::is_algebraic(ty) || user)
+            if (user ||
+                object::is_program_cmd(ty) || object::is_algebraic(ty) ||
+                object::is_special_menu(ty))
             {
                 dirtyEditor = true;
                 edRows = 0;

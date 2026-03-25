@@ -447,7 +447,8 @@ help/$(NAME).idx: help/$(NAME).md
 	grep -b '^#\|^\* `[^`]*`' $< 		|	\
 	sed -e 's/:\(\* `[^`]*`\).*/:\1/g'   	|	\
 	sort -k2 -t: > $@
-	[ "$$(cat $@ | wc -L)" -lt 80 ]
+	[ "$$(cat $@ | wc -L)" -lt 80 ] || \
+		{ echo "Some help header exceeds 80 bytes"; exit 2; }
 
 check-ids: help/$(NAME).md
 	@for I in $$(cpp -xc++ -D'ID(n)=n' src/ids.tbl | 		\

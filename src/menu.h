@@ -211,6 +211,21 @@ struct SysMenu : menu                                                   \
 #include "ids.tbl"
 
 
+#define SPECIAL_MENU_DECLARE(item)                                      \
+struct item : object                                                    \
+/* ------------------------------------------------------------ */      \
+/*   Create a special item in a menu                            */      \
+/* ------------------------------------------------------------ */      \
+{                                                                       \
+    item(id type) : object(type) {}                                     \
+    OBJECT_DECL(item);                                                  \
+    EVAL_DECL(item);                                                    \
+    INSERT_DECL(item);                                                  \
+    HELP_DECL(item);                                                    \
+}
+
+
+
 
 // ============================================================================
 //

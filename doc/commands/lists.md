@@ -54,6 +54,13 @@ It can be set to MapOneLevel to get the behaviour of most programming languages.
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
 
 
+The operation applies recursively to inner lists.
+
+```rpl
+{ 1 2 { 3 4 } } « →STR » MAP
+@ Expecting { "1" "2" { "3" "4" } }
+
+```
 
 ## Reduce
 

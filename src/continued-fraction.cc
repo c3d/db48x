@@ -34,10 +34,8 @@
 //       The decimal x is converted to an exact rational mant/10^denom_exp,
 //       and the standard Euclidean GCD algorithm is applied.  Iteration stops
 //       (before appending) when the next convergent denominator Q_{k+1} would
-//       exceed 10^(eff_exp/2), where eff_exp = significant_digits(x) − xe is
-//       the effective denominator exponent.  Coefficients beyond that threshold
-//       belong to the finite decimal approximation, not the true mathematical
-//       value, and are discarded.
+//       exceed 10^(eff_exp/2).  For finite rationals (e.g. 2.3), eff_exp/2 can
+//       be 0 — a minimum threshold of 10 ensures the full expansion completes.
 
 #include "continued-fraction.h"
 
@@ -155,8 +153,11 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
     // mantissa).  When precision P is not a multiple of 3, kigit alignment
     // adds trailing zeros, making the kigit-based denom_exp too large; using
     // significant_digits() corrects this and prevents garbage coefficients.
+    // For finite rationals (e.g. 2.3), eff_exp/2 can be 0 — ensure tlim >= 1.
     large    eff_exp = (large) dec->significant_digits() - xe;
     size_t   tlim    = (eff_exp > 0) ? (size_t)(eff_exp / 2) : 0;
+    if (tlim < 1 && denom_exp > 0)
+        tlim = 1;
     bignum_g thresh  = bignum::pow(k10, tlim);
     if (!thresh)
         return object::ERROR;

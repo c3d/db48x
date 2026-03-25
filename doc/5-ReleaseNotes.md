@@ -1,5 +1,48 @@
 # Release notes
 
+## Release 0.9.17 - Rational approximation, indexing, Android fixes
+
+This incremental release delivers new features and fixes a number of bugs.
+
+### New features
+
+* Add `→Qπ` command for rational approximation with π, √n, ln(n) and e
+* Apply `→Q` and `→Qπ` to numbers in expressions
+* Add array/list indexing support in algebraic expressions e.g. `'L(1)'`
+* Add ability to `Store` / `Copy` to `L(1)`
+* Add "real" `ConstantName` and `ConstantValue` commands
+
+### Bug fixes
+
+* Fix parentheses around exponents in graph rendering of `'(a+b)^(c+d)'`
+* Fix label for `ToRelativeUncertainty`, `→RelRnd` instead of `→RelUnc`
+* Fix command alias mapping for `RNrm`
+* Improve parsing of implicit multiplication for a number of edge cases
+* Fix `utf8_next` for garbage bytes following ASCII characters
+* Fix unsatisfied symbol errors with gcc/emcc in the WASM build
+* Save Android system state when app is suspended or hidden
+* Ensure Android help resources are extracted and available at runtime
+* Restore image testing functionality in the test framework
+* Updated test images that had become obsolete
+* Report errors when saving reference files in tests
+* Avoid stack corruption / crash when parsing malformed help index
+* Fix computation of `DFC(2.3)`
+* Fix null-pointer crash if the multiple equation solver fails
+
+
+### Enhancements
+
+* Constrain `→Q` and `→Qπ` behavior to FIX/SCI/ENG setting (like HPs)
+* Minor optimization for `program::run`
+* Save about 3.4K of RAM on physical devices
+* Speed up test runs while increasing default wait time for stability
+* Documentation cleanup and additions, add more RPL examples
+* Add clear build-time error message when a help topic exceeds 80 characters
+* Add demo for interactive menu use
+* Optimize away redundant argument checking
+* Documentation for DCF and DCF2F
+
+
 ## Release 0.9.16 - Factorization, precision fixes, and documentation
 
 This release adds prime and factorization features, improves numeric precision,
@@ -20,7 +63,7 @@ and expands simulator and user documentation.
 
 * Fix `expm1` precision loss for small arguments, including complex values
 * Fix `ln1p` precision loss for small arguments
-* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Fix shift behavior after transient alpha, support shift/xshift for transalpha
 * Reset `show_x` and `show_y` when exiting `SHOW`
 * Ensure the simulator creates the `screens` directory when needed
 * Fix an infinity optimization regression in arithmetic
