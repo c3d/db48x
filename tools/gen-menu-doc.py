@@ -622,12 +622,14 @@ def main():
     )
     out.append('---\n')
 
-    # Sort alphabetically for the document
+    # Sort alphabetically for the document, including external menus
+    all_menu_names = set(menus) | EXTERNAL_MENUS
     sorted_menus = dict(sorted(menus.items(), key=lambda x: x[0].lower()))
+    sorted_external = sorted(EXTERNAL_MENUS - set(menus), key=str.lower)
 
     # ── table of contents ────────────────────────────────────────────────────
     out.append('## Contents\n')
-    for name in sorted_menus:
+    for name in sorted(all_menu_names, key=str.lower):
         anchor = name.lower() + ('-reference' if name in conflicts else '')
         out.append(f'- [{name}](#{anchor})')
     out.append('')
@@ -637,7 +639,7 @@ def main():
     for name, items in sorted_menus.items():
         if name in conflicts:
             out.append(f'### {name} Reference\n')
-            out.append(f'See also: [{name} user documentation](#{conflicts[name]})\n')
+            out.append(f'See also: [{name}](#{conflicts[name]}) user documentation\n')
         else:
             out.append(f'### {name}\n')
         access = format_access_line(name, direct_keys, parents, menus,
@@ -645,6 +647,15 @@ def main():
         if access:
             out.append(access)
         out.append(menu_table(name, items, name_map, doc_index, menu_names, conflicts))
+
+    # ── placeholder sections for external (dynamically populated) menus ──────
+    for name in sorted_external:
+        if name in conflicts:
+            out.append(f'### {name} Reference\n')
+            out.append(f'See also: [{name}](#{conflicts[name]}) user documentation\n')
+        else:
+            out.append(f'### {name}\n')
+        out.append('_Content loaded dynamically at runtime._\n')
 
     output.write_text('\n'.join(out) + '\n')
     print(f'→ {output.relative_to(ROOT)}  ({len(menus)} menus)', file=sys.stderr)
