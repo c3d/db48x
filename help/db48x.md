@@ -16463,6 +16463,24 @@ Return DB48X version information as text.
 
  ▶ `"Version information"`
 
+## Chuck
+
+The most powerful command in DB48x.
+
+ ▶ `"Chuck pearl of wisdom"`
+
+The `CHUCK` command is by far the most powerful command in DB48x.
+Users must run it regularly to keep their calculator in shape.
+
+* `CHUCK` does not have arguments, it wins every single one.
+* `CHUCK` does not merely produce a result, it produces the best result
+every single time, effortlessly.
+* `CHUCK` does not need help, it provides help.
+* `CHUCK` never fails, any error is a user error.
+* `CHUCK` does not drain the battery, it exercises power.
+* `CHUCK` is so fast it has to slow down for you to keep up.
+* `CHUCK` can identify if your DB48x build is genuine.
+
 
 ## FreeMemory
 

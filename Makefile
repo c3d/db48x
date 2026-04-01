@@ -348,7 +348,7 @@ QRC_FILES=		sim/config.qrc		\
 			sim/help/img.qrc
 
 # Build Qt simulator directly with qmake
-qt-$(TARGET): $(QMAKEFILE) $(VERSION_H) .config
+qt-$(TARGET): $(QMAKEFILE) $(VERSION_H) $(CHUCK_H).config
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F)
 qt-%: $(QMAKEFILE) .config
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
@@ -478,12 +478,14 @@ PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
 VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
 VERSION_H = src/$(PLATFORM)/version.h
+CHUCK_H = src/$(PLATFORM)/chuck-norris.h
 
 FONTS=Editor Help Reduced Stack
 
 .prebuild:	$(FONTS:%=fonts/%Font.cc)			\
 		src/decimal-pi.h src/decimal-e.h		\
-		$(VERSION_H)
+		$(VERSION_H)					\
+		$(CHUCK_H)
 
 fonts/EditorFont.cc: $(BASE_FONT) | $(TTF2FONT)
 	$(PRINT_GENERATE) $(TTF2FONT) -s 48 -S 80 -y -10 EditorFont $(BASE_FONT) $@
@@ -500,12 +502,19 @@ src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
 	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
 
 VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
+CHUCK_GIT_H=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h
 $(VERSION_H): $(VERSION_GIT_H)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) cp $< $@
 $(VERSION_GIT_H):
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) echo '#define DB48X_VERSION "$(VERSION)"' > $@
+$(CHUCK_H): $(CHUCK_GIT_H)
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) cp $< $@
+$(CHUCK_GIT_H):
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) tools/generate-chuck.sh > $@
 
 # ------------------------------------------------------------------------------
 # Help generation (lifted from Makefile)
