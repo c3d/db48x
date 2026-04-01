@@ -729,7 +729,7 @@ Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [Linea
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
+| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | [SolverIterations](#solveriterations) |
 | [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
 | [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
 

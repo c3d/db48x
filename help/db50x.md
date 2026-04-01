@@ -4360,6 +4360,35 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.18 "Chuck" - Sucess begins inside
+
+This release includes a number of under-the-hood improvements that
+will make the life of maintainers easier in the long run.
+
+### New features
+
+* Implement the `Chuck` command
+* Make `xq` recognize more patterns during simplification
+* List the menus in the help file
+* Support for tables in the help file
+* `ListRecursionDepth` setting for `map`, `reduce`, `filter`
+
+### Bug fixes
+
+* Remove `-fsanitize` option on macOS (hangs on macOS 26.4)
+* Fix incorrect evaluation of constants during simplification
+
+### Improvements
+
+* Switch to the make-it-quick build system
+* Shared cross-platorm clipboard code
+* Automate the build of releases
+* Put the variables naming expression patterns in a namespace
+* Improved instructions for AI agents
+* Repair GitHub actions
+* Improve solver shuffle around singularities and errors
+* Fix path for grep testing in case of example test failure
+
 ## Release 0.9.17 - Rational approximation, indexing, Android fixes
 
 This incremental release delivers new features and fixes a number of bugs.
@@ -18468,7 +18497,7 @@ Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [Linea
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
+| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | [SolverIterations](#solveriterations) |
 | [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
 | [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
 

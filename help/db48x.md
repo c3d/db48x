@@ -4351,6 +4351,35 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.18 "Chuck" - Sucess begins inside
+
+This release includes a number of under-the-hood improvements that
+will make the life of maintainers easier in the long run.
+
+### New features
+
+* Implement the `Chuck` command
+* Make `xq` recognize more patterns during simplification
+* List the menus in the help file
+* Support for tables in the help file
+* `ListRecursionDepth` setting for `map`, `reduce`, `filter`
+
+### Bug fixes
+
+* Remove `-fsanitize` option on macOS (hangs on macOS 26.4)
+* Fix incorrect evaluation of constants during simplification
+
+### Improvements
+
+* Switch to the make-it-quick build system
+* Shared cross-platorm clipboard code
+* Automate the build of releases
+* Put the variables naming expression patterns in a namespace
+* Improved instructions for AI agents
+* Repair GitHub actions
+* Improve solver shuffle around singularities and errors
+* Fix path for grep testing in case of example test failure
+
 ## Release 0.9.17 - Rational approximation, indexing, Android fixes
 
 This incremental release delivers new features and fixes a number of bugs.
@@ -9486,9 +9515,8 @@ M=1.708e45_kg  t=4.18902 53989e119_s
 ```
 * **Example 2** For a very small black hole having the mass of 1000_kg, to calculate `[rs_m;As_(m^2);TH_K;PBH_W;SBH_(J/K);tev_s;Mxsun;MxSagA;Mxearth;txyr]` (Schwarzschild radius; Schwarzschild area; Black hole temperature; Black hole evaporation power; Black hole entropy; Evaporation time; Factor multiplicative of Sun mass, of Sagittarius A* mass & of Earth mass; Multiplicative factor of a year) from 2 known variables (maintain 24 digits of precision):
 ```rpl
-
 M=1000_kg  t=8.40716 15834 7⁳⁻⁸ s
-@ Expecting [ rs=1.48523 20538 2⁳⁻²⁴ m As=2.77203 36055 6⁳⁻⁴⁷ m↑2 TH=1.22690 06705 9⁳²⁰ K PBH=3.56162 21447 8⁳²⁶ W SBH=0.36627 05548 53 J/K tev=8.41147 78997⁳⁻⁸ s Mxsun=0. MxSagA=0. Mxearth=1.67⁳⁻²² txyr=2.66406 8745⁳⁻¹⁵ ]
+@ Expecting [ rs=1.48523 20538 2⁳⁻²⁴ m As=2.77203 36055 6⁳⁻⁴⁷ m↑2 TH=1.22690 06705 9⁳²⁰ K PBH=3.56162 21447 8⁳²⁶ W SBH=0.36627 05548 53 J/K tev=8.41147 78997⁳⁻⁸ s Mxsun=5.02891 62685 4⁳⁻²⁸ MxSagA=1.17096 01873 5⁳⁻³⁴ Mxearth=1.67443 38069 5⁳⁻²² txyr=2.66406 87452 4⁳⁻¹⁵ ]
 'ROOT(ⒺB H Thermodynamics;[rs;As;TH;PBH;SBH;tev;Mxsun;MxSagA;Mxearth;txyr];[1_m;1_(m^2);1_K;1_W;1_(J/K);1_s;1;1;1;1])'
 ```
 
@@ -15432,7 +15460,7 @@ compared to HP implementations of RPL.
 For example, you can find a complex root for the following equation:
 ```rpl
 'ROOT((X-5)²+3;X;0+0ⅈ)'
-@ Expecting X=5+1.73205 08075 7ⅈ
+@ Expecting X=5.+1.73205 08075 7ⅈ
 ```
 
 ### Differences with HP calculators
@@ -18453,7 +18481,7 @@ Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [Linea
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | SolverIterations |
+| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | [SolverIterations](#solveriterations) |
 | [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
 | [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
 
@@ -18686,3 +18714,4 @@ _Content loaded dynamically at runtime._
 ### UnitsMenu
 
 _Content loaded dynamically at runtime._
+
