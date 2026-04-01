@@ -3983,6 +3983,12 @@ restart:
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
     static char link[60];
+    bool        in_table    = false;
+    int         table_col   = 0;
+    int         table_ncols = 0;
+    coord       table_col_w = 0;
+    bool        advance_col = false;
+    bool        escaped     = false;
 
     // Pun not indented
     helpfile.seek(help);
@@ -4054,7 +4060,9 @@ restart:
                     uint    off  = helpfile.position();
                     unicode nx   = helpfile.get();
                     unicode nnx  = helpfile.get();
-                    if (nx      == '#' || (nx == '*' && nnx == ' '))
+                    if (nx == '#' || (nx == '*' && nnx == ' ')
+                        || (nx == '-' && nnx == ' ')
+                        || (in_table && nx == '|'))
                     {
                         newline = true;
                         emit = true;
@@ -4155,17 +4163,97 @@ restart:
                 skip = true;
                 break;
 
+            case '\\':
+                escaped = true;
+                skip    = true;
+                break;
+
+            case '|':
+                if (escaped)
+                {
+                    escaped = false;
+                    break;
+                }
+                if (style == CODE)
+                    break;
+                if (last == '\n' || (in_table && table_col >= table_ncols))
+                {
+                    // Start of a table row (first or subsequent)
+                    uint       pos0    = helpfile.position();
+                    unicode    c       = 0;
+                    int        cols    = 0;
+                    bool       is_sep  = true;
+                    while (c != '\n' && c != unicode(EOF))
+                    {
+                        c = helpfile.get();
+                        if (c == '|')
+                            cols++;
+                        if (c != '|' && c != ':' && c != '-' && c != ' '
+                            && c != '\r' && c != '\n' && c != unicode(EOF))
+                            is_sep = false;
+                    }
+                    helpfile.seek(pos0);
+                    if (is_sep)
+                    {
+                        // Separator row: skip the whole line
+                        c = 0;
+                        while (c != '\n' && c != unicode(EOF))
+                            c = helpfile.get();
+                        ch   = '\n'; // so that last=='\n' for the next row
+                        skip = true;
+                    }
+                    else
+                    {
+                        if (!in_table && cols > 0)
+                        {
+                            in_table    = true;
+                            table_ncols = cols;
+                            table_col_w = (xright - r.x1 - 4) / table_ncols;
+                        }
+                        table_col = 0;
+                        x         = r.x1 + 2;
+                        xleft     = r.x1 + 2;
+                        skip      = true;
+                    }
+                }
+                else if (in_table)
+                {
+                    advance_col = true;
+                    emit        = true;
+                    skip        = true;
+                }
+                break;
+
             case '<':
                 // Skip HTML tags
-                if (last == '\n')
-                {
-                    unicode c = helpfile.get();
-                    while (c != '\n' && c != unicode(EOF))
-                        c = helpfile.get();
-                }
                 if (style > ITALIC)
                     break;
+                {
+                    unicode c = helpfile.get();
+                    if (last == '\n')
+                    {
+                        // Block-level: skip whole line
+                        while (c != '\n' && c != unicode(EOF))
+                            c = helpfile.get();
+                    }
+                    else
+                    {
+                        // Inline tag: skip to closing >
+                        while (c != '>' && c != '\n' && c != unicode(EOF))
+                            c = helpfile.get();
+                    }
+                }
                 skip = true;
+                break;
+
+            case '-':
+                if (last == '\n' && helpfile.peek() == ' ')
+                {
+                    restyle = NORMAL;
+                    ch      = L'●';
+                    xleft   = r.x1 + 2 + font->width(utf8("● "));
+                    break;
+                }
                 break;
 
             case '*':
@@ -4287,6 +4375,11 @@ restart:
                 break;
 
             case '[':
+                if (escaped)
+                {
+                    escaped = false;
+                    break;
+                }
                 if (style != CODE)
                 {
                     if (helpfile.peek() != '!')
@@ -4317,6 +4410,11 @@ restart:
                 }
                 break;
             case ']':
+                if (escaped)
+                {
+                    escaped = false;
+                    break;
+                }
                 if (style == TOPIC || style == HIGHLIGHTED_TOPIC)
                 {
                     unicode n  = helpfile.get();
@@ -4448,22 +4546,34 @@ restart:
         }
         else
         {
-            // Go to new line if this does not fit
-            coord right  = x + width;
-            if (right >= xright - 1)
+            // Go to new line if this does not fit (not inside table columns)
+            if (!in_table)
             {
-                x = xleft;
-                y += height;
+                coord right  = x + width;
+                if (right >= xright - 1)
+                {
+                    x = xleft;
+                    y += height;
+                }
             }
             if (widx && hadTitle)
             {
-                y += 5 * height / 4;
+                y += in_table ? height : 5 * height / 4;
                 hadTitle = false;
             }
         }
 
         coord yf = y + height;
         bool draw = yf > ytop;
+
+        // Clip to column boundary when inside a table
+        if (in_table && draw)
+        {
+            coord col_x1 = r.x1 + 2 + table_col * table_col_w;
+            coord col_x2 = col_x1 + table_col_w - 1;
+            rect  ccol(col_x1, r.y1, col_x2, r.y2);
+            Screen.clip(ccol);
+        }
 
         pattern color     = styles[style].color;
         pattern bg        = styles[style].background;
@@ -4547,6 +4657,20 @@ restart:
         if (italic)
             if (draw)
                 Screen.clip(r);
+        else if (in_table && draw)
+            Screen.clip(r);
+
+        // Advance to next table column
+        if (advance_col)
+        {
+            table_col++;
+            if (table_col < table_ncols)
+            {
+                x     = r.x1 + 2 + table_col * table_col_w;
+                xleft = x;
+            }
+            advance_col = false;
+        }
 
         // Check special case of yellow shift key
         if (yellow || blue)
@@ -4591,6 +4715,15 @@ restart:
 
         if (newline)
         {
+            if (in_table)
+            {
+                table_col = 0;
+                if (helpfile.peek() != '|')
+                {
+                    in_table    = false;
+                    table_ncols = 0;
+                }
+            }
             xleft  = r.x1 + 2;
             x = xleft;
             if (!hadTitle)

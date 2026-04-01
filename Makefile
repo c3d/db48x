@@ -477,7 +477,8 @@ clangdb-%: .ALWAYS
 # Generated sources: fonts, decimals, version (after .recurse so tools exist)
 # ------------------------------------------------------------------------------
 
-HELP_SOURCES = $(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)
+MENUS_TREE   = doc/8-menus-tree-$(if $(filter dm42n,$(MODEL)),dm42,$(MODEL)).md
+HELP_SOURCES = $(filter-out doc/8-menus-tree-%.md,$(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)) $(MENUS_TREE)
 PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
 PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
@@ -539,6 +540,10 @@ help/$(NAME).md: $(HELP_SOURCES)
 	@cp doc/*.png help/ 2>/dev/null || true
 	@mkdir -p help/img
 	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
+	
+doc/8-menus-tree-dm42.md doc/8-menus-tree-dm32.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
+	python3 tools/gen-menu-doc.py --model dm42
+	python3 tools/gen-menu-doc.py --model dm32
 
 help/$(NAME).idx: help/$(NAME).md
 	@grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@

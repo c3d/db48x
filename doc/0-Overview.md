@@ -370,6 +370,11 @@ menu is special in the sense that:
 
 * The 🟦 function *stores* into the variable.
 
+### Menu Tree
+
+The complete hierarchy of all built-in menus is documented in the
+[Menu Tree](#soft-menus-tree).
+
 
 ## Differences with other RPLs
 
