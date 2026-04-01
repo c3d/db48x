@@ -360,7 +360,7 @@ $(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)
 		$(QMAKE_ENV)				\
 		$(QMAKE) $(<F) -o $(@F) 		\
 		$(QMAKE_SPECS:%=-spec %) 		\
-		CONFIG+=silent		 		\
+		$(if $V,,CONFIG+=silent) 		\
 		CONFIG+=$(QMAKE_$(TARGET)) 		\
 		DESTDIR="$$DESTDIR"			\
 		OBJECTS_DIR=$(abspath $(MIQ_OBJDIR))	\
@@ -467,6 +467,11 @@ TOOLS=$(foreach t,$(TOOLS_BUILDS),$t$(notdir $(t:%/=%)))
 tools: $(TOOLS)
 tools/%:
 	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D)
+
+clangdb: clangdb-color-dm32-sim
+clangdb-%: .ALWAYS
+	@rm -rf .build && bear -- make v-$(TARGET) V=1 VERBOSE=1 $*
+
 
 # ------------------------------------------------------------------------------
 # Generated sources: fonts, decimals, version (after .recurse so tools exist)
