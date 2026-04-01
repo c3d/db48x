@@ -547,7 +547,7 @@ MENU(VectorMenu,
 // ----------------------------------------------------------------------------
 //   Operations on vectors
 // ----------------------------------------------------------------------------
-     "Norm",    ID_abs,
+     "Norm",    ID_norm,
      "Dot",     ID_dot,
      "Cross",   ID_cross,
      "→Rect",   ID_ToRectangular,
@@ -575,7 +575,7 @@ MENU(MatrixMenu,
      "TrConj",  ID_TransConjugate,
 
      "Det",     ID_det,
-     "Norm",    ID_abs,
+     "Norm",    ID_norm,
      "→Array",  ID_ToArray,
      "Array→",  ID_FromArray,
      "Random",  ID_RandomMatrix,

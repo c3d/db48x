@@ -700,6 +700,7 @@ algebraic_p arithmetic::non_numeric<multiply>(algebraic_r x, algebraic_r y)
     return optimize<multiply>(x, y);
 }
 
+
 bool multiply::integer_ok(object::id &xt, object::id &yt,
                           ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------

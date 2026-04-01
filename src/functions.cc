@@ -604,8 +604,7 @@ FUNCTION_BODY(neg)
         return -u;
     }
     case ID_unit:
-        return unit::simple(neg::run(unit_p(+x)->value()),
-                            unit_p(+x)->uexpr());
+        return unit_p(+x)->map(neg::evaluate);
     case ID_tag:
     {
         algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic();
@@ -632,7 +631,7 @@ FUNCTION_BODY(neg)
 
 FUNCTION_BODY(abs)
 // ----------------------------------------------------------------------------
-//   Implementation of 'abs'
+//   Implementation of absolute value
 // ----------------------------------------------------------------------------
 //   Special case where we don't need to promote argument to decimal
 {
@@ -683,8 +682,7 @@ FUNCTION_BODY(abs)
     }
 
     case ID_unit:
-        return unit::simple(abs::run(unit_p(+x)->value()),
-                            unit_p(+x)->uexpr());
+        return unit_p(+x)->map(abs::evaluate);
     case ID_tag:
     {
         algebraic_g tagged = tag_p(+x)->tagged_object()->as_algebraic_or_list();
@@ -692,7 +690,6 @@ FUNCTION_BODY(abs)
     }
 
     case ID_array:
-        return array_p(+x)->norm();
     case ID_list:
         return list_p(+x)->map(abs::evaluate);
 
@@ -710,88 +707,102 @@ FUNCTION_BODY(abs)
 }
 
 
-FUNCTION_BODY(arg)
+FUNCTION_BODY(norm)
 // ----------------------------------------------------------------------------
-//   Implementation of the complex argument (0 for non-complex values)
+//   Implementation of norm
 // ----------------------------------------------------------------------------
 {
     if (!x)
         return nullptr;
 
-    id xt = x->type();
-    if (should_be_symbolic(xt))
-        return symbolic(ID_arg, x);
-    auto angle_mode = Settings.AngleMode();
-    algebraic_g a;
-    if (is_complex(xt))
-    {
-        a = complex_p(algebraic_p(x))->arg(angle_mode);
-    }
-    else
-    {
-        bool negative = x->is_negative(false);
-        a = integer::make(0);
-        a = complex::convert_angle(a, angle_mode, angle_mode, negative);
-    }
-    if (a && Settings.SetAngleUnits() && a->is_real())
-        add_angle(a);
+    if (array_p a = x->as<array>())
+        return a->norm();
+    if (list_p l = x->as<list>())
+        return l->map(norm::evaluate);
+    if (unit_p u = x->as<unit>())
+        return u->map(norm::evaluate);
+    return abs::evaluate(x);
+}
+
+
+static algebraic_p complex_op(algebraic_r  x,
+                              object::id   op,
+                              algebraic_fn fn,
+                              algebraic_g  (complex::*method)() const,
+                              algebraic_p (*real)(algebraic_r x))
+// ----------------------------------------------------------------------------
+//   Conversion from complex number to real values
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    object::id xt = x->type();
+    if (function::should_be_symbolic(xt))
+        return function::symbolic(op, x);
+    if (object::is_complex(xt))
+        return (complex_p(+x)->*method)();
+    if (object::is_array_or_list(xt))
+        return list_p(+x)->map(fn);
+    if (unit_p u = unit::get(x))
+        return op == object::ID_arg ? fn(u->value()) : u->map(fn);
+    if (!object::is_real(xt))
+        rt.type_error();
+    return real(x);
+}
+
+
+#define COMPLEX_OP(op)                                          \
+    static algebraic_p complex_op_##op(algebraic_r x);          \
+    FUNCTION_BODY(op)                                           \
+    {                                                           \
+        return complex_op(x,                                    \
+                          ID_##op,                              \
+                          op::evaluate,                         \
+                          &complex::op,                         \
+                          complex_op_##op);                     \
+    }                                                           \
+    static algebraic_p complex_op_##op(algebraic_r x)
+
+
+COMPLEX_OP(arg)
+// ----------------------------------------------------------------------------
+//   Extract the argument of the input
+// ----------------------------------------------------------------------------
+{
+    auto        am  = Settings.AngleMode();
+    bool        neg = x->is_negative(false);
+    algebraic_g a   = integer::make(0);
+    a               = complex::convert_angle(a, am, am, neg);
+    if (a && a->is_real())
+        if (Settings.SetAngleUnits())
+            algebraic::add_angle(a);
     return a;
 }
 
 
-FUNCTION_BODY(re)
+COMPLEX_OP(re)
 // ----------------------------------------------------------------------------
 //   Extract the real part of a number
 // ----------------------------------------------------------------------------
 {
-    if (!x)
-        return nullptr;
-
-    id xt = x->type();
-    if (should_be_symbolic(xt))
-        return symbolic(ID_re, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->re();
-    if (!is_real(xt))
-        rt.type_error();
     return x;
 }
 
 
-FUNCTION_BODY(im)
+COMPLEX_OP(im)
 // ----------------------------------------------------------------------------
 //   Extract the imaginary part of a number (0 for real values)
 // ----------------------------------------------------------------------------
 {
-    if (!x)
-        return nullptr;
-
-    id xt = x->type();
-    if (should_be_symbolic(xt))
-        return symbolic(ID_im, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->im();
-    if (!is_real(xt))
-        rt.type_error();
     return integer::make(0);
 }
 
 
-FUNCTION_BODY(conj)
+COMPLEX_OP(conj)
 // ----------------------------------------------------------------------------
 //   Compute the conjugate of input
 // ----------------------------------------------------------------------------
 {
-    if (!x)
-        return nullptr;
-
-    id xt = x->type();
-    if (should_be_symbolic(xt))
-        return symbolic(ID_conj, x);
-    if (is_complex(xt))
-        return complex_p(algebraic_p(x))->conjugate();
-    if (!is_real(xt))
-        rt.type_error();
     return x;
 }
 
@@ -807,26 +818,16 @@ FUNCTION_BODY(sign)
     id xt = x->type();
     if (should_be_symbolic(xt))
         return symbolic(ID_sign, x);
-
     if (x->is_negative(false))
-    {
         return integer::make(-1);
-    }
-    else if (x->is_zero(false))
-    {
+    if (x->is_zero(false))
         return integer::make(0);
-    }
-    else if (is_integer(xt) || is_bignum(xt) || is_fraction(xt) || is_real(xt))
-    {
+    if (is_integer(xt) || is_bignum(xt) || is_fraction(xt) || is_real(xt))
         return integer::make(1);
-    }
-    else if (is_complex(xt))
-    {
+    if (is_complex(xt))
         return polar::make(integer::make(1),
                            complex_p(algebraic_p(x))->pifrac(),
                            object::ID_PiRadians);
-    }
-
     rt.type_error();
     return nullptr;
 }

@@ -468,7 +468,7 @@ Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-refe
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [RowNrm](#rownorm) | [ColNrm](#columnnorm) | _CondNum_ | [Size](#size) | \[[Vector](#vectormenu)\] |   |
-| [Det](#determinant) | [Norm](#abs) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
+| [Det](#determinant) | [Norm](#norm) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
 | `[]` | [Idnty](#identitymatrix) | [Const](#constantarray) | Transp | TrConj | ▶ |
 
 **Page 2**
@@ -935,7 +935,7 @@ Access: [ListMenu](#listmenu) ▶ 🟦 F5; [MatrixMenu](#matrixmenu) 🟦 F5
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Hypot](#hypot) | [Atan2](#atan2) |   |   |   |   |
 | [→Vec2](#to2dvector) | [→Vec3](#to3dvector) | [Vec→](#fromvector) | [→Cylind](#tocylindrical) | \[[Complex](#complexmenu)\] | \[[Matrix](#matrixmenu)\] |
-| [Norm](#abs) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
+| [Norm](#norm) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
 
 ### CharactersMenu Reference
 

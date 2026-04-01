@@ -1207,6 +1207,33 @@ algebraic_p unit::convert_to_real() const
 }
 
 
+algebraic_p unit::map(algebraic_fn fn) const
+// ----------------------------------------------------------------------------
+//   Map an algebraic function to the value part of the unit
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = value();
+    algebraic_g u = uexpr();
+    x             = fn(x);
+    if (x)
+        return unit::simple(x, u);
+    return nullptr;
+}
+
+
+algebraic_p unit::map(bool (*fn)(algebraic_g &x)) const
+// ----------------------------------------------------------------------------
+//   Map an algebraic function to an algebraic conversion function
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = value();
+    algebraic_g u = uexpr();
+    if (fn(x))
+        return unit::simple(x, u);
+    return nullptr;
+}
+
+
 unit_p unit::cycle() const
 // ----------------------------------------------------------------------------
 //   Cycle the unit SI prefix across the closest appropriate ones

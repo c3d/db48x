@@ -4654,10 +4654,7 @@ restart:
             }
             x += kwidth;
         }
-        if (italic)
-            if (draw)
-                Screen.clip(r);
-        else if (in_table && draw)
+        if (draw && (italic || in_table))
             Screen.clip(r);
 
         // Advance to next table column

@@ -57,6 +57,9 @@ struct unit : complex
     static bool convert_to_linear(algebraic_g &value, algebraic_g &uexpr);
     algebraic_p convert_to_real() const;
 
+    algebraic_p map(algebraic_fn fn) const;
+    algebraic_p map(bool (*fn)(algebraic_g &x)) const;
+
     static algebraic_p parse_uexpr(gcutf8 source, size_t &len);
 
     static unit_p lookup(symbol_p name, int *prefix_index = nullptr);
@@ -71,6 +74,7 @@ struct unit : complex
     {
         return object::static_object(object::ID_UnitsSIPrefixCycle);
     }
+
 
     static bool mode;           // Set to true to evaluate units
     static bool factoring;      // Set to true when factoring out units

@@ -242,6 +242,7 @@ algebraic_p derived::evaluate(algebraic_r x)
 
 FUNCTION_MAT(abs);
 FUNCTION(sign);
+FUNCTION_MAT(norm);
 FUNCTION(IntPart);
 FUNCTION(FracPart);
 FUNCTION(ceil);

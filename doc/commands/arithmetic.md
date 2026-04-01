@@ -112,7 +112,8 @@ Fractional part of a number
 ## Abs
 
 Return the absolute value for a real number.
-Return the Euclidean norm for a complex number, vector or matrix.
+Return the modulus for a complex number
+Return the absolute value of elements for a matrix or a vector, which is different from HP calculators, see `NORM`
 
 
 # Integer arithmetic and polynomials

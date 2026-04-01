@@ -693,6 +693,12 @@ operate on these items when it makes sense. Therefore:
   `[[a b][c d] 2. ^` performs the operation element-wise and returns
   `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
 
+* When applied to a matrix or vector, `abs` returns a matrix or vector with the
+  `abs` of elements, whereas HP calcualtors compute the Euclidean norm. The
+  `norm` command performs like `abs` on HP calculators, computing the absolute
+  value for real numbers, the modulus for complex numbers, and the Euclidean
+  norm for arrays and vectors
+
 ### Mathematics
 
 * The `Σ` operation behaves differently between the HP48 and the HP50. On the

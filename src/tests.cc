@@ -5571,10 +5571,106 @@ void tests::complex_functions()
     test(CLEAR, "-31 arg", ENTER).expect("180 °");
     step("Complex argument on decimals in degrees");
     test(CLEAR, "-31.234 arg", ENTER).expect("180 °");
-    test(CLEAR, "RAD", ENTER);
 
     step("Restore default 24-digit precision");
     test(CLEAR, "24 PRECISION 12 SIG", ENTER).noerror();
+
+    step("Re with list of polar units")
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } re", ENTER)
+        .expect("{ 230 V -115 V -115 V }");
+    step("Im with list of polar units")
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } im", ENTER)
+        .expect("{ 0 V 199.18584 287 V -199.18584 287 V }");
+    step("Arg with list of polar units")
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } arg", ENTER)
+        .expect("{ 0 ° 120 ° -120 ° }");
+    step("Abs with list of polar units")
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } abs", ENTER)
+        .expect("{ 230 V 230 V 230 V }");
+    step("Norm with list of polar units")
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } norm", ENTER)
+        .expect("{ 230 V 230 V 230 V }");
+    step("Conj with list of polar units")
+
+        .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } conj", ENTER)
+        .expect("{ 230∡0° V 230∡-120° V 230∡120° V }");
+
+    step("Re with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } re", ENTER)
+        .expect("{ 1 V 3 V -5 V -7 V }");
+    step("Im with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } im", ENTER)
+        .expect("{ 2 V 4 V 6 V -8 V }");
+    step("Arg with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } arg", ENTER)
+        .expect("{ 63.43494 88229 ° 53.13010 23542 ° 129.80557 1092 ° -131.18592 5166 ° }");
+    step("Abs with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } abs", ENTER)
+        .expect("{ 2.23606 79775 V 5. V 7.81024 96759 1 V 10.63014 58127 V }");
+    step("Norm with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } norm", ENTER)
+        .expect("{ 2.23606 79775 V 5. V 7.81024 96759 1 V 10.63014 58127 V }");
+    step("Conjugate with list of rectangular")
+        .test(CLEAR, "{ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V } conj", ENTER)
+        .expect("{ 1-2ⅈ V 3-4ⅈ V -5-6ⅈ V -7+8ⅈ V }");
+
+    step("Re with polar array")
+        .test(CLEAR, "[ 230∡0° V 230∡120° V 230∡-120° V ] re", ENTER)
+        .expect("[ 230 V -115 V -115 V ]");
+    step("Im with polar array")
+        .test(CLEAR, "[230∡0° V 230∡120° V 230∡-120° V] im", ENTER)
+        .expect("[ 0 V 199.18584 287 V -199.18584 287 V ]");
+    step("Arg with polar array")
+        .test(CLEAR, "[ 230∡0° V 230∡120° V 230∡-120° V ] arg", ENTER)
+        .expect("[ 0 ° 120 ° -120 ° ]");
+    step("Abs with polar array")
+        .test(CLEAR, "[230∡0° V 230∡120° V 230∡-120° V] abs", ENTER)
+        .expect("[ 230 V 230 V 230 V ]");
+    step("Conjugate with polar array")
+        .test(CLEAR, "[ 230∡0° V 230∡120° V 230∡-120° V ] conj", ENTER)
+        .expect("[ 230∡0° V 230∡-120° V 230∡120° V ]");
+
+    step("Re with array of rectangular")
+        .test(CLEAR, "[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] re", ENTER)
+        .expect("[ 1 V 3 V -5 V -7 V ]");
+    step("Im with array of rectangular")
+        .test(CLEAR, "[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] im", ENTER)
+        .expect("[ 2 V 4 V 6 V -8 V ]");
+    step("Arg with array of rectangular")
+        .test(CLEAR, "[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] arg", ENTER)
+        .expect("[ 63.43494 88229 ° 53.13010 23542 ° 129.80557 1092 ° -131.18592 5166 ° ]");
+    step("Abs with array of rectangular")
+        .test("[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] abs", ENTER)
+        .expect("[ 2.23606 79775 V 5. V 7.81024 96759 1 V 10.63014 58127 V ]");
+    step("Norm with array of rectangular")
+        .test(CLEAR, "[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] norm", ENTER)
+        .expect("5.08560 95405 5+7.86533 05333 5ⅈ V");
+    step("Conjugate with array of rectangular")
+        .test(CLEAR, "[ 1+2ⅈ V 3+4ⅈ V -5+6ⅈ V -7-8ⅈ V ] conj", ENTER)
+        .expect("[ 1-2ⅈ V 3-4ⅈ V -5-6ⅈ V -7+8ⅈ V ]");
+    step("Re with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] re", ENTER)
+        .want("[[ 1 V 3 V ] [ -5 V -7 V ]]");
+    step("Im with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] im", ENTER)
+        .want("[[ 2 V 4 V ] [ 6 V -8 V ]]");
+    step("Arg with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] arg", ENTER)
+        .want("[[ 63.43494 88229 ° 53.13010 23542 ° ]"
+              " [ 129.80557 1092 ° -131.18592 5166 ° ]]");
+    step("Abs with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] abs", ENTER)
+        .want("[[ 2.23606 79775 V 5. V ]"
+              " [ 7.81024 96759 1 V 10.63014 58127 V ]]");
+    step("Norm with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] norm", ENTER)
+        .expect("5.08560 95405 5+7.86533 05333 5ⅈ V");
+    step("Conjugate with matrix of rectangular")
+        .test(CLEAR, "[[ 1+2ⅈ V 3+4ⅈ V][ -5+6ⅈ V -7-8ⅈ V ]] conj", ENTER)
+        .want("[[ 1-2ⅈ V 3-4ⅈ V ]"
+              " [ -5-6ⅈ V -7+8ⅈ V ]]");
+
+    test(CLEAR, "RAD", ENTER);
 }
 
 
@@ -7169,10 +7265,11 @@ void tests::vector_functions()
     test(CLEAR, "[1 2 3] INV", ENTER)
         .expect("[ 1 ¹/₂ ¹/₃ ]");
 
-    step("Fröbenius norm");
-    test(CLEAR, "[1 2 3] ABS", ENTER)
-        .expect("3.74165 73867 7");
-    test(CLEAR, "[1 2 3] NORM", ENTER)
+    step("Absolute value of vector")
+        .test(CLEAR, "[1 -2 3] ABS", ENTER)
+        .expect("[ 1 2 3 ]");
+    step("Fröbenius norm of vector")
+        .test(CLEAR, "[1 2 3] NORM", ENTER)
         .expect("3.74165 73867 7");
 
     step("Component-wise application of functions");
@@ -7566,10 +7663,11 @@ void tests::matrix_functions()
     test(CLEAR, "[[1 2 3][4 5 6][7 8 19]] DET", ENTER)
         .want("-30");
 
-    step("Froebenius norm");
-    test(CLEAR, "[[1 2] [3 4]] ABS", ENTER)
-        .want("5.47722 55750 5");
-    test(CLEAR, "[[1 2] [3 4]] NORM", ENTER)
+    step("Absolute value of matrix")
+        .test(CLEAR, "[[1 -2] [-3 4]] ABS", ENTER)
+        .want("[[ 1 2 ] [ 3 4 ]]");
+    step("Froebenius norm of matrix")
+        .test(CLEAR, "[[1 2] [3 4]] NORM", ENTER)
         .want("5.47722 55750 5");
 
     step("Component-wise application of functions");

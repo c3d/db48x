@@ -395,17 +395,8 @@ bool algebraic::to_integer(algebraic_g &x)
         break;
 
     case ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_integer(v))
-        {
-            x = unit::simple(v, u);
-            break;
-        }
-    }
-    // fallthrough
+        x = unit_p(+x)->map(to_integer);
+        break;
     default:
         return false;
     }
@@ -521,17 +512,8 @@ static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
         break;
     }
     case object::ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_fraction_dispatch(v, ctx))
-        {
-            x = unit::simple(v, u);
-            break;
-        }
-        return false;
-    }
+        x = unit_p(+x)->map(ctx.map_fn);
+        break;
     case object::ID_equation:
     {
         object_p inner = equation_p(+x)->value();
@@ -897,17 +879,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         break;
     }
     case ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_decimal(v, weak))
-        {
-            x = unit::simple(v, u);
-            return x;
-        }
-        break;
-    }
+        x = unit_p(+x)->map(weak ? to_decimal_weak : to_decimal_strong);
+        return x;
     case ID_integer:
     case ID_neg_integer:
         if (weak)
@@ -938,16 +911,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
 
     case ID_array:
     case ID_list:
-    {
-        bool ok = true;
-        if (list_p res = list_p(+x)->map(weak
-                                         ? to_decimal_weak
-                                         : to_decimal_strong))
-            x = res;
-        else
-            ok = false;
-        return ok;
-    }
+        x = list_p(+x)->map(weak ? to_decimal_weak : to_decimal_strong);
+        return x;
 
     case ID_expression:
         if (!unit::mode)

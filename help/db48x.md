@@ -635,6 +635,12 @@ operate on these items when it makes sense. Therefore:
   `[[a b][c d] 2. ^` performs the operation element-wise and returns
   `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
 
+* When applied to a matrix or vector, `abs` returns a matrix or vector with the
+  `abs` of elements, whereas HP calcualtors compute the Euclidean norm. The
+  `norm` command performs like `abs` on HP calculators, computing the absolute
+  value for real numbers, the modulus for complex numbers, and the Euclidean
+  norm for arrays and vectors
+
 ### Mathematics
 
 * The `Σ` operation behaves differently between the HP48 and the HP50. On the
@@ -10032,7 +10038,8 @@ Fractional part of a number
 ## Abs
 
 Return the absolute value for a real number.
-Return the Euclidean norm for a complex number, vector or matrix.
+Return the modulus for a complex number
+Return the absolute value of elements for a matrix or a vector, which is different from HP calculators, see `NORM`
 
 
 # Integer arithmetic and polynomials
@@ -13084,6 +13091,11 @@ Column norm (one norm) of a matrix
 
 ## RowNorm
 Row norm (infinity norm) of a matrix
+
+
+## Norm
+
+Euclidean norm of a vector of matrix
 
 
 ## ConstantArray
@@ -18097,7 +18109,7 @@ Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-refe
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [RowNrm](#rownorm) | [ColNrm](#columnnorm) | _CondNum_ | [Size](#size) | \[[Vector](#vectormenu)\] |   |
-| [Det](#determinant) | [Norm](#abs) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
+| [Det](#determinant) | [Norm](#norm) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
 | `[]` | [Idnty](#identitymatrix) | [Const](#constantarray) | Transp | TrConj | ▶ |
 
 **Page 2**
@@ -18564,7 +18576,7 @@ Access: [ListMenu](#listmenu) ▶ 🟦 F5; [MatrixMenu](#matrixmenu) 🟦 F5
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Hypot](#hypot) | [Atan2](#atan2) |   |   |   |   |
 | [→Vec2](#to2dvector) | [→Vec3](#to3dvector) | [Vec→](#fromvector) | [→Cylind](#tocylindrical) | \[[Complex](#complexmenu)\] | \[[Matrix](#matrixmenu)\] |
-| [Norm](#abs) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
+| [Norm](#norm) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
 
 ### CharactersMenu Reference
 
