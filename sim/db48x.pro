@@ -137,8 +137,8 @@ win32:   LIBS += -lsetupapi -lgnurx
 android: LIBS +=
 freebsd: LIBS += -lthr -liconv
 macx:    LIBS += -framework CoreFoundation -framework IOKit
-macx:    QMAKE_CFLAGS += -fsanitize=address
-macx:    LIBS += -fsanitize=address
+macx:    QMAKE_CFLAGS +=
+macx:    LIBS +=
 clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
 clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-extension
 gcc:     QMAKE_CFLAGS   += -Wall -Wno-unknown-warning-option -Wno-packed-bitfield-compat
