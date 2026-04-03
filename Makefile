@@ -15,6 +15,7 @@
 ##    make dm42n          : Build for SwissMicros DM42n (called db50x)
 ##    make dm32           : Build for SwissMicros DM32 (called db50x)
 ##    make android        : Build Android App Bundle for Google Play
+##    make wasm           : Build WebAssembly (Emscripten: wasm/$(NAME).js)
 ##    make tools          : Build the tools (decimize, crc32, etc)
 ##    make help           : List all targets
 ##
@@ -71,7 +72,7 @@ NAME ?= db48x
 # Build target: release, opt or debug
 TARGET ?= release
 
-# Build kind: fw, sim or android
+# Build kind: fw, sim, android or wasm
 KIND ?=
 
 # Calculator model: dm32, dm42 or dm42n
@@ -118,6 +119,7 @@ PRODUCTS ?= $(NAME)$(EXT_$(KIND))
 EXT_fw = .exe
 EXT_sim = .lib
 EXT_android = .exe
+EXT_wasm = .exe
 
 CONFIG=$(CONFIG_$(KIND))
 CONFIG_sim=							\
@@ -131,6 +133,7 @@ CONFIG_sim=							\
 	sigstksz						\
 	strsignal
 CONFIG_android=$(CONFIG_sim)
+CONFIG_wasm=
 
 SOURCES =							\
 	src/$(PLATFORM)/target.cc				\
@@ -202,6 +205,17 @@ SOURCES_fw =							\
 	$(SDK)/$(PLATFORM)/startup_pgm.s
 
 SOURCES_sim =							\
+	sim/dmcp.cpp						\
+	sim/sim-screen.cpp					\
+	sim/sim-window.cpp					\
+	src/tests.cc						\
+	recorder/recorder.c					\
+	recorder/recorder_ring.c
+
+SOURCES_wasm =							\
+	sim/dmcp.cpp						\
+	sim/sim-screen.cpp					\
+	sim/sim-window.cpp					\
 	src/tests.cc						\
 	recorder/recorder.c					\
 	recorder/recorder_ring.c
@@ -213,6 +227,7 @@ endif
 # ------------------------------------------------------------------------------
 
 INCLUDES ?= 	$(KIND)			\
+		src/$(KIND)		\
 		src/$(MODEL)		\
 		src/$(PLATFORM) 	\
 		src 			\
@@ -261,6 +276,11 @@ DEFINES_android=ANDROID					\
 		USE_QT					\
 		HELPFILE_NAME=\"help/$(NAME).md\"	\
 		HELPINDEX_NAME=\"help/$(NAME).idx\"
+DEFINES_wasm =	SIMULATOR				\
+		WASM					\
+		__packed=""				\
+		HELPFILE_NAME=\"help/$(NAME).md\"	\
+		HELPINDEX_NAME=\"help/$(NAME).idx\"
 
 
 # ------------------------------------------------------------------------------
@@ -297,6 +317,7 @@ TIME=
 # Suppress VLA warning for sim; must come after -Wall
 CXXFLAGS_TARGET_$(TARGET) += $(CXXFLAGS_$(KIND))
 CXXFLAGS_sim = -Wno-vla-cxx-extension
+CXXFLAGS_wasm = -Wno-vla-cxx-extension
 
 
 # ------------------------------------------------------------------------------
@@ -308,10 +329,11 @@ dm32:		dm32-fw-$(TARGET)
 dm42n:		dm42n-fw-$(TARGET)
 sim:		sim-$(TARGET)
 android:	android-$(TARGET)
+wasm:		wasm-$(TARGET)
 
 fw-%:
 	$(PRINT_COMMAND) $(MAKE) $* KIND=fw BUILDENV=arm-none-eabi
-ifneq ($(KIND),sim)
+ifeq ($(filter $(KIND),sim wasm),)
 sim-%:
 	$(PRINT_COMMAND) $(MAKE) qt-$* KIND=sim BUILDENV=auto RECURSE=.config
 endif
@@ -319,6 +341,24 @@ ifneq ($(KIND),android)
 android-%:
 	$(PRINT_COMMAND) $(MAKE) android-$* KIND=android RECURSE=.build
 endif
+
+# ------------------------------------------------------------------------------
+# WebAssembly with Emscripten
+# ------------------------------------------------------------------------------
+
+# Installing the SDK
+emsdk/emsdk:
+	$(PRINT_COMMAND) git submodule update --init --recursive emsdk
+
+emsdk: emsdk/emsdk
+	@emcc --version >/dev/null 2>&1 || \
+		( cd $(TOP)emsdk && ./emsdk install latest && ./emsdk activate latest )
+
+.PHONY: emsdk
+
+wasm-%: emsdk
+	$(PRINT_COMMAND) ( EMSDK_QUIET=1 . $(TOP)emsdk/emsdk_env.sh && \
+		$(MAKE) $* KIND=wasm BUILDENV=wasm MODEL=dm32 OUTPUT=wasm/ )
 
 color-%:
 	$(PRINT_COMMAND) $(MAKE) $* COLOR=color
