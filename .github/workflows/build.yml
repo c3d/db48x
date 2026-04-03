@@ -43,13 +43,13 @@ jobs:
 
     - name: Deploy Qt dependencies
       run: |
-        macdeployqt sim/db48x.app
+        macdeployqt db48x.app
 
     - name: Code sign macOS app (with Apple Developer certificate)
       if: ${{ env.APPLE_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: sim/db48x.app
+        file: db48x.app
         certificate-data: ${{ secrets.APPLE_CERT_DATA }}
         certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
         apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
@@ -60,12 +60,10 @@ jobs:
     - name: Code sign macOS app (ad-hoc fallback)
       if: ${{ env.APPLE_CERT_DATA == '' }}
       run: |
-        codesign --force --deep --sign - sim/db48x.app
+        codesign --force --deep --sign - db48x.app
 
     - name: Create macOS archive
       run: |
-        cd sim
-        cp ../allow-db48x-macos.sh .
         chmod +x allow-db48x-macos.sh
         zip -r db48x-macos.zip db48x.app allow-db48x-macos.sh
 
@@ -73,7 +71,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: db48x-simulator-macos
-        path: sim/db48x-macos.zip
+        path: db48x-macos.zip
 
   build-simulator-linux:
     name: Build Simulator (Linux)
@@ -108,7 +106,7 @@ jobs:
       with:
         name: db48x-simulator-linux
         path: |
-          sim/db48x
+          db48x
           help/
 
   build-simulator-windows:
@@ -149,7 +147,6 @@ jobs:
     - name: Deploy Qt dependencies
       shell: msys2 {0}
       run: |
-        cd sim/debug
         windeployqt6 db48x.exe
         # Copy MinGW runtime and MSYS2 dependencies
         cp /mingw64/bin/libgcc_s_seh-1.dll .
@@ -183,7 +180,7 @@ jobs:
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: sim/debug/db48x.exe
+        file: debug/db48x.exe
         certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
@@ -192,11 +189,11 @@ jobs:
       with:
         name: db48x-simulator-windows
         path: |
-          sim/debug/db48x.exe
-          sim/debug/*.dll
-          sim/debug/platforms/
-          sim/debug/imageformats/
-          sim/debug/tls/
+          db48x.exe
+          *.dll
+          platforms/
+          imageformats/
+          tls/
           help/
 
   build-color-simulator-macos:
@@ -227,13 +224,13 @@ jobs:
 
     - name: Deploy Qt dependencies
       run: |
-        macdeployqt sim/db50x.app
+        macdeployqt db50x.app
 
     - name: Code sign macOS app (with Apple Developer certificate)
       if: ${{ env.APPLE_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: sim/db50x.app
+        file: db50x.app
         certificate-data: ${{ secrets.APPLE_CERT_DATA }}
         certificate-password: ${{ secrets.APPLE_CERT_PASSWORD }}
         apple-team-id: ${{ secrets.APPLE_TEAM_ID }}
@@ -244,12 +241,10 @@ jobs:
     - name: Code sign macOS app (ad-hoc fallback)
       if: ${{ env.APPLE_CERT_DATA == '' }}
       run: |
-        codesign --force --deep --sign - sim/db50x.app
+        codesign --force --deep --sign - db50x.app
 
     - name: Create macOS archive
       run: |
-        cd sim
-        cp ../allow-db50x-macos.sh .
         chmod +x allow-db50x-macos.sh
         zip -r db50x-macos.zip db50x.app allow-db50x-macos.sh
 
@@ -257,7 +252,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: db50x-color-simulator-macos
-        path: sim/db50x-macos.zip
+        path: db50x-macos.zip
 
   build-color-simulator-linux:
     name: Build Color DM32 Simulator (Linux)
@@ -292,7 +287,7 @@ jobs:
       with:
         name: db50x-color-simulator-linux
         path: |
-          sim/db50x
+          db50x
           help/
 
   build-color-simulator-windows:
@@ -333,7 +328,6 @@ jobs:
     - name: Deploy Qt dependencies
       shell: msys2 {0}
       run: |
-        cd sim/debug
         windeployqt6 db50x.exe
         # Copy MinGW runtime and MSYS2 dependencies
         cp /mingw64/bin/libgcc_s_seh-1.dll .
@@ -367,7 +361,7 @@ jobs:
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: sim/debug/db50x.exe
+        file: debug/db50x.exe
         certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
@@ -376,11 +370,11 @@ jobs:
       with:
         name: db50x-color-simulator-windows
         path: |
-          sim/debug/db50x.exe
-          sim/debug/*.dll
-          sim/debug/platforms/
-          sim/debug/imageformats/
-          sim/debug/tls/
+          debug/db50x.exe
+          debug/*.dll
+          debug/platforms/
+          debug/imageformats/
+          debug/tls/
           help/
 
   build-wasm:
@@ -467,10 +461,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
-        # Generate version.h, qrc files, and recorder config
-        make src/dmcp/version.h
-        make sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
-        cd recorder && make TARGET=opt && cd ..
         # Build Android app (signed if keystore available, unsigned otherwise)
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p $HOME/.local
@@ -546,10 +536,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
-        # Generate version.h, qrc files, and recorder config
-        make src/dmcp/version.h
-        make COLOR=color sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
-        cd recorder && make TARGET=opt && cd ..
         # Build Android app (signed if keystore available, unsigned otherwise)
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p $HOME/.local
