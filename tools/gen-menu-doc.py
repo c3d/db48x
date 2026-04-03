@@ -23,6 +23,8 @@ import sys
 from pathlib import Path
 
 ROOT      = Path(__file__).resolve().parent.parent
+# Explicit UTF-8: Windows defaults read_text/write_text to the locale (e.g. cp1252).
+TEXT_ENCODING = 'utf-8'
 MENU_CC   = ROOT / 'src'  / 'menu.cc'
 UI_CC     = ROOT / 'src'  / 'user_interface.cc'
 IDS_TBL   = ROOT / 'src'  / 'ids.tbl'
@@ -128,7 +130,7 @@ def parse_ids_tbl(path):
     CMD(X)           → X → 'X'
     NAMED(X, "y")    → X → 'y'
     """
-    text = strip_c_comments(path.read_text())
+    text = strip_c_comments(path.read_text(encoding=TEXT_ENCODING))
     names = {}
     for m in re.finditer(r'\bCMD\s*\(\s*(\w+)\s*\)', text):
         names.setdefault(m.group(1), m.group(1))
@@ -209,7 +211,7 @@ def parse_menu_cc(path):
     """
     from collections import OrderedDict
     menus = OrderedDict()
-    text  = strip_c_comments(path.read_text())
+    text  = strip_c_comments(path.read_text(encoding=TEXT_ENCODING))
 
     macro_re = re.compile(r'\bMENU\s*\(')
     pos = 0
@@ -266,7 +268,9 @@ def build_conflicts(doc_root, menu_names):
     for md in sorted(doc_root.glob('**/*.md')):
         if md.name.startswith('8-menus-tree-'):
             continue
-        for m in re.finditer(r'^#{1,3} (.+)$', md.read_text(), re.MULTILINE):
+        for m in re.finditer(r'^#{1,3} (.+)$',
+                             md.read_text(encoding=TEXT_ENCODING),
+                             re.MULTILINE):
             h = m.group(1).strip()
             if h in menu_names and h not in conflicts:
                 conflicts[h] = _gh_anchor(h)
@@ -289,7 +293,9 @@ def build_doc_index(doc_dir):
     for md in sorted(doc_dir.glob('*.md')):
         rel    = f'commands/{md.name}'
         seen   = {}   # base_anchor → count, for deduplication within this file
-        for m in re.finditer(r'^#{1,3} (.+)$', md.read_text(), re.MULTILINE):
+        for m in re.finditer(r'^#{1,3} (.+)$',
+                             md.read_text(encoding=TEXT_ENCODING),
+                             re.MULTILINE):
             h        = m.group(1).strip()
             base_anc = _gh_anchor(h)
             # GitHub dedup: first occurrence is plain, then -1, -2, ...
@@ -475,7 +481,7 @@ def parse_keymap(path):
     Returns dict: id_name → list[(plane, key_const)]
     plane: 0=unshifted, 1=🟨, 2=🟦
     """
-    text = path.read_text()
+    text = path.read_text(encoding=TEXT_ENCODING)
     table_names = [
         'defaultUnshiftedCommand',
         'defaultShiftedCommand',
@@ -657,7 +663,7 @@ def main():
             out.append(f'### {name}\n')
         out.append('_Content loaded dynamically at runtime._\n')
 
-    output.write_text('\n'.join(out) + '\n')
+    output.write_text('\n'.join(out) + '\n', encoding=TEXT_ENCODING)
     print(f'→ {output.relative_to(ROOT)}  ({len(menus)} menus)', file=sys.stderr)
 
 
