@@ -138,6 +138,7 @@ jobs:
           mingw-w64-x86_64-qt6-declarative
           mingw-w64-x86_64-qt6-multimedia
           mingw-w64-x86_64-qt6-translations
+          mingw-w64-x86_64-qt6-tools
 
     - name: Build simulator
       shell: msys2 {0}
@@ -194,6 +195,7 @@ jobs:
           platforms/
           imageformats/
           tls/
+          translations/
           help/
 
   build-color-simulator-macos:
@@ -319,6 +321,7 @@ jobs:
           mingw-w64-x86_64-qt6-declarative
           mingw-w64-x86_64-qt6-multimedia
           mingw-w64-x86_64-qt6-translations
+          mingw-w64-x86_64-qt6-tools
 
     - name: Build color DM32 simulator
       shell: msys2 {0}
@@ -375,6 +378,7 @@ jobs:
           debug/platforms/
           debug/imageformats/
           debug/tls/
+          debug/translations/
           help/
 
   build-wasm:
