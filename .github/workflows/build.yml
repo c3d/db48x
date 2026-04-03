@@ -465,21 +465,12 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
-        # Build Android app (signed if keystore available, unsigned otherwise)
+        export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
-          mkdir -p $HOME/.local
-          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
-          make android
-        else
-          cd sim && \
-            $QT_ROOT_DIR/bin/qmake -spec android-clang db48x.pro && \
-            make VARIANT=android && \
-            mkdir -p ../android/libs/arm64-v8a && \
-            cp libdb48x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
-            $QT_HOST_PATH/bin/androiddeployqt \
-              --input android-db48x-deployment-settings.json \
-              --output ../android --gradle --aab
+          mkdir -p "$HOME/.local"
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > "$HOME/.local/android_release.keystore"
         fi
+        make android
       env:
         ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
 
@@ -540,21 +531,12 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
         export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
-        # Build Android app (signed if keystore available, unsigned otherwise)
+        export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
-          mkdir -p $HOME/.local
-          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > $HOME/.local/android_release.keystore
-          make color-android
-        else
-          cd sim && \
-            $QT_ROOT_DIR/bin/qmake -spec android-clang db50x.pro && \
-            make VARIANT=android && \
-            mkdir -p ../android/libs/arm64-v8a && \
-            cp libdb50x_arm64-v8a.so ../android/libs/arm64-v8a/ && \
-            $QT_HOST_PATH/bin/androiddeployqt \
-              --input android-db50x-deployment-settings.json \
-              --output ../android --gradle --aab
+          mkdir -p "$HOME/.local"
+          echo "$ANDROID_KEYSTORE_DATA" | base64 -d > "$HOME/.local/android_release.keystore"
         fi
+        make color-dm32-android
       env:
         ANDROID_KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASS }}
 

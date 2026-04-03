@@ -504,8 +504,11 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 	$(PRINT_COPY) cp $< $@
 
 #------------------------------------------------------------------------------
-# Android App Bundle for Google Play (requires ANDROID_KEYSTORE_PASS env)
+# Android App Bundle for Google Play
 #------------------------------------------------------------------------------
+# Signing: if $(ANDROID_KEYSTORE) exists and ANDROID_KEYSTORE_PASS is non-empty,
+# androiddeployqt signs the AAB; otherwise an unsigned bundle is produced (and
+# a warning is printed). Override ANDROID_DEPLOY_QT / ANDROID_QT_BASE as needed.
 
 ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
@@ -513,17 +516,25 @@ ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
 ANDROID_QT_BASE ?= /Volumes/Qt/6.8.1
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
-ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/macos/bin/androiddeployqt
+# Host kit: macOS uses .../macos/bin; Linux CI and typical offline installs use gcc_64
+ANDROID_QT_HOST_SUBDIR_Darwin = macos
+ANDROID_QT_HOST_SUBDIR_Linux = gcc_64
+ANDROID_QT_HOST_SUBDIR ?= $(or $(ANDROID_QT_HOST_SUBDIR_$(HOST_OS_NAME)),gcc_64)
+ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/$(ANDROID_QT_HOST_SUBDIR)/bin/androiddeployqt
 ANDROID_KEYSTORE ?= $(HOME)/.local/android_release.keystore
-ANDROID_JAVA_HOME ?= $(shell /usr/libexec/java_home -v 17 2>/dev/null || \
-                             /usr/libexec/java_home -v 21 2>/dev/null || \
-                             true)
+ANDROID_JAVA_HOME ?= $(or $(JAVA_HOME),					    \
+			$(shell /usr/libexec/java_home -v 17 2>/dev/null || \
+				/usr/libexec/java_home -v 21 2>/dev/null || \
+				true))
+ANDROID_CAN_SIGN := $(and $(wildcard $(ANDROID_KEYSTORE)),$(strip $(ANDROID_KEYSTORE_PASS)))
+ANDROID_DEPLOY_SIGN_FLAGS = $(if $(ANDROID_CAN_SIGN),\
+	--sign $(ANDROID_KEYSTORE) $(NAME) --storepass '$(ANDROID_KEYSTORE_PASS)',)
 QMAKE = $(ANDROID_QT_BIN)/qmake
 QMAKE_SPECS = android-clang
 QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
 		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
-		export JAVA_HOME=$(ANDROID_JAVA_HOME) ;
+		export JAVA_HOME=$(ANDROID_JAVA_HOME);
 AAB_FILE=$(OUTPUT:%=%/)$(NAME).aab
 
 android-$(TARGET): $(AAB_FILE)
@@ -532,9 +543,9 @@ android-%: qt-%
 # Additional dependencies for Android build
 $(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
 
-# Deploy and sign the AAB via androiddeployqt. androiddeployqt expects the .so
-# at <output>/libs/arm64-v8a/; the qmake build puts it in DESTDIR, so we must
-# run make install INSTALL_ROOT=<output> first.
+# Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
+# expects the .so at <output>/libs/arm64-v8a/; the qmake build puts it in
+# DESTDIR, so we must run make install INSTALL_ROOT=<output> first.
 $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 	$(PRINT_COMMAND) 						\
 		AAB="$(abspath $@)";					\
@@ -544,8 +555,8 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		$(ANDROID_DEPLOY_QT)					\
 		  --input android-$(NAME)-deployment-settings.json	\
 		  --output "$$AAB" --gradle --aab			\
-		  --sign $(ANDROID_KEYSTORE) $(NAME)			\
-		  --storepass '$(ANDROID_KEYSTORE_PASS)'
+		  $(ANDROID_DEPLOY_SIGN_FLAGS)
+	$(if $(ANDROID_CAN_SIGN),,$(PRINT_COMMAND) $(INFO) "[WARNING]" "Android AAB is UNSIGNED (need $(ANDROID_KEYSTORE) and ANDROID_KEYSTORE_PASS). Not for Play Store.")
 
 endif
 
