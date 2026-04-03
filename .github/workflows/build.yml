@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -68,7 +68,7 @@ jobs:
         zip -r db48x-macos.zip db48x.app allow-db48x-macos.sh
 
     - name: Upload simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-simulator-macos
         path: db48x-macos.zip
@@ -79,7 +79,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -102,7 +102,7 @@ jobs:
         make sim
 
     - name: Upload simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-simulator-linux
         path: |
@@ -117,7 +117,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -186,7 +186,7 @@ jobs:
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
     - name: Upload simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-simulator-windows
         path: |
@@ -206,7 +206,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -251,7 +251,7 @@ jobs:
         zip -r db50x-macos.zip db50x.app allow-db50x-macos.sh
 
     - name: Upload color simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-color-simulator-macos
         path: db50x-macos.zip
@@ -262,7 +262,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -285,7 +285,7 @@ jobs:
         make color-dm32-sim
 
     - name: Upload color simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-color-simulator-linux
         path: |
@@ -300,7 +300,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -369,7 +369,7 @@ jobs:
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
     - name: Upload color simulator artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-color-simulator-windows
         path: |
@@ -384,10 +384,13 @@ jobs:
   build-wasm:
     name: Build WebAssembly
     runs-on: ubuntu-latest
+    # setup-emsdk@v14 still declares node20; opt into Node 24 until a new release.
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -412,7 +415,7 @@ jobs:
         make SHELL=/bin/bash wasm
 
     - name: Upload WASM artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-wasm
         path: |
@@ -429,7 +432,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -480,7 +483,7 @@ jobs:
         find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Upload Android artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-android
         path: |
@@ -495,7 +498,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -546,7 +549,7 @@ jobs:
         find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Upload Android artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-android
         path: |
@@ -559,7 +562,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -575,7 +578,7 @@ jobs:
         mv db48x-v*.tgz db48x-dm42-firmware.tgz
 
     - name: Upload DM42 firmware artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db48x-dm42-firmware
         path: db48x-dm42-firmware.tgz
@@ -586,7 +589,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -602,7 +605,7 @@ jobs:
         mv db50x-v*.tgz db50x-dm32-firmware.tgz
 
     - name: Upload DM32 firmware artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-dm32-firmware
         path: db50x-dm32-firmware.tgz
@@ -613,7 +616,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
 
@@ -629,7 +632,7 @@ jobs:
         mv db50x-v*.tgz db50x-dm42n-firmware.tgz
 
     - name: Upload DM42n firmware artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: db50x-dm42n-firmware
         path: db50x-dm42n-firmware.tgz
@@ -655,7 +658,7 @@ jobs:
 
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
 
     - name: Display structure of downloaded files
       run: ls -R
@@ -680,7 +683,7 @@ jobs:
         cp db50x-color-simulator-macos/db50x-macos.zip db50x-color-simulator-macos-${GITHUB_SHA:0:8}.zip
 
     - name: Upload release packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: release-packages
         path: |
@@ -714,12 +717,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0  # Fetch full history for tag access
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         path: artifacts/
 
