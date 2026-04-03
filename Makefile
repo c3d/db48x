@@ -331,6 +331,97 @@ dm42n-%:
 
 
 # ------------------------------------------------------------------------------
+# Building the tools
+# ------------------------------------------------------------------------------
+
+TOOLS_BUILDS=$(dir $(wildcard tools/*/Makefile))
+TOOLS=$(foreach t,$(TOOLS_BUILDS),$t$(notdir $(t:%/=%)))
+tools: $(TOOLS)
+tools/%:
+	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D)
+
+clangdb: clangdb-color-dm32-sim
+clangdb-%: .ALWAYS
+	@rm -rf .build && bear -- make v-$(TARGET) V=1 VERBOSE=1 $*
+
+
+# ------------------------------------------------------------------------------
+# Generated sources: fonts, decimals, version (after .recurse so tools exist)
+# ------------------------------------------------------------------------------
+
+MENUS_TREE   = doc/8-menus-tree-$(if $(filter dm42n,$(MODEL)),dm42,$(MODEL)).md
+HELP_SOURCES = $(filter-out doc/8-menus-tree-%.md,$(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)) $(MENUS_TREE)
+PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
+PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
+HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
+VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
+VERSION_H = src/$(PLATFORM)/version.h
+CHUCK_H = src/$(PLATFORM)/chuck-norris.h
+FONTS=Editor Help Reduced Stack
+
+.prebuild:	$(FONTS:%=fonts/%Font.cc)			\
+		src/decimal-pi.h src/decimal-e.h		\
+		$(VERSION_H)					\
+		$(CHUCK_H)
+
+fonts/EditorFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 48 -S 80 -y -10 EditorFont $(BASE_FONT) $@
+fonts/StackFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 32 -S 80 -y -8 StackFont $(BASE_FONT) $@
+fonts/ReducedFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
+fonts/HelpFont.cc: $(BASE_FONT) | $(TTF2FONT)
+	$(PRINT_GENERATE) $(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
+
+src/decimal-pi.h: src/decimal-pi.txt | $(DECIMIZE)
+	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_pi
+src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
+	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
+
+VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
+CHUCK_GIT_H=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h
+$(VERSION_H): $(VERSION_GIT_H)
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) cp $< $@
+$(VERSION_GIT_H):
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) echo '#define DB48X_VERSION "$(VERSION)"' > $@
+$(CHUCK_H): $(CHUCK_GIT_H)
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) cp $< $@
+$(CHUCK_GIT_H):
+	@mkdir -p $(@D)
+	$(PRINT_GENERATE) tools/generate-chuck.sh > $@
+
+# ------------------------------------------------------------------------------
+# Help generation (lifted from Makefile)
+# ------------------------------------------------------------------------------
+
+.prebuild: help/$(NAME).md help/$(NAME).idx
+help/$(NAME).md: $(HELP_SOURCES)
+	@mkdir -p help
+	@cat $^ | sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
+	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
+	    -e '/<!--- KEEP_IT --->/d' \
+	    -e '/<!--- !KEEP_IT --->/d' \
+	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
+	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
+	    -e 's/db48x.md/$(NAME).md/g' \
+	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
+	@cp doc/*.png help/ 2>/dev/null || true
+	@mkdir -p help/img
+	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
+
+doc/8-menus-tree-dm42.md doc/8-menus-tree-dm32.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
+	python3 tools/gen-menu-doc.py --model dm42
+	python3 tools/gen-menu-doc.py --model dm32
+
+help/$(NAME).idx: help/$(NAME).md
+	@grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
+	@[ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
+
+
+# ------------------------------------------------------------------------------
 #  Qt-hosted builds - Library built here, Qt-based app in sim/db48x.pro
 # ------------------------------------------------------------------------------
 
@@ -348,12 +439,13 @@ QRC_FILES=		sim/config.qrc		\
 			sim/help/img.qrc
 
 # Build Qt simulator directly with qmake
-qt-$(TARGET): $(QMAKEFILE) $(VERSION_H) $(CHUCK_H).config
+qt-$(TARGET): $(QMAKEFILE)
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F)
-qt-%: $(QMAKEFILE) .config
+qt-%: $(QMAKEFILE)
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
 
-$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)
+$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)	\
+		$(VERSION_H) $(CHUCK_H) .config
 	$(PRINT_COMMAND) 				\
 		DESTDIR="$(abspath $(or $(OUTPUT),.))";	\
 		cd sim &&				\
@@ -456,98 +548,6 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		  --storepass '$(ANDROID_KEYSTORE_PASS)'
 
 endif
-
-
-# ------------------------------------------------------------------------------
-# Building the tools
-# ------------------------------------------------------------------------------
-
-TOOLS_BUILDS=$(dir $(wildcard tools/*/Makefile))
-TOOLS=$(foreach t,$(TOOLS_BUILDS),$t$(notdir $(t:%/=%)))
-tools: $(TOOLS)
-tools/%:
-	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D)
-
-clangdb: clangdb-color-dm32-sim
-clangdb-%: .ALWAYS
-	@rm -rf .build && bear -- make v-$(TARGET) V=1 VERBOSE=1 $*
-
-
-# ------------------------------------------------------------------------------
-# Generated sources: fonts, decimals, version (after .recurse so tools exist)
-# ------------------------------------------------------------------------------
-
-MENUS_TREE   = doc/8-menus-tree-$(if $(filter dm42n,$(MODEL)),dm42,$(MODEL)).md
-HELP_SOURCES = $(filter-out doc/8-menus-tree-%.md,$(wildcard doc/*.md doc/calc-help/*.md doc/commands/*.md)) $(MENUS_TREE)
-PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
-PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
-HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
-VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
-VERSION_H = src/$(PLATFORM)/version.h
-CHUCK_H = src/$(PLATFORM)/chuck-norris.h
-
-FONTS=Editor Help Reduced Stack
-
-.prebuild:	$(FONTS:%=fonts/%Font.cc)			\
-		src/decimal-pi.h src/decimal-e.h		\
-		$(VERSION_H)					\
-		$(CHUCK_H)
-
-fonts/EditorFont.cc: $(BASE_FONT) | $(TTF2FONT)
-	$(PRINT_GENERATE) $(TTF2FONT) -s 48 -S 80 -y -10 EditorFont $(BASE_FONT) $@
-fonts/StackFont.cc: $(BASE_FONT) | $(TTF2FONT)
-	$(PRINT_GENERATE) $(TTF2FONT) -s 32 -S 80 -y -8 StackFont $(BASE_FONT) $@
-fonts/ReducedFont.cc: $(BASE_FONT) | $(TTF2FONT)
-	$(PRINT_GENERATE) $(TTF2FONT) -s 24 -S 80 -y -5 ReducedFont $(BASE_FONT) $@
-fonts/HelpFont.cc: $(BASE_FONT) | $(TTF2FONT)
-	$(PRINT_GENERATE) $(TTF2FONT) -s 18 -S 80 -y -3 HelpFont $(BASE_FONT) $@
-
-src/decimal-pi.h: src/decimal-pi.txt | $(DECIMIZE)
-	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_pi
-src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
-	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
-
-VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
-CHUCK_GIT_H=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h
-$(VERSION_H): $(VERSION_GIT_H)
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) cp $< $@
-$(VERSION_GIT_H):
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) echo '#define DB48X_VERSION "$(VERSION)"' > $@
-$(CHUCK_H): $(CHUCK_GIT_H)
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) cp $< $@
-$(CHUCK_GIT_H):
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) tools/generate-chuck.sh > $@
-
-# ------------------------------------------------------------------------------
-# Help generation (lifted from Makefile)
-# ------------------------------------------------------------------------------
-
-.prebuild: help/$(NAME).md help/$(NAME).idx
-help/$(NAME).md: $(HELP_SOURCES)
-	@mkdir -p help
-	@cat $^ | sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
-	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
-	    -e '/<!--- KEEP_IT --->/d' \
-	    -e '/<!--- !KEEP_IT --->/d' \
-	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
-	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
-	    -e 's/db48x.md/$(NAME).md/g' \
-	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
-	@cp doc/*.png help/ 2>/dev/null || true
-	@mkdir -p help/img
-	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
-	
-doc/8-menus-tree-dm42.md doc/8-menus-tree-dm32.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
-	python3 tools/gen-menu-doc.py --model dm42
-	python3 tools/gen-menu-doc.py --model dm32
-
-help/$(NAME).idx: help/$(NAME).md
-	@grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
-	@[ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
 
 
 # ------------------------------------------------------------------------------
