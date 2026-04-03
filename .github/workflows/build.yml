@@ -152,8 +152,7 @@ jobs:
         cp /mingw64/bin/libgcc_s_seh-1.dll .
         cp /mingw64/bin/libstdc++-6.dll .
         cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libsystre-0.dll .
-        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libgnurx-0.dll .
         cp /mingw64/bin/libintl-8.dll .
         cp /mingw64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
@@ -333,8 +332,7 @@ jobs:
         cp /mingw64/bin/libgcc_s_seh-1.dll .
         cp /mingw64/bin/libstdc++-6.dll .
         cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libsystre-0.dll .
-        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libgnurx-0.dll .
         cp /mingw64/bin/libintl-8.dll .
         cp /mingw64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
