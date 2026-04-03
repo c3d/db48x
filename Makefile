@@ -130,6 +130,7 @@ CONFIG_sim=							\
 	setlinebuf						\
 	sigstksz						\
 	strsignal
+CONFIG_android=$(CONFIG_sim)
 
 SOURCES =							\
 	src/$(PLATFORM)/target.cc				\
