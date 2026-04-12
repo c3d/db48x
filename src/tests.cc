@@ -56,13 +56,14 @@ RECORDER(tests, 256, "Information about tests");
 RECORDER_TWEAK_DEFINE(snapshots, 0, "Record snapshots for failing tests");
 RECORDER_DECLARE(errors);
 
-uint    tests::default_wait_time  = 2000;
-uint    tests::key_delay_time     = 0;
-uint    tests::refresh_delay_time = 20;
-uint    tests::image_wait_time    = 500;
-cstring tests::dump_on_fail       = nullptr;
-bool    tests::running            = false;
-bool    tests::simulate_typing    = false;
+uint        tests::default_wait_time  = 2000;
+uint        tests::key_delay_time     = 0;
+uint        tests::refresh_delay_time = 20;
+uint        tests::image_wait_time    = 500;
+cstring     tests::dump_on_fail       = nullptr;
+std::string tests::testing_path       = ".";
+bool        tests::running            = false;
+bool        tests::simulate_typing    = false;
 
 #define TEST_CATEGORY(name, enabled, descr)                     \
     RECORDER_TWEAK_DEFINE(est_##name, enabled, "Test " descr);  \
@@ -7999,7 +8000,7 @@ void tests::solver_testing()
     step("Jacobian solver, circle and line with singular initial Jacobian")
         .test(CLEAR, "{ 'X^2+Y^2=1' 'X+Y=0' } { X Y } { 0 0 } ROOT", ENTER)
         .expect("{ X=-0.70710 67811 87 Y=0.70710 67811 87 }");
-    
+
     step("Jacobian solver, ln equations with singular Jacobian at initial guess")
         .test(CLEAR, "{ 'LN(X)+Y=0' 'LN(Y)+X=0' } { X Y } { 1 1 } ROOT", ENTER)
         .expect("{ X=0.56714 32904 1 Y=0.56714 32904 1 }");
@@ -13789,11 +13790,13 @@ void tests::check_help_examples()
                     bool fails = failures.size() > nfailures;
                     if (fails || skiptest)
                     {
+                        passfail(!skiptest ? 0 : fails ? 1 : -1);
+
                         std::string grep = "grep -inr '^##*";
                         grep += topic;
-                        grep += "$' doc";
-                        passfail(!skiptest ? 0 : fails ? 1 : -1);
+                        grep += "$' " + testing_path + "/doc";
                         system(grep.c_str());
+
                         if (skiptest && fails)
                             ok = -1;
                     }

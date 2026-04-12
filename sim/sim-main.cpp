@@ -165,7 +165,10 @@ int main(int argc, char *argv[])
             object::name(object::id(128)),
             uint(object::NUM_IDS),
             HELPFILE_NAME);
-    testDirectory = QDir::current();
+    if (cstring doc = getenv("DB48X_DOCPATH"))
+        tests::testing_path = std::string(doc);
+    else
+        tests::testing_path = QDir::current().absolutePath().toUtf8();
 
     record(options,
            "Simulator invoked as %+s with %d arguments", argv[0], argc-1);

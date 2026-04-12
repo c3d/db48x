@@ -1500,7 +1500,7 @@ bool tests::image_match(cstring file, int x, int y, int w, int h, bool force)
 #ifdef CONFIG_COLOR
     name = "color-" + name;
 #  endif // CONFIG_COLOR
-    name = testDirectory.filePath(name);
+    name = QDir(QString::fromUtf8(testing_path)).filePath(name);
     QFileInfo reference(name);
     if (force || !reference.exists() || !data.load(name, "PNG"))
     {

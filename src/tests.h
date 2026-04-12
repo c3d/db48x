@@ -501,6 +501,7 @@ public:
     static uint          refresh_delay_time;
     static uint          image_wait_time;
     static cstring       dump_on_fail;
+    static std::string   testing_path;
     static bool          running;
     static bool          simulate_typing;
 };
