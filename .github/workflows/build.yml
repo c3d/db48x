@@ -401,6 +401,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y libfreetype6-dev pkg-config
 
+    - name: Generate recorder config header
+      run: |
+        make -C recorder TARGET=opt BUILDENV=auto RECURSE=.config .config
+        cp recorder/.build/linux/opt/config.h recorder/config.h
+
     - name: Setup Emscripten
       uses: mymindstorm/setup-emsdk@v14
       with:
