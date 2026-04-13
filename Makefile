@@ -379,7 +379,7 @@ TOOLS_BUILDS=$(dir $(wildcard tools/*/Makefile))
 TOOLS=$(foreach t,$(TOOLS_BUILDS),$t$(notdir $(t:%/=%)))
 tools: $(TOOLS)
 tools/%:
-	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D)
+	$(PRINT_COMMAND) cd tools/$(*D) && $(MAKE) BUILDENV=auto TIME= DO_INSTALL= VARIANT=$(*D) OUTPUT=./
 
 clangdb: clangdb-color-dm32-sim
 clangdb-%: .ALWAYS
