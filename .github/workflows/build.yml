@@ -140,11 +140,11 @@ jobs:
           mingw-w64-x86_64-qt6-translations
           mingw-w64-x86_64-qt6-tools
 
-    - name: Build simulator
+    - name: Build debug simulator
       shell: msys2 {0}
       run: |
         echo "${{ github.run_number }}" > .build_id
-        mingw32-make sim
+        mingw32-make debug-sim
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -182,7 +182,7 @@ jobs:
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: debug/db48x.exe
+        file: db48x.exe
         certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
@@ -324,11 +324,11 @@ jobs:
           mingw-w64-x86_64-qt6-translations
           mingw-w64-x86_64-qt6-tools
 
-    - name: Build color DM32 simulator
+    - name: Build debug color DM32 simulator
       shell: msys2 {0}
       run: |
         echo "${{ github.run_number }}" > .build_id
-        mingw32-make color-dm32-sim
+        mingw32-make debug-color-dm32-sim
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -366,7 +366,7 @@ jobs:
       if: ${{ env.WINDOWS_CERT_DATA != '' }}
       uses: lando/code-sign-action@v3
       with:
-        file: debug/db50x.exe
+        file: db50x.exe
         certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
         certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
@@ -375,12 +375,12 @@ jobs:
       with:
         name: db50x-color-simulator-windows
         path: |
-          debug/db50x.exe
-          debug/*.dll
-          debug/platforms/
-          debug/imageformats/
-          debug/tls/
-          debug/translations/
+          db50x.exe
+          *.dll
+          platforms/
+          imageformats/
+          tls/
+          translations/
           help/
 
   build-wasm:

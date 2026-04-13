@@ -6,7 +6,8 @@ This directory contains GitHub Actions workflows for automated building and test
 
 ### build.yml
 
-Main build workflow that runs on every push and pull request to main/master/develop branches.
+Main build workflow that runs on pushes and pull requests for the `stable` and
+`dev` branches, plus manual dispatches, published releases, and version tags.
 
 #### Jobs
 
@@ -28,8 +29,8 @@ Main build workflow that runs on every push and pull request to main/master/deve
 
 3. **build-simulator-windows** - Builds the Windows simulator
    - Platform: Windows (latest)
-   - Requirements: Qt 6.7.3 (includes MinGW 9.0), MSYS2 (FreeType, pkg-config)
-   - Target: `mingw32-make sim`
+   - Requirements: MSYS2 MinGW64 with Qt 6 packages, `libsystre`, FreeType, and `pkg-config`
+   - Target: `mingw32-make debug-sim`
    - Build ID: Uses GitHub Actions run number
    - Artifacts: `db48x.exe`, DLLs, help files
 
@@ -51,8 +52,8 @@ Main build workflow that runs on every push and pull request to main/master/deve
 
 6. **build-color-simulator-windows** - Builds the color DM32 simulator for Windows
    - Platform: Windows (latest)
-   - Requirements: Qt 6.7.3 (includes MinGW 9.0), MSYS2 (FreeType, pkg-config)
-   - Target: `mingw32-make color-dm32-sim`
+   - Requirements: MSYS2 MinGW64 with Qt 6 packages, `libsystre`, FreeType, and `pkg-config`
+   - Target: `mingw32-make debug-color-dm32-sim`
    - Build ID: Uses GitHub Actions run number
    - Artifacts: `db50x.exe`, DLLs, help files
 
@@ -96,9 +97,9 @@ Main build workflow that runs on every push and pull request to main/master/deve
    - Artifacts: Distribution tarball (`db50x-v*.tgz`) with `.pg5`, `_qspi.bin`, help files
 
 12. **build-release-package** - Creates release packages
-    - Runs only on pushes to main/master
-    - Depends on all other build jobs
-    - Creates `.tar.gz` archives of firmware builds
+   - Runs only for version-tag pushes
+   - Depends on all other build jobs
+   - Creates `.tar.gz` archives of firmware builds
 
 ## Code Signing
 
