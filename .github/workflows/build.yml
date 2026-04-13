@@ -133,7 +133,7 @@ jobs:
           mingw-w64-x86_64-make
           mingw-w64-x86_64-freetype
           mingw-w64-x86_64-pkg-config
-          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-libsystre
           mingw-w64-x86_64-qt6-base
           mingw-w64-x86_64-qt6-declarative
           mingw-w64-x86_64-qt6-multimedia
@@ -154,7 +154,8 @@ jobs:
         cp /mingw64/bin/libgcc_s_seh-1.dll .
         cp /mingw64/bin/libstdc++-6.dll .
         cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libgnurx-0.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
         cp /mingw64/bin/libintl-8.dll .
         cp /mingw64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
@@ -316,7 +317,7 @@ jobs:
           mingw-w64-x86_64-make
           mingw-w64-x86_64-freetype
           mingw-w64-x86_64-pkg-config
-          mingw-w64-x86_64-libgnurx
+          mingw-w64-x86_64-libsystre
           mingw-w64-x86_64-qt6-base
           mingw-w64-x86_64-qt6-declarative
           mingw-w64-x86_64-qt6-multimedia
@@ -337,7 +338,8 @@ jobs:
         cp /mingw64/bin/libgcc_s_seh-1.dll .
         cp /mingw64/bin/libstdc++-6.dll .
         cp /mingw64/bin/libwinpthread-1.dll .
-        cp /mingw64/bin/libgnurx-0.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
         cp /mingw64/bin/libintl-8.dll .
         cp /mingw64/bin/libiconv-2.dll .
         # Copy all Qt dependency DLLs
