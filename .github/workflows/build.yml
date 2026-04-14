@@ -23,14 +23,14 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.1'
+        version: '6.8.3'
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
@@ -79,7 +79,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -91,7 +91,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.5.3'
+        version: '6.8.3'
         host: 'linux'
         target: 'desktop'
         modules: 'qtmultimedia'
@@ -117,7 +117,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -207,14 +207,14 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.1'
+        version: '6.8.3'
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
@@ -263,7 +263,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -275,7 +275,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.5.3'
+        version: '6.8.3'
         host: 'linux'
         target: 'desktop'
         modules: 'qtmultimedia'
@@ -301,7 +301,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -386,13 +386,10 @@ jobs:
   build-wasm:
     name: Build WebAssembly
     runs-on: ubuntu-latest
-    # setup-emsdk@v14 still declares node20; opt into Node 24 until a new release.
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -407,7 +404,7 @@ jobs:
         cp recorder/.build/linux/opt/config.h recorder/config.h
 
     - name: Setup Emscripten
-      uses: mymindstorm/setup-emsdk@v14
+      uses: mymindstorm/setup-emsdk@v16
       with:
         version: 'latest'
 
@@ -439,12 +436,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -452,14 +449,14 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.1'
+        version: '6.8.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
         modules: 'qtmultimedia'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
 
     - name: Install Android NDK
       run: |
@@ -510,12 +507,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         distribution: 'temurin'
         java-version: '17'
@@ -523,14 +520,14 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.1'
+        version: '6.8.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
         modules: 'qtmultimedia'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      uses: android-actions/setup-android@v4
 
     - name: Install Android NDK
       run: |
@@ -579,7 +576,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -606,7 +603,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -633,7 +630,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -734,7 +731,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0  # Fetch full history for tag access
 
@@ -782,7 +779,7 @@ jobs:
         git tag -l --format='%(contents)' "${{ github.ref_name }}" > release_notes.md
 
     - name: Create Release and Upload Assets
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ github.ref_name }}
         name: ${{ github.ref_name }}
