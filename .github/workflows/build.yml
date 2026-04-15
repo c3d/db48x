@@ -486,14 +486,19 @@ jobs:
 
     - name: List generated AAB files
       run: |
-        echo "Looking for AAB files in android directory:"
-        find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+        echo "Looking for AAB files in workspace:"
+        find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Verify generated AAB
+      run: test -f android/db48x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7
       with:
         name: db48x-android
+        if-no-files-found: error
         path: |
+          android/*.aab
           android/**/*.aab
           help/
 
@@ -552,14 +557,19 @@ jobs:
 
     - name: List generated AAB files
       run: |
-        echo "Looking for AAB files in android directory:"
-        find android -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+        echo "Looking for AAB files in workspace:"
+        find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
+
+    - name: Verify generated AAB
+      run: test -f android/db50x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7
       with:
         name: db50x-android
+        if-no-files-found: error
         path: |
+          android/*.aab
           android/**/*.aab
           help/
 
@@ -759,10 +769,12 @@ jobs:
         mv artifacts/db50x-dm32-*.tar.gz releases/db50x-dm32.tar.gz
         mv artifacts/db50x-dm42n-*.tar.gz releases/db50x-dm42n.tar.gz
 
-    - name: Move Android artifacts
+    - name: Package Android artifacts
       run: |
-        mv artifacts/db48x-android-*.tar.gz releases/db48x-android.tar.gz
-        mv artifacts/db50x-android-*.tar.gz releases/db50x-android.tar.gz
+        cd artifacts/db48x-android
+        tar czf ../../releases/db48x-android.tar.gz *
+        cd ../db50x-android
+        tar czf ../../releases/db50x-android.tar.gz *
 
     - name: Extract tag message for release body
       run: |

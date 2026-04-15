@@ -576,7 +576,10 @@ QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
 		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
 		export JAVA_HOME=$(ANDROID_JAVA_HOME);
-AAB_FILE=$(OUTPUT:%=%/)$(NAME).aab
+# make-it-quick defaults OUTPUT to the workspace root; keep Android bundles
+# under android/ unless the caller overrides ANDROID_OUTPUT_DIR explicitly.
+ANDROID_OUTPUT_DIR ?= android
+AAB_FILE=$(ANDROID_OUTPUT_DIR:%=%/)$(NAME).aab
 
 android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
@@ -585,18 +588,27 @@ android-%: qt-%
 $(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
-# expects the .so at <output>/libs/arm64-v8a/; the qmake build puts it in
-# DESTDIR, so we must run make install INSTALL_ROOT=<output> first.
+# expects a build directory as --output and the .so staged under
+# <output>/libs/arm64-v8a/, so we must run make install INSTALL_ROOT=<output>
+# first. Normalize the final bundle to $(AAB_FILE) so workflows and helper
+# scripts can upload a stable path.
 $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 	$(PRINT_COMMAND) 						\
 		AAB="$(abspath $@)";					\
+		OUTDIR="$(abspath $(dir $@))";				\
+		mkdir -p "$$OUTDIR" &&					\
 		cd sim && 						\
-		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$AAB" &&	\
+		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$OUTDIR" &&	\
 		$(QMAKE_ENV)						\
 		$(ANDROID_DEPLOY_QT)					\
 		  --input android-$(NAME)-deployment-settings.json	\
-		  --output "$$AAB" --gradle --aab			\
-		  $(ANDROID_DEPLOY_SIGN_FLAGS)
+		  --output "$$OUTDIR" --gradle --aab			\
+		  $(ANDROID_DEPLOY_SIGN_FLAGS) &&			\
+		if [ ! -f "$$AAB" ]; then				\
+			BUILT_AAB="$$(find "$$OUTDIR" -type f -name '*.aab' | sort | tail -1)"; \
+			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB"; \
+		fi &&						\
+		test -f "$$AAB"
 	$(if $(ANDROID_CAN_SIGN),,$(PRINT_COMMAND) $(INFO) "[WARNING]" "Android AAB is UNSIGNED (need $(ANDROID_KEYSTORE) and ANDROID_KEYSTORE_PASS). Not for Play Store.")
 
 endif
