@@ -194,7 +194,7 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
             symbol_g arg  = render(depth, argp, editing);
             int      maxp =
                 oid == ID_neg ? precedence::FUNCTION : precedence::SYMBOL;
-            if (argp < maxp)
+            if (argp < maxp || oid == ID_tgamma || oid == ID_lgamma)
                 arg = parentheses(arg);
             precedence = precedence::FUNCTION;
             switch(oid)
@@ -2258,10 +2258,11 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
             int      maxp = (oid == ID_neg
                              ? precedence::MULTIPLICATIVE
                              : precedence::SYMBOL);
-            bool paren = (argp < maxp &&
-                          oid != ID_sqrt && oid != ID_inv && oid != ID_abs &&
-                          oid != ID_exp && oid != ID_exp10 && oid != ID_exp2 &&
-                          oid != ID_cbrt);
+            bool paren = ((argp < maxp &&
+                           oid != ID_sqrt && oid != ID_inv && oid != ID_abs &&
+                           oid != ID_exp && oid != ID_exp10 && oid != ID_exp2 &&
+                           oid != ID_cbrt) ||
+                          oid == ID_tgamma || oid == ID_lgamma);
             if (paren)
                 arg = parentheses(g, arg, 3);
             precedence = precedence::FUNCTION;
