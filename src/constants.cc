@@ -644,7 +644,7 @@ static const cstring basic_constants[] =
     // *Tau mass - Measurement
     "mτ",       "[ 1.90754_u "
                 "  0.00013_u "
-                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' ]",
+                "  'ROUND(UBASE(Ⓢmτ/Ⓒmτ);-2)' ]",
 
     // ------------------------------------------------------------------------
     // *mpme ratio - Measurement

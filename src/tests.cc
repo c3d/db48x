@@ -11988,7 +11988,7 @@ void tests::constants_menu()
         .test(LSHIFT, F4).expect("0.00001 17344 41 nm");
     step("Tau Compton wavelength")
         .test(CLEAR, NOSHIFT, F5).expect("λcτ")
-        .test(LSHIFT, F5).expect("0.00000 06977 7 nm");
+        .test(LSHIFT, F5).expect("0.00000 06977 71 nm");
 
 
     // ------------------------------------------------------------------------
