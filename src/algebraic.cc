@@ -1396,7 +1396,9 @@ algebraic_p algebraic::epsilon(int impr)
 {
     int         disp = Settings.DisplayDigits();
     int         prec = Settings.Precision();
-    int         dig  = std::min(disp + 1, std::max(prec - impr, 3));
+    int         dig  = Settings.DisplayMode() == object::ID_Std
+                           ? std::max(prec - impr, 3)
+                           : std::min(disp + 1, std::max(prec - impr, 3));
     algebraic_p eps  = decimal::make(1, -dig);
     return eps;
 }

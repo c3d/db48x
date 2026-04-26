@@ -7865,7 +7865,6 @@ void tests::solver_testing()
         .test(CLEAR, "'tan(x)=224' 'x' 0 ROOT", ENTER)
         .expect("x=89.74421 69693");
 
-
     step("Solving menu")
         .test(CLEAR, "'A²+B²=C²'", ENTER)
         .test(LSHIFT, KEY7, LSHIFT, F1, F6)
@@ -7873,7 +7872,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.+2.11075 8519⁳⁻¹²'");
+        .expect("'25=25.-7.8⁳⁻²¹'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -8018,6 +8017,25 @@ void tests::solver_testing()
               ("ⒺDe Broglie Wave STEQ SolvingMenu NextEQ"), ENTER,
               LSHIFT, F3)
         .expect("m=9.10938 37139⁳⁻³¹ kg");
+
+    step("Solver with high precision in FIX vs STD mode")
+        .test(CLEAR, "128 PREC", ENTER).noerror()
+        .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
+        .expect("X=0.99985")
+        .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
+        .expect("X=0.99984 77415 31")
+        .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
+        .expect("0");
+
+    step("Solver with regular precision in FIX vs STD mode")
+        .test(CLEAR, "{PREC} PURGE", ENTER)
+        .noerror()
+        .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
+        .expect("X=0.99985")
+        .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
+        .expect("X=0.99984 77415 31")
+        .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
+        .expect("-1.14803⁳⁻¹⁹");
 
     step("Exit: Clear variables")
         .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
@@ -8354,7 +8372,7 @@ void tests::numerical_integration()
     step("Integrate with expression")
         .test(CLEAR, "1 2 '1/X' 'X' INTEGRATE", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_ln, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
+        .test(KEY2, ID_ln, ID_subtract).expect("-3.07⁳⁻²²");
     step("Integration through menu")
         .test(CLEAR, 2, ENTER).expect("2")
         .test(3, ENTER).expect("3")
@@ -8391,7 +8409,7 @@ void tests::numerical_integration()
               ENTER).noerror()
         .test("1 2 '1/X' 'X' ∫", ENTER)
         .noerror().expect("0.69314 71805 6")
-        .test(KEY2, ID_ln, ID_subtract).expect("1.55318 8⁳⁻¹⁸");
+        .test(KEY2, ID_ln, ID_subtract).expect("-3.07⁳⁻²²");
 
     step("Integrate with display-induced imprecision")
         .test(CLEAR, "3 FIX", ENTER).noerror()
