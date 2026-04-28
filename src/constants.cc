@@ -472,9 +472,9 @@ static const cstring basic_constants[] =
 
     // ------------------------------------------------------------------------
     "ⅉ",        "0+ⅈ1",                 // Imaginary unit
-    "rad",      "1_r",                  // One radian
-    "twoπ",     "'2*Ⓒπ'_r",            // Two pi radian
-    "angl",     "180_°",                // Half turn
+    "rad",      "[ 1_r 0_r 0 ]",        // One radian
+    "twoπ",     "[ '2*Ⓒπ'_r 0_r 0 ]",  // Two pi radian
+    "angl",     "[ 180_° 0_° 0 ]",      // Half turn
     "−∞",       "-9.99999E999999",      // A small version of infinity
 
 
@@ -524,7 +524,7 @@ static const cstring basic_constants[] =
                 "  1 g/mol ]",
     // *C12 Molar Mass - Calculation from measurement
     "MC12",     "[ 'ROUND(CONVERT(12*ⒸMu;1_g/mol);XPON(UVAL(ⓇMC12*12*ⒸMu))-XPON(UVAL(12*ⒸMu))-2)' "
-                "  'ROUND(CONVERT(ⓇMC12*ⒸMC12;1_kg/mol);-2)' "
+                "  'ROUND(CONVERT(ⓇMC12*ⒸMC12;1_g/mol);-2)' "
                 "  'ⓇMu' "
                 "  12 g/mol ]",
 
@@ -580,7 +580,7 @@ static const cstring basic_constants[] =
     // ------------------------------------------------------------------------
     // *Vaccuum permittivity - Calculation from measurement
     "ε₀",       "[ 'ROUND(CONVERT(1/(Ⓒμ₀*Ⓒc²);1_F/m);XPON(UVAL(Ⓡε₀/(Ⓒμ₀*Ⓒc²)))-XPON(UVAL(1/(Ⓒμ₀*Ⓒc²)))-2)' "
-                "  'ROUND(UBASE(Ⓡε₀*Ⓒε₀);-2)' "
+                "  'Convert(ROUND(UBASE(Ⓡε₀*Ⓒε₀);-2); 1_F/m)' "
                 "  'Ⓡμ₀' "
                 "  8.854⁳⁻¹² F/m ]",
     // *Vaccuum permeability - Calculation from measurement
@@ -964,9 +964,9 @@ static const cstring basic_constants[] =
 
     "No",                       "False",                // No value = false
     "Yes",                      "True",                 // Yes value = true
-    "UnixEpoch",                "19700101_date",
-    "SinclairZX81RAM",          "1_KiB",
-    "PageSize",                 "4_KiB",
+    "UnixEpoch",                "[ 19700101_date 0_date 0 ]",
+    "SinclairZX81RAM",          "[ 1_KiB 0_KiB 0 ]",
+    "PageSize",                 "[ 4_KiB 0_KiB 0 ]",
     "HelloWorld",               "\"Hello World\""
 };
 //   clang-format on
