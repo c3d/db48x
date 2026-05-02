@@ -1178,7 +1178,7 @@ static const cstring basic_constants[] =
 
     "Astronomy",      nullptr,
 
-"Astronomy/Mercury",     nullptr,
+    "Astronomy/Mercury",     nullptr,
 
     // *Mercury gravitational parameter - Measurement [4]
     "GM☿",      "[ 2.2031868551E13_m³/s² "
@@ -1253,7 +1253,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Venus",     nullptr,
+    "Astronomy/Venus",     nullptr,
 
     // *Venus gravitational parameter - Measurement [4]
     "GM♀",      "[ 3.24858592E14_m³/s² "
@@ -1329,7 +1329,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Earth",     nullptr,
+    "Astronomy/Earth",     nullptr,
 
     // *Earth gravitational parameter - Exact nominal value [3]
     "GM♁",      "[ 3.986004E14_m³/s² "
@@ -1402,7 +1402,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Moon",     nullptr,
+    "Astronomy/Moon",     nullptr,
 
     // *Moon gravitational parameter - Measurement [4]
     "GM☽",      "[ 4.9028001184E12_m³/s² "
@@ -1477,7 +1477,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Mars",     nullptr,
+    "Astronomy/Mars",     nullptr,
 
     // *Mars gravitational parameter - Measurement [4]
     "GM♂",      "[ 4.28283758161E13_m³/s² "
@@ -1552,7 +1552,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Jupiter",     nullptr,
+    "Astronomy/Jupiter",     nullptr,
 
     // *Jupiter gravitational parameter - Exact nominal value [3]
     "GM♃",      "[ 1.26686534E17_m³/s² "
@@ -1622,7 +1622,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Saturn",     nullptr,
+    "Astronomy/Saturn",     nullptr,
 
     // *Saturn gravitational parameter - Measurement [4]
     "GM♄",      "[ 3.79405848418E16_m³/s² "
@@ -1696,7 +1696,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Uranus",     nullptr,
+    "Astronomy/Uranus",     nullptr,
 
     // *Uranus gravitational parameter - Measurement [4]
     "GM⛢",      "[ 5.7945564E15_m³/s² "
@@ -1770,7 +1770,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Neptune",     nullptr,
+    "Astronomy/Neptune",     nullptr,
 
     // *Neptune gravitational parameter - Measurement [4]
     "GM♆",      "[ 6.83652710058E15_m³/s² "
@@ -1843,7 +1843,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Pluto",     nullptr,
+    "Astronomy/Pluto",     nullptr,
 
     // *Pluto gravitational parameter - Measurement [4]
     "GM♇",      "[ 9.755E11_m³/s² "
@@ -1917,7 +1917,7 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
-"Astronomy/Sun",     nullptr,
+    "Astronomy/Sun",     nullptr,
 
     // *Solar mass - Calculation from nominal value [2] [3] [5]
     "M☉",       "[ 'ROUND(CONVERT(ⒸGM☉/ⒸG;1_kg);XPON(UVAL(ⒸGM☉/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☉/ⒸG))-2)' "
@@ -1965,7 +1965,7 @@ static const cstring basic_constants[] =
                 "  'ROUND(ⓈProt☉/ⒸProt☉;-2)' "
                 "  2.193E6_s ]",
 
-"Astronomy/Cosmology & Varia",     nullptr,
+    "Astronomy/Cosmology & Varia",     nullptr,
 
     // *Cosmological constant - Measurement [1] [2]
     "Λ",       "[ 1.088E-52_1/m² "
@@ -2058,7 +2058,7 @@ static const cstring basic_constants[] =
                 "  0.05E27_W "
                 "  'ROUND(ⓈL★Vega/ⒸL★Vega;-2)' ]",
 
-"Materials",     nullptr,
+    "Materials",     nullptr,
 
     // ========================================================================
     //   A. GASES (at StdT = 273.15 K = 0°C, StdP = 101.325 kPa)
@@ -2070,7 +2070,7 @@ static const cstring basic_constants[] =
     //   R is given as a calculation 'CONVERT(ⒸcpX-ⒸcvX;1_J/(kg*K))' for all gases.
     // ========================================================================
 
-"Materials/Dry Air",     nullptr,
+    "Materials/Dry Air",     nullptr,
 
     // *Dry air volumetric density - Measurement [M1] [M2]
     "ρvAir",     "[ 1.2929_kg/m³ "
@@ -2117,7 +2117,7 @@ static const cstring basic_constants[] =
                 "  0.2E6_V/m "
                 "  'ROUND(ⓈEdAir/ⒸEdAir;-2)' ]",
 
-"Materials/N2",     nullptr,
+    "Materials/N2",     nullptr,
 
     // *Dinitrogen N2 volumetric density - Measurement [M2] [M3]
     "ρvN2",      "[ 1.2506_kg/m³ "
@@ -2159,7 +2159,7 @@ static const cstring basic_constants[] =
                 "  0.3E6_V/m "
                 "  'ROUND(ⓈEdN2/ⒸEdN2;-2)' ]",
 
-"Materials/O2",     nullptr,
+    "Materials/O2",     nullptr,
 
     // *Dioxygen O2 volumetric density - Measurement [M2] [M3]
     "ρvO2",      "[ 1.4290_kg/m³ "
@@ -2201,7 +2201,7 @@ static const cstring basic_constants[] =
                 "  0.3E6_V/m "
                 "  'ROUND(ⓈEdO2/ⒸEdO2;-2)' ]",
 
-"Materials/Argon",     nullptr,
+    "Materials/Argon",     nullptr,
 
     // *Argon volumetric density - Measurement [M2]
     "ρvAr",      "[ 1.7839_kg/m³ "
@@ -2243,7 +2243,7 @@ static const cstring basic_constants[] =
                 "  0.2E6_V/m "
                 "  'ROUND(ⓈEdAr/ⒸEdAr;-2)' ]",
 
-"Materials/CO2",     nullptr,
+    "Materials/CO2",     nullptr,
 
     // *Carbon dioxide CO2 volumetric density - Measurement [M2] [M3]
     "ρvCO2",     "[ 1.9768_kg/m³ "
@@ -2292,7 +2292,7 @@ static const cstring basic_constants[] =
     //   These parameters are therefore not listed for liquids.
     // ========================================================================
 
-"Materials/H2O",     nullptr,
+    "Materials/H2O",     nullptr,
 
     // *Liquid water volumetric density - Measurement [M4] [M2]
     "ρvH2O",     "[ 998.2_kg/m³ "
@@ -2326,7 +2326,7 @@ static const cstring basic_constants[] =
     //   C1. Materials for optical fibers and waveguides
     // ------------------------------------------------------------------------
 
-"Materials/Silicon",     nullptr,
+    "Materials/Silicon",     nullptr,
 
     // *Crystalline silicon volumetric density - Measurement [M10] [M11]
     "ρvSi",      "[ 2330._kg/m³ "
@@ -2349,7 +2349,7 @@ static const cstring basic_constants[] =
                 "  0.5E3_Ω·m "
                 "  'ROUND(ⓈρSi/ⒸρSi;-2)' ]",
 
-"Materials/SiO2",     nullptr,
+    "Materials/SiO2",     nullptr,
 
     // *Fused silica volumetric density - Measurement [M7]
     "ρvSiO2",    "[ 2201._kg/m³ "
@@ -2376,7 +2376,7 @@ static const cstring basic_constants[] =
                 "  0.5E8_V/m "
                 "  'ROUND(ⓈEdSiO2/ⒸEdSiO2;-2)' ]",
 
-"Materials/GeO2",     nullptr,
+    "Materials/GeO2",     nullptr,
 
     // *Germanate glass volumetric density - Measurement [M8] [M9]
     "ρvGeO2",    "[ 3650._kg/m³ "
@@ -2399,7 +2399,7 @@ static const cstring basic_constants[] =
                 "  0.5E8_V/m "
                 "  'ROUND(ⓈEdGeO2/ⒸEdGeO2;-2)' ]",
 
-"Materials/Si3N4",     nullptr,
+    "Materials/Si3N4",     nullptr,
 
     // *Silicon nitride volumetric density - Measurement [M18] [M19]
     "ρvSi3N4",   "[ 3170._kg/m³ "
@@ -2426,7 +2426,7 @@ static const cstring basic_constants[] =
     //   C2. Reference optical glasses
     // ------------------------------------------------------------------------
 
-"Materials/BK7 Glass",     nullptr,
+    "Materials/BK7 Glass",     nullptr,
 
     // *Schott BK7 glass volumetric density - Measurement [M15]
     "ρvBK7",     "[ 2510._kg/m³ "
@@ -2453,7 +2453,7 @@ static const cstring basic_constants[] =
     //   C3. Optical crystals (UV and IR)
     // ------------------------------------------------------------------------
 
-"Materials/Al2O3 Sapphire",     nullptr,
+    "Materials/Al2O3 Sapphire",     nullptr,
 
     // *Sapphire volumetric density - Measurement [M16]
     "ρvAl2O3",   "[ 3980._kg/m³ "
@@ -2476,7 +2476,7 @@ static const cstring basic_constants[] =
                 "  0.5E8_V/m "
                 "  'ROUND(ⓈEdAl2O3/ⒸEdAl2O3;-2)' ]",
 
-"Materials/CaF2",     nullptr,
+    "Materials/CaF2",     nullptr,
 
     // *Calcium fluoride volumetric density - Measurement [M17] [M15]
     "ρvCaF2",    "[ 3180._kg/m³ "
@@ -2499,7 +2499,7 @@ static const cstring basic_constants[] =
                 "  0.2E9_V/m "
                 "  'ROUND(ⓈEdCaF2/ⒸEdCaF2;-2)' ]",
 
-"Materials/C Diamond",     nullptr,
+    "Materials/C Diamond",     nullptr,
 
     // *Diamond volumetric density - Measurement [M13] [M14]
     "ρvC",       "[ 3515._kg/m³ "
@@ -2529,7 +2529,7 @@ static const cstring basic_constants[] =
     //   cv ≈ cp for all metals at room temperature (difference < 0.5%).
     // ------------------------------------------------------------------------
 
-"Materials/Al Metal",     nullptr,
+    "Materials/Al Metal",     nullptr,
 
     // *Aluminium volumetric density - Measurement [M12] [M2]
     "ρvAl",      "[ 2700._kg/m³ "
@@ -2540,7 +2540,7 @@ static const cstring basic_constants[] =
                 "  2._J/(kg*K) "
                 "  'ROUND(ⓈcpAl/ⒸcpAl;-2)' ]",
 
-"Materials/Cu Metal",     nullptr,
+    "Materials/Cu Metal",     nullptr,
 
     // *Copper volumetric density - Measurement [M12] [M2]
     "ρvCu",      "[ 8960._kg/m³ "
@@ -2551,7 +2551,7 @@ static const cstring basic_constants[] =
                 "  1._J/(kg*K) "
                 "  'ROUND(ⓈcpCu/ⒸcpCu;-2)' ]",
 
-"Materials/Fe Metal",     nullptr,
+    "Materials/Fe Metal",     nullptr,
 
     // *Iron volumetric density (α phase) - Measurement [M12] [M2]
     "ρvFe",      "[ 7874._kg/m³ "
