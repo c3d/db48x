@@ -4,7 +4,7 @@
 //
 //   File Description:
 //
-//     Evaluate RPL command lines passed to the simulator (-e option)
+//     Evaluate RPL command lines passed to the simulator (-e/-E options)
 //
 //
 //
@@ -30,12 +30,18 @@
 
 #include "dmcp.h"
 #include "program.h"
+#include "renderer.h"
 #include "runtime.h"
+#include "settings.h"
+#include "tests.h"
 
 #include <cstdio>
 #include <cstring>
 
 std::vector<std::string> sim_eval_commands;
+std::vector<std::string> sim_eval_console_commands;
+bool                     sim_eval_headless = false;
+bool                     sim_eval_print_levels = false;
 static std::string       sim_eval_pending;
 
 
@@ -78,15 +84,63 @@ bool sim_eval_run(cstring line)
 }
 
 
+void sim_eval_print_stack()
+// ----------------------------------------------------------------------------
+//   Print all stack levels, bottom first (optional level prefixes)
+// ----------------------------------------------------------------------------
+{
+    FILE  *out = sim_eval_headless ? stdout : stderr;
+    uint   depth = rt.depth();
+    bool   rml   = Settings.MultiLineResult();
+    bool   sml   = Settings.MultiLineStack();
+
+    for (uint n = depth; n > 0; n--)
+    {
+        uint     level = n - 1;
+        object_p obj   = rt.stack(level);
+        if (!obj)
+            continue;
+
+        bool     ml  = level ? sml : rml;
+        renderer r(nullptr, ~0U, true, ml);
+        size_t   len = obj->render(r);
+        utf8     text = r.text();
+
+        if (sim_eval_print_levels)
+            fprintf(out, "%u:", level + 1);
+        if (len)
+            fwrite(text, 1, len, out);
+        fputc('\n', out);
+    }
+
+    if (utf8 err = rt.error())
+        fprintf(stderr, "%s\n", cstring(err));
+
+    fflush(out);
+}
+
+
 void process_sim_eval_commands()
 // ----------------------------------------------------------------------------
-//   Run all -e command lines once at simulator startup
+//   Run queued -e or -E command lines once at simulator startup
 // ----------------------------------------------------------------------------
 {
     static bool done = false;
     if (done)
         return;
     done = true;
+
+    if (!sim_eval_console_commands.empty())
+    {
+        for (const std::string &cmd : sim_eval_console_commands)
+        {
+            sim_eval_run(cmd.c_str());
+            sim_eval_print_stack();
+        }
+        sim_eval_console_commands.clear();
+        if (sim_eval_headless)
+            key_push(tests::EXIT_PGM);
+    }
 
     for (const std::string &cmd : sim_eval_commands)
         sim_eval_run(cmd.c_str());

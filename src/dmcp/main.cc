@@ -612,10 +612,13 @@ extern "C" void program_main()
                    key, last_key, test_command);
             if (key == tests::EXIT_PGM || key == tests::SAVE_PGM)
             {
-                cstring path = get_reset_state_file();
-                printf("Exit: saving state to %s\n", path);
-                if (path && *path)
-                    save_state_file(path);
+                if (!sim_eval_headless)
+                {
+                    cstring path = get_reset_state_file();
+                    printf("Exit: saving state to %s\n", path);
+                    if (path && *path)
+                        save_state_file(path);
+                }
                 if (key == tests::EXIT_PGM)
                     break;
             }
@@ -798,6 +801,11 @@ void process_test_commands()
     {
         record(tests_rpl, "Evaluating command line [%s]", sim_eval_pending_line());
         sim_eval_run(sim_eval_pending_line());
+    }
+    else if (test_command == tests::PRINT_STACK)
+    {
+        record(tests_rpl, "Printing stack to stdout");
+        sim_eval_print_stack();
     }
     if (!ui.showing_graphics())
         redraw_lcd(true);

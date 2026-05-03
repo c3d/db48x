@@ -31,6 +31,7 @@
 
 #include "dmcp.h"
 #include "main.h"
+#include "sim-eval.h"
 #include "recorder.h"
 #include "sim-dmcp.h"
 #include "symbol.h"
@@ -89,7 +90,7 @@ extern bool alt_held;
 MainWindow *MainWindow::mainWindow = nullptr;
 qreal MainWindow::userScaling = 1.0;
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent, bool console)
 // ----------------------------------------------------------------------------
 //    The main window of the simulator
 // ----------------------------------------------------------------------------
@@ -208,6 +209,8 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
 
     rpl.start();
+    if (console)
+        connect(&rpl, &QThread::finished, qApp, &QCoreApplication::quit);
     if (run_tests)
     {
         ui_ms_sleep(1000);      // In case we are loading a file

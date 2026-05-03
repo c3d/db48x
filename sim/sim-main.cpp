@@ -37,12 +37,16 @@
 #include "sysmenu.h"
 #include "version.h"
 
+#include <cstdlib>
 #include <unistd.h>
 
 #include <QApplication>
-#include <QWindow>
-#include <QStandardPaths>
+#include <QByteArray>
 #include <QDirIterator>
+#include <QFont>
+#include <QFontDatabase>
+#include <QStandardPaths>
+#include <QWindow>
 
 RECORDER(options, 32, "Information about command line options");
 RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
@@ -136,6 +140,87 @@ static void copy(const QString &fromName, const QString &toName)
 // Ensure linker keeps debug code
 extern cstring debug();
 
+
+static void sim_select_platform(bool headless)
+// ----------------------------------------------------------------------------
+//   Choose the Qt platform plugin for headless runs
+// ----------------------------------------------------------------------------
+//   The offscreen plugin has no real "Sans Serif" font on macOS and spends
+//   ~100 ms building alias tables (qt.qpa.fonts warning). On macOS, keep the
+//   native platform and simply do not show the window. Linux headless CI still
+//   needs offscreen when there is no display server.
+{
+    if (!headless || !qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
+        return;
+#if defined(Q_OS_LINUX)
+    qputenv("QT_QPA_PLATFORM", "offscreen");
+#endif
+}
+
+
+static void sim_configure_application_font(QApplication &app)
+// ----------------------------------------------------------------------------
+//   Set a concrete application font (offscreen needs an explicit family)
+// ----------------------------------------------------------------------------
+{
+    QString family;
+    if (qgetenv("QT_QPA_PLATFORM").contains("offscreen"))
+    {
+#if defined(Q_OS_MAC)
+        static const char *const paths[] = {
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/System/Library/Fonts/Supplemental/Arial.ttf",
+            nullptr
+        };
+#elif defined(Q_OS_WIN)
+        static const char *const paths[] = {
+            "C:/Windows/Fonts/arial.ttf",
+            nullptr
+        };
+#else
+        static const char *const paths[] = {
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            nullptr
+        };
+#endif
+        for (uint i = 0; paths[i]; i++)
+        {
+            int id = QFontDatabase::addApplicationFont(paths[i]);
+            if (id < 0)
+                continue;
+            QStringList families = QFontDatabase::applicationFontFamilies(id);
+            if (!families.isEmpty())
+            {
+                family = families.first();
+                break;
+            }
+        }
+        if (family.isEmpty())
+        {
+#if defined(Q_OS_MAC)
+            family = "Helvetica";
+#elif defined(Q_OS_WIN)
+            family = "Segoe UI";
+#else
+            family = "DejaVu Sans";
+#endif
+        }
+    }
+    else
+    {
+        family = QFontDatabase::systemFont(QFontDatabase::GeneralFont).family();
+    }
+
+    if (!family.isEmpty())
+    {
+        QFont::insertSubstitution("Sans Serif", family);
+        QFont::insertSubstitution("Sans", family);
+        app.setFont(QFont(family));
+    }
+}
+
+
 int main(int argc, char *argv[])
 // ----------------------------------------------------------------------------
 //   Main entry point for the simulator
@@ -153,19 +238,6 @@ int main(int argc, char *argv[])
         if (cstring result = debug())
             record(options, "Strange input %s", result);
 
-    // Indicate the first two-byte opcode
-    fprintf(stderr,
-            "%s version %s\n"
-            "Last single-byte opcode is %s\n"
-            "First two byte opcode is %s\n"
-            "Total of %u opcodes\n"
-            "Help file name is %s\n",
-            PROGRAM_NAME,
-            DB48X_VERSION,
-            object::name(object::id(127)),
-            object::name(object::id(128)),
-            uint(object::NUM_IDS),
-            HELPFILE_NAME);
     if (cstring doc = getenv("DB48X_DOCPATH"))
         tests::testing_path = std::string(doc);
     else
@@ -227,6 +299,21 @@ int main(int argc, char *argv[])
                     sim_eval_commands.emplace_back(as + 2);
                 else if (a + 1 < argc)
                     sim_eval_commands.emplace_back(argv[++a]);
+                break;
+
+            case 'E':
+                if (as[2])
+                    sim_eval_console_commands.emplace_back(as + 2);
+                else if (a + 1 < argc)
+                    sim_eval_console_commands.emplace_back(argv[++a]);
+                break;
+
+            case 'H':
+                sim_eval_headless = true;
+                break;
+
+            case 'l':
+                sim_eval_print_levels = true;
                 break;
 
             case 'k':
@@ -322,6 +409,22 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Indicate the first two-byte opcode
+    if (!sim_eval_headless)
+        fprintf(stderr,
+                "%s version %s\n"
+                "Last single-byte opcode is %s\n"
+                "First two byte opcode is %s\n"
+                "Total of %u opcodes\n"
+                "Help file name is %s\n",
+                PROGRAM_NAME,
+                DB48X_VERSION,
+                object::name(object::id(127)),
+                object::name(object::id(128)),
+                uint(object::NUM_IDS),
+                HELPFILE_NAME);
+
+
 #if QT_VERSION < 0x060000
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif // QT version 6
@@ -340,9 +443,15 @@ int main(int argc, char *argv[])
     QDir::setCurrent(files);
     QDir::current().mkdir("screens");
 
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    sim_select_platform(sim_eval_headless);
 
-    return a.exec();
+    QApplication a(argc, argv);
+    sim_configure_application_font(a);
+
+    MainWindow w(nullptr, sim_eval_headless);
+    if (!sim_eval_headless)
+        w.show();
+
+    int rc = a.exec();
+    return sim_eval_headless ? 0 : rc;
 }

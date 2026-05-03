@@ -60,19 +60,21 @@
 ## Running Tests
 
 - Build the simulator first: `make -j sim`
-- Run tests from the `sim/` directory with `QT_QPA_PLATFORM=offscreen` (required
-  in headless environments — without it the Qt GUI initialization crashes):
+- **Before submitting changes, run the full test suite** and fix any failures.
+  From the repository root (after building the simulator):
   ```
-  cd sim && QT_QPA_PLATFORM=offscreen ./db48x.app/Contents/MacOS/db48x -Tname
+  db48x -H -Tall
   ```
-  Use `-Tall` to run all tests, or `-Tname` for a specific test group.
+  The `-H` flag runs in headless mode (no Qt window). Exit code 0 means all
+  tests passed; non-zero means there are failures (see console output or
+  `failures.log` if you capture it).
+- To run a single test group: `db48x -H -Tname` (e.g. `-Tsectrig`).
 - Enable recorder traces during tests with `-tchannel` (see Debugging section):
   ```
-  QT_QPA_PLATFORM=offscreen ./db48x.app/Contents/MacOS/db48x -Ttoqpi -talgebraic
+  db48x -H -Ttoqpi -talgebraic
   ```
-- Exit code 0 = all pass; non-zero = failures.
 - **All new features and bug fixes must include tests.** Build and run the
-  relevant test group before considering work complete.
+  full suite (`db48x -H -Tall`) before considering work complete.
 
 ## Adding Tests
 

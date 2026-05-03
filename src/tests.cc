@@ -1547,6 +1547,11 @@ void tests::sim_eval_command()
         .test(CLEAR)
         .eval("1 2 +")
         .expect("3");
+
+    step("Print full stack after evaluation")
+        .test(CLEAR, "1", ENTER, "2", ENTER)
+        .print_stack()
+        .expect("2");
 }
 
 
@@ -16226,6 +16231,15 @@ tests &tests::eval(cstring line, uint extrawait)
 {
     sim_eval_set_pending(line);
     return rpl_command(EVAL_LINE, extrawait);
+}
+
+
+tests &tests::print_stack(uint extrawait)
+// ----------------------------------------------------------------------------
+//   Print all stack levels on the RPL thread (as with sim -E)
+// ----------------------------------------------------------------------------
+{
+    return rpl_command(PRINT_STACK, extrawait);
 }
 
 

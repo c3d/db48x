@@ -249,6 +249,7 @@ struct tests
         SAVE_PGM   = 107,       // Save program on the RPL thread
         START_TEST = 108,       // Start test (Synchronize battery)
         EVAL_LINE  = 109,       // Evaluate command line (sim -e)
+        PRINT_STACK = 118,      // Print stack to stdout (sim -E)
 
         // Reaching a specific shift state
         NOSHIFT    = 110,       // Clear shifts
@@ -386,6 +387,7 @@ public:
 
     tests &rpl_command(uint command, uint extrawait = 0);
     tests &eval(cstring line, uint extrawait = 0);
+    tests &print_stack(uint extrawait = 0);
     tests &clear(uint extrawait = 0);
     tests &keysync(uint extrawait = 0);
     tests &nokeys(uint extrawait = 0);

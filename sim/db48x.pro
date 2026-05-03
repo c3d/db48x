@@ -19,7 +19,7 @@
 #  This software is licensed under the terms described in LICENSE.txt
 #******************************************************************************
 
-QT += core gui quick widgets quickcontrols2 quickwidgets multimedia
+QT += core gui widgets multimedia
 TEMPLATE = app
 
 CONFIG += debug warn_off c++17

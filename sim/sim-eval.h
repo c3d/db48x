@@ -6,7 +6,7 @@
 //
 //   File Description:
 //
-//     Evaluate RPL command lines passed to the simulator (-e option)
+//     Evaluate RPL command lines passed to the simulator (-e/-E options)
 //
 //
 //
@@ -34,8 +34,12 @@
 #include <vector>
 
 extern std::vector<std::string> sim_eval_commands;
+extern std::vector<std::string> sim_eval_console_commands;
+extern bool                     sim_eval_headless;
+extern bool                     sim_eval_print_levels;
 
 bool     sim_eval_run(cstring line);
+void     sim_eval_print_stack();
 void     process_sim_eval_commands();
 void     sim_eval_set_pending(cstring line);
 cstring  sim_eval_pending_line();

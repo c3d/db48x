@@ -39,6 +39,9 @@ The simulator can be started with the command-line options listed in the table b
 | -w[[`<whitespace>`]`<integer>`] | Set the default time the test suite waits for a command to complete, in milliseconds. You can increase this to run the test suite on a very slow machine. The default = 1000 ms. |
 | -D[[`<whitespace>`]`<argument>`] | Set the pattern of recorder traces to show when a test fails. |
 | -e[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, as if typed on the command line and executed with Enter. The option may be repeated to run several commands in order. |
+| -E[[`<whitespace>`]`<argument>`] | Like `-e`, but also prints every stack level after each command (bottom of stack first). With the normal GUI, output goes to stderr; with `-H`, to stdout. The option may be repeated. |
+| -H | Headless mode: use the offscreen Qt platform, do not show a window, and exit when startup commands finish. Use with `-E` for batch scripting. Implies `QT_QPA_PLATFORM=offscreen`. |
+| -l | With `-E`, prefix each printed stack line with its level number (`1:` is the top of stack). Default is to print values only. |
 | -I | Initialize the user's environment. WARNING: This may overwrite user configuration with defaults. |
 | -N | Disable beeps. Use this if you get error messages about audio drivers. |
 | -T[`<test>` \| all] | Run tests. Without a suffix, run the full test suite. With a suffix, select individual test suites. For example `-Tmatrices` will run the `matrices` portion of the test suite. |

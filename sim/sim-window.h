@@ -162,7 +162,7 @@ public:
     static qreal       userScaling;
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0, bool console = false);
     ~MainWindow();
 
     void pushKey(int key);
