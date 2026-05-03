@@ -67,6 +67,7 @@ struct tests
     void data_types();
     void editor_operations();
     void interactive_stack_operations();
+    void sim_eval_command();
     void stack_operations();
     void arithmetic();
     void global_variables();
@@ -247,6 +248,7 @@ struct tests
         EXIT_PGM   = 106,       // Exiting program
         SAVE_PGM   = 107,       // Save program on the RPL thread
         START_TEST = 108,       // Start test (Synchronize battery)
+        EVAL_LINE  = 109,       // Evaluate command line (sim -e)
 
         // Reaching a specific shift state
         NOSHIFT    = 110,       // Clear shifts
@@ -383,6 +385,7 @@ public:
     void   flush();
 
     tests &rpl_command(uint command, uint extrawait = 0);
+    tests &eval(cstring line, uint extrawait = 0);
     tests &clear(uint extrawait = 0);
     tests &keysync(uint extrawait = 0);
     tests &nokeys(uint extrawait = 0);

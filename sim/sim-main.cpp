@@ -31,6 +31,7 @@
 #include "object.h"
 #include "recorder.h"
 #include "settings.h"
+#include "sim-eval.h"
 #include "sim-rpl.h"
 #include "sim-window.h"
 #include "sysmenu.h"
@@ -221,6 +222,13 @@ int main(int argc, char *argv[])
                     tests::dump_on_fail = argv[++a];
                 break;
 
+            case 'e':
+                if (as[2])
+                    sim_eval_commands.emplace_back(as + 2);
+                else if (a + 1 < argc)
+                    sim_eval_commands.emplace_back(argv[++a]);
+                break;
+
             case 'k':
                 if (as[2])
                     load_saved_keymap(as + 2);
@@ -267,7 +275,6 @@ int main(int argc, char *argv[])
                 else if (a < argc)
                     MainWindow::userScaling = atof(argv[++a]);
                 break;
-
             }
         }
         else if (cstring pos = strchr(as, '='))

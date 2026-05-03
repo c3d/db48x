@@ -43,6 +43,7 @@
 #include "util.h"
 
 #if SIMULATOR
+#  include "sim-eval.h"
 #  include "tests.h"
 #endif
 
@@ -582,6 +583,9 @@ extern "C" void program_main()
 
     // Initialization
     program_init();
+#if SIMULATOR && !WASM
+    process_sim_eval_commands();
+#endif // SIMULATOR && !WASM
     redraw_lcd(true);
     last_keystroke_time = program::read_time();
 
@@ -789,6 +793,11 @@ void process_test_commands()
     else if (test_command == tests::START_TEST)
     {
         program::read_battery();
+    }
+    else if (test_command == tests::EVAL_LINE)
+    {
+        record(tests_rpl, "Evaluating command line [%s]", sim_eval_pending_line());
+        sim_eval_run(sim_eval_pending_line());
     }
     if (!ui.showing_graphics())
         redraw_lcd(true);
