@@ -793,6 +793,7 @@ Additional contributors to the project include (in order of appearance):
 * Riccardo Lucatuorto (gnuduncan@gmail.com)
 * Ralf Ahlbrink (raprism@users.noreply.github.com)
 * Mikael Djurfeldt (mikael@djurfeldt.com)
+* Pasquale Pigazzini (pasquale.pigazzini@gmail.com)
 
 The authors would like to acknowledge
 
