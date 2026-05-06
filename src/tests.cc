@@ -3819,7 +3819,7 @@ void tests::float_numerical_functions()
         .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
-    test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
+    test(CLEAR, "'PRECISION' PURGE STD SoftFP", ENTER).noerror();
 }
 
 
@@ -4006,7 +4006,7 @@ void tests::double_numerical_functions()
         .expect("10 ¹/₄");
 
     step("Restore default 24-digit precision");
-    test(CLEAR, "24 PRECISION 12 SIG SoftFP", ENTER).noerror();
+    test(CLEAR, "'PRECISION' PURGE STD SoftFP", ENTER).noerror();
 }
 
 
@@ -4170,7 +4170,7 @@ void tests::high_precision_numerical_functions()
         .expect("-1.93671 70284 36984 00445 39742 77784 19614 09228 14972 69013 57207 96225 22144 30998 44778 15307 33025 32493 05294 47540 14534 16384 29680 297 r");
 
     step("Restore default 24-digit precision");
-    test(CLEAR, "24 PRECISION 12 SIG", ENTER).noerror();
+    test(CLEAR, "'PRECISION' PURGE STD", ENTER).noerror();
 }
 
 
@@ -4612,7 +4612,7 @@ void tests::cfraction()
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
     step("Restore default precision")
-        .test(CLEAR, "24 Precision", ENTER).noerror();
+        .test(CLEAR, "'PRECISION' PURGE", ENTER).noerror();
 }
 
 
@@ -5574,7 +5574,7 @@ void tests::complex_functions()
     test(CLEAR, "-31.234 arg", ENTER).expect("180 °");
 
     step("Restore default 24-digit precision");
-    test(CLEAR, "24 PRECISION 12 SIG", ENTER).noerror();
+    test(CLEAR, "'PRECISION' PURGE STD", ENTER).noerror();
 
     step("Re with list of polar units")
         .test(CLEAR, "{ 230∡0° V 230∡120° V 230∡-120° V } re", ENTER)
