@@ -31,7 +31,7 @@ The simulator can be started with the command-line options listed in the table b
 | -i[[`<whitespace>`]`<integer>`] | Set the maximum time waiting for an image to match the expected image during testing. Default = 500 ms. |
 | -k[[`<whitespace>`]`<argument>`] | Load a saved keymap to change keyboard layout. |
 | -K | Simulate typing of individual keys during tests. |
-| -m[[`<whitespace>`]`<integer>`] | Set the memory size available to the calculator in megabytes. |
+| -m[[`<whitespace>`]`<integer>`] | Set the memory size available to the calculator in kilobytes. |
 | -n | Enable beeps while running the test suite (noisy testing). |
 | -r[[`<whitespace>`]`<integer>`] | Set the time to wait for a screen update in milliseconds. Default = 20 ms. |
 | -s[[`<whitespace>`]`<real>`] | Scale the application window by the given floating-point scaling factor. |
