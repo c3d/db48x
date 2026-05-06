@@ -1189,16 +1189,18 @@ static object::result get(bool increment)
 // ----------------------------------------------------------------------------
 {
     // Check we have an object at level 2
-    if (object_p items = rt.stack(1))
+    if (object_p items = object::strip(rt.stack(1)))
     {
         if (symbol_p name = items->as_quoted<symbol>())
         {
             items = directory::recall_all(name, true);
             if (!items)
                 return object::ERROR;
+            items = object::strip(items);
         }
 
-        object_p item = items->at(rt.stack(0));
+        object_g index = object::strip(rt.stack(0));
+        object_p item = items->at(+index);
         if (!item)
         {
             if (!rt.error())
@@ -1207,7 +1209,6 @@ static object::result get(bool increment)
         else if (increment)
         {
             rt.push(item);
-            object_g index = rt.stack(1);
             bool wrap = items->next_index(&+index);
             if (index)
             {
@@ -1249,7 +1250,7 @@ static object::result put(bool increment)
 // ----------------------------------------------------------------------------
 {
     // Check that we have an object at level 2
-    if (object_p items = rt.stack(2))
+    if (object_p items = object::strip(rt.stack(2)))
     {
         symbol_p name = items->as_quoted<symbol>();
         if (name)
@@ -1257,13 +1258,14 @@ static object::result put(bool increment)
             items = directory::recall_all(name, true);
             if (!items)
                 return object::ERROR;
+            items = object::strip(items);
         }
 
-        if (object_g result = items->at(rt.stack(1), rt.top()))
+        object_g index = object::strip(rt.stack(1));
+        if (object_g result = items->at(index, rt.top()))
         {
             if (increment)
             {
-                object_g index = rt.stack(1);
                 bool wrap = result->next_index(&+index);
                 if (index)
                 {

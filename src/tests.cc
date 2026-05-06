@@ -6643,7 +6643,7 @@ void tests::list_functions()
     step("List index, too many items")
         .test(CLEAR, "{ A B C }", ENTER, "{2 3} GET", ENTER)
         .error("Bad argument type");
-    step("Character from array")
+    step("Character from text")
         .test(CLEAR, "\"Hello World\"", ENTER, "2 GET", ENTER)
         .expect("\"e\"");
     step("Deep nesting");
@@ -6685,7 +6685,7 @@ void tests::list_functions()
     step("List index, too many items for GETI")
         .test(CLEAR, "{ A B C }", ENTER, "{2 3} GETI", ENTER)
         .error("Bad argument type");
-    step("Character from array using GETI")
+    step("Character from text using GETI")
         .test(CLEAR, "\"Hello\"", ENTER, "2 ")
         .test("GETI", ENTER).expect("\"e\"").test(BSP).expect("3")
         .test("GETI", ENTER).expect("\"l\"").test(BSP).expect("4")
@@ -6702,6 +6702,16 @@ void tests::list_functions()
     test(CLEAR, "[ A [ D E [ 1 2 \"Hello World\" ] F ] 2 3 ]", ENTER,
          "[ 2 3 3 5 ] GET", ENTER)
         .expect("\"o\"");
+
+    step("Index tagged array")
+        .test(CLEAR, ":mytag:[11 222 3333] 2 GET", ENTER)
+        .expect("222")
+        .test(CLEAR, ":mytag:[11 222 3333] 2 GETI", ENTER)
+        .got("222", "3", "mytag:[ 11 222 3 333 ]")
+        .test(CLEAR, ":mytag:[11 222 3333] :I:2 GET", ENTER)
+        .expect("222")
+        .test(CLEAR, ":mytag:[11 222 3333] :idx:2 GETI", ENTER)
+        .got("222", "3", "mytag:[ 11 222 3 333 ]");
 
     step("List indexing in equation L(1)")
         .test(CLEAR, "{ X Y Z } 'L' STO", ENTER).noerror()
@@ -6767,6 +6777,13 @@ void tests::list_functions()
     step("Index error when putting out of range with PUTI")
         .test(CLEAR, "{ 11 22 33 } 5 55 PUTI", ENTER)
         .error("Index out of range");
+    step("Put stuff in a tagged array")
+        .test(CLEAR, ":tag:{ 11 22 33 } 1 55 PUT", ENTER)
+        .expect("{ 55 22 33 }")
+        .test(CLEAR, ":A:{ 11 22 33 } :B:1 :C:55 PUT", ENTER)
+        .expect("{ C:55 22 33 }")
+        .test(CLEAR, ":A:{ 11 22 33 } :B:2 :C:55 PUTI", ENTER)
+        .got("3", "{ 11 C:55 33 }");
 
     step("Concatenation of lists");
     test(CLEAR, "{ A B C D } { F G H I } +", ENTER)
