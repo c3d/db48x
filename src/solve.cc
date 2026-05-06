@@ -829,7 +829,7 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
     uint           max           = Settings.SolverIterations();
     uint           maxerrs       = Settings.SolverShuffles();
     uint           iter          = 0;
-    int            errs          = 0;
+    uint           errs          = 0;
     bool           back          = false; // Go backwards
     array_g        j, v, d;
     algebraic_g    magnitude, last, forward;
