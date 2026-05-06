@@ -1196,11 +1196,17 @@ void ui_refresh()
 //   Request a refresh of the LCD
 // ----------------------------------------------------------------------------
 {
-    static uint done = true;
-    while (!done) sys_delay(1);
-    done = false;
+    static std::atomic<uint> refreshing = 0;
+    uint count = 0;
+    while (refreshing)
+    {
+        if (count++ > 1000)
+            refreshing--;
+        sys_delay(1);
+    }
+    refreshing++;
     SimScreen::update_pixmap();
-    postToThread([&] { SimScreen::refresh_lcd(); done = true; });
+    postToThread([&] { SimScreen::refresh_lcd(); refreshing--; });
 }
 
 
