@@ -52,12 +52,11 @@ static const cstring basic_library[] =
 {
 
     // ------------------------------------------------------------------------
-    //   Physics
+    //   Test cases to show examples of library commands
     // ------------------------------------------------------------------------
 
     "Secrets",          nullptr,
 
-    "Dedicace", "\"À tous ceux qui se souviennent de Maubert électronique\"",
     "Dedicace", "\"À tous ceux qui se souviennent de Maubert électronique\"",
     "LibraryHelp",  "\"To modify the library, edit the config/library.csv file\"",
     "Physics",          nullptr,
