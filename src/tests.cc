@@ -14088,6 +14088,23 @@ void tests::regression_checks()
         .test(CLEAR, "'-X²'", ENTER).expect("'-X²'")
         .test(CLEAR, "'-X²-Y'", ENTER).expect("'-X²-Y'")
         .test(CLEAR, "'-X²-3*-Y'", ENTER).expect("'-X²-3·(-Y)'");
+
+    step("Nested store of subobject in custom menu (#1670)")
+        .test(CLEAR, "{ { X Y } { Z T } } 'CST' STO", ENTER).noerror()
+        .test("'CST' RCL 2 GET", ENTER).expect("{ Z T }")
+        .test("'CST' STO", ENTER).noerror()
+        .test("'CST' RCL", ENTER).expect("{ Z T }");
+    step("Nested store of subobject in normal variable (#1670)")
+        .test(CLEAR, "{ { XX YY } { ZZ TT } } 'ABC' STO", ENTER).noerror()
+        .test("'ABC' 2 GET", ENTER).expect("{ ZZ TT }")
+        .test("'ABC' STO", ENTER).noerror()
+        .test("ABC", ENTER).expect("{ ZZ TT }");
+    step("Nested store of subobject in normal variable (#1670)")
+        .test(CLEAR, "'CST' RCL 2 GET", ENTER).expect("T")
+        .test("'ABC' STO", ENTER).noerror()
+        .test("ABC", ENTER).expect("'T'");
+    step("Cleaning up #1670")
+        .test(CLEAR, "{ CST ABC } PURGE", ENTER).noerror();
 }
 
 
