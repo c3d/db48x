@@ -225,7 +225,7 @@ object::result CustomMenu::run_menu_command(bool tmp)
 //   Shared code between Menu and TMenu
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.top())
+    if (object_g obj = object::strip(rt.top()))
     {
         id oty = obj->type();
         if (object::is_real(oty))
@@ -255,7 +255,7 @@ object::result CustomMenu::run_menu_command(bool tmp)
         // Result from RclMenu: apply as is
         if (is_menu(oty))
         {
-            ui.menu(menu_p(obj));
+            ui.menu(menu_p(+obj));
             return OK;
         }
 
@@ -273,11 +273,15 @@ object::result CustomMenu::run_menu_command(bool tmp)
             // Store in CST and evaluate the custom menu
             object_p cst = static_object(ID_CustomMenu);
             if (directory::store_here(cst, obj))
-                return run<CustomMenu>();
+            {
+                result rc = run<CustomMenu>();
+                ui.menu_refresh(ID_CustomMenu);
+                return rc;
+            }
         }
 
         // Run the custom menu
-        list_g tmenu  = list_p(obj);
+        list_g tmenu  = list_p(+obj);
         uint   nitems = tmenu->items();
         info   mi(0);
         items_init(mi, nitems);
