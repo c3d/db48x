@@ -285,8 +285,15 @@ object_p directory::store(object_g name, object_g value)
                 return nullptr;           // Out of memory
         }
 
+        // Compute change in size for directories
+        delta = vs - es;
+
         // Clone any value in the stack that points to the existing value
         rt.clone_global(evalue, es);
+
+        // Clone input value if it is within object being replaced
+        if (+value >= +evalue && +value < +evalue + es)
+            value = rt.clone(value);
 
         // Move memory above storage if necessary
         if (vs != es)
@@ -295,9 +302,6 @@ object_p directory::store(object_g name, object_g value)
         // Copy new value into storage location
         memmove((byte *) evalue, (byte *) value, vs);
         value = evalue;
-
-        // Compute change in size for directories
-        delta = vs - es;
     }
     else
     {
