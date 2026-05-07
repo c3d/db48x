@@ -42,6 +42,7 @@
 
 
 RECORDER(bignum, 16, "Bignums");
+RECORDER(bignum_error, 16, "Bignums");
 
 bignum::bignum(id type, integer_g value)
 // ----------------------------------------------------------------------------
@@ -178,7 +179,7 @@ static size_t render_num(renderer &r,
         uint digit = remainder->value<uint>();
         if (digit > base)
         {
-            printf("Ooops: digit=%u, base=%u\n", digit, base);
+            record(bignum_error, "digit=%u, base=%u", digit, base);
             bignum::quorem(n, b, bignum::ID_bignum, &quotient, &remainder);
         }
         unicode c = upper        ? fancy_upper_digits[digit]
