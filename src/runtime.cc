@@ -979,7 +979,7 @@ object_p runtime::clone(object_p source)
 }
 
 
-object_p runtime::clone_global(object_p global, size_t sz)
+bool runtime::clone_global(object_p global, size_t sz)
 // ----------------------------------------------------------------------------
 //   Check if any entry in the stack points to a given global, if so clone it
 // ----------------------------------------------------------------------------
@@ -997,11 +997,15 @@ object_p runtime::clone_global(object_p global, size_t sz)
         if (*s >= global && *s < global + sz)
         {
             if (!cloned)
+            {
                 cloned = clone(global);
+                if (!cloned)
+                    return false;
+            }
             *s = cloned + (*s - global);
         }
     }
-    return cloned;
+    return true;
 }
 
 

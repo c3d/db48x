@@ -289,11 +289,16 @@ object_p directory::store(object_g name, object_g value)
         delta = vs - es;
 
         // Clone any value in the stack that points to the existing value
-        rt.clone_global(evalue, es);
+        if (!rt.clone_global(evalue, es))
+            return nullptr;     // Out of memory, bail out
 
         // Clone input value if it is within object being replaced
         if (+value >= +evalue && +value < +evalue + es)
+        {
             value = rt.clone(value);
+            if (!value)
+                return nullptr;
+        }
 
         // Move memory above storage if necessary
         if (vs != es)
@@ -643,7 +648,8 @@ size_t directory::purge(object_p name)
         object_p body   = header;
         size_t   old    = leb128<size_t>(body); // Old size of directory
 
-        rt.clone_global(value, vs);
+        if (!rt.clone_global(value, vs))
+            return 0;           // Out of memory, bail out
         rt.move_globals(name, name + purged);
 
         if (old < purged)
