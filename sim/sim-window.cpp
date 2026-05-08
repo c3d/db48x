@@ -177,6 +177,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     setlocale(LC_ALL, "C");
 
+#ifndef ANDROID
+    // Restore last window geometry if we have one (must come before the
+    // manual layout pass below, since we disabled automatic layout)
+    QSettings settings;
+    QByteArray savedGeometry = settings.value("MainWindow/geometry").toByteArray();
+    if (!savedGeometry.isEmpty())
+        restoreGeometry(savedGeometry);
+#endif
+
     // Set initial geometry manually since we disabled layout management
     QResizeEvent initialResize(size(), size());
     resizeEvent(&initialResize);
@@ -204,6 +213,19 @@ MainWindow::~MainWindow()
 {
     key_push(tests::EXIT_PGM);
     record(sim_audio, "Deleting audio");
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+// ----------------------------------------------------------------------------
+//  Persist window geometry across runs
+// ----------------------------------------------------------------------------
+{
+#ifndef ANDROID
+    QSettings settings;
+    settings.setValue("MainWindow/geometry", saveGeometry());
+#endif
+    QMainWindow::closeEvent(event);
 }
 
 
