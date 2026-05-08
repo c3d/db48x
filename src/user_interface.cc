@@ -1181,7 +1181,7 @@ bool user_interface::replace_character_left_of_cursor(unicode code)
 
 bool user_interface::replace_character_left_of_cursor(symbol_p sym)
 // ----------------------------------------------------------------------------
-//    Replace the character left of cursor with teh symbol
+//    Replace the character left of cursor with the symbol
 // ----------------------------------------------------------------------------
 {
     size_t len = 0;
