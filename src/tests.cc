@@ -201,7 +201,7 @@ void tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            range_types();
+            editor_operations();
         }
 
 #if 0
@@ -1285,6 +1285,12 @@ void tests::editor_operations()
     step("Check numbering separators after - with exponent")
         .test(CLEAR, F, KEY1, KEY0, KEY0, KEY0, O, N, KEY1)
         .editor("'1 000⁳-1'");
+
+    step("Check that CHS changes the sign correctly (#1691)")
+        .test(CLEAR, F, KEY3, SUB, KEY5, CHS)
+        .editor("'3+5'")
+        .test(CHS)
+        .editor("'3-5'");
 
     step("Editing unit in program (bug #1192)")
         .test(CLEAR, LSHIFT, RUNSTOP, "25.4", ENTER)
@@ -2998,20 +3004,23 @@ void tests::integer_display_formats()
     step("Entering numbers with spacing");
     test(CLEAR, "FancyExponent", ENTER).noerror();
 
-    test(CLEAR, "1").editor("1");
-    test(CHS).editor("-1");
-    test(CHS).editor("1");
-    test("2").editor("12");
-    test("3").editor("123");
-    test("4").editor("1 234");
-    test("5").editor("12 345");
-    test(CHS).editor("-12 345");
-    test(EEX).editor("-12 345⁳");
-    test("34").editor("-12 345⁳34");
-    test(CHS).editor("-12 345⁳-34");
-    test(" ").editor("-12 345⁳-34 ");
-    test("12345.45678901234").editor("-12 345⁳-34 12 345.45678 90123 4");
-    test(ENTER).noerror();
+    test(CLEAR, "1").editor("1")
+        .test(CHS).editor("-1")
+        .test(CHS).editor("+1")
+        .test("2").editor("+12")
+        .test("3").editor("+123")
+        .test("4").editor("+1 234")
+        .test("5").editor("+12 345")
+        .test(CHS).editor("-12 345")
+        .test(EEX).editor("-12 345⁳")
+        .test("34").editor("-12 345⁳34")
+        .test(CHS).editor("-12 345⁳-34")
+        .test(CHS).editor("-12 345⁳+34")
+        .test(CHS).editor("-12 345⁳-34")
+        .test(" ").editor("-12 345⁳-34 ")
+        .test("12345.45678901234").editor("-12 345⁳-34 12 345.45678 90123 4")
+        .test(ENTER).noerror()
+        .got("12 345.45678 9", "-1.2345⁳⁻³⁰");
 
     step("Based number rendering");
     test(CLEAR, "#1234ABCDEFh", ENTER)
@@ -5010,6 +5019,16 @@ void tests::complex_types()
         .type(ID_rectangular).expect("6+7ⅈ");
     test(CLEAR, "7-8ⅈ", ENTER)
         .type(ID_rectangular).expect("7-8ⅈ");
+    test(CLEAR, "1", ID_ComplexMenu, F1, CHS, "2")
+        .editor("1-ⅈ2")
+        .test(CHS)
+        .editor("1+ⅈ2")
+        .test(" 3", CHS)
+        .editor("1+ⅈ2 -3")
+        .test(F2, "4", CHS, CHS)
+        .editor("1+ⅈ2 -3∡+4")
+        .test(ENTER).noerror()
+        .got("3∡-176°", "1+2ⅈ");
 
     step("Integer polar form");
     test(CLEAR, "0∡0", ENTER)

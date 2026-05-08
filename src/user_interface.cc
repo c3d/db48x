@@ -5804,15 +5804,16 @@ bool user_interface::handle_digits(int key)
             unicode dm          = Settings.DecimalSeparator();
             unicode ns          = Settings.NumberSeparator();
             unicode hs          = Settings.BasedSeparator();
-            bool    had_complex = false;
+            bool    had_numsep  = false;
             while (p > ed && !found)
             {
                 p = (byte *) utf8_previous(p);
                 c = utf8_codepoint(p);
-                if (c == complex::I_MARK || c == complex::ANGLE_MARK)
+                if (c == complex::I_MARK || c == complex::ANGLE_MARK ||
+                    c == '-' || c == '+')
                 {
-                    had_complex = true;
-                    if (c == complex::ANGLE_MARK)
+                    had_numsep = true;
+                    if (c == complex::ANGLE_MARK || c == '+' || c == '-')
                     {
                         found = utf8_next(p);
                     }
@@ -5834,7 +5835,7 @@ bool user_interface::handle_digits(int key)
             if (c == 'e' || c == 'E' || c == Settings.ExponentSeparator())
                 c  = utf8_codepoint(p);
 
-            if (had_complex)
+            if (had_numsep)
             {
                 if (c == '+' || c == '-')
                     *p = '+' + '-' - c;
