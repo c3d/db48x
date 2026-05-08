@@ -785,7 +785,8 @@ Additional contributors to the project include (in order of appearance):
 * Ralf Ahlbrink (raprism@users.noreply.github.com)
 * Mikael Djurfeldt (mikael@djurfeldt.com)
 * Pasquale Pigazzini (pasquale.pigazzini@gmail.com)
-* Wolf <wolfwings@wolfwings.us>
+* Wolf (wolfwings@wolfwings.us)
+- Alex Sergeev (alexander.sergeev@live.com)
 
 The authors would like to acknowledge
 

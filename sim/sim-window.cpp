@@ -106,6 +106,16 @@ MainWindow::MainWindow(QWidget *parent)
     QCoreApplication::setOrganizationName("DB48X");
     QCoreApplication::setApplicationName(PROGRAM_NAME);
 
+    // Default the persisted state file path on first run, so that the RPL
+    // engine's EXIT_PGM handler in main.cc actually writes a state file
+    // (it's a no-op when no path has been configured). The file lives
+    // under the app data dir; QDir::setCurrent() is already pointed there.
+    if (ui_read_setting("state", nullptr, 0) == 0)
+    {
+        QString defaultPath = QString("state/") + PROGRAM_NAME + ".48S";
+        ui_save_setting("state", defaultPath.toUtf8().constData());
+    }
+
     ui.setupUi(this);
 
     // Disable automatic layout management for manual control

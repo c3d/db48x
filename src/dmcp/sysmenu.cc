@@ -395,8 +395,11 @@ static int state_load_callback(cstring path, cstring name, void *data)
         file prog(path, file::READING);
         if (!prog.valid())
         {
-            ui.draw_message("State load failed", prog.error(), name);
-            wait_for_key_press();
+            if (!is_silent)
+            {
+                ui.draw_message("State load failed", prog.error(), name);
+                wait_for_key_press();
+            }
             return 1;
         }
 
