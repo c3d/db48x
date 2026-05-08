@@ -185,6 +185,7 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *ev);
     bool         eventFilter(QObject *obj, QEvent *ev);
     void         resizeEvent(QResizeEvent *event);
+    void         closeEvent(QCloseEvent *event);
     void         handleAppStateChange(Qt::ApplicationState state);
 
 signals:
