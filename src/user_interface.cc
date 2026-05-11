@@ -5933,14 +5933,106 @@ bool user_interface::handle_digits(int key)
             }
             else
             {
-                byte   buf[4];
-                size_t sz = utf8_encode(Settings.ExponentSeparator(), buf);
-                insert(cursor, buf, sz);
+                // Special case for EEX
+                byte   *ed          = rt.editor();
+                byte   *p           = ed + cursor;
+                byte    cursor_move = 0;
+                uint    hadN        = 0;
+                uint    hadS        = 0;
+                bool    found       = false;
+                unicode c           = utf8_codepoint(p);
+                unicode dm          = Settings.DecimalSeparator();
+                unicode ns          = Settings.NumberSeparator();
+                unicode hs          = Settings.BasedSeparator();
+                while (p > ed)
+                {
+                    p = (byte *) utf8_previous(p);
+                    c = utf8_codepoint(p);
+                    if (c == '-' || c == '+')
+                    {
+                        if (!hadN)
+                            hadS = 1;
+                        else if (hadN)
+                            hadS = hadN;
+                        cursor_move++;
+                        continue;
+                    }
+                    if ((c >= '0' && c <= '9') || c == dm || c == ns)
+                    {
+                        if (!hadN && !hadS)
+                            hadN = 1;
+                        else if (hadS)
+                            hadN = hadS;
+                        cursor_move++;
+                        continue;
+                    }
+                    if (c == 'e' || c == 'E' ||
+                        c == Settings.ExponentSeparator())
+                    {
+                        // E    --> use old E   criteria: 1=0,2=0,3=0
+                        // E-   --> use old E   criteria: 1=S,2=0,3=0
+                        // E8   --> use old E   criteria: 1=N,2=0,3=0
+                        // E-8  --> use old E   criteria: 1=N,2=S,3=0
+                        // E8-   --> new E      criteria: 1=S,2=N,3=0
+                        // E-8-  --> new E      criteria: 1=S,2=N,3=S
+                        // E8-7  --> new E      criteria: 1=N,2=S,3=N
+                        // E8-7  --> new E      criteria: 1=N,2=S,3=N
+                        if ((hadS < 2 && hadN < 2) ||
+                            (hadN > 0 && hadN < 3 && hadS == 2))
+                        {
+                            found = true;
+                            for (int i = 0; i < cursor_move; i++)
+                                cursor = utf8_previous(ed, cursor);
+                        }
+                        break;
+                    }
+                    break;
+                }
+                // '(c)8.888887-8 cursor at beginning --> jump to end of Number,
+                // new E: 8.888887E(c)-8
+                // '(c)8.888887E-8 cursor at beginning --> jump to end of
+                // Number, use old E: 8.888887E(c)-8
+                if (!found)
+                {
+                    cursor_move = 0;
+                    p           = (byte *) ed + cursor;
+                    byte *ende  = ed + rt.editing();
+                    while (p < ende)
+                    {
+                        c = utf8_codepoint(p);
+                        p = (byte *) utf8_next(p);
+                        if ((c >= '0' && c <= '9') || c == dm || c == ns ||
+                            c == hs)
+                        {
+                            cursor_move++;
+                            cursor = utf8_next(ed, cursor);
+                            continue;
+                        }
+                        if (c == 'e' || c == 'E' ||
+                            c == Settings.ExponentSeparator())
+                        {
+                            found  = true;
+                            cursor = utf8_next(ed, cursor);
+                        }
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    p = (byte *) ed + cursor;
+                    p = (byte *) utf8_previous(p);
+                    c = utf8_codepoint(p);
+                    if (!((c >= '0' && c <= '9') || c == dm || c == ns ||
+                          c == hs))
+                        insert(cursor, utf8("1"), 1);
+                    byte   buf[4];
+                    size_t sz = utf8_encode(Settings.ExponentSeparator(), buf);
+                    insert(cursor, buf, sz);
+                }
             }
-            last = 0;
+            last        = 0;
             dirtyEditor = true;
             return true;
-
         }
     }
     if (key > KEY_CHS && key < KEY_F1)
