@@ -2285,17 +2285,13 @@ bool user_interface::draw_annunciators()
 
         if (alpha || user)
         {
-            static cstring lbls[] = {
-                "", "ABC", "abc", "abc",
-                "USR", "αUS", "usr", "αus",
-                "", "ABC", "abc", "abc",
-                "1US", "α1U", "1us", "α1u"
-            };
-            utf8 label = utf8(lbls[alpha + 2*lowercase + 4*user + 8*userOnce]);
+            unicode al = alpha ? (lowercase ? 'a' : 'A') : ' ';
+            unicode us = user ? (userOnce ? 'u' : 'U') : ' ';
             pattern apat = lowercase
                 ? Settings.LowerAlphaForeground()
                 : Settings.AlphaForeground();
-            Screen.text(alpha_x + 1, 0, label, hdr_font, apat);
+            Screen.glyph(alpha_x + 1, 0, us, hdr_font, apat);
+            Screen.glyph(alpha_x + 10, 0, al, hdr_font, apat);
         }
         alphaDrawn = alpha;
         lowercDrawn = lowercase;
