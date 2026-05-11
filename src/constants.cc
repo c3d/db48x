@@ -449,14 +449,29 @@ COMMAND_BODY(Constants)
 
 // ============================================================================
 //
-//   Constant definitions
-//   *: Algefrification & Conformity to CODATA2022
+//   Constant definitions - Algebrified and in conformity with CODATA2022
+//
 // ============================================================================
+//
+//  The HP48 constants are quite outdated. A lot of progress happened in the
+//  field of physics since then. This file reflects this progress.
+//
+//  In particular, physical constants now have uncertainty values, and
+//  they are connected to one another according to the laws of physics.
+//  As a result, many constants are now treated as *fundamental* that we obtain
+//  from measurements, while others are *derived*, i.e. *computed* from the
+//  value of measured constants. This ensures that better measurements will
+//  automatically improve the value of computed constants. This process is
+//  what we call "algebrified constants" in the comment above.
+//
 
 static const cstring basic_constants[] =
 // ----------------------------------------------------------------------------
 //   List of basic constants (including standard and relative uncertainty)
 // ----------------------------------------------------------------------------
+//   Revision: 2026-05-11  Jean Wilson (calculations & references)
+//                         with the aid of Claude's AI
+//
 //   clang-format off
 {
     // ------------------------------------------------------------------------
@@ -464,19 +479,54 @@ static const cstring basic_constants[] =
     // ------------------------------------------------------------------------
     "Mathematics",     nullptr,
 
-    "π",        "3.14159",              // Evaluated specially (decimal-pi.h)
-    "e",        "2.71828",              // Evaluated specially (decimal-e.h)
-    "ⅈ",        "0+ⅈ1",                 // Imaginary unit
-    "∞",        "9.99999E999999",       // A small version of infinity
-    "?",        "Undefined",            // Undefined result
+    // *Pi constant - Theory approximation - Evaluated specially (decimal-pi.h)
+    "π",      "[3.14159"
+                "  0 "
+                "  0 ]",
+    // *Euler number - Theory approximation - Evaluated specially (decimal-e.h)
+    "e",      "[2.71828"
+                "  0 "
+                "  0 ]",
+    // *Imaginary unit - Exact definition
+    "ⅈ",       "[0+ⅈ1"
+                "  0 "
+                "  0 ]",
+    // *Infinity - A small numeric version of infinity
+    "∞",      "[9.99999E999999"
+                "  0 "
+                "  0 ]",
+    // *Undefined constant - Exact convention
+    "?",      "[Undefined"
+                "  0 "
+                "  0 ]",
 
     // ------------------------------------------------------------------------
-    "ⅉ",        "0+ⅈ1",                 // Imaginary unit
-    "rad",      "[ 1_r 0_r 0 ]",        // One radian
-    "twoπ",     "[ '2*Ⓒπ'_r 0_r 0 ]",  // Two pi radian
-    "angl",     "[ 180_° 0_° 0 ]",      // Half turn
-    "−∞",       "-9.99999E999999",      // A small version of infinity
+    // *Imaginary unit in physics - Exact definition
+    "ⅉ",       "[0+ⅈ1"
+                "  0 "
+                "  0 ]",
+    // *One radian - Exact definition
+    "rad",      "[1_r"
+                "  0_r "
+                "  0 ]",
+    // *Two pi radians - Exact definition
+    "twoπ",     "['2*Ⓒπ'_r"
+                "  0_r "
+                "  0 ]",
+    // *Half turn (180°) - Exact definition
+    "angl",     "[ 180_°"
+                "  0_° "
+                "  0 ]",
+    // *Minus infinity - A small numeric version of minus infinity
+    "−∞",    "[-9.99999E999999"
+                "  0 "
+                "  0 ]",
 
+    // ------------------------------------------------------------------------
+    // *Euler-Mascheroni constant - Theory approximation
+    "γ",       "[ 0.5772156649015328606065120900824024 "
+                "  0 "
+                "  0 ]",
 
     // ------------------------------------------------------------------------
     //   Chemistry
@@ -484,29 +534,29 @@ static const cstring basic_constants[] =
 
     "Chemistry",     nullptr,
 
-    // *Avogadro's number - Exact definition
+    // *Avogadro's number - Exact definition [0]
     "NA",       "[ 6.02214076E23_mol⁻¹ "
                 "  0_mol⁻¹ "
                 "  0 ]",
-    // *Boltzmann - Exact definition
+    // *Boltzmann constant - Exact definition [0]
     "k",        "[ 1.380649E-23_J/K "
                 "  0_J/K "
                 "  0 ]",
-    // *Molar volume - Calculation convention
+    // *Molar volume - Exact calculation [0]
     "Vm",       "[ 'CONVERT(ⒸR*ⒸStdT/ⒸStdP;1_m^3/mol)' "
                 "  0_m^3/mol "
                 "  0 "
                 "  2.241E-2_m^3/mol ]",
-    // *Universal gas constant - Exact calculation
+    // *Universal gas constant - Exact calculation [0]
     "R",        "[ 'CONVERT(ⒸNA*Ⓒk;1_J/(mol*K))' "
                 "  0_J/(mol*K) "
                 "  0 "
-                "  8.314 J/(mol·K) ]",
-    // *Stefan-Boltzmann - Exact calculation
-    "σ",        "[ 'CONVERT(Ⓒπ²/60*Ⓒk^4/(Ⓒℏ^3*Ⓒc²);1_W/(m²*K^4))' "
-                "  0_W/(m²*K^4) "
+                "  8.314_J/(mol·K) ]",
+    // *Faraday constant - Exact calculation [0]
+    "F",        "[ 'CONVERT(ⒸNA*Ⓒqe;1_C/mol)' "
+                "  0_C/mol "
                 "  0 "
-                "  5.67⁳⁻⁸ W/(m↑2·K↑4) ]",
+                "  96485._C/mol ]",
 
     // ------------------------------------------------------------------------
     // *Standard temperature - Definition convention
@@ -517,39 +567,38 @@ static const cstring basic_constants[] =
     "StdP",     "[ 101.325_kPa "
                 "  0_kPa "
                 "  0 ]",
-    // *Molar Mass Constant - Calculation from measurement
+    // *Molar mass constant - Calculation from measurement [0]
     "Mu",       "[ 'ROUND(CONVERT(ⒸNA*Ⓒu;1_g/mol);XPON(ⓇMu*ⒸNA*Ⓒu)-XPON(ⒸNA*Ⓒu)-2)' "
                 "  'ROUND(CONVERT(ⓇMu*ⒸMu;1_g/mol);-2)' "
                 "  'Ⓡu' "
-                "  1 g/mol ]",
-    // *C12 Molar Mass - Calculation from measurement
+                "  1_g/mol ]",
+    // *C12 molar mass - Calculation from measurement [0]
     "MC12",     "[ 'ROUND(CONVERT(12*ⒸMu;1_g/mol);XPON(UVAL(ⓇMC12*12*ⒸMu))-XPON(UVAL(12*ⒸMu))-2)' "
                 "  'ROUND(CONVERT(ⓇMC12*ⒸMC12;1_g/mol);-2)' "
                 "  'ⓇMu' "
-                "  12 g/mol ]",
+                "  12_g/mol ]",
+    // *Mass unit (Dalton) - Calculation from measurement [0]
+    "Da",       "[ 'Ⓒu' "
+                "  'Ⓢu' "
+                "  'Ⓡu' "
+                "  1.661E-27_kg ]",
 
-    // *Loschmidt constant - Exact calculation
+    // ------------------------------------------------------------------------
+    // *Loschmidt constant - Exact calculation [0]
     "n0",       "[ 'CONVERT(ⒸNA/ⒸVm;1_m^-3)' "
                 "  0_m^-3 "
                 "  0 "
-                "  2.687⁳²⁵ (m↑3)⁻¹ ]",
-
-    // ------------------------------------------------------------------------
-    // *Sakur-Tetrode constant - Calculation from measurement
+                "  2.687E25_(m↑3)⁻¹ ]",
+    // *Sackur-Tetrode constant - Calculation from measurement [0]
     "SoR",      "[ 'ROUND((5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP));XPON(ⓇSoR*(5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP)))-XPON((5/2+LN(UBASE(Ⓒu*Ⓒk*(1_K)/(2*Ⓒπ*Ⓒℏ²))^1.5*Ⓒk*(1_K)/ⒸStdP)))-2)' "
                 "  'ROUND(ⓇSoR*ABS(ⒸSoR);-2)' "
                 "  4.0E-10 "
                 "  -1.165 ]",
-    // *Mass unit (Dalton) - Calculation from measurement
-    "Da",       "[ 'Ⓒu' "
-                "  'Ⓢu' "
-                "  'Ⓡu' "
-                "  1.661⁳⁻²⁷ kg ]",
-    // * kq ratio - Exact calculation
+    // *kq ratio - Exact calculation [0]
     "kq",       "[ 'CONVERT(Ⓒk/Ⓒqe;1_J/(K*C))' "
                 "  0_J/(K*C) "
                 "  0 "
-                "  8.617⁳⁻⁵ J/(K·C) ]",
+                "  8.617E-5_J/(K·C) ]",
 
     // ------------------------------------------------------------------------
     //   Physics
@@ -557,13 +606,15 @@ static const cstring basic_constants[] =
 
     "Physics",      nullptr,
 
-    // *Imaginary unit in physics - Definition convention
-    "ⅉ",         "0+ⅈ1",
-    // *Speed of light - Exact definition
+    // *Imaginary unit in physics - Exact definition
+    "ⅉ",       "[0+ⅈ1"
+                "  0 "
+                "  0 ]",
+    // *Speed of light - Exact definition [0]
     "c",        "[ 299792458_m/s "
                 "  0_m/s "
                 "  0 ]",
-    // *Gravitation constant - Measurement
+    // *Gravitation constant - Measurement [0]
     "G",        "[ 6.67430E-11_m^3/(s²*kg) "
                 "  0.00015E-11_m^3/(s²*kg) "
                 "  'ROUND(UBASE(ⓈG/ⒸG);-2)' ]",
@@ -571,91 +622,174 @@ static const cstring basic_constants[] =
     "g",        "[ 9.80665_m/s² "
                 "  0_m/s² "
                 "  0 ]",
-    // *Vacuum characteristic impedance - Calculation from measurement
-    "Z₀",       "[ 'ROUND(CONVERT(Ⓒμ₀*Ⓒc;1_Ω);XPON(UVAL(ⓇZ₀*Ⓒμ₀*Ⓒc))-XPON(UVAL(Ⓒμ₀*Ⓒc))-2)' "
-                "  'CONVERT(ROUND(UBASE(ⓇZ₀*ⒸZ₀);-2);1_Ω)' "
-                "  'Ⓡμ₀' "
-                "  376.7 Ω ]",
+    // *Stefan-Boltzmann constant - Exact calculation [0]
+    "σ",        "[ 'CONVERT(Ⓒπ²/60*Ⓒk^4/(Ⓒℏ^3*Ⓒc²);1_W/(m²*K^4))' "
+                "  0_W/(m²*K^4) "
+                "  0 "
+                "  5.670E-8_W/(m↑2·K↑4) ]",
 
     // ------------------------------------------------------------------------
-    // *Vaccuum permittivity - Calculation from measurement
+    // *Vacuum permittivity - Calculation from measurement [0]
     "ε₀",       "[ 'ROUND(CONVERT(1/(Ⓒμ₀*Ⓒc²);1_F/m);XPON(UVAL(Ⓡε₀/(Ⓒμ₀*Ⓒc²)))-XPON(UVAL(1/(Ⓒμ₀*Ⓒc²)))-2)' "
                 "  'Convert(ROUND(UBASE(Ⓡε₀*Ⓒε₀);-2); 1_F/m)' "
                 "  'Ⓡμ₀' "
-                "  8.854⁳⁻¹² F/m ]",
-    // *Vaccuum permeability - Calculation from measurement
+                "  8.854E-12_F/m ]",
+    // *Vacuum permeability - Calculation from measurement [0]
     "μ₀",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc);1_H/m);XPON(UVAL(Ⓡμ₀*4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc)))-XPON(UVAL(4*Ⓒπ*Ⓒα*Ⓒℏ/(Ⓒqe²*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡμ₀*Ⓒμ₀);-2);1_H/m)' "
                 "  'Ⓡα' "
-                "  1.257⁳⁻⁶ H/m ]",
-    // *Coulomb constant - Calculation from measurement
+                "  1.257E-6_H/m ]",
+    // *Coulomb constant - Calculation from measurement [0]
     "ke",      "[ 'ROUND(CONVERT(1/(4*Ⓒπ*Ⓒε₀);1_(N*(m/C)²));XPON(UVAL(Ⓡke/(4*Ⓒπ*Ⓒε₀)))-XPON(UVAL(1/(4*Ⓒπ*Ⓒε₀)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡke*Ⓒke);-2);1_(N*(m/C)²))' "
                 "  'Ⓡε₀' "
-                "  8.988⁳⁹ N·m↑2/C↑2 ]",
+                "  8.988E9_N·m↑2/C↑2 ]",
+    // *Vacuum characteristic impedance - Calculation from measurement [0]
+    "Z₀",       "[ 'ROUND(CONVERT(Ⓒμ₀*Ⓒc;1_Ω);XPON(UVAL(ⓇZ₀*Ⓒμ₀*Ⓒc))-XPON(UVAL(Ⓒμ₀*Ⓒc))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇZ₀*ⒸZ₀);-2);1_Ω)' "
+                "  'Ⓡμ₀' "
+                "  376.7_Ω ]",
+    // *ε₀q ratio - Calculation from measurement [0]
+    "ε₀q",      "[ 'ROUND(CONVERT(Ⓒε₀/Ⓒqe;1_F/(m*C));XPON(UVAL(Ⓡε₀q*Ⓒε₀/Ⓒqe))-XPON(UVAL(Ⓒε₀/Ⓒqe))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡε₀q*Ⓒε₀q);-2);1_F/(m*C))' "
+                "  'Ⓡε₀' "
+                "  5.526E7_F/(m·C) ]",
 
     // ------------------------------------------------------------------------
-    //   Particle masses
+    // *qε₀ product - Calculation from measurement [0]
+    "qε₀",      "[ 'ROUND(CONVERT(Ⓒqe*Ⓒε₀;1_F*C/m);XPON(UVAL(Ⓡqε₀*Ⓒqe*Ⓒε₀))-XPON(UVAL(Ⓒqe*Ⓒε₀))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡqε₀*Ⓒqε₀);-2);1_F*C/m)' "
+                "  'Ⓡε₀' "
+                "  1.419E-30_F·C/m ]",
+    // *Ref intensity - Definition convention
+    "I₀",       "[ 0.000000000001_W/m² "
+                "  0_W/m² "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    //   Mass constants
     // ------------------------------------------------------------------------
 
     "Mass",     nullptr,
 
-    // ------------------------------------------------------------------------
-    // *Electron mass - Calculation from measurement
-    "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
-                "  'Ⓡu' "
-                "  9.109⁳⁻³¹ kg ]",
-    // *Neutron mass - Measurement
-    "mn",       "[ 1.67492750056E-27_kg "
-                "  0.00000000085E-27_kg "
-                "  'ROUND(UBASE(Ⓢmn/Ⓒmn);-2)' ]",
-    // *Proton mass - Measurement
-    "mp",       "[ 1.67262192595E-27_kg "
-                "  0.00000000052E-27_kg "
-                "  'ROUND(UBASE(Ⓢmp/Ⓒmp);-2)' ]",
-    // *Hydrogen mass - Measurement
-    "mH",       "[ 1.00782503223_u "
-                "  0.00000000009_u "
-                "  'ROUND(UBASE(ⓈmH/ⒸmH);-2)' ]",
-    // *Mass unit (u) - Calculation from measurement
+    // *Mass unit (u) - Calculation from measurement [0]
     "u",        "[ 'ROUND(CONVERT(Ⓒme/ⒸAre;1_kg);XPON(UVAL(Ⓡu*Ⓒme/ⒸAre))-XPON(UVAL(Ⓒme/ⒸAre))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡu*Ⓒu);-2);1_kg)' "
                 "  3.1E-10 "
-                "  1.661⁳⁻²⁷ kg ]",
+                "  1.661E-27_kg ]",
+    // *Electron mass - Calculation from measurement [0]
+    "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
+                "  'Ⓡu' "
+                "  9.109E-31_kg ]",
+    // *Neutron mass - Measurement [0]
+    "mn",       "[ 1.67492750056E-27_kg "
+                "  0.00000000085E-27_kg "
+                "  'ROUND(UBASE(Ⓢmn/Ⓒmn);-2)' "
+                "  1.675E-27_kg ]",
+    // *Proton mass - Measurement [0]
+    "mp",       "[ 1.67262192595E-27_kg "
+                "  0.00000000052E-27_kg "
+                "  'ROUND(UBASE(Ⓢmp/Ⓒmp);-2)' "
+                "  1.673E-27_kg ]",
+    // *Hydrogen mass - Measurement [0]
+    "mH",       "[ 1.00782503223_u "
+                "  0.00000000009_u "
+                "  'ROUND(UBASE(ⓈmH/ⒸmH);-2)' "
+                "  1.008_u ]",
 
     // ------------------------------------------------------------------------
-    // *Deuterium mass - Measurement
+    // *Deuterium mass - Measurement [0]
     "mD",       "[ 2.01410177812_u "
                 "  0.00000000012_u "
-                "  'ROUND(UBASE(ⓈmD/ⒸmD);-2)' ]",
-    // *Tritium mass - Measurement
+                "  'ROUND(UBASE(ⓈmD/ⒸmD);-2)' "
+                "  2.014_u ]",
+    // *Tritium mass - Measurement [0]
     "mT",       "[ 3.0160492779_u "
                 "  0.0000000024_u "
-                "  'ROUND(UBASE(ⓈmT/ⒸmT);-2)' ]",
-    // *Helium atomic mass - Measurement
+                "  'ROUND(UBASE(ⓈmT/ⒸmT);-2)' "
+                "  3.016_u ]",
+    // *Helium atomic mass - Measurement [0]
     "mHe",      "[ 4.00260325413_u "
                 "  0.00000000006_u "
-                "  'ROUND(UBASE(ⓈmHe/ⒸmHe);-2)' ]",
-    // *Muon mass - Measurement
+                "  'ROUND(UBASE(ⓈmHe/ⒸmHe);-2)' "
+                "  4.003_u ]",
+    // *Muon mass - Measurement [0]
     "mμ",       "[ 0.1134289257_u "
                 "  0.0000000025_u "
-                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' ]",
-    // *Tau mass - Measurement
+                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' "
+                "  0.1134_u ]",
+    // *Tau mass - Measurement [0]
     "mτ",       "[ 1.90754_u "
                 "  0.00013_u "
-                "  'ROUND(UBASE(Ⓢmτ/Ⓒmτ);-2)' ]",
+                "  'ROUND(UBASE(Ⓢmτ/Ⓒmτ);-2)' "
+                "  1.908_u ]",
 
     // ------------------------------------------------------------------------
-    // *mpme ratio - Measurement
+    // *mpme ratio - Measurement [0]
     "mpme",     "[ 1836.152673426 "
                 "  0.000000032 "
-                "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' ]",
-    // *Electron relative atomic mass - Measurement
+                "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' "
+                "  1836. ]",
+    // *Electron relative atomic mass - Measurement [0]
     "Are",       "[ 5.485799090441E-4 "
                 "  0.000000000097E-4 "
-                "  'ROUND(ⓈAre/ⒸAre;-2)' ]",
+                "  'ROUND(ⓈAre/ⒸAre;-2)' "
+                "  5.486E-4 ]",
+    // *Top quark mass - Measurement [2]
+    "mQtop",       "[ 172.52_GeV "
+                "  0.33_GeV "
+                "  'ROUND(ⓈmQtop/ⒸmQtop;-2)' "
+                "  173._GeV ]",
+    // *Bottom quark mass - Measurement [2]
+    "mQbot",       "[ 4.183_GeV "
+                "  0.007_GeV "
+                "  'ROUND(ⓈmQbot/ⒸmQbot;-2)' "
+                "  4.183_GeV ]",
+    // *Charm quark mass - Measurement [2]
+    "mQcha",       "[ 1.2730_GeV "
+                "  0.0046_GeV "
+                "  'ROUND(ⓈmQcha/ⒸmQcha;-2)' "
+                "  1.273_GeV ]",
 
+    // ------------------------------------------------------------------------
+    // *Strange quark mass - Measurement [2]
+    "mQstr",       "[ 93.5_MeV "
+                "  0.8_MeV "
+                "  'ROUND(ⓈmQstr/ⒸmQstr;-2)' ]",
+    // *Down quark mass - Measurement [2]
+    "mQdwn",       "[ 4.70_MeV "
+                "  0.07_MeV "
+                "  'ROUND(ⓈmQdwn/ⒸmQdwn;-2)' ]",
+    // *Up quark mass - Measurement [2]
+    "mQup",       "[ 2.16_MeV "
+                "  0.07_MeV "
+                "  'ROUND(ⓈmQup/ⒸmQup;-2)' ]",
+    // *Maximum neutrino mass - Measurement [2]
+    "mνmax",       "[ 0.45_eV/c² "
+                "  0_eV/c² "
+                "  0 ]",
+    // *Minimum neutrino mass - Measurement [2]
+    "mνmin",       "[ 0.001_eV/c² "
+                "  0_eV/c² "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Higgs boson mass - Measurement [15]
+    "mHig",       "[ 125.11_GeV "
+                "  0.11_GeV "
+                "  'ROUND(ⓈmHig/ⒸmHig;-2)' "
+                "  125._GeV ]",
+    // *W boson mass - Measurement [16]
+    "mW",       "[ 80.3602_GeV "
+                "  0.0099_GeV "
+                "  'ROUND(ⓈmW/ⒸmW;-2)' "
+                "  80.36_GeV ]",
+    // *Z° boson mass - Measurement [17]
+    "mZ°",       "[ 91.1876_GeV "
+                "  0.0021_GeV "
+                "  'ROUND(ⓈmZ°/ⒸmZ°;-2)' "
+                "  91.19_GeV ]",
 
     // ------------------------------------------------------------------------
     //   Electromagnetism
@@ -663,49 +797,129 @@ static const cstring basic_constants[] =
 
     "Electromagnetism",     nullptr,
 
-    // ------------------------------------------------------------------------
-    // *Electronic charge - Exact definition
+    // *Electronic charge - Exact definition [0]
     "qe",       "[ 1.602176634E-19_C "
                 "  0_C "
                 "  0 ]",
-    // *Photon wavelength - Exact calculation
-    "λ0",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒqe/(1_V);1_nm)' "
+    // *Rydberg constant - Measurement [0]
+    "R∞",       "[ 10973731.568157_m⁻¹ "
+                "  0.000012_m⁻¹ "
+                "  'ROUND(UBASE(ⓈR∞/ⒸR∞);-2)' "
+                "  1.097E7_m⁻¹ ]",
+    // *Photon wavelength - Exact calculation [0]
+    "λ₀",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒqe/(1_V);1_nm)' "
                 "  0_nm "
                 "  0 ]",
-    // *Photon frequency - Exact calculation1 239.84198 43320 03 nm
-    "f0",       "[ 'CONVERT(Ⓒc/Ⓒλ0;1_Hz)' "
+    // *Photon frequency - Exact calculation [0]
+    "f₀",       "[ 'CONVERT(Ⓒc/Ⓒλ₀;1_Hz)' "
                 "  0_Hz "
                 "  0 "
-                "  2.418⁳¹⁴ Hz ]",
-    // *Electron g-factor - Measurement
+                "  2.418E14_Hz ]",
+    // *Electron g-factor - Measurement [0]
     "ge",       "[ -2.00231930436092 "
                 "  0.00000000000036 "
                 "  'ROUND(UBASE(ABS(Ⓢge/Ⓒge));-2)' ]",
-    // *qme ratio - Calculation from measurement
+
+    // ------------------------------------------------------------------------
+    // *qme ratio - Calculation from measurement [0]
     "qme",      "[ 'ROUND(CONVERT(Ⓒqe/Ⓒme;1_C/kg);XPON(UVAL(Ⓡqme*Ⓒqe/Ⓒme))-XPON(UVAL(Ⓒqe/Ⓒme))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡqme*Ⓒqme);-2);1_C/kg)' "
                 "  'Ⓡme' "
-                "  1.759⁳¹¹ C/kg ]",
-
-    // ------------------------------------------------------------------------
-    // *Electron magnetic moment - Measurement
+                "  1.759E11_C/kg ]",
+    // *Electron magnetic moment - Measurement [0]
     "μe",       "[ -9.2847646917E-24_J/T "
                 "  0.0000000029E-24_J/T "
                 "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
-    // *Proton magnetic moment - Measurement
+    // *Proton magnetic moment - Measurement [0]
     "μp",       "[ 1.41060679545E-26_J/T "
                 "  0.00000000060E-26_J/T "
                 "  'ROUND(UBASE(ABS(Ⓢμp/Ⓒμp));-2)' ]",
-    // *Neutron magnetic moment - Measurement
+    // *Neutron magnetic moment - Measurement [0]
     "μn",       "[ -9.6623653E-27_J/T "
                 "  0.0000023E-27_J/T "
                 "  'ROUND(UBASE(ABS(Ⓢμn/Ⓒμn));-2)' ]",
-    // *Muon magnetic moment - Measurement
+    // *Muon magnetic moment - Measurement [0]
     "μμ",       "[ -4.49044830E-26_J/T "
                 "  0.00000010E-26_J/T "
                 "  'ROUND(UBASE(ABS(Ⓢμμ/Ⓒμμ));-2)' ]",
 
     // ------------------------------------------------------------------------
+    // *Bohr magneton - Calculation from measurement [0]
+    "μB",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒme);1_J/T);XPON(UVAL(ⓇμB*Ⓒqe*Ⓒℏ/(2*Ⓒme)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒme)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇμB*ⒸμB);-2);1_J/T)' "
+                "  'Ⓡme' "
+                "  9.274E-24_J/T ]",
+    // *Nuclear magneton - Calculation from measurement [0]
+    "μN",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒmp);1_J/T);XPON(UVAL(ⓇμN*Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇμN*ⒸμN);-2);1_J/T)' "
+                "  'Ⓡmp' "
+                "  5.051E-27_J/T ]",
+    // *Electron gyromagnetic ratio - Calculation from measurement [0]
+    "γe",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμe)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγe*2*ABS(Ⓒμe)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμe)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγe*Ⓒγe);-2);1_(s*T)^-1)' "
+                "  'Ⓡμe' "
+                "  1.761E11_(s·T)⁻¹ ]",
+    // *Proton gyromagnetic ratio - Calculation from measurement [0]
+    "γp",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμp)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγp*2*ABS(Ⓒμp)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμp)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγp*Ⓒγp);-2);1_(s*T)^-1)' "
+                "  'Ⓡμp' "
+                "  2.675E8_(s·T)⁻¹ ]",
+    // *Neutron gyromagnetic ratio - Calculation from measurement [0]
+    "γn",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμn)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγn*2*ABS(Ⓒμn)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμn)/Ⓒℏ))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡγn*Ⓒγn);-2);1_(s*T)^-1)' "
+                "  'Ⓡμn' "
+                "  1.832E8_(s·T)⁻¹ ]",
+
+    // ------------------------------------------------------------------------
+    // *First radiation constant - Exact calculation [0]
+    "c1",       "[ 'CONVERT(2*Ⓒπ*Ⓒh*Ⓒc²;1_(W*m²))' "
+                "  0_(W*m²) "
+                "  0 "
+                "  3.742E-16_W·m↑2 ]",
+    // *Second radiation constant - Exact calculation [0]
+    "c2",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒk;1_(m*K))' "
+                "  0_(m*K) "
+                "  0 "
+                "  0.01439_m·K ]",
+    // *Wien's wavelength constant - Theory approximation [0]
+    "c3",       "[ 2.897771955185172661478605448092885_mm*K "
+                "  0_mm*K "
+                "  0 ]",
+    // *Wien's frequency constant - Theory approximation [0]
+    "c3f",      "[ 0.05878925757646824946606130795309722_THz/K "
+                "  0_THz/K "
+                "  0 ]",
+    // *von Klitzing constant - Exact calculation [0]
+    "Rk",       "[ 'CONVERT(2*Ⓒπ*Ⓒℏ/Ⓒqe²;1_Ω)' "
+                "  0_Ω "
+                "  0 "
+                "  25813._Ω ]",
+
+    // ------------------------------------------------------------------------
+    // *Conductance quantum - Exact calculation [0]
+    "G0",       "[ 'CONVERT(Ⓒqe²/(Ⓒπ*Ⓒℏ);1_S)' "
+                "  0_S "
+                "  0 "
+                "  7.748E-5_S ]",
+    // *Fermi reduced coupling constant - Measurement [2]
+    "G0F",       "[ 1.1663787E-5_GeV^-2 "
+                "  0.0000006E-5_GeV^-2 "
+                "  'ROUND(UBASE(ABS(ⓈG0F/ⒸG0F));-2)' ]",
+    // *Magnetic flux quantum - Exact calculation [0]
+    "ø",        "[ 'CONVERT(Ⓒπ*Ⓒℏ/Ⓒqe;1_Wb)' "
+                "  0_Wb "
+                "  0 "
+                "  2.068E-15_Wb ]",
+    // *Josephson constant - Exact calculation [0]
+    "KJ",       "[ 'CONVERT(2*Ⓒqe/Ⓒh;1_Hz/V)' "
+                "  0_Hz/V "
+                "  0 "
+                "  4.836E14_Hz/V ]",
+    // *Quantum of circulation - Calculation from measurement [0]
+    "Kc",       "[ 'ROUND(CONVERT(Ⓒπ*Ⓒℏ/Ⓒme;1_m²/s);XPON(UVAL(ⓇKc*Ⓒπ*Ⓒℏ/Ⓒme))-XPON(UVAL(Ⓒπ*Ⓒℏ/Ⓒme))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇKc*ⒸKc);-2);1_m²/s)' "
+                "  'Ⓡme' "
+                "  3.637E-4_m↑2/s ]",
 
     // ------------------------------------------------------------------------
     //   Particle sizes
@@ -713,59 +927,60 @@ static const cstring basic_constants[] =
 
     "Size",     nullptr,
 
-    // *Classical electron radius - Calculation from measurement
+    // *Classical electron radius - Calculation from measurement [0]
     "re",       "[ 'ROUND(CONVERT(Ⓒα^2*Ⓒa0; 1_fm); XPON(Ⓡre*Ⓒα^2*Ⓒa0) - XPON(Ⓒα^2*Ⓒa0) - 2)' "
                 "  'ROUND(Ⓡre*Ⓒre; -2)' "
                 "  'ROUND(3*Ⓢα/Ⓒα; -2)' "
-                "  2.818 fm ]",
-    // *Proton charge radius - Measurement
-    "rp",       "[ 8.4075⁳-16_m "
-                "  0.0064⁳-16_m "
+                "  2.818_fm ]",
+    // *Proton charge radius - Measurement [0]
+    "rp",       "[ 8.4075E-16_m "
+                "  0.0064E-16_m "
                 "  'ROUND(Ⓢrp/Ⓒrp;-2)' "
-                "  0.841 fm ]",
-    // *Bohr radius - Calculation from measurement
+                "  0.841_fm ]",
+    // *Bohr radius - Calculation from measurement [0]
     "a0",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²);1_nm);XPON(UVAL(Ⓡa0*4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-XPON(UVAL(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓢα/Ⓒα*Ⓒa0);-2);1_nm)' "
                 "  'Ⓡα' "
-                "  5.292⁳⁻² nm ]",
-    // *Thomson cross-section - Calculation from measurement
-    "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
-                "  'ROUND(6*Ⓢα/Ⓒα;-2)' "
-                "  6.652⁳⁻²⁹ m² ]",
-
+                "  5.292E-2_nm ]",
 
     // ------------------------------------------------------------------------
     //    Compton effect
     // ------------------------------------------------------------------------
 
     "Scattering",   nullptr,
-    // ------------------------------------------------------------------------
-    // *Electron Compton wavelength - Calculation from measurement
+
+    // *Thomson cross-section - Calculation from measurement [0]
+    "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
+                "  'ROUND(6*Ⓢα/Ⓒα;-2)' "
+                "  6.652E-29_m² ]",
+    // *Electron Compton wavelength - Calculation from measurement [0]
     "λc",       "[ 'ROUND(CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm);XPON(UVAL(Ⓡλc*Ⓒh/(Ⓒme*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒme*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡλc*Ⓒλc);-2);1_nm)' "
                 "  'Ⓡme' "
-                "  2.426⁳⁻³ nm ]",
-    // *Proton Compton wavelength - Calculation from measurement
+                "  2.426E-3_nm ]",
+    // *Proton Compton wavelength - Calculation from measurement [0]
     "λcp",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm);XPON(UVAL(Ⓡλcp*Ⓒh/(Ⓒmp*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmp*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡλcp*Ⓒλcp);-2);1_nm)' "
                 "  'Ⓡmp' "
-                "  1.321⁳⁻⁶ nm ]",
-    // *Neutron Compton wavelength - Calculation from measurement
+                "  1.321E-6_nm ]",
+    // *Neutron Compton wavelength - Calculation from measurement [0]
     "λcn",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm);XPON(UVAL(Ⓡλcn*Ⓒh/(Ⓒmn*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmn*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡλcn*Ⓒλcn);-2);1_nm)' "
                 "  'Ⓡmn' "
-                "  1.32⁳⁻⁶ nm ]",
-    // *Muon Compton wavelength - Calculation from measurement
+                "  1.320E-6_nm ]",
+    // *Muon Compton wavelength - Calculation from measurement [0]
     "λcμ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmμ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcμ*Ⓒh/(Ⓒmμ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmμ*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡλcμ*Ⓒλcμ);-2);1_nm)' "
                 "  'Ⓡmμ' "
-                "  1.173⁳⁻⁵ nm ]",
-    // *Tau Compton wavelength - Calculation from measurement
+                "  1.173E-5_nm ]",
+
+    // ------------------------------------------------------------------------
+    // *Tau Compton wavelength - Calculation from measurement [0]
     "λcτ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmτ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcτ*Ⓒh/(Ⓒmτ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmτ*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡλcτ*Ⓒλcτ);-2);1_nm)' "
                 "  'Ⓡmτ' "
-                "  6.978⁳⁻⁷ nm ]",
+                "  6.978E-7_nm ]",
 
     // ------------------------------------------------------------------------
     //   Quantum mechanics
@@ -773,202 +988,1517 @@ static const cstring basic_constants[] =
 
     "Quantum",    nullptr,
 
-    // *Planck - Exact definition
+    // *Planck constant - Exact definition [0]
     "h",        "[ 6.62607015E-34_J*s "
                 "  0_J*s "
                 "  0 ]",
-    // *Dirac - Exact definition
+    // *Dirac constant - Exact definition [0]
     "ℏ",        "[ 'CONVERT(Ⓒh/(2*Ⓒπ);1_J*s)' "
                 "  0_J*s "
                 "  0 "
-                "  1.055⁳⁻³⁴ J·s ]",
-    // *fine structure constant - Measurement
+                "  1.055E-34_J·s ]",
+    // *Fine structure constant - Measurement [0]
     "α",        "[ 0.00729735256434 "
                 "  0.00000000000114 "
                 "  'ROUND(UBASE(Ⓢα/Ⓒα);-2)' ]",
-    // *Cs hyperfine transition - Exact definition
+    // *Cs hyperfine transition frequency - Exact definition [0]
     "ΔfCs",     "[ 9192631770_Hz "
                 "  0_Hz "
                 "  0 ]",
-    // *Weak mixing angle - Measurement
+    // *Weak mixing angle - Calculation from measurement [2]
     "θw",       "[ 'ROUND(CONVERT(ASIN(√(0.22305));1_°);XPON(UVAL(Ⓡθw*ASIN(√(0.22305))))-XPON(UVAL(ASIN(√(0.22305))))-2)' "
                    "'CONVERT(ROUND((ASIN(√(0.22305+0.00023))-ASIN(√(0.22305-0.00023)))/2;-2);1_°)' "
                 "  'ROUND(UBASE(ABS(Ⓢθw/CONVERT(ASIN(√(0.22305));1_°)));-2)' "
-                "  28.18 ° ]"
-,
+                "  28.18_° ]",
 
     // ------------------------------------------------------------------------
-    // *Planck length - Calculation from measurement
+    // *Planck length - Calculation from measurement [0]
     "Lpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^3);1_m);XPON(UVAL(ⓇLpl*√(Ⓒℏ*ⒸG/Ⓒc^3)))-XPON(UVAL(√(Ⓒℏ*ⒸG/Ⓒc^3)))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇLpl*ⒸLpl);-2);1_m)' "
                 "  'ⓇG/2' "
-                "  1.616⁳⁻³⁵ m ]",
-    // *Planck time - Calculation from measurement
+                "  1.616E-35_m ]",
+    // *Planck time - Calculation from measurement [0]
     "Tpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*ⒸG/Ⓒc^5);1_s);XPON(UVAL(ⓇTpl*√(Ⓒℏ*ⒸG/Ⓒc^5)))-XPON(UVAL(√(Ⓒℏ*ⒸG/Ⓒc^5)))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇTpl*ⒸTpl);-2);1_s)' "
                 "  'ⓇG/2' "
-                "  5.391⁳⁻⁴⁴ s ]",
-    // *Planck mass - Calculation from measurement
+                "  5.391E-44_s ]",
+    // *Planck mass - Calculation from measurement [0]
     "Mpl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc/ⒸG);1_kg);XPON(UVAL(ⓇMpl*√(Ⓒℏ*Ⓒc/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc/ⒸG)))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇMpl*ⒸMpl);-2);1_kg)' "
                 "  'ⓇG/2' "
-                "  2.176⁳⁻⁸ kg ]",
-    // *Planck energy - Calculation from measurement
+                "  2.176E-8_kg ]",
+    // *Planck energy - Calculation from measurement [0]
     "Epl",      "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc^5/ⒸG);1_GeV);XPON(UVAL(ⓇEpl*√(Ⓒℏ*Ⓒc^5/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc^5/ⒸG)))-2)' "
                 "  'ROUND(CONVERT(ROUND(UBASE(ⓇEpl*ⒸEpl);-2);1_GeV);-2)' "
                 "  'ⓇG/2' "
-                "  1.221⁳¹⁹ GeV ]",
-    // *Planck temperature - Calculation from measurement
+                "  1.221E19_GeV ]",
+    // *Planck temperature - Calculation from measurement [0]
     "T°pl",     "[ 'ROUND(CONVERT(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk;1_K);XPON(UVAL(ⓇT°pl*√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-XPON(UVAL(√((Ⓒℏ*Ⓒc^5/ⒸG))/Ⓒk))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇT°pl*ⒸT°pl);-2);1_K)' "
                 "  'ⓇG/2' "
-                "  1.417⁳³² K ]",
+                "  1.417E32_K ]",
 
     // ------------------------------------------------------------------------
-    // *Hartree energy - Calculation from measurement
+    // *Planck charge - Calculation from measurement [0]
+    "qpl",     "[ 'ROUND(CONVERT(√(4*Ⓒπ*Ⓒε₀*Ⓒℏ*Ⓒc);1_C);XPON(UVAL(Ⓡqpl*√(4*Ⓒπ*Ⓒε₀*Ⓒℏ*Ⓒc)))-XPON(UVAL(√(4*Ⓒπ*Ⓒε₀*Ⓒℏ*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡqpl*Ⓒqpl);-2);1_C)' "
+                "  'Ⓡε₀/2' "
+                "  1.876E-18_C ]",
+    // *Planck momentum - Calculation from measurement [0]
+    "ppl",     "[ 'ROUND(CONVERT(√(Ⓒℏ*Ⓒc↑3/ⒸG);1_kg·m/s);XPON(UVAL(Ⓡppl*√(Ⓒℏ*Ⓒc↑3/ⒸG)))-XPON(UVAL(√(Ⓒℏ*Ⓒc↑3/ⒸG)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡppl*Ⓒppl);-2);1_kg·m/s)' "
+                "  'ⓇG/2' "
+                "  6.525_kg·m/s ]",
+    // *Planck force - Calculation from measurement [0]
+    "Fpl",     "[ 'ROUND(CONVERT(Ⓒc↑4/ⒸG;1_N);XPON(UVAL(Ⓡppl*Ⓒc↑4/ⒸG))-XPON(UVAL(Ⓒc↑4/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇFpl*ⒸFpl);-2);1_N)' "
+                "  'ⓇG' "
+                "  1.210E44_N ]",
+    // *Planck density - Calculation from measurement [0]
+    "ρvpl",     "[ 'ROUND(CONVERT(Ⓒc↑5/(Ⓒℏ*ⒸG²);1_kg/m³);XPON(UVAL(Ⓡρvpl*Ⓒc↑5/(Ⓒℏ*ⒸG²)))-XPON(UVAL(Ⓒc↑5/(Ⓒℏ*ⒸG²)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρvpl*Ⓒρvpl);-2);1_kg/m³)' "
+                "  'ⓇG*2' "
+                "  5.155E96_kg/m³ ]",
+    // *Hartree energy - Calculation from measurement [0]
     "Eh",       "[ 'ROUND(CONVERT(2*Ⓒh*Ⓒc*ⒸR∞;1_J);XPON(UVAL(ⓇEh*2*Ⓒh*Ⓒc*ⒸR∞))-XPON(UVAL(2*Ⓒh*Ⓒc*ⒸR∞))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇEh*ⒸEh);-2);1_J)' "
                 "  'ⓇR∞' "
-                "  4.36⁳⁻¹⁸ J ]",
+                "  4.360E-18_J ]",
 
     // ------------------------------------------------------------------------
-    //   Quantum mechanics (electro) magnetic effects
+    //  Astronomy & Astrophysics
     // ------------------------------------------------------------------------
 
-    "Magnetism",      nullptr,
+    "Astronomy",      nullptr,
+
+"Astronomy/Mercury",     nullptr,
+
+    // *Mercury gravitational parameter - Measurement [4]
+    "GM☿",      "[ 2.2031868551E13_m³/s² "
+                "  0.0000000091E13_m³/s² "
+                "  'ROUND(ⓈGM☿/ⒸGM☿;-2)' "
+                "  2.203E13_m³/s² ]",
+    // *Mercury equatorial radius - Measurement [22]
+    "Req☿",     "[ 2439.7_km "
+                "  0.1_km "
+                "  'ROUND(ⓈReq☿/ⒸReq☿;-2)' "
+                "  2440._km ]",
+    // *Mercury polar radius - Measurement [22]
+    "Rp☿",      "[ 2439.7_km "
+                "  0.1_km "
+                "  'ROUND(ⓈRp☿/ⒸRp☿;-2)' "
+                "  2440._km ]",
+    // *Mercury oblateness - Calculation from measurement [22]
+    "f☿",       "[ 'ROUND(1-ⒸRp☿/ⒸReq☿;XPON(UVAL(Ⓡf☿*(1-ⒸRp☿/ⒸReq☿)))-XPON(1-ⒸRp☿/ⒸReq☿)-2)' "
+                "  'ROUND(Ⓡf☿*Ⓒf☿;-2)' "
+                "  'ⓇRp☿+ⓇReq☿' ]",
+    // *Mercury mean density - Calculation from measurement [4] [22]
+    "ρv☿",       "[ 'ROUND(CONVERT(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿);1_kg/m³);XPON(UVAL(Ⓡρv☿*ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-XPON(UVAL(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv☿*Ⓒρv☿);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq☿+ⓇRp☿' ]",
 
     // ------------------------------------------------------------------------
-    // *Bohr magneton - Calculation from measurement
-    "μB",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒme);1_J/T);XPON(UVAL(ⓇμB*Ⓒqe*Ⓒℏ/(2*Ⓒme)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒme)))-2)' "
-                "  'CONVERT(ROUND(UBASE(ⓇμB*ⒸμB);-2);1_J/T)' "
-                "  'Ⓡme' "
-                "  9.274⁳⁻²⁴ J/T ]",
-    // *Nuclear magneton - Calculation from measurement
-    "μN",       "[ 'ROUND(CONVERT(Ⓒqe*Ⓒℏ/(2*Ⓒmp);1_J/T);XPON(UVAL(ⓇμN*Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-XPON(UVAL(Ⓒqe*Ⓒℏ/(2*Ⓒmp)))-2)' "
-                "  'CONVERT(ROUND(UBASE(ⓇμN*ⒸμN);-2);1_J/T)' "
-                "  'Ⓡmp' "
-                "  5.051⁳⁻²⁷ J/T ]",
-    // *Electron gyromagnetic ratio - Calculation from measurement
-    "γe",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμe)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγe*2*ABS(Ⓒμe)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμe)/Ⓒℏ))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡγe*Ⓒγe);-2);1_(s*T)^-1)' "
-                "  'Ⓡμe' "
-                "  1.761⁳¹¹ (s·T)⁻¹ ]",
-    // *Proton gyromagnetic ratio - Calculation from measurement
-    "γp",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμp)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγp*2*ABS(Ⓒμp)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμp)/Ⓒℏ))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡγp*Ⓒγp);-2);1_(s*T)^-1)' "
-                "  'Ⓡμp' "
-                "  2.675⁳⁸ (s·T)⁻¹ ]",
-    // *Neutron gyromagnetic ratio - Calculation from measurement
-    "γn",       "[ 'ROUND(CONVERT(2*ABS(Ⓒμn)/Ⓒℏ;1_(s*T)^-1);XPON(UVAL(Ⓡγn*2*ABS(Ⓒμn)/Ⓒℏ))-XPON(UVAL(2*ABS(Ⓒμn)/Ⓒℏ))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡγn*Ⓒγn);-2);1_(s*T)^-1)' "
-                "  'Ⓡμn' "
-                "  1.832⁳⁸ (s·T)⁻¹ ]",
+    // *Mercury surface gravity - Calculation from measurement [4] [22]
+    "g☿",       "[ 'ROUND(CONVERT(ⒸGM☿/ⒸReq☿²;1_m/s²);XPON(UVAL(Ⓡg☿*ⒸGM☿/ⒸReq☿²))-XPON(UVAL(ⒸGM☿/ⒸReq☿²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg☿*Ⓒg☿);-2);1_m/s²)' "
+                "  '2·ⓇReq☿' ]",
+    // *Mercury escape velocity - Calculation from measurement [4] [22]
+    "Ve☿",      "[ 'ROUND(CONVERT(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☿*√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe☿*ⒸVe☿);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq☿+ⓇRp☿))' ]",
+    // *Mercury sidereal rotation period - Measurement [22]
+    "Prot☿",    "[ 5067014.4_s "
+                "  0.1_s "
+                "  'ROUND(ⓈProt☿/ⒸProt☿;-2)' "
+                "  5.067E6_s ]",
+    // *Mercury axial tilt - Measurement [22]
+    "ϵ☿",       "[ 0.034_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢϵ☿/Ⓒϵ☿;-2)' ]",
+    // *Mercury semi-major axis - Measurement [23]
+    "a☿",       "[ 57909050_km "
+                "  10_km "
+                "  'ROUND(Ⓢa☿/Ⓒa☿;-2)' "
+                "  5.791E7_km ]",
 
     // ------------------------------------------------------------------------
-    // *Rydberg - Measurement
-    "R∞",       "[ 10973731.568157_m⁻¹ "
-                "  0.000012_m⁻¹ "
-                "  'ROUND(UBASE(ⓈR∞/ⒸR∞);-2)' ]",
-    // *von Klitzing constant - Exact calculation
-    "Rk",       "[ 'CONVERT(2*Ⓒπ*Ⓒℏ/Ⓒqe²;1_Ω)' "
-                "  0_Ω "
-                "  0 "
-                "  25 813. Ω ]",
-    // *Faraday constant - Exact calculation
-    "F",        "[ 'CONVERT(ⒸNA*Ⓒqe;1_C/mol)' "
-                "  0_C/mol "
-                "  0 "
-                "  96 485. C/mol ]",
-    // *Conductance quantum - Exact calculation
-    "G0",       "[ 'CONVERT(Ⓒqe²/(Ⓒπ*Ⓒℏ);1_S)' "
-                "  0_S "
-                "  0 "
-                "  7.748⁳⁻⁵ S ]",
-    // *Fermi reduced coupling constant - Measurement
-    "G0F",       "[ 1.1663787E-5_GeV^-2 "
-                "  0.0000006E-5_GeV^-2 "
-                "  'ROUND(UBASE(ABS(ⓈG0F/ⒸG0F));-2)' ]",
-
-    // ------------------------------------------------------------------------
-    // *First radiation constant - Exact calculation
-    "c1",       "[ 'CONVERT(2*Ⓒπ*Ⓒh*Ⓒc²;1_(W*m²))' "
-                "  0_(W*m²) "
-                "  0 "
-                "  3.742⁳⁻¹⁶ W·m↑2 ]",
-    // *Second radiation constant - Exact calculation
-    "c2",       "[ 'CONVERT(Ⓒh*Ⓒc/Ⓒk;1_(m*K))' "
-                "  0_(m*K) "
-                "  0 "
-                "  0.0144 m·K ]",
-    // *Wien's constant - Theory approximation
-    "c3",       "[ 2.897771955185172661478605448092885_mm*K "
-                "  0_mm*K "
+    // *Mercury orbital eccentricity - Measurement [23]
+    "e☿",       "[ 0.205630 "
+                "  0.000001 "
+                "  'ROUND(Ⓢe☿/Ⓒe☿;-2)' "
+                "  0.2056 ]",
+    // *Mercury orbital inclination - Measurement [23]
+    "i☿",       "[ 7.005_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi☿/Ⓒi☿;-2)' ]",
+    // *Mercury longitude of ascending node - Measurement [23]
+    "Ω☿",       "[ 48.331_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ☿/ⒸΩ☿;-2)' "
+                "  48.33_° ]",
+    // *Mercury argument of perihelion - Measurement [23]
+    "ω☿",       "[ 29.124_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω☿/Ⓒω☿;-2)' "
+                "  29.12_° ]",
+    // *Mercury last perihelion passage - Measurement [M20]
+    "T₀☿",      "[ 20260219.4583_date "
+                "  0_date "
                 "  0 ]",
-    // *Wien's frequency constant - Theory approximation
-    "c3f",      "[ 0.05878925757646824946606130795309722_THz/K "
-                "  0_THz/K "
+
+"Astronomy/Venus",     nullptr,
+
+    // *Venus gravitational parameter - Measurement [4]
+    "GM♀",      "[ 3.24858592E14_m³/s² "
+                "  0.00000012E14_m³/s² "
+                "  'ROUND(ⓈGM♀/ⒸGM♀;-2)' "
+                "  3.249E14_m³/s² ]",
+    // *Venus equatorial radius - Measurement [22]
+    "Req♀",     "[ 6051.8_km "
+                "  0.1_km "
+                "  'ROUND(ⓈReq♀/ⒸReq♀;-2)' "
+                "  6052._km ]",
+    // *Venus polar radius - Measurement [22]
+    "Rp♀",      "[ 6051.8_km "
+                "  0.1_km "
+                "  'ROUND(ⓈRp♀/ⒸRp♀;-2)' "
+                "  6052._km ]",
+    // *Venus oblateness - Calculation from measurement [22]
+    "f♀",       "[ 'ROUND(1-ⒸRp♀/ⒸReq♀;XPON(UVAL(Ⓡf♀*(1-ⒸRp♀/ⒸReq♀)))-XPON(1-ⒸRp♀/ⒸReq♀)-2)' "
+                "  'ROUND(Ⓡf♀*Ⓒf♀;-2)' "
+                "  'ⓇRp♀+ⓇReq♀' ]",
+    // *Venus mean density - Calculation from measurement [4] [22]
+    "ρv♀",       "[ 'ROUND(CONVERT(ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀);1_kg/m³);XPON(UVAL(Ⓡρv♀*ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀)))-XPON(UVAL(ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♀*Ⓒρv♀);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♀+ⓇRp♀' ]",
+
+    // ------------------------------------------------------------------------
+    // *Venus surface gravity - Calculation from measurement [4] [22]
+    "g♀",       "[ 'ROUND(CONVERT(ⒸGM♀/ⒸReq♀²;1_m/s²);XPON(UVAL(Ⓡg♀*ⒸGM♀/ⒸReq♀²))-XPON(UVAL(ⒸGM♀/ⒸReq♀²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♀*Ⓒg♀);-2);1_m/s²)' "
+                "  '2·ⓇReq♀' ]",
+    // *Venus escape velocity - Calculation from measurement [4] [22]
+    "Ve♀",      "[ 'ROUND(CONVERT(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♀*√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♀*ⒸVe♀);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♀+ⓇRp♀))' ]",
+    // *Venus sidereal rotation period - Measurement [22]
+    "Prot♀",    "[ 20996772.8_s "
+                "  8.64_s "
+                "  'ROUND(ⓈProt♀/ⒸProt♀;-2)' "
+                "  2.100E7_s ]",
+    // *Venus axial tilt - Measurement [22]
+    "ϵ♀",       "[ 177.36_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ♀/Ⓒϵ♀;-2)' "
+                "  177.4_° ]",
+    // *Venus semi-major axis - Measurement [23]
+    "a♀",       "[ 108208000_km "
+                "  10_km "
+                "  'ROUND(Ⓢa♀/Ⓒa♀;-2)' "
+                "  1.082E8_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Venus orbital eccentricity - Measurement [23]
+    "e♀",       "[ 0.006772 "
+                "  0.000001 "
+                "  'ROUND(Ⓢe♀/Ⓒe♀;-2)' ]",
+    // *Venus orbital inclination - Measurement [23]
+    "i♀",       "[ 3.39458_° "
+                "  0.00001_° "
+                "  'ROUND(Ⓢi♀/Ⓒi♀;-2)' "
+                "  3.395_° ]",
+    // *Venus longitude of ascending node - Measurement [23]
+    "Ω♀",       "[ 76.680_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♀/ⒸΩ♀;-2)' "
+                "  76.68_° ]",
+    // *Venus argument of perihelion - Measurement [23]
+    "ω♀",       "[ 54.884_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♀/Ⓒω♀;-2)' "
+                "  54.88_° ]",
+    // *Venus next perihelion passage - Measurement [M20]
+    "T₀♀",      "[ 20260515_date "
+                "  0_date "
                 "  0 ]",
-    // *Magnetic flux quantum - Exact calculation
-    "ø",        "[ 'CONVERT(Ⓒπ*Ⓒℏ/Ⓒqe;1_Wb)' "
-                "  0_Wb "
+
+"Astronomy/Earth",     nullptr,
+
+    // *Earth gravitational parameter - Exact nominal value [3]
+    "GM🜨",      "[ 3.986004E14_m³/s² "
+                "  0_m³/s² "
+                "  0 ]",
+    // *Earth equatorial radius - Exact nominal value [3]
+    "Req🜨",     "[ 6378.1_km "
+                "  0_km "
+                "  0 ]",
+    // *Earth polar radius - Exact nominal value [3]
+    "Rp🜨",      "[ 6356.8_km "
+                "  0_km "
+                "  0 ]",
+    // *Earth oblateness - Calculation from nominal value [3]
+    "f🜨",       "[ 'ROUND(1-ⒸRp🜨/ⒸReq🜨;XPON(UVAL(Ⓡf🜨*(1-ⒸRp🜨/ⒸReq🜨)))-XPON(1-ⒸRp🜨/ⒸReq🜨)-2)' "
+                "  'ROUND(Ⓡf🜨*Ⓒf🜨;-2)' "
+                "  'ⓇRp🜨+ⓇReq🜨' ]",
+    // *Earth mean density - Calculation from nominal value [3]
+    "ρv🜨",       "[ 'ROUND(CONVERT(ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨);1_kg/m³);XPON(UVAL(Ⓡρv🜨*ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨)))-XPON(UVAL(ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv🜨*Ⓒρv🜨);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq🜨+ⓇRp🜨' ]",
+
+    // ------------------------------------------------------------------------
+    // *Earth surface gravity - Calculation from nominal value [3]
+    "g🜨",       "[ 'ROUND(CONVERT(ⒸGM🜨/ⒸReq🜨²;1_m/s²);XPON(UVAL(Ⓡg🜨*ⒸGM🜨/ⒸReq🜨²))-XPON(UVAL(ⒸGM🜨/ⒸReq🜨²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg🜨*Ⓒg🜨);-2);1_m/s²)' "
+                "  '2·ⓇReq🜨' ]",
+    // *Earth escape velocity - Calculation from nominal value [3]
+    "Ve🜨",      "[ 'ROUND(CONVERT(√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3));1_m/s);XPON(UVAL(ⓇVe🜨*√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3))))-XPON(UVAL(√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe🜨*ⒸVe🜨);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq🜨+ⓇRp🜨))' ]",
+    // *Earth sidereal rotation period - Measurement [24]
+    "Prot🜨",    "[ 86164.0905_s "
+                "  0.0001_s "
+                "  'ROUND(ⓈProt🜨/ⒸProt🜨;-2)' "
+                "  8.616E4_s ]",
+    // *Earth axial tilt - Measurement [24]
+    "ϵ🜨",       "[ 23.4393_° "
+                "  0.0001_° "
+                "  'ROUND(Ⓢϵ🜨/Ⓒϵ🜨;-2)' "
+                "  23.44_° ]",
+    // *Earth semi-major axis - Exact nominal value [3]
+    "a🜨",       "[ 149597870.7_km "
+                "  0_km "
                 "  0 "
-                "  2.068⁳⁻¹⁵ Wb ]",
+                "  1.496E8_km ]",
 
     // ------------------------------------------------------------------------
-    // *Josephson constant - Exact calculation
-    "KJ",       "[ 'CONVERT(2*Ⓒqe/Ⓒh;1_Hz/V)' "
-                "  0_Hz/V "
+    // *Earth orbital eccentricity - Measurement [23]
+    "e🜨",       "[ 0.0167086 "
+                "  0.0000001 "
+                "  'ROUND(Ⓢe🜨/Ⓒe🜨;-2)' "
+                "  0.01671 ]",
+    // *Earth orbital inclination - Measurement [23]
+    "i🜨",       "[ 0.00005_° "
+                "  0.00001_° "
+                "  'ROUND(Ⓢi🜨/Ⓒi🜨;-2)' ]",
+    // *Earth longitude of ascending node - Measurement [23]
+    "Ω🜨",       "[ 348.74_° "
+                "  0.01_° "
+                "  'ROUND(ⓈΩ🜨/ⒸΩ🜨;-2)' "
+                "  348.7_° ]",
+    // *Earth argument of perihelion - Measurement [23]
+    "ω🜨",       "[ 114.20783_° "
+                "  0.00001_° "
+                "  'ROUND(Ⓢω🜨/Ⓒω🜨;-2)' "
+                "  114.2_° ]",
+    // *Earth perihelion passage - Measurement [M20]
+    "T₀🜨",      "[ 20260103.7188_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Moon",     nullptr,
+
+    // *Moon gravitational parameter - Measurement [4]
+    "GM☽",      "[ 4.9028001184E12_m³/s² "
+                "  0.0000000009E12_m³/s² "
+                "  'ROUND(ⓈGM☽/ⒸGM☽;-2)' "
+                "  4.903E12_m³/s² ]",
+    // *Moon equatorial radius - Measurement [22]
+    "Req☽",     "[ 1738.1_km "
+                "  0.1_km "
+                "  'ROUND(ⓈReq☽/ⒸReq☽;-2)' "
+                "  1738._km ]",
+    // *Moon polar radius - Measurement [22]
+    "Rp☽",      "[ 1736.0_km "
+                "  0.1_km "
+                "  'ROUND(ⓈRp☽/ⒸRp☽;-2)' "
+                "  1736._km ]",
+    // *Moon oblateness - Calculation from measurement [22]
+    "f☽",       "[ 'ROUND(1-ⒸRp☽/ⒸReq☽;XPON(UVAL(Ⓡf☽*(1-ⒸRp☽/ⒸReq☽)))-XPON(1-ⒸRp☽/ⒸReq☽)-2)' "
+                "  'ROUND(Ⓡf☽*Ⓒf☽;-2)' "
+                "  'ⓇRp☽+ⓇReq☽' ]",
+    // *Moon mean density - Calculation from measurement [4] [22]
+    "ρv☽",       "[ 'ROUND(CONVERT(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽);1_kg/m³);XPON(UVAL(Ⓡρv☽*ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-XPON(UVAL(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv☽*Ⓒρv☽);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq☽+ⓇRp☽' ]",
+
+    // ------------------------------------------------------------------------
+    // *Moon surface gravity - Calculation from measurement [4] [22]
+    "g☽",       "[ 'ROUND(CONVERT(ⒸGM☽/ⒸReq☽²;1_m/s²);XPON(UVAL(Ⓡg☽*ⒸGM☽/ⒸReq☽²))-XPON(UVAL(ⒸGM☽/ⒸReq☽²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg☽*Ⓒg☽);-2);1_m/s²)' "
+                "  '2·ⓇReq☽' ]",
+    // *Moon escape velocity - Calculation from measurement [4] [22]
+    "Ve☽",      "[ 'ROUND(CONVERT(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☽*√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe☽*ⒸVe☽);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq☽+ⓇRp☽))' ]",
+    // *Moon sidereal rotation period - Measurement [22]
+    "Prot☽",    "[ 2360591.5_s "
+                "  0.1_s "
+                "  'ROUND(ⓈProt☽/ⒸProt☽;-2)' "
+                "  2.361E6_s ]",
+    // *Moon axial tilt - Measurement [22]
+    "ϵ☽",       "[ 1.5424_° "
+                "  0.0001_° "
+                "  'ROUND(Ⓢϵ☽/Ⓒϵ☽;-2)' "
+                "  1.542_° ]",
+    // *Moon semi-major axis - Measurement [25]
+    "a☽",       "[ 384399_km "
+                "  1_km "
+                "  'ROUND(Ⓢa☽/Ⓒa☽;-2)' "
+                "  3.844E5_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Moon orbital eccentricity - Measurement [25]
+    "e☽",       "[ 0.0549 "
+                "  0.0001 "
+                "  'ROUND(Ⓢe☽/Ⓒe☽;-2)' ]",
+    // *Moon orbital inclination - Measurement [25]
+    "i☽",       "[ 5.145_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi☽/Ⓒi☽;-2)' ]",
+    // *Moon longitude of ascending node - Measurement [25]
+    "Ω☽",       "[ 125.08_° "
+                "  0.01_° "
+                "  'ROUND(ⓈΩ☽/ⒸΩ☽;-2)' "
+                "  125.1_° ]",
+    // *Moon argument of perigee - Measurement [25]
+    "ω☽",       "[ 318.15_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢω☽/Ⓒω☽;-2)' "
+                "  318.2_° ]",
+    // *Moon perigee passage - Calculation from measurement [M20] [M22]
+    "T₀☽",      "[ 20260517.5833_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Mars",     nullptr,
+
+    // *Mars gravitational parameter - Measurement [4]
+    "GM♂",      "[ 4.28283758161E13_m³/s² "
+                "  0.00000000091E13_m³/s² "
+                "  'ROUND(ⓈGM♂/ⒸGM♂;-2)' "
+                "  4.283E13_m³/s² ]",
+    // *Mars equatorial radius - Measurement [22]
+    "Req♂",     "[ 3396.2_km "
+                "  0.1_km "
+                "  'ROUND(ⓈReq♂/ⒸReq♂;-2)' "
+                "  3396._km ]",
+    // *Mars polar radius - Measurement [22]
+    "Rp♂",      "[ 3376.2_km "
+                "  0.1_km "
+                "  'ROUND(ⓈRp♂/ⒸRp♂;-2)' "
+                "  3376._km ]",
+    // *Mars oblateness - Calculation from measurement [22]
+    "f♂",       "[ 'ROUND(1-ⒸRp♂/ⒸReq♂;XPON(UVAL(Ⓡf♂*(1-ⒸRp♂/ⒸReq♂)))-XPON(1-ⒸRp♂/ⒸReq♂)-2)' "
+                "  'ROUND(Ⓡf♂*Ⓒf♂;-2)' "
+                "  'ⓇRp♂+ⓇReq♂' ]",
+    // *Mars mean density - Calculation from measurement [4] [22]
+    "ρv♂",       "[ 'ROUND(CONVERT(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂);1_kg/m³);XPON(UVAL(Ⓡρv♂*ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-XPON(UVAL(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♂*Ⓒρv♂);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♂+ⓇRp♂' ]",
+
+    // ------------------------------------------------------------------------
+    // *Mars surface gravity - Calculation from measurement [4] [22]
+    "g♂",       "[ 'ROUND(CONVERT(ⒸGM♂/ⒸReq♂²;1_m/s²);XPON(UVAL(Ⓡg♂*ⒸGM♂/ⒸReq♂²))-XPON(UVAL(ⒸGM♂/ⒸReq♂²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♂*Ⓒg♂);-2);1_m/s²)' "
+                "  '2·ⓇReq♂' ]",
+    // *Mars escape velocity - Calculation from measurement [4] [22]
+    "Ve♂",      "[ 'ROUND(CONVERT(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♂*√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♂*ⒸVe♂);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♂+ⓇRp♂))' "
+                "  5027._m/s ]",
+    // *Mars sidereal rotation period - Measurement [22]
+    "Prot♂",    "[ 88642.7_s "
+                "  0.1_s "
+                "  'ROUND(ⓈProt♂/ⒸProt♂;-2)' "
+                "  8.864E4_s ]",
+    // *Mars axial tilt - Measurement [22]
+    "ϵ♂",       "[ 25.19_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ♂/Ⓒϵ♂;-2)' ]",
+    // *Mars semi-major axis - Measurement [23]
+    "a♂",       "[ 227939200_km "
+                "  100_km "
+                "  'ROUND(Ⓢa♂/Ⓒa♂;-2)' "
+                "  2.279E8_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Mars orbital eccentricity - Measurement [23]
+    "e♂",       "[ 0.0934 "
+                "  0.0001 "
+                "  'ROUND(Ⓢe♂/Ⓒe♂;-2)' ]",
+    // *Mars orbital inclination - Measurement [23]
+    "i♂",       "[ 1.850_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi♂/Ⓒi♂;-2)' ]",
+    // *Mars longitude of ascending node - Measurement [23]
+    "Ω♂",       "[ 49.558_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♂/ⒸΩ♂;-2)' "
+                "  49.56_° ]",
+    // *Mars argument of perihelion - Measurement [23]
+    "ω♂",       "[ 286.502_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♂/Ⓒω♂;-2)' "
+                "  286.5_° ]",
+    // *Mars perihelion passage - Measurement [M20]
+    "T₀♂",      "[ 20260326_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Jupiter",     nullptr,
+
+    // *Jupiter gravitational parameter - Exact nominal value [3]
+    "GM♃",      "[ 1.26686534E17_m³/s² "
+                "  0_m³/s² "
+                "  0 ]",
+    // *Jupiter equatorial radius - Exact nominal value [3]
+    "Req♃",     "[ 71492_km "
+                "  0_km "
+                "  0 ]",
+    // *Jupiter polar radius - Exact nominal value [3]
+    "Rp♃",      "[ 66854_km "
+                "  0_km "
+                "  0 ]",
+    // *Jupiter oblateness - Calculation from nominal value [3]
+    "f♃",       "[ 'ROUND(1-ⒸRp♃/ⒸReq♃;XPON(UVAL(Ⓡf♃*(1-ⒸRp♃/ⒸReq♃)))-XPON(1-ⒸRp♃/ⒸReq♃)-2)' "
+                "  'ROUND(Ⓡf♃*Ⓒf♃;-2)' "
+                "  'ⓇRp♃+ⓇReq♃' ]",
+    // *Jupiter mean density - Calculation from nominal value [3]
+    "ρv♃",       "[ 'ROUND(CONVERT(ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃);1_kg/m³);XPON(UVAL(Ⓡρv♃*ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃)))-XPON(UVAL(ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♃*Ⓒρv♃);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♃+ⓇRp♃' ]",
+
+    // ------------------------------------------------------------------------
+    // *Jupiter surface gravity - Calculation from nominal value [3]
+    "g♃",       "[ 'ROUND(CONVERT(ⒸGM♃/ⒸReq♃²;1_m/s²);XPON(UVAL(Ⓡg♃*ⒸGM♃/ⒸReq♃²))-XPON(UVAL(ⒸGM♃/ⒸReq♃²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♃*Ⓒg♃);-2);1_m/s²)' "
+                "  '2·ⓇReq♃' ]",
+    // *Jupiter escape velocity - Calculation from nominal value [3]
+    "Ve♃",      "[ 'ROUND(CONVERT(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♃*√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♃*ⒸVe♃);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♃+ⓇRp♃))' ]",
+    // *Jupiter sidereal rotation period - Measurement [22]
+    "Prot♃",    "[ 35730_s "
+                "  1_s "
+                "  'ROUND(ⓈProt♃/ⒸProt♃;-2)' ]",
+    // *Jupiter axial tilt - Measurement [22]
+    "ϵ♃",       "[ 3.13_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ♃/Ⓒϵ♃;-2)' ]",
+    // *Jupiter semi-major axis - Measurement [23]
+    "a♃",       "[ 778570000_km "
+                "  1000_km "
+                "  'ROUND(Ⓢa♃/Ⓒa♃;-2)' "
+                "  7.786E8_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Jupiter orbital eccentricity - Measurement [23]
+    "e♃",       "[ 0.0489 "
+                "  0.0001 "
+                "  'ROUND(Ⓢe♃/Ⓒe♃;-2)' ]",
+    // *Jupiter orbital inclination - Measurement [23]
+    "i♃",       "[ 1.303_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi♃/Ⓒi♃;-2)' ]",
+    // *Jupiter longitude of ascending node - Measurement [23]
+    "Ω♃",       "[ 100.464_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♃/ⒸΩ♃;-2)' "
+                "  100.5_° ]",
+    // *Jupiter argument of perihelion - Measurement [23]
+    "ω♃",       "[ 273.867_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♃/Ⓒω♃;-2)' "
+                "  273.9_° ]",
+    // *Jupiter perihelion passage - Measurement [4] [M21]
+    "T₀♃",      "[ 20230120_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Saturn",     nullptr,
+
+    // *Saturn gravitational parameter - Measurement [4]
+    "GM♄",      "[ 3.79405848418E16_m³/s² "
+                "  0.00000000091E16_m³/s² "
+                "  'ROUND(ⓈGM♄/ⒸGM♄;-2)' "
+                "  3.794E16_m³/s² ]",
+    // *Saturn equatorial radius - Measurement [22]
+    "Req♄",     "[ 60268_km "
+                "  4_km "
+                "  'ROUND(ⓈReq♄/ⒸReq♄;-2)' "
+                "  6.027E4_km ]",
+    // *Saturn polar radius - Measurement [22]
+    "Rp♄",      "[ 54364_km "
+                "  10_km "
+                "  'ROUND(ⓈRp♄/ⒸRp♄;-2)' "
+                "  5.436E4_km ]",
+    // *Saturn oblateness - Calculation from measurement [22]
+    "f♄",       "[ 'ROUND(1-ⒸRp♄/ⒸReq♄;XPON(UVAL(Ⓡf♄*(1-ⒸRp♄/ⒸReq♄)))-XPON(1-ⒸRp♄/ⒸReq♄)-2)' "
+                "  'ROUND(Ⓡf♄*Ⓒf♄;-2)' "
+                "  'ⓇRp♄+ⓇReq♄' ]",
+    // *Saturn mean density - Calculation from measurement [4] [22]
+    "ρv♄",       "[ 'ROUND(CONVERT(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄);1_kg/m³);XPON(UVAL(Ⓡρv♄*ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-XPON(UVAL(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♄*Ⓒρv♄);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♄+ⓇRp♄' ]",
+
+    // ------------------------------------------------------------------------
+    // *Saturn surface gravity - Calculation from measurement [4] [22]
+    "g♄",       "[ 'ROUND(CONVERT(ⒸGM♄/ⒸReq♄²;1_m/s²);XPON(UVAL(Ⓡg♄*ⒸGM♄/ⒸReq♄²))-XPON(UVAL(ⒸGM♄/ⒸReq♄²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♄*Ⓒg♄);-2);1_m/s²)' "
+                "  '2·ⓇReq♄' ]",
+    // *Saturn escape velocity - Calculation from measurement [4] [22]
+    "Ve♄",      "[ 'ROUND(CONVERT(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♄*√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♄*ⒸVe♄);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♄+ⓇRp♄))' ]",
+    // *Saturn sidereal rotation period - Measurement [22]
+    "Prot♄",    "[ 38361_s "
+                "  50_s "
+                "  'ROUND(ⓈProt♄/ⒸProt♄;-2)' "
+                "  3.836E4_s ]",
+    // *Saturn axial tilt - Measurement [22]
+    "ϵ♄",       "[ 26.73_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ♄/Ⓒϵ♄;-2)' ]",
+    // *Saturn semi-major axis - Measurement [23]
+    "a♄",       "[ 1433530000_km "
+                "  10000_km "
+                "  'ROUND(Ⓢa♄/Ⓒa♄;-2)' "
+                "  1.434E9_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Saturn orbital eccentricity - Measurement [23]
+    "e♄",       "[ 0.0565 "
+                "  0.0001 "
+                "  'ROUND(Ⓢe♄/Ⓒe♄;-2)' ]",
+    // *Saturn orbital inclination - Measurement [23]
+    "i♄",       "[ 2.485_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi♄/Ⓒi♄;-2)' ]",
+    // *Saturn longitude of ascending node - Measurement [23]
+    "Ω♄",       "[ 113.665_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♄/ⒸΩ♄;-2)' "
+                "  113.7_° ]",
+    // *Saturn argument of perihelion - Measurement [23]
+    "ω♄",       "[ 339.392_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♄/Ⓒω♄;-2)' "
+                "  339.4_° ]",
+    // *Saturn perihelion passage - Measurement [4] [M21]
+    "T₀♄",      "[ 20030726_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Uranus",     nullptr,
+
+    // *Uranus gravitational parameter - Measurement [4]
+    "GM⛢",      "[ 5.7945564E15_m³/s² "
+                "  0.0000040E15_m³/s² "
+                "  'ROUND(ⓈGM⛢/ⒸGM⛢;-2)' "
+                "  5.795E15_m³/s² ]",
+    // *Uranus equatorial radius - Measurement [22]
+    "Req⛢",     "[ 25559_km "
+                "  4_km "
+                "  'ROUND(ⓈReq⛢/ⒸReq⛢;-2)' "
+                "  2.556E4_km ]",
+    // *Uranus polar radius - Measurement [22]
+    "Rp⛢",      "[ 24973_km "
+                "  20_km "
+                "  'ROUND(ⓈRp⛢/ⒸRp⛢;-2)' "
+                "  2.497E4_km ]",
+    // *Uranus oblateness - Calculation from measurement [22]
+    "f⛢",       "[ 'ROUND(1-ⒸRp⛢/ⒸReq⛢;XPON(UVAL(Ⓡf⛢*(1-ⒸRp⛢/ⒸReq⛢)))-XPON(1-ⒸRp⛢/ⒸReq⛢)-2)' "
+                "  'ROUND(Ⓡf⛢*Ⓒf⛢;-2)' "
+                "  'ⓇRp⛢+ⓇReq⛢' ]",
+    // *Uranus mean density - Calculation from measurement [4] [22]
+    "ρv⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢);1_kg/m³);XPON(UVAL(Ⓡρv⛢*ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-XPON(UVAL(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv⛢*Ⓒρv⛢);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq⛢+ⓇRp⛢' ]",
+
+    // ------------------------------------------------------------------------
+    // *Uranus surface gravity - Calculation from measurement [4] [22]
+    "g⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/ⒸReq⛢²;1_m/s²);XPON(UVAL(Ⓡg⛢*ⒸGM⛢/ⒸReq⛢²))-XPON(UVAL(ⒸGM⛢/ⒸReq⛢²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg⛢*Ⓒg⛢);-2);1_m/s²)' "
+                "  '2·ⓇReq⛢' ]",
+    // *Uranus escape velocity - Calculation from measurement [4] [22]
+    "Ve⛢",      "[ 'ROUND(CONVERT(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3));1_m/s);XPON(UVAL(ⓇVe⛢*√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-XPON(UVAL(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe⛢*ⒸVe⛢);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq⛢+ⓇRp⛢))' ]",
+    // *Uranus sidereal rotation period - Measurement [22]
+    "Prot⛢",    "[ 62064_s "
+                "  10_s "
+                "  'ROUND(ⓈProt⛢/ⒸProt⛢;-2)' "
+                "  6.206E4_s ]",
+    // *Uranus axial tilt - Measurement [22]
+    "ϵ⛢",       "[ 97.77_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ⛢/Ⓒϵ⛢;-2)' ]",
+    // *Uranus semi-major axis - Measurement [23]
+    "a⛢",       "[ 2872460000_km "
+                "  10000_km "
+                "  'ROUND(Ⓢa⛢/Ⓒa⛢;-2)' "
+                "  2.872E9_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Uranus orbital eccentricity - Measurement [23]
+    "e⛢",       "[ 0.04717 "
+                "  0.00001 "
+                "  'ROUND(Ⓢe⛢/Ⓒe⛢;-2)' ]",
+    // *Uranus orbital inclination - Measurement [23]
+    "i⛢",       "[ 0.773_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi⛢/Ⓒi⛢;-2)' ]",
+    // *Uranus longitude of ascending node - Measurement [23]
+    "Ω⛢",       "[ 74.006_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ⛢/ⒸΩ⛢;-2)' "
+                "  74.01_° ]",
+    // *Uranus argument of perihelion - Measurement [23]
+    "ω⛢",       "[ 96.998857_° "
+                "  0.000001_° "
+                "  'ROUND(Ⓢω⛢/Ⓒω⛢;-2)' "
+                "  97.00_° ]",
+    // *Uranus perihelion passage - Calculation from measurement [4] [M21]
+    "T₀⛢",      "[ 20500816_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Neptune",     nullptr,
+
+    // *Neptune gravitational parameter - Measurement [4]
+    "GM♆",      "[ 6.83652710058E15_m³/s² "
+                "  0.00000010058E15_m³/s² "
+                "  'ROUND(ⓈGM♆/ⒸGM♆;-2)' "
+                "  6.837E15_m³/s² ]",
+    // *Neptune equatorial radius - Measurement [22]
+    "Req♆",     "[ 24764_km "
+                "  15_km "
+                "  'ROUND(ⓈReq♆/ⒸReq♆;-2)' "
+                "  2.476E4_km ]",
+    // *Neptune polar radius - Measurement [22]
+    "Rp♆",      "[ 24341_km "
+                "  30_km "
+                "  'ROUND(ⓈRp♆/ⒸRp♆;-2)' "
+                "  2.434E4_km ]",
+    // *Neptune oblateness - Calculation from measurement [22]
+    "f♆",       "[ 'ROUND(1-ⒸRp♆/ⒸReq♆;XPON(UVAL(Ⓡf♆*(1-ⒸRp♆/ⒸReq♆)))-XPON(1-ⒸRp♆/ⒸReq♆)-2)' "
+                "  'ROUND(Ⓡf♆*Ⓒf♆;-2)' "
+                "  'ⓇRp♆+ⓇReq♆' ]",
+    // *Neptune mean density - Calculation from measurement [4] [22]
+    "ρv♆",       "[ 'ROUND(CONVERT(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆);1_kg/m³);XPON(UVAL(Ⓡρv♆*ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-XPON(UVAL(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♆*Ⓒρv♆);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♆+ⓇRp♆' ]",
+
+    // ------------------------------------------------------------------------
+    // *Neptune surface gravity - Calculation from measurement [4] [22]
+    "g♆",       "[ 'ROUND(CONVERT(ⒸGM♆/ⒸReq♆²;1_m/s²);XPON(UVAL(Ⓡg♆*ⒸGM♆/ⒸReq♆²))-XPON(UVAL(ⒸGM♆/ⒸReq♆²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♆*Ⓒg♆);-2);1_m/s²)' "
+                "  '2·ⓇReq♆' ]",
+    // *Neptune escape velocity - Calculation from measurement [4] [22]
+    "Ve♆",      "[ 'ROUND(CONVERT(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♆*√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♆*ⒸVe♆);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♆+ⓇRp♆))' ]",
+    // *Neptune sidereal rotation period - Measurement [22]
+    "Prot♆",    "[ 58000_s "
+                "  100_s "
+                "  'ROUND(ⓈProt♆/ⒸProt♆;-2)' ]",
+    // *Neptune axial tilt - Measurement [22]
+    "ϵ♆",       "[ 28.32_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢϵ♆/Ⓒϵ♆;-2)' ]",
+    // *Neptune semi-major axis - Measurement [23]
+    "a♆",       "[ 4495060000_km "
+                "  10000_km "
+                "  'ROUND(Ⓢa♆/Ⓒa♆;-2)' "
+                "  4.495E9_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Neptune orbital eccentricity - Measurement [23]
+    "e♆",       "[ 0.00859 "
+                "  0.00001 "
+                "  'ROUND(Ⓢe♆/Ⓒe♆;-2)' ]",
+    // *Neptune orbital inclination - Measurement [23]
+    "i♆",       "[ 1.770_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢi♆/Ⓒi♆;-2)' ]",
+    // *Neptune longitude of ascending node - Measurement [23]
+    "Ω♆",       "[ 131.784_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♆/ⒸΩ♆;-2)' "
+                "  131.8_° ]",
+    // *Neptune argument of perihelion - Measurement [23]
+    "ω♆",       "[ 273.187_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♆/Ⓒω♆;-2)' "
+                "  273.2_° ]",
+    // *Neptune perihelion passage - Calculation from measurement [4] [M21]
+    "T₀♆",      "[ 20420904_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Pluto",     nullptr,
+
+    // *Pluto gravitational parameter - Measurement [4]
+    "GM♇",      "[ 9.755E11_m³/s² "
+                "  0.005E11_m³/s² "
+                "  'ROUND(ⓈGM♇/ⒸGM♇;-2)' ]",
+    // *Pluto equatorial radius - Measurement [26]
+    "Req♇",     "[ 1188.3_km "
+                "  1.6_km "
+                "  'ROUND(ⓈReq♇/ⒸReq♇;-2)' "
+                "  1188._km ]",
+    // *Pluto polar radius - Measurement [26]
+    "Rp♇",      "[ 1188.3_km "
+                "  1.6_km "
+                "  'ROUND(ⓈRp♇/ⒸRp♇;-2)' "
+                "  1188._km ]",
+    // *Pluto oblateness - Calculation from measurement [26]
+    "f♇",       "[ 'ROUND(1-ⒸRp♇/ⒸReq♇;XPON(UVAL(Ⓡf♇*(1-ⒸRp♇/ⒸReq♇)))-XPON(1-ⒸRp♇/ⒸReq♇)-2)' "
+                "  'ROUND(Ⓡf♇*Ⓒf♇;-2)' "
+                "  'ⓇRp♇+ⓇReq♇' ]",
+    // *Pluto mean density - Calculation from measurement [4] [26]
+    "ρv♇",       "[ 'ROUND(CONVERT(ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇);1_kg/m³);XPON(UVAL(Ⓡρv♇*ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇)))-XPON(UVAL(ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♇*Ⓒρv♇);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♇+ⓇRp♇' ]",
+
+    // ------------------------------------------------------------------------
+    // *Pluto surface gravity - Calculation from measurement [4] [26]
+    "g♇",       "[ 'ROUND(CONVERT(ⒸGM♇/ⒸReq♇²;1_m/s²);XPON(UVAL(Ⓡg♇*ⒸGM♇/ⒸReq♇²))-XPON(UVAL(ⒸGM♇/ⒸReq♇²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♇*Ⓒg♇);-2);1_m/s²)' "
+                "  '2·ⓇReq♇' ]",
+    // *Pluto escape velocity - Calculation from measurement [4] [26]
+    "Ve♇",      "[ 'ROUND(CONVERT(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♇*√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♇*ⒸVe♇);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♇+ⓇRp♇))' ]",
+    // *Pluto sidereal rotation period - Measurement [26]
+    "Prot♇",    "[ 551856.7_s "
+                "  0.1_s "
+                "  'ROUND(ⓈProt♇/ⒸProt♇;-2)' "
+                "  5.519E5_s ]",
+    // *Pluto axial tilt - Measurement [26]
+    "ϵ♇",       "[ 119.591_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢϵ♇/Ⓒϵ♇;-2)' "
+                "  119.6_° ]",
+    // *Pluto semi-major axis - Measurement [23]
+    "a♇",       "[ 5906380000_km "
+                "  10000_km "
+                "  'ROUND(Ⓢa♇/Ⓒa♇;-2)' "
+                "  5.906E9_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Pluto orbital eccentricity - Measurement [23]
+    "e♇",       "[ 0.2488 "
+                "  0.0001 "
+                "  'ROUND(Ⓢe♇/Ⓒe♇;-2)' ]",
+    // *Pluto orbital inclination - Measurement [23]
+    "i♇",       "[ 17.16_° "
+                "  0.01_° "
+                "  'ROUND(Ⓢi♇/Ⓒi♇;-2)' ]",
+    // *Pluto longitude of ascending node - Measurement [23]
+    "Ω♇",       "[ 110.299_° "
+                "  0.001_° "
+                "  'ROUND(ⓈΩ♇/ⒸΩ♇;-2)' "
+                "  110.3_° ]",
+    // *Pluto argument of perihelion - Measurement [23]
+    "ω♇",       "[ 113.834_° "
+                "  0.001_° "
+                "  'ROUND(Ⓢω♇/Ⓒω♇;-2)' "
+                "  113.8_° ]",
+    // *Pluto perihelion passage - Measurement [4] [M21]
+    "T₀♇",      "[ 19890905_date "
+                "  0_date "
+                "  0 ]",
+
+"Astronomy/Sun",     nullptr,
+
+    // *Solar mass - Calculation from nominal value [2] [3] [5]
+    "M☉",       "[ 'ROUND(CONVERT(ⒸGM☉/ⒸG;1_kg);XPON(UVAL(ⒸGM☉/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☉/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM☉*ⒸM☉);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.989E30_kg ]",
+    // *Solar gravitational parameter - Exact nominal value [3]
+    "GM☉",      "[ 1.3271244E20_m³/s² "
+                "  0_m³/s² "
+                "  0 ]",
+    // *Solar luminosity - Exact nominal value [3]
+    "L☉",       "[ 3.828E26_W "
+                "  0_W "
+                "  0 ]",
+    // *Solar equatorial radius - Exact nominal value [3]
+    "Req☉",     "[ 695700_km "
+                "  0_km "
+                "  0 ]",
+    // *Solar polar radius - Measurement [18] [19]
+    "Rp☉",      "[ 695508_km "
+                "  140_km "
+                "  'ROUND(ⓈRp☉/ⒸRp☉;-2)' "
+                "  6.955E5_km ]",
+
+    // ------------------------------------------------------------------------
+    // *Solar oblateness - Calculation from measurement [18] [19]
+    "f☉",       "[ 'ROUND(1-ⒸRp☉/ⒸReq☉;XPON(UVAL(Ⓡf☉*(1-ⒸRp☉/ⒸReq☉)))-XPON(1-ⒸRp☉/ⒸReq☉)-2)' "
+                "  'ROUND(Ⓡf☉*Ⓒf☉;-2)' "
+                "  'ⓇRp☉+ⓇReq☉' ]",
+    // *Solar mean density - Calculation from nominal value [3]
+    "ρv☉",       "[ 'ROUND(CONVERT(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉);1_kg/m³);XPON(UVAL(Ⓡρv☉*ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-XPON(UVAL(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv☉*Ⓒρv☉);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq☉+ⓇRp☉' ]",
+    // *Solar surface gravity - Calculation from nominal value [3]
+    "g☉",       "[ 'ROUND(CONVERT(ⒸGM☉/ⒸReq☉²;1_m/s²);XPON(UVAL(Ⓡg☉*ⒸGM☉/ⒸReq☉²))-XPON(UVAL(ⒸGM☉/ⒸReq☉²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg☉*Ⓒg☉);-2);1_m/s²)' "
+                "  '2·ⓇReq☉' ]",
+    // *Solar escape velocity - Calculation from nominal value [3]
+    "Ve☉",      "[ 'ROUND(CONVERT(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☉*√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe☉*ⒸVe☉);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq☉+ⓇRp☉))' ]",
+    // *Solar sidereal rotation period - Measurement [20] [21]
+    "Prot☉",    "[ 2192832_s "
+                "  864_s "
+                "  'ROUND(ⓈProt☉/ⒸProt☉;-2)' "
+                "  2.193E6_s ]",
+
+"Astronomy/Cosmology & Varia",     nullptr,
+
+    // *Cosmological constant - Measurement [1] [2]
+    "Λ",       "[ 1.088E-52_1/m² "
+                "  0.030E-52_1/m² "
+                "  'ROUND(ⓈΛ/ⒸΛ;-2)' ]",
+    // *Hubble constant - Measurement [1]
+    "H₀",       "[ 67.4_km/(s·Mpc) "
+                "  0.5_km/(s·Mpc) "
+                "  'ROUND(ⓈH₀/ⒸH₀;-2)' ]",
+    // *Baryon density parameter - Measurement [1]
+    "ωb",       "[ 0.02237 "
+                "  0.00015 "
+                "  'ROUND(Ⓢωb/Ⓒωb;-2)' ]",
+    // *Cold dark matter density parameter - Measurement [1]
+    "ωc",       "[ 0.1200 "
+                "  0.0012 "
+                "  'ROUND(Ⓢωc/Ⓒωc;-2)' ]",
+    // *CMB acoustic scale - Measurement [1]
+    "100θ*",    "[ 1.04109 "
+                "  0.00030 "
+                "  'ROUND(Ⓢ100θ*/Ⓒ100θ*;-2)' "
+                "  1.041 ]",
+
+    // ------------------------------------------------------------------------
+    // *Reionization optical depth - Measurement [1]
+    "τr",       "[ 0.0544 "
+                "  0.0073 "
+                "  'ROUND(Ⓢτr/Ⓒτr;-2)' ]",
+    // *Scalar spectral index - Measurement [1]
+    "ns",       "[ 0.9665 "
+                "  0.0038 "
+                "  'ROUND(Ⓢns/Ⓒns;-2)' ]",
+    // *Power spectrum amplitude - Measurement [1]
+    "(ln(10¹⁰As))", "[ 3.044 "
+                "  0.014 "
+                "  'ROUND(Ⓢln(10¹⁰As)/Ⓒln(10¹⁰As);-2)' ]",
+    // *Milky Way total mass - Measurement [8] [9] [10]
+    "MG",       "[ 1.5E12_M☉ "
+                "  0.5E12_M☉ "
+                "  'ROUND(ⓈMG/ⒸMG;-2)' ]",
+    // *Milky Way dark matter fraction - Measurement [8] [9]
+    "fDMG",     "[ 0.85 "
+                "  0.05 "
+                "  'ROUND(ⓈfDMG/ⒸfDMG;-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Milky Way disk radius - Measurement [8] [9]
+    "RG",       "[ 50000_ly "
+                "  5000_ly "
+                "  'ROUND(ⓈRG/ⒸRG;-2)' ]",
+    // *Distance to Sgr A* - Measurement [6] [7]
+    "D●SgrA*",  "[ 26673_ly "
+                "  42_ly "
+                "  'ROUND(ⓈD●SgrA*/ⒸD●SgrA*;-2)' "
+                "  2.667E4_ly ]",
+    // *Sgr A* Schwarzschild radius - Measurement [7]
+    "R●SgrA*",  "[ 12.0E6_km "
+                "  0.4E6_km "
+                "  'ROUND(ⓈR●SgrA*/ⒸR●SgrA*;-2)' ]",
+    // *Sgr A* black hole mass - Measurement [7]
+    "M●SgrA*",  "[ 4.297E6_M☉ "
+                "  0.012E6_M☉ "
+                "  'ROUND(ⓈM●SgrA*/ⒸM●SgrA*;-2)' ]",
+    // *Andromeda galaxy total mass - Measurement [11] [12]
+    "MNGC224",  "[ 1.5E12_M☉ "
+                "  0.5E12_M☉ "
+                "  'ROUND(ⓈMNGC224/ⒸMNGC224;-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Andromeda dark matter fraction - Measurement [11] [12]
+    "fDMNGC224", "[ 0.85 "
+                "  0.05 "
+                "  'ROUND(ⓈfDMNGC224/ⒸfDMNGC224;-2)' ]",
+    // *Andromeda galaxy disk radius - Measurement [11]
+    "RNGC224",  "[ 110000_ly "
+                "  10000_ly "
+                "  'ROUND(ⓈRNGC224/ⒸRNGC224;-2)' "
+                "  1.100E5_ly ]",
+    // *Distance to Andromeda galaxy - Measurement [11]
+    "DNGC224",  "[ 2537000_ly "
+                "  50000_ly "
+                "  'ROUND(ⓈDNGC224/ⒸDNGC224;-2)' "
+                "  2.537E6_ly ]",
+    // *Vega gravitational parameter - Measurement [13] [14]
+    "GM★Vega",  "[ 1.89E19_m³/s² "
+                "  0.05E19_m³/s² "
+                "  'ROUND(ⓈGM★Vega/ⒸGM★Vega;-2)' ]",
+    // *Vega luminosity - Measurement [13] [14]
+    "L★Vega",   "[ 1.51E27_W "
+                "  0.05E27_W "
+                "  'ROUND(ⓈL★Vega/ⒸL★Vega;-2)' ]",
+
+"Materials",     nullptr,
+
+    // ========================================================================
+    //   A. GASES (at StdT = 273.15 K = 0°C, StdP = 101.325 kPa)
+    //
+    //   Parameters: ρv, n*, cp, cv, γ, R, ε, μ, ρ, Ed
+    //     *: where relevant
+    //   γ = cp/cv and R = cp − cv apply to gases only.
+    //   γ is given as a calculation 'ROUND(ⒸcpX/ⒸcvX;4)' for diatomic gases.
+    //   R is given as a calculation 'CONVERT(ⒸcpX-ⒸcvX;1_J/(kg*K))' for all gases.
+    // ========================================================================
+
+"Materials/Dry Air",     nullptr,
+
+    // *Dry air volumetric density - Measurement [M1] [M2]
+    "ρvAir",     "[ 1.2929_kg/m³ "
+                "  0.0001_kg/m³ "
+                "  'ROUND(ⓈρvAir/ⒸρvAir;-2)' ]",
+    // *Dry air refractive index - Measurement [M2]
+    "nAir",     "[ 1.000293 "
+                "  0.000001 "
+                "  'ROUND(ⓈnAir/ⒸnAir;-2)' ]",
+    // *Dry air specific heat cp - Measurement [M1] [M2]
+    "cpAir",    "[ 1006._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcpAir/ⒸcpAir;-2)' ]",
+    // *Dry air specific heat cv - Calculation from measurement [M1] [M2]
+    "cvAir",    "[ 717._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcvAir/ⒸcvAir;-2)' ]",
+    // *Dry air adiabatic index - Calculation: γ=cp/cv [M1] [M2]
+    "γAir",     "[ 'ROUND(ⒸcpAir/ⒸcvAir;XPON(UVAL(ⓇγAir*ⒸcpAir/ⒸcvAir))-XPON(UVAL(ⒸcpAir/ⒸcvAir))-2)' "
+                "  'ROUND(ⓇγAir*ⒸγAir;-2)' "
+                "  'ROUND(ⓈcpAir/ⒸcpAir+ⓈcvAir/ⒸcvAir;-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Dry air specific gas constant - Calculation: R=cp-cv [M1]
+    "RAir",     "[ 'ROUND(CONVERT(ⒸcpAir-ⒸcvAir;1_J/(kg*K));XPON(UVAL(ⓇRAir*(ⒸcpAir-ⒸcvAir)))-XPON(UVAL(ⒸcpAir-ⒸcvAir))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇRAir*ⒸRAir);-2);1_J/(kg*K))' "
+                "  'ROUND((ⓈcpAir+ⓈcvAir)/ABS(ⒸcpAir-ⒸcvAir);-2)' ]",
+    // *Dry air electric permittivity - Measurement [M1] [M2]
+    "εAir",     "[ 8.8542E-12_F/m "
+                "  0.0005E-12_F/m "
+                "  'ROUND(ⓈεAir/ⒸεAir;-2)' "
+                "  8.854E-12_F/m ]",
+    // *Dry air magnetic permeability - Measurement [M1] [M2]
+    "μAir",     "[ 1.2566E-6_H/m "
+                "  0.0001E-6_H/m "
+                "  'ROUND(ⓈμAir/ⒸμAir;-2)' "
+                "  1.257E-6_H/m ]",
+    // *Dry air resistivity - Measurement [M1] [M2]
+    "ρAir",     "[ 1.5E15_Ω·m "
+                "  0.5E15_Ω·m "
+                "  'ROUND(ⓈρAir/ⒸρAir;-2)' ]",
+    // *Dry air dielectric rigidity - Measurement [M1] [M2]
+    "EdAir",    "[ 3.0E6_V/m "
+                "  0.2E6_V/m "
+                "  'ROUND(ⓈEdAir/ⒸEdAir;-2)' ]",
+
+"Materials/N2",     nullptr,
+
+    // *Dinitrogen N2 volumetric density - Measurement [M2] [M3]
+    "ρvN2",      "[ 1.2506_kg/m³ "
+                "  0.0001_kg/m³ "
+                "  'ROUND(ⓈρvN2/ⒸρvN2;-2)' ]",
+    // *Dinitrogen N2 specific heat cp - Measurement [M2] [M3]
+    "cpN2",     "[ 1039._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcpN2/ⒸcpN2;-2)' ]",
+    // *Dinitrogen N2 specific heat cv - Measurement [M2] [M3]
+    "cvN2",     "[ 742._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcvN2/ⒸcvN2;-2)' ]",
+    // *Dinitrogen N2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
+    "γN2",      "[ 'ROUND(ⒸcpN2/ⒸcvN2;XPON(UVAL(ⓇγN2*ⒸcpN2/ⒸcvN2))-XPON(UVAL(ⒸcpN2/ⒸcvN2))-2)' "
+                "  'ROUND(ⓇγN2*ⒸγN2;-2)' "
+                "  'ROUND(ⓈcpN2/ⒸcpN2+ⓈcvN2/ⒸcvN2;-2)' ]",
+    // *Dinitrogen N2 specific gas constant - Calculation: R=cp-cv [M2]
+    "RN2",      "[ 'ROUND(CONVERT(ⒸcpN2-ⒸcvN2;1_J/(kg*K));XPON(UVAL(ⓇRN2*(ⒸcpN2-ⒸcvN2)))-XPON(UVAL(ⒸcpN2-ⒸcvN2))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇRN2*ⒸRN2);-2);1_J/(kg*K))' "
+                "  'ROUND((ⓈcpN2+ⓈcvN2)/ABS(ⒸcpN2-ⒸcvN2);-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Dinitrogen N2 electric permittivity - Measurement [M2]
+    "εN2",      "[ 8.859E-12_F/m "        // εr ≈ 1.000580 at STP
+                "  0.001E-12_F/m "
+                "  'ROUND(ⓈεN2/ⒸεN2;-2)' ]",
+    // *Dinitrogen N2 magnetic permeability - Measurement [M2]
+    "μN2",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
+                "  0.0001E-6_H/m "
+                "  'ROUND(ⓈμN2/ⒸμN2;-2)' "
+                "  1.257E-6_H/m ]",
+    // *Dinitrogen N2 resistivity - Measurement [M2]
+    "ρN2",      "[ 1.0E15_Ω·m "           // dry N2 at STP; excellent insulator
+                "  0.5E15_Ω·m "
+                "  'ROUND(ⓈρN2/ⒸρN2;-2)' ]",
+    // *Dinitrogen N2 dielectric rigidity - Measurement [M2]
+    "EdN2",     "[ 3.5E6_V/m "            // slightly higher than dry air
+                "  0.3E6_V/m "
+                "  'ROUND(ⓈEdN2/ⒸEdN2;-2)' ]",
+
+"Materials/O2",     nullptr,
+
+    // *Dioxygen O2 volumetric density - Measurement [M2] [M3]
+    "ρvO2",      "[ 1.4290_kg/m³ "
+                "  0.0001_kg/m³ "
+                "  'ROUND(ⓈρvO2/ⒸρvO2;-2)' ]",
+    // *Dioxygen O2 specific heat cp - Measurement [M2] [M3]
+    "cpO2",     "[ 919._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcpO2/ⒸcpO2;-2)' ]",
+    // *Dioxygen O2 specific heat cv - Measurement [M2] [M3]
+    "cvO2",     "[ 659._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcvO2/ⒸcvO2;-2)' ]",
+    // *Dioxygen O2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
+    "γO2",      "[ 'ROUND(ⒸcpO2/ⒸcvO2;XPON(UVAL(ⓇγO2*ⒸcpO2/ⒸcvO2))-XPON(UVAL(ⒸcpO2/ⒸcvO2))-2)' "
+                "  'ROUND(ⓇγO2*ⒸγO2;-2)' "
+                "  'ROUND(ⓈcpO2/ⒸcpO2+ⓈcvO2/ⒸcvO2;-2)' ]",
+    // *Dioxygen O2 specific gas constant - Calculation: R=cp-cv [M2]
+    "RO2",      "[ 'ROUND(CONVERT(ⒸcpO2-ⒸcvO2;1_J/(kg*K));XPON(UVAL(ⓇRO2*(ⒸcpO2-ⒸcvO2)))-XPON(UVAL(ⒸcpO2-ⒸcvO2))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇRO2*ⒸRO2);-2);1_J/(kg*K))' "
+                "  'ROUND((ⓈcpO2+ⓈcvO2)/ABS(ⒸcpO2-ⒸcvO2);-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Dioxygen O2 electric permittivity - Measurement [M2]
+    "εO2",      "[ 8.859E-12_F/m "        // εr ≈ 1.000530 at STP
+                "  0.001E-12_F/m "
+                "  'ROUND(ⓈεO2/ⒸεO2;-2)' ]",
+    // *Dioxygen O2 magnetic permeability - Measurement [M2]
+    "μO2",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000019 (paramagnetic)
+                "  0.0001E-6_H/m "
+                "  'ROUND(ⓈμO2/ⒸμO2;-2)' "
+                "  1.257E-6_H/m ]",
+    // *Dioxygen O2 resistivity - Measurement [M2]
+    "ρO2",      "[ 1.0E15_Ω·m "           // dry O2 at STP
+                "  0.5E15_Ω·m "
+                "  'ROUND(ⓈρO2/ⒸρO2;-2)' ]",
+    // *Dioxygen O2 dielectric rigidity - Measurement [M2]
+    "EdO2",     "[ 2.9E6_V/m "            // slightly lower than N2
+                "  0.3E6_V/m "
+                "  'ROUND(ⓈEdO2/ⒸEdO2;-2)' ]",
+
+"Materials/Argon",     nullptr,
+
+    // *Argon volumetric density - Measurement [M2]
+    "ρvAr",      "[ 1.7839_kg/m³ "
+                "  0.0001_kg/m³ "
+                "  'ROUND(ⓈρvAr/ⒸρvAr;-2)' ]",
+    // *Argon specific heat cp - Exact calculation [M2]
+    "cpAr",     "[ 520.3_J/(kg*K) "
+                "  0.1_J/(kg*K) "
+                "  'ROUND(ⓈcpAr/ⒸcpAr;-2)' ]",
+    // *Argon specific heat cv - Exact calculation [M2]
+    "cvAr",     "[ 312.2_J/(kg*K) "
+                "  0.1_J/(kg*K) "
+                "  'ROUND(ⓈcvAr/ⒸcvAr;-2)' ]",
+    // *Argon adiabatic index - Exact definition: 5/3 for monatomic ideal gas [M2]
+    "γAr",      "[ '5/3' "
                 "  0 "
-                "  4.836⁳¹⁴ Hz/V ]",
-    // *Quantum of circulation - Calculation from measurement
-    "Kc",       "[ 'ROUND(CONVERT(Ⓒπ*Ⓒℏ/Ⓒme;1_m²/s);XPON(UVAL(ⓇKc*Ⓒπ*Ⓒℏ/Ⓒme))-XPON(UVAL(Ⓒπ*Ⓒℏ/Ⓒme))-2)' "
-                "  'CONVERT(ROUND(UBASE(ⓇKc*ⒸKc);-2);1_m²/s)' "
-                "  'Ⓡme' "
-                "  3.637⁳⁻⁴ m↑2/s ]",
+                "  0 ]",
+    // *Argon specific gas constant - Exact calculation: R=cp-cv [M2]
+    "RAr",      "[ 'CONVERT(ⒸcpAr-ⒸcvAr;1_J/(kg*K))' "
+                "  0_J/(kg*K) "
+                "  0 ]",
 
     // ------------------------------------------------------------------------
-    //  Materials
+    // *Argon electric permittivity - Measurement [M2]
+    "εAr",      "[ 8.855E-12_F/m "        // εr ≈ 1.000516 at STP
+                "  0.001E-12_F/m "
+                "  'ROUND(ⓈεAr/ⒸεAr;-2)' ]",
+    // *Argon magnetic permeability - Measurement [M2]
+    "μAr",      "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
+                "  0.0001E-6_H/m "
+                "  'ROUND(ⓈμAr/ⒸμAr;-2)' "
+                "  1.257E-6_H/m ]",
+    // *Argon resistivity - Measurement [M2]
+    "ρAr",      "[ 1.0E15_Ω·m "           // noble gas; excellent insulator
+                "  0.5E15_Ω·m "
+                "  'ROUND(ⓈρAr/ⒸρAr;-2)' ]",
+    // *Argon dielectric rigidity - Measurement [M2]
+    "EdAr",     "[ 2.0E6_V/m "            // lower than air (no polar molecules)
+                "  0.2E6_V/m "
+                "  'ROUND(ⓈEdAr/ⒸEdAr;-2)' ]",
+
+"Materials/CO2",     nullptr,
+
+    // *Carbon dioxide CO2 volumetric density - Measurement [M2] [M3]
+    "ρvCO2",     "[ 1.9768_kg/m³ "
+                "  0.0001_kg/m³ "
+                "  'ROUND(ⓈρvCO2/ⒸρvCO2;-2)' ]",
+    // *Carbon dioxide CO2 specific heat cp - Measurement [M2] [M3]
+    "cpCO2",    "[ 819._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcpCO2/ⒸcpCO2;-2)' ]",
+    // *Carbon dioxide CO2 specific heat cv - Measurement [M2] [M3]
+    "cvCO2",    "[ 630._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcvCO2/ⒸcvCO2;-2)' ]",
+    // *Carbon dioxide CO2 adiabatic index - Calculation: γ=cp/cv [M2] [M3]
+    "γCO2",     "[ 'ROUND(ⒸcpCO2/ⒸcvCO2;XPON(UVAL(ⓇγCO2*ⒸcpCO2/ⒸcvCO2))-XPON(UVAL(ⒸcpCO2/ⒸcvCO2))-2)' "
+                "  'ROUND(ⓇγCO2*ⒸγCO2;-2)' "
+                "  'ROUND(ⓈcpCO2/ⒸcpCO2+ⓈcvCO2/ⒸcvCO2;-2)' ]",
+    // *Carbon dioxide CO2 specific gas constant - Calculation: R=cp-cv [M2]
+    "RCO2",     "[ 'ROUND(CONVERT(ⒸcpCO2-ⒸcvCO2;1_J/(kg*K));XPON(UVAL(ⓇRCO2*(ⒸcpCO2-ⒸcvCO2)))-XPON(UVAL(ⒸcpCO2-ⒸcvCO2))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇRCO2*ⒸRCO2);-2);1_J/(kg*K))' "
+                "  'ROUND((ⓈcpCO2+ⓈcvCO2)/ABS(ⒸcpCO2-ⒸcvCO2);-2)' ]",
+
+    // ------------------------------------------------------------------------
+    // *Carbon dioxide CO2 electric permittivity - Measurement [M2] [M3]
+    "εCO2",     "[ 8.920E-12_F/m "        // εr ≈ 1.000921 at STP
+                "  0.001E-12_F/m "
+                "  'ROUND(ⓈεCO2/ⒸεCO2;-2)' ]",
+    // *Carbon dioxide CO2 magnetic permeability - Measurement [M2]
+    "μCO2",     "[ 1.2566E-6_H/m "        // μr ≈ 1.0000000 (diamagnetic)
+                "  0.0001E-6_H/m "
+                "  'ROUND(ⓈμCO2/ⒸμCO2;-2)' "
+                "  1.257E-6_H/m ]",
+    // *Carbon dioxide CO2 resistivity - Measurement [M2]
+    "ρCO2",     "[ 1.0E13_Ω·m "           // lower than N2/Ar; polar molecule
+                "  0.5E13_Ω·m "
+                "  'ROUND(ⓈρCO2/ⒸρCO2;-2)' ]",
+    // *Carbon dioxide CO2 dielectric rigidity - Measurement [M2]
+    "EdCO2",    "[ 2.9E6_V/m "            // similar to air
+                "  0.3E6_V/m "
+                "  'ROUND(ⓈEdCO2/ⒸEdCO2;-2)' ]",
+
+    // ========================================================================
+    //   B. LIQUIDS (at T = 293.15 K = 20°C, P = 101.325 kPa)
+    //
+    //   For liquids: cv ≈ cp (difference < 1%), γ ≈ 1, R_id ≈ 0.
+    //   These parameters are therefore not listed for liquids.
+    // ========================================================================
+
+"Materials/H2O",     nullptr,
+
+    // *Liquid water volumetric density - Measurement [M4] [M2]
+    "ρvH2O",     "[ 998.2_kg/m³ "
+                "  0.1_kg/m³ "
+                "  'ROUND(ⓈρvH2O/ⒸρvH2O;-2)' ]",
+    // *Liquid water refractive index - Measurement [M4]
+    "nH2O",     "[ 1.3330 "
+                "  0.0005 "
+                "  'ROUND(ⓈnH2O/ⒸnH2O;-2)' "
+                "  1.333 ]",
+    // *Liquid water specific heat cp - Measurement [M4] [M2]
+    "cpH2O",    "[ 4182._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcpH2O/ⒸcpH2O;-2)' ]",
+    // *Liquid water resistivity - Measurement [M4] [M2]
+    "ρH2O",     "[ 1.8E5_Ω·m "            // ultra-pure water at 25°C; 18 MΩ·cm
+                "  0.2E5_Ω·m "
+                "  'ROUND(ⓈρH2O/ⒸρH2O;-2)' ]",
+
+    // ========================================================================
+    //   C. SOLIDS (at T = 293.15 K = 20°C, P = 101.325 kPa)
+    //
+    //   Sub-sections:
+    //     C1. Materials for optical fibers and waveguides
+    //     C2. Reference optical glasses
+    //     C3. Optical crystals (UV and IR)
+    //     C4. Reference metals (thermal and mechanical engineering)
+    // ========================================================================
+
+    // ------------------------------------------------------------------------
+    //   C1. Materials for optical fibers and waveguides
     // ------------------------------------------------------------------------
 
-    "Materials",     nullptr,
+"Materials/Silicon",     nullptr,
 
-    // * ε₀q ratio - Calculation from measurement
-    "ε₀q",      "[ 'ROUND(CONVERT(Ⓒε₀/Ⓒqe;1_F/(m*C));XPON(UVAL(Ⓡε₀q*Ⓒε₀/Ⓒqe))-XPON(UVAL(Ⓒε₀/Ⓒqe))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡε₀q*Ⓒε₀q);-2);1_F/(m*C))' "
-                "  'Ⓡε₀' "
-                "  5.526⁳⁷ F/(m·C) ]",
-    // * qε₀ product - Calculation from measurement
-    "qε₀",      "[ 'ROUND(CONVERT(Ⓒqe*Ⓒε₀;1_F*C/m);XPON(UVAL(Ⓡqε₀*Ⓒqe*Ⓒε₀))-XPON(UVAL(Ⓒqe*Ⓒε₀))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡqε₀*Ⓒqε₀);-2);1_F*C/m)' "
-                "  'Ⓡε₀' "
-                "  1.419⁳⁻³⁰ F·C/m ]",
-    // *Dielectric constant - Definition convention
+    // *Crystalline silicon volumetric density - Measurement [M10] [M11]
+    "ρvSi",      "[ 2330._kg/m³ "
+                "  1._kg/m³ "
+                "  'ROUND(ⓈρvSi/ⒸρvSi;-2)' ]",
+    // *Crystalline silicon refractive index - Measurement [M11]
+    "nSi",      "[ 3.4179 "
+                "  0.0002 "
+                "  'ROUND(ⓈnSi/ⒸnSi;-2)' ]",
+    // *Crystalline silicon specific heat - Measurement [M10]
+    "cpSi",     "[ 711._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcpSi/ⒸcpSi;-2)' ]",
+    // *Dielectric constant of silicon - Definition convention [HP50g manual]
     "εsi",      "[ 11.9 "
                 "  0 "
                 "  0 ]",
-    // *SiO2 dielectric constant - Definition convention
+    // *Crystalline silicon resistivity - Measurement [M10] [M11]
+    "ρSi",      "[ 2.3E3_Ω·m "            // intrinsic Si at 300 K; range 10²–10⁴ Ω·m
+                "  0.5E3_Ω·m "
+                "  'ROUND(ⓈρSi/ⒸρSi;-2)' ]",
+
+"Materials/SiO2",     nullptr,
+
+    // *Fused silica volumetric density - Measurement [M7]
+    "ρvSiO2",    "[ 2201._kg/m³ "
+                "  2._kg/m³ "
+                "  'ROUND(ⓈρvSiO2/ⒸρvSiO2;-2)' ]",
+    // *Fused silica refractive index - Measurement [M5]
+    "nSiO2",    "[ 1.45701 "
+                "  0.00005 "
+                "  'ROUND(ⓈnSiO2/ⒸnSiO2;-2)' ]",
+    // *Fused silica specific heat - Measurement [M7]
+    "cpSiO2",   "[ 703._J/(kg*K) "
+                "  5._J/(kg*K) "
+                "  'ROUND(ⓈcpSiO2/ⒸcpSiO2;-2)' ]",
+    // *Dielectric constant of SiO2 - Definition convention [HP50g manual]
     "εox",      "[ 3.9 "
                 "  0 "
                 "  0 ]",
+    // *Fused silica resistivity - Measurement [M7]
+    "ρSiO2",    "[ 1.0E18_Ω·m "           // fused silica; excellent insulator
+                "  0.5E18_Ω·m "
+                "  'ROUND(ⓈρSiO2/ⒸρSiO2;-2)' ]",
+    // *Fused silica dielectric rigidity - Measurement [M7]
+    "EdSiO2",   "[ 5.0E8_V/m "            // fused silica bulk breakdown
+                "  0.5E8_V/m "
+                "  'ROUND(ⓈEdSiO2/ⒸEdSiO2;-2)' ]",
+
+"Materials/GeO2",     nullptr,
+
+    // *Germanate glass volumetric density - Measurement [M8] [M9]
+    "ρvGeO2",    "[ 3650._kg/m³ "
+                "  10._kg/m³ "
+                "  'ROUND(ⓈρvGeO2/ⒸρvGeO2;-2)' ]",
+    // *Germanate glass refractive index - Measurement [M8]
+    "nGeO2",    "[ 1.607 "
+                "  0.002 "
+                "  'ROUND(ⓈnGeO2/ⒸnGeO2;-2)' ]",
+    // *Germanate glass specific heat - Measurement [M9]
+    "cpGeO2",   "[ 440._J/(kg*K) "
+                "  10._J/(kg*K) "
+                "  'ROUND(ⓈcpGeO2/ⒸcpGeO2;-2)' ]",
+    // *Germanate glass resistivity - Measurement [M9]
+    "ρGeO2",    "[ 1.0E12_Ω·m "           // pure GeO2 glass; lower than SiO2
+                "  0.5E12_Ω·m "
+                "  'ROUND(ⓈρGeO2/ⒸρGeO2;-2)' ]",
+    // *Germanate glass dielectric rigidity - Measurement [M9]
+    "EdGeO2",   "[ 4.0E8_V/m "            // estimated from glass family
+                "  0.5E8_V/m "
+                "  'ROUND(ⓈEdGeO2/ⒸEdGeO2;-2)' ]",
+
+"Materials/Si3N4",     nullptr,
+
+    // *Silicon nitride volumetric density - Measurement [M18] [M19]
+    "ρvSi3N4",   "[ 3170._kg/m³ "
+                "  10._kg/m³ "
+                "  'ROUND(ⓈρvSi3N4/ⒸρvSi3N4;-2)' ]",
+    // *LPCVD Si3N4 refractive index - Measurement [M18]
+    "nSi3N4",   "[ 2.016 "
+                "  0.005 "
+                "  'ROUND(ⓈnSi3N4/ⒸnSi3N4;-2)' ]",
+    // *Silicon nitride specific heat - Measurement [M19]
+    "cpSi3N4",  "[ 691._J/(kg*K) "
+                "  10._J/(kg*K) "
+                "  'ROUND(ⓈcpSi3N4/ⒸcpSi3N4;-2)' ]",
+    // *Silicon nitride resistivity - Measurement [M19]
+    "ρSi3N4",   "[ 1.0E14_Ω·m "           // LPCVD Si3N4; good insulator
+                "  0.5E14_Ω·m "
+                "  'ROUND(ⓈρSi3N4/ⒸρSi3N4;-2)' ]",
+    // *Silicon nitride dielectric rigidity - Measurement [M19]
+    "EdSi3N4",  "[ 1.0E9_V/m "            // thin-film breakdown field
+                "  0.2E9_V/m "
+                "  'ROUND(ⓈEdSi3N4/ⒸEdSi3N4;-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Ref intensity - Definition convention
-    "I₀",       "[ 0.000000000001_W/m² "
-                "  0_W/m² "
-                "  0 ]",
+    //   C2. Reference optical glasses
+    // ------------------------------------------------------------------------
+
+"Materials/BK7 Glass",     nullptr,
+
+    // *Schott BK7 glass volumetric density - Measurement [M15]
+    "ρvBK7",     "[ 2510._kg/m³ "
+                "  5._kg/m³ "
+                "  'ROUND(ⓈρvBK7/ⒸρvBK7;-2)' ]",
+    // *Schott BK7 glass refractive index - Measurement [M15]
+    "nBK7",     "[ 1.51680 "
+                "  0.00002 "
+                "  'ROUND(ⓈnBK7/ⒸnBK7;-2)' ]",
+    // *Schott BK7 glass specific heat - Measurement [M15]
+    "cpBK7",    "[ 858._J/(kg*K) "
+                "  10._J/(kg*K) "
+                "  'ROUND(ⓈcpBK7/ⒸcpBK7;-2)' ]",
+    // *Schott BK7 glass resistivity - Measurement [M15]
+    "ρBK7",     "[ 1.0E13_Ω·m "           // borosilicate glass at 20°C
+                "  0.5E13_Ω·m "
+                "  'ROUND(ⓈρBK7/ⒸρBK7;-2)' ]",
+    // *Schott BK7 glass dielectric rigidity - Measurement [M15]
+    "EdBK7",    "[ 2.5E7_V/m "            // bulk optical glass breakdown
+                "  0.5E7_V/m "
+                "  'ROUND(ⓈEdBK7/ⒸEdBK7;-2)' ]",
 
     // ------------------------------------------------------------------------
-    //  Comp
+    //   C3. Optical crystals (UV and IR)
+    // ------------------------------------------------------------------------
+
+"Materials/Al2O3 Sapphire",     nullptr,
+
+    // *Sapphire volumetric density - Measurement [M16]
+    "ρvAl2O3",   "[ 3980._kg/m³ "
+                "  5._kg/m³ "
+                "  'ROUND(ⓈρvAl2O3/ⒸρvAl2O3;-2)' ]",
+    // *Sapphire ordinary refractive index - Measurement [M16]
+    "nAl2O3",   "[ 1.7659 "
+                "  0.0002 "
+                "  'ROUND(ⓈnAl2O3/ⒸnAl2O3;-2)' ]",
+    // *Sapphire specific heat - Measurement [M16] [M2]
+    "cpAl2O3",  "[ 765._J/(kg*K) "
+                "  5._J/(kg*K) "
+                "  'ROUND(ⓈcpAl2O3/ⒸcpAl2O3;-2)' ]",
+    // *Sapphire resistivity - Measurement [M16]
+    "ρAl2O3",   "[ 1.0E14_Ω·m "           // single-crystal sapphire at 20°C
+                "  0.5E14_Ω·m "
+                "  'ROUND(ⓈρAl2O3/ⒸρAl2O3;-2)' ]",
+    // *Sapphire dielectric rigidity - Measurement [M16]
+    "EdAl2O3",  "[ 4.0E8_V/m "            // bulk sapphire breakdown field
+                "  0.5E8_V/m "
+                "  'ROUND(ⓈEdAl2O3/ⒸEdAl2O3;-2)' ]",
+
+"Materials/CaF2",     nullptr,
+
+    // *Calcium fluoride volumetric density - Measurement [M17] [M15]
+    "ρvCaF2",    "[ 3180._kg/m³ "
+                "  5._kg/m³ "
+                "  'ROUND(ⓈρvCaF2/ⒸρvCaF2;-2)' ]",
+    // *Calcium fluoride refractive index - Measurement [M17]
+    "nCaF2",    "[ 1.43381 "
+                "  0.00005 "
+                "  'ROUND(ⓈnCaF2/ⒸnCaF2;-2)' ]",
+    // *Calcium fluoride specific heat - Measurement [M15]
+    "cpCaF2",   "[ 854._J/(kg*K) "
+                "  5._J/(kg*K) "
+                "  'ROUND(ⓈcpCaF2/ⒸcpCaF2;-2)' ]",
+    // *Calcium fluoride resistivity - Measurement [M17]
+    "ρCaF2",    "[ 1.0E15_Ω·m "           // single-crystal CaF2 at 20°C
+                "  0.5E15_Ω·m "
+                "  'ROUND(ⓈρCaF2/ⒸρCaF2;-2)' ]",
+    // *Calcium fluoride dielectric rigidity - Measurement [M17]
+    "EdCaF2",   "[ 1.0E9_V/m "            // CaF2 crystal bulk breakdown
+                "  0.2E9_V/m "
+                "  'ROUND(ⓈEdCaF2/ⒸEdCaF2;-2)' ]",
+
+"Materials/C Diamond",     nullptr,
+
+    // *Diamond volumetric density - Measurement [M13] [M14]
+    "ρvC",       "[ 3515._kg/m³ "
+                "  1._kg/m³ "
+                "  'ROUND(ⓈρvC/ⒸρvC;-2)' ]",
+    // *Diamond refractive index - Measurement [M14]
+    "nC",       "[ 2.4180 "
+                "  0.0002 "
+                "  'ROUND(ⓈnC/ⒸnC;-2)' ]",
+    // *Diamond specific heat - Measurement [M13]
+    "cpC",      "[ 502._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcpC/ⒸcpC;-2)' ]",
+    // *Diamond resistivity - Measurement [M13] [M14]
+    "ρC",       "[ 1.0E13_Ω·m "           // type IIa natural diamond; ~10¹¹–10¹⁴ Ω·m
+                "  0.5E13_Ω·m "
+                "  'ROUND(ⓈρC/ⒸρC;-2)' ]",
+    // *Diamond dielectric rigidity - Measurement [M13] [M14]
+    "EdC",      "[ 1.0E9_V/m "            // type IIa diamond; highest of any solid
+                "  0.2E9_V/m "
+                "  'ROUND(ⓈEdC/ⒸEdC;-2)' ]",
+
+    // ------------------------------------------------------------------------
+    //   C4. Reference metals (thermal and mechanical engineering)
+    //
+    //   For metals: n not listed (complex n, strongly wavelength-dependent).
+    //   cv ≈ cp for all metals at room temperature (difference < 0.5%).
+    // ------------------------------------------------------------------------
+
+"Materials/Al Metal",     nullptr,
+
+    // *Aluminium volumetric density - Measurement [M12] [M2]
+    "ρvAl",      "[ 2700._kg/m³ "
+                "  1._kg/m³ "
+                "  'ROUND(ⓈρvAl/ⒸρvAl;-2)' ]",
+    // *Aluminium specific heat - Measurement [M12] [M2]
+    "cpAl",     "[ 902._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcpAl/ⒸcpAl;-2)' ]",
+
+"Materials/Cu Metal",     nullptr,
+
+    // *Copper volumetric density - Measurement [M12] [M2]
+    "ρvCu",      "[ 8960._kg/m³ "
+                "  5._kg/m³ "
+                "  'ROUND(ⓈρvCu/ⒸρvCu;-2)' ]",
+    // *Copper specific heat - Measurement [M12] [M2]
+    "cpCu",     "[ 385._J/(kg*K) "
+                "  1._J/(kg*K) "
+                "  'ROUND(ⓈcpCu/ⒸcpCu;-2)' ]",
+
+"Materials/Fe Metal",     nullptr,
+
+    // *Iron volumetric density (α phase) - Measurement [M12] [M2]
+    "ρvFe",      "[ 7874._kg/m³ "
+                "  3._kg/m³ "
+                "  'ROUND(ⓈρvFe/ⒸρvFe;-2)' ]",
+    // *Iron specific heat (α phase, BCC) - Measurement [M12] [M2]
+    "cpFe",     "[ 450._J/(kg*K) "
+                "  2._J/(kg*K) "
+                "  'ROUND(ⓈcpFe/ⒸcpFe;-2)' ]",
+
+    // ------------------------------------------------------------------------
+    //  Computing
     // ------------------------------------------------------------------------
     "Computing",   nullptr,
 
+   // *Boolean false value - Exact convention
     "No",                       "False",                // No value = false
+    // *Boolean true value - Exact convention
     "Yes",                      "True",                 // Yes value = true
+    // *Unix time epoch - Exact convention
     "UnixEpoch",                "[ 19700101_date 0_date 0 ]",
+    // *Sinclair ZX81 RAM size - Exact definition
     "SinclairZX81RAM",          "[ 1_KiB 0_KiB 0 ]",
+    // *Virtual memory page size - Exact convention
     "PageSize",                 "[ 4_KiB 0_KiB 0 ]",
-    "HelloWorld",               "\"Hello World\""
+
+    // ------------------------------------------------------------------------
+    // *Hello World string - Exact convention
+    "HelloWorld",               "[ \"Hello World\""
+                                "  \"\""
+                                "  0"
 };
+// ------------------------------------------------------------------------
+//   References are in constants.md — Bibliographic references section
+//   NUMERIC CONSTANTS TABLE (actual value as of 2026-05-11)
+//
+//   Section                    Count    %
+//   Mathematics                 11    2.8%
+//   Chemistry                   13    3.3%
+//   Physics                     12    3.1%
+//   Mass                        23    5.9%
+//   Electromagnetism            25    6.4%
+//   Size                         3    0.8%
+//   Scattering                   6    1.5%
+//   Quantum                     15    3.8%
+//   Astronomy                  180   46.0%
+//   Materials                   97   24.8%
+//   Computing                    6    1.5%
+//   TOTAL                      391  100.0%
+//
+//   Exact or Definition         40   11.3%
+//   Calculated                 112   28.6%
+//   Measured                   239   61.1%
+// ------------------------------------------------------------------------
 //   clang-format on
 
 
