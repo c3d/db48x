@@ -1088,6 +1088,7 @@ COMMAND_BODY(Version)
 }
 
 
+#ifdef HAS_CHUCK
 COMMAND_BODY(ChuckNorris)
 // ----------------------------------------------------------------------------
 //   Return the Chuck Norris quote for this version
@@ -1102,6 +1103,7 @@ COMMAND_BODY(ChuckNorris)
             return OK;
     return ERROR;
 }
+#endif // HAS_CHUCK
 
 
 COMMAND_BODY(Help)

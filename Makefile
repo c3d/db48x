@@ -111,6 +111,9 @@ CRCFIX = tools/forcecrc32/forcecrc32
 CRC32 = tools/crc32/crc32
 BASE_FONT = fonts/FogSans-ddd.ttf
 
+# Enable CHUCK feature (may lead to multiple iterations in FW build)
+# CHUCK=yes
+
 # ------------------------------------------------------------------------------
 # Sources and products
 # ------------------------------------------------------------------------------
@@ -243,7 +246,8 @@ DEFINES =							\
 	$(DEFINES_$(MODEL))					\
 	$(DEFINES_$(TARGET))					\
 	$(DEFINES_$(KIND))					\
-	$(DEFINES_$(PLATFORM))
+	$(DEFINES_$(PLATFORM))					\
+	$(CHUCK:%=HAS_CHUCK)
 
 DEFINES_debug = DEBUG
 DEFINES_release = NDEBUG OPTIMIZED
@@ -400,7 +404,7 @@ PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
 VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
 VERSION_H = src/$(PLATFORM)/version.h
-CHUCK_H = src/$(PLATFORM)/chuck-norris.h
+CHUCK_H = $(CHUCK:%=src/$(PLATFORM)/chuck-norris.h)
 FONTS=Editor Help Reduced Stack
 
 .prebuild:	$(FONTS:%=fonts/%Font.cc)			\
@@ -423,7 +427,7 @@ src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
 	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
 
 VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
-CHUCK_GIT_H=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h
+CHUCK_GIT_H=$(CHUCK:%=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h)
 $(VERSION_H): $(VERSION_GIT_H)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) cp $< $@

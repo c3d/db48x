@@ -169,7 +169,6 @@ COMMAND_DECLARE(SystemSetup,-1);        // Select the system menu
 COMMAND_DECLARE(ScreenCapture,-1);      // Snapshot screen state to a file
 COMMAND_DECLARE(Beep,2);                // Emit a sound (if enabled)
 COMMAND_DECLARE(Version,0);             // Return a version string
-COMMAND_DECLARE(ChuckNorris,0);         // Return a Chuck Norris quote
 COMMAND_DECLARE(Help,-1);               // Activate online help
 COMMAND_DECLARE(LastArg,-1);            // Return last arguments
 COMMAND_DECLARE(LastX,-1);              // Return last X argument
@@ -213,5 +212,9 @@ COMMAND_DECLARE(UIUp,-1);               // Actions related to up key
 COMMAND_DECLARE(UIDown,-1);             // Actions related to down key
 COMMAND_DECLARE(UIBackspace,-1);        // Actions related to backspace
 COMMAND_DECLARE(UIDelete,-1);           // Action related to delete
+
+#ifdef HAS_CHUCK
+COMMAND_DECLARE(ChuckNorris,0);         // Return a Chuck Norris quote
+#endif // HAS_CHUCK
 
 #endif // COMMAND_H

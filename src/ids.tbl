@@ -712,7 +712,6 @@ NAMED(RangeIntersect,   "∩")            ALIAS(RangeIntersect, "Intersect")
 CMD(Type)
 CMD(TypeName)
 CMD(Version)
-OP(ChuckNorris, "Chuck")
 CMD(Date)
 CMD(Time)
 CMD(DateTime)
@@ -724,6 +723,10 @@ OP(SetTime, "→Time")
 CMD(Wait)
 CMD(Bytes)
 CMD(ScreenCapture)
+
+#ifdef HAS_CHUCK
+OP(ChuckNorris, "Chuck")
+#endif // HAS_CHUCK
 
 // Special arithmetic
 CMD(Factors)
