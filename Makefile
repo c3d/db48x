@@ -321,7 +321,7 @@ TIME=
 CXXFLAGS_TARGET_$(TARGET) += $(CXXFLAGS_$(KIND))
 CXXFLAGS_sim = -Wno-vla-cxx-extension
 CXXFLAGS_wasm = -Wno-vla-cxx-extension
-
+CXXFLAGS_fw = -Wa,-adhlns=$@.lst
 
 # ------------------------------------------------------------------------------
 # Default and variant targets
