@@ -51,12 +51,16 @@ SECTIONS
     *(.qspi*)          /* .qspi* sections */
 /* ==== Symbols to QSPI - in direct order === */
     *(.fonts)
-    *(.rodata._Z*)
+    *(.rodata._Z*)      /* C++ data */
+    *(.rodata.small*)   /* Small primes table */
 /* ======================== */
     . = ALIGN(8);
     _qspi_end = .;         /* define a global symbols at end of qspi */
 
   } >QSPI /* AT> FLASH */
+
+ _qspi_init_base = LOADADDR(.qspi);
+ _qspi_init_length = SIZEOF(.qspi);
 
   /* Constant data goes into FLASH */
   .rodata :
@@ -64,38 +68,16 @@ SECTIONS
     KEEP(*(.rodata.prog_info)) /* Program info */
     KEEP(*(.qspi.qspi_build_id))
     . = ALIGN(64);
-    *(.rodata)         /* .rodata sections (constants, strings, etc.) */
-    *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
+    KEEP(*(.flash))     /* Data that needs to be in flash */
+    *(.rodata)          /* .rodata sections (constants, strings, etc.) */
+    *(.rodata*)         /* .rodata* sections (constants, strings, etc.) */
+    *(.rodata.str*)     /* String constants */
 
     /* Constants declared non const in intel library */
     . = ALIGN(16);
-    *(.data.BID128_1*)
-    *(.data.BID128_DEC_PI)
-    *(.data.BID128_POSHALF)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_SHIFTER)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_N15000)
-    *(.data.BID128_EXP_M11000)
-    *(.data.bid_coeff_2)
-    *(.data.bid_coeff_3)
-    *(.data.bid_coeff_4)
-    *(.data.BID128_POSHALF)
-    *(.data.BID128_EXP_11000)
-    *(.data.BID128_INF)
-    *(.data.BID128_SHIFTER)
-    *(.data.BID128_NEGHALF)
-    *(.data.BID128_LOG_2PI_OVER_2)
-    *(.data.BID128_HALF)
-    *(.data.BID128_ZERO)
-    *(.bss.BID128_ZERO)
-
     *(.data.__global_locale)
     . = ALIGN(8);
   } >FLASH
-
- _qspi_init_base = LOADADDR(.qspi);
- _qspi_init_length = SIZEOF(.qspi);
 
   /* The program code and other data goes into FLASH */
   .text :

@@ -367,6 +367,21 @@ bool load_saved_keymap(cstring name)
 }
 
 
+uint slowdown(uint random)
+// ----------------------------------------------------------------------------
+//   Artificial slow-down for QSPI acceess
+// ----------------------------------------------------------------------------
+//   The reason for slowing down is that the QSPI occasionally feeds bad bytes
+//   if read too fast. See also issue #12, issue #304, #1532, and
+//   commit 63eb8efabd1 introducing DEOPTIMIZE_CATALOG.
+{
+    char buffer[8];
+    for (uint i = 0; i < sizeof(buffer); i++)
+        buffer[i] = random++;
+    return buffer[0] ^ buffer[sizeof(buffer)-1];
+}
+
+
 extern uint memory_size;
 void program_init()
 // ----------------------------------------------------------------------------
@@ -541,6 +556,7 @@ extern const uint prog_build_id;
 extern const uint qspi_build_id;
 #endif
 
+
 extern "C" void program_main()
 // ----------------------------------------------------------------------------
 //   DMCP main entry point and main loop
@@ -552,11 +568,12 @@ extern "C" void program_main()
 #ifndef SIMULATOR
     if (prog_build_id != qspi_build_id)
     {
-        msg_box(t24,
-                "Incompatible " PROGRAM_NAME " build ID\n"
-                "Please reload program and QSPI\n"
-                "from the same build",
-                true);
+        static const char __attribute__((section(".flash"))) msg[] =
+            "Incompatible " PROGRAM_NAME
+            " build ID\n"
+            "Please reload program and QSPI\n"
+            "from the same build";
+        msg_box(t24, msg, true);
         lcd_refresh();
         wait_for_key_press();
         return;

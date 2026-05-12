@@ -332,6 +332,34 @@ inline bool utf8_more(utf8 start, utf8 current, size_t size)
 }
 
 
+inline int utf8_compare(utf8 a, utf8 b)
+// ----------------------------------------------------------------------------
+//   UTF8-aware version of strcasecmp
+// ----------------------------------------------------------------------------
+//   This code contains a really ugly workaround for a QSPI-read bug:
+//   on DM32/DM42n, reading the QSPI too fast sometimes returns a 0 byte.
+//   In order to avoid the problem, we need to intersperse RAM memory accesses
+//   which are performed by the slowdown() routine below
+{
+    while (true)
+    {
+        extern uint slowdown(uint);
+        unicode ac = utf8_codepoint(a);
+        slowdown(uint(ac));
+        unicode bc = utf8_codepoint(b);
+        slowdown(uint(bc));
+        if (ac >= 'A' && ac <= 'Z')
+            ac = ac + ('a' - 'A');
+        if (bc >= 'A' && bc <= 'Z')
+            bc = bc + ('a' - 'A');
+        if (ac - bc || !ac || !bc)
+            return ac - bc;
+        a = utf8_next(a);
+        b = utf8_next(b);
+    }
+}
+
+
 // ============================================================================
 //
 //   Symbol classification
