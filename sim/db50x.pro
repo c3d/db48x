@@ -40,8 +40,7 @@ DEFINES+=MEMORY=500
 INCLUDEPATH -= ../src/dm42
 INCLUDEPATH += ../src/dm32
 
-OBJECTS_DIR=db50x-build
-android:        OBJECTS_DIR=db50x-android-build
+isEmpty(OBJECTS_DIR):OBJECTS_DIR=db50x-build
 
 ICON = db50x.icns
 
@@ -50,5 +49,3 @@ DISTFILES += \
     android/build.gradle \
     android/res/values/libs.xml \
     android/res/xml/qtprovider_paths.xml
-
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

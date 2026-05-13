@@ -78,9 +78,11 @@ struct complex : algebraic
     algebraic_g         re() const;
     algebraic_g         im() const;
     algebraic_g         mod() const;
+    algebraic_g         arg() const;
     algebraic_g         arg(angle_unit unit) const;
     algebraic_g         pifrac() const;
     complex_g           conjugate() const;
+    algebraic_g         conj() const { return +conjugate(); }
     algebraic_p         is_real() const;
 
     polar_g             as_polar() const;

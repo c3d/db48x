@@ -30,12 +30,16 @@
 #include "algebraic.h"
 
 #include "arithmetic.h"
+#include "factor.h"
+#include "fraction.h"
+#include "list.h"
 #include "array.h"
 #include "bignum.h"
 #include "compare.h"
 #include "complex.h"
 #include "constants.h"
 #include "decimal.h"
+#include "equations.h"
 #include "expression.h"
 #include "functions.h"
 #include "hwfp.h"
@@ -53,9 +57,12 @@
 #include <cmath>
 #include <cstdio>
 
+using namespace eq_wildcards;
+
 
 RECORDER(algebraic,       16, "RPL Algebraics");
 RECORDER(algebraic_error, 16, "Errors processing a algebraic");
+RECORDER(quotient,        16, "Quotient computations");
 
 
 INSERT_BODY(algebraic)
@@ -388,21 +395,165 @@ bool algebraic::to_integer(algebraic_g &x)
         break;
 
     case ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_integer(v))
-        {
-            x = unit::simple(v, u);
-            break;
-        }
-    }
-    // fallthrough
+        x = unit_p(+x)->map(to_integer);
+        break;
     default:
         return false;
     }
     return x;                   // Need x to be non-null
+}
+
+
+// ============================================================================
+//
+//   to_fraction / to_quotient shared dispatch
+//
+// ============================================================================
+
+struct to_fraction_context
+// ----------------------------------------------------------------------------
+//   Callbacks for real conversion and list mapping
+// ----------------------------------------------------------------------------
+{
+    bool (*convert_real)(algebraic_g &);
+    algebraic_p (*map_fn)(algebraic_r);
+};
+
+
+static bool to_fraction_real(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//   Convert hwfloat/hwdouble/decimal to fraction
+// ----------------------------------------------------------------------------
+{
+    object::id ty = x->type();
+    switch(ty)
+    {
+    case object::ID_hwfloat:
+        x = hwfloat_p(+x)->to_fraction();
+        break;
+    case object::ID_hwdouble:
+        x = hwdouble_p(+x)->to_fraction();
+        break;
+    case object::ID_decimal:
+    case object::ID_neg_decimal:
+        x = decimal_p(+x)->to_fraction();
+        break;
+    case object::ID_integer:
+    case object::ID_neg_integer:
+    case object::ID_bignum:
+    case object::ID_neg_bignum:
+    case object::ID_fraction:
+    case object::ID_neg_fraction:
+    case object::ID_big_fraction:
+    case object::ID_neg_big_fraction:
+        return true;
+    default:
+        return false;
+    }
+    return x;
+}
+
+
+static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
+// ----------------------------------------------------------------------------
+//   Shared type switch; real types via callback, compound types recursed/mapped
+// ----------------------------------------------------------------------------
+{
+    object::id ty = x->type();
+    switch(ty)
+    {
+    case object::ID_hwfloat:
+    case object::ID_hwdouble:
+    case object::ID_decimal:
+    case object::ID_neg_decimal:
+        return ctx.convert_real(x);
+
+    case object::ID_integer:
+    case object::ID_neg_integer:
+    case object::ID_bignum:
+    case object::ID_neg_bignum:
+    case object::ID_fraction:
+    case object::ID_neg_fraction:
+    case object::ID_big_fraction:
+    case object::ID_neg_big_fraction:
+        break;
+
+    case object::ID_rectangular:
+    {
+        rectangular_p z = rectangular_p(+x);
+        algebraic_g re = z->re();
+        algebraic_g im = z->im();
+        if (!to_fraction_dispatch(re, ctx) || !to_fraction_dispatch(im, ctx))
+            return false;
+        x = rectangular::make(re, im);
+        break;
+    }
+    case object::ID_polar:
+    {
+        polar_p z = polar_p(+x);
+        algebraic_g mod = z->mod();
+        algebraic_g arg = z->pifrac();
+        if (!to_fraction_dispatch(mod, ctx) || !to_fraction_dispatch(arg, ctx))
+            return false;
+        x = polar::make(mod, arg, object::ID_PiRadians);
+        break;
+    }
+    case object::ID_range:
+    case object::ID_drange:
+    case object::ID_prange:
+    case object::ID_uncertain:
+    {
+        range_p r = range_p(+x);
+        algebraic_g lo = r->lo();
+        algebraic_g hi = r->hi();
+        if (!to_fraction_dispatch(lo, ctx) || !to_fraction_dispatch(hi, ctx))
+            return false;
+        x = range::make(r->type(), lo, hi);
+        break;
+    }
+    case object::ID_unit:
+        x = unit_p(+x)->map(ctx.map_fn);
+        break;
+    case object::ID_equation:
+    {
+        object_p inner = equation_p(+x)->value();
+        if (!inner || !inner->is_algebraic())
+            return false;
+        x = algebraic_p(inner);
+        // fall through
+    }
+    case object::ID_array:
+    case object::ID_list:
+    case object::ID_expression:
+    {
+        list_g mapped = list_p(+x)->map(ctx.map_fn);
+        if (!mapped)
+            return false;
+        record(algebraic, "to_fraction mapped %p type %+s size %u",
+               +mapped, object::name(mapped->type()), mapped->size());
+        x = +mapped;
+        break;
+    }
+    case object::ID_constant:
+        // Leave constants as is
+        return true;
+
+    default:
+        return false;
+    }
+    return x;
+}
+
+
+static algebraic_p to_fraction_map_fn(algebraic_r a)
+// ----------------------------------------------------------------------------
+//   Map callback for list::map in to_fraction
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ag = a;
+    if (ag->is_algebraic_num())
+        algebraic::to_fraction(ag);
+    return +ag;
 }
 
 
@@ -411,79 +562,228 @@ bool algebraic::to_fraction(algebraic_g &x)
 //  Check if we can promote the number to a fraction
 // ----------------------------------------------------------------------------
 {
-    id ty = x->type();
-    switch(ty)
-    {
-    case ID_hwfloat:
-        x = hwfloat_p(+x)->to_fraction();
-        break;
-    case ID_hwdouble:
-        x = hwdouble_p(+x)->to_fraction();
-        break;
-    case ID_decimal:
-    case ID_neg_decimal:
-        x = decimal_p(+x)->to_fraction();
-        break;
+    to_fraction_context ctx = { to_fraction_real, to_fraction_map_fn };
+    return to_fraction_dispatch(x, ctx);
+}
 
-    case ID_integer:
-    case ID_neg_integer:
-    case ID_bignum:
-    case ID_neg_bignum:
-    case ID_fraction:
-    case ID_neg_fraction:
-    case ID_big_fraction:
-    case ID_neg_big_fraction:
-        break;
 
-    case ID_rectangular:
+
+
+// ============================================================================
+//
+//    Exact quotient
+//
+// ============================================================================
+
+template <byte ...args>
+constexpr byte eq<args...>::object_data[sizeof...(args)+2];
+
+static algebraic_p        check_quotient_patterns(algebraic_r value,
+                                                  algebraic_g &bestq,
+                                                  size_t       npats,
+                                                  const byte_p patterns[])
+// ------------------------------------------------------------------------
+//   Try to apply the patterns in order, find the one with lowest p/q
+// ------------------------------------------------------------------------
+{
+    symbol_g    xx      = expression_p(x.as_bytes())->as_quoted<symbol>();
+    symbol_g    pp      = expression_p(p.as_bytes())->as_quoted<symbol>();
+    symbol_g    qq      = expression_p(q.as_bytes())->as_quoted<symbol>();
+    symbol_g    ss      = expression_p(s.as_bytes())->as_quoted<symbol>();
+    symbol_g    tt      = expression_p(t.as_bytes())->as_quoted<symbol>();
+    algebraic_g best   = value;
+    algebraic_g numer  = nullptr;
+    algebraic_g denom  = nullptr;
+    algebraic_g unity  = integer::make(1);
+    algebraic_g sq_s   = unity;
+    algebraic_g sq_t   = unity;
+
+    record(quotient, ">Check patterns for %t", +value);
+
+    for (size_t i = 0; i < npats; i += 2)
     {
-        rectangular_p z = rectangular_p(+x);
-        algebraic_g re = z->re();
-        algebraic_g im = z->im();
-        if (!to_fraction(re) || !to_fraction(im))
-            return false;
-        x = rectangular::make(re, im);
-        break;
-    }
-    case ID_polar:
-    {
-        polar_p z = polar_p(+x);
-        algebraic_g mod = z->mod();
-        algebraic_g arg = z->pifrac();
-        if (!to_fraction(mod) || !to_fraction(arg))
-            return false;
-        x = polar::make(mod, arg, object::ID_PiRadians);
-        break;
-    }
-    case ID_range:
-    case ID_drange:
-    case ID_prange:
-    case ID_uncertain:
-    {
-        range_p r = range_p(+x);
-        algebraic_g lo = r->lo();
-        algebraic_g hi = r->hi();
-        if (!to_fraction(lo) || !to_fraction(hi))
-            return false;
-        x = range::make(r->type(), lo, hi);
-        break;
-    }
-    case ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_fraction(v))
+        expression_p src = expression_p(patterns[i + 0]);
+        if (algebraic_g val = expression_p(src->substitute(xx, +value)))
         {
-            x = unit::simple(v, u);
-            break;
+            record(quotient, "Pattern %t value %t", src, +val);
+            if (algebraic::to_decimal(val, true))
+            {
+                if (to_fraction_real(val))
+                {
+                    if (val->is_fraction())
+                    {
+                        fraction_p frac = fraction_p(+val);
+                        numer           = bignum::smaller(frac->numerator());
+                        denom           = bignum::smaller(frac->denominator());
+                        record(quotient, "Fraction %t = %t/%t", +val, +numer, +denom);
+                    }
+                    else
+                    {
+                        if (val->is_bignum())
+                            val = bignum::smaller(bignum_p(+val));
+                        numer = val;
+                        denom = unity;
+                        record(quotient, "Non-fraction %t", +val);
+                    }
+                    if (!numer || !denom)
+                        return nullptr;
+
+                    integer_p ip = numer->as_small_integer();
+                    integer_p iq = denom->as_small_integer();
+                    if (!ip || !iq)
+                    {
+                        record(quotient,
+                               "Skipping, p is %+s, q is %+s",
+                               object::fancy(numer->type()),
+                               object::fancy(denom->type()));
+                        continue;
+                    }
+
+                    expression_p dst       = expression_p(patterns[i + 1]);
+                    bool         squares   = dst->contains(ss);
+                    bool         fractions = dst->contains(pp);
+                    if (squares)
+                    {
+                        ularge pv = ip->value<ularge>();
+                        ularge qv = iq->value<ularge>();
+                        ularge ps, pr, qs, qr;
+                        extract_square_factor(pv, ps, pr);
+                        extract_square_factor(qv, qs, qr);
+                        sq_s = fraction::make(ps, qs);
+                        sq_t = fraction::make(pr, qr);
+                        denom = integer::make(std::max(qr, qs));
+                        record(quotient,
+                               "Squares: p=%t s=%t q=%t t=%t", +numer, +sq_s, +denom, +sq_t);
+                    }
+
+                    if (!bestq || algebraic::compare(bestq, denom) > 0)
+                    {
+                        record(quotient, "Replace with %t (%+s)", dst,
+                               squares ? "has squares" : "no squares");
+                        val = squares
+                            ? expression_p(dst->substitute(ss, +sq_s, tt, +sq_t))
+                            : fractions
+                            ? expression_p(dst->substitute(pp, +numer, qq, +denom))
+                            : expression_p(dst->substitute(xx, +val));
+                        record(quotient, "After substitution %t", +val);
+                        if (val)
+                        {
+                            if (object_p qo = expression_p(+val)->quoted())
+                                if (algebraic_p qa = qo->as_algebraic())
+                                    val = qa;
+                            best  = +val;
+                            record(quotient, "Best is %t", +best);
+                            bestq = denom;
+                            if (numer->is_zero() || numer->is_one() ||
+                                denom->is_zero() || denom->is_one())
+                                break;
+                        }
+                    }
+                }
+            }
         }
     }
-    // fallthrough
-    default:
+
+    record(quotient, "<Got best match %t", +best);
+    return +best;
+}
+
+
+template <typename... args>
+algebraic_p check_quotient_patterns(algebraic_r value,
+                                    algebraic_g &bestq,
+                                    args... rest)
+// ----------------------------------------------------------------------------
+//   Check a series of patterns and stop at the first one
+// ----------------------------------------------------------------------------
+{
+    static constexpr byte_p rwdata[] = { rest.as_bytes()... };
+    return check_quotient_patterns(value, bestq, sizeof...(rest), rwdata);
+}
+
+
+static bool to_quotient_real(algebraic_g &value)
+// ----------------------------------------------------------------------------
+//   Convert real to fraction with π, √n, ln(n), e factors (→Qπ)
+// ----------------------------------------------------------------------------
+{
+    if (!value)
         return false;
+    bool neg = value->is_negative();
+    if (neg)
+        value = -value;
+    algebraic_g bestq = nullptr;
+    algebraic_g r = check_quotient_patterns(value, bestq,
+                                            x,          x,
+                                            x/pi,       x*pi,
+                                            x*pi,       p/(q*pi),
+                                            pi/x,       q*pi/p,
+                                            x/ln(k2),   x*ln(k2),
+                                            x/ln(k3),   x*ln(k3),
+                                            x/ln(k5),   x*ln(k5),
+                                            x/ln(k7),   x*ln(k7),
+                                            x/ln(k10),  x*ln(k10),
+                                            x*ln(k2),   x/ln(k2),
+                                            x*ln(k3),   x/ln(k3),
+                                            x*ln(k5),   x/ln(k5),
+                                            x*ln(k7),   x/ln(k7),
+                                            x*ln(k10),  x/ln(k10),
+                                            sq(x),      s*sqrt(t),
+                                            exp(x),     ln(x),
+                                            k2^x,       log2(x),
+                                            k10^x,      log10(x),
+                                            ln(x),      exp(x),
+                                            log2(x),    k2^x,
+                                            log10(x),   k10^x);
+    if (r)
+    {
+        if (expression_p expr = r->as<expression>())
+            r = expr->rewrites<expression::DOWN>(
+                // Multiplicative simplifications
+                k0 * x, k0,
+                k1 * x, x,
+                x * k0, k0,
+                x * k1, x,
+                k0 / x, k0,
+                x / k1, x,
+                x / x,   k1,
+                x * (p/q), x*p/q,
+
+                // Power simplifications
+                sqrt(k1/x), sqrt(x)/x,
+                sqrt(k1), k1,
+                sqrt(k0), k0,
+                k0^x, k0,
+                k1^x, k1,
+                x^k0, k1,
+                x^k1, x);
+        record(quotient, "Simplifies as %t", +r);
+        if (r)
+            value = neg ? expression::make(object::ID_neg, r) : r;
     }
-    return x;                   // We need x to be non-null
+    return r;
+}
+
+
+static algebraic_p to_quotient_map_fn(algebraic_r a)
+// ----------------------------------------------------------------------------
+//   Map callback for list::map in to_quotient
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ag = a;
+    if (ag->is_algebraic_num())
+        algebraic::to_quotient(ag);
+    return +ag;
+}
+
+
+bool algebraic::to_quotient(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//   Convert to fraction, trying π, √n, ln(n), and e as factors
+// ----------------------------------------------------------------------------
+{
+    to_fraction_context ctx = { to_quotient_real, to_quotient_map_fn };
+    return to_fraction_dispatch(x, ctx);
 }
 
 
@@ -579,17 +879,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         break;
     }
     case ID_unit:
-    {
-        unit_p ux = unit_p(+x);
-        algebraic_g v = ux->value();
-        algebraic_g u = ux->uexpr();
-        if (to_decimal(v, weak))
-        {
-            x = unit::simple(v, u);
-            return x;
-        }
-        break;
-    }
+        x = unit_p(+x)->map(weak ? to_decimal_weak : to_decimal_strong);
+        return x;
     case ID_integer:
     case ID_neg_integer:
         if (weak)
@@ -620,16 +911,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
 
     case ID_array:
     case ID_list:
-    {
-        bool ok = true;
-        if (list_p res = list_p(+x)->map(weak
-                                         ? to_decimal_weak
-                                         : to_decimal_strong))
-            x = res;
-        else
-            ok = false;
-        return ok;
-    }
+        x = list_p(+x)->map(weak ? to_decimal_weak : to_decimal_strong);
+        return x;
 
     case ID_expression:
         if (!unit::mode)

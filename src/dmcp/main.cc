@@ -690,10 +690,9 @@ extern "C" void program_main()
 
 #if WASM
 uint            memory_size           = 100;
-volatile uint   test_command          = 0;
 bool            noisy_tests           = false;
 bool            no_beep               = false;
-bool            tests::running        = false;
+// test_command and tests::running are defined in tests.cc (same as Qt sim).
 
 static void *rpl_thread(void *)
 // ----------------------------------------------------------------------------

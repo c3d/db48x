@@ -322,6 +322,11 @@ menu is special in the sense that:
 
 * The 🟦 function *stores* into the variable.
 
+### Menu Tree
+
+The complete hierarchy of all built-in menus is documented in the
+[Menu Tree](#soft-menus-tree).
+
 
 ## Differences with other RPLs
 
@@ -573,6 +578,9 @@ operate on these items when it makes sense. Therefore:
 * As indicated [earlier](#representation-of-objects), quoted names in lists
   remain quoted, whereas on HP calculators, the quotes are removed.
 
+* The `MAP` operation on the HP50G recurses on inner lists. On DB48x, it does
+  not by default. This is controlled by the `ListDepthIteration` setting.
+  A value of `0` restores HP50G-style infinite recursion.
 
 ### Vectors and matrices differences
 
@@ -629,6 +637,12 @@ operate on these items when it makes sense. Therefore:
   words it returns `[[ 'a²+b·c' 'a·b+b·d' ] [ 'c·a+d·c' 'c·b+d²' ]]`. However,
   `[[a b][c d] 2. ^` performs the operation element-wise and returns
   `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
+
+* When applied to a matrix or vector, `abs` returns a matrix or vector with the
+  `abs` of elements, whereas HP calcualtors compute the Euclidean norm. The
+  `norm` command performs like `abs` on HP calculators, computing the absolute
+  value for real numbers, the modulus for complex numbers, and the Euclidean
+  norm for arrays and vectors
 
 ### Mathematics
 
@@ -4337,6 +4351,78 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.18 "Chuck" - Sucess begins inside
+
+This release includes a number of under-the-hood improvements that
+will make the life of maintainers easier in the long run.
+
+### New features
+
+* Implement the `Chuck` command
+* Make `xq` recognize more patterns during simplification
+* List the menus in the help file
+* Support for tables in the help file
+* `ListRecursionDepth` setting for `map`, `reduce`, `filter`
+
+### Bug fixes
+
+* Remove `-fsanitize` option on macOS (hangs on macOS 26.4)
+* Fix incorrect evaluation of constants during simplification
+
+### Improvements
+
+* Switch to the make-it-quick build system
+* Shared cross-platorm clipboard code
+* Automate the build of releases
+* Put the variables naming expression patterns in a namespace
+* Improved instructions for AI agents
+* Repair GitHub actions
+* Improve solver shuffle around singularities and errors
+* Fix path for grep testing in case of example test failure
+
+## Release 0.9.17 - Rational approximation, indexing, Android fixes
+
+This incremental release delivers new features and fixes a number of bugs.
+
+### New features
+
+* Add `→Qπ` command for rational approximation with π, √n, ln(n) and e
+* Apply `→Q` and `→Qπ` to numbers in expressions
+* Add array/list indexing support in algebraic expressions e.g. `'L(1)'`
+* Add ability to `Store` / `Copy` to `L(1)`
+* Add "real" `ConstantName` and `ConstantValue` commands
+
+### Bug fixes
+
+* Fix parentheses around exponents in graph rendering of `'(a+b)^(c+d)'`
+* Fix label for `ToRelativeUncertainty`, `→RelRnd` instead of `→RelUnc`
+* Fix command alias mapping for `RNrm`
+* Improve parsing of implicit multiplication for a number of edge cases
+* Fix `utf8_next` for garbage bytes following ASCII characters
+* Fix unsatisfied symbol errors with gcc/emcc in the WASM build
+* Save Android system state when app is suspended or hidden
+* Ensure Android help resources are extracted and available at runtime
+* Restore image testing functionality in the test framework
+* Updated test images that had become obsolete
+* Report errors when saving reference files in tests
+* Avoid stack corruption / crash when parsing malformed help index
+* Fix computation of `DFC(2.3)`
+* Fix null-pointer crash if the multiple equation solver fails
+
+
+### Enhancements
+
+* Constrain `→Q` and `→Qπ` behavior to FIX/SCI/ENG setting (like HPs)
+* Minor optimization for `program::run`
+* Save about 3.4K of RAM on physical devices
+* Speed up test runs while increasing default wait time for stability
+* Documentation cleanup and additions, add more RPL examples
+* Add clear build-time error message when a help topic exceeds 80 characters
+* Add demo for interactive menu use
+* Optimize away redundant argument checking
+* Documentation for DCF and DCF2F
+
+
 ## Release 0.9.16 - Factorization, precision fixes, and documentation
 
 This release adds prime and factorization features, improves numeric precision,
@@ -4357,7 +4443,7 @@ and expands simulator and user documentation.
 
 * Fix `expm1` precision loss for small arguments, including complex values
 * Fix `ln1p` precision loss for small arguments
-* Fix shift behavior after transient alpha, and support shift/xshift for transalpha
+* Fix shift behavior after transient alpha, support shift/xshift for transalpha
 * Reset `show_x` and `show_y` when exiting `SHOW`
 * Ensure the simulator creates the `screens` directory when needed
 * Fix an infinity optimization regression in arithmetic
@@ -5800,7 +5886,6 @@ implemented by the time the project reaches version 1.0.
 * `PUSH`
 * `PVIEW`
 * `PX→C`
-* `→Qπ`
 * `qr`
 * `QR`
 * `QUAD`
@@ -9431,7 +9516,7 @@ M=1.708e45_kg  t=4.18902 53989e119_s
 * **Example 2** For a very small black hole having the mass of 1000_kg, to calculate `[rs_m;As_(m^2);TH_K;PBH_W;SBH_(J/K);tev_s;Mxsun;MxSagA;Mxearth;txyr]` (Schwarzschild radius; Schwarzschild area; Black hole temperature; Black hole evaporation power; Black hole entropy; Evaporation time; Factor multiplicative of Sun mass, of Sagittarius A* mass & of Earth mass; Multiplicative factor of a year) from 2 known variables (maintain 24 digits of precision):
 ```rpl
 M=1000_kg  t=8.40716 15834 7⁳⁻⁸ s
-@ Expecting [ rs=1.48523 20538 2⁳⁻²⁴ m As=2.77203 36055 6⁳⁻⁴⁷ m↑2 TH=1.22690 06705 9⁳²⁰ K PBH=3.56162 21447 8⁳²⁶ W SBH=0.36627 05548 53 J/K tev=8.41147 78997⁳⁻⁸ s Mxsun=0. MxSagA=0. Mxearth=1.67⁳⁻²² txyr=2.66406 8745⁳⁻¹⁵ ]
+@ Expecting [ rs=1.48523 20538 2⁳⁻²⁴ m As=2.77203 36055 6⁳⁻⁴⁷ m↑2 TH=1.22690 06705 9⁳²⁰ K PBH=3.56162 21447 8⁳²⁶ W SBH=0.36627 05548 53 J/K tev=8.41147 78997⁳⁻⁸ s Mxsun=5.02891 62685 4⁳⁻²⁸ MxSagA=1.17096 01873 5⁳⁻³⁴ Mxearth=1.67443 38069 5⁳⁻²² txyr=2.66406 87452 4⁳⁻¹⁵ ]
 'ROOT(ⒺB H Thermodynamics;[rs;As;TH;PBH;SBH;tev;Mxsun;MxSagA;Mxearth;txyr];[1_m;1_(m^2);1_K;1_W;1_(J/K);1_s;1;1;1;1])'
 ```
 
@@ -9857,20 +9942,6 @@ Convert a number or angle to an angle in multiple of π radians.
 If given a number, that number is interpreted using the current angle mode.
 
 
-## →Rectangular
-
-Convert vector or complex to cartesian coordinates
-
-
-## →Polar
-
-Convert vector or complex to polar coordinates
-
-
-## →Spherical
-
-Convert vector or complex to spherical coordinates
-
 ## R→D
 
 Convert radians to degrees.
@@ -9999,7 +10070,8 @@ Fractional part of a number
 ## Abs
 
 Return the absolute value for a real number.
-Return the Euclidean norm for a complex number, vector or matrix.
+Return the modulus for a complex number
+Return the absolute value of elements for a matrix or a vector, which is different from HP calculators, see `NORM`
 
 
 # Integer arithmetic and polynomials
@@ -10102,12 +10174,6 @@ Greatest common divisor
 ## LCM
 Least common multiple
 
-
-## IDIV2
-Integer division, get quotient and remainder.
-On DB48X, this is an alias for [div2](#div2).
-
-`Y` `X` ▶ `IP(Y/X)` `Y rem X`
 
 ## IQUOT
 Quotient of the integer division
@@ -10670,16 +10736,16 @@ Extract modulus and argument from a complex number in polar form
 Make a complex number in polar form from argument and modulus
 
 ## ToRectangular
-Convert a complex number to rectangular form
+Convert a complex number or vector to rectangular (cartesian) form.
 
 ## ToPolar
-Convert a complex number or a 2D or 3D vector to polar form
+Convert a complex number or a 2D or 3D vector to polar form.
 
 ## ToCylindrical
 Convert a 3D vector to cylindrical form
 
 ## ToSpherical
-Convert a 3D vector to spherical form
+Convert a 3D vector to spherical form.
 
 ## To2DVector
 Make a 2D vector from two components
@@ -10691,28 +10757,12 @@ Make a 3D vector from three components
 Expand a vector into its individual components
 # Lists, Matrix and String commands
 
-## PUT
-Replace an item in a composite
-
-
 ## PUTI
 Replace an item and increase index
 
 
-## GET
-Extract an item from a composite
-
-
 ## GETI
 Extract an item and increase index
-
-
-## HEAD
-Extract the first item in a composite
-
-
-## TAIL
-Removes the first item in a composite
 
 
 ## OBJDECOMP
@@ -10827,6 +10877,24 @@ The name can be given as a symbol or as text.
 `'c'` ▶ `299792458_m/s`
 
 
+## StandardUncertainty
+
+Returns the standard uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the absolute
+uncertainty (denoted Ⓢ*X* in expressions) conforming to CODATA.
+
+`'c'` `StandardUncertainty` ▶ `0_m/s`
+
+
+## RelativeUncertainty
+
+Returns the relative uncertainty of a constant from the constants library.
+The name can be given as a symbol or as text. The result is the relative
+uncertainty (denoted Ⓡ*X* in expressions) conforming to CODATA.
+
+`'c'` `RelativeUncertainty` ▶ `0`
+
+
 ## LibraryEquation
 
 Returns the value of a library equation from the equation library.
@@ -10842,6 +10910,31 @@ The name can be given as a symbol or as text.
 
 `'Dedicace'"` ▶ `"À tous ceux qui se souviennent de Maubert électronique"`
 
+
+## ConstantName
+
+Return the name for a given constant, as text
+
+```rpl
+Ⓒπ ConstantName
+@ Expecting "π"
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
+
+
+## ConstantValue
+
+Return the value for a given constant
+
+```rpl
+Ⓒπ ConstantValue
+@ Expecting 3.14159 26535 9
+```
+
+This also works for library items, library equations, standard and relative
+uncertainties.
 
 # Precision control
 
@@ -12405,29 +12498,6 @@ Generate an integral sign of the given size
 45 GraphicIntegral
 @ Image check
 ```
-
-
-## Header
-
-The `Header` command updates a special variable also called `Header`.
-
-When that variable is present, it must evaluate to something that can render
-graphically, either directly a graphic object or a (possibly multi-line) text.
-
-When a header is provided, the normal content of the header, i.e. date, time and
-name of the state file, is no longer shown.  However, annunciators and battery
-status are still overimposed.
-
-It is the responsibility of the programmer to ensure that the header program
-does not draw important data at these locations, and also to make sure that the
-header program is "well behaved", i.e. does not leave things on stack. If the
-header program generates an error, then that error may get in the way of normal
-calculator operations.
-
-```rpl
-« TIME " " PATH TAIL TOTEXT + + "
-" + DATE + " Mem: " + MEM + » HEADER
-```
 # Library Management
 
 DB48x features a [library](#library) that can contain arbitary RPL code,
@@ -12533,17 +12603,6 @@ at the deepest level in the stack. This is the opposite of [→List](#tolist). T
 
 `{ A B ... }` ▶ `A` `B` ... `Count`
 
-
-## List→
-
-Expand a list on the stack and return the number of elements. After executing
-the command, level 1 contains the number of elements, and a corresponding number
-of stack levels contain individual elements of the list, the first element being
-at the deepest level in the stack. This is the opposite of [→List](#tolist). The
-[Obj→](#fromobj) command performs the same operation when applied to a list.
-
-`{ A B ... }` ▶ `A` `B` ... `Count`
-
 ## Head
 
 Return the first element of a list, or an `Invalid dimension` error if the list
@@ -12565,6 +12624,36 @@ first level of the stack should take one argument and return a single value.
 
 `{ A B ... }` `F` ▶ `{ F(A) F(B) ... }`
 
+
+```rpl
+{ 1 2 A 42.2 [ 1 2 3 ]} « →STR » MAP
+@ Expecting { "1" "2" "A" "42.2" "[ 1 2 3 ]" }
+```
+
+Unlike on HP calculators, `Map` does not apply recursively to inner lists by default.
+
+```rpl
+{ 1 2 { 3 4 } } « →STR » MAP
+@ Expecting { "1" "2" "{ 3 4 }" }
+```
+
+This can be changed by setting `ListRecursionDepth` to `0`.
+
+```rpl
+0 ListRecursionDepth
+{ 1 2 { 3 4 } }  « →STR » MAP
+@ Expecting { "1" "2" { "3" "4" } }
+```
+
+`Map` can also be constrained to a given depth.
+
+```rpl
+2 ListRecursionDepth
+{ 1 2 { 3 { 4 { 5 } } } }  « →STR » MAP
+@ Expecting { "1" "2" { "3" "{ 4 { 5 } }" } }
+'ListRecursionDepth' Purge
+```
+
 ## Reduce
 
 Apply a cumulative pairwise operation on all elements in a list or array.
@@ -12574,6 +12663,22 @@ operation to all elements.
 
 `{ A B ... }` `F` ▶ `F(F(A, B), ...)`
 
+For example, to sum all the elements in a list as text, one can use:
+
+```rpl
+{ X Y Z T 12 { Hello World } } « →STR + » REDUCE
+@ Expecting "XYZT12{ Hello World }"
+```
+
+Reduce obeys the `ListRecursionDepth` setting:
+
+```rpl
+0 ListRecursionDepth
+{ X Y Z T 12 { Hello World } } « →STR + » REDUCE
+@ Expecting "XYZT12HelloWorld"
+'ListRecursionDepth' Purge
+```
+
 
 ## Filter
 
@@ -12582,6 +12687,22 @@ level 1 of the stack takes a value as argument, and returns a truth values. The
 resulting list is built with all elements where the predicate is true.
 
 `{ A B ... }` `P` ▶ `{ A ... }` if `P(A)` is true and `P(B)` is false.
+
+For example, to filter all odd numbers in an array, one can use:
+
+```rpl
+[ 1 2 3 4 5 6 42 ] « 2 MOD 0 = » FILTER
+@ Expecting [ 2 4 6 42 ]
+```
+
+`Filter` obeys the `ListRecursionDepth` setting:
+
+```rpl
+0 ListRecursionDepth
+{ 1 2 3 4 { 5 6 { 42 } } } « 2 MOD 0 = » FILTER
+@ Expecting { 2 4 { 6 { 42 } } }
+'ListRecursionDepth' Purge
+```
 
 
 ## Get
@@ -13058,6 +13179,11 @@ Column norm (one norm) of a matrix
 Row norm (infinity norm) of a matrix
 
 
+## Norm
+
+Euclidean norm of a vector of matrix
+
+
 ## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same
@@ -13506,6 +13632,37 @@ integrate as the previous one, so the maximum number of samples taken is in the
 order of `2^IntegrationIterations`.
 
 
+# Continued fractions
+
+## DFC
+
+Decompose a real number into its continued fraction coefficients (Décomposition
+en Fraction Continue).
+
+`X` ▶ `{ a0 a1 a2 … }`
+
+Returns a list of integers such that *X* ≈ a₀ + 1/(a₁ + 1/(a₂ + …)). For
+integers the result is a single-element list. For rationals the expansion is
+exact and finite. For decimals and irrationals (π, *e*, √2, etc.), the expansion
+stops when the next convergent would exceed the precision of the input.
+
+Examples: `22/7 DFC` → `{ 3 7 }`, `2 √ DFC` → `{ 1 2 2 2 … }`.
+
+The inverse `DFC2F` reconstructs the value from the coefficient list.
+
+## DFC2F
+
+Reconstruct a real number from its continued fraction coefficient list.
+
+`{ a0 a1 … an }` ▶ `a0 + 1/(a1 + 1/(… + 1/an))`
+
+Evaluates the list right-to-left to produce a rational or decimal result.
+`DFC2F(DFC(x))` gives an exact round-trip for integers and fractions, and an
+approximate round-trip for irrationals within the current precision.
+
+Example: `{ 3 7 } DFC2F` → `22/7`.
+
+
 # Numerical conversions
 
 ## →Num
@@ -13519,6 +13676,30 @@ Convert decimal values to fractions. For example `1.25 →Frac` gives `5/4`.
 The precision of the conversion in digits is defined by
 [→FracDigits](#ToFractionDigits), and the maximum number of iterations for the
 conversion is defined by [→FracDigits](#ToFractionIterations)
+
+## →Qπ
+
+Convert decimal values to a rational form, or a rational form with π, square
+roots, natural logs, or the Euler constant *e* factored out, whichever yields
+the smaller denominator.
+
+The rational result is a "best guess", since there might be more than one
+rational expression consistent with the argument. `→Qπ` finds a quotient of
+integers that agrees with the argument to the number of decimal places specified
+by the display format mode.
+
+For example, `3.14159265359 →Qπ` gives `π`, `1.4142135624 →Qπ` gives `√2`,
+and `0.346573590280 →Qπ` gives `ln 2/2`.
+
+For a complex argument, the real or imaginary part (or both) can have a constant
+factor.
+
+The [→QπMaxPrime](#→qπmaxprime) setting (default 100, max 10000)
+limits which primes are tried when factoring squares for √*n* detection. Lower
+values speed up conversion on resource-constrained hardware.
+
+The algorithm attempts: π; any √*n* (by squaring and factoring); ln 2, ln 3,
+ln 5, ln 7, ln 10; *e*; *e*^(p/q); and combined factors π·√2, π·√3.
 
 ## →Integer
 
@@ -14553,15 +14734,15 @@ Display comands using the long form, for example `Store`.
 
 Display names using the short form in lower case, for example `varName` will show as `varname`.
 
-## UpperCase
+## UpperCaseNames
 
 Display names using the short form in upper case, for example `varName` will show as `VARNAME`.
 
-## Capitalized
+## CapitalizedNames
 
 Display names using the short form capitalized, for example `varName` will show as `VarName`.
 
-## LongForm
+## LongFormNames
 
 Display names using the long form, for example `varName` will show as `varName`.
 
@@ -14625,6 +14806,20 @@ value` error. Lowering the value speeds up failure detection for numbers that
 are hard to factor (e.g. products of two large primes); raising it allows
 factoring tougher semiprimes at the cost of longer run time.
 
+## SolverIterations
+
+Number of times the solver will try to find a solution.
+
+## SolverImprecision
+
+Relative imprecision that is tolerated by the solver
+
+## SolverShuffles
+
+Number of times the solver will shuffle the test vector around errors and
+singularities.
+
+
 ## MathModesMenu
 
 The `MathModesMenu` controls settings related to mathematical computations.
@@ -14672,15 +14867,6 @@ bits is limited only by memory and performance.
 
 Return the current [word size](#wordsize) in bits.
 
-## STWS
-
-`STWS` is a compatibility spelling for the [WordSize](#wordsize) command.
-
-## RCWS
-
-`RCWS` is a compatibility spelling for the [RecallWordSize](#recallwordsize)
-command.
-
 
 # Command tuning
 
@@ -14706,6 +14892,16 @@ whereas `3 →FracIterations 3.1415926 →Frac` will give `355/113`.
 Define the maximum number of digits of precision converting a decimal value to a
 fraction. For example, `2 →FracDigits 3.1415926 →Frac` will give `355/113`.
 
+## →QπMaxPrime
+
+Define the largest prime used when extracting square factors during [→Qπ](#toqπ)
+conversion. When converting a decimal to a rational form with π, √*n*, ln, or *e*
+factors, the algorithm squares the value, converts to a fraction, then factors out
+perfect squares from the numerator and denominator. This setting limits which
+primes are tried (2 to 10000, default 100). Lower values speed up conversion on
+DM32/DM42 at the cost of missing some √*n* simplifications for numbers whose
+square has large prime factors.
+
 
 # User interface
 
@@ -14716,9 +14912,20 @@ labels, rounded or square.
 
 ## Header
 
-This command can be used to define a program that is evaluated when drawing the
-header, i.e. what is shown above the stack. The header should be returned as a
-text, and leave room for the battery to display.
+The `Header` command updates a special variable also called `Header`.
+
+When that variable is present, it must evaluate to something that can render
+graphically, either directly a graphic object or a (possibly multi-line) text.
+
+When a header is provided, the normal content of the header, i.e. date, time and
+name of the state file, is no longer shown.  However, annunciators and battery
+status are still overimposed.
+
+It is the responsibility of the programmer to ensure that the header program
+does not draw important data at these locations, and also to make sure that the
+header program is "well behaved", i.e. does not leave things on stack. If the
+header program generates an error, then that error may get in the way of normal
+calculator operations.
 
 For example, the following shows the current time, the current path, the date
 and free memory in a two-line header, with a 10 second `CustomHeaderRefresh`.
@@ -14748,7 +14955,7 @@ Display menus on a single row, with labels changing using shift.
 
 Display menus on a single row, flattened across multiple pages.
 
-## RoundedMenu
+## RoundedMenus
 
 Display menus using rounded black or white tabs.
 
@@ -14818,9 +15025,9 @@ rendering.
 
 This is the opposite of [TextStackDisplay](#textstackdisplay)
 
-## TextStacktDisplay
+## TextStackDisplay
 
-Display the stack levels above the first one using a text-only representations.
+Display the stack levels above the first one using a text-only representation.
 
 This is the opposite of [GraphicStackDisplay](#graphicstackdisplay)
 
@@ -14874,7 +15081,7 @@ editing.
 Show empty menu entries. For example, when selecting the `VariablesMenu` and
 there is no variable defined, an empty menu shows up.
 
-## HideEmptyMenu.
+## HideEmptyMenu
 
 Restore the default behaviour where empty menus entries are not shown, leaving
 more space for the stack display.
@@ -14976,9 +15183,9 @@ This is the way RPL in HP calculators works.
 
 When this setting is set, DB48X behaves like the HP48S and later HP devices and
 evaluates lists as if they were programs. For example, `{ 1 2 + } EVAL` returns
-`3`. The default is [ListsAsData](#listsasdata).
+`3`. The default is [ListAsData](#listasdata).
 
-## ListsAsData
+## ListAsData
 
 When this setting is set, DB48X behaves like the HP28 and evaluates lists as
 data. For example, `{ 1 2 + } EVAL` returns `{ 1 2 + }`.
@@ -15012,6 +15219,17 @@ or `not` applied to integers return a bitwise numerical result, which deviates
 from the HP implementations of RPL.
 
 The opposite setting is `TruthLogicForIntegers`.
+
+## ListRecursionDepth
+
+This setting selects the depth of recursion for `Map`, `Reduce` or `Filter`.
+By default, it is set to `1`, indicating that recursion only applies to the
+top-level of the list. This matches the way `Map`, `Reduce` and `Filter` work in
+most programming languages.
+
+A value larger than `1` can be used to recurse beyond the first level.
+On the HP50G, `Map` applies recursively to all levels. This can be achieved by
+setting `ListRecursionDepth` to `0`.
 
 
 # Evaluation settings
@@ -15271,13 +15489,20 @@ END
 As an extension to the HP implementation, `ROOT` can solve systems of equations
 and multiple variables by solving them one equation at a time, a programmatic version of what the HP50G Advanced Reference Manual calls the Multiple Equation Solver (`MINIT`, `MITM` and `MSOLVR` commands).
 
-## SolvingMenuSolve
+## Solving Menu Solve Key
 
-Solve the system of equations for the given variable.
+A variable name followed by "?" will solve the system of equations for the given
+variable.
 
-## SolvingMenuRecall
+## Solving Menu Recall Key
 
-Recall the current value of a variable in a system of equations. The value is returned as an assignment.
+A variable name followed by ▶ will recall the value of the given equation. The
+value is returned as an assignment.
+
+## Solving Menu Store Key
+
+A variable name preceded by ▶ will store the value of the given equation. The
+stored value is placed on the stack as an assignment.
 
 ## MultipleEquationsSolver
 
@@ -15287,13 +15512,9 @@ Solve a system of multiple equations simultaneously.
 
 Solve for multiple variables in a system of equations.
 
-## MSlv
-
-On HP50G, a special command is dedicated to solving systems of equations.
-
-On DB48x, the `MSlv` command is provided for comptability. It behaves almost
-exactly like `Root`, except that it leaves the equations and variable lists on
-the stack in addition to the result.
+On HP50G, `MSlv` is dedicated to solving systems of equations.
+On DB48x, it behaves almost exactly like `Root`, except that it
+leaves the equations and variable lists on the stack in addition to the result.
 
 ```rpl
 RAD
@@ -16370,6 +16591,24 @@ Return DB48X version information as text.
 
  ▶ `"Version information"`
 
+## Chuck
+
+The most powerful command in DB48x.
+
+ ▶ `"Chuck pearl of wisdom"`
+
+The `CHUCK` command is by far the most powerful command in DB48x.
+Users must run it regularly to keep their calculator in shape.
+
+* `CHUCK` does not have arguments, it wins every single one.
+* `CHUCK` does not merely produce a result, it produces the best result
+every single time, effortlessly.
+* `CHUCK` does not need help, it provides help.
+* `CHUCK` never fails, any error is a user error.
+* `CHUCK` does not drain the battery, it exercises power.
+* `CHUCK` is so fast it has to slow down for you to keep up.
+* `CHUCK` can identify if your DB48x build is genuine.
+
 
 ## FreeMemory
 
@@ -16724,14 +16963,6 @@ List all code points in a Utf8 string
 
 Convert an object to its text representation.
 
-## ToDecimal
-
-Convert an object to its decimal representation.
-
-## ToFraction
-
-Convert an object to its fractional representation.
-
 ## Compile
 
 Compile and evaluate the text, as if it was typed on the command line.
@@ -17026,20 +17257,12 @@ Compute the square root
 Compute the cube root
 
 
-## EXPM
+## Expm1
 Compute exp(x)-1
-
-
-## LNP1
-Compute ln(x+1)
 
 
 ## Ln1p
 Compute ln(x+1)
-
-
-## Expm1
-Compute exp(x)-1
 
 
 ## Exp2
@@ -17530,3 +17753,965 @@ automatically be disabled after the first operation. The opposite setting is
 
 Enable temporary user mode, where the first activation of `ToggleUserMode` only
 enables user mode for a single operation. The oppsite setting is `UserModeLock`.
+# Soft Menus Tree
+
+
+Soft-menu hierarchy of the DB48X calculator for dm42 keyboard
+
+Buttons are shown as they appear on the calculator screen:
+**6 columns** (F1–F6) and **3 rows** per page.
+
+**Legend**
+
+| Style | Meaning |
+|:------|:--------|
+| \[Menu\] | Opens a sub-menu (defined in this document) |
+| [Command](#add) | Executes a command — link leads to the reference doc |
+| Command | Command with no documentation entry found |
+| _Unimplemented_ | Not yet implemented |
+| `text` | Inserts literal text in the command line |
+| 🟨 KEY | Press the yellow shift key once, then KEY |
+| 🟦 KEY | Press the yellow shift key twice, then KEY |
+| ▶ Fn | Navigate to next page, then press Fn |
+
+---
+
+## Contents
+
+- [AlarmMenu](#alarmmenu)
+- [AlgebraMenu](#algebramenu)
+- [AnglesMenu](#anglesmenu)
+- [ArithmeticMenu](#arithmeticmenu)
+- [BasesMenu](#basesmenu)
+- [CalculationMenu](#calculationmenu)
+- [CharactersMenu](#charactersmenu-reference)
+- [CircularMenu](#circularmenu)
+- [ClearThingsMenu](#clearthingsmenu)
+- [CompareMenu](#comparemenu)
+- [ComplexMenu](#complexmenu)
+- [ConstantsMenu](#constantsmenu-reference)
+- [DateMenu](#datemenu-reference)
+- [DebugMenu](#debugmenu-reference)
+- [DifferentialSolverMenu](#differentialsolvermenu)
+- [DisplayModesMenu](#displaymodesmenu-reference)
+- [EditMenu](#editmenu)
+- [EquationsMenu](#equationsmenu)
+- [ExpLogIdentitiesMenu](#explogidentitiesmenu)
+- [FilesMenu](#filesmenu)
+- [FlagsMenu](#flagsmenu)
+- [FractionsMenu](#fractionsmenu)
+- [GraphicsMenu](#graphicsmenu)
+- [HyperbolicMenu](#hyperbolicmenu)
+- [IntegrationMenu](#integrationmenu)
+- [IOMenu](#iomenu)
+- [Library](#library-reference)
+- [LinearSolverMenu](#linearsolvermenu)
+- [ListMenu](#listmenu)
+- [LoopsMenu](#loopsmenu)
+- [MainMenu](#mainmenu-reference)
+- [MathMenu](#mathmenu-reference)
+- [MathModesMenu](#mathmodesmenu-reference)
+- [MatrixMenu](#matrixmenu)
+- [MemoryMenu](#memorymenu)
+- [ModesMenu](#modesmenu-reference)
+- [MultiSolverMenu](#multisolvermenu)
+- [NumbersMenu](#numbersmenu)
+- [NumericalSolverMenu](#numericalsolvermenu)
+- [ObjectMenu](#objectmenu)
+- [PartsMenu](#partsmenu)
+- [PlotMenu](#plotmenu)
+- [PolynomialsMenu](#polynomialsmenu)
+- [PolynomialSolverMenu](#polynomialsolvermenu)
+- [PowersMenu](#powersmenu)
+- [PrintingMenu](#printingmenu)
+- [ProbabilitiesMenu](#probabilitiesmenu)
+- [ProgramMenu](#programmenu)
+- [RangeMenu](#rangemenu)
+- [RealMenu](#realmenu)
+- [SeparatorModesMenu](#separatormodesmenu-reference)
+- [SignalProcessingMenu](#signalprocessingmenu)
+- [SolverMenu](#solvermenu)
+- [StackMenu](#stackmenu)
+- [StatisticsMenu](#statisticsmenu)
+- [SymbolicMenu](#symbolicmenu)
+- [SymbolicSolverMenu](#symbolicsolvermenu)
+- [TestsMenu](#testsmenu)
+- [TextMenu](#textmenu)
+- [TimeMenu](#timemenu-reference)
+- [TrigIdentitiesMenu](#trigidentitiesmenu)
+- [UnitsConversionsMenu](#unitsconversionsmenu)
+- [UnitsMenu](#unitsmenu)
+- [UserInterfaceModesMenu](#userinterfacemodesmenu)
+- [UserModeMenu](#usermodemenu-reference)
+- [VectorMenu](#vectormenu)
+
+---
+
+### AlarmMenu
+
+Access: [DateMenu](#datemenu-reference) 🟨 F6; [TimeMenu](#timemenu-reference) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _AckAll_ | \[[Time](#timemenu-reference)\] | \[[Date](#datemenu-reference)\] |   |   |   |
+| _Alarm_ | _Ack_ | _→Alarm_ | _Alarm→_ | _FindAlm_ | _DelAlm_ |
+
+### AlgebraMenu
+
+Access: 🟦 D (LOG); [SymbolicMenu](#symbolicmenu) F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Ⓓ](#algebraconfiguration) | [ⓧ](#algebravariable) | [Stoⓧ](#storealgebravariable) | [Final](#finalalgebraresults) | &Wild | \[[Symb](#symbolicmenu)\] |
+| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _→Qπ_ |
+| [↓Match](#match-1) | [↑Match](#match) | [Isolate](#isolate) | Apply | Subst | [\|](#where) |
+
+### AnglesMenu
+
+Access: 🟦 L (TAN); [ComplexMenu](#complexmenu) 🟦 F5; [MathMenu](#mathmenu-reference) 🟦 F3; [ModesMenu](#modesmenu-reference) 🟨 F2; [RealMenu](#realmenu) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→DMS](#dms) | [DMS→](#dms-1) | DMS+ | DMS- | [Hypot](#hypot) | [Atan2](#atan2) |
+| →Deg | →Rad | →Grad | →πr | [→Polar](#topolar) | [→Rect](#torectangular) |
+| Deg | Rad | Grad | [πr](#piradians) | [D→R](#dr) | [R→D](#rd) |
+
+### ArithmeticMenu
+
+Access: [SymbolicMenu](#symbolicmenu) 🟨 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Show_ | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
+| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
+
+### BasesMenu
+
+Access: 🟨 T (4); [MathMenu](#mathmenu-reference) 🟦 F2; [ProgramMenu](#programmenu) 🟨 F5
+
+*3 pages · 45 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [WordSize](#wordsize) | [NAnd](#nand) | [NOr](#nor) | [Implies](#implies) | [Excludes](#excludes) |   |
+| [Base](#base) | Bin | Oct | Dec | Hex | ◀ |
+| `#` | [And](#and) | [Or](#or) | [Xor](#xor) | [Not](#not) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [SLC](#shiftleftcount) | [SRC](#shiftrightcount) | [ASRC](#arithmeticshiftrightcount) | [RLC](#rotateleftcount) | [RRC](#rotaterightcount) |   |
+| [SLB](#shiftleftbyte) | [SRB](#shiftrightbyte) | [ASRB](#arithmeticshiftrightbyte) | [RLB](#rotateleftbyte) | [RRB](#rotaterightbyte) | ◀ |
+| [SL](#shiftleft) | [SR](#shiftright) | [ASR](#arithmeticshiftright) | [RL](#rotateleft) | [RR](#rotateright) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| CntBits | 1-comp | 2-comp | [Modern](#modernbasednumbers) | [TruthLogicForIntegers](#truthlogicforintegers) |   |
+| SetBit | ClrBit | FlipBit | FstSet | LstSet | ◀ |
+| `#` | R→B | B→R | [Base](#base) | [WordSize](#wordsize) | ▶ |
+
+### CalculationMenu
+
+Access: [SymbolicMenu](#symbolicmenu) 🟨 F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Limit_ | _Serie_ | _Taylor_ | \[[Symb](#symbolicmenu)\] |   |   |
+| [LName](#listexpressionnames) | [XVars](#expressionvariables) | _Deriv_ | _DerivX_ | _IBF_ | _IntVX_ |
+
+### CircularMenu
+
+Access: 🟦 K (COS); [MathMenu](#mathmenu-reference) F3; [RealMenu](#realmenu) 🟦 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _sec_ | _csc_ | _cot_ | _sec⁻¹_ | _csc⁻¹_ | _cot⁻¹_ |
+| [sin](#sin) | [cos](#cos) | [tan](#tan) | [sin⁻¹](#asin) | [cos⁻¹](#acos) | [tan⁻¹](#atan) |
+
+### ClearThingsMenu
+
+Access: 🟨 (⌫)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Stack](#clearstack) | [Purge](#purge) | Stats | _Mem_ | Error | [LCD](#clearlcd) |
+
+### CompareMenu
+
+Access: [ProgramMenu](#programmenu) 🟨 F3; [TestsMenu](#testsmenu) 🟦 F4
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [true](#true) | [false](#false) | \[[Tests](#testsmenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |   |
+| [and](#and) | [or](#or) | [xor](#xor) | [not](#not) | [==](#-2) | _Unimplemented_ |
+| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
+
+### ComplexMenu
+
+Access: 🟨 G (STO); [MathMenu](#mathmenu-reference) F2; [VectorMenu](#vectormenu) 🟨 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| 2+i3 | [ℝ∡ℝ→ℂ](#realtopolar) | [ℂ→ℝ∡ℝ](#polartoreal) | Auto ℂ | \[[Angles](#anglesmenu)\] |   |
+| [→Rect](#torectangular) | [→Polar](#topolar) | [conj](#conj) | [sign](#sign) | [\|z\|](#abs) | [arg](#arg) |
+| `ⅈ` | `∡` | [ℝ→ℂ](#realtorectangular) | [ℂ→ℝ](#rectangulartoreal) | [re](#re) | [im](#im) |
+
+### DateMenu Reference
+
+See also: [DateMenu](#datemenu) user documentation
+
+Access: [AlarmMenu](#alarmmenu) 🟨 F3; [TimeMenu](#timemenu-reference) 🟦 F4
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [→Time](#settime) | [→Date](#setdate) | [JDN](#juliandaynumber) | [JDN→](#datefromjuliandaynumber) | \[[Time](#timemenu-reference)\] | \[[Alarms](#alarmmenu)\] |
+| `_date` | `_d` | [Date](#date-1) | [Dt+Tm](#datetime) | ∆Date | [Date+](#date) |
+
+### DebugMenu Reference
+
+See also: [DebugMenu](#debugmenu) user documentation
+
+Access: 🟦 X (1); [ProgramMenu](#programmenu) 🟦 F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] |   |   |   |
+| [Halt](#halt) | [Step↑](#stepout) | DoErr | ErrMsg | ErrNum | ClrErr |
+| [Debug](#debug) | [Step](#step) | [Over](#over) | [Steps](#multiplesteps) | [Continue](#continue) | [Kill](#kill) |
+
+### DifferentialSolverMenu
+
+Access: [SolverMenu](#solvermenu) 🟨 F4; [SymbolicMenu](#symbolicmenu) 🟦 F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### DisplayModesMenu Reference
+
+See also: [DisplayModesMenu](#displaymodesmenu) user documentation
+
+Access: 🟨 O (EEX); [MathModesMenu](#mathmodesmenu-reference) 🟦 F6; [ModesMenu](#modesmenu-reference) 🟨 F5; [SeparatorModesMenu](#separatormodesmenu-reference) 🟨 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [1 1/2](#mixedfractions) | [3/2](#improperfractions) | [1/3](#bigfractions) | [¹/₃](#smallfractions) | \[[UI](#userinterfacemodesmenu)\] | \[[Math](#mathmodesmenu-reference)\] |
+| [MantissaSpacing](#mantissaspacing) | [FractionSpacing](#fractionspacing) | [BasedSpacing](#basedspacing) | [StandardExponent](#standardexponent) | [MinimumSignificantDigits](#minimumsignificantdigits) | \[[Seps](#separatormodesmenu-reference)\] |
+| Std | Fix | Sci | Eng | Sig | [Precision](#precision) |
+
+### EditMenu
+
+Access: 🟦 (▼)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Stack | Hist↑ | Hist↓ |   |   |   |
+| Csr⇄Sel | \|← | →\| | Replace | [Copy](#copy) | Clear |
+| Select | ←Word | Word→ | [Search](#editorsearch) | [Cut](#editorcut) | [Paste](#editorpaste) |
+
+### ExpLogIdentitiesMenu
+
+Access: [SymbolicMenu](#symbolicmenu) 🟨 F4
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _ExpLn_ | _Lin_ | _LnCollect_ | _SinCos_ | _TExpand_ | \[[Symb](#symbolicmenu)\] |
+
+### FilesMenu
+
+Access: 🟦 (0)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Seek_ | _Dir_ |   |   |   |   |
+| _Save_ | _Load_ | _Open_ | _Close_ | _Read_ | _Write_ |
+| [Libs](#libs) | [Attach](#attach) | [Detach](#detach) | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
+
+### FlagsMenu
+
+Access: 🟨 V (6); [ProgramMenu](#programmenu) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Prog](#programmenu)\] | \[[Loops](#loopsmenu)\] | \[[Modes](#modesmenu-reference)\] |   |   |   |
+| [F→Bin](#flagstobinary) | [Bin→F](#binarytoflags) | \[[Tests](#testsmenu)\] | [Flip](#flipflag) | [Set?Set](#testflagsetthenset) | [Clr?Set](#testflagclearthenset) |
+| [Set](#setflag) | [Clear](#clearflag) | [Set?](#testflagset) | [Clear?](#testflagclear) | [Set?Clr](#testflagsetthenclear) | [Clr?Clr](#testflagclearthenclear) |
+
+### FractionsMenu
+
+Access: 🟦 I (R↓); [MathMenu](#mathmenu-reference) 🟦 F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Frac→](#explode) | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) | FractionIterations | FractionLargestPrime | FractionDigits |
+| [%Total](#percenttotal) | [%Chg](#percentchange) | DMS+ | DMS- | [→HMS](#hms) | [HMS→](#hms-1) |
+| `/` | [%](#percent) | [→DMS](#dms) | [DMS→](#dms-1) | [→Num](#num) | →Frac |
+
+### GraphicsMenu
+
+Access: 🟦 (.)
+
+*4 pages · 59 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| PixOn | PixOff | [Pix?](#pixtest) | [PixCol?](#pixcolor) | _Arc_ |   |
+| [RGB](#rgb) | [Gray](#gray) | Foregnd | Bckgnd | LnWidth | ◀ |
+| [Line](#drawline) | Rect | RndRect | Ellipse | Circle | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→LCD](#tolcd) | [LCD→](#fromlcd) | [Pict](#pict) | Clip | CurClip |   |
+| Freeze | [Show](#show) | [→Grob](#togrob) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ◀ |
+| [ClLCD](#clearlcd) | [Disp](#drawtext) | [DispXY](#drawstyledtext) | [Input](#input) | [Prompt](#prompt) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Σ](#graphicsum) | [∏](#graphicproduct) | [∫](#graphicintegral) | [Subscript](#graphicsubscript) | [Exponent](#graphicexponent) |   |
+| [(.)](#graphicparentheses) | [\|.\|](#graphicnorm) | [÷](#graphicratio) | [√.](#graphicroot) | [Stack](#graphicstack) | ◀ |
+| [GOr](#gor) | [GXor](#gxor) | [GAnd](#gand) | [Extract](#extract) | [Append](#graphicappend) | ▶ |
+
+**Page 4**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [BlankBitmap](#blankbitmap) | _Unimplemented_ | [GraphicPicture](#pict) | \[[Plot](#plotmenu)\] |   |   |
+| _Unimplemented_ | [→Grob](#togrob) | [Blank](#blankgraphic) | [BlBitmap](#blankbitmap) | [BlGrob](#blankgrob) | ◀ |
+| [LCD→](#fromlcd) | [→LCD](#tolcd) | [→Bitmap](#tobitmap) | [→HPGrob](#tohpgrob) | [→Bitmap](#tobitmap) | ▶ |
+
+### HyperbolicMenu
+
+Access: 🟦 J (SIN); [MathMenu](#mathmenu-reference) 🟨 F1; [PowersMenu](#powersmenu) 🟦 F6; [RealMenu](#realmenu) 🟦 F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Powers](#powersmenu)\] |   |   |   |   |   |
+| [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
+
+### IntegrationMenu
+
+Access: 🟨 Q (8); [SymbolicMenu](#symbolicmenu) 🟦 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| Σ | ∏ |   |   |   |   |
+| [∂](#derivative) | ∫ | [Num ∫](#integrate) | Symb ∫ | [Eq](#equation) | _Indep_ |
+
+### IOMenu
+
+Access: 🟦 (-); [MainMenu](#mainmenu-reference) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| _Save_ | [MinimumBatteryVoltage](#minimumbatteryvoltage) |   |   |   |   |
+| _Save_ | _Load_ | _Print_ | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
+
+### LinearSolverMenu
+
+Access: [SolverMenu](#solvermenu) 🟨 F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### ListMenu
+
+Access: 🟨 (-); [ProgramMenu](#programmenu) 🟦 F4
+
+*2 pages · 30 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Sort](#sort) | [RSort](#reversesort) | [Map](#map) | [Reduce](#reduce) | [Filter](#filter) |   |
+| [QSort](#quicksort) | [RQSort](#reversequicksort) | [∑List](#listsum) | [∏List](#listproduct) | [∆List](#listdifferences) | ◀ |
+| [→List](#list) | [List→](#list-1) | [Size](#size) | [Head](#head) | [Tail](#tail) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Obj→](#explode) | _Find_ | \[[Objects](#objectmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Vector](#vectormenu)\] |   |
+| DoList | DoSubs | NSub | EndSub | [Extract](#extract) | ◀ |
+| [Get](#get) | [Put](#put) | [GetI](#geti) | [PutI](#puti) | [Reverse](#reverselist) | ▶ |
+
+### LoopsMenu
+
+Access: 🟦 Y (2); [CompareMenu](#comparemenu) 🟦 F4; [FlagsMenu](#flagsmenu) 🟦 F2; [ProgramMenu](#programmenu) 🟨 F4; [TestsMenu](#testsmenu) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Compare](#testsmenu)\] | \[[Prog](#programmenu)\] | _Label_ | _Goto_ | _Gosub_ | _Return_ |
+| [Start](#start) | StStep | [For](#for) | ForStep | [Until](#until) | [While](#while) |
+
+### MainMenu Reference
+
+See also: [MainMenu](#mainmenu) user documentation
+
+Access: 🟦 A (Σ+)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Lib](#library-reference)\] | \[[Eqns](#equationsmenu)\] | \[[Const](#constantsmenu-reference)\] | \[[Time](#timemenu-reference)\] | \[[I/O](#iomenu)\] | \[[Chars](#charactersmenu-reference)\] |
+| [Cat](#catalog) | \[[Real](#realmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Stack](#stackmenu)\] | \[[UI](#userinterfacemodesmenu)\] |
+| Help | \[[Math](#mathmenu-reference)\] | \[[Prog](#programmenu)\] | \[[Plot](#plotmenu)\] | \[[Solve](#solvermenu)\] | \[[Modes](#modesmenu-reference)\] |
+
+### MathMenu Reference
+
+See also: [MathMenu](#mathmenu) user documentation
+
+Access: E (LN); [MainMenu](#mainmenu-reference) F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Signal](#signalprocessingmenu)\] | \[[Bases](#basesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Symb](#symbolicmenu)\] | \[[Frac](#fractionsmenu)\] |
+| \[[Hyper](#hyperbolicmenu)\] | \[[Proba](#probabilitiesmenu)\] | \[[Stats](#statisticsmenu)\] | \[[Solver](#solvermenu)\] | \[[Const](#constantsmenu-reference)\] | \[[Eqns](#equationsmenu)\] |
+| \[[Real](#realmenu)\] | \[[Cmplx](#complexmenu)\] | \[[Trig](#circularmenu)\] | \[[Powers](#powersmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Ranges](#rangemenu)\] |
+
+### MathModesMenu Reference
+
+See also: [MathModesMenu](#mathmodesmenu) user documentation
+
+Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F6; [ModesMenu](#modesmenu-reference) F4
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Lazy | Lossy | [LinFitΣ](#linearfitsums) | x·y | [Angles](#setangleunits) | \[[Disp](#displaymodesmenu-reference)\] |
+| [MaxNumberBits](#maxnumberbits) | [MaxRewrites](#maxrewrites) | FractionIterations | FractionDigits | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) |
+| [Sym](#symbolicresults) | [Simpl](#autosimplify) | 0^0=1 | HwFP | Auto ℂ | Princ |
+
+### MatrixMenu
+
+Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmenu-reference) F5; [VectorMenu](#vectormenu) 🟨 F6
+
+*3 pages · 35 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [RowNrm](#rownorm) | [ColNrm](#columnnorm) | _CondNum_ | [Size](#size) | \[[Vector](#vectormenu)\] |   |
+| [Det](#determinant) | [Norm](#norm) | [→Array](#array) | [Array→](#array-1) | [Random](#random) | ◀ |
+| `[]` | [Idnty](#identitymatrix) | [Const](#constantarray) | Transp | TrConj | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _SVD_ | _SVL_ | _Diag→_ | _→Diag_ | _SpecRad_ |   |
+| _LU_ | _LQ_ | _QR_ | _Schur_ | _Cholesky_ | ◀ |
+| [Col+](#col) | [Col-](#col-) | →Col | Col→ | ColSwp | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Row+](#row) | [Row-](#row-) | →Row | Row→ | RowSwp | ▶ |
+
+### MemoryMenu
+
+Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
+
+*3 pages · 37 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | [RunStats](#runtimestatistics) | [GCStats](#garbagecollectorstatistics) |   |
+| [Avail](#availablememory) | [Vars](#variables) | [Home](#homedirectory) | [Path](#directorypath) | [GC](#garbagecollect) | ◀ |
+| [Store](#store) | [Recall](#recall) | [Purge](#purge) | [CrDir](#createdirectory) | [UpDir](#updirectory) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | CurDir |   |
+| [Recall](#recall) | Recall+ | Recall- | Recall× | Recall÷ | ◀ |
+| [Store](#store) | Store+ | Store- | Store× | Store÷ | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| GC Clr | RT Clr |   |   |   | ◀ |
+| [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
+
+### ModesMenu Reference
+
+See also: [ModesMenu](#modesmenu) user documentation
+
+Access: 🟨 N (+/-); [FlagsMenu](#flagsmenu) 🟦 F3; [MainMenu](#mainmenu-reference) F6; [SeparatorModesMenu](#separatormodesmenu-reference) 🟨 F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Modes](#modes) | [Reset](#resetmodes) | [System](#systemsetup) |   |   |   |
+| Grad | \[[Angles](#anglesmenu)\] | Beep | Flash | \[[Display](#displaymodesmenu-reference)\] | \[[Seps](#separatormodesmenu-reference)\] |
+| Deg | Rad | [n×π](#piradians) | \[[Math](#mathmodesmenu-reference)\] | \[[User](#usermodemenu-reference)\] | \[[UI](#userinterfacemodesmenu)\] |
+
+### MultiSolverMenu
+
+Access: [SolverMenu](#solvermenu) 🟦 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _Eqs_ | _Indeps_ | _MRoot_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### NumbersMenu
+
+Access: 🟦 W (×)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) |   |   |
+| [→Num](#num) | [→Q](#q) | [→Qπ](#q-1) | R#Seed | [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |
+| Σ | ∏ | QuoRem | [Factors](#factors) | Ran# | [Random](#random) |
+
+### NumericalSolverMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### ObjectMenu
+
+Access: [ListMenu](#listmenu) ▶ 🟦 F3; [ProgramMenu](#programmenu) 🟦 F3
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Eval](#evaluate) | [Run](#run) | Clone | [DTag](#deletetag) | [Tag→](#tag-1) | \[[Tools](#toolsmenu)\] |
+| [→List](#list) | [→Text](#totext) | [→Tag](#tag) | [→Graph](#togrob) | [→Prog](#program) | [→Array](#array) |
+| [Bytes](#bytes) | [Type](#type) | [TypeName](#typename) | [Obj→](#explode) | [→Num](#num) | →Frac |
+
+### PartsMenu
+
+Access: 🟦 E (LN); [RealMenu](#realmenu) 🟦 F6
+
+*2 pages · 30 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| →Int | [→Q](#q) | [→Qπ](#q-1) | [SigDig](#sigdig) | [Get](#get) |   |
+| Trunc | [Mant](#mant) | [Xpon](#xpon) | [Ceil](#ceil) | [Floor](#floor) | ◀ |
+| [abs](#abs) | [sign](#sign) | [IntegerPart](#intpart) | [FractionalPart](#fracpart) | Round | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) |   |
+| [CstName](#constantname) | [CstValue](#constantvalue) | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | [Tag→](#tag-1) | ◀ |
+| [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Obj→](#explode) | ▶ |
+
+### PlotMenu
+
+Access: 🟦 O (EEX); [GraphicsMenu](#graphicsmenu) ▶×3 🟦 F4; [MainMenu](#mainmenu-reference) F4; [SolverMenu](#solvermenu) 🟦 F3; [StatisticsMenu](#statisticsmenu) 🟦 F5; [SymbolicMenu](#symbolicmenu) 🟨 F6
+
+*2 pages · 20 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Lines | Axes | [StatsPlotBins](#statsplotbins) | [XYPlotBins](#xyplotbins) | PlotRefreshRate |   |
+| Foregnd | Backgnd | LineWdth | [Xrange](#xrange) | [Yrange](#yrange) | ◀ |
+| [Function](#functionplot) | [Polar](#polarplot) | [Param](#parametricplot) | [Scatter](#scatterplot) | [Truth](#truthplot) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Bar](#barplot) | [Histogrm](#histogramplot) | [Clear](#clearlcd) | Freeze | DrAxes | ▶ |
+
+### PolynomialsMenu
+
+Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#symbolicmenu) 🟨 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Solve_ | _TVMRoot_ | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
+| _FRoots_ | _MRoot_ | _MSolvr_ | _PCoef_ | _PRoot_ | [Root](#root) |
+| `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
+
+### PolynomialSolverMenu
+
+Access: [SolverMenu](#solvermenu) 🟨 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+
+### PowersMenu
+
+Access: 🟨 E (LN); [HyperbolicMenu](#hyperbolicmenu) 🟨 F1; [MathMenu](#mathmenu-reference) F4; [RealMenu](#realmenu) 🟦 F3
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [pow](#pow) | [xroot](#xroot) | _FstSet_ | _LstSet_ | _popcnt_ | \[[Hyper](#hyperbolicmenu)\] |
+| [exp2](#exp2) | log2 | [expm1](#expm1) | [ln1p](#ln1p) | x³ | [∛](#cbrt) |
+| [exp](#exp) | [ln](#ln) | [exp10](#exp10) | [log10](#log10) | [x²](#sq) | [√](#sqrt) |
+
+### PrintingMenu
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _Print_ | _Screen_ | _Disk_ | _IR_ |   |   |
+
+### ProbabilitiesMenu
+
+Access: 🟨 W (×); [MathMenu](#mathmenu-reference) 🟨 F2; [RealMenu](#realmenu) 🟦 F4; [StatisticsMenu](#statisticsmenu) 🟦 F4
+
+*2 pages · 22 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| _Normal_ | _Student_ | _Chi²_ | _F-Distr_ | _FFT_ |   |
+| Γ | ln(Γ) | erf | erfc | RSeed | ◀ |
+| Comb | Perm | x! | Ran# | [Random](#random) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |   |   |   | ◀ |
+| _Normal⁻¹_ | _Studnt⁻¹_ | _Chi²⁻¹_ | _F-Dist⁻¹_ | _FFT⁻¹_ | ▶ |
+
+### ProgramMenu
+
+Access: 🟨 Z (3); [CompareMenu](#comparemenu) 🟦 F5; [DebugMenu](#debugmenu-reference) 🟦 F3; [FlagsMenu](#flagsmenu) 🟦 F1; [LoopsMenu](#loopsmenu) 🟨 F2; [MainMenu](#mainmenu-reference) F3; [TestsMenu](#testsmenu) 🟦 F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Stack](#stackmenu)\] | \[[Debug](#debugmenu-reference)\] | \[[Objects](#objectmenu)\] | \[[List](#listmenu)\] | \[[Flag](#flagsmenu)\] | [Version](#version) |
+| \[[Mem](#memorymenu)\] | \[[Test](#testsmenu)\] | \[[Cmp](#comparemenu)\] | \[[Loop](#loopsmenu)\] | \[[Base](#basesmenu)\] | [Eval](#evaluate) |
+| `«»` | `{}` | `[]` | `→  «»` | `→  ''` | [Run](#run) |
+
+### RangeMenu
+
+Access: [MathMenu](#mathmenu-reference) F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Size](#size) |   |   |   |   |   |
+| [→Range](#range) | [→∆Range](#range-1) | [→%Range](#range-2) | [→σRange](#range-3) | [∪](#rangeunion) | [∩](#rangeintersect) |
+| `…` | `±` | `±%` | `±σ` | Range→ | `ρ` |
+
+### RealMenu
+
+Access: 🟦 G (STO); [MainMenu](#mainmenu-reference) 🟨 F2; [MathMenu](#mathmenu-reference) F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Trig](#circularmenu)\] | \[[Hyper](#hyperbolicmenu)\] | \[[Powers](#powersmenu)\] | \[[Prob](#probabilitiesmenu)\] | \[[Angles](#anglesmenu)\] | \[[Parts](#partsmenu)\] |
+| [Ceil](#ceil) | [Floor](#floor) | rem | [%](#percent) | [%Chg](#percentchange) | [%Total](#percenttotal) |
+| [Min](#min) | [Max](#max) | [mod](#mod) | [abs](#abs) | [→Num](#num) | [→Q](#q) |
+
+### SeparatorModesMenu Reference
+
+See also: [SeparatorModesMenu](#separatormodesmenu) user documentation
+
+Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟨 F6; [ModesMenu](#modesmenu-reference) 🟨 F6
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [1.2x10³²](#fancyexponent) | [1.2E32](#classicexponent) | [1.0→1.](#trailingdecimal) | [1→1.0](#showasdecimal) | Fixed0 |   |
+| #1 000 | #1.000 | #1'000 | #1_000 | \[[Disp](#displaymodesmenu-reference)\] | \[[Modes](#modesmenu-reference)\] |
+| [1 000](#numberspaces) | [1.000,](#numberdotorcomma) | [1'000](#numberticks) | [1_000](#numberunderscore) | [2.3](#decimaldot) | [2,3](#decimalcomma) |
+
+### SignalProcessingMenu
+
+Access: [MathMenu](#mathmenu-reference) 🟦 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| _FFT_ | _InvFFT_ |   |   |   |   |
+
+### SolverMenu
+
+Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Multi](#multisolvermenu)\] | \[[Finance](#financesolvermenu)\] | \[[Plot](#plotmenu)\] | \[[Eqns](#equationsmenu)\] | [SolverImprecision](#solverimprecision) | [SolverIterations](#solveriterations) |
+| [▶Eq](#steq) | [Stoⓧ](#storealgebravariable) | \[[Symb](#symbolicsolvermenu)\] | \[[Diff](#differentialsolvermenu)\] | \[[Poly](#polynomialsolvermenu)\] | \[[Linear](#linearsolvermenu)\] |
+| [Eq▶](#rceq) | [ⓧ](#algebravariable) | [Root](#root) | [EvalEq](#evaleq) | [NxtEq](#nexteq) | \[[Solve](#solvingmenu)\] |
+
+### StackMenu
+
+Access: I (R↓); [MainMenu](#mainmenu-reference) 🟨 F5; [ProgramMenu](#programmenu) 🟦 F1
+
+*2 pages · 22 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [DupN](#duplicaten) | [DropN](#dropn) | [Depth](#depth) | [Nip](#nip) | [Pick3](#pick3) |   |
+| [Dup2](#duplicate2) | [Drop2](#drop2) | [Rot↓](#unrot) | [Roll↓](#rolld) | [Pick](#pick) | ◀ |
+| [Dup](#duplicate) | [Drop](#drop) | [Rot↑](#rot) | [Roll↑](#roll) | [Over](#over) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [NDupN](#ndupn) | [DupDup](#duplicatetwice) |   |   |   | ◀ |
+| [Swap](#swap) | [LastArg](#lastarguments) | [LastX](#lastx) | [Undo](#undo) | [ClrStk](#clearstack) | ▶ |
+
+### StatisticsMenu
+
+Access: 🟨 S (÷); [MathMenu](#mathmenu-reference) 🟨 F3
+
+*3 pages · 35 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| StoΣ | RclΣ | ClrΣ | \[[Proba](#probabilitiesmenu)\] | \[[Plot](#plotmenu)\] |   |
+| [XCol](#independentcolumn) | [YCol](#dependentcolumn) | [MinΣ](#min) | [MaxΣ](#max) | [ΣSize](#size) | ◀ |
+| [Σ+](#) | [Σ-](#-) | Total | [Mean](#average) | [StdDev](#standarddeviation) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [ΣX](#x) | [ΣY](#y) | [ΣXY](#xy) | [ΣX²](#x-1) | [ΣY²](#y-1) |   |
+| [BestFit](#bestfit) | [LinFit](#linearfit) | [ExpFit](#exponentialfit) | [LogFit](#logarithmicfit) | [PwrFit](#powerfit) | ◀ |
+| [LR](#linearregression) | ΣLine | PredX | PredY | [Corr](#correlation) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Median](#median) | [Bins](#frequencybins) | [PopVar](#populationvariance) | [PopSDev](#populationstandarddeviation) | [PCovar](#populationcovariance) | ▶ |
+
+### SymbolicMenu
+
+Access: 🟦 P (7); [AlgebraMenu](#algebramenu) 🟦 F6; [ArithmeticMenu](#arithmeticmenu) 🟨 F6; [CalculationMenu](#calculationmenu) 🟨 F4; [ExpLogIdentitiesMenu](#explogidentitiesmenu) F6; [MainMenu](#mainmenu-reference) 🟨 F4; [MathMenu](#mathmenu-reference) 🟦 F5; [TrigIdentitiesMenu](#trigidentitiesmenu) 🟨 F1
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
+| \[[Arith](#arithmeticmenu)\] | \[[Calc](#calculationmenu)\] | \[[Trig](#trigidentitiesmenu)\] | \[[Exp/Ln](#explogidentitiesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Graph](#plotmenu)\] |
+| Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
+
+### SymbolicSolverMenu
+
+Access: [SolverMenu](#solvermenu) 🟨 F3
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   |   |
+| [Eq](#equation) | _Indep_ | _Root_ | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
+
+### TestsMenu
+
+Access: 🟦 Z (3); [CompareMenu](#comparemenu) 🟦 F3; [FlagsMenu](#flagsmenu) 🟨 F3; [LoopsMenu](#loopsmenu) 🟨 F1; [ProgramMenu](#programmenu) 🟨 F2
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Case](#case) | Then | When | \[[Compare](#comparemenu)\] | \[[Loops](#loopsmenu)\] | \[[Prog](#programmenu)\] |
+| IfThen | IfElse | [IfErr](#iferr) | IfErrElse | [IFT](#ift) | [IFTE](#ifte) |
+| [<](#-3) | [=](#) | [>](#-5) | [≤](#-4) | [≠](#-1) | [≥](#-6) |
+
+### TextMenu
+
+Access: 🟦 T (4)
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [T→Real](#compiletoreal) | [T→Expr](#compiletoexpression) | [T→Int](#compiletointeger) | [T→Pos](#compiletopositive) |   |   |
+| [T→Code](#textcode) | [Code→T](#codetext) | [Extract](#extract) | [T→Obj](#compiletoobject) | [T→Alg](#compiletoalgebraic) | [T→Num](#compiletonumber) |
+| [→Text](#totext) | [Text→](#compile) | [Length](#size) | [Append](#add) | [Repeat](#repeat) | [C→Code](#charcode) |
+
+### TimeMenu Reference
+
+See also: [TimeMenu](#timemenu) user documentation
+
+Access: 🟦 V (6); [AlarmMenu](#alarmmenu) 🟨 F2; [DateMenu](#datemenu-reference) 🟨 F5; [MainMenu](#mainmenu-reference) 🟦 F4
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [→Time](#settime) | [→Date](#setdate) | _ClkAdj_ | \[[Dates](#datemenu-reference)\] | \[[Alarms](#alarmmenu)\] |   |
+| Chrono | [Ticks](#ticks) | [Dt+Tm](#datetime) | [T→Str](#totext) | [Wait](#wait) | [TEval](#teval) |
+| _hms | [Time](#time) | [→HMS](#hms) | [HMS→](#hms-1) | [HMS+](#hms-2) | [HMS-](#hms-) |
+
+### TrigIdentitiesMenu
+
+Access: [SymbolicMenu](#symbolicmenu) 🟨 F3
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| \[[Symb](#symbolicmenu)\] |   |   |   |   |   |
+| _HalfTan_ | _Tan→SinCos_ | _Tan→SinCos²_ | _TExpand_ | _TLin_ | [TrigSin](#trigsin) |
+
+### UnitsConversionsMenu
+
+Access: 🟦 U (5)
+
+*3 pages · 36 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| µ (-6) | n (-9) | p (-12) | T (+12) | P (+15) |   |
+| m (-3) | c (-2) | k (+3) | M (+6) | G (+9) | ◀ |
+| [Convert](#convert) | [Base](#base) | [Value](#unitvalue) | [Factor](#factorunit) | [→Unit](#unit) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Ki | Mi | Gi | Ti | [Pi](#pi) |   |
+| y (-24) | z (-21) | a (-18) | Z (+21) | Y (+24) | ◀ |
+| f (-15) | d (-1) | da (+1) | h (+2) | E (+18) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [SIPfx](#unitssiprefixcycle) |   |   |   |   | ◀ |
+| Ei | Zi | Yi | Ri | Qi | ▶ |
+
+### UserInterfaceModesMenu
+
+Access: 🟦 N (+/-); [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F5; [MainMenu](#mainmenu-reference) 🟨 F6; [ModesMenu](#modesmenu-reference) F6
+
+*4 pages · 47 items total*
+
+**Page 1**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [3-lines](#threerowsmenus) | [1-line](#singlerowmenus) | [Flat](#flatmenus) | [Round](#roundedmenus) | \[[Hide](#hideemptymenu)\] |   |
+| ResultFont | StackFont | EditorFont | MultilineEditorFont | [CursorBlinkRate](#cursorblinkrate) | ◀ |
+| [GrRes](#graphicresultdisplay) | [GrStk](#graphicstackdisplay) | Beep | Flash | \[[User](#usermodemenu-reference)\] | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| Fixed0 | VProg | BusyIndicatorRefresh | \[[ExitMenu](#exitclearsmenu)\] | [ListEval](#listasprogram) |   |
+| [EditorWrapColumn](#editorwrapcolumn) | [TabWidth](#tabwidth) | [MaximumShowWidth](#maximumshowwidth) | [MaximumShowHeight](#maximumshowheight) | ErrorBeepFrequency | ◀ |
+| [cmd](#lowercase) | [CMD](#uppercase) | [Cmd](#capitalized) | [Command](#longform) | ErrorBeepDuration | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [TextRenderingSizeLimit](#textrenderingsizelimit) | [GraphRenderingSizeLimit](#graphrenderingsizelimit) | PlotRefreshRate | AllVars | [SIPrefixCycle](#unitssiprefixcycle) |   |
+| [ResultGraphingTimeLimit](#resultgraphingtimelimit) | [StackGraphingTimeLimit](#stackgraphingtimelimit) | [GraphingTimeLimit](#graphingtimelimit) | [ShowTimeLimit](#showtimelimit) | [MinimumBatteryVoltage](#minimumbatteryvoltage) | ◀ |
+| [Units](#showbuiltinunits) | Const | Eqns | [Libs](#libs) | Chars | ▶ |
+
+**Page 4**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| [Header](#header) | [CustomHeaderRefresh](#customheaderrefresh) |   |   |   | ▶ |
+
+### UserModeMenu Reference
+
+See also: [UserModeMenu](#usermodemenu) user documentation
+
+Access: [ModesMenu](#modesmenu-reference) F5; [UserInterfaceModesMenu](#userinterfacemodesmenu) F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+| [DelKeys](#deletekeys) | [KeyMap](#keymap) |   |   |   |   |
+| [Toggle](#toggleusermode) | [User](#usermode) | [Lock](#usermodelock) | [RclKeys](#recallkeys) | [StoKeys](#storekeys) | [Assign](#assignkey) |
+
+### VectorMenu
+
+Access: [ListMenu](#listmenu) ▶ 🟦 F5; [MatrixMenu](#matrixmenu) 🟦 F5
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Hypot](#hypot) | [Atan2](#atan2) |   |   |   |   |
+| [→Vec2](#to2dvector) | [→Vec3](#to3dvector) | [Vec→](#fromvector) | [→Cylind](#tocylindrical) | \[[Complex](#complexmenu)\] | \[[Matrix](#matrixmenu)\] |
+| [Norm](#norm) | [Dot](#dot) | [Cross](#cross) | [→Rect](#torectangular) | [→Polar](#topolar) | [→Spher](#tospherical) |
+
+### CharactersMenu Reference
+
+See also: [CharactersMenu](#charactersmenu) user documentation
+
+_Content loaded dynamically at runtime._
+
+### ConstantsMenu Reference
+
+See also: [ConstantsMenu](#constantsmenu) user documentation
+
+_Content loaded dynamically at runtime._
+
+### EquationsMenu
+
+_Content loaded dynamically at runtime._
+
+### Library Reference
+
+See also: [Library](#library) user documentation
+
+_Content loaded dynamically at runtime._
+
+### UnitsMenu
+
+_Content loaded dynamically at runtime._
+

@@ -104,6 +104,18 @@ algebraic_g complex::mod() const
 }
 
 
+algebraic_g complex::arg() const
+// ----------------------------------------------------------------------------
+//   Return argument in a format-independant way
+// ----------------------------------------------------------------------------
+{
+    algebraic_g a = arg(Settings.AngleMode());
+    if (a && Settings.SetAngleUnits() && a->is_real())
+        add_angle(a);
+    return a;
+}
+
+
 algebraic_g complex::arg(complex::angle_unit unit) const
 // ----------------------------------------------------------------------------
 //   Return argument in a format-independant way

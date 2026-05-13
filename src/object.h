@@ -111,6 +111,7 @@ RECORDER_DECLARE(run);
 RECORDER_DECLARE(object_errors);
 
 struct algebraic;
+struct integer;
 struct menu_info;
 struct object;
 struct parser;
@@ -125,6 +126,7 @@ struct list;
 struct user_interface;
 
 typedef const algebraic *algebraic_p;
+typedef const integer   *integer_p;
 typedef const object    *object_p;
 typedef const program   *program_p;
 typedef const symbol    *symbol_p;
@@ -234,7 +236,7 @@ struct object
     }
 
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif // DM42
@@ -362,7 +364,7 @@ struct object
     //   Render like for the `Show` command
     // ------------------------------------------------------------------------
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif
 
@@ -403,6 +405,15 @@ struct object
     // ------------------------------------------------------------------------
     {
         return is_real() ? algebraic_p(this) : nullptr;
+    }
+
+
+    integer_p as_small_integer() const
+    // ------------------------------------------------------------------------
+    //   Return the object as a small integer (positive or negative)
+    // ------------------------------------------------------------------------
+    {
+        return is_small_integer() ? integer_p(this) : nullptr;
     }
 
 
@@ -565,7 +576,7 @@ struct object
     //
     // ========================================================================
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif
@@ -793,6 +804,35 @@ struct object
     }
 
 
+    static bool is_sequence(id ty)
+    // ------------------------------------------------------------------------
+    //   Check if we have a sequence of objects (array, list, program, expr, …)
+    // ------------------------------------------------------------------------
+    {
+        return ty == ID_array || ty == ID_list || is_program(ty);
+    }
+
+
+    bool is_sequence() const
+    // ------------------------------------------------------------------------
+    //   Return true if this is a sequence of objects
+    // ------------------------------------------------------------------------
+    {
+        return is_sequence(type());
+    }
+
+
+    list_p as_sequence() const
+    // ------------------------------------------------------------------------
+    //   Convert to list if this is a sequence (array, list, program, expr, …)
+    // ------------------------------------------------------------------------
+    {
+        if (is_sequence())
+            return list_p(this);
+        return nullptr;
+    }
+
+
     algebraic_p as_extended_algebraic() const
     // ------------------------------------------------------------------------
     //   Return an object as an algebraic if possible, or nullptr
@@ -844,7 +884,7 @@ struct object
         return nullptr;
     }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif
 
@@ -985,7 +1025,7 @@ struct object
 protected:
     static const dispatch   handler[NUM_IDS];
 
-#if DEBUG
+#if SIMULATOR
 public:
     cstring debug() const;
 #endif

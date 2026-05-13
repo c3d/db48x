@@ -370,6 +370,11 @@ menu is special in the sense that:
 
 * The 🟦 function *stores* into the variable.
 
+### Menu Tree
+
+The complete hierarchy of all built-in menus is documented in the
+[Menu Tree](#soft-menus-tree).
+
 
 ## Differences with other RPLs
 
@@ -631,6 +636,9 @@ operate on these items when it makes sense. Therefore:
 * As indicated [earlier](#representation-of-objects), quoted names in lists
   remain quoted, whereas on HP calculators, the quotes are removed.
 
+* The `MAP` operation on the HP50G recurses on inner lists. On DB48x, it does
+  not by default. This is controlled by the `ListDepthIteration` setting.
+  A value of `0` restores HP50G-style infinite recursion.
 
 ### Vectors and matrices differences
 
@@ -687,6 +695,12 @@ operate on these items when it makes sense. Therefore:
   words it returns `[[ 'a²+b·c' 'a·b+b·d' ] [ 'c·a+d·c' 'c·b+d²' ]]`. However,
   `[[a b][c d] 2. ^` performs the operation element-wise and returns
   `[[ 'a↑2.' 'b↑2.' ] [ 'c↑2.' 'd↑2.' ]]`.
+
+* When applied to a matrix or vector, `abs` returns a matrix or vector with the
+  `abs` of elements, whereas HP calcualtors compute the Euclidean norm. The
+  `norm` command performs like `abs` on HP calculators, computing the absolute
+  value for real numbers, the modulus for complex numbers, and the Euclidean
+  norm for arrays and vectors
 
 ### Mathematics
 

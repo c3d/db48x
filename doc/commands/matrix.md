@@ -341,6 +341,11 @@ Column norm (one norm) of a matrix
 Row norm (infinity norm) of a matrix
 
 
+## Norm
+
+Euclidean norm of a vector of matrix
+
+
 ## ConstantArray
 
 Returns a constant array, defined as an array whose elements all have the same

@@ -33,7 +33,7 @@
 #include <cstdint>
 
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC push_options
 #  pragma GCC optimize("-O3")
 #endif // DM42
@@ -151,7 +151,7 @@ inline Data *leb128skip(Data *ptr)
     return (Data *) p;
 }
 
-#ifdef DM42
+#if DM42 && FIRMWARE
 #  pragma GCC pop_options
 #endif // DM42
 

@@ -1088,6 +1088,22 @@ COMMAND_BODY(Version)
 }
 
 
+COMMAND_BODY(ChuckNorris)
+// ----------------------------------------------------------------------------
+//   Return the Chuck Norris quote for this version
+// ----------------------------------------------------------------------------
+{
+#include "chuck-norris.h"
+    const size_t nchuckles = sizeof(chuckles)/sizeof(chuckles[0]);
+    static_assert (nchuckles > 0);
+    const utf8 chuckle_text = (utf8) chuckles[rand() % nchuckles];
+    if (text_g chuckle = text::make(chuckle_text))
+        if (rt.push(object_p(chuckle)))
+            return OK;
+    return ERROR;
+}
+
+
 COMMAND_BODY(Help)
 // ----------------------------------------------------------------------------
 //   Bring contextual help

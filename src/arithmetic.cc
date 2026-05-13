@@ -700,6 +700,7 @@ algebraic_p arithmetic::non_numeric<multiply>(algebraic_r x, algebraic_r y)
     return optimize<multiply>(x, y);
 }
 
+
 bool multiply::integer_ok(object::id &xt, object::id &yt,
                           ularge &xv, ularge &yv)
 // ----------------------------------------------------------------------------
@@ -1862,6 +1863,10 @@ template object::result arithmetic::evaluate<struct pow>();
 template object::result arithmetic::evaluate<struct hypot>();
 template object::result arithmetic::evaluate<struct atan2>();
 
+template algebraic_p arithmetic::evaluate<add>(algebraic_r x, algebraic_r y);
+template algebraic_p arithmetic::evaluate<subtract>(algebraic_r x, algebraic_r y);
+template algebraic_p arithmetic::evaluate<multiply>(algebraic_r x, algebraic_r y);
+template algebraic_p arithmetic::evaluate<divide>(algebraic_r x, algebraic_r y);
 template algebraic_p arithmetic::evaluate<struct mod>(algebraic_r x, algebraic_r y);
 template algebraic_p arithmetic::evaluate<struct rem>(algebraic_r x, algebraic_r y);
 template algebraic_p arithmetic::evaluate<struct pow>(algebraic_r x, algebraic_r y);

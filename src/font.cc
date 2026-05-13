@@ -244,7 +244,7 @@ bool font::glyph(unicode codepoint, glyph_info &g) const
     case ID_dense_font:  return ((dense_font *)this)->glyph(codepoint, g);
     case ID_dmcp_font:   return ((dmcp_font *)this)->glyph(codepoint, g);
     default:
-        record(fonts_error, "Unexpectd font type %d", type());
+        record(fonts_error, "Unexpected font type %d", type());
     }
     return false;
 }

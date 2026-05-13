@@ -112,7 +112,8 @@ Fractional part of a number
 ## Abs
 
 Return the absolute value for a real number.
-Return the Euclidean norm for a complex number, vector or matrix.
+Return the modulus for a complex number
+Return the absolute value of elements for a matrix or a vector, which is different from HP calculators, see `NORM`
 
 
 # Integer arithmetic and polynomials
@@ -215,12 +216,6 @@ Greatest common divisor
 ## LCM
 Least common multiple
 
-
-## IDIV2
-Integer division, get quotient and remainder.
-On DB48X, this is an alias for [div2](#div2).
-
-`Y` `X` ▶ `IP(Y/X)` `Y rem X`
 
 ## IQUOT
 Quotient of the integer division

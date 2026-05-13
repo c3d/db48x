@@ -22,17 +22,17 @@
 QT += core gui quick widgets quickcontrols2 quickwidgets multimedia
 TEMPLATE = app
 
-CONFIG += debug warn_off
+CONFIG += debug warn_off c++17
 
-# Qt support code
+# Qt support code (RPL engine is in libdb48x.a, built by make-it-quick)
 SOURCES +=                                      \
-	../recorder/recorder.c                  \
-	../recorder/recorder_ring.c             \
         sim-main.cpp                            \
         sim-window.cpp                          \
-	sim-screen.cpp                          \
-	sim-rpl.cpp                             \
+ 	sim-screen.cpp                          \
+ 	sim-rpl.cpp                             \
 	dmcp.cpp                                \
+	../recorder/recorder.c                  \
+	../recorder/recorder_ring.c             \
         ../fonts/EditorFont.cc                  \
         ../fonts/HelpFont.cc                    \
         ../fonts/ReducedFont.cc                 \
@@ -131,21 +131,20 @@ DEFINES +=      MEMORY=100
 color:DEFINES += CONFIG_COLOR
 
 # Additional external library HIDAPI linked statically into the code
-INCLUDEPATH += ../src/dm42 ../src/dmcp ../src
+INCLUDEPATH += ../src/dm42 ../src/dmcp ../src ..
 
 win32:   LIBS += -lsetupapi -lgnurx
 android: LIBS +=
 freebsd: LIBS += -lthr -liconv
 macx:    LIBS += -framework CoreFoundation -framework IOKit
-macx:    QMAKE_CFLAGS += -fsanitize=address
-macx:    LIBS += -fsanitize=address
+macx:    QMAKE_CFLAGS +=
+macx:    LIBS +=
 clang:   QMAKE_CFLAGS   += -Wall -Wno-unknown-pragmas
 clang:   QMAKE_CXXFLAGS += -Wall -Wno-unknown-pragmas -Wno-vla-extension
-gcc:     QMAKE_CFLAGS   += -Wall -Wno-packed-bitfield-compat
-gcc:     QMAKE_CXXFLAGS += -Wall -Wno-packed-bitfield-compat
+gcc:     QMAKE_CFLAGS   += -Wall -Wno-unknown-warning-option -Wno-packed-bitfield-compat
+gcc:     QMAKE_CXXFLAGS += -Wall -Wno-unknown-warning-option -Wno-packed-bitfield-compat
 
-OBJECTS_DIR=db48x-build
-android:        OBJECTS_DIR=db48x-android-build
+isEmpty(OBJECTS_DIR): OBJECTS_DIR=db48x-build
 
 ICON = db48x.icns
 
