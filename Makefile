@@ -661,9 +661,9 @@ DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
 
 FLASH_BIN = $(MIQ_OBJDIR)$(NAME)_flash.bin
 FLASH_HEX = $(FLASH_BIN:.bin=.hex)
-QSPI_BIN  = $(OUTPUT:%=%/)$(NAME)_qspi.bin
+QSPI_BIN  = $(OUTPUT)$(NAME)_qspi.bin
 QSPI_HEX  = $(MIQ_OBJDIR)$(NAME)_qspi.hex
-PGM_FILE  = $(OUTPUT:%=%/)$(NAME).$(PGM)
+PGM_FILE  = $(OUTPUT)$(NAME).$(PGM)
 QSPI_CRC  = src/$(MODEL)/qspi_crc.h
 
 .postbuild: $(PGM_FILE) $(QSPI_BIN) $(QSPI_HEX) $(FLASH_BIN) $(FLASH_HEX)
