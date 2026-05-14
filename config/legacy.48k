@@ -62,7 +62,7 @@ OffWithImage			"0"		"."		"«	»"	"+"
 UIUp				"?"		"∫"		"["		"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
-OffWithImage			";"		"·"		"{	}"	"!'
+OffWithImage			";"		"·"		"{	}"	"!"
 ]
 
 @ PLANE 6: LOWERCASE UNSHIFTED

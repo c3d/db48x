@@ -1,4 +1,29 @@
-@  PLANE 0: UNSHIFTED
+@ An unquoted @ character starts a comment.
+@ A comment ends with the next newline.
+
+@ See "Keyboard interaction" in the Help / Documentation.
+@ See "Key positions" in the Help / Documentation for the Plane titles.
+@ See the source file .../dmcp.h at "Key codes".
+@ See the source file .../user_interface.cc at "load_keymap".
+
+@ Each Plane is an Array or List.
+@ There should be 9 planes.
+@ Each plane should define 37 Mappings.
+@ A mapping is either a command or a double quoted string.
+
+@ Note that the menu / function keys are excluded from the mappings.
+
+@ The keys are numbered as follows:
+@  1 = A         2 = B           3 = C           4 = D           5 = E           6 = F
+@  7 = G         8 = H           9 = I          10 = J          11 = K          12 = L
+@ 13 = ENTER                    14 = M          15 = N          16 = O          17 = <-
+@ 18 = left          19 = P / 7        20 = Q / 8         21 = R / 9            22 = S
+@ 23 = right         24 = T / 4        25 = U / 5         26 = V / 6            27 = W
+@ 28 = shift         29 = X / 1        30 = Y / 2         31 = Z / 3            32 = _
+@ 33 = EXIT          34 = :            35 = ,             36 = SPC              37 = CAT
+
+@ Plane 1: Unshifted.
+@ Indicated on the key, in white.
 [
 ToolsMenu	inv		sqrt		pow		MathMenu	UIAlgebraic
 Store	       ToggleCustomMenu	StackMenu	sin		cos		tan
@@ -9,7 +34,8 @@ UILeftShift			"1"		"2"		"3"		-
 UIExit				"0"		UIDecimal	Run		+
 ]
 
-@ PLANE 1: LEFT SHIFTED
+@ Plane 2: Left shift (yellow shift key pressed once).
+@ Indicated above the key, on the left, in yellow.
 [
 LastMenu	exp		sq		abs		PowersMenu	EquationsMenu
 ComplexMenu	MemoryMenu	ConstantsMenu	asin		acos		atan
@@ -20,7 +46,8 @@ UIRightShift			ToDecimal	ToggleUserMode	ProgramMenu	ListMenu
 OffWithImage			SystemSetup	Show		"«	»"	Catalog
 ]
 
-@ PLANE 2: RIGHT SHIFTED
+@ Plane 3: Right shift (blue shift = yellow shift key pressed twice).
+@ Indicated above the key, on the right, in blue.
 [
 MainMenu	ln		xroot 		AlgebraMenu	PartsMenu	CharactersMenu
 RealMenu	Library		FractionsMenu	HyperbolicMenu	CircularMenu	AnglesMenu
@@ -31,7 +58,8 @@ UINoShift			DebugMenu	LoopsMenu	TestsMenu	ObjectMenu
 SaveState			FilesMenu	GraphicsMenu	"{	}"	Help
 ]
 
-@ PLANE 3: ALPHA UNSHIFTED
+@ Plane 4: Uppercase alpha (activated with the ALPHA = Shift ENTER key).
+@ Indicated at the lower right of the key, in white.
 [
 "A"		"B"		"C"		"D"		"E"		"F"
 "G"		"H"		"I"		"J"		"K"		"L"
@@ -39,33 +67,38 @@ UIEnter				"M"		"N"		"O"		UIBackspace
 UILeft				"P"		"Q"		"R"		"S"
 UIRight				"T"		"U"		"V"		"W"
 UILeftShift			"X"		"Y"		"Z"		"_"
-UIExit				":	:"	","		" "		";"
+UIExit				":"		","		" "		Catalog
 ]
 
-@ PLANE 4: ALPHA LEFT SHIFTED
+@ plane 5: Uppercase alfa left shift.
+@ Indicated at the right of the key, in yellow.
+@ Keys without such a yellow indication, the numerics and basic number operations,
+@ default to what is on the key, in white.
 [
-"Σ"		"^"		"√"		"∂"		"ρ"		"("
+"Σ"		"^"		"√"		"∂"		"σ"		"("
 "▶"		"%"		"π"		"<"		"="		">"
 UILowercase			"⇄"		"±"		"∡"		UIDelete
 UILeft				"7"		"8"		"9"		"÷"
 UIRight				"4"		"5"		"6"		"×"
 UIRightShift			"1"		"2"		"3"		"-"
-OffWithImage			"0"		"."		"«	»"	"+"
+OffWithImage			"0"		UIDecimal	"="		"+"
 ]
 
-@ PLANE 5: ALPHA RIGHT SHIFTED
+@ Plane 6: Uppercase alfa mode right shift.
+@ Indicated at the upper right of the key, in blue.
 [
-"∏"		"∆"		"↑"		"μ"		"θ"		"\"
+"∏"		"∆"		"↑"		"μ"		"θ"		"''"
 "→"		"←"		"↓"		"≤"		"≠"		"≥"
 """"				"~"		 "°"		"ε"		"
 "
 UIUp				"?"		"∫"		"["		"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
-OffWithImage			";"		"·"		"{	}"	"!'
+OffWithImage			";"		"·"		"{	}"	"!"
 ]
 
-@ PLANE 6: LOWERCASE UNSHIFTED
+@ Plane 7: Lowercase alpha mode (activated with ALPHA ALPHA).
+@ Indicated at the lower right of the key, in white, but in lowercase.
 [
 "a"		"b"		"c"		"d"		"e"		"f"
 "g"		"h"		"i"		"j"		"k"		"l"
@@ -73,10 +106,11 @@ UIEnter				"m"		"n"		"o"		UIBackspace
 UILeft				"p"		"q"		"r"		"s"
 UIRight				"t"		"u"		"v"		"w"
 UILeftShift			"x"		"y"		"z"		"_"
-UIExit				":	:"	","		" "		";"
+UIExit				":"		","		" "		Catalog
 ]
 
-@ PLANE 7: LOWERCASE LEFT SHIFTED
+@ Plane 8: Lowercase alpha left shift.
+@ Apparently intended to give uppercase characters while in lowercase alpha mode.
 [
 "A"		"B"		"C"		"D"		"E"		"F"
 "G"		"H"		"I"		"J"		"K"		"L"
@@ -84,16 +118,17 @@ UINoAlpha			"M"		"N"		"O"		UIDelete
 UILeft				"P"		"Q"		"R"		"S"
 UIRight				"T"		"U"		"V"		"W"
 UIRightShift			"X"		"Y"		"Z"		"_"
-OffWithImage			":	:"	","		";"		"?"
+OffWithImage			":"		","		";"		"?"
 ]
 
-@ PLANE 8: LOWERCASE RIGHT SHIFTED
+@ plane 9: Lowercase alpha mode right shift.
+@ Apparently Intended to give easey access to some often used greek letters.
 [
 "α"		"β"		"γ"		"δ"		"ε"		"φ"
-"Γ"		"θ"		"Δ"		"λ"		"λ"		"ν"
+"Γ"		"θ"		"Δ"		"λ"		"μ"		"ν"
 UINoAlpha			"Π"		"Σ"		"ω"		"
 "
-UIUp				"?"		"∫"		"["		"/"
+UIUp				"?"		"∫"		"[	]"	"/"
 UIDown				"#"		"∞"		"|"		"*"
 UINoShift			"&"		"@"		"$"		"…"
 OffWithImage			";"		"·"		"{	}"	"!"
