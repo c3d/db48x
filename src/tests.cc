@@ -4444,6 +4444,16 @@ void tests::fraction_decimal_conversions()
     test(CLEAR, "0.25 →Frac", ENTER).expect("1/4");
     test(CLEAR, "0.2 ToFraction", ENTER).expect("1/5");
 
+    step("Decimal and fraction conversions on arrays, lists and expressions")
+        .test(CLEAR, "[ X 1.5 2.3 ]", ID_ToFraction)
+        .want("[ 'X' 3/2 23/10 ]")
+        .test(ID_ToDecimal)
+        .want("[ 'X' 1.5 2.3 ]")
+        .test(CLEAR, "{ -2.7 9.5 'A+2.5*B' }", ID_ToFraction)
+        .want("{ -27/10 19/2 'A+5/2·B' }")
+        .test(ID_ToDecimal)
+        .want("{ -2.7 9.5 'A+2.5·B' }");
+
     step("Integer conversions");
     test(CLEAR, "3. R→I", ENTER).expect("3");
     test(CLEAR, "-3. R→I", ENTER).expect("-3");
@@ -4493,6 +4503,9 @@ void tests::fraction_decimal_conversions()
     test(CLEAR, "'2.5*X^(exp(2))-sqrt(3)+Y*ln(2)'", ENTER).noerror()
         .test("→Q", ENTER)
         .expect("'5/2·X↑exp 2-√ 3+Y·ln 2'");
+    test(CLEAR, "[ X 3.2 -5.5 ]", ENTER).noerror()
+        .test("→Q", ENTER)
+        .want("[ 'X' 16/5 -11/2 ]");
 
     // HP50G limits fraction precision to FIX mode.
     step("ToFraction respects DisplayDigits (STD, FIX 8, 6, 4, 2)")
@@ -4506,6 +4519,7 @@ void tests::fraction_decimal_conversions()
         .test("pi →Num ToFraction", ENTER).expect("355/113")
         .test(CLEAR, "2 FIX", ENTER).noerror()
         .test("pi →Num ToFraction", ENTER).expect("333/106");
+
 
     step("Restoring small fraction mode")
         .test(CLEAR, "SmallFractions MixedFractions Std", ENTER).noerror();
@@ -8124,7 +8138,7 @@ void tests::constants_parsing()
             istep(cst[i]);
             test(CLEAR, (cst[i+1]), ENTER).noerror();
             test(("if dup typename \"array\" = "
-                        "then →Num else Run end"), ENTER).noerror();
+                  "then →Num else Run end"), ENTER).noerror();
         }
         else
         {
@@ -11407,7 +11421,7 @@ void tests::insertion_of_variables_constants_and_units()
     step("Insert infinity value")
         .test(CLEAR, LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
     step("Insert undefined value")
-        .test(CLEAR, LSHIFT, F5).expect("Undefined");
+        .test(CLEAR, LSHIFT, F5).expect("'Undefined'");
     step("Insert j value")
         .test(CLEAR, F6, LSHIFT, F1).expect("0+1ⅈ");
     step("Insert rad value")
@@ -11454,13 +11468,13 @@ void tests::insertion_of_variables_constants_and_units()
                                  "2.71828 18284 59045 23536 029  "
                                  "0+ⅈ1  "
                                  "9.99999⁳999999  "
-                                 "Undefined »");
+                                 "'Undefined' »");
 
     step("Test that constants parse")
         .test(ENTER)
         .want("« π e ⅈ ∞ ? "
               "3.14159 26535 9 2.71828 18284 6 0+1ⅈ 9.99999⁳⁹⁹⁹⁹⁹⁹ "
-              "Undefined »", 300);
+              "'Undefined' »", 300);
 
     step("Select library menu")
         .test(CLEAR, RSHIFT, H).noerror();
@@ -11885,7 +11899,7 @@ void tests::constants_menu()
         .test(LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
     step("Undefined")
         .test(CLEAR, NOSHIFT, F5).expect("?")
-        .test(LSHIFT, F5).expect("Undefined");
+        .test(LSHIFT, F5).expect("'Undefined'");
     step("j")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("ⅉ")

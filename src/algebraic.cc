@@ -44,6 +44,7 @@
 #include "functions.h"
 #include "hwfp.h"
 #include "integer.h"
+#include "object.h"
 #include "parser.h"
 #include "range.h"
 #include "renderer.h"
@@ -534,6 +535,11 @@ static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
         x = +mapped;
         break;
     }
+    case object::ID_symbol:
+    case object::ID_local:
+        x = algebraic_p(+x)->evaluate();
+        return x && to_fraction_dispatch(x, ctx);
+
     case object::ID_constant:
         // Leave constants as is
         return true;
@@ -914,10 +920,12 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
         x = list_p(+x)->map(weak ? to_decimal_weak : to_decimal_strong);
         return x;
 
+    case ID_symbol:
+    case ID_local:
     case ID_expression:
         if (!unit::mode)
         {
-            expression_p eq = expression_p(+x);
+            algebraic_p eq = algebraic_p(+x);
             settings::SaveNumericalResults save(true);
             x = eq->evaluate();
             return x && !rt.error();
