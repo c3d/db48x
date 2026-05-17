@@ -286,7 +286,7 @@ struct runtime
     // ------------------------------------------------------------------------
 
 
-    text_p close_editor(bool convert = false, bool trailing_zero = true);
+    text_p close_editor(bool trailing_zero = true);
     // ------------------------------------------------------------------------
     //   Close the editor and encapsulate its content in a temporary string
     // ------------------------------------------------------------------------

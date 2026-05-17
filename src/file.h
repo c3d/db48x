@@ -74,7 +74,8 @@ struct file
     uint    rfind(unicode cp1, unicode cp2);
     cstring error(int err) const;
     cstring error() const;
-    cstring filename() const { return name; }
+    cstring filename() const    { return name; }
+    void    transliterate()     { xlate = true; }
 
     static bool    unlink(text_p path);
     static bool    unlink(cstring path);
@@ -91,6 +92,7 @@ protected:
     uint        closed;         // Position in file when closing
     file *      previous;       // Previous file to reopen when closing
     bool        writing;        // Should we reopen for writing
+    bool        xlate;          // Turn << into «, >> into » and -> into →
 };
 
 

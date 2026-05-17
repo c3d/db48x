@@ -369,7 +369,7 @@ object_p files::recall_source(text_p name) const
         // Loop on the input file and process it as if it was being typed
         uint bytes = 0;
         rt.clear();
-
+        prog.transliterate();
         for (unicode c = prog.get(); c; c = prog.get())
         {
             byte buffer[4];
@@ -383,7 +383,7 @@ object_p files::recall_source(text_p name) const
     size_t edlen = rt.editing();
     if (edlen)
     {
-        text_g edstr = rt.close_editor(true);
+        text_g edstr = rt.close_editor();
         if (edstr)
         {
             gcutf8 editor = edstr->value();
@@ -424,7 +424,7 @@ text_p files::recall_text(text_p name) const
     }
 
     // End of file: execute the command we typed
-    return rt.close_editor(true, false);
+    return rt.close_editor(false);
 }
 
 
@@ -476,7 +476,7 @@ list_p files::recall_list(text_p name, bool as_array) const
             nonsp++;
         if (sepok && (c == ',' || c == ';' || c == '\n'))
         {
-            text_p parsed = rt.close_editor(true, false);
+            text_p parsed = rt.close_editor(false);
             size_t len    = 0;
             utf8   txt    = parsed->value(&len);
             if (nonsp)

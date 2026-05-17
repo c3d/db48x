@@ -768,7 +768,7 @@ size_t runtime::remove(size_t offset, size_t len)
 }
 
 
-text_p runtime::close_editor(bool convert, bool trailing_zero)
+text_p runtime::close_editor(bool trailing_zero)
 // ----------------------------------------------------------------------------
 //   Close the editor and encapsulate its content into a string
 // ----------------------------------------------------------------------------
@@ -802,10 +802,6 @@ text_p runtime::close_editor(bool convert, bool trailing_zero)
 
     // We are no longer editing
     Editing = 0;
-
-    // Import special characters if necessary (importing text file)
-    if (convert)
-        obj = obj->import();
 
     // Return a pointer to a valid C string safely wrapped in a RPL string
     return obj;

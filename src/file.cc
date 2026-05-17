@@ -84,7 +84,7 @@ file::file()
 // ----------------------------------------------------------------------------
 //   Construct a file object
 // ----------------------------------------------------------------------------
-    : data(), name(), closed(), previous(nullptr)
+    : data(), name(), closed(), previous(nullptr), writing(), xlate()
 {}
 
 
@@ -288,6 +288,19 @@ unicode file::get()
     unicode code = valid() ? fgetc(data) : unicode(EOF);
     if (code == unicode(EOF))
         return 0;
+
+    if (xlate && (code == '<' || code == '>' || code == '-'))
+    {
+        uint    offs = ftell(data);
+        unicode next = valid() ? fgetc(data) : unicode(EOF);
+        if (code == '<' && next == '<')
+            return L'«';
+        else if (code == '>' && next == '>')
+            return L'»';
+        else if (code == '-' && next == '>')
+            return L'→';
+        seek(offs);
+    }
 
     if (code & 0x80)
     {

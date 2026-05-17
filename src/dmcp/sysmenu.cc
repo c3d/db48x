@@ -406,7 +406,7 @@ static int state_load_callback(cstring path, cstring name, void *data)
         // Loop on the input file and process it as if it was being typed
         size_t bytes = 0;
         rt.clear();
-
+        prog.transliterate();
         for (unicode c = prog.get(); c; c = prog.get())
         {
             byte buffer[4];
@@ -420,7 +420,7 @@ static int state_load_callback(cstring path, cstring name, void *data)
     size_t edlen = rt.editing();
     if (edlen)
     {
-        text_g edstr = rt.close_editor(true, false);
+        text_g edstr = rt.close_editor(false);
         if (edstr)
         {
             // Need to re-fetch editor length after text conversion
