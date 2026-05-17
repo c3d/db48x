@@ -659,7 +659,9 @@ src/dmcp/qspi_check.c: .buildid
 DEFINES_src/dmcp/qspi_check.c = BUILD_ID=$$($(TOP)tools/build_id)
 .goodbye: .show-buildid
 .buildid:
+	$(PRINT_COMMAND) $(INFO) "[BUILD]" "$(shell $(TOP)tools/build_id)"
 	@$(TOP)tools/build_id -u >/dev/null 2>&1 || true
+	@touch src/dmcp/qspi_check.c
 .show-buildid: .product
 	$(PRINT_COMMAND) $(INFO) "[BUILD ID]" "$(shell $(TOP)tools/build_id)"
 
@@ -672,7 +674,7 @@ QSPI_CRC  = src/$(MODEL)/qspi_crc.h
 
 .postbuild: $(PGM_FILE) $(QSPI_BIN) $(QSPI_HEX) $(FLASH_BIN) $(FLASH_HEX)
 
-$(PGM_FILE): $(FLASH_BIN)
+$(PGM_FILE): $(FLASH_BIN) | $(LOGS).mkdir
 	$(PRINT_GENERATE)$(INFO_NONL_CMD) "[SHA]" ; $(TOP)tools/add_pgm_chsum $< $@ | tee $(MIQ_BUILDLOG).sha1
 	$(PRINT_COMMAND) $(INFO_NONL_CMD) "[BYTES]"; echo $$(cat $@ | wc -c)
 	$(PRINT_COMMAND) $(INFO) "[SIZE]" "$(shell $(SIZE) $(ELF_FILE) | tail -1 | sed -e 's/^ //g')"
@@ -680,10 +682,10 @@ $(PGM_FILE): $(FLASH_BIN)
 $(FLASH_BIN): $(ELF_FILE)
 	$(PRINT_GENERATE) $(OBJCOPY) --remove-section .qspi -O binary $< $@
 
-$(QSPI_BIN): $(ELF_FILE) | $(CRCFIX) $(CRC32)
+$(QSPI_BIN): $(ELF_FILE) | $(LOGS).mkdir $(CRCFIX) $(CRC32)
 	$(PRINT_GENERATE) $(OBJCOPY) --only-section .qspi -O binary   $< $@
 	$(PRINT_COMMAND) $(INFO) "[PATCH CRC]" "$(QSPI_BIN)"; $(TOP)tools/adjust_crc $(CRCFIX) $(QSPI_BIN) > $(MIQ_BUILDLOG).crc
-	$(PRINT_COMMAND) $(INFO) "[CHECK CRC]" "$(QSPI_CRC)"; $(TOP)tools/check_qspi_crc "$(NAME)" "$@" "$(QSPI_CRC)" || ( echo "QSPI CRC changed, rebuilding" && $(MAKE) )
+	$(PRINT_COMMAND) $(INFO) "[CHECK CRC]" "$(QSPI_CRC)"; $(TOP)tools/check_qspi_crc "$(NAME)" "$@" "$(QSPI_CRC)" || ( echo "QSPI CRC changed, rebuilding" && $(MAKE) .postbuild )
 
 $(FLASH_HEX): $(ELF_FILE)
 	$(PRINT_GENERATE) $(OBJCOPY) --remove-section .qspi -O ihex   $< $@
