@@ -160,15 +160,18 @@ object::id command::lookup(utf8 name, size_t &maxlen, bool eq)
                     if (len <= max)
                     {
                         cmp = strncasecmp(cstring(cmd), cstring(name), len);
-                        if (cmp == 0 && at_end(name, max, cmd, len, eq))
-                        {
-                            if (uskip || xsq)
-                                return id(0);
-                            maxlen = len;
-                            return type;
-                        }
+
                         if (cmp == 0)
+                        {
+                            if (at_end(name, max, cmd, len, eq))
+                            {
+                                if (uskip || xsq)
+                                    return id(0);
+                                maxlen = len;
+                                return type;
+                            }
                             cmp = -1; // Logically equivalent to cmd ending in 0
+                        }
                     }
                     else
                     {
