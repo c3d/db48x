@@ -708,6 +708,8 @@ TAR_OPTS = $(TAR_OPTS_$(HOST_OS_NAME))
 TAR_OPTS_Darwin = --no-mac-metadata --no-fflags --no-xattrs --no-acls
 TAR_FILES = $(PGM_FILE)					\
 	    $(QSPI_BIN)					\
+	    $(TAR_EXTRA_FILES)
+TAR_EXTRA_FILES=	   				\
 	    keymap.bin					\
 	    help/$(NAME).md help/$(NAME).idx		\
 	    help/*.bmp help/*/*.bmp			\
