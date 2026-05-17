@@ -31,6 +31,10 @@ CONFIG += color
 
 include(db48x.pro)
 
+RESOURCES-=help-db48x.qrc
+RESOURCES+=help-db50x.qrc
+RESOURCES-=help/img.qrc
+RESOURCES+=help/img.qrc
 DEFINES-=HELPFILE_NAME=\\\"help/db48x.md\\\"
 DEFINES-=HELPINDEX_NAME=\\\"help/db48x.idx\\\"
 DEFINES+=HELPFILE_NAME=\\\"help/db50x.md\\\"

@@ -470,27 +470,31 @@ compares: compare color-compare
 # ------------------------------------------------------------------------------
 
 .prebuild: help/$(NAME).md help/$(NAME).idx
-help/$(NAME).md: $(HELP_SOURCES)
-	@mkdir -p help
-	@cat $^ | sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
-	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' \
-	    -e '/<!--- KEEP_IT --->/d' \
-	    -e '/<!--- !KEEP_IT --->/d' \
-	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' \
-	    -e 's/DB48X/$(PRODUCT_NAME)/g' \
-	    -e 's/db48x.md/$(NAME).md/g' \
-	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
-	@cp doc/*.png help/ 2>/dev/null || true
-	@mkdir -p help/img
-	@rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
 
-doc/8-menus-tree-dm42.md doc/8-menus-tree-dm32.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
-	python3 tools/gen-menu-doc.py --model dm42
-	python3 tools/gen-menu-doc.py --model dm32
+GENERATE_HELP_MD=					\
+	cat $^ |					\
+	sed -e '/<!--- $(HELP_MACHINE) --->/,/<!--- !$(HELP_MACHINE) --->/s/$(HELP_MACHINE)/KEEP_IT/g' \
+	    -e '/<!--- DM.* --->/,/<!--- !DM.* --->/d' 	\
+	    -e '/<!--- KEEP_IT --->/d' 			\
+	    -e '/<!--- !KEEP_IT --->/d' 		\
+	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' 	\
+	    -e 's/DB48X/$(PRODUCT_NAME)/g'	 	\
+	    -e 's/db48x.md/$(NAME).md/g' 		\
+	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
+
+help/$(NAME).md: $(HELP_SOURCES)
+	$(PRINT_COMMAND) mkdir -p help
+	$(PRINT_GENERATE) $(GENERATE_HELP_MD)
+	$(PRINT_COMMAND) cp doc/*.png help/ 2>/dev/null || true
+	$(PRINT_COMMAND) mkdir -p help/img
+	$(PRINT_COMMAND) rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
+
+doc/8-menus-tree-%.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
+	$(PRINT_GENERATE) python3 tools/gen-menu-doc.py --model $*
 
 help/$(NAME).idx: help/$(NAME).md
-	@grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
-	@[ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
+	$(PRINT_GENERATE) grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
+	$(PRINT_COMMAND) [ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
 
 
 # ------------------------------------------------------------------------------
@@ -507,7 +511,7 @@ QMAKEFILE=sim/$(NAME)-$(KIND)-$(TARGET).mak
 QRC_FILES=		sim/config.qrc		\
 			sim/state.qrc		\
 			sim/library.qrc		\
-			sim/help.qrc		\
+			sim/help-$(NAME).qrc	\
 			sim/help/img.qrc
 
 # Build Qt simulator directly with qmake
@@ -533,6 +537,19 @@ $(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)	\
 		UI_DIR=$(abspath $(MIQ_OBJDIR))
 
 # Generation of Qt resource files
+sim/help-$(NAME).qrc: help/$(NAME).md help/$(NAME).idx
+sim/help-$(NAME).qrc: $(MIQ_MAKEDEPS)
+	$(PRINT_GENERATE) (echo '<RCC>';				\
+	 echo ' <qresource prefix="/help">';				\
+	 for I in $(NAME).md $(NAME).idx; do				\
+		J=$$(basename $$I);					\
+		echo '  <file alias="'$$J'">../help/'$$J'</file>';	\
+	 done;								\
+	 echo ' </qresource>';						\
+	 echo '</RCC>')							\
+	> $@
+
+
 sim/%.qrc: $(MIQ_MAKEDEPS)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) (echo '<RCC>';			\
@@ -545,7 +562,6 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	 echo '</RCC>')						\
 	> $@
 
-sim/help.qrc: help/$(NAME).md help/$(NAME).idx
 
 QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx

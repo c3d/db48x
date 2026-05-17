@@ -109,7 +109,7 @@ RESOURCES +=                    \
         config.qrc              \
         state.qrc 		\
 	library.qrc             \
-	help.qrc		\
+	help-db48x.qrc		\
 	help/img.qrc
 
 
