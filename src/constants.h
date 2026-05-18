@@ -133,6 +133,7 @@ struct constant : algebraic
         return val;
     }
     algebraic_p numerical_value() const;
+    algebraic_p range() const;
     uint value_index() const
     {
         switch (type())
@@ -219,6 +220,7 @@ public:
 // Special entries to get a named constant or its value
 SPECIAL_MENU_DECLARE(constant_menu_name);
 SPECIAL_MENU_DECLARE(constant_menu_value);
+SPECIAL_MENU_DECLARE(constant_menu_range);
 
 #define ID(i)
 #define CONSTANT_MENU(ConstantMenu)     struct ConstantMenu : constant_menu {};
@@ -230,6 +232,7 @@ COMMAND_DECLARE(Infinity, 0);
 COMMAND_DECLARE(NegativeInfinity, 0);
 COMMAND_DECLARE(ConstantName,1);
 COMMAND_DECLARE(ConstantValue,1);
+COMMAND_DECLARE(ConstantRange,1);
 COMMAND_DECLARE(Const, 1);
 COMMAND_DECLARE(StandardUncertainty, 1);
 COMMAND_DECLARE(RelativeUncertainty, 1);

@@ -11304,7 +11304,7 @@ void tests::graphic_stack_rendering()
 
     step("Constants")
         .test(CLEAR, LSHIFT, I, F2, F1, F2, F3)
-        .image_noheader("constants", 2);
+        .image_noheader("constants", 3);
 
     step("Vector")
         .test(CLEAR, LSHIFT, KEY9, "1 2 3", ENTER, EXIT)
@@ -11674,9 +11674,20 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_PartsMenu, F6, ID_ConstantValue)
         .expect("299 792 458 m/s");
-    step("Check constant value from command line")
-        .test(CLEAR, "Ⓒc CONSTANTVALUE", ENTER)
-        .expect("299 792 458 m/s");
+    step("Check constant range from menu")
+        .test(CLEAR, "Ⓒc", ENTER)
+        .expect("c")
+        .test(ID_PartsMenu, F6, ID_ConstantRange)
+        .expect("299 792 458±0 m/s");
+    step("Check G constant value from command line")
+        .test(CLEAR, "ⒸG CONSTANTVALUE", ENTER)
+        .expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)");
+    step("Check G constant name from command line")
+        .test(CLEAR, "ⒸG CONSTANTNAME", ENTER)
+        .expect("\"G\"");
+    step("Check G constant range from command line")
+        .test(CLEAR, "ⒸG CONSTANTRANGE", ENTER)
+        .expect("6.6743⁳⁻¹¹±1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
     step("Insert constant from constants menu")
         .test(CLEAR, ID_ConstantsMenu, RSHIFT, F1, "c", ENTER)
         .expect("c")

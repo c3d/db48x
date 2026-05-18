@@ -154,6 +154,55 @@ algebraic_p constant::numerical_value() const
 }
 
 
+algebraic_p constant::range() const
+// ----------------------------------------------------------------------------
+//   Evaluate a constant as a range
+// ----------------------------------------------------------------------------
+{
+    save<bool> nodates(unit::nodates, true);
+    if (algebraic_g value = specification())
+    {
+        algebraic_g uncertainty;
+        if (array_p spec = value->as<array>())
+        {
+            if (object_p obj = spec->at(0))
+                if (algebraic_p alg = obj->as_extended_algebraic())
+                    value = alg;
+            if (object_p obj = spec->at(1))
+                if (algebraic_p alg = obj->as_extended_algebraic())
+                    uncertainty = alg;
+        }
+        if (value)
+            to_decimal(value, true);
+        if (uncertainty)
+            to_decimal(uncertainty, true);
+
+        algebraic_g uexpr;
+        if (unit_g uval = unit::get(value))
+        {
+            uexpr = uval->uexpr();
+            if (!uval->convert(uncertainty))
+                return nullptr;
+            unit_g uunc = unit::get(uncertainty);
+            if (!uunc)
+                return nullptr;
+            value = uval->value();
+            uncertainty = uunc->value();
+        }
+        if (value && uncertainty)
+        {
+            if (range::adjust_input(ID_drange, value, uncertainty))
+                if (range_p range = range::make(ID_drange, value, uncertainty))
+                    value = range;
+            if (uexpr && value)
+                value = unit::make(value, uexpr);
+        }
+        return value;
+    }
+    return nullptr;
+}
+
+
 MENU_BODY(constant_menu)
 // ----------------------------------------------------------------------------
 //   Build a constants menu
@@ -251,6 +300,47 @@ INSERT_BODY(constant_menu_value)
 
 
 HELP_BODY(constant_menu_value)
+// ----------------------------------------------------------------------------
+//   Put the help for a given constant name
+// ----------------------------------------------------------------------------
+{
+    return constant_menu_name::do_help(nullptr);
+}
+
+
+EVAL_BODY(constant_menu_range)
+// ----------------------------------------------------------------------------
+//   Put the value of a constant on the stack
+// ----------------------------------------------------------------------------
+{
+    rt.command(static_object(ID_ConstantRange));
+    int key = ui.evaluating;
+    if (object_p cstobj = constant::do_key(constant::constants, key))
+        if (constant_p cst = cstobj->as<constant>())
+            if (algebraic_p range = cst->range())
+                if (rt.push(range))
+                    return OK;
+    if (!rt.error())
+        rt.type_error();
+    return ERROR;
+}
+
+
+INSERT_BODY(constant_menu_range)
+// ----------------------------------------------------------------------------
+//   Insert the range associated to a constant
+// ----------------------------------------------------------------------------
+{
+    int key = ui.evaluating;
+    if (object_p cstobj = constant::do_key(constant::constants, key))
+        if (constant_p cst = cstobj->as<constant>())
+            if (object_p range = cst->range())
+                return ui.insert_object(range, " ", " ");
+    return ERROR;
+}
+
+
+HELP_BODY(constant_menu_range)
 // ----------------------------------------------------------------------------
 //   Put the help for a given constant name
 // ----------------------------------------------------------------------------
@@ -402,6 +492,23 @@ COMMAND_BODY(ConstantValue)
             if (rt.top(value))
                 return OK;
     }
+    return ERROR;
+}
+
+
+COMMAND_BODY(ConstantRange)
+// ----------------------------------------------------------------------------
+//   Put the range associated to a constant on the stack
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (constant_p cst = obj->as<constant>())
+            if (algebraic_p value = cst->range())
+                if (rt.top(value))
+                    return OK;
+
+    if (!rt.error())
+        rt.type_error();
     return ERROR;
 }
 
@@ -2569,7 +2676,7 @@ const constant::config constant::constants =
     .last_menu     = ID_ConstantsMenu99,
     .name          = ID_constant_menu_name,
     .value         = ID_constant_menu_value,
-    .command       = ID_object,
+    .command       = ID_constant_menu_range,
     .file          = "config/constants.csv",
     .library       = "library",
     .builtins      = basic_constants,
@@ -3485,7 +3592,7 @@ const constant::config standard_uncertainty::standard =
     .last_menu      = ID_ConstantsMenu99,
     .name           = ID_constant_menu_name,
     .value          = ID_constant_menu_value,
-    .command        = ID_object,
+    .command        = ID_constant_menu_range,
     .file           = "config/constants.csv",
     .library        = "library",
     .builtins       = basic_constants,
