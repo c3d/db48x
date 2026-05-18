@@ -7634,7 +7634,7 @@ void debug_printf(cstring format, ...)
         vsnprintf(buffer + sz, sizeof(buffer) - sz, format, va);
         va_end(va);
         size  h = HelpFont->height();
-        coord y = (debug_printf_row % 8 + 2) * h;
+        coord y = (debug_printf_row % 12) * h;
         coord x = Screen.text(0, y, utf8(buffer), HelpFont,
                               pattern::white, pattern::black);
         Screen.fill(x, y, x+10, y + HelpFont->height(), pattern::gray50);
