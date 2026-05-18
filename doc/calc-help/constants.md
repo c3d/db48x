@@ -860,23 +860,31 @@ the universe during the Big Bang when quantum gravity effects became
 dominant. Its value depends on the measured value of the gravitational
 constant `G`. [CODATA](#codata)
 
-### qpl — Planck charge
+### qpl constant
+
+Planck charge
 
 The Planck charge unit is the natural unit of electric charge in Planck units,
 defined as `qpl=√(4π·ε₀·ℏ·c)`. Its value depends on the vacuum permittivity `ε₀`. [CODATA](#codata)
 
-### ppl — Planck momentum
+### ppl constant
+
+Planck momentum
 
 The Planck momentum unit is the natural unit of momentum in Planck units, defined
 as `ppl=√(ℏ·c³/G)`. Its value depends on the gravitational constant `G`. [CODATA](#codata)
 
-### Fpl — Planck force
+### Fpl constant
+
+Planck force
 
 The Planck force unit is the natural unit of force in Planck units, defined as
 `Fpl=c⁴/G`. It is the maximum force postulated in general relativity. Its value
 depends on the gravitational constant `G`. [CODATA](#codata)
 
-### ρvpl — Planck density
+### ρvpl constant
+
+Planck density
 
 The Planck density unit is the natural unit of density in Planck units, defined
 as `ρvpl=c⁵/(ℏ·G²)`. Its value depends on the gravitational constant `G`. [CODATA](#codata)
@@ -895,82 +903,112 @@ measured value of the Rydberg constant `R∞`. [CODATA](#codata)
 
 ## Mercury ☿
 
-### GM☿ — Mercury gravitational parameter
+### GM☿ constant
+
+Mercury gravitational parameter
 
 It is measured by radio tracking of spacecraft (Mariner 10, MESSENGER). [Reference 4](#reference-4)
 
-### Req☿ — Mercury equatorial radius
+### Req☿ constant
+
+Mercury equatorial radius
 
 It is measured by radar altimetry and spacecraft imaging. [Reference 22](#reference-22)
 
-### Rp☿ — Mercury polar radius
+### Rp☿ constant
+
+Mercury polar radius
 
 Mercury's polar radius is also measured, since Mercury being essentially
 spherical; equatorial and polar radii are equal within measurement precision. [Reference 22](#reference-22)
 
-### f☿ — Mercury oblateness
+### f☿ constant
+
+Mercury oblateness
 
 Mercury's oblateness is calculated from its equatorial and polar radii measurement.
 Due to Mercury's near-spherical shape, this value is effectively zero. [Reference 22](#reference-22)
 
-### ρv☿ — Mercury mean density
+### ρv☿ constant
+
+Mercury mean density
 
 It is calculated from measurement of its gravitational parameter and volume.
 Its high density indicates a large metallic core. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g☿ — Mercury surface gravity
+### g☿ constant
+
+Mercury surface gravity
 
 It is calculated from measurement of `GM☿` and the equatorial radius
 `Req☿`. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve☿ — Mercury escape velocity
+### Ve☿ constant
+
+Mercury escape velocity
 
 Mercury's escape velocity at the equatorial surface is calculated from
 measured quantities. It is the minimum speed needed to break free from
 Mercury's gravitational pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot☿ — Mercury sidereal rotation period
+### Prot☿ constant
+
+Mercury sidereal rotation period
 
 Mercury's sidereal rotation period is a measured quantity. It is the true time
 it takes to spin 360° on its axis. Mercury is in a 3:2 spin-orbit resonance with
 the Sun, rotating three times for every two orbits. [Reference 22](#reference-22)
 
-### ϵ☿ — Mercury axial tilt
+### ϵ☿ constant
+
+Mercury axial tilt
 
 Mercury's axial tilt (obliquity) is measured from spacecraft observations.
 The nearly zero value is consistent with its spin-orbit resonance. It is the
 angle of the planet's rotational axis relative to its orbital plane. [Reference 22](#reference-22)
 
-### a☿ — Mercury semi-major axis
+### a☿ constant
+
+Mercury semi-major axis
 
 Mercury's orbital semi-major axis is a measured quantity. It is half the length
 of the longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e☿ — Mercury orbital eccentricity
+### e☿ constant
+
+Mercury orbital eccentricity
 
 Mercury's orbital eccentricity is a measured quantity, it is the largest of
 all major planets. When different from 0, it is a measure of how much a
 planet's elliptical path deviates from a perfect circle. [Reference 23](#reference-23)
 
-### i☿ — Mercury orbital inclination
+### i☿ constant
+
+Mercury orbital inclination
 
 Mercury's orbital inclination with respect to the ecliptic plane is a measured
 angle. [Reference 23](#reference-23)
 
-### Ω☿ — Mercury longitude of ascending node
+### Ω☿ constant
+
+Mercury longitude of ascending node
 
 Mercury's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Mercury crosses
 northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω☿ — Mercury argument of perihelion
+### ω☿ constant
+
+Mercury argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀☿ — Mercury last perihelion passage
+### T₀☿ constant
+
+Mercury last perihelion passage
 
 Mercury's most recent time of perihelion passage is a measured quantity.
 Mercury passes perihelion approximately four times per year. Value in JDN
@@ -980,81 +1018,111 @@ orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 ## Venus ♀
 
-### GM♀ — Venus gravitational parameter
+### GM♀ constant
+
+Venus gravitational parameter
 
 Venus's gravitational parameter, measured by radio tracking of spacecraft
 (Magellan, Venus Express). [Reference 4](#reference-4)
 
-### Req♀ — Venus equatorial radius
+### Req♀ constant
+
+Venus equatorial radius
 
 Venus's equatorial radius is a measured quantity. Venus is essentially spherical.
 [Reference 22](#reference-22)
 
-### Rp♀ — Venus polar radius
+### Rp♀ constant
+
+Venus polar radius
 
 Venus's polar radius is a measured quantity, essentially equal to the equatorial
 radius. [Reference 22](#reference-22)
 
-### f♀ — Venus oblateness
+### f♀ constant
+
+Venus oblateness
 
 Venus's oblateness obtained from measurement is effectively zero given its near-
 spherical shape. [Reference 22](#reference-22)
 
-### ρv♀ — Venus mean density
+### ρv♀ constant
+
+Venus mean density
 
 Venus's mean density, calculated from measurement of its gravitational parameter and
 volume. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g♀ — Venus surface gravity
+### g♀ constant
+
+Venus surface gravity
 
 Venus's surface gravity is calculated from measurement of `GM♀` and `Req♀`.
 [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve♀ — Venus escape velocity
+### Ve♀ constant
+
+Venus escape velocity
 
 Venus's escape velocity at the equatorial surface is calculated from measured
 quantities. It is the minimum speed needed to break free from Venus’s gravitational
 pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot♀ — Venus sidereal rotation period
+### Prot♀ constant
+
+Venus sidereal rotation period
 
 Measured. Venus's sidereal rotation period is the true time it takes to spin 360°
 on its axis. Venus rotates retrograde (opposite to its orbital motion), with a
 rotation period longer than its orbital period. [Reference 22](#reference-22)
 
-### ϵ♀ — Venus axial tilt
+### ϵ♀ constant
+
+Venus axial tilt
 
 Measured. Venus's axial tilt. The near-180° value reflects its retrograde rotation.
 It is the angle of the planet's rotational axis relative to its orbital plane. [Reference 22](#reference-22)
 
-### a♀ — Venus semi-major axis
+### a♀ constant
+
+Venus semi-major axis
 
 Measured. Venus's orbital semi-major axis is half the length of the longest
 diameter of the elliptical orbit, which is also the average distance from one
 of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♀ — Venus orbital eccentricity
+### e♀ constant
+
+Venus orbital eccentricity
 
 Measured. Venus's orbital eccentricity, nearly circular (therefore, near 0). [Reference 23](#reference-23)
 
-### i♀ — Venus orbital inclination
+### i♀ constant
+
+Venus orbital inclination
 
 Venus's orbital inclination with respect to the ecliptic plane is a measured angle.
 [Reference 23](#reference-23)
 
-### Ω♀ — Venus longitude of ascending node
+### Ω♀ constant
+
+Venus longitude of ascending node
 
 Venus's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Venus crosses northward
 through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♀ — Venus argument of perihelion
+### ω♀ constant
+
+Venus argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the Sun),
 measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♀ — Venus last perihelion passage
+### T₀♀ constant
+
+Venus last perihelion passage
 
 Measured. Venus's most recent time of perihelion passage. Venus passes perihelion
 approximately twice per year. Value in JDN. It is the most recent point in its
@@ -1063,85 +1131,117 @@ orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 ## Earth ♁
 
-### GM♁ — Earth gravitational parameter
+### GM♁ constant
+
+Earth gravitational parameter
 
 Exact nominal value (IAU 2015). Earth's gravitational parameter. An exact nominal
 value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Req♁ — Earth equatorial radius
+### Req♁ constant
+
+Earth equatorial radius
 
 Exact nominal value (IAU 2015). Earth's equatorial radius. An exact nominal value
 defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Rp♁ — Earth polar radius
+### Rp♁ constant
+
+Earth polar radius
 
 Exact nominal value (IAU 2015). Earth's polar radius. An exact nominal value
 defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### f♁ — Earth oblateness
+### f♁ constant
+
+Earth oblateness
 
 Calculated from nominal value. Earth's oblateness, reflecting its equatorial
 bulge due to rotation. Calculated from `Req♁` and `Rp♁`. When greater than 0, it
 describes how much a celestial body deviates from a perfect sphere, forming an
 "oblate spheroid". [Particle Data Group 2023](#particle-data-group-2023)
 
-### ρv♁ — Earth mean density
+### ρv♁ constant
+
+Earth mean density
 
 Calculated from nominal value. Earth's mean density, calculated from its gravitational
 parameter and volume. [Particle Data Group 2023](#particle-data-group-2023)
 
-### g♁ — Earth surface gravity
+### g♁ constant
+
+Earth surface gravity
 
 Calculated from nominal value. Earth's surface gravity at the equator, calculated
 from `GM♁` and `Req♁`. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Ve♁ — Earth escape velocity
+### Ve♁ constant
+
+Earth escape velocity
 
 Calculated from nominal value, it is valid at the equatorial surface. It is the
 minimum speed needed to break free from Earth's gravitational pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Prot♁ — Earth sidereal rotation period
+### Prot♁ constant
+
+Earth sidereal rotation period
 
 Measured. Earth's sidereal rotation period (one sidereal day), the time for one
 rotation relative to the fixed stars. [Reference 24](#reference-24)
 
-### ϵ♁ — Earth axial tilt
+### ϵ♁ constant
+
+Earth axial tilt
 
 Measured. Earth's axial tilt (obliquity of the ecliptic), the primary driver of the
 seasons. It is the angle of the planet's rotational axis relative to its orbital plane.
 [Reference 24](#reference-24)
 
-### a♁ — Earth semi-major axis
+### a♁ constant
+
+Earth semi-major axis
 
 Exact nominal value (1 AU by definition). Earth's orbital semi-major axis, defined
 as exactly 1 astronomical unit (AU). It is half the length of the longest diameter
 of the elliptical orbit, which is also the average distance from one of the radii
 to the orbit. [Particle Data Group 2023](#particle-data-group-2023)
 
-### e♁ — Earth orbital eccentricity
+### e♁ constant
+
+Earth orbital eccentricity
 
 Measured. Earth's orbital eccentricity (low since the orbit is nearly circular) . [Reference 23](#reference-23)
 
-### i♁ — Earth orbital inclination
+### i♁ constant
 
-Measured (reference plane — near zero relative to the J2000.0 ecliptic plane).
+Earth orbital inclination
+
+Measured (reference plane constant
+
+near zero relative to the J2000.0 ecliptic plane).
 The Earth's orbital inclination is often defined by convention with respect to
 the reference plane (effectively zero) as being the ecliptic plane (in such case
 this angle is zero). [Reference 23](#reference-23)
 
-### Ω♁ — Earth longitude of ascending node
+### Ω♁ constant
+
+Earth longitude of ascending node
 
 Earth’s longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where the Earth crosses
 northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♁ — Earth argument of perihelion
+### ω♁ constant
+
+Earth argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♁ — Earth perihelion passage
+### T₀♁ constant
+
+Earth perihelion passage
 
 Measured. Earth's most recent time of perihelion passage (early January each
 year). Value in JDN. It is the most recent point in its orbit when it was
@@ -1150,83 +1250,113 @@ closest to the Sun. [Materials 20](#materials-20)
 
 ## Moon ☽
 
-### GM☽ — Moon gravitational parameter
+### GM☽ constant
+
+Moon gravitational parameter
 
 Measured. Moon's gravitational parameter, measured by lunar laser ranging
 and spacecraft radio tracking. [Reference 4](#reference-4)
 
-### Req☽ — Moon equatorial radius
+### Req☽ constant
+
+Moon equatorial radius
 
 Measured. Moon's equatorial radius, measured by laser altimetry (LRO mission). [Reference 22](#reference-22)
 
-### Rp☽ — Moon polar radius
+### Rp☽ constant
+
+Moon polar radius
 
 Measured. Moon's polar radius. [Reference 22](#reference-22)
 
-### f☽ — Moon oblateness
+### f☽ constant
+
+Moon oblateness
 
 Calculated from measurement. Moon's oblateness, reflecting its slight equatorial
 bulge. Calculated from `Req☽` and `Rp☽`. When greater than 0, it describes how
 much a celestial body deviates from a perfect sphere, forming an "oblate spheroid".
 [Reference 22](#reference-22)
 
-### ρv☽ — Moon mean density
+### ρv☽ constant
+
+Moon mean density
 
 Calculated from measurement. Moon's mean density, reflecting its predominantly
 silicate composition with a small iron core. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g☽ — Moon surface gravity
+### g☽ constant
+
+Moon surface gravity
 
 Calculated from measurement. Moon's surface gravity, approximately one sixth
 of Earth's. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve☽ — Moon escape velocity
+### Ve☽ constant
+
+Moon escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface. It is
 the minimum speed needed to break free from Moon's gravitational pull and
 never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot☽ — Moon sidereal rotation period
+### Prot☽ constant
+
+Moon sidereal rotation period
 
 Measured. Moon's sidereal rotation period is the true time it takes to spin
 360° on its axis. The Moon is tidally locked to Earth, so its rotation period
 equals its orbital period. [Reference 22](#reference-22)
 
-### ϵ☽ — Moon axial tilt
+### ϵ☽ constant
+
+Moon axial tilt
 
 Measured. Moon's axial tilt is the angle of the planet's rotational axis
 relative to its orbital plane. [Reference 22](#reference-22)
 
-### a☽ — Moon semi-major axis
+### a☽ constant
+
+Moon semi-major axis
 
 Measured. Moon's orbital semi-major axis (mean Earth-Moon distance). It is half
 the length of the longest diameter of the elliptical orbit, which is also the
 average distance from one of the radii to the orbit. [Reference 25](#reference-25)
 
-### e☽ — Moon orbital eccentricity
+### e☽ constant
+
+Moon orbital eccentricity
 
 Measured. Moon's orbital eccentricity. The Moon's elliptical orbit causes
 noticeable variation in its apparent size (supermoon and micromoon effects).
 When different from 0, it is a measure of how much the moon's elliptical path
 deviates from a perfect circle. [Reference 25](#reference-25)
 
-### i☽ — Moon orbital inclination
+### i☽ constant
+
+Moon orbital inclination
 
 Moon's orbital inclination is a measured angle with respect to the ecliptic
 plane. [Reference 25](#reference-25)
 
-### Ω☽ — Moon longitude of ascending node
+### Ω☽ constant
+
+Moon longitude of ascending node
 
 Moon's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where the Moon crosses
 northward through Earth's orbital plane.. [Reference 25](#reference-25)
 
-### ω☽ — Moon argument of perigee
+### ω☽ constant
+
+Moon argument of perigee
 
 Measured. Moon's argument of perigee. It is the most recent point in its
 orbit when it was closest to the Earth. [Reference 25](#reference-25)
 
-### T₀☽ — Moon perigee passage
+### T₀☽ constant
+
+Moon perigee passage
 
 Calculated from measurement (Meeus ch.50, ±1 hour). See MPERC.txt. Moon's
 most recent time of perigee passage (closest approach to Earth). The perigee
@@ -1236,80 +1366,110 @@ recurs approximately every 27.55 days. Computed using the Meeus algorithm
 
 ## Mars ♂
 
-### GM♂ — Mars gravitational parameter
+### GM♂ constant
+
+Mars gravitational parameter
 
 Measured. Mars system gravitational parameter, including the contribution of
 its moons Phobos and Deimos, measured by spacecraft radio tracking. [Reference 4](#reference-4)
 
-### Req♂ — Mars equatorial radius
+### Req♂ constant
+
+Mars equatorial radius
 
 Measured. Mars's equatorial radius. [Reference 22](#reference-22)
 
-### Rp♂ — Mars polar radius
+### Rp♂ constant
+
+Mars polar radius
 
 Measured. Mars's polar radius. Mars is noticeably oblate due to its rotation. [Reference 22](#reference-22)
 
-### f♂ — Mars oblateness
+### f♂ constant
+
+Mars oblateness
 
 Calculated from measurement. When greater than 0, it describes how much a
 celestial body deviates from a perfect sphere, forming an "oblate spheroid". [Reference 22](#reference-22)
 
-### ρv♂ — Mars mean density
+### ρv♂ constant
+
+Mars mean density
 
 Calculated from measurement. Mars's mean density, intermediate between rocky
 and metallic compositions. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g♂ — Mars surface gravity
+### g♂ constant
+
+Mars surface gravity
 
 Calculated from measurement. Mars's surface gravity, approximately 38% of
 Earth's. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve♂ — Mars escape velocity
+### Ve♂ constant
+
+Mars escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface. It is the
 minimum speed needed to break free from Mars's gravitational pull and never
 return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot♂ — Mars sidereal rotation period
+### Prot♂ constant
+
+Mars sidereal rotation period
 
 Measured. Mars's sidereal rotation period is the true time it takes to spin
 360° on its axis. A Martian day (sol) is very similar in length to an Earth day.
 [Reference 22](#reference-22)
 
-### ϵ♂ — Mars axial tilt
+### ϵ♂ constant
+
+Mars axial tilt
 Measured. Mars's axial tilt, similar to Earth's, gives Mars comparable
 seasonal variations. It is the angle of the planet's rotational axis
 relative to its orbital plane. [Reference 22](#reference-22)
 
-### a♂ — Mars semi-major axis
+### a♂ constant
+
+Mars semi-major axis
 
 Measured. Mars's orbital semi-major axis is half the length of the longest
 diameter of the elliptical orbit, which is also the average distance from
 one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♂ — Mars orbital eccentricity
+### e♂ constant
+
+Mars orbital eccentricity
 
 Measured. Mars's orbital eccentricity, significantly larger than Earth's.
 When different from 0, it is a measure of how much a planet's elliptical
 path deviates from a perfect circle. [Reference 23](#reference-23)
 
-### i♂ — Mars orbital inclination
+### i♂ constant
+
+Mars orbital inclination
 
 Mars's orbital inclination is a measured angle with respect to the ecliptic
 plane. [Reference 23](#reference-23)
 
-### Ω♂ — Mars longitude of ascending node
+### Ω♂ constant
+
+Mars longitude of ascending node
 Mars's longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where Mars crosses
 northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♂ — Mars argument of perihelion
+### ω♂ constant
+
+Mars argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♂ — Mars perihelion passage
+### T₀♂ constant
+
+Mars perihelion passage
 
 Measured. Mars's most recent time of perihelion passage. Mars's orbital
 period is approximately 1.88 years. Value in JDN. It is the most recent point
@@ -1318,86 +1478,116 @@ in its orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 ## Jupiter ♃
 
-### GM♃ — Jupiter gravitational parameter
+### GM♃ constant
+
+Jupiter gravitational parameter
 
 Exact nominal value (IAU 2015). Jupiter system gravitational parameter.
 An exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Req♃ — Jupiter equatorial radius
+### Req♃ constant
+
+Jupiter equatorial radius
 
 Exact nominal value (IAU 2015). Jupiter's equatorial radius. An exact
 nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Rp♃ — Jupiter polar radius
+### Rp♃ constant
+
+Jupiter polar radius
 
 Exact nominal value (IAU 2015). Jupiter's polar radius. An exact nominal
 value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### f♃ — Jupiter oblateness
+### f♃ constant
+
+Jupiter oblateness
 
 Calculated from nominal value. It is the largest of any planet due to its
 rapid rotation and gaseous composition. When greater than 0, it describes
 how much a celestial body deviates from a perfect sphere, forming an
 "oblate spheroid". [Particle Data Group 2023](#particle-data-group-2023)
 
-### ρv♃ — Jupiter mean density
+### ρv♃ constant
+
+Jupiter mean density
 
 Calculated from nominal value. Jupiter's mean density, lower than water
 due to its gaseous composition. [Particle Data Group 2023](#particle-data-group-2023)
 
-### g♃ — Jupiter surface gravity
+### g♃ constant
+
+Jupiter surface gravity
 
 Calculated from nominal value. Jupiter's surface gravity at the 1-bar
 pressure level. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Ve♃ — Jupiter escape velocity
+### Ve♃ constant
+
+Jupiter escape velocity
 
 Calculated from nominal value, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Jupiter's gravitational
 pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Prot♃ — Jupiter sidereal rotation period
+### Prot♃ constant
+
+Jupiter sidereal rotation period
 
 Measured. Jupiter's sidereal rotation period is the true time it takes to
 spin 360° on its axis (System III, based on radio emissions from its
 magnetosphere). [Reference 22](#reference-22)
 
-### ϵ♃ — Jupiter axial tilt
+### ϵ♃ constant
+
+Jupiter axial tilt
 
 Measured. Jupiter's axial tilt is the angle of the planet's rotational
 axis relative to its orbital plane. It is very small compared to Earth's.
 [Reference 22](#reference-22)
 
-### a♃ — Jupiter semi-major axis
+### a♃ constant
+
+Jupiter semi-major axis
 
 Measured. Jupiter's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♃ — Jupiter orbital eccentricity
+### e♃ constant
+
+Jupiter orbital eccentricity
 
 Measured. Jupiter's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
 perfect circle. [Reference 23](#reference-23)
 
-### i♃ — Jupiter orbital inclination
+### i♃ constant
+
+Jupiter orbital inclination
 
 Jupiter's orbital inclination is a measured angle with respect to the
 ecliptic plane. [Reference 23](#reference-23)
 
-### Ω♃ — Jupiter longitude of ascending node
+### Ω♃ constant
+
+Jupiter longitude of ascending node
 
 Jupiter's longitude of the ascending node is a measured angle
 quantifying the horizontal orientation of the orbit. It represents
 where Jupiter crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♃ — Jupiter argument of perihelion
+### ω♃ constant
+
+Jupiter argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♃ — Jupiter perihelion passage
+### T₀♃ constant
+
+Jupiter perihelion passage
 
 Measured. Jupiter's most recent time of perihelion passage. Jupiter's
 orbital period is approximately 11.86 years. It is the most recent point
@@ -1406,83 +1596,115 @@ in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#refere
 
 ## Saturn ♄
 
-### GM♄ — Saturn gravitational parameter
+### GM♄ constant
+
+Saturn gravitational parameter
 
 Measured. Saturn system gravitational parameter, measured by radio
 tracking of the Cassini spacecraft. [Reference 4](#reference-4)
 
-### Req♄ — Saturn equatorial radius
+### Req♄ constant
+
+Saturn equatorial radius
 
 Measured. Saturn's equatorial radius at the 1-bar pressure level. [Reference 22](#reference-22)
 
-### Rp♄ — Saturn polar radius
+### Rp♄ constant
+
+Saturn polar radius
 
 Measured. Saturn's polar radius at the 1-bar pressure level. [Reference 22](#reference-22)
 
-### f♄ — Saturn oblateness
+### f♄ constant
+
+Saturn oblateness
 
 Calculated from measurement. It is the second largest of any planet.
 When greater than 0, it describes how much a celestial body deviates
 from a perfect sphere, forming an "oblate spheroid". [Reference 22](#reference-22)
 
-### ρv♄ — Saturn mean density
+### ρv♄ constant
+
+Saturn mean density
 
 Calculated from measurement. Saturn's mean density, the lowest of any
-planet — less than that of water. [Reference 4](#reference-4) [Reference 22](#reference-22)
+planet constant
 
-### g♄ — Saturn surface gravity
+less than that of water. [Reference 4](#reference-4) [Reference 22](#reference-22)
+
+### g♄ constant
+
+Saturn surface gravity
 
 Calculated from measurement. Saturn's surface gravity at the 1-bar
 pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve♄ — Saturn escape velocity
+### Ve♄ constant
+
+Saturn escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Saturn's gravitational
 pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot♄ — Saturn sidereal rotation period
+### Prot♄ constant
+
+Saturn sidereal rotation period
 
 Measured. Saturn's sidereal rotation period is the true time it takes
 to spin 360° on its axis (System III, based on Cassini radio
 measurements). [Reference 22](#reference-22)
 
-### ϵ♄ — Saturn axial tilt
+### ϵ♄ constant
+
+Saturn axial tilt
 
 Measured. Saturn's axial tilt, which causes its rings to appear at
 varying angles from Earth, It is the angle of the planet's rotational
 axis relative to its orbital plane.. [Reference 22](#reference-22)
 
-### a♄ — Saturn semi-major axis
+### a♄ constant
+
+Saturn semi-major axis
 
 Measured. Saturn's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♄ — Saturn orbital eccentricity
+### e♄ constant
+
+Saturn orbital eccentricity
 
 Measured. Saturn's orbital eccentricity. When different from 0, it is
 a measure of how much a planet's elliptical path deviates from a perfect
 circle. [Reference 23](#reference-23)
 
-### i♄ — Saturn orbital inclination
+### i♄ constant
+
+Saturn orbital inclination
 
 Saturn's orbital inclination is a measured angle with respect to the
 ecliptic plane. [Reference 23](#reference-23)
 
-### Ω♄ — Saturn longitude of ascending node
+### Ω♄ constant
+
+Saturn longitude of ascending node
 
 Saturn's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Saturn
 crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♄ — Saturn argument of perihelion
+### ω♄ constant
+
+Saturn argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♄ — Saturn perihelion passage
+### T₀♄ constant
+
+Saturn perihelion passage
 
 Measured. Saturn's most recent time of perihelion passage. Saturn's
 orbital period is approximately 29.46 years. It is the most recent point
@@ -1491,84 +1713,114 @@ in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#refere
 
 ## Uranus ⛢
 
-### GM⛢ — Uranus gravitational parameter
+### GM⛢ constant
+
+Uranus gravitational parameter
 
 Measured. Uranus system gravitational parameter, measured by Voyager
 2 radio tracking. [Reference 4](#reference-4)
 
-### Req⛢ — Uranus equatorial radius
+### Req⛢ constant
+
+Uranus equatorial radius
 
 Measured. Uranus's equatorial radius, measured by Voyager 2 and stellar
 occultations. [Reference 22](#reference-22)
 
-### Rp⛢ — Uranus polar radius
+### Rp⛢ constant
+
+Uranus polar radius
 
 Measured. Uranus's polar radius. [Reference 22](#reference-22)
 
-### f⛢ — Uranus oblateness
+### f⛢ constant
+
+Uranus oblateness
 
 Calculated from measurement. When greater than 0, it describes how much
 a celestial body deviates from a perfect sphere, forming an "oblate
 spheroid". [Reference 22](#reference-22)
 
-### ρv⛢ — Uranus mean density
+### ρv⛢ constant
+
+Uranus mean density
 
 Calculated from measurement. Uranus's mean density, characteristic of
 an ice giant. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g⛢ — Uranus surface gravity
+### g⛢ constant
+
+Uranus surface gravity
 
 Calculated from measurement. Uranus's surface gravity at the 1-bar
 pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve⛢ — Uranus escape velocity
+### Ve⛢ constant
+
+Uranus escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Uranus's gravitational
 pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot⛢ — Uranus sidereal rotation period
+### Prot⛢ constant
+
+Uranus sidereal rotation period
 
 Measured. Uranus's sidereal rotation period is the true time it takes
 to spin 360° on its axis. Uranus rotates retrograde relative to its
 orbital motion. [Reference 22](#reference-22)
 
-### ϵ⛢ — Uranus axial tilt
+### ϵ⛢ constant
+
+Uranus axial tilt
 
 Measured. Uranus's axial tilt is the angle of the planet's rotational
 axis relative to its orbital plane. Its extreme obliquity (≈98°) means
 it rotates almost on its side. [Reference 22](#reference-22)
 
-### a⛢ — Uranus semi-major axis
+### a⛢ constant
+
+Uranus semi-major axis
 
 Measured. Uranus's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e⛢ — Uranus orbital eccentricity
+### e⛢ constant
+
+Uranus orbital eccentricity
 
 Measured. Uranus's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
 perfect circle. [Reference 23](#reference-23)
 
-### i⛢ — Uranus orbital inclination
+### i⛢ constant
+
+Uranus orbital inclination
 
 Uranus's orbital inclination is a measured angle with respect to the
 ecliptic plane. [Reference 23](#reference-23)
 
-### Ω⛢ — Uranus longitude of ascending node
+### Ω⛢ constant
+
+Uranus longitude of ascending node
 
 Uranus's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Uranus
 crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω⛢ — Uranus argument of perihelion
+### ω⛢ constant
+
+Uranus argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀⛢ — Uranus perihelion passage
+### T₀⛢ constant
+
+Uranus perihelion passage
 
 Calculated from measurement (JPL DE440 orbital propagation). Uranus's
 predicted next time of perihelion passage (~2050). Uranus's orbital
@@ -1579,83 +1831,113 @@ recent point in its orbit when it was closest to the Sun. Value in JDN.
 
 ## Neptune ♆
 
-### GM♆ — Neptune gravitational parameter
+### GM♆ constant
+
+Neptune gravitational parameter
 
 Measured. Neptune system gravitational parameter, measured by Voyager
 2 radio tracking and Hubble Space Telescope astrometry of Triton. [Reference 4](#reference-4)
 
-### Req♆ — Neptune equatorial radius
+### Req♆ constant
+
+Neptune equatorial radius
 
 Measured. Neptune's equatorial radius, measured by Voyager 2 and stellar
 occultations. [Reference 22](#reference-22)
 
-### Rp♆ — Neptune polar radius
+### Rp♆ constant
+
+Neptune polar radius
 
 Measured. Neptune's polar radius. [Reference 22](#reference-22)
 
-### f♆ — Neptune oblateness
+### f♆ constant
+
+Neptune oblateness
 
 Calculated from measurement. When greater than 0, it describes how
 much a celestial body deviates from a perfect sphere, forming an
 "oblate spheroid". [Reference 22](#reference-22)
 
-### ρv♆ — Neptune mean density
+### ρv♆ constant
+
+Neptune mean density
 
 Calculated from measurement. Neptune's mean density, characteristic of
 an ice giant. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### g♆ — Neptune surface gravity
+### g♆ constant
+
+Neptune surface gravity
 
 Calculated from measurement. Neptune's surface gravity at the 1-bar
 pressure level. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Ve♆ — Neptune escape velocity
+### Ve♆ constant
+
+Neptune escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface. It
 is the minimum speed needed to break free from Neptune's gravitational
 pull and never return. [Reference 4](#reference-4) [Reference 22](#reference-22)
 
-### Prot♆ — Neptune sidereal rotation period
+### Prot♆ constant
+
+Neptune sidereal rotation period
 
 Measured. Neptune's sidereal rotation period is the true time it takes
 to spin 360° on its axis (System III, from Voyager 2 radio measurements).
 [Reference 22](#reference-22)
 
-### ϵ♆ — Neptune axial tilt
+### ϵ♆ constant
+
+Neptune axial tilt
 
 Measured. Neptune's axial tilt, comparable to Earth's, is the angle of
 the planet's rotational axis relative to its orbital plane. [Reference 22](#reference-22)
 
-### a♆ — Neptune semi-major axis
+### a♆ constant
+
+Neptune semi-major axis
 
 Measured. Neptune's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♆ — Neptune orbital eccentricity
+### e♆ constant
+
+Neptune orbital eccentricity
 
 Measured. Neptune's orbital eccentricity. When different from 0, it
 is a measure of how much a planet's elliptical path deviates from a
 perfect circle. [Reference 23](#reference-23)
 
-### i♆ — Neptune orbital inclination
+### i♆ constant
+
+Neptune orbital inclination
 
 Neptune's orbital inclination is a measured angle with respect to
 the ecliptic plane. [Reference 23](#reference-23)
 
-### Ω♆ — Neptune longitude of ascending node
+### Ω♆ constant
+
+Neptune longitude of ascending node
 
 Neptune's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Neptune
 crosses northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♆ — Neptune argument of perihelion
+### ω♆ constant
+
+Neptune argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♆ — Neptune perihelion passage
+### T₀♆ constant
+
+Neptune perihelion passage
 
 Calculated from measurement (JPL DE440 orbital propagation). Neptune's
 predicted next time of perihelion passage (~2042). Neptune's orbital
@@ -1666,81 +1948,111 @@ in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 ## Pluton ♇
 
-### GM♇ — Pluto gravitational parameter
+### GM♇ constant
+
+Pluto gravitational parameter
 
 Measured. Pluto system gravitational parameter, measured by New Horizons
 radio tracking. [Reference 4](#reference-4)
 
-### Req♇ — Pluto equatorial radius
+### Req♇ constant
+
+Pluto equatorial radius
 
 Measured. Pluto's equatorial radius, measured by New Horizons occultation
 and imaging. [Reference 26](#reference-26)
 
-### Rp♇ — Pluto polar radius
+### Rp♇ constant
+
+Pluto polar radius
 
 Measured. Pluto's polar radius. Pluto is essentially spherical. [Reference 26](#reference-26)
 
-### f♇ — Pluto oblateness
+### f♇ constant
+
+Pluto oblateness
 
 Calculated from measurement. Pluto being spherical, its oblateness is
 effectively zero. [Reference 26](#reference-26)
 
-### ρv♇ — Pluto mean density
+### ρv♇ constant
+
+Pluto mean density
 
 Calculated from measurement. Pluto's mean density, consistent with
 a mixture of rock and ice. [Reference 4](#reference-4) [Reference 26](#reference-26)
 
-### g♇ — Pluto surface gravity
+### g♇ constant
+
+Pluto surface gravity
 
 Calculated from measurement. Pluto's surface gravity. [Reference 4](#reference-4) [Reference 26](#reference-26)
 
-### Ve♇ — Pluto escape velocity
+### Ve♇ constant
+
+Pluto escape velocity
 
 Calculated from measurement, it is valid at the equatorial surface.
 It is the minimum speed needed to break free from Pluto's gravitational
 pull and never return. [Reference 4](#reference-4) [Reference 26](#reference-26)
 
-### Prot♇ — Pluto sidereal rotation period
+### Prot♇ constant
+
+Pluto sidereal rotation period
 
 Measured. Pluto's sidereal rotation period is the true time it takes to
 spin 360° on its axis. Pluto rotates retrograde and is tidally locked to
 its moon Charon. [Reference 26](#reference-26)
 
-### ϵ♇ — Pluto axial tilt
+### ϵ♇ constant
+
+Pluto axial tilt
 
 Measured. Pluto's axial tilt is the angle of the planet's rotational
 axis relative to its orbital plane. [Reference 26](#reference-26)
 
-### a♇ — Pluto semi-major axis
+### a♇ constant
+
+Pluto semi-major axis
 
 Measured. Pluto's orbital semi-major axis is half the length of the
 longest diameter of the elliptical orbit, which is also the average
 distance from one of the radii to the orbit. [Reference 23](#reference-23)
 
-### e♇ — Pluto orbital eccentricity
+### e♇ constant
+
+Pluto orbital eccentricity
 
 Measured. Pluto's orbital eccentricity, large enough to bring it inside
 Neptune's orbit near perihelion. When different from 0, it is a measure
 of how much a planet's elliptical path deviates from a perfect circle. [Reference 23](#reference-23)
 
-### i♇ — Pluto orbital inclination
+### i♇ constant
+
+Pluto orbital inclination
 
 Pluto's orbital inclination is a measured angle with respect to the ecliptic
 plane, ir is the highest of any solar system body traditionally listed. [Reference 23](#reference-23)
 
-### Ω♇ — Pluto longitude of ascending node
+### Ω♇ constant
+
+Pluto longitude of ascending node
 
 Pluto's longitude of the ascending node is a measured angle quantifying
 the horizontal orientation of the orbit. It represents where Pluto crosses
 northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω♇ — Pluto argument of perihelion
+### ω♇ constant
+
+Pluto argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀♇ — Pluto perihelion passage
+### T₀♇ constant
+
+Pluto perihelion passage
 
 Measured. Pluto's last time of perihelion passage (1989 Sep 05). Pluto's
 orbital period is approximately 248 years. It is the most recent point in
@@ -1749,30 +2061,42 @@ in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 ## Solar ☉
 
-### M☉ — Solar mass
+### M☉ constant
+
+Solar mass
 
 It is derived from the exact nominal solar gravitational parameter
 `GM☉` and the measured gravitational constant `G`. [Particle Data Group 2024](#particle-data-group-2024) [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
 
-### GM☉ — Solar gravitational parameter
+### GM☉ constant
+
+Solar gravitational parameter
 
 It is an exact nominal value defined by the International Astronomical
 Union (IAU 2015 Resolution B3). [Particle Data Group 2023](#particle-data-group-2023)
 
-### L☉ — Solar luminosity
+### L☉ constant
+
+Solar luminosity
 
 It is an exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Req☉ — Solar equatorial radius
+### Req☉ constant
+
+Solar equatorial radius
 
 It is an exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Rp☉ — Solar polar radius
+### Rp☉ constant
+
+Solar polar radius
 
 It is measured by helioseismology and limb-darkening observations.
 [Reference 18](#reference-18) [Reference 19](#reference-19)
 
-### f☉ — Solar oblateness
+### f☉ constant
+
+Solar oblateness
 
 The Solar oblateness (or flattening) is calculated from the nominal
 equatorial radius and the polar radius measurement as
@@ -1780,23 +2104,31 @@ equatorial radius and the polar radius measurement as
 When greater than 0, it describes how much a celestial body deviates
 from a perfect sphere, forming an "oblate spheroid". [Reference 18](#reference-18) [Reference 19](#reference-19)
 
-### ρv☉ — Solar mean density
+### ρv☉ constant
+
+Solar mean density
 
 It is calculated from the nominal gravitational parameter `GM☉`, the
 gravitational constant `G`, and the solar radii measurement. [Particle Data Group 2023](#particle-data-group-2023)
 
-### g☉ — Solar surface gravity
+### g☉ constant
+
+Solar surface gravity
 
 The Solar surface gravity at the equator is calculated from `GM☉`
 and the measurement of the equatorial radius `Req☉`. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Ve☉ — Solar escape velocity
+### Ve☉ constant
+
+Solar escape velocity
 
 The Solar escape velocity at the equatorial surface is calculated from
 `GM☉` and the measurement of solar radii. It is the minimum speed needed
 to break free from Sun's gravitational pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Prot☉ — Solar sidereal rotation period
+### Prot☉ constant
+
+Solar sidereal rotation period
 
 The Solar sidereal rotation period at the equator (System I) is measured
 by tracking surface features using Doppler techniques. It is the true
@@ -1805,117 +2137,157 @@ time it takes to spin 360° on its axis. [Reference 20](#reference-20) [Referenc
 
 ## Cosmology & Varia
 
-### Λ — Cosmological constant
+### Λ constant
+
+Cosmological constant
 
 It represents the measured energy density of empty space (dark energy)
 in Einstein's field equations. Its value is inferred from observations
 of the large-scale structure and expansion of the universe. [Planck 2020](#planck-2020) [Particle Data Group 2024](#particle-data-group-2024)
 
-### H₀ — Hubble constant
+### H₀ constant
+
+Hubble constant
 
 It is the measured current rate of expansion of the universe, expressed
 in `km/(s·Mpc)`. Its value is measured from observations of the cosmic
 microwave background and Type Ia supernovae. [Planck 2020](#planck-2020)
 
-### ωb — Baryon density parameter
+### ωb constant
+
+Baryon density parameter
 
 It is the measured physical density of baryonic matter (ordinary matter)
 in the universe, measured from the cosmic microwave background power
 spectrum. [Planck 2020](#planck-2020)
 
-### ωc — Dark matter density parameter
+### ωc constant
+
+Dark matter density parameter
 
 It is the measured physical density of cold dark matter in the universe,
 measured from the cosmic microwave background power spectrum. [Planck 2020](#planck-2020)
 
-### 100θ* — CMB acoustic scale
+### 100θ* constant
+
+CMB acoustic scale
 
 The CMB Acoustic scale corresponds to the measure of one hundred times
 the angular size of the sound horizon at recombination, measured from
 the position of the first acoustic peak in the CMB power spectrum. [Planck 2020](#planck-2020)
 
-### τr — Reionization optical depth
+### τr constant
+
+Reionization optical depth
 
 It is the measured integrated optical depth to Thomson scattering from
 the epoch of reionization, measured from the CMB polarization spectrum.
 [Planck 2020](#planck-2020)
 
-### ns — Scalar spectral index
+### ns constant
+
+Scalar spectral index
 
 It is the measured tilt of the primordial power spectrum of density
 fluctuations, where ns=1 corresponds to a scale-invariant Harrison-
 Zel'dovich spectrum. [Planck 2020](#planck-2020)
 
-### (ln(10¹⁰As)) — Power spectrum amplitude
+### (ln(10¹⁰As)) constant
+
+Power spectrum amplitude
 
 Measured amplitude of the primordial power spectrum. The logarithm
 of the scalar power spectrum amplitude, normalized at a pivot scale
 of `0.05 Mpc⁻¹`. [Planck 2020](#planck-2020)
 
-### MG — Milky Way total mass
+### MG constant
+
+Milky Way total mass
 
 Measured total mass of the Milky Way galaxy, including baryonic
 and dark matter components, estimated from stellar kinematics and
 satellite galaxy dynamics. [Reference 8](#reference-8) [Reference 9](#reference-9) [Reference 10](#reference-10)
 
-### fDMG — Milky Way dark matter fraction
+### fDMG constant
+
+Milky Way dark matter fraction
 
 Measured fraction of dark matter in the Milky Way galaxy. Estimated
 from rotation curves, satellite dynamics, and gravitational lensing.
 [Reference 8](#reference-8) [Reference 9](#reference-9)
 
-### RG — Milky Way disk radius
+### RG constant
+
+Milky Way disk radius
 
 Measure of the equatorial radius of the Milky Way galaxy's disk,
 estimated from star count surveys and kinematic models. [Reference 8](#reference-8) [Reference 9](#reference-9)
 
-### D●SgrA* — Distance to Sgr A*
+### D●SgrA* constant
+
+Distance to Sgr A*
 
 Measured distance from the Sun to the black hole Sagittarius A* at
 the Galactic centre, measured by stellar orbit monitoring with the
 GRAVITY instrument. [Reference 6](#reference-6) [Reference 7](#reference-7)
 
-### R●SgrA* — Sgr A* Schwarzschild radius
+### R●SgrA* constant
+
+Sgr A* Schwarzschild radius
 
 Measured Schwarzschild radius of the black hole Sagittarius A*, derived
 from its mass measurement by the Event Horizon Telescope collaboration.
 [Reference 7](#reference-7)
 
-### M●SgrA* — Sgr A* black hole mass
+### M●SgrA* constant
+
+Sgr A* black hole mass
 
 Measured mass of the supermassive black hole Sagittarius A* at the
 Galactic centre, measured from the orbits of stars in its immediate vicinity.
 [Reference 7](#reference-7)
 
-### MNGC224 — Andromeda galaxy total mass
+### MNGC224 constant
+
+Andromeda galaxy total mass
 
 Measure of the total mass of the Andromeda galaxy (M31, NGC 224), including
 dark matter, estimated from satellite galaxy kinematics and gravitational
 timing arguments. [Reference 11](#reference-11) [Reference 12](#reference-12)
 
-### fDMNGC224 — Andromeda dark matter fraction
+### fDMNGC224 constant
+
+Andromeda dark matter fraction
 
 Measured fraction of dark matter in the Andromeda galaxy (M31), estimated
 from dynamical modelling of its halo. [Reference 11](#reference-11) [Reference 12](#reference-12)
 
-### RNGC224 — Andromeda galaxy disk radius
+### RNGC224 constant
+
+Andromeda galaxy disk radius
 
 Measurement of the mean equatorial radius of the Andromeda galaxy (M31),
 estimated from stellar population surveys. [Reference 11](#reference-11)
 
-### DNGC224 — Distance to Andromeda galaxy
+### DNGC224 constant
+
+Distance to Andromeda galaxy
 
 Measurement of the mean distance from the Milky Way to the Andromeda
 galaxy (M31), measured using Cepheid variable stars and tip of the red
 giant branch. [Reference 11](#reference-11)
 
-### GM★Vega — Vega gravitational parameter
+### GM★Vega constant
+
+Vega gravitational parameter
 
 Measurement of the gravitational parameter of the star Vega (mass times
 gravitational constant `G`). Measured by interferometry and spectral
 analysis. [Reference 13](#reference-13) [Reference 14](#reference-14)
 
-### L★Vega — Vega luminosity
+### L★Vega constant
+
+Vega luminosity
 
 Measured luminosity of the star Vega, used as a photometric reference
 standard in stellar astronomy. [Reference 13](#reference-13) [Reference 14](#reference-14)
@@ -1932,47 +2304,63 @@ standard in stellar astronomy. [Reference 13](#reference-13) [Reference 14](#ref
   `γ` is given as a calculation `cp/cv` for diatomic gases.
   `R` is given as a calculation `cp-cv` for all gases.
 
-## Dry Air — Gas
+## Dry Air constant
 
-### ρvAir — Dry air density
+Gas
+
+### ρvAir constant
+
+Dry air density
 
 Measured. Volumetric density of dry air at standard temperature (0°C)
 and pressure (101.325 kPa).
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### nAir — Refractive index of dry air
+### nAir constant
+
+Refractive index of dry air
 
 Measured. Refractive index of dry air at 589 nm (sodium D line), 0°C,
 1 atm. Varies slightly with humidity and CO2 content.
 [Materials 2](#materials-2)
 
-### cpAir — Specific heat cp of dry air
+### cpAir constant
+
+Specific heat cp of dry air
 
 Measured. Specific heat of dry air at constant pressure at 300 K.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### cvAir — Specific heat cv of dry air
+### cvAir constant
+
+Specific heat cv of dry air
 
 Specific heat of dry air at constant volume, calculated as
 `cpAir − RAir`.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### γAir — Adiabatic index of dry air
+### γAir constant
+
+Adiabatic index of dry air
 
 Calculated from measurement. Adiabatic index (heat capacity ratio) of
 dry air, `γ=cp/cv`, at 300 K.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### RAir — Specific gas constant of dry air
+### RAir constant
+
+Specific gas constant of dry air
 
 Exact calculation: `R/M_Air`. Specific gas constant of dry air,
 `RAir=R/M_Air`, where `M_Air=28.9647 g/mol`. [Materials 1](#materials-1)
 
-### εAir — Electric permittivity of dry air
+### εAir constant
+
+Electric permittivity of dry air
 
 Measured. Electric permittivity of dry airat STP. The relative
 permittivity `εr≈1.000536` is very close to vacuum permittivity `ε₀`.
@@ -1981,7 +2369,9 @@ form in response to electric charges.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### μAir — Magnetic permeability of dry air
+### μAir constant
+
+Magnetic permeability of dry air
 
 Measured. Magnetic permeability of dry air at STP. The relative
 permeability `μr≈1.0000004`, essentially identical to `μ₀`. It
@@ -1990,7 +2380,9 @@ current.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### ρAir — Resistivity of dry air
+### ρAir constant
+
+Resistivity of dry air
 
 Measured. Electrical resistivity of dry air at STP. Dry air is an
 excellent insulator; resistivity ranges from 10¹³ to 10¹⁶ Ω·m
@@ -1999,7 +2391,9 @@ opposes the flow of electric current.
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-### EdAir — Dielectric rigidity of dry air
+### EdAir constant
+
+Dielectric rigidity of dry air
 
 Measured. Dielectric breakdown field strength of dry air at STP.
 Above this threshold, dry air undergoes avalanche ionisation
@@ -2007,9 +2401,13 @@ Above this threshold, dry air undergoes avalanche ionisation
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-## N2 — Gas
+## N2 constant
 
-### ρvN2 — Dinitrogen N2 density
+Gas
+
+### ρvN2 constant
+
+Dinitrogen N2 density
 
 Measured. Volumetric density of dinitrogen (N2) at `0°C`,
 `101.325 kPa`.
@@ -2017,60 +2415,80 @@ Measured. Volumetric density of dinitrogen (N2) at `0°C`,
 [Materials 3](#materials-3)
 
 
-### cpN2 — Dinitrogen N2 specific heat cp
+### cpN2 constant
+
+Dinitrogen N2 specific heat cp
 
 Measured. Specific heat of N2 at constant pressure.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### cvN2 — Dinitrogen N2 specific heat cv
+### cvN2 constant
+
+Dinitrogen N2 specific heat cv
 
 Measured. Specific heat of N2 at constant volume.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### γN2 — Dinitrogen N2 adiabatic index
+### γN2 constant
+
+Dinitrogen N2 adiabatic index
 
 Measured. Adiabatic index of N2, γ=cp/cv.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### RN2 — Dinitrogen N2 specific gas constant
+### RN2 constant
+
+Dinitrogen N2 specific gas constant
 
 Exact calculation: `R/M_N2`. Specific gas constant of N2, `RN2=R/M_N2`,
 where `M_N2=28.014 g/mol`. [Materials 2](#materials-2)
 
-### εN2 — Electric permittivity of N2
+### εN2 constant
+
+Electric permittivity of N2
 
 Measured. Electric permittivity of N2 at STP. Relative permittivity
 `εr≈1.000580`; N2 is widely used as an insulating gas in high-voltage
 equipment. It is a measure of how dense an electric field is "permitted"
 to form in response to electric charges. [Materials 2](#materials-2)
 
-### μN2 — Magnetic permeability of N2
+### μN2 constant
+
+Magnetic permeability of N2
 
 Measured. Magnetic permeability of N2 at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
 induced by an electric current. [Materials 2](#materials-2)
 
-### ρN2 — Resistivity of N2
+### ρN2 constant
+
+Resistivity of N2
 
 Measured. Electrical resistivity of dry N2 at STP. Excellent insulator
 used in purged electrical enclosures. It quantifies how strongly a
 material opposes the flow of electric current. [Materials 2](#materials-2)
 
-### EdN2 — Dielectric rigidity of N2
+### EdN2 constant
+
+Dielectric rigidity of N2
 
 Measured. Dielectric breakdown field of N2 at STP. Slightly higher
 than dry air; preferred for high-voltage insulation. It is the electric
 field threshold above which an avalanche ionisation occurs. [Materials 2](#materials-2)
 
-## O2 — Gas
+## O2 constant
 
-### ρvO2 — Dioxygen O2 density
+Gas
+
+### ρvO2 constant
+
+Dioxygen O2 density
 
 Measured. Volumetric density of dioxygen (O2) at `0°C`,
 `101.325 kPa`.
@@ -2078,108 +2496,148 @@ Measured. Volumetric density of dioxygen (O2) at `0°C`,
 [Materials 3](#materials-3)
 
 
-### cpO2 — Dioxygen O2 specific heat cp
+### cpO2 constant
+
+Dioxygen O2 specific heat cp
 
 Measured. Specific heat of O2 at constant pressure.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### cvO2 — Dioxygen O2 specific heat cv
+### cvO2 constant
+
+Dioxygen O2 specific heat cv
 
 Measured. Specific heat of O2 at constant volume.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### γO2 — Dioxygen O2 adiabatic index
+### γO2 constant
+
+Dioxygen O2 adiabatic index
 
 Measured. Adiabatic index of O2, `γ=cp/cv`, at `300 K`.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### RO2 — Dioxygen O2 specific gas constant
+### RO2 constant
+
+Dioxygen O2 specific gas constant
 
 Exact calculation: `R/M_O2`. Specific gas constant of O2, `RO2=R/M_O2`,
 where `M_O2=31.999 g/mol`. [Materials 2](#materials-2)
 
-### εO2 — Electric permittivity of O2
+### εO2 constant
+
+Electric permittivity of O2
 
 Measured. Electric permittivity of O2 at STP. Relative permittivity
 `εr≈1.000530`, comparable to N2. It is a measure of how dense an electric
 field is "permitted" to form in response to electric charges. [Materials 2](#materials-2)
 
-### μO2 — Magnetic permeability of O2
+### μO2 constant
+
+Magnetic permeability of O2
 
 Measured. Magnetic permeability of O2 at STP. Paramagnetic with
 `μr≈1.0000019` due to its unpaired electrons. It quantifies the strength
 of the magnetic field induced by an electric current. [Materials 2](#materials-2)
 
-### ρO2 — Resistivity of O2
+### ρO2 constant
+
+Resistivity of O2
 
 Measured. Electrical resistivity of dry O2 at STP. Good insulator
 under standard conditions. It quantifies how strongly a material
 opposes the flow of electric current. [Materials 2](#materials-2)
 
-### EdO2 — Dielectric rigidity of O2
+### EdO2 constant
+
+Dielectric rigidity of O2
 
 Measured. Dielectric breakdown electric field of O2 at STP.
 Slightly lower than N2. [Materials 2](#materials-2)
 
-## Argon — Gas
+## Argon constant
 
-### ρvAr — Argon density
+Gas
+
+### ρvAr constant
+
+Argon density
 
 Measured. Volumetric density of argon (Ar) at `0°C`,
 `101.325 kPa`. [Materials 2](#materials-2)
 
-### cpAr — Argon specific heat cp
+### cpAr constant
+
+Argon specific heat cp
 
 Exact calculation: `(5/2)·R/M_Ar` (monatomic ideal gas). Specific
 heat of argon at constant pressure. [Materials 2](#materials-2)
 
-### cvAr — Argon specific heat cv
+### cvAr constant
+
+Argon specific heat cv
 
 Specific heat of argon at constant volume. Exactly `(3/2)·R/M_Ar` for
 a monatomic ideal gas. [Materials 2](#materials-2)
 
-### γAr — Argon adiabatic index
+### γAr constant
+
+Argon adiabatic index
 
 Adiabatic index of argon. Exactly `5/3` for any monatomic ideal gas. [Materials 2](#materials-2)
 
-### RAr — Argon specific gas constant
+### RAr constant
+
+Argon specific gas constant
 
 Exact calculation. Specific gas constant of argon, `RAr=R/M_Ar`, where
 `M_Ar=39.948 g/mol`. [Materials 2](#materials-2)
 
-### εAr — Electric permittivity of Ar
+### εAr constant
+
+Electric permittivity of Ar
 
 Measured. Electric permittivity of Ar at STP. Relative permittivity
 `εr≈1.000516`; used as an inert dielectric medium. It is a measure of how
 dense an electric field is "permitted" to form in response to electric charges.
 [Materials 2](#materials-2)
 
-### μAr — Magnetic permeability of Ar
+### μAr constant
+
+Magnetic permeability of Ar
 
 Measured. Magnetic permeability of Ar at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
 induced by an electric current. [Materials 2](#materials-2)
 
-### ρAr — Resistivity of Ar
+### ρAr constant
+
+Resistivity of Ar
 
 Measured. Electrical resistivity of argon at STP. Excellent insulator; used
 in plasma physics and dielectric studies. It quantifies how strongly a
 material opposes the flow of electric current. [Materials 2](#materials-2)
 
-### EdAr — Dielectric rigidity of Ar
+### EdAr constant
+
+Dielectric rigidity of Ar
 
 Measured. Dielectric breakdown electric field of argon at STP. Lower than
 air due to absence of polar molecules. [Materials 2](#materials-2)
 
-## CO2 — Gas
+## CO2 constant
 
-### ρvCO2 — Carbon dioxide CO2 density
+Gas
+
+### ρvCO2 constant
+
+Carbon dioxide CO2 density
 
 Measured. Volumetric density of carbon dioxide (CO2) at `0°C`,
 `101.325 kPa`.
@@ -2187,7 +2645,9 @@ Measured. Volumetric density of carbon dioxide (CO2) at `0°C`,
 [Materials 3](#materials-3)
 
 
-### cpCO2 — Carbon dioxide CO2 specific heat cp
+### cpCO2 constant
+
+Carbon dioxide CO2 specific heat cp
 
 Measured. Specific heat of CO2 at constant pressure at `300 K`.
 Strongly temperature-dependent.
@@ -2195,14 +2655,18 @@ Strongly temperature-dependent.
 [Materials 3](#materials-3)
 
 
-### cvCO2 — Carbon dioxide CO2 specific heat cv
+### cvCO2 constant
+
+Carbon dioxide CO2 specific heat cv
 
 Measured. Specific heat of CO2 at constant volume at `300 K`.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
 
-### γCO2 — Carbon dioxide CO2 adiabatic index
+### γCO2 constant
+
+Carbon dioxide CO2 adiabatic index
 
 Measured. Adiabatic index of CO2 at `300 K`. Lower than diatomic gases
 due to its additional vibrational modes.
@@ -2210,12 +2674,16 @@ due to its additional vibrational modes.
 [Materials 3](#materials-3)
 
 
-### RCO2 — Carbon dioxide CO2 specific gas constant
+### RCO2 constant
+
+Carbon dioxide CO2 specific gas constant
 
 Exact calculation. Specific gas constant of CO2, `RCO2=R/M_CO2`,
 where `M_CO2=44.010 g/mol`. [Materials 2](#materials-2)
 
-### εCO2 — Electric permittivity of CO2
+### εCO2 constant
+
+Electric permittivity of CO2
 
 Measured. Electric permittivity of CO2 at STP. Relative permittivity `εr≈1.000921`,
 slightly higher than N2 and Ar due to CO2's quadrupole moment. It is a measure
@@ -2224,19 +2692,25 @@ charges.
 [Materials 2](#materials-2)
 [Materials 3](#materials-3)
 
-### μCO2 — Magnetic permeability of CO2
+### μCO2 constant
+
+Magnetic permeability of CO2
 
 Measured. Magnetic permeability of CO2 at STP. Diamagnetic with `μr≈1.0000000`,
 essentially equal to `μ₀`. It quantifies the strength of the magnetic field
 induced by an electric current. [Materials 2](#materials-2)
 
-### ρCO2 — Resistivity of CO2
+### ρCO2 constant
+
+Resistivity of CO2
 
 Measured. Electrical resistivity of CO2 at STP. Lower than N2 and Ar; sometimes
 used as arc-quenching medium in circuit breakers. It quantifies how strongly
 a material opposes the flow of electric current. [Materials 2](#materials-2)
 
-### EdCO2 — Dielectric rigidity of CO2
+### EdCO2 constant
+
+Dielectric rigidity of CO2
 
 Measured. Dielectric breakdown electric field of CO2 at STP. Comparable to dry
 air. [Materials 2](#materials-2)
@@ -2247,26 +2721,36 @@ air. [Materials 2](#materials-2)
   For liquids: `cv ≈ `cp (difference < 1%), `γ ≈ 1`, `R = cp - cv ≈ 0`.
   These parameters are therefore not listed for liquids.
 
-## H2O — Liquid
+## H2O constant
 
-### ρvH2O — Liquid water density
+Liquid
+
+### ρvH2O constant
+
+Liquid water density
 
 Measured (IAPWS-IF97). Volumetric density of liquid water at `20°C`,
 `101.325 kPa`. [Materials 4](#materials-4)
 [Materials 2](#materials-2)
 
-### nH2O — Refractive index of liquid water
+### nH2O constant
+
+Refractive index of liquid water
 
 Measured. Refractive index of liquid water at `589 nm` (sodium D line), `20°C`.
 [Materials 4](#materials-4)
 
-### cpH2O — Specific heat cp of liquid water
+### cpH2O constant
+
+Specific heat cp of liquid water
 
 Measured (IAPWS-IF97). Specific heat of liquid water at constant pressure
 at `20°C`. Near its minimum value in the `0–100°C` range. [Materials 4](#materials-4)
 [Materials 2](#materials-2)
 
-### ρH2O — Resistivity of liquid water
+### ρH2O constant
+
+Resistivity of liquid water
 
 Measured. Electrical resistivity of ultra-pure water at `25°C` . The value
 `1.8×10⁵ Ω·m (18 MΩ·cm)` is the theoretical maximum for pure water. It
@@ -2279,125 +2763,175 @@ quantifies how strongly a material opposes the flow of electric current.
 
 ## C1. Materials for optical fibers and waveguides
 
-## Silicon — Dielectric
+## Silicon constant
 
-### ρvSi — Crystalline silicon density
+Dielectric
+
+### ρvSi constant
+
+Crystalline silicon density
 
 Measured. Volumetric density of crystalline silicon, the foundation
 of modern microelectronics and an important infrared photonic
 material. [Materials 10](#materials-10) [Materials 11](#materials-11)
 
-### nSi — Refractive index of crystalline silicon
+### nSi constant
+
+Refractive index of crystalline silicon
 
 Measured (Silicon is transparent only for `λ > 1.1 µm`). Refractive
 index of crystalline silicon at `1150 nm`, `20°C`. [Materials 11](#materials-11)
 
-### cpSi — Specific heat of silicon
+### cpSi constant
+
+Specific heat of silicon
 
 Measured. Specific heat of crystalline silicon at `300 K`. [Materials 10](#materials-10)
 
-### εsi — Dielectric constant of silicon
+### εsi constant
+
+Dielectric constant of silicon
 
 Exact convention. Dielectric constant of silicon. The relative permittivity
 measures how well an applied electric field penetrates the material
 compared to vacuum. Has an exact value by convention. [HP50g Manual]
 
-### ρSi — Resistivity of crystalline silicon
+### ρSi constant
+
+Resistivity of crystalline silicon
 
 Measured. Electrical resistivity of intrinsic crystalline silicon at `300 K`.
 Semiconductor; resistivity varies over many orders of magnitude with doping.
 It quantifies how strongly a material opposes the flow of electric current.
 [Materials 10](#materials-10) [Materials 11](#materials-11)
 
-## SiO2 — Dielectric
+## SiO2 constant
 
-### ρvSiO2 — Fused silica density
+Dielectric
+
+### ρvSiO2 constant
+
+Fused silica density
 
 Measured. Volumetric density of amorphous fused silica (vitreous SiO2),
 the primary material for standard optical fibers. [Materials 5](#materials-5) [Materials 7](#materials-7)
 
-### nSiO2 — Refractive index of fused silica
+### nSiO2 constant
+
+Refractive index of fused silica
 
 Measured (Malitson 1965 Sellmeier fit). Refractive index of fused silica
 at `589.3 nm` (sodium D line), `20°C`. The Sellmeier-calibrated value
 from Malitson (1965) is the standard reference for fiber optic design. [Materials 5](#materials-5)
 
-### cpSiO2 — Specific heat of fused silica
+### cpSiO2 constant
+
+Specific heat of fused silica
 
 Measured. Specific heat of fused silica at `20°C`. [Materials 7](#materials-7)
 
-### εox — Dielectric constant of SiO2
+### εox constant
+
+Dielectric constant of SiO2
 
 Exact convention. Dielectric constant of SiO2 (silicon dioxide). The relative
 permittivity of thermally grown or deposited silicon dioxide, used in MOS
 device modelling. Has an exact value by convention. It measures how well
 an applied electric field penetrates the material compared to vacuum. [HP50g Manual]
 
-### ρSiO2 — Resistivity of fused silica
+### ρSiO2 constant
+
+Resistivity of fused silica
 
 Measured. Electrical resistivity of fused silica at `20°C`. Among the best
 solid insulators; used in high-voltage isolation and MEMS. It quantifies
 how strongly a material opposes the flow of electric current. [Materials 7](#materials-7)
 
-### EdSiO2 — Dielectric rigidity of fused silica
+### EdSiO2 constant
+
+Dielectric rigidity of fused silica
 
 Measured. Dielectric breakdown electric field of fused silica. Very high;
 SiO2 is the standard gate dielectric in MOSFET technology. [Materials 7](#materials-7)
 
-## GeO2 — Dielectric
+## GeO2 constant
 
-## ρvGeO2 — Germanate glass density
+Dielectric
+
+## ρvGeO2 constant
+
+Germanate glass density
 
 Measured. Volumetric density of germanate glass (GeO2), used as a dopant
 in the core of standard single-mode optical fibers to raise the refractive
 index. [Materials 8](#materials-8) [Materials 9](#materials-9)
 
-### nGeO2 — Refractive index of germanate glass
+### nGeO2 constant
+
+Refractive index of germanate glass
 
 Measured. Refractive index of pure GeO2 glass at `589 nm`, `20°C`. The
 actual core index of a doped fiber is interpolated between nSiO2
 and nGeO2. [Materials 8](#materials-8)
 
-### cpGeO2 — Specific heat of germanate glass
+### cpGeO2 constant
+
+Specific heat of germanate glass
 
 Measured. Specific heat of germanate glass. [Materials 9](#materials-9)
 
-### ρGeO2 — Resistivity of germanate glass
+### ρGeO2 constant
+
+Resistivity of germanate glass
 
 Measured. Electrical resistivity of pure GeO2 glass at `20°C`. Lower
 than fused silica but still an excellent insulator. It quantifies how
 strongly a material opposes the flow of electric current. [Materials 9](#materials-9)
 
-### EdGeO2 — Dielectric rigidity of germanate glass
+### EdGeO2 constant
+
+Dielectric rigidity of germanate glass
 
 Measured. Dielectric breakdown electric field of GeO2 glass. Similar
 order of magnitude to SiO2; varies with purity. [Materials 9](#materials-9)
 
-## Si3N4 — Dielectric
+## Si3N4 constant
 
-### ρvSi3N4 — Silicon nitride density
+Dielectric
+
+### ρvSi3N4 constant
+
+Silicon nitride density
 
 Measured. Volumetric density of silicon nitride (Si3N4) deposited by
 LPCVD, the standard platform for integrated photonic waveguides.
 [Materials 18](#materials-18) [Materials 19](#materials-19)
 
-### nSi3N4 — Refractive index of LPCVD Si3N4
+### nSi3N4 constant
+
+Refractive index of LPCVD Si3N4
 
 Measured; depends on deposition conditions. Refractive index of LPCVD Si3N4
 at `633 nm` (He-Ne laser), `20°C`. The value depends on deposition conditions
 and stoichiometry. [Materials 18](#materials-18)
 
-### cpSi3N4 — Specific heat of Si3N4
+### cpSi3N4 constant
+
+Specific heat of Si3N4
 
 Measured. Specific heat of silicon nitride. [Materials 19](#materials-19)
 
-### ρSi3N4 — Resistivity of Si3N4
+### ρSi3N4 constant
+
+Resistivity of Si3N4
 
 Measured. Electrical resistivity of LPCVD Si3N4 at `20°C`. Excellent insulator
 used for passivation and etch-stop layers in integrated circuits. It quantifies
 how strongly a material opposes the flow of electric current. [Materials 19](#materials-19)
 
-### EdSi3N4 — Dielectric rigidity of Si3N4
+### EdSi3N4 constant
+
+Dielectric rigidity of Si3N4
 
 Measured. Dielectric breakdown electric field of Si3N4 thin films. Higher than
 SiO2; used as storage dielectric in SONOS flash memory. [Materials 19](#materials-19)
@@ -2405,30 +2939,42 @@ SiO2; used as storage dielectric in SONOS flash memory. [Materials 19](#material
 
 ## C2. Reference optical glasses
 
-##BK7 Glass — Dielectric
+##BK7 Glass constant
 
-### ρvBK7 — Schott BK7 glass density
+Dielectric
+
+### ρvBK7 constant
+
+Schott BK7 glass density
 
 Measured. Volumetric density of Schott BK7 borosilicate glass, the
 most widely used optical glass for visible-range optics. [Materials 15](#materials-15)
 
-### nBK7 — Refractive index of Schott BK7 glass
+### nBK7 constant
+
+Refractive index of Schott BK7 glass
 
 Measured (Schott catalogue nominal nd). Refractive index of Schott BK7 at
 `589.3 nm` (sodium d line), `20°C`. This is the nominal nd value used in
 optical design. [Materials 15](#materials-15)
 
-### cpBK7 — Specific heat of BK7 glass
+### cpBK7 constant
+
+Specific heat of BK7 glass
 
 Measured. Specific heat of BK7 glass. [Materials 15](#materials-15)
 
-### ρBK7 — Resistivity of BK7 glass
+### ρBK7 constant
+
+Resistivity of BK7 glass
 
 Measured. Electrical resistivity of BK7 borosilicate glass at `20°C`. Used
 in high-voltage optical isolators. It quantifies how strongly a material
 opposes the flow of electric current. [Materials 15](#materials-15)
 
-### EdBK7 — Dielectric rigidity of BK7 glass
+### EdBK7 constant
+
+Dielectric rigidity of BK7 glass
 
 Measured. Dielectric breakdown electric field of BK7 glass. Lower than
 crystalline dielectrics due to its amorphous microstructure. [Materials 15](#materials-15)
@@ -2436,88 +2982,124 @@ crystalline dielectrics due to its amorphous microstructure. [Materials 15](#mat
 
 ## C3. Optical crystals (UV & IR)
 
-## Al2O3 Sapphire — Dielectric
+## Al2O3 Sapphire constant
 
-### ρvAl2O3 — Sapphire density
+Dielectric
+
+### ρvAl2O3 constant
+
+Sapphire density
 
 Measured. Volumetric density of single-crystal sapphire (alpha-Al2O3),
 used for UV-to-IR windows, substrates, and high-power laser rods. [Materials 16](#materials-16)
 
-### nAl2O3 — Ordinary refractive index of sapphire
+### nAl2O3 constant
+
+Ordinary refractive index of sapphire
 
 Measured (ordinary axis; birefringent material). Ordinary refractive index
 of sapphire at `589 nm`, `20°C`. Sapphire is birefringent; the extraordinary
 index is slightly higher. [Materials 16](#materials-16)
 
-### cpAl2O3 — Specific heat of sapphire
+### cpAl2O3 constant
+
+Specific heat of sapphire
 
 Measured. Specific heat of sapphire at `300 K`. [Materials 16](#materials-16) [Materials 2](#materials-2)
 
-### ρAl2O3 — Resistivity of sapphire
+### ρAl2O3 constant
+
+Resistivity of sapphire
 
 Measured. Electrical resistivity of single-crystal sapphire at `20°C`. One
 of the best insulating substrates; used in power electronics and RF
 substrates. It quantifies how strongly a material opposes the flow of electric
 current. [Materials 16](#materials-16)
 
-### EdAl2O3 — Dielectric rigidity of sapphire
+### EdAl2O3 constant
+
+Dielectric rigidity of sapphire
 
 Measured. Dielectric breakdown electric field of sapphire. High strength;
 enables use in high-field capacitors and microwave devices. [Materials 16](#materials-16)
 
-## CaF2 — Dielectric
+## CaF2 constant
 
-### ρvCaF2 — Calcium fluoride density
+Dielectric
+
+### ρvCaF2 constant
+
+Calcium fluoride density
 
 Measured. Volumetric density of calcium fluoride (CaF2), a key material
 for deep ultraviolet optics (`193` nm excimer lithography) and infrared
 windows. [Materials 17](#materials-17) [Materials 15](#materials-15)
 
-### nCaF2 — Refractive index of CaF2
+### nCaF2 constant
+
+Refractive index of CaF2
 
 Measured. Refractive index of CaF2 at `589 nm`, `20°C`. CaF2 is transparent
 from `130 nm` to `10 µm`, making it useful across a very wide spectral range.
 [Materials 17](#materials-17)
 
-### cpCaF2 — Specific heat of CaF2
+### cpCaF2 constant
+
+Specific heat of CaF2
 
 Measured. Specific heat of calcium fluoride. [Materials 15](#materials-15)
 
-### ρCaF2 — Resistivity of CaF2
+### ρCaF2 constant
+
+Resistivity of CaF2
 
 Measured. Electrical resistivity of single-crystal CaF2 at `20°C` . Excellent
 insulator; ionic crystal structure provides high purity. It quantifies
 how strongly a material opposes the flow of electric current. [Materials 17](#materials-17)
 
-### EdCaF2 — Dielectric rigidity of CaF2
+### EdCaF2 constant
+
+Dielectric rigidity of CaF2
 
 Measured. Dielectric breakdown electric field of CaF2 crystal. Very high;
 consistent with use in high-power UV laser optics. [Materials 17](#materials-17)
 
-## C Diamond — Dielectric
+## C Diamond constant
 
-### ρvC — Diamond density
+Dielectric
+
+### ρvC constant
+
+Diamond density
 
 Measured. Volumetric density of cubic (type IIa) diamond. Diamond has
 the highest known thermal conductivity of any material at room
 temperature. [Materials 13](#materials-13) [Materials 14](#materials-14)
 
-### nC — Refractive index of diamond
+### nC constant
+
+Refractive index of diamond
 
 Measured (type IIa diamond). Refractive index of diamond at `589 nm`,
 `20°C`. [Materials 14](#materials-14)
 
-### cpC — Specific heat of diamond
+### cpC constant
+
+Specific heat of diamond
 
 Measured. Specific heat of diamond at `300 K`. [Materials 13](#materials-13)
 
-### ρC — Resistivity of diamond
+### ρC constant
+
+Resistivity of diamond
 
 Measured (type IIa natural diamond). Electrical resistivity of type IIa diamond
 at `20°C`. Resistivity varies strongly with crystal purity. It quantifies how
 strongly a material opposes the flow of electric current. [Materials 13](#materials-13) [Materials 14](#materials-14)
 
-### EdC — Dielectric rigidity of diamond
+### EdC constant
+
+Dielectric rigidity of diamond
 
 Measured (type IIa diamond). Dielectric breakdown electric field of diamond.
 Highest of any known solid; enables use in next-generation high-power
@@ -2529,36 +3111,54 @@ electronics. [Materials 13](#materials-13) [Materials 14](#materials-14)
     For metals: `n` not listed (complex `n`, strongly wavelength-dependent).
     `cv ≈ cp` for all metals at room temperature (difference < 0.5%).
 
-## Al — Metal
+## Al constant
 
-### ρvAl — Aluminium density
+Metal
+
+### ρvAl constant
+
+Aluminium density
 
 Measured. Volumetric density of pure aluminium, a standard reference
 material in mechanical and thermal engineering. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-### cpAl — Specific heat of aluminium
+### cpAl constant
+
+Specific heat of aluminium
 
 Measured. Specific heat of pure aluminium at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Cu — Metal
+## Cu constant
 
-### ρvCu — Copper density
+Metal
+
+### ρvCu constant
+
+Copper density
 
 Measured. Volumetric density of copper, the reference material for
 thermal and electrical conductivity in engineering. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-### cpCu — Specific heat of copper
+### cpCu constant
+
+Specific heat of copper
 
 Measured. Specific heat of copper at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Fe — Metal
+## Fe constant
 
-### ρvFe — Iron density (alpha phase)
+Metal
+
+### ρvFe constant
+
+Iron density (alpha phase)
 
 Measured (alpha phase, BCC). Volumetric density of iron in its alpha
 phase (body-centred cubic), stable below `912°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-### cpFe — Specific heat of iron (alpha phase, BCC)
+### cpFe constant
+
+Specific heat of iron (alpha phase, BCC)
 
 Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
 [Materials 12](#materials-12) [Materials 2](#materials-2)
