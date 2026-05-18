@@ -1225,73 +1225,73 @@ static const cstring basic_constants[] =
 "Astronomy/Earth",     nullptr,
 
     // *Earth gravitational parameter - Exact nominal value [3]
-    "GM🜨",      "[ 3.986004E14_m³/s² "
+    "GM♁",      "[ 3.986004E14_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
     // *Earth equatorial radius - Exact nominal value [3]
-    "Req🜨",     "[ 6378.1_km "
+    "Req♁",     "[ 6378.1_km "
                 "  0_km "
                 "  0 ]",
     // *Earth polar radius - Exact nominal value [3]
-    "Rp🜨",      "[ 6356.8_km "
+    "Rp♁",      "[ 6356.8_km "
                 "  0_km "
                 "  0 ]",
     // *Earth oblateness - Calculation from nominal value [3]
-    "f🜨",       "[ 'ROUND(1-ⒸRp🜨/ⒸReq🜨;XPON(UVAL(Ⓡf🜨*(1-ⒸRp🜨/ⒸReq🜨)))-XPON(1-ⒸRp🜨/ⒸReq🜨)-2)' "
-                "  'ROUND(Ⓡf🜨*Ⓒf🜨;-2)' "
-                "  'ⓇRp🜨+ⓇReq🜨' ]",
+    "f♁",       "[ 'ROUND(1-ⒸRp♁/ⒸReq♁;XPON(UVAL(Ⓡf♁*(1-ⒸRp♁/ⒸReq♁)))-XPON(1-ⒸRp♁/ⒸReq♁)-2)' "
+                "  'ROUND(Ⓡf♁*Ⓒf♁;-2)' "
+                "  'ⓇRp♁+ⓇReq♁' ]",
     // *Earth mean density - Calculation from nominal value [3]
-    "ρv🜨",       "[ 'ROUND(CONVERT(ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨);1_kg/m³);XPON(UVAL(Ⓡρv🜨*ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨)))-XPON(UVAL(ⒸGM🜨/(ⒸG·4/3·Ⓒπ·ⒸReq🜨²·ⒸRp🜨)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡρv🜨*Ⓒρv🜨);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq🜨+ⓇRp🜨' ]",
+    "ρv♁",       "[ 'ROUND(CONVERT(ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁);1_kg/m³);XPON(UVAL(Ⓡρv♁*ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁)))-XPON(UVAL(ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡρv♁*Ⓒρv♁);-2);1_kg/m³)' "
+                "  'ⓇG+2·ⓇReq♁+ⓇRp♁' ]",
 
     // ------------------------------------------------------------------------
     // *Earth surface gravity - Calculation from nominal value [3]
-    "g🜨",       "[ 'ROUND(CONVERT(ⒸGM🜨/ⒸReq🜨²;1_m/s²);XPON(UVAL(Ⓡg🜨*ⒸGM🜨/ⒸReq🜨²))-XPON(UVAL(ⒸGM🜨/ⒸReq🜨²))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡg🜨*Ⓒg🜨);-2);1_m/s²)' "
-                "  '2·ⓇReq🜨' ]",
+    "g♁",       "[ 'ROUND(CONVERT(ⒸGM♁/ⒸReq♁²;1_m/s²);XPON(UVAL(Ⓡg♁*ⒸGM♁/ⒸReq♁²))-XPON(UVAL(ⒸGM♁/ⒸReq♁²))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡg♁*Ⓒg♁);-2);1_m/s²)' "
+                "  '2·ⓇReq♁' ]",
     // *Earth escape velocity - Calculation from nominal value [3]
-    "Ve🜨",      "[ 'ROUND(CONVERT(√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3));1_m/s);XPON(UVAL(ⓇVe🜨*√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3))))-XPON(UVAL(√(2·ⒸGM🜨/(ⒸReq🜨²·ⒸRp🜨)↑(2/3))))-2)' "
-                "  'CONVERT(ROUND(UBASE(ⓇVe🜨*ⒸVe🜨);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq🜨+ⓇRp🜨))' ]",
+    "Ve♁",      "[ 'ROUND(CONVERT(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♁*√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇVe♁*ⒸVe♁);-2);1_m/s)' "
+                "  '1/2·(2/3·(2·ⓇReq♁+ⓇRp♁))' ]",
     // *Earth sidereal rotation period - Measurement [24]
-    "Prot🜨",    "[ 86164.0905_s "
+    "Prot♁",    "[ 86164.0905_s "
                 "  0.0001_s "
-                "  'ROUND(ⓈProt🜨/ⒸProt🜨;-2)' "
+                "  'ROUND(ⓈProt♁/ⒸProt♁;-2)' "
                 "  8.616E4_s ]",
     // *Earth axial tilt - Measurement [24]
-    "ϵ🜨",       "[ 23.4393_° "
+    "ϵ♁",       "[ 23.4393_° "
                 "  0.0001_° "
-                "  'ROUND(Ⓢϵ🜨/Ⓒϵ🜨;-2)' "
+                "  'ROUND(Ⓢϵ♁/Ⓒϵ♁;-2)' "
                 "  23.44_° ]",
     // *Earth semi-major axis - Exact nominal value [3]
-    "a🜨",       "[ 149597870.7_km "
+    "a♁",       "[ 149597870.7_km "
                 "  0_km "
                 "  0 "
                 "  1.496E8_km ]",
 
     // ------------------------------------------------------------------------
     // *Earth orbital eccentricity - Measurement [23]
-    "e🜨",       "[ 0.0167086 "
+    "e♁",       "[ 0.0167086 "
                 "  0.0000001 "
-                "  'ROUND(Ⓢe🜨/Ⓒe🜨;-2)' "
+                "  'ROUND(Ⓢe♁/Ⓒe♁;-2)' "
                 "  0.01671 ]",
     // *Earth orbital inclination - Measurement [23]
-    "i🜨",       "[ 0.00005_° "
+    "i♁",       "[ 0.00005_° "
                 "  0.00001_° "
-                "  'ROUND(Ⓢi🜨/Ⓒi🜨;-2)' ]",
+                "  'ROUND(Ⓢi♁/Ⓒi♁;-2)' ]",
     // *Earth longitude of ascending node - Measurement [23]
-    "Ω🜨",       "[ 348.74_° "
+    "Ω♁",       "[ 348.74_° "
                 "  0.01_° "
-                "  'ROUND(ⓈΩ🜨/ⒸΩ🜨;-2)' "
+                "  'ROUND(ⓈΩ♁/ⒸΩ♁;-2)' "
                 "  348.7_° ]",
     // *Earth argument of perihelion - Measurement [23]
-    "ω🜨",       "[ 114.20783_° "
+    "ω♁",       "[ 114.20783_° "
                 "  0.00001_° "
-                "  'ROUND(Ⓢω🜨/Ⓒω🜨;-2)' "
+                "  'ROUND(Ⓢω♁/Ⓒω♁;-2)' "
                 "  114.2_° ]",
     // *Earth perihelion passage - Measurement [M20]
-    "T₀🜨",      "[ 20260103.7188_date "
+    "T₀♁",      "[ 20260103.7188_date "
                 "  0_date "
                 "  0 ]",
 

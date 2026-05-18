@@ -1061,87 +1061,87 @@ approximately twice per year. Value in JDN. It is the most recent point in its
 orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 
-## Earth 🜨
+## Earth ♁
 
-### GM🜨 — Earth gravitational parameter
+### GM♁ — Earth gravitational parameter
 
 Exact nominal value (IAU 2015). Earth's gravitational parameter. An exact nominal
 value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Req🜨 — Earth equatorial radius
+### Req♁ — Earth equatorial radius
 
 Exact nominal value (IAU 2015). Earth's equatorial radius. An exact nominal value
 defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### Rp🜨 — Earth polar radius
+### Rp♁ — Earth polar radius
 
 Exact nominal value (IAU 2015). Earth's polar radius. An exact nominal value
 defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
-### f🜨 — Earth oblateness
+### f♁ — Earth oblateness
 
 Calculated from nominal value. Earth's oblateness, reflecting its equatorial
-bulge due to rotation. Calculated from `Req🜨` and `Rp🜨`. When greater than 0, it
+bulge due to rotation. Calculated from `Req♁` and `Rp♁`. When greater than 0, it
 describes how much a celestial body deviates from a perfect sphere, forming an
 "oblate spheroid". [Particle Data Group 2023](#particle-data-group-2023)
 
-### ρv🜨 — Earth mean density
+### ρv♁ — Earth mean density
 
 Calculated from nominal value. Earth's mean density, calculated from its gravitational
 parameter and volume. [Particle Data Group 2023](#particle-data-group-2023)
 
-### g🜨 — Earth surface gravity
+### g♁ — Earth surface gravity
 
 Calculated from nominal value. Earth's surface gravity at the equator, calculated
-from `GM🜨` and `Req🜨`. [Particle Data Group 2023](#particle-data-group-2023)
+from `GM♁` and `Req♁`. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Ve🜨 — Earth escape velocity
+### Ve♁ — Earth escape velocity
 
 Calculated from nominal value, it is valid at the equatorial surface. It is the
 minimum speed needed to break free from Earth's gravitational pull and never return. [Particle Data Group 2023](#particle-data-group-2023)
 
-### Prot🜨 — Earth sidereal rotation period
+### Prot♁ — Earth sidereal rotation period
 
 Measured. Earth's sidereal rotation period (one sidereal day), the time for one
 rotation relative to the fixed stars. [Reference 24](#reference-24)
 
-### ϵ🜨 — Earth axial tilt
+### ϵ♁ — Earth axial tilt
 
 Measured. Earth's axial tilt (obliquity of the ecliptic), the primary driver of the
 seasons. It is the angle of the planet's rotational axis relative to its orbital plane.
 [Reference 24](#reference-24)
 
-### a🜨 — Earth semi-major axis
+### a♁ — Earth semi-major axis
 
 Exact nominal value (1 AU by definition). Earth's orbital semi-major axis, defined
 as exactly 1 astronomical unit (AU). It is half the length of the longest diameter
 of the elliptical orbit, which is also the average distance from one of the radii
 to the orbit. [Particle Data Group 2023](#particle-data-group-2023)
 
-### e🜨 — Earth orbital eccentricity
+### e♁ — Earth orbital eccentricity
 
 Measured. Earth's orbital eccentricity (low since the orbit is nearly circular) . [Reference 23](#reference-23)
 
-### i🜨 — Earth orbital inclination
+### i♁ — Earth orbital inclination
 
 Measured (reference plane — near zero relative to the J2000.0 ecliptic plane).
 The Earth's orbital inclination is often defined by convention with respect to
 the reference plane (effectively zero) as being the ecliptic plane (in such case
 this angle is zero). [Reference 23](#reference-23)
 
-### Ω🜨 — Earth longitude of ascending node
+### Ω♁ — Earth longitude of ascending node
 
 Earth’s longitude of the ascending node is a measured angle quantifying the
 horizontal orientation of the orbit. It represents where the Earth crosses
 northward through Earth's orbital plane. [Reference 23](#reference-23)
 
-### ω🜨 — Earth argument of perihelion
+### ω♁ — Earth argument of perihelion
 
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
-### T₀🜨 — Earth perihelion passage
+### T₀♁ — Earth perihelion passage
 
 Measured. Earth's most recent time of perihelion passage (early January each
 year). Value in JDN. It is the most recent point in its orbit when it was
