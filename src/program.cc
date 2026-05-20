@@ -320,6 +320,7 @@ uint program::read_time()
 // ----------------------------------------------------------------------------
 //   The sys_current_ms() function stops running when timers are off.
 {
+	/*
     dt_t date;
     tm_t time;
     rtc_read(&time, &date);
@@ -329,6 +330,8 @@ uint program::read_time()
              time.hour * 3600 +
               jd * 86400) * 100 + time.csec) * 10;
     return ticks;
+*/	
+	return sys_current_ms();
 }
 
 

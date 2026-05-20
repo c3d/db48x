@@ -36,7 +36,7 @@
 #include "symbol.h"
 #include "utf8.h"
 
-#include <strings.h>
+//#include <strings.h>
 
 
 locals_stack *locals_stack::stack = nullptr;

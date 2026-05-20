@@ -31,9 +31,15 @@
 
 #include "dmcp.h"
 #include "types.h"
+#include "errno.h"
 
-#include <stdio.h>
+//#include <stdio.h>
 
+
+#if  USE_EmFile
+#include "FS.h"
+#define MAX_FILE 16
+#endif
 
 // For the text pointer variant of the constructor
 typedef const struct text *text_p;
@@ -80,17 +86,30 @@ struct file
     static bool    unlink(cstring path);
     static cstring extension(cstring path);
     static cstring basename(cstring path);
-
+#if USE_EmFile
+   static int allocate_slot();
+#endif
 protected:
     static file *current;       // Only one open file at a time
-#if SIMULATOR
+#if USE_EmFile
+   static file* open_files[MAX_FILE];
+#endif
+#if (SIMULATOR )
     typedef FILE *FIL;
+#elif USE_EmFile
+ //   typedef FS_FILE FIL;
+
 #endif // SIMULATOR
-    FIL         data;
+    FS_FILE         *data;
     cstring     name;           // File name to use when reopening
     uint        closed;         // Position in file when closing
     file *      previous;       // Previous file to reopen when closing
     bool        writing;        // Should we reopen for writing
+   bool     f_eof;
+#if USE_EmFile
+   int slot;                     // slot in open-file table
+#endif
+
 };
 
 
@@ -103,12 +122,16 @@ protected:
 //
 // ============================================================================
 
-#ifndef SIMULATOR
+#if (SIMULATOR | USE_EmFile )
+
+#else
 #define ftell(f)     f_tell(&f)
 #define fseek(f,o,w) f_lseek(&f,o)
 #define fclose(f)    f_close(&f)
 #define feof(f)      f_eof(&f)
 #endif // SIMULATOR
+
+
 
 
 
@@ -125,6 +148,9 @@ inline bool file::valid()
 {
 #if SIMULATOR
     return data          != 0;
+#elif USE_EmFile
+    return data          != 0;
+
 #else
     return data.flag && !data.err;
 #endif
@@ -136,7 +162,12 @@ inline void file::seek(uint off)
 //    Move the read position in the data file
 // ----------------------------------------------------------------------------
 {
+#if USE_EmFile
+   FS_FSeek(data, off, FS_FILE_BEGIN);
+#else
     fseek(data, off, SEEK_SET);
+#endif
+
 }
 
 
@@ -145,10 +176,21 @@ inline unicode file::peek()
 //    Look at what is as current position without moving it
 // ----------------------------------------------------------------------------
 {
+
+#if USE_EmFile
+    uint off       = FS_FTell(data);
+    unicode result = get();
+    seek(off);
+    return result;
+
+#else
     uint off       = ftell(data);
     unicode result = get();
     seek(off);
     return result;
+#endif
+
+
 }
 
 
@@ -167,7 +209,12 @@ inline uint file::position()
 //   Return current position in help file
 // ----------------------------------------------------------------------------
 {
+#if USE_EmFile
+   return FS_FTell(data);
+#else
     return ftell(data);
+#endif
+
 }
 
 
@@ -176,7 +223,12 @@ inline bool file::eof()
 //   Indicate if end of file
 // ----------------------------------------------------------------------------
 {
+#if USE_EmFile
+   return f_eof;
+#else
     return feof(data);
+#endif
+
 }
 
 #endif // FILE_H

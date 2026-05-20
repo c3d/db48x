@@ -77,7 +77,7 @@ struct user_interface
     {
         HISTORY         = 8,    // Number of menus and commands kept in history
         NUM_PLANES      = 3,    // NONE, Shift and "extended" shift
-        NUM_KEYS        = 46,   // Including SCREENSHOT, SH_UP and SH_DN
+        NUM_KEYS        = 52,   // Including SCREENSHOT, SH_UP and SH_DN
         NUM_SOFTKEYS    = 6,    // Number of softkeys
         NUM_MENUS = NUM_PLANES * NUM_SOFTKEYS,
     };
