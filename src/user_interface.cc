@@ -1680,7 +1680,7 @@ bool user_interface::draw_menus()
     }
 
     settings::SaveTabWidth stw(0);
-    for (int plane = 0; plane < planes; plane++)
+    for (int plane = 0; plane < visiblePlanes; plane++)
     {
         cstring *labels = menuLabel[plane];
         if (help)
