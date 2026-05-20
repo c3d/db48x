@@ -29,64 +29,16 @@
 
 #include "target.h"
 
-static const byte dmcp_position[] =
-// ----------------------------------------------------------------------------
-//   Convert DMCP key codes to row/column positions
-// ----------------------------------------------------------------------------
-{
-    KB_F1,      11,
-    KB_F2,      12,
-    KB_F3,      13,
-    KB_F4,      14,
-    KB_F5,      15,
-    KB_F6,      16,
 
-    KB_A,       21,
-    KB_B,       22,
-    KB_C,       23,
-    KB_D,       24,
-    KB_E,       25,
-    KB_F,       26,
-
-    KB_G,       31,
-    KB_H,       32,
-    KB_I,       33,
-    KB_J,       34,
-    KB_K,       35,
-    KB_L,       36,
-
-    KB_ENT,     41,
-    KB_M,       42,
-    KB_N,       43,
-    KB_O,       44,
-    KB_BKS,     45,
-
-    KB_UP,      51,
-    KB_P,       52,
-    KB_Q,       53,
-    KB_R,       54,
-    KB_S,       55,
-
-    KB_DN,      61,
-    KB_T,       62,
-    KB_U,       63,
-    KB_V,       64,
-    KB_W,       65,
-
-    KB_SHIFT,   71,
-    KB_X,       72,
-    KB_Y,       73,
-    KB_Z,       74,
-    KB_SUB,     75,
-
-
-    KB_ON,      81,
-    KB_0,       82,
-    KB_DOT,     83,
-    KB_SPC,     84,
-    KB_ADD,     85
-};
-
+uint8_t MemToggle_B1=0;
+uint8_t MemToggle_B2=0;
+uint8_t MemToggle_C2=0;
+uint8_t MemToggle_D1=0;
+uint8_t MemToggle_D2=0;
+uint8_t MemToggle_D3=0;
+uint8_t MemToggle_E1=0;
+uint8_t MemToggle_E2=0;
+uint8_t MemToggle_F1=0;
 
 
 uint platform_plane(bool ls, bool rs, bool al, bool lc, bool trans)
@@ -106,6 +58,7 @@ uint platform_keyid(uint pkey, bool ls, bool rs, bool al, bool lc, bool trans)
     return pkey + 100 * platform_plane(ls, rs, al, lc, trans);
 }
 
+extern  const uint8_t dmcp_position[100] ;
 
 uint platform_keyid(uint rc, uint plane)
 // ----------------------------------------------------------------------------
