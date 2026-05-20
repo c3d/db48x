@@ -11682,6 +11682,10 @@ void tests::constants_menu()
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
+    step("Astronomy constants menu hierarchy")
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F4, NOSHIFT, F3)
+        .test(NOSHIFT, F1).expect("GM♁")
+        .test(LSHIFT, F1).expect("3.98600 4⁳¹⁴ m↑3/s↑2");
     step("Insert pi constant")
         .test(CLEAR, "pi", ENTER).type(ID_constant).expect("π")
         .test(ID_ToDecimal).expect("3.14159 26535 9")

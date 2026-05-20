@@ -1296,21 +1296,79 @@ utf8 constant::do_instance_help(constant::config_r cfg) const
 //   Build a constants menu
 //
 // ============================================================================
+//
+//   In the following, we skip menus beginning with `=`
+//   That feature is used by the `=Cycle` menu in config/units.csv,
+//   which describes unit cycles but should not show in units menu
 
-utf8 constant_menu::do_name(constant::config_r cfg, id type, size_t &len)
+static bool path_top_level(cstring name)
 // ----------------------------------------------------------------------------
-//   Return the name associated with the type
+//   True if name has no '/' (top-level category)
 // ----------------------------------------------------------------------------
 {
-    uint count = type - cfg.first_menu;
+    return !strchr(name, '/');
+}
+
+
+static bool path_top_level(symbol_p sym)
+// ----------------------------------------------------------------------------
+//   True if name has no '/' (top-level category)
+// ----------------------------------------------------------------------------
+{
+    size_t len = 0;
+    utf8   txt = sym->value(&len);
+    return !memchr(txt, '/', len);
+}
+
+
+static utf8 path_last_segment(utf8 path, size_t &len)
+// ----------------------------------------------------------------------------
+//   Return the final path segment (text after the last '/')
+// ----------------------------------------------------------------------------
+{
+    size_t i = len;
+    while (i-- > 0)
+    {
+        if (path[i] == '/')
+        {
+            len -= i + 1;
+            return path + i + 1;
+        }
+    }
+    return path;
+}
+
+
+static bool path_is_direct_child(utf8   child,
+                                 size_t clen,
+                                 utf8   parent,
+                                 size_t plen)
+// ----------------------------------------------------------------------------
+//   True if child is parent + '/' + one segment (no further slashes)
+// ----------------------------------------------------------------------------
+{
+    if (clen <= plen || memcmp(child, parent, plen) != 0 || child[plen] != '/')
+        return false;
+    utf8 rest = child + plen + 1;
+    return !memchr(rest, '/', clen - plen - 1);
+}
+
+
+static utf8 path_for_menu(constant::config_r cfg,
+                          object::id         menu,
+                          size_t            *len = nullptr)
+// ----------------------------------------------------------------------------
+//   Return the full category path for a menu id
+// ----------------------------------------------------------------------------
+{
+    uint      count = menu - cfg.first_menu;
     unit_file cfile(cfg.file);
 
-    // List all preceding entries
     if (cfile.valid())
         while (symbol_p mname = cfile.next(true))
             if (*mname->value() != '=')
                 if (!count--)
-                    return mname->value(&len);
+                    return mname->value(len);
 
     if (cfg.show_builtins())
     {
@@ -1318,11 +1376,12 @@ utf8 constant_menu::do_name(constant::config_r cfg, id type, size_t &len)
         auto   builtins = cfg.builtins;
         for (size_t b = 0; b < maxb; b += 2)
         {
-            if (!builtins[b+1] || !*builtins[b+1])
+            if (!builtins[b + 1] || !*builtins[b + 1])
             {
                 if (!count--)
                 {
-                    len = strlen(builtins[b]);
+                    if (len)
+                        *len = strlen(builtins[b]);
                     return utf8(builtins[b]);
                 }
             }
@@ -1333,17 +1392,121 @@ utf8 constant_menu::do_name(constant::config_r cfg, id type, size_t &len)
 }
 
 
+static uint path_count_direct_children(constant::config_r cfg,
+                                       utf8               parent,
+                                       size_t             plen)
+// ----------------------------------------------------------------------------
+//   Count category headers that are direct children of parent
+// ----------------------------------------------------------------------------
+{
+    uint      count = 0;
+    unit_file cfile(cfg.file);
+
+    if (cfile.valid())
+    {
+        cfile.seek(0);
+        while (symbol_p mname = cfile.next(true))
+        {
+            if (*mname->value() == '=')
+                continue;
+            size_t mlen = 0;
+            utf8   path = mname->value(&mlen);
+            if (path_is_direct_child(path, mlen, parent, plen))
+                count++;
+        }
+    }
+
+    if (!cfile.valid() || cfg.show_builtins())
+    {
+        size_t maxb     = cfg.nbuiltins;
+        auto   builtins = cfg.builtins;
+        for (size_t b = 0; b < maxb; b += 2)
+        {
+            if (!builtins[b + 1] || !*builtins[b + 1])
+            {
+                utf8   child = utf8(builtins[b]);
+                size_t clen  = strlen(builtins[b]);
+                if (path_is_direct_child(child, clen, parent, plen))
+                    count++;
+            }
+        }
+    }
+
+    return count;
+}
+
+
+utf8 constant_menu::do_name(constant::config_r cfg, id type, size_t &len)
+// ----------------------------------------------------------------------------
+//   Return the display name associated with the type
+// ----------------------------------------------------------------------------
+{
+    if (utf8 path = path_for_menu(cfg, type, &len))
+        return path_last_segment(path, len);
+    return nullptr;
+}
+
+
 bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
 // ----------------------------------------------------------------------------
 //   Load the menu from a file
 // ----------------------------------------------------------------------------
 {
+    id     type    = this->type();
+    size_t curlen  = 0;
+    utf8   current = path_for_menu(cfg, type, &curlen);
+    if (!current)
+        return false;
+
+    uint children = path_count_direct_children(cfg, current, curlen);
+    if (children)
+    {
+        items_init(mi, children);
+        uint idx = 0;
+        unit_file cfile(cfg.file);
+        if (cfile.valid())
+        {
+            cfile.seek(0);
+            while (symbol_p mname = cfile.next(true))
+            {
+                if (*mname->value() == '=')
+                    continue;
+                size_t mlen = 0;
+                utf8   path = mname->value(&mlen);
+                if (path_is_direct_child(path, mlen, current, curlen))
+                {
+                    path = path_last_segment(path, mlen);
+                    symbol_p label = symbol::make(path, mlen);
+                    items(mi, label, id(cfg.first_menu + idx));
+                }
+                idx++;
+            }
+        }
+        if (!cfile.valid() || cfg.show_builtins())
+        {
+            size_t maxb     = cfg.nbuiltins;
+            auto   builtins = cfg.builtins;
+            for (size_t b = 0; b < maxb; b += 2)
+            {
+                if (!builtins[b + 1] || !*builtins[b + 1])
+                {
+                    utf8   child = utf8(builtins[b]);
+                    size_t clen  = strlen(builtins[b]);
+                    id     cid   = id(cfg.first_menu + idx);
+                    if (path_is_direct_child(child, clen, current, curlen))
+                        items(mi, cstring(path_last_segment(child, clen)), cid);
+                    idx++;
+                }
+            }
+        }
+        return true;
+    }
+
     // Use the constants loaded from the constants file
     unit_file cfile(cfg.file);
     size_t    matching = 0;
     uint      position = 0;
     uint      count    = 0;
-    id        type     = this->type();
     id        menu     = cfg.first_menu;
     id        lastm    = cfg.last_menu;
     size_t    first    = 0;
@@ -1467,7 +1630,7 @@ utf8 constant_menu::do_menu_help(constant::config_r cfg,
 {
     static char buf[64];
     size_t len = 0;
-    utf8 base = do_name(cfg, cst->type(), len);
+    utf8 base = path_for_menu(cfg, cst->type(), &len);
     snprintf(buf, sizeof(buf), "%.*s%s", int(len), base, cfg.menu_help);
     return utf8(buf);
 }
@@ -1478,53 +1641,91 @@ bool constant::do_collection_menu(constant::config_r cfg, menu_info &mi)
 //   Build the collection menu for the given config
 // ----------------------------------------------------------------------------
 {
-    uint      infile   = 0;
-    uint      count    = 0;
-    uint      maxmenus = cfg.last_menu - cfg.first_menu;
-    size_t    maxb     = cfg.nbuiltins;
-    auto      builtins = cfg.builtins;
+    uint      menuID        = 0;
+    uint      infile        = 0;
+    uint      inbuiltins    = 0;
+    uint      menus         = cfg.last_menu - cfg.first_menu;
+    size_t    maxb          = cfg.nbuiltins;
+    auto      builtins      = cfg.builtins;
     unit_file cfile(cfg.file);
 
-    // List all menu entries in the file (up to 100)
+    // List all top-level menu entries in the file (up to 100)
     if (cfile.valid())
+    {
         while (symbol_p mname = cfile.next(true))
+        {
             if (*mname->value() != '=')
-                if (infile++ >= maxmenus)
+            {
+                if (menuID++ >= menus)
+                {
+                    record(constants_error,
+                           "Too many entries in file %s, %u > %u, %u top level",
+                           cfg.file, menuID, menus, infile);
                     break;
+                }
+                if (path_top_level(mname))
+                    infile++;
+            }
+        }
+    }
 
-    // Count built-in constant menu titles
+    // Count built-in top-level constant menu titles
     if (!infile || cfg.show_builtins())
     {
         for (size_t b = 0; b < maxb; b += 2)
-            if (!builtins[b+1] || !*builtins[b+1])
-                count++;
-        if (infile + count > maxmenus)
-            count = maxmenus - infile;
+        {
+            if (!builtins[b + 1] || !*builtins[b + 1])
+            {
+                if (menuID++ >= menus)
+                {
+                    record(constants_error,
+                           "Too many builtins after %s, %u > %u, "
+                           "%u + %u top level",
+                           cfg.file, menuID, menus, infile, inbuiltins);
+                    break;
+                }
+                if (path_top_level(builtins[b]))
+                    inbuiltins++;
+            }
+        }
+        // If too many file entries, we may need to truncate builtins
+        if (infile + inbuiltins > menus)
+        {
+            record(constants_error,
+                   "Too many entries in file %s, %u + %u > %u, truncating",
+                   cfg.file, infile, inbuiltins, menus);
+            inbuiltins = menus - infile;
+        }
     }
 
-    menu::items_init(mi, infile + count);
-    infile = 0;
+    uint mitems = infile + inbuiltins;
+    menu::items_init(mi, mitems);
+    menuID = 0;
     if (cfile.valid())
     {
         cfile.seek(0);
         while (symbol_p mname = cfile.next(true))
         {
-            if (*mname->value() == '=')
+            if (*mname->value() == '=') // Skip =Cycle menu and similar
                 continue;
-            if (infile >= maxmenus)
+            if (menuID++ >= menus)
                 break;
-            menu::items(mi, mname, id(cfg.first_menu + infile++));
+            if (!path_top_level(mname))
+                continue;
+            menu::items(mi, mname, id(cfg.first_menu + menuID - 1));
         }
     }
     if (!infile || cfg.show_builtins())
     {
         for (size_t b = 0; b < maxb; b += 2)
         {
-            if (!builtins[b+1] || !*builtins[b+1])
+            if (!builtins[b + 1] || !*builtins[b + 1])
             {
-                if (infile >= maxmenus)
+                if (menuID++ >= menus)
                     break;
-                menu::items(mi, builtins[b], id(cfg.first_menu + infile++));
+                if (!path_top_level(builtins[b]))
+                    continue;
+                menu::items(mi, builtins[b], id(cfg.first_menu + menuID -1));
             }
         }
     }
