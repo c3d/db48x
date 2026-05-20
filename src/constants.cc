@@ -1210,7 +1210,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg☿*Ⓒg☿);-2);1_m/s²)' "
                 "  'ⓇGM☿+2·ⓇReq☿' ]",
     // *Mercury escape velocity - Calculation from measurement [4] [22]
-    "Ve☿",      "[ 'ROUND(CONVERT(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☿*√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-2)' "
+    "Ve☿",      "[ 'ROUND(CONVERT(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3));1_m/s);XPON(UVAL(ⓇVe☿*√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3))))-XPON(UVAL(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☿*ⒸVe☿);-2);1_m/s)' "
                 "  0.02 ]",
     // *Mercury sidereal rotation period - Measurement [22]
@@ -1285,7 +1285,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♀*Ⓒg♀);-2);1_m/s²)' "
                 "  'ⓇGM♀+2·ⓇReq♀' ]",
     // *Venus escape velocity - Calculation from measurement [4] [22]
-    "Ve♀",      "[ 'ROUND(CONVERT(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♀*√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-2)' "
+    "Ve♀",      "[ 'ROUND(CONVERT(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♀*√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♀*ⒸVe♀);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♀+(2/3·(2·ⓇReq♀+ⓇRp♀)))' ]",
     // *Venus sidereal rotation period - Measurement [22]
@@ -1358,7 +1358,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♁*Ⓒg♁);-2);1_m/s²)' "
                 "  'ⓇGM♁+2·ⓇReq♁' ]",
     // *Earth escape velocity - Calculation from nominal value [3]
-    "Ve♁",      "[ 'ROUND(CONVERT(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♁*√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-2)' "
+    "Ve♁",      "[ 'ROUND(CONVERT(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♁*√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♁*ⒸVe♁);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♁+(2/3·(2·ⓇReq♁+ⓇRp♁)))' ]",
     // *Earth sidereal rotation period - Measurement [24]
@@ -1434,7 +1434,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg☽*Ⓒg☽);-2);1_m/s²)' "
                 "  'ⓇGM☽+2·ⓇReq☽' ]",
     // *Moon escape velocity - Calculation from measurement [4] [22]
-    "Ve☽",      "[ 'ROUND(CONVERT(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☽*√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-2)' "
+    "Ve☽",      "[ 'ROUND(CONVERT(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(1/3));1_m/s);XPON(UVAL(ⓇVe☽*√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(1/3))))-XPON(UVAL(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☽*ⒸVe☽);-2);1_m/s)' "
                 "  '1/2·(ⓇGM☽+(2/3·(2·ⓇReq☽+ⓇRp☽)))' ]",
     // *Moon sidereal rotation period - Measurement [22]
@@ -1509,7 +1509,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♂*Ⓒg♂);-2);1_m/s²)' "
                 "  'ⓇGM♂+2·ⓇReq♂' ]",
     // *Mars escape velocity - Calculation from measurement [4] [22]
-    "Ve♂",      "[ 'ROUND(CONVERT(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♂*√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-2)' "
+    "Ve♂",      "[ 'ROUND(CONVERT(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♂*√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♂*ⒸVe♂);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♂+(2/3·(2·ⓇReq♂+ⓇRp♂)))' ]",
     // *Mars sidereal rotation period - Measurement [22]
@@ -1580,7 +1580,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♃*Ⓒg♃);-2);1_m/s²)' "
                 "  'ⓇGM♃+2·ⓇReq♃' ]",
     // *Jupiter escape velocity - Calculation from nominal value [3]
-    "Ve♃",      "[ 'ROUND(CONVERT(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♃*√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-2)' "
+    "Ve♃",      "[ 'ROUND(CONVERT(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♃*√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♃*ⒸVe♃);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♃+(2/3·(2·ⓇReq♃+ⓇRp♃)))' ]",
     // *Jupiter sidereal rotation period - Measurement [22]
@@ -1653,7 +1653,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♄*Ⓒg♄);-2);1_m/s²)' "
                 "  'ⓇGM♄+2·ⓇReq♄' ]",
     // *Saturn escape velocity - Calculation from measurement [4] [22]
-    "Ve♄",      "[ 'ROUND(CONVERT(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♄*√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-2)' "
+    "Ve♄",      "[ 'ROUND(CONVERT(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♄*√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♄*ⒸVe♄);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♄+(2/3·(2·ⓇReq♄+ⓇRp♄)))' ]",
     // *Saturn sidereal rotation period - Measurement [22]
@@ -1727,7 +1727,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg⛢*Ⓒg⛢);-2);1_m/s²)' "
                 "  'ⓇGM⛢+2·ⓇReq⛢' ]",
     // *Uranus escape velocity - Calculation from measurement [4] [22]
-    "Ve⛢",      "[ 'ROUND(CONVERT(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3));1_m/s);XPON(UVAL(ⓇVe⛢*√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-XPON(UVAL(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-2)' "
+    "Ve⛢",      "[ 'ROUND(CONVERT(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3));1_m/s);XPON(UVAL(ⓇVe⛢*√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3))))-XPON(UVAL(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe⛢*ⒸVe⛢);-2);1_m/s)' "
                 "  '1/2·(ⓇGM⛢+(2/3·(2·ⓇReq⛢+ⓇRp⛢)))' ]",
     // *Uranus sidereal rotation period - Measurement [22]
@@ -1801,7 +1801,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♆*Ⓒg♆);-2);1_m/s²)' "
                 "  'ⓇGM♆+2·ⓇReq♆' ]",
     // *Neptune escape velocity - Calculation from measurement [4] [22]
-    "Ve♆",      "[ 'ROUND(CONVERT(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♆*√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-2)' "
+    "Ve♆",      "[ 'ROUND(CONVERT(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♆*√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♆*ⒸVe♆);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♆+(2/3·(2·ⓇReq♆+ⓇRp♆)))' ]",
     // *Neptune sidereal rotation period - Measurement [22]
@@ -1873,7 +1873,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg♇*Ⓒg♇);-2);1_m/s²)' "
                 "  'ⓇGM♇+2·ⓇReq♇' ]",
     // *Pluto escape velocity - Calculation from measurement [4] [26]
-    "Ve♇",      "[ 'ROUND(CONVERT(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♇*√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-2)' "
+    "Ve♇",      "[ 'ROUND(CONVERT(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3));1_m/s);XPON(UVAL(ⓇVe♇*√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3))))-XPON(UVAL(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♇*ⒸVe♇);-2);1_m/s)' "
                 "  '1/2·(ⓇGM♇+(2/3·(2·ⓇReq♇+ⓇRp♇)))' ]",
     // *Pluto sidereal rotation period - Measurement [26]
@@ -1955,7 +1955,7 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡg☉*Ⓒg☉);-2);1_m/s²)' "
                 "  'ⓇGM☉+2·ⓇReq☉' ]",
     // *Solar escape velocity - Calculation from nominal value [3]
-    "Ve☉",      "[ 'ROUND(CONVERT(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☉*√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-2)' "
+    "Ve☉",      "[ 'ROUND(CONVERT(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(1/3));1_m/s);XPON(UVAL(ⓇVe☉*√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(1/3))))-XPON(UVAL(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(1/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☉*ⒸVe☉);-2);1_m/s)' "
                 "  '1/2·(ⓇGM☉+(2/3·(2·ⓇReq☉+ⓇRp☉)))' ]",
     // *Solar sidereal rotation period - Measurement [20] [21]
