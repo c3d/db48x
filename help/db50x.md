@@ -4365,6 +4365,93 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.19 "Spirit" - More constants, more space left
+
+This release includes a larger-than-usual number of changes, mostly to
+make room for more constants. A side effect is that we gained a lot of
+additional space for the DM32, giving us a lot of headroom for future
+developments. On the other hand, this may cause unexpected bugs. If
+you run DB48x on a DM32, please check for anything out of the ordinary
+and report it.
+
+### New features
+
+* Hierarchical constants library, with astronomy data for planets
+* fonts: Add astronomy-related glyphs and a few more
+* simulator: RPL evaluation with -e, to preload the calculator
+* simulator: RPL console evaluation mode with -E (prints to console)
+* simulator: RPL evaluation from file with -f and -F
+* simulator: headless mode with -H (no window showing)
+* simulator: screen capture with -C for scripting
+* simulator: Persist window geometry across runs
+* simulator: Persist calculator state on exit
+* ui: Enhanced behaviour for EEX key (skips to exponent)
+* variables: Store and recall to path
+* GCD (GreatestCommonDenominator) and LCM (LeastCommonMultiple)
+* Quote command
+* Hitting EXIT while editing clears menu
+
+### Bug fixes
+
+* variables: Memory corruption when replacing object with subobject
+* Fix parsing bug causing partial load of .48k keymaps beyond "@"
+* arrays: Strip tags from array and index in `get` and `put`
+* solver: Improve solver precision in Std mode
+* constants: Correcting the standard uncertainty of several constants.
+* constants: Correct the Tau mass relative uncertainty.
+* Make sure simulators get the correct help file (distinct .qrc files)
+* Show empty menu when entering empty directory in 1-line mode
+* Accept decimal / fraction conversions for arrays containing names
+* Make it possible to reload `Demo.48s` after initial run on DM32
+* Correctly show error message while loading files
+* ui: Do not remove `-` when using CHS in an expression like `5-3`.
+* bignum: Remove leftover printf statement
+* menu: Refresh `CustomMenu` if updated while active
+* simulator: Fix race condition in Paste command
+* ci: keep Android AABs under `android/`
+* ci: package db50x Windows simulator from the correct path
+* wasm: bootstrap recorder and host tools correctly
+* ci: use libsystre in Windows packaging
+* doc: Fix description of simulator -m option
+* ids: Fix aliases for EquationValue and XLibValue
+* menus: Connect menu entries incorrectly marked as unimplemented
+* Fix help topics for various constants / constant groups
+
+### Improvements
+
+* fw: Move all C / C++ strings to the QSPI on DM32 (save >80K flash)
+* tests: Replace `LSHIFT, I` with `ID_ConstantsMenu` for readaibility
+* tests: Run cstlib / eqlib tests beyond first error
+* tests: Use `STD` instead of `12 SIG`
+* tests: Do not save state file after running the test suite
+* Do not waste memory while converting`<<`, `>>` and `->`
+* Improve rebuild in case of QSPI CRC mismatch
+* Enable `make TAR_EXTRA_FILES= install` to install only binaries
+* makefile: Generate listing files like the old makefiles
+* makefile: Add image comparison targets like in old makefile
+* makefile: Avoid extraneous / in paths
+* makefile: Pass DB50X_VERSION through the command-line
+* debug: Change debug_printf to use all 12 rows
+* commands: micro-optimize factorization of cmp == 0 test
+* chuck: Make the CHUCK command optional for repeatable builds
+* install: Add `DISK_NAME` variables to specify volume name
+* ui: Simplify display of alpha and user indicators
+* doc: Add information on how to start Fedora on WSL
+* ui: Fix misspelling in comment
+* doc: Make the age-verification LEGAL-NOTICE more general
+* chore(ci): bump packages versions
+* doc: Add Pasquale Pigazzini as an author
+* solver: Fix compiler warning about signed vs unsigned
+* library: Fix comment and remove duplicate entry
+* commands: Add `Γ` alias for `Gamma`
+* menus: Update and reorganize parts menu
+* locals: Detect incorrect argument count in algebraic function calls
+* locals: Do not evaluate algebraic expression passed as argument
+* version: Update copyright year to 2026
+* parser: Accept `,` as a separator in algebraic function calls
+* Reorder the constants menu for efficiency
+
+
 ## Release 0.9.18 "Chuck" - Sucess begins inside
 
 This release includes a number of under-the-hood improvements that
@@ -4717,13 +4804,13 @@ HP48 implementation.
 
 ## Implemented commands
 
-
-The following is an extensive list of commands.
+The following is an extensive list of implemented commands, some with multiple
+spellings.
 
 * `!`
 * `%`
+* `%Ch`
 * `%T`
-* `%Total`
 * `*`
 * `+`
 * `-`
@@ -4736,6 +4823,8 @@ The following is an extensive list of commands.
 * `abs`
 * `acos`
 * `acosh`
+* `acot`
+* `acsc`
 * `AlarmMenu`
 * `AlgebraMenu`
 * `AllEquationVariables`
@@ -4744,7 +4833,7 @@ The following is an extensive list of commands.
 * `AlphaForeground`
 * `Amort`
 * `AmortTable`
-* `and`
+* `And`
 * `AngleMode`
 * `AnglesMenu`
 * `Apply`
@@ -4753,6 +4842,7 @@ The following is an extensive list of commands.
 * `arg`
 * `ArithmeticMenu`
 * `Arry→`
+* `asec`
 * `asin`
 * `asinh`
 * `Asn`
@@ -4821,6 +4911,7 @@ The following is an extensive list of commands.
 * `Col+`
 * `Col-`
 * `Collect`
+* `Color`
 * `ColΣ`
 * `Col→`
 * `comb`
@@ -4839,9 +4930,8 @@ The following is an extensive list of commands.
 * `conj`
 * `ConLib`
 * `Const`
-* `ConstantName`
+* `ConstantRange`
 * `Constants`
-* `ConstantValue`
 * `cont`
 * `Convert`
 * `ConvertToUnit`
@@ -4849,9 +4939,11 @@ The following is an extensive list of commands.
 * `Corr`
 * `cos`
 * `cosh`
+* `cot`
 * `CountBits`
 * `Cov`
 * `CrDir`
+* `csc`
 * `Cst`
 * `CstRU`
 * `CstSU`
@@ -4875,6 +4967,7 @@ The following is an extensive list of commands.
 * `C→R`
 * `Date`
 * `Date+`
+* `Date-`
 * `DateDash`
 * `DateDot`
 * `DateForeground`
@@ -4885,7 +4978,6 @@ The following is an extensive list of commands.
 * `DateTime`
 * `DayBeforeMonth`
 * `dbug`
-* `DDays`
 * `DebugMenu`
 * `DebugOnError`
 * `Dec`
@@ -4898,6 +4990,8 @@ The following is an extensive list of commands.
 * `det`
 * `Detach`
 * `DetailedTypes`
+* `DFC`
+* `DFC2F`
 * `DifferentialSolverMenu`
 * `Disp`
 * `DisplayDigits`
@@ -4953,9 +5047,6 @@ The following is an extensive list of commands.
 * `Eng`
 * `Eq`
 * `EqnLib`
-* `EquationName`
-* `EquationSolver`
-* `EquationValue`
 * `equiv`
 * `erf`
 * `erfc`
@@ -4969,7 +5060,7 @@ The following is an extensive list of commands.
 * `ErrorForeground`
 * `Eval`
 * `EvalEq`
-* `excludes`
+* `Excludes`
 * `ExitClearsMenu`
 * `ExitKeepsMenu`
 * `exp`
@@ -4980,6 +5071,7 @@ The following is an extensive list of commands.
 * `ExpLogIdentitiesMenu`
 * `ExpLogMenu`
 * `expm`
+* `Factors`
 * `False`
 * `FancyExponent`
 * `FC?`
@@ -4988,7 +5080,6 @@ The following is an extensive list of commands.
 * `FF`
 * `FilesMenu`
 * `Filter`
-* `Factors`
 * `FinalAlgebraResults`
 * `FinanceRounding`
 * `FirstBitSet`
@@ -5011,9 +5102,9 @@ The following is an extensive list of commands.
 * `FS?C`
 * `FS?S`
 * `Function`
-* `Gamma`
 * `GAnd`
 * `GC`
+* `GCD`
 * `GCIconForeground`
 * `GCStats`
 * `GCStatsClearAfterRead`
@@ -5065,6 +5156,7 @@ The following is an extensive list of commands.
 * `HideSeconds`
 * `HideTime`
 * `HideVoltage`
+* `Histogram`
 * `HMS+`
 * `HMS-`
 * `HMS→`
@@ -5072,6 +5164,7 @@ The following is an extensive list of commands.
 * `HorizontalLists`
 * `HorizontalProgramRendering`
 * `HorizontalVectors`
+* `HSV`
 * `HyperbolicMenu`
 * `Idn`
 * `IFT`
@@ -5097,6 +5190,7 @@ The following is an extensive list of commands.
 * `IOMenu`
 * `IP`
 * `Isol`
+* `IsPrime`
 * `JDN`
 * `JDN→`
 * `Keys`
@@ -5109,10 +5203,10 @@ The following is an extensive list of commands.
 * `LaxArrayResizing`
 * `LazyEvaluation`
 * `LCD→`
+* `LCM`
 * `LeadingZero`
 * `LeftShiftBackground`
 * `LeftShiftForeground`
-* `lgamma`
 * `LibEq`
 * `Library`
 * `Libs`
@@ -5124,10 +5218,12 @@ The following is an extensive list of commands.
 * `ListAsData`
 * `ListAsProgram`
 * `ListMenu`
+* `ListRecursionDepth`
 * `List→`
 * `ln`
 * `ln1p`
 * `LName`
+* `lnΓ`
 * `log`
 * `log2`
 * `LogFit`
@@ -5149,6 +5245,8 @@ The following is an extensive list of commands.
 * `MathModesMenu`
 * `MatrixMenu`
 * `Max`
+* `MaxFactorIterations`
+* `MaxFactorsBits`
 * `MaxFlags`
 * `MaxH`
 * `MaximumDecimalExponent`
@@ -5182,7 +5280,7 @@ The following is an extensive list of commands.
 * `MultipleSteps`
 * `MultiSolverMenu`
 * `NameDisplayMode`
-* `NAnd`
+* `nand`
 * `NDupN`
 * `NeedToClearErrors`
 * `neg`
@@ -5205,6 +5303,7 @@ The following is an extensive list of commands.
 * `NoPositiveUnderflow`
 * `NoProgramLastArguments`
 * `NOr`
+* `norm`
 * `NormalPolynomialRender`
 * `NoStackAutoScale`
 * `NoStackSave`
@@ -5243,7 +5342,9 @@ The following is an extensive list of commands.
 * `Path`
 * `PCov`
 * `perm`
+* `PgAll`
 * `PgDir`
+* `Pi`
 * `Pick`
 * `Pick3`
 * `Pict`
@@ -5268,8 +5369,8 @@ The following is an extensive list of commands.
 * `Prec`
 * `PredX`
 * `PredY`
-* `PrevPr`
 * `PrefixPolynomialRender`
+* `PrevPr`
 * `PrincipalSolution`
 * `PrintingMenu`
 * `ProbabilitiesMenu`
@@ -5278,7 +5379,6 @@ The following is an extensive list of commands.
 * `Prompt`
 * `PSDev`
 * `Purge`
-* `PurgeAll`
 * `PushEvaluatedAssignment`
 * `PushOriginalAssignment`
 * `Put`
@@ -5287,12 +5387,14 @@ The following is an extensive list of commands.
 * `PwrFit`
 * `P→R`
 * `QuickSort`
+* `Quote`
 * `Rad`
 * `rand`
 * `Random`
 * `RandomGeneratorBits`
 * `RandomGeneratorOrder`
 * `RangeMenu`
+* `Range→`
 * `RanM`
 * `RcEq`
 * `Rcl`
@@ -5315,6 +5417,7 @@ The following is an extensive list of commands.
 * `rem`
 * `ReorderTerms`
 * `ReportPrecisionLoss`
+* `Res`
 * `ResetModes`
 * `ResultBackground`
 * `ResultFont`
@@ -5331,6 +5434,7 @@ The following is an extensive list of commands.
 * `RLB`
 * `RLC`
 * `Rnd`
+* `RNrm`
 * `Roll`
 * `RollD`
 * `Root`
@@ -5340,7 +5444,6 @@ The following is an extensive list of commands.
 * `RoundMenuForeground`
 * `Row+`
 * `Row-`
-* `RowNorm`
 * `Row→`
 * `RR`
 * `RRB`
@@ -5370,6 +5473,7 @@ The following is an extensive list of commands.
 * `SDev`
 * `SearchBackground`
 * `SearchForeground`
+* `sec`
 * `SelectedMenuForeground`
 * `SelectionBackground`
 * `SelectionForeground`
@@ -5420,10 +5524,8 @@ The following is an extensive list of commands.
 * `SoftwareDisplayRefresh`
 * `SolverImprecision`
 * `SolverIterations`
+* `SolverShuffles`
 * `SolvingMenu`
-* `SolvingMenuRecall`
-* `SolvingMenuSolve`
-* `SolvingMenuStore`
 * `Sort`
 * `sq`
 * `SquareMenuBackground`
@@ -5445,6 +5547,7 @@ The following is an extensive list of commands.
 * `StandardExponent`
 * `StateNameForeground`
 * `StatisticsMenu`
+* `StatsPlotBins`
 * `Std`
 * `StdRnd`
 * `StepByStepAlgebraResults`
@@ -5519,6 +5622,7 @@ The following is an extensive list of commands.
 * `ToolsMenu`
 * `TooManyDigitsErrors`
 * `ToPolar`
+* `ToRange`
 * `ToSpherical`
 * `ToStr`
 * `Tot`
@@ -5527,9 +5631,11 @@ The following is an extensive list of commands.
 * `TrailingDecimal`
 * `Tran`
 * `TrigIdentitiesMenu`
+* `TrigSin`
 * `Trn`
 * `Trnc`
 * `True`
+* `Truth`
 * `TruthLogicForIntegers`
 * `TVars`
 * `TVM`
@@ -5591,9 +5697,6 @@ The following is an extensive list of commands.
 * `UVal`
 * `Var`
 * `VariablesMenu`
-* `VariablesMenuExecute`
-* `VariablesMenuRecall`
-* `VariablesMenuStore`
 * `VariableWidthDigits`
 * `Vars`
 * `VectorMenu`
@@ -5607,13 +5710,15 @@ The following is an extensive list of commands.
 * `Wait`
 * `XCol`
 * `XLib`
-* `XlibName`
-* `XlibValue`
-* `Xor`
+* `XLibName`
+* `XLibValue`
+* `xor`
 * `xpon`
+* `XQ`
 * `XRng`
 * `xroot`
 * `XVars`
+* `XYPlotBins`
 * `x³`
 * `YCol`
 * `YearFirst`
@@ -5624,6 +5729,7 @@ The following is an extensive list of commands.
 * `ZeroPowerZeroIsOne`
 * `ZeroPowerZeroIsUndefined`
 * `|`
+* `Γ`
 * `Σ`
 * `Σ+`
 * `Σ-`
@@ -5636,6 +5742,8 @@ The following is an extensive list of commands.
 * `ΣXY`
 * `ΣY`
 * `ΣY2`
+* `℮`
+* `→%Range`
 * `→2D`
 * `→3D`
 * `→Cartesian`
@@ -5647,19 +5755,26 @@ The following is an extensive list of commands.
 * `→Q`
 * `→QDigits`
 * `→QIterations`
+* `→QπMaxPrime`
 * `→Rad`
 * `→Row`
+* `→Un`
 * `→Ur`
 * `→Us`
 * `→πr`
+* `→∆Range`
 * `↓Match`
 * `∂`
 * `∆List`
 * `∏`
 * `∏List`
+* `−∞`
 * `√`
 * `∛`
+* `∞`
 * `∠`
+* `∩`
+* `∪`
 * `∫`
 * `≠`
 * `≤`

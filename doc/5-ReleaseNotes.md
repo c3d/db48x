@@ -1,5 +1,92 @@
 # Release notes
 
+## Release 0.9.19 "Spirit" - More constants, more space left
+
+This release includes a larger-than-usual number of changes, mostly to
+make room for more constants. A side effect is that we gained a lot of
+additional space for the DM42, giving us a lot of headroom for future
+developments. On the other hand, this may cause unexpected bugs. If
+you run DB48x on a DM42, please check for anything out of the ordinary
+and report it.
+
+### New features
+
+* Hierarchical constants library, with astronomy data for planets
+* fonts: Add astronomy-related glyphs and a few more
+* simulator: RPL evaluation with -e, to preload the calculator
+* simulator: RPL console evaluation mode with -E (prints to console)
+* simulator: RPL evaluation from file with -f and -F
+* simulator: headless mode with -H (no window showing)
+* simulator: screen capture with -C for scripting
+* simulator: Persist window geometry across runs
+* simulator: Persist calculator state on exit
+* ui: Enhanced behaviour for EEX key (skips to exponent)
+* variables: Store and recall to path
+* GCD (GreatestCommonDenominator) and LCM (LeastCommonMultiple)
+* Quote command
+* Hitting EXIT while editing clears menu
+
+### Bug fixes
+
+* variables: Memory corruption when replacing object with subobject
+* Fix parsing bug causing partial load of .48k keymaps beyond "@"
+* arrays: Strip tags from array and index in `get` and `put`
+* solver: Improve solver precision in Std mode
+* constants: Correcting the standard uncertainty of several constants.
+* constants: Correct the Tau mass relative uncertainty.
+* Make sure simulators get the correct help file (distinct .qrc files)
+* Show empty menu when entering empty directory in 1-line mode
+* Accept decimal / fraction conversions for arrays containing names
+* Make it possible to reload `Demo.48s` after initial run on DM42
+* Correctly show error message while loading files
+* ui: Do not remove `-` when using CHS in an expression like `5-3`.
+* bignum: Remove leftover printf statement
+* menu: Refresh `CustomMenu` if updated while active
+* simulator: Fix race condition in Paste command
+* ci: keep Android AABs under `android/`
+* ci: package db50x Windows simulator from the correct path
+* wasm: bootstrap recorder and host tools correctly
+* ci: use libsystre in Windows packaging
+* doc: Fix description of simulator -m option
+* ids: Fix aliases for EquationValue and XLibValue
+* menus: Connect menu entries incorrectly marked as unimplemented
+* Fix help topics for various constants / constant groups
+
+### Improvements
+
+* fw: Move all C / C++ strings to the QSPI on DM42 (save >80K flash)
+* tests: Replace `LSHIFT, I` with `ID_ConstantsMenu` for readaibility
+* tests: Run cstlib / eqlib tests beyond first error
+* tests: Use `STD` instead of `12 SIG`
+* tests: Do not save state file after running the test suite
+* Do not waste memory while converting`<<`, `>>` and `->`
+* Improve rebuild in case of QSPI CRC mismatch
+* Enable `make TAR_EXTRA_FILES= install` to install only binaries
+* makefile: Generate listing files like the old makefiles
+* makefile: Add image comparison targets like in old makefile
+* makefile: Avoid extraneous / in paths
+* makefile: Pass DB48X_VERSION through the command-line
+* debug: Change debug_printf to use all 12 rows
+* commands: micro-optimize factorization of cmp == 0 test
+* chuck: Make the CHUCK command optional for repeatable builds
+* install: Add `DISK_NAME` variables to specify volume name
+* ui: Simplify display of alpha and user indicators
+* doc: Add information on how to start Fedora on WSL
+* ui: Fix misspelling in comment
+* doc: Make the age-verification LEGAL-NOTICE more general
+* chore(ci): bump packages versions
+* doc: Add Pasquale Pigazzini as an author
+* solver: Fix compiler warning about signed vs unsigned
+* library: Fix comment and remove duplicate entry
+* commands: Add `Γ` alias for `Gamma`
+* menus: Update and reorganize parts menu
+* locals: Detect incorrect argument count in algebraic function calls
+* locals: Do not evaluate algebraic expression passed as argument
+* version: Update copyright year to 2026
+* parser: Accept `,` as a separator in algebraic function calls
+* Reorder the constants menu for efficiency
+
+
 ## Release 0.9.18 "Chuck" - Sucess begins inside
 
 This release includes a number of under-the-hood improvements that
