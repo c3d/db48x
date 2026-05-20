@@ -53,7 +53,8 @@ struct tests
     tests()
         : file(), line(), tstart(),
           tname(), sname(), tindex(), sindex(), cindex(), count(),
-          ok(), longpress(), failures(), explanation()
+          ok(), testSelection(),
+          longpress(), failures(), explanation()
     { }
 
     // Run all tests
@@ -490,6 +491,7 @@ public:
     uint                 refresh_count;
     int                  last_key;
     int                  ok;
+    uint                 testSelection;
     bool                 longpress;
     std::vector<failure> failures;
     std::string          explanation;

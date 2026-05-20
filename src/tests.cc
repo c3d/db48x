@@ -186,6 +186,8 @@ void tests::run(uint onlyCurrent)
 // ----------------------------------------------------------------------------
 {
     save<bool> markRunning(running, true);
+    save<uint> markTestSelection(testSelection, onlyCurrent);
+
     rpl_command(START_TEST);
 
     tindex = sindex = cindex = count = 0;
@@ -201,7 +203,7 @@ void tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            editor_operations();
+            constants_parsing();
         }
 
 #if 0
@@ -8144,8 +8146,9 @@ void tests::constants_parsing()
         {
             begin(cst[i], true);
         }
-        if (!ok)
+        if (!ok && (testSelection & 1))
         {
+            // In interactive mode, stop with the test on the command line
             test(cst[i+1]);
             break;
         }
@@ -8174,8 +8177,9 @@ void tests::eqnlib_parsing()
         {
             begin(eq[i], true);
         }
-        if (!ok)
+        if (!ok && (testSelection & 1))
         {
+            // In interactive mode, stop with the test on the command line
             test(eq[i+1]);
             break;
         }
