@@ -1202,17 +1202,17 @@ static const cstring basic_constants[] =
     // *Mercury mean density - Calculation from measurement [4] [22]
     "ρv☿",       "[ 'ROUND(CONVERT(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿);1_kg/m³);XPON(UVAL(Ⓡρv☿*ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-XPON(UVAL(ⒸGM☿/(ⒸG·4/3·Ⓒπ·ⒸReq☿²·ⒸRp☿)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☿*Ⓒρv☿);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq☿+ⓇRp☿' ]",
+                "  'ⓇGM☿+ⓇG+2·ⓇReq☿+ⓇRp☿' ]",
 
     // ------------------------------------------------------------------------
     // *Mercury surface gravity - Calculation from measurement [4] [22]
     "g☿",       "[ 'ROUND(CONVERT(ⒸGM☿/ⒸReq☿²;1_m/s²);XPON(UVAL(Ⓡg☿*ⒸGM☿/ⒸReq☿²))-XPON(UVAL(ⒸGM☿/ⒸReq☿²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg☿*Ⓒg☿);-2);1_m/s²)' "
-                "  '2·ⓇReq☿' ]",
+                "  'ⓇGM☿+2·ⓇReq☿' ]",
     // *Mercury escape velocity - Calculation from measurement [4] [22]
     "Ve☿",      "[ 'ROUND(CONVERT(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☿*√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☿/(ⒸReq☿²·ⒸRp☿)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☿*ⒸVe☿);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq☿+ⓇRp☿))' ]",
+                "  0.02 ]",
     // *Mercury sidereal rotation period - Measurement [22]
     "Prot☿",    "[ 5067014.4_s "
                 "  0.1_s "
@@ -1277,17 +1277,17 @@ static const cstring basic_constants[] =
     // *Venus mean density - Calculation from measurement [4] [22]
     "ρv♀",       "[ 'ROUND(CONVERT(ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀);1_kg/m³);XPON(UVAL(Ⓡρv♀*ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀)))-XPON(UVAL(ⒸGM♀/(ⒸG·4/3·Ⓒπ·ⒸReq♀²·ⒸRp♀)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♀*Ⓒρv♀);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♀+ⓇRp♀' ]",
+                "  'ⓇGM♀ +ⓇG+2·ⓇReq♀+ⓇRp♀' ]",
 
     // ------------------------------------------------------------------------
     // *Venus surface gravity - Calculation from measurement [4] [22]
     "g♀",       "[ 'ROUND(CONVERT(ⒸGM♀/ⒸReq♀²;1_m/s²);XPON(UVAL(Ⓡg♀*ⒸGM♀/ⒸReq♀²))-XPON(UVAL(ⒸGM♀/ⒸReq♀²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♀*Ⓒg♀);-2);1_m/s²)' "
-                "  '2·ⓇReq♀' ]",
+                "  'ⓇGM♀+2·ⓇReq♀' ]",
     // *Venus escape velocity - Calculation from measurement [4] [22]
     "Ve♀",      "[ 'ROUND(CONVERT(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♀*√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♀/(ⒸReq♀²·ⒸRp♀)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♀*ⒸVe♀);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♀+ⓇRp♀))' ]",
+                "  '1/2·(ⓇGM♀+(2/3·(2·ⓇReq♀+ⓇRp♀)))' ]",
     // *Venus sidereal rotation period - Measurement [22]
     "Prot♀",    "[ 20996772.8_s "
                 "  8.64_s "
@@ -1350,17 +1350,17 @@ static const cstring basic_constants[] =
     // *Earth mean density - Calculation from nominal value [3]
     "ρv♁",       "[ 'ROUND(CONVERT(ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁);1_kg/m³);XPON(UVAL(Ⓡρv♁*ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁)))-XPON(UVAL(ⒸGM♁/(ⒸG·4/3·Ⓒπ·ⒸReq♁²·ⒸRp♁)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♁*Ⓒρv♁);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♁+ⓇRp♁' ]",
+                "  'ⓇGM♁ +ⓇG+2·ⓇReq♁+ⓇRp♁' ]",
 
     // ------------------------------------------------------------------------
     // *Earth surface gravity - Calculation from nominal value [3]
     "g♁",       "[ 'ROUND(CONVERT(ⒸGM♁/ⒸReq♁²;1_m/s²);XPON(UVAL(Ⓡg♁*ⒸGM♁/ⒸReq♁²))-XPON(UVAL(ⒸGM♁/ⒸReq♁²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♁*Ⓒg♁);-2);1_m/s²)' "
-                "  '2·ⓇReq♁' ]",
+                "  'ⓇGM♁+2·ⓇReq♁' ]",
     // *Earth escape velocity - Calculation from nominal value [3]
     "Ve♁",      "[ 'ROUND(CONVERT(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♁*√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♁/(ⒸReq♁²·ⒸRp♁)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♁*ⒸVe♁);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♁+ⓇRp♁))' ]",
+                "  '1/2·(ⓇGM♁+(2/3·(2·ⓇReq♁+ⓇRp♁)))' ]",
     // *Earth sidereal rotation period - Measurement [24]
     "Prot♁",    "[ 86164.0905_s "
                 "  0.0001_s "
@@ -1426,17 +1426,17 @@ static const cstring basic_constants[] =
     // *Moon mean density - Calculation from measurement [4] [22]
     "ρv☽",       "[ 'ROUND(CONVERT(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽);1_kg/m³);XPON(UVAL(Ⓡρv☽*ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-XPON(UVAL(ⒸGM☽/(ⒸG·4/3·Ⓒπ·ⒸReq☽²·ⒸRp☽)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☽*Ⓒρv☽);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq☽+ⓇRp☽' ]",
+                "  'ⓇGM☽ +ⓇG+2·ⓇReq☽+ⓇRp☽' ]",
 
     // ------------------------------------------------------------------------
     // *Moon surface gravity - Calculation from measurement [4] [22]
     "g☽",       "[ 'ROUND(CONVERT(ⒸGM☽/ⒸReq☽²;1_m/s²);XPON(UVAL(Ⓡg☽*ⒸGM☽/ⒸReq☽²))-XPON(UVAL(ⒸGM☽/ⒸReq☽²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg☽*Ⓒg☽);-2);1_m/s²)' "
-                "  '2·ⓇReq☽' ]",
+                "  'ⓇGM☽+2·ⓇReq☽' ]",
     // *Moon escape velocity - Calculation from measurement [4] [22]
     "Ve☽",      "[ 'ROUND(CONVERT(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☽*√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☽/(ⒸReq☽²·ⒸRp☽)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☽*ⒸVe☽);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq☽+ⓇRp☽))' ]",
+                "  '1/2·(ⓇGM☽+(2/3·(2·ⓇReq☽+ⓇRp☽)))' ]",
     // *Moon sidereal rotation period - Measurement [22]
     "Prot☽",    "[ 2360591.5_s "
                 "  0.1_s "
@@ -1501,18 +1501,17 @@ static const cstring basic_constants[] =
     // *Mars mean density - Calculation from measurement [4] [22]
     "ρv♂",       "[ 'ROUND(CONVERT(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂);1_kg/m³);XPON(UVAL(Ⓡρv♂*ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-XPON(UVAL(ⒸGM♂/(ⒸG·4/3·Ⓒπ·ⒸReq♂²·ⒸRp♂)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♂*Ⓒρv♂);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♂+ⓇRp♂' ]",
+                "  'ⓇGM♂ +ⓇG+2·ⓇReq♂+ⓇRp♂' ]",
 
     // ------------------------------------------------------------------------
     // *Mars surface gravity - Calculation from measurement [4] [22]
     "g♂",       "[ 'ROUND(CONVERT(ⒸGM♂/ⒸReq♂²;1_m/s²);XPON(UVAL(Ⓡg♂*ⒸGM♂/ⒸReq♂²))-XPON(UVAL(ⒸGM♂/ⒸReq♂²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♂*Ⓒg♂);-2);1_m/s²)' "
-                "  '2·ⓇReq♂' ]",
+                "  'ⓇGM♂+2·ⓇReq♂' ]",
     // *Mars escape velocity - Calculation from measurement [4] [22]
     "Ve♂",      "[ 'ROUND(CONVERT(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♂*√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♂/(ⒸReq♂²·ⒸRp♂)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♂*ⒸVe♂);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♂+ⓇRp♂))' "
-                "  5027._m/s ]",
+                "  '1/2·(ⓇGM♂+(2/3·(2·ⓇReq♂+ⓇRp♂)))' ]",
     // *Mars sidereal rotation period - Measurement [22]
     "Prot♂",    "[ 88642.7_s "
                 "  0.1_s "
@@ -1573,17 +1572,17 @@ static const cstring basic_constants[] =
     // *Jupiter mean density - Calculation from nominal value [3]
     "ρv♃",       "[ 'ROUND(CONVERT(ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃);1_kg/m³);XPON(UVAL(Ⓡρv♃*ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃)))-XPON(UVAL(ⒸGM♃/(ⒸG·4/3·Ⓒπ·ⒸReq♃²·ⒸRp♃)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♃*Ⓒρv♃);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♃+ⓇRp♃' ]",
+                "  'ⓇGM♃ +ⓇG+2·ⓇReq♃+ⓇRp♃' ]",
 
     // ------------------------------------------------------------------------
     // *Jupiter surface gravity - Calculation from nominal value [3]
     "g♃",       "[ 'ROUND(CONVERT(ⒸGM♃/ⒸReq♃²;1_m/s²);XPON(UVAL(Ⓡg♃*ⒸGM♃/ⒸReq♃²))-XPON(UVAL(ⒸGM♃/ⒸReq♃²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♃*Ⓒg♃);-2);1_m/s²)' "
-                "  '2·ⓇReq♃' ]",
+                "  'ⓇGM♃+2·ⓇReq♃' ]",
     // *Jupiter escape velocity - Calculation from nominal value [3]
     "Ve♃",      "[ 'ROUND(CONVERT(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♃*√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♃/(ⒸReq♃²·ⒸRp♃)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♃*ⒸVe♃);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♃+ⓇRp♃))' ]",
+                "  '1/2·(ⓇGM♃+(2/3·(2·ⓇReq♃+ⓇRp♃)))' ]",
     // *Jupiter sidereal rotation period - Measurement [22]
     "Prot♃",    "[ 35730_s "
                 "  1_s "
@@ -1646,17 +1645,17 @@ static const cstring basic_constants[] =
     // *Saturn mean density - Calculation from measurement [4] [22]
     "ρv♄",       "[ 'ROUND(CONVERT(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄);1_kg/m³);XPON(UVAL(Ⓡρv♄*ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-XPON(UVAL(ⒸGM♄/(ⒸG·4/3·Ⓒπ·ⒸReq♄²·ⒸRp♄)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♄*Ⓒρv♄);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♄+ⓇRp♄' ]",
+                "  'ⓇGM♄ +ⓇG+2·ⓇReq♄+ⓇRp♄' ]",
 
     // ------------------------------------------------------------------------
     // *Saturn surface gravity - Calculation from measurement [4] [22]
     "g♄",       "[ 'ROUND(CONVERT(ⒸGM♄/ⒸReq♄²;1_m/s²);XPON(UVAL(Ⓡg♄*ⒸGM♄/ⒸReq♄²))-XPON(UVAL(ⒸGM♄/ⒸReq♄²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♄*Ⓒg♄);-2);1_m/s²)' "
-                "  '2·ⓇReq♄' ]",
+                "  'ⓇGM♄+2·ⓇReq♄' ]",
     // *Saturn escape velocity - Calculation from measurement [4] [22]
     "Ve♄",      "[ 'ROUND(CONVERT(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♄*√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♄/(ⒸReq♄²·ⒸRp♄)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♄*ⒸVe♄);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♄+ⓇRp♄))' ]",
+                "  '1/2·(ⓇGM♄+(2/3·(2·ⓇReq♄+ⓇRp♄)))' ]",
     // *Saturn sidereal rotation period - Measurement [22]
     "Prot♄",    "[ 38361_s "
                 "  50_s "
@@ -1720,17 +1719,17 @@ static const cstring basic_constants[] =
     // *Uranus mean density - Calculation from measurement [4] [22]
     "ρv⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢);1_kg/m³);XPON(UVAL(Ⓡρv⛢*ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-XPON(UVAL(ⒸGM⛢/(ⒸG·4/3·Ⓒπ·ⒸReq⛢²·ⒸRp⛢)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv⛢*Ⓒρv⛢);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq⛢+ⓇRp⛢' ]",
+                "  'ⓇGM⛢ +ⓇG+2·ⓇReq⛢+ⓇRp⛢' ]",
 
     // ------------------------------------------------------------------------
     // *Uranus surface gravity - Calculation from measurement [4] [22]
     "g⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/ⒸReq⛢²;1_m/s²);XPON(UVAL(Ⓡg⛢*ⒸGM⛢/ⒸReq⛢²))-XPON(UVAL(ⒸGM⛢/ⒸReq⛢²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg⛢*Ⓒg⛢);-2);1_m/s²)' "
-                "  '2·ⓇReq⛢' ]",
+                "  'ⓇGM⛢+2·ⓇReq⛢' ]",
     // *Uranus escape velocity - Calculation from measurement [4] [22]
     "Ve⛢",      "[ 'ROUND(CONVERT(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3));1_m/s);XPON(UVAL(ⓇVe⛢*√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-XPON(UVAL(√(2·ⒸGM⛢/(ⒸReq⛢²·ⒸRp⛢)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe⛢*ⒸVe⛢);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq⛢+ⓇRp⛢))' ]",
+                "  '1/2·(ⓇGM⛢+(2/3·(2·ⓇReq⛢+ⓇRp⛢)))' ]",
     // *Uranus sidereal rotation period - Measurement [22]
     "Prot⛢",    "[ 62064_s "
                 "  10_s "
@@ -1794,17 +1793,17 @@ static const cstring basic_constants[] =
     // *Neptune mean density - Calculation from measurement [4] [22]
     "ρv♆",       "[ 'ROUND(CONVERT(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆);1_kg/m³);XPON(UVAL(Ⓡρv♆*ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-XPON(UVAL(ⒸGM♆/(ⒸG·4/3·Ⓒπ·ⒸReq♆²·ⒸRp♆)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♆*Ⓒρv♆);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♆+ⓇRp♆' ]",
+                "  'ⓇGM♆ +ⓇG+2·ⓇReq♆+ⓇRp♆' ]",
 
     // ------------------------------------------------------------------------
     // *Neptune surface gravity - Calculation from measurement [4] [22]
     "g♆",       "[ 'ROUND(CONVERT(ⒸGM♆/ⒸReq♆²;1_m/s²);XPON(UVAL(Ⓡg♆*ⒸGM♆/ⒸReq♆²))-XPON(UVAL(ⒸGM♆/ⒸReq♆²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♆*Ⓒg♆);-2);1_m/s²)' "
-                "  '2·ⓇReq♆' ]",
+                "  'ⓇGM♆+2·ⓇReq♆' ]",
     // *Neptune escape velocity - Calculation from measurement [4] [22]
     "Ve♆",      "[ 'ROUND(CONVERT(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♆*√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♆/(ⒸReq♆²·ⒸRp♆)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♆*ⒸVe♆);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♆+ⓇRp♆))' ]",
+                "  '1/2·(ⓇGM♆+(2/3·(2·ⓇReq♆+ⓇRp♆)))' ]",
     // *Neptune sidereal rotation period - Measurement [22]
     "Prot♆",    "[ 58000_s "
                 "  100_s "
@@ -1866,17 +1865,17 @@ static const cstring basic_constants[] =
     // *Pluto mean density - Calculation from measurement [4] [26]
     "ρv♇",       "[ 'ROUND(CONVERT(ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇);1_kg/m³);XPON(UVAL(Ⓡρv♇*ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇)))-XPON(UVAL(ⒸGM♇/(ⒸG·4/3·Ⓒπ·ⒸReq♇²·ⒸRp♇)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv♇*Ⓒρv♇);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq♇+ⓇRp♇' ]",
+                "  'ⓇGM♇ +ⓇG+2·ⓇReq♇+ⓇRp♇' ]",
 
     // ------------------------------------------------------------------------
     // *Pluto surface gravity - Calculation from measurement [4] [26]
     "g♇",       "[ 'ROUND(CONVERT(ⒸGM♇/ⒸReq♇²;1_m/s²);XPON(UVAL(Ⓡg♇*ⒸGM♇/ⒸReq♇²))-XPON(UVAL(ⒸGM♇/ⒸReq♇²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg♇*Ⓒg♇);-2);1_m/s²)' "
-                "  '2·ⓇReq♇' ]",
+                "  'ⓇGM♇+2·ⓇReq♇' ]",
     // *Pluto escape velocity - Calculation from measurement [4] [26]
     "Ve♇",      "[ 'ROUND(CONVERT(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3));1_m/s);XPON(UVAL(ⓇVe♇*√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-XPON(UVAL(√(2·ⒸGM♇/(ⒸReq♇²·ⒸRp♇)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe♇*ⒸVe♇);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq♇+ⓇRp♇))' ]",
+                "  '1/2·(ⓇGM♇+(2/3·(2·ⓇReq♇+ⓇRp♇)))' ]",
     // *Pluto sidereal rotation period - Measurement [26]
     "Prot♇",    "[ 551856.7_s "
                 "  0.1_s "
@@ -1950,15 +1949,15 @@ static const cstring basic_constants[] =
     // *Solar mean density - Calculation from nominal value [3]
     "ρv☉",       "[ 'ROUND(CONVERT(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉);1_kg/m³);XPON(UVAL(Ⓡρv☉*ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-XPON(UVAL(ⒸGM☉/(ⒸG·4/3·Ⓒπ·ⒸReq☉²·ⒸRp☉)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡρv☉*Ⓒρv☉);-2);1_kg/m³)' "
-                "  'ⓇG+2·ⓇReq☉+ⓇRp☉' ]",
+                "  'ⓇGM☉ +ⓇG+2·ⓇReq☉+ⓇRp☉' ]",
     // *Solar surface gravity - Calculation from nominal value [3]
     "g☉",       "[ 'ROUND(CONVERT(ⒸGM☉/ⒸReq☉²;1_m/s²);XPON(UVAL(Ⓡg☉*ⒸGM☉/ⒸReq☉²))-XPON(UVAL(ⒸGM☉/ⒸReq☉²))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡg☉*Ⓒg☉);-2);1_m/s²)' "
-                "  '2·ⓇReq☉' ]",
+                "  'ⓇGM☉+2·ⓇReq☉' ]",
     // *Solar escape velocity - Calculation from nominal value [3]
     "Ve☉",      "[ 'ROUND(CONVERT(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3));1_m/s);XPON(UVAL(ⓇVe☉*√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-XPON(UVAL(√(2·ⒸGM☉/(ⒸReq☉²·ⒸRp☉)↑(2/3))))-2)' "
                 "  'CONVERT(ROUND(UBASE(ⓇVe☉*ⒸVe☉);-2);1_m/s)' "
-                "  '1/2·(2/3·(2·ⓇReq☉+ⓇRp☉))' ]",
+                "  '1/2·(ⓇGM☉+(2/3·(2·ⓇReq☉+ⓇRp☉)))' ]",
     // *Solar sidereal rotation period - Measurement [20] [21]
     "Prot☉",    "[ 2192832_s "
                 "  864_s "
@@ -1986,7 +1985,7 @@ static const cstring basic_constants[] =
     // *CMB acoustic scale - Measurement [1]
     "100θ*",    "[ 1.04109 "
                 "  0.00030 "
-                "  'ROUND(Ⓢ100θ*/Ⓒ100θ*;-2)' "
+                "  'ROUND(0.00030/1.04109;-2)' "
                 "  1.041 ]",
 
     // ------------------------------------------------------------------------
@@ -2001,7 +2000,7 @@ static const cstring basic_constants[] =
     // *Power spectrum amplitude - Measurement [1]
     "(ln(10¹⁰As))", "[ 3.044 "
                 "  0.014 "
-                "  'ROUND(Ⓢln(10¹⁰As)/Ⓒln(10¹⁰As);-2)' ]",
+                "  'ROUND(0.014/3.044;-2)' ]",
     // *Milky Way total mass - Measurement [8] [9] [10]
     "MG",       "[ 1.5E12_M☉ "
                 "  0.5E12_M☉ "
@@ -2019,16 +2018,16 @@ static const cstring basic_constants[] =
     // *Distance to Sgr A* - Measurement [6] [7]
     "D●SgrA*",  "[ 26673_ly "
                 "  42_ly "
-                "  'ROUND(ⓈD●SgrA*/ⒸD●SgrA*;-2)' "
+                "  'ROUND(42/26673;-2)' "
                 "  2.667E4_ly ]",
     // *Sgr A* Schwarzschild radius - Measurement [7]
     "R●SgrA*",  "[ 12.0E6_km "
                 "  0.4E6_km "
-                "  'ROUND(ⓈR●SgrA*/ⒸR●SgrA*;-2)' ]",
+                "  'ROUND(0.4E6/12.0E6;-2)' ]",
     // *Sgr A* black hole mass - Measurement [7]
     "M●SgrA*",  "[ 4.297E6_M☉ "
                 "  0.012E6_M☉ "
-                "  'ROUND(ⓈM●SgrA*/ⒸM●SgrA*;-2)' ]",
+                "  'ROUND(0.012E6/4.297E6;-2)' ]",
     // *Andromeda galaxy total mass - Measurement [11] [12]
     "MNGC224",  "[ 1.5E12_M☉ "
                 "  0.5E12_M☉ "
@@ -2580,9 +2579,7 @@ static const cstring basic_constants[] =
 
     // ------------------------------------------------------------------------
     // *Hello World string - Exact convention
-    "HelloWorld",               "[ \"Hello World\""
-                                "  \"\""
-                                "  0"
+    "HelloWorld",               "\"Hello World\"",
 };
 // ------------------------------------------------------------------------
 //   References are in constants.md — Bibliographic references section
