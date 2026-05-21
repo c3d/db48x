@@ -74,25 +74,19 @@ int                   menu_item_run(uint8_t mid);
 cstring               menu_item_description(uint8_t mid, char *, const int);
 cstring               state_name();
 bool                  load_state_file(cstring path);
-bool                  load_state_file_silent(cstring path);
 bool                  save_state_file(cstring path);
-bool                  save_state_file_silent(cstring path);
 bool                  load_system_state();
-bool                  save_system_state(void *);
 bool                  save_system_state();
-bool                  save_system_state_silent();
 bool                  load_saved_keymap(cstring name = nullptr);
 void                  power_off(bool offimg);
 void                  system_setup();
-void                  mark_dirty(uint row);
-void                  mark_dirty(int x1, int y1, int x2, int y2);
+void                  mark_dirty(uint32_t x_min, uint32_t y_min, uint32_t x_max, uint32_t y_max);
 void                  refresh_dirty();
 void                  redraw_lcd(bool force);
 void                  set_timer(uint timerid, uint period);
 #if SIMULATOR
-bool                  process_test_key(int key);
+void                  process_test_key(int key);
 void                  process_test_commands();
-extern int            last_key;
 #endif
 
 #endif // SYSMENU_H
