@@ -37,7 +37,9 @@
 #include "sysmenu.h"
 #include "version.h"
 
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include <QApplication>
@@ -139,6 +141,271 @@ static void copy(const QString &fromName, const QString &toName)
 
 // Ensure linker keeps debug code
 extern cstring debug();
+
+
+static void sim_test_traces(cstring suffix)
+// ----------------------------------------------------------------------------
+//   Configure est_* recorder traces for -O / -T
+// ----------------------------------------------------------------------------
+{
+    static bool first = true;
+    if (first)
+    {
+        recorder_trace_set("est_.*=0");
+        first = false;
+    }
+    if (!suffix || !*suffix)
+        return;
+
+    char tname[256];
+    if (strcmp(suffix, "all") == 0)
+        strcpy(tname, "est_.*");
+    else
+        snprintf(tname, sizeof(tname) - 1, "est_%s", suffix);
+    recorder_trace_set(tname);
+}
+
+
+static void sim_usage(FILE *out, cstring prog)
+// ----------------------------------------------------------------------------
+//   Print simulator command-line help (from SIMULATOR.md)
+// ----------------------------------------------------------------------------
+{
+    fprintf(out,
+            "Usage: %s [options] [setting=value ...]\n"
+            "\n"
+            "Environment variables:\n"
+            "  DB48X_TRACES   Recorder trace filter "
+            "(default: \".*(error|warn(ing)?)s?\")\n"
+            "  DB48X_INSTALL  Same as the -I option\n"
+            "\n"
+            "Options:\n"
+            "  -D<pattern>  Recorder traces on test failure\n"
+            "  -E<cmd>    Like -e, print stack after each command "
+            "(repeatable)\n"
+            "  -H         Headless: no window, exit when done "
+            "(use with -E)\n"
+            "  -I         Initialize user environment (may overwrite)\n"
+            "  -K         Simulate typing keys during tests\n"
+            "  -N         Disable beeps\n"
+            "  -O[test]   Configure test traces without running tests\n"
+            "  -T[test]   Run tests (all or one suite, e.g. -Tmatrices)\n"
+            "  -d[N]      Key delay in ms for tests (default: 0)\n"
+            "  -e<cmd>    Evaluate RPL command line at startup (repeatable)\n"
+            "  -h         Show this help\n"
+            "  -i[N]      Max wait for image match in tests (default: 500)\n"
+            "  -k<map>    Load saved keymap\n"
+            "  -l         With -E, prefix stack lines with level numbers\n"
+            "  -m[N]      Memory size in kilobytes\n"
+            "  -n         Enable beeps during tests\n"
+            "  -r[N]      Screen refresh wait in ms (default: 20)\n"
+            "  -s<N>      Window scaling factor\n"
+            "  -t<trace>  Enable recorder trace (repeatable, regex ok)\n"
+            "  -w[N]      Default test command wait in ms (default: 1000)\n"
+            "\n"
+            "  -E writes stack to stderr with the GUI, to stdout with -H.\n"
+            "\n"
+            "Arguments:\n"
+            "  setting=value   Set initial RPL settings or flags "
+            "(e.g. AngleMode=1)\n"
+            "                  Values yes/true or positive integers\n"
+            "\n",
+            prog);
+}
+
+
+static bool sim_parse_args(int argc, char *argv[])
+// ----------------------------------------------------------------------------
+//   Parse command-line options; return false if an option is invalid
+// ----------------------------------------------------------------------------
+{
+    for (int a = 1; a < argc; a++)
+    {
+        cstring as = argv[a];
+        record(options, "  %u: %+s", a, as);
+        if (as[0] != '-')
+            continue;
+
+        if (!strcmp(as, "-h") || !strcmp(as, "--help"))
+        {
+            sim_usage(stdout, argv[0]);
+            exit(0);
+        }
+
+        if (!as[1])
+        {
+            fprintf(stderr, "Unknown option: %s\n", as);
+            return false;
+        }
+
+        switch (as[1])
+        {
+        case 'D':
+            if (as[2])
+                tests::dump_on_fail = as + 2;
+            else if (a + 1 < argc)
+                tests::dump_on_fail = argv[++a];
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'd':
+            if (as[2])
+                tests::key_delay_time = atoi(as + 2);
+            else if (a + 1 < argc)
+                tests::key_delay_time = atoi(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'E':
+            if (as[2])
+                sim_eval_console_commands.emplace_back(as + 2);
+            else if (a + 1 < argc)
+                sim_eval_console_commands.emplace_back(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'e':
+            if (as[2])
+                sim_eval_commands.emplace_back(as + 2);
+            else if (a + 1 < argc)
+                sim_eval_commands.emplace_back(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'H':
+            sim_eval_headless = true;
+            break;
+
+        case 'I':
+            install = true;
+            break;
+
+        case 'i':
+            if (as[2])
+                tests::image_wait_time = atoi(as + 2);
+            else if (a + 1 < argc)
+                tests::image_wait_time = atoi(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'K':
+            tests::simulate_typing = true;
+            break;
+
+        case 'k':
+            if (as[2])
+                load_saved_keymap(as + 2);
+            else if (a + 1 < argc)
+                load_saved_keymap(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'l':
+            sim_eval_print_levels = true;
+            break;
+
+        case 'm':
+            if (as[2])
+                memory_size = atoi(as + 2);
+            else if (a + 1 < argc)
+                memory_size = atoi(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 'n':
+            noisy_tests = true;
+            break;
+
+        case 'N':
+            no_beep = true;
+            break;
+
+        case 'O':
+            if (as[2])
+                sim_test_traces(as + 2);
+            break;
+
+        case 'r':
+            if (as[2])
+                tests::refresh_delay_time = atoi(as + 2);
+            else if (a + 1 < argc)
+                tests::refresh_delay_time = atoi(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 's':
+            if (as[2])
+                MainWindow::userScaling = atof(as + 2);
+            else if (a + 1 < argc)
+                MainWindow::userScaling = atof(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        case 't':
+            recorder_trace_set(as + 2);
+            break;
+
+        case 'T':
+            run_tests = true;
+            if (as[2])
+                sim_test_traces(as + 2);
+            break;
+
+        case 'w':
+            if (as[2])
+                tests::default_wait_time = atoi(as + 2);
+            else if (a + 1 < argc)
+                tests::default_wait_time = atoi(argv[++a]);
+            else
+            {
+                fprintf(stderr, "Option %s requires an argument\n", as);
+                return false;
+            }
+            break;
+
+        default:
+            fprintf(stderr, "Unknown option: %s\n", as);
+            return false;
+        }
+    }
+    return true;
+}
 
 
 static void sim_select_platform(bool headless)
@@ -244,127 +511,22 @@ int main(int argc, char *argv[])
         tests::testing_path = QDir::current().absolutePath().toUtf8();
 
     record(options,
-           "Simulator invoked as %+s with %d arguments", argv[0], argc-1);
+           "Simulator invoked as %+s with %d arguments", argv[0], argc - 1);
+
+    if (!sim_parse_args(argc, argv))
+    {
+        fprintf(stderr, "Try '%s -h' for usage.\n", argv[0]);
+        sim_usage(stderr, argv[0]);
+        exit(1);
+    }
+
     for (int a = 1; a < argc; a++)
     {
         cstring as = argv[a];
-        record(options, "  %u: %+s", a, as);
         if (as[0] == '-')
-        {
-            switch(as[1])
-            {
-            case 't':
-                recorder_trace_set(as+2);
-                break;
-            case 'n':
-                noisy_tests = true;
-                break;
-            case 'N':
-                no_beep = true;
-                break;
+            continue;
 
-            case 'I':
-                install = true;
-                break;
-
-            case 'T':
-                run_tests = true;
-                // fall-through
-            case 'O':
-                if (as[2])
-                {
-                    static bool first = true;
-                    if (first)
-                    {
-                        recorder_trace_set("est_.*=0");
-                        first = false;
-                    }
-                    char tname[256];
-                    if (strcmp(as+2, "all") == 0)
-                        strcpy(tname, "est_.*");
-                    else
-                        snprintf(tname, sizeof(tname)-1, "est_%s", as+2);
-                    recorder_trace_set(tname);
-                }
-                break;
-            case 'D':
-                if (as[2])
-                    tests::dump_on_fail = as+2;
-                else if (a < argc)
-                    tests::dump_on_fail = argv[++a];
-                break;
-
-            case 'e':
-                if (as[2])
-                    sim_eval_commands.emplace_back(as + 2);
-                else if (a + 1 < argc)
-                    sim_eval_commands.emplace_back(argv[++a]);
-                break;
-
-            case 'E':
-                if (as[2])
-                    sim_eval_console_commands.emplace_back(as + 2);
-                else if (a + 1 < argc)
-                    sim_eval_console_commands.emplace_back(argv[++a]);
-                break;
-
-            case 'H':
-                sim_eval_headless = true;
-                break;
-
-            case 'l':
-                sim_eval_print_levels = true;
-                break;
-
-            case 'k':
-                if (as[2])
-                    load_saved_keymap(as + 2);
-                else if (a < argc)
-                    load_saved_keymap(argv[++a]);
-                break;
-            case 'K':
-                tests::simulate_typing = true;
-                break;
-
-            case 'w':
-                if (as[2])
-                    tests::default_wait_time = atoi(as+2);
-                else if (a < argc)
-                    tests::default_wait_time = atoi(argv[++a]);
-                break;
-            case 'd':
-                if (as[2])
-                    tests::key_delay_time = atoi(as+2);
-                else if (a < argc)
-                    tests::key_delay_time = atoi(argv[++a]);
-                break;
-            case 'r':
-                if (as[2])
-                    tests::refresh_delay_time = atoi(as+2);
-                else if (a < argc)
-                    tests::refresh_delay_time = atoi(argv[++a]);
-                break;
-            case 'i':
-                if (as[2])
-                    tests::image_wait_time = atoi(as+2);
-                else if (a < argc)
-                    tests::image_wait_time = atoi(argv[++a]);
-                break;
-            case 'm':
-                if (as[2])
-                    memory_size = atoi(as+2);
-                else if (a < argc)
-                    memory_size = atoi(argv[++a]);
-                break;
-            case 's':
-                if (as[2])
-                    MainWindow::userScaling = atof(as+2);
-                else if (a < argc)
-                    MainWindow::userScaling = atof(argv[++a]);
-                break;
-            }
-        }
-        else if (cstring pos = strchr(as, '='))
+        if (cstring pos = strchr(as, '='))
         {
             size_t len   = pos - as;
             ularge value = strtoull(pos + 1, nullptr, 0);
