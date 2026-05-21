@@ -397,9 +397,9 @@ void tests::demo_ui()
               RSHIFT, ENTER,
               "             Equations and constants", ENTER, "D", ENTER,
               WLABEL, ENTER, KDELAY(25),
-              LSHIFT, I, F2, F1, F2, MUL, WSHOW,
+              ID_ConstantsMenu, F2, F1, F2, MUL, WSHOW,
               LSHIFT, F1, LSHIFT, F2, WSHOW,
-              LSHIFT, I, F3, F1, LSHIFT, F1, WSHOW,
+              ID_ConstantsMenu, F3, F1, LSHIFT, F1, WSHOW,
               CLEAR,
               ID_EquationsMenu, F2, RSHIFT, F2, RSHIFT, F1, WSHOW,
               LSHIFT, F1, RSHIFT, F1, WSHOW);
@@ -4495,7 +4495,7 @@ void tests::fraction_decimal_conversions()
 
     step("Expressions");
     test(CLEAR, "355 113 /",
-         LSHIFT, I, F2, F1, "-", ENTER) .expect("'355/113-π'");
+         ID_ConstantsMenu, F2, F1, "-", ENTER) .expect("'355/113-π'");
     test("→Num", ENTER).expect("0.00000 02667 64");
 
     step("→Q with algebraic expression");
@@ -5360,7 +5360,7 @@ void tests::complex_arithmetic()
         .expect("'(2+3ⅈ)+A'");
 
     step("Complex expression involving constants")
-        .test(CLEAR, LSHIFT, I, F2, F2, F3, F1, MUL, ID_pow)
+        .test(CLEAR, ID_ConstantsMenu, F2, F2, F3, F1, MUL, ID_pow)
         .expect("'e↑(ⅈ·π)'")
         .test(LSHIFT, KEY1)
         .expect("-1.");
@@ -8759,7 +8759,7 @@ void tests::auto_simplification()
     test(CLEAR, "ⅈ", ENTER, ENTER, MUL).expect("-1");
 
     step("i*i == -1 (symbolic constant)");
-    test(CLEAR, LSHIFT, I, F2, F3, ENTER, MUL).expect("-1");
+    test(CLEAR, ID_ConstantsMenu, F2, F3, ENTER, MUL).expect("-1");
 
     step("Simplification of rectangular real-only results");
     test(CLEAR, "0ⅈ3 0ⅈ5", ENTER, MUL).expect("-15");
@@ -11303,7 +11303,7 @@ void tests::graphic_stack_rendering()
         .image_noheader("reduced");
 
     step("Constants")
-        .test(CLEAR, LSHIFT, I, F2, F1, F2, F3)
+        .test(CLEAR, ID_ConstantsMenu, F2, F1, F2, F3)
         .image_noheader("constants", 3);
 
     step("Vector")
@@ -11396,7 +11396,7 @@ void tests::insertion_of_variables_constants_and_units()
     BEGIN(insert);
 
     step("Select constant menu")
-        .test(CLEAR, LSHIFT, I, F2).image_menus("constants-menu", 1);
+        .test(CLEAR, ID_ConstantsMenu, F2).image_menus("constants-menu", 1);
     step("Insert pi")
         .test(NOSHIFT, F1).expect("π");
     step("Insert e")
@@ -11417,41 +11417,41 @@ void tests::insertion_of_variables_constants_and_units()
         .test(NOSHIFT, F4).expect("angl");
 
     step("Insert pi value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F1, LSHIFT, F1)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F1, LSHIFT, F1)
         .expect("3.14159 26535 9");
     step("Insert e value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F2, LSHIFT, F2)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F2, LSHIFT, F2)
         .expect("2.71828 18284 6");
     step("Insert i value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F3, LSHIFT, F3)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F3, LSHIFT, F3)
         .expect("0+1ⅈ");
     step("Insert infinity value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F4, LSHIFT, F4)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F4, LSHIFT, F4)
         .expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
     step("Insert undefined value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F5, LSHIFT, F5)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F5, LSHIFT, F5)
         .expect("'Undefined'");
     step("Insert j value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F1, LSHIFT, F1)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F1, LSHIFT, F1)
         .expect("0+1ⅈ");
     step("Insert rad value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F2, LSHIFT, F2)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F2, LSHIFT, F2)
         .expect("1 r");
     step("Insert two pi value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F3, LSHIFT, F3)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F3, LSHIFT, F3)
         .expect("6.28318 53071 8 r");
     step("Insert angl value")
-        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F4, LSHIFT, F4)
+        .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F4, LSHIFT, F4)
         .expect("180 °");
 
     step("Begin program")
         .test(CLEAR, LSHIFT, RUNSTOP).editor("«»");
     step("Insert pi")
-        .test(LSHIFT, I, F2, NOSHIFT, F1).editor("« Ⓒπ »");
+        .test(ID_ConstantsMenu, F2, NOSHIFT, F1).editor("« Ⓒπ »");
     step("Insert e")
-        .test(LSHIFT, I, F2, NOSHIFT, F2).editor("« Ⓒπ  Ⓒe »");
+        .test(ID_ConstantsMenu, F2, NOSHIFT, F2).editor("« Ⓒπ  Ⓒe »");
     step("Insert i")
-        .test(LSHIFT, I, F2, NOSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ »");
+        .test(ID_ConstantsMenu, F2, NOSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ »");
     step("Insert infinity")
         .test(LSHIFT, I, F2, NOSHIFT, F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞ »");
     step("Insert undefined")
@@ -11898,7 +11898,7 @@ void tests::constants_menu()
         .expect("299 792 458. m/s");
 
     step("Dates constants menu")
-        .test(CLEAR, LSHIFT, I, F1);
+        .test(CLEAR, ID_ConstantsMenu, F1);
     step("Bastille day")
         .test(CLEAR, NOSHIFT, F1).expect("BastilleDay")
         .test(LSHIFT, F1).expect("Tue 14/Jul/1789");
@@ -11912,7 +11912,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Mathematics constants menu")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, F2);
+        .test(CLEAR, ID_ConstantsMenu, F2);
     step("Pi")
         .test(CLEAR, NOSHIFT, F1).expect("π")
         .test(LSHIFT, F1).expect("3.14159 26535 9");
@@ -11943,7 +11943,7 @@ void tests::constants_menu()
         .test(LSHIFT, F4).expect("180 °");
 
     step("Chemistry constants")
-        .test(CLEAR, LSHIFT, I, F3);
+        .test(CLEAR, ID_ConstantsMenu, F3);
     step("Avogadro constant")
         .test(CLEAR, NOSHIFT, F1).expect("NA")
         .test(LSHIFT, F1).expect("6.02214 076⁳²³ mol⁻¹");
@@ -11989,7 +11989,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Physics constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, F4);
+        .test(CLEAR, ID_ConstantsMenu, F4);
     step("Imaginary unit")
         .test(CLEAR, NOSHIFT, F1).expect("ⅉ")
         .test(LSHIFT, F1).expect("0+1ⅈ");
@@ -12032,7 +12032,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Mass constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, F5);
+        .test(CLEAR, ID_ConstantsMenu, F5);
     step("Mass unit")
         .test(CLEAR, NOSHIFT, F1).expect("u")
         .test(LSHIFT, F1).expect("1.66053 90689 2⁳⁻²⁷ kg");
@@ -12076,7 +12076,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Size constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F1);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F1);
     step("Classical electron radius")
         .test(CLEAR, NOSHIFT, F1).expect("re")
         .test(LSHIFT, F1).expect("2.81794 03205 fm");
@@ -12090,7 +12090,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Scattering constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F2);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F2);
     step("Thomson cross-section")
         .test(CLEAR, NOSHIFT, F1).expect("σe")
         .test(LSHIFT, F1).expect("6.65245 87052⁳⁻²⁹ m↑2");
@@ -12114,7 +12114,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Quantum constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F3);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F3);
     step("Planck")
         .test(CLEAR, NOSHIFT, F1).expect("h")
         .test(LSHIFT, F1).expect("6.62607 015⁳⁻³⁴ J·s");
@@ -12156,7 +12156,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Electromagnetism constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, F6);
+        .test(CLEAR, ID_ConstantsMenu, F6);
     step("Electronic charge")
         .test(CLEAR, NOSHIFT, F1).expect("qe")
         .test(LSHIFT, F1).expect("1.60217 6634⁳⁻¹⁹ C");
@@ -14046,7 +14046,7 @@ void tests::regression_checks()
     test(CLEAR, "8 gamma", ENTER).expect("5 040.");
 
     step("Bug 168: pi no longer parses correctly");
-    test(CLEAR, LSHIFT, I, F2, F1).expect("π");
+    test(CLEAR, ID_ConstantsMenu, F2, F1).expect("π");
     test(DOWN).editor("Ⓒπ");
     test(ENTER).expect("π");
 
