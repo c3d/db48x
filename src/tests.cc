@@ -11398,55 +11398,64 @@ void tests::insertion_of_variables_constants_and_units()
     step("Select constant menu")
         .test(CLEAR, LSHIFT, I, F2).image_menus("constants-menu", 1);
     step("Insert pi")
-        .test(CLEAR, F1).expect("π");
+        .test(NOSHIFT, F1).expect("π");
     step("Insert e")
-        .test(CLEAR, F2).expect("e");
+        .test(NOSHIFT, F2).expect("e");
     step("Insert i")
-        .test(CLEAR, F3).expect("ⅈ");
+        .test(NOSHIFT, F3).expect("ⅈ");
     step("Insert Infinity")
-        .test(CLEAR, F4).expect("∞");
+        .test(NOSHIFT, F4).expect("∞");
     step("Insert Undefined")
-        .test(CLEAR, F5).expect("?");
+        .test(NOSHIFT, F5).expect("?");
     step("Insert j")
-        .test(CLEAR, F6, F1).expect("ⅉ");
+        .test(NOSHIFT, F6, NOSHIFT, F1).expect("ⅉ");
     step("Insert rad")
-        .test(CLEAR, F2).expect("rad");
+        .test(NOSHIFT, F2).expect("rad");
     step("Insert two pi")
-        .test(CLEAR, F3).expect("twoπ");
+        .test(NOSHIFT, F3).expect("twoπ");
     step("Insert angl")
-        .test(CLEAR, F4, F6).expect("angl");
+        .test(NOSHIFT, F4).expect("angl");
 
     step("Insert pi value")
-        .test(CLEAR, LSHIFT, F1).expect("3.14159 26535 9");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F1, LSHIFT, F1)
+        .expect("3.14159 26535 9");
     step("Insert e value")
-        .test(CLEAR, LSHIFT, F2).expect("2.71828 18284 6");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F2, LSHIFT, F2)
+        .expect("2.71828 18284 6");
     step("Insert i value")
-        .test(CLEAR, LSHIFT, F3).expect("0+1ⅈ");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F3, LSHIFT, F3)
+        .expect("0+1ⅈ");
     step("Insert infinity value")
-        .test(CLEAR, LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F4, LSHIFT, F4)
+        .expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
     step("Insert undefined value")
-        .test(CLEAR, LSHIFT, F5).expect("'Undefined'");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F5, LSHIFT, F5)
+        .expect("'Undefined'");
     step("Insert j value")
-        .test(CLEAR, F6, LSHIFT, F1).expect("0+1ⅈ");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F1, LSHIFT, F1)
+        .expect("0+1ⅈ");
     step("Insert rad value")
-        .test(CLEAR, LSHIFT, F2).expect("1 r");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F2, LSHIFT, F2)
+        .expect("1 r");
     step("Insert two pi value")
-        .test(CLEAR, LSHIFT, F3).expect("6.28318 53071 8 r");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F3, LSHIFT, F3)
+        .expect("6.28318 53071 8 r");
     step("Insert angl value")
-        .test(CLEAR, LSHIFT, F4, F6).expect("180 °");
+        .test(CLEAR, LSHIFT, I, F2, NOSHIFT, F6, NOSHIFT, F4, LSHIFT, F4)
+        .expect("180 °");
 
     step("Begin program")
         .test(CLEAR, LSHIFT, RUNSTOP).editor("«»");
     step("Insert pi")
-        .test(F1).editor("« Ⓒπ »");
+        .test(LSHIFT, I, F2, NOSHIFT, F1).editor("« Ⓒπ »");
     step("Insert e")
-        .test(F2).editor("« Ⓒπ  Ⓒe »");
+        .test(LSHIFT, I, F2, NOSHIFT, F2).editor("« Ⓒπ  Ⓒe »");
     step("Insert i")
-        .test(F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ »");
+        .test(LSHIFT, I, F2, NOSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ »");
     step("Insert infinity")
-        .test(F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞ »");
+        .test(LSHIFT, I, F2, NOSHIFT, F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞ »");
     step("Insert undefined")
-        .test(F5).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ? »");
+        .test(LSHIFT, I, F2, NOSHIFT, F5).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ? »");
 
     step("Insert pi value")
         .test(LSHIFT, F1).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
@@ -11689,7 +11698,7 @@ void tests::constants_menu()
         .test(CLEAR, "ⒸG CONSTANTRANGE", ENTER)
         .expect("6.6743⁳⁻¹¹±1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
     step("Insert constant from constants menu")
-        .test(CLEAR, ID_ConstantsMenu, RSHIFT, F1, "c", ENTER)
+        .test(CLEAR, ID_ConstantsMenu, F4, F2, ENTER)
         .expect("c")
         .test(ID_ToDecimal)
         .expect("299 792 458 m/s");
@@ -11947,9 +11956,9 @@ void tests::constants_menu()
     step("Universal Gas constant")
         .test(CLEAR, NOSHIFT, F4).expect("R")
         .test(LSHIFT, F4).expect("8.31446 26181 5 J/(mol·K)");
-    step("Stefan-Boltzmann constant")
-        .test(CLEAR, NOSHIFT, F5).expect("σ")
-        .test(LSHIFT, F5).expect("0.00000 00567 04 W/(m↑2·K↑4)");
+    step("Faraday constant")
+        .test(CLEAR, NOSHIFT, F5).expect("F")
+        .test(LSHIFT, F5).expect("96 485.33212 33 C/mol");
     step("Standard temperature")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("StdT")
@@ -11963,16 +11972,16 @@ void tests::constants_menu()
     step("Carbon-12 mass")
         .test(CLEAR, NOSHIFT, F4).expect("MC12")
         .test(LSHIFT, F4).expect("12.00000 00126 g/mol");
-    step("Loschmidt constant")
-        .test(CLEAR, NOSHIFT, F5).expect("n0")
-        .test(LSHIFT, F5).expect("2.68678 01118⁳²⁵ (m↑3)⁻¹");
-    step("Sakur-Tetrode constant")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("SoR")
-        .test(LSHIFT, F1).expect("-1.16487 05214 9");
     step("Dalton constant")
-        .test(CLEAR, NOSHIFT, F2).expect("Da")
-        .test(LSHIFT, F2).expect("1.66053 90689 2⁳⁻²⁷ kg");
+        .test(CLEAR, NOSHIFT, F5).expect("Da")
+        .test(LSHIFT, F5).expect("1.66053 90689 2⁳⁻²⁷ kg");
+    step("Loschmidt constant")
+        .test(NOSHIFT, F6)
+        .test(CLEAR, NOSHIFT, F1).expect("n0")
+        .test(LSHIFT, F1).expect("2.68678 01118⁳²⁵ (m↑3)⁻¹");
+    step("Sakur-Tetrode constant")
+        .test(CLEAR, NOSHIFT, F2).expect("SoR")
+        .test(LSHIFT, F2).expect("-1.16487 05214 9");
     step("Boltzmann / electron mass ratio")
         .test(CLEAR, NOSHIFT, F3).expect("kq")
         .test(LSHIFT, F3).expect("0.00008 61733 33 J/(K·C)");
@@ -11993,9 +12002,9 @@ void tests::constants_menu()
     step("Earth gravity")
         .test(CLEAR, NOSHIFT, F4).expect("g")
         .test(LSHIFT, F4).expect("9.80665 m/s↑2");
-    step("Acceleration of Earth gravity Earth")
-        .test(CLEAR, NOSHIFT, F5).expect("Z₀")
-        .test(LSHIFT, F5).expect("376.73031 3412 Ω");
+    step("Stefan-Boltzmann constant")
+        .test(CLEAR, NOSHIFT, F5).expect("σ")
+        .test(LSHIFT, F5).expect("0.00000 00567 04 W/(m↑2·K↑4)");
     step("Vaccuum permittivity")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("ε₀")
@@ -12006,26 +12015,39 @@ void tests::constants_menu()
     step("Coulomb constant")
         .test(CLEAR, NOSHIFT, F3).expect("ke")
         .test(LSHIFT, F3).expect("8.98755 17862⁳⁹ N·m↑2/C↑2");
+    step("Vacuum characteristic impedance")
+        .test(CLEAR, NOSHIFT, F4).expect("Z₀")
+        .test(LSHIFT, F4).expect("376.73031 3412 Ω");
+    step("ε₀q ratio")
+        .test(CLEAR, NOSHIFT, F5).expect("ε₀q")
+        .test(LSHIFT, F5).expect("55 263 493.618 F/(m·C)");
+    step("qε₀ product")
+        .test(NOSHIFT, F6)
+        .test(CLEAR, NOSHIFT, F1).expect("qε₀")
+        .test(LSHIFT, F1).expect("1.41859 72836 3⁳⁻³⁰ F·C/m");
+    step("Sound reference intensity")
+        .test(CLEAR, NOSHIFT, F2).expect("I₀")
+        .test(LSHIFT, F2).expect("1.⁳⁻¹² W/m↑2");
 
     // ------------------------------------------------------------------------
     step("Mass constants")
     // ------------------------------------------------------------------------
         .test(CLEAR, LSHIFT, I, F5);
-    step("Electron mass")
-        .test(CLEAR, NOSHIFT, F1).expect("me")
-        .test(LSHIFT, F1).expect("9.10938 37139⁳⁻³¹ kg");
-    step("Neutron mass")
-        .test(CLEAR, NOSHIFT, F2).expect("mn")
-        .test(LSHIFT, F2).expect("1.67492 75005 6⁳⁻²⁷ kg");
-    step("Proton mass")
-        .test(CLEAR, NOSHIFT, F3).expect("mp")
-        .test(LSHIFT, F3).expect("1.67262 19259 5⁳⁻²⁷ kg");
-    step("Hydrogen mass")
-        .test(CLEAR, NOSHIFT, F4).expect("mH")
-        .test(LSHIFT, F4).expect("1.00782 50322 3 u");
     step("Mass unit")
-        .test(CLEAR, NOSHIFT, F5).expect("u")
-        .test(LSHIFT, F5).expect("1.66053 90689 2⁳⁻²⁷ kg");
+        .test(CLEAR, NOSHIFT, F1).expect("u")
+        .test(LSHIFT, F1).expect("1.66053 90689 2⁳⁻²⁷ kg");
+    step("Electron mass")
+        .test(CLEAR, NOSHIFT, F2).expect("me")
+        .test(LSHIFT, F2).expect("9.10938 37139⁳⁻³¹ kg");
+    step("Neutron mass")
+        .test(CLEAR, NOSHIFT, F3).expect("mn")
+        .test(LSHIFT, F3).expect("1.67492 75005 6⁳⁻²⁷ kg");
+    step("Proton mass")
+        .test(CLEAR, NOSHIFT, F4).expect("mp")
+        .test(LSHIFT, F4).expect("1.67262 19259 5⁳⁻²⁷ kg");
+    step("Hydrogen mass")
+        .test(CLEAR, NOSHIFT, F5).expect("mH")
+        .test(LSHIFT, F5).expect("1.00782 50322 3 u");
     step("Deuterium mass")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("mD")
@@ -12064,29 +12086,29 @@ void tests::constants_menu()
     step("Bohr radius")
         .test(CLEAR, NOSHIFT, F3).expect("a0")
         .test(LSHIFT, F3).expect("0.05291 77210 54 nm");
-    step("Thomson cross-section")
-        .test(CLEAR, NOSHIFT, F4).expect("σe")
-        .test(LSHIFT, F4).expect("6.65245 87052⁳⁻²⁹ m↑2");
 
     // ------------------------------------------------------------------------
     step("Scattering constants")
     // ------------------------------------------------------------------------
         .test(CLEAR, LSHIFT, I, LSHIFT, F2);
+    step("Thomson cross-section")
+        .test(CLEAR, NOSHIFT, F1).expect("σe")
+        .test(LSHIFT, F1).expect("6.65245 87052⁳⁻²⁹ m↑2");
     step("Electron Compton wavelength")
-        .test(CLEAR, NOSHIFT, F1).expect("λc")
-        .test(LSHIFT, F1).expect("0.00242 63102 35 nm");
+        .test(CLEAR, NOSHIFT, F2).expect("λc")
+        .test(LSHIFT, F2).expect("0.00242 63102 35 nm");
     step("Proton Compton wavelength")
-        .test(CLEAR, NOSHIFT, F2).expect("λcp")
-        .test(LSHIFT, F2).expect("0.00000 13214 1 nm");
+        .test(CLEAR, NOSHIFT, F3).expect("λcp")
+        .test(LSHIFT, F3).expect("0.00000 13214 1 nm");
     step("Neutron Compton wavelength")
-        .test(CLEAR, NOSHIFT, F3).expect("λcn")
-        .test(LSHIFT, F3).expect("0.00000 13195 91 nm");
+        .test(CLEAR, NOSHIFT, F4).expect("λcn")
+        .test(LSHIFT, F4).expect("0.00000 13195 91 nm");
     step("Muon Compton wavelength")
-        .test(CLEAR, NOSHIFT, F4).expect("λcμ")
-        .test(LSHIFT, F4).expect("0.00001 17344 41 nm");
+        .test(CLEAR, NOSHIFT, F5).expect("λcμ")
+        .test(LSHIFT, F5).expect("0.00001 17344 41 nm");
     step("Tau Compton wavelength")
-        .test(CLEAR, NOSHIFT, F5).expect("λcτ")
-        .test(LSHIFT, F5).expect("0.00000 06977 71 nm");
+        .test(CLEAR, NOSHIFT, F6).expect("λcτ")
+        .test(LSHIFT, F6).expect("0.00000 06977 71 nm");
 
 
     // ------------------------------------------------------------------------
@@ -12127,15 +12149,23 @@ void tests::constants_menu()
 
     step("Hartree energy")
         .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("Eh")
-        .test(LSHIFT, F1).expect("4.35974 47222 1⁳⁻¹⁸ J");
+        .test(CLEAR, NOSHIFT, F5).expect("Eh")
+        .test(LSHIFT, F5).expect("4.35974 47222 1⁳⁻¹⁸ J");
 
 
     // ------------------------------------------------------------------------
-    step("Magnetism constants")
+    step("Electromagnetism constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F4);
+        .test(CLEAR, LSHIFT, I, F6);
+    step("Electronic charge")
+        .test(CLEAR, NOSHIFT, F1).expect("qe")
+        .test(LSHIFT, F1).expect("1.60217 6634⁳⁻¹⁹ C");
+    step("Rydberg")
+        .test(CLEAR, NOSHIFT, F2).expect("R∞")
+        .test(LSHIFT, F2).expect("10 973 731.5682 m⁻¹");
     step("Bohr magneton")
+        .test(NOSHIFT, F6)
+        .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("μB")
         .test(LSHIFT, F1).expect("9.27401 00657⁳⁻²⁴ J/T");
     step("Nuclear magneton")
@@ -12150,23 +12180,6 @@ void tests::constants_menu()
     step("Neutron gyromagnetic ratio")
         .test(CLEAR, NOSHIFT, F5).expect("γn")
         .test(LSHIFT, F5).expect("183 247 175. (s·T)⁻¹");
-    step("Rydberg")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("R∞")
-        .test(LSHIFT, F1).expect("10 973 731.5682 m⁻¹");
-    step("von Klitzing constant")
-        .test(CLEAR, NOSHIFT, F2).expect("Rk")
-        .test(LSHIFT, F2).expect("25 812.80745 93 Ω");
-    step("Faraday")
-        .test(CLEAR, NOSHIFT, F3).expect("F")
-        .test(LSHIFT, F3).expect("96 485.33212 33 C/mol");
-    step("Conductance quantum")
-        .test(CLEAR, NOSHIFT, F4).expect("G0")
-        .test(LSHIFT, F4).expect("0.00007 74809 17 S");
-    step("Fermi reduced coupling constant")
-        .test(CLEAR, NOSHIFT, F5).expect("G0F")
-        .test(LSHIFT, F5).expect("0.00001 16637 87 (GeV↑2)⁻¹");
-
     step("First radiation constant")
         .test(NOSHIFT, F6)
         .test(CLEAR, NOSHIFT, F1).expect("c1")
@@ -12180,61 +12193,53 @@ void tests::constants_menu()
     step("Wien's frequency constant")
         .test(CLEAR, NOSHIFT, F4).expect("c3f")
         .test(LSHIFT, F4).expect("0.05878 92575 76 THz/K");
-    step("Magnetic flux quantum")
-        .test(CLEAR, NOSHIFT, F5).expect("ø")
-        .test(LSHIFT, F5).expect("2.06783 38484 6⁳⁻¹⁵ Wb");
-    step("Josephson constant")
+    step("von Klitzing constant")
+        .test(CLEAR, NOSHIFT, F5).expect("Rk")
+        .test(LSHIFT, F5).expect("25 812.80745 93 Ω");
+    step("Conductance quantum")
         .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("KJ")
-        .test(LSHIFT, F1).expect("4.83597 84841 7⁳¹⁴ Hz/V");
-
+        .test(CLEAR, NOSHIFT, F1).expect("G0")
+        .test(LSHIFT, F1).expect("0.00007 74809 17 S");
+    step("Fermi reduced coupling constant")
+        .test(CLEAR, NOSHIFT, F2).expect("G0F")
+        .test(LSHIFT, F2).expect("0.00001 16637 87 (GeV↑2)⁻¹");
+    step("Magnetic flux quantum")
+        .test(CLEAR, NOSHIFT, F3).expect("ø")
+        .test(LSHIFT, F3).expect("2.06783 38484 6⁳⁻¹⁵ Wb");
+    step("Josephson constant")
+        .test(CLEAR, NOSHIFT, F4).expect("KJ")
+        .test(LSHIFT, F4).expect("4.83597 84841 7⁳¹⁴ Hz/V");
     step("Quantum of circulation")
-        .test(CLEAR, NOSHIFT, F2).expect("Kc")
-        .test(LSHIFT, F2).expect("0.00036 36947 55 m↑2/s");
+        .test(CLEAR, NOSHIFT, F5).expect("Kc")
+        .test(LSHIFT, F5).expect("0.00036 36947 55 m↑2/s");
 
     // ------------------------------------------------------------------------
-    step("Material constants")
-    // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F5);
-    step(" ε₀q ratio")
-        .test(CLEAR, NOSHIFT, F1).expect("ε₀q")
-        .test(LSHIFT, F1).expect("55 263 493.618 F/(m·C)");
-    step(" qε₀ product")
-        .test(CLEAR, NOSHIFT, F2).expect("qε₀")
-        .test(LSHIFT, F2).expect("1.41859 72836 3⁳⁻³⁰ F·C/m");
-    step("Dielectric constant")
-        .test(CLEAR, NOSHIFT, F3).expect("εsi")
-        .test(LSHIFT, F3).expect("11.9");
+    step("Silicon dielectric constant")
+        .test(CLEAR, "'εsi' CONST", ENTER, ID_ToDecimal)
+        .expect("11.9");
     step("SiO2 dielectric constant")
-        .test(CLEAR, NOSHIFT, F4).expect("εox")
-        .test(LSHIFT, F4).expect("3.9");
-    step("Sound reference intensity")
-        .test(CLEAR, NOSHIFT, F5).expect("I₀")
-        .test(LSHIFT, F5).expect("1.⁳⁻¹² W/m↑2");
+        .test(CLEAR, "'εox' CONST", ENTER, ID_ToDecimal)
+        .expect("3.9");
 
 
-    // ------------------------------------------------------------------------
-    step("Computing constants")
-    // ------------------------------------------------------------------------
-        .test(CLEAR, LSHIFT, I, LSHIFT, F6);
     step("No constant")
-        .test(CLEAR, NOSHIFT, F1).expect("No")
-        .test(LSHIFT, F1).expect("False");
+        .test(CLEAR, "'No' CONST", ENTER, ID_ToDecimal)
+        .expect("False");
     step("Yes constant")
-        .test(CLEAR, NOSHIFT, F2).expect("Yes")
-        .test(LSHIFT, F2).expect("True");
+        .test(CLEAR, "'Yes' CONST", ENTER, ID_ToDecimal)
+        .expect("True");
     step("Unix epoch constant")
-        .test(CLEAR, NOSHIFT, F3).expect("UnixEpoch")
-        .test(LSHIFT, F3).expect("Thu 1/Jan/1970");
+        .test(CLEAR, "'UnixEpoch' CONST", ENTER)
+        .expect("Thu 1/Jan/1970");
     step("Sinclair ZX81 RAM size")
-        .test(CLEAR, NOSHIFT, F4).expect("SinclairZX81RAM")
-        .test(LSHIFT, F4).expect("1 KiB");
+        .test(CLEAR, "'SinclairZX81RAM' CONST", ENTER, ID_ToDecimal)
+        .expect("1. KiB");
     step("Page size")
-        .test(CLEAR, NOSHIFT, F5).expect("PageSize")
-        .test(LSHIFT, F5).expect("4 KiB");
+        .test(CLEAR, "'PageSize' CONST", ENTER, ID_ToDecimal)
+        .expect("4. KiB");
     step("Hello World constant")
-        .test(NOSHIFT, F6).expect("HelloWorld")
-        .test(LSHIFT, F6).expect("\"Hello World\"");
+        .test(CLEAR, "'HelloWorld' CONST", ENTER)
+        .expect("\"Hello World\"");
 }
 
 
