@@ -27,17 +27,20 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+
 #include "sysmenu.h"
 
 #include "dmcp.h"
 #include "file.h"
-#include "main.h"
 #include "object.h"
 #include "program.h"
 #include "renderer.h"
 #include "runtime.h"
 #include "settings.h"
-#include "sim-dmcp.h"
+
+#include "DBxxxx.h"
+
+
 #include "target.h"
 #include "types.h"
 #include "user_interface.h"
@@ -48,9 +51,7 @@
 #include <cstring>
 #include <errno.h>
 
-// --- I/O Operation Modes ---
-#define STATE_IO_INTERACTIVE ((void *) 1)
-#define STATE_IO_SILENT      ((void *) 2)
+
 
 
 
@@ -88,37 +89,78 @@ const smenu_t application_menu =
     "Setup",  application_menu_items,   NULL, NULL
 };
 
+extern char keymap_name[];
 
 void about_dialog()
 // ----------------------------------------------------------------------------
 //   Display the About dialog
 // ----------------------------------------------------------------------------
 {
-    lcd_clear_buf();
-    lcd_writeClr(t24);
+   char buff[50];
 
+    lcd_clear_buf();    // ok
+    lcd_writeClr(t24);     //
     // Header based on original system about
-    lcd_for_calc(DISP_ABOUT);
+    lcd_for_calc(DISP_ABOUT);    // limité
+
 
     font_p font = LibMonoFont10x17;
-    coord x = 0;
-    coord y = LCD_H / 2 + 15;
+    coord x = 5;
+    coord y = 5;
     size  h = font->height();
     coord x2;
+
+   Screen.text(x, y, utf8("This project is powered by SEGGER Tools"), font);
+   y += h;
+   Screen.text(x, y, utf8("under the Segger's Friendly License, FSL"), font);
+    y += h;
+   Screen.text(x, y, utf8("with grateful thanks to SEGGER team"), font);
+
+
+#if KBD_H3_6
+   snprintf(buff, sizeof(buff), "Horizontal keyboard 49keys, %s", keymap_name);
+#else
+   snprintf(buff, sizeof(buff), "Vertical keyboard 43keys, %s", keymap_name);
+#endif
+    y += h +10;
+   x2 = Screen.text( 5, y, utf8(buff), font, pattern::black);
+
+#if SHARP_27_400x240 
+   snprintf(buff, sizeof(buff), "Sharp 2.7'' %dx%d, 170dpi", LCD_WIDTH, LCD_HEIGHT);
+#elif SHARP_32_536x336 
+   snprintf(buff, sizeof(buff), "Sharp 3.2'' %dx%d, 200dpi", LCD_WIDTH, LCD_HEIGHT);
+#elif TFT_LTDC 
+   snprintf(buff, sizeof(buff), "LTDC VGA 3.5'' %dx%d, 230dpi", LCD_WIDTH, LCD_HEIGHT);
+#endif
+   y += h ;
+   x2 = Screen.text( 5, y, utf8(buff), font, pattern::black);
+
+   y += h ;
+   x2 = Screen.text(5, y, utf8("IP over USB, SNTP, FTP server : usb.local (Admin,Secret) "), font, pattern::black);
+
+    y += h +5;
+    for (uint i = 0; i < 2; i++)
+        x2 = Screen.text(5+i, y, utf8(HARD_NAME ""), font, pattern::black);
+   snprintf(buff, sizeof(buff), "v%s, %3dMhz, %3dKb by d212", HARD_VERSION, SystemCoreClock/1000000, DB_MEM_SIZE);
+//    y += h+5;
+   x2 = Screen.text( x2, y, utf8(buff), font, pattern::black);
+
+
+ 
+
+   y = LCD_H / 2 + 30;
     for (uint i = 0; i < 2; i++)
         x2 = Screen.text(x+i, y, utf8(PROGRAM_NAME " "), font, pattern::black);
-    Screen.text(x2, y, utf8("v" PROGRAM_VERSION " ©2025 C. de Dinechin"), font);
+    Screen.text(x2, y, utf8("v" PROGRAM_VERSION " © 2024 C. de Dinechin"), font);
     y += h;
     Screen.text(x, y, utf8("A modern implementation of RPL, and"), font);
     y += h;
     Screen.text(x, y, utf8("a tribute to Bill Hewlett and Dave Packard"), font);
 
-#ifdef SIMULATOR
     y += 3 * h / 2;
     Screen.text(x, y, utf8("    Press EXIT key to continue..."), font);
-#endif // SIMULATOR
-    lcd_refresh();
-
+//    lcd_refresh();
+lcd_forced_refresh();
     wait_for_key_press();
 }
 
@@ -238,16 +280,13 @@ static bool state_save_variable(object_p name, object_p obj, void *renderer_ptr)
 }
 
 
-static int state_save_callback(cstring fpath, cstring fname, void *data)
+static int state_save_callback(cstring fpath, cstring fname, void *)
 // ----------------------------------------------------------------------------
 //   Callback when a file is selected
 // ----------------------------------------------------------------------------
 {
     // Display the name of the file being saved
-    if (data != STATE_IO_SILENT)
-    {
-      ui.draw_message("Saving state...", fname);
-    }
+    ui.draw_message("Saving state...", fname);
 
     // Open save file name
     file prog(fpath, file::WRITING);
@@ -316,13 +355,19 @@ static int state_save()
 
     bool display_new = true;
     bool overwrite_check = true;
-    void *user_data = STATE_IO_INTERACTIVE;
+    void *user_data = NULL;
+   /*
     int ret = file_selection_screen("Save state",
                                     "/state", ".48S",
                                     state_save_callback,
                                     display_new, overwrite_check,
                                     user_data);
     return ret;
+*/
+//!! for a test :
+ 
+return state_save_callback("state\\State1.48s", "State1", user_data);
+
 }
 
 
@@ -357,18 +402,15 @@ static bool danger_will_robinson(cstring header,
 }
 
 
-static int state_load_callback(cstring path, cstring name, void *data)
+static int state_load_callback(cstring path, cstring name, void *merge)
 // ----------------------------------------------------------------------------
 //   Callback when a file is selected for loading
 // ----------------------------------------------------------------------------
 {
-    bool is_silent = (data == STATE_IO_SILENT);
-    bool is_merge = (data != NULL);
-
-    if (!is_merge)
+    if (!merge)
     {
         // Check before erasing state
-        if (!danger_will_robinson("Loading DB48X state",
+       if (!danger_will_robinson("Loading DB48X state",
 
                                   "You are about to erase the current",
                                   "calculator state to replace it with",
@@ -384,11 +426,8 @@ static int state_load_callback(cstring path, cstring name, void *data)
     }
 
     // Display the name of the file being saved
-    if (!is_silent)
-    {
-        ui.draw_message(is_merge ? "Merge state" : "Load state",
-			"Loading state...", name);
-    }
+    ui.draw_message(merge ? "Merge state" : "Load state",
+                    "Loading state...", name);
 
     // Store the state file name
     {
@@ -396,7 +435,9 @@ static int state_load_callback(cstring path, cstring name, void *data)
         if (!prog.valid())
         {
             ui.draw_message("State load failed", prog.error(), name);
+#if DBh743
             wait_for_key_press();
+#endif    
             return 1;
         }
 
@@ -468,7 +509,7 @@ static int state_load_callback(cstring path, cstring name, void *data)
         }
     }
 
-    if (!is_merge)
+    if (!merge)
         set_reset_state_file(path);
 
     // Exit with success
@@ -601,7 +642,14 @@ static int keymap_load()
 }
 
 
-#ifndef SIMULATOR
+#if   (SIMULATOR )
+int       ui_wrap_io(file_sel_fn callback,
+                     const char *path,
+                     void       *data,
+                     bool        writing);
+
+#else
+
 int ui_wrap_io(file_sel_fn callback,
                const char *path,
                void       *data,
@@ -617,6 +665,7 @@ int ui_wrap_io(file_sel_fn callback,
     return callback(path, name, data);
 }
 
+
 #endif // SIMULATOR
 
 
@@ -624,19 +673,10 @@ int ui_wrap_io(file_sel_fn callback,
 
 bool load_state_file(cstring path)
 // ----------------------------------------------------------------------------
-//   Load the state file directly
+//   Load the state file directly 
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_load_callback, path, STATE_IO_INTERACTIVE, false) == 0;
-}
-
-
-bool load_state_file_silent(cstring path)
-// ----------------------------------------------------------------------------
-//   Load the state file directly
-// ----------------------------------------------------------------------------
-{
-    return ui_wrap_io(state_load_callback, path, STATE_IO_SILENT, false) == 0;
+    return ui_wrap_io(state_load_callback, path, (void *) 1, false) == MRET_EXIT;
 }
 
 
@@ -645,16 +685,7 @@ bool save_state_file(cstring path)
 //   Save the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_save_callback, path, STATE_IO_INTERACTIVE, true) == 0;
-}
-
-
-bool save_state_file_silent(cstring path)
-// ----------------------------------------------------------------------------
-//   Save the state file directly
-// ----------------------------------------------------------------------------
-{
-    return ui_wrap_io(state_save_callback, path, STATE_IO_SILENT, true) == 0;
+    return ui_wrap_io(state_save_callback, path, (void *) 1, true) == MRET_EXIT;
 }
 
 
@@ -663,36 +694,14 @@ bool load_system_state()
 //   Load the default system state file
 // ----------------------------------------------------------------------------
 {
-    if (sys_disk_ok())
+    if (Check_Disk())
     {
         // Try to load the state file, but only if it has the right
         // extension. This is necessary, because get_reset_state_file() could
         // legitimately return a .f42 file if we just switched from DM42.
         char *state = get_reset_state_file();
         if (is_valid_state_file(state))
-            return load_state_file_silent(state);
-    }
-    return false;
-}
-
-
-bool save_system_state(void *mode)
-// ----------------------------------------------------------------------------
-//   Save the default system state file
-// ----------------------------------------------------------------------------
-{
-    if (sys_disk_ok())
-    {
-        // Try to save the state file, but only if it has the right
-        // extension. This is necessary, because get_reset_state_file() could
-        // legitimately return a .f42 file if we just switched from DM42.
-        char *state = get_reset_state_file();
-        if (is_valid_state_file(state))
-  	    return (mode == STATE_IO_INTERACTIVE
-		    ? save_state_file(state)
-		    : save_state_file_silent(state));
-        else
-            return state_save() == 0;
+            return load_state_file(state);
     }
     return false;
 }
@@ -703,16 +712,18 @@ bool save_system_state()
 //   Save the default system state file
 // ----------------------------------------------------------------------------
 {
-    return save_system_state(STATE_IO_INTERACTIVE);
-}
-
-
-bool save_system_state_silent()
-// ----------------------------------------------------------------------------
-//   Save the default system state file without display a window
-// ----------------------------------------------------------------------------
-{
-    return save_system_state(STATE_IO_SILENT);
+    if (Check_Disk())
+    {
+        // Try to save the state file, but only if it has the right
+        // extension. This is necessary, because get_reset_state_file() could
+        // legitimately return a .f42 file if we just switched from DM42.
+        char *state = get_reset_state_file();
+        if (is_valid_state_file(state))
+            return save_state_file(state);
+        else
+            return state_save() == 0;
+    }
+    return false;
 }
 
 
@@ -863,8 +874,12 @@ void power_off(bool offimg)
 //   Power off the calculator
 // ----------------------------------------------------------------------------
 {
-    SET_ST(STAT_PGM_END);
-    power_check(false, offimg);
+   RTT_vprintf_cr_time( "Power Off, sysmenu.cc");
+//   SET_ST(STAT_PGM_END);
+//   sys_timer_disable(TIMER0);
+//   sys_timer_disable(TIMER1);    // avoid first line 
+   OS_TASKEVENT_Set( &TKBD, EV_KPo_ReqPOff);
+   power_check(false, offimg);
 }
 
 

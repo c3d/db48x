@@ -6,9 +6,8 @@
 //
 //     User interface for the calculator
 //
-//
-//
-//
+// mod for horizontal keyboard
+// updated to 0.9.13, 0.9.14
 //
 //
 //
@@ -78,6 +77,7 @@ RECORDER(tests_ui,      16, "Test interaction with user interface");
 RECORDER(shifts,        16, "Shift logic (including transient alpha)");
 RECORDER(keymap_warning, 8, "Warnings about invalid keymaps");
 
+
 // Updated when loading keymaps from files (e.g. db48x.48k).
 static uint help_keymap_generation = 1;
 // Updated when ASSIGN/DELKEYS/STOKEY change user key bindings.
@@ -143,7 +143,6 @@ user_interface::user_interface()
       taLowercase(false),
       taPrevAlpha(false),
       taPrevLowerc(false),
-      delayedArrow(false),
       userOnce(false),
       shiftDrawn(false),
       xshiftDrawn(false),
@@ -582,7 +581,7 @@ bool user_interface::editor_history(bool back)
             rt.edit(+ed, sz);
             cursor = 0;
             select = ~0U;
-            alpha = lowercase = shift = xshift = false;
+            alpha = lowercase = xshift = shift = false;
             edRows = 0;
             dirtyEditor = true;
             break;
@@ -645,6 +644,8 @@ bool user_interface::key(int key, bool repeating, bool talpha)
 
     if (rt.error())
     {
+//      RTT_vprintf_cr_T_F( key, "\n\nErreur %d \n", rt.error());
+
         if (key && Settings.NoNeedToClearErrors())
         {
             // Do not return true, handle the key as if there was no error
@@ -659,7 +660,7 @@ bool user_interface::key(int key, bool repeating, bool talpha)
         {
             if (key == KEY_EXIT || key == KEY_ENTER || key == KEY_BSP)
                 rt.clear_error();
-            else if (key == KEY_SHIFT)
+            else if (key == KEY_SHIFT || key == KEY_SHIFT2)
                 handle_shifts(key, talpha);
             else if (key)
                 beep(2200, 75);
@@ -669,7 +670,65 @@ bool user_interface::key(int key, bool repeating, bool talpha)
         }
     }
 
+    if (( key != K_B1)
+          &&( key != 0)
+          &&( MemToggle_B1 > 0))
+      { 
+         MemToggle_B1 = 0;
+      }
+
+    if (( key != K_C2)
+          &&( key != 0)
+          &&( MemToggle_C2 > 0))
+      { 
+         MemToggle_C2 = 0;
+      }
+
+    if (( key != K_D1)
+          &&( key != 0)
+          &&( MemToggle_D1 > 0))
+      { 
+         MemToggle_D1 = 0;
+      }
+
+    if (( key != K_D2)
+          &&( key != 0)
+          &&( MemToggle_D2 > 0))
+      { 
+         MemToggle_D2 = 0;
+      }
+
+    if (( key != K_D3)
+          &&( key != 0)
+          &&( MemToggle_D3 > 0))
+      { 
+         MemToggle_D3 = 0;
+      }
+    if (( key != K_E2)
+          &&( key != 0)
+          &&( MemToggle_E2 > 0))
+      { 
+         MemToggle_E2 = 0;
+      }
+
+    if (( key != K_F1)
+          &&( key != 0)
+          &&( MemToggle_F1 > 0))
+      { 
+         MemToggle_F1 = 0;
+      }
+
+    if (( key != K_E1)
+          &&( key != 0)
+          &&( MemToggle_E1 > 0))
+      { 
+         MemToggle_E1 = 0;
+      }
+
+
+
     // Handle keys
+// for keyboard modification, must return true correctly, k_b5 hist, k_c6 edit, returning true for help, preventing handle_editing() execution
     bool result =
         handle_shifts(key, talpha)      ||
         handle_help(key)                ||
@@ -682,10 +741,16 @@ bool user_interface::key(int key, bool repeating, bool talpha)
 
     if (rt.editing())
         update_mode();
-
-    if (!skey && last != KEY_SHIFT && !transalpha)
+// && !transalpha, v0.9.17
+    if (!skey && (last != KEY_SHIFT) && !transalpha)
     {
         shift = false;
+//        xshift = false;
+    }
+    if (!skey && (last != KEY_SHIFT2) && !transalpha)
+    {
+//        shift = false;
+      if (last != KEY_SHIFT)
         xshift = false;
     }
 
@@ -731,7 +796,7 @@ object_p user_interface::assign(int keyid, object_p toassign)
     else
         wrkeymap->purge(+keyname);
     rt.updir();
-    help_assignment_generation++;
+   help_assignment_generation++;          // v0.9.17
     menu_refresh(menu::ID_VariablesMenu);
     return result;
 }
@@ -1552,7 +1617,21 @@ void user_interface::draw_dirty(coord x1, coord y1, coord x2, coord y2)
 //   Indicates that a component dirtied a given area of the screen
 // ----------------------------------------------------------------------------
 {
-    mark_dirty(x1, y1, x2, y2);
+
+                
+                     
+               
+               
+           mark_dirty(x1, y1, x2, y2);
+    
+                   
+               
+                       
+               
+               
+                   
+                     
+
 }
 
 
@@ -1563,7 +1642,6 @@ void user_interface::draw_dirty(const rect &r)
 {
     draw_dirty(r.x1, r.y1, r.x2, r.y2);
 }
-
 
 void user_interface::refresh()
 // ----------------------------------------------------------------------------
@@ -1590,21 +1668,23 @@ void user_interface::refresh()
 }
 
 
+
 bool user_interface::draw_graphics(bool erase)
 // ----------------------------------------------------------------------------
 //   Start graphics mode
 // ----------------------------------------------------------------------------
 {
-    bool started = false;
+     bool started = false;
     if (!graphics || erase)
     {
-        started = true;
+        bool started = true;
         draw_start(false);
         graphics = true;
         if (erase || user_display() == nullptr)
         {
             DISPLAY(display.fill(display.area(), Settings.Background()));
             draw_dirty(0, 0, LCD_W-1, LCD_H-1);
+            return true;
         }
     }
     return started;
@@ -1884,7 +1964,8 @@ bool user_interface::draw_menus()
 }
 
 
-static const size header_width = 248;
+//static const size header_width = 248;
+static const size header_width = (LCD_W*100)/161;
 
 
 bool user_interface::draw_header()
@@ -2383,8 +2464,12 @@ bool user_interface::draw_busy(unicode glyph, pattern color)
         Screen.clip(clip);
     }
     draw_dirty(busy);
-    refresh_dirty();
-    return true;
+   if (sys_timer_timeout(TIMER2))
+   {
+      refresh_dirty();
+       set_timer(TIMER2, 100);
+   }
+   return true;
 }
 
 
@@ -2395,7 +2480,6 @@ bool user_interface::draw_idle()
 {
     if (freezeHeader)
         return false;
-
     if (graphics)
     {
         record(tests_ui, "Waiting for key");
@@ -2413,8 +2497,6 @@ bool user_interface::draw_idle()
             return false;
         }
     }
-
-
     draw_busy(0, pattern::black);
     alphaDrawn = !alphaDrawn;
     shiftDrawn = !shift;
@@ -3201,7 +3283,7 @@ void user_interface::load_help(utf8 topic, size_t len)
                     }
                     refidx = 0;
                 }
-                else if (refidx < sizeof(ref) - 1)
+                else if (refidx < sizeof(ref) - 1) // v0.9.17
                 {
                     ref[refidx++] = c;
                 }
@@ -3260,6 +3342,7 @@ void user_interface::load_help(utf8 topic, size_t len)
             }
             else
             {
+            // v0.9.17
                 if (refidx < sizeof(ref))
                     ref[refidx] = 0;
                 record(help_search, "Checking %u: %s", level, ref);
@@ -3387,9 +3470,9 @@ void user_interface::draw_help_access_paths(id cmd,
         case KEY_STO:        return "STO (G)";
         case KEY_RCL:        return "VAR (H)";
         case KEY_RDN:        return "STK (I)";
-        case KEY_SIN:        return "SIN (J)";
-        case KEY_COS:        return "COS (K)";
-        case KEY_TAN:        return "TAN (L)";
+  //      case KEY_SIN:        return "SIN (J)";
+  //      case KEY_COS:        return "COS (K)";
+  //      case KEY_TAN:        return "TAN (L)";
         case KEY_ENTER:      return "ENTER";
         case KEY_SWAP:       return "x⇆y (M)";
         case KEY_CHS:        return "+/- (N)";
@@ -3905,6 +3988,7 @@ void user_interface::draw_help_access_paths(id cmd,
 }
 
 
+
 bool user_interface::draw_help()
 // ----------------------------------------------------------------------------
 //    Draw the help content
@@ -3913,6 +3997,7 @@ bool user_interface::draw_help()
 restart:
     record(help, "draw_help entry force=%u dirty=%u stack=%u freeze=%u",
            force, dirtyHelp, dirtyStack, freezeStack);
+
     if ((!force && !dirtyHelp && !dirtyStack) || freezeStack)
         return false;
     dirtyHelp = false;
@@ -3982,13 +4067,7 @@ restart:
     uint    shown     = 0;
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
-    static char link[60];
-    bool        in_table    = false;
-    int         table_col   = 0;
-    int         table_ncols = 0;
-    coord       table_col_w = 0;
-    bool        advance_col = false;
-    bool        escaped     = false;
+     static char link[60];
 
     // Pun not indented
     helpfile.seek(help);
@@ -4060,9 +4139,7 @@ restart:
                     uint    off  = helpfile.position();
                     unicode nx   = helpfile.get();
                     unicode nnx  = helpfile.get();
-                    if (nx == '#' || (nx == '*' && nnx == ' ')
-                        || (nx == '-' && nnx == ' ')
-                        || (in_table && nx == '|'))
+                    if (nx      == '#' || (nx == '*' && nnx == ' '))
                     {
                         newline = true;
                         emit = true;
@@ -4157,103 +4234,23 @@ restart:
                         emit = true;
                         if (hadTitle)
                             y += height;
-                        hadTitle = false;
+                        hadTitle = false;  // v0.9.17
                     }
                 }
                 skip = true;
-                break;
-
-            case '\\':
-                escaped = true;
-                skip    = true;
-                break;
-
-            case '|':
-                if (escaped)
-                {
-                    escaped = false;
-                    break;
-                }
-                if (style == CODE)
-                    break;
-                if (last == '\n' || (in_table && table_col >= table_ncols))
-                {
-                    // Start of a table row (first or subsequent)
-                    uint       pos0    = helpfile.position();
-                    unicode    c       = 0;
-                    int        cols    = 0;
-                    bool       is_sep  = true;
-                    while (c != '\n' && c != unicode(EOF))
-                    {
-                        c = helpfile.get();
-                        if (c == '|')
-                            cols++;
-                        if (c != '|' && c != ':' && c != '-' && c != ' '
-                            && c != '\r' && c != '\n' && c != unicode(EOF))
-                            is_sep = false;
-                    }
-                    helpfile.seek(pos0);
-                    if (is_sep)
-                    {
-                        // Separator row: skip the whole line
-                        c = 0;
-                        while (c != '\n' && c != unicode(EOF))
-                            c = helpfile.get();
-                        ch   = '\n'; // so that last=='\n' for the next row
-                        skip = true;
-                    }
-                    else
-                    {
-                        if (!in_table && cols > 0)
-                        {
-                            in_table    = true;
-                            table_ncols = cols;
-                            table_col_w = (xright - r.x1 - 4) / table_ncols;
-                        }
-                        table_col = 0;
-                        x         = r.x1 + 2;
-                        xleft     = r.x1 + 2;
-                        skip      = true;
-                    }
-                }
-                else if (in_table)
-                {
-                    advance_col = true;
-                    emit        = true;
-                    skip        = true;
-                }
                 break;
 
             case '<':
                 // Skip HTML tags
-                if (style > ITALIC)
-                    break;
+                if (last == '\n')
                 {
                     unicode c = helpfile.get();
-                    if (last == '\n')
-                    {
-                        // Block-level: skip whole line
-                        while (c != '\n' && c != unicode(EOF))
-                            c = helpfile.get();
-                    }
-                    else
-                    {
-                        // Inline tag: skip to closing >
-                        while (c != '>' && c != '\n' && c != unicode(EOF))
-                            c = helpfile.get();
-                    }
+                    while (c != '\n' && c != unicode(EOF))
+                        c = helpfile.get();
                 }
-                skip = true;
-                break;
-
-            case '-':
-                if (last == '\n' && helpfile.peek() == ' ')
-                {
-                    restyle = NORMAL;
-                    ch      = L'●';
-                    xleft   = r.x1 + 2 + font->width(utf8("● "));
+                if (style > ITALIC)
                     break;
-                }
+                skip = true;
                 break;
 
             case '*':
@@ -4375,11 +4372,6 @@ restart:
                 break;
 
             case '[':
-                if (escaped)
-                {
-                    escaped = false;
-                    break;
-                }
                 if (style != CODE)
                 {
                     if (helpfile.peek() != '!')
@@ -4410,11 +4402,6 @@ restart:
                 }
                 break;
             case ']':
-                if (escaped)
-                {
-                    escaped = false;
-                    break;
-                }
                 if (style == TOPIC || style == HIGHLIGHTED_TOPIC)
                 {
                     unicode n  = helpfile.get();
@@ -4519,7 +4506,7 @@ restart:
                                 }
                             }
                         }
-
+// v0.9.17                        
                         // Remember that we had a command to draw menu path
                         hadCmd = cmd;
                     }
@@ -4546,34 +4533,22 @@ restart:
         }
         else
         {
-            // Go to new line if this does not fit (not inside table columns)
-            if (!in_table)
+            // Go to new line if this does not fit
+            coord right  = x + width;
+            if (right >= xright - 1)
             {
-                coord right  = x + width;
-                if (right >= xright - 1)
-                {
-                    x = xleft;
-                    y += height;
-                }
+                x = xleft;
+                y += height;
             }
             if (widx && hadTitle)
             {
-                y += in_table ? height : 5 * height / 4;
+                y += 5 * height / 4;
                 hadTitle = false;
             }
         }
 
         coord yf = y + height;
         bool draw = yf > ytop;
-
-        // Clip to column boundary when inside a table
-        if (in_table && draw)
-        {
-            coord col_x1 = r.x1 + 2 + table_col * table_col_w;
-            coord col_x2 = col_x1 + table_col_w - 1;
-            rect  ccol(col_x1, r.y1, col_x2, r.y2);
-            Screen.clip(ccol);
-        }
 
         pattern color     = styles[style].color;
         pattern bg        = styles[style].background;
@@ -4654,20 +4629,9 @@ restart:
             }
             x += kwidth;
         }
-        if (draw && (italic || in_table))
-            Screen.clip(r);
-
-        // Advance to next table column
-        if (advance_col)
-        {
-            table_col++;
-            if (table_col < table_ncols)
-            {
-                x     = r.x1 + 2 + table_col * table_col_w;
-                xleft = x;
-            }
-            advance_col = false;
-        }
+        if (italic)
+            if (draw)
+                Screen.clip(r);
 
         // Check special case of yellow shift key
         if (yellow || blue)
@@ -4694,8 +4658,8 @@ restart:
 
         // Check if we need to draw the image
         if (imdsp)
-        {
-            if (image && draw)
+        {  
+            if (image && draw)      // v0.9.17
             {
                 grob::surface srcs = image->pixels();
                 rect drect = srcs.area();
@@ -4712,15 +4676,6 @@ restart:
 
         if (newline)
         {
-            if (in_table)
-            {
-                table_col = 0;
-                if (helpfile.peek() != '|')
-                {
-                    in_table    = false;
-                    table_ncols = 0;
-                }
-            }
             xleft  = r.x1 + 2;
             x = xleft;
             if (!hadTitle)
@@ -4728,7 +4683,7 @@ restart:
         }
         if (style <= SUBSUBTITLE)
             y += height / 2;
-
+// v0.9.17
         // Check if we want to draw the possible keys to access a command
         if (hadCmd)
         {
@@ -4737,6 +4692,7 @@ restart:
                                        xleft, xright, ybot, height);
             hadCmd = id(0);
         }
+
 
         // Select style for next round
         style = restyle;
@@ -4799,6 +4755,21 @@ bool user_interface::noHelpForKey(int key)
 // ----------------------------------------------------------------------------
 {
     bool editing  = rt.editing();
+   // test re
+//      return true;
+   if (     key == KEY_UP 
+         || key == KEY_DOWN 
+         || key == KEY_LEFT 
+         || key == KEY_RIGHT 
+      ) return true;
+
+// no help for exit key, enable [EXIT] + ([+] | [-]) for adjusting Back light level
+   if ( (KEY_EXIT == key)   && !shift && !xshift) return true;
+
+// v0.9.17
+    // No help for shifted UP/DOWN (history, edit, etc)
+//    if (key == KEY_UP || key == KEY_DOWN)
+//        return true;
 
     // Show help for Duplicate and Drop only if not editing
     if (key == KEY_ENTER || key == KEY_BSP)
@@ -4812,9 +4783,11 @@ bool user_interface::noHelpForKey(int key)
 
     if (editing)
     {
-        // No help for ENTER, BSP, UP, DOWN and RUN keys while editing
+        // No help for ENTER or BSP key while editing
         if (key == KEY_ENTER || key == KEY_BSP ||
-            key == KEY_UP || key == KEY_DOWN || key == KEY_RUN)
+            key == KEY_UP || key == KEY_DOWN ||
+            key == KEY_LEFT || key == KEY_RIGHT || 
+            key == KEY_RUN)
             return true;
 
         // No help for A-F keys in hexadecimal entry mode
@@ -4824,19 +4797,11 @@ bool user_interface::noHelpForKey(int key)
 
     // No help for digits entry
     if (!shift && !xshift)
-    {
-        // Show help for Negate and Cycle only if not editing
-        if (key == KEY_CHS || key == KEY_E)
-            return editing;
-
-        if (key > KEY_SWAP && key < KEY_ADD &&
+        if (key > KEY_ENTER && key < KEY_ADD &&
             key != KEY_SUB && key != KEY_MUL && key != KEY_DIV && key != KEY_RUN)
             return true;
-    }
 
-    // No help for shifted UP/DOWN (history, edit, etc)
-    if (key == KEY_UP || key == KEY_DOWN)
-        return true;
+
 
     // Other cases are regular functions, we can display help
     return false;
@@ -4853,7 +4818,7 @@ bool user_interface::handle_screen_capture(int key)
     {
         if (key == KEY_SCREENSHOT)
         {
-            shift = xshift = alpha = lowercase = longpress = repeat = false;
+            shift = xshift = alpha = longpress = repeat = false;
             last = 0;
             draw_annunciators();
             refresh_dirty();
@@ -4881,7 +4846,7 @@ bool user_interface::handle_help(int &key)
     if (!showing_help())
     {
         // Exit if we are editing or entering digits
-        if (last == KEY_SHIFT || Stack.interactive)
+        if (last == KEY_SHIFT || last == KEY_SHIFT2 || Stack.interactive)
             return false;
 
         // Check if we have a long press, if so load corresponding help
@@ -4928,7 +4893,7 @@ bool user_interface::handle_help(int &key)
         {
             if (!noHelpForKey(last))
                 key = last;     // Time to evaluate
-            last = 0;
+            last    = 0;
         }
 
         // Help keyboard movements only applies when help is shown
@@ -5048,7 +5013,6 @@ bool user_interface::handle_shifts(int &key, bool talpha)
 // ----------------------------------------------------------------------------
 {
     bool consumed = false;
-
     record(shifts, "Key %d%+s%+s%+s",
            key,
            talpha       ? " talpha"    : "",
@@ -5063,20 +5027,29 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         {
             if (key == KEY_UP || key == KEY_DOWN)
             {
-                repeat = true;
+                // Let menu and normal keys go through
+//                if (xshift)
+//                    return false;
 
                 // Delay processing of up or down until after delay
+// v0.9.17
+//                repeat = true;
                 if (longpress)
+                {
+                    repeat = true;
                     return false;
+                }
 
-                taLowercase = key == KEY_DOWN;
-                delayedArrow = true;
                 last = key;
+                repeat = true;
+//                lowercase = key == KEY_DOWN;
+                taLowercase = key == KEY_DOWN;
                 return true;
             }
             else if (key)
             {
                 // A non-arrow key was pressed while arrows are down
+                      
                 transalpha = true;
                 taPrevAlpha = alpha;
                 taPrevLowerc = lowercase;
@@ -5093,9 +5066,9 @@ bool user_interface::handle_shifts(int &key, bool talpha)
                 return true;
             }
         }
-        else if (!key && delayedArrow)
+//        else if (!key && delayedArrow)  // v0.9.17
+        else if (!key && (last == KEY_UP || last == KEY_DOWN))
         {
-            delayedArrow = false;
             if (!longpress)
                 key = last;
             last = 0;
@@ -5103,7 +5076,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
         }
         else
         {
-            delayedArrow = false;
+         delayedArrow = false;
         }
     }
     else
@@ -5135,7 +5108,7 @@ bool user_interface::handle_shifts(int &key, bool talpha)
     }
 
 
-    if (key == KEY_SHIFT)
+    if (key == KEY_SHIFT || key == KEY_SHIFT2)
     {
         if (longpress)
         {
@@ -5144,28 +5117,42 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             else
                 alpha = true;
             shift = false;
+/* before v0.9.14
+            alpha = !alpha;
+            lowercase = false;
+            xshift = 0;
+            shift = 0;
+*/
+        }
+        else if (xshift)
+        {
             xshift = false;
         }
         else
         {
-            if (xshift)
+            xshift = false;
+            if (key == KEY_SHIFT )
             {
-                xshift = false;
+// modif re
+               xshift = shift == 1 ? 1 : 0;
+               shift = shift == 1 ? 0 : 1;
+//               if ( last != KEY_SHIFT) {shift = 1; xshift = 0;} 
+//               else  {shift = 0; xshift = 0;} 
             }
-            else if (shift)
+            if (key == KEY_SHIFT2)
             {
-                shift = false;
-                xshift = true;
+               shift = 0;
+               xshift = xshift == 1 ? 0 :1;
+//               if ( last != KEY_SHIFT2) {shift = 0; xshift = 1;}
+//               else {shift = 0; xshift = 0;}
             }
-            else
-            {
-                shift = true;
-            }
+
             repeat = true;
         }
         consumed = true;
     }
-    else if (shift && key == KEY_ENTER)
+//    else if (shift && key == KEY_ENTER)
+    else if ( !xshift && !shift && key == KEY_ALPHA)
     {
         // Cycle ABC -> abc -> non alpha
         if (alpha)
@@ -5173,11 +5160,12 @@ bool user_interface::handle_shifts(int &key, bool talpha)
             if (lowercase)
                 alpha = lowercase = false;
             else
-                lowercase = true;
+               lowercase = true;
         }
         else
         {
-            alpha = true;
+            alpha     = true;
+            lowercase = false;
         }
         consumed = true;
         shift = false;
@@ -5393,9 +5381,10 @@ bool user_interface::handle_editing(int key)
                         char valbuf[40];
                         snprintf(sizebuf, sizeof(sizebuf), "%lu bytes %s",
                                  (unsigned long) size, obj->fancy());
+                        bin->render(valbuf, sizeof(valbuf));
                         size_t len = bin->render(valbuf, sizeof(valbuf) - 1);
-                        valbuf[len] = 0;
-                        draw_message("Object info", sizebuf, valbuf);
+                        valbuf[len] = '\0';
+                  draw_message("Object info", sizebuf, valbuf);
                         wait_for_key_press();
                     }
                 }
@@ -5478,8 +5467,8 @@ bool user_interface::handle_editing(int key)
     {
         switch(key)
         {
-        case KEY_XEQ:
-            // XEQ is used to enter algebraic / equation objects
+        case KEY_EQ_AL:
+            // K_H1 is used to enter algebraic / equation objects
             if (!shift && !xshift)
                 if (do_algebraic())
                     return true;
@@ -5497,10 +5486,13 @@ bool user_interface::handle_editing(int key)
             }
             else if (xshift)
             {
-                insert('{', PROGRAM);
+/*                insert('{', PROGRAM);
                 last = 0;
                 return true;
+ */
+               return false;
             }
+
             else if (isEditing)
             {
                 // Stick to space role while editing, do not EVAL, repeat
@@ -5573,19 +5565,36 @@ bool user_interface::handle_editing(int key)
 
             return do_exit();
 
-        case KEY_UP:
+        case KEY_LEFT:
+// during editing, shift Left => PreviousMenu
             if (shift)
-                return do_up();
+                return false;
             if (xshift)
-                return editor_history();
+                return false;
             return do_left();
 
-        case KEY_DOWN:
+        case KEY_RIGHT:
+// during editing, shift Right => CharMenu
             if (shift)
-                return do_down();
+                return false;
             if (xshift)
                 return false;
             return do_right();
+
+        case KEY_UP:
+            if (shift)
+                return editor_history();
+            if (xshift)
+                return false;
+            return do_up();
+
+        case KEY_DOWN:
+            if (shift)
+                return false;
+            if (xshift)
+                return false;
+            return do_down();
+
         case 0:
             return false;
         }
@@ -5615,8 +5624,11 @@ bool user_interface::handle_editing(int key)
         case KEY_UP:
             if (xshift)
             {
-                editor_history();
-                return true;
+// modif re, std behaviour for shift up and xshift up
+//                editor_history();
+//                return true;
+                return false;
+
             }
             else if (!shift)
             {
@@ -5673,7 +5685,12 @@ bool user_interface::handle_alpha(int key)
 // ----------------------------------------------------------------------------
 {
     // Things that we never handle in alpha mode
-    if (!key || (key >= KEY_F1 && key <= KEY_F6) || key == KEY_EXIT)
+    if (!key || (key >= KEY_F1 && key <= KEY_F6) || key == KEY_EXIT || key == KEY_ALPHA)
+        return false;
+   // allow char menu & Previous Menu during alpha mode
+   if (shift && key == K_C5)
+        return false;
+   if (shift && key == K_C3)
         return false;
 
     // Allow "alpha" mode for keys A-F in based number mode
@@ -5681,50 +5698,62 @@ bool user_interface::handle_alpha(int key)
     bool editing = rt.editing();
     bool hex = editing && !alpha && mode == BASED && key >= KB_A && key <= KB_F;
     bool special = xshift && (key == KEY_ENTER || (key == KEY_BSP && editing));
-    if (!alpha && !hex && !special)
+   
+    if (!alpha && !hex && !special )
         return false;
 
     static const char upper[] =
+        "<d_>=_"        // ligne b1-b6
+        "dBCDEF"
         "ABCDEF"
-        "GHIJKL"
-        "_MNO_"
-        "_PQRS"
-        "_TUVW"
-        "_XYZ_"
-        "_:, ;";
+        "GHIJK_"
+        "LMNOP"
+        "QRSTU"
+        "_VWXY"
+        "Z, ;"         // ligne i1 i6
+        "ZXCVBN"        // ligne a1 a6
+        ;
     static const char lower[] =
+        "<d_>=_"
+        "d_____"
         "abcdef"
-        "ghijkl"
-        "_mno_"
-        "_pqrs"
-        "_tuvw"
-        "_xyz_"
-        "_:, ;";
+        "ghijk_"
+        "lmnop"
+        "qrstu"
+        "_vwxy"
+        "z, ;"
+        "tuvwx";
 
     static const unicode shifted[] =
     {
-        L'Σ', '^', L'√', L'∂', L'σ', '(',
-        L'▶', '%', L'π', '<', '=', '>',
-        '_', L'⇄', L'±', L'∡', '_',
-        '_', '7', '8', '9', L'÷',
+        L'←', L'↓','_', L'→', L'↑', '_', // ligne b1-b6
+        '_',  '_', '_', '_', '_',
+
+        L'Σ', '^', L'√', L'∂', L'σ', L'▶',
+        '(', 'd',  L'⇄', L'±', L'∡', 'd',
+        'd', '7', '8', '9', L'÷',
         '_', '4', '5', '6', L'×',
-        '_', '1', '2', '3', '-',
-        '_', '0', '.',  L'«', '+'
+        '\n',  '1', '2', '3', '-',
+        '0', '.',  L'«', '+'
     };
 
     static const  unicode xshifted[] =
     {
-        L'∏', L'∆', L'↑', L'μ', L'θ', '\'',
+        L'≤', L'μ', '_', L'≥', L'≠', '\'', // ligne b1-b6
+        L'∏', 'd', L'↑', L'μ', L'θ', '\'',
+
+        L'∏', L'∆', L'°', L'μ', L'θ', 'd',
+        '\'', ')', '~', L'%', L'ε', '\n',
+        L'Ω',  '?', L'∫',   '[',  '/',
+        L'€',  '#',  L'∞', '|' , '*',
+        '_', '&',   '@', '$',  L'…',
+        ';',  L'·', '{',  '!',
         L'→', L'←', L'↓', L'≤', L'≠', L'≥',
-        '"',  '~', L'°', L'ε', '\n',
-        '_',  '?', L'∫',   '[',  '/',
-        '_',  '#',  L'∞', '|' , '*',
-        '_',  '&',   '@', '$',  L'…',
-        '_',  ';',  L'·', '{',  '!'
     };
 
     // Special case: + in alpha mode shows the catalog
-    if (key == KEY_ADD && !shift && !xshift)
+//    if (key == KEY_ADD && !shift && !xshift)
+    if (key == KEY_CAT && !shift && !xshift)
     {
         object_p cat = command::static_object(menu::ID_Catalog);
         cat->evaluate();
@@ -5782,15 +5811,16 @@ bool user_interface::handle_digits(int key)
 {
     if (alpha || shift || xshift || !key)
         return false;
-
+// modif
     static const char numbers[] =
         "______"
         "______"
-        "__-__"
+        "______"
+        "___-__"
         "_789_"
         "_456_"
         "_123_"
-        "_0.__";
+        "0.__";
 
     if (rt.editing())
     {
@@ -5995,55 +6025,76 @@ static const byte defaultUnshiftedCommand[2*user_interface::NUM_KEYS] =
 //   RPL code for the commands assigned by default to each key
 // ----------------------------------------------------------------------------
 //   All the default-assigned commands fit in one or two bytes
+// not used if file config/db48x.48k is defined in keymap.cfg
+// needs to be in order, with no missing value in K_xx order !!!!!
 {
 #define OP2BYTES(key, id)                                              \
     [2*(key) - 2] = (id) < 0x80 ? (id) & 0x7F : ((id) & 0x7F) | 0x80,  \
     [2*(key) - 1] = (id) < 0x80 ?           0 : ((id) >> 7)
 
-    OP2BYTES(KEY_SIGMA, menu::ID_ToolsMenu),
-    OP2BYTES(KEY_INV,   function::ID_inv),
-    OP2BYTES(KEY_SQRT,  function::ID_sqrt),
-    OP2BYTES(KEY_LOG,   function::ID_pow),
-    OP2BYTES(KEY_LN,    function::ID_MathMenu),
-    OP2BYTES(KEY_XEQ,   0),
-    OP2BYTES(KEY_STO,   command::ID_Sto),
-    OP2BYTES(KEY_RCL,   command::ID_ToggleCustomMenu),
-    OP2BYTES(KEY_RDN,   menu::ID_StackMenu),
-    OP2BYTES(KEY_SIN,   function::ID_sin),
-    OP2BYTES(KEY_COS,   function::ID_cos),
-    OP2BYTES(KEY_TAN,   function::ID_tan),
-    OP2BYTES(KEY_ENTER, function::ID_Dup),
+    // 1
+    OP2BYTES(K_B1,   menu::ID_ToolsMenu),
+    OP2BYTES(K_B2,   function::ID_inv),
+    OP2BYTES(K_B3,  function::ID_sqrt),
+    OP2BYTES(K_B4,   function::ID_pow),
+    OP2BYTES(K_B5,    function::ID_MathMenu),
+    OP2BYTES(K_B6,   0),
+
+   // 7
+    OP2BYTES(K_C1,    0),
+    OP2BYTES(K_C2,    0),
+    OP2BYTES(K_C3,    0),
+    OP2BYTES(K_C4,    0),
+    OP2BYTES(K_C5,    0),
+    OP2BYTES(K_C6,    0),
+
+   // 13
+    OP2BYTES(K_D1,   command::ID_Sto),
+    OP2BYTES(K_D2,   command::ID_ToggleCustomMenu),
+    OP2BYTES(K_D3,   menu::ID_StackMenu),
+    OP2BYTES(K_D4,   function::ID_sin),
+    OP2BYTES(K_D5,   function::ID_cos),
+    OP2BYTES(K_D6,   function::ID_tan),
+
+    // 19
+    OP2BYTES(K_E1, function::ID_Dup),
+    OP2BYTES(K_E2, function::ID_Dup),
     OP2BYTES(KEY_SWAP,  function::ID_Swap),
     OP2BYTES(KEY_CHS,   function::ID_neg),
     OP2BYTES(KEY_E,     function::ID_Cycle),
     OP2BYTES(KEY_BSP,   command::ID_Drop),
-    OP2BYTES(KEY_UP,    0),
+
+    // 25
+    OP2BYTES(K_F1,    0),
     OP2BYTES(KEY_7,     0),
     OP2BYTES(KEY_8,     0),
     OP2BYTES(KEY_9,     0),
     OP2BYTES(KEY_DIV,   arithmetic::ID_divide),
-    OP2BYTES(KEY_DOWN,  0),
+
+    OP2BYTES(K_G1,  0),
     OP2BYTES(KEY_4,     0),
     OP2BYTES(KEY_5,     0),
     OP2BYTES(KEY_6,     0),
     OP2BYTES(KEY_MUL,   arithmetic::ID_multiply),
-    OP2BYTES(KEY_SHIFT, 0),
+
+    OP2BYTES(K_H1, function::ID_Dup),
     OP2BYTES(KEY_1,     0),
     OP2BYTES(KEY_2,     0),
     OP2BYTES(KEY_3,     0),
-    OP2BYTES(KEY_SUB,   command::ID_subtract),
-    OP2BYTES(KEY_EXIT,  0),
-    OP2BYTES(KEY_0,     0),
-    OP2BYTES(KEY_DOT,   0),
-    OP2BYTES(KEY_RUN,   command::ID_Run),
-    OP2BYTES(KEY_ADD,   command::ID_add),
+    OP2BYTES(K_H5,   command::ID_subtract),
 
-    OP2BYTES(KEY_F1,    0),
-    OP2BYTES(KEY_F2,    0),
-    OP2BYTES(KEY_F3,    0),
-    OP2BYTES(KEY_F4,    0),
-    OP2BYTES(KEY_F5,    0),
-    OP2BYTES(KEY_F6,    0),
+    OP2BYTES(K_I2,     0),
+    OP2BYTES(K_I3,   0),
+    OP2BYTES(K_I4,   command::ID_Run),
+    OP2BYTES(K_I5,   command::ID_add),
+
+    OP2BYTES(K_A1,    0),
+    OP2BYTES(K_A2,    0),
+    OP2BYTES(K_A3,    0),
+    OP2BYTES(K_A4,    0),
+    OP2BYTES(K_A5,    0),
+    OP2BYTES(K_A6,    0),
+
 
     OP2BYTES(KEY_SCREENSHOT, command::ID_ScreenCapture),
     OP2BYTES(KEY_SH_UP,  0),
@@ -6057,39 +6108,56 @@ static const byte defaultShiftedCommand[2*user_interface::NUM_KEYS] =
 // ----------------------------------------------------------------------------
 //   All the default assigned commands fit in one or two bytes
 {
-    OP2BYTES(KEY_SIGMA, menu::ID_LastMenu),
-    OP2BYTES(KEY_INV,   arithmetic::ID_exp),
-    OP2BYTES(KEY_SQRT,  arithmetic::ID_sq),
-    OP2BYTES(KEY_LOG,   function::ID_abs),
-    OP2BYTES(KEY_LN,    function::ID_PowersMenu),
-    OP2BYTES(KEY_XEQ,   menu::ID_EquationsMenu),
-    OP2BYTES(KEY_STO,   menu::ID_ComplexMenu),
-    OP2BYTES(KEY_RCL,   menu::ID_MemoryMenu),
-    OP2BYTES(KEY_RDN,   menu::ID_ConstantsMenu),
-    OP2BYTES(KEY_SIN,   function::ID_asin),
-    OP2BYTES(KEY_COS,   function::ID_acos),
-    OP2BYTES(KEY_TAN,   function::ID_atan),
-    OP2BYTES(KEY_ENTER, 0),     // Alpha
+    OP2BYTES(K_B1, menu::ID_LastMenu),
+    OP2BYTES(K_B2,   arithmetic::ID_exp),
+    OP2BYTES(K_B3,  arithmetic::ID_sq),
+    OP2BYTES(K_B4,   function::ID_abs),
+    OP2BYTES(K_B5,    function::ID_PowersMenu),
+    OP2BYTES(K_B6,    menu::ID_LastMenu),
+
+
+
+    OP2BYTES(K_C1,    0),
+    OP2BYTES(K_C2,    0),
+    OP2BYTES(K_C3,    0),
+    OP2BYTES(K_C4,    0),
+    OP2BYTES(K_C5,    0),
+    OP2BYTES(K_C6,    0),
+
+    OP2BYTES(K_D1,   menu::ID_ComplexMenu),
+    OP2BYTES(K_D2,   menu::ID_MemoryMenu),
+    OP2BYTES(K_D3,   menu::ID_ConstantsMenu),
+    OP2BYTES(K_D4,   function::ID_asin),
+    OP2BYTES(K_D5,   function::ID_acos),
+    OP2BYTES(K_D6,   function::ID_atan),
+
+    OP2BYTES(K_E1, 0),     // Alpha
+    OP2BYTES(K_E2, 0),     // Alpha
     OP2BYTES(KEY_SWAP,  menu::ID_LastArg),
     OP2BYTES(KEY_CHS,   menu::ID_ModesMenu),
     OP2BYTES(KEY_E,     menu::ID_DisplayModesMenu),
     OP2BYTES(KEY_BSP,   menu::ID_ClearThingsMenu),
-    OP2BYTES(KEY_UP,    0),
+
+    OP2BYTES(K_F1,    0),
     OP2BYTES(KEY_7,     menu::ID_SolverMenu),
     OP2BYTES(KEY_8,     menu::ID_IntegrationMenu),
     OP2BYTES(KEY_9,     0),     // Insert []
     OP2BYTES(KEY_DIV,   menu::ID_StatisticsMenu),
-    OP2BYTES(KEY_DOWN,  0),
+
+    OP2BYTES(K_G1,  0),
     OP2BYTES(KEY_4,     menu::ID_BasesMenu),
     OP2BYTES(KEY_5,     menu::ID_UnitsMenu),
     OP2BYTES(KEY_6,     menu::ID_FlagsMenu),
     OP2BYTES(KEY_MUL,   menu::ID_ProbabilitiesMenu),
-    OP2BYTES(KEY_SHIFT, 0),
+
+
+    OP2BYTES(K_H1,   menu::ID_EquationsMenu),
     OP2BYTES(KEY_1,     function::ID_ToDecimal),
     OP2BYTES(KEY_2,     command::ID_ToggleUserMode),
     OP2BYTES(KEY_3,     menu::ID_ProgramMenu),
     OP2BYTES(KEY_SUB,   menu::ID_ListMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_OffWithImage),
+
+//    OP2BYTES(K_I2,  command::ID_OffWithImage),
     OP2BYTES(KEY_0,     command::ID_SystemSetup),
     OP2BYTES(KEY_DOT,   command::ID_Show),
     OP2BYTES(KEY_RUN,   0),
@@ -6114,39 +6182,57 @@ static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
 // ----------------------------------------------------------------------------
 //   All the default assigned commands fit in one or two bytes
 {
-    OP2BYTES(KEY_SIGMA, menu::ID_MainMenu),
-    OP2BYTES(KEY_INV,   command::ID_ln),
-    OP2BYTES(KEY_SQRT,  menu::ID_xroot),
-    OP2BYTES(KEY_LOG,   menu::ID_AlgebraMenu),
-    OP2BYTES(KEY_LN,    menu::ID_PartsMenu),
-    OP2BYTES(KEY_XEQ,   menu::ID_CharactersMenu),
-    OP2BYTES(KEY_STO,   menu::ID_RealMenu),
-    OP2BYTES(KEY_RCL,   menu::ID_Library),
-    OP2BYTES(KEY_RDN,   menu::ID_FractionsMenu),
-    OP2BYTES(KEY_SIN,   menu::ID_HyperbolicMenu),
-    OP2BYTES(KEY_COS,   menu::ID_CircularMenu),
-    OP2BYTES(KEY_TAN,   menu::ID_AnglesMenu),
-    OP2BYTES(KEY_ENTER, 0),     // Text
+    OP2BYTES(K_B1, menu::ID_MainMenu),
+    OP2BYTES(K_B2,   command::ID_ln),
+    OP2BYTES(K_B3,  menu::ID_xroot),
+    OP2BYTES(K_B4,   menu::ID_AlgebraMenu),
+    OP2BYTES(K_B5,    menu::ID_PartsMenu),
+    OP2BYTES(K_B6,    0),
+
+    OP2BYTES(KEY_N1,    0),
+    OP2BYTES(KEY_N2,    0),
+    OP2BYTES(KEY_N3,    0),
+    OP2BYTES(KEY_N4,    0),
+    OP2BYTES(KEY_N5,    0),
+    OP2BYTES(KEY_N6,    0),
+
+
+    OP2BYTES(K_D1,   menu::ID_RealMenu),
+    OP2BYTES(K_D2,   menu::ID_Library),
+    OP2BYTES(K_D3,   menu::ID_FractionsMenu),
+    OP2BYTES(K_D4,   menu::ID_HyperbolicMenu),
+    OP2BYTES(K_D5,   menu::ID_CircularMenu),
+    OP2BYTES(K_D6,   menu::ID_AnglesMenu),
+
+   //19
+    OP2BYTES(K_E1, 0),     // Alpha
+    OP2BYTES(K_E2, 0),     // Alpha
     OP2BYTES(KEY_SWAP,  function::ID_Undo),
     OP2BYTES(KEY_CHS,   menu::ID_UserInterfaceModesMenu),
     OP2BYTES(KEY_E,     menu::ID_PlotMenu),
     OP2BYTES(KEY_BSP,   function::ID_UpDir),
-    OP2BYTES(KEY_UP,    0),
+
+    // 25
+    OP2BYTES(K_F1,    0),
     OP2BYTES(KEY_7,     menu::ID_SymbolicMenu),
     OP2BYTES(KEY_8,     menu::ID_PolynomialsMenu),
     OP2BYTES(KEY_9,     menu::ID_MatrixMenu),
     OP2BYTES(KEY_DIV,   menu::ID_FinanceSolverMenu),
-    OP2BYTES(KEY_DOWN,  menu::ID_EditMenu),
+
+    // 30
+    OP2BYTES(K_G1,  menu::ID_EditMenu),
     OP2BYTES(KEY_4,     menu::ID_TextMenu),
     OP2BYTES(KEY_5,     menu::ID_UnitsConversionsMenu),
     OP2BYTES(KEY_6,     menu::ID_TimeMenu),
     OP2BYTES(KEY_MUL,   menu::ID_NumbersMenu),
-    OP2BYTES(KEY_SHIFT, 0),
+
+    // 35
+    OP2BYTES(KEY_ENTER, menu::ID_CharactersMenu),     // Text
     OP2BYTES(KEY_1,     menu::ID_DebugMenu),
     OP2BYTES(KEY_2,     menu::ID_LoopsMenu),
     OP2BYTES(KEY_3,     menu::ID_TestsMenu),
     OP2BYTES(KEY_SUB,   menu::ID_IOMenu),
-    OP2BYTES(KEY_EXIT,  command::ID_SaveState),
+
     OP2BYTES(KEY_0,     menu::ID_FilesMenu),
     OP2BYTES(KEY_DOT,   menu::ID_GraphicsMenu),
     OP2BYTES(KEY_RUN,   0),
@@ -6158,6 +6244,8 @@ static const byte defaultSecondShiftedCommand[2*user_interface::NUM_KEYS] =
     OP2BYTES(KEY_F4,    0),
     OP2BYTES(KEY_F5,    0),
     OP2BYTES(KEY_F6,    0),
+
+
 
     OP2BYTES(KEY_SCREENSHOT, command::ID_ScreenCapture),
     OP2BYTES(KEY_SH_UP, 0),
@@ -6260,7 +6348,8 @@ bool user_interface::load_keymap(cstring name)
     if (result)
     {
         keymap = result;
-        help_keymap_generation++;
+       help_keymap_generation++;          // v0.9.17
+
 #if SIMULATOR
         ui_load_keymap(name);
 #endif // SIMULATOR
@@ -6381,7 +6470,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
                 menu_refresh(menu::ID_Catalog, true);
                 ac = false;
             }
-            else if (ty == object::ID_constant_menu_name)
+            else if (ty == object::object::ID_constant_menu_name)
             {
                 unicode lc = character_left_of_cursor();
                 if (lc == L'Ⓒ' || lc == L'Ⓡ' || lc == L'Ⓢ')
@@ -6420,9 +6509,11 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         case PROGRAM:
         case MATRIX:
         insert_object:
-            if (user ||
+                    if (user ||
                 object::is_program_cmd(ty) || object::is_algebraic(ty) ||
                 object::is_special_menu(ty))
+// v0.9.17
+//            if (object::is_program_cmd(ty) || object::is_algebraic(ty) || user)
             {
                 dirtyEditor = true;
                 edRows = 0;
@@ -6490,8 +6581,8 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
         alpha = false;
         lowercase = false;
     }
-    shift = false;
     xshift = false;
+    shift = false;
 
     if (userOnce && usr == Settings.UserMode())
     {
@@ -7213,6 +7304,7 @@ bool user_interface::editor_search()
         // Start search
         searching = select = cursor;
         alpha = true;
+        lowercase = false;
         shift = xshift = false;
     }
     return true;
@@ -7568,3 +7660,272 @@ void debug_wait(int delay)
     else if (delay < 0)
         wait_for_key_press();
 }
+
+
+
+
+COMMAND_BODY(ToggleB1)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_MainMenu)
+         MemToggle_B1 = 2;
+      else if  (m->type() == ID_MathMenu)
+         MemToggle_B1 = 0;
+      else if  (m->type() == ID_ToolsMenu)
+         MemToggle_B1 = 1;
+   }
+
+   if (MemToggle_B1 == 0)
+   {      
+      MemToggle_B1 = 1;
+      return run<ToolsMenu>();
+   }
+   if (MemToggle_B1 == 1)
+   {      
+      MemToggle_B1 = 2;
+      return run<MainMenu>();
+   }
+   if (MemToggle_B1 == 2)
+   {      
+      MemToggle_B1 = 0;
+      return run<MathMenu>();
+   }
+   return OK;
+
+}
+COMMAND_BODY(ToggleB2)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_FilesMenu)
+         MemToggle_B2 = 0;
+      else if  (m->type() == ID_Library)
+         MemToggle_B2 = 2;
+      else if  (m->type() == ID_Catalog )
+         MemToggle_B2 = 1;
+   }
+
+   if (MemToggle_B2 == 0)
+   {      
+      MemToggle_B2 = 1;
+      object_p cat = command::static_object(menu::ID_Catalog);
+      cat->evaluate();
+      return OK;
+
+   }
+   if (MemToggle_B2 == 1)
+   {      
+      MemToggle_B2 = 2;
+      return run<Library>();
+   }
+   if (MemToggle_B2 == 2)
+   {      
+      MemToggle_B2 = 0;
+      return run<FilesMenu>();
+   }
+   return OK;
+
+}
+
+COMMAND_BODY(ToggleC2)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_MemoryMenu)
+         MemToggle_C2 = 0;
+      else if  (m->type() == ID_DebugMenu)
+         MemToggle_C2 = 2;
+      else if  (m->type() == ID_ProgramMenu)
+         MemToggle_C2 = 1;
+   }
+   if (MemToggle_C2 == 0)
+   {      
+      MemToggle_C2 = 1;
+      return run<ProgramMenu>();
+   }
+   if (MemToggle_C2 == 1)
+   {      
+      MemToggle_C2 = 2;
+      return run<DebugMenu>();
+   }
+   if (MemToggle_C2 == 2)
+   {      
+      MemToggle_C2 = 0;
+      return run<MemoryMenu>();
+   }
+   return OK;
+
+}
+
+COMMAND_BODY(ToggleE2)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_StackMenu)
+         MemToggle_E2 = 1;
+      else if  (m->type() == ID_ConstantsMenu)
+         MemToggle_E2 = 2;
+      else if  (m->type() == ID_PartsMenu)
+         MemToggle_E2 = 0;
+   }
+   if (MemToggle_E2 == 0)
+   {      
+      MemToggle_E2 = 1;
+      return run<StackMenu>();
+   }
+   if (MemToggle_E2 == 1)
+   {      
+      MemToggle_E2 = 2;
+      return run<ConstantsMenu>();
+   }
+   if (MemToggle_E2 == 2)
+   {      
+      MemToggle_E2 = 0;
+      return run<PartsMenu>();
+   }
+   return OK;
+
+}
+
+COMMAND_BODY(ToggleE1)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_SolverMenu)
+         MemToggle_E1 = 1;
+      else if  (m->type() == ID_EquationsMenu)
+         MemToggle_E1 = 2;
+      else if  (m->type() == ID_FinanceSolverMenu)
+         MemToggle_E1 = 0;
+   }
+   if (MemToggle_E1 == 0)
+   {      
+      MemToggle_E1 = 1;
+      return run<SolverMenu>();
+   }
+   if (MemToggle_E1 == 1)
+   {      
+      MemToggle_E1 = 2;
+      return run<EquationsMenu>();
+   }
+   if (MemToggle_E1 == 2)
+   {      
+      MemToggle_E1 = 0;
+      object_p cat = command::static_object(menu::ID_FinanceSolverMenu);
+      cat->evaluate();
+      return OK;
+   }
+   return OK;
+
+}
+
+COMMAND_BODY(ToggleF1)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_UnitsMenu)
+         MemToggle_F1 = 1;
+      else if  (m->type() == ID_UnitsConversionsMenu)
+         MemToggle_F1 = 0;
+   }
+   if (MemToggle_F1 == 0)
+   {      
+      MemToggle_F1 = 1;
+      return run<UnitsMenu>();
+   }
+   if (MemToggle_F1 == 1)
+   {      
+      MemToggle_F1 = 0;
+      return run<UnitsConversionsMenu>();
+   }
+   return OK;
+
+}
+
+COMMAND_BODY(ToggleD1)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_CircularMenu)
+         MemToggle_D1 = 1;
+      else if  (m->type() == ID_AnglesMenu)
+         MemToggle_D1 = 2;
+      else if  (m->type() == ID_HyperbolicMenu)
+         MemToggle_D1 = 0;
+   }
+   if (MemToggle_D1 == 0)
+   {      
+      MemToggle_D1 = 1;
+      return run<CircularMenu>();
+   }
+   if (MemToggle_D1 == 1)
+   {      
+      MemToggle_D1 = 2;
+      return run<AnglesMenu>();
+   }
+   if (MemToggle_D1 == 2)
+   {      
+      MemToggle_D1 = 0;
+      return run<HyperbolicMenu>();
+   }
+   return OK;
+}
+COMMAND_BODY(ToggleD3)
+{
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_PowersMenu)
+         MemToggle_D3 = 1;
+      else if  (m->type() == ID_ComplexMenu)
+         MemToggle_D3 = 0;
+      else if  (m->type() == ID_RealMenu)
+         MemToggle_D3 = 2;
+   }
+   if (MemToggle_D3 == 0)
+   {      
+      MemToggle_D3 = 1;
+      return run<PowersMenu>();
+   }
+   if (MemToggle_D3 == 1)
+   {      
+      MemToggle_D3 = 2;
+      return run<RealMenu>();
+   }
+   if (MemToggle_D3 == 2)
+   {      
+      MemToggle_D3 = 0;
+      return run<ComplexMenu>();
+   }
+   return OK;
+}
+COMMAND_BODY(ToggleD2)
+{   
+   if (menu_p m = ui.menu())
+   {
+      if (m->type() == ID_BasesMenu)
+         MemToggle_D2 = 1;
+      else if  (m->type() == ID_FractionsMenu)
+         MemToggle_D2 = 0;
+      else if  (m->type() == ID_NumbersMenu)
+         MemToggle_D2 = 2;
+   }
+   if (MemToggle_D2 == 0)
+   {      
+      MemToggle_D2 = 1;
+      return run<BasesMenu>();
+   }
+   if (MemToggle_D2 == 1)
+   {      
+      MemToggle_D2 = 2;
+      return run<NumbersMenu>();
+   }
+   if (MemToggle_D2 == 2)
+   {      
+      MemToggle_D2 = 0;
+      return run<FractionsMenu>();
+   }
+   return OK;
+}
+
+
