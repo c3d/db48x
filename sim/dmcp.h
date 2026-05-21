@@ -1,4 +1,4 @@
-/*
+/*  
 
 BSD 3-Clause License
 
@@ -40,6 +40,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
      at their discretion
 
 */
+
+/********************************************************************************
+ * Différences avec version originale : 
+1.    extern sys_sdb_t sdb;
+            définit dans dmcp.cc
+2.    line_font_t
+         const uint8_t  *data;
+         const uint16_t *offs;
+            remplacé par 
+         uint8_t const * data;
+         uint16_t const * offs;
+3.    disp_stat_t
+ 
+ Modif re 
+4.    suppression __packed 
+ 
+ */
+
+
+
 #ifndef __SYS_DMCP_H__
 #define __SYS_DMCP_H__
 
@@ -52,7 +72,7 @@ extern "C" {
 typedef unsigned int uint;
 
 #include "ff_ifc.h"
-
+#include "DBxxxx.h"
 
 // ----------------------------------
 
@@ -93,13 +113,6 @@ void bitblt24(uint32_t x, uint32_t dx, uint32_t y, uint32_t val, int blt_op, int
 // Returns pointer to line buffer (doesn't depend on LCD_INVERT_XAXIS)
 uint8_t * lcd_line_addr(int y);
 
-// Drawing Prototypes
-void lcd_clear_buf();
-void lcd_refresh();
-void lcd_refresh_dma();
-void lcd_refresh_wait();
-void lcd_forced_refresh();
-void lcd_refresh_lines(int ln, int cnt);
 
 
 void lcd_fill_rect(uint32_t x, uint32_t y, uint32_t dx, uint32_t dy, int val);
@@ -109,21 +122,6 @@ void lcd_fill_ptrn(int x, int y, int dx, int dy, int ptrn1, int ptrn2);
 void lcd_draw_img(const char* img, uint32_t xo, uint32_t yo, uint32_t x, uint32_t y);
 void lcd_draw_img_direct(const char* img, uint32_t xo, uint32_t yo, uint32_t x, uint32_t y);
 void lcd_draw_img_part(const char* img, uint32_t xo, uint32_t yo, uint32_t x, uint32_t y, uint32_t dx);
-
-#define LCD_X 400
-#define LCD_Y 240
-#define LCD_LINE_SIZE      50                  // LCD_X/8
-#define LCD_LINE_BUF_SIZE  (2+LCD_LINE_SIZE+2) // CMD, Line_nr, line data (50 bytes), dummy (2 bytes)
-
-void lcd_fillLine(int ln, uint8_t val);
-void lcd_fillLines(int ln, uint8_t val, int cnt);
-
-
-void lcd_set_buf_cleared(int val);
-int lcd_get_buf_cleared();
-
-uint8_t reverse_byte(uint8_t x);
-
 
 // ----------------------------------
 
@@ -265,20 +263,6 @@ void lcd_print(disp_stat_t * ds, const char* fmt, ...);
 // ----------------------------------
 
 
-typedef struct {
-  uint16_t year;
-  uint8_t  month;
-  uint8_t  day;
-} dt_t;
-
-typedef struct {
-  uint8_t hour;
-  uint8_t min;
-  uint8_t sec;
-  uint8_t csec;
-  uint8_t dow;
-} tm_t;
-
 const char* get_wday_shortcut(int day); // 0 = Monday
 const char* get_month_shortcut(int month); // 1 = Jan
 
@@ -329,7 +313,7 @@ typedef struct {
 } sys_sdb_t;
 
 
-#define calc_state      (sdb.calc_state)
+//#define calc_state      (sdb.calc_state)
 #define ppgm_fp         (sdb.ppgm_fp)
 
 #define key_to_alpha_table (sdb.key_to_alpha_table)
@@ -385,15 +369,11 @@ void rtc_read(tm_t * tm, dt_t *dt);
 void rtc_write(tm_t * tm, dt_t *dt);
 void rtc_update_time_sec(int delta_sec);
 uint8_t rtc_read_century();
-void rtc_write_century(uint8_t cent);
-uint8_t rtc_read_min();
-uint8_t rtc_read_sec();
+//void rtc_write_century(uint8_t cent);
+//uint8_t rtc_read_min();
+//uint8_t rtc_read_sec();
 void rtc_wakeup_delay();
 
-// ==== VBAT
-uint32_t read_power_voltage();
-int get_lowbat_state();
-int get_vbat();
 
 // ==== Buzzer
 // Freq in mHz
@@ -429,7 +409,6 @@ void set_reset_state_file(const char * str);
 
 // ==== USB functions
 int switch_usb_powered_freq();
-int usb_powered();
 void usb_acm_on();
 int usb_is_on();
 void usb_turn_off();
@@ -447,6 +426,12 @@ int write_buf_size();
 
 void program_main();
 
+
+// modif re
+    #define __packed __attribute__((__packed__))
+
+
+
 typedef struct {
   uint32_t pgm_magic;
   uint32_t pgm_size;
@@ -458,7 +443,7 @@ typedef struct {
   char pgm_name[16];
   char pgm_ver[16];
   uint32_t required_keymap_id;
-} __packed prog_info_t;
+}  __packed prog_info_t;
 
 
 // Keyboard
@@ -713,7 +698,7 @@ typedef struct item_sel_state {
   void * data;        // Custom data (useful for line draw callback)
   void * items;       // Custom data for items
 
-} __packed item_sel_state_t;
+}  __packed item_sel_state_t;
 
 
 // Initialize item sel structure
@@ -738,68 +723,6 @@ int run_menu_item_sys(uint8_t line_id);
 
 
 #define MAX_LCD_LINE_LEN 40
-
-#define MAX_KEY_NR       37
-#define MAX_FNKEY_NR     43
-
-
-// -------------
-//  Key codes
-// -------------
-
-#define KEY_SIGMA  1
-#define KEY_INV    2
-#define KEY_SQRT   3
-#define KEY_LOG    4
-#define KEY_LN     5
-#define KEY_XEQ    6
-#define KEY_STO    7
-#define KEY_RCL    8
-#define KEY_RDN    9
-#define KEY_SIN   10
-#define KEY_COS   11
-#define KEY_TAN   12
-#define KEY_ENTER 13
-#define KEY_SWAP  14
-#define KEY_CHS   15
-#define KEY_E     16
-#define KEY_BSP   17
-#define KEY_UP    18
-#define KEY_7     19
-#define KEY_8     20
-#define KEY_9     21
-#define KEY_DIV   22
-#define KEY_DOWN  23
-#define KEY_4     24
-#define KEY_5     25
-#define KEY_6     26
-#define KEY_MUL   27
-#define KEY_SHIFT 28
-#define KEY_1     29
-#define KEY_2     30
-#define KEY_3     31
-#define KEY_SUB   32
-#define KEY_EXIT  33
-#define KEY_0     34
-#define KEY_DOT   35
-#define KEY_RUN   36
-#define KEY_ADD   37
-
-#define KEY_F1    38
-#define KEY_F2    39
-#define KEY_F3    40
-#define KEY_F4    41
-#define KEY_F5    42
-#define KEY_F6    43
-
-#define KEY_SCREENSHOT 44
-#define KEY_SH_UP      45
-#define KEY_SH_DOWN    46
-
-#define KEY_DOUBLE_RELEASE 99
-
-#define KEY_PAGEUP     KEY_DIV
-#define KEY_PAGEDOWN   KEY_MUL
 
 
 #define IS_EXIT_KEY(k)  ( (k) == KEY_EXIT || (k) == KEY_BSP )
@@ -866,23 +789,8 @@ int run_menu_item_sys(uint8_t line_id);
 int create_screenshot(int report_error);
 
 
-// ---------------------------
-//  Key buffer functions
-// ---------------------------
-int key_empty();
-int key_push(int k1);
-int key_tail();
-int key_pop();
-int key_pop_last();
-void key_pop_all();
 
 
-// Key functions
-int key_to_nr(int key);
-void wait_for_key_press();
-int runner_get_key(int *repeat);
-int runner_get_key_delay(int *repeat, uint timeout, uint rep0, uint rep1, uint rep1tout);
-void wait_for_key_release(int tout);
 
 
 
@@ -895,18 +803,17 @@ void runner_key_tout_init(const int slow);
 
 
 // Autorepeat
-int toggle_slow_autorepeat();
-int is_slow_autorepeat();
+//int toggle_slow_autorepeat();
+//int is_slow_autorepeat();
 
 // Auto off
-void reset_auto_off();
-int is_auto_off();
+//int is_auto_off();
 int is_menu_auto_off();
-int sys_auto_off_cnt();
+//int sys_auto_off_cnt();
 
 // Time/date
-void print_dmy_date(char * s, int const sz, dt_t *dt, const char * append, int shortmon, char sep_arg);
-void print_clk24_time(char * t, int const sz, tm_t *tm, int disp_sec, int disp_dow);
+//void print_dmy_date(char * s, int const sz, dt_t *dt, const char * append, int shortmon, char sep_arg);
+//void print_clk24_time(char * t, int const sz, tm_t *tm, int disp_sec, int disp_dow);
 
 
 // Check and create dir
@@ -921,7 +828,6 @@ int file_exists(const char * fn);
 // Returns -1 if file doesn't exist
 int file_size(const char * fn);
 
-int sys_disk_ok();
 int sys_disk_write_enable(int val);
 void sys_disk_check_valid();
 int sys_is_disk_write_enable();
@@ -930,18 +836,9 @@ void sys_clear_write_buf_used();
 int sys_write_buf_used();
 
 
-// System timers
-void sys_timer_disable(int timer_ix);
-void sys_timer_start(int timer_ix, uint32_t ms_value);
-int sys_timer_active(int timer_ix);
-int sys_timer_timeout(int timer_ix);
-
-// Millisecond delay
-void sys_delay(uint32_t ms_delay);
 
 // Current systick count
-uint32_t sys_tick_count();
-uint32_t sys_current_ms();
+//uint32_t sys_tick_count();
 
 // Critical sections
 void sys_critical_start();

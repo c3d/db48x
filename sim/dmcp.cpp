@@ -12,7 +12,6 @@
 //
 //
 //
-//
 // ****************************************************************************
 //   (C) 2022 Christophe de Dinechin <christophe@dinechin.org>
 //   This software is licensed under the terms outlined in LICENSE.txt
@@ -27,28 +26,42 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+// on n'utilise pas test
+
+
 #include "dmcp.h"
+#include "DBxxxx.h"
+
 
 #include "datetime.h"
 #include "dmcp_fonts.c"
-#include "object.h"
 #include "recorder.h"
-#include "runtime.h"
-#include "sim-dmcp.h"
-#include "sysmenu.h"
+
+
+
+
 #include "target.h"
 #include "tests.h"
-#include "text.h"
 #include "types.h"
-#include "user_interface.h"
 
-#include <cstring>
 #include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
+//#include <sys/select.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
+
+#include "SEGGER_RTT.h"
+#include "RTOS.h"
+
+#include "user_interface.h"
+
+//#include "LS027B7DH01.h"
+
+#ifndef  SIMULATOR
+volatile uint test_command = 0;
+#endif
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -70,9 +83,14 @@ extern bool          run_tests;
 extern bool          noisy_tests;
 extern bool          no_beep;
 
-uint                 lcd_refresh_requested = 0;
+extern uint32_t      Cnt_ms ; 
+extern OS_MAILBOX   Mb_Keyboard;
+
+extern LCD_Handle_t hlcd;
+
+
 int                  lcd_buf_cleared_result = 0;
-pixword              lcd_buffer[LCD_SCANLINE * LCD_H * color::BPP / 32];
+//pixword              lcd_buffer[LCD_SCANLINE * LCD_H * color::BPP / 32];
 bool                 shift_held = false;
 bool                 alt_held   = false;
 
@@ -122,6 +140,30 @@ sys_sdb_t sdb =
     /* msc_end_cb         */ nullptr
 };
 
+
+cstring get_wday_shortcut(int day)
+{
+    static cstring dow[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+    return dow[day];
+}
+
+int julian_day(dt_t *dt)
+{
+    return julian_day_number(dt->day, dt->month, dt->year);
+}
+
+
+cstring get_month_shortcut(int month)
+{
+    static cstring name[] =
+    {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
+    return name[month - 1];
+}
+
+
 void LCD_power_off(int UNUSED clear)
 {
     record(dmcp, "LCD_power_off");
@@ -133,44 +175,26 @@ void LCD_power_on()
     record(dmcp, "LCD_power_on");
 }
 
-uint32_t read_power_voltage()
-{
-    const uint vmax = 3000;
-    const uint vmin = 2600;
-    if (tests::running)
-        return 2777;
-    return ui_battery() * (vmax - vmin) / 1000 + vmin;
-}
 
-int get_vbat()
-{
-    return read_power_voltage();
-}
-
-int get_lowbat_state()
-{
-    const uint vlow = 2450;
-    return read_power_voltage() < vlow;
-}
-
-int usb_powered()
-{
-    return ui_charging();
-}
 
 int create_screenshot(int report_error)
 {
     record(dmcp_notyet,
            "create_screenshot(%d) not implemented", report_error);
-    ui_screenshot();
+ //   ui_screenshot();
     return 0;
 }
 
 
 void draw_power_off_image(int allow_errors)
 {
+       SEGGER_RTT_printf(0, "\ndraw_power_off_image to do...");
+
+
     record(dmcp_notyet,
            "draw_power_off_image(%d) not implemented", allow_errors);
+
+
 }
 
 
@@ -178,13 +202,13 @@ int handle_menu(const smenu_t * menu_id, int action, int cur_line)
 {
     uint menu_line = 0;
     bool done = false;
-
+   uint32_t keybdata;
+    lcd_clear_buf();
     while (!done)
     {
         t24->xoffs = 0;
         lcd_writeClr(t24);
         lcd_writeClr(t20);
-        lcd_clear_buf();
         lcd_putsR(t20, menu_id->name);
 
         char buf[80];
@@ -220,12 +244,19 @@ int handle_menu(const smenu_t * menu_id, int action, int cur_line)
         bool redraw = false;
         while (!redraw)
         {
-            while (!test_command && key_empty())
-                sys_sleep();
-            if (test_command)
-                return 0;
+            int key = 0;
+            StopMode2_enable = 0xff;
 
-            int key = key_pop();
+            while (!test_command && key_empty())  {    OS_TASK_Delay(100); } // first try
+            StopMode2_enable = 0;
+
+//               sys_sleep();
+
+            if (test_command)
+                   return 0;
+
+            key = key_pop();
+
             uint wanted = 0;
             switch (key)
             {
@@ -262,6 +293,7 @@ int handle_menu(const smenu_t * menu_id, int action, int cur_line)
 
             case KEY_ENTER:
                 run_menu_item_app(menu_id->items[menu_line]);
+                lcd_clear_buf();
                 redraw = true;
                 break;
             }
@@ -271,6 +303,7 @@ int handle_menu(const smenu_t * menu_id, int action, int cur_line)
                 {
                     menu_line = wanted - 1;
                     run_menu_item_app(menu_id->items[menu_line]);
+                    lcd_clear_buf();
                     redraw = true;
                 }
             }
@@ -286,132 +319,14 @@ volatile uint    keyrd   = 0;
 volatile uint    keywr   = 0;
 enum {  nkeys = sizeof(keys) / sizeof(keys[0]) };
 
-int key_empty()
-{
-    static bool empty = true;
-    if ((keyrd == keywr) != empty)
-    {
-        record(keys_empty,
-               "Key empty %u-%u = %+s",
-               keyrd,
-               keywr,
-               keyrd == keywr ? "empty" : "full");
-        empty = keyrd == keywr;
-    }
-    return keyrd == keywr;
-}
 
-int key_remaining()
-{
-    return nkeys - (keywr - keyrd);
-}
-
-int key_pop()
-{
-    if (keyrd != keywr)
-    {
-        int key = keys[keyrd++ % nkeys];
-        record(keys, "Key %d (rd %u wr %u)", key, keyrd, keywr);
-        record(tests_rpl, "Key %d (rd %u wr %u)", key, keyrd, keywr);
-        return key;
-    }
-    return -1;
-}
-
-int key_tail()
-{
-    if (keyrd != keywr)
-    {
-        int key = keys[(keyrd + nkeys - 1) % nkeys];
-        return key;
-    }
-    return -1;
-}
-
-int key_pop_last()
-{
-    if (keywr - keyrd > 1)
-        keyrd = keywr - 1;
-    if (keyrd != keywr)
-    {
-        int key = keys[keyrd++ % nkeys];
-        return key;
-    }
-    return -1;
-}
-
-void key_pop_all()
-{
-    keyrd = 0;
-    keywr = 0;
-}
-int key_push(int k)
-{
-    record(keys, "Push key %d (wr %u rd %u) shifts=%+s",
-           k, keywr, keyrd,
-           shift_held ? alt_held ? "Shift+Alt" : "Shift"
-           : alt_held ? "Alt" : "None");
-    ui_push_key(k);
-    if (keywr - keyrd < nkeys)
-        keys[keywr++ % nkeys] = k;
-    else
-        record(keys_warning, "Dropped key %d (wr %u rd %u)", k, keywr, keyrd);
-    record(keys, "Pushed key %d (wr %u rd %u)", k, keywr, keyrd);
-    return keywr - keyrd < nkeys;
-}
-
-int read_key(int *k1, int *k2)
-{
-    uint count = keywr - keyrd;
-    if (shift_held || alt_held)
-    {
-        *k1 = keys[(keywr - 1) % nkeys];
-        if (*k1)
-        {
-            *k2 = shift_held ? KEY_UP : KEY_DOWN;
-            return 2;
-        }
-    }
-
-    if (count > 1)
-    {
-        *k1 = keys[(keywr - 2) % nkeys];
-        *k2 = keys[(keywr - 1) % nkeys];
-        record(keys, "read_key has two keys %d and %d", *k1, *k2);
-        return 2;
-    }
-    if (count > 0)
-    {
-        *k1 = keys[(keywr - 1) % nkeys];
-        *k2 = 0;
-        return 1;
-    }
-    *k1 = *k2 = 0;
-    return 0;
-}
-
-int sys_last_key()
-{
-    return keys[(keywr - 1) % nkeys];
-}
-
-int runner_get_key(int *repeat)
-{
-    return repeat ? key_pop_last() :  key_pop();
-}
-
-void lcd_clear_buf()
-{
-    record(lcd, "Clearing buffer");
-    for (unsigned i = 0; i < sizeof(lcd_buffer) / sizeof(*lcd_buffer); i++)
-        lcd_buffer[i] = pattern::white.bits;
-}
 
 static uint32_t last_warning = 0;
 
 inline void lcd_set_pixel(int x, int y)
 {
-    if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
+   Disp_SetPixel( &hlcd, x, y, 1);
+/*    if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
     {
         uint now = sys_current_ms();
         if (now - last_warning > 1000)
@@ -423,12 +338,15 @@ inline void lcd_set_pixel(int x, int y)
     }
     surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::black);
+   LCD_MarkLineModified( &hlcd, x);
+*/
 }
 
 inline void lcd_clear_pixel(int x, int y)
 {
+   Disp_SetPixel( &hlcd, x, y, 0);
 
-    if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
+/*    if (x < 0 || x > LCD_W || y < 0 || y > LCD_H)
     {
         uint now = sys_current_ms();
         if (now - last_warning > 1000)
@@ -440,6 +358,8 @@ inline void lcd_clear_pixel(int x, int y)
     }
     surface s(lcd_buffer, LCD_W, LCD_H, LCD_SCANLINE, LCD_W);
     s.fill(x, y, x, y, pattern::white);
+   LCD_MarkLineModified( &hlcd, x);
+*/
 }
 
 inline void lcd_pixel(int x, int y, int val)
@@ -450,7 +370,7 @@ inline void lcd_pixel(int x, int y, int val)
         lcd_clear_pixel(x, y);
 }
 
-void lcd_draw_menu_keys(const char *keys[])
+void lcd_draw_menu_keys_not_used(const char *keys[])
 {
     int my = LCD_H - t20->f->height - 4;
     int mh = t20->f->height + 2;
@@ -534,15 +454,7 @@ int lcd_fontWidth(disp_stat_t * ds)
 }
 int lcd_for_calc(int what)
 {
-    font_p font = LibMonoFont14x22;
-    coord x = 0;
-    coord y = 0;
-    size  h = font->height();
-    Screen.text(x, y, utf8("About"), font);
-    Screen.invert(x, y, LCD_W, h);
-    y += 3*h/2;
-    Screen.text(x, y, utf8("DMCP Simulator"), font);
-
+    record(dmcp_notyet, "lcd_for_calc %d not implemented", what);
     return 0;
 }
 int lcd_get_buf_cleared()
@@ -554,6 +466,7 @@ int lcd_lineHeight(disp_stat_t * ds)
 {
     return ds->f->height;
 }
+/*
 uint8_t * lcd_line_addr(int y)
 {
     if (y < 0 || y > LCD_H)
@@ -564,6 +477,7 @@ uint8_t * lcd_line_addr(int y)
     blitter::offset offset = y * LCD_SCANLINE * color::BPP / 32;
     return (uint8_t *) (lcd_buffer + offset);
 }
+*/
 int lcd_toggleFontT(int nr)
 {
     return nr;
@@ -599,67 +513,27 @@ void lcd_print(disp_stat_t * ds, const char* fmt, ...)
     lcd_puts(ds, buffer);
 }
 
-void lcd_forced_refresh()
-{
-    record(lcd, "Forced refresh requested %u drawn %u",
-           lcd_refresh_requested, ui_refresh_count());
-    lcd_refresh_requested++;
-    ui_refresh();
-}
-void lcd_refresh()
-{
-    record(lcd, "Normal refresh requested %u drawn %u",
-           lcd_refresh_requested, ui_refresh_count());
-    lcd_refresh_requested++;
-    ui_refresh();
-}
-void lcd_refresh_dma()
-{
-    record(lcd, "DMA refresh requested %u drawn %u",
-           lcd_refresh_requested, ui_refresh_count());
-    record(lcd_refresh, "Refresh DMA %u", lcd_refresh_requested);
-    lcd_refresh_requested++;
-    ui_refresh();
-}
-void lcd_refresh_wait()
-{
-    record(lcd, "Wait refresh requested %u drawn %u",
-           lcd_refresh_requested, ui_refresh_count());
-    lcd_refresh_requested++;
-    ui_refresh();
-}
-void lcd_refresh_lines(int ln, int cnt)
-{
-    record(lcd_refresh, "Refresh lines (%d-%d) count %d, requested %u drawn %u",
-           ln, ln+cnt-1, cnt,
-           lcd_refresh_requested, ui_refresh_count());
-    if (ln >= 0 && cnt > 0)
-    {
-        lcd_refresh_requested++;
-        ui_refresh();
-    }
-}
 void lcd_setLine(disp_stat_t * ds, int ln_nr)
 {
     ds->x = ds->xoffs;;
     ds->y = ln_nr * lcd_lineHeight(ds);
-    record(lcd, "set line %u coord (%d, %d)", ln_nr, ds->x, ds->y);
+//SEGGER_RTT_printf(0, "\nset line %u coord (%d, %d)", ln_nr, ds->x, ds->y);
 }
 
-void lcd_setXY(disp_stat_t * ds, int x, int y)
+void lcd_setXY_not_used(disp_stat_t * ds, int x, int y)
 {
-    record(lcd, "set XY (%d, %d)", x, y);
+//SEGGER_RTT_printf(0, "\nset XY (%d, %d)", x, y);
     ds->x = x;
     ds->y = y;
 }
 void lcd_set_buf_cleared(int val)
 {
-    record(lcd, "Set buffer cleared %d", val);
+//SEGGER_RTT_printf(0, "\nSet buffer cleared %d", val);
     lcd_buf_cleared_result = val;
 }
 void lcd_switchFont(disp_stat_t * ds, int nr)
 {
-    record(lcd, "Selected font %d", nr);
+//SEGGER_RTT_printf(0, "\nSelected font %d", nr);
     if (nr >= 0 && nr <= (int) dmcp_fonts_count)
         ds->f = dmcp_fonts[nr];
 }
@@ -685,7 +559,7 @@ int lcd_charWidth(disp_stat_t * ds, int c)
     }
     else
     {
-        record(lcd_width, "Character width of nonexistent %d is %d", c, width);
+//SEGGER_RTT_printf(0, "\nCharacter width of nonexistent %d is %d", c, width);
     }
 
     return width;
@@ -713,9 +587,8 @@ int lcd_textWidth(disp_stat_t * ds, const char* text)
         }
         else
         {
-            record(lcd_width,
-                   "Nonexistent character %d at offset %d in [%s]",
-                   c + first, p - (const byte *) text, text);
+//SEGGER_RTT_printf(0, "\nNonexistent character %d at offset %d in [%s]",
+//                   c + first, p - (const byte *) text, text);
         }
     }
     return width;
@@ -723,7 +596,7 @@ int lcd_textWidth(disp_stat_t * ds, const char* text)
 
 void lcd_writeClr(disp_stat_t *ds)
 {
-    record(lcd, "Clearing display state"); // Not sure this is what it does
+//SEGGER_RTT_printf(0, "\nClearing display state"); // Not sure this is what it does
     ds->x      = 0; // ds->xoffs;
     ds->y      = 0;
     ds->inv    = 0;
@@ -737,7 +610,7 @@ void lcd_writeNl(disp_stat_t *ds)
 {
     ds->x = ds->xoffs;
     ds->y += lcd_lineHeight(ds);
-    record(lcd, "New line, now at (%d, %d)", ds->x, ds->y);
+//SEGGER_RTT_printf(0, "\nNew line, now at (%d, %d)", ds->x, ds->y);
 }
 
 inline void lcd_writeTextInternal(disp_stat_t *ds, const char *text, int write)
@@ -755,10 +628,10 @@ inline void lcd_writeTextInternal(disp_stat_t *ds, const char *text, int write)
     int                color    = ds->inv == 0;
     const byte        *p        = (const byte *) text;
 
-    if (write)
-        record(lcd, "Write text [%s] at (%d, %d)", text, x, y);
-    else
-        record(lcd, "Skip text [%s] at (%d, %d)", text, x, y);
+//    if (write)
+//SEGGER_RTT_printf(0, "\nWrite text [%s] at (%d, %d)", text, x, y);
+//    else
+//SEGGER_RTT_printf(0, "\nSkip text [%s] at (%d, %d)", text, x, y);
 
     if (ds->lnfill)
         lcd_fill_rect(ds->xoffs, y, LCD_W, height, color);
@@ -811,9 +684,8 @@ inline void lcd_writeTextInternal(disp_stat_t *ds, const char *text, int write)
         }
         else
         {
-            record(lcd_warning,
-                   "Nonexistent character [%d] in [%s] at %d, max=%d",
-                   c + first, text, p - (byte_p) text, count + first);
+//SEGGER_RTT_printf(0, "\nNonexistent character [%d] in [%s] at %d, max=%d",
+//                   c + first, text, p - (byte_p) text, count + first);
         }
 
     }
@@ -833,135 +705,74 @@ void lcd_writeTextWidth(disp_stat_t * ds, const char* text)
 {
     lcd_writeTextInternal(ds, text, 0);
 }
-void reset_auto_off()
-{
-    // No effect
-}
 void rtc_wakeup_delay()
 {
-    record(dmcp_notyet, "rtc_wakeup_delay not implemented");
+   SEGGER_RTT_printf(0, "\nrtc_wakeup_delay not implemented");
 }
 void run_help_file(const char * help_file)
 {
-    record(dmcp_notyet, "run_help_file not implemented");
+   SEGGER_RTT_printf(0, "\nrun_help_file not implemented");
 }
 void run_help_file_style(const char * help_file, user_style_fn_t *user_style_fn)
 {
-    record(dmcp_notyet, "run_help_file_style not implemented");
+   SEGGER_RTT_printf(0, "\nrun_help_file_style not implemented");
 }
 void start_buzzer_freq(uint32_t freq)
 {
+   SEGGER_RTT_printf(0, "\nBuzzer not implemented");
     record(dmcp, "start_buzzer %u.%03uHz", freq / 1000, freq % 1000);
-    if (!no_beep && (!tests::running || noisy_tests))
-        ui_start_buzzer(freq);
+//    if (!no_beep && (!tests::running || noisy_tests))
+//        ui_start_buzzer(freq);
+
 }
 void stop_buzzer()
 {
+   SEGGER_RTT_printf(0, "\nBuzzer not implemented");
     record(dmcp, "stop_buzzer");
-    if (!no_beep && (!tests::running || noisy_tests))
-        ui_stop_buzzer();
+//    if (!no_beep && (!tests::running || noisy_tests))
+//        ui_stop_buzzer();
 }
 
 int sys_free_mem()
 {
-    // On the simulator, we have real memory
-    return 1024 * 1024;
+    // On the simulator, we have real memory, only 400k in u858
+    return 64 * 1024;
 }
 
-void sys_delay(uint32_t ms_delay)
-{
-    ui_ms_sleep(ms_delay);
-}
 
-static struct timer
-{
-    uint32_t deadline;
-    bool     enabled;
-} timers[4];
+extern struct timer timers[4];
 
 void sys_sleep()
 {
+/*
     uint32_t entry = sys_current_ms();
-    uint32_t max = ST(STAT_CLK_WKUP_SECONDS) ? 1000 : 60000;
     while (!test_command && key_empty())
     {
         uint32_t now = sys_current_ms();
-        if (now - entry >= max)
-        {
-            SET_ST(STAT_CLK_WKUP_FLAG);
-            goto done;
-        }
         for (int i = 0; i < 4; i++)
             if (timers[i].enabled &&
-                int(timers[i].deadline - now) < 0)
+                int(timers[i].deadline - now) < 0 &&
+                int(timers[i].deadline - entry) >= 0)
                 goto done;
-        ui_ms_sleep(tests::running ? 1 : 20);
+//        ui_ms_sleep(tests::running ? 1 : 20);
+        OS_TASK_Delay_ms( 10 );
     }
 done:
     CLR_ST(STAT_SUSPENDED | STAT_OFF | STAT_PGM_END);
+    */
 }
 
 void sys_critical_start()
 {
+   OS_TASK_EnterRegion();
 }
 
 void sys_critical_end()
 {
+   OS_TASK_LeaveRegion();
 }
 
-void sys_timer_disable(int timer_ix)
-{
-    timers[timer_ix].enabled = false;
-}
 
-void sys_timer_start(int timer_ix, uint32_t ms_value)
-{
-    uint32_t now = sys_current_ms();
-    uint32_t then = now + ms_value;
-    timers[timer_ix].deadline = then;
-    timers[timer_ix].enabled = true;
-}
-int sys_timer_active(int timer_ix)
-{
-    return timers[timer_ix].enabled;
-}
-
-int sys_timer_timeout(int timer_ix)
-{
-    if (timers[timer_ix].enabled)
-    {
-        uint32_t now = sys_current_ms();
-        return int(timers[timer_ix].deadline - now) < 0;
-    }
-    return false;
-}
-
-void wait_for_key_press()
-{
-    wait_for_key_release(-1);
-    while (key_empty() || !key_pop())
-    {
-        // Avoid refreshing the screen
-        if (test_command == tests::KEYSYNC)
-        {
-            record(tests_rpl, "Blocking screen refresh from wait_for_keypress");
-            test_command = 0;
-        }
-        else if (test_command)
-        {
-            record(tests_rpl, "Waiting for key interrupted by command %u",
-                   test_command);
-            break;
-        }
-        sys_sleep();
-    }
-}
-
-void wait_for_key_release(int tout)
-{
-    while (!key_empty() && key_pop())
-       sys_sleep();
-}
 
 int file_selection_screen(const char   *title,
                           const char   *base_dir,
@@ -990,82 +801,37 @@ int power_check_screen()
     return 0;
 }
 
-int sys_disk_ok()
-{
-    return 1;
-}
 
 int sys_disk_write_enable(int val)
 {
     return 0;
 }
 
-uint32_t sys_current_ms()
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000000 + tv.tv_usec) / 1000;
-}
 
 
-FRESULT f_open(FIL *fp, const TCHAR *path, BYTE mode)
-{
-    record(dmcp_notyet, "f_open not implemented");
-    return FR_NOT_ENABLED;
-}
-FRESULT f_close(FIL *fp)
-{
-    record(dmcp_notyet, "f_close not implemented");
-    return FR_NOT_ENABLED;
-}
 
-FRESULT f_read(FIL *fp, void *buff, UINT btr, UINT *br)
-{
-    record(dmcp_notyet, "f_read not implemented");
-    return FR_NOT_ENABLED;
-}
-
-FRESULT f_write(FIL *fp, const void *buff, UINT btw, UINT *bw)
-{
-    record(dmcp_notyet, "f_write not implemented");
-    return FR_NOT_ENABLED;
-}
-
-FRESULT f_lseek(FIL *fp, FSIZE_t ofs)
-{
-    record(dmcp_notyet, "f_lseek not implemented");
-    return FR_NOT_ENABLED;
-}
-
-FRESULT f_rename(const TCHAR *path_old, const TCHAR *path_new)
-{
-    record(dmcp_notyet, "f_rename not implemented");
-    return FR_NOT_ENABLED;
-}
-
-FRESULT f_unlink(const TCHAR *path)
-{
-    record(dmcp_notyet, "f_unlink not implemented");
-    return FR_NOT_ENABLED;
-}
 
 void disp_disk_info(const char *hdr)
 {
-    ui_draw_message(hdr);
+   char buff[60];
+   snprintf(buff, sizeof(buff), "\n disp_disk_info : %s ", hdr);
+   SEGGER_RTT_WriteString(0,  buff);
+
+ //   ui_draw_message(hdr);
 }
 
 void set_reset_state_file(const char * str)
 {
-    ui_save_setting("state", str);
-    record(dmcp, "Setting saved state: %s", str);
+//    ui_save_setting("state", str);
+//    record(dmcp, "Setting saved state: %s", str);
 }
 
 
 char *get_reset_state_file()
 {
-    static char result[256];
-    result[0] = 0;
-    ui_read_setting("state", result, sizeof(result));
+    static char result[256] = { "state\\State1.48s"};
+//    result[0] = 0;
+//    ui_read_setting("state", result, sizeof(result));
     record(dmcp, "Saved state: %+s", result);
     return result;
 }
@@ -1076,8 +842,12 @@ void set_reset_magic(uint32_t value)
     reset_magic = value;
 }
 
+
+
+
 void sys_reset()
 {
+
 }
 
 int is_menu_auto_off()
@@ -1086,75 +856,18 @@ int is_menu_auto_off()
 }
 
 
-void rtc_read(tm_t * tm, dt_t *dt)
-{
-    time_t now;
-    time(&now);
-
-    struct tm utm;
-#ifdef _WIN32
-    localtime_s(&utm, &now);
-#else
-    localtime_r(&now, &utm);
-#endif
-
-    struct timeval tv;
-    gettimeofday(&tv, nullptr);
-
-    dt->year = 1900 + utm.tm_year;
-    dt->month = utm.tm_mon + 1;
-    dt->day = utm.tm_mday;
-
-
-    tm->hour = utm.tm_hour;
-    tm->min = utm.tm_min;
-    tm->sec = utm.tm_sec;
-    tm->csec = tv.tv_usec / 10000;
-    tm->dow = (utm.tm_wday + 6) % 7;
-}
-
-void rtc_write(tm_t * tm, dt_t *dt)
-{
-    record(dmcp_error, "Writing RTC %u/%u/%u %u:%u:%u (ignored)",
-           dt->day, dt->month, dt->year,
-           tm->hour, tm->min, tm->sec);
-}
-
-
-int julian_day(dt_t *dt)
-{
-    return julian_day_number(dt->day, dt->month, dt->year);
-}
-
-
-cstring get_wday_shortcut(int day)
-{
-    static cstring dow[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-    return dow[day];
-}
-
-cstring get_month_shortcut(int month)
-{
-    static cstring name[] =
-    {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-    return name[month - 1];
-}
 
 
 int check_create_dir(const char * dir)
 {
+/*
     struct stat st;
     if (stat(dir, &st) == 0)
         if (st.st_mode & S_IFDIR)
             return 0;
-#ifdef _WIN32
-    return mkdir(dir);
-#else
     return mkdir(dir, 0777);
-#endif
+*/
+return 0;
 }
 
 
@@ -1165,71 +878,4 @@ void bitblt24(uint32_t x,
               int      blt_op,
               int      fill)
 {
-}
-
-
-
-size_t ui_clipboard_copy(char *buf, size_t maxlen)
-// ----------------------------------------------------------------------------
-//   Copy from clipboard
-// ----------------------------------------------------------------------------
-{
-    if (!buf || maxlen == 0)
-        return 0;
-
-    extern user_interface ui;
-    ui.clear_shift();
-
-    if (size_t sz = rt.editing())
-    {
-        utf8 data = rt.editor();
-        size_t copy = sz < maxlen ? sz : maxlen - 1;
-        memcpy(buf, data, copy);
-        buf[copy] = '\0';
-        return copy;
-    }
-
-    if (!ST(STAT_RUNNING) && rt.depth() > 0)
-    {
-        if (object_p obj = rt.top())
-        {
-            if (text_p sym = obj->as_text())
-            {
-                size_t sz = 0;
-                utf8 data = sym->value(&sz);
-                size_t copy = sz < maxlen ? sz : maxlen - 1;
-                memcpy(buf, data, copy);
-                buf[copy] = '\0';
-                return copy;
-            }
-            size_t rendered = obj->render(buf, maxlen - 1);
-            if (rendered > 0)
-            {
-                buf[rendered] = '\0';
-                return rendered;
-            }
-        }
-    }
-    return 0;
-}
-
-
-void ui_clipboard_paste(const char *text, size_t len)
-// ----------------------------------------------------------------------------
-//   Past clipboard
-// ----------------------------------------------------------------------------
-{
-    if (!text || len == 0)
-        return;
-
-    extern user_interface ui;
-    ui.clear_shift();
-
-    if (!ST(STAT_RUNNING))
-    {
-        uint pos = ui.cursor_position();
-        size_t ins = ui.insert(pos, utf8(text), len);
-        ui.cursor_position(pos + ins);
-        redraw_lcd(false);
-    }
 }
