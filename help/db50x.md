@@ -20952,23 +20952,31 @@ Access: [ListMenu](#listmenu) ▶ 🟦 F3; [ProgramMenu](#programmenu) 🟦 F3
 
 Access: 🟦 E (1/x); [RealMenu](#realmenu) 🟦 F6
 
-*2 pages · 30 items total*
+*3 pages · 45 items total*
 
 **Page 1**
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| →Int | [→Q](#q) | [→Qπ](#q-1) | [SigDig](#sigdig) | [Get](#get) |   |
-| Trunc | [Mant](#mant) | [Xpon](#xpon) | [Ceil](#ceil) | [Floor](#floor) | ◀ |
+| R→I | →ℚ | [→Qπ](#q-1) | [→Decimal](#decimal) | [SignificantDigits](#sigdig) |   |
+| Truncate | [Mantissa](#mant) | [Exponent](#xpon) | [ceil](#ceil) | [floor](#floor) | ◀ |
 | [abs](#abs) | [sign](#sign) | [IntegerPart](#intpart) | [FractionalPart](#fracpart) | Round | ▶ |
 
 **Page 2**
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) |   |
-| [CstName](#constantname) | [CstValue](#constantvalue) | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | [Tag→](#tag-1) | ◀ |
-| [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Obj→](#explode) | ▶ |
+| [→2D](#to2dvector) | [→3D](#to3dvector) | [→Rectangular](#torectangular) | [→Cylindrical](#tocylindrical) | [→Spherical](#tospherical) |   |
+| [Object→](#explode) | Range→ | [List→](#list-1) | Arry→ | [Vector→](#fromvector) | ◀ |
+| [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Get](#get) | ▶ |
+
+**Page 3**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | Polynomial→ | →Polynomial |   |
+| [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) | ◀ |
+| [CstName](#constantname) | [CstValue](#constantvalue) | CstRng | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | ▶ |
 
 ### PlotMenu
 

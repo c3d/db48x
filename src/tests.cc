@@ -11726,6 +11726,9 @@ void tests::constants_menu()
     step("Check constant value from command line")
         .test(CLEAR, "Ⓒc CONSTANTVALUE", ENTER)
         .expect("299 792 458 m/s");
+    step("Check constant value from command line")
+        .test(CLEAR, "Ⓒc CONSTANTRANGE", ENTER)
+        .expect("299 792 458±0 m/s");
     step("Check constant name from menu")
         .test(CLEAR, "Ⓒc", ENTER)
         .expect("c")
@@ -11943,7 +11946,7 @@ void tests::constants_menu()
               ID_PartsMenu, ID_StandardRound)
         .error("Inconsistent units");
     step("Parts menu uncertainty labels")
-        .test(CLEAR, ID_PartsMenu, F6)
+        .test(CLEAR, ID_PartsMenu, F6, F6)
         .image_menus("parts-menu-labels", 2);
 
     step("Use Const command from command line")

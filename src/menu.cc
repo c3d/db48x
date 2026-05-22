@@ -409,41 +409,59 @@ MENU(PartsMenu,
 // ----------------------------------------------------------------------------
 //   Extract parts of a number
 // ----------------------------------------------------------------------------
-     ID_abs,
+     ID_abs,                                    // First page
      ID_sign,
      ID_IntPart,
      ID_FracPart,
      ID_Round,
 
-     "Trunc",   ID_Truncate,
-     "Mant",    ID_mant,
-     "Xpon",    ID_xpon,
-     "Ceil",    ID_ceil,
-     "Floor",   ID_floor,
+     ID_Truncate,
+     ID_mant,
+     ID_xpon,
+     ID_ceil,
+     ID_floor,
 
-     "→Int",    ID_ToInteger,
-     "→Q",      ID_ToFraction,
-     "→Qπ",     ID_ToQuotient,
-     "SigDig",  ID_SigDig,
-     ID_Get,
+     ID_ToInteger,
+     ID_ToFraction,
+     ID_ToQuotient,
+     ID_ToDecimal,
+     ID_SigDig,
 
-     ID_re,
+     ID_re,                                     // Second page
      ID_im,
      ID_arg,
      ID_Size,
-     "Obj→",    ID_Explode,
+     ID_Get,
 
-     "CstName", ID_ConstantName,
+     ID_Explode,
+     ID_FromRange,
+     ID_FromList,
+     ID_FromArray,
+     ID_FromVector,
+
+     ID_To2DVector,
+     ID_To3DVector,
+     ID_ToRectangular,
+     ID_ToCylindrical,
+     ID_ToSpherical,
+
+     "CstName", ID_ConstantName,                // Third page
      "CstValue",ID_ConstantValue,
+     "CstRng",  ID_ConstantRange,
      "StdUnc",  ID_StandardUncertainty,
      "RelUnc",  ID_RelativeUncertainty,
-     "Tag→",    ID_FromTag,
 
      "StdRnd",  ID_StandardRound,
      "RelRnd",  ID_RelativeRound,
      "→StdUnc", ID_ToStandardUncertainty,
      "→RelUnc", ID_ToRelativeUncertainty,
-     "PrcRnd",  ID_PrecisionRound
+     "PrcRnd",  ID_PrecisionRound,
+
+     ID_FromTag,
+     ID_ToTag,
+     ID_DTag,
+     ID_FromPolynomial,
+     ID_ToPolynomial
 );
 
 
