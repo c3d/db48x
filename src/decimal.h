@@ -544,9 +544,15 @@ struct decimal : algebraic
     static decimal_p sin(decimal_r x);
     static decimal_p cos(decimal_r x);
     static decimal_p tan(decimal_r x);
+    static decimal_p sec(decimal_r x);
+    static decimal_p csc(decimal_r x);
+    static decimal_p cot(decimal_r x);
     static decimal_p asin(decimal_r x);
     static decimal_p acos(decimal_r x);
     static decimal_p atan(decimal_r x);
+    static decimal_p asec(decimal_r x);
+    static decimal_p acsc(decimal_r x);
+    static decimal_p acot(decimal_r x);
 
     static decimal_p sin_fracpi(uint qturns, decimal_r fp);
     static decimal_p cos_fracpi(uint qturns, decimal_r fp);

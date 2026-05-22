@@ -93,9 +93,15 @@ public:
     RANGE_FUNCTION(sin);
     RANGE_FUNCTION(cos);
     RANGE_FUNCTION(tan);
+    RANGE_FUNCTION(sec);
+    RANGE_FUNCTION(csc);
+    RANGE_FUNCTION(cot);
     RANGE_FUNCTION(asin);
     RANGE_FUNCTION(acos);
     RANGE_FUNCTION(atan);
+    RANGE_FUNCTION(asec);
+    RANGE_FUNCTION(acsc);
+    RANGE_FUNCTION(acot);
 
     RANGE_FUNCTION(sinh);
     RANGE_FUNCTION(cosh);
@@ -191,9 +197,15 @@ struct uncertain : range
     UNCERTAIN_FUNCTION(sin);
     UNCERTAIN_FUNCTION(cos);
     UNCERTAIN_FUNCTION(tan);
+    UNCERTAIN_FUNCTION(sec);
+    UNCERTAIN_FUNCTION(csc);
+    UNCERTAIN_FUNCTION(cot);
     UNCERTAIN_FUNCTION(asin);
     UNCERTAIN_FUNCTION(acos);
     UNCERTAIN_FUNCTION(atan);
+    UNCERTAIN_FUNCTION(asec);
+    UNCERTAIN_FUNCTION(acsc);
+    UNCERTAIN_FUNCTION(acot);
 
     UNCERTAIN_FUNCTION(sinh);
     UNCERTAIN_FUNCTION(cosh);

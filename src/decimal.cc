@@ -2442,6 +2442,52 @@ decimal_p decimal::tan(decimal_r x)
 }
 
 
+decimal_p decimal::sec(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Secant as reciprocal of cosine
+// ----------------------------------------------------------------------------
+{
+    uint qturns;
+    decimal_g fp;
+    precision_adjust prec;
+    if (!x->adjust_from_angle(qturns, fp))
+        return nullptr;
+    decimal_g c = cos_fracpi(qturns, fp);
+    return prec(inv(c));
+}
+
+
+decimal_p decimal::csc(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Cosecant as reciprocal of sine
+// ----------------------------------------------------------------------------
+{
+    uint qturns;
+    decimal_g fp;
+    precision_adjust prec;
+    if (!x->adjust_from_angle(qturns, fp))
+        return nullptr;
+    decimal_g s = sin_fracpi(qturns, fp);
+    return prec(inv(s));
+}
+
+
+decimal_p decimal::cot(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Cotangent as ratio of cos/sin
+// ----------------------------------------------------------------------------
+{
+    uint qturns;
+    decimal_g fp;
+    precision_adjust prec;
+    if (!x->adjust_from_angle(qturns, fp))
+        return nullptr;
+    decimal_g s = sin_fracpi(qturns, fp);
+    decimal_g c = cos_fracpi(qturns, fp);
+    return prec(c / s);
+}
+
+
 decimal_p decimal::asin(decimal_r x)
 // ----------------------------------------------------------------------------
 //   Arc-sine, use asin(x) = atan(x / sqrt(1-x^2))
@@ -2491,6 +2537,58 @@ decimal_p decimal::acos(decimal_r x)
         tmp = exact_angle(5,-1);
     }
     return prec(tmp);
+}
+
+
+decimal_p decimal::asec(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Arc-secant
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    if (!x)
+        return nullptr;
+    decimal_g absx = abs(x);
+    decimal_g one = make(1);
+    if (absx && absx < one)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+    return prec(acos(one / x));
+}
+
+
+decimal_p decimal::acsc(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Arc-cosecant
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    if (!x)
+        return nullptr;
+    decimal_g absx = abs(x);
+    decimal_g one = make(1);
+    if (absx && absx < one)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+    return prec(asin(one / x));
+}
+
+
+decimal_p decimal::acot(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Arc-cotangent
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    if (!x)
+        return nullptr;
+    if (x->is_zero())
+        return exact_angle(5, -1);
+    return prec(atan(make(1) / x));
 }
 
 

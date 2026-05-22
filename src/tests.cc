@@ -117,6 +117,7 @@ TESTS(double,           "Hardware-accelerated 16-digit (double)")
 TESTS(highp,            "High-precision computations (60 digits)")
 TESTS(trigoptim,        "Special trigonometry optimzations");
 TESTS(trigunits,        "Trigonometric units");
+TESTS(sectrig,          "Secant, cosecant, cotangent");
 TESTS(dfrac,            "Simple conversion to decimal and back");
 TESTS(round,            "Rounding and truncating");
 TESTS(ctypes,           "Complex types");
@@ -242,6 +243,7 @@ int tests::run(uint onlyCurrent)
         high_precision_numerical_functions();
         exact_trig_cases();
         trig_units();
+        sec_csc_cot();
         fraction_decimal_conversions();
         rounding_and_truncating();
         complex_types();
@@ -4807,6 +4809,41 @@ void tests::trig_units()
         .test(LSHIFT, F2).expect("0.00872 66462 6 r");
     step("Converting to degrees")
         .test(LSHIFT, F1).expect("0.5 °");
+}
+
+
+void tests::sec_csc_cot()
+// ----------------------------------------------------------------------------
+//   Secant, cosecant, cotangent and inverses
+// ----------------------------------------------------------------------------
+{
+    BEGIN(sectrig);
+
+    step("Degrees mode")
+        .test(CLEAR, "Deg", ENTER).noerror();
+    step("Dimensionless trig results")
+        .test("NoAngleUnits", ENTER).noerror();
+    step("sec(0) = 1")
+        .test(CLEAR, "0", ENTER, ID_sec).expect("1.");
+    step("sec(45°)")
+        .test(CLEAR, "45", ENTER, ID_sec)
+        .expect("1.41421 35623 7");
+    step("csc(90°) = 1")
+        .test(CLEAR, "90", ENTER, ID_csc).expect("1.");
+    step("cot(45°) = 1")
+        .test(CLEAR, "45", ENTER, ID_cot).expect("1.");
+    step("cot⁻¹(1) = 45°")
+        .test(CLEAR, "1", ENTER, ID_acot).expect("45.");
+    step("sec⁻¹(2) = 60°")
+        .test(CLEAR, "2", ENTER, ID_asec).expect("60.");
+    step("csc⁻¹(2) = 30°")
+        .test(CLEAR, "2", ENTER, ID_acsc).expect("30.");
+    step("sec⁻¹ out of domain")
+        .test(CLEAR, "0.5", ENTER, ID_asec).error("Argument outside domain");
+    step("Symbolic sec")
+        .test(CLEAR, "'X'", ENTER, ID_sec).expect("'sec X'");
+    step("Restore angle units for later tests")
+        .test("SetAngleUnits", ENTER).noerror();
 }
 
 
@@ -14457,9 +14494,15 @@ void tests::plotting_all_functions()
     FUNCTION(sin);
     FUNCTION(cos);
     FUNCTION(tan);
+    FUNCTION(sec);
+    FUNCTION(csc);
+    FUNCTION(cot);
     FUNCTION(asin);
     FUNCTION(acos);
     FUNCTION(atan);
+    FUNCTION(asec);
+    FUNCTION(acsc);
+    FUNCTION(acot);
 
     step("Select degrees");
     test(CLEAR, SHIFT, N, F1).noerror();

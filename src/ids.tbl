@@ -296,6 +296,12 @@ NAMED(atan, "tan⁻¹")            ALIAS(atan, "arctan")   ALIAS(atan, "atan")
 CMD(sin)
 CMD(cos)
 CMD(tan)                        // WARNING: order used in function.cc
+CMD(sec)
+CMD(csc)
+CMD(cot)
+NAMED(asec, "sec⁻¹")           ALIAS(asec, "arcsec")   ALIAS(asec, "asec")
+NAMED(acsc, "csc⁻¹")           ALIAS(acsc, "arccsc")   ALIAS(acsc, "acsc")
+NAMED(acot, "cot⁻¹")           ALIAS(acot, "arccot")   ALIAS(acot, "acot")
 
 // Exp and log
 CMD(ln)

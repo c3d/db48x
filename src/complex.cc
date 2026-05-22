@@ -1162,6 +1162,33 @@ COMPLEX_BODY(tan)
 }
 
 
+COMPLEX_BODY(sec)
+// ----------------------------------------------------------------------------
+//   Complex implementation of sec
+// ----------------------------------------------------------------------------
+{
+    return complex::make(1, 0) / complex::cos(z);
+}
+
+
+COMPLEX_BODY(csc)
+// ----------------------------------------------------------------------------
+//   Complex implementation of csc
+// ----------------------------------------------------------------------------
+{
+    return complex::make(1, 0) / complex::sin(z);
+}
+
+
+COMPLEX_BODY(cot)
+// ----------------------------------------------------------------------------
+//   Complex implementation of cot
+// ----------------------------------------------------------------------------
+{
+    return complex::cos(z) / complex::sin(z);
+}
+
+
 COMPLEX_BODY(asin)
 // ----------------------------------------------------------------------------
 //   Complex implementation of asin
@@ -1199,6 +1226,33 @@ COMPLEX_BODY(atan)
     // atan(z) = -i/2 ln((i-z) / (i + z))
     complex_g i = complex::make(0,1);
     return complex::ln((i - z) / (i + z)) / complex_g(complex::make(0,2));
+}
+
+
+COMPLEX_BODY(asec)
+// ----------------------------------------------------------------------------
+//   Complex implementation of asec
+// ----------------------------------------------------------------------------
+{
+    return complex::acos(complex::make(1, 0) / z);
+}
+
+
+COMPLEX_BODY(acsc)
+// ----------------------------------------------------------------------------
+//   Complex implementation of acsc
+// ----------------------------------------------------------------------------
+{
+    return complex::asin(complex::make(1, 0) / z);
+}
+
+
+COMPLEX_BODY(acot)
+// ----------------------------------------------------------------------------
+//   Complex implementation of acot
+// ----------------------------------------------------------------------------
+{
+    return complex::atan(complex::make(1, 0) / z);
 }
 
 

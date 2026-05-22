@@ -456,9 +456,15 @@ struct eq
     EQ_FUNCTION(sin);
     EQ_FUNCTION(cos);
     EQ_FUNCTION(tan);
+    EQ_FUNCTION(sec);
+    EQ_FUNCTION(csc);
+    EQ_FUNCTION(cot);
     EQ_FUNCTION(asin);
     EQ_FUNCTION(acos);
     EQ_FUNCTION(atan);
+    EQ_FUNCTION(asec);
+    EQ_FUNCTION(acsc);
+    EQ_FUNCTION(acot);
 
     EQ_FUNCTION(sinh);
     EQ_FUNCTION(cosh);
@@ -658,9 +664,15 @@ EQ_FUNCTION(cbrt);
 EQ_FUNCTION(sin);
 EQ_FUNCTION(cos);
 EQ_FUNCTION(tan);
+EQ_FUNCTION(sec);
+EQ_FUNCTION(csc);
+EQ_FUNCTION(cot);
 EQ_FUNCTION(asin);
 EQ_FUNCTION(acos);
 EQ_FUNCTION(atan);
+EQ_FUNCTION(asec);
+EQ_FUNCTION(acsc);
+EQ_FUNCTION(acot);
 
 EQ_FUNCTION(sinh);
 EQ_FUNCTION(cosh);

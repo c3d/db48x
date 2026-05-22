@@ -651,12 +651,12 @@ MENU(CircularMenu,
 
      ID_sin,    ID_cos,         ID_tan,
      ID_asin,   ID_acos,        ID_atan,
-     "sec",     ID_Unimplemented,
-     "csc",     ID_Unimplemented,
-     "cot",     ID_Unimplemented,
-     "sec⁻¹",   ID_Unimplemented,
-     "csc⁻¹",   ID_Unimplemented,
-     "cot⁻¹",   ID_Unimplemented);
+     "sec",     ID_sec,
+     "csc",     ID_csc,
+     "cot",     ID_cot,
+     "sec⁻¹",   ID_asec,
+     "csc⁻¹",   ID_acsc,
+     "cot⁻¹",   ID_acot);
 
 MENU(BasesMenu,
 // ----------------------------------------------------------------------------

@@ -19769,6 +19769,45 @@ For a real argument that is an odd-integer multiple of 90 degrees, an
 `symbexpr` ▶ `tan symbexpr`
 
 
+## sec
+
+[Analytic function](#analytic-functions) returning the secant of the argument (1/cos).
+
+For real arguments, the current angle mode determines the number's units, unless
+angular units are specified. At odd-integer multiples of 90° in the current angle
+units, an [infinite result](#infinite-result) is generated.
+
+`z` ▶ *sec* `z`
+
+`symbexpr` ▶ `sec symbexpr`
+
+
+## csc
+
+[Analytic function](#analytic-functions) returning the cosecant of the argument (1/sin).
+
+For real arguments, the current angle mode determines the number's units, unless
+angular units are specified. At integer multiples of 180° in the current angle
+units, an [infinite result](#infinite-result) is generated.
+
+`z` ▶ *csc* `z`
+
+`symbexpr` ▶ `csc symbexpr`
+
+
+## cot
+
+[Analytic function](#analytic-functions) returning the cotangent of the argument (cos/sin).
+
+For real arguments, the current angle mode determines the number's units, unless
+angular units are specified. At integer multiples of 180° in the current angle
+units, an [infinite result](#infinite-result) is generated.
+
+`z` ▶ *cot* `z`
+
+`symbexpr` ▶ `cot symbexpr`
+
+
 ## ASIN
 Compute the arcsine
 
@@ -19779,6 +19818,21 @@ Compute the arccosine
 
 ## ATAN
 Compute the arctangent
+
+
+## sec⁻¹
+
+Compute the arc-secant. The argument must satisfy |x| ≥ 1.
+
+
+## csc⁻¹
+
+Compute the arc-cosecant. The argument must satisfy |x| ≥ 1.
+
+
+## cot⁻¹
+
+Compute the arc-cotangent.
 
 
 ## ATAN2
@@ -20509,7 +20563,7 @@ Access: 🟦 K (COS); [MathMenu](#mathmenu-reference) F3; [RealMenu](#realmenu) 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| _sec_ | _csc_ | _cot_ | _sec⁻¹_ | _csc⁻¹_ | _cot⁻¹_ |
+| [sec](#sec) | [csc](#csc) | [cot](#cot) | [sec⁻¹](#sec-1) | [csc⁻¹](#csc-1) | [cot⁻¹](#cot-1) |
 | [sin](#sin) | [cos](#cos) | [tan](#tan) | [sin⁻¹](#asin) | [cos⁻¹](#acos) | [tan⁻¹](#atan) |
 
 ### ClearThingsMenu

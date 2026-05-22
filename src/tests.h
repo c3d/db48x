@@ -85,6 +85,7 @@ struct tests
     void high_precision_numerical_functions();
     void exact_trig_cases();
     void trig_units();
+    void sec_csc_cot();
     void fraction_decimal_conversions();
     void cfraction();
     void rounding_and_truncating();

@@ -182,7 +182,7 @@ Access: 🟦 K (COS); [MathMenu](#mathmenu-reference) F3; [RealMenu](#realmenu) 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| _sec_ | _csc_ | _cot_ | _sec⁻¹_ | _csc⁻¹_ | _cot⁻¹_ |
+| [sec](#sec) | [csc](#csc) | [cot](#cot) | [sec⁻¹](#sec-1) | [csc⁻¹](#csc-1) | [cot⁻¹](#cot-1) |
 | [sin](#sin) | [cos](#cos) | [tan](#tan) | [sin⁻¹](#asin) | [cos⁻¹](#acos) | [tan⁻¹](#atan) |
 
 ### ClearThingsMenu
