@@ -193,7 +193,8 @@ static void sim_usage(FILE *out, cstring prog)
             "  -s<N>      Window scaling factor\n"
             "  -t<trace>  Enable recorder trace (repeatable, regex ok)\n"
             "  -w[N]      Default test command wait in ms (default: 1000)\n"
-            "  -D<pattern>  Recorder traces on test failure\n"
+            "  -C<file>   Create a screeen snapshot to the given file\n"
+            "  -D<pattrn> Recorder traces pattern on test failure\n"
             "  -E<cmd>    Similar to -e, printing stack to console\n"
             "  -F<cmd>    Similar to -f, printing stack to console\n"
             "  -H         Headless: no window, exit when done\n"
@@ -243,6 +244,10 @@ static bool sim_parse_args(int argc, char *argv[])
 #define check_arg()     if (!arg) goto missing_arg; nargs = 1;
         switch (as[1])
         {
+        case 'C':
+            check_arg();
+            rplcmds.queue_snapshot(arg);
+            break;
         case 'D':
             check_arg();
             tests::dump_on_fail = arg;

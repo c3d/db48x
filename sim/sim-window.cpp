@@ -925,7 +925,7 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 }
 
 
-void MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
+bool MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
 // ----------------------------------------------------------------------------
 //   Save a simulator screenshot under the "SCREEN" directory
 // ----------------------------------------------------------------------------
@@ -934,13 +934,23 @@ void MainWindow::screenshot(cstring basename, int x, int y, int w, int h)
     QDateTime today = QDateTime::currentDateTime();
     name += today.toString("yyyyMMdd-hhmmss");
     name += ".png";
+    return screensave(name.toUtf8().constData(), x, y, w, h);
+}
 
+
+bool MainWindow::screensave(cstring filename, int x, int y, int w, int h)
+// ----------------------------------------------------------------------------
+//   Save a simulator screenshot under the "SCREEN" directory
+// ----------------------------------------------------------------------------
+{
     QPixmap &screen = MainWindow::theScreen();
     QPixmap img = screen.copy(x, y, w, h);
-    bool ok = img.save(name, "PNG");
-    record(sim_window, "Screen capture %+s for %s",
+    bool ok = img.save(filename, "PNG");
+    record(sim_window,
+           "Screen capture %+s for %s",
            ok ? "succeeded" : "failed",
-           name.toUtf8().constData());
+           filename);
+    return ok;
 }
 
 

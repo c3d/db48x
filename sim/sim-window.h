@@ -169,7 +169,12 @@ public:
     QPixmap &screen() { return ui.screen->mainPixmap; }
     static MainWindow * theMainWindow() { return mainWindow; }
     static QPixmap &    theScreen()     { return mainWindow->screen(); }
-    static void         screenshot(cstring basename = "screens/",
+    static bool         screenshot(cstring basename = "screens/",
+                                   int     x = 0,
+                                   int     y = 0,
+                                   int     w = LCD_W,
+                                   int     h = LCD_H);
+    static bool         screensave(cstring filename,
                                    int     x = 0,
                                    int     y = 0,
                                    int     w = LCD_W,
@@ -178,7 +183,11 @@ public:
 
     void                startBuzzer(uint frequency);
     void                stopBuzzer();
-    bool                buzzerPlaying() { return playing; }
+    bool                buzzerPlaying()         { return playing; }
+    static void         setExitCode(int rc)
+    {
+        mainWindow->pendingExitCode = rc;
+    }
 
 protected:
     virtual void keyPressEvent(QKeyEvent *ev);

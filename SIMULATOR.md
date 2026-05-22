@@ -27,6 +27,7 @@ The simulator can be started with the command-line options listed in the table b
 
 | Option | Description |
 | --- | --- |
+| -C[[`<whitespace>`]`<filename>`] | Save a snapshot of the string to a given file after executing preceding commands if any. |
 | -D[[`<whitespace>`]`<argument>`] | Set the pattern of recorder traces to show when a test fails. |
 | -E[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, as if typed on the command line and executed with Enter, and print out each stack level after evaluation (see `-l` option for stack level numbering). The option may be repeated to run several commands in order. In headless mode (`-H` option), output is to standard output, otherwise it is to standard error. |
 | -F[[`<whitespace>`]`<argument>`] | Similar to `-E`, but evaluates from a file. Using `-` as a file name reads from standard input. |

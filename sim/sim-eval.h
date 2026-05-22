@@ -42,11 +42,26 @@ struct sim_commands
     ~sim_commands() {}
 
     bool queue(cstring arg, bool print, bool file);
+    bool queue_snapshot(cstring arg);
     bool run(const std::string &cmd);
     void print_stack();
     void process_commands();
 
-    std::vector<std::string> commands;
+    enum opcode
+    {
+        EXECUTE,
+        PRINT,
+        SNAPSHOT
+    };
+    struct command
+    {
+        command(opcode op, cstring arg): op(op), arg(arg) {}
+        command(opcode op, const std::string &arg): op(op), arg(arg) {}
+        opcode      op;
+        std::string arg;
+    };
+
+    std::vector<command>     commands;
     bool                     headless;
     bool                     print_levels;
 };

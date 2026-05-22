@@ -33,6 +33,7 @@
 #include "renderer.h"
 #include "runtime.h"
 #include "settings.h"
+#include "sim-window.h"
 #include "tests.h"
 
 #include <cstdio>
@@ -101,30 +102,43 @@ bool sim_commands::queue(cstring arg, bool print, bool file)
         return false;
     }
 
-    std::string command;
+    std::string cmd;
     if (file)
     {
         if (strcmp(arg, "-"))
         {
             std::ifstream f(arg);
-            if (!read_stream(f, command, arg))
+            if (!read_stream(f, cmd, arg))
                 return false;
         }
         else
         {
-            if (!read_stream(std::cin, command, "standard input"))
+            if (!read_stream(std::cin, cmd, "standard input"))
                 return false;
         }
     }
     else
     {
-        command = arg;
+        cmd = arg;
     }
 
-    transliterate(command);
-    commands.emplace_back(command);
-    if (print)
-        commands.emplace_back();
+    transliterate(cmd);
+    commands.emplace_back(command(print ? PRINT : EXECUTE, cmd));
+    return true;
+}
+
+
+bool sim_commands::queue_snapshot(cstring arg)
+// ----------------------------------------------------------------------------
+//   Queue a snapshot request
+// ----------------------------------------------------------------------------
+{
+    if (!arg || !*arg)
+    {
+        fprintf(stderr, "Missing argument");
+        return false;
+    }
+    commands.emplace_back(command(SNAPSHOT, arg));
     return true;
 }
 
@@ -188,12 +202,25 @@ void sim_commands::process_commands()
 // ----------------------------------------------------------------------------
 {
     bool ran = !commands.empty();
-    for (const std::string &cmd : commands)
+    for (const auto  &cmd : commands)
     {
-        if (cmd.empty())
-            print_stack();
+        if (cmd.op == SNAPSHOT)
+        {
+            if (!MainWindow::screensave(cmd.arg.c_str()))
+            {
+                fprintf(stderr,
+                        "Error saving %s: %s\n",
+                        cmd.arg.c_str(),
+                        strerror(errno));
+                MainWindow::setExitCode(1);
+            }
+        }
         else
-            run(cmd);
+        {
+            run(cmd.arg);
+            if (cmd.op == PRINT)
+                print_stack();
+        }
     }
     commands.clear();
     if (ran && headless)
