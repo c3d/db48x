@@ -27,8 +27,6 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include "tests.h"
-
 #include "dmcp.h"
 #include "equations.h"
 #include "list.h"
@@ -40,6 +38,8 @@
 #include "types.h"
 #include "user_interface.h"
 
+#include "tests.h"
+
 #include <regex.h>
 #include <stdio.h>
 
@@ -49,8 +49,6 @@
 inline void srand48(long seed) { srand((unsigned int)seed); }
 inline long lrand48() { return ((long)rand() << 16) | rand(); }
 #endif
-
-extern bool run_tests;
 
 volatile uint test_command = 0;
 
@@ -183,7 +181,7 @@ EXTRA(settings,         "Recall and activate every RPL setting");
 EXTRA(commands,         "Parse every single RPL command");
 
 
-void tests::run(uint onlyCurrent)
+int tests::run(uint onlyCurrent)
 // ----------------------------------------------------------------------------
 //   Run all test categories
 // ----------------------------------------------------------------------------
@@ -312,8 +310,7 @@ void tests::run(uint onlyCurrent)
 
     RECORDER_TRACE(errors) = tracing;
 
-    if (run_tests)
-        exit(failures.size() ? 1 : 0);
+    return failures.empty() ? 0 : 1;
 }
 
 

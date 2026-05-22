@@ -212,13 +212,14 @@ MainWindow::MainWindow(QWidget *parent, bool console)
 #endif
 
     rpl.start();
-    if (console)
-        connect(&rpl, &QThread::finished, qApp, &QCoreApplication::quit);
+    connect(&rpl, &QThread::finished, this, &MainWindow::onRplFinished);
     if (run_tests)
     {
+        connect(&tests, &QThread::finished, this, &MainWindow::onTestsFinished);
         ui_ms_sleep(1000);      // In case we are loading a file
         tests.start();
     }
+
 }
 
 
@@ -227,8 +228,48 @@ MainWindow::~MainWindow()
 //  Destroy the main window
 // ----------------------------------------------------------------------------
 {
-    key_push(tests::EXIT_PGM);
+    if (tests.isRunning())
+        tests.wait();
+    if (rpl.isRunning())
+    {
+        key_push(tests::EXIT_PGM);
+        rpl.wait();
+    }
     record(sim_audio, "Deleting audio");
+}
+
+
+void MainWindow::onTestsFinished()
+// ----------------------------------------------------------------------------
+//   Tests completed: stop RPL and exit with pass/fail status
+// ----------------------------------------------------------------------------
+{
+    pendingExitCode = tests.exitCode;
+    requestShutdown();
+}
+
+
+void MainWindow::onRplFinished()
+// ----------------------------------------------------------------------------
+//   RPL thread ended: quit the Qt event loop
+// ----------------------------------------------------------------------------
+{
+    QCoreApplication::exit(pendingExitCode);
+}
+
+
+void MainWindow::requestShutdown()
+// ----------------------------------------------------------------------------
+//   Ask the RPL thread to exit; quit immediately if it already stopped
+// ----------------------------------------------------------------------------
+{
+    if (shutdownRequested)
+        return;
+    shutdownRequested = true;
+    if (rpl.isRunning())
+        key_push(tests::EXIT_PGM);
+    else
+        QCoreApplication::exit(pendingExitCode);
 }
 
 

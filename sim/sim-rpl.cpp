@@ -46,11 +46,10 @@ RPLThread::~RPLThread()
 //   Destructor
 // ----------------------------------------------------------------------------
 {
-    while (!isFinished())
-    {
-        if (key_remaining())
-            key_push(tests::EXIT_PGM);
-    }
+    if (isFinished())
+        return;
+    key_push(tests::EXIT_PGM);
+    wait();
 }
 
 

@@ -57,8 +57,8 @@ struct tests
           longpress(), failures(), explanation()
     { }
 
-    // Run all tests
-    void run(uint onlyCurrent);
+    // Run all tests; return 0 if all passed, 1 if any failed
+    int run(uint onlyCurrent);
 
     // Individual test categories
     void reset_settings();
