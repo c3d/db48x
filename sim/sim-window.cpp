@@ -188,19 +188,22 @@ MainWindow::MainWindow(QWidget *parent, bool console)
 
     setlocale(LC_ALL, "C");
 
+    if (!console)
+    {
 #ifndef ANDROID
-    // Restore last window geometry if we have one (must come before the
-    // manual layout pass below, since we disabled automatic layout)
-    QSettings settings;
-    QByteArray savedGeometry = settings.value("MainWindow/geometry").toByteArray();
-    if (!savedGeometry.isEmpty())
-        restoreGeometry(savedGeometry);
+        // Restore last window geometry if we have one (must come before the
+        // manual layout pass below, since we disabled automatic layout)
+        QSettings settings;
+        QByteArray savedGeometry =
+            settings.value("MainWindow/geometry").toByteArray();
+        if (!savedGeometry.isEmpty())
+            restoreGeometry(savedGeometry);
 #endif
 
-    // Set initial geometry manually since we disabled layout management
-    QResizeEvent initialResize(size(), size());
-    resizeEvent(&initialResize);
-
+        // Set initial geometry manually since we disabled layout management
+        QResizeEvent initialResize(size(), size());
+        resizeEvent(&initialResize);
+    }
 #ifdef ANDROID
     extract_android_assets();
 

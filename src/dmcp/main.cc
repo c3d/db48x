@@ -612,7 +612,7 @@ extern "C" void program_main()
                    key, last_key, test_command);
             if (key == tests::EXIT_PGM || key == tests::SAVE_PGM)
             {
-                if (!rplcmds.headless)
+                if (key != tests::EXIT_PGM || !rplcmds.headless)
                 {
                     cstring path = get_reset_state_file();
                     printf("Exit: saving state to %s\n", path);

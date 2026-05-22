@@ -349,24 +349,7 @@ static bool sim_parse_args(int argc, char *argv[])
 }
 
 
-static void sim_select_platform(bool headless)
-// ----------------------------------------------------------------------------
-//   Choose the Qt platform plugin for headless runs
-// ----------------------------------------------------------------------------
-//   The offscreen plugin has no real "Sans Serif" font on macOS and spends
-//   ~100 ms building alias tables (qt.qpa.fonts warning). On macOS, keep the
-//   native platform and simply do not show the window. Linux headless CI still
-//   needs offscreen when there is no display server.
-{
-    if (!headless || !qEnvironmentVariableIsEmpty("QT_QPA_PLATFORM"))
-        return;
-#if defined(Q_OS_LINUX)
-    qputenv("QT_QPA_PLATFORM", "offscreen");
-#endif
-}
-
-
-static void sim_configure_application_font(QApplication &app)
+static void configure_fonts(QApplication &app)
 // ----------------------------------------------------------------------------
 //   Set a concrete application font (offscreen needs an explicit family)
 // ----------------------------------------------------------------------------
@@ -513,6 +496,7 @@ int main(int argc, char *argv[])
 
     // Indicate the first two-byte opcode
     if (!rplcmds.headless)
+    {
         fprintf(stderr,
                 "%s version %s\n"
                 "Last single-byte opcode is %s\n"
@@ -525,12 +509,16 @@ int main(int argc, char *argv[])
                 object::name(object::id(128)),
                 uint(object::NUM_IDS),
                 HELPFILE_NAME);
-
+    }
+    else
+    {
+        qputenv("QT_QPA_PLATFORM", "offscreen");
+        qputenv("QT_LOGGING_RULES", "*.warning=false");
+    }
 
 #if QT_VERSION < 0x060000
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif // QT version 6
-
 
     QCoreApplication::setOrganizationName("DB48X");
     QCoreApplication::setOrganizationDomain("48calc.org");
@@ -545,14 +533,10 @@ int main(int argc, char *argv[])
     QDir::setCurrent(files);
     QDir::current().mkdir("screens");
 
-    sim_select_platform(rplcmds.headless);
-
     QApplication a(argc, argv);
-    sim_configure_application_font(a);
-
+    configure_fonts(a);
     MainWindow w(nullptr, rplcmds.headless);
-    if (!rplcmds.headless)
-        w.show();
+    w.show();
 
     int rc = a.exec();
     return rc;

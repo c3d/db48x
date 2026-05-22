@@ -30,7 +30,7 @@ The simulator can be started with the command-line options listed in the table b
 | -D[[`<whitespace>`]`<argument>`] | Set the pattern of recorder traces to show when a test fails. |
 | -E[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, as if typed on the command line and executed with Enter, and print out each stack level after evaluation (see `-l` option for stack level numbering). The option may be repeated to run several commands in order. In headless mode (`-H` option), output is to standard output, otherwise it is to standard error. |
 | -F[[`<whitespace>`]`<argument>`] | Similar to `-E`, but evaluates from a file. Using `-` as a file name reads from standard input. |
-| -H | Headless mode: do not show a window, and exit when startup commands finish. Use with `-E` for batch scripting. On Linux, uses the offscreen Qt platform; on macOS, the native platform with a hidden window. |
+| -H | Headless mode: do not show a window, and exit when startup commands finish. Use with `-E` for batch scripting. |
 | -I | Initialize the user's environment. WARNING: This may overwrite user configuration with defaults. |
 | -K | Simulate typing of individual keys during tests. |
 | -N | Disable beeps. Use this if you get error messages about audio drivers. |

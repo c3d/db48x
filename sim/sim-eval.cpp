@@ -187,6 +187,7 @@ void sim_commands::process_commands()
 //   Run queued -e or -E command lines once at simulator startup
 // ----------------------------------------------------------------------------
 {
+    bool ran = !commands.empty();
     for (const std::string &cmd : commands)
     {
         if (cmd.empty())
@@ -195,6 +196,6 @@ void sim_commands::process_commands()
             run(cmd);
     }
     commands.clear();
-    if (headless)
+    if (ran && headless)
         key_push(tests::EXIT_PGM);
 }
