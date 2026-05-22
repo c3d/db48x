@@ -246,7 +246,7 @@ static int state_save_callback(cstring fpath, cstring fname, void *data)
     // Display the name of the file being saved
     if (data != STATE_IO_SILENT)
     {
-      ui.draw_message("Saving state...", fname);
+        ui.draw_message("Saving state...", fname);
     }
 
     // Open save file name
