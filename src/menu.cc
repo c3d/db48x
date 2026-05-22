@@ -623,14 +623,14 @@ MENU(PolynomialsMenu,
      "QuoRem",  ID_Div2,
 
      "FRoots",  ID_Unimplemented,
-     "MRoot",   ID_Unimplemented,
-     "MSolvr",  ID_Unimplemented,
+     "MRoot",   ID_MultipleEquationsSolver,
+     "MSolvr",  ID_SolverMenu,
      "PCoef",   ID_Unimplemented,
      "PRoot",   ID_Unimplemented,
      "Root",    ID_Root,
 
-     "Solve",   ID_Unimplemented,
-     "TVMRoot", ID_Unimplemented,
+     "Solve",   ID_Root,
+     "TVMRoot", ID_TVMRoot,
      "XRoot",   ID_xroot,
      "Zeros",   ID_Unimplemented,
      "FCoef",   ID_Unimplemented);
@@ -844,7 +844,7 @@ MENU(AlgebraMenu,
      "∑",               ID_Sum,
      "∏",               ID_Product,
      "∆",               ID_Unimplemented,
-     "→Qπ",             ID_Unimplemented,
+     "→Qπ",             ID_ToQuotient,
 
      "Ⓓ",               ID_AlgebraConfiguration,
      "ⓧ",               ID_AlgebraVariable,
@@ -864,7 +864,7 @@ MENU(ArithmeticMenu,
      "∆",               ID_Unimplemented,
      "Taylor",          ID_Unimplemented,
 
-     "Show",            ID_Unimplemented,
+     "Show",            ID_Show,
      "Quote",           ID_Unimplemented,
      "|",               ID_Where,
      "=",               ID_SelfInsert,
@@ -877,7 +877,7 @@ MENU(CalculationMenu,
 // ----------------------------------------------------------------------------
      "LName",           ID_LName,
      "XVars",           ID_XVars,
-     "Deriv",           ID_Unimplemented,
+     "Deriv",           ID_Derivative,
      "DerivX",          ID_Unimplemented,
      "IBF",             ID_Unimplemented,
      "IntVX",           ID_Unimplemented,
@@ -1266,7 +1266,7 @@ MENU(NumericalSolverMenu,
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
-     "Root",    ID_Unimplemented,
+     "Root",    ID_Root,
 
      ID_SolverMenu);
 
@@ -1276,7 +1276,7 @@ MENU(DifferentialSolverMenu,
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
-     "Root",    ID_Unimplemented,
+     "Root",    ID_Root,
 
      ID_SolverMenu);
 
@@ -1287,7 +1287,7 @@ MENU(SymbolicSolverMenu,
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
-     "Root",    ID_Unimplemented,
+     "Root",    ID_Root,
      "Isolate", ID_Isolate,
 
      ID_SolverMenu);
@@ -1298,7 +1298,7 @@ MENU(PolynomialSolverMenu,
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
-     "Root",    ID_Unimplemented,
+     "Root",    ID_Root,
 
      ID_SolverMenu);
 
@@ -1308,7 +1308,7 @@ MENU(LinearSolverMenu,
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
      "Indep",   ID_Unimplemented,
-     "Root",    ID_Unimplemented,
+     "Root",    ID_Root,
 
      ID_SolverMenu);
 
@@ -1318,7 +1318,7 @@ MENU(MultiSolverMenu,
 // ----------------------------------------------------------------------------
      "Eqs",     ID_Unimplemented,
      "Indeps",  ID_Unimplemented,
-     "MRoot",   ID_Unimplemented,
+     "MRoot",   ID_MultipleEquationsSolver,
 
      ID_SolverMenu);
 
@@ -1335,9 +1335,9 @@ MENU(PowersMenu,
      ID_cubed,  ID_cbrt,
 
      ID_pow, ID_xroot,
-     "FstSet",  ID_Unimplemented,
-     "LstSet",  ID_Unimplemented,
-     "popcnt",  ID_Unimplemented,
+     "FstSet",  ID_FirstBitSet,
+     "LstSet",  ID_LastBitSet,
+     "popcnt",  ID_CountBits,
      "Hyper",   ID_HyperbolicMenu);
 
 MENU(FractionsMenu,
@@ -1403,7 +1403,7 @@ MENU(ClearThingsMenu,
      "Stack",   ID_ClearStack,
      "Purge",   ID_Purge,
      "Stats",   ID_ClearData,
-     "Mem",     ID_Unimplemented,
+     "Mem",     ID_Mem,
      "Error",   ID_err0,
      "LCD",     ID_ClLCD);
 
@@ -1585,7 +1585,7 @@ MENU(PrintingMenu,
 //   Printing operations
 // ----------------------------------------------------------------------------
      "Print",   ID_Unimplemented,
-     "Screen",  ID_Unimplemented,
+     "Screen",  ID_ScreenCapture,
      "Disk",    ID_Unimplemented,
      "IR",      ID_Unimplemented);
 
@@ -1593,13 +1593,13 @@ MENU(IOMenu,
 // ----------------------------------------------------------------------------
 //   I/O operations
 // ----------------------------------------------------------------------------
-     "Save",                            ID_Unimplemented,
+     "Save",                            ID_SaveState,
      "Load",                            ID_Unimplemented,
      "Print",                           ID_Unimplemented,
      "Voltage",                         ID_BatteryVoltage,
      "USB?",                            ID_USBPowered,
      "Low?",                            ID_LowBattery,
-     "Save",                            ID_Unimplemented,
+     "Save",                            ID_SaveState,
      MinimumBatteryVoltage::label,      ID_MinimumBatteryVoltage);
 
 MENU(FilesMenu,
@@ -1684,7 +1684,7 @@ MENU(GraphicsMenu,
      "→Bitmap", ID_ToBitmap,
      "→HPGrob", ID_ToHPGrob,
 #ifdef CONFIG_COLOR
-     "→Pixmap", ID_ToBitmap,
+     "→Pixmap", ID_ToPixmap,
 #else
      "→Pixmap", ID_Unimplemented,
 #endif // CONFIG_COLOR
@@ -1694,7 +1694,7 @@ MENU(GraphicsMenu,
      "BlBitmap",ID_BlankBitmap,
      "BlGrob",  ID_BlankGrob,
 #ifdef CONFIG_COLOR
-     "BlPixmap",ID_BlankBitmap,
+     "BlPixmap", ID_BlankPixmap,
 #else
      "BlPixmap", ID_Unimplemented,
 #endif // CONFIG_COLOR

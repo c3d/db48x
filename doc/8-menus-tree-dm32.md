@@ -112,7 +112,7 @@ Access: 🟦 D (yˣ); [SymbolicMenu](#symbolicmenu) F6
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Ⓓ](#algebraconfiguration) | [ⓧ](#algebravariable) | [Stoⓧ](#storealgebravariable) | [Final](#finalalgebraresults) | &Wild | \[[Symb](#symbolicmenu)\] |
-| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _→Qπ_ |
+| [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | [→Qπ](#q-1) |
 | [↓Match](#match-1) | [↑Match](#match) | [Isolate](#isolate) | Apply | Subst | [\|](#where) |
 
 ### AnglesMenu
@@ -132,7 +132,7 @@ Access: [SymbolicMenu](#symbolicmenu) 🟨 F1
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| _Show_ | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
+| [Show](#show) | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
 | [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
 
 ### BasesMenu
@@ -173,7 +173,7 @@ Access: [SymbolicMenu](#symbolicmenu) 🟨 F2
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 | _Limit_ | _Serie_ | _Taylor_ | \[[Symb](#symbolicmenu)\] |   |   |
-| [LName](#listexpressionnames) | [XVars](#expressionvariables) | _Deriv_ | _DerivX_ | _IBF_ | _IntVX_ |
+| [LName](#listexpressionnames) | [XVars](#expressionvariables) | [Deriv](#derivative) | _DerivX_ | _IBF_ | _IntVX_ |
 
 ### CircularMenu
 
@@ -193,7 +193,7 @@ Access: 🟨 (⌫)
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Stack](#clearstack) | [Purge](#purge) | Stats | _Mem_ | Error | [LCD](#clearlcd) |
+| [Stack](#clearstack) | [Purge](#purge) | Stats | [Mem](#availablememory) | Error | [LCD](#clearlcd) |
 
 ### CompareMenu
 
@@ -247,7 +247,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F4; [SymbolicMenu](#symbolicmenu) 🟦 F2
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### DisplayModesMenu Reference
 
@@ -345,9 +345,9 @@ Access: 🟦 (.)
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [BlankBitmap](#blankbitmap) | _Unimplemented_ | [GraphicPicture](#pict) | \[[Plot](#plotmenu)\] |   |   |
+| [BlankPixmap](#blankpixmap) | _Unimplemented_ | [GraphicPicture](#pict) | \[[Plot](#plotmenu)\] |   |   |
 | _Unimplemented_ | [→Grob](#togrob) | [Blank](#blankgraphic) | [BlBitmap](#blankbitmap) | [BlGrob](#blankgrob) | ◀ |
-| [LCD→](#fromlcd) | [→LCD](#tolcd) | [→Bitmap](#tobitmap) | [→HPGrob](#tohpgrob) | [→Bitmap](#tobitmap) | ▶ |
+| [LCD→](#fromlcd) | [→LCD](#tolcd) | [→Bitmap](#tobitmap) | [→HPGrob](#tohpgrob) | [→Pixmap](#topixmap) | ▶ |
 
 ### HyperbolicMenu
 
@@ -376,8 +376,8 @@ Access: 🟦 (-); [MainMenu](#mainmenu-reference) 🟦 F5
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| _Save_ | [MinimumBatteryVoltage](#minimumbatteryvoltage) |   |   |   |   |
-| _Save_ | _Load_ | _Print_ | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
+| [Save](#savestate) | [MinimumBatteryVoltage](#minimumbatteryvoltage) |   |   |   |   |
+| [Save](#savestate) | _Load_ | _Print_ | [Voltage](#batteryvoltage) | [USB?](#usbpowered) | [Low?](#lowbattery) |
 
 ### LinearSolverMenu
 
@@ -387,7 +387,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F6
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### ListMenu
 
@@ -537,7 +537,7 @@ Access: [SolverMenu](#solvermenu) 🟦 F1
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| _Eqs_ | _Indeps_ | _MRoot_ | \[[SolverMenu](#solvermenu)\] |   |   |
+| _Eqs_ | _Indeps_ | [MRoot](#multipleequationssolver) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### NumbersMenu
 
@@ -555,7 +555,7 @@ Access: 🟦 W (×)
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### ObjectMenu
 
@@ -617,8 +617,8 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| _Solve_ | _TVMRoot_ | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
-| _FRoots_ | _MRoot_ | _MSolvr_ | _PCoef_ | _PRoot_ | [Root](#root) |
+| [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
+| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | _PCoef_ | _PRoot_ | [Root](#root) |
 | `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
 
 ### PolynomialSolverMenu
@@ -629,7 +629,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F5
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### PowersMenu
 
@@ -637,7 +637,7 @@ Access: 🟨 E (1/x); [HyperbolicMenu](#hyperbolicmenu) 🟨 F1; [MathMenu](#mat
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [pow](#pow) | [xroot](#xroot) | _FstSet_ | _LstSet_ | _popcnt_ | \[[Hyper](#hyperbolicmenu)\] |
+| [pow](#pow) | [xroot](#xroot) | FstSet | LstSet | popcnt | \[[Hyper](#hyperbolicmenu)\] |
 | [exp2](#exp2) | log2 | [expm1](#expm1) | [ln1p](#ln1p) | x³ | [∛](#cbrt) |
 | [exp](#exp) | [ln](#ln) | [exp10](#exp10) | [log10](#log10) | [x²](#sq) | [√](#sqrt) |
 
@@ -647,7 +647,7 @@ Access: 🟨 E (1/x); [HyperbolicMenu](#hyperbolicmenu) 🟨 F1; [MathMenu](#mat
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| _Print_ | _Screen_ | _Disk_ | _IR_ |   |   |
+| _Print_ | [Screen](#screencapture) | _Disk_ | _IR_ |   |   |
 
 ### ProbabilitiesMenu
 
@@ -725,7 +725,7 @@ Access: [MathMenu](#mathmenu-reference) 🟦 F1
 
 ### SolverMenu
 
-Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
+Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialsMenu](#polynomialsmenu) 🟨 F3; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -803,7 +803,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F3
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | _Root_ | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
+| [Eq](#equation) | _Indep_ | [Root](#root) | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
 
 ### TestsMenu
 
