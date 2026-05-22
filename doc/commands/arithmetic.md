@@ -210,11 +210,19 @@ Get percentage of a total
 
 
 ## GCD
-Greatest common divisor
+Greatest common divisor of two integers.
+
+`Y` `X` `GCD` → `gcd(X,Y)`
+
+The result is always non-negative. `gcd(0,0)` is `0`.
 
 
 ## LCM
-Least common multiple
+Least common multiple of two integers.
+
+`Y` `X` `LCM` → `lcm(X,Y)`
+
+The result is always non-negative. If either argument is `0`, the result is `0`.
 
 
 ## IQUOT

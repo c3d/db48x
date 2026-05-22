@@ -545,7 +545,7 @@ Access: 🟦 W (×)
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) |   |   |
+| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) | [GCD](#gcd) | [LCM](#lcm) |
 | [→Num](#num) | [→Q](#q) | [→Qπ](#q-1) | R#Seed | [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |
 | Σ | ∏ | QuoRem | [Factors](#factors) | Ran# | [Random](#random) |
 

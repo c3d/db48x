@@ -739,6 +739,8 @@ CMD(Factors)
 CMD(IsPrime)
 NAMED(NextPrime,"NextPr")
 NAMED(PreviousPrime,"PrevPr")
+OP(GCD, "GreatestCommonDenominator")
+OP(LCM, "LeastCommonMultiple")
 
 NAMED(Div2, "QuoRem")                   ALIAS(Div2, "IDiv2")
                                         ALIAS(Div2, "QuotientRemainder")

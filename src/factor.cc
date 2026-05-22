@@ -708,6 +708,105 @@ static bignum_p factorable_value_from_stack()
 }
 
 
+static bignum_p integer_value_from_stack(uint level)
+// ----------------------------------------------------------------------------
+//   Promote an integer on the stack to bignum
+// ----------------------------------------------------------------------------
+{
+    object_p xo = object::strip(rt.stack(level));
+    if (!xo)
+        return nullptr;
+
+    if (!object::is_integer(xo->type()))
+    {
+        rt.type_error();
+        return nullptr;
+    }
+
+    return bignum::promote(xo);
+}
+
+
+static bignum_p bignum_abs(bignum_r x)
+// ----------------------------------------------------------------------------
+//   Return the absolute value of a bignum
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    if (x->type() == object::ID_neg_bignum)
+        return -x;
+    return x;
+}
+
+
+static bool integer_pair_from_stack(bignum_g &xa, bignum_g &xb)
+// ----------------------------------------------------------------------------
+//   Read two integers from the stack (X in level 2, Y in level 1)
+// ----------------------------------------------------------------------------
+{
+    bignum_g x = integer_value_from_stack(1);
+    bignum_g y = integer_value_from_stack(0);
+    if (!x || !y)
+        return false;
+    xa = bignum_abs(x);
+    xb = bignum_abs(y);
+    return xa && xb;
+}
+
+
+static object::result integer_binary_result(bignum_r result)
+// ----------------------------------------------------------------------------
+//   Drop one argument and push result on stack
+// ----------------------------------------------------------------------------
+{
+    if (!result)
+        return object::ERROR;
+    if (rt.drop() && rt.top(result))
+        return object::OK;
+    return object::ERROR;
+}
+
+
+COMMAND_BODY(GCD)
+// ----------------------------------------------------------------------------
+//   Greatest common divisor of two integers
+// ----------------------------------------------------------------------------
+{
+    bignum_g xa, xb;
+    if (!integer_pair_from_stack(xa, xb))
+        return ERROR;
+
+    bignum_g r = bignum::gcd(xa, xb);
+    return integer_binary_result(r);
+}
+
+
+COMMAND_BODY(LCM)
+// ----------------------------------------------------------------------------
+//   Least common multiple of two integers
+// ----------------------------------------------------------------------------
+{
+    bignum_g xa, xb;
+    if (!integer_pair_from_stack(xa, xb))
+        return ERROR;
+
+    if (xa->is_zero() || xb->is_zero())
+        return integer_binary_result(bignum::make(0));
+
+    bignum_g g = bignum::gcd(xa, xb);
+    if (!g)
+        return ERROR;
+
+    bignum_g prod = xa * xb;
+    if (!prod)
+        return ERROR;
+
+    bignum_g r = prod / g;
+    return integer_binary_result(r);
+}
+
+
 static object::result adjacent_prime_command(bool next)
 // ----------------------------------------------------------------------------
 //   Command for adjacent prime number

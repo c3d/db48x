@@ -121,4 +121,8 @@ COMMAND_DECLARE(Factors, 1);
 COMMAND_DECLARE(NextPrime, 1);
 COMMAND_DECLARE(PreviousPrime, 1);
 
+// GCD / LCM: greatest common divisor and least common multiple of integers
+COMMAND_DECLARE(GCD, 2);
+COMMAND_DECLARE(LCM, 2);
+
 #endif // FACTOR_H

@@ -487,7 +487,9 @@ MENU(NumbersMenu,
      "→Int",    ID_ToInteger,
      "IsPrime", ID_IsPrime,
      "NextPr",  ID_NextPrime,
-     "PrevPr",  ID_PreviousPrime);
+     "PrevPr",  ID_PreviousPrime,
+     "GCD",     ID_GCD,
+     "LCM",     ID_LCM);
 
 
 MENU(AnglesMenu,

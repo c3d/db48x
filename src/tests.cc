@@ -13393,6 +13393,40 @@ void tests::prime_number_tests()
               "{ MaxFactorIterations } Purge Std", ENTER).noerror()
         .test("147573952589676412927", ENTER, ID_Factors)
         .expect("{ 193 707 721 1 761 838 257 287 1 }", 10000);
+
+    // GCD and LCM
+    step("GCD(48,18) = 6")
+        .test(CLEAR, "48", ENTER, "18", ENTER, ID_GCD).expect("6");
+    step("GCD(17,19) = 1")
+        .test(CLEAR, "17", ENTER, "19", ENTER, ID_GCD).expect("1");
+    step("GCD(0,0) = 0")
+        .test(CLEAR, "0", ENTER, "0", ENTER, ID_GCD).expect("0");
+    step("GCD(-48,18) = 6")
+        .test(CLEAR, "-48", ENTER, "18", ENTER, ID_GCD).expect("6");
+    step("LCM(12,18) = 36")
+        .test(CLEAR, "12", ENTER, "18", ENTER, ID_LCM).expect("36");
+    step("LCM(4,9) = 36")
+        .test(CLEAR, "4", ENTER, "9", ENTER, ID_LCM).expect("36");
+    step("LCM(0,12) = 0")
+        .test(CLEAR, "0", ENTER, "12", ENTER, ID_LCM).expect("0");
+    step("LCM(12,0) = 0")
+        .test(CLEAR, "12", ENTER, "0", ENTER, ID_LCM).expect("0");
+    step("GCD of large integers")
+        .test(CLEAR,
+              "2305843009213693951",
+              ENTER,
+              "618970019642690137449562111",
+              ENTER,
+              ID_GCD)
+        .expect("1");
+    step("LCM of coprime large integers")
+        .test(CLEAR,
+              "2147483647",
+              ENTER,
+              "9999999967",
+              ENTER,
+              ID_LCM)
+        .expect("21 474 836 399 133 039 649", 10000);
 }
 
 

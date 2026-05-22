@@ -12727,11 +12727,19 @@ Get percentage of a total
 
 
 ## GCD
-Greatest common divisor
+Greatest common divisor of two integers.
+
+`Y` `X` `GCD` → `gcd(X,Y)`
+
+The result is always non-negative. `gcd(0,0)` is `0`.
 
 
 ## LCM
-Least common multiple
+Least common multiple of two integers.
+
+`Y` `X` `LCM` → `lcm(X,Y)`
+
+The result is always non-negative. If either argument is `0`, the result is `0`.
 
 
 ## IQUOT
@@ -20910,7 +20918,7 @@ Access: 🟦 W (×)
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) |   |   |
+| →Int | [IsPrime](#isprime) | [NextPr](#nextpr) | [PrevPr](#prevpr) | [GCD](#gcd) | [LCM](#lcm) |
 | [→Num](#num) | [→Q](#q) | [→Qπ](#q-1) | R#Seed | [RandomGeneratorBits](#randomgeneratorbits) | [RandomGeneratorOrder](#randomgeneratororder) |
 | Σ | ∏ | QuoRem | [Factors](#factors) | Ran# | [Random](#random) |
 
