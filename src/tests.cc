@@ -9461,6 +9461,14 @@ void tests::symbolic_differentiation()
         .test(CLEAR, "'asin(A*X^2)+acos(X*B)+atan(C*X^6)' 'X'",
               LENGTHY(3000), ID_Derivative)
         .expect("'2·A·X÷√(1-(A·X²)²)+(-B)÷√(1-(X·B)²)+6·C·X↑5÷((C·X↑6)²+1)'");
+    step("Derivative of secant, cosecant, cotangent")
+        .test(CLEAR, "'sec(A*X^2)+csc(X*B)+cot(C*X)' 'X'",
+              LENGTHY(3000), ID_Derivative)
+        .expect("'2·A·X·sec(A·X²)·tan(A·X²)+(-B)·csc(X·B)·cot(X·B)+(-C)·(csc(C·X))²'");
+    step("Derivative of arc-secant, arc-cosecant, arc-cotangent")
+        .test(CLEAR, "'asec(A*X^2)+acsc(X*B)+acot(C*X^6)' 'X'",
+              LENGTHY(3000), ID_Derivative)
+        .expect("'2·A·X÷(A·X²·√((A·X²)²-1))+(-B)÷(X·B·√((X·B)²-1))+(-(6·C·X↑5))÷((C·X↑6)²+1)'");
     step("Derivative of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(A*X)+acosh(X*B)+atanh(C+X)' 'X'",
               LENGTHY(3000), ID_Derivative)
@@ -9575,6 +9583,14 @@ void tests::symbolic_integration()
         .test(CLEAR, "'asin(A*X+B)+acos(X*B+A*(X+1))+atan(C*(X-6))' 'X'",
               LENGTHY(20000), ID_Primitive)
         .expect("'((A·X+B)·sin⁻¹(A·X+B)+√(1-(A·X+B)²))÷A+((X·B+A·(X+1))·cos⁻¹(X·B+A·(X+1))-√(1-(X·B+A·(X+1))²))÷(B+A)+(C·(X-6)·tan⁻¹(C·(X-6))-ln((C·(X-6))²+1)÷2)÷C'");
+    step("Primitive of secant, cosecant, cotangent")
+        .test(CLEAR, "'sec(A*X+3)+csc(X*B-5)+cot(Z-C*X)' 'X'",
+              LENGTHY(10000), ID_Primitive)
+        .expect("'ln (abs(sec(A·X+3)+tan(A·X+3)))÷A+ln (abs (tan((X·B-5)÷2)))÷B+ln (abs (sin(Z-C·X)))÷C'");
+    step("Primitive of arc-secant, arc-cosecant, arc-cotangent")
+        .test(CLEAR, "'asec(A*X+B)+acsc(X*B+A*(X+1))+acot(C*(X-6))' 'X'",
+              LENGTHY(20000), ID_Primitive)
+        .expect("'((A·X+B)·sec⁻¹(A·X+B)-√((A·X+B)²-1))÷A+((X·B+A·(X+1))·csc⁻¹(X·B+A·(X+1))+√((X·B+A·(X+1))²-1))÷(B+A)+(C·(X-6)·cot⁻¹(C·(X-6))+ln((C·(X-6))²+1)÷2)÷C'");
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
               LENGTHY(20000), ID_Primitive)
