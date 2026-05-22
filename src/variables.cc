@@ -253,7 +253,49 @@ object_p directory::store(object_g name, object_g value)
     case ID_symbol:
         break;
 
-#define ID(n)
+    case ID_list:
+    case ID_array:
+    {
+        directory_g dir = this;
+        object_g subname = nullptr;
+        for (object_p obj : *list_p(+name))
+        {
+            if (obj->type() == ID_Home)
+            {
+                dir = (directory_p) rt.homedir();
+                subname = nullptr;
+            }
+            else
+            {
+                if (subname)
+                {
+                    bool found = false;
+                    if (object_p named = dir->recall(subname))
+                    {
+                        if (directory_p subdir = named->as<directory>())
+                        {
+                            dir = subdir;
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                    {
+                        rt.directory_path_error();
+                        return nullptr;
+                    }
+                }
+                subname = obj;
+            }
+        }
+        if (!subname)
+        {
+            rt.undefined_name_error();
+            return nullptr;
+        }
+        return ((directory *) +dir)->store(subname, value);
+    }
+
+        #define ID(n)
 #define SETTING(Name, Low, High, Init)          \
     case ID_##Name:
 #define FLAG(Enable, Disable)                   \
@@ -502,6 +544,37 @@ object_p directory::recall(object_p name) const
             return expression::dependent_value
                 ? *expression::dependent_value : nullptr;
         break;
+    }
+
+    case ID_list:
+    case ID_array:
+    {
+        directory_g dir = this;
+        object_g result = nullptr;
+        for (object_p obj : *list_p(name))
+        {
+            if (obj->type() == ID_Home)
+            {
+                dir = (directory_p) rt.homedir();
+            }
+            else if (object_p named = dir->recall(obj))
+            {
+                if (result)
+                {
+                    rt.directory_path_error();
+                    return nullptr;
+                }
+                if (directory_p subdir = named->as<directory>())
+                    dir = subdir;
+                else
+                    result = named;
+            }
+        }
+        if (!result)
+            result = +dir;
+        if (!result)
+            rt.undefined_name_error();
+        return result;
     }
 
 #define ID(n)

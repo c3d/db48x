@@ -2256,6 +2256,16 @@ void tests::global_variables()
         .test(CLEAR, "242 'Foo' STO", ENTER).noerror();
     step("Recall from subdirectory")
         .test(CLEAR, "Foo", ENTER).expect("242");
+    step("Recall with relative path")
+        .test(CLEAR, "{ Foo } RCL", ENTER).expect("242");
+    step("Recall with absolute path")
+        .test(CLEAR, "{ Home DirTest Foo } RCL", ENTER).expect("242");
+    step("Store with relative path")
+        .test(CLEAR, "342 { Foo } STO", ENTER).got()
+        .test(CLEAR, "{ Home DirTest Foo } RCL", ENTER).expect("342");
+    step("Store with absolute path")
+        .test(CLEAR, "442 { Home DirTest Foo } STO", ENTER).got()
+        .test(CLEAR, "{ Foo } RCL", ENTER).expect("442");
     step("Store another variable in subdirectory")
         .test(CLEAR, "\"Glop\" 'Baz' STO", ENTER).noerror();
     step("List variables in subdirectory")
@@ -2293,13 +2303,13 @@ void tests::global_variables()
         .error("Cannot purge active directory");
 
     step("Find variable from level above")
-        .test(CLEAR, "Foo", ENTER).expect("242");
+        .test(CLEAR, "Foo", ENTER).expect("442");
     step("Create local variable")
         .test(CLEAR, "\"Hello\" 'Foo' sto", ENTER).noerror();
     step("Local variable hides variable above")
         .test(CLEAR, "Foo", ENTER).expect("\"Hello\"");
     step("Updir shows shadowed variable again")
-        .test(CLEAR, "Updir Foo", ENTER).expect("242");
+        .test(CLEAR, "Updir Foo", ENTER).expect("442");
     step("Two independent variables with the same name")
         .test(CLEAR, "DirTest2 Foo", ENTER).expect("\"Hello\"");
     step("Cleanup")
