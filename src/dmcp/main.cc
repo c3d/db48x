@@ -584,7 +584,7 @@ extern "C" void program_main()
     // Initialization
     program_init();
 #if SIMULATOR && !WASM
-    process_sim_eval_commands();
+    rplcmds.process_commands();
 #endif // SIMULATOR && !WASM
     redraw_lcd(true);
     last_keystroke_time = program::read_time();
@@ -612,7 +612,7 @@ extern "C" void program_main()
                    key, last_key, test_command);
             if (key == tests::EXIT_PGM || key == tests::SAVE_PGM)
             {
-                if (!sim_eval_headless)
+                if (!rplcmds.headless)
                 {
                     cstring path = get_reset_state_file();
                     printf("Exit: saving state to %s\n", path);
@@ -796,16 +796,6 @@ void process_test_commands()
     else if (test_command == tests::START_TEST)
     {
         program::read_battery();
-    }
-    else if (test_command == tests::EVAL_LINE)
-    {
-        record(tests_rpl, "Evaluating command line [%s]", sim_eval_pending_line());
-        sim_eval_run(sim_eval_pending_line());
-    }
-    else if (test_command == tests::PRINT_STACK)
-    {
-        record(tests_rpl, "Printing stack to stdout");
-        sim_eval_print_stack();
     }
     if (!ui.showing_graphics())
         redraw_lcd(true);

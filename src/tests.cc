@@ -224,7 +224,6 @@ void tests::run(uint onlyCurrent)
         keyboard_entry();
         data_types();
         editor_operations();
-        sim_eval_command();
         stack_operations();
         interactive_stack_operations();
         arithmetic();
@@ -1533,25 +1532,6 @@ void tests::interactive_stack_operations()
         .test(ENTER, CLEAR, "123 456 789 ABC DEF GHI", ENTER,
               UP, UP, UP, RSHIFT, F5, RSHIFT, F6, ENTER)
        .got("3", "'GHI'", "'DEF'", "789", "'ABC'", "456", "123");
-}
-
-
-void tests::sim_eval_command()
-// ----------------------------------------------------------------------------
-//   Test simulator -e command line evaluation
-// ----------------------------------------------------------------------------
-{
-    BEGIN(sim_eval);
-
-    step("Evaluate command line at startup")
-        .test(CLEAR)
-        .eval("1 2 +")
-        .expect("3");
-
-    step("Print full stack after evaluation")
-        .test(CLEAR, "1", ENTER, "2", ENTER)
-        .print_stack()
-        .expect("2");
 }
 
 
@@ -16221,25 +16201,6 @@ tests &tests::rpl_command(uint command, uint extrawait)
         fail();
     }
     return *this;
-}
-
-
-tests &tests::eval(cstring line, uint extrawait)
-// ----------------------------------------------------------------------------
-//   Evaluate a command line on the RPL thread (as with sim -e)
-// ----------------------------------------------------------------------------
-{
-    sim_eval_set_pending(line);
-    return rpl_command(EVAL_LINE, extrawait);
-}
-
-
-tests &tests::print_stack(uint extrawait)
-// ----------------------------------------------------------------------------
-//   Print all stack levels on the RPL thread (as with sim -E)
-// ----------------------------------------------------------------------------
-{
-    return rpl_command(PRINT_STACK, extrawait);
 }
 
 

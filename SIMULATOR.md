@@ -28,7 +28,8 @@ The simulator can be started with the command-line options listed in the table b
 | Option | Description |
 | --- | --- |
 | -D[[`<whitespace>`]`<argument>`] | Set the pattern of recorder traces to show when a test fails. |
-| -E[[`<whitespace>`]`<argument>`] | Like `-e`, but also prints every stack level after each command (bottom of stack first). With the normal GUI, output goes to stderr; with `-H`, to stdout. The option may be repeated. |
+| -E[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, as if typed on the command line and executed with Enter, and print out each stack level after evaluation (see `-l` option for stack level numbering). The option may be repeated to run several commands in order. In headless mode (`-H` option), output is to standard output, otherwise it is to standard error. |
+| -F[[`<whitespace>`]`<argument>`] | Similar to `-E`, but evaluates from a file. Using `-` as a file name reads from standard input. |
 | -H | Headless mode: do not show a window, and exit when startup commands finish. Use with `-E` for batch scripting. On Linux, uses the offscreen Qt platform; on macOS, the native platform with a hidden window. |
 | -I | Initialize the user's environment. WARNING: This may overwrite user configuration with defaults. |
 | -K | Simulate typing of individual keys during tests. |
@@ -36,7 +37,8 @@ The simulator can be started with the command-line options listed in the table b
 | -O[`<test>` \| all] | Only configure test-suite recorder traces (`est_<test>` or `est_.*` for `all`) without enabling automatic test execution. |
 | -T[`<test>` \| all] | Run tests. Without a suffix, run the full test suite. With a suffix, select individual test suites. For example `-Tmatrices` will run the `matrices` portion of the test suite. |
 | -d[[`<whitespace>`]`<integer>`] | Set key delay time in milliseconds to slow down tests. Default = 0 ms. |
-| -e[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, as if typed on the command line and executed with Enter. The option may be repeated to run several commands in order. |
+| -e[[`<whitespace>`]`<argument>`] | Evaluate an RPL command line at startup, in a way similar to `-E` but without printing out the stack results on the console. The option may be repeated to run several commands in order. |
+| -f[[`<whitespace>`]`<argument>`] | Similar to `-e` but reading RPL source code from a file. If the file name is `-`, then reads RPL code from standard input. |
 | -h | Show command-line usage and exit. |
 | -i[[`<whitespace>`]`<integer>`] | Set the maximum time waiting for an image to match the expected image during testing. Default = 500 ms. |
 | -k[[`<whitespace>`]`<argument>`] | Load a saved keymap to change keyboard layout. |

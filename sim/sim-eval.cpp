@@ -37,45 +37,107 @@
 
 #include <cstdio>
 #include <cstring>
-
-std::vector<std::string> sim_eval_commands;
-std::vector<std::string> sim_eval_console_commands;
-bool                     sim_eval_headless = false;
-bool                     sim_eval_print_levels = false;
-static std::string       sim_eval_pending;
+#include <fstream>
+#include <iostream>
+#include <iterator>
 
 
-void sim_eval_set_pending(cstring line)
+// RPL commands piled up for the RPL thread to pick up
+sim_commands rplcmds;
+
+static void transliterate(std::string &s)
 // ----------------------------------------------------------------------------
-//   Queue a command line for evaluation on the RPL thread
+//   Transliterate RPL special characters from source
 // ----------------------------------------------------------------------------
 {
-    sim_eval_pending = line ? line : "";
+    std::string out;
+    out.reserve(s.size());
+    for (size_t i = 0; i < s.size(); i++)
+    {
+        cstring repl = nullptr;
+        if (i + 1 < s.size())
+        {
+            if (s[i] == '<' && s[i + 1] == '<')
+                repl = "«";
+            else if (s[i] == '>' && s[i + 1] == '>')
+                repl = "»";
+            else if (s[i] == '-' && s[i + 1] == '>')
+                repl = "→";
+        }
+        if (repl)
+            ++i, out += repl;
+        else
+            out += s[i];
+    }
+    s.swap(out);
 }
 
 
-cstring sim_eval_pending_line()
+static bool read_stream(std::istream &input, std::string &out, cstring name)
 // ----------------------------------------------------------------------------
-//   Return the command line queued for evaluation on the RPL thread
+//   Read commands from a file or stdin stream
 // ----------------------------------------------------------------------------
 {
-    return sim_eval_pending.c_str();
+    std::string data((std::istreambuf_iterator<char>(input)),
+                     std::istreambuf_iterator<char>());
+    if (input.bad())
+    {
+        fprintf(stderr, "Cannot read commands from %s\n", name);
+        return false;
+    }
+    data.swap(out);
+    return true;
 }
 
 
-bool sim_eval_run(cstring line)
+bool sim_commands::queue(cstring arg, bool print, bool file)
+// ----------------------------------------------------------------------------
+//   Queue a command line; arg "-" reads all of stdin (one command per line)
+// ----------------------------------------------------------------------------
+{
+    if (!arg || !*arg)
+    {
+        fprintf(stderr, "Missing argument");
+        return false;
+    }
+
+    std::string command;
+    if (file)
+    {
+        if (strcmp(arg, "-"))
+        {
+            std::ifstream f(arg);
+            if (!read_stream(f, command, arg))
+                return false;
+        }
+        else
+        {
+            if (!read_stream(std::cin, command, "standard input"))
+                return false;
+        }
+    }
+    else
+    {
+        command = arg;
+    }
+
+    transliterate(command);
+    commands.emplace_back(command);
+    if (print)
+        commands.emplace_back();
+    return true;
+}
+
+
+bool sim_commands::run(const std::string &cmd)
 // ----------------------------------------------------------------------------
 //   Parse and evaluate a command line like interactive entry
 // ----------------------------------------------------------------------------
 {
-    if (!line || !*line)
-        return true;
-
-    size_t    len  = strlen(line);
-    program_g cmds = program::parse((utf8) line, len);
+    program_g cmds = program::parse(utf8(cmd.c_str()), cmd.length());
     if (!cmds)
     {
-        fprintf(stderr, "Cannot parse command line: %s\n", line);
+        fprintf(stderr, "Cannot parse command line: %s\n", cmd.c_str());
         return false;
     }
 
@@ -84,12 +146,12 @@ bool sim_eval_run(cstring line)
 }
 
 
-void sim_eval_print_stack()
+void sim_commands::print_stack()
 // ----------------------------------------------------------------------------
 //   Print all stack levels, bottom first (optional level prefixes)
 // ----------------------------------------------------------------------------
 {
-    FILE  *out = sim_eval_headless ? stdout : stderr;
+    FILE  *out   = headless ? stdout : stderr;
     uint   depth = rt.depth();
     bool   rml   = Settings.MultiLineResult();
     bool   sml   = Settings.MultiLineStack();
@@ -106,7 +168,7 @@ void sim_eval_print_stack()
         size_t   len = obj->render(r);
         utf8     text = r.text();
 
-        if (sim_eval_print_levels)
+        if (print_levels)
             fprintf(out, "%u:", level + 1);
         if (len)
             fwrite(text, 1, len, out);
@@ -120,29 +182,19 @@ void sim_eval_print_stack()
 }
 
 
-void process_sim_eval_commands()
+void sim_commands::process_commands()
 // ----------------------------------------------------------------------------
 //   Run queued -e or -E command lines once at simulator startup
 // ----------------------------------------------------------------------------
 {
-    static bool done = false;
-    if (done)
-        return;
-    done = true;
-
-    if (!sim_eval_console_commands.empty())
+    for (const std::string &cmd : commands)
     {
-        for (const std::string &cmd : sim_eval_console_commands)
-        {
-            sim_eval_run(cmd.c_str());
-            sim_eval_print_stack();
-        }
-        sim_eval_console_commands.clear();
-        if (sim_eval_headless)
-            key_push(tests::EXIT_PGM);
+        if (cmd.empty())
+            print_stack();
+        else
+            run(cmd);
     }
-
-    for (const std::string &cmd : sim_eval_commands)
-        sim_eval_run(cmd.c_str());
-    sim_eval_commands.clear();
+    commands.clear();
+    if (headless)
+        key_push(tests::EXIT_PGM);
 }

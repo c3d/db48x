@@ -33,15 +33,24 @@
 #include <string>
 #include <vector>
 
-extern std::vector<std::string> sim_eval_commands;
-extern std::vector<std::string> sim_eval_console_commands;
-extern bool                     sim_eval_headless;
-extern bool                     sim_eval_print_levels;
+struct sim_commands
+// ----------------------------------------------------------------------------
+//  List of RPL commands to evaluate
+// ----------------------------------------------------------------------------
+{
+    sim_commands() : commands(), headless(false), print_levels(false) {}
+    ~sim_commands() {}
 
-bool     sim_eval_run(cstring line);
-void     sim_eval_print_stack();
-void     process_sim_eval_commands();
-void     sim_eval_set_pending(cstring line);
-cstring  sim_eval_pending_line();
+    bool queue(cstring arg, bool print, bool file);
+    bool run(const std::string &cmd);
+    void print_stack();
+    void process_commands();
+
+    std::vector<std::string> commands;
+    bool                     headless;
+    bool                     print_levels;
+};
+
+extern sim_commands rplcmds;
 
 #endif // SIM_EVAL_H
