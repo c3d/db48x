@@ -367,6 +367,10 @@ EVAL_BODY(local)
 // ----------------------------------------------------------------------------
 {
     if (object_p obj = o->recall())
+    {
+        if (obj->as<expression>())
+            return rt.push(obj) ? OK : ERROR;
         return program::run_program(obj);
+    }
     return ERROR;
 }

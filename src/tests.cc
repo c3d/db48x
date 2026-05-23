@@ -205,7 +205,7 @@ int tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            constants_parsing();
+            local_variables();
         }
 
 #if 0
@@ -2383,8 +2383,31 @@ void tests::local_variables()
          "LocTest", ENTER)
         .expect("'(X+Y)·(X-Y)÷((Y+Z)·(Y-Z))'");
 
+    step("Defer local argument evaluation for symbolic args");
+    test(CLEAR, "3 'X' STO "
+         "'X' 'Y' 'Z' LocTest", ENTER)
+        .expect("'(X+Y)·(X-Y)÷((Y+Z)·(Y-Z))'");
+    step("Defer local argument evaluation for symbolic expressions");
+    test(CLEAR, "'X+1' 'Y' 'Z' LocTest", ENTER)
+        .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
+    step("Do not defer local argument evaluation for programs");
+    test(CLEAR, "« X 1 + » 'Y' 'Z' LocTest", ENTER)
+        .expect("'(4+Y)·(4-Y)÷((Y+Z)·(Y-Z))'");
+    test(CLEAR, "'LocTest(X,Y,Z)'", ENTER)
+        .expect("'LocTest(X;Y;Z)'")
+        .test(ID_Run)
+        .expect("'(3+Y)·(3-Y)÷((Y+Z)·(Y-Z))'");
+    test(CLEAR, "'LocTest(X+1;Y;Z)'", ENTER)
+        .expect("'LocTest(X+1;Y;Z)'")
+        .test(ID_Run)
+        .expect("'(4+Y)·(4-Y)÷((Y+Z)·(Y-Z))'");
+    test(CLEAR, "'LocTest(X,Y+1,Z)'", ENTER)
+        .expect("'LocTest(X;Y+1;Z)'")
+        .test(ID_Run)
+        .expect("'(3+(Y+1))·(3-(Y+1))÷((Y+1+Z)·(Y+1-Z))'");
+
     step("Cleanup");
-    test(CLEAR, XEQ, "LocTest", ENTER, "PurgeAll", ENTER).noerror();
+    test(CLEAR, "{ LocTest X } PurgeAll", ENTER).noerror();
 }
 
 

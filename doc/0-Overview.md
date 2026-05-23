@@ -437,7 +437,9 @@ unintentional differences, since the implementation is completely new.
 * Local names are evaluated on DB48X, unlike in the HP versions of RPL. This
   makes it easier to use local subprograms in larger programs as if they were
   normal operations. In the less frequent case where you do not want evaluation,
-  you need to use `RCL` like for global variables.
+  you need to quote the name and use `RCL` like for global variables. However,
+  as a convenience in algebraic mode, expressions are not evaluated. See the
+  `Quote` command for details.
 
 * Lists do not evaluate as programs by default, like on the HP28, but unlike on
   the HP48 and later HP models. This can be controlled using the
