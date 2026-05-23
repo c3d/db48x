@@ -2916,6 +2916,20 @@ EVAL_BODY(funcall)
                                 return OK;
                     return ERROR;
                 }
+                if (program_p prog = callee->as<program>())
+                {
+                    if (object_p inner = prog->at(0))
+                    {
+                        if (locals_p locs = inner->as<locals>())
+                        {
+                            if (locs->variables() + 1 != fcall->items())
+                            {
+                                rt.argument_count_error();
+                                return ERROR;
+                            }
+                        }
+                    }
+                }
             }
         }
     }

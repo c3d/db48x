@@ -2369,48 +2369,64 @@ void tests::local_variables()
 {
     BEGIN(locals);
 
-    step("Creating a local block");
     cstring source = "« → A B C « A B + A B - × B C + B C - × ÷ » »";
-    test(CLEAR, source, ENTER).type(ID_program).want(source);
-    test(XEQ, "LocTest", ENTER, STO).noerror();
+    step("Creating a local block")
+        .test(CLEAR, source, ENTER).type(ID_program).want(source)
+        .test(XEQ, "LocTest", ENTER, STO).noerror();
 
-    step("Calling a local block with numerical values");
-    test(CLEAR, 1, ENTER, 2, ENTER, 3, ENTER, "LocTest", ENTER).expect("³/₅");
+    step("Calling a local block with numerical values")
+        .test(CLEAR, 1, ENTER, 2, ENTER, 3, ENTER, "LocTest", ENTER)
+        .expect("³/₅");
 
-    step("Calling a local block with symbolic values");
-    test(CLEAR,
-         XEQ, "X", ENTER,
-         XEQ, "Y", ENTER,
-         XEQ, "Z", ENTER,
-         "LocTest", ENTER)
+    step("Calling a local block with symbolic values")
+        .test(CLEAR,
+              XEQ, "X", ENTER,
+              XEQ, "Y", ENTER,
+              XEQ, "Z", ENTER,
+              "LocTest", ENTER)
         .expect("'(X+Y)·(X-Y)÷((Y+Z)·(Y-Z))'");
 
-    step("Defer local argument evaluation for symbolic args");
-    test(CLEAR, "3 'X' STO "
-         "'X' 'Y' 'Z' LocTest", ENTER)
+    step("Defer local argument evaluation for symbolic args")
+        .test(CLEAR, "3 'X' STO "
+              "'X' 'Y' 'Z' LocTest", ENTER)
         .expect("'(X+Y)·(X-Y)÷((Y+Z)·(Y-Z))'");
-    step("Defer local argument evaluation for symbolic expressions");
-    test(CLEAR, "'X+1' 'Y' 'Z' LocTest", ENTER)
-        .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
-    step("Do not defer local argument evaluation for programs");
-    test(CLEAR, "« X 1 + » 'Y' 'Z' LocTest", ENTER)
-        .expect("'(4+Y)·(4-Y)÷((Y+Z)·(Y-Z))'");
-    test(CLEAR, "'LocTest(X,Y,Z)'", ENTER)
+    step("defer local argument evaluation for names in algebraic form")
+        .test(CLEAR, "'LocTest(X,Y,Z)'", ENTER)
         .expect("'LocTest(X;Y;Z)'")
         .test(ID_Run)
         .expect("'(3+Y)·(3-Y)÷((Y+Z)·(Y-Z))'");
-    test(CLEAR, "'LocTest(X+1;Y;Z)'", ENTER)
+    step("Defer local argument evaluation for symbolic expressions")
+        .test(CLEAR, "'X+1' 'Y' 'Z' LocTest", ENTER)
+        .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
+    step("Defer local argument evaluation for symbolic expressions in algbraic")
+        .test(CLEAR, "'LocTest(X+1;Y;Z)'", ENTER)
         .expect("'LocTest(X+1;Y;Z)'")
         .test(ID_Run)
         .expect("'(4+Y)·(4-Y)÷((Y+Z)·(Y-Z))'");
-    test(CLEAR, "'LocTest(X,Y+1,Z)'", ENTER)
+    step("Do not defer local argument evaluation for programs")
+        .test(CLEAR, "« X 1 + » 'Y' 'Z' LocTest", ENTER)
+        .expect("'(4+Y)·(4-Y)÷((Y+Z)·(Y-Z))'");
+    step("Do not defer local argument evaluation for programs in algebraic")
+        .test(CLEAR, "'LocTest(X,Y+1,Z)'", ENTER)
         .expect("'LocTest(X;Y+1;Z)'")
         .test(ID_Run)
         .expect("'(3+(Y+1))·(3-(Y+1))÷((Y+1+Z)·(Y+1-Z))'");
-    test(CLEAR, "'LocTest(Quote(X+1),Y,Z)'", ENTER)
+    step("Quote in algebraic")
+        .test(CLEAR, "'LocTest(Quote(X+1),Y,Z)'", ENTER)
         .expect("'LocTest(Quote X+1;Y;Z)'")
         .test(ID_Run)
         .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
+
+    step("Argument count mismatch")
+        .test(CLEAR, "0 'LocTest(Quote(X+1),Y)'", ENTER)
+        .expect("'LocTest(Quote X+1;Y)'")
+        .test(ID_Run)
+        .error("Wrong argument count");
+    step("Argument count mismatch")
+        .test(CLEAR, "'LocTest(Quote(X+1);Y;Z;T)'", ENTER)
+        .expect("'LocTest(Quote X+1;Y;Z;T)'")
+        .test(ID_Run)
+        .error("Wrong argument count");
 
     step("Cleanup");
     test(CLEAR, "{ LocTest X } PurgeAll", ENTER).noerror();
