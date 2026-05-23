@@ -1144,7 +1144,12 @@ void tests::editor_operations()
     step("History level 2")
         .test(RSHIFT, UP).editor("1 2 3 4");
     step("Exiting old history")
-        .test(EXIT).editor("");
+        .image_menus("editor-menu", 3)
+        .test(EXIT)
+        .editor("1 2 3 4")
+        .image_menus("editor-menu-cleared", 3)
+        .test(EXIT)
+        .editor("");
     step("Check 8-level history")
         .test("A", ENTER, "B", ENTER, "C", ENTER, "D", ENTER,
               "E", ENTER, "F", ENTER, "G", ENTER, "H", ENTER,
@@ -1159,6 +1164,7 @@ void tests::editor_operations()
         .test(RSHIFT, UP).editor("H");
     step("EXIT key still saves editor contents")
         .test(CLEAR, "ABCD").editor("ABCD")
+        .test(EXIT).editor("ABCD")
         .test(EXIT).editor("").noerror()
         .test(RSHIFT, UP).editor("ABCD");
     step("End of editor")
@@ -14316,7 +14322,7 @@ void tests::regression_checks()
     step("Bug 917: Editor works when exiting and search is active")
         .test(CLEAR, "123", ENTER, DOWN)
         .editor("123")
-        .test(NOSHIFT, A, EXIT)
+        .test(NOSHIFT, A, EXIT, EXIT)
         .expect("123")
         .test(KEY1)
         .editor("1")

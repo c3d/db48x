@@ -6692,6 +6692,10 @@ bool user_interface::do_exit()
         dirtyEditor = true;
         dirtyStack = true;
     }
+    else if (menuLabel[0][0])
+    {
+        clear_menu();
+    }
     else if (validate_input)
     {
         program::halted = true;
