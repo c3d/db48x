@@ -106,6 +106,63 @@ The command will generate `Unable to isolate` if the expression cannot be
 reorganized, for example because it contains functions that have no known
 inverse.
 
+
+## Quote
+
+Return an object unevaluated (quoted).
+
+`Obj` `Quote` → `QuotedObj`
+
+The result is an algebraic expression containing `Obj` without evaluating it.
+This is used to pass unevaluated names or formulas as arguments, for example
+when building symbolic functions or when a CAS command must not evaluate its
+parameters prematurely.
+
+`5` `QUOTE` → `'5'`
+`'A+B'` `QUOTE` → `'A+B'` (unchanged if already quoted)
+
+`Quote` is mostly useful in algebraic expressions:
+
+```rpl
+@ Create an ArcLen commnand
+@ Note that the HP50G ARM erroneously lacks ∫ at end of the program
+@ We changed the names compared to ARM example because DB48x is case-insensitive,
+@ and START..END or VAR would cause a syntax error with original example names.
+« → arcstart arcend arcexpr arcvar
+  « arcstart arcend arcexpr arcvar ∂ SQ 1 + SQRT arcvar ∫ »
+» 'ArcLen' STO
+
+@ Evaluate the result numerically in radians
+'ArcLen(0,π,QUOTE(SIN(X)),QUOTE(X))'
+RAD →Decimal DEG
+@ Expecting 3.82019 77890 3
+```
+
+However, the rules for local name evaluations make the use of `Quote` less often necessary than on HP calculator. Consider the following example:
+
+```rpl
+@ Example program
+« → A B C 'A+B*C' » 'MyFn' STO
+
+@ Evaluation of MyFn with symbolic names
+'MyFn(X;Y;Z)' EVAL
+
+@ Evaluation of MyFn with expressions
+'MyFn(X+1;Y-1;Z*2)' EVAL
+
+@ Store a numerical value in X
+42 'X' STO
+
+@ Evaluation of MyFn without quotes will evaluate X
+'MyFn(X+1;Y-1;Z*2)' EVAL
+
+@ Evaluation of MyFn with quote will not evaluate X
+'MyFn(Quote(X+1);Y-1;Z*2)' EVAL
+
+4 →List
+@ Expecting { 'X+Y·Z' 'X+1+(Y-1)·(Z·2)' '43+(Y-1)·(Z·2)' 'X+1+(Y-1)·(Z·2)' }
+```
+
 ## Derivative
 
 Compute the derivative function for an expression. The algebraic syntax for `∂` is `'∂name(expr)'` For example, `'∂x(sin(2*x^2)'` computes `4*X*cos(2*X^2)`

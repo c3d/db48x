@@ -3034,6 +3034,31 @@ COMMAND_BODY(Apply)
 }
 
 
+COMMAND_BODY(Quote)
+// ----------------------------------------------------------------------------
+//   Return the argument unevaluated
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = object::strip(rt.top()))
+    {
+        // Leave quoted expressions as is
+        if (expression_p expr = expression::get(obj))
+            if (object_p inner = expr->quoted(ID_object))
+                if (inner->type() != ID_expression)
+                    if (rt.top(expr))
+                        return OK;
+
+        if (algebraic_p alg = obj->as_extended_algebraic())
+            if (expression_p expr = expression::make(alg))
+                if (rt.top(expr))
+                    return OK;
+
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
 
 // ============================================================================
 //
@@ -4023,7 +4048,7 @@ static algebraic_p derivative_funcall_build(funcall_p src, funcall_p repl)
 
 expression_p expression::derivative(symbol_r sym) const
 // ----------------------------------------------------------------------------
-//   Compute the derivative of the
+//   Compute the derivative of the expression
 // ----------------------------------------------------------------------------
 {
     save<symbol_g *>       sindep(independent, (symbol_g *) &sym);

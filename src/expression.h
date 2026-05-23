@@ -759,6 +759,9 @@ FUNCTION(Simplify);
 FUNCTION(TrigSin);
 
 COMMAND_DECLARE(Apply, 2);
+COMMAND_DECLARE_SPECIAL(Quote, algebraic, 1,
+                        PREC_DECL(SYMBOL);
+                        static bool can_be_symbolic(uint) { return true; });
 COMMAND_DECLARE(Isolate, 2);
 COMMAND_DECLARE_SPECIAL(Derivative, algebraic, 2,
                         PREC_DECL(SYMBOL);

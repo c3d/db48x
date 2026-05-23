@@ -30,6 +30,7 @@
 #include "dmcp.h"
 #include "equations.h"
 #include "list.h"
+#include "object.h"
 #include "recorder.h"
 #include "settings.h"
 #include "sim-dmcp.h"
@@ -206,6 +207,7 @@ int tests::run(uint onlyCurrent)
         if (onlyCurrent & 1)
         {
             local_variables();
+            symbolic_operations();
         }
 
 #if 0
@@ -2405,6 +2407,10 @@ void tests::local_variables()
         .expect("'LocTest(X;Y+1;Z)'")
         .test(ID_Run)
         .expect("'(3+(Y+1))·(3-(Y+1))÷((Y+1+Z)·(Y+1-Z))'");
+    test(CLEAR, "'LocTest(Quote(X+1),Y,Z)'", ENTER)
+        .expect("'LocTest(Quote X+1;Y;Z)'")
+        .test(ID_Run)
+        .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
 
     step("Cleanup");
     test(CLEAR, "{ LocTest X } PurgeAll", ENTER).noerror();
@@ -9439,6 +9445,31 @@ void tests::symbolic_operations()
     step("TrigSin: cos without square passes through");
     test(CLEAR, "'cos(X)+1' TrigSin", ENTER)
         .expect("'cos X+1'");
+
+    step("Quote: integer becomes quoted expression")
+        .test(CLEAR, ID_ArithmeticMenu).noerror()
+        .test(CLEAR, "5", ENTER, ID_Quote).expect("'5'");
+    step("Quote: expression is unchanged")
+        .test(CLEAR, "'A+B'", ENTER, ID_Quote).expect("'A+B'");
+    step("Quote: quoted name is unchanged")
+        .test(CLEAR, "'X'", ENTER, ID_Quote).expect("'X'");
+    step("Quote: equation is unchanged")
+        .test(CLEAR, "'A=B'", ENTER, ID_Quote).expect("'A=B'");
+    step("Quote: quoted result can be evaluated")
+        .test(CLEAR, "7", ENTER, ID_Quote, ID_Eval).expect("7");
+    step("Quote in expression (example from HP50G advanced reference manual)")
+        .test(CLEAR,
+              "« → arcstart arcend arcexpr arcvar "
+              "« arcstart arcend arcexpr arcvar ∂ SQ 1 + SQRT arcvar ∫ » "
+              "» 'ArcLen' STO", ENTER).noerror()
+        .test("'ArcLen(0;π;QUOTE(SIN(X));QUOTE(X))'", ENTER)
+        .expect("'ArcLen(0;π;Quote sin X;Quote X)'")
+        .test(ID_Run)
+        .expect("'∫(0;π;√((cos X)²+1);X)'")
+        .test(ID_ModesMenu, ID_Rad, ID_ToDecimal)
+        .expect("3.82019 77890 3")
+        .test(ID_Deg, "'ArcLen'", ID_Purge)
+        .noerror();
 }
 
 

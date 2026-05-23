@@ -132,7 +132,7 @@ Access: [SymbolicMenu](#symbolicmenu) 🟨 F1
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| [Show](#show) | _Quote_ | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
+| [Show](#show) | [Quote](#quote) | [\|](#where) | `=` | _Rules_ | \[[Symb](#symbolicmenu)\] |
 | [∂](#derivative) | ∫ | ∑ | ∏ | _∆_ | _Taylor_ |
 
 ### BasesMenu

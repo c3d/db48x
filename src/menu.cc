@@ -885,7 +885,7 @@ MENU(ArithmeticMenu,
      "Taylor",          ID_Unimplemented,
 
      "Show",            ID_Show,
-     "Quote",           ID_Unimplemented,
+     "Quote",           ID_Quote,
      "|",               ID_Where,
      "=",               ID_SelfInsert,
      "Rules",           ID_Unimplemented,
