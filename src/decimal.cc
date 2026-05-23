@@ -218,7 +218,7 @@ PARSE_BODY(decimal)
                 exponent--;
             }
         }
-        else if (decimalDot < 0 && (cp == '.' || cp == ','))
+        else if (decimalDot < 0 && (cp == '.' || (cp == ',' && !p.precedence)))
         {
             decimalDot = +s - +source;
         }

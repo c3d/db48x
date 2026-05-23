@@ -399,7 +399,7 @@ PARSE_BODY(rectangular)
         size_t spaces = utf8_skip_whitespace(p.source + offs, max - offs);
         offs += spaces;
         cp = utf8_codepoint(p.source + offs);
-        if (cp == ';')
+        if (cp == ';' || (cp == ',' && !Settings.DecimalComma()))
         {
             offs++;
             offs += utf8_skip_whitespace(p.source + offs, max - offs);

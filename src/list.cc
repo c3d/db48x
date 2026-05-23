@@ -117,15 +117,17 @@ object::result list::list_parse(id      type,
             s = +p.source + utf8_next(+p.source, s - +p.source, max);
             break;
         }
-        if (precedence && (cp == '\'' || cp == ')' ||
-                           (!alist && (cp == ';' || cp == '}' || cp == ']'))))
+        bool separator = cp == ';' || (cp == ',' && !Settings.DecimalComma());
+        if (precedence &&
+            (cp == '\'' || cp == ')' ||
+             (!alist && (separator || cp == '}' || cp == ']'))))
         {
             break;
         }
-        if (utf8_whitespace(cp) || (cp == ';' && alist))
+        if (utf8_whitespace(cp) || (alist && separator))
         {
             s = utf8_next(s);
-            if (cp == ';')
+            if (separator)
                 precedence = p.precedence;
             continue;
         }
@@ -253,7 +255,7 @@ object::result list::list_parse(id      type,
                         {
                             iswhere = false;
                         }
-                        else if (cp != ';')
+                        else if (cp != ';' && cp != ',')
                         {
                             rt.unterminated_error().source(start, +s-start);
                             return ERROR;
@@ -488,7 +490,7 @@ object::result list::list_parse(id      type,
     // Check that we have a matching closing character
     if (close && cp != close)
     {
-        if (cp != ';')
+        if (cp != ';' && cp != ',')
             record(list_error,
                    "Missing terminator, got %u (%c) not %u (%c) at %s",
                    cp, cp, close, close, utf8(s));

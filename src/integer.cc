@@ -576,7 +576,7 @@ PARSE_BODY(integer)
     // Check if we finish with something indicative of a fraction or real number
     if (!endp)
     {
-        if (*s == '.' || *s == ',' ||
+        if (*s == '.' || (*s == ',' && !p.precedence) ||
             utf8_codepoint(s) == Settings.ExponentSeparator())
             return SKIP;
     }

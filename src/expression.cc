@@ -2865,7 +2865,7 @@ PARSE_BODY(funcall)
 
         source = p.source;      // In case of GC
         cp = utf8_codepoint(source + parsed);
-        if (cp != ')' && cp != ';')
+        if (cp != ')' && cp != ';' && cp != ',')
         {
             rt.syntax_error().source(source + parsed);
             return ERROR;
