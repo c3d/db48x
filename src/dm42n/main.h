@@ -29,8 +29,6 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include "version.h"
-
 #define PROGRAM_NAME    "DB50X"
 #define PROGRAM_VERSION DB48X_VERSION
 

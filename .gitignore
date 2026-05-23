@@ -22,7 +22,6 @@
 /compile_commands.json
 /sim/gcc111libbid.a
 /sim/simulator
-/src/*/version.h
 /.cache/
 /*.bin
 /*.tgz

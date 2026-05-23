@@ -35,7 +35,6 @@
 #include "sim-rpl.h"
 #include "sim-window.h"
 #include "sysmenu.h"
-#include "version.h"
 
 #include <cstdio>
 #include <cstdlib>

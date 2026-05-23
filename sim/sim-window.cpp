@@ -69,7 +69,6 @@
 #include <QDir>
 #include <QSettings>
 #include <atomic>
-#include "version.h"
 
 void extract_android_assets();
 

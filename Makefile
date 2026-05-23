@@ -242,11 +242,12 @@ INCLUDES ?= 	$(KIND)			\
 		sim			\
 		.
 
-DEFINES =							\
-	$(DEFINES_$(MODEL))					\
-	$(DEFINES_$(TARGET))					\
-	$(DEFINES_$(KIND))					\
-	$(DEFINES_$(PLATFORM))					\
+DEFINES =				\
+	$(DEFINES_$(MODEL))		\
+	$(DEFINES_$(TARGET))		\
+	$(DEFINES_$(KIND))		\
+	$(DEFINES_$(PLATFORM))		\
+	DB48X_VERSION=\"$(VERSION)\"	\
 	$(CHUCK:%=HAS_CHUCK)
 
 DEFINES_debug = DEBUG
@@ -403,13 +404,11 @@ PRODUCT_NAME = $(shell echo $(NAME) | tr "[:lower:]" "[:upper:]")
 PRODUCT_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42n,$(shell echo $(MODEL) | tr "[:lower:]" "[:upper:]"))
 HELP_MACHINE = $(if $(filter dm42n,$(MODEL)),DM42,$(PRODUCT_MACHINE))
 VERSION := $(shell git describe --dirty=Z --abbrev=4 2>/dev/null | sed -e 's/^v//g' -e 's/-g/-/g' | cut -c 1-16)
-VERSION_H = src/$(PLATFORM)/version.h
 CHUCK_H = $(CHUCK:%=src/$(PLATFORM)/chuck-norris.h)
 FONTS=Editor Help Reduced Stack
 
 .prebuild:	$(FONTS:%=fonts/%Font.cc)			\
 		src/decimal-pi.h src/decimal-e.h		\
-		$(VERSION_H)					\
 		$(CHUCK_H)
 
 fonts/EditorFont.cc: $(BASE_FONT) | $(TTF2FONT)
@@ -426,14 +425,7 @@ src/decimal-pi.h: src/decimal-pi.txt | $(DECIMIZE)
 src/decimal-e.h: src/decimal-e.txt | $(DECIMIZE)
 	$(PRINT_GENERATE) $(DECIMIZE) < $< > $@ decimal_e
 
-VERSION_GIT_H=$(MIQ_OBJDIR)version-$(VERSION).h
 CHUCK_GIT_H=$(CHUCK:%=$(MIQ_OBJDIR)chuck-norris-$(VERSION).h)
-$(VERSION_H): $(VERSION_GIT_H)
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) cp $< $@
-$(VERSION_GIT_H):
-	@mkdir -p $(@D)
-	$(PRINT_GENERATE) echo '#define DB48X_VERSION "$(VERSION)"' > $@
 $(CHUCK_H): $(CHUCK_GIT_H)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) cp $< $@
@@ -520,20 +512,20 @@ qt-$(TARGET): $(QMAKEFILE)
 qt-%: $(QMAKEFILE)
 	$(PRINT_COMMAND) $(MAKE) -C $(<D) -f $(<F) $*
 
-$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS)	\
-		$(VERSION_H) $(CHUCK_H) .config
-	$(PRINT_COMMAND) 				\
-		DESTDIR="$(abspath $(or $(OUTPUT),.))";	\
-		cd sim &&				\
-		$(QMAKE_ENV)				\
-		$(QMAKE) $(<F) -o $(@F) 		\
-		$(QMAKE_SPECS:%=-spec %) 		\
-		$(if $V,,CONFIG+=silent) 		\
-		CONFIG+=$(QMAKE_$(TARGET)) 		\
-		DESTDIR="$$DESTDIR"			\
-		OBJECTS_DIR=$(abspath $(MIQ_OBJDIR))	\
-		RCC_DIR=$(abspath $(MIQ_OBJDIR))	\
-		MOC_DIR=$(abspath $(MIQ_OBJDIR))	\
+$(QMAKEFILE): sim/$(NAME).pro $(QRC_FILES) $(MIQ_MAKEDEPS) $(CHUCK_H) .config
+	$(PRINT_COMMAND) 					\
+		DESTDIR="$(abspath $(or $(OUTPUT),.))";		\
+		cd sim &&					\
+		$(QMAKE_ENV)					\
+		$(QMAKE) $(<F) -o $(@F) 			\
+		$(QMAKE_SPECS:%=-spec %) 			\
+		$(if $V,,CONFIG+=silent) 			\
+		CONFIG+=$(QMAKE_$(TARGET)) 			\
+		DEFINES+="DB48X_VERSION=\'\\\"$(VERSION)\\\"\'"	\
+		DESTDIR="$$DESTDIR"				\
+		OBJECTS_DIR=$(abspath $(MIQ_OBJDIR))		\
+		RCC_DIR=$(abspath $(MIQ_OBJDIR))		\
+		MOC_DIR=$(abspath $(MIQ_OBJDIR))		\
 		UI_DIR=$(abspath $(MIQ_OBJDIR))
 
 # Generation of Qt resource files

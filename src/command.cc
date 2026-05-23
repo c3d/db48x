@@ -53,7 +53,6 @@
 #include "user_interface.h"
 #include "utf8.h"
 #include "util.h"
-#include "version.h"
 
 #ifdef SIMULATOR
 #include "sim-dmcp.h"

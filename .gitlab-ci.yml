@@ -278,7 +278,6 @@ build-android:
     - export QT_HOST_PATH=$HOME/Qt/6.8.1/gcc_64
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
-    - make src/dmcp/version.h
     - make sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
     - cd recorder && make TARGET=opt && cd ..
     - |
@@ -330,7 +329,6 @@ build-color-android:
     - export QT_HOST_PATH=$HOME/Qt/6.8.1/gcc_64
   script:
     - echo "$CI_PIPELINE_IID" > .build_id
-    - make src/dmcp/version.h
     - make COLOR=color sim/config.qrc sim/state.qrc sim/library.qrc sim/help.qrc sim/help/img.qrc
     - cd recorder && make TARGET=opt && cd ..
     - |
