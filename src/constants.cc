@@ -1964,7 +1964,7 @@ static const cstring basic_constants[] =
                 "  'ROUND(ⓈProt☉/ⒸProt☉;-2)' "
                 "  2.193E6_s ]",
 
-    "Astronomy/Cosmology & Varia",     nullptr,
+    "Astronomy/Cosmology",     nullptr,
 
     // *Cosmological constant - Measurement [1] [2]
     "Λ",       "[ 1.088E-52_1/m² "
@@ -2665,8 +2665,8 @@ const constant::config constant::constants =
 //  Define the configuration for the constants
 // ----------------------------------------------------------------------------
 {
-    .menu_help     = " Constants",
-    .help          = " Constant",
+    .menu_help     = " constants",
+    .help          = " constant",
     .prefix        = L'Ⓒ',
     .type          = ID_constant,
     .first_menu    = ID_ConstantsMenu00,
@@ -2915,8 +2915,8 @@ utf8 constant::do_instance_help(constant::config_r cfg) const
 // ----------------------------------------------------------------------------
 {
     static char buf[64];
-    size_t len = 0;
-    utf8 base = do_name(cfg, &len);
+    size_t      len  = 0;
+    utf8        base = do_name(cfg, &len);
     snprintf(buf, sizeof(buf), "%.*s%s", int(len), base, cfg.help);
     return utf8(buf);
 }
@@ -3263,8 +3263,8 @@ utf8 constant_menu::do_menu_help(constant::config_r cfg,
 // ----------------------------------------------------------------------------
 {
     static char buf[64];
-    size_t len = 0;
-    utf8 base = path_for_menu(cfg, cst->type(), &len);
+    size_t      len  = 0;
+    utf8        base = do_name(cfg, cst->type(), len);
     snprintf(buf, sizeof(buf), "%.*s%s", int(len), base, cfg.menu_help);
     return utf8(buf);
 }

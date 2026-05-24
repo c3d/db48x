@@ -6161,7 +6161,7 @@ zeta function and in integrals involving the natural logarithm.
 Its exact nature (rational or irrational) remains unknown.
 
 
-## Chemistry constant
+## Chemistry constants
 
 ### NA constant
 
@@ -6542,7 +6542,7 @@ method performed at e+e- colliders (LEP) using: resonance scan, cross-section
 mapping & Breit-Wigner fit. [Reference 17](#reference-17)
 
 
-## Electromagnetism
+## Electromagnetism constants
 
 ### qe constant
 
@@ -6767,7 +6767,7 @@ connection with superfluid helium. It is defined as the ratio of
 Planck's constant `h` to the mass of the relevant particle `m`
 chosen here as the electron. [CODATA](#codata)
 
-## Size
+## Size constants
 
 ### re constant
 
@@ -6789,7 +6789,7 @@ atom in its ground state. Its value depends on the vacuum electric
 permittivity `ε0`. [CODATA](#codata)
 
 
-## Scattering
+## Scattering constants
 
 ### σe constant
 
@@ -6991,9 +6991,9 @@ twice the ionization energy of a hydrogen atom. Its value depends on the
 measured value of the Rydberg constant `R∞`. [CODATA](#codata)
 
 
-## Astronomy
+## Astronomy constants
 
-## Mercury ☿
+## Mercury constants
 
 ### GM☿ constant
 
@@ -7108,7 +7108,7 @@ Mercury passes perihelion approximately four times per year. Value in JDN
 orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 
-## Venus ♀
+## Venus constants
 
 ### GM♀ constant
 
@@ -7221,7 +7221,7 @@ approximately twice per year. Value in JDN. It is the most recent point in its
 orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 
-## Earth ♁
+## Earth constants
 
 ### GM♁ constant
 
@@ -7340,7 +7340,7 @@ year). Value in JDN. It is the most recent point in its orbit when it was
 closest to the Sun. [Materials 20](#materials-20)
 
 
-## Moon ☽
+## Moon constants
 
 ### GM☽ constant
 
@@ -7456,7 +7456,7 @@ recurs approximately every 27.55 days. Computed using the Meeus algorithm
 (15 terms, ±1 hour accuracy). Value in JDN. [Materials 20](#materials-20) [Materials 22](#materials-22)
 
 
-## Mars ♂
+## Mars constants
 
 ### GM♂ constant
 
@@ -7568,7 +7568,7 @@ period is approximately 1.88 years. Value in JDN. It is the most recent point
 in its orbit when it was closest to the Sun. [Materials 20](#materials-20)
 
 
-## Jupiter ♃
+## Jupiter constants
 
 ### GM♃ constant
 
@@ -7686,7 +7686,7 @@ orbital period is approximately 11.86 years. It is the most recent point
 in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 
-## Saturn ♄
+## Saturn constants
 
 ### GM♄ constant
 
@@ -7803,7 +7803,7 @@ orbital period is approximately 29.46 years. It is the most recent point
 in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 
-## Uranus ⛢
+## Uranus constants
 
 ### GM⛢ constant
 
@@ -7921,7 +7921,7 @@ recent point in its orbit when it was closest to the Sun. Value in JDN.
 [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 
-## Neptune ♆
+## Neptune constants
 
 ### GM♆ constant
 
@@ -8038,7 +8038,7 @@ most recent point in its orbit when it was closest to the Sun. Value
 in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
 
-## Pluton ♇
+## Pluto constants
 
 ### GM♇ constant
 
@@ -8151,7 +8151,7 @@ orbital period is approximately 248 years. It is the most recent point in
 its orbit when it was closest to the Sun. Next perihelion: ~2237. Value
 in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
 
-## Solar ☉
+## Sun constants
 
 ### M☉ constant
 
@@ -8227,7 +8227,7 @@ by tracking surface features using Doppler techniques. It is the true
 time it takes to spin 360° on its axis. [Reference 20](#reference-20) [Reference 21](#reference-21)
 
 
-## Cosmology & Varia
+## Cosmology constants
 
 ### Λ constant
 
@@ -8386,8 +8386,7 @@ standard in stellar astronomy. [Reference 13](#reference-13) [Reference 14](#ref
 
 
 
-## Materials
-
+## Materials constants
 
 ## A. GASES (at `StdT = 273.15 K = 0°C`, `StdP = 101.325 kPa`)
   Parameters: `ρv`, `n*`, `cp`, `cv`, `γ`, `R`, `ε`, `μ`, `ρ`, `Ed`
@@ -8396,7 +8395,7 @@ standard in stellar astronomy. [Reference 13](#reference-13) [Reference 14](#ref
   `γ` is given as a calculation `cp/cv` for diatomic gases.
   `R` is given as a calculation `cp-cv` for all gases.
 
-## Dry Air constant
+## Dry Air constants
 
 Gas
 
@@ -9256,7 +9255,7 @@ Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
 [Materials 12](#materials-12) [Materials 2](#materials-2)
 
 
-## Dates Constants
+## Dates constants
 
 ### BastilleDay constant
 
