@@ -773,130 +773,6 @@ static const cstring basic_constants[] =
                 "  0_W/m² "
                 "  0 ]",
 
-    // ------------------------------------------------------------------------
-    //   Mass constants
-    // ------------------------------------------------------------------------
-
-    "Mass",     nullptr,
-
-    // *Mass unit (u) - Calculation from measurement [0]
-    "u",        "[ 'ROUND(CONVERT(Ⓒme/ⒸAre;1_kg);XPON(UVAL(Ⓡu*Ⓒme/ⒸAre))-XPON(UVAL(Ⓒme/ⒸAre))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡu*Ⓒu);-2);1_kg)' "
-                "  3.1E-10 "
-                "  1.661E-27_kg ]",
-    // *Electron mass - Calculation from measurement [0]
-    "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
-                "  'Ⓡu' "
-                "  9.109E-31_kg ]",
-    // *Neutron mass - Measurement [0]
-    "mn",       "[ 1.67492750056E-27_kg "
-                "  0.00000000085E-27_kg "
-                "  'ROUND(UBASE(Ⓢmn/Ⓒmn);-2)' "
-                "  1.675E-27_kg ]",
-    // *Proton mass - Measurement [0]
-    "mp",       "[ 1.67262192595E-27_kg "
-                "  0.00000000052E-27_kg "
-                "  'ROUND(UBASE(Ⓢmp/Ⓒmp);-2)' "
-                "  1.673E-27_kg ]",
-    // *Hydrogen mass - Measurement [0]
-    "mH",       "[ 1.00782503223_u "
-                "  0.00000000009_u "
-                "  'ROUND(UBASE(ⓈmH/ⒸmH);-2)' "
-                "  1.008_u ]",
-
-    // ------------------------------------------------------------------------
-    // *Deuterium mass - Measurement [0]
-    "mD",       "[ 2.01410177812_u "
-                "  0.00000000012_u "
-                "  'ROUND(UBASE(ⓈmD/ⒸmD);-2)' "
-                "  2.014_u ]",
-    // *Tritium mass - Measurement [0]
-    "mT",       "[ 3.0160492779_u "
-                "  0.0000000024_u "
-                "  'ROUND(UBASE(ⓈmT/ⒸmT);-2)' "
-                "  3.016_u ]",
-    // *Helium atomic mass - Measurement [0]
-    "mHe",      "[ 4.00260325413_u "
-                "  0.00000000006_u "
-                "  'ROUND(UBASE(ⓈmHe/ⒸmHe);-2)' "
-                "  4.003_u ]",
-    // *Muon mass - Measurement [0]
-    "mμ",       "[ 0.1134289257_u "
-                "  0.0000000025_u "
-                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' "
-                "  0.1134_u ]",
-    // *Tau mass - Measurement [0]
-    "mτ",       "[ 1.90754_u "
-                "  0.00013_u "
-                "  'ROUND(UBASE(Ⓢmτ/Ⓒmτ);-2)' "
-                "  1.908_u ]",
-
-    // ------------------------------------------------------------------------
-    // *mpme ratio - Measurement [0]
-    "mpme",     "[ 1836.152673426 "
-                "  0.000000032 "
-                "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' "
-                "  1836. ]",
-    // *Electron relative atomic mass - Measurement [0]
-    "Are",       "[ 5.485799090441E-4 "
-                "  0.000000000097E-4 "
-                "  'ROUND(ⓈAre/ⒸAre;-2)' "
-                "  5.486E-4 ]",
-    // *Top quark mass - Measurement [2]
-    "mQtop",       "[ 172.52_GeV "
-                "  0.33_GeV "
-                "  'ROUND(ⓈmQtop/ⒸmQtop;-2)' "
-                "  173._GeV ]",
-    // *Bottom quark mass - Measurement [2]
-    "mQbot",       "[ 4.183_GeV "
-                "  0.007_GeV "
-                "  'ROUND(ⓈmQbot/ⒸmQbot;-2)' "
-                "  4.183_GeV ]",
-    // *Charm quark mass - Measurement [2]
-    "mQcha",       "[ 1.2730_GeV "
-                "  0.0046_GeV "
-                "  'ROUND(ⓈmQcha/ⒸmQcha;-2)' "
-                "  1.273_GeV ]",
-
-    // ------------------------------------------------------------------------
-    // *Strange quark mass - Measurement [2]
-    "mQstr",       "[ 93.5_MeV "
-                "  0.8_MeV "
-                "  'ROUND(ⓈmQstr/ⒸmQstr;-2)' ]",
-    // *Down quark mass - Measurement [2]
-    "mQdwn",       "[ 4.70_MeV "
-                "  0.07_MeV "
-                "  'ROUND(ⓈmQdwn/ⒸmQdwn;-2)' ]",
-    // *Up quark mass - Measurement [2]
-    "mQup",       "[ 2.16_MeV "
-                "  0.07_MeV "
-                "  'ROUND(ⓈmQup/ⒸmQup;-2)' ]",
-    // *Maximum neutrino mass - Measurement [2]
-    "mνmax",       "[ 0.45_eV/c² "
-                "  0_eV/c² "
-                "  0 ]",
-    // *Minimum neutrino mass - Measurement [2]
-    "mνmin",       "[ 0.001_eV/c² "
-                "  0_eV/c² "
-                "  0 ]",
-
-    // ------------------------------------------------------------------------
-    // *Higgs boson mass - Measurement [15]
-    "mHig",       "[ 125.11_GeV "
-                "  0.11_GeV "
-                "  'ROUND(ⓈmHig/ⒸmHig;-2)' "
-                "  125._GeV ]",
-    // *W boson mass - Measurement [16]
-    "mW",       "[ 80.3602_GeV "
-                "  0.0099_GeV "
-                "  'ROUND(ⓈmW/ⒸmW;-2)' "
-                "  80.36_GeV ]",
-    // *Z° boson mass - Measurement [17]
-    "mZ°",       "[ 91.1876_GeV "
-                "  0.0021_GeV "
-                "  'ROUND(ⓈmZ°/ⒸmZ°;-2)' "
-                "  91.19_GeV ]",
 
     // ------------------------------------------------------------------------
     //   Electromagnetism
@@ -1029,67 +905,6 @@ static const cstring basic_constants[] =
                 "  3.637E-4_m↑2/s ]",
 
     // ------------------------------------------------------------------------
-    //   Particle sizes
-    // ------------------------------------------------------------------------
-
-    "Size",     nullptr,
-
-    // *Classical electron radius - Calculation from measurement [0]
-    "re",       "[ 'ROUND(CONVERT(Ⓒα^2*Ⓒa0; 1_fm); XPON(Ⓡre*Ⓒα^2*Ⓒa0) - XPON(Ⓒα^2*Ⓒa0) - 2)' "
-                "  'ROUND(Ⓡre*Ⓒre; -2)' "
-                "  'ROUND(3*Ⓢα/Ⓒα; -2)' "
-                "  2.818_fm ]",
-    // *Proton charge radius - Measurement [0]
-    "rp",       "[ 8.4075E-16_m "
-                "  0.0064E-16_m "
-                "  'ROUND(Ⓢrp/Ⓒrp;-2)' "
-                "  0.841_fm ]",
-    // *Bohr radius - Calculation from measurement [0]
-    "a0",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²);1_nm);XPON(UVAL(Ⓡa0*4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-XPON(UVAL(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓢα/Ⓒα*Ⓒa0);-2);1_nm)' "
-                "  'Ⓡα' "
-                "  5.292E-2_nm ]",
-
-    // ------------------------------------------------------------------------
-    //    Compton effect
-    // ------------------------------------------------------------------------
-
-    "Scattering",   nullptr,
-
-    // *Thomson cross-section - Calculation from measurement [0]
-    "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
-                "  'ROUND(6*Ⓢα/Ⓒα;-2)' "
-                "  6.652E-29_m² ]",
-    // *Electron Compton wavelength - Calculation from measurement [0]
-    "λc",       "[ 'ROUND(CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm);XPON(UVAL(Ⓡλc*Ⓒh/(Ⓒme*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒme*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡλc*Ⓒλc);-2);1_nm)' "
-                "  'Ⓡme' "
-                "  2.426E-3_nm ]",
-    // *Proton Compton wavelength - Calculation from measurement [0]
-    "λcp",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm);XPON(UVAL(Ⓡλcp*Ⓒh/(Ⓒmp*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmp*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡλcp*Ⓒλcp);-2);1_nm)' "
-                "  'Ⓡmp' "
-                "  1.321E-6_nm ]",
-    // *Neutron Compton wavelength - Calculation from measurement [0]
-    "λcn",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm);XPON(UVAL(Ⓡλcn*Ⓒh/(Ⓒmn*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmn*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡλcn*Ⓒλcn);-2);1_nm)' "
-                "  'Ⓡmn' "
-                "  1.320E-6_nm ]",
-    // *Muon Compton wavelength - Calculation from measurement [0]
-    "λcμ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmμ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcμ*Ⓒh/(Ⓒmμ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmμ*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡλcμ*Ⓒλcμ);-2);1_nm)' "
-                "  'Ⓡmμ' "
-                "  1.173E-5_nm ]",
-
-    // ------------------------------------------------------------------------
-    // *Tau Compton wavelength - Calculation from measurement [0]
-    "λcτ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmτ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcτ*Ⓒh/(Ⓒmτ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmτ*Ⓒc)))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡλcτ*Ⓒλcτ);-2);1_nm)' "
-                "  'Ⓡmτ' "
-                "  6.978E-7_nm ]",
-
-    // ------------------------------------------------------------------------
     //   Quantum mechanics
     // ------------------------------------------------------------------------
 
@@ -1171,6 +986,194 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(ⓇEh*ⒸEh);-2);1_J)' "
                 "  'ⓇR∞' "
                 "  4.360E-18_J ]",
+
+    // ------------------------------------------------------------------------
+    //   Particle mass constants
+    // ------------------------------------------------------------------------
+
+    "Mass",     nullptr,
+
+    // *Mass unit (u) - Calculation from measurement [0]
+    "u",        "[ 'ROUND(CONVERT(Ⓒme/ⒸAre;1_kg);XPON(UVAL(Ⓡu*Ⓒme/ⒸAre))-XPON(UVAL(Ⓒme/ⒸAre))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡu*Ⓒu);-2);1_kg)' "
+                "  3.1E-10 "
+                "  1.661E-27_kg ]",
+    // *Electron mass - Calculation from measurement [0]
+    "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
+                "  'Ⓡu' "
+                "  9.109E-31_kg ]",
+    // *Neutron mass - Measurement [0]
+    "mn",       "[ 1.67492750056E-27_kg "
+                "  0.00000000085E-27_kg "
+                "  'ROUND(UBASE(Ⓢmn/Ⓒmn);-2)' "
+                "  1.675E-27_kg ]",
+    // *Proton mass - Measurement [0]
+    "mp",       "[ 1.67262192595E-27_kg "
+                "  0.00000000052E-27_kg "
+                "  'ROUND(UBASE(Ⓢmp/Ⓒmp);-2)' "
+                "  1.673E-27_kg ]",
+    // *Hydrogen mass - Measurement [0]
+    "mH",       "[ 1.00782503223_u "
+                "  0.00000000009_u "
+                "  'ROUND(UBASE(ⓈmH/ⒸmH);-2)' "
+                "  1.008_u ]",
+
+    // ------------------------------------------------------------------------
+    // *Deuterium mass - Measurement [0]
+    "mD",       "[ 2.01410177812_u "
+                "  0.00000000012_u "
+                "  'ROUND(UBASE(ⓈmD/ⒸmD);-2)' "
+                "  2.014_u ]",
+    // *Tritium mass - Measurement [0]
+    "mT",       "[ 3.0160492779_u "
+                "  0.0000000024_u "
+                "  'ROUND(UBASE(ⓈmT/ⒸmT);-2)' "
+                "  3.016_u ]",
+    // *Helium atomic mass - Measurement [0]
+    "mHe",      "[ 4.00260325413_u "
+                "  0.00000000006_u "
+                "  'ROUND(UBASE(ⓈmHe/ⒸmHe);-2)' "
+                "  4.003_u ]",
+    // *Muon mass - Measurement [0]
+    "mμ",       "[ 0.1134289257_u "
+                "  0.0000000025_u "
+                "  'ROUND(UBASE(Ⓢmμ/Ⓒmμ);-2)' "
+                "  0.1134_u ]",
+    // *Tau mass - Measurement [0]
+    "mτ",       "[ 1.90754_u "
+                "  0.00013_u "
+                "  'ROUND(UBASE(Ⓢmτ/Ⓒmτ);-2)' "
+                "  1.908_u ]",
+
+    // ------------------------------------------------------------------------
+    // *mpme ratio - Measurement [0]
+    "mpme",     "[ 1836.152673426 "
+                "  0.000000032 "
+                "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' "
+                "  1836. ]",
+    // *Electron relative atomic mass - Measurement [0]
+    "Are",       "[ 5.485799090441E-4 "
+                "  0.000000000097E-4 "
+                "  'ROUND(ⓈAre/ⒸAre;-2)' "
+                "  5.486E-4 ]",
+    // *Top quark mass - Measurement [2]
+    "mQtop",       "[ 172.52_GeV "
+                "  0.33_GeV "
+                "  'ROUND(ⓈmQtop/ⒸmQtop;-2)' "
+                "  173._GeV ]",
+    // *Bottom quark mass - Measurement [2]
+    "mQbot",       "[ 4.183_GeV "
+                "  0.007_GeV "
+                "  'ROUND(ⓈmQbot/ⒸmQbot;-2)' "
+                "  4.183_GeV ]",
+    // *Charm quark mass - Measurement [2]
+    "mQcha",       "[ 1.2730_GeV "
+                "  0.0046_GeV "
+                "  'ROUND(ⓈmQcha/ⒸmQcha;-2)' "
+                "  1.273_GeV ]",
+
+    // ------------------------------------------------------------------------
+    // *Strange quark mass - Measurement [2]
+    "mQstr",       "[ 93.5_MeV "
+                "  0.8_MeV "
+                "  'ROUND(ⓈmQstr/ⒸmQstr;-2)' ]",
+    // *Down quark mass - Measurement [2]
+    "mQdwn",       "[ 4.70_MeV "
+                "  0.07_MeV "
+                "  'ROUND(ⓈmQdwn/ⒸmQdwn;-2)' ]",
+    // *Up quark mass - Measurement [2]
+    "mQup",       "[ 2.16_MeV "
+                "  0.07_MeV "
+                "  'ROUND(ⓈmQup/ⒸmQup;-2)' ]",
+    // *Maximum neutrino mass - Measurement [2]
+    "mνmax",       "[ 0.45_eV/c² "
+                "  0_eV/c² "
+                "  0 ]",
+    // *Minimum neutrino mass - Measurement [2]
+    "mνmin",       "[ 0.001_eV/c² "
+                "  0_eV/c² "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Higgs boson mass - Measurement [15]
+    "mHig",       "[ 125.11_GeV "
+                "  0.11_GeV "
+                "  'ROUND(ⓈmHig/ⒸmHig;-2)' "
+                "  125._GeV ]",
+    // *W boson mass - Measurement [16]
+    "mW",       "[ 80.3602_GeV "
+                "  0.0099_GeV "
+                "  'ROUND(ⓈmW/ⒸmW;-2)' "
+                "  80.36_GeV ]",
+    // *Z° boson mass - Measurement [17]
+    "mZ°",       "[ 91.1876_GeV "
+                "  0.0021_GeV "
+                "  'ROUND(ⓈmZ°/ⒸmZ°;-2)' "
+                "  91.19_GeV ]",
+
+
+    // ------------------------------------------------------------------------
+    //   Particle sizes
+    // ------------------------------------------------------------------------
+
+    "Size",     nullptr,
+
+    // *Classical electron radius - Calculation from measurement [0]
+    "re",       "[ 'ROUND(CONVERT(Ⓒα^2*Ⓒa0; 1_fm); XPON(Ⓡre*Ⓒα^2*Ⓒa0) - XPON(Ⓒα^2*Ⓒa0) - 2)' "
+                "  'ROUND(Ⓡre*Ⓒre; -2)' "
+                "  'ROUND(3*Ⓢα/Ⓒα; -2)' "
+                "  2.818_fm ]",
+    // *Proton charge radius - Measurement [0]
+    "rp",       "[ 8.4075E-16_m "
+                "  0.0064E-16_m "
+                "  'ROUND(Ⓢrp/Ⓒrp;-2)' "
+                "  0.841_fm ]",
+    // *Bohr radius - Calculation from measurement [0]
+    "a0",       "[ 'ROUND(CONVERT(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²);1_nm);XPON(UVAL(Ⓡa0*4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-XPON(UVAL(4*Ⓒπ*Ⓒε₀*Ⓒℏ²/(Ⓒme*Ⓒqe²)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓢα/Ⓒα*Ⓒa0);-2);1_nm)' "
+                "  'Ⓡα' "
+                "  5.292E-2_nm ]",
+
+    // ------------------------------------------------------------------------
+    //    Compton effect
+    // ------------------------------------------------------------------------
+
+    "Scattering",   nullptr,
+
+    // *Thomson cross-section - Calculation from measurement [0]
+    "σe",       "[ 'ROUND(CONVERT(8*Ⓒπ*Ⓒre²/3;1_m²);XPON(UVAL(Ⓡσe*8*Ⓒπ*Ⓒre²/3))-XPON(UVAL(8*Ⓒπ*Ⓒre²/3))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡσe*Ⓒσe);-2);1_m²)' "
+                "  'ROUND(6*Ⓢα/Ⓒα;-2)' "
+                "  6.652E-29_m² ]",
+    // *Electron Compton wavelength - Calculation from measurement [0]
+    "λc",       "[ 'ROUND(CONVERT(Ⓒh/(Ⓒme*Ⓒc);1_nm);XPON(UVAL(Ⓡλc*Ⓒh/(Ⓒme*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒme*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλc*Ⓒλc);-2);1_nm)' "
+                "  'Ⓡme' "
+                "  2.426E-3_nm ]",
+    // *Proton Compton wavelength - Calculation from measurement [0]
+    "λcp",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmp*Ⓒc);1_nm);XPON(UVAL(Ⓡλcp*Ⓒh/(Ⓒmp*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmp*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcp*Ⓒλcp);-2);1_nm)' "
+                "  'Ⓡmp' "
+                "  1.321E-6_nm ]",
+    // *Neutron Compton wavelength - Calculation from measurement [0]
+    "λcn",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmn*Ⓒc);1_nm);XPON(UVAL(Ⓡλcn*Ⓒh/(Ⓒmn*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmn*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcn*Ⓒλcn);-2);1_nm)' "
+                "  'Ⓡmn' "
+                "  1.320E-6_nm ]",
+    // *Muon Compton wavelength - Calculation from measurement [0]
+    "λcμ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmμ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcμ*Ⓒh/(Ⓒmμ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmμ*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcμ*Ⓒλcμ);-2);1_nm)' "
+                "  'Ⓡmμ' "
+                "  1.173E-5_nm ]",
+
+    // ------------------------------------------------------------------------
+    // *Tau Compton wavelength - Calculation from measurement [0]
+    "λcτ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmτ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcτ*Ⓒh/(Ⓒmτ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmτ*Ⓒc)))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡλcτ*Ⓒλcτ);-2);1_nm)' "
+                "  'Ⓡmτ' "
+                "  6.978E-7_nm ]",
+
 
     // ------------------------------------------------------------------------
     //  Astronomy & Astrophysics

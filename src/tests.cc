@@ -12174,7 +12174,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Mass constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F5);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F1);
     step("Mass unit")
         .test(CLEAR, NOSHIFT, F1).expect("u")
         .test(LSHIFT, F1).expect("1.66053 90689 2⁳⁻²⁷ kg");
@@ -12218,7 +12218,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Size constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F1);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F2);
     step("Classical electron radius")
         .test(CLEAR, NOSHIFT, F1).expect("re")
         .test(LSHIFT, F1).expect("2.81794 03205 fm");
@@ -12232,7 +12232,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Scattering constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F2);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F3);
     step("Thomson cross-section")
         .test(CLEAR, NOSHIFT, F1).expect("σe")
         .test(LSHIFT, F1).expect("6.65245 87052⁳⁻²⁹ m↑2");
@@ -12256,7 +12256,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Quantum constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F3);
+        .test(CLEAR, ID_ConstantsMenu, F6);
     step("Planck")
         .test(CLEAR, NOSHIFT, F1).expect("h")
         .test(LSHIFT, F1).expect("6.62607 015⁳⁻³⁴ J·s");
@@ -12298,7 +12298,7 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
     step("Electromagnetism constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F6);
+        .test(CLEAR, ID_ConstantsMenu, F5);
     step("Electronic charge")
         .test(CLEAR, NOSHIFT, F1).expect("qe")
         .test(LSHIFT, F1).expect("1.60217 6634⁳⁻¹⁹ C");

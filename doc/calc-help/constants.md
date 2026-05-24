@@ -295,6 +295,8 @@ definition `β=10·LOG10(I/I₀)`. By convention it has an exact value.
 
 ## Mass constants
 
+This section documents the mass of fundamental particles.
+
 ### u constant
 
 Unified atomic mass unit.
@@ -677,6 +679,8 @@ chosen here as the electron. [CODATA](#codata)
 
 ## Size constants
 
+Consants describing the size of fundamental particles
+
 ### re constant
 
 The classical electron radius. Through the Bohr radius `a0`, it
@@ -698,6 +702,8 @@ permittivity `ε0`. [CODATA](#codata)
 
 
 ## Scattering constants
+
+Scattering constants for the Compton effect.
 
 ### σe constant
 
