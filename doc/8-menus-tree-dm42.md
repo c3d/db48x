@@ -247,7 +247,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F4; [SymbolicMenu](#symbolicmenu) 🟦 F2
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | [Indep](#indep) | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### DisplayModesMenu Reference
 
@@ -367,7 +367,7 @@ Access: 🟨 Q (8); [SymbolicMenu](#symbolicmenu) 🟦 F1
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 | Σ | ∏ |   |   |   |   |
-| [∂](#derivative) | ∫ | [Num ∫](#integrate) | Symb ∫ | [Eq](#equation) | _Indep_ |
+| [∂](#derivative) | ∫ | [Num ∫](#integrate) | Symb ∫ | [Eq](#equation) | [Indep](#indep) |
 
 ### IOMenu
 
@@ -387,7 +387,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F6
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | [Indep](#indep) | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### ListMenu
 
@@ -555,7 +555,7 @@ Access: 🟦 W (×)
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | [Indep](#indep) | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### ObjectMenu
 
@@ -637,7 +637,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F5
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
+| [Eq](#equation) | [Indep](#indep) | [Root](#root) | \[[SolverMenu](#solvermenu)\] |   |   |
 
 ### PowersMenu
 
@@ -811,7 +811,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F3
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
 |   |   |   |   |   |   |
-| [Eq](#equation) | _Indep_ | [Root](#root) | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
+| [Eq](#equation) | [Indep](#indep) | [Root](#root) | [Isolate](#isolate) | \[[SolverMenu](#solvermenu)\] |   |
 
 ### TestsMenu
 

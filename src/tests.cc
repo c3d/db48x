@@ -14514,6 +14514,31 @@ void tests::plotting()
         .image("polar-yrng");
     step("Restoring plot parameters")
         .test(ID_Swap, "'PPAR'", ID_Sto);
+    step("Enter sandbox for INDEP/DEPND tests")
+        .test(CLEAR, "'PlotIndepTest' CRDIR", ENTER)
+        .noerror()
+        .test("PlotIndepTest", ENTER)
+        .noerror();
+    step("Polar plot: Select independent variable with INDEP")
+        .test(CLEAR, "'T' INDEP", ENTER)
+        .noerror()
+        .test("'PPAR' RCL", ENTER)
+        .match(".*\\{ T -10 10 \\}.*");
+    step("Polar plot: Select independent range with INDEP")
+        .test(CLEAR, "0 6.28 INDEP", ENTER)
+        .noerror()
+        .test("'PPAR' RCL", ENTER)
+        .match(".*0.*6\\.28.*");
+    step("Polar plot: Select dependent variable with DEPND")
+        .test(CLEAR, "'U' DEPND", ENTER)
+        .noerror()
+        .test("'PPAR' RCL 7 GET", ENTER)
+        .expect("{ U -6 6 }");
+    step("Leave sandbox for INDEP/DEPND tests")
+        .test(CLEAR, "UPDIR", ENTER)
+        .noerror()
+        .test("'PlotIndepTest' PURGE", ENTER)
+        .noerror();
 
     step("Parametric plot: Program");
     test(CLEAR,

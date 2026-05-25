@@ -68,6 +68,13 @@
   The `-H` flag runs in headless mode (no Qt window). Exit code 0 means all
   tests passed; non-zero means there are failures (see console output or
   `failures.log` if you capture it).
+- **Treat every test failure as your problem until proven otherwise.** The user
+  typically invokes you with a clean test suite. Do **not** dismiss failures as
+  “pre-existing”, “unrelated”, or “environmental” unless you have **proven**
+  that (e.g. reproduced on the parent commit, or isolated the failure to code
+  you did not touch). Failures in tests that run **after** your new tests are
+  often caused by **state leakage** (settings, reserved variables such as
+  `PPAR`, directories, flags). Investigate before claiming innocence.
 - To run a single test group: `db48x -H -Tname` (e.g. `-Tsectrig`).
 - Enable recorder traces during tests with `-tchannel` (see Debugging section):
   ```
@@ -95,6 +102,13 @@
   `{ FractionLargestPrime } Purge Std`. The `Std` reapplies standard
   defaults. See `MaxFactorIterations` and `FractionLargestPrime` in
   `tests.cc` for examples.
+- **Sandbox directories**: when a test modifies reserved variables, global
+  state, or directory contents that later tests depend on, run it inside a
+  temporary directory: `'MyTest' CRDIR`, enter it, run the test, then `UPDIR`
+  and `'MyTest' PURGE`. See `SLVTST` in `solver_testing`, `ExamplesTest` in
+  `check_help_examples`, and `PlotIndepTest` in `plotting` for examples.
+  Plotting tests that change `PPAR` must not run in the main directory unless
+  the prior state is fully restored before subsequent image-based plot tests.
 - **Test assertions** (`.expect`, `.want`, `.match`):
   - Use `.expect()` for **exact match**.
   - Use `.want()` when you only need to ignore/allow variation in spaces

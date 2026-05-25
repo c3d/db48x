@@ -1250,7 +1250,7 @@ MENU(IntegrationMenu,
      "Num ∫",   ID_Integrate,
      "Symb ∫",  ID_Primitive,
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
 
      "Σ",       ID_Sum,
      "∏",       ID_Product);
@@ -1285,7 +1285,7 @@ MENU(NumericalSolverMenu,
 //  Menu for numerical equation solving
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
      "Root",    ID_Root,
 
      ID_SolverMenu);
@@ -1295,7 +1295,7 @@ MENU(DifferentialSolverMenu,
 //   Menu for differential equation solving
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
      "Root",    ID_Root,
 
      ID_SolverMenu);
@@ -1306,7 +1306,7 @@ MENU(SymbolicSolverMenu,
 //   Menu for symbolic equation solving
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
      "Root",    ID_Root,
      "Isolate", ID_Isolate,
 
@@ -1317,7 +1317,7 @@ MENU(PolynomialSolverMenu,
 //   Menu for polynom solving
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
      "Root",    ID_Root,
 
      ID_SolverMenu);
@@ -1327,7 +1327,7 @@ MENU(LinearSolverMenu,
 //   Menu for linear system solving
 // ----------------------------------------------------------------------------
      "Eq",      ID_Equation,
-     "Indep",   ID_Unimplemented,
+     "Indep",   ID_Indep,
      "Root",    ID_Root,
 
      ID_SolverMenu);

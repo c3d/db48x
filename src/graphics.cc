@@ -45,6 +45,7 @@
 #include "user_interface.h"
 #include "util.h"
 #include "variables.h"
+#include <atomic>
 
 typedef const based_integer *based_integer_p;
 typedef const based_bignum  *based_bignum_p;
@@ -73,6 +74,8 @@ PlotParametersAccess::PlotParametersAccess()
       imin(integer::make(-10)),
       imax(integer::make(10)),
       dependent(symbol::make("y")),
+      dmin(integer::make(-6)),
+      dmax(integer::make(6)),
       resolution(integer::make(0)),
       xorigin(integer::make(0)),
       yorigin(integer::make(0)),
@@ -125,29 +128,24 @@ bool PlotParametersAccess::parse(list_p parms)
             break;
 
         case 2:                 // Independent variable
-            if (list_g ilist = obj->as<list>())
+            if (symbol_g sym = obj->as_quoted<symbol>())
+            {
+                independent = sym;
+                valid = true;
+            }
+            else if (list_g ilist = obj->as<list>())
             {
                 int ok = 0;
                 if (object_p name = ilist->at(0))
                     if (symbol_p sym = name->as<symbol>())
                         ok++, independent = sym;
                 if (object_p obj = ilist->at(1))
-                    if (algebraic_p val = obj->as_algebraic())
+                    if (algebraic_p val = obj->as_real())
                         ok++, imin = val;
                 if (object_p obj = ilist->at(2))
-                    if (algebraic_p val = obj->as_algebraic())
+                    if (algebraic_p val = obj->as_real())
                         ok++, imax = val;
                 valid = ok == 3;
-                break;
-            }
-            // fallthrough
-            [[fallthrough]];
-
-        case 6:                 // Dependent variable
-            if (symbol_g sym = obj->as<symbol>())
-            {
-                (index == 2 ? independent : dependent) = sym;
-                valid = true;
             }
             break;
 
@@ -225,6 +223,28 @@ bool PlotParametersAccess::parse(list_p parms)
                 type = obj->type();
             break;
 
+        case 6:                 // Dependent variable
+            if (symbol_g sym = obj->as_quoted<symbol>())
+            {
+                dependent = sym;
+                valid = true;
+            }
+            else if (list_g ilist = obj->as<list>())
+            {
+                int ok = 0;
+                if (object_p name = ilist->at(0))
+                    if (symbol_p sym = name->as<symbol>())
+                        ok++, dependent = sym;
+                if (object_p obj = ilist->at(1))
+                    if (algebraic_p val = obj->as_real())
+                        ok++, dmin = val;
+                if (object_p obj = ilist->at(2))
+                    if (algebraic_p val = obj->as_real())
+                        ok++, dmax = val;
+                valid = ok == 3;
+            }
+            break;
+
         default:
             break;
         }
@@ -241,7 +261,6 @@ bool PlotParametersAccess::parse(list_p parms)
     // Check that we have sane input
     if (!check_validity())
     {
-        check_validity();
         rt.invalid_ppar_error();
         return false;
     }
@@ -275,14 +294,14 @@ bool PlotParametersAccess::write(object_p name) const
 
     if (directory *dir = rt.variables(0))
     {
-        rectangular_g zmin = rectangular::make(xmin, ymin);
-        rectangular_g zmax = rectangular::make(xmax, ymax);
+        rectangular_g zmin  = rectangular::make(xmin, ymin);
+        rectangular_g zmax  = rectangular::make(xmax, ymax);
         list_g        indep = list::make(independent, imin, imax);
         complex_g     zorig = rectangular::make(xorigin, yorigin);
         list_g        ticks = list::make(xticks, yticks);
         list_g        axes  = list::make(zorig, ticks, xlabel, ylabel);
         object_g      ptype = command::static_object(type);
-        symbol_g      dep = dependent;
+        list_g        dep   = list::make(dependent, dmin, dmax);
 
         list_g        par =
             list::make(zmin, zmax, indep, resolution, axes, ptype, dep);
@@ -302,9 +321,9 @@ bool PlotParametersAccess::check_validity() const
     // All labels must be defined
     if (!xmin|| !xmax|| !ymin|| !ymax)
         return false;
-    if (!independent|| !dependent|| !resolution)
+    if (!independent || !imin || !imax)
         return false;
-    if (!imin|| !imax)
+    if (!dependent   || !dmin || !dmax)
         return false;
     if (!resolution|| !xorigin|| !yorigin)
         return false;
@@ -317,6 +336,8 @@ bool PlotParametersAccess::check_validity() const
     if (!ymin->is_real() || !ymax->is_real())
         return false;
     if (!imin->is_real() || !imax->is_real())
+        return false;
+    if (!dmin->is_real() || !dmax->is_real())
         return false;
     if (!resolution->is_real())
         return false;
@@ -339,10 +360,12 @@ bool PlotParametersAccess::check_validity() const
     test = imin >= imax;
     if (test->as_truth(true))
         return false;
+    test = dmin >= dmax;
+    if (test->as_truth(true))
+        return false;
 
     return true;
 }
-
 
 
 
@@ -2566,6 +2589,139 @@ COMMAND_BODY(Res)
         rt.type_error();
     }
     return ERROR;
+}
+
+
+static bool set_ppar_variable(bool dependent)
+// ----------------------------------------------------------------------------
+//   Shared code for Indep and Depnd
+// ----------------------------------------------------------------------------
+//   These commands are special in that they take a variable number of args
+//   Four forms take 1 argument (name or list)
+//   The last form takes 2 real numbers from the stack
+{
+    uint depth = rt.depth();
+    if (!depth)
+    {
+        rt.missing_argument_error();
+        return false;
+    }
+
+    PlotParametersAccess ppar;
+    if (depth >= 2)
+    {
+        object_p arg  = rt.stack(0);
+        object_p arg2 = rt.stack(1);
+        if (arg->is_real() && arg2->is_real())
+        {
+            if (!rt.args(2))
+                return false;
+            algebraic_g min = algebraic_p(arg2);
+            algebraic_g max = algebraic_p(arg);
+            if (dependent)
+            {
+                ppar.ymin = min;
+                ppar.ymax = max;
+            }
+            else
+            {
+                ppar.imin = min;
+                ppar.imax = max;
+            }
+            if (ppar.write() && rt.drop(2))
+                return true;
+            return false;
+        }
+    }
+
+    if (!rt.args(1))
+        return false;
+
+    object_p arg = rt.top();
+    symbol_p    name = nullptr;
+    algebraic_p min  = nullptr;
+    algebraic_p max  = nullptr;
+    if (list_p specs = arg->as<list>())
+    {
+        for (auto it : *specs)
+        {
+            if (min && max)
+                break;
+            if (symbol_p sym = it->as_quoted<symbol>())
+            {
+                if (name || min || max)
+                    rt.type_error();
+                else
+                    name = sym;
+            }
+            else if (algebraic_p rv = it->as_real())
+            {
+                if (!min)
+                    min = rv;
+                else if (!max)
+                    max = rv;
+                else
+                    break;
+            }
+            else
+            {
+                rt.type_error();
+                return false;
+            }
+        }
+    }
+    else if (symbol_p sym = arg->as_quoted<symbol>())
+    {
+        name = sym;
+    }
+    else
+    {
+        rt.type_error();
+        return false;
+    }
+
+    if (min && !max)
+    {
+        rt.domain_error();
+        return false;
+    }
+    if (dependent)
+    {
+        if (name)
+            ppar.dependent = name;
+        if (min)
+            ppar.dmin = min;
+        if (max)
+            ppar.dmax = max;
+    }
+    else
+    {
+        if (name)
+            ppar.independent = name;
+        if (min)
+            ppar.imin = min;
+        if (max)
+            ppar.imax = max;
+    }
+    return ppar.write() && rt.drop();
+}
+
+
+COMMAND_BODY(Indep)
+// ----------------------------------------------------------------------------
+//   Set the independent variable in the plot parameters
+// ----------------------------------------------------------------------------
+{
+    return set_ppar_variable(false) ? OK : ERROR;
+}
+
+
+COMMAND_BODY(Depnd)
+// ----------------------------------------------------------------------------
+//   Set the dependent variable in the plot parameters
+// ----------------------------------------------------------------------------
+{
+    return set_ppar_variable(true) ? OK : ERROR;
 }
 
 

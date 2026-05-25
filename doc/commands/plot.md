@@ -83,6 +83,48 @@ causes the circle to be elongated vertically:
 @ Image yrange-circle
 ```
 
+## Indep
+
+Set the independent variable in `PlotParameters`.
+
+The independent variable name and its plotting range are stored as the third
+element in `PlotParameters`. The default name is `x`, with range `-10` to `10`.
+
+The argument can be:
+
+* A variable name, e.g. `'T'`, which replaces the independent variable name
+* A list containing a name, e.g. `{ 'T' }`, which replaces the name but keeps
+  the existing range
+* A list containing a name and two real numbers, e.g. `{ 'T' 0 6.28 }`, which
+  replaces both the name and the range
+* A list containing two real numbers, e.g. `{ 0 6.28 }`, or two real numbers on
+  the stack, which replace the range but keep the existing name
+
+```rpl
+'PPAR' PGALL
+'T' INDEP
+'PPAR' RCL 3 GET
+@ Expecting { T -10 10 }
+```
+
+## Depnd
+
+Set the dependent variable in `PlotParameters`.
+
+The dependent variable name is stored as the last element in `PlotParameters`.
+The default name is `y`.
+
+The argument formats are the same as for `Indep`. When a range is given, it
+updates the vertical plotting range (`YRange`), which is used for example by
+`TruthPlot`.
+
+```rpl
+'PPAR' PGALL
+'U' DEPND
+'V' INDEP
+'sin(25*V)+cos(32*U)*exp(ⅈV)' TruthPlot
+@ Image depend
+```
 
 ## PlotParameters
 

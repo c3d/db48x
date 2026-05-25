@@ -68,6 +68,8 @@ struct PlotParametersAccess
     algebraic_g     imin;
     algebraic_g     imax;
     symbol_g        dependent;
+    algebraic_g     dmin;
+    algebraic_g     dmax;
     algebraic_g     resolution;
     algebraic_g     xorigin;
     algebraic_g     yorigin;
@@ -222,6 +224,8 @@ COMMAND_DECLARE(XScale,1);
 COMMAND_DECLARE(YScale,1);
 COMMAND_DECLARE(Center,1);
 COMMAND_DECLARE(Res,1);
+COMMAND_DECLARE(Indep, ~2);
+COMMAND_DECLARE(Depnd, ~2);
 
 COMMAND_DECLARE(CompileToAlgebraic,  1);
 COMMAND_DECLARE(CompileToNumber,  1);
