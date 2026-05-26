@@ -476,7 +476,7 @@ Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-refe
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | _SVD_ | _SVL_ | _Diag→_ | _→Diag_ | _SpecRad_ |   |
-| _LU_ | _LQ_ | _QR_ | _Schur_ | _Cholesky_ | ◀ |
+| [LU](#lu) | _LQ_ | _QR_ | _Schur_ | _Cholesky_ | ◀ |
 | [Col+](#col) | [Col-](#col-) | →Col | Col→ | ColSwp | ▶ |
 
 **Page 3**

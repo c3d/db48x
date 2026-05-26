@@ -134,6 +134,7 @@ TESTS(text,             "Text operations");
 TESTS(vectors,          "Vectors");
 TESTS(matrices,         "Matrices");
 TESTS(rref,             "REF, RREF, RREFP row echelon");
+TESTS(lu,               "LU matrix factorization");
 TESTS(solver,           "Solver");
 TESTS(cstlib,           "Built-in constants parsing");
 TESTS(equations,        "Built-in equations");
@@ -261,6 +262,7 @@ int tests::run(uint onlyCurrent)
         vector_functions();
         matrix_functions();
         row_echelon();
+        lu_decomposition();
         solver_testing();
         constants_parsing();
         eqnlib_parsing();
@@ -8055,6 +8057,64 @@ void tests::row_echelon()
 }
 
 
+void tests::lu_decomposition()
+// ----------------------------------------------------------------------------
+//   LU factorization (P·A = L·U)
+// ----------------------------------------------------------------------------
+{
+    BEGIN(lu);
+
+    step("Plain fractions for LU matrix display")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER).noerror();
+
+    step("LU returns P on level 1")
+        .test(CLEAR, "[[2 0][0 3]] LUFactorization", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]", 1000);
+
+    step("LU returns U on level 2")
+        .test(CLEAR, "[[2 0][0 3]] LUFactorization SWAP", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]", 1000);
+
+    step("LU returns L on level 3")
+        .test(CLEAR, "[[2 0][0 3]] LUFactorization Pick3", ENTER)
+        .want("[[ 2 0 ] [ 0 3 ]]", 1000);
+
+    step("LU 3x3 partial pivoting")
+        .test(CLEAR, "[[-1 2 5][3 1 -2][7 6 5]] LUFactorization", ENTER)
+        .want("[[ 0 0 1 ] [ 1 0 0 ] [ 0 1 0 ]]", 1000)
+        .test(CLEAR, "[[-1 2 5][3 1 -2][7 6 5]] LUFactorization SWAP", ENTER)
+        .want("[[ 1 6/7 5/7 ] [ 0 1 2 ] [ 0 0 1 ]]", 1000)
+        .test(CLEAR, "[[-1 2 5][3 1 -2][7 6 5]] LUFactorization Pick3", ENTER)
+        .want("[[ 7 0 0 ] [ -1 20/7 0 ] [ 3 -11/7 -1 ]]", 1000);
+
+    step("LU 2x2 L times U")
+        .test(CLEAR, "[[3 0][1 2/3]] [[1 4/3][0 1]] *", ENTER)
+        .want("[[ 3 4 ] [ 1 2 ]]", 1000);
+
+    step("P·A equals L·U")
+        .test(CLEAR,
+              "[[0 1][1 0]] [[1 2][3 4]] *"
+              " [[3 0][1 2/3]] [[1 4/3][0 1]] * -",
+              ENTER)
+        .want("[[ 0 0 ] [ 0 0 ]]", 1000);
+
+    step("LU rejects non-square matrix")
+        .test(CLEAR, "[[1 2 3][4 5 6]] LUFactorization", ENTER)
+        .error("Invalid dimension");
+
+    step("LU rejects singular matrix")
+        .test(CLEAR, "[[1 2][2 4]] LUFactorization", ENTER)
+        .error("Divide by zero");
+
+    step("LU rejects symbolic matrices")
+        .test(CLEAR, "[[a b][c d]] LU", ENTER)
+        .error("Bad argument type");
+
+    step("Restore fraction display default")
+        .test(CLEAR, "SmallFractions MixedFractions", ENTER).noerror();
+}
+
+
 void tests::solver_testing()
 // ----------------------------------------------------------------------------
 //   Test that the solver works as expected
@@ -14139,6 +14199,7 @@ void tests::check_help_examples()
                         else
                         {
                             want(ref.c_str());
+                            itest(BSP);
                         }
                     }
                     bool fails = failures.size() > nfailures;

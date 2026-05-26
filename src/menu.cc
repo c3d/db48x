@@ -612,7 +612,7 @@ MENU(MatrixMenu,
      "Col→",    ID_ColumnsToMatrix,
      "ColSwp",  ID_ColumnSwap,
 
-     "LU",      ID_Unimplemented,
+     "LU",      ID_LU,
      "LQ",      ID_Unimplemented,
      "QR",      ID_Unimplemented,
      "Schur",   ID_Unimplemented,

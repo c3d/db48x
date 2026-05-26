@@ -68,6 +68,17 @@ struct echelon_result
 };
 
 
+struct lu_result
+// ----------------------------------------------------------------------------
+//   LU decomposition gives three matrices as results
+// ----------------------------------------------------------------------------
+{
+    array_g L;
+    array_g U;
+    array_g P;
+};
+
+
 struct array : list
 // ----------------------------------------------------------------------------
 //   An array is a list with [ and ] as delimiters
@@ -152,6 +163,7 @@ struct array : list
 
     static echelon_result row_echelon(array_r m, echelon_options opt);
     static object::result echelon_command(echelon_mode mode);
+    static lu_result      lu_factorization(array_r m);
 
 public:
     OBJECT_DECL(array);
@@ -195,6 +207,7 @@ COMMAND_DECLARE(REF, 1);
 COMMAND_DECLARE(RREF, 1);
 COMMAND_DECLARE(RREFP, 1);
 COMMAND_DECLARE(RREFMOD, 1);
+COMMAND_DECLARE(LU, 1);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);

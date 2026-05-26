@@ -509,7 +509,21 @@ Find a basis for the kernel of a linear application
 
 
 ## LU
-LU factorization of a matrix
+
+Crout LU factorization with partial pivoting for a square matrix `A`.
+
+Returns `L`, `U`, and a permutation matrix `P` such that `P·A = L·U`.
+`L` is lower triangular, `U` is upper triangular with ones on its diagonal,
+and `P` records the row exchanges performed during pivoting.
+
+`M` → `L` `U` `P`
+
+```rpl
+[[-1 2 5][3 1 -2][7 6 5]] LU 3 →List
+@ Expecting { [[ 7 0 0 ] [ -1 2 ⁶/₇ 0 ] [ 3 -1 ⁴/₇ -1 ]] [[ 1 ⁶/₇ ⁵/₇ ] [ 0 1 2 ] [ 0 0 1 ]] [[ 0 0 1 ] [ 1 0 0 ] [ 0 1 0 ]] }
+```
+
+See also: `REF`, `RREF`, `QR`, `DET`, `INV`, `LSQ`.
 
 
 ## MAD

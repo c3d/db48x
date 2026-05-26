@@ -42,7 +42,6 @@
 #include <cstring>
 
 
-
 RECORDER(runtime,       16, "RPL runtime");
 RECORDER(runtime_error, 16, "RPL runtime error (anomalous behaviors)");
 RECORDER(editor,        16, "Text editor (command line)");

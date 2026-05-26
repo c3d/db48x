@@ -588,10 +588,7 @@ algebraic_p array::determinant() const
                 {
                     size_t ia = index * n + j;
                     size_t ib = i * n + j;
-                    object_p a = rt.stack(px + ~ia);
-                    object_p b = rt.stack(px + ~ib);
-                    rt.stack(px + ~ia, b);
-                    rt.stack(px + ~ib, a);
+                    rt.swap(px + ~ia, px + ~ib);
                 }
 
 #if SIMULATOR
@@ -766,6 +763,24 @@ static size_t echelon_index(size_t row, size_t col, size_t cols)
 }
 
 
+static bool echelon_swap_rows(size_t a, size_t b, size_t cols, size_t base)
+// ----------------------------------------------------------------------------
+//   Swap two rows in a stack-backed matrix
+// ----------------------------------------------------------------------------
+{
+    if (a == b)
+        return true;
+    for (size_t c = 0; c < cols; c++)
+    {
+        size_t ia = echelon_index(a, c, cols);
+        size_t ib = echelon_index(b, c, cols);
+        if (!rt.swap(base + ~ia, base + ~ib))
+            return false;
+    }
+    return true;
+}
+
+
 #if SIMULATOR
 static void echelon_dump_matrix(cstring label, size_t rows, size_t cols,
                                   size_t base, size_t stack_depth)
@@ -773,19 +788,20 @@ static void echelon_dump_matrix(cstring label, size_t rows, size_t cols,
 //   Log every stack-backed matrix coefficient (temporary debug aid)
 // ----------------------------------------------------------------------------
 {
-    if (!RECORDER_TRACE(echelon))
-        return;
     record(echelon, "=== %s depth=%u (saved=%u) base=%u %zux%zu ===",
            label, rt.depth(), stack_depth, base, rows, cols);
-    for (size_t r = 0; r < rows; r++)
+    if (RECORDER_TRACE(echelon) > 1)
     {
-        for (size_t c = 0; c < cols; c++)
+        for (size_t r = 0; r < rows; r++)
         {
-            size_t ix   = echelon_index(r, c, cols);
-            size_t slot = base + ~ix;
-            object_p v  = rt.stack(slot);
-            record(echelon, "  m[%zu,%zu] ix=%zu slot=%zu -> %t",
-                   r, c, ix, slot, v);
+            for (size_t c = 0; c < cols; c++)
+            {
+                size_t ix   = echelon_index(r, c, cols);
+                size_t slot = base + ~ix;
+                object_p v  = rt.stack(slot);
+                record(echelon, "  m[%zu,%zu] ix=%zu slot=%zu -> %t",
+                       r, c, ix, slot, v);
+            }
         }
     }
 }
@@ -1126,6 +1142,272 @@ COMMAND_BODY(RREFMOD)
 }
 
 
+enum class lu_matrix_part : uint8_t
+// ----------------------------------------------------------------------------
+//   Identify which part of the matrix we are looking at
+// ----------------------------------------------------------------------------
+{
+    L,
+    U,
+    P,
+};
+
+
+struct lu_pack_ctx
+// ----------------------------------------------------------------------------
+//  LU packing context
+// ----------------------------------------------------------------------------
+{
+    lu_matrix_part part;
+    size_t         n;
+    size_t         base;
+    size_t        *row_perm;
+};
+
+
+static object_p lu_pack_item(size_t rows, size_t cols, size_t r, size_t c,
+                             void *data)
+// ----------------------------------------------------------------------------
+//   One matrix coefficient for array::build during LU pack
+// ----------------------------------------------------------------------------
+{
+    lu_pack_ctx *ctx = (lu_pack_ctx *) data;
+    size_t       n    = ctx->n;
+    size_t       base = ctx->base;
+
+    if (program::interrupted())
+        return nullptr;
+
+    switch (ctx->part)
+    {
+    case lu_matrix_part::L:
+        if (c > r)
+            return +integer::make(0);
+        if (c < r)
+        {
+            object_p wrc = echelon_element(r, c, n, base);
+            object_p dcc = echelon_element(c, c, n, base);
+            if (!wrc || !dcc)
+                return nullptr;
+            algebraic_p wp = wrc->as_algebraic();
+            algebraic_p dp = dcc->as_algebraic();
+            if (!wp || !dp)
+                return nullptr;
+            cleaner     purge;
+            algebraic_g v = algebraic_g(wp) * algebraic_g(dp);
+            if (!v)
+                return nullptr;
+            return +purge(v);
+        }
+        return echelon_element(r, r, n, base);
+
+    case lu_matrix_part::U:
+        if (c < r)
+            return +integer::make(0);
+        if (c == r)
+            return +integer::make(1);
+        {
+            object_p wrc = echelon_element(r, c, n, base);
+            object_p drr = echelon_element(r, r, n, base);
+            if (!wrc || !drr)
+                return nullptr;
+            algebraic_p wp = wrc->as_algebraic();
+            algebraic_p dr = drr->as_algebraic();
+            if (!wp || !dr)
+                return nullptr;
+            cleaner     purge;
+            algebraic_g v = algebraic_g(wp) / algebraic_g(dr);
+            if (!v)
+                return nullptr;
+            return +purge(v);
+        }
+
+    case lu_matrix_part::P:
+        return +integer::make(ctx->row_perm[r] == c ? 1 : 0);
+    }
+    return nullptr;
+}
+
+
+static array_p lu_pack_matrix(size_t n, size_t base, object::id UNUSED atype,
+                              lu_matrix_part part, size_t *row_perm)
+// ----------------------------------------------------------------------------
+//   Build L, U, or P from LU workspace and row permutation
+// ----------------------------------------------------------------------------
+{
+    lu_pack_ctx ctx = { part, n, base, row_perm };
+    return array::build(n, n, lu_pack_item, &ctx);
+}
+
+
+lu_result array::lu_factorization(array_r m)
+// ----------------------------------------------------------------------------
+//   Crout LU decomposition with partial pivoting (P·A = L·U)
+// ----------------------------------------------------------------------------
+{
+    lu_result result;
+
+    size_t     n      = 0;
+    size_t     cols   = 0;
+    size_t     depth  = rt.depth();
+    object::id atype = m->type();
+    size_t     base  = 0;
+
+    if (!m->is_matrix(&n, &cols, true))
+    {
+        rt.type_error();
+        rt.drop(rt.depth() - depth);
+        return result;
+    }
+    if (n != cols)
+    {
+        rt.dimension_error();
+        rt.drop(rt.depth() - depth);
+        return result;
+    }
+
+    size_t row_perm[n];
+    for (size_t i = 0; i < n; i++)
+        row_perm[i] = i;
+
+    base = n * n;
+
+    for (size_t k = 0; k < n; k++)
+    {
+        if (program::interrupted())
+            goto err;
+
+        size_t     pivot = k;
+        object_p   best_obj = echelon_element(pivot, k, n, base);
+        if (!best_obj)
+            goto err;
+        algebraic_p best = best_obj->as_algebraic();
+        if (!best)
+            goto err;
+
+        for (size_t i = k + 1; i < n; i++)
+        {
+            object_p cand_obj = echelon_element(i, k, n, base);
+            if (!cand_obj)
+                goto err;
+            algebraic_p cand = cand_obj->as_algebraic();
+            if (!cand)
+                goto err;
+            if (best->is_zero(false))
+            {
+                if (!cand->is_zero(false))
+                {
+                    pivot = i;
+                    best  = cand;
+                }
+            }
+            else if (!cand->is_zero(false) && smaller_magnitude(best, cand))
+            {
+                pivot = i;
+                best  = cand;
+            }
+        }
+
+        if (best->is_zero(false))
+        {
+            rt.zero_divide_error();
+            goto err;
+        }
+
+        if (pivot != k)
+        {
+            if (!echelon_swap_rows(pivot, k, n, base))
+                goto err;
+            std::swap(row_perm[k], row_perm[pivot]);
+        }
+
+        object_p piv_obj = echelon_element(k, k, n, base);
+        if (!piv_obj)
+            goto err;
+        algebraic_p piv = piv_obj->as_algebraic();
+        if (!piv)
+            goto err;
+
+        for (size_t i = k + 1; i < n; i++)
+        {
+            object_p lead_obj = echelon_element(i, k, n, base);
+            if (!lead_obj)
+                goto err;
+            algebraic_p lead = lead_obj->as_algebraic();
+            if (!lead)
+                goto err;
+
+            cleaner     purge;
+            algebraic_g mult = algebraic_g(lead) / algebraic_g(piv);
+            if (!mult)
+                goto err;
+            mult = purge(mult);
+            if (!rt.stack(base + ~echelon_index(i, k, n), +mult))
+                goto err;
+
+            for (size_t j = k + 1; j < n; j++)
+            {
+                cleaner purge2;
+                object_p t_obj = echelon_element(i, j, n, base);
+                object_p p_obj = echelon_element(k, j, n, base);
+                if (!t_obj || !p_obj)
+                    goto err;
+                algebraic_p t_val = t_obj->as_algebraic();
+                algebraic_p p_val = p_obj->as_algebraic();
+                if (!t_val || !p_val)
+                    goto err;
+                algebraic_g nj = algebraic_g(t_val) - mult * algebraic_g(p_val);
+                if (!nj)
+                    goto err;
+                nj = purge2(nj);
+                if (!rt.stack(base + ~echelon_index(i, j, n), +nj))
+                    goto err;
+            }
+        }
+    }
+
+    result.L = lu_pack_matrix(n, base, atype, lu_matrix_part::L, row_perm);
+    if (!result.L)
+        goto err;
+    result.U = lu_pack_matrix(n, base, atype, lu_matrix_part::U, row_perm);
+    if (!result.U)
+        goto err;
+    result.P = lu_pack_matrix(n, base, atype, lu_matrix_part::P, row_perm);
+    if (!result.P)
+        goto err;
+
+    rt.drop(rt.depth() - depth);
+    return result;
+
+err:
+    rt.drop(rt.depth() - depth);
+    return result;
+}
+
+
+COMMAND_BODY(LU)
+// ----------------------------------------------------------------------------
+//   LU factorization (HP50G: P·A = L·U, stack order L U P)
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        if (array_p m = obj->as<array>())
+        {
+            lu_result lr = array::lu_factorization(m);
+            if (!lr.L || !lr.U || !lr.P)
+                return ERROR;
+            rt.drop(1);
+            if (!rt.push(+lr.L) || !rt.push(+lr.U) || !rt.push(+lr.P))
+                return ERROR;
+            return OK;
+        }
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
 array_p array::invert() const
 // ----------------------------------------------------------------------------
 //   Compute the inverse of a square matrix
@@ -1269,10 +1551,7 @@ array_p array::invert() const
                             goto err;
 
                         size_t p = mat ? pt : pm;
-                        object_p a = rt.stack(p + ~oa);
-                        object_p b = rt.stack(p + ~ob);
-                        rt.stack(p + ~oa, b);
-                        rt.stack(p + ~ob, a);
+                        rt.swap(p + ~oa, p + ~ob);
                     }
 
                 }

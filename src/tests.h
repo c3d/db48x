@@ -101,6 +101,7 @@ struct tests
     void vector_functions();
     void matrix_functions();
     void row_echelon();
+    void lu_decomposition();
     void solver_testing();
     void constants_parsing();
     void eqnlib_parsing();
