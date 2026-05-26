@@ -42,7 +42,7 @@ algebraic_p to_days(object_p days, bool error = true);
 
 // Convert date value to Julian day number, or 0 if fails
 algebraic_p julian_day_number(algebraic_p date, bool error = true);
-ularge julian_day_number(int d, int m, int y);
+double julian_day_number(int d, int m, int y);
 
 // Convert Julian day number to date
 algebraic_p date_from_julian_day(object_p jdn, bool error = true);

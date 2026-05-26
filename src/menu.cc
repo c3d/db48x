@@ -198,7 +198,7 @@ static object::id unit_menu(unit_p u)
                 result = object::ID_TimeMenu;
             else if (sym->matches("date") || sym->matches("d") ||
                      sym->matches("yr"))
-                result = object::ID_DateMenu;
+                result = object::ID_DatesMenu;
         }
     }
     return result;
@@ -1796,11 +1796,11 @@ MENU(TimeMenu,
      "→Time",   ID_SetTime,
      "→Date",   ID_SetDate,
      "ClkAdj",  ID_Unimplemented,
-     "Dates",   ID_DateMenu,
+     "Dates",   ID_DatesMenu,
      "Alarms",  ID_AlarmMenu);
 
 
-MENU(DateMenu,
+MENU(DatesMenu,
 // ----------------------------------------------------------------------------
 //   Date operations
 // ----------------------------------------------------------------------------
@@ -1832,7 +1832,7 @@ MENU(AlarmMenu,
 
      "AckAll",  ID_Unimplemented,
      "Time",    ID_TimeMenu,
-     "Date",    ID_DateMenu);
+     "Dates",   ID_DatesMenu);
 
 
 MENU(TextMenu,

@@ -179,7 +179,7 @@ spellings.
 * `DateDash`
 * `DateDot`
 * `DateForeground`
-* `DateMenu`
+* `DatesMenu`
 * `DateSeparatorCommand`
 * `DateSlash`
 * `DateSpace`
@@ -1157,7 +1157,7 @@ spellings.
 * `DateDash`
 * `DateDot`
 * `DateForeground`
-* `DateMenu`
+* `DatesMenu`
 * `DateSeparatorCommand`
 * `DateSlash`
 * `DateSpace`
@@ -2135,7 +2135,7 @@ spellings.
 * `DateDash`
 * `DateDot`
 * `DateForeground`
-* `DateMenu`
+* `DatesMenu`
 * `DateSeparatorCommand`
 * `DateSlash`
 * `DateSpace`

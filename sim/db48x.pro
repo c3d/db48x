@@ -95,7 +95,9 @@ SOURCES +=                                      \
         ../src/unit.cc                          \
         ../src/user_interface.cc                \
         ../src/util.cc                          \
-        ../src/variables.cc
+        ../src/variables.cc                     \
+        ../src/jd2cal.c                         \
+        ../src/cal2jd.c
 
 HEADERS +=                                      \
 	sim-window.h                            \

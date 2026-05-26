@@ -36,6 +36,8 @@
 #include "tag.h"
 #include "unit.h"
 
+#include "sofa.h"
+#include "sofam.h"
 
 // ============================================================================
 //
@@ -132,7 +134,8 @@ uint to_date(object_p dtobj, dt_t &dt, tm_t &tm, bool error)
 
     const uint days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     bool bisext = m == 2 && y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
-    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext || y == 0)
+    if (m < 1 || m > 12 || d < 1 || d > days[m-1] + bisext ||
+	(Settings.BCECEyearNumbering() && y == 0))
     {
         if (error)
             rt.invalid_date_error();
@@ -201,9 +204,14 @@ algebraic_p julian_day_number(const dt_t &dt, const tm_t &tm)
 //   Compute julian day number for a dt_t structure
 // ----------------------------------------------------------------------------
 {
+    double jdn_value = julian_day_number(dt.day, dt.month, dt.year);
+    long jdn_day = long(jdn_value);
+    long jdn_fraction_of_day = long((jdn_value - jdn_day) * 8640000);
+
     ularge csecs = (tm.hour * 3600 + tm.min * 60 + tm.sec) * 100 + tm.csec;
-    ularge jval = julian_day_number(dt.day, dt.month, dt.year);
-    algebraic_g jdn = integer::make(jval);
+    algebraic_g jdn = integer::make(jdn_day);
+
+    csecs += jdn_fraction_of_day;
     if (csecs)
     {
         algebraic_g frac = +fraction::make(integer::make(csecs),
@@ -227,27 +235,21 @@ algebraic_p julian_day_number(algebraic_p dtobj, bool error)
 }
 
 
-ularge julian_day_number(int d, int m, int y)
+double julian_day_number(int d, int m, int y)
 // ----------------------------------------------------------------------------
 //   Compute the Julian day number given day, month and year
 // ----------------------------------------------------------------------------
-// The algorithm below follows the description in
-// https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_day_number
-// which itself seems to be based on the "Fliegel and van Flandern" algorithms:
-// https://aa.usno.navy.mil/faq/JD_formula --> JD.
-// With a little bit of algebra this function can be shown to be equivalent.
-//
-// According to https://en.wikipedia.org/wiki/Gregorian_calendar
-// "Thursday 4 October 1582 was followed by Friday 15 October 1582"
-// This function doesn't do the 10 day advance.
 {
-    int rm = (m-14)/12;
-    ularge jdn = ((1461 * (y + 4800 + rm)) / 4
-                  + (367 * (m - 2 - 12 * rm)) / 12
-                  - (3 * ((y + 4900 + rm) / 100)) / 4
-                  + d
-                  - 32075);
-    return jdn;
+    int result;
+    double djm0, djm;
+
+    result = iauCal2jd(y, m, d, &djm0, &djm);
+    if (result < 0)
+    {
+        rt.invalid_date_error();
+        return 0.0;
+    }
+    return (djm0 + djm);
 }
 
 
@@ -255,63 +257,65 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
 // ----------------------------------------------------------------------------
 //   Create a date from a Julian day object
 // ----------------------------------------------------------------------------
-// See comments in julian_day_number
 {
     if (!jdn)
         return nullptr;
 
     if (algebraic_g jval = jdn->as_real())
     {
-        large jdn = jval->as_int64(0, error);
+        double dj1, dj2 = 0.0;
+        int year, month, day;
+        double jdn_fraction_of_day;
+        int result;
 
-        enum
+        // How on earth do I get the real or double value out of jval?
         {
-            y = 4716,
-            j = 1401,
-            m = 2,
-            n = 12,
-            r = 4,
-            p = 1461,
-            v = 3,
-            u = 5,
-            s = 153,
-            w = 2,
-            B = 274277,
-            C = -38
-        };
-
-        large f = jdn + j + (((4 * jdn + B) / 146097) * 3) / 4 + C;
-        large e = r * f + v;
-        large g = (e % p) / r;
-        large h = u * g + w;
-        uint day = (h % s) / u + 1;
-        uint month = (h / s + m ) % n + 1;
-        int year = e / p - y + (n + m - month) / n;
-
-	bool negativeYear = year < 0;
-	if (negativeYear)
-            year = -year;
-
-        ularge dval = year * 10000 + month * 100 + day;
-
-        algebraic_g date = integer::make(dval);
-        algebraic_g fp = integer::make(1);
-        fp = jval % fp;
-        if (!fp->is_zero())
-        {
-            algebraic_g factor = integer::make(86400);
-            fp = fp * factor;
-            ularge hval = fp->as_uint64(0, false);
-            uint hour = hval / 3600;
-            uint min = (hval / 60) % 60;
-            uint sec = hval % 60;
-            hval = hour * 10000 + min * 100 + sec;
-            fp = +fraction::make(integer::make(hval),
-                                 integer::make(1000000));
-            date = date + fp;
+	    // Format hhmmsscc, thus cc is hundreds of a second.
+	    const long scale_to_cc = 100 * 100 * 100 * 100;
+            algebraic_g scale = integer::make(scale_to_cc);
+            algebraic_g j = jval * scale;
+            dj1 = double(j->as_uint64(0, false)) / scale_to_cc;
         }
 
-	if (negativeYear)
+        result = iauJd2cal(dj1, dj2, &year, &month, &day, &jdn_fraction_of_day);
+        if (result < 0)
+	{
+            if (error)
+	        rt.invalid_date_error();
+            return nullptr;
+	}
+
+        bool negative_year = year < 0;
+        if (negative_year)
+            year = -year;
+
+        algebraic_g date_part = nullptr;
+        {
+          int date = (((year * 100) + month) * 100) + day;
+          date_part = integer::make(date);
+        }
+
+        algebraic_g time_part = nullptr;
+        {
+            const long scale_to_cc = 24 * 60 * 60 * 100;
+            const long scale_from_cc = 100 * 100 * 100 * 100;
+            int d = round(jdn_fraction_of_day * scale_to_cc);
+            int cc = d % 100;
+            d = d / 100;
+            int seconds = d % 60;
+            d = d / 60;
+            int minutes = d % 60;
+            d = d / 60;
+            int hours = d % 24;
+
+            int time = ((hours * 100 + minutes) * 100 + seconds) * 100 + cc;
+            time_part = +fraction::make(integer::make(time),
+                                        +integer::make(scale_from_cc));
+        }
+
+        algebraic_g date = date_part + time_part;
+
+        if (negative_year)
             date = -date;
 
         date = unit::make(date, +symbol::make("date"));
@@ -498,9 +502,6 @@ COMMAND_BODY(ChronoTime)
 }
 
 
-
-
-
 static bool setTime(object_p tobj)
 // ----------------------------------------------------------------------------
 //   Set the system date based on input
@@ -527,7 +528,6 @@ COMMAND_BODY(SetTime)
                 return OK;
     return ERROR;
 }
-
 
 
 void render_time(renderer &r, algebraic_g &value,
@@ -609,8 +609,9 @@ size_t render_date(renderer &r, algebraic_g date)
 {
     if (!date || !date->is_real())
         return 0;
-    bool neg = date->is_negative();
-    if (neg)
+    
+    bool negative_date = date->is_negative();
+    if (negative_date)
         date = -date;
 
     algebraic_g factor = integer::make(100);
@@ -623,11 +624,14 @@ size_t render_date(renderer &r, algebraic_g date)
     date = date / factor;
     uint month = date->as_uint32(0, false) % 100;
     date = date / factor;
-    uint year = date->as_uint32(0, false);
-    if (year == 0)
+    int year = date->as_int32(0, false);
+
+    if (Settings.ShowDayOfWeek())
     {
-        rt.invalid_date_error();
-        return 0;
+        int syear = negative_date ? -int(year) : year;
+        ularge jdn = julian_day_number(day, month, syear);
+        uint dow = (jdn + 1) % 7;
+        r.printf("%s ", get_wday_shortcut(dow));
     }
 
     char mname[4];
@@ -636,19 +640,20 @@ size_t render_date(renderer &r, algebraic_g date)
     else
         snprintf(mname, 4, "%u", month);
 
+    bool zero_year = year == 0;
+    if (zero_year && !Settings.AstronomicalYearNumbering())
+        return 0;
+
+    if ((negative_date || zero_year) && Settings.BCECEyearNumbering())
+        year = year + 1;
+    if (negative_date && Settings.AstronomicalYearNumbering())
+        year = - year;
+    
     char ytext[16];
     if (Settings.TwoDigitYear())
-        snprintf(ytext, sizeof(ytext), "%02u", year % 100);
+        snprintf(ytext, sizeof(ytext), "%02i", year % 100);
     else
-        snprintf(ytext, sizeof(ytext), "%u", year);
-
-    if (Settings.ShowDayOfWeek())
-    {
-        int syear = neg ? -int(year) : year;
-        ularge jdn = julian_day_number(day, month, syear);
-        uint dow = jdn % 7;
-        r.printf("%s ", get_wday_shortcut(dow));
-    }
+        snprintf(ytext, sizeof(ytext), "%i", year);
 
     char sep   = Settings.DateSeparator();
     uint index = 2 * Settings.YearFirst() + Settings.MonthBeforeDay();
@@ -659,8 +664,13 @@ size_t render_date(renderer &r, algebraic_g date)
     case 2: r.printf("%s%c%u%c%s", ytext, sep, day,   sep, mname); break;
     case 3: r.printf("%s%c%s%c%u", ytext, sep, mname, sep, day);   break;
     }
-    if (neg)
-        r.printf(" BC");
+    if (Settings.BCECEyearNumbering())
+    {
+        r.printf(" ");
+        if (negative_date || zero_year)
+            r.printf("B");
+        r.printf("CE");
+    }
 
     if (time && !time->is_zero())
     {
@@ -671,7 +681,6 @@ size_t render_date(renderer &r, algebraic_g date)
 
     return r.size();
 }
-
 
 
 // ============================================================================
