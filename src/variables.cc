@@ -1703,6 +1703,7 @@ static flag_conversion flag_conversions[] =
     {  -98,     object::ID_VerticalVectors              },
     { -100,     object::ID_FinalAlgebraResults          },
     { -103,     object::ID_ComplexResults               },
+    { -126,     object::ID_EchelonFormKeepLastColumn    },
 };
 
 

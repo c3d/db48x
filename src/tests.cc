@@ -133,6 +133,7 @@ TESTS(sorting,          "Sorting operations");
 TESTS(text,             "Text operations");
 TESTS(vectors,          "Vectors");
 TESTS(matrices,         "Matrices");
+TESTS(rref,             "REF, RREF, RREFP row echelon");
 TESTS(solver,           "Solver");
 TESTS(cstlib,           "Built-in constants parsing");
 TESTS(equations,        "Built-in equations");
@@ -259,6 +260,7 @@ int tests::run(uint onlyCurrent)
         sorting_functions();
         vector_functions();
         matrix_functions();
+        row_echelon();
         solver_testing();
         constants_parsing();
         eqnlib_parsing();
@@ -7995,6 +7997,61 @@ void tests::matrix_functions()
     step("Column norm for vector")
         .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_ColumnNorm)
         .expect("6");
+}
+
+
+void tests::row_echelon()
+// ----------------------------------------------------------------------------
+//   REF, RREF and RREFP matrix elimination
+// ----------------------------------------------------------------------------
+{
+    BEGIN(rref);
+
+    step("Enable symbolic results for echelon commands")
+        .test(CLEAR, "SymbolicResults", ENTER).noerror();
+
+    step("RREF solves 2x2 linear system")
+        .test(CLEAR, "[[3 4 5][5 6 7]] RREF", ENTER)
+        .want("[[ 1 0 -1 ] [ 0 1 2 ]]");
+
+    step("RREFP returns pivots and diagonal matrix")
+        .test(CLEAR, "[[2 1][3 4]] RREFP", ENTER)
+        .want("[[ 10 0 ] [ 0 5 ]]")
+        .test(BSP)
+        .expect("{ 10 5 }");
+
+    step("REF produces upper triangular form")
+        .test(CLEAR, "[[1 -2 1 0][2 1 -2 -3][5 -2 1 12]] REF", ENTER)
+        .want("[[ 1 -2 1 0 ]"
+              " [ 0 5 -4 -3 ]"
+              " [ 0 0 12 84 ] ]");
+
+    step("RREF on symbolic augmented matrix")
+        .test(CLEAR, "[[m 0 n][0 p q]] RREF", ENTER)
+        .want("[[ 1 0 'n÷m' ]"
+              " [ 0 1 'q÷p' ] ]");
+
+    step("RREF on rank-deficient matrix")
+        .test(CLEAR, "[[1 2 3][2 4 6]] RREF", ENTER)
+        .want("[[ 1 2 3 ] [ 0 0 0 ]]");
+
+    step("RREF on symbolic matrix")
+        .test(CLEAR, "[[a b c][d e f]] RREF", ENTER)
+        .want("[[ 1 0 'c÷a-b÷a·((a·f-d·c)÷(a·e-d·b))' ] "
+              "[ 'a·d-d·a' 1 '(a·f-d·c)÷(a·e-d·b)' ]]");
+
+#if 0
+    step("RREFMOD not implemented yet")
+        .test(CLEAR, "[[1 2][3 4]] RREFMOD", ENTER)
+        .error("Not implemented");
+#endif
+
+    step("NumericalResults accepted")
+        .test(CLEAR, "NumericalResults [[1 2][3 4]] RREF", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]");
+
+    step("Restore symbolic results default")
+        .test(CLEAR, "SymbolicResults", ENTER).noerror();
 }
 
 

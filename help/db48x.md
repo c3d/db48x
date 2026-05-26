@@ -16075,15 +16075,61 @@ Change dimensions of an array
 
 
 ## REF
-Reduce matrix to echelon form (upper triangular form)
+Reduce a matrix to echelon form (upper triangular) using Gaussian elimination.
+Requires symbolic results.
+
+`M` `REF` → `M'`
+
+See also: `RREF`, `RREFP`.
 
 
 ## RREF
-Fully reduce to row-reduced echelon form
+Fully reduce a matrix to row-reduced echelon form using Gauss-Jordan elimination.
+For an augmented system matrix, the coefficient block becomes an identity and the
+extra column holds the solution. Requires symbolic results.
+
+`M` `RREF` → `M'`
+
+```rpl
+[[3 4 5][5 6 7]] RREF
+@ Expecting [[ 1 0 -1 ] [ 0 1 2 ]]
+```
+
+See also: `REF`, `RREFP`.
+
+
+## RREFP
+Row-reduced echelon form with pivot list. Returns the pivot values and a matrix
+whose coefficient block is diagonal but not necessarily scaled to 1. DB48X uses
+`RREFP` because commands are case-insensitive and the HP50G name `rref` would
+collide with `RREF`. Requires symbolic results.
+
+`M` `RREFP` → `{ pivots }` `M'`
+
+```rpl
+[[2 1][3 4]] RREFP 2 →List
+@ Expecting { { 10 5 } [[ 10 0 ] [ 0 5 ]] }
+```
+
+See also: `RREF`, `REF`, `RREFMOD`.
 
 
 ## RREFMOD
+Modular row-reduced echelon form (reduction modulo the current CAS modulus).
+Requires symbolic results.
 
+
+## EchelonFormKeepLastColumn
+
+When set, `RREF` and `RREFP` reduce the coefficient block but leave the last
+column unnormalizedw. The last column is still updated by row operations on the
+rest of the matrix. The inverse flag is `EchelonFormReduceLastColumn`.
+
+This corresponds to HP50G system flag −126.
+
+## EchelonFormReduceLastColumn
+
+When set, `RREF` and `RREFP` reduce the coefficient block including the last column. The inverse flag is `EchelonFormKeepLastColumn`.
 
 ## RSD
 Residual R=B-A*X' on a system A*X=B

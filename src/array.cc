@@ -34,6 +34,7 @@
 #include "expression.h"
 #include "functions.h"
 #include "grob.h"
+#include "settings.h"
 #include "stack-cmds.h"
 #include "stats.h"
 #include "tag.h"
@@ -43,6 +44,7 @@
 
 RECORDER(matrix, 16, "Determinant computation");
 RECORDER(matrix_error, 16, "Errors in matrix computations");
+RECORDER(echelon, 16, "Row echelon elimination (REF/RREF/RREFP)");
 
 
 
@@ -753,6 +755,375 @@ do                                              \
 #define dump_matrix(msg, ...)
 
 #endif // SIMULATOR
+
+
+static size_t echelon_index(size_t row, size_t col, size_t cols)
+// ----------------------------------------------------------------------------
+//   Index in row-major flat matrix layout
+// ----------------------------------------------------------------------------
+{
+    return row * cols + col;
+}
+
+
+#if SIMULATOR
+static void echelon_dump_matrix(cstring label, size_t rows, size_t cols,
+                                  size_t base, size_t stack_depth)
+// ----------------------------------------------------------------------------
+//   Log every stack-backed matrix coefficient (temporary debug aid)
+// ----------------------------------------------------------------------------
+{
+    if (!RECORDER_TRACE(echelon))
+        return;
+    record(echelon, "=== %s depth=%u (saved=%u) base=%u %zux%zu ===",
+           label, rt.depth(), stack_depth, base, rows, cols);
+    for (size_t r = 0; r < rows; r++)
+    {
+        for (size_t c = 0; c < cols; c++)
+        {
+            size_t ix   = echelon_index(r, c, cols);
+            size_t slot = base + ~ix;
+            object_p v  = rt.stack(slot);
+            record(echelon, "  m[%zu,%zu] ix=%zu slot=%zu -> %t",
+                   r, c, ix, slot, v);
+        }
+    }
+}
+#else
+#define echelon_dump_matrix(label, rows, cols, base, stack_depth)
+#endif // SIMULATOR
+
+
+static inline object_p echelon_element(size_t row, size_t col,
+                                       size_t cols, size_t base)
+// ----------------------------------------------------------------------------
+//   Fetch one coefficient from stack-backed matrix
+// ----------------------------------------------------------------------------
+{
+    size_t ix = echelon_index(row, col, cols);
+    return rt.stack(base + ~ix);
+}
+
+
+static bool echelon_combine_row(size_t target, size_t pivot, size_t col,
+                                size_t cols, size_t base, size_t k_start)
+// ----------------------------------------------------------------------------
+//   Replace target row with reduced row
+// ----------------------------------------------------------------------------
+//   This compute pivot*target - lead*pivot_row (fraction-free)
+{
+    object_p lead_obj = echelon_element(target, col, cols, base);
+    object_p piv_obj = echelon_element(pivot, col, cols, base);
+    if (!lead_obj || !piv_obj)
+        return false;
+
+    algebraic_p lead = lead_obj->as_algebraic();
+    algebraic_p piv  = piv_obj->as_algebraic();
+    if (!lead || !piv)
+        return false;
+
+    if (lead->is_zero(false))
+        return true;
+
+    record(echelon,
+           "combine target=%zu pivot=%zu col=%zu lead=%t pivot=%t",
+           target, pivot, col, +lead, +piv);
+
+    algebraic_g aa = piv;
+    algebraic_g ca = lead;
+    for (size_t k = k_start; k < cols; k++)
+    {
+        cleaner     purge;
+        object_p t_obj = echelon_element(target, k, cols, base);
+        object_p p_obj = echelon_element(pivot, k, cols, base);
+        if (!t_obj || !p_obj)
+            return false;
+        algebraic_p t_val = t_obj->as_algebraic();
+        algebraic_p p_val = p_obj->as_algebraic();
+        if (!t_val || !p_val)
+            return false;
+        algebraic_g mjka = t_val;
+        algebraic_g mika = p_val;
+        mjka = aa * mjka - ca * mika;
+        if (!mjka)
+            return false;
+        record(echelon,
+               "  k=%zu: %t * %t - %t * %t -> %t",
+               k, +aa, +t_val, +ca, +p_val, +mjka);
+        mjka = purge(mjka);
+        size_t ix = echelon_index(target, k, cols);
+        if (!rt.stack(base + ~ix, +mjka))
+            return false;
+    }
+    return true;
+}
+
+
+static bool echelon_scale_row(size_t row, size_t col, size_t end_col,
+                              size_t cols, size_t base, algebraic_r divisor)
+// ----------------------------------------------------------------------------
+//   Divide one row by the pivot value for columns col..end_col-1
+// ----------------------------------------------------------------------------
+{
+    for (size_t k = col; k < end_col; k++)
+    {
+        cleaner purge;
+        object_p v_obj = echelon_element(row, k, cols, base);
+        if (!v_obj)
+            return false;
+        algebraic_p val = v_obj->as_algebraic();
+        if (!val)
+            return false;
+        algebraic_g result = val / divisor;
+        if (!result)
+            return false;
+        result = purge(result);
+        size_t ix = echelon_index(row, k, cols);
+        if (!rt.stack(base + ~ix, +result))
+            return false;
+    }
+    return true;
+}
+
+
+static array_p echelon_build_array(size_t rows, size_t cols,
+                                   size_t base, object::id atype)
+// ----------------------------------------------------------------------------
+//   Pack stack-backed matrix into a new array object
+// ----------------------------------------------------------------------------
+{
+    scribble scr;
+    for (size_t r = 0; r < rows; r++)
+    {
+        object_p vec;
+        {
+            scribble sv;
+            for (size_t c = 0; c < cols; c++)
+            {
+                if (program::interrupted())
+                    return nullptr;
+                size_t ix = echelon_index(r, c, cols);
+                object_p elt = rt.stack(base + ~ix);
+                if (!elt || !rt.append(elt))
+                    return nullptr;
+            }
+            vec = list::make(atype, sv.scratch(), sv.growth());
+        }
+        if (!vec || !rt.append(vec))
+            return nullptr;
+    }
+    object_p result = list::make(atype, scr.scratch(), scr.growth());
+    return array_p(result);
+}
+
+
+echelon_result array::row_echelon(array_r m, echelon_options opt)
+// ----------------------------------------------------------------------------
+//   Shared Gauss / Gauss-Jordan elimination kernel
+// ----------------------------------------------------------------------------
+{
+    echelon_result result;
+
+    if (opt.mode == echelon_mode::RREFMOD)
+    {
+        rt.error("RREFMOD Not implemented");
+        return result;
+    }
+
+    size_t     rows     = 0;
+    size_t     cols     = 0;
+    size_t     depth    = rt.depth();
+    object::id atype    = m->type();
+    size_t     end_col  = 0;
+    size_t     norm_end = 0;
+    size_t     base     = 0;
+    size_t     row      = 0;
+    size_t     col      = 0;
+    list_g     pivots;
+
+    if (!m->is_matrix(&rows, &cols, true))
+    {
+        rt.type_error();
+    err:
+        rt.drop(rt.depth() - depth);
+        return result;
+    }
+
+    size_t pivot_col[rows];
+    for (size_t i = 0; i < rows; i++)
+        pivot_col[i] = ~0U;
+
+    end_col = cols;
+    if (!opt.reduce_last_col && cols > 0)
+        end_col = cols - 1;
+
+    norm_end = opt.reduce_last_col ? cols : end_col;
+    base     = rows * cols;
+
+    record(echelon, "Echelon %zux%zu mode %u end_col %zu reduce_last %u",
+           rows, cols, unsigned(opt.mode), end_col, opt.reduce_last_col);
+    echelon_dump_matrix("loaded", rows, cols, base, depth);
+
+    while (row < rows && col < end_col)
+    {
+        if (program::interrupted())
+            goto err;
+
+        object_p pivot_obj = echelon_element(row, col, cols, base);
+        if (!pivot_obj)
+            goto err;
+        if (pivot_obj->is_zero(false))
+        {
+            record(echelon, "skip zero pivot at row=%zu col=%zu", row, col);
+            col++;
+            continue;
+        }
+
+        algebraic_p pivot = pivot_obj->as_algebraic();
+        if (!pivot)
+            goto err;
+
+        record(echelon, "pivot row=%zu col=%zu slot=%zu value=%t",
+               row, col, base + ~echelon_index(row, col, cols), +pivot);
+
+        pivot_col[row] = col;
+        for (size_t j = row + 1; j < rows; j++)
+        {
+            if (program::interrupted())
+                goto err;
+            record(echelon,
+                   "forward eliminate row %zu using pivot row %zu", j, row);
+            if (!echelon_combine_row(j, row, col, cols, base, col))
+                goto err;
+        }
+        echelon_dump_matrix("after forward", rows, cols, base, depth);
+
+        if (opt.mode == echelon_mode::REF)
+        {
+            row++;
+            col++;
+            continue;
+        }
+
+        if (opt.mode == echelon_mode::RREF)
+        {
+            record(echelon, "scale pivot row %zu by %t", row, +pivot);
+            if (!echelon_scale_row(row, col, norm_end, cols, base, pivot))
+                goto err;
+            echelon_dump_matrix("after scale", rows, cols, base, depth);
+        }
+
+        for (size_t j = 0; j < row; j++)
+        {
+            if (program::interrupted())
+                goto err;
+            record(echelon, "back-sub row %zu using pivot row %zu", j, row);
+            size_t k0 = opt.mode == echelon_mode::RREFP ? 0 : col;
+            if (!echelon_combine_row(j, row, col, cols, base, k0))
+                goto err;
+        }
+        echelon_dump_matrix("after back-sub", rows, cols, base, depth);
+
+        row++;
+        col++;
+    }
+
+    if (opt.mode == echelon_mode::RREFP)
+    {
+        scribble sc;
+        for (size_t r = 0; r < rows; r++)
+        {
+            if (pivot_col[r] < cols)
+            {
+                object_p diag = echelon_element(r, pivot_col[r], cols, base);
+                record(echelon, "RREFP final pivot [%zu,%zu] = %t",
+                       r, pivot_col[r], diag);
+                if (!diag || !rt.append(diag))
+                    goto err;
+            }
+        }
+        pivots = list::make(object::ID_list, sc.scratch(), sc.growth());
+        if (!pivots)
+            goto err;
+    }
+
+    echelon_dump_matrix("final", rows, cols, base, depth);
+    result.matrix = echelon_build_array(rows, cols, base, atype);
+    if (!result.matrix)
+        goto err;
+    result.pivots = pivots;
+    rt.drop(rt.depth() - depth);
+    record(echelon,
+           "Echelon result %t pivots %t", +result.matrix, +result.pivots);
+    return result;
+}
+
+
+object::result array::echelon_command(echelon_mode mode)
+// ----------------------------------------------------------------------------
+//   Shared command wrapper for REF / RREF / RREFP / RREFMOD
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+    {
+        if (array_p m = obj->as<array>())
+        {
+            echelon_options opt;
+            opt.mode            = mode;
+            opt.reduce_last_col = Settings.EchelonFormReduceLastColumn();
+            echelon_result er   = row_echelon(m, opt);
+            rt.drop(1);
+            if (mode == echelon_mode::RREFP)
+            {
+                if (!er.pivots)
+                    er.pivots = list::make(ID_list, nullptr, 0);
+                if (!er.pivots || !rt.push(+er.pivots))
+                    return ERROR;
+            }
+            if (!er.matrix || !rt.push(+er.matrix))
+                return ERROR;
+            return OK;
+        }
+        rt.type_error();
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(REF)
+// ----------------------------------------------------------------------------
+//   Reduce matrix to echelon form (forward elimination only)
+// ----------------------------------------------------------------------------
+{
+    return array::echelon_command(echelon_mode::REF);
+}
+
+
+COMMAND_BODY(RREF)
+// ----------------------------------------------------------------------------
+//   Reduce matrix to row-reduced echelon form
+// ----------------------------------------------------------------------------
+{
+    return array::echelon_command(echelon_mode::RREF);
+}
+
+
+COMMAND_BODY(RREFP)
+// ----------------------------------------------------------------------------
+//   Row-reduced echelon form with pivot list (HP50G rref)
+// ----------------------------------------------------------------------------
+{
+    return array::echelon_command(echelon_mode::RREFP);
+}
+
+
+COMMAND_BODY(RREFMOD)
+// ----------------------------------------------------------------------------
+//   Modular row-reduced echelon form
+// ----------------------------------------------------------------------------
+{
+    return array::echelon_command(echelon_mode::RREFMOD);
+}
 
 
 array_p array::invert() const

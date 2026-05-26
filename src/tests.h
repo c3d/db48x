@@ -100,6 +100,7 @@ struct tests
     void sorting_functions();
     void vector_functions();
     void matrix_functions();
+    void row_echelon();
     void solver_testing();
     void constants_parsing();
     void eqnlib_parsing();

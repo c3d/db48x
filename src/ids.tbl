@@ -465,6 +465,10 @@ CMD(DeleteColumn)       ALIAS(DeleteColumn,     "Column-")
 CMD(DeleteRow)          ALIAS(DeleteRow,        "Row-")
 CMD(ColumnSwap)         ALIAS(ColumnSwap,       "CSwp")
 CMD(RowSwap)            ALIAS(RowSwap,          "RSwp")
+NAMED(REF,     "RowEchelonForm")
+NAMED(RREF,    "RowReducedEchelonForm")
+NAMED(RREFP,   "RowReducedEchelonFormPivots")   ALIAS(RREFP, "RREFPivots")
+NAMED(RREFMOD, "RowReducedEchelonFormModulo")
 
 
 
@@ -1072,6 +1076,7 @@ FLAG(NumericalIntegration,      SymbolicIntegration)
 FLAG(TVMPayAtBeginningOfPeriod, TVMPayAtEndOfPeriod)
 FLAG(TruthLogicForIntegers,     BitwiseLogicForIntegers)
 FLAG(LaxArrayResizing,          StrictArrayResizing)
+FLAG(EchelonFormKeepLastColumn, EchelonFormReduceLastColumn)
 
 SETTING_BITS(ListRecursionDepth, uint, 16, 0U, 65535U,    1U)
 

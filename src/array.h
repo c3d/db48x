@@ -36,6 +36,38 @@
 
 GCP(array);
 
+enum class echelon_mode : uint8_t
+// ----------------------------------------------------------------------------
+//   Describe which kind of echelon operation we request
+// ----------------------------------------------------------------------------
+{
+    REF,
+    RREF,
+    RREFP,
+    RREFMOD,
+};
+
+
+struct echelon_options
+// ----------------------------------------------------------------------------
+//   Parameters for echelon operations
+// ----------------------------------------------------------------------------
+{
+    echelon_mode mode            = echelon_mode::RREF;
+    bool         reduce_last_col = true;
+};
+
+
+struct echelon_result
+// ----------------------------------------------------------------------------
+//   Echelon operations return a matrix and a list of pivot points
+// ----------------------------------------------------------------------------
+{
+    array_g matrix;
+    list_g  pivots;
+};
+
+
 struct array : list
 // ----------------------------------------------------------------------------
 //   An array is a list with [ and ] as delimiters
@@ -118,6 +150,9 @@ struct array : list
     static result       delete_row_or_column(bool columnist);
     static result       swap_row_or_column(bool columnist);
 
+    static echelon_result row_echelon(array_r m, echelon_options opt);
+    static object::result echelon_command(echelon_mode mode);
+
 public:
     OBJECT_DECL(array);
     PARSE_DECL(array);
@@ -156,6 +191,10 @@ COMMAND_DECLARE(DeleteColumn, 2);
 COMMAND_DECLARE(DeleteRow, 2);
 COMMAND_DECLARE(ColumnSwap, 3);
 COMMAND_DECLARE(RowSwap, 3);
+COMMAND_DECLARE(REF, 1);
+COMMAND_DECLARE(RREF, 1);
+COMMAND_DECLARE(RREFP, 1);
+COMMAND_DECLARE(RREFMOD, 1);
 
 COMMAND_DECLARE(ToCylindrical, 1);
 COMMAND_DECLARE(ToSpherical, 1);
