@@ -1237,6 +1237,32 @@ COMMAND_BODY(Path)
 }
 
 
+static bool do_crdir(directory *dir, object_p name)
+// ----------------------------------------------------------------------------
+//   Internal helper for CRDIR
+// ----------------------------------------------------------------------------
+{
+    if (object_p quoted = name->as_quoted(object::ID_object))
+        name = quoted;
+    if (list_p lst = name->as<list>())
+    {
+        for (object_p sub : *lst)
+            if (!do_crdir(dir, sub))
+                return false;
+        return true;
+    }
+
+    if (dir->recall(name))
+    {
+        rt.name_exists_error();
+        return false;
+    }
+
+    object_p newdir = rt.make<directory>();
+    return dir->store(name, newdir);
+}
+
+
 COMMAND_BODY(CrDir)
 // ----------------------------------------------------------------------------
 //   Create a directory
@@ -1250,23 +1276,8 @@ COMMAND_BODY(CrDir)
     }
 
     if (object_p obj = rt.pop())
-    {
-        symbol_p name = obj->as_quoted<symbol>();
-        if (!name)
-        {
-            rt.invalid_name_error();
-            return ERROR;
-        }
-        if (dir->recall(name))
-        {
-            rt.name_exists_error();
-            return ERROR;
-        }
-
-        object_p newdir = rt.make<directory>();
-        if (dir->store(name, newdir))
+        if (do_crdir(dir, obj))
             return OK;
-    }
     return ERROR;
 }
 
