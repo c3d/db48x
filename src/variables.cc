@@ -319,6 +319,17 @@ object_p directory::store(object_g name, object_g value)
     {
         // Replace an existing entry
         object_g evalue = existing->skip();
+
+        // Do not replace a non-empty directory except with another directory
+        if (evalue->as<directory>())
+        {
+            if (!value->as<directory>())
+            {
+                rt.no_directory_error();
+                return nullptr;
+            }
+        }
+
         size_t es = evalue->size();
         if (vs > es)
         {
@@ -569,6 +580,11 @@ object_p directory::recall(object_p name) const
                 else
                     result = named;
             }
+            else
+            {
+                rt.undefined_name_error();
+                return nullptr;
+            }
         }
         if (!result)
             result = +dir;
@@ -727,7 +743,7 @@ size_t directory::purge(object_p name, bool allowdir)
             {
                 if (dir->count() != 0)
                 {
-                    rt.purge_nonemtpy_directory_error();
+                    rt.nonemtpy_directory_error();
                     return 0;
                 }
             }

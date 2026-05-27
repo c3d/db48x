@@ -2315,18 +2315,32 @@ void tests::global_variables()
         .error("Cannot purge active directory");
 
     step("Write in a subdirectory")
-        .test(CLEAR, "{ SubDirTest EmptySubDirTest} CRDIR", ENTER)
+        .test(CLEAR, "{ SubDirTest EmptySubDirTest EmptyToo } CRDIR", ENTER)
         .got()
         .test("42 { SubDirTest FortyTwo } STO", ENTER)
-        .got()
+        .got();
+    step("Recall from a subdirectory")
         .test("{ SubDirTest FortyTwo } RCL", ENTER)
-        .got("42");
+        .got("42")
+        .test("{ SubDirTest FortyThree } RCL", ENTER)
+        .error("Undefined name");
+    step("Can't store a non-directory to a directory")
+        .test(CLEAR, "42 'EmptySubDirTest' STO", ENTER)
+        .error("No directory");
+    step("Can store a directory to a directory")
+        .test(CLEAR, "Dir { FortyThree 43 } 'SubDirTest' STO", ENTER)
+        .got()
+        .test(CLEAR, "{ SubDirTest FortyTwo } RCL", ENTER)
+        .error("Undefined name")
+        .test(CLEAR, "{ SubDirTest FortyThree } RCL", ENTER)
+        .expect("43");
     step("Can't purge non-empty directory")
         .test(CLEAR, "'SubDirTest' PURGE", ENTER)
         .error("Non-empty directory");
     step("Can purge empty directory")
         .test(CLEAR, "'EmptySubDirTest' PURGE", ENTER)
         .noerror();
+
     step("Can purge non-empty directory with PGDIR")
         .test(CLEAR, "'SubDirTest' PURGE", ENTER)
         .error("Non-empty directory")
