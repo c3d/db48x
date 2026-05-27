@@ -156,6 +156,11 @@ struct directory : list
     //   Enumerate all the variables in the directory, return count of true
     // ------------------------------------------------------------------------
 
+    bool order(object_p namelist);
+    // ------------------------------------------------------------------------
+    //   Reorder variables in the directory
+    // ------------------------------------------------------------------------
+
     static bool render_name(object_p name, object_p obj, void *renderer_ptr);
     // ------------------------------------------------------------------------
     //   Render an entry in the directory
@@ -218,6 +223,7 @@ COMMAND_DECLARE(Path,0);                // Return a list describing current path
 COMMAND_DECLARE(CrDir,1);               // Create a directory
 COMMAND_DECLARE(UpDir,0);               // Move one directory up
 COMMAND_DECLARE(PgDir,1);               // Purge directory
+COMMAND_DECLARE(Order,1);               // Reorder variables in directory
 
 
 struct VariablesMenu : menu

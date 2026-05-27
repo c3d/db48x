@@ -875,6 +875,84 @@ bool directory::find(uint index, object_p &nref, object_p &vref) const
 }
 
 
+bool directory::order(object_p orderobj)
+// ----------------------------------------------------------------------------
+//   Reorder variables to match the given list of names
+// ----------------------------------------------------------------------------
+{
+    id oty = orderobj->type();
+    if (oty != ID_list && oty != ID_array)
+    {
+        rt.type_error();
+        return false;
+    }
+
+    // Keep directory in a GC pointer since we are going to move stuff a lot
+    directory_g dir = directory_p(this);
+
+    // Check that we only have valid names
+    list_g orderlist = list_p(orderobj);
+    size_t sz = 0;
+    for (object_p obj : *orderlist)
+    {
+        object_p sym = obj->as_quoted<symbol>();
+        if (!sym)
+        {
+            switch (obj->type())
+            {
+                // Special names that are allowed as variable names
+            case ID_integer:
+                if (Settings.NumberedVariables())
+                    sym = obj;
+                break;
+            case ID_Pict:
+            case ID_StatsData:
+            case ID_StatsParameters:
+            case ID_Equation:
+            case ID_PlotParameters:
+            case ID_AlgebraConfiguration:
+            case ID_AlgebraVariable:
+            case ID_CustomMenu:
+            case ID_Header:
+            case ID_KeyMap:
+            case ID_UnitsSIPrefixCycle:
+                sym = obj;
+                break;
+            default:
+                break;
+            }
+            if (!sym)
+            {
+                rt.type_error();
+                return false;
+            }
+        }
+        if (!dir->lookup(sym))
+        {
+            rt.undefined_name_error();
+            return false;
+        }
+        sz++;
+    }
+
+    // Purge each name and store it back
+    settings::SaveStoreAtStart sas(true);
+    while (sz-- > 0)
+    {
+        symbol_g sym = orderlist->at(sz)->as_quoted<symbol>();
+        object_g value = rt.clone(dir->recall(sym));
+        if (!value)
+            return false;
+        if (!((directory *) +dir)->purge(sym, true))
+            return false;
+        if (!((directory *) +dir)->store_here(sym, value))
+            return false;
+    }
+
+    return true;
+}
+
+
 object_p directory::name(uint index) const
 // ----------------------------------------------------------------------------
 //   Return name at given index
@@ -1339,6 +1417,23 @@ COMMAND_BODY(UpDir)
     rt.updir();
     ui.menu_refresh(ID_VariablesMenu, true);
     return OK;
+}
+
+
+COMMAND_BODY(Order)
+// ----------------------------------------------------------------------------
+//   Reorder variables in the current directory
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.pop())
+    {
+        directory *dir = rt.variables(0);
+        if (!dir)
+            rt.no_directory_error();
+        else if (dir->order(obj))
+            return OK;
+    }
+    return ERROR;
 }
 
 

@@ -14145,7 +14145,19 @@ When evaluating `A='2+3*5'`, pushes `A='2+3*5'` on the stack.
 
 
 ## ORDER
-Sort variables in a directory
+
+Reorder variables in the current directory.
+
+`{ Names... }` ▶
+
+`Names` is a list (or array) of variable names in the desired order. Each name
+must exist in the current directory. Names may be quoted. Variables listed first
+appear first in the [Variables](#Variables) display and variable menu; any
+variables in the directory that are not named in the list keep their relative
+order and are placed after the listed ones.
+
+For example, if the directory contains `C`, `B`, and `A` (in that order),
+`{ 'A' 'B' 'C' } ORDER` reorders them to `A`, `B`, `C`.
 
 
 ## QUOTEID

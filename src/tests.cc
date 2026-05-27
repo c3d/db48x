@@ -2282,6 +2282,25 @@ void tests::global_variables()
         .test(CLEAR, "\"Glop\" 'Baz' STO", ENTER).noerror();
     step("List variables in subdirectory")
         .test(CLEAR, "variables", ENTER).expect("{ Baz Foo }");
+    step("Order reorders variables in the directory")
+        .test(CLEAR, "'OrderTest' CRDIR OrderTest", ENTER)
+        .test("1 'C' STO 2 'B' STO 3 'A' STO", ENTER)
+        .test("VARS", ENTER).expect("{ A B C }")
+        .test("{ 'A' 'B' 'C' } ORDER", ENTER).noerror()
+        .test("VARS", ENTER).expect("{ A B C }")
+        .test("{ 'C' 'A' 'B' } ORDER", ENTER).noerror()
+        .test("VARS", ENTER).expect("{ C A B }")
+        .test("{ 'B' } ORDER", ENTER).noerror()
+        .test("VARS", ENTER).expect("{ B C A }");
+    step("Order errors on unknown name")
+        .test(CLEAR, "{ 'Missing' } ORDER", ENTER)
+        .error("Undefined name");
+    step("Order with repeated names")
+        .test(CLEAR, "{ A B A } ORDER", ENTER)
+        .test("VARS", ENTER)
+        .expect("{ A B C }");
+    step("Cleanup after Order tests")
+        .test(CLEAR, "UPDIR 'OrderTest' PGDIR", ENTER).noerror();
     step("List variables in subdirectory with the correct type")
         .test(CLEAR, "28 tvars", ENTER).expect("{ Foo }")
         .test(CLEAR, "2 tvars", ENTER).expect("{ Baz }");

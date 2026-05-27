@@ -628,6 +628,7 @@ NAMED(Home, "HomeDirectory")
 NAMED(CrDir, "CreateDirectory") ALIAS(CrDir, "MkDir")
 NAMED(UpDir, "UpDirectory")
 NAMED(PgDir, "PurgeDirectory")  ALIAS(PgDir, "RmDir")
+CMD(Order)
 
 /// Equations
 NAMED(MatchUp,   "↑Match")
