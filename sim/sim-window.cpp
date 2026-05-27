@@ -734,7 +734,7 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
             "config/true42.48k",
         };
 
-        // HACK - Not thread safe, don't do that while running
+        // Changing keymap while the calculator is running is not supported.
         extern user_interface ui;
         static uint newmap = 0;
         ui.load_keymap(keyboards[newmap++]);
@@ -999,11 +999,28 @@ void MainWindow::load_keymap(cstring keymapfile)
 //   A new keymap was loaded, update visible keyboard layout on screen
 // ----------------------------------------------------------------------------
 {
-    QFileInfo fi(keymapfile);
-    QString name = fi.baseName() + ".png";
-    QString style = ("border-image: url(:/bitmap/" + name + ") "
-                     "0 0 0 0 stretch stretch;");
-    theMainWindow()->ui.keyboard->setStyleSheet(style);
+    QString path = QString::fromUtf8(keymapfile);
+    auto apply = [path] {
+        QFileInfo fi(path);
+        QString name = fi.baseName() + ".png";
+        QString style = ("border-image: url(:/bitmap/" + name + ") "
+                         "0 0 0 0 stretch stretch;");
+        theMainWindow()->ui.keyboard->setStyleSheet(style);
+    };
+
+    if (QThread::currentThread() == qApp->thread())
+    {
+        apply();
+        return;
+    }
+
+    std::atomic<bool> done = false;
+    postToThread([&] {
+        apply();
+        done = true;
+    });
+    while (!done)
+        sys_delay(1);
 }
 
 
