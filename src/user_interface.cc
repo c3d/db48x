@@ -729,7 +729,7 @@ object_p user_interface::assign(int keyid, object_p toassign)
     if (assigned && !assigned->as_quoted<StandardKey>())
         result = wrkeymap->store(+keyname, assigned);
     else
-        wrkeymap->purge(+keyname);
+        wrkeymap->purge(+keyname, false);
     rt.updir();
     help_assignment_generation++;
     menu_refresh(menu::ID_VariablesMenu);

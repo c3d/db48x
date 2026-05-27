@@ -116,7 +116,7 @@ struct directory : list
     //    Check if a name exists in the directory, return name ptr if it does
     // ------------------------------------------------------------------------
 
-    size_t purge(object_p name);
+    size_t purge(object_p name, bool allowdir);
     // ------------------------------------------------------------------------
     //   Purge an entry from the directory, return purged size
     // ------------------------------------------------------------------------

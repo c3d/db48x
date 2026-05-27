@@ -404,7 +404,7 @@ COMMAND_BODY(DeleteKeys)
         {
             object_p name = static_object(ID_KeyMap);
             directory *curdir = rt.variables(0);
-            curdir->purge(name);
+            curdir->purge(name, true);
             return OK;
         }
 

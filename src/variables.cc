@@ -637,7 +637,7 @@ object_p directory::store_here(object_p name, object_p value)
 }
 
 
-size_t directory::purge(object_p name)
+size_t directory::purge(object_p name, bool allowdir)
 // ----------------------------------------------------------------------------
 //    Purge a name (and associated value) from the directory
 // ----------------------------------------------------------------------------
@@ -692,9 +692,15 @@ size_t directory::purge(object_p name)
     {
         size_t size = 0;
         for (object_p obj : *list_p(name))
-            size += purge(obj);
+            size += purge(obj, allowdir);
         return size;
     }
+
+    case ID_expression:
+        if (object_p sym = name->as_quoted(ID_object))
+            return purge(sym, allowdir);
+        rt.invalid_name_error();
+        return 0;
 
     case ID_integer:
         if (Settings.NumberedVariables())
@@ -715,6 +721,18 @@ size_t directory::purge(object_p name)
             rt.purge_active_directory_error();
             return 0;
         }
+        if (!allowdir)
+        {
+            if (directory_p dir = value->as<directory>())
+            {
+                if (dir->count() != 0)
+                {
+                    rt.purge_nonemtpy_directory_error();
+                    return 0;
+                }
+            }
+        }
+
         size_t   vs     = value->size();
         size_t   purged = ns + vs;
         object_p header = (object_p) payload();
@@ -754,7 +772,7 @@ size_t directory::purge_all(object_p namep)
     size_t     result = 0;
     directory *dir    = nullptr;
     for (uint depth = 0; !rt.error() && (dir = rt.variables(depth)); depth++)
-        result += dir->purge(name);
+        result += dir->purge(name, false);
     return result;
 }
 
@@ -1023,24 +1041,39 @@ COMMAND_BODY(RecallMul)         { return recall_op(ID_multiply); }
 COMMAND_BODY(RecallDiv)         { return recall_op(ID_divide); }
 
 
+static bool do_purge(bool allowdir)
+// ----------------------------------------------------------------------------
+//   Run purge command variants
+// ----------------------------------------------------------------------------
+{
+    object_p name = rt.stack(0);
+    if (!name)
+        return false;
+
+    // Purge the object (HP48 doesn't error out if name does not exist)
+    if (directory *dir = rt.variables(0))
+        dir->purge(name, allowdir);
+    else
+        rt.no_directory_error();
+    return !rt.error() && rt.drop();
+}
+
+
 COMMAND_BODY(Purge)
 // ----------------------------------------------------------------------------
 //   Purge a global variable from current directory
 // ----------------------------------------------------------------------------
 {
-    object_p name = rt.stack(0);
-    if (!name)
-        return ERROR;
-    if (object_p quoted = name->as_quoted(ID_object))
-        name = quoted;
+    return do_purge(false) ? OK : ERROR;
+}
 
-    // Purge the object (HP48 doesn't error out if name does not exist)
-    if (directory *dir = rt.variables(0))
-        dir->purge(name);
-    else
-        rt.no_directory_error();
-    rt.drop();
-    return rt.error() ? ERROR : OK;
+
+COMMAND_BODY(PgDir)
+// ----------------------------------------------------------------------------
+//   Really the same as 'purge'
+// ----------------------------------------------------------------------------
+{
+    return do_purge(true) ? OK : ERROR;
 }
 
 
@@ -1290,15 +1323,6 @@ COMMAND_BODY(UpDir)
     rt.updir();
     ui.menu_refresh(ID_VariablesMenu, true);
     return OK;
-}
-
-
-COMMAND_BODY(PgDir)
-// ----------------------------------------------------------------------------
-//   Really the same as 'purge'
-// ----------------------------------------------------------------------------
-{
-    return Purge::evaluate();
 }
 
 

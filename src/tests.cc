@@ -2314,6 +2314,25 @@ void tests::global_variables()
         .test(CLEAR, "'DirTest' PurgeAll", ENTER)
         .error("Cannot purge active directory");
 
+    step("Write in a subdirectory")
+        .test(CLEAR, "{ SubDirTest EmptySubDirTest} CRDIR", ENTER)
+        .got()
+        .test("42 { SubDirTest FortyTwo } STO", ENTER)
+        .got()
+        .test("{ SubDirTest FortyTwo } RCL", ENTER)
+        .got("42");
+    step("Can't purge non-empty directory")
+        .test(CLEAR, "'SubDirTest' PURGE", ENTER)
+        .error("Non-empty directory");
+    step("Can purge empty directory")
+        .test(CLEAR, "'EmptySubDirTest' PURGE", ENTER)
+        .noerror();
+    step("Can purge non-empty directory with PGDIR")
+        .test(CLEAR, "'SubDirTest' PURGE", ENTER)
+        .error("Non-empty directory")
+        .test(CLEAR, "'SubDirTest' PGDIR", ENTER)
+        .got();
+
     step("Find variable from level above")
         .test(CLEAR, "Foo", ENTER).expect("442");
     step("Create local variable")
@@ -8334,7 +8353,7 @@ void tests::solver_testing()
         .expect("-1.14803⁳⁻¹⁹");
 
     step("Exit: Clear variables")
-        .test(CLEAR, "UPDIR 'SLVTST' PURGE", ENTER);
+        .test(CLEAR, "UPDIR 'SLVTST' PGDIR", ENTER);
 }
 
 
@@ -8653,8 +8672,8 @@ void tests::eqnlib_columns_and_beams()
     step("Exit: Clear variables")
         .test(CLEAR,
               "UPDIR "
-              "'SLVTST' PURGE "
-              "'CurrentEquationVariables' PURGE", ENTER);
+              "'SLVTST' PGDIR "
+              "'CurrentEquationVariables' PURGE", ENTER).noerror();
 }
 
 
@@ -12896,7 +12915,7 @@ void tests::statistics()
         if (dir)
             step("Exiting directory")
                 .test(CLEAR, "Updir", ENTER).noerror()
-                .test("'Test' Purge", ENTER).noerror();
+                .test("'Test' PGDIR", ENTER).noerror();
     }
 }
 void tests::probabilities()
@@ -14282,7 +14301,7 @@ void tests::check_help_examples()
     step("Exiting ExamplesTest directory and purging it")
         .test(CLEAR, "UPDIR", ENTER)
         .noerror()
-        .test("'ExamplesTest' PURGE")
+        .test("'ExamplesTest' PGDIR")
         .noerror();
     step("Restore MinimumSignificantDigits")
         .test(CLEAR, "'MinimumSignificantDigits' PURGE", ENTER);
@@ -14655,7 +14674,7 @@ void tests::plotting()
     step("Leave sandbox for INDEP/DEPND tests")
         .test(CLEAR, "UPDIR", ENTER)
         .noerror()
-        .test("'PlotIndepTest' PURGE", ENTER)
+        .test("'PlotIndepTest' PGDIR", ENTER)
         .noerror();
 
     step("Parametric plot: Program");
