@@ -13901,6 +13901,10 @@ The `Value` is copied in a storage location identified by `Name`. The storage lo
 
 * Symbol or integer: The value is stored in a global variable with that name in the current directory, which is created if necessary. Whether integers can be used as variable names depends on the `NumberedVariables` setting.
 
+* List or array: The name is a path through nested directories. Each element except the last must name an existing directory; the last element is the variable name in that directory. For example, `42 { SubDirTest FortyTwo } STO` stores `42` in variable `FortyTwo` inside directory `SubDirTest`. A path may start with [HomeDirectory](#HomeDirectory) to refer to the home directory.
+
+* Directory variable: If the target name already holds a directory, the new value must also be a directory (replacing the old tree). Storing a non-directory value over a directory name reports `No directory`.
+
 * Local name: The value is stored in the corresponding local variable.
 
 * Setting name: The value is used for the corresponding setting, as if the setting command had been executed. For example, `16 'Base' STO` has the same effect as `16 Base`.
@@ -13916,6 +13920,8 @@ Recall an object from a specified location. For example `'ABC' RCL` recalls the 
 The `Value` is fetched from a storage location identified by `Name`. The storage location depends on the type of `Name`, which can be quoted in an expression:
 
 * Symbol or integer: The value is fetched from a global variable with that name in the current directory or any enclosing directory. Whether integers can be used as variable names depends on the `NumberedVariables` setting.
+
+* List or array: The name is a path through nested directories, as for [Store](#Store). Each element except the last must name an existing directory; the last element is the variable to recall. If any path component is missing, recall fails with `Undefined name`.
 
 * Local name: The value is fetched from the corresponding local variable.
 
@@ -13985,11 +13991,20 @@ Subtract one from content of a variable
 
 Delete a global variable from the current directory
 
+`Name` can be a symbol, a quoted name, or a list (or array) of names to purge
+several variables in one command.
+
+If `Name` refers to a directory variable, `Purge` only succeeds when that
+directory is empty (no variables inside). Purging a non-empty directory reports
+`Non-empty directory`. Use [PurgeDirectory](#PurgeDirectory) to remove a directory
+and all of its contents.
+
 *Remark*: `Purge` only removes a variable from the current directory, not the
 enclosing directories. Since [Recall](#Recall) will fetch variable values from
 enclosing directories, it is possible that `'X' Purge 'X' Recall` will fetch a
 value for `X` from an enclosing directory. Use [PurgeAll](#PurgeAll) if you want
-to purge a variable including in enclosing directories.
+to purge a variable including in enclosing directories. The same non-empty
+directory restriction applies to `PurgeAll`.
 
 ## PurgeAll
 
@@ -14001,11 +14016,22 @@ want to only purge a variable in the current directory.
 
 
 ## CreateDirectory
-Create new directory
+
+Create one or more empty directories in the current directory.
+
+`Name` may be a single directory name or a list (or array) of names. For
+example, `{ Tools Examples } CreateDirectory` creates both `Tools` and
+`Examples`. An error is reported if any of the names already exists.
 
 
 ## PurgeDirectory
-Purge entire directory tree
+
+Delete a global variable from the current directory, including directory contents.
+
+`PurgeDirectory` behaves like [Purge](#Purge) for ordinary variables. For a
+directory variable, it removes the directory and everything inside it, even when
+the directory is not empty. `Name` may be a list (or array) of names, as with
+`Purge`.
 
 
 ## UpDirectory
