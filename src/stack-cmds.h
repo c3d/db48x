@@ -242,14 +242,8 @@ COMMAND(Swap,2)
 //   Implement the RPL "swap" command, swap the two top elements
 // ----------------------------------------------------------------------------
 {
-    object_p x = rt.stack(0);
-    object_p y = rt.stack(1);
-    if (x && y)
-    {
-        rt.stack(0, y);
-        rt.stack(1, x);
+    if (rt.swap(0,1))
         return OK;
-    }
     return ERROR;
 }
 

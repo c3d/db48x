@@ -1183,6 +1183,23 @@ bool runtime::stack(uint idx, object_p obj)
 }
 
 
+bool runtime::swap(uint a, uint b)
+// ----------------------------------------------------------------------------
+//    Swap two arbitrary levels of the stack
+// ----------------------------------------------------------------------------
+{
+    runtime_invariants check;
+    uint               d = depth();
+    if  (a >= d || b >= d)
+    {
+        missing_argument_error();
+        return false;
+    }
+    std::swap(Stack[a], Stack[b]);
+    return true;
+}
+
+
 bool runtime::roll(uint idx)
 // ----------------------------------------------------------------------------
 //    Move the object at a given position in the stack
