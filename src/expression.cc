@@ -3270,6 +3270,15 @@ bool expression::split(id type, expression_g &left, expression_g &right) const
                             left = la;
                             result = true;
                         }
+                        else if (algebraic_p ralg = r->as_algebraic())
+                        {
+                            if (algebraic_p lalg = l->as_algebraic())
+                            {
+                                right = expression::make(ralg);
+                                left = expression::make(lalg);
+                                result = right && left;
+                            }
+                        }
                     }
                 }
             }
