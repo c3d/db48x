@@ -241,8 +241,34 @@ Subtraction operator MOD the current system modulo
 Multiplication operator MOD the current system modulo
 
 
-## PEVAL
-Evaluation of polynomial given as vector of coefficients
+## PEval
+
+Evaluate a polynomial at a point (Horner’s method).
+
+`Poly` `X` ▶ `Value`
+
+* `Poly` (level 2) is a coefficient **array**, **list**, **polynomial**, or
+  univariate **expression** (same inputs as `PRoot`; converted to descending
+  coefficients).
+* `X` (level 1) is the evaluation point (any algebraic).
+* Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
+  `A·X²+B·X+C` in descending degree order).
+* Returns `Value`, the polynomial evaluated at `X`.
+
+```rpl
+[ 1 -5 6 ] 2 PEval
+@ Expecting 0
+```
+
+```rpl
+'X^2-5*X+6' 3 PEval
+@ Expecting 0
+```
+
+```rpl
+'x↑4+2·x↑3-25·x↑2-26·x+120' 3 PEval
+@ Expecting -48
+```
 
 
 ## PCoef
@@ -259,7 +285,7 @@ Build the monic polynomial whose roots are the given values.
   **descending degree order** (highest power first).
 * With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
   coefficient **array** in that same order, as on HP calculators.
-* Coefficient order matches `PEVAL`, `PDIV2`, and `PRoot`.
+* Coefficient order matches `PEval`, `PDIV2`, and `PRoot`.
 
 ```rpl
 CompatiblePolynomials
@@ -274,8 +300,7 @@ NewStylePolynomials
 ```
 
 The compatible-mode vector is the coefficient list of
-x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector (or on the polynomial
-after `ToPolynomial`) to recover the roots.
+`x⁴+2x³−25x²−26x+120`. Use `PRoot` on that vector to recover the roots.
 
 
 ## IEGCD
@@ -370,8 +395,9 @@ Find all roots of a polynomial given by its coefficients.
 
 `Coeffs` ▶ `Roots`
 
-* `Coeffs` is an array, list, or **polynomial** (converted via `ToArray`) whose
-  coefficients are in **descending degree order** (same convention as `PEVAL`
+* `Coeffs` is an array, list, polynomial, or univariate expression
+  (same inputs as `PEval`; polynomials are converted via `ToArray`) whose
+  coefficients are in descending degree order (same convention as `PEval`
   and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
   high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.

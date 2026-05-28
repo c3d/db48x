@@ -218,13 +218,14 @@ This is the opposite of `ModernBasedNumbers`.
 Use DB48X polynomial objects for polynomial-oriented commands where the result
 is a polynomial in one variable (typically `X` from `AlgebraVariable`).
 
-With this flag active (the default), `PCoef` returns a **polynomial** built from
+With this flag active (the default), `PCoef` returns a polynomial built from
 the given roots. Coefficient vectors in descending degree order—the form expected
-by `PEVAL`, `PRoot`, and related commands—are obtained with `ToArray` on that
+by `PEval`, `PRoot`, and related commands—are obtained with `ToArray` on that
 polynomial, or by building the vector directly.
 
-`PRoot` and `PCoef` accept a coefficient **array**, **list**, or **polynomial**
-as input; a polynomial is converted internally to its coefficient vector.
+`PRoot`, `PCoef`, and `PEval` accept a coefficient array, list,
+polynomial, or univariate expression as input; non-vectors are converted
+internally to a coefficient vector.
 
 This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
 
@@ -232,7 +233,7 @@ This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
 
 Use HP-style coefficient vectors for polynomial root and coefficient commands.
 
-With this flag active, `PCoef` returns a coefficient **array** in descending
+With this flag active, `PCoef` returns a coefficient array in descending
 degree order, matching classic RPL calculators. `PRoot` still accepts arrays,
 lists, and polynomials; use `ToPolynomial` to turn a coefficient vector into a
 polynomial object for symbolic work.

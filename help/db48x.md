@@ -5982,7 +5982,6 @@ implemented by the time the project reaches version 1.0.
 * `PDIM`
 * `PERINFO`
 * `PERTBL`
-* `PEVAL`
 * `PICTURE`
 * `PLOT`
 * `PLOTADD`
@@ -12879,8 +12878,34 @@ Subtraction operator MOD the current system modulo
 Multiplication operator MOD the current system modulo
 
 
-## PEVAL
-Evaluation of polynomial given as vector of coefficients
+## PEval
+
+Evaluate a polynomial at a point (Horner’s method).
+
+`Poly` `X` ▶ `Value`
+
+* `Poly` (level 2) is a coefficient **array**, **list**, **polynomial**, or
+  univariate **expression** (same inputs as `PRoot`; converted to descending
+  coefficients).
+* `X` (level 1) is the evaluation point (any algebraic).
+* Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
+  `A·X²+B·X+C` in descending degree order).
+* Returns `Value`, the polynomial evaluated at `X`.
+
+```rpl
+[ 1 -5 6 ] 2 PEval
+@ Expecting 0
+```
+
+```rpl
+'X^2-5*X+6' 3 PEval
+@ Expecting 0
+```
+
+```rpl
+[ 1 2 -25 -26 120 ] ToPolynomial 3 PEval
+@ Expecting -48
+```
 
 
 ## PCoef
@@ -12897,7 +12922,7 @@ Build the monic polynomial whose roots are the given values.
   **descending degree order** (highest power first).
 * With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
   coefficient **array** in that same order, as on HP calculators.
-* Coefficient order matches `PEVAL`, `PDIV2`, and `PRoot`.
+* Coefficient order matches `PEval`, `PDIV2`, and `PRoot`.
 
 ```rpl
 CompatiblePolynomials
@@ -13008,8 +13033,9 @@ Find all roots of a polynomial given by its coefficients.
 
 `Coeffs` ▶ `Roots`
 
-* `Coeffs` is an array, list, or **polynomial** (converted via `ToArray`) whose
-  coefficients are in **descending degree order** (same convention as `PEVAL`
+* `Coeffs` is an array, list, **polynomial**, or univariate **expression**
+  (same inputs as `PEval`; polynomials are converted via `ToArray`) whose
+  coefficients are in **descending degree order** (same convention as `PEval`
   and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
   high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.
@@ -17460,11 +17486,12 @@ is a polynomial in one variable (typically `X` from `AlgebraVariable`).
 
 With this flag active (the default), `PCoef` returns a **polynomial** built from
 the given roots. Coefficient vectors in descending degree order—the form expected
-by `PEVAL`, `PRoot`, and related commands—are obtained with `ToArray` on that
+by `PEval`, `PRoot`, and related commands—are obtained with `ToArray` on that
 polynomial, or by building the vector directly.
 
-`PRoot` and `PCoef` accept a coefficient **array**, **list**, or **polynomial**
-as input; a polynomial is converted internally to its coefficient vector.
+`PRoot`, `PCoef`, and `PEval` accept a coefficient **array**, **list**,
+**polynomial**, or univariate **expression** as input; non-vectors are converted
+internally to a coefficient vector.
 
 This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
 
@@ -21441,7 +21468,7 @@ Access: 🟦 E (LN); [RealMenu](#realmenu) 🟦 F6
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | Polynomial→ | →Polynomial |   |
+| [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | [Polynomial→](#frompolynomial) | [→Polynomial](#topolynomial) |   |
 | [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) | ◀ |
 | [CstName](#constantname) | [CstValue](#constantvalue) | CstRng | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | ▶ |
 
@@ -21473,9 +21500,9 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |   |
-| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PCoef](#pcoef) | [PRoot](#proot) | [Root](#root) |
-| `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
+| [Root](#root) | [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |
+| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
+| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [Obj→](#explode) | Display | QuoRem |
 
 ### PolynomialSolverMenu
 
@@ -21649,7 +21676,7 @@ Access: 🟦 P (7); [AlgebraMenu](#algebramenu) 🟦 F6; [ArithmeticMenu](#arith
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
 | \[[Arith](#arithmeticmenu)\] | \[[Calc](#calculationmenu)\] | \[[Trig](#trigidentitiesmenu)\] | \[[Exp/Ln](#explogidentitiesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Graph](#plotmenu)\] |
-| Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
+| Collect | Expand | Simplify | [→Poly](#topolynomial) | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
 
 ### SymbolicSolverMenu
 

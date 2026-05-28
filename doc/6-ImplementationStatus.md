@@ -575,6 +575,9 @@ spellings.
 * `PositiveUnderflowIndicator`
 * `PowerVoltage`
 * `PPar` (`PlotParameters`)
+* `PCoef` (`PolynomialCoefficients`)
+* `PEval` (`PolynomialEvaluation`)
+* `PRoot` (`PolynomialRoots`)
 * `PrcRnd` (`PrecisionRound`)
 * `Prec` (`Precision`)
 * `PredX` (`PredictX`)
@@ -3160,7 +3163,6 @@ implemented by the time the project reaches version 1.0.
 * `PDIM`
 * `PERINFO`
 * `PERTBL`
-* `PEVAL`
 * `PICTURE`
 * `PLOT`
 * `PLOTADD`

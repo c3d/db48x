@@ -593,7 +593,7 @@ Access: 🟦 E (1/x); [RealMenu](#realmenu) 🟦 F6
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | Polynomial→ | →Polynomial |   |
+| [Tag→](#tag-1) | [→Tag](#tag) | [DeleteTag](#deletetag) | [Polynomial→](#frompolynomial) | [→Polynomial](#topolynomial) |   |
 | [StdRnd](#standardround) | [RelRnd](#relativeround) | [→StdUnc](#us) | [→RelUnc](#ur) | [PrcRnd](#precisionround) | ◀ |
 | [CstName](#constantname) | [CstValue](#constantvalue) | CstRng | [StdUnc](#standarduncertainty) | [RelUnc](#relativeuncertainty) | ▶ |
 
@@ -625,9 +625,9 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |   |
-| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PCoef](#pcoef) | [PRoot](#proot) | [Root](#root) |
-| `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
+| [Root](#root) | [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |
+| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
+| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [Obj→](#explode) | Display | QuoRem |
 
 ### PolynomialSolverMenu
 
@@ -801,7 +801,7 @@ Access: 🟦 P (7); [AlgebraMenu](#algebramenu) 🟦 F6; [ArithmeticMenu](#arith
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | \[[Integ](#integrationmenu)\] | \[[DSolve](#differentialsolvermenu)\] | [Simplify](#autosimplify) | [KeepAll](#noautosimplify) |   |   |
 | \[[Arith](#arithmeticmenu)\] | \[[Calc](#calculationmenu)\] | \[[Trig](#trigidentitiesmenu)\] | \[[Exp/Ln](#explogidentitiesmenu)\] | \[[Poly](#polynomialsmenu)\] | \[[Graph](#plotmenu)\] |
-| Collect | Expand | Simplify | →Poly | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
+| Collect | Expand | Simplify | [→Poly](#topolynomial) | [→Prog](#program) | \[[Algbra](#algebramenu)\] |
 
 ### SymbolicSolverMenu
 

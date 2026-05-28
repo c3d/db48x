@@ -165,6 +165,7 @@ FUNCTION_EXT(ToPolynomial,
              static const uint seqtypes = ((1UL << ID_array)
                                          | (1UL << ID_list)););
 COMMAND_DECLARE(FromPolynomial,         1);
+COMMAND_DECLARE(PEval,                  2);
 COMMAND_DECLARE(PRoot,                  1);
 COMMAND_DECLARE(PCoef,                  1);
 COMMAND_DECLARE(Zeros,                  2);

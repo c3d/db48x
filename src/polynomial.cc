@@ -1959,7 +1959,8 @@ static object_p poly_coeff(size_t n, size_t above, size_t i)
 }
 
 
-static bool poly_push_coeff(object_r obj, size_t &n, size_t &above)
+static bool poly_push_coeff(object_r obj, size_t &n, size_t &above,
+                            bool numeric_only)
 // ----------------------------------------------------------------------------
 //   Push validated coefficients onto the stack
 // ----------------------------------------------------------------------------
@@ -2001,7 +2002,15 @@ static bool poly_push_coeff(object_r obj, size_t &n, size_t &above)
     for (object_p o : *lst)
     {
         o = object::strip(o);
-        if (!o->is_real() && !o->is_complex())
+        if (numeric_only)
+        {
+            if (!o->is_real() && !o->is_complex())
+            {
+                rt.type_error();
+                goto err;
+            }
+        }
+        else if (!o->is_algebraic())
         {
             rt.type_error();
             goto err;
@@ -2016,6 +2025,26 @@ static bool poly_push_coeff(object_r obj, size_t &n, size_t &above)
 err:
     rt.drop(rt.depth() - depth);
     return false;
+}
+
+
+static algebraic_p horner(size_t n, size_t skip, algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Horner evaluation from coefficients on the stack
+// ----------------------------------------------------------------------------
+{
+    algebraic_g result, c;
+    for (size_t i = 0; i < n; i++)
+    {
+        object_p    o = rt.stack(skip + n + ~i);
+        c = o->as_algebraic();
+        if (!c)
+            return nullptr;
+        result = result ? result * x + c : c;
+        if (!result)
+            return nullptr;
+    }
+    return result;
 }
 
 
@@ -2651,6 +2680,35 @@ static bool poly_proot_numeric(size_t n, size_t &nroots)
 }
 
 
+COMMAND_BODY(PEval)
+// ----------------------------------------------------------------------------
+//   Evaluate a polynomial at a point
+// ----------------------------------------------------------------------------
+{
+    if (object_p xobj = rt.pop())
+        if (object_p coeffobj = rt.pop())
+        {
+            algebraic_p x = xobj->as_algebraic();
+            if (!x)
+            {
+                rt.type_error();
+                return ERROR;
+            }
+
+            size_t saved = rt.depth();
+            size_t n     = 0;
+            size_t above = 0;
+            if (!poly_push_coeff(coeffobj, n, above, false))
+                return ERROR;
+            algebraic_p result = horner(n, above, x);
+            rt.drop(rt.depth() - saved);
+            if (result && rt.push(result))
+                return OK;
+        }
+    return ERROR;
+}
+
+
 COMMAND_BODY(PRoot)
 // ----------------------------------------------------------------------------
 //   All roots of a polynomial from coefficient vector
@@ -2661,7 +2719,7 @@ COMMAND_BODY(PRoot)
         size_t saved = rt.depth();
         size_t n     = 0;
         size_t above = 0;
-        if (!poly_push_coeff(obj, n, above))
+        if (!poly_push_coeff(obj, n, above, true))
             return ERROR;
         size_t nroots = 0;
         if (!poly_proot_numeric(n, nroots))
@@ -2691,7 +2749,7 @@ COMMAND_BODY(PCoef)
         size_t saved = rt.depth();
         size_t nroots = 0;
         size_t above  = 0;
-        if (!poly_push_coeff(obj, nroots, above))
+        if (!poly_push_coeff(obj, nroots, above, true))
             return ERROR;
         if (!poly_pcoef_from_roots(nroots))
         {

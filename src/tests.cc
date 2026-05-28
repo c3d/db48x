@@ -171,7 +171,7 @@ TESTS(statistics,       "Statistics");
 TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
-TESTS(prootzeros,       "Polynomial roots");
+TESTS(prootzeros,       "Polynomial roots and evaluation");
 TESTS(quorem,           "Quotient and remainder");
 TESTS(primes,           "Prime number tests");
 TESTS(expr,             "Operations on expressions");
@@ -13247,6 +13247,36 @@ void tests::polynomial_roots()
     step("PRoot accepts expression input in compatible mode")
         .test(CLEAR, "'x↑4+2·x↑3-25·x↑2-26·x+120' PROOT", ENTER)
         .want("[ -5 -3 2 4 ]");
+    step("PRoot rejects symbolic coefficients")
+        .test(CLEAR, "[ 'A' 'B' 'C' ] PRoot", ENTER)
+        .error("Bad argument type");
+    step("PEval: coefficient vector")
+        .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
+        .expect("0");
+    step("PEval: expression input")
+        .test(CLEAR, "'X^2-5*X+6' 3 PEval", ENTER)
+        .expect("0");
+    step("PEval: polynomial input")
+        .test(CLEAR, "[ 1 2 -25 -26 120 ] ToPolynomial 3 PEval", ENTER)
+        .expect("-48");
+    step("PEval: symbolic A with coefficient vector")
+        .test(CLEAR, "[ 1 2 1 ] 'A' PEval", ENTER)
+        .expect("'(A+2)·A+1'");
+    step("PEval: symbolic A with expression")
+        .test(CLEAR, "'A^2+2*A+1' 'A' PEval", ENTER)
+        .expect("'(A+2)·A+1'");
+    step("PEval: symbolic A with polynomial")
+        .test(CLEAR, "'A^2+2*A+1' ToPolynomial 'A' PEval", ENTER)
+        .expect("'(A+2)·A+1'");
+    step("PEval: symbolic coefficients and X (HP-style)")
+        .test(CLEAR, "{ 'A' 'B' 'C' } 'X' PEval", ENTER)
+        .expect("'(A·X+B)·X+C'");
+    step("PEval: symbolic coefficients at numeric X")
+        .test(CLEAR, "[ 'A' 'B' 'C' ] 2 PEval", ENTER)
+        .expect("'(A·2+B)·2+C'");
+    step("PEval: symbolic coefficients match expanded form")
+        .test(CLEAR, "[ 'A' 'B' 'C' ] 'X' PEval", ENTER)
+        .expect("'(A·X+B)·X+C'");
     step("ToPolynomial converts array to polynomial")
         .test(CLEAR, "[1 2 -25 -26 120] ToPolynomial", ENTER)
         .expect("x↑4+2·x↑3-25·x↑2-26·x+120")
