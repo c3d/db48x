@@ -213,6 +213,32 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+## NewStylePolynomials
+
+Use DB48X polynomial objects for polynomial-oriented commands where the result
+is a polynomial in one variable (typically `X` from `AlgebraVariable`).
+
+With this flag active (the default), `PCoef` returns a **polynomial** built from
+the given roots. Coefficient vectors in descending degree order—the form expected
+by `PEVAL`, `PRoot`, and related commands—are obtained with `ToArray` on that
+polynomial, or by building the vector directly.
+
+`PRoot` and `PCoef` accept a coefficient **array**, **list**, or **polynomial**
+as input; a polynomial is converted internally to its coefficient vector.
+
+This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
+
+## CompatiblePolynomials
+
+Use HP-style coefficient vectors for polynomial root and coefficient commands.
+
+With this flag active, `PCoef` returns a coefficient **array** in descending
+degree order, matching classic RPL calculators. `PRoot` still accepts arrays,
+lists, and polynomials; use `ToPolynomial` to turn a coefficient vector into a
+polynomial object for symbolic work.
+
+This is the opposite of [NewStylePolynomials](#newstylepolynomials).
+
 ## ShowAsDecimal
 
 Show integer numbers like `25` and fractions like `3/2` as decimal values.

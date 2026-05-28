@@ -13224,17 +13224,46 @@ void tests::polynomial_roots()
     step("PRoot: quadratic")
         .test(CLEAR, "[1 -5 6] PRoot", ENTER)
         .want("[ 2 3 ]");
-    step("PCoef: build coefficients from roots")
-        .test(CLEAR, "[2 -3 4 -5] PCoef", ENTER)
+    step("PCoef: compatible coefficients from roots")
+        .test(CLEAR, "CompatiblePolynomials [2 -3 4 -5] PCoef", ENTER)
         .want("[ 1 2 -25 -26 120 ]");
     step("PRoot: decimal coefficient vector")
         .test(CLEAR, "[1. 2. -25. -26. 120.] PRoot", ENTER)
         .want("[ -5 -3 2 4 ]");
-    step("PCoef then PRoot round-trip")
-        .test(CLEAR, "[2 -3 4 -5] PCoef", ENTER, "PRoot", ENTER)
+    step("PCoef then PRoot round-trip in compatible mode")
+        .test(CLEAR, "CompatiblePolynomials [2 -3 4 -5] PCoef", ENTER)
+        .expect("[ 1 2 -25 -26 120 ]")
+        .test("PRoot", ENTER)
         .want("[ -5 -3 2 4 ]");
+    step("PCoef: new-style polynomial output")
+        .test(CLEAR, "NewStylePolynomials [2 -3 4 -5] PCoef", ENTER)
+        .expect("x↑4+2·x↑3-25·x↑2-26·x+120");
+    step("PRoot accepts polynomial input in compatible mode")
+        .test(CLEAR,
+              "CompatiblePolynomials [1 2 -25 -26 120] ToPolynomial ", ENTER)
+        .expect("x↑4+2·x↑3-25·x↑2-26·x+120")
+        .test("PRoot", ENTER)
+        .want("[ -5 -3 2 4 ]");
+    step("PRoot accepts expression input in compatible mode")
+        .test(CLEAR, "'x↑4+2·x↑3-25·x↑2-26·x+120' PROOT", ENTER)
+        .want("[ -5 -3 2 4 ]");
+    step("ToPolynomial converts array to polynomial")
+        .test(CLEAR, "[1 2 -25 -26 120] ToPolynomial", ENTER)
+        .expect("x↑4+2·x↑3-25·x↑2-26·x+120")
+        .test("ToArray", ENTER)
+        .want("[ 1 2 -25 -26 120 ]");
+    step("ToPolynomial converts list to polynomial")
+        .test(CLEAR, "{ 1 2 -25 -26 120} ToPolynomial", ENTER)
+        .expect("x↑4+2·x↑3-25·x↑2-26·x+120")
+        .test("ToArray", ENTER)
+        .want("[ 1 2 -25 -26 120 ]");
     step("Zeros: cubic polynomial")
         .test(CLEAR, "'X^3-X^2-8*X+12' 'X' Zeros", ENTER)
+        .want("{ 2 -3 }");
+    step("Zeros: cubic polynomial")
+        .test(CLEAR, "'X^3-X^2-8*X+12' ToPolynomial", ENTER)
+        .expect("X↑3-X↑2-8·X+12")
+        .test("'X' Zeros", ENTER)
         .want("{ 2 -3 }");
     step("Zeros: multivariate rejected")
         .test(CLEAR, "'X*Y' 'X' Zeros", ENTER)

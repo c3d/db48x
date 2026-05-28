@@ -27,8 +27,10 @@ Find all zeros of a univariate expression.
 @ Expecting { 2 -3 }
 ```
 
-For a coefficient vector instead of an expression, use `PRoot`. To build
-coefficients from a list of roots, use `PCoef`.
+For a coefficient vector or polynomial instead of an expression, use `PRoot`.
+To build a polynomial or coefficient vector from a list of roots, use `PCoef`
+(see [NewStylePolynomials](#newstylepolynomials) and
+[CompatiblePolynomials](#compatiblepolynomials)).
 
 
 ## Root

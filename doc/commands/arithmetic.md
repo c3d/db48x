@@ -249,23 +249,33 @@ Evaluation of polynomial given as vector of coefficients
 
 Build the monic polynomial whose roots are the given values.
 
-`Roots` ▶ `Coeffs`
+`Roots` ▶ `Poly` or `Coeffs`
 
 * `Roots` is an array or list of algebraic values (integers, fractions,
   decimals, or complex numbers). Each entry is one root of the polynomial.
-* Returns `Coeffs`, an array of coefficients in **descending degree order**
-  (highest power first), for the monic polynomial
-  ∏(x − rᵢ) over all roots rᵢ.
-* Coefficient order matches the other polynomial-vector commands such as
-  `PEVAL`, `PDIV2`, and `PRoot`.
+* Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
+* With [NewStylePolynomials](#newstylepolynomials) active (default), the result
+  is a **polynomial** object. Use `ToArray` to obtain coefficients in
+  **descending degree order** (highest power first).
+* With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
+  coefficient **array** in that same order, as on HP calculators.
+* Coefficient order matches `PEVAL`, `PDIV2`, and `PRoot`.
 
 ```rpl
+CompatiblePolynomials
 [ 2 -3 4 -5 ] PCoef
 @ Expecting [ 1 2 -25 -26 120 ]
 ```
 
-The result is the coefficient vector of
-x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector to recover the roots.
+```rpl
+NewStylePolynomials
+[ 2 -3 4 -5 ] PCoef
+@ Expecting x↑4+2·x↑3-25·x↑2-26·x+120
+```
+
+The compatible-mode vector is the coefficient list of
+x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector (or on the polynomial
+after `ToPolynomial`) to recover the roots.
 
 
 ## IEGCD
@@ -356,16 +366,17 @@ Extract digits from a real number
 
 ## PRoot
 
-Find all roots of a polynomial given by its coefficient vector.
+Find all roots of a polynomial given by its coefficients.
 
 `Coeffs` ▶ `Roots`
 
-* `Coeffs` is an array or list of algebraic coefficients in **descending degree
-  order** (same convention as `PEVAL` and `PCoef`). The leading coefficient
-  must be non-zero; trailing zeros at the high end are ignored.
+* `Coeffs` is an array, list, or **polynomial** (converted via `ToArray`) whose
+  coefficients are in **descending degree order** (same convention as `PEVAL`
+  and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
+  high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.
-* Degree is limited to 100. Inputs must be arrays or lists of algebraic
-  elements.
+* Degree is limited to 100. Coefficient elements must be algebraic (real or
+  complex).
 
 For low degrees, roots are found by closed forms (linear and quadratic). For
 higher degrees, the implementation tries exact rational candidates (when the
@@ -386,9 +397,10 @@ integer, and negligible imaginary parts are dropped.
 @ Expecting [ 2 3 ]
 ```
 
-To obtain coefficients from a symbolic expression in one variable, expand it to
-a polynomial (for example with `ToPolynomial`) and read off coefficients, or
-use `Zeros` on the expression directly.
+To obtain coefficients from a symbolic expression in one variable, use
+`ToPolynomial` and then `ToArray`, or use `Zeros` on the expression directly.
+See [NewStylePolynomials](#newstylepolynomials) for how `PCoef` formats its
+result.
 
 
 ## IsPrime

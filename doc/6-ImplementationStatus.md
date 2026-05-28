@@ -129,6 +129,7 @@ spellings.
 * `CompareMenu`
 * `CompatibleBasedNumbers`
 * `CompatibleGROBs`
+* `CompatiblePolynomials`
 * `CompatibleTypes`
 * `ComplexIAfterImaginary`
 * `ComplexIBeforeImaginary`
@@ -519,6 +520,7 @@ spellings.
 * `NoTrailingDecimal`
 * `NoUndefinedResult`
 * `NSub`
+* `NewStylePolynomials`
 * `Num` (`CharToUnicode`, `Char→Code`, `Codepoint`)
 * `NumberDotOrComma`
 * `NumberedVariables`
@@ -1107,6 +1109,7 @@ spellings.
 * `CompareMenu`
 * `CompatibleBasedNumbers`
 * `CompatibleGROBs`
+* `CompatiblePolynomials`
 * `CompatibleTypes`
 * `ComplexIAfterImaginary`
 * `ComplexIBeforeImaginary`
@@ -1497,6 +1500,7 @@ spellings.
 * `NoTrailingDecimal`
 * `NoUndefinedResult`
 * `NSub`
+* `NewStylePolynomials`
 * `Num`
 * `NumberDotOrComma`
 * `NumberedVariables`
@@ -2085,6 +2089,7 @@ spellings.
 * `CompareMenu`
 * `CompatibleBasedNumbers`
 * `CompatibleGROBs`
+* `CompatiblePolynomials`
 * `CompatibleTypes`
 * `ComplexIAfterImaginary`
 * `ComplexIBeforeImaginary`
@@ -2475,6 +2480,7 @@ spellings.
 * `NoTrailingDecimal`
 * `NoUndefinedResult`
 * `NSub`
+* `NewStylePolynomials`
 * `Num`
 * `NumberDotOrComma`
 * `NumberedVariables`

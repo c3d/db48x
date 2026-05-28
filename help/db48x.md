@@ -4912,6 +4912,7 @@ spellings.
 * `CompareMenu`
 * `CompatibleBasedNumbers`
 * `CompatibleGROBs`
+* `CompatiblePolynomials`
 * `CompatibleTypes`
 * `ComplexIAfterImaginary`
 * `ComplexIBeforeImaginary`
@@ -5302,6 +5303,7 @@ spellings.
 * `NoTrailingDecimal`
 * `NoUndefinedResult`
 * `NSub`
+* `NewStylePolynomials`
 * `Num`
 * `NumberDotOrComma`
 * `NumberedVariables`
@@ -12885,23 +12887,33 @@ Evaluation of polynomial given as vector of coefficients
 
 Build the monic polynomial whose roots are the given values.
 
-`Roots` ▶ `Coeffs`
+`Roots` ▶ `Poly` or `Coeffs`
 
 * `Roots` is an array or list of algebraic values (integers, fractions,
   decimals, or complex numbers). Each entry is one root of the polynomial.
-* Returns `Coeffs`, an array of coefficients in **descending degree order**
-  (highest power first), for the monic polynomial
-  ∏(x − rᵢ) over all roots rᵢ.
-* Coefficient order matches the other polynomial-vector commands such as
-  `PEVAL`, `PDIV2`, and `PRoot`.
+* Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
+* With [NewStylePolynomials](#newstylepolynomials) active (default), the result
+  is a **polynomial** object. Use `ToArray` to obtain coefficients in
+  **descending degree order** (highest power first).
+* With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
+  coefficient **array** in that same order, as on HP calculators.
+* Coefficient order matches `PEVAL`, `PDIV2`, and `PRoot`.
 
 ```rpl
+CompatiblePolynomials
 [ 2 -3 4 -5 ] PCoef
 @ Expecting [ 1 2 -25 -26 120 ]
 ```
 
-The result is the coefficient vector of
-x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector to recover the roots.
+```rpl
+NewStylePolynomials
+[ 2 -3 4 -5 ] PCoef
+@ Expecting x↑4+2·x↑3-25·x↑2-26·x+120
+```
+
+The compatible-mode vector is the coefficient list of
+x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector (or on the polynomial
+after `ToPolynomial`) to recover the roots.
 
 
 ## IEGCD
@@ -12992,16 +13004,17 @@ Extract digits from a real number
 
 ## PRoot
 
-Find all roots of a polynomial given by its coefficient vector.
+Find all roots of a polynomial given by its coefficients.
 
 `Coeffs` ▶ `Roots`
 
-* `Coeffs` is an array or list of algebraic coefficients in **descending degree
-  order** (same convention as `PEVAL` and `PCoef`). The leading coefficient
-  must be non-zero; trailing zeros at the high end are ignored.
+* `Coeffs` is an array, list, or **polynomial** (converted via `ToArray`) whose
+  coefficients are in **descending degree order** (same convention as `PEVAL`
+  and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
+  high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.
-* Degree is limited to 100. Inputs must be arrays or lists of algebraic
-  elements.
+* Degree is limited to 100. Coefficient elements must be algebraic (real or
+  complex).
 
 For low degrees, roots are found by closed forms (linear and quadratic). For
 higher degrees, the implementation tries exact rational candidates (when the
@@ -13022,9 +13035,10 @@ integer, and negligible imaginary parts are dropped.
 @ Expecting [ 2 3 ]
 ```
 
-To obtain coefficients from a symbolic expression in one variable, expand it to
-a polynomial (for example with `ToPolynomial`) and read off coefficients, or
-use `Zeros` on the expression directly.
+To obtain coefficients from a symbolic expression in one variable, use
+`ToPolynomial` and then `ToArray`, or use `Zeros` on the expression directly.
+See [NewStylePolynomials](#newstylepolynomials) for how `PCoef` formats its
+result.
 
 
 ## IsPrime
@@ -15619,6 +15633,12 @@ Note that on HP calculators, this command only works with lists and not with vec
 Stack to Array Command: Returns a vector or matrix built from individual
 elements placed on the stack and dimensions.
 
+If the argument on the stack is a **polynomial**, `→Array` returns its
+coefficient vector in **descending degree order** (the same layout `PRoot` and
+`PCoef` use in [CompatiblePolynomials](#compatiblepolynomials) mode). This is
+the usual way to obtain coefficients from a [NewStylePolynomials](#newstylepolynomials)
+`PCoef` result. No stack items are consumed beyond the polynomial.
+
 If the dimension is given as a positive integer, then `→Array` returns a
 vector built from the given number of individual items.
 
@@ -17433,6 +17453,32 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+## NewStylePolynomials
+
+Use DB48X polynomial objects for polynomial-oriented commands where the result
+is a polynomial in one variable (typically `X` from `AlgebraVariable`).
+
+With this flag active (the default), `PCoef` returns a **polynomial** built from
+the given roots. Coefficient vectors in descending degree order—the form expected
+by `PEVAL`, `PRoot`, and related commands—are obtained with `ToArray` on that
+polynomial, or by building the vector directly.
+
+`PRoot` and `PCoef` accept a coefficient **array**, **list**, or **polynomial**
+as input; a polynomial is converted internally to its coefficient vector.
+
+This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
+
+## CompatiblePolynomials
+
+Use HP-style coefficient vectors for polynomial root and coefficient commands.
+
+With this flag active, `PCoef` returns a coefficient **array** in descending
+degree order, matching classic RPL calculators. `PRoot` still accepts arrays,
+lists, and polynomials; use `ToPolynomial` to turn a coefficient vector into a
+polynomial object for symbolic work.
+
+This is the opposite of [NewStylePolynomials](#newstylepolynomials).
+
 ## ShowAsDecimal
 
 Show integer numbers like `25` and fractions like `3/2` as decimal values.
@@ -18224,8 +18270,10 @@ Find all zeros of a univariate expression.
 @ Expecting { 2 -3 }
 ```
 
-For a coefficient vector instead of an expression, use `PRoot`. To build
-coefficients from a list of roots, use `PCoef`.
+For a coefficient vector or polynomial instead of an expression, use `PRoot`.
+To build a polynomial or coefficient vector from a list of roots, use `PCoef`
+(see [NewStylePolynomials](#newstylepolynomials) and
+[CompatiblePolynomials](#compatiblepolynomials)).
 
 
 ## Root
@@ -19202,6 +19250,38 @@ The `AlgebraVariable` command returns the current variable used for polynomial
 evaluation and symbolic computations.
 If no variable is set, it defaults to `X`.
 The variable is stored in the algebra configuration directory.
+
+## ToPolynomial
+
+Convert an algebraic object to a polynomial.
+
+`X` ▶ `Poly`
+
+* If `X` is already a polynomial, it is returned unchanged.
+* If `X` is an array or list of coefficients in **descending degree order**, a
+  univariate polynomial in the current `AlgebraVariable` is built (same layout
+  as `PRoot` and `PCoef` in [CompatiblePolynomials](#compatiblepolynomials)
+  mode).
+* Otherwise, `X` is treated as an expression and expanded to a polynomial when
+  possible.
+
+```rpl
+[ 1 2 -25 -26 120 ] ToPolynomial
+@ Expecting x↑4+2·x↑3-25·x↑2-26·x+120
+```
+
+Use `ToArray` to recover the coefficient vector. See
+[NewStylePolynomials](#newstylepolynomials) for the default `PCoef` result type.
+
+## FromPolynomial
+
+Convert a polynomial to an ordinary expression.
+
+`Poly` ▶ `Expr`
+
+Rewrites the polynomial using normal infix notation (sums and products of
+powers). The variable names and term order follow the internal polynomial
+representation. Use `ToPolynomial` for the inverse conversion.
 
 ## StoreAlgebraVariable
 

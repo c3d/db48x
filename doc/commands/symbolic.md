@@ -310,6 +310,38 @@ evaluation and symbolic computations.
 If no variable is set, it defaults to `X`.
 The variable is stored in the algebra configuration directory.
 
+## ToPolynomial
+
+Convert an algebraic object to a polynomial.
+
+`X` ▶ `Poly`
+
+* If `X` is already a polynomial, it is returned unchanged.
+* If `X` is an array or list of coefficients in **descending degree order**, a
+  univariate polynomial in the current `AlgebraVariable` is built (same layout
+  as `PRoot` and `PCoef` in [CompatiblePolynomials](#compatiblepolynomials)
+  mode).
+* Otherwise, `X` is treated as an expression and expanded to a polynomial when
+  possible.
+
+```rpl
+[ 1 2 -25 -26 120 ] ToPolynomial
+@ Expecting x↑4+2·x↑3-25·x↑2-26·x+120
+```
+
+Use `ToArray` to recover the coefficient vector. See
+[NewStylePolynomials](#newstylepolynomials) for the default `PCoef` result type.
+
+## FromPolynomial
+
+Convert a polynomial to an ordinary expression.
+
+`Poly` ▶ `Expr`
+
+Rewrites the polynomial using normal infix notation (sums and products of
+powers). The variable names and term order follow the internal polynomial
+representation. Use `ToPolynomial` for the inverse conversion.
+
 ## StoreAlgebraVariable
 
 Store the current algebra variable.

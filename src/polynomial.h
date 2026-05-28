@@ -81,6 +81,8 @@ struct polynomial : expression
     static polynomial_p make(symbol_p expr);
     static polynomial_p make(expression_p expr, bool error = false);
     static polynomial_p make(algebraic_r factor, symbol_r sym, ularge exp);
+    static polynomial_p from_coefficients(object_p coeffs, bool error = false);
+    static object_p     coefficients(polynomial_r poly, bool error = false);
 
     // Write in the scratchpad a combination of the variables of two polynoms
     static byte *copy_variables(polynomial_r x, byte *previous = nullptr);
@@ -159,7 +161,9 @@ struct polynomial : expression
 };
 
 
-FUNCTION(ToPolynomial);
+FUNCTION_EXT(ToPolynomial,
+             static const uint seqtypes = ((1UL << ID_array)
+                                         | (1UL << ID_list)););
 COMMAND_DECLARE(FromPolynomial,         1);
 COMMAND_DECLARE(PRoot,                  1);
 COMMAND_DECLARE(PCoef,                  1);

@@ -1359,11 +1359,15 @@ GRAPH_BODY(polynomial)
 
 FUNCTION_BODY(ToPolynomial)
 // ----------------------------------------------------------------------------
-//   Convert an expression as a polynomial
+//   Convert array/list/expression to a polynomial object
 // ----------------------------------------------------------------------------
 {
     if (!x)
         return nullptr;
+    if (polynomial_p poly = x->as<polynomial>())
+        return poly;
+    if (polynomial_p poly = polynomial::from_coefficients(object_p(+x), false))
+        return poly;
     if (polynomial_p poly = polynomial::make(x))
         return poly;
     if (!rt.error())
@@ -1717,6 +1721,217 @@ COMMAND_BODY(StoreAlgebraVariable)
 }
 
 
+static bool polynomial_univariate_info(polynomial_r poly,
+                                       size_t      &var_index,
+                                       ularge      &degree)
+// ----------------------------------------------------------------------------
+//   Locate univariate variable and degree for coefficient conversion
+// ----------------------------------------------------------------------------
+{
+    if (!poly)
+        return false;
+
+    size_t nvars    = poly->variables();
+    bool   has_var  = false;
+    size_t active   = 0;
+    degree          = 0;
+
+    for (size_t v = 0; v < nvars; v++)
+    {
+        bool used = false;
+        for (auto term : *poly)
+        {
+            ularge e = term.rank(v);
+            if (e)
+            {
+                used = true;
+                if (e > degree)
+                    degree = e;
+            }
+        }
+        if (used)
+        {
+            if (has_var)
+            {
+                rt.invalid_polynomial_error();
+                return false;
+            }
+            has_var = true;
+            active = v;
+        }
+    }
+
+    var_index = active;
+    return true;
+}
+
+
+polynomial_p polynomial::from_coefficients(object_p coeffs, bool error)
+// ----------------------------------------------------------------------------
+//   Build a univariate polynomial from array/list coefficients
+// ----------------------------------------------------------------------------
+{
+    if (!coeffs)
+        return nullptr;
+    if (polynomial_p poly = coeffs->as<polynomial>())
+        return poly;
+
+    list_p list = coeffs->as_array_or_list();
+    if (!list)
+    {
+        if (error)
+            rt.type_error();
+        return nullptr;
+    }
+
+    size_t n = 0;
+    for (object_p item : *list)
+    {
+        (void) item;
+        n++;
+    }
+    if (!n || n > Settings.MaxPolynomialDegree())
+    {
+        if (error)
+            rt.dimension_error();
+        return nullptr;
+    }
+
+    symbol_p var = polynomial::main_variable();
+    if (!var)
+        return nullptr;
+
+    polynomial_g result = polynomial::make(integer::make(0));
+    if (!result)
+        return nullptr;
+
+    size_t i = 0;
+    for (object_p item : *list)
+    {
+        object_p o = object::strip(item);
+        if (!o->is_real() && !o->is_complex())
+        {
+            if (error)
+                rt.type_error();
+            return nullptr;
+        }
+        algebraic_p coeff = o->as_algebraic();
+        if (!coeff)
+            return nullptr;
+
+        ularge exp = n + ~i;
+        if (!coeff->is_zero(false))
+        {
+            polynomial_g term = polynomial::make(coeff, var, exp);
+            if (!term)
+                return nullptr;
+            result = polynomial::add(result, term);
+            if (!result)
+                return nullptr;
+        }
+        i++;
+    }
+
+    return result;
+}
+
+
+object_p polynomial::coefficients(polynomial_r poly, bool error)
+// ----------------------------------------------------------------------------
+//   Convert a univariate polynomial to coefficient array
+// ----------------------------------------------------------------------------
+{
+    if (!poly)
+    {
+        if (error)
+            rt.type_error();
+        return nullptr;
+    }
+
+    size_t depth = rt.depth();
+    size_t vidx  = 0;
+    ularge deg   = 0;
+    if (!polynomial_univariate_info(poly, vidx, deg))
+        return nullptr;
+    if (deg >= Settings.MaxPolynomialDegree())
+    {
+        if (error)
+            rt.dimension_error();
+        return nullptr;
+    }
+
+    if (poly->variables() == 0)
+    {
+        algebraic_g c = integer::make(0);
+        for (auto term : *poly)
+        {
+            algebraic_g f = term.factor();
+            if (!f)
+                return nullptr;
+            if (!f->is_real() && !f->is_complex())
+            {
+                if (error)
+                    rt.type_error();
+                return nullptr;
+            }
+            c = c + f;
+            if (!c)
+                return nullptr;
+        }
+        if (!rt.push(+c))
+            return nullptr;
+    }
+    else
+    {
+        size_t n = deg + 1;
+        for (size_t k = 0; k < n; k++)
+        {
+            ularge exp = deg - k;
+            algebraic_g coeff = integer::make(0);
+            for (auto term : *poly)
+            {
+                if (term.rank(vidx) != exp)
+                    continue;
+                algebraic_g f = term.factor();
+                if (!f)
+                    goto coeff_error;
+                if (!f->is_real() && !f->is_complex())
+                {
+                    if (error)
+                        rt.type_error();
+                    goto coeff_error;
+                }
+                coeff = coeff + f;
+                if (!coeff)
+                    goto coeff_error;
+            }
+            if (!rt.push(+coeff))
+                goto coeff_error;
+        }
+    }
+
+    {
+        size_t   n = rt.depth() - depth;
+        scribble scr;
+        for (size_t i = 0; i < n; i++)
+        {
+            object_p o = rt.stack(n + ~i);
+            if (!o || !rt.append(o))
+                goto coeff_error;
+        }
+        object_p result = list::make(object::ID_array,
+                                     scr.scratch(),
+                                     scr.growth());
+        if (result && rt.drop(n))
+            return result;
+    }
+
+coeff_error:
+    rt.drop(rt.depth() - depth);
+    return nullptr;
+}
+
+
 // ============================================================================
 //
 //   Polynomial roots (PRoot / PCoef / Zeros)
@@ -1750,14 +1965,33 @@ static bool poly_push_coeff(object_r obj, size_t &n, size_t &above)
 // ----------------------------------------------------------------------------
 {
     size_t depth = rt.depth();
-    list_p lst   = obj->as_array_or_list();
+    object_g coeffs = object::strip(obj);
+    list_p   lst    = obj->as_array_or_list();
+    if (!lst)
+    {
+        if (expression_p expr = coeffs->as<expression>())
+            if (polynomial_p poly = polynomial::make(expr))
+                coeffs = poly;
+        if (polynomial_p poly = coeffs->as<polynomial>())
+        {
+            coeffs = polynomial::coefficients(poly, true);
+            if (!coeffs)
+                return false;
+            lst = coeffs->as_array_or_list();
+        }
+    }
     if (!lst)
     {
         rt.type_error();
         return false;
     }
 
-    n = lst->items();
+    n = 0;
+    for (object_p item : *lst)
+    {
+        (void) item;
+        n++;
+    }
     if (!n || n > Settings.MaxPolynomialDegree())
     {
         rt.dimension_error();
@@ -2464,10 +2698,22 @@ COMMAND_BODY(PCoef)
             rt.drop(rt.depth() - saved);
             return ERROR;
         }
-        size_t       ncoeffs = rt.depth() - saved;
-        array_p result = poly_build_array(ncoeffs, false, false);
-        if (result && rt.push(result))
-            return OK;
+        size_t  ncoeffs = rt.depth() - saved;
+        array_p coeffs  = poly_build_array(ncoeffs, false, false);
+        if (coeffs)
+        {
+            if (Settings.NewStylePolynomials())
+            {
+                if (polynomial_p poly = polynomial::from_coefficients(coeffs, true))
+                    if (rt.push(poly))
+                        return OK;
+            }
+            else
+            {
+                if (rt.push(coeffs))
+                    return OK;
+            }
+        }
         rt.drop(rt.depth() - saved);
     }
     return ERROR;

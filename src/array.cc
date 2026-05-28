@@ -34,6 +34,7 @@
 #include "expression.h"
 #include "functions.h"
 #include "grob.h"
+#include "polynomial.h"
 #include "settings.h"
 #include "stack-cmds.h"
 #include "stats.h"
@@ -2163,6 +2164,17 @@ COMMAND_BODY(ToArray)
 //   Stack to array
 // ----------------------------------------------------------------------------
 {
+    if (object_p obj = rt.top())
+    {
+        if (polynomial_p poly = obj->as<polynomial>())
+        {
+            if (object_p coeffs = polynomial::coefficients(poly, true))
+                if (rt.top(coeffs))
+                    return OK;
+            return ERROR;
+        }
+    }
+
     size_t rows = 0, columns = 0;
     if (array::size_from_stack(&rows, &columns))
     {
