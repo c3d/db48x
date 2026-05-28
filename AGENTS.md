@@ -1,5 +1,13 @@
 # DB48X Project Guide
 
+## Project Overview
+
+DB48X is a modern implementation of RPL (Reverse Polish Lisp) targeting SwissMicros calculators (DM32, DM42, DM42n). It's a complete calculator firmware written in C++ with:
+- An RPL object system with compact LEB128 encoding
+- Qt-based simulator for development/testing
+- Firmware builds for ARM Cortex-M4 (DM42/DM32 hardware)
+- Android and WebAssembly builds
+
 ## General Guidelines for AI Assistants
 
 - **Do not stack unrelated code changes.** If the user is in the middle of
@@ -15,9 +23,21 @@
 
 ## Build System
 
-- `make -j8` builds the DM42 ARM firmware. A QSPI CRC change requires a
-  **second `make`** run (the first will say "Run build once more").
-- `make -j sim` builds the macOS Qt simulator (used for testing).
+**Simulator (for development/testing):**
+```bash
+make -j sim                         # Build Qt simulator
+./db48x.app/Contents/MacOS/db48x    # Run on macOS
+./sim/db48x                         # Run on Linux
+```
+
+**Firmware:**
+```bash
+make -j8                # Build DM42 firmware (db48x.pgm)
+make -j8 debug          # Debug build
+make -j8 dm32           # Build for DM32 (db50x.pg5)
+```
+
+**QSPI CRC rebuilds:** If you see "Run build once more", run `make` again. QSPI is flash memory containing numerical routines; the build forces CRC compatibility with original DM42 firmware to allow switching between DB48X and stock DM42 firmware.
 - `help/db48x.md` and `help/db50x.md` are **auto-generated** by the build.
   Never edit them directly; edit `doc/commands/*.md` instead.
 - **Documentation internal links**: use only the anchor part, e.g. `(#Anchor)`,
@@ -92,6 +112,11 @@
   ```
 - **All new features and bug fixes must include tests.** Build and run the
   full suite (`db48x -H -Tall`) before considering work complete.
+
+**Platform notes:**
+- Run simulator from repo root so `help/` and `config/` directories are found
+- DMCP: SwissMicros Device Management Control Program (calculator firmware platform)
+- QSPI: Quad-SPI flash region storing numerical routines
 
 ## Adding Tests
 
