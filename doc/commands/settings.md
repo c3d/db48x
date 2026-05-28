@@ -213,6 +213,14 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+# Polynomial settings
+
+Settings for `PRoot`, `PCoef`, `PEval`, `Zeros`, and related polynomial commands.
+Numeric limits apply to coefficient vectors, expressions converted to
+polynomials, and internal root-finding. Assign a new value on the command line
+(e.g. `200 MaxPolynomialDegree`) or use `{ MaxPolynomialDegree } Purge Std` to
+restore defaults after tests.
+
 ## NewStylePolynomials
 
 Use DB48X polynomial objects for polynomial-oriented commands where the result
@@ -239,6 +247,31 @@ lists, and polynomials; use `ToPolynomial` to turn a coefficient vector into a
 polynomial object for symbolic work.
 
 This is the opposite of [NewStylePolynomials](#newstylepolynomials).
+
+## MaxPolynomialDegree
+
+Maximum degree accepted by `PRoot`, `PCoef`, `PEval`, `Zeros`, and coefficient
+conversion (`ToPolynomial`, `ToArray` on a polynomial). The value is the highest
+power in the univariate polynomial (e.g. `[ 1 2 1 ]` has degree 2).
+
+Range 5 to 100,000; default **100**. Inputs with more coefficients than
+`MaxPolynomialDegree + 1` report a dimension error.
+
+## MaxLaguerreIterations
+
+Maximum iterations of Laguerre’s method per root when `PRoot` or `Zeros` uses
+numerical root finding (after low-degree formulas and rational root search).
+
+Range 5 to 1000; default **80**. Increasing the value may help difficult
+polynomials converge; lowering it fails faster on pathological cases.
+
+## MaxRootDivisor
+
+Largest integer tested as a candidate divisor when `PRoot` or `Zeros` searches
+for rational roots (via divisors of the constant term).
+
+Range 5 to 100,000,000; default **1,000,000**. Larger values allow more exact
+rational roots on polynomials with big constant terms, at higher cost.
 
 ## ShowAsDecimal
 
@@ -556,7 +589,7 @@ Return the current [word size](#wordsize) in bits.
 # Command tuning
 
 Various settings can be used to tune specific commands.
-See also `IntegrationIterations`
+See also `IntegrationIterations` and [Polynomial settings](#polynomial-settings).
 
 ## MaxRewrites
 

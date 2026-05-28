@@ -5248,6 +5248,9 @@ spellings.
 * `Max`
 * `MaxFactorIterations`
 * `MaxFactorsBits`
+* `MaxLaguerreIterations`
+* `MaxPolynomialDegree`
+* `MaxRootDivisor`
 * `MaxFlags`
 * `MaxH`
 * `MaximumDecimalExponent`
@@ -12899,6 +12902,7 @@ Evaluate a polynomial at a point (Horner’s method).
 * `X` (level 1) is the evaluation point (any algebraic).
 * Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
   `A·X²+B·X+C` in descending degree order).
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns `Value`, the polynomial evaluated at `X`.
 
 ```rpl
@@ -12912,7 +12916,7 @@ Evaluate a polynomial at a point (Horner’s method).
 ```
 
 ```rpl
-[ 1 2 -25 -26 120 ] ToPolynomial 3 PEval
+'x↑4+2·x↑3-25·x↑2-26·x+120' 3 PEval
 @ Expecting -48
 ```
 
@@ -12925,6 +12929,8 @@ Build the monic polynomial whose roots are the given values.
 
 * `Roots` is an array or list of algebraic values (integers, fractions,
   decimals, or complex numbers). Each entry is one root of the polynomial.
+* Degree after expansion is limited by
+  [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
 * With [NewStylePolynomials](#newstylepolynomials) active (default), the result
   is a **polynomial** object. Use `ToArray` to obtain coefficients in
@@ -12946,8 +12952,7 @@ NewStylePolynomials
 ```
 
 The compatible-mode vector is the coefficient list of
-x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector (or on the polynomial
-after `ToPolynomial`) to recover the roots.
+`x⁴+2x³−25x²−26x+120`. Use `PRoot` on that vector to recover the roots.
 
 
 ## IEGCD
@@ -13042,19 +13047,22 @@ Find all roots of a polynomial given by its coefficients.
 
 `Coeffs` ▶ `Roots`
 
-* `Coeffs` is an array, list, **polynomial**, or univariate **expression**
+* `Coeffs` is an array, list, polynomial, or univariate expression
   (same inputs as `PEval`; polynomials are converted via `ToArray`) whose
-  coefficients are in **descending degree order** (same convention as `PEval`
+  coefficients are in descending degree order (same convention as `PEval`
   and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
   high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.
-* Degree is limited to 100. Coefficient elements must be algebraic (real or
-  complex).
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
+  Coefficients must be real or complex numbers (not symbolic names).
+* Rational root search is bounded by [MaxRootDivisor](#maxrootdivisor); numerical
+  roots use Laguerre’s method with at most
+  [MaxLaguerreIterations](#maxlaguerreiterations) per root.
 
 For low degrees, roots are found by closed forms (linear and quadratic). For
 higher degrees, the implementation tries exact rational candidates (when the
-constant term allows), then uses a numerical method (Laguerre’s method with
-deflation) for remaining roots.
+constant term allows), then uses Laguerre’s method with deflation for remaining
+roots.
 
 Numeric results are cleaned up using the same imprecision rules as the equation
 solver: values within `SolverImprecision` of an integer are snapped to that
@@ -17488,18 +17496,26 @@ This is the opposite of `CompatibleBasedNumbers`.
 Display based numbers using the HP syntax, i.e. `#12ABh` for hexadecimal.
 This is the opposite of `ModernBasedNumbers`.
 
+# Polynomial settings
+
+Settings for `PRoot`, `PCoef`, `PEval`, `Zeros`, and related polynomial commands.
+Numeric limits apply to coefficient vectors, expressions converted to
+polynomials, and internal root-finding. Assign a new value on the command line
+(e.g. `200 MaxPolynomialDegree`) or use `{ MaxPolynomialDegree } Purge Std` to
+restore defaults after tests.
+
 ## NewStylePolynomials
 
 Use DB50X polynomial objects for polynomial-oriented commands where the result
 is a polynomial in one variable (typically `X` from `AlgebraVariable`).
 
-With this flag active (the default), `PCoef` returns a **polynomial** built from
+With this flag active (the default), `PCoef` returns a polynomial built from
 the given roots. Coefficient vectors in descending degree order—the form expected
 by `PEval`, `PRoot`, and related commands—are obtained with `ToArray` on that
 polynomial, or by building the vector directly.
 
-`PRoot`, `PCoef`, and `PEval` accept a coefficient **array**, **list**,
-**polynomial**, or univariate **expression** as input; non-vectors are converted
+`PRoot`, `PCoef`, and `PEval` accept a coefficient array, list,
+polynomial, or univariate expression as input; non-vectors are converted
 internally to a coefficient vector.
 
 This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
@@ -17508,12 +17524,37 @@ This is the opposite of [CompatiblePolynomials](#compatiblepolynomials).
 
 Use HP-style coefficient vectors for polynomial root and coefficient commands.
 
-With this flag active, `PCoef` returns a coefficient **array** in descending
+With this flag active, `PCoef` returns a coefficient array in descending
 degree order, matching classic RPL calculators. `PRoot` still accepts arrays,
 lists, and polynomials; use `ToPolynomial` to turn a coefficient vector into a
 polynomial object for symbolic work.
 
 This is the opposite of [NewStylePolynomials](#newstylepolynomials).
+
+## MaxPolynomialDegree
+
+Maximum degree accepted by `PRoot`, `PCoef`, `PEval`, `Zeros`, and coefficient
+conversion (`ToPolynomial`, `ToArray` on a polynomial). The value is the highest
+power in the univariate polynomial (e.g. `[ 1 2 1 ]` has degree 2).
+
+Range 5 to 100,000; default **100**. Inputs with more coefficients than
+`MaxPolynomialDegree + 1` report a dimension error.
+
+## MaxLaguerreIterations
+
+Maximum iterations of Laguerre’s method per root when `PRoot` or `Zeros` uses
+numerical root finding (after low-degree formulas and rational root search).
+
+Range 5 to 1000; default **80**. Increasing the value may help difficult
+polynomials converge; lowering it fails faster on pathological cases.
+
+## MaxRootDivisor
+
+Largest integer tested as a candidate divisor when `PRoot` or `Zeros` searches
+for rational roots (via divisors of the constant term).
+
+Range 5 to 100,000,000; default **1,000,000**. Larger values allow more exact
+rational roots on polynomials with big constant terms, at higher cost.
 
 ## ShowAsDecimal
 
@@ -17831,7 +17872,7 @@ Return the current [word size](#wordsize) in bits.
 # Command tuning
 
 Various settings can be used to tune specific commands.
-See also `IntegrationIterations`
+See also `IntegrationIterations` and [Polynomial settings](#polynomial-settings).
 
 ## MaxRewrites
 
@@ -18296,6 +18337,9 @@ Find all zeros of a univariate expression.
   sequence (not sorted).
 * The expression must reduce to a polynomial in `'Var'` with no other variables
   present; otherwise an error is reported.
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
+  Root-finding limits match `PRoot` ([MaxRootDivisor](#maxrootdivisor),
+  [MaxLaguerreIterations](#maxlaguerreiterations)).
 * When the `ComplexResults` flag is off, roots with a non-negligible imaginary
   part are omitted from the list. When it is on, complex zeros are included.
 * Uses the same root-finding core as `PRoot` on the extracted coefficient

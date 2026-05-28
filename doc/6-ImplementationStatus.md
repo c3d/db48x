@@ -456,6 +456,9 @@ spellings.
 * `Max`
 * `MaxFactorIterations`
 * `MaxFactorsBits`
+* `MaxLaguerreIterations`
+* `MaxPolynomialDegree`
+* `MaxRootDivisor`
 * `MaxFlags`
 * `MaxH` (`MaximumShowHeight`)
 * `MaximumDecimalExponent`
@@ -1439,6 +1442,9 @@ spellings.
 * `Max`
 * `MaxFactorIterations`
 * `MaxFactorsBits`
+* `MaxLaguerreIterations`
+* `MaxPolynomialDegree`
+* `MaxRootDivisor`
 * `MaxFlags`
 * `MaxH`
 * `MaximumDecimalExponent`
@@ -2419,6 +2425,9 @@ spellings.
 * `Max`
 * `MaxFactorIterations`
 * `MaxFactorsBits`
+* `MaxLaguerreIterations`
+* `MaxPolynomialDegree`
+* `MaxRootDivisor`
 * `MaxFlags`
 * `MaxH`
 * `MaximumDecimalExponent`

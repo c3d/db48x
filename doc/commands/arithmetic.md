@@ -253,6 +253,7 @@ Evaluate a polynomial at a point (Horner’s method).
 * `X` (level 1) is the evaluation point (any algebraic).
 * Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
   `A·X²+B·X+C` in descending degree order).
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns `Value`, the polynomial evaluated at `X`.
 
 ```rpl
@@ -279,6 +280,8 @@ Build the monic polynomial whose roots are the given values.
 
 * `Roots` is an array or list of algebraic values (integers, fractions,
   decimals, or complex numbers). Each entry is one root of the polynomial.
+* Degree after expansion is limited by
+  [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
 * With [NewStylePolynomials](#newstylepolynomials) active (default), the result
   is a **polynomial** object. Use `ToArray` to obtain coefficients in
@@ -401,13 +404,16 @@ Find all roots of a polynomial given by its coefficients.
   and `PCoef`). The leading coefficient must be non-zero; trailing zeros at the
   high end are ignored.
 * Returns `Roots`, an array containing every root, sorted in ascending order.
-* Degree is limited to 100. Coefficient elements must be algebraic (real or
-  complex).
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
+  Coefficients must be real or complex numbers (not symbolic names).
+* Rational root search is bounded by [MaxRootDivisor](#maxrootdivisor); numerical
+  roots use Laguerre’s method with at most
+  [MaxLaguerreIterations](#maxlaguerreiterations) per root.
 
 For low degrees, roots are found by closed forms (linear and quadratic). For
 higher degrees, the implementation tries exact rational candidates (when the
-constant term allows), then uses a numerical method (Laguerre’s method with
-deflation) for remaining roots.
+constant term allows), then uses Laguerre’s method with deflation for remaining
+roots.
 
 Numeric results are cleaned up using the same imprecision rules as the equation
 solver: values within `SolverImprecision` of an integer are snapped to that

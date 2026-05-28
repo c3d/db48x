@@ -17,6 +17,9 @@ Find all zeros of a univariate expression.
   sequence (not sorted).
 * The expression must reduce to a polynomial in `'Var'` with no other variables
   present; otherwise an error is reported.
+* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
+  Root-finding limits match `PRoot` ([MaxRootDivisor](#maxrootdivisor),
+  [MaxLaguerreIterations](#maxlaguerreiterations)).
 * When the `ComplexResults` flag is off, roots with a non-negligible imaginary
   part are omitted from the list. When it is on, complex zeros are included.
 * Uses the same root-finding core as `PRoot` on the extracted coefficient
