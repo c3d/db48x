@@ -36,9 +36,12 @@
 
 ## Adding a New Command
 
-1. **`src/ids.tbl`**: Add `NAMED(Foo, "→Foo")` or `CMD(Foo)`. Add `ALIAS` for
-   alternate spellings. Update any `ID_RANGE` lines whose boundary the new
-   command changes (e.g. `is_command`, `is_algebraic_fn`).
+1. **`src/ids.tbl`**: Add `NAMED(Foo, "→Foo")` or `CMD(Foo)`. Use `ALIAS` only
+   for spellings that differ in more than case (parsing is case-independent).
+   Prefer `NAMED(ShortName, "LongSpelling")` when the C++ identifier is short
+   (e.g. `NAMED(PRoot, "PolynomialRoots")`); do not add `ALIAS` entries that
+   only change capitalization. Update any `ID_RANGE` lines whose boundary the
+   new command changes (e.g. `is_command`, `is_algebraic_fn`).
 2. **Header** (e.g. `src/functions.h`): Declare with `FUNCTION(Foo)`,
    `COMMAND_DECLARE(Foo, nargs)`, or `STANDARD_FUNCTION(Foo)` as appropriate.
 3. **Implementation** (e.g. `src/functions.cc`): Implement with
@@ -60,6 +63,9 @@
 ## Running Tests
 
 - Build the simulator first: `make -j sim`
+- **Quick RPL checks** (no rebuild): use simulator `-E` to evaluate a command
+  line and print the stack, e.g. `db48x -H -E '[1 2 3] PROOT'`. Read from
+  stdin with `-F -`, e.g. `db48x -H -F - -E '1 2 +'`. See `SIMULATOR.md`.
 - **Before submitting changes, run the full test suite** and fix any failures.
   From the repository root (after building the simulator):
   ```
@@ -135,9 +141,21 @@
   willy-nilly. Dispatch is done using `obj->type()` and a switch statement (or
   the handler table), not virtual functions.
 
+- For the same reason, it is **NOT OK TO USE THE STANDARD LIBRARY**, for example
+  `std::vector`, because on device firmware there is no real `malloc()`, no
+  ecception handling, etc. Using `std::vector` results in unsatisfied symbols
+  building the firmware, and the correct approach is to avoid using
+  `std::vector`, not to try random disastrous repairs to bring the firmware up
+  to standard.
+
 - `src/ids.tbl` is the single source of truth for all object/command IDs. It is
   `#include`d with varying macro definitions to generate enums, spelling tables,
   and dispatch tables.
+- **Promote reusable helpers to shared modules**: do not multiply local `static`
+  helpers when an existing shared utility would do better. Before adding local
+  helpers, check the relevant subsystem (`runtime.*`, `complex.*`, `factor.*`,
+  etc.). If the logic is generic and reused, move it to the appropriate shared
+  file and call it from feature code.
 - Dispatch: `object::handler[ID_Foo].evaluate` calls `Foo::do_evaluate`.
 - For `FUNCTION`-style commands: the evaluate chain is
   `do_evaluate` -> `evaluate()` (static) -> `evaluate(algebraic_r x)`.
