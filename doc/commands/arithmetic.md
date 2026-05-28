@@ -247,8 +247,8 @@ Evaluate a polynomial at a point (Horner’s method).
 
 `Poly` `X` ▶ `Value`
 
-* `Poly` (level 2) is a coefficient **array**, **list**, **polynomial**, or
-  univariate **expression** (same inputs as `PRoot`; converted to descending
+* `Poly` (level 2) is a coefficient array, list, polynomial, or
+  univariate expression (same inputs as `PRoot`; converted to descending
   coefficients).
 * `X` (level 1) is the evaluation point (any algebraic).
 * Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
@@ -284,10 +284,10 @@ Build the monic polynomial whose roots are the given values.
   [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
 * With [NewStylePolynomials](#newstylepolynomials) active (default), the result
-  is a **polynomial** object. Use `ToArray` to obtain coefficients in
-  **descending degree order** (highest power first).
+  is a polynomial object. Use `ToArray` to obtain coefficients in
+  descending degree order (highest power first).
 * With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
-  coefficient **array** in that same order, as on HP calculators.
+  coefficient array in that same order, as on HP calculators.
 * Coefficient order matches `PEval`, `PDIV2`, and `PRoot`.
 
 ```rpl

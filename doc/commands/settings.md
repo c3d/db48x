@@ -254,7 +254,7 @@ Maximum degree accepted by `PRoot`, `PCoef`, `PEval`, `Zeros`, and coefficient
 conversion (`ToPolynomial`, `ToArray` on a polynomial). The value is the highest
 power in the univariate polynomial (e.g. `[ 1 2 1 ]` has degree 2).
 
-Range 5 to 100,000; default **100**. Inputs with more coefficients than
+Range 5 to 100,000; default 100. Inputs with more coefficients than
 `MaxPolynomialDegree + 1` report a dimension error.
 
 ## MaxLaguerreIterations
@@ -262,7 +262,7 @@ Range 5 to 100,000; default **100**. Inputs with more coefficients than
 Maximum iterations of Laguerre’s method per root when `PRoot` or `Zeros` uses
 numerical root finding (after low-degree formulas and rational root search).
 
-Range 5 to 1000; default **80**. Increasing the value may help difficult
+Range 5 to 1000; default 80. Increasing the value may help difficult
 polynomials converge; lowering it fails faster on pathological cases.
 
 ## MaxRootDivisor
@@ -270,7 +270,7 @@ polynomials converge; lowering it fails faster on pathological cases.
 Largest integer tested as a candidate divisor when `PRoot` or `Zeros` searches
 for rational roots (via divisors of the constant term).
 
-Range 5 to 100,000,000; default **1,000,000**. Larger values allow more exact
+Range 5 to 100,000,000; default 1,000,000. Larger values allow more exact
 rational roots on polynomials with big constant terms, at higher cost.
 
 ## ShowAsDecimal

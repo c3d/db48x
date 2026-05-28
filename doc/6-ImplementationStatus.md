@@ -780,7 +780,7 @@ spellings.
 * `StoKeys` (`StoreKeys`)
 * `StoreAtEnd`
 * `StoreAtStart`
-* `StoVX` (`StoreAlgebraVariable`, `Storeⓧ`)
+* `StoVX` (`StoreAlgebraVariable`, `Storeⓧ`, `STOVX`)
 * `StoΣ` (`StoreData`, `StoreΣ`)
 * `StrictArrayResizing`
 * `Str→` (`Compile`, `Text→`)
@@ -921,7 +921,7 @@ spellings.
 * `VerticalProgramRendering`
 * `VerticalVectors`
 * `VoltageForeground`
-* `VX` (`AlgebraVariable`, `RclVX`, `ⓧ`)
+* `VX` (`AlgebraVariable`, `RclVX`, `RCLVX`, `ⓧ`)
 * `V→` (`FromVector`, `Vector→`)
 * `Wait`
 * `XCol` (`IndependentColumn`)
@@ -3206,7 +3206,6 @@ implemented by the time the project reaches version 1.0.
 * `RCIJ`
 * `RCLALARM`
 * `RCLF`
-* `RCLVX`
 * `RDM`
 * `REF`
 * `REMAINDER`
@@ -3265,7 +3264,6 @@ implemented by the time the project reaches version 1.0.
 * `SREPL`
 * `STOALARM`
 * `STOF`
-* `STOVX`
 * `STREAM`
 * `STURM`
 * `STURMAB`

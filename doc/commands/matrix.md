@@ -5,8 +5,8 @@
 Stack to Array Command: Returns a vector or matrix built from individual
 elements placed on the stack and dimensions.
 
-If the argument on the stack is a **polynomial**, `→Array` returns its
-coefficient vector in **descending degree order** (the same layout `PRoot` and
+If the argument on the stack is a polynomial, `→Array` returns its
+coefficient vector in descending degree order (the same layout `PRoot` and
 `PCoef` use in [CompatiblePolynomials](#compatiblepolynomials) mode). This is
 the usual way to obtain coefficients from a [NewStylePolynomials](#newstylepolynomials)
 `PCoef` result. No stack items are consumed beyond the polynomial.

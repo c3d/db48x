@@ -303,12 +303,14 @@ The configuration directory is stored in the global variable with the name
 
 ## AlgebraVariable
 
-Recall the current algebra variable.
+Recall the current CAS algebra variable (HP-50G `VX` / `RCLVX`).
 
 The `AlgebraVariable` command returns the current variable used for polynomial
 evaluation and symbolic computations.
 If no variable is set, it defaults to `X`.
-The variable is stored in the algebra configuration directory.
+The variable is stored in the `AlgebraConfiguration` directory.
+
+Spellings: `VX`, `RclVX`, `RCLVX`, `ⓧ`.
 
 ## ToPolynomial
 
@@ -317,7 +319,7 @@ Convert an algebraic object to a polynomial.
 `X` ▶ `Poly`
 
 * If `X` is already a polynomial, it is returned unchanged.
-* If `X` is an array or list of coefficients in **descending degree order**, a
+* If `X` is an array or list of coefficients in descending degree order, a
   univariate polynomial in the current `AlgebraVariable` is built (same layout
   as `PRoot` and `PCoef` in [CompatiblePolynomials](#compatiblepolynomials)
   mode).
@@ -344,11 +346,14 @@ representation. Use `ToPolynomial` for the inverse conversion.
 
 ## StoreAlgebraVariable
 
-Store the current algebra variable.
+Store the current CAS algebra variable (HP-50G `STOVX`).
 
-The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+The `StoreAlgebraVariable` command sets the variable used for polynomial
+evaluation and symbolic computations.
 The variable must be a quoted symbol (e.g., `'X'`).
-The variable is stored in the algebra configuration directory.
+The variable is stored in the `AlgebraConfiguration` directory.
+
+Spellings: `StoVX`, `STOVX`, `Storeⓧ`.
 
 ## Equation
 

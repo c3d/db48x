@@ -6028,7 +6028,6 @@ implemented by the time the project reaches version 1.0.
 * `RCIJ`
 * `RCLALARM`
 * `RCLF`
-* `RCLVX`
 * `RDM`
 * `REF`
 * `REMAINDER`
@@ -6087,7 +6086,6 @@ implemented by the time the project reaches version 1.0.
 * `SREPL`
 * `STOALARM`
 * `STOF`
-* `STOVX`
 * `STREAM`
 * `STURM`
 * `STURMAB`
@@ -12896,8 +12894,8 @@ Evaluate a polynomial at a point (Horner’s method).
 
 `Poly` `X` ▶ `Value`
 
-* `Poly` (level 2) is a coefficient **array**, **list**, **polynomial**, or
-  univariate **expression** (same inputs as `PRoot`; converted to descending
+* `Poly` (level 2) is a coefficient array, list, polynomial, or
+  univariate expression (same inputs as `PRoot`; converted to descending
   coefficients).
 * `X` (level 1) is the evaluation point (any algebraic).
 * Coefficients may be numbers or symbols (e.g. `[ 'A' 'B' 'C' ]` for
@@ -12933,10 +12931,10 @@ Build the monic polynomial whose roots are the given values.
   [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
 * Returns the monic polynomial ∏(x − rᵢ) over all roots rᵢ.
 * With [NewStylePolynomials](#newstylepolynomials) active (default), the result
-  is a **polynomial** object. Use `ToArray` to obtain coefficients in
-  **descending degree order** (highest power first).
+  is a polynomial object. Use `ToArray` to obtain coefficients in
+  descending degree order (highest power first).
 * With [CompatiblePolynomials](#compatiblepolynomials) active, the result is a
-  coefficient **array** in that same order, as on HP calculators.
+  coefficient array in that same order, as on HP calculators.
 * Coefficient order matches `PEval`, `PDIV2`, and `PRoot`.
 
 ```rpl
@@ -15676,8 +15674,8 @@ Note that on HP calculators, this command only works with lists and not with vec
 Stack to Array Command: Returns a vector or matrix built from individual
 elements placed on the stack and dimensions.
 
-If the argument on the stack is a **polynomial**, `→Array` returns its
-coefficient vector in **descending degree order** (the same layout `PRoot` and
+If the argument on the stack is a polynomial, `→Array` returns its
+coefficient vector in descending degree order (the same layout `PRoot` and
 `PCoef` use in [CompatiblePolynomials](#compatiblepolynomials) mode). This is
 the usual way to obtain coefficients from a [NewStylePolynomials](#newstylepolynomials)
 `PCoef` result. No stack items are consumed beyond the polynomial.
@@ -17537,7 +17535,7 @@ Maximum degree accepted by `PRoot`, `PCoef`, `PEval`, `Zeros`, and coefficient
 conversion (`ToPolynomial`, `ToArray` on a polynomial). The value is the highest
 power in the univariate polynomial (e.g. `[ 1 2 1 ]` has degree 2).
 
-Range 5 to 100,000; default **100**. Inputs with more coefficients than
+Range 5 to 100,000; default 100. Inputs with more coefficients than
 `MaxPolynomialDegree + 1` report a dimension error.
 
 ## MaxLaguerreIterations
@@ -17545,7 +17543,7 @@ Range 5 to 100,000; default **100**. Inputs with more coefficients than
 Maximum iterations of Laguerre’s method per root when `PRoot` or `Zeros` uses
 numerical root finding (after low-degree formulas and rational root search).
 
-Range 5 to 1000; default **80**. Increasing the value may help difficult
+Range 5 to 1000; default 80. Increasing the value may help difficult
 polynomials converge; lowering it fails faster on pathological cases.
 
 ## MaxRootDivisor
@@ -17553,7 +17551,7 @@ polynomials converge; lowering it fails faster on pathological cases.
 Largest integer tested as a candidate divisor when `PRoot` or `Zeros` searches
 for rational roots (via divisors of the constant term).
 
-Range 5 to 100,000,000; default **1,000,000**. Larger values allow more exact
+Range 5 to 100,000,000; default 1,000,000. Larger values allow more exact
 rational roots on polynomials with big constant terms, at higher cost.
 
 ## ShowAsDecimal
@@ -19324,12 +19322,14 @@ The configuration directory is stored in the global variable with the name
 
 ## AlgebraVariable
 
-Recall the current algebra variable.
+Recall the current CAS algebra variable (HP-50G `VX` / `RCLVX`).
 
 The `AlgebraVariable` command returns the current variable used for polynomial
 evaluation and symbolic computations.
 If no variable is set, it defaults to `X`.
-The variable is stored in the algebra configuration directory.
+The variable is stored in the `AlgebraConfiguration` directory.
+
+Spellings: `VX`, `RclVX`, `RCLVX`, `ⓧ`.
 
 ## ToPolynomial
 
@@ -19338,7 +19338,7 @@ Convert an algebraic object to a polynomial.
 `X` ▶ `Poly`
 
 * If `X` is already a polynomial, it is returned unchanged.
-* If `X` is an array or list of coefficients in **descending degree order**, a
+* If `X` is an array or list of coefficients in descending degree order, a
   univariate polynomial in the current `AlgebraVariable` is built (same layout
   as `PRoot` and `PCoef` in [CompatiblePolynomials](#compatiblepolynomials)
   mode).
@@ -19365,11 +19365,14 @@ representation. Use `ToPolynomial` for the inverse conversion.
 
 ## StoreAlgebraVariable
 
-Store the current algebra variable.
+Store the current CAS algebra variable (HP-50G `STOVX`).
 
-The `StoreAlgebraVariable` command sets the variable used for polynomial evaluation and symbolic computations.
+The `StoreAlgebraVariable` command sets the variable used for polynomial
+evaluation and symbolic computations.
 The variable must be a quoted symbol (e.g., `'X'`).
-The variable is stored in the algebra configuration directory.
+The variable is stored in the `AlgebraConfiguration` directory.
+
+Spellings: `StoVX`, `STOVX`, `Storeⓧ`.
 
 ## Equation
 

@@ -33,6 +33,10 @@
   displays all alternate spellings for a command. Do not create separate `##`
   entries for aliases or compatibility spellings. Document each command once
   under its primary name.
+- **No markdown bold for emphasis in command docs**: do not write `**foo**` in
+  `doc/commands/*.md` to highlight words. The built-in help renderer does not
+  display bold correctly, and it is easy to overuse. Use backticks for command
+  names, settings, and literal RPL fragments; otherwise write plain prose.
 
 ## Adding a New Command
 
