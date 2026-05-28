@@ -67,7 +67,6 @@ RECORDER(lcd_warning,   64, "Warnings from lcd/display functions");
 #undef ppgm_fp
 
 extern bool          run_tests;
-extern bool          noisy_tests;
 extern bool          no_beep;
 
 uint                 lcd_refresh_requested = 0;
@@ -852,13 +851,13 @@ void run_help_file_style(const char * help_file, user_style_fn_t *user_style_fn)
 void start_buzzer_freq(uint32_t freq)
 {
     record(dmcp, "start_buzzer %u.%03uHz", freq / 1000, freq % 1000);
-    if (!no_beep && (!tests::running || noisy_tests))
+    if (!no_beep)
         ui_start_buzzer(freq);
 }
 void stop_buzzer()
 {
     record(dmcp, "stop_buzzer");
-    if (!no_beep && (!tests::running || noisy_tests))
+    if (!no_beep)
         ui_stop_buzzer();
 }
 

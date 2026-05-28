@@ -54,7 +54,6 @@ RECORDER_TWEAK_DEFINE(rpl_objects_detail, 0, "Set to 1 to see object addresses")
 
 bool   run_tests   = false;
 bool   install     = false;
-bool   noisy_tests = false;
 bool   no_beep     = false;
 uint   memory_size = MEMORY; // Memory size in kilobytes
 QDir   testDirectory;
@@ -187,7 +186,7 @@ static void sim_usage(FILE *out, cstring prog)
             "  -k<map>    Load saved keymap\n"
             "  -l         Prefix -E / -F stack levels with level numbers\n"
             "  -m[N]      Memory size in kilobytes\n"
-            "  -n         Enable beeps during tests\n"
+            "  -n         Enable beeps (override -H, -T or -N)\n"
             "  -r[N]      Screen refresh wait in ms (default: 20)\n"
             "  -s<N>      Window scaling factor\n"
             "  -t<trace>  Enable recorder trace (repeatable, regex ok)\n"
@@ -196,7 +195,7 @@ static void sim_usage(FILE *out, cstring prog)
             "  -D<pattrn> Recorder traces pattern on test failure\n"
             "  -E<cmd>    Similar to -e, printing stack to console\n"
             "  -F<cmd>    Similar to -f, printing stack to console\n"
-            "  -H         Headless: no window, exit when done\n"
+            "  -H         Headless: no window, no sound, exit when done\n"
             "  -I         Initialize user environment (may overwrite)\n"
             "  -K         Simulate typing keys during tests\n"
             "  -N         Disable beeps\n"
@@ -268,6 +267,7 @@ static bool sim_parse_args(int argc, char *argv[])
 
         case 'H':
             rplcmds.headless = true;
+            no_beep = true;
             break;
 
         case 'I':
@@ -298,7 +298,7 @@ static bool sim_parse_args(int argc, char *argv[])
             break;
 
         case 'n':
-            noisy_tests = true;
+            no_beep = false;
             break;
 
         case 'N':
@@ -328,6 +328,7 @@ static bool sim_parse_args(int argc, char *argv[])
         case 'T':
             check_arg();
             run_tests = true;
+            no_beep = true;
             sim_test_traces(arg);
             break;
 
