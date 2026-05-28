@@ -418,29 +418,7 @@ object::result function::evaluate(algebraic_fn op, uint seqtypes)
     if (object_p top = strip(rt.top()))
     {
         id topty = top->type();
-        if (topty == ID_polynomial)
-        {
-            if (op == algebraic_fn(sq::evaluate) ||
-                op == algebraic_fn(cubed::evaluate))
-            {
-                polynomial_g xp = polynomial_p(top);
-                ularge exp = op == algebraic_fn(cubed::evaluate) ? 3 : 2;
-                top = polynomial::pow(xp, exp);
-                return (top && rt.top(top)) ? OK : ERROR;
-            }
-            else if (op == algebraic_fn(neg::evaluate))
-            {
-                polynomial_g xp = polynomial_p(top);
-                top = polynomial::neg(xp);
-                return (top && rt.top(top)) ? OK : ERROR;
-            }
-            else
-            {
-                top = polynomial_p(top)->as_expression();
-            }
-            topty = top ? top->type() : ID_expression;
-        }
-        if (topty == ID_list ||
+        if ((topty == ID_list && (seqtypes & (1UL << topty)) == 0) ||
             (topty == ID_array && (seqtypes & (1UL << topty)) == 0))
         {
             top = list_p(top)->map(op);
