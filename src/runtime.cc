@@ -1259,6 +1259,23 @@ bool runtime::drop(uint count)
 }
 
 
+bool runtime::drop_at(uint base, uint count)
+// ----------------------------------------------------------------------------
+//   Pop deep objects from the stack, or return NULL
+// ----------------------------------------------------------------------------
+{
+    runtime_invariants check;
+    if (count + base > depth())
+    {
+        missing_argument_error();
+        return false;
+    }
+    memmove(Stack + count, Stack, base * sizeof(*Stack));
+    Stack += count;
+    return true;
+}
+
+
 
 // ============================================================================
 //

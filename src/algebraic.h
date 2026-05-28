@@ -144,6 +144,8 @@ struct algebraic : command
 
     static algebraic_p epsilon(int imprecision = 0);
 
+    algebraic_p snap_near_integer(algebraic_r eps) const;
+
     static int compare(algebraic_r x, algebraic_r y);
 
     INSERT_DECL(algebraic);

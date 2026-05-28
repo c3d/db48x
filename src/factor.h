@@ -24,7 +24,10 @@
 //   This software is licensed under the terms outlined in LICENSE.txt
 // ****************************************************************************
 
+#include "algebraic.h"
 #include "bignum.h"
+
+#include <vector>
 
 
 // ============================================================================
@@ -92,6 +95,7 @@ bool     factorize(bignum_g n, factor_result &result);
 int      is_prime(bignum_r n);
 
 void     extract_square_factor(ularge n, ularge &sq, ularge &rem);
+size_t   integer_divisors_push(ularge n);
 
 
 // ============================================================================

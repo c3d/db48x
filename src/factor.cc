@@ -13,6 +13,7 @@
 #include "factor.h"
 
 #include "command.h"
+#include "integer.h"
 #include "list.h"
 #include "settings.h"
 
@@ -960,4 +961,48 @@ void extract_square_factor(ularge n, ularge &sq, ularge &rem)
                 return;
         }
     }
+}
+
+
+size_t integer_divisors_push(ularge n)
+// ----------------------------------------------------------------------------
+//   Push all positive and negative divisors of n (for rational root search)
+// ----------------------------------------------------------------------------
+{
+    if (!n)
+        n = 1;
+    size_t count = 0;
+    for (ularge d = 1; d * d <= n; d++)
+    {
+        if (n % d)
+            continue;
+        if (!rt.push(integer::make(d)))
+            goto err;
+        count++;
+        if (d > 1)
+        {
+            if (!rt.push(integer::make(-ularge(d))))
+                goto err;
+            count++;
+        }
+        ularge q = n / d;
+        if (q != d)
+        {
+            if (!rt.push(integer::make(q)))
+                goto err;
+            count++;
+            if (q > 1)
+            {
+                if (!rt.push(integer::make(-q)))
+                    goto err;
+                count++;
+            }
+        }
+    }
+    return count;
+
+err:
+    if (count)
+        rt.drop(count);
+    return 0;
 }

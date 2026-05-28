@@ -3150,7 +3150,6 @@ implemented by the time the project reaches version 1.0.
 * `PARSURFACE`
 * `PARTFRAC`
 * `PCAR`
-* `PCOEF`
 * `PCONTOUR`
 * `PDIM`
 * `PERINFO`
@@ -3169,7 +3168,6 @@ implemented by the time the project reaches version 1.0.
 * `PREDV`
 * `PREVAL`
 * `PROMPTSTO`
-* `PROOT`
 * `PROPFRAC`
 * `PSDEV`
 * `PSI`
@@ -3309,7 +3307,6 @@ implemented by the time the project reaches version 1.0.
 * `YSLICE`
 * `YVOL`
 * `YYRNG`
-* `ZEROS`
 * `ZFACTOR`
 * `ZVOL`
 * `;` (Semicolon)

@@ -1463,6 +1463,15 @@ algebraic_p object::as_algebraic() const
 }
 
 
+complex_p object::as_complex() const
+// ----------------------------------------------------------------------------
+//   Return rectangular or polar as complex, or nullptr
+// ----------------------------------------------------------------------------
+{
+    return is_complex() ? complex_p(this) : nullptr;
+}
+
+
 object_p object::strip(object_p obj)
 // ----------------------------------------------------------------------------
 //   Strip the object of tags and assignments

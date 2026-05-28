@@ -32,7 +32,9 @@
 
 #include "arithmetic.h"
 #include "compare.h"
+#include "fraction.h"
 #include "functions.h"
+#include "integer.h"
 #include "parser.h"
 #include "renderer.h"
 #include "runtime.h"
@@ -181,6 +183,128 @@ rectangular_p complex::make(int re, int im)
     return rectangular_p(make(ID_rectangular,
                               integer::make(re), integer::make(im),
                               ID_PiRadians));
+}
+
+
+complex_g complex::zero()
+// ----------------------------------------------------------------------------
+//   Complex zero
+// ----------------------------------------------------------------------------
+{
+    return make(0, 0);
+}
+
+
+complex_g complex::one()
+// ----------------------------------------------------------------------------
+//   Complex one
+// ----------------------------------------------------------------------------
+{
+    return make(1, 0);
+}
+
+
+complex_g complex::from_algebraic(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Promote an algebraic to a complex value
+// ----------------------------------------------------------------------------
+{
+    if (complex_p z = x->as_complex())
+        return z;
+    if (x->is_real())
+        return rectangular::make(x, integer::make(0));
+    return nullptr;
+}
+
+
+bool complex::is_zero() const
+// ----------------------------------------------------------------------------
+//   Test if complex is zero
+// ----------------------------------------------------------------------------
+{
+    if (type() == ID_rectangular)
+        return rectangular_p(this)->is_zero();
+    return polar_p(this)->is_zero();
+}
+
+
+bool complex::is_one() const
+// ----------------------------------------------------------------------------
+//   Test if complex is one
+// ----------------------------------------------------------------------------
+{
+    if (type() == ID_rectangular)
+        return rectangular_p(this)->is_one();
+    return polar_p(this)->is_one();
+}
+
+
+bool complex::is_integer(algebraic_g &re) const
+// ----------------------------------------------------------------------------
+//   If z is a purely real integer, return that value
+// ----------------------------------------------------------------------------
+{
+    if (has_imaginary())
+        return false;
+    algebraic_g eps = epsilon();
+    re = this->re()->snap_near_integer(eps);
+    return re && re->is_integer();
+}
+
+
+bool complex::near(complex_r other) const
+// ----------------------------------------------------------------------------
+//   Test if two complex values are equal within solver imprecision
+// ----------------------------------------------------------------------------
+{
+    if (!other)
+        return false;
+    complex_g   self = complex_p(this);
+    complex_g   d    = self - other;
+    if (!d)
+        return false;
+    algebraic_g m   = abs::run(algebraic_p(+d));
+    algebraic_g eps = epsilon();
+    return m && smaller_magnitude(m, eps);
+}
+
+
+bool complex::has_imaginary() const
+// ----------------------------------------------------------------------------
+//   True when the imaginary part exceeds solver imprecision
+// ----------------------------------------------------------------------------
+{
+    algebraic_g im = this->im()->evaluate();
+    if (!im)
+        return false;
+    algebraic_g aim = abs::run(im);
+    if (!aim)
+        return false;
+    return !smaller_magnitude(aim, epsilon());
+}
+
+
+algebraic_p complex::as_rounded_result(int impr) const
+// ----------------------------------------------------------------------------
+//   Drop imaginary noise that result from complex coefficients
+// ----------------------------------------------------------------------------
+{
+    rectangular_g r = as_rectangular();
+    if (!r)
+        return nullptr;
+    algebraic_g eps = epsilon(impr);
+    algebraic_g re  = r->re();
+    algebraic_g im  = r->im();
+    re = re->snap_near_integer(eps);
+    if (!re || !im)
+        return nullptr;
+    im = abs::run(im);
+    if (!im || im->is_zero(false) || smaller_magnitude(im, eps))
+        return re;
+    im = im->snap_near_integer(eps);
+    if (!im)
+        return nullptr;
+    return rectangular::make(re, im);
 }
 
 

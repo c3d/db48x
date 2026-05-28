@@ -761,6 +761,11 @@ struct runtime
     //   Pop the top-level object from the stack, or return NULL
     // ------------------------------------------------------------------------
 
+    bool drop_at(uint base, uint count = 1);
+    // ------------------------------------------------------------------------
+    //   Pop the top-level object from the stack, or return NULL
+    // ------------------------------------------------------------------------
+
     bool swap(uint a, uint b);
     // ------------------------------------------------------------------------
     //   Swap two levels in the stack

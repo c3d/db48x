@@ -171,6 +171,7 @@ TESTS(statistics,       "Statistics");
 TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
+TESTS(prootzeros,       "Polynomial roots");
 TESTS(quorem,           "Quotient and remainder");
 TESTS(primes,           "Prime number tests");
 TESTS(expr,             "Operations on expressions");
@@ -300,6 +301,7 @@ int tests::run(uint onlyCurrent)
         probabilities();
         sum_and_product();
         polynomials();
+        polynomial_roots();
         quotient_and_remainder();
         prime_number_tests();
         exact_quotient();
@@ -13206,6 +13208,37 @@ void tests::polynomials()
     step("Restore default rendering for polynomials")
         .test(CLEAR, "'PrefixPolynomialRender' purge", ENTER)
         .noerror();
+}
+
+
+void tests::polynomial_roots()
+// ----------------------------------------------------------------------------
+//   PRoot, PCoef, Zeros
+// ----------------------------------------------------------------------------
+{
+    BEGIN(prootzeros);
+
+    step("PRoot: HP quartic example")
+        .test(CLEAR, "[1 2 -25 -26 120] PRoot", ENTER)
+        .want("[ -5 -3 2 4 ]");
+    step("PRoot: quadratic")
+        .test(CLEAR, "[1 -5 6] PRoot", ENTER)
+        .want("[ 2 3 ]");
+    step("PCoef: build coefficients from roots")
+        .test(CLEAR, "[2 -3 4 -5] PCoef", ENTER)
+        .want("[ 1 2 -25 -26 120 ]");
+    step("PRoot: decimal coefficient vector")
+        .test(CLEAR, "[1. 2. -25. -26. 120.] PRoot", ENTER)
+        .want("[ -5 -3 2 4 ]");
+    step("PCoef then PRoot round-trip")
+        .test(CLEAR, "[2 -3 4 -5] PCoef", ENTER, "PRoot", ENTER)
+        .want("[ -5 -3 2 4 ]");
+    step("Zeros: cubic polynomial")
+        .test(CLEAR, "'X^3-X^2-8*X+12' 'X' Zeros", ENTER)
+        .want("{ 2 -3 }");
+    step("Zeros: multivariate rejected")
+        .test(CLEAR, "'X*Y' 'X' Zeros", ENTER)
+        .error("Expression is not a polynomial");
 }
 
 

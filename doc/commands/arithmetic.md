@@ -245,8 +245,27 @@ Multiplication operator MOD the current system modulo
 Evaluation of polynomial given as vector of coefficients
 
 
-## PCOEF
-Coefficients of monic polynomial with the given roots
+## PCoef
+
+Build the monic polynomial whose roots are the given values.
+
+`Roots` ▶ `Coeffs`
+
+* `Roots` is an array or list of algebraic values (integers, fractions,
+  decimals, or complex numbers). Each entry is one root of the polynomial.
+* Returns `Coeffs`, an array of coefficients in **descending degree order**
+  (highest power first), for the monic polynomial
+  ∏(x − rᵢ) over all roots rᵢ.
+* Coefficient order matches the other polynomial-vector commands such as
+  `PEVAL`, `PDIV2`, and `PRoot`.
+
+```rpl
+[ 2 -3 4 -5 ] PCoef
+@ Expecting [ 1 2 -25 -26 120 ]
+```
+
+The result is the coefficient vector of
+x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector to recover the roots.
 
 
 ## IEGCD
@@ -335,8 +354,41 @@ Truncate a number to the given number of figures
 Extract digits from a real number
 
 
-## PROOT
-All roots of a polynomial
+## PRoot
+
+Find all roots of a polynomial given by its coefficient vector.
+
+`Coeffs` ▶ `Roots`
+
+* `Coeffs` is an array or list of algebraic coefficients in **descending degree
+  order** (same convention as `PEVAL` and `PCoef`). The leading coefficient
+  must be non-zero; trailing zeros at the high end are ignored.
+* Returns `Roots`, an array containing every root, sorted in ascending order.
+* Degree is limited to 100. Inputs must be arrays or lists of algebraic
+  elements.
+
+For low degrees, roots are found by closed forms (linear and quadratic). For
+higher degrees, the implementation tries exact rational candidates (when the
+constant term allows), then uses a numerical method (Laguerre’s method with
+deflation) for remaining roots.
+
+Numeric results are cleaned up using the same imprecision rules as the equation
+solver: values within `SolverImprecision` of an integer are snapped to that
+integer, and negligible imaginary parts are dropped.
+
+```rpl
+[ 1 2 -25 -26 120 ] PRoot
+@ Expecting [ -5 -3 2 4 ]
+```
+
+```rpl
+[ 1 -5 6 ] PRoot
+@ Expecting [ 2 3 ]
+```
+
+To obtain coefficients from a symbolic expression in one variable, expand it to
+a polynomial (for example with `ToPolynomial`) and read off coefficients, or
+use `Zeros` on the expression directly.
 
 
 ## IsPrime

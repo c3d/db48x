@@ -161,6 +161,9 @@ struct polynomial : expression
 
 FUNCTION(ToPolynomial);
 COMMAND_DECLARE(FromPolynomial,         1);
+COMMAND_DECLARE(PRoot,                  1);
+COMMAND_DECLARE(PCoef,                  1);
+COMMAND_DECLARE(Zeros,                  2);
 COMMAND_DECLARE(AlgebraConfiguration,   0);
 COMMAND_DECLARE(AlgebraVariable,        0);
 COMMAND_DECLARE(StoreAlgebraVariable,   1);

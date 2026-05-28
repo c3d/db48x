@@ -5985,7 +5985,6 @@ implemented by the time the project reaches version 1.0.
 * `PARSURFACE`
 * `PARTFRAC`
 * `PCAR`
-* `PCOEF`
 * `PCONTOUR`
 * `PDIM`
 * `PERINFO`
@@ -6004,7 +6003,6 @@ implemented by the time the project reaches version 1.0.
 * `PREDV`
 * `PREVAL`
 * `PROMPTSTO`
-* `PROOT`
 * `PROPFRAC`
 * `PSDEV`
 * `PSI`
@@ -6144,7 +6142,6 @@ implemented by the time the project reaches version 1.0.
 * `YSLICE`
 * `YVOL`
 * `YYRNG`
-* `ZEROS`
 * `ZFACTOR`
 * `ZVOL`
 * `;` (Semicolon)
@@ -12893,8 +12890,27 @@ Multiplication operator MOD the current system modulo
 Evaluation of polynomial given as vector of coefficients
 
 
-## PCOEF
-Coefficients of monic polynomial with the given roots
+## PCoef
+
+Build the monic polynomial whose roots are the given values.
+
+`Roots` ▶ `Coeffs`
+
+* `Roots` is an array or list of algebraic values (integers, fractions,
+  decimals, or complex numbers). Each entry is one root of the polynomial.
+* Returns `Coeffs`, an array of coefficients in **descending degree order**
+  (highest power first), for the monic polynomial
+  ∏(x − rᵢ) over all roots rᵢ.
+* Coefficient order matches the other polynomial-vector commands such as
+  `PEVAL`, `PDIV2`, and `PRoot`.
+
+```rpl
+[ 2 -3 4 -5 ] PCoef
+@ Expecting [ 1 2 -25 -26 120 ]
+```
+
+The result is the coefficient vector of
+x⁴ + 2x³ − 25x² − 26x + 120. Use `PRoot` on that vector to recover the roots.
 
 
 ## IEGCD
@@ -12983,8 +12999,41 @@ Truncate a number to the given number of figures
 Extract digits from a real number
 
 
-## PROOT
-All roots of a polynomial
+## PRoot
+
+Find all roots of a polynomial given by its coefficient vector.
+
+`Coeffs` ▶ `Roots`
+
+* `Coeffs` is an array or list of algebraic coefficients in **descending degree
+  order** (same convention as `PEVAL` and `PCoef`). The leading coefficient
+  must be non-zero; trailing zeros at the high end are ignored.
+* Returns `Roots`, an array containing every root, sorted in ascending order.
+* Degree is limited to 100. Inputs must be arrays or lists of algebraic
+  elements.
+
+For low degrees, roots are found by closed forms (linear and quadratic). For
+higher degrees, the implementation tries exact rational candidates (when the
+constant term allows), then uses a numerical method (Laguerre’s method with
+deflation) for remaining roots.
+
+Numeric results are cleaned up using the same imprecision rules as the equation
+solver: values within `SolverImprecision` of an integer are snapped to that
+integer, and negligible imaginary parts are dropped.
+
+```rpl
+[ 1 2 -25 -26 120 ] PRoot
+@ Expecting [ -5 -3 2 4 ]
+```
+
+```rpl
+[ 1 -5 6 ] PRoot
+@ Expecting [ 2 3 ]
+```
+
+To obtain coefficients from a symbolic expression in one variable, expand it to
+a polynomial (for example with `ToPolynomial`) and read off coefficients, or
+use `Zeros` on the expression directly.
 
 
 ## IsPrime
@@ -18161,6 +18210,33 @@ The following information is stored in state files:
 Numerical integration (adaptive Simpson)
 
 
+## Zeros
+
+Find all zeros of a univariate expression.
+
+`'Expr'` `'Var'` ▶ `{ Zeros }`
+
+* `'Expr'` is an algebraic expression or equation in the variable `'Var'`.
+  Equations are converted to the difference of their sides before solving.
+* `'Var'` must be a quoted variable name (symbol).
+* Returns a list of distinct zeros. Order follows the internal root-finding
+  sequence (not sorted).
+* The expression must reduce to a polynomial in `'Var'` with no other variables
+  present; otherwise an error is reported.
+* When the `ComplexResults` flag is off, roots with a non-negligible imaginary
+  part are omitted from the list. When it is on, complex zeros are included.
+* Uses the same root-finding core as `PRoot` on the extracted coefficient
+  vector. Numeric cleanup follows `SolverImprecision`, like `Root`.
+
+```rpl
+'X^3-X^2-8*X+12' 'X' Zeros
+@ Expecting { 2 -3 }
+```
+
+For a coefficient vector instead of an expression, use `PRoot`. To build
+coefficients from a list of roots, use `PCoef`.
+
+
 ## Root
 
 Find the root of an equation or of a system of equations.
@@ -21334,8 +21410,8 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | _Zeros_ | _FCoef_ |   |
-| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | _PCoef_ | _PRoot_ | [Root](#root) |
+| [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |   |
+| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PCoef](#pcoef) | [PRoot](#proot) | [Root](#root) |
 | `Ⓟ''` | →Poly | Poly→ | [Obj→](#explode) | Display | QuoRem |
 
 ### PolynomialSolverMenu

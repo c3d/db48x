@@ -4,6 +4,33 @@
 Numerical integration (adaptive Simpson)
 
 
+## Zeros
+
+Find all zeros of a univariate expression.
+
+`'Expr'` `'Var'` ▶ `{ Zeros }`
+
+* `'Expr'` is an algebraic expression or equation in the variable `'Var'`.
+  Equations are converted to the difference of their sides before solving.
+* `'Var'` must be a quoted variable name (symbol).
+* Returns a list of distinct zeros. Order follows the internal root-finding
+  sequence (not sorted).
+* The expression must reduce to a polynomial in `'Var'` with no other variables
+  present; otherwise an error is reported.
+* When the `ComplexResults` flag is off, roots with a non-negligible imaginary
+  part are omitted from the list. When it is on, complex zeros are included.
+* Uses the same root-finding core as `PRoot` on the extracted coefficient
+  vector. Numeric cleanup follows `SolverImprecision`, like `Root`.
+
+```rpl
+'X^3-X^2-8*X+12' 'X' Zeros
+@ Expecting { 2 -3 }
+```
+
+For a coefficient vector instead of an expression, use `PRoot`. To build
+coefficients from a list of roots, use `PCoef`.
+
+
 ## Root
 
 Find the root of an equation or of a system of equations.

@@ -93,6 +93,16 @@ struct complex : algebraic
                              algebraic_r x, algebraic_r y,
                              angle_unit polar_unit);
     static rectangular_p make(int re = 0, int im = 1);
+    static complex_g    zero();
+    static complex_g    one();
+    static complex_g    from_algebraic(algebraic_r x);
+
+    bool                is_zero() const;
+    bool                is_one() const;
+    bool                is_integer(algebraic_g &re) const;
+    bool                near(complex_r other) const;
+    bool                has_imaginary() const;
+    algebraic_p         as_rounded_result(int impr = -1) const;
 
     enum { I_MARK = L'ⅈ', ANGLE_MARK = L'∡' };
 

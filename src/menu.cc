@@ -645,14 +645,14 @@ MENU(PolynomialsMenu,
      "FRoots",  ID_Unimplemented,
      "MRoot",   ID_MultipleEquationsSolver,
      "MSolvr",  ID_SolverMenu,
-     "PCoef",   ID_Unimplemented,
-     "PRoot",   ID_Unimplemented,
+     "PCoef",   ID_PCoef,
+     "PRoot",   ID_PRoot,
      "Root",    ID_Root,
 
      "Solve",   ID_Root,
      "TVMRoot", ID_TVMRoot,
      "XRoot",   ID_xroot,
-     "Zeros",   ID_Unimplemented,
+     "Zeros",   ID_Zeros,
      "FCoef",   ID_Unimplemented);
 
 

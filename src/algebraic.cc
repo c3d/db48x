@@ -573,6 +573,29 @@ bool algebraic::to_fraction(algebraic_g &x)
 }
 
 
+algebraic_p algebraic::snap_near_integer(algebraic_r eps) const
+// ----------------------------------------------------------------------------
+//   Round to integer or bignum when the fractional part is below epsilon
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = this;
+    if (!x)
+        return nullptr;
+
+    id ty = x->type();
+    if (is_integer(ty) || is_bignum(ty) || !is_real(ty))
+        return x;
+
+    algebraic_g frac = FracPart::evaluate(x);
+    if (!frac)
+        return x;
+    if (frac->is_zero(false) || smaller_magnitude(frac, eps))
+        algebraic::to_integer(x);
+    return x;
+}
+
+
+
 
 
 // ============================================================================
