@@ -9558,6 +9558,24 @@ void tests::symbolic_operations()
     step("Isolate atan")
         .test(CLEAR, "'A=atan X' X", NOSHIFT, F3)
         .expect("'X=tan A'");
+    step("Isolate sec")
+        .test(CLEAR, "'sec X=A' X", NOSHIFT, F3)
+        .expect("'X=sec⁻¹ A+2·i1·π'");
+    step("Isolate csc")
+        .test(CLEAR, "'csc X=A' X", NOSHIFT, F3)
+        .expect("'X=csc⁻¹ A+2·i1·π'");
+    step("Isolate cot")
+        .test(CLEAR, "'cot X=A' X", NOSHIFT, F3)
+        .expect("'X=cot⁻¹ A+i1·π'");
+    step("Isolate asec")
+        .test(CLEAR, "'A=asec X' X", NOSHIFT, F3)
+        .expect("'X=sec A'");
+    step("Isolate acsc")
+        .test(CLEAR, "'A=acsc X' X", NOSHIFT, F3)
+        .expect("'X=csc A'");
+    step("Isolate acot")
+        .test(CLEAR, "'A=acot X' X", NOSHIFT, F3)
+        .expect("'X=cot A'");
     step("Isolate sinh")
         .test(CLEAR, "'sinh X=A' X", NOSHIFT, F3)
         .expect("'X=sinh⁻¹ A+2·i1·π·ⅈ'");
@@ -9576,6 +9594,26 @@ void tests::symbolic_operations()
     step("Isolate atanh")
         .test(CLEAR, "'A=atanh X' X", NOSHIFT, F3)
         .expect("'X=tanh A'");
+#if 0
+    step("Isolate sech")
+        .test(CLEAR, "'sech X=A' X", NOSHIFT, F3)
+        .expect("'X=sech⁻¹ A+2·i1·π·ⅈ'");
+    step("Isolate csch")
+        .test(CLEAR, "'csch X=A' X", NOSHIFT, F3)
+        .expect("'X=csch⁻¹ A+2·i1·π·ⅈ'");
+    step("Isolate coth")
+        .test(CLEAR, "'coth X=A' X", NOSHIFT, F3)
+        .expect("'X=coth⁻¹ A+i1·π·ⅈ'");
+    step("Isolate asech")
+        .test(CLEAR, "'A=asech X' X", NOSHIFT, F3)
+        .expect("'X=sech A'");
+    step("Isolate acsch")
+        .test(CLEAR, "'A=acsch X' X", NOSHIFT, F3)
+        .expect("'X=csch A'");
+    step("Isolate acoth")
+        .test(CLEAR, "'A=acoth X' X", NOSHIFT, F3)
+        .expect("'X=coth A'");
+#endif
     step("Isolate log")
         .test(CLEAR, "'A=ln X' X", NOSHIFT, F3)
         .expect("'X=exp A'");
