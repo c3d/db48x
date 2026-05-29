@@ -1261,7 +1261,7 @@ bool runtime::drop(uint count)
 
 bool runtime::drop_at(uint base, uint count)
 // ----------------------------------------------------------------------------
-//   Pop deep objects from the stack, or return NULL
+//   Remove count entries at depth base from the top
 // ----------------------------------------------------------------------------
 {
     runtime_invariants check;
@@ -1272,6 +1272,157 @@ bool runtime::drop_at(uint base, uint count)
     }
     memmove(Stack + count, Stack, base * sizeof(*Stack));
     Stack += count;
+    return true;
+}
+
+
+bool runtime::push_at(uint base, object_p obj)
+// ----------------------------------------------------------------------------
+//   Insert one object at depth base from the top
+// ----------------------------------------------------------------------------
+{
+    runtime_invariants check;
+    ASSERT(obj && "Pushing a NULL object");
+    ASSERT((obj->type() < object::NUM_IDS ||
+            object::object_error(obj->type(), obj)) &&
+           "Invalid type pushed");
+    if (available(sizeof(void *)) < sizeof(void *))
+        return false;
+    Stack--;
+    memmove(Stack, Stack + 1, base * sizeof(*Stack));
+    Stack[base] = obj;
+    return true;
+}
+
+
+
+// ============================================================================
+//
+//   Stack buffer implementation
+//
+// ============================================================================
+
+stack_buffer *runtime::Buffers = nullptr;
+
+
+stack_buffer::stack_buffer(size_t sz)
+// ----------------------------------------------------------------------------
+//   Create an empty buffer and link it as the topmost in the chain
+// ----------------------------------------------------------------------------
+    : base(0), count(sz), next(runtime::Buffers)
+{
+    runtime::Buffers = this;
+}
+
+
+stack_buffer::~stack_buffer()
+// ----------------------------------------------------------------------------
+//   Release the buffer and unlink from the chain
+// ----------------------------------------------------------------------------
+{
+    ASSERT(runtime::Buffers == this && "Stack buffers not in order");
+    cleanup();
+    runtime::Buffers = next;
+}
+
+
+static object_p dummy_stack_buffer_result = nullptr;
+object_p &stack_buffer::operator[](size_t i) const
+// ----------------------------------------------------------------------------
+//   Read the object at index i with bounds check
+// ----------------------------------------------------------------------------
+{
+    if (i >= count || base + i >= rt.depth())
+    {
+        rt.index_error();
+        return dummy_stack_buffer_result;
+    }
+    return rt.Stack[base + i];
+}
+
+
+object_p stack_buffer::get(size_t i)
+// ----------------------------------------------------------------------------
+//   Write an object at index i with bounds check
+// ----------------------------------------------------------------------------
+{
+    if (i >= count)
+    {
+        rt.index_error();
+        return nullptr;
+    }
+    return rt.stack(base + i);
+}
+
+
+bool stack_buffer::set(size_t i, object_p obj)
+// ----------------------------------------------------------------------------
+//   Write an object at index i with bounds check
+// ----------------------------------------------------------------------------
+{
+    if (i >= count)
+    {
+        rt.index_error();
+        return false;
+    }
+    return rt.stack(base + i, obj);
+}
+
+
+bool stack_buffer::push(object_p obj)
+// ----------------------------------------------------------------------------
+//   Append one item to this buffer, shifting deeper buffers
+// ----------------------------------------------------------------------------
+{
+    if (!obj || !rt.push_at(base + count, obj))
+        return false;
+    count++;
+    for (stack_buffer *sb = next; sb; sb = sb->next)
+        sb->base++;
+    return true;
+}
+
+
+bool stack_buffer::drop(size_t n)
+// ----------------------------------------------------------------------------
+//   Remove n items from the end of this buffer, shifting deeper buffers
+// ----------------------------------------------------------------------------
+{
+    if (n > count)
+        n = count;
+    if (n)
+    {
+        rt.drop_at(base + count - n, n);
+        count -= n;
+        for (stack_buffer *sb = next; sb; sb = sb->next)
+            sb->base -= n;
+    }
+    return true;
+}
+
+
+bool stack_buffer::grow(size_t n, object_p obj)
+// ----------------------------------------------------------------------------
+//   Grow the buffer by pushing n copies of obj
+// ----------------------------------------------------------------------------
+{
+    if (!obj)
+    {
+        obj = +integer::make(0);
+        if (!obj)
+            return false;
+    }
+    for (size_t i = 0; i < n; i++)
+    {
+        if (!rt.push_at(base + count + i, obj))
+        {
+            rt.drop_at(base + count, i);
+            return false;
+        }
+    }
+    count += n;
+    for (stack_buffer *sb = next; sb; sb = sb->next)
+        sb->base += n;
     return true;
 }
 
