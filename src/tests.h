@@ -53,7 +53,7 @@ struct tests
     tests()
         : file(), line(), tstart(),
           tname(), sname(), tindex(), sindex(), cindex(), count(),
-          ok(), testSelection(),
+          ok(), testSelection(), fkeyIndex(),
           longpress(), failures(), explanation()
     { }
 
@@ -135,6 +135,7 @@ struct tests
     void online_help();
     void graphic_stack_rendering();
     void insertion_of_variables_constants_and_units();
+    void constants_operations();
     void constants_menu();
     void character_menu();
     void statistics();
@@ -265,7 +266,6 @@ struct tests
         LOWERCASE  = 122,       // Lowercase
         LOWER_LS   = 123,       // Lowercase with left shift
         LOWER_RS   = 124,       // Lowercase with right shift
-
     };
 
     enum id : unsigned
@@ -361,6 +361,8 @@ public:
     tests &itest(KEYTYPE keytype);
 
     tests &type_keys(cstring txt);
+    tests &ifkey();
+    tests &ifkey(uint shifts);
 
     template <typename... Args>
     tests &itest(LENGTHY length, Args... args)
@@ -497,6 +499,7 @@ public:
     int                  last_key;
     int                  ok;
     uint                 testSelection;
+    uint                 fkeyIndex;
     bool                 longpress;
     std::vector<failure> failures;
     std::string          explanation;
@@ -516,6 +519,7 @@ public:
 #define here()          position(__FILE__, __LINE__)
 #define step(...)       position(__FILE__, __LINE__).istep(__VA_ARGS__)
 #define test(...)       position(__FILE__, __LINE__).itest(__VA_ARGS__)
+#define fkey(...)       position(__FILE__, __LINE__).ifkey(__VA_ARGS__)
 #define got(...)        position(__FILE__, __LINE__).igot(__VA_ARGS__)
 #endif // SIMULATOR
 

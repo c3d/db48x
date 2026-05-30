@@ -630,8 +630,38 @@ static const cstring basic_constants[] =
                 "  0 ]",
 
     // ------------------------------------------------------------------------
+    // *Tau (alias for twoπ) - The circle constant
+    "τ",        "['2*Ⓒπ'_r"
+                "  0_r "
+                "  0 ]",
     // *Euler-Mascheroni constant - Theory approximation
     "γ",       "[ 0.5772156649015328606065120900824024 "
+                "  0 "
+                "  0 ]",
+    // *Golden ratio - Exact calculation
+    "ϕ",       "[ 1.618033988749894848204586834365638 "
+                "  0 "
+                "  0 ]",
+    // *Catalan's constant - Theory approximation
+    "Gⓒ",      "[ 9.159655941772190150546035149323841E-1 "
+                "  0 "
+                "  0 ]",
+    // *Khinchin's constant - Theory approximation
+    "K₀",      "[ 2.685452001065306445309714835481796 "
+                "  0 "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // *Feigenbaum alpha - Theory approximation
+    "Fα",      "[ 2.502907875095892822283902873218216 "
+                "  0 "
+                "  0 ]",
+    // *Feigenbaum delta - Theory approximation
+    "Fδ",      "[ 4.669201609102990671853203820466202 "
+                "  0 "
+                "  0 ]",
+    // *Silver ratio - Exact calculation
+    "δₛ",      "[ 2.414213562373095048801688724209698 "
                 "  0 "
                 "  0 ]",
 
@@ -812,6 +842,10 @@ static const cstring basic_constants[] =
     // *Electron magnetic moment - Measurement [0]
     "μe",       "[ -9.2847646917E-24_J/T "
                 "  0.0000000029E-24_J/T "
+                "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
+    // *Electron magnetic moment / Bohr magneton - Measurement [0]
+    "μeμB",     "[ -1.00115965218046 "
+                "  0.00000000000011 "
                 "  'ROUND(UBASE(ABS(Ⓢμe/Ⓒμe));-2)' ]",
     // *Proton magnetic moment - Measurement [0]
     "μp",       "[ 1.41060679545E-26_J/T "
@@ -998,6 +1032,11 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡu*Ⓒu);-2);1_kg)' "
                 "  3.1E-10 "
                 "  1.661E-27_kg ]",
+    // *Energy equivalent of atomic mass unit - Exact calculation [0]
+    "uc²",      "[ 'CONVERT(Ⓒu*Ⓒc²;1_J)' "
+                "  0_J "
+                "  0 "
+                "  1.492E-10_J ]",
     // *Electron mass - Calculation from measurement [0]
     "me",       "[ 'ROUND(CONVERT(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc);1_kg);XPON(UVAL(Ⓡme*2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-XPON(UVAL(2*Ⓒh*ⒸR∞/((Ⓒα²)*Ⓒc)))-2)' "
                 "  'CONVERT(ROUND(UBASE(Ⓡme*Ⓒme);-2);1_kg)' "
@@ -1052,6 +1091,11 @@ static const cstring basic_constants[] =
                 "  0.000000032 "
                 "  'ROUND(UBASE(Ⓢmpme/Ⓒmpme);-2)' "
                 "  1836. ]",
+    // *mnmp ratio - Neutron/proton mass ratio - Measurement [0]
+    "mnmp",     "[ 1.00137841946 "
+                "  0.00000000051 "
+                "  'ROUND(UBASE(Ⓢmn/Ⓒmn+Ⓢmp/Ⓒmp);-2)' "
+                "  1.001 ]",
     // *Electron relative atomic mass - Measurement [0]
     "Are",       "[ 5.485799090441E-4 "
                 "  0.000000000097E-4 "
@@ -1166,7 +1210,6 @@ static const cstring basic_constants[] =
                 "  'CONVERT(ROUND(UBASE(Ⓡλcμ*Ⓒλcμ);-2);1_nm)' "
                 "  'Ⓡmμ' "
                 "  1.173E-5_nm ]",
-
     // ------------------------------------------------------------------------
     // *Tau Compton wavelength - Calculation from measurement [0]
     "λcτ",      "[ 'ROUND(CONVERT(Ⓒh/(Ⓒmτ*Ⓒc);1_nm);XPON(UVAL(Ⓡλcτ*Ⓒh/(Ⓒmτ*Ⓒc)))-XPON(UVAL(Ⓒh/(Ⓒmτ*Ⓒc)))-2)' "

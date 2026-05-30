@@ -166,7 +166,8 @@ TESTS(date,             "Date operations");
 TESTS(infinity,         "Infinity and undefined operations");
 TESTS(overflow,         "Overflow and underflow");
 TESTS(insert,           "Insertion of variables, units and constants");
-TESTS(constants,        "Check the value of all built-in constants");
+TESTS(constops,         "Operations on constants");
+TESTS(constants,        "Check the value of built-in constants");
 TESTS(characters,       "Character menu and catalog");
 TESTS(statistics,       "Statistics");
 TESTS(probabilities,    "Probabilities");
@@ -297,6 +298,7 @@ int tests::run(uint onlyCurrent)
         online_help();
         graphic_stack_rendering();
         insertion_of_variables_constants_and_units();
+        constants_operations();
         constants_menu();
         character_menu();
         statistics();
@@ -11950,7 +11952,7 @@ void tests::insertion_of_variables_constants_and_units()
     step("Insert infinity value")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F4, LSHIFT, F4)
         .expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
-    step("Insert undefined value")
+    step("Insert Undefined")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F5, LSHIFT, F5)
         .expect("'Undefined'");
     step("Insert j value")
@@ -12177,12 +12179,12 @@ void tests::insertion_of_variables_constants_and_units()
 }
 
 
-void tests::constants_menu()
+void tests::constants_operations()
 // ----------------------------------------------------------------------------
-//   Check that all the constants can be inserted in the program
+//   Check basic operations on constants
 // ----------------------------------------------------------------------------
 {
-    BEGIN(constants);
+    BEGIN(constops);
 
     step("Insert constant from command line")
         .test(CLEAR, "Ⓒc", ENTER)
@@ -12247,6 +12249,26 @@ void tests::constants_menu()
     step("Insert negative infinity")
         .test(CLEAR, "NegativeInfinity", ENTER).type(ID_constant).expect("−∞")
         .test(CLEAR, ("−∞"), ENTER).type(ID_constant).expect("−∞");
+    step("Test tau constant (2π)")
+        .test(CLEAR, "\"τ\" CONST", ENTER).expect("6.28318 53071 8 r")
+        .test(CLEAR, "\"twoπ\" CONST", ENTER).expect("6.28318 53071 8 r");
+    step("Test golden ratio")
+        .test(CLEAR, "\"ϕ\" CONST", ENTER).expect("1.61803 39887 5");
+    step("Test Catalan's constant")
+        .test(CLEAR, "\"Gⓒ\" CONST", ENTER).expect("0.91596 55941 77");
+    step("Test Khinchin's constant")
+        .test(CLEAR, "\"K₀\" CONST", ENTER).expect("2.68545 20010 7");
+    step("Test Feigenbaum constants")
+        .test(CLEAR, "\"Fα\" CONST", ENTER).expect("2.50290 78751")
+        .test(CLEAR, "\"Fδ\" CONST", ENTER).expect("4.66920 16091");
+    step("Test silver ratio")
+        .test(CLEAR, "\"δₛ\" CONST", ENTER).expect("2.41421 35623 7");
+    step("Test atomic mass unit energy equivalent")
+        .test(CLEAR, "\"uc²\" CONST", ENTER).expect("1.49241 80876 9⁳⁻¹⁰ J");
+    step("Test neutron-proton mass ratio")
+        .test(CLEAR, "\"mnmp\" CONST", ENTER).expect("1.00137 84194 6");
+    step("Test electron magnetic moment / Bohr magneton ratio")
+        .test(CLEAR, "\"μeμB\" CONST", ENTER).expect("-1.00115 96521 8");
     step("Negate infinities")
         .test(CLEAR, ("∞"), ENTER).expect("∞")
         .test(CHS).expect("−∞")
@@ -12421,331 +12443,505 @@ void tests::constants_menu()
     step("Use Const command from command line")
         .test(CLEAR, "'c' CONST", ENTER, ID_ToDecimal)
         .expect("299 792 458. m/s");
+}
 
+
+void tests::constants_menu()
+// ----------------------------------------------------------------------------
+//   Check that the constants can be evaluated
+// ----------------------------------------------------------------------------
+{
+    BEGIN(constants);
+
+    // ------------------------------------------------------------------------
     step("Dates constants menu")
-        .test(CLEAR, ID_ConstantsMenu, F1);
+    // ------------------------------------------------------------------------
+        .test(CLEAR, ID_ConstantsMenu, F1).fkey();
     step("Bastille day")
-        .test(CLEAR, NOSHIFT, F1).expect("BastilleDay")
-        .test(LSHIFT, F1).expect("Tue 14/Jul/1789");
+        .fkey(0).expect("BastilleDay")
+        .fkey(1).expect("Tue 14/Jul/1789");
     step("Martin Luther King's day")
-        .test(CLEAR, NOSHIFT, F2).expect("MartinLutherKingDeath")
-        .test(LSHIFT, F2).expect("Thu 4/Apr/1968");
+        .fkey(0).expect("MartinLutherKingDeath")
+        .fkey(1).expect("Thu 4/Apr/1968");
     step("Independence Day")
-        .test(CLEAR, NOSHIFT, F3).expect("IndependenceDay")
-        .test(LSHIFT, F3).expect("Thu 4/Jul/1776");
+        .fkey(0).expect("IndependenceDay")
+        .fkey(1).expect("Thu 4/Jul/1776");
 
     // ------------------------------------------------------------------------
     step("Mathematics constants menu")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F2);
+        .test(CLEAR, ID_ConstantsMenu, F2).fkey();
     step("Pi")
-        .test(CLEAR, NOSHIFT, F1).expect("π")
-        .test(LSHIFT, F1).expect("3.14159 26535 9");
+        .fkey(0).expect("π")
+        .fkey(1).expect("3.14159 26535 9")
+        .fkey(2).expect("3.14159 26535 9");
     step("e")
-        .test(CLEAR, NOSHIFT, F2).expect("e")
-        .test(LSHIFT, F2).expect("2.71828 18284 6");
+        .fkey(0).expect("e")
+        .fkey(1).expect("2.71828 18284 6")
+        .fkey(2).expect("2.71828 18284 6");
     step("i")
-        .test(CLEAR, NOSHIFT, F3).expect("ⅈ")
-        .test(LSHIFT, F3).expect("0+1ⅈ");
+        .fkey(0).expect("ⅈ")
+        .fkey(1).expect("0+1ⅈ")
+        .fkey(2).expect("0+1ⅈ±0");
     step("Infinity")
-        .test(CLEAR, NOSHIFT, F4).expect("∞")
-        .test(LSHIFT, F4).expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
+        .fkey(0).expect("∞")
+        .fkey(1).expect("9.99999⁳⁹⁹⁹⁹⁹⁹")
+        .fkey(2).expect("9.99999⁳⁹⁹⁹⁹⁹⁹±0");
     step("Undefined")
-        .test(CLEAR, NOSHIFT, F5).expect("?")
-        .test(LSHIFT, F5).expect("'Undefined'");
+        .fkey(0).expect("?")
+        .fkey(1).expect("'Undefined'")
+        .fkey(2).expect("'(Undefined+Undefined)÷2'±0");
     step("j")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("ⅉ")
-        .test(LSHIFT, F1).expect("0+1ⅈ");
+        .fkey(0).expect("ⅉ")
+        .fkey(1).expect("0+1ⅈ")
+        .fkey(2).expect("0+1ⅈ±0");
     step("rad")
-        .test(CLEAR, NOSHIFT, F2).expect("rad")
-        .test(LSHIFT, F2).expect("1 r");
+        .fkey(0).expect("rad")
+        .fkey(1).expect("1 r")
+        .fkey(2).expect("1±0 r");
     step("twoπ")
-        .test(CLEAR, NOSHIFT, F3).expect("twoπ")
-        .test(LSHIFT, F3).expect("6.28318 53071 8 r");
-    step("anglπ")
-        .test(CLEAR, NOSHIFT, F4).expect("angl")
-        .test(LSHIFT, F4).expect("180 °");
+        .fkey(0).expect("twoπ")
+        .fkey(1).expect("6.28318 53071 8 r")
+        .fkey(2).expect("6.28318 53071 8±0 r");
+    step("angl")
+        .fkey(0).expect("angl")
+        .fkey(1).expect("180 °")
+        .fkey(2).expect("180±0 °");
+    step("Minus infinity")
+        .fkey(0).expect("−∞")
+        .fkey(1).expect("-9.99999⁳⁹⁹⁹⁹⁹⁹")
+        .fkey(2).expect("-9.99999⁳⁹⁹⁹⁹⁹⁹±0");
+    step("τ")
+        .fkey(0).expect("τ")
+        .fkey(1).expect("6.28318 53071 8 r")
+        .fkey(2).expect("6.28318 53071 8±0 r");
+    step("γ (Euler-Mascheroni)")
+        .fkey(0).expect("γ")
+        .fkey(1).expect("0.57721 56649 02")
+        .fkey(2).expect("0.57721 56649 02±0");
+    step("ϕ (golden ratio)")
+        .fkey(0).expect("ϕ")
+        .fkey(1).expect("1.61803 39887 5")
+        .fkey(2).expect("1.61803 39887 5±0");
+    step("Gⓒ (Catalan)")
+        .fkey(0).expect("Gⓒ")
+        .fkey(1).expect("0.91596 55941 77")
+        .fkey(2).expect("0.91596 55941 77±0");
+    step("K₀ (Khinchin)")
+        .fkey(0).expect("K₀")
+        .fkey(1).expect("2.68545 20010 7")
+        .fkey(2).expect("2.68545 20010 7±0");
+    step("Fα (Feigenbaum alpha)")
+        .fkey(0).expect("Fα")
+        .fkey(1).expect("2.50290 78751")
+        .fkey(2).expect("2.50290 78751±0");
+    step("Fδ (Feigenbaum delta)")
+        .fkey(0).expect("Fδ")
+        .fkey(1).expect("4.66920 16091")
+        .fkey(2).expect("4.66920 16091±0");
+    step("δₛ (silver ratio)")
+        .fkey(0).expect("δₛ")
+        .fkey(1).expect("2.41421 35623 7")
+        .fkey(2).expect("2.41421 35623 7±0");
 
+
+    // ------------------------------------------------------------------------
     step("Chemistry constants")
-        .test(CLEAR, ID_ConstantsMenu, F3);
+    // ------------------------------------------------------------------------
+        .test(CLEAR, ID_ConstantsMenu, F3).fkey();
     step("Avogadro constant")
-        .test(CLEAR, NOSHIFT, F1).expect("NA")
-        .test(LSHIFT, F1).expect("6.02214 076⁳²³ mol⁻¹");
+        .fkey(0).expect("NA")
+        .fkey(1).expect("6.02214 076⁳²³ mol⁻¹")
+        .fkey(2).expect("6.02214 076⁳²³±0 mol⁻¹");
     step("Boltzmann constant")
-        .test(CLEAR, NOSHIFT, F2).expect("k")
-        .test(LSHIFT, F2).expect("1.38064 9⁳⁻²³ J/K");
+        .fkey(0).expect("k")
+        .fkey(1).expect("1.38064 9⁳⁻²³ J/K")
+        .fkey(2).expect("1.38064 9⁳⁻²³±0 J/K");
     step("Molar volume")
-        .test(CLEAR, NOSHIFT, F3).expect("Vm")
-        .test(LSHIFT, F3).expect("0.02241 39695 45 m↑3/mol");
+        .fkey(0).expect("Vm")
+        .fkey(1).expect("0.02241 39695 45 m↑3/mol")
+        .fkey(2).expect("0.02241 39695 45±0 m↑3/mol");
     step("Universal Gas constant")
-        .test(CLEAR, NOSHIFT, F4).expect("R")
-        .test(LSHIFT, F4).expect("8.31446 26181 5 J/(mol·K)");
+        .fkey(0).expect("R")
+        .fkey(1).expect("8.31446 26181 5 J/(mol·K)")
+        .fkey(2).expect("8.31446 26181 5±0 J/(mol·K)");
     step("Faraday constant")
-        .test(CLEAR, NOSHIFT, F5).expect("F")
-        .test(LSHIFT, F5).expect("96 485.33212 33 C/mol");
+        .fkey(0).expect("F")
+        .fkey(1).expect("96 485.33212 33 C/mol")
+        .fkey(2).expect("96 485.33212 33±0 C/mol");
     step("Standard temperature")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("StdT")
-        .test(LSHIFT, F1).expect("273.15 K");
+        .fkey(0).expect("StdT")
+        .fkey(1).expect("273.15 K")
+        .fkey(2).expect("273.15±0 K");
     step("Standard pressure")
-        .test(CLEAR, NOSHIFT, F2).expect("StdP")
-        .test(LSHIFT, F2).expect("101.325 kPa");
+        .fkey(0).expect("StdP")
+        .fkey(1).expect("101.325 kPa")
+        .fkey(2).expect("101.325±0 kPa");
     step("Mass unit")
-        .test(CLEAR, NOSHIFT, F3).expect("Mu")
-        .test(LSHIFT, F3).expect("1.00000 00010 5 g/mol");
+        .fkey(0).expect("Mu")
+        .fkey(1).expect("1.00000 00010 5 g/mol")
+        .fkey(2).expect("1.00000 00010 5±3.1⁳⁻¹⁰ g/mol");
     step("Carbon-12 mass")
-        .test(CLEAR, NOSHIFT, F4).expect("MC12")
-        .test(LSHIFT, F4).expect("12.00000 00126 g/mol");
+        .fkey(0).expect("MC12")
+        .fkey(1).expect("12.00000 00126 g/mol")
+        .fkey(2).expect("12.00000 00126±0.00000 00037 g/mol");
     step("Dalton constant")
-        .test(CLEAR, NOSHIFT, F5).expect("Da")
-        .test(LSHIFT, F5).expect("1.66053 90689 2⁳⁻²⁷ kg");
+        .fkey(0).expect("Da")
+        .fkey(1).expect("1.66053 90689 2⁳⁻²⁷ kg")
+        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±5.1⁳⁻³⁷ kg");
     step("Loschmidt constant")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("n0")
-        .test(LSHIFT, F1).expect("2.68678 01118⁳²⁵ (m↑3)⁻¹");
+        .fkey(0).expect("n0")
+        .fkey(1).expect("2.68678 01118⁳²⁵ (m↑3)⁻¹")
+        .fkey(2).expect("2.68678 01118⁳²⁵±0 (m↑3)⁻¹");
     step("Sakur-Tetrode constant")
-        .test(CLEAR, NOSHIFT, F2).expect("SoR")
-        .test(LSHIFT, F2).expect("-1.16487 05214 9");
+        .fkey(0).expect("SoR")
+        .fkey(1).expect("-1.16487 05214 9")
+        .fkey(2).expect("-1.16487 05214 9±4.7⁳⁻¹⁰");
     step("Boltzmann / electron mass ratio")
-        .test(CLEAR, NOSHIFT, F3).expect("kq")
-        .test(LSHIFT, F3).expect("0.00008 61733 33 J/(K·C)");
+        .fkey(0).expect("kq")
+        .fkey(1).expect("0.00008 61733 33 J/(K·C)")
+        .fkey(2).expect("0.00008 61733 33±0 J/(K·C)");
 
     // ------------------------------------------------------------------------
     step("Physics constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F4);
+        .test(CLEAR, ID_ConstantsMenu, F4).fkey();
     step("Imaginary unit")
-        .test(CLEAR, NOSHIFT, F1).expect("ⅉ")
-        .test(LSHIFT, F1).expect("0+1ⅈ");
+        .fkey(0).expect("ⅉ")
+        .fkey(1).expect("0+1ⅈ")
+        .fkey(2).expect("0+1ⅈ±0");
     step("Speed of light")
-        .test(CLEAR, NOSHIFT, F2).expect("c")
-        .test(LSHIFT, F2).expect("299 792 458 m/s");
+        .fkey(0).expect("c")
+        .fkey(1).expect("299 792 458 m/s")
+        .fkey(2).expect("299 792 458±0 m/s");
     step("Gravitational constant")
-        .test(CLEAR, NOSHIFT, F3).expect("G")
-        .test(LSHIFT, F3).expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)");
+        .fkey(0).expect("G")
+        .fkey(1).expect("6.6743⁳⁻¹¹ m↑3/(s↑2·kg)")
+        .fkey(2).expect("6.6743⁳⁻¹¹±1.5⁳⁻¹⁵ m↑3/(s↑2·kg)");
     step("Earth gravity")
-        .test(CLEAR, NOSHIFT, F4).expect("g")
-        .test(LSHIFT, F4).expect("9.80665 m/s↑2");
+        .fkey(0).expect("g")
+        .fkey(1).expect("9.80665 m/s↑2")
+        .fkey(2).expect("9.80665±0 m/s↑2");
     step("Stefan-Boltzmann constant")
-        .test(CLEAR, NOSHIFT, F5).expect("σ")
-        .test(LSHIFT, F5).expect("0.00000 00567 04 W/(m↑2·K↑4)");
+        .fkey(0).expect("σ")
+        .fkey(1).expect("0.00000 00567 04 W/(m↑2·K↑4)")
+        .fkey(2).expect("0.00000 00567 04±0 W/(m↑2·K↑4)");
     step("Vaccuum permittivity")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("ε₀")
-        .test(LSHIFT, F1).expect("8.85418 78188⁳⁻¹² F/m");
+        .fkey(0).expect("ε₀")
+        .fkey(1).expect("8.85418 78188⁳⁻¹² F/m")
+        .fkey(2).expect("8.85418 78188⁳⁻¹²±1.4⁳⁻²¹ F/m");
     step("Vaccuum permeability")
-        .test(CLEAR, NOSHIFT, F2).expect("μ₀")
-        .test(LSHIFT, F2).expect("0.00000 12566 37 H/m");
+        .fkey(0).expect("μ₀")
+        .fkey(1).expect("0.00000 12566 37 H/m")
+        .fkey(2).expect("0.00000 12566 37±2.⁳⁻¹⁶ H/m");
     step("Coulomb constant")
-        .test(CLEAR, NOSHIFT, F3).expect("ke")
-        .test(LSHIFT, F3).expect("8.98755 17862⁳⁹ N·m↑2/C↑2");
+        .fkey(0).expect("ke")
+        .fkey(1).expect("8.98755 17862⁳⁹ N·m↑2/C↑2")
+        .fkey(2).expect("8.98755 17862⁳⁹±1.4 N·m↑2/C↑2");
     step("Vacuum characteristic impedance")
-        .test(CLEAR, NOSHIFT, F4).expect("Z₀")
-        .test(LSHIFT, F4).expect("376.73031 3412 Ω");
+        .fkey(0).expect("Z₀")
+        .fkey(1).expect("376.73031 3412 Ω")
+        .fkey(2).expect("376.73031 3412±0.00000 006 Ω");
     step("ε₀q ratio")
-        .test(CLEAR, NOSHIFT, F5).expect("ε₀q")
-        .test(LSHIFT, F5).expect("55 263 493.618 F/(m·C)");
+        .fkey(0).expect("ε₀q")
+        .fkey(1).expect("55 263 493.618 F/(m·C)")
+        .fkey(2).expect("55 263 493.618±0.0088 F/(m·C)");
     step("qε₀ product")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("qε₀")
-        .test(LSHIFT, F1).expect("1.41859 72836 3⁳⁻³⁰ F·C/m");
+        .fkey(0).expect("qε₀")
+        .fkey(1).expect("1.41859 72836 3⁳⁻³⁰ F·C/m")
+        .fkey(2).expect("1.41859 72836 3⁳⁻³⁰±2.3⁳⁻⁴⁰ F·C/m");
     step("Sound reference intensity")
-        .test(CLEAR, NOSHIFT, F2).expect("I₀")
-        .test(LSHIFT, F2).expect("1.⁳⁻¹² W/m↑2");
+        .fkey(0).expect("I₀")
+        .fkey(1).expect("1.⁳⁻¹² W/m↑2")
+        .fkey(2).expect("1.⁳⁻¹²±0 W/m↑2");
 
     // ------------------------------------------------------------------------
     step("Mass constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F1);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F1).fkey();
     step("Mass unit")
-        .test(CLEAR, NOSHIFT, F1).expect("u")
-        .test(LSHIFT, F1).expect("1.66053 90689 2⁳⁻²⁷ kg");
+        .fkey(0).expect("u")
+        .fkey(1).expect("1.66053 90689 2⁳⁻²⁷ kg")
+        .fkey(2).expect("1.66053 90689 2⁳⁻²⁷±5.1⁳⁻³⁷ kg");
+    step("Mass unit energy equivalent")
+        .fkey(0).expect("uc²")
+        .fkey(1).expect("1.49241 80876 9⁳⁻¹⁰ J")
+        .fkey(2).expect("1.49241 80876 9⁳⁻¹⁰±0 J");
     step("Electron mass")
-        .test(CLEAR, NOSHIFT, F2).expect("me")
-        .test(LSHIFT, F2).expect("9.10938 37139⁳⁻³¹ kg");
+        .fkey(0).expect("me")
+        .fkey(1).expect("9.10938 37139⁳⁻³¹ kg")
+        .fkey(2).expect("9.10938 37139⁳⁻³¹±2.8⁳⁻⁴⁰ kg");
     step("Neutron mass")
-        .test(CLEAR, NOSHIFT, F3).expect("mn")
-        .test(LSHIFT, F3).expect("1.67492 75005 6⁳⁻²⁷ kg");
+        .fkey(0).expect("mn")
+        .fkey(1).expect("1.67492 75005 6⁳⁻²⁷ kg")
+        .fkey(2).expect("1.67492 75005 6⁳⁻²⁷±8.5⁳⁻³⁷ kg");
     step("Proton mass")
-        .test(CLEAR, NOSHIFT, F4).expect("mp")
-        .test(LSHIFT, F4).expect("1.67262 19259 5⁳⁻²⁷ kg");
+        .fkey(0).expect("mp")
+        .fkey(1).expect("1.67262 19259 5⁳⁻²⁷ kg")
+        .fkey(2).expect("1.67262 19259 5⁳⁻²⁷±5.2⁳⁻³⁷ kg");
     step("Hydrogen mass")
-        .test(CLEAR, NOSHIFT, F5).expect("mH")
-        .test(LSHIFT, F5).expect("1.00782 50322 3 u");
+        .fkey(0).expect("mH")
+        .fkey(1).expect("1.00782 50322 3 u")
+        .fkey(2).expect("1.00782 50322 3±9.⁳⁻¹¹ u");
     step("Deuterium mass")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("mD")
-        .test(LSHIFT, F1).expect("2.01410 17781 2 u");
+        .fkey(0).expect("mD")
+        .fkey(1).expect("2.01410 17781 2 u")
+        .fkey(2).expect("2.01410 17781 2±1.2⁳⁻¹⁰ u");
     step("Tritium mass")
-        .test(CLEAR, NOSHIFT, F2).expect("mT")
-        .test(LSHIFT, F2).expect("3.01604 92779 u");
+        .fkey(0).expect("mT")
+        .fkey(1).expect("3.01604 92779 u")
+        .fkey(2).expect("3.01604 92779±0.00000 00024 u");
     step("Helium mass")
-        .test(CLEAR, NOSHIFT, F3).expect("mHe")
-        .test(LSHIFT, F3).expect("4.00260 32541 3 u");
+        .fkey(0).expect("mHe")
+        .fkey(1).expect("4.00260 32541 3 u")
+        .fkey(2).expect("4.00260 32541 3±6.⁳⁻¹¹ u");
     step("Muon mass")
-        .test(CLEAR, NOSHIFT, F4).expect("mμ")
-        .test(LSHIFT, F4).expect("0.11342 89257 u");
+        .fkey(0).expect("mμ")
+        .fkey(1).expect("0.11342 89257 u")
+        .fkey(2).expect("0.11342 89257±0.00000 00025 u");
     step("Tau mass")
-        .test(CLEAR, NOSHIFT, F5).expect("mτ")
-        .test(LSHIFT, F5).expect("1.90754 u");
+        .fkey(0).expect("mτ")
+        .fkey(1).expect("1.90754 u")
+        .fkey(2).expect("1.90754±0.00013 u");
     step("Proton / electron mass ratio")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("mpme")
-        .test(LSHIFT, F1).expect("1 836.15267 343");
+        .fkey(0).expect("mpme")
+        .fkey(1).expect("1 836.15267 343")
+        .fkey(2).expect("1 836.15267 343±0.00000 0032");
+    step("Neutron to proton mass ratio")
+        .fkey(0).expect("mnmp")
+        .fkey(1).expect("1.00137 84194 6")
+        .fkey(2).expect("1.00137 84194 6±5.1⁳⁻¹⁰");
     step("Electron relative atomic mass")
-        .test(CLEAR, NOSHIFT, F2).expect("Are")
-        .test(LSHIFT, F2).expect("0.00054 85799 09");
+        .fkey(0).expect("Are")
+        .fkey(1).expect("0.00054 85799 09")
+        .fkey(2).expect("0.00054 85799 09±9.7⁳⁻¹⁵");
 
 
     // ------------------------------------------------------------------------
     step("Size constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F2);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F2).fkey();
     step("Classical electron radius")
-        .test(CLEAR, NOSHIFT, F1).expect("re")
-        .test(LSHIFT, F1).expect("2.81794 03205 fm");
+        .fkey(0).expect("re")
+        .fkey(1).expect("2.81794 03205 fm")
+        .fkey(2).expect("2.81794 03205±0.00000 00013 fm");
     step("Proton charge radius")
-        .test(CLEAR, NOSHIFT, F2).expect("rp")
-        .test(LSHIFT, F2).expect("8.4075⁳⁻¹⁶ m");
+        .fkey(0).expect("rp")
+        .fkey(1).expect("8.4075⁳⁻¹⁶ m")
+        .fkey(2).expect("8.4075⁳⁻¹⁶±6.4⁳⁻¹⁹ m");
     step("Bohr radius")
-        .test(CLEAR, NOSHIFT, F3).expect("a0")
-        .test(LSHIFT, F3).expect("0.05291 77210 54 nm");
+        .fkey(0).expect("a0")
+        .fkey(1).expect("0.05291 77210 54 nm")
+        .fkey(2).expect("0.05291 77210 54±8.3⁳⁻¹² nm");
 
     // ------------------------------------------------------------------------
     step("Scattering constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F3);
+        .test(CLEAR, ID_ConstantsMenu, LSHIFT, F3).fkey();
     step("Thomson cross-section")
-        .test(CLEAR, NOSHIFT, F1).expect("σe")
-        .test(LSHIFT, F1).expect("6.65245 87052⁳⁻²⁹ m↑2");
+        .fkey(0).expect("σe")
+        .fkey(1).expect("6.65245 87052⁳⁻²⁹ m↑2")
+        .fkey(2).expect("6.65245 87052⁳⁻²⁹±6.3⁳⁻³⁸ m↑2");
     step("Electron Compton wavelength")
-        .test(CLEAR, NOSHIFT, F2).expect("λc")
-        .test(LSHIFT, F2).expect("0.00242 63102 35 nm");
+        .fkey(0).expect("λc")
+        .fkey(1).expect("0.00242 63102 35 nm")
+        .fkey(2).expect("0.00242 63102 35±7.5⁳⁻¹³ nm");
     step("Proton Compton wavelength")
-        .test(CLEAR, NOSHIFT, F3).expect("λcp")
-        .test(LSHIFT, F3).expect("0.00000 13214 1 nm");
+        .fkey(0).expect("λcp")
+        .fkey(1).expect("0.00000 13214 1 nm")
+        .fkey(2).expect("0.00000 13214 1±4.1⁳⁻¹⁶ nm");
     step("Neutron Compton wavelength")
-        .test(CLEAR, NOSHIFT, F4).expect("λcn")
-        .test(LSHIFT, F4).expect("0.00000 13195 91 nm");
+        .fkey(0).expect("λcn")
+        .fkey(1).expect("0.00000 13195 91 nm")
+        .fkey(2).expect("0.00000 13195 91±6.7⁳⁻¹⁶ nm");
     step("Muon Compton wavelength")
-        .test(CLEAR, NOSHIFT, F5).expect("λcμ")
-        .test(LSHIFT, F5).expect("0.00001 17344 41 nm");
+        .fkey(0).expect("λcμ")
+        .fkey(1).expect("0.00001 17344 41 nm")
+        .fkey(2).expect("0.00001 17344 41±2.6⁳⁻¹³ nm");
     step("Tau Compton wavelength")
-        .test(CLEAR, NOSHIFT, F6).expect("λcτ")
-        .test(LSHIFT, F6).expect("0.00000 06977 71 nm");
+        .fkey(0).expect("λcτ")
+        .fkey(1).expect("0.00000 06977 71 nm")
+        .fkey(2).expect("0.00000 06977 71±4.7⁳⁻¹¹ nm");
 
 
     // ------------------------------------------------------------------------
     step("Quantum constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F6);
+        .test(CLEAR, ID_ConstantsMenu, F6).fkey();
     step("Planck")
-        .test(CLEAR, NOSHIFT, F1).expect("h")
-        .test(LSHIFT, F1).expect("6.62607 015⁳⁻³⁴ J·s");
+        .fkey(0).expect("h")
+        .fkey(1).expect("6.62607 015⁳⁻³⁴ J·s")
+        .fkey(2).expect("6.62607 015⁳⁻³⁴±0 J·s");
     step("Dirac")
-        .test(CLEAR, NOSHIFT, F2).expect("ℏ")
-        .test(LSHIFT, F2).expect("1.05457 18176 5⁳⁻³⁴ J·s");
+        .fkey(0).expect("ℏ")
+        .fkey(1).expect("1.05457 18176 5⁳⁻³⁴ J·s")
+        .fkey(2).expect("1.05457 18176 5⁳⁻³⁴±0 J·s");
     step("fine structure constant")
-        .test(CLEAR, NOSHIFT, F3).expect("α")
-        .test(LSHIFT, F3).expect("0.00729 73525 64");
+        .fkey(0).expect("α")
+        .fkey(1).expect("0.00729 73525 64")
+        .fkey(2).expect("0.00729 73525 64±1.14⁳⁻¹²");
     step("Cs hyperfine transition")
-        .test(CLEAR, NOSHIFT, F4).expect("ΔfCs")
-        .test(LSHIFT, F4).expect("9 192 631 770 Hz");
+        .fkey(0).expect("ΔfCs")
+        .fkey(1).expect("9 192 631 770 Hz")
+        .fkey(2).expect("9 192 631 770±0 Hz");
     step("Weak mixing angle")
-        .test(CLEAR, NOSHIFT, F5).expect("θw")
-        .test(LSHIFT, F5).expect("28.183 °");
+        .fkey(0).expect("θw")
+        .fkey(1).expect("28.183 °")
+        .fkey(2).expect("28.183±0.016 °");
     step("Planck length")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("Lpl")
-        .test(LSHIFT, F1).expect("1.61625 5⁳⁻³⁵ m");
+        .fkey(0).expect("Lpl")
+        .fkey(1).expect("1.61625 5⁳⁻³⁵ m")
+        .fkey(2).expect("1.61625 5⁳⁻³⁵±1.8⁳⁻⁴⁰ m");
     step("Planck time")
-        .test(CLEAR, NOSHIFT, F2).expect("Tpl")
-        .test(LSHIFT, F2).expect("5.39124 6⁳⁻⁴⁴ s");
+        .fkey(0).expect("Tpl")
+        .fkey(1).expect("5.39124 6⁳⁻⁴⁴ s")
+        .fkey(2).expect("5.39124 6⁳⁻⁴⁴±5.9⁳⁻⁴⁹ s");
     step("Planck mass")
-        .test(CLEAR, NOSHIFT, F3).expect("Mpl")
-        .test(LSHIFT, F3).expect("0.00000 00217 64 kg");
+        .fkey(0).expect("Mpl")
+        .fkey(1).expect("0.00000 00217 64 kg")
+        .fkey(2).expect("0.00000 00217 64±2.4⁳⁻¹³ kg");
     step("Planck energy")
-        .test(CLEAR, NOSHIFT, F4).expect("Epl")
-        .test(LSHIFT, F4).expect("1.22089⁳¹⁹ GeV");
+        .fkey(0).expect("Epl")
+        .fkey(1).expect("1.22089⁳¹⁹ GeV")
+        .fkey(2).expect("1.22089⁳¹⁹±1.4⁳¹⁴ GeV");
     step("Planck temperature")
-        .test(CLEAR, NOSHIFT, F5).expect("T°pl")
-        .test(LSHIFT, F5).expect("1.41678 4⁳³² K");
-
+        .fkey(0).expect("T°pl")
+        .fkey(1).expect("1.41678 4⁳³² K")
+        .fkey(2).expect("1.41678 4⁳³²±1.6⁳²⁷ K");
+    step("Planck charge")
+        .fkey(0).expect("qpl")
+        .fkey(1).expect("1.87554 60384 2⁳⁻¹⁸ C")
+        .fkey(2).expect("1.87554 60384 2⁳⁻¹⁸±1.5⁳⁻²⁸ C");
+    step("Planck momentum")
+        .fkey(0).expect("ppl")
+        .fkey(1).expect("6.52478 6 kg·m/s")
+        .fkey(2).expect("6.52478 6±0.00007 2 kg·m/s");
+    step("Planck force")
+        .fkey(0).expect("Fpl")
+        .fkey(1).expect("1.21025 6⁳⁴⁴ N")
+        .fkey(2).expect("1.21025 6⁳⁴⁴±2.7⁳³⁹ N");
+    step("Planck density")
+        .fkey(0).expect("ρvpl")
+        .fkey(1).expect("5.15485⁳⁹⁶ kg/m↑3")
+        .fkey(2).expect("5.15485⁳⁹⁶±2.3⁳⁹² kg/m↑3");
     step("Hartree energy")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F5).expect("Eh")
-        .test(LSHIFT, F5).expect("4.35974 47222 1⁳⁻¹⁸ J");
+        .fkey(0).expect("Eh")
+        .fkey(1).expect("4.35974 47222 1⁳⁻¹⁸ J")
+        .fkey(2).expect("4.35974 47222 1⁳⁻¹⁸±4.8⁳⁻³⁰ J");
 
 
     // ------------------------------------------------------------------------
     step("Electromagnetism constants")
     // ------------------------------------------------------------------------
-        .test(CLEAR, ID_ConstantsMenu, F5);
+        .test(CLEAR, ID_ConstantsMenu, F5).fkey();
     step("Electronic charge")
-        .test(CLEAR, NOSHIFT, F1).expect("qe")
-        .test(LSHIFT, F1).expect("1.60217 6634⁳⁻¹⁹ C");
+        .fkey(0).expect("qe")
+        .fkey(1).expect("1.60217 6634⁳⁻¹⁹ C")
+        .fkey(2).expect("1.60217 6634⁳⁻¹⁹±0 C");
     step("Rydberg")
-        .test(CLEAR, NOSHIFT, F2).expect("R∞")
-        .test(LSHIFT, F2).expect("10 973 731.5682 m⁻¹");
+        .fkey(0).expect("R∞")
+        .fkey(1).expect("10 973 731.5682 m⁻¹")
+        .fkey(2).expect("10 973 731.5682±0.00001 2 m⁻¹");
+    step("Photon wavelength")
+        .fkey(0).expect("λ₀")
+        .fkey(1).expect("1 239.84198 433 nm")
+        .fkey(2).expect("1 239.84198 433±0 nm");
+    step("Photon frequency")
+        .fkey(0).expect("f₀")
+        .fkey(1).expect("2.41798 92420 8⁳¹⁴ Hz")
+        .fkey(2).expect("2.41798 92420 8⁳¹⁴±0 Hz");
+    step("Electron g-factor")
+        .fkey(0).expect("ge")
+        .fkey(1).expect("-2.00231 93043 6")
+        .fkey(2).expect("-2.00231 93043 6±3.6⁳⁻¹³");
+    step("Electron charge/mass ratio")
+        .fkey(0).expect("qme")
+        .fkey(1).expect("1.75882 00083 8⁳¹¹ C/kg")
+        .fkey(2).expect("1.75882 00083 8⁳¹¹±55. C/kg");
+    step("Electron magnetic moment")
+        .fkey(0).expect("μe")
+        .fkey(1).expect("-9.28476 46917⁳⁻²⁴ J/T")
+        .fkey(2).expect("-9.28476 46917⁳⁻²⁴±2.9⁳⁻³³ J/T");
+    step("Electron magnetic moment / bohr magneton ratio")
+        .fkey(0).expect("μeμB")
+        .fkey(1).expect("-1.00115 96521 8")
+        .fkey(2).expect("-1.00115 96521 8±1.1⁳⁻¹³");
+    step("Proton magnetic moment")
+        .fkey(0).expect("μp")
+        .fkey(1).expect("1.41060 67954 5⁳⁻²⁶ J/T")
+        .fkey(2).expect("1.41060 67954 5⁳⁻²⁶±6.⁳⁻³⁶ J/T");
+    step("Neutron magnetic moment")
+        .fkey(0).expect("μn")
+        .fkey(1).expect("-9.66236 53⁳⁻²⁷ J/T")
+        .fkey(2).expect("-9.66236 53⁳⁻²⁷±2.3⁳⁻³³ J/T");
+    step("Muon magnetic moment")
+        .fkey(0).expect("μμ")
+        .fkey(1).expect("-4.49044 83⁳⁻²⁶ J/T")
+        .fkey(2).expect("-4.49044 83⁳⁻²⁶±1.⁳⁻³³ J/T");
     step("Bohr magneton")
-        .test(NOSHIFT, F6)
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("μB")
-        .test(LSHIFT, F1).expect("9.27401 00657⁳⁻²⁴ J/T");
+        .fkey(0).expect("μB")
+        .fkey(1).expect("9.27401 00657⁳⁻²⁴ J/T")
+        .fkey(2).expect("9.27401 00657⁳⁻²⁴±2.9⁳⁻³³ J/T");
     step("Nuclear magneton")
-        .test(CLEAR, NOSHIFT, F2).expect("μN")
-        .test(LSHIFT, F2).expect("5.05078 37393⁳⁻²⁷ J/T");
+        .fkey(0).expect("μN")
+        .fkey(1).expect("5.05078 37393⁳⁻²⁷ J/T")
+        .fkey(2).expect("5.05078 37393⁳⁻²⁷±1.6⁳⁻³⁶ J/T");
     step("Electron gyromagnetic ratio")
-        .test(CLEAR, NOSHIFT, F3).expect("γe")
-        .test(LSHIFT, F3).expect("1.76085 96278 3⁳¹¹ (s·T)⁻¹");
+        .fkey(0).expect("γe")
+        .fkey(1).expect("1.76085 96278 3⁳¹¹ (s·T)⁻¹")
+        .fkey(2).expect("1.76085 96278 3⁳¹¹±55. (s·T)⁻¹");
     step("Proton gyromagnetic ratio")
-        .test(CLEAR, NOSHIFT, F4).expect("γp")
-        .test(LSHIFT, F4).expect("267 522 187.08 (s·T)⁻¹");
+        .fkey(0).expect("γp")
+        .fkey(1).expect("267 522 187.08 (s·T)⁻¹")
+        .fkey(2).expect("267 522 187.08±0.12 (s·T)⁻¹");
     step("Neutron gyromagnetic ratio")
-        .test(CLEAR, NOSHIFT, F5).expect("γn")
-        .test(LSHIFT, F5).expect("183 247 175. (s·T)⁻¹");
+        .fkey(0).expect("γn")
+        .fkey(1).expect("183 247 175. (s·T)⁻¹")
+        .fkey(2).expect("183 247 175.±44. (s·T)⁻¹");
     step("First radiation constant")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("c1")
-        .test(LSHIFT, F1).expect("3.74177 18521 9⁳⁻¹⁶ W·m↑2");
+        .fkey(0).expect("c1")
+        .fkey(1).expect("3.74177 18521 9⁳⁻¹⁶ W·m↑2")
+        .fkey(2).expect("3.74177 18521 9⁳⁻¹⁶±0 W·m↑2");
     step("Second radiation constant")
-        .test(CLEAR, NOSHIFT, F2).expect("c2")
-        .test(LSHIFT, F2).expect("0.01438 77687 75 m·K");
+        .fkey(0).expect("c2")
+        .fkey(1).expect("0.01438 77687 75 m·K")
+        .fkey(2).expect("0.01438 77687 75±0 m·K");
     step("Wien's constant")
-        .test(CLEAR, NOSHIFT, F3).expect("c3")
-        .test(LSHIFT, F3).expect("2.89777 19551 9 mm·K");
+        .fkey(0).expect("c3")
+        .fkey(1).expect("2.89777 19551 9 mm·K")
+        .fkey(2).expect("2.89777 19551 9±0 mm·K");
     step("Wien's frequency constant")
-        .test(CLEAR, NOSHIFT, F4).expect("c3f")
-        .test(LSHIFT, F4).expect("0.05878 92575 76 THz/K");
+        .fkey(0).expect("c3f")
+        .fkey(1).expect("0.05878 92575 76 THz/K")
+        .fkey(2).expect("0.05878 92575 76±0 THz/K");
     step("von Klitzing constant")
-        .test(CLEAR, NOSHIFT, F5).expect("Rk")
-        .test(LSHIFT, F5).expect("25 812.80745 93 Ω");
+        .fkey(0).expect("Rk")
+        .fkey(1).expect("25 812.80745 93 Ω")
+        .fkey(2).expect("25 812.80745 93±0 Ω");
     step("Conductance quantum")
-        .test(NOSHIFT, F6)
-        .test(CLEAR, NOSHIFT, F1).expect("G0")
-        .test(LSHIFT, F1).expect("0.00007 74809 17 S");
+        .fkey(0).expect("G0")
+        .fkey(1).expect("0.00007 74809 17 S")
+        .fkey(2).expect("0.00007 74809 17±0 S");
     step("Fermi reduced coupling constant")
-        .test(CLEAR, NOSHIFT, F2).expect("G0F")
-        .test(LSHIFT, F2).expect("0.00001 16637 87 (GeV↑2)⁻¹");
+        .fkey(0).expect("G0F")
+        .fkey(1).expect("0.00001 16637 87 (GeV↑2)⁻¹")
+        .fkey(2).expect("0.00001 16637 87±6.⁳⁻¹² (GeV↑2)⁻¹");
     step("Magnetic flux quantum")
-        .test(CLEAR, NOSHIFT, F3).expect("ø")
-        .test(LSHIFT, F3).expect("2.06783 38484 6⁳⁻¹⁵ Wb");
+        .fkey(0).expect("ø")
+        .fkey(1).expect("2.06783 38484 6⁳⁻¹⁵ Wb")
+        .fkey(2).expect("2.06783 38484 6⁳⁻¹⁵±0 Wb");
     step("Josephson constant")
-        .test(CLEAR, NOSHIFT, F4).expect("KJ")
-        .test(LSHIFT, F4).expect("4.83597 84841 7⁳¹⁴ Hz/V");
+        .fkey(0).expect("KJ")
+        .fkey(1).expect("4.83597 84841 7⁳¹⁴ Hz/V")
+        .fkey(2).expect("4.83597 84841 7⁳¹⁴±0 Hz/V");
     step("Quantum of circulation")
-        .test(CLEAR, NOSHIFT, F5).expect("Kc")
-        .test(LSHIFT, F5).expect("0.00036 36947 55 m↑2/s");
+        .fkey(0).expect("Kc")
+        .fkey(1).expect("0.00036 36947 55 m↑2/s")
+        .fkey(2).expect("0.00036 36947 55±1.1⁳⁻¹³ m↑2/s");
 
     // ------------------------------------------------------------------------
-    step("Silicon dielectric constant")
-        .test(CLEAR, "'εsi' CONST", ENTER, ID_ToDecimal)
-        .expect("11.9");
-    step("SiO2 dielectric constant")
-        .test(CLEAR, "'εox' CONST", ENTER, ID_ToDecimal)
-        .expect("3.9");
-
+    //   Manual evaluation of computer science constants
+    // ------------------------------------------------------------------------
 
     step("No constant")
         .test(CLEAR, "'No' CONST", ENTER, ID_ToDecimal)
@@ -17315,6 +17511,35 @@ tests &tests::itest(const std::string &s)
 }
 
 
+tests &tests::ifkey()
+// ----------------------------------------------------------------------------
+//   Reset to first function key
+// ----------------------------------------------------------------------------
+{
+    fkeyIndex = ~0;
+    return *this;
+}
+
+
+tests &tests::ifkey(uint shifts)
+// ----------------------------------------------------------------------------
+//   Test the next function key with or without shifts
+// ----------------------------------------------------------------------------
+{
+    if (!shifts)
+    {
+        fkeyIndex++;
+        auto nextobj = command::static_object(command::ID_MenuNextPage);
+        if (ui.function[0][fkeyIndex] == nextobj)
+        {
+            itest(CLEAR, NOSHIFT, key(F1 + fkeyIndex));
+            fkeyIndex = 0;
+        }
+    }
+    return itest(CLEAR, key(NOSHIFT + shifts), key(F1 + fkeyIndex));
+}
+
+
 tests &tests::type_keys(cstring txt)
 // ----------------------------------------------------------------------------
 //   Type the string one key at a time (for data entry tests)
@@ -17670,6 +17895,7 @@ tests &tests::itest(tests::KEYTYPE kt)
 {
     return type_keys(kt.text.c_str());
 }
+
 
 
 // ============================================================================

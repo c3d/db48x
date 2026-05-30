@@ -50,6 +50,13 @@ This constant defines corresponds to one radian.
 
 This constant holds the value of two times [π](#π-constant).
 
+### τ constant
+
+The circle constant tau, equal to 2π (approximately 6.28318). An alias for
+[twoπ](#twoπ-constant), tau represents the ratio of a circle's circumference
+to its radius. Some mathematicians argue that τ is more natural than π for many
+formulas, particularly in trigonometry and angular mathematics.
+
 ### angl constant
 
 This constants holds one half-turn expressed in degrees.
@@ -67,6 +74,48 @@ approximately equal to 0.5772, appearing in analysis and
 number theory, notably in the Laurent expansion of the Riemann
 zeta function and in integrals involving the natural logarithm.
 Its exact nature (rational or irrational) remains unknown.
+
+### ϕ constant
+
+The golden ratio, approximately 1.618033988749895. This is the positive solution
+to the equation x² = x + 1, which can also be expressed as (1 + √5)/2. The golden
+ratio appears frequently in geometry, art, architecture, and nature. It is the
+most irrational of all irrational numbers in the sense that it has the slowest
+converging continued fraction expansion.
+
+### Gⓒ constant
+
+Catalan's constant, approximately 0.9159655941772191. This constant appears in
+combinatorics and is defined as the alternating sum: G = 1 - 1/9 + 1/25 - 1/49 + ...
+= Σ((-1)ⁿ/(2n+1)²). It appears in various mathematical contexts including the
+evaluation of certain integrals and series.
+
+### K₀ constant
+
+Khinchin's constant, approximately 2.6854520010653. For almost all real numbers,
+the geometric mean of the first n terms in the continued fraction representation
+tends to Khinchin's constant as n approaches infinity. This is a remarkable result
+in number theory discovered by Aleksandr Khinchin.
+
+### Fα constant
+
+Feigenbaum's alpha constant, approximately 2.5029078750959. This is the
+ratio between the diameters of successive circles in the bifurcation diagram
+of the logistic map. It is one of the two Feigenbaum constants in chaos theory.
+
+### Fδ constant
+
+Feigenbaum's delta constant, approximately 4.6692016091030. This is the
+limiting ratio of each bifurcation interval to the next in the period-doubling
+cascade of the logistic map. Together with Fα, this universal constant appears
+in many chaotic systems, not just the logistic map.
+
+### δₛ constant
+
+The silver ratio, approximately 2.4142135623731, equal to 1 + √2. Like the golden
+ratio, the silver ratio appears in various geometric and mathematical contexts.
+It is the positive solution to x² = 2x + 1 and represents the ratio of sides in
+a silver rectangle.
 
 
 ## Chemistry constants
@@ -306,6 +355,15 @@ carbon-12 in its nuclear and electronic ground state and at rest. It is a non-SI
 unit accepted for use with SI. It is identical to the
 [Dalton](#dalton constant). [CODATA](#codata)
 
+### uc² constant
+
+Energy equivalent of the atomic mass unit. This is the energy equivalent of
+one atomic mass unit (u) according to Einstein's mass-energy equivalence
+E = mc². The value is calculated exactly as `u·c²` where c is the speed of
+light. This constant is useful for converting between mass units and energy
+units in nuclear and particle physics, with a value of approximately
+1.492×10⁻¹⁰ J or about 931.5 MeV. [CODATA](#codata)
+
 ### me constant
 
 Electron mass. In particle physics, the electron mass is the mass of a
@@ -381,6 +439,16 @@ Dimensionless ratio between the mass of the proton `mp` and the mass
 of the electron `me`. Currently, the most precise measurements of the
 charge-to-mass ratio of a proton still use a magnetic field like Thompson
 did, but rely on measuring (cyclotron) frequencies rather than deflection. [CODATA](#codata)
+
+### mnmp constant
+
+Neutron-to-proton mass ratio. This dimensionless constant represents
+the ratio of the neutron mass `mn` to the proton mass `mp`, with a value
+of approximately 1.00137841946. This ratio is slightly greater than 1,
+reflecting that the neutron is slightly heavier than the proton. This
+mass difference is crucial in nuclear physics and explains why free neutrons
+are unstable and undergo beta decay with a half-life of about 10 minutes,
+while protons bound in nuclei are stable. [CODATA](#codata)
 
 ### Are constant
 
@@ -517,6 +585,17 @@ and electric charge. Its angular momentum comes from two types of
 rotation: spin and orbital motion. Therefore an external magnetic field
 exerts a torque on the electron magnetic moment revealing its existence.
 It's a measured quantity. [CODATA](#codata)
+
+### μeμB constant
+
+Electron magnetic moment to Bohr magneton ratio. This dimensionless
+constant represents the ratio of the electron magnetic moment `μe` to
+the Bohr magneton `μB`, with a value of approximately -1.00115965218046.
+The value being very close to -1 (but not exactly -1) is a consequence
+of quantum electrodynamics (QED) corrections. The small deviation from
+-1 is due to the anomalous magnetic dipole moment of the electron, which
+has been calculated and measured to extraordinary precision and serves
+as one of the most stringent tests of QED theory. [CODATA](#codata)
 
 ### μp constant
 
