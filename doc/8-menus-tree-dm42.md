@@ -356,7 +356,7 @@ Access: 🟦 J (SIN); [MathMenu](#mathmenu-reference) 🟨 F1; [PowersMenu](#pow
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| \[[Powers](#powersmenu)\] |   |   |   |   |   |
+| [csch](#csch) | [sech](#sech) | [coth](#coth) | [csch⁻¹](#csch-1) | [sech⁻¹](#sech-1) | [coth⁻¹](#coth-1) |
 | [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
 
 ### IntegrationMenu
@@ -641,7 +641,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F5
 
 ### PowersMenu
 
-Access: 🟨 E (LN); [HyperbolicMenu](#hyperbolicmenu) 🟨 F1; [MathMenu](#mathmenu-reference) F4; [RealMenu](#realmenu) 🟦 F3
+Access: 🟨 E (LN); [MathMenu](#mathmenu-reference) F4; [RealMenu](#realmenu) 🟦 F3
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|

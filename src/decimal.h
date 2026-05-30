@@ -563,6 +563,12 @@ struct decimal : algebraic
     static decimal_p asinh(decimal_r x);
     static decimal_p acosh(decimal_r x);
     static decimal_p atanh(decimal_r x);
+    static decimal_p csch(decimal_r x);
+    static decimal_p sech(decimal_r x);
+    static decimal_p coth(decimal_r x);
+    static decimal_p acsch(decimal_r x);
+    static decimal_p asech(decimal_r x);
+    static decimal_p acoth(decimal_r x);
 
     static decimal_p ln1p(decimal_r x);
     static decimal_p expm1(decimal_r x);

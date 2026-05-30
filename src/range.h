@@ -109,6 +109,12 @@ public:
     RANGE_FUNCTION(asinh);
     RANGE_FUNCTION(acosh);
     RANGE_FUNCTION(atanh);
+    RANGE_FUNCTION(csch);
+    RANGE_FUNCTION(sech);
+    RANGE_FUNCTION(coth);
+    RANGE_FUNCTION(acsch);
+    RANGE_FUNCTION(asech);
+    RANGE_FUNCTION(acoth);
 
     RANGE_FUNCTION(ln1p);
     RANGE_FUNCTION(expm1);
@@ -213,6 +219,12 @@ struct uncertain : range
     UNCERTAIN_FUNCTION(asinh);
     UNCERTAIN_FUNCTION(acosh);
     UNCERTAIN_FUNCTION(atanh);
+    UNCERTAIN_FUNCTION(csch);
+    UNCERTAIN_FUNCTION(sech);
+    UNCERTAIN_FUNCTION(coth);
+    UNCERTAIN_FUNCTION(acsch);
+    UNCERTAIN_FUNCTION(asech);
+    UNCERTAIN_FUNCTION(acoth);
 
     UNCERTAIN_FUNCTION(ln1p);
     UNCERTAIN_FUNCTION(expm1);

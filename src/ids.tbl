@@ -383,9 +383,15 @@ CMD(TestFlagClear)                      ALIAS(TestFlagClear,    "FC?")
 NAMED(asinh, "sinh⁻¹")
 NAMED(acosh, "cosh⁻¹")
 NAMED(atanh, "tanh⁻¹")
+NAMED(acsch, "csch⁻¹")
+NAMED(asech, "sech⁻¹")
+NAMED(acoth, "coth⁻¹")
 CMD(sinh)
 CMD(cosh)
 CMD(tanh)
+CMD(csch)
+CMD(sech)
+CMD(coth)
 
 CMD(ln1p)       ALIAS(ln1p, "lnp1")             // HP48 compatibility
 CMD(expm1)      ALIAS(expm1, "expm")            // HP48 compatibility

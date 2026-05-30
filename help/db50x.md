@@ -20429,6 +20429,30 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
+## csch
+Compute the hyperbolic cosecant (1/sinh)
+
+
+## sech
+Compute the hyperbolic secant (1/cosh)
+
+
+## coth
+Compute the hyperbolic cotangent (cosh/sinh)
+
+
+## csch⁻¹
+Compute the hyperbolic arccosecant
+
+
+## sech⁻¹
+Compute the hyperbolic arcsecant
+
+
+## coth⁻¹
+Compute the hyperbolic arccotangent
+
+
 ## LOG10
 Compute logarithm in base 10
 
@@ -21295,7 +21319,7 @@ Access: 🟦 J (SIN); [MathMenu](#mathmenu-reference) 🟨 F1; [PowersMenu](#pow
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| \[[Powers](#powersmenu)\] |   |   |   |   |   |
+| [csch](#csch) | [sech](#sech) | [coth](#coth) | [csch⁻¹](#csch-1) | [sech⁻¹](#sech-1) | [coth⁻¹](#coth-1) |
 | [sinh](#sinh) | [cosh](#cosh) | [tanh](#tanh) | [sinh⁻¹](#asinh) | [cosh⁻¹](#acosh) | [tanh⁻¹](#atanh) |
 
 ### IntegrationMenu
@@ -21580,7 +21604,7 @@ Access: [SolverMenu](#solvermenu) 🟨 F5
 
 ### PowersMenu
 
-Access: 🟨 E (1/x); [HyperbolicMenu](#hyperbolicmenu) 🟨 F1; [MathMenu](#mathmenu-reference) F4; [RealMenu](#realmenu) 🟦 F3
+Access: 🟨 E (1/x); [MathMenu](#mathmenu-reference) F4; [RealMenu](#realmenu) 🟦 F3
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|

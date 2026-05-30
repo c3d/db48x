@@ -413,6 +413,59 @@ struct hwfp : hwfp_base
         return make(to_angle(std::atanh(x->value())));
     }
 
+    static hwfp_p csch(hwfp_r x)
+    {
+        hw s = std::sinh(x->value());
+        if (s == hw(0.0))
+        {
+            rt.zero_divide_error();
+            return nullptr;
+        }
+        return make(hw(1.0) / s);
+    }
+
+    static hwfp_p sech(hwfp_r x)
+    {
+        hw c = std::cosh(x->value());
+        return make(hw(1.0) / c);
+    }
+
+    static hwfp_p coth(hwfp_r x)
+    {
+        hw s = std::sinh(x->value());
+        if (s == hw(0.0))
+        {
+            rt.zero_divide_error();
+            return nullptr;
+        }
+        hw c = std::cosh(x->value());
+        return make(c / s);
+    }
+
+    static hwfp_p acsch(hwfp_r x)
+    {
+        // acsch(x) = ln(1/x + sqrt(1/x^2 + 1))
+        hw inv_x = hw(1.0) / x->value();
+        hw result = std::log(inv_x + std::sqrt(inv_x*inv_x + hw(1.0)));
+        return make(result);
+    }
+
+    static hwfp_p asech(hwfp_r x)
+    {
+        // asech(x) = ln(1/x + sqrt(1/x^2 - 1))
+        hw inv_x = hw(1.0) / x->value();
+        hw result = std::log(inv_x + std::sqrt(inv_x*inv_x - hw(1.0)));
+        return make(result);
+    }
+
+    static hwfp_p acoth(hwfp_r x)
+    {
+        // acoth(x) = 1/2 * ln((x+1)/(x-1))
+        hw xv = x->value();
+        hw result = hw(0.5) * std::log((xv + hw(1.0)) / (xv - hw(1.0)));
+        return make(result);
+    }
+
 
     static hwfp_p ln1p(hwfp_r x)
     {

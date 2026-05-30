@@ -2748,6 +2748,96 @@ decimal_p decimal::atanh(decimal_r x)
 }
 
 
+decimal_p decimal::csch(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Hyperbolic cosecant
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    decimal_g s = sinh(x);
+    return prec(inv(s));
+}
+
+
+decimal_p decimal::sech(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Hyperbolic secant
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    decimal_g c = cosh(x);
+    return prec(inv(c));
+}
+
+
+decimal_p decimal::coth(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Hyperbolic cotangent
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    decimal_g s = sinh(x);
+    decimal_g c = cosh(x);
+    return prec(c / s);
+}
+
+
+decimal_p decimal::acsch(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Inverse hyperbolic cosecant
+// ----------------------------------------------------------------------------
+{
+    precision_adjust prec;
+    decimal_g one = make(1);
+    decimal_g inv_x = inv(x);
+    return prec(ln(inv_x + decimal_g(sqrt(inv_x*inv_x + one))));
+}
+
+
+decimal_p decimal::asech(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Inverse hyperbolic secant
+// ----------------------------------------------------------------------------
+{
+    // Domain: 0 < x <= 1
+    if (x->is_zero() || x->is_negative())
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+    decimal_g one = make(1);
+    if (x > one)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    precision_adjust prec;
+    decimal_g inv_x = inv(x);
+    return prec(ln(inv_x + decimal_g(sqrt(inv_x*inv_x - one))));
+}
+
+
+decimal_p decimal::acoth(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Inverse hyperbolic cotangent
+// ----------------------------------------------------------------------------
+{
+    // Domain: |x| > 1
+    decimal_g absx = abs(x);
+    decimal_g one = make(1);
+    if (absx && absx <= one)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    precision_adjust prec;
+    decimal_g half = make(5, -1);
+    return prec(half * ln((x + one) / (x - one)));
+}
+
+
 decimal_p decimal::ln1p(decimal_r x)
 // ----------------------------------------------------------------------------
 //   ln(1+x)

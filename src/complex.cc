@@ -1447,6 +1447,76 @@ COMPLEX_BODY(atanh)
 }
 
 
+COMPLEX_BODY(csch)
+// ----------------------------------------------------------------------------
+//   Complex implementation of csch
+// ----------------------------------------------------------------------------
+{
+    // csch(z) = 1 / sinh(z)
+    complex_g one = complex::make(1, 0);
+    return one / complex::sinh(z);
+}
+
+
+COMPLEX_BODY(sech)
+// ----------------------------------------------------------------------------
+//   Complex implementation of sech
+// ----------------------------------------------------------------------------
+{
+    // sech(z) = 1 / cosh(z)
+    complex_g one = complex::make(1, 0);
+    return one / complex::cosh(z);
+}
+
+
+COMPLEX_BODY(coth)
+// ----------------------------------------------------------------------------
+//   Complex implementation of coth
+// ----------------------------------------------------------------------------
+{
+    // coth(z) = cosh(z) / sinh(z)
+    complex_g s = complex::sinh(z);
+    complex_g c = complex::cosh(z);
+    return c / s;
+}
+
+
+COMPLEX_BODY(acsch)
+// ----------------------------------------------------------------------------
+//   Complex implementation of acsch
+// ----------------------------------------------------------------------------
+{
+    // acsch(z) = ln(1/z + sqrt(1/z^2 + 1))
+    complex_g one = complex::make(1, 0);
+    complex_g inv_z = one / z;
+    return complex::ln(inv_z + complex::sqrt(inv_z*inv_z + one));
+}
+
+
+COMPLEX_BODY(asech)
+// ----------------------------------------------------------------------------
+//   Complex implementation of asech
+// ----------------------------------------------------------------------------
+{
+    // asech(z) = ln(1/z + sqrt(1/z^2 - 1))
+    complex_g one = complex::make(1, 0);
+    complex_g inv_z = one / z;
+    return complex::ln(inv_z + complex::sqrt(inv_z*inv_z - one));
+}
+
+
+COMPLEX_BODY(acoth)
+// ----------------------------------------------------------------------------
+//   Complex implementation of acoth
+// ----------------------------------------------------------------------------
+{
+    // acoth(z) = 1/2 ln((z+1) / (z-1))
+    complex_g one = complex::make(1, 0);
+    complex_g two = complex::make(2, 0);
+    return complex::ln((z + one) / (z - one)) / two;
+}
+
+
 COMPLEX_BODY(ln1p)
 // ----------------------------------------------------------------------------
 //   Complex implementation of log1p, avoiding cancellation for small z

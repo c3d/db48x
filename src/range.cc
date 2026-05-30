@@ -766,6 +766,149 @@ RANGE_BODY(atanh)
 }
 
 
+RANGE_BODY(csch)
+// ----------------------------------------------------------------------------
+//   Range implementation of csch
+// ----------------------------------------------------------------------------
+{
+    if (!r)
+        return nullptr;
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    bool        lneg = lo->is_negative(false);
+    bool        hneg = hi->is_negative(false);
+
+    // csch has discontinuity at x=0
+    if (lneg != hneg)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    // csch is monotonic decreasing on each side of 0
+    return monotonic(csch::evaluate, r, !lneg);
+}
+
+
+RANGE_BODY(sech)
+// ----------------------------------------------------------------------------
+//   Range implementation of sech
+// ----------------------------------------------------------------------------
+{
+    // sech has a maximum at x=0, similar to cosh pattern
+    if (!r)
+        return nullptr;
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    bool        lneg = lo->is_negative(false);
+    bool        hneg = hi->is_negative(false);
+
+    if (lneg == hneg)
+        return monotonic(sech::evaluate, r, lneg);
+
+    // Range spans x=0, so maximum is sech(0) = 1
+    lo = sech::evaluate(lo);
+    hi = sech::evaluate(hi);
+    range::sort(lo, hi);
+    hi = integer::make(1);  // maximum of sech
+    return range::make(r->type(), lo, hi);
+}
+
+
+RANGE_BODY(coth)
+// ----------------------------------------------------------------------------
+//   Range implementation of coth
+// ----------------------------------------------------------------------------
+{
+    if (!r)
+        return nullptr;
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    bool        lneg = lo->is_negative(false);
+    bool        hneg = hi->is_negative(false);
+
+    // coth has discontinuity at x=0
+    if (lneg != hneg)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    // coth is monotonic decreasing on each side of 0
+    return monotonic(coth::evaluate, r, !lneg);
+}
+
+
+RANGE_BODY(acsch)
+// ----------------------------------------------------------------------------
+//   Range implementation of acsch
+// ----------------------------------------------------------------------------
+{
+    if (!r)
+        return nullptr;
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+    bool        lneg = lo->is_negative(false);
+    bool        hneg = hi->is_negative(false);
+
+    // acsch has discontinuity at x=0
+    if (lneg != hneg)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    // acsch is monotonic decreasing on each side of 0
+    return monotonic(acsch::evaluate, r, !lneg);
+}
+
+
+RANGE_BODY(asech)
+// ----------------------------------------------------------------------------
+//   Range implementation of asech
+// ----------------------------------------------------------------------------
+{
+    return monotonic(asech::evaluate, r, true);
+}
+
+
+RANGE_BODY(acoth)
+// ----------------------------------------------------------------------------
+//   Range implementation of acoth
+// ----------------------------------------------------------------------------
+{
+    if (!r)
+        return nullptr;
+    algebraic_g lo   = r->lo();
+    algebraic_g hi   = r->hi();
+
+    // acoth is defined for |x| > 1
+    // Check if range contains values in (-1, 1)
+    algebraic_g one = integer::make(1);
+    algebraic_g neg_one = integer::make(-1);
+
+    if ((lo->compare_to(neg_one) > 0 && lo->compare_to(one) < 0) ||
+        (hi->compare_to(neg_one) > 0 && hi->compare_to(one) < 0))
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    bool lneg = lo->is_negative(false);
+    bool hneg = hi->is_negative(false);
+
+    // acoth has discontinuity between -1 and 1
+    if (lneg != hneg)
+    {
+        rt.domain_error();
+        return nullptr;
+    }
+
+    // acoth is monotonic decreasing on each side
+    return monotonic(acoth::evaluate, r, !lneg);
+}
+
+
 RANGE_BODY(ln1p)
 // ----------------------------------------------------------------------------
 //   Range implementation of ln1p
@@ -1597,6 +1740,60 @@ UNCERTAIN_BODY(atanh)
 // ----------------------------------------------------------------------------
 {
     return univariate(atanh::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(csch)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of csch
+// ----------------------------------------------------------------------------
+{
+    return univariate(csch::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(sech)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of sech
+// ----------------------------------------------------------------------------
+{
+    return univariate(sech::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(coth)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of coth
+// ----------------------------------------------------------------------------
+{
+    return univariate(coth::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(acsch)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of acsch
+// ----------------------------------------------------------------------------
+{
+    return univariate(acsch::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(asech)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of asech
+// ----------------------------------------------------------------------------
+{
+    return univariate(asech::evaluate, u);
+}
+
+
+UNCERTAIN_BODY(acoth)
+// ----------------------------------------------------------------------------
+//   Uncertain Number implementation of acoth
+// ----------------------------------------------------------------------------
+{
+    return univariate(acoth::evaluate, u);
 }
 
 

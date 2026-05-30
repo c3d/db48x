@@ -663,7 +663,8 @@ MENU(HyperbolicMenu,
 // ----------------------------------------------------------------------------
      ID_sinh,   ID_cosh,        ID_tanh,
      ID_asinh,  ID_acosh,       ID_atanh,
-     "Powers", ID_PowersMenu);
+     ID_csch,   ID_sech,        ID_coth,
+     ID_acsch,  ID_asech,       ID_acoth);
 
 MENU(CircularMenu,
 // ----------------------------------------------------------------------------

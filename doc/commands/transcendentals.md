@@ -163,6 +163,30 @@ Compute the hyperbolic arccosine
 Compute the hyperbolic arctangent
 
 
+## csch
+Compute the hyperbolic cosecant (1/sinh)
+
+
+## sech
+Compute the hyperbolic secant (1/cosh)
+
+
+## coth
+Compute the hyperbolic cotangent (cosh/sinh)
+
+
+## csch⁻¹
+Compute the hyperbolic arccosecant
+
+
+## sech⁻¹
+Compute the hyperbolic arcsecant
+
+
+## coth⁻¹
+Compute the hyperbolic arccotangent
+
+
 ## LOG10
 Compute logarithm in base 10
 

@@ -119,6 +119,7 @@ TESTS(highp,            "High-precision computations (60 digits)")
 TESTS(trigoptim,        "Special trigonometry optimzations");
 TESTS(trigunits,        "Trigonometric units");
 TESTS(sectrig,          "Secant, cosecant, cotangent");
+TESTS(hyprecip,         "Hyperbolic reciprocal functions");
 TESTS(dfrac,            "Simple conversion to decimal and back");
 TESTS(round,            "Rounding and truncating");
 TESTS(ctypes,           "Complex types");
@@ -249,6 +250,7 @@ int tests::run(uint onlyCurrent)
         exact_trig_cases();
         trig_units();
         sec_csc_cot();
+        hyperbolic_reciprocals();
         fraction_decimal_conversions();
         rounding_and_truncating();
         complex_types();
@@ -3711,6 +3713,12 @@ void tests::decimal_numerical_functions()
     TFN(asinh).expect("0.3157282658293796179108945471020638");
     TFNA(acosh, 1.321).expect("0.7812302051962526147422171616034349");
     TFN(atanh).expect("0.3327615884818145958017641705087511");
+    TFN(csch).expect("3.062401030349690404093841432441518");
+    TFN(sech).expect("0.9506024964775850506431436009384491");
+    TFN(coth).expect("3.221536911271830423613076528590613");
+    TFN(acsch).expect("1.854279593524329166962477681215374");
+    TFNA(asech, 0.9).expect("0.4671453081032620181283814916659229");
+    TFNA(acoth, 1.5).expect("0.8047189562170501873003796666130938");
     TFN(ln1p).expect("0.278389025540188266771628342111551");
     TFN(lnp1).expect("0.278389025540188266771628342111551");
     TFN(expm1).expect("0.3785055808937538954474307074914123");
@@ -3921,6 +3929,12 @@ void tests::float_numerical_functions()
     TFN(asinh).expect("0.31572 8F");
     TFNA(acosh, 1.321).expect("0.78123F");
     TFN(atanh).expect("0.33276 2F");
+    TFN(csch).expect("3.0624F");
+    TFN(sech).expect("0.95060 3F");
+    TFN(coth).expect("3.22154F");
+    TFN(acsch).expect("1.85428F");
+    TFNA(asech, 0.9).expect("0.46714 5F");
+    TFNA(acoth, 1.5).expect("0.80471 9F");
     TFN(ln1p).expect("0.27838 9F");
     TFN(lnp1).expect("0.27838 9F");
     TFN(expm1).expect("0.37850 6F");
@@ -4108,6 +4122,12 @@ void tests::double_numerical_functions()
     TFN(asinh).expect("0.31572 82658 2938D");
     TFNA(acosh, 1.321).expect("0.78123 02051 96253D");
     TFN(atanh).expect("0.33276 15884 81815D");
+    TFN(csch).expect("3.06240 10303 4969D");
+    TFN(sech).expect("0.95060 24964 77585D");
+    TFN(coth).expect("3.22153 69112 7183D");
+    TFN(acsch).expect("1.85427 95935 2433D");
+    TFNA(asech, 0.9).expect("0.46714 53081 03262D");
+    TFNA(acoth, 1.5).expect("0.80471 89562 1705D");
     TFN(ln1p).expect("0.27838 90255 40188D");
     TFN(lnp1).expect("0.27838 90255 40188D");
     TFN(expm1).expect("0.37850 55808 93754D");
@@ -4289,6 +4309,12 @@ void tests::high_precision_numerical_functions()
     TFN(asinh).expect("0.31572 82658 29379 61791 08945 47102 06380 00526 27320 40054 59952 39850 65785 93616 95975 70753 88242 69995 19084 50283 99306 71224 23629 0976");
     TFNA(acosh, 1.321).expect("0.78123 02051 96252 61474 22171 61603 43488 77028 85612 70883 33986 53192 83139 13864 10921 83081 88302 58903 47353 53634 04169 89742 02815 2852");
     TFN(atanh).expect("0.33276 15884 81814 59580 17641 70508 75106 43974 10006 34850 01665 72697 61781 57932 14419 67812 59706 77324 50200 63307 05966 90651 74209 3097");
+    TFN(csch).expect("3.06240 10303 49690 40409 38414 32441 51821 03583 66319 22894 71159 79841 05023 64430 80969 11510 67493 94136 59374 51134 06622 25944 91181 09");
+    TFN(sech).expect("0.95060 24964 77585 05064 31436 00938 44913 04488 78932 92343 11073 41302 65388 00763 13709 78287 35180 93275 18426 22737 43213 20794 16602 057");
+    TFN(coth).expect("3.22153 69112 71830 42361 30765 28590 61266 91608 60889 18862 44610 61240 60070 35175 65187 31681 69006 32390 46599 95337 35241 30755 11645 613");
+    TFN(acsch).expect("1.85427 95935 24329 16696 24776 81215 37438 74278 04359 54539 76540 77062 54496 14641 45167 12078 92382 31841 53801 23461 43134 73826 12864 584");
+    TFNA(asech, 0.9).expect("0.46714 53081 03262 01812 83814 91665 92294 47009 19204 23633 27792 55399 67947 89933 05012 99864 75646 19824 24662 17709 50456 98526 15041 5052");
+    TFNA(acoth, 1.5).expect("0.80471 89562 17050 18730 03796 66613 09381 97628 00677 13425 88609 56323 94573 70894 93853 82888 23150 66939 04658 98053 99983 15151 08577 8145");
     TFN(ln1p).expect("0.27838 90255 40188 26677 16283 42111 55094 94375 15179 05132 39494 81036 05142 66257 54337 55520 43633 04277 35736 38433 06042 83576 22139 6359");
     TFN(lnp1).expect("0.27838 90255 40188 26677 16283 42111 55094 94375 15179 05132 39494 81036 05142 66257 54337 55520 43633 04277 35736 38433 06042 83576 22139 6359");
     TFN(expm1).expect("0.37850 55808 93753 89544 74307 07491 41233 20571 72641 03364 97968 05333 18108 98772 58256 72784 28319 13246 66682 04200 00162 72067 10690 0258");
@@ -4963,6 +4989,132 @@ void tests::sec_csc_cot()
         .test(CLEAR, "'X'", ENTER, ID_sec).expect("'sec X'");
     step("Restore angle units for later tests")
         .test("SetAngleUnits", ENTER).noerror();
+}
+
+
+void tests::hyperbolic_reciprocals()
+// ----------------------------------------------------------------------------
+//   Test hyperbolic reciprocal functions
+// ----------------------------------------------------------------------------
+{
+    BEGIN(hyprecip);
+
+    // Basic decimal tests
+    step("csch(0.321)")
+        .test(CLEAR, "0.321", ENTER, ID_csch)
+        .expect("3.06240 10303 5");
+
+    step("sech(0.321)")
+        .test(CLEAR, "0.321", ENTER, ID_sech)
+        .expect("0.95060 24964 78");
+
+    step("coth(0.321)")
+        .test(CLEAR, "0.321", ENTER, ID_coth)
+        .expect("3.22153 69112 7");
+
+    step("acsch(2.5)")
+        .test(CLEAR, "2.5", ENTER, ID_acsch)
+        .expect("0.39003 53197 71");
+
+    step("asech(0.5)")
+        .test(CLEAR, "0.5", ENTER, ID_asech)
+        .expect("1.31695 78969 2");
+
+    step("acoth(2.5)")
+        .test(CLEAR, "2.5", ENTER, ID_acoth)
+        .expect("0.42364 89301 94");
+
+    // Complex tests
+    step("csch(4+2ⅈ)")
+        .test(CLEAR, "4", ENTER, "2", ENTER, ID_RealToRectangular,
+              ID_HyperbolicMenu, ID_csch)
+        .expect("-0.01523 21948 44-0.03330 52908 07ⅈ");
+
+    step("sech(3+11ⅈ)")
+        .test(CLEAR, "3", ENTER, "11", ENTER, ID_RealToRectangular,
+              ID_HyperbolicMenu, ID_sech)
+        .expect("0.00044 39756 03+0.09982 05725 89ⅈ");
+
+    step("coth(1.5+0.5ⅈ)")
+        .test(CLEAR, "1.5", ENTER, "0.5", ENTER, ID_RealToRectangular,
+              ID_HyperbolicMenu, ID_coth)
+        .expect("1.05148 49080 4-0.08832 15300 14ⅈ");
+
+    // Inverse relationship tests
+    step("acsch(csch(1.234)) = 1.234")
+        .test(CLEAR, "1.234", ENTER, ID_csch, ID_acsch)
+        .expect("1.234");
+
+    step("csch(acsch(2.5)) = 2.5")
+        .test(CLEAR, "2.5", ENTER, ID_acsch, ID_csch)
+        .expect("2.5");
+
+    step("asech(sech(0.75)) = 0.75")
+        .test(CLEAR, "0.75", ENTER, ID_sech, ID_asech)
+        .expect("0.75");
+
+    step("sech(asech(0.5)) = 0.5")
+        .test(CLEAR, "0.5", ENTER, ID_asech, ID_sech)
+        .expect("0.5");
+
+    step("acoth(coth(1.5)) = 1.5")
+        .test(CLEAR, "1.5", ENTER, ID_coth, ID_acoth)
+        .expect("1.5");
+
+    step("coth(acoth(2)) = 2")
+        .test(CLEAR, "2", ENTER, ID_acoth, ID_coth)
+        .expect("2.");
+
+    // ISOL tests
+    step("ISOL csch(X)=3")
+        .test(CLEAR, "'csch(X)=3'", ENTER, "'X'", ENTER, ID_Isolate)
+        .expect("'X=csch⁻¹ 3+2·i1·π·ⅈ'");
+
+    step("ISOL sech(X)=0.5")
+        .test(CLEAR, "'sech(X)=0.5'", ENTER, "'X'", ENTER, ID_Isolate)
+        .expect("'X=sech⁻¹ 0.5+2·i1·π·ⅈ'");
+
+    step("ISOL coth(X)=2")
+        .test(CLEAR, "'coth(X)=2'", ENTER, "'X'", ENTER, ID_Isolate)
+        .expect("'X=coth⁻¹ 2+i1·π·ⅈ'");
+
+    // Derivative tests
+    step("d/dx csch(X)")
+        .test(CLEAR, "'csch(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(-1)·csch X·coth X'");
+
+    step("d/dx sech(X)")
+        .test(CLEAR, "'sech(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(-1)·sech X·tanh X'");
+
+    step("d/dx coth(X)")
+        .test(CLEAR, "'coth(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(-1)÷(sinh X)²'");
+
+    step("d/dx acsch(X)")
+        .test(CLEAR, "'acsch(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(-1)÷(abs X·√(X²+1))'");
+
+    step("d/dx asech(X)")
+        .test(CLEAR, "'asech(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(-1)÷(X·√(1-X²))'");
+
+    step("d/dx acoth(X)")
+        .test(CLEAR, "'acoth(X)'", ENTER, "'X'", ENTER, ID_Derivative)
+        .expect("'(1-X²)⁻¹'");
+
+    // Primitive tests
+    step("∫ csch(X) dX")
+        .test(CLEAR, "'csch(X)'", ENTER, "'X'", ENTER, ID_Primitive)
+        .expect("'ln (abs (tanh(X÷2)))'");
+
+    step("∫ sech(X) dX")
+        .test(CLEAR, "'sech(X)'", ENTER, "'X'", ENTER, ID_Primitive)
+        .expect("'tan⁻¹ (sinh X)'");
+
+    step("∫ coth(X) dX")
+        .test(CLEAR, "'coth(X)'", ENTER, "'X'", ENTER, ID_Primitive)
+        .expect("'ln (abs (sinh X))'");
 }
 
 
@@ -6179,6 +6331,12 @@ void tests::range_types()
     TFN(asinh).expect("0.88137 35870 2…1.81844 64592 3");
     TFNA(acosh, "1.321…1.325").expect("0.78123 02051 96…0.78584 80192 36");
     TFNA(atanh, "0.321…0.325").expect("0.33276 15884 82…0.33722 75237 74");
+    TFN(csch).expect("0.09982 15696 69…0.85091 81282 39");
+    TFN(sech).expect("0.64805 42736 64…0.09932 79274 19");
+    TFN(coth).expect("1.00496 98233 1…1.31303 52855");
+    TFN(acsch).expect("0.32745 01502 37…0.88137 35870 2");
+    TFNA(asech, "0.91…0.97").expect("0.24807 14216 19…0.44116 33162 86");
+    TFNA(acoth, "1.321…1.325").expect("0.98382 50678 46…0.98915 61415 72");
     TFN(ln1p).expect("0.69314 71805 6…1.38629 43611 2");
     TFN(lnp1).expect("0.69314 71805 6…1.38629 43611 2");
     TFN(expm1).expect("1.71828 18284 6…19.08553 69232");
@@ -6277,6 +6435,12 @@ void tests::range_types()
     TFN(asinh).expect("0.32553 85360 41±1.76917 40112 2");
     TFNA(acosh, "1.321±0.025").expect("0.78058 71062 93±0.02898 78937 9");
     TFNA(atanh, "0.321±0.025").expect("0.33301 11698 75±0.02788 14094 98");
+    TFNA(csch, "3±1").expect("0.15618 20675 49±0.11953 84972 23");
+    TFN(sech).expect("0.51830 94967 37±0.48169 05032 63");
+    TFNA(coth, "3±1").expect("1.01899 29355 6±0.01832 17851 63");
+    TFNA(acsch, "3±1").expect("0.36433 91433 03±0.11687 26817 56");
+    TFNA(asech, "0.91±0.033").expect("0.43479 35932 17±0.08882 80604 21");
+    TFNA(acoth, "1.321±0.025").expect("0.99064 81393 18±0.03363 40122 4");
     TFNA(ln1p, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
     TFNA(lnp1, "3±1").expect("1.35402 51005 5±0.25541 28118 83");
     TFN(expm1).expect("26.36674 26582±27.23140 7375");
@@ -6351,6 +6515,12 @@ void tests::range_types()
     TFN(asinh).expect("0.88121 44969 49±2.40735 92360 4%");
     TFNA(acosh, "1.321±0.025%").expect("0.78123 00931 78±0.04897 49317 72%");
     TFNA(atanh, "0.321±0.025%").expect("0.33276 15910 51±0.02688 68087 85%");
+    TFN(csch).expect("0.85185 63535 45±3.93792 45500 1%");
+    TFN(sech).expect("0.64810 08792 94±2.28409 72797 9%");
+    TFN(coth).expect("1.31389 17471 7±1.65531 61613 5%");
+    TFN(acsch).expect("0.88185 11079 5±2.40670 44543 6%");
+    TFNA(asech, "0.91±0.033%").expect("0.44116 28149 58±0.18041 70714 04%");
+    TFNA(acoth, "1.321±0.025%").expect("0.98915 64011 27±0.04481 23650 32%");
     TFN(ln1p).expect("0.69303 46679 02±2.16455 62403 6%");
     TFN(lnp1).expect("0.69303 46679 02±2.16455 62403 6%");
     TFN(expm1).expect("1.71950 51470 3±4.74326 51081 9%");
@@ -6512,6 +6682,12 @@ void tests::uncertain_operations()
     TFN(asinh).expect("0.88137 35870 2±σ2.12132 03435 6");
     TFNA(acosh, "1.321±σ1.325").expect("0.78123 02051 96±σ1.53506 15435");
     TFNA(atanh, "0.321±σ0.325").expect("0.33276 15884 82±σ0.36233 54021 76");
+    TFN(csch).expect("0.85091 81282 39±σ3.35185 65823 5");
+    TFN(sech).expect("0.64805 42736 64±σ1.48066 30426 9");
+    TFN(coth).expect("1.31303 52855±σ2.17218 49829");
+    TFN(acsch).expect("0.88137 35870 2±σ2.12132 03435 6");
+    TFNA(asech, "0.91±σ0.033").expect("0.44116 33162 86±σ0.08746 50621 78");
+    TFNA(acoth, "1.321±σ0.025").expect("0.98915 61415 72±σ0.03355 52003 18");
     TFN(ln1p).expect("0.69314 71805 6±σ1.5");
     TFN(lnp1).expect("0.69314 71805 6±σ1.5");
     TFN(expm1).expect("1.71828 18284 6±σ8.15484 54853 8");
@@ -9594,7 +9770,6 @@ void tests::symbolic_operations()
     step("Isolate atanh")
         .test(CLEAR, "'A=atanh X' X", NOSHIFT, F3)
         .expect("'X=tanh A'");
-#if 0
     step("Isolate sech")
         .test(CLEAR, "'sech X=A' X", NOSHIFT, F3)
         .expect("'X=sech⁻¹ A+2·i1·π·ⅈ'");
@@ -9613,7 +9788,6 @@ void tests::symbolic_operations()
     step("Isolate acoth")
         .test(CLEAR, "'A=acoth X' X", NOSHIFT, F3)
         .expect("'X=coth A'");
-#endif
     step("Isolate log")
         .test(CLEAR, "'A=ln X' X", NOSHIFT, F3)
         .expect("'X=exp A'");
@@ -14980,6 +15154,13 @@ void tests::plotting_all_functions()
     FUNCTION(asinh);
     FUNCTION(acosh);
     FUNCTION(atanh);
+
+    FUNCTION(sech);
+    FUNCTION(csch);
+    FUNCTION(coth);
+    FUNCTION(asech);
+    FUNCTION(accsh);
+    FUNCTION(acoth);
 
     FUNCTION(ln1p);
     FUNCTION(expm1);

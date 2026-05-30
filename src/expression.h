@@ -472,6 +472,12 @@ struct eq
     EQ_FUNCTION(asinh);
     EQ_FUNCTION(acosh);
     EQ_FUNCTION(atanh);
+    EQ_FUNCTION(csch);
+    EQ_FUNCTION(sech);
+    EQ_FUNCTION(coth);
+    EQ_FUNCTION(acsch);
+    EQ_FUNCTION(asech);
+    EQ_FUNCTION(acoth);
 
     EQ_FUNCTION(ln1p);
     EQ_FUNCTION(expm1);
@@ -680,6 +686,12 @@ EQ_FUNCTION(tanh);
 EQ_FUNCTION(asinh);
 EQ_FUNCTION(acosh);
 EQ_FUNCTION(atanh);
+EQ_FUNCTION(csch);
+EQ_FUNCTION(sech);
+EQ_FUNCTION(coth);
+EQ_FUNCTION(acsch);
+EQ_FUNCTION(asech);
+EQ_FUNCTION(acoth);
 
 EQ_FUNCTION(ln1p);
 EQ_FUNCTION(expm1);

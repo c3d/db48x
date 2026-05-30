@@ -140,6 +140,12 @@ public:
     COMPLEX_FUNCTION(asinh);
     COMPLEX_FUNCTION(acosh);
     COMPLEX_FUNCTION(atanh);
+    COMPLEX_FUNCTION(csch);
+    COMPLEX_FUNCTION(sech);
+    COMPLEX_FUNCTION(coth);
+    COMPLEX_FUNCTION(acsch);
+    COMPLEX_FUNCTION(asech);
+    COMPLEX_FUNCTION(acoth);
 
     COMPLEX_FUNCTION(ln1p);
     COMPLEX_FUNCTION(expm1);

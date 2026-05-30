@@ -86,6 +86,7 @@ struct tests
     void exact_trig_cases();
     void trig_units();
     void sec_csc_cot();
+    void hyperbolic_reciprocals();
     void fraction_decimal_conversions();
     void cfraction();
     void rounding_and_truncating();
