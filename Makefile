@@ -439,12 +439,11 @@ $(CHUCK_GIT_H):
 
 IMAGES=$(COLOR:%=color-)images
 cmp-% compare-%:
-	compare $(IMAGES)/$*.png $(IMAGES)/bad/$*.png -compose src $*.png || true
-	open $*.png $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
-	echo mv -f $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
+	$(PRINT_COMMAND) compare $(IMAGES)/$*.png $(IMAGES)/bad/$*.png -compose src $*.png || true
+	$(PRINT_COMMAND) open $*.png $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
 update-%:
-	mv $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
-	rm -f $*.png
+	$(PRINT_COMMAND) mv $(IMAGES)/bad/$*.png $(IMAGES)/$*.png
+	$(PRINT_COMMAND) rm -f $*.png
 updates-%:
 	$(MAKE) update-$* color-update-$*
 cmps-% compares-%:
