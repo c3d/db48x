@@ -13719,7 +13719,7 @@ void tests::polynomial_roots()
         .want("{ 2 -3 }");
     step("Zeros: multivariate rejected")
         .test(CLEAR, "'X*Y' 'X' Zeros", ENTER)
-        .error("Expression is not a polynomial");
+        .error("Invalid polynomial");
 }
 
 
