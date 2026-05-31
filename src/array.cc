@@ -2168,7 +2168,7 @@ COMMAND_BODY(ToArray)
     {
         if (polynomial_p poly = obj->as<polynomial>())
         {
-            if (object_p coeffs = polynomial::coefficients(poly, true))
+            if (object_p coeffs = poly->coefficients(true))
                 if (rt.top(coeffs))
                     return OK;
             return ERROR;
