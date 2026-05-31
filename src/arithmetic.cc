@@ -1726,11 +1726,14 @@ algebraic_p arithmetic::evaluate(id          op,
                 xp = polynomial::make(x);
             if (xp)
             {
-                if (!yp && op == ID_pow)
-                    if (integer_g yi = y->as<integer>())
-                        return polynomial::pow(xp, yi);
                 if (!yp)
-                    yp = polynomial::make(y);
+                {
+                    if (op == ID_pow)
+                        if (integer_g yi = y->as<integer>())
+                            return polynomial::pow(xp, yi);
+                    if (op == ID_add || op == ID_subtract || op == ID_multiply)
+                        yp = polynomial::make(y);
+                }
                 if (yp)
                 {
                     switch(op)

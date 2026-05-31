@@ -854,9 +854,11 @@ bool polynomial::quorem(polynomial_r  x,
         }
         q = add(q, rpoly);
         rpoly = mul(rpoly, y);
-        r = sub(r, rpoly);
+        r     = sub(r, rpoly);
         if (!r)
             return false;
+        if (r->is_zero(false))
+            break;
 
         // Restart with rest
         rvar = r->variable(+var);
@@ -1077,11 +1079,13 @@ polynomial::iterator polynomial::ranking(size_t var) const
 // ----------------------------------------------------------------------------
 {
     size_t vars    = variables();
+    if (!vars)
+        return begin();
     ularge maxexp  = 0;
     iterator where = end();
     for (auto term : *this)
     {
-        iterator here = term;
+        iterator here = term;   // Using term.exponent() below moves term
         algebraic_g factor = term.factor();
         if (!factor->is_zero(false))
         {
@@ -1610,7 +1614,7 @@ ularge polynomial::iterator::rank(size_t var) const
 //   Return the rank associated with a variable
 // ----------------------------------------------------------------------------
 {
-    ularge      maxexp = 0;
+    ularge maxexp = 0;
     if (offset < size)
     {
         iterator    it     = *this;

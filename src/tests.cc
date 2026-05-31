@@ -13613,6 +13613,20 @@ void tests::polynomials()
         .test(CLEAR, "'X^999999999999'", ENTER, ID_ToolsMenu, F4)
         .expect("ⓅX↑999999999999");
 
+    step("Polynomial divided by constant")
+        .test(CLEAR, "'X^3-5'", ENTER, ID_PolynomialsMenu, ID_ToPolynomial)
+        .expect("ⓅX↑3-5")
+        .test("3", ID_divide)
+        .expect("'(X·X²+-5)÷3'");
+    step("Polynomial divided by constant polynomial")
+        .test(CLEAR, "'X^3-5'", ENTER, ID_PolynomialsMenu, ID_ToPolynomial)
+        .expect("ⓅX↑3-5")
+        .test("3", ID_ToPolynomial)
+        .expect("Ⓟ3")
+        .test(ID_divide)
+        .expect("Ⓟ¹/₃·X↑3-1 ²/₃");
+
+
     step("Restore default rendering for polynomials")
         .test(CLEAR, "'PrefixPolynomialRender' purge", ENTER)
         .noerror();
