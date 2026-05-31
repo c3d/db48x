@@ -1784,12 +1784,7 @@ polynomial_p polynomial::from_coefficients(object_p coeffs, bool error)
         return nullptr;
     }
 
-    size_t n = 0;
-    for (object_p item : *list)
-    {
-        (void) item;
-        n++;
-    }
+    size_t n = list->items();
     if (!n || n > Settings.MaxPolynomialDegree())
     {
         if (error)
@@ -1987,12 +1982,7 @@ static bool poly_push_coeff(object_r obj, size_t &n, size_t &above,
         return false;
     }
 
-    n = 0;
-    for (object_p item : *lst)
-    {
-        (void) item;
-        n++;
-    }
+    n = lst->items();
     if (!n || n > Settings.MaxPolynomialDegree())
     {
         rt.dimension_error();
