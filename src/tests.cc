@@ -13685,8 +13685,11 @@ void tests::polynomial_roots()
         .test(CLEAR, "[ 1 2 1 ] 'A' PEval", ENTER)
         .expect("'(A+2)·A+1'");
     step("PEval: symbolic A with expression")
-        .test(CLEAR, "'A^2+2*A+1' 'A' PEval", ENTER)
+        .test(CLEAR, "'X^2+2*X+1' 'A' PEval", ENTER)
         .expect("'(A+2)·A+1'");
+    step("PEval: symbolic A with expression not using X")
+        .test(CLEAR, "'A^2+2*A+1' 'A' PEval", ENTER)
+        .error("Invalid polynomial");
     step("PEval: symbolic A with polynomial")
         .test(CLEAR, "'A^2+2*A+1' ToPolynomial 'A' PEval", ENTER)
         .expect("'(A+2)·A+1'");

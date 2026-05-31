@@ -83,6 +83,9 @@ struct polynomial : expression
     static polynomial_p make(algebraic_r factor, symbol_r sym, ularge exp);
     static polynomial_p from_coefficients(object_p coeffs, bool error = false);
     array_p             coefficients(bool error = false) const;
+    size_t              expand(bool error = false) const;
+    size_t              expand(stack_buffer &sbuf, bool error = false) const;
+    static polynomial_p get(object_p obj);
 
     // Write in the scratchpad a combination of the variables of two polynoms
     static byte *copy_variables(polynomial_r x, byte *previous = nullptr);

@@ -41,6 +41,7 @@
 #include "fraction.h"
 #include "list.h"
 #include "parser.h"
+#include "runtime.h"
 #include "settings.h"
 #include "functions.h"
 #include "unit.h"
@@ -981,7 +982,7 @@ size_t polynomial::variable(utf8 name, size_t len) const
         if (size_t(p - first) >= length)
             break;
     }
-    return ~0U;
+    return ~0UL;
 }
 
 
@@ -1378,13 +1379,7 @@ FUNCTION_BODY(ToPolynomial)
 //   Convert array/list/expression to a polynomial object
 // ----------------------------------------------------------------------------
 {
-    if (!x)
-        return nullptr;
-    if (polynomial_p poly = x->as<polynomial>())
-        return poly;
-    if (polynomial_p poly = polynomial::from_coefficients(object_p(+x), false))
-        return poly;
-    if (polynomial_p poly = polynomial::make(x))
+    if (polynomial_p poly = polynomial::get(+x))
         return poly;
     if (!rt.error())
         rt.invalid_polynomial_error();
@@ -1802,20 +1797,49 @@ polynomial_p polynomial::from_coefficients(object_p coeffs, bool error)
 }
 
 
-array_p polynomial::coefficients(bool error) const
+polynomial_p polynomial::get(object_p obj)
 // ----------------------------------------------------------------------------
-//   Convert a univariate polynomial to coefficient array
+//   Turn an object into a polynomial
 // ----------------------------------------------------------------------------
 {
-    if (variables() > 1)
+    if (!obj)
+        return nullptr;
+    obj = object::strip(obj);
+    if (polynomial_p poly = obj->as<polynomial>())
+        return poly;
+    if (polynomial_p poly = polynomial::from_coefficients(obj, false))
+        return poly;
+    if (algebraic_p alg = obj->as_algebraic())
+        if (polynomial_p poly = polynomial::make(alg))
+            return poly;
+    return nullptr;
+}
+
+
+size_t polynomial::expand(bool error) const
+// ----------------------------------------------------------------------------
+//   Expand polynomial coefficients on the stack
+// ----------------------------------------------------------------------------
+{
+    stack_buffer sbuf;
+    size_t       result = expand(sbuf, error);
+    sbuf.keep();                // Do not erase the stack
+    return result;
+}
+
+
+size_t polynomial::expand(stack_buffer &sbuf, bool error) const
+// ----------------------------------------------------------------------------
+//   Expand polynomial coefficients in a given stack buffer
+// ----------------------------------------------------------------------------
+{
+    size_t var = variable(main_variable());
+    if (variables() > 1 || !~var)
     {
         rt.invalid_polynomial_error();
-        return nullptr;
+        return 0;
     }
 
-    cleaner      purge;
-    size_t       var = variable(main_variable());
-    stack_buffer sbuf;
     algebraic_g  factor, existing;
     for (iterator it : *this)
     {
@@ -1825,7 +1849,7 @@ array_p polynomial::coefficients(bool error) const
             if (exp > Settings.MaxPolynomialDegree())
             {
                 rt.dimension_error();
-                return nullptr;
+                return 0;
             }
             sbuf.grow(exp + 1 - sbuf.items());
         }
@@ -1835,20 +1859,98 @@ array_p polynomial::coefficients(bool error) const
         if (!existing)
         {
             rt.type_error();
-            return nullptr;
+            return 0;
         }
         factor = existing + factor;
         sbuf[exp] = +factor;
     }
+    return sbuf.items();
+}
 
-    scribble scr;
-    size_t   i = sbuf.items();
-    while (i-- > 0)
-        if (!rt.append(sbuf[i]))
+
+array_p polynomial::coefficients(bool error) const
+// ----------------------------------------------------------------------------
+//   Convert a univariate polynomial to coefficient array
+// ----------------------------------------------------------------------------
+{
+    cleaner      purge;
+    scribble     scr;
+    stack_buffer sbuf;
+    size_t       n = expand(sbuf, error);
+    if (rt.error())
+        return nullptr;
+    while (n-- > 0)
+        if (!rt.append(sbuf[n]))
             return nullptr;
     array_g result = array_p(list::make(ID_array, scr.scratch(), scr.growth()));
-    result         = purge(result);
+    result = purge(result);
     return result;
+}
+
+
+
+// ============================================================================
+//
+//   Polynomial evaluation (Horner's method)
+//
+// ============================================================================
+
+static algebraic_p horner(size_t n, algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Horner evaluation from coefficients on the stack
+// ----------------------------------------------------------------------------
+{
+    algebraic_g result, c;
+    for (size_t i = 0; i < n; i++)
+    {
+        object_p o = rt.stack(n + ~i);
+        c = o->as_algebraic();
+        if (!c)
+            return nullptr;
+        result = result ? result * x + c : c;
+        if (!result)
+            return nullptr;
+    }
+    return result;
+}
+
+
+COMMAND_BODY(PEval)
+// ----------------------------------------------------------------------------
+//   Evaluate a polynomial at a point
+// ----------------------------------------------------------------------------
+{
+    if (object_p xobj = rt.stack(0))
+    {
+        algebraic_p x = xobj->as_algebraic();
+        if (!x)
+        {
+            rt.type_error();
+            return ERROR;
+        }
+
+        if (object_p pobj = rt.stack(1))
+        {
+            size_t depth = rt.depth();
+            size_t n     = 0;
+            if (list_p lst = pobj->as_array_or_list())
+            {
+                if (!lst->expand_without_size(&n))
+                    return ERROR;
+            }
+            else if (polynomial_p poly = polynomial::get(pobj))
+            {
+                n = poly->expand(true);
+                if (rt.error())
+                    return ERROR;
+            }
+            algebraic_p result = horner(n, x);
+            rt.drop(rt.depth() - depth);
+            if (result && rt.drop() && rt.top(result))
+                return OK;
+        }
+    }
+    return ERROR;
 }
 
 
@@ -1941,26 +2043,6 @@ static bool poly_push_coeff(object_r obj, size_t &n, size_t &above,
 err:
     rt.drop(rt.depth() - depth);
     return false;
-}
-
-
-static algebraic_p horner(size_t n, size_t skip, algebraic_r x)
-// ----------------------------------------------------------------------------
-//   Horner evaluation from coefficients on the stack
-// ----------------------------------------------------------------------------
-{
-    algebraic_g result, c;
-    for (size_t i = 0; i < n; i++)
-    {
-        object_p    o = rt.stack(skip + n + ~i);
-        c = o->as_algebraic();
-        if (!c)
-            return nullptr;
-        result = result ? result * x + c : c;
-        if (!result)
-            return nullptr;
-    }
-    return result;
 }
 
 
@@ -2593,35 +2675,6 @@ static bool poly_proot_numeric(size_t n, size_t &nroots)
     if (!rt.drop_at(nroots, n))
         return false;
     return poly_buf_proot(p, nroots);
-}
-
-
-COMMAND_BODY(PEval)
-// ----------------------------------------------------------------------------
-//   Evaluate a polynomial at a point
-// ----------------------------------------------------------------------------
-{
-    if (object_p xobj = rt.pop())
-        if (object_p coeffobj = rt.pop())
-        {
-            algebraic_p x = xobj->as_algebraic();
-            if (!x)
-            {
-                rt.type_error();
-                return ERROR;
-            }
-
-            size_t saved = rt.depth();
-            size_t n     = 0;
-            size_t above = 0;
-            if (!poly_push_coeff(coeffobj, n, above, false))
-                return ERROR;
-            algebraic_p result = horner(n, above, x);
-            rt.drop(rt.depth() - saved);
-            if (result && rt.push(result))
-                return OK;
-        }
-    return ERROR;
 }
 
 
