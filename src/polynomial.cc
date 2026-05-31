@@ -1823,7 +1823,8 @@ size_t polynomial::expand(bool error) const
 {
     stack_buffer sbuf;
     size_t       result = expand(sbuf, error);
-    sbuf.keep();                // Do not erase the stack
+    if (result)
+        sbuf.keep();                // Do not erase the stack
     return result;
 }
 
@@ -1836,7 +1837,8 @@ size_t polynomial::expand(stack_buffer &sbuf, bool error) const
     size_t var = variable(main_variable());
     if (variables() > 1 || !~var)
     {
-        rt.invalid_polynomial_error();
+        if (error)
+            rt.invalid_polynomial_error();
         return 0;
     }
 
@@ -1848,7 +1850,8 @@ size_t polynomial::expand(stack_buffer &sbuf, bool error) const
         {
             if (exp > Settings.MaxPolynomialDegree())
             {
-                rt.dimension_error();
+                if (error)
+                    rt.dimension_error();
                 return 0;
             }
             sbuf.grow(exp + 1 - sbuf.items());
@@ -1858,13 +1861,30 @@ size_t polynomial::expand(stack_buffer &sbuf, bool error) const
         existing = obj ? obj->as_algebraic() : nullptr;
         if (!existing)
         {
-            rt.type_error();
+            if (error)
+                rt.type_error();
             return 0;
         }
         factor = existing + factor;
         sbuf[exp] = +factor;
     }
     return sbuf.items();
+}
+
+
+size_t polynomial::expand(object_p pobj, bool error)
+// ----------------------------------------------------------------------------
+//   Expand a polynomial-convertible object (array, equation or polynomial)
+// ----------------------------------------------------------------------------
+{
+    size_t sz = 0;
+    if (list_p lst = pobj->as_array_or_list())
+        lst->expand_without_size(&sz);
+    else if (polynomial_p poly = polynomial::get(pobj))
+        sz = poly->expand(true);
+    else if (error)
+        rt.type_error();
+    return sz;
 }
 
 
@@ -1931,20 +1951,11 @@ COMMAND_BODY(PEval)
 
         if (object_p pobj = rt.stack(1))
         {
-            size_t depth = rt.depth();
-            size_t n     = 0;
-            if (list_p lst = pobj->as_array_or_list())
-            {
-                if (!lst->expand_without_size(&n))
-                    return ERROR;
-            }
-            else if (polynomial_p poly = polynomial::get(pobj))
-            {
-                n = poly->expand(true);
-                if (rt.error())
-                    return ERROR;
-            }
-            algebraic_p result = horner(n, x);
+            size_t      depth  = rt.depth();
+            size_t      degree = polynomial::expand(pobj, true);
+            if (rt.error())
+                return ERROR;
+            algebraic_p result = horner(degree, x);
             rt.drop(rt.depth() - depth);
             if (result && rt.drop() && rt.top(result))
                 return OK;
@@ -1970,79 +1981,6 @@ static inline size_t poly_slot(size_t n, size_t above, size_t i)
 // ----------------------------------------------------------------------------
 {
     return above + n + ~i;
-}
-
-
-static object_p poly_coeff(size_t n, size_t above, size_t i)
-// ----------------------------------------------------------------------------
-//   Fetch one coefficient from the stack segment
-// ----------------------------------------------------------------------------
-{
-    return rt.stack(poly_slot(n, above, i));
-}
-
-
-static bool poly_push_coeff(object_r obj, size_t &n, size_t &above,
-                            bool numeric_only)
-// ----------------------------------------------------------------------------
-//   Push validated coefficients onto the stack
-// ----------------------------------------------------------------------------
-{
-    size_t depth = rt.depth();
-    object_g coeffs = object::strip(obj);
-    list_p   lst    = obj->as_array_or_list();
-    if (!lst)
-    {
-        if (expression_p expr = coeffs->as<expression>())
-            if (polynomial_p poly = polynomial::make(expr))
-                coeffs = poly;
-        if (polynomial_p poly = coeffs->as<polynomial>())
-        {
-            coeffs = poly->coefficients(true);
-            if (!coeffs)
-                return false;
-            lst = coeffs->as_array_or_list();
-        }
-    }
-    if (!lst)
-    {
-        rt.type_error();
-        return false;
-    }
-
-    n = lst->items();
-    if (!n || n > Settings.MaxPolynomialDegree())
-    {
-        rt.dimension_error();
-        return false;
-    }
-
-    for (object_p o : *lst)
-    {
-        o = object::strip(o);
-        if (numeric_only)
-        {
-            if (!o->is_real() && !o->is_complex())
-            {
-                rt.type_error();
-                goto err;
-            }
-        }
-        else if (!o->is_algebraic())
-        {
-            rt.type_error();
-            goto err;
-        }
-        if (!rt.push(o))
-            goto err;
-    }
-
-    above = 0;
-    return true;
-
-err:
-    rt.drop(rt.depth() - depth);
-    return false;
 }
 
 
@@ -2574,95 +2512,6 @@ static bool poly_buf_proot(poly_buf &p, size_t &nroots)
     return nroots > 0;
 }
 
-static bool poly_pcoef_from_roots(size_t nroots)
-// ----------------------------------------------------------------------------
-//   Expand ∏(x−rᵢ) into monic coefficients on the stack
-// ----------------------------------------------------------------------------
-{
-    size_t max = Settings.MaxPolynomialDegree() + 1;
-    if (nroots > max)
-    {
-        rt.dimension_error();
-        return false;
-    }
-
-    size_t    depth = rt.depth();
-    algebraic_g one = integer::make(1);
-    if (!rt.push(+one))
-        return false;
-    size_t m = 1;
-
-    for (size_t r = 0; r < nroots; r++)
-    {
-        object_p  ro = rt.stack(m + r);
-        complex_g root = complex::from_algebraic(ro->as_algebraic());
-        if (!root)
-            goto pcoef_err;
-        complex_g nr = -root;
-        if (!nr)
-            goto pcoef_err;
-
-        complex_g saved[128];
-        if (m > 128)
-        {
-            rt.dimension_error();
-            goto pcoef_err;
-        }
-        for (size_t i = 0; i < m; i++)
-        {
-            object_p oi = poly_coeff(m, 0, i);
-            saved[i] = complex::from_algebraic(oi->as_algebraic());
-            if (!saved[i])
-                goto pcoef_err;
-        }
-
-        size_t nm = m + 1;
-        for (size_t i = 0; i < nm; i++)
-        {
-            complex_g val;
-            if (!i)
-                val = nr * saved[0];
-            else if (i < m)
-                val = saved[i - 1] - root * saved[i];
-            else
-                val = saved[m - 1];
-            if (!val)
-                goto pcoef_err;
-            algebraic_g a = val->as_rounded_result();
-            if (!a || !rt.push(+a))
-                goto pcoef_err;
-        }
-        if (!rt.drop_at(nm, m))
-            goto pcoef_err;
-        m = nm;
-    }
-
-    {
-        object_p tail = rt.stack(0);
-        algebraic_p ta = tail ? tail->as_algebraic() : nullptr;
-        if (ta && ta->is_one(false))
-        {
-            for (size_t i = 0; i < m / 2; i++)
-            {
-                if (!rt.swap(i, m + ~i))
-                    goto pcoef_err;
-            }
-        }
-    }
-    for (size_t i = 0; i < nroots; i++)
-    {
-        if (!rt.roll(m + 1))
-            goto pcoef_err;
-        if (!rt.drop())
-            goto pcoef_err;
-    }
-    return true;
-
-pcoef_err:
-    rt.drop(rt.depth() - depth);
-    return false;
-}
-
 
 static bool poly_proot_numeric(size_t n, size_t &nroots)
 // ----------------------------------------------------------------------------
@@ -2683,17 +2532,16 @@ COMMAND_BODY(PRoot)
 //   All roots of a polynomial from coefficient vector
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.pop())
+    if (object_p pobj = rt.top())
     {
-        size_t saved = rt.depth();
-        size_t n     = 0;
-        size_t above = 0;
-        if (!poly_push_coeff(obj, n, above, true))
+        size_t depth  = rt.depth();
+        size_t degree = polynomial::expand(pobj, true);
+        if (rt.error())
             return ERROR;
         size_t nroots = 0;
-        if (!poly_proot_numeric(n, nroots))
+        if (!poly_proot_numeric(degree, nroots))
         {
-            rt.drop(rt.depth() - saved);
+            rt.drop(rt.depth() - depth);
             if (!rt.error())
                 rt.no_solution_error();
             return ERROR;
@@ -2702,7 +2550,7 @@ COMMAND_BODY(PRoot)
         array_p result = poly_build_array(nroots, true, true);
         if (result && rt.push(result))
             return OK;
-        rt.drop(rt.depth() - saved);
+        rt.drop(rt.depth() - depth);
     }
     return ERROR;
 }
@@ -2713,35 +2561,37 @@ COMMAND_BODY(PCoef)
 //   Monic polynomial coefficients from roots
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.pop())
+    if (object_p obj = rt.top())
     {
-        size_t saved = rt.depth();
-        size_t nroots = 0;
-        size_t above  = 0;
-        if (!poly_push_coeff(obj, nroots, above, true))
-            return ERROR;
-        if (!poly_pcoef_from_roots(nroots))
+        list_p roots = obj->as_array_or_list();
+        if (!roots)
         {
-            rt.drop(rt.depth() - saved);
+            rt.type_error();
             return ERROR;
         }
-        size_t  ncoeffs = rt.depth() - saved;
-        array_p coeffs  = poly_build_array(ncoeffs, false, false);
-        if (coeffs)
+        polynomial_g var  = polynomial::make(polynomial::main_variable());
+        polynomial_g poly = nullptr;
+        polynomial_g term = nullptr;
+        for (object_p root : *roots)
         {
-            if (Settings.NewStylePolynomials())
+            algebraic_p r = root->as_algebraic();
+            if (!r)
             {
-                if (polynomial_p poly = polynomial::from_coefficients(coeffs, true))
-                    if (rt.push(poly))
-                        return OK;
+                rt.invalid_polynomial_error();
+                return ERROR;
             }
-            else
-            {
-                if (rt.push(coeffs))
-                    return OK;
-            }
+            term = polynomial::make(algebraic_p(r));
+            term = polynomial::sub(var, term);
+            poly = poly ? polynomial::mul(poly, term) : +term;
+            if (!poly)
+                return ERROR;
         }
-        rt.drop(rt.depth() - saved);
+
+        algebraic_p result = +poly;
+        if (Settings.CompatiblePolynomials())
+            result = poly->coefficients();
+        if (result && rt.top(result))
+            return OK;
     }
     return ERROR;
 }
@@ -2753,6 +2603,7 @@ COMMAND_BODY(Zeros)
 // ----------------------------------------------------------------------------
 {
     if (object_p varobj = rt.stack(0))
+    {
         if (object_p expr = rt.stack(1))
         {
             symbol_p var = varobj->as_quoted<symbol>();
@@ -2805,5 +2656,6 @@ COMMAND_BODY(Zeros)
                 return OK;
             rt.drop(rt.depth() - saved);
         }
+    }
     return ERROR;
 }

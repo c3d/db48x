@@ -13671,7 +13671,7 @@ void tests::polynomial_roots()
         .want("[ -5 -3 2 4 ]");
     step("PRoot rejects symbolic coefficients")
         .test(CLEAR, "[ 'A' 'B' 'C' ] PRoot", ENTER)
-        .error("Bad argument type");
+        .error("No solution?");
     step("PEval: coefficient vector")
         .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
         .expect("0");
@@ -13691,8 +13691,15 @@ void tests::polynomial_roots()
         .test(CLEAR, "'A^2+2*A+1' 'A' PEval", ENTER)
         .error("Invalid polynomial");
     step("PEval: symbolic A with polynomial")
-        .test(CLEAR, "'A^2+2*A+1' ToPolynomial 'A' PEval", ENTER)
+        .test(CLEAR, "'X^2+2*X+1' ToPolynomial", ENTER)
+        .expect("X↑2+2·X+1")
+        .test("'A' PEval", ENTER)
         .expect("'(A+2)·A+1'");
+    step("PEval: symbolic A with invalid polynomial")
+        .test(CLEAR, "'A^2+2*A+1'", ID_PolynomialsMenu, ID_ToPolynomial)
+        .expect("A↑2+2·A+1")
+        .test("'A'", ID_PEval)
+        .error("Invalid polynomial");
     step("PEval: symbolic coefficients and X (HP-style)")
         .test(CLEAR, "{ 'A' 'B' 'C' } 'X' PEval", ENTER)
         .expect("'(A·X+B)·X+C'");

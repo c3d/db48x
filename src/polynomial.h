@@ -85,6 +85,7 @@ struct polynomial : expression
     array_p             coefficients(bool error = false) const;
     size_t              expand(bool error = false) const;
     size_t              expand(stack_buffer &sbuf, bool error = false) const;
+    static size_t       expand(object_p obj, bool error = false);
     static polynomial_p get(object_p obj);
 
     // Write in the scratchpad a combination of the variables of two polynoms
