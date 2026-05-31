@@ -9992,8 +9992,12 @@ void tests::symbolic_differentiation()
         .error("Unknown derivative");
 
     step("Derivative of function with angle (#1491)")
-        .test(CLEAR, ("'sin((0.5_r/s)·x)' 'x' ∂"), ENTER)
+        .test(CLEAR, "'sin((0.5_r/s)·x)' 'x' ∂", ENTER)
         .expect("'0.5 r/s·cos(0.5 r/s·x)'");
+
+    step("Derivative of polynomial")
+        .test(CLEAR, "Ⓟ'2·X+3·A·X↑4-32' X", ID_IntegrationMenu, ID_Derivative)
+        .expect("2+12·A·X↑3");
 }
 
 

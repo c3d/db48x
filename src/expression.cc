@@ -4214,6 +4214,13 @@ COMMAND_BODY(Derivative)
 //   Compute the derivative of an expression
 // ----------------------------------------------------------------------------
 {
+    if (object_p pobj = rt.stack(1))
+        if (polynomial_p poly = pobj->as<polynomial>())
+            if (object_p xobj = rt.stack(0))
+                if (symbol_p sym = xobj->as_quoted<symbol>())
+                    if (polynomial_p der = poly->derivative(sym))
+                        if (rt.drop() && rt.top(der))
+                            return OK;
     return expression::variable_command(&expression::derivative);
 }
 

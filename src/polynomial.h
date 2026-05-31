@@ -103,6 +103,9 @@ struct polynomial : expression
                                polynomial_g &q, polynomial_g &r);
     static polynomial_p pow(polynomial_r x, integer_r y);
     static polynomial_p pow(polynomial_r x, ularge y);
+    polynomial_p        derivative() const;
+    polynomial_p        derivative(size_t vidx) const;
+    polynomial_p        derivative(symbol_p vname) const;
 
     // Return total length of the polynomial in bytes
     size_t length() const

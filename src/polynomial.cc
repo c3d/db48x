@@ -1908,6 +1908,79 @@ array_p polynomial::coefficients(bool error) const
 }
 
 
+polynomial_p polynomial::derivative() const
+// ----------------------------------------------------------------------------
+//   Return derivative in the default variable
+// ----------------------------------------------------------------------------
+{
+    return derivative(main_variable());
+}
+
+
+polynomial_p polynomial::derivative(symbol_p sym) const
+// ----------------------------------------------------------------------------
+//   Return derivative in the default variable
+// ----------------------------------------------------------------------------
+{
+    return derivative(variable(sym));
+}
+
+
+polynomial_p polynomial::derivative(size_t var) const
+// ----------------------------------------------------------------------------
+//   Return derivative in the given variable
+// ----------------------------------------------------------------------------
+{
+    scribble     scr;
+    polynomial_g x        = this;
+    gcbytes      polycopy = copy_variables(x);
+    size_t       nvars    = x->variables();
+    for (iterator term : *x)
+    {
+        algebraic_g factor = term.factor();
+        iterator    it     = term;
+        bool        skip   = false;
+        for (size_t v = 0; v < nvars; v++)
+        {
+            ularge exponent = it.exponent();
+            if (v == var)
+            {
+                if (exponent > 0)
+                    factor = factor * integer::make(exponent);
+                else
+                    skip = true;
+            }
+        }
+        if (skip)
+        {
+            for (size_t v = 0; v < nvars; v++)
+                term.exponent();
+        }
+        else
+        {
+            size_t sz = factor->size();
+            byte  *np = rt.allocate(sz);
+            if (!np)
+                return nullptr;
+            memcpy(np, +factor, sz);
+            for (size_t v = 0; v < nvars; v++)
+            {
+                ularge exponent = term.exponent();
+                if (v == var && exponent > 0)
+                    exponent--;
+                byte *ep = rt.allocate(leb128size(exponent));
+                if (!ep)
+                    return nullptr;
+                leb128(ep, exponent);
+            }
+        }
+    }
+    gcbytes data   = scr.scratch();
+    size_t  datasz = scr.growth();
+    return rt.make<polynomial>(data, datasz);
+}
+
+
 
 // ============================================================================
 //
