@@ -1025,6 +1025,18 @@ ularge polynomial::order(size_t *var) const
 }
 
 
+bool polynomial::is_zero(bool error) const
+// ----------------------------------------------------------------------------
+//   Return true if the polynomial is zero
+// ----------------------------------------------------------------------------
+{
+    iterator first = begin();
+    if (first == end())
+        return true;
+    return false;
+}
+
+
 polynomial::iterator polynomial::ranking(size_t *var) const
 // ----------------------------------------------------------------------------
 //   Locate the highest-ranking term in the polynomial

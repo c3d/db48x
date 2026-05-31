@@ -113,6 +113,7 @@ struct polynomial : expression
     size_t   variable(utf8 name, size_t len) const;
     size_t   variable(symbol_p name) const;
     ularge   order(size_t *var = nullptr) const;
+    bool     is_zero(bool error = true) const;
 
     // Convert polynomial to expression
     algebraic_p as_expression() const;

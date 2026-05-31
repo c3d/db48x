@@ -1546,6 +1546,10 @@ bool object::is_zero(bool error) const
         return uncertain_p(this)->is_zero();
     case ID_unit:
         return unit_p(this)->value()->is_zero(error);
+    case ID_expression:
+        return expression_p(this)->is_zero(error);
+    case ID_polynomial:
+        return polynomial_p(this)->is_zero(error);
 
     default:
         if (error)

@@ -2562,6 +2562,17 @@ expression_p expression::get(object_p obj)
 }
 
 
+bool expression::is_zero(bool error) const
+// ----------------------------------------------------------------------------
+//   Check if the expression has value zero
+// ----------------------------------------------------------------------------
+{
+    if (object_p term = quoted(ID_object))
+        return term->is_zero(error);
+    return false;
+}
+
+
 bool expression::is_simplifiable() const
 // ----------------------------------------------------------------------------
 //   Return true if the expression is simplifiable

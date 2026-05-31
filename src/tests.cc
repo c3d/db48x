@@ -13583,8 +13583,8 @@ void tests::polynomials()
     step("Special case where resulting polynomial is empty")
         .test("'X*Y'", ENTER, ID_add)
         .expect("Ⓟ0");
-    step("Adding back one fo the original variables")
-        .test("'X'", ENTER, ID_add)
+    step("Adding back one of the original variables")
+        .test("'X'", ENTER, ID_PolynomialsMenu, ID_ToPolynomial, ID_add)
         .expect("ⓅX");
     step("Multiplication of simple polynomials")
         .test(NOSHIFT, F1, "X-Y", ENTER, NOSHIFT, F1, "X+Y", ENTER, ID_multiply)
