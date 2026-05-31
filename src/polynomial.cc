@@ -1981,6 +1981,83 @@ polynomial_p polynomial::derivative(size_t var) const
 }
 
 
+polynomial_p polynomial::primitive() const
+// ----------------------------------------------------------------------------
+//   Return primitive in the default variable
+// ----------------------------------------------------------------------------
+{
+    return primitive(main_variable());
+}
+
+
+polynomial_p polynomial::primitive(symbol_p sym) const
+// ----------------------------------------------------------------------------
+//   Return primitive in the given variable
+// ----------------------------------------------------------------------------
+{
+    return primitive(variable(sym));
+}
+
+
+polynomial_p polynomial::primitive(size_t var) const
+// ----------------------------------------------------------------------------
+//   Return primitive in the given variable
+// ----------------------------------------------------------------------------
+{
+    scribble     scr;
+    polynomial_g x        = this;
+    gcbytes      polycopy = copy_variables(x);
+    size_t       nvars    = x->variables();
+    for (iterator term : *x)
+    {
+        algebraic_g factor = term.factor();
+        iterator    it     = term;
+        for (size_t v = 0; v < nvars; v++)
+        {
+            ularge exponent = it.exponent();
+            if (v == var)
+            {
+                // Integrate: divide by (exponent+1)
+                factor = factor / integer::make(exponent + 1);
+            }
+        }
+        if (!factor)
+            return nullptr;
+
+        size_t sz = factor->size();
+        byte  *np = rt.allocate(sz);
+        if (!np)
+            return nullptr;
+        memcpy(np, +factor, sz);
+        for (size_t v = 0; v < nvars; v++)
+        {
+            ularge exponent = term.exponent();
+            if (v == var)
+                exponent++;  // Increase exponent by 1
+            byte *ep = rt.allocate(leb128size(exponent));
+            if (!ep)
+                return nullptr;
+            leb128(ep, exponent);
+        }
+    }
+    gcbytes data   = scr.scratch();
+    size_t  datasz = scr.growth();
+    return rt.make<polynomial>(data, datasz);
+}
+
+
+array_p polynomial::roots() const
+// ----------------------------------------------------------------------------
+//   Compute the roots from a polynomial
+// ----------------------------------------------------------------------------
+{
+    size_t degree = polynomial::expand(this, true);
+    if (rt.error())
+        return nullptr;
+    return nullptr;
+}
+
+
 
 // ============================================================================
 //

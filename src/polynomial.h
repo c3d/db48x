@@ -106,6 +106,10 @@ struct polynomial : expression
     polynomial_p        derivative() const;
     polynomial_p        derivative(size_t vidx) const;
     polynomial_p        derivative(symbol_p vname) const;
+    polynomial_p        primitive() const;
+    polynomial_p        primitive(size_t vidx) const;
+    polynomial_p        primitive(symbol_p vname) const;
+    array_p             roots() const;
 
     // Return total length of the polynomial in bytes
     size_t length() const

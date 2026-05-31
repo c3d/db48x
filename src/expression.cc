@@ -4450,6 +4450,13 @@ COMMAND_BODY(Primitive)
 //   Compute the primitive of an expression
 // ----------------------------------------------------------------------------
 {
+    if (object_p pobj = rt.stack(1))
+        if (polynomial_p poly = pobj->as<polynomial>())
+            if (object_p xobj = rt.stack(0))
+                if (symbol_p sym = xobj->as_quoted<symbol>())
+                    if (polynomial_p prim = poly->primitive(sym))
+                        if (rt.drop() && rt.top(prim))
+                            return OK;
     return expression::variable_command(&expression::primitive);
 }
 

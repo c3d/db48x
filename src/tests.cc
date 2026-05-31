@@ -10020,6 +10020,9 @@ void tests::symbolic_integration()
     step("Primitive of a polynomial")
         .test(CLEAR, "'A*X+B*X^2-C*sq(X)+D*X^5+42' 'X'", ID_Primitive)
         .expect("'A÷2·X²+B÷3·X³+D÷6·X↑6+42·X-C÷3·X³'");
+    step("Primitive of polynomial object")
+        .test(CLEAR, "Ⓟ'2·X+3·A·X↑4-32' X", ID_IntegrationMenu, ID_Primitive)
+        .expect("X↑2+³/₅·A·X↑5-32·X");
     step("Primitive of ratio")
         .test(CLEAR, "'A*X/(B*X+1)' 'X'", ID_Primitive)
         .expect("'A÷B²·(B·X-ln (abs(B·X+1))+1)'");
