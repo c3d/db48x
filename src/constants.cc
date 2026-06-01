@@ -1467,6 +1467,48 @@ static const cstring basic_constants[] =
     "T₀♁",      "[ 'JDN→(IFTE((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d))≥1;2461044.220333+IP((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d)))*UVAL(CONVERT(ⒸPorb♁;1_d));2461044.220333))' "
                 "  0.83_d 0 ]",
 
+    // ------------------------------------------------------------------------
+    // WGS-84 / GPS reference ellipsoid (defining constants, exact)
+    // *Earth equatorial radius - WGS-84 defining constant [WGS-84]
+    "a♁GPS",    "[ 6378137_m "
+                "  0_m "
+                "  0 ]",
+    // *Earth flattening - WGS-84 defining constant 1/298.257223563 [WGS-84]
+    "f♁GPS",    "[ '1/298.257223563' "
+                "  0 "
+                "  0 ]",
+    // *Earth nominal mean angular velocity - WGS-84 [WGS-84]
+    "ω♁GPS",    "[ 7.2921150E-5_r/s "
+                "  0_r/s "
+                "  0 ]",
+    // *Earth gravitational parameter (incl. atmosphere) - WGS-84 [WGS-84]
+    "GM♁GPS",   "[ 3.986004418E14_m³/s² "
+                "  0_m³/s² "
+                "  0 ]",
+    // *Earth first eccentricity squared - WGS-84 ellipsoid, from flattening [WGS-84]
+    "e²♁GPS",   "[ '2*Ⓒf♁GPS-Ⓒf♁GPS²' "
+                "  0 "
+                "  0 ]",
+    // *Earth second eccentricity squared - WGS-84 ellipsoid, from first [WGS-84]
+    "e'²♁GPS",  "[ 'Ⓒe²♁GPS/(1-Ⓒe²♁GPS)' "
+                "  0 "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // Calendar and astronomical years
+    // *Tropical year (equinox to equinox, J2000) - seasonal year [24]
+    "Ytrop♁",   "[ 365.24219_d "
+                "  0_d "
+                "  0 ]",
+    // *Julian year - exact, defines the light-year [24]
+    "YJul♁",    "[ 365.25_d "
+                "  0_d "
+                "  0 ]",
+    // *Gregorian mean year - exact: 365 + 1/4 - 1/100 + 1/400 [24]
+    "YGreg♁",   "[ 365.2425_d "
+                "  0_d "
+                "  0 ]",
+
     "Astronomy/Moon",     nullptr,
 
     // *Moon gravitational parameter - Measurement [4]
