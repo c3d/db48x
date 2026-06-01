@@ -361,13 +361,15 @@ static bool range_binary(range_g &x, range_g &y,
 //   Check if we deal with an uncertain number or with regular ranges
 // ----------------------------------------------------------------------------
 {
-    if (x->type() == object::ID_uncertain)
+    if (x->type() == object::ID_uncertain || y->type() == object::ID_uncertain)
     {
-        if (y->type() == object::ID_uncertain)
+        if (x->type() == y->type())
         {
             x = ufn((uncertain_r) x, (uncertain_r) y);
             return x;
         }
+        rt.type_error();
+        return false;
     }
     x = rfn(x, y);
     return x;

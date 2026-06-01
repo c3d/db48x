@@ -6117,7 +6117,6 @@ void tests::range_types()
 {
     BEGIN(ranges);
 
-
     step("Create range with unit")
         .test(CLEAR, "103_m 2_km", ENTER, ID_RangeMenu, ID_ToRange)
         .expect("103…2 000 m");
@@ -6190,6 +6189,10 @@ void tests::range_types()
         .test(CLEAR, "1…3", ENTER, ID_ToPercentRange).expect("2±50%")
         .test(CLEAR, "2±1", ENTER, ID_ToPercentRange).expect("2±50%")
         .test(CLEAR, "2±100%", ENTER, ID_ToPercentRange).expect("2±100%");
+    step("Converting ranges to uncertain numbers fail")
+        .test(CLEAR, "1…3", ENTER, ID_ToUncertain).error("Bad argument type")
+        .test(CLEAR, "2±1", ENTER, ID_ToUncertain).error("Bad argument type")
+        .test(CLEAR, "2±1%", ENTER, ID_ToUncertain).error("Bad argument type");
 
     step("Building range with infinity input")
         .test(CLEAR, "−∞…∞", ENTER).expect("−∞…∞")
@@ -6615,6 +6618,11 @@ void tests::uncertain_operations()
         .test(CLEAR, "a 3", ENTER, ID_ToUncertain).error("Bad argument type")
         .test(CLEAR, "1 b", ENTER, ID_ToUncertain).error("Bad argument type");
 
+    step("Cannot convert uncertain numbers to range types")
+        .test(CLEAR, "1±σ3", ID_ToRange).error("Bad argument type")
+        .test(CLEAR, "1±σ3", ID_ToDeltaRange).error("Bad argument type")
+        .test(CLEAR, "1±σ3", ID_ToPercentRange).error("Bad argument type");
+
     step("Add uncertain numbers")
         .test(CLEAR, "1±σ3 2±σ5", NOSHIFT, ADD).expect("3±σ5.83095 18948 5");
     step("Subtract uncertain numbers")
@@ -6666,6 +6674,50 @@ void tests::uncertain_operations()
         .test(CLEAR, "5 2±σ3", NOSHIFT, DIV).expect("2 ¹/₂±σ3.75");
     step("Power uncertain numbers")
         .test(CLEAR, "5 1±σ3", NOSHIFT, ID_pow).expect("5±σ24.14156 86865");
+
+    step("Add uncertain numbers with range fails")
+        .test(CLEAR, "2…3 2±σ3", NOSHIFT, ADD).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, ADD).error("Bad argument type")
+        .test(CLEAR, "2±3% 2±σ3", NOSHIFT, ADD).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, ADD).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3", NOSHIFT, ADD).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3%", NOSHIFT, ADD).error("Bad argument type");
+    step("Subtract  uncertain numbers with range fails")
+        .test(CLEAR, "2…3 2±σ3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±3% 2±σ3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3%", NOSHIFT, SUB).error("Bad argument type")        .test(CLEAR, "2±3 2±σ3", NOSHIFT, SUB).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, SUB).error("Bad argument type");
+    step("Multiply  uncertain numbers with range fails")
+        .test(CLEAR, "2…3 2±σ3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±3% 2±σ3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3%", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, MUL).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, MUL).error("Bad argument type");
+    step("Divide uncertain numbers with range fails")
+        .test(CLEAR, "2…3 2±σ3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±3% 2±σ3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3%", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", NOSHIFT, DIV).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", NOSHIFT, DIV).error("Bad argument type");
+    step("Power uncertain numbers with range fails")
+        .test(CLEAR, "2…3 2±σ3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±3% 2±σ3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2±3%", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±3 2±σ3", ID_pow).error("Bad argument type")
+        .test(CLEAR, "2±σ3 2…3", ID_pow).error("Bad argument type");
+
 
 #define TFNA(name, arg)                                         \
     step(#name " (uncertain number)").test(CLEAR, arg " " #name, ENTER)
