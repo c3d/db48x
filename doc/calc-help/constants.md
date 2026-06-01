@@ -994,6 +994,14 @@ Mercury gravitational parameter
 
 It is measured by radio tracking of spacecraft (Mariner 10, MESSENGER). [Reference 4](#reference-4)
 
+### M☿ constant
+
+Mercury mass
+
+Mercury's mass, derived from the gravitational parameter `GM☿` and the measured
+gravitational constant `G` as `GM☿/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req☿ constant
 
 Mercury equatorial radius
@@ -1110,6 +1118,14 @@ Venus gravitational parameter
 Venus's gravitational parameter, measured by radio tracking of spacecraft
 (Magellan, Venus Express). [Reference 4](#reference-4)
 
+### M♀ constant
+
+Venus mass
+
+Venus's mass, derived from the gravitational parameter `GM♀` and the measured
+gravitational constant `G` as `GM♀/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♀ constant
 
 Venus equatorial radius
@@ -1222,6 +1238,14 @@ Earth gravitational parameter
 
 Exact nominal value (IAU 2015). Earth's gravitational parameter. An exact nominal
 value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+
+### M♁ constant
+
+Earth mass
+
+Earth's mass, derived from the gravitational parameter `GM♁` and the measured
+gravitational constant `G` as `GM♁/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
 
 ### Req♁ constant
 
@@ -1342,6 +1366,14 @@ Moon gravitational parameter
 Measured. Moon's gravitational parameter, measured by lunar laser ranging
 and spacecraft radio tracking. [Reference 4](#reference-4)
 
+### M☽ constant
+
+Moon mass
+
+The Moon's mass, derived from the gravitational parameter `GM☽` and the measured
+gravitational constant `G` as `GM☽/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req☽ constant
 
 Moon equatorial radius
@@ -1458,6 +1490,14 @@ Mars gravitational parameter
 Measured. Mars system gravitational parameter, including the contribution of
 its moons Phobos and Deimos, measured by spacecraft radio tracking. [Reference 4](#reference-4)
 
+### M♂ constant
+
+Mars mass
+
+Mars's mass, derived from the gravitational parameter `GM♂` and the measured
+gravitational constant `G` as `GM♂/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♂ constant
 
 Mars equatorial radius
@@ -1569,6 +1609,14 @@ Jupiter gravitational parameter
 
 Exact nominal value (IAU 2015). Jupiter system gravitational parameter.
 An exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
+
+### M♃ constant
+
+Jupiter mass
+
+Jupiter's mass, derived from the gravitational parameter `GM♃` and the measured
+gravitational constant `G` as `GM♃/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
 
 ### Req♃ constant
 
@@ -1688,6 +1736,14 @@ Saturn gravitational parameter
 Measured. Saturn system gravitational parameter, measured by radio
 tracking of the Cassini spacecraft. [Reference 4](#reference-4)
 
+### M♄ constant
+
+Saturn mass
+
+Saturn's mass, derived from the gravitational parameter `GM♄` and the measured
+gravitational constant `G` as `GM♄/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♄ constant
 
 Saturn equatorial radius
@@ -1804,6 +1860,14 @@ Uranus gravitational parameter
 
 Measured. Uranus system gravitational parameter, measured by Voyager
 2 radio tracking. [Reference 4](#reference-4)
+
+### M⛢ constant
+
+Uranus mass
+
+Uranus's mass, derived from the gravitational parameter `GM⛢` and the measured
+gravitational constant `G` as `GM⛢/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
 
 ### Req⛢ constant
 
@@ -1923,6 +1987,14 @@ Neptune gravitational parameter
 Measured. Neptune system gravitational parameter, measured by Voyager
 2 radio tracking and Hubble Space Telescope astrometry of Triton. [Reference 4](#reference-4)
 
+### M♆ constant
+
+Neptune mass
+
+Neptune's mass, derived from the gravitational parameter `GM♆` and the measured
+gravitational constant `G` as `GM♆/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♆ constant
 
 Neptune equatorial radius
@@ -2039,6 +2111,14 @@ Pluto gravitational parameter
 
 Measured. Pluto system gravitational parameter, measured by New Horizons
 radio tracking. [Reference 4](#reference-4)
+
+### M♇ constant
+
+Pluto mass
+
+Pluto's mass, derived from the gravitational parameter `GM♇` and the measured
+gravitational constant `G` as `GM♇/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
 
 ### Req♇ constant
 
