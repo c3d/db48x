@@ -92,7 +92,7 @@ struct complex : algebraic
     static complex_p    make(id type,
                              algebraic_r x, algebraic_r y,
                              angle_unit polar_unit);
-    static rectangular_p make(int re = 0, int im = 1);
+    static rectangular_p make(int re = 0, int im = 0);
     static complex_g    zero();
     static complex_g    one();
     static complex_g    from_algebraic(algebraic_r x);
