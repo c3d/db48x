@@ -1257,8 +1257,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Mercury rotation angular velocity - Calculation from Prot
-    "ωrot☿",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt☿;1_r/s);XPON(UVAL(Ⓡωrot☿*2*Ⓒπ/ⒸProt☿))-XPON(UVAL(2*Ⓒπ/ⒸProt☿))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☿*2*Ⓒπ/ⒸProt☿);-2);1_r/s)' "
+    "ωrot☿",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☿;1_r/s);XPON(UVAL(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☿))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿);-2);1_r/s)' "
                 "  'ⓇProt☿' ]",
     // *Mercury axial tilt - Measurement [22]
     "ϵ☿",       "[ 0.034_° "
@@ -1344,8 +1344,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Venus rotation angular velocity - Calculation from Prot  [retrograde]
-    "ωrot♀",    "[ 'ROUND(CONVERT(-2*Ⓒπ/ⒸProt♀;1_r/s);XPON(UVAL(Ⓡωrot♀*2*Ⓒπ/ⒸProt♀))-XPON(UVAL(2*Ⓒπ/ⒸProt♀))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♀*2*Ⓒπ/ⒸProt♀);-2);1_r/s)' "
+    "ωrot♀",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♀;1_r/s);XPON(UVAL(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♀))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀);-2);1_r/s)' "
                 "  'ⓇProt♀' ]",
     // *Venus axial tilt - Measurement [22]
     "ϵ♀",       "[ 177.36_° "
@@ -1429,8 +1429,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Earth rotation angular velocity - Calculation from Prot
-    "ωrot♁",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt♁;1_r/s);XPON(UVAL(Ⓡωrot♁*2*Ⓒπ/ⒸProt♁))-XPON(UVAL(2*Ⓒπ/ⒸProt♁))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♁*2*Ⓒπ/ⒸProt♁);-2);1_r/s)' "
+    "ωrot♁",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♁;1_r/s);XPON(UVAL(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♁))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁);-2);1_r/s)' "
                 "  'ⓇProt♁' ]",
     // *Earth axial tilt - Measurement [24]
     "ϵ♁",       "[ 23.4393_° "
@@ -1486,11 +1486,11 @@ static const cstring basic_constants[] =
                 "  0_m³/s² "
                 "  0 ]",
     // *Earth first eccentricity squared - WGS-84 ellipsoid, from flattening [WGS-84]
-    "e²♁GPS",   "[ '2*Ⓒf♁GPS-Ⓒf♁GPS²' "
+    "e12♁GPS",  "[ '2*Ⓒf♁GPS-Ⓒf♁GPS²' "
                 "  0 "
                 "  0 ]",
     // *Earth second eccentricity squared - WGS-84 ellipsoid, from first [WGS-84]
-    "e'²♁GPS",  "[ 'Ⓒe²♁GPS/(1-Ⓒe²♁GPS)' "
+    "e22♁GPS",  "[ 'Ⓒe12♁GPS/(1-Ⓒe12♁GPS)' "
                 "  0 "
                 "  0 ]",
 
@@ -1559,8 +1559,8 @@ static const cstring basic_constants[] =
                 "  97165_s "
                 "  0 ]",
     // *Moon rotation angular velocity - Calculation from Prot
-    "ωrot☽",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt☽;1_r/s);XPON(UVAL(Ⓡωrot☽*2*Ⓒπ/ⒸProt☽))-XPON(UVAL(2*Ⓒπ/ⒸProt☽))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☽*2*Ⓒπ/ⒸProt☽);-2);1_r/s)' "
+    "ωrot☽",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☽;1_r/s);XPON(UVAL(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☽))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽);-2);1_r/s)' "
                 "  'ⓇProt☽' ]",
     // *Moon axial tilt - Measurement [22]
     "ϵ☽",       "[ 1.5424_° "
@@ -1648,8 +1648,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Mars rotation angular velocity - Calculation from Prot
-    "ωrot♂",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt♂;1_r/s);XPON(UVAL(Ⓡωrot♂*2*Ⓒπ/ⒸProt♂))-XPON(UVAL(2*Ⓒπ/ⒸProt♂))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♂*2*Ⓒπ/ⒸProt♂);-2);1_r/s)' "
+    "ωrot♂",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♂;1_r/s);XPON(UVAL(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♂))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂);-2);1_r/s)' "
                 "  'ⓇProt♂' ]",
     // *Mars axial tilt - Measurement [22]
     "ϵ♂",       "[ 25.19_° "
@@ -1730,8 +1730,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Jupiter rotation angular velocity - Calculation from Prot
-    "ωrot♃",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt♃;1_r/s);XPON(UVAL(Ⓡωrot♃*2*Ⓒπ/ⒸProt♃))-XPON(UVAL(2*Ⓒπ/ⒸProt♃))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♃*2*Ⓒπ/ⒸProt♃);-2);1_r/s)' "
+    "ωrot♃",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♃;1_r/s);XPON(UVAL(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♃))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃);-2);1_r/s)' "
                 "  'ⓇProt♃' ]",
     // *Jupiter axial tilt - Measurement [22]
     "ϵ♃",       "[ 3.13_° "
@@ -1816,8 +1816,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Saturn rotation angular velocity - Calculation from Prot
-    "ωrot♄",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt♄;1_r/s);XPON(UVAL(Ⓡωrot♄*2*Ⓒπ/ⒸProt♄))-XPON(UVAL(2*Ⓒπ/ⒸProt♄))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♄*2*Ⓒπ/ⒸProt♄);-2);1_r/s)' "
+    "ωrot♄",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♄;1_r/s);XPON(UVAL(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♄))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄);-2);1_r/s)' "
                 "  'ⓇProt♄' ]",
     // *Saturn axial tilt - Measurement [22]
     "ϵ♄",       "[ 26.73_° "
@@ -1902,8 +1902,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Uranus rotation angular velocity - Calculation from Prot  [retrograde]
-    "ωrot⛢",    "[ 'ROUND(CONVERT(-2*Ⓒπ/ⒸProt⛢;1_r/s);XPON(UVAL(Ⓡωrot⛢*2*Ⓒπ/ⒸProt⛢))-XPON(UVAL(2*Ⓒπ/ⒸProt⛢))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot⛢*2*Ⓒπ/ⒸProt⛢);-2);1_r/s)' "
+    "ωrot⛢",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt⛢;1_r/s);XPON(UVAL(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt⛢))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢);-2);1_r/s)' "
                 "  'ⓇProt⛢' ]",
     // *Uranus axial tilt - Measurement [22]
     "ϵ⛢",       "[ 97.77_° "
@@ -1987,8 +1987,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Neptune rotation angular velocity - Calculation from Prot
-    "ωrot♆",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt♆;1_r/s);XPON(UVAL(Ⓡωrot♆*2*Ⓒπ/ⒸProt♆))-XPON(UVAL(2*Ⓒπ/ⒸProt♆))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♆*2*Ⓒπ/ⒸProt♆);-2);1_r/s)' "
+    "ωrot♆",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♆;1_r/s);XPON(UVAL(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♆))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆);-2);1_r/s)' "
                 "  'ⓇProt♆' ]",
     // *Neptune axial tilt - Measurement [22]
     "ϵ♆",       "[ 28.32_° "
@@ -2072,8 +2072,8 @@ static const cstring basic_constants[] =
                 "  0_s "
                 "  0 ]",
     // *Pluto rotation angular velocity - Calculation from Prot  [retrograde]
-    "ωrot♇",    "[ 'ROUND(CONVERT(-2*Ⓒπ/ⒸProt♇;1_r/s);XPON(UVAL(Ⓡωrot♇*2*Ⓒπ/ⒸProt♇))-XPON(UVAL(2*Ⓒπ/ⒸProt♇))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♇*2*Ⓒπ/ⒸProt♇);-2);1_r/s)' "
+    "ωrot♇",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♇;1_r/s);XPON(UVAL(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♇))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇);-2);1_r/s)' "
                 "  'ⓇProt♇' ]",
     // *Pluto axial tilt - Measurement [26]
     "ϵ♇",       "[ 119.591_° "
@@ -2157,8 +2157,8 @@ static const cstring basic_constants[] =
                 "  'ROUND(ⓈProt☉/ⒸProt☉;-2)' "
                 "  2.193E6_s ]",
     // *Sun rotation angular velocity - Calculation from Prot
-    "ωrot☉",    "[ 'ROUND(CONVERT(2*Ⓒπ/ⒸProt☉;1_r/s);XPON(UVAL(Ⓡωrot☉*2*Ⓒπ/ⒸProt☉))-XPON(UVAL(2*Ⓒπ/ⒸProt☉))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☉*2*Ⓒπ/ⒸProt☉);-2);1_r/s)' "
+    "ωrot☉",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☉;1_r/s);XPON(UVAL(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☉))-2)' "
+                "  'CONVERT(ROUND(UBASE(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉);-2);1_r/s)' "
                 "  'ⓇProt☉' ]",
 
     "Astronomy/Cosmology",     nullptr,
