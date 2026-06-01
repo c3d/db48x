@@ -1214,6 +1214,11 @@ static const cstring basic_constants[] =
                 "  0.0000000091E13_m³/s² "
                 "  'ROUND(ⓈGM☿/ⒸGM☿;-2)' "
                 "  2.203E13_m³/s² ]",
+    // *Mercury mass - Calculation from GM and G
+    "M☿",       "[ 'ROUND(CONVERT(ⒸGM☿/ⒸG;1_kg);XPON(UVAL(ⒸGM☿/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☿/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM☿*ⒸM☿);-2);1_kg)' "
+                "  'ⓇG' "
+                "  3.301E23_kg ]",
     // *Mercury equatorial radius - Measurement [22]
     "Req☿",     "[ 2439.7_km "
                 "  0.1_km "
@@ -1292,6 +1297,11 @@ static const cstring basic_constants[] =
                 "  0.00000012E14_m³/s² "
                 "  'ROUND(ⓈGM♀/ⒸGM♀;-2)' "
                 "  3.249E14_m³/s² ]",
+    // *Venus mass - Calculation from GM and G
+    "M♀",       "[ 'ROUND(CONVERT(ⒸGM♀/ⒸG;1_kg);XPON(UVAL(ⒸGM♀/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♀/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♀*ⒸM♀);-2);1_kg)' "
+                "  'ⓇG' "
+                "  4.867E24_kg ]",
     // *Venus equatorial radius - Measurement [22]
     "Req♀",     "[ 6051.8_km "
                 "  0.1_km "
@@ -1370,6 +1380,11 @@ static const cstring basic_constants[] =
     "GM♁",      "[ 3.986004E14_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Earth mass - Calculation from GM and G
+    "M♁",       "[ 'ROUND(CONVERT(ⒸGM♁/ⒸG;1_kg);XPON(UVAL(ⒸGM♁/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♁/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♁*ⒸM♁);-2);1_kg)' "
+                "  'ⓇG' "
+                "  5.972E24_kg ]",
     // *Earth equatorial radius - Exact nominal value [3]
     "Req♁",     "[ 6378.1_km "
                 "  0_km "
@@ -1447,6 +1462,11 @@ static const cstring basic_constants[] =
                 "  0.0000000009E12_m³/s² "
                 "  'ROUND(ⓈGM☽/ⒸGM☽;-2)' "
                 "  4.903E12_m³/s² ]",
+    // *Moon mass - Calculation from GM and G
+    "M☽",       "[ 'ROUND(CONVERT(ⒸGM☽/ⒸG;1_kg);XPON(UVAL(ⒸGM☽/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☽/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM☽*ⒸM☽);-2);1_kg)' "
+                "  'ⓇG' "
+                "  7.346E22_kg ]",
     // *Moon equatorial radius - Measurement [22]
     "Req☽",     "[ 1738.1_km "
                 "  0.1_km "
@@ -1527,6 +1547,11 @@ static const cstring basic_constants[] =
                 "  0.00000000091E13_m³/s² "
                 "  'ROUND(ⓈGM♂/ⒸGM♂;-2)' "
                 "  4.283E13_m³/s² ]",
+    // *Mars mass - Calculation from GM and G
+    "M♂",       "[ 'ROUND(CONVERT(ⒸGM♂/ⒸG;1_kg);XPON(UVAL(ⒸGM♂/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♂/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♂*ⒸM♂);-2);1_kg)' "
+                "  'ⓇG' "
+                "  6.417E23_kg ]",
     // *Mars equatorial radius - Measurement [22]
     "Req♂",     "[ 3396.2_km "
                 "  0.1_km "
@@ -1603,6 +1628,11 @@ static const cstring basic_constants[] =
     "GM♃",      "[ 1.26686534E17_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Jupiter mass - Calculation from GM and G
+    "M♃",       "[ 'ROUND(CONVERT(ⒸGM♃/ⒸG;1_kg);XPON(UVAL(ⒸGM♃/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♃/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♃*ⒸM♃);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.898E27_kg ]",
     // *Jupiter equatorial radius - Exact nominal value [3]
     "Req♃",     "[ 71492_km "
                 "  0_km "
@@ -1677,6 +1707,11 @@ static const cstring basic_constants[] =
                 "  0.00000000091E16_m³/s² "
                 "  'ROUND(ⓈGM♄/ⒸGM♄;-2)' "
                 "  3.794E16_m³/s² ]",
+    // *Saturn mass - Calculation from GM and G
+    "M♄",       "[ 'ROUND(CONVERT(ⒸGM♄/ⒸG;1_kg);XPON(UVAL(ⒸGM♄/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♄/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♄*ⒸM♄);-2);1_kg)' "
+                "  'ⓇG' "
+                "  5.685E26_kg ]",
     // *Saturn equatorial radius - Measurement [22]
     "Req♄",     "[ 60268_km "
                 "  4_km "
@@ -1754,6 +1789,11 @@ static const cstring basic_constants[] =
                 "  0.0000040E15_m³/s² "
                 "  'ROUND(ⓈGM⛢/ⒸGM⛢;-2)' "
                 "  5.795E15_m³/s² ]",
+    // *Uranus mass - Calculation from GM and G
+    "M⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/ⒸG;1_kg);XPON(UVAL(ⒸGM⛢/ⒸG·ⓇG))-XPON(UVAL(ⒸGM⛢/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM⛢*ⒸM⛢);-2);1_kg)' "
+                "  'ⓇG' "
+                "  8.682E25_kg ]",
     // *Uranus equatorial radius - Measurement [22]
     "Req⛢",     "[ 25559_km "
                 "  4_km "
@@ -1831,6 +1871,11 @@ static const cstring basic_constants[] =
                 "  0.00000010058E15_m³/s² "
                 "  'ROUND(ⓈGM♆/ⒸGM♆;-2)' "
                 "  6.837E15_m³/s² ]",
+    // *Neptune mass - Calculation from GM and G
+    "M♆",       "[ 'ROUND(CONVERT(ⒸGM♆/ⒸG;1_kg);XPON(UVAL(ⒸGM♆/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♆/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♆*ⒸM♆);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.024E26_kg ]",
     // *Neptune equatorial radius - Measurement [22]
     "Req♆",     "[ 24764_km "
                 "  15_km "
@@ -1906,6 +1951,11 @@ static const cstring basic_constants[] =
     "GM♇",      "[ 9.755E11_m³/s² "
                 "  0.005E11_m³/s² "
                 "  'ROUND(ⓈGM♇/ⒸGM♇;-2)' ]",
+    // *Pluto mass - Calculation from GM and G
+    "M♇",       "[ 'ROUND(CONVERT(ⒸGM♇/ⒸG;1_kg);XPON(UVAL(ⒸGM♇/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♇/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♇*ⒸM♇);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.462E22_kg ]",
     // *Pluto equatorial radius - Measurement [26]
     "Req♇",     "[ 1188.3_km "
                 "  1.6_km "
