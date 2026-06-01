@@ -1281,10 +1281,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω☿/Ⓒω☿;-2)' "
                 "  29.12_° ]",
-    // *Mercury last perihelion passage - Measurement [M20]
-    "T₀☿",      "[ 20260219.4583_date "
-                "  0_date "
-                "  0 ]",
+    // *Mercury time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀☿",      "[ 'JDN→(IFTE((JDN(DateTime)-2461178.915934)/UVAL(CONVERT(ⒸPorb☿;1_d))≥1;2461178.915934+IP((JDN(DateTime)-2461178.915934)/UVAL(CONVERT(ⒸPorb☿;1_d)))*UVAL(CONVERT(ⒸPorb☿;1_d));2461178.915934))' "
+                "  0 0 ]",
 
     "Astronomy/Venus",     nullptr,
 
@@ -1361,10 +1360,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♀/Ⓒω♀;-2)' "
                 "  54.88_° ]",
-    // *Venus next perihelion passage - Measurement [M20]
-    "T₀♀",      "[ 20260515_date "
-                "  0_date "
-                "  0 ]",
+    // *Venus time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀♀",      "[ 'JDN→(IFTE((JDN(DateTime)-2461175.615653)/UVAL(CONVERT(ⒸPorb♀;1_d))≥1;2461175.615653+IP((JDN(DateTime)-2461175.615653)/UVAL(CONVERT(ⒸPorb♀;1_d)))*UVAL(CONVERT(ⒸPorb♀;1_d));2461175.615653))' "
+                "  0 0 ]",
 
     "Astronomy/Earth",     nullptr,
 
@@ -1438,10 +1436,9 @@ static const cstring basic_constants[] =
                 "  0.00001_° "
                 "  'ROUND(Ⓢω♁/Ⓒω♁;-2)' "
                 "  114.2_° ]",
-    // *Earth perihelion passage - Measurement [M20]
-    "T₀♁",      "[ 20260103.7188_date "
-                "  0_date "
-                "  0 ]",
+    // *Earth time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀♁",      "[ 'JDN→(IFTE((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d))≥1;2461044.220333+IP((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d)))*UVAL(CONVERT(ⒸPorb♁;1_d));2461044.220333))' "
+                "  0 0 ]",
 
     "Astronomy/Moon",     nullptr,
 
@@ -1591,10 +1588,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♂/Ⓒω♂;-2)' "
                 "  286.5_° ]",
-    // *Mars perihelion passage - Measurement [M20]
-    "T₀♂",      "[ 20260326_date "
-                "  0_date "
-                "  0 ]",
+    // *Mars time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀♂",      "[ 'JDN→(IFTE((JDN(DateTime)-2461125.798009)/UVAL(CONVERT(ⒸPorb♂;1_d))≥1;2461125.798009+IP((JDN(DateTime)-2461125.798009)/UVAL(CONVERT(ⒸPorb♂;1_d)))*UVAL(CONVERT(ⒸPorb♂;1_d));2461125.798009))' "
+                "  0 0 ]",
 
     "Astronomy/Jupiter",     nullptr,
 
@@ -1665,10 +1661,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♃/Ⓒω♃;-2)' "
                 "  273.9_° ]",
-    // *Jupiter perihelion passage - Measurement [4] [M21]
-    "T₀♃",      "[ 20230120_date "
-                "  0_date "
-                "  0 ]",
+    // *Jupiter time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀♃",      "[ 'JDN→(IFTE((JDN(DateTime)-2459964.991260)/UVAL(CONVERT(ⒸPorb♃;1_d))≥1;2459964.991260+IP((JDN(DateTime)-2459964.991260)/UVAL(CONVERT(ⒸPorb♃;1_d)))*UVAL(CONVERT(ⒸPorb♃;1_d));2459964.991260))' "
+                "  0 0 ]",
 
     "Astronomy/Saturn",     nullptr,
 
@@ -1743,10 +1738,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♄/Ⓒω♄;-2)' "
                 "  339.4_° ]",
-    // *Saturn perihelion passage - Measurement [4] [M21]
-    "T₀♄",      "[ 20030726_date "
-                "  0_date "
-                "  0 ]",
+    // *Saturn time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    "T₀♄",      "[ 'JDN→(IFTE((JDN(DateTime)-2452847.154242)/UVAL(CONVERT(ⒸPorb♄;1_d))≥1;2452847.154242+IP((JDN(DateTime)-2452847.154242)/UVAL(CONVERT(ⒸPorb♄;1_d)))*UVAL(CONVERT(ⒸPorb♄;1_d));2452847.154242))' "
+                "  0 0 ]",
 
     "Astronomy/Uranus",     nullptr,
 
@@ -1821,10 +1815,9 @@ static const cstring basic_constants[] =
                 "  0.000001_° "
                 "  'ROUND(Ⓢω⛢/Ⓒω⛢;-2)' "
                 "  97.00_° ]",
-    // *Uranus perihelion passage - Calculation from measurement [4] [M21]
-    "T₀⛢",      "[ 20500816_date "
-                "  0_date "
-                "  0 ]",
+    // *Uranus time of perihelion passage - Computed via IFTE from Tp and Porb [M22]  (last perihelion 1966; next ~2050)
+    "T₀⛢",      "[ 'JDN→(IFTE((JDN(DateTime)-2439264.256742)/UVAL(CONVERT(ⒸPorb⛢;1_d))≥1;2439264.256742+IP((JDN(DateTime)-2439264.256742)/UVAL(CONVERT(ⒸPorb⛢;1_d)))*UVAL(CONVERT(ⒸPorb⛢;1_d));2439264.256742))' "
+                "  0 0 ]",
 
     "Astronomy/Neptune",     nullptr,
 
@@ -1898,10 +1891,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♆/Ⓒω♆;-2)' "
                 "  273.2_° ]",
-    // *Neptune perihelion passage - Calculation from measurement [4] [M21]
-    "T₀♆",      "[ 20420904_date "
-                "  0_date "
-                "  0 ]",
+    // *Neptune time of perihelion passage - Computed via IFTE from Tp and Porb [M21]  (EXCEPTION: Tp = next perihelion 2042; floor-IFTE returns it unchanged)
+    "T₀♆",      "[ 'JDN→(IFTE((JDN(DateTime)-2467131.5)/UVAL(CONVERT(ⒸPorb♆;1_d))≥1;2467131.5+IP((JDN(DateTime)-2467131.5)/UVAL(CONVERT(ⒸPorb♆;1_d)))*UVAL(CONVERT(ⒸPorb♆;1_d));2467131.5))' "
+                "  0 0 ]",
 
     "Astronomy/Pluto",     nullptr,
 
@@ -1976,10 +1968,9 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♇/Ⓒω♇;-2)' "
                 "  113.8_° ]",
-    // *Pluto perihelion passage - Measurement [4] [M21]
-    "T₀♇",      "[ 19890905_date "
-                "  0_date "
-                "  0 ]",
+    // *Pluto time of perihelion passage - Computed via IFTE from Tp and Porb [M21]  (last perihelion 1989)
+    "T₀♇",      "[ 'JDN→(IFTE((JDN(DateTime)-2447774.5)/UVAL(CONVERT(ⒸPorb♇;1_d))≥1;2447774.5+IP((JDN(DateTime)-2447774.5)/UVAL(CONVERT(ⒸPorb♇;1_d)))*UVAL(CONVERT(ⒸPorb♇;1_d));2447774.5))' "
+                "  0 0 ]",
 
     "Astronomy/Sun",     nullptr,
 

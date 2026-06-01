@@ -1104,12 +1104,14 @@ exposed by `T₀☿`. [Materials 22](#materials-22) [Reference 23](#reference-23
 
 ### T₀☿ constant
 
-Mercury last perihelion passage
+Mercury time of perihelion passage
 
-Mercury's most recent time of perihelion passage is a measured quantity.
-Mercury passes perihelion approximately four times per year. Value in JDN
-(Julian Day Number, Gregorian calendar). It is the most recent point in its
-orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀☿` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb☿`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`, so the constant displays as a date but tracks "now". Mercury passes
+perihelion roughly four times per year. [Materials 22](#materials-22)
 
 
 ## Venus constants
@@ -1229,11 +1231,13 @@ exposed by `T₀♀`. [Materials 22](#materials-22) [Reference 23](#reference-23
 
 ### T₀♀ constant
 
-Venus last perihelion passage
+Venus time of perihelion passage
 
-Measured. Venus's most recent time of perihelion passage. Venus passes perihelion
-approximately twice per year. Value in JDN. It is the most recent point in its
-orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♀` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♀`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Venus passes perihelion about twice per year. [Materials 22](#materials-22)
 
 
 ## Earth constants
@@ -1358,11 +1362,13 @@ successive perihelion passages. [Materials 22](#materials-22) [Reference 23](#re
 
 ### T₀♁ constant
 
-Earth perihelion passage
+Earth time of perihelion passage
 
-Measured. Earth's most recent time of perihelion passage (early January each
-year). Value in JDN. It is the most recent point in its orbit when it was
-closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♁` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♁`, the
+anomalistic year) and returns the most recent perihelion passage at or before
+the current date (early January each year). The computation is carried out in
+Julian Day Number and converted to a date with `JDN→`. [Materials 22](#materials-22)
 
 
 ## Moon constants
@@ -1597,11 +1603,13 @@ perihelion passages exposed by `T₀♂`. [Materials 22](#materials-22) [Referen
 
 ### T₀♂ constant
 
-Mars perihelion passage
+Mars time of perihelion passage
 
-Measured. Mars's most recent time of perihelion passage. Mars's orbital
-period is approximately 1.88 years. Value in JDN. It is the most recent point
-in its orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♂` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♂`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Mars's orbital period is approximately 1.88 years. [Materials 22](#materials-22)
 
 
 ## Jupiter constants
@@ -1725,11 +1733,13 @@ recurrence of the perihelion passages exposed by `T₀♃`. [Materials 23](#mate
 
 ### T₀♃ constant
 
-Jupiter perihelion passage
+Jupiter time of perihelion passage
 
-Measured. Jupiter's most recent time of perihelion passage. Jupiter's
-orbital period is approximately 11.86 years. It is the most recent point
-in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♃` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♃`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Materials 22](#materials-22)
 
 
 ## Saturn constants
@@ -1852,11 +1862,13 @@ recurrence of the perihelion passages exposed by `T₀♄`. [Materials 23](#mate
 
 ### T₀♄ constant
 
-Saturn perihelion passage
+Saturn time of perihelion passage
 
-Measured. Saturn's most recent time of perihelion passage. Saturn's
-orbital period is approximately 29.46 years. It is the most recent point
-in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♄` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♄`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Saturn's orbital period is approximately 29.46 years. [Materials 22](#materials-22)
 
 
 ## Uranus constants
@@ -1978,13 +1990,15 @@ of the perihelion passages exposed by `T₀⛢`. [Materials 23](#materials-23)
 
 ### T₀⛢ constant
 
-Uranus perihelion passage
+Uranus time of perihelion passage
 
-Calculated from measurement (JPL DE440 orbital propagation). Uranus's
-predicted next time of perihelion passage (~2050). Uranus's orbital
-period is approximately 84 years. Last perihelion: 1966. It is the most
-recent point in its orbit when it was closest to the Sun. Value in JDN.
-[Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀⛢` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb⛢`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
+was in 1966 and the next is around 2050, so the returned value can be decades in
+the past. [Materials 22](#materials-22)
 
 
 ## Neptune constants
@@ -2105,13 +2119,16 @@ of the perihelion passages exposed by `T₀♆`. [Materials 23](#materials-23)
 
 ### T₀♆ constant
 
-Neptune perihelion passage
+Neptune time of perihelion passage
 
-Calculated from measurement (JPL DE440 orbital propagation). Neptune's
-predicted next time of perihelion passage (~2042). Neptune's orbital
-period is approximately 164.8 years. Last perihelion: 1876. It is the
-most recent point in its orbit when it was closest to the Sun. Value
-in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♆` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♆`) and returns
+the most recent perihelion passage at or before the current date, carried out in
+Julian Day Number and converted to a date with `JDN→`. Neptune is a deliberate
+exception to the "most recent past perihelion" convention: its true last
+perihelion (~1876) is uninformative and hard to source, so Tp is set to the next
+perihelion (2042-09-04). Because that date is in the future, the floor-IFTE
+returns it unchanged, giving the useful upcoming date. [Materials 21](#materials-21)
 
 
 ## Pluto constants
@@ -2230,12 +2247,15 @@ recurrence of the perihelion passages exposed by `T₀♇`. [Materials 23](#mate
 
 ### T₀♇ constant
 
-Pluto perihelion passage
+Pluto time of perihelion passage
 
-Measured. Pluto's last time of perihelion passage (1989 Sep 05). Pluto's
-orbital period is approximately 248 years. It is the most recent point in
-its orbit when it was closest to the Sun. Next perihelion: ~2237. Value
-in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♇` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♇`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
+was in 1989 (Sep 05) and the next is around 2237, so the returned value can be
+decades in the past. [Materials 21](#materials-21)
 
 ## Sun constants
 
