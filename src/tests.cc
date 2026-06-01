@@ -6403,7 +6403,7 @@ void tests::range_types()
     step("Divide delta ranges")
         .test(CLEAR, "1±3 5", NOSHIFT, DIV).expect("¹/₅±³/₅");
     step("Power delta ranges")
-        .test(CLEAR, "1±3 5", NOSHIFT, ID_pow).expect("256±768");
+        .test(CLEAR, "1±3 5", NOSHIFT, ID_pow).expect("496±528");
 
     step("Add delta ranges with promotion")
         .test(CLEAR, "5 1±3", NOSHIFT, ADD).expect("6±3");
@@ -6543,6 +6543,25 @@ void tests::range_types()
     TFN(norm).expect("1±3%");
 #undef TFN
 #undef TFNA
+
+    step("Range square")
+        .test(CLEAR, "-1…3", ID_sq).expect("1…9")
+        .test(CLEAR, "1±3", ID_sq).expect("10±6")
+        .test(CLEAR, "1±300%", ID_sq).expect("10±60%");
+    step("Range cubed")
+        .test(CLEAR, "-1…3", ID_cubed).expect("-1…27")
+        .test(CLEAR, "-2…6", ID_cubed).expect("-8…216")
+        .test(CLEAR, "1±3", ID_cubed).expect("28±36")
+        .test(CLEAR, "1±300%", ID_cubed).expect("28±128 ⁴/₇%");
+    step("Range power (odd)")
+        .test(CLEAR, "-1…3 5", ID_pow).expect("-1…243")
+        .test(CLEAR, "-2…6 3", ID_pow).expect("-8…216")
+        .test(CLEAR, "1±3 5", ID_pow).expect("496±528")
+        .test(CLEAR, "1±300% 5", ID_pow).expect("496±106 ¹⁴/₃₁%");
+    step("Range power (even)")
+        .test(CLEAR, "-1…3 6", ID_pow).expect("1…729")
+        .test(CLEAR, "1±3 6", ID_pow).expect("2 080±2 016")
+        .test(CLEAR, "1±300% 6", ID_pow).expect("2 080±96 ¹²/₁₃%");
 
     step("Exploding range objects")
         .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)

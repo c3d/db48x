@@ -958,7 +958,9 @@ FUNCTION_BODY(sq)
         return nullptr;
     if (x->is_symbolic())
         return symbolic(ID_sq, x);
-    return x * x;
+    if (x->is_range())
+        return pow(x, 2);
+    return x*x;
 }
 
 
@@ -981,7 +983,9 @@ FUNCTION_BODY(cubed)
         return nullptr;
     if (x->is_symbolic())
         return symbolic(ID_cubed, x);
-    return x * x * x;
+    if (x->is_range())
+        return pow(x, 3);
+    return x*x*x;
 }
 
 

@@ -2038,6 +2038,15 @@ algebraic_g pow(algebraic_r xr, ularge y)
             r = prec(decimal_p(+r));
         return r;
     }
+    if (x->is_range())
+    {
+        algebraic_g lo = range_p(+x)->lo();
+        algebraic_g hi = range_p(+x)->hi();
+        lo = pow(lo, y);
+        hi = pow(hi, y);
+        range::sort(lo, hi);
+        return range::make(x->type(), lo, hi);
+    }
     while (y)
     {
         if (y & 1)
