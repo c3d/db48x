@@ -1091,6 +1091,17 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb☿ constant
+
+Mercury orbital period
+
+Mercury's sidereal orbital period — the time to complete one revolution around
+the Sun. It is distinct from the rotation period `Prot☿` (the spin period).
+Computed from Meeus' Chapter 38 orbital elements and cross-checked against JPL
+Horizons. The stored value is a mean orbital period, used as an approximation of
+the anomalistic period that governs the recurrence of the perihelion passages
+exposed by `T₀☿`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀☿ constant
 
 Mercury last perihelion passage
@@ -1204,6 +1215,17 @@ Venus argument of perihelion
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the Sun),
 measured in the direction of motion. [Reference 23](#reference-23)
+
+### Porb♀ constant
+
+Venus orbital period
+
+Venus's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♀` (the spin period). Computed
+from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
+The stored value is a mean orbital period, used as an approximation of the
+anomalistic period that governs the recurrence of the perihelion passages
+exposed by `T₀♀`. [Materials 22](#materials-22) [Reference 23](#reference-23)
 
 ### T₀♀ constant
 
@@ -1323,6 +1345,16 @@ Earth argument of perihelion
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
+
+### Porb♁ constant
+
+Earth orbital period
+
+Earth's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♁` (the sidereal day). Computed
+from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
+The stored value is the mean (anomalistic) year used to advance `T₀♁` between
+successive perihelion passages. [Materials 22](#materials-22) [Reference 23](#reference-23)
 
 ### T₀♁ constant
 
@@ -1552,6 +1584,17 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♂ constant
+
+Mars orbital period
+
+Mars's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♂` (the spin period, close to
+an Earth day). Computed from Meeus' Chapter 38 orbital elements and cross-checked
+against JPL Horizons. The stored value is a mean orbital period, used as an
+approximation of the anomalistic period that governs the recurrence of the
+perihelion passages exposed by `T₀♂`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀♂ constant
 
 Mars perihelion passage
@@ -1670,6 +1713,16 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♃ constant
+
+Jupiter orbital period
+
+Jupiter's sidereal orbital period — the time to complete one revolution around
+the Sun (about 11.86 years). It is distinct from the rotation period `Prot♃`
+(the ~10 h spin period). Tabulated sidereal value from the NASA Planetary Fact
+Sheet, used as an approximation of the anomalistic period that governs the
+recurrence of the perihelion passages exposed by `T₀♃`. [Materials 23](#materials-23)
+
 ### T₀♃ constant
 
 Jupiter perihelion passage
@@ -1787,6 +1840,16 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♄ constant
+
+Saturn orbital period
+
+Saturn's sidereal orbital period — the time to complete one revolution around
+the Sun (about 29.46 years). It is distinct from the rotation period `Prot♄`
+(the ~10.7 h spin period). Tabulated sidereal value from the NASA Planetary Fact
+Sheet, used as an approximation of the anomalistic period that governs the
+recurrence of the perihelion passages exposed by `T₀♄`. [Materials 23](#materials-23)
+
 ### T₀♄ constant
 
 Saturn perihelion passage
@@ -1902,6 +1965,16 @@ Uranus argument of perihelion
 It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
+
+### Porb⛢ constant
+
+Uranus orbital period
+
+Uranus's sidereal orbital period — the time to complete one revolution around
+the Sun (about 84 years). It is distinct from the rotation period `Prot⛢` (the
+~17 h spin period). Tabulated sidereal value from the NASA Planetary Fact Sheet,
+used as an approximation of the anomalistic period that governs the recurrence
+of the perihelion passages exposed by `T₀⛢`. [Materials 23](#materials-23)
 
 ### T₀⛢ constant
 
@@ -2020,6 +2093,16 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♆ constant
+
+Neptune orbital period
+
+Neptune's sidereal orbital period — the time to complete one revolution around
+the Sun (about 165 years). It is distinct from the rotation period `Prot♆` (the
+~16 h spin period). Tabulated sidereal value from the NASA Planetary Fact Sheet,
+used as an approximation of the anomalistic period that governs the recurrence
+of the perihelion passages exposed by `T₀♆`. [Materials 23](#materials-23)
+
 ### T₀♆ constant
 
 Neptune perihelion passage
@@ -2134,6 +2217,16 @@ Pluto argument of perihelion
 It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
+
+### Porb♇ constant
+
+Pluto orbital period
+
+Pluto's sidereal orbital period — the time to complete one revolution around the
+Sun (about 248 years). It is distinct from the rotation period `Prot♇` (the
+~6.4 day spin period). Tabulated sidereal value from the NASA Planetary Fact
+Sheet, used as an approximation of the anomalistic period that governs the
+recurrence of the perihelion passages exposed by `T₀♇`. [Materials 23](#materials-23)
 
 ### T₀♇ constant
 
@@ -3506,4 +3599,8 @@ Park, R.S., et al. (2021). "The JPL Planetary and Lunar Ephemerides DE440 and DE
 
 ### Materials 22
 
-Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Formula for lunar perigee — implemented in MPERC.txt.)
+Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 38: Perihelion and Aphelion of the Planets; Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Planetary orbital periods derived from the Chapter 38 elements; lunar perigee formula from Chapter 50.)
+
+### Materials 23
+
+Williams, D.R. NASA Planetary Fact Sheet. NASA Space Science Data Coordinated Archive (NSSDCA), Goddard Space Flight Center. [Source](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) Accessed: June 2026. (Sidereal orbital periods of the giant planets, used as an approximation of the anomalistic period.)

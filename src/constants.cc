@@ -1247,6 +1247,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☿/ⒸProt☿;-2)' "
                 "  5.067E6_s ]",
+    // *Mercury orbital period - Computed [M22]
+    "Porb☿",    "[ 7600551.8_s "
+                "  0_s "
+                "  0 ]",
     // *Mercury axial tilt - Measurement [22]
     "ϵ☿",       "[ 0.034_° "
                 "  0.001_° "
@@ -1322,6 +1326,10 @@ static const cstring basic_constants[] =
                 "  8.64_s "
                 "  'ROUND(ⓈProt♀/ⒸProt♀;-2)' "
                 "  2.100E7_s ]",
+    // *Venus orbital period - Computed [M22]
+    "Porb♀",    "[ 19414071.4_s "
+                "  0_s "
+                "  0 ]",
     // *Venus axial tilt - Measurement [22]
     "ϵ♀",       "[ 177.36_° "
                 "  0.01_° "
@@ -1395,6 +1403,10 @@ static const cstring basic_constants[] =
                 "  0.0001_s "
                 "  'ROUND(ⓈProt♁/ⒸProt♁;-2)' "
                 "  8.616E4_s ]",
+    // *Earth orbital period - Computed [M22]
+    "Porb♁",    "[ 31558956.5_s "
+                "  0_s "
+                "  0 ]",
     // *Earth axial tilt - Measurement [24]
     "ϵ♁",       "[ 23.4393_° "
                 "  0.0001_° "
@@ -1546,6 +1558,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♂/ⒸProt♂;-2)' "
                 "  8.864E4_s ]",
+    // *Mars orbital period - Computed [M22]
+    "Porb♂",    "[ 59356065.6_s "
+                "  0_s "
+                "  0 ]",
     // *Mars axial tilt - Measurement [22]
     "ϵ♂",       "[ 25.19_° "
                 "  0.01_° "
@@ -1616,6 +1632,10 @@ static const cstring basic_constants[] =
     "Prot♃",    "[ 35730_s "
                 "  1_s "
                 "  'ROUND(ⓈProt♃/ⒸProt♃;-2)' ]",
+    // *Jupiter orbital period - Sidereal [M23]
+    "Porb♃",    "[ 374335776_s "
+                "  0_s "
+                "  0 ]",
     // *Jupiter axial tilt - Measurement [22]
     "ϵ♃",       "[ 3.13_° "
                 "  0.01_° "
@@ -1690,6 +1710,10 @@ static const cstring basic_constants[] =
                 "  50_s "
                 "  'ROUND(ⓈProt♄/ⒸProt♄;-2)' "
                 "  3.836E4_s ]",
+    // *Saturn orbital period - Sidereal [M23]
+    "Porb♄",    "[ 929596608_s "
+                "  0_s "
+                "  0 ]",
     // *Saturn axial tilt - Measurement [22]
     "ϵ♄",       "[ 26.73_° "
                 "  0.01_° "
@@ -1764,6 +1788,10 @@ static const cstring basic_constants[] =
                 "  10_s "
                 "  'ROUND(ⓈProt⛢/ⒸProt⛢;-2)' "
                 "  6.206E4_s ]",
+    // *Uranus orbital period - Sidereal [M23]
+    "Porb⛢",    "[ 2651486400_s "
+                "  0_s "
+                "  0 ]",
     // *Uranus axial tilt - Measurement [22]
     "ϵ⛢",       "[ 97.77_° "
                 "  0.01_° "
@@ -1837,6 +1865,10 @@ static const cstring basic_constants[] =
     "Prot♆",    "[ 58000_s "
                 "  100_s "
                 "  'ROUND(ⓈProt♆/ⒸProt♆;-2)' ]",
+    // *Neptune orbital period - Sidereal [M23]
+    "Porb♆",    "[ 5200416000_s "
+                "  0_s "
+                "  0 ]",
     // *Neptune axial tilt - Measurement [22]
     "ϵ♆",       "[ 28.32_° "
                 "  0.01_° "
@@ -1910,6 +1942,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♇/ⒸProt♇;-2)' "
                 "  5.519E5_s ]",
+    // *Pluto orbital period - Sidereal [M23]
+    "Porb♇",    "[ 7824384000_s "
+                "  0_s "
+                "  0 ]",
     // *Pluto axial tilt - Measurement [26]
     "ϵ♇",       "[ 119.591_° "
                 "  0.001_° "
