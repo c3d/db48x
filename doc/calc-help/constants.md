@@ -1409,7 +1409,7 @@ The geocentric gravitational constant of the WGS-84 system, including the mass o
 the Earth's atmosphere. Exact by definition, and distinct from the IAU nominal
 `GM♁`. [WGS-84](#wgs-84)
 
-### e²♁GPS constant
+### e12♁GPS constant
 
 Earth first eccentricity squared (WGS-84)
 
@@ -1417,13 +1417,13 @@ The square of the first eccentricity of the WGS-84 reference ellipsoid, computed
 from the flattening as `2·f♁GPS−f♁GPS²`. This is an ellipsoid (shape) eccentricity,
 not the orbital eccentricity `e♁`. [WGS-84](#wgs-84)
 
-### e'²♁GPS constant
+### e22♁GPS constant
 
 Earth second eccentricity squared (WGS-84)
 
 The square of the second eccentricity of the WGS-84 reference ellipsoid, computed
-from the first as `e²♁GPS/(1−e²♁GPS)`. An ellipsoid eccentricity, distinct from the
-orbital eccentricity `e♁`. [WGS-84](#wgs-84)
+from the first as `e12♁GPS/(1−e12♁GPS)`. An ellipsoid eccentricity, distinct from
+the orbital eccentricity `e♁`. [WGS-84](#wgs-84)
 
 ### Ytrop♁ constant
 
