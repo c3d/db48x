@@ -525,14 +525,16 @@ FUNCTION_BODY(neg)
     case ID_fraction:
     case ID_big_fraction:
     case ID_decimal:
-    {
-        // We can keep the object, just changing the type
-        id negty = id(xt + 1);
-        algebraic_p clone = algebraic_p(rt.clone(x));
-        byte *tp = (byte *) clone;
-        *tp = negty;
-        return clone;
-    }
+        if (!x->is_zero())
+        {
+            // We can keep the object, just changing the type
+            id negty = id(xt + 1);
+            algebraic_p clone = algebraic_p(rt.clone(x));
+            byte *tp = (byte *) clone;
+            *tp = negty;
+            return clone;
+        }
+        return x;
 
     case ID_neg_integer:
     case ID_neg_bignum:
