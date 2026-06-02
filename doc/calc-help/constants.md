@@ -1,9 +1,55 @@
-# Constants library
+mple # Constants library
 
 The DB48X calculator features a library of constants covering mathematics,
 physics, chemistry, astronomy, materials science and computer science.
 The built-in constants can be extended using the `config/constants.csv`
 configuration file.
+
+## Configuration file
+
+Using the `config/constants.csv` file, users can add their own constants,
+or overrule built in constants.
+
+The first column is interpreted as either:
+* a menu label (when there is no second column);
+* a constant name.
+
+The second column is interpreted as the constant value.
+
+A hierarchy of menus is created by using a forward slash as separator between
+the levels in the menu label.
+
+```
+"Dates"
+
+"Dates/America"
+"IndigenousPeoplesDay",		"14921012_date"
+```
+
+Only the deepest menu level may contain constants.
+Constants on intermediate levels are ignored.
+
+
+The constant value can be a single value, as above, or an array containing:
+* value;
+* standard uncertainty;
+* relative uncertainty;
+* optionally a label (defaults to the value).
+
+```
+"Sample"
+
+"C1",	"[ 3 0.5 0.16667 aLabel ]"
+"C2",	"[ '1+2' 0.5 1/6 ]"
+"C3",	"[ v sv 'sv / v' ]"
+```
+
+As shown in the example above, algebraic expressions can be used, which may
+refer to other constants, as long as definitions are not circular. Although you
+can have user-defined variables in a constant definition, this is not
+recommended, in particular because for performance reasons the calculator will
+cache the value of constants on first use.
+
 
 ## Mathematics constants
 
