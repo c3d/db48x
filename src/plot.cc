@@ -206,13 +206,8 @@ object::result draw_plot(object::id                  kind,
 
     if (dname == object::ID_Equation)
     {
-        if (to_plot->type() == object::ID_equation)
-        {
-            to_plot = equation_p(+to_plot)->value();
-            if (!to_plot)
-                return object::ERROR;
-        }
-
+        if (expression_p expr = expression::get(to_plot))
+            to_plot = expr;
         if (!to_plot->is_program())
         {
             rt.invalid_equation_error();

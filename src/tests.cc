@@ -15173,26 +15173,36 @@ void tests::plotting()
         .noerror()
         .image("plot-sine");
 
-    step("Function plot: Equation");
-    test(CLEAR,
-         ALPHA, X, ENTER, ENTER, ID_sin, 3, ID_multiply,
-         ID_Swap, 21, ID_multiply, ID_cos, 2, ID_multiply, ID_add, ENTER,
-         ID_PlotMenu, LENGTHY(200), ID_Function)
+    step("Function plot: polynomial")
+        .test(CLEAR, "Ⓟ'X↑4-7·X↑3+17·X↑2-17·X+6'",
+              ID_PlotMenu, LENGTHY(200), ID_Function)
+        .noerror()
+        .image("plot-poly");
+    step("Function plot: tagged object")
+        .test(CLEAR, ":MyTag:'X↑4-7·X↑3+17·X↑2-17·X+6'",
+              ID_PlotMenu, LENGTHY(200), ID_Function)
+        .noerror()
+        .image("plot-poly");
+    step("Function plot: Equation")
+        .test(CLEAR,
+              ALPHA, X, ENTER, ENTER, ID_sin, 3, ID_multiply,
+              ID_Swap, 21, ID_multiply, ID_cos, 2, ID_multiply, ID_add, ENTER,
+              ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-eq");
-    step("Function plot: Program");
-    test(CLEAR,
-         LSHIFT, RUNSTOP,
-         ID_StackMenu, ID_Dup, ID_tan, ID_Swap,
-         41, ID_multiply, ID_sin, ID_multiply, ENTER,
-         ID_PlotMenu, LENGTHY(200), ID_Function)
+    step("Function plot: Program")
+        .test(CLEAR,
+              LSHIFT, RUNSTOP,
+              ID_StackMenu, ID_Dup, ID_tan, ID_Swap,
+              41, ID_multiply, ID_sin, ID_multiply, ENTER,
+              ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-pgm");
-    step("Function plot: Disable curve filling");
-    test(CLEAR,
-         RSHIFT, UP, ENTER,
-         ID_NoCurveFilling,
-         ID_PlotMenu, LENGTHY(200), ID_Function)
+    step("Function plot: Disable curve filling")
+        .test(CLEAR,
+              RSHIFT, UP, ENTER,
+              ID_NoCurveFilling,
+              ID_PlotMenu, LENGTHY(200), ID_Function)
         .noerror()
         .image("plot-nofill");
     step("Check that LastArgs gives us the previous plot")
@@ -15203,44 +15213,44 @@ void tests::plotting()
         .noerror()
         .image("plot-pgm");
 
-    step("Polar plot: Program");
-    test(CLEAR,
-         LSHIFT, RUNSTOP,
-         61, ID_multiply,
-         ID_tan, ID_sq,
-         2, ID_add,
-         ENTER,
+    step("Polar plot: Program")
+        .test(CLEAR,
+              LSHIFT, RUNSTOP,
+              61, ID_multiply,
+              ID_tan, ID_sq,
+              2, ID_add,
+              ENTER,
          ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm");
-    step("Polar plot: Program, no fill");
-    test(CLEAR,
-         ID_NoCurveFilling,
-         SHIFT, RUNSTOP,
-         61, ID_multiply,
-         ID_tan, ID_sq, 2, ID_add, ENTER,
-         ID_PlotMenu, LENGTHY(200), ID_Polar)
+    step("Polar plot: Program, no fill")
+        .test(CLEAR,
+              ID_NoCurveFilling,
+              SHIFT, RUNSTOP,
+              61, ID_multiply,
+              ID_tan, ID_sq, 2, ID_add, ENTER,
+              ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm-nofill");
-    step("Polar plot: Program, curve filling");
-    test(CLEAR,
-         ID_CurveFilling,
-         LSHIFT, RUNSTOP,
-         61, ID_multiply,
-         ID_tan, ID_sq, 2, ID_add, ENTER,
-         ID_PlotMenu, LENGTHY(200), ID_Polar)
+    step("Polar plot: Program, curve filling")
+        .test(CLEAR,
+              ID_CurveFilling,
+              LSHIFT, RUNSTOP,
+              61, ID_multiply,
+              ID_tan, ID_sq, 2, ID_add, ENTER,
+              ID_PlotMenu, LENGTHY(200), ID_Polar)
         .noerror()
         .image("polar-pgm");
-    step("Polar plot: Equation");
-    test(CLEAR,
-         F, J, 611, MUL, ALPHA, X, NOSHIFT, DOWN,
-         MUL, K, 271, MUL, ALPHA, X, NOSHIFT, DOWN,
-         ADD, KEY2, DOT, KEY5, ENTER,
-         RSHIFT, O, ENTER, LENGTHY(200), F2)
+    step("Polar plot: Equation")
+        .test(CLEAR,
+              F, J, 611, MUL, ALPHA, X, NOSHIFT, DOWN,
+              MUL, K, 271, MUL, ALPHA, X, NOSHIFT, DOWN,
+              ADD, KEY2, DOT, KEY5, ENTER,
+              RSHIFT, O, ENTER, LENGTHY(200), F2)
         .noerror()
         .image("polar-eq");
-    step("Polar plot: Zoom in X and Y");
-    test(EXIT, "0.5 XSCALE 0.5 YSCALE", ENTER)
+    step("Polar plot: Zoom in X and Y")
+        .test(EXIT, "0.5 XSCALE 0.5 YSCALE", ENTER)
         .noerror()
         .test(ENTER, LENGTHY(200), F2)
         .noerror()
