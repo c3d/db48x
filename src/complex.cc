@@ -571,32 +571,37 @@ PARSE_BODY(rectangular)
         if (max <= 1)
             return SKIP;
         offs = utf8_next(p.source, offs, max);
-        cp = utf8_codepoint(p.source + offs);
+        cp = offs < max ? utf8_codepoint(p.source + offs) : 0;
     }
 
     bool imark = cp == I_MARK;
     if (imark)
     {
         offs = utf8_next(p.source, offs, max);
-        cp = utf8_codepoint(p.source + offs);
+        cp = offs < max ? utf8_codepoint(p.source + offs) : 0;
     }
     bool     sp    = utf8_whitespace(cp);
     size_t   imsz  = max - offs;
     object_p imobj = sp ? nullptr : parse(p.source + offs, imsz,
                                           PARENTHESES, p.separator);
+    algebraic_g im;
     if (!imobj)
     {
         rt.clear_error();
         if (!imark)
             return SKIP;
         // Case i or 3+i: We only got the imaginary mark
-        algebraic_g im = re ? +re : algebraic_p(integer::make(neg ? -1 : 1));
-        re = integer::make(0);
+        if (!re || hadsign)
+            im = algebraic_p(integer::make(neg ? -1 : 1));
+        if (re && !hadsign)
+            im = re;
+        if (!re || !hadsign)
+            re = integer::make(0);
         p.out = rectangular::make(re, im);
         p.length = offs;
         return p.out ? OK : ERROR;
     }
-    algebraic_g im = imobj->as_algebraic();
+    im = imobj->as_algebraic();
     if (!im)
         return SKIP;            // Case of 3+"Hello"
 
