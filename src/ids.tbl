@@ -766,7 +766,7 @@ NAMED(Div2, "QuoRem")                   ALIAS(Div2, "IDiv2")
 
 // Additional list and data sorting functions
 NAMED(FromList, "List→")
-CMD(QuickSort)
+CMD(QuickSort)                          ALIAS(QuickSort, "QSort")
 CMD(ReverseSort)
 CMD(ReverseQuickSort)
 CMD(ReverseList)                        ALIAS(ReverseList, "RevList")

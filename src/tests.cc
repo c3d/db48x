@@ -7474,6 +7474,12 @@ void tests::sorting_functions()
     step("Reverse sort (ReverseSort)")
         .test("ReverseSort", ENTER)
         .expect("{ \"DEF\" \"ABC\" 9.2 8.4 7 3 2.5 }");
+    step("Value sort with expression (SORT)")
+        .test(CLEAR, "{ '2+9' 7 '2-5' } SORT", ENTER)
+        .expect("{ '2-5' 7 '2+9' }");
+    step("Memory sort with expression (QUICKSORT)")
+        .test(CLEAR, "{ '2+9' 7 '2-5' } QSORT", ENTER)
+        .expect("{ 7 '2-5' '2+9' }");
     step("Min function (integer)")
         .test(CLEAR, "1 2 MIN", ENTER).expect("1");
     step("Max function (integer)")

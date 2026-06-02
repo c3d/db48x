@@ -1905,14 +1905,17 @@ int value_compare(object_p *xp, object_p *yp)
     object::id xty = x->type();
     object::id yty = y->type();
     if ((object::is_algebraic(xty) && object::is_algebraic(yty)) ||
-        (xty == object::ID_array   && yty == object::ID_array) ||
+        (xty == object::ID_array   && yty == object::ID_array)   ||
         (xty == object::ID_list    && yty == object::ID_list))
     {
         algebraic_g xa     = algebraic_p(x);
         algebraic_g ya     = algebraic_p(y);
         int         result = 0;
+        xa = xa->evaluate();
+        ya = ya->evaluate();
         if (comparison::compare(&result, xa, ya))
             return result;
+        rt.clear_error();
     }
     return x->compare_to(y);
 }
