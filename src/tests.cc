@@ -5353,7 +5353,7 @@ void tests::complex_types()
 
     step("Integer rectangular form");
     test(CLEAR, "0ⅈ0", ENTER)
-        .type(ID_rectangular).expect("0+0ⅈ");
+        .type(ID_rectangular).expect("0ⅈ");
     test(CLEAR, "1ⅈ2", ENTER)
         .type(ID_rectangular).expect("1+2ⅈ");
     test(CLEAR, "3+ⅈ4", ENTER)
@@ -5527,13 +5527,13 @@ void tests::complex_types()
 
     step("Short rectangular forms for i")
         .test(CLEAR, "ⅈ", ENTER)
-        .type(ID_rectangular).expect("0+1ⅈ");
+        .type(ID_rectangular).expect("ⅈ");
     step("Short rectangular forms for 3.5i")
         .test(CLEAR, "3.5ⅈ", ENTER)
-        .type(ID_rectangular).expect("0+3.5ⅈ");
+        .type(ID_rectangular).expect("3.5ⅈ");
     step("Short rectangular forms for i12.05")
         .test(CLEAR, "ⅈ12.05", ENTER)
-        .type(ID_rectangular).expect("0+12.05ⅈ");
+        .type(ID_rectangular).expect("12.05ⅈ");
 
     step("Syntax error for empty phase")
         .test(CLEAR, "1∡", ENTER)
@@ -5691,8 +5691,8 @@ void tests::complex_functions()
     test(CLEAR, "RAD", ENTER).noerror();
 
     step("Square root (optimized negative case)");
-    test(CLEAR, "-1ⅈ0", ENTER, SQRT).expect("0+1.ⅈ");
-    test(CLEAR, "-4ⅈ0", ENTER, SQRT).expect("0+2.ⅈ");
+    test(CLEAR, "-1ⅈ0", ENTER, SQRT).expect("ⅈ");
+    test(CLEAR, "-4ⅈ0", ENTER, SQRT).expect("2.ⅈ");
 
     step("Square root (optimized positive case)");
     test(CLEAR, "1ⅈ0", ENTER, SQRT).expect("1.+0ⅈ");
@@ -5740,7 +5740,7 @@ void tests::complex_functions()
 
     step("Complex ln1p (zero)");
     test(CLEAR, "0+0ⅈ ln1p", ENTER)
-        .expect("0.+0.ⅈ");
+        .expect("0.ⅈ");
 
     step("Complex ln1p (real axis)");
     test(CLEAR, "1+0ⅈ ln1p", ENTER)
@@ -5777,7 +5777,7 @@ void tests::complex_functions()
 
     step("Complex exponential minus 1 (zero)");
     test(CLEAR, "0+0ⅈ expm1", ENTER)
-        .expect("0.+0ⅈ");  // expm1(0) = e^0 - 1 = 0
+        .expect("0ⅈ");  // expm1(0) = e^0 - 1 = 0
 
     step("Complex expm1 real axis (full precision)")
         .test(CLEAR, "1+0ⅈ expm1", ENTER)
@@ -5915,7 +5915,7 @@ void tests::complex_functions()
     step("Complex conjugate");
     test(CLEAR, "3+4ⅈ conj", ENTER).expect("3-4ⅈ");
     step("Symbolic complex conjugate");
-    test(CLEAR, "a+bⅈ conj", ENTER).expect("a+'-b'ⅈ");
+    test(CLEAR, "a+bⅈ conj", ENTER).expect("a-'b'ⅈ");
     step("Complex conjugate on integers");
     test(CLEAR, "31 conj", ENTER).expect("31");
     step("Complex conjugate on decimals");
@@ -6084,7 +6084,7 @@ void tests::complex_promotion()
 
     step("sqrt(-1) succeeds in complex mode")
         .test(CLEAR, "-1 sqrt", ENTER)
-        .expect("0+1.ⅈ");
+        .expect("ⅈ");
     step("asin(-2) succeeds in complex mode")
         .test(CLEAR, "-2 asin", ENTER)
         .expect("-1.57079 63267 9+1.31695 78969 2ⅈ °");
@@ -12026,7 +12026,7 @@ void tests::insertion_of_variables_constants_and_units()
         .expect("2.71828 18284 6");
     step("Insert i value")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F3, LSHIFT, F3)
-        .expect("0+1ⅈ");
+        .expect("ⅈ");
     step("Insert infinity value")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F4, LSHIFT, F4)
         .expect("9.99999⁳⁹⁹⁹⁹⁹⁹");
@@ -12035,7 +12035,7 @@ void tests::insertion_of_variables_constants_and_units()
         .expect("'Undefined'");
     step("Insert j value")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F1, LSHIFT, F1)
-        .expect("0+1ⅈ");
+        .expect("ⅈ");
     step("Insert rad value")
         .test(CLEAR, ID_ConstantsMenu, F2, NOSHIFT, F6, NOSHIFT, F2, LSHIFT, F2)
         .expect("1 r");
@@ -12070,25 +12070,25 @@ void tests::insertion_of_variables_constants_and_units()
         .test(LSHIFT, F3).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
                                  "2.71828 18284 59045 23536 029  "
-                                 "0+ⅈ1 »");
+                                 "ⅈ »");
     step("Insert infinity value")
         .test(LSHIFT, F4).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
                                  "2.71828 18284 59045 23536 029  "
-                                 "0+ⅈ1  "
+                                 "ⅈ  "
                                  "9.99999⁳999999 »");
     step("Insert undefined value")
         .test(LSHIFT, F5).editor("« Ⓒπ  Ⓒe  Ⓒⅈ  Ⓒ∞  Ⓒ?  "
                                  "3.14159 26535 89793 23846 264  "
                                  "2.71828 18284 59045 23536 029  "
-                                 "0+ⅈ1  "
+                                 "ⅈ  "
                                  "9.99999⁳999999  "
                                  "'Undefined' »");
 
     step("Test that constants parse")
         .test(ENTER)
         .want("« π e ⅈ ∞ ? "
-              "3.14159 26535 9 2.71828 18284 6 0+1ⅈ 9.99999⁳⁹⁹⁹⁹⁹⁹ "
+              "3.14159 26535 9 2.71828 18284 6 ⅈ 9.99999⁳⁹⁹⁹⁹⁹⁹ "
               "'Undefined' »", 300);
 
     step("Select library menu")
@@ -12559,8 +12559,8 @@ void tests::constants_menu()
         .fkey(2).expect("2.71828 18284 6");
     step("i")
         .fkey(0).expect("ⅈ")
-        .fkey(1).expect("0+1ⅈ")
-        .fkey(2).expect("0+1ⅈ±0");
+        .fkey(1).expect("ⅈ")
+        .fkey(2).expect("ⅈ±0");
     step("Infinity")
         .fkey(0).expect("∞")
         .fkey(1).expect("9.99999⁳⁹⁹⁹⁹⁹⁹")
@@ -12571,8 +12571,8 @@ void tests::constants_menu()
         .fkey(2).expect("'(Undefined+Undefined)÷2'±0");
     step("j")
         .fkey(0).expect("ⅉ")
-        .fkey(1).expect("0+1ⅈ")
-        .fkey(2).expect("0+1ⅈ±0");
+        .fkey(1).expect("ⅈ")
+        .fkey(2).expect("ⅈ±0");
     step("rad")
         .fkey(0).expect("rad")
         .fkey(1).expect("1 r")
@@ -12686,8 +12686,8 @@ void tests::constants_menu()
         .test(CLEAR, ID_ConstantsMenu, F4).fkey();
     step("Imaginary unit")
         .fkey(0).expect("ⅉ")
-        .fkey(1).expect("0+1ⅈ")
-        .fkey(2).expect("0+1ⅈ±0");
+        .fkey(1).expect("ⅈ")
+        .fkey(2).expect("ⅈ±0");
     step("Speed of light")
         .fkey(0).expect("c")
         .fkey(1).expect("299 792 458 m/s")
@@ -16805,7 +16805,7 @@ void tests::exact_quotient()
         .test(CLEAR, "1-2ⅈ 4", ENTER, DIV, ID_ToQuotient)
         .expect("1/4-1/2ⅈ")
         .test(CLEAR, "-1-0ⅈ LN", ENTER, ID_ToQuotient)
-        .expect("0+'π'ⅈ");;
+        .expect("'π'ⅈ");;
     step("→Qπ with range")
         .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
         .test(ID_ToQuotient)

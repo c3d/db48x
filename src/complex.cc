@@ -32,6 +32,7 @@
 
 #include "arithmetic.h"
 #include "compare.h"
+#include "expression.h"
 #include "fraction.h"
 #include "functions.h"
 #include "integer.h"
@@ -702,13 +703,25 @@ RENDER_BODY(rectangular)
         return r.printf("Invalid rectangular");
     bool ifirst = r.editing() || Settings.ComplexIBeforeImaginary();
     bool neg  = im->is_negative(false);
+    if (expression_p expr = im->as<expression>())
+        if (object_p obj = expr->outermost_operator())
+            if (obj->type() == ID_neg)
+                neg = true;
     if (neg)
         im = -im;
-    re->render(r);
-    r.put(neg ? '-' : '+');
+    if (!re->is_zero(false))
+    {
+        re->render(r);
+        r.put(neg ? '-' : '+');
+    }
+    else if (neg)
+    {
+        r.put('-');
+    }
     if (ifirst)
         r.put(unicode(I_MARK));
-    im->render(r);
+    if (!im->is_one(false))
+        im->render(r);
     if (!ifirst)
         r.put(unicode(I_MARK));
     return r.size();
