@@ -460,6 +460,8 @@ static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
 //   Shared type switch; real types via callback, compound types recursed/mapped
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return false;
     object::id ty = x->type();
     switch(ty)
     {
