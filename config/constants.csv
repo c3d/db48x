@@ -1,5 +1,14 @@
 "Dates"
 
-"BastilleDay",              "17890714_date"
-"MartinLutherKingDeath",    "19680404_date"
-"IndependenceDay",          "17760704_date"
+"Dates/America"
+"IndigenousPeoplesDay",		"14921012_date"
+
+"Dates/Australia"
+"AustraliaDay",			"17880126_date"
+
+"Dates/France"
+"BastilleDay",			"17890714_date"
+
+"Dates/USA"
+"IndependenceDay",      	"17760704_date"
+"MartinLutherKingDeath",	"19680404_date" 
