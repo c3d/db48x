@@ -779,6 +779,73 @@ algebraic_p check_quotient_patterns(algebraic_r value,
 }
 
 
+static bool to_sqrt_real(algebraic_g &value)
+// ----------------------------------------------------------------------------
+//   Convert real to fraction with π and √n
+// ----------------------------------------------------------------------------
+{
+    if (!value)
+        return false;
+    bool neg = value->is_negative();
+    if (neg)
+        value = -value;
+    algebraic_g bestq = nullptr;
+    algebraic_g r = check_quotient_patterns(value, bestq,
+                                            x,          x,
+                                            sq(x),      s*sqrt(t),
+                                            exp(x),     ln(x));
+    if (r)
+    {
+        if (expression_p expr = r->as<expression>())
+            r = expr->rewrites<expression::DOWN>(
+                // Multiplicative simplifications
+                k0 * x, k0,
+                k1 * x, x,
+                x * k0, k0,
+                x * k1, x,
+                k0 / x, k0,
+                x / k1, x,
+                x / x,   k1,
+                x * (p/q), x*p/q,
+
+                // Power simplifications
+                sqrt(k1/x), sqrt(x)/x,
+                sqrt(k1), k1,
+                sqrt(k0), k0,
+                k0^x, k0,
+                k1^x, k1,
+                x^k0, k1,
+                x^k1, x);
+        record(quotient, "Simplifies as %t", +r);
+        if (r)
+            value = neg ? -r : r;
+    }
+    return r;
+}
+
+
+static algebraic_p to_sqrt_map_fn(algebraic_r a)
+// ----------------------------------------------------------------------------
+//   Map callback for list::map in to_sqrt
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ag = a;
+    if (ag->is_algebraic_num())
+        algebraic::to_sqrt(ag);
+    return +ag;
+}
+
+
+bool algebraic::to_sqrt(algebraic_g &x)
+// ----------------------------------------------------------------------------
+//   Convert to fraction, trying π, √n, ln(n), and e as factors
+// ----------------------------------------------------------------------------
+{
+    to_fraction_context ctx = { to_sqrt_real, to_sqrt_map_fn };
+    return to_fraction_dispatch(x, ctx);
+}
+
+
 static bool to_quotient_real(algebraic_g &value)
 // ----------------------------------------------------------------------------
 //   Convert real to fraction with π, √n, ln(n), e factors (→Qπ)
