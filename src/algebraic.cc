@@ -595,7 +595,53 @@ algebraic_p algebraic::snap_near_integer(algebraic_r eps) const
 }
 
 
+algebraic_p algebraic::integer_sqrt(ularge value)
+// ----------------------------------------------------------------------------
+//   Build an expression for the square root of an integer
+// ----------------------------------------------------------------------------
+{
+    if (value < 2)
+        return integer::make(value);
+    ularge sq = 0, rem = 0;
+    extract_square_factor(value, sq, rem);
+    algebraic_g result = integer::make(sq);
+    if (rem > 1)
+        result = result * expression::make(ID_sqrt, integer::make(rem));
+    return result;
+}
 
+
+algebraic_p algebraic::symbolic_sqrt() const
+// ----------------------------------------------------------------------------
+//   Return a symbolic form for the square root
+// ----------------------------------------------------------------------------
+{
+    algebraic_g x = this;
+    if (x && x->is_fractionable() && Settings.SymbolicResults())
+    {
+        if (x->is_negative())
+        {
+            x = -x;
+            x = x->symbolic_sqrt();
+            return rectangular::make(integer::make(0), x);
+        }
+
+        if (integer_p i = x->as<integer>())
+            return integer_sqrt(i->value<ularge>());
+        if (bignum_p b = x->as<bignum>())
+            return integer_sqrt(b->value<ularge>());
+        if (x->is_fraction())
+        {
+            fraction_p f = fraction_p(+x);
+            ularge num = f->numerator_value();
+            ularge den = f->denominator_value();
+            algebraic_g n = integer_sqrt(num);
+            algebraic_g d   = integer_sqrt(den);
+            return n / d;
+        }
+    }
+    return sqrt::run(x);
+}
 
 
 // ============================================================================
@@ -607,10 +653,10 @@ algebraic_p algebraic::snap_near_integer(algebraic_r eps) const
 template <byte ...args>
 constexpr byte eq<args...>::object_data[sizeof...(args)+2];
 
-static algebraic_p        check_quotient_patterns(algebraic_r value,
-                                                  algebraic_g &bestq,
-                                                  size_t       npats,
-                                                  const byte_p patterns[])
+static algebraic_p check_quotient_patterns(algebraic_r value,
+                                           algebraic_g &bestq,
+                                           size_t       npats,
+                                           const byte_p patterns[])
 // ------------------------------------------------------------------------
 //   Try to apply the patterns in order, find the one with lowest p/q
 // ------------------------------------------------------------------------

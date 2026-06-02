@@ -134,8 +134,8 @@ struct algebraic : command
     // -------------------------------------------------------------------------
 
 
-    bool is_numeric_constant() const;
-    algebraic_p as_numeric_constant() const;
+    bool               is_numeric_constant() const;
+    algebraic_p        as_numeric_constant() const;
     // ------------------------------------------------------------------------
     //   Check if a value is a valid numerical constant (real or complex)
     // ------------------------------------------------------------------------
@@ -144,7 +144,9 @@ struct algebraic : command
 
     static algebraic_p epsilon(int imprecision = 0);
 
-    algebraic_p snap_near_integer(algebraic_r eps) const;
+    algebraic_p        snap_near_integer(algebraic_r eps) const;
+    static algebraic_p integer_sqrt(ularge value);
+    algebraic_p        symbolic_sqrt() const;
 
     static int compare(algebraic_r x, algebraic_r y);
 
