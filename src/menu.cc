@@ -638,22 +638,22 @@ MENU(PolynomialsMenu,
      "Ⓟ'\t'",   ID_SelfInsert,
      "→Poly",   ID_ToPolynomial,
      "Poly→",   ID_FromPolynomial,
-     "Obj→",    ID_Explode,
-     "Display", ID_PrefixPolynomialRender,
-     "QuoRem",  ID_Div2,
-
-     "FRoots",  ID_Unimplemented,
-     "MRoot",   ID_MultipleEquationsSolver,
-     "MSolvr",  ID_SolverMenu,
      "PEval",   ID_PEval,
      "PCoef",   ID_PCoef,
      "PRoot",   ID_PRoot,
-     "Root",    ID_Root,
 
+     "Obj→",    ID_Explode,
+     "Display", ID_PrefixPolynomialRender,
+     "QuoRem",  ID_Div2,
+     "Root",    ID_Root,
+     "Zeros",   ID_Zeros,
+     "MRoot",   ID_MultipleEquationsSolver,
+
+     "MSolvr",  ID_SolverMenu,
      "Solve",   ID_Root,
      "TVMRoot", ID_TVMRoot,
+     "FRoots",  ID_Unimplemented,
      "XRoot",   ID_xroot,
-     "Zeros",   ID_Zeros,
      "FCoef",   ID_Unimplemented);
 
 

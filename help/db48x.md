@@ -21650,9 +21650,9 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Root](#root) | [Solve](#root) | [TVMRoot](#tvmroot) | [XRoot](#xroot) | [Zeros](#zeros) | _FCoef_ |
-| _FRoots_ | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
-| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [Obj→](#explode) | Display | QuoRem |
+| \[[MSolvr](#solvermenu)\] | [Solve](#root) | [TVMRoot](#tvmroot) | _FRoots_ | [XRoot](#xroot) | _FCoef_ |
+| [Obj→](#explode) | Display | QuoRem | [Root](#root) | [Zeros](#zeros) | [MRoot](#multipleequationssolver) |
+| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
 
 ### PolynomialSolverMenu
 
@@ -21758,7 +21758,7 @@ Access: [MathMenu](#mathmenu-reference) 🟦 F1
 
 ### SolverMenu
 
-Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialsMenu](#polynomialsmenu) 🟨 F3; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
+Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialsMenu](#polynomialsmenu) 🟦 F1; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|

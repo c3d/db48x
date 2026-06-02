@@ -13839,18 +13839,20 @@ void tests::quotient_and_remainder()
         .test(BSP)
         .expect("Q:7.");
     step("Polynomials")
-        .test(CLEAR, "'X^2+X+1'", ENTER, "'2*(X+2)'", ID_PolynomialsMenu, F6)
+        .test(CLEAR, "'X^2+X+1'", ENTER, "'2*(X+2)'",
+              ID_PolynomialsMenu, ID_Div2)
         .expect("R:3")
         .test(BSP)
         .expect("Q:¹/₂·X-¹/₂");
     step("Polynomials with polynomial remainder")
         .test(CLEAR, "'(X^2+X+1)^3'", ENTER,
-              "'2*(X+2)^2'", ID_PolynomialsMenu, F6)
+              "'2*(X+2)^2'", ID_PolynomialsMenu, ID_Div2)
         .expect("R:-81·X-135")
         .test(BSP)
         .expect("Q:¹/₂·X↑4-¹/₂·X↑3+3·X↑2-6 ¹/₂·X+17");
     step("Polynomials with zero remainder")
-        .test(CLEAR, "'(X^2+X+1)^3'", ENTER, "'(1+X^2+X)^2'", ID_PolynomialsMenu, F6)
+        .test(CLEAR, "'(X^2+X+1)^3'", ENTER, "'(1+X^2+X)^2'",
+              ID_PolynomialsMenu, ID_Div2)
         .expect("R:0")
         .test(BSP)
         .expect("Q:X↑2+X+1");
