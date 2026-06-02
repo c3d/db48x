@@ -3586,6 +3586,10 @@ expression_p expression::simplify() const
         X*cubed(X),     X^k4,
         sq(X)*sq(X),    X^k4,
         sq(sq(X)),      X^k4,
+        X*Z+Y*Z,        (X+Y)*Z,
+        Z*X+Z*Y,        Z*(X+Y),
+        X*Z-Y*Z,        (X-Y)*Z,
+        Z*X-Z*Y,        Z*(X-Y),
 
         // Division simplification
         X*(Y/Z),        (X*Y)/Z,
@@ -3594,6 +3598,8 @@ expression_p expression::simplify() const
         A/(B/X),        (A/B)*X,
         k1/X,           inv(X),
         inv(inv(X)),    X,
+        X/Z+Y/Z,        (X+Y)/Z,
+        X/Z-Y/Z,        (X-Y)/Z,
 
         // Power simplifications
         (X^A)*X,        X^(A+k1),
