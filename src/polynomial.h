@@ -109,7 +109,11 @@ struct polynomial : expression
     polynomial_p        primitive() const;
     polynomial_p        primitive(size_t vidx) const;
     polynomial_p        primitive(symbol_p vname) const;
-    array_p             roots() const;
+    algebraic_p         evaluate(algebraic_r x) { return horner(x); }
+    static algebraic_p  horner(stack_buffer &sbuf, algebraic_r x);
+    algebraic_p         horner(algebraic_r x);
+    list_p              roots(id ty, symbol_p var) const;
+    list_p              roots_internal(id ty, symbol_p var) const;
 
     // Return total length of the polynomial in bytes
     size_t length() const
@@ -119,7 +123,7 @@ struct polynomial : expression
 
     // Access variables in the polynomial
     size_t   variables() const;
-    symbol_g variable(size_t index) const;
+    symbol_p variable(size_t index) const;
     utf8     variable(size_t index, size_t *len) const;
     size_t   variable(utf8 name, size_t len) const;
     size_t   variable(symbol_p name) const;

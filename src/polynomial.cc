@@ -31,6 +31,7 @@
 
 #include "arithmetic.h"
 #include "array.h"
+#include "compare.h"
 #include "complex.h"
 #include "decimal.h"
 #include "expression.h"
@@ -294,6 +295,23 @@ polynomial_p polynomial::make(expression_p expr, bool error)
         {
             if (!polynomial_op(depth, pow, 3))
                 goto error;
+        }
+        else if (ty == ID_sqrt)
+        {
+            bool ok = false;
+            if (object_p pobj = rt.top())
+                if (polynomial_p poly = pobj->as<polynomial>())
+                    if (poly->variables() == 0)
+                        if (algebraic_p expr = poly->as_expression())
+                            if (algebraic_g v = expr->evaluate())
+                                if (algebraic_g s = sqrt::run(v))
+                                    if (polynomial_p repl = make(s))
+                                        ok = rt.top(repl);
+            if (!ok)
+            {
+                rt.value_error();
+                goto error;
+            }
         }
         else
         {
@@ -926,7 +944,7 @@ size_t polynomial::variables() const
 }
 
 
-symbol_g polynomial::variable(size_t index) const
+symbol_p polynomial::variable(size_t index) const
 // ----------------------------------------------------------------------------
 //   Return the variable at the given index as a symbol
 // ----------------------------------------------------------------------------
@@ -1809,6 +1827,8 @@ polynomial_p polynomial::get(object_p obj)
         return poly;
     if (polynomial_p poly = polynomial::from_coefficients(obj, false))
         return poly;
+    if (expression_p expr = obj->as<expression>())
+        obj = expr->as_difference_for_solve();
     if (algebraic_p alg = obj->as_algebraic())
         if (polynomial_p poly = polynomial::make(alg))
             return poly;
@@ -2046,14 +2066,231 @@ polynomial_p polynomial::primitive(size_t var) const
 }
 
 
-array_p polynomial::roots() const
+RECORDER(polyroots, 16, "Polynomial roots");
+
+list_p polynomial::roots(object::id ty, symbol_p var) const
+// ----------------------------------------------------------------------------
+//   Compute roots for polynomial and cleanup
+// ----------------------------------------------------------------------------
+{
+    cleaner purge;
+    list_p  result = roots_internal(ty, var);
+    if (result)
+        result = result->sort();
+    return purge(result);
+}
+
+
+list_p polynomial::roots_internal(object::id ty, symbol_p var) const
 // ----------------------------------------------------------------------------
 //   Compute the roots from a polynomial
 // ----------------------------------------------------------------------------
 {
-    size_t degree = polynomial::expand(this, true);
-    if (rt.error())
-        return nullptr;
+    // We can deal with degree <- 2 symbolically, otherwise must be numeric
+    polynomial_g p      = this;
+    symbol_g     vname  = var;
+    bool         round  = Settings.SymbolicResults() && Settings.AutoSimplify();
+    scribble     scr;
+    record(polyroots, "Roots of %t for variable %t", +p, +vname);
+    settings::SaveFractionDigits fd(4);
+
+    while (p && !program::interrupted())
+    {
+        size_t       vars   = p->variables();
+        size_t       vidx   = p->variable(+vname);
+        iterator     r      = p->ranking(vidx);
+        ularge       degree = r.rank(vidx);
+
+        record(polyroots, "Degree %lu", degree);
+        if (degree <= 2)
+        {
+            // ax^2+bx+c = 0, or bx+c=0
+            algebraic_g a[3];
+            algebraic_g x, y;
+            for (iterator term : *p)
+            {
+                uint vexp = ~0;
+                x = term.factor();
+                for (size_t v = 0; v < vars; v++)
+                {
+                    ularge exp = term.exponent();
+                    if (v == vidx)
+                    {
+                        vexp = exp;
+                    }
+                    else
+                    {
+                        y = variable(v);
+                        y = ::pow(y, exp);
+                        x = x * y;
+                    }
+                }
+                if (vexp > 2)
+                {
+                    rt.invalid_polynomial_error();
+                    return nullptr;
+                }
+                algebraic_g &vf = a[vexp];
+                vf = vf ? vf + x : x;
+            }
+
+            record(polyroots, "Direct a=%t b=%t c=%t", +a[2], +a[1], +a[0]);
+            if (!a[0])
+                a[0] = integer::make(0);
+            if (a[2] && !a[2]->is_zero(false))
+            {
+                if (!a[1])
+                    a[1] = integer::make(0);
+                y = a[2] * a[0];                  // ac
+                y = y + y;                        // 2ac
+                y = y + y;                        // 4ac
+                y = a[1] * a[1] - y;              // b^2-4ac
+                if (!y)
+                    goto error;
+                bool neg = y->is_negative(false);
+                if (neg)
+                {
+                    // If negative, provide result only in complex mode
+                    if (!Settings.ComplexResults())
+                    {
+                        record(polyroots, "No real solutions, delta=%t", +y);
+                        return list::make(ty, scr.scratch(), scr.growth());
+                    }
+                    y = -y;
+                }
+                if (!y)
+                    goto error;
+                y = y->symbolic_sqrt();             // sqrt(b^2-4ac)
+                a[2] = integer::make(2) * a[2];         // 2a
+                a[1] = -a[1] / a[2];                    // -b/2a
+                y  = y / a[2];                      // sqrt(b^2-4ac) / 2a
+                if (!y)
+                    goto error;
+                if (neg)
+                {
+                    if (Settings.AutoSimplify())
+                        if (expression_p expr = y->as<expression>())
+                            y = expr->simplify();
+                    x = rectangular::make(a[1], -y);
+                    y = rectangular::make(a[1], y);
+                }
+                else
+                {
+                    x = a[1] - y;
+                    y    = a[1] + y;
+                }
+                if (Settings.AutoSimplify())
+                {
+                    if (expression_p expr = y->as<expression>())
+                        y = expr->simplify();
+                    if (expression_p expr = x->as<expression>())
+                        x = expr->simplify();
+                }
+                if (round && x && y)
+                {
+                    to_sqrt(x);
+                    to_sqrt(y);
+                }
+                record(polyroots, "Solutions %t and %t", +x, +y);
+                if (!rt.append(+x) || !rt.append(+y))
+                    goto error;
+            }
+            else if (a[1] && !a[1]->is_zero(false))
+            {
+                y = -a[0] / a[1];
+                record(polyroots, "Solution is %t", +y);
+                if (!rt.append(+y))
+                    goto error;
+            }
+            else
+            {
+                rt.invalid_polynomial_error();
+                goto error;
+            }
+            return list::make(ty, scr.scratch(), scr.growth());
+        }
+        else
+        {
+            polynomial_g der1 = p->derivative(vidx);
+            polynomial_g der2 = der1->derivative(vidx);
+            stack_buffer spoly, sder1, sder2;
+            if (!p->expand(spoly, true)     ||
+                !der1->expand(sder1, true)  ||
+                !der2->expand(sder2, true))
+                goto error;
+
+            record(polyroots, "p  =%t", +p);
+            record(polyroots, "p' =%t", +der1);
+            record(polyroots, "p''=%t", +der2);
+
+            settings::SaveComplexResults scr(true);
+            size_t      max = Settings.SolverIterations();
+            algebraic_g eps = algebraic::epsilon();
+            algebraic_g n   = integer::make(degree);
+            algebraic_g n1  = integer::make(1);
+            algebraic_g x   = integer::make(0);
+            algebraic_g y, g, h, a;
+            n1 = n - n1;
+
+            // Laguerre iteration
+            bool found = false;
+            for (size_t i = 0; i < max; i++)
+            {
+                if (!x)
+                    goto error;
+                y = horner(spoly, x);
+                record(polyroots, "Laguerre %zu x=%t y=%t", i, +x, +y);
+                if (!y)
+                    goto error;
+                if (y->is_zero(false) || smaller_magnitude(y, eps))
+                {
+                    found = true;
+                    record(polyroots, "Solution found x=%t y=%t", +x, +y);
+                    break;
+                }
+                g = horner(sder1, x);
+                g = g / y;
+                h = horner(sder2, x);
+                h = g * g - h / y;
+                a = n1 * (n * h - g * g);
+                a = sqrt::run(a);
+                record(polyroots, "G=%t H=%t nH-G^2=%t", +g, +h, +a);
+                y = g - a;
+                a = g + a;
+                record(polyroots, "denominators %t or %t", +a, +y);
+                if (smaller_magnitude(a, y))
+                    a = y;
+                a = n / a;
+                x = x - a;
+                record(polyroots, "a=%t new x=%t", +a, +x);
+            }
+
+            sder1.cleanup();
+            sder2.cleanup();
+            spoly.cleanup();
+            if (!found)
+            {
+                rt.no_solution_error();
+                goto error;
+            }
+            if (round && x)
+                to_sqrt(x);
+            if (!rt.append(x))
+                goto error;
+
+            // Here p(x) is small enough, generate x-x0 polynomial
+            der1 = make(vname);
+            der2 = make(x);
+            der1 = sub(der1, der2);
+            der2 = div(p, der1);
+            record(polyroots, "Dividing %t by %t is %t", +p, +der1, +der2);
+            p = der2;
+        }
+    }
+
+error:
+    if (!rt.error())
+        rt.invalid_polynomial_error();
     return nullptr;
 }
 
@@ -2065,15 +2302,17 @@ array_p polynomial::roots() const
 //
 // ============================================================================
 
-static algebraic_p horner(size_t n, algebraic_r x)
+algebraic_p polynomial::horner(stack_buffer &s, algebraic_r x)
 // ----------------------------------------------------------------------------
 //   Horner evaluation from coefficients on the stack
 // ----------------------------------------------------------------------------
 {
+    cleaner     purge;
+    size_t      n = s.items();
     algebraic_g result, c;
     for (size_t i = 0; i < n; i++)
     {
-        object_p o = rt.stack(n + ~i);
+        object_p o = s[n + ~i];
         c = o->as_algebraic();
         if (!c)
             return nullptr;
@@ -2081,7 +2320,20 @@ static algebraic_p horner(size_t n, algebraic_r x)
         if (!result)
             return nullptr;
     }
-    return result;
+    return purge(result);
+}
+
+
+algebraic_p polynomial::horner(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Horner evaluation from a polynomial
+// ----------------------------------------------------------------------------
+{
+    stack_buffer s;
+    expand(s, true);
+    if (rt.error())
+        return nullptr;
+    return horner(s, x);
 }
 
 
@@ -2101,12 +2353,12 @@ COMMAND_BODY(PEval)
 
         if (object_p pobj = rt.stack(1))
         {
-            size_t      depth  = rt.depth();
-            size_t      degree = polynomial::expand(pobj, true);
-            if (rt.error())
+            size_t       sz = polynomial::expand(pobj, true);
+            if (!sz)
                 return ERROR;
-            algebraic_p result = horner(degree, x);
-            rt.drop(rt.depth() - depth);
+            stack_buffer s(sz);
+            algebraic_p result = polynomial::horner(s, x);
+            s.cleanup();
             if (result && rt.drop() && rt.top(result))
                 return OK;
         }
@@ -2122,586 +2374,20 @@ COMMAND_BODY(PEval)
 //
 // ============================================================================
 
-RECORDER(polyroots, 16, "Polynomial roots");
-
-
-static inline size_t poly_slot(size_t n, size_t above, size_t i)
-// ----------------------------------------------------------------------------
-//   Compute stack slot for one coefficient index
-// ----------------------------------------------------------------------------
-{
-    return above + n + ~i;
-}
-
-
-static bool poly_push_root(complex_r root, size_t &nroots)
-// ----------------------------------------------------------------------------
-//   Push one rounded root and update count
-// ----------------------------------------------------------------------------
-{
-    algebraic_g a = root->as_rounded_result();
-    if (!a || !rt.push(+a))
-        return false;
-    nroots++;
-    return true;
-}
-
-
-static int poly_root_compare(const void *pa, const void *pb)
-// ----------------------------------------------------------------------------
-//   Compare two roots for ascending sort order
-// ----------------------------------------------------------------------------
-{
-    algebraic_p a = (*(object_p const *) pa)->as_algebraic();
-    algebraic_p b = (*(object_p const *) pb)->as_algebraic();
-    if (!a || !b)
-        return 0;
-    int cmp = algebraic::compare(a, b);
-    return cmp < 0 ? -1 : cmp > 0 ? 1 : 0;
-}
-
-
-static array_p poly_build_array(size_t count,
-                                bool   sort_items,
-                                bool   low_index_first)
-// ----------------------------------------------------------------------------
-//   Build an array from stack results
-// ----------------------------------------------------------------------------
-{
-    if (sort_items && count > 1)
-        qsort(rt.stack_base(), count, sizeof(object_p), poly_root_compare);
-
-    scribble scr;
-    for (size_t i = 0; i < count; i++)
-    {
-        size_t   ix = low_index_first ? i : count + ~i;
-        object_p o  = rt.stack(ix);
-        if (!o || !rt.append(o))
-            return nullptr;
-    }
-    rt.drop(count);
-    return array_p(list::make(object::ID_array, scr.scratch(), scr.growth()));
-}
-
-
-static list_p poly_build_list(size_t count, bool unique)
-// ----------------------------------------------------------------------------
-//   Build root list with optional deduplication
-// ----------------------------------------------------------------------------
-{
-    size_t depth = rt.depth();
-    for (size_t i = 0; i < count; i++)
-    {
-        object_p o = rt.stack(count + ~i);
-        if (!o)
-            return nullptr;
-        complex_g r = complex::from_algebraic(o->as_algebraic());
-        if (!r)
-            return nullptr;
-        if (!Settings.ComplexResults() && r->has_imaginary())
-            continue;
-        if (unique)
-        {
-            size_t out = rt.depth() - depth;
-            bool found = false;
-            for (size_t j = 0; j < out; j++)
-            {
-                object_p prior = rt.stack(out + ~j);
-                complex_g op = complex::from_algebraic(prior->as_algebraic());
-                if (op && r->near(op))
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (found)
-                continue;
-        }
-        algebraic_g a = r->as_rounded_result();
-        if (!a || !rt.push(+a))
-            return nullptr;
-    }
-    size_t out = rt.depth() - depth;
-    scribble scr;
-    for (size_t i = 0; i < out; i++)
-    {
-        object_p o = rt.stack(out + ~i);
-        if (!o || !rt.append(o))
-            return nullptr;
-    }
-    rt.drop(count + out);
-    return list::make(scr.scratch(), scr.growth());
-}
-
-
-
-struct poly_buf
-// ----------------------------------------------------------------------------
-//   Coefficient buffer (stack storage, no std::vector)
-// ----------------------------------------------------------------------------
-{
-    size_t    n;
-    complex_g c[128];
-};
-
-
-static bool poly_buf_read(poly_buf &p, size_t n, size_t skip)
-// ----------------------------------------------------------------------------
-//   Read n coefficients from the stack into p
-// ----------------------------------------------------------------------------
-{
-    if (n > sizeof(p.c) / sizeof(p.c[0]))
-    {
-        rt.dimension_error();
-        return false;
-    }
-    p.n = n;
-    for (size_t i = 0; i < n; i++)
-    {
-        object_p    o = rt.stack(skip + n + ~i);
-        algebraic_p a = o->as_algebraic();
-        if (!a)
-            return false;
-        p.c[i] = complex::from_algebraic(a);
-        if (!p.c[i])
-            return false;
-    }
-    return true;
-}
-
-
-static bool poly_buf_trim(poly_buf &p)
-// ----------------------------------------------------------------------------
-//   Drop leading zero coefficients
-// ----------------------------------------------------------------------------
-{
-    while (p.n > 1 && p.c[0]->is_zero())
-    {
-        for (size_t i = 0; i + 1 < p.n; i++)
-            p.c[i] = p.c[i + 1];
-        p.n--;
-    }
-    if (!p.n)
-    {
-        rt.dimension_error();
-        return false;
-    }
-    if (p.c[0]->is_zero())
-    {
-        rt.zero_divide_error();
-        return false;
-    }
-    return true;
-}
-
-
-static bool poly_buf_normalize(poly_buf &p)
-// ----------------------------------------------------------------------------
-//   Divide by leading coefficient
-// ----------------------------------------------------------------------------
-{
-    complex_g lead = p.c[0];
-    if (!lead || lead->is_zero())
-        return false;
-    for (size_t i = 0; i < p.n; i++)
-    {
-        p.c[i] = p.c[i] / lead;
-        if (!p.c[i])
-            return false;
-    }
-    return true;
-}
-
-
-static complex_g poly_buf_horner(poly_buf &p, complex_r x)
-// ----------------------------------------------------------------------------
-//   Horner evaluation
-// ----------------------------------------------------------------------------
-{
-    complex_g result = complex::zero();
-    for (size_t i = 0; i < p.n; i++)
-    {
-        result = result * x + p.c[i];
-        if (!result)
-            return nullptr;
-    }
-    return result;
-}
-
-
-static bool poly_buf_deflate(poly_buf &p, complex_r root)
-// ----------------------------------------------------------------------------
-//   Deflate after removing one root
-// ----------------------------------------------------------------------------
-{
-    if (p.n <= 1)
-        return false;
-    complex_g check = poly_buf_horner(p, root);
-    complex_g zero = complex::zero();
-    if (!check || (!check->is_zero() && !check->near(zero)))
-        return false;
-    size_t m = p.n - 1;
-    complex_g prev = p.c[0];
-    for (size_t i = 1; i < m; i++)
-    {
-        complex_g bi = p.c[i] + root * prev;
-        if (!bi)
-            return false;
-        p.c[i] = bi;
-        prev = bi;
-    }
-    p.n = m;
-    return true;
-}
-
-
-static void poly_buf_derivative(poly_buf &p, poly_buf &d)
-// ----------------------------------------------------------------------------
-//   Derivative into d
-// ----------------------------------------------------------------------------
-{
-    if (p.n <= 1)
-    {
-        d.n = 0;
-        return;
-    }
-    d.n = p.n - 1;
-    size_t deg = p.n - 1;
-    for (size_t i = 0; i < d.n; i++)
-        d.c[i] = p.c[i] * complex::make(int(deg - i), 0);
-}
-
-
-static complex_g poly_buf_laguerre_root(poly_buf &p)
-// ----------------------------------------------------------------------------
-//   Laguerre root finder
-// ----------------------------------------------------------------------------
-{
-    settings::SaveNumericalResults snr(true);
-
-    size_t n = p.n - 1;
-    if (!n)
-        return complex::zero();
-
-    complex_g x = complex::one();
-    if (n > 1)
-        x = rectangular::make(decimal::make(5, -1), decimal::make(5, -1));
-
-    algebraic_g huge = decimal::make(1, 8);
-    algebraic_g tiny = algebraic::epsilon();
-
-    for (size_t iter = 0; iter < Settings.MaxLaguerreIterations(); iter++)
-    {
-        if (program::interrupted())
-            return nullptr;
-
-        complex_g pv = poly_buf_horner(p, x);
-        if (!pv)
-            return nullptr;
-        if (pv->is_zero())
-            return x;
-
-        poly_buf d1, d2;
-        poly_buf_derivative(p, d1);
-        poly_buf_derivative(d1, d2);
-        complex_g fp  = poly_buf_horner(d1, x);
-        complex_g fpp = poly_buf_horner(d2, x);
-        if (!fp || !fpp)
-            return nullptr;
-
-        complex_g G = fp / pv;
-        complex_g H = G * G - fpp / pv;
-        if (!G || !H)
-            return nullptr;
-
-        complex_g nf   = complex::make(int(n), 0);
-        complex_g nfm1 = complex::make(int(n - 1), 0);
-        complex_g disc = nfm1 * (nf * H - G * G);
-        complex_g sdisc = complex::sqrt(disc);
-        if (!sdisc)
-            return nullptr;
-
-        complex_g denom = G + sdisc;
-        complex_g alt   = G - sdisc;
-        if (!denom || !alt)
-            return nullptr;
-        algebraic_g da = abs::run(algebraic_p(+denom));
-        algebraic_g db = abs::run(algebraic_p(+alt));
-        if (da && db && algebraic::compare(da, db) < 0)
-            denom = alt;
-
-        if (denom->is_zero())
-            denom = rectangular::make(tiny, tiny);
-
-        complex_g dz = -nf / denom;
-        if (!dz)
-            return nullptr;
-        algebraic_g dzabs = abs::run(algebraic_p(+dz));
-        if (dzabs && algebraic::compare(dzabs, huge) > 0)
-            break;
-
-        complex_g nx = x + dz;
-        if (!nx)
-            return nullptr;
-        if (nx->near(x))
-            return nx;
-        x = nx;
-    }
-    return x;
-}
-
-
-static bool poly_buf_quadratic(poly_buf &p, size_t &nroots)
-// ----------------------------------------------------------------------------
-//   Quadratic roots pushed on the stack
-// ----------------------------------------------------------------------------
-{
-    if (p.n != 3)
-        return false;
-    complex_g a  = p.c[0];
-    complex_g b  = p.c[1];
-    complex_g d  = p.c[2];
-    complex_g four = complex::make(4, 0);
-    complex_g disc = b * b - four * a * d;
-    complex_g s    = complex::sqrt(disc);
-    if (!s)
-        return false;
-    complex_g twoa = complex::make(2, 0) * a;
-    if (!twoa)
-        return false;
-    complex_g mb = -b;
-    complex_g r1 = (mb + s) / twoa;
-    complex_g r2 = (mb - s) / twoa;
-    if (!r1 || !r2)
-        return false;
-    if (r1->near(r2))
-    {
-        if (!poly_push_root(r1, nroots))
-            return false;
-        return true;
-    }
-    if (!poly_push_root(r1, nroots))
-        return false;
-    if (!poly_push_root(r2, nroots))
-        return false;
-    if (algebraic::compare(r1->as_rounded_result(),
-                           r2->as_rounded_result()) > 0)
-    {
-        if (!rt.swap(0, 1))
-            return false;
-    }
-    return true;
-}
-
-
-static bool poly_buf_try_integer(poly_buf &p, size_t &nroots)
-// ----------------------------------------------------------------------------
-//   Rational root test
-// ----------------------------------------------------------------------------
-{
-    if (!p.n)
-        return false;
-
-    algebraic_g constant_i;
-    if (!p.c[p.n - 1]->is_integer(constant_i))
-        return false;
-    if (p.c[0]->has_imaginary())
-        return false;
-
-    object_p cobj = object_p(+constant_i);
-    if (object::is_bignum(cobj->type()))
-        return false;
-    if (!object::is_integer(cobj->type()))
-        return false;
-
-    ularge val = integer_p(cobj)->value<ularge>();
-    if (cobj->type() == object::ID_neg_integer)
-        val = integer_p(cobj)->value<ularge>();
-    if (val > Settings.MaxRootDivisor())
-        return false;
-
-    size_t dcount = integer_divisors_push(val);
-    if (!dcount)
-        return false;
-
-    for (size_t i = 0; i < dcount; i++)
-    {
-        object_p  ro = rt.stack(dcount + ~i);
-        algebraic_p ra = ro->as_algebraic();
-        if (!ra)
-            goto div_err;
-        complex_g z = complex::from_algebraic(ra);
-        if (!z)
-            goto div_err;
-        complex_g pv = poly_buf_horner(p, z);
-        if (!pv)
-        {
-            rt.clear_error();
-            continue;
-        }
-        complex_g zero = complex::zero();
-        if (pv->is_zero() || pv->near(zero))
-        {
-            rt.drop(dcount);
-            if (!poly_buf_deflate(p, z))
-                return false;
-            if (!poly_push_root(z, nroots))
-                return false;
-            return true;
-        }
-    }
-    rt.drop(dcount);
-    return false;
-
-div_err:
-    rt.clear_error();
-    rt.drop(dcount);
-    return false;
-}
-
-
-static bool poly_buf_from_poly(polynomial_r poly, symbol_r var, poly_buf &p)
-// ----------------------------------------------------------------------------
-//   Load univariate coefficients from a polynomial object
-// ----------------------------------------------------------------------------
-{
-    if (!poly || !var)
-        return false;
-
-    size_t vidx  = poly->variable(+var);
-    size_t nvars = poly->variables();
-    for (size_t v = 0; v < nvars; v++)
-    {
-        if (v == vidx)
-            continue;
-        for (auto term : *poly)
-        {
-            if (term.rank(v))
-            {
-                rt.invalid_polynomial_error();
-                return false;
-            }
-        }
-    }
-
-    ularge degree = 0;
-    for (auto term : *poly)
-    {
-        ularge e = term.rank(vidx);
-        if (e > degree)
-            degree = e;
-    }
-    if (degree > Settings.MaxPolynomialDegree())
-    {
-        rt.dimension_error();
-        return false;
-    }
-
-    p.n = size_t(degree) + 1;
-    for (size_t i = 0; i < p.n; i++)
-        p.c[i] = complex::zero();
-    for (auto term : *poly)
-    {
-        ularge      e = term.rank(vidx);
-        complex_g   c = complex::from_algebraic(term.factor());
-        if (!c)
-            return false;
-        size_t      i = size_t(degree - e);
-        p.c[i]       = p.c[i] + c;
-        if (!p.c[i])
-            return false;
-    }
-    return poly_buf_trim(p);
-}
-
-
-static bool poly_buf_proot(poly_buf &p, size_t &nroots)
-// ----------------------------------------------------------------------------
-//   Find all roots; push each on the stack
-// ----------------------------------------------------------------------------
-{
-    nroots = 0;
-    if (!poly_buf_trim(p) || !poly_buf_normalize(p))
-        return false;
-    if (p.n <= 1)
-        return false;
-
-    if (p.n == 2)
-    {
-        complex_g root = -p.c[1] / p.c[0];
-        if (!root)
-            return false;
-        return poly_push_root(root, nroots);
-    }
-    if (p.n == 3)
-        return poly_buf_quadratic(p, nroots);
-
-    size_t guard = 0;
-    while (p.n > 1 && guard++ < Settings.MaxPolynomialDegree() + 2)
-    {
-        if (program::interrupted())
-            return false;
-        if (p.n == 3)
-        {
-            if (poly_buf_try_integer(p, nroots))
-                continue;
-            return poly_buf_quadratic(p, nroots);
-        }
-        if (poly_buf_try_integer(p, nroots))
-            continue;
-        complex_g root = poly_buf_laguerre_root(p);
-        if (!root)
-            return false;
-        if (!poly_buf_deflate(p, root))
-            break;
-        if (!poly_push_root(root, nroots))
-            return false;
-    }
-    poly_buf_trim(p);
-    rt.clear_error();
-    return nroots > 0;
-}
-
-
-static bool poly_proot_numeric(size_t n, size_t &nroots)
-// ----------------------------------------------------------------------------
-//   Solve numeric roots from stacked coefficients
-// ----------------------------------------------------------------------------
-{
-    poly_buf p;
-    if (!poly_buf_read(p, n, nroots))
-        return false;
-    if (!rt.drop_at(nroots, n))
-        return false;
-    return poly_buf_proot(p, nroots);
-}
-
-
 COMMAND_BODY(PRoot)
 // ----------------------------------------------------------------------------
 //   All roots of a polynomial from coefficient vector
 // ----------------------------------------------------------------------------
 {
     if (object_p pobj = rt.top())
-    {
-        size_t depth  = rt.depth();
-        size_t degree = polynomial::expand(pobj, true);
-        if (rt.error())
-            return ERROR;
-        size_t nroots = 0;
-        if (!poly_proot_numeric(degree, nroots))
-        {
-            rt.drop(rt.depth() - depth);
-            if (!rt.error())
-                rt.no_solution_error();
-            return ERROR;
-        }
-        rt.clear_error();
-        array_p result = poly_build_array(nroots, true, true);
-        if (result && rt.push(result))
-            return OK;
-        rt.drop(rt.depth() - depth);
-    }
+        if (polynomial_p poly = polynomial::get(pobj))
+            if (symbol_p var = polynomial::main_variable())
+                if (list_p roots = poly->roots(ID_array, var))
+                    if (rt.top(roots))
+                        return OK;
+
+    if (!rt.error())
+        rt.type_error();
     return ERROR;
 }
 
@@ -2758,17 +2444,11 @@ COMMAND_BODY(Zeros)
         {
             symbol_p var = varobj->as_quoted<symbol>();
             if (!var)
-            {
-                rt.type_error();
-                return ERROR;
-            }
-
+                goto error;
             algebraic_g eq = expr->as_algebraic();
             if (!eq)
-            {
-                rt.type_error();
-                return ERROR;
-            }
+                goto error;
+
             if (expression_p eqeq = expression::get(eq))
                 if (expression_g diff = eqeq->as_difference_for_solve())
                     eq = algebraic_p(+diff);
@@ -2777,35 +2457,19 @@ COMMAND_BODY(Zeros)
             if (!eqexpr)
                 eqexpr = expression::get(eq);
             if (!eqexpr)
-            {
-                rt.type_error();
-                return ERROR;
-            }
+                goto error;
 
             polynomial_p poly = polynomial::make(eqexpr, true);
             if (!poly)
-                return ERROR;
-
-            size_t saved = rt.depth();
-            poly_buf   p;
-            if (!poly_buf_from_poly(poly, var, p))
-                return ERROR;
-
-            size_t nroots = 0;
-            if (!poly_buf_proot(p, nroots))
-            {
-                rt.drop(rt.depth() - saved);
-                if (!rt.error())
-                    rt.no_solution_error();
-                return ERROR;
-            }
-
-            rt.clear_error();
-            list_p result = poly_build_list(nroots, true);
-            if (result && rt.drop(2) && rt.push(result))
+                goto error;
+            list_p roots = poly->roots(ID_list, var);
+            if (roots && rt.drop() && rt.top(roots))
                 return OK;
-            rt.drop(rt.depth() - saved);
         }
     }
+
+error:
+    if (!rt.error())
+        rt.type_error();
     return ERROR;
 }

@@ -18398,24 +18398,21 @@ Find all zeros of a univariate expression.
 
 `'Expr'` `'Var'` ▶ `{ Zeros }`
 
-* `'Expr'` is an algebraic expression or equation in the variable `'Var'`.
-  Equations are converted to the difference of their sides before solving.
+* `'Expr'` is an algebraic expression, equation or polynomial in the variable
+  `'Var'`.  Equations are converted to the difference of their sides before
+  solving.
 * `'Var'` must be a quoted variable name (symbol).
-* Returns a list of distinct zeros. Order follows the internal root-finding
-  sequence (not sorted).
-* The expression must reduce to a polynomial in `'Var'` with no other variables
-  present; otherwise an error is reported.
-* Degree is limited by [MaxPolynomialDegree](#maxpolynomialdegree) (default 100).
-  Root-finding limits match `PRoot` ([MaxRootDivisor](#maxrootdivisor),
-  [MaxLaguerreIterations](#maxlaguerreiterations)).
-* When the `ComplexResults` flag is off, roots with a non-negligible imaginary
-  part are omitted from the list. When it is on, complex zeros are included.
-* Uses the same root-finding core as `PRoot` on the extracted coefficient
-  vector. Numeric cleanup follows `SolverImprecision`, like `Root`.
+* `Zeros` returns a list of zeros for the polynomial.
+* If `SymbolicResults` is set, `Zeros` will attempt to return symbolic results,
+* If `AutoSimplify` is set, will round numerical results to fractions and square
+  roots if applicable.
+* If `ComplexResults` is set, `Zeros` will attempt to find complex roots.
+* For higher-order polynomials, `Zeros` uses the Laguerre method, with the same
+  limits as for `PRoot`.
 
 ```rpl
 'X^3-X^2-8*X+12' 'X' Zeros
-@ Expecting { 2 -3 }
+@ Expecting { -3 2 2 }
 ```
 
 For a coefficient vector or polynomial instead of an expression, use `PRoot`.

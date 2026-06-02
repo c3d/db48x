@@ -13755,7 +13755,7 @@ void tests::polynomial_roots()
         .want("[ -5 -3 2 4 ]");
     step("PRoot rejects symbolic coefficients")
         .test(CLEAR, "[ 'A' 'B' 'C' ] PRoot", ENTER)
-        .error("No solution?");
+        .error("Bad argument type");
     step("PEval: coefficient vector")
         .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
         .expect("0");
@@ -13805,15 +13805,28 @@ void tests::polynomial_roots()
         .want("[ 1 2 -25 -26 120 ]");
     step("Zeros: cubic polynomial")
         .test(CLEAR, "'X^3-X^2-8*X+12' 'X' Zeros", ENTER)
-        .want("{ 2 -3 }");
+        .want("{ -3 2 2 }");
     step("Zeros: cubic polynomial")
         .test(CLEAR, "'X^3-X^2-8*X+12' ToPolynomial", ENTER)
         .expect("X↑3-X↑2-8·X+12")
         .test("'X' Zeros", ENTER)
-        .want("{ 2 -3 }");
+        .want("{ -3 2 2 }");
+    step("Zeros: symbolic solutions for linear")
+        .test(CLEAR, "'X*A+B' 'X' Zeros", ENTER)
+        .expect("{ '(-B)÷A' }");
+    step("Zeros: symbolic solutions for quadratic")
+        .test(CLEAR, "'A*X*X+B*X*X+C' 'X' Zeros", ENTER)
+        .expect("{ '√(-(4·(A+B)·C))÷(2·(A+B))' "
+                "'-(√(-(4·(A+B)·C))÷(2·(A+B)))' }");
     step("Zeros: multivariate rejected")
-        .test(CLEAR, "'X*Y' 'X' Zeros", ENTER)
+        .test(CLEAR, "'X^3*Y' 'X' Zeros", ENTER)
         .error("Invalid polynomial");
+    step("Zeros: Solutions in the real space vs complex space")
+        .test(CLEAR, "'X^2+3=0' 'X' Zeros", ENTER)
+        .expect("{ }")
+        .test(CLEAR, "ComplexResults 'X^2+3=0' 'X' Zeros", ENTER)
+        .expect("{ '√ 3'ⅈ -'√ 3'ⅈ }")
+        .test(CLEAR, "'ComplexResults' PURGE", ENTER);
 }
 
 
