@@ -407,7 +407,7 @@ Access: 🟨 (-); [ProgramMenu](#programmenu) 🟦 F4
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Obj→](#explode) | _Find_ | \[[Objects](#objectmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Vector](#vectormenu)\] |   |
+| [Obj→](#explode) | _Find_ | [Unique](#unique) | [QUnique](#quickunique) | \[[Objects](#objectmenu)\] |   |
 | DoList | DoSubs | NSub | EndSub | [Extract](#extract) | ◀ |
 | [Get](#get) | [Put](#put) | [GetI](#geti) | [PutI](#puti) | [Reverse](#reverselist) | ▶ |
 
@@ -459,7 +459,7 @@ Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F6; [ModesMenu](#mo
 
 ### MatrixMenu
 
-Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmenu-reference) F5; [VectorMenu](#vectormenu) 🟨 F6
+Access: 🟦 R (9); [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmenu-reference) F5; [VectorMenu](#vectormenu) 🟨 F6
 
 *3 pages · 35 items total*
 
@@ -559,7 +559,7 @@ Access: 🟦 W (×)
 
 ### ObjectMenu
 
-Access: [ListMenu](#listmenu) ▶ 🟦 F3; [ProgramMenu](#programmenu) 🟦 F3
+Access: [ListMenu](#listmenu) ▶ 🟦 F5; [ProgramMenu](#programmenu) 🟦 F3
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -937,7 +937,7 @@ Access: [ModesMenu](#modesmenu-reference) F5; [UserInterfaceModesMenu](#userinte
 
 ### VectorMenu
 
-Access: [ListMenu](#listmenu) ▶ 🟦 F5; [MatrixMenu](#matrixmenu) 🟦 F5
+Access: [MatrixMenu](#matrixmenu) 🟦 F5
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|

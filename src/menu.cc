@@ -1109,9 +1109,9 @@ MENU(ListMenu,
 
      "Obj→",    ID_Explode,
      "Find",    ID_Unimplemented,
-     "Objects", ID_ObjectMenu,
-     "Matrix",  ID_MatrixMenu,
-     "Vector",  ID_VectorMenu);
+     "Unique",  ID_Unique,
+     "QUnique", ID_QuickUnique,
+     "Objects", ID_ObjectMenu);
 
 
 MENU(ObjectMenu,

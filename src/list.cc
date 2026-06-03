@@ -1941,7 +1941,7 @@ static int memory_compare_reverse(object_p *xp, object_p *yp)
 
 static object::result do_sort(int (*compare)(object_p *x, object_p *y))
 // ----------------------------------------------------------------------------
-//   RPL command for a sort
+//   Shared code for all RPL sorting commands
 // ----------------------------------------------------------------------------
 {
     if  (object_p obj = rt.stack(0))
@@ -1949,6 +1949,27 @@ static object::result do_sort(int (*compare)(object_p *x, object_p *y))
         if (list_p items = obj->as_array_or_list())
         {
             items = items->sort(compare);
+            return items && rt.top(+items) ? object::OK : object::ERROR;
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return object::ERROR;
+}
+
+
+static object::result do_unique(int (*compare)(object_p *x, object_p *y))
+// ----------------------------------------------------------------------------
+//   Shared code for all RPL sorting commands
+// ----------------------------------------------------------------------------
+{
+    if  (object_p obj = rt.stack(0))
+    {
+        if (list_p items = obj->as_array_or_list())
+        {
+            items = items->unique(compare);
             return items && rt.top(+items) ? object::OK : object::ERROR;
         }
         else
@@ -2003,6 +2024,26 @@ COMMAND_BODY(ReverseList)
 {
     return do_sort(nullptr);
 }
+
+
+COMMAND_BODY(Unique)
+// ----------------------------------------------------------------------------
+//   Isolate unique values in a list using value comparison
+// ----------------------------------------------------------------------------
+{
+    return do_unique(value_compare);
+}
+
+
+COMMAND_BODY(QuickUnique)
+// ----------------------------------------------------------------------------
+//   Isolate unique values in a list using memory compare
+// ----------------------------------------------------------------------------
+{
+    return do_unique(memory_compare);
+}
+
+
 
 
 
@@ -2857,7 +2898,6 @@ object_p list::column(size_t index) const
 }
 
 
-// Get a sorted list
 list_p list::sort() const
 // ----------------------------------------------------------------------------
 //   Return a sorted list based on value-compare
@@ -2890,5 +2930,33 @@ list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
             if (!rt.append(obj))
                 return nullptr;
     rt.drop(count);
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+list_p list::unique() const
+// ----------------------------------------------------------------------------
+//   Return a sorted list based on value-compare
+// ----------------------------------------------------------------------------
+{
+    return unique(value_compare);
+}
+
+
+list_p list::unique(int (*compare)(object_p *x, object_p *y)) const
+// ----------------------------------------------------------------------------
+//  Return a list where consecutive items comparing equal are merged
+// ----------------------------------------------------------------------------
+{
+    id       ty = type();
+    object_g last;
+    scribble scr;
+    for (object_p item : *this)
+    {
+        if (!last || compare((object_p *) &last, (object_p *) &item) != 0)
+            if (!rt.append(+item))
+                return nullptr;
+        last = item;
+    }
     return list::make(ty, scr.scratch(), scr.growth());
 }

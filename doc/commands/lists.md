@@ -166,8 +166,20 @@ When the data is a name, data is feched directly from the given named variable.
 Sort elements in a list or array, sorting by increasing values when comparing
 numers, text or symbols.
 
+```rpl
+{ 27 42 2.2 "DEF" "ABC" } SORT
+@ Expecting { 2.2 27 42 "ABC" "DEF" }
+```
+
 This may be a little slower than `QuickSort`, but is useful to sort
 lists or arrays of numerical values or text values.
+
+Expressions are compared by evaluated value but preserved as is:
+
+```rpl
+{ 1 '2/3+0.21' 0 } Sort
+@ Expecting { 0 '²/₃+0.21' 1 }
+```
 
 ## QuickSort
 
@@ -189,6 +201,37 @@ order compared to `QuickSort`.
 
 Reverse the order of elements in a list
 
+## Unique
+
+Remove duplicate consecutive values.
+
+```rpl
+{ 1 2 3 2 2 3 3 1 1 1 1 2 3 } Unique
+@ Expecting { 1 2 3 2 3 1 2 3 }
+```
+
+To guarantee uniqueness across all the values, the list should be sorted first.
+
+```rpl
+{ 1 2 3 2 2 3 3 1 1 1 1 2 3 } Sort Unique
+@ Expecting { 1 2 3 }
+```
+
+Like for `Sort`, expressions are evaluated but preserved in the result:
+
+```rpl
+{ '1+2' '1-2' '2+3' '2-1' '2/(1+1)' '3+2' } Sort Unique
+@ Expecting { '1-2' '2÷(1+1)' '1+2' '3+2' }
+```
+
+## QuickUnique
+
+Remove duplicate consecutive values that match exactly in memory
+
+```rpl
+{ '1+2' '1-2' '2+3' '2-1' '1-2' '2-1' '2/(1+1)' '3+2' } QuickSort QuickUnique
+@ Expecting { '1+2' '1-2' '2-1' '2+3' '3+2' '2÷(1+1)' }
+```
 
 ## ADDROT
 Add elements to a list, keep only the last N elements

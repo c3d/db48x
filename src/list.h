@@ -375,6 +375,8 @@ struct list : text
     // Get a sorted list
     list_p sort() const;
     list_p sort(int (*compare)(object_p *x, object_p *y)) const;
+    list_p unique() const;
+    list_p unique(int (*compare)(object_p *x, object_p *y)) const;
 
 public:
     // Shared code for parsing and rendering, taking delimiters as input
@@ -404,6 +406,8 @@ COMMAND_DECLARE(QuickSort,1);
 COMMAND_DECLARE(ReverseSort,1);
 COMMAND_DECLARE(ReverseQuickSort,1);
 COMMAND_DECLARE(ReverseList,1);
+COMMAND_DECLARE(Unique,1);
+COMMAND_DECLARE(QuickUnique,1);
 COMMAND_DECLARE(Head,1);
 COMMAND_DECLARE(Tail,1);
 COMMAND_DECLARE(Map,2);
