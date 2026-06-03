@@ -13805,12 +13805,12 @@ void tests::polynomial_roots()
         .want("[ 1 2 -25 -26 120 ]");
     step("Zeros: cubic polynomial")
         .test(CLEAR, "'X^3-X^2-8*X+12' 'X' Zeros", ENTER)
-        .want("{ -3 2 2 }");
+        .want("{ -3 2 }");
     step("Zeros: cubic polynomial")
         .test(CLEAR, "'X^3-X^2-8*X+12' ToPolynomial", ENTER)
         .expect("X↑3-X↑2-8·X+12")
         .test("'X' Zeros", ENTER)
-        .want("{ -3 2 2 }");
+        .want("{ -3 2 }");
     step("Zeros: symbolic solutions for linear")
         .test(CLEAR, "'X*A+B' 'X' Zeros", ENTER)
         .expect("{ '(-B)÷A' }");
@@ -13818,9 +13818,12 @@ void tests::polynomial_roots()
         .test(CLEAR, "'A*X*X+B*X*X+C' 'X' Zeros", ENTER)
         .expect("{ '√(-(4·(A+B)·C))÷(2·(A+B))' "
                 "'-(√(-(4·(A+B)·C))÷(2·(A+B)))' }");
-    step("Zeros: multivariate rejected")
-        .test(CLEAR, "'X^3*Y' 'X' Zeros", ENTER)
-        .error("Invalid polynomial");
+    step("Zeros: multivariate isolated")
+        .test(CLEAR, "'X^3*Y=1' 'X' Zeros", ENTER)
+        .expect("{ 'Y⁻¹↑3⁻¹+exp(i1·π·ⅈ÷3)' }");
+    step("Zeros: algebraic mode and multiple solutions")
+        .test(CLEAR, "'zeros(sin(x)*cos(x);x)'", ENTER, ID_Run)
+        .expect("{ 'sin⁻¹ 0+2·i1·π' 'cos⁻¹ 0+2·i2·π' }");
     step("Zeros: Solutions in the real space vs complex space")
         .test(CLEAR, "'X^2+3=0' 'X' Zeros", ENTER)
         .expect("{ }")

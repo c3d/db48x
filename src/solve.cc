@@ -1032,8 +1032,7 @@ expression_p Root::isolate(expression_p eq, symbol_p name)
 // ----------------------------------------------------------------------------
 {
     settings::SavePrincipalSolution sps(true);
-    error_save ers;
-    return eq->isolate(name);
+    return eq->isolate(name, false);
 }
 
 

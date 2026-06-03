@@ -6,31 +6,43 @@ Numerical integration (adaptive Simpson)
 
 ## Zeros
 
-Find all zeros of a univariate expression.
+Find unique zeros of a univariate expression.
 
 `'Expr'` `'Var'` ▶ `{ Zeros }`
 
-* `'Expr'` is an algebraic expression, equation or polynomial in the variable
-  `'Var'`.  Equations are converted to the difference of their sides before
-  solving.
-* `'Var'` must be a quoted variable name (symbol).
-* `Zeros` returns a list of zeros for the polynomial.
-* If `SymbolicResults` is set, `Zeros` will attempt to return symbolic results,
-* If `AutoSimplify` is set, will round numerical results to fractions and square
-  roots if applicable.
-* If `ComplexResults` is set, `Zeros` will attempt to find complex roots.
-* For higher-order polynomials, `Zeros` uses the Laguerre method, with the same
-  limits as for `PRoot`.
+`'Expr'` can be an algebraic expression, equation or polynomial in the variable
+`'Var'`.  Equations such as `'X+1=X^2'` are converted to the difference of their
+sides before solving. `'Var'` must be the quoted name of a variable found in the
+expression.
 
 ```rpl
-'X^3-X^2-8*X+12' 'X' Zeros
-@ Expecting { -3 2 2 }
+'Zeros(X^3-X^2-8*X+12;X)'
+@ Expecting { -3 2 }
 ```
 
-For a coefficient vector or polynomial instead of an expression, use `PRoot`.
-To build a polynomial or coefficient vector from a list of roots, use `PCoef`
-(see [NewStylePolynomials](#newstylepolynomials) and
-[CompatiblePolynomials](#compatiblepolynomials)).
+`Zeros` will attempt to return symbolic results when possible:
+
+```rpl
+'A*X^2+B*X+C' 'X' Zeros
+@ Expecting { '(-B+√(B²-4·A·C))÷(2·A)' '(-B-√(B²-4·A·C))÷(2·A)' }
+```
+
+`Zeros` will find independent roots in the terms of a product:
+
+```rpl
+'zeros(sin(x)*cos(x);x)'
+@ Expecting { 'sin⁻¹ 0+2·i1·π' 'cos⁻¹ 0+2·i2·π' }
+```
+
+When finding the roots of polynomials, if `SymbolicResults` and `AutoSimplify`
+are set, `Zeros` will round numerical results to fractions and square roots if
+possible. `Zeros` will only return complex results if `ComplexResults` is
+set.
+
+```rpl
+ComplexResults 'Zeros(x^2+3;x)' Eval  RealResults
+@ Expecting { '√ 3'ⅈ -'√ 3'ⅈ }
+```
 
 
 ## Root

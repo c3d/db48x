@@ -101,6 +101,7 @@ bool function::has_symbolic_arguments(id type)
             type == ID_Copy                     ||
             type == ID_Integrate                ||
             type == ID_Root                     ||
+            type == ID_Zeros                    ||
             type == ID_MultipleEquationsSolver  ||
             type == ID_Derivative               ||
             type == ID_Primitive                ||

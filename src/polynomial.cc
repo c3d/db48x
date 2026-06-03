@@ -2077,6 +2077,8 @@ list_p polynomial::roots(object::id ty, symbol_p var) const
     list_p  result = roots_internal(ty, var);
     if (result)
         result = result->sort();
+    if (result)
+        result = result->unique();
     return purge(result);
 }
 
@@ -2429,47 +2431,5 @@ COMMAND_BODY(PCoef)
         if (result && rt.top(result))
             return OK;
     }
-    return ERROR;
-}
-
-
-COMMAND_BODY(Zeros)
-// ----------------------------------------------------------------------------
-//   All zeros of an expression in one variable
-// ----------------------------------------------------------------------------
-{
-    if (object_p varobj = rt.stack(0))
-    {
-        if (object_p expr = rt.stack(1))
-        {
-            symbol_p var = varobj->as_quoted<symbol>();
-            if (!var)
-                goto error;
-            algebraic_g eq = expr->as_algebraic();
-            if (!eq)
-                goto error;
-
-            if (expression_p eqeq = expression::get(eq))
-                if (expression_g diff = eqeq->as_difference_for_solve())
-                    eq = algebraic_p(+diff);
-
-            expression_p eqexpr = eq->as<expression>();
-            if (!eqexpr)
-                eqexpr = expression::get(eq);
-            if (!eqexpr)
-                goto error;
-
-            polynomial_p poly = polynomial::make(eqexpr, true);
-            if (!poly)
-                goto error;
-            list_p roots = poly->roots(ID_list, var);
-            if (roots && rt.drop() && rt.top(roots))
-                return OK;
-        }
-    }
-
-error:
-    if (!rt.error())
-        rt.type_error();
     return ERROR;
 }

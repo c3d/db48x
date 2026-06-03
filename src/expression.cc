@@ -3769,14 +3769,13 @@ COMMAND_BODY(Where)
 }
 
 
-expression_p expression::isolate(symbol_r sym) const
+expression_p expression::isolate(symbol_r sym, bool error) const
 // ----------------------------------------------------------------------------
 //   Isolate the variable in the expression
 // ----------------------------------------------------------------------------
 {
     save<symbol_g *> sindep(independent, (symbol_g *) &sym);
     save<object_g *> sindval(independent_value, nullptr);
-    save<uint>       sconstant(constant_index, 0);
     expression_g eq = this;
     if (eq)
     {
@@ -3950,7 +3949,8 @@ expression_p expression::isolate(symbol_r sym) const
 
     if (+result == +eq)
     {
-        rt.cannot_isolate_error();
+        if (error)
+            rt.cannot_isolate_error();
         return nullptr;
     }
     if (result && Settings.AutoSimplify())
@@ -3959,11 +3959,30 @@ expression_p expression::isolate(symbol_r sym) const
 }
 
 
+expression_p expression::isolated(symbol_r var) const
+// ----------------------------------------------------------------------------
+//   Isolate the value of an isolated variable
+// ----------------------------------------------------------------------------
+{
+    // Check if we can isolate the variable
+    if (expression_p isol = isolate(var, false))
+    {
+        expression_g left, right;
+        if (isol->split_equation(left, right))
+            if (symbol_p sym = left->as_quoted<symbol>())
+                if (sym->is_same_as(+var))
+                    return +right;
+    }
+    return nullptr;
+}
+
+
 COMMAND_BODY(Isolate)
 // ----------------------------------------------------------------------------
 //   Isolate a variable from an expression
 // ----------------------------------------------------------------------------
 {
+    save<uint> sconstant(expression::constant_index, 0);
     return expression::variable_command(&expression::isolate);
 }
 
@@ -4522,4 +4541,79 @@ INSERT_BODY(Primitive)
 {
     int key = ui.evaluating;
     return ui.insert_softkey(key, "", "", false);
+}
+
+
+list_p expression::zeros(object_p eqobj, symbol_r var)
+// ----------------------------------------------------------------------------
+//   Internal engine to compute zeros, may run recursively
+// ----------------------------------------------------------------------------
+{
+    object_g   eq = eqobj;
+    cleaner    purge;
+
+    // Check if we have a polynomial, if so return roots directly
+    if (polynomial_p poly = polynomial::get(+eq))
+        if (list_p roots = poly->roots(ID_list, +var))
+            return purge(roots);
+
+    // Check that we have a valid expression
+    expression_g expr = expression::get(+eq);
+    if (!expr)
+        return nullptr;
+
+    // If we have something like 'x=y', turn it into 'x-y'
+    if (expression_p diff = expr->as_difference_for_solve())
+        expr = diff;
+
+    // Check if we can isolate the variable
+    rt.clear_error();
+    if (expression_g isol = expr->isolated(var))
+        return purge(list::make(ID_list, isol));
+
+    // Check if we are multiplying or dividing two expressions
+    object_p op = expr->outermost_operator();
+    if (op)
+    {
+        // Split at that operator and see if we can do something
+        id ty = op->type();
+        if (ty == ID_multiply ||
+            ty == ID_divide || ty == ID_mod || ty == ID_rem)
+        {
+            expression_g left, right;
+            if (expr->split(ty, left, right))
+            {
+                list_g lzeros = zeros(+left, +var);
+                if (ty == ID_multiply)
+                {
+                    list_g rzeros = zeros(+right, +var);
+                    lzeros        = lzeros->append(+rzeros);
+                }
+                return purge(lzeros);
+            }
+        }
+    }
+
+    // Return an empty list
+    return purge(list::make(ID_list, nullptr, 0));
+}
+
+
+NFUNCTION_BODY(Zeros)
+// ----------------------------------------------------------------------------
+//   Zeros of an expression for a given variable
+// ----------------------------------------------------------------------------
+{
+    save<uint> sconstant(expression::constant_index, 0);
+    algebraic_g &eqobj    = args[1];
+    algebraic_g &variable = args[0];
+
+    if (symbol_g var  = variable->as_quoted<symbol>())
+        if (object_p expr = eqobj)
+            if (list_p roots = expression::zeros(expr, var))
+                return roots;
+
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
 }

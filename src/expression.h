@@ -265,11 +265,14 @@ struct expression : program
                                   algebraic_g  factor,
                                   algebraic_g &scale,
                                   algebraic_g &exponent);
-    expression_p isolate(symbol_r sym) const;
-    expression_p derivative(symbol_r sym) const;
-    expression_p primitive(symbol_r sym) const;
+    expression_p       isolate(symbol_r sym, bool error) const;
+    expression_p       isolate(symbol_r s) const { return isolate(s, true); }
+    expression_p       isolated(symbol_r sym) const;
+    static list_p      zeros(object_p eq, symbol_r sym);
+    expression_p       derivative(symbol_r sym) const;
+    expression_p       primitive(symbol_r sym) const;
 
-    expression_p where(algebraic_r args) const
+    expression_p       where(algebraic_r args) const
     {
         algebraic_g expr = this;
         if (algebraic_p obj = list::where(expr, args))
@@ -762,6 +765,11 @@ struct eq_always : eq<object::ID_True>
 
 COMMAND_DECLARE(MatchUp,   2);
 COMMAND_DECLARE(MatchDown, 2);
+NFUNCTION(Zeros, 2,
+          static bool can_be_symbolic(uint a)
+          {
+              return true;
+          });
 
 FUNCTION(Expand);
 FUNCTION(Collect);
