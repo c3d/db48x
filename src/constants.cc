@@ -1258,7 +1258,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Mercury rotation angular velocity - Calculation from Prot
     "ωrot☿",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☿;1_r/s);XPON(UVAL(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☿))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿;-2);1_r/s)' "
                 "  'ⓇProt☿' ]",
     // *Mercury axial tilt - Measurement [22]
     "ϵ☿",       "[ 0.034_° "
@@ -1345,7 +1345,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Venus rotation angular velocity - Calculation from Prot  [retrograde]
     "ωrot♀",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♀;1_r/s);XPON(UVAL(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♀))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀;-2);1_r/s)' "
                 "  'ⓇProt♀' ]",
     // *Venus axial tilt - Measurement [22]
     "ϵ♀",       "[ 177.36_° "
@@ -1402,7 +1402,7 @@ static const cstring basic_constants[] =
                 "  0_km "
                 "  0 ]",
     // *Earth oblateness - Calculation from nominal value [3]
-    "f♁",       "[ 'ROUND(1-ⒸRp♁/ⒸReq♁;XPON(UVAL(Ⓡf♁*(1-ⒸRp♁/ⒸReq♁)))-XPON(1-ⒸRp♁/ⒸReq♁)-2)' "
+    "f♁",       "[ 'ROUND(1-ⒸRp♁/ⒸReq♁;-5)' "
                 "  'ROUND(Ⓡf♁*Ⓒf♁;-2)' "
                 "  'ⓇRp♁+ⓇReq♁' ]",
     // *Earth mean density - Calculation from nominal value [3]
@@ -1430,7 +1430,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Earth rotation angular velocity - Calculation from Prot
     "ωrot♁",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♁;1_r/s);XPON(UVAL(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♁))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁;-2);1_r/s)' "
                 "  'ⓇProt♁' ]",
     // *Earth axial tilt - Measurement [24]
     "ϵ♁",       "[ 23.4393_° "
@@ -1560,7 +1560,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Moon rotation angular velocity - Calculation from Prot
     "ωrot☽",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☽;1_r/s);XPON(UVAL(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☽))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽;-2);1_r/s)' "
                 "  'ⓇProt☽' ]",
     // *Moon axial tilt - Measurement [22]
     "ϵ☽",       "[ 1.5424_° "
@@ -1649,7 +1649,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Mars rotation angular velocity - Calculation from Prot
     "ωrot♂",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♂;1_r/s);XPON(UVAL(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♂))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂;-2);1_r/s)' "
                 "  'ⓇProt♂' ]",
     // *Mars axial tilt - Measurement [22]
     "ϵ♂",       "[ 25.19_° "
@@ -1704,7 +1704,7 @@ static const cstring basic_constants[] =
                 "  0_km "
                 "  0 ]",
     // *Jupiter oblateness - Calculation from nominal value [3]
-    "f♃",       "[ 'ROUND(1-ⒸRp♃/ⒸReq♃;XPON(UVAL(Ⓡf♃*(1-ⒸRp♃/ⒸReq♃)))-XPON(1-ⒸRp♃/ⒸReq♃)-2)' "
+    "f♃",       "[ 'ROUND(1-ⒸRp♃/ⒸReq♃;-5)' "
                 "  'ROUND(Ⓡf♃*Ⓒf♃;-2)' "
                 "  'ⓇRp♃+ⓇReq♃' ]",
     // *Jupiter mean density - Calculation from nominal value [3]
@@ -1731,7 +1731,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Jupiter rotation angular velocity - Calculation from Prot
     "ωrot♃",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♃;1_r/s);XPON(UVAL(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♃))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃;-2);1_r/s)' "
                 "  'ⓇProt♃' ]",
     // *Jupiter axial tilt - Measurement [22]
     "ϵ♃",       "[ 3.13_° "
@@ -1817,7 +1817,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Saturn rotation angular velocity - Calculation from Prot
     "ωrot♄",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♄;1_r/s);XPON(UVAL(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♄))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄;-2);1_r/s)' "
                 "  'ⓇProt♄' ]",
     // *Saturn axial tilt - Measurement [22]
     "ϵ♄",       "[ 26.73_° "
@@ -1903,7 +1903,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Uranus rotation angular velocity - Calculation from Prot  [retrograde]
     "ωrot⛢",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt⛢;1_r/s);XPON(UVAL(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt⛢))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢;-2);1_r/s)' "
                 "  'ⓇProt⛢' ]",
     // *Uranus axial tilt - Measurement [22]
     "ϵ⛢",       "[ 97.77_° "
@@ -1988,7 +1988,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Neptune rotation angular velocity - Calculation from Prot
     "ωrot♆",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♆;1_r/s);XPON(UVAL(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♆))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆;-2);1_r/s)' "
                 "  'ⓇProt♆' ]",
     // *Neptune axial tilt - Measurement [22]
     "ϵ♆",       "[ 28.32_° "
@@ -2073,7 +2073,7 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Pluto rotation angular velocity - Calculation from Prot  [retrograde]
     "ωrot♇",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♇;1_r/s);XPON(UVAL(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♇))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇;-2);1_r/s)' "
                 "  'ⓇProt♇' ]",
     // *Pluto axial tilt - Measurement [26]
     "ϵ♇",       "[ 119.591_° "
@@ -2158,7 +2158,7 @@ static const cstring basic_constants[] =
                 "  2.193E6_s ]",
     // *Sun rotation angular velocity - Calculation from Prot
     "ωrot☉",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☉;1_r/s);XPON(UVAL(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☉))-2)' "
-                "  'CONVERT(ROUND(UBASE(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉);-2);1_r/s)' "
+                "  'CONVERT(ROUND(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉;-2);1_r/s)' "
                 "  'ⓇProt☉' ]",
 
     "Astronomy/Cosmology",     nullptr,
