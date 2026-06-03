@@ -16825,6 +16825,13 @@ void tests::exact_quotient()
         .expect("1/4-1/2ⅈ")
         .test(CLEAR, "-1-0ⅈ LN", ENTER, ID_ToQuotient)
         .expect("'π'ⅈ");;
+    step("→Qπ with complex rounding to re or im only")
+        .test(CLEAR, "0.25+0.000000000000005ⅈ", ENTER, ID_ToQuotient)
+        .expect("1/4")
+        .test(CLEAR, "1e-24-2.2ⅈ 4", ENTER, DIV, ID_ToQuotient)
+        .expect("-'11/20'ⅈ")
+        .test(CLEAR, "-1-0ⅈ LN 1e-24 +", ENTER, ID_ToQuotient)
+        .expect("'π'ⅈ");;
     step("→Qπ with range")
         .test(CLEAR, "pi →Num pi →Num 0.001 +", ENTER, ID_RangeMenu, ID_ToRange)
         .test(ID_ToQuotient)

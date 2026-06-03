@@ -1347,7 +1347,7 @@ algebraic_p decimal::to_fraction(uint count, uint decimals) const
     while (count--)
     {
         // Check if the decimal part is small enough
-        if (fp->is_zero())
+        if (fp->is_zero() || fp->exponent() < -large(decimals))
             break;
 
         next = one / fp;

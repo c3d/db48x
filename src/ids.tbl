@@ -314,7 +314,8 @@ NAMED(ToDecimal, "→Decimal")
 ALIAS(ToDecimal, "→Number")     ALIAS(ToDecimal, "→Num")
 NAMED(ToFraction, "→ℚ")         ALIAS(ToFraction, "→Frac")
                                 ALIAS(ToFraction, "→Q")
-NAMED(ToQuotient, "→Qπ")        ALIAS(ToQuotient, "→QPi") // Last algeb.
+NAMED(ToQuotient, "→ℚπ")        ALIAS(ToQuotient, "→QPi") // Last algeb.
+                                ALIAS(ToQuotient, "→Qπ")
                                 ALIAS(ToQuotient, "XQ")
 
 

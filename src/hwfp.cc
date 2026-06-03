@@ -97,7 +97,7 @@ algebraic_p hwfp<hw>::to_fraction(uint count, uint prec) const
     while (count--)
     {
         // Check if the decimal part is small enough
-        if (decimal_part == 0.0)
+        if (decimal_part <= eps)
             break;
 
         hw next = 1.0 / decimal_part;

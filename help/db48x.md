@@ -21599,7 +21599,7 @@ Access: 🟦 E (LN); [RealMenu](#realmenu) 🟦 F6
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| R→I | →ℚ | [→Qπ](#q-1) | [→Decimal](#decimal) | [SignificantDigits](#sigdig) |   |
+| R→I | →ℚ | →ℚπ | [→Decimal](#decimal) | [SignificantDigits](#sigdig) |   |
 | Truncate | [Mantissa](#mant) | [Exponent](#xpon) | [ceil](#ceil) | [floor](#floor) | ◀ |
 | [abs](#abs) | [sign](#sign) | [IntegerPart](#intpart) | [FractionalPart](#fracpart) | Round | ▶ |
 

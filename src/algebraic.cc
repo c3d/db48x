@@ -483,17 +483,35 @@ static bool to_fraction_dispatch(algebraic_g &x, const to_fraction_context &ctx)
 
     case object::ID_rectangular:
     {
-        rectangular_p z = rectangular_p(+x);
-        algebraic_g re = z->re();
-        algebraic_g im = z->im();
-        if (!to_fraction_dispatch(re, ctx) || !to_fraction_dispatch(im, ctx))
-            return false;
-        x = rectangular::make(re, im);
+        rectangular_p z   = rectangular_p(+x);
+        algebraic_g   re  = z->re();
+        algebraic_g   im  = z->im();
+        algebraic_g   eps = decimal::make(1, -int(Settings.FractionDigits()));
+        if (smaller_magnitude(re, im * eps))
+        {
+            re = integer::make(0);
+            if (!to_fraction_dispatch(im, ctx))
+                return false;
+            x = rectangular::make(re, im);
+        }
+        else if (smaller_magnitude(im, re * eps))
+        {
+            if (!to_fraction_dispatch(re, ctx))
+                return false;
+            x = re;
+        }
+        else
+        {
+            if (!to_fraction_dispatch(re, ctx) ||
+                !to_fraction_dispatch(im, ctx))
+                return false;
+            x = rectangular::make(re, im);
+        }
         break;
     }
     case object::ID_polar:
     {
-        polar_p z = polar_p(+x);
+        polar_p     z   = polar_p(+x);
         algebraic_g mod = z->mod();
         algebraic_g arg = z->pifrac();
         if (!to_fraction_dispatch(mod, ctx) || !to_fraction_dispatch(arg, ctx))
@@ -792,8 +810,7 @@ static bool to_sqrt_real(algebraic_g &value)
     algebraic_g bestq = nullptr;
     algebraic_g r = check_quotient_patterns(value, bestq,
                                             x,          x,
-                                            sq(x),      s*sqrt(t),
-                                            exp(x),     ln(x));
+                                            sq(x),      s*sqrt(t));
     if (r)
     {
         if (expression_p expr = r->as<expression>())
