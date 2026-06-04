@@ -116,6 +116,12 @@ struct directory : list
     //    Check if a name exists in the directory, return name ptr if it does
     // ------------------------------------------------------------------------
 
+    symbol_p lookup(utf8 name, size_t len) const;
+    static symbol_p lookup_all(utf8 name, size_t len);
+    // ------------------------------------------------------------------------
+    //    Check if a name exists in the directory, return name ptr if it does
+    // ------------------------------------------------------------------------
+
     size_t purge(object_p name, bool allowdir);
     // ------------------------------------------------------------------------
     //   Purge an entry from the directory, return purged size

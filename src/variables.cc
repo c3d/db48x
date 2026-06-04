@@ -507,6 +507,56 @@ object_p directory::lookup(object_p ref) const
 }
 
 
+symbol_p directory::lookup(utf8 name, size_t len) const
+// ----------------------------------------------------------------------------
+//   Find if the name exists in the directory, if so return pointer to it
+// ----------------------------------------------------------------------------
+{
+    byte_p   p     = payload();
+    size_t   size  = leb128<size_t>(p);
+
+    while (size)
+    {
+        object_p nobj  = (object_p) p;
+        size_t   ns   = nobj->size();
+        if (symbol_p sym = nobj->as<symbol>())
+            if (sym->matches(name, len))
+                return sym;
+
+        p += ns;
+        object_p value = (object_p) p;
+        size_t vs = value->size();
+        p += vs;
+
+        // Defensive coding against malformed directorys
+        if (ns + vs > size)
+        {
+            record(directory_error,
+                   "Lookup malformed directory (ns=%u vs=%u size=%u)",
+                   ns, vs, size);
+            return nullptr;     // Malformed directory, quick exit
+        }
+
+        size -= (ns + vs);
+    }
+
+    return nullptr;
+}
+
+
+symbol_p directory::lookup_all(utf8 name, size_t len)
+// ----------------------------------------------------------------------------
+//   If a symbol exists in any directory, use it
+// ----------------------------------------------------------------------------
+{
+    directory *dir = nullptr;
+    for (uint depth = 0; (dir = rt.variables(depth)); depth++)
+        if (symbol_p sym = dir->lookup(name, len))
+            return sym;
+    return nullptr;
+}
+
+
 object_p directory::recall(object_p name) const
 // ----------------------------------------------------------------------------
 //   If the referenced object exists in directory, return associated value
