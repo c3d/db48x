@@ -88,6 +88,8 @@ object::id command::lookup(utf8 name, size_t &maxlen, bool eq)
 {
     id     type  = id(0);
     size_t len   = maxlen;
+    if (!len)
+        return type;
 
     if (!sorted_ids)
     {
