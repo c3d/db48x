@@ -1456,7 +1456,7 @@ EVAL_BODY(solving_menu_store)
         uint index = solver_menu_index(key);
         if (algebraic_p entry = expression_variable_or_unit(index))
         {
-            if (object_p obj = strip(rt.pop()))
+            if (object_p obj = strip(rt.top()))
             {
                 algebraic_g value = obj->as_algebraic();
                 if (!value)
@@ -1499,7 +1499,7 @@ EVAL_BODY(solving_menu_store)
                     }
                 }
 
-                if (value && assign(name, value))
+                if (value && rt.drop() && assign(name, value))
                     return OK;
             }
         }
