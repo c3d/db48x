@@ -3472,29 +3472,48 @@ The following is the same program using an algebraic expression for readability:
 Instead of local variables, a program can take input from global variables.
 The following program, `SPH`, calculates the volume of a spherical cap of height
 *h* within a sphere of radius *R* using values stored in variables `H` and `R`.
-We can then use assignments like `R=10` and `H=3` to set the values before we
-run the program.
+
+We can use the `STO` command sto initialize the values for `R` and `H`:
 
 ```rpl
-« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
-'SPH' STO
-
-R=10 H=3 SPH
-@ Expecting 254.46900 4941
-```
-
-Alternatively, we can use the `STO` command sto initialize the values for `R`
-and `H`:
-
-```rpl
-« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
-'SPH' STO
-
 10 'R' STO
 3 'H' STO
+@ Keep these variables for the next step
+```
+
+Once this is done, we can enter the `SPH` program to compute the volume of a
+epherical cap:
+
+
+```rpl
+« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
+'SPH' STO
+@ Keep this variable for the next step
+```
+
+Finally, we can execute that program using its name:
+
+```rpl
 SPH
 @ Expecting 254.46900 4941
+@ Keep SPH for the next step
 ```
+
+We can also use assignments such as `R=20` or `H=18` to change the value of global variables, and then evaluate the `SPHP` program with the new values:
+
+```rpl
+R=20 H=18 SPH
+@ Expecting 14 250.26427 67
+```
+
+Note that `R` is also the name of a built-in constant. If you type `R` and there
+is no variable by that name, this will be interpreted as the constant `ⒸR`.
+Setting the `ExplicitConstants` flag disables that automatic lookup of
+constants. Alternatively, you can use `Ⓥ` as a prefix to ensure that the
+following name is interpreted as a variable name. For example, while `Clone` is
+a built-in command, you can use a global variable named `ⓋClone`.
+
+
 
 ## Viewing and editing programs
 
@@ -3848,12 +3867,12 @@ stack into global variable `A` without removing it from the stack..
 
 Using global variables is rarely the most efficient, but it has the benefit that
 it leaves the inputs and output of the program avaiable for later use. This can
-be beneficial if these values are precious and should be preserved.
+be useful if these values are precious and should be preserved.
 
 ```rpl
 «
   'R' Store 'H' Store
-  2 Ⓒπ →Num * R * R H + *
+  2 Ⓒπ →Num * r * r H + *
   'A' Copy
 »
 'ACyl' Store
@@ -3863,7 +3882,19 @@ be beneficial if these values are precious and should be preserved.
 ```
 
 Note that global variables stick around in the current directory after the
-program executes. They can be purged using `{ R H A } Purge`.
+program executes. They can be purged using `{ r H A } Purge`.
+
+Also note that we can retrieve the value stored in `R` using `r`. Unlike the
+HP50G, DB48x is case-independent by default. Set the `DistinguishSymbolCase`
+flag if you prefer the HP50G behavior of distinguishing `r` from `R`.
+
+Furthermore, `R` is also the name of a [built-in constant](#r-constant).  If no
+global by that name exists, `R` will be interpreted as that constant, unless you
+set the flag `ExplicitConstants`. This matches the behaviour of the HP50G with
+constants such as `e` or `π`. Unlike for variables, case always matters for
+constants. For example, `ⒸG` is the gravitational constant, whereas`Ⓒg` is the
+gravity acceleration on Earth.
+
 
 ### ACyl: Using algebraic expressions
 
@@ -3872,8 +3903,8 @@ and global variables. Using algebraic expressions can make programs easier to
 read, since the operations look similar to normal mathematical expressions.
 
 ```rpl
-« 'R' Store 'H' Store
-'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
+« 'r' Store 'H' Store
+'2*Ⓒπ*r*(r+H)' →Num 'A' Copy »
 'ACyl' Store
 
 3_m 2_m ACyl
@@ -14286,6 +14317,16 @@ Assignments are useful in conjonction with the solver. For example, the
 following example will solve a simple triangle equation for specific values of
 `α` and `β`.
 
+Note that this example requires `ExplicitConstants` since both `α` and `γ` are
+the names of built-ibn constants.
+
+```rpl
+ExplicitConstants
+```
+
+Once this setting is done, you can use `α`, `β` and `γ` without risking a clash
+with constant names:
+
 ```rpl
 α=20 β=30
 'ROOT(α+β+γ=180;γ;0)' EVAL
@@ -14307,6 +14348,11 @@ interactive `SolvingMenu`:
 SolvingMenu
 ```
 
+You can then restore `AutomaticConstants`.
+
+```rpl
+AutomaticConstants
+```
 
 
 ### PushEvaluatedAssignment
@@ -18207,6 +18253,61 @@ there is no variable defined, an empty menu shows up.
 Restore the default behaviour where empty menus entries are not shown, leaving
 more space for the stack display.
 
+## ExplicitConstants
+
+Require an explicit marker to identify a constant from the constant library.
+This is the opposite of `AutomaticConstants`
+
+## AutomaticConstants
+
+When parsing, identify the constants from the constants library without an
+explicit `Ⓒ` constant marker. For example, `G` will parse as `ⒸG`.
+
+Note that constants, unlike symbols or commands, are always case sensitive,
+because there are constants that differ only in case, such as `ⒸG`
+(gravitational constant) and `Ⓒg` (gravitational acceleration on Earth).
+
+If a global variable with the same name exists at the time of parsing, it takes
+precedence over the constant.
+
+This is the opposite of `ExplicitConstants`
+
+## ExplicitXLibs
+
+Require an explicit marker to identify a library item from the library.
+This is the opposite of `AutomaticConstants`
+
+## AutomaticXLibs
+
+When parsing, identify the library entries from the library without an
+explicit `Ⓛ` library marker.
+
+```rpl
+AutomaticXlibs
+```
+
+With this setting, a named library entry like `SiDensity` will work as if it
+were a built-in command, and will invoke the library-provided `SiDensity` entry.
+
+
+```rpl
+255_°C SiDensity
+@ Expecting 5.11894 93475 7⁳¹⁴ (cm↑3)⁻¹
+```
+
+The `AutomaticXLibs` flag is the opposite of `ExplicitXLibs`:
+
+```rpl
+ExplicitXLibs
+```
+
+With `ExplicitXLibs`, typing `'SiDensity'` will simply produce a name:
+
+```rpl
+SiDensity
+@ Expecting 'SiDensity'
+```
+
 
 # Statistics settings
 
@@ -21585,13 +21686,13 @@ Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-refe
 
 Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 
-*3 pages · 37 items total*
+*3 pages · 35 items total*
 
 **Page 1**
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | [RunStats](#runtimestatistics) | [GCStats](#garbagecollectorstatistics) |   |
+| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | CurDir | [GCStats](#garbagecollectorstatistics) |   |
 | [Avail](#availablememory) | [Vars](#variables) | [Home](#homedirectory) | [Path](#directorypath) | [GC](#garbagecollect) | ◀ |
 | [Store](#store) | [Recall](#recall) | [Purge](#purge) | [CrDir](#createdirectory) | [UpDir](#updirectory) | ▶ |
 
@@ -21599,7 +21700,7 @@ Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | CurDir |   |
+| [Bytes](#bytes) | System | [RunStats](#runtimestatistics) | GC Clr | RT Clr |   |
 | [Recall](#recall) | Recall+ | Recall- | Recall× | Recall÷ | ◀ |
 | [Store](#store) | Store+ | Store- | Store× | Store÷ | ▶ |
 
@@ -21608,8 +21709,8 @@ Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| GC Clr | RT Clr |   |   |   | ◀ |
-| [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
+|   |   |   |   |   | ◀ |
+| `Ⓥ` | [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | ▶ |
 
 ### ModesMenu Reference
 

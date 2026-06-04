@@ -81,6 +81,7 @@ struct constant : algebraic
         symbol_p   (*label)(symbol_r); // Menu label adustment
         bool       (*show_builtins)(); // How to check if we show builtins
         bool       stack_prefix;       // Show prefix on the stack
+        bool       ignore_case;        // Case-insensitive parsing
     };
     typedef const config &config_r;
 

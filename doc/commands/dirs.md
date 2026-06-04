@@ -214,6 +214,16 @@ Assignments are useful in conjonction with the solver. For example, the
 following example will solve a simple triangle equation for specific values of
 `α` and `β`.
 
+Note that this example requires `ExplicitConstants` since both `α` and `γ` are
+the names of built-ibn constants.
+
+```rpl
+ExplicitConstants
+```
+
+Once this setting is done, you can use `α`, `β` and `γ` without risking a clash
+with constant names:
+
 ```rpl
 α=20 β=30
 'ROOT(α+β+γ=180;γ;0)' EVAL
@@ -235,6 +245,11 @@ interactive `SolvingMenu`:
 SolvingMenu
 ```
 
+You can then restore `AutomaticConstants`.
+
+```rpl
+AutomaticConstants
+```
 
 
 ### PushEvaluatedAssignment

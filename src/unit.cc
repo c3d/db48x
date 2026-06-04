@@ -71,6 +71,7 @@ PARSE_BODY(unit)
     if (!umark)
         return SKIP;
     offs = utf8_next(p.source, offs, max);
+    save<bool> tn(p.truenames, true);
     size_t   usz  = max - offs;
     object_p uobj = parse_uexpr(p.source + offs, usz);
     if (!uobj)
@@ -1141,6 +1142,9 @@ bool unit::convert(unit_g &x, bool error) const
             if (!cfu->is_one(false))
                 o = o * cfu;
         }
+
+        if (!o)
+            return false;
 
         if (!o->is_real())
         {

@@ -45,6 +45,7 @@
 #include "unit.h"
 #include "user_interface.h"
 #include "utf8.h"
+#include "variables.h"
 
 RECORDER(constants,         16, "Constant objects");
 RECORDER(constants_error,   16, "Error on constant objects");
@@ -2728,6 +2729,7 @@ const constant::config constant::constants =
     .label         = constant_label,
     .show_builtins = show_builtin_constants,
     .stack_prefix  = false,
+    .ignore_case   = false,
 };
 
 
@@ -2741,10 +2743,12 @@ object::result constant::do_parsing(config_r cfg, parser &p)
     size_t  parsed = 0;
 
     // First character must be a constant marker
-    unicode cp = utf8_codepoint(source);
-    if (cp != cfg.prefix)
+    unicode cp     = utf8_codepoint(source);
+    bool    needed = cp == cfg.prefix;
+    if (!needed && unit::mode)
         return SKIP;
-    parsed = utf8_next(source, parsed, max);
+    if (needed)
+        parsed = utf8_next(source, parsed, max);
     size_t first = parsed;
 
     // Other characters must be alphabetic
@@ -2752,12 +2756,35 @@ object::result constant::do_parsing(config_r cfg, parser &p)
         parsed = utf8_next(source, parsed, max);
     if (parsed <= first)
         return SKIP;
+    if (!needed)
+    {
+        // Check if the name exists in the current directory, prefer it if so
+        if (symbol_p sym = directory::lookup_all(source, parsed))
+        {
+            p.length = parsed;
+            p.out    = sym;
+            return OK;
+        }
+
+        // Never use a constant in an assignent
+        size_t remain  = max - parsed;
+        size_t next    = parsed + utf8_skip_whitespace(source + parsed, remain);
+        if (next < max)
+        {
+            unicode cp   = utf8_codepoint(source + next);
+            bool    ineq = p.precedence;
+            if (cp == '_'                               // Units
+                || (!ineq && cp == '=')                 // In assignment
+                || (ineq && (cp == '\'' || cp =='(')))  // 'A' or 'F(...)'
+                return SKIP;
+        }
+    }
 
     size_t     len = parsed - first;
-    constant_p cst = do_lookup(cfg, source + first, len, true);
+    constant_p cst = do_lookup(cfg, source + first, len, needed);
     p.length       = parsed;
     p.out          = cst;
-    return cst ? OK : ERROR;
+    return cst ? OK : needed ? ERROR : SKIP;
 }
 
 
@@ -2788,9 +2815,11 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
     unit_file cfile(cfg.file);
     size_t    maxb     = cfg.nbuiltins;
     auto      builtins = cfg.builtins;
-    cstring   ctxt     = nullptr;
+    utf8      ctxt     = nullptr;
     size_t    clen     = 0;
     uint      idx      = 0;
+    bool      icase    = cfg.ignore_case && Settings.IgnoreSymbolCase();
+    settings::SaveIgnoreSymbolCase isc(icase);
 
     // Check in-file constants
     if (cfile.valid())
@@ -2800,10 +2829,10 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
         {
             while (symbol_p name = cfile.next(false))
             {
-                ctxt = cstring(name->value(&clen));
+                ctxt = name->value(&clen);
 
                 // Constant name comparison is case-sensitive
-                if (len == clen && memcmp(txt, ctxt, len) == 0)
+                if (len == clen && symbol::compare(txt, ctxt, len) == 0)
                     return constant::make(cfg.type, idx);
                 idx++;
             }
@@ -2815,8 +2844,8 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
     {
         if (builtins[b+1] && *builtins[b+1])
         {
-            ctxt = builtins[b];
-            if (ctxt[len] == 0 && memcmp(ctxt, txt, len) == 0)
+            ctxt = utf8(builtins[b]);
+            if (ctxt[len] == 0 && symbol::compare(ctxt, txt, len) == 0)
                 return constant::make(cfg.type, idx);
             idx++;
         }
@@ -2885,6 +2914,9 @@ object_p constant::do_value(config_r cfg) const
     symbol_g  cname    = nullptr;
     size_t    clen     = 0;
     uint      idx      = index();
+
+    settings::SaveAutomaticConstants sac(false);
+    settings::SaveAutomaticXLibs     sax(false);
 
     // Check in-file constants
     if (cfile.valid())
@@ -3643,7 +3675,8 @@ const constant::config standard_uncertainty::standard =
     .error          = invalid_constant_error,
     .label          = nullptr,
     .show_builtins  = show_builtin_constants,
-    .stack_prefix  = true,
+    .stack_prefix   = true,
+    .ignore_case    = false,
 };
 
 
@@ -3698,6 +3731,7 @@ const constant::config relative_uncertainty::relative =
     .label          = nullptr,
     .show_builtins  = show_builtin_constants,
     .stack_prefix   = true,
+    .ignore_case    = false,
 };
 
 

@@ -255,29 +255,48 @@ The following is the same program using an algebraic expression for readability:
 Instead of local variables, a program can take input from global variables.
 The following program, `SPH`, calculates the volume of a spherical cap of height
 *h* within a sphere of radius *R* using values stored in variables `H` and `R`.
-We can then use assignments like `R=10` and `H=3` to set the values before we
-run the program.
+
+We can use the `STO` command sto initialize the values for `R` and `H`:
 
 ```rpl
-« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
-'SPH' STO
-
-R=10 H=3 SPH
-@ Expecting 254.46900 4941
-```
-
-Alternatively, we can use the `STO` command sto initialize the values for `R`
-and `H`:
-
-```rpl
-« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
-'SPH' STO
-
 10 'R' STO
 3 'H' STO
+@ Keep these variables for the next step
+```
+
+Once this is done, we can enter the `SPH` program to compute the volume of a
+epherical cap:
+
+
+```rpl
+« '1/3*Ⓒπ*H^2*(3*R-H)' →NUM »
+'SPH' STO
+@ Keep this variable for the next step
+```
+
+Finally, we can execute that program using its name:
+
+```rpl
 SPH
 @ Expecting 254.46900 4941
+@ Keep SPH for the next step
 ```
+
+We can also use assignments such as `R=20` or `H=18` to change the value of global variables, and then evaluate the `SPHP` program with the new values:
+
+```rpl
+R=20 H=18 SPH
+@ Expecting 14 250.26427 67
+```
+
+Note that `R` is also the name of a built-in constant. If you type `R` and there
+is no variable by that name, this will be interpreted as the constant `ⒸR`.
+Setting the `ExplicitConstants` flag disables that automatic lookup of
+constants. Alternatively, you can use `Ⓥ` as a prefix to ensure that the
+following name is interpreted as a variable name. For example, while `Clone` is
+a built-in command, you can use a global variable named `ⓋClone`.
+
+
 
 ## Viewing and editing programs
 
@@ -631,12 +650,12 @@ stack into global variable `A` without removing it from the stack..
 
 Using global variables is rarely the most efficient, but it has the benefit that
 it leaves the inputs and output of the program avaiable for later use. This can
-be beneficial if these values are precious and should be preserved.
+be useful if these values are precious and should be preserved.
 
 ```rpl
 «
   'R' Store 'H' Store
-  2 Ⓒπ →Num * R * R H + *
+  2 Ⓒπ →Num * r * r H + *
   'A' Copy
 »
 'ACyl' Store
@@ -646,7 +665,19 @@ be beneficial if these values are precious and should be preserved.
 ```
 
 Note that global variables stick around in the current directory after the
-program executes. They can be purged using `{ R H A } Purge`.
+program executes. They can be purged using `{ r H A } Purge`.
+
+Also note that we can retrieve the value stored in `R` using `r`. Unlike the
+HP50G, DB48x is case-independent by default. Set the `DistinguishSymbolCase`
+flag if you prefer the HP50G behavior of distinguishing `r` from `R`.
+
+Furthermore, `R` is also the name of a [built-in constant](#r-constant).  If no
+global by that name exists, `R` will be interpreted as that constant, unless you
+set the flag `ExplicitConstants`. This matches the behaviour of the HP50G with
+constants such as `e` or `π`. Unlike for variables, case always matters for
+constants. For example, `ⒸG` is the gravitational constant, whereas`Ⓒg` is the
+gravity acceleration on Earth.
+
 
 ### ACyl: Using algebraic expressions
 
@@ -655,8 +686,8 @@ and global variables. Using algebraic expressions can make programs easier to
 read, since the operations look similar to normal mathematical expressions.
 
 ```rpl
-« 'R' Store 'H' Store
-'2*Ⓒπ*R*(R+H)' →Num 'A' Copy »
+« 'r' Store 'H' Store
+'2*Ⓒπ*r*(r+H)' →Num 'A' Copy »
 'ACyl' Store
 
 3_m 2_m ACyl

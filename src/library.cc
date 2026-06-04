@@ -106,6 +106,7 @@ const xlib::config xlib::library =
     .label          = nullptr,
     .show_builtins  = show_builtin_library,
     .stack_prefix   = false,
+    .ignore_case    = true,
 };
 
 

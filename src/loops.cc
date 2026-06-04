@@ -150,13 +150,13 @@ object::result loop::object_parser(parser  &p,
 //   may allocate new temporaries, which itself may cause garbage collection.
 {
     // We have to be careful that we may have to GC to make room for loop
-    gcutf8   src  = p.source;
-    size_t   max  = p.length;
-    object_g obj1 = nullptr;
-    object_g obj2 = nullptr;
-    object_g obj3 = nullptr;    // Case of 'else'
-    symbol_g name = nullptr;
-    id       type = id1;
+    gcutf8     src  = p.source;
+    size_t     max  = p.length;
+    object_g   obj1 = nullptr;
+    object_g   obj2 = nullptr;
+    object_g   obj3 = nullptr; // Case of 'else'
+    symbol_g   name = nullptr;
+    id         type = id1;
 
     // Loop over the two or three separators we got
     while (open || middle || close1 || close2 || terminator)
@@ -228,7 +228,7 @@ object::result loop::object_parser(parser  &p,
             // Parse an object
             done   = utf8(src) - utf8(p.source);
             length = max > done ? max - done : 0;
-            object_g obj    = object::parse(src, length);
+            object_g obj = object::parse(src, length, 0, 0, true);
             if (!obj)
                 return ERROR;
 

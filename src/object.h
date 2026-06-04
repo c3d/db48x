@@ -487,7 +487,8 @@ struct object
     static object_p parse(utf8    source,
                           size_t &size,
                           int     precedence = 0,
-                          unicode separator  = 0);
+                          unicode separator  = 0,
+                          bool    truenames  = false);
     // ------------------------------------------------------------------------
     //  Try parsing the object as a top-level temporary
     // ------------------------------------------------------------------------

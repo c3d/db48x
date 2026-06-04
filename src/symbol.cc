@@ -80,9 +80,16 @@ PARSE_BODY(symbol)
     utf8    source = p.source;
     size_t  max    = p.length;
     size_t  parsed = 0;
+    size_t  skip   = 0;
 
     // First character must be alphabetic
-    unicode cp = utf8_codepoint(source);
+    unicode cp     = utf8_codepoint(source);
+    if (cp == L'Ⓥ')
+    {
+        parsed = utf8_next(source, parsed, max);
+        cp     = utf8_codepoint(source + parsed);
+        skip   = parsed;
+    }
     if (!is_valid_as_name_initial(cp))
         return SKIP;
     parsed = utf8_next(source, parsed, max);
@@ -94,7 +101,7 @@ PARSE_BODY(symbol)
     // Build the resulting symbol
     gcutf8 text   = source;
     p.length      = parsed;
-    p.out         = rt.make<symbol>(ID_symbol, text, parsed);
+    p.out         = rt.make<symbol>(ID_symbol, text + skip, parsed - skip);
 
     return OK;
 }
@@ -107,7 +114,11 @@ RENDER_BODY(symbol)
 {
     size_t len    = 0;
     utf8   txt    = o->value(&len);
+    size_t cmdlen = len;
     auto   format = r.editing() ? ID_LongFormNames : Settings.NameDisplayMode();
+    if (r.editing() && !r.graphing())
+        if (command::lookup(txt, cmdlen) && cmdlen == len)
+            r.put(unicode(L'Ⓥ'));
     r.put(format, txt, len);
     return r.size();
 }

@@ -182,7 +182,7 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
             if (precedence == precedence::NONE ||
                 (!editing && obj->type() == ID_unit))
                 precedence = precedence::SYMBOL;
-            if (obj->type() == ID_symbol)
+            if (obj->type() == ID_symbol && !editing)
                 return symbol_p(object_p(obj));
             return obj->as_symbol(editing);
 

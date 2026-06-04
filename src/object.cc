@@ -195,7 +195,8 @@ static inline unicode tolow(unicode cp)
 object_p object::parse(utf8    source,
                        size_t &size,
                        int     precedence,
-                       unicode separator)
+                       unicode separator,
+                       bool    truenames)
 // ----------------------------------------------------------------------------
 //  Try parsing the object as a top-level temporary
 // ----------------------------------------------------------------------------
@@ -218,7 +219,7 @@ object_p object::parse(utf8    source,
     result  r      = SKIP;
     bool    is_fp  = false;
     unicode cp     = utf8_codepoint(source);
-    parser  p(source, size, precedence, separator);
+    parser  p(source, size, precedence, separator, truenames);
 
 retry:
     switch (cp)
@@ -310,6 +311,9 @@ retry:
     case L'Ⓟ':                  // Polynomials
         r = polynomial::do_parse(p);
         break;
+    case L'Ⓥ':
+        r = symbol::do_parse(p);
+        break;
     case ':':                   // Tagged objects
         r = tag::do_parse(p);
         break;
@@ -368,6 +372,13 @@ retry:
             }
             if (r == SKIP)
                 r = local::do_parse(p);
+            if (!p.truenames)
+            {
+                if (r == SKIP && Settings.AutomaticXLibs())
+                    r = xlib::do_parse(p);
+                if (r == SKIP && Settings.AutomaticConstants())
+                    r = constant::do_parse(p);
+            }
             if (r == SKIP)
                 r = symbol::do_parse(p);
         }
@@ -1111,8 +1122,8 @@ GRAPH_BODY(object)
 //  The default for rendering is to render the text using default font
 // ----------------------------------------------------------------------------
 {
-    renderer r(nullptr, ~0U, g.stack, true, g.expression);
-    using pixsize  = blitter::size;
+    renderer r(g.expression, !g.stack, g.stack, true, true);
+    using pixsize = blitter::size;
     size_t  sz     = o->render(r);
     gcutf8  txt    = r.text();
     font_p  font   = Settings.font(g.font);

@@ -804,6 +804,61 @@ there is no variable defined, an empty menu shows up.
 Restore the default behaviour where empty menus entries are not shown, leaving
 more space for the stack display.
 
+## ExplicitConstants
+
+Require an explicit marker to identify a constant from the constant library.
+This is the opposite of `AutomaticConstants`
+
+## AutomaticConstants
+
+When parsing, identify the constants from the constants library without an
+explicit `Ⓒ` constant marker. For example, `G` will parse as `ⒸG`.
+
+Note that constants, unlike symbols or commands, are always case sensitive,
+because there are constants that differ only in case, such as `ⒸG`
+(gravitational constant) and `Ⓒg` (gravitational acceleration on Earth).
+
+If a global variable with the same name exists at the time of parsing, it takes
+precedence over the constant.
+
+This is the opposite of `ExplicitConstants`
+
+## ExplicitXLibs
+
+Require an explicit marker to identify a library item from the library.
+This is the opposite of `AutomaticConstants`
+
+## AutomaticXLibs
+
+When parsing, identify the library entries from the library without an
+explicit `Ⓛ` library marker.
+
+```rpl
+AutomaticXlibs
+```
+
+With this setting, a named library entry like `SiDensity` will work as if it
+were a built-in command, and will invoke the library-provided `SiDensity` entry.
+
+
+```rpl
+255_°C SiDensity
+@ Expecting 5.11894 93475 7⁳¹⁴ (cm↑3)⁻¹
+```
+
+The `AutomaticXLibs` flag is the opposite of `ExplicitXLibs`:
+
+```rpl
+ExplicitXLibs
+```
+
+With `ExplicitXLibs`, typing `'SiDensity'` will simply produce a name:
+
+```rpl
+SiDensity
+@ Expecting 'SiDensity'
+```
+
 
 # Statistics settings
 

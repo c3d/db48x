@@ -1745,7 +1745,7 @@ MENU(MemoryMenu,
      "Free",    ID_FreeMemory,
      "TVars",   ID_TVars,
      "PgAll",   ID_PurgeAll,
-     "RunStats",ID_RuntimeStatistics,
+     "CurDir",  ID_CurrentDirectory,
      "GCStats", ID_GarbageCollectorStatistics,
 
      "Store",   ID_Sto,
@@ -1760,20 +1760,17 @@ MENU(MemoryMenu,
      "Recall×", ID_RecallMul,
      "Recall÷", ID_RecallDiv,
 
+     "Bytes",   ID_Bytes,
+     "System",  ID_SystemMemory,
+     "RunStats",ID_RuntimeStatistics,
+     "GC Clr", ID_GCStatsClearAfterRead,
+     "RT Clr", ID_RunStatsClearAfterRead,
+
+     "Ⓥ",       ID_SelfInsert,
      "▶",       ID_Copy,
      "Clone",   ID_Clone,
      "Incr",    ID_Increment,
-     "Decr",    ID_Decrement,
-     "CurDir",  ID_CurrentDirectory,
-
-     "GCStats", ID_GarbageCollectorStatistics,
-     "RunStats",ID_RuntimeStatistics,
-     "Avail",   ID_Mem,
-     "System",  ID_SystemMemory,
-     "Bytes",   ID_Bytes,
-
-     "GC Clr", ID_GCStatsClearAfterRead,
-     "RT Clr", ID_RunStatsClearAfterRead
+     "Decr",    ID_Decrement
 );
 
 

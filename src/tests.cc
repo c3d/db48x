@@ -2146,8 +2146,8 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ FreeMemory TypedVariables PurgeAll"
-                " RuntimeStatistics GarbageCollectorStatistics }")
+        .expect("{ FreeMemory TypedVariables PurgeAll "
+                "CurrentDirectory GarbageCollectorStatistics }")
         .test(F6,
               RSHIFT, RUNSTOP,
               F1, F2, F3, F4, F5,
@@ -2160,16 +2160,13 @@ void tests::global_variables()
         .test(RSHIFT, RUNSTOP,
               RSHIFT, F1, RSHIFT, F2, RSHIFT, F3, RSHIFT, F4, RSHIFT, F5,
               ENTER)
-        .expect("{ ▶ Clone Increment Decrement CurrentDirectory }")
+        .expect("{ Bytes SystemMemory RuntimeStatistics "
+                "GCStatsClearAfterRead RunStatsClearAfterRead }")
         .test(F6,
               RSHIFT, RUNSTOP,
-              F1, F2, F3, F4, F5,
+              F1, "Help", F2, F3, F4, F5,
               ENTER)
-        .expect("{ GarbageCollectorStatistics RuntimeStatistics"
-                " AvailableMemory SystemMemory Bytes }")
-        .test(RSHIFT, RUNSTOP,
-              LSHIFT, F1, LSHIFT, F2, ENTER)
-        .expect("{ GCStatsClearAfterRead RunStatsClearAfterRead }");
+        .expect("{ Help ▶ Clone Increment Decrement }");
 
     step("Store in long-name global variable");
     test(CLEAR, "\"Hello World\"", ENTER, XEQ, "SomeLongVariable", ENTER, STO)
@@ -8513,12 +8510,12 @@ void tests::solver_testing()
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
-        .noerror().expect("X=-3");
+        .noerror().expect("x=-3");
     step("Solver with arithmetic syntax")
         .test(CLEAR, "'ROOT(X+3;X;0)'", ENTER)
-        .expect("'Root(X+3;X;0)'")
+        .expect("'Root(x+3;x;0)'")
         .test(RUNSTOP)
-        .expect("X=-3")
+        .expect("x=-3")
         .test("X", ENTER)
         .expect("-3")
         .test("'X' purge", ENTER)
@@ -8587,11 +8584,11 @@ void tests::solver_testing()
     step("Jacobian solver, linear case")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ X=0.2 Y=1.8 }");
+        .expect("{ x=0.2 Y=1.8 }");
     step("Jacobian solver, linear case with extra true equation")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y+10=0' }"
               "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
-        .expect("{ X=0.2 Y=1.8 }");
+        .expect("{ x=0.2 Y=1.8 }");
     step("Jacobian solver, linear case with extra false equation")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y=10' }"
               "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
@@ -8599,15 +8596,15 @@ void tests::solver_testing()
     step("Jacobian solver, two circles")
         .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ X=0.5 Y=0.86602 54037 84 }");
+        .expect("{ x=0.5 Y=0.86602 54037 84 }");
 
     step("Jacobian solver, circle and line with singular initial Jacobian")
         .test(CLEAR, "{ 'X^2+Y^2=1' 'X+Y=0' } { X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ X=-0.70710 67811 87 Y=0.70710 67811 87 }");
+        .expect("{ x=-0.70710 67811 87 Y=0.70710 67811 87 }");
 
     step("Jacobian solver, ln equations with singular Jacobian at initial guess")
         .test(CLEAR, "{ 'LN(X)+Y=0' 'LN(Y)+X=0' } { X Y } { 1 1 } ROOT", ENTER)
-        .expect("{ X=0.56714 32904 1 Y=0.56714 32904 1 }");
+        .expect("{ x=0.56714 32904 1 Y=0.56714 32904 1 }");
     step("Solving when the variable is initialized with a constant")
         .test(CLEAR, ("m=Ⓒme "
                             "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
@@ -8626,9 +8623,9 @@ void tests::solver_testing()
     step("Solver with high precision in FIX vs STD mode")
         .test(CLEAR, "128 PREC", ENTER).noerror()
         .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("X=0.99985")
+        .expect("x=0.99985")
         .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("X=0.99984 77415 31")
+        .expect("x=0.99984 77415 31")
         .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
         .expect("0");
 
@@ -8636,9 +8633,9 @@ void tests::solver_testing()
         .test(CLEAR, "{PREC} PURGE", ENTER)
         .noerror()
         .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("X=0.99985")
+        .expect("x=0.99985")
         .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("X=0.99984 77415 31")
+        .expect("x=0.99984 77415 31")
         .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
         .expect("-1.14803⁳⁻¹⁹");
 
@@ -8690,6 +8687,9 @@ void tests::eqnlib_parsing()
     size_t nbuiltins = equation::equations.nbuiltins;
     const cstring *eq = equation::equations.builtins;
 
+    step("Disable automatic constants")
+        .test(CLEAR, "ExplicitConstants ExplicitXLibs", ENTER)
+        .noerror();
     for (size_t i = 0; i < nbuiltins; i += 2)
     {
         if (eq[i+1])
@@ -8708,6 +8708,9 @@ void tests::eqnlib_parsing()
             break;
         }
     }
+    step("Restore automatic constants")
+        .test(CLEAR, "{ ExplicitConstants ExplicitXLibs } Purge", ENTER)
+        .noerror();
 }
 
 
@@ -10055,7 +10058,7 @@ void tests::symbolic_differentiation()
         .expect("'A·G′(A·X+B)·F′(G(A·X+B))'");
 
     step("Derivative of multi-variable user-defined function")
-        .test(CLEAR, "'F(A*X+B;C*X+D;E*X-G)' 'X'", ID_Derivative)
+        .test(CLEAR, "'F(A*X+B;C*X+D;E*X-ⓋG)' 'X'", ID_Derivative)
         .expect("'A·F′₁(A·X+B;C·X+D;E·X-G)"
                 "+C·F′₂(A·X+B;C·X+D;E·X-G)"
                 "+E·F′₃(A·X+B;C·X+D;E·X-G)'");
@@ -12144,7 +12147,7 @@ void tests::insertion_of_variables_constants_and_units()
         .test(CLEAR, "RelativityMassEnergy LIBEQ", ENTER)
         .expect("'E=m·c↑2'");
     step("Programmatic library lookup (symbol)")
-        .test(CLEAR, "Dedicace XLIB", ENTER)
+        .test(CLEAR, "'Dedicace' XLIB", ENTER)
         .expect("\"À tous ceux qui se souviennent de Maubert électronique\"");
     step("Programmatic constant lookup (text)")
         .test(CLEAR, "\"NA\" CONST", ENTER)
@@ -14763,6 +14766,9 @@ void tests::check_help_examples()
         .test(CLEAR, "2048 TextRenderingSizeLimit", ENTER).noerror();
     step("Purge plot parameters")
         .test(CLEAR, "'PPAR' PGALL", ENTER).noerror();
+    step("Activate automatic constants")
+        .test(CLEAR, "ExplicitConstants ExplicitXLibs", ENTER)
+        .noerror();
 
     step("Opening help file").test(CLEAR);
     FILE *f = fopen(HELPFILE_NAME, "r");
@@ -14966,6 +14972,9 @@ void tests::check_help_examples()
         .test(CLEAR, "'MinimumSignificantDigits' PURGE", ENTER);
     step("Restore TextRenderingSizeLimit")
         .test(CLEAR, "'TextRenderingSizeLimit' PURGE", ENTER);
+    step("Restore automatic constants")
+        .test(CLEAR, "{ ExplicitConstants ExplicitXLibs } Purge", ENTER)
+        .noerror();
 }
 
 

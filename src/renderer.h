@@ -45,19 +45,20 @@ struct renderer
              bool stk = false, bool ml = false, bool expr = false)
         : target(buf), length(len), written(0), saving(), tabs(0), column(0),
           edit(!stk && buf == nullptr),
-          expr(expr), stk(stk), mlstk(ml), txt(false),
+          expr(expr), stk(stk), mlstk(ml), txt(false), graph(false),
           needSpace(false), gotSpace(false),
           needCR(false), gotCR(false) {}
-    renderer(bool equation, bool edit = false, bool stk = false, bool ml = false)
+    renderer(bool equation, bool edit=false,
+             bool stk=false, bool ml=false, bool gr=false)
         : target(), length(~0U), written(0), saving(), tabs(0), column(0),
           edit(edit),
-          expr(equation), stk(stk), mlstk(ml), txt(false),
+          expr(equation), stk(stk), mlstk(ml), txt(false), graph(gr),
           needSpace(false), gotSpace(false),
           needCR(false), gotCR(false) {}
     renderer(file &f)
         : target(), length(~0U), written(0), saving(&f), tabs(0), column(0),
           edit(true),
-          expr(false), stk(false), mlstk(false), txt(false),
+          expr(false), stk(false), mlstk(false), txt(false), graph(false),
           needSpace(false), gotSpace(false),
           needCR(false), gotCR(false) {}
     ~renderer();
@@ -71,6 +72,7 @@ struct renderer
     bool   put(object::id fmt, utf8 s, size_t len = ~0UL);
 
     bool   editing() const              { return edit; }
+    bool   graphing() const             { return graph; }
     bool   expression() const           { return expr; }
     bool   stack() const                { return stk; }
     bool   multiline_stack() const      { return mlstk; }
@@ -140,6 +142,7 @@ protected:
     bool   stk       : 1; // Format for stack rendering
     bool   mlstk     : 1; // Format for multi-line stack rendering
     bool   txt       : 1; // Inside text
+    bool   graph     : 1; // Graph rendering
     bool   needSpace : 1; // Need a space before next non-space
     bool   gotSpace  : 1; // Just emitted a space
     bool   needCR    : 1; // Need a CR before next non-space

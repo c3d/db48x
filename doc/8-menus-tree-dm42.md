@@ -491,13 +491,13 @@ Access: 🟦 R (9); [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmen
 
 Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 
-*3 pages · 37 items total*
+*3 pages · 35 items total*
 
 **Page 1**
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | [RunStats](#runtimestatistics) | [GCStats](#garbagecollectorstatistics) |   |
+| [Free](#freememory) | [TVars](#typedvariables) | [PgAll](#purgeall) | CurDir | [GCStats](#garbagecollectorstatistics) |   |
 | [Avail](#availablememory) | [Vars](#variables) | [Home](#homedirectory) | [Path](#directorypath) | [GC](#garbagecollect) | ◀ |
 | [Store](#store) | [Recall](#recall) | [Purge](#purge) | [CrDir](#createdirectory) | [UpDir](#updirectory) | ▶ |
 
@@ -505,7 +505,7 @@ Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | CurDir |   |
+| [Bytes](#bytes) | System | [RunStats](#runtimestatistics) | GC Clr | RT Clr |   |
 | [Recall](#recall) | Recall+ | Recall- | Recall× | Recall÷ | ◀ |
 | [Store](#store) | Store+ | Store- | Store× | Store÷ | ▶ |
 
@@ -514,8 +514,8 @@ Access: 🟨 H (RCL); [ProgramMenu](#programmenu) 🟨 F1
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 |   |   |   |   |   |   |
-| GC Clr | RT Clr |   |   |   | ◀ |
-| [GCStats](#garbagecollectorstatistics) | [RunStats](#runtimestatistics) | [Avail](#availablememory) | System | [Bytes](#bytes) | ▶ |
+|   |   |   |   |   | ◀ |
+| `Ⓥ` | [▶](#copy) | Clone | [Incr](#increment) | [Decr](#decrement) | ▶ |
 
 ### ModesMenu Reference
 
