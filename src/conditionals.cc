@@ -716,7 +716,11 @@ COMMAND_BODY(IFT)
         if (object_g condition = rt.pop())
         {
             if (expression_p expr = condition->as<expression>())
+            {
                 condition = expr->evaluate();
+                if (!condition)
+                    return ERROR;
+            }
             int cvalue = condition->as_truth(true);
             if (cvalue >= 0)
                 return cvalue ? program::run(ift) : OK;
@@ -738,7 +742,11 @@ COMMAND_BODY(IFTE)
             if (object_g condition = rt.pop())
             {
                 if (expression_p expr = condition->as<expression>())
+                {
                     condition = expr->evaluate();
+                    if (!condition)
+                        return ERROR;
+                }
                 int cvalue = condition->as_truth(true);
                 if (cvalue >= 0)
                     return program::run(cvalue ? ift : iff);
