@@ -52,10 +52,11 @@
 //   Catalogs are the only mutable RPL objects.
 //   They can change when objects are stored or purged.
 
-#include "list.h"
-#include "runtime.h"
 #include "command.h"
+#include "functions.h"
+#include "list.h"
 #include "menu.h"
+#include "runtime.h"
 
 
 GCP(directory);
@@ -198,34 +199,34 @@ private:
 
 
 COMMAND_DECLARE(Sto, 2);
-COMMAND_DECLARE(Rcl, 1);
+COMMAND_DECLARE_FN(Rcl, 1);
 COMMAND_DECLARE(StoreAdd, 2);
 COMMAND_DECLARE(StoreSub, 2);
 COMMAND_DECLARE(StoreMul, 2);
 COMMAND_DECLARE(StoreDiv, 2);
-COMMAND_DECLARE(RecallAdd, 2);
-COMMAND_DECLARE(RecallSub, 2);
-COMMAND_DECLARE(RecallMul, 2);
-COMMAND_DECLARE(RecallDiv, 2);
-COMMAND_DECLARE(Increment, 1);
-COMMAND_DECLARE(Decrement, 1);
+COMMAND_DECLARE_FN(RecallAdd, 2);
+COMMAND_DECLARE_FN(RecallSub, 2);
+COMMAND_DECLARE_FN(RecallMul, 2);
+COMMAND_DECLARE_FN(RecallDiv, 2);
+COMMAND_DECLARE_FN(Increment, 1);
+COMMAND_DECLARE_FN(Decrement, 1);
 COMMAND_DECLARE_SPECIAL(Copy, command, 2,
                         PREC_DECL(WHERE);
                         static bool can_be_symbolic(uint a) { return a==0; });
 COMMAND_DECLARE(Purge,1);
 COMMAND_DECLARE(PurgeAll,1);
-COMMAND_DECLARE(Vars, 0);
-COMMAND_DECLARE(TVars, 1);
+SYMBOL_DECLARE(Vars);
+COMMAND_DECLARE_FN(TVars, 1);
 
-COMMAND_DECLARE(Mem,0);
-COMMAND_DECLARE(FreeMemory,0);
-COMMAND_DECLARE(SystemMemory,0);
+SYMBOL_DECLARE(Mem);
+SYMBOL_DECLARE(FreeMemory);
+SYMBOL_DECLARE(SystemMemory);
 COMMAND_DECLARE(GarbageCollect,0);
 COMMAND_DECLARE(GarbageCollectorStatistics,0);
 
 COMMAND_DECLARE(Home,0);                // Return to home directory
-COMMAND_DECLARE(CurrentDirectory,0);    // Return the current directory
-COMMAND_DECLARE(Path,0);                // Return a list describing current path
+COMMAND_DECLARE(CurrentDirectory, 0);   // Return the current directory
+SYMBOL_DECLARE(Path);                   // Return a list describing current path
 COMMAND_DECLARE(CrDir,1);               // Create a directory
 COMMAND_DECLARE(UpDir,0);               // Move one directory up
 COMMAND_DECLARE(PgDir,1);               // Purge directory
@@ -266,13 +267,13 @@ SPECIAL_MENU_DECLARE(variable_menu_store);
 COMMAND_DECLARE(SetFlag,1);
 COMMAND_DECLARE(ClearFlag,1);
 COMMAND_DECLARE(FlipFlag,1);
-COMMAND_DECLARE(TestFlagSet,1);
-COMMAND_DECLARE(TestFlagClear,1);
-COMMAND_DECLARE(TestFlagClearThenClear,1);
-COMMAND_DECLARE(TestFlagClearThenSet,1);
-COMMAND_DECLARE(TestFlagSetThenClear,1);
-COMMAND_DECLARE(TestFlagSetThenSet,1);
-COMMAND_DECLARE(FlagsToBinary,0);
+COMMAND_DECLARE_FN(TestFlagSet,1);
+COMMAND_DECLARE_FN(TestFlagClear,1);
+COMMAND_DECLARE_FN(TestFlagClearThenClear,1);
+COMMAND_DECLARE_FN(TestFlagClearThenSet,1);
+COMMAND_DECLARE_FN(TestFlagSetThenClear,1);
+COMMAND_DECLARE_FN(TestFlagSetThenSet,1);
+SYMBOL_DECLARE(FlagsToBinary);
 COMMAND_DECLARE(BinaryToFlags,1);
 
 #endif // VARIABLES_H

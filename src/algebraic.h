@@ -159,4 +159,26 @@ struct algebraic : command
 typedef algebraic_p (*algebraic_fn)(algebraic_r x);
 typedef algebraic_p (*arithmetic_fn)(algebraic_r x, algebraic_r y);
 
+
+// ============================================================================
+//
+//   Commands and quasi-symbols that can be used in expressions
+//
+// ============================================================================
+
+#define SYMBOL_DECLARE(derived)                                         \
+    COMMAND_DECLARE_SPECIAL(derived, algebraic, 0, PREC_DECL(SYMBOL); )
+#define COMMAND_DECLARE_FN(derived, nargs)            \
+    COMMAND_DECLARE_SPECIAL(derived, command, nargs, PREC_DECL(FUNCTION); )
+
+SYMBOL_DECLARE(Ticks);                  // Return number of ticks
+SYMBOL_DECLARE(Version);                // Return a version string
+COMMAND_DECLARE_FN(ToText,1);           // Convert an object to text
+COMMAND_DECLARE_FN(ToProgram,1);        // Convert expression to program
+COMMAND_DECLARE_FN(Type, 1);            // Return the type of the object
+COMMAND_DECLARE_FN(TypeName, 1);        // Return the type name of the object
+COMMAND_DECLARE_FN(Cycle, 1);           // Cycle among representations
+COMMAND_DECLARE_FN(BinaryToReal, 1);    // Convert binary to real
+COMMAND_DECLARE_FN(RealToBinary, 1);    // Convert real to binary
+
 #endif // ALGEBRAIC_H

@@ -1774,25 +1774,16 @@ algebraic_p array::norm() const
 }
 
 
-COMMAND_BODY(det)
+FUNCTION_BODY(det)
 // ----------------------------------------------------------------------------
 //   Implement the 'det' command
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.top())
-    {
-        if (array_p arr = obj->as<array>())
-        {
-            if (algebraic_g det = arr->determinant())
-                if (rt.top(det))
-                    return OK;
-        }
-        else
-        {
-            rt.type_error();
-        }
-    }
-    return ERROR;
+    if (array_p arr = x->as<array>())
+        if (algebraic_g det = arr->determinant())
+            return det;
+    rt.type_error();
+    return nullptr;
 }
 
 
@@ -2035,13 +2026,18 @@ COMMAND_BODY(cross)
 }
 
 
-algebraic_p array::one_norm(array_p ao, bool column)
+algebraic_p array::one_norm(algebraic_r ao, bool column)
 // ----------------------------------------------------------------------------
 //   Compute a row or column 1-norm
 // ----------------------------------------------------------------------------
 {
+    array_g a = ao->as<array>();
+    if (!a)
+    {
+        rt.type_error();
+        return nullptr;
+    }
     size_t  cx, rx;
-    array_g a = ao;
     algebraic_g norm, item, sum;
     if (a->is_matrix(&cx, &rx))
     {
@@ -2102,40 +2098,22 @@ algebraic_p array::one_norm(array_p ao, bool column)
 }
 
 
-object::result array::one_norm(bool column)
-// ----------------------------------------------------------------------------
-//   Compute a 1-norm (row or column)
-// ----------------------------------------------------------------------------
-{
-    object_p obj = rt.top();
-    if (array_p a = obj->as<array>())
-    {
-        if (algebraic_p norm = one_norm(a, column))
-            if (rt.top(norm))
-                return OK;
-    }
-    else
-    {
-        rt.type_error();
-    }
-    return ERROR;
-}
-
-
-COMMAND_BODY(ColumnNorm)
+FUNCTION_BODY(ColumnNorm)
 // ----------------------------------------------------------------------------
 //   Compute the column norm
 // ----------------------------------------------------------------------------
 {
-    return array::one_norm(true);}
+    return array::one_norm(x, true);
+}
 
 
-COMMAND_BODY(RowNorm)
+
+FUNCTION_BODY(RowNorm)
 // ----------------------------------------------------------------------------
 //   Implement a cross product
 // ----------------------------------------------------------------------------
 {
-    return array::one_norm(false);
+    return array::one_norm(x, false);
 }
 
 
@@ -3137,44 +3115,32 @@ array_p array::to_spherical() const
 }
 
 
-COMMAND_BODY(ToCylindrical)
+FUNCTION_BODY(ToCylindrical)
 // ----------------------------------------------------------------------------
 //   Convert vector to cylindrical coordinates
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.top())
-    {
-        if (array_p v = obj->as<array>())
-        {
-            if (array_p c = v->to_cylindrical())
-                if (rt.top(c))
-                    return OK;
-        }
-        if (!rt.error())
-            rt.type_error();
-    }
-    return ERROR;
+    if (array_p v = x->as<array>())
+        if (array_p c = v->to_cylindrical())
+            return c;
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
 }
 
 
 
-COMMAND_BODY(ToSpherical)
+FUNCTION_BODY(ToSpherical)
 // ----------------------------------------------------------------------------
 //   Convert vector to spherical coordinates
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.top())
-    {
-        if (array_p v = obj->as<array>())
-        {
-            if (array_p c = v->to_spherical())
-                if (rt.top(c))
-                    return OK;
-        }
-        if (!rt.error())
-            rt.type_error();
-    }
-    return ERROR;
+    if (array_p v = x->as<array>())
+        if (array_p c = v->to_spherical())
+            return c;
+    if (!rt.error())
+        rt.type_error();
+    return nullptr;
 }
 
 
@@ -3251,43 +3217,27 @@ array_p array::transpose() const
 }
 
 
-static object::result transpose(bool conjugate)
-// ----------------------------------------------------------------------------
-//   Transpose with or without conjugate
-// ----------------------------------------------------------------------------
-{
-    if (object_g obj = rt.top())
-    {
-        if (array_p a = obj->as<array>())
-        {
-            a = a->transpose();
-            if (a && rt.top(a))
-                return conjugate ? conj::evaluate() : object::OK;
-        }
-        else
-        {
-            rt.type_error();
-        }
-    }
-    return object::ERROR;
-}
-
-
-COMMAND_BODY(Transpose)
+FUNCTION_BODY(Transpose)
 // ----------------------------------------------------------------------------
 //   Convert an array to its transposed version
 // ----------------------------------------------------------------------------
 {
-    return transpose(false);
+    if (array_p a = x->as<array>())
+        return a->transpose();
+    rt.type_error();
+    return nullptr;
 }
 
 
-COMMAND_BODY(TransConjugate)
+FUNCTION_BODY(TransConjugate)
 // ----------------------------------------------------------------------------
 //   Convert an array to its transposed / conjugate version
 // ----------------------------------------------------------------------------
 {
-    return transpose(true);
+    if (array_p a = x->as<array>())
+        return conj::evaluate(a->transpose());
+    rt.type_error();
+    return nullptr;
 }
 
 

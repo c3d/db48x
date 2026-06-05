@@ -181,6 +181,7 @@ TESTS(random,           "Random number generation");
 TESTS(library,          "Library entries");
 TESTS(examples,         "On-line help examples");
 TESTS(xq,               "Exact quotient (XQ command)");
+TESTS(autoconst,        "Automated constant and library parsing");
 
 EXTRA(plotfns,          "Plot all functions");
 EXTRA(sysflags,         "Enable/disable every RPL flag");
@@ -211,8 +212,7 @@ int tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            local_variables();
-            symbolic_operations();
+            automated_constant_and_library_parsing();
         }
 
 #if 0
@@ -314,6 +314,7 @@ int tests::run(uint onlyCurrent)
         object_structure();
         financial_functions();
         library();
+        automated_constant_and_library_parsing();
         check_help_examples();
         regression_checks();
         demo_ui();
@@ -8607,8 +8608,8 @@ void tests::solver_testing()
         .expect("{ x=0.56714 32904 1 Y=0.56714 32904 1 }");
     step("Solving when the variable is initialized with a constant")
         .test(CLEAR, ("m=Ⓒme "
-                            "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
-                            "Eval Pick3 StEq SolvingMenu"), ENTER,
+                      "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
+                      "Eval Pick3 StEq SolvingMenu"), ENTER,
               LSHIFT, F3)
         .expect("9.10938 37139⁳⁻³¹ kg");
     step("Solving with constant initializer, second case (#1418)")
@@ -14347,6 +14348,14 @@ void tests::expression_operations()
         .test("LNAME", ENTER)
         .got("[ ABC A B X ]", "'ABC+A+∏(X;B;A;A+B·X)+X'");
 
+    step("List variables in expression with LNAME, algebraic form")
+        .test(CLEAR, "'LNAME(COS(B)/2*A + MYFUNC(PQ) + INV(T))'", ENTER)
+        .expect("'ListExpressionNames cos B÷2·A+MYFUNC(PQ)+T⁻¹'")
+        .test(ID_Run)
+        .expect("{ 'cos B÷2·A+MYFUNC(PQ)+T⁻¹' [ MYFUNC PQ A B T ]")
+        .test(ID_Drop)
+        .error("Too few arguments");
+
     step("List variables in integral")
         .test(CLEAR, "'ABC+∫(A;B;X+Y;X)'", ENTER)
         .expect("'ABC+∫(A;B;X+Y;X)'")
@@ -14743,8 +14752,27 @@ void tests::library()
         .test(CLEAR, "{ \"CollatzBenchmark\" { CountPrimes }}",
               ID_FilesMenu, ID_Detach, ID_Libs)
         .expect("{ }");
+}
 
 
+void tests::automated_constant_and_library_parsing()
+// ----------------------------------------------------------------------------
+//   Check the ability to parse constants and library items automatically
+// ----------------------------------------------------------------------------
+{
+    BEGIN(autoconst);
+
+    step("Default settings for AutomaticConstants and AutomaticXLibs")
+        .test(CLEAR, "'AutomaticConstants' FS?", ENTER)
+        .expect("True")
+        .test(CLEAR, "'AutomaticXLibs' FS?", ENTER)
+        .expect("True");
+    step("Default value for π, e, R and G found from library")
+        .test(CLEAR, "[ π e R G ]", ENTER)
+        .expect("[ π e R G ]")
+        .test(ID_ToDecimal)
+        .expect("[ 3.14159 26535 9 2.71828 18284 6 "
+                "8.31446 26181 5 J/(mol·K) 6.6743⁳⁻¹¹ m↑3/(s↑2·kg) ]");
 }
 
 

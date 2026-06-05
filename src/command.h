@@ -68,7 +68,7 @@ struct command : object
     // Execute a command
     static result   evaluate()    { return OK; }
 
-    // Find the commadn object ID associated with a given spelling
+    // Find the command object ID associated with a given spelling
     static id       lookup(utf8 name, size_t &len, bool eq=false);
 
 public:
@@ -116,13 +116,12 @@ struct derived : base                                                   \
                             INSERT_DECL(derived);       \
                             HELP_DECL(derived);)
 
-#define COMMAND_BODY(derived)                   \
+#define COMMAND_BODY(derived)                           \
     object::result derived::evaluate()
 
 #define COMMAND(derived, nargs)                         \
     COMMAND_DECLARE(derived, nargs);                    \
     inline COMMAND_BODY(derived)
-
 
 
 // ============================================================================
@@ -146,17 +145,12 @@ struct Unimplemented : command
 // Various global commands
 COMMAND_DECLARE(Eval,1);                // Evaluate an object
 COMMAND_DECLARE(Run, 0);                // Resume execution or evaluate
-COMMAND_DECLARE(Compile,1);             // Compile and evalaute a text
+COMMAND_DECLARE(Compile,1);             // Compile and evaluate a text
 COMMAND_DECLARE(Explode,1);             // Explode an object (aka Obj→)
-COMMAND_DECLARE(ToText,1);              // Convert an object to text
-COMMAND_DECLARE(ToProgram,1);           // Convert expression to program
 COMMAND_DECLARE(SelfInsert,-1);         // Enter menu label in the editor
 COMMAND_DECLARE(ReplaceChar,-1);        // Replace editor character with label
-COMMAND_DECLARE(Ticks,0);               // Return number of ticks
 COMMAND_DECLARE(Wait,1);                // Wait a given amount of time
 COMMAND_DECLARE(Bytes,1);               // Return bytes for object
-COMMAND_DECLARE(Type,1);                // Return the type of the object
-COMMAND_DECLARE(TypeName,1);            // Return the type name of the object
 COMMAND_DECLARE(Off,-1);                // Switch the calculator off
 COMMAND_DECLARE(OffWithImage,-1);       // ... and show off-images
 COMMAND_DECLARE(SaveState, -1);         // Save state to disk
@@ -168,14 +162,10 @@ COMMAND_DECLARE(LowBattery, 0);         // Return true if battery is low
 COMMAND_DECLARE(SystemSetup,-1);        // Select the system menu
 COMMAND_DECLARE(ScreenCapture,-1);      // Snapshot screen state to a file
 COMMAND_DECLARE(Beep,2);                // Emit a sound (if enabled)
-COMMAND_DECLARE(Version,0);             // Return a version string
 COMMAND_DECLARE(Help,-1);               // Activate online help
 COMMAND_DECLARE(LastArg,-1);            // Return last arguments
 COMMAND_DECLARE(LastX,-1);              // Return last X argument
 COMMAND_DECLARE(Undo,-1);               // Revert to the Undo stack
-COMMAND_DECLARE(Cycle,1);               // Cycle among representations
-COMMAND_DECLARE(BinaryToReal,1);        // Convert binary to real
-COMMAND_DECLARE(RealToBinary,1);        // Convert real to binary
 
 COMMAND_DECLARE(EditorSelect,-1);       // Select from current cursor position
 COMMAND_DECLARE(EditorWordLeft,-1);     // Move cursor one word left

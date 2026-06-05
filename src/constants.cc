@@ -433,84 +433,66 @@ COMMAND_BODY(NegativeInfinity)
 }
 
 
-COMMAND_BODY(ConstantName)
+FUNCTION_BODY(ConstantName)
 // ----------------------------------------------------------------------------
 //   Put the name of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    if (object_p cst = rt.top())
+    utf8   name = nullptr;
+    size_t sz   = 0;
+    switch (x->type())
     {
-        utf8   name = nullptr;
-        size_t sz   = 0;
-        switch (cst->type())
-        {
-        case ID_constant: name = constant_p(cst)->name(&sz); break;
-        case ID_equation: name = equation_p(cst)->name(&sz); break;
-        case ID_xlib:     name = xlib_p    (cst)->name(&sz); break;
-        case ID_standard_uncertainty:
-            name = standard_uncertainty_p(cst)->name(&sz);
-            break;
-        case ID_relative_uncertainty:
-            name = relative_uncertainty_p(cst)->name(&sz);
-            break;
-        default:
-            rt.type_error();
-        }
-
-        if (name)
-            if (text_p sym = text::make(name, sz))
-                if (rt.top(sym))
-                    return OK;
+#define CASE(c)    case ID_##c: name = c##_p(+x)->name(&sz); break
+        CASE(constant);
+        CASE(equation);
+        CASE(xlib);
+        CASE(standard_uncertainty);
+        CASE(relative_uncertainty);
+#undef CASE
+    default: rt.type_error();
     }
-    return ERROR;
+    if (name)
+        if (text_p sym = text::make(name, sz))
+            return sym;
+    return nullptr;
 }
 
 
-COMMAND_BODY(ConstantValue)
+FUNCTION_BODY(ConstantValue)
 // ----------------------------------------------------------------------------
 //   Put the value of a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    if (object_p cst = rt.top())
+    object_p value = nullptr;
+    switch (x->type())
     {
-        object_p value = nullptr;
-        switch (cst->type())
-        {
-        case ID_constant: value = constant_p(cst)->value(); break;
-        case ID_equation: value = equation_p(cst)->value(); break;
-        case ID_xlib:     value = xlib_p    (cst)->value(); break;
-        case ID_standard_uncertainty:
-            value = standard_uncertainty_p(cst)->value();
-            break;
-        case ID_relative_uncertainty:
-            value = relative_uncertainty_p(cst)->value();
-            break;
-        default:
-            rt.type_error();
-        }
-
-        if (value)
-            if (rt.top(value))
-                return OK;
+#define CASE(c)    case ID_##c: value = c##_p(+x)->value(); break
+        CASE(constant);
+        CASE(equation);
+        CASE(xlib);
+        CASE(standard_uncertainty);
+        CASE(relative_uncertainty);
+#undef CASE
+    default:
+        rt.type_error();
     }
-    return ERROR;
+    if (value)
+        return algebraic_p(value);
+    return nullptr;
 }
 
 
-COMMAND_BODY(ConstantRange)
+FUNCTION_BODY(ConstantRange)
 // ----------------------------------------------------------------------------
 //   Put the range associated to a constant on the stack
 // ----------------------------------------------------------------------------
 {
-    if (object_p obj = rt.top())
-        if (constant_p cst = obj->as<constant>())
-            if (algebraic_p value = cst->range())
-                if (rt.top(value))
-                    return OK;
-
+    if (constant_p cst = x->as<constant>())
+        if (algebraic_p value = cst->range())
+            return value;
     if (!rt.error())
         rt.type_error();
-    return ERROR;
+    return nullptr;
 }
 
 

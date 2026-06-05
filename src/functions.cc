@@ -105,7 +105,8 @@ bool function::has_symbolic_arguments(id type)
             type == ID_MultipleEquationsSolver  ||
             type == ID_Derivative               ||
             type == ID_Primitive                ||
-            type == ID_Quote);
+            type == ID_Quote                    ||
+            type == ID_LName);
 }
 
 
@@ -138,6 +139,8 @@ bool function::is_symbolic_argument(id type, uint arg)
         return Primitive::can_be_symbolic(arg);
     case ID_Quote:
         return Quote::can_be_symbolic(arg);
+    case ID_LName:
+        return true;
     default:
         break;
     }

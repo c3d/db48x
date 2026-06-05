@@ -34,7 +34,10 @@
 #include "menu.h"
 #include "symbol.h"
 
-NFUNCTION(Root,3,
+GCP(list);
+GCP(expression);
+
+NFUNCTION_EXT(Root,3,
           static bool can_be_symbolic(uint a)
           {
               return a == 1 || a == 2;
@@ -55,12 +58,12 @@ NFUNCTION(Root,3,
     );
 COMMAND_DECLARE(MultipleEquationsSolver, 1);
 
-COMMAND_DECLARE(MultipleVariablesSolver,3);
+COMMAND_DECLARE_FN(MultipleVariablesSolver,3);
 
 COMMAND_DECLARE(StEq, 1);
-COMMAND_DECLARE(RcEq, 0);
+SYMBOL_DECLARE(RcEq);
 COMMAND_DECLARE(NextEq, 0);
-COMMAND_DECLARE(EvalEq, 0);
+SYMBOL_DECLARE(EvalEq);
 
 
 struct SolvingMenu : menu

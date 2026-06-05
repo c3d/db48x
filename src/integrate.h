@@ -38,11 +38,10 @@ algebraic_p integrate(program_g    eq,
                       algebraic_g low,
                       algebraic_g high);
 
-NFUNCTION(Integrate, 4,
+NFUNCTION_EXT(Integrate, 4,
           static bool can_be_symbolic(uint a)
           {
-              return
-                  Settings.SymbolicIntegration() || a == 0 || a == 1;
+              return Settings.SymbolicIntegration() || a == 0 || a == 1;
           }
     );
 

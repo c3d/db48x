@@ -31,6 +31,7 @@
 #include "complex.h"
 
 #include "arithmetic.h"
+#include "array.h"
 #include "compare.h"
 #include "expression.h"
 #include "fraction.h"

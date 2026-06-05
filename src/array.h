@@ -30,6 +30,7 @@
 // ****************************************************************************
 
 #include "arithmetic.h"
+#include "functions.h"
 #include "list.h"
 #include "runtime.h"
 
@@ -154,8 +155,7 @@ struct array : list
     static array_p      mul(array_r x, array_r y);
     static algebraic_p  dot(array_r x, array_r y);
     static array_p      cross(array_r x, array_r y);
-    static algebraic_p  one_norm(array_p x, bool column);
-    static result       one_norm(bool column);
+    static algebraic_p  one_norm(algebraic_r x, bool column);
 
     static result       add_row_or_column(bool columnist);
     static result       delete_row_or_column(bool columnist);
@@ -180,18 +180,18 @@ array_p operator-(array_r x, array_r y);
 array_p operator*(array_r x, array_r y);
 array_p operator/(array_r x, array_r y);
 
-COMMAND_DECLARE(det, 1);
-COMMAND_DECLARE_SPECIAL(dot,   command, 2, PREC_DECL(MULTIPLICATIVE); );
-COMMAND_DECLARE_SPECIAL(cross, command, 2, PREC_DECL(MULTIPLICATIVE); );
+FUNCTION_MAT(det);
+COMMAND_DECLARE_SPECIAL(dot,   algebraic, 2, PREC_DECL(MULTIPLICATIVE); );
+COMMAND_DECLARE_SPECIAL(cross, algebraic, 2, PREC_DECL(MULTIPLICATIVE); );
 COMMAND_DECLARE(ToArray, ~2);
 COMMAND_DECLARE(FromArray, 1);
 COMMAND_DECLARE(ConstantArray, 2);
-COMMAND_DECLARE(IdentityMatrix, 1);
-COMMAND_DECLARE(RandomMatrix, 1);
-COMMAND_DECLARE(Transpose, 1);
-COMMAND_DECLARE(TransConjugate, 1);
-COMMAND_DECLARE(ColumnNorm, 1);
-COMMAND_DECLARE(RowNorm, 1);
+COMMAND_DECLARE_FN(IdentityMatrix, 1);
+COMMAND_DECLARE_FN(RandomMatrix, 1);
+FUNCTION_MAT(Transpose);
+FUNCTION_MAT(TransConjugate);
+FUNCTION_MAT(ColumnNorm);
+FUNCTION_MAT(RowNorm);
 
 COMMAND_DECLARE(MatrixToColumns, 1);
 COMMAND_DECLARE(MatrixToRows, 1);
@@ -209,10 +209,10 @@ COMMAND_DECLARE(RREFP, 1);
 COMMAND_DECLARE(RREFMOD, 1);
 COMMAND_DECLARE(LU, 1);
 
-COMMAND_DECLARE(ToCylindrical, 1);
-COMMAND_DECLARE(ToSpherical, 1);
-COMMAND_DECLARE(To2DVector, 2);
-COMMAND_DECLARE(To3DVector, 3);
+COMMAND_DECLARE_FN(To2DVector, 2);
+COMMAND_DECLARE_FN(To3DVector, 3);
+FUNCTION_MAT(ToCylindrical);
+FUNCTION_MAT(ToSpherical);
 COMMAND_DECLARE(FromVector, 1);
 
 #endif // ARRAY_H

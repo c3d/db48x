@@ -32,6 +32,7 @@
 #include "algebraic.h"
 #include "array.h"
 #include "command.h"
+#include "functions.h"
 #include "menu.h"
 
 
@@ -227,16 +228,16 @@ SPECIAL_MENU_DECLARE(constant_menu_range);
 #define CONSTANT_MENU(ConstantMenu)     struct ConstantMenu : constant_menu {};
 #include "ids.tbl"
 
-COMMAND_DECLARE(Pi, 0);
-COMMAND_DECLARE(EulerianNumber, 0);
-COMMAND_DECLARE(Infinity, 0);
-COMMAND_DECLARE(NegativeInfinity, 0);
-COMMAND_DECLARE(ConstantName,1);
-COMMAND_DECLARE(ConstantValue,1);
-COMMAND_DECLARE(ConstantRange,1);
-COMMAND_DECLARE(Const, 1);
-COMMAND_DECLARE(StandardUncertainty, 1);
-COMMAND_DECLARE(RelativeUncertainty, 1);
+SYMBOL_DECLARE(Pi);
+SYMBOL_DECLARE(EulerianNumber);
+SYMBOL_DECLARE(Infinity);
+SYMBOL_DECLARE(NegativeInfinity);
+FUNCTION(ConstantName);
+FUNCTION(ConstantValue);
+FUNCTION(ConstantRange);
+COMMAND_DECLARE_FN(Const, 1);
+COMMAND_DECLARE_FN(StandardUncertainty, 1);
+COMMAND_DECLARE_FN(RelativeUncertainty, 1);
 COMMAND_DECLARE(Constants, 0);
 
 

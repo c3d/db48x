@@ -28,6 +28,7 @@
 
 #include "program.h"
 
+#include "array.h"
 #include "dmcp.h"
 #include "parser.h"
 #include "settings.h"

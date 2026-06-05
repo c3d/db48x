@@ -1373,6 +1373,8 @@ INSERT_BODY(object)
 //   Default insertion is as a program object
 // ----------------------------------------------------------------------------
 {
+    if (o->is_algebraic_fn())
+        return ui.insert_object(o, o->arity() ? ui.ALGEBRAIC : ui.CONSTANT);
     return ui.insert(o->name(), ui.PROGRAM);
 }
 

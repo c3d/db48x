@@ -29,7 +29,7 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-
+#include "arithmetic.h"
 #include "functions.h"
 #include "program.h"
 #include "settings.h"
@@ -38,6 +38,8 @@
 GCP(expression);
 GCP(funcall);
 GCP(grob);
+GCP(array);
+
 struct grapher;
 
 struct expression : program
@@ -765,7 +767,7 @@ struct eq_always : eq<object::ID_True>
 
 COMMAND_DECLARE(MatchUp,   2);
 COMMAND_DECLARE(MatchDown, 2);
-NFUNCTION(Zeros, 2,
+NFUNCTION_EXT(Zeros, 2,
           static bool can_be_symbolic(uint a)
           {
               return true;
@@ -782,7 +784,7 @@ COMMAND_DECLARE(Apply, 2);
 COMMAND_DECLARE_SPECIAL(Quote, algebraic, 1,
                         PREC_DECL(SYMBOL);
                         static bool can_be_symbolic(uint) { return true; });
-COMMAND_DECLARE(Isolate, 2);
+COMMAND_DECLARE_FN(Isolate, 2);
 COMMAND_DECLARE_SPECIAL(Derivative, algebraic, 2,
                         PREC_DECL(SYMBOL);
                         INSERT_DECL(Derivative);
@@ -796,6 +798,6 @@ COMMAND_DECLARE_SPECIAL(Primitive, algebraic, 2,
 COMMAND_DECLARE_SPECIAL(Where, arithmetic, 2,
                         PREC_DECL(WHERE);
                         static bool can_be_symbolic(uint) { return true; });
-NFUNCTION(Subst, 2, static bool can_be_symbolic(uint) { return true; } );
+NFUNCTION_EXT(Subst, 2, static bool can_be_symbolic(uint) { return true; } );
 
 #endif // EXPRESSION_H

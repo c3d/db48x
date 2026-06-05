@@ -1077,6 +1077,10 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
 
     case ID_symbol:
     case ID_local:
+    case ID_Pi:
+    case ID_EulerianNumber:
+    case ID_Infinity:
+    case ID_NegativeInfinity:
     case ID_expression:
         if (!unit::mode)
         {

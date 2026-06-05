@@ -117,7 +117,7 @@ struct derived : logical                                                \
                                                                         \
     OBJECT_DECL(derived);                                               \
     ARITY_DECL(1);                                                      \
-    PREC_DECL(NONE);                                                    \
+    PREC_DECL(FUNCTION);                                                \
     EVAL_DECL(derived)                                                  \
     {                                                                   \
         record(logical, "Evaluating "#derived" unary logical %t", o);   \

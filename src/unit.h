@@ -124,12 +124,12 @@ struct unit_file : file
 #define UNIT_MENU(UnitMenu)     struct UnitMenu : unit_menu {};
 #include "ids.tbl"
 
-COMMAND_DECLARE(Convert,2);
+COMMAND_DECLARE_FN(Convert,2);
 FUNCTION(UBase);
-COMMAND_DECLARE(UFact,2);
+COMMAND_DECLARE_FN(UFact,2);
 COMMAND_DECLARE_INSERT(ConvertToUnitPrefix,-1);
 FUNCTION(UVal);
-COMMAND_DECLARE(ToUnit,2);
+COMMAND_DECLARE_FN(ToUnit,2);
 COMMAND_DECLARE_INSERT(ApplyUnit,1);
 COMMAND_DECLARE_INSERT(ConvertToUnit,1);
 COMMAND_DECLARE_INSERT(ApplyInverseUnit, 1);

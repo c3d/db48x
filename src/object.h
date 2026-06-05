@@ -206,7 +206,7 @@ struct object
         menu_fn         menu;           // Build menu entries
         menu_marker_fn  menu_marker;    // Show marker
         uint            arity;          // Number of input arguments
-        uint            precedence;     // Precedence in equations
+        uint            precedence;     // Precedence in expressions
     };
 
 
@@ -707,6 +707,24 @@ struct object
     }
 
 
+    static bool is_algebraic_fn(id ty)
+    // ------------------------------------------------------------------------
+    //   True if this can be used in algebraic expressions
+    // ------------------------------------------------------------------------
+    {
+        return handler[ty].precedence != NONE;
+    }
+
+
+    bool is_algebraic_fn() const
+    // ------------------------------------------------------------------------
+    //   True if can be used in algebraic expressions
+    // ------------------------------------------------------------------------
+    {
+        return is_algebraic_fn(type());
+    }
+
+
     static bool is_algebraic(id ty)
     // ------------------------------------------------------------------------
     //    Check if a type denotes an algebraic value or function
@@ -1011,6 +1029,7 @@ struct object
 #define MARKER_DECL(D)  static unicode  do_menu_marker(const D *o UNUSED)
 #define ARITY_DECL(A)   enum { ARITY = A }
 #define PREC_DECL(P)    enum { PRECEDENCE = precedence::P }
+#define ALG_DECL(A)     enum { IS_ALGEBRAIC = A }
 
     OBJECT_DECL(object);
     PARSE_DECL(object);
@@ -1024,6 +1043,7 @@ struct object
     MARKER_DECL(object);
     ARITY_DECL(0);
     PREC_DECL(NONE);
+    ALG_DECL(false);
 
     template <typename T, typename U>
     static intptr_t ptrdiff(T *t, U *u)

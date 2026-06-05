@@ -30,14 +30,14 @@
 // ****************************************************************************
 
 #include "algebraic.h"
-#include "array.h"
 #include "complex.h"
 #include "decimal.h"
 #include "hwfp.h"
-#include "list.h"
+#include "range.h"
 #include "runtime.h"
 
 RECORDER_DECLARE(function);
+
 
 struct function : algebraic
 // ----------------------------------------------------------------------------
@@ -299,8 +299,9 @@ FUNCTION(DegreesToRadians);
 
 
 
+#define NFUNCTION(derived, fnarity)     NFUNCTION_EXT(derived, fnarity, )
 
-#define NFUNCTION(derived, fnarity, extra)                              \
+#define NFUNCTION_EXT(derived, fnarity, extra)                          \
 struct derived : function                                               \
 /* ----------------------------------------------------------------- */ \
 /*  Macro to define a mathematical function with more than 1 arg     */ \
@@ -335,40 +336,41 @@ public:                                                                 \
                                   algebraic_g UNUSED args[], \
                                   uint UNUSED        arity)
 
-NFUNCTION(Round, 2, );
-NFUNCTION(Truncate, 2, );
+NFUNCTION(Round, 2);
+NFUNCTION(Truncate, 2);
 
-NFUNCTION(ToStandardUncertainty, 2, );
-NFUNCTION(ToRelativeUncertainty, 2, );
-NFUNCTION(StandardRound, 2, );
-NFUNCTION(RelativeRound, 2, );
-NFUNCTION(PrecisionRound, 2, );
+NFUNCTION(ToStandardUncertainty, 2);
+NFUNCTION(ToRelativeUncertainty, 2);
+NFUNCTION(StandardRound, 2);
+NFUNCTION(RelativeRound, 2);
+NFUNCTION(PrecisionRound, 2);
 
-NFUNCTION(xroot, 2, );
-NFUNCTION(comb, 2, );
-NFUNCTION(perm, 2, );
-NFUNCTION(Sum, 4,
+NFUNCTION(xroot, 2);
+NFUNCTION(comb, 2);
+NFUNCTION(perm, 2);
+NFUNCTION_EXT(Sum, 4,
           static bool can_be_symbolic(uint a)
           {
               return a == 0 || a == 3;
           }
     );
-NFUNCTION(Product, 4,
+NFUNCTION_EXT(Product, 4,
           static bool can_be_symbolic(uint a)
           {
               return a == 0 || a == 3;
           }
     );
-NFUNCTION(Min, 2,
+NFUNCTION_EXT(Min, 2,
           static algebraic_p evaluate(algebraic_r x, algebraic_r y);
     );
-NFUNCTION(Max, 2,
+NFUNCTION_EXT(Max, 2,
           static algebraic_p evaluate(algebraic_r x, algebraic_r y);
 );
 
 
-NFUNCTION(Percent, 2, );
-NFUNCTION(PercentChange, 2, );
-NFUNCTION(PercentTotal, 2, );
+NFUNCTION(Percent, 2);
+NFUNCTION(PercentChange, 2);
+NFUNCTION(PercentTotal, 2);
+
 
 #endif // FUNCTIONS_H

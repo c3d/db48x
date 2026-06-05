@@ -34,6 +34,7 @@
 
 #include "menu.h"
 
+#include "array.h"
 #include "object.h"
 #include "settings.h"
 #include "unit.h"
@@ -232,8 +233,6 @@ COMMAND_BODY(ToolsMenu)
         if (object_p top = rt.top())
         {
             id ty = top->type();
-            if (is_algebraic_fn(ty))
-                ty = ID_expression;
             switch(ty)
             {
             case ID_integer:
@@ -280,7 +279,10 @@ COMMAND_BODY(ToolsMenu)
             case ID_unit:               menu = unit_menu(unit_p(top)); break;
             case ID_polynomial:         menu = ID_PolynomialsMenu; break;
             case ID_equation:           menu = ID_SolverMenu; break;
-            default:                    break;
+            default:
+                if (is_algebraic_fn(ty))
+                    menu = ID_SymbolicMenu;
+                break;
             }
         }
     }

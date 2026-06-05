@@ -137,18 +137,6 @@ ID_RANGE(is_program_cmd,   Drop,           IfErrThenElse)
 ID_RANGE(is_command,       Drop,           ToQuotient,  ToList, LastMenu)
 ID_RANGE(is_symbolic,      expression,     xlib,
                            polynomial,     relative_uncertainty)
-ID_RANGE(is_algebraic_fn,  Rcl,            ToQuotient,
-                           TestFlagSet,    det,
-                           Get,            IFTE,
-                           CurrentClip,    GraphicIntegral,
-                           Mem,            FlagsToBinary,
-                           ConstantArray,  CurrentDirectory,
-                           MatchUp,        errn,
-                           ToTag,          Ticks,
-                           QuickSort,      ListDifferences,
-                           RecallAdd,      TextToUnicode,
-                           Convert,        ToUnit,
-                           RandomNumber,   Random)
 ID_RANGE(is_immediate,     MainMenu,       SelfInsert)
 ID_RANGE(is_unit,          unit,           unit)
 ID_RANGE(is_plot,          Function,       Parametric)

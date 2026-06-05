@@ -101,8 +101,8 @@ template <> object::result comparison::evaluate<same>();
 COMPARISON_DECLARE(same, cmp == 0);
 
 // Truth results
-COMMAND_DECLARE_SPECIAL(True,  algebraic, 0, ); // Evaluate as self
-COMMAND_DECLARE_SPECIAL(False, algebraic, 0, ); // Evaluate as self
+SYMBOL_DECLARE(True);           // Evaluate as self
+SYMBOL_DECLARE(False);          // Evaluate as self
 
 
 

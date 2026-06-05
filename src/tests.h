@@ -151,6 +151,7 @@ struct tests
     void object_structure();
     void financial_functions();
     void library();
+    void automated_constant_and_library_parsing();
     void check_help_examples();
     void regression_checks();
     void demo_setup();
