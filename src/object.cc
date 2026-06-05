@@ -526,10 +526,11 @@ text_p object::as_text(bool edit, bool equation) const
     if (type() == ID_text && !equation)
         return text_p(this);
 
-    record(render, "Rendering %+s %p into text", name(), this);
+    object_g o = this;
+    record(render, "Rendering %+s %p into text", o->name(), this);
     renderer r(equation, edit);
-    size_t size = render(r);
-    record(render, "Rendered %+s as size %u [%s]", name(), size, r.text());
+    size_t size = o->render(r);
+    record(render, "Rendered %+s as size %u [%s]", o->name(), size, r.text());
     if (!size)
         return nullptr;
     id type = equation ? ID_symbol : ID_text;
