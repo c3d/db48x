@@ -1725,11 +1725,11 @@ point to the Sun), measured in the direction of motion. [Reference 23](#referenc
 
 Jupiter orbital period
 
-Jupiter's sidereal orbital period — the time to complete one revolution around
-the Sun (about 11.86 years). It is distinct from the rotation period `Prot♃`
-(the ~10 h spin period). Tabulated sidereal value from the NASA Planetary Fact
-Sheet, used as an approximation of the anomalistic period that governs the
-recurrence of the perihelion passages exposed by `T₀♃`. [Materials 23](#materials-23)
+Jupiter's orbital period — the time to complete one revolution around the Sun
+(about 11.86 years). It is distinct from the rotation period `Prot♃` (the ~10 h
+spin period). The value is the anomalistic period (perihelion to perihelion),
+computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
+passages exposed by `T₀♃`. [Materials 22](#materials-22)
 
 ### T₀♃ constant
 
@@ -1854,11 +1854,11 @@ point to the Sun), measured in the direction of motion. [Reference 23](#referenc
 
 Saturn orbital period
 
-Saturn's sidereal orbital period — the time to complete one revolution around
-the Sun (about 29.46 years). It is distinct from the rotation period `Prot♄`
-(the ~10.7 h spin period). Tabulated sidereal value from the NASA Planetary Fact
-Sheet, used as an approximation of the anomalistic period that governs the
-recurrence of the perihelion passages exposed by `T₀♄`. [Materials 23](#materials-23)
+Saturn's orbital period — the time to complete one revolution around the Sun
+(about 29.46 years). It is distinct from the rotation period `Prot♄` (the ~10.7 h
+spin period). The value is the anomalistic period (perihelion to perihelion),
+computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
+passages exposed by `T₀♄`. [Materials 22](#materials-22)
 
 ### T₀♄ constant
 
@@ -1982,11 +1982,11 @@ point to the Sun), measured in the direction of motion. [Reference 23](#referenc
 
 Uranus orbital period
 
-Uranus's sidereal orbital period — the time to complete one revolution around
-the Sun (about 84 years). It is distinct from the rotation period `Prot⛢` (the
-~17 h spin period). Tabulated sidereal value from the NASA Planetary Fact Sheet,
-used as an approximation of the anomalistic period that governs the recurrence
-of the perihelion passages exposed by `T₀⛢`. [Materials 23](#materials-23)
+Uranus's orbital period — the time to complete one revolution around the Sun
+(about 84 years). It is distinct from the rotation period `Prot⛢` (the ~17 h spin
+period). The value is the anomalistic period (perihelion to perihelion), computed
+from Meeus' Chapter 38, which governs the recurrence of the perihelion passages
+exposed by `T₀⛢`. [Materials 22](#materials-22)
 
 ### T₀⛢ constant
 
