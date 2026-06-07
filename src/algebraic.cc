@@ -65,6 +65,8 @@ RECORDER(algebraic,       16, "RPL Algebraics");
 RECORDER(algebraic_error, 16, "Errors processing a algebraic");
 RECORDER(quotient,        16, "Quotient computations");
 
+bool algebraic::in_expression = false;
+
 
 INSERT_BODY(algebraic)
 // ----------------------------------------------------------------------------
@@ -1580,4 +1582,23 @@ int algebraic::compare(algebraic_r x, algebraic_r y)
     if (x && y && comparison::compare(&result, x, y))
         return result;
     return 777;
+}
+
+
+bool algebraic::list_result(uint depth, bool reverse)
+// ----------------------------------------------------------------------------
+//   For commands that give result in algebraic mode, return the list
+// ----------------------------------------------------------------------------
+{
+    if (!in_expression)
+        return true;
+    scribble scr;
+    for (uint d = 0; d < depth; d++)
+    {
+        object_p obj = rt.stack(reverse ? depth + ~d : d);
+        if (!obj || !rt.append(obj))
+            return false;
+    }
+    list_p result = list::make(ID_list, scr.scratch(), scr.growth());
+    return result && rt.drop(depth) && rt.push(result);
 }

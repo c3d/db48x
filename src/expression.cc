@@ -57,7 +57,6 @@ symbol_g *expression::independent                   = nullptr;
 object_g *expression::independent_value             = nullptr;
 symbol_g *expression::dependent                     = nullptr;
 object_g *expression::dependent_value               = nullptr;
-bool      expression::in_algebraic                  = false;
 bool      expression::contains_independent_variable = false;
 uint      expression::constant_index                = 0;
 
@@ -79,7 +78,6 @@ EVAL_BODY(expression)
 //   Evaluate expressions, indicating that we are in algebraic mode
 // ----------------------------------------------------------------------------
 {
-    save<bool> savealg(in_algebraic, true);
     if (running)
         return rt.push(o) ? OK : ERROR;
     return o->run_program();

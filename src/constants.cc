@@ -3618,7 +3618,7 @@ object_p constant::cache() const
 
 object_p constant::uncache() const
 // ----------------------------------------------------------------------------
-//   Remove teh cached value from the runtime
+//   Remove the cached value from the runtime
 // ----------------------------------------------------------------------------
 {
     constant_g cst   = this;

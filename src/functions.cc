@@ -1282,14 +1282,14 @@ NFUNCTION_BODY(xroot)
 //   Compute the x-th root
 // ----------------------------------------------------------------------------
 {
-    algebraic_g &x = args[expression::in_algebraic ? 1 : 0];
+    algebraic_g &x = args[0];
     if (x->is_zero(false))
     {
         rt.domain_error();
     }
     else
     {
-        algebraic_g &y = args[expression::in_algebraic ? 0 : 1];
+        algebraic_g &y = args[1];
         if (x->is_symbolic() || y->is_symbolic())
             return expression::make(ID_xroot, args, 2, ID_expression, true);
 

@@ -212,7 +212,7 @@ int tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            numerical_integration();
+            solver_testing();
         }
 
 #if 0
@@ -14391,9 +14391,8 @@ void tests::expression_operations()
         .test(CLEAR, "'LNAME(COS(B)/2*A + MYFUNC(PQ) + INV(T))'", ENTER)
         .expect("'ListExpressionNames(cos B÷2·A+MYFUNC(PQ)+T⁻¹)'")
         .test(ID_Run)
-        .expect("{ 'cos B÷2·A+MYFUNC(PQ)+T⁻¹' [ MYFUNC PQ A B T ]")
-        .test(ID_Drop)
-        .error("Too few arguments");
+        .want("{ 'cos B÷2·A+MYFUNC(PQ)+T⁻¹' [ MYFUNC PQ A B T ] }")
+        .test(ID_Drop),noerror().test(ID_Drop).error("Too few arguments");
 
     step("List variables in integral")
         .test(CLEAR, "'ABC+∫(A;B;X+Y;X)'", ENTER)

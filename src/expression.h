@@ -358,7 +358,6 @@ public:
     static object_g    *independent_value;
     static symbol_g    *dependent;
     static object_g    *dependent_value;
-    static bool         in_algebraic;
     static bool         contains_independent_variable;
     static uint         constant_index;
 

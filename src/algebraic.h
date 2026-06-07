@@ -151,7 +151,9 @@ struct algebraic : command
     static algebraic_p integer_sqrt(ularge value);
     algebraic_p        symbolic_sqrt() const;
 
-    static int compare(algebraic_r x, algebraic_r y);
+    static int         compare(algebraic_r x, algebraic_r y);
+    static bool        list_result(uint depth, bool reverse = true);
+    static bool        in_expression;
 
     INSERT_DECL(algebraic);
 };

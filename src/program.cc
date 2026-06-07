@@ -123,6 +123,7 @@ object::result program::run(bool synchronous) const
     size_t   size  = 0;
     object_p first = objects(&size);
     object_p end   = first + size;
+    bool     expr  = type() == ID_expression;
 
     record(program, "Run %t (%p-%p) %+s",
            this, first, end, outer ? "outer" : "inner");
@@ -130,8 +131,10 @@ object::result program::run(bool synchronous) const
     if (!rt.run_push(first, end))
         return ERROR;
     if (outer || synchronous)
+    {
+        save<bool> salg(in_expression, expr);
         return run_loop(depth);
-
+    }
     return OK;
 }
 

@@ -2326,7 +2326,8 @@ COMMAND_BODY(LName)
     if (object_p obj = rt.top())
         if (list_p result = list_variables(obj, ID_array, false))
             if (rt.push(result))
-                return OK;
+                if (algebraic::list_result(2))
+                    return OK;
     return ERROR;
 }
 
