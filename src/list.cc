@@ -329,7 +329,7 @@ object::result list::list_parse(id      type,
                 // We just parsed an algebraic, e.g. 'sin', etc
                 // stash it and require parentheses for arguments
                 id type = obj->type();
-                if (function::has_symbolic_arguments(type))
+                if (has_symbolic_arguments(type))
                     special = type;
                 if (!is_extended_algebraic(type) && !special)
                 {
@@ -398,7 +398,10 @@ object::result list::list_parse(id      type,
             // Copy the parsed object to the scratch pad (may GC)
             do
             {
-                record(list_parse, "Copying %t to scratchpad", object_p(obj));
+                record(list_parse,
+                       "Copying %t to scratchpad arg %u/%u prec %d [%+s]",
+                       +obj, arg, arity, precedence,
+                       special ? cstring(object::name(special)) : "");
                 objcount++;
 
                 size_t objsize = obj->size();
@@ -406,9 +409,11 @@ object::result list::list_parse(id      type,
 
                 // For expressions, copy only the payload unless we want it
                 // to be preserved as a symbolic expression
-                if (precedence && !alist)
-                    if (!special ||
-                        !function::is_symbolic_argument(special, arity-arg))
+                // Note a subtlety here:
+                // - For single-argument functions, arg is 0
+                // - For n-ary functions, arg is 1..n (does not start at 0)
+                if (precedence && (!alist || obj->as_quoted(ID_object)))
+                    if (!special || !is_symbolic_argument(special, arg))
                         if (expression_p eq = obj->as<expression>())
                             obj = eq->objects(&objsize);
 

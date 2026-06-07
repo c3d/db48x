@@ -178,6 +178,7 @@ const object::dispatch object::handler[NUM_IDS] =
         .menu_marker  = (menu_marker_fn) id::do_menu_marker, \
         .arity        = id::ARITY,                           \
         .precedence   = id::PRECEDENCE,                      \
+        .symbolic     = id::SYMBOLIC_ARGS,                   \
     },
 #include "ids.tbl"
 };

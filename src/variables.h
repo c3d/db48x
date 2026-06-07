@@ -210,9 +210,9 @@ COMMAND_DECLARE_FN(RecallMul, 2);
 COMMAND_DECLARE_FN(RecallDiv, 2);
 COMMAND_DECLARE_FN(Increment, 1);
 COMMAND_DECLARE_FN(Decrement, 1);
-COMMAND_DECLARE_SPECIAL(Copy, command, 2,
+COMMAND_DECLARE_SPECIAL(Copy, algebraic, 2,
                         PREC_DECL(WHERE);
-                        static bool can_be_symbolic(uint a) { return a==0; });
+                        SYMARGS);
 COMMAND_DECLARE(Purge,1);
 COMMAND_DECLARE(PurgeAll,1);
 SYMBOL_DECLARE(Vars);

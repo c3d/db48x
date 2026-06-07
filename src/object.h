@@ -207,6 +207,7 @@ struct object
         menu_marker_fn  menu_marker;    // Show marker
         uint            arity;          // Number of input arguments
         uint            precedence;     // Precedence in expressions
+        uint            symbolic;       // Which arguments are symbolic
     };
 
 
@@ -1029,7 +1030,9 @@ struct object
 #define MARKER_DECL(D)  static unicode  do_menu_marker(const D *o UNUSED)
 #define ARITY_DECL(A)   enum { ARITY = A }
 #define PREC_DECL(P)    enum { PRECEDENCE = precedence::P }
-#define ALG_DECL(A)     enum { IS_ALGEBRAIC = A }
+#define SYMARGS_DECL(n) enum { SYMBOLIC_ARGS = n 0U }
+#define SYMARG(n)       (1<<(n)) |
+#define SYMARGS         enum { SYMBOLIC_ARGS = ~0U };
 
     OBJECT_DECL(object);
     PARSE_DECL(object);
@@ -1043,7 +1046,9 @@ struct object
     MARKER_DECL(object);
     ARITY_DECL(0);
     PREC_DECL(NONE);
-    ALG_DECL(false);
+
+    // Default is for arguments to be evaluated during function evaluation
+    enum { SYMBOLIC_ARGS = 0 };
 
     template <typename T, typename U>
     static intptr_t ptrdiff(T *t, U *u)

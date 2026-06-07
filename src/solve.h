@@ -38,23 +38,20 @@ GCP(list);
 GCP(expression);
 
 NFUNCTION_EXT(Root,3,
-          static bool can_be_symbolic(uint a)
-          {
-              return a == 1 || a == 2;
-          }
-          static algebraic_p solve(program_r   eq,
-                                   algebraic_r name,
-                                   algebraic_r guess);
-          static algebraic_p solve(algebraic_g &eq,
-                                   algebraic_g &vars,
-                                   algebraic_g &guess);
-          static list_p multiple_equation_solver(list_r eqs,
-                                                 list_r names,
-                                                 list_r guesses);
-          static bool jacobi_solver(list_g &eqs,
-                                    list_g &vars,
-                                    list_g &guesses);
-          static expression_p isolate(expression_p eq, symbol_p name);
+              SYMARGS_DECL(SYMARG(1) SYMARG(2));
+              static algebraic_p solve(program_r   eq,
+                                       algebraic_r name,
+                                       algebraic_r guess);
+              static algebraic_p solve(algebraic_g &eq,
+                                       algebraic_g &vars,
+                                       algebraic_g &guess);
+              static list_p multiple_equation_solver(list_r eqs,
+                                                     list_r names,
+                                                     list_r guesses);
+              static bool jacobi_solver(list_g &eqs,
+                                        list_g &vars,
+                                        list_g &guesses);
+              static expression_p isolate(expression_p eq, symbol_p name);
     );
 COMMAND_DECLARE(MultipleEquationsSolver, 1);
 

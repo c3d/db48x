@@ -31,6 +31,7 @@
 
 #include "command.h"
 #include "loops.h"
+#include "object.h"
 
 
 struct IfThen : conditional_loop
@@ -210,8 +211,7 @@ struct case_skip_conditional : conditional
 
 // The stack-based forms
 COMMAND_DECLARE(IFT,2);
-COMMAND_DECLARE_SPECIAL(IFTE,command,3,
-                        static bool can_be_symbolic(uint a) { return a!=2; } );
+COMMAND_DECLARE_SPECIAL(IFTE,command,3, SYMARGS_DECL(SYMARG(2) SYMARG(3)); );
 
 // Saved error message
 COMMAND_DECLARE(errm,0);

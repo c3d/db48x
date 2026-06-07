@@ -421,7 +421,7 @@ COMMAND_DECLARE_FN(ListSum,1);
 COMMAND_DECLARE_FN(ListProduct,1);
 COMMAND_DECLARE_FN(ListDifferences,1);
 COMMAND_DECLARE_FN(XVars, 1);
-COMMAND_DECLARE_FN(LName, 1);
+COMMAND_DECLARE_SPECIAL(LName, algebraic, 1, PREC_DECL(FUNCTION); SYMARGS);
 
 
 inline list_g operator+(list_r x, list_r y)

@@ -71,6 +71,26 @@ struct command : object
     // Find the command object ID associated with a given spelling
     static id       lookup(utf8 name, size_t &len, bool eq=false);
 
+    static uint     has_symbolic_arguments(id type)
+    // ------------------------------------------------------------------------
+    //   Check if command keeps arguments symbolic in algebraic mode (Sum, Root)
+    // ------------------------------------------------------------------------
+    {
+        return handler[type].symbolic;
+    }
+
+    static bool     is_symbolic_argument(id type, uint arg)
+    // ------------------------------------------------------------------------
+    //   Check if a given argument must be passed as symbolic
+    // ------------------------------------------------------------------------
+    //   Subtlety here:
+    //   - For single-argument functions, arg is 0
+    //   - For n-ary functions, arg is 1..n (does not start at 0)
+    {
+        return has_symbolic_arguments(type) & (1<<arg);
+    }
+
+
 public:
     PARSE_DECL(command);
     RENDER_DECL(command);

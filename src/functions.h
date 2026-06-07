@@ -101,19 +101,11 @@ public:
 
 
     typedef algebraic_p (*nfunction_fn)(id op, algebraic_g args[], uint arity);
-    static result evaluate(id op, nfunction_fn fn, uint arity,
-                           bool (*can_be_symbolic)(uint arg));
+    static result evaluate(id op, nfunction_fn fn, uint arity, uint symbolic);
     // ------------------------------------------------------------------------
     //   Evaluate a function with n arguments
     // ------------------------------------------------------------------------
 
-    // For functions with N arguments, check if arg can be symbolic
-    static bool can_be_symbolic(uint /* argument */) { return false; }
-
-
-    // Check if function has symbolic arguments, e.g. Sum or Root
-    static bool has_symbolic_arguments(id type);
-    static bool is_symbolic_argument(id type, uint arg);
 };
 
 
@@ -325,7 +317,7 @@ public:                                                                 \
     {                                                                   \
         return function::evaluate(derived::static_id,                   \
                                   derived::evaluate, fnarity,           \
-                                  derived::can_be_symbolic);            \
+                                  derived::SYMBOLIC_ARGS);              \
     }                                                                   \
     static algebraic_p evaluate(id op, algebraic_g args[], uint arity); \
 }
@@ -348,24 +340,14 @@ NFUNCTION(PrecisionRound, 2);
 NFUNCTION(xroot, 2);
 NFUNCTION(comb, 2);
 NFUNCTION(perm, 2);
-NFUNCTION_EXT(Sum, 4,
-          static bool can_be_symbolic(uint a)
-          {
-              return a == 0 || a == 3;
-          }
-    );
-NFUNCTION_EXT(Product, 4,
-          static bool can_be_symbolic(uint a)
-          {
-              return a == 0 || a == 3;
-          }
-    );
+NFUNCTION_EXT(Sum,     4, SYMARGS_DECL(SYMARG(1) SYMARG(4)); );
+NFUNCTION_EXT(Product, 4, SYMARGS_DECL(SYMARG(1) SYMARG(4)); );
 NFUNCTION_EXT(Min, 2,
-          static algebraic_p evaluate(algebraic_r x, algebraic_r y);
+              static algebraic_p evaluate(algebraic_r x, algebraic_r y);
     );
 NFUNCTION_EXT(Max, 2,
-          static algebraic_p evaluate(algebraic_r x, algebraic_r y);
-);
+              static algebraic_p evaluate(algebraic_r x, algebraic_r y);
+    );
 
 
 NFUNCTION(Percent, 2);

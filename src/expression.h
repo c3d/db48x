@@ -767,12 +767,7 @@ struct eq_always : eq<object::ID_True>
 
 COMMAND_DECLARE(MatchUp,   2);
 COMMAND_DECLARE(MatchDown, 2);
-NFUNCTION_EXT(Zeros, 2,
-          static bool can_be_symbolic(uint a)
-          {
-              return true;
-          });
-
+NFUNCTION_EXT(Zeros, 2, SYMARGS );
 FUNCTION(Expand);
 FUNCTION(Collect);
 FUNCTION(FoldConstants);
@@ -782,22 +777,21 @@ FUNCTION(TrigSin);
 
 COMMAND_DECLARE(Apply, 2);
 COMMAND_DECLARE_SPECIAL(Quote, algebraic, 1,
-                        PREC_DECL(SYMBOL);
-                        static bool can_be_symbolic(uint) { return true; });
+                        PREC_DECL(FUNCTION); SYMARGS);
 COMMAND_DECLARE_FN(Isolate, 2);
 COMMAND_DECLARE_SPECIAL(Derivative, algebraic, 2,
                         PREC_DECL(SYMBOL);
                         INSERT_DECL(Derivative);
                         PARSE_DECL(Derivative);
-                        static bool can_be_symbolic(uint) { return true; });
+                        SYMARGS);
 COMMAND_DECLARE_SPECIAL(Primitive, algebraic, 2,
                         PREC_DECL(MULTIPLICATIVE);
                         INSERT_DECL(Primitive);
                         PARSE_DECL(Primitive);
-                        static bool can_be_symbolic(uint) { return true; });
+                        SYMARGS);
 COMMAND_DECLARE_SPECIAL(Where, arithmetic, 2,
                         PREC_DECL(WHERE);
-                        static bool can_be_symbolic(uint) { return true; });
-NFUNCTION_EXT(Subst, 2, static bool can_be_symbolic(uint) { return true; } );
+                        SYMARGS);
+NFUNCTION_EXT(Subst, 2, SYMARGS);
 
 #endif // EXPRESSION_H

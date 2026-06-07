@@ -212,7 +212,7 @@ int tests::run(uint onlyCurrent)
         here().begin("Current");
         if (onlyCurrent & 1)
         {
-            automated_constant_and_library_parsing();
+            numerical_integration();
         }
 
 #if 0
@@ -2479,18 +2479,18 @@ void tests::local_variables()
         .expect("'(3+(Y+1))·(3-(Y+1))÷((Y+1+Z)·(Y+1-Z))'");
     step("Quote in algebraic")
         .test(CLEAR, "'LocTest(Quote(X+1),Y,Z)'", ENTER)
-        .expect("'LocTest(Quote X+1;Y;Z)'")
+        .expect("'LocTest(Quote(X+1);Y;Z)'")
         .test(ID_Run)
         .expect("'(X+1+Y)·(X+1-Y)÷((Y+Z)·(Y-Z))'");
 
     step("Argument count mismatch")
         .test(CLEAR, "0 'LocTest(Quote(X+1),Y)'", ENTER)
-        .expect("'LocTest(Quote X+1;Y)'")
+        .expect("'LocTest(Quote(X+1);Y)'")
         .test(ID_Run)
         .error("Wrong argument count");
     step("Argument count mismatch")
         .test(CLEAR, "'LocTest(Quote(X+1);Y;Z;T)'", ENTER)
-        .expect("'LocTest(Quote X+1;Y;Z;T)'")
+        .expect("'LocTest(Quote(X+1);Y;Z;T)'")
         .test(ID_Run)
         .error("Wrong argument count");
 
@@ -7526,6 +7526,21 @@ void tests::sorting_functions()
         .test(CLEAR, "X [1 2 3] Max", ENTER).expect("'Max(X;[1;2;3])'");
     step("Max with arrays")
         .test(CLEAR, "[1 2 3] [3 2 1] Max", ENTER).expect("[ 3 2 3 ]");
+    step("Max with arrays (algebraic)")
+        .test(CLEAR, "'MAX([1;2;3];[3;2;1])'", ENTER)
+        .expect("'Max([1;2;3];[3;2;1])'")
+        .test(ID_Run)
+        .expect("[ 3 2 3 ]");
+    step("Max with arrays and scalar (algebraic)")
+        .test(CLEAR, "'MAX([1;2;3];2)'", ENTER)
+        .expect("'Max([1;2;3];2)'")
+        .test(ID_Run)
+        .expect("[ 2 2 3 ]");
+    step("Max with arrays andscalar (algebraic)")
+        .test(CLEAR, "'MAX(2;[1;2;3])'", ENTER)
+        .expect("'Max(2;[1;2;3])'")
+        .test(ID_Run)
+        .expect("[ 2 2 3 ]");
     step("Min function (symbolic types)")
         .test(CLEAR, "1 \"DEF\" MAX", ENTER).error("Bad argument type");
     step("Max function (symbolic types)")
@@ -9044,25 +9059,41 @@ void tests::numerical_integration()
 
     step("Integrate with symbols")
         .test(CLEAR, "A B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)-ln (abs A)'");
+    step("Integrate with one symbol")
+        .test(CLEAR, "1 B '1/X' 'X' ∫", ENTER)
+        .expect("'ln (abs B)'");
+    step("Integrate with second symbol")
+        .test(CLEAR, "A 1 '1/X' 'X' ∫", ENTER)
+        .expect("'-ln (abs A)'");
+
+    step("Integrate with symbols (algebraic)")
+        .test(CLEAR, "'∫(A;B;1÷X;X)'", ENTER)
         .expect("'∫(A;B;1÷X;X)'")
         .test(DOWN)
         .editor("'∫(A;B;1÷X;X)'")
         .test(ENTER)
-        .expect("'∫(A;B;1÷X;X)'");
-    step("Integrate with one symbol")
-        .test(CLEAR, "1 B '1/X' 'X' ∫", ENTER)
+        .expect("'∫(A;B;1÷X;X)'")
+        .test(ID_Run)
+        .expect("'ln (abs B)-ln (abs A)'");
+    step("Integrate with one symbol (algebraic)")
+        .test(CLEAR, "'∫(1;B;1÷X;X)'", ENTER)
         .expect("'∫(1;B;1÷X;X)'")
         .test(DOWN)
         .editor("'∫(1;B;1÷X;X)'")
         .test(ENTER)
-        .expect("'∫(1;B;1÷X;X)'");
-    step("Integrate with second symbol")
-        .test(CLEAR, "A 1 '1/X' 'X' ∫", ENTER)
+        .expect("'∫(1;B;1÷X;X)'")
+        .test(ID_Run)
+        .expect("'ln (abs B)'");
+    step("Integrate with second symbol (algebraic)")
+        .test(CLEAR, "'∫(A;1;1÷X;X)'", ENTER)
         .expect("'∫(A;1;1÷X;X)'")
         .test(DOWN)
         .editor("'∫(A;1;1÷X;X)'")
         .test(ENTER)
-        .expect("'∫(A;1;1÷X;X)'");
+        .expect("'∫(A;1;1÷X;X)'")
+        .test(ID_Run)
+        .expect("'-ln (abs A)'");
 
     step("Check evaluation with NumericalResults flag set")
         .test(CLEAR, "-3 CF", ENTER,
@@ -9080,7 +9111,15 @@ void tests::numerical_integration()
         .test(CLEAR, "-3 CF", ENTER,
               "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
               ID_IntegrationMenu, ID_Integrate)
+        .expect("'exp π-1.'")
+        .test(ID_ToDecimal)
+        .expect("22.14069 26328");
+    step("Check evaluation without NumericalResults flag clear (algebraic)")
+        .test(CLEAR, "-3 CF", ENTER,
+              "'∫(0;Ⓒπ;EXP(X);X)'", ENTER)
         .expect("'∫(0;π;exp X;X)'")
+        .test(ID_Run)
+        .expect("'exp π-1.'")
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Check inference variable with NumericalResults flag set")
@@ -9088,7 +9127,7 @@ void tests::numerical_integration()
               "0 Ⓒπ 'EXP(X)' 'X'", ENTER,
               "3 'X' STO", ENTER,
               ID_IntegrationMenu, ID_Integrate)
-        .expect("'∫(0;π;exp X;X)'")
+        .expect("'exp π-1.'")
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
     step("Cleanup & restore symbolic integration")
@@ -9696,7 +9735,7 @@ void tests::symbolic_operations()
 
     step("Apply function call for algebraic function")
         .test(CLEAR, "{ 'x+y' } 'sin' APPLY", ENTER)
-        .expect("'sin x+y'");
+        .expect("'sin(x+y)'");
 
     step("Apply function call: incorrect arg count")
         .test(CLEAR, "{ x y } 'sin' APPLY", ENTER)
@@ -9951,7 +9990,7 @@ void tests::symbolic_operations()
               "« arcstart arcend arcexpr arcvar ∂ SQ 1 + SQRT arcvar ∫ » "
               "» 'ArcLen' STO", ENTER).noerror()
         .test("'ArcLen(0;π;QUOTE(SIN(X));QUOTE(X))'", ENTER)
-        .expect("'ArcLen(0;π;Quote sin X;Quote X)'")
+        .expect("'ArcLen(0;π;Quote (sin X);Quote X)'")
         .test(ID_Run)
         .expect("'∫(0;π;√((cos X)²+1);X)'")
         .test(ID_ModesMenu, ID_Rad, ID_ToDecimal)
@@ -13526,18 +13565,18 @@ void tests::probabilities()
 
     step("Symbolic combinations")
         .test(CLEAR, "n m", NOSHIFT, F1)
-        .expect("'Combinations(n;m)'")
+        .expect("'n!÷(m!·(n-m)!)'")
         .test(CLEAR, "n 1", NOSHIFT, F1)
-        .expect("'Combinations(n;1)'")
+        .expect("'n!÷(n-1)!'")
         .test(CLEAR, "1 z", NOSHIFT, F1)
-        .expect("'Combinations(1;z)'");
+        .expect("'(z!·(1-z)!)⁻¹'");
     step("Symbolic permutations")
         .test(CLEAR, "n m", NOSHIFT, F2)
-        .expect("'Permutations(n;m)'")
+        .expect("'n!÷(n-m)!'")
         .test(CLEAR, "n 1", NOSHIFT, F2)
-        .expect("'Permutations(n;1)'")
+        .expect("'n!÷(n-1)!'")
         .test(CLEAR, "1 z", NOSHIFT, F2)
-        .expect("'Permutations(1;z)'");
+        .expect("'(1-z)!⁻¹'");
 }
 
 
@@ -14350,7 +14389,7 @@ void tests::expression_operations()
 
     step("List variables in expression with LNAME, algebraic form")
         .test(CLEAR, "'LNAME(COS(B)/2*A + MYFUNC(PQ) + INV(T))'", ENTER)
-        .expect("'ListExpressionNames cos B÷2·A+MYFUNC(PQ)+T⁻¹'")
+        .expect("'ListExpressionNames(cos B÷2·A+MYFUNC(PQ)+T⁻¹)'")
         .test(ID_Run)
         .expect("{ 'cos B÷2·A+MYFUNC(PQ)+T⁻¹' [ MYFUNC PQ A B T ]")
         .test(ID_Drop)

@@ -87,67 +87,6 @@ algebraic_p function::symbolic(id op, algebraic_r x)
 }
 
 
-bool function::has_symbolic_arguments(id type)
-// ----------------------------------------------------------------------------
-//   Check if the command has any symbolic arguments, e.g. Root or Sum
-// ----------------------------------------------------------------------------
-{
-    return (type == ID_IFTE                     ||
-            type == ID_Sum                      ||
-            type == ID_Product                  ||
-            type == ID_IFTE                     ||
-            type == ID_Subst                    ||
-            type == ID_Where                    ||
-            type == ID_Copy                     ||
-            type == ID_Integrate                ||
-            type == ID_Root                     ||
-            type == ID_Zeros                    ||
-            type == ID_MultipleEquationsSolver  ||
-            type == ID_Derivative               ||
-            type == ID_Primitive                ||
-            type == ID_Quote                    ||
-            type == ID_LName);
-}
-
-
-bool function::is_symbolic_argument(id type, uint arg)
-// ----------------------------------------------------------------------------
-//   Check if the given argument needs to be stored in symbolic form
-// ----------------------------------------------------------------------------
-{
-    switch(type)
-    {
-    case ID_Sum:
-        return Sum::can_be_symbolic(arg);
-    case ID_Product:
-        return Product::can_be_symbolic(arg);
-    case ID_IFTE:
-        return IFTE::can_be_symbolic(arg);
-    case ID_Subst:
-        return Subst::can_be_symbolic(arg);
-    case ID_Where:
-        return Where::can_be_symbolic(arg);
-    case ID_Copy:
-        return Copy::can_be_symbolic(arg);
-    case ID_Integrate:
-        return Integrate::can_be_symbolic(arg);
-    case ID_Root:
-        return Root::can_be_symbolic(arg);
-    case ID_Derivative:
-        return Derivative::can_be_symbolic(arg);
-    case ID_Primitive:
-        return Primitive::can_be_symbolic(arg);
-    case ID_Quote:
-        return Quote::can_be_symbolic(arg);
-    case ID_LName:
-        return true;
-    default:
-        break;
-    }
-    return false;
-}
-
-
 object::result function::evaluate(id op, ops_t ops)
 // ----------------------------------------------------------------------------
 //   Shared code for evaluation of all common math functions
@@ -445,8 +384,10 @@ object::result function::evaluate(algebraic_fn op, uint seqtypes)
 }
 
 
-object::result function::evaluate(id op, nfunction_fn fn, uint arity,
-                                  bool (*can_be_symbolic)(uint arg))
+object::result function::evaluate(id           op,
+                                  nfunction_fn fn,
+                                  uint         arity,
+                                  uint         symbolic)
 // ----------------------------------------------------------------------------
 //   Perform the operation from the stack for n-ary functions
 // ----------------------------------------------------------------------------
@@ -454,7 +395,6 @@ object::result function::evaluate(id op, nfunction_fn fn, uint arity,
     if (!rt.args(arity))
         return ERROR;
 
-    bool is_symbolic = false;
     algebraic_g args[arity];
     for (uint a = 0; a < arity; a++)
     {
@@ -468,31 +408,9 @@ object::result function::evaluate(id op, nfunction_fn fn, uint arity,
             return ERROR;
         }
         args[a] = arg;
-        if (arg->is_symbolic())
-        {
-            if (!can_be_symbolic(a))
-            {
-                if (Settings.NumericalResults())
-                {
-                    // Conversion to numerical if needed (may fail silently)
-                    (void) to_decimal(args[a], true);
-                    if (!args[a])
-                        return ERROR;
-                }
-                if (args[a]->is_symbolic())
-                    is_symbolic = true;
-            }
-        }
     }
 
-    algebraic_g result;
-
-    // Check the symbolic case
-    if (is_symbolic)
-        result = expression::make(op, args, arity, ID_expression, true);
-    else
-        result = fn(op, args, arity);
-
+    algebraic_g result = fn(op, args, arity);
     if (result && rt.drop(arity) && rt.push(+result))
         return OK;
     return ERROR;
@@ -1214,6 +1132,16 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
         return func(decimal_p(+value), digits);
 
     default:
+        if (value->is_symbolic())
+        {
+            settings::SaveNumericalResults snr(true);
+            algebraic_g evaluated = expression_p(+value)->evaluate();
+            if (!evaluated)
+                return nullptr;
+            if (!evaluated->is_symbolic())
+                return rnd_or_trnc(evaluated, digits, func);
+        }
+
         rt.type_error();
         return nullptr;
     }
@@ -1268,18 +1196,21 @@ NFUNCTION_BODY(ToRelativeUncertainty)
 }
 
 
-static algebraic_p uncertainty_rounding(algebraic_g args[], object::
-                                        id which)
+static algebraic_p uncertainty_rounding(algebraic_g args[], object::id which)
 // ----------------------------------------------------------------------------
 //  Compute standard or relative round
 // ----------------------------------------------------------------------------
 {
     algebraic_g x   = args[1];
     algebraic_g u   = args[0];
+    (void) algebraic::to_decimal(x, true);
+    (void) algebraic::to_decimal(u, true);
+
     algebraic_g xv  = x;
     bool        rel = which == object::ID_RelativeRound;
     bool        prc = which == object::ID_PrecisionRound;
     unit_g      uu  = unit::get(u);
+
     if (uu && rel)
     {
         u = uu->convert_to_real();
@@ -1352,13 +1283,16 @@ NFUNCTION_BODY(xroot)
 // ----------------------------------------------------------------------------
 {
     algebraic_g &x = args[expression::in_algebraic ? 1 : 0];
-    if (x->is_zero())
+    if (x->is_zero(false))
     {
         rt.domain_error();
     }
     else
     {
         algebraic_g &y = args[expression::in_algebraic ? 0 : 1];
+        if (x->is_symbolic() || y->is_symbolic())
+            return expression::make(ID_xroot, args, 2, ID_expression, true);
+
         bool is_int = x->is_integer();
         bool is_neg = false;
         if (!is_int && x->is_decimal())
@@ -1503,7 +1437,7 @@ NFUNCTION_BODY(perm)
 }
 
 
-static algebraic_p sum_product(object::id op,
+static algebraic_p sum_product(object::id func, object::id op,
                                algebraic_g args[], uint arity)
 // ----------------------------------------------------------------------------
 //   Perform a sum or product on the operations
@@ -1585,6 +1519,10 @@ static algebraic_p sum_product(object::id op,
         }
         return result;
     }
+    else if (init->is_symbolic() || last->is_symbolic())
+    {
+        return expression::make(func, args, 4, object::ID_expression, true);
+    }
     else
     {
         rt.type_error();
@@ -1598,7 +1536,7 @@ NFUNCTION_BODY(Sum)
 //   Sum operation
 // ----------------------------------------------------------------------------
 {
-    return sum_product(ID_add, args, arity);
+    return sum_product(ID_Sum, ID_add, args, arity);
 }
 
 
@@ -1607,7 +1545,7 @@ NFUNCTION_BODY(Product)
 //   Product operation
 // ----------------------------------------------------------------------------
 {
-    return sum_product(ID_multiply, args, arity);
+    return sum_product(ID_Product, ID_multiply, args, arity);
 }
 
 
@@ -1795,8 +1733,8 @@ NFUNCTION_BODY(Min)
 //   Process the Min command
 // ----------------------------------------------------------------------------
 {
-    algebraic_g x = args[0]->as_extended_algebraic();
-    algebraic_g y = args[1]->as_extended_algebraic();
+    algebraic_g x = args[1]->as_extended_algebraic();
+    algebraic_g y = args[0]->as_extended_algebraic();
     return evaluate(x, y);
 }
 
@@ -1806,8 +1744,8 @@ NFUNCTION_BODY(Max)
 //   Process the Max command
 // ----------------------------------------------------------------------------
 {
-    algebraic_g x = args[0]->as_extended_algebraic();
-    algebraic_g y = args[1]->as_extended_algebraic();
+    algebraic_g x = args[1]->as_extended_algebraic();
+    algebraic_g y = args[0]->as_extended_algebraic();
     return evaluate(x, y);
 }
 
