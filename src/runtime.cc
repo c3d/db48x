@@ -47,9 +47,11 @@ RECORDER(runtime_error, 16, "RPL runtime error (anomalous behaviors)");
 RECORDER(editor,        16, "Text editor (command line)");
 RECORDER(errors,        16, "Runtime errors)");
 RECORDER(gc,           256, "Garbage collection events");
+RECORDER(gc_stats,      16, "Garbage collection statistics");
 RECORDER(gc_errors,     16, "Garbage collection errors");
 RECORDER(gc_details,   256, "Details about garbage collection (noisy)");
 RECORDER(cache,        256, "Cached values for the stack");
+RECORDER(available, 16, "Available memory and requests");
 
 
 // ============================================================================
@@ -197,15 +199,16 @@ size_t runtime::available(size_t size)
 //   Check if we have enough for the given size
 // ----------------------------------------------------------------------------
 {
-    if (available() < size)
+    size_t avail = available();
+    record(available, "Available %u for %u", avail, size);
+    if (avail < size)
     {
         gc();
-        size_t avail = available();
+        avail = available();
         if (avail < size)
             out_of_memory_error();
-        return avail;
     }
-    return size;
+    return avail;
 }
 
 
@@ -450,6 +453,8 @@ size_t runtime::gc()
     lock     it;
     uint     now      = sys_current_ms();
     size_t   recycled = 0;
+    size_t   objcount = 0;
+    size_t   delcount = 0;
     object_p first    = (object_p) Globals;
     object_p last     = Temporaries;
     object_p free     = first;
@@ -480,6 +485,7 @@ size_t runtime::gc()
     for (object_p obj = first; obj < last; obj = next)
     {
         bool found = false;
+        objcount++;
         next = obj->skip();
         record(gc_details, "Scanning object %p (ends at %p)", obj, next);
         for (object_p *s = firstobjptr; s < lastobjptr && !found; s++)
@@ -539,8 +545,12 @@ size_t runtime::gc()
         else
         {
             recycled += next - obj;
-            record(gc_details, "Recycling %p size %u total %u",
-                   obj, next - obj, recycled);
+            record(gc_details,
+                   "Recycling %p size %u total %u",
+                   obj,
+                   next - obj,
+                   recycled);
+            delcount++;
         }
     }
 
@@ -585,6 +595,10 @@ size_t runtime::gc()
     GCLDuration = duration;
     GCPurged += recycled;
     GCDuration += duration;
+    record(gc_stats,
+           "GC has %u bytes in %u objects after "
+           "purging %u bytes from %u objects in %u ms",
+           available(), objcount - delcount, recycled, delcount, duration);
 
     return recycled;
 }
