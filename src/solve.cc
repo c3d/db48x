@@ -956,7 +956,9 @@ bool Root::jacobi_solver(list_g &eqs, list_g &vars, list_g &guesses)
             if (!val)
                 goto error;
             algebraic_g dx = val;
-            val = val * oeps;
+            val            = val * oeps;
+            if (!val)
+                goto error;
             if (val->is_same_as(*gi))
                 val = val + oeps;
             dx = dx - val;
