@@ -1480,6 +1480,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☽/ⒸProt☽;-2)' "
                 "  2.361E6_s ]",
+    // *Moon orbital period - anomalistic month (perigee to perigee) [M22]
+    "Porb☽",    "[ 2380713.11_s "
+                "  97165_s "
+                "  0 ]",
     // *Moon axial tilt - Measurement [22]
     "ϵ☽",       "[ 1.5424_° "
                 "  0.0001_° "
@@ -1510,9 +1514,10 @@ static const cstring basic_constants[] =
                 "  0.01_° "
                 "  'ROUND(Ⓢω☽/Ⓒω☽;-2)' "
                 "  318.2_° ]",
-    // *Moon perigee passage - Calculation from measurement [M20] [M22]
-    "T₀☽",      "[ 20260517.5833_date "
-                "  0_date "
+    // *Moon time of perigee passage - PeriSel (full Meeus ch.50); unc = ch.50
+    //  method accuracy vs true perigee ~5 min (1σ), up to ~30 min rare [M22]
+    "T₀☽",      "[ 'JDN→(ⓁPeriSel(→Num(JDN(DateTime))))' "
+                "  300_s "
                 "  0 ]",
 
     "Astronomy/Mars",     nullptr,
