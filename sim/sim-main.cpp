@@ -191,7 +191,7 @@ static void sim_usage(FILE *out, cstring prog)
             "  -s<N>      Window scaling factor\n"
             "  -t<trace>  Enable recorder trace (repeatable, regex ok)\n"
             "  -w[N]      Default test command wait in ms (default: 1000)\n"
-            "  -C<file>   Create a screeen snapshot to the given file\n"
+            "  -C<file>   Create a screen snapshot to the given file\n"
             "  -D<pattrn> Recorder traces pattern on test failure\n"
             "  -E<cmd>    Similar to -e, printing stack to console\n"
             "  -F<cmd>    Similar to -f, printing stack to console\n"
