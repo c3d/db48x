@@ -184,6 +184,12 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
                 precedence = precedence::SYMBOL;
             if (obj->type() == ID_symbol && !editing)
                 return symbol_p(object_p(obj));
+            if (expression_p expr = obj->as<expression>())
+            {
+                if (!expr->expand_without_size())
+                    return nullptr;
+                return expr->render(depth, precedence, editing);
+            }
             return obj->as_symbol(editing);
 
         case 1:
