@@ -79,6 +79,7 @@ void extract_android_assets();
 RECORDER(sim_window, 16, "Window management for the simulator");
 RECORDER(sim_keys, 16, "Keys from the simulator");
 RECORDER(sim_audio, 16, "Audio for the simulator");
+RECORDER(sim_error, 16, "Errors in the simulator");
 
 extern bool run_tests;
 extern bool shift_held;
@@ -1306,7 +1307,10 @@ void ui_refresh()
     while (refreshing)
     {
         if (count++ > 1000)
-            refreshing--;
+        {
+            record(sim_error, "Screen refresh did not occur after 1s");
+            return;
+        }
         sys_delay(1);
     }
     refreshing++;
