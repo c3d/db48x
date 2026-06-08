@@ -4387,6 +4387,82 @@ To enter `IFTE` in a program, select the `TestsMenu` (🟦 _3_) and then
 the _IFTE_ command (🟨 _F6_).
 # Release notes
 
+## Release 0.9.20 "Corpus" - Polynomials and algebraic expressions
+
+This release focuses on support for polynomial, root finding and algebraic
+expressions, and on making evaluation of algebraic expressions behave closer to
+algebraic mode on the HP50G, i.e. treat `'` like the HP50G treats a backquote
+expression or an expression entered in algebraic mode.
+
+### New features
+
+* `LU` command generating LU-decomposition for matrices
+* `REF`, `RREF` and `RREFP` commands to put matrices in Echelon form
+* `Order` command to reorder variables in the current directory
+* `PEval`, `PRoot` and `Zeros` commands for polynomials and expressions
+* `Unique` and `QuickUnique` commands to keep unique values in a list
+* `DEPND` and `INDEP` commands to set dependent/independent variables
+* Implicitly recognize `xlib` and `constants` by name, e.g. `c` or `Dedicace`
+* Flags to control the above, `AutomaticConstants` and `AutomaticXLibs`
+* Preserve symbol case for existing variables
+* Creating symbols matching builtin names using the `Ⓥ` prefix, e.g. `ⓋHelp`
+* Value comparison for `Sort` or `Unique` now works with expressions
+* Simplification now factors common ratios, e.g. `A*X+B*X`
+* Primitive and derivative of a polynomial
+* Several new constants lifted from the R47 constant catalog
+* Hyperbolic secant functions `sech`,`csch`, `coth`, and their inverse
+* `CrDir` can now take a list as input to create multiple directories
+
+### Bug fixes
+
+* Crash in solver in case of error evaluating some intermediate step
+* Correctly put parentheses in `'sin(x+1)'` rendered in text mode
+* Occasional `object_error` in `as_text()` on simulator
+* Crash in `IFT` / `IFTE` if given invalid input
+* Detection of expression vs. RPL programs during evaluation
+* Crash in quotient or decimal conversions given erroneous input
+* Parsing of `0+ⅈ`, was incorrectly parsed as `0ⅈ`
+* Negating `0` no longer shows `-0`
+* No longer allow incorrect mixing of ranges and uncertain numbers
+* Dividing a polynomial by a number now divides constant terms
+* Correctly split expressions that contain a single term when testing equations
+* Fix simulator race condition while loading the keymap
+* `STO` will no longer overwrite a directory with a non-directory value
+* `Purge` will no longer erase non-empty directories, `PGDir` is now needed
+* `RAr` constant uncertainty was incorrectly set to 0
+* Swap keyboard legacy and 42k keymaps in simulator
+
+### Improvements
+
+* Purely imaginary values such as `0+3ⅈ` now render as `3ⅈ`
+* The `LNAME` command now returns a list in algebraic expressions
+* `Σ`, `∏`, `∂` and `∫`, `COMB` and `PERM` now partially evaluate as on HP50G
+* Refactor detection of symbolic arguments in functions for scalability
+* Refactor detection of algebraic functions for scalability
+* Signal when `ui_refresh()` takes too long due to internal race condition
+* Do not drop input in multisolver when a wrong value is given
+* Quick exit when parsing empty commands
+* Rounding for `→ℚ` more accurately respects displayed precision
+* Internal factoring with square roots and fractions `to_sqrt`, used in `PRoot`
+* Internal integer and fraction square root, used in simplification
+* Reorganize the polynomials menu to bring useful functions at first level
+* Accept polynomials and tagged expressions in plotting commands
+* Do not default imaginary part to 1 in `complex::make` (was error prone)
+* Optimize the integer power case for range objects
+* Zero detection for expressions and polynomials in simplifications
+* Makefiles no longer emit confusing `mv` output in `make compare`
+* New `stack_buffer` facility in the runtime to keep multiple exansions on stack
+* Add `ISOL` tests for `sec`, `csc`, `cot` functions
+* Consolidate project guidance into `AGENTS.md`
+* Simplify simulator beep control logic: `-N` blocks beeps, `-n` restores them
+* Refresh implementation status
+* Update documentation for `PGDIR`, `STO` and `RCL` new capabilties
+* Internal facility to swap arbitrary stack levels
+* Update man page
+* Add recorder_scope-compatible instrumentation for GC and available memory
+* Accelerate display of constants/equations/library menus
+
+
 ## Release 0.9.19 "Spirit" - More constants, more space left
 
 This release includes a larger-than-usual number of changes, mostly to
@@ -21585,7 +21661,7 @@ Access: 🟨 (-); [ProgramMenu](#programmenu) 🟦 F4
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Obj→](#explode) | _Find_ | \[[Objects](#objectmenu)\] | \[[Matrix](#matrixmenu)\] | \[[Vector](#vectormenu)\] |   |
+| [Obj→](#explode) | _Find_ | [Unique](#unique) | [QUnique](#quickunique) | \[[Objects](#objectmenu)\] |   |
 | DoList | DoSubs | NSub | EndSub | [Extract](#extract) | ◀ |
 | [Get](#get) | [Put](#put) | [GetI](#geti) | [PutI](#puti) | [Reverse](#reverselist) | ▶ |
 
@@ -21637,7 +21713,7 @@ Access: [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F6; [ModesMenu](#mo
 
 ### MatrixMenu
 
-Access: 🟦 R (9); [ListMenu](#listmenu) ▶ 🟦 F4; [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmenu-reference) F5; [VectorMenu](#vectormenu) 🟨 F6
+Access: 🟦 R (9); [MainMenu](#mainmenu-reference) 🟨 F3; [MathMenu](#mathmenu-reference) F5; [VectorMenu](#vectormenu) 🟨 F6
 
 *3 pages · 35 items total*
 
@@ -21737,7 +21813,7 @@ Access: 🟦 W (×)
 
 ### ObjectMenu
 
-Access: [ListMenu](#listmenu) ▶ 🟦 F3; [ProgramMenu](#programmenu) 🟦 F3
+Access: [ListMenu](#listmenu) ▶ 🟦 F5; [ProgramMenu](#programmenu) 🟦 F3
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
@@ -22115,7 +22191,7 @@ Access: [ModesMenu](#modesmenu-reference) F5; [UserInterfaceModesMenu](#userinte
 
 ### VectorMenu
 
-Access: [ListMenu](#listmenu) ▶ 🟦 F5; [MatrixMenu](#matrixmenu) 🟦 F5
+Access: [MatrixMenu](#matrixmenu) 🟦 F5
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
