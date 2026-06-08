@@ -2249,8 +2249,8 @@ static const cstring basic_constants[] =
                 "  0 ]",
     // *Argon specific gas constant - Exact calculation: R=cp-cv [M2]
     "RAr",      "[ 'CONVERT(ⒸcpAr-ⒸcvAr;1_J/(kg*K))' "
-                "  0_J/(kg*K) "
-                "  0 ]",
+                "  'CONVERT(ROUND(UBASE(ⓇRAr*ⒸRAr);-2);1_J/(kg*K))' "
+                "  'ROUND((ⓈcpAr+ⓈcvAr)/ABS(ⒸcpAr-ⒸcvAr);-2)' ]",
 
     // ------------------------------------------------------------------------
     // *Argon electric permittivity - Measurement [M2]
