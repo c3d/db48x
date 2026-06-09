@@ -78,8 +78,9 @@ struct constant : algebraic
         cstring    library;     // Path for library files
         builtins_p builtins;    // Builtins definitions
         size_t     nbuiltins;   // Number of entries in builtins[]
+        cstring    vlabel;      // Label for value
+        cstring    clabel;      // Label for command
         runtime &  (*error)();  // Emit error message
-        symbol_p   (*label)(symbol_r); // Menu label adustment
         bool       (*show_builtins)(); // How to check if we show builtins
         bool       stack_prefix;       // Show prefix on the stack
         bool       ignore_case;        // Case-insensitive parsing

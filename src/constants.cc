@@ -2653,42 +2653,6 @@ static bool show_builtin_constants()
 }
 
 
-static symbol_p constant_label(symbol_r sym)
-// ----------------------------------------------------------------------------
-//   Compute numerical value of equation
-// ----------------------------------------------------------------------------
-{
-    if (sym)
-    {
-        size_t   len    = 0;
-        utf8     source = sym->value(&len);
-        if (object_p obj = object::parse(source, len))
-        {
-            if (array_p a = obj->as<array>())
-            {
-                uint idx = 0;
-                for (object_p disp : *a)
-                {
-                    if (idx == 0 || idx == 3)
-                        obj = disp;
-                    idx++;
-                }
-            }
-            if (expression_p expr = obj->as<expression>())
-            {
-                settings::SaveNumericalResults snr(true);
-                if (object_p evaluated = expr->evaluate())
-                    obj = evaluated;
-            }
-            settings::SaveDisplayDigits sdd(4);
-            if (symbol_p ssym = obj->as_symbol(false))
-                return ssym;
-        }
-    }
-    return sym;
-}
-
-
 const constant::config constant::constants =
 // ----------------------------------------------------------------------------
 //  Define the configuration for the constants
@@ -2707,8 +2671,9 @@ const constant::config constant::constants =
     .library       = "library",
     .builtins      = basic_constants,
     .nbuiltins     = sizeof(basic_constants) / sizeof(*basic_constants),
+    .vlabel        = "Value",
+    .clabel        = "Range",
     .error         = invalid_constant_error,
-    .label         = constant_label,
     .show_builtins = show_builtin_constants,
     .stack_prefix  = false,
     .ignore_case   = false,
@@ -2807,7 +2772,7 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
     if (cfile.valid())
     {
         cfile.seek(0);
-        while (symbol_g category = cfile.next(true))
+        while (cfile.next(true))                        // Category
         {
             while (symbol_p name = cfile.next(false))
             {
@@ -2854,7 +2819,7 @@ utf8 constant::do_name(config_r cfg, size_t *len) const
     if (cfile.valid())
     {
         cfile.seek(0);
-        while (symbol_g category = cfile.next(true))
+        while (cfile.next(true))                        // Category
         {
             while (symbol_p sym = cfile.next(false))
             {
@@ -2904,7 +2869,7 @@ object_p constant::do_value(config_r cfg) const
     if (cfile.valid())
     {
         cfile.seek(0);
-        while (symbol_g category = cfile.next(true))
+        while (cfile.next(true))                        // Category
         {
             uint position = cfile.position();
             while (symbol_p sym = cfile.next(false))
@@ -3256,13 +3221,14 @@ bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
             count = (last - first) / 2;
     }
 
-    items_init(mi, count + matching, 2, 1);
+    uint planes   = 1 + !!cfg.value + !!cfg.command;
+    items_init(mi, count + matching, planes, 1);
 
     // Insert the built-in constants after the ones from the file
     uint skip     = mi.skip;
-    uint planes   = 1 + !!cfg.value + !!cfg.command;
     id   ids[3]   = { cfg.name, cfg.value, cfg.command };
     auto builtins = cfg.builtins;
+
     for (uint plane = 0; plane < planes; plane++)
     {
         mi.plane  = plane;
@@ -3274,41 +3240,25 @@ bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
         if (matching)
         {
             cfile.seek(position);
-            if (plane == 1)
+
+            if (plane)
             {
-                while (symbol_g mentry = cfile.next(false))
-                {
-                    uint posafter = cfile.position();
-                    size_t mlen = 0;
-                    utf8 mtxt = mentry->value(&mlen);
-                    cfile.seek(position);
-                    mentry = cfile.lookup(mtxt, mlen, false, false);
-                    if (cfg.label)
-                        mentry = cfg.label(mentry);
-                    cfile.seek(posafter);
-                    if (mentry)
-                        items(mi, mentry, type);
-                }
+                cstring label = plane == 1 ? cfg.vlabel : cfg.clabel;
+                while (cfile.next(false))
+                    items(mi, label, type);
             }
             else
             {
-                while (symbol_g mentry = cfile.next(false))
+                while (symbol_p mentry = cfile.next(false))
                     items(mi, mentry, type);
             }
         }
         for (uint i = 0; i < count; i++)
         {
-            cstring   label = builtins[first + 2 * i + plane % 2];
-            if (plane == 1 && cfg.label)
-            {
-                symbol_g mentry = symbol::make(label);
-                mentry = cfg.label(mentry);
-                items(mi, mentry, type);
-            }
-            else
-            {
-                items(mi, label, type);
-            }
+            cstring label = plane == 1 ? cfg.vlabel
+                          : plane == 2 ? cfg.clabel
+                                       : builtins[first + 2 * i];
+            items(mi, label, type);
         }
     }
 
@@ -3534,7 +3484,7 @@ object_p constant::lookup_menu(config_r cfg, utf8 name, size_t len)
     if (cfile.valid())
     {
         cfile.seek(0);
-        while (symbol_g category = cfile.next(true))
+        while (symbol_p category = cfile.next(true))
         {
             size_t clen = 0;
             utf8 ctxt = category->value(&clen);
@@ -3654,8 +3604,9 @@ const constant::config standard_uncertainty::standard =
     .library        = "library",
     .builtins       = basic_constants,
     .nbuiltins      = sizeof(basic_constants) / sizeof(*basic_constants),
+    .vlabel         = "StdUnc",
+    .clabel         = nullptr,
     .error          = invalid_constant_error,
-    .label          = nullptr,
     .show_builtins  = show_builtin_constants,
     .stack_prefix   = true,
     .ignore_case    = false,
@@ -3709,8 +3660,9 @@ const constant::config relative_uncertainty::relative =
     .library        = "library",
     .builtins       = basic_constants,
     .nbuiltins      = sizeof(basic_constants) / sizeof(*basic_constants),
+    .vlabel         = "RelUnc",
+    .clabel         = nullptr,
     .error          = invalid_constant_error,
-    .label          = nullptr,
     .show_builtins  = show_builtin_constants,
     .stack_prefix   = true,
     .ignore_case    = false,

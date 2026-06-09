@@ -1416,24 +1416,6 @@ static runtime &invalid_equation_error()
 }
 
 
-static symbol_p equation_label(symbol_r sym)
-// ----------------------------------------------------------------------------
-//   Simplify equations to show then in menu label
-// ----------------------------------------------------------------------------
-{
-    if (sym)
-    {
-        size_t   len    = 0;
-        utf8     source = sym->value(&len);
-        if (object_p obj = object::parse(source, len))
-            if (expression_p expr = obj->as<expression>())
-                if (symbol_p ssym = expr->as_symbol(false))
-                    return ssym;
-    }
-    return sym;
-}
-
-
 static bool show_builtin_equations()
 // ----------------------------------------------------------------------------
 //   Show the builtin equations
@@ -1461,8 +1443,9 @@ const equation::config equation::equations =
     .library        = "library",
     .builtins       = basic_equations,
     .nbuiltins      = sizeof(basic_equations) / sizeof(*basic_equations),
+    .vlabel         = "Equation",
+    .clabel         = "Solve",
     .error          = invalid_equation_error,
-    .label          = equation_label,
     .show_builtins  = show_builtin_equations,
     .stack_prefix   = false,
 };
