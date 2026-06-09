@@ -50,6 +50,7 @@ The simulator can be started with the command-line options listed in the table b
 | -s[[`<whitespace>`]`<real>`] | Scale the application window by the given floating-point scaling factor. |
 | -t`<trace>` | Enable the named recorder trace. Multiple traces can be enabled by using multiple `-t` options, or by using a regular expression as an argument to `-t`. |
 | -w[[`<whitespace>`]`<integer>`] | Set the default time the test suite waits for a command to complete, in milliseconds. You can increase this to run the test suite on a very slow machine. The default = 1000 ms. |
+| -Z | Zero the initial state of the calculator (clean slate mode) |
 
 
 ## Arguments

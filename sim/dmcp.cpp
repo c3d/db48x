@@ -72,9 +72,9 @@ extern bool          no_beep;
 uint                 lcd_refresh_requested = 0;
 int                  lcd_buf_cleared_result = 0;
 pixword              lcd_buffer[LCD_SCANLINE * LCD_H * color::BPP / 32];
-bool                 shift_held = false;
-bool                 alt_held   = false;
-
+bool                 shift_held  = false;
+bool                 alt_held    = false;
+bool                 clean_slate = false;
 
 // Eliminate a really cumbersome warning
 #define DS_INIT                                 \
@@ -1064,7 +1064,8 @@ char *get_reset_state_file()
 {
     static char result[256];
     result[0] = 0;
-    ui_read_setting("state", result, sizeof(result));
+    if (!clean_slate)
+        ui_read_setting("state", result, sizeof(result));
     record(dmcp, "Saved state: %+s", result);
     return result;
 }

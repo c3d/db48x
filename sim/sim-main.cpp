@@ -58,6 +58,8 @@ bool   no_beep     = false;
 uint   memory_size = MEMORY; // Memory size in kilobytes
 QDir   testDirectory;
 
+extern bool clean_slate;
+
 size_t recorder_render_object(intptr_t tracing,
                               const char *UNUSED /* format */,
                               char *buffer, size_t size,
@@ -201,6 +203,7 @@ static void sim_usage(FILE *out, cstring prog)
             "  -N         Disable beeps\n"
             "  -O[test]   Configure test traces without running tests\n"
             "  -T[test]   Run tests (all or one suite, e.g. -Tmatrices)\n"
+            "  -Z         Zero initial state (Clean slate mode)\n"
             "\n"
             "  -E and -F write to stdout with -H, to stderr otherwise.\n"
             "\n"
@@ -335,6 +338,10 @@ static bool sim_parse_args(int argc, char *argv[])
         case 'w':
             check_arg();
             tests::default_wait_time = atoi(arg);
+            break;
+
+        case 'Z':
+            clean_slate = true;
             break;
 
         default:
