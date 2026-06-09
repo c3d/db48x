@@ -937,6 +937,16 @@ static const cstring basic_constants[] =
                 "  0 "
                 "  1.055E-34_J·s ]",
     // *Fine structure constant - Measurement [0]
+    // Value keeps guard digits past the CODATA-2022 recommended 7.2973525643e-3.
+    // The last digit (...564 34) differs from the bare 1/137.035999177 continuation
+    // (...564 33): keeping ...34 is what makes the α-dependent constants
+    // (μ₀, ε₀, me, a0, re, σe) round to their CODATA-2022 recommended values, which
+    // are each rounded independently and so are not mutually consistent at the
+    // 1e-12 level. The shift is far below α's own uncertainty (u_r = 1.6e-10).
+    // Uncertainty σ kept at 1.14e-12: at 2 s.f. it reproduces both NIST's
+    // u(α) = 1.1e-12 and u_r(α) = 1.6e-10 (α·u_r = 1.17e-12 alone would round
+    // u(α) up to 1.2e-12). It propagates to the dependent CODATA u_r's
+    // (re = 3·u_r(α), σe = 6·u_r(α)); a 2-figure 1.2e-12 breaks the u(α) match.
     "α",        "[ 0.00729735256434 "
                 "  0.00000000000114 "
                 "  'ROUND(UBASE(Ⓢα/Ⓒα);-2)' ]",
