@@ -1052,14 +1052,15 @@ size_t object::render(renderer &r) const
 // ------------------------------------------------------------------------
 {
     record(render, "Rendering %p into %p", this, &r);
-    if (r.stack())
-    {
+    if (!r.editing())
         if (Settings.ShowAsDecimal())
             if (is_real() && !is_fp())
                 if (algebraic_g x = this->as_algebraic())
                     if (algebraic::decimal_promotion(x))
                         return decimal::do_render(decimal_p(+x), r);
 
+    if (r.stack())
+    {
         size_t sz = size();
         if (sz > Settings.TextRenderingSizeLimit())
             return r.printf("Large %s (%lu bytes)", name(), sz);

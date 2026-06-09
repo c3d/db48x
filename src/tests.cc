@@ -3545,8 +3545,26 @@ void tests::decimal_display_formats()
         .expect("123.")
         .test("2 FIX", ENTER)
         .expect("123.00")
+        .image_noheader("show-as-decimal-integer", 3)
         .test(ID_ShowAsDecimal)
-        .expect("123");;
+        .expect("123")
+        .image_noheader("show-integers-and-fractions-integer", 3);
+    step("Display integers as decimal")
+        .test(ID_ShowAsDecimal)
+        .test(CLEAR, "1/23", ENTER)
+        .expect("4.35⁳⁻²")
+        .image_noheader("show-as-decimal-fraction", 3)
+        .test(ID_ShowAsDecimal)
+        .expect("¹/₂₃")
+        .image_noheader("show-integers-and-fractions-fraction", 3);
+    step("Display expression as decimal")
+        .test(ID_ShowAsDecimal)
+        .test("'2+2.235*X^3'", ENTER)
+        .expect("'2.00+2.24·X↑3.00'")
+        .image_noheader("show-as-decimal-equation", 3)
+        .test(ID_ShowAsDecimal)
+        .expect("'2+2.24·X↑3'")
+        .image_noheader("show-integers-and-fractions-equation", 3);
 
     step("Display fractions as decimal")
         .test(CLEAR, "5/2", ENTER)
