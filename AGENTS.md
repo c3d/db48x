@@ -201,6 +201,52 @@ make -j8 dm32           # Build for DM32 (db50x.pg5)
 - `constant::lookup("π", false)` returns a symbolic constant (the `false`
   suppresses errors if not found). `algebraic::pi()` returns a numeric value.
 
+### The cleaner purge pattern
+
+The **cleaner purge** pattern is a lightweight memory reclamation technique that
+complements garbage collection. It reclaims intermediate temporaries without
+running a full GC cycle.
+
+**Usage pattern:**
+```cpp
+cleaner purge;                              // Save current Temporaries pointer
+algebraic_g result = evaluate(op, y, x);    // Do work (may create temps)
+if (+result != +x && +result != +y)         // Check if result is new
+    result = purge(result);                 // Purge intermediate temporaries
+return result;
+```
+
+**How it works:**
+1. `cleaner purge;` saves the current `rt.Temporaries` pointer and GC cycle count
+2. During computation, intermediate temporary objects may be allocated above that mark
+3. `purge(result)` checks if:
+   - No GC ran during the operation (cycle count unchanged)
+   - The result is a new temporary (above the saved mark)
+   - Automatic cleanup is enabled in settings
+4. If all conditions hold, it discards all temporaries between the saved mark and
+   the result, keeping only the result by moving it down to the saved position
+5. If GC ran (objects may have moved), `purge()` returns the result unchanged
+
+**When to use:**
+- At the end of functions that create multiple intermediate objects but return
+  one final result
+- The idiom is `cleaner purge;` at function start, then `purge(result)` before
+  returning
+
+**The input check:**
+Always verify the result is new before purging:
+```cpp
+if (+result != +input1 && +result != +input2)
+    result = purge(result);
+```
+If you skip this check and the result aliases an input still on the stack, purging
+would move that stack object, corrupting the stack.
+
+**Statistics:**
+The runtime tracks both memory reclamation mechanisms separately:
+- `rt.GCPurged` - bytes reclaimed by full garbage collection
+- `rt.GCCleared` - bytes reclaimed by cleaner purge operations
+
 ### Type ranges (`ID_RANGE`) — critical gotcha
 
 The `ID_RANGE(is_integer, ...)` range covers IDs from `based_integer` through
