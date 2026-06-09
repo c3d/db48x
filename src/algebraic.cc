@@ -1409,6 +1409,7 @@ algebraic_p algebraic::evaluate_function(program_r eq, algebraic_r x)
 //   - Something that evaluates using the indep and returns it on the stack,
 //     for example 'X + 1' (assuming X is the independent variable)
 {
+    cleaner purge;
     stack_depth_restore sdr;
     if (!rt.push(+x))
         return nullptr;
@@ -1418,7 +1419,7 @@ algebraic_p algebraic::evaluate_function(program_r eq, algebraic_r x)
     if (err != OK)
         return nullptr;
 
-    object_p result = rt.pop();
+    algebraic_g result = algebraic_p(rt.pop());
     if (!result)
         return nullptr;
 
@@ -1443,7 +1444,9 @@ algebraic_p algebraic::evaluate_function(program_r eq, algebraic_r x)
         return nullptr;
     }
 
-    return algebraic_p(result);
+    if (+result != +x)
+        result = purge(result);
+    return result;
 }
 
 
@@ -1454,6 +1457,7 @@ algebraic_p algebraic::evaluate_function(program_r   eq,
 //   Evaluate the eq object as a function of two variables
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     stack_depth_restore sdr;
     if (!rt.push(+x) || !rt.push(+y))
         return nullptr;
@@ -1464,7 +1468,7 @@ algebraic_p algebraic::evaluate_function(program_r   eq,
     if (err != OK)
         return nullptr;
 
-    object_p result = rt.pop();
+    algebraic_g result = algebraic_p(rt.pop());
     if (!result)
         return nullptr;
 
@@ -1489,7 +1493,10 @@ algebraic_p algebraic::evaluate_function(program_r   eq,
         rt.type_error();
         return nullptr;
     }
-    return algebraic_p(result);
+
+    if (+result != +x && +result != +y)
+        result = purge(result);
+    return result;
 }
 
 

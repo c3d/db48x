@@ -45,6 +45,7 @@ object::result logical::evaluate(id ty,
 //   Evaluation for binary logical operations
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     object_p yo = strip(rt.stack(1));
     object_p xo = strip(rt.stack(0));
     if (!xo || !yo)
@@ -62,8 +63,10 @@ object::result logical::evaluate(id ty,
 
     if (is_symbolic(xt) || is_symbolic(yt))
     {
-        x = expression::make(ty, y, x);
-        if (x && rt.drop() && rt.top(x))
+        algebraic_g result = expression::make(ty, y, x);
+        if (result && result != +x && result != +y)
+            result = purge(result);
+        if (result && rt.drop() && rt.top(result))
             return OK;
         return ERROR;
     }
@@ -166,6 +169,8 @@ object::result logical::evaluate(id ty,
         bignum_g yg = (bignum *) object_p(y);
         rt.pop();
         bignum_g rg = big(yg, xg);
+        if (rg && +rg != +xg && +rg != +yg)
+            rg = purge(rg);
         if (bignum_p(rg) && rt.top(rg))
             return OK;
         return ERROR; // Out of memory
@@ -184,16 +189,20 @@ object::result logical::evaluate(id ty,
 //   Evaluation for unary logical operations
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     algebraic_g x = algebraic_p(rt.stack(0));
     if (!x)
         return ERROR;
+    algebraic_g xorig = x;
 
     id   xt  = x->type();
 
     if (is_symbolic(xt))
     {
-        x = expression::make(ty, x);
-        if (x && rt.top(x))
+        algebraic_g result = expression::make(ty, x);
+        if (result && +result != +xorig)
+            result = purge(result);
+        if (result && rt.top(result))
             return OK;
         return ERROR;
     }
@@ -276,6 +285,8 @@ object::result logical::evaluate(id ty,
         bignum_g rg = big(xg);
         if (neg)
             rg = -rg;
+        if (rg && +rg != +xg)
+            rg = purge(rg);
         if (bignum_p(rg) && rt.top(rg))
             return OK;
         return ERROR; // Out of memory

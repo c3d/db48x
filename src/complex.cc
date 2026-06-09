@@ -291,6 +291,7 @@ algebraic_p complex::as_rounded_result(int impr) const
 //   Drop imaginary noise that result from complex coefficients
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     rectangular_g r = as_rectangular();
     if (!r)
         return nullptr;
@@ -302,11 +303,18 @@ algebraic_p complex::as_rounded_result(int impr) const
         return nullptr;
     im = abs::run(im);
     if (!im || im->is_zero(false) || smaller_magnitude(im, eps))
+    {
+        if (+re != +r)
+            re = purge(re);
         return re;
+    }
     im = im->snap_near_integer(eps);
     if (!im)
         return nullptr;
-    return rectangular::make(re, im);
+    algebraic_p result = rectangular::make(re, im);
+    if (result && +result != +r)
+        result = purge(result);
+    return result;
 }
 
 
@@ -427,10 +435,14 @@ polar_g complex::as_polar() const
 //   Switch to polar form if preferred for computation
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     if (type() == ID_rectangular)
     {
         rectangular_g r = rectangular_p(this);
-        return polar::make(r->mod(), r->pifrac(), object::ID_PiRadians);
+        polar_g result = polar::make(r->mod(), r->pifrac(), object::ID_PiRadians);
+        if (result)
+            result = purge(result);
+        return result;
     }
     return polar_p(this);
 }
@@ -441,10 +453,14 @@ rectangular_g complex::as_rectangular() const
 //   Switch to rectangular form if preferred for computation
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     if (type() == ID_polar)
     {
         polar_g r = polar_p(this);
-        return rectangular::make(r->re(), r->im());
+        rectangular_g result = rectangular::make(r->re(), r->im());
+        if (result)
+            result = purge(result);
+        return result;
     }
     return rectangular_p(this);
 }

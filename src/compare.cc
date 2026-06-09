@@ -307,17 +307,23 @@ algebraic_p comparison::compare(comparison_fn comparator,
 //   Compare two algebraic values without using the stack
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
+    algebraic_p result = nullptr;
     int cmp = 0;
     if (compare(&cmp, x, y))
     {
         // Could evaluate the result, return True or False
         id type = comparator(cmp) ? ID_True : ID_False;
-        return algebraic_p(command::static_object(type));
+        result = algebraic_p(command::static_object(type));
     }
-
-    // Otherwise, need to build an equation with the comparison
-    expression_p eq = expression::make(op, x, y);
-    return eq;
+    else
+    {
+        // Otherwise, need to build an equation with the comparison
+        result = expression::make(op, x, y);
+    }
+    if (result && result != +x && result != +y)
+        result = purge(result);
+    return result;
 }
 
 

@@ -1301,6 +1301,8 @@ expression_p expression::rewrite(expression_r from,
 //   to is `B + A`, then the output will be `sin(Y + X) + 3`.
 //
 {
+    cleaner purge;
+
     // Do not keep going if we got an error along the way (e.g. out of memory)
     if (!from || !to || rt.error())
         return nullptr;
@@ -1422,6 +1424,10 @@ err:
         record(rewrites_done,
                "%t rewritten as %t applying %t->%t with condition %t %u times",
                +saved, +eq, +from, +to, +cond, rwcount);
+
+    // Purge intermediate temporaries created during rewrite
+    if (eq && +eq != this)
+        eq = purge(eq);
     return eq;
 }
 

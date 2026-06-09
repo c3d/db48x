@@ -498,6 +498,7 @@ algebraic_p StatsAccess::sum(sum_fn op, uint scol) const
 //   Run a sum on a single column
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     algebraic_g s = integer::make(0);
     algebraic_g x;
     for (object_p row : *data)
@@ -538,7 +539,7 @@ algebraic_p StatsAccess::sum(sum_fn op, uint scol) const
             break;
         }
     }
-    return s;
+    return purge(s);
 }
 
 
@@ -547,6 +548,7 @@ algebraic_p StatsAccess::sum(sxy_fn op, uint xcol, uint ycol) const
 //   Run a sum on a single column
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     algebraic_g s = integer::make(0);
     algebraic_g x, y;
     for (object_p row : *data)
@@ -599,7 +601,7 @@ algebraic_p StatsAccess::sum(sxy_fn op, uint xcol, uint ycol) const
             break;
         }
     }
-    return s;
+    return purge(s);
 }
 
 

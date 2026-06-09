@@ -1216,12 +1216,16 @@ algebraic_p unit::map(algebraic_fn fn) const
 //   Map an algebraic function to the value part of the unit
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     algebraic_g x = value();
     algebraic_g u = uexpr();
     x             = fn(x);
+    algebraic_p result = nullptr;
     if (x)
-        return unit::simple(x, u);
-    return nullptr;
+        result = unit::simple(x, u);
+    if (result)
+        result = purge(result);
+    return result;
 }
 
 
@@ -1230,11 +1234,15 @@ algebraic_p unit::map(bool (*fn)(algebraic_g &x)) const
 //   Map an algebraic function to an algebraic conversion function
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;
     algebraic_g x = value();
     algebraic_g u = uexpr();
+    algebraic_p result = nullptr;
     if (fn(x))
-        return unit::simple(x, u);
-    return nullptr;
+        result = unit::simple(x, u);
+    if (result)
+        result = purge(result);
+    return result;
 }
 
 
