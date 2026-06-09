@@ -27,7 +27,7 @@ DB48X is a modern implementation of RPL (Reverse Polish Lisp) targeting SwissMic
 ```bash
 make -j sim                         # Build Qt simulator
 ./db48x.app/Contents/MacOS/db48x    # Run on macOS
-./sim/db48x                         # Run on Linux
+./db48x                             # Run on Linux
 ```
 
 **Firmware:**

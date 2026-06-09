@@ -144,7 +144,7 @@ need to run it from the top-level directory if you want the built-in help files
 and the configuration files to be found:
 
 ```bash
-`./sim/db48x
+`./db48x
 ```
 
 DB48x should run now :-)
@@ -196,7 +196,7 @@ DB48x's output, for example traces or error messages:
 * Copy the shortcut `Windows PowerShell (x86)`  and rename it to `db48x + WSL`
 * Right-click on the file and select `Properties`
 * Change the target of the shortcut to
-  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./sim/db48x`
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./db48x`
 
 ###  DB48x (without terminal)
 
@@ -210,4 +210,4 @@ message emitted by DB48x.
 * Copy the shortcut `Windows PowerShell (x86)`  and rename it to `DB48x`
 * Right-click on the file and `Properties`
 * Change the target of the shortcut to
-  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl --cd "~/db48x" -- ./sim/db48x`
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl --cd "~/db48x" -- ./db48x`

@@ -60,7 +60,7 @@ build-simulator-macos:
   with:
     name: db48x-simulator-macos
     path: |
-      sim/db48x.app
+      db48x.app
       help/
 ```
 
@@ -69,7 +69,7 @@ build-simulator-macos:
 artifacts:
   name: "db48x-simulator-macos-$CI_COMMIT_SHORT_SHA"
   paths:
-    - sim/db48x.app
+    - db48x.app
     - help/
   expire_in: 30 days
 ```
@@ -234,4 +234,3 @@ gitlab-runner exec shell build-simulator-macos
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [GitLab CI/CD Documentation](https://docs.gitlab.com/ee/ci/)
 - [Migrating from GitHub Actions to GitLab CI](https://docs.gitlab.com/ee/ci/migration/github_actions.html)
-

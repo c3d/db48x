@@ -6,7 +6,7 @@ It brings calculator functionality to your computer (Linux, macOS, Windows + WSL
 This document describes some of its additional functionality.
 Building the simulator is described in [BUILD](BUILD.md).
 
-Run the simulator with the command `<path>/sim/db48x [Option]* [argument]*`.
+Run the simulator with the command `<path>/db48x [Option]* [argument]*`.
 The simulator uses a few [Environment variables](#environment-variables), and its behavior can be further
 influenced with [Options](#options) and/or [Arguments](#arguments).
 
@@ -146,7 +146,7 @@ If you make changes, run the test suite to verify you did not break existing fun
 
 The calculator code frequently calls the `record(<name>, ...);` procedure to record what is happening at that point.
 
-If you run the simulator with the command `<path>/sim/db48x -t<name>`, the recorder prints those trace messages (see also [Environment variables](#environment-variables) and [Options](#options)).
+If you run the simulator with the command `<path>/db48x -t<name>`, the recorder prints those trace messages (see also [Environment variables](#environment-variables) and [Options](#options)).
 
 ## Post-mortem flight recorder dump
 

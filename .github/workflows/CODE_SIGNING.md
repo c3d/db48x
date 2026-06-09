@@ -126,11 +126,11 @@ script:
       security create-keychain -p actions temp.keychain
       security import cert.p12 -k temp.keychain -P "$APPLE_CERT_PASSWORD" -T /usr/bin/codesign
       # Sign
-      codesign --keychain temp.keychain --sign "$APPLE_TEAM_ID" --options runtime sim/db48x.app
+      codesign --keychain temp.keychain --sign "$APPLE_TEAM_ID" --options runtime db48x.app
       # Notarize (requires xcrun altool or notarytool)
       # ... notarization steps ...
     else
-      codesign --force --deep --sign - sim/db48x.app
+      codesign --force --deep --sign - db48x.app
     fi
 ```
 
@@ -164,10 +164,10 @@ The workflows are designed to work without any secrets configured:
 **macOS**:
 ```bash
 # Check if properly signed
-codesign -dv --verbose=4 sim/db48x.app
+codesign -dv --verbose=4 db48x.app
 
 # Check notarization
-spctl -a -vv sim/db48x.app
+spctl -a -vv db48x.app
 ```
 
 **Windows**:
@@ -194,4 +194,3 @@ jarsigner -verify -verbose -certs android/db48x.aab
 - [Android App Signing](https://developer.android.com/studio/publish/app-signing)
 - [Google Play Console](https://play.google.com/console)
 - [../ANDROID_BUILD.md](../ANDROID_BUILD.md) - DB48X Android build documentation
-
