@@ -13891,6 +13891,32 @@ void tests::polynomial_roots()
         .test(CLEAR, "ComplexResults 'X^2+3=0' 'X' Zeros", ENTER)
         .expect("{ '√ 3'ⅈ -'√ 3'ⅈ }")
         .test(CLEAR, "'ComplexResults' PURGE", ENTER);
+
+    step("PEVAL and PCOEF in algebraic form")
+        .test(CLEAR, "'PEVAL(PCOEF([1;2;3;4]);X)'", ENTER)
+        .expect("'PolynomialEvaluation(PolynomialCoefficients [1;2;3;4];X)'")
+        .test(ID_Run)
+        .expect("'(((X+-10)·X+35)·X+-50)·X+24'");
+    step("PEVAL and PCOEF in algebraic form, numerical")
+        .test(CLEAR, "'PEVAL(PCOEF([1;2;3;4]);42)'", ENTER)
+        .expect("'PolynomialEvaluation(PolynomialCoefficients [1;2;3;4];42)'")
+        .test(ID_Run)
+        .expect("2 430 480");
+    step("PROOT in algebraic form")
+        .test(CLEAR, "'PROOT(PCOEF([4;2;3;1]))'", ENTER)
+        .expect("'PolynomialRoots (PolynomialCoefficients [4;2;3;1])'")
+        .test(ID_Run)
+        .expect("[ 1 2 3 4 ]");
+    step("ZEROS in algebraic form")
+        .test(CLEAR, "'zeros((x+1)*(x-1);x)'", ENTER)
+        .expect("'Zeros((x+1)·(x-1);x)'")
+        .test(ID_Run)
+        .expect("{ -1 1 }");
+    step("ZEROS in algebraic form, complicated convergence")
+        .test(CLEAR, "'zeros(PCOEF([4;3;2;17]);x)'", ENTER)
+        .expect("'Zeros(PolynomialCoefficients [4;3;2;17];x)'")
+        .test(ID_Run)
+        .expect("{ 2 3 4 17 }");
 }
 
 

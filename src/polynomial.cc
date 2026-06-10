@@ -1820,18 +1820,25 @@ polynomial_p polynomial::get(object_p obj)
 //   Turn an object into a polynomial
 // ----------------------------------------------------------------------------
 {
-    if (!obj)
-        return nullptr;
-    obj = object::strip(obj);
-    if (polynomial_p poly = obj->as<polynomial>())
-        return poly;
-    if (polynomial_p poly = polynomial::from_coefficients(obj, false))
-        return poly;
-    if (expression_p expr = obj->as<expression>())
-        obj = expr->as_difference_for_solve();
-    if (algebraic_p alg = obj->as_algebraic())
-        if (polynomial_p poly = polynomial::make(alg))
+    for (uint retries = 0; retries < 2; retries++)
+    {
+        if (!obj)
+            return nullptr;
+        obj = object::strip(obj);
+        if (polynomial_p poly = obj->as<polynomial>())
             return poly;
+        if (polynomial_p poly = polynomial::from_coefficients(obj, false))
+            return poly;
+        if (expression_p expr = obj->as<expression>())
+            obj = expr->as_difference_for_solve();
+        if (algebraic_p alg = obj->as_algebraic())
+            if (polynomial_p poly = polynomial::make(alg))
+                return poly;
+        if (!retries)
+            if (algebraic_p alg = obj->as_algebraic())
+                if (algebraic_p eval = alg->evaluate())
+                    obj = eval;
+    }
     return nullptr;
 }
 
@@ -2236,6 +2243,9 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
 
             // Laguerre iteration
             bool found = false;
+            bool yneg  = false;
+            bool yschg = false;
+            decimal::precision_adjust prec(3);
             for (size_t i = 0; i < max; i++)
             {
                 if (!x)
@@ -2250,6 +2260,11 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                     record(polyroots, "Solution found x=%t y=%t", +x, +y);
                     break;
                 }
+
+                bool yn = y->is_negative(false);
+                yschg   = yneg != yn;
+                yneg    = yn;
+
                 g = horner(sder1, x);
                 g = g / y;
                 h = horner(sder2, x);
@@ -2265,6 +2280,12 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                 a = n / a;
                 x = x - a;
                 record(polyroots, "a=%t new x=%t", +a, +x);
+                if (yschg && smaller_magnitude(a, eps * x))
+                {
+                    found = true;
+                    record(polyroots, "Sign change at a=%t new x=%t", +a, +x);
+                    break;
+                }
             }
 
             sder1.cleanup();
