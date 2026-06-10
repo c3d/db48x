@@ -14,13 +14,13 @@ DB48X is a RPL calculator, which means that:
   been a central feature of practically all Hewlett-Packard scientific
   calculators since the HP-35. You enter arguments to a functions by pushing
   them on the stack, and the operation removes its arguments from the stack
-  before putting its result(s). Unlike earlier HP calculators, the RPL stack is
-  practically unlimited.
+  before putting its result(s). In contrast to earlier HP calculators, the RPL
+  stack is practically unlimited.
 
 ![Stack and menus](img/stack-and-menus.bmp)
 
-* Unlike simpler calculators, it uses a _command line_ for data entry, with
-  advanced text editing capabilities, and a rich text-based command
+* Unlike simpler earlier calculators, DB48x uses a _command line_ for data
+  entry, with advanced text editing capabilities, and a rich text-based command
   language. One way to access the hundreds of available commands is by simply
   typing their name.
 
@@ -223,7 +223,7 @@ There is a quick way to manually enter angles in DMS format by using the _._
 more than once during data entry. For example, to enter 10°20′30″, you simply
 need to type _1_, _0_, _._, _2_, _0_, _._, _3_, _0_, _ENTER_.
 
-On the command-line, this shows up as `10°20′30_hms`. Once you hit the _ENTER_
+On the command-line, this shows up as `10°20′30_dms`. Once you hit the _ENTER_
 key, this shows on the stack as `10°20′30″`.
 
 Using _._ more while on the command-line lets you add fractions of a second, for

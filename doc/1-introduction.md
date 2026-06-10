@@ -57,8 +57,10 @@ you type `3` and then hit the `×` key, you will end up with `(2+x)×3`, showing
 how the algebraic expression was built from RPN keystrokes.
 
 Algebraic expressions are not evaluated automatically. The _R/S_ key (bound to
-the [Evaluate](#evaluate) function) will compute their value as needed. On the
-DB48X keyboard overlay, this key is also marked as `=` for that reason.
+the [Run](#run) command) will compute their value as needed. On the
+DB48X keyboard overlay, this key is also marked as `=` for that reason. The
+overlay labels also include `Eval` and `Spc`, since this key changes purpose
+depending on the context.
 
 ## Rich data types
 
