@@ -11106,6 +11106,31 @@ void tests::flags_functions()
     step("Check that flags are all clear at end");
     for (uint f = 0; f < nflags; f++)
         test(CLEAR, (f * 23) % 128, " FC?", ENTER).expect("True");
+
+    step("Check symbolic flag syntax")
+        .test(CLEAR, "'TestFlagSet( ThreeRowsMenus )'", ENTER)
+        .expect("'TestFlagSet ThreeRowsMenus'")
+        .test(ID_Run)
+        .expect("True");
+    step("Check symbolic flag syntax clear then set")
+        .test(CLEAR, "'TestFlagClearThenSet(SingleRowMenus )'", ENTER)
+        .expect("'TestFlagClearThenSet SingleRowMenus'")
+        .test(ID_Run)
+        .expect("True");
+    step("Check symbolic flag syntax set")
+        .test(CLEAR, "'TestFlagSet( SingleRowMenus)'", ENTER)
+        .expect("'TestFlagSet SingleRowMenus'")
+        .test(ID_Run)
+        .expect("True")
+        .test(CLEAR, "'TestFlagSet(ThreeRowsMenus)'", ENTER)
+        .expect("'TestFlagSet ThreeRowsMenus'")
+        .test(ID_Run)
+        .expect("False");
+    step("Check symbolic flag syntax clear then set")
+        .test(CLEAR, "'TestFlagSetThenSet(ThreeRowsMenus)'", ENTER)
+        .expect("'TestFlagSetThenSet ThreeRowsMenus'")
+        .test(ID_Run)
+        .expect("False");
 }
 
 

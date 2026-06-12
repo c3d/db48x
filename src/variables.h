@@ -267,12 +267,16 @@ SPECIAL_MENU_DECLARE(variable_menu_store);
 COMMAND_DECLARE(SetFlag,1);
 COMMAND_DECLARE(ClearFlag,1);
 COMMAND_DECLARE(FlipFlag,1);
-COMMAND_DECLARE_FN(TestFlagSet,1);
-COMMAND_DECLARE_FN(TestFlagClear,1);
-COMMAND_DECLARE_FN(TestFlagClearThenClear,1);
-COMMAND_DECLARE_FN(TestFlagClearThenSet,1);
-COMMAND_DECLARE_FN(TestFlagSetThenClear,1);
-COMMAND_DECLARE_FN(TestFlagSetThenSet,1);
+#define FLAG_TEST_DECLARE(fn)                           \
+    COMMAND_DECLARE_SPECIAL(fn, algebraic, 1,           \
+                            PREC_DECL(FUNCTION);        \
+                            SYMARGS;);
+FLAG_TEST_DECLARE(TestFlagSet);
+FLAG_TEST_DECLARE(TestFlagClear);
+FLAG_TEST_DECLARE(TestFlagClearThenClear);
+FLAG_TEST_DECLARE(TestFlagClearThenSet);
+FLAG_TEST_DECLARE(TestFlagSetThenClear);
+FLAG_TEST_DECLARE(TestFlagSetThenSet);
 SYMBOL_DECLARE(FlagsToBinary);
 COMMAND_DECLARE(BinaryToFlags,1);
 

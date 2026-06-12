@@ -576,6 +576,11 @@ bool settings::flag(object::id name, bool value)
     {
         // For all settings, 'store' is much like running it
 #define ID(n)
+#define SETTING_VALUE(Name, Alias, Base, Value) \
+    case ID_##Name:                             \
+        if (value)                              \
+            Settings.Base(Value);               \
+        break;
 #define SETTING(Name, Low, High, Init)
 #define FLAG(Enable, Disable)                   \
     case ID_##Enable:                           \
@@ -604,6 +609,10 @@ bool settings::flag(object::id name, bool *value)
         // For all settings, 'store' is much like running it
 #define ID(n)
 #define SETTING(Name, Low, High, Init)
+#define SETTING_VALUE(Name, Alias, Base, Value) \
+    case ID_##Name:                             \
+        *value = Settings.Base() == Value;      \
+        return true;
 #define FLAG(Enable, Disable)                   \
     case ID_##Enable:                           \
         *value = Settings.Enable();             \
@@ -627,6 +636,7 @@ cstring setting::printf(cstring format, ...)
 {
     va_list va;
     va_start(va, format);
+
     char   buf[80];
     size_t size = vsnprintf(buf, sizeof(buf), format, va);
     va_end(va);
