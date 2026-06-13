@@ -6592,9 +6592,9 @@ void tests::range_types()
         .test(CLEAR, "1±3 5", ID_pow).expect("496±528")
         .test(CLEAR, "1±300% 5", ID_pow).expect("496±106 ¹⁴/₃₁%");
     step("Range power (even)")
-        .test(CLEAR, "-1…3 6", ID_pow).expect("1…729")
-        .test(CLEAR, "1±3 6", ID_pow).expect("2 080±2 016")
-        .test(CLEAR, "1±300% 6", ID_pow).expect("2 080±96 ¹²/₁₃%");
+        .test(CLEAR, "-1…3 6", ID_pow).expect("0…729")
+        .test(CLEAR, "1±3 6", ID_pow).expect("2 048±2 048")
+        .test(CLEAR, "1±300% 6", ID_pow).expect("2 048±100%");
 
     step("Exploding range objects")
         .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)

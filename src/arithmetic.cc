@@ -2042,9 +2042,14 @@ algebraic_g pow(algebraic_r xr, ularge y)
     {
         algebraic_g lo = range_p(+x)->lo();
         algebraic_g hi = range_p(+x)->hi();
+        bool        crossesZero =
+            (y & 1) == 0 &&
+            (lo->is_negative(false) != hi->is_negative(false));
         lo = pow(lo, y);
         hi = pow(hi, y);
         range::sort(lo, hi);
+        if (crossesZero)
+            lo = integer::make(0);
         return range::make(x->type(), lo, hi);
     }
     while (y)
