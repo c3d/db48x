@@ -143,6 +143,7 @@ struct tests
     void sum_and_product();
     void polynomials();
     void polynomial_roots();
+    void partfrac();
     void quotient_and_remainder();
     void prime_number_tests();
     void exact_quotient();

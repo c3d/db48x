@@ -174,6 +174,7 @@ TESTS(probabilities,    "Probabilities");
 TESTS(sumprod,          "Sums and products");
 TESTS(poly,             "Polynomials");
 TESTS(prootzeros,       "Polynomial roots and evaluation");
+TESTS(partfrac,         "Partial fraction decomposition");
 TESTS(quorem,           "Quotient and remainder");
 TESTS(primes,           "Prime number tests");
 TESTS(expr,             "Operations on expressions");
@@ -306,6 +307,7 @@ int tests::run(uint onlyCurrent)
         sum_and_product();
         polynomials();
         polynomial_roots();
+        partfrac();
         quotient_and_remainder();
         prime_number_tests();
         exact_quotient();
@@ -14045,6 +14047,31 @@ void tests::polynomial_roots()
         .expect("'Zeros(PolynomialCoefficients [4;3;2;17];x)'")
         .test(ID_Run)
         .expect("{ 2 3 4 17 }");
+}
+
+
+void tests::partfrac()
+// ----------------------------------------------------------------------------
+//   Partial fraction decomposition
+// ----------------------------------------------------------------------------
+{
+    BEGIN(partfrac);
+
+    step("Simple distinct linear factors")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
+        .test("'1/(X^2-1)' PartFrac", ENTER)
+        .expect("'1/2÷(X-1)+-1/2÷(X+1)'")
+        .test("SmallFractions MixedFractions", ENTER);
+    step("Simple pole at zero")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
+        .test("'1/(X*(X-1))' PartFrac", ENTER)
+        .expect("'1÷(X-1)+-1÷X'")
+        .test("SmallFractions MixedFractions", ENTER);
+    step("PartialFractions alias")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
+        .test("'1/(X^2-1)' PartialFractions", ENTER)
+        .expect("'1/2÷(X-1)+-1/2÷(X+1)'")
+        .test("SmallFractions MixedFractions", ENTER);
 }
 
 

@@ -656,7 +656,8 @@ MENU(PolynomialsMenu,
      "TVMRoot", ID_TVMRoot,
      "FRoots",  ID_Unimplemented,
      "XRoot",   ID_xroot,
-     "FCoef",   ID_Unimplemented);
+     "FCoef",   ID_Unimplemented,
+     "PrtFrc",  ID_PartFrac);
 
 
 MENU(HyperbolicMenu,

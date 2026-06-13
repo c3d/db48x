@@ -628,6 +628,7 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 | \[[MSolvr](#solvermenu)\] | [Solve](#root) | [TVMRoot](#tvmroot) | _FRoots_ | [XRoot](#xroot) | _FCoef_ |
 | [Obj→](#explode) | Display | QuoRem | [Root](#root) | [Zeros](#zeros) | [MRoot](#multipleequationssolver) |
 | `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
+| [PrtFrc](#partfrac) |   |   |   |   |   |
 
 ### PolynomialSolverMenu
 

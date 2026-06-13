@@ -188,4 +188,7 @@ COMMAND_DECLARE(AlgebraConfiguration,   0);
 SYMBOL_DECLARE(AlgebraVariable);
 COMMAND_DECLARE(StoreAlgebraVariable,   1);
 
+COMMAND_DECLARE_SPECIAL(PartFrac, algebraic, 1,
+                        PREC_DECL(FUNCTION); SYMARGS);
+
 #endif // POLYNOMIAL_H

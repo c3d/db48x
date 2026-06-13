@@ -20157,6 +20157,32 @@ Create a case-list of integers in the given range.
 ## ASSUME
 Apply certain assumptions about a variable to an expression.
 
+## PartFrac
+
+Decompose a rational function of the current algebra variable into partial
+fractions. The argument must be a quotient of polynomials in that variable
+(with numeric coefficients). If the fraction is improper, the polynomial part
+is returned separately, followed by the sum of proper fractional terms.
+
+The command also accepts the alias `PartialFractions`. In algebraic mode, the
+argument may remain symbolic (unevaluated) inside expressions.
+
+```rpl
+'1/(X^2-1)' PartFrac
+@ Expecting '1/2÷(X-1)+-1/2÷(X+1)'
+```
+
+```rpl
+'1/(X*(X-1))' PartFrac
+@ Expecting '1÷(X-1)+-1÷X'
+```
+
+With `ComplexResults`, irreducible factors are split into linear terms with
+complex denominators. Without `ComplexResults`, irreducible quadratics are
+kept as `(A·X+B)/(X^2+…)` terms.
+
+See also: `Expand`, `Collect`, `ToPolynomial`, `AlgebraVariable`
+
 ## AlgebraConfiguration
 
 Name reserved for the current algebra configuration directory.
@@ -22244,6 +22270,7 @@ Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#sym
 | \[[MSolvr](#solvermenu)\] | [Solve](#root) | [TVMRoot](#tvmroot) | _FRoots_ | [XRoot](#xroot) | _FCoef_ |
 | [Obj→](#explode) | Display | QuoRem | [Root](#root) | [Zeros](#zeros) | [MRoot](#multipleequationssolver) |
 | `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
+| [PrtFrc](#partfrac) |   |   |   |   |   |
 
 ### PolynomialSolverMenu
 
