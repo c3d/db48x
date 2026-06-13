@@ -2462,7 +2462,8 @@ COMMAND_BODY(PCoef)
 //
 // ============================================================================
 
-RECORDER(partfrac, 16, "Partial fractions");
+RECORDER(partfrac,       16, "Partial fractions");
+RECORDER(partfrac_error, 16, "Errors while computing partial fractions");
 
 
 static polynomial_g partfrac_linear_poly(symbol_r var, algebraic_r root)
@@ -2491,30 +2492,6 @@ static bool partfrac_deflate(polynomial_g &poly, algebraic_r root, symbol_r var)
         return false;
     poly = quot;
     return true;
-}
-
-
-static size_t partfrac_root_multiplicity(polynomial_r den,
-                                         algebraic_r root,
-                                         symbol_r var)
-// ----------------------------------------------------------------------------
-//   Multiplicity of root in the full denominator
-// ----------------------------------------------------------------------------
-{
-    polynomial_g t = polynomial::make(den->as_expression());
-    if (!t)
-        return 0;
-    size_t         m = 0;
-    while (t && !t->is_zero(true))
-    {
-        polynomial_g lin = partfrac_linear_poly(var, root);
-        polynomial_g quot, rem;
-        if (!lin || !polynomial::quorem(t, lin, quot, rem) || !rem->is_zero(true))
-            break;
-        m++;
-        t = quot;
-    }
-    return m;
 }
 
 
@@ -2585,11 +2562,11 @@ static bool partfrac_add_term(algebraic_g &acc, algebraic_r num, algebraic_r den
 
 
 static bool partfrac_linear(polynomial_g &rem,
-                            polynomial_r den,
-                            algebraic_r root,
-                            size_t       mult,
-                            symbol_r     var,
-                            algebraic_g &acc)
+                            polynomial_r  den,
+                            algebraic_r   root,
+                            size_t        mult,
+                            symbol_r      var,
+                            algebraic_g  &acc)
 // ----------------------------------------------------------------------------
 //   Partial fractions for a linear pole (x - root)^mult
 // ----------------------------------------------------------------------------
@@ -2598,10 +2575,8 @@ static bool partfrac_linear(polynomial_g &rem,
     if (!s)
         return false;
     for (size_t k = 0; k < mult; k++)
-    {
         if (!partfrac_deflate(s, root, var))
             return false;
-    }
 
     algebraic_g sa = partfrac_evaluate(s, root);
     if (!sa || sa->is_zero(true))
@@ -2614,12 +2589,12 @@ static bool partfrac_linear(polynomial_g &rem,
         if (!aj)
             return false;
 
-        algebraic_g den_term = partfrac_lin_pow(var, root, j);
-        if (!den_term || !partfrac_add_term(acc, aj, den_term))
+        algebraic_g dterm = partfrac_lin_pow(var, root, j);
+        if (!dterm || !partfrac_add_term(acc, aj, dterm))
             return false;
 
-        polynomial_g aj_poly = polynomial::make(aj);
-        polynomial_g prod    = polynomial::mul(s, aj_poly);
+        polynomial_g ajp  = polynomial::make(aj);
+        polynomial_g prod = polynomial::mul(s, ajp);
         if (!prod)
             return false;
         rem = polynomial::sub(rem, prod);
@@ -2632,7 +2607,9 @@ static bool partfrac_linear(polynomial_g &rem,
 }
 
 
-static bool partfrac_one_root(polynomial_r poly, symbol_r var, algebraic_g &root)
+static size_t partfrac_one_root(polynomial_r poly,
+                                symbol_r     var,
+                                algebraic_g &root)
 // ----------------------------------------------------------------------------
 //   Pick the largest root of a univariate polynomial
 // ----------------------------------------------------------------------------
@@ -2640,18 +2617,29 @@ static bool partfrac_one_root(polynomial_r poly, symbol_r var, algebraic_g &root
     list_p rlist = poly->roots_internal(object::ID_array, var);
     if (!rlist)
         return false;
-    rt.clear_error();
-    algebraic_g best = nullptr;
+    algebraic_g best;
+    size_t      multiplicity = 0;
     for (object_p o : *rlist)
     {
         algebraic_g r = o->as_algebraic();
         if (!r)
-            continue;
-        if (!best || algebraic::compare(best, r) < 0)
+        {
+            record(partfrac_error, "Invalid root %t", r);
+            return 0;
+        }
+        int cmp = best ? algebraic::compare(best, r) : -1;
+        if (cmp < 0)
+        {
             best = r;
+            multiplicity = 1;
+        }
+        else if (!cmp)
+        {
+            multiplicity++;
+        }
     }
     root = best;
-    return +root != nullptr;
+    return multiplicity;
 }
 
 
@@ -2666,8 +2654,11 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
     polynomial_g work = polynomial::make(den->as_expression());
     if (!work)
         return false;
-    size_t       guard = 0;
-    while (work && !work->is_zero(true) && guard++ < Settings.MaxPolynomialDegree() + 2)
+
+    algebraic_g root;
+    size_t      loop = 0;
+    while (work && !work->is_zero(true) &&
+           loop++ < Settings.MaxPolynomialDegree() + 2)
     {
         if (program::interrupted())
             return false;
@@ -2676,60 +2667,18 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
         if (!deg)
             break;
 
-        algebraic_g root;
-        if (!partfrac_one_root(work, var, root))
-            return false;
-
-        size_t mult = partfrac_root_multiplicity(den, root, var);
+        size_t mult = partfrac_one_root(work, var, root);
         if (!mult)
-            mult = 1;
-
+            return false;
         record(partfrac, "root=%t mult=%zu", +root, mult);
         if (!partfrac_linear(rem, den, root, mult, var, acc))
             return false;
 
         for (size_t k = 0; k < mult; k++)
-        {
             if (!partfrac_deflate(work, root, var))
                 return false;
-        }
     }
     return rem && rem->is_zero(true);
-}
-
-
-static symbol_p partfrac_symbol_from(expression_r expr)
-// ----------------------------------------------------------------------------
-//   Find the first symbol in an expression tree
-// ----------------------------------------------------------------------------
-{
-    if (!expr || expr->type() != object::ID_expression)
-        return nullptr;
-    for (object_p obj : *expr)
-        if (symbol_p sym = obj->as<symbol>())
-            return sym;
-    return nullptr;
-}
-
-
-static bool partfrac_bind_variable(expression_r num,
-                                   expression_r den,
-                                   symbol_g &   var)
-// ----------------------------------------------------------------------------
-//   Set the algebra variable before building polynomials
-// ----------------------------------------------------------------------------
-{
-    var = partfrac_symbol_from(den);
-    if (!var)
-        var = partfrac_symbol_from(num);
-    if (!var)
-        var = polynomial::main_variable();
-    if (!var)
-        return false;
-    if (!polynomial::main_variable(var))
-        return false;
-    rt.clear_error();
-    return true;
 }
 
 
@@ -2738,13 +2687,8 @@ static algebraic_p partfrac_decompose(expression_r eq)
 //   Partial fraction decomposition of a rational expression
 // ----------------------------------------------------------------------------
 {
-    rt.clear_error();
     expression_g num, den;
     if (!eq->split(object::ID_divide, num, den))
-        return nullptr;
-
-    symbol_g var;
-    if (!partfrac_bind_variable(num, den, var))
         return nullptr;
 
     polynomial_g np = polynomial::make(num, true);
@@ -2772,6 +2716,7 @@ static algebraic_p partfrac_decompose(expression_r eq)
     if (ddeg == 0)
         return acc ? algebraic_p(+acc) : algebraic_p(+eq);
 
+    symbol_g var = polynomial::main_variable();
     if (!partfrac_decompose_proper(np, dp, var, acc))
         return nullptr;
     return acc ? algebraic_p(+acc) : nullptr;
@@ -2782,9 +2727,18 @@ COMMAND_BODY(PartFrac)
 // ----------------------------------------------------------------------------
 //   Decompose a rational expression into partial fractions
 // ----------------------------------------------------------------------------
+//   Given an expression N(x)/D(x), decompose it into partial fractions
+//   Algorithm:
+//   1. If degree(N) >= degree(D), perform polynomial division first
+//   2. Factor the denominator D(x) to find roots
+//   3. For each distinct root r with multiplicity m:
+//      - For real roots: create A₁/(x-r) + A₂/(x-r)² + ... + Aₘ/(x-r)^m
+//      - For complex conjugate pairs (if kept as quadratic):
+//        create (Bx+C)/(x²+px+q)
+//   4. Solve for coefficients using Heaviside cover-up method or
+//      by clearing denominators and equating coefficients
 {
-    rt.clear_error();
-    if (object_p obj = rt.pop())
+    if (object_p obj = rt.top())
     {
         algebraic_g input = obj->as_algebraic();
         if (!input)
@@ -2803,7 +2757,7 @@ COMMAND_BODY(PartFrac)
         }
 
         if (algebraic_p result = partfrac_decompose(eq))
-            if (rt.push(result))
+            if (rt.top(result))
                 return OK;
 
         if (!rt.error())

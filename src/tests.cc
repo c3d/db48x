@@ -307,7 +307,7 @@ int tests::run(uint onlyCurrent)
         sum_and_product();
         polynomials();
         polynomial_roots();
-        partfrac();
+        partial_fractions();
         quotient_and_remainder();
         prime_number_tests();
         exact_quotient();
@@ -14050,7 +14050,7 @@ void tests::polynomial_roots()
 }
 
 
-void tests::partfrac()
+void tests::partial_fractions()
 // ----------------------------------------------------------------------------
 //   Partial fraction decomposition
 // ----------------------------------------------------------------------------

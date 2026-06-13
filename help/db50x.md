@@ -20161,19 +20161,25 @@ Apply certain assumptions about a variable to an expression.
 
 Decompose a rational function of the current algebra variable into partial
 fractions. The argument must be a quotient of polynomials in that variable
-(with numeric coefficients). If the fraction is improper, the polynomial part
-is returned separately, followed by the sum of proper fractional terms.
-
-The command also accepts the alias `PartialFractions`. In algebraic mode, the
-argument may remain symbolic (unevaluated) inside expressions.
+(with numeric coefficients).
 
 ```rpl
 '1/(X^2-1)' PartFrac
 @ Expecting '1/2÷(X-1)+-1/2÷(X+1)'
 ```
 
+ If the fraction is improper, the polynomial part is returned separately,
+followed by the sum of proper fractional terms.
+
 ```rpl
 '1/(X*(X-1))' PartFrac
+@ Expecting '1÷(X-1)+-1÷X'
+```
+
+The command can be used in algebraic expressions:
+
+```rpl
+'PartialFractions(1/(X*(X-1)))'
 @ Expecting '1÷(X-1)+-1÷X'
 ```
 
