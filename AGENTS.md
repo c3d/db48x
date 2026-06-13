@@ -20,6 +20,12 @@ DB48X is a modern implementation of RPL (Reverse Polish Lisp) targeting SwissMic
   adjusted files themselves. Read the current file state before editing; prefer
   minimal, targeted edits that accomplish the goal without clobbering unrelated
   changes the user has made.
+- **Use `rg` (ripgrep) instead of `find`/`grep` when searching.** The `rg` command
+  is faster and more battery-efficient than `find` or `grep`. Examples:
+  - `rg "pattern"` instead of `grep -r "pattern"`
+  - `rg -t cpp "pattern"` to search only C++ files
+  - `rg -l "pattern"` to list files (like `grep -l`)
+  - `rg --files | rg "\.h$"` instead of `find . -name "*.h"`
 
 ## Build System
 
@@ -67,11 +73,50 @@ make -j8 dm32           # Build for DM32 (db50x.pg5)
    only change capitalization. Update any `ID_RANGE` lines whose boundary the
    new command changes (e.g. `is_command`, `is_algebraic_fn`).
 2. **Header** (e.g. `src/functions.h`): Declare with `FUNCTION(Foo)`,
-   `COMMAND_DECLARE(Foo, nargs)`, or `STANDARD_FUNCTION(Foo)` as appropriate.
+   `COMMAND_DECLARE(Foo, nargs)`, `COMMAND_DECLARE_FN(Foo, nargs)`, or
+   `STANDARD_FUNCTION(Foo)` as appropriate (see below).
 3. **Implementation** (e.g. `src/functions.cc`): Implement with
    `FUNCTION_BODY(Foo)` or `COMMAND_BODY(Foo)`.
 4. **`src/menu.cc`**: Wire up menu entries (replace `ID_Unimplemented` if a
    placeholder exists).
+
+### Commands in Algebraic Expressions
+
+Commands that should be usable in algebraic expressions (like `'JDN(DateTime)'`)
+must use `COMMAND_DECLARE_FN` instead of `COMMAND_DECLARE`:
+
+- `COMMAND_DECLARE_FN(name, arity)` adds `PREC_DECL(FUNCTION)` for function
+  precedence
+- Makes the command parseable and callable inside algebraic expressions
+- Use for: mathematical functions, conversion functions, any fixed-arity command
+  that returns one result and should work in expressions
+
+**Note:** `SYMARGS` and `SYMARGS_DECL` are separate and only needed for
+functions that require arguments to stay symbolic/unevaluated (like `Sum`,
+`Integrate`, `Quote`). Most functions just need `COMMAND_DECLARE_FN`, not
+`SYMARGS`.
+
+**Example:**
+```cpp
+// In header (src/datetime.h):
+COMMAND_DECLARE_FN(JulianDayNumber, 1);  // Can be used in expressions
+```
+
+Then in RPL:
+```rpl
+@ Works in both RPN and algebraic mode:
+2461178.5 JDN→                           @ RPN: OK
+'JDN→(2461178.5)'                        @ Algebraic: OK (see commit 40c59d837)
+```
+
+**Variable arity functions** (like `ToRange` which takes 1 or 2 arguments) use
+negative arity notation:
+```cpp
+COMMAND_DECLARE_FN(ToRange, ~2);  // ~2 means "at least 2, variable arity"
+```
+During expression parsing, variadic functions are wrapped in `funcall` to handle
+argument count correctly. The infrastructure provides `variable_arity()` and
+`arity()` helpers.
 
 ### Menu layout
 
@@ -90,6 +135,29 @@ make -j8 dm32           # Build for DM32 (db50x.pg5)
 - **Quick RPL checks** (no rebuild): use simulator `-E` to evaluate a command
   line and print the stack, e.g. `db48x -H -E '[1 2 3] PROOT'`. Read from
   stdin with `-F -`, e.g. `db48x -H -F - -E '1 2 +'`. See `SIMULATOR.md`.
+
+**Quick testing examples from the test suite:**
+
+Using simulator `-E` flag for quick RPL checks:
+```bash
+./db48x.app/Contents/MacOS/db48x -H -E "Clear 'JDN(20250919_date)' →Num"
+```
+
+**Getting default RPL spelling for commands**
+
+To get the default RPL spelling for commands with aliases, you can use the
+following trick:
+
+```bash
+db48x -H -E "{ ToPolar PolarToReal RealToPolar }"
+```
+
+This produces a list containing the actual spellings after parsing:
+
+```
+{ →Polar Polarℂ→ℝ ℝ→Polarℂ }
+```
+
 - **Before submitting changes, run the full test suite** and fix any failures.
   From the repository root (after building the simulator):
   ```
@@ -158,6 +226,45 @@ make -j8 dm32           # Build for DM32 (db50x.pg5)
   -1.5. For a list with negative numbers, use `{ -1.5 2.3 }` (literal minus).
   Using `neg` inside a list leads to "Bad argument type" when applying →Q or
   similar commands that expect numeric elements.
+
+### User visible tests
+
+**User-visible tests** Document RPL commands and functions in the topical
+markdown files under `doc/`. This is introduced with an RPL block that looks
+like this and is automatically scanned by the test suite
+
+```rpl
+1 2 +
+@ Expecting 3
+```
+
+See `tests::check_help_examples()` for the code that scans and evaluates all
+these code snippets. **Avoid comments in the code snippets** since they are part of the documentation and can be copy/pasted by the user. Usually, the comments should go above the RPL code snippet, i.e. write something like this:
+
+    Adding integers produces the result on the stack:
+
+    ```rpl
+    1 2 +
+    @ Expecting 3
+    ```
+
+rather than
+
+    ```rpl
+    @ Adding integers produces the result on the stack:
+    1 2 +
+    @ Expecting 3
+    ```
+
+### RPL syntax in tests
+
+Remember that RPL uses `@` for comments, not `//` or `#`
+
+The `@ Expecting` fragments needs the space between @ and Expecting
+
+The test suite cleans up between RPL code snippets, except if they contain a
+comment that begins with `@ Keep` or `@ Save`, in which case the variables and
+other changes made by the code snippet are visible to the next one.
 
 ## Architecture Notes
 
