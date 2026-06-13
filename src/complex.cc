@@ -1088,6 +1088,8 @@ COMMAND_BODY(RectangularToReal)
     im = +tag::make("im", im);
     if (!re || !im || !rt.top(re) || !rt.push(im))
         return ERROR;
+    if (!algebraic::list_result(2))
+        return ERROR;
     return OK;
 }
 
@@ -1123,6 +1125,8 @@ COMMAND_BODY(PolarToReal)
     object_g modobj = +tag::make("mod", +mod);
     object_g argobj = +tag::make("arg", +arg);
     if (!modobj || !argobj || !rt.top(modobj) || !rt.push(argobj))
+        return ERROR;
+    if (!algebraic::list_result(2))
         return ERROR;
     return OK;
 }

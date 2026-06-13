@@ -5560,6 +5560,23 @@ void tests::complex_types()
     step("Cycle complex units")
         .test(ID_Cycle).expect("5.46717 47731 3∡50.19442 89077° Ω")
         .test(ID_Cycle).expect("3.5+4.2ⅈ Ω");
+
+    step("ToRectangular in algebraic expressions")
+        .test(CLEAR, "'ToRectangular(3∡45°)'", ENTER)
+        .type(ID_expression).expect("'→Rectangular(3∡45°)'")
+        .test(ID_Run).expect("2.12132 03435 6+2.12132 03435 6ⅈ");
+    step("ToPolar in algebraic expressions")
+        .test(CLEAR, "'ToPolar(3+4ⅈ)'", ENTER)
+        .type(ID_expression).expect("'→Polar(3+4ⅈ)'")
+        .test(ID_Run).expect("5.∡53.13010 23542°");
+    step("RectangularToReal in algebraic expressions")
+        .test(CLEAR, "'RectangularToReal(3+4ⅈ)'", ENTER)
+        .type(ID_expression).expect("'ℂ→ℝ(3+4ⅈ)'")
+        .test(ID_Run).expect("{ re:3 im:4 }");
+    step("PolarToReal in algebraic expressions")
+        .test(CLEAR, "'PolarToReal(5∡45°)'", ENTER)
+        .type(ID_expression).expect("'Polarℂ→ℝ(5∡45°)'")
+        .test(ID_Run).expect("{ mod:5 arg:45 ° }");
 }
 
 
@@ -6561,9 +6578,9 @@ void tests::range_types()
 #undef TFNA
 
     step("Range square")
-        .test(CLEAR, "-1…3", ID_sq).expect("1…9")
-        .test(CLEAR, "1±3", ID_sq).expect("10±6")
-        .test(CLEAR, "1±300%", ID_sq).expect("10±60%");
+        .test(CLEAR, "-1…3", ID_sq).expect("0…9")
+        .test(CLEAR, "1±3", ID_sq).expect("8±8")
+        .test(CLEAR, "1±300%", ID_sq).expect("8±100%");
     step("Range cubed")
         .test(CLEAR, "-1…3", ID_cubed).expect("-1…27")
         .test(CLEAR, "-2…6", ID_cubed).expect("-8…216")
@@ -6626,6 +6643,63 @@ void tests::range_types()
         .test(CLEAR, "1…3_km 2…6_1/s", ENTER, MUL)
         .expect("2…18 km/s");
 
+    step("FromRange in algebraic expressions")
+        .test(CLEAR, "'FromRange(1…3)'", ENTER)
+        .expect("'Range→(1…3)'")
+        .test(ID_Run).expect("{ 1 3 }");
+    step("RangeUnion in algebraic expressions")
+        .test(CLEAR, "'RangeUnion(1…3;2…6)'", ENTER)
+        .expect("'∪(1…3;2…6)'")
+        .test(ID_Run).expect("1…6");
+    step("RangeIntersect in algebraic expressions")
+        .test(CLEAR, "'RangeIntersect(1…3;2…6)'", ENTER)
+        .expect("'∩(1…3;2…6)'")
+        .test(ID_Run).expect("2…3");
+
+    step("ToRange in algebraic expressions (two args)")
+        .test(CLEAR, "'ToRange(1;3)'", ENTER)
+        .expect("'→Range(1;3)'")
+        .test(ID_Run).expect("1…3");
+    step("ToRange in algebraic expressions (one arg)")
+        .test(CLEAR, "'ToRange(1…3)'", ENTER)
+        .expect("'→Range(1…3)'")
+        .test(ID_Run)
+        .expect("1…3");
+    step("ToRange in algebraic expressions (actual conversion)")
+        .test(CLEAR, "'ToRange(1±3)'", ENTER)
+        .expect("'→Range(1±3)'")
+        .test(ID_Run)
+        .expect("-2…4");
+    step("ToRange in algebraic expressions (expression)")
+        .test(CLEAR, "'ToRange(1±3+1…3)'", ENTER)
+        .expect("'→Range((1±3)+(1…3))'")
+        .test(ID_Run)
+        .expect("-1…7");
+    step("ToDeltaRange in algebraic expressions (two args)")
+        .test(CLEAR, "'ToDeltaRange(1;3)'", ENTER)
+        .expect("'→∆Range(1;3)'")
+        .test(ID_Run)
+        .expect("1±3");
+    step("ToDeltaRange in algebraic expressions (one arg)")
+        .test(CLEAR, "'ToDeltaRange(1±3)'", ENTER)
+
+        .test(ID_Run).expect("1±3");
+    step("ToPercentRange in algebraic expressions (two args)")
+        .test(CLEAR, "'ToPercentRange(1;50)'", ENTER)
+
+        .test(ID_Run).expect("1±50%");
+    step("ToPercentRange in algebraic expressions (one arg)")
+        .test(CLEAR, "'ToPercentRange(1±50%)'", ENTER)
+
+        .test(ID_Run).expect("1±50%");
+    step("ToUncertain in algebraic expressions (two args)")
+        .test(CLEAR, "'ToUncertain(10;0.5)'", ENTER)
+
+        .test(ID_Run).expect("10±σ0.5");
+    step("ToUncertain in algebraic expressions (one arg)")
+        .test(CLEAR, "'ToUncertain(10±σ0.5)'", ENTER)
+
+        .test(ID_Run).expect("10±σ0.5");
 }
 
 
@@ -11479,6 +11553,35 @@ void tests::date_operations()
     step("Adding invalid dates")
         .test(CLEAR, "1 2 DATE+", ENTER)
         .error("Invalid date");
+
+    step("JDN in algebraic expressions (issue #1710)")
+        .test(CLEAR, "'JDN(20250919_date)'", ENTER)
+        .expect("'JDN Fri 19/Sep/2025'")
+        .test(ID_Run).expect("2 460 938");
+    step("JDN→ in algebraic expressions (issue #1710)")
+        .test(CLEAR, "'JDN→(2461178.5)'", ENTER)
+        .expect("'JDN→ 2 461 178.5'")
+        .test(ID_Run).expect("Sun 17/May/2026, 12:00:00");
+    step("ToHMS in algebraic expressions")
+        .test(CLEAR, "'ToHMS(10.5)'", ENTER)
+        .expect("'→HMS 10.5'")
+        .test(ID_Run)
+        .expect("10:30:00");
+    step("FromHMS in algebraic expressions")
+        .test(CLEAR, "'FromHMS(10.3_hms)'", ENTER)
+        .expect("'HMS→ 10:18:00'")
+        .test(ID_Run)
+        .expect("10.3");
+    step("ToDMS in algebraic expressions")
+        .test(CLEAR, "'ToDMS(10.5)'", ENTER)
+        .expect("'→DMS 10.5'")
+        .test(ID_Run)
+        .expect("10°30′00″");
+    step("FromDMS in algebraic expressions")
+        .test(CLEAR, "'FromDMS(10.3_dms)'", ENTER)
+        .expect("'DMS→ 10°18′00″'")
+        .test(ID_Run)
+        .expect("10.3");
 }
 
 

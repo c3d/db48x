@@ -713,7 +713,7 @@ OP(ToGrads,     "→Grads")               ALIAS(ToGrads,   "→Grad")
 OP(ToPiRadians, "→PiRadians")           ALIAS(ToPiRadians, "→πr")
 
 // Ranges
-NAMED(FromRange,      "Range→")
+NAMED(FromRange,      "Range→")         ALIAS(FromRange,   "RangeToReal")
 NAMED(ToRange,        "→Range")         ALIAS(ToRange,     "→Interval")
 NAMED(ToDeltaRange,   "→∆Range")
 NAMED(ToPercentRange, "→%Range")

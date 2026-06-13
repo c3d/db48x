@@ -205,7 +205,7 @@ struct object
         insert_fn       insert;         // Insert object in editor
         menu_fn         menu;           // Build menu entries
         menu_marker_fn  menu_marker;    // Show marker
-        uint            arity;          // Number of input arguments
+        int             arity;          // Number of input arguments (<0 = max)
         uint            precedence;     // Precedence in expressions
         uint            symbolic;       // Which arguments are symbolic
     };
@@ -872,12 +872,24 @@ struct object
     }
 
 
-    uint arity() const
+    uint arity() const          { return arity(type()); }
+    static uint arity(id ty)
     // ------------------------------------------------------------------------
     //   Return the arity for arithmetic operators
     // ------------------------------------------------------------------------
     {
-        return ops().arity;
+        int a = handler[ty].arity;
+        return uint(a < 0 ? ~a : a);
+    }
+
+
+    bool variable_arity() const { return variable_arity(type()); }
+    static bool variable_arity(id ty)
+    // ------------------------------------------------------------------------
+    //   Return true if object has variable arity
+    // ------------------------------------------------------------------------
+    {
+        return handler[ty].arity < 0;
     }
 
 

@@ -225,11 +225,11 @@ public:
     RENDER_DECL(polar);
 };
 
-COMMAND_DECLARE(RealToRectangular,2);
-COMMAND_DECLARE(RealToPolar,2);
-COMMAND_DECLARE(RectangularToReal,1);
-COMMAND_DECLARE(PolarToReal,1);
-COMMAND_DECLARE(ToRectangular,1);
-COMMAND_DECLARE(ToPolar,1);
+COMMAND_DECLARE_FN(RealToRectangular,2);
+COMMAND_DECLARE_FN(RealToPolar,2);
+COMMAND_DECLARE_FN(RectangularToReal,1);
+COMMAND_DECLARE_FN(PolarToReal,1);
+COMMAND_DECLARE_FN(ToRectangular,1);
+COMMAND_DECLARE_FN(ToPolar,1);
 
 #endif // COMPLEX_H

@@ -1246,7 +1246,8 @@ COMMAND_BODY(FromRange)
                 y = unit::make(y, u->uexpr());
         }
         if (x && y && rt.top(+x) && rt.push(+y))
-            return OK;
+            if (algebraic::list_result(2))
+                return OK;
     }
     return ERROR;
 }

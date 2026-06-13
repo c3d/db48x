@@ -28,6 +28,18 @@ This function can also convert another type of range to an interval:
 @ Expecting 2…10
 ```
 
+This command can be used in algebraic expressions with one or two arguments:
+
+```rpl
+'→Range(2;3)' →Num
+@ Expecting 2…3
+```
+
+```rpl
+'→Range(6±4)' →Num
+@ Expecting 2…10
+```
+
 ## →∆Range
 
 Build a delta range (range of the form `a±b`) out of two individual components
@@ -49,6 +61,18 @@ This function can also convert another type of range to delta form:
 
 ```rpl
 6±50% →∆Range
+@ Expecting 6±3
+```
+
+This command can be used in algebraic expressions with one or two arguments:
+
+```rpl
+'→∆Range(4;6)' →Num
+@ Expecting 4±6
+```
+
+```rpl
+'→∆Range(6±50%)' →Num
 @ Expecting 6±3
 ```
 
@@ -76,6 +100,18 @@ This function can also convert another type of range to percentage form:
 @ Expecting 2±100%
 ```
 
+This command can be used in algebraic expressions with one or two arguments:
+
+```rpl
+'→%Range(10;20)' →Num
+@ Expecting 10.±20.%
+```
+
+```rpl
+'→%Range(0…4)' →Num
+@ Expecting 2±100%
+```
+
 ## →σRange
 
 Build an uncertain number (range of the form `a±σb`) out of two individual
@@ -91,6 +127,36 @@ deviation.
 
 Uncertain numbers cannot be converted to and from other types of range.
 
+This command can be used in algebraic expressions with two arguments:
+
+```rpl
+'→σRange(100;2)' →Num
+@ Expecting 100±σ2
+```
+
+
+## FromRange
+
+Extract the components from a range object, returning the low and high values for
+interval ranges, or center and delta values for delta/percent ranges.
+
+```rpl
+2…3 Range→ 2 →List
+@ Expecting { 2 3 }
+```
+
+```rpl
+6±4 Range→ 2 →List
+@ Expecting { 6 4 }
+```
+
+This command can be used in algebraic expressions, in which case it automatically produces a list with two results:
+
+```rpl
+'Range→(2…3)' →Num
+@ Expecting { 2 3 }
+```
+
 
 ## RangeUnion
 
@@ -101,6 +167,13 @@ Perform the union of two ranges
 @ Expecting 1…6
 ```
 
+This command can be used in algebraic expressions:
+
+```rpl
+'∪(1…3;2…6)' →Num
+@ Expecting 1…6
+```
+
 
 ## RangeIntersect
 
@@ -108,5 +181,12 @@ Perform the intersection of two ranges
 
 ```rpl
 1…3 2…6 ∩
+@ Expecting 2…3
+```
+
+This command can be used in algebraic expressions:
+
+```rpl
+'∩(1…3;2…6)' →Num
 @ Expecting 2…3
 ```

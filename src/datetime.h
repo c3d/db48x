@@ -85,18 +85,18 @@ COMMAND_DECLARE(ChronoTime,0);  // Return current date and time
 COMMAND_DECLARE(TimedEval,1);   // Timed evaluation
 
 // HMS and DMS operations
-COMMAND_DECLARE(ToHMS,1);       // Convert from decimal to H:MM:SS format
-COMMAND_DECLARE(FromHMS,1);     // Convert from H:MM:SS format to decimal
-COMMAND_DECLARE(ToDMS,1);       // Convert from decimal to H:MM:SS format
-COMMAND_DECLARE(FromDMS,1);     // Convert from H:MM:SS format to decimal
-COMMAND_DECLARE(HMSAdd,2);      // Add numbers in HMS format
-COMMAND_DECLARE(HMSSub,2);      // Subtract numbers in HMS format
-COMMAND_DECLARE(DMSAdd,2);      // Add numbers in HMS format
-COMMAND_DECLARE(DMSSub,2);      // Subtract numbers in HMS format
-COMMAND_DECLARE(DateAdd,2);     // Add a date and a number of days
-COMMAND_DECLARE(DateSub,2);     // Count days between two dates
-COMMAND_DECLARE(JulianDayNumber,1);// Return JDN for given date
-COMMAND_DECLARE(DateFromJulianDayNumber,1); // Date from JDN
+COMMAND_DECLARE_FN(ToHMS,1);       // Convert from decimal to H:MM:SS format
+COMMAND_DECLARE_FN(FromHMS,1);     // Convert from H:MM:SS format to decimal
+COMMAND_DECLARE_FN(ToDMS,1);       // Convert from decimal to H:MM:SS format
+COMMAND_DECLARE_FN(FromDMS,1);     // Convert from H:MM:SS format to decimal
+COMMAND_DECLARE_FN(HMSAdd,2);      // Add numbers in HMS format
+COMMAND_DECLARE_FN(HMSSub,2);      // Subtract numbers in HMS format
+COMMAND_DECLARE_FN(DMSAdd,2);      // Add numbers in HMS format
+COMMAND_DECLARE_FN(DMSSub,2);      // Subtract numbers in HMS format
+COMMAND_DECLARE_FN(DateAdd,2);     // Add a date and a number of days
+COMMAND_DECLARE_FN(DateSub,2);     // Count days between two dates
+COMMAND_DECLARE_FN(JulianDayNumber,1);// Return JDN for given date
+COMMAND_DECLARE_FN(DateFromJulianDayNumber,1); // Date from JDN
 COMMAND_DECLARE(InsertHms,-1);  // Insert _hms, optionnaly replacing _dms
 
 #endif // DATETIME_H

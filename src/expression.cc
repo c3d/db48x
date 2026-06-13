@@ -161,6 +161,8 @@ symbol_p expression::render(uint depth, int &precedence, bool editing)
     if (object_g obj = rt.pop())
     {
         uint arity = obj->arity();
+        if (obj->variable_arity())
+            arity = 0;          // Let 'funcall' deal with extra args
         if (rt.depth() < depth + arity)
         {
             if (rt.depth() != depth)
@@ -2229,6 +2231,8 @@ grob_p expression::graph(grapher &g, uint depth, int &precedence)
     if (object_g obj = rt.pop())
     {
         uint arity = obj->arity();
+        if (obj->variable_arity())
+            arity = 0;          // Let 'funcall' deal with extra args
         if (rt.depth() < depth + arity)
         {
             if (rt.depth() != depth)
@@ -2843,7 +2847,8 @@ PARSE_BODY(funcall)
     id nty = p.out->type();
     if (nty != ID_symbol && nty != ID_local &&
         nty != ID_expression && nty != ID_funcall &&
-        nty != ID_list && nty != ID_array && nty != ID_xlib)
+        nty != ID_list && nty != ID_array && nty != ID_xlib &&
+        !variable_arity(nty))
         return SKIP;
 
     // Cannot parse functions while parsing a unit
@@ -3032,7 +3037,9 @@ COMMAND_BODY(Apply)
                 }
                 else if (callee->is_algebraic_fn())
                 {
-                    if (arity != callee->arity())
+                    uint carity = callee->arity();
+                    bool varity = callee->variable_arity();
+                    if (arity != carity || (varity && arity > carity))
                     {
                         rt.argument_count_error();
                         return ERROR;

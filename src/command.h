@@ -111,7 +111,7 @@ struct derived : base                                                   \
     derived(id i = ID_##derived) : base(i) { }                          \
                                                                         \
     OBJECT_DECL(derived);                                               \
-    ARITY_DECL(nargs >= 0 ? nargs : ~nargs);                            \
+    ARITY_DECL(nargs);                                                  \
     EVAL_DECL(derived)                                                  \
     {                                                                   \
         record(command, "Evaluating " #derived " command %t", o);       \
