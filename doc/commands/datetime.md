@@ -123,7 +123,7 @@ This command can be used in algebraic expressions:
 
 ```rpl
 'HMS→(12.30)'
-@ Expecting 12.5
+@ Expecting 12 ¹/₂
 ```
 
 
@@ -199,7 +199,7 @@ This command can be used in algebraic expressions:
 
 ```rpl
 'DMS→(12.30)'
-@ Expecting 12.5
+@ Expecting 12 ¹/₂
 ```
 
 ## DMS+
@@ -270,7 +270,7 @@ This command can be used in algebraic expressions:
 
 ```rpl
 'DDAYS(20250101;20240101)'
-@ Expecting 366 d
+@ Expecting 366 d
 ```
 
 ## Time
