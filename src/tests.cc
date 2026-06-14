@@ -14060,17 +14060,22 @@ void tests::partial_fractions()
     step("Simple distinct linear factors")
         .test(CLEAR, "BigFractions ImproperFractions", ENTER)
         .test("'1/(X^2-1)' PartFrac", ENTER)
-        .expect("'1/2÷(X-1)+-1/2÷(X+1)'")
+        .expect("'1/2÷(x-1)+-1/2÷(x+1)'")
         .test("SmallFractions MixedFractions", ENTER);
     step("Simple pole at zero")
         .test(CLEAR, "BigFractions ImproperFractions", ENTER)
         .test("'1/(X*(X-1))' PartFrac", ENTER)
-        .expect("'1÷(X-1)+-1÷X'")
+        .expect("'1÷(x-1)+-1÷x'")
         .test("SmallFractions MixedFractions", ENTER);
     step("PartialFractions alias")
         .test(CLEAR, "BigFractions ImproperFractions", ENTER)
         .test("'1/(X^2-1)' PartialFractions", ENTER)
-        .expect("'1/2÷(X-1)+-1/2÷(X+1)'")
+        .expect("'1/2÷(x-1)+-1/2÷(x+1)'")
+        .test("SmallFractions MixedFractions", ENTER);
+    step("Repeated linear factors")
+        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
+        .test("'1/(X^2-1)^3' PartFrac", ENTER)
+        .expect("'1/8÷(x-1)↑3+-3/16÷(x-1)↑2+3/16÷(x-1)+-1/8÷(x+1)↑3+-3/16÷(x+1)↑2+-3/16÷(x+1)'")
         .test("SmallFractions MixedFractions", ENTER);
 }
 

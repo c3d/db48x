@@ -2571,16 +2571,21 @@ static bool partfrac_linear(polynomial_g &rem,
 //   Partial fractions for a linear pole (x - root)^mult
 // ----------------------------------------------------------------------------
 {
-    polynomial_g s = polynomial::make(den->as_expression());
-    if (!s)
+    polynomial_g cof = polynomial::make(den->as_expression());
+    if (!cof)
         return false;
     for (size_t k = 0; k < mult; k++)
-        if (!partfrac_deflate(s, root, var))
+    {
+        if (!partfrac_deflate(cof, root, var))
             return false;
+    }
 
-    algebraic_g sa = partfrac_evaluate(s, root);
+    algebraic_g sa = partfrac_evaluate(cof, root);
     if (!sa || sa->is_zero(true))
         return false;
+
+    polynomial_g orig     = rem;
+    polynomial_g stripped = nullptr;
 
     for (size_t j = mult; j; j--)
     {
@@ -2594,8 +2599,11 @@ static bool partfrac_linear(polynomial_g &rem,
             return false;
 
         polynomial_g ajp  = polynomial::make(aj);
-        polynomial_g prod = polynomial::mul(s, ajp);
+        polynomial_g prod = polynomial::mul(cof, ajp);
         if (!prod)
+            return false;
+        stripped = stripped ? polynomial::add(stripped, prod) : +prod;
+        if (!stripped)
             return false;
         rem = polynomial::sub(rem, prod);
         if (!rem)
@@ -2603,7 +2611,8 @@ static bool partfrac_linear(polynomial_g &rem,
         if (j > 1 && !partfrac_deflate(rem, root, var))
             return false;
     }
-    return true;
+    rem = polynomial::sub(orig, stripped);
+    return +rem != nullptr;
 }
 
 
@@ -2670,15 +2679,18 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
         size_t mult = partfrac_one_root(work, var, root);
         if (!mult)
             return false;
-        record(partfrac, "root=%t mult=%zu", +root, mult);
         if (!partfrac_linear(rem, den, root, mult, var, acc))
             return false;
 
         for (size_t k = 0; k < mult; k++)
+        {
             if (!partfrac_deflate(work, root, var))
                 return false;
+        }
     }
-    return rem && rem->is_zero(true);
+    if (rem && rem->is_zero(true))
+        return true;
+    return !work->variables();
 }
 
 
@@ -2696,30 +2708,39 @@ static algebraic_p partfrac_decompose(expression_r eq)
     if (!np || !dp)
         return nullptr;
 
-    algebraic_g acc = nullptr;
-    size_t      nvar = 0;
-    size_t      dvar = 0;
-    ularge      ndeg = np->order(&nvar);
-    ularge      ddeg = dp->order(&dvar);
+    symbol_g var = polynomial::main_variable();
+    if (!var)
+        return nullptr;
 
-    if (ndeg >= ddeg)
+    size_t dvidx = dp->variable(+var);
+    if (~dvidx)
     {
-        polynomial_g quot, rpart;
-        if (!polynomial::quorem(np, dp, quot, rpart))
+        algebraic_g acc = nullptr;
+        size_t      nvar = 0;
+        size_t      dvar = 0;
+        ularge      ndeg = np->order(&nvar);
+        ularge      ddeg = dp->order(&dvar);
+
+        if (ndeg >= ddeg)
+        {
+            polynomial_g quot, rpart;
+            if (!polynomial::quorem(np, dp, quot, rpart))
+                return nullptr;
+            acc = quot->as_expression();
+            np  = rpart;
+            if (!np)
+                return nullptr;
+        }
+
+        if (ddeg == 0)
+            return acc ? algebraic_p(+acc) : algebraic_p(+eq);
+
+        if (!partfrac_decompose_proper(np, dp, var, acc))
             return nullptr;
-        acc = quot->as_expression();
-        np  = rpart;
-        if (!np)
-            return nullptr;
+        return acc ? algebraic_p(+acc) : nullptr;
     }
 
-    if (ddeg == 0)
-        return acc ? algebraic_p(+acc) : algebraic_p(+eq);
-
-    symbol_g var = polynomial::main_variable();
-    if (!partfrac_decompose_proper(np, dp, var, acc))
-        return nullptr;
-    return acc ? algebraic_p(+acc) : nullptr;
+    return algebraic_p(+eq);
 }
 
 
