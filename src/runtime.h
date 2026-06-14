@@ -1206,6 +1206,14 @@ using object_r  = const object_g &;
     GCP_EXISTING(T)
 
 
+template <typename T>
+inline uintptr_t _recorder_arg(const gcp<T> &p)
+{
+    return (uintptr_t) p.Safe();
+}
+
+
+
 // ============================================================================
 //
 //   Stack buffer - temporary value arrays backed by the RPL stack
