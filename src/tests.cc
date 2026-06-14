@@ -14058,25 +14058,39 @@ void tests::partial_fractions()
     BEGIN(partfrac);
 
     step("Simple distinct linear factors")
-        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
-        .test("'1/(X^2-1)' PartFrac", ENTER)
-        .expect("'1/2÷(x-1)+-1/2÷(x+1)'")
-        .test("SmallFractions MixedFractions", ENTER);
+        .test(CLEAR, "'1/(X^2-1)' PartFrac", ENTER)
+        .expect("'¹/₂÷(x-1)+-¹/₂÷(x+1)'");
     step("Simple pole at zero")
-        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
-        .test("'1/(X*(X-1))' PartFrac", ENTER)
-        .expect("'1÷(x-1)+-1÷x'")
-        .test("SmallFractions MixedFractions", ENTER);
+        .test(CLEAR, "'1/(X*(X-1))' PartFrac", ENTER)
+        .expect("'1÷(x-1)+-1÷x'");
     step("PartialFractions alias")
-        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
-        .test("'1/(X^2-1)' PartialFractions", ENTER)
-        .expect("'1/2÷(x-1)+-1/2÷(x+1)'")
-        .test("SmallFractions MixedFractions", ENTER);
+        .test(CLEAR, "'1/(X^2-1)' PartialFractions", ENTER)
+        .expect("'¹/₂÷(x-1)+-¹/₂÷(x+1)'");
     step("Repeated linear factors")
-        .test(CLEAR, "BigFractions ImproperFractions", ENTER)
-        .test("'1/(X^2-1)^3' PartFrac", ENTER)
-        .expect("'1/8÷(x-1)↑3+-3/16÷(x-1)↑2+3/16÷(x-1)+-1/8÷(x+1)↑3+-3/16÷(x+1)↑2+-3/16÷(x+1)'")
-        .test("SmallFractions MixedFractions", ENTER);
+        .test(CLEAR, "'1/(X^2-1)^3' PartFrac", ENTER)
+        .expect("'¹/₈÷(x-1)↑3+-³/₁₆÷(x-1)↑2+³/₁₆÷(x-1)+-¹/₈÷(x+1)↑3+-³/₁₆÷(x+1)↑2+-³/₁₆÷(x+1)'");
+    step("Improper fraction with polynomial quotient")
+        .test(CLEAR, "'(X^3+2*X^2+X)/(X^2-1)' PartFrac", ENTER)
+        .expect("'X+2+2÷(x-1)'");
+    step("Improper fraction, simple case")
+        .test(CLEAR, "'(X^2+1)/(X^2-1)' PartFrac", ENTER)
+        .expect("'1+1÷(x-1)+-1÷(x+1)'");
+    step("Constant numerator")
+        .test(CLEAR, "'5/(X-2)' PartFrac", ENTER)
+        .expect("'5÷(x-2)'");
+    step("Algebraic form")
+        .test(CLEAR,
+              "'PartFrac((X+1)*(X+5)*(X+9)*(X-12)*(X-42)/((X-1)^3*(X-2)))'",
+              ENTER)
+        .expect("'PartFrac((X+1)·(X+5)·(X+9)·(X-12)·(X-42)÷((X-1)↑3·(X-2)))'")
+        .test(ID_Run)
+        .expect("'X+-34+92 400÷(x-2)+-54 120÷(x-1)↑3+"
+                "-89 372÷(x-1)↑2+-92 826÷(x-1)'");
+    step("Case where there is a zero sub inside")
+        .test(CLEAR, "'(X+1)*(X+5)*(X+3)*(X-1)*(X-4)/((X-1)^3*(X-2))'", ENTER)
+        .expect("'(X+1)·(X+5)·(X+3)·(X-1)·(X-4)÷((X-1)↑3·(X-2))'")
+        .test(ID_PolynomialsMenu, ID_PartFrac)
+        .expect("'X+9+-210÷(x-2)+0÷(x-1)↑3+144÷(x-1)↑2+228÷(x-1)'");
 }
 
 

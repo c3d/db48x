@@ -51,6 +51,8 @@
 
 #include <cstdlib>
 
+RECORDER(polynomials,       16, "Polynomial operations");
+RECORDER(polynomials_error, 16, "Polynomial operation errors");
 
 polynomial_p polynomial::make(algebraic_p value)
 // ----------------------------------------------------------------------------
@@ -472,8 +474,34 @@ polynomial_p polynomial::addsub(polynomial_r x, polynomial_r y, bool sub)
 //  Add or subtract two polynomials
 // ----------------------------------------------------------------------------
 {
+    record(polynomials, "%s: x=%t (type=%+s, vars=%u), y=%t (type=%+s, vars=%u)",
+           sub ? "sub" : "add",
+           x, x ? object::name(x->type()) : utf8("null"), x ? x->variables() : 0,
+           y, y ? object::name(y->type()) : utf8("null"), y ? y->variables() : 0);
+
     if (!x || !y)
+    {
+        record(polynomials_error, "Returning null because %s is null",
+               !x ? (!y ? "both x and y" : "x") : "y");
         return nullptr;
+    }
+
+    // Handle zero polynomials specially
+    if (y->is_zero(true))
+    {
+        record(polynomials, "y is zero polynomial, returning %s",
+               sub ? "x" : "sum");
+        if (sub)
+            return x;
+        // For addition, we still need to go through the normal path
+    }
+    if (x->is_zero(true))
+    {
+        record(polynomials, "x is zero polynomial");
+        if (sub)
+            return polynomial::neg(y);
+        return y;
+    }
 
     scribble scr;
     gcbytes  result = copy_variables(x);
@@ -481,7 +509,10 @@ polynomial_p polynomial::addsub(polynomial_r x, polynomial_r y, bool sub)
         rt.free(scr.growth());
     result          = copy_variables(y, (byte *) +result);
     if (!result)
+    {
+        record(polynomials_error, "copy_variables returned null");
         return nullptr;
+    }
 
     byte_p p     = +result;
     size_t nvars = leb128<size_t>(p);
@@ -2571,47 +2602,97 @@ static bool partfrac_linear(polynomial_g &rem,
 //   Partial fractions for a linear pole (x - root)^mult
 // ----------------------------------------------------------------------------
 {
+    record(partfrac, "partfrac_linear: root=%t, mult=%u, rem=%t",
+           root, (unsigned)mult, rem);
+
     polynomial_g cof = polynomial::make(den->as_expression());
     if (!cof)
+    {
+        record(partfrac_error, "Failed to make polynomial from den");
         return false;
+    }
     for (size_t k = 0; k < mult; k++)
     {
         if (!partfrac_deflate(cof, root, var))
+        {
+            record(partfrac_error, "Failed to deflate cof, k=%u", (unsigned)k);
             return false;
+        }
     }
 
-    algebraic_g sa = partfrac_evaluate(cof, root);
-    if (!sa || sa->is_zero(true))
+    algebraic_g scale_factor = partfrac_evaluate(cof, root);
+    if (!scale_factor || scale_factor->is_zero(true))
+    {
+        record(partfrac_error, "Scale factor is zero or null: %t", scale_factor);
         return false;
+    }
+    record(partfrac, "Scale factor: %t", scale_factor);
 
     polynomial_g orig     = rem;
     polynomial_g stripped = nullptr;
 
     for (size_t j = mult; j; j--)
     {
-        algebraic_g rv = partfrac_evaluate(rem, root);
-        algebraic_g aj = rv / sa;
-        if (!aj)
+        algebraic_g remainder_value = partfrac_evaluate(rem, root);
+        algebraic_g coefficient = remainder_value / scale_factor;
+        if (!coefficient)
+        {
+            record(partfrac_error, "Failed to compute coefficient, j=%u", (unsigned)j);
             return false;
+        }
+        record(partfrac, "j=%u: coeff=%t", (unsigned)j, coefficient);
 
         algebraic_g dterm = partfrac_lin_pow(var, root, j);
-        if (!dterm || !partfrac_add_term(acc, aj, dterm))
+        if (!dterm || !partfrac_add_term(acc, coefficient, dterm))
+        {
+            record(partfrac_error, "Failed to add term, j=%u", (unsigned)j);
             return false;
+        }
 
-        polynomial_g ajp  = polynomial::make(aj);
-        polynomial_g prod = polynomial::mul(cof, ajp);
+        polynomial_g coeff_poly  = polynomial::make(coefficient);
+        record(partfrac, "polynomial::make(%t) = %t (type=%+s)",
+               coefficient, coeff_poly,
+               coeff_poly ? object::name(coeff_poly->type()) : utf8("null"));
+        if (!coeff_poly)
+        {
+            record(partfrac_error, "Failed to make polynomial from coefficient %t", coefficient);
+            return false;
+        }
+        polynomial_g prod = polynomial::mul(cof, coeff_poly);
+        record(partfrac, "polynomial::mul(cof=%t, coeff_poly=%t) = %t (type=%+s)",
+               cof, coeff_poly, prod, prod ? object::name(prod->type()) : utf8("null"));
         if (!prod)
+        {
+            record(partfrac_error, "Failed to multiply polynomials");
             return false;
+        }
         stripped = stripped ? polynomial::add(stripped, prod) : +prod;
+        record(partfrac, "stripped = %t (type=%+s)",
+               stripped, stripped ? object::name(stripped->type()) : utf8("null"));
         if (!stripped)
+        {
+            record(partfrac_error, "Failed to add to stripped");
             return false;
+        }
         rem = polynomial::sub(rem, prod);
+        record(partfrac, "polynomial::sub(rem, prod=%t) = %t (type=%+s)",
+               prod, rem, rem ? object::name(rem->type()) : utf8("null"));
         if (!rem)
+        {
+            record(partfrac_error, "Remainder became null after subtraction: rem was %t, prod was %t",
+                   rem, prod);
             return false;
+        }
         if (j > 1 && !partfrac_deflate(rem, root, var))
+        {
+            record(partfrac_error, "Failed to deflate rem, j=%u", (unsigned)j);
             return false;
+        }
     }
+    // Recompute remainder from original minus what we stripped out
+    // This verifies our incremental computation and provides clean result
     rem = polynomial::sub(orig, stripped);
+    record(partfrac, "Final rem: %t", rem);
     return +rem != nullptr;
 }
 
@@ -2625,7 +2706,7 @@ static size_t partfrac_one_root(polynomial_r poly,
 {
     list_p rlist = poly->roots_internal(object::ID_array, var);
     if (!rlist)
-        return false;
+        return 0;
     algebraic_g best;
     size_t      multiplicity = 0;
     for (object_p o : *rlist)
@@ -2660,9 +2741,14 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
 //   Decompose a proper rational function remainder/denominator
 // ----------------------------------------------------------------------------
 {
+    record(partfrac, "decompose_proper: rem=%t, den=%t", rem, den);
+
     polynomial_g work = polynomial::make(den->as_expression());
     if (!work)
+    {
+        record(partfrac_error, "Failed to make polynomial from den");
         return false;
+    }
 
     algebraic_g root;
     size_t      loop = 0;
@@ -2673,14 +2759,30 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
             return false;
 
         ularge deg = work->order();
+        record(partfrac, "Loop %u: work degree=%u", (unsigned)loop, (unsigned)deg);
         if (!deg)
             break;
 
         size_t mult = partfrac_one_root(work, var, root);
         if (!mult)
+        {
+            record(partfrac_error, "Failed to find root");
             return false;
+        }
+        record(partfrac, "Found root %t with multiplicity %u", root, (unsigned)mult);
+
         if (!partfrac_linear(rem, den, root, mult, var, acc))
+        {
+            record(partfrac_error, "partfrac_linear failed");
             return false;
+        }
+
+        // If remainder is zero, we're done
+        if (rem && rem->is_zero(true))
+        {
+            record(partfrac, "Remainder is zero, decomposition complete");
+            break;
+        }
 
         for (size_t k = 0; k < mult; k++)
         {
@@ -2688,9 +2790,23 @@ static bool partfrac_decompose_proper(polynomial_g &rem,
                 return false;
         }
     }
+    // Success if remainder is zero (all terms accounted for)
+    // OR if we've fully factored the denominator (work has no variables left)
     if (rem && rem->is_zero(true))
+    {
+        record(partfrac, "Success: remainder is zero");
         return true;
-    return !work->variables();
+    }
+    if (!work || !work->variables())
+    {
+        record(partfrac, "Success: denominator fully factored");
+        return true;
+    }
+    record(partfrac_error,
+           "Failed: rem=%t (zero=%d), work=%t (has_vars=%d)",
+           rem, rem ? rem->is_zero(true) : -1,
+           work, work ? work->variables() : 0);
+    return false;
 }
 
 
@@ -2699,47 +2815,89 @@ static algebraic_p partfrac_decompose(expression_r eq)
 //   Partial fraction decomposition of a rational expression
 // ----------------------------------------------------------------------------
 {
+    cleaner purge;  // Reclaim intermediate temporaries on success
+    record(partfrac, "Decomposing %t", eq);
+
     expression_g num, den;
     if (!eq->split(object::ID_divide, num, den))
+    {
+        record(partfrac_error, "Failed to split as division");
         return nullptr;
+    }
+
+    record(partfrac, "Numerator: %t, Denominator: %t", num, den);
 
     polynomial_g np = polynomial::make(num, true);
     polynomial_g dp = polynomial::make(den, true);
     if (!np || !dp)
+    {
+        record(partfrac_error,
+               "Failed to make polynomials: num=%t -> %t, den=%t -> %t",
+               num, np, den, dp);
         return nullptr;
+    }
 
     symbol_g var = polynomial::main_variable();
     if (!var)
+    {
+        record(partfrac_error, "No main variable");
         return nullptr;
+    }
+
+    record(partfrac, "Variable: %t", var);
 
     size_t dvidx = dp->variable(+var);
+    record(partfrac, "Denominator variable index: %u (not found = %u)",
+           (unsigned)dvidx, (unsigned)~0U);
     if (~dvidx)
     {
+        record(partfrac, "Variable found in denominator");
         algebraic_g acc = nullptr;
         size_t      nvar = 0;
         size_t      dvar = 0;
         ularge      ndeg = np->order(&nvar);
         ularge      ddeg = dp->order(&dvar);
 
+        record(partfrac, "Degrees: num=%u, den=%u", (unsigned)ndeg, (unsigned)ddeg);
+
         if (ndeg >= ddeg)
         {
+            record(partfrac, "Improper fraction, performing division");
             polynomial_g quot, rpart;
             if (!polynomial::quorem(np, dp, quot, rpart))
+            {
+                record(partfrac_error, "Polynomial division failed");
                 return nullptr;
+            }
+            record(partfrac, "Quotient: %t, Remainder: %t", quot, rpart);
             acc = quot->as_expression();
             np  = rpart;
             if (!np)
+            {
+                record(partfrac_error, "Remainder is null after division");
                 return nullptr;
+            }
         }
 
         if (ddeg == 0)
+        {
+            record(partfrac, "Constant denominator, returning");
             return acc ? algebraic_p(+acc) : algebraic_p(+eq);
+        }
 
+        record(partfrac, "Calling partfrac_decompose_proper");
         if (!partfrac_decompose_proper(np, dp, var, acc))
+        {
+            record(partfrac_error, "partfrac_decompose_proper failed");
             return nullptr;
-        return acc ? algebraic_p(+acc) : nullptr;
+        }
+        algebraic_g result = acc;
+        if (result && +result != +eq)
+            result = purge(result);
+        return algebraic_p(+result);
     }
 
+    record(partfrac, "Variable not in denominator, returning unchanged");
     return algebraic_p(+eq);
 }
 

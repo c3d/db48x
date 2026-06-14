@@ -20156,7 +20156,7 @@ fractions. The argument must be a quotient of polynomials in that variable
 
 ```rpl
 '1/(X^2-1)' PartFrac
-@ Expecting '1/2÷(X-1)+-1/2÷(X+1)'
+@ Expecting '¹/₂÷(x-1)+-¹/₂÷(x+1)'
 ```
 
  If the fraction is improper, the polynomial part is returned separately,
@@ -20164,14 +20164,14 @@ followed by the sum of proper fractional terms.
 
 ```rpl
 '1/(X*(X-1))' PartFrac
-@ Expecting '1÷(X-1)+-1÷X'
+@ Expecting '(x-1)⁻¹+-1÷x'
 ```
 
 The command can be used in algebraic expressions:
 
 ```rpl
 'PartialFractions(1/(X*(X-1)))'
-@ Expecting '1÷(X-1)+-1÷X'
+@ Expecting '1÷(x-1)+-1÷x'
 ```
 
 With `ComplexResults`, irreducible factors are split into linear terms with
