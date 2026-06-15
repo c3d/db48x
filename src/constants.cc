@@ -1214,6 +1214,11 @@ static const cstring basic_constants[] =
                 "  0.0000000091E13_m³/s² "
                 "  'ROUND(ⓈGM☿/ⒸGM☿;-2)' "
                 "  2.203E13_m³/s² ]",
+    // *Mercury mass - Calculation from GM and G
+    "M☿",       "[ 'ROUND(CONVERT(ⒸGM☿/ⒸG;1_kg);XPON(UVAL(ⒸGM☿/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☿/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM☿*ⒸM☿);-2);1_kg)' "
+                "  'ⓇG' "
+                "  3.301E23_kg ]",
     // *Mercury equatorial radius - Measurement [22]
     "Req☿",     "[ 2439.7_km "
                 "  0.1_km "
@@ -1247,6 +1252,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☿/ⒸProt☿;-2)' "
                 "  5.067E6_s ]",
+    // *Mercury rotation angular velocity - Calculation from Prot
+    "ωrot☿",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☿;1_r/s);XPON(UVAL(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☿))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot☿*(2*Ⓒπ*1_r)/ⒸProt☿;-2);1_r/s)' "
+                "  'ⓇProt☿' ]",
     // *Mercury axial tilt - Measurement [22]
     "ϵ☿",       "[ 0.034_° "
                 "  0.001_° "
@@ -1289,6 +1298,11 @@ static const cstring basic_constants[] =
                 "  0.00000012E14_m³/s² "
                 "  'ROUND(ⓈGM♀/ⒸGM♀;-2)' "
                 "  3.249E14_m³/s² ]",
+    // *Venus mass - Calculation from GM and G
+    "M♀",       "[ 'ROUND(CONVERT(ⒸGM♀/ⒸG;1_kg);XPON(UVAL(ⒸGM♀/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♀/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♀*ⒸM♀);-2);1_kg)' "
+                "  'ⓇG' "
+                "  4.867E24_kg ]",
     // *Venus equatorial radius - Measurement [22]
     "Req♀",     "[ 6051.8_km "
                 "  0.1_km "
@@ -1322,6 +1336,10 @@ static const cstring basic_constants[] =
                 "  8.64_s "
                 "  'ROUND(ⓈProt♀/ⒸProt♀;-2)' "
                 "  2.100E7_s ]",
+    // *Venus rotation angular velocity - Calculation from Prot  [retrograde]
+    "ωrot♀",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♀;1_r/s);XPON(UVAL(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♀))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♀*(2*Ⓒπ*1_r)/ⒸProt♀;-2);1_r/s)' "
+                "  'ⓇProt♀' ]",
     // *Venus axial tilt - Measurement [22]
     "ϵ♀",       "[ 177.36_° "
                 "  0.01_° "
@@ -1364,6 +1382,11 @@ static const cstring basic_constants[] =
     "GM♁",      "[ 3.986004E14_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Earth mass - Calculation from GM and G
+    "M♁",       "[ 'ROUND(CONVERT(ⒸGM♁/ⒸG;1_kg);XPON(UVAL(ⒸGM♁/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♁/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♁*ⒸM♁);-2);1_kg)' "
+                "  'ⓇG' "
+                "  5.972E24_kg ]",
     // *Earth equatorial radius - Exact nominal value [3]
     "Req♁",     "[ 6378.1_km "
                 "  0_km "
@@ -1373,7 +1396,7 @@ static const cstring basic_constants[] =
                 "  0_km "
                 "  0 ]",
     // *Earth oblateness - Calculation from nominal value [3]
-    "f♁",       "[ 'ROUND(1-ⒸRp♁/ⒸReq♁;XPON(UVAL(Ⓡf♁*(1-ⒸRp♁/ⒸReq♁)))-XPON(1-ⒸRp♁/ⒸReq♁)-2)' "
+    "f♁",       "[ 'ROUND(1-ⒸRp♁/ⒸReq♁;-5)' "
                 "  'ROUND(Ⓡf♁*Ⓒf♁;-2)' "
                 "  'ⓇRp♁+ⓇReq♁' ]",
     // *Earth mean density - Calculation from nominal value [3]
@@ -1395,6 +1418,10 @@ static const cstring basic_constants[] =
                 "  0.0001_s "
                 "  'ROUND(ⓈProt♁/ⒸProt♁;-2)' "
                 "  8.616E4_s ]",
+    // *Earth rotation angular velocity - Calculation from Prot
+    "ωrot♁",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♁;1_r/s);XPON(UVAL(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♁))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♁*(2*Ⓒπ*1_r)/ⒸProt♁;-2);1_r/s)' "
+                "  'ⓇProt♁' ]",
     // *Earth axial tilt - Measurement [24]
     "ϵ♁",       "[ 23.4393_° "
                 "  0.0001_° "
@@ -1431,6 +1458,48 @@ static const cstring basic_constants[] =
                 "  0_date "
                 "  0 ]",
 
+    // ------------------------------------------------------------------------
+    // WGS-84 / GPS reference ellipsoid (defining constants, exact)
+    // *Earth equatorial radius - WGS-84 defining constant [WGS-84]
+    "a♁GPS",    "[ 6378137_m "
+                "  0_m "
+                "  0 ]",
+    // *Earth flattening - WGS-84 defining constant 1/298.257223563 [WGS-84]
+    "f♁GPS",    "[ '1/298.257223563' "
+                "  0 "
+                "  0 ]",
+    // *Earth nominal mean angular velocity - WGS-84 [WGS-84]
+    "ω♁GPS",    "[ 7.2921150E-5_r/s "
+                "  0_r/s "
+                "  0 ]",
+    // *Earth gravitational parameter (incl. atmosphere) - WGS-84 [WGS-84]
+    "GM♁GPS",   "[ 3.986004418E14_m³/s² "
+                "  0_m³/s² "
+                "  0 ]",
+    // *Earth first eccentricity squared - WGS-84 ellipsoid, from flattening [WGS-84]
+    "e12♁GPS",  "[ '2*Ⓒf♁GPS-Ⓒf♁GPS²' "
+                "  0 "
+                "  0 ]",
+    // *Earth second eccentricity squared - WGS-84 ellipsoid, from first [WGS-84]
+    "e22♁GPS",  "[ 'Ⓒe12♁GPS/(1-Ⓒe12♁GPS)' "
+                "  0 "
+                "  0 ]",
+
+    // ------------------------------------------------------------------------
+    // Calendar and astronomical years
+    // *Tropical year (equinox to equinox, J2000) - seasonal year [24]
+    "Ytrop♁",   "[ 365.24219_d "
+                "  0_d "
+                "  0 ]",
+    // *Julian year - exact, defines the light-year [24]
+    "YJul♁",    "[ 365.25_d "
+                "  0_d "
+                "  0 ]",
+    // *Gregorian mean year - exact: 365 + 1/4 - 1/100 + 1/400 [24]
+    "YGreg♁",   "[ 365.2425_d "
+                "  0_d "
+                "  0 ]",
+
     "Astronomy/Moon",     nullptr,
 
     // *Moon gravitational parameter - Measurement [4]
@@ -1438,6 +1507,11 @@ static const cstring basic_constants[] =
                 "  0.0000000009E12_m³/s² "
                 "  'ROUND(ⓈGM☽/ⒸGM☽;-2)' "
                 "  4.903E12_m³/s² ]",
+    // *Moon mass - Calculation from GM and G
+    "M☽",       "[ 'ROUND(CONVERT(ⒸGM☽/ⒸG;1_kg);XPON(UVAL(ⒸGM☽/ⒸG·ⓇG))-XPON(UVAL(ⒸGM☽/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM☽*ⒸM☽);-2);1_kg)' "
+                "  'ⓇG' "
+                "  7.346E22_kg ]",
     // *Moon equatorial radius - Measurement [22]
     "Req☽",     "[ 1738.1_km "
                 "  0.1_km "
@@ -1471,6 +1545,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☽/ⒸProt☽;-2)' "
                 "  2.361E6_s ]",
+    // *Moon rotation angular velocity - Calculation from Prot
+    "ωrot☽",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☽;1_r/s);XPON(UVAL(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☽))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot☽*(2*Ⓒπ*1_r)/ⒸProt☽;-2);1_r/s)' "
+                "  'ⓇProt☽' ]",
     // *Moon axial tilt - Measurement [22]
     "ϵ☽",       "[ 1.5424_° "
                 "  0.0001_° "
@@ -1513,6 +1591,11 @@ static const cstring basic_constants[] =
                 "  0.00000000091E13_m³/s² "
                 "  'ROUND(ⓈGM♂/ⒸGM♂;-2)' "
                 "  4.283E13_m³/s² ]",
+    // *Mars mass - Calculation from GM and G
+    "M♂",       "[ 'ROUND(CONVERT(ⒸGM♂/ⒸG;1_kg);XPON(UVAL(ⒸGM♂/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♂/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♂*ⒸM♂);-2);1_kg)' "
+                "  'ⓇG' "
+                "  6.417E23_kg ]",
     // *Mars equatorial radius - Measurement [22]
     "Req♂",     "[ 3396.2_km "
                 "  0.1_km "
@@ -1546,6 +1629,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♂/ⒸProt♂;-2)' "
                 "  8.864E4_s ]",
+    // *Mars rotation angular velocity - Calculation from Prot
+    "ωrot♂",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♂;1_r/s);XPON(UVAL(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♂))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♂*(2*Ⓒπ*1_r)/ⒸProt♂;-2);1_r/s)' "
+                "  'ⓇProt♂' ]",
     // *Mars axial tilt - Measurement [22]
     "ϵ♂",       "[ 25.19_° "
                 "  0.01_° "
@@ -1586,6 +1673,11 @@ static const cstring basic_constants[] =
     "GM♃",      "[ 1.26686534E17_m³/s² "
                 "  0_m³/s² "
                 "  0 ]",
+    // *Jupiter mass - Calculation from GM and G
+    "M♃",       "[ 'ROUND(CONVERT(ⒸGM♃/ⒸG;1_kg);XPON(UVAL(ⒸGM♃/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♃/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♃*ⒸM♃);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.898E27_kg ]",
     // *Jupiter equatorial radius - Exact nominal value [3]
     "Req♃",     "[ 71492_km "
                 "  0_km "
@@ -1595,7 +1687,7 @@ static const cstring basic_constants[] =
                 "  0_km "
                 "  0 ]",
     // *Jupiter oblateness - Calculation from nominal value [3]
-    "f♃",       "[ 'ROUND(1-ⒸRp♃/ⒸReq♃;XPON(UVAL(Ⓡf♃*(1-ⒸRp♃/ⒸReq♃)))-XPON(1-ⒸRp♃/ⒸReq♃)-2)' "
+    "f♃",       "[ 'ROUND(1-ⒸRp♃/ⒸReq♃;-5)' "
                 "  'ROUND(Ⓡf♃*Ⓒf♃;-2)' "
                 "  'ⓇRp♃+ⓇReq♃' ]",
     // *Jupiter mean density - Calculation from nominal value [3]
@@ -1616,6 +1708,10 @@ static const cstring basic_constants[] =
     "Prot♃",    "[ 35730_s "
                 "  1_s "
                 "  'ROUND(ⓈProt♃/ⒸProt♃;-2)' ]",
+    // *Jupiter rotation angular velocity - Calculation from Prot
+    "ωrot♃",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♃;1_r/s);XPON(UVAL(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♃))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♃*(2*Ⓒπ*1_r)/ⒸProt♃;-2);1_r/s)' "
+                "  'ⓇProt♃' ]",
     // *Jupiter axial tilt - Measurement [22]
     "ϵ♃",       "[ 3.13_° "
                 "  0.01_° "
@@ -1657,6 +1753,11 @@ static const cstring basic_constants[] =
                 "  0.00000000091E16_m³/s² "
                 "  'ROUND(ⓈGM♄/ⒸGM♄;-2)' "
                 "  3.794E16_m³/s² ]",
+    // *Saturn mass - Calculation from GM and G
+    "M♄",       "[ 'ROUND(CONVERT(ⒸGM♄/ⒸG;1_kg);XPON(UVAL(ⒸGM♄/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♄/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♄*ⒸM♄);-2);1_kg)' "
+                "  'ⓇG' "
+                "  5.685E26_kg ]",
     // *Saturn equatorial radius - Measurement [22]
     "Req♄",     "[ 60268_km "
                 "  4_km "
@@ -1690,6 +1791,10 @@ static const cstring basic_constants[] =
                 "  50_s "
                 "  'ROUND(ⓈProt♄/ⒸProt♄;-2)' "
                 "  3.836E4_s ]",
+    // *Saturn rotation angular velocity - Calculation from Prot
+    "ωrot♄",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♄;1_r/s);XPON(UVAL(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♄))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♄*(2*Ⓒπ*1_r)/ⒸProt♄;-2);1_r/s)' "
+                "  'ⓇProt♄' ]",
     // *Saturn axial tilt - Measurement [22]
     "ϵ♄",       "[ 26.73_° "
                 "  0.01_° "
@@ -1731,6 +1836,11 @@ static const cstring basic_constants[] =
                 "  0.0000040E15_m³/s² "
                 "  'ROUND(ⓈGM⛢/ⒸGM⛢;-2)' "
                 "  5.795E15_m³/s² ]",
+    // *Uranus mass - Calculation from GM and G
+    "M⛢",       "[ 'ROUND(CONVERT(ⒸGM⛢/ⒸG;1_kg);XPON(UVAL(ⒸGM⛢/ⒸG·ⓇG))-XPON(UVAL(ⒸGM⛢/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM⛢*ⒸM⛢);-2);1_kg)' "
+                "  'ⓇG' "
+                "  8.682E25_kg ]",
     // *Uranus equatorial radius - Measurement [22]
     "Req⛢",     "[ 25559_km "
                 "  4_km "
@@ -1764,6 +1874,10 @@ static const cstring basic_constants[] =
                 "  10_s "
                 "  'ROUND(ⓈProt⛢/ⒸProt⛢;-2)' "
                 "  6.206E4_s ]",
+    // *Uranus rotation angular velocity - Calculation from Prot  [retrograde]
+    "ωrot⛢",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt⛢;1_r/s);XPON(UVAL(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt⛢))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot⛢*(2*Ⓒπ*1_r)/ⒸProt⛢;-2);1_r/s)' "
+                "  'ⓇProt⛢' ]",
     // *Uranus axial tilt - Measurement [22]
     "ϵ⛢",       "[ 97.77_° "
                 "  0.01_° "
@@ -1805,6 +1919,11 @@ static const cstring basic_constants[] =
                 "  0.00000010058E15_m³/s² "
                 "  'ROUND(ⓈGM♆/ⒸGM♆;-2)' "
                 "  6.837E15_m³/s² ]",
+    // *Neptune mass - Calculation from GM and G
+    "M♆",       "[ 'ROUND(CONVERT(ⒸGM♆/ⒸG;1_kg);XPON(UVAL(ⒸGM♆/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♆/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♆*ⒸM♆);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.024E26_kg ]",
     // *Neptune equatorial radius - Measurement [22]
     "Req♆",     "[ 24764_km "
                 "  15_km "
@@ -1837,6 +1956,10 @@ static const cstring basic_constants[] =
     "Prot♆",    "[ 58000_s "
                 "  100_s "
                 "  'ROUND(ⓈProt♆/ⒸProt♆;-2)' ]",
+    // *Neptune rotation angular velocity - Calculation from Prot
+    "ωrot♆",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt♆;1_r/s);XPON(UVAL(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♆))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♆*(2*Ⓒπ*1_r)/ⒸProt♆;-2);1_r/s)' "
+                "  'ⓇProt♆' ]",
     // *Neptune axial tilt - Measurement [22]
     "ϵ♆",       "[ 28.32_° "
                 "  0.01_° "
@@ -1877,6 +2000,11 @@ static const cstring basic_constants[] =
     "GM♇",      "[ 9.755E11_m³/s² "
                 "  0.005E11_m³/s² "
                 "  'ROUND(ⓈGM♇/ⒸGM♇;-2)' ]",
+    // *Pluto mass - Calculation from GM and G
+    "M♇",       "[ 'ROUND(CONVERT(ⒸGM♇/ⒸG;1_kg);XPON(UVAL(ⒸGM♇/ⒸG·ⓇG))-XPON(UVAL(ⒸGM♇/ⒸG))-2)' "
+                "  'CONVERT(ROUND(UBASE(ⓇM♇*ⒸM♇);-2);1_kg)' "
+                "  'ⓇG' "
+                "  1.462E22_kg ]",
     // *Pluto equatorial radius - Measurement [26]
     "Req♇",     "[ 1188.3_km "
                 "  1.6_km "
@@ -1910,6 +2038,10 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♇/ⒸProt♇;-2)' "
                 "  5.519E5_s ]",
+    // *Pluto rotation angular velocity - Calculation from Prot  [retrograde]
+    "ωrot♇",    "[ 'ROUND(CONVERT(-(2*Ⓒπ*1_r)/ⒸProt♇;1_r/s);XPON(UVAL(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt♇))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot♇*(2*Ⓒπ*1_r)/ⒸProt♇;-2);1_r/s)' "
+                "  'ⓇProt♇' ]",
     // *Pluto axial tilt - Measurement [26]
     "ϵ♇",       "[ 119.591_° "
                 "  0.001_° "
@@ -1992,6 +2124,10 @@ static const cstring basic_constants[] =
                 "  864_s "
                 "  'ROUND(ⓈProt☉/ⒸProt☉;-2)' "
                 "  2.193E6_s ]",
+    // *Sun rotation angular velocity - Calculation from Prot
+    "ωrot☉",    "[ 'ROUND(CONVERT((2*Ⓒπ*1_r)/ⒸProt☉;1_r/s);XPON(UVAL(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉))-XPON(UVAL((2*Ⓒπ*1_r)/ⒸProt☉))-2)' "
+                "  'CONVERT(ROUND(Ⓡωrot☉*(2*Ⓒπ*1_r)/ⒸProt☉;-2);1_r/s)' "
+                "  'ⓇProt☉' ]",
 
     "Astronomy/Cosmology",     nullptr,
 
