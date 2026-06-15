@@ -1091,14 +1091,27 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb☿ constant
+
+Mercury orbital period
+
+Mercury's sidereal orbital period — the time to complete one revolution around
+the Sun. It is distinct from the rotation period `Prot☿` (the spin period).
+Computed from Meeus' Chapter 38 orbital elements and cross-checked against JPL
+Horizons. The stored value is a mean orbital period, used as an approximation of
+the anomalistic period that governs the recurrence of the perihelion passages
+exposed by `T₀☿`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀☿ constant
 
-Mercury last perihelion passage
+Mercury time of perihelion passage
 
-Mercury's most recent time of perihelion passage is a measured quantity.
-Mercury passes perihelion approximately four times per year. Value in JDN
-(Julian Day Number, Gregorian calendar). It is the most recent point in its
-orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀☿` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb☿`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`, so the constant displays as a date but tracks "now". Mercury passes
+perihelion roughly four times per year. [Materials 22](#materials-22)
 
 
 ## Venus constants
@@ -1205,13 +1218,26 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the Sun),
 measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♀ constant
+
+Venus orbital period
+
+Venus's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♀` (the spin period). Computed
+from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
+The stored value is a mean orbital period, used as an approximation of the
+anomalistic period that governs the recurrence of the perihelion passages
+exposed by `T₀♀`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀♀ constant
 
-Venus last perihelion passage
+Venus time of perihelion passage
 
-Measured. Venus's most recent time of perihelion passage. Venus passes perihelion
-approximately twice per year. Value in JDN. It is the most recent point in its
-orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♀` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♀`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Venus passes perihelion about twice per year. [Materials 22](#materials-22)
 
 
 ## Earth constants
@@ -1324,13 +1350,25 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♁ constant
+
+Earth orbital period
+
+Earth's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♁` (the sidereal day). Computed
+from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
+The stored value is the mean (anomalistic) year used to advance `T₀♁` between
+successive perihelion passages. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀♁ constant
 
-Earth perihelion passage
+Earth time of perihelion passage
 
-Measured. Earth's most recent time of perihelion passage (early January each
-year). Value in JDN. It is the most recent point in its orbit when it was
-closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♁` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♁`, the
+anomalistic year) and returns the most recent perihelion passage at or before
+the current date (early January each year). The computation is carried out in
+Julian Day Number and converted to a date with `JDN→`. [Materials 22](#materials-22)
 
 
 ## Moon constants
@@ -1552,13 +1590,26 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♂ constant
+
+Mars orbital period
+
+Mars's sidereal orbital period — the time to complete one revolution around the
+Sun. It is distinct from the rotation period `Prot♂` (the spin period, close to
+an Earth day). Computed from Meeus' Chapter 38 orbital elements and cross-checked
+against JPL Horizons. The stored value is a mean orbital period, used as an
+approximation of the anomalistic period that governs the recurrence of the
+perihelion passages exposed by `T₀♂`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+
 ### T₀♂ constant
 
-Mars perihelion passage
+Mars time of perihelion passage
 
-Measured. Mars's most recent time of perihelion passage. Mars's orbital
-period is approximately 1.88 years. Value in JDN. It is the most recent point
-in its orbit when it was closest to the Sun. [Materials 20](#materials-20)
+Computed, not stored: `T₀♂` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♂`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Mars's orbital period is approximately 1.88 years. [Materials 22](#materials-22)
 
 
 ## Jupiter constants
@@ -1670,13 +1721,25 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♃ constant
+
+Jupiter orbital period
+
+Jupiter's orbital period — the time to complete one revolution around the Sun
+(about 11.86 years). It is distinct from the rotation period `Prot♃` (the ~10 h
+spin period). The value is the anomalistic period (perihelion to perihelion),
+computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
+passages exposed by `T₀♃`. [Materials 22](#materials-22)
+
 ### T₀♃ constant
 
-Jupiter perihelion passage
+Jupiter time of perihelion passage
 
-Measured. Jupiter's most recent time of perihelion passage. Jupiter's
-orbital period is approximately 11.86 years. It is the most recent point
-in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♃` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♃`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Materials 22](#materials-22)
 
 
 ## Saturn constants
@@ -1787,13 +1850,25 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♄ constant
+
+Saturn orbital period
+
+Saturn's orbital period — the time to complete one revolution around the Sun
+(about 29.46 years). It is distinct from the rotation period `Prot♄` (the ~10.7 h
+spin period). The value is the anomalistic period (perihelion to perihelion),
+computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
+passages exposed by `T₀♄`. [Materials 22](#materials-22)
+
 ### T₀♄ constant
 
-Saturn perihelion passage
+Saturn time of perihelion passage
 
-Measured. Saturn's most recent time of perihelion passage. Saturn's
-orbital period is approximately 29.46 years. It is the most recent point
-in its orbit when it was closest to the Sun. Value in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♄` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♄`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Saturn's orbital period is approximately 29.46 years. [Materials 22](#materials-22)
 
 
 ## Uranus constants
@@ -1903,15 +1978,27 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb⛢ constant
+
+Uranus orbital period
+
+Uranus's orbital period — the time to complete one revolution around the Sun
+(about 84 years). It is distinct from the rotation period `Prot⛢` (the ~17 h spin
+period). The value is the anomalistic period (perihelion to perihelion), computed
+from Meeus' Chapter 38, which governs the recurrence of the perihelion passages
+exposed by `T₀⛢`. [Materials 22](#materials-22)
+
 ### T₀⛢ constant
 
-Uranus perihelion passage
+Uranus time of perihelion passage
 
-Calculated from measurement (JPL DE440 orbital propagation). Uranus's
-predicted next time of perihelion passage (~2050). Uranus's orbital
-period is approximately 84 years. Last perihelion: 1966. It is the most
-recent point in its orbit when it was closest to the Sun. Value in JDN.
-[Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀⛢` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb⛢`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
+was in 1966 and the next is around 2050, so the returned value can be decades in
+the past. [Materials 22](#materials-22)
 
 
 ## Neptune constants
@@ -2020,15 +2107,28 @@ It is the measured angle between the ascending node (where the orbit
 crosses the reference plane northward) and the perihelion (the closest
 point to the Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♆ constant
+
+Neptune orbital period
+
+Neptune's sidereal orbital period — the time to complete one revolution around
+the Sun (about 165 years). It is distinct from the rotation period `Prot♆` (the
+~16 h spin period). Tabulated sidereal value from the NASA Planetary Fact Sheet,
+used as an approximation of the anomalistic period that governs the recurrence
+of the perihelion passages exposed by `T₀♆`. [Materials 23](#materials-23)
+
 ### T₀♆ constant
 
-Neptune perihelion passage
+Neptune time of perihelion passage
 
-Calculated from measurement (JPL DE440 orbital propagation). Neptune's
-predicted next time of perihelion passage (~2042). Neptune's orbital
-period is approximately 164.8 years. Last perihelion: 1876. It is the
-most recent point in its orbit when it was closest to the Sun. Value
-in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♆` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♆`) and returns
+the most recent perihelion passage at or before the current date, carried out in
+Julian Day Number and converted to a date with `JDN→`. Neptune is a deliberate
+exception to the "most recent past perihelion" convention: its true last
+perihelion (~1876) is uninformative and hard to source, so Tp is set to the next
+perihelion (2042-09-04). Because that date is in the future, the floor-IFTE
+returns it unchanged, giving the useful upcoming date. [Materials 21](#materials-21)
 
 
 ## Pluto constants
@@ -2135,14 +2235,27 @@ It is the measured angle between the ascending node (where the orbit crosses
 the reference plane northward) and the perihelion (the closest point to the
 Sun), measured in the direction of motion. [Reference 23](#reference-23)
 
+### Porb♇ constant
+
+Pluto orbital period
+
+Pluto's sidereal orbital period — the time to complete one revolution around the
+Sun (about 248 years). It is distinct from the rotation period `Prot♇` (the
+~6.4 day spin period). Tabulated sidereal value from the NASA Planetary Fact
+Sheet, used as an approximation of the anomalistic period that governs the
+recurrence of the perihelion passages exposed by `T₀♇`. [Materials 23](#materials-23)
+
 ### T₀♇ constant
 
-Pluto perihelion passage
+Pluto time of perihelion passage
 
-Measured. Pluto's last time of perihelion passage (1989 Sep 05). Pluto's
-orbital period is approximately 248 years. It is the most recent point in
-its orbit when it was closest to the Sun. Next perihelion: ~2237. Value
-in JDN. [Reference 4](#reference-4) [Materials 21](#materials-21)
+Computed, not stored: `T₀♇` evaluates an expression (IFTE) that advances from a
+reference perihelion passage (Tp) by whole orbital periods (`Porb♇`) and returns
+the most recent perihelion passage at or before the current date. The
+computation is carried out in Julian Day Number and converted to a date with
+`JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
+was in 1989 (Sep 05) and the next is around 2237, so the returned value can be
+decades in the past. [Materials 21](#materials-21)
 
 ## Sun constants
 
@@ -3506,4 +3619,8 @@ Park, R.S., et al. (2021). "The JPL Planetary and Lunar Ephemerides DE440 and DE
 
 ### Materials 22
 
-Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Formula for lunar perigee — implemented in MPERC.txt.)
+Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 38: Perihelion and Aphelion of the Planets; Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Planetary orbital periods derived from the Chapter 38 elements; lunar perigee formula from Chapter 50.)
+
+### Materials 23
+
+Williams, D.R. NASA Planetary Fact Sheet. NASA Space Science Data Coordinated Archive (NSSDCA), Goddard Space Flight Center. [Source](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) Accessed: June 2026. (Sidereal orbital periods of the giant planets, used as an approximation of the anomalistic period.)
