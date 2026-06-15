@@ -1439,14 +1439,35 @@ Moon argument of perigee
 Measured. Moon's argument of perigee. It is the most recent point in its
 orbit when it was closest to the Earth. [Reference 25](#reference-25)
 
+### Porb☽ constant
+
+Moon orbital period
+
+The Moon's anomalistic month — the mean interval between successive perigee
+passages (about 27.55 days). It is distinct from the rotation period `Prot☽` and
+from the sidereal month. Its absolute uncertainty (±1.12 days) is the measured 1σ
+spread of real perigee-to-perigee intervals over 2000–2050, made large by the
+solar perturbation; this variability is why the Moon differs from the planets.
+The value is the standard anomalistic month used by `ⓁPeriSel`. [Materials 22](#materials-22)
+
 ### T₀☽ constant
 
-Moon perigee passage
+Moon time of perigee passage
 
-Calculated from measurement (Meeus ch.50, ±1 hour). See MPERC.txt. Moon's
-most recent time of perigee passage (closest approach to Earth). The perigee
-recurs approximately every 27.55 days. Computed using the Meeus algorithm
-(15 terms, ±1 hour accuracy). Value in JDN. [Materials 20](#materials-20) [Materials 22](#materials-22)
+Computed, not stored: `T₀☽` evaluates `JDN→(ⓁPeriSel(→Num(JDN(DateTime))))`,
+calling the library routine `ⓁPeriSel` on the current date to obtain the nearest
+lunar perigee, then converting the Julian Day Number to a date. `ⓁPeriSel`
+implements Meeus' Chapter 50 perigee formula in full — all 60 Table 50.A periodic
+terms, including the time-dependent coefficients — and matches the PyMeeus
+reference implementation to better than 0.001 minute over 1950–2100. The accuracy
+of the perigee *instant* against the true Earth–Moon distance minimum is limited by
+the Chapter 50 method itself: about 5 minutes typical (1σ), up to ~30 minutes in
+rare cases; this is the basis for the ±5 minutes (`300_s`) uncertainty. `ⓁPeriSel`
+accepts either a date or a Julian Day Number as input. The perigee recurs about
+every 27.55 days (`Porb☽`). Validated against observed perigees: JDN 2457706.5 →
+2457706.974818 (2016-Nov-14, k=224) and 2464291.5 → 2464292.421948 (2034-Nov-25,
+k=463). Note: Meeus' worked example at p.357 (JDN 2447442.35) is an apogee, not a
+perigee, and must not be used to check this value. [Materials 22](#materials-22)
 
 
 ## Mars constants
