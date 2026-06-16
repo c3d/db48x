@@ -21322,8 +21322,68 @@ accept an input value that is a multiple of 42.
 »
 ```
 
-## KEYEVAL
-Simulate a keypress from within a program
+## KeyEval
+
+Simulate a key press from within a program.
+
+`KeyEval` takes a [key position](#Key-positions) from the stack and processes
+that key exactly as if it had been typed on the keyboard, including the shift,
+alpha, and lowercase modifiers encoded in the key position. The key position is
+popped from the stack.
+
+Use `KeyEval` in programs to trigger keyboard actions programmatically, for
+example to invoke a command bound to a key, insert text from a user key
+assignment, or open a menu.
+
+When `UserMode` is active, user key assignments stored in `KeyMap` are
+honored. Otherwise, the standard keyboard bindings apply.
+
+The key position uses the same `rc.ph` format documented for `AssignKey` and
+`RecallKeys` in the [User Mode](#UserModeMenu) section. For an unshifted key,
+an integer row/column value such as `34` is enough. Shifted and alpha keys use
+a decimal suffix; for example `45.2` is the left-shifted backspace key.
+
+For example, the following program pushes `1` on the stack, then simulates
+pressing the key that evaluates `SIN`:
+
+```rpl
+« 1 34 KeyEval »
+```
+
+See also `Wait`, which waits for a real key press and returns its key position,
+and `KeyCode`, which returns the object bound to a key without executing it.
+
+
+## KeyCode
+
+Return the object bound to a key without executing it.
+
+`KeyCode` takes a [key position](#Key-positions) from the top of the stack and
+replaces it with the object currently assigned to that key: a command, program,
+text, or menu object. The object is not evaluated.
+
+The lookup uses the current soft menu, any keyboard layout loaded with the
+simulator `-k` option, and the standard keyboard bindings. It does not read
+user key assignments from the `KeyMap` directory; use `RecallKeys` to inspect
+those.
+
+The key position format is the same as for `AssignKey`, `KeyEval`, and
+`Wait`. See [Key positions](#Key-positions) in the User Mode section.
+
+For example, the following returns the command bound to the unshifted `SIN`
+key (row 3, column 4):
+
+```rpl
+34 KeyCode
+@ Expecting sin
+```
+
+The left-shifted backspace key is at position `45.2`:
+
+```rpl
+45.2 KeyCode
+@ Expecting ClearThingsMenu
+```
 
 
 ## Key
@@ -21769,7 +21829,7 @@ Access: 🟦 L (TAN); [ComplexMenu](#complexmenu) 🟦 F5; [MathMenu](#mathmenu-
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [→DMS](#dms) | [DMS→](#dms-1) | DMS+ | DMS- | [Hypot](#hypot) | [Atan2](#atan2) |
+| [→DMS](#dms) | [DMS→](#dms-1) | [DMS+](#dms-2) | [DMS-](#dms-) | [Hypot](#hypot) | [Atan2](#atan2) |
 | →Deg | →Rad | →Grad | →πr | [→Polar](#topolar) | [→Rect](#torectangular) |
 | Deg | Rad | Grad | [πr](#piradians) | [D→R](#dr) | [R→D](#rd) |
 
@@ -21956,7 +22016,7 @@ Access: 🟦 I (R↓); [MathMenu](#mathmenu-reference) 🟦 F6
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Frac→](#explode) | [1 1/2](#mixedfractions) | [¹/₃](#smallfractions) | FractionIterations | FractionLargestPrime | FractionDigits |
-| [%Total](#percenttotal) | [%Chg](#percentchange) | DMS+ | DMS- | [→HMS](#hms) | [HMS→](#hms-1) |
+| [%Total](#percenttotal) | [%Chg](#percentchange) | [DMS+](#dms-2) | [DMS-](#dms-) | [→HMS](#hms) | [HMS→](#hms-1) |
 | `/` | [%](#percent) | [→DMS](#dms) | [DMS→](#dms-1) | [→Num](#num) | →Frac |
 
 ### GraphicsMenu
@@ -22234,7 +22294,7 @@ Access: 🟦 E (1/x); [RealMenu](#realmenu) 🟦 F6
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [→2D](#to2dvector) | [→3D](#to3dvector) | [→Rectangular](#torectangular) | [→Cylindrical](#tocylindrical) | [→Spherical](#tospherical) |   |
-| [Object→](#explode) | Range→ | [List→](#list-1) | Arry→ | [Vector→](#fromvector) | ◀ |
+| [Object→](#explode) | [Range→](#fromrange) | [List→](#list-1) | Arry→ | [Vector→](#fromvector) | ◀ |
 | [re](#re) | [im](#im) | [arg](#arg) | [Size](#size) | [Get](#get) | ▶ |
 
 **Page 3**
@@ -22271,12 +22331,23 @@ Access: 🟦 O (EEX); [GraphicsMenu](#graphicsmenu) ▶×3 🟦 F4; [MainMenu](#
 
 Access: 🟦 Q (8); [MathMenu](#mathmenu-reference) 🟦 F4; [SymbolicMenu](#symbolicmenu) 🟨 F5
 
+*2 pages · 19 items total*
+
+**Page 1**
+
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| \[[MSolvr](#solvermenu)\] | [Solve](#root) | [TVMRoot](#tvmroot) | _FRoots_ | [XRoot](#xroot) | _FCoef_ |
-| [Obj→](#explode) | Display | QuoRem | [Root](#root) | [Zeros](#zeros) | [MRoot](#multipleequationssolver) |
-| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [PEval](#peval) | [PCoef](#pcoef) | [PRoot](#proot) |
-| [PrtFrc](#partfrac) |   |   |   |   |   |
+| [Zeros](#zeros) | [MRoot](#multipleequationssolver) | \[[MSolvr](#solvermenu)\] | [Solve](#root) | [TVMRoot](#tvmroot) |   |
+| [PRoot](#proot) | [Obj→](#explode) | Display | QuoRem | [Root](#root) | ◀ |
+| `Ⓟ''` | [→Poly](#topolynomial) | [Poly→](#frompolynomial) | [PEval](#peval) | [PCoef](#pcoef) | ▶ |
+
+**Page 2**
+
+| F1 | F2 | F3 | F4 | F5 | F6 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+|   |   |   |   |   |   |
+|   |   |   |   |   | ◀ |
+| _FRoots_ | [XRoot](#xroot) | _FCoef_ | [PrtFrc](#partfrac) |   | ▶ |
 
 ### PolynomialSolverMenu
 
@@ -22346,7 +22417,7 @@ Access: [MathMenu](#mathmenu-reference) F6
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [Size](#size) |   |   |   |   |   |
 | [→Range](#range) | [→∆Range](#range-1) | [→%Range](#range-2) | [→σRange](#range-3) | [∪](#rangeunion) | [∩](#rangeintersect) |
-| `…` | `±` | `±%` | `±σ` | Range→ | `ρ` |
+| `…` | `±` | `±%` | `±σ` | [Range→](#fromrange) | `ρ` |
 
 ### RealMenu
 
@@ -22382,7 +22453,7 @@ Access: [MathMenu](#mathmenu-reference) 🟦 F1
 
 ### SolverMenu
 
-Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialsMenu](#polynomialsmenu) 🟦 F1; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
+Access: 🟨 P (7); [DifferentialSolverMenu](#differentialsolvermenu) F4; [LinearSolverMenu](#linearsolvermenu) F4; [MainMenu](#mainmenu-reference) F5; [MathMenu](#mathmenu-reference) 🟨 F4; [MultiSolverMenu](#multisolvermenu) F4; [NumericalSolverMenu](#numericalsolvermenu) F4; [PolynomialsMenu](#polynomialsmenu) 🟦 F3; [PolynomialSolverMenu](#polynomialsolvermenu) F4; [SymbolicSolverMenu](#symbolicsolvermenu) F5
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|

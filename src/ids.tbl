@@ -738,6 +738,8 @@ OP(SetTime, "→Time")
 CMD(Wait)
 CMD(Bytes)
 CMD(ScreenCapture)
+CMD(KeyEval)
+CMD(KeyCode)
 
 #ifdef HAS_CHUCK
 OP(ChuckNorris, "Chuck")

@@ -179,6 +179,9 @@ struct user_interface
     void        clear_help();
     void        clear_menu();
     object_p    object_for_key(int key);
+    object_p    object_for_key(object_p pos);
+    static uint key_for_position(object_p pos, uint *plane = nullptr);
+    bool        keyeval(object_p pos);
     int         evaluating_function_key() const;
     bool        end_edit();
     void        clear_editor();

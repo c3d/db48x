@@ -836,7 +836,24 @@ void tests::keyboard_entry()
     step("Inserting a colon in text editor inserts tag delimiters")
         .test(CLEAR, ALPHA, KEY0).editor("::");
     step("Inserting a colon in text inserts a single colon")
-        .test(CLEAR, RSHIFT, ENTER, KEY0).editor("\":\"");
+        .test(CLEAR, RSHIFT, ENTER, KEY0)
+        .editor("\":\"");
+
+    step("Insert 123 using KEYEVAL")
+        .test(CLEAR, "72 KEYEVAL 73 KEYEVAL 74 KEYEVAL", ENTER)
+        .editor("123");
+    step("Insert « 123 + » using KEYEVAL")
+        .test(CLEAR,
+              "84.2 KEYEVAL "
+              "72 KEYEVAL 73 KEYEVAL 74 KEYEVAL "
+              "85 KEYEVAL 41 KEYEVAL", ENTER)
+        .want("« 123 + »");
+    step("Insert { 456 * } using KEYEVAL")
+        .test(CLEAR,
+              "84.3 KEYEVAL "
+              "62 KEYEVAL 63 KEYEVAL 64 KEYEVAL "
+              "65 KEYEVAL 41 KEYEVAL", ENTER)
+        .want("{ 456 × }");
 }
 
 

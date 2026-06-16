@@ -170,6 +170,8 @@ COMMAND_DECLARE(Explode,1);             // Explode an object (aka Obj→)
 COMMAND_DECLARE(SelfInsert,-1);         // Enter menu label in the editor
 COMMAND_DECLARE(ReplaceChar,-1);        // Replace editor character with label
 COMMAND_DECLARE(Wait,1);                // Wait a given amount of time
+COMMAND_DECLARE(KeyEval,1);             // Evaluate a key as if it was typed
+COMMAND_DECLARE(KeyCode,1);             // Return a program evaluating key
 COMMAND_DECLARE(Bytes,1);               // Return bytes for object
 COMMAND_DECLARE(Off,-1);                // Switch the calculator off
 COMMAND_DECLARE(OffWithImage,-1);       // ... and show off-images

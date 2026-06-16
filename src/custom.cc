@@ -349,35 +349,6 @@ COMMAND_BODY(KeyMap)
 }
 
 
-static uint convert_key_position_to_id(object_p obj)
-// ----------------------------------------------------------------------------
-//    Convert the HP48 format (rc.p = row, column, plane) to native key
-// ----------------------------------------------------------------------------
-{
-    uint rc = obj->as_uint32(0, true);
-
-    if (decimal_g rcp = obj->as<decimal>())
-    {
-        if (rc < 100)
-        {
-            if (decimal_g rcps = decimal::make(1, 2)) // Decimal part * 100
-            {
-                if (decimal_g rcpf = (rcps * rcp) % rcps)
-                {
-                    ularge pf = rcpf->as_unsigned();
-                    return platform_keyid(rc, uint(pf));
-                }
-            }
-        }
-        else
-        {
-            rt.value_error();
-        }
-    }
-    return platform_keyid(rc, 0);
-}
-
-
 COMMAND_BODY(AssignKey)
 // ----------------------------------------------------------------------------
 //   Assign a single key
@@ -385,7 +356,7 @@ COMMAND_BODY(AssignKey)
 {
     if (object_g obj = rt.stack(1))
         if (object_g pos = rt.stack(0))
-            if (uint keyid = convert_key_position_to_id(pos))
+            if (uint keyid = ui.key_for_position(pos))
                 if (ui.assign(keyid, obj))
                     if (rt.drop(2))
                         return OK;
@@ -412,14 +383,14 @@ COMMAND_BODY(DeleteKeys)
         {
             for (object_p key : *keys)
             {
-                if (uint keyid = convert_key_position_to_id(key))
+                if (uint keyid = ui.key_for_position(key))
                     ui.assign(keyid, nullptr);
                 else
                     return rt.value_error(), ERROR;
             }
             return OK;
         }
-        if (uint keyid = convert_key_position_to_id(obj))
+        if (uint keyid = ui.key_for_position(obj))
             if (ui.assign(keyid, nullptr))
                 return OK;
 
@@ -448,7 +419,7 @@ COMMAND_BODY(StoreKeys)
                         assigned->type() == ID_integer)
                         break;
 
-                    uint keyid = convert_key_position_to_id(obj);
+                    uint keyid = ui.key_for_position(obj);
                     if (!keyid)
                     {
                         rt.value_error();

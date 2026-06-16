@@ -849,6 +849,34 @@ COMMAND_BODY(Wait)
 }
 
 
+COMMAND_BODY(KeyEval)
+// ----------------------------------------------------------------------------
+//   Evaluate the command corresponding to the given keycode
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.pop())
+        if (ui.keyeval(obj))
+            return OK;
+    if (!rt.error())
+        rt.value_error();
+    return ERROR;
+}
+
+
+COMMAND_BODY(KeyCode)
+// ----------------------------------------------------------------------------
+//   Return the object bound to the given key position
+// ----------------------------------------------------------------------------
+{
+    if (object_p obj = rt.top())
+        if (object_p code = ui.object_for_key(obj))
+            if (code && rt.top(code))
+                return OK;
+    if (!rt.error())
+        rt.value_error();
+    return ERROR;
+}
+
 
 COMMAND_BODY(Bytes)
 // ----------------------------------------------------------------------------

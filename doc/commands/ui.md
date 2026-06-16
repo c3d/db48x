@@ -146,8 +146,68 @@ accept an input value that is a multiple of 42.
 »
 ```
 
-## KEYEVAL
-Simulate a keypress from within a program
+## KeyEval
+
+Simulate a key press from within a program.
+
+`KeyEval` takes a [key position](#Key-positions) from the stack and processes
+that key exactly as if it had been typed on the keyboard, including the shift,
+alpha, and lowercase modifiers encoded in the key position. The key position is
+popped from the stack.
+
+Use `KeyEval` in programs to trigger keyboard actions programmatically, for
+example to invoke a command bound to a key, insert text from a user key
+assignment, or open a menu.
+
+When `UserMode` is active, user key assignments stored in `KeyMap` are
+honored. Otherwise, the standard keyboard bindings apply.
+
+The key position uses the same `rc.ph` format documented for `AssignKey` and
+`RecallKeys` in the [User Mode](#UserModeMenu) section. For an unshifted key,
+an integer row/column value such as `34` is enough. Shifted and alpha keys use
+a decimal suffix; for example `45.2` is the left-shifted backspace key.
+
+For example, the following program pushes `1` on the stack, then simulates
+pressing the key that evaluates `SIN`:
+
+```rpl
+« 1 34 KeyEval »
+```
+
+See also `Wait`, which waits for a real key press and returns its key position,
+and `KeyCode`, which returns the object bound to a key without executing it.
+
+
+## KeyCode
+
+Return the object bound to a key without executing it.
+
+`KeyCode` takes a [key position](#Key-positions) from the top of the stack and
+replaces it with the object currently assigned to that key: a command, program,
+text, or menu object. The object is not evaluated.
+
+The lookup uses the current soft menu, any keyboard layout loaded with the
+simulator `-k` option, and the standard keyboard bindings. It does not read
+user key assignments from the `KeyMap` directory; use `RecallKeys` to inspect
+those.
+
+The key position format is the same as for `AssignKey`, `KeyEval`, and
+`Wait`. See [Key positions](#Key-positions) in the User Mode section.
+
+For example, the following returns the command bound to the unshifted `SIN`
+key (row 3, column 4):
+
+```rpl
+34 KeyCode
+@ Expecting sin
+```
+
+The left-shifted backspace key is at position `45.2`:
+
+```rpl
+45.2 KeyCode
+@ Expecting ClearThingsMenu
+```
 
 
 ## Key

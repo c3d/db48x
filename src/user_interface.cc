@@ -6364,8 +6364,8 @@ object_p user_interface::object_for_key(int key)
 //    Return the object for a given key
 // ----------------------------------------------------------------------------
 {
-    object_p obj = nullptr;
-    uint plane = shift_plane();
+    object_p obj   = nullptr;
+    uint     plane = shift_plane();
     if (key >= KEY_F1 && key <= KEY_F6)
     {
         uint fplane = plane < menu_planes() ? plane : 0;
@@ -6384,6 +6384,72 @@ object_p user_interface::object_for_key(int key)
     if (*ptr)
         obj = (object_p) ptr;
     return obj;
+}
+
+
+uint user_interface::key_for_position(object_p obj, uint *plane)
+// ----------------------------------------------------------------------------
+//    Convert the HP48 format (rc.p = row, column, plane) to native key
+// ----------------------------------------------------------------------------
+{
+    uint rc = obj->as_uint32(0, true);
+    uint pf = 0;
+
+    if (decimal_g rcp = obj->as<decimal>())
+    {
+        if (rc >= 100)
+        {
+            rt.value_error();
+            return 0;
+        }
+        if (decimal_g rcps = decimal::make(1, 2)) // Decimal part * 100
+            if (decimal_g rcpf = (rcps * rcp) % rcps)
+                pf = rcpf->as_unsigned();
+    }
+    if (plane)
+    {
+        *plane = pf;
+        pf     = 0;
+    }
+    return platform_keyid(rc, pf);
+}
+
+
+object_p user_interface::object_for_key(object_p pos)
+// ----------------------------------------------------------------------------
+//   Give the object associated to a key position given in user format
+// ----------------------------------------------------------------------------
+{
+    uint plane = 0;
+    if (uint keyid = key_for_position(pos, &plane))
+    {
+        plane /= 10;
+        shift             = plane == 2 || plane == 5 || plane == 8;
+        xshift            = plane == 3 || plane == 6 || plane == 9;
+        alpha             = plane >= 4;
+        lowercase         = plane >= 7;
+        return object_for_key(keyid);
+    }
+    return nullptr;
+}
+
+
+bool user_interface::keyeval(object_p pos)
+// ----------------------------------------------------------------------------
+//   Emulate typing a given key
+// ----------------------------------------------------------------------------
+{
+    uint plane = 0;
+    if (uint keyid = key_for_position(pos, &plane))
+    {
+        plane /= 10;
+        shift             = plane == 2 || plane == 5 || plane == 8;
+        xshift            = plane == 3 || plane == 6 || plane == 9;
+        alpha             = plane >= 4;
+        lowercase         = plane >= 7;
+        return key(keyid, false, false) & key(0, false, false);
+    }
+    return false;
 }
 
 
