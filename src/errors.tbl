@@ -114,6 +114,8 @@ ERROR(no_debugged_program,      "No program being debugged")
 ERROR(input_validation,         "Invalid input")
 ERROR(invalid_tvm_variable,     "Undefined TVM variable")
 ERROR(invalid_tvm_equation,     "Invalid TVM equation")
+ERROR(empty_cash_flows,         "Empty cash flow list")
+ERROR(no_irr,                   "No internal rate of return")
 ERROR(invalid_pixmap,           "Pixmaps require color support")
 
 // Filesystem errors

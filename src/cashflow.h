@@ -1,59 +1,81 @@
-#pragma once
+#ifndef CASHFLOW_H
+#define CASHFLOW_H
+// ****************************************************************************
+//  cashflow.h                                                   DB48X project
+// ****************************************************************************
+//
+//   File Description:
+//
+//      HP-17bii-style cash-flow modeling (CFLO): NPV and IRR over a list of
+//      cash flows with optional repetition counts.
+//
+//      The active cash-flow list is stored in the reserved `CFData` variable,
+//      mirroring the way statistics use `ΣData`. Each entry is either a plain
+//      number (count 1) or a two-element list { amount count } for repeated
+//      flows (the HP "#TIMES" / Nj feature).
+//
+// ****************************************************************************
+//   (C) 2025 Christophe de Dinechin <christophe@dinechin.org>
+//   This software is licensed under the terms outlined in LICENSE.txt
+// ****************************************************************************
+//   This file is part of DB48X.
+//
+//   DB48X is free software: you can redistribute it and/or modify
+//   it under the terms outlined in the LICENSE.txt file
+//
+//   DB48X is distributed in the hope that it will be useful,
+//   but WITHOUT ANY WARRANTY; without even the implied warranty of
+//   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// ****************************************************************************
 
-#include <cmath>
-#include <cstddef>
-#include <optional>
-#include <stdexcept>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include "command.h"
+#include "list.h"
+#include "menu.h"
 
-namespace db48x::finance {
 
-struct CashFlowEntry {
-    double amount = 0.0;
-    int count = 1;
+// Computation commands (operate on a list on the stack, or on `CFData`)
+COMMAND_DECLARE(NPV, 1);                // [ {cashflows} ] rate% -> NPV
+COMMAND_DECLARE(IRR, 0);               // [ {cashflows} ] -> IRR%
+
+// Cash-flow list editing (operate on the `CFData` variable)
+COMMAND_DECLARE(CFAdd, 1);             // amount -> (append, count 1)
+COMMAND_DECLARE(CFAddTimes, 2);        // amount count -> (append {amount count})
+COMMAND_DECLARE(CFDrop, 0);            // -> amount (remove and return last entry)
+COMMAND_DECLARE(CFInsert, 2);          // amount index -> (insert before index)
+COMMAND_DECLARE(CFClear, 0);           // -> (clear the active cash-flow list)
+COMMAND_DECLARE(CFStore, 1);           // name -> (save active list under name)
+COMMAND_DECLARE(CFRecall, 1);          // name -> (load named list as active)
+
+
+struct CashFlowData : command
+// ----------------------------------------------------------------------------
+//   Helper to access the reserved `CFData` cash-flow list variable
+// ----------------------------------------------------------------------------
+{
+    CashFlowData(id type = ID_CashFlowData) : command(type) {}
+
+    static object_p name();             // The `CFData` variable name object
+    static list_p   load();             // Recall the active list (may be null)
+    static bool     store(list_g cf);   // Store the active list
+    static bool     is_empty(list_p cf);// True if the list has no entries
+
+    // Sum of cf_t / (1 + rate%)^t over the expanded list (t starts at 0)
+    static algebraic_p npv(list_p cf, algebraic_r rate_percent);
+    // Internal rate of return (percent), or null on failure (error is set)
+    static algebraic_p irr(list_p cf);
 };
 
-struct CashFlowList {
-    std::string name;
-    bool times_prompting = false;
-    std::vector<CashFlowEntry> entries;
 
-    void clear();
-    void add(double amount, int count = 1);
-    void insert(std::size_t index, double amount, int count = 1);
-    void erase(std::size_t index);
-    bool empty() const;
-    std::size_t expanded_periods() const;
-    std::vector<double> expand() const;
+struct CashFlowMenu : menu
+// ----------------------------------------------------------------------------
+//   HP-17bii-style cash-flow editor menu
+// ----------------------------------------------------------------------------
+{
+    CashFlowMenu(id type = ID_CashFlowMenu) : menu(type) {}
+
+public:
+    OBJECT_DECL(CashFlowMenu);
+    MENU_DECL(CashFlowMenu);
 };
 
-struct CashFlowState {
-    CashFlowList active;
-    std::unordered_map<std::string, CashFlowList> saved;
-
-    void clear_active();
-    void save_active_as(const std::string& name);
-    bool load_named(const std::string& name);
-};
-
-enum class FinanceResultKind {
-    Ok,
-    Error
-};
-
-struct FinanceResult {
-    FinanceResultKind kind = FinanceResultKind::Ok;
-    std::string message;
-    double value = 0.0;
-};
-
-double npv(const CashFlowList& cf, double rate_percent);
-std::optional<double> irr(const CashFlowList& cf, double guess_percent = 10.0);
-
-FinanceResult cmd_cflo_input(CashFlowState& st, double amount, int count = 1);
-FinanceResult cmd_cflo_npv(CashFlowState& st, double rate_percent);
-FinanceResult cmd_cflo_irr(CashFlowState& st, double guess_percent = 10.0);
-
-} // namespace db48x::finance
+#endif // CASHFLOW_H

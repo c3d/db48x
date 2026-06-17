@@ -240,6 +240,7 @@ object_p directory::store(object_g name, object_g value)
     case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
+    case ID_CashFlowData:
     case ID_Equation:
     case ID_PlotParameters:
     case ID_AlgebraConfiguration:
@@ -584,6 +585,7 @@ object_p directory::recall(object_p name) const
     case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
+    case ID_CashFlowData:
     case ID_Equation:
     case ID_PlotParameters:
     case ID_AlgebraConfiguration:
@@ -730,6 +732,7 @@ size_t directory::purge(object_p name, bool allowdir)
     case ID_Pict:
     case ID_StatsData:
     case ID_StatsParameters:
+    case ID_CashFlowData:
     case ID_Equation:
     case ID_PlotParameters:
     case ID_AlgebraConfiguration:
@@ -958,6 +961,7 @@ bool directory::order(object_p orderobj)
             case ID_Pict:
             case ID_StatsData:
             case ID_StatsParameters:
+            case ID_CashFlowData:
             case ID_Equation:
             case ID_PlotParameters:
             case ID_AlgebraConfiguration:

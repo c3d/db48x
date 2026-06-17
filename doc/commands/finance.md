@@ -159,3 +159,133 @@ n Amort →V3
 
 @ Expecting [ -11 554.09 -445.91 0. ]
 ```
+
+
+
+
+# Cash flow modeling
+
+DB48x implements HP-17bii-style cash-flow modeling (CFLO). A cash-flow series is
+an ordinary list where each element is either a number (a single flow) or a
+two-element list `{ amount count }` describing `count` identical consecutive
+flows (the HP "#TIMES" / `Nj` feature). The first flow is the period-zero flow
+`CF0`, the next is `CF1`, and so on.
+
+The active cash-flow series is stored in the reserved `CFData` variable, in the
+same way statistics use the statistics data variable. The `CashFlowMenu` (also
+reachable as `CFLO`) gives interactive access to the editing and computation
+commands. The same commands can be used programmatically by leaving a list on
+the stack.
+
+All rates used by `NPV` and `IRR` are *periodic* percentages, exactly like the
+HP 17bii. `NPV` results are rounded according to the `FinanceRounding` setting;
+`IRR` is returned at full precision.
+
+
+## NPV
+
+Compute the net present value of a cash-flow series for a periodic interest
+rate, given as a percentage:
+
+`NPV = Σ CFt / (1 + I%/100)^t`, for `t` from `0` to the last period.
+
+The interest rate is taken from the first level of the stack. The cash-flow
+series is taken from the second level of the stack if it is a list, otherwise
+from the active `CFData` variable.
+
+```rpl
+@ CF0=-100, CF1=60, CF2=60 at 10% per period
+{ -100 60 60 } 10 NPV
+@ Expecting 4.13
+```
+
+
+## IRR
+
+Compute the internal rate of return of a cash-flow series, i.e. the periodic
+interest rate (in percent) for which the net present value is zero.
+
+The cash-flow series is taken from the first level of the stack if it is a list,
+otherwise from the active `CFData` variable. The series must contain at least
+one positive and one negative flow, otherwise a `No internal rate of return`
+error is reported.
+
+```rpl
+@ CF0=-100, CF1=60, CF2=60
+{ -100 60 60 } IRR
+@ Expecting 13.0662
+```
+
+
+## CFData
+
+The reserved variable holding the active cash-flow series. Evaluating `CFData`
+recalls the current series onto the stack. It is also available as the `Data`
+soft key of the `CashFlowMenu`.
+
+
+## CFAdd
+
+Append a single cash flow to the active series (`CF+` soft key).
+
+```rpl
+CFClear   -20000 CFAdd   5000 CFAdd
+@ Active series is now { -20000 5000 }
+```
+
+
+## CFAddTimes
+
+Append a repeated cash flow `{ amount count }` to the active series, where the
+amount is taken from level 2 and the repetition count from level 1 (`CFxN` soft
+key). This is the HP "#TIMES" / `Nj` feature.
+
+```rpl
+CFClear   -20000 CFAdd   9000 3 CFAddTimes
+@ Active series is now { -20000 { 9000 3 } }
+```
+
+
+## CFDrop
+
+Remove the last entry of the active series and return it on the stack (`CF-`
+soft key).
+
+
+## CFInsert
+
+Insert a cash flow before a given 1-based index in the active series. The amount
+is taken from level 2 and the index from level 1 (`CFINS` soft key).
+
+
+## CFClear
+
+Clear the active cash-flow series (`Clr` soft key).
+
+
+## CFStore
+
+Save the active cash-flow series under a name (`STO` soft key, also `CFName`).
+
+```rpl
+@ Save the current series as MYCF
+'MYCF' CFStore
+```
+
+
+## CFRecall
+
+Load a named series as the active cash-flow series (`RCL` soft key, also
+`CFGet`).
+
+```rpl
+@ Make MYCF the active series
+'MYCF' CFRecall
+```
+
+
+## CashFlowMenu
+
+Display the cash-flow editor menu. It is also available as `CFLO`. The menu
+gives access to `CFAdd`, `CFAddTimes`, `CFDrop`, `CFInsert`, `CFClear`,
+`CFData`, `NPV`, `IRR`, `CFStore` and `CFRecall`.

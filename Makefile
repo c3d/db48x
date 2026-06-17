@@ -153,6 +153,7 @@ SOURCES =							\
 	src/arithmetic.cc					\
 	src/array.cc						\
 	src/bignum.cc						\
+	src/cashflow.cc						\
 	src/catalog.cc						\
 	src/characters.cc					\
 	src/command.cc						\
