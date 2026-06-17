@@ -974,6 +974,18 @@ ALIAS(TVMAmortTable, "AmortizationSchedule")
 CMD(TVMRoot)
 CMD(TVMEquation)
 
+// Cash-flow modeling (HP-17bii CFLO)
+NAMED(CashFlowData,     "CFData")
+CMD(NPV)                                ALIAS(NPV,      "NetPresentValue")
+CMD(IRR)                                ALIAS(IRR,      "InternalRateOfReturn")
+OP(CFAdd,               "CF+")
+NAMED(CFAddTimes,       "CFxN")
+OP(CFDrop,              "CF-")
+NAMED(CFInsert,         "CFINS")
+CMD(CFClear)
+NAMED(CFStore,          "CFSTO")        ALIAS(CFStore,  "CFName")
+NAMED(CFRecall,         "CFRCL")        ALIAS(CFRecall, "CFGet")
+
 
 
 // ============================================================================
@@ -1401,6 +1413,7 @@ CMD(CustomMenu)                 ALIAS(CustomMenu, "Cst")
 CMD(ToggleCustomMenu)
 CMD(SolvingMenu)
 CMD(FinanceSolverMenu)          ALIAS(FinanceSolverMenu, "TVM")
+CMD(CashFlowMenu)               ALIAS(CashFlowMenu, "CFLO")
 CMD(ToolsMenu)
 CMD(Catalog)
 

@@ -14698,6 +14698,58 @@ void tests::financial_functions()
                 "+FV·(1+I%Yr÷(100·PYr))↑(-n)+PV'");
     step("Cleanup")
         .test(CLEAR, "{ PYr n I%Yr Pmt FV PV } PURGE", ENTER).noerror();
+
+    step("Cash flow NPV from a list on the stack")
+        .test(CLEAR, "{ -100 60 60 } 10 NPV", ENTER)
+        .expect("4.13");
+    step("Cash flow IRR from a list on the stack")
+        .test(CLEAR, "4 FIX", ENTER).noerror()
+        .test(CLEAR, "{ -100 60 60 } IRR", ENTER)
+        .expect("13.0662")
+        .test(CLEAR, "STD", ENTER).noerror();
+    step("Build the active cash flow list with CF+")
+        .test(CLEAR, "CFClear", ENTER).noerror()
+        .test(CLEAR, "-100 CF+", ENTER).noerror()
+        .test(CLEAR, "60 CF+", ENTER).noerror()
+        .test(CLEAR, "60 CF+", ENTER).noerror()
+        .test(CLEAR, "CFData", ENTER)
+        .expect("{ -100 60 60 }");
+    step("NPV uses the active cash flow list when no list is supplied")
+        .test(CLEAR, "10 NPV", ENTER)
+        .expect("4.13");
+    step("Repeated cash flows with CFxN match the expanded list")
+        .test(CLEAR, "CFClear", ENTER).noerror()
+        .test(CLEAR, "-100 CF+", ENTER).noerror()
+        .test(CLEAR, "60 2 CFxN", ENTER).noerror()
+        .test(CLEAR, "CFData", ENTER)
+        .expect("{ -100 { 60 2 } }")
+        .test(CLEAR, "10 NPV", ENTER)
+        .expect("4.13");
+    step("CFDrop removes and returns the last cash flow")
+        .test(CLEAR, "CFDrop", ENTER)
+        .expect("{ 60 2 }")
+        .test(CLEAR, "CFData", ENTER)
+        .expect("{ -100 }");
+    step("Save and recall a named cash flow list")
+        .test(CLEAR, "CFClear", ENTER).noerror()
+        .test(CLEAR, "-100 CF+", ENTER).noerror()
+        .test(CLEAR, "60 CF+", ENTER).noerror()
+        .test(CLEAR, "60 CF+", ENTER).noerror()
+        .test(CLEAR, "'MYCF' CFStore", ENTER).noerror()
+        .test(CLEAR, "CFClear", ENTER).noerror()
+        .test(CLEAR, "'MYCF' CFRecall", ENTER).noerror()
+        .test(CLEAR, "10 NPV", ENTER)
+        .expect("4.13")
+        .test(CLEAR, "'MYCF' PURGE", ENTER).noerror();
+    step("IRR requires mixed signs")
+        .test(CLEAR, "{ 100 60 60 } IRR", ENTER)
+        .error("No internal rate of return");
+    step("NPV reports an error on an empty cash flow list")
+        .test(CLEAR, "CFClear", ENTER).noerror()
+        .test(CLEAR, "10 NPV", ENTER)
+        .error("Empty cash flow list");
+    step("Cash flow cleanup")
+        .test(CLEAR, "'CFData' PURGE", ENTER).noerror();
 }
 
 
