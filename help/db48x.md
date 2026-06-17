@@ -7297,6 +7297,14 @@ Mercury gravitational parameter
 
 It is measured by radio tracking of spacecraft (Mariner 10, MESSENGER). [Reference 4](#reference-4)
 
+### M☿ constant
+
+Mercury mass
+
+Mercury's mass, derived from the gravitational parameter `GM☿` and the measured
+gravitational constant `G` as `GM☿/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req☿ constant
 
 Mercury equatorial radius
@@ -7346,6 +7354,13 @@ Mercury sidereal rotation period
 Mercury's sidereal rotation period is a measured quantity. It is the true time
 it takes to spin 360° on its axis. Mercury is in a 3:2 spin-orbit resonance with
 the Sun, rotating three times for every two orbits. [Reference 22](#reference-22)
+
+### ωrot☿ constant
+
+Mercury rotation angular velocity
+
+Mercury's sidereal rotation angular velocity, computed as `2π/Prot☿` from the
+sidereal rotation period. The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ☿ constant
 
@@ -7426,6 +7441,14 @@ Venus gravitational parameter
 Venus's gravitational parameter, measured by radio tracking of spacecraft
 (Magellan, Venus Express). [Reference 4](#reference-4)
 
+### M♀ constant
+
+Venus mass
+
+Venus's mass, derived from the gravitational parameter `GM♀` and the measured
+gravitational constant `G` as `GM♀/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♀ constant
 
 Venus equatorial radius
@@ -7476,6 +7499,15 @@ Venus sidereal rotation period
 Measured. Venus's sidereal rotation period is the true time it takes to spin 360°
 on its axis. Venus rotates retrograde (opposite to its orbital motion), with a
 rotation period longer than its orbital period. [Reference 22](#reference-22)
+
+### ωrot♀ constant
+
+Venus rotation angular velocity
+
+Venus's sidereal rotation angular velocity, computed as `2π/Prot♀` from the
+sidereal rotation period. The value is negative because Venus rotates retrograde
+(opposite to its orbital motion); the uncertainty uses the positive magnitude.
+The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ♀ constant
 
@@ -7552,6 +7584,14 @@ Earth gravitational parameter
 Exact nominal value (IAU 2015). Earth's gravitational parameter. An exact nominal
 value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
+### M♁ constant
+
+Earth mass
+
+Earth's mass, derived from the gravitational parameter `GM♁` and the measured
+gravitational constant `G` as `GM♁/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
+
 ### Req♁ constant
 
 Earth equatorial radius
@@ -7602,6 +7642,13 @@ Earth sidereal rotation period
 
 Measured. Earth's sidereal rotation period (one sidereal day), the time for one
 rotation relative to the fixed stars. [Reference 24](#reference-24)
+
+### ωrot♁ constant
+
+Earth rotation angular velocity
+
+Earth's sidereal rotation angular velocity, computed as `2π/Prot♁` from the
+sidereal rotation period. The unit is radians per second (`r/s`). [Reference 24](#reference-24)
 
 ### ϵ♁ constant
 
@@ -7683,6 +7730,14 @@ Moon gravitational parameter
 Measured. Moon's gravitational parameter, measured by lunar laser ranging
 and spacecraft radio tracking. [Reference 4](#reference-4)
 
+### M☽ constant
+
+Moon mass
+
+The Moon's mass, derived from the gravitational parameter `GM☽` and the measured
+gravitational constant `G` as `GM☽/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req☽ constant
 
 Moon equatorial radius
@@ -7733,6 +7788,14 @@ Moon sidereal rotation period
 Measured. Moon's sidereal rotation period is the true time it takes to spin
 360° on its axis. The Moon is tidally locked to Earth, so its rotation period
 equals its orbital period. [Reference 22](#reference-22)
+
+### ωrot☽ constant
+
+Moon rotation angular velocity
+
+The Moon's sidereal rotation angular velocity, computed as `2π/Prot☽` from the
+sidereal rotation period. Because the Moon is tidally locked, this equals its
+orbital mean motion. The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ☽ constant
 
@@ -7820,6 +7883,14 @@ Mars gravitational parameter
 Measured. Mars system gravitational parameter, including the contribution of
 its moons Phobos and Deimos, measured by spacecraft radio tracking. [Reference 4](#reference-4)
 
+### M♂ constant
+
+Mars mass
+
+Mars's mass, derived from the gravitational parameter `GM♂` and the measured
+gravitational constant `G` as `GM♂/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♂ constant
 
 Mars equatorial radius
@@ -7868,6 +7939,13 @@ Mars sidereal rotation period
 Measured. Mars's sidereal rotation period is the true time it takes to spin
 360° on its axis. A Martian day (sol) is very similar in length to an Earth day.
 [Reference 22](#reference-22)
+
+### ωrot♂ constant
+
+Mars rotation angular velocity
+
+Mars's sidereal rotation angular velocity, computed as `2π/Prot♂` from the
+sidereal rotation period. The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ♂ constant
 
@@ -7945,6 +8023,14 @@ Jupiter gravitational parameter
 Exact nominal value (IAU 2015). Jupiter system gravitational parameter.
 An exact nominal value defined by the IAU (2015). [Particle Data Group 2023](#particle-data-group-2023)
 
+### M♃ constant
+
+Jupiter mass
+
+Jupiter's mass, derived from the gravitational parameter `GM♃` and the measured
+gravitational constant `G` as `GM♃/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Particle Data Group 2023](#particle-data-group-2023) [Reference 5](#reference-5)
+
 ### Req♃ constant
 
 Jupiter equatorial radius
@@ -7997,6 +8083,13 @@ Jupiter sidereal rotation period
 Measured. Jupiter's sidereal rotation period is the true time it takes to
 spin 360° on its axis (System III, based on radio emissions from its
 magnetosphere). [Reference 22](#reference-22)
+
+### ωrot♃ constant
+
+Jupiter rotation angular velocity
+
+Jupiter's sidereal rotation angular velocity, computed as `2π/Prot♃` from the
+sidereal rotation period (System III). The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ♃ constant
 
@@ -8075,6 +8168,14 @@ Saturn gravitational parameter
 Measured. Saturn system gravitational parameter, measured by radio
 tracking of the Cassini spacecraft. [Reference 4](#reference-4)
 
+### M♄ constant
+
+Saturn mass
+
+Saturn's mass, derived from the gravitational parameter `GM♄` and the measured
+gravitational constant `G` as `GM♄/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♄ constant
 
 Saturn equatorial radius
@@ -8126,6 +8227,13 @@ Saturn sidereal rotation period
 Measured. Saturn's sidereal rotation period is the true time it takes
 to spin 360° on its axis (System III, based on Cassini radio
 measurements). [Reference 22](#reference-22)
+
+### ωrot♄ constant
+
+Saturn rotation angular velocity
+
+Saturn's sidereal rotation angular velocity, computed as `2π/Prot♄` from the
+sidereal rotation period (System III). The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ♄ constant
 
@@ -8204,6 +8312,14 @@ Uranus gravitational parameter
 Measured. Uranus system gravitational parameter, measured by Voyager
 2 radio tracking. [Reference 4](#reference-4)
 
+### M⛢ constant
+
+Uranus mass
+
+Uranus's mass, derived from the gravitational parameter `GM⛢` and the measured
+gravitational constant `G` as `GM⛢/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req⛢ constant
 
 Uranus equatorial radius
@@ -8254,6 +8370,15 @@ Uranus sidereal rotation period
 Measured. Uranus's sidereal rotation period is the true time it takes
 to spin 360° on its axis. Uranus rotates retrograde relative to its
 orbital motion. [Reference 22](#reference-22)
+
+### ωrot⛢ constant
+
+Uranus rotation angular velocity
+
+Uranus's sidereal rotation angular velocity, computed as `2π/Prot⛢` from the
+sidereal rotation period. The value is negative because Uranus rotates retrograde
+relative to its orbital motion; the uncertainty uses the positive magnitude. The
+unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ⛢ constant
 
@@ -8334,6 +8459,14 @@ Neptune gravitational parameter
 Measured. Neptune system gravitational parameter, measured by Voyager
 2 radio tracking and Hubble Space Telescope astrometry of Triton. [Reference 4](#reference-4)
 
+### M♆ constant
+
+Neptune mass
+
+Neptune's mass, derived from the gravitational parameter `GM♆` and the measured
+gravitational constant `G` as `GM♆/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♆ constant
 
 Neptune equatorial radius
@@ -8384,6 +8517,13 @@ Neptune sidereal rotation period
 Measured. Neptune's sidereal rotation period is the true time it takes
 to spin 360° on its axis (System III, from Voyager 2 radio measurements).
 [Reference 22](#reference-22)
+
+### ωrot♆ constant
+
+Neptune rotation angular velocity
+
+Neptune's sidereal rotation angular velocity, computed as `2π/Prot♆` from the
+sidereal rotation period (System III). The unit is radians per second (`r/s`). [Reference 22](#reference-22)
 
 ### ϵ♆ constant
 
@@ -8464,6 +8604,14 @@ Pluto gravitational parameter
 Measured. Pluto system gravitational parameter, measured by New Horizons
 radio tracking. [Reference 4](#reference-4)
 
+### M♇ constant
+
+Pluto mass
+
+Pluto's mass, derived from the gravitational parameter `GM♇` and the measured
+gravitational constant `G` as `GM♇/G`. The relative uncertainty is carried as
+`ⓇG` (the dominant term), so the mass self-corrects whenever `G` is updated. [Reference 4](#reference-4) [Reference 5](#reference-5)
+
 ### Req♇ constant
 
 Pluto equatorial radius
@@ -8512,6 +8660,15 @@ Pluto sidereal rotation period
 Measured. Pluto's sidereal rotation period is the true time it takes to
 spin 360° on its axis. Pluto rotates retrograde and is tidally locked to
 its moon Charon. [Reference 26](#reference-26)
+
+### ωrot♇ constant
+
+Pluto rotation angular velocity
+
+Pluto's sidereal rotation angular velocity, computed as `2π/Prot♇` from the
+sidereal rotation period. The value is negative because Pluto rotates retrograde;
+the uncertainty uses the positive magnitude. The unit is radians per second
+(`r/s`). [Reference 26](#reference-26)
 
 ### ϵ♇ constant
 
@@ -8656,6 +8813,14 @@ The Solar sidereal rotation period at the equator (System I) is measured
 by tracking surface features using Doppler techniques. It is the true
 time it takes to spin 360° on its axis. [Reference 20](#reference-20) [Reference 21](#reference-21)
 
+
+### ωrot☉ constant
+
+Solar rotation angular velocity
+
+The Sun's sidereal rotation angular velocity at the equator (System I), computed
+as `2π/Prot☉` from the sidereal rotation period. The unit is radians per second
+(`r/s`). [Reference 20](#reference-20) [Reference 21](#reference-21)
 
 ## Cosmology constants
 
