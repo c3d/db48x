@@ -7721,6 +7721,74 @@ the current date (early January each year). The computation is carried out in
 Julian Day Number and converted to a date with `JDN→`. [Materials 22](#materials-22)
 
 
+### a♁GPS constant
+
+Earth equatorial radius (WGS-84)
+
+The semi-major axis of the WGS-84 reference ellipsoid, a defining constant of the
+World Geodetic System 1984 used by GPS. Exact by definition. [WGS-84](#wgs-84)
+
+### f♁GPS constant
+
+Earth flattening (WGS-84)
+
+The flattening of the WGS-84 reference ellipsoid, `1/298.257223563`, a defining
+constant. Exact by definition. [WGS-84](#wgs-84)
+
+### ω♁GPS constant
+
+Earth nominal mean angular velocity (WGS-84)
+
+The nominal mean angular velocity of the Earth in the WGS-84 system. Exact by
+definition, and distinct from the sidereal value `ωrot♁` derived from `Prot♁`. [WGS-84](#wgs-84)
+
+### GM♁GPS constant
+
+Earth gravitational parameter (WGS-84)
+
+The geocentric gravitational constant of the WGS-84 system, including the mass of
+the Earth's atmosphere. Exact by definition, and distinct from the IAU nominal
+`GM♁`. [WGS-84](#wgs-84)
+
+### e12♁GPS constant
+
+Earth first eccentricity squared (WGS-84)
+
+The square of the first eccentricity of the WGS-84 reference ellipsoid, computed
+from the flattening as `2·f♁GPS−f♁GPS²`. This is an ellipsoid (shape) eccentricity,
+not the orbital eccentricity `e♁`. [WGS-84](#wgs-84)
+
+### e22♁GPS constant
+
+Earth second eccentricity squared (WGS-84)
+
+The square of the second eccentricity of the WGS-84 reference ellipsoid, computed
+from the first as `e12♁GPS/(1−e12♁GPS)`. An ellipsoid eccentricity, distinct from
+the orbital eccentricity `e♁`. [WGS-84](#wgs-84)
+
+### Ytrop♁ constant
+
+Tropical year
+
+The tropical (seasonal) year, equinox to equinox, about 365.24219 days at J2000.
+It is distinct from `Porb♁` (the anomalistic year, perihelion to perihelion, used
+by `T₀♁`) and from the calendar years `YJul♁` and `YGreg♁`. [Reference 24](#reference-24)
+
+### YJul♁ constant
+
+Julian year
+
+The Julian year, exactly 365.25 days. It is the year used to define the
+light-year. [Reference 24](#reference-24)
+
+### YGreg♁ constant
+
+Gregorian mean year
+
+The mean year of the Gregorian calendar, exactly 365.2425 days
+(365 + 1/4 − 1/100 + 1/400). [Reference 24](#reference-24)
+
+
 ## Moon constants
 
 ### GM☽ constant
@@ -9920,6 +9988,10 @@ Particle Data Group (2024). "Review of Particle Physics — Astrophysical Consta
 ### Particle Data Group 2023
 
 Particle Data Group 2023 Prša, A., et al. (2016). "Nominal values for selected solar and planetary quantities: IAU 2015 Resolution B3". The Astronomical Journal, 152(2), 41. arXiv:1605.09788 — DOI: 10.3847/0004-6256/152/2/41
+
+### WGS-84
+
+National Geospatial-Intelligence Agency (2014). Department of Defense World Geodetic System 1984: Its Definition and Relationships with Local Geodetic Systems, NGA.STND.0036_1.0.0_WGS84, 3rd ed. (Defining parameters of the WGS-84 reference ellipsoid used by GPS.)
 
 ### Reference 4
 
