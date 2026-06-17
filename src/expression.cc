@@ -4189,7 +4189,7 @@ expression_p expression::derivative(symbol_r sym) const
 
         sin(X)>>indep,          (X>>indep)*cos(X),
         cos(X)>>indep,          -(X>>indep)*sin(X),
-        tan(X)>>indep,          (X>>indep)/sq(cos(x)),
+        tan(X)>>indep,          (X>>indep)/sq(cos(X)),
         sec(X)>>indep,          (X>>indep)*sec(X)*tan(X),
         csc(X)>>indep,          -(X>>indep)*csc(X)*cot(X),
         cot(X)>>indep,          -(X>>indep)*sq(csc(X)),
