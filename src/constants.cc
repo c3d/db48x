@@ -901,7 +901,7 @@ static const cstring basic_constants[] =
                 "  0_S "
                 "  0 "
                 "  7.748E-5_S ]",
-    // *Fermi reduced coupling constant - Measurement [2]
+    // *Fermi reduced coupling constant - Measurement [0]
     "G0F",       "[ 1.1663787E-5_GeV^-2 "
                 "  0.0000006E-5_GeV^-2 "
                 "  'ROUND(UBASE(ABS(ⓈG0F/ⒸG0F));-2)' ]",
@@ -944,7 +944,7 @@ static const cstring basic_constants[] =
     "ΔfCs",     "[ 9192631770_Hz "
                 "  0_Hz "
                 "  0 ]",
-    // *Weak mixing angle - Calculation from measurement [2]
+    // *Weak mixing angle - Calculation from measurement [0]
     "θw",       "[ 'ROUND(CONVERT(ASIN(√(0.22305));1_°);XPON(UVAL(Ⓡθw*ASIN(√(0.22305))))-XPON(UVAL(ASIN(√(0.22305))))-2)' "
                    "'CONVERT(ROUND((ASIN(√(0.22305+0.00023))-ASIN(√(0.22305-0.00023)))/2;-2);1_°)' "
                 "  'ROUND(UBASE(ABS(Ⓢθw/CONVERT(ASIN(√(0.22305));1_°)));-2)' "
@@ -1252,7 +1252,7 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☿/ⒸProt☿;-2)' "
                 "  5.067E6_s ]",
-    // *Mercury orbital period - Computed [M22]
+    // *Mercury orbital period - Computed [27]
     "Porb☿",    "[ 7600551.8_s "
                 "  0_s "
                 "  0 ]",
@@ -1290,7 +1290,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω☿/Ⓒω☿;-2)' "
                 "  29.12_° ]",
-    // *Mercury time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Mercury time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀☿",      "[ 'JDN→(IFTE((JDN(DateTime)-2461178.915934)/UVAL(CONVERT(ⒸPorb☿;1_d))≥1;2461178.915934+IP((JDN(DateTime)-2461178.915934)/UVAL(CONVERT(ⒸPorb☿;1_d)))*UVAL(CONVERT(ⒸPorb☿;1_d));2461178.915934))' "
                 "  0.0080_d 0 ]",
 
@@ -1339,7 +1339,7 @@ static const cstring basic_constants[] =
                 "  8.64_s "
                 "  'ROUND(ⓈProt♀/ⒸProt♀;-2)' "
                 "  2.100E7_s ]",
-    // *Venus orbital period - Computed [M22]
+    // *Venus orbital period - Computed [27]
     "Porb♀",    "[ 19414071.4_s "
                 "  0_s "
                 "  0 ]",
@@ -1378,7 +1378,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♀/Ⓒω♀;-2)' "
                 "  54.88_° ]",
-    // *Venus time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Venus time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀♀",      "[ 'JDN→(IFTE((JDN(DateTime)-2461175.615653)/UVAL(CONVERT(ⒸPorb♀;1_d))≥1;2461175.615653+IP((JDN(DateTime)-2461175.615653)/UVAL(CONVERT(ⒸPorb♀;1_d)))*UVAL(CONVERT(ⒸPorb♀;1_d));2461175.615653))' "
                 "  0.11_d 0 ]",
 
@@ -1424,7 +1424,7 @@ static const cstring basic_constants[] =
                 "  0.0001_s "
                 "  'ROUND(ⓈProt♁/ⒸProt♁;-2)' "
                 "  8.616E4_s ]",
-    // *Earth orbital period - Computed [M22]
+    // *Earth orbital period - Computed [27]
     "Porb♁",    "[ 31558956.5_s "
                 "  0_s "
                 "  0 ]",
@@ -1463,7 +1463,7 @@ static const cstring basic_constants[] =
                 "  0.00001_° "
                 "  'ROUND(Ⓢω♁/Ⓒω♁;-2)' "
                 "  114.2_° ]",
-    // *Earth time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Earth time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀♁",      "[ 'JDN→(IFTE((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d))≥1;2461044.220333+IP((JDN(DateTime)-2461044.220333)/UVAL(CONVERT(ⒸPorb♁;1_d)))*UVAL(CONVERT(ⒸPorb♁;1_d));2461044.220333))' "
                 "  0.83_d 0 ]",
 
@@ -1554,7 +1554,7 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt☽/ⒸProt☽;-2)' "
                 "  2.361E6_s ]",
-    // *Moon orbital period - anomalistic month (perigee to perigee) [M22]
+    // *Moon orbital period - anomalistic month (perigee to perigee) [27]
     "Porb☽",    "[ 2380713.11_s "
                 "  97165_s "
                 "  0 ]",
@@ -1593,7 +1593,7 @@ static const cstring basic_constants[] =
                 "  'ROUND(Ⓢω☽/Ⓒω☽;-2)' "
                 "  318.2_° ]",
     // *Moon time of perigee passage - PeriSel (full Meeus ch.50); unc = ch.50
-    //  method accuracy vs true perigee ~5 min (1σ), up to ~30 min rare [M22]
+    //  method accuracy vs true perigee ~5 min (1σ), up to ~30 min rare [27]
     "T₀☽",      "[ 'JDN→(ⓁPeriSel(→Num(JDN(DateTime))))' "
                 "  300_s "
                 "  0 ]",
@@ -1643,7 +1643,7 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♂/ⒸProt♂;-2)' "
                 "  8.864E4_s ]",
-    // *Mars orbital period - Computed [M22]
+    // *Mars orbital period - Computed [27]
     "Porb♂",    "[ 59356065.6_s "
                 "  0_s "
                 "  0 ]",
@@ -1680,7 +1680,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♂/Ⓒω♂;-2)' "
                 "  286.5_° ]",
-    // *Mars time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Mars time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀♂",      "[ 'JDN→(IFTE((JDN(DateTime)-2461125.798009)/UVAL(CONVERT(ⒸPorb♂;1_d))≥1;2461125.798009+IP((JDN(DateTime)-2461125.798009)/UVAL(CONVERT(ⒸPorb♂;1_d)))*UVAL(CONVERT(ⒸPorb♂;1_d));2461125.798009))' "
                 "  0.16_d 0 ]",
 
@@ -1725,7 +1725,7 @@ static const cstring basic_constants[] =
     "Prot♃",    "[ 35730_s "
                 "  1_s "
                 "  'ROUND(ⓈProt♃/ⒸProt♃;-2)' ]",
-    // *Jupiter orbital period - Computed, anomalistic perigee interval [M22]
+    // *Jupiter orbital period - Computed, anomalistic perigee interval [27]
     "Porb♃",    "[ 374360783_s "
                 "  0_s "
                 "  0 ]",
@@ -1762,7 +1762,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♃/Ⓒω♃;-2)' "
                 "  273.9_° ]",
-    // *Jupiter time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Jupiter time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀♃",      "[ 'JDN→(IFTE((JDN(DateTime)-2459964.991260)/UVAL(CONVERT(ⒸPorb♃;1_d))≥1;2459964.991260+IP((JDN(DateTime)-2459964.991260)/UVAL(CONVERT(ⒸPorb♃;1_d)))*UVAL(CONVERT(ⒸPorb♃;1_d));2459964.991260))' "
                 "  8.9_d 0 ]",
 
@@ -1811,7 +1811,7 @@ static const cstring basic_constants[] =
                 "  50_s "
                 "  'ROUND(ⓈProt♄/ⒸProt♄;-2)' "
                 "  3.836E4_s ]",
-    // *Saturn orbital period - Computed, anomalistic perigee interval [M22]
+    // *Saturn orbital period - Computed, anomalistic perigee interval [27]
     "Porb♄",    "[ 928565359_s "
                 "  0_s "
                 "  0 ]",
@@ -1848,7 +1848,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♄/Ⓒω♄;-2)' "
                 "  339.4_° ]",
-    // *Saturn time of perihelion passage - Computed via IFTE from Tp and Porb [M22]
+    // *Saturn time of perihelion passage - Computed via IFTE from Tp and Porb [27]
     "T₀♄",      "[ 'JDN→(IFTE((JDN(DateTime)-2452847.154242)/UVAL(CONVERT(ⒸPorb♄;1_d))≥1;2452847.154242+IP((JDN(DateTime)-2452847.154242)/UVAL(CONVERT(ⒸPorb♄;1_d)))*UVAL(CONVERT(ⒸPorb♄;1_d));2452847.154242))' "
                 "  17_d 0 ]",
 
@@ -1897,7 +1897,7 @@ static const cstring basic_constants[] =
                 "  10_s "
                 "  'ROUND(ⓈProt⛢/ⒸProt⛢;-2)' "
                 "  6.206E4_s ]",
-    // *Uranus orbital period - Computed, anomalistic perigee interval [M22]
+    // *Uranus orbital period - Computed, anomalistic perigee interval [27]
     "Porb⛢",    "[ 2658520424_s "
                 "  0_s "
                 "  0 ]",
@@ -1934,7 +1934,7 @@ static const cstring basic_constants[] =
                 "  0.000001_° "
                 "  'ROUND(Ⓢω⛢/Ⓒω⛢;-2)' "
                 "  97.00_° ]",
-    // *Uranus time of perihelion passage - Computed via IFTE from Tp and Porb [M22]  (last perihelion 1966; next ~2050)
+    // *Uranus time of perihelion passage - Computed via IFTE from Tp and Porb [27]  (last perihelion 1966; next ~2050)
     "T₀⛢",      "[ 'JDN→(IFTE((JDN(DateTime)-2439264.256742)/UVAL(CONVERT(ⒸPorb⛢;1_d))≥1;2439264.256742+IP((JDN(DateTime)-2439264.256742)/UVAL(CONVERT(ⒸPorb⛢;1_d)))*UVAL(CONVERT(ⒸPorb⛢;1_d));2439264.256742))' "
                 "  40_d 0 ]",
 
@@ -1982,7 +1982,7 @@ static const cstring basic_constants[] =
     "Prot♆",    "[ 58000_s "
                 "  100_s "
                 "  'ROUND(ⓈProt♆/ⒸProt♆;-2)' ]",
-    // *Neptune orbital period - Sidereal [M23]
+    // *Neptune orbital period - Sidereal [28]
     "Porb♆",    "[ 5200416000_s "
                 "  0_s "
                 "  0 ]",
@@ -2019,7 +2019,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♆/Ⓒω♆;-2)' "
                 "  273.2_° ]",
-    // *Neptune time of perihelion passage - Computed via IFTE from Tp and Porb [M21]  (EXCEPTION: Tp = next perihelion 2042; floor-IFTE returns it unchanged)
+    // *Neptune time of perihelion passage - Computed via IFTE from Tp and Porb [4]  (EXCEPTION: Tp = next perihelion 2042; floor-IFTE returns it unchanged)
     "T₀♆",      "[ 'JDN→(IFTE((JDN(DateTime)-2467131.5)/UVAL(CONVERT(ⒸPorb♆;1_d))≥1;2467131.5+IP((JDN(DateTime)-2467131.5)/UVAL(CONVERT(ⒸPorb♆;1_d)))*UVAL(CONVERT(ⒸPorb♆;1_d));2467131.5))' "
                 "  10_d 0 ]",
 
@@ -2067,7 +2067,7 @@ static const cstring basic_constants[] =
                 "  0.1_s "
                 "  'ROUND(ⓈProt♇/ⒸProt♇;-2)' "
                 "  5.519E5_s ]",
-    // *Pluto orbital period - Sidereal [M23]
+    // *Pluto orbital period - Sidereal [28]
     "Porb♇",    "[ 7824384000_s "
                 "  0_s "
                 "  0 ]",
@@ -2105,7 +2105,7 @@ static const cstring basic_constants[] =
                 "  0.001_° "
                 "  'ROUND(Ⓢω♇/Ⓒω♇;-2)' "
                 "  113.8_° ]",
-    // *Pluto time of perihelion passage - Computed via IFTE from Tp and Porb [M21]  (last perihelion 1989)
+    // *Pluto time of perihelion passage - Computed via IFTE from Tp and Porb [4]  (last perihelion 1989)
     "T₀♇",      "[ 'JDN→(IFTE((JDN(DateTime)-2447774.5)/UVAL(CONVERT(ⒸPorb♇;1_d))≥1;2447774.5+IP((JDN(DateTime)-2447774.5)/UVAL(CONVERT(ⒸPorb♇;1_d)))*UVAL(CONVERT(ⒸPorb♇;1_d));2447774.5))' "
                 "  5_d 0 ]",
 
