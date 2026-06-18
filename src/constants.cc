@@ -2202,9 +2202,9 @@ static const cstring basic_constants[] =
     "MG",       "[ 1.5E12_M☉ "
                 "  0.5E12_M☉ "
                 "  'ROUND(ⓈMG/ⒸMG;-2)' ]",
-    // *Milky Way dark matter fraction - Measurement [8] [9]
-    "fDMG",     "[ 0.85 "
-                "  0.05 "
+    // *Milky Way dark matter fraction - Measurement [9] [32]
+    "fDMG",     "[ 0.95 "
+                "  0.02 "
                 "  'ROUND(ⓈfDMG/ⒸfDMG;-2)' ]",
 
     // ------------------------------------------------------------------------
@@ -2225,26 +2225,26 @@ static const cstring basic_constants[] =
     "M●SgrA*",  "[ 4.297E6_M☉ "
                 "  0.012E6_M☉ "
                 "  'ROUND(0.012E6/4.297E6;-2)' ]",
-    // *Andromeda galaxy total mass - Measurement [11] [12]
-    "MNGC224",  "[ 1.5E12_M☉ "
-                "  0.5E12_M☉ "
+    // *Andromeda galaxy total mass - Measurement [35] [36]
+    "MNGC224",  "[ 1.4E12_M☉ "
+                "  0.4E12_M☉ "
                 "  'ROUND(ⓈMNGC224/ⒸMNGC224;-2)' ]",
 
     // ------------------------------------------------------------------------
-    // *Andromeda dark matter fraction - Measurement [11] [12]
-    "fDMNGC224", "[ 0.85 "
-                "  0.05 "
+    // *Andromeda dark matter fraction - Measurement [31] [35]
+    "fDMNGC224", "[ 0.92 "
+                "  0.03 "
                 "  'ROUND(ⓈfDMNGC224/ⒸfDMNGC224;-2)' ]",
-    // *Andromeda galaxy disk radius - Measurement [11]
+    // *Andromeda galaxy disk radius - Measurement [34]
     "RNGC224",  "[ 110000_ly "
                 "  10000_ly "
                 "  'ROUND(ⓈRNGC224/ⒸRNGC224;-2)' "
                 "  1.100E5_ly ]",
-    // *Distance to Andromeda galaxy - Measurement [11]
-    "DNGC224",  "[ 2537000_ly "
-                "  50000_ly "
+    // *Distance to Andromeda galaxy - Measurement [29]
+    "DNGC224",  "[ 2482000_ly "
+                "  36000_ly "
                 "  'ROUND(ⓈDNGC224/ⒸDNGC224;-2)' "
-                "  2.537E6_ly ]",
+                "  2.482E6_ly ]",
     // *Vega gravitational parameter - Measurement [13] [14]
     "GM★Vega",  "[ 1.89E19_m³/s² "
                 "  0.05E19_m³/s² "

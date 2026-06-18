@@ -8969,7 +8969,7 @@ Milky Way dark matter fraction
 
 Measured fraction of dark matter in the Milky Way galaxy. Estimated
 from rotation curves, satellite dynamics, and gravitational lensing.
-[Reference 8](#reference-8) [Reference 9](#reference-9)
+[Reference 9](#reference-9) [Reference 32](#reference-32)
 
 ### RG constant
 
@@ -9008,21 +9008,21 @@ Andromeda galaxy total mass
 
 Measure of the total mass of the Andromeda galaxy (M31, NGC 224), including
 dark matter, estimated from satellite galaxy kinematics and gravitational
-timing arguments. [Reference 11](#reference-11) [Reference 12](#reference-12)
+timing arguments. [Reference 35](#reference-35) [Reference 36](#reference-36)
 
 ### fDMNGC224 constant
 
 Andromeda dark matter fraction
 
 Measured fraction of dark matter in the Andromeda galaxy (M31), estimated
-from dynamical modelling of its halo. [Reference 11](#reference-11) [Reference 12](#reference-12)
+from dynamical modelling of its halo. [Reference 31](#reference-31) [Reference 35](#reference-35)
 
 ### RNGC224 constant
 
 Andromeda galaxy disk radius
 
 Measurement of the mean equatorial radius of the Andromeda galaxy (M31),
-estimated from stellar population surveys. [Reference 11](#reference-11)
+estimated from stellar population surveys. [Reference 34](#reference-34)
 
 ### DNGC224 constant
 
@@ -9030,7 +9030,7 @@ Distance to Andromeda galaxy
 
 Measurement of the mean distance from the Milky Way to the Andromeda
 galaxy (M31), measured using Cepheid variable stars and tip of the red
-giant branch. [Reference 11](#reference-11)
+giant branch. [Reference 29](#reference-29)
 
 ### GM★Vega constant
 
@@ -10023,14 +10023,6 @@ Watkins, L.L., et al. (2019). "Evidence for an Intermediate-Mass Milky Way from 
 
 Posti, L., & Helmi, A. (2019). "Mass and shape of the Milky Way's dark matter halo with globular clusters from Gaia and Hubble". Astronomy & Astrophysics, 621, A56. arXiv:1805.01408 — DOI: 10.1051/0004-6361/201833355
 
-### Reference 11
-
-Peñarrubia, J., et al. (2014). "A timing constraint on the (total) mass of the Large Magellanic Cloud". Monthly Notices of the Royal Astronomical Society, 443(3), 2204–2222. arXiv:1405.4662 — DOI: 10.1093/mnras/stu879
-
-### Reference 12
-
-Veljanoski, J., et al. (2014). "The M31 satellite plane: Evidence for a recent flyby?" Monthly Notices of the Royal Astronomical Society: Letters, 442(1), L86–L90. arXiv:1404.5988 — DOI: 10.1093/mnrasl/slu050
-
 ### Reference 13
 
 Yoon, J., et al. (2010). "A New View of Vega's Composition, Mass, and Age". The Astrophysical Journal, 708(1), 71–79. arXiv:0910.3124 — DOI: 10.1088/0004-637X/708/1/71
@@ -10038,6 +10030,30 @@ Yoon, J., et al. (2010). "A New View of Vega's Composition, Mass, and Age". The 
 ### Reference 14
 
 Aufdenberg, J.P., et al. (2006). "First Results from the CHARA Array. VII. Long-Baseline Interferometric Measurements of Vega Consistent with a Pole-On, Rapidly Rotating Star". The Astrophysical Journal, 645(1), 664–675. arXiv:astro-ph/0603327 — DOI: 10.1086/504149
+
+### Reference 29
+
+Li, S., Riess, A.G., & Yuan, W. (2021). The Astrophysical Journal, 920, 84. DOI: 10.3847/1538-4357/ac1597 — Cepheid distance to M31 (761 ± 11 kpc), source for the distance to the Andromeda galaxy `DNGC224`.
+
+### Reference 31
+
+Sick, J., Courteau, S., Cuillandre, J.-C., et al. (2015). IAU Symposium 311, 82 (arXiv:1410.0017) — M31 stellar mass and mass-to-light modelling, source for the Andromeda dark matter fraction `fDMNGC224`.
+
+### Reference 32
+
+Licquia, T.C., & Newman, J.A. (2015). The Astrophysical Journal, 806, 96. DOI: 10.1088/0004-637X/806/1/96 — Milky Way stellar mass, source for the Milky Way dark matter fraction `fDMG`.
+
+### Reference 34
+
+Nieten, C., Neininger, N., Guélin, M., et al. (2006). Astronomy & Astrophysics, 453, 459. DOI: 10.1051/0004-6361:20035672 — M31 disk extent from CO and HI surveys, source for the Andromeda galaxy disk radius `RNGC224`.
+
+### Reference 35
+
+Watkins, L.L., Evans, N.W., & An, J.H. (2010). Monthly Notices of the Royal Astronomical Society, 406, 264. DOI: 10.1111/j.1365-2966.2010.16708.x — Tracer mass estimators applied to the Andromeda satellite system, source for the Andromeda galaxy total mass `MNGC224` and the dynamical mass in `fDMNGC224`.
+
+### Reference 36
+
+Zhang, X., Chen, B., Chen, P., Sun, J., & Tian, Z. (2024). Monthly Notices of the Royal Astronomical Society, 528, 2653. DOI: 10.1093/mnras/stae025 — Updated dynamical mass of the Andromeda galaxy, corroborating `MNGC224`.
 
 ### Particle physics data
 
