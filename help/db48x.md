@@ -7464,7 +7464,7 @@ the Sun. It is distinct from the rotation period `Prot☿` (the spin period).
 Computed from Meeus' Chapter 38 orbital elements and cross-checked against JPL
 Horizons. The stored value is a mean orbital period, used as an approximation of
 the anomalistic period that governs the recurrence of the perihelion passages
-exposed by `T₀☿`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+exposed by `T₀☿`. [Reference 27](#reference-27) [Reference 23](#reference-23)
 
 ### T₀☿ constant
 
@@ -7475,7 +7475,7 @@ reference perihelion passage (Tp) by whole orbital periods (`Porb☿`) and retur
 the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
 `JDN→`, so the constant displays as a date but tracks "now". Mercury passes
-perihelion roughly four times per year. [Materials 22](#materials-22)
+perihelion roughly four times per year. [Reference 27](#reference-27)
 
 
 ## Venus constants
@@ -7608,7 +7608,7 @@ Sun. It is distinct from the rotation period `Prot♀` (the spin period). Comput
 from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
 The stored value is a mean orbital period, used as an approximation of the
 anomalistic period that governs the recurrence of the perihelion passages
-exposed by `T₀♀`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+exposed by `T₀♀`. [Reference 27](#reference-27) [Reference 23](#reference-23)
 
 ### T₀♀ constant
 
@@ -7618,7 +7618,7 @@ Computed, not stored: `T₀♀` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♀`) and returns
 the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Venus passes perihelion about twice per year. [Materials 22](#materials-22)
+`JDN→`. Venus passes perihelion about twice per year. [Reference 27](#reference-27)
 
 
 ## Earth constants
@@ -7754,7 +7754,7 @@ Earth's sidereal orbital period — the time to complete one revolution around t
 Sun. It is distinct from the rotation period `Prot♁` (the sidereal day). Computed
 from Meeus' Chapter 38 orbital elements and cross-checked against JPL Horizons.
 The stored value is the mean (anomalistic) year used to advance `T₀♁` between
-successive perihelion passages. [Materials 22](#materials-22) [Reference 23](#reference-23)
+successive perihelion passages. [Reference 27](#reference-27) [Reference 23](#reference-23)
 
 ### T₀♁ constant
 
@@ -7764,7 +7764,7 @@ Computed, not stored: `T₀♁` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♁`, the
 anomalistic year) and returns the most recent perihelion passage at or before
 the current date (early January each year). The computation is carried out in
-Julian Day Number and converted to a date with `JDN→`. [Materials 22](#materials-22)
+Julian Day Number and converted to a date with `JDN→`. [Reference 27](#reference-27)
 
 
 ### a♁GPS constant
@@ -7966,7 +7966,7 @@ passages (about 27.55 days). It is distinct from the rotation period `Prot☽` a
 from the sidereal month. Its absolute uncertainty (±1.12 days) is the measured 1σ
 spread of real perigee-to-perigee intervals over 2000–2050, made large by the
 solar perturbation; this variability is why the Moon differs from the planets.
-The value is the standard anomalistic month used by `ⓁPeriSel`. [Materials 22](#materials-22)
+The value is the standard anomalistic month used by `ⓁPeriSel`. [Reference 27](#reference-27)
 
 ### T₀☽ constant
 
@@ -7985,7 +7985,7 @@ accepts either a date or a Julian Day Number as input. The perigee recurs about
 every 27.55 days (`Porb☽`). Validated against observed perigees: JDN 2457706.5 →
 2457706.974818 (2016-Nov-14, k=224) and 2464291.5 → 2464292.421948 (2034-Nov-25,
 k=463). Note: Meeus' worked example at p.357 (JDN 2447442.35) is an apogee, not a
-perigee, and must not be used to check this value. [Materials 22](#materials-22)
+perigee, and must not be used to check this value. [Reference 27](#reference-27)
 
 
 ## Mars constants
@@ -8115,7 +8115,7 @@ Sun. It is distinct from the rotation period `Prot♂` (the spin period, close t
 an Earth day). Computed from Meeus' Chapter 38 orbital elements and cross-checked
 against JPL Horizons. The stored value is a mean orbital period, used as an
 approximation of the anomalistic period that governs the recurrence of the
-perihelion passages exposed by `T₀♂`. [Materials 22](#materials-22) [Reference 23](#reference-23)
+perihelion passages exposed by `T₀♂`. [Reference 27](#reference-27) [Reference 23](#reference-23)
 
 ### T₀♂ constant
 
@@ -8125,7 +8125,7 @@ Computed, not stored: `T₀♂` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♂`) and returns
 the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Mars's orbital period is approximately 1.88 years. [Materials 22](#materials-22)
+`JDN→`. Mars's orbital period is approximately 1.88 years. [Reference 27](#reference-27)
 
 
 ## Jupiter constants
@@ -8260,7 +8260,7 @@ Jupiter's orbital period — the time to complete one revolution around the Sun
 (about 11.86 years). It is distinct from the rotation period `Prot♃` (the ~10 h
 spin period). The value is the anomalistic period (perihelion to perihelion),
 computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
-passages exposed by `T₀♃`. [Materials 22](#materials-22)
+passages exposed by `T₀♃`. [Reference 27](#reference-27)
 
 ### T₀♃ constant
 
@@ -8270,7 +8270,7 @@ Computed, not stored: `T₀♃` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♃`) and returns
 the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Materials 22](#materials-22)
+`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Reference 27](#reference-27)
 
 
 ## Saturn constants
@@ -8404,7 +8404,7 @@ Saturn's orbital period — the time to complete one revolution around the Sun
 (about 29.46 years). It is distinct from the rotation period `Prot♄` (the ~10.7 h
 spin period). The value is the anomalistic period (perihelion to perihelion),
 computed from Meeus' Chapter 38, which governs the recurrence of the perihelion
-passages exposed by `T₀♄`. [Materials 22](#materials-22)
+passages exposed by `T₀♄`. [Reference 27](#reference-27)
 
 ### T₀♄ constant
 
@@ -8414,7 +8414,7 @@ Computed, not stored: `T₀♄` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♄`) and returns
 the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Saturn's orbital period is approximately 29.46 years. [Materials 22](#materials-22)
+`JDN→`. Saturn's orbital period is approximately 29.46 years. [Reference 27](#reference-27)
 
 
 ## Uranus constants
@@ -8549,7 +8549,7 @@ Uranus's orbital period — the time to complete one revolution around the Sun
 (about 84 years). It is distinct from the rotation period `Prot⛢` (the ~17 h spin
 period). The value is the anomalistic period (perihelion to perihelion), computed
 from Meeus' Chapter 38, which governs the recurrence of the perihelion passages
-exposed by `T₀⛢`. [Materials 22](#materials-22)
+exposed by `T₀⛢`. [Reference 27](#reference-27)
 
 ### T₀⛢ constant
 
@@ -8561,7 +8561,7 @@ the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
 `JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
 was in 1966 and the next is around 2050, so the returned value can be decades in
-the past. [Materials 22](#materials-22)
+the past. [Reference 27](#reference-27)
 
 
 ## Neptune constants
@@ -8693,7 +8693,7 @@ Neptune's sidereal orbital period — the time to complete one revolution around
 the Sun (about 165 years). It is distinct from the rotation period `Prot♆` (the
 ~16 h spin period). Tabulated sidereal value from the NASA Planetary Fact Sheet,
 used as an approximation of the anomalistic period that governs the recurrence
-of the perihelion passages exposed by `T₀♆`. [Materials 23](#materials-23)
+of the perihelion passages exposed by `T₀♆`. [Reference 28](#reference-28)
 
 ### T₀♆ constant
 
@@ -8706,7 +8706,7 @@ Julian Day Number and converted to a date with `JDN→`. Neptune is a deliberate
 exception to the "most recent past perihelion" convention: its true last
 perihelion (~1876) is uninformative and hard to source, so Tp is set to the next
 perihelion (2042-09-04). Because that date is in the future, the floor-IFTE
-returns it unchanged, giving the useful upcoming date. [Materials 21](#materials-21)
+returns it unchanged, giving the useful upcoming date. [Reference 4](#reference-4)
 
 
 ## Pluto constants
@@ -8838,7 +8838,7 @@ Pluto's sidereal orbital period — the time to complete one revolution around t
 Sun (about 248 years). It is distinct from the rotation period `Prot♇` (the
 ~6.4 day spin period). Tabulated sidereal value from the NASA Planetary Fact
 Sheet, used as an approximation of the anomalistic period that governs the
-recurrence of the perihelion passages exposed by `T₀♇`. [Materials 23](#materials-23)
+recurrence of the perihelion passages exposed by `T₀♇`. [Reference 28](#reference-28)
 
 ### T₀♇ constant
 
@@ -8850,7 +8850,7 @@ the most recent perihelion passage at or before the current date. The
 computation is carried out in Julian Day Number and converted to a date with
 `JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
 was in 1989 (Sep 05) and the next is around 2237, so the returned value can be
-decades in the past. [Materials 21](#materials-21)
+decades in the past. [Reference 4](#reference-4)
 
 ## Sun constants
 
@@ -9614,7 +9614,7 @@ Dielectric
 Fused silica density
 
 Measured. Volumetric density of amorphous fused silica (vitreous SiO2),
-the primary material for standard optical fibers. [Materials 5](#materials-5) [Materials 7](#materials-7)
+the primary material for standard optical fibers. [Materials 7](#materials-7)
 
 ### nSiO2 constant
 
@@ -10139,6 +10139,14 @@ Williams, J.G., et al. (2014). "Lunar interior properties from the GRAIL mission
 
 Nimmo, F., et al. (2017). "Mean radius and shape of Pluto and Charon from New Horizons images". Icarus, 287, 12–29. arXiv:1603.00821 — DOI: 10.1016/j.icarus.2016.06.027
 
+### Reference 27
+
+Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 38: Perihelion and Aphelion of the Planets; Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Planetary orbital periods derived from the Chapter 38 elements; lunar perigee formula from Chapter 50.)
+
+### Reference 28
+
+Williams, D.R. NASA Planetary Fact Sheet. NASA Space Science Data Coordinated Archive (NSSDCA), Goddard Space Flight Center. [Source](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) Accessed: June 2026. (Sidereal orbital periods of the giant planets, used as an approximation of the anomalistic period.)
+
 ## Materials & Fluids data
 
 ### Materials 1
@@ -10160,10 +10168,6 @@ Wagner, W., & Pruss, A. (2002). "The IAPWS Formulation 1995 for the Thermodynami
 ### Materials 5
 
 Malitson, I.H. (1965). "Interspecimen Comparison of the Refractive Index of Fused Silica". J. Opt. Soc. Am., 55(10), 1205–1209. DOI: 10.1364/JOSA.55.001205
-
-### Materials 6
-
-Palik, E.D. (Ed.) (1985). Handbook of Optical Constants of Solids. Academic Press, New York. ISBN: 0-12-544420-6
 
 ### Materials 7
 
@@ -10215,22 +10219,6 @@ Luke, K., Okawachi, Y., Lamont, M.R.E., Gaeta, A.L., & Lipson, M. (2015). "Broad
 ### Materials 19
 
 NIST Materials Measurement Laboratory (2024). Materials Properties Database. [Source](https://trc.nist.gov) — Accessed: March 2026
-
-### Materials 20
-
-Espenak, F. (2025–2026). Sky Event Almanacs — Greenwich Mean Time. AstroPixels.com. [Source](https://www.astropixels.com/almanac/almanac21) Accessed: April–May 2026. (Source for perihelion/perigee dates of inner planets and Moon.)
-
-### Materials 21
-
-Park, R.S., et al. (2021). "The JPL Planetary and Lunar Ephemerides DE440 and DE441". The Astronomical Journal, 161(3), 105. DOI: 10.3847/1538-3881/abd414 (Source for perihelion dates of outer planets: Jupiter to Pluto.)
-
-### Materials 22
-
-Meeus, J. (1998). Astronomical Algorithms, 2nd ed. Willmann-Bell Inc., Richmond, Virginia. ISBN: 978-0-943396-61-3. Chapter 38: Perihelion and Aphelion of the Planets; Chapter 50: Perigee and Apogee of the Moon, pp. 355–358. (Planetary orbital periods derived from the Chapter 38 elements; lunar perigee formula from Chapter 50.)
-
-### Materials 23
-
-Williams, D.R. NASA Planetary Fact Sheet. NASA Space Science Data Coordinated Archive (NSSDCA), Goddard Space Flight Center. [Source](https://nssdc.gsfc.nasa.gov/planetary/factsheet/) Accessed: June 2026. (Sidereal orbital periods of the giant planets, used as an approximation of the anomalistic period.)
 # Equations library
 
 The DB48X calculator features a library of equations covering mathematics,
