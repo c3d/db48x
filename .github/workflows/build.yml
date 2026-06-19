@@ -77,7 +77,7 @@ jobs:
         path: db48x-macos.zip
 
   build-simulator-linux:
-    name: Build Simulator (Linux)
+    name: Build Simulator (Linux, Ubuntu)
     runs-on: ubuntu-latest
 
     steps:
@@ -115,6 +115,97 @@ jobs:
           db48x
           help/
 
+  build-simulator-linux-fedora:
+    name: Build Simulator (Linux, Fedora)
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+    - name: Install git
+      run: dnf install -y git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        dnf install -y @development-tools gcc gcc-c++ git which python3 \
+          python3-pip glibc-langpack-en \
+          pulseaudio-libs-devel \
+          libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel \
+          pkgconfig xcb-util-wm-devel xcb-util-image-devel \
+          xcb-util-keysyms-devel xcb-util-renderutil-devel
+        python3 -m pip install aqtinstall
+        python3 -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+          --modules qtmultimedia
+        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Run test suite
+      run: ./db48x -H -I -Tall
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-simulator-linux-fedora
+        path: |
+          db48x
+          help/
+
+  build-simulator-linux-arch:
+    name: Build Simulator (Linux, Arch)
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+    - name: Install git
+      run: pacman -Sy --noconfirm git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        pacman -Syu --noconfirm base-devel git which python python-pip \
+          libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+        python -m pip install --break-system-packages aqtinstall
+        python -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+          --modules qtmultimedia
+        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Build simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make sim
+
+    - name: Run test suite
+      run: ./db48x -H -I -Tall
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-simulator-linux-arch
+        path: |
+          db48x
+          help/
+
   build-simulator-windows:
     name: Build Simulator (Windows)
     runs-on: windows-latest
@@ -146,11 +237,11 @@ jobs:
           mingw-w64-x86_64-qt6-translations
           mingw-w64-x86_64-qt6-tools
 
-    - name: Build debug simulator
+    - name: Build simulator
       shell: msys2 {0}
       run: |
         echo "${{ github.run_number }}" > .build_id
-        mingw32-make debug-sim
+        mingw32-make sim
 
     - name: Run test suite
       shell: msys2 {0}
@@ -271,7 +362,7 @@ jobs:
         path: db50x-macos.zip
 
   build-color-simulator-linux:
-    name: Build Color DM32 Simulator (Linux)
+    name: Build Color DM32 Simulator (Linux, Ubuntu)
     runs-on: ubuntu-latest
 
     steps:
@@ -309,6 +400,97 @@ jobs:
           db50x
           help/
 
+  build-color-simulator-linux-fedora:
+    name: Build Color DM32 Simulator (Linux, Fedora)
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+    - name: Install git
+      run: dnf install -y git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        dnf install -y @development-tools gcc gcc-c++ git which python3 \
+          python3-pip glibc-langpack-en \
+          pulseaudio-libs-devel \
+          libxcb-devel mesa-libGL-devel libxkbcommon-x11-devel freetype-devel \
+          pkgconfig xcb-util-wm-devel xcb-util-image-devel \
+          xcb-util-keysyms-devel xcb-util-renderutil-devel
+        python3 -m pip install aqtinstall
+        python3 -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+          --modules qtmultimedia
+        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Run test suite
+      run: ./db50x -H -I -Tall
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-color-simulator-linux-fedora
+        path: |
+          db50x
+          help/
+
+  build-color-simulator-linux-arch:
+    name: Build Color DM32 Simulator (Linux, Arch)
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      QT_QPA_PLATFORM: offscreen
+
+    steps:
+    - name: Install git
+      run: pacman -Sy --noconfirm git
+
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        pacman -Syu --noconfirm base-devel git which python python-pip \
+          libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
+          xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
+        python -m pip install --break-system-packages aqtinstall
+        python -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+          --modules qtmultimedia
+        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+
+    - name: Build color DM32 simulator
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        make color-dm32-sim
+
+    - name: Run test suite
+      run: ./db50x -H -I -Tall
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-color-simulator-linux-arch
+        path: |
+          db50x
+          help/
+
   build-color-simulator-windows:
     name: Build Color DM32 Simulator (Windows)
     runs-on: windows-latest
@@ -340,11 +522,11 @@ jobs:
           mingw-w64-x86_64-qt6-translations
           mingw-w64-x86_64-qt6-tools
 
-    - name: Build debug color DM32 simulator
+    - name: Build color DM32 simulator
       shell: msys2 {0}
       run: |
         echo "${{ github.run_number }}" > .build_id
-        mingw32-make debug-color-dm32-sim
+        mingw32-make color-dm32-sim
 
     - name: Run test suite
       shell: msys2 {0}
@@ -677,9 +859,13 @@ jobs:
     needs: [
       build-simulator-macos,
       build-simulator-linux,
+      build-simulator-linux-fedora,
+      build-simulator-linux-arch,
       build-simulator-windows,
       build-color-simulator-macos,
       build-color-simulator-linux,
+      build-color-simulator-linux-fedora,
+      build-color-simulator-linux-arch,
       build-color-simulator-windows,
       build-android,
       build-color-android,
@@ -736,9 +922,13 @@ jobs:
     needs: [
       build-simulator-macos,
       build-simulator-linux,
+      build-simulator-linux-fedora,
+      build-simulator-linux-arch,
       build-simulator-windows,
       build-color-simulator-macos,
       build-color-simulator-linux,
+      build-color-simulator-linux-fedora,
+      build-color-simulator-linux-arch,
       build-color-simulator-windows,
       build-android,
       build-color-android,

@@ -343,9 +343,12 @@ build-android:
   stage: build
   image: fedora:latest
   before_script:
-    - dnf install -y gcc gcc-c++ make which git java-latest-openjdk-devel wget unzip glib2 dbus-devel pulseaudio-libs-devel freetype-devel pkgconfig python3 python3-pip
-    - export JAVA_HOME=/usr/lib/jvm/java
+    - dnf install -y gcc gcc-c++ make which git wget curl tar unzip glib2 dbus-devel pulseaudio-libs-devel freetype-devel pkgconfig python3 python3-pip
+    - curl -fsSL "https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse" -o /tmp/jdk17.tar.gz
+    - mkdir -p $HOME/jdk17 && tar -xzf /tmp/jdk17.tar.gz -C $HOME/jdk17 --strip-components=1
+    - export JAVA_HOME=$HOME/jdk17
     - export PATH=$JAVA_HOME/bin:$PATH
+    - java -version
     - wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
     - mkdir -p $HOME/android-sdk/cmdline-tools
     - unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
@@ -381,9 +384,12 @@ build-color-android:
   stage: build
   image: fedora:latest
   before_script:
-    - dnf install -y gcc gcc-c++ make which git java-latest-openjdk-devel wget unzip glib2 dbus-devel pulseaudio-libs-devel freetype-devel pkgconfig python3 python3-pip
-    - export JAVA_HOME=/usr/lib/jvm/java
+    - dnf install -y gcc gcc-c++ make which git wget curl tar unzip glib2 dbus-devel pulseaudio-libs-devel freetype-devel pkgconfig python3 python3-pip
+    - curl -fsSL "https://api.adoptium.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/eclipse" -o /tmp/jdk17.tar.gz
+    - mkdir -p $HOME/jdk17 && tar -xzf /tmp/jdk17.tar.gz -C $HOME/jdk17 --strip-components=1
+    - export JAVA_HOME=$HOME/jdk17
     - export PATH=$JAVA_HOME/bin:$PATH
+    - java -version
     - wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
     - mkdir -p $HOME/android-sdk/cmdline-tools
     - unzip -q commandlinetools-linux-11076708_latest.zip -d $HOME/android-sdk/cmdline-tools
