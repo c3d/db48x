@@ -41,6 +41,9 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make sim
 
+    - name: Run test suite
+      run: ./db48x.app/Contents/MacOS/db48x -H -I -Tall
+
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db48x.app
@@ -101,6 +104,9 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make sim
 
+    - name: Run test suite
+      run: ./db48x -H -I -Tall
+
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
       with:
@@ -145,6 +151,10 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         mingw32-make debug-sim
+
+    - name: Run test suite
+      shell: msys2 {0}
+      run: ./db48x.exe -H -I -Tall
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -225,6 +235,9 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
 
+    - name: Run test suite
+      run: ./db50x.app/Contents/MacOS/db50x -H -I -Tall
+
     - name: Deploy Qt dependencies
       run: |
         macdeployqt db50x.app
@@ -285,6 +298,9 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         make color-dm32-sim
 
+    - name: Run test suite
+      run: ./db50x -H -I -Tall
+
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
       with:
@@ -329,6 +345,10 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         mingw32-make debug-color-dm32-sim
+
+    - name: Run test suite
+      shell: msys2 {0}
+      run: ./db50x.exe -H -I -Tall
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
