@@ -42,7 +42,7 @@ jobs:
         make sim
 
     - name: Run test suite
-      run: ./db48x.app/Contents/MacOS/db48x -H -I -Tall
+      run: ./db48x.app/Contents/MacOS/db48x -H -I -w 10000 -r 50 -Tall
 
     - name: Deploy Qt dependencies
       run: |
@@ -105,7 +105,7 @@ jobs:
         make sim
 
     - name: Run test suite
-      run: ./db48x -H -I -Tall
+      run: ./db48x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
@@ -152,7 +152,7 @@ jobs:
         make sim
 
     - name: Run test suite
-      run: ./db48x -H -I -Tall
+      run: ./db48x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
@@ -196,7 +196,7 @@ jobs:
         make sim
 
     - name: Run test suite
-      run: ./db48x -H -I -Tall
+      run: ./db48x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload simulator artifact
       uses: actions/upload-artifact@v7
@@ -245,7 +245,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db48x.exe -H -I -Tall
+      run: ./db48x.exe -H -I -w 10000 -r 50 -Tall
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -327,7 +327,7 @@ jobs:
         make color-dm32-sim
 
     - name: Run test suite
-      run: ./db50x.app/Contents/MacOS/db50x -H -I -Tall
+      run: ./db50x.app/Contents/MacOS/db50x -H -I -w 10000 -r 50 -Tall
 
     - name: Deploy Qt dependencies
       run: |
@@ -390,7 +390,7 @@ jobs:
         make color-dm32-sim
 
     - name: Run test suite
-      run: ./db50x -H -I -Tall
+      run: ./db50x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
@@ -437,7 +437,7 @@ jobs:
         make color-dm32-sim
 
     - name: Run test suite
-      run: ./db50x -H -I -Tall
+      run: ./db50x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
@@ -481,7 +481,7 @@ jobs:
         make color-dm32-sim
 
     - name: Run test suite
-      run: ./db50x -H -I -Tall
+      run: ./db50x -H -I -w 10000 -r 50 -Tall
 
     - name: Upload color simulator artifact
       uses: actions/upload-artifact@v7
@@ -530,7 +530,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db50x.exe -H -I -Tall
+      run: ./db50x.exe -H -I -w 10000 -r 50 -Tall
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
