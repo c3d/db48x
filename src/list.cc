@@ -2426,10 +2426,11 @@ COMMAND_BODY(DoList)
             }
 
             // Run program on all the lists
-            scribble scr;
+            list_g result = list::make(lty, nullptr, 0);
             size_t depth = rt.depth();
             for (size_t i = 0; i < length; i++)
             {
+                cleaner purge;
                 size_t offs = base + count - 1;
                 for (size_t d = count; d --> 0; )
                 {
@@ -2451,14 +2452,15 @@ COMMAND_BODY(DoList)
                 for (size_t d = added; d --> 0; )
                 {
                     object_g obj = rt.stack(d);
-                    if (!rt.append(obj))
+                    result = result->append(obj);
+                    if (!result)
                         return ERROR;
                 }
                 rt.drop(added);
+                result = purge(result);
             }
 
-            list_p result =  list::make(lty, scr.scratch(), scr.growth());
-            if (rt.drop(base + count) && rt.push(result))
+            if (result && rt.drop(base + count) && rt.push(+result))
                 return OK;
         }
     }
@@ -2521,10 +2523,11 @@ COMMAND_BODY(DoSubs)
             rt.drop(base + 1);
 
             // Run program on all subs in the list
-            scribble scr;
+            list_g result = list::make(lty, nullptr, 0);
             size_t depth = rt.depth();
             for (size_t i = 0; i < endsub; i++)
             {
+                cleaner purge;
                 nsub = i + 1;
                 for (size_t d = 0; d < count; d++)
                     if (!rt.push(lst->at(i + d)))
@@ -2543,14 +2546,15 @@ COMMAND_BODY(DoSubs)
                 for (size_t d = added; d --> 0; )
                 {
                     object_g obj = rt.stack(d);
-                    if (!rt.append(obj))
+                    result = result->append(obj);
+                    if (!result)
                         return ERROR;
                 }
                 rt.drop(added);
+                result = purge(result);
             }
 
-            list_p result =  list::make(lty, scr.scratch(), scr.growth());
-            if (rt.push(result))
+            if (result && rt.push(+result))
                 return OK;
         }
     }
