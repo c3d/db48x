@@ -26,6 +26,16 @@ DB48X is a modern implementation of RPL (Reverse Polish Lisp) targeting SwissMic
   - `rg -t cpp "pattern"` to search only C++ files
   - `rg -l "pattern"` to list files (like `grep -l`)
   - `rg --files | rg "\.h$"` instead of `find . -name "*.h"`
+- **Do not add case-only aliases in `ids.tbl`.** Command parsing is
+  case-independent, so `LIMIT`, `Limit`, and `limit` all refer to the same
+  command once it is registered. Reserve `ALIAS` for spellings that differ in
+  more than capitalization (e.g. `TAYLR` for `Taylor`, or `PartialFractions`
+  for `PartFrac`). Symbol names are also case-independent by default
+  (`IgnoreSymbolCase`): `X` and `x` are the same, as are `ABC`, `abc`, and
+  `abC`. Do not treat capitalization as a distinct variable in docs, tests, or
+  debugging. This does not apply to `ⓧ` (`VX`): that object names the current
+  algebra variable (`STOVX` / `RCLVX`), defaults to `x`, and after `'ABC'
+  STOVX` denotes `ABC` — not `x`/`X`.
 
 ## Build System
 
@@ -67,11 +77,10 @@ make -j8 dm32           # Build for DM32 (db50x.pg5)
 ## Adding a New Command
 
 1. **`src/ids.tbl`**: Add `NAMED(Foo, "→Foo")` or `CMD(Foo)`. Use `ALIAS` only
-   for spellings that differ in more than case (parsing is case-independent).
+   for spellings that differ in more than case (see general guideline above).
    Prefer `NAMED(ShortName, "LongSpelling")` when the C++ identifier is short
-   (e.g. `NAMED(PRoot, "PolynomialRoots")`); do not add `ALIAS` entries that
-   only change capitalization. Update any `ID_RANGE` lines whose boundary the
-   new command changes (e.g. `is_command`, `is_algebraic_fn`).
+   (e.g. `NAMED(PRoot, "PolynomialRoots")`). Update any `ID_RANGE` lines whose
+   boundary the new command changes (e.g. `is_command`, `is_algebraic_fn`).
 2. **Header** (e.g. `src/functions.h`): Declare with `FUNCTION(Foo)`,
    `COMMAND_DECLARE(Foo, nargs)`, `COMMAND_DECLARE_FN(Foo, nargs)`, or
    `STANDARD_FUNCTION(Foo)` as appropriate (see below).
