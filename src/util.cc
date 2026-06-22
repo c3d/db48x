@@ -123,6 +123,7 @@ void assertion_failed(const char *msg)
 // ----------------------------------------------------------------------------
 {
     record(assert_error, "Assertion failed: %s", msg);
+    recorder_dump();
 }
 
 

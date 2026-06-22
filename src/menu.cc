@@ -980,7 +980,10 @@ MENU(DebugMenu,
 
      "Run",             ID_Run,
      "ErrDbg",          ID_DebugOnError,
-     "Prog",            ID_ProgramMenu);
+     "Prog",            ID_ProgramMenu,
+     "Record",          ID_FlightRecorderConfigure,
+     "WSLog",           ID_FlightRecorderDump,
+     "DumpSome",        ID_FlightRecorderDumpSome);
 
 
 MENU(TestsMenu,

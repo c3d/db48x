@@ -178,6 +178,24 @@ size_t text::utf8_characters() const
 }
 
 
+cstring text::null_terminated_value() const
+// ----------------------------------------------------------------------------
+//   Return a null-terminated string for standard C functions (don't abuse it)
+// ----------------------------------------------------------------------------
+{
+    size_t sz;
+    utf8   txt = value(&sz);
+    if (!txt[sz - 1])
+        return cstring(txt);
+
+    char zero = 0;
+    text_p padded = text_g(this) + text_g(text::make(&zero, 1));
+    if (!padded)
+        return "";
+    return cstring(padded->value(nullptr));
+}
+
+
 object_p text::compile() const
 // ----------------------------------------------------------------------------
 //   Compile and run the text as if on the command line

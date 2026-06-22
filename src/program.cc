@@ -593,3 +593,66 @@ COMMAND_BODY(RuntimeStatistics)
 
     return  ERROR;
 }
+
+
+
+// ============================================================================
+//
+//   Flight recorder control
+//
+// ============================================================================
+
+static bool run_cstring_command(int (*fn)(cstring))
+// ----------------------------------------------------------------------------
+//  Shared code to run a C function taking a null-terminated string as input
+// ----------------------------------------------------------------------------
+{
+    if (object_p config = object::strip(rt.top()))
+    {
+        if (text_p wanted = config->as<text>())
+        {
+            int result = fn(wanted->null_terminated_value());
+            integer_p rc = integer::make(result);
+            return rc && rt.top(rc);
+        }
+        rt.type_error();
+    }
+    return false;
+}
+
+
+static inline bool run_cstring_command(uint (*fn)(cstring))
+// ----------------------------------------------------------------------------
+//   We don't really care if function return unsigned
+// ----------------------------------------------------------------------------
+{
+    return run_cstring_command((int (*)(cstring)) fn);
+}
+
+
+COMMAND_BODY(FlightRecorderConfigure)
+// ----------------------------------------------------------------------------
+//   Configure specific traces for the flight recorder
+// ----------------------------------------------------------------------------
+{
+    return run_cstring_command(recorder_trace_set) ? OK : ERROR;
+}
+
+
+COMMAND_BODY(FlightRecorderDump)
+// ----------------------------------------------------------------------------
+//   Cause a flight recorder dump
+// ----------------------------------------------------------------------------
+{
+    recorder_dump();
+    return OK;
+}
+
+
+COMMAND_BODY(FlightRecorderDumpSome)
+// ----------------------------------------------------------------------------
+//   Cause a partial flight recorder dump
+// ----------------------------------------------------------------------------
+{
+    return run_cstring_command(recorder_dump_for) ? OK : ERROR;
+}

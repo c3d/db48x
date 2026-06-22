@@ -123,7 +123,8 @@ struct text : algebraic
         return (utf8) p;
     }
 
-    size_t utf8_characters() const;
+    cstring null_terminated_value() const;
+    size_t  utf8_characters() const;
 
     // Iterator, built in a way that is robust to garbage collection in loops
     struct iterator

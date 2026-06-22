@@ -55,6 +55,9 @@ void assertion_failed(const char *);
 #define RECORDER_TWEAK(Name)    0
 #define RECORD(rec, fmt, ...)   do { recorder_ignore(__VA_ARGS__); } while(0)
 #define record(...)             RECORD(__VA_ARGS__)
+inline unsigned recorder_dump()                         { return 0; }
+inline unsigned recorder_dump_for(const char *set)      { return 0; }
+inline int recorder_trace_set(const char *set)          { return 0; }
 
 // This is just to avoid warnings about unused parameters
 inline void recorder_ignore() {}

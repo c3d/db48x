@@ -114,4 +114,8 @@ COMMAND_DECLARE(Continue,-1);
 COMMAND_DECLARE(Kill,-1);
 COMMAND_DECLARE(RuntimeStatistics,0);
 
+COMMAND_DECLARE(FlightRecorderConfigure, 1);
+COMMAND_DECLARE(FlightRecorderDump, 0);
+COMMAND_DECLARE(FlightRecorderDumpSome, 1);
+
 #endif // PROGRAM_H

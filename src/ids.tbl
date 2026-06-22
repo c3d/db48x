@@ -852,6 +852,11 @@ CMD(MultipleSteps)
 CMD(Continue)                           ALIAS(Continue, "cont")
 CMD(Kill)
 
+// DB48x debugging
+CMD(FlightRecorderConfigure)
+CMD(FlightRecorderDump)                 ALIAS(FlightRecorderDump, "WSLog")
+CMD(FlightRecorderDumpSome)
+
 // Input and prompting
 CMD(Input)
 CMD(Prompt)

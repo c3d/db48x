@@ -22288,7 +22288,7 @@ Access: 🟦 X (1); [ProgramMenu](#programmenu) 🟦 F2
 
 | F1 | F2 | F3 | F4 | F5 | F6 |
 |:--:|:--:|:--:|:--:|:--:|:--:|
-| [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] |   |   |   |
+| [Run](#run) | [ErrDbg](#debugonerror) | \[[Prog](#programmenu)\] | Record | WSLog | DumpSome |
 | [Halt](#halt) | [Step↑](#stepout) | DoErr | ErrMsg | ErrNum | ClrErr |
 | [Debug](#debug) | [Step](#step) | [Over](#over) | [Steps](#multiplesteps) | [Continue](#continue) | [Kill](#kill) |
 
