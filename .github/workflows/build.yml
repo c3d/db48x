@@ -30,7 +30,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
@@ -94,7 +94,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'linux'
         target: 'desktop'
         modules: 'qtmultimedia'
@@ -142,9 +142,9 @@ jobs:
           pkgconfig xcb-util-wm-devel xcb-util-image-devel \
           xcb-util-keysyms-devel xcb-util-renderutil-devel
         python3 -m pip install aqtinstall
-        python3 -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+        python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build simulator
       run: |
@@ -186,9 +186,9 @@ jobs:
           libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
         python -m pip install --break-system-packages aqtinstall
-        python -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+        python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build simulator
       run: |
@@ -315,7 +315,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'mac'
         target: 'desktop'
         arch: 'clang_64'
@@ -379,7 +379,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'linux'
         target: 'desktop'
         modules: 'qtmultimedia'
@@ -427,9 +427,9 @@ jobs:
           pkgconfig xcb-util-wm-devel xcb-util-image-devel \
           xcb-util-keysyms-devel xcb-util-renderutil-devel
         python3 -m pip install aqtinstall
-        python3 -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+        python3 -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build color DM32 simulator
       run: |
@@ -471,9 +471,9 @@ jobs:
           libpulse fontconfig libxcb mesa libxkbcommon-x11 freetype2 pkgconf \
           xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil
         python -m pip install --break-system-packages aqtinstall
-        python -m aqt install-qt linux desktop 6.8.3 --outputdir /opt/Qt \
+        python -m aqt install-qt linux desktop 6.9.2 --outputdir /opt/Qt \
           --modules qtmultimedia
-        echo "/opt/Qt/6.8.3/gcc_64/bin" >> "$GITHUB_PATH"
+        echo "/opt/Qt/6.9.2/gcc_64/bin" >> "$GITHUB_PATH"
 
     - name: Build color DM32 simulator
       run: |
@@ -651,7 +651,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
@@ -722,7 +722,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.3'
+        version: '6.9.2'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
