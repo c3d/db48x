@@ -332,7 +332,7 @@ object_p files::recall_binary(text_p name) const
         {
             if (!f.read(&c, 1))
                 break;
-            byte *ptr = rt.allocate(1);
+            byte *ptr = scr.allocate(1);
             *ptr = c;
         }
 

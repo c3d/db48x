@@ -247,7 +247,7 @@ COMMAND_BODY(TVMAmortTable)
                         FinanceSolverMenu::round(i);
                         FinanceSolverMenu::round(b);
                         array_p row = array_p(list::make(ID_array, i, p, b));
-                        rt.append(row);
+                        ascr.append(row);
                         s = 1;
                         interest = integer::make(0);
                         principal = integer::make(0);

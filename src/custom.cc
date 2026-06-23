@@ -443,7 +443,7 @@ COMMAND_BODY(StoreKeys)
 }
 
 
-static bool compatible_keyid(object_p name, object_p obj, void *)
+static bool compatible_keyid(object_p name, object_p obj, void *arg)
 // ----------------------------------------------------------------------------
 //   Append the compatible key ID to the list
 // ----------------------------------------------------------------------------
@@ -451,8 +451,9 @@ static bool compatible_keyid(object_p name, object_p obj, void *)
     if (integer_p keyarg = name->as<integer>())
     {
         ularge keyid = keyarg->value<ularge>();
-        object_p ckey = compatible_key_id(keyid);
-        return ckey && obj && rt.append(obj) && rt.append(ckey);
+        object_p ckey  = compatible_key_id(keyid);
+        scribble &scr = *((scribble *) arg);
+        return ckey && obj && scr.append(obj) && scr.append(ckey);
     }
     return false;
 }
@@ -473,14 +474,14 @@ COMMAND_BODY(RecallKeys)
         {
             object_p updir = static_object(ID_UpDir);
             integer_p level = integer::make(depth);
-            if (!rt.append(level) || !rt.append(updir))
+            if (!scr.append(level) || !scr.append(updir))
                 return ERROR;
         }
         if (object_p keymapvar = dir->recall(name))
         {
             if (directory_p keymap = keymapvar->as<directory>())
             {
-                keymap->enumerate(compatible_keyid, nullptr);
+                keymap->enumerate(compatible_keyid, &scr);
                 used = scr.growth();
             }
         }

@@ -108,7 +108,7 @@ PARSE_BODY(locals)
         while (is_valid_in_name(cp) && utf8_more(p.source, s, max))
         {
             size_t cplen = utf8_encode(cp, encoding);
-            gcbytes namep = rt.allocate(cplen);
+            gcbytes namep = scr.allocate(cplen);
             if (!namep)
                 return ERROR;
             memcpy(namep, encoding, cplen);
@@ -119,7 +119,7 @@ PARSE_BODY(locals)
 
         // Encode name
         size_t lsize = leb128size(namelen);
-        gcbytes endp = rt.allocate(lsize);
+        gcbytes endp = scr.allocate(lsize);
         if (!endp)
             return ERROR;
         byte *lp = lengthp;
@@ -141,7 +141,7 @@ PARSE_BODY(locals)
 
     // Encode number of names
     size_t csz  = leb128size(names);
-    byte *end = rt.allocate(csz);
+    byte *end = scr.allocate(csz);
     if (!end)
         return ERROR;
     byte  *cntp = countp;
@@ -166,7 +166,7 @@ PARSE_BODY(locals)
         return result;
 
     // Copy the program to the scratchpad
-    if (!rt.append(p.out))
+    if (!scr.append(p.out))
         return ERROR;
 
     // Compute total number of bytes in payload and build object

@@ -1328,7 +1328,7 @@ struct scribble
 //   Temporary area using the scratchpad
 // ----------------------------------------------------------------------------
 {
-    scribble(): allocated(rt.allocated())
+    scribble(): allocated(rt.allocated()), current(allocated)
     {
     }
     ~scribble()
@@ -1352,9 +1352,42 @@ struct scribble
     {
         return rt.scratchpad() - rt.allocated() + allocated;
     }
+    inline void adjust()
+    {
+        size_t allocated = rt.allocated();
+        if (current < allocated)
+        {
+            record(runtime_error,
+                   "Scribble purged %lu bytes", allocated - current);
+            rt.free(allocated - current);
+        }
+    }
+
+    template <typename ...Items>
+    inline byte *append(Items... items)
+    {
+        adjust();
+        byte *result = rt.append(items...);
+        current      = rt.allocated();
+        return result;
+    }
+    inline byte *append_expression(object_p obj)
+    {
+        adjust();
+        byte *result = rt.append_expression(obj);
+        current      = rt.allocated();
+        return result;
+    }
+    inline byte *allocate(size_t sz)
+    {
+        adjust();
+        byte *result = rt.allocate(sz);
+        current      = rt.allocated();
+        return result;
+    }
 
 private:
-    size_t  allocated;
+    size_t  allocated, current;
 };
 
 

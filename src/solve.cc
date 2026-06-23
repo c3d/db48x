@@ -672,7 +672,7 @@ list_p Root::multiple_equation_solver(list_r eqs, list_r names, list_r guesses)
             ty = obj->type();
             computed = true;
         }
-        rt.append(obj);
+        scr.append(obj);
         if (ty == ID_unit)
         {
             obj = unit_p(obj)->value();

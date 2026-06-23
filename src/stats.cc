@@ -930,7 +930,7 @@ algebraic_p StatsAccess::median() const
             m = list_median(lcol);
             if (columns == 1)
                 return m;
-            if (!m || !rt.append(+m))
+            if (!m || !scr.append(+m))
                 return nullptr;
         }
         else if (c == 0 && columns == 1)

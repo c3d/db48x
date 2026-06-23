@@ -64,7 +64,7 @@ symbol_g characters_file::next()
             if (quoted && peek() == '"') // Treat double "" as a data quote
             {
                 c = getchar();
-                byte *buf = rt.allocate(1);
+                byte *buf = scr.allocate(1);
                 *buf = byte(c);
             }
             else
@@ -79,7 +79,7 @@ symbol_g characters_file::next()
         }
         else if (quoted)
         {
-            byte *buf = rt.allocate(1);
+            byte *buf = scr.allocate(1);
             *buf = byte(c);
         }
     }

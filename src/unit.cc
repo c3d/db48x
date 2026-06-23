@@ -1521,7 +1521,7 @@ symbol_p unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
                 c = getchar();
                 if (column == 1 && found)
                 {
-                    byte *buf = rt.allocate(1);
+                    byte *buf = scr.allocate(1);
                     *buf = byte(c);
                 }
             }
@@ -1583,7 +1583,7 @@ symbol_p unit_file::lookup(gcutf8 what, size_t len, bool menu, bool seek0)
             }
             else if (column == 1 && found)
             {
-                byte *buf = rt.allocate(1);
+                byte *buf = scr.allocate(1);
                 *buf = byte(c);
             }
             index++;
@@ -1641,7 +1641,7 @@ symbol_p unit_file::next(bool menu)
         {
             if (column == 0)
             {
-                byte *buf = rt.allocate(1);
+                byte *buf = scr.allocate(1);
                 *buf = byte(c);
             }
         }
@@ -1908,7 +1908,7 @@ FUNCTION_BODY(UBase)
                 r = r->evaluate();
                 lobj = r;
             }
-            if (!rt.append(lobj))
+            if (!scr.append(lobj))
                 return nullptr;
 
         }

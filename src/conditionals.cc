@@ -408,7 +408,7 @@ PARSE_BODY(CaseStatement)
                     return ERROR;
 
                 // Copy the parsed object to the scratch pad (may GC)
-                if (!rt.append(obj))
+                if (!scr.append(obj))
                     return ERROR;
 
                 // Jump past what we parsed
@@ -443,7 +443,7 @@ PARSE_BODY(CaseStatement)
         if (!had_end)
         {
             // Copy the parsed object to the scratch pad (may GC)
-            if (!rt.append(obj1))
+            if (!outer_scr.append(obj1))
                 return ERROR;
             obj1 = nullptr;
         }

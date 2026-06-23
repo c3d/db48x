@@ -563,12 +563,12 @@ COMMAND_BODY(RuntimeStatistics)
     if (running && sleeping && runcycles)
     {
         scribble scr;
-        if (rt.append(running)   &&
-            rt.append(sleeping)  &&
-            rt.append(display)   &&
-            rt.append(stack)     &&
-            rt.append(refresh)   &&
-            rt.append(runcycles))
+        if (scr.append(running)  &&
+            scr.append(sleeping) &&
+            scr.append(display)  &&
+            scr.append(stack)    &&
+            scr.append(refresh)  &&
+            scr.append(runcycles))
         {
             size_t sz = scr.growth();
             gcbytes data = scr.scratch();

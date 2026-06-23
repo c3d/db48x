@@ -4115,7 +4115,7 @@ restart:
                         {
                             c = helpfile.get();
                             size_t sz = utf8_size(c);
-                            if (byte *p = rt.allocate(sz))
+                            if (byte *p = scr.allocate(sz))
                                 utf8_encode(c, p);
                             else
                                 isimg = false;
@@ -6339,7 +6339,7 @@ bool user_interface::load_keymap(cstring name)
             if (parsed->type() == object::ID_symbol)
                 record(keymap_warning, "%s key %u: %t is a symbol",
                        name, key, parsed);
-            rt.append(parsed);
+            scr.append(parsed);
             idx = 0;
         }
         if (!c)

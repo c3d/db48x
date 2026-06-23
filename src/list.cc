@@ -54,6 +54,7 @@
 RECORDER(list, 16, "Lists");
 RECORDER(list_parse, 16, "List parsing");
 RECORDER(list_error, 16, "Errors processing lists");
+RECORDER(my_debug_trace, 16, "List map/filter debug trace");
 
 
 object::result list::list_parse(id      type,
@@ -417,7 +418,7 @@ object::result list::list_parse(id      type,
                         if (expression_p eq = obj->as<expression>())
                             obj = eq->objects(&objsize);
 
-                if (!rt.append(obj, objsize))
+                if (!scr.append(obj, objsize))
                     return ERROR;
 
                 if (xroot_arg)
@@ -475,7 +476,7 @@ object::result list::list_parse(id      type,
         rt.command(obj);
         if (objcount == 0 && scr.growth() == 0)
         {
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return ERROR;
             objcount = 1;
         }
@@ -672,7 +673,7 @@ list_p list::remove(size_t first, size_t len) const
     for (object_p copy : *this)
     {
         if (idx < first || idx >= first + len)
-            if (!rt.append(copy))
+            if (!scr.append(copy))
                 return nullptr;
         idx++;
     }
@@ -692,14 +693,14 @@ list_p list::insert(object_p whato, size_t pos) const
     for (object_g copy : *this)
     {
         if (idx == pos)
-            if (!rt.append(what))
+            if (!scr.append(what))
                 return nullptr;
-        if (!rt.append(copy))
+        if (!scr.append(copy))
             return nullptr;
         idx++;
     }
     if (idx == pos)
-        if (!rt.append(what))
+        if (!scr.append(what))
             return nullptr;
     return list::make(ty, scr.scratch(), scr.growth());
 }
@@ -718,15 +719,15 @@ list_p list::insert(list_p whato, size_t pos) const
     {
         if (idx == pos)
             for (object_p inserted : *what)
-                if (!rt.append(inserted))
+                if (!scr.append(inserted))
                     return nullptr;
-        if (!rt.append(copy))
+        if (!scr.append(copy))
             return nullptr;
         idx++;
     }
     if (idx == pos)
         for (object_p inserted : *what)
-            if (!rt.append(inserted))
+            if (!scr.append(inserted))
                 return nullptr;
     return list::make(ty, scr.scratch(), scr.growth());
 }
@@ -753,14 +754,14 @@ list_p list::swap(size_t first, size_t second) const
     {
         if (idx == first)
         {
-            if (!rt.append(sobj))
+            if (!scr.append(sobj))
                 return nullptr;
             sobj = copy;
             first = second;
         }
         else
         {
-            if (!rt.append(copy))
+            if (!scr.append(copy))
                 return nullptr;
         }
         idx++;
@@ -1064,7 +1065,7 @@ list_p list::list_from_stack(uint depth, id ty)
     scribble scr;
     for (uint i = 0; i < depth; i++)
         if (object_g obj = rt.stack(depth + ~i))
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
 
     if (list_p result = list::make(ty, scr.scratch(), scr.growth()))
@@ -1596,9 +1597,10 @@ list_p list::map(object_p prgobj, size_t recurse) const
     id       ty    = type();
     object_g prg   = prgobj;
     size_t   depth = rt.depth();
-    scribble scr;
+    list_g   result = list::make(ty, nullptr, 0);
     for (object_p obj : *this)
     {
+        cleaner purge;
         id oty = obj->type();
         if (is_array_or_list(oty) && recurse > 0)
         {
@@ -1621,11 +1623,13 @@ list_p list::map(object_p prgobj, size_t recurse) const
         if (!obj)
             goto error;
 
-        if (!rt.append(obj))
+        result = result->append(obj);
+        if (!result)
             goto error;
+        result = purge(result);
     }
 
-    return list::make(ty, scr.scratch(), scr.growth());
+    return result;
 
 error:
     if (rt.depth() > depth)
@@ -1688,9 +1692,10 @@ list_p list::filter(object_p prgobj, size_t recurse) const
     id       ty    = type();
     object_g prg   = prgobj;
     size_t   depth = rt.depth();
-    scribble scr;
+    list_g   result = list::make(ty, nullptr, 0);
     for (object_g obj : *this)
     {
+        cleaner purge;
         bool keep = false;
         id oty = obj->type();
         if (is_array_or_list(oty) && recurse > 0)
@@ -1714,11 +1719,20 @@ list_p list::filter(object_p prgobj, size_t recurse) const
             if (rt.error())
                 goto error;
         }
-        if (keep && !rt.append(obj))
-            goto error;
+        record(my_debug_trace, "filter keep=%d obj=%t result=%t",
+               keep, +obj, +result);
+        if (keep)
+        {
+            result = result->append(obj);
+            if (!result)
+                goto error;
+            result = purge(result);
+        }
     }
 
-    return list::make(ty, scr.scratch(), scr.growth());
+    record(my_debug_trace, "filter done result=%t size=%u",
+           +result, result ? result->size() : 0);
+    return result;
 
 error:
     if (rt.depth() > depth)
@@ -1736,9 +1750,10 @@ list_p list::pair_map(object_p prgobj) const
     object_g prg   = prgobj;
     size_t   depth = rt.depth();
     object_g prev;
-    scribble scr;
+    list_g   result = list::make(ty, nullptr, 0);
     for (object_g obj : *this)
     {
+        cleaner purge;
         if (prev)
         {
             if (!rt.push(obj) || !rt.push(prev))
@@ -1751,13 +1766,15 @@ list_p list::pair_map(object_p prgobj) const
                 goto error;
             }
             object_p item   = rt.pop();
-            if (!rt.append(item))
+            result = result->append(item);
+            if (!result)
                 goto error;
+            result = purge(result);
         }
         prev = obj;
     }
 
-    return list::make(ty, scr.scratch(), scr.growth());
+    return result;
 
 error:
     if (rt.depth() > depth)
@@ -1796,7 +1813,7 @@ list_p list::map(algebraic_fn fn, size_t recurse) const
             obj = +a;
         }
 
-        if (!rt.append(obj))
+        if (!scr.append(obj))
             return nullptr;
     }
 
@@ -1834,7 +1851,7 @@ list_p list::map(arithmetic_fn fn, algebraic_r y, size_t recurse) const
             obj = +a;
         }
 
-        if (!rt.append(obj))
+        if (!scr.append(obj))
             return nullptr;
     }
 
@@ -1874,7 +1891,7 @@ list_p list::map(algebraic_r x, arithmetic_fn fn, size_t recurse) const
             obj = +a;
         }
 
-        if (!rt.append(obj))
+        if (!scr.append(obj))
             return nullptr;
     }
 
@@ -2269,7 +2286,7 @@ list_p list::names(bool units, id type) const
         while (rt.depth() > depth)
         {
             object_g obj = rt.pop();
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 goto error;
         }
 
@@ -2673,15 +2690,15 @@ list_p list::substitute(symbol_r name, object_p repl, size_t replsz) const
                     rt.inconsistent_units_error();
                     return nullptr;
                 }
-                if (!arepl || !rt.append(arepl, arepl->size()))
+                if (!arepl || !scr.append(arepl, arepl->size()))
                     return nullptr;
             }
-            else if (!rt.append(replobj, replsz))
+            else if (!scr.append(replobj, replsz))
                 return nullptr;
         }
         else
         {
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
     }
@@ -2795,7 +2812,7 @@ static list_p extract_sublist(list_r data, uint level, uint depth,
                 return nullptr;
             }
         }
-        rt.append(item);
+        scr.append(item);
     }
 
     list_p result = list::make(ty, scr.scratch(), scr.growth());
@@ -2901,7 +2918,7 @@ object_p list::column(size_t index) const
         if (!row)
             return nullptr;
         object_p item = row->at(colidx);
-        if (!item || !rt.append(item))
+        if (!item || !scr.append(item))
             return nullptr;
     }
     return list::make(ty, scr.scratch(), scr.growth());
@@ -2937,7 +2954,7 @@ list_p list::sort(int (*compare)(object_p *x, object_p *y)) const
     scribble scr;
     for (size_t i = 0; i < count; i++)
         if (object_g obj = rt.stack(i))
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
     rt.drop(count);
     return list::make(ty, scr.scratch(), scr.growth());
@@ -2964,7 +2981,7 @@ list_p list::unique(int (*compare)(object_p *x, object_p *y)) const
     for (object_p item : *this)
     {
         if (!last || compare((object_p *) &last, (object_p *) &item) != 0)
-            if (!rt.append(+item))
+            if (!scr.append(+item))
                 return nullptr;
         last = item;
     }

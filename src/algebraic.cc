@@ -1603,7 +1603,7 @@ bool algebraic::list_result(uint depth, bool reverse)
     for (uint d = 0; d < depth; d++)
     {
         object_p obj = rt.stack(reverse ? depth + ~d : d);
-        if (!obj || !rt.append(obj))
+        if (!obj || !scr.append(obj))
             return false;
     }
     list_p result = list::make(ID_list, scr.scratch(), scr.growth());

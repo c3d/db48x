@@ -1278,12 +1278,12 @@ COMMAND_BODY(GarbageCollectorStatistics)
     if (cycles && purged && duration && lpurged && lduration && cleared)
     {
         scribble scr;
-        if (rt.append(cycles)    &&
-            rt.append(purged)    &&
-            rt.append(duration)  &&
-            rt.append(lpurged)   &&
-            rt.append(lduration) &&
-            rt.append(cleared))
+        if (scr.append(cycles)    &&
+            scr.append(purged)    &&
+            scr.append(duration)  &&
+            scr.append(lpurged)   &&
+            scr.append(lduration) &&
+            scr.append(cleared))
         {
             size_t sz = scr.growth();
             gcbytes data = scr.scratch();
@@ -1360,13 +1360,24 @@ COMMAND_BODY(CurrentDirectory)
 }
 
 
+struct path_callback_data
+// ----------------------------------------------------------------------------
+//   Data passed to path_callback below
+// ----------------------------------------------------------------------------
+{
+    scribble   &scr;
+    directory_p dir;
+};
+
+
 static bool path_callback(object_p name, object_p obj, void *arg)
 // ----------------------------------------------------------------------------
 //   Find the directory in enclosing directory
 // ----------------------------------------------------------------------------
 {
-    if (obj == object_p(arg))
-        if (rt.append(name))
+    path_callback_data *data = (path_callback_data *) arg;
+    if (obj == object_p(data->dir))
+        if (data->scr.append(name))
             return true;
     return false;
 }
@@ -1380,7 +1391,7 @@ list_p directory::path(id type)
     scribble scr;
 
     size_t sz = leb128size(ID_Home);
-    byte *p = rt.allocate(sz);
+    byte *p = scr.allocate(sz);
     leb128(p, ID_Home);
 
     uint depth = rt.directories();
@@ -1389,7 +1400,8 @@ list_p directory::path(id type)
     {
         depth--;
         directory_p next = rt.variables(depth-1);
-        if (dir->enumerate(path_callback, (void *) next) != 1)
+        path_callback_data data = { scr, next };
+        if (dir->enumerate(path_callback, &data) != 1)
         {
             rt.directory_path_error();
             return nullptr;
@@ -1487,12 +1499,24 @@ COMMAND_BODY(Order)
 }
 
 
+struct vars_enumerator_data
+// ----------------------------------------------------------------------------
+//   Data passed to vars_enumerator below
+// ----------------------------------------------------------------------------
+{
+    object_p types;
+    scribble *scr;
+};
+
+
 static bool vars_enumerator(object_p name, object_p value, void *arg)
 // ----------------------------------------------------------------------------
 //   Callback to add the variable name to the scratchpad
 // ----------------------------------------------------------------------------
 {
-    object_p types = object_p(arg);
+    vars_enumerator_data *data = (vars_enumerator_data *) arg;
+    object_p types = data->types;
+    scribble &scr = *data->scr;
     if (types)
     {
         int tval = value->type_value();
@@ -1520,7 +1544,7 @@ static bool vars_enumerator(object_p name, object_p value, void *arg)
 
     object_g gname = name;
     size_t sz = name->size();
-    byte *p = rt.allocate(sz);
+    byte *p = scr.allocate(sz);
     if (!p)
         return false;
     memmove(p, byte_p(+gname), sz);
@@ -1540,7 +1564,8 @@ static list_p variables(object_p types)
         return nullptr;
     }
     scribble scr;
-    dir->enumerate(vars_enumerator, (void *) types);
+    vars_enumerator_data data = { types, &scr };
+    dir->enumerate(vars_enumerator, &data);
     list_p list = list::make (scr.scratch(), scr.growth());
     return list;
 }

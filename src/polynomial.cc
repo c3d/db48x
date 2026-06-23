@@ -81,7 +81,7 @@ polynomial_p polynomial::make(algebraic_p value)
     scribble    scr;
     algebraic_g avalue = value;
     size_t      sz     = value->size();
-    byte       *p      = rt.allocate(1 + sz);
+    byte       *p      = scr.allocate(1 + sz);
     if (!p)
         return nullptr;
     *p++ = 0; // Number of variables = 0
@@ -107,7 +107,7 @@ polynomial_p polynomial::make(symbol_p name)
     size_t   len    = leb128<size_t>(p);
     size_t   namesz = p + len - src;
     size_t   polysz = namesz + integer::required_memory(ID_integer, 1) + 2;
-    byte    *dst    = rt.allocate(polysz);
+    byte    *dst    = scr.allocate(polysz);
     if (!dst)
         return nullptr;
     dst = leb128(dst, 1);     // Number of variables = 1
@@ -137,7 +137,7 @@ polynomial_p polynomial::make(algebraic_r factor, symbol_r sym, ularge exp)
     size_t   len = sym->length();
     size_t   fsz = factor->size();
     size_t   asz = 1 + fsz + len + leb128size(len) + leb128size(exp);
-    byte    *p   = rt.allocate(asz);
+    byte    *p   = scr.allocate(asz);
     if (!p)
         return nullptr;
     *p++ = 1; // Number of variables = 1
@@ -336,7 +336,7 @@ error:
 }
 
 
-byte *polynomial::copy_variables(polynomial_r x, byte *prev)
+byte *polynomial::copy_variables(polynomial_r x, scribble &scr, byte *prev)
 // ----------------------------------------------------------------------------
 //   Copy variables from an existing polynomial, return pointer at end
 // ----------------------------------------------------------------------------
@@ -392,7 +392,7 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
             // Size needed for variable
             size_t offs   = old - +gprev;
             bool   vszchg = !prev || leb128size(ovars + 1) != leb128size(ovars);
-            byte  *copy   = rt.allocate(vsz + vszchg);
+            byte  *copy   = scr.allocate(vsz + vszchg);
             if (!copy)
                 return nullptr;
             ovars++;
@@ -424,7 +424,7 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
 
     if (!gprev)
     {
-        byte *p = rt.allocate(1);
+        byte *p = scr.allocate(1);
         if (p)
             *p = 0;
         gprev = p;
@@ -443,21 +443,21 @@ polynomial_p polynomial::neg(polynomial_r x)
         return nullptr;
 
     scribble scr;
-    gcbytes  polycopy = copy_variables(x);
+    gcbytes  polycopy = copy_variables(x, scr);
     size_t   nvars    = x->variables();
     for (auto term : *x)
     {
         algebraic_g factor = term.factor();
         factor             = -factor;
         size_t sz          = factor->size();
-        byte  *np          = rt.allocate(sz);
+        byte  *np          = scr.allocate(sz);
         if (!np)
             return nullptr;
         memcpy(np, +factor, sz);
         for (size_t v = 0; v < nvars; v++)
         {
             ularge exponent = term.exponent();
-            byte  *ep       = rt.allocate(leb128size(exponent));
+            byte  *ep       = scr.allocate(leb128size(exponent));
             if (!ep)
                 return nullptr;
             leb128(ep, exponent);
@@ -504,10 +504,10 @@ polynomial_p polynomial::addsub(polynomial_r x, polynomial_r y, bool sub)
     }
 
     scribble scr;
-    gcbytes  result = copy_variables(x);
+    gcbytes  result = copy_variables(x, scr);
     if (!result)                // Special case of empty x
         rt.free(scr.growth());
-    result          = copy_variables(y, (byte *) +result);
+    result          = copy_variables(y, scr, (byte *) +result);
     if (!result)
     {
         record(polynomials_error, "copy_variables returned null");
@@ -576,14 +576,14 @@ polynomial_p polynomial::addsub(polynomial_r x, polynomial_r y, bool sub)
         if (!xfactor->is_zero(false))
         {
             size_t sz = xfactor->size();
-            byte  *p  = rt.allocate(sz);
+            byte  *p  = scr.allocate(sz);
             if (!p)
                 return nullptr;
             memcpy(p, +xfactor, sz);
             p += sz;
             for (size_t v = 0; v < nvars; v++)
             {
-                p = rt.allocate(leb128size(xexp[v]));
+                p = scr.allocate(leb128size(xexp[v]));
                 if (!p)
                     return nullptr;
                 leb128(p, xexp[v]);
@@ -625,14 +625,14 @@ polynomial_p polynomial::addsub(polynomial_r x, polynomial_r y, bool sub)
                 yfactor = -yfactor;
 
             size_t sz = yfactor->size();
-            byte  *p  = rt.allocate(sz);
+            byte  *p  = scr.allocate(sz);
             if (!p)
                 return nullptr;
             memcpy(p, +yfactor, sz);
             p += sz;
             for (size_t v = 0; v < nvars; v++)
             {
-                p = rt.allocate(leb128size(yexp[v]));
+                p = scr.allocate(leb128size(yexp[v]));
                 if (!p)
                     return nullptr;
                 leb128(p, yexp[v]);
@@ -673,10 +673,10 @@ polynomial_p polynomial::mul(polynomial_r x, polynomial_r y)
         return nullptr;
 
     scribble scr;
-    gcbytes  result = copy_variables(x);
+    gcbytes  result = copy_variables(x, scr);
     if (!result)
         rt.free(scr.growth());
-    result          = copy_variables(y, (byte *) +result);
+    result          = copy_variables(y, scr, (byte *) +result);
     if (!result)
         return nullptr;
 
@@ -738,7 +738,7 @@ polynomial_p polynomial::mul(polynomial_r x, polynomial_r y)
             if (!rfactor->is_zero(false))
             {
                 // Check if there is an existing term with same exponents
-                gcbytes end = rt.allocate(0);
+                gcbytes end = scr.allocate(0);
                 byte_p next = end;
                 for (byte_p check = terms; check < end; check = next)
                 {
@@ -768,7 +768,7 @@ polynomial_p polynomial::mul(polynomial_r x, polynomial_r y)
             if (!rfactor->is_zero(false))
             {
                 size_t sz = rfactor->size();
-                byte  *p  = rt.allocate(sz);
+                byte  *p  = scr.allocate(sz);
                 if (!p)
                     return nullptr;
                 memcpy(p, +rfactor, sz);
@@ -776,7 +776,7 @@ polynomial_p polynomial::mul(polynomial_r x, polynomial_r y)
                 for (size_t v = 0; v < nvars; v++)
                 {
                     ularge exp = xexp[v] + yexp[v];
-                    p = rt.allocate(leb128size(exp));
+                    p = scr.allocate(leb128size(exp));
                     p = leb128(p, exp);
                 }
             }
@@ -1958,7 +1958,7 @@ array_p polynomial::coefficients(bool error) const
     if (rt.error())
         return nullptr;
     while (n-- > 0)
-        if (!rt.append(sbuf[n]))
+        if (!scr.append(sbuf[n]))
             return nullptr;
     array_g result = array_p(list::make(ID_array, scr.scratch(), scr.growth()));
     result = purge(result);
@@ -1991,7 +1991,7 @@ polynomial_p polynomial::derivative(size_t var) const
 {
     scribble     scr;
     polynomial_g x        = this;
-    gcbytes      polycopy = copy_variables(x);
+    gcbytes      polycopy = copy_variables(x, scr);
     size_t       nvars    = x->variables();
     for (iterator term : *x)
     {
@@ -2017,7 +2017,7 @@ polynomial_p polynomial::derivative(size_t var) const
         else
         {
             size_t sz = factor->size();
-            byte  *np = rt.allocate(sz);
+            byte  *np = scr.allocate(sz);
             if (!np)
                 return nullptr;
             memcpy(np, +factor, sz);
@@ -2026,7 +2026,7 @@ polynomial_p polynomial::derivative(size_t var) const
                 ularge exponent = term.exponent();
                 if (v == var && exponent > 0)
                     exponent--;
-                byte *ep = rt.allocate(leb128size(exponent));
+                byte *ep = scr.allocate(leb128size(exponent));
                 if (!ep)
                     return nullptr;
                 leb128(ep, exponent);
@@ -2064,7 +2064,7 @@ polynomial_p polynomial::primitive(size_t var) const
 {
     scribble     scr;
     polynomial_g x        = this;
-    gcbytes      polycopy = copy_variables(x);
+    gcbytes      polycopy = copy_variables(x, scr);
     size_t       nvars    = x->variables();
     for (iterator term : *x)
     {
@@ -2083,7 +2083,7 @@ polynomial_p polynomial::primitive(size_t var) const
             return nullptr;
 
         size_t sz = factor->size();
-        byte  *np = rt.allocate(sz);
+        byte  *np = scr.allocate(sz);
         if (!np)
             return nullptr;
         memcpy(np, +factor, sz);
@@ -2092,7 +2092,7 @@ polynomial_p polynomial::primitive(size_t var) const
             ularge exponent = term.exponent();
             if (v == var)
                 exponent++;  // Increase exponent by 1
-            byte *ep = rt.allocate(leb128size(exponent));
+            byte *ep = scr.allocate(leb128size(exponent));
             if (!ep)
                 return nullptr;
             leb128(ep, exponent);
@@ -2232,14 +2232,14 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                     to_sqrt(y);
                 }
                 record(polyroots, "Solutions %t and %t", +x, +y);
-                if (!rt.append(+x) || !rt.append(+y))
+                if (!scr.append(+x) || !scr.append(+y))
                     goto error;
             }
             else if (a[1] && !a[1]->is_zero(false))
             {
                 y = -a[0] / a[1];
                 record(polyroots, "Solution is %t", +y);
-                if (!rt.append(+y))
+                if (!scr.append(+y))
                     goto error;
             }
             else
@@ -2263,7 +2263,7 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
             record(polyroots, "p' =%t", +der1);
             record(polyroots, "p''=%t", +der2);
 
-            settings::SaveComplexResults scr(true);
+            settings::SaveComplexResults savecr(true);
             size_t      max = Settings.SolverIterations();
             algebraic_g eps = algebraic::epsilon();
             algebraic_g n   = integer::make(degree);
@@ -2329,7 +2329,7 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
             }
             if (round && x)
                 to_sqrt(x);
-            if (!rt.append(x))
+            if (!scr.append(x))
                 goto error;
 
             // Here p(x) is small enough, generate x-x0 polynomial

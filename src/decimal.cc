@@ -204,7 +204,7 @@ PARSE_BODY(decimal)
                 kigit = kigit * 10 + (cp - '0');
                 if (++kigc == 3)
                 {
-                    kint *kigp = (kint *) rt.allocate(sizeof(kint));
+                    kint *kigp = (kint *) scr.allocate(sizeof(kint));
                     if (!kigp)
                         return ERROR;
                     *kigp = kigit;
@@ -235,7 +235,7 @@ PARSE_BODY(decimal)
     {
         while (kigc++ < 3)
             kigit *= 10;
-        kint *kigp = (kint *) rt.allocate(sizeof(kint));
+        kint *kigp = (kint *) scr.allocate(sizeof(kint));
         if (!kigp)
             return ERROR;
         *kigp = kigit;
@@ -998,7 +998,7 @@ decimal_p decimal::truncate(large to_exp) const
             else if (rm == 2)
                 k -= k % 10;
         }
-        kint *kp = (kint *) rt.allocate(sizeof(kint));
+        kint *kp = (kint *) scr.allocate(sizeof(kint));
         if (!kp)
             return nullptr;
         *kp = k;
@@ -1073,7 +1073,7 @@ decimal_p decimal::round(large to_exp) const
                 break;
             }
         }
-        kint *kp = (kint *) rt.allocate(sizeof(kint));
+        kint *kp = (kint *) scr.allocate(sizeof(kint));
         if (!kp)
             return nullptr;
         *kp = k;
@@ -1153,7 +1153,7 @@ bool decimal::split(decimal_g &ip, decimal_g &fp, large to_exp) const
             }
             k -= rest;
         }
-        kint *kp = (kint *) rt.allocate(sizeof(kint));
+        kint *kp = (kint *) scr.allocate(sizeof(kint));
         if (!kp)
             return false;
         *kp = k;
@@ -1162,7 +1162,7 @@ bool decimal::split(decimal_g &ip, decimal_g &fp, large to_exp) const
     for (size_t i = copy; i < nkigits; i++)
     {
         kint k = i == copy ? rest : kigit(+bp, i);
-        kint *kp = (kint *) rt.allocate(sizeof(kint));
+        kint *kp = (kint *) scr.allocate(sizeof(kint));
         if (!kp)
             return false;
         *kp = k;
@@ -1636,7 +1636,7 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
 
     // Allocate the mantissa
     scribble scr;
-    kint    *rb = (kint *) rt.allocate(rs * sizeof(kint));
+    kint    *rb = (kint *) scr.allocate(rs * sizeof(kint));
     if (!rb)
         return nullptr;
 
@@ -1677,7 +1677,7 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
         xe += expincr;
         if (rs < ps)
         {
-            rb = (kint *) rt.allocate(sizeof(kint)) - rs;
+            rb = (kint *) scr.allocate(sizeof(kint)) - rs;
             if (!rb)
                 return nullptr;
             rb[rs] = 0;
@@ -1751,7 +1751,7 @@ decimal_p decimal::subtract(decimal_r x, decimal_r y)
 
     // Allocate the mantissa
     scribble scr;
-    kint    *rb = (kint *) rt.allocate(rs * sizeof(kint));
+    kint    *rb = (kint *) scr.allocate(rs * sizeof(kint));
     if (!rb)
         return nullptr;
 
@@ -1840,7 +1840,7 @@ decimal_p decimal::multiply(decimal_r x, decimal_r y)
 
     // Allocate the mantissa
     scribble scr;
-    kint    *rb = (kint *) rt.allocate(rs * sizeof(kint));
+    kint    *rb = (kint *) scr.allocate(rs * sizeof(kint));
     if (!rb)
         return nullptr;
 
@@ -1972,7 +1972,7 @@ decimal_p decimal::divide(decimal_r x, decimal_r y)
 
     // Allocate memory for the result
     scribble scr;
-    kint    *rp = (kint *) rt.allocate((rs + qs + xs + ys) * sizeof(kint));
+    kint    *rp = (kint *) scr.allocate((rs + qs + xs + ys) * sizeof(kint));
     if (!rp)
         return nullptr;
 

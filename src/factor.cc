@@ -924,11 +924,11 @@ COMMAND_BODY(Factors)
     for (size_t i = 0; i < result.count; i++)
     {
         bignum_p p = result.factors[i].prime;
-        if (!p || !rt.append(p))
+        if (!p || !scr.append(p))
             return ERROR;
 
         bignum_p e = bignum::make(result.factors[i].exponent);
-        if (!e || !rt.append(e))
+        if (!e || !scr.append(e))
             return ERROR;
     }
 

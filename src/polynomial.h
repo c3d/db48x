@@ -89,7 +89,9 @@ struct polynomial : expression
     static polynomial_p get(object_p obj);
 
     // Write in the scratchpad a combination of the variables of two polynoms
-    static byte *copy_variables(polynomial_r x, byte *previous = nullptr);
+    static byte *copy_variables(polynomial_r x,
+                                scribble &scr,
+                                byte *previous = nullptr);
 
     // Add, sub, mul or div by another polynom
     static polynomial_p neg(polynomial_r x);

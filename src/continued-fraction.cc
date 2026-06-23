@@ -62,7 +62,7 @@ static algebraic_p bignum_to_algebraic(bignum_r n)
 }
 
 
-static object::result dfc_decimal(decimal_r dec, bool neg)
+static object::result dfc_decimal(decimal_r dec, bool neg, list_g &result)
 // ----------------------------------------------------------------------------
 //  Core DFC algorithm for a decimal value
 // ----------------------------------------------------------------------------
@@ -144,7 +144,10 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
         next_p = rem;
         next_q = q;
     }
-    if (!a0 || !rt.append(a0))
+    if (!a0)
+        return object::ERROR;
+    result = result->append(a0);
+    if (!result)
         return object::ERROR;
 
     // Stopping threshold: 10^(eff_exp/2).
@@ -186,7 +189,10 @@ static object::result dfc_decimal(decimal_r dec, bool neg)
         if (Q_new > thresh)
             break;
         algebraic_g ai = bignum_to_algebraic(ai_big);
-        if (!ai || !rt.append(ai))
+        if (!ai)
+            return object::ERROR;
+        result = result->append(ai);
+        if (!result)
             return object::ERROR;
         Q_prev = Q_curr;
         Q_curr = Q_new;
@@ -210,11 +216,9 @@ COMMAND_BODY(DFC)
     // Fast path 1: integer input → { n }
     if (object::is_integer(ty))
     {
-        scribble scr;
-        if (!rt.append(xo))
-            return ERROR;
-        list_g lst = list::make(scr.scratch(), scr.growth());
-        if (!lst || !rt.top(lst))
+        list_g result = list::make(object::ID_list, nullptr, 0);
+        result = result->append(xo);
+        if (!result || !rt.top(result))
             return ERROR;
         return OK;
     }
@@ -228,7 +232,7 @@ COMMAND_BODY(DFC)
         ularge     p      = frac->numerator_value();
         ularge     q      = frac->denominator_value();
         bool       neg    = (ty == object::ID_neg_fraction);
-        scribble   scr;
+        list_g     result = list::make(object::ID_list, nullptr, 0);
 
         ularge    quot  = p / q;
         ularge    rem   = p % q;
@@ -253,7 +257,8 @@ COMMAND_BODY(DFC)
             next_p = rem;
             next_q = q;
         }
-        if (!a0i || !rt.append(a0i))
+        result = result->append(a0i);
+        if (!result)
             return ERROR;
 
         // Remaining coefficients: reciprocal swap then standard GCD steps.
@@ -264,13 +269,15 @@ COMMAND_BODY(DFC)
             ularge    a  = p / q;
             ularge    r  = p % q;
             integer_g ai = rt.make<integer>(a);
-            if (!ai || !rt.append(ai))
+            if (!ai)
+                return ERROR;
+            result = result->append(ai);
+            if (!result)
                 return ERROR;
             p = q;
             q = r;
         }
-        list_g lst = list::make(scr.scratch(), scr.growth());
-        if (!lst || !rt.top(lst))
+        if (!rt.top(result))
             return ERROR;
         return OK;
     }
@@ -293,15 +300,13 @@ COMMAND_BODY(DFC)
         xo = algebraic_p(+xo);
     }
 
-    scribble  scr;
-    decimal_g dec = decimal_p(+xo);
+    list_g    result = list::make(object::ID_list, nullptr, 0);
+    decimal_g dec    = decimal_p(+xo);
     if (!dec)
         return ERROR;
-    result r = dfc_decimal(dec, ty == object::ID_neg_decimal);
-    if (r != OK)
-        return r;
-    list_g lst = list::make(scr.scratch(), scr.growth());
-    if (!lst || !rt.top(lst))
+    if (dfc_decimal(dec, ty == object::ID_neg_decimal, result) != OK)
+        return ERROR;
+    if (!result || !rt.top(result))
         return ERROR;
     return OK;
 }

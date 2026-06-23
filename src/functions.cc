@@ -1106,7 +1106,7 @@ static algebraic_p rnd_or_trnc(algebraic_r value, int digits,
             if (!a)
                 return nullptr;
             obj = +a;
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
         return list::make(ty, scr.scratch(), scr.growth());

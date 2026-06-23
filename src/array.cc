@@ -458,12 +458,12 @@ array_p array::build(size_t rows, size_t columns, item_fn items, void *data)
                     for (size_t c = 0; c < columns; c++)
                     {
                         object_g it = items(rows, columns, r, c, data);
-                        if (program::interrupted() || !rt.append(it))
+                        if (program::interrupted() || !scr.append(it))
                             return nullptr;
                     }
                     row = list::make(ID_array, srow.scratch(), srow.growth());
                 }
-                if (program::interrupted() || !rt.append(row))
+                if (program::interrupted() || !scr.append(row))
                     return nullptr;
             }
         }
@@ -472,7 +472,7 @@ array_p array::build(size_t rows, size_t columns, item_fn items, void *data)
             for (size_t r = 0; r < rows; r++)
             {
                 object_g it = items(rows, columns, r, 0, data);
-                if (program::interrupted() || !rt.append(it))
+                if (program::interrupted() || !scr.append(it))
                     return nullptr;
             }
         }
@@ -921,12 +921,12 @@ static array_p echelon_build_array(size_t rows, size_t cols,
                     return nullptr;
                 size_t ix = echelon_index(r, c, cols);
                 object_p elt = rt.stack(base + ~ix);
-                if (!elt || !rt.append(elt))
+                if (!elt || !scr.append(elt))
                     return nullptr;
             }
             vec = list::make(atype, sv.scratch(), sv.growth());
         }
-        if (!vec || !rt.append(vec))
+        if (!vec || !scr.append(vec))
             return nullptr;
     }
     object_p result = list::make(atype, scr.scratch(), scr.growth());
@@ -1055,7 +1055,7 @@ echelon_result array::row_echelon(array_r m, echelon_options opt)
                 object_p diag = echelon_element(r, pivot_col[r], cols, base);
                 record(echelon, "RREFP final pivot [%zu,%zu] = %t",
                        r, pivot_col[r], diag);
-                if (!diag || !rt.append(diag))
+                if (!diag || !sc.append(diag))
                     goto err;
             }
         }
@@ -1699,12 +1699,12 @@ array_p array::invert() const
                         goto err;
                     size_t orc = r * n + c;
                     object_p mrc = rt.stack(pt + ~orc);
-                    if (!rt.append(mrc))
+                    if (!sv.append(mrc))
                         goto err;
                 }
                 vec = list::make(atype, sv.scratch(), sv.growth());
             }
-            if (!rt.append(vec))
+            if (!sr.append(vec))
                 goto err;
         }
 
@@ -2223,7 +2223,7 @@ COMMAND_BODY(RowsToMatrix)
             object_p obj = rt.stack(rows - row);
             if (!obj || !obj->is_extended_algebraic())
                 goto type_error;
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 goto error;
         }
         list_p result = list::make(ID_array, scr.scratch(), scr.growth());
@@ -2280,7 +2280,7 @@ COMMAND_BODY(MatrixToColumns)
                         else
                             row = integer::make(0);
                     }
-                    if (!row || !rt.append(row))
+                    if (!row || !scr.append(row))
                     {
                         rows += c;
                         goto error;
@@ -2363,7 +2363,7 @@ COMMAND_BODY(ColumnsToMatrix)
                             else
                                 obj = integer::make(0);
                         }
-                        if (!obj || !rt.append(obj))
+                        if (!obj || !scr.append(obj))
                         {
                             rt.drop(columns);
                             return ERROR;
@@ -2371,7 +2371,7 @@ COMMAND_BODY(ColumnsToMatrix)
                     }
                     robj = list::make(ID_array, rscr.scratch(), rscr.growth());
                 }
-                if (!robj || !rt.append(robj))
+                if (!robj || !scr.append(robj))
                 {
                     rt.drop(columns);
                     return ERROR;
@@ -2475,7 +2475,7 @@ object::result array::add_row_or_column(bool columnist)
                     goto dimension_error;
                 list_p irl = irow->as_array_or_list();
                 orl = irl ? orl->insert(irl, row) : orl->insert(irow, row);
-                if (!orl || !rt.append(orl))
+                if (!orl || !scr.append(orl))
                     return ERROR;
                 ++oi;
                 ++ii;
@@ -2574,7 +2574,7 @@ object::result array::delete_row_or_column(bool columnist)
             if (!orl)
                 goto dimension_error;
             orl = orl->remove(row, count);
-            if (!orl || !rt.append(orl))
+            if (!orl || !scr.append(orl))
                 return ERROR;
         }
         ol = list::make(ty, scr.scratch(), scr.growth());
@@ -2634,7 +2634,7 @@ object::result array::swap_row_or_column(bool columnist)
                     return ERROR;
                 }
             }
-            if (!rt.append(row))
+            if (!scr.append(row))
                 return ERROR;
         }
         if (vec)

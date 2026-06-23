@@ -233,7 +233,7 @@ object::result loop::object_parser(parser  &p,
                 return ERROR;
 
             // Copy the parsed object to the scratch pad (may GC)
-            byte *objcopy = rt.append(obj);
+            byte *objcopy = scr.append(obj);
             if (!objcopy)
                 return ERROR;
 

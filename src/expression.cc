@@ -690,7 +690,7 @@ static object_p grab_arguments(size_t &eq, size_t &eqsz)
             object_p obj = rt.stack(eq + len);
             if (sym->found_in(obj))
                 expression::contains_independent_variable = true;
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
     }
@@ -699,7 +699,7 @@ static object_p grab_arguments(size_t &eq, size_t &eqsz)
         while (len--)
         {
             object_p obj = rt.stack(eq + len);
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
     }
@@ -1134,7 +1134,7 @@ static algebraic_p build_expr(expression_p eqin,
         {
             // Copy from source equation directly
             object_p obj = *it;
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
         else if (!replaced)
@@ -1232,7 +1232,7 @@ static algebraic_p build_expr(expression_p eqin,
                     nvars++;
                     nconstants++;
                 }
-                if (!rt.append(tobjsize, byte_p(tobj)))
+                if (!scr.append(tobjsize, byte_p(tobj)))
                     return nullptr;
             }
 
@@ -1248,7 +1248,7 @@ static algebraic_p build_expr(expression_p eqin,
                 if (!value)
                     return nullptr;
                 rt.free(len);
-                if (!rt.append(value))
+                if (!scr.append(value))
                     return nullptr;
             }
 
@@ -2886,7 +2886,7 @@ PARSE_BODY(funcall)
             return ERROR;
         parsed += child.length;
 
-        if (!rt.append_expression(obj))
+        if (!scr.append_expression(obj))
             return ERROR;
 
         source = p.source;      // In case of GC
@@ -2906,7 +2906,7 @@ PARSE_BODY(funcall)
     }
 
     // Copy the name last
-    if (!rt.append(callee))
+    if (!scr.append(callee))
         return ERROR;
 
     // Create the function call object
@@ -2976,7 +2976,7 @@ array_p funcall::args() const
         return nullptr;
     scribble scr;
     while (object_p obj = arg(sdr.depth))
-        if (!rt.append(obj))
+        if (!scr.append(obj))
             return nullptr;
     if (rt.depth() > sdr.depth)
         return nullptr;
@@ -3054,9 +3054,9 @@ COMMAND_BODY(Apply)
                 scribble scr;
                 size_t argsize = 0;
                 object_p argsrc = lst->objects(&argsize);
-                if (rt.append(argsrc, argsize))
+                if (scr.append(argsrc, argsize))
                 {
-                    if (rt.append(callee))
+                    if (scr.append(callee))
                     {
                         gcbytes scratch = scr.scratch();
                         size_t  alloc   = scr.growth();
@@ -4114,7 +4114,7 @@ static algebraic_p derivative_funcall_build(funcall_p src, funcall_p repl)
         {
             if (++a == nobj)
                 obj = +st;
-            if (!rt.append(obj))
+            if (!scr.append(obj))
                 return nullptr;
         }
         gcbytes bytes = scr.scratch();
