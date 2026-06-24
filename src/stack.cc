@@ -144,14 +144,17 @@ uint stack::draw_stack()
     object_g cached;
     char     buf[16];
 
-    // Invalidate cache if settings changed
-    static uint settingsHash = 0;
-    uint hash = Settings.hash() ^ (interactive ? 0x4242 : 0) ;
-    if (hash != settingsHash)
+    // Invalidate cache if settings changed or temporaries were reclaimed
+    static uint   settingsHash    = 0;
+    static size_t gcclearedAtDraw = 0;
+    uint          hash = Settings.hash() ^ (interactive ? 0x4242 : 0);
+    if (hash != settingsHash || rt.gc_cleared() != gcclearedAtDraw)
     {
+        if (hash != settingsHash)
+            font::clear_cache();
         rt.uncache();
-        font::clear_cache();
         settingsHash = hash;
+        gcclearedAtDraw = rt.gc_cleared();
     }
 
     for (uint level = interactive_base; level < depth; level++)

@@ -352,6 +352,7 @@ struct runtime
     void     uncache(object_p key, size_t sz);
     void     uncache(object_p key)      { uncache(key, 1); }
     void     uncache()                  { uncache(nullptr, ~0UL); }
+    size_t   gc_cleared() const         { return GCCleared; }
 
 
     // ========================================================================
