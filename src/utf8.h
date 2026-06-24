@@ -225,7 +225,7 @@ inline size_t utf8_size(unicode cp)
 }
 
 
-inline size_t utf8_size(utf8 text, size_t max = ~0UL)
+inline size_t utf8_size(utf8 text, size_t max = ~0ULL)
 // ----------------------------------------------------------------------------
 //   Return the number of bytes required for a UTF-8 encoding of text
 // ----------------------------------------------------------------------------

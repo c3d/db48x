@@ -281,7 +281,7 @@ object::result draw_plot(object::id                  kind,
     if (xyplot)
     {
         uint        shift = 1;
-        algebraic_g div   = integer::make(1UL << shift);
+        algebraic_g div   = integer::make(1ULL << shift);
         algebraic_g dx    = (ppar.xmax - ppar.xmin) / div;
         algebraic_g dy    = (ppar.ymax - ppar.ymin) / div;
         size        w     = 2*display_width();
@@ -315,7 +315,7 @@ object::result draw_plot(object::id                  kind,
                         algebraic::compare(dy, step) < 0)
                         break;
                     shift++;
-                    div = integer::make(1UL << shift);
+                    div = integer::make(1ULL << shift);
                     dx = (ppar.xmax - ppar.xmin) / div;
                     dy = (ppar.ymax - ppar.ymin) / div;
                     x = ppar.xmin + dx;

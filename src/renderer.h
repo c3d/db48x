@@ -69,7 +69,7 @@ struct renderer
     bool   put(unicode code);
     bool   put(utf8 s)                  { return put(cstring(s)); }
     bool   put(utf8 s, size_t len)      { return put(cstring(s), len); }
-    bool   put(object::id fmt, utf8 s, size_t len = ~0UL);
+    bool   put(object::id fmt, utf8 s, size_t len = ~0ULL);
 
     bool   editing() const              { return edit; }
     bool   graphing() const             { return graph; }

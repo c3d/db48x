@@ -702,7 +702,7 @@ ularge decimal::as_unsigned(bool magnitude) const
 
     // If we overflow in the computation, return a "maxint"
     if (exp >= 19)
-        return ~0UL;
+        return ~0ULL;
 
     ularge xp  = exp;
     ularge pow = 1;
@@ -737,8 +737,8 @@ large decimal::as_integer() const
 // ----------------------------------------------------------------------------
 {
     large result = (large) as_unsigned(true);
-    if (result == ~0L)
-        result = 0x7FFFFFFFFFFFFFFFL;
+    if (result == ~0LL)
+        result = 0x7FFFFFFFFFFFFFFFLL;
     if (type() == ID_neg_decimal)
         result = -result;
     return result;
@@ -751,7 +751,7 @@ int32_t decimal::as_int32() const
 // ----------------------------------------------------------------------------
 {
     large result = (large) as_unsigned(true);
-    if (result == ~0L || result >= 0x80000000L)
+    if (result == ~0LL || result >= 0x80000000LL)
         result = 0x7FFFFFFF;
     if (type() == ID_neg_decimal)
         result = -result;
@@ -786,7 +786,7 @@ decimal_p decimal::from_bignum(bignum_p valuep)
     decimal_g digits;
     large     exp    = 0;
     bignum_g  value  = valuep;
-    bignum_g  div    = bignum::make(1000000000000UL);
+    bignum_g  div    = bignum::make(1000000000000ULL);
     bignum_g  kigit;
 
     while (!value->is_zero())
@@ -816,7 +816,7 @@ decimal_p decimal::from_random_seed(bignum_p valuep)
     decimal_g digits;
     large     exp    = 0;
     bignum_g  value  = valuep;
-    bignum_g  div    = bignum::make(1000000000000UL);
+    bignum_g  div    = bignum::make(1000000000000ULL);
     bignum_g  kigit;
 
     while (!value->is_zero())

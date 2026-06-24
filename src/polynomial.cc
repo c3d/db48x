@@ -1031,7 +1031,7 @@ size_t polynomial::variable(utf8 name, size_t len) const
         if (size_t(p - first) >= length)
             break;
     }
-    return ~0UL;
+    return ~0ULL;
 }
 
 
@@ -1041,7 +1041,7 @@ size_t polynomial::variable(symbol_p sym) const
 // ----------------------------------------------------------------------------
 {
     if (!sym)
-        return ~0UL;
+        return ~0ULL;
     size_t len  = 0;
     utf8   name = sym->value(&len);
     return variable(name, len);
