@@ -988,6 +988,7 @@ bool object::object_error(id type, object_p ptr)
            "Invalid type %d for %p  Data %16llX %16llX",
            type, ptr, debug[0], debug[1]);
     runtime::dump_gc_pointers();
+    recorder_dump();
     return false;
 }
 #endif // SIMULATOR
