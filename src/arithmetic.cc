@@ -1593,7 +1593,7 @@ algebraic_p arithmetic::evaluate(id          op,
                 if (ops.integer_ok(xt, yt, xv, yv))
                 {
                     if (based)
-                        xv &= (1UL << ws) - 1UL;
+                        xv &= (1ULL << ws) - 1ULL;
                     return rt.make<integer>(xt, xv);
                 }
             }
