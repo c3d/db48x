@@ -84,7 +84,7 @@ PARSE_BODY(symbol)
 
     // First character must be alphabetic
     unicode cp     = utf8_codepoint(source);
-    if (cp == L'Ⓥ')
+    if (cp == U'Ⓥ')
     {
         parsed = utf8_next(source, parsed, max);
         cp     = utf8_codepoint(source + parsed);
@@ -118,7 +118,7 @@ RENDER_BODY(symbol)
     auto   format = r.editing() ? ID_LongFormNames : Settings.NameDisplayMode();
     if (r.editing() && !r.graphing())
         if (command::lookup(txt, cmdlen) && cmdlen == len)
-            r.put(unicode(L'Ⓥ'));
+            r.put(unicode(U'Ⓥ'));
     r.put(format, txt, len);
     return r.size();
 }

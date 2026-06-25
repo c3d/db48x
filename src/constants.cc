@@ -230,8 +230,8 @@ EVAL_BODY(constant_menu_name)
     rt.command(static_object(ID_ConstantName));
     int key = ui.evaluating;
     unicode pfx = ui.character_left_of_cursor();
-    const constant::config &cfg = pfx == L'Ⓡ' ? relative_uncertainty::relative
-                                : pfx == L'Ⓢ' ? standard_uncertainty::standard
+    const constant::config &cfg = pfx == U'Ⓡ' ? relative_uncertainty::relative
+                                : pfx == U'Ⓢ' ? standard_uncertainty::standard
                                               : constant::constants;
     if (object_p cstobj = constant::do_key(cfg, key))
         if (constant_p cst = cstobj->as<constant>())
@@ -250,7 +250,7 @@ INSERT_BODY(constant_menu_name)
 {
     int key = ui.evaluating;
     unicode prefix = ui.character_left_of_cursor();
-    bool noprefix = prefix == L'Ⓒ' || prefix == L'Ⓡ' || prefix == L'Ⓢ';
+    bool noprefix = prefix == U'Ⓒ' || prefix == U'Ⓡ' || prefix == U'Ⓢ';
     return ui.insert_softkey(key, noprefix ? "" : " Ⓒ", " ", false);
 }
 
@@ -2828,7 +2828,7 @@ const constant::config constant::constants =
 {
     .menu_help     = " constants",
     .help          = " constant",
-    .prefix        = L'Ⓒ',
+    .prefix        = U'Ⓒ',
     .type          = ID_constant,
     .first_menu    = ID_ConstantsMenu00,
     .last_menu     = ID_ConstantsMenu99,
@@ -3761,7 +3761,7 @@ const constant::config standard_uncertainty::standard =
 {
     .menu_help      = " Constants",
     .help           = " Constant",
-    .prefix         = L'Ⓢ',
+    .prefix         = U'Ⓢ',
     .type           = ID_standard_uncertainty,
     .first_menu     = ID_ConstantsMenu00,
     .last_menu      = ID_ConstantsMenu99,
@@ -3817,7 +3817,7 @@ const constant::config relative_uncertainty::relative =
 {
     .menu_help      = " Constants",
     .help           = " Constant",
-    .prefix         = L'Ⓡ',
+    .prefix         = U'Ⓡ',
     .type           = ID_relative_uncertainty,
     .first_menu     = ID_ConstantsMenu00,
     .last_menu      = ID_ConstantsMenu99,

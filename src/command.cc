@@ -114,7 +114,7 @@ object::id command::lookup(utf8 name, size_t &maxlen, bool eq)
         // Compute the maximum possible size for the command
         size_t max = maxlen;
         if (is_valid_as_name_initial(name) ||
-            (!eq && utf8_codepoint(name) == L'↑')) // e.g. ↑Match
+            (!eq && utf8_codepoint(name) == U'↑')) // e.g. ↑Match
         {
             for (max = utf8_size(name, max);
                  max < maxlen && !is_separator(name + max);
@@ -271,7 +271,7 @@ RENDER_BODY(command)
             if (ty == ID_divide)
                 r.put('/');
             else if (ty == ID_multiply)
-                r.put(unicode(L'·'));
+                r.put(unicode(U'·'));
             else
                 break;
             return r.size();
@@ -728,7 +728,7 @@ MARKER_BODY(Unimplemented)
 //   We mark unimplemented features with a little gray mark
 // ----------------------------------------------------------------------------
 {
-    return L'░';
+    return U'░';
 }
 
 

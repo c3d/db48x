@@ -1640,7 +1640,7 @@ static bool evaluate_variable(object_p name, object_p value, void *arg)
         disp = name->as_symbol(true);
     menu::info &mi = *((menu::info *) arg);
     if (value->type() == object::ID_directory)
-        mi.marker = L'◥';
+        mi.marker = U'◥';
     menu::items(mi, disp, menu::ID_variable_menu_execute);
 
     return true;
@@ -1706,8 +1706,8 @@ void VariablesMenu::list_variables(info &mi)
 
     for (uint k = 0; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
     {
-        ui.marker(k + 1 * ui.NUM_SOFTKEYS, L'▶', false);
-        ui.marker(k + 2 * ui.NUM_SOFTKEYS, L'▶', true);
+        ui.marker(k + 1 * ui.NUM_SOFTKEYS, U'▶', false);
+        ui.marker(k + 2 * ui.NUM_SOFTKEYS, U'▶', true);
     }
 }
 

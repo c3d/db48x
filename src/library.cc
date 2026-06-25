@@ -91,7 +91,7 @@ const xlib::config xlib::library =
 {
     .menu_help      = "Library",
     .help           = "",
-    .prefix         = L'Ⓛ',
+    .prefix         = U'Ⓛ',
     .type           = ID_xlib,
     .first_menu     = ID_LibraryMenu00,
     .last_menu      = ID_LibraryMenu99,

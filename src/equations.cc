@@ -1432,7 +1432,7 @@ const equation::config equation::equations =
 {
     .menu_help      = "",
     .help           = "",
-    .prefix         = L'Ⓔ',
+    .prefix         = U'Ⓔ',
     .type           = ID_equation,
     .first_menu     = ID_EquationsMenu00,
     .last_menu      = ID_EquationsMenu99,
@@ -1776,7 +1776,7 @@ RENDER_BODY(assignment)
     {
         // Inside an expression, use the old HP syntax
         value->render(r);
-        r.put(unicode(L'▶'));
+        r.put(unicode(U'▶'));
         name->render(r);
     }
     else

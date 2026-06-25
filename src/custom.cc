@@ -173,7 +173,7 @@ void CustomMenu::add_custom_item(info &mi, object_p obj)
         {
             if (object_p value = directory::recall_all(sym, false))
                 if (value->type() == object::ID_directory)
-                    mi.marker = L'◥';
+                    mi.marker = U'◥';
         }
         else
         {
@@ -215,7 +215,7 @@ void CustomMenu::add_custom_item(info &mi, object_p obj)
     if (!sym)
         sym = obj->as_symbol(false);
     if (obj->type() == object::ID_directory)
-        mi.marker = L'◥';
+        mi.marker = U'◥';
     menu::items(mi, sym, obj);
 }
 

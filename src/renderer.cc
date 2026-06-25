@@ -189,7 +189,7 @@ static unicode db48x_to_lower(unicode cp)
 //   Case conversion to lowercase ignoring special DB48X characters
 // ----------------------------------------------------------------------------
 {
-    if (cp == L'Σ' || cp == L'∏' || cp == L'∆')
+    if (cp == U'Σ' || cp == U'∏' || cp == U'∆')
         return cp;
     return towlower(cp);
 }
@@ -200,8 +200,8 @@ static unicode db48x_to_upper(unicode cp)
 //   Case conversion to uppercase ignoring special DB48X characters
 // ----------------------------------------------------------------------------
 {
-    if (cp == L'∂' || cp ==  L'ρ' || cp == L'π' ||
-        cp == L'μ' || cp == L'θ' || cp == L'ε')
+    if (cp == U'∂' || cp ==  U'ρ' || cp == U'π' ||
+        cp == U'μ' || cp == U'θ' || cp == U'ε')
         return cp;
     return towupper(cp);
 }

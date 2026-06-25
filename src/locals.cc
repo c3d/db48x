@@ -54,7 +54,7 @@ static inline bool is_program_separator(unicode cp)
 //   Check if a given unicode character can begin a program object
 // ----------------------------------------------------------------------------
 {
-    return cp == L'«'           // Program object
+    return cp == U'«'           // Program object
         || cp == '\''           // Equation
         || cp == '{';           // List
 }
@@ -68,7 +68,7 @@ PARSE_BODY(locals)
     gcutf8  s   = p.source;
     size_t  max = p.length;
     unicode cp  = utf8_codepoint(s);
-    if (cp != L'→' && cp != L'▶')
+    if (cp != U'→' && cp != U'▶')
         return SKIP;
     s = utf8_next(s);
 
@@ -157,7 +157,7 @@ PARSE_BODY(locals)
     object::result result = ERROR;
     switch(cp)
     {
-    case L'«':  result = program   ::do_parse(p); break;
+    case U'«':  result = program   ::do_parse(p); break;
     case  '\'': result = expression::do_parse(p); break;
     case '{':   result = list      ::do_parse(p); break;
     default:                                    break;

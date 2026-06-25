@@ -66,7 +66,7 @@ PARSE_BODY(program)
 //    Try to parse this as a program
 // ----------------------------------------------------------------------------
 {
-    return list_parse(ID_program, p, L'«', L'»');
+    return list_parse(ID_program, p, U'«', U'»');
 }
 
 
@@ -75,7 +75,7 @@ RENDER_BODY(program)
 //   Render the program into the given program buffer
 // ----------------------------------------------------------------------------
 {
-    return o->list_render(r, L'«', L'»');
+    return o->list_render(r, U'«', U'»');
 }
 
 
@@ -227,7 +227,7 @@ object::result program::run_loop(size_t depth)
 
         if (stepping)
         {
-            ui.draw_busy(L'›', Settings.SteppingIconForeground());
+            ui.draw_busy(U'›', Settings.SteppingIconForeground());
             halted = --stepping == 0;
         }
     }

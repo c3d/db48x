@@ -136,7 +136,7 @@ PARSE_BODY(range)
     }
 
     size_t   ysz    = max - offs;
-    bool     yisinf = utf8_codepoint(p.source + offs) == L'∞';
+    bool     yisinf = utf8_codepoint(p.source + offs) == U'∞';
     object_p yobj   = yisinf
                         ? rt.infinity(false)
                         : parse(p.source + offs, ysz, PARENTHESES, p.separator);

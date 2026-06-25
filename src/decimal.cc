@@ -261,9 +261,9 @@ PARSE_BODY(decimal)
             bool  expneg = false;
             s = utf8_next(s);
             unicode sign = utf8_codepoint(s);
-            if (sign == '+' || sign == '-' || sign == L'⁻')
+            if (sign == '+' || sign == '-' || sign == U'⁻')
             {
-                expneg = sign == '-' || sign == L'⁻';
+                expneg = sign == '-' || sign == U'⁻';
                 s = utf8_next(s);
             }
             bool expok = false;
@@ -372,8 +372,8 @@ RENDER_BODY(decimal)
 
     static uint16_t fancy_digit[10] =
     {
-        L'⁰', L'¹', L'²', L'³', L'⁴',
-        L'⁵', L'⁶', L'⁷', L'⁸', L'⁹'
+        U'⁰', U'¹', U'²', U'³', U'⁴',
+        U'⁵', U'⁶', U'⁷', U'⁸', U'⁹'
     };
 
     // Emit sign if necessary
@@ -665,7 +665,7 @@ RENDER_BODY(decimal)
                 for (char *ptr = expbuf; ptr < end; ptr++)
                 {
                     char c = *ptr;
-                    unicode u = c == '-' ? L'⁻' : fancy_digit[c - '0'];
+                    unicode u = c == '-' ? U'⁻' : fancy_digit[c - '0'];
                     r.put(u);
                 }
             }

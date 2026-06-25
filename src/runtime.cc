@@ -460,7 +460,7 @@ size_t runtime::gc()
     object_p free     = first;
     object_p next;
 
-    ui.draw_busy(L'●', Settings.GCIconForeground());
+    ui.draw_busy(U'●', Settings.GCIconForeground());
 
     record(gc, "Garbage collection, available %u, range %p-%p",
            available(), first, last);

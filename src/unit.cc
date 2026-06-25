@@ -1779,7 +1779,7 @@ MENU_BODY(unit_menu)
 
     for (uint k = 0; k < ui.NUM_SOFTKEYS - (mi.pages > 1); k++)
     {
-        ui.marker(k + 1 * ui.NUM_SOFTKEYS, L'→', true);
+        ui.marker(k + 1 * ui.NUM_SOFTKEYS, U'→', true);
         ui.marker(k + 2 * ui.NUM_SOFTKEYS, '/', false);
     }
 
@@ -2096,7 +2096,7 @@ INSERT_BODY(ApplyInverseUnit)
         unicode c = ui.character_left_of_cursor();
         return ui.insert_softkey(key,
                                  c == '_'                  ? "1/("
-                                 : (c == '/' || c == L'÷') ? "("
+                                 : (c == '/' || c == U'÷') ? "("
                                                            : "/(",
                                  ")",
                                  false);

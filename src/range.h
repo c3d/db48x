@@ -72,7 +72,7 @@ struct range : complex
     static bool adjust_input(id ty, algebraic_g &x, algebraic_g &y);
     static bool adjust_output(id ty, algebraic_g &x, algebraic_g &y);
 
-    enum { INTERVAL_MARK = L'…' };
+    enum { INTERVAL_MARK = U'…' };
 
 public:
     SIZE_DECL(range);
@@ -147,7 +147,7 @@ struct drange : range
 // ----------------------------------------------------------------------------
 {
     drange(id type, algebraic_r x, algebraic_r y);
-    enum { PLUSMINUS_MARK = L'±' };
+    enum { PLUSMINUS_MARK = U'±' };
 
 public:
     OBJECT_DECL(drange);
@@ -190,7 +190,7 @@ struct uncertain : range
         return rt.make<uncertain>(a, s);
     }
 
-    enum { SIGMA_MARK = L'σ' };
+    enum { SIGMA_MARK = U'σ' };
 
     // Uncertain number implementation for main functions
 #define UNCERTAIN_FUNCTION(name)    static uncertain_p name(uncertain_r u)

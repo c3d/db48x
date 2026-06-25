@@ -346,7 +346,7 @@ uint stack::draw_stack()
 
                 if (dots)
                 {
-                    unicode sep   = L'…';
+                    unicode sep   = U'…';
                     coord   x     = hdrx + 5;
                     coord   split = 200;
                     coord   skip  = font->width(sep) * 3 / 2;

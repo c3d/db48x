@@ -284,17 +284,17 @@ object::result list::list_parse(id      type,
                 // Check special postfix notations
                 switch(cp)
                 {
-                case L'²':
+                case U'²':
                     postfix_cmd = ID_sq;
                     break;
-                case L'³':
+                case U'³':
                     postfix_cmd = ID_cubed;
                     break;
                 case '!':
                     postfix_cmd = ID_fact;
                     break;
-                case L'⁻':
-                    if (utf8_codepoint(utf8_next(s)) == L'¹')
+                case U'⁻':
+                    if (utf8_codepoint(utf8_next(s)) == U'¹')
                         postfix_cmd = ID_inv;
                     break;
                 default:

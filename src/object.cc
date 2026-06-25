@@ -280,7 +280,7 @@ retry:
     case '[':                   // Arrays
         r = array::do_parse(p);
         break;
-    case L'«':                  // Programs
+    case U'«':                  // Programs
         r = program::do_parse(p);
         break;
     case '(':
@@ -294,37 +294,37 @@ retry:
     case complex::ANGLE_MARK:   // Polar complex numbers
         r = polar::do_parse(p);
         break;
-    case L'Ⓒ':                  // Constants
+    case U'Ⓒ':                  // Constants
         r = constant::do_parse(p);
         break;
-    case L'Ⓔ':                  // Equations
+    case U'Ⓔ':                  // Equations
         r = equation::do_parse(p);
         break;
-    case L'Ⓛ':                  // Library items
+    case U'Ⓛ':                  // Library items
         r = xlib::do_parse(p);
         break;
-    case L'Ⓡ':                  // Constants relative uncertainty
+    case U'Ⓡ':                  // Constants relative uncertainty
         r = relative_uncertainty::do_parse(p);
         break;
-    case L'Ⓢ':                  // Constants standard uncertainty
+    case U'Ⓢ':                  // Constants standard uncertainty
         r = standard_uncertainty::do_parse(p);
         break;
-    case L'Ⓟ':                  // Polynomials
+    case U'Ⓟ':                  // Polynomials
         r = polynomial::do_parse(p);
         break;
-    case L'Ⓥ':
+    case U'Ⓥ':
         r = symbol::do_parse(p);
         break;
     case ':':                   // Tagged objects
         r = tag::do_parse(p);
         break;
-    case L'∂':
+    case U'∂':
         r = Derivative::do_parse(p);
         break;
-    case L'∫':
+    case U'∫':
         r = Primitive::do_parse(p);
         break;
-    case L'−':
+    case U'−':
         r = range::do_parse(p);
         if (r == OK)
             break;
@@ -334,7 +334,7 @@ retry:
         r = command::do_parse(p);
         if (r == SKIP && is_valid_as_name_initial(cp))
         {
-            if (r == SKIP && (cp == L'→' || cp == L'▶'))
+            if (r == SKIP && (cp == U'→' || cp == U'▶'))
                 r = locals::do_parse(p);
             if (r == SKIP)
             {

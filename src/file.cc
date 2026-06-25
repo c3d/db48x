@@ -294,11 +294,11 @@ unicode file::get()
         uint    offs = ftell(data);
         unicode next = valid() ? fgetc(data) : unicode(EOF);
         if (code == '<' && next == '<')
-            return L'«';
+            return U'«';
         else if (code == '>' && next == '>')
-            return L'»';
+            return U'»';
         else if (code == '-' && next == '>')
-            return L'→';
+            return U'→';
         seek(offs);
     }
 

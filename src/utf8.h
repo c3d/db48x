@@ -404,7 +404,7 @@ inline bool is_valid_in_function_name(unicode cp)
 // ----------------------------------------------------------------------------
 {
     // Functions like ΣX² or sin⁻¹ are valid
-    return (cp == L'⁻' || cp == L'¹' || cp == L'²' || cp == L'³' ||
+    return (cp == U'⁻' || cp == U'¹' || cp == U'²' || cp == U'³' ||
             is_valid_in_name(cp));
 }
 
@@ -423,7 +423,7 @@ inline bool is_valid_in_constant_name(unicode cp)
 //   In constants, we accept a few additional characters
 // ----------------------------------------------------------------------------
 {
-    return cp == L'ⅈ' || cp == L'−' || is_valid_in_name(cp);
+    return cp == U'ⅈ' || cp == U'−' || is_valid_in_name(cp);
 }
 
 
@@ -447,7 +447,7 @@ inline bool is_valid_as_name_initial(unicode cp)
     for (utf8 p = invalid; *p; p = utf8_next(p))
         if (cp == utf8_codepoint(p))
             return false;
-    return cp == L'−' || is_valid_in_name(cp);
+    return cp == U'−' || is_valid_in_name(cp);
 }
 
 
@@ -531,7 +531,7 @@ inline bool is_unicode_space(unicode c)
 // ----------------------------------------------------------------------------
 {
     return isspace(c)
-        || c == L' ' || c == L' ' || c == L' ' || c == L' ' || c == L' ';
+        || c == U' ' || c == U' ' || c == U' ' || c == U' ' || c == U' ';
 }
 
 

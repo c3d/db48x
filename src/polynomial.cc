@@ -1170,7 +1170,7 @@ PARSE_BODY(polynomial)
 
     // First character must be a constant marker
     unicode cp = utf8_codepoint(source);
-    if (cp != L'Ⓟ')
+    if (cp != U'Ⓟ')
         return SKIP;
     parsed = utf8_next(source, parsed, max);
 
@@ -1276,13 +1276,13 @@ RENDER_BODY(polynomial)
 
     bool editing = r.editing();
     if (editing || Settings.PrefixPolynomialRender())
-        r.put(unicode(L'Ⓟ'));
+        r.put(unicode(U'Ⓟ'));
     if (editing)
         r.put('\'');
 
     // Loop over all factors
     bool    first = true;
-    unicode mul   = Settings.UseDotForMultiplication() ? L'·' : L'×';
+    unicode mul   = Settings.UseDotForMultiplication() ? U'·' : U'×';
     for (auto term : *poly)
     {
         // Emit the factor
@@ -1311,7 +1311,7 @@ RENDER_BODY(polynomial)
                 vars[v]->render(r);
                 if (exponent > 1)
                 {
-                    r.put(unicode(L'↑'));
+                    r.put(unicode(U'↑'));
                     char exptxt[24];
                     char *end = render_u64(exptxt, exponent);
                     r.put(exptxt, end - exptxt);

@@ -443,9 +443,9 @@ PARSE_BODY(integer)
                 uint want_dms = 0;
                 switch(cp)
                 {
-                case L'°':  want_dms = 1;           break;
-                case L'′':  want_dms = 2;           break;
-                case L'″':  want_dms = 3;           break;
+                case U'°':  want_dms = 1;           break;
+                case U'′':  want_dms = 2;           break;
+                case U'″':  want_dms = 3;           break;
                 default:                            break;
                 }
                 if (want_dms)
@@ -618,13 +618,13 @@ static size_t render_num(renderer &r,
         upper = lower = false;
     static uint16_t fancy_upper_digits[10] =
     {
-        L'⁰', L'¹', L'²', L'³', L'⁴',
-        L'⁵', L'⁶', L'⁷', L'⁸', L'⁹'
+        U'⁰', U'¹', U'²', U'³', U'⁴',
+        U'⁵', U'⁶', U'⁷', U'⁸', U'⁹'
     };
     static uint16_t fancy_lower_digits[10] =
     {
-        L'₀', L'₁', L'₂', L'₃', L'₄',
-        L'₅', L'₆', L'₇', L'₈', L'₉'
+        U'₀', U'₁', U'₂', U'₃', U'₄',
+        U'₅', U'₆', U'₇', U'₈', U'₉'
     };
 
     // Check which kind of spacing to use

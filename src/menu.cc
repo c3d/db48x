@@ -59,7 +59,7 @@ MARKER_BODY(menu)
 //   A menu has a mark to identify it
 // ----------------------------------------------------------------------------
 {
-    return L'◥';
+    return U'◥';
 }
 
 

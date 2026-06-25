@@ -4278,7 +4278,7 @@ PARSE_BODY(Derivative)
 
     // First character must be a constant marker
     unicode cp = utf8_codepoint(source);
-    if (cp != L'∂')
+    if (cp != U'∂')
         return SKIP;
     parsed = utf8_next(source, parsed, max);
 
@@ -4514,7 +4514,7 @@ PARSE_BODY(Primitive)
 
     // First character must be a constant marker
     unicode cp = utf8_codepoint(source);
-    if (cp != L'∫')
+    if (cp != U'∫')
         return SKIP;
     parsed = utf8_next(source, parsed, max);
 

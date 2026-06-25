@@ -217,7 +217,7 @@ void user_interface::insert(unicode c, modes m, bool autoclose)
     case ':':  if (m != TEXT)   closing = ':';  m = DIRECT;             break;
     case '"':                   closing = '"';  m = TEXT;               break;
     case '\'':                  closing = '\''; m = ALGEBRAIC;          break;
-    case L'«':                  closing = L'»'; m = PROGRAM;            break;
+    case U'«':                  closing = U'»'; m = PROGRAM;            break;
     case '_':                                   m = UNIT;               break;
     case '\n': edRows = 0;                    break; // Recompute rows
     }
@@ -908,8 +908,8 @@ void user_interface::update_mode()
             case ']':       vecs--;                         break;
             case '(':       parn++;                         break;
             case ')':       parn--;                         break;
-            case L'«':      progs++;                        break;
-            case L'»':      progs--;                        break;
+            case U'«':      progs++;                        break;
+            case U'»':      progs--;                        break;
             case '_':       unit = true;                    break;
             case '#':       based++;
                             hnum = inum = syms = 0;
@@ -1085,7 +1085,7 @@ bool user_interface::at_end_of_number(bool want_polar)
         if (~lastnum)
         {
             // An exponent must be followed by numbers
-            if (code == L'⁳' || code == 'E' || code == 'e')
+            if (code == U'⁳' || code == 'E' || code == 'e')
             {
                 hadexp = true;
                 inexp = true;
@@ -1109,7 +1109,7 @@ bool user_interface::at_end_of_number(bool want_polar)
                 }
                 continue;
             }
-            if (code == settings::SPACE_DEFAULT || code == L'’' || code == '_')
+            if (code == settings::SPACE_DEFAULT || code == U'’' || code == '_')
                 continue;
         }
 
@@ -1800,7 +1800,7 @@ bool user_interface::draw_menus()
                         {
                             mark = settings::MARK;
                         }
-                        if (mark == L'░')
+                        if (mark == U'░')
                         {
                             color = Settings.UnimplementedForeground();
                         }
@@ -1816,7 +1816,7 @@ bool user_interface::draw_menus()
                             mcw -= mkw;
                             if (alignLeft)
                                 trect.x1 += mkw;
-                            else if (marker != L'◥')
+                            else if (marker != U'◥')
                                 trect.x2 -= mkw;
                         }
                     }
@@ -1840,7 +1840,7 @@ bool user_interface::draw_menus()
                 if (marker)
                 {
                     Screen.clip(mrect);
-                    bool dossier = marker == L'◥';
+                    bool dossier = marker == U'◥';
                     if (dossier)
                     {
                         pattern fldcol = Settings.FolderCornerForeground();
@@ -2084,6 +2084,8 @@ bool user_interface::draw_header()
 static const uint ann_width   = 15;
 static const uint ann_height  = 12;
 static const uint alpha_width = 30;
+
+// U'…' (char32_t) for Unicode codepoints; portable on all platforms.
 
 bool user_interface::draw_battery(bool now)
 // ----------------------------------------------------------------------------
@@ -2353,7 +2355,7 @@ bool user_interface::draw_busy()
 //   Draw the default busy cursor
 // ----------------------------------------------------------------------------
 {
-    return draw_busy(L'▶', Settings.RunningIconForeground());
+    return draw_busy(U'▶', Settings.RunningIconForeground());
 }
 
 
@@ -2903,7 +2905,7 @@ bool user_interface::draw_stepping_object()
         renderer r(nullptr, 40);
         obj->render(r);
         draw_user_command(r.text(), r.size());
-        draw_busy(L'♦', Settings.HaltedIconForeground());
+        draw_busy(U'♦', Settings.HaltedIconForeground());
         return true;
     }
     return false;
@@ -3869,10 +3871,10 @@ void user_interface::draw_help_access_paths(id cmd,
             {
                 unicode cp = utf8_codepoint(text);
                 text       = utf8_next(text);
-                if (cp == L'🟨' || cp == L'🟦')
+                if (cp == U'🟨' || cp == U'🟦')
                 {
-                    bool          ls     = cp == L'🟨';
-                    const byte   *source = cp == L'🟦' ? ann_right : ann_left;
+                    bool          ls     = cp == U'🟨';
+                    const byte   *source = cp == U'🟦' ? ann_right : ann_left;
                     pixword      *sw     = (pixword *) source;
                     grob::surface s(sw, ann_width, ann_height, 16);
                     pattern       fg    = ls ? Settings.LeftShiftForeground()
@@ -4246,7 +4248,7 @@ restart:
                 if (last == '\n' && helpfile.peek() == ' ')
                 {
                     restyle = NORMAL;
-                    ch      = L'●';
+                    ch      = U'●';
                     xleft   = r.x1 + 2 + font->width(utf8("● "));
                     break;
                 }
@@ -4256,7 +4258,7 @@ restart:
                 if (last == '\n' && helpfile.peek() == ' ')
                 {
                     restyle = NORMAL;
-                    ch      = L'●'; // L'■'; // L'•';
+                    ch      = U'●'; // U'■'; // U'•';
                     xleft   = r.x1 + 2 + font->width(utf8("● "));
                     break;
                 }
@@ -4444,11 +4446,11 @@ restart:
                     skip    = true;
                 }
                 break;
-            case L'🟨':
+            case U'🟨':
                 emit = true;
                 yellow = true;
                 break;
-            case L'🟦':
+            case U'🟦':
                 emit = true;
                 blue = true;
                 break;
@@ -5487,7 +5489,7 @@ bool user_interface::handle_editing(int key)
                 if (isEditing && (mode == ALGEBRAIC || mode == PARENTHESES))
                     insert('=', ALGEBRAIC);
                 else
-                    insert(L'«', PROGRAM);
+                    insert(U'«', PROGRAM);
                 last = 0;
                 return true;
             }
@@ -5699,24 +5701,24 @@ bool user_interface::handle_alpha(int key)
 
     static const unicode shifted[] =
     {
-        L'Σ', '^', L'√', L'∂', L'σ', '(',
-        L'▶', '%', L'π', '<', '=', '>',
-        '_', L'⇄', L'±', L'∡', '_',
-        '_', '7', '8', '9', L'÷',
-        '_', '4', '5', '6', L'×',
+        U'Σ', '^', U'√', U'∂', U'σ', '(',
+        U'▶', '%', U'π', '<', '=', '>',
+        '_', U'⇄', U'±', U'∡', '_',
+        '_', '7', '8', '9', U'÷',
+        '_', '4', '5', '6', U'×',
         '_', '1', '2', '3', '-',
-        '_', '0', '.',  L'«', '+'
+        '_', '0', '.',  U'«', '+'
     };
 
     static const  unicode xshifted[] =
     {
-        L'∏', L'∆', L'↑', L'μ', L'θ', '\'',
-        L'→', L'←', L'↓', L'≤', L'≠', L'≥',
-        '"',  '~', L'°', L'ε', '\n',
-        '_',  '?', L'∫',   '[',  '/',
-        '_',  '#',  L'∞', '|' , '*',
-        '_',  '&',   '@', '$',  L'…',
-        '_',  ';',  L'·', '{',  '!'
+        U'∏', U'∆', U'↑', U'μ', U'θ', '\'',
+        U'→', U'←', U'↓', U'≤', U'≠', U'≥',
+        '"',  '~', U'°', U'ε', '\n',
+        '_',  '?', U'∫',   '[',  '/',
+        '_',  '#',  U'∞', '|' , '*',
+        '_',  '&',   '@', '$',  U'…',
+        '_',  ';',  U'·', '{',  '!'
     };
 
     // Special case: + in alpha mode shows the catalog
@@ -6045,11 +6047,11 @@ bool user_interface::handle_digits(int key)
             {
             case KEY_ADD:       found = do_search('+'); break;
             case KEY_SUB:       found = do_search('-'); break;
-            case KEY_MUL:       found = do_search('*')||do_search(L'×')
-                                                      ||do_search(L'·'); break;
-            case KEY_DIV:       found = do_search('/')||do_search(L'÷'); break;
-            case KEY_DOT:       found = do_search('.')||do_search(L','); break;
-            case KEY_E:         found = do_search('E')||do_search(L'⁳'); break;
+            case KEY_MUL:       found = do_search('*')||do_search(U'×')
+                                                      ||do_search(U'·'); break;
+            case KEY_DIV:       found = do_search('/')||do_search(U'÷'); break;
+            case KEY_DOT:       found = do_search('.')||do_search(U','); break;
+            case KEY_E:         found = do_search('E')||do_search(U'⁳'); break;
             default:
                 if (c == '_')
                     return false;
@@ -6539,7 +6541,7 @@ bool user_interface::handle_functions(int key, object_p objp, bool user)
             else if (ty == object::ID_constant_menu_name)
             {
                 unicode lc = character_left_of_cursor();
-                if (lc == L'Ⓒ' || lc == L'Ⓡ' || lc == L'Ⓢ')
+                if (lc == U'Ⓒ' || lc == U'Ⓡ' || lc == U'Ⓢ')
                 {
                     dirtyEditor = true;
                     edRows = 0;
@@ -7003,17 +7005,17 @@ bool user_interface::do_decimal_separator()
     {
         p = (byte *) utf8_previous(p);
         unicode cp = utf8_codepoint(p);
-        if (cp == L'″')
+        if (cp == U'″')
         {
             found = p;
             c = '/';
         }
-        else if (cp == L'′')
+        else if (cp == U'′')
         {
             found = p;
-            c = L'″';
+            c = U'″';
         }
-        else if (cp == L'°')
+        else if (cp == U'°')
         {
             found = p;
             if (uint(found - ed) == cursor - utf8_size(cp))
@@ -7030,7 +7032,7 @@ bool user_interface::do_decimal_separator()
             }
             else
             {
-                c = L'′';
+                c = U'′';
             }
         }
         else if (cp == dm)
@@ -7039,12 +7041,12 @@ bool user_interface::do_decimal_separator()
             remove (found - ed, utf8_size(cp));
             if (uint(found - ed - 1) == cursor - utf8_size(cp))
             {
-                c = L'°';
+                c = U'°';
             }
             else
             {
-                insert(found - ed, unicode(L'°'));
-                c = L'′';
+                insert(found - ed, unicode(U'°'));
+                c = U'′';
             }
             size_t edlen = rt.editing();
             ed = rt.editor();

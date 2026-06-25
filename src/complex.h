@@ -104,7 +104,7 @@ struct complex : algebraic
     bool                has_imaginary() const;
     algebraic_p         as_rounded_result(int impr = -1) const;
 
-    enum { I_MARK = L'ⅈ', ANGLE_MARK = L'∡' };
+    enum { I_MARK = U'ⅈ', ANGLE_MARK = U'∡' };
 
 public:
     SIZE_DECL(complex);

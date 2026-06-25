@@ -331,7 +331,7 @@ unicode settings::digit_separator(uint index)
 //   Find the digit separator from
 // ----------------------------------------------------------------------------
 {
-    static unicode sep[] = { SPACE_DEFAULT, ',', L'’', '_' };
+    static unicode sep[] = { SPACE_DEFAULT, ',', U'’', '_' };
     if (sep[index] == ',' && Settings.DecimalComma())
         return '.';
     return sep[index];

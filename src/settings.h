@@ -96,25 +96,25 @@ public:
     enum
     {
         // Try hard to make source code unreadable
-        SPACE_3_PER_EM          = L' ',
-        SPACE_4_PER_EM          = L' ',
-        SPACE_6_PER_EM          = L' ',
-        SPACE_THIN              = L' ',
-        SPACE_MEDIUM_MATH       = L' ',
+        SPACE_3_PER_EM          = U' ',
+        SPACE_4_PER_EM          = U' ',
+        SPACE_6_PER_EM          = U' ',
+        SPACE_THIN              = U' ',
+        SPACE_MEDIUM_MATH       = U' ',
 
         SPACE_DEFAULT           = SPACE_MEDIUM_MATH,
         SPACE_UNIT              = SPACE_6_PER_EM,
-        CONSTANT_MARKER         = L'Ⓒ',
-        EQUATION_MARKER         = L'Ⓔ',
-        XLIB_MARKER             = L'Ⓛ',
+        CONSTANT_MARKER         = U'Ⓒ',
+        EQUATION_MARKER         = U'Ⓔ',
+        XLIB_MARKER             = U'Ⓛ',
 
-        MARK                    = L'●', // L'■'
-        CLEAR_MARK              = L'○',
-        COMPLEX_I               = L'ⅈ',
-        DEGREES_SYMBOL          = L'°',
-        RADIANS_SYMBOL          = L'ʳ', // ʳʳ'
-        GRAD_SYMBOL             = L'ℊ',
-        PI_RADIANS_SYMBOL       = L'ℼ',
+        MARK                    = U'●', // U'■'
+        CLEAR_MARK              = U'○',
+        COMPLEX_I               = U'ⅈ',
+        DEGREES_SYMBOL          = U'°',
+        RADIANS_SYMBOL          = U'ʳ', // ʳʳ'
+        GRAD_SYMBOL             = U'ℊ',
+        PI_RADIANS_SYMBOL       = U'ℼ',
     };
 
     enum font_id
@@ -208,7 +208,7 @@ public:
     }
     unicode ExponentSeparator() const
     {
-        return FancyExponent() ? L'⁳' : 'E';
+        return FancyExponent() ? U'⁳' : 'E';
     }
 
     char DateSeparator() const
