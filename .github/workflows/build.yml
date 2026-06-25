@@ -245,7 +245,15 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db48x.exe -H -I -w 10000 -r 50 -Tall
+      run: ./db48x.exe -H -I -w 15000 -r 75 -Tall
+
+    - name: Upload failed test images
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-test-images-windows
+        path: images/bad/*.png
+        if-no-files-found: ignore
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -530,7 +538,15 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db50x.exe -H -I -w 10000 -r 50 -Tall
+      run: ./db50x.exe -H -I -w 15000 -r 75 -Tall
+
+    - name: Upload failed test images
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-test-images-windows
+        path: color-images/bad/*.png
+        if-no-files-found: ignore
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
