@@ -7272,7 +7272,7 @@ bool user_interface::do_search(unicode with, bool restart)
         selected = 0;
         select = cursor;
     }
-    size_t found  = ~0;
+    size_t found  = SIZE_MAX;
     uint   ref    = forward ? select : cursor;
     uint   start  = restart ? searching : ref;
     uint   search = start;

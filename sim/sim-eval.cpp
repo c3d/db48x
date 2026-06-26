@@ -178,7 +178,7 @@ void sim_commands::print_stack()
             continue;
 
         bool     ml  = level ? sml : rml;
-        renderer r(nullptr, ~0U, true, ml);
+        renderer r(nullptr, SIZE_MAX, true, ml);
         size_t   len = obj->render(r);
         utf8     text = r.text();
 

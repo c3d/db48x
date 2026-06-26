@@ -225,7 +225,7 @@ inline size_t utf8_size(unicode cp)
 }
 
 
-inline size_t utf8_size(utf8 text, size_t max = ~0ULL)
+inline size_t utf8_size(utf8 text, size_t max = SIZE_MAX)
 // ----------------------------------------------------------------------------
 //   Return the number of bytes required for a UTF-8 encoding of text
 // ----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ inline bool utf8_whitespace(unicode cp)
 }
 
 
-inline size_t utf8_skip_whitespace(utf8 s, size_t size = ~0U)
+inline size_t utf8_skip_whitespace(utf8 s, size_t size = SIZE_MAX)
 // ----------------------------------------------------------------------------
 //   Skip whitespace at given string
 // ----------------------------------------------------------------------------

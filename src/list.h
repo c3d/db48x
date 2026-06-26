@@ -303,18 +303,18 @@ struct list : text
 
     // Apply an algebraic function to all elements in list
     list_p        map(object_p prg, size_t recurse) const;
-    list_p        map(algebraic_fn fn, size_t r = ~0U) const;
-    list_p        map(arithmetic_fn fn, algebraic_r y, size_t r = ~0U) const;
-    list_p        map(algebraic_r x, arithmetic_fn fn, size_t r = ~0U) const;
-    static list_p map(algebraic_fn fn, list_r x, size_t recurse = ~0U)
+    list_p        map(algebraic_fn fn, size_t r = SIZE_MAX) const;
+    list_p        map(arithmetic_fn fn, algebraic_r y, size_t r = SIZE_MAX) const;
+    list_p        map(algebraic_r x, arithmetic_fn fn, size_t r = SIZE_MAX) const;
+    static list_p map(algebraic_fn fn, list_r x, size_t recurse = SIZE_MAX)
     {
         return x->map(fn, recurse);
     }
-    static list_p map(arithmetic_fn fn, list_r x, algebraic_r y, size_t r = ~0U)
+    static list_p map(arithmetic_fn fn, list_r x, algebraic_r y, size_t r = SIZE_MAX)
     {
         return x->map(fn, y, r);
     }
-    static list_p map(arithmetic_fn fn, algebraic_r x, list_r y, size_t r = ~0U)
+    static list_p map(arithmetic_fn fn, algebraic_r x, list_r y, size_t r = SIZE_MAX)
     {
         return y->map(x, fn, r);
     }

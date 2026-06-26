@@ -41,7 +41,7 @@ struct renderer
 //  Arguments to the RENDER command
 // ----------------------------------------------------------------------------
 {
-    renderer(char *buf = nullptr, size_t len = ~0U,
+    renderer(char *buf = nullptr, size_t len = SIZE_MAX,
              bool stk = false, bool ml = false, bool expr = false)
         : target(buf), length(len), written(0), saving(), tabs(0), column(0),
           edit(!stk && buf == nullptr),
@@ -50,13 +50,13 @@ struct renderer
           needCR(false), gotCR(false) {}
     renderer(bool equation, bool edit=false,
              bool stk=false, bool ml=false, bool gr=false)
-        : target(), length(~0U), written(0), saving(), tabs(0), column(0),
+        : target(), length(SIZE_MAX), written(0), saving(), tabs(0), column(0),
           edit(edit),
           expr(equation), stk(stk), mlstk(ml), txt(false), graph(gr),
           needSpace(false), gotSpace(false),
           needCR(false), gotCR(false) {}
     renderer(file &f)
-        : target(), length(~0U), written(0), saving(&f), tabs(0), column(0),
+        : target(), length(SIZE_MAX), written(0), saving(&f), tabs(0), column(0),
           edit(true),
           expr(false), stk(false), mlstk(false), txt(false), graph(false),
           needSpace(false), gotSpace(false),
@@ -69,7 +69,7 @@ struct renderer
     bool   put(unicode code);
     bool   put(utf8 s)                  { return put(cstring(s)); }
     bool   put(utf8 s, size_t len)      { return put(cstring(s), len); }
-    bool   put(object::id fmt, utf8 s, size_t len = ~0ULL);
+    bool   put(object::id fmt, utf8 s, size_t len = SIZE_MAX);
 
     bool   editing() const              { return edit; }
     bool   graphing() const             { return graph; }

@@ -1341,7 +1341,7 @@ COMMAND_BODY(Home)
 //   Return the home directory
 // ----------------------------------------------------------------------------
 {
-    rt.updir(~0U);
+    rt.updir(SIZE_MAX);
     ui.menu_refresh(ID_VariablesMenu, true);
     return OK;
 }

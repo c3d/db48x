@@ -392,7 +392,7 @@ struct decimal : algebraic
       size_t    index;
     };
     iterator begin() const      { return iterator(this); }
-    iterator end() const        { return iterator(this, ~0U); }
+    iterator end() const        { return iterator(this, SIZE_MAX); }
 
 
     ularge   as_unsigned(bool magnitude = false) const;

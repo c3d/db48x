@@ -212,7 +212,7 @@ uint stack::draw_stack()
                 if (level == 0)
                 {
                     bool     ml = level ? sml : rml;
-                    renderer r(nullptr, ~0U, true, ml);
+                    renderer r(nullptr, SIZE_MAX, true, ml);
                     size_t   len = obj->render(r);
                     utf8     out = r.text();
                     int      key = last_key;
@@ -263,7 +263,7 @@ uint stack::draw_stack()
             else
             {
                 // Text rendering
-                renderer r(nullptr, ~0U, true, ml);
+                renderer r(nullptr, SIZE_MAX, true, ml);
                 len = obj->render(r);
                 out = r.text();
                 gcutf8 saveOut = out;

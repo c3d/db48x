@@ -968,7 +968,7 @@ echelon_result array::row_echelon(array_r m, echelon_options opt)
 
     size_t pivot_col[rows];
     for (size_t i = 0; i < rows; i++)
-        pivot_col[i] = ~0U;
+        pivot_col[i] = SIZE_MAX;
 
     end_col = cols;
     if (!opt.reduce_last_col && cols > 0)
