@@ -471,7 +471,7 @@ GENERATE_HELP_MD=					\
 	    -e 's/KEEP_IT/$(PRODUCT_MACHINE)/g' 	\
 	    -e 's/DB48X/$(PRODUCT_NAME)/g'	 	\
 	    -e 's/db48x.md/$(NAME).md/g' 		\
-	    -e 's/DM42/$(PRODUCT_MACHINE)/g' > $@
+	    -e 's/DM42/$(PRODUCT_MACHINE)/g' | tr -d '\r' > $@
 
 help/$(NAME).md: $(HELP_SOURCES)
 	$(PRINT_COMMAND) mkdir -p help
@@ -484,7 +484,7 @@ doc/8-menus-tree-%.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
 	$(PRINT_GENERATE) python3 tools/gen-menu-doc.py --model $*
 
 help/$(NAME).idx: help/$(NAME).md
-	$(PRINT_GENERATE) grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
+	$(PRINT_GENERATE) grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | tr -d '\r' | sort -k2 -t: > $@
 	$(PRINT_COMMAND) [ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
 
 
