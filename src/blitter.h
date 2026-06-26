@@ -1090,20 +1090,10 @@ union blitter::color<blitter::mode::RGB_16BPP>
 // ------------------------------------------------------------------------
 //  Color representation (16-bit, e.g. HP Prime)
 // ------------------------------------------------------------------------
+//  Use explicit bit packing: GCC packed bitfields in a union do not always
+//  share storage with a sibling bitfield on all targets (notably MinGW).
 {
-    struct rgb16
-    {
-        rgb16(uint8_t red, uint8_t green, uint8_t blue)
-            : blue(blue),
-              green(green),
-              red(red)
-        {
-        }
-        uint8_t blue  : 5;
-        uint8_t green : 6;
-        uint8_t red   : 5;
-    } PACKED rgb16;
-    uint16_t value : 16;
+    uint16_t value;
 
     enum
     {
@@ -1113,23 +1103,26 @@ union blitter::color<blitter::mode::RGB_16BPP>
   public:
     // Build a color from normalized RGB values
     color(uint8_t red, uint8_t green, uint8_t blue)
-        : rgb16(red >> 3, green >> 2, blue >> 3)
+        : value(((red >> 3) << 11) | ((green >> 2) << 5) | (blue >> 3))
     {}
     color(pixword pix): value(pix & 0xFFFF) {}
 
     uint8_t red()
     {
-        return (rgb16.red << 3) | (rgb16.red & 0x7);
+        uint8_t r = (value >> 11) & 0x1F;
+        return (r << 3) | (r & 0x7);
     }
     uint8_t green()
     {
-        return (rgb16.green << 2) | (rgb16.green & 0x3);
+        uint8_t g = (value >> 5) & 0x3F;
+        return (g << 2) | (g & 0x3);
     }
     uint8_t blue()
     {
-        return (rgb16.blue << 3) | (rgb16.blue & 0x7);
+        uint8_t b = value & 0x1F;
+        return (b << 3) | (b & 0x7);
     }
-} PACKED;
+};
 
 
 // ============================================================================
