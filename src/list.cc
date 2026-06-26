@@ -1943,6 +1943,45 @@ int value_compare(object_p *xp, object_p *yp)
 }
 
 
+static int value_sort_compare(object_p *xp, object_p *yp)
+// ----------------------------------------------------------------------------
+//   Sort by value, breaking ties with reverse symbolic compare
+// ----------------------------------------------------------------------------
+{
+    object_p x = *xp;
+    object_p y = *yp;
+    object::id xty = x->type();
+    object::id yty = y->type();
+    if ((object::is_algebraic(xty) && object::is_algebraic(yty)) ||
+        (xty == object::ID_array   && yty == object::ID_array)   ||
+        (xty == object::ID_list    && yty == object::ID_list))
+    {
+        algebraic_g xa     = algebraic_p(x);
+        algebraic_g ya     = algebraic_p(y);
+        int         result = 0;
+        xa = xa->evaluate();
+        ya = ya->evaluate();
+        if (comparison::compare(&result, xa, ya))
+        {
+            if (result)
+                return result;
+            return y->compare_to(x);
+        }
+        rt.clear_error();
+    }
+    return x->compare_to(y);
+}
+
+
+static int value_sort_compare_reverse(object_p *xp, object_p *yp)
+// ----------------------------------------------------------------------------
+//   Sort in decreasing value order, breaking ties with symbolic compare
+// ----------------------------------------------------------------------------
+{
+    return -value_sort_compare(xp, yp);
+}
+
+
 static int value_compare_reverse(object_p *xp, object_p *yp)
 // ----------------------------------------------------------------------------
 //   Sort item according in decreasing value order
@@ -2008,7 +2047,7 @@ COMMAND_BODY(Sort)
 //   Sort contents of a list according to value
 // ----------------------------------------------------------------------------
 {
-    return do_sort(value_compare);
+    return do_sort(value_sort_compare);
 }
 
 
@@ -2026,7 +2065,7 @@ COMMAND_BODY(ReverseSort)
 //   Sort contents of a list according to value
 // ----------------------------------------------------------------------------
 {
-    return do_sort(value_compare_reverse);
+    return do_sort(value_sort_compare_reverse);
 }
 
 
@@ -2930,7 +2969,7 @@ list_p list::sort() const
 //   Return a sorted list based on value-compare
 // ----------------------------------------------------------------------------
 {
-    return sort(value_compare);
+    return sort(value_sort_compare);
 }
 
 
