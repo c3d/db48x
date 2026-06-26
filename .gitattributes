@@ -1,0 +1,3 @@
+# Keep markdown sources LF on all platforms (Windows CI builds help from these)
+doc/** text eol=lf
+help/** text eol=lf
