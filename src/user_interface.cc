@@ -4754,14 +4754,14 @@ restart:
         {
             if (c == '`')
             {
-                if (!markers)
-                    codeEnd = helpfile.position() - 2; // Remove last \n
                 markers++;
                 if (markers == 3)
                     break;
             }
             else
             {
+                if (c != '\n')
+                    codeEnd = helpfile.position();
                 markers = 0;
             }
         }
