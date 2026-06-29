@@ -273,7 +273,11 @@ char file::getchar()
 //   Read char code at offset
 // ----------------------------------------------------------------------------
 {
-    int c = valid() ? fgetc(data) : 0;
+    int c = 0;
+    do
+    {
+        c = valid() ? fgetc(data) : EOF;
+    } while (c == '\r');
     if (c == EOF)
         c = 0;
     return c;
@@ -285,7 +289,11 @@ unicode file::get()
 //   Read UTF8 code at offset
 // ----------------------------------------------------------------------------
 {
-    unicode code = valid() ? fgetc(data) : unicode(EOF);
+    unicode code = 0;
+    do
+    {
+        code = valid() ? fgetc(data) : unicode(EOF);
+    } while (code == '\r');
     if (code == unicode(EOF))
         return 0;
 
