@@ -10112,7 +10112,7 @@ Er0=Er
 
 The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
-![E field finite line](img/EFieldFiniteLine.bmp)
+![E field finite line](img/E_Field_Finite_Line.bmp)
 
 * **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
@@ -10201,7 +10201,7 @@ The electrical resistivity `ρ` of most materials changes with temperature. If t
 
 ### Series & Parallel R
 
-![Series & Parallel R](img/Series&ParallelR.bmp)
+![Series & Parallel R](img/SeriesAndParallelR.bmp)
 
 * To calculate `[Rs_Ω;Rp_Ω]` (Series & Parallel Resistances) from 2 known variables:
 ```rpl
@@ -10212,7 +10212,7 @@ R1=2_Ω  R2=3_Ω
 
 ### Series & Parallel C
 
-![Series & Parallel C](img/Series&ParallelC.bmp)
+![Series & Parallel C](img/SeriesAndParallelC.bmp)
 
 * To calculate `[Cs_μF;Cp_μF]` (Series & Parallel Capacitances) from 2 known variables:
 ```rpl
@@ -10223,7 +10223,7 @@ C1=2_μF  C2=3_μF
 
 ### Series & Parallel L
 
-![Series & Parallel L](img/Series&ParallelL.bmp)
+![Series & Parallel L](img/SeriesAndParallelL.bmp)
 
 * To calculate `[Ls_mH;Lp_mH]` (Series & Parallel Inductances) from 2 known variables:
 ```rpl
@@ -10293,8 +10293,6 @@ C=20_μF  V=100_V
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
-
-![DC Inductor Voltage](img/DCInductorVoltage.bmp)
 
 * To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference; Final current; Final time) from 5 known variables:
 ```rpl
@@ -10578,7 +10576,7 @@ m=1_kg  r=5_cm  N=2000_Hz
 
 The force is that exerted by the spring.
 
-![Hooke’s Law](img/Missing name.bmp)
+![Hooke’s Law](img/HookesLaw.bmp)
 
 * To calculate `[F_lbf;W_ft*lbf]` (Force; Work) from 2 known variables:
 ```rpl
@@ -10898,7 +10896,7 @@ The 28 variables in the Magnetism section are:
 The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L` providing that `r < L/10` (see the following example 2 compared to example 2 of "Straight Wire Finite"). Note that if an electric current passes through a straight wire, one must use the following right-hand rule te determine the direction of the `B` field: when the thumb is pointed in the direction of conventional current (from positive to negative), the curled fingers will then point in the direction of the magnetic field (see fig.).
 
 
-![Straight Wire Infinite](img/StraightWireInfinite.bmp)
+![Straight Wire Infinite](img/StraightWire.bmp)
 
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
@@ -10968,7 +10966,7 @@ Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
 
 The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`. The right-hand rule applies also here: when the fingers curl around the solenoid in the sense of the current, the thumb points in the direction of the magnetic field (see fig.).
 
-![B Field In Infinite Solenoid](img/BFieldInInfiniteSolenoid.bmp)
+![B Field In Infinite Solenoid](img/MagneticFieldInSolenoid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 3 known variables:
 ```rpl
@@ -11018,7 +11016,7 @@ B0 B %Ch
 
 The magnetic field `B` is calculated in the center of the torroid. The right-hand rule applies also here: when the fingers curl around the outer circle of the torroid following the sense of the current, the thumb points in the direction of the central magnetic field (see fig.).
 
-![B Field In Toroid](img/BFieldInToroid.bmp)
+![B Field In Toroid](img/MagneticFieldInToroid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
@@ -11031,7 +11029,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 
 When a conductor carrying a current (to the right) is suddenly plunged into a perpendicular magnetic field (towards the bottom), there is a deviation (towards the top) of the free electrons which unbalances the distribution of electric charges. This transfer of charges from top to bottom gives rise to an electric force which in return balances the magnetic force. And it is precisely the appearance of this new electric field which is revealed by the Hall voltage `VH` measured between the top and the bottom of the conductor (small multimeter on the right).
 
-![Hall Effect](img/Hall Effect VH.bmp)
+![Hall Effect](img/HallEffectVH.bmp)
 
 * To calculate `[VH_V]` (Hall tension) from 5 known variables:
 ```rpl
@@ -11044,7 +11042,7 @@ n=5e28_(1/m^3)  B=0.641_T  q=1.60217 6634e-19_C  L=2_mm  I=10_A
 
 Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
-![Cyclotron Motion](img/Cyclotron_BW.bmp)
+![Cyclotron Motion](img/CyclotronBW.bmp)
 
 * To calculate `[Rc_m;fc_Hz;T_s]` (Radius of the circular path; Cyclotron frequency; Period) from 4 known variables:
 ```rpl
@@ -11057,7 +11055,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s
 
 Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
-![Helicoidal Motion](img/Helicoidal Motion BW.bmp)
+![Helicoidal Motion](img/HelicoidalMotionBW.bmp)
 
 * To calculate `[Rc_m;T_s;Dpitch_m]` (Radius of the circular path; Period, pitch of the helicoidal motion) from 4 known variables:
 ```rpl
@@ -11143,7 +11141,7 @@ y0=1000_ft  y=0_ft  v0=0_ft/s  gloc=9.80665_m/s↑2  φ=45_°  h=1000_m  Mp=5.97
 
 During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
-![Projectile Motion](img/Projectile_BW.bmp)
+![Projectile Motion](img/ProjectileMotion.bmp)
 
 * To calculate `[R_ft;vcx_ft/s;vcy_ft/s;x_ft;y_ft;hmax_ft;tf_s]` (Range, Components `x` & `y` of velocity at time `t`; Positions `x` & `y` at time `t`; Maximum height; Time of flight) from 5 known variables:
 ```rpl
@@ -11267,7 +11265,7 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 #### Refraction Law
 
-![Refraction Law](img/RefractionLaw.bmp)
+![Refraction Law](img/LawOfRefraction.bmp)
 
 * To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
@@ -11289,7 +11287,7 @@ n1=1  n2=1.5
 
 #### Fiber Optic
 
-![Fiber Optic](img/Fiber Optic BW.bmp)
+![Fiber Optic](img/FiberOpticBW.bmp)
 
 * To calculate `[vf0_m/s;vf1_m/s;vf2_m/s;NA;θ0_°]` (Speed of light in media of refraction index `n1f` & `n2f`; Numerical aperture; Acceptance angle) from 3 known variables:
 ```rpl
@@ -11302,7 +11300,7 @@ nf0=1.2  nf1=1.5  nf2=1.45
 
 The Brewster angle is the angle of incidence at which the reflected wave is completely polarized.
 
-![Brewster’s Law](img/Brewster’sLaw.bmp)
+![Brewster’s Law](img/BrewstersLaw.bmp)
 
 * To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
@@ -11346,7 +11344,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Rayleigh’s Criterion
 
-![Rayleigh’s Criterion](img/Rayleigh's Criterion_BW.bmp)
+![Rayleigh’s Criterion](img/RayleighsCriterionBW.bmp)
 
 * To calculate `[θr_°;y_m]` (Rayleigh’s criterion angle; Distance between two point source) from 3 known variables:
 ```rpl
@@ -11359,7 +11357,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
-![Malus Law](img/Malus Law BW.bmp)
+![Malus Law](img/MalusLawBW.bmp)
 
 * To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
@@ -11419,7 +11417,7 @@ The 25 variables in the Oscillations section are:
 
 #### Mass-Spring System
 
-![Mass-Spring System](img/Mass-SpringSystem.bmp)
+![Mass-Spring System](img/MassSpringSystem.bmp)
 
 * To calculate `[ω_(r/s);T_s;f_Hz]` (Angular frequency; Oscillation period; Frequency) from 2 known variables:
 ```rpl
@@ -11499,7 +11497,7 @@ E₀=E
 
 We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
-![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
+![Driven Damped Oscillations](img/DrivenDampedOscillations2BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
@@ -11733,7 +11731,7 @@ The 54 variables in the Solid State Devices section are:
 
 These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes abruptly at the junction. The equation assume the current density is determined by minority carries injected across the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500 K.
 
-![PN Step Junctions](img/PNStepJunctions.bmp)
+![PN Step Junctions](img/PNStepJunction.bmp)
 
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
@@ -11759,7 +11757,7 @@ tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=
 
 These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The equations also include the special conditions when the emitter-base or collector-base junction is open, which are convenient for measuring transistor parameters.
 
-![Bipolar Transistors](img/BipolarTransistors.bmp)
+![Bipolar Transistors](img/BipolarTransistor.bmp)
 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
@@ -11855,7 +11853,7 @@ Stresses and strains are positive in the directions shown in the picture.
 
 #### Mohr’s Circle
 
-![Mohr’s Circle](img/Mohr’sCircle.bmp) ```![Mohr’s Circle](img/Mohr’sCircle.bmp)```
+![Mohr’s Circle](img/MohrsCircle.bmp) ```![Mohr’s Circle](img/MohrsCircle.bmp)```
 
 * To calculate `[σ1_psi;σ2_psi;θp1_°;θp2_°;τmax_psi;θs_°;σavg_psi]` (Maximum principal normal stress; Minimum principal normal stress; Angle to plane of maximum principal normal stress; Angle to plane of minimum principal normal stress; Maximum shear stress; Angle to plane of maximum shear stress; Normal stress on place of maximum shear stress) from 3 known variables:
 ```rpl
