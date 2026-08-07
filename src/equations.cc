@@ -1409,49 +1409,49 @@ static const cstring basic_equations[] =
     "  'F=(Q_kg/s)·(Ve_m/s)+((Pe_kPa)-(Pa_kPa))·(Ae_m↑2)' "
     "}",
     //1b.
-    "Rocket ΔV",  "{ "
+    "Rocket ΔV",  "{ "
     "  'ΔV=(Ve_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(t_s)))' "
     "}",
     //2.
-    "Tsiolkovsky & Propellant Mass",  "{ "
+    "Tsiolkovsky & Propellant Mass",  "{ "
     "  'Mf=(Mo_kg)·exp(-(ΔV_m/s)/(C_m/s))' "
     "  'Mp=(Mo_kg)-(Mf_kg)' "
     "}",
     //3.
-    "Burn Duration",  "{ "
+    "Burn Duration",  "{ "
     "  'ΔV=(C_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(Δt_s)))' "
     "  'ΔV=(Vf_m/s)-(Vi_m/s)' "
     "}",
     //4.
-    "Rocket Engine Exhaust Velocity",  "{ "
+    "Rocket Engine Exhaust Velocity",  "{ "
     "  'Ve=SQRT((2·k/(k-1))·(ⒸR·(Tc_K)/(M_(g/mol)))·(1-((Pe_atm)/(Pc_atm))↑((k-1)/k)))' "
     "}",
     //5.
-    "Rocket Engine Specific Impulse",  "{ "
+    "Rocket Engine Specific Impulse",  "{ "
     "  'Isp=(F_N)/((Q_kg/s)·Ⓒg)' "
     "}",
     //6.
-    "Exhaust Nozzle Throat Parameters",  "{ "
+    "Exhaust Nozzle Throat Parameters",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
     "}",
     //7.
-    "Exhaust Nozzle Characteristic Velocity",  "{ "
+    "Exhaust Nozzle Characteristic Velocity",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
     "  'Cstar=(Pc_MPa)·(At_m↑2)/(Q_kg/s)' "
     "}",
     //8.
-    "Nozzle Mach number & Optimal Exit Area",  "{ "
+    "Nozzle Mach number & Optimal Exit Area",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
     "  'Pe=Pa_MPa' "
     "}",
     //9.
-    "Optimised Third Stage Rocket Nozzle",  "{ "
+    "Optimised Third Stage Rocket Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1459,7 +1459,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //10.
-    "Optimised First Stage Rocket Nozzle",  "{ "
+    "Optimised First Stage Rocket Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1467,7 +1467,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //11.
-    "Optimised Second Stage Rocket Nozzle",  "{ "
+    "Optimised Second Stage Rocket Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1475,7 +1475,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //12.
-    "Unrealistic Nozzle Optimised for Mars",  "{ "
+    "Unrealistic Nozzle Optimised for Mars",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1483,7 +1483,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //13.
-    "Mars Day Time Optimized Nozzle",  "{ "
+    "Mars Day Time Optimized Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1491,7 +1491,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //14.
-    "Mars Night Time Optimized Nozzle",  "{ "
+    "Mars Night Time Optimized Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1499,7 +1499,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //15.
-    "Venus First stage Optimized Nozzle",  "{ "
+    "Venus First stage Optimized Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1507,7 +1507,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //16.
-    "Venus Second Stage Optimized Nozzle",  "{ "
+    "Venus Second Stage Optimized Nozzle",  "{ "
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
@@ -1515,7 +1515,7 @@ static const cstring basic_equations[] =
     "  'Pe=Pa_MPa' "
     "}",
     //17.
-    "Properly Adapted Conic Nozzle",  "{ "
+    "Properly Adapted Conic Nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1525,7 +1525,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //18.
-    "Under-Extended Conic Nozzle",  "{ "
+    "Under-Extended Conic Nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1535,7 +1535,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //19.
-    "Over-extended conic nozzle",  "{ "
+    "Over-extended conic nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1545,7 +1545,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //20.
-    "Characteristic Nozzle Geometry",  "{ "
+    "Characteristic Nozzle Geometry",  "{ "
     "  'Dt=2·SQRT((At_cm↑2)/Ⓒπ)' "
     "  'Vc=(At_cm↑2)·(Lstar_cm)' "
     "  'Lc=(1_cm)·(exp(0.029·(ln((Dt_cm)/(1_cm)))²+0.47·ln((Dt_cm)/(1_cm))+1.94))' "
@@ -1554,17 +1554,17 @@ static const cstring basic_equations[] =
     "  'CtnRatio=(Ac_cm²)/(At_cm²)' "
     "}",
     //21.
-    "Solid Rocket Burn Rate",  "{ "
+    "Solid Rocket Burn Rate",  "{ "
     "  'Ab=Ⓒπ·(L_m)·(D_m)' "
     "  'r=(1_mm/s)·a·((Pc_Pa)/(1_Pa))↑n' "
     "  'Qs=(ρp_g/ml)·(Ab_m²)·(r_mm/s)' "
     "}",
     //22.
-    "Solid Rocket Propellant Ideal Density",  "{ "
+    "Solid Rocket Propellant Ideal Density",  "{ "
     "  'ρp=1/(wAl/(ρAl_g/ml)+wAP/(ρAP_g/ml)+wHTPB/(ρHTPB_g/ml))' "
     "}",
     //23.
-    "Multi-Stages Rocket ΔV",  "{ "
+    "Multi-Stages Rocket ΔV",  "{ "
     "  'C1=(Isp1_s)·Ⓒg' "
     "  'C2=(Isp2_s)·Ⓒg' "
     "  'Mo1=Mp1_kg+Md1_kg+Mp2_kg+Md2_kg+Mpl_kg' "
@@ -1580,12 +1580,12 @@ static const cstring basic_equations[] =
 
 // --- Complementary 9 (R25–R33) ---
     //A-1.
-    "Conical Nozzle Divergence Loss",  "{ "
+    "Conical Nozzle Divergence Loss",  "{ "
     "  'λ=(1+cos(α_°))/2' "
     "  'Fnet=λ·(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //A-2.
-    "Bell Nozzle Contour",  "{ "
+    "Bell Nozzle Contour",  "{ "
     "  'At=Ⓒπ·(Rt_cm)↑2' "
     "  'Ae=ε·(At_cm↑2)' "
     "  'Rex=SQRT((Ae_cm↑2)/Ⓒπ)' "
@@ -1593,44 +1593,44 @@ static const cstring basic_equations[] =
     "  'Lnz=Li·(SQRT(ε)-1)·(Rt_cm)/tan(15_°)' "
     "}",
     //A-3.
-    "Combustion Chamber Stay-Time",  "{ "
+    "Combustion Chamber Stay-Time",  "{ "
     "  'V=ⒸR·(Tc_K)/((Pc_Pa)·(M_(g/mol)))' "
     "  'Vc=(Lstar_m)·(At_m↑2)' "
     "  'ts=(Vc_m↑3)/((V_m↑3/kg)·(Q_kg/s))' "
     "}",
     //B-1.
-    "Thrust Coefficient",  "{ "
+    "Thrust Coefficient",  "{ "
     "  'Cfx=SQRT((2·k↑2/(k-1))·(2/(k+1))↑((k+1)/(k-1))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))+((Pe_MPa)-(Pa_MPa))/(Pc_MPa)·(Ae_m↑2)/(At_m↑2)' "
     "  'Cstar=(Pc_MPa)·(At_m↑2)/(Q_kg/s)' "
     "  'Isp=(Pc_MPa)·(At_m↑2)/((Q_kg/s)·Ⓒg)·Cfx' "
     "  'F=(Pc_MPa)·(At_m↑2)·Cfx' "
     "}",
     //B-2.
-    "Total Impulse",  "{ "
+    "Total Impulse",  "{ "
     "  'It=(Isp_s)·Ⓒg·(Mp_kg)' "
     "  'F=(It_N·s)/(Δt_s)' "
     "}",
     //B-3.
-    "Vertical Ascent with Gravity Loss",  "{ "
+    "Vertical Ascent with Gravity Loss",  "{ "
     "  'C=(Isp_s)·Ⓒg' "
     "  'Mf=(Mo_kg)-(Mp_kg)' "
     "  'Δt=(Mp_kg)/(Q_kg/s)' "
     "  'Vbo=(C_m/s)·ln((Mo_kg)/(Mf_kg))-Ⓒg·(Δt_s)' "
     "}",
     //B-4.
-    "Optimal Staging",  "{ "
+    "Optimal Staging",  "{ "
     "  'C=(Isp_s)·Ⓒg' "
     "  'ΔV1=(ΔVtot_m/s)/n' "
     "  'MR=exp((ΔV1_m/s)/(C_m/s))' "
     "}",
     //C-1.
-    "Sea-level vs Vacuum Thrust",  "{ "
+    "Sea-level vs Vacuum Thrust",  "{ "
     "  'Fsl=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "  'Fvac=(Q_kg/s)·(Ve_m/s)+(Pe_MPa)·(Ae_m↑2)' "
     "  'ΔF=(Pa_MPa)·(Ae_m↑2)' "
     "}",
     //C-2.  (Earth shown; swap ⒸGM♁/ⒸReq♁ → ♂ or ♀ for Mars/Venus)
-    "Multi-Planet Launch ΔV",  "{ "
+    "Multi-Planet Launch ΔV",  "{ "
     "  'rorb=(ⒸReq♁)+(horb_km)' "
     "  'Vcirc=SQRT(ⒸGM♁/(rorb_km))' "
     "  'Vesc=SQRT(2·ⒸGM♁/(rorb_km))' "
