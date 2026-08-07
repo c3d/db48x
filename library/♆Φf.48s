@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ♆Φf — mean orbital elements of Neptune (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♆Φf -> [ 30.0699768 0.00860097 1.77011616 -10.228930 44.89850948 131.7831805 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '30.06992276+0.00026291·T' EVAL '0.00859048+0.00005105·T' EVAL '1.77004347+0.00035372·T' EVAL
+    '-55.12002969+218.45945325·T' EVAL '44.96476227-0.32241464·T' EVAL '131.78422574-0.00508664·T' EVAL
+    6 →ARRY » » 
+»

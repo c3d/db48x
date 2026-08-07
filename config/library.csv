@@ -13,6 +13,85 @@
 
 	"PeriSel",		"="
 
+"Astronomy/Ephemeris Orbital Elements"
+
+	"☿Φf",		"="
+	"♀Φf",		"="
+	"♁Φf",		"="
+	"♂Φf",		"="
+	"♃Φf",		"="
+	"♄Φf",		"="
+	"⛢Φf",		"="
+	"♆Φf",		"="
+	"☾Φf",		"="
+	"☾Pos",		"="
+	"☾Hf",		"="
+	"MSumS",	"="
+	"MSumC",	"="
+
+"Astronomy/HelioCntrX Ecliptical Coordinates"
+
+	"EaΦf",		"="
+	"νΦf",		"="
+	"rΦf",		"="
+	"uΦf",		"="
+	"λΦf",		"="
+	"βΦf",		"="
+	"PosΦf",	"="
+	"♁Pf",		"="
+	"♂Pf",		"="
+	"VΦf",		"="
+
+"Astronautics/Flight Parameters"
+
+	"DABf",		"="
+	"DAToB",	"="
+	"DEarthToA",	"="
+	"T₀SDAToB",	"="
+	"T₀SDEarthToA",	"="
+	"θs",		"="
+
+"Astronomy/Planet Atmospheres/Earth"
+
+	"T♁StdAtm",	"="
+	"P♁StdAtm",	"="
+	"ρ♁StdAtm",	"="
+	"μ♁StdAtm",	"="
+
+"Astronomy/Planet Atmospheres/Mars"
+
+	"T♂DayAtm",	"="
+	"P♂DayAtm",	"="
+	"ρ♂DayAtm",	"="
+	"T♂NightAtm",	"="
+	"P♂NightAtm",	"="
+	"ρ♂NightAtm",	"="
+
+"Astronomy/Planet Atmospheres/Venus"
+
+	"T♀Atm",	"="
+	"P♀Atm",	"="
+	"ρ♀Atm",	"="
+
+"Astronautics/Trajectory"
+
+	"Hohmann",	"="
+	"BiElliptic",	"="
+	"TrToOrbi",	"="
+	"LambertU",	"="
+	"StumpC",	"="
+	"StumpS",	"="
+	"LamUF",	"="
+	"rv2coe",	"="
+	"TrCost",	"="
+	"MinTofDV",	"="
+	"MinΔVTraj",	"="
+	"aTr",		"="
+	"MinΔDTraj",	"="
+	"MinΔtTraj",	"="
+	"GAssist",	"="
+
+
 "Mathematics"
 
 	"CollatzBenchmark",	"="

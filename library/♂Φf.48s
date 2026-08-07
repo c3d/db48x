@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ ♂Φf — mean orbital elements of Mars (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   J2000 (2451545): T=0 returns this planet's element0 row (juge-de-paix, green).
+@@   2459050.5 ♂Φf PosΦf -> [ 1.159010882 -0.753079682 -0.044216374 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '1.52371034+0.00001847·T' EVAL '0.09339410+0.00007882·T' EVAL '1.84969142-0.00813131·T' EVAL
+    '-4.55343205+19140.30268499·T' EVAL '-23.94362959+0.44441088·T' EVAL '49.55953891-0.29257343·T' EVAL
+    6 →ARRY » » 
+»

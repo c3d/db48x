@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ DEarthToA — Earth-referenced distance to a body position
+@@ Convenience wrapper over DAToB with Earth as the first body.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : [E] [A]   ( [E] [A] -- d )
+@@ Output : distance (au)
+@@ VALIDATION (device-confirmed):
+@@   Wrapper of DAToB.
+@@ ============================================================
+ → E A
+  «
+    E A DAToB
+  »
+»

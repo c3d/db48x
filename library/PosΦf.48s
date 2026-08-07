@@ -1,0 +1,47 @@
+«
+@@ ============================================================
+@@ PosΦf — orbital elements → heliocentric ecliptic position
+@@ Solves Kepler and chains EaΦf νΦf rΦf uΦf λΦf βΦf. Guards DEG.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : [a e I L ϖ Ω]   ( [a e I L ϖ Ω] -- [x y z] )
+@@ Output : [x y z] in au
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♁Φf PosΦf -> [ 0.468733637 -0.901591683 0.000042104 ]
+@@ ============================================================
+ → V
+  « DEG
+    V 1 GET  V 2 GET  V 3 GET  V 4 GET  V 5 GET  V 6 GET
+    → a e I L ϖ Ω
+    «
+      L ϖ - DUP 180 + 360 / FLOOR 360 * -
+      → M
+      «
+        e M EaΦf
+        → Ea
+        «
+          e Ea νΦf
+          a e Ea rΦf
+          ϖ Ω -
+          → ν r ω
+          «
+            ω ν uΦf
+            → u
+            «
+              Ω I u λΦf Uval
+              I u βΦf Uval
+              → λ β
+              «
+                r 'COS(β_°)·COS(λ_°)' EVAL ×
+                r 'COS(β_°)·SIN(λ_°)' EVAL ×
+                r 'SIN(β_°)' EVAL ×
+                3 →ARRY
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»

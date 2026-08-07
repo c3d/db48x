@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ♃Φf — mean orbital elements of Jupiter (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♃Φf -> [ 5.20286315 0.04835901 1.30401944 658.004574 14.77215181 100.5159709 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '5.20288700-0.00011607·T' EVAL '0.04838624-0.00013253·T' EVAL '1.30439695-0.00183714·T' EVAL
+    '34.39644051+3034.74612775·T' EVAL '14.72847983+0.21252668·T' EVAL '100.47390909+0.20469106·T' EVAL
+    6 →ARRY » » 
+»

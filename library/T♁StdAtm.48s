@@ -1,0 +1,81 @@
+«
+@@ ============================================================
+@@ T♁StdAtm — Earth temperature, U.S. Standard Atmosphere 1976 (analytic ≤86 km) + Braeunig Table 8 (86-1000 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   2000_m T♁StdAtm -> 275.154088844 K ; 80_km -> 198.638576251 K (device)
+@@ ============================================================
+@Earth: U.S. Standard Atmosphere Temperature Profile T♁StdAtm(Z_m); Z_m: geometric height
+@Source: USSA 1976 (NOAA ST76-1562), ≤86 km ; R. Braeunig Table 8, 86-1000 km
+@Homosphere 0-86 km: USSA 1976 @(https://www.ngdc.noaa.gov/stp/space-weather/online-publications/miscellaneous/us-standard-atmosphere-1976/us-standard-atmosphere_st76-1562_noaa.pdf)
+@Heterosphere 86-1000 km: Braeunig Table 8, exp-polynomial in Pa
+@(https://www.braeunig.us/space/atmmodel.htm#modeling)
+@Validity domain: Zmin=-5000_m; Zmax=1000000_m
+@Note: analytic (exact) ≤86 km; ~4-figure engineering fit >86 km
+   → Z
+   «
+      Z 1_m Convert 'Z' Store
+      Z UnitValue Duplicate 86000 ≥ Swap 1000000 ≤ And
+      if
+      then
+        Z UnitValue 1000 ÷
+        → z
+        «
+           case
+           z 91 <
+           then
+              186.8673
+           end
+           z 110 <
+           then
+              1 z 91 - -19.9429 ÷ x² - √ -76.3232 × 263.1905 +
+           end
+           z 120 <
+           then
+              240 12 z 110 - × +
+           end
+           z 120 - 6356.766 120 + × 6356.766 z + ÷ -0.01875 × exp 640 × 1000 Swap -
+           end
+        »
+      else
+        Z UnitValue 1000000 >
+        if
+        then
+            "Z out of range -5_km < Z < 1000_km" DoError
+        else
+           Z UnitValue Duplicate 6356766 × Swap 6356766 + ÷
+           case
+           Duplicate 11000 ≤
+           then
+              288.15 Swap -0.0065 × +
+           end
+           Duplicate 20000 ≤
+           then
+              Drop 216.65
+           end
+           Duplicate 32000 ≤
+           then
+              20000 - 0.001 × 216.65 +
+           end
+           Duplicate 47000 ≤
+           then
+              32000 - 0.0028 × 228.65 +
+           end
+           Duplicate 51000 ≤
+           then
+              Drop 270.65
+           end
+           Duplicate 71000 ≤
+           then
+              51000 - -0.0028 × 270.65 +
+           end
+              84852 Min 71000 - -0.002 × 214.65 +
+           end
+       end
+     end 1_K ×
+   »
+»

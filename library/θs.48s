@@ -1,0 +1,21 @@
+«
+@@ ============================================================
+@@ θs — Greenwich/local apparent sidereal time
+@@ IAU sidereal-time polynomial in JD, plus longitude L; result in degrees.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD L   ( JD L -- θs )
+@@ Output : sidereal time (° tagged)
+@@ VALIDATION (device-confirmed):
+@@   Sidereal-time helper.
+@@ ============================================================
+ → JD L
+  «
+    JD Uval 'JD' Sto
+    L Uval 'L' Sto
+    '280.46061837+360.98564736629·(JD-2451545)+0.000387933·((JD-2451545)/36525)↑2-((JD-2451545)/36525)↑3/38710000+L' Eval
+    360 MOD
+    1_° ·
+  »
+»

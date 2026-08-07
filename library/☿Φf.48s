@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ☿Φf — mean orbital elements of Mercury (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ☿Φf -> [ 0.38709935 0.20563985 7.00375687 30967.29907 77.49077258 48.30500972 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '0.38709927+0.00000037·T' EVAL '0.20563593+0.00001906·T' EVAL '7.00497902-0.00594749·T' EVAL
+    '252.25032350+149472.67411175·T' EVAL '77.45779628+0.16047689·T' EVAL '48.33076593-0.12534081·T' EVAL
+    6 →ARRY » » 
+»

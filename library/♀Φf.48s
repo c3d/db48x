@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ♀Φf — mean orbital elements of Venus (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♀Φf -> [ 0.72333646 0.00676828 3.39451394 12206.76934 131.6030186 76.62277934 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '0.72333566+0.00000390·T' EVAL '0.00677672-0.00004107·T' EVAL '3.39467605-0.00078890·T' EVAL
+    '181.97909950+58517.81538729·T' EVAL '131.60246718+0.00268329·T' EVAL '76.67984255-0.27769418·T' EVAL
+    6 →ARRY » » 
+»

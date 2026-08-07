@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ⛢Φf — mean orbital elements of Uranus (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ⛢Φf -> [ 19.1887615 0.04724840 0.77213862 401.286615 171.0381268 74.02563899 ]
+@@ ============================================================
+ → JD « JD 2451545 - 36525 / → T
+  « '19.18916464-0.00196176·T' EVAL '0.04725744-0.00004397·T' EVAL '0.77263783-0.00242939·T' EVAL
+    '313.23810451+428.48202785·T' EVAL '170.95427630+0.40805281·T' EVAL '74.01692503+0.04240589·T' EVAL
+    6 →ARRY » » 
+»

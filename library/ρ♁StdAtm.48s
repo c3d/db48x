@@ -1,0 +1,79 @@
+«
+@@ ============================================================
+@@ ρ♁StdAtm — Earth density, USSA 1976 (ρ=P/(R·T) ≤86 km) + Braeunig Table 8 (86-1000 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   2000_m ρ♁StdAtm -> 1.006553696670 kg/m^3 ; 60_km -> 3.09679772E-4 kg/m^3 (device)
+@@ ============================================================
+@Earth: U.S. Standard Atmosphere Density Profile ρ♁StdAtm(Z_m); Z_m: geometric height
+@Source: USSA 1976 (NOAA ST76-1562), ≤86 km ; R. Braeunig Table 8, 86-1000 km
+@Homosphere 0-86 km: ρ = P/(R_air·T), USSA 1976
+@(https://www.ngdc.noaa.gov/stp/space-weather/online-publications/miscellaneous/us-standard-atmosphere-1976/us-standard-atmosphere_st76-1562_noaa.pdf)
+@Heterosphere 86-1000 km: Braeunig Table 8, exp-polynomial in kg/m³ (M variable) 	@(https://www.braeunig.us/space/atmmodel.htm#modeling)
+@Validity domain: Zmin=-5000_m; Zmax=1000000_m
+@Note: analytic (exact) ≤86 km; ~4-figure engineering fit >86 km
+        → Z
+        «
+           Z 1_m Convert 'Z' Store
+           Z UnitValue Duplicate 86000 ≥ Swap 1000000 ≤ And
+           if
+           then
+              Z UnitValue 1000 ÷
+              → z
+              «
+                 case
+                 z 91 <
+                 then
+                    0 z × -0.000003322622 + z × 0.000911146 + z × -0.2609971 + z × 5.944694 +
+                 end
+                 z 100 <
+                 then
+                    0 z × 0.00002873405 + z × -0.008492037 + z × 0.6541179 + z × -23.6201 +
+                 end
+                 z 110 <
+                 then
+                    -0.00001240774 z × 0.005162063 + z × -0.8048342 + z × 55.55996 + z × -1443.338 +
+                 end
+                 z 120 <
+                 then
+                    0 z × -0.00008854164 + z × 0.03373254 + z × -4.390837 + z × 176.5294 +
+                 end
+                 z 150 <
+                 then
+                    3.661771E-7 z × -0.0002154344 + z × 0.04809214 + z × -4.884744 + z × 172.3597 +
+                 end
+                 z 200 <
+                 then
+                    1.906032E-8 z × -0.00001527799 + z × 0.004724294 + z × -0.699234 + z × 20.50921 +
+                 end
+                 z 300 <
+                 then
+                    1.199282E-9 z × -0.000001451051 + z × 0.0006910474 + z × -0.173622 + z × -5.321644 +
+                 end
+                 z 500 <
+                 then
+                    1.140564E-10 z × -0.000000213076 + z × 0.0001570762 + z × -0.07029296 + z × -12.89844 +
+                 end
+                 z 750 <
+                 then
+                    8.105631E-12 z × -2.358417E-9 + z × -0.00000263511 + z × -0.01562608 + z × -20.02246 +
+                 end
+                 -3.701195E-12 z × -8.608611E-9 + z × 0.00005118829 + z × -0.06600998 + z × -6.137674 +
+                 end
+                 exp 1_kg × 1_m ÷ 1_m ÷ 1_m ÷ BaseUnits
+              »
+           else
+              Z UnitValue 1000000 >
+              if
+              then
+                 "Z out of range -5_km < Z < 1000_km" DoError
+              else
+                 Z P♁StdAtm Z T♁StdAtm 287.05287_J/(kg·K) × ÷ BaseUnits
+              end
+           end
+        »
+»

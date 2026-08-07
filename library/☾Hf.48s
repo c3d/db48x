@@ -1,0 +1,23 @@
+«
+@@ ============================================================
+@@ ☾Hf — Moon heliocentric ecliptic position (position function)
+@@ = PosΦf(♁Φf) + geocentric Moon vector. Plugs into the transfer machinery like a planet.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [x y z] )
+@@ Output : [x y z] in au
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ☾Hf -> [ 0.46792776 -0.89918210 0.00011955 ]
+@@ ============================================================
+ → JD
+  « DEG
+    JD ♁Φf PosΦf → earth
+    « JD ☾Pos → mp
+      « mp 1 GET mp 2 GET mp 3 GET → lam bet dd
+        « 'dd·COS(bet_°)·COS(lam_°)/149597870.7' EVAL
+          'dd·COS(bet_°)·SIN(lam_°)/149597870.7' EVAL
+          'dd·SIN(bet_°)/149597870.7' EVAL
+          3 →ARRY  earth + » » »
+  »
+»

@@ -1,0 +1,28 @@
+«
+@@ ============================================================
+@@ TrCost — ΔV cost of a ballistic transfer between two dates (position functions)
+@@ Lambert between the two positions, differenced against each body's velocity. km/s.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t₁ t₂ 'Af' 'Bf'   ( t₁ t₂ 'Af' 'Bf' -- { ΔVtot ΔVdep ΔVarr } )
+@@ Output : { ΔVtot ΔVdep ΔVarr } km/s
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 2459250.5 '♁Pf' '♂Pf' TrCost -> { 6.3738 3.6446 2.7292 }   (Earth→Mars, 200 d)
+@@   2459050.5 2459250.5 '☾Hf' '♂Pf' TrCost -> { 7.40385 4.67123 2.73262 }   (Moon→Mars)
+@@ ============================================================
+ → t1 t2 Af Bf
+  « 0 0 0 0 0 0 0 0  → rA rB vt tof vA vB dvd dva
+    «
+      t1 Af EVAL 'rA' STO
+      t2 Bf EVAL 'rB' STO
+      t2 t1 - 'tof' STO
+      rA rB tof 0.00029591220828559 LambertU 'vt' STO
+      t1 Af VΦf 'vA' STO
+      t2 Bf VΦf 'vB' STO
+      vt 1 GET vA -  DUP DOT √  1731.4568 ·  'dvd' STO
+      vt 2 GET vB -  DUP DOT √  1731.4568 ·  'dva' STO
+      dvd dva +  dvd  dva  3 →LIST
+    »
+  »
+»
