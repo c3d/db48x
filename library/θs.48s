@@ -1,6 +1,6 @@
 «
 @@ ============================================================
-@@ θs — Greenwich/local apparent sidereal time
+@@ θs — Greenwich/local mean sidereal time
 @@ IAU sidereal-time polynomial in JD, plus longitude L; result in degrees.
 @@ Author & design         : Jean Wilson
 @@ Co-authors & programming : Claude & Claude Code (Anthropic)
@@ -8,7 +8,10 @@
 @@ Input  : JD L   ( JD L -- θs )
 @@ Output : sidereal time (° tagged)
 @@ VALIDATION (device-confirmed):
-@@   Sidereal-time helper.
+@@   2451545 0 θs -> 280.46061837 °   (GMST at J2000.0, 2000-01-01 12:00 UT)
+@@   NB: JD must be Universal Time. DB48x JDN is +0.5 d (PR 1580); from a
+@@   civil date use  <date>_date JDN 0.5 -  e.g. 20201006.120000_date JDN 0.5 -
+@@   -> 2459129 (JD of 2020-10-06 12:00 UT).
 @@ ============================================================
  → JD L
   «

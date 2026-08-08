@@ -15365,7 +15365,26 @@ Julian Day of closest approach between two bodies inside a search window
 
 ## θs
 
-Sidereal-time helper (Greenwich / local apparent sidereal time).
+Mean sidereal time from a **Universal-Time** Julian Date `JD` and a longitude
+`L`, using the IAU sidereal-time polynomial: `θs = GMST(JD) + L`, reduced to
+`[0, 360)°`. With `L = 0` this returns Greenwich mean sidereal time (GMST); with
+the observer’s longitude (East positive, West negative) it returns the local
+mean sidereal time. Sidereal time is the hour angle of the vernal equinox.
+
+`JD  L` → `θs` (°)
+
+```rpl
+2451545 0 θs
+@ Expecting 280.46061837 °     (GMST at the J2000.0 epoch, 2000-01-01 12:00 UT)
+```
+
+⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` currently overshoots
+the true JD by 0.5 day — it adds the time counted from *midnight* to the *noon*-
+based Julian day number (see PR 1580) — and it keeps the entered clock time. So
+to start from a civil date, convert the time to UT and subtract the offset:
+`<date>_date JDN 0.5 -`. For example `20201006.120000_date JDN 0.5 -` yields the
+correct `2459129` (JD of 2020-10-06 12:00 UT), which `-73.58 θs` then turns into
+a local mean sidereal time.
 
 ---
 
