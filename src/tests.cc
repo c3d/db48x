@@ -11611,6 +11611,9 @@ void tests::online_help()
 {
     BEGIN(help);
 
+    step("Activating flight recorder")
+        .test(CLEAR, "\"help=1\" FlightRecorderConfigure", ENTER);
+
     step("Main menu shows help as F1")
         .test(CLEAR, EXIT, A, LENGTHY(100), F1).noerror()
         .image_noheader("help");
@@ -11730,6 +11733,9 @@ void tests::online_help()
         .editor("@ Will be 3000_km\n3000 2_km →Unit")
         .test(ENTER)
         .expect("3 000 km");
+
+    step("Deactivating flight recorder")
+        .test(CLEAR, "\"help=0\" FlightRecorderConfigure", ENTER);
 }
 
 
