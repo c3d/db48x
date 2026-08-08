@@ -15322,8 +15322,8 @@ directly to a heliocentric `[x y z]`. Define one per body as needed (`♂Pf`, �
 `JD` → `[x y z]`
 
 ```rpl
-« → JD « JD ♁Φf PosΦf » » '♁Pf' Sto     @ Earth position function
-« → JD « JD ♂Φf PosΦf » » '♂Pf' Sto     @ Mars  position function
+« → JD « JD ♁Φf PosΦf » » 'Ⓛ♁Pf' Sto     @ Earth position function
+« → JD « JD ♂Φf PosΦf » » 'Ⓛ♂Pf' Sto     @ Mars  position function
 ```
 
 ## VΦf
@@ -15334,7 +15334,7 @@ function** (`h = 0.5 day`).
 `JD  'Pf'` → `[vx vy vz]`   (au/day)
 
 ```rpl
-2459050.5 '♁Pf' VΦf
+2459050.5 'Ⓛ♁Pf' VΦf
 @ Expecting [ 0.01498469 0.00787138 -0.00000036 ]     (= 29.307 km/s)
 ```
 
@@ -15399,6 +15399,11 @@ hyperbola into a capture orbit (set `r_a = r_p` for circular capture).
 
 `v∞  r_p  r_a  μ` → `{ ΔV_ins  v_hyp  v_cap }`
 
+```rpl
+2.5_km/s 3689_km 3689_km ⒸGM♂ TrToOrbi
+@ Expecting { 2021.27_m/s 5428.58_m/s 3407.31_m/s }   (circular capture)
+```
+
 ## LambertU
 
 Lambert's problem by the **universal-variable** formulation (Stumpff functions),
@@ -15423,6 +15428,11 @@ State vector to classical orbital elements.
 
 `[r]  [v]  μ` → `{ a  e  i  Ω  ω  ν }`
 
+```rpl
+[ -6045 -3490 2500 ] [ -3.457 6.618 2.533 ] 398600 rv2coe
+@ Expecting { 8788.10 0.17121 153.249 255.279 20.068 28.446 }
+```
+
 ---
 
 ## TrCost
@@ -15434,14 +15444,14 @@ and differences against each body's velocity.
 `t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
 
 ```rpl
-2459050.5 2459250.5 '♁Pf' '♂Pf' TrCost
+2459050.5 2459250.5 'Ⓛ♁Pf' 'Ⓛ♂Pf' TrCost
 @ Expecting { 6.3738 3.6446 2.7292 }                  (Earth→Mars, 200 days)
 ```
 
 The Moon plugs in identically:
 
 ```rpl
-2459050.5 2459250.5 '☾Hf' '♂Pf' TrCost
+2459050.5 2459250.5 '☾Hf' 'Ⓛ♂Pf' TrCost
 @ Expecting { 7.40385 4.67123 2.73262 }               (Moon→Mars)
 ```
 
@@ -15454,10 +15464,11 @@ For a fixed departure date, the flight time that minimises `TrCost` ΔV
 
 ```rpl
 3 'AstronTXPrecision' STO
-2459054 '♁Pf' '♂Pf' 150 225 MinTofDV
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 MinTofDV
 @ Expecting { 6.32086 205.20 }
 ```
 
+3 'AstronTXPrecision' STO
 ## MinΔVTraj
 
 Optimal launch window: minimise ΔV over **both** departure date and flight time
@@ -15466,7 +15477,8 @@ Optimal launch window: minimise ΔV over **both** departure date and flight time
 `'Af'  'Bf'  t₁_lo  t₁_hi  tof_lo  tof_hi` → `{ ΔV  t₁  tof }`
 
 ```rpl
-'♁Pf' '♂Pf' 2459030 2459075 150 225 MinΔVTraj
+3 'AstronTXPrecision' STO
+'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 MinΔVTraj
 @ Expecting { 6.31693 2459055.70 205.38 }             (Mars 2020 window; level 3)
 ```
 
@@ -15474,6 +15486,7 @@ Runtime is set by the variable `AstronTXPrecision` (below) — level 3 ≈ 63 s 
 the simulator. The minimum ΔV is nearly identical at all levels; higher levels
 only sharpen the dates.
 
+3 'AstronTXPrecision' STO
 ## MinΔDTraj
 
 Minimum-energy transfer for a departure date: the flight time giving the
@@ -15482,7 +15495,8 @@ smallest semi-major axis `a` (via `aTr`). A 1-D optimum by geometry.
 `t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ a  tof }`
 
 ```rpl
-2459054 '♁Pf' '♂Pf' 180 270 MinΔDTraj
+3 'AstronTXPrecision' STO
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 180 270 MinΔDTraj
 @ Expecting { 1.31743 228.22 }
 ```
 
@@ -15494,10 +15508,11 @@ solution). Used by `MinΔDTraj`.
 `t₁  t₂  'Af'  'Bf'` → `a`   (au)
 
 ```rpl
-2459054 2459282 '♁Pf' '♂Pf' aTr
+2459054 2459282 'Ⓛ♁Pf' 'Ⓛ♂Pf' aTr
 @ Expecting 1.31743
 ```
 
+3 'AstronTXPrecision' STO
 ## MinΔtTraj
 
 Fastest transfer under a ΔV budget: smallest flight time whose `TrCost` stays
@@ -15506,7 +15521,8 @@ within `budget` (bisection).
 `t₁  'Af'  'Bf'  budget  tof_lo  tof_hi` → `{ tof  ΔV }`
 
 ```rpl
-2459054 '♁Pf' '♂Pf' 7 150 205 MinΔtTraj
+3 'AstronTXPrecision' STO
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 7 150 205 MinΔtTraj
 @ Expecting { 173.38 7.000 }                          (7 km/s budget)
 ```
 
