@@ -16,7 +16,7 @@
       t1 Af EVAL 'rA' STO
       t2 Bf EVAL 'rB' STO
       t2 t1 - 'tof' STO
-      rA rB tof 0.00029591220828559 LambertU 'vt' STO
+      rA rB tof 0.00029591220828559 ⓁLambertU 'vt' STO
       rA DUP DOT √ 'rmag' STO
       vt 1 GET DUP DOT √ 'vmag' STO
       '1/(2/rmag-vmag^2/0.00029591220828559)' EVAL

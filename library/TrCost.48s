@@ -17,9 +17,9 @@
       t1 Af EVAL 'rA' STO
       t2 Bf EVAL 'rB' STO
       t2 t1 - 'tof' STO
-      rA rB tof 0.00029591220828559 LambertU 'vt' STO
-      t1 Af VΦf 'vA' STO
-      t2 Bf VΦf 'vB' STO
+      rA rB tof 0.00029591220828559 ⓁLambertU 'vt' STO
+      t1 Af ⓁVΦf 'vA' STO
+      t2 Bf ⓁVΦf 'vB' STO
       vt 1 GET vA -  DUP DOT √  1731.4568 ·  'dvd' STO
       vt 2 GET vB -  DUP DOT √  1731.4568 ·  'dva' STO
       dvd dva +  dvd  dva  3 →LIST

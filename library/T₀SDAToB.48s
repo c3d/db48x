@@ -8,13 +8,13 @@
 @@ Input  : 'Af' 'Bf' JD1 JD2   ( 'Af' 'Bf' JD1 JD2 -- JDmin )
 @@ Output : JD of minimum distance
 @@ VALIDATION (device-confirmed):
-@@   '♁Φf' '♂Φf' 2459120 2459140 T₀SDAToB -> 2459129.07   (2020-10-06)
+@@   'Ⓛ♁Φf' 'Ⓛ♂Φf' 2459120 2459140 T₀SDAToB -> 2459129.07   (2020-10-06)
 @@ ============================================================
  → Af Bf JD1 JD2
   « 0.5 → h
     «
-      « JDsd h + Af EVAL PosΦf  JDsd h + Bf EVAL PosΦf  DAToB Uval
-        JDsd h - Af EVAL PosΦf  JDsd h - Bf EVAL PosΦf  DAToB Uval  - »
+      « JDsd h + Af EVAL ⓁPosΦf  JDsd h + Bf EVAL ⓁPosΦf  ⓁDAToB Uval
+        JDsd h - Af EVAL ⓁPosΦf  JDsd h - Bf EVAL ⓁPosΦf  ⓁDAToB Uval  - »
       'JDsd'  JD1 JD2 2 →LIST  ROOT
     »
   »

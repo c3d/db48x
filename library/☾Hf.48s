@@ -12,8 +12,8 @@
 @@ ============================================================
  → JD
   « DEG
-    JD ♁Φf PosΦf → earth
-    « JD ☾Pos → mp
+    JD Ⓛ♁Φf ⓁPosΦf → earth
+    « JD Ⓛ☾Pos → mp
       « mp 1 GET mp 2 GET mp 3 GET → lam bet dd
         « 'dd·COS(bet_°)·COS(lam_°)/149597870.7' EVAL
           'dd·COS(bet_°)·SIN(lam_°)/149597870.7' EVAL

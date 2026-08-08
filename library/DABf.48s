@@ -8,8 +8,8 @@
 @@ Input  : JD 'Af' 'Bf'   ( JD 'Af' 'Bf' -- d )
 @@ Output : distance (au)
 @@ VALIDATION (device-confirmed):
-@@   2459050.5 '♁Φf' '♂Φf' DABf -> 0.707458 au   (Earth-Mars, 2020-07-20)
+@@   2459050.5 'Ⓛ♁Φf' 'Ⓛ♂Φf' DABf -> 0.707458 au   (Earth-Mars, 2020-07-20)
 @@ ============================================================
  → JD Af Bf
-  « JD Af EVAL PosΦf   JD Bf EVAL PosΦf   DAToB »
+  « JD Af EVAL ⓁPosΦf   JD Bf EVAL ⓁPosΦf   ⓁDAToB »
 »

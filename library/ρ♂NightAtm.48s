@@ -32,7 +32,7 @@
         z 300 >
         if then "Z out of range -8_km < Z < 300_km" DoError
         else
-          z 1_km × Duplicate P♂NightAtm Swap T♂NightAtm 191.181_J/(kg·K) × ÷ BaseUnits
+          z 1_km × Duplicate ⓁP♂NightAtm Swap ⓁT♂NightAtm 191.181_J/(kg·K) × ÷ BaseUnits
         end
       end
     »

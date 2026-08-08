@@ -31,7 +31,7 @@
         z 300 >
         if then "Z out of range -3_km < Z < 300_km" DoError
         else
-          z 1_km × Duplicate P♀Atm Swap T♀Atm 191.357_J/(kg·K) × ÷ BaseUnits
+          z 1_km × Duplicate ⓁP♀Atm Swap ⓁT♀Atm 191.357_J/(kg·K) × ÷ BaseUnits
         end
       end
     »

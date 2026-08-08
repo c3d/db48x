@@ -18,19 +18,19 @@
       L ϖ - DUP 180 + 360 / FLOOR 360 * -
       → M
       «
-        e M EaΦf
+        e M ⓁEaΦf
         → Ea
         «
-          e Ea νΦf
-          a e Ea rΦf
+          e Ea ⓁνΦf
+          a e Ea ⓁrΦf
           ϖ Ω -
           → ν r ω
           «
-            ω ν uΦf
+            ω ν ⓁuΦf
             → u
             «
-              Ω I u λΦf Uval
-              I u βΦf Uval
+              Ω I u ⓁλΦf Uval
+              I u ⓁβΦf Uval
               → λ β
               «
                 r 'COS(β_°)·COS(λ_°)' EVAL ×

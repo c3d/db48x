@@ -115,7 +115,7 @@ Distance between two bodies at one date, from their **element functions**.
 `JD  'Af'  'Bf'` → `distance`   (au)
 
 ```rpl
-2459050.5 '♁Φf' '♂Φf' DABf
+2459050.5 'Ⓛ♁Φf' 'Ⓛ♂Φf' DABf
 @ Expecting 0.707458 au                               (Earth–Mars, 2020-07-20)
 ```
 
@@ -127,7 +127,7 @@ Julian Day of closest approach between two bodies inside a search window
 `'Af'  'Bf'  JD_lo  JD_hi` → `JD_min`
 
 ```rpl
-'♁Φf' '♂Φf' 2459120 2459140 T₀SDAToB
+'Ⓛ♁Φf' 'Ⓛ♂Φf' 2459120 2459140 T₀SDAToB
 @ Expecting 2459129.07                                (2020-10-06)
 ```
 

@@ -20,7 +20,7 @@
     Z UnitValue 86000 <
     if
     then
-      Z T♁StdAtm UnitValue             @ Extract pure value of T_K (ex: 275.154)
+      Z ⓁT♁StdAtm UnitValue             @ Extract pure value of T_K (ex: 275.154)
       Duplicate 1.5 ^ 1.458E-6 ×       @ Calculation of beta × T^(3/2)
       Swap 110.4 +               @ Calculation of T + S
       ÷                          @ Dividing both terms

@@ -72,7 +72,7 @@
               then
                  "Z out of range -5_km < Z < 1000_km" DoError
               else
-                 Z P♁StdAtm Z T♁StdAtm 287.05287_J/(kg·K) × ÷ BaseUnits
+                 Z ⓁP♁StdAtm Z ⓁT♁StdAtm 287.05287_J/(kg·K) × ÷ BaseUnits
               end
            end
         »

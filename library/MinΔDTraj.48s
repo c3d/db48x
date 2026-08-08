@@ -18,12 +18,12 @@
       1 niter START
         'lo+(hi-lo)/3' EVAL 'm1' STO
         'hi-(hi-lo)/3' EVAL 'm2' STO
-        t1  t1 m1 +  Af Bf aTr 'da1' STO
-        t1  t1 m2 +  Af Bf aTr 'da2' STO
+        t1  t1 m1 +  Af Bf ⓁaTr 'da1' STO
+        t1  t1 m2 +  Af Bf ⓁaTr 'da2' STO
         IF da1 da2 < THEN m2 'hi' STO ELSE m1 'lo' STO END
       NEXT
       'lo+(hi-lo)/2' EVAL 'tofopt' STO
-      t1  t1 tofopt +  Af Bf aTr
+      t1  t1 tofopt +  Af Bf ⓁaTr
       tofopt  2 →LIST
     »
   »

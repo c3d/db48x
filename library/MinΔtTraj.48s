@@ -17,12 +17,12 @@
       toflo →Num 'lo' STO  tofhi →Num 'hi' STO
       1 niter START
         'lo+(hi-lo)/2' EVAL 'mid' STO
-        t1  t1 mid +  Af Bf TrCost 1 GET 'dvm' STO
+        t1  t1 mid +  Af Bf ⓁTrCost 1 GET 'dvm' STO
         IF dvm budget > THEN mid 'lo' STO ELSE mid 'hi' STO END
       NEXT
       'lo+(hi-lo)/2' EVAL 'mid' STO
       mid
-      t1  t1 mid +  Af Bf TrCost 1 GET
+      t1  t1 mid +  Af Bf ⓁTrCost 1 GET
       2 →LIST
     »
   »
