@@ -8,7 +8,8 @@
 @@ Input  : 'Af' 'Bf' t1_lo t1_hi tof_lo tof_hi   ( 'Af' 'Bf' t1_lo t1_hi tof_lo tof_hi -- { ΔV t₁ tof } )
 @@ Output : { ΔV t₁ tof }
 @@ VALIDATION (device-confirmed):
-@@   '♁Pf' '♂Pf' 2459030 2459075 150 225 MinΔVTraj -> { 6.31693 2459055.70 205.38 }  (Mars 2020, level 3)
+@@   1 'AstronTXPrecision' STO
+@@   'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 MinΔVTraj -> { 6.31702 2459055.62 205.66 }  (Mars 2020, level 1)
 @@ ============================================================
  → Af Bf t1lo t1hi toflo tofhi
   « 0 0 0 0 0 0 0 0 → lo hi m1 m2 dv1 dv2 t1opt niter

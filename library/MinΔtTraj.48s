@@ -8,7 +8,8 @@
 @@ Input  : t₁ 'Af' 'Bf' budget tof_lo tof_hi   ( t₁ 'Af' 'Bf' budget tof_lo tof_hi -- { tof ΔV } )
 @@ Output : { tof ΔV }
 @@ VALIDATION (device-confirmed):
-@@   2459054 '♁Pf' '♂Pf' 7 150 205 MinΔtTraj -> { 173.38 7.000 }   (7 km/s budget)
+@@   1 'AstronTXPrecision' STO
+@@   2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 7 150 205 MinΔtTraj -> { 173.63 6.990 }   (7 km/s budget)
 @@ ============================================================
  → t1 Af Bf budget toflo tofhi
   « 0 0 0 0 0 → lo hi mid dvm niter

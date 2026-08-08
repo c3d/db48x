@@ -8,8 +8,8 @@
 @@ Input  : t₁ 'Af' 'Bf' tof_lo tof_hi   ( t₁ 'Af' 'Bf' tof_lo tof_hi -- { ΔV tof } )
 @@ Output : { ΔV tof }
 @@ VALIDATION (device-confirmed):
-@@   3 'AstronTXPrecision' STO
-@@   2459054 '♁Pf' '♂Pf' 150 225 MinTofDV -> { 6.32086 205.20 }
+@@   1 'AstronTXPrecision' STO
+@@   2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 MinTofDV -> { 6.32099 205.66 }
 @@ ============================================================
  → t1 Af Bf toflo tofhi
   « 0 0 0 0 0 0 0 0 → lo hi m1 m2 dv1 dv2 tofopt niter

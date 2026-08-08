@@ -250,12 +250,11 @@ For a fixed departure date, the flight time that minimises `TrCost` ΔV
 `t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ ΔV  tof }`
 
 ```rpl
-3 'AstronTXPrecision' STO
+1 'AstronTXPrecision' STO
 2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 MinTofDV
-@ Expecting { 6.32086 205.20 }
+@ Expecting { 6.32099 205.66 }
 ```
 
-3 'AstronTXPrecision' STO
 ## MinΔVTraj
 
 Optimal launch window: minimise ΔV over **both** departure date and flight time
@@ -264,16 +263,15 @@ Optimal launch window: minimise ΔV over **both** departure date and flight time
 `'Af'  'Bf'  t₁_lo  t₁_hi  tof_lo  tof_hi` → `{ ΔV  t₁  tof }`
 
 ```rpl
-3 'AstronTXPrecision' STO
+1 'AstronTXPrecision' STO
 'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 MinΔVTraj
-@ Expecting { 6.31693 2459055.70 205.38 }             (Mars 2020 window; level 3)
+@ Expecting { 6.31702 2459055.62 205.66 }             (Mars 2020 window; level 1)
 ```
 
-Runtime is set by the variable `AstronTXPrecision` (below) — level 3 ≈ 63 s on
-the simulator. The minimum ΔV is nearly identical at all levels; higher levels
-only sharpen the dates.
+Runtime is set by the variable `AstronTXPrecision` (below): this example runs at
+level 1 (≈ 13 s on the simulator); level 3 (≈ 63 s) only sharpens the dates —
+the minimum ΔV is nearly identical at every level.
 
-3 'AstronTXPrecision' STO
 ## MinΔDTraj
 
 Minimum-energy transfer for a departure date: the flight time giving the
@@ -282,9 +280,9 @@ smallest semi-major axis `a` (via `aTr`). A 1-D optimum by geometry.
 `t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ a  tof }`
 
 ```rpl
-3 'AstronTXPrecision' STO
+1 'AstronTXPrecision' STO
 2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 180 270 MinΔDTraj
-@ Expecting { 1.31743 228.22 }
+@ Expecting { 1.31743 228.77 }
 ```
 
 ## aTr
@@ -299,7 +297,6 @@ solution). Used by `MinΔDTraj`.
 @ Expecting 1.31743
 ```
 
-3 'AstronTXPrecision' STO
 ## MinΔtTraj
 
 Fastest transfer under a ΔV budget: smallest flight time whose `TrCost` stays
@@ -308,9 +305,9 @@ within `budget` (bisection).
 `t₁  'Af'  'Bf'  budget  tof_lo  tof_hi` → `{ tof  ΔV }`
 
 ```rpl
-3 'AstronTXPrecision' STO
+1 'AstronTXPrecision' STO
 2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 7 150 205 MinΔtTraj
-@ Expecting { 173.38 7.000 }                          (7 km/s budget)
+@ Expecting { 173.63 6.990 }                          (7 km/s budget)
 ```
 
 ## AstronTXPrecision
@@ -318,7 +315,9 @@ within `budget` (bisection).
 Global variable controlling the iteration count of the window optimizers
 (`MinTofDV`, `MinΔVTraj`, `MinΔtTraj`, `MinΔDTraj`): `1`/`2`/`3` → `6`/`9`/`12`
 iterations. Simulator runtime for `MinΔVTraj` ≈ 16 / 35 / 63 s (hardware ≈ ×8).
-Use level 1 to explore, level 3 to refine.
+Use level 1 to explore, level 3 to refine. Set it before calling an optimizer
+(`1 'AstronTXPrecision' STO`); the routines read it to size their search and
+provide no built-in default.
 
 ---
 
