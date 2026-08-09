@@ -15829,8 +15829,11 @@ Primitive check: `[1 0 0] [0 1 0] DAToB` → `1.41421356 au`.
 
 `[A] [B]` → `d` (au)
 
+The live example chains `♁Pf` and `♂Pf` at today's date, so it returns the
+**current Earth-Mars distance** — the value changes every time you run it:
+
 ```rpl
-DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf DAToB   @ Earth-Mars distance right now (au)
+DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf DAToB   @ current Earth-Mars distance (au)
 ```
 
 ## DEarthToA
