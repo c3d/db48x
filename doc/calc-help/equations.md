@@ -3563,7 +3563,7 @@ a=7500_km  ecc=0.1  ν=225_°
 
 ---
 
-#### Luni-Solar Perturbations
+#### Luni Solar Perturbations
 
 Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circular orbit,
 `n` revolutions/day: `dΩ=−k·cos(inc)/n`, `dω=k'·(4−5·sin²inc)/n`.
@@ -3572,7 +3572,7 @@ Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circula
 ```rpl
 inc=51.6_°  n=15.5
 @ Expecting [ dΩM=-0.00013 54502 9015 °/d  dΩS=-0.00006 17140 3752 °/d  dωM=0.00010 13043 596 °/d  dωS=0.00004 61564 242 °/d ]
-'ROOT(ⒺLuni-Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
+'ROOT(ⒺLuni Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
 ```
 
 #### J2 Perturbations
@@ -3625,7 +3625,7 @@ HA=200_km  HB=35786.06815021_km
 'ROOT(ⒺHohmann Transfer;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
 ```
 
-#### One-Tangent Burn
+#### One Tangent Burn
 
 Faster transfer with a chosen `atx` (> Hohmann's). Ellipse `ecc=1−rA/atx`; true anomaly
 `ν` and flight-path angle `fpa` at B; `ΔVB` by the law of cosines; time of flight from
@@ -3637,7 +3637,7 @@ Kepler (`Ea`, `M`, `P`).
 ```rpl
 HA=200_km  HB=35786.06815021_km  atx=30000_km
 @ Expecting [ rA=6 578.1 km  rB=42 164.16815 021 km  ecc=0.78073  ν=157.67032 23126 3 °  fpa=46.87570 62535 72 °  ViA=7 784.28323 25417 m/s  VfB=3 074.65999 20399 m/s  VtxA=10 387.65858 5497 m/s  VtxB=2 370.73577 88884 m/s  ΔVA=2 603.37535 29558 m/s  ΔVB=2 260.16869 32089 m/s  ΔVT=4 863.54404 61646 m/s  Ea=121.28867 34296 1 °  M=83.06197 14538 64 °  P=51 712.18463 0719 s  TOF=11 931.43334 3371 s ]
-'ROOT(ⒺOne-Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
+'ROOT(ⒺOne Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
 ```
 
 ---
@@ -3770,7 +3770,7 @@ Hp=185_km  dmoon=384400_km
 
 Sun-referenced (`☉`) stationary conditions and libration points: the Sun-synchronous nodal-regression condition, the collinear Lagrange points, and the JWST halo orbit at the Sun–Earth L2 point.
 
-#### Sun-Synchronous Orbit
+#### Sun Synchronous Orbit
 
 Inclination that makes the node precess at the Sun's rate (360°/yr) via J2, so the local
 solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))`, needs `inc>90°`.
@@ -3779,7 +3779,7 @@ solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))
 ```rpl
 H=700_km  ecc=0
 @ Expecting [ a=7 078.1 km  dΩsun=0.98564 73320 9908 °/d  inc=98.18778 45390 92 °  P=5 926.33291 29206 s ]
-'ROOT(ⒺSun-Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
+'ROOT(ⒺSun Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
 ```
 
 #### Collinear Lagrange Points
@@ -3793,7 +3793,7 @@ centrifugal). `rapp=Ⓒa♁·(ⒸGM♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved impli
 'ROOT(ⒺCollinear Lagrange Points;[rapp;rL2;rL1];[1_km;1500000_km;1500000_km])'
 ```
 
-#### JWST at Sun-Earth L2
+#### JWST at Sun Earth L2
 
 L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGM♁))` (≈1 yr, so
 it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body periodic orbit.
@@ -3802,7 +3802,7 @@ it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body peri
 ```rpl
 rL2=1501531.72084_km
 @ Expecting [ dSunL2=151 099 402.42084 km  PL2=31 558 148.62813 5 s  VL2=30 083.68952 1882 m/s ]
-'ROOT(ⒺJWST at Sun-Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
+'ROOT(ⒺJWST at Sun Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
 ```
 
 ---
@@ -3826,7 +3826,7 @@ rA=1_au  rB=1.524_au
 'ROOT(ⒺHeliocentric Hohmann Transfer;[atx;VcsA;VcsB;VtxA;VtxB;vinfD;vinfA;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
-#### One-Tangent Interplanetary Transfer
+#### One Tangent Interplanetary Transfer
 
 Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly at arrival
 `ν=acos((atx(1−ecc²)/rB−1)/ecc)`, eccentric anomaly `Ea`, and `TOF` from Kepler's equation.
@@ -3837,7 +3837,7 @@ Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly
 ```rpl
 rA=1_au  rB=1.524_au  atx=1.3_au
 @ Expecting [ ecc=0.23076 92307 6923  ν=146.48805 93894 1 °  Ea=138.30245 33968 4 °  TOF=16 827 452.85711 3 s ]
-'ROOT(ⒺOne-Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
+'ROOT(ⒺOne Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
 ```
 
 #### Departure Phase Angle
@@ -3886,7 +3886,7 @@ vinf=2438.2_m/s  dmiss=18500_km  gam=150.451_°
 
 ---
 
-#### Gravity-Assist Swing-By
+#### Gravity Assist Swing By
 
 Planetary flyby: the spacecraft's velocity relative to the planet keeps its magnitude
 `vinf` but rotates by the hyperbolic turn angle `dturn=−2·asin(1/ecc)`. Decompose incoming
@@ -3897,12 +3897,12 @@ velocities into X,Y about the planet's velocity, rotate, recompose. `thi`/`fpaSf
 ```rpl
 Vpln=12740_m/s  fpaP=2.40_°  VSi=9470_m/s  fpaSi=39.2_°  dmiss=-2500000_km
 @ Expecting [ … VSf=19 697.35504 0872 m/s  fpaSf=14.06782 26183 37 ° … ]
-'ROOT(ⒺGravity-Assist Swing-By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
+'ROOT(ⒺGravity Assist Swing By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
 ```
 
 ---
 
-#### Patched-Conic Mission Capstone
+#### Patched Conic Mission Capstone
 
 Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → departure hyperbola
 (`TMI` from a parking orbit) + arrival capture (`MOI` into `rm`). `dVtot=TMI+MOI`.
@@ -3911,7 +3911,7 @@ Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → dep
 ```rpl
 rA=1_au  rB=1.524_au  Hp=200_km  rm=3896.2_km
 @ Expecting [ atx=1.262 au  …  TMI=3 611.74115 793 m/s  MOI=2 070.35297 95932 m/s  dVtot=5 682.09413 75232 m/s  TOF=22 370 268.98169 7 s ]
-'ROOT(ⒺPatched-Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+'ROOT(ⒺPatched Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
 #### Synodic Period & Launch Window
@@ -3926,7 +3926,7 @@ rA=1_au  rB=1.524_au
 'ROOT(ⒺSynodic Period & Launch Window;[P1;P2;Tsyn];[1_d;1_d;1_d])'
 ```
 
-#### Bi-Elliptic vs Hohmann
+#### Bi Elliptic vs Hohmann
 
 Compare a Hohmann (`dvH`) to a bi-elliptic transfer via a far turning point `rstar` (`dvBE`).
 Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of much longer time.
@@ -3937,10 +3937,10 @@ Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of mu
 ```rpl
 rA=1_au  rB=30.07_au  rstar=50_au
 @ Expecting [ atx=15.535 au  dvH=15 707.33870 8 m/s  …  dvBE=15 377.05850 9 m/s  dgain=330.28020 0 m/s ]
-'ROOT(ⒺBi-Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+'ROOT(ⒺBi Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
 ```
 
-#### Solar-System Escape
+#### Solar System Escape
 
 Δv to leave the solar system from a planet's orbit: `vinf=Vsun−Vplanet` (with
 `Vsun=√(2ⒸGM☉/rA)`), then `dVesc` from a parking orbit and `C3=vinf²`. The Oberth effect
@@ -3950,7 +3950,7 @@ makes `dVesc≪vinf`.
 ```rpl
 rA=1_au  Hp=200_km
 @ Expecting [ Vsun=42 121.91513 6632 m/s  Vplanet=29 784.69182 9677 m/s  vinf=12 337.22330 6955 m/s  r0=6 578.1 km  Vo=16 534.72738 8576 m/s  dVesc=8 750.44415 60348 m/s  C3=152.20707 89256 8 km↑2/s↑2 ]
-'ROOT(ⒺSolar-System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
+'ROOT(ⒺSolar System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
 ```
 
 ---

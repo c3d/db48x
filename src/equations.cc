@@ -1737,7 +1737,7 @@ static const cstring basic_equations[] =
     "}",
 
     //13.
-    "Luni-Solar Perturbations",  "{ "
+    "Luni Solar Perturbations",  "{ "
     "  'dΩM=-0.00338·cos(inc_°)/n·(1_°/d)' "
     "  'dΩS=-0.00154·cos(inc_°)/n·(1_°/d)' "
     "  'dωM=0.00169·(4-5·sin(inc_°)↑2)/n·(1_°/d)' "
@@ -1778,7 +1778,7 @@ static const cstring basic_equations[] =
     "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
     "}",
     //17.
-    "One-Tangent Burn",  "{ "
+    "One Tangent Burn",  "{ "
     "  'rA=(ⒸReq♁)+(HA_km)' "
     "  'rB=(ⒸReq♁)+(HB_km)' "
     "  'ecc=1-(rA_km)/(atx_km)' "
@@ -1897,7 +1897,7 @@ static const cstring basic_equations[] =
     // ------------------------------------------------------------------------
 
     //33.
-    "Sun-Synchronous Orbit",  "{ "
+    "Sun Synchronous Orbit",  "{ "
     "  'a=(ⒸReq♁)+(H_km)' "
     "  'dΩsun=(360_°)/(365.2422_d)' "
     "  'inc=acos((dΩsun_°/d)/(-2.06474E14·((a_km)/(1_km))↑(-7/2)·(1-ecc↑2)↑(-2)·(1_°/d)))' "
@@ -1910,7 +1910,7 @@ static const cstring basic_equations[] =
     "  'rL1=SQRT(ⒸGM♁/(ⒸGM☉/((Ⓒa♁)-(rL1_km))↑2-((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)-(rL1_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3))' "
     "}",
     //35.
-    "JWST at Sun-Earth L2",  "{ "
+    "JWST at Sun Earth L2",  "{ "
     "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
     "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
     "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
@@ -1932,7 +1932,7 @@ static const cstring basic_equations[] =
     "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
     "}",
     //28.
-    "One-Tangent Interplanetary Transfer",  "{ "
+    "One Tangent Interplanetary Transfer",  "{ "
     "  'ecc=1-((rA_au)/(atx_au))' "
     "  'ν=acos(((atx_au)·(1-ecc↑2)/(rB_au)-1)/ecc)' "
     "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
@@ -1961,7 +1961,7 @@ static const cstring basic_equations[] =
     "}",
 
     //32.
-    "Gravity-Assist Swing-By",  "{ "
+    "Gravity Assist Swing By",  "{ "
     "  'VPx=(Vpln_m/s)·cos(fpaP_°)' "
     "  'VPy=(Vpln_m/s)·sin(fpaP_°)' "
     "  'VSix=(VSi_m/s)·cos(fpaSi_°)' "
@@ -1984,7 +1984,7 @@ static const cstring basic_equations[] =
     "}",
 
     //36.
-    "Patched-Conic Mission Capstone",  "{ "
+    "Patched Conic Mission Capstone",  "{ "
     "  'atx=((rA_au)+(rB_au))/2' "
     "  'VcsA=SQRT(ⒸGM☉/(rA_au))' "
     "  'VtxA=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))' "
@@ -2007,7 +2007,7 @@ static const cstring basic_equations[] =
     "  'Tsyn=1/(1/(P1_d)-1/(P2_d))' "
     "}",
     //38.
-    "Bi-Elliptic vs Hohmann",  "{ "
+    "Bi Elliptic vs Hohmann",  "{ "
     "  'atx=((rA_au)+(rB_au))/2' "
     "  'dvH=(SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rA_au)))+(SQRT(ⒸGM☉/(rB_au))-SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au))))' "
     "  'abe1=((rA_au)+(rstar_au))/2' "
@@ -2019,7 +2019,7 @@ static const cstring basic_equations[] =
     "  'dgain=(dvH_m/s)-(dvBE_m/s)' "
     "}",
     //39.
-    "Solar-System Escape",  "{ "
+    "Solar System Escape",  "{ "
     "  'Vsun=SQRT(2·ⒸGM☉/(rA_au))' "
     "  'Vplanet=SQRT(ⒸGM☉/(rA_au))' "
     "  'vinf=(Vsun_m/s)-(Vplanet_m/s)' "
