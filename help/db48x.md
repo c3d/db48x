@@ -15818,7 +15818,8 @@ Mars heliocentric ecliptic position from a Julian Day (`♂Φf` composed with `P
 `JD` → `[x y z]` (au)
 
 ```rpl
-2459050.5 ♂Pf     @ Expecting [ 1.159010882 -0.753079682 -0.044216374 ]
+DateTime JDN Ⓛ♂Pf     @ Mars' heliocentric position right now (au); its norm ~ 1.5 au
+2459050.5 Ⓛ♂Pf        @ Expecting [ 1.159010882 -0.753079682 -0.044216374 ]   (fixed JD, 2020-07-20)
 ```
 
 ## DAToB
@@ -15828,7 +15829,8 @@ Distance between two heliocentric position vectors, `|A−B|`, reduced to au. Pr
 `[A] [B]` → `d` (au)
 
 ```rpl
-[ 1 0 0 ] [ 0 1 0 ] DAToB     @ Expecting 1.41421356 au
+DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf DAToB   @ Earth-Mars distance right now (au)
+[ 1 0 0 ] [ 0 1 0 ] DAToB                @ Expecting 1.41421356 au   (sqrt2 primitive check)
 ```
 
 ## DEarthToA
