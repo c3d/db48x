@@ -4048,7 +4048,9 @@ rMars=1.524_au  rEar=1_au  rp=3896.2_km
 
 Martian EDL: gravity `gmars=ⒸGM♂/rmars²`, peak entry deceleration (Allen-Eggers)
 `amax=Ventry²·sin(fpa)/(2e·Hs)` (independent of ballistic coefficient), terminal descent
-`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`).
+`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`). This entry-descent-
+landing sequence is the one a **Mars 2020 (Perseverance)**-class spacecraft flies on
+arrival — hypersonic entry, peak-g, then terminal descent — as at Jezero crater.
 
 * To calculate: `[gmars_m/s^2;amax_m/s^2;amaxg;vterm_m/s]` from `Ventry`, `fpa`, `Hs`, `ρa`, `Cd`, `Ad`, `msat`, `rmars`:
 ```rpl
@@ -4062,7 +4064,8 @@ Ventry=6000_m/s  fpa=12_°  Hs=11.1_km  ρa=0.015_kg/m³  Cd=1.5  Ad=10_m↑2  m
 Wait until Earth's rotation brings the site into the target orbital plane: local sidereal
 time `LST=θs(JD0;lonE)`, wait `twait=(OmegaT−LST)/360.98565°·d`. Inverse of **Orbit Orientation**:
 with `OmegaT` = that sim's RAAN Ω (and its site), `twait`=0.125 d recovers its burnout instant
-(JD 2451838.125).
+(JD 2451838.125). The same wait-time logic sets the daily launch instant from a pad — e.g. timing a departure from Cape
+Canaveral into the **Mars 2020 (Perseverance)** window.
 
 * To calculate: `[LST_°;dOmega_°;twait_d]` from `JD0`, `lonE`, `OmegaT`:
 ```rpl
