@@ -226,13 +226,15 @@ State vector to classical orbital elements.
 
 ΔV cost of a ballistic transfer between two dates, using **position functions**
 for the departure and arrival bodies. Solves Lambert between the two positions
-and differences against each body's velocity.
+and differences against each body's velocity. The example below reproduces the
+Earth→Mars leg of NASA's **Mars 2020 (Perseverance)** mission — departure in the
+late-July 2020 window, ~200-day cruise.
 
 `t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
 
 ```rpl
 2459050.5 2459250.5 'Ⓛ♁Pf' 'Ⓛ♂Pf' TrCost
-@ Expecting { 6.3738 3.6446 2.7292 }                  (Earth→Mars, 200 days)
+@ Expecting { 6.3738 3.6446 2.7292 }   (Earth→Mars ~200 d — Mars 2020 / Perseverance)
 ```
 
 The Moon plugs in identically:
@@ -258,14 +260,15 @@ For a fixed departure date, the flight time that minimises `TrCost` ΔV
 ## MinΔVTraj
 
 Optimal launch window: minimise ΔV over **both** departure date and flight time
-(2-D ternary search over `TrCost`). Keep the window under the 180° ridge.
+(2-D ternary search over `TrCost`). Keep the window under the 180° ridge. The
+example scans the real **Mars 2020 (Perseverance)** launch window of late July 2020.
 
 `'Af'  'Bf'  t₁_lo  t₁_hi  tof_lo  tof_hi` → `{ ΔV  t₁  tof }`
 
 ```rpl
 1 'AstronTXPrecision' STO
 'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 MinΔVTraj
-@ Expecting { 6.31702 2459055.62 205.66 }             (Mars 2020 window; level 1)
+@ Expecting { 6.31702 2459055.62 205.66 }   (Mars 2020 = Perseverance window; level 1)
 ```
 
 Runtime is set by the variable `AstronTXPrecision` (below): this example runs at
