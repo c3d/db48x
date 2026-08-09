@@ -1410,7 +1410,7 @@ static const cstring basic_equations[] =
     "}",
     //1b.
     "Rocket ΔV",  "{ "
-    "  'ΔV=(Ve_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(t_s)))' "
+    "  'ΔV=(Ve_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(Δt_s)))' "
     "}",
     //2.
     "Tsiolkovsky & Propellant Mass",  "{ "
@@ -1525,7 +1525,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //18.
-    "Under-Extended Conic Nozzle",  "{ "
+    "Under Extended Conic Nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1535,7 +1535,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //19.
-    "Over-extended conic nozzle",  "{ "
+    "Over extended conic nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1564,7 +1564,7 @@ static const cstring basic_equations[] =
     "  'ρp=1/(wAl/(ρAl_g/ml)+wAP/(ρAP_g/ml)+wHTPB/(ρHTPB_g/ml))' "
     "}",
     //23.
-    "Multi-Stages Rocket ΔV",  "{ "
+    "Multi Stages Rocket ΔV",  "{ "
     "  'C1=(Isp1_s)·Ⓒg' "
     "  'C2=(Isp2_s)·Ⓒg' "
     "  'Mo1=Mp1_kg+Md1_kg+Mp2_kg+Md2_kg+Mpl_kg' "
@@ -1593,7 +1593,7 @@ static const cstring basic_equations[] =
     "  'Lnz=Li·(SQRT(ε)-1)·(Rt_cm)/tan(15_°)' "
     "}",
     //A-3.
-    "Combustion Chamber Stay-Time",  "{ "
+    "Combustion Chamber Stay Time",  "{ "
     "  'V=ⒸR·(Tc_K)/((Pc_Pa)·(M_(g/mol)))' "
     "  'Vc=(Lstar_m)·(At_m↑2)' "
     "  'ts=(Vc_m↑3)/((V_m↑3/kg)·(Q_kg/s))' "
@@ -1624,13 +1624,13 @@ static const cstring basic_equations[] =
     "  'MR=exp((ΔV1_m/s)/(C_m/s))' "
     "}",
     //C-1.
-    "Sea-level vs Vacuum Thrust",  "{ "
+    "Sea level vs Vacuum Thrust",  "{ "
     "  'Fsl=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "  'Fvac=(Q_kg/s)·(Ve_m/s)+(Pe_MPa)·(Ae_m↑2)' "
     "  'ΔF=(Pa_MPa)·(Ae_m↑2)' "
     "}",
     //C-2.  (Earth shown; swap ⒸGM♁/ⒸReq♁ → ♂ or ♀ for Mars/Venus)
-    "Multi-Planet Launch ΔV",  "{ "
+    "Multi Planet Launch ΔV",  "{ "
     "  'rorb=(ⒸReq♁)+(horb_km)' "
     "  'Vcirc=SQRT(ⒸGM♁/(rorb_km))' "
     "  'Vesc=SQRT(2·ⒸGM♁/(rorb_km))' "
