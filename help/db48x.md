@@ -15318,12 +15318,12 @@ angle mode to `DEG`. The transforms are also callable individually: `EaΦf`
 
 Position-function wrapper: element function composed with `PosΦf`, mapping a date
 directly to a heliocentric `[x y z]`. Define one per body as needed (`♂Pf`, …).
+Fixed check: `2459050.5 Ⓛ♁Pf` → `[0.468733637 -0.901591683 0.000042104]`.
 
 `JD` → `[x y z]`
 
 ```rpl
 DateTime JDN Ⓛ♁Pf     @ Earth's heliocentric position right now (au); its norm ≈ 1 au
-2459050.5 Ⓛ♁Pf        @ Expecting [ 0.468733637 -0.901591683 0.000042104 ]   (fixed JD, 2020-07-20)
 ```
 
 ## VΦf
@@ -15814,23 +15814,23 @@ Neptune mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]
 ## ♂Pf
 
 Mars heliocentric ecliptic position from a Julian Day (`♂Φf` composed with `PosΦf`). Companion of `♁Pf`.
+Fixed check: `2459050.5 Ⓛ♂Pf` → `[1.159010882 -0.753079682 -0.044216374]`.
 
 `JD` → `[x y z]` (au)
 
 ```rpl
 DateTime JDN Ⓛ♂Pf     @ Mars' heliocentric position right now (au); its norm ~ 1.5 au
-2459050.5 Ⓛ♂Pf        @ Expecting [ 1.159010882 -0.753079682 -0.044216374 ]   (fixed JD, 2020-07-20)
 ```
 
 ## DAToB
 
 Distance between two heliocentric position vectors, `|A−B|`, reduced to au. Primitive used by `DABf`/`T₀SD*`.
+Primitive check: `[1 0 0] [0 1 0] DAToB` → `1.41421356 au`.
 
 `[A] [B]` → `d` (au)
 
 ```rpl
 DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf DAToB   @ Earth-Mars distance right now (au)
-[ 1 0 0 ] [ 0 1 0 ] DAToB                @ Expecting 1.41421356 au   (sqrt2 primitive check)
 ```
 
 ## DEarthToA
