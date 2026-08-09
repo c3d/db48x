@@ -90,8 +90,8 @@ directly to a heliocentric `[x y z]`. Define one per body as needed (`♂Pf`, �
 `JD` → `[x y z]`
 
 ```rpl
-« → JD « JD ♁Φf PosΦf » » 'Ⓛ♁Pf' Sto     @ Earth position function
-« → JD « JD ♂Φf PosΦf » » 'Ⓛ♂Pf' Sto     @ Mars  position function
+DateTime JDN Ⓛ♁Pf     @ Earth's heliocentric position right now (au); its norm ≈ 1 au
+2459050.5 Ⓛ♁Pf        @ Expecting [ 0.468733637 -0.901591683 0.000042104 ]   (fixed JD, 2020-07-20)
 ```
 
 ## VΦf
