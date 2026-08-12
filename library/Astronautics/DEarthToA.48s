@@ -1,17 +1,15 @@
 «
 @@ ============================================================
-@@ DEarthToA — Earth-referenced distance to a body position
-@@ Convenience wrapper over DAToB with Earth as the first body.
+@@ DEarthToA — Earth-to-body distance at one date (Earth is built in)
+@@ Earth-referenced variant of DABf (first body = ♁Φf). Give the date and the
+@@ target's element function; Earth's position is computed internally.
 @@ Author & design         : Jean Wilson
 @@ Co-authors & programming : Claude & Claude Code (Anthropic)
 @@
-@@ Input  : [E] [A]   ( [E] [A] -- d )
+@@ Input  : JD 'Af'   ( JD 'Af' -- d )
 @@ Output : distance (au)
 @@ VALIDATION (device-confirmed):
-@@   Wrapper of DAToB.
+@@   2459050.5 'Ⓛ♂Φf' DEarthToA -> 0.707458 au   (Earth-Mars, 2020-07-20)
 @@ ============================================================
- → E A
-  «
-    E A ⓁDAToB
-  »
+ → JD Af « JD 'Ⓛ♁Φf' Af ⓁDABf »
 »
