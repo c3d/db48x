@@ -606,12 +606,17 @@ DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf DAToB   @ current Earth-Mars distance (a
 
 ## DEarthToA
 
-Earth-referenced distance: Earth-to-body separation from two position vectors (thin wrapper of `DAToB`).
+Earth-referenced distance: Earth-to-body separation from two position vectors —
+a thin wrapper of `DAToB` where the **first** vector is Earth.
+Primitive check: `[1 0 0] [0 1 0] DEarthToA` → `1.41421356 au`.
 
 `[E] [A]` → `d` (au)
 
+The live example puts Earth first, then the target body, both at today's date, so
+it returns the current Earth-to-target distance (here Venus):
+
 ```rpl
-[ 1 0 0 ] [ 0 1 0 ] DEarthToA     @ Expecting 1.41421356 au
+DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♀Φf ⓁPosΦf DEarthToA   @ current Earth-Venus distance (au)
 ```
 
 ## T₀SDEarthToA
