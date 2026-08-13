@@ -4019,7 +4019,7 @@ rp=71892_km  rmoon=670900_km
 'ROOT(ⒺPath to Jupiter Satellites;[atxJ;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
-#### Path to Saturne Satellites
+#### Path to Saturn Satellites
 
 In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea: swap `rmoon`.
 
@@ -4027,7 +4027,7 @@ In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea
 ```rpl
 rp=62268_km  rmoon=1221870_km
 @ Expecting [ atxS=642 069 km  Vpark=24 684.22816 9978 m/s  dv1=9 367.66028 62295 m/s  Vmoon=5 572.36440 77728 m/s  dv2=3 837.03823 5274 m/s  dVtot=13 204.69852 1504 m/s  TOF=262 403.97839 812 s ]
-'ROOT(ⒺPath to Saturne Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+'ROOT(ⒺPath to Saturn Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
 ---
