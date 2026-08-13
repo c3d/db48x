@@ -1638,8 +1638,8 @@ static const cstring basic_equations[] =
     "}",
 
     "Astronautics", nullptr,
-    "Astronautics/GeoCntrX", nullptr,
-    "Astronautics/GeoCntrX/Stationary", nullptr,
+    "Astronautics/Geocentric", nullptr,
+    "Astronautics/Geocentric/Stationary", nullptr,
     // ------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------
@@ -1759,7 +1759,7 @@ static const cstring basic_equations[] =
     "}",
 
     // ------------------------------------------------------------------------
-    "Astronautics/GeoCntrX/Trajectory", nullptr,
+    "Astronautics/Geocentric/Trajectory", nullptr,
     // ------------------------------------------------------------------------
 
     // ------------------------------------------------------------------------

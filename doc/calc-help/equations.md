@@ -3377,13 +3377,13 @@ horb=200_km
 Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
 ## Astronautics
 
-### GeoCntrX / Stationary
+### Geocentric / Stationary
 
 Earth-centered (`♁`) orbits of fixed geometry, from the two-body results (circular
 velocity, Kepler's third law, angular momentum, vis-viva). Radii geocentric, referenced
 to `ⒸReq♁`.
 
-The variables of the GeoCntrX / Stationary section are:
+The variables of the Geocentric / Stationary section are:
 
 * `a`: Semi-major axis
 * `ecc`: Eccentricity (not `e`, reserved for Euler's number)
@@ -3602,7 +3602,7 @@ H=400_km  Cd=2.67  Ad=8_m↑2  ρa=2.62E-12_kg/m³  msat=1000_kg  Hs=58.2_km
 
 ---
 
-### GeoCntrX / Trajectory
+### Geocentric / Trajectory
 
 In-plane transfers between two circular geocentric orbits (radii from altitudes over
 `ⒸReq♁`). Velocities from vis-viva; total cost is the sum of the two burns.
