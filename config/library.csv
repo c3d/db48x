@@ -11,9 +11,11 @@
 
 "Astronomy"
 
-	"PeriSel",		"=/library/Astronomy/PeriSel.48s"
+
 
 "Astronomy/Ephemeris Orbital Elements"
+
+	"PeriSel",		"=/library/Astronomy/PeriSel.48s"
 
 	"☿Φf",		"=/library/Astronomy/☿Φf.48s"
 	"♀Φf",		"=/library/Astronomy/♀Φf.48s"
@@ -29,7 +31,8 @@
 	"MSumS",	"=/library/Astronomy/MSumS.48s"
 	"MSumC",	"=/library/Astronomy/MSumC.48s"
 
-"Astronomy/HelioCntrX Ecliptical Coordinates"
+"Astronomy/Heliocentric Ecliptic Coordinates"
+
 
 	"EaΦf",		"=/library/Astronomy/EaΦf.48s"
 	"νΦf",		"=/library/Astronomy/νΦf.48s"
@@ -42,20 +45,10 @@
 	"♂Pf",		"=/library/Astronomy/♂Pf.48s"
 	"VΦf",		"=/library/Astronomy/VΦf.48s"
 
-"Astronautics"
-
-"Astronautics/Flight Parameters"
-
-	"DABf",		"=/library/Astronautics/DABf.48s"
-	"DAToB",	"=/library/Astronautics/DAToB.48s"
-	"DEarthToA",	"=/library/Astronautics/DEarthToA.48s"
-	"T₀SDAToB",	"=/library/Astronautics/T₀SDAToB.48s"
-	"T₀SDEarthToA",	"=/library/Astronautics/T₀SDEarthToA.48s"
-	"θs",		"=/library/Astronautics/θs.48s"
-
 "Astronomy/Planet Atmospheres"
 
 "Astronomy/Planet Atmospheres/Earth"
+
 
 	"T♁StdAtm",	"=/library/Astronomy/T♁StdAtm.48s"
 	"P♁StdAtm",	"=/library/Astronomy/P♁StdAtm.48s"
@@ -63,6 +56,7 @@
 	"μ♁StdAtm",	"=/library/Astronomy/μ♁StdAtm.48s"
 
 "Astronomy/Planet Atmospheres/Mars"
+
 
 	"T♂DayAtm",	"=/library/Astronomy/T♂DayAtm.48s"
 	"P♂DayAtm",	"=/library/Astronomy/P♂DayAtm.48s"
@@ -73,11 +67,25 @@
 
 "Astronomy/Planet Atmospheres/Venus"
 
+
 	"T♀Atm",	"=/library/Astronomy/T♀Atm.48s"
 	"P♀Atm",	"=/library/Astronomy/P♀Atm.48s"
 	"ρ♀Atm",	"=/library/Astronomy/ρ♀Atm.48s"
 
+"Astronautics"
+
+"Astronautics/Flight Parameters"
+
+
+	"DABf",		"=/library/Astronautics/DABf.48s"
+	"DAToB",	"=/library/Astronautics/DAToB.48s"
+	"DEarthToA",	"=/library/Astronautics/DEarthToA.48s"
+	"T₀SDAToB",	"=/library/Astronautics/T₀SDAToB.48s"
+	"T₀SDEarthToA",	"=/library/Astronautics/T₀SDEarthToA.48s"
+	"θs",		"=/library/Astronautics/θs.48s"
+
 "Astronautics/Trajectory"
+
 
 	"Hohmann",	"=/library/Astronautics/Hohmann.48s"
 	"BiElliptic",	"=/library/Astronautics/BiElliptic.48s"
@@ -94,7 +102,6 @@
 	"MinΔDTraj",	"=/library/Astronautics/MinΔDTraj.48s"
 	"MinΔtTraj",	"=/library/Astronautics/MinΔtTraj.48s"
 	"GAssist",	"=/library/Astronautics/GAssist.48s"
-
 
 "Mathematics"
 
