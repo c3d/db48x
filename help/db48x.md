@@ -14003,7 +14003,7 @@ Hp=185_km  dmoon=384400_km
 
 ---
 
-### HelioCntrX / Stationary
+### Heliocentric / Stationary
 
 Sun-referenced (`☉`) stationary conditions and libration points: the Sun-synchronous nodal-regression condition, the collinear Lagrange points, and the JWST halo orbit at the Sun–Earth L2 point.
 
@@ -14044,7 +14044,7 @@ rL2=1501531.72084_km
 
 ---
 
-### HelioCntrX / Trajectory
+### Heliocentric / Trajectory
 
 Sun-centered (`☉`) interplanetary transfers and mission analysis: heliocentric Hohmann and one-tangent transfers, departure and arrival hyperbolae, gravity-assist swing-bys, launch windows, and patched-conic mission capstones.
 
