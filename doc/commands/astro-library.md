@@ -72,7 +72,7 @@ a planet.
 
 Heliocentric ecliptic position `[x y z]` (au) from an orbital-element vector.
 Solves Kepler's equation and chains the six coordinate transforms. Guards the
-angle mode to `DEG`. The transforms are also callable individually: `EaΦf`
+angle mode to degrees. The transforms are also callable individually: `EaΦf`
 (eccentric anomaly, Kepler root), `νΦf` (true anomaly), `rΦf` (radius), `uΦf`
 (argument of latitude), `λΦf` (ecliptic longitude), `βΦf` (ecliptic latitude).
 
