@@ -2571,3 +2571,36 @@ HELP_BODY(assignment)
 {
     return utf8("Assignments");
 }
+
+// ==========================================================================
+//   Equation Library - grand total of variables
+//   (from doc/calc-help/equations.md; each name is counted once per section
+//   that uses it - the same name recurring in another section is expected and
+//   counted again, since every section carries its own variable list.)
+// --------------------------------------------------------------------------
+//     Columns and Beams                    21
+//     Electricity                          78
+//     Fluids                               30
+//     Forces and Energy                    37
+//     Gases                                38
+//     Heat transfer                        31
+//     Magnetism                            28
+//     Motion                               38
+//     Optics                               40
+//     Oscillations                         25
+//     Plane Geometry                       21
+//     Solid geometry                       12
+//     Solid State Devices                  53
+//     Stress Analysis                      28
+//     Waves                                40
+//     Relativity                          107
+//     Modern Physics                       43
+//     Nuclear Physics                      52
+//     Finance                               6
+//     Geocentric / Stationary              54
+//     Geocentric / Trajectory              80
+//     Heliocentric / Stationary            12
+//     Heliocentric / Trajectory           129
+// --------------------------------------------------------------------------
+//     GRAND TOTAL                        1003
+// ==========================================================================
