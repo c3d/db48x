@@ -147,13 +147,11 @@ mean sidereal time. Sidereal time is the hour angle of the vernal equinox.
 @ Expecting 280.46061837 °     (GMST at the J2000.0 epoch, 2000-01-01 12:00 UT)
 ```
 
-⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` currently overshoots
-the true JD by 0.5 day — it adds the time counted from *midnight* to the *noon*-
-based Julian day number (see PR 1580) — and it keeps the entered clock time. So
-to start from a civil date, convert the time to UT and subtract the offset:
-`<date>_date JDN 0.5 -`. For example `20201006.120000_date JDN 0.5 -` yields the
-correct `2459129` (JD of 2020-10-06 12:00 UT), which `-73.58 θs` then turns into
-a local mean sidereal time.
+⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` comes out 0.5 day too large (a known half-day offset), so convert your
+civil clock time to UT and subtract half a day: `<date>_date JDN 0.5 -`. For
+example, `20201006.120000_date JDN 0.5 -` gives the correct `2459129` (JD of
+2020-10-06 12:00 UT), which `-73.58 θs` then turns into a local mean
+sidereal time.
 
 ---
 
