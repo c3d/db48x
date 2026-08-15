@@ -14,9 +14,10 @@ Two input conventions coexist and must not be mixed:
 * **Position functions** `♁Pf`/`♂Pf`/`☾Hf` return a heliocentric position
   `[x y z]`. Used by the *transfer* functions (`VΦf`, `TrCost`, `Min…`, `aTr`).
 
-*Each `##` title is the exact function name, for long-press lookup. Where a
-family shares one entry (the eight `…Φf`, the six transforms), the siblings are
-listed in that entry's body.*
+Each `##` heading is the exact function name, so long-press help resolves it.
+Two of the entries stand for a whole family — the eight planetary element
+functions (`…Φf`) and the six coordinate transforms — and list their
+other members in the entry body.
 
 ---
 
