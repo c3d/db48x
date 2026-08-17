@@ -3962,7 +3962,7 @@ interpreted as `False`.
 
 Note: This is a difference from HP calculators, where a test returns `0` or `1`.
 
-#### To include a test in a program
+#### To include a test in a program
 
 Tests can be entered using the stack or algebraic syntax.
 
@@ -4103,7 +4103,7 @@ The `same` function, finally, tests *identity* of two objects. It differs from
 @ Expecting { True True False }
 ```
 
-#### Equality: Differences with HP
+#### Equality: Differences with HP
 
 The DB48x `=` operator differs from HP calculators, that use `=` only to build
 equations. As a result, `2=3` returns `False` on DB48x, but evaluates as `2=3`
@@ -13009,7 +13009,7 @@ Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.05_MPa
 'ROOT(ⒺProperly Adapted Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
 ```
 
-#### Under-Extended Conic Nozzle
+#### Under Extended Conic Nozzle
 
 * The previous and the next 2 simulations prove that the highest value of thrust F is found with adapted Conic Nozzle (Pa/Pe=1) as shown in the figure.
 
@@ -13020,17 +13020,17 @@ To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure 
 ```rpl
 Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa  
 @ Expecting [ Pt=2.82236 96502 689 MPa Tt=3 272.72727 27273 K At=0.03443 98985 1769 m↑2 Nm=3.03213 30836 005 Ae=0.24268 50403 7052 m↑2 Ve=2 677.44630 75513 m/s Fnet=279.87888 27736 5 kN ]
-'ROOT(ⒺUnder-Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+'ROOT(ⒺUnder Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
 ```
 
-#### Over-extended conic nozzle
+#### Over Extended Conic Nozzle
 
 * When the exhaust nozzle pressure `Pe` is less than the ambient pressure `Pa`.
 To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
 ```rpl
 Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa  
 @ Expecting [ Pt=2.82236 96502 689 MPa Tt=3 272.72727 27273 K At=0.03443 98985 1769 m↑2 Nm=3.76599 41252 237 Ae=0.69630 57034 8304 m↑2 Ve=2 962.65092 49691 m/s Fnet=278.85744 99098 3 kN ]
-'ROOT(ⒺOver-extended conic nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+'ROOT(ⒺOver Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
 ```
 
 #### Characteristic Nozzle Geometry
@@ -13067,13 +13067,13 @@ a=0.1  n=0.3  Pc=5_MPa  ρp=1.7_g/ml  L=10_m  D=1_m
 'ROOT(ⒺSolid Rocket Propellant Ideal Density;[ρp];[1_g/ml])'
 ```
 
-#### Multi-Stages Rocket ΔV
+#### Multi Stages Rocket ΔV
 
 * To calculate: `[C1_m/s; C2_m/s; Mo1_kg; Mf1_kg; Mo2_kg; Mf2_kg; Mo_kg; MplMo; ΔV1_m/s; ΔV2_m/s; ΔVtot_m/s]` (Stage 1 & 2 effective exhaust gas velocity; Stage 1 initial & final mass; Stage 2 initial & final mass; Total initial mass; Payload over initial mass ratio; Stage 1 & 2 velocity change; Total velocity change) from 7 known variables.
 ```rpl
 Isp1=260_s  Isp2=320_s  Mp1=120000_kg  Md1=9000_kg  Mp2=30000_kg  Md2=3000_kg  Mpl=3000_kg
 @ Expecting [ C1=2 549.729 m/s C2=3 138.128 m/s Mo1=165 000 kg Mf1=45 000 kg Mo2=36 000 kg Mf2=6 000 kg Mo=201 000 kg MplMo=0.01492 53731 3433 ΔV1=3 312.81950 38435 m/s ΔV2=5 622.77055 96497 m/s ΔVtot=8 935.59006 34932 m/s ]
-'ROOT(ⒺMulti-Stages Rocket ΔV;[C1;C2;Mo1;Mf1;Mo2;Mf2;Mo;MplMo;ΔV1;ΔV2;ΔVtot];[1_m/s;1_m/s;1_kg;1_kg;1_kg;1_kg;1_kg;1_1;1_m/s;1_m/s;1_m/s])'
+'ROOT(ⒺMulti Stages Rocket ΔV;[C1;C2;Mo1;Mf1;Mo2;Mf2;Mo;MplMo;ΔV1;ΔV2;ΔVtot];[1_m/s;1_m/s;1_kg;1_kg;1_kg;1_kg;1_kg;1_1;1_m/s;1_m/s;1_m/s])'
 ```
 
 #### Conical Nozzle Divergence Loss
@@ -13107,7 +13107,7 @@ and `θe` (exit) are read from the Rao chart and label the figure.
 'ROOT(ⒺBell Nozzle Contour;[At;Ae;Rex;Rarc;Lnz];[1_cm↑2;1_cm↑2;1_cm;1_cm;1_cm])'
 ```
 
-#### Combustion Chamber Stay-Time
+#### Combustion Chamber Stay Time
 
 Propellant residence time `ts` in the chamber, from the ideal-gas specific volume `V` (chamber `Tc`,
 `Pc`, mean molar mass `M`), the chamber volume `Vc=Lstar·At`, and the mass flow `Q`.
@@ -13118,7 +13118,7 @@ Propellant residence time `ts` in the chamber, from the ideal-gas specific volum
 ```rpl
 Lstar=1.1_m  At=0.0344398985_m↑2  Q=100_kg/s  Tc=3600_K  Pc=5_MPa  M=24_(g/mol)
 @ Expecting [ V=0.24943 388 m↑3/kg Vc=0.03788 3888 m↑3 ts=1.51879 48 ms ]
-'ROOT(ⒺCombustion Chamber Stay-Time;[V;Vc;ts];[1_m↑3/kg;1_m↑3;1_ms])'
+'ROOT(ⒺCombustion Chamber Stay Time;[V;Vc;ts];[1_m↑3/kg;1_m↑3;1_ms])'
 ```
 
 #### Thrust Coefficient
@@ -13177,7 +13177,7 @@ with `ΔV1=ΔVtot/n` and `C=Isp·Ⓒg`.
 'ROOT(ⒺOptimal Staging;[C;ΔV1;MR];[1_m/s;1_m/s;1_1])'
 ```
 
-#### Sea-level vs Vacuum Thrust
+#### Sea level vs Vacuum Thrust
 
 The same fixed engine loses thrust at sea level through the ambient back-pressure term `Pa·Ae`; the
 gain from sea level to vacuum is exactly `ΔF=Pa·Ae`. `Pa` may be supplied by the atmosphere function
@@ -13189,10 +13189,10 @@ gain from sea level to vacuum is exactly `ΔF=Pa·Ae`. `Pa` may be supplied by t
 ```rpl
 Q=100_kg/s  Ve=2831.85728_m/s  Ae=0.40883751863782_m↑2  Pe=0.05_MPa  Pa=0.101325_MPa
 @ Expecting [ Fsl=262.20214 kN Fvac=303.62760 kN ΔF=41.42546 kN ]
-'ROOT(ⒺSea-level vs Vacuum Thrust;[Fsl;Fvac;ΔF];[1_kN;1_kN;1_kN])'
+'ROOT(ⒺSea level vs Vacuum Thrust;[Fsl;Fvac;ΔF];[1_kN;1_kN;1_kN])'
 ```
 
-#### Multi-Planet Launch ΔV
+#### Multi Planet Launch ΔV
 
 The circular-orbit velocity `Vcirc` at a low orbit **is** the ideal launch ΔV to reach that orbit;
 `Vesc` is the escape speed there and `gsurf` the surface gravity. The central-body constant selects
@@ -13205,7 +13205,7 @@ the planetary constants and, for drag/thermal loss, the atmosphere functions `ρ
 ```rpl
 horb=200_km
 @ Expecting [ rorb=6 578.1 km Vcirc=7 784.28323 m/s Vesc=11 008.63892 m/s gsurf=9.79839 81 m/s↑2 ]   @ Earth
-'ROOT(ⒺMulti-Planet Launch ΔV;[rorb;Vcirc;Vesc;gsurf];[1_km;1_m/s;1_m/s;1_m/s↑2])'
+'ROOT(ⒺMulti Planet Launch ΔV;[rorb;Vcirc;Vesc;gsurf];[1_km;1_m/s;1_m/s;1_m/s↑2])'
 ```
 Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
 # Menus
