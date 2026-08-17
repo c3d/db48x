@@ -13623,29 +13623,68 @@ horb=200_km
 Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
 ## Astronautics
 
-### GeoCntrX / Stationary
+### Geocentric / Stationary
 
 Earth-centered (`♁`) orbits of fixed geometry, from the two-body results (circular
 velocity, Kepler's third law, angular momentum, vis-viva). Radii geocentric, referenced
 to `ⒸReq♁`.
 
-The variables of the GeoCntrX / Stationary section are:
+The variables of the Geocentric / Stationary section are:
 
+* `Δa`: Semi-major-axis decay per revolution (atmospheric drag)
+* `ΔP`: Orbital-period decrease per revolution (atmospheric drag)
+* `Δt`: Elapsed time
+* `Δv`: Velocity gain per revolution (atmospheric drag) (dim.: speed)
+* `ρa`: Atmospheric density at the orbit altitude (dim.: mass/volume, in SI: kg/m^3)
+* `ν`: True anomaly
+* `ν0`: Initial true anomaly
+* `ω`: Argument of perigee
+* `Ω`: Right ascension of the ascending node (celestial)
 * `a`: Semi-major axis
+* `Ad`: Drag (frontal) area
+* `argLat`: Argument of latitude (`ω`+`ν`)
+* `Az`: Burnout azimuth
+* `C`: Launch quadratic parameter (`2·ⒸGM♁/(r1·v1²)`)
+* `Cd`: Drag coefficient
+* `dlon`: Longitude increment from the node to burnout
+* `dΩJ2`: Nodal-regression rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dΩM`: Nodal-regression rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dΩS`: Nodal-regression rate from the Sun (dim.: angle/time, in SI: °/d)
+* `dωJ2`: Apsidal-precession rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dωM`: Apsidal-precession rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dωS`: Apsidal-precession rate from the Sun (dim.: angle/time, in SI: °/d)
+* `Ea`: Eccentric anomaly
+* `Ea0`: Initial eccentric anomaly
 * `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `fpa`: Flight-path angle
 * `H`: Altitude above the equatorial radius
-* `Hp`: Altitude at perigee
+* `H1`: Burnout altitude
 * `Ha`: Altitude at apogee
-* `Rp`: Geocentric radius at perigee
-* `Ra`: Geocentric radius at apogee
-* `r`: Geocentric orbital radius (circular orbit)
-* `v`: Circular orbital velocity
-* `Vp`: Velocity at perigee
-* `Va`: Velocity at apogee
-* `Vc`: Reference circular velocity at perigee radius
-* `Vesc`: Escape velocity
+* `Hp`: Altitude at perigee
+* `Hs`: Atmospheric scale height
+* `inc`: Inclination
+* `lat`: Burnout latitude
+* `Life`: Orbital lifetime
+* `lon2`: Burnout longitude
+* `lonAN`: Longitude of the ascending node
+* `M`: Mean anomaly
+* `M0`: Initial mean anomaly
+* `msat`: Satellite mass
+* `n`: Revolutions per day
 * `P`: Orbital period
+* `r`: Geocentric orbital radius (circular orbit)
+* `r1`: Geocentric radius at burnout
+* `Ra`: Geocentric radius at apogee
+* `Rp`: Geocentric radius at perigee
 * `Rsoi`: Sphere-of-influence radius
+* `v`: Circular orbital velocity (dim.: speed)
+* `v1`: Burnout speed (dim.: speed)
+* `Va`: Velocity at apogee (dim.: speed)
+* `Vc`: Reference circular velocity at perigee radius (dim.: speed)
+* `Vc1`: Circular velocity at the burnout radius (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `Vp`: Velocity at perigee (dim.: speed)
+* `zen`: Zenith angle at burnout
 
 * Reference: [1] http://www.braeunig.us/space/problem.htm — problems 4.1–4.7, 4.25, 4.30.
 
@@ -13809,7 +13848,7 @@ a=7500_km  ecc=0.1  ν=225_°
 
 ---
 
-#### Luni-Solar Perturbations
+#### Luni Solar Perturbations
 
 Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circular orbit,
 `n` revolutions/day: `dΩ=−k·cos(inc)/n`, `dω=k'·(4−5·sin²inc)/n`.
@@ -13818,7 +13857,7 @@ Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circula
 ```rpl
 inc=51.6_°  n=15.5
 @ Expecting [ dΩM=-0.00013 54502 9015 °/d  dΩS=-0.00006 17140 3752 °/d  dωM=0.00010 13043 596 °/d  dωS=0.00004 61564 242 °/d ]
-'ROOT(ⒺLuni-Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
+'ROOT(ⒺLuni Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
 ```
 
 #### J2 Perturbations
@@ -13848,14 +13887,93 @@ H=400_km  Cd=2.67  Ad=8_m↑2  ρa=2.62E-12_kg/m³  msat=1000_kg  Hs=58.2_km
 
 ---
 
-### GeoCntrX / Trajectory
+### Geocentric / Trajectory
 
 In-plane transfers between two circular geocentric orbits (radii from altitudes over
 `ⒸReq♁`). Velocities from vis-viva; total cost is the sum of the two burns.
 
-The new variables are: `HA`, `HB` (orbit altitudes); `rA`, `rB` (radii); `atx` (transfer
-semi-major axis); `ViA`, `VfB` (circular speeds); `VtxA`, `VtxB` (transfer speeds);
-`ΔVA`, `ΔVB`, `ΔVT` (burns); `TOF` (time of flight).
+The variables of the Geocentric / Trajectory section are:
+
+* `Δinc`: Plane-change angle
+* `Δt`: Time of flight along the hyperbolic arc
+* `Δθ`: Lead angle to a co-orbital target
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First burn velocity change (dim.: speed)
+* `ΔV2`: Second burn velocity change (dim.: speed)
+* `ΔVA`: Departure burn at A (dim.: speed)
+* `ΔVB`: Arrival burn at B (dim.: speed)
+* `ΔVT`: Total transfer velocity change (dim.: speed)
+* `ΔVtli`: Translunar-injection burn (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `θ`: Angle between the two orbital planes
+* `ν`: True anomaly at arrival
+* `ν0`: Initial true anomaly
+* `Ωf`: Final right ascension of the ascending node
+* `Ωi`: Initial right ascension of the ascending node
+* `a`: Semi-major axis (negative for a hyperbola)
+* `a1`: X-component of the initial plane's unit normal
+* `a2`: Y-component of the initial plane's unit normal
+* `a3`: Z-component of the initial plane's unit normal
+* `ad`: Semi-major axis of the deorbit transfer ellipse
+* `aph`: Semi-major axis of the phasing orbit
+* `atx`: Transfer-orbit semi-major axis
+* `AtoM`: Area-to-mass ratio (dim.: area/mass, in SI: m^2/kg)
+* `b1`: X-component of the final plane's unit normal
+* `b2`: Y-component of the final plane's unit normal
+* `b3`: Z-component of the final plane's unit normal
+* `CR`: Radiation-pressure coefficient
+* `cx`: X-component of the line-of-nodes vector
+* `cy`: Y-component of the line-of-nodes vector
+* `cz`: Z-component of the line-of-nodes vector
+* `dHmin`: Minimum graveyard rise above GEO
+* `dmoon`: Earth-Moon distance
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `Fh`: Hyperbolic eccentric anomaly at `ν`
+* `Fh0`: Hyperbolic eccentric anomaly at `ν0`
+* `fpa`: Flight-path angle
+* `H`: Orbit altitude above the equatorial radius
+* `H1`: Initial orbit altitude
+* `HA`: Altitude of the departure (inner) orbit
+* `HB`: Altitude of the destination (outer) orbit
+* `Hp`: Parking-orbit altitude
+* `hp`: Perigee altitude after the deorbit burn
+* `incf`: Final inclination
+* `inci`: Initial inclination
+* `latN1`: Latitude of the first node
+* `latN2`: Latitude of the second node
+* `lonN1`: Longitude of the first node
+* `lonN2`: Longitude of the second node
+* `M`: Mean anomaly
+* `Nrev`: Number of phasing revolutions
+* `P`: Orbital period
+* `Pph`: Phasing-orbit period
+* `Ptgt`: Target-orbit period
+* `r`: Orbital radius
+* `r1`: Initial orbital radius
+* `rA`: Radius of the departure (inner) orbit
+* `rB`: Radius of the destination (outer) orbit
+* `rgeo`: Geostationary-orbit radius
+* `rgrave`: Graveyard-orbit radius
+* `rp`: Perigee radius
+* `TOF`: Time of flight
+* `tof`: Time of flight (translunar transfer)
+* `v1`: Circular speed on the initial orbit (dim.: speed)
+* `va`: Speed at the phasing-orbit apogee (dim.: speed)
+* `varr`: Geocentric arrival speed at the Moon (dim.: speed)
+* `Vbo`: Burnout speed (dim.: speed)
+* `vcg`: Circular speed at GEO (dim.: speed)
+* `vdo`: Speed after the deorbit burn (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `VfB`: Circular speed on the destination orbit (dim.: speed)
+* `vgr`: Circular speed at the graveyard radius (dim.: speed)
+* `Vi`: Circular orbital speed (dim.: speed)
+* `ViA`: Circular speed on the departure orbit (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vp`: Speed at the transfer perigee (dim.: speed)
+* `vtli`: Speed after translunar injection (dim.: speed)
+* `VtxA`: Transfer-orbit speed at A (dim.: speed)
+* `VtxB`: Transfer-orbit speed at B (dim.: speed)
 
 #### Hohmann Transfer
 
@@ -13871,7 +13989,7 @@ HA=200_km  HB=35786.06815021_km
 'ROOT(ⒺHohmann Transfer;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
 ```
 
-#### One-Tangent Burn
+#### One Tangent Burn
 
 Faster transfer with a chosen `atx` (> Hohmann's). Ellipse `ecc=1−rA/atx`; true anomaly
 `ν` and flight-path angle `fpa` at B; `ΔVB` by the law of cosines; time of flight from
@@ -13883,7 +14001,7 @@ Kepler (`Ea`, `M`, `P`).
 ```rpl
 HA=200_km  HB=35786.06815021_km  atx=30000_km
 @ Expecting [ rA=6 578.1 km  rB=42 164.16815 021 km  ecc=0.78073  ν=157.67032 23126 3 °  fpa=46.87570 62535 72 °  ViA=7 784.28323 25417 m/s  VfB=3 074.65999 20399 m/s  VtxA=10 387.65858 5497 m/s  VtxB=2 370.73577 88884 m/s  ΔVA=2 603.37535 29558 m/s  ΔVB=2 260.16869 32089 m/s  ΔVT=4 863.54404 61646 m/s  Ea=121.28867 34296 1 °  M=83.06197 14538 64 °  P=51 712.18463 0719 s  TOF=11 931.43334 3371 s ]
-'ROOT(ⒺOne-Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
+'ROOT(ⒺOne Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
 ```
 
 ---
@@ -14012,11 +14130,26 @@ Hp=185_km  dmoon=384400_km
 
 ---
 
-### HelioCntrX / Stationary
+### Heliocentric / Stationary
 
 Sun-referenced (`☉`) stationary conditions and libration points: the Sun-synchronous nodal-regression condition, the collinear Lagrange points, and the JWST halo orbit at the Sun–Earth L2 point.
 
-#### Sun-Synchronous Orbit
+The variables of the Heliocentric / Stationary section are:
+
+* `a`: Semi-major axis
+* `dSunL2`: Sun-L2 distance
+* `dΩsun`: Nodal-regression rate matching the Sun (dim.: angle/time, in SI: °/d)
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `H`: Orbit altitude above the equatorial radius
+* `inc`: Inclination
+* `P`: Orbital period
+* `PL2`: Orbital period about the Sun at L2
+* `rapp`: First-approximation L1/L2 distance from Earth
+* `rL1`: Sun-Earth L1 distance from Earth
+* `rL2`: Sun-Earth L2 distance from Earth
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+
+#### Sun Synchronous Orbit
 
 Inclination that makes the node precess at the Sun's rate (360°/yr) via J2, so the local
 solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))`, needs `inc>90°`.
@@ -14025,7 +14158,7 @@ solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))
 ```rpl
 H=700_km  ecc=0
 @ Expecting [ a=7 078.1 km  dΩsun=0.98564 73320 9908 °/d  inc=98.18778 45390 92 °  P=5 926.33291 29206 s ]
-'ROOT(ⒺSun-Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
+'ROOT(ⒺSun Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
 ```
 
 #### Collinear Lagrange Points
@@ -14039,7 +14172,7 @@ centrifugal). `rapp=Ⓒa♁·(ⒸGM♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved impli
 'ROOT(ⒺCollinear Lagrange Points;[rapp;rL2;rL1];[1_km;1500000_km;1500000_km])'
 ```
 
-#### JWST at Sun-Earth L2
+#### JWST at Sun Earth L2
 
 L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGM♁))` (≈1 yr, so
 it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body periodic orbit.
@@ -14048,14 +14181,146 @@ it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body peri
 ```rpl
 rL2=1501531.72084_km
 @ Expecting [ dSunL2=151 099 402.42084 km  PL2=31 558 148.62813 5 s  VL2=30 083.68952 1882 m/s ]
-'ROOT(ⒺJWST at Sun-Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
+'ROOT(ⒺJWST at Sun Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
 ```
 
 ---
 
-### HelioCntrX / Trajectory
+### Heliocentric / Trajectory
 
 Sun-centered (`☉`) interplanetary transfers and mission analysis: heliocentric Hohmann and one-tangent transfers, departure and arrival hyperbolae, gravity-assist swing-bys, launch windows, and patched-conic mission capstones.
+
+The variables of the Heliocentric / Trajectory section are:
+
+* `Δν`: Transfer's change in true anomaly
+* `ΔVinj`: Injection burn onto the departure hyperbola (dim.: speed)
+* `φ`: Departure phase angle (target lead angle)
+* `ν`: True anomaly at arrival
+* `ωt`: Target planet's mean angular rate (dim.: angle/time, in SI: °/s)
+* `ρa`: Atmospheric density at the descent altitude (dim.: mass/volume, in SI: kg/m^3)
+* `a`: Semi-major axis of the arrival hyperbola (negative)
+* `abe1`: First bi-elliptic transfer semi-major axis
+* `abe2`: Second bi-elliptic transfer semi-major axis
+* `acap`: Capture-orbit semi-major axis
+* `Ad`: Drag (frontal) area
+* `aEM`: Earth-Mercury transfer semi-major axis
+* `aES`: Earth-Saturn transfer semi-major axis
+* `aEV`: Earth-Venus transfer semi-major axis
+* `amax`: Peak entry deceleration (dim.: acceleration, in SI: m/s^2)
+* `amaxg`: Peak entry deceleration in g
+* `aobj`: Incoming object's orbit semi-major axis
+* `atx`: Transfer-orbit semi-major axis
+* `atxJ`: Jupiter-system transfer semi-major axis
+* `atxS`: Saturn-system transfer semi-major axis
+* `bimp`: Impact parameter (aiming distance)
+* `C3`: Characteristic energy (dim.: speed^2, in SI: km^2/s^2)
+* `Cd`: Drag coefficient
+* `dgain`: Bi-elliptic Δv saving over Hohmann (dim.: speed)
+* `dmiss`: Targeted miss distance
+* `dOmega`: Node offset to the target plane
+* `dSunL2`: Sun-L2 distance
+* `dturn`: Hyperbolic turn angle
+* `dv1`: First burn (dim.: speed)
+* `dv2`: Second burn (dim.: speed)
+* `dv3`: Third burn (dim.: speed)
+* `dvBE`: Total bi-elliptic Δv (dim.: speed)
+* `dVdep`: Departure-injection burn (dim.: speed)
+* `dVesc`: Escape burn from the parking orbit (dim.: speed)
+* `dvH`: Total Hohmann Δv (dim.: speed)
+* `dVint`: Interception Δv relative to Earth (dim.: speed)
+* `dVtot`: Total velocity change (dim.: speed)
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `eccV`: Eccentricity of the Venus flyby hyperbola
+* `eobj`: Incoming object's orbit eccentricity
+* `fpa`: Flight-path angle
+* `fpaP`: Planet's heliocentric flight-path angle
+* `fpaSf`: Spacecraft's outgoing flight-path angle
+* `fpaSi`: Spacecraft's incoming flight-path angle
+* `gam`: Approach asymptote angle
+* `gmars`: Mars surface gravity (dim.: acceleration, in SI: m/s^2)
+* `H`: Parking-orbit altitude (departure hyperbola)
+* `Hp`: Parking-orbit altitude
+* `Hs`: Atmospheric scale height
+* `JD0`: Reference Julian date
+* `LST`: Local sidereal time
+* `lonE`: East longitude of the launch site
+* `MOI`: Mars orbit-insertion burn (dim.: speed)
+* `MOIsat`: Saturn orbit-insertion burn (dim.: speed)
+* `msat`: Spacecraft mass
+* `OmegaT`: Target right ascension of the ascending node
+* `P1`: Period of the inner planet
+* `P2`: Period of the outer planet
+* `PL2`: Orbital period about the Sun at L2
+* `r0`: Parking-orbit radius
+* `rA`: Departure planet's orbital radius
+* `rapo`: Capture-orbit apoapsis radius
+* `rB`: Destination planet's orbital radius
+* `rE`: Earth's orbital radius
+* `rEar`: Earth's orbital radius
+* `rL2`: Sun-Earth L2 distance from Earth
+* `rm`: Capture-orbit radius at the target planet
+* `rMars`: Mars's orbital radius
+* `rmars`: Mars's physical radius
+* `rMe`: Mercury's orbital radius
+* `rmoon`: Target moon's orbital radius
+* `rp`: Periapsis / parking-orbit radius
+* `rpV`: Venus flyby periapsis radius
+* `rSa`: Saturn's orbital radius
+* `rstar`: Bi-elliptic far turning-point radius
+* `rV`: Venus's orbital radius
+* `rX`: Radius at which the object crosses Earth's orbit
+* `TEI`: Trans-Earth injection burn (dim.: speed)
+* `thf`: Outgoing relative-velocity direction angle
+* `thi`: Incoming relative-velocity direction angle
+* `TMI`: Trans-Mars injection burn (dim.: speed)
+* `TOF`: Time of flight
+* `tofd`: Transfer time of flight (departure phasing)
+* `Tsyn`: Synodic period
+* `turnV`: Venus flyby turn angle
+* `twait`: Wait time until the launch window
+* `Varr`: Heliocentric arrival speed (dim.: speed)
+* `Vcap`: Capture-orbit periapsis speed (dim.: speed)
+* `Vcirc`: Circular speed at the parking orbit (dim.: speed)
+* `VcsA`: Departure planet's circular speed (dim.: speed)
+* `VcsB`: Destination planet's circular speed (dim.: speed)
+* `vEarth`: Earth's heliocentric speed (dim.: speed)
+* `Ventry`: Atmospheric entry speed (dim.: speed)
+* `vfly`: Flyby (encounter) speed (dim.: speed)
+* `Vhyp`: Hyperbolic arrival speed at periapsis (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vinfA`: Arrival excess speed (dim.: speed)
+* `vinfD`: Departure excess speed (dim.: speed)
+* `vinfEar`: Excess speed at Earth arrival (dim.: speed)
+* `vinfMars`: Excess speed at Mars departure (dim.: speed)
+* `vinfMe`: Excess speed at Mercury (dim.: speed)
+* `vinfSa`: Excess speed at Saturn (dim.: speed)
+* `vinfV`: Excess speed at Venus (dim.: speed)
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+* `Vmoon`: Moon's circular orbital speed (dim.: speed)
+* `Vo`: Periapsis speed on the departure hyperbola (dim.: speed)
+* `vobj`: Incoming object's heliocentric speed (dim.: speed)
+* `Vpark`: Parking-orbit circular speed (dim.: speed)
+* `Vplanet`: Planet's heliocentric speed (dim.: speed)
+* `Vpln`: Planet's heliocentric speed at flyby (dim.: speed)
+* `VPx`: Planet velocity, X-component (dim.: speed)
+* `VPy`: Planet velocity, Y-component (dim.: speed)
+* `vr`: Radial velocity component (dim.: speed)
+* `Vrfx`: Outgoing relative velocity, X-component (dim.: speed)
+* `Vrfy`: Outgoing relative velocity, Y-component (dim.: speed)
+* `Vrix`: Incoming relative velocity, X-component (dim.: speed)
+* `Vriy`: Incoming relative velocity, Y-component (dim.: speed)
+* `VSf`: Spacecraft outgoing heliocentric speed (dim.: speed)
+* `VSfx`: Spacecraft outgoing velocity, X-component (dim.: speed)
+* `VSfy`: Spacecraft outgoing velocity, Y-component (dim.: speed)
+* `VSi`: Spacecraft incoming heliocentric speed (dim.: speed)
+* `VSix`: Spacecraft incoming velocity, X-component (dim.: speed)
+* `VSiy`: Spacecraft incoming velocity, Y-component (dim.: speed)
+* `Vsun`: Local solar-escape speed (dim.: speed)
+* `vt`: Tangential velocity component (dim.: speed)
+* `vterm`: Terminal descent speed (dim.: speed)
+* `VtxA`: Transfer speed at departure (dim.: speed)
+* `VtxB`: Transfer speed at arrival (dim.: speed)
 
 #### Heliocentric Hohmann Transfer
 
@@ -14072,7 +14337,7 @@ rA=1_au  rB=1.524_au
 'ROOT(ⒺHeliocentric Hohmann Transfer;[atx;VcsA;VcsB;VtxA;VtxB;vinfD;vinfA;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
-#### One-Tangent Interplanetary Transfer
+#### One Tangent Interplanetary Transfer
 
 Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly at arrival
 `ν=acos((atx(1−ecc²)/rB−1)/ecc)`, eccentric anomaly `Ea`, and `TOF` from Kepler's equation.
@@ -14083,7 +14348,7 @@ Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly
 ```rpl
 rA=1_au  rB=1.524_au  atx=1.3_au
 @ Expecting [ ecc=0.23076 92307 6923  ν=146.48805 93894 1 °  Ea=138.30245 33968 4 °  TOF=16 827 452.85711 3 s ]
-'ROOT(ⒺOne-Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
+'ROOT(ⒺOne Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
 ```
 
 #### Departure Phase Angle
@@ -14132,7 +14397,7 @@ vinf=2438.2_m/s  dmiss=18500_km  gam=150.451_°
 
 ---
 
-#### Gravity-Assist Swing-By
+#### Gravity Assist Swing By
 
 Planetary flyby: the spacecraft's velocity relative to the planet keeps its magnitude
 `vinf` but rotates by the hyperbolic turn angle `dturn=−2·asin(1/ecc)`. Decompose incoming
@@ -14143,12 +14408,12 @@ velocities into X,Y about the planet's velocity, rotate, recompose. `thi`/`fpaSf
 ```rpl
 Vpln=12740_m/s  fpaP=2.40_°  VSi=9470_m/s  fpaSi=39.2_°  dmiss=-2500000_km
 @ Expecting [ … VSf=19 697.35504 0872 m/s  fpaSf=14.06782 26183 37 ° … ]
-'ROOT(ⒺGravity-Assist Swing-By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
+'ROOT(ⒺGravity Assist Swing By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
 ```
 
 ---
 
-#### Patched-Conic Mission Capstone
+#### Patched Conic Mission Capstone
 
 Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → departure hyperbola
 (`TMI` from a parking orbit) + arrival capture (`MOI` into `rm`). `dVtot=TMI+MOI`.
@@ -14157,7 +14422,7 @@ Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → dep
 ```rpl
 rA=1_au  rB=1.524_au  Hp=200_km  rm=3896.2_km
 @ Expecting [ atx=1.262 au  …  TMI=3 611.74115 793 m/s  MOI=2 070.35297 95932 m/s  dVtot=5 682.09413 75232 m/s  TOF=22 370 268.98169 7 s ]
-'ROOT(ⒺPatched-Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+'ROOT(ⒺPatched Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
 #### Synodic Period & Launch Window
@@ -14172,7 +14437,7 @@ rA=1_au  rB=1.524_au
 'ROOT(ⒺSynodic Period & Launch Window;[P1;P2;Tsyn];[1_d;1_d;1_d])'
 ```
 
-#### Bi-Elliptic vs Hohmann
+#### Bi Elliptic vs Hohmann
 
 Compare a Hohmann (`dvH`) to a bi-elliptic transfer via a far turning point `rstar` (`dvBE`).
 Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of much longer time.
@@ -14183,10 +14448,10 @@ Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of mu
 ```rpl
 rA=1_au  rB=30.07_au  rstar=50_au
 @ Expecting [ atx=15.535 au  dvH=15 707.33870 8 m/s  …  dvBE=15 377.05850 9 m/s  dgain=330.28020 0 m/s ]
-'ROOT(ⒺBi-Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+'ROOT(ⒺBi Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
 ```
 
-#### Solar-System Escape
+#### Solar System Escape
 
 Δv to leave the solar system from a planet's orbit: `vinf=Vsun−Vplanet` (with
 `Vsun=√(2ⒸGM☉/rA)`), then `dVesc` from a parking orbit and `C3=vinf²`. The Oberth effect
@@ -14196,7 +14461,7 @@ makes `dVesc≪vinf`.
 ```rpl
 rA=1_au  Hp=200_km
 @ Expecting [ Vsun=42 121.91513 6632 m/s  Vplanet=29 784.69182 9677 m/s  vinf=12 337.22330 6955 m/s  r0=6 578.1 km  Vo=16 534.72738 8576 m/s  dVesc=8 750.44415 60348 m/s  C3=152.20707 89256 8 km↑2/s↑2 ]
-'ROOT(ⒺSolar-System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
+'ROOT(ⒺSolar System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
 ```
 
 ---
@@ -14265,7 +14530,7 @@ rp=71892_km  rmoon=670900_km
 'ROOT(ⒺPath to Jupiter Satellites;[atxJ;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
-#### Path to Saturne Satellites
+#### Path to Saturn Satellites
 
 In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea: swap `rmoon`.
 
@@ -14273,7 +14538,7 @@ In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea
 ```rpl
 rp=62268_km  rmoon=1221870_km
 @ Expecting [ atxS=642 069 km  Vpark=24 684.22816 9978 m/s  dv1=9 367.66028 62295 m/s  Vmoon=5 572.36440 77728 m/s  dv2=3 837.03823 5274 m/s  dVtot=13 204.69852 1504 m/s  TOF=262 403.97839 812 s ]
-'ROOT(ⒺPath to Saturne Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+'ROOT(ⒺPath to Saturn Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
 ```
 
 ---
@@ -14294,7 +14559,9 @@ rMars=1.524_au  rEar=1_au  rp=3896.2_km
 
 Martian EDL: gravity `gmars=ⒸGM♂/rmars²`, peak entry deceleration (Allen-Eggers)
 `amax=Ventry²·sin(fpa)/(2e·Hs)` (independent of ballistic coefficient), terminal descent
-`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`).
+`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`). This entry-descent-
+landing sequence is the one a **Mars 2020 (Perseverance)**-class spacecraft flies on
+arrival — hypersonic entry, peak-g, then terminal descent — as at Jezero crater.
 
 * To calculate: `[gmars_m/s^2;amax_m/s^2;amaxg;vterm_m/s]` from `Ventry`, `fpa`, `Hs`, `ρa`, `Cd`, `Ad`, `msat`, `rmars`:
 ```rpl
@@ -14308,7 +14575,8 @@ Ventry=6000_m/s  fpa=12_°  Hs=11.1_km  ρa=0.015_kg/m³  Cd=1.5  Ad=10_m↑2  m
 Wait until Earth's rotation brings the site into the target orbital plane: local sidereal
 time `LST=θs(JD0;lonE)`, wait `twait=(OmegaT−LST)/360.98565°·d`. Inverse of **Orbit Orientation**:
 with `OmegaT` = that sim's RAAN Ω (and its site), `twait`=0.125 d recovers its burnout instant
-(JD 2451838.125).
+(JD 2451838.125). The same wait-time logic sets the daily launch instant from a pad — e.g. timing a departure from Cape
+Canaveral into the **Mars 2020 (Perseverance)** window.
 
 * To calculate: `[LST_°;dOmega_°;twait_d]` from `JD0`, `lonE`, `OmegaT`:
 ```rpl
