@@ -67,6 +67,7 @@
 #include <QtMath>
 #ifdef ANDROID
 #include <QDir>
+#include <QDirIterator>
 #include <QSettings>
 #include <atomic>
 
@@ -427,28 +428,37 @@ void extract_android_assets()
     QString savedAssetVersion = settings.value("AssetVersion", "").toString();
 
     if (savedAssetVersion != currentAssetVersion) {
-        QStringList filesToExtract = {"db48x.idx", "db48x.md"};
-
-        for (const QString& fileName : filesToExtract) {
-            QString assetPath = ":/help/" + fileName; // Check your Qt resource prefix
-            QString targetPath = sandboxDir + "/help/" + fileName;
-
-            if (QFile::exists(targetPath)) {
-                QFile::remove(targetPath);
+        // The RPL engine opens its files with fopen(), so Qt resources are
+        // invisible to it: they must exist as real files. Extract the whole
+        // resource tree, not just the help. Without config/library.csv and
+        // library/*.48s on disk, the only reachable library entries are the
+        // ones compiled into basic_library[], i.e. Secrets and Physics.
+        QDir from(":/");
+        QDir to(sandboxDir);
+        QDirIterator it(":/", QDirIterator::Subdirectories);
+        while (it.hasNext())
+        {
+            QFileInfo fi(it.next());
+            QString relPath = from.relativeFilePath(fi.absoluteFilePath());
+            QString absPath = to.filePath(relPath);
+            if (fi.isDir())
+            {
+                QDir().mkpath(absPath);
             }
-
-	    // Create the directory structure if it doesn't exist
-	    QFileInfo targetInfo(targetPath);
-	    QDir().mkpath(targetInfo.absolutePath());
-
-            QFile assetFile(assetPath);
-            if (assetFile.copy(targetPath)) {
-                QFile::setPermissions(targetPath,
-                    QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser);
+            else if (fi.isFile())
+            {
+                QFileInfo targetInfo(absPath);
+                QDir().mkpath(targetInfo.absolutePath());
+                QFile::remove(absPath);
+                if (QFile::copy(fi.absoluteFilePath(), absPath))
+                    QFile::setPermissions(absPath,
+                                          QFileDevice::ReadOwner  |
+                                          QFileDevice::WriteOwner |
+                                          QFileDevice::ReadUser);
             }
         }
 
-	settings.setValue("AssetVersion", currentAssetVersion);
+        settings.setValue("AssetVersion", currentAssetVersion);
     }
 
     QDir::setCurrent(sandboxDir);
