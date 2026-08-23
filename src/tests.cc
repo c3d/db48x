@@ -15116,6 +15116,8 @@ void tests::check_help_examples()
         int ci = fgetc(f);
         if (ci == EOF)
             break;
+        if (ci == '\r')
+            continue;
         byte c = ci;
         ASSERT(tidx < sizeof(topic));
 
