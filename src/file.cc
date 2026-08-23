@@ -372,15 +372,22 @@ uint file::rfind(unicode  cp)
 //    Return position right before code point, position file right after it
 {
     uint    off = ftell(data);
-    unicode c;
+    unicode c   = 0;
     do
     {
         if (off == 0)
             break;
-        fseek(data, --off, SEEK_SET);
-        c = get();
+        off--;
+        fseek(data, off, SEEK_SET);
+        int raw = valid() ? fgetc(data) : EOF;
+        c = raw == EOF ? 0 : unicode(raw);
+        if (c == '\r')
+            continue;
     }
     while (c != cp);
+
+    seek(off);
+    get();
     return off;
 }
 
@@ -392,16 +399,23 @@ uint file::rfind(unicode  cp1, unicode cp2)
 //    Return position right before code point, position file right after it
 {
     uint    off = ftell(data);
-    unicode c;
-    bool    in = false;
+    unicode c   = 0;
+    bool    in  = false;
     do
     {
         if (off == 0)
             break;
-        fseek(data, --off, SEEK_SET);
-        c = get();
+        off--;
+        fseek(data, off, SEEK_SET);
+        int raw = valid() ? fgetc(data) : EOF;
+        c = raw == EOF ? 0 : unicode(raw);
+        if (c == '\r')
+            continue;
     }
     while (c != cp1 && (c != cp2 || (in = !in)));
+
+    seek(off);
+    get();
     return off;
 }
 
