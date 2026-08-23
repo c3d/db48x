@@ -147,7 +147,7 @@ void file::open(cstring path, mode wrmode)
     name = path;
 
 #if SIMULATOR
-    data = fopen(path, reading ? "r" : append ? "a" : "w");
+    data = fopen(path, reading ? "rb" : append ? "ab" : "wb");
     if (!data)
     {
         record(file_error, "Error %s opening %s", strerror(errno), path);
