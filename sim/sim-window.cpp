@@ -419,18 +419,22 @@ void extract_android_assets()
 //   On Android, the online help needs to be put in assets
 // ----------------------------------------------------------------------------
 {
-    QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString sandboxDir =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(sandboxDir);
 
     QSettings settings("DB48X", "Emulator");
     QString currentAssetVersion = DB48X_VERSION;
     QString savedAssetVersion = settings.value("AssetVersion", "").toString();
 
-    if (savedAssetVersion != currentAssetVersion) {
+    if (savedAssetVersion != currentAssetVersion)
+    {
         QStringList filesToExtract = {"db48x.idx", "db48x.md"};
 
-        for (const QString& fileName : filesToExtract) {
-            QString assetPath = ":/help/" + fileName; // Check your Qt resource prefix
+        for (const QString &fileName : filesToExtract)
+        {
+            // Check your Qt resource prefix
+            QString assetPath = ":/help/" + fileName;
             QString targetPath = sandboxDir + "/help/" + fileName;
 
             if (QFile::exists(targetPath)) {
@@ -442,13 +446,16 @@ void extract_android_assets()
 	    QDir().mkpath(targetInfo.absolutePath());
 
             QFile assetFile(assetPath);
-            if (assetFile.copy(targetPath)) {
+            if (assetFile.copy(targetPath))
+            {
                 QFile::setPermissions(targetPath,
-                    QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser);
+                                      QFileDevice::ReadOwner |
+                                          QFileDevice::WriteOwner |
+                                          QFileDevice::ReadUser);
             }
         }
 
-	settings.setValue("AssetVersion", currentAssetVersion);
+        settings.setValue("AssetVersion", currentAssetVersion);
     }
 
     QDir::setCurrent(sandboxDir);
@@ -462,18 +469,20 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 //   Trigger background auto-save when Android suspends the app
 // ----------------------------------------------------------------------------
 {
-    // If a native dialog is currently open, the user is actively managing state.
+    // If a native dialog is open, the user is actively managing state.
     // Abort the background auto-save to prevent recursive Intents.
     if (is_dialog_open)
         return;
 
     static bool isSaved = false;
 
-    if (state == Qt::ApplicationActive) {
+    if (state == Qt::ApplicationActive)
+    {
         isSaved = false;
     }
-    else if ((state == Qt::ApplicationSuspended || state == Qt::ApplicationHidden)
-             && !isSaved) // Check both suspend and hidden + avoid double save
+    else if ((state == Qt::ApplicationSuspended ||
+              state == Qt::ApplicationHidden) &&
+             !isSaved) // Check both suspend and hidden + avoid double save
     {
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)

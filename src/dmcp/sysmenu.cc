@@ -627,7 +627,7 @@ bool load_state_file(cstring path)
 //   Load the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_load_callback, path, STATE_IO_INTERACTIVE, false) == 0;
+    return !ui_wrap_io(state_load_callback, path, STATE_IO_INTERACTIVE, false);
 }
 
 
@@ -636,7 +636,7 @@ bool load_state_file_silent(cstring path)
 //   Load the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_load_callback, path, STATE_IO_SILENT, false) == 0;
+    return !ui_wrap_io(state_load_callback, path, STATE_IO_SILENT, false);
 }
 
 
@@ -645,7 +645,7 @@ bool save_state_file(cstring path)
 //   Save the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_save_callback, path, STATE_IO_INTERACTIVE, true) == 0;
+    return !ui_wrap_io(state_save_callback, path, STATE_IO_INTERACTIVE, true);
 }
 
 
@@ -654,7 +654,7 @@ bool save_state_file_silent(cstring path)
 //   Save the state file directly
 // ----------------------------------------------------------------------------
 {
-    return ui_wrap_io(state_save_callback, path, STATE_IO_SILENT, true) == 0;
+    return !ui_wrap_io(state_save_callback, path, STATE_IO_SILENT, true);
 }
 
 
