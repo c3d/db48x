@@ -1,3 +1,8 @@
 # Keep markdown sources LF on all platforms (Windows CI builds help from these)
 doc/** text eol=lf
 help/** text eol=lf
+
+# The two rules above also match the images that live beside the markdown.
+# Binary assets must never be line-ending normalised.
+*.bmp binary
+*.png binary
