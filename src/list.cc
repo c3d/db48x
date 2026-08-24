@@ -1982,15 +1982,6 @@ static int value_sort_compare_reverse(object_p *xp, object_p *yp)
 }
 
 
-static int value_compare_reverse(object_p *xp, object_p *yp)
-// ----------------------------------------------------------------------------
-//   Sort item according in decreasing value order
-// ----------------------------------------------------------------------------
-{
-    return -value_compare(xp, yp);
-}
-
-
 static int memory_compare_reverse(object_p *xp, object_p *yp)
 // ----------------------------------------------------------------------------
 //   Sort item according in decreasing value order
