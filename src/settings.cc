@@ -46,8 +46,6 @@
 
 #include <cstdarg>
 #include <cstdlib>
-#include <random>
-#include <stdexcept>
 
 
 RECORDER(settings,              16, "Settings");
