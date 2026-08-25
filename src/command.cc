@@ -394,11 +394,9 @@ bool command::initialize_sorted_ids()
         // sometimes gives bogus data out of the QSPI when "hammered" like in
         // qsort, which results in incorrectly sorted arrays.
         bool fumbled;
-        uint sorts = 0;
         do
         {
             fumbled = false;
-            sorts++;
             qsort(sorted_ids, count, sizeof(sorted_ids[0]), sort_ids);
             sys_delay(10);      // For DM32 hardware on battery
 
