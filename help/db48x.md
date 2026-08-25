@@ -13131,7 +13131,7 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 
 ## Rocketry
 
-The 90 variables in the Rocketry section are:
+The 89 variables in the Rocketry section are:
 
 * `α`: Divergent cone half-angle
 * `Δt`: Elapsed time or Burn duration time
@@ -13168,7 +13168,6 @@ The 90 variables in the Rocketry section are:
 * `k`: Specific heat ratio
 * `L`: Solid Rocket combustion length
 * `Lc`: Combustion chamber length
-* `Ln`: Axial length of the nozzle from throat to exit plane
 * `Li`: Fractional axial length based on a 15-degree conical nozzle
 * `Lstar`: Combustion chamber characteristic length for a given propellant
 * `M`: average molecular weight of the exhaust gases
