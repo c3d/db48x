@@ -11610,6 +11610,12 @@ void tests::online_help()
 // ----------------------------------------------------------------------------
 {
     BEGIN(help);
+#ifdef _WIN32
+    const bool lose = true;
+#else
+    const bool lose = false;
+#endif
+
 
     step("Main menu shows help as F1")
         .test(CLEAR, EXIT, A, LENGTHY(100), F1).noerror()
@@ -11666,10 +11672,10 @@ void tests::online_help()
         .image_noheader("help-page7");
     step("Previous topic with F4")
         .test(UP, F4).noerror()
-        .image_noheader("help-page8");
+        .image_noheader(lose ? "help-page8-losedows" : "help-page8");
     step("Select topic with ENTER")
         .test(LENGTHY(200), ENTER).noerror()
-        .image_noheader("help-design");
+        .image_noheader(lose ? "help-design-losedows" : "help-design");
     step("Loading a URL")
         .test(F1, F3, ENTER).noerror()
         .image_noheader("help-url")
