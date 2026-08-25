@@ -3567,7 +3567,7 @@ Az=86_°  lat=32_°  lon2=-60_°  ν=25.7975314366_°  JDbo=2451838.125
 
 Time from `ν0` to `ν`: eccentric anomaly `cos(Ea)=(ecc+cos ν)/(1+ecc·cos ν)`; mean anomaly
 `M=Ea−ecc·sin(Ea)` (deg via `180/π`); period `P=2π√(a³/ⒸGM♁)`; `Δt=(M−M0)/360·P`.
-(`acos` branch valid for `ν` in 0…180°.)
+(`acos()` branch valid for `ν` in 0…180°.)
 
 * To calculate: `[Ea0_°;Ea_°;M0_°;M_°;P_s;Δt_s]` from `a`, `ecc`, `ν0`, `ν`:
 ```rpl
@@ -3578,7 +3578,7 @@ a=7500_km  ecc=0.1  ν0=30_°  ν=90_°
 
 #### Time in Elliptic 2
 
-True anomaly after `Δt`: `M=M0+Δt/P·360`; Kepler `Ea=M+ecc·sin(Ea)` (deg, solved by `Root`);
+True anomaly after `Δt`: `M=M0+Δt/P·360`; Kepler `Ea=M+ecc·sin(Ea)` (deg, solved by `Root(...)`);
 then `ν` from `Ea` via `→Polar(ℝ→ℂ(...))` (correct quadrant).
 
 * To calculate: `[Ea0_°;M0_°;P_s;M_°;Ea_°;ν_°]` from `a`, `ecc`, `ν0`, `Δt`:
@@ -4010,7 +4010,7 @@ The variables of the Heliocentric / Trajectory section are:
 * `rA`: Departure planet's orbital radius
 * `rapo`: Capture-orbit apoapsis radius
 * `rB`: Destination planet's orbital radius
-* `rE`: Earth's orbital radius
+* `rEar`: Earth's orbital radius
 * `rEar`: Earth's orbital radius
 * `rL2`: Sun-Earth L2 distance from Earth
 * `rm`: Capture-orbit radius at the target planet
@@ -4251,7 +4251,7 @@ Why route via Venus: a direct Earth→Mercury transfer arrives at `vinfMe`≈9.6
 capture), whereas Earth→Venus arrives at only `vinfV`≈2.7 km/s, and a close Venus flyby (`rpV`)
 can turn the relative velocity up to `turnV` to shed energy toward Mercury.
 
-* To calculate: `[aEM_au;vinfMe_m/s;aEV_au;vinfV_m/s;eccV;turnV_°]` from `rE`, `rV`, `rMe`, `rpV`:
+* To calculate: `[aEM_au;vinfMe_m/s;aEV_au;vinfV_m/s;eccV;turnV_°]` from `rEar`, `rV`, `rMe`, `rpV`:
 ```rpl
 rEar=1_au  rV=0.723332_au  rMe=0.387098_au  rpV=6351.8_km
 @ Expecting [ aEM=0.69354 9 au  vinfMe=9 611.49649 90762 m/s  aEV=0.86166 6 au  vinfV=2 706.56344 64884 m/s  eccV=1.14323 16126 178  turnV=122.02214 72385 6 ° ]
