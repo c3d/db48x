@@ -12750,14 +12750,16 @@ void tests::constants_menu()
     // ------------------------------------------------------------------------
         .test(CLEAR, ID_ConstantsMenu, F1).fkey();
     step("Bastille day")
+        .test(CLEAR, ID_ConstantsMenu, F1, F3).fkey()
         .fkey(0).expect("BastilleDay")
         .fkey(1).expect("Tue 14/Jul/1789");
+    step("Independence Day")
+        .test(CLEAR, ID_ConstantsMenu, F1, F4).fkey()
+        .fkey(0).expect("IndependenceDay")
+        .fkey(1).expect("Thu 4/Jul/1776");
     step("Martin Luther King's day")
         .fkey(0).expect("MartinLutherKingDeath")
         .fkey(1).expect("Thu 4/Apr/1968");
-    step("Independence Day")
-        .fkey(0).expect("IndependenceDay")
-        .fkey(1).expect("Thu 4/Jul/1776");
 
     // ------------------------------------------------------------------------
     step("Mathematics constants menu")
