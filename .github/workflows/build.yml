@@ -497,6 +497,7 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
+          android/build/outputs/apk/**/*.apk
           help/
 
   build-color-android:
@@ -568,6 +569,7 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
+          android/build/outputs/apk/**/*.apk
           help/
 
   build-dm42-firmware:
