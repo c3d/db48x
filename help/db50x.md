@@ -12856,7 +12856,7 @@ Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
 
 #### Burn Duration
 
-![Burn Duration](img/CombustionChamber&Nozzle.bmp)
+![Burn Duration](img/CombustionChamberNozzle.bmp)
 
 * To calculate: `[ΔV_m/s;Δt_s]` (Velocity change; Burn duration) from 5 known variables:
 ```rpl
@@ -13111,7 +13111,7 @@ and `θe` (exit) are read from the Rao chart and label the figure.
 Propellant residence time `ts` in the chamber, from the ideal-gas specific volume `V` (chamber `Tc`,
 `Pc`, mean molar mass `M`), the chamber volume `Vc=Lstar·At`, and the mass flow `Q`.
 
-![Combustion Chamber Stay-Time](img/CombustionChamber&Nozzle.bmp)
+![Combustion Chamber Stay-Time](img/CombustionChamberNozzle.bmp)
 
 * To calculate: `[V_m↑3/kg;Vc_m↑3;ts_ms]` (Specific volume; Chamber volume; Stay-time) from 6 known variables:
 ```rpl
