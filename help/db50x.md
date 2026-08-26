@@ -10255,7 +10255,7 @@ using the `config/equations.csv` configuration file.
 
 The 21 variables in the Columns and Beams section are:
 
-* `o`: Eccentricity (offset) of load (dim.: length)
+* `ε`: Eccentricity (offset) of load (dim.: length)
 * `σcr`: Critical stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `σmax`: Maximum stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `θ`: Slope at `x` (dim.: angle)
@@ -10406,7 +10406,7 @@ L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
 
 The 78 variables in the Electricity section are:
 
-* `∈r`: Relative permittivity
+* `εr`: Relative permittivity
 * `μr`: Relative permeability
 * `ω`: Angular frequency (dim.: angle/time)
 * `ω₀`: Resonant angular frequency (dim.: angle/time)
@@ -10927,7 +10927,7 @@ The 37 variables in the Force and Energy section are:
 * `ωf`: Final angular velocitie (dim.: angle/time, in SI: r/s)
 * `ρ`: Fluid density (dim.: mass/volume, in SI: kg/m^3)
 * `τ`: Torque (dim.: force·length, in SI: N·m)
-* `Θ`: Angular displacement (dim.: angle, in SI: r)
+* `θ`: Angular displacement (dim.: angle, in SI: r)
 * `A`: Projected area relative to flow
 * `ar`: Centripetal acceleration at `r`
 * `at`: Tangential acceleration at `r`
@@ -11657,7 +11657,7 @@ The 40 variables in the Optics section are:
 * `I`: Transmitted irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `I₀`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix`: Transmitted irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
-* `Ix0`: Incident irradiance or polarized X rayx radiance flux (dim.: power/area, in SI: W/m^2)
+* `I₀x`: Incident irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
 * `m`: Magnification
 * `n`: Index of refraction
 * `n1`: Index of refraction of medium 1
@@ -12113,7 +12113,8 @@ The 54 variables in the Solid State Devices section are:
 * `ICEO`: Collector current (collector-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICO`: Collector current (emitter-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICS`: Collector-to-base saturation current (dim.: charge/time, in SI: ampere, A)
-* `ID, IDS`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `ID`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `IDS`: Drain-to-source current (dim.: charge/time, in SI: ampere, A)
 * `IE`: Total emitter current (dim.: charge/time, in SI: ampere, A)
 * `IES`: Emitter-to-base saturation current (dim.: charge/time, in SI: ampere, A)
 * `IS`: Transistor saturation current (dim.: charge/time, in SI: ampere, A)
