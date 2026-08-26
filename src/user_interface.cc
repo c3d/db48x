@@ -3158,7 +3158,7 @@ void user_interface::load_help(utf8 topic, size_t len)
 
     // Check if the index exists. If so, scan it
     {
-        file index(HELPINDEX_NAME, file::READING);
+        file index(HELPINDEX_NAME, file::READING_BINARY);
         if (index.valid())
         {
             for (char c = index.getchar(); !found && c; c = index.getchar())
@@ -3219,7 +3219,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     // Need to have the help file open here
     if (!helpfile.valid())
     {
-        helpfile.open(HELPFILE_NAME, file::READING);
+        helpfile.open(HELPFILE_NAME, file::READING_BINARY);
         if (!helpfile.valid())
         {
             help = -1u;
@@ -4148,7 +4148,7 @@ restart:
                                 image = files->recall_grob(name);
                             impos = offs;
 
-                            helpfile.open(HELPFILE_NAME, file::READING);
+                            helpfile.open(HELPFILE_NAME, file::READING_BINARY);
                             helpfile.seek(offs);
                         }
                         imdsp = true;

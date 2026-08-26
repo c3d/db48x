@@ -137,7 +137,7 @@ void file::open(cstring path, mode wrmode)
 //    Open a file for reading
 // ----------------------------------------------------------------------------
 {
-    bool reading = wrmode == READING;
+    bool reading = wrmode == READING || wrmode == READING_BINARY;
     bool append  = wrmode == APPEND;
     writing      = append || wrmode == WRITING;
     previous     = current;
@@ -147,7 +147,10 @@ void file::open(cstring path, mode wrmode)
     name = path;
 
 #if SIMULATOR
-    data = fopen(path, reading ? "r" : append ? "a" : "w");
+    if (wrmode == READING_BINARY)
+        data = fopen(path, "rb");
+    else
+        data = fopen(path, reading ? "r" : append ? "a" : "w");
     if (!data)
     {
         record(file_error, "Error %s opening %s", strerror(errno), path);
