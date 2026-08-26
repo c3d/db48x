@@ -562,6 +562,14 @@ QRC_DOT_help/img=../
 QRC_EXT_library=*.48[sS]
 QRC_EXT_state=*.48[sS]
 
+# The pattern rule above lists a directory, but make cannot know that from
+# the rule alone: without these, adding a file leaves the .qrc untouched and
+# the new resource silently absent from the binary.
+sim/config.qrc:   $(wildcard $(QRC_EXT_config:%=config/%))
+sim/state.qrc:    $(wildcard $(QRC_EXT_state:%=state/%))
+sim/library.qrc:  $(wildcard $(QRC_EXT_library:%=library/%))
+sim/help/img.qrc: $(wildcard $(QRC_EXT_help/img:%=help/img/%))
+
 keyboard:				\
 	Keyboard-Layout.png 		\
 	Keyboard-Cutout.png		\
