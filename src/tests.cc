@@ -15075,7 +15075,7 @@ void tests::check_help_examples()
         .noerror();
 
     step("Opening help file").test(CLEAR);
-    FILE *f = fopen(HELPFILE_NAME, "r");
+    FILE *f = fopen(HELPFILE_NAME, "rb");
     if (!f)
     {
         fail();

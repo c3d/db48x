@@ -483,13 +483,9 @@ help/$(NAME).md: $(HELP_SOURCES)
 doc/8-menus-tree-%.md: src/menu.cc src/ids.tbl tools/gen-menu-doc.py
 	$(PRINT_GENERATE) python3 tools/gen-menu-doc.py --model $*
 
-help/$(NAME).idx: help/$(NAME).md FORCE
-	$(PRINT_COMMAND) tr -d '\r' < help/$(NAME).md > help/$(NAME).md.tmp && mv help/$(NAME).md.tmp help/$(NAME).md
-	$(PRINT_GENERATE) grep -b '^#\|^\* `[^`]*`' help/$(NAME).md | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
+help/$(NAME).idx: help/$(NAME).md
+	$(PRINT_GENERATE) grep -b '^#\|^\* `[^`]*`' $< | sed -e 's/:\(\* `[^`]*`\).*/:\1/g' | sort -k2 -t: > $@
 	$(PRINT_COMMAND) [ "$$(cat $@ | wc -L)" -lt 80 ] || { echo "Some help header exceeds 80 bytes"; exit 2; }
-
-.PHONY: FORCE
-FORCE:
 
 
 # ------------------------------------------------------------------------------
