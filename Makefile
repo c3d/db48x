@@ -476,6 +476,7 @@ GENERATE_HELP_MD=					\
 help/$(NAME).md: $(HELP_SOURCES)
 	$(PRINT_COMMAND) mkdir -p help
 	$(PRINT_GENERATE) $(GENERATE_HELP_MD)
+	$(PRINT_COMMAND) tr -d '\r' < $@ > $@.tmp && mv $@.tmp $@
 	$(PRINT_COMMAND) cp doc/*.png help/ 2>/dev/null || true
 	$(PRINT_COMMAND) mkdir -p help/img
 	$(PRINT_COMMAND) rsync -a --delete doc/img/*.bmp help/img/ 2>/dev/null || true
