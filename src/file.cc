@@ -363,7 +363,9 @@ uint file::find(unicode cp1, unicode cp2)
     {
         off = ftell(data);
         c   = get();
-    } while (c && c != cp1 && (c != cp2 || (in = !in)));
+        if (c == cp2)
+            in = !in;
+    } while (c && (in || c != cp1));
     return off;
 }
 
@@ -414,8 +416,10 @@ uint file::rfind(unicode  cp1, unicode cp2)
         c = raw == EOF ? 0 : unicode(raw);
         if (c == '\r')
             continue;
+        if (c == cp2)
+            in = !in;
     }
-    while (c != cp1 && (c != cp2 || (in = !in)));
+    while (c && (in || c != cp1));
 
     seek(off);
     get();
