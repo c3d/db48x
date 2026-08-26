@@ -545,9 +545,10 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) (echo '<RCC>';			\
 	 echo ' <qresource prefix="/'$*'">';			\
-	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
-		J=$$(basename $$I);				\
-		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$*'/'$$J'</file>';	\
+	 for I in $(patsubst %,'%',$(wildcard $(QRC_EXT_$*:%=$*/%))); do	\
+		J=$$(basename "$$I");				\
+		E=$$(printf '%s' "$$J" | sed -e 's/&/\&amp;/g');	\
+		echo '  <file alias="'"$$E"'">../'$(QRC_DOT_$*)$*'/'"$$E"'</file>';	\
 	 done;							\
 	 echo ' </qresource>';					\
 	 echo '</RCC>')						\
