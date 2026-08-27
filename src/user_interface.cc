@@ -156,6 +156,7 @@ user_interface::user_interface()
       longpress(false),
       blink(false),
       follow(false),
+      topicLocked(false),
       force(false),
       dirtyMenu(false),
       dirtyStack(false),
@@ -604,6 +605,7 @@ void user_interface::clear_help()
     image       = nullptr;
     impos       = 0;
     topic       = 0;
+    topicLocked = false;
     follow      = false;
     last        = 0;
     longpress   = false;
@@ -4034,6 +4036,7 @@ restart:
     uint    lastTopic = 0;
     uint    codeStart = 0;
     uint    shown     = 0;
+    uint    highlight = topic;
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
     static char link[60];
@@ -4377,9 +4380,9 @@ restart:
                         if (wascode)
                         {
                             lastTopic = pos;
-                            if (topic < shown)
-                                topic = lastTopic;
-                            if (lastTopic == topic)
+                            if (highlight < shown)
+                                highlight = lastTopic;
+                            if (lastTopic == highlight)
                             {
                                 restyle    = HIGHLIGHTED_CODE;
                                 codeStart  = 0;
@@ -4439,14 +4442,14 @@ restart:
                     if (helpfile.peek() != '!')
                     {
                         lastTopic      = helpfile.position();
-                        if (topic < shown)
-                            topic      = lastTopic;
-                        if (lastTopic == topic)
+                        if (highlight < shown)
+                            highlight  = lastTopic;
+                        if (lastTopic == highlight)
                         {
                             restyle    = HIGHLIGHTED_TOPIC;
                             codeStart  = 0;
-                            record(help, "highlight start pos=%u topic=%u",
-                                   lastTopic, topic);
+                            record(help, "highlight start pos=%u highlight=%u",
+                                   lastTopic, highlight);
                         }
                         else
                         {
@@ -4804,11 +4807,14 @@ restart:
         style = restyle;
     }
 
-    if (helpfile.position() < topic)
-        topic = lastTopic;
+    if (helpfile.position() < highlight)
+        highlight = lastTopic;
 
-    record(help, "draw_help end: topic=%u help=%u lastTopic=%u pos=%u",
-           topic, help, lastTopic, helpfile.position());
+    if (!topicLocked)
+        topic = highlight;
+
+    record(help, "draw_help end: topic=%u highlight=%u help=%u lastTopic=%u pos=%u",
+           topic, highlight, help, lastTopic, helpfile.position());
 
     Screen.clip(clip);
 
@@ -5006,6 +5012,7 @@ bool user_interface::handle_help(int &key)
     switch (key)
     {
     case KEY_F1:
+        topicLocked = false;
         load_help(utf8("Overview"));
         break;
     case KEY_F2:
@@ -5016,12 +5023,14 @@ bool user_interface::handle_help(int &key)
     case KEY_SUB:
         if (line > count * height)
         {
+            topicLocked = false;
             line -= count * height;
         }
         else
         {
             line = 0;
             count++;
+            topicLocked = true;
             while(count--)
             {
                 helpfile.seek(help);
@@ -5048,6 +5057,7 @@ bool user_interface::handle_help(int &key)
     case KEY_DOWN:
     case KEY_2:
     case KEY_ADD:
+        topicLocked = false;
         line   += count * height;
         repeat  = true;
         dirtyHelp = true;
@@ -5065,6 +5075,7 @@ bool user_interface::handle_help(int &key)
             topic = helpfile.rfind('[', '`');
         }
         topic  = helpfile.position();
+        topicLocked = true;
         help_log_link_at(helpfile, topic, "F4: after");
         repeat = true;
         dirtyHelp = true;
@@ -5076,17 +5087,20 @@ bool user_interface::handle_help(int &key)
         while (count--)
             helpfile.find('[', '`');
         topic  = helpfile.position();
+        topicLocked = true;
         repeat = true;
         dirtyHelp = true;
         break;
 
     case KEY_ENTER:
+        topicLocked = false;
         follow = true;
         dirtyHelp = true;
         break;
 
     case KEY_F6:
     case KEY_BSP:
+        topicLocked = false;
         if (topicsHistory)
         {
             --topicsHistory;
