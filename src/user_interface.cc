@@ -3284,8 +3284,8 @@ void user_interface::load_help(utf8 topic, size_t len)
     {
         help = topicpos;
         line = 0;
-        record(help, "Found topic %s at position %u level %u",
-               topic, helpfile.position(), level);
+        record(help, "Found topic %.*s at position %u level %u",
+               int(len), topic, helpfile.position(), level);
 
         if (topicsHistory >= NUM_TOPICS)
         {
@@ -3903,6 +3903,62 @@ void user_interface::draw_help_access_paths(id cmd,
 }
 
 
+static void help_log_link_at(file &hf, uint pos, cstring label)
+// ----------------------------------------------------------------------------
+//   Log markdown link text and anchor at a file position after '['
+// ----------------------------------------------------------------------------
+{
+    if (!hf.valid() || !pos)
+    {
+        record(help, "%+s pos=%u (invalid)", label, pos);
+        return;
+    }
+
+    hf.seek(pos - 1);
+    if (hf.getchar() != '[')
+    {
+        record(help, "%+s pos=%u (no '[')", label, pos);
+        return;
+    }
+
+    char    text[40];
+    char    anchor[40];
+    char   *p = text;
+    unicode c = hf.get();
+    while (c && c != ']' && p < text + sizeof(text) - 1)
+    {
+        *p++ = char(c);
+        c    = hf.get();
+    }
+    *p = 0;
+
+    p = anchor;
+    c = hf.get();
+    if (c != '(')
+    {
+        record(help, "%+s pos=%u text=%+s (no link)", label, pos, text);
+        return;
+    }
+
+    char *ap = anchor;
+    while (c != ')')
+    {
+        c = hf.get();
+        if (c != '#')
+        {
+            if (ap < anchor + sizeof(anchor))
+                *ap++ = c;
+        }
+    }
+    if (ap > anchor)
+        ap[-1] = 0;
+    else
+        *ap = 0;
+
+    record(help, "%+s pos=%u text=%+s anchor=%+s", label, pos, text, anchor);
+}
+
+
 bool user_interface::draw_help()
 // ----------------------------------------------------------------------------
 //    Draw the help content
@@ -4389,6 +4445,8 @@ restart:
                         {
                             restyle    = HIGHLIGHTED_TOPIC;
                             codeStart  = 0;
+                            record(help, "highlight start pos=%u topic=%u",
+                                   lastTopic, topic);
                         }
                         else
                         {
@@ -4433,8 +4491,14 @@ restart:
                                 *p++ = n;
                     }
                     p[-1] = 0;
+                    if (style == HIGHLIGHTED_TOPIC)
+                        record(help,
+                               "highlight link pos=%u anchor=%+s follow=%u y=%d",
+                               lastTopic, link, uint(follow), int(y));
                     if (follow && style == HIGHLIGHTED_TOPIC && y >= 0)
                     {
+                        record(help, "follow link anchor=%+s shown=%u",
+                               link, shown);
                         if (topicsHistory)
                             topics[topicsHistory-1] = shown;
                         load_help(utf8(link));
@@ -4743,6 +4807,9 @@ restart:
     if (helpfile.position() < topic)
         topic = lastTopic;
 
+    record(help, "draw_help end: topic=%u help=%u lastTopic=%u pos=%u",
+           topic, help, lastTopic, helpfile.position());
+
     Screen.clip(clip);
 
     if (follow && codeStart)
@@ -4990,12 +5057,15 @@ bool user_interface::handle_help(int &key)
     case KEY_9:
     case KEY_DIV:
         ++count;
+        record(help, "F4: before topic=%u help=%u count=%u",
+               topic, help, count);
         while(count--)
         {
             helpfile.seek(topic);
             topic = helpfile.rfind('[', '`');
         }
         topic  = helpfile.position();
+        help_log_link_at(helpfile, topic, "F4: after");
         repeat = true;
         dirtyHelp = true;
         break;
