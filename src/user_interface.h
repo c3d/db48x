@@ -329,6 +329,7 @@ protected:
     bool     longpress    : 1;  // We had a long press of the key
     bool     blink        : 1;  // Cursor blink indicator
     bool     follow       : 1;  // Follow a help topic
+    uint     skipTopicSync;     // Skip topic=highlight sync for N redraws
     bool     force        : 1;  // Force a redraw of everything
     bool     dirtyMenu    : 1;  // Menu label needs redraw
     bool     dirtyStack   : 1;  // Need to redraw the stack

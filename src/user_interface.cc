@@ -74,6 +74,7 @@ RECORDER(text_editor,   16, "Text editor");
 RECORDER(menus,         16, "Menu operations");
 RECORDER(help,          16, "On-line help");
 RECORDER(help_search,   16, "On-line help topic search");
+RECORDER(help_trace,    16, "On-line help scroll trace");
 RECORDER(tests_ui,      16, "Test interaction with user interface");
 RECORDER(shifts,        16, "Shift logic (including transient alpha)");
 RECORDER(keymap_warning, 8, "Warnings about invalid keymaps");
@@ -156,6 +157,7 @@ user_interface::user_interface()
       longpress(false),
       blink(false),
       follow(false),
+      skipTopicSync(0),
       force(false),
       dirtyMenu(false),
       dirtyStack(false),
@@ -604,6 +606,7 @@ void user_interface::clear_help()
     image       = nullptr;
     impos       = 0;
     topic       = 0;
+    skipTopicSync = 0;
     follow      = false;
     last        = 0;
     longpress   = false;
@@ -4072,6 +4075,8 @@ restart:
     uint    lastTopic = 0;
     uint    codeStart = 0;
     uint    shown     = 0;
+    uint    highlight = topic;
+    uint    skipDraws = skipTopicSync;
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
     static char link[60];
@@ -4088,7 +4093,7 @@ restart:
     // Pun not indented
     helpfile.seek(help);
 
-    record(help, "draw_help scroll: help=%u line=%u topic=%u y0=%d ytop=%d "
+    record(help_trace, "draw_help scroll: help=%u line=%u topic=%u y0=%d ytop=%d "
            "height=%u stackTop=%u",
            help, line, topic, int(ytop + 2 - line), int(ytop), height,
            stackTop);
@@ -4109,7 +4114,7 @@ restart:
             if (y >= ytop)
             {
                 shown  = helpfile.position();
-                record(help, "shown set: shown=%u y=%d line=%u pos=%u",
+                record(help_trace, "shown set: shown=%u y=%d line=%u pos=%u",
                        shown, int(y), line, helpfile.position());
             }
             else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H)
@@ -4118,7 +4123,7 @@ restart:
                 uint oldLine = line;
                 help = helpfile.position();
                 line = ytop + 2 - y;
-                record(help,
+                record(help_trace,
                        "scroll adjust: help %u->%u line %u->%u y=%d pos=%u",
                        oldHelp, help, oldLine, line, int(y),
                        helpfile.position());
@@ -4155,7 +4160,7 @@ restart:
 
             case '\r':
                 crUnexpected++;
-                record(help, "unexpected CR in draw at pos=%u",
+                record(help_trace, "unexpected CR in draw at pos=%u",
                        helpfile.position() - 1);
                 skip = true;
                 break;
@@ -4438,14 +4443,14 @@ restart:
                         if (wascode)
                         {
                             lastTopic = pos;
-                            if (topic < shown)
+                            if (highlight < shown)
                             {
                                 record(help,
-                                       "topic bump code: %u -> %u shown=%u",
-                                       topic, lastTopic, shown);
-                                topic = lastTopic;
+                                       "highlight bump code: %u -> %u shown=%u",
+                                       highlight, lastTopic, shown);
+                                highlight = lastTopic;
                             }
-                            if (lastTopic == topic)
+                            if (lastTopic == highlight)
                             {
                                 restyle    = HIGHLIGHTED_CODE;
                                 codeStart  = 0;
@@ -4505,18 +4510,18 @@ restart:
                     if (helpfile.peek() != '!')
                     {
                         lastTopic      = helpfile.position();
-                        if (topic < shown)
+                        if (!skipDraws && highlight < shown)
                         {
-                            record(help, "topic bump link: %u -> %u shown=%u",
-                                   topic, lastTopic, shown);
-                            topic      = lastTopic;
+                            record(help, "highlight bump link: %u -> %u shown=%u",
+                                   highlight, lastTopic, shown);
+                            highlight  = lastTopic;
                         }
-                        if (lastTopic == topic)
+                        if (lastTopic == highlight)
                         {
                             restyle    = HIGHLIGHTED_TOPIC;
                             codeStart  = 0;
-                            record(help, "highlight start pos=%u topic=%u",
-                                   lastTopic, topic);
+                            record(help, "highlight start pos=%u highlight=%u",
+                                   lastTopic, highlight);
                         }
                         else
                         {
@@ -4601,7 +4606,7 @@ restart:
                 nlGlyph++;
                 uint pos = helpfile.position() - 1;
                 if (pos + 100 >= topic && pos <= topic + 300)
-                    record(help,
+                    record(help_trace,
                            "NL glyph pos=%u widx=%u y=%d style=%u emit=%u",
                            pos, widx, int(y), style, emit);
             }
@@ -4858,7 +4863,7 @@ restart:
             nlAdvance++;
             uint pos = helpfile.position();
             if (pos + 100 >= topic && pos <= topic + 300)
-                record(help,
+                record(help_trace,
                        "NL advance pos=%u y=%d hadTitle=%u in_table=%u",
                        pos, int(y), hadTitle, in_table);
             if (in_table)
@@ -4891,16 +4896,22 @@ restart:
         style = restyle;
     }
 
-    if (helpfile.position() < topic)
-    {
-        record(help, "topic tail: %u -> %u pos=%u shown=%u",
-               topic, lastTopic, helpfile.position(), shown);
-        topic = lastTopic;
-    }
+    if (!skipDraws && helpfile.position() < highlight)
+        highlight = lastTopic;
 
-    record(help, "draw_help end: topic=%u help=%u lastTopic=%u pos=%u "
-           "shown=%u y=%d line=%u NL advance=%u glyph=%u cr=%u",
-           topic, help, lastTopic, helpfile.position(), shown, int(y), line,
+    if (skipDraws)
+        highlight = topic;
+
+    if (skipTopicSync)
+        skipTopicSync--;
+    else
+        topic = highlight;
+
+    record(help, "draw_help end: topic=%u highlight=%u help=%u lastTopic=%u "
+           "pos=%u shown=%u skip=%u y=%d line=%u",
+           topic, highlight, help, lastTopic, helpfile.position(), shown,
+           skipTopicSync, int(y), line);
+    record(help_trace, "draw_help trace: NL advance=%u glyph=%u cr=%u",
            nlAdvance, nlGlyph, crUnexpected);
 
     Screen.clip(clip);
@@ -5099,6 +5110,7 @@ bool user_interface::handle_help(int &key)
     switch (key)
     {
     case KEY_F1:
+        skipTopicSync = 0;
         load_help(utf8("Overview"));
         break;
     case KEY_F2:
@@ -5109,14 +5121,16 @@ bool user_interface::handle_help(int &key)
     case KEY_SUB:
         if (line > count * height)
         {
+            skipTopicSync = 0;
             line -= count * height;
-            record(help, "UP pixel: line=%u topic=%u help=%u count=%u",
+            record(help_trace, "UP pixel: line=%u topic=%u help=%u count=%u",
                    line, topic, help, count);
         }
         else
         {
             line = 0;
             count++;
+            skipTopicSync = 2;
             record(help, "UP sect: before help=%u line=%u topic=%u count=%u "
                    "height=%u",
                    help, line, topic, count, uint(height));
@@ -5131,7 +5145,7 @@ bool user_interface::handle_help(int &key)
                     count++;
                     line += height;
                 }
-                record(help,
+                record(help_trace,
                        "UP sect: iter help %u->%u next=%+c line=%u count=%u",
                        before, help, next, line, count);
                 if (!help)
@@ -5152,6 +5166,7 @@ bool user_interface::handle_help(int &key)
     case KEY_DOWN:
     case KEY_2:
     case KEY_ADD:
+        skipTopicSync = 0;
         line   += count * height;
         repeat  = true;
         dirtyHelp = true;
@@ -5169,6 +5184,7 @@ bool user_interface::handle_help(int &key)
             topic = helpfile.rfind('[', '`');
         }
         topic  = helpfile.position();
+        skipTopicSync = 2;
         help_log_link_at(helpfile, topic, "F4: after");
         record(help, "F4: after help=%u line=%u topic=%u",
                help, line, topic);
@@ -5182,17 +5198,20 @@ bool user_interface::handle_help(int &key)
         while (count--)
             helpfile.find('[', '`');
         topic  = helpfile.position();
+        skipTopicSync = 2;
         repeat = true;
         dirtyHelp = true;
         break;
 
     case KEY_ENTER:
+        skipTopicSync = 0;
         follow = true;
         dirtyHelp = true;
         break;
 
     case KEY_F6:
     case KEY_BSP:
+        skipTopicSync = 0;
         if (topicsHistory)
         {
             --topicsHistory;
