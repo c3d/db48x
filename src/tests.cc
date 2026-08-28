@@ -14744,18 +14744,19 @@ void tests::library()
     step("Attach library by library ID")
         .test(CLEAR, "{ 0 5 }",
               ID_FilesMenu, ID_Attach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark }");
+        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel }");
     step("Detach library by library name")
         .test(CLEAR, "\"LibraryHelp\"",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ Dedicace KineticEnergy CollatzBenchmark }");
+        .expect("{ Dedicace KineticEnergy PeriSel }");
     step("Attach library by library name")
         .test(CLEAR, "{ \"LibraryHelp\" \"KineticEnergy\" }",
               ID_FilesMenu, ID_Attach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark }");
+        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel }");
+
 
     step("Math: Collatz conjecture benchmark")
-        .test(CLEAR, RSHIFT, H, F3, LENGTHY(5000), F1, ENTER, SWAP)
+        .test(CLEAR, RSHIFT, H, F5, LENGTHY(5000), F1, ENTER, SWAP)
         .expect("1")
         .test(BSP)
         .match("duration:[1-9].*ms");
@@ -14770,7 +14771,7 @@ void tests::library()
     step("Check attached libraries")
         .test(CLEAR, ID_FilesMenu, ID_Libs)
         .expect("{ "
-                "Dedicace LibraryHelp KineticEnergy "
+                "Dedicace LibraryHelp KineticEnergy PeriSel "
                 "CollatzBenchmark CollatzConjecture CountPrimes "
                 "TriangleEquations "
                 "}");
@@ -14778,18 +14779,18 @@ void tests::library()
     step("Detach libraries")
         .test(CLEAR, "{ ⓁTriangleEquations ⓁCollatzConjecture }",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ Dedicace LibraryHelp KineticEnergy CollatzBenchmark "
-                "CountPrimes }");
+        .expect("{ Dedicace LibraryHelp KineticEnergy PeriSel "
+                "CollatzBenchmark CountPrimes }");
 
     step("Detach libraries by number")
         .test(CLEAR, "{ 0 { 1 2 }}",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ CollatzBenchmark CountPrimes }");
+        .expect("{ PeriSel CollatzBenchmark CountPrimes }");
 
     step("Detach libraries by name")
         .test(CLEAR, "{ \"CollatzBenchmark\" { CountPrimes }}",
               ID_FilesMenu, ID_Detach, ID_Libs)
-        .expect("{ }");
+        .expect("{ PeriSel }");
 }
 
 

@@ -9,6 +9,101 @@
 	"SiDensity",		"« → T '(8.35123E20 (cm↑-3))*exp((-7 555.17 K)÷T)' »"
 	"Fanning",		"« → Roughness Reynolds 'IFTE(Reynolds≤2100;16/Reynolds;(4.781-((-2۰log((Roughness)/3.7+12/Reynolds)-4.781)^2/((-2۰log((Roughness)/3.7+2.51۰(-2۰log((Roughness)/3.7+12/Reynolds))/Reynolds))-2۰(-2۰log((Roughness)/3.7+12/Reynolds))+4.781)))^-2)' »"
 
+"Astronomy"
+
+
+
+"Astronomy/Ephemeris Orbital Elements"
+
+	"PeriSel",		"=/library/PeriSel.48s"
+
+	"☿Φf",		"=/library/Astronomy/MerPhif.48s"
+	"♀Φf",		"=/library/Astronomy/VenPhif.48s"
+	"♁Φf",		"=/library/Astronomy/EarPhif.48s"
+	"♂Φf",		"=/library/Astronomy/MarPhif.48s"
+	"♃Φf",		"=/library/Astronomy/JupPhif.48s"
+	"♄Φf",		"=/library/Astronomy/SatPhif.48s"
+	"⛢Φf",		"=/library/Astronomy/UraPhif.48s"
+	"♆Φf",		"=/library/Astronomy/NepPhif.48s"
+	"☾Φf",		"=/library/Astronomy/MoonPhif.48s"
+	"☾Pos",		"=/library/Astronomy/MoonPos.48s"
+	"☾Hf",		"=/library/Astronomy/MoonHf.48s"
+	"MSumS",	"=/library/Astronomy/MSumS.48s"
+	"MSumC",	"=/library/Astronomy/MSumC.48s"
+
+"Astronomy/Heliocentric Coords"
+
+
+	"EaΦf",		"=/library/Astronomy/EaPhif.48s"
+	"νΦf",		"=/library/Astronomy/nuPhif.48s"
+	"rΦf",		"=/library/Astronomy/rPhif.48s"
+	"uΦf",		"=/library/Astronomy/uPhif.48s"
+	"λΦf",		"=/library/Astronomy/lambdaPhif.48s"
+	"βΦf",		"=/library/Astronomy/betaPhif.48s"
+	"PosΦf",	"=/library/Astronomy/PosPhif.48s"
+	"♁Pf",		"=/library/Astronomy/EarPf.48s"
+	"♂Pf",		"=/library/Astronomy/MarPf.48s"
+	"♀Pf",		"=/library/Astronomy/VenPf.48s"
+	"VΦf",		"=/library/Astronomy/VPhif.48s"
+
+"Astronomy/Planet Atmospheres"
+
+"Astronomy/Planet Atmospheres/Earth"
+
+
+	"T♁StdAtm",	"=/library/Astronomy/TEarStdAtm.48s"
+	"P♁StdAtm",	"=/library/Astronomy/PEarStdAtm.48s"
+	"ρ♁StdAtm",	"=/library/Astronomy/rhoEarStdAtm.48s"
+	"μ♁StdAtm",	"=/library/Astronomy/muEarStdAtm.48s"
+
+"Astronomy/Planet Atmospheres/Mars"
+
+
+	"T♂DayAtm",	"=/library/Astronomy/TMarDayAtm.48s"
+	"P♂DayAtm",	"=/library/Astronomy/PMarDayAtm.48s"
+	"ρ♂DayAtm",	"=/library/Astronomy/rhoMarDayAtm.48s"
+	"T♂NightAtm",	"=/library/Astronomy/TMarNightAtm.48s"
+	"P♂NightAtm",	"=/library/Astronomy/PMarNightAtm.48s"
+	"ρ♂NightAtm",	"=/library/Astronomy/rhoMarNightAtm.48s"
+
+"Astronomy/Planet Atmospheres/Venus"
+
+
+	"T♀Atm",	"=/library/Astronomy/TVenAtm.48s"
+	"P♀Atm",	"=/library/Astronomy/PVenAtm.48s"
+	"ρ♀Atm",	"=/library/Astronomy/rhoVenAtm.48s"
+
+"Astronautics"
+
+"Astronautics/Flight Parameters"
+
+
+	"DABf",		"=/library/Astronautics/DABf.48s"
+	"DAToB",	"=/library/Astronautics/DAToB.48s"
+	"DEarthToA",	"=/library/Astronautics/DEarthToA.48s"
+	"T₀SDAToB",	"=/library/Astronautics/T0SDAToB.48s"
+	"T₀SDEarthToA",	"=/library/Astronautics/T0SDEarthToA.48s"
+	"θs",		"=/library/Astronautics/thetas.48s"
+
+"Astronautics/Trajectory"
+
+
+	"Hohmann",	"=/library/Astronautics/Hohmann.48s"
+	"BiElliptic",	"=/library/Astronautics/BiElliptic.48s"
+	"TrToOrbi",	"=/library/Astronautics/TrToOrbi.48s"
+	"LambertU",	"=/library/Astronautics/LambertU.48s"
+	"StumpC",	"=/library/Astronautics/StumpC.48s"
+	"StumpS",	"=/library/Astronautics/StumpS.48s"
+	"LamUF",	"=/library/Astronautics/LamUF.48s"
+	"rv2coe",	"=/library/Astronautics/rv2coe.48s"
+	"TrCost",	"=/library/Astronautics/TrCost.48s"
+	"MinTofDV",	"=/library/Astronautics/MinTofDV.48s"
+	"MinΔVTraj",	"=/library/Astronautics/MinDeltaVTraj.48s"
+	"aTr",		"=/library/Astronautics/aTr.48s"
+	"MinΔDTraj",	"=/library/Astronautics/MinDeltaDTraj.48s"
+	"MinΔtTraj",	"=/library/Astronautics/MinDeltatTraj.48s"
+	"GAssist",	"=/library/Astronautics/GAssist.48s"
+
 "Mathematics"
 
 	"CollatzBenchmark",	"="

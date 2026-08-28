@@ -1,0 +1,21 @@
+«
+@@ ============================================================
+@@ TrToOrbi — orbital insertion / capture from a hyperbolic approach
+@@ Burn from the arrival hyperbola into a capture orbit (r_a = r_p → circular).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : v∞ r_p r_a μ   ( v∞ r_p r_a μ -- { ΔVins v_hyp v_cap } )
+@@ Output : { ΔVins v_hyp v_cap }
+@@ VALIDATION (device-confirmed):
+@@   2.5_km/s 3689_km 3689_km ⒸGM♂ TrToOrbi -> { 2021.27_m/s 5428.58_m/s 3407.31_m/s }  (circular)
+@@ ============================================================
+ → vinf rp ra μ
+  «
+    vinf UBASE Uval 'vinf' STO  rp UBASE Uval 'rp' STO  ra UBASE Uval 'ra' STO  μ UBASE Uval 'μ' STO
+    '√(vinf^2+2·μ/rp)' EVAL  1_m/s ·
+    '√(2·μ·ra/(rp·(rp+ra)))' EVAL  1_m/s ·
+    → vhyp vcap
+    « vhyp vcap -  vhyp  vcap  3 →LIST »
+  »
+»

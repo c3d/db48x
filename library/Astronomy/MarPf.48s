@@ -1,0 +1,14 @@
+«
+@@ ============================================================
+@@ ♂Pf — Mars position function (element function composed with PosΦf)
+@@ Mars companion of ♁Pf. Define ☿Pf ♀Pf ♃Pf … the same way as needed.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [x y z] )
+@@ Output : [x y z] in au
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♂Pf -> [ 1.159010882 -0.753079682 -0.044216374 ]
+@@ ============================================================
+ → JD « JD Ⓛ♂Φf ⓁPosΦf » 
+»
