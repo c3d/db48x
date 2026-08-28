@@ -135,6 +135,12 @@
 "Examples"
         "InteractiveMenu", "="
 
+"AstroExamples"
+        "LightTime", "=/library/AstroExamples/LightTime.48s"
+        "Elongation", "=/library/AstroExamples/Elongation.48s"
+        "ApparentSize", "=/library/AstroExamples/ApparentSize.48s"
+        "SkyCoords", "=/library/AstroExamples/SkyCoords.48s"
+
 "Configs"
 
 	"Cst",		"=/config/constants.csv"
