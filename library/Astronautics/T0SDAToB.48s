@@ -1,7 +1,8 @@
 «
 @@ ============================================================
 @@ T₀SDAToB — Julian Day of closest approach between two bodies (windowed)
-@@ Root of d/dt of the inter-body distance inside [JD1,JD2] (centred difference).
+@@ Minimum of the inter-body distance inside [JD1,JD2], found as the root of
+@@ its centred difference by bisection.
 @@ Author & design         : Jean Wilson
 @@ Co-authors & programming : Claude & Claude Code (Anthropic)
 @@
@@ -9,13 +10,33 @@
 @@ Output : JD of minimum distance
 @@ VALIDATION (device-confirmed):
 @@   'Ⓛ♁Φf' 'Ⓛ♂Φf' 2459120 2459140 T₀SDAToB -> 2459129.07   (2020-10-06)
+@@
+@@ Bisection rather than Root: PosΦf reaches EaΦf, which solves Kepler with
+@@ Root of its own. A Root evaluated inside another Root diverges, and the
+@@ outer one then returns its own lower bound as though it had converged --
+@@ silently, since it believes it has a solution. Bisection needs no solver,
+@@ no tolerance and no derivative: the centred difference changes sign across
+@@ the minimum, which is all that is required.
+@@
+@@ The difference is written out at both places it is needed rather than held
+@@ in a program: a program that mentions the enclosing locals resolves them by
+@@ position, and the position moves as the loop pushes frames of its own.
 @@ ============================================================
  → Af Bf JD1 JD2
-  « 0.5 → h
-    «
-      « JDsd h + Af EVAL ⓁPosΦf  JDsd h + Bf EVAL ⓁPosΦf  ⓁDAToB Uval
-        JDsd h - Af EVAL ⓁPosΦf  JDsd h - Bf EVAL ⓁPosΦf  ⓁDAToB Uval  - »
-      'JDsd'  JD1 JD2 2 →LIST  ROOT
-    »
+  « JD1 →Num JD2 →Num
+    JD1 →Num 0.5 + Af EVAL ⓁPosΦf  JD1 0.5 + Bf EVAL ⓁPosΦf  ⓁDAToB Uval
+    JD1 →Num 0.5 - Af EVAL ⓁPosΦf  JD1 0.5 - Bf EVAL ⓁPosΦf  ⓁDAToB Uval -
+    1 45 FOR i
+      → lo hi flo
+      « lo hi + 2 /
+        → mid
+        « mid 0.5 + Af EVAL ⓁPosΦf  mid 0.5 + Bf EVAL ⓁPosΦf  ⓁDAToB Uval
+          mid 0.5 - Af EVAL ⓁPosΦf  mid 0.5 - Bf EVAL ⓁPosΦf  ⓁDAToB Uval -
+          → fm
+          « IF fm flo * 0 < THEN lo mid flo ELSE mid hi fm END »
+        »
+      »
+    NEXT
+    DROP + 2 /
   »
 »

@@ -14987,7 +14987,7 @@ Julian Day of closest approach between two bodies inside a search window
 
 ```rpl
 'Ⓛ♁Φf' 'Ⓛ♂Φf' 2459120 2459140 ⓁT₀SDAToB     @ (2020-10-06)
-@ Expecting 2459129.07
+@ Expecting 2 459 129.07195
 ```
 
 ## θs
@@ -15489,7 +15489,7 @@ Julian Day of closest approach **from Earth** to a body, over `[JD1 JD2]` (Earth
 
 ```rpl
 'Ⓛ♂Φf' 2459120 2459140 ⓁT₀SDEarthToA     @ (Mars, 2020-10-06)
-@ Expecting 2459129.07
+@ Expecting 2 459 129.07195
 ```
 
 ## EaΦf
