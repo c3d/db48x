@@ -4037,6 +4037,7 @@ restart:
     uint    codeStart = 0;
     uint    shown     = 0;
     uint    highlight = topic;
+    uint    skipDraws = skipTopicSync;
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
     static char link[60];
@@ -4442,7 +4443,7 @@ restart:
                     if (helpfile.peek() != '!')
                     {
                         lastTopic      = helpfile.position();
-                        if (highlight < shown)
+                        if (!skipDraws && highlight < shown)
                             highlight  = lastTopic;
                         if (lastTopic == highlight)
                         {
@@ -4807,8 +4808,11 @@ restart:
         style = restyle;
     }
 
-    if (helpfile.position() < highlight)
+    if (!skipDraws && helpfile.position() < highlight)
         highlight = lastTopic;
+
+    if (skipDraws)
+        highlight = topic;
 
     if (skipTopicSync)
         skipTopicSync--;
