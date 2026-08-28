@@ -10526,7 +10526,7 @@ Er0=Er
 
 The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
-![E field finite line](img/EFieldFiniteLine.bmp)
+![E field finite line](img/E_Field_Finite_Line.bmp)
 
 * **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
@@ -10615,7 +10615,7 @@ The electrical resistivity `ρ` of most materials changes with temperature. If t
 
 ### Series & Parallel R
 
-![Series & Parallel R](img/Series&ParallelR.bmp)
+![Series & Parallel R](img/SeriesAndParallelR.bmp)
 
 * To calculate `[Rs_Ω;Rp_Ω]` (Series & Parallel Resistances) from 2 known variables:
 ```rpl
@@ -10626,7 +10626,7 @@ R1=2_Ω  R2=3_Ω
 
 ### Series & Parallel C
 
-![Series & Parallel C](img/Series&ParallelC.bmp)
+![Series & Parallel C](img/SeriesAndParallelC.bmp)
 
 * To calculate `[Cs_μF;Cp_μF]` (Series & Parallel Capacitances) from 2 known variables:
 ```rpl
@@ -10637,7 +10637,7 @@ C1=2_μF  C2=3_μF
 
 ### Series & Parallel L
 
-![Series & Parallel L](img/Series&ParallelL.bmp)
+![Series & Parallel L](img/SeriesAndParallelL.bmp)
 
 * To calculate `[Ls_mH;Lp_mH]` (Series & Parallel Inductances) from 2 known variables:
 ```rpl
@@ -10707,8 +10707,6 @@ C=20_μF  V=100_V
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
-
-![DC Inductor Voltage](img/DCInductorVoltage.bmp)
 
 * To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference; Final current; Final time) from 5 known variables:
 ```rpl
@@ -10992,7 +10990,7 @@ m=1_kg  r=5_cm  N=2000_Hz
 
 The force is that exerted by the spring.
 
-![Hooke’s Law](img/Missing name.bmp)
+![Hooke’s Law](img/HookesLaw.bmp)
 
 * To calculate `[F_lbf;W_ft*lbf]` (Force; Work) from 2 known variables:
 ```rpl
@@ -11312,7 +11310,7 @@ The 28 variables in the Magnetism section are:
 The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L` providing that `r < L/10` (see the following example 2 compared to example 2 of "Straight Wire Finite"). Note that if an electric current passes through a straight wire, one must use the following right-hand rule te determine the direction of the `B` field: when the thumb is pointed in the direction of conventional current (from positive to negative), the curled fingers will then point in the direction of the magnetic field (see fig.).
 
 
-![Straight Wire Infinite](img/StraightWireInfinite.bmp)
+![Straight Wire Infinite](img/StraightWire.bmp)
 
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
@@ -11382,7 +11380,7 @@ Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
 
 The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`. The right-hand rule applies also here: when the fingers curl around the solenoid in the sense of the current, the thumb points in the direction of the magnetic field (see fig.).
 
-![B Field In Infinite Solenoid](img/BFieldInInfiniteSolenoid.bmp)
+![B Field In Infinite Solenoid](img/MagneticFieldInSolenoid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 3 known variables:
 ```rpl
@@ -11432,7 +11430,7 @@ B0 B %Ch
 
 The magnetic field `B` is calculated in the center of the torroid. The right-hand rule applies also here: when the fingers curl around the outer circle of the torroid following the sense of the current, the thumb points in the direction of the central magnetic field (see fig.).
 
-![B Field In Toroid](img/BFieldInToroid.bmp)
+![B Field In Toroid](img/MagneticFieldInToroid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
@@ -11445,7 +11443,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 
 When a conductor carrying a current (to the right) is suddenly plunged into a perpendicular magnetic field (towards the bottom), there is a deviation (towards the top) of the free electrons which unbalances the distribution of electric charges. This transfer of charges from top to bottom gives rise to an electric force which in return balances the magnetic force. And it is precisely the appearance of this new electric field which is revealed by the Hall voltage `VH` measured between the top and the bottom of the conductor (small multimeter on the right).
 
-![Hall Effect](img/Hall Effect VH.bmp)
+![Hall Effect](img/HallEffectVH.bmp)
 
 * To calculate `[VH_V]` (Hall tension) from 5 known variables:
 ```rpl
@@ -11458,7 +11456,7 @@ n=5e28_(1/m^3)  B=0.641_T  q=1.60217 6634e-19_C  L=2_mm  I=10_A
 
 Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
-![Cyclotron Motion](img/Cyclotron_BW.bmp)
+![Cyclotron Motion](img/CyclotronBW.bmp)
 
 * To calculate `[Rc_m;fc_Hz;T_s]` (Radius of the circular path; Cyclotron frequency; Period) from 4 known variables:
 ```rpl
@@ -11471,7 +11469,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s
 
 Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
-![Helicoidal Motion](img/Helicoidal Motion BW.bmp)
+![Helicoidal Motion](img/HelicoidalMotionBW.bmp)
 
 * To calculate `[Rc_m;T_s;Dpitch_m]` (Radius of the circular path; Period, pitch of the helicoidal motion) from 4 known variables:
 ```rpl
@@ -11557,7 +11555,7 @@ y0=1000_ft  y=0_ft  v0=0_ft/s  gloc=9.80665_m/s↑2  φ=45_°  h=1000_m  Mp=5.97
 
 During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
-![Projectile Motion](img/Projectile_BW.bmp)
+![Projectile Motion](img/ProjectileMotion.bmp)
 
 * To calculate `[R_ft;vcx_ft/s;vcy_ft/s;x_ft;y_ft;hmax_ft;tf_s]` (Range, Components `x` & `y` of velocity at time `t`; Positions `x` & `y` at time `t`; Maximum height; Time of flight) from 5 known variables:
 ```rpl
@@ -11681,7 +11679,7 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 #### Refraction Law
 
-![Refraction Law](img/RefractionLaw.bmp)
+![Refraction Law](img/LawOfRefraction.bmp)
 
 * To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
@@ -11703,7 +11701,7 @@ n1=1  n2=1.5
 
 #### Fiber Optic
 
-![Fiber Optic](img/Fiber Optic BW.bmp)
+![Fiber Optic](img/FiberOpticBW.bmp)
 
 * To calculate `[vf0_m/s;vf1_m/s;vf2_m/s;NA;θ0_°]` (Speed of light in media of refraction index `n1f` & `n2f`; Numerical aperture; Acceptance angle) from 3 known variables:
 ```rpl
@@ -11716,7 +11714,7 @@ nf0=1.2  nf1=1.5  nf2=1.45
 
 The Brewster angle is the angle of incidence at which the reflected wave is completely polarized.
 
-![Brewster’s Law](img/Brewster’sLaw.bmp)
+![Brewster’s Law](img/BrewstersLaw.bmp)
 
 * To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
@@ -11760,7 +11758,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Rayleigh’s Criterion
 
-![Rayleigh’s Criterion](img/Rayleigh's Criterion_BW.bmp)
+![Rayleigh’s Criterion](img/RayleighsCriterionBW.bmp)
 
 * To calculate `[θr_°;y_m]` (Rayleigh’s criterion angle; Distance between two point source) from 3 known variables:
 ```rpl
@@ -11773,7 +11771,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
-![Malus Law](img/Malus Law BW.bmp)
+![Malus Law](img/MalusLawBW.bmp)
 
 * To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
@@ -11833,7 +11831,7 @@ The 25 variables in the Oscillations section are:
 
 #### Mass-Spring System
 
-![Mass-Spring System](img/Mass-SpringSystem.bmp)
+![Mass-Spring System](img/MassSpringSystem.bmp)
 
 * To calculate `[ω_(r/s);T_s;f_Hz]` (Angular frequency; Oscillation period; Frequency) from 2 known variables:
 ```rpl
@@ -11913,7 +11911,7 @@ E₀=E
 
 We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
-![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
+![Driven Damped Oscillations](img/DrivenDampedOscillations2BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
@@ -12147,7 +12145,7 @@ The 54 variables in the Solid State Devices section are:
 
 These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes abruptly at the junction. The equation assume the current density is determined by minority carries injected across the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500 K.
 
-![PN Step Junctions](img/PNStepJunctions.bmp)
+![PN Step Junctions](img/PNStepJunction.bmp)
 
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
@@ -12173,7 +12171,7 @@ tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=
 
 These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The equations also include the special conditions when the emitter-base or collector-base junction is open, which are convenient for measuring transistor parameters.
 
-![Bipolar Transistors](img/BipolarTransistors.bmp)
+![Bipolar Transistors](img/BipolarTransistor.bmp)
 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
@@ -12269,7 +12267,7 @@ Stresses and strains are positive in the directions shown in the picture.
 
 #### Mohr’s Circle
 
-![Mohr’s Circle](img/Mohr’sCircle.bmp) ```![Mohr’s Circle](img/Mohr’sCircle.bmp)```
+![Mohr’s Circle](img/MohrsCircle.bmp) ```![Mohr’s Circle](img/MohrsCircle.bmp)```
 
 * To calculate `[σ1_psi;σ2_psi;θp1_°;θp2_°;τmax_psi;θs_°;σavg_psi]` (Maximum principal normal stress; Minimum principal normal stress; Angle to plane of maximum principal normal stress; Angle to plane of minimum principal normal stress; Maximum shear stress; Angle to plane of maximum shear stress; Normal stress on place of maximum shear stress) from 3 known variables:
 ```rpl
@@ -13138,6 +13136,530 @@ Time value of money equation when payments are made at the end of the period.
 n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
+```
+
+## Rocketry
+
+The 110 variables in the Rocketry section are:
+
+* `α`: Divergent cone half-angle
+* `Δt`: Elapsed time or Burn duration time
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First stage velocity change (dim.: speed)
+* `ΔV2`: Second stage velocity change (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `ε`: Expansion ratio
+* `λ`: Exit-gas momentum correction factor
+* `ρp`: Solid rocket propellant density (dim.: mass/volume, in SI: g/ml)
+* `ρAl`: Solid rocket propellant Aluminium density (dim.: mass/volume, in SI: g/ml)
+* `ρAP`: Solid rocket propellant Ammonium Perchlorate density (dim.: mass/volume, in SI: g/ml)
+* `ρHTPB`: Solid rocket propellant HTPB density (dim.: mass/volume, in SI: g/ml)
+* `θ`: Convergent cone half-angle
+* `a`: Solid rocket propellant burn rate coefficient
+* `Ab`: Area of the cylindrical burning surface (in solid rocket motor)
+* `Ae`: Nozzle exit area 
+* `AeAt`: Ratio of nozzle exit area over sonic throat area
+* `At`: Nozzle sonic throat area
+* `C`: Effective exhaust gas velocity (dim.: speed)
+* `C1`: Stage 1 effective exhaust gas velocity (dim.: speed)
+* `C2`: Stage 2 effective exhaust gas velocity (dim.: speed)
+* `D`: Solid Rocket combustion diameter
+* `Dc`: Combustion chamber diameter
+* `Cstar`: Characteristic exhaust velocity (dim.: speed)
+* `CtnRatio`: Contraction ratio of the major cross-sectional area of the combuster divided by the throat area
+* `Dt`: Throat diameter
+* `Fnet`: Net engine thrust (dim.: force, in SI: N)
+* `H`: Starting height of rocket engine 
+* `Isp`: Specific impulse (dim.: time, in SI: s)
+* `Isp1`: First stage specific impulse (dim.: time, in SI: s)
+* `Isp2`: Second stage specific impulse (dim.: time, in SI: s)
+* `k`: Specific heat ratio
+* `L`: Solid Rocket combustion length
+* `Lc`: Combustion chamber length
+* `Li`: Fractional axial length based on a 15-degree conical nozzle
+* `Lstar`: Combustion chamber characteristic length for a given propellant
+* `M`: average molecular weight of the exhaust gases
+* `Md`: Spacecraft's dry mass
+* `Md1`: Spacecraft's stage 1 dry mass 
+* `Md2`: Spacecraft's stage 2 dry mass
+* `Mf`: Spacecraft's total mass
+* `Mf1`: Total vehicle mass when stage 1 is burned out but not yet discarded
+* `Mf2`: Total vehicle mass when stage 2 is burned out but not yet discarded
+* `Mo`: Spacecraft's initial mass 
+* `Mo1`: Total vehicle mass when stage 1 is ignited 
+* `Mo2`: Total vehicle mass when stage 2 is ignited 
+* `Mp`: Spacecraft's propellant mass
+* `Mp1`: Spacecraft's stage 1 propellant mass
+* `Mp2`: Spacecraft's stage 2 propellant mass
+* `Mpl`: Spacecraft's payload mass
+* `MplMo`: Ratio of payload to initial masses
+* `Nm`: Mach number as the ratio of the gas velocity to the local speed of sound
+* `Pa`: Ambient external pressure (dim.: force/area, in SI: kPa) 
+* `Pc`: Combustion chamber pressure (dim.: force/area, in SI: MPa)
+* `Pe`: Pressure at the nozzle exit (dim.: force/area, in SI: MPa)
+* `Pt`: Gas pressure at the nozzle throat (dim.: force/area, in SI: MPa)
+* `Q`: Propellant consumption mass flow rate (dim.: mass/time, in SI: kg/s)
+* `Qs`: Solid rocket combustion product generation rate (dim.: mass/time, in SI: kg/s)
+* `R`: Conical nozzle circular arc radius (dim.: length, in SI: m)
+* `r`: Solid rocket propellant burn rate (dim.: mass/time, in SI: kg/s)
+* `ts`: Propellant stay-time
+* `Tc`: Combustion chamber temperature 
+* `Tt`: Gas temperature at the nozzle throat
+* `V`: Average specific volume
+* `Vc`: Combustion chamber volume
+* `Ve`: Exhaust gas velocity (dim.: speed)
+* `Vi`: Initial rocket velocity (dim.: speed)
+* `Vf`: Final rocket velocity (dim.: speed)
+* `wAl`: Solid rocket propellant Aluminium fraction by mass
+* `wAP`: Solid rocket propellant Ammonium Perchlorate fraction by mass
+* `wHTPB`: Solid rocket propellant HTPB fraction by mass
+
+* `Cfx`: Thrust coefficient (dim.: dimensionless)
+* `It`: Total impulse (dim.: force*time, in SI: N*s)
+* `Vbo`: Burnout velocity (dim.: speed)
+* `n`: Number of rocket stages ([Optimal Staging](#Optimal Staging)), or Solid propellant burn-rate pressure exponent ([Solid Rocket Burn Rate](#Solid Rocket Burn Rate))
+* `MR`: Per-stage mass ratio (dim.: dimensionless)
+* `Rt`: Nozzle throat radius (dim.: length)
+* `Rex`: Nozzle exit radius (dim.: length)
+* `Rarc`: Nozzle throat downstream circular-arc radius (dim.: length)
+* `Lnz`: Bell nozzle length from throat to exit plane (dim.: length)
+* `Fsl`: Sea-level thrust (dim.: force, in SI: N)
+* `Fvac`: Vacuum thrust (dim.: force, in SI: N)
+* `ΔF`: Thrust gain from sea level to vacuum (dim.: force, in SI: N)
+* `horb`: Orbital altitude above the surface (dim.: length)
+* `rorb`: Orbital radius from the body center (dim.: length)
+* `Vcirc`: Circular-orbit velocity (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `gsurf`: Surface gravity (dim.: length/time^2, in SI: m/s^2)
+* `LNose`: Length of nose (dim.: length)
+* `dN`: Diameter at base of nose (dim.: length)
+* `dF`: Diameter at front of transition (dim.: length)
+* `dR`: Diameter at rear of transition (dim.: length)
+* `LT`: Length of transition (dim.: length)
+* `XP`: Distance from tip of nose to front of transition (dim.: length)
+* `CR`: Fin root chord (dim.: length)
+* `CT`: Fin tip chord (dim.: length)
+* `SFs`: Fin semispan (dim.: length)
+* `LF`: Length of fin mid-chord line (dim.: length)
+* `RB`: Radius of body at aft end (dim.: length)
+* `XR`: Distance between fin root leading edge and fin tip leading edge parallel to body (dim.: length)
+* `XB`: Distance from nose tip to fin root chord leading edge (dim.: length)
+* `NF`: Number of fins
+* `XN`: Center of pressure of the nose, from the nose tip (dim.: length)
+* `CNN`: Force coefficient of the nose
+* `CNT`: Force coefficient of the transition
+* `XT`: Center of pressure of the transition, from the nose tip (dim.: length)
+* `CNF`: Force coefficient of the fins
+* `XF`: Center of pressure of the fins, from the nose tip (dim.: length)
+* `CNR`: Force coefficient of the rocket
+* `XCP`: Center of pressure of the rocket, from the nose tip (dim.: length)
+
+* References: [1]: http://www.braeunig.us/space/problem.htm
+& [2] http://www.braeunig.us/space/sup1.htm
+The 24 simulations are inspired from the solutions of P#1 to #12 of [1] and ex. 1 to 3 of [2].
+
+#### Thrust
+
+These equations derive from the conservation of momentum during the propulsion phase of a rocket whose engine ejects gas at velocity `Ve`, consuming fuel at rate `Q` to produce thrust `Fnet`. After burn duration `Δt` this results in a change in velocity, `ΔV`, for the rocket. 
+
+![Thrust](img/RocketPropulsion.bmp)
+
+* To calculate: `[Fnet_kN]` (Rocket thrust) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ Fnet=96.5 kN ] 
+'ROOT(ⒺThrust;[Fnet];[1_kN])'
+```
+
+#### Rocket ΔV
+
+* To calculate: `[ΔV_m/s]` (Velocity change) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ ΔV=191.81375 1526 m/s ]
+'ROOT(ⒺRocket ΔV;[ΔV];[1_m/s])'
+
+```
+#### Tsiolkovsky & Propellant Mass
+
+* To calculate: `[Mo_kg;Mp_kg]` (Spacecraft's Initial & Propellant mass) from 3 known variables:
+```rpl
+Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
+@ Expecting [ Mo=93 999.97959 06 kg Mp=18 999.97959 06 kg ]
+'ROOT(ⒺTsiolkovsky & Propellant Mass;[Mo;Mp];[1_kg;1_kg])' 
+```
+
+#### Burn Duration
+
+![Burn Duration](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[ΔV_m/s;Δt_s]` (Velocity change; Burn duration) from 5 known variables:
+```rpl
+Mo=5000_kg  C=3000_m/s  Vf=12000_m/s  Vi=7790_m/s  Q=10_kg/s
+@ Expecting [ ΔV=4 210 m/s Δt=377.11182 8738 s ]
+'ROOT(ⒺBurn Duration;[ΔV;Δt];[1_m/s;1_s])' 
+```
+
+#### Rocket Engine Exhaust Velocity
+
+* To calculate: `[Ve_m/s]` (Exhaust velocity) from 5 known variables:
+```rpl
+Pc=50_atm  Pe=1_atm  Tc=3470_K  M=21.40_(g/mol)   k=1.221
+@ Expecting [ Ve=2 749.35021 959 m/s ]
+'ROOT(ⒺRocket Engine Exhaust Velocity;[Ve];[1_m/s])'
+```
+
+#### Rocket Engine Specific Impulse
+
+* To calculate: `[Isp_s]` (Specific impulse) from 2 known variables:
+```rpl
+Fnet=1000000_N  Q=400_kg/s
+@ Expecting [ Isp=254.92905 3244 s ]
+'ROOT(ⒺRocket Engine Specific Impulse;[Isp];[1_s])'
+```
+
+#### Exhaust Nozzle Throat Parameters
+
+* To calculate: `[Pt_MPa  Tt_K  At_m↑2]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area) from 5 known variables: 
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 ]
+'ROOT(ⒺExhaust Nozzle Throat Parameters;[Pt;Tt;At];[1_MPa;1_K;1_m²])'
+```
+
+#### Exhaust Nozzle Characteristic Velocity
+
+* To calculate: `[Pt_MPa;Tt_K;At_m↑2;Cstar_m/s]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area;Characteristic velocity) from 5 known variables:
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 Cstar=1 779.27362 321 m/s ]
+'ROOT(ⒺExhaust Nozzle Characteristic Velocity;[Pt;Tt;At;Cstar];[1_MPa;1_K;1_m²;1_m/s])'
+```
+
+#### Nozzle Mach number & Optimal Exit Area
+
+* The following simulations explore the optimization of rocket engines allowing them to function in different planetary atmospheric conditions, either on Earth (`♁`), Mars (`♂`) or Venus (`♀`).
+
+![Nozzle Mach number & Optimal Exit Area](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Nm_1;Ae_m²;AeAt_1;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 Pe=0.0795 MPa ]
+'ROOT(ⒺNozzle Mach number & Optimal Exit Area;[Nm;Ae;AeAt;Pe];[1_1;1_m²;1_1;1_MPa])'
+```
+
+#### Optimised Third Stage Rocket Nozzle
+
+* For a third stage rocket nozzle optimised for `H=5000_m` in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221  H=5000_m 
+@ Expecting [ Nm=3.39632 79963 7 Ae=1.89765 87728 9 m↑2 AeAt=10.80671 28297 Pa=5.40482 54060 8⁳⁻² MPa Pe=5.40482 54060 8⁳⁻² MPa ]
+'ROOT(ⒺOptimised Third Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised First Stage Rocket Nozzle
+
+* For a first stage rocket nozzle optimised for `H=3_m` on Earth (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa  At=0.1756_m↑2  k=1.221  H=3_m
+@ Expecting [ Nm=3.05335 36461 Ae=1.19222 07953 2 m↑2 AeAt=6.78941 22740 3 Pa=0.10128 89657 59 MPa Pe=0.10128 89657 59 MPa ]
+'ROOT(ⒺOptimised First Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised Second Stage Rocket Nozzle
+
+* For a second stage rocket nozzle optimised for `H` unknown in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]`  (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 H=2 000.14258 71 m Pe=0.0795 MPa ]
+'ROOT(ⒺOptimised Second Stage Rocket Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Unrealistic Nozzle Optimised for Mars
+
+* This simulation shows that it is unrealistic to have a first stage rocket nozzle optimised in Mars atmosphere (`♂`) during day time.
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 H=2_m
+@ Expecting [ Nm=6.10680 95604 3 Ae=62.28237 61777 m↑2 AeAt=354.68323 5636 Pa=6.10396 15628 2⁳⁻⁴ MPa Pe=6.10396 15628 2⁳⁻⁴ MPa ]
+'ROOT(ⒺUnrealistic Nozzle Optimised for Mars;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Mars Day Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at day time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=9.63271 37837 7 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Day Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Mars Night Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at night time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=8.34690 83813 4 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Night Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+
+```
+#### Venus First stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=25_MPa At=0.1756_m↑2  k=1.221 Pa=9.33_MPa
+@ Expecting [ Nm=1.32945 59203 Ae=0.19118 07663 16 m↑2 AeAt=1.08872 87375 6 H=3.39862 99663 6 m Pe=9.33 MPa ]
+'ROOT(ⒺVenus First stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Venus Second Stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=10.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.08_MPa  @Pa='P♀Atm(52.1_km)' Eval
+@ Expecting [ Nm=3.55835 99705 9 Ae=2.36748 85818 9 m↑2 AeAt=13.48228 12181 H=52.09922 71871 km Pe=0.08 MPa ]
+'ROOT(ⒺVenus Second Stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_km;1_MPa])'
+```
+
+#### Properly Adapted Conic Nozzle
+
+* The following three simulations explore the optimization of rocket engines in terms of their conic nozzle geometry.
+
+![Properly Adapted Conic Nozzle](img/VariousConicNozzles.bmp)
+
+* When the exhaust nozzle pressure `Pe` equals the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.05_MPa
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.39769 72938 Ae=0.40883 75186 38 m↑2 Ve=2 831.85728 461 m/s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺProperly Adapted Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Under Extended Conic Nozzle
+
+* The previous and the next 2 simulations prove that the highest value of thrust Fnet is found with adapted Conic Nozzle (Pa/Pe=1) as shown in the figure.
+
+![Under-Extended Conic Nozzle](img/OptimalThrust.bmp)
+
+* When the exhaust nozzle pressure `Pe` is greater than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.03213 30836 Ae=0.24268 50403 71 m↑2 Ve=2 677.44630 755 m/s Fnet=279.87888 2774 kN ]
+'ROOT(ⒺUnder Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Over Extended Conic Nozzle
+
+* When the exhaust nozzle pressure `Pe` is less than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.76599 41252 2 Ae=0.69630 57034 83 m↑2 Ve=2 962.65092 497 m/s Fnet=278.85744 991 kN ]
+'ROOT(ⒺOver Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Characteristic Nozzle Geometry
+
+![Characteristic Nozzle Geometry](img/RocketEgineGeometry.bmp)
+
+![Characteristic Nozzle Geometry](img/ChamberLengthVSThroatDiameter.bmp)
+
+- To calculate: `[Dt_m;Vc_cm³;Lc_cm;Dc_cm;Ac_cm²;CtnRatio]` (Throat diameter; Combustion chamber volume; Combustion chamber length; Combustion chamber diameter; Contraction ratio of the major cross-sectional area of the combuster divided by the throat area) from 3 known variables:
+```rpl
+At=1756_cm↑2  θ=20_°  Lstar=110_cm @For LOX/RP-1 propellant combination
+@ Expecting [ Dt=47.28433 82163 cm Vc=193 160 cm↑3 Lc=65.60406 06668 cm Dc=56.69736 55569 cm Ac=2 524.73407 254 cm↑2 CtnRatio=1.43777 56677 3 ]
+'ROOT(ⒺCharacteristic Nozzle Geometry;[Dt;Vc;Lc;Dc;Ac;CtnRatio];[1_cm;1_cm³;1_cm;1_cm;1_cm²;1_1])'
+```
+
+#### Solid Rocket Burn Rate
+
+![Solid Rocket Burn Rate](img/SolidRocket1.bmp)
+
+- For a solid rocket motor, we search the combustion product generation rate `Qs` and the propellant burn rate `r` when the chamber pressure is `Pc=5.0 MPa`. 
+To calculate: `[Ab_m²;r_mm/s;Qs_kg/s]` (Solid rocket: Area of the cylindrical burning surface & Propellant burn rate; Combustion product generation rate) from 6 known variables.
+```rpl
+a=0.1  n=0.3  Pc=5_MPa  ρp=1.7_g/ml  L=10_m  D=1_m
+@ Expecting [ Ab=31.41592 65359 m↑2 r=10.22565 18256 mm/s Qs=546.12215 5111 kg/s ]
+'ROOT(ⒺSolid Rocket Burn Rate;[Ab;r;Qs];[1_m²;1_mm/s;1_kg/s])'
+```
+
+#### Solid Rocket Propellant Ideal Density
+
+* To calculate: `[ρp_g/ml]` (Solid rocket propellant ideal density) from 6 known variables.
+```rpl
+ρAl=2.70_g/ml  ρAP=1.95_g/ml  ρHTPB=0.93_g/ml  wAl=0.18  wAP=0.68  wHTPB=0.14
+@ Expecting [ ρp=1.76702 71850 3 g/ml ]
+'ROOT(ⒺSolid Rocket Propellant Ideal Density;[ρp];[1_g/ml])'
+```
+
+#### Multi Stages Rocket ΔV
+
+* To calculate: `[C1_m/s; C2_m/s; Mo1_kg; Mf1_kg; Mo2_kg; Mf2_kg; Mo_kg; MplMo; ΔV1_m/s; ΔV2_m/s; ΔVtot_m/s]` (Stage 1 & 2 effective exhaust gas velocity; Stage 1 initial & final mass; Stage 2 initial & final mass; Total initial mass; Payload over initial mass ratio; Stage 1 & 2 velocity change; Total velocity change) from 7 known variables.
+```rpl
+Isp1=260_s  Isp2=320_s  Mp1=120000_kg  Md1=9000_kg  Mp2=30000_kg  Md2=3000_kg  Mpl=3000_kg
+@ Expecting [ C1=2 549.729 m/s C2=3 138.128 m/s Mo1=165 000 kg Mf1=45 000 kg Mo2=36 000 kg Mf2=6 000 kg Mo=201 000 kg MplMo=1.49253 73134 3⁳⁻² ΔV1=3 312.81950 384 m/s ΔV2=5 622.77055 965 m/s ΔVtot=8 935.59006 349 m/s ]
+'ROOT(ⒺMulti Stages Rocket ΔV;[C1;C2;Mo1;Mf1;Mo2;Mf2;Mo;MplMo;ΔV1;ΔV2;ΔVtot];[1_m/s;1_m/s;1_kg;1_kg;1_kg;1_kg;1_kg;1_1;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Conical Nozzle Divergence Loss
+
+A conical nozzle's exhaust momentum is reduced by its divergence half-angle `α` through the
+correction factor `λ=(1+cos α)/2`; the net thrust falls by that factor. Shown for the adapted case
+(`Pe=Pa`), where the pressure term vanishes.
+
+![Conical Nozzle Divergence Loss](img/VariousConicNozzles.bmp)
+
+* To calculate: `[λ;Fnet_kN]` (Divergence-loss factor; Net engine thrust) from 6 known variables:
+```rpl
+α=15_°  Q=100_kg/s  Ve=2831.85728_m/s  Pe=0.05_MPa  Pa=0.05_MPa  Ae=0.40883751863782_m↑2
+@ Expecting [ λ=0.98296 29131 45 Fnet=278.36106 8156 kN ]
+'ROOT(ⒺConical Nozzle Divergence Loss;[λ;Fnet];[1_1;1_kN])'
+```
+
+#### Bell Nozzle Contour
+
+Geometry of a thrust-optimised parabolic (bell) nozzle after Rao: throat and exit areas from the
+expansion ratio `ε` and throat radius `Rt`, the downstream throat arc `Rarc=0.382·Rt`, and the bell
+length `Lnz` as the fraction `Li` of the reference 15° conical length. The wall angles `θn` (initial)
+and `θe` (exit) are read from the Rao chart and label the figure.
+
+![Bell Nozzle Contour](img/BellNozzle.bmp)
+
+* To calculate: `[At_cm↑2;Ae_cm↑2;Rex_cm;Rarc_cm;Lnz_cm]` (Throat & exit areas; Exit radius; Throat arc radius; Bell length) from 3 known variables:
+```rpl
+ε=11.87  Rt=10.470225_cm  Li=0.8
+@ Expecting [ At=344.39901 5893 cm↑2 Ae=4 088.01631 865 cm↑2 Rex=36.07292 6262 cm Rarc=3.99962 595 cm Lnz=76.44046 55367 cm ]
+'ROOT(ⒺBell Nozzle Contour;[At;Ae;Rex;Rarc;Lnz];[1_cm↑2;1_cm↑2;1_cm;1_cm;1_cm])'
+```
+
+#### Combustion Chamber Stay Time
+
+Propellant residence time `ts` in the chamber, from the ideal-gas specific volume `V` (chamber `Tc`,
+`Pc`, mean molar mass `M`), the chamber volume `Vc=Lstar·At`, and the mass flow `Q`.
+
+![Combustion Chamber Stay-Time](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[V_m↑3/kg;Vc_m↑3;ts_ms]` (Specific volume; Chamber volume; Stay-time) from 6 known variables:
+```rpl
+Lstar=1.1_m  At=0.0344398985_m↑2  Q=100_kg/s  Tc=3600_K  Pc=5_MPa  M=24_(g/mol)
+@ Expecting [ V=0.24943 38785 45 m↑3/kg Vc=0.03788 38883 5 m↑3 ts=1.51879 48233 4 ms ]
+'ROOT(ⒺCombustion Chamber Stay Time;[V;Vc;ts];[1_m↑3/kg;1_m↑3;1_ms])'
+```
+
+#### Thrust Coefficient
+
+The dimensionless thrust coefficient `Cfx` isolates the nozzle's contribution to thrust; it links the
+throat (characteristic velocity `Cstar`) and the nozzle to specific impulse via `Isp=Cfx·Cstar/Ⓒg`,
+and gives `Fnet=Cfx·Pc·At`. Shown for the adapted case — reproducing the thrust of « Properly Adapted
+Conic Nozzle ».
+
+![Thrust Coefficient](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Cfx;Cstar_m/s;Isp_s;Fnet_kN]` (Thrust coefficient; Characteristic velocity; Specific impulse; Thrust) from 7 known variables:
+```rpl
+k=1.2  Pc=5_MPa  Pe=0.05_MPa  Pa=0.05_MPa  At=0.03443989851769_m↑2  Ae=0.40883751863782_m↑2  Q=100_kg/s
+@ Expecting [ Cfx=1.64452 12712 6 Cstar=1 721.99492 588 m/s Isp=288.76907 8596 s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺThrust Coefficient;[Cfx;Cstar;Isp;Fnet];[1_1;1_m/s;1_s;1_kN])'
+```
+
+#### Total Impulse
+
+Total impulse delivered by a burn: `It=Isp·Ⓒg·Mp` (specific impulse × standard gravity × propellant
+mass), equivalently `Fnet·Δt`; the mean thrust over the burn is `Fnet=It/Δt`.
+
+* To calculate: `[It_N·s;Fnet_kN]` (Total impulse; Mean thrust) from 3 known variables:
+```rpl
+Isp=300_s  Mp=10000_kg  Δt=120_s
+@ Expecting [ It=29 419 950. N·s Fnet=245.16625 kN ]
+'ROOT(ⒺTotal Impulse;[It;Fnet];[1_N·s;1_kN])'
+```
+
+#### Vertical Ascent with Gravity Loss
+
+Burnout velocity of a vertically-launched stage: the ideal Tsiolkovsky increment `C·ln(Mo/Mf)` minus
+the constant-gravity loss `Ⓒg·Δt`, with effective exhaust velocity `C=Isp·Ⓒg` and burn time
+`Δt=Mp/Q`.
+
+![Vertical Ascent with Gravity Loss](img/RocketPropulsion.bmp)
+
+* To calculate: `[C_m/s;Mf_kg;Δt_s;Vbo_m/s]` (Exhaust velocity; Final mass; Burn time; Burnout velocity) from 4 known variables:
+```rpl
+Isp=300_s  Mo=50000_kg  Mp=40000_kg  Q=500_kg/s
+@ Expecting [ C=2 941.995 m/s Mf=10 000 kg Δt=80 s Vbo=3 950.42629 119 m/s ]
+'ROOT(ⒺVertical Ascent with Gravity Loss;[C;Mf;Δt;Vbo];[1_m/s;1_kg;1_s;1_m/s])'
+```
+
+#### Optimal Staging
+
+For a multi-stage vehicle with equal specific impulse across stages, the minimum-mass strategy is an
+**equal split of ΔV** among the `n` stages; each then carries the same mass ratio `MR=exp(ΔV1/C)`,
+with `ΔV1=ΔVtot/n` and `C=Isp·Ⓒg`.
+
+* To calculate: `[C_m/s;ΔV1_m/s;MR]` (Exhaust velocity; Per-stage ΔV; Stage mass ratio) from 3 known variables:
+```rpl
+ΔVtot=9400_m/s  n=2  Isp=320_s
+@ Expecting [ C=3 138.128 m/s ΔV1=4 700 m/s MR=4.47142 96415 3 ]
+'ROOT(ⒺOptimal Staging;[C;ΔV1;MR];[1_m/s;1_m/s;1_1])'
+```
+
+#### Sea level vs Vacuum Thrust
+
+The same fixed engine loses thrust at sea level through the ambient back-pressure term `Pa·Ae`; the
+gain from sea level to vacuum is exactly `ΔF=Pa·Ae`. `Pa` may be supplied by the atmosphere function
+`P♁StdAtm(0_m)`.
+
+![Sea-level vs Vacuum Thrust](img/OptimalThrust.bmp)
+
+* To calculate: `[Fsl_kN;Fvac_kN;ΔF_kN]` (Sea-level thrust; Vacuum thrust; Thrust gain) from 5 known variables:
+```rpl
+Q=100_kg/s  Ve=2831.85728_m/s  Ae=0.40883751863782_m↑2  Pe=0.05_MPa  Pa=0.101325_MPa
+@ Expecting [ Fsl=262.20214 2356 kN Fvac=303.62760 3932 kN ΔF=41.42546 1576 kN ]
+'ROOT(ⒺSea level vs Vacuum Thrust;[Fsl;Fvac;ΔF];[1_kN;1_kN;1_kN])'
+```
+
+#### Multi Planet Launch ΔV
+
+The circular-orbit velocity `Vcirc` at a low orbit **is** the ideal launch ΔV to reach that orbit;
+`Vesc` is the escape speed there and `gsurf` the surface gravity. The central-body constant selects
+the planet — swap `ⒸGM♁/ⒸReq♁` for `♂` or `♀` to compare Earth, Mars and Venus. Bridges Rocketry with
+the planetary constants and, for drag/thermal loss, the atmosphere functions `ρ♁/♂/♀StdAtm`.
+
+![Multi-Planet Launch ΔV](img/LaunchToSpace.bmp)
+
+* To calculate: `[rorb_km;Vcirc_m/s;Vesc_m/s;gsurf_m/s↑2]` (Orbital radius; Circular-orbit velocity; Escape velocity; Surface gravity) from 1 known variable:
+```rpl
+horb=200_km
+@ Expecting [ rorb=6 578.1 km Vcirc=7 784.28323 254 m/s Vesc=11 008.63892 08 m/s gsurf=9.79839 81336 7 m/s↑2 ]
+'ROOT(ⒺMulti Planet Launch ΔV;[rorb;Vcirc;Vesc;gsurf];[1_km;1_m/s;1_m/s;1_m/s↑2])'
+```
+Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
+#### Barrowman Method
+
+Subsonic centre of pressure of a finned rocket, by the algebraic method James S. Barrowman published
+in 1967 at NASA's Sounding Rocket Branch. Each part contributes a normal-force coefficient and its own
+centre of pressure, measured from the nose tip; the rocket's `XCP` is their coefficient-weighted mean.
+The nose always contributes `CNN=2`, and a transition that narrows rearward gives a **negative** `CNT`.
+Shown for an ogive nose — for a conical nose replace `0.466` by `0.666` in `XN`. The vehicle is stable
+when its centre of gravity lies ahead of `XCP`, conventionally by one to two body calibers `dN`.
+
+`LF` is not independent: it is the fin mid-chord length `√(SFs↑2+(XR+CT/2-CR/2)↑2)`, here `√(245↑2+65↑2)`.
+
+![Barrowman Method](img/BarrowmanMethod.bmp)
+
+* To calculate: `[XN_mm;CNN;CNT;XT_mm;CNF;XF_mm;CNR;XCP_mm]` (Nose CP; Nose, transition and fin force coefficients; Transition and fin CP; Rocket force coefficient; Rocket centre of pressure) from 14 known variables:
+```rpl
+LNose=405_mm  dN=205_mm  dF=205_mm  dR=165_mm  LT=125_mm  XP=905_mm  CR=245_mm  CT=125_mm  SFs=245_mm  LF=253.475837112732_mm  RB=85_mm  XR=125_mm  XB=1765_mm  NF=3
+@ Expecting [ XN=188.73 mm CNN=2 CNT=-0.70434 26531 83 XT=965.24774 7748 mm CNF=7.99426 99069 4 XF=1 868.61486 486 mm CNR=9.28992 72537 6 XCP=1 575.44898 065 mm ]
+'ROOT(ⒺBarrowman Method;[XN;CNN;CNT;XT;CNF;XF;CNR;XCP];[1_mm;1_1;1_1;1_mm;1_1;1_mm;1_1;1_mm])'
 ```
 # Menus
 
