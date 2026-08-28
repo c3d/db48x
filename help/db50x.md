@@ -19976,9 +19976,10 @@ The Gregorian calendar jumps from 1582-10-04 to 1582-10-15.
 This command ignores that gap, so the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters like
 [The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
 
-To compute the Julian Day Number for the first day of the millenium:
+A Julian Date begins at **noon** Universal Time: the whole day number belongs
+to noon, and midnight is half a day earlier. First day of the millenium, at noon:
 ```rpl
-20000101 JDN
+20000101.120000 JDN
 @ Expecting 2 451 545
 ```
 
@@ -19991,7 +19992,7 @@ It is the opposite of the `JDN` command.
 
 ```rpl
 2451545 JDN→
-@ Expecting Sat 1/Jan/2000
+@ Expecting Sat 1/Jan/2000, 12:00:00
 ```
 
 ## ACK
