@@ -156,7 +156,7 @@ user_interface::user_interface()
       longpress(false),
       blink(false),
       follow(false),
-      topicLocked(false),
+      skipTopicSync(0),
       force(false),
       dirtyMenu(false),
       dirtyStack(false),
@@ -605,7 +605,7 @@ void user_interface::clear_help()
     image       = nullptr;
     impos       = 0;
     topic       = 0;
-    topicLocked = false;
+    skipTopicSync = 0;
     follow      = false;
     last        = 0;
     longpress   = false;
@@ -4810,11 +4810,13 @@ restart:
     if (helpfile.position() < highlight)
         highlight = lastTopic;
 
-    if (!topicLocked)
+    if (skipTopicSync)
+        skipTopicSync--;
+    else
         topic = highlight;
 
-    record(help, "draw_help end: topic=%u highlight=%u help=%u lastTopic=%u pos=%u",
-           topic, highlight, help, lastTopic, helpfile.position());
+    record(help, "draw_help end: topic=%u highlight=%u help=%u lastTopic=%u pos=%u skip=%u",
+           topic, highlight, help, lastTopic, helpfile.position(), skipTopicSync);
 
     Screen.clip(clip);
 
@@ -5012,7 +5014,7 @@ bool user_interface::handle_help(int &key)
     switch (key)
     {
     case KEY_F1:
-        topicLocked = false;
+        skipTopicSync = 0;
         load_help(utf8("Overview"));
         break;
     case KEY_F2:
@@ -5023,14 +5025,14 @@ bool user_interface::handle_help(int &key)
     case KEY_SUB:
         if (line > count * height)
         {
-            topicLocked = false;
+            skipTopicSync = 0;
             line -= count * height;
         }
         else
         {
             line = 0;
             count++;
-            topicLocked = true;
+            skipTopicSync = 2;
             while(count--)
             {
                 helpfile.seek(help);
@@ -5057,7 +5059,7 @@ bool user_interface::handle_help(int &key)
     case KEY_DOWN:
     case KEY_2:
     case KEY_ADD:
-        topicLocked = false;
+        skipTopicSync = 0;
         line   += count * height;
         repeat  = true;
         dirtyHelp = true;
@@ -5075,7 +5077,7 @@ bool user_interface::handle_help(int &key)
             topic = helpfile.rfind('[', '`');
         }
         topic  = helpfile.position();
-        topicLocked = true;
+        skipTopicSync = 2;
         help_log_link_at(helpfile, topic, "F4: after");
         repeat = true;
         dirtyHelp = true;
@@ -5087,20 +5089,20 @@ bool user_interface::handle_help(int &key)
         while (count--)
             helpfile.find('[', '`');
         topic  = helpfile.position();
-        topicLocked = true;
+        skipTopicSync = 2;
         repeat = true;
         dirtyHelp = true;
         break;
 
     case KEY_ENTER:
-        topicLocked = false;
+        skipTopicSync = 0;
         follow = true;
         dirtyHelp = true;
         break;
 
     case KEY_F6:
     case KEY_BSP:
-        topicLocked = false;
+        skipTopicSync = 0;
         if (topicsHistory)
         {
             --topicsHistory;
