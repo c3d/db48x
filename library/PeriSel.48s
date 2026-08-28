@@ -1,0 +1,277 @@
+«
+@@ ============================================================
+@@ PeriSel — time of lunar perigee passage (Selene), for DB48x
+@@ Meeus, "Astronomical Algorithms" 2nd ed., ch. 50 — full Table 50.A
+@@ Merged implementation:
+@@   - data-driven structure (matrix x array, explicit 50.A tables) : evgaster
+@@   - angle-mode-independent sine via 1_°                          : J. Wilson
+@@
+@@ Input : a Julian Day Number (JDN, real) OR a date (_date-unit value).
+@@         A date in DB48x is a `_date`-unit value (YYYYMMDD.HHMMSS_date); a JDN is a
+@@         plain real. JDN() on a plain-real JDN would ERROR (read as an invalid
+@@         YYYYMMDD date). So the input preamble tests "does the input carry a unit
+@@         (date)?": if yes -> JDN converts it; if a plain real -> use as-is.
+@@ Output: JDN of the nearest perigee (Dynamical Time, TD/TT)
+@@ Pure function of its input — does NOT read DateTime.
+@@
+@@ Accuracy of the perigee INSTANT vs the true Earth-Moon distance minimum is a
+@@ limit of the ch.50 method itself: ~5 min typical (median ~3 min), up to ~30 min
+@@ in rare cases (measured against Meeus ch.47). This is the basis for the ±5 min
+@@ (300_s) absolute uncertainty carried by the T₀☽ constant. The formula itself
+@@ matches PyMeeus (full Meeus) to < 0.001 min over 1950-2100.
+@@
+@@ Two changes vs evgaster's original are tagged "MERGED:" below:
+@@   1) Each sine argument is scaled by 1_° so sin is mode-independent.
+@@   2) The global Degrees-mode save/switch/restore is therefore removed.
+@@ JDE-row T^3 coefficient = -0.000001098, the value published in Meeus eq.50.1
+@@ (confirmed in the book; matches evgaster's original matrix). NOTE: PyMeeus
+@@ uses +0.000001098 instead; the resulting difference is < 0.1 s over 1950-2100
+@@ (at most 2*0.000001098*T^3 d, i.e. < 0.2 s even a century from epoch 2000), far
+@@ below the ~5 min method accuracy, so it does not affect any perigee instant.
+@@
+@@ Epoch (k = 0 mean perigee): JDE 2451534.6698 ; anomalistic month 27.55454989 d
+@@
+@@ VALIDATION (full formula vs PyMeeus and real perigees):
+@@   2457706.5  PeriSel -> 2457706.974818   2016-Nov-14   k = 224
+@@   2464291.5  PeriSel -> 2464292.421948   2034-Nov-25   k = 463
+@@ ============================================================
+
+	@@ Step 0: input preamble — accept a date OR a JDN (PR1701-conformance §4).
+	@@ A DB48x date is a `_date`-unit value; a JDN is a plain real. JDN() on a
+	@@ plain real ERRORS, so guard: if the input carries a unit (date), convert
+	@@ it with JDN; a plain real passes through unchanged. ( date|JDN -- JDN )
+	Duplicate TypeName "unit" == « JDN » IFT
+
+	@@ Step 1: k = nearest integer anomalistic-month count since the k=0 epoch.
+	@@ ( JDN -- k )
+	2451534.6698 -  27.55454989 ÷  0 Round
+
+	@@ Step 2: T = k / 1325.55  (Julian centuries scale used by Table 50.A).
+	@@ ( k -- k T )
+	Duplicate 1325.55 ÷
+
+        @@ Recall precision loss flag and clear it
+        'ReportPrecisionLoss' Recall
+        IgnorePrecisionLoss
+
+	→ k T PrecFlag
+	«
+
+		@@ Step 3: D, M, F (deg) and JDE (mean perigee) via matrix x array.
+		@@ Each matrix row dotted with [ 1 , k , T^2 , T^3 , T^4 ].
+		@@ Rows:  D ; M ; F ; JDE.
+		@@ JDE-row T^3 coefficient -0.000001098 = the published Meeus eq.50.1 value
+		@@ (PyMeeus uses +; the difference is < 0.1 s over 1950-2100 — see header).
+		[
+			[     171.9179  335.9106046   -0.0100383  -0.00001156   0.000000055  ]
+			[     347.3477   27.1577721   -0.0008130  -0.0000010    0            ]
+			[     316.6109  364.5287911   -0.0125053  -0.0000148    0            ]
+			[ 2451534.6698   27.55454989  -0.0006691  -0.000001098  0.0000000052 ]
+		]
+
+		@@ The multiplier array [ 1 , k , T^2 , T^3 , T^4 ].
+		1  k  T 2 ^  T 3 ^  T 4 ^  5 ToArray
+
+		@@ Matrix x array -> the four results D, M, F, JDE.
+		@@ ( Matrix Array -- D M F JDE )
+		*  FromArray  Drop
+
+		→ D M F JDE
+		«
+
+			@@ Step 4: Table 50.A "Argument of sine", as { Dfactor Mfactor Ffactor }.
+			@@ Leading 0's kept; trailing 0's added programmatically below.
+			{
+				{ 2 }
+				{ 4 }
+				{ 6 }
+				{ 8 }
+				{ 2 -1 }
+				{ 0 1 }
+				{ 10 }
+				{ 4 -1 }
+				{ 6 -1 }
+				{ 12 }
+				{ 1 }
+				{ 8 -1 }
+				{ 14 }
+				{ 0 0 2 }
+				{ 3 }
+				{ 10 -1 }
+				{ 16 }
+				{ 12 -1 }
+				{ 5 }
+				{ 2 0 2 }
+				{ 18 }
+				{ 14 -1 }
+				{ 7 }
+				{ 2 1 }
+				{ 20 }
+				{ 1 1 }
+				{ 16 -1 }
+				{ 4 1 }
+				{ 9 }
+				{ 4 0 2 }
+				{ 2 -2 }
+				{ 4 -2 }
+				{ 6 -2 }
+				{ 22 }
+				{ 18 -1 }
+				{ 6 1 }
+				{ 11 }
+				{ 8 1 }
+				{ 4 0 -2 }
+				{ 6 0 2 }
+				{ 3 1 }
+				{ 5 1 }
+				{ 13 }
+				{ 20 -1 }
+				{ 3 2 }
+				{ 4 -2 2 }
+				{ 1 2 }
+				{ 22 -1 }
+				{ 0 0 4 }
+				{ 6 0 -2 }
+				{ 2 1 -2 }
+				{ 0 2 }
+				{ 0 -1 2 }
+				{ 2 0 4 }
+				{ 0 -2 2 }
+				{ 2 2 -2 }
+				{ 24 }
+				{ 4 0 -4 }
+				{ 2 2 }
+				{ 1 -1 }
+			}
+
+			@@ Pad each argument list to 3 elements with trailing 0's.
+			«
+				Duplicate Size
+				Case
+					1 When Drop { 0 0 } + End
+					2 When Drop { 0 } + End
+					3 When Drop End
+				End
+			»
+			Map
+
+
+			@@ For each padded { dD dM dF }, evaluate the Table 50.A sine term
+			@@ directly: sin((dD·D + dM·M + dF·F) · 1_°).  D, M and F are read from
+			@@ the enclosing locals at run time.
+			@@ NOTE: this replaces evgaster's ToProgram-built mapper.  A program
+			@@ assembled at run time with ToProgram cannot be evaluated when PeriSel
+			@@ is invoked inside an algebraic (e.g. the T₀☽ constant: it stays the
+			@@ symbolic 'PeriSel(x)' and ⒸT₀☽ →Num errors).  Expressing the mapper as
+			@@ a fixed program avoids ToProgram while giving identical results.
+			@@ MERGED: the argument is scaled by 1_° so sin is angle-mode-independent
+			@@ (RAD/DEG/GRAD all agree; no global Degrees-mode save/switch/restore).
+			« FromList Drop → dD dM dF
+			    « dD D * dM M * + dF F * + 1_° * sin » »
+			Map
+
+
+			@@ Step 5: Table 50.A "Coefficient", as { coefficient Tcoefficient }.
+			@@ Trailing 0 (no T-term) added programmatically below.
+			{
+				{ -1.6769 }
+				{ +0.4589 }
+				{ -0.1856 }
+				{ +0.0883 }
+				{ -0.0773 +0.00019 }
+				{ +0.0502 -0.00013 }
+				{ -0.0460 }
+				{ +0.0422 -0.00011 }
+				{ -0.0256 }
+				{ +0.0253 }
+				{ +0.0237 }
+				{ +0.0162 }
+				{ -0.0145 }
+				{ +0.0129 }
+				{ -0.0112 }
+				{ -0.0104 }
+				{ +0.0086 }
+				{ +0.0069 }
+				{ +0.0066 }
+				{ -0.0053 }
+				{ -0.0052 }
+				{ -0.0046 }
+				{ -0.0041 }
+				{ +0.0040 }
+				{ +0.0032 }
+				{ -0.0032 }
+				{ +0.0031 }
+				{ -0.0029 }
+				{ +0.0027 }
+				{ +0.0027 }
+				{ -0.0027 }
+				{ +0.0024 }
+				{ -0.0021 }
+				{ -0.0021 }
+				{ -0.0021 }
+				{ +0.0019 }
+				{ -0.0018 }
+				{ -0.0014 }
+				{ -0.0014 }
+				{ -0.0014 }
+				{ +0.0014 }
+				{ -0.0014 }
+				{ +0.0013 }
+				{ +0.0013 }
+				{ +0.0011 }
+				{ -0.0011 }
+				{ -0.0010 }
+				{ -0.0009 }
+				{ -0.0008 }
+				{ +0.0008 }
+				{ +0.0008 }
+				{ +0.0007 }
+				{ +0.0007 }
+				{ +0.0007 }
+				{ -0.0006 }
+				{ -0.0006 }
+				{ +0.0006 }
+				{ +0.0005 }
+				{ +0.0005 }
+				{ -0.0004 }
+			}
+
+			@@ Add a 0 T-coefficient where it is missing.
+			«
+				If
+					Duplicate Size 1 =
+				Then
+					0 +
+				End
+			»
+			Map
+
+
+			@@ Form each coefficient = coefficient + Tcoefficient * T.
+			«
+				FromList Drop
+				T *
+				+
+			»
+			Map
+
+
+			@@ Step 6: sum  JDE + Sigma( coefficient * sine )  on the fly.
+			→ s c
+			«
+				JDE
+				1  s Size
+				For i
+				    c i Get
+				    s i Get
+				    *
+				    +
+				Next
+			»
+
+
+		»
+
+                PrecFlag 'ReportPrecisionLoss' Store
+	»
+»

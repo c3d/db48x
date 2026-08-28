@@ -1,0 +1,39 @@
+«
+@@ ============================================================
+@@ ρ♀Atm — Venus density, ρ=P/(R·TM) ≤100 km + Braeunig Table 20 (-3..300 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 66.3503 kg/m^3 ; 50_km -> 1.59369 kg/m^3 ; 200_km -> 1.96027E-12 kg/m^3
+@@ ============================================================
+@Venus density  ρ♀Atm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 17-20 — https://www.braeunig.us/space/atmmodel.htm#venus
+@0-100 km ρ = P/(R·TM), R = 191.357; 100-300 km Table 20 density polynomials
+@Validity: -3_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 100 ≥ z 300 ≤ And
+      if then
+        case
+          z 140 < then 9.776973E-07 z × -4.431351E-04 + z × 0.07498141 + z × -5.886184 + z × 174.7343 + exp end
+          z 210 < then -2.869772E-09 z × 2.658564E-06 + z × -9.897302E-04 + z × 0.1856624 + z × -17.67973 + z × 664.9583 + exp end
+                       9.249815E-09 z × -1.006456E-05 + z × 0.004115272 + z × -0.8247589 + z × 39.32464 + exp
+        end
+        1_kg/m^3 ×
+      else
+        z 300 >
+        if then "Z out of range -3_km < Z < 300_km" DoError
+        else
+          z 1_km × Duplicate ⓁP♀Atm Swap ⓁT♀Atm 191.357_J/(kg·K) × ÷ BaseUnits
+        end
+      end
+    »
+  »
+»
