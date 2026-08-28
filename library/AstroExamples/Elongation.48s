@@ -1,0 +1,67 @@
+«
+@@ ============================================================
+@@ Elongation — Sun-Earth-planet angle (elongation) of a planet
+@@ Editable AstroExamples entry, companion of LightTime.
+@@ Type 1-7 (or 0 to quit), ENTER to push it, then = to run. Computes today's
+@@ elongation: the angle Sun-Earth-planet, i.e. how far the planet sits from the
+@@ Sun in our sky. Small = near the Sun (hard to see); large = well placed.
+@@ Displays it and leaves Target/Elongation tagged on the stack.
+@@ An invitation to build your own RPL program from the astronomy library.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  DEPTH → d0
+  «
+    CLLCD
+    "  Elongation of a planet" 1 DISP
+    "1 Mercury  2 Venus  3 Mars" 3 DISP
+    "4 Jupiter  5 Saturn" 4 DISP
+    "6 Uranus   7 Neptune" 5 DISP
+    "0 = Quit" 6 DISP
+    "Pick, ENTER, then =" 7 DISP
+    HALT
+    IF DEPTH d0 > THEN
+      → n
+      «
+        IF n 0 ≠ THEN
+          IF n 1 ≥ n 7 ≤ AND THEN
+            DEG
+            DateTime JDN → jd
+            «
+              jd Ⓛ♁Pf → E
+              «
+                jd { 'Ⓛ☿Φf' 'Ⓛ♀Φf' 'Ⓛ♂Φf' 'Ⓛ♃Φf' 'Ⓛ♄Φf' 'Ⓛ⛢Φf' 'Ⓛ♆Φf' } n GET EVAL ⓁPosΦf → P
+              «
+                E NEG P E - → a b
+                «
+                  a b DOT a a DOT √ b b DOT √ · / ACOS → elong
+                  «
+                    { "Mercury" "Venus" "Mars" "Jupiter" "Saturn" "Uranus" "Neptune" } n GET → name
+                    «
+                      CLLCD
+                      "Target: " name + 1 DISP
+                      "Elongation:" 3 DISP
+                      "  " elong + 4 DISP
+                      "(Sun-Earth-planet angle)" 6 DISP
+                      "Press any key" 7 DISP
+                      -1 WAIT DROP
+                      name "Target" →Tag
+                      elong "Elongation" →Tag
+                    »
+                  »
+                »
+              »
+              »
+            »
+          ELSE
+            CLLCD
+            "Invalid choice." 3 DISP
+            "Enter 1-7, or 0 to quit." 4 DISP
+            "Press any key" 6 DISP
+            -1 WAIT DROP
+          END
+        END
+      »
+    END
+  »
+»

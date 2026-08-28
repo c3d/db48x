@@ -1,0 +1,22 @@
+«
+@@ ============================================================
+@@ Hohmann — two-impulse Hohmann transfer between circular orbits
+@@ Universal by μ. Inputs reduced to SI base (UBASE Uval); outputs SI-tagged.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : r₁ r₂ μ   ( r₁ r₂ μ -- { ΔV₁ ΔV₂ ΔVtot tof } )
+@@ Output : { ΔV₁ ΔV₂ ΔVtot tof }
+@@ VALIDATION (device-confirmed):
+@@   6678_km 42164_km ⒸGM♁ Hohmann -> { 2425.77_m/s 1466.84_m/s 3892.61_m/s 18990.1_s }  (LEO→GEO)
+@@ ============================================================
+ → r1 r2 μ
+  «
+    r1 UBASE Uval 'r1' STO  r2 UBASE Uval 'r2' STO  μ UBASE Uval 'μ' STO
+    '√(2·μ·r2/(r1·(r1+r2)))-√(μ/r1)' EVAL  1_m/s ·
+    '√(μ/r2)-√(2·μ·r1/(r2·(r1+r2)))' EVAL  1_m/s ·
+    '→Num(Ⓒπ)·√((r1+r2)^3/(8·μ))' EVAL  1_s ·
+    → dv1 dv2 tof
+    « dv1 dv2  dv1 dv2 +  tof  4 →LIST »
+  »
+»

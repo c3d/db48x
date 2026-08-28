@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ νΦf — true anomaly from eccentric anomaly
+@@ ν = 2·atan(√((1+e)/(1-e))·tan(E/2)). Guarded DEG (inverse trig).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : e E   ( e E -- ν )
+@@ Output : true anomaly (°)
+@@ VALIDATION (device-confirmed):
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → eLΦ EaLΦ
+  « DEG
+    eLΦ Uval 'eLΦ' Sto  EaLΦ Uval 'EaLΦ' Sto
+    '2·ATAN(√((1+eLΦ)/(1-eLΦ))·TAN(EaLΦ_°/2))' Eval
+  »
+»

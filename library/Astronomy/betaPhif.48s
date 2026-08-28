@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ βΦf — ecliptic latitude from inclination and argument of latitude
+@@ β = asin(sin I·sin u). Guarded DEG.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : I u   ( I u -- β )
+@@ Output : ecliptic latitude (°)
+@@ VALIDATION (device-confirmed):
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → ILΦ uLΦ
+  « DEG
+    ILΦ Uval 'ILΦ' Sto  uLΦ Uval 'uLΦ' Sto
+    'ASIN(SIN(ILΦ_°)·SIN(uLΦ_°))' Eval
+  »
+»
