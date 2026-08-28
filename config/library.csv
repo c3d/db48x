@@ -141,6 +141,25 @@
         "ApparentSize", "=/library/AstroExamples/ApparentSize.48s"
         "SkyCoords", "=/library/AstroExamples/SkyCoords.48s"
 
+"Missions"
+
+"Missions/Earth To Mars & Back"
+
+"Missions/Earth To Mars & Back/Planners"
+
+	"RTPlan",	"=/library/Missions/RTPlan.48s"
+	"OppRoute",	"=/library/Missions/OppRoute.48s"
+	"RTPlanOpp",	"=/library/Missions/RTPlanOpp.48s"
+	"MarsRoundTrip",	"=/library/Missions/MarsRoundTrip.48s"
+	"MissionΔV",	"=/library/Missions/MissionDeltaV.48s"
+
+"Missions/Earth To Mars & Back/Examples"
+
+	"ETMB1",	"=/library/Missions/ETMB1.48s"
+	"ETMB2",	"=/library/Missions/ETMB2.48s"
+	"ETMB3",	"=/library/Missions/ETMB3.48s"
+	"ETMB4",	"=/library/Missions/ETMB4.48s"
+
 "Configs"
 
 	"Cst",		"=/config/constants.csv"

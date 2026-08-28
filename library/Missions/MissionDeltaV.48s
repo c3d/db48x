@@ -1,0 +1,54 @@
+«
+ 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH
+ « HFP 15 Precision
+@@ ============================================================
+@@ MissionΔV — end-to-end propulsive ΔV budget of a conjunction round trip
+@@ Takes an RTPlan itinerary { t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot }. Recomputes the two
+@@ transfer legs (TrCost) for their departure/arrival v∞, converts the space burns from
+@@ parking orbits (TrToOrbi), and adds representative atmospheric phases. Patched-conic.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : { t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot }   ( IT -- 8 tagged ΔV, km/s )
+@@ Assumptions: LEO r=6678 km, Mars orbit r=3689 km; Earth ascent 9.4, Mars EDL 0.6,
+@@   Mars ascent 4.1, Earth entry 0.0 (aerobraked) km/s. TMI/MOI/TEI computed via TrToOrbi.
+@@ VALIDATION (device-confirmed): the conjunction itinerary
+@@   { 2459055.617 2459259.801 517.558 2459777.359 2460049.376 6.31786 6.50523 12.82309 }
+@@   MissionΔV -> AscentEarth 9.4, TMI 3.81, MOI 2.07, EDL 0.6, AscentMars 4.1, TEI 2.48,
+@@   Entry 0.0, TOTAL 22.47 km/s (typical chemical Mars round trip).
+@@ ============================================================
+ → IT
+ «
+   IT 1 GET IT 2 GET IT 4 GET IT 5 GET → t1 t2 t3 t4
+   «
+     t1 t2 'Ⓛ♁Pf' 'Ⓛ♂Pf' ⓁTrCost → outL
+     «
+       t3 t4 'Ⓛ♂Pf' 'Ⓛ♁Pf' ⓁTrCost → retL
+       «
+         outL 2 GET outL 3 GET retL 2 GET → vdepO varrO vdepR
+         «
+           vdepO 1_km/s · 6678 1_km · DUP ⒸGM♁ ⓁTrToOrbi 1 GET Uval 1000 / → dvTMI
+           «
+             varrO 1_km/s · 3689 1_km · DUP ⒸGM♂ ⓁTrToOrbi 1 GET Uval 1000 / → dvMOI
+             «
+               vdepR 1_km/s · 3689 1_km · DUP ⒸGM♂ ⓁTrToOrbi 1 GET Uval 1000 / → dvTEI
+               «
+                 9.4 "1_AscentEarth" →Tag
+                 dvTMI "2_TMI" →Tag
+                 dvMOI "3_MOI" →Tag
+                 0.6 "4_EDL_Mars" →Tag
+                 4.1 "5_AscentMars" →Tag
+                 dvTEI "6_TEI" →Tag
+                 0.0 "7_EntryEarth" →Tag
+                 9.4 dvTMI + dvMOI + 0.6 + 4.1 + dvTEI + 0.0 + "8_TOTAL" →Tag
+               »
+             »
+           »
+         »
+       »
+     »
+   »
+ »
+savP Precision  IF savH THEN HFP ELSE SFP END
+ »
+»
