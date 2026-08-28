@@ -1403,10 +1403,10 @@ static const cstring basic_equations[] =
     // ------------------------------------------------------------------------
     "Rocketry", nullptr,
     // ------------------------------------------------------------------------
-    //T#*: 24 simulations, 101 equations, 75 variables, 8 figures
+    //T#*: 34 simulations (ROOT), 140 equations, 111 variables, 16 figures
     //1a.
     "Thrust",  "{ "
-    "  'F=(Q_kg/s)·(Ve_m/s)+((Pe_kPa)-(Pa_kPa))·(Ae_m↑2)' "
+    "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_kPa)-(Pa_kPa))·(Ae_m↑2)' "
     "}",
     //1b.
     "Rocket ΔV",  "{ "
@@ -1428,7 +1428,7 @@ static const cstring basic_equations[] =
     "}",
     //5.
     "Rocket Engine Specific Impulse",  "{ "
-    "  'Isp=(F_N)/((Q_kg/s)·Ⓒg)' "
+    "  'Isp=(Fnet_N)/((Q_kg/s)·Ⓒg)' "
     "}",
     //6.
     "Exhaust Nozzle Throat Parameters",  "{ "
@@ -1455,7 +1455,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♁StdAtm(H_m)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //10.
@@ -1463,7 +1463,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♁StdAtm(H_m)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //11.
@@ -1471,7 +1471,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♁StdAtm(H_m)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //12.
@@ -1479,7 +1479,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♂DayAtm(H_m)' "
+    "  'Pa=ⓁP♂DayAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //13.
@@ -1487,7 +1487,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♂DayAtm(H_m)' "
+    "  'Pa=ⓁP♂DayAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //14.
@@ -1495,7 +1495,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♂NightAtm(H_m)' "
+    "  'Pa=ⓁP♂NightAtm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //15.
@@ -1503,7 +1503,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♀Atm(H_m)' "
+    "  'Pa=ⓁP♀Atm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //16.
@@ -1511,7 +1511,7 @@ static const cstring basic_equations[] =
     "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
     "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
     "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
-    "  'Pa=P♀Atm(H_m)' "
+    "  'Pa=ⓁP♀Atm(H_m)' "
     "  'Pe=Pa_MPa' "
     "}",
     //17.
@@ -1525,7 +1525,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //18.
-    "Under Extended Conic Nozzle",  "{ "
+    "Under Extended Conic Nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1535,7 +1535,7 @@ static const cstring basic_equations[] =
     "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "}",
     //19.
-    "Over Extended Conic Nozzle",  "{ "
+    "Over Extended Conic Nozzle",  "{ "
     "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
     "  'Tt=(Tc_K)/(1+(k-1)/2)' "
     "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
@@ -1564,7 +1564,7 @@ static const cstring basic_equations[] =
     "  'ρp=1/(wAl/(ρAl_g/ml)+wAP/(ρAP_g/ml)+wHTPB/(ρHTPB_g/ml))' "
     "}",
     //23.
-    "Multi Stages Rocket ΔV",  "{ "
+    "Multi Stages Rocket ΔV",  "{ "
     "  'C1=(Isp1_s)·Ⓒg' "
     "  'C2=(Isp2_s)·Ⓒg' "
     "  'Mo1=Mp1_kg+Md1_kg+Mp2_kg+Md2_kg+Mpl_kg' "
@@ -1593,7 +1593,7 @@ static const cstring basic_equations[] =
     "  'Lnz=Li·(SQRT(ε)-1)·(Rt_cm)/tan(15_°)' "
     "}",
     //A-3.
-    "Combustion Chamber Stay Time",  "{ "
+    "Combustion Chamber Stay Time",  "{ "
     "  'V=ⒸR·(Tc_K)/((Pc_Pa)·(M_(g/mol)))' "
     "  'Vc=(Lstar_m)·(At_m↑2)' "
     "  'ts=(Vc_m↑3)/((V_m↑3/kg)·(Q_kg/s))' "
@@ -1603,12 +1603,12 @@ static const cstring basic_equations[] =
     "  'Cfx=SQRT((2·k↑2/(k-1))·(2/(k+1))↑((k+1)/(k-1))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))+((Pe_MPa)-(Pa_MPa))/(Pc_MPa)·(Ae_m↑2)/(At_m↑2)' "
     "  'Cstar=(Pc_MPa)·(At_m↑2)/(Q_kg/s)' "
     "  'Isp=(Pc_MPa)·(At_m↑2)/((Q_kg/s)·Ⓒg)·Cfx' "
-    "  'F=(Pc_MPa)·(At_m↑2)·Cfx' "
+    "  'Fnet=(Pc_MPa)·(At_m↑2)·Cfx' "
     "}",
     //B-2.
     "Total Impulse",  "{ "
     "  'It=(Isp_s)·Ⓒg·(Mp_kg)' "
-    "  'F=(It_N·s)/(Δt_s)' "
+    "  'Fnet=(It_N·s)/(Δt_s)' "
     "}",
     //B-3.
     "Vertical Ascent with Gravity Loss",  "{ "
@@ -1624,17 +1624,28 @@ static const cstring basic_equations[] =
     "  'MR=exp((ΔV1_m/s)/(C_m/s))' "
     "}",
     //C-1.
-    "Sea level vs Vacuum Thrust",  "{ "
+    "Sea level vs Vacuum Thrust",  "{ "
     "  'Fsl=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
     "  'Fvac=(Q_kg/s)·(Ve_m/s)+(Pe_MPa)·(Ae_m↑2)' "
     "  'ΔF=(Pa_MPa)·(Ae_m↑2)' "
     "}",
     //C-2.  (Earth shown; swap ⒸGM♁/ⒸReq♁ → ♂ or ♀ for Mars/Venus)
-    "Multi Planet Launch ΔV",  "{ "
+    "Multi Planet Launch ΔV",  "{ "
     "  'rorb=(ⒸReq♁)+(horb_km)' "
     "  'Vcirc=SQRT(ⒸGM♁/(rorb_km))' "
     "  'Vesc=SQRT(2·ⒸGM♁/(rorb_km))' "
     "  'gsurf=ⒸGM♁/(ⒸReq♁)↑2' "
+    "}",
+    //C-3.  (ogive nose shown; for a conical nose use 'XN=0.666·(LNose_mm)')
+    "Barrowman Method",  "{ "
+    "  'XN=0.466·(LNose_mm)' "
+    "  'CNN=2' "
+    "  'CNT=2·(((dR_mm)/(dN_mm))↑2-((dF_mm)/(dN_mm))↑2)' "
+    "  'XT=(XP_mm)+(LT_mm)/3·(1+(1-(dF_mm)/(dR_mm))/(1-((dF_mm)/(dR_mm))↑2))' "
+    "  'CNF=(1+(RB_mm)/((SFs_mm)+(RB_mm)))·(4·NF·((SFs_mm)/(dN_mm))↑2/(1+SQRT(1+(2·(LF_mm)/((CR_mm)+(CT_mm)))↑2)))' "
+    "  'XF=(XB_mm)+(XR_mm)/3·((CR_mm)+2·(CT_mm))/((CR_mm)+(CT_mm))+1/6·((CR_mm)+(CT_mm)-(CR_mm)·(CT_mm)/((CR_mm)+(CT_mm)))' "
+    "  'CNR=CNN+CNT+CNF' "
+    "  'XCP=(CNN·(XN_mm)+CNT·(XT_mm)+CNF·(XF_mm))/CNR' "
     "}",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
