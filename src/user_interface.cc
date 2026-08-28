@@ -156,7 +156,6 @@ user_interface::user_interface()
       longpress(false),
       blink(false),
       follow(false),
-      skipTopicSync(0),
       force(false),
       dirtyMenu(false),
       dirtyStack(false),
@@ -605,7 +604,6 @@ void user_interface::clear_help()
     image       = nullptr;
     impos       = 0;
     topic       = 0;
-    skipTopicSync = 0;
     follow      = false;
     last        = 0;
     longpress   = false;
@@ -3113,6 +3111,10 @@ bool user_interface::transient_object(object_p obj)
 }
 
 
+static void help_log_line_endings(cstring path);
+static void help_log_link_at(file &hf, uint pos, cstring label);
+
+
 void user_interface::load_help(utf8 topic, size_t len)
 // ----------------------------------------------------------------------------
 //   Find the help message associated with the topic
@@ -3228,6 +3230,7 @@ void user_interface::load_help(utf8 topic, size_t len)
             line = 0;
             return;
         }
+        help_log_line_endings(HELPFILE_NAME);
     }
 
     helpfile.seek(idxpos);
@@ -3905,6 +3908,39 @@ void user_interface::draw_help_access_paths(id cmd,
 }
 
 
+static void help_log_line_endings(cstring path)
+// ----------------------------------------------------------------------------
+//   Count raw CR/LF bytes in the help file (binary scan)
+// ----------------------------------------------------------------------------
+{
+    FILE *f = fopen(path, "rb");
+    if (!f)
+    {
+        record(help, "help line endings: cannot open %+s", path);
+        return;
+    }
+
+    uint cr = 0, lf = 0, crlf = 0;
+    uint size = 0;
+    int  prev = -1;
+    int  c;
+    while ((c = fgetc(f)) != EOF)
+    {
+        size++;
+        if (c == '\r')
+            cr++;
+        if (c == '\n')
+            lf++;
+        if (c == '\n' && prev == '\r')
+            crlf++;
+        prev = c;
+    }
+    fclose(f);
+    record(help, "help line endings %+s: size=%u CR=%u LF=%u CRLF=%u",
+           path, size, cr, lf, crlf);
+}
+
+
 static void help_log_link_at(file &hf, uint pos, cstring label)
 // ----------------------------------------------------------------------------
 //   Log markdown link text and anchor at a file position after '['
@@ -4036,8 +4072,6 @@ restart:
     uint    lastTopic = 0;
     uint    codeStart = 0;
     uint    shown     = 0;
-    uint    highlight = topic;
-    uint    skipDraws = skipTopicSync;
     bool    hadTitle  = false;
     id      hadCmd    = id(0);
     static char link[60];
@@ -4047,9 +4081,17 @@ restart:
     coord       table_col_w = 0;
     bool        advance_col = false;
     bool        escaped     = false;
+    uint        nlAdvance   = 0;
+    uint        nlGlyph     = 0;
+    uint        crUnexpected = 0;
 
     // Pun not indented
     helpfile.seek(help);
+
+    record(help, "draw_help scroll: help=%u line=%u topic=%u y0=%d ytop=%d "
+           "height=%u stackTop=%u",
+           help, line, topic, int(ytop + 2 - line), int(ytop), height,
+           stackTop);
 
     // Display until end of help
     while (y < ybot)
@@ -4067,11 +4109,19 @@ restart:
             if (y >= ytop)
             {
                 shown  = helpfile.position();
+                record(help, "shown set: shown=%u y=%d line=%u pos=%u",
+                       shown, int(y), line, helpfile.position());
             }
             else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H)
             {
+                uint oldHelp = help;
+                uint oldLine = line;
                 help = helpfile.position();
                 line = ytop + 2 - y;
+                record(help,
+                       "scroll adjust: help %u->%u line %u->%u y=%d pos=%u",
+                       oldHelp, help, oldLine, line, int(y),
+                       helpfile.position());
             }
         }
 
@@ -4101,6 +4151,13 @@ restart:
                 }
                 skip = last == ' ';
                 emit = style != KEY && style != CODE;
+                break;
+
+            case '\r':
+                crUnexpected++;
+                record(help, "unexpected CR in draw at pos=%u",
+                       helpfile.position() - 1);
+                skip = true;
                 break;
 
             case '\n':
@@ -4381,9 +4438,14 @@ restart:
                         if (wascode)
                         {
                             lastTopic = pos;
-                            if (highlight < shown)
-                                highlight = lastTopic;
-                            if (lastTopic == highlight)
+                            if (topic < shown)
+                            {
+                                record(help,
+                                       "topic bump code: %u -> %u shown=%u",
+                                       topic, lastTopic, shown);
+                                topic = lastTopic;
+                            }
+                            if (lastTopic == topic)
                             {
                                 restyle    = HIGHLIGHTED_CODE;
                                 codeStart  = 0;
@@ -4443,14 +4505,18 @@ restart:
                     if (helpfile.peek() != '!')
                     {
                         lastTopic      = helpfile.position();
-                        if (!skipDraws && highlight < shown)
-                            highlight  = lastTopic;
-                        if (lastTopic == highlight)
+                        if (topic < shown)
+                        {
+                            record(help, "topic bump link: %u -> %u shown=%u",
+                                   topic, lastTopic, shown);
+                            topic      = lastTopic;
+                        }
+                        if (lastTopic == topic)
                         {
                             restyle    = HIGHLIGHTED_TOPIC;
                             codeStart  = 0;
-                            record(help, "highlight start pos=%u highlight=%u",
-                                   lastTopic, highlight);
+                            record(help, "highlight start pos=%u topic=%u",
+                                   lastTopic, topic);
                         }
                         else
                         {
@@ -4497,8 +4563,10 @@ restart:
                     p[-1] = 0;
                     if (style == HIGHLIGHTED_TOPIC)
                         record(help,
-                               "highlight link pos=%u anchor=%+s follow=%u y=%d",
-                               lastTopic, link, uint(follow), int(y));
+                               "highlight link pos=%u anchor=%+s follow=%u "
+                               "y=%d help=%u line=%u shown=%u",
+                               lastTopic, link, uint(follow), int(y),
+                               help, line, shown);
                     if (follow && style == HIGHLIGHTED_TOPIC && y >= 0)
                     {
                         record(help, "follow link anchor=%+s shown=%u",
@@ -4528,6 +4596,15 @@ restart:
 
             if (!skip)
                 widx += utf8_encode(ch, buffer+widx);
+            if (ch == '\n' && !skip && widx > 0)
+            {
+                nlGlyph++;
+                uint pos = helpfile.position() - 1;
+                if (pos + 100 >= topic && pos <= topic + 300)
+                    record(help,
+                           "NL glyph pos=%u widx=%u y=%d style=%u emit=%u",
+                           pos, widx, int(y), style, emit);
+            }
             if (widx         >= sizeof(buffer) / sizeof(buffer[0]) - 3)
                 emit          = true;
             last              = ch;
@@ -4778,6 +4855,12 @@ restart:
 
         if (newline)
         {
+            nlAdvance++;
+            uint pos = helpfile.position();
+            if (pos + 100 >= topic && pos <= topic + 300)
+                record(help,
+                       "NL advance pos=%u y=%d hadTitle=%u in_table=%u",
+                       pos, int(y), hadTitle, in_table);
             if (in_table)
             {
                 table_col = 0;
@@ -4808,19 +4891,17 @@ restart:
         style = restyle;
     }
 
-    if (!skipDraws && helpfile.position() < highlight)
-        highlight = lastTopic;
+    if (helpfile.position() < topic)
+    {
+        record(help, "topic tail: %u -> %u pos=%u shown=%u",
+               topic, lastTopic, helpfile.position(), shown);
+        topic = lastTopic;
+    }
 
-    if (skipDraws)
-        highlight = topic;
-
-    if (skipTopicSync)
-        skipTopicSync--;
-    else
-        topic = highlight;
-
-    record(help, "draw_help end: topic=%u highlight=%u help=%u lastTopic=%u pos=%u skip=%u",
-           topic, highlight, help, lastTopic, helpfile.position(), skipTopicSync);
+    record(help, "draw_help end: topic=%u help=%u lastTopic=%u pos=%u "
+           "shown=%u y=%d line=%u NL advance=%u glyph=%u cr=%u",
+           topic, help, lastTopic, helpfile.position(), shown, int(y), line,
+           nlAdvance, nlGlyph, crUnexpected);
 
     Screen.clip(clip);
 
@@ -5018,7 +5099,6 @@ bool user_interface::handle_help(int &key)
     switch (key)
     {
     case KEY_F1:
-        skipTopicSync = 0;
         load_help(utf8("Overview"));
         break;
     case KEY_F2:
@@ -5029,16 +5109,20 @@ bool user_interface::handle_help(int &key)
     case KEY_SUB:
         if (line > count * height)
         {
-            skipTopicSync = 0;
             line -= count * height;
+            record(help, "UP pixel: line=%u topic=%u help=%u count=%u",
+                   line, topic, help, count);
         }
         else
         {
             line = 0;
             count++;
-            skipTopicSync = 2;
+            record(help, "UP sect: before help=%u line=%u topic=%u count=%u "
+                   "height=%u",
+                   help, line, topic, count, uint(height));
             while(count--)
             {
+                uint before = help;
                 helpfile.seek(help);
                 help = helpfile.rfind('\n');
                 unicode next = helpfile.peek();
@@ -5047,11 +5131,16 @@ bool user_interface::handle_help(int &key)
                     count++;
                     line += height;
                 }
+                record(help,
+                       "UP sect: iter help %u->%u next=%+c line=%u count=%u",
+                       before, help, next, line, count);
                 if (!help)
                     break;
             }
             if (help)
                 help = helpfile.position();
+            record(help, "UP sect: after help=%u line=%u topic=%u",
+                   help, line, topic);
         }
         repeat = true;
         dirtyHelp = true;
@@ -5063,7 +5152,6 @@ bool user_interface::handle_help(int &key)
     case KEY_DOWN:
     case KEY_2:
     case KEY_ADD:
-        skipTopicSync = 0;
         line   += count * height;
         repeat  = true;
         dirtyHelp = true;
@@ -5073,16 +5161,17 @@ bool user_interface::handle_help(int &key)
     case KEY_9:
     case KEY_DIV:
         ++count;
-        record(help, "F4: before topic=%u help=%u count=%u",
-               topic, help, count);
+        record(help, "F4: before topic=%u help=%u line=%u count=%u",
+               topic, help, line, count);
         while(count--)
         {
             helpfile.seek(topic);
             topic = helpfile.rfind('[', '`');
         }
         topic  = helpfile.position();
-        skipTopicSync = 2;
         help_log_link_at(helpfile, topic, "F4: after");
+        record(help, "F4: after help=%u line=%u topic=%u",
+               help, line, topic);
         repeat = true;
         dirtyHelp = true;
         break;
@@ -5093,20 +5182,17 @@ bool user_interface::handle_help(int &key)
         while (count--)
             helpfile.find('[', '`');
         topic  = helpfile.position();
-        skipTopicSync = 2;
         repeat = true;
         dirtyHelp = true;
         break;
 
     case KEY_ENTER:
-        skipTopicSync = 0;
         follow = true;
         dirtyHelp = true;
         break;
 
     case KEY_F6:
     case KEY_BSP:
-        skipTopicSync = 0;
         if (topicsHistory)
         {
             --topicsHistory;
@@ -5114,6 +5200,8 @@ bool user_interface::handle_help(int &key)
             {
                 help = topics[topicsHistory-1];
                 line = 0;
+                record(help, "F6 back: help=%u line=%u topic=%u history=%u",
+                       help, line, topic, topicsHistory);
                 dirtyHelp = true;
                 break;
             }

@@ -35,6 +35,7 @@
 #include "utf8.h"
 
 #include <unistd.h>
+#include <string.h>
 
 
 
@@ -296,6 +297,16 @@ unicode file::get()
     do
     {
         code = valid() ? fgetc(data) : unicode(EOF);
+        if (code == '\r')
+        {
+            if (name)
+            {
+                cstring dot = strrchr(name, '.');
+                if (dot && !strcmp(dot, ".md"))
+                    record(file, "CR skipped at %u in %+s",
+                           uint(ftell(data) - 1), name);
+            }
+        }
     } while (code == '\r');
     if (code == unicode(EOF))
         return 0;
