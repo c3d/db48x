@@ -1,0 +1,40 @@
+«
+@@ ============================================================
+@@ ρ♂DayAtm — Mars dayside density, ρ=P/(R·TM) ≤120 km + Braeunig Table 15 (-8..300 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 0.0139758 kg/m^3 ; 50_km -> 1.10534E-4 kg/m^3 ; 120_km -> 1.381966E-8 kg/m^3
+@@ ============================================================
+@Mars Day density  ρ♂DayAtm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 11-15 — https://www.braeunig.us/space/atmmodel.htm#mars
+@0-120 km ρ = P/(R·TM); 120-300 km Table 15 density polynomial (M variable)
+@Validity: -8_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 120 ≥ z 300 ≤ And
+      if then
+        z 200 <
+        if then
+          -2.55314E-10 z × 2.31927E-07 + z × -8.33206E-05 + z × 0.0151947 + z × -1.52799 + z × 48.69659 + exp
+        else
+          2.65472E-11 z × -2.45558E-08 + z × 6.31410E-06 + z × 4.73359E-04 + z × -0.443712 + z × 23.79408 + exp
+        end
+        1_kg/m^3 ×
+      else
+        z 300 >
+        if then "Z out of range -8_km < Z < 300_km" DoError
+        else
+          z 1_km × Duplicate ⓁP♂DayAtm Swap ⓁT♂DayAtm 191.181_J/(kg·K) × ÷ BaseUnits
+        end
+      end
+    »
+  »
+»

@@ -1,0 +1,50 @@
+«
+@@ ============================================================
+@@ P♀Atm — Venus pressure (single global model), Braeunig Tables 18/20 (-3..300 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 9.332E6 Pa ; 50_km -> 106176 Pa ; 200_km -> 1.89469E-7 Pa
+@@ ============================================================
+@Venus pressure  P♀Atm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 17-20 — https://www.braeunig.us/space/atmmodel.htm#venus
+@0-100 km Table 18 (geopotential h); 100-300 km Table 20 (geometric z)
+@Validity: -3_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 100 ≥ z 300 ≤ And
+      if then
+        case
+          z 140 < then 1.255723E-06 z × -5.579211E-04 + z × 0.09250745 + z × -7.058415 + z × 214.0424 + exp end
+          z 210 < then -1.884212E-09 z × 1.784462E-06 + z × -6.803835E-04 + z × 0.1308837 + z × -12.79816 + z × 499.6816 + exp end
+                       4.489586E-09 z × -4.899145E-06 + z × 0.002015526 + z × -0.4456979 + z × 25.26467 + exp
+        end
+      else
+        z 300 >
+        if then "Z out of range -3_km < Z < 300_km" DoError
+        else
+          z 6051.8 × 6051.8 z + ÷
+          → h
+          «
+            case
+              h 15.5 < then h -7.63 × 735.000 + 735.000 Swap ÷ 46.353 -7.63 ÷ ^ 9332000     × end
+              h 36.5 < then h 15.5 - -8.47 × 616.735 + 616.735 Swap ÷ 46.353 -8.47 ÷ ^ 3214540  × end
+              h 49.5 < then h 36.5 - -6.91 × 438.865 + 438.865 Swap ÷ 46.353 -6.91 ÷ ^ 499392   × end
+              h 58   < then h 49.5 - -9.72 × 349.035 + 349.035 Swap ÷ 46.353 -9.72 ÷ ^ 107458   × end
+              h 87   < then h 58 - -3.27687 × 266.415 + 266.415 Swap ÷ 46.353 -3.27687 ÷ ^ 29634.9 × end
+                           h 87 - -0.499214 × 171.386 + 171.386 Swap ÷ 46.353 -0.499214 ÷ ^ 57.7754 ×
+            end
+          »
+        end
+      end
+      1_Pa ×
+    »
+  »
+»

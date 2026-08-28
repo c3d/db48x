@@ -1,0 +1,54 @@
+«
+@@ ============================================================
+@@ P♂NightAtm — Mars nightside (Pathfinder) pressure, Braeunig Table 13; Table 15 reused >120 km
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 610.5 Pa ; 50_km -> 2.72434 Pa
+@@ ============================================================
+@Mars Night (Pathfinder) pressure  P♂NightAtm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 11-15 — https://www.braeunig.us/space/atmmodel.htm#mars
+@0-120 km Table 13 nightside (geopotential h); 120-300 km Table 15 (day model reused)
+@Validity: -8_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 120 ≥ z 300 ≤ And
+      if then
+        z 200 <
+        if then
+          -4.18520E-10 z × 3.45846E-07 + z × -1.13352E-04 + z × 0.0188613 + z × -1.71718 + z × 61.10381 + exp
+        else
+          -4.83452E-11 z × 6.96178E-08 + z × -4.03197E-05 + z × 0.0117655 + z × -1.76494 + z × 93.67154 + exp
+        end
+      else
+        z 300 >
+        if then "Z out of range -8_km < Z < 300_km" DoError
+        else
+          z 3389.51 × 3389.51 z + ÷
+          → h
+          «
+            case
+              h 8.5 < then h -2.00 × 198.00 + 198.00 Swap ÷ 19.435 -2.00 ÷ ^ 610.5     × end
+              h 16  < then h 8.5 -  1.90 × 181.00 + 181.00 Swap ÷ 19.435  1.90 ÷ ^ 255.172  × end
+              h 31  < then h 16 - -1.70 × 195.25 + 195.25 Swap ÷ 19.435 -1.70 ÷ ^ 117.537  × end
+              h 48  < then h 31 - -0.60 × 169.75 + 169.75 Swap ÷ 19.435 -0.60 ÷ ^ 23.7302  × end
+              h 59  < then h 48 - -3.65 × 159.55 + 159.55 Swap ÷ 19.435 -3.65 ÷ ^ 3.18820  × end
+              h 67  < then h 59 - -19.435 × 119.40 ÷ exp 0.681102                      × end
+              h 76  < then h 67 - -2.90 × 119.40 + 119.40 Swap ÷ 19.435 -2.90 ÷ ^ 0.185218 × end
+              h 84  < then h 76 -  4.30 × 93.30 + 93.30 Swap ÷ 19.435  4.30 ÷ ^ 0.0354632 × end
+                           h 84 - -19.435 × 127.70 ÷ exp 0.00858406 ×
+            end
+          »
+        end
+      end
+      1_Pa ×
+    »
+  »
+»

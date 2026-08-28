@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ uΦf — argument of latitude
+@@ u = ω + ν (perihelion argument plus true anomaly).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : ω ν   ( ω ν -- u )
+@@ Output : argument of latitude (°)
+@@ VALIDATION (device-confirmed):
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → ωLΦ νLΦ
+  « ωLΦ Uval 'ωLΦ' Sto  νLΦ Uval 'νLΦ' Sto
+    'ωLΦ+νLΦ' Eval
+  »
+»

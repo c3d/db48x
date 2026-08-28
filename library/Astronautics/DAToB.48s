@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ DAToB — distance between two position vectors
+@@ |A - B| reduced to au. Primitive used by DABf / T₀SD*.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : [A] [B]   ( [A] [B] -- d )
+@@ Output : distance (au)
+@@ VALIDATION (device-confirmed):
+@@   Primitive (device-confirmed via DABf).
+@@ ============================================================
+ → A B
+  «
+    A B - DUP DOT √
+    1_au ·
+  »
+»

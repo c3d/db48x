@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ VΦf — heliocentric velocity of a body (centred finite difference of a position function)
+@@ v = (Pf(JD+h) - Pf(JD-h))/(2h), h = 0.5 day. Pf is a position function.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD 'Pf'   ( JD 'Pf' -- [vx vy vz] )
+@@ Output : [vx vy vz] in au/day (1 au/day = 1731.4568 km/s)
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 '♁Pf' VΦf -> [ 0.01498469 0.00787138 -0.00000036 ]   (= 29.307 km/s)
+@@ ============================================================
+ → JD Pf « 0.5 → h
+  « JD h + Pf EVAL  JD h - Pf EVAL  -  2 h · / » » 
+»

@@ -1,0 +1,40 @@
+«
+ 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH
+ « HFP 15 Precision
+@@ ============================================================
+@@ MarsRoundTrip — compare a CONJUNCTION vs an OPPOSITION Earth⇄Mars round trip
+@@ Runs RTPlan (conjunction, 2020 window) and RTPlanOpp (opposition Venus-flyby
+@@ return, 2022 window), computes the opposition Earth-entry speed, and leaves a
+@@ tagged side-by-side comparison on the stack. Pedagogical orchestrator — then
+@@ explore your own windows with RTPlan / RTPlanOpp directly.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : (none)   ( -- Conj_years Conj_dVtot Opp_return_d Opp_TEI Opp_entry )
+@@   Conj_* : conjunction total mission (years) and total ΔV (km/s)
+@@   Opp_*  : opposition Venus-flyby return time (d), Mars-departure ΔV and Earth
+@@            entry speed (km/s) — the swing-by makes entry gentle (~5 vs ~15 km/s)
+@@ NOTE: slow (~90 s) — it chains both optimisers at AstronTXPrecision 1.
+@@ VALIDATION (device-confirmed): MarsRoundTrip ->
+@@   Conj_years:2.7208  Conj_dVtot:12.8231  Opp_return_d:290  Opp_TEI:5.9004  Opp_entry:5.4416
+@@   Conjunction 2.72 yr / 12.82 km/s ; opposition Venus return, Earth entry only 5.44 km/s.
+@@ ============================================================
+ 1 'AstronTXPrecision' STO
+ 2459030 2459075 500 ⓁRTPlan → rC «
+   2459920 2459980 ⓁRTPlanOpp → rO «
+     rC 1 GET  rC 5 GET  rC 8 GET  rO 2 GET  rO 3 GET  rO 4 GET  rO 8 GET
+     → t1c t4c dVc tvO t4O dVo tofO «
+        tvO Ⓛ♀Pf  t4O Ⓛ♁Pf  t4O tvO -  0.00029591220828559  ⓁLambertU 2 GET
+        t4O 0.5 + Ⓛ♁Pf  t4O 0.5 - Ⓛ♁Pf  -  -  DUP DOT √  1731.4568 ·  → entO «
+           t4c t1c - 365.25 /  "Conj_years"    →Tag
+           dVc                  "Conj_dVtot"    →Tag
+           tofO                 "Opp_return_d"  →Tag
+           dVo                  "Opp_TEI"       →Tag
+           entO                 "Opp_entry"     →Tag
+        »
+     »
+   »
+ »
+savP Precision  IF savH THEN HFP ELSE SFP END
+ »
+»
