@@ -11429,10 +11429,10 @@ void tests::date_operations()
 
     step("Converting from a date to a Julian day number")
         .test(CLEAR, "20250919_date", ENTER, ID_JulianDayNumber)
-        .expect("2 460 938");
+        .expect("2 460 937 ¹/₂");
     step("Converting from a Julian day number to a date")
         .test(CLEAR, "1 000 000", ENTER, ID_DateFromJulianDayNumber)
-        .expect("Tue 21/Oct/1975 BC");
+        .expect("Tue 21/Oct/1975 BC, 12:00:00");
     step("Adding invalid dates")
         .test(CLEAR, "1 2 DATE+", ENTER)
         .error("Invalid date");
