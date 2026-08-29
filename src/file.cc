@@ -387,10 +387,15 @@ uint file::rfind(unicode  cp)
         fseek(data, off, SEEK_SET);
         int raw = valid() ? fgetc(data) : EOF;
         c = raw == EOF ? 0 : unicode(raw);
-        if (c == '\r')
-            continue;
+    } while (c != cp);
+
+    if (c == '\n' && off)
+    {
+        fseek(data, off - 1, SEEK_SET);
+        if (valid() && fgetc(data) == '\r')
+            off--;
     }
-    while (c != cp);
+
 
     seek(off);
     get();
