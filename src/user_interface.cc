@@ -72,7 +72,7 @@ using std::min;
 RECORDER(user_interface,16, "ui processing");
 RECORDER(text_editor,   16, "Text editor");
 RECORDER(menus,         16, "Menu operations");
-RECORDER(help,          16, "On-line help");
+RECORDER(help,         256, "On-line help");
 RECORDER(help_search,   16, "On-line help topic search");
 RECORDER(help_trace,    16, "On-line help scroll trace");
 RECORDER(tests_ui,      16, "Test interaction with user interface");
