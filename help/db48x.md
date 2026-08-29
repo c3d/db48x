@@ -3102,9 +3102,9 @@ for the units file.
 On the command-line, constant names are prefixed with _CST_, which is a way to
 distinguish them from normal symbols.
 
-You can edit the constants catalog by recalling its content on the stack using
-`"config:equations.csv" RCL`, editing the values, and then storing the content
-back to disk using `"config:equations.csv" STO`.
+You can edit the additional constants by recalling the content of that file on
+the stack using `"config:constants.csv" RCL`, editing the values, and then
+storing the content back to disk using `"config:constants.csv" STO`.
 
 
 ## Infinite results
@@ -3200,12 +3200,14 @@ update the library content.
 
 ## Equations Library
 
-The equations library is a catalog of common equations that are stored on disk
-in the `config/equations.csv` file.
+The equations library is a catalog of common equations covering mathematics,
+physics, chemistry and computer science. Like the constants, the equations are
+built in, and additional equations can be provided by a
+`config/equations.csv` file.
 
-You can edit it by recalling its content on the stack using
-`"config:equations.csv" RCL`, editing the values, and then storing the content
-back to disk using `"config:equations.csv" STO`.
+You can edit the additional equations by recalling the content of that file on
+the stack using `"config:equations.csv" RCL`, editing the values, and then
+storing the content back to disk using `"config:equations.csv" STO`.
 # RPL Programming
 
 If you’ve used a calculator or computer before, you’re probably familiar with
