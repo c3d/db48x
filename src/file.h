@@ -67,6 +67,7 @@ struct file
     char    getchar();
     void    seek(uint offset);
     unicode peek();
+    unicode peek_skipping_cr();
     uint    position();
     uint    find(unicode cp);
     uint    find(unicode cp1, unicode cp2);
@@ -151,6 +152,23 @@ inline unicode file::peek()
     unicode result = get();
     seek(off);
     return result;
+}
+
+
+inline unicode file::peek_skipping_cr()
+// ----------------------------------------------------------------------------
+//    peek(), but if current char is CR skip it once (CRLF after rfind '\n')
+// ----------------------------------------------------------------------------
+{
+    uint    pos = position();
+    unicode c   = peek();
+    if (c == '\r')
+    {
+        get();
+        c = peek();
+        seek(pos);
+    }
+    return c;
 }
 
 
