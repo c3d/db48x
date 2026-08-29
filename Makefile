@@ -724,7 +724,7 @@ TAR_EXTRA_FILES=	   				\
 	    help/*.bmp help/*/*.bmp			\
 	    state/*.48[sSbB]				\
 	    config/*.csv config/*.48k config/*.cfg	\
-	    library/*.48[sSbB]
+	    library/*.48[sSbB] library/*/*.48[sSbB]
 
 PRINT_INSTALL=$(PRINT_COMMAND) $(INFO) "[INSTALL]" "$(NAME) => $(MOUNTPOINT)/" $(COLOR_FILTER);
 PRINT_PACKAGE=$(PRINT_COMMAND) $(INFO) "[PACKAGE]" "$(NAME)-$(VERSION)" $(COLOR_FILTER);
