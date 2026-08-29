@@ -255,6 +255,14 @@ jobs:
         path: images/bad/*.png
         if-no-files-found: ignore
 
+    - name: Upload Windows help file for debugging
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-help-windows
+        path: help/db48x.md
+        if-no-files-found: error
+
     - name: Deploy Qt dependencies
       shell: msys2 {0}
       run: |
@@ -547,6 +555,14 @@ jobs:
         name: db50x-test-images-windows
         path: color-images/bad/*.png
         if-no-files-found: ignore
+
+    - name: Upload Windows help file for debugging
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-help-windows
+        path: help/db50x.md
+        if-no-files-found: error
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
