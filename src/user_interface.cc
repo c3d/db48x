@@ -4006,7 +4006,7 @@ bool user_interface::draw_help()
 // ----------------------------------------------------------------------------
 {
 restart:
-    record(help, "draw_help entry force=%u dirty=%u stack=%u freeze=%u",
+    record(help_trace, "draw_help entry force=%u dirty=%u stack=%u freeze=%u",
            force, dirtyHelp, dirtyStack, freezeStack);
     if ((!force && !dirtyHelp && !dirtyStack) || freezeStack)
         return false;
@@ -5123,7 +5123,7 @@ bool user_interface::handle_help(int &key)
         {
             skipTopicSync = 0;
             line -= count * height;
-            record(help_trace, "UP pixel: line=%u topic=%u help=%u count=%u",
+            record(help, "UP pixel: line=%u topic=%u help=%u count=%u",
                    line, topic, help, count);
         }
         else
@@ -5145,7 +5145,7 @@ bool user_interface::handle_help(int &key)
                     count++;
                     line += height;
                 }
-                record(help_trace,
+                record(help,
                        "UP sect: iter help %u->%u next=%+c line=%u count=%u",
                        before, help, next, line, count);
                 if (!help)
