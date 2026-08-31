@@ -27,7 +27,6 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include "sim-install.h"
 #include "sim-window.h"
 
 #include "dmcp.h"
@@ -415,6 +414,8 @@ void MainWindow::resizeEvent(QResizeEvent * event)
 
 
 #ifdef ANDROID
+#include "sim-install.h"
+
 void extract_android_assets()
 // ----------------------------------------------------------------------------
 //   On Android, the online help needs to be put in assets
@@ -451,6 +452,8 @@ void extract_android_assets()
             sim_install_copy_file(assetPath, targetPath,
                                   "help/" + fileName, perms);
         }
+
+        sim_install_regenerate_help_indices(sandboxDir);
 
         settings.setValue("AssetVersion", currentAssetVersion);
     }

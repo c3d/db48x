@@ -137,6 +137,7 @@ static void copy(const QString &fromName, const QString &toName)
             }
         }
     }
+    sim_install_regenerate_help_indices(toName);
 }
 
 

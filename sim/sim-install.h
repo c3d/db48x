@@ -28,13 +28,12 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
-#include <QFileDevice>
-#include <QString>
+class QString;
 
-bool sim_install_help_file_uses_lf(const QString &relativePath);
 bool sim_install_copy_file(const QString &from,
                            const QString &to,
                            const QString &relativePath,
-                           QFileDevice::Permissions perms);
+                           unsigned     perms);
+void sim_install_regenerate_help_indices(const QString &destRoot);
 
 #endif // SIM_INSTALL_H
