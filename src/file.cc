@@ -403,6 +403,28 @@ uint file::rfind(unicode  cp)
 }
 
 
+unicode file::help_section_char()
+// ----------------------------------------------------------------------------
+//    Character starting the next line for help UP section scan (raw bytes)
+// ----------------------------------------------------------------------------
+{
+    uint pos = position();
+    int  raw = valid() ? fgetc(data) : EOF;
+    if (raw == '\r')
+    {
+        fseek(data, pos + 1, SEEK_SET);
+        raw = valid() ? fgetc(data) : EOF;
+    }
+    if (raw == '\n')
+    {
+        seek(pos);
+        return '\n';
+    }
+    seek(pos);
+    return raw == EOF ? 0 : unicode(raw);
+}
+
+
 uint file::rfind(unicode  cp1, unicode cp2)
 // ----------------------------------------------------------------------------
 //    Find a given code point in file looking backward
