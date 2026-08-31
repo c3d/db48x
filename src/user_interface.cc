@@ -5139,7 +5139,7 @@ bool user_interface::handle_help(int &key)
                 uint before = help;
                 helpfile.seek(help);
                 help = helpfile.rfind('\n');
-                unicode next = helpfile.peek_skipping_cr();
+                unicode next = helpfile.help_section_char();
                 if (next != '#')
                 {
                     count++;
