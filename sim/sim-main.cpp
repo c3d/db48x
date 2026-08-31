@@ -32,6 +32,7 @@
 #include "recorder.h"
 #include "settings.h"
 #include "sim-eval.h"
+#include "sim-install.h"
 #include "sim-rpl.h"
 #include "sim-window.h"
 #include "sysmenu.h"
@@ -131,8 +132,8 @@ static void copy(const QString &fromName, const QString &toName)
                 auto perms = fi.permissions()
                     | QFile::WriteUser | QFile::WriteOwner;
                 QFile::remove(absPath);
-                QFile::copy(fi.absoluteFilePath(), absPath);
-                QFile::setPermissions(absPath, perms);
+                sim_install_copy_file(fi.absoluteFilePath(), absPath,
+                                      relPath, perms);
             }
         }
     }

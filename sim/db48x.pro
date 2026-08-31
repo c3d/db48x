@@ -27,6 +27,7 @@ CONFIG += debug warn_off c++17
 # Qt support code (RPL engine is in libdb48x.a, built by make-it-quick)
 SOURCES +=                                      \
         sim-main.cpp                            \
+        sim-install.cpp                         \
         sim-eval.cpp                            \
         sim-window.cpp                          \
  	sim-screen.cpp                          \
@@ -98,6 +99,7 @@ SOURCES +=                                      \
         ../src/variables.cc
 
 HEADERS +=                                      \
+        sim-install.h                           \
 	sim-window.h                            \
 	sim-screen.h                            \
 	sim-rpl.h
