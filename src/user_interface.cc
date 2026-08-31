@@ -5112,6 +5112,7 @@ bool user_interface::handle_help(int &key)
     case KEY_F1:
         skipTopicSync = 0;
         load_help(utf8("Overview"));
+        topic = help;
         break;
     case KEY_F2:
         count = 8;
