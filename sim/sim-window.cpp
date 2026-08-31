@@ -27,6 +27,7 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+#include "sim-install.h"
 #include "sim-window.h"
 
 #include "dmcp.h"
@@ -445,14 +446,10 @@ void extract_android_assets()
 	    QFileInfo targetInfo(targetPath);
 	    QDir().mkpath(targetInfo.absolutePath());
 
-            QFile assetFile(assetPath);
-            if (assetFile.copy(targetPath))
-            {
-                QFile::setPermissions(targetPath,
-                                      QFileDevice::ReadOwner |
-                                          QFileDevice::WriteOwner |
-                                          QFileDevice::ReadUser);
-            }
+            auto perms = QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                | QFileDevice::ReadUser;
+            sim_install_copy_file(assetPath, targetPath,
+                                  "help/" + fileName, perms);
         }
 
         settings.setValue("AssetVersion", currentAssetVersion);
