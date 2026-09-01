@@ -3162,6 +3162,7 @@ void user_interface::load_help(utf8 topic, size_t len)
     uint       topicpos = 0;
     bool       found    = false;
     uint       idxpos   = 0;
+    char       first    = 0;
 
     // Check if the index exists. If so, scan it
     {
@@ -3215,9 +3216,9 @@ void user_interface::load_help(utf8 topic, size_t len)
             // Not found in index, quit
             if (!found)
                 goto notfound;
-            if (!isvar)
-                found = false;
-            else if (found)
+            else
+                // Index header match is authoritative; rescanning can leave
+                // the file pointer mid-section on defective platforms (Lose).
                 topicpos = idxpos;
         }
     }
@@ -3236,8 +3237,17 @@ void user_interface::load_help(utf8 topic, size_t len)
         help_log_line_endings(HELPFILE_NAME);
     }
 
-    helpfile.seek(idxpos);
-    for (char c = helpfile.getchar(); !found && c; c = helpfile.getchar())
+    if (found)
+    {
+        first = 0;
+    }
+    else
+    {
+        helpfile.seek(idxpos);
+        first = helpfile.getchar();
+    }
+
+    for (char c = first; !found && c; c = helpfile.getchar())
     {
         // Reset topic after newline
         if (hadcr)
@@ -3292,8 +3302,9 @@ void user_interface::load_help(utf8 topic, size_t len)
     {
         help = topicpos;
         line = 0;
+        helpfile.seek(help);
         record(help, "Found topic %.*s at position %u level %u",
-               int(len), topic, helpfile.position(), level);
+               int(len), topic, help, level);
 
         if (topicsHistory >= NUM_TOPICS)
         {
@@ -5113,6 +5124,7 @@ bool user_interface::handle_help(int &key)
         skipTopicSync = 0;
         load_help(utf8("Overview"));
         topic = help;
+        line  = 0;
         break;
     case KEY_F2:
         count = 8;
