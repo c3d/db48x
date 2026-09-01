@@ -203,6 +203,8 @@ void SimScreen::updatePixmap()
                         pt.setPen(qcol);
 
                         coord xx = (xw * 32 + bit) / color::BPP;
+                        if (xx >= LCD_W)
+                            continue;
                         coord yy = y;
                         s.horizontal_adjust(xx, xx);
                         s.vertical_adjust(yy, yy);
