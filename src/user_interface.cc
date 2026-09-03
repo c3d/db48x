@@ -3116,6 +3116,8 @@ bool user_interface::transient_object(object_p obj)
 
 static void help_log_line_endings(cstring path);
 static void help_log_link_at(file &hf, uint pos, cstring label);
+static void help_log_raw(cstring path, uint pos, uint before, uint after,
+                         cstring label);
 
 
 void user_interface::load_help(utf8 topic, size_t len)
@@ -3220,6 +3222,8 @@ void user_interface::load_help(utf8 topic, size_t len)
                 // Index header match is authoritative; rescanning can leave
                 // the file pointer mid-section on defective platforms (Lose).
                 topicpos = idxpos;
+                record(help, "index match %+.*s idxpos=%u",
+                        int(len), topic, idxpos);
         }
     }
 
@@ -3305,6 +3309,7 @@ void user_interface::load_help(utf8 topic, size_t len)
         helpfile.seek(help);
         record(help, "Found topic %.*s at position %u level %u",
                int(len), topic, help, level);
+        help_log_raw(HELPFILE_NAME, help, 1, 40, "load_help");
 
         if (topicsHistory >= NUM_TOPICS)
         {
@@ -3955,21 +3960,70 @@ static void help_log_line_endings(cstring path)
 }
 
 
+static void help_log_raw(cstring path, uint pos, uint before, uint after,
+                         cstring label)
+// ----------------------------------------------------------------------------
+//   Log raw bytes around a file offset (binary read, independent of helpfile)
+// ----------------------------------------------------------------------------
+{
+    FILE *f = fopen(path, "rb");
+    if (!f)
+    {
+        record(help, "%+s pos=%u (cannot open %+s)", label, pos, path);
+        return;
+    }
+
+    uint start = pos >= before ? pos - before : 0;
+    if (fseek(f, long(start), SEEK_SET))
+    {
+        fclose(f);
+        record(help, "%+s pos=%u (seek fail start=%u)", label, pos, start);
+        return;
+    }
+
+    char show[48];
+    char hex[4 * 12 + 1];
+    uint n   = 0;
+    uint hn  = 0;
+    uint mark = pos - start;
+    while (n < before + after && n < sizeof(show) - 1)
+    {
+        int c = fgetc(f);
+        if (c == EOF)
+            break;
+        show[n] = (c >= 32 && c < 127) ? char(c) : '.';
+        if (n >= mark - 1 && hn / 3 < 12)
+            hn += snprintf(hex + hn, sizeof(hex) - hn, "%02x ", c);
+        n++;
+    }
+    show[n] = 0;
+    if (hn && hex[hn - 1] == ' ')
+        hex[hn - 1] = 0;
+    record(help, "%+s pos=%u text=[%+s] hex=[%+s]", label, pos, show, hex);
+    fclose(f);
+}
+
+
 static void help_log_link_at(file &hf, uint pos, cstring label)
 // ----------------------------------------------------------------------------
 //   Log markdown link text and anchor at a file position after '['
 // ----------------------------------------------------------------------------
 {
-    if (!hf.valid() || !pos)
+    if (!pos)
     {
         record(help, "%+s pos=%u (invalid)", label, pos);
         return;
     }
 
+    help_log_raw(hf.filename(), pos, 4, 32, label);
+
+    if (!hf.valid())
+        return;
+
     hf.seek(pos - 1);
     if (hf.getchar() != '[')
     {
-        record(help, "%+s pos=%u (no '[')", label, pos);
+        record(help, "%+s pos=%u (no '[' after seek)", label, pos);
         return;
     }
 
@@ -3984,7 +4038,6 @@ static void help_log_link_at(file &hf, uint pos, cstring label)
     }
     *p = 0;
 
-    p = anchor;
     c = hf.get();
     if (c != '(')
     {
@@ -3998,14 +4051,11 @@ static void help_log_link_at(file &hf, uint pos, cstring label)
         c = hf.get();
         if (c != '#')
         {
-            if (ap < anchor + sizeof(anchor))
-                *ap++ = c;
+            if (ap < anchor + sizeof(anchor) - 1)
+                *ap++ = char(c);
         }
     }
-    if (ap > anchor)
-        ap[-1] = 0;
-    else
-        *ap = 0;
+    *ap = 0;
 
     record(help, "%+s pos=%u text=%+s anchor=%+s", label, pos, text, anchor);
 }
@@ -4103,6 +4153,7 @@ restart:
 
     // Pun not indented
     helpfile.seek(help);
+    help_log_raw(HELPFILE_NAME, help, 1, 40, "draw_help seek");
 
     record(help_trace, "draw_help scroll: help=%u line=%u topic=%u y0=%d ytop=%d "
            "height=%u stackTop=%u",
@@ -4587,9 +4638,11 @@ restart:
                     {
                         record(help, "follow link anchor=%+s shown=%u",
                                link, shown);
+                        help_log_raw(HELPFILE_NAME, help, 1, 20, "before follow");
                         if (topicsHistory)
                             topics[topicsHistory-1] = shown;
                         load_help(utf8(link));
+                        help_log_raw(HELPFILE_NAME, help, 1, 40, "after follow");
                         Screen.clip(clip);
                         goto restart;
                     }
@@ -4929,6 +4982,7 @@ restart:
 
     if (follow && codeStart)
     {
+        help_log_raw(HELPFILE_NAME, codeStart, 0, 24, "codeStart");
         helpfile.seek(codeStart);
         uint codeEnd = 0;
         uint markers = 0;
@@ -5191,10 +5245,14 @@ bool user_interface::handle_help(int &key)
         ++count;
         record(help, "F4: before topic=%u help=%u line=%u count=%u",
                topic, help, line, count);
+        help_log_raw(HELPFILE_NAME, topic, 4, 24, "F4: before");
         while(count--)
         {
             helpfile.seek(topic);
+            uint before = topic;
             topic = helpfile.rfind('[', '`');
+            record(help, "F4: rfind off=%u pos=%u (from %u)",
+                   topic, helpfile.position(), before);
         }
         topic  = helpfile.position();
         skipTopicSync = 2;
