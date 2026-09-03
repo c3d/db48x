@@ -377,8 +377,9 @@ uint file::rfind(unicode  cp)
 // ----------------------------------------------------------------------------
 //    Return position right before code point, position file right after it
 {
-    uint    off = ftell(data);
-    unicode c   = 0;
+    uint    from = ftell(data);
+    uint    off  = from;
+    unicode c    = 0;
     do
     {
         if (off == 0)
@@ -396,6 +397,7 @@ uint file::rfind(unicode  cp)
             off--;
     }
 
+    record(file, "rfind %+c from=%u off=%u", cp, from, off);
 
     seek(off);
     get();
@@ -431,9 +433,10 @@ uint file::rfind(unicode  cp1, unicode cp2)
 // ----------------------------------------------------------------------------
 //    Return position right before code point, position file right after it
 {
-    uint    off = ftell(data);
-    unicode c   = 0;
-    bool    in  = false;
+    uint    from = ftell(data);
+    uint    off  = from;
+    unicode c    = 0;
+    bool    in   = false;
     do
     {
         if (off == 0)
@@ -448,6 +451,9 @@ uint file::rfind(unicode  cp1, unicode cp2)
             in = !in;
     }
     while (c && (in || c != cp1));
+
+    record(file, "rfind %+c%+c from=%u off=%u in=%u",
+           cp1, cp2, from, off, uint(in));
 
     seek(off);
     get();

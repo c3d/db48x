@@ -245,7 +245,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db48x.exe -H -I -w 25000 -r 100 -D help -Tall
+      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
 
     - name: Upload failed test images
       if: always()
@@ -546,7 +546,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
-      run: ./db50x.exe -H -I -w 25000 -r 100 -D help -Tall
+      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
 
     - name: Upload failed test images
       if: always()
