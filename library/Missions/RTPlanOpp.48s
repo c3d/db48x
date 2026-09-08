@@ -1,0 +1,51 @@
+«
+@@ ============================================================
+@@ RTPlanOpp — best Venus-flyby Mars→Earth return over a Mars-departure window
+@@ Two-stage search (coarse grid → local refine) over (t3, Venus flyby, Earth arrival),
+@@ minimising a combined cost  P = matchErr + 0.1·max(0, turnReq − turnMax)  so it
+@@ favours a ballistic (matchErr→0) AND turn-feasible (turnReq ≤ turnMax) swing-by.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t3lo t3hi   ( t3lo t3hi -- { t3 tv t4 ΔVTEI matchErr turnReq turnMax tof } )
+@@   t3lo t3hi : Mars-departure search window (JD). Keep it narrow (~60 d) — slow.
+@@ Output : the best return itinerary. Feasible ⇔ matchErr≈0 AND turnReq ≤ turnMax.
+@@ VALIDATION (device-confirmed): 2459920 2459980 RTPlanOpp ->
+@@   { 2459930 2460150 2460220  5.90 0.00084 30.93° 49.72° 290 }  (Mars dep 2022-12-16,
+@@   Venus 2023-07-24, Earth 2023-10-02; near-ballistic matchErr<1 m/s, turnReq ≤ turnMax ✓).
+@@ ============================================================
+ → t3lo t3hi
+ « 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH « HFP 15 Precision 1000000 'zzP' STO  0 'zzt3' STO  0 'zztv' STO  0 'zzt4' STO
+   t3lo t3hi FOR t3
+     130 290 FOR d1
+       60 200 FOR d2
+         t3  t3 d1 +  t3 d1 + d2 +  ⓁOppRoute
+         → R
+         « R 2 GET  R 3 GET Uval R 4 GET Uval - 0 MAX 0.1 · +
+           → P
+           « P zzP <
+             « P 'zzP' STO  t3 'zzt3' STO  t3 d1 + 'zztv' STO  t3 d1 + d2 + 'zzt4' STO » IFT »
+         »
+       35 STEP
+     40 STEP
+   25 STEP
+   zzt3 zztv zzt4
+   → b3 bv b4
+   « b3 15 - b3 15 + FOR t3
+       bv 15 - bv 15 + FOR tv
+         b4 15 - b4 15 + FOR t4
+           t3 tv t4 ⓁOppRoute
+           → R
+           « R 2 GET  R 3 GET Uval R 4 GET Uval - 0 MAX 0.1 · +
+             → P
+             « P zzP <
+               « P 'zzP' STO  t3 'zzt3' STO  tv 'zztv' STO  t4 'zzt4' STO » IFT »
+           »
+         5 STEP
+       5 STEP
+     5 STEP
+   »
+   zzt3 zztv zzt4 3 →List   zzt3 zztv zzt4 ⓁOppRoute  +
+   savP Precision  IF savH THEN HFP ELSE SFP END »
+ »
+»

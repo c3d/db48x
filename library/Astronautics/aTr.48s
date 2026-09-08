@@ -1,0 +1,25 @@
+«
+@@ ============================================================
+@@ aTr — semi-major axis of the transfer between two dates
+@@ Vis-viva on the LambertU solution. Used by MinΔDTraj.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t₁ t₂ 'Af' 'Bf'   ( t₁ t₂ 'Af' 'Bf' -- a )
+@@ Output : semi-major axis (au)
+@@ VALIDATION (device-confirmed):
+@@   2459054 2459282 '♁Pf' '♂Pf' aTr -> 1.31743
+@@ ============================================================
+ → t1 t2 Af Bf
+  « 0 0 0 0 0 0 → rA rB vt tof rmag vmag
+    «
+      t1 Af EVAL 'rA' STO
+      t2 Bf EVAL 'rB' STO
+      t2 t1 - 'tof' STO
+      rA rB tof 0.00029591220828559 ⓁLambertU 'vt' STO
+      rA DUP DOT √ 'rmag' STO
+      vt 1 GET DUP DOT √ 'vmag' STO
+      '1/(2/rmag-vmag^2/0.00029591220828559)' EVAL
+    »
+  »
+»

@@ -1,0 +1,45 @@
+«
+@@ ============================================================
+@@ LambertU — Lambert solver, universal variable (robust, replaces p-iteration)
+@@ Handles ellipse/parabola/hyperbola incl. near-180°. Secant on z with Stumpff. DEG.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : [r₁] [r₂] dt μ   ( [r₁] [r₂] dt μ -- { [v₁] [v₂] } )
+@@ Output : { [v₁] [v₂] } terminal velocity vectors
+@@ VALIDATION (device-confirmed):
+@@   [ 5000 10000 2100 ] [ -14600 2500 7000 ] 3600 398600 LambertU
+@@     -> { [ -5.99249 1.92536 3.24564 ] [ -3.31246 -4.19662 -0.38529 ] }   (Curtis Ex. 5.2)
+@@ ============================================================
+ → r1v r2v dt μ
+  « DEG
+    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    → r1 r2 cosd dth Aa z1 z2 zn dz F1 F2 it cz sz y fco gg gdo
+    «
+      r1v DUP DOT √ 'r1' STO
+      r2v DUP DOT √ 'r2' STO
+      r1v r2v DOT  r1 r2 · /  'cosd' STO
+      'ACOS(cosd)' EVAL Uval 'dth' STO
+      r1v 1 GET r2v 2 GET ·  r1v 2 GET r2v 1 GET ·  -
+      0 <  « 360 dth - 'dth' STO »  IFT
+      'SIN(dth_°)·√(r1·r2/(1-COS(dth_°)))' EVAL 'Aa' STO
+      0 'z1' STO  1 'z2' STO
+      z1 r1 r2 Aa μ dt ⓁLamUF 'F1' STO
+      z2 r1 r2 Aa μ dt ⓁLamUF 'F2' STO
+      0 'it' STO
+      DO
+        'z2-F2·(z2-z1)/(F2-F1)' EVAL 'zn' STO
+        zn z2 - ABS 'dz' STO
+        z2 'z1' STO  F2 'F1' STO  zn 'z2' STO
+        z2 r1 r2 Aa μ dt ⓁLamUF 'F2' STO
+        'it+1' EVAL 'it' STO
+      UNTIL  dz 0.0000001 <  it 30 ≥  OR  END
+      z2 ⓁStumpC 'cz' STO  z2 ⓁStumpS 'sz' STO
+      'r1+r2+Aa·(z2·sz-1)/√(cz)' EVAL 'y' STO
+      '1-y/r1' EVAL 'fco' STO  'Aa·√(y/μ)' EVAL 'gg' STO  '1-y/r2' EVAL 'gdo' STO
+      r2v  fco r1v ·  -  gg /
+      gdo r2v ·  r1v  -  gg /
+      2 →LIST
+    »
+  »
+»

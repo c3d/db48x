@@ -1,0 +1,21 @@
+«
+@@ ============================================================
+@@ λΦf — ecliptic longitude from node, inclination, argument of latitude
+@@ λ = Ω + atan2(cos I·sin u, cos u). Built with R→C ARG. Guarded DEG.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Ω I u   ( Ω I u -- λ )
+@@ Output : ecliptic longitude (°)
+@@ VALIDATION (device-confirmed):
+@@   0.461280 -0.887253 R→C ARG -> -62.530° (internal diagnostic).
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → ΩLΦ ILΦ uLΦ
+  « DEG
+    uLΦ Uval COS
+    ILΦ Uval COS  uLΦ Uval SIN  ×
+    R→C ARG
+    ΩLΦ Uval 1_° × +
+  »
+»

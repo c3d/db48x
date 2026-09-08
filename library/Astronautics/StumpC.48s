@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ StumpC — Stumpff function C(z) (three regimes)
+@@ C(z) for z>0 / z<0 / z≈0. Radian argument converted to degrees for DEG mode.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : z   ( z -- C(z) )
+@@ Output : scalar
+@@ VALIDATION (device-confirmed):
+@@   1.539854 StumpC -> 0.439044
+@@ ============================================================
+ → z « IF z 0.000001 > THEN '(1-COS(√(z)·180/→Num(Ⓒπ)))/z' EVAL
+    ELSE IF z -0.000001 < THEN '(COSH(√(-z))-1)/(-z)' EVAL ELSE 0.5 END END » 
+»

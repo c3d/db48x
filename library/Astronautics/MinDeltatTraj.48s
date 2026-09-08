@@ -1,0 +1,30 @@
+«
+@@ ============================================================
+@@ MinΔtTraj — fastest transfer under a ΔV budget
+@@ Bisection: smallest flight time whose TrCost stays within budget.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t₁ 'Af' 'Bf' budget tof_lo tof_hi   ( t₁ 'Af' 'Bf' budget tof_lo tof_hi -- { tof ΔV } )
+@@ Output : { tof ΔV }
+@@ VALIDATION (device-confirmed):
+@@   1 'AstronTXPrecision' STO
+@@   2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 7 150 205 MinΔtTraj -> { 173.63 6.990 }   (7 km/s budget)
+@@ ============================================================
+ → t1 Af Bf budget toflo tofhi
+  « 0 0 0 0 0 → lo hi mid dvm niter
+    «
+      '3·AstronTXPrecision+3' EVAL 'niter' STO
+      toflo →Num 'lo' STO  tofhi →Num 'hi' STO
+      1 niter START
+        'lo+(hi-lo)/2' EVAL 'mid' STO
+        t1  t1 mid +  Af Bf ⓁTrCost 1 GET 'dvm' STO
+        IF dvm budget > THEN mid 'lo' STO ELSE mid 'hi' STO END
+      NEXT
+      'lo+(hi-lo)/2' EVAL 'mid' STO
+      mid
+      t1  t1 mid +  Af Bf ⓁTrCost 1 GET
+      2 →LIST
+    »
+  »
+»
