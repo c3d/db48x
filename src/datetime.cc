@@ -204,6 +204,11 @@ algebraic_p julian_day_number(const dt_t &dt, const tm_t &tm)
     ularge csecs = (tm.hour * 3600 + tm.min * 60 + tm.sec) * 100 + tm.csec;
     ularge jval = julian_day_number(dt.day, dt.month, dt.year);
     algebraic_g jdn = integer::make(jval);
+    // Julian day numbers are referenced to NOON (a Julian date rolls over at
+    // 12:00 UT), whereas csecs is counted from midnight. Shift by -1/2 day so
+    // the returned value is the astronomical Julian Date (JD).
+    algebraic_g half = +fraction::make(integer::make(1), +integer::make(2));
+    jdn = jdn - half;
     if (csecs)
     {
         algebraic_g frac = +fraction::make(integer::make(csecs),
@@ -262,6 +267,10 @@ algebraic_p date_from_julian_day(object_p jdn, bool error)
 
     if (algebraic_g jval = jdn->as_real())
     {
+        // Undo the -1/2 day noon offset applied by julian_day_number() before
+        // splitting into the noon-based integer day and the time-of-day part.
+        algebraic_g half = +fraction::make(integer::make(1), +integer::make(2));
+        jval = jval + half;
         large jdn = jval->as_int64(0, error);
 
         enum
