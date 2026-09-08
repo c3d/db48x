@@ -1,0 +1,52 @@
+«
+@@ ============================================================
+@@ T♀Atm — Venus temperature (single global model), Braeunig Tables 17/20 (-3..300 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 735.000 K ; 50_km -> 348.157 K ; 100_km -> 161.860 K ; 300_km -> 208.210 K
+@@ ============================================================
+@Venus temperature  T♀Atm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 17-20 — https://www.braeunig.us/space/atmmodel.htm#venus
+@0-100 km Table 17/18 (geopotential h); 100-300 km Table 20 (geometric z)
+@Validity: -3_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 100 ≥ z 300 ≤ And
+      if then
+        @ Table 20 : geometric-altitude polynomials ÷ exponential
+        case
+          z 115 < then -0.00504 z × 1.6112 + z × -171.678 + z × 6257.66 + end
+          z 135 < then 0.00001733333 z × -0.007826667 + z × 1.375967 + z × -112.72633 + z × 3795.74 + end
+          z 150 < then -0.00472 z × 1.9952 + z × -278.41 + z × 12991.22 + end
+                       z 150 - 6201.8 × 6051.8 z + ÷ -0.106428 × exp 16.49 × 208.21 Swap -
+        end
+      else
+        z 300 >
+        if then "Z out of range -3_km < Z < 300_km" DoError
+        else
+          z 6051.8 × 6051.8 z + ÷
+          → h
+          «
+            case
+              h 15.5 < then h -7.63 × 735.000 +          end
+              h 36.5 < then h 15.5 - -8.47 × 616.735 +   end
+              h 49.5 < then h 36.5 - -6.91 × 438.865 +   end
+              h 58   < then h 49.5 - -9.72 × 349.035 +   end
+              h 87   < then h 58 - -3.27687 × 266.415 +  end
+                           h 87 - -0.499214 × 171.386 +
+            end
+          »
+        end
+      end
+      1_K ×
+    »
+  »
+»

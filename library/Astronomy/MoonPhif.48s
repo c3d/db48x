@@ -1,0 +1,20 @@
+«
+@@ ============================================================
+@@ ☾Φf — Moon mean geocentric orbital elements (from Meeus; ~1-2° in position)
+@@ a in au (~384400 km); e,I constant; L,ϖ,Ω at their own rates (node 18.6 yr, perigee 8.85 yr).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2451545 ☾Φf -> [ 0.0025696 0.0549006 5.145396 218.3164477 83.3530513 125.0443527 ]
+@@ ============================================================
+ → JD « JD Uval 2451545 - 36525 / → T
+  «
+    0.0025696  0.0549006  5.145396
+    '218.3164477+481267.88123421·T' EVAL
+    '83.3530513+4069.0137287·T' EVAL
+    '125.0443527-1934.1362911·T' EVAL
+    6 →ARRY » » 
+»

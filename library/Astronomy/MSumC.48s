@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ MSumC — Σ c·cos(row·av) over a Meeus term table (helper for ☾Pos)
+@@ Cosine companion of MSumS (used for the Moon distance term).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : av tbl   ( av tbl -- Σ )
+@@ Output : scalar sum
+@@ VALIDATION (device-confirmed):
+@@   Internal helper of ☾Pos (device-confirmed in chain).
+@@ ============================================================
+ → av tbl « 0 → acc
+  « 1 tbl SIZE FOR i  acc  tbl i GET DUP 1 GET SWAP av DOT COS ·  +  'acc' STO  NEXT  acc » » 
+»

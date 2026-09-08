@@ -1,0 +1,50 @@
+«
+@@ ============================================================
+@@ T♂DayAtm — Mars dayside (Viking) temperature, Braeunig Tables 11/13/15 (-8..300 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   0_m -> 228.50 K ; 50_km -> 155.308 K ; 120_km -> 127.775 K
+@@ ============================================================
+@Mars Day (Viking) temperature  T♂DayAtm(Z); Z geometric altitude
+@Source: R. Braeunig, "Atmospheric Modeling", Tables 11-15 — https://www.braeunig.us/space/atmmodel.htm#mars
+@0-120 km Tables 11/13 dayside (geopotential h); 120-300 km Table 15
+@Validity: -8_km ≤ Z ≤ 300_km
+  → Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue 1000 ÷
+    → z
+    «
+      z 120 ≥ z 300 ≤ And
+      if then
+        @ Table 15 : T = 200 - 72.225·exp(-0.0195·ξ),  ξ=(z-120)·3509.51/(3389.51+z)
+        z 120 - 3509.51 × 3389.51 z + ÷ -0.0195 × exp 72.225 × 200 Swap -
+      else
+        z 300 >
+        if then "Z out of range -8_km < Z < 300_km" DoError
+        else
+          z 3389.51 × 3389.51 z + ÷
+          → h
+          «
+            case
+              h 39  < then h -1.80 × 228.50 +      end
+              h 48  < then 158.30                  end
+              h 55  < then h 48 - -2.35 × 158.30 + end
+              h 66  < then h 55 -  0.65 × 141.85 + end
+              h 75  < then h 66 - -2.50 × 149.00 + end
+              h 84  < then h 75 -  2.50 × 126.50 + end
+              h 95  < then 149.00                  end
+              h 105 < then h 95 - -1.40 × 149.00 + end
+                           h 105 - -0.65 × 135.00 +
+            end
+          »
+        end
+      end
+      1_K ×
+    »
+  »
+»

@@ -1,0 +1,23 @@
+«
+@@ ============================================================
+@@ BiElliptic — three-impulse bi-elliptic transfer (intermediate apoapsis r_b)
+@@ Universal by μ. Beats Hohmann for very large radius ratios.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : r₁ r₂ r_b μ   ( r₁ r₂ r_b μ -- { ΔV₁ ΔV₂ ΔV₃ ΔVtot tof } )
+@@ Output : { ΔV₁ ΔV₂ ΔV₃ ΔVtot tof }
+@@ VALIDATION (device-confirmed):
+@@   6678_km 42164_km 200000_km ⒸGM♁ BiElliptic -> { 3022.18_m/s 474.20_m/s 876.94_m/s 4373.32_m/s 374954_s }
+@@ ============================================================
+ → r1 r2 rb μ
+  «
+    r1 UBASE Uval 'r1' STO  r2 UBASE Uval 'r2' STO  rb UBASE Uval 'rb' STO  μ UBASE Uval 'μ' STO
+    '√(2·μ·rb/(r1·(r1+rb)))-√(μ/r1)' EVAL  1_m/s ·
+    '√(2·μ·r2/(rb·(r2+rb)))-√(2·μ·r1/(rb·(r1+rb)))' EVAL  1_m/s ·
+    '√(2·μ·rb/(r2·(r2+rb)))-√(μ/r2)' EVAL  1_m/s ·
+    '→Num(Ⓒπ)·(√((r1+rb)^3/(8·μ))+√((r2+rb)^3/(8·μ)))' EVAL  1_s ·
+    → dv1 dv2 dv3 tof
+    « dv1 dv2 dv3  dv1 dv2 + dv3 +  tof  5 →LIST »
+  »
+»
