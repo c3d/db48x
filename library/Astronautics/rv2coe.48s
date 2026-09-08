@@ -1,0 +1,39 @@
+«
+@@ ============================================================
+@@ rv2coe — state vector to classical orbital elements
+@@ Curtis Algorithm 4.2. Local variables. Guards DEG (angles in degrees).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : [r] [v] μ   ( [r] [v] μ -- { a e i Ω ω ν } )
+@@ Output : { a e i Ω ω ν }
+@@ VALIDATION (device-confirmed):
+@@   [-6045 -3490 2500] [-3.457 6.618 2.533] 398600 rv2coe
+@@     -> { 8788.10 0.17121 153.249 255.279 20.068 28.446 }   (Curtis Ex. 4.3)
+@@ ============================================================
+ → rv vv μ
+  « 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    → rmag vmag vrad hvec hmag incl nvec nmag Omg evec emag wp nuA sma
+    «
+      DEG
+      rv DUP DOT √ 'rmag' STO
+      vv DUP DOT √ 'vmag' STO
+      rv vv DOT rmag / 'vrad' STO
+      rv vv CROSS 'hvec' STO
+      hvec DUP DOT √ 'hmag' STO
+      hvec 3 GET hmag / ACOS Uval 'incl' STO
+      hvec 2 GET NEG  hvec 1 GET  0  3 →ARRY 'nvec' STO
+      nvec DUP DOT √ 'nmag' STO
+      nvec 1 GET nmag / ACOS Uval 'Omg' STO
+      nvec 2 GET 0 <  « 360 Omg - 'Omg' STO »  IFT
+      '(vmag^2-μ/rmag)' EVAL rv ·  rv vv DOT vv ·  -  μ /  'evec' STO
+      evec DUP DOT √ 'emag' STO
+      nvec evec DOT  nmag emag · /  ACOS Uval 'wp' STO
+      evec 3 GET 0 <  « 360 wp - 'wp' STO »  IFT
+      evec rv DOT  emag rmag · /  ACOS Uval 'nuA' STO
+      vrad 0 <  « 360 nuA - 'nuA' STO »  IFT
+      '1/(2/rmag-vmag^2/μ)' EVAL 'sma' STO
+      sma emag incl Omg wp nuA  6 →LIST
+    »
+  »
+»

@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ rΦf — heliocentric distance from eccentric anomaly
+@@ r = a·(1 - e·cos(E)). Mode-independent.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : a e E   ( a e E -- r )
+@@ Output : radius (au)
+@@ VALIDATION (device-confirmed):
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → aLΦ eLΦ EaLΦ
+  « aLΦ Uval 'aLΦ' Sto  eLΦ Uval 'eLΦ' Sto  EaLΦ Uval 'EaLΦ' Sto
+    'aLΦ·(1-eLΦ·COS(EaLΦ_°))' Eval
+  »
+»

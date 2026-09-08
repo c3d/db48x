@@ -1,0 +1,59 @@
+«
+@@ ============================================================
+@@ ApparentSize — apparent (angular) diameter of a planet, in arcseconds
+@@ Editable AstroExamples entry, companion of LightTime / Elongation.
+@@ Type 1-7 (or 0 to quit), ENTER, then =. Angular diameter 2·R/d (small-angle,
+@@ exact to <1e-8 arcsec for planets): planet radius ⒸReq… over Earth-to-planet
+@@ distance (DAToB), in arcseconds. Displays it and leaves Target/arcsec tagged.
+@@ NB: local is named diam, NOT arcsec (which is the built-in arcsecant sec⁻¹).
+@@ An invitation to build your own RPL program from the astronomy library.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  DEPTH → d0
+  «
+    CLLCD
+    "  Apparent size of a planet" 1 DISP
+    "1 Mercury  2 Venus  3 Mars" 3 DISP
+    "4 Jupiter  5 Saturn" 4 DISP
+    "6 Uranus   7 Neptune" 5 DISP
+    "0 = Quit" 6 DISP
+    "Pick, ENTER, then =" 7 DISP
+    HALT
+    IF DEPTH d0 > THEN
+      → n
+      «
+        IF n 0 ≠ THEN
+          IF n 1 ≥ n 7 ≤ AND THEN
+            DateTime JDN → jd
+            «
+              jd Ⓛ♁Pf jd { 'Ⓛ☿Φf' 'Ⓛ♀Φf' 'Ⓛ♂Φf' 'Ⓛ♃Φf' 'Ⓛ♄Φf' 'Ⓛ⛢Φf' 'Ⓛ♆Φf' } n GET EVAL ⓁPosΦf ⓁDAToB 1_km CONVERT → dist
+              «
+                { ⒸReq☿ ⒸReq♀ ⒸReq♂ ⒸReq♃ ⒸReq♄ ⒸReq⛢ ⒸReq♆ } n GET →Num dist / 2 · 206264.806 · → diam
+                «
+                  { "Mercury" "Venus" "Mars" "Jupiter" "Saturn" "Uranus" "Neptune" } n GET → name
+                  «
+                    CLLCD
+                    "Target: " name + 1 DISP
+                    "Apparent diameter:" 3 DISP
+                    "  " diam →Str + " arcsec" + 4 DISP
+                    "Press any key" 7 DISP
+                    -1 WAIT DROP
+                    name "Target" →Tag
+                    diam "arcsec" →Tag
+                  »
+                »
+              »
+            »
+          ELSE
+            CLLCD
+            "Invalid choice." 3 DISP
+            "Enter 1-7, or 0 to quit." 4 DISP
+            "Press any key" 6 DISP
+            -1 WAIT DROP
+          END
+        END
+      »
+    END
+  »
+»

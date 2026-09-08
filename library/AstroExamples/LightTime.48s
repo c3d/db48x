@@ -1,0 +1,63 @@
+«
+@@ ============================================================
+@@ LightTime — One-Way Light Time (OWLT) & Round-Trip Time (RTT) to a planet
+@@ Editable Function-Library example (Jean Wilson's OWLT/RTT idea).
+@@ Type 1-7 (or 0 to quit), ENTER to push it, then = to run. Computes today's
+@@ Earth-to-target distance with DAToB, then OWLT = d/c and RTT = 2·d/c. Displays
+@@ them and also leaves them tagged on the stack (Target/Distance/OWLT/RTT).
+@@ An invitation to build your own RPL program from the astronomy library.
+@@ To extend: add a label, an element function 'Ⓛ…Φf', and a table row.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  DEPTH → d0
+  «
+    CLLCD
+    "   OWLT / RTT to a planet" 1 DISP
+    "1 Mercury  2 Venus  3 Mars" 3 DISP
+    "4 Jupiter  5 Saturn" 4 DISP
+    "6 Uranus   7 Neptune" 5 DISP
+    "0 = Quit" 6 DISP
+    "Pick, ENTER, then =" 7 DISP
+    HALT
+    IF DEPTH d0 > THEN
+      → n
+      «
+        IF n 0 ≠ THEN
+          IF n 1 ≥ n 7 ≤ AND THEN
+            DateTime JDN → jd
+            «
+              jd Ⓛ♁Pf
+              jd { 'Ⓛ☿Φf' 'Ⓛ♀Φf' 'Ⓛ♂Φf' 'Ⓛ♃Φf' 'Ⓛ♄Φf' 'Ⓛ⛢Φf' 'Ⓛ♆Φf' } n GET EVAL ⓁPosΦf
+              ⓁDAToB
+              DUP Ⓒc / 1_min CONVERT
+              → d owlt
+              «
+                { "Mercury" "Venus" "Mars" "Jupiter" "Saturn" "Uranus" "Neptune" } n GET → name
+                «
+                  CLLCD
+                  "Target: " name + 1 DISP
+                  "Distance: " d + 3 DISP
+                  "OWLT = " owlt + 5 DISP
+                  "RTT  = " owlt 2 · + 6 DISP
+                  "Press any key" 7 DISP
+                  -1 WAIT DROP
+                  name "Target" →Tag
+                  d "Distance" →Tag
+                  owlt "OWLT" →Tag
+                  owlt 2 · "RTT" →Tag
+                »
+              »
+            »
+          ELSE
+            CLLCD
+            "Invalid choice." 3 DISP
+            "Enter 1-7, or 0 to quit." 4 DISP
+            "Press any key" 6 DISP
+            -1 WAIT DROP
+          END
+        END
+      »
+    END
+  »
+»

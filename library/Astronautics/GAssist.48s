@@ -1,0 +1,27 @@
+«
+@@ ============================================================
+@@ GAssist — gravity-assist (swing-by): deflection & free ΔV, patched-conic
+@@ In the planet frame v∞ keeps its magnitude and turns by δ, sin(δ/2)=1/e, e=1+rp·v∞²/μ.
+@@ Free Δv = 2·v∞/e (exact, no trig), maximal near v∞ ≈ √(μ/rp).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : v∞ r_p μ   ( v∞ r_p μ -- { δ Δv e } )
+@@ Output : { δ Δv e } — deflection (°), free Δv (m/s), hyperbola e
+@@ VALIDATION (device-confirmed):
+@@   5_km/s 3500_km ⒸGM♂ GAssist -> { 38.36995_° 3286.18964_m/s 3.04304 }
+@@   13.973_km/s 3500_km ⒸGM♂ GAssist -> { 6.76222_° 1648.17768_m/s 16.95570 }
+@@ ============================================================
+ → vinf rp μ
+  «
+    DEG
+    vinf UBASE Uval 'vinf' STO  rp UBASE Uval 'rp' STO  μ UBASE Uval 'μ' STO
+    '1+rp·vinf^2/μ' EVAL → ecc
+    «
+      '2·ASIN(1/ecc)' EVAL
+      '2·vinf/ecc' EVAL  1_m/s ·
+      ecc
+      3 →LIST
+    »
+  »
+»
