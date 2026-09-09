@@ -316,3 +316,95 @@ Set both the independent and dependent data columns in the reserved variable
 `ΣParameters`.
 
 `XCol` `YCol` ▶ (Update `ΣParameters`)
+
+## GammaP
+
+Regularised lower incomplete gamma function, `P(a,x)`: the probability that a
+gamma variable of shape `a` and unit scale does not exceed `x`. The shape must
+be positive and `x` must not be negative.
+
+`a` `x` ▶ `P(a,x)`
+
+Evaluated by a series below `a+1` and by a continued fraction above it, in the
+precision currently in force. It is the primitive behind the chi-square and
+gamma distributions and behind `UTPC`.
+
+```rpl
+2 1.5 GammaP
+@ Expecting 0.44217 45996 29
+```
+
+## BetaI
+
+Regularised incomplete beta function, `I(x;a,b)`. Both shapes must be positive
+and `x` must lie between zero and one.
+
+`a` `b` `x` ▶ `I(x;a,b)`
+
+Evaluated by a continued fraction, using the symmetry `I(x;a,b) = 1-I(1-x;b,a)`
+where that converges faster. It is the primitive behind the beta, Student and
+Fisher distributions and behind `UTPT` and `UTPF`.
+
+```rpl
+2 3 0.4 BetaI
+@ Expecting 0.5248
+```
+
+## UTPC
+
+Upper tail of the chi-square distribution with `n` degrees of freedom: the
+probability that the variable exceeds `x`.
+
+`n` `x` ▶ `P(X>x)`
+
+```rpl
+4 3 UTPC
+@ Expecting 0.55782 54003 71
+```
+
+At the 95th percentile it would return 0.05, which is the critical value of
+the test at five per cent.
+
+## UTPN
+
+Upper tail of the normal distribution of mean `m` and **variance** `v` — the
+variance, as on the HP50G, not the standard deviation.
+
+`m` `v` `x` ▶ `P(X>x)`
+
+```rpl
+0 1 1 UTPN
+@ Expecting 0.15865 52539 31
+```
+
+One standard deviation above the mean leaves about a sixth of the
+distribution above it.
+
+## UTPT
+
+Upper tail of the Student distribution with `n` degrees of freedom. Negative
+values of `t` are handled by symmetry.
+
+`n` `t` ▶ `P(T>t)`
+
+```rpl
+4 1 UTPT
+@ Expecting 0.18695 04831 5
+```
+
+At t = 2.7764451052 it would return 0.025, the critical value of the
+two-sided test at five per cent.
+
+## UTPF
+
+Upper tail of the Fisher distribution with `n` degrees of freedom in the
+numerator and `d` in the denominator.
+
+`n` `d` `x` ▶ `P(F>x)`
+
+```rpl
+4 6 1 UTPF
+@ Expecting 0.4752
+```
+
+At x = 4.5336769502 8 it would return 0.05.
