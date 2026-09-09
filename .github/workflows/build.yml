@@ -497,7 +497,17 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          help/
+
+    - name: Rename Android .apk
+      run: ln -s android/build/outputs/apk/debug/android-debug.apk db48x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db48x.apk
+        archive: false
 
   build-color-android:
     name: Build Android App (db50x)
@@ -568,7 +578,17 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
-          help/
+
+    - name: Rename Android .apk
+      run: ln -s android/build/outputs/apk/debug/android-debug.apk db50x.apk
+
+    - name: Upload Android .apk artifact
+      uses: actions/upload-artifact@v7
+      with:
+        if-no-files-found: error
+        path: |
+          db50x.apk
+        archive: false
 
   build-dm42-firmware:
     name: Build DM42 Firmware
