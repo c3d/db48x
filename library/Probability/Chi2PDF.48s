@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2PDF
+  @  Density (or mass) at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "Chi2PDF: needs 2 arguments" DoError END Explode Drop END
+  → dfv Xv « dfv 0 + Xv 0 + → df X « 'IFTE(X≤0;0;(X^(df/2-1))*EXP(-X/2)/((2^(df/2))*Γ(df/2)))' →Num dfv Xv 2 →List Drop » »
+»

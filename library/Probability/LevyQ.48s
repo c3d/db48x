@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LevyQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "LevyQ: needs 3 arguments" DoError END Explode Drop END
+  → x0v scv pv « x0v 0 + scv 0 + pv 0 + → x0 sc p « 'x0' →Num 'x0+sc*10000000' →Num 0 0 → lo hi x d « 1 80 START '((lo+hi)/2)' →Num 'x' STO '(IFTE(x≤x0;0;erfc(√(sc/(2*(x-x0))))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '((lo+hi)/2)' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x≤x0;0;√(sc/(2*Ⓒπ))*ExP(-sc/(2*(x-x0)))/((x-x0)^1.5)))>0.000000000000000000000000000001;x-((IFTE(x≤x0;0;erfc(√(sc/(2*(x-x0))))))-p)/(IFTE(x≤x0;0;√(sc/(2*Ⓒπ))*ExP(-sc/(2*(x-x0)))/((x-x0)^1.5)));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x x0v scv pv 3 →List Drop » » »
+»

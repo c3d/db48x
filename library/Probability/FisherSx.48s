@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  FisherSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "FisherSx: needs 2 arguments" DoError END END END
+  → dfnv dfdv « dfnv 0 + dfdv 0 + → dfn dfd « 'IFTE(dfd>4;√(2*(dfd^2)*(dfn+dfd-2)/(dfn*((dfd-2)^2)*(dfd-4)));Ⓒ?)' →Num dfnv dfdv 2 →List Drop » »
+»

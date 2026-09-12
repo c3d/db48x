@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GEVQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "GEVQ: needs 4 arguments" DoError END Explode Drop END
+  → x0v scv xiv pv « x0v 0 + scv 0 + xiv 0 + pv 0 + → x0 sc xi p « 'IFTE(ABS(xi)<0.000000001;x0-sc*LN(-LN(p));x0+sc*(((-LN(p))^(-xi))-1)/xi)' →Num x0v scv xiv pv 4 →List Drop » »
+»

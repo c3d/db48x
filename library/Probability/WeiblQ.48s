@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  WeiblQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "WeiblQ: needs 3 arguments" DoError END Explode Drop END
+  → shv λv pv « shv 0 + λv 0 + pv 0 + → sh λ p « 'λ*((-LN(1-p))^(1/sh))' →Num shv λv pv 3 →List Drop » »
+»

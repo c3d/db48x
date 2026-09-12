@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  RayleighQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "RayleighQ: needs 2 arguments" DoError END Explode Drop END
+  → sv pv « sv 0 + pv 0 + → s p « 's*√(-2*LN(1-p))' →Num sv pv 2 →List Drop » »
+»

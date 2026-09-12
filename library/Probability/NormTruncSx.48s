@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  NormTruncSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 == THEN Explode Drop ELSE IF DUP Size 5 == THEN Explode Drop Drop ELSE "NormTruncSx: needs 4 arguments" DoError END END END
+  → x0v scv Xminv Xmaxv « x0v 0 + scv 0 + Xminv 0 + Xmaxv 0 + → x0 sc Xmin Xmax « 'sc*√(1+(((Xmin-x0)/sc)*(EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-((Xmax-x0)/sc)*(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))-(((EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))))^2)' →Num x0v scv Xminv Xmaxv 4 →List Drop » »
+»

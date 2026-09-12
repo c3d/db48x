@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  PhitQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 1; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 1 ≠ THEN "PhitQ: needs 1 arguments" DoError END Explode Drop END
+  → pv « pv 0 + → p « '-12' →Num '12' →Num 0 0 → lo hi x d « 1 40 START '(lo+hi)/2' →Num 'x' STO '(0.5*(1+erf(x/√(2))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(EXP(-(x^2)/2)/√(2*Ⓒπ))>0.000000000000000000000000000001;x-((0.5*(1+erf(x/√(2))))-p)/(EXP(-(x^2)/2)/√(2*Ⓒπ));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x pv 1 →List Drop » » »
+»

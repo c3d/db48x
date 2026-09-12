@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LgNrmSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "LgNrmSx: needs 2 arguments" DoError END END END
+  → μlv σlv « μlv 0 + σlv 0 + → μl σl « '√((EXP(σl^2)-1)*EXP(2*μl+σl^2))' →Num μlv σlv 2 →List Drop » »
+»

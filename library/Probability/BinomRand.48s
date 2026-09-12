@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  BinomRand
+  @  Random draw by inversion: a uniform variate, then BinomQ.
+  @  Stack: nt, p0
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "BinomRand: needs 2 arguments" DoError END END END
+  → ntv p0v « ntv p0v rand ⓁBinomQ ntv p0v 2 →List Drop »
+»

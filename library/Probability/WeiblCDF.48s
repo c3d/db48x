@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  WeiblCDF
+  @  Distribution function at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "WeiblCDF: needs 3 arguments" DoError END Explode Drop END
+  → shv λv Xv « shv 0 + λv 0 + Xv 0 + → sh λ X « 'IFTE(X<0;0;1-EXP(-((X/λ)^sh)))' →Num shv λv Xv 3 →List Drop » »
+»

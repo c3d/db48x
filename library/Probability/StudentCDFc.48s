@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  StudentCDFc
+  @  Upper tail at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "StudentCDFc: needs 2 arguments" DoError END Explode Drop END
+  → dfv Xv « dfv 0 + Xv 0 + → df X « '1-(IFTE(X<0;0.5*BetaI(df/2;0.5;df/(df+X^2));1-0.5*BetaI(df/2;0.5;df/(df+X^2))))' →Num dfv Xv 2 →List Drop » »
+»
