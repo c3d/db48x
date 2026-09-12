@@ -44,6 +44,7 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QDirIterator>
+#include <QFile>
 #include <QFont>
 #include <QFontDatabase>
 #include <QStandardPaths>
@@ -110,10 +111,10 @@ static void copy(const QString &fromName, const QString &toName)
     if (!to.exists())
         to.mkpath(toName);
 
-    for (QDirIterator it(fromName, QDirIterator::Subdirectories);
-         it.hasNext();
-         it.next())
+    QDirIterator it(fromName, QDirIterator::Subdirectories);
+    while (it.hasNext())
     {
+        it.next();
         const auto fi = it.fileInfo();
         if (!fi.isHidden())
         {
@@ -531,10 +532,42 @@ int main(int argc, char *argv[])
 
     QString files =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    // On Android the mere existence of the application data directory does not
+    // mean the resources were extracted: the Qt bootstrap creates it before we
+    // run, so the existence test never fired and the library was never
+    // installed. Stamp the extracted tree with the version there, and
+    // re-extract whenever that stamp is missing or stale, which also refreshes
+    // the resources when the application is updated in place.
+#ifdef ANDROID
+    QString  stampPath = files + "/.assets-version";
+    QString  wanted    = DB48X_VERSION;
+    QString  found;
+    QFile    stamp(stampPath);
+    if (stamp.open(QIODevice::ReadOnly))
+    {
+        found = QString::fromUtf8(stamp.readAll()).trimmed();
+        stamp.close();
+    }
+    if (getenv("DB48X_INSTALL") || found != wanted)
+        install = true;
+    if (install)
+    {
+        copy(":/", files);
+        if (stamp.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+            stamp.write(wanted.toUtf8());
+            stamp.close();
+        }
+    }
+#else // !ANDROID
+    // On a desktop the data directory is created by us alone, so its absence
+    // still is the right signal, and the version changes at every commit.
     if (getenv("DB48X_INSTALL") || !QDir(files).exists())
         install = true;
     if (install)
         copy(":/", files);
+#endif // ANDROID
     QDir::setCurrent(files);
     QDir::current().mkdir("screens");
 
