@@ -1,0 +1,10 @@
+«
+  @ ------------------------------------------------------------
+  @  Anova1
+  @  One-way analysis of variance: are three or more group means equal?
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Takes one list of lists, one inner list per group.
+  @ ------------------------------------------------------------
+  → grp « grp Size → ng « 0 0 → ntot gsum « 1 ng FOR ii grp ii GET → grpi « grpi Size ntot + 'ntot' STO 1 grpi Size FOR jj grpi jj GET gsum + 'gsum' STO NEXT » NEXT gsum ntot / → gmean « 0 0 → ssb ssw « 1 ng FOR ii grp ii GET → grpi « 0 → ssum « 1 grpi Size FOR jj grpi jj GET ssum + 'ssum' STO NEXT ssum grpi Size / → smean « grpi Size smean gmean - DUP * * ssb + 'ssb' STO 1 grpi Size FOR jj grpi jj GET smean - DUP * ssw + 'ssw' STO NEXT » » » NEXT ssb ng 1 - / ssw ntot ng - / / →Num ng 1 - ntot ng - → fv df1 df2 « fv "F" →Tag df1 "df1" →Tag df2 "df2" →Tag df1 df2 fv UTPF "p" →Tag » » » » » »
+»

@@ -376,6 +376,34 @@
 	"LevyArgs",	"=/library/Probability/LevyArgs.48s"
 	"LevyAll",	"=/library/Probability/LevyAll.48s"
 
+"StatTests"
+
+"StatTests/StudentTests"
+
+	"TTest1",	"=/library/StatTests/TTest1.48s"
+	"TTest1Args",	"=/library/StatTests/TTest1Args.48s"
+	"TTest2",	"=/library/StatTests/TTest2.48s"
+	"TTest2Args",	"=/library/StatTests/TTest2Args.48s"
+	"TTestW",	"=/library/StatTests/TTestW.48s"
+	"TTestWArgs",	"=/library/StatTests/TTestWArgs.48s"
+	"TTestP",	"=/library/StatTests/TTestP.48s"
+	"TTestPArgs",	"=/library/StatTests/TTestPArgs.48s"
+	"TTestLR",	"=/library/StatTests/TTestLR.48s"
+
+"StatTests/Chi2Tests"
+
+	"Chi2GOF",	"=/library/StatTests/Chi2GOF.48s"
+	"Chi2Indep",	"=/library/StatTests/Chi2Indep.48s"
+	"Chi2Var",	"=/library/StatTests/Chi2Var.48s"
+	"Chi2VarArgs",	"=/library/StatTests/Chi2VarArgs.48s"
+
+"StatTests/FisherTests"
+
+	"FTestVar",	"=/library/StatTests/FTestVar.48s"
+	"FTestVarArgs",	"=/library/StatTests/FTestVarArgs.48s"
+	"Anova1",	"=/library/StatTests/Anova1.48s"
+	"FTestLR",	"=/library/StatTests/FTestLR.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="

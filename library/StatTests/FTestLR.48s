@@ -1,0 +1,10 @@
+«
+  @ ------------------------------------------------------------
+  @  FTestLR
+  @  Overall significance of the linear regression on ΣData.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Takes no argument: it reads the current ΣData.
+  @ ------------------------------------------------------------
+  « ΣSize ΣX ΣY ΣXY ΣX² ΣY² → nn sumx sumy sumxy sumx2 sumy2 « 'sumx2-sumx^2/nn' →Num 'sumy2-sumy^2/nn' →Num 'sumxy-sumx*sumy/nn' →Num → sxx syy sxy « 'sxy/sxx' →Num → bhat « '(syy-bhat*sxy)/(nn-2)' →Num → se2 « '(bhat^2*sxx)/se2' →Num 'nn-2' →Num → fv df2 « fv "F" →Tag 1 "df1" →Tag df2 "df2" →Tag 1 df2 fv UTPF "p" →Tag » » » » » » EVAL
+»

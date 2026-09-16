@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TTest1Args
+  @  Labels a row of values with the parameter names of TTest1.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "TTest1Args: needs 4 arguments" DoError END Explode Drop END
+  → nv xbv sdv muv « nv 0 + xbv 0 + sdv 0 + muv 0 + → nn xb sd mu0 « nn "n" →Tag xb "xbar" →Tag sd "s" →Tag mu0 "mu0" →Tag nv xbv sdv muv 4 →List Drop » »
+»
