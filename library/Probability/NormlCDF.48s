@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  NormlCDF
+  @  Distribution function at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "NormlCDF: needs 3 arguments" DoError END Explode Drop END
+  → μv sxv Xv « μv 0 + sxv 0 + Xv 0 + → μ sx X « '0.5*(1+erf((X-μ)/(sx*√(2))))' →Num μv sxv Xv 3 →List Drop » »
+»

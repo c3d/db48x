@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  StudentQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "StudentQ: needs 2 arguments" DoError END Explode Drop END
+  → dfv pv « dfv 0 + pv 0 + → df p « '-1000000' →Num '1000000' →Num 0 0 → lo hi x d « 1 40 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x<0;0.5*BetaI(df/2;0.5;df/(df+x^2));1-0.5*BetaI(df/2;0.5;df/(df+x^2))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(Γ((df+1)/2)/(√(df*Ⓒπ)*Γ(df/2))*((1+(x^2)/df)^(-(df+1)/2)))>0.000000000000000000000000000001;x-((IFTE(x<0;0.5*BetaI(df/2;0.5;df/(df+x^2));1-0.5*BetaI(df/2;0.5;df/(df+x^2))))-p)/(Γ((df+1)/2)/(√(df*Ⓒπ)*Γ(df/2))*((1+(x^2)/df)^(-(df+1)/2)));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x dfv pv 2 →List Drop » » »
+»

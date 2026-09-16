@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  NegBinomQ
+  @  Discrete quantile. Stack: rs, p0, p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "NegBinomQ: needs 3 arguments" DoError END Explode Drop END
+  → rs p0 p « IF 'p<0 OR p>1' EVAL THEN Ⓒ? ELSE 0 0 → k c « WHILE 'c<p AND k≤rs*(1-p0)/p0+40*√(rs*(1-p0))/p0' EVAL REPEAT 'c+COMB(k+rs-1;k)*(p0^rs)*((1-p0)^k)' EVAL 'c' STO 'k+1' EVAL 'k' STO END 'IFTE(k≤0;0;k-1)' EVAL R→I » END rs p0 p 3 →List Drop »
+»

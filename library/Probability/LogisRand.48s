@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  LogisRand
+  @  Random draw by inversion: a uniform variate, then LogisQ.
+  @  Stack: μ, s
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "LogisRand: needs 2 arguments" DoError END END END
+  → μv sv « μv sv rand ⓁLogisQ μv sv 2 →List Drop »
+»

@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  TriAsymRand
+  @  Random draw by inversion: a uniform variate, then TriAsymQ.
+  @  Stack: Xmin, Xmax, xp
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 == THEN Explode Drop ELSE IF DUP Size 4 == THEN Explode Drop Drop ELSE "TriAsymRand: needs 3 arguments" DoError END END END
+  → Xminv Xmaxv xpv « Xminv Xmaxv xpv rand ⓁTriAsymQ Xminv Xmaxv xpv 3 →List Drop »
+»

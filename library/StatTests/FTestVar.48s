@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  FTestVar
+  @  Equality of two variances. Put the larger variance first.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "FTestVar: needs 4 arguments" DoError END Explode Drop END
+  → n1v s1v n2v s2v « n1v 0 + s1v 0 + n2v 0 + s2v 0 + → n1 sd1 n2 sd2 « 'sd1^2/sd2^2' →Num 'n1-1' →Num 'n2-1' →Num → fv df1 df2 « fv "F" →Tag df1 "df1" →Tag df2 "df2" →Tag df1 df2 fv UTPF 2 * "p" →Tag n1v s1v n2v s2v 4 →List Drop » » »
+»

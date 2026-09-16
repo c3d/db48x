@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LgNrmArgs
+  @  Returns the parameters tagged with their names.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "LgNrmArgs: needs 3 arguments" DoError END Explode Drop END
+  → μlv σlv Xv « μlv 0 + σlv 0 + Xv 0 + → μl σl X « μl "μl" →Tag σl "σl" →Tag X "X" →Tag μlv σlv Xv 3 →List Drop » »
+»

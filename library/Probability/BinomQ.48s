@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BinomQ
+  @  Discrete quantile. Stack: nt, p0, p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "BinomQ: needs 3 arguments" DoError END Explode Drop END
+  → nt p0 p « IF 'p<0 OR p>1' EVAL THEN Ⓒ? ELSE 0 0 → k c « WHILE 'c<p AND k≤nt' EVAL REPEAT 'c+COMB(nt;k)*(p0^k)*((1-p0)^(nt-k))' EVAL 'c' STO 'k+1' EVAL 'k' STO END 'IFTE(k≤0;0;k-1)' EVAL R→I » END nt p0 p 3 →List Drop »
+»

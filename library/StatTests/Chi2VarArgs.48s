@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2VarArgs
+  @  Labels a row of values with the parameter names of Chi2Var.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "Chi2VarArgs: needs 3 arguments" DoError END Explode Drop END
+  → nv sdv sgv « nv 0 + sdv 0 + sgv 0 + → nn sd sg0 « nn "n" →Tag sd "s" →Tag sg0 "sigma0" →Tag nv sdv sgv 3 →List Drop » »
+»

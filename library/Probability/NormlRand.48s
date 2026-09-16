@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  NormlRand
+  @  Random draw by inversion: a uniform variate, then NormlQ.
+  @  Stack: μ, sx
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "NormlRand: needs 2 arguments" DoError END END END
+  → μv sxv « μv sxv rand ⓁNormlQ μv sxv 2 →List Drop »
+»

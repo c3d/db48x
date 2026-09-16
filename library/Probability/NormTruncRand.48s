@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  NormTruncRand
+  @  Random draw by inversion: a uniform variate, then NormTruncQ.
+  @  Stack: x0, sc, Xmin, Xmax
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 == THEN Explode Drop ELSE IF DUP Size 5 == THEN Explode Drop Drop ELSE "NormTruncRand: needs 4 arguments" DoError END END END
+  → x0v scv Xminv Xmaxv « x0v scv Xminv Xmaxv rand ⓁNormTruncQ x0v scv Xminv Xmaxv 4 →List Drop »
+»

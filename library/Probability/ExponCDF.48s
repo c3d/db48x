@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  ExponCDF
+  @  Distribution function at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "ExponCDF: needs 2 arguments" DoError END Explode Drop END
+  → λv Xv « λv 0 + Xv 0 + → λ X « 'IFTE(X<0;0;1-EXP(-λ*X))' →Num λv Xv 2 →List Drop » »
+»

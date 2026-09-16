@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  HyperAll
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "HyperAll: needs 4 arguments" DoError END Explode Drop END
+  → Npv Ksv ndv Xv « Npv 0 + Ksv 0 + ndv 0 + Xv 0 + → Np Ks nd X « 'IFTE(X<0;0;IFTE(X≥nd;1;Σ(Jx;0;IP(X);COMB(Ks;Jx)*COMB(Np-Ks;nd-Jx)/COMB(Np;nd))))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X<0;0;IFTE(X>nd;0;COMB(Ks;IP(X))*COMB(Np-Ks;nd-IP(X))/COMB(Np;nd)))' →Num "PDF" →Tag '1-Kc' →Num "CDFc" →Tag 'nd*Ks/Np' →Num "μ" →Tag '√(nd*(Ks/Np)*(1-Ks/Np)*(Np-nd)/(Np-1))' →Num "sx" →Tag { Kc } PURGE Npv Ksv ndv Xv 4 →List Drop » »
+»
