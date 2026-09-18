@@ -147,7 +147,9 @@ void file::open(cstring path, mode wrmode)
     name = path;
 
 #if SIMULATOR
-    data = fopen(path, reading ? "r" : append ? "a" : "w");
+    // Binary even for text: get() and getchar() already skip '\r', and on
+    // Windows text mode makes ftell() wrong on LF files, so seeks land off
+    data = fopen(path, reading ? "rb" : append ? "ab" : "wb");
     if (!data)
     {
         record(file_error, "Error %s opening %s", strerror(errno), path);
