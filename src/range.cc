@@ -1373,8 +1373,11 @@ static uncertain_p bivariate(uncertain_r   x,
     algebraic_g ya  = y->average();
 
     algebraic_g fa  = f(xa, ya);
-    algebraic_g dxv = dfdx ? dfdx(xa, ya) : nullptr;
-    algebraic_g dyv = dfdy ? dfdy(xa, ya) : nullptr;
+
+    // An exact operand contributes nothing: skip its derivative, which may not
+    // exist, e.g. d(x^y)/dy = ln(x)·x^y for an exact integer power of x < 0
+    algebraic_g dxv = dfdx && !xs->is_zero() ? dfdx(xa, ya) : nullptr;
+    algebraic_g dyv = dfdy && !ys->is_zero() ? dfdy(xa, ya) : nullptr;
     dxv             = dxv ? dxv * xs : xs;
     dyv             = dyv ? dyv * ys : ys;
     algebraic_g fs  = dxv * dxv + dyv * dyv;

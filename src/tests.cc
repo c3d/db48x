@@ -6657,6 +6657,14 @@ void tests::uncertain_operations()
         .test(CLEAR, "2±σ3", NOSHIFT, ID_inv).expect("¹/₂±σ0.75");
     step("Negate uncertain numbers")
         .test(CLEAR, "1±σ3", ENTER, ID_neg).expect("-1±σ3");
+    step("Square and cube of uncertain numbers go through the derivative")
+        .test(CLEAR, "2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
+        .test(CLEAR, "-2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
+        .test(CLEAR, "0.5±σ2", ENTER, ID_sq).expect("0.25±σ2.")
+        .test(CLEAR, "2±σ0.05", ENTER, ID_cubed).expect("8±σ0.6");
+    step("Exact integer power of a negative uncertain number")
+        .test(CLEAR, "-2±σ0.05 2", NOSHIFT, ID_pow).expect("4±σ0.2")
+        .test(CLEAR, "-2±σ0.05 3", NOSHIFT, ID_pow).expect("-8±σ0.6");
 
     step("Add uncertain numbers with promotion")
         .test(CLEAR, "1±σ3 5", NOSHIFT, ADD).expect("6±σ3.");
