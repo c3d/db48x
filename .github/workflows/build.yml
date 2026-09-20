@@ -75,6 +75,7 @@ jobs:
       with:
         name: db48x-simulator-macos
         path: db48x-macos.zip
+        retention-days: 7
 
   build-simulator-linux:
     name: Build Simulator (Linux, Ubuntu)
@@ -114,6 +115,7 @@ jobs:
         path: |
           db48x
           help/
+        retention-days: 7
 
   build-simulator-linux-fedora:
     name: Build Simulator (Linux, Fedora)
@@ -161,6 +163,7 @@ jobs:
         path: |
           db48x
           help/
+        retention-days: 7
 
   build-simulator-linux-arch:
     name: Build Simulator (Linux, Arch)
@@ -205,6 +208,7 @@ jobs:
         path: |
           db48x
           help/
+        retention-days: 7
 
   build-simulator-windows:
     name: Build Simulator (Windows)
@@ -254,6 +258,7 @@ jobs:
         name: db48x-test-images-windows
         path: images/bad/*.png
         if-no-files-found: ignore
+        retention-days: 1
 
     - name: Upload Windows help file for debugging
       if: always()
@@ -262,6 +267,7 @@ jobs:
         name: db48x-help-windows
         path: help/db48x.md
         if-no-files-found: error
+        retention-days: 1
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -315,6 +321,7 @@ jobs:
           tls/
           translations/
           help/
+        retention-days: 7
 
   build-color-simulator-macos:
     name: Build Color DM32 Simulator (macOS)
@@ -376,6 +383,7 @@ jobs:
       with:
         name: db50x-color-simulator-macos
         path: db50x-macos.zip
+        retention-days: 7
 
   build-color-simulator-linux:
     name: Build Color DM32 Simulator (Linux, Ubuntu)
@@ -415,6 +423,7 @@ jobs:
         path: |
           db50x
           help/
+        retention-days: 7
 
   build-color-simulator-linux-fedora:
     name: Build Color DM32 Simulator (Linux, Fedora)
@@ -462,6 +471,7 @@ jobs:
         path: |
           db50x
           help/
+        retention-days: 7
 
   build-color-simulator-linux-arch:
     name: Build Color DM32 Simulator (Linux, Arch)
@@ -506,6 +516,7 @@ jobs:
         path: |
           db50x
           help/
+        retention-days: 7
 
   build-color-simulator-windows:
     name: Build Color DM32 Simulator (Windows)
@@ -555,6 +566,7 @@ jobs:
         name: db50x-test-images-windows
         path: color-images/bad/*.png
         if-no-files-found: ignore
+        retention-days: 1
 
     - name: Upload Windows help file for debugging
       if: always()
@@ -563,6 +575,7 @@ jobs:
         name: db50x-help-windows
         path: help/db50x.md
         if-no-files-found: error
+        retention-days: 1
 
     - name: Deploy Qt dependencies
       shell: msys2 {0}
@@ -616,6 +629,7 @@ jobs:
           tls/
           translations/
           help/
+        retention-days: 7
 
   build-wasm:
     name: Build WebAssembly
@@ -661,6 +675,7 @@ jobs:
           wasm/db48x.wasm
           wasm/*.html
           help/
+        retention-days: 7
 
   build-android:
     name: Build Android App (db48x)
@@ -732,6 +747,7 @@ jobs:
           android/*.aab
           android/**/*.aab
           help/
+        retention-days: 7
 
   build-color-android:
     name: Build Android App (db50x)
@@ -803,6 +819,7 @@ jobs:
           android/*.aab
           android/**/*.aab
           help/
+        retention-days: 7
 
   build-dm42-firmware:
     name: Build DM42 Firmware
@@ -830,6 +847,7 @@ jobs:
       with:
         name: db48x-dm42-firmware
         path: db48x-dm42-firmware.tgz
+        retention-days: 7
 
   build-dm32-firmware:
     name: Build DM32 Firmware
@@ -857,6 +875,7 @@ jobs:
       with:
         name: db50x-dm32-firmware
         path: db50x-dm32-firmware.tgz
+        retention-days: 7
 
   build-dm42n-firmware:
     name: Build DM42n Firmware
@@ -884,6 +903,7 @@ jobs:
       with:
         name: db50x-dm42n-firmware
         path: db50x-dm42n-firmware.tgz
+        retention-days: 7
 
   build-release-package:
     name: Create Release Package
@@ -947,6 +967,7 @@ jobs:
           db48x-wasm-*.tar.gz
           db48x-simulator-macos-*.zip
           db50x-color-simulator-macos-*.zip
+        retention-days: 7
 
   create-release:
     name: Create Release and Upload Assets
