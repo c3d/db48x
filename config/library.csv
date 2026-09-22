@@ -404,6 +404,20 @@
 	"Anova1",	"=/library/StatTests/Anova1.48s"
 	"FTestLR",	"=/library/StatTests/FTestLR.48s"
 
+"Uncertainty"
+
+"Uncertainty/Rounding"
+
+	"SciRngRnd",	"=/library/Uncertainty/SciRngRnd.48s"
+	"SciRngText",	"=/library/Uncertainty/SciRngText.48s"
+	"SciRngParen",	"=/library/Uncertainty/SciRngParen.48s"
+
+"Uncertainty/TypeB"
+
+	"ResN0→σR",	"=/library/Uncertainty/ResN0ToSigmaR.48s"
+	"Bound→σ",	"=/library/Uncertainty/BoundToSigma.48s"
+	"ResN0",	"=/library/Uncertainty/ResN0.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="

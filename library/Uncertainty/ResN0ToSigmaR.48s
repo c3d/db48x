@@ -1,0 +1,172 @@
+«
+    @ ResN0→σR: guided conversion of a reading into a value with its standard
+    @ uncertainty, x±σu. It asks for the value as read, zeros included, then
+    @ where the bound comes from, then the law; the work is done by ResN0 and
+    @ Bound→σ, which programs can call directly.
+    @ After Jean Wilson's ResN0→σR (2025-2026).
+
+    @ 1. The value, as the instrument shows it: kept as text, zeros included
+    @    A number already on the stack is offered for editing, without digit separators
+    ""
+    IF DEPTH 1 > THEN
+        OVER TypeName → RwT
+        «
+            IF RwT "integer" == RwT "decimal" == OR RwT "neg_integer" == OR
+               RwT "neg_decimal" == OR RwT "unit" == OR
+            THEN
+                DROP
+                IF DUP TypeName "unit" == THEN
+                    DUP UVAL SWAP 1 SWAP →Unit →Str 3 OVER Size SUB "_" SWAP +
+                ELSE
+                    ""
+                END
+                SWAP →Str "" SWAP 1 OVER Size
+                FOR RwK
+                    DUP RwK RwK SUB
+                    IF DUP NUM 8287 == THEN DROP ELSE ROT SWAP + SWAP END
+                NEXT
+                DROP SWAP +
+            END
+        »
+    END
+    "Reading as displayed, then ENTER" SWAP 0 "values" 3 →List INPUT
+    DUP STR→ DUP IF DUP TypeName "unit" == THEN UVAL END 0 0 0
+    → RwTxt RwX RwXv RwPt RwZ RwStop
+    «
+        @ Scan the digits before any unit or exponent: decimal point? trailing zeros?
+        1 RwTxt Size
+        FOR RwI
+            IF RwStop 0 = THEN
+                RwTxt RwI RwI SUB
+                CASE
+                    DUP "." == THEN DROP 1 'RwPt' STO END
+                    DUP "0" == THEN DROP RwZ 1 + 'RwZ' STO END
+                    DUP NUM DUP 49 ≥ SWAP 57 ≤ AND THEN DROP 0 'RwZ' STO END
+                    DUP "_" == OVER "E" == OR OVER "e" == OR OVER "⁳" == OR THEN
+                        DROP 1 'RwStop' STO
+                    END
+                    DROP
+                END
+            END
+        NEXT
+        @ Significant trailing zeros: all of them after a decimal point; ask otherwise
+        CASE
+            RwPt 1 = THEN RwZ END
+            RwZ 0 = THEN 0 END
+            ClearLCD
+            "7000 and 7.000E3 are the same number:" { #0 #4d 0 true false } DrawText
+            "only you know which zeros were measured." { #0 #26d 0 true false } DrawText
+            "How many trailing zeros were measured?" { #0 #70d 0 true false } DrawText
+            "from 0 (7E3, read to ±1000)" { #0 #92d 0 true false } DrawText
+            "to all of them (7.000E3, read to ±1)." { #0 #114d 0 true false } DrawText
+            "Typing 7.000E3 or 7000. says it directly." { #0 #158d 0 true false } DrawText
+            "Press a key, 0 to " RwZ + { #0 #202d 0 true false } DrawText
+            0 Wait KeyCode
+            IF DUP TypeName "text" ≠ THEN DROP "ResN0→σR: cancelled" DoError END
+            IF DUP NUM DUP 48 ≥ SWAP 48 RwZ + ≤ AND NOT THEN DROP "ResN0→σR: cancelled" DoError END
+            STR→
+        END
+        → RwN
+        «
+            @ Resolution: the unit of the last significant digit
+            IF RwXv 0 = THEN
+                10 1 RwZ - ^ IF RwX TypeName "unit" == THEN 1 RwX →Unit × END
+            ELSE
+                RwX RwN ⓁResN0
+            END
+            → RwD
+            «
+                @ 2. Where the bound comes from
+                ClearLCD
+                "Resolution: " RwD →Str + { #0 #4d 0 true false } DrawText
+                IF RwD TypeName "unit" == THEN RwD UVAL ELSE RwD END → RwDv «
+                "Where does the bound come from?" { #0 #48d 0 true false } DrawText
+                "1 Digital display (±½ last digit)" { #0 #70d 0 true false } DrawText
+                "2 Graduated scale (±½ division)" { #0 #92d 0 true false } DrawText
+                "3 Stated tolerance ±a" { #0 #114d 0 true false } DrawText
+                "4 Expanded uncertainty ±U, level p" { #0 #136d 0 true false } DrawText
+                0 Wait KeyCode
+                IF DUP "1" == OVER "2" == OR OVER "3" == OR OVER "4" == OR NOT THEN
+                    DROP "ResN0→σR: cancelled" DoError
+                END
+                STR→
+                → RwO
+                «
+                    @ The bound, in the unit of the value, and the level p for origin 4
+                    CASE
+                        RwO 1 = THEN RwD 2 ÷ 0.95 END
+                        RwO 2 = THEN
+                            "Smallest division of the scale" RwDv →Str 0 "values" 3 →List INPUT
+                            STR→ IF DUP TypeName "unit" ≠ RwX TypeName "unit" == AND THEN 1 RwX →Unit × END
+                            2 ÷ 0.95
+                        END
+                        RwO 3 = THEN
+                            "Tolerance a, or a- a+ if unequal" { "" 0 "values" } INPUT
+                            "{ " SWAP + " }" + STR→
+                            IF DUP Size 1 = THEN 1 GET END
+                            0.95
+                        END
+                        "Expanded uncertainty U" { "" 0 "values" } INPUT STR→
+                        "Confidence level p" { "0.95" 0 "values" } INPUT STR→
+                    END
+                    → RwA RwP
+                    «
+                        @ 3. The law: only those that fit the origin of the bound
+                        ClearLCD
+                        IF RwO 4 < THEN
+                            "Which law inside the bounds?" { #0 #4d 0 true false } DrawText
+                            "1 Rectangular (nothing known)" { #0 #26d 0 true false } DrawText
+                            "2 Triangular (centre likelier)" { #0 #48d 0 true false } DrawText
+                            "3 Triangular, other mode" { #0 #70d 0 true false } DrawText
+                            "4 U-shaped (edges likelier)" { #0 #92d 0 true false } DrawText
+                            "5 Beta (shapes α, β)" { #0 #114d 0 true false } DrawText
+                            "6 Normal, truncated at the bounds" { #0 #136d 0 true false } DrawText
+                            "123456"
+                        ELSE
+                            "Which law gave ±U at level p?" { #0 #4d 0 true false } DrawText
+                            "7 Normal" { #0 #26d 0 true false } DrawText
+                            "8 Student (degrees of freedom ν)" { #0 #48d 0 true false } DrawText
+                            "9 Rayleigh (magnitude, one-sided)" { #0 #70d 0 true false } DrawText
+                            "0 Log-normal (positive, one-sided)" { #0 #92d 0 true false } DrawText
+                            "7890"
+                        END
+                        0 Wait KeyCode
+                        @ Accept only a digit offered on the screen
+                        0 1 4 PICK Size
+                        FOR RwJ
+                            IF 3 PICK RwJ RwJ SUB 3 PICK == THEN DROP 1 END
+                        NEXT
+                        IF NOT THEN DROP2 "ResN0→σR: cancelled" DoError END
+                        SWAP DROP STR→
+                        → RwL
+                        «
+                            @ Extra parameters of the chosen law
+                            CASE
+                                RwL 3 = THEN
+                                    "Most likely value (the mode)" RwXv →Str 0 "values" 3 →List INPUT
+                                    STR→ 1 →List
+                                END
+                                RwL 5 = THEN
+                                    "Beta shapes α β" { "2 2" 0 "values" } INPUT
+                                    "{ " SWAP + " }" + STR→
+                                END
+                                RwL 6 = THEN
+                                    "Bounds at how many σ of the normal?" { "2" 0 "values" } INPUT
+                                    STR→ 1 →List
+                                END
+                                RwL 8 = THEN
+                                    "Degrees of freedom ν" { "10" 0 "values" } INPUT
+                                    STR→ RwP 2 →List
+                                END
+                                RwO 4 = THEN RwP 1 →List END
+                                { }
+                            END
+                            RwX RwA RwL 4 ROLL ⓁBound→σ
+                        »
+                »
+                    »
+                »
+            »
+        »
+    »
+»
