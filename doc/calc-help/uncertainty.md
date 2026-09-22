@@ -29,6 +29,9 @@ Tools for measured values and their uncertainties, whether written as bounds
   uncertainty into a standard uncertainty: [ResN0→σR](#resn0→σr) guides
   the choice step by step, [Bound→σ](#bound→σ) and [ResN0](#resn0) do the
   same work from the stack.
+* [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
+  for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
+  for how two intervals sit on the line.
 
 
 ## RoundingLibrary
@@ -62,7 +65,7 @@ After Jean Wilson's SciRngRnd (2025–2026).
 
 Rounds a measured value and its uncertainty by the NIST rule: the uncertainty
 to two significant digits, the value to the same decimal place. See
-[Rounding](#roundinglibrary) for the rule and why.
+Rounding for the rule and why.
 
 It accepts every interval type and returns the same type, units included:
 
@@ -110,10 +113,11 @@ and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
 @ Expecting 12.35±0.1
 ```
 
+See also: [Rounding](#roundinglibrary).
 
 ## SciRngText
 
-The result of [SciRngRnd](#scirngrnd) written as text, with the trailing zeros
+The result of SciRngRnd written as text, with the trailing zeros
 that the rounding makes significant and that a number cannot carry. The display
 settings are not changed. Use it for a report, a label or a printed table; use
 SciRngRnd to go on computing. Without a unit, the text reads back as a number
@@ -142,10 +146,11 @@ Stack: an interval, or `X` `U`, as for SciRngRnd.
 @ Expecting "12.35±σ0.10 m"
 ```
 
+See also: [SciRngRnd](#scirngrnd).
 
 ## SciRngParen
 
-The result of [SciRngRnd](#scirngrnd) in concise notation, the form the GUM
+The result of SciRngRnd in concise notation, the form the GUM
 (JCGM 100:2008, §7.2.2) and the CODATA tables use: the digits in parentheses
 are the uncertainty, in units of the last digit of the value. `1.456±0.023` is
 written `1.456(23)`; the Newtonian constant of gravitation appears in the
@@ -159,7 +164,7 @@ keeps it clear, `1.2346(79)×10⁵`. A zero uncertainty gives the value alone.
 the notation says exactly what the value is. For bounds, `a±b`, `a…b` or `a±p%`,
 the entry writes the half-width in the same way, but a reader will take it for a
 standard deviation: say so next to the value, or write it with
-[SciRngText](#scirngtext) instead.
+SciRngText instead.
 
 The result is text, as for SciRngText; the display settings are not changed.
 
@@ -185,6 +190,7 @@ Stack: an interval, or `X` `U`, as for SciRngRnd.
 @ Expecting "1.2346(79)×10⁵"
 ```
 
+See also: [SciRngRnd](#scirngrnd), [SciRngText](#scirngtext).
 
 ## TypeBLibrary
 
@@ -245,7 +251,7 @@ The same work, without the questions, is done by [ResN0](#resn0) and
 ## Bound→σ
 
 Standard uncertainty from a bound, for a given law — the calculation behind
-[ResN0→σR](#resn0→σr), for programs.
+ResN0→σR, for programs.
 
 Stack: `X`, `A`, `law`, `P`.
 
@@ -286,6 +292,7 @@ Unequal bounds move the value to the middle of the interval:
 @ Expecting 10.1±σ0.11547 00538 38
 ```
 
+See also: [ResN0→σR](#resn0→σr).
 
 ## ResN0
 
@@ -307,3 +314,149 @@ Stack: `X`, `N` — or `{ X N }`.
 
 A value of zero has no significant digit to count from: type its resolution
 directly.
+
+## CompareLibrary
+
+Do two measurements of the same quantity agree? The question has two forms,
+and they must not be confused.
+
+* With **bounds** — `a…b`, `a±b`, `a±p%` — the true value is somewhere inside
+  each interval, so the question is geometric: do the intervals meet, and by
+  how much? That is [ΔConcord](#Δconcord), and [RngRel](#rngrel) for the bare
+  relation.
+* With **standard deviations** — `a±σb` — the bars are not bounds: the value is
+  outside ±σ one time in three. The question is statistical: is the difference
+  D = Y − X compatible with zero? That is [σConcord](#σconcord).
+
+Reading ±σ bars as bounds is a classic error. 10±σ1 and 12.2±σ1 do not touch,
+yet the difference is only 1.56 standard deviations of D, and p = 0.12: the two
+measurements are compatible at any usual threshold. Two ±σ bars that just touch
+give p = 0.16; incompatibility at 5 % needs a gap of about 0.77σ between the
+bars. This is why ΔConcord refuses `a±σb` values, and σConcord refuses bounds.
+
+After Jean Wilson's Concord (2025).
+
+
+## ΔConcord
+
+Draws two bounded intervals X and Y on the same scale, with their intersection,
+and states how much of each it covers and how they sit on the line. Y is first
+expressed in the unit of X.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number.
+
+It returns, tagged: `X∩Y` (a range, or `"∅"` when they do not meet), the part of
+X and the part of Y that the intersection covers, in per cent, and the relation
+as RngRel names it. The drawing stays on screen until a key is
+pressed.
+
+```rpl
+1…3 2…4 ⓁΔConcord
+```
+
+It returns `X∩Y:2…3`, `X%:50`, `Y%:50` and `rel:"X overlaps Y"`.
+
+A mass measured to ±0.0023 g, against a reference given to ±0.005 g, in grams
+both:
+
+```rpl
+5.3617±0.0023_g 5.360±0.005_g ⓁΔConcord
+```
+
+The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
+`Y%:46`, `rel:"X containedBy Y"`.
+
+
+Random pairs make a good exercise. This draws two intervals between −100 and
+100 and compares them; run it several times:
+
+```rpl
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+ⓁΔConcord
+```
+
+See also: [RngRel](#rngrel).
+
+## σConcord
+
+Are two measurements X = a±σb and Y = c±σd compatible? The answer is read on
+their difference D = Y − X, normal with mean d = c − a and standard deviation
+
+σD = √(σX² + σY² − 2ρ·σX·σY)
+
+where ρ is the global variable `ρ` that the arithmetic of the calculator also
+uses for correlated values (0 when it does not exist). The entry draws the law
+of D, marks zero, and shades the two tails beyond ±|d| around d: their area is
+the p-value.
+
+Stack: `X`, `Y` — each `a±σb` or a plain number, taken as exact.
+
+It returns, tagged: `d`, `σD`, `z` = |d|/σD, and `p` = 2·UTPN(0,1,z), the
+probability of a difference at least this large if the two measure the same
+thing. There is no verdict: the threshold belongs to the user. A small p
+says the measurements disagree; a large p does not prove they agree — it says
+the data cannot tell them apart.
+
+```rpl
+10±σ1 12.2±σ1 ⓁσConcord
+```
+
+It returns `d:2.2`, `σD:1.41421 35623 7`, `z:1.55563 49186 1` and
+`p:0.11979 49304 26`.
+
+The two ±σ bars do not touch, yet p = 0.12. With a correlation of 0.5, the
+difference is better known and the same gap weighs more:
+
+```rpl
+0.5 'ρ' STO 10±σ1 12.2±σ1 ⓁσConcord
+```
+
+Now `σD:1`, `z:2.2` and `p:0.02780 68950 27`. Purge `ρ` afterwards, or it will
+also weigh on the arithmetic of every uncertain value.
+
+
+## RngRel
+
+How two bounded intervals X and Y sit on the line: one of the thirteen cases of
+Allen's interval algebra, which the IEEE 1788-2015 standard for interval
+arithmetic calls the *overlap* state, returned as a sentence that says which
+way it goes: `"X overlaps Y"`, `"X metBy Y"`. Exactly one case holds for any
+pair, which avoids the ambiguity of < between intervals.
+
+| Case | X = [a₁, a₂], Y = [b₁, b₂] |
+|---|---|
+| before | a₂ < b₁ |
+| meets | a₂ = b₁ |
+| overlaps | a₁ < b₁ < a₂ < b₂ |
+| starts | a₁ = b₁, a₂ < b₂ |
+| containedBy | b₁ < a₁, a₂ < b₂ |
+| finishes | b₁ < a₁, a₂ = b₂ |
+| equals | a₁ = b₁, a₂ = b₂ |
+| finishedBy | a₁ < b₁, a₂ = b₂ |
+| contains | a₁ < b₁, b₂ < a₂ |
+| startedBy | a₁ = b₁, b₂ < a₂ |
+| overlappedBy | b₁ < a₁ < b₂ < a₂ |
+| metBy | a₁ = b₂ |
+| after | b₂ < a₁ |
+
+A point interval takes the first case that matches, in the order equals,
+before, after, starts, finishes, meets, then the others.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number; Y is expressed in
+the unit of X. `a±σb` values are refused, as for ΔConcord.
+
+```rpl
+1…3 2…4 ⓁRngRel
+@ Expecting "X overlaps Y"
+```
+
+```rpl
+1…3_m 100…300_cm ⓁRngRel
+@ Expecting "X equals Y"
+```
+
+```rpl
+2 1…3 ⓁRngRel
+@ Expecting "X containedBy Y"
+```

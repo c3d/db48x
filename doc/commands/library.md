@@ -44,7 +44,7 @@ For example, to preload the `Dedicace` library item, you can use one of:
 ```rpl
 'Dedicace' Attach
 Libs
-@ Expecting { Dedicace SiDensity TTest1 TTest1Args TTest2 TTest2Args TTestW TTestWArgs TTestP TTestPArgs TTestLR Chi2GOF Chi2Indep Chi2Var Chi2VarArgs FTestVar FTestVarArgs Anova1 FTestLR SciRngRnd SciRngText SciRngParen Bound→σ ResN0 }
+@ Expecting { Dedicace SiDensity TTest1 TTest1Args TTest2 TTest2Args TTestW TTestWArgs TTestP TTestPArgs TTestLR Chi2GOF Chi2Indep Chi2Var Chi2VarArgs FTestVar FTestVarArgs Anova1 FTestLR SciRngRnd SciRngText SciRngParen Bound→σ ResN0 ΔConcord σConcord RngRel }
 ```
 
 
@@ -63,7 +63,7 @@ For example, to unload the `Dedicace` and `KineticEnergy` library item, you can 
 ```rpl
 { Dedicace "KineticEnergy" } Detach
 Libs
-@ Expecting { SiDensity TTest1 TTest1Args TTest2 TTest2Args TTestW TTestWArgs TTestP TTestPArgs TTestLR Chi2GOF Chi2Indep Chi2Var Chi2VarArgs FTestVar FTestVarArgs Anova1 FTestLR SciRngRnd SciRngText SciRngParen Bound→σ ResN0 }
+@ Expecting { SiDensity TTest1 TTest1Args TTest2 TTest2Args TTestW TTestWArgs TTestP TTestPArgs TTestLR Chi2GOF Chi2Indep Chi2Var Chi2VarArgs FTestVar FTestVarArgs Anova1 FTestLR SciRngRnd SciRngText SciRngParen Bound→σ ResN0 ΔConcord σConcord RngRel }
 ```
 
 ## Libs

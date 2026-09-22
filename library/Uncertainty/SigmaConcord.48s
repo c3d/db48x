@@ -1,0 +1,136 @@
+«
+    @ σConcord: are two measurements X = a±σb and Y = c±σd compatible? The
+    @ question is about their difference D = Y − X, normal with mean d = c − a and
+    @ standard deviation σD = √(σX² + σY² − 2ρ·σX·σY), ρ being the global variable
+    @ ρ that the arithmetic of the core also uses (0 if it does not exist).
+    @ Draws the law of D, marks zero, shades the two tails that make the p-value,
+    @ and returns, tagged: d, σD, z = |d|/σD and p = 2·UTPN(0,1,z). No verdict:
+    @ the threshold belongs to the user. Y is expressed in the unit of X; a plain
+    @ number counts as exact. Bounds a…b, a±b, a±p% are refused: see ΔConcord.
+    @ Two ±σ bars that do not touch can still be compatible: 10±σ1 and 12.2±σ1
+    @ give p = 0.12.
+
+    @ Value and standard deviation of a value without unit: V → a σ
+    «
+        DUP TypeName → ScK
+        «
+            CASE
+                ScK "uncertain" == THEN Object→ END
+                ScK "range" == ScK "drange" == OR ScK "prange" == OR THEN
+                    DROP "σConcord: bounds are not ±σ, use ΔConcord" DoError
+                END
+                ScK "integer" == ScK "neg_integer" == OR ScK "decimal" == OR
+                ScK "neg_decimal" == OR ScK "fraction" == OR ScK "neg_fraction" == OR
+                ScK "bignum" == OR ScK "neg_bignum" == OR THEN 0 END
+                DROP "σConcord: X and Y must be a±σb values or numbers" DoError
+            END
+        »
+    »
+    @ Pixel column of a value: V Min Max Left Right → #x
+    «
+        → ScV ScMin ScMax ScL ScR
+        « ScV ScMin - ScMax ScMin - ÷ ScR ScL - × ScL + 0 RND R→B »
+    »
+    → ScSplit ScPix
+    «
+        → ScX ScY
+        «
+            @ Refuse bounds before anything is put on the stack
+            ScX ScY 2 →List 1 2
+            FOR ScJ
+                DUP ScJ GET IF DUP TypeName "unit" == THEN UVAL END TypeName
+                IF DUP "range" == OVER "drange" == OR SWAP "prange" == OR THEN
+                    DROP "σConcord: bounds are not ±σ, use ΔConcord" DoError
+                END
+            NEXT
+            DROP
+            @ Y in the unit of X; the unit kept aside as 1_unit (or 1)
+            IF ScX TypeName "unit" == THEN
+                IF ScY TypeName "unit" ≠ THEN "σConcord: X has a unit, Y has none" DoError END
+                ScY ScX Convert 'ScY' STO
+                1 ScX →Unit ScX UVAL ScY UVAL
+            ELSE
+                IF ScY TypeName "unit" == THEN "σConcord: Y has a unit, X has none" DoError END
+                1 ScX ScY
+            END
+            SWAP ScSplit ROT ScSplit
+            IFERR 'ρ' RCL THEN DROP 0 END
+            → ScU ScA ScSA ScC ScSC ScRho
+            «
+                ScC ScA -
+                ScSA SQ ScSC SQ + 2 ScRho × ScSA × ScSC × -
+                IF DUP 0 ≤ THEN DROP "σConcord: no uncertainty left on D = Y − X" DoError END
+                √
+                → ScD ScS
+                «
+                    ScD ABS ScS ÷
+                    DUP 0 1 ROT UTPN 2 ×
+                    ScD 4 ScS × - 0 MIN ScD 4 ScS × + 0 MAX
+                    FromLCD Size DROP B→R
+                    → ScZ ScP ScMin ScMax ScW
+                    «
+                        ClearLCD
+                        "σConcord: law of D = Y − X" { #0d #2d 1 true false } DrawText
+                        @ Axis at row 150, peak at row 34; curve drawn as 160 segments;
+                        @ where |D − d| ≥ |d|, a vertical stroke shades the tail
+                        24 ScW 12 - 150 34
+                        → ScL ScR ScBase ScTop
+                        «
+                            ScMin ScMin ScMax ScL ScR ScPix ScBase R→B 2 →List
+                            ScMax ScMin ScMax ScL ScR ScPix ScBase R→B 2 →List DrawLine
+                            ScMin ScMin ScMax ScL ScR ScPix ScBase R→B 2 →List
+                            → ScPrev
+                            «
+                                0 160
+                                FOR ScJ
+                                    ScMin ScMax ScMin - ScJ × 160 ÷ +
+                                    → ScT
+                                    «
+                                        ScT ScMin ScMax ScL ScR ScPix
+                                        ScBase ScBase ScTop - ScT ScD - ScS ÷ SQ -2 ÷ EXP × - 0 RND R→B
+                                        2 →List
+                                        DUP ScPrev SWAP DrawLine
+                                        IF ScT ScD - ABS ScD ABS ≥ THEN
+                                            DUP 1 GET ScBase R→B 2 →List DrawLine
+                                        ELSE
+                                            DROP
+                                        END
+                                        ScT ScMin ScMax ScL ScR ScPix
+                                        ScBase ScBase ScTop - ScT ScD - ScS ÷ SQ -2 ÷ EXP × - 0 RND R→B
+                                        2 →List 'ScPrev' STO
+                                    »
+                                NEXT
+                            »
+                            @ Zero, dashed from the top to the axis
+                            0 ScMin ScMax ScL ScR ScPix
+                            → ScZx
+                            «
+                                ScTop ScBase
+                                FOR ScJ
+                                    ScZx ScJ R→B 2 →List ScZx ScJ 4 + R→B 2 →List DrawLine
+                                8 STEP
+                                "0" ScZx B→R 3 - R→B #152d 2 →List 0 true false 3 →List + DrawText
+                            »
+                            @ The mark d, unless it would sit on top of the 0
+                            ScD ScMin ScMax ScL ScR ScPix B→R 0 ScMin ScMax ScL ScR ScPix B→R
+                            - ABS 12 ≥ IF THEN
+                                "d" ScD ScMin ScMax ScL ScR ScPix B→R 3 - R→B #152d 2 →List
+                                0 true false 3 →List + DrawText
+                            END
+                        »
+                        @ X and Y, written over the upper left of the drawing
+                        "X = " ScX →Str + { #0d #24d 0 true false } DrawText
+                        "Y = " ScY →Str + { #0d #42d 0 true false } DrawText
+                        @ The numbers
+                        "d = " ScD -4 RND ScU × →Str + "     σD = " + ScS -4 RND ScU × →Str +
+                        { #0d #172d 0 true false } DrawText
+                        "z = |d| / σD = " ScZ -4 RND →Str + { #0d #192d 0 true false } DrawText
+                        "p = 2·UTPN(0,1,z) = " ScP -4 RND →Str + "   (shaded)" +
+                        { #0d #212d 0 true false } DrawText
+                        ScD ScU × "d" →Tag ScS ScU × "σD" →Tag ScZ "z" →Tag ScP "p" →Tag
+                    »
+                »
+            »
+        »
+    »
+»

@@ -418,6 +418,12 @@
 	"Bound→σ",	"=/library/Uncertainty/BoundToSigma.48s"
 	"ResN0",	"=/library/Uncertainty/ResN0.48s"
 
+"Uncertainty/Compare"
+
+	"ΔConcord",	"=/library/Uncertainty/DeltaConcord.48s"
+	"σConcord",	"=/library/Uncertainty/SigmaConcord.48s"
+	"RngRel",	"=/library/Uncertainty/RngRel.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="
