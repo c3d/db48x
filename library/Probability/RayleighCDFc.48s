@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  RayleighCDFc
+  @  Upper tail at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "RayleighCDFc: needs 2 arguments" DoError END Explode Drop END
+  → sv Xv « sv 0 + Xv 0 + → s X « 'IFTE(X<0;1;EXP(-(X^2)/(2*(s^2))))' →Num sv Xv 2 →List Drop » »
+»

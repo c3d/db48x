@@ -1,0 +1,10 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2GOF
+  @  Goodness of fit: do observed counts follow the expected ones?
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Takes two lists of the same length: observed, then expected.
+  @ ------------------------------------------------------------
+  → ob ex « IF ob Size ex Size ≠ THEN "Chi2GOF: lists must have the same length" DoError END 0 → acc « 1 ob Size FOR ii ob ii GET ex ii GET - DUP * ex ii GET / acc + 'acc' STO NEXT acc →Num ob Size 1 - → xv dfv « xv "chi2" →Tag dfv "df" →Tag dfv xv UTPC "p" →Tag » » »
+»

@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GEVSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 == THEN Explode Drop ELSE IF DUP Size 4 == THEN Explode Drop Drop ELSE "GEVSx: needs 3 arguments" DoError END END END
+  → x0v scv xiv « x0v 0 + scv 0 + xiv 0 + → x0 sc xi « 'IFTE(ABS(xi)<0.000000001;sc*Ⓒπ/√(6);sc*√(Γ(1-2*xi)-Γ(1-xi)^2)/ABS(xi))' →Num x0v scv xiv 3 →List Drop » »
+»

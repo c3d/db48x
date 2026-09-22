@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GeomCDFc
+  @  Upper tail at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "GeomCDFc: needs 2 arguments" DoError END Explode Drop END
+  → pv Xv « pv 0 + Xv 0 + → p X « '1-(IFTE(X<1;0;1-((1-p)^IP(X))))' →Num pv Xv 2 →List Drop » »
+»

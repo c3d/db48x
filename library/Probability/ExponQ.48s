@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  ExponQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "ExponQ: needs 2 arguments" DoError END Explode Drop END
+  → λv pv « λv 0 + pv 0 + → λ p « '-LN(1-p)/λ' →Num λv pv 2 →List Drop » »
+»

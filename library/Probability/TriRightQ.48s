@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TriRightQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "TriRightQ: needs 3 arguments" DoError END Explode Drop END
+  → Xminv Xmaxv pv « Xminv 0 + Xmaxv 0 + pv 0 + → Xmin Xmax p « 'Xmin' →Num 'Xmax' →Num 0 0 → lo hi x d « 1 45 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x≤Xmin;0;IFTE(x≥Xmax;1;((x-Xmin)^2)/((Xmax-Xmin)^2))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x<Xmin;0;IFTE(x>Xmax;0;2*(x-Xmin)/((Xmax-Xmin)^2))))>0.000000000000000000000000000001;x-((IFTE(x≤Xmin;0;IFTE(x≥Xmax;1;((x-Xmin)^2)/((Xmax-Xmin)^2))))-p)/(IFTE(x<Xmin;0;IFTE(x>Xmax;0;2*(x-Xmin)/((Xmax-Xmin)^2))));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x Xminv Xmaxv pv 3 →List Drop » » »
+»

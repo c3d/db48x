@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BernoulliCDF
+  @  Distribution function at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "BernoulliCDF: needs 2 arguments" DoError END Explode Drop END
+  → pv Xv « pv 0 + Xv 0 + → p X « 'IFTE(X<0;0;IFTE(X<1;1-p;1))' →Num pv Xv 2 →List Drop » »
+»

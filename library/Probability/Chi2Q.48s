@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2Q
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "Chi2Q: needs 2 arguments" DoError END Explode Drop END
+  → dfv pv « dfv 0 + pv 0 + → df p « '0' →Num 'df+40*√(2*df)+50' →Num 0 0 → lo hi x d « 1 34 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x≤0;0;GammaP(df/2;x/2)))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x≤0;0;(x^(df/2-1))*EXP(-x/2)/((2^(df/2))*Γ(df/2))))>0.000000000000000000000000000001;x-((IFTE(x≤0;0;GammaP(df/2;x/2)))-p)/(IFTE(x≤0;0;(x^(df/2-1))*EXP(-x/2)/((2^(df/2))*Γ(df/2))));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x dfv pv 2 →List Drop » » »
+»

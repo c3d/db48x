@@ -1,0 +1,66 @@
+«
+    @ RngRel: how two bounded intervals X and Y sit on the line, as one of the
+    @ thirteen cases of Allen's interval algebra, which IEEE 1788-2015 names the
+    @ overlap state: before, meets, overlaps, starts, containedBy, finishes,
+    @ equals, finishedBy, contains, startedBy, overlappedBy, metBy, after,
+    @ returned as a sentence: "X overlaps Y".
+    @ X and Y may be a…b, a±b, a±p% or a plain number, with compatible units;
+    @ Y is expressed in the unit of X. A value a±σb is refused: its bars are not
+    @ bounds, and σConcord is the comparison that fits it.
+    @ Point intervals take the first rule that matches, in the order below.
+    @ After Jean Wilson's Concord (2025).
+
+    @ Bounds of a value without unit: V → lo hi
+    «
+        DUP TypeName → RrK
+        «
+            CASE
+                RrK "range" == THEN Object→ END
+                RrK "drange" == THEN Object→ → RrA RrH « RrA RrH - RrA RrH + » END
+                RrK "prange" == THEN
+                    Object→ → RrA RrP « RrA ABS RrP × 100 ÷ → RrH « RrA RrH - RrA RrH + » »
+                END
+                RrK "uncertain" == THEN
+                    DROP "RngRel: a±σb has no bounds, use σConcord" DoError
+                END
+                RrK "integer" == RrK "neg_integer" == OR RrK "decimal" == OR
+                RrK "neg_decimal" == OR RrK "fraction" == OR RrK "neg_fraction" == OR
+                RrK "bignum" == OR RrK "neg_bignum" == OR THEN DUP END
+                DROP "RngRel: X and Y must be intervals or numbers" DoError
+            END
+        »
+    »
+    → RrBounds
+    «
+        → RrX RrY
+        «
+            @ Y in the unit of X, then both without unit
+            IF RrX TypeName "unit" == THEN
+                IF RrY TypeName "unit" ≠ THEN "RngRel: X has a unit, Y has none" DoError END
+                RrY RrX Convert UVAL RrX UVAL
+            ELSE
+                IF RrY TypeName "unit" == THEN "RngRel: Y has a unit, X has none" DoError END
+                RrY RrX
+            END
+            RrBounds ROT RrBounds
+            → RrA1 RrA2 RrB1 RrB2
+            «
+                CASE
+                    RrA1 RrB1 = RrA2 RrB2 = AND THEN "equals" END
+                    RrA2 RrB1 < THEN "before" END
+                    RrB2 RrA1 < THEN "after" END
+                    RrA1 RrB1 = THEN IF RrA2 RrB2 < THEN "starts" ELSE "startedBy" END END
+                    RrA2 RrB2 = THEN IF RrA1 RrB1 > THEN "finishes" ELSE "finishedBy" END END
+                    RrA2 RrB1 = THEN "meets" END
+                    RrA1 RrB2 = THEN "metBy" END
+                    RrA1 RrB1 > RrA2 RrB2 < AND THEN "containedBy" END
+                    RrA1 RrB1 < RrA2 RrB2 > AND THEN "contains" END
+                    RrA1 RrB1 < THEN "overlaps" END
+                    "overlappedBy"
+                END
+                @ Said as a sentence, so that the direction is plain: X overlaps Y
+                "X " SWAP + " Y" +
+            »
+        »
+    »
+»

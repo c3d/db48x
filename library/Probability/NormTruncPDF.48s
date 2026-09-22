@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  NormTruncPDF
+  @  Density (or mass) at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 5; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 5 ≠ THEN "NormTruncPDF: needs 5 arguments" DoError END Explode Drop END
+  → x0v scv Xminv Xmaxv Xv « x0v 0 + scv 0 + Xminv 0 + Xmaxv 0 + Xv 0 + → x0 sc Xmin Xmax X « 'IFTE(X<Xmin;0;IFTE(X>Xmax;0;(EXP(-(((X-x0)/sc)^2)/2)/(sc*√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))))' →Num x0v scv Xminv Xmaxv Xv 5 →List Drop » »
+»

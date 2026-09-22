@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LevyCDF
+  @  Distribution function of Levy. Stack: x0, sc, X.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "LevyCDF: needs 3 arguments" DoError END Explode Drop END
+  → x0v scv Xv « x0v 0 + scv 0 + Xv 0 + → x0 sc X « 'IFTE(X≤x0;0;erfc(√(sc/(2*(X-x0)))))' →Num x0v scv Xv 3 →List Drop » »
+»

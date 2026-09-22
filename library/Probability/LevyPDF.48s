@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LevyPDF
+  @  Density of Levy at X. Stack: x0, sc, X.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "LevyPDF: needs 3 arguments" DoError END Explode Drop END
+  → x0v scv Xv « x0v 0 + scv 0 + Xv 0 + → x0 sc X « 'IFTE(X≤x0;0;√(sc/(2*Ⓒπ))*EXP(-sc/(2*(X-x0)))/((X-x0)^1.5))' →Num x0v scv Xv 3 →List Drop » »
+»

@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BetaAll
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "BetaAll: needs 3 arguments" DoError END Explode Drop END
+  → av bv Xv « av 0 + bv 0 + Xv 0 + → a b X « 'IFTE(X≤0;0;IFTE(X≥1;1;BetaI(a;b;X)))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X≤0;0;IFTE(X≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(X^(a-1))*((1-X)^(b-1))))' →Num "PDF" →Tag '1-Kc' →Num "CDFc" →Tag 'a/(a+b)' →Num "μ" →Tag '√(a*b/(((a+b)^2)*(a+b+1)))' →Num "sx" →Tag { Kc } PURGE av bv Xv 3 →List Drop » »
+»

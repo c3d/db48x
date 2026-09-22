@@ -1,0 +1,102 @@
+«
+    @ SciRngParen: the result of SciRngRnd in concise (parenthetical) notation,
+    @ as the GUM and CODATA write it: 1.456±0.023 → "1.456(23)", the digits in
+    @ parentheses being the uncertainty in units of the last digit of the value.
+    @ When the uncertainty reaches the tens, a power of ten keeps it unambiguous:
+    @ 123456.7±789.1 → "1.2346(79)×10⁵". By convention the parentheses denote a
+    @ standard uncertainty. After Jean Wilson's SciRngRnd (2025-2026).
+    @ None of the helpers below calls another one: a program held in a local
+    @ variable that names another local reaches the wrong variable when it runs
+    @ under more local scopes than where it was written.
+
+    @ Decimals for an uncertainty rounded to 2 significant digits: U → d
+    «
+        IF DUP 0 = THEN DROP 0 ELSE ABS LOG FLOOR 1 SWAP - R→I END
+    »
+    @ Any value as displayed, without the digit separators: V → "text"
+    «
+        →Str "" SWAP 1 OVER Size
+        FOR SciPos
+            DUP SciPos SciPos SUB
+            IF DUP NUM 8287 == THEN DROP ELSE ROT SWAP + SWAP END
+        NEXT
+        DROP
+    »
+    @ Value with d decimals, written in full, zeros kept: V d → "text"
+    «
+        → Vc Dc
+        «
+            Vc ABS
+            IF Dc 0 > THEN 10 Dc ^ × END
+            0 RND R→I →Str
+            "" SWAP 1 OVER Size
+            FOR SciPos
+                DUP SciPos SciPos SUB
+                IF DUP NUM DUP 48 ≥ SWAP 57 ≤ AND THEN ROT SWAP + SWAP ELSE DROP END
+            NEXT
+            DROP
+            IF Dc 0 > THEN
+                WHILE DUP Size Dc ≤ REPEAT "0" SWAP + END
+                DUP 1 OVER Size Dc - SUB "." +
+                SWAP DUP Size Dc - 1 + OVER Size SUB +
+            END
+            IF Vc 0 < THEN "-" SWAP + END
+        »
+    »
+    @ Positive integer written in superscript digits: N → "⁵"
+    «
+        →Str "" SWAP 1 OVER Size
+        FOR SciPos
+            DUP SciPos SciPos SUB
+            IF DUP NUM DUP 48 ≥ SWAP 57 ≤ AND THEN
+                NUM 47 - "⁰¹²³⁴⁵⁶⁷⁸⁹" SWAP DUP SUB ROT SWAP + SWAP
+            ELSE
+                DROP
+            END
+        NEXT
+        DROP
+    »
+    → SciPlaces SciPlain SciFix SciSup
+    «
+        ⓁSciRngRnd
+        @ Unit as text, with a plain space (" m"), and the interval without it
+        IF DUP TypeName "unit" == THEN
+            DUP 1 SWAP →Unit →Str 3 OVER Size SUB " " SWAP + SWAP UVAL
+        ELSE
+            "" SWAP
+        END
+        DUP TypeName SWAP Object→
+        → SciUnit SciKind Ac Bc
+        «
+            @ Central value and absolute uncertainty, whatever the type
+            CASE
+                SciKind "range" == THEN Ac Bc + 2 ÷ Bc Ac - 2 ÷ END
+                SciKind "prange" == THEN Ac Ac ABS Bc × 100 ÷ -2 RND END
+                Ac Bc
+            END
+            → Xc Uc
+            «
+                IF Uc 0 = THEN
+                    @ Zero uncertainty: the value alone, as it is
+                    Xc SciPlain
+                ELSE
+                    Uc SciPlaces → Dc
+                    «
+                        IF Dc 0 ≥ THEN
+                            Xc Dc SciFix "(" +
+                            Uc 10 Dc ^ × 0 RND R→I SciPlain + ")" +
+                        ELSE
+                            @ Uncertainty in the tens or more: mantissa and power of ten
+                            IF Xc 0 = THEN Dc NEG ELSE Xc ABS LOG FLOOR R→I Dc NEG MAX END
+                            → SciExp
+                            « Xc 10 SciExp ^ ÷ SciExp Dc + SciFix "(" +
+                              Uc 10 Dc ^ × 0 RND R→I SciPlain + ")×10" +
+                              SciExp SciSup + »
+                        END
+                    »
+                END
+            »
+            SciUnit +
+        »
+    »
+»

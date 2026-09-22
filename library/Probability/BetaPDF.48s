@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BetaPDF
+  @  Density (or mass) at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "BetaPDF: needs 3 arguments" DoError END Explode Drop END
+  → av bv Xv « av 0 + bv 0 + Xv 0 + → a b X « 'IFTE(X≤0;0;IFTE(X≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(X^(a-1))*((1-X)^(b-1))))' →Num av bv Xv 3 →List Drop » »
+»
