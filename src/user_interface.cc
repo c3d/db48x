@@ -4422,13 +4422,23 @@ restart:
                         break;
                     }
 
+                    // The anchor may hold non-ASCII characters, e.g. the
+                    // arrow of `#llh→xyz`: store them as UTF-8, not as a
+                    // truncated byte, or the topic is never found
                     char *p = link;
                     while (n != ')')
                     {
                         n = helpfile.get();
                         if (n != '#')
-                            if (p < link + sizeof(link))
-                                *p++ = n;
+                        {
+                            byte   enc[4];
+                            size_t sz = utf8_encode(n, enc);
+                            if (p + sz <= link + sizeof(link))
+                            {
+                                memcpy(p, enc, sz);
+                                p += sz;
+                            }
+                        }
                     }
                     p[-1] = 0;
                     if (follow && style == HIGHLIGHTED_TOPIC && y >= 0)
