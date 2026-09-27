@@ -2922,7 +2922,7 @@ North component is `x` and East component is `y`; `180°+(-y)∠(-x)` gives
 that direction between 0° and 360°. Solving for all the variables of an
 entry, steps included, is the simplest way to use it.
 
-The 28 variables in the Navigation section are:
+The 41 variables in the Navigation section are:
 
 *Positions, courses and distances*
 
@@ -2937,6 +2937,13 @@ The 28 variables in the Navigation section are:
 * `XTD`: Cross-track distance: how far the present position is from the route, positive when right of it (dim.: length, in SI: m)
 * `ATD`: Along-track distance: how far along the route the present position is (dim.: length, in SI: m)
 * `Rs`: Radius of the spherical earth (dim.: length, in SI: m)
+* `TC`: True course, or track: the direction actually followed over the ground (for a ship: course made good)
+* `TH`: True heading: the direction the aircraft or ship points to
+* `V`: Own speed through the air or the water: true airspeed of an aircraft, speed of a ship (dim.: speed)
+* `GS`: Ground speed (for a ship: speed made good) (dim.: speed)
+* `WD`: Direction the wind comes **from**. A current setting towards `set` acts as a wind from `set+180°`
+* `WS`: Wind speed, or drift of the current (dim.: speed)
+* `WCA`: Wind correction angle, `TH-TC`: negative when heading left of the track
 
 *Intermediate steps*
 
@@ -2951,10 +2958,15 @@ The 28 variables in the Navigation section are:
 * `x2`: North component of the final course
 * `xP`: North component of the course towards the present position
 * `TC1P`: True course from the departure point towards the present position
+* `gN`, `gE`: North and East components of the ground speed vector
+* `wN`, `wE`: North and East components of the wind, pointing where it comes from
+* `aN`, `aE`: North and East components of the own speed vector
 
 * References:
   [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
-  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings*.
+  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings* ;
+  [3] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C, chapter 16, *Navigation* ;
+  [4] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2024), chapter 10, *Dead Reckoning*, §1008.
 
 #### Great Circle
 
@@ -3037,4 +3049,92 @@ How far is the present position from the planned route?
 φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
 @ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
 'ROOT(ⒺCross Track Error;[Δφ;Δλ;hav;θ1P;xP;TC1P;θXT;θAT;XTD;ATD];[1_°;1_°;0;1_°;0;1_°;1_°;1_°;1_nmi;1_nmi])'
+```
+
+#### Wind Correction
+
+The wind triangle: what heading to fly, or to steer, to follow a given track?
+The aircraft moves through the air, and the air moves over the ground; the
+ground speed vector is the sum of the own speed vector and of the wind. The
+same triangle serves a ship in a current.
+
+* Main results: the true heading `TH` and the ground speed `GS` needed to
+  follow the true course `TC` at the own speed `V`, with a wind of speed `WS`
+  coming from `WD`.
+* Steps: the wind correction angle `WCA` between heading and track.
+* For a current, give its drift as `WS`, and as `WD` the direction opposite to
+  its set: a current setting towards 170° acts as a wind from 350°.
+
+* To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
+```rpl
+TC=90_° V=120_knot WD=45_° WS=40_knot
+@ Expecting [ WCA=-13.63302 22254 ° TH=76.36697 77746 ° GS=88.33476 66494 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
+```rpl
+TC=31_° V=115_knot WD=360_° WS=10_knot
+@ Expecting [ WCA=-2.56690 27668 6 ° TH=28.43309 72331 ° GS=106.31293 6833 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` (Course to steer; Speed made good) for a ship at 12 kt which must make good 095°, in a current setting towards 170° at 2.5 kt, that is a wind from 350°. The book gives 083.5° and 12.4 kt [4, example 2]:
+```rpl
+TC=95_° V=12_knot WD=350_° WS=2.5_knot
+@ Expecting [ WCA=-11.60916 12726 ° TH=83.39083 87274 ° GS=12.40156 4643 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+#### Ground Track
+
+Where does a heading lead? The ground track and speed that result from a
+heading and a speed through a moving air or water.
+
+* Main results: the true course `TC` actually followed over the ground, and
+  the ground speed `GS`, when heading `TH` at the own speed `V` with a wind of
+  speed `WS` coming from `WD`.
+* Steps: the North and East components `gN` and `gE` of the ground speed, and
+  the wind correction angle `WCA`, here the drift to be expected.
+
+* To calculate: `[TC;GS]` (Course and speed made good) for a ship steering 080° at 10 kt in a current setting towards 140° at 2 kt, that is a wind from 320°. The book reads 089° and 11.2 kt on its plot [4, example 1]:
+```rpl
+TH=80_° V=10_knot WD=320_° WS=2_knot
+@ Expecting [ gN=0.20439 28904 31 knot gE=11.13365 27495 knot GS=11.13552 87257 knot TC=88.94827 55646 ° WCA=-8.94827 55646 3 ° ]
+'ROOT(ⒺGround Track;[gN;gE;GS;TC;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+#### Wind Finding
+
+What is the wind? A pilot who knows the heading and airspeed, and measures the
+track and ground speed (with a GPS, for instance), can deduce the wind. The
+same calculation gives the set and drift of a current, the direction of which
+is then `WD-180°`.
+
+* Main results: the direction `WD` the wind comes from, and its speed `WS`.
+* Steps: the North and East components `wN` and `wE` of the wind.
+
+* To calculate: `[WD;WS]` (Wind direction and speed) from the heading 076.37° and airspeed 120 kt, with a track of 090° and a ground speed of 88.33 kt; this is the first `Wind Correction` example in reverse, and gives back the wind from 045° at 40 kt:
+```rpl
+TH=76.37_° V=120_knot TC=90_° GS=88.33_knot
+@ Expecting [ wN=28.27811 98124 knot wE=28.29052 96673 knot WS=40.00007 66122 knot WD=45.01256 93702 ° ]
+'ROOT(ⒺWind Finding;[wN;wE;WS;WD];[1_knot;1_knot;1_knot;1_°])'
+```
+
+#### Required Heading & Speed
+
+What heading and own speed are needed to make good both a given track and a
+given ground speed, for instance to reach a waypoint at a set time?
+
+* Main results: the true heading `TH` and the own speed `V` that make good the
+  true course `TC` at the ground speed `GS`, with a wind of speed `WS` coming
+  from `WD`.
+* Steps: the North and East components `aN` and `aE` of the own speed vector,
+  and the wind correction angle `WCA`.
+
+* To calculate: `[TH;V]` (Course and speed to steer) for a ship which must make good 265° at 15 kt, in a current setting towards 185° at 3 kt, that is a wind from 005°. The book reads 276° and 14.8 kt on its plot [4, example 3]:
+```rpl
+TC=265_° GS=15_knot WD=5_° WS=3_knot
+@ Expecting [ aN=1.68124 79530 6 knot aE=-14.68145 32431 knot V=14.77740 38319 knot TH=276.53277 4288 ° WCA=11.53277 42876 ° ]
+'ROOT(ⒺRequired Heading & Speed;[aN;aE;V;TH;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
 ```

@@ -1444,6 +1444,31 @@ static const cstring basic_equations[] =
     "  '(XTD_nmi)=(Rs_nmi)·(θXT_r)/(1_r)' "
     "  '(ATD_nmi)=(Rs_nmi)·(θAT_r)/(1_r)' "
     "}",
+    "Wind Correction",  "{ "
+    "  '(WCA_°)=ASIN((WS_knot)·SIN((WD_°)-(TC_°))/(V_knot))' "
+    "  '(TH_°)=180_°+(-SIN((TC_°)+(WCA_°)))∠(-COS((TC_°)+(WCA_°)))' "
+    "  '(GS_knot)=(V_knot)·COS(WCA_°)-(WS_knot)·COS((WD_°)-(TC_°))' "
+    "}",
+    "Ground Track",  "{ "
+    "  '(gN_knot)=(V_knot)·COS(TH_°)-(WS_knot)·COS(WD_°)' "
+    "  '(gE_knot)=(V_knot)·SIN(TH_°)-(WS_knot)·SIN(WD_°)' "
+    "  '(GS_knot)=√((gN_knot)²+(gE_knot)²)' "
+    "  '(TC_°)=180_°+(-(gE_knot)/(GS_knot))∠(-(gN_knot)/(GS_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+    "Wind Finding",  "{ "
+    "  '(wN_knot)=(V_knot)·COS(TH_°)-(GS_knot)·COS(TC_°)' "
+    "  '(wE_knot)=(V_knot)·SIN(TH_°)-(GS_knot)·SIN(TC_°)' "
+    "  '(WS_knot)=√((wN_knot)²+(wE_knot)²)' "
+    "  '(WD_°)=180_°+(-(wE_knot)/(WS_knot))∠(-(wN_knot)/(WS_knot))' "
+    "}",
+    "Required Heading & Speed",  "{ "
+    "  '(aN_knot)=(GS_knot)·COS(TC_°)+(WS_knot)·COS(WD_°)' "
+    "  '(aE_knot)=(GS_knot)·SIN(TC_°)+(WS_knot)·SIN(WD_°)' "
+    "  '(V_knot)=√((aN_knot)²+(aE_knot)²)' "
+    "  '(TH_°)=180_°+(-(aE_knot)/(V_knot))∠(-(aN_knot)/(V_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
