@@ -2893,3 +2893,111 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
+
+
+## Aeronautics
+
+The `Aeronautics` section groups the calculations of air and marine
+navigation. Its equations use a spherical earth: they are exact on the sphere,
+and within about 0.5% of the ellipsoidal (WGS-84) answer.
+
+### Navigation
+
+Conventions: latitudes are positive North, **longitudes are positive East**
+(as in GPS coordinates; West longitudes are negative), and true courses are
+measured clockwise from true North, from 0° to 360°. Angles can be entered in
+any angular unit, for instance `'33_°+57_arcmin'` for 33°57′.
+
+The radius `Rs` of the sphere is a variable. With `Rs='(10800_nmi)/Ⓒπ'`, one
+arc-minute of a great circle is exactly one nautical mile, the convention of
+the navigation references below; the WGS-84 mean radius, `(2a+b)/3`, is
+6 371 008.8 m.
+
+The 23 variables in the Navigation section are:
+
+* `ATD`: Along-track distance, from the departure point to the point abeam the present position (dim.: length, in SI: m)
+* `D`: Great-circle distance between departure and destination (dim.: length, in SI: m)
+* `Dv`: Great-circle distance from the departure point to the vertex (dim.: length, in SI: m)
+* `Δλ`: Longitude change from departure to destination
+* `Δλv`: Longitude change from the departure point to the vertex
+* `λ1`: Longitude of the departure point
+* `λ2`: Longitude of the destination
+* `λP`: Longitude of the present position
+* `λv`: Longitude of the northern vertex
+* `φ1`: Latitude of the departure point
+* `φ2`: Latitude of the destination
+* `φP`: Latitude of the present position
+* `φv`: Latitude of the northern vertex, the highest latitude reached by the great circle
+* `Rs`: Radius of the spherical earth (dim.: length, in SI: m)
+* `TC1`: Initial true course, from departure towards destination
+* `TC2`: Final true course, on arrival at the destination
+* `TC1P`: True course from the departure point towards the present position
+* `θ`: Central angle between departure and destination
+* `θ1P`: Central angle between the departure point and the present position
+* `θAT`: Central angle along the track
+* `θv`: Central angle between the departure point and the vertex
+* `θXT`: Central angle across the track
+* `XTD`: Cross-track distance, positive when the present position is right of the course (dim.: length, in SI: m)
+
+* References:
+  [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings*.
+
+#### Great Circle
+
+The great circle is the shortest route between two points of a sphere. The
+distance `D` is computed with the haversine formula, which stays accurate for
+short distances. The course changes all along the route, from `TC1` at
+departure to `TC2` on arrival.
+
+* To calculate: `[θ;D;TC1;TC2]` (Central angle; Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=35.72876 83542 ° D=2 143.72610 125 nmi TC1=65.89216 65527 ° TC2=93.85816 38167 ° ]
+'ROOT(ⒺGreat Circle;[θ;D;TC1;TC2];[1_°;1_nmi;1_°;1_°])'
+```
+
+* To calculate: `[θ;D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
+```rpl
+φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=78.22558 092 ° D=4 693.53485 52 nmi TC1=252.98680 2724 ° TC2=289.35065 3611 ° ]
+'ROOT(ⒺGreat Circle;[θ;D;TC1;TC2];[1_°;1_nmi;1_°;1_°])'
+```
+
+#### Great Circle Vertex
+
+The vertex is the point of highest latitude of a great circle (Clairaut's
+relation: `COS(φ)·SIN(TC)` is constant along it). The equations give the
+northern vertex; the southern one lies at `-φv`, 180° of longitude away.
+
+* To calculate: `[φv;Δλv;λv;θv;Dv]` (Vertex latitude and longitude; Distance to the vertex) from 28°N, 125°W, initial course 291° [2, §1210, example 1]:
+```rpl
+φ1=28_° λ1=-125_° TC1=291_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ φv=34.48215 17436 ° Δλv=-39.27119 44547 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
+'ROOT(ⒺGreat Circle Vertex;[φv;Δλv;λv;θv;Dv];[1_°;1_°;1_°;1_°;1_nmi])'
+```
+
+#### Great Circle Destination
+
+Position reached after a distance `D` along a great circle leaving `(φ1;λ1)`
+on the initial true course `TC1` (the *direct* problem).
+
+* To calculate: `[θ;φ2;Δλ;λ2]` (Destination latitude and longitude) 100 nmi from LAX on the initial course from LAX to JFK, 1.150035 radians [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r D=100_nmi Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=1.66666 66666 7 ° φ2=34.61697 31196 ° Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
+'ROOT(ⒺGreat Circle Destination;[θ;φ2;Δλ;λ2];[1_°;1_°;1_°;1_°])'
+```
+
+#### Cross Track Error
+
+Distance `XTD` between the present position `(φP;λP)` and the great circle
+from `(φ1;λ1)` to `(φ2;λ2)`, positive when right of course, and the distance
+`ATD` already covered along the route.
+
+* To calculate: `[θ1P;TC1P;TC1;θXT;θAT;XTD;ATD]` (Cross-track and along-track distances) on the route LAX to JFK, from the present position 34°30′N, 116°30′W [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ1P=1.66444 68173 2 ° TC1P=70.17227 64696 ° TC1=65.89216 65527 ° θXT=0.12420 45397 88 ° θAT=1.65980 74453 6 ° XTD=7.45227 23872 7 nmi ATD=99.58844 67214 nmi ]
+'ROOT(ⒺCross Track Error;[θ1P;TC1P;TC1;θXT;θAT;XTD;ATD];[1_°;1_°;1_°;1_°;1_°;1_nmi;1_nmi])'
+```

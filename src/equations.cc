@@ -1400,6 +1400,42 @@ static const cstring basic_equations[] =
     "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
 
+    // ------------------------------------------------------------------------
+    "Aeronautics", nullptr,
+    // ------------------------------------------------------------------------
+    // Spherical earth of radius Rs, longitudes positive East, courses in
+    // [0°;360°) from true North. 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°)
+    // and (SIN(λ))∠(COS(λ)) brings a longitude back into ]-180°;180°].
+    "Aeronautics/Navigation", nullptr,
+    "Great Circle",  "{ "
+    "  '(θ_°)=2·ASIN(√(SIN(((φ2_°)-(φ1_°))/2)²+COS(φ1_°)·COS(φ2_°)·SIN(((λ2_°)-(λ1_°))/2)²))' "
+    "  '(D_nmi)=(Rs_nmi)·(θ_r)/(1_r)' "
+    "  '(TC1_°)=180_°+(-(SIN((λ2_°)-(λ1_°))·COS(φ2_°)))∠(-(COS(φ1_°)·SIN(φ2_°)-SIN(φ1_°)·COS(φ2_°)·COS((λ2_°)-(λ1_°))))' "
+    "  '(TC2_°)=180_°+(SIN((λ1_°)-(λ2_°))·COS(φ1_°))∠(COS(φ2_°)·SIN(φ1_°)-SIN(φ2_°)·COS(φ1_°)·COS((λ1_°)-(λ2_°)))' "
+    "}",
+    "Great Circle Vertex",  "{ "
+    "  '(φv_°)=ACOS(ABS(COS(φ1_°)·SIN(TC1_°)))' "
+    "  '(Δλv_°)=(SIN(TC1_°)·COS(TC1_°))∠(SIN(TC1_°)²·SIN(φ1_°))' "
+    "  '(λv_°)=(SIN((λ1_°)+(Δλv_°)))∠(COS((λ1_°)+(Δλv_°)))' "
+    "  '(θv_°)=ACOS(SIN(φ1_°)/SIN(φv_°))' "
+    "  '(Dv_nmi)=(Rs_nmi)·(θv_r)/(1_r)' "
+    "}",
+    "Great Circle Destination",  "{ "
+    "  '(θ_°)=(1_r)·(D_nmi)/(Rs_nmi)' "
+    "  '(φ2_°)=ASIN(SIN(φ1_°)·COS(θ_°)+COS(φ1_°)·SIN(θ_°)·COS(TC1_°))' "
+    "  '(Δλ_°)=(SIN(TC1_°)·SIN(θ_°)·COS(φ1_°))∠(COS(θ_°)-SIN(φ1_°)·SIN(φ2_°))' "
+    "  '(λ2_°)=(SIN((λ1_°)+(Δλ_°)))∠(COS((λ1_°)+(Δλ_°)))' "
+    "}",
+    "Cross Track Error",  "{ "
+    "  '(θ1P_°)=2·ASIN(√(SIN(((φP_°)-(φ1_°))/2)²+COS(φ1_°)·COS(φP_°)·SIN(((λP_°)-(λ1_°))/2)²))' "
+    "  '(TC1P_°)=180_°+(-(SIN((λP_°)-(λ1_°))·COS(φP_°)))∠(-(COS(φ1_°)·SIN(φP_°)-SIN(φ1_°)·COS(φP_°)·COS((λP_°)-(λ1_°))))' "
+    "  '(TC1_°)=180_°+(-(SIN((λ2_°)-(λ1_°))·COS(φ2_°)))∠(-(COS(φ1_°)·SIN(φ2_°)-SIN(φ1_°)·COS(φ2_°)·COS((λ2_°)-(λ1_°))))' "
+    "  '(θXT_°)=ASIN(SIN(θ1P_°)·SIN((TC1P_°)-(TC1_°)))' "
+    "  '(θAT_°)=ACOS(COS(θ1P_°)/COS(θXT_°))' "
+    "  '(XTD_nmi)=(Rs_nmi)·(θXT_r)/(1_r)' "
+    "  '(ATD_nmi)=(Rs_nmi)·(θAT_r)/(1_r)' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
