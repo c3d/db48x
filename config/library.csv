@@ -59,3 +59,12 @@
 	"XYZ→LLH",	"=/library/XYZtoLLH.48s"
 	"RadialFix",	"="
 	"GCPoint",	"="
+
+"Navigation/Route"
+
+	"WPAdd",		"="
+	"WPIns",		"="
+	"WPDel",		"="
+	"WPLegs",	"="
+	"WPNext",	"="
+	"WPDirect",	"="

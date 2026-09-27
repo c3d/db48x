@@ -160,3 +160,162 @@ Four tenths of the way from Los Angeles (LAX, 33°57′N, 118°24′W) to New Yo
 33.95 -118.4 40.63333333333333 -73.78333333333333 0.4 ⓁGCPoint 2 →LIST
 @ Expecting { 38.66944 7748 ° -101.62616 0313 ° }
 ```
+
+
+## RouteLibrary
+
+The Route subsection keeps a route — a list of waypoints — and follows it
+while travelling.
+
+* The route is the variable `Route` of the current directory: a list with one
+  `{ "name" φ λ }` list per waypoint. It can be viewed and edited like any
+  list.
+* The active leg is the variable `RouteLeg`: leg 1 goes from the first to the
+  second waypoint.
+
+To build a route: [WPAdd](#wpadd) adds a waypoint at the end,
+[WPIns](#wpins) inserts one, for instance to divert, and [WPDel](#wpdel)
+removes one. [WPLegs](#wplegs) lists the legs with their distance and course.
+
+On the way: [WPNext](#wpnext) gives, from the present position, the bearing,
+distance and time to the next waypoint, and how far off the route one is; it
+moves to the next leg by itself once a waypoint is passed.
+[WPDirect](#wpdirect) goes straight from the present position to a chosen
+waypoint.
+
+Distances and bearings are computed on the WGS-84 ellipsoid with
+[VincentyInv](#vincentyinv).
+
+
+## WPAdd
+
+Adds a waypoint at the end of the route, and creates the route if needed.
+
+Stack: `"name"` `φ` `λ` ▶ nothing; the waypoint is added to `Route`.
+
+The examples of this subsection build a route from Los Angeles to New York
+through Albuquerque, then show the names of its waypoints, with
+`Route « 1 GET » MAP`:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+Route « 1 GET » MAP
+@ Expecting { "LAX" "ABQ" "JFK" }
+```
+
+
+## WPIns
+
+Inserts a waypoint into the route: it becomes waypoint `n`, and the following
+ones move down by one. This is how to divert, or to add a turning point. The
+active leg follows the waypoints it pointed to.
+
+Stack: `"name"` `φ` `λ` `n` ▶ nothing.
+
+A stop at Denver, inserted between Albuquerque and New York:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+"DEN" 39.8561 -104.6737 3 ⓁWPIns
+Route « 1 GET » MAP
+@ Expecting { "LAX" "ABQ" "DEN" "JFK" }
+```
+
+
+## WPDel
+
+Removes waypoint `n` from the route. The active leg follows the waypoints it
+pointed to.
+
+Stack: `n` ▶ nothing.
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+2 ⓁWPDel
+Route « 1 GET » MAP
+@ Expecting { "LAX" "JFK" }
+```
+
+
+## WPLegs
+
+Lists the legs of the route: for each leg, `"A→B"`, its distance in nautical
+miles and its initial true course; then the total distance.
+
+Stack: ▶ `{ legs }` `Total`.
+
+The example shows the total, then the distance of each leg:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+ⓁWPLegs SWAP « 2 GET » MAP LIST→ DROP 3 →LIST
+@ Expecting { Total:2 174.82710 563 nmi 588.50367 4436 nmi 1 586.32343 12 nmi }
+```
+
+
+## WPNext
+
+Where is the next waypoint, and how far off the route am I?
+
+Stack: `φ` `λ` `GS` ▶ `To` `Brg` `Dist` `XTD` `ETE`, from the present
+position and the ground speed (knots if a plain number; 0 to skip `ETE`):
+
+* `To`: the next waypoint, the end of the active leg;
+* `Brg` and `Dist`: its true bearing and its distance in nautical miles;
+* `XTD`: the cross-track distance from the active leg, positive when right of
+  it;
+* `ETE`: the time to reach it at the ground speed, in hours, minutes and
+  seconds.
+
+When the present position is abeam or past the end of the active leg, the
+next leg becomes active, and the results refer to it.
+
+Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+34.3 -114.0 450 ⓁWPNext 5 →LIST
+@ Expecting { To:"ABQ" Brg:80.99381 77706 ° Dist:368.36060 6014 nmi XTD:11.28267 43886 nmi ETE:0:49:06.88484 81140 31 }
+```
+
+East of Albuquerque, the first leg is behind: the second leg, to New York,
+becomes active, and `RouteLeg`, added at the end, is 2:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+35.3 -104.0 450 ⓁWPNext 5 →LIST RouteLeg +
+@ Expecting { To:"JFK" Brg:68.26395 64658 ° Dist:1 461.44173 207 nmi XTD:32.14230 0708 nmi ETE:3:14:51.53385 65283 63 2 }
+```
+
+
+## WPDirect
+
+"Direct to": go straight from the present position to waypoint `n` of the
+route. The present position is inserted before waypoint `n` under the name
+`"DCT"`, and the leg from it to waypoint `n` becomes the active leg.
+
+Stack: `φ` `λ` `n` ▶ nothing.
+
+Over Los Angeles, cleared direct to New York; the route now goes through
+`"DCT"`, and the active leg is the third, from `"DCT"` to New York:
+
+```rpl
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+34.0 -118.0 3 ⓁWPDirect
+Route « 1 GET » MAP RouteLeg +
+@ Expecting { "LAX" "ABQ" "DCT" "JFK" 3 }
+```

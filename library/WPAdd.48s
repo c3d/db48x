@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ WPAdd — add a waypoint at the end of the route.
+@@
+@@ Input : "name" φ λ — name, latitude and longitude (East positive).
+@@         Plain numbers are degrees; angles with a unit are accepted.
+@@ The route is the list stored in the variable Route of the current
+@@ directory, one { "name" φ λ } list per waypoint; it is created if
+@@ it does not exist yet.
+@@ ============================================================
+
+  3 →LIST 1 →LIST
+  IFERR 'Route' RCL THEN DROP { } END
+  SWAP + 'Route' STO
+»
