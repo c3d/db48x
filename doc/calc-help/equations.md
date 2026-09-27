@@ -2919,9 +2919,10 @@ below. The other variables are intermediate steps: they keep each equation
 short enough to be shown on the screen of the solver, and they let you follow
 the calculation. A course, for instance, is the direction of a vector whose
 North component is `x` and East component is `y`; `180°+(-y)∠(-x)` gives
-that direction between 0° and 360°.
+that direction between 0° and 360°. Solving for all the variables of an
+entry, steps included, is the simplest way to use it.
 
-The 39 variables in the Navigation section are:
+The 28 variables in the Navigation section are:
 
 *Positions, courses and distances*
 
@@ -2945,17 +2946,11 @@ The 39 variables in the Navigation section are:
 * `θXT`, `θAT`: Central angles across and along the track
 * `Δφ`, `Δλ`: Latitude and longitude differences
 * `Δλv`: Longitude difference from the departure point to the vertex
-* `λe`: Vertex longitude before being brought back between -180° and 180°
-* `hφ`, `hλ`: Haversines of `Δφ` and `Δλ`, that is `SIN(Δφ/2)²` and `SIN(Δλ/2)²`
 * `hav`: Haversine of the central angle, `SIN(θ/2)²`
-* `x1`, `y1`: North and East components of the initial course: `TC1` is the direction of the vector `(x1;y1)`
-* `x2`, `y2`: North and East components of the final course (Great Circle), or of the longitude change (Destination)
-* `xP`, `yP`: North and East components of the course towards the present position
-* `xv`, `yv`: Components of the longitude change to the vertex
+* `x1`: North component of the initial course
+* `x2`: North component of the final course
+* `xP`: North component of the course towards the present position
 * `TC1P`: True course from the departure point towards the present position
-* `ΔTC`: Angle between the route and the course towards the present position
-* `n`: `COS(φ1)·SIN(θ)`, shared by two steps of the destination
-* `z2`: Sine of the destination latitude
 
 * References:
   [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
@@ -2969,22 +2964,22 @@ The great circle is the shortest route between two points of a sphere.
   `(φ2;λ2)`, the initial true course `TC1` to steer at departure, and the final
   true course `TC2` on arrival. On a great circle the course changes all along
   the route, so `TC1` and `TC2` differ, except along a meridian or the equator.
-* Steps: the central angle `θ` comes from the haversine formula, through `hφ`,
-  `hλ` and `hav`, which stays accurate for short distances; the courses come
-  from their North and East components `x1`, `y1`, `x2`, `y2`.
+* Steps: the central angle `θ` comes from the haversine `hav`, which stays
+  accurate for short distances; each course comes from its North component,
+  `x1` or `x2`.
 
 * To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
 ```rpl
 φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
-@ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hφ=3.39772 71696 6⁳⁻³ hλ=0.14408 91160 87 hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi y1=0.53301 58968 38 x1=0.23851 69937 16 TC1=65.89216 65527 ° y2=-0.58262 54697 x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
-'ROOT(ⒺGreat Circle;[Δφ;Δλ;hφ;hλ;hav;θ;D;y1;x1;TC1;y2;x2;TC2];[1_°;1_°;0;0;0;1_°;1_nmi;0;0;1_°;0;0;1_°])'
+@ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi x1=0.23851 69937 16 TC1=65.89216 65527 ° x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
 ```
 
 * To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
 ```rpl
 φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
-@ Expecting [ Δφ=2 ° Δλ=-85 ° hφ=3.04586 49045 2⁳⁻⁴ hλ=0.45642 21286 26 hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi y1=-0.93611 68066 63 x1=-0.28643 54215 54 TC1=252.98680 2724 ° y2=0.92365 56400 76 x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
-'ROOT(ⒺGreat Circle;[Δφ;Δλ;hφ;hλ;hav;θ;D;y1;x1;TC1;y2;x2;TC2];[1_°;1_°;0;0;0;1_°;1_nmi;0;0;1_°;0;0;1_°])'
+@ Expecting [ Δφ=2 ° Δλ=-85 ° hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi x1=-0.28643 54215 54 TC1=252.98680 2724 ° x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
 ```
 
 #### Great Circle Vertex
@@ -3004,8 +2999,8 @@ ice or in bad weather.
 * To calculate: `[φv;λv;Dv]` (Vertex latitude and longitude; Distance to the vertex) from 28°N, 125°W, initial course 291° [2, §1210, example 1]:
 ```rpl
 φ1=28_° λ1=-125_° TC1=291_° Rs='(10800_nmi)/Ⓒπ'
-@ Expecting [ φv=34.48215 17436 ° yv=-0.33456 53031 79 xv=0.40917 84626 9 Δλv=-39.27119 44547 ° λe=-164.27119 4455 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
-'ROOT(ⒺGreat Circle Vertex;[φv;yv;xv;Δλv;λe;λv;θv;Dv];[1_°;0;0;1_°;1_°;1_°;1_°;1_nmi])'
+@ Expecting [ φv=34.48215 17436 ° Δλv=-39.27119 44547 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
+'ROOT(ⒺGreat Circle Vertex;[φv;Δλv;λv;θv;Dv];[1_°;1_°;1_°;1_°;1_nmi])'
 ```
 
 #### Great Circle Destination
@@ -3015,14 +3010,13 @@ great circle?
 
 * Main results: the latitude `φ2` and longitude `λ2` reached after a distance
   `D` from `(φ1;λ1)`, on the initial true course `TC1`.
-* Steps: `θ` is the distance as an angle, `z2` the sine of the arrival
-  latitude, and `Δλ` the change of longitude.
+* Steps: `θ` is the distance as an angle, and `Δλ` the change of longitude.
 
 * To calculate: `[φ2;λ2]` (Destination latitude and longitude) 100 nmi from LAX on the initial course from LAX to JFK, 1.150035 radians [1]:
 ```rpl
 φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r D=100_nmi Rs='(10800_nmi)/Ⓒπ'
-@ Expecting [ θ=1.66666 66666 7 ° n=0.02412 65084 32 z2=0.56808 75634 35 φ2=34.61697 31196 ° x2=0.68231 75322 78 Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
-'ROOT(ⒺGreat Circle Destination;[θ;n;z2;φ2;x2;Δλ;λ2];[1_°;0;0;1_°;0;1_°;1_°])'
+@ Expecting [ θ=1.66666 66666 7 ° φ2=34.61697 31196 ° Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
+'ROOT(ⒺGreat Circle Destination;[θ;φ2;Δλ;λ2];[1_°;1_°;1_°;1_°])'
 ```
 
 #### Cross Track Error
@@ -3035,12 +3029,12 @@ How far is the present position from the planned route?
   already covered along the route. `TC1` can come from the `Great Circle`
   equations.
 * Steps: the distance `θ1P` and course `TC1P` from the departure point to the
-  present position, computed as in `Great Circle`, then the angle `ΔTC`
-  between that course and the route.
+  present position, computed as in `Great Circle`; then the angles `θXT` and
+  `θAT` across and along the route.
 
 * To calculate: `[XTD;ATD]` (Cross-track and along-track distances) on the route from LAX to JFK (initial course 1.150035 radians), from the present position 34°30′N, 116°30′W [1]:
 ```rpl
 φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
-@ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hφ=2.30365 15475 5⁳⁻⁵ hλ=2.74892 02912 1⁳⁻⁴ hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° yP=2.73240 50798 4⁳⁻² xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° ΔTC=4.28012 46773 2 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
-'ROOT(ⒺCross Track Error;[Δφ;Δλ;hφ;hλ;hav;θ1P;yP;xP;TC1P;ΔTC;θXT;θAT;XTD;ATD];[1_°;1_°;0;0;0;1_°;0;0;1_°;1_°;1_°;1_°;1_nmi;1_nmi])'
+@ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
+'ROOT(ⒺCross Track Error;[Δφ;Δλ;hav;θ1P;xP;TC1P;θXT;θAT;XTD;ATD];[1_°;1_°;0;1_°;0;1_°;1_°;1_°;1_nmi;1_nmi])'
 ```
