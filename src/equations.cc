@@ -1401,12 +1401,13 @@ static const cstring basic_equations[] =
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
 
     // ------------------------------------------------------------------------
-    "Aeronautics", nullptr,
+    "Navigation", nullptr,
     // ------------------------------------------------------------------------
-    // Spherical earth of radius Rs, longitudes positive East, courses in
-    // [0°;360°) from true North. 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°)
-    // and (SIN(λ))∠(COS(λ)) brings a longitude back into ]-180°;180°].
-    "Aeronautics/Navigation", nullptr,
+    // Air, marine and land navigation on a spherical earth of radius Rs.
+    // Longitudes positive East, courses in [0°;360°) from true North.
+    // 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°), and (SIN(λ))∠(COS(λ))
+    // brings a longitude back into ]-180°;180°]. Each step is kept short
+    // enough to be shown by the solver above the stack.
     "Great Circle",  "{ "
     "  '(Δφ_°)=(φ2_°)-(φ1_°)' "
     "  '(Δλ_°)=(λ2_°)-(λ1_°)' "
@@ -1437,11 +1438,9 @@ static const cstring basic_equations[] =
     "  'n=COS(φ1_°)·SIN(θ_°)' "
     "  'z2=SIN(φ1_°)·COS(θ_°)+n·COS(TC1_°)' "
     "  '(φ2_°)=ASIN(z2)' "
-    "  'y2=n·SIN(TC1_°)' "
     "  'x2=COS(θ_°)-SIN(φ1_°)·z2' "
-    "  '(Δλ_°)=(y2)∠(x2)' "
-    "  '(λe_°)=(λ1_°)+(Δλ_°)' "
-    "  '(λ2_°)=(SIN(λe_°))∠(COS(λe_°))' "
+    "  '(Δλ_°)=(n·SIN(TC1_°))∠(x2)' "
+    "  '(λ2_°)=(SIN((λ1_°)+(Δλ_°)))∠(COS((λ1_°)+(Δλ_°)))' "
     "}",
     "Cross Track Error",  "{ "
     "  '(Δφ_°)=(φP_°)-(φ1_°)' "
