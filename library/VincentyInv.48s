@@ -1,0 +1,85 @@
+«
+@@ ============================================================
+@@ VincentyInv — distance and azimuths between two points on the
+@@ WGS-84 ellipsoid, the inverse geodetic problem.
+@@ T. Vincenty, "Direct and inverse solutions of geodesics on the
+@@ ellipsoid with application of nested equations", Survey Review
+@@ 23(176), 1975, pp. 88-93.
+@@
+@@ Input : φ1 λ1 φ2 λ2, latitudes and longitudes, East positive.
+@@         Plain numbers are degrees; angles with a unit are accepted.
+@@ Output: s α1 α2 — distance in metres, azimuths in degrees from
+@@         true North at the departure (α1) and arrival (α2) points.
+@@ The iteration converges to 1E-12 radian (about 0.006 mm). It does
+@@ not converge for nearly antipodal points: after 200 iterations the
+@@ function stops with an error rather than return a wrong value.
+@@
+@@ The work is done in radians without angle units. The angle mode and
+@@ the angle units setting are restored before returning, and before
+@@ reporting an error. IFERR is not used: when an error leaves nested
+@@ local frames, the locals of its THEN branch no longer designate the
+@@ right values.
+@@ ============================================================
+
+  @ Angles in radians: plain numbers are degrees
+  4 →LIST
+  « IF DUP TypeName "unit" == THEN 1_r CONVERT UVAL ELSE Ⓒπ →Num * 180 / END »
+  MAP LIST→ DROP
+  Ⓒa♁GPS →Num UVAL Ⓒf♁GPS →Num
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  0
+  → p1 q1 p2 q2 axa fla amode aunits fail
+  «
+    'axa*(1-fla)' EVAL 'ATAN((1-fla)*TAN(p1))' EVAL 'ATAN((1-fla)*TAN(p2))' EVAL 'q2-q1' EVAL
+    → bxa ur1 ur2 dlon
+    «
+      ur1 SIN ur1 COS ur2 SIN ur2 COS
+      dlon 0 0 0 0 0 0 0 0
+      → su1 cu1 su2 cu2 lam lamp ssig csig sgm salf c2a c2m iter
+      «
+        DO
+          lam 'lamp' STO
+          '√((cu2*SIN(lam))²+(cu1*su2-su1*cu2*COS(lam))²)' EVAL 'ssig' STO
+          'su1*su2+cu1*cu2*COS(lam)' EVAL 'csig' STO
+          '(ssig)∠(csig)' EVAL 'sgm' STO
+          IF ssig 0 = THEN 0 ELSE 'cu1*cu2*SIN(lam)/ssig' EVAL END 'salf' STO
+          '1-salf²' EVAL 'c2a' STO
+          IF c2a 0 = THEN 0 ELSE 'csig-2*su1*su2/c2a' EVAL END 'c2m' STO
+          'fla/16*c2a*(4+fla*(4-3*c2a))' EVAL
+          → cvc
+          « 'dlon+(1-cvc)*fla*salf*(sgm+cvc*ssig*(c2m+cvc*csig*(2*c2m²-1)))' EVAL 'lam' STO »
+          iter 1 + 'iter' STO
+        UNTIL
+          'ABS(lam-lamp)' EVAL 1E-12 < iter 200 ≥ OR
+        END
+        IF 'ABS(lam-lamp)' EVAL 1E-12 ≥ THEN 1 'fail' STO END
+
+        'c2a*(axa²-bxa²)/bxa²' EVAL
+        → usq
+        «
+          '1+usq/16384*(4096+usq*(-768+usq*(320-175*usq)))' EVAL
+          'usq/1024*(256+usq*(-128+usq*(74-47*usq)))' EVAL
+          → aca bcb
+          «
+            'bcb*ssig*(c2m+bcb/4*(csig*(2*c2m²-1)-bcb/6*c2m*(4*ssig²-3)*(4*c2m²-3)))' EVAL
+            → dsig
+            «
+              'bxa*aca*(sgm-dsig)' EVAL 1_m *
+              '(cu2*SIN(lam))∠(cu1*su2-su1*cu2*COS(lam))' EVAL
+              '(cu1*SIN(lam))∠(cu1*su2*COS(lam)-su1*cu2)' EVAL
+              2 →LIST
+              « 180 * Ⓒπ →Num / 360 MOD 1_° * »
+              MAP LIST→ DROP
+            »
+          »
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    IF fail THEN
+      DROP DROP DROP
+      "VincentyInv: no convergence (nearly antipodal points)" DOERR
+    END
+  »
+»

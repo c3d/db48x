@@ -50,3 +50,12 @@
 	"Eqns",		"=/config/equations.csv"
 	"Lib",		"=/config/library.csv"
 	"Units",	"=/config/units.csv"
+
+"Navigation"
+
+	"VincentyInv",	"="
+	"VincentyDir",	"="
+	"LLH→XYZ",	"=/library/LLHtoXYZ.48s"
+	"XYZ→LLH",	"=/library/XYZtoLLH.48s"
+	"RadialFix",	"="
+	"GCPoint",	"="

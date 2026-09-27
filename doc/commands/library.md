@@ -42,10 +42,14 @@ The libraries to attach can be identified by one of:
 For example, to preload the `Dedicace` library item, you can use one of:
 
 ```rpl
+Libs Detach
 'Dedicace' Attach
 Libs
-@ Expecting { Dedicace SiDensity PeriSel }
+@ Expecting { Dedicace }
 ```
+
+The first line detaches whatever was loaded before, so that `Libs` only shows
+what this example attached.
 
 
 ## Detach
@@ -61,9 +65,11 @@ The libraries to attach can be identified by one of:
 For example, to unload the `Dedicace` and `KineticEnergy` library item, you can use one of:
 
 ```rpl
+Libs Detach
+{ Dedicace SiDensity "KineticEnergy" } Attach
 { Dedicace "KineticEnergy" } Detach
 Libs
-@ Expecting { SiDensity PeriSel }
+@ Expecting { SiDensity }
 ```
 
 ## Libs
