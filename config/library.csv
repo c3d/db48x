@@ -53,6 +53,8 @@
 
 "Navigation"
 
+"Navigation/Geodesy"
+
 	"VincentyInv",	"="
 	"VincentyDir",	"="
 	"LLH→XYZ",	"=/library/LLHtoXYZ.48s"

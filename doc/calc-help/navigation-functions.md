@@ -5,6 +5,8 @@
 The Navigation section of the Function Library computes positions, distances
 and directions on the Earth, for air, marine and land navigation.
 
+The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
+
 * On the **WGS-84 ellipsoid**, the reference surface of GPS, to the millimetre:
   [VincentyInv](#vincentyinv) gives the distance and azimuths between two
   points, [VincentyDir](#vincentydir) the point reached from a given point,
@@ -13,6 +15,9 @@ and directions on the Earth, for air, marine and land navigation.
 * On a **sphere**, where the formulas are shorter and angles are enough:
   [RadialFix](#radialfix) finds a position from two bearings, and
   [GCPoint](#gcpoint) a point along a great-circle route.
+
+The [Route](#routelibrary) subsection keeps a route of waypoints and follows
+it while travelling.
 
 **Conventions.** Latitudes are positive North, longitudes positive East, as in
 GPS coordinates: West longitudes are negative. Azimuths and bearings are
@@ -26,6 +31,15 @@ setting are left as they were found.
 The ellipsoid functions use the constants `Ⓒa♁GPS`, `Ⓒf♁GPS`, `Ⓒe12♁GPS` and
 `Ⓒe22♁GPS`. The `Navigation` section of the Equation Library holds the
 spherical equations of great circles and of the wind and current triangles.
+
+
+## GeodesyLibrary
+
+The Geodesy subsection computes distances, directions and positions:
+
+* on the WGS-84 ellipsoid: [VincentyInv](#vincentyinv),
+  [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
+* on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
 
 
 ## VincentyInv
@@ -193,11 +207,12 @@ Adds a waypoint at the end of the route, and creates the route if needed.
 
 Stack: `"name"` `φ` `λ` ▶ nothing; the waypoint is added to `Route`.
 
-The examples of this subsection build a route from Los Angeles to New York
-through Albuquerque, then show the names of its waypoints, with
-`Route « 1 GET » MAP`:
+The examples of this subsection first purge any previous route, build a
+route from Los Angeles to New York through Albuquerque, then show the names of
+its waypoints, with `Route « 1 GET » MAP`:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
@@ -217,6 +232,7 @@ Stack: `"name"` `φ` `λ` `n` ▶ nothing.
 A stop at Denver, inserted between Albuquerque and New York:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
@@ -234,6 +250,7 @@ pointed to.
 Stack: `n` ▶ nothing.
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
@@ -253,6 +270,7 @@ Stack: ▶ `{ legs }` `Total`.
 The example shows the total, then the distance of each leg:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
@@ -265,38 +283,44 @@ The example shows the total, then the distance of each leg:
 
 Where is the next waypoint, and how far off the route am I?
 
-Stack: `φ` `λ` `GS` ▶ `To` `Brg` `Dist` `XTD` `ETE`, from the present
-position and the ground speed (knots if a plain number; 0 to skip `ETE`):
+Stack: `φ` `λ` `GS` ▶ `To` `Brg` `Dist` `XTD` `ETE` `ETA`, from the present
+position and the ground speed (knots if a plain number; 0 to skip `ETE` and
+`ETA`):
 
 * `To`: the next waypoint, the end of the active leg;
 * `Brg` and `Dist`: its true bearing and its distance in nautical miles;
 * `XTD`: the cross-track distance from the active leg, positive when right of
   it;
-* `ETE`: the time to reach it at the ground speed, in hours, minutes and
-  seconds.
+* `ETE`: the Estimated Time En route, the time left to reach it at the
+  ground speed, in hours, minutes and seconds;
+* `ETA`: the Estimated Time of Arrival, the time by the clock of the
+  calculator when it will be reached.
 
 When the present position is abeam or past the end of the active leg, the
 next leg becomes active, and the results refer to it.
 
-Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque:
+Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque.
+The examples drop the `ETA`, which depends on the time they are run:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
-34.3 -114.0 450 ⓁWPNext 5 →LIST
-@ Expecting { To:"ABQ" Brg:80.99381 77706 ° Dist:368.36060 6014 nmi XTD:11.28267 43886 nmi ETE:0:49:06.88484 81140 31 }
+34.3 -114.0 450 ⓁWPNext DROP 5 →LIST
+@ Expecting { To:"ABQ" Brg:80.99381 77706 ° Dist:368.36060 6014 nmi XTD:11.28267 43886 nmi ETE:0:49:07 }
 ```
 
 East of Albuquerque, the first leg is behind: the second leg, to New York,
 becomes active, and `RouteLeg`, added at the end, is 2:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd
-35.3 -104.0 450 ⓁWPNext 5 →LIST RouteLeg +
-@ Expecting { To:"JFK" Brg:68.26395 64658 ° Dist:1 461.44173 207 nmi XTD:32.14230 0708 nmi ETE:3:14:51.53385 65283 63 2 }
+35.3 -104.0 450 ⓁWPNext DROP 5 →LIST RouteLeg +
+@ Expecting { To:"JFK" Brg:68.26395 64658 ° Dist:1 461.44173 207 nmi XTD:32.14230 0708 nmi ETE:3:14:52 2 }
 ```
 
 
@@ -312,6 +336,7 @@ Over Los Angeles, cleared direct to New York; the route now goes through
 `"DCT"`, and the active leg is the third, from `"DCT"` to New York:
 
 ```rpl
+{ Route RouteLeg } PURGE
 "LAX" 33.9425 -118.4081 ⓁWPAdd
 "ABQ" 35.0402 -106.6090 ⓁWPAdd
 "JFK" 40.6398 -73.7789 ⓁWPAdd

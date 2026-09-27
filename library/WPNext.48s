@@ -8,7 +8,9 @@
 @@ Output: tagged values — To: the next waypoint, Brg: its true
 @@         bearing, Dist: its distance (nmi), XTD: the cross-track
 @@         distance from the active leg, positive right of it (nmi),
-@@         and ETE: the time to reach it at GS (h.mmss).
+@@         ETE: the Estimated Time En route, the time left to reach it
+@@         at GS, and ETA: the Estimated Time of Arrival, by the clock of
+@@         the calculator.
 @@
 @@ The active leg, from waypoint RouteLeg to the next one, starts at 1.
 @@ When the present position is abeam or past the end of the leg, the
@@ -68,7 +70,9 @@
           '6371008.8*ASIN(SIN(tap)*SIN(dcr))' EVAL
           1_m * 1_nmi CONVERT "XTD" →TAG
           IF gs UVAL 0 > THEN
-            dist gs / 1_h CONVERT UVAL →HMS "ETE" →TAG
+            dist gs / 1_h CONVERT UVAL 3600 * 0 RND 3600 /
+            DUP →HMS "ETE" →TAG
+            SWAP →HMS TIME HMS+ "ETA" →TAG
           END
         »
       »
