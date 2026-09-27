@@ -108,13 +108,15 @@ surface.
 
 Stack: `X` `Y` `Z` ▶ `φ` `λ` `h`.
 
-The example of [LLH→XYZ](#llh→xyz) in reverse; the coordinates, rounded to the
+The example of LLH→XYZ in reverse; the coordinates, rounded to the
 millimetre, give back 53°48′33.820″N, 2°07′46.380″E and 73 m:
 
 ```rpl
 3771793.968 140253.342 5124304.349 ⓁXYZ→LLH 3 →LIST
 @ Expecting { 53.80939 444 ° 2.12955 00013 2 ° 72.99993 06719 m }
 ```
+
+See also: [LLH→XYZ](#llh→xyz), the conversion in the other direction.
 
 
 ## RadialFix
