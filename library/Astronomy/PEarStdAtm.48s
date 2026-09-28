@@ -1,0 +1,60 @@
+«
+@@ ============================================================
+@@ P♁StdAtm — Earth pressure, USSA 1976 (≤86 km) + Braeunig Table 8 (86-1000 km)
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : Z   ( geometric altitude, length unit e.g. 50_km )
+@@ Output : see units below
+@@ VALIDATION (device / double-precision):
+@@   2000_m P♁StdAtm -> 0.0795014065710 MPa ; 60_km -> 2.195879E-5 MPa (device)
+@@ ============================================================
+@Earth: U.S. Standard Atmosphere Pressure Profile P♁StdAtm(Z_m); Z_m: geometric height
+@Source: USSA 1976 (NOAA ST76-1562), ≤86 km ; R. Braeunig Table 8, 86-1000 km
+@Homosphere 0-86 km: USSA 1976 @(https://www.ngdc.noaa.gov/stp/space-weather/online-publications/miscellaneous/us-standard-atmosphere-1976/us-standard-atmosphere_st76-1562_noaa.pdf)
+@Heterosphere 86-1000 km: Braeunig Table 8, exp-polynomial in Pa @(https://www.braeunig.us/space/atmmodel.htm#modeling)
+@Validity domain: Zmin=-5000_m; Zmax=1000000_m
+@Note: analytic (exact) ≤86 km; ~4-figure engineering fit >86 km
+→ Z
+  «
+    Z 1_m Convert 'Z' Store
+    Z UnitValue Duplicate 86000 ≥ Swap 1000000 ≤ And
+    if then
+      Z UnitValue 1000 ÷
+      → z
+      «
+        case
+          z 91  < then 0 z × 2.159582E-6 + z × -4.836957E-4 + z × -0.1425192 + z × 13.47530 + end
+          z 100 < then 0 z × 3.304895E-5 + z × -9.062730E-3 + z × 0.6516698 + z × -11.03037 + end
+          z 110 < then 0 z × 6.693926E-5 + z × -1.945388E-2 + z × 1.719080 + z × -47.75030 + end
+          z 120 < then 0 z × -6.539316E-5 + z × 2.485568E-2 + z × -3.223620 + z × 135.9355 + end
+          z 150 < then 2.283506E-7 z × -1.343221E-4 + z × 2.999016E-2 + z × -3.055446 + z × 113.5764 + end
+          z 200 < then 1.209434E-8 z × -9.692458E-6 + z × 3.002041E-3 + z × -0.4523015 + z × 19.19151 + end
+          z 300 < then 8.113942E-10 z × -9.822568E-7 + z × 4.687616E-4 + z × -0.1231710 + z × 3.067409 + end
+          z 500 < then 9.814674E-11 z × -1.654439E-7 + z × 1.148115E-4 + z × -5.431334E-2 + z × -2.011365 + end
+          z 750 < then -7.835161E-11 z × 1.964589E-7 + z × -1.657213E-4 + z × 4.305869E-2 + z × -14.77132 + end
+          2.813255E-11 z × -1.120689E-7 + z × 1.695568E-4 + z × -0.1188941 + z × 14.56718 +
+        end
+        exp 1E-6 ×
+      »
+    else
+      Z UnitValue 1000000 >
+      if
+      then
+          "Z out of range -5_km < Z < 1000_km" DoError
+      else
+        Z UnitValue Duplicate 6356766 × Swap 6356766 + ÷
+        case
+          Duplicate 11000 ≤ then 2.25577E-5 × 1 Swap - 5.25588 ^ 0.101325 × end
+          Duplicate 20000 ≤ then 11000 - -1.57688E-4 × exp 0.022632 × end
+          Duplicate 32000 ≤ then 20000 - 0.001 × 216.65 + 216.65 Swap ÷ 34.1632 ^ 0.005475 × end
+          Duplicate 47000 ≤ then 32000 - 0.0028 × 228.65 + 228.65 Swap ÷ 12.2011 ^ 0.000868 × end
+          Duplicate 51000 ≤ then 47000 - -1.26226E-4 × exp 0.000111 × end
+          Duplicate 71000 ≤ then 51000 - -0.0028 × 270.65 + 270.65 Swap ÷ -12.2011 ^ 6.6939E-5 × end
+          84852 Min 71000 - -0.002 × 214.65 + 214.65 Swap ÷ -17.0816 ^ 3.9564E-6 ×
+        end
+      end
+    end
+    1_MPa ×
+  »
+»

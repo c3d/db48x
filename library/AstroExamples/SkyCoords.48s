@@ -1,0 +1,55 @@
+«
+@@ ============================================================
+@@ SkyCoords — equatorial coordinates (Right Ascension / Declination) of a planet
+@@ Editable AstroExamples entry, companion of LightTime/Elongation/ApparentSize.
+@@ Type 1-7 (or 0 to quit), ENTER, then =. Computes today's geocentric RA & Dec:
+@@ rotate the Earth-to-planet ecliptic vector by the obliquity (23.43929°); RA is
+@@ shown in HOURS (hh:mm:ss via →HMS), Dec in degrees. Displayed and left tagged
+@@ on the stack (Target / RA / Dec). Mode-independent (ARG 1_° CONVERT).
+@@ An invitation to build your own RPL program from the astronomy library.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@ ============================================================
+  DEPTH → d0
+  «
+    CLLCD
+    "  Sky coords (RA / Dec)" 1 DISP
+    "1 Mercury  2 Venus  3 Mars" 3 DISP
+    "4 Jupiter  5 Saturn" 4 DISP
+    "6 Uranus   7 Neptune" 5 DISP
+    "0 = Quit" 6 DISP
+    "Pick, ENTER, then =" 7 DISP
+    HALT
+    IF DEPTH d0 > THEN
+      → n
+      «
+        IF n 0 ≠ THEN
+          IF n 1 ≥ n 7 ≤ AND THEN
+            DateTime JDN → jd
+            «
+              jd Ⓛ♁Pf jd { 'Ⓛ☿Φf' 'Ⓛ♀Φf' 'Ⓛ♂Φf' 'Ⓛ♃Φf' 'Ⓛ♄Φf' 'Ⓛ⛢Φf' 'Ⓛ♆Φf' } n GET EVAL ⓁPosΦf SWAP - → g
+              «
+                g 1 GET Uval g 2 GET Uval g 3 GET Uval 23.43929 → x y z e
+                «
+                  x  y e COS · z e SIN · -  y e SIN · z e COS · +  → xe ye ze
+                  «
+                    CLLCD
+                    { "Mercury" "Venus" "Mars" "Jupiter" "Saturn" "Uranus" "Neptune" } n GET DUP "Target: " SWAP + 1 DISP "Target" →Tag
+                    xe ye ℝ→ℂ ARG 1_° CONVERT Uval 360 MOD 15 / →HMS DUP →Str "RA:  " SWAP + 3 DISP "RA" →Tag
+                    xe xe · ye ye · + √ ze ℝ→ℂ ARG 1_° CONVERT DUP →Str "Dec: " SWAP + 4 DISP "Dec" →Tag
+                    "Press any key" 7 DISP -1 WAIT DROP
+                  »
+                »
+              »
+            »
+          ELSE
+            CLLCD
+            "Invalid choice." 3 DISP
+            "Enter 1-7, or 0 to quit." 4 DISP
+            "Press any key" 6 DISP -1 WAIT DROP
+          END
+        END
+      »
+    END
+  »
+»

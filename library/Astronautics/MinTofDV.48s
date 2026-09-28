@@ -1,0 +1,31 @@
+«
+@@ ============================================================
+@@ MinTofDV — flight time minimising TrCost ΔV for a fixed departure date
+@@ 1-D ternary search; iteration count set by AstronTXPrecision.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t₁ 'Af' 'Bf' tof_lo tof_hi   ( t₁ 'Af' 'Bf' tof_lo tof_hi -- { ΔV tof } )
+@@ Output : { ΔV tof }
+@@ VALIDATION (device-confirmed):
+@@   1 'AstronTXPrecision' STO
+@@   2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 MinTofDV -> { 6.32099 205.66 }
+@@ ============================================================
+ → t1 Af Bf toflo tofhi
+  « 0 0 0 0 0 0 0 0 → lo hi m1 m2 dv1 dv2 tofopt niter
+    «
+      '3·AstronTXPrecision+3' EVAL 'niter' STO
+      toflo →Num 'lo' STO  tofhi →Num 'hi' STO
+      1 niter START
+        'lo+(hi-lo)/3' EVAL 'm1' STO
+        'hi-(hi-lo)/3' EVAL 'm2' STO
+        t1  t1 m1 +  Af Bf ⓁTrCost 1 GET 'dv1' STO
+        t1  t1 m2 +  Af Bf ⓁTrCost 1 GET 'dv2' STO
+        IF dv1 dv2 < THEN m2 'hi' STO ELSE m1 'lo' STO END
+      NEXT
+      'lo+(hi-lo)/2' EVAL 'tofopt' STO
+      t1  t1 tofopt +  Af Bf ⓁTrCost 1 GET
+      tofopt  2 →LIST
+    »
+  »
+»

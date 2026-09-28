@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ MSumS — Σ c·sin(row·av) over a Meeus term table (helper for ☾Pos)
+@@ av = argument vector [0 D M M' F] (deg); tbl = { [c d m mp f] … }. Returns Σ c·sin((d·D+…)°).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : av tbl   ( av tbl -- Σ )
+@@ Output : scalar sum
+@@ VALIDATION (device-confirmed):
+@@   Internal helper of ☾Pos (device-confirmed in chain).
+@@ ============================================================
+ → av tbl « 0 → acc
+  « 1 tbl SIZE FOR i  acc  tbl i GET DUP 1 GET SWAP av DOT SIN ·  +  'acc' STO  NEXT  acc » » 
+»

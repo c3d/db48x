@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ StumpS — Stumpff function S(z) (three regimes)
+@@ S(z) for z>0 / z<0 / z≈0. Companion of StumpC.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : z   ( z -- S(z) )
+@@ Output : scalar
+@@ VALIDATION (device-confirmed):
+@@   1.539854 StumpS -> 0.154295
+@@ ============================================================
+ → z « IF z 0.000001 > THEN '(√(z)-SIN(√(z)·180/→Num(Ⓒπ)))/z^1.5' EVAL
+    ELSE IF z -0.000001 < THEN '(SINH(√(-z))-√(-z))/(-z)^1.5' EVAL ELSE 1 6 / END END » 
+»
