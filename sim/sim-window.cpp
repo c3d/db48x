@@ -372,6 +372,14 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     // Set screen ratio and geometry
     int xOffset      = (nw - scaledSW) / 2;
     int yOffset      = (nh - scaledSH - kh) / 2;
+#ifdef ANDROID
+    // The screen must also be at y=0. On Android, partial updates of a view
+    // placed lower reach the display shifted down by twice its offset
+    // instead of once, so its top rows (the header) are never refreshed
+    // until something repaints the whole window. Leave the spare space
+    // below the keyboard instead.
+    yOffset = 0;
+#endif
     int screenWidth  = scaledSW;
     int screenHeight = scaledSH;
 
@@ -403,7 +411,7 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     }
 #endif // ANDROID
 
-    // Position the screen view (always at x=0 on Android)
+    // Position the screen view (always at 0,0 on Android)
     QRect sframe(xOffset, yOffset, screenWidth, screenHeight);
     ui.screen->setGeometry(sframe);
     ui.screen->setScale(sr);
