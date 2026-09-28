@@ -547,7 +547,7 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	$(PRINT_GENERATE) (echo '<RCC>';			\
 	 echo ' <qresource prefix="/'$*'">';			\
 	 for I in $(patsubst %,'%',$(wildcard $(QRC_EXT_$*:%=$*/%))); do	\
-		J=$$(basename "$$I");				\
+		J=$${I#$*/};					\
 		E=$$(printf '%s' "$$J" | sed -e 's/&/\&amp;/g');	\
 		echo '  <file alias="'"$$E"'">../'$(QRC_DOT_$*)$*'/'"$$E"'</file>';	\
 	 done;							\
@@ -560,7 +560,7 @@ QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx
 QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
-QRC_EXT_library=*.48[sS]
+QRC_EXT_library=*.48[sS] */*.48[sS]
 QRC_EXT_state=*.48[sS]
 
 # The pattern rule above lists a directory, but make cannot know that from

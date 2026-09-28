@@ -67,6 +67,7 @@
 #include <QtMath>
 #ifdef ANDROID
 #include <QDir>
+#include <QDirIterator>
 #include <QSettings>
 #include <atomic>
 
@@ -431,26 +432,33 @@ void extract_android_assets()
 
     if (savedAssetVersion != currentAssetVersion)
     {
-        QStringList filesToExtract = {"db48x.idx", "db48x.md"};
-
-        for (const QString &fileName : filesToExtract)
+        // The RPL engine opens its files with fopen(), so Qt resources are
+        // invisible to it: they must exist as real files. Extract the whole
+        // resource tree, not just the help. Without config/library.csv and
+        // library/*.48s on disk, the only reachable library entries are the
+        // ones compiled into basic_library[], i.e. Secrets and Physics.
+        auto perms = QFileDevice::ReadOwner | QFileDevice::WriteOwner
+            | QFileDevice::ReadUser;
+        QDir from(":/");
+        QDir to(sandboxDir);
+        QDirIterator it(":/", QDirIterator::Subdirectories);
+        while (it.hasNext())
         {
-            // Check your Qt resource prefix
-            QString assetPath = ":/help/" + fileName;
-            QString targetPath = sandboxDir + "/help/" + fileName;
-
-            if (QFile::exists(targetPath)) {
-                QFile::remove(targetPath);
+            QFileInfo fi(it.next());
+            QString relPath = from.relativeFilePath(fi.absoluteFilePath());
+            QString absPath = to.filePath(relPath);
+            if (fi.isDir())
+            {
+                QDir().mkpath(absPath);
             }
-
-	    // Create the directory structure if it doesn't exist
-	    QFileInfo targetInfo(targetPath);
-	    QDir().mkpath(targetInfo.absolutePath());
-
-            auto perms = QFileDevice::ReadOwner | QFileDevice::WriteOwner
-                | QFileDevice::ReadUser;
-            sim_install_copy_file(assetPath, targetPath,
-                                  "help/" + fileName, perms);
+            else if (fi.isFile())
+            {
+                QFileInfo targetInfo(absPath);
+                QDir().mkpath(targetInfo.absolutePath());
+                QFile::remove(absPath);
+                sim_install_copy_file(fi.absoluteFilePath(), absPath,
+                                      relPath, perms);
+            }
         }
 
         sim_install_regenerate_help_indices(sandboxDir);
