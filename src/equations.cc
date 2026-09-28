@@ -2132,6 +2132,76 @@ static const cstring basic_equations[] =
     "  'vfly=SQRT((vobj_m/s)↑2+(VL2_m/s)↑2-2·(vobj_m/s)·(VL2_m/s)·cos(fpa_°))' "
     "}",
 
+    // ------------------------------------------------------------------------
+    "Navigation", nullptr,
+    // ------------------------------------------------------------------------
+    // Air, marine and land navigation on a spherical earth of radius Rs.
+    // Longitudes positive East, courses in [0°;360°) from true North.
+    // 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°), and (SIN(λ))∠(COS(λ))
+    // brings a longitude back into ]-180°;180°]. Each step is kept short
+    // enough to be shown by the solver above the stack.
+    "Great Circle",  "{ "
+    "  '(Δφ_°)=(φ2_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λ2_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φ2_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ_°)=2·ASIN(√(hav))' "
+    "  '(D_nmi)=(Rs_nmi)·(θ_r)/(1_r)' "
+    "  'x1=COS(φ1_°)·SIN(φ2_°)-SIN(φ1_°)·COS(φ2_°)·COS(Δλ_°)' "
+    "  '(TC1_°)=180_°+(-SIN(Δλ_°)·COS(φ2_°))∠(-x1)' "
+    "  'x2=SIN(φ1_°)·COS(φ2_°)-COS(φ1_°)·SIN(φ2_°)·COS(Δλ_°)' "
+    "  '(TC2_°)=180_°+(-SIN(Δλ_°)·COS(φ1_°))∠(x2)' "
+    "}",
+    "Great Circle Vertex",  "{ "
+    "  '(φv_°)=ACOS(ABS(COS(φ1_°)·SIN(TC1_°)))' "
+    "  '(Δλv_°)=(SIN(TC1_°)·COS(TC1_°))∠(SIN(TC1_°)²·SIN(φ1_°))' "
+    "  '(λv_°)=(SIN((λ1_°)+(Δλv_°)))∠(COS((λ1_°)+(Δλv_°)))' "
+    "  '(θv_°)=ACOS(SIN(φ1_°)/SIN(φv_°))' "
+    "  '(Dv_nmi)=(Rs_nmi)·(θv_r)/(1_r)' "
+    "}",
+    "Great Circle Destination",  "{ "
+    "  '(θ_°)=(1_r)·(D_nmi)/(Rs_nmi)' "
+    "  '(φ2_°)=ASIN(SIN(φ1_°)·COS(θ_°)+COS(φ1_°)·SIN(θ_°)·COS(TC1_°))' "
+    "  '(Δλ_°)=(SIN(TC1_°)·SIN(θ_°)·COS(φ1_°))∠(COS(θ_°)-SIN(φ1_°)·SIN(φ2_°))' "
+    "  '(λ2_°)=(SIN((λ1_°)+(Δλ_°)))∠(COS((λ1_°)+(Δλ_°)))' "
+    "}",
+    "Cross Track Error",  "{ "
+    "  '(Δφ_°)=(φP_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λP_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φP_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ1P_°)=2·ASIN(√(hav))' "
+    "  'xP=COS(φ1_°)·SIN(φP_°)-SIN(φ1_°)·COS(φP_°)·COS(Δλ_°)' "
+    "  '(TC1P_°)=180_°+(-SIN(Δλ_°)·COS(φP_°))∠(-xP)' "
+    "  '(θXT_°)=ASIN(SIN(θ1P_°)·SIN((TC1P_°)-(TC1_°)))' "
+    "  '(θAT_°)=ACOS(COS(θ1P_°)/COS(θXT_°))' "
+    "  '(XTD_nmi)=(Rs_nmi)·(θXT_r)/(1_r)' "
+    "  '(ATD_nmi)=(Rs_nmi)·(θAT_r)/(1_r)' "
+    "}",
+    "Wind Correction",  "{ "
+    "  '(WCA_°)=ASIN((WS_knot)·SIN((WD_°)-(TC_°))/(V_knot))' "
+    "  '(TH_°)=180_°+(-SIN((TC_°)+(WCA_°)))∠(-COS((TC_°)+(WCA_°)))' "
+    "  '(GS_knot)=(V_knot)·COS(WCA_°)-(WS_knot)·COS((WD_°)-(TC_°))' "
+    "}",
+    "Ground Track",  "{ "
+    "  '(gN_knot)=(V_knot)·COS(TH_°)-(WS_knot)·COS(WD_°)' "
+    "  '(gE_knot)=(V_knot)·SIN(TH_°)-(WS_knot)·SIN(WD_°)' "
+    "  '(GS_knot)=√((gN_knot)²+(gE_knot)²)' "
+    "  '(TC_°)=180_°+(-(gE_knot)/(GS_knot))∠(-(gN_knot)/(GS_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+    "Wind Finding",  "{ "
+    "  '(wN_knot)=(V_knot)·COS(TH_°)-(GS_knot)·COS(TC_°)' "
+    "  '(wE_knot)=(V_knot)·SIN(TH_°)-(GS_knot)·SIN(TC_°)' "
+    "  '(WS_knot)=√((wN_knot)²+(wE_knot)²)' "
+    "  '(WD_°)=180_°+(-(wE_knot)/(WS_knot))∠(-(wN_knot)/(WS_knot))' "
+    "}",
+    "Required Heading & Speed",  "{ "
+    "  '(aN_knot)=(GS_knot)·COS(TC_°)+(WS_knot)·COS(WD_°)' "
+    "  '(aE_knot)=(GS_knot)·SIN(TC_°)+(WS_knot)·SIN(WD_°)' "
+    "  '(V_knot)=√((aN_knot)²+(aE_knot)²)' "
+    "  '(TH_°)=180_°+(-(aE_knot)/(V_knot))∠(-(aN_knot)/(V_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
