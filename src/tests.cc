@@ -2402,6 +2402,16 @@ void tests::global_variables()
     step("Cleanup")
         .test(CLEAR, "'Foo' Purge", ENTER).noerror();
 
+    step("Purge a list while the enclosing directory size header shrinks")
+        .test(CLEAR,
+              "« 0 100 140 FOR n "
+              "'P' CRDIR P 'Q' CRDIR Q "
+              "\"\" 1 n START \"x\" + NEXT 'A' STO 1 'B' STO "
+              "{ A B } PURGE variables SIZE + "
+              "UPDIR UPDIR 'P' PGDIR "
+              "NEXT » EVAL", LENGTHY(5000), ENTER)
+        .expect("0");
+
     step("Make sure elements are cloned when purging (#854)")
         .test(CLEAR, "{ 11 23 34 44 } 'X' Sto", ENTER).noerror()
         .test("X", ENTER).expect("{ 11 23 34 44 }")
