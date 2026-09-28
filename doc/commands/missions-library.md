@@ -12,6 +12,36 @@ return shown with its to-scale trajectory figure: **ETMB1** (2022), **ETMB2** (2
 featured soft-entry twin, where the Venus swing-by does the most work), **ETMB3** (2042)
 and **ETMB4** (2048).
 
+## MissionsLibrary
+
+The Missions section of the library: complete interplanetary missions, planned
+with the Astronomy and Astronautics functions. It holds one family of
+missions, [Earth To Mars & Back](#earth-to-mars-&-backlibrary).
+
+## Earth To Mars & BackLibrary
+
+Earth⇄Mars round trips, in two submenus: [Planners](#plannerslibrary), the
+planning tools, and [Examples](#exampleslibrary), four worked missions.
+
+## PlannersLibrary
+
+* [RTPlan](#rtplan): a conjunction-class round trip, with a long stay and the
+  lowest ΔV.
+* [OppRoute](#opproute) and [RTPlanOpp](#rtplanopp): an opposition-class
+  return through a Venus gravity assist.
+* [MarsRoundTrip](#marsroundtrip): the two classes side by side.
+* [MissionΔV](#missionΔv): the end-to-end propulsive ΔV budget.
+
+## ExamplesLibrary
+
+Two menus of the library are named Examples:
+
+* in Missions, Earth To Mars & Back: four worked missions with a Venus-flyby
+  return, [ETMB1](#etmb1) (2022), [ETMB2](#etmb2) (2035), [ETMB3](#etmb3)
+  (2042) and [ETMB4](#etmb4) (2048);
+* the Examples section: [InteractiveMenu](#interactivemenu), a program that
+  stops in the solver menu, then resumes with `=` to show the results.
+
 ## RTPlan
 
 Conjunction-class Earth⇄Mars round-trip optimiser (heliocentric ΔV). It optimises the
