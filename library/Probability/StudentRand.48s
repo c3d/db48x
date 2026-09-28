@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  StudentRand
+  @  Random draw by inversion: a uniform variate, then StudentQ.
+  @  Stack: df
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 1; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 1 == THEN Explode Drop ELSE IF DUP Size 2 == THEN Explode Drop Drop ELSE "StudentRand: needs 1 arguments" DoError END END END
+  → dfv « dfv rand ⓁStudentQ dfv 1 →List Drop »
+»
