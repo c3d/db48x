@@ -68,9 +68,11 @@
 #ifdef ANDROID
 #include <QDir>
 #include <QSettings>
+#include <QJniObject>
 #include <atomic>
 
 void extract_android_assets();
+static void android_haptic_tap();
 
 #endif // ANDROID
 #endif // WASM
@@ -643,6 +645,75 @@ struct mousemap
 };
 
 
+#ifdef ANDROID
+static void android_haptic_tap()
+// ----------------------------------------------------------------------------
+//   Short vibration when a key is pressed, like the phone's own keyboard
+// ----------------------------------------------------------------------------
+//   View.performHapticFeedback needs no permission and honours the phone's
+//   "vibrate on touch" setting. Like any call into the Android view system,
+//   it must run on the Android main thread, not on Qt's.
+{
+    QNativeInterface::QAndroidApplication::runOnAndroidMainThread([]() {
+        QJniObject activity(QNativeInterface::QAndroidApplication::context());
+        if (!activity.isValid())
+            return;
+        QJniObject window =
+            activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
+        if (!window.isValid())
+            return;
+        QJniObject decor =
+            window.callObjectMethod("getDecorView", "()Landroid/view/View;");
+        if (!decor.isValid())
+            return;
+        // performHapticFeedback leaves the strength to the phone, and on a
+        // Galaxy S20 FE even VIRTUAL_KEY can barely be felt. Drive the
+        // vibrator directly instead, with our own duration and amplitude
+        // (needs the VIBRATE permission, granted at install time).
+        // Driving the vibrator directly bypasses the phone's "touch feedback"
+        // setting, so honour it by hand: no vibration when it is off
+        QJniObject resolver = activity.callObjectMethod(
+            "getContentResolver", "()Landroid/content/ContentResolver;");
+        jint haptics = QJniObject::callStaticMethod<jint>(
+            "android/provider/Settings$System", "getInt",
+            "(Landroid/content/ContentResolver;Ljava/lang/String;I)I",
+            resolver.object(),
+            QJniObject::fromString("haptic_feedback_enabled").object<jstring>(),
+            jint(1));
+        static QJniObject vibrator;
+        if (haptics && !vibrator.isValid())
+            vibrator = activity.callObjectMethod(
+                "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;",
+                QJniObject::fromString("vibrator").object<jstring>());
+        if (haptics && vibrator.isValid())
+        {
+            const jlong duration  = 20;  // ms
+            const jint  amplitude = 255; // 1..255
+            QJniObject effect = QJniObject::callStaticObjectMethod(
+                "android/os/VibrationEffect", "createOneShot",
+                "(JI)Landroid/os/VibrationEffect;", duration, amplitude);
+            if (effect.isValid())
+                vibrator.callMethod<void>("vibrate",
+                                          "(Landroid/os/VibrationEffect;)V",
+                                          effect.object());
+        }
+        // The standard key click, honouring the "touch sounds" setting. The
+        // volume argument asks for full level instead of Android's default,
+        // which is attenuated; the system volume still applies.
+        QJniObject audio = activity.callObjectMethod(
+            "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;",
+            QJniObject::fromString("audio").object<jstring>());
+        if (audio.isValid())
+        {
+            const jint FX_KEY_CLICK = 0;  // AudioManager.FX_KEY_CLICK
+            audio.callMethod<void>("playSoundEffect", "(IF)V",
+                                   FX_KEY_CLICK, jfloat(1.0f));
+        }
+    });
+}
+#endif // ANDROID
+
+
 void MainWindow::pushKey(int key)
 // ----------------------------------------------------------------------------
 //   When pushing a key, update the highlight rectangle
@@ -927,6 +998,9 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                             record(sim_keys, "  [%d] found at %d as %d",
                                    k, ptr - mouseMap, ptr->keynum);
                             key_push(ptr->keynum);
+#ifdef ANDROID
+                            android_haptic_tap();
+#endif
                         }
             }
 
@@ -956,6 +1030,9 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                            ptr - mouseMap, ptr->keynum);
 
                     key_push(ptr->keynum);
+#ifdef ANDROID
+                    android_haptic_tap();
+#endif
                 }
 
             return true;
