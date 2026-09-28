@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ EaΦf — eccentric anomaly by Kepler's equation (Root solver)
+@@ Solves E = M + e·(180/π)·sin(E). Mode-independent (explicit _°).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : e M   ( e M -- E )
+@@ Output : eccentric anomaly (°)
+@@ VALIDATION (device-confirmed):
+@@   Component of PosΦf (device-confirmed in chain).
+@@ ============================================================
+ → eLΦ MLΦ
+  « eLΦ Uval 'eLΦ' Sto  MLΦ Uval 'MLΦ' Sto
+    'Root(EaLΦ=(MLΦ_°)+eLΦ·(180_°)/→Num(Ⓒπ)·sin(EaLΦ_°);EaLΦ;1_°)' Eval
+  »
+»

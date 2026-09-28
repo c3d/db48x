@@ -1,0 +1,14 @@
+«
+@@ ============================================================
+@@ T₀SDEarthToA — closest-approach date from Earth to a body
+@@ Earth-referenced variant of T₀SDAToB (Af = ♁Φf).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : 'Af' JD1 JD2   ( 'Af' JD1 JD2 -- JDmin )
+@@ Output : JD of minimum distance
+@@ VALIDATION (device-confirmed):
+@@   'Ⓛ♂Φf' 2459120 2459140 T₀SDEarthToA -> 2459129.07   (2020-10-06)
+@@ ============================================================
+ → Af JD1 JD2 « 'Ⓛ♁Φf' Af JD1 JD2 ⓁT₀SDAToB » 
+»

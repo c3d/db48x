@@ -15019,7 +15019,7 @@ void tests::library()
 
 
     step("Math: Collatz conjecture benchmark")
-        .test(CLEAR, RSHIFT, H, F4, LENGTHY(5000), F1, ENTER, SWAP)
+        .test(CLEAR, RSHIFT, H, F5, LENGTHY(5000), F1, ENTER, SWAP)
         .expect("1")
         .test(BSP)
         .match("duration:[1-9].*ms");

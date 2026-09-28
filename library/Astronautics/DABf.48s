@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ DABf — distance between two bodies at one date (element functions)
+@@ Positions via PosΦf of each element function, then DAToB.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD 'Af' 'Bf'   ( JD 'Af' 'Bf' -- d )
+@@ Output : distance (au)
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 'Ⓛ♁Φf' 'Ⓛ♂Φf' DABf -> 0.707458 au   (Earth-Mars, 2020-07-20)
+@@ ============================================================
+ → JD Af Bf
+  « JD Af EVAL ⓁPosΦf   JD Bf EVAL ⓁPosΦf   ⓁDAToB »
+»

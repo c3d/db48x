@@ -1,0 +1,15 @@
+«
+@@ ============================================================
+@@ DEarthToA — Earth-to-body distance at one date (Earth is built in)
+@@ Earth-referenced variant of DABf (first body = ♁Φf). Give the date and the
+@@ target's element function; Earth's position is computed internally.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD 'Af'   ( JD 'Af' -- d )
+@@ Output : distance (au)
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 'Ⓛ♂Φf' DEarthToA -> 0.707458 au   (Earth-Mars, 2020-07-20)
+@@ ============================================================
+ → JD Af « JD 'Ⓛ♁Φf' Af ⓁDABf »
+»
