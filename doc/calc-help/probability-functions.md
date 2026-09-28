@@ -131,6 +131,331 @@ These entries live on the calculator's disk, under Probability in the LIB menu:
 the files are library/Probability/*.48s and config/library.csv declares them.
 They therefore cost no program memory at all.
 
+## ProbabilityLibrary
+
+Thirty distributions, one submenu each, holding the density, the distribution
+function, the upper tail, the quantile, a random draw, the two moments, and two
+entries that answer with names rather than bare numbers.
+
+Parameters go first and the varying argument last, bare or bundled in a list of
+the right length, whose length is checked before anything is computed.
+
+Three of these laws are not only models but instruments: [Student](#studentlibrary)
+measures means, [Chi2](#chi2library) measures counts and variances, and
+[Fisher](#fisherlibrary) compares variances. The tests that use them are in the
+StatTests section — see [StatTests](#stattestslibrary).
+
+## NormlLibrary
+
+The normal law, the reference against which the others are read: the limit
+toward which a sum of many small independent causes tends, whatever their own
+laws. Its two parameters are its two moments, which is true of almost no other
+law here.
+
+Parameters: `μ`, `sx`, then the point.
+
+Entries: NormlPDF, NormlCDF, NormlCDFc, NormlQ, NormlRand, NormlArgs, NormlAll.
+
+It is also the law behind the Student tests — see [StudentTests](#studenttestslibrary).
+
+## LgNrmLibrary
+
+A quantity whose **logarithm** is normal — what one gets when causes multiply
+instead of adding. Particle sizes, incomes, times to failure. Beware the
+parameters: μl and σl are the mean and deviation of the logarithm, not of the
+quantity.
+
+Parameters: `μl`, `σl`, then the point.
+
+Entries: LgNrmPDF, LgNrmCDF, LgNrmCDFc, LgNrmQ, LgNrmRand, LgNrmMu, LgNrmSx, LgNrmArgs, LgNrmAll.
+
+## ExponLibrary
+
+Waiting time when the hazard is constant: the chance of the event in the next
+minute does not depend on how long one has already waited. It is the **only**
+continuous law with that property, and that is what makes it the default model
+of a lifetime with no wear and no infancy.
+
+Parameters: `λ`, then the point.
+
+Entries: ExponPDF, ExponCDF, ExponCDFc, ExponQ, ExponRand, ExponMu, ExponSx, ExponArgs, ExponAll.
+
+## WeiblLibrary
+
+Waiting time when the hazard is **not** constant — the working tool of
+reliability. The shape sh says which regime: below 1 the hazard falls (infant
+mortality), at 1 it is the exponential exactly, above 1 it rises (wear-out).
+
+Parameters: `sh`, `λ`, then the point.
+
+Entries: WeiblPDF, WeiblCDF, WeiblCDFc, WeiblQ, WeiblRand, WeiblMu, WeiblSx, WeiblArgs, WeiblAll.
+
+## RayleighLibrary
+
+The length of a two-dimensional vector whose two components are independent
+normals of the same deviation: wind speed from its components, radial error of
+a shot, amplitude of a signal with random phase.
+
+Parameters: `s`, then the point.
+
+Entries: RayleighPDF, RayleighCDF, RayleighCDFc, RayleighQ, RayleighRand, RayleighMu, RayleighSx, RayleighArgs, RayleighAll.
+
+## LogisLibrary
+
+Shaped like the normal but with heavier tails, and unlike it possessing a
+distribution function in closed form — which is why growth curves and logistic
+regression use it. Note that s is a scale, not the standard deviation: the
+deviation is sπ/√3.
+
+Parameters: `μ`, `s`, then the point.
+
+Entries: LogisPDF, LogisCDF, LogisCDFc, LogisQ, LogisRand, LogisSx, LogisArgs, LogisAll.
+
+## ParetoLibrary
+
+The power law: a few very large values and a crowd of small ones. The
+exponent ap decides what exists at all — the mean is infinite when ap ≤ 1, and
+the variance when ap ≤ 2. Read those returns as a statement about the model,
+not as a defect of the arithmetic.
+
+Parameters: `xm`, `ap`, then the point.
+
+Entries: ParetoPDF, ParetoCDF, ParetoCDFc, ParetoQ, ParetoRand, ParetoMu, ParetoSx, ParetoArgs, ParetoAll.
+
+## CauchLibrary
+
+The ratio of two independent normals. It has **no mean and no variance**: the
+average of a thousand draws is no better than a single draw, and the usual
+tests do not apply to it. It is here as much as a warning as a model.
+
+Parameters: `x0`, `sc`, then the point.
+
+Entries: CauchPDF, CauchCDF, CauchCDFc, CauchQ, CauchRand, CauchMu, CauchSx, CauchArgs, CauchAll.
+
+## UnifContLibrary
+
+Equal density over an interval — the raw material of simulation, since a
+uniform passed through the quantile of any law returns a draw from that law.
+That is exactly how every Rand entry of this section works.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UnifContPDF, UnifContCDF, UnifContCDFc, UnifContQ, UnifContRand, UnifContMu, UnifContSx, UnifContArgs, UnifContAll.
+
+## TriSymLibrary
+
+The symmetric triangular law, which is the sum of two uniforms. Used as a
+rough stand-in for the normal when only a minimum, a maximum and a centre are
+known.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriSymPDF, TriSymCDF, TriSymCDFc, TriSymQ, TriSymRand, TriSymMu, TriSymSx, TriSymArgs, TriSymAll.
+
+## Chi2Library
+
+The sum of df squared standard normals — and therefore the law of an estimated
+variance. It is what turns a sample deviation into a statement about the
+population.
+
+Parameters: `df`, then the point.
+
+Entries: Chi2PDF, Chi2CDF, Chi2CDFc, Chi2Q, Chi2Rand, Chi2Mu, Chi2Sx, Chi2Args, Chi2All.
+
+It is also the law behind the chi-square tests — see [Chi2Tests](#chi2testslibrary).
+
+## BetaLibrary
+
+Defined on the interval from zero to one, which makes it the natural law of a
+proportion. Its two shapes a and b bend it into almost anything: uniform, bell,
+U, or a spike at either end.
+
+Parameters: `a`, `b`, then the point.
+
+Entries: BetaPDF, BetaCDF, BetaCDFc, BetaQ, BetaRand, BetaMu, BetaSx, BetaArgs, BetaAll.
+
+## PhitLibrary
+
+The standard normal, μ = 0 and sx = 1 — the tabulated one. It takes **no
+parameter**, only the point, which is why its Mu, Sx and Rand entries take
+nothing at all.
+
+No parameter: only the point.
+
+Entries: PhitPDF, PhitCDF, PhitCDFc, PhitQ, PhitRand, PhitMu, PhitSx, PhitArgs, PhitAll.
+
+## TriRightLibrary
+
+A triangular law whose mode sits at its maximum: rising density, abrupt end.
+Three-point estimates in project planning, where the optimistic case is also
+the likeliest.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriRightPDF, TriRightCDF, TriRightCDFc, TriRightQ, TriRightRand, TriRightMu, TriRightSx, TriRightArgs, TriRightAll.
+
+## TriLeftLibrary
+
+A triangular law whose mode sits at its minimum: the mirror of TriRight, for
+the case where the pessimistic end is the likeliest and a long tail stretches
+toward the optimistic one.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriLeftPDF, TriLeftCDF, TriLeftCDFc, TriLeftQ, TriLeftRand, TriLeftMu, TriLeftSx, TriLeftArgs, TriLeftAll.
+
+## TriAsymLibrary
+
+The general triangular law, with the mode xp anywhere between the two bounds.
+The honest form of a three-point estimate — minimum, maximum, most likely —
+when nothing more is known.
+
+Parameters: `Xmin`, `Xmax`, `xp`, then the point.
+
+Entries: TriAsymPDF, TriAsymCDF, TriAsymCDFc, TriAsymQ, TriAsymRand, TriAsymMu, TriAsymSx, TriAsymArgs, TriAsymAll.
+
+## UShapeLibrary
+
+Density highest at **both** edges and lowest in the middle: the law of a
+quantity that spends its time near its extremes, like the position of a
+pendulum sampled at random instants.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UShapePDF, UShapeCDF, UShapeCDFc, UShapeQ, UShapeRand, UShapeMu, UShapeSx, UShapeArgs, UShapeAll.
+
+## GEVLibrary
+
+The law of **maxima**: whatever the underlying law, the largest of many draws
+tends to this one. The shape xi selects the family — Gumbel at zero, Fréchet
+above, reversed Weibull below. The tool of flood and gust engineering.
+
+Parameters: `x0`, `sc`, `xi`, then the point.
+
+Entries: GEVPDF, GEVCDF, GEVCDFc, GEVQ, GEVRand, GEVMu, GEVSx, GEVArgs, GEVAll.
+
+## BernoulliLibrary
+
+One trial, one success or one failure. The atom from which Binom, Geom and
+NegBinom are built.
+
+Parameters: `p`, then the point.
+
+Entries: BernoulliPDF, BernoulliCDF, BernoulliCDFc, BernoulliQ, BernoulliRand, BernoulliMu, BernoulliSx, BernoulliArgs, BernoulliAll.
+
+## BinomLibrary
+
+The number of successes in nt independent trials of probability p. Note that
+its quantile is a staircase, which is why it is computed by summation and not
+by a solver — a step has no slope to follow.
+
+Parameters: `nt`, `p`, then the point.
+
+Entries: BinomPDF, BinomCDF, BinomCDFc, BinomQ, BinomRand, BinomMu, BinomSx, BinomArgs, BinomAll.
+
+## PoissLibrary
+
+Rare events in a fixed window when they arrive independently at a constant
+rate: its mean and its variance are both λ, which is the quickest test of
+whether real counts are Poisson at all.
+
+Parameters: `λ`, then the point.
+
+Entries: PoissPDF, PoissCDF, PoissCDFc, PoissQ, PoissRand, PoissMu, PoissSx, PoissArgs, PoissAll.
+
+## GeomLibrary
+
+The number of trials up to the first success. The discrete memoryless law —
+the exponential's counterpart, and like it indifferent to how long one has
+already waited.
+
+Parameters: `p`, then the point.
+
+Entries: GeomPDF, GeomCDF, GeomCDFc, GeomQ, GeomRand, GeomMu, GeomSx, GeomArgs, GeomAll.
+
+## HyperLibrary
+
+Sampling **without** replacement: Ks favourable items among Np, of which nd are
+drawn. Where Binom would apply if the draws were put back. The difference
+matters when the sample is a noticeable fraction of the population.
+
+Parameters: `Np`, `Ks`, `nd`, then the point.
+
+Entries: HyperPDF, HyperCDF, HyperCDFc, HyperQ, HyperRand, HyperMu, HyperSx, HyperArgs, HyperAll.
+
+## UnifDisLibrary
+
+Equally likely integers between two bounds — the die, the lottery, the random
+index.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UnifDisPDF, UnifDisCDF, UnifDisCDFc, UnifDisQ, UnifDisRand, UnifDisMu, UnifDisSx, UnifDisArgs, UnifDisAll.
+
+## GammaLibrary
+
+The waiting time until the a-th event of a Poisson process, hence the sum of a
+exponentials. With a = 1 it is the exponential, and with a half-integer shape
+it is the chi-square in disguise.
+
+Parameters: `a`, `sc`, then the point.
+
+Entries: GammaPDF, GammaCDF, GammaCDFc, GammaQ, GammaRand, GammaMu, GammaSx, GammaArgs, GammaAll.
+
+## NormTruncLibrary
+
+A normal restricted to an interval and renormalised. What one needs when a
+quantity is normal in principle but cannot be negative, or cannot exceed a
+tolerance.
+
+Parameters: `x0`, `sc`, `Xmin`, `Xmax`, then the point.
+
+Entries: NormTruncPDF, NormTruncCDF, NormTruncCDFc, NormTruncQ, NormTruncRand, NormTruncMu, NormTruncSx, NormTruncArgs, NormTruncAll.
+
+## NegBinomLibrary
+
+The number of trials until the rs-th success. Also used, with a real rs, as an
+over-dispersed Poisson — counts whose variance exceeds their mean.
+
+Parameters: `rs`, `p`, then the point.
+
+Entries: NegBinomPDF, NegBinomCDF, NegBinomCDFc, NegBinomQ, NegBinomRand, NegBinomMu, NegBinomSx, NegBinomArgs, NegBinomAll.
+
+## StudentLibrary
+
+The normal with its standard deviation **estimated** rather than known. The
+extra uncertainty widens the tails, and df governs how much: at df = 30 it is
+already close to the normal, at df = 2 it barely has a variance.
+
+Parameters: `df`, then the point.
+
+Entries: StudentPDF, StudentCDF, StudentCDFc, StudentQ, StudentRand, StudentMu, StudentSx, StudentArgs, StudentAll.
+
+It is also the law behind the Student tests — see [StudentTests](#studenttestslibrary).
+
+## FisherLibrary
+
+The ratio of two chi-squares, each divided by its degrees of freedom — hence
+the law of a **ratio of variances**, and the foundation of the analysis of
+variance.
+
+Parameters: `dfn`, `dfd`, then the point.
+
+Entries: FisherPDF, FisherCDF, FisherCDFc, FisherQ, FisherRand, FisherMu, FisherSx, FisherArgs, FisherAll.
+
+It is also the law behind the tests built on it — see [FisherTests](#fishertestslibrary).
+
+## LevyLibrary
+
+A stable law with a tail so heavy that its mean is infinite. It is the law of
+the first time a Brownian motion reaches a level, and it appears wherever a
+sum of heavy-tailed quantities refuses to become normal.
+
+Parameters: `x0`, `sc`, then the point.
+
+Entries: LevyPDF, LevyCDF, LevyCDFc, LevyQ, LevyRand, LevyMu, LevySx, LevyArgs, LevyAll.
+
+
 ## NormlPDF
 
 Density of the Norml distribution at X. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
