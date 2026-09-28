@@ -1,0 +1,88 @@
+«
+@@ ============================================================
+@@ VincentyDir — point reached from a given point, azimuth and
+@@ distance on the WGS-84 ellipsoid, the direct geodetic problem.
+@@ T. Vincenty, Survey Review 23(176), 1975, pp. 88-93.
+@@
+@@ Input : φ1 λ1 α1 s — latitude and longitude of departure (East
+@@         positive), initial azimuth from true North, distance.
+@@         Plain numbers are degrees and metres; angles and lengths
+@@         with a unit are accepted.
+@@ Output: φ2 λ2 α2 — latitude and longitude reached, and azimuth
+@@         there, in degrees.
+@@ The iteration converges to 1E-12 radian; it always converges for
+@@ the direct problem. Angle mode and angle units setting are
+@@ restored before returning (see VincentyInv for why not IFERR).
+@@ ============================================================
+
+  IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END
+  → dist
+  «
+    3 →LIST
+    « IF DUP TypeName "unit" == THEN 1_r CONVERT UVAL ELSE Ⓒπ →Num * 180 / END »
+    MAP LIST→ DROP dist
+  »
+  Ⓒa♁GPS →Num UVAL Ⓒf♁GPS →Num
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → p1 q1 az1 dist axa fla amode aunits
+  «
+    'axa*(1-fla)' EVAL 'ATAN((1-fla)*TAN(p1))' EVAL
+    → bxa ur1
+    «
+      ur1 SIN ur1 COS
+      → su1 cu1
+      «
+        '(su1/cu1)∠(COS(az1))' EVAL
+        'cu1*SIN(az1)' EVAL
+        → sg1 salf
+        «
+          '1-salf²' EVAL
+          → c2a
+          «
+            'c2a*(axa²-bxa²)/bxa²' EVAL
+            → usq
+            «
+              '1+usq/16384*(4096+usq*(-768+usq*(320-175*usq)))' EVAL
+              'usq/1024*(256+usq*(-128+usq*(74-47*usq)))' EVAL
+              → aca bcb
+              «
+                'dist/(bxa*aca)' EVAL 0 0 0
+                → sgm sgp c2m iter
+                «
+                  DO
+                    sgm 'sgp' STO
+                    'COS(2*sg1+sgm)' EVAL 'c2m' STO
+                    'dist/(bxa*aca)+bcb*SIN(sgm)*(c2m+bcb/4*(COS(sgm)*(2*c2m²-1)-bcb/6*c2m*(4*SIN(sgm)²-3)*(4*c2m²-3)))' EVAL 'sgm' STO
+                    iter 1 + 'iter' STO
+                  UNTIL
+                    'ABS(sgm-sgp)' EVAL 1E-12 < iter 200 ≥ OR
+                  END
+                  'COS(2*sg1+sgm)' EVAL 'c2m' STO
+                  'su1*SIN(sgm)-cu1*COS(sgm)*COS(az1)' EVAL
+                  'fla/16*c2a*(4+fla*(4-3*c2a))' EVAL
+                  → tmp cvc
+                  «
+                    '(su1*COS(sgm)+cu1*SIN(sgm)*COS(az1))∠((1-fla)*√(salf²+tmp²))' EVAL
+                    '(SIN(sgm)*SIN(az1))∠(cu1*COS(sgm)-su1*SIN(sgm)*COS(az1))' EVAL
+                    → lat2 lamb
+                    «
+                      'q1+lamb-(1-cvc)*fla*salf*(sgm+cvc*SIN(sgm)*(c2m+cvc*COS(sgm)*(2*c2m²-1)))' EVAL
+                      → lon2
+                      «
+                        lat2 180 * Ⓒπ →Num / 1_° *
+                        '(SIN(lon2))∠(COS(lon2))' EVAL 180 * Ⓒπ →Num / 1_° *
+                        '(salf)∠(-tmp)' EVAL 180 * Ⓒπ →Num / 360 MOD 1_° *
+                      »
+                    »
+                  »
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

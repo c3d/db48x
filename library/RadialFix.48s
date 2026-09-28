@@ -1,0 +1,67 @@
+«
+@@ ============================================================
+@@ RadialFix — position at the intersection of two radials (two
+@@ bearings taken from two known points), on a sphere.
+@@ Ed Williams, Aviation Formulary V1.47, "Intersection of two
+@@ radials", global version (V1.43 and later).
+@@
+@@ Input : φ1 λ1 C1 φ2 λ2 C2 — two points (East positive) and the
+@@         true bearing of the sought position from each of them.
+@@         Plain numbers are degrees; angles with a unit are accepted.
+@@ Output: φ λ — latitude and longitude of the intersection.
+@@ Errors: "Infinity of intersections" when the two radials lie on
+@@         the same great circle; "Intersection ambiguous" when they
+@@         diverge (their great circles meet on the far side).
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  6 →LIST
+  « IF DUP TypeName "unit" == THEN 1_r CONVERT UVAL ELSE Ⓒπ →Num * 180 / END »
+  MAP LIST→ DROP
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  ""
+  → p1 q1 crs13 p2 q2 crs23 amode aunits fail
+  «
+    '2*ASIN(√(SIN((p2-p1)/2)²+COS(p1)*COS(p2)*SIN((q2-q1)/2)²))' EVAL
+    '(SIN(q2-q1)*COS(p2))∠(COS(p1)*SIN(p2)-SIN(p1)*COS(p2)*COS(q2-q1))' EVAL
+    '(SIN(q1-q2)*COS(p1))∠(COS(p2)*SIN(p1)-SIN(p2)*COS(p1)*COS(q1-q2))' EVAL
+    → d12 crs12 crs21
+    «
+      '(SIN(crs13-crs12))∠(COS(crs13-crs12))' EVAL
+      '(SIN(crs21-crs23))∠(COS(crs21-crs23))' EVAL
+      → an1 an2
+      «
+        IF 'ABS(SIN(an1))<1E-12 AND ABS(SIN(an2))<1E-12' EVAL THEN
+          "Infinity of intersections" 'fail' STO 0 0
+        ELSE
+          IF 'SIN(an1)*SIN(an2)<0' EVAL THEN
+            "Intersection ambiguous" 'fail' STO 0 0
+          ELSE
+            'ABS(an1)' EVAL 'an1' STO 'ABS(an2)' EVAL 'an2' STO
+            'ACOS(-COS(an1)*COS(an2)+SIN(an1)*SIN(an2)*COS(d12))' EVAL
+            → an3
+            «
+              '(SIN(d12)*SIN(an1)*SIN(an2))∠(COS(an2)+COS(an1)*COS(an3))' EVAL
+              → d13
+              «
+                'ASIN(SIN(p1)*COS(d13)+COS(p1)*SIN(d13)*COS(crs13))' EVAL
+                → p3
+                «
+                  '(SIN(crs13)*SIN(d13)*COS(p1))∠(COS(d13)-SIN(p1)*SIN(p3))' EVAL
+                  → dq
+                  «
+                    p3 180 * Ⓒπ →Num / 1_° *
+                    '(SIN(q1+dq))∠(COS(q1+dq))' EVAL 180 * Ⓒπ →Num / 1_° *
+                  »
+                »
+              »
+            »
+          END
+        END
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+    IF fail "" ≠ THEN DROP DROP "RadialFix: " fail + DOERR END
+  »
+»
