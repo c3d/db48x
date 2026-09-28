@@ -746,6 +746,7 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
+          android/build/outputs/apk/**/*.apk
           help/
         retention-days: 7
 
@@ -818,6 +819,7 @@ jobs:
         path: |
           android/*.aab
           android/**/*.aab
+          android/build/outputs/apk/**/*.apk
           help/
         retention-days: 7
 
