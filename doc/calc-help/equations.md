@@ -2893,3 +2893,254 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
+
+
+## Navigation
+
+The `Navigation` section computes routes, positions and distances on the
+surface of the earth. It serves air, marine and land navigation alike: a great
+circle is the shortest route for an aircraft, a ship or a traveller.
+
+The equations use a spherical earth. They are exact on the sphere, and within
+about 0.5% of the ellipsoidal (WGS-84) answer.
+
+**Conventions.** Latitudes are positive North. **Longitudes are positive East**,
+as in GPS coordinates: West longitudes are negative. True courses are measured
+clockwise from true North, from 0° to 360°. Angles can be entered in any
+angular unit, for instance `'33_°+57_arcmin'` for 33°57′.
+
+**Earth radius.** The radius `Rs` of the sphere is a variable. With
+`Rs='(10800_nmi)/Ⓒπ'`, one arc-minute of a great circle is exactly one
+nautical mile, the convention of the navigation references below. The WGS-84
+mean radius, `(2a+b)/3`, is 6 371 008.8 m.
+
+**Results and steps.** Each entry computes a few main results, listed first
+below. The other variables are intermediate steps: they keep each equation
+short enough to be shown on the screen of the solver, and they let you follow
+the calculation. A course, for instance, is the direction of a vector whose
+North component is `x` and East component is `y`; `180°+(-y)∠(-x)` gives
+that direction between 0° and 360°. Solving for all the variables of an
+entry, steps included, is the simplest way to use it.
+
+The 41 variables in the Navigation section are:
+
+*Positions, courses and distances*
+
+* `φ1`, `λ1`: Latitude and longitude of the departure point
+* `φ2`, `λ2`: Latitude and longitude of the destination
+* `φP`, `λP`: Latitude and longitude of the present position
+* `φv`, `λv`: Latitude and longitude of the northern vertex, the point of highest latitude of the great circle
+* `D`: Great-circle distance from departure to destination (dim.: length, in SI: m)
+* `Dv`: Great-circle distance from the departure point to the vertex (dim.: length, in SI: m)
+* `TC1`: Initial true course, at departure
+* `TC2`: Final true course, on arrival
+* `XTD`: Cross-track distance: how far the present position is from the route, positive when right of it (dim.: length, in SI: m)
+* `ATD`: Along-track distance: how far along the route the present position is (dim.: length, in SI: m)
+* `Rs`: Radius of the spherical earth (dim.: length, in SI: m)
+* `TC`: True course, or track: the direction actually followed over the ground (for a ship: course made good)
+* `TH`: True heading: the direction the aircraft or ship points to
+* `V`: Own speed through the air or the water: true airspeed of an aircraft, speed of a ship (dim.: speed)
+* `GS`: Ground speed (for a ship: speed made good) (dim.: speed)
+* `WD`: Direction the wind comes **from**. A current setting towards `set` acts as a wind from `set+180°`
+* `WS`: Wind speed, or drift of the current (dim.: speed)
+* `WCA`: Wind correction angle, `TH-TC`: negative when heading left of the track
+
+*Intermediate steps*
+
+* `θ`: Central angle between departure and destination; `D` is the arc `Rs·θ`
+* `θ1P`: Central angle between the departure point and the present position
+* `θv`: Central angle between the departure point and the vertex
+* `θXT`, `θAT`: Central angles across and along the track
+* `Δφ`, `Δλ`: Latitude and longitude differences
+* `Δλv`: Longitude difference from the departure point to the vertex
+* `hav`: Haversine of the central angle, `SIN(θ/2)²`
+* `x1`: North component of the initial course
+* `x2`: North component of the final course
+* `xP`: North component of the course towards the present position
+* `TC1P`: True course from the departure point towards the present position
+* `gN`, `gE`: North and East components of the ground speed vector
+* `wN`, `wE`: North and East components of the wind, pointing where it comes from
+* `aN`, `aE`: North and East components of the own speed vector
+
+* References:
+  [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings* ;
+  [3] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C, chapter 16, *Navigation* ;
+  [4] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2024), chapter 10, *Dead Reckoning*, §1008.
+
+#### Great Circle
+
+The great circle is the shortest route between two points of a sphere.
+
+![Great circle route](img/GreatCircleRoute.bmp)
+
+* Main results: the distance `D` between departure `(φ1;λ1)` and destination
+  `(φ2;λ2)`, the initial true course `TC1` to steer at departure, and the final
+  true course `TC2` on arrival. On a great circle the course changes all along
+  the route, so `TC1` and `TC2` differ, except along a meridian or the equator.
+* Steps: the central angle `θ` comes from the haversine `hav`, which stays
+  accurate for short distances; each course comes from its North component,
+  `x1` or `x2`.
+
+* To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi x1=0.23851 69937 16 TC1=65.89216 65527 ° x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+* To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
+```rpl
+φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=2 ° Δλ=-85 ° hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi x1=-0.28643 54215 54 TC1=252.98680 2724 ° x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+#### Great Circle Vertex
+
+The vertex is the point of highest latitude of a great circle. It tells how far
+toward the pole a great-circle route goes, which matters in high latitudes, in
+ice or in bad weather.
+
+* Main results: the latitude `φv` and longitude `λv` of the vertex, and the
+  distance `Dv` from the departure point to it, for a great circle leaving
+  `(φ1;λ1)` on the initial true course `TC1`.
+* Steps: `φv` follows from Clairaut's relation, `COS(φ)·SIN(TC)` being constant
+  along a great circle; `Δλv` is the longitude difference to the vertex.
+* The equations give the northern vertex; the southern one lies at `-φv`,
+  180° of longitude away.
+
+* To calculate: `[φv;λv;Dv]` (Vertex latitude and longitude; Distance to the vertex) from 28°N, 125°W, initial course 291° [2, §1210, example 1]:
+```rpl
+φ1=28_° λ1=-125_° TC1=291_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ φv=34.48215 17436 ° Δλv=-39.27119 44547 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
+'ROOT(ⒺGreat Circle Vertex;[φv;Δλv;λv;θv;Dv];[1_°;1_°;1_°;1_°;1_nmi])'
+```
+
+#### Great Circle Destination
+
+The *direct* problem: where does one arrive after a given distance along a
+great circle?
+
+* Main results: the latitude `φ2` and longitude `λ2` reached after a distance
+  `D` from `(φ1;λ1)`, on the initial true course `TC1`.
+* Steps: `θ` is the distance as an angle, and `Δλ` the change of longitude.
+
+* To calculate: `[φ2;λ2]` (Destination latitude and longitude) 100 nmi from LAX on the initial course from LAX to JFK, 1.150035 radians [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r D=100_nmi Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=1.66666 66666 7 ° φ2=34.61697 31196 ° Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
+'ROOT(ⒺGreat Circle Destination;[θ;φ2;Δλ;λ2];[1_°;1_°;1_°;1_°])'
+```
+
+#### Cross Track Error
+
+How far is the present position from the planned route?
+
+![Cross-track distance](img/CrossTrackDistance.bmp)
+
+* Main results: the cross-track distance `XTD` between the present position
+  `(φP;λP)` and the great circle leaving `(φ1;λ1)` on the initial course
+  `TC1`, positive when right of the route; and the along-track distance `ATD`
+  already covered along the route. `TC1` can come from the `Great Circle`
+  equations.
+* Steps: the distance `θ1P` and course `TC1P` from the departure point to the
+  present position, computed as in `Great Circle`; then the angles `θXT` and
+  `θAT` across and along the route.
+
+* To calculate: `[XTD;ATD]` (Cross-track and along-track distances) on the route from LAX to JFK (initial course 1.150035 radians), from the present position 34°30′N, 116°30′W [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
+'ROOT(ⒺCross Track Error;[Δφ;Δλ;hav;θ1P;xP;TC1P;θXT;θAT;XTD;ATD];[1_°;1_°;0;1_°;0;1_°;1_°;1_°;1_nmi;1_nmi])'
+```
+
+#### Wind Correction
+
+The wind triangle: what heading to fly, or to steer, to follow a given track?
+The aircraft moves through the air, and the air moves over the ground; the
+ground speed vector is the sum of the own speed vector and of the wind. The
+same triangle serves a ship in a current.
+
+![Wind triangle](img/WindTriangle.bmp)
+
+* Main results: the true heading `TH` and the ground speed `GS` needed to
+  follow the true course `TC` at the own speed `V`, with a wind of speed `WS`
+  coming from `WD`.
+* Steps: the wind correction angle `WCA` between heading and track.
+* For a current, give its drift as `WS`, and as `WD` the direction opposite to
+  its set: a current setting towards 170° acts as a wind from 350°.
+
+* To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
+```rpl
+TC=90_° V=120_knot WD=45_° WS=40_knot
+@ Expecting [ WCA=-13.63302 22254 ° TH=76.36697 77746 ° GS=88.33476 66494 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
+```rpl
+TC=31_° V=115_knot WD=360_° WS=10_knot
+@ Expecting [ WCA=-2.56690 27668 6 ° TH=28.43309 72331 ° GS=106.31293 6833 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` (Course to steer; Speed made good) for a ship at 12 kt which must make good 095°, in a current setting towards 170° at 2.5 kt, that is a wind from 350°. The book gives 083.5° and 12.4 kt [4, example 2]:
+```rpl
+TC=95_° V=12_knot WD=350_° WS=2.5_knot
+@ Expecting [ WCA=-11.60916 12726 ° TH=83.39083 87274 ° GS=12.40156 4643 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+#### Ground Track
+
+Where does a heading lead? The ground track and speed that result from a
+heading and a speed through a moving air or water.
+
+* Main results: the true course `TC` actually followed over the ground, and
+  the ground speed `GS`, when heading `TH` at the own speed `V` with a wind of
+  speed `WS` coming from `WD`.
+* Steps: the North and East components `gN` and `gE` of the ground speed, and
+  the wind correction angle `WCA`, here the drift to be expected.
+
+* To calculate: `[TC;GS]` (Course and speed made good) for a ship steering 080° at 10 kt in a current setting towards 140° at 2 kt, that is a wind from 320°. The book reads 089° and 11.2 kt on its plot [4, example 1]:
+```rpl
+TH=80_° V=10_knot WD=320_° WS=2_knot
+@ Expecting [ gN=0.20439 28904 31 knot gE=11.13365 27495 knot GS=11.13552 87257 knot TC=88.94827 55646 ° WCA=-8.94827 55646 3 ° ]
+'ROOT(ⒺGround Track;[gN;gE;GS;TC;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+#### Wind Finding
+
+What is the wind? A pilot who knows the heading and airspeed, and measures the
+track and ground speed (with a GPS, for instance), can deduce the wind. The
+same calculation gives the set and drift of a current, the direction of which
+is then `WD-180°`.
+
+* Main results: the direction `WD` the wind comes from, and its speed `WS`.
+* Steps: the North and East components `wN` and `wE` of the wind.
+
+* To calculate: `[WD;WS]` (Wind direction and speed) from the heading 076.37° and airspeed 120 kt, with a track of 090° and a ground speed of 88.33 kt; this is the first `Wind Correction` example in reverse, and gives back the wind from 045° at 40 kt:
+```rpl
+TH=76.37_° V=120_knot TC=90_° GS=88.33_knot
+@ Expecting [ wN=28.27811 98124 knot wE=28.29052 96673 knot WS=40.00007 66122 knot WD=45.01256 93702 ° ]
+'ROOT(ⒺWind Finding;[wN;wE;WS;WD];[1_knot;1_knot;1_knot;1_°])'
+```
+
+#### Required Heading & Speed
+
+What heading and own speed are needed to make good both a given track and a
+given ground speed, for instance to reach a waypoint at a set time?
+
+* Main results: the true heading `TH` and the own speed `V` that make good the
+  true course `TC` at the ground speed `GS`, with a wind of speed `WS` coming
+  from `WD`.
+* Steps: the North and East components `aN` and `aE` of the own speed vector,
+  and the wind correction angle `WCA`.
+
+* To calculate: `[TH;V]` (Course and speed to steer) for a ship which must make good 265° at 15 kt, in a current setting towards 185° at 3 kt, that is a wind from 005°. The book reads 276° and 14.8 kt on its plot [4, example 3]:
+```rpl
+TC=265_° GS=15_knot WD=5_° WS=3_knot
+@ Expecting [ aN=1.68124 79530 6 knot aE=-14.68145 32431 knot V=14.77740 38319 knot TH=276.53277 4288 ° WCA=11.53277 42876 ° ]
+'ROOT(ⒺRequired Heading & Speed;[aN;aE;V;TH;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
