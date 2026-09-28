@@ -1647,6 +1647,490 @@ static const cstring basic_equations[] =
     "  'CNR=CNN+CNT+CNF' "
     "  'XCP=(CNN·(XN_mm)+CNT·(XT_mm)+CNF·(XF_mm))/CNR' "
     "}",
+    "Astronautics", nullptr,
+    "Astronautics/Geocentric", nullptr,
+    "Astronautics/Geocentric/Stationary", nullptr,
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    //1.
+    "Circular Orbit",  "{ "
+    "  'v=SQRT(ⒸGM♁/((ⒸReq♁)+(H_km)))' "
+    "  'P=2·Ⓒπ·SQRT(((ⒸReq♁)+(H_km))↑3/ⒸGM♁)' "
+    "}",
+    //2.
+    "Geosynchronous Orbit",  "{ "
+    "  'r=(ⒸGM♁·(P_s)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'H=(r_km)-(ⒸReq♁)' "
+    "  'v=SQRT(ⒸGM♁/(r_km))' "
+    "}",
+    //3.
+    "Elliptic Orbit Velocities",  "{ "
+    "  'Rp=(ⒸReq♁)+(Hp_km)' "
+    "  'Ra=(ⒸReq♁)+(Ha_km)' "
+    "  'Vp=SQRT(2·ⒸGM♁·(Ra_km)/((Rp_km)·((Ra_km)+(Rp_km))))' "
+    "  'Va=SQRT(2·ⒸGM♁·(Rp_km)/((Ra_km)·((Ra_km)+(Rp_km))))' "
+    "}",
+    //4.
+    "Elliptic Orbit from Perigee State",  "{ "
+    "  'Rp=(ⒸReq♁)+(Hp_km)' "
+    "  'Vc=SQRT(ⒸGM♁/(Rp_km))' "
+    "  'a=ⒸGM♁/(2·(Vc_m/s)↑2-(Vp_m/s)↑2)' "
+    "  'Ra=2·(a_km)-(Rp_km)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "  'ecc=((Ra_km)-(Rp_km))/((Ra_km)+(Rp_km))' "
+    "}",
+    //5.
+    "Elliptic Orbit Apsides",  "{ "
+    "  'Rp=(a_km)·(1-ecc)' "
+    "  'Ra=(a_km)·(1+ecc)' "
+    "  'Hp=(Rp_km)-(ⒸReq♁)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "}",
+    //6.
+    "Escape Velocity",  "{ "
+    "  'Vesc=SQRT(2·ⒸGM♁/((ⒸReq♁)+(H_km)))' "
+    "}",
+    //7.
+    "Earth’s Sphere Of Influence",  "{ "
+    "  'Rsoi=(Ⓒa♁)·(ⒸGM♁/ⒸGM☉)↑(2/5)' "
+    "}",
+
+    //8.
+    "Launch to Orbit",  "{ "
+    "  'r1=(ⒸReq♁)+(H1_km)' "
+    "  'Vc1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'C=2·((Vc1_m/s)/(v1_m/s))↑2' "
+    "  'Rp=(r1_km)·(-C+SQRT(C↑2-4·(1-C)·(-sin(zen_°)↑2)))/(2·(1-C))' "
+    "  'Ra=(r1_km)·(-C-SQRT(C↑2-4·(1-C)·(-sin(zen_°)↑2)))/(2·(1-C))' "
+    "  'Hp=(Rp_km)-(ⒸReq♁)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "  'a=(r1_km)/(2-2/C)' "
+    "  'ecc=SQRT((2/C-1)↑2·sin(zen_°)↑2+cos(zen_°)↑2)' "
+    "  'ν=atan((2/C)·sin(zen_°)·cos(zen_°)/((2/C)·sin(zen_°)↑2-1))' "
+    "}",
+
+    //9.
+    "Orbit Orientation",  "{ "
+    "  'inc=acos(cos(lat_°)·sin(Az_°))' "
+    "  'argLat=atan(tan(lat_°)/cos(Az_°))' "
+    "  'ω=atan(tan(lat_°)/cos(Az_°))-(ν_°)' "
+    "  'dlon=atan(sin(lat_°)·tan(Az_°))' "
+    "  'lonAN=(lon2_°)-atan(sin(lat_°)·tan(Az_°))' "
+    "  'Ω=Ⓛθs(JDbo;lonAN)' "
+    "}",
+
+    //10.
+    "Time in Elliptic 1",  "{ "
+    "  'Ea0=acos((ecc+cos(ν0_°))/(1+ecc·cos(ν0_°)))' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'M0=(Ea0_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea0_°)' "
+    "  'M=(Ea_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "  'Δt=((M_°)-(M0_°))/(360_°)·(P_s)' "
+    "}",
+    //11.
+    "Time in Elliptic 2",  "{ "
+    "  'Ea0=acos((ecc+cos(ν0_°))/(1+ecc·cos(ν0_°)))' "
+    "  'M0=(Ea0_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea0_°)' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "  'M=(M0_°)+((Δt_s)/(P_s))·(360_°)' "
+    "  'Ea=(M_°)+ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'ν=2·arg(→Polar(ℝ→ℂ(√(1-ecc)·cos((Ea_°)/2);√(1+ecc)·sin((Ea_°)/2))))' "
+    "}",
+    //12.
+    "Elliptic Position",  "{ "
+    "  'r=(a_km)·(1-ecc↑2)/(1+ecc·cos(ν_°))' "
+    "  'fpa=atan(ecc·sin(ν_°)/(1+ecc·cos(ν_°)))' "
+    "  'v=SQRT(ⒸGM♁·(2/(r_km)-1/(a_km)))' "
+    "}",
+
+    //13.
+    "Luni Solar Perturbations",  "{ "
+    "  'dΩM=-0.00338·cos(inc_°)/n·(1_°/d)' "
+    "  'dΩS=-0.00154·cos(inc_°)/n·(1_°/d)' "
+    "  'dωM=0.00169·(4-5·sin(inc_°)↑2)/n·(1_°/d)' "
+    "  'dωS=0.00077·(4-5·sin(inc_°)↑2)/n·(1_°/d)' "
+    "}",
+    //14.
+    "J2 Perturbations",  "{ "
+    "  'dΩJ2=-2.06474E14·((a_km)/(1_km))↑(-7/2)·cos(inc_°)·(1-ecc↑2)↑(-2)·(1_°/d)' "
+    "  'dωJ2=1.03237E14·((a_km)/(1_km))↑(-7/2)·(4-5·sin(inc_°)↑2)·(1-ecc↑2)↑(-2)·(1_°/d)' "
+    "}",
+    //15.
+    "Atmospheric Drag",  "{ "
+    "  'a=(ⒸReq♁)+(H_km)' "
+    "  'v=SQRT(ⒸGM♁/(a_km))' "
+    "  'Δa=-2·Ⓒπ·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)↑2/(msat_kg)' "
+    "  'ΔP=-6·Ⓒπ↑2·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)↑2/((msat_kg)·(v_m/s))' "
+    "  'Δv=Ⓒπ·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)·(v_m/s)/(msat_kg)' "
+    "  'Life=-(Hs_km)/(Δa_m)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Geocentric/Trajectory", nullptr,
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    //16.
+    "Hohmann Transfer",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'atx=((rA_km)+(rB_km))/2' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=(VfB_m/s)-(VtxB_m/s)' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "}",
+    //17.
+    "One Tangent Burn",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'ecc=1-(rA_km)/(atx_km)' "
+    "  'ν=acos(((atx_km)·(1-ecc↑2)/(rB_km)-1)/ecc)' "
+    "  'fpa=atan(ecc·sin(ν_°)/(1+ecc·cos(ν_°)))' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=SQRT((VtxB_m/s)↑2+(VfB_m/s)↑2-2·(VtxB_m/s)·(VfB_m/s)·cos(fpa_°))' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'M=(Ea_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'P=2·Ⓒπ·SQRT((atx_km)↑3/ⒸGM♁)' "
+    "  'TOF=((M_°)/(360_°))·(P_s)' "
+    "}",
+
+    //18.
+    "Simple Plane Change",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'Vi=SQRT(ⒸGM♁/(r_km))' "
+    "  'ΔV=2·(Vi_m/s)·sin((Δinc_°)/2)' "
+    "}",
+    //19.
+    "Combined Plane Change & Hohmann",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'atx=((rA_km)+(rB_km))/2' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=SQRT((VtxB_m/s)↑2+(VfB_m/s)↑2-2·(VtxB_m/s)·(VfB_m/s)·cos(Δinc_°))' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "}",
+    //20.
+    "Plane Change Between Orbits",  "{ "
+    "  'a1=sin(inci_°)·cos(Ωi_°)' "
+    "  'a2=sin(inci_°)·sin(Ωi_°)' "
+    "  'a3=cos(inci_°)' "
+    "  'b1=sin(incf_°)·cos(Ωf_°)' "
+    "  'b2=sin(incf_°)·sin(Ωf_°)' "
+    "  'b3=cos(incf_°)' "
+    "  'θ=acos(a1·b1+a2·b2+a3·b3)' "
+    "  'cx=a2·b3-a3·b2' "
+    "  'cy=a3·b1-a1·b3' "
+    "  'cz=a1·b2-a2·b1' "
+    "  'latN1=atan(cz/SQRT(cx↑2+cy↑2))' "
+    "  'lonN1=atan(cy/cx)+(90_°)' "
+    "  'latN2=-(latN1_°)' "
+    "  'lonN2=(lonN1_°)+(180_°)' "
+    "}",
+
+    //21.
+    "Hyperbolic Time of Flight",  "{ "
+    "  'Fh0=acosh(((ecc)+cos(ν0_°))/(1+(ecc)·cos(ν0_°)))' "
+    "  'Fh=acosh(((ecc)+cos(ν_°))/(1+(ecc)·cos(ν_°)))' "
+    "  'Δt=SQRT((-(a_km))↑3/ⒸGM♁)·(((ecc)·sinh(Fh)-Fh)-((ecc)·sinh(Fh0)-Fh0))' "
+    "}",
+    //22.
+    "Hyperbolic Excess Velocity",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'Vesc=SQRT(2·ⒸGM♁/(r_km))' "
+    "  'vinf=SQRT((Vbo_m/s)↑2-(Vesc_m/s)↑2)' "
+    "}",
+
+    //23.
+    "Coplanar Phasing",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'v1=SQRT(ⒸGM♁/(r_km))' "
+    "  'Ptgt=2·Ⓒπ·SQRT((r_km)↑3/ⒸGM♁)' "
+    "  'Pph=(Ptgt_s)·(1-(Δθ_°)/((360_°)·Nrev))' "
+    "  'aph=(ⒸGM♁·(Pph_s)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'va=SQRT(ⒸGM♁·(2/(r_km)-1/(aph_km)))' "
+    "  'ΔV=2·((v1_m/s)-(va_m/s))' "
+    "}",
+    //24.
+    "Controlled Deorbit",  "{ "
+    "  'r1=(ⒸReq♁)+(H1_km)' "
+    "  'rp=(ⒸReq♁)+(hp_km)' "
+    "  'ad=((r1_km)+(rp_km))/2' "
+    "  'v1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'vdo=SQRT(ⒸGM♁·(2/(r1_km)-1/(ad_km)))' "
+    "  'ΔV=(v1_m/s)-(vdo_m/s)' "
+    "}",
+    //25.
+    "GEO Graveyard Disposal",  "{ "
+    "  'rgeo=(ⒸGM♁·(ⒸProt♁)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'dHmin=((235)+(1000·CR·AtoM))·(1_km)' "
+    "  'rgrave=(rgeo_km)+(dHmin_km)' "
+    "  'atx=((rgeo_km)+(rgrave_km))/2' "
+    "  'vcg=SQRT(ⒸGM♁/(rgeo_km))' "
+    "  'vp=SQRT(ⒸGM♁·(2/(rgeo_km)-1/(atx_km)))' "
+    "  'vgr=SQRT(ⒸGM♁/(rgrave_km))' "
+    "  'va=SQRT(ⒸGM♁·(2/(rgrave_km)-1/(atx_km)))' "
+    "  'ΔV1=(vp_m/s)-(vcg_m/s)' "
+    "  'ΔV2=(vgr_m/s)-(va_m/s)' "
+    "  'ΔVtot=(ΔV1_m/s)+(ΔV2_m/s)' "
+    "}",
+    //26.
+    "Translunar Injection",  "{ "
+    "  'r1=(ⒸReq♁)+(Hp_km)' "
+    "  'atx=((r1_km)+(dmoon_km))/2' "
+    "  'v1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'vtli=SQRT(ⒸGM♁·(2/(r1_km)-1/(atx_km)))' "
+    "  'ΔVtli=(vtli_m/s)-(v1_m/s)' "
+    "  'varr=SQRT(ⒸGM♁·(2/(dmoon_km)-1/(atx_km)))' "
+    "  'tof=Ⓒπ·SQRT((atx_km)↑3/ⒸGM♁)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Heliocentric", nullptr,
+    "Astronautics/Heliocentric/Stationary", nullptr,
+    // ------------------------------------------------------------------------
+
+    //33.
+    "Sun Synchronous Orbit",  "{ "
+    "  'a=(ⒸReq♁)+(H_km)' "
+    "  'dΩsun=(360_°)/(365.2422_d)' "
+    "  'inc=acos((dΩsun_°/d)/(-2.06474E14·((a_km)/(1_km))↑(-7/2)·(1-ecc↑2)↑(-2)·(1_°/d)))' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "}",
+    //34.
+    "Collinear Lagrange Points",  "{ "
+    "  'rapp=(Ⓒa♁)·(ⒸGM♁/(3·ⒸGM☉))↑(1/3)' "
+    "  'rL2=SQRT(ⒸGM♁/(((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)+(rL2_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3-ⒸGM☉/((Ⓒa♁)+(rL2_km))↑2))' "
+    "  'rL1=SQRT(ⒸGM♁/(ⒸGM☉/((Ⓒa♁)-(rL1_km))↑2-((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)-(rL1_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3))' "
+    "}",
+    //35.
+    "JWST at Sun Earth L2",  "{ "
+    "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Heliocentric/Trajectory", nullptr,
+    // ------------------------------------------------------------------------
+
+    //27.
+    "Heliocentric Hohmann Transfer",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'VcsA=SQRT(ⒸGM☉/(rA_au))' "
+    "  'VcsB=SQRT(ⒸGM☉/(rB_au))' "
+    "  'VtxA=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))' "
+    "  'VtxB=SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'vinfD=(VtxA_m/s)-(VcsA_m/s)' "
+    "  'vinfA=(VcsB_m/s)-(VtxB_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //28.
+    "One Tangent Interplanetary Transfer",  "{ "
+    "  'ecc=1-((rA_au)/(atx_au))' "
+    "  'ν=acos(((atx_au)·(1-ecc↑2)/(rB_au)-1)/ecc)' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'TOF=((Ea_°)/(180_°)·→Num(Ⓒπ)-ecc·sin(Ea_°))·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //29.
+    "Departure Phase Angle",  "{ "
+    "  'φ=(Δν_°)-((ωt_°/d)·(tofd_d))' "
+    "}",
+
+    //30.
+    "Departure Hyperbola & Injection",  "{ "
+    "  'r0=(ⒸReq♁)+(H_km)' "
+    "  'Vo=SQRT((vinf_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'Vcirc=SQRT(ⒸGM♁/(r0_km))' "
+    "  'ΔVinj=(Vo_m/s)-(Vcirc_m/s)' "
+    "  'C3=(vinf_m/s)↑2' "
+    "}",
+    //31.
+    "Arrival Hyperbola",  "{ "
+    "  'bimp=(dmiss_km)·sin(gam_°)' "
+    "  'a=-ⒸGM♂/((vinf_m/s)↑2)' "
+    "  'ecc=SQRT(1+((bimp_km)↑2)/((a_km)↑2))' "
+    "  'rp=(a_km)·(1-ecc)' "
+    "  'dturn=2·asin(1/ecc)' "
+    "}",
+
+    //32.
+    "Gravity Assist Swing By",  "{ "
+    "  'VPx=(Vpln_m/s)·cos(fpaP_°)' "
+    "  'VPy=(Vpln_m/s)·sin(fpaP_°)' "
+    "  'VSix=(VSi_m/s)·cos(fpaSi_°)' "
+    "  'VSiy=(VSi_m/s)·sin(fpaSi_°)' "
+    "  'Vrix=(VSix_m/s)-(VPx_m/s)' "
+    "  'Vriy=(VSiy_m/s)-(VPy_m/s)' "
+    "  'vinf=SQRT((Vrix_m/s)↑2+(Vriy_m/s)↑2)' "
+    "  'thi=arg(→Polar(ℝ→ℂ((Vrix_m/s)/(1_m/s);(Vriy_m/s)/(1_m/s))))' "
+    "  'bimp=(dmiss_km)·sin(thi_°)' "
+    "  'a=-ⒸGM♃/((vinf_m/s)↑2)' "
+    "  'ecc=SQRT(1+((bimp_km)↑2)/((a_km)↑2))' "
+    "  'dturn=-2·asin(1/ecc)' "
+    "  'thf=(thi_°)+(dturn_°)' "
+    "  'Vrfx=(vinf_m/s)·cos(thf_°)' "
+    "  'Vrfy=(vinf_m/s)·sin(thf_°)' "
+    "  'VSfx=(Vrfx_m/s)+(VPx_m/s)' "
+    "  'VSfy=(Vrfy_m/s)+(VPy_m/s)' "
+    "  'VSf=SQRT((VSfx_m/s)↑2+(VSfy_m/s)↑2)' "
+    "  'fpaSf=arg(→Polar(ℝ→ℂ((VSfx_m/s)/(1_m/s);(VSfy_m/s)/(1_m/s))))' "
+    "}",
+
+    //36.
+    "Patched Conic Mission Capstone",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'VcsA=SQRT(ⒸGM☉/(rA_au))' "
+    "  'VtxA=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))' "
+    "  'vinfD=(VtxA_m/s)-(VcsA_m/s)' "
+    "  'VcsB=SQRT(ⒸGM☉/(rB_au))' "
+    "  'VtxB=SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'vinfA=(VcsB_m/s)-(VtxB_m/s)' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinfD_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'TMI=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'Varr=SQRT((vinfA_m/s)↑2+2·ⒸGM♂/(rm_km))' "
+    "  'MOI=(Varr_m/s)-SQRT(ⒸGM♂/(rm_km))' "
+    "  'dVtot=(TMI_m/s)+(MOI_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //37.
+    "Synodic Period & Launch Window",  "{ "
+    "  'P1=2·Ⓒπ·SQRT((rA_au)↑3/ⒸGM☉)' "
+    "  'P2=2·Ⓒπ·SQRT((rB_au)↑3/ⒸGM☉)' "
+    "  'Tsyn=1/(1/(P1_d)-1/(P2_d))' "
+    "}",
+    //38.
+    "Bi Elliptic vs Hohmann",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'dvH=(SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rA_au)))+(SQRT(ⒸGM☉/(rB_au))-SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au))))' "
+    "  'abe1=((rA_au)+(rstar_au))/2' "
+    "  'abe2=((rB_au)+(rstar_au))/2' "
+    "  'dv1=SQRT(ⒸGM☉·(2/(rA_au)-1/(abe1_au)))-SQRT(ⒸGM☉/(rA_au))' "
+    "  'dv2=SQRT(ⒸGM☉·(2/(rstar_au)-1/(abe2_au)))-SQRT(ⒸGM☉·(2/(rstar_au)-1/(abe1_au)))' "
+    "  'dv3=SQRT(ⒸGM☉·(2/(rB_au)-1/(abe2_au)))-SQRT(ⒸGM☉/(rB_au))' "
+    "  'dvBE=(dv1_m/s)+(dv2_m/s)+(dv3_m/s)' "
+    "  'dgain=(dvH_m/s)-(dvBE_m/s)' "
+    "}",
+    //39.
+    "Solar System Escape",  "{ "
+    "  'Vsun=SQRT(2·ⒸGM☉/(rA_au))' "
+    "  'Vplanet=SQRT(ⒸGM☉/(rA_au))' "
+    "  'vinf=(Vsun_m/s)-(Vplanet_m/s)' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinf_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'dVesc=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'C3=(vinf_m/s)↑2' "
+    "}",
+
+    //40.
+    "Interception Of Incoming Object",  "{ "
+    "  'vobj=SQRT(ⒸGM☉·(2/(rX_au)-1/(aobj_au)))' "
+    "  'vEarth=SQRT(ⒸGM☉/(rX_au))' "
+    "  'vt=SQRT(ⒸGM☉·(aobj_au)·(1-eobj↑2))/(rX_au)' "
+    "  'vr=SQRT((vobj_m/s)↑2-(vt_m/s)↑2)' "
+    "  'fpa=atan((vr_m/s)/(vt_m/s))' "
+    "  'dVint=SQRT((vobj_m/s)↑2+(vEarth_m/s)↑2-2·(vobj_m/s)·(vEarth_m/s)·cos(fpa_°))' "
+    "}",
+    //41.
+    "Asteroid Belt Injection Orbit",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'vinfD=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rA_au))' "
+    "  'vinfA=SQRT(ⒸGM☉/(rB_au))-SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinfD_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'dVdep=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //42.
+    "To Mercury Through Venus",  "{ "
+    "  'aEM=((rEar_au)+(rMe_au))/2' "
+    "  'vinfMe=SQRT(ⒸGM☉·(2/(rMe_au)-1/(aEM_au)))-SQRT(ⒸGM☉/(rMe_au))' "
+    "  'aEV=((rEar_au)+(rV_au))/2' "
+    "  'vinfV=SQRT(ⒸGM☉·(2/(rV_au)-1/(aEV_au)))-SQRT(ⒸGM☉/(rV_au))' "
+    "  'eccV=1+(rpV_km)·(vinfV_m/s)↑2/ⒸGM♀' "
+    "  'turnV=2·asin(1/eccV)' "
+    "}",
+
+    //43.
+    "Saturn Injection Orbit",  "{ "
+    "  'aES=((rEar_au)+(rSa_au))/2' "
+    "  'vinfSa=SQRT(ⒸGM☉/(rSa_au))-SQRT(ⒸGM☉·(2/(rSa_au)-1/(aES_au)))' "
+    "  'Vhyp=SQRT((vinfSa_m/s)↑2+2·ⒸGM♄/(rp_km))' "
+    "  'acap=((rp_km)+(rapo_km))/2' "
+    "  'Vcap=SQRT(ⒸGM♄·(2/(rp_km)-1/(acap_km)))' "
+    "  'MOIsat=(Vhyp_m/s)-(Vcap_m/s)' "
+    "}",
+    //44.
+    "Path to Jupiter Satellites",  "{ "
+    "  'atxJ=((rp_km)+(rmoon_km))/2' "
+    "  'Vpark=SQRT(ⒸGM♃/(rp_km))' "
+    "  'dv1=SQRT(ⒸGM♃·(2/(rp_km)-1/(atxJ_km)))-SQRT(ⒸGM♃/(rp_km))' "
+    "  'Vmoon=SQRT(ⒸGM♃/(rmoon_km))' "
+    "  'dv2=SQRT(ⒸGM♃/(rmoon_km))-SQRT(ⒸGM♃·(2/(rmoon_km)-1/(atxJ_km)))' "
+    "  'dVtot=(dv1_m/s)+(dv2_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atxJ_km)↑3/ⒸGM♃)' "
+    "}",
+    //45.
+    "Path to Saturn Satellites",  "{ "
+    "  'atxS=((rp_km)+(rmoon_km))/2' "
+    "  'Vpark=SQRT(ⒸGM♄/(rp_km))' "
+    "  'dv1=SQRT(ⒸGM♄·(2/(rp_km)-1/(atxS_km)))-SQRT(ⒸGM♄/(rp_km))' "
+    "  'Vmoon=SQRT(ⒸGM♄/(rmoon_km))' "
+    "  'dv2=SQRT(ⒸGM♄/(rmoon_km))-SQRT(ⒸGM♄·(2/(rmoon_km)-1/(atxS_km)))' "
+    "  'dVtot=(dv1_m/s)+(dv2_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atxS_km)↑3/ⒸGM♄)' "
+    "}",
+
+    //46.
+    "From Mars to Earth",  "{ "
+    "  'atx=((rMars_au)+(rEar_au))/2' "
+    "  'vinfMars=SQRT(ⒸGM☉/(rMars_au))-SQRT(ⒸGM☉·(2/(rMars_au)-1/(atx_au)))' "
+    "  'vinfEar=SQRT(ⒸGM☉·(2/(rEar_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rEar_au))' "
+    "  'Vo=SQRT((vinfMars_m/s)↑2+2·ⒸGM♂/(rp_km))' "
+    "  'TEI=(Vo_m/s)-SQRT(ⒸGM♂/(rp_km))' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //47.
+    "Mars Landing",  "{ "
+    "  'gmars=ⒸGM♂/((rmars_km)↑2)' "
+    "  'amax=((Ventry_m/s)↑2·sin(fpa_°))/(2·EXP(1)·(Hs_km))' "
+    "  'amaxg=(amax_m/s^2)/Ⓒg' "
+    "  'vterm=SQRT(2·(msat_kg)·(gmars_m/s^2)/((ρa_kg/m³)·Cd·(Ad_m↑2)))' "
+    "}",
+    //48.
+    "Launch Window from a Site",  "{ "
+    "  'LST=Ⓛθs(JD0;(lonE_°))' "
+    "  'dOmega=(OmegaT_°)-(LST_°)' "
+    "  'twait=(dOmega_°)/(360.98565_°/d)' "
+    "}",
+    //49.
+    "Comet Interceptor",  "{ "
+    "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
+    "  'vobj=SQRT(ⒸGM☉·(2/(rX_au)-1/(aobj_au)))' "
+    "  'vt=SQRT(ⒸGM☉·(aobj_au)·(1-eobj↑2))/(rX_au)' "
+    "  'vr=SQRT((vobj_m/s)↑2-(vt_m/s)↑2)' "
+    "  'fpa=atan((vr_m/s)/(vt_m/s))' "
+    "  'vfly=SQRT((vobj_m/s)↑2+(VL2_m/s)↑2-2·(vobj_m/s)·(VL2_m/s)·cos(fpa_°))' "
+    "}",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
@@ -1699,6 +2183,40 @@ const equation::config equation::equations =
 };
 
 
+
+// ==========================================================================
+//   Equation Library - grand total of variables
+//   (from doc/calc-help/equations.md; each name is counted once per section
+//   that uses it - the same name recurring in another section is expected and
+//   counted again, since every section carries its own variable list.)
+// --------------------------------------------------------------------------
+//     Columns and Beams                    21
+//     Electricity                          78
+//     Fluids                               30
+//     Forces and Energy                    37
+//     Gases                                38
+//     Heat transfer                        31
+//     Magnetism                            28
+//     Motion                               38
+//     Optics                               40
+//     Oscillations                         25
+//     Plane Geometry                       21
+//     Solid geometry                       12
+//     Solid State Devices                  54
+//     Stress Analysis                      28
+//     Waves                                40
+//     Relativity                          109
+//     Modern Physics                       43
+//     Nuclear Physics                      52
+//     Finance                               6
+//     Rocketry                             110
+//     Geocentric / Stationary              54
+//     Geocentric / Trajectory              80
+//     Heliocentric / Stationary            12
+//     Heliocentric / Trajectory           128
+// --------------------------------------------------------------------------
+//     GRAND TOTAL                        1115
+// ==========================================================================
 
 // ============================================================================
 //
