@@ -3273,21 +3273,21 @@ The 84 variables in the Flight Management section are:
 
 ### Flight Management
 
-The pilot's calculations from the flight manual and the weather:
-[Headwind & Crosswind](#headwind & crosswind),
-[Time Speed & Distance](#time speed & distance),
-[Fuel Required](#fuel required), [Endurance & Range](#endurance & range),
-[Weight Shift](#weight shift), [Weight Change](#weight change),
-[CG in % MAC](#cg in % mac), [Pressure Altitude](#pressure altitude),
-[ISA Deviation](#isa deviation), [Density Altitude](#density altitude),
-[Humidity Correction](#humidity correction), [True Altitude](#true altitude)
-[Cloud Base](#cloud base), [True Airspeed](#true airspeed),
-[Mach & True Airspeed](#mach & true airspeed),
-[Climb & Descent Gradient](#climb & descent gradient),
-[Top of Descent](#top of descent), [Equal Time Point](#equal time point),
-[Point of No Return](#point of no return),
-[Time & Distance to Station](#time & distance to station) and
-[Hydroplaning Speed](#hydroplaning speed).
+The pilot's calculations from the flight manual and the weather, in
+seven submenus:
+[Runway](#runway),
+[Time & Distance](#time & distance),
+[Fuel & Endurance](#fuel & endurance),
+[Weight & Balance](#weight & balance),
+[Altitudes](#altitudes),
+[Airspeeds](#airspeeds) and
+[Climb & Descent](#climb & descent).
+
+#### Runway
+
+The wind on the runway, and the risk of hydroplaning on a wet one.
+
+Entries: [Headwind & Crosswind](#headwind & crosswind) and [Hydroplaning Speed](#hydroplaning speed).
 
 #### Headwind & Crosswind
 
@@ -3323,6 +3323,27 @@ XW=15_knot WD=30_° RWY=0_°
 'ROOT(ⒺHeadwind & Crosswind;[WS;HW];[10_knot;1_knot])'
 ```
 
+#### Hydroplaning Speed
+
+On a wet runway, above a speed that depends on the tire pressure, the tires
+can ride on a film of water and lose all braking.
+
+* Main result: the speed `Vhp` above which dynamic hydroplaning can start, for
+  the tire pressure `Ptire` of the main wheels.
+
+* To calculate: `Vhp` (Hydroplaning speed) for tires inflated to 36 psi. The book gives 54 kt [1, chapter 11]:
+```rpl
+Ptire=36_psi
+@ Expecting Vhp=54. knot
+'ROOT(ⒺHydroplaning Speed;Vhp;1_knot)'
+```
+
+#### Time & Distance
+
+Time, speed and distance, and the time to a radio station.
+
+Entries: [Time Speed & Distance](#time speed & distance) and [Time & Distance to Station](#time & distance to station).
+
 #### Time Speed & Distance
 
 The distance `D` flown at the ground speed `GS` during the time en route
@@ -3334,6 +3355,28 @@ D=210_nmi GS=140_knot
 @ Expecting ETE=1.5 h
 'ROOT(ⒺTime Speed & Distance;ETE;1_h)'
 ```
+
+#### Time & Distance to Station
+
+Flying across a radial, the time for the bearing of a station to change gives
+the time to fly to it: the "1 in 60" rule.
+
+* Main results: the time `TSta` and distance `DSta` to the station, when its
+  bearing changes by `ΔBrg` in the time `Tbc`, at the ground speed `GS`.
+
+* To calculate: `[TSta;DSta]` (Time; Distance to the station) when the bearing changes by 10° in 2 min, at 120 kt. The book gives 12 min [1, chapter 16]:
+```rpl
+Tbc=120_s ΔBrg=10_° GS=120_knot
+@ Expecting [ TSta=12. min DSta=24. nmi ]
+'ROOT(ⒺTime & Distance to Station;[TSta;DSta];[1_min;1_nmi])'
+```
+
+#### Fuel & Endurance
+
+The fuel for a flight, how long and how far it lasts, and the points
+that decide whether to go on or turn back.
+
+Entries: [Fuel Required](#fuel required), [Endurance & Range](#endurance & range), [Equal Time Point](#equal time point) and [Point of No Return](#point of no return).
 
 #### Fuel Required
 
@@ -3371,6 +3414,46 @@ FOB=38_gal FFR=6.9_gal/h GS=116_mph ρfuel=6_lb/gal
 @ Expecting [ Endur=5.50724 63768 1 h SpR=14.60887 59508 nmi/gal Rng=555.13728 613 nmi Wfuel=228 lb ]
 'ROOT(ⒺEndurance & Range;[Endur;SpR;Rng;Wfuel];[1_h;1_nmi/gal;1_nmi;1_lb])'
 ```
+
+#### Equal Time Point
+
+The equal time point is the point of a route from which it takes as long to
+go on to the destination as to return: the point that decides whether to
+continue or turn back after an engine failure or a medical emergency.
+
+* Main results: the distance `DETP` and time `TETP` from departure to the
+  equal time point, on a route of length `D`, with the ground speeds `GSO`
+  going on and `GSH` returning.
+
+* To calculate: `[DETP;TETP]` (Distance; Time to the equal time point) for a crossing of 1 722 nmi, at 502 kt going on and 384 kt returning. The source gives 746 nmi [8]:
+```rpl
+D=1722_nmi GSO=502_knot GSH=384_knot
+@ Expecting [ DETP=746.32957 1106 nmi TETP=1.48671 22930 4 h ]
+'ROOT(ⒺEqual Time Point;[DETP;TETP];[1_nmi;1_h])'
+```
+
+#### Point of No Return
+
+The point of no return is the farthest point from which the aircraft can
+still return to its departure with the fuel on board.
+
+* Main results: the time `TPNR` and distance `DPNR` from departure to the
+  point of no return, for an endurance `Endur`, the usable fuel without the
+  reserve, and the ground speeds `GSO` going out and `GSH` returning.
+
+* To calculate: `[TPNR;DPNR]` (Time; Distance to the point of no return) with 5 h of usable fuel, at 120 kt going out and 180 kt returning. Check: 3 h out, then 360 nmi back at 180 kt in 2 h:
+```rpl
+Endur=5_h GSO=120_knot GSH=180_knot
+@ Expecting [ TPNR=3 h DPNR=360. nmi ]
+'ROOT(ⒺPoint of No Return;[TPNR;DPNR];[1_h;1_nmi])'
+```
+
+#### Weight & Balance
+
+The center of gravity when weights move, are added or removed, and its
+position on the mean aerodynamic chord.
+
+Entries: [Weight Shift](#weight shift), [Weight Change](#weight change) and [CG in % MAC](#cg in % mac).
 
 #### Weight Shift
 
@@ -3443,6 +3526,13 @@ PMAC=27.4 LEMAC=144_in MAC=62_in
 @ Expecting CG=160.988 in
 'ROOT(ⒺCG in % MAC;CG;150_in)'
 ```
+
+#### Altitudes
+
+Pressure and density altitude, the standard temperature, the cold
+temperature correction, and the base of cumulus clouds.
+
+Entries: [Pressure Altitude](#pressure altitude), [ISA Deviation](#isa deviation), [Density Altitude](#density altitude), [Humidity Correction](#humidity correction), [True Altitude](#true altitude) and [Cloud Base](#cloud base).
 
 #### Pressure Altitude
 
@@ -3579,6 +3669,13 @@ OAT=85_°F Tdp=71_°F
 'ROOT(ⒺCloud Base;[Tc;Tdc;Hcb];[1;1;1_ft])'
 ```
 
+#### Airspeeds
+
+From the calibrated airspeed to the true airspeed, at low speed and with
+the compressibility of the air.
+
+Entries: [True Airspeed](#true airspeed) and [Mach & True Airspeed](#mach & true airspeed).
+
 #### True Airspeed
 
 The true airspeed `TAS` from the calibrated airspeed `CAS`, at low speed
@@ -3620,6 +3717,13 @@ CAS=250_knot Hp=10000_ft IAT=2_°C Kr=0.8
 @ Expecting [ qc=104.98222 864 hPa Ps=696.81641 3877 hPa Mach=0.45227 51142 87 Ti=275.15 OAT=266.43015 5408 K TAS=287.67416 9311 knot ]
 'ROOT(ⒺMach & True Airspeed;[qc;Ps;Mach;Ti;OAT;TAS];[1_hPa;1_hPa;0.5;1;1_K;1_knot])'
 ```
+
+#### Climb & Descent
+
+The gradient of a climb or a descent, the vertical speed, and where to
+start a descent.
+
+Entries: [Climb & Descent Gradient](#climb & descent gradient) and [Top of Descent](#top of descent).
 
 #### Climb & Descent Gradient
 
@@ -3678,67 +3782,4 @@ Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
 Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
 @ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
 'ROOT(ⒺTop of Descent;[Grd;FPA;ΔH;DTOD;TTOD];[0.1;1_°;1_ft;1_nmi;1_min])'
-```
-
-#### Equal Time Point
-
-The equal time point is the point of a route from which it takes as long to
-go on to the destination as to return: the point that decides whether to
-continue or turn back after an engine failure or a medical emergency.
-
-* Main results: the distance `DETP` and time `TETP` from departure to the
-  equal time point, on a route of length `D`, with the ground speeds `GSO`
-  going on and `GSH` returning.
-
-* To calculate: `[DETP;TETP]` (Distance; Time to the equal time point) for a crossing of 1 722 nmi, at 502 kt going on and 384 kt returning. The source gives 746 nmi [8]:
-```rpl
-D=1722_nmi GSO=502_knot GSH=384_knot
-@ Expecting [ DETP=746.32957 1106 nmi TETP=1.48671 22930 4 h ]
-'ROOT(ⒺEqual Time Point;[DETP;TETP];[1_nmi;1_h])'
-```
-
-#### Point of No Return
-
-The point of no return is the farthest point from which the aircraft can
-still return to its departure with the fuel on board.
-
-* Main results: the time `TPNR` and distance `DPNR` from departure to the
-  point of no return, for an endurance `Endur`, the usable fuel without the
-  reserve, and the ground speeds `GSO` going out and `GSH` returning.
-
-* To calculate: `[TPNR;DPNR]` (Time; Distance to the point of no return) with 5 h of usable fuel, at 120 kt going out and 180 kt returning. Check: 3 h out, then 360 nmi back at 180 kt in 2 h:
-```rpl
-Endur=5_h GSO=120_knot GSH=180_knot
-@ Expecting [ TPNR=3 h DPNR=360. nmi ]
-'ROOT(ⒺPoint of No Return;[TPNR;DPNR];[1_h;1_nmi])'
-```
-
-#### Time & Distance to Station
-
-Flying across a radial, the time for the bearing of a station to change gives
-the time to fly to it: the "1 in 60" rule.
-
-* Main results: the time `TSta` and distance `DSta` to the station, when its
-  bearing changes by `ΔBrg` in the time `Tbc`, at the ground speed `GS`.
-
-* To calculate: `[TSta;DSta]` (Time; Distance to the station) when the bearing changes by 10° in 2 min, at 120 kt. The book gives 12 min [1, chapter 16]:
-```rpl
-Tbc=120_s ΔBrg=10_° GS=120_knot
-@ Expecting [ TSta=12. min DSta=24. nmi ]
-'ROOT(ⒺTime & Distance to Station;[TSta;DSta];[1_min;1_nmi])'
-```
-
-#### Hydroplaning Speed
-
-On a wet runway, above a speed that depends on the tire pressure, the tires
-can ride on a film of water and lose all braking.
-
-* Main result: the speed `Vhp` above which dynamic hydroplaning can start, for
-  the tire pressure `Ptire` of the main wheels.
-
-* To calculate: `Vhp` (Hydroplaning speed) for tires inflated to 36 psi. The book gives 54 kt [1, chapter 11]:
-```rpl
-Ptire=36_psi
-@ Expecting Vhp=54. knot
-'ROOT(ⒺHydroplaning Speed;Vhp;1_knot)'
 ```

@@ -1477,11 +1477,19 @@ static const cstring basic_equations[] =
     // The pilot's calculations, from the flight manual and the weather, in
     // the units of the FAA handbooks; every equation also accepts SI units.
     // Wind directions are where the wind comes from, as in Navigation.
+    "Aeronautics/Flight Management/Runway", nullptr,
     "Headwind & Crosswind",  "{ "
     "  '(HW_knot)=(WS_knot)·COS((WD_°)-(RWY_°))' "
     "  '(XW_knot)=(WS_knot)·SIN((WD_°)-(RWY_°))' "
     "}",
+    "Hydroplaning Speed",  "'(Vhp_knot)=(9_knot)·√((Ptire_psi)/(1_psi))'",
+    "Aeronautics/Flight Management/Time & Distance", nullptr,
     "Time Speed & Distance",  "'(D_nmi)=(GS_knot)·(ETE_h)'",
+    "Time & Distance to Station",  "{ "
+    "  '(TSta_min)=(Tbc_s)·(60_°)/(ΔBrg_°)' "
+    "  '(DSta_nmi)=(GS_knot)·(TSta_min)' "
+    "}",
+    "Aeronautics/Flight Management/Fuel & Endurance", nullptr,
     "Fuel Required",  "{ "
     "  '(Trip_gal)=(FFR_gal/h)·(ETE_h)' "
     "  '(Rsv_gal)=(FFR_gal/h)·(TRes_h)' "
@@ -1494,6 +1502,15 @@ static const cstring basic_equations[] =
     "  '(Rng_nmi)=(SpR_nmi/gal)·(FOB_gal)' "
     "  '(Wfuel_lb)=(FOB_gal)·(ρfuel_lb/gal)' "
     "}",
+    "Equal Time Point",  "{ "
+    "  '(DETP_nmi)=(D_nmi)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(TETP_h)=(DETP_nmi)/(GSO_knot)' "
+    "}",
+    "Point of No Return",  "{ "
+    "  '(TPNR_h)=(Endur_h)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(DPNR_nmi)=(TPNR_h)·(GSO_knot)' "
+    "}",
+    "Aeronautics/Flight Management/Weight & Balance", nullptr,
     // Weight and balance: arms in inches from the datum, positive aft;
     // a weight shifted forward has a negative distance, a weight removed a
     // negative weight.
@@ -1506,6 +1523,7 @@ static const cstring basic_equations[] =
     "  '(CGn_in)=((Wt_lb)·(CG_in)+(Wch_lb)·(Arm_in))/(Wn_lb)' "
     "}",
     "CG in % MAC",  "'PMAC=100·((CG_in)-(LEMAC_in))/(MAC_in)'",
+    "Aeronautics/Flight Management/Altitudes", nullptr,
     // Altitudes and temperatures, in the troposphere of the standard
     // atmosphere (below 36 089 ft): T0/L = 288.15/0.0065 m = 145 442.16 ft,
     // L = 0.0065 K/m = 0.0019812 K/ft. Temperature differences are in K.
@@ -1539,6 +1557,7 @@ static const cstring basic_equations[] =
     "  'Tdc=(Tdp_K)/(1_K)-273.15' "
     "  '(Hcb_ft)=(Tc-Tdc)·(409.0909_ft)' "
     "}",
+    "Aeronautics/Flight Management/Airspeeds", nullptr,
     // Airspeeds: speed of sound at sea level 661.4786 kt, standard pressure
     // 1 013.25 hPa, troposphere as above.
     "True Airspeed",  "{ "
@@ -1553,6 +1572,7 @@ static const cstring basic_equations[] =
     "  '(OAT_K)=Ti/(1+0.2·Kr·(Mach)²)·(1_K)' "
     "  '(TAS_knot)=Mach·(661.4786_knot)·√((OAT_K)/(288.15_K))' "
     "}",
+    "Aeronautics/Flight Management/Climb & Descent", nullptr,
     // Flight path angle FPA positive in climb, negative in descent; the
     // vertical speed VS has the same sign. 1 nmi = 6 076.11549 ft.
     "Climb & Descent Gradient",  "{ "
@@ -1568,19 +1588,6 @@ static const cstring basic_equations[] =
     "  '(VS_ft/min)=(GS_knot)·Grd' "
     "  '(TTOD_min)=(DTOD_nmi)/(GS_knot)' "
     "}",
-    "Equal Time Point",  "{ "
-    "  '(DETP_nmi)=(D_nmi)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
-    "  '(TETP_h)=(DETP_nmi)/(GSO_knot)' "
-    "}",
-    "Point of No Return",  "{ "
-    "  '(TPNR_h)=(Endur_h)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
-    "  '(DPNR_nmi)=(TPNR_h)·(GSO_knot)' "
-    "}",
-    "Time & Distance to Station",  "{ "
-    "  '(TSta_min)=(Tbc_s)·(60_°)/(ΔBrg_°)' "
-    "  '(DSta_nmi)=(GS_knot)·(TSta_min)' "
-    "}",
-    "Hydroplaning Speed",  "'(Vhp_knot)=(9_knot)·√((Ptire_psi)/(1_psi))'",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
