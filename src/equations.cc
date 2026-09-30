@@ -1494,6 +1494,18 @@ static const cstring basic_equations[] =
     "  '(Rng_nmi)=(SpR_nmi/gal)·(FOB_gal)' "
     "  '(Wfuel_lb)=(FOB_gal)·(ρfuel_lb/gal)' "
     "}",
+    // Weight and balance: arms in inches from the datum, positive aft;
+    // a weight shifted forward has a negative distance, a weight removed a
+    // negative weight.
+    "Weight Shift",  "{ "
+    "  '(ΔCG_in)=(Wsh_lb)·(Dsh_in)/(Wt_lb)' "
+    "  '(CGn_in)=(CG_in)+(ΔCG_in)' "
+    "}",
+    "Weight Change",  "{ "
+    "  '(Wn_lb)=(Wt_lb)+(Wch_lb)' "
+    "  '(CGn_in)=((Wt_lb)·(CG_in)+(Wch_lb)·(Arm_in))/(Wn_lb)' "
+    "}",
+    "CG in % MAC",  "'PMAC=100·((CG_in)-(LEMAC_in))/(MAC_in)'",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)

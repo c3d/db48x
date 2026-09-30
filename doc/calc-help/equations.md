@@ -3151,14 +3151,14 @@ TC=265_° GS=15_knot WD=5_° WS=3_knot
 The `Aeronautics` section gathers the calculations of aircraft operation. Its
 first part, [Flight Management](#flight management), holds the pilot's
 calculations from the flight manual and the weather: wind components on a
-runway, time, speed and distance, and fuel.
+runway, time, speed and distance, fuel, and weight and balance.
 
 **Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
 lb); every equation also accepts SI units. Wind directions are where the wind
 comes **from**, as in [Navigation](#navigation), and the same names are used
 for the same quantities: `WD`, `WS`, `GS`, `D`.
 
-The 21 variables in the Flight Management section are:
+The 33 variables in the Flight Management section are:
 
 * `WS`: Wind speed (dim.: speed)
 * `WD`: Direction the wind comes **from**
@@ -3185,25 +3185,42 @@ The 21 variables in the Flight Management section are:
 * `ρfuel`: Fuel density: 6 lb/gal for AVGAS, 6.8 lb/gal for Jet A and Jet A-1,
   6.5 lb/gal for Jet B [1, chapter 10] (dim.: mass/volume)
 * `Wfuel`: Weight of the fuel on board (dim.: mass)
+* `Wt`: Weight of the aircraft (dim.: mass)
+* `CG`: Center of gravity, as an arm from the datum, positive aft (dim.: length)
+* `Wsh`: Weight shifted (dim.: mass)
+* `Dsh`: Distance it is shifted, negative forward (dim.: length)
+* `ΔCG`: Change of the center of gravity (dim.: length)
+* `CGn`: New center of gravity (dim.: length)
+* `Wch`: Weight added, negative when removed (dim.: mass)
+* `Arm`: Arm of the weight added or removed (dim.: length)
+* `Wn`: New weight of the aircraft (dim.: mass)
+* `MAC`: Mean aerodynamic chord (dim.: length)
+* `LEMAC`: Arm of the leading edge of the mean aerodynamic chord (dim.: length)
+* `PMAC`: Center of gravity in percent of the mean aerodynamic chord
 
 * References:
   [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
   chapters 10, *Weight and Balance*, 11, *Aircraft Performance*, and 16,
   *Navigation* ;
   [2] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
-  [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions*.
+  [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions* ;
+  [4] FAA, *Aircraft Weight and Balance Handbook*, FAA-H-8083-1B.
 
 ### Flight Management
 
 The pilot's calculations from the flight manual and the weather:
 [Headwind & Crosswind](#headwind & crosswind),
 [Time Speed & Distance](#time speed & distance),
-[Fuel Required](#fuel required) and [Endurance & Range](#endurance & range).
+[Fuel Required](#fuel required), [Endurance & Range](#endurance & range),
+[Weight Shift](#weight shift), [Weight Change](#weight change) and
+[CG in % MAC](#cg in % mac).
 
 #### Headwind & Crosswind
 
 The components of the wind along and across a runway, which decide whether a
 takeoff or a landing stays within the crosswind the aircraft can handle.
+
+![Runway wind](img/RunwayWind.bmp)
 
 * Main results: the headwind `HW`, negative for a tailwind, and the crosswind
   `XW`, positive for a wind from the right, for a wind of speed `WS` coming
@@ -3279,4 +3296,76 @@ How long, and how far, the fuel on board lasts.
 FOB=38_gal FFR=6.9_gal/h GS=116_mph ρfuel=6_lb/gal
 @ Expecting [ Endur=5.50724 63768 1 h SpR=14.60887 59508 nmi/gal Rng=555.13728 613 nmi Wfuel=228 lb ]
 'ROOT(ⒺEndurance & Range;[Endur;SpR;Rng;Wfuel];[1_h;1_nmi/gal;1_nmi;1_lb])'
+```
+
+#### Weight Shift
+
+Moving a weight inside the aircraft moves its center of gravity, the weight
+of the aircraft staying the same. Arms are measured from the datum, positive
+aft.
+
+* Main results: the change `ΔCG` and the new center of gravity `CGn` when a
+  weight `Wsh` moves by `Dsh`, negative forward, in an aircraft of weight `Wt`
+  whose center of gravity is at `CG`.
+* Solved for `Wsh`, the entry gives the weight to move to bring the center of
+  gravity back within a limit.
+
+* To calculate: `[ΔCG;CGn]` (Change of CG; New CG) when 100 lb move from station 30 to station 150, in an aircraft of 8 000 lb with its CG at 77 in [1, chapter 10]:
+```rpl
+Wsh=100_lb Dsh=120_in Wt=8000_lb CG=77_in
+@ Expecting [ ΔCG=1.5 in CGn=78.5 in ]
+'ROOT(ⒺWeight Shift;[ΔCG;CGn];[1_in;1_in])'
+```
+
+* To calculate: `[ΔCG;Wsh]` (Change of CG; Weight to move) to bring the CG of a 7 800 lb aircraft from 81.5 in back to its aft limit of 80.5 in, by moving cargo 120 in forward [1, chapter 10]:
+```rpl
+Dsh=-120_in Wt=7800_lb CG=81.5_in CGn=80.5_in
+@ Expecting [ ΔCG=-1. in Wsh=65. lb ]
+'ROOT(ⒺWeight Shift;[ΔCG;Wsh];[1_in;1_lb])'
+```
+
+#### Weight Change
+
+Adding or removing a weight changes both the weight of the aircraft and its
+center of gravity.
+
+* Main results: the new weight `Wn` and the new center of gravity `CGn` when
+  a weight `Wch`, negative when removed, is added at the arm `Arm` to an
+  aircraft of weight `Wt` whose center of gravity is at `CG`.
+
+* To calculate: `[Wn;CGn]` (New weight; New CG) when 140 lb are added at station 150 to an aircraft of 6 860 lb with its CG at 80 in [1, chapter 10]:
+```rpl
+Wt=6860_lb CG=80_in Wch=140_lb Arm=150_in
+@ Expecting [ Wn=7 000 lb CGn=81.4 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+* To calculate: `[Wn;CGn]` when 100 lb are removed from station 150 in an aircraft of 6 100 lb with its CG at 80 in. The book rounds the change of CG to 1.2 in, and finds 78.8 in [1, chapter 10]:
+```rpl
+Wt=6100_lb CG=80_in Wch=-100_lb Arm=150_in
+@ Expecting [ Wn=6 000 lb CGn=78.83333 33333 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+#### CG in % MAC
+
+Large aircraft give the position of their center of gravity as a percentage
+of the mean aerodynamic chord `MAC`, counted from its leading edge `LEMAC`.
+
+![Mean aerodynamic chord](img/MeanAerodynamicChord.bmp)
+
+* Main result: `PMAC`, the center of gravity `CG` in percent of `MAC`.
+
+* To calculate: `PMAC` (CG in % MAC) for a CG at 161 in, with the leading edge of the MAC at 144 in and a MAC of 62 in. The book gives 27.4 % [4, chapter 3]:
+```rpl
+CG=161_in LEMAC=144_in MAC=62_in
+@ Expecting PMAC=27.41935 48387
+'ROOT(ⒺCG in % MAC;PMAC;1)'
+```
+
+* To calculate: `CG` for a CG at 27.4 % of the same MAC. The book writes 160.9 in, cutting off the digits instead of rounding them [4, chapter 3]:
+```rpl
+PMAC=27.4 LEMAC=144_in MAC=62_in
+@ Expecting CG=160.988 in
+'ROOT(ⒺCG in % MAC;CG;150_in)'
 ```
