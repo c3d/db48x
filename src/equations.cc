@@ -1506,6 +1506,39 @@ static const cstring basic_equations[] =
     "  '(CGn_in)=((Wt_lb)·(CG_in)+(Wch_lb)·(Arm_in))/(Wn_lb)' "
     "}",
     "CG in % MAC",  "'PMAC=100·((CG_in)-(LEMAC_in))/(MAC_in)'",
+    // Altitudes and temperatures, in the troposphere of the standard
+    // atmosphere (below 36 089 ft): T0/L = 288.15/0.0065 m = 145 442.16 ft,
+    // L = 0.0065 K/m = 0.0019812 K/ft. Temperature differences are in K.
+    "Pressure Altitude",  "{ "
+    "  '(ΔHp_ft)=(145442.16_ft)·(1-((QNH_hPa)/(1013.25_hPa))^0.190263)' "
+    "  '(Hp_ft)=(Hind_ft)+(ΔHp_ft)' "
+    "}",
+    "ISA Deviation",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  '(ΔISA_K)=(OAT_K)-(Tstd_K)' "
+    "}",
+    "Density Altitude",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  'θr=(Tstd_K)/(OAT_K)' "
+    "  '(Hd_ft)=(Hp_ft)+(Tstd_K)/(0.0019812_K/ft)·(1-θr^0.234969)' "
+    "}",
+    "Humidity Correction",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'fe=EXP(17.3·Tc/(Tc+237))' "
+    "  'fHp=(1-6.88E-6·(Hp_ft)/(1_ft))^-5.26' "
+    "  '(ΔHd_ft)=(0.267_ft)·RH·(Tc+273)·fe·fHp' "
+    "}",
+    "True Altitude",  "{ "
+    "  '(ΔTA_ft)=((Hind_ft)-(Hstn_ft))·(ΔISA_K)/(OAT_K)' "
+    "  '(TA_ft)=(Hind_ft)+(ΔTA_ft)' "
+    "}",
+    // Two temperatures with offset units subtracted in one expression:
+    // the second is read as a difference. One step each avoids it.
+    "Cloud Base",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'Tdc=(Tdp_K)/(1_K)-273.15' "
+    "  '(Hcb_ft)=(Tc-Tdc)·(409.0909_ft)' "
+    "}",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)

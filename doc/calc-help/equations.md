@@ -3151,14 +3151,23 @@ TC=265_° GS=15_knot WD=5_° WS=3_knot
 The `Aeronautics` section gathers the calculations of aircraft operation. Its
 first part, [Flight Management](#flight management), holds the pilot's
 calculations from the flight manual and the weather: wind components on a
-runway, time, speed and distance, fuel, and weight and balance.
+runway, time, speed and distance, fuel, weight and balance, and altitudes.
 
 **Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
-lb); every equation also accepts SI units. Wind directions are where the wind
+lb, ft, inHg); every equation also accepts SI units.
+
+**Temperatures.** `°C` and `°F` are units with an offset: `20_°C` is
+293.15 K. A temperature **difference**, such as the deviation `ΔISA` from
+the standard temperature, must therefore be entered in `K` (or in `°R` for
+Fahrenheit degrees): 36 °F above standard is `20_K`, while `36_°F` is
+275.37 K.
+
+**Standard atmosphere.** The altitude entries use the troposphere of the
+standard atmosphere, valid up to 36 089 ft. Wind directions are where the wind
 comes **from**, as in [Navigation](#navigation), and the same names are used
 for the same quantities: `WD`, `WS`, `GS`, `D`.
 
-The 33 variables in the Flight Management section are:
+The 53 variables in the Flight Management section are:
 
 * `WS`: Wind speed (dim.: speed)
 * `WD`: Direction the wind comes **from**
@@ -3197,6 +3206,25 @@ The 33 variables in the Flight Management section are:
 * `MAC`: Mean aerodynamic chord (dim.: length)
 * `LEMAC`: Arm of the leading edge of the mean aerodynamic chord (dim.: length)
 * `PMAC`: Center of gravity in percent of the mean aerodynamic chord
+* `QNH`: Altimeter setting (dim.: pressure)
+* `Hind`: Indicated altitude, read on the altimeter set to `QNH`; on the ground, the elevation of the field (dim.: length)
+* `ΔHp`: Correction from the indicated altitude to the pressure altitude (dim.: length)
+* `Hp`: Pressure altitude, the altitude in the standard atmosphere where the pressure is the same (dim.: length)
+* `OAT`: Outside air temperature (dim.: temperature)
+* `Tstd`: Standard temperature at the pressure altitude (dim.: temperature)
+* `ΔISA`: Deviation from the standard temperature, a temperature difference: enter it in K, never in °C or °F (dim.: temperature)
+* `θr`: Temperature ratio `Tstd/OAT`
+* `Hd`: Density altitude, the altitude in the standard atmosphere where the air density is the same (dim.: length)
+* `RH`: Relative humidity, as a fraction: 0.8 for 80 %
+* `Tc`: Outside air temperature in °C, as a plain number
+* `fe`, `fHp`: Vapor pressure and altitude factors of the humidity correction
+* `ΔHd`: Increase of the density altitude due to humidity (dim.: length)
+* `Hstn`: Elevation of the altimeter setting station (dim.: length)
+* `ΔTA`: Correction from the indicated to the true altitude, negative in cold air (dim.: length)
+* `TA`: True altitude, above mean sea level (dim.: length)
+* `Tdp`: Dew point (dim.: temperature)
+* `Tdc`: Dew point in °C, as a plain number
+* `Hcb`: Height of the base of cumulus clouds above the ground (dim.: length)
 
 * References:
   [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
@@ -3204,7 +3232,11 @@ The 33 variables in the Flight Management section are:
   *Navigation* ;
   [2] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
   [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions* ;
-  [4] FAA, *Aircraft Weight and Balance Handbook*, FAA-H-8083-1B.
+  [4] FAA, *Aircraft Weight and Balance Handbook*, FAA-H-8083-1B ;
+  [5] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 8, *Flight Instruments*, and 12, *Weather Theory* ;
+  [6] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, *Determination of Altitude*.
 
 ### Flight Management
 
@@ -3212,8 +3244,11 @@ The pilot's calculations from the flight manual and the weather:
 [Headwind & Crosswind](#headwind & crosswind),
 [Time Speed & Distance](#time speed & distance),
 [Fuel Required](#fuel required), [Endurance & Range](#endurance & range),
-[Weight Shift](#weight shift), [Weight Change](#weight change) and
-[CG in % MAC](#cg in % mac).
+[Weight Shift](#weight shift), [Weight Change](#weight change),
+[CG in % MAC](#cg in % mac), [Pressure Altitude](#pressure altitude),
+[ISA Deviation](#isa deviation), [Density Altitude](#density altitude),
+[Humidity Correction](#humidity correction), [True Altitude](#true altitude)
+and [Cloud Base](#cloud base).
 
 #### Headwind & Crosswind
 
@@ -3368,4 +3403,139 @@ CG=161_in LEMAC=144_in MAC=62_in
 PMAC=27.4 LEMAC=144_in MAC=62_in
 @ Expecting CG=160.988 in
 'ROOT(ⒺCG in % MAC;CG;150_in)'
+```
+
+#### Pressure Altitude
+
+The pressure altitude `Hp` is what the altimeter reads when set to the
+standard pressure, 29.92 inHg or 1 013.25 hPa. It is the starting point of
+the performance charts, and the flight level above the transition altitude.
+
+* Main results: the correction `ΔHp` and the pressure altitude `Hp` for an
+  indicated altitude `Hind` read with the altimeter set to `QNH`. On the
+  ground, `Hind` is the elevation of the field.
+* The rule of thumb, 1 000 ft per inHg or about 27 ft per hPa, is close to
+  this exact formula near sea level.
+
+* To calculate: `[ΔHp;Hp]` (Correction; Pressure altitude) for a field at 5 883 ft with an altimeter setting of 30.10 inHg. The book finds 5 718 ft [1, chapter 11, sample problem 1]:
+```rpl
+Hind=5883_ft QNH=30.10_inHg
+@ Expecting [ ΔHp=-164.90698 7072 ft Hp=5 718.09301 293 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+* To calculate: `[ΔHp;Hp]` at sea level with an altimeter setting of 28.0 inHg. The table of the book gives +1 824 ft [1, chapter 11, figure 11-3]:
+```rpl
+Hind=0_ft QNH=28.0_inHg
+@ Expecting [ ΔHp=1 824.91706 57 ft Hp=1 824.91706 57 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+#### ISA Deviation
+
+The standard temperature `Tstd` at a pressure altitude, and the deviation
+`ΔISA` of the outside air temperature `OAT` from it. Performance charts are
+often entered with `ΔISA`.
+
+* `ΔISA` is a temperature difference: enter it in `K`, never in `°C` or
+  `°F`.
+
+* To calculate: `[Tstd;OAT]` (Standard temperature; Outside air temperature) at 6 000 ft, 36 °F above standard, that is 20 K. The result, 296.26 K, is 23.11 °C [1, chapter 11, sample problem 7]:
+```rpl
+Hp=6000_ft ΔISA=20_K
+@ Expecting [ Tstd=276.2628 K OAT=296.2628 K ]
+'ROOT(ⒺISA Deviation;[Tstd;OAT];[1_K;1_K])'
+```
+
+* To calculate: `[Tstd;ΔISA]` (Standard temperature; Deviation) at sea level with 22 °C [1, chapter 11, sample problem 5]:
+```rpl
+Hp=0_ft OAT=22_°C
+@ Expecting [ Tstd=288.15 K ΔISA=7. K ]
+'ROOT(ⒺISA Deviation;[Tstd;ΔISA];[1_K;1_K])'
+```
+
+#### Density Altitude
+
+The density altitude `Hd` is the altitude in the standard atmosphere where
+the air has the same density. It governs engine power, lift and propeller
+thrust: on a hot day at a high field, the aircraft performs as if it were
+much higher.
+
+* Main results: the density altitude `Hd` for a pressure altitude `Hp` and an
+  outside air temperature `OAT`, with the standard temperature `Tstd` and the
+  temperature ratio `θr` as steps. The formula is exact in the troposphere.
+* The rule of thumb, `Hd ≈ Hp + 118.6 ft/K·ΔISA` (the FAA rounds it to
+  120 ft per °C), is close to it for moderate deviations.
+
+* To calculate: `[Tstd;θr;Hd]` (Standard temperature; Temperature ratio; Density altitude) at a pressure altitude of 8 000 ft and 18 °C. The source gives 10 145 ft, and 10 236 ft by the rule of thumb [2]:
+```rpl
+Hp=8000_ft OAT=18_°C
+@ Expecting [ Tstd=272.3004 K θr=0.93525 81143 74 Hd=10 144.65994 68 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+* To calculate: `[Tstd;θr;Hd]` at a pressure altitude of 6 300 m and 32 °C. The result, 26 693.5 ft, is 8 136 m, as in the source [6]:
+```rpl
+Hp=6300_m OAT=32_°C
+@ Expecting [ Tstd=247.2 K θr=0.81009 33966 9 Hd=26 693.49310 57 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+#### Humidity Correction
+
+Humid air is lighter than dry air: it raises the density altitude. This
+empirical correction by Ed Williams gives the increase `ΔHd` to add to the
+density altitude computed for dry air.
+
+* Main result: `ΔHd` for a relative humidity `RH`, given as a fraction (0.8
+  for 80 %), an outside air temperature `OAT` and a pressure altitude `Hp`.
+* Steps: `Tc`, the temperature in °C as a plain number, and the factors `fe`
+  and `fHp` of the formula.
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` (Temperature; Factors; Humidity correction) at sea level, 30 °C and 100 % humidity. The source gives 565 ft [2]:
+```rpl
+Hp=0_ft OAT=30_°C RH=1
+@ Expecting [ Tc=30. fe=6.98538 58062 5 fHp=1. ΔHd=565.12469 7111 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` at 5 000 ft, 40 °C and 80 % humidity. The source gives 977 ft [2]:
+```rpl
+Hp=5000_ft OAT=40_°C RH=0.8
+@ Expecting [ Tc=40. fe=12.16052 37341 fHp=1.20217 14995 ΔHd=977.38190 267 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+#### True Altitude
+
+In cold air, the atmosphere is compressed, and the aircraft is lower than its
+altimeter shows: a hazard over terrain, which approach procedures correct.
+This is the form given by Ed Williams.
+
+* Main results: the correction `ΔTA`, negative in cold air, and the true
+  altitude `TA` for an indicated altitude `Hind`, with the altimeter set at a
+  station of elevation `Hstn`, a deviation `ΔISA` from the standard
+  temperature and an outside air temperature `OAT`, both at the aircraft.
+
+* To calculate: `[ΔTA;TA]` (Correction; True altitude) 1 000 ft above a sea level station where it is −10 °C, that is −11.98 °C and 25 K below standard at the aircraft. The ICAO cold temperature table, rounded up to tens, gives 100 ft [2; 5, chapter 8]:
+```rpl
+Hind=1000_ft Hstn=0_ft ΔISA=-25_K OAT=-11.98_°C
+@ Expecting [ ΔTA=-95.72309 22388 ft TA=904.27690 7761 ft ]
+'ROOT(ⒺTrue Altitude;[ΔTA;TA];[1_ft;1_ft])'
+```
+
+#### Cloud Base
+
+The base of cumulus clouds, where rising air cools down to its dew point:
+the temperature and the dew point converge by about 4.4 °F per 1 000 ft.
+
+* Main result: the height `Hcb` of the cloud base above the ground, for an
+  outside air temperature `OAT` and a dew point `Tdp` measured at the ground.
+* Steps: `Tc` and `Tdc`, both temperatures in °C as plain numbers.
+
+* To calculate: `[Tc;Tdc;Hcb]` (Temperature; Dew point; Cloud base) for 85 °F and a dew point of 71 °F. The book gives 3 180 ft, cutting off the digits of 14/4.4 [5, chapter 12]:
+```rpl
+OAT=85_°F Tdp=71_°F
+@ Expecting [ Tc=29.44444 44444 Tdc=21.66666 66667 Hcb=3 181.81811 111 ft ]
+'ROOT(ⒺCloud Base;[Tc;Tdc;Hcb];[1;1;1_ft])'
 ```
