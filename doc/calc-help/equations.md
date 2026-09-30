@@ -3152,7 +3152,10 @@ The `Aeronautics` section gathers the calculations of aircraft operation. Its
 first part, [Flight Management](#flight management), holds the pilot's
 calculations from the flight manual and the weather: wind components on a
 runway, time, speed and distance, fuel, weight and balance, altitudes,
-airspeeds, climb and descent, and the decision points of a flight.
+airspeeds, climb and descent, and the decision points of a flight. Its second
+part, [Performance](#performance), gives the performance of the aircraft from
+its drag polar: lift and drag, stall, turns, glide, climb, range and
+endurance, takeoff and landing.
 
 **Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
 lb, ft, inHg); every equation also accepts SI units.
@@ -3788,4 +3791,739 @@ Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
 Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
 @ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
 'ROOT(ⒺTop of Descent;[Grd;FPA;ΔH;DTOD;TTOD];[0.1;1_°;1_ft;1_nmi;1_min])'
+```
+
+### Performance
+
+The aircraft as it is, from its drag polar: lift and drag, stall and load
+factor, turns, glide, climb, range and endurance, takeoff and landing, in
+seven submenus:
+[Lift & Drag](#lift & drag),
+[Stall & Load Factor](#stall & load factor),
+[Turns](#turns),
+[Glide](#glide),
+[Climb & Power](#climb & power),
+[Range & Endurance](#range & endurance) and
+[Takeoff & Landing](#takeoff & landing).
+
+**Mass and weight.** As in [Flight Management](#flight management), `Wt` is
+the **mass** of the aircraft, in lb or kg; its weight is the force
+`(Wt_lb)·Ⓒg`. Lift, drag and thrust are forces, in lbf or N.
+
+**Air density.** The entries that need the air density `ρa` compute it from
+the density ratio `DRat` of [True Airspeed](#true airspeed): `ρa` is
+1.225 kg/m³ times `DRat`. Give `DRat=1` for the sea level standard air, the
+density at which the flight manual gives its stall speeds; they are then
+calibrated airspeeds. Or give `ρa` directly: the `ρ♁StdAtm` function of the
+library gives it in the standard atmosphere, for a geometric altitude.
+
+**Coefficients.** The lift and drag coefficients `CL` and `CD` are plain
+numbers. The drag polar is parabolic: `CD` is `CD0+Kind·CL²`, the drag at
+zero lift plus the drag induced by the lift.
+
+**Sources.** The FAA handbook often rounds its figures, and a few of them are
+wrong; the examples give the book value next to the computed one.
+
+The 78 variables in the Performance section are:
+
+* `ρa`: Air density (dim.: mass/volume)
+* `qd`: Dynamic pressure, `ρa·TAS²/2` (dim.: pressure)
+* `Lift`: Lift (dim.: force)
+* `nLF`: Load factor, lift over weight: 1 in level flight
+* `Sw`: Wing area (dim.: area)
+* `CL`: Lift coefficient
+* `bw`: Wingspan (dim.: length)
+* `AR`: Aspect ratio of the wing, span squared over area
+* `eO`: Oswald efficiency factor, 0.7 to 0.85 for most airplanes
+* `Kind`: Induced drag factor of the drag polar
+* `CD0`: Drag coefficient at zero lift
+* `CD`: Drag coefficient
+* `LD`: Lift to drag ratio, also called the glide ratio or finesse
+* `Drag`: Drag (dim.: force)
+* `LDmax`: Maximum lift to drag ratio
+* `CLmd`: Lift coefficient of minimum drag, at `LDmax`
+* `Vmd`: Speed of minimum drag (dim.: speed)
+* `Vmp`: Speed of minimum power (dim.: speed)
+* `Vbrj`: Speed of best range of a jet at constant altitude (dim.: speed)
+* `CLmax`: Maximum lift coefficient, for the configuration of flaps and gear
+* `Vst`: Stall speed (dim.: speed)
+* `φb`: Bank angle
+* `Vstn`: Stall speed at the load factor `nLF` (dim.: speed)
+* `nlim`: Limit load factor
+* `VA`: Maneuvering speed (dim.: speed)
+* `Vref`: Reference speed, given for the weight `Wt0` or planned for the
+  takeoff or the landing (dim.: speed)
+* `Wt0`: Reference weight of the aircraft (dim.: mass)
+* `Vadj`: Speed adjusted to the weight `Wt` (dim.: speed)
+* `nPU`: Load factor at the bottom of a pull up
+* `Rpu`: Radius of the pull up (dim.: length)
+* `TRad`: Radius of turn (dim.: length)
+* `TRate`: Rate of turn (dim.: angular speed)
+* `Ttrn`: Time for a full turn (dim.: time)
+* `Hpv`: Pivotal altitude, above the ground (dim.: length)
+* `Dgl`: Distance of the glide over the ground (dim.: length)
+* `Tgl`: Time of the glide (dim.: time)
+* `CLms`: Lift coefficient of minimum sink
+* `LDms`: Lift to drag ratio at minimum sink
+* `Vms`: Speed of minimum sink (dim.: speed)
+* `VSms`: Minimum sink rate, negative (dim.: speed)
+* `Preq`: Power required, drag times speed (dim.: power)
+* `ηp`: Propeller efficiency, 0.8 to 0.85 in cruise
+* `Psh`: Shaft power of the engine (dim.: power)
+* `Pav`: Shaft power available (dim.: power)
+* `Thr`: Thrust (dim.: force)
+* `ROC0`: Rate of climb at sea level (dim.: speed)
+* `Habs`: Absolute ceiling, where the rate of climb falls to zero
+  (dim.: length)
+* `Hsc`: Service ceiling, where the rate of climb falls to 100 ft/min
+  (dim.: length)
+* `Hini`, `Hfin`: Initial and final altitudes (dim.: length)
+* `Tclb`: Time to climb (dim.: time)
+* `BSFC`: Brake specific fuel consumption of a piston engine, the mass of
+  fuel per unit of energy (dim.: mass/energy)
+* `TSFC`: Thrust specific fuel consumption of a jet engine, in `1/h`: the
+  value the handbooks give in lb/(lbf·h) (dim.: 1/time)
+* `FFm`: Fuel flow, as a mass (dim.: mass/time)
+* `Wini`, `Wfin`: Initial and final weights of the aircraft (dim.: mass)
+* `Vini`, `Vfin`: Initial and final speeds (dim.: speed)
+* `Ebat`: Usable energy of the battery (dim.: energy)
+* `ηe`: Efficiency from the battery to the propeller thrust
+* `fLO`: Liftoff speed over stall speed, about 1.2
+* `fTD`: Touchdown speed over stall speed, about 1.3
+* `fav`: Fraction of the liftoff or touchdown speed where the forces are
+  averaged, about 0.7
+* `μr`: Rolling friction coefficient: 0.02 on a dry paved runway, 0.04 to
+  0.06 on short grass, 0.08 to 0.12 on long or wet grass; 0.4 when braking
+  on a dry runway
+* `VLO`: Liftoff speed (dim.: speed)
+* `VTD`: Touchdown speed (dim.: speed)
+* `qLO`, `qTD`: Dynamic pressure at `fav·VLO` or `fav·VTD` (dim.: pressure)
+* `Rav`: Average resistance, drag plus rolling friction (dim.: force)
+* `sLO`: Takeoff ground roll (dim.: length)
+* `sLD`: Landing ground roll (dim.: length)
+* `s0`: Distance in the reference conditions (dim.: length)
+* `sWnd`: Distance corrected for the wind (dim.: length)
+* `xW`: Exponent of the weight: 2 for a takeoff, 1 for a landing
+* `fW`: Weight factor
+* `Vact`: Actual speed, compared to the reference speed `Vref`
+  (dim.: speed)
+* `fV`: Speed factor
+* `sCor`: Distance corrected for weight and speed (dim.: length)
+
+The entries also use `Wt`, `TAS`, `GS`, `DRat`, `FPA`, `VS`, `ΔH`, `HW`,
+`Endur`, `Rng` and `Wfuel`, with the same meaning as in Flight Management.
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 5, *Aerodynamics of Flight*, and 11, *Aircraft Performance* ;
+  [2] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, chapters *Flight Range & Endurance*,
+  *Climbing, Ceiling & Gliding*, *Takeoff & Landing Performance*, *Maximum
+  Lift, Stalling & Spinning*, *Finite Wing Characteristics*, *Maneuvers &
+  Gusts* and *Worked Examples: Airplane Performance* ;
+  [3] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [4] 14 CFR 23.337, *Limit maneuvering load factors*, before amendment 23-64
+  of 2017.
+
+#### Lift & Drag
+
+The lift and the drag of the aircraft from its drag polar, and the speeds that
+follow from it.
+
+Entries: [Lift](#lift), [Drag Polar](#drag polar) and [Characteristic Speeds](#characteristic speeds).
+
+#### Lift
+
+The lift equals the weight times the load factor; it is the dynamic pressure
+times the wing area times the lift coefficient.
+
+* Main results: the lift coefficient `CL` needed to fly the mass `Wt` at the
+  true airspeed `TAS`, with the wing area `Sw`, at the load factor `nLF`, 1 in
+  level flight; or the speed for a given `CL`.
+* Steps: the air density `ρa` and the dynamic pressure `qd`.
+* At the same lift coefficient, twice the speed gives four times the lift.
+* The handbook says that at 18 000 ft the air has half the density of sea
+  level [1, chapter 5]: it is the pressure that is halved there. The density
+  ratio of the standard atmosphere is 0.57.
+
+* To calculate: `[DRat;qd;Lift;CL]` (Density ratio; Dynamic pressure; Lift; Lift coefficient) for a Cessna 172 of 2 100 lb at 120 kt, in air of 0.00216 slug/ft³, with a wing of 174 ft². The source gives 0.272 [2]:
+```rpl
+Wt=2100_lb TAS=120_knot ρa=0.00216_slug/ft^3 Sw=174_ft^2 nLF=1
+@ Expecting [ DRat=0.90874 95899 83 qd=2 121.23984 487 Pa Lift=2 100. lbf CL=0.27241 86027 28 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[DRat;qd;Lift;CL]` for an airliner of 16 000 kg at 253 kt, in air of 0.9048 kg/m³, with a wing of 60 m². The source gives 0.341 [2]:
+```rpl
+Wt=16000_kg TAS=253_knot ρa=0.9048_kg/m^3 Sw=60_m^2 nLF=1
+@ Expecting [ DRat=0.73861 22448 98 qd=7 663.73716 447 Pa Lift=35 273.96194 96 lbf CL=0.34123 12570 94 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[ρa;Lift;qd;TAS]` (Density; Lift; Dynamic pressure; True airspeed) to fly the same Cessna at a lift coefficient of 0.5, at a density ratio of 0.7385:
+```rpl
+Wt=2100_lb DRat=0.7385 Sw=174_ft^2 nLF=1 CL=0.5
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Lift=2 100. lbf qd=1 155.73038 918 Pa TAS=98.25654 49074 knot ]
+'ROOT(ⒺLift;[ρa;Lift;qd;TAS];[1_kg/m^3;1_lbf;1_Pa;100_knot])'
+```
+
+#### Drag Polar
+
+The parabolic drag polar: the drag coefficient is the drag at zero lift plus
+the drag induced by the lift, which decreases with the aspect ratio of the
+wing.
+
+* Main results: the aspect ratio `AR`, the induced drag factor `Kind`, the
+  drag coefficient `CD`, the lift to drag ratio `LD` and the drag `Drag`, for
+  a wingspan `bw`, a wing area `Sw`, an Oswald factor `eO`, a drag
+  coefficient at zero lift `CD0`, and the lift coefficient `CL` and lift
+  `Lift` of the Lift entry.
+* Solved the other way, a measured drag gives `CD0`.
+* The Drag Force equation of the Forces and Energy section gives the drag
+  of any body from its drag coefficient.
+
+* To calculate: `[AR;Kind;CD;LD;Drag]` (Aspect ratio; Induced drag factor; Drag coefficient; Lift to drag ratio; Drag) for the Cessna 172 of the Lift entry: 36 ft of span, `CD0` 0.02 and an Oswald factor of 0.81. The source gives 7.45, 0.0239 and 11.38, from rounded coefficients [2]:
+```rpl
+bw=36_ft Sw=174_ft^2 CD0=0.02 eO=0.81 CL=0.272419 Lift=2100_lbf
+@ Expecting [ AR=7.44827 58620 7 Kind=0.05276 05549 8 CD=2.39154 72192 2⁳⁻² LD=11.39091 03617 Drag=184.35752 1332 lbf ]
+'ROOT(ⒺDrag Polar;[AR;Kind;CD;LD;Drag];[1;0.1;0.1;10;1_lbf])'
+```
+
+* To calculate: `[AR;Kind;LD;CD;CD0]` for an airplane of 2 105 lb that needs 245 lbf of thrust in level flight at a lift coefficient of 0.315, with a wing of 30 ft by 5.25 ft and an Oswald factor of 0.75. The source gives `CD0` 0.0293 [2]:
+```rpl
+Lift=2105_lbf Drag=245_lbf CL=0.315 bw=30_ft Sw=157.5_ft^2 eO=0.75
+@ Expecting [ AR=5.71428 57142 9 Kind=0.07427 23067 76 LD=8.59183 67346 9 CD=0.03666 27078 38 CD0=0.02929 30381 99 ]
+'ROOT(ⒺDrag Polar;[AR;Kind;LD;CD;CD0];[1;0.1;10;0.1;0.01])'
+```
+
+#### Characteristic Speeds
+
+The speeds that follow from the drag polar.
+
+* Main results: the maximum lift to drag ratio `LDmax`, reached at the lift
+  coefficient `CLmd` and the speed of minimum drag `Vmd`; the speed of
+  minimum power `Vmp`; the speed of best range of a jet at constant altitude
+  `Vbrj`.
+* `Vmd` gives the longest glide, the best range of a propeller airplane and
+  the longest endurance of a jet. `Vmp` gives the longest endurance of a
+  propeller airplane and the minimum sink rate; it is about 76 % of `Vmd`.
+* These speeds are true airspeeds; with `DRat=1`, calibrated airspeeds.
+
+* To calculate: `[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj]` (Density; Maximum lift to drag ratio; Its lift coefficient; Speeds of minimum drag, of minimum power, of best jet range) for an airplane of 2 550 lb with a wing of 174 ft², `CD0` 0.0319 and `Kind` 0.0610515, at sea level. The source gives `Vmp` 58.8 kt, with a density of 0.002378 slug/ft³ [2]:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 LDmax=11.32991 08712 CLmd=0.72284 83135 81 Vmd=77.38532 25844 knot Vmp=58.80012 96453 knot Vbrj=101.84481 2037 knot ]
+'ROOT(ⒺCharacteristic Speeds;[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj];[1_kg/m^3;10;1;100_knot;100_knot;100_knot])'
+```
+
+* To calculate: `[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj]` for a jet of 5 000 lb with a wing of 180 ft², `CD0` 0.018 and `Kind` 0.095, in air of 0.001066 slug/ft³. The source gives 270 kt for the best range [2]:
+```rpl
+Wt=5000_lb Sw=180_ft^2 CD0=0.018 Kind=0.095 ρa=0.001066_slug/ft^3
+@ Expecting [ DRat=0.44848 47513 53 LDmax=12.09127 08352 CLmd=0.43528 57500 66 Vmd=205.00969 5811 knot Vmp=155.77368 2781 knot Vbrj=269.80793 306 knot ]
+'ROOT(ⒺCharacteristic Speeds;[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj];[1;10;1;100_knot;100_knot;100_knot])'
+```
+
+#### Stall & Load Factor
+
+The stall speed, how it grows with the load factor and changes with the
+weight, the maneuvering speed, and the limit load factor.
+
+Entries: [Stall Speed](#stall speed), [Load Factor & Accelerated Stall](#load factor & accelerated stall), [Maneuvering Speed & Weight](#maneuvering speed & weight), [Pull Up](#pull up) and [Limit Load Factor](#limit load factor).
+
+#### Stall Speed
+
+The speed at which the wing reaches its maximum lift coefficient in level
+flight.
+
+* Main result: the stall speed `Vst` for the mass `Wt`, the wing area `Sw` and
+  the maximum lift coefficient `CLmax` of the configuration of flaps and gear.
+* With `DRat=1`, the stall speed is a calibrated airspeed, the one of the
+  flight manual; with the density of the day, a true airspeed.
+
+* To calculate: `[ρa;Vst]` (Density; Stall speed) for an airplane of 20 000 lb with a wing of 340 ft² and a `CLmax` of 1.7, at a density ratio of 0.7385. The source gives 117.6 kt [2]:
+```rpl
+Wt=20000_lb Sw=340_ft^2 CLmax=1.7 DRat=0.7385
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Vst=117.64203 9787 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+* To calculate: `[ρa;Vst]` for an airplane of 5 200 lb with a wing of 160 ft² and a `CLmax` of 2.1 in landing configuration, at sea level. The source gives 67.6 kt [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+#### Load Factor & Accelerated Stall
+
+In a level turn, the lift must hold up the weight and turn the aircraft: the
+load factor grows with the bank angle, and the stall speed with the square
+root of the load factor.
+
+* Main results: the load factor `nLF` for the bank angle `φb`, and the stall
+  speed `Vstn` at that load factor, from the stall speed `Vst` in level
+  flight.
+* 60° of bank gives 2 G; a stall speed of 50 kt becomes 100 kt at 4 G.
+
+* To calculate: `[nLF;Vstn]` (Load factor; Stall speed) at 45° of bank, for a stall speed of 57 kt. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+φb=45_° Vst=57_knot
+@ Expecting [ nLF=1.41421 35623 7 Vstn=67.78480 55552 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[nLF;Vstn];[1;100_knot])'
+```
+
+* To calculate: `[φb;Vstn]` (Bank angle; Stall speed) for a load factor of 3, with a stall speed of 45 kt. The handbook says that a bank of 72° gives 3 G, and that the speed must stay above 75 kt; 72° gives 3.24 G [1, chapter 5]:
+```rpl
+nLF=3 Vst=45_knot
+@ Expecting [ φb=70.52877 93655 ° Vstn=77.94228 63406 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[φb;Vstn];[45_°;100_knot])'
+```
+
+#### Maneuvering Speed & Weight
+
+Below the maneuvering speed, the wing stalls before the load factor reaches its
+limit. All the speeds flown at a given lift coefficient (stall, maneuvering,
+best glide, approach) change with the square root of the weight.
+
+* Main results: the maneuvering speed `VA` for a stall speed `Vst` and a limit
+  load factor `nlim`; and the speed `Vadj` at the weight `Wt`, from the speed
+  `Vref` given for the weight `Wt0`.
+* A lighter aircraft has a lower maneuvering speed.
+
+* To calculate: `nlim` (Limit load factor) when the maneuvering speed is 1.7 times the stall speed. The handbook says 3 G [1, chapter 5]:
+```rpl
+Vst=60_knot VA=102_knot
+@ Expecting nlim=2.89
+'ROOT(ⒺManeuvering Speed & Weight;nlim;3)'
+```
+
+* To calculate: `Vadj` (Adjusted speed) at 2 800 lb, for an approach speed of 70 kt at 2 950 lb. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+Vref=70_knot Wt=2800_lb Wt0=2950_lb
+@ Expecting Vadj=68.19712 20626 knot
+'ROOT(ⒺManeuvering Speed & Weight;Vadj;70_knot)'
+```
+
+#### Pull Up
+
+At the bottom of a pull up or of a loop, the lift must hold up the weight and
+curve the path.
+
+* Main result: the load factor `nPU` for the true airspeed `TAS` and the
+  radius `Rpu`.
+* At the top of a loop, the weight helps curve the path: the load factor is
+  `nPU-2`.
+
+* To calculate: `nPU` (Load factor) at 120 kt, on a radius of 1 000 ft:
+```rpl
+TAS=120_knot Rpu=1000_ft
+@ Expecting nPU=2.27498 13056 9
+'ROOT(ⒺPull Up;nPU;2)'
+```
+
+#### Limit Load Factor
+
+The limit load factor of the normal category of 14 CFR part 23, before its
+rewrite of 2017: the certification of older light airplanes.
+
+* Main result: the limit load factor `nlim` for the maximum weight `Wt`: 3.8,
+  or less above 4 118 lb. The utility category requires 4.4, the acrobatic
+  category 6.
+
+* To calculate: `nlim` for a maximum weight of 6 000 lb [4]:
+```rpl
+Wt=6000_lb
+@ Expecting nlim=3.6
+'ROOT(ⒺLimit Load Factor;nlim;3)'
+```
+
+#### Turns
+
+The radius and rate of a level turn, and the pivotal altitude.
+
+Entries: [Level Turn](#level turn) and [Pivotal Altitude](#pivotal altitude).
+
+#### Level Turn
+
+A coordinated turn at constant altitude: the horizontal part of the lift turns
+the aircraft.
+
+* Main results: the load factor `nLF`, the radius `TRad`, the rate `TRate` and
+  the time `Ttrn` of a full turn, for a true airspeed `TAS` and a bank angle
+  `φb`. Give `TRate=3_°/s` for the bank of a standard rate turn.
+* The radius grows with the square of the speed; the rate falls with it.
+* The rules of thumb divide the square of the speed in knots by 11.26 times
+  the tangent of the bank [1, chapter 5] or by 11.23 [3], for a radius in
+  feet: the exact constant is 11.294, and the radii of the handbook are 0.3 %
+  too large.
+
+* To calculate: `[nLF;TRad;TRate;Ttrn]` (Load factor; Radius; Rate; Time for 360°) at 120 kt and 30° of bank. The handbook gives 2 215 ft, 5.25 °/s and 68.6 s [1, chapter 5]:
+```rpl
+TAS=120_knot φb=30_°
+@ Expecting [ nLF=1.15470 05383 8 TRad=2 208.33240 015 ft TRate=5.25488 18154 °/s Ttrn=68.50772 53203 s ]
+'ROOT(ⒺLevel Turn;[nLF;TRad;TRate;Ttrn];[1;1_ft;1_°/s;1_s])'
+```
+
+* To calculate: `[φb;nLF;TRad;Ttrn]` (Bank angle; Load factor; Radius; Time) for a standard rate turn at 100 kt. The source gives 15.4° [3]:
+```rpl
+TAS=100_knot TRate=3_°/s
+@ Expecting [ φb=15.35884 67547 ° nLF=1.03703 68440 1 TRad=3 223.47938 108 ft Ttrn=120 s ]
+'ROOT(ⒺLevel Turn;[φb;nLF;TRad;Ttrn];[10_°;1;1_ft;1_s])'
+```
+
+#### Pivotal Altitude
+
+The height above the ground at which a point on the ground seems to stay fixed
+behind the wingtip, whatever the bank: the eights on pylons are flown there.
+
+* Main result: the pivotal altitude `Hpv` for the ground speed `GS`.
+
+* To calculate: `Hpv` (Pivotal altitude) at a ground speed of 100 kt. The source gives 890 ft [3]:
+```rpl
+GS=100_knot
+@ Expecting Hpv=885.40368 4504 ft
+'ROOT(ⒺPivotal Altitude;Hpv;1_ft)'
+```
+
+#### Glide
+
+The distance of a glide, and the speed of the least sink rate.
+
+Entries: [Glide Distance](#glide distance) and [Minimum Sink](#minimum sink).
+
+#### Glide Distance
+
+Without engine, the aircraft glides along a path whose slope is the inverse of
+its lift to drag ratio: the glide ratio is the lift to drag ratio.
+
+* Main results: the flight path angle `FPA`, negative, the distance over the
+  ground `Dgl`, the vertical speed `VS` and the time `Tgl`, for a height to
+  lose `ΔH`, a lift to drag ratio `LD`, a true airspeed `TAS` and a ground
+  speed `GS`.
+* The longest glide is at `LDmax`, flown at the speed of minimum drag `Vmd`
+  of Characteristic Speeds. A headwind shortens it.
+* The time is the distance over the ground speed; the time along the path,
+  `ΔH` over `VS`, is 0.2 % longer at a glide ratio of 15.
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` (Flight path angle; Distance; Vertical speed; Time) for Air Transat flight 236, the Airbus A330 that ran out of fuel over the Atlantic on 24 August 2001 and that captain Robert Piché glided to Lajes, in the Azores. The source models it as a glide from 30 000 ft at 195 kt, at a lift to drag ratio of 15, and finds about 74 nmi and 22.8 min [2]:
+```rpl
+LD=15 ΔH=30000_ft TAS=195_knot GS=195_knot
+@ Expecting [ FPA=-3.81407 48342 9 ° Dgl=74.06047 5162 nmi VS=-1 313.57586 727 ft/min Tgl=22.78783 85114 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` for a glider at a glide ratio of 30, losing 3 400 ft at 50 kt against a headwind of 10 kt:
+```rpl
+LD=30 ΔH=3400_ft TAS=50_knot GS=40_knot
+@ Expecting [ FPA=-1.90915 2433 ° Dgl=13.42963 28294 nmi VS=-168.68729 6563 ft/min Tgl=20.14444 92441 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+#### Minimum Sink
+
+The speed at which a glider, or an airplane without engine, loses height the
+most slowly: it stays longest in the air, but does not go farthest.
+
+* Main results: the lift coefficient `CLms`, the lift to drag ratio `LDms`,
+  the speed `Vms` and the sink rate `VSms` at minimum sink, from the drag
+  polar `CD0` and `Kind`, the mass `Wt` and the wing area `Sw`.
+* The speed of minimum sink is the speed of minimum power of Characteristic
+  Speeds.
+
+* To calculate: `[ρa;CLms;LDms;Vms;VSms]` (Density; Lift coefficient; Lift to drag ratio; Speed; Sink rate) for the airplane of 2 550 lb of Characteristic Speeds, engine off, at sea level:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 CLms=1.25201 00052 9 LDms=9.81199 06370 5 Vms=58.80012 96453 knot VSms=-603.74295 4129 ft/min ]
+'ROOT(ⒺMinimum Sink;[ρa;CLms;LDms;Vms;VSms];[1_kg/m^3;1;10;60_knot;-500_ft/min])'
+```
+
+#### Climb & Power
+
+The power the aircraft needs, the rate and angle of climb it gets from its
+engine, and the time to climb.
+
+Entries: [Power Required](#power required), [Rate & Angle of Climb](#rate & angle of climb) and [Time to Climb & Ceilings](#time to climb & ceilings).
+
+#### Power Required
+
+The power needed to fly is the drag times the speed; the engine must give more,
+since the propeller does not turn all of its power into thrust.
+
+* Main results: the power required `Preq` for the drag `Drag` at the true
+  airspeed `TAS`, and the shaft power `Psh` with a propeller efficiency `ηp`.
+* From 100 to 200 kt, the parasite drag grows four times and its power eight
+  times; the induced drag and its power fall to a fourth and to a half
+  [1, chapter 11].
+
+* To calculate: `[Preq;Psh]` (Power required; Shaft power) for a Cessna 172 with 183.7 lbf of drag at 120 kt, and a propeller efficiency of 0.85. The source gives 79.6 hp [2]:
+```rpl
+Drag=183.672_lbf TAS=120_knot ηp=0.85
+@ Expecting [ Preq=67.63710 80888 hp Psh=79.57306 83397 hp ]
+'ROOT(ⒺPower Required;[Preq;Psh];[1_hp;1_hp])'
+```
+
+#### Rate & Angle of Climb
+
+The excess power gives the rate of climb, the excess thrust the angle of
+climb.
+
+* Main results: the vertical speed `VS` from the power available `Pav` of the
+  engine, the propeller efficiency `ηp` and the power required `Preq`; and
+  the flight path angle `FPA` from the thrust `Thr` and the drag `Drag`.
+* The best rate of climb, at the speed Vy, gains the most height in a given
+  time; the best angle, at the speed Vx, in a given distance. For a
+  propeller airplane, Vy is about the speed of minimum power.
+* A climb at 10° needs a thrust equal to the drag plus 17 % of the weight
+  [1, chapter 5].
+
+* To calculate: `VS` (Vertical speed) for an airplane of 2 550 lb with 180 hp at 0.8 of propeller efficiency, needing 46.9 hp at its speed of minimum power. The source gives 1 257 ft/min [2]:
+```rpl
+Pav=180_hp ηp=0.8 Preq=46.8836_hp Wt=2550_lb
+@ Expecting VS=1 256.80047 059 ft/min
+'ROOT(ⒺRate & Angle of Climb;VS;1000_ft/min)'
+```
+
+* To calculate: `FPA` (Flight path angle) for an airplane of 2 000 lb with 400 lbf of thrust and 200 lbf of drag:
+```rpl
+Wt=2000_lb Thr=400_lbf Drag=200_lbf
+@ Expecting FPA=5.73917 04772 7 °
+'ROOT(ⒺRate & Angle of Climb;FPA;5_°)'
+```
+
+#### Time to Climb & Ceilings
+
+When the rate of climb falls linearly with altitude, from `ROC0` at sea level
+to zero at the absolute ceiling `Habs`, the time to climb has a closed form.
+
+* Main results: the service ceiling `Hsc`, where the rate of climb is
+  100 ft/min, and the time `Tclb` to climb from `Hini` to `Hfin`.
+* Two rates of climb read in the flight manual at two altitudes give `ROC0`
+  and `Habs`.
+
+* To calculate: `[Hsc;Tclb]` (Service ceiling; Time to climb) from 1 000 to 9 000 ft, for a rate of climb of 973.5 ft/min at sea level and an absolute ceiling of 20 072 ft. The source gives 11.2 min [2]:
+```rpl
+ROC0=973.5_ft/min Habs=20072.2_ft Hini=1000_ft Hfin=9000_ft
+@ Expecting [ Hsc=18 010.34072 93 ft Tclb=11.21227 34995 min ]
+'ROOT(ⒺTime to Climb & Ceilings;[Hsc;Tclb];[1_ft;1_min])'
+```
+
+* To calculate: `Hsc` (Service ceiling) for a rate of climb of 1 235 ft/min at sea level and an absolute ceiling of 14 790 ft. The source gives 13 593 ft [2]:
+```rpl
+ROC0=1235_ft/min Habs=14790.4_ft
+@ Expecting Hsc=13 592.79676 11 ft
+'ROOT(ⒺTime to Climb & Ceilings;Hsc;1_ft)'
+```
+
+#### Range & Endurance
+
+The fuel flow of piston and jet engines, the Breguet equations for the range
+and the endurance, and the range of an electric airplane.
+
+Entries: [Fuel Flow](#fuel flow), [Breguet Range Propeller](#breguet range propeller), [Breguet Endurance Propeller](#breguet endurance propeller), [Breguet Jet](#breguet jet), [Jet Range at Constant Altitude](#jet range at constant altitude) and [Battery Range & Endurance](#battery range & endurance).
+
+#### Fuel Flow
+
+The fuel flow from the specific consumption of the engine, and the endurance
+of the fuel on board.
+
+* Main results: the fuel flow `FFm`, as a mass, of a piston engine from its
+  specific consumption `BSFC` and its shaft power `Psh`, or of a jet engine
+  from its specific consumption `TSFC` and its thrust `Thr`; and the endurance
+  `Endur` of the fuel `Wfuel`.
+* `TSFC` is entered in `1/h`: the 0.5 lb/(lbf·h) of the handbooks is
+  `0.5_h^-1`.
+* The Endurance & Range entry of Flight Management works with a volume of
+  fuel; `ρfuel` converts.
+
+* To calculate: `[FFm;Endur]` (Fuel flow; Endurance) for a Cessna 172 using 79.6 hp at 0.45 lb/(hp·h), with 48 lb of fuel. The source gives 35.8 lb/h and 1.34 h [2]:
+```rpl
+BSFC=0.45_lb/(hp*h) Psh=79.573_hp Wfuel=48_lb
+@ Expecting [ FFm=35.80785 lb/h Endur=1.34048 81890 4 h ]
+'ROOT(ⒺFuel Flow;[FFm;Endur];[1_lb/h;1_h])'
+```
+
+* To calculate: `FFm` for a jet with 1 374 lbf of thrust at 0.5 lb/(lbf·h). The source gives 687 lb/h [2]:
+```rpl
+TSFC=0.5_h^-1 Thr=1373.97_lbf
+@ Expecting FFm=686.985 lb/h
+'ROOT(ⒺFuel Flow;FFm;1_lb/h)'
+```
+
+#### Breguet Range Propeller
+
+The range of a propeller airplane that flies at its best lift to drag ratio
+while it burns its fuel.
+
+* Main result: the range `Rng` from the propeller efficiency `ηp`, the lift to
+  drag ratio `LD`, the specific consumption `BSFC`, and the initial and final
+  weights `Wini` and `Wfin`.
+* One source finds 170 nmi for a Cessna 172 where the formula gives 162, and
+  160.9 nmi by the hourly consumption [2].
+
+* To calculate: `Rng` (Range) for an airplane of the class of the Cessna 182, from 2 890 to 2 620 lb, with a lift to drag ratio of 13.6, a propeller efficiency of 0.8 and 0.45 lb/(hp·h). The source gives 889 statute miles, or 772.5 nmi [2]:
+```rpl
+ηp=0.8 LD=13.6 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting Rng=772.76186 4125 nmi
+'ROOT(ⒺBreguet Range Propeller;Rng;1_nmi)'
+```
+
+#### Breguet Endurance Propeller
+
+The endurance of a propeller airplane flown at a constant lift coefficient:
+the speed falls with the square root of the weight as the fuel burns.
+
+* Main results: the final speed `Vfin` and the endurance `Endur`, from the
+  initial speed `Vini`, the lift to drag ratio `LD` at that lift coefficient,
+  the propeller efficiency `ηp`, the specific consumption `BSFC`, and the
+  weights `Wini` and `Wfin`.
+* For the longest endurance, start at the speed of minimum power `Vmp`, with
+  the lift to drag ratio `LDms` of Minimum Sink.
+
+* To calculate: `[Vfin;Endur]` (Final speed; Endurance) for the same airplane, from 117.3 ft/s at a lift to drag ratio of 11.79. The source gives 9.9 h [2]:
+```rpl
+Vini=117.309_ft/s ηp=0.8 LD=11.7865 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting [ Vfin=66.17737 52512 knot Endur=9.87589 53051 2 h ]
+'ROOT(ⒺBreguet Endurance Propeller;[Vfin;Endur];[1_knot;1_h])'
+```
+
+#### Breguet Jet
+
+The endurance of a jet, and its range in a cruise climb: at constant speed and
+lift coefficient, the jet climbs as it gets lighter.
+
+* Main results: the endurance `Endur` from the lift to drag ratio `LD`, the
+  specific consumption `TSFC` and the weights `Wini` and `Wfin`; and the range
+  `Rng` at the true airspeed `TAS`.
+
+* To calculate: `Endur` (Endurance) for a business jet from 18 815 to 13 215 lb, with a lift to drag ratio of 16.85 and 0.6 lb/(lbf·h). The source gives 9.9 h [2]:
+```rpl
+LD=16.85 Wini=18815_lb Wfin=13215_lb TSFC=0.6_h^-1
+@ Expecting Endur=9.92189 43507 h
+'ROOT(ⒺBreguet Jet;Endur;1_h)'
+```
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) in a cruise climb for the jet of Jet Range at Constant Altitude, at 269.8 kt, from 5 000 to 4 000 lb. At constant altitude it flies 596.5 nmi:
+```rpl
+LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1 TAS=269.808_knot
+@ Expecting [ Endur=2.33660 30688 8 h Rng=630.43420 0807 nmi ]
+'ROOT(ⒺBreguet Jet;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Jet Range at Constant Altitude
+
+The range of a jet that keeps its altitude and its lift coefficient: it must
+slow down as it gets lighter.
+
+* Main results: the final speed `Vfin` and the range `Rng`, from the initial
+  speed `Vini`, the lift to drag ratio `LD`, the specific consumption `TSFC`
+  and the weights `Wini` and `Wfin`.
+* For the best range, start at the speed `Vbrj` of Characteristic Speeds.
+* One source finds that drop tanks add 10.4 % to the range, where its own
+  figures give 9.8 % [2].
+
+* To calculate: `[Vfin;Rng]` (Final speed; Range) for a jet of 5 000 lb that burns 1 000 lb of fuel from 269.8 kt, with a lift to drag ratio of 10.47 and 1 lb/(lbf·h). The source gives 596 nmi [2]:
+```rpl
+Vini=269.808_knot LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1
+@ Expecting [ Vfin=241.32361 1549 knot Rng=596.53715 3568 nmi ]
+'ROOT(ⒺJet Range at Constant Altitude;[Vfin;Rng];[1_knot;1_nmi])'
+```
+
+#### Battery Range & Endurance
+
+An electric airplane does not get lighter as it flies: its range and its
+endurance follow from the energy of its battery.
+
+* Main results: the endurance `Endur` from the usable energy `Ebat`, the
+  efficiency `ηe` from the battery to the thrust, and the power required
+  `Preq`; and the range `Rng` from the lift to drag ratio `LD` and the mass
+  `Wt`.
+* The efficiency `ηe` is the product of the efficiencies of the battery, the
+  motor and the propeller, about 0.95, 0.95 and 0.8.
+* Enter the energy in `kW*h`.
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) for an electric airplane of 1 300 kg with 60 kWh, an efficiency of 0.75, a lift to drag ratio of 15, needing 40 hp at 68 kt:
+```rpl
+Ebat=60_(kW*h) ηe=0.75 Preq=40_hp LD=15 Wt=1300_kg
+@ Expecting [ Endur=1.50864 98507 9 h Rng=102.92035 2116 nmi ]
+'ROOT(ⒺBattery Range & Endurance;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Takeoff & Landing
+
+The ground roll at takeoff and landing, and how the wind, the weight and the
+speed change the distances of the flight manual.
+
+Entries: [Takeoff Ground Roll](#takeoff ground roll), [Landing Ground Roll](#landing ground roll), [Wind on Runway Distances](#wind on runway distances) and [Weight & Speed Corrections](#weight & speed corrections).
+
+#### Takeoff Ground Roll
+
+An estimate of the ground roll to liftoff, with the forces averaged at 70 % of
+the liftoff speed.
+
+* Main results: the stall speed `Vst`, the liftoff speed `VLO`, the average
+  resistance `Rav` and the ground roll `sLO`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in takeoff configuration, the thrust `Thr`, the
+  coefficients `CL` and `CD` during the roll, and the rolling friction `μr`.
+* `fLO` is usually 1.2, `fav` 0.7.
+
+* To calculate: `[ρa;Vst;VLO;qLO;Rav;sLO]` (Density; Stall speed; Liftoff speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², a `CLmax` of 1.6, rolling at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway. The source finds 3 247 ft, with the stall speed of 6 000 lb instead of 6 600 [2]:
+```rpl
+Wt=6600_lb Thr=1200_lbf Sw=160_ft^2 CLmax=1.6 CD=0.0388 CL=0.4 μr=0.02 DRat=1 fLO=1.2 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=87.26472 05797 knot VLO=104.71766 4696 knot qLO=871.00176 1176 Pa Rav=221.64648 lbf sLO=3 274.90985 284 ft ]
+'ROOT(ⒺTakeoff Ground Roll;[ρa;Vst;VLO;qLO;Rav;sLO];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Landing Ground Roll
+
+An estimate of the ground roll from touchdown to stop, with the brakes and
+the forces averaged at 70 % of the touchdown speed.
+
+* Main results: the stall speed `Vst`, the touchdown speed `VTD`, the average
+  resistance `Rav` and the ground roll `sLD`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in landing configuration, the coefficients `CL` and `CD`
+  during the roll, and the braking friction `μr`.
+* `fTD` is usually 1.3, `fav` 0.7. Spoilers bring `CL` near zero and put the
+  weight on the wheels.
+
+* To calculate: `[ρa;Vst;VTD;qTD;Rav;sLD]` (Density; Stall speed; Touchdown speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 5 200 lb with a wing of 160 ft², a `CLmax` of 2.1, spoilers out, braking at 0.4. The source gives 814.6 ft [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 CD=0.05 CL=0 μr=0.4 DRat=1 fTD=1.3 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot VTD=87.89458 15196 knot qTD=613.62541 9049 Pa Rav=2 182.52666 667 lbf sLD=814.85309 5344 ft ]
+'ROOT(ⒺLanding Ground Roll;[ρa;Vst;VTD;qTD;Rav;sLD];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Wind on Runway Distances
+
+A headwind shortens the takeoff and landing distances, a tailwind lengthens
+them more.
+
+* Main result: the distance `sWnd` for the headwind `HW` of Headwind &
+  Crosswind, negative for a tailwind, from the distance `s0` without wind
+  and the liftoff or touchdown speed `Vref`.
+* A headwind of 10 % of the speed shortens the distance by 19 %, a tailwind of
+  10 % lengthens it by 21 % [1, chapter 11].
+
+* To calculate: `sWnd` (Distance with wind) for a distance of 1 000 ft without wind and a tailwind of 10 kt, at a touchdown speed of 100 kt. The handbook says that 10 kt of tailwind add about 21 % [1, chapter 11], which holds at 100 kt:
+```rpl
+s0=1000_ft HW=-10_knot Vref=100_knot
+@ Expecting sWnd=1 210 ft
+'ROOT(ⒺWind on Runway Distances;sWnd;1_ft)'
+```
+
+#### Weight & Speed Corrections
+
+The takeoff distance grows with the square of the weight, the landing distance
+in proportion to it, and both with the square of the speed.
+
+* Main results: the weight factor `fW`, the speed factor `fV` and the
+  distance `sCor`, from the distance `s0` of the flight manual at the weight
+  `Wt0` and the speed `Vref`, for the weight `Wt` and the speed `Vact`.
+* Give `xW=2` for a takeoff, `xW=1` for a landing.
+* 10 % more weight at takeoff means 21 % more distance [1, chapter 11].
+
+* To calculate: `[fW;fV;sCor]` (Weight factor; Speed factor; Distance) for a landing of 1 600 ft at 70 kt, flown at 80 kt. The handbook counts 20 % more, 1 920 ft [1, chapter 11]:
+```rpl
+s0=1600_ft Wt=2400_lb Wt0=2400_lb xW=1 Vact=80_knot Vref=70_knot
+@ Expecting [ fW=1 fV=1.30612 24489 8 sCor=2 089.79591 837 ft ]
+'ROOT(ⒺWeight & Speed Corrections;[fW;fV;sCor];[1;1;1_ft])'
 ```

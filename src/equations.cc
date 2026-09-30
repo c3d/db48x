@@ -1589,6 +1589,142 @@ static const cstring basic_equations[] =
     "  '(TTOD_min)=(DTOD_nmi)/(GS_knot)' "
     "}",
 
+    "Aeronautics/Performance", nullptr,
+    // ------------------------------------------------------------------------
+    // The aircraft as it is: lift and drag from its drag polar, stall, load
+    // factor, turns, glide, climb, range and endurance, takeoff and landing.
+    // Wt is a mass, as in Flight Management; its weight is (Wt_lb)·Ⓒg.
+    // Equations are written force = force or speed = speed, so that the
+    // coefficients come out as plain numbers.
+    "Aeronautics/Performance/Lift & Drag", nullptr,
+    "Lift",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(qd_Pa)=(ρa_(kg/m^3))·(TAS_knot)²/2' "
+    "  '(Lift_lbf)=nLF·(Wt_lb)·Ⓒg' "
+    "  '(Lift_lbf)=(qd_Pa)·(Sw_ft²)·CL' "
+    "}",
+    "Drag Polar",  "{ "
+    "  'AR=(bw_ft)²/(Sw_ft²)' "
+    "  'Kind=1/(Ⓒπ·AR·eO)' "
+    "  'CD=CD0+Kind·(CL)²' "
+    "  'LD=CL/CD' "
+    "  '(Drag_lbf)=(Lift_lbf)/LD' "
+    "}",
+    "Characteristic Speeds",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'LDmax=1/(2·√(CD0·Kind))' "
+    "  'CLmd=√(CD0/Kind)' "
+    "  '(Vmd_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmd))' "
+    "  '(Vmp_knot)=(Vmd_knot)/(3^0.25)' "
+    "  '(Vbrj_knot)=(Vmd_knot)·(3^0.25)' "
+    "}",
+    "Aeronautics/Performance/Stall & Load Factor", nullptr,
+    "Stall Speed",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "}",
+    "Load Factor & Accelerated Stall",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(Vstn_knot)=(Vst_knot)·√(nLF)' "
+    "}",
+    "Maneuvering Speed & Weight",  "{ "
+    "  '(VA_knot)=(Vst_knot)·√(nlim)' "
+    "  '(Vadj_knot)=(Vref_knot)·√((Wt_lb)/(Wt0_lb))' "
+    "}",
+    "Pull Up",  "'(nPU-1)·Ⓒg·(Rpu_ft)=(TAS_knot)²'",
+    // 14 CFR 23.337(a)(1) before amendment 23-64 (2017), normal category
+    "Limit Load Factor",  "'nlim=MIN(3.8;2.1+24000/((Wt_lb)/(1_lb)+10000))'",
+
+    "Aeronautics/Performance/Turns", nullptr,
+    "Level Turn",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(TRad_ft)=(TAS_knot)²/(Ⓒg·TAN(φb_°))' "
+    "  '(TRate_°/s)=(1_r)·Ⓒg·TAN(φb_°)/(TAS_knot)' "
+    "  '(Ttrn_s)=(360_°)/(TRate_°/s)' "
+    "}",
+    "Pivotal Altitude",  "'(Hpv_ft)=(GS_knot)²/Ⓒg'",
+    "Aeronautics/Performance/Glide", nullptr,
+    "Glide Distance",  "{ "
+    "  'TAN(FPA_°)=-1/LD' "
+    "  '(Dgl_nmi)=(ΔH_ft)·LD·(GS_knot)/(TAS_knot)' "
+    "  '(VS_ft/min)=(TAS_knot)·SIN(FPA_°)' "
+    "  '(Tgl_min)=(Dgl_nmi)/(GS_knot)' "
+    "}",
+    "Minimum Sink",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'CLms=√(3·CD0/Kind)' "
+    "  'LDms=CLms/(CD0+Kind·(CLms)²)' "
+    "  '(Vms_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLms))' "
+    "  '(VSms_ft/min)=-(Vms_knot)·SIN(ATAN(1/LDms))' "
+    "}",
+    "Aeronautics/Performance/Climb & Power", nullptr,
+    "Power Required",  "{ "
+    "  '(Preq_hp)=(Drag_lbf)·(TAS_knot)' "
+    "  '(Psh_hp)=(Preq_hp)/ηp' "
+    "}",
+    "Rate & Angle of Climb",  "{ "
+    "  'ηp·(Pav_hp)-(Preq_hp)=(Wt_lb)·Ⓒg·(VS_ft/min)' "
+    "  '(Thr_lbf)-(Drag_lbf)=(Wt_lb)·Ⓒg·SIN(FPA_°)' "
+    "}",
+    // Rate of climb decreasing linearly with altitude, from ROC0 at sea level
+    // to zero at the absolute ceiling Habs
+    "Time to Climb & Ceilings",  "{ "
+    "  '(Hsc_ft)=(Habs_ft)·(1-(100_ft/min)/(ROC0_ft/min))' "
+    "  '(Tclb_min)=(Habs_ft)/(ROC0_ft/min)·LN(((Habs_ft)-(Hini_ft))/((Habs_ft)-(Hfin_ft)))' "
+    "}",
+    "Aeronautics/Performance/Range & Endurance", nullptr,
+    // TSFC is in 1/h: the weight of fuel per hour per unit of thrust, the
+    // value the handbooks give in lb/(lbf·h)
+    "Fuel Flow",  "{ "
+    "  '(FFm_lb/h)=(BSFC_lb/(hp*h))·(Psh_hp)' "
+    "  '(FFm_lb/h)·Ⓒg=(TSFC_1/h)·(Thr_lbf)' "
+    "  '(Endur_h)=(Wfuel_lb)/(FFm_lb/h)' "
+    "}",
+    "Breguet Range Propeller",  "'(Rng_nmi)=ηp·LD·LN((Wini_lb)/(Wfin_lb))/((BSFC_lb/(hp*h))·Ⓒg)'",
+    // Flown at a constant lift coefficient: the speed decreases with the
+    // square root of the weight
+    "Breguet Endurance Propeller",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Endur_h)=2·ηp·LD·(1/(Vfin_knot)-1/(Vini_knot))/((BSFC_lb/(hp*h))·Ⓒg)' "
+    "}",
+    // Cruise climb: constant speed and lift coefficient
+    "Breguet Jet",  "{ "
+    "  '(Endur_h)=LD·LN((Wini_lb)/(Wfin_lb))/(TSFC_1/h)' "
+    "  '(Rng_nmi)=(TAS_knot)·(Endur_h)' "
+    "}",
+    "Jet Range at Constant Altitude",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Rng_nmi)=2·LD·((Vini_knot)-(Vfin_knot))/(TSFC_1/h)' "
+    "}",
+    "Battery Range & Endurance",  "{ "
+    "  '(Endur_h)=ηe·(Ebat_(kW*h))/(Preq_hp)' "
+    "  '(Rng_nmi)=ηe·(Ebat_(kW*h))·LD/((Wt_lb)·Ⓒg)' "
+    "}",
+    "Aeronautics/Performance/Takeoff & Landing", nullptr,
+    // Forces averaged at fav·VLO (0.7 VLO, J. G. Leishman)
+    "Takeoff Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VLO_knot)=fLO·(Vst_knot)' "
+    "  '(qLO_Pa)=(ρa_(kg/m^3))·(fav·(VLO_knot))²/2' "
+    "  '(Rav_lbf)=(qLO_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qLO_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLO_ft)=(Wt_lb)·(VLO_knot)²/(2·((Thr_lbf)-(Rav_lbf)))' "
+    "}",
+    "Landing Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VTD_knot)=fTD·(Vst_knot)' "
+    "  '(qTD_Pa)=(ρa_(kg/m^3))·(fav·(VTD_knot))²/2' "
+    "  '(Rav_lbf)=(qTD_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qTD_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLD_ft)=(Wt_lb)·(VTD_knot)²/(2·(Rav_lbf))' "
+    "}",
+    "Wind on Runway Distances",  "'(sWnd_ft)=(s0_ft)·((Vref_knot)-(HW_knot))²/(Vref_knot)²'",
+    "Weight & Speed Corrections",  "{ "
+    "  'fW=((Wt_lb)/(Wt0_lb))^xW' "
+    "  'fV=((Vact_knot)/(Vref_knot))²' "
+    "  '(sCor_ft)=(s0_ft)·fW·fV' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
