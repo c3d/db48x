@@ -3421,6 +3421,8 @@ The equal time point is the point of a route from which it takes as long to
 go on to the destination as to return: the point that decides whether to
 continue or turn back after an engine failure or a medical emergency.
 
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
+
 * Main results: the distance `DETP` and time `TETP` from departure to the
   equal time point, on a route of length `D`, with the ground speeds `GSO`
   going on and `GSH` returning.
@@ -3436,6 +3438,8 @@ D=1722_nmi GSO=502_knot GSH=384_knot
 
 The point of no return is the farthest point from which the aircraft can
 still return to its departure with the fuel on board.
+
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
 
 * Main results: the time `TPNR` and distance `DPNR` from departure to the
   point of no return, for an endurance `Endur`, the usable fuel without the
@@ -3763,6 +3767,8 @@ FPA=-3_° GS=90_knot
 
 Where to start the descent, to reach a target altitude along a given flight
 path angle, or at a given vertical speed.
+
+![Top of descent](img/TopOfDescent.bmp)
 
 * Main results: the distance `DTOD` of the top of descent before the target,
   the vertical speed `VS` and the time `TTOD`, for a descent from `Hcr` to
