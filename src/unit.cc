@@ -657,6 +657,8 @@ static const cstring basic_units[] =
 
     "therm",    "105506000_J",          // EEC therm
     "eV",       "1.60217733E-19_J",     // electron-Volt
+    "Wh",       "3600_J",               // Watt-hour
+    "kWh",      "=",                    // Kilowatt-hour
 
     // ------------------------------------------------------------------------
     // Power menu
