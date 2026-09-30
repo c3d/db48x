@@ -1,0 +1,37 @@
+«
+@@ ============================================================
+@@ WBLoad — weight and balance of a loading.
+@@
+@@ Input:  a list of stations, one { "name" weight arm } list each.
+@@         Arms are measured from the datum, positive aft; a negative
+@@         weight removes a load, for instance the fuel burnt.
+@@ Output: the total weight Wt, the total moment Mom and the center
+@@         of gravity CG = Mom/Wt, tagged.
+@@ Weights and arms may carry units, or be plain numbers in any
+@@ consistent units.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → sta
+  «
+    sta 1 GET LIST→ DROP
+    → nam wi ai
+    «
+      wi wi ai ×
+    »
+    2 sta SIZE FOR kk
+      sta kk GET LIST→ DROP
+      → nam wi ai
+      «
+        SWAP wi + SWAP wi ai × +
+      »
+    NEXT
+    → wt mo
+    «
+      wt "Wt" →TAG
+      mo "Mom" →TAG
+      mo wt / "CG" →TAG
+    »
+  »
+»
