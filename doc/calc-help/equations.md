@@ -3973,6 +3973,8 @@ The parabolic drag polar: the drag coefficient is the drag at zero lift plus
 the drag induced by the lift, which decreases with the aspect ratio of the
 wing.
 
+![Drag polar](img/DragPolar.bmp)
+
 * Main results: the aspect ratio `AR`, the induced drag factor `Kind`, the
   drag coefficient `CD`, the lift to drag ratio `LD` and the drag `Drag`, for
   a wingspan `bw`, a wing area `Sw`, an Oswald factor `eO`, a drag
@@ -4148,6 +4150,8 @@ Entries: [Level Turn](#level turn) and [Pivotal Altitude](#pivotal altitude)
 A coordinated turn at constant altitude: the horizontal part of the lift turns
 the aircraft.
 
+![Level turn](img/LevelTurn.bmp)
+
 * Main results: the load factor `nLF`, the radius `TRad`, the rate `TRate` and
   the time `Ttrn` of a full turn, for a true airspeed `TAS` and a bank angle
   `φb`. Give `TRate=3_°/s` for the bank of a standard rate turn.
@@ -4195,6 +4199,8 @@ Entries: [Glide Distance](#glide distance) and [Minimum Sink](#minimum sink)
 
 Without engine, the aircraft glides along a path whose slope is the inverse of
 its lift to drag ratio: the glide ratio is the lift to drag ratio.
+
+![Glide](img/GlideDistance.bmp)
 
 * Main results: the flight path angle `FPA`, negative, the distance over the
   ground `Dgl`, the vertical speed `VS` and the time `Tgl`, for a height to
@@ -4459,6 +4465,8 @@ Entries: [Takeoff Ground Roll](#takeoff ground roll), [Landing Ground Roll](
 
 An estimate of the ground roll to liftoff, with the forces averaged at 70 % of
 the liftoff speed.
+
+![Takeoff roll](img/TakeoffRoll.bmp)
 
 * Main results: the stall speed `Vst`, the liftoff speed `VLO`, the average
   resistance `Rav` and the ground roll `sLO`, for the mass `Wt`, the wing area
