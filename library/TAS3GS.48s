@@ -1,0 +1,77 @@
+«
+@@ ============================================================
+@@ TAS3GS — true airspeed and wind from three GPS ground speeds.
+@@
+@@ Fly three legs at the same indicated airspeed and altitude, on
+@@ headings 120° apart, and note the ground speed of each.
+@@ Input:  H1 GS1 GS2 GS3 — the first heading (degrees if a plain
+@@         number), and the ground speeds on H1, H1+120° and H1+240°
+@@         (knots if plain numbers).
+@@ Output: the true airspeed TAS, the direction the wind comes from WD
+@@         and its speed WS, tagged.
+@@ Method: Ed Williams, Aviation Formulary, "Determining the TAS and
+@@ the wind from three GPS ground speeds"; the wind direction then
+@@ follows from the ground speeds along each heading.
+@@ Angle mode and angle units setting are restored before returning.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → hd1 gv1 gv2 gv3 amode aunits
+  «
+    hd1 IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END
+    gv1 IF DUP TypeName "unit" == THEN 1_knot CONVERT UVAL END
+    gv2 IF DUP TypeName "unit" == THEN 1_knot CONVERT UVAL END
+    gv3 IF DUP TypeName "unit" == THEN 1_knot CONVERT UVAL END
+    → h g1 g2 g3
+    «
+      g1 SQ g2 SQ + g3 SQ + 3 /
+      → vms
+      «
+        g1 SQ vms / 1 -  g2 SQ vms / 1 -  g3 SQ vms / 1 -
+        → ea eb ec
+        «
+          ea SQ eb SQ + ec SQ + 6 /
+          → mq
+          «
+            IF mq 0.25 > THEN
+              "TAS3GS: inconsistent ground speeds" DOERR
+            END
+            0.5 0.25 mq - √ +
+            → bp
+            «
+              vms bp * √  vms mq * bp / √
+              → tv wv
+              «
+                0 0
+                { } g1 + g2 + g3 +
+                → gl
+                «
+                  0 2 FOR kk
+                    gl kk 1 + GET SQ tv SQ - wv SQ - 2 tv * /
+                    h 120 kk * + Ⓒπ →Num * 180 /
+                    → pp hk
+                    «
+                      pp hk SIN * 2 * 3 / +
+                      SWAP pp hk COS * 2 * 3 / + SWAP
+                    »
+                  NEXT
+                »
+                → wn we
+                «
+                  tv 1_knot * "TAS" →TAG
+                  '(-we)∠(-wn)' EVAL 180 * Ⓒπ →Num / 360 + 360 MOD
+                  1_° * "WD" →TAG
+                  wv 1_knot * "WS" →TAG
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

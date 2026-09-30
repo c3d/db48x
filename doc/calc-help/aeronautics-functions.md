@@ -8,7 +8,7 @@ equation solver. Its equations are in the Aeronautics section of the Equation
 Library.
 
 * [Flight Management](#flight-managementlibrary): weight and balance, and
-  the flight plan.
+  the flight plan, and the check of the airspeed indicator.
 
 ## Flight ManagementLibrary
 
@@ -20,7 +20,9 @@ plan along a route:
 * [WBEnv](#wbenv): whether a loading lies within the center of gravity
   envelope, and the forward and aft limits at its weight;
 * [FPlan](#fplan): the flight plan along the route, leg by leg, with the
-  wind: courses, headings, ground speeds, times and fuel.
+  wind: courses, headings, ground speeds, times and fuel;
+* [TAS3GS](#tas3gs): the true airspeed and the wind from three GPS ground
+  speeds, to check the airspeed indicator.
 
 ## WBLoad
 
@@ -134,4 +136,37 @@ The same route with one wind, from 270° at 30 kt, for the whole flight:
 ```
 
 See also: [WPLegs](#wplegs), the legs of the route without the wind.
+
+## TAS3GS
+
+The true airspeed and the wind from three GPS ground speeds: a way to check
+the airspeed indicator in flight, with nothing but a GPS. Fly three legs at
+the same indicated airspeed and altitude, on headings 120° apart, and note
+the ground speed of each.
+
+Stack: `H1` `GS1` `GS2` `GS3` ▶ `TAS` `WD` `WS`, tagged. `H1` is the first
+heading, in degrees if a plain number, and `GS1`, `GS2`, `GS3` the ground
+speeds on `H1`, `H1+120°` and `H1+240°`, in knots if plain numbers. `TAS` is
+the true airspeed, `WD` the direction the wind comes from and `WS` its
+speed.
+
+The true airspeed and the wind speed come from the method of Ed Williams
+(*Aviation Formulary*); the wind direction then follows from the ground
+speed along each heading. Ground speeds too far from each other to come
+from one airspeed and one wind are an error.
+
+At 120 kt, with a wind from 040° at 20 kt, the ground speeds on 000°, 120°
+and 240° are 105.47, 118.18 and 138.96 kt:
+
+```rpl
+0 105.4659 118.17975 138.96218 ⓁTAS3GS
+@ Expecting WS:19.99976 68283 knot
+```
+
+The same flight on 030°, 150° and 270°:
+
+```rpl
+30_° 100.36395 128.22518 133.73623 ⓁTAS3GS
+@ Expecting WS:19.99999 89702 knot
+```
 
