@@ -1,0 +1,81 @@
+«
+@@ ============================================================
+@@ TORoll — takeoff ground roll, integrated step by step.
+@@
+@@ Input:  Wt Sw rho — the mass, the wing area and the air density;
+@@         CL CD mu — the lift and drag coefficients during the roll
+@@         and the rolling friction coefficient;
+@@         Thr — the thrust, or a list { T0 TLO } of the thrust at
+@@         rest and at liftoff, varying linearly with the airspeed;
+@@         VLO HW — the liftoff airspeed and the headwind, negative
+@@         for a tailwind.
+@@         Values with units are converted; plain numbers are taken
+@@         in SI units (kg, m², kg/m³, N, m/s).
+@@ Output: the ground speed at liftoff GSLO, the duration tLO and the
+@@         ground roll sLO, tagged.
+@@ Method: the acceleration is (T − D − mu·(W − L))/m at the airspeed
+@@ V = GS + HW; the distance and the time are the integrals of GS/a
+@@ and 1/a over the ground speed, by Simpson's rule on 100 steps.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → wt sw rho clr cdr muf thr vlo hw
+  «
+    wt IF DUP TypeName "unit" == THEN UBASE UVAL END
+    sw IF DUP TypeName "unit" == THEN UBASE UVAL END
+    rho IF DUP TypeName "unit" == THEN UBASE UVAL END
+    thr IF DUP TypeName "list" == THEN LIST→ DROP ELSE DUP END
+    IF DUP TypeName "unit" == THEN UBASE UVAL END SWAP
+    IF DUP TypeName "unit" == THEN UBASE UVAL END SWAP
+    vlo IF DUP TypeName "unit" == THEN UBASE UVAL END
+    hw IF DUP TypeName "unit" == THEN UBASE UVAL END
+    → mk sa ra t0 t1 vl vw
+    «
+      IF vl vw ≤ THEN "TORoll: headwind above the liftoff speed" DOERR END
+      vl vw - 100 /
+      → hh
+      «
+        0 0
+        0 100 FOR ii
+          ii hh *
+          → vg
+          «
+            vg vw +
+            → va
+            «
+              ra sa * va SQ * 2 /
+              → qs
+              «
+                t0 t1 t0 - va * vl / +
+                qs cdr * -
+                muf mk 9.80665 * qs clr * - * -
+                mk /
+              »
+            »
+            → acc
+            «
+              IF acc 0 ≤ THEN
+                "TORoll: the thrust cannot reach the liftoff speed" DOERR
+              END
+              IF ii 0 == ii 100 == OR THEN 1
+              ELSE IF ii 2 MOD THEN 4 ELSE 2 END END
+              → wf
+              «
+                wf vg * acc /  wf acc /
+              »
+            »
+          »
+          ROT + ROT ROT + SWAP
+        NEXT
+        hh 3 / * SWAP hh 3 / * SWAP
+        → sd td
+        «
+          vl vw - 1_m/s * 1_knot CONVERT "GSLO" →TAG
+          td 1_s * "tLO" →TAG
+          sd 1_m * 1_ft CONVERT "sLO" →TAG
+        »
+      »
+    »
+  »
+»

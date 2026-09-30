@@ -9,6 +9,8 @@ Library.
 
 * [Flight Management](#flight-managementlibrary): weight and balance, and
   the flight plan, and the check of the airspeed indicator.
+* [Aircraft Performance](#aircraft-performancelibrary): the drag polar
+  from measurements, the speeds of best climb, and the takeoff roll.
 
 ## Flight ManagementLibrary
 
@@ -170,3 +172,134 @@ The same flight on 030°, 150° and 270°:
 @ Expecting WS:19.99999 89702 knot
 ```
 
+## Aircraft PerformanceLibrary
+
+The performance of the aircraft from its drag polar, where the equation
+solver is not enough: a least squares fit, an optimum, an integration.
+
+* [PolarFit](#polarfit): the drag polar fitted to measured points;
+* [ClimbVxVy](#climbvxvy): the speeds of best rate and of best angle of
+  climb of a propeller airplane;
+* [TORoll](#toroll): the takeoff ground roll, integrated step by step, with
+  the wind and a thrust that falls with the speed.
+
+## PolarFit
+
+The parabolic drag polar `CD = CD0 + Kind·CL²` that best fits a list of
+measured lift and drag coefficients, by least squares on `CL²`, and the
+maximum lift to drag ratio that follows.
+
+Stack: a list of points, one `{ CL CD }` list each ▶ `CD0` `Kind` `LDmax`
+`CLmd`, tagged. At least two points must have different lift coefficients.
+Flight test measurements give the coefficients through the Lift and Drag
+Polar equations of the Equation Library: the lift is the weight, the drag is
+the thrust in level flight.
+
+Three points taken exactly on the polar `CD = 0.03 + 0.055·CL²` of a
+textbook example give it back (J. G. Leishman, *Introduction to Aerospace
+Flight Vehicles*, Embry-Riddle Aeronautical University, *Takeoff & Landing
+Performance*):
+
+```rpl
+{ { 0.2 0.0322 } { 0.4 0.0388 } { 0.6 0.0498 } } ⓁPolarFit
+@ Expecting CLmd:0.73854 89458 76
+```
+
+Five points of a light airplane, read to three significant digits:
+
+```rpl
+{ { 0.3 0.0248 } { 0.5 0.0332 } { 0.7 0.0459 } { 0.9 0.0628 } { 1.1 0.0839 } } ⓁPolarFit
+@ Expecting CLmd:0.61600 61969 29
+```
+
+See also: the Drag Polar and Characteristic Speeds equations of the Equation
+Library.
+
+## ClimbVxVy
+
+The speed `Vy` of the best rate of climb, which gains the most height in a
+given time, and the speed Vx of the best angle of climb, which gains the
+most height in a given distance, for a propeller airplane whose engine gives
+a constant power.
+
+Stack: `CD0` `Kind` `Wt` `Sw` `ρa` `Pav` `ηp` `CLmax` ▶ `Vy` `VSmax` Vx
+`FPAmax`, tagged: the drag polar, the mass, the wing area, the air density,
+the shaft power available, the propeller efficiency and the maximum lift
+coefficient. Values with units are converted; plain numbers are in SI units.
+
+`Vy` is the speed of minimum power. Vx is the root of
+`2·a·Vx⁴ + ηp·Pav·Vx − 2·b = 0`, where the drag is `a·V² + b/V²`. With this
+model, Vx often falls below the stall speed: the result is then the stall
+speed, tagged `VxStall`, as the handbook says that Vx is frequently just
+above the stall speed (*Pilot's Handbook of Aeronautical Knowledge*,
+FAA-H-8083-25C, chapter 11).
+
+An airplane of 2 550 lb, with a wing of 174 ft², a polar of `CD0` 0.0319 and
+`Kind` 0.0610515, 180 hp at 0.8 of efficiency, at sea level. The source finds
+1 257 ft/min at 58.8 kt (J. G. Leishman, *Climbing, Ceiling & Gliding*); the
+best angle is at the stall speed:
+
+```rpl
+0.0319 0.0610515 2550_lb 174_ft^2 1.225 180_hp 0.8 1.6 ⓁClimbVxVy
+@ Expecting FPAmax:13.66030 53597 °
+```
+
+The same airplane with half the power, in air of 0.9 kg/m³: Vx is now
+above the stall speed of 60.7 kt:
+
+```rpl
+0.0319 0.0610515 2550_lb 174_ft^2 0.9 90_hp 0.8 1.6 ⓁClimbVxVy
+DROP SWAP DROP
+@ Expecting Vx:61.43051 8191 knot
+```
+
+See also: the Rate & Angle of Climb and Characteristic Speeds equations of
+the Equation Library.
+
+## TORoll
+
+The takeoff ground roll, integrated step by step over the ground speed, with
+the wind and a thrust that changes with the airspeed, as a propeller thrust
+does.
+
+Stack: `Wt` `Sw` `ρa` `CL` `CD` `μr` `Thr` `VLO` `HW` ▶ `GSLO` `tLO` `sLO`,
+tagged: the mass, the wing area, the air density, the lift and drag
+coefficients during the roll, the rolling friction, the thrust, the liftoff
+airspeed and the headwind, negative for a tailwind. `Thr` is a thrust, or a
+list `{ T0 TLO }` of the thrust at rest and at liftoff. Values with units are
+converted; plain numbers are in SI units. The results are the ground speed
+at liftoff, the duration and the length of the roll.
+
+The acceleration is `(T − D − μr·(W − L))/m`; the distance and the time are
+the integrals of `GS/a` and `1/a` over the ground speed, by Simpson's rule.
+The Takeoff Ground Roll equation estimates the same distance with the forces
+averaged at 70 % of the liftoff speed.
+
+An airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², rolling
+at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway, lifting off at
+176.7 ft/s. The exact solution for a constant thrust is 3 289.2 ft and
+36.1 s:
+
+```rpl
+6600_lb 160_ft^2 0.002378_slug/ft^3 0.4 0.0388 0.02 1200_lbf 176.702_ft/s 0_knot ⓁTORoll
+@ Expecting sLO:3 289.14666 856 ft
+```
+
+The same takeoff against a headwind of 10 kt. The rule of the square of the
+speed ratio gives 2 678 ft:
+
+```rpl
+6600_lb 160_ft^2 0.002378_slug/ft^3 0.4 0.0388 0.02 1200_lbf 176.702_ft/s 10_knot ⓁTORoll
+@ Expecting sLO:2 707.12691 754 ft
+```
+
+With a propeller thrust falling from 1 300 lbf at rest to 1 000 lbf at
+liftoff, at sea level:
+
+```rpl
+6600_lb 160_ft^2 1.225 0.4 0.0388 0.02 { 1300_lbf 1000_lbf } 104.7_knot 0 ⓁTORoll
+@ Expecting sLO:3 725.45580 94 ft
+```
+
+See also: the Takeoff Ground Roll and Wind on Runway Distances equations of
+the Equation Library.

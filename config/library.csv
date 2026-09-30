@@ -79,3 +79,9 @@
 	"WBEnv",		"="
 	"FPlan",		"="
 	"TAS3GS",	"="
+
+"Aeronautics/Aircraft Performance"
+
+	"PolarFit",	"="
+	"ClimbVxVy",	"="
+	"TORoll",	"="
