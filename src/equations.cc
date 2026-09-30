@@ -1539,6 +1539,48 @@ static const cstring basic_equations[] =
     "  'Tdc=(Tdp_K)/(1_K)-273.15' "
     "  '(Hcb_ft)=(Tc-Tdc)·(409.0909_ft)' "
     "}",
+    // Airspeeds: speed of sound at sea level 661.4786 kt, standard pressure
+    // 1 013.25 hPa, troposphere as above.
+    "True Airspeed",  "{ "
+    "  'DRat=(1-(Hp_ft)/(1_ft)/145442.16)^5.25588·(288.15_K)/(OAT_K)' "
+    "  '(TAS_knot)=(CAS_knot)/√(DRat)' "
+    "}",
+    "Mach & True Airspeed",  "{ "
+    "  '(qc_hPa)=(1013.25_hPa)·((1+0.2·((CAS_knot)/(661.4786_knot))²)^3.5-1)' "
+    "  '(Ps_hPa)=(1013.25_hPa)·(1-(Hp_ft)/(1_ft)/145442.16)^5.25588' "
+    "  'Mach=√(5·(((qc_hPa)/(Ps_hPa)+1)^(2/7)-1))' "
+    "  'Ti=(IAT_K)/(1_K)' "
+    "  '(OAT_K)=Ti/(1+0.2·Kr·(Mach)²)·(1_K)' "
+    "  '(TAS_knot)=Mach·(661.4786_knot)·√((OAT_K)/(288.15_K))' "
+    "}",
+    // Flight path angle FPA positive in climb, negative in descent; the
+    // vertical speed VS has the same sign. 1 nmi = 6 076.11549 ft.
+    "Climb & Descent Gradient",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  'GPct=100·Grd' "
+    "  'Gft=6076.11549·Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "}",
+    "Top of Descent",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  '(ΔH_ft)=(Hcr_ft)-(Htgt_ft)' "
+    "  '(DTOD_nmi)=-(ΔH_ft)/Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "  '(TTOD_min)=(DTOD_nmi)/(GS_knot)' "
+    "}",
+    "Equal Time Point",  "{ "
+    "  '(DETP_nmi)=(D_nmi)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(TETP_h)=(DETP_nmi)/(GSO_knot)' "
+    "}",
+    "Point of No Return",  "{ "
+    "  '(TPNR_h)=(Endur_h)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(DPNR_nmi)=(TPNR_h)·(GSO_knot)' "
+    "}",
+    "Time & Distance to Station",  "{ "
+    "  '(TSta_min)=(Tbc_s)·(60_°)/(ΔBrg_°)' "
+    "  '(DSta_nmi)=(GS_knot)·(TSta_min)' "
+    "}",
+    "Hydroplaning Speed",  "'(Vhp_knot)=(9_knot)·√((Ptire_psi)/(1_psi))'",
 
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)

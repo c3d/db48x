@@ -3151,7 +3151,8 @@ TC=265_° GS=15_knot WD=5_° WS=3_knot
 The `Aeronautics` section gathers the calculations of aircraft operation. Its
 first part, [Flight Management](#flight management), holds the pilot's
 calculations from the flight manual and the weather: wind components on a
-runway, time, speed and distance, fuel, weight and balance, and altitudes.
+runway, time, speed and distance, fuel, weight and balance, altitudes,
+airspeeds, climb and descent, and the decision points of a flight.
 
 **Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
 lb, ft, inHg); every equation also accepts SI units.
@@ -3167,7 +3168,7 @@ standard atmosphere, valid up to 36 089 ft. Wind directions are where the wind
 comes **from**, as in [Navigation](#navigation), and the same names are used
 for the same quantities: `WD`, `WS`, `GS`, `D`.
 
-The 53 variables in the Flight Management section are:
+The 84 variables in the Flight Management section are:
 
 * `WS`: Wind speed (dim.: speed)
 * `WD`: Direction the wind comes **from**
@@ -3225,6 +3226,34 @@ The 53 variables in the Flight Management section are:
 * `Tdp`: Dew point (dim.: temperature)
 * `Tdc`: Dew point in °C, as a plain number
 * `Hcb`: Height of the base of cumulus clouds above the ground (dim.: length)
+* `CAS`: Calibrated airspeed (dim.: speed)
+* `TAS`: True airspeed (dim.: speed)
+* `DRat`: Density ratio, the air density over its sea level standard value
+* `qc`: Impact pressure, total minus static pressure (dim.: pressure)
+* `Ps`: Static pressure (dim.: pressure)
+* `Mach`: Mach number
+* `IAT`: Indicated air temperature, read in flight (dim.: temperature)
+* `Kr`: Recovery factor of the temperature probe, 0.7 to 1
+* `Ti`: Indicated air temperature in K, as a plain number
+* `FPA`: Flight path angle, positive in climb, negative in descent
+* `Grd`: Gradient, the tangent of the flight path angle
+* `GPct`: Gradient in percent
+* `Gft`: Gradient in feet per nautical mile
+* `VS`: Vertical speed, with the sign of `FPA` (dim.: speed)
+* `Hcr`: Cruise altitude (dim.: length)
+* `Htgt`: Target altitude, at the end of the descent (dim.: length)
+* `ΔH`: Height to lose (dim.: length)
+* `DTOD`: Distance of the top of descent from the target (dim.: length)
+* `TTOD`: Time from the top of descent to the target (dim.: time)
+* `GSO`: Ground speed going on to the destination (dim.: speed)
+* `GSH`: Ground speed returning home (dim.: speed)
+* `DETP`, `TETP`: Distance and time from departure to the equal time point (dim.: length; time)
+* `TPNR`, `DPNR`: Time and distance from departure to the point of no return (dim.: time; length)
+* `Tbc`: Time for the bearing of a station to change by `ΔBrg` (dim.: time)
+* `ΔBrg`: Change of the bearing of the station
+* `TSta`, `DSta`: Time and distance to the station (dim.: time; length)
+* `Ptire`: Tire pressure of the main wheels (dim.: pressure)
+* `Vhp`: Speed above which dynamic hydroplaning can start (dim.: speed)
 
 * References:
   [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
@@ -3236,7 +3265,11 @@ The 53 variables in the Flight Management section are:
   [5] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
   chapters 8, *Flight Instruments*, and 12, *Weather Theory* ;
   [6] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
-  Embry-Riddle Aeronautical University, *Determination of Altitude*.
+  Embry-Riddle Aeronautical University, *Determination of Altitude* and
+  *Airspeed* ;
+  [7] FAA, *Terminal Procedures Publication*, legend, tables *Rate of Climb*
+  and *Rate of Descent* ;
+  [8] E. Davenport, *Equal Time Points*, code7700.com.
 
 ### Flight Management
 
@@ -3248,7 +3281,13 @@ The pilot's calculations from the flight manual and the weather:
 [CG in % MAC](#cg in % mac), [Pressure Altitude](#pressure altitude),
 [ISA Deviation](#isa deviation), [Density Altitude](#density altitude),
 [Humidity Correction](#humidity correction), [True Altitude](#true altitude)
-and [Cloud Base](#cloud base).
+[Cloud Base](#cloud base), [True Airspeed](#true airspeed),
+[Mach & True Airspeed](#mach & true airspeed),
+[Climb & Descent Gradient](#climb & descent gradient),
+[Top of Descent](#top of descent), [Equal Time Point](#equal time point),
+[Point of No Return](#point of no return),
+[Time & Distance to Station](#time & distance to station) and
+[Hydroplaning Speed](#hydroplaning speed).
 
 #### Headwind & Crosswind
 
@@ -3538,4 +3577,168 @@ the temperature and the dew point converge by about 4.4 °F per 1 000 ft.
 OAT=85_°F Tdp=71_°F
 @ Expecting [ Tc=29.44444 44444 Tdc=21.66666 66667 Hcb=3 181.81811 111 ft ]
 'ROOT(ⒺCloud Base;[Tc;Tdc;Hcb];[1;1;1_ft])'
+```
+
+#### True Airspeed
+
+The true airspeed `TAS` from the calibrated airspeed `CAS`, at low speed
+(Mach below 0.3, where the calibrated and equivalent airspeeds are the same).
+The airspeed indicator measures the dynamic pressure, which depends on the
+air density: the thinner the air, the faster the aircraft for the same
+reading.
+
+* Main result: `TAS` for a pressure altitude `Hp` and an outside air
+  temperature `OAT`, with the density ratio `DRat` as a step.
+* The rule of thumb adds 2 % per 1 000 ft. The correction from indicated to
+  calibrated airspeed comes from the table of the flight manual.
+
+* To calculate: `[DRat;TAS]` (Density ratio; True airspeed) at 4 200 ft and 68.4 °F, for a calibrated airspeed of 134.9 kt. The source rounds the density ratio to 0.841, and finds 147.1 kt [6]:
+```rpl
+Hp=4200_ft OAT=68.4_°F CAS=134.9_knot
+@ Expecting [ DRat=0.84200 27064 51 TAS=147.01281 9202 knot ]
+'ROOT(ⒺTrue Airspeed;[DRat;TAS];[1;1_knot])'
+```
+
+#### Mach & True Airspeed
+
+The Mach number and the true airspeed from the calibrated airspeed, with the
+compressibility of the air, as an air data computer does. Above about 200 kt
+the low speed formula of True Airspeed is no longer accurate.
+
+* Main results: the Mach number `Mach`, the outside air temperature `OAT` and
+  the true airspeed `TAS`, for a calibrated airspeed `CAS`, a pressure
+  altitude `Hp` and the indicated air temperature `IAT` read by a probe of
+  recovery factor `Kr`.
+* Steps: the impact pressure `qc`, the static pressure `Ps`, and `Ti`, the
+  indicated temperature in K as a plain number.
+* The `Mach Number` equation of the Waves section computes the same Mach
+  number from the speed of sound.
+
+* To calculate: `[qc;Ps;Mach;Ti;OAT;TAS]` (Impact pressure; Static pressure; Mach; Temperatures; True airspeed) at 250 kt, 10 000 ft, with an indicated temperature of 2 °C and a recovery factor of 0.8. The source gives Mach 0.4523, −6.72 °C and 287.7 kt [2]:
+```rpl
+CAS=250_knot Hp=10000_ft IAT=2_°C Kr=0.8
+@ Expecting [ qc=104.98222 864 hPa Ps=696.81641 3877 hPa Mach=0.45227 51142 87 Ti=275.15 OAT=266.43015 5408 K TAS=287.67416 9311 knot ]
+'ROOT(ⒺMach & True Airspeed;[qc;Ps;Mach;Ti;OAT;TAS];[1_hPa;1_hPa;0.5;1;1_K;1_knot])'
+```
+
+#### Climb & Descent Gradient
+
+The gradient of a flight path, in its three usual forms, and the vertical
+speed that follows it at a given ground speed.
+
+* Main results: the gradient `Grd`, in percent `GPct` and in feet per
+  nautical mile `Gft`, and the vertical speed `VS`, for a flight path angle
+  `FPA` at a ground speed `GS`.
+* `FPA` and `VS` are positive in climb and negative in descent: one entry
+  serves both.
+* The rules of thumb: a 3° glide path is about 318 ft per nautical mile, and
+  its vertical speed about 5 times the ground speed.
+
+* To calculate: `[Grd;GPct;Gft;VS]` (Gradient; Percent; ft/nmi; Vertical speed) for a 3° climb at 120 kt. The FAA table gives 318 ft/nmi and 637 ft/min [7]:
+```rpl
+FPA=3_° GS=120_knot
+@ Expecting [ Grd=0.05240 77792 83 GPct=5.24077 79283 Gft=318.43571 9498 VS=636.87143 8531 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;FPA;GPct;VS]` for a departure procedure requiring 200 ft/nmi, at 120 kt. The FAA table gives 3.29 % and 400 ft/min [7]:
+```rpl
+Gft=200 GS=120_knot
+@ Expecting [ Grd=0.03291 57667 15 FPA=1.88525 38508 1 ° GPct=3.29157 66714 6 VS=399.99999 9708 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;FPA;GPct;VS];[0.1;1_°;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;GPct;Gft;VS]` for a 3° descent at 90 kt. The FAA table gives 478 ft/min [7]:
+```rpl
+FPA=-3_° GS=90_knot
+@ Expecting [ Grd=-0.05240 77792 83 GPct=-5.24077 79283 Gft=-318.43571 9498 VS=-477.65357 8899 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+#### Top of Descent
+
+Where to start the descent, to reach a target altitude along a given flight
+path angle, or at a given vertical speed.
+
+* Main results: the distance `DTOD` of the top of descent before the target,
+  the vertical speed `VS` and the time `TTOD`, for a descent from `Hcr` to
+  `Htgt` at a ground speed `GS` along the flight path angle `FPA`, negative
+  in descent. Give `VS` instead of `FPA` to descend at a set vertical speed.
+* The rule of thumb, 3 nmi per 1 000 ft, corresponds to a 3° path.
+
+* To calculate: `[Grd;ΔH;DTOD;VS;TTOD]` (Gradient; Height to lose; Distance; Vertical speed; Time) for a descent from 9 500 to 2 000 ft on a 3° path at 120 kt. The rule of thumb gives 22.5 nmi:
+```rpl
+Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
+@ Expecting [ Grd=-0.05240 77792 83 ΔH=7 500 ft DTOD=23.55263 41621 nmi VS=-636.87143 8531 ft/min TTOD=11.77631 7081 min ]
+'ROOT(ⒺTop of Descent;[Grd;ΔH;DTOD;VS;TTOD];[0.1;1_ft;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[Grd;FPA;ΔH;DTOD;TTOD]` for the same descent at 500 ft/min and 150 kt:
+```rpl
+Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
+@ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
+'ROOT(ⒺTop of Descent;[Grd;FPA;ΔH;DTOD;TTOD];[0.1;1_°;1_ft;1_nmi;1_min])'
+```
+
+#### Equal Time Point
+
+The equal time point is the point of a route from which it takes as long to
+go on to the destination as to return: the point that decides whether to
+continue or turn back after an engine failure or a medical emergency.
+
+* Main results: the distance `DETP` and time `TETP` from departure to the
+  equal time point, on a route of length `D`, with the ground speeds `GSO`
+  going on and `GSH` returning.
+
+* To calculate: `[DETP;TETP]` (Distance; Time to the equal time point) for a crossing of 1 722 nmi, at 502 kt going on and 384 kt returning. The source gives 746 nmi [8]:
+```rpl
+D=1722_nmi GSO=502_knot GSH=384_knot
+@ Expecting [ DETP=746.32957 1106 nmi TETP=1.48671 22930 4 h ]
+'ROOT(ⒺEqual Time Point;[DETP;TETP];[1_nmi;1_h])'
+```
+
+#### Point of No Return
+
+The point of no return is the farthest point from which the aircraft can
+still return to its departure with the fuel on board.
+
+* Main results: the time `TPNR` and distance `DPNR` from departure to the
+  point of no return, for an endurance `Endur`, the usable fuel without the
+  reserve, and the ground speeds `GSO` going out and `GSH` returning.
+
+* To calculate: `[TPNR;DPNR]` (Time; Distance to the point of no return) with 5 h of usable fuel, at 120 kt going out and 180 kt returning. Check: 3 h out, then 360 nmi back at 180 kt in 2 h:
+```rpl
+Endur=5_h GSO=120_knot GSH=180_knot
+@ Expecting [ TPNR=3 h DPNR=360. nmi ]
+'ROOT(ⒺPoint of No Return;[TPNR;DPNR];[1_h;1_nmi])'
+```
+
+#### Time & Distance to Station
+
+Flying across a radial, the time for the bearing of a station to change gives
+the time to fly to it: the "1 in 60" rule.
+
+* Main results: the time `TSta` and distance `DSta` to the station, when its
+  bearing changes by `ΔBrg` in the time `Tbc`, at the ground speed `GS`.
+
+* To calculate: `[TSta;DSta]` (Time; Distance to the station) when the bearing changes by 10° in 2 min, at 120 kt. The book gives 12 min [1, chapter 16]:
+```rpl
+Tbc=120_s ΔBrg=10_° GS=120_knot
+@ Expecting [ TSta=12. min DSta=24. nmi ]
+'ROOT(ⒺTime & Distance to Station;[TSta;DSta];[1_min;1_nmi])'
+```
+
+#### Hydroplaning Speed
+
+On a wet runway, above a speed that depends on the tire pressure, the tires
+can ride on a film of water and lose all braking.
+
+* Main result: the speed `Vhp` above which dynamic hydroplaning can start, for
+  the tire pressure `Ptire` of the main wheels.
+
+* To calculate: `Vhp` (Hydroplaning speed) for tires inflated to 36 psi. The book gives 54 kt [1, chapter 11]:
+```rpl
+Ptire=36_psi
+@ Expecting Vhp=54. knot
+'ROOT(ⒺHydroplaning Speed;Vhp;1_knot)'
 ```
