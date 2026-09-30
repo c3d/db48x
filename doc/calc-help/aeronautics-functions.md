@@ -222,6 +222,8 @@ given time, and the speed Vx of the best angle of climb, which gains the
 most height in a given distance, for a propeller airplane whose engine gives
 a constant power.
 
+![Climb speeds](img/ClimbSpeeds.bmp)
+
 Stack: `CD0` `Kind` `Wt` `Sw` `ρa` `Pav` `ηp` `CLmax` ▶ `Vy` `VSmax` Vx
 `FPAmax`, tagged: the drag polar, the mass, the wing area, the air density,
 the shaft power available, the propeller efficiency and the maximum lift
