@@ -1470,6 +1470,31 @@ static const cstring basic_equations[] =
     "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
     "}",
 
+    // ------------------------------------------------------------------------
+    "Aeronautics", nullptr,
+    "Aeronautics/Flight Management", nullptr,
+    // ------------------------------------------------------------------------
+    // The pilot's calculations, from the flight manual and the weather, in
+    // the units of the FAA handbooks; every equation also accepts SI units.
+    // Wind directions are where the wind comes from, as in Navigation.
+    "Headwind & Crosswind",  "{ "
+    "  '(HW_knot)=(WS_knot)·COS((WD_°)-(RWY_°))' "
+    "  '(XW_knot)=(WS_knot)·SIN((WD_°)-(RWY_°))' "
+    "}",
+    "Time Speed & Distance",  "'(D_nmi)=(GS_knot)·(ETE_h)'",
+    "Fuel Required",  "{ "
+    "  '(Trip_gal)=(FFR_gal/h)·(ETE_h)' "
+    "  '(Rsv_gal)=(FFR_gal/h)·(TRes_h)' "
+    "  '(FReq_gal)=(Taxi_gal)+(Trip_gal)+(Rsv_gal)' "
+    "  '(Extra_gal)=(FOB_gal)-(FReq_gal)' "
+    "}",
+    "Endurance & Range",  "{ "
+    "  '(Endur_h)=(FOB_gal)/(FFR_gal/h)' "
+    "  '(SpR_nmi/gal)=(GS_knot)/(FFR_gal/h)' "
+    "  '(Rng_nmi)=(SpR_nmi/gal)·(FOB_gal)' "
+    "  '(Wfuel_lb)=(FOB_gal)·(ρfuel_lb/gal)' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)

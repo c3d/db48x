@@ -3144,3 +3144,139 @@ TC=265_° GS=15_knot WD=5_° WS=3_knot
 @ Expecting [ aN=1.68124 79530 6 knot aE=-14.68145 32431 knot V=14.77740 38319 knot TH=276.53277 4288 ° WCA=11.53277 42876 ° ]
 'ROOT(ⒺRequired Heading & Speed;[aN;aE;V;TH;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
 ```
+
+
+## Aeronautics
+
+The `Aeronautics` section gathers the calculations of aircraft operation. Its
+first part, [Flight Management](#flight management), holds the pilot's
+calculations from the flight manual and the weather: wind components on a
+runway, time, speed and distance, and fuel.
+
+**Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
+lb); every equation also accepts SI units. Wind directions are where the wind
+comes **from**, as in [Navigation](#navigation), and the same names are used
+for the same quantities: `WD`, `WS`, `GS`, `D`.
+
+The 21 variables in the Flight Management section are:
+
+* `WS`: Wind speed (dim.: speed)
+* `WD`: Direction the wind comes **from**
+* `RWY`: Runway heading: runway 17 is 170°. Tower and ATIS winds are magnetic,
+  like runway headings; METAR and TAF winds are true
+* `HW`: Headwind component; negative for a tailwind (dim.: speed)
+* `XW`: Crosswind component; positive for a wind from the right (dim.: speed)
+* `D`: Distance (dim.: length)
+* `GS`: Ground speed (dim.: speed)
+* `ETE`: Estimated time en route (dim.: time)
+* `FFR`: Fuel flow (dim.: volume/time)
+* `Trip`: Fuel for the trip (dim.: volume)
+* `TRes`: Reserve time: under VFR in the United States, 30 min by day and
+  45 min by night [3] (dim.: time)
+* `Rsv`: Reserve fuel (dim.: volume)
+* `Taxi`: Fuel for start-up and taxi (dim.: volume)
+* `FReq`: Fuel required for the flight (dim.: volume)
+* `FOB`: Fuel on board (dim.: volume)
+* `Extra`: Fuel on board beyond what is required (dim.: volume)
+* `Endur`: Endurance, the flight time with the fuel on board (dim.: time)
+* `SpR`: Specific range, the distance flown per unit of fuel
+  (dim.: length/volume)
+* `Rng`: Range with the fuel on board (dim.: length)
+* `ρfuel`: Fuel density: 6 lb/gal for AVGAS, 6.8 lb/gal for Jet A and Jet A-1,
+  6.5 lb/gal for Jet B [1, chapter 10] (dim.: mass/volume)
+* `Wfuel`: Weight of the fuel on board (dim.: mass)
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 10, *Weight and Balance*, 11, *Aircraft Performance*, and 16,
+  *Navigation* ;
+  [2] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions*.
+
+### Flight Management
+
+The pilot's calculations from the flight manual and the weather:
+[Headwind & Crosswind](#headwind & crosswind),
+[Time Speed & Distance](#time speed & distance),
+[Fuel Required](#fuel required) and [Endurance & Range](#endurance & range).
+
+#### Headwind & Crosswind
+
+The components of the wind along and across a runway, which decide whether a
+takeoff or a landing stays within the crosswind the aircraft can handle.
+
+* Main results: the headwind `HW`, negative for a tailwind, and the crosswind
+  `XW`, positive for a wind from the right, for a wind of speed `WS` coming
+  from `WD` on a runway of heading `RWY`.
+* Solved the other way, the entry gives the strongest wind acceptable from a
+  given direction for a given crosswind limit.
+
+* To calculate: `[HW;XW]` (Headwind; Crosswind) for a wind from 060° at 20 kt on runway 03 [2]:
+```rpl
+WS=20_knot WD=60_° RWY=30_°
+@ Expecting [ HW=17.32050 80757 knot XW=10. knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[HW;XW]` for a wind from 140° at 25 kt on runway 17. The book reads 22 kt and 13 kt on its crosswind chart; the crosswind comes from the left [1, chapter 11, sample problem 10]:
+```rpl
+WS=25_knot WD=140_° RWY=170_°
+@ Expecting [ HW=21.65063 50946 knot XW=-12.5 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[WS;HW]` (Strongest wind; its headwind) for a demonstrated crosswind of 15 kt, with the wind 30° off the runway:
+```rpl
+XW=15_knot WD=30_° RWY=0_°
+@ Expecting [ WS=30. knot HW=25.98076 21135 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[WS;HW];[10_knot;1_knot])'
+```
+
+#### Time Speed & Distance
+
+The distance `D` flown at the ground speed `GS` during the time en route
+`ETE`. Solve it for whichever of the three is unknown.
+
+* To calculate: `ETE` (Time en route) for 210 nmi at a ground speed of 140 kt [1, chapter 16]:
+```rpl
+D=210_nmi GS=140_knot
+@ Expecting ETE=1.5 h
+'ROOT(ⒺTime Speed & Distance;ETE;1_h)'
+```
+
+#### Fuel Required
+
+The fuel needed for a flight: the trip at the fuel flow `FFR` during `ETE`,
+a reserve for the time `TRes`, and the fuel for start-up and taxi.
+
+* Main results: the trip fuel `Trip`, the reserve `Rsv`, the fuel required
+  `FReq`, and `Extra`, the fuel on board `FOB` beyond what is required.
+
+* To calculate: `Trip` (Trip fuel) for 400 nmi at 100 kt, that is 4 h, at 5 gal/h [1, chapter 16]:
+```rpl
+FFR=5_gal/h ETE=4_h
+@ Expecting Trip=20 gal
+'ROOT(ⒺFuel Required;Trip;1_gal)'
+```
+
+* To calculate: `[Trip;Rsv;FReq;Extra]` (Trip fuel; Reserve; Fuel required; Extra fuel) for a 30 min flight at 8 gal/h, with the 30 min VFR day reserve, 1 gal for taxi and 38 gal on board [1, chapter 16; 3]:
+```rpl
+FFR=8_gal/h ETE=0.5_h TRes=0.5_h Taxi=1_gal FOB=38_gal
+@ Expecting [ Trip=4. gal Rsv=4. gal FReq=9. gal Extra=29. gal ]
+'ROOT(ⒺFuel Required;[Trip;Rsv;FReq;Extra];[1_gal;1_gal;1_gal;1_gal])'
+```
+
+#### Endurance & Range
+
+How long, and how far, the fuel on board lasts.
+
+* Main results: the endurance `Endur` at the fuel flow `FFR`, the specific
+  range `SpR` at the ground speed `GS`, the range `Rng`, and the weight
+  `Wfuel` of the fuel on board for a fuel density `ρfuel`.
+
+* To calculate: `[Endur;SpR;Rng;Wfuel]` (Endurance; Specific range; Range; Fuel weight) with 38 gal of AVGAS at 6.9 gal/h and 116 mph. The book's table gives 5.5 h and 635 mi; the exact values are 5.51 h and 555.1 nmi, that is 638.8 mi [1, chapter 11, sample problem 6]:
+```rpl
+FOB=38_gal FFR=6.9_gal/h GS=116_mph ρfuel=6_lb/gal
+@ Expecting [ Endur=5.50724 63768 1 h SpR=14.60887 59508 nmi/gal Rng=555.13728 613 nmi Wfuel=228 lb ]
+'ROOT(ⒺEndurance & Range;[Endur;SpR;Rng;Wfuel];[1_h;1_nmi/gal;1_nmi;1_lb])'
+```
