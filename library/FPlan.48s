@@ -1,0 +1,100 @@
+«
+@@ ============================================================
+@@ FPlan — flight plan along the route, leg by leg.
+@@
+@@ Input:  TAS FFR wind — the true airspeed (knots if a plain number),
+@@         the fuel flow (per hour if a plain number, for instance
+@@         12_gal/h), and the wind, either one { WD WS } for the whole
+@@         route or a list with one { WD WS } per leg; WD is where the
+@@         wind comes from (degrees if a plain number), WS its speed
+@@         (knots if a plain number).
+@@ Output: a list with one { "A→B" D TC TH GS ETE fuel } list per leg,
+@@         then the totals Dist, ETE and Fuel, tagged.
+@@ The route is the variable Route, as for WPLegs. Distances and
+@@ courses are along the WGS-84 ellipsoid (VincentyInv); the wind is
+@@ corrected on the mean course of each leg, the average of its
+@@ initial and final courses, which change along a long leg.
+@@ Angle mode and angle units setting are restored before returning.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → tas ffr wnd amode aunits
+  «
+    tas IF DUP TypeName "unit" == THEN 1_knot CONVERT UVAL END
+    ffr IF DUP TypeName "unit" == THEN 1_h * END
+    'Route' RCL
+    → vt fph rtl
+    «
+      { } 0 0 0 fph *
+      1 rtl SIZE 1 - FOR ii
+        rtl ii GET LIST→ DROP
+        rtl ii 1 + GET LIST→ DROP
+        IF wnd 1 GET TypeName "list" == THEN wnd ii GET ELSE wnd END
+        LIST→ DROP
+        → nma p1 q1 nb p2 q2 wdr wsr
+        «
+          wdr IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END
+          wsr IF DUP TypeName "unit" == THEN 1_knot CONVERT UVAL END
+          p1 q1 p2 q2 ⓁVincentyInv
+          → wdd wsk dst az1 az2
+          «
+            dst 1_nmi CONVERT UVAL
+            az1 1_° CONVERT UVAL
+            az2 1_° CONVERT UVAL
+            → dn a1 a2
+            «
+              a2 a1 - 540 + 360 MOD 180 - 2 / a1 + 360 MOD
+              → tcm
+              «
+                wdd tcm - Ⓒπ →Num * 180 /
+                → dlt
+                «
+                  wsk vt / dlt SIN *
+                  → swc
+                  «
+                    IF swc ABS 1 ≥ THEN
+                      "FPlan: wind too strong for this airspeed" DOERR
+                    END
+                    swc ASIN 180 * Ⓒπ →Num /
+                    vt 1 swc SQ - √ * wsk dlt COS * -
+                    → wca gs
+                    «
+                      dn gs /
+                      → th
+                      «
+                        nma "→" + nb +
+                        dn 1_nmi *
+                        tcm 1_° *
+                        tcm wca + 360 MOD 1_° *
+                        gs 1_knot *
+                        th 1_h *
+                        th fph *
+                        7 →LIST
+                        → leg
+                        «
+                          th fph * +
+                          ROT dn + ROT th + ROT
+                          4 ROLL leg 1 →LIST + 4 ROLLD
+                        »
+                      »
+                    »
+                  »
+                »
+              »
+            »
+          »
+        »
+      NEXT
+      → dsum tsum fsum
+      «
+        dsum 1_nmi * "Dist" →TAG
+        tsum 1_h * "ETE" →TAG
+        fsum "Fuel" →TAG
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»
