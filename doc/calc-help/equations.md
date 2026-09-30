@@ -4273,6 +4273,8 @@ Drag=183.672_lbf TAS=120_knot ηp=0.85
 The excess power gives the rate of climb, the excess thrust the angle of
 climb.
 
+![Climb speeds](img/ClimbSpeeds.bmp)
+
 * Main results: the vertical speed `VS` from the power available `Pav` of the
   engine, the propeller efficiency `ηp` and the power required `Preq`; and
   the flight path angle `FPA` from the thrust `Thr` and the drag `Drag`.
