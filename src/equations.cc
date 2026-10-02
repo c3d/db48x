@@ -1400,6 +1400,331 @@ static const cstring basic_equations[] =
     "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
 
+    // ------------------------------------------------------------------------
+    "Navigation", nullptr,
+    // ------------------------------------------------------------------------
+    // Air, marine and land navigation on a spherical earth of radius Rs.
+    // Longitudes positive East, courses in [0°;360°) from true North.
+    // 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°), and (SIN(λ))∠(COS(λ))
+    // brings a longitude back into ]-180°;180°]. Each step is kept short
+    // enough to be shown by the solver above the stack.
+    "Great Circle",  "{ "
+    "  '(Δφ_°)=(φ2_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λ2_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φ2_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ_°)=2·ASIN(√(hav))' "
+    "  '(D_nmi)=(Rs_nmi)·(θ_r)/(1_r)' "
+    "  'x1=COS(φ1_°)·SIN(φ2_°)-SIN(φ1_°)·COS(φ2_°)·COS(Δλ_°)' "
+    "  '(TC1_°)=180_°+(-SIN(Δλ_°)·COS(φ2_°))∠(-x1)' "
+    "  'x2=SIN(φ1_°)·COS(φ2_°)-COS(φ1_°)·SIN(φ2_°)·COS(Δλ_°)' "
+    "  '(TC2_°)=180_°+(-SIN(Δλ_°)·COS(φ1_°))∠(x2)' "
+    "}",
+    "Great Circle Vertex",  "{ "
+    "  '(φv_°)=ACOS(ABS(COS(φ1_°)·SIN(TC1_°)))' "
+    "  '(Δλv_°)=(SIN(TC1_°)·COS(TC1_°))∠(SIN(TC1_°)²·SIN(φ1_°))' "
+    "  '(λv_°)=(SIN((λ1_°)+(Δλv_°)))∠(COS((λ1_°)+(Δλv_°)))' "
+    "  '(θv_°)=ACOS(SIN(φ1_°)/SIN(φv_°))' "
+    "  '(Dv_nmi)=(Rs_nmi)·(θv_r)/(1_r)' "
+    "}",
+    "Great Circle Destination",  "{ "
+    "  '(θ_°)=(1_r)·(D_nmi)/(Rs_nmi)' "
+    "  '(φ2_°)=ASIN(SIN(φ1_°)·COS(θ_°)+COS(φ1_°)·SIN(θ_°)·COS(TC1_°))' "
+    "  '(Δλ_°)=(SIN(TC1_°)·SIN(θ_°)·COS(φ1_°))∠(COS(θ_°)-SIN(φ1_°)·SIN(φ2_°))' "
+    "  '(λ2_°)=(SIN((λ1_°)+(Δλ_°)))∠(COS((λ1_°)+(Δλ_°)))' "
+    "}",
+    "Cross Track Error",  "{ "
+    "  '(Δφ_°)=(φP_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λP_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φP_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ1P_°)=2·ASIN(√(hav))' "
+    "  'xP=COS(φ1_°)·SIN(φP_°)-SIN(φ1_°)·COS(φP_°)·COS(Δλ_°)' "
+    "  '(TC1P_°)=180_°+(-SIN(Δλ_°)·COS(φP_°))∠(-xP)' "
+    "  '(θXT_°)=ASIN(SIN(θ1P_°)·SIN((TC1P_°)-(TC1_°)))' "
+    "  '(θAT_°)=ACOS(COS(θ1P_°)/COS(θXT_°))' "
+    "  '(XTD_nmi)=(Rs_nmi)·(θXT_r)/(1_r)' "
+    "  '(ATD_nmi)=(Rs_nmi)·(θAT_r)/(1_r)' "
+    "}",
+    "Wind Correction",  "{ "
+    "  '(WCA_°)=ASIN((WS_knot)·SIN((WD_°)-(TC_°))/(V_knot))' "
+    "  '(TH_°)=180_°+(-SIN((TC_°)+(WCA_°)))∠(-COS((TC_°)+(WCA_°)))' "
+    "  '(GS_knot)=(V_knot)·COS(WCA_°)-(WS_knot)·COS((WD_°)-(TC_°))' "
+    "}",
+    "Ground Track",  "{ "
+    "  '(gN_knot)=(V_knot)·COS(TH_°)-(WS_knot)·COS(WD_°)' "
+    "  '(gE_knot)=(V_knot)·SIN(TH_°)-(WS_knot)·SIN(WD_°)' "
+    "  '(GS_knot)=√((gN_knot)²+(gE_knot)²)' "
+    "  '(TC_°)=180_°+(-(gE_knot)/(GS_knot))∠(-(gN_knot)/(GS_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+    "Wind Finding",  "{ "
+    "  '(wN_knot)=(V_knot)·COS(TH_°)-(GS_knot)·COS(TC_°)' "
+    "  '(wE_knot)=(V_knot)·SIN(TH_°)-(GS_knot)·SIN(TC_°)' "
+    "  '(WS_knot)=√((wN_knot)²+(wE_knot)²)' "
+    "  '(WD_°)=180_°+(-(wE_knot)/(WS_knot))∠(-(wN_knot)/(WS_knot))' "
+    "}",
+    "Required Heading & Speed",  "{ "
+    "  '(aN_knot)=(GS_knot)·COS(TC_°)+(WS_knot)·COS(WD_°)' "
+    "  '(aE_knot)=(GS_knot)·SIN(TC_°)+(WS_knot)·SIN(WD_°)' "
+    "  '(V_knot)=√((aN_knot)²+(aE_knot)²)' "
+    "  '(TH_°)=180_°+(-(aE_knot)/(V_knot))∠(-(aN_knot)/(V_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Aeronautics", nullptr,
+    "Aeronautics/Flight Management", nullptr,
+    // ------------------------------------------------------------------------
+    // The pilot's calculations, from the flight manual and the weather, in
+    // the units of the FAA handbooks; every equation also accepts SI units.
+    // Wind directions are where the wind comes from, as in Navigation.
+    "Aeronautics/Flight Management/Runway", nullptr,
+    "Headwind & Crosswind",  "{ "
+    "  '(HW_knot)=(WS_knot)·COS((WD_°)-(RWY_°))' "
+    "  '(XW_knot)=(WS_knot)·SIN((WD_°)-(RWY_°))' "
+    "}",
+    "Hydroplaning Speed",  "'(Vhp_knot)=(9_knot)·√((Ptire_psi)/(1_psi))'",
+    "Aeronautics/Flight Management/Time & Distance", nullptr,
+    "Time Speed & Distance",  "'(D_nmi)=(GS_knot)·(ETE_h)'",
+    "Time & Distance to Station",  "{ "
+    "  '(TSta_min)=(Tbc_s)·(60_°)/(ΔBrg_°)' "
+    "  '(DSta_nmi)=(GS_knot)·(TSta_min)' "
+    "}",
+    "Aeronautics/Flight Management/Fuel & Endurance", nullptr,
+    "Fuel Required",  "{ "
+    "  '(Trip_gal)=(FFR_gal/h)·(ETE_h)' "
+    "  '(Rsv_gal)=(FFR_gal/h)·(TRes_h)' "
+    "  '(FReq_gal)=(Taxi_gal)+(Trip_gal)+(Rsv_gal)' "
+    "  '(Extra_gal)=(FOB_gal)-(FReq_gal)' "
+    "}",
+    "Endurance & Range",  "{ "
+    "  '(Endur_h)=(FOB_gal)/(FFR_gal/h)' "
+    "  '(SpR_nmi/gal)=(GS_knot)/(FFR_gal/h)' "
+    "  '(Rng_nmi)=(SpR_nmi/gal)·(FOB_gal)' "
+    "  '(Wfuel_lb)=(FOB_gal)·(ρfuel_lb/gal)' "
+    "}",
+    "Equal Time Point",  "{ "
+    "  '(DETP_nmi)=(D_nmi)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(TETP_h)=(DETP_nmi)/(GSO_knot)' "
+    "}",
+    "Point of No Return",  "{ "
+    "  '(TPNR_h)=(Endur_h)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(DPNR_nmi)=(TPNR_h)·(GSO_knot)' "
+    "}",
+    "Aeronautics/Flight Management/Weight & Balance", nullptr,
+    // Weight and balance: arms in inches from the datum, positive aft;
+    // a weight shifted forward has a negative distance, a weight removed a
+    // negative weight.
+    "Weight Shift",  "{ "
+    "  '(ΔCG_in)=(Wsh_lb)·(Dsh_in)/(Wt_lb)' "
+    "  '(CGn_in)=(CG_in)+(ΔCG_in)' "
+    "}",
+    "Weight Change",  "{ "
+    "  '(Wn_lb)=(Wt_lb)+(Wch_lb)' "
+    "  '(CGn_in)=((Wt_lb)·(CG_in)+(Wch_lb)·(Arm_in))/(Wn_lb)' "
+    "}",
+    "CG in % MAC",  "'PMAC=100·((CG_in)-(LEMAC_in))/(MAC_in)'",
+    "Aeronautics/Flight Management/Altitudes", nullptr,
+    // Altitudes and temperatures, in the troposphere of the standard
+    // atmosphere (below 36 089 ft): T0/L = 288.15/0.0065 m = 145 442.16 ft,
+    // L = 0.0065 K/m = 0.0019812 K/ft. Temperature differences are in K.
+    "Pressure Altitude",  "{ "
+    "  '(ΔHp_ft)=(145442.16_ft)·(1-((QNH_hPa)/(1013.25_hPa))^0.190263)' "
+    "  '(Hp_ft)=(Hind_ft)+(ΔHp_ft)' "
+    "}",
+    "ISA Deviation",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  '(ΔISA_K)=(OAT_K)-(Tstd_K)' "
+    "}",
+    "Density Altitude",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  'θr=(Tstd_K)/(OAT_K)' "
+    "  '(Hd_ft)=(Hp_ft)+(Tstd_K)/(0.0019812_K/ft)·(1-θr^0.234969)' "
+    "}",
+    "Humidity Correction",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'fe=EXP(17.3·Tc/(Tc+237))' "
+    "  'fHp=(1-6.88E-6·(Hp_ft)/(1_ft))^-5.26' "
+    "  '(ΔHd_ft)=(0.267_ft)·RH·(Tc+273)·fe·fHp' "
+    "}",
+    "True Altitude",  "{ "
+    "  '(ΔTA_ft)=((Hind_ft)-(Hstn_ft))·(ΔISA_K)/(OAT_K)' "
+    "  '(TA_ft)=(Hind_ft)+(ΔTA_ft)' "
+    "}",
+    // Two temperatures with offset units subtracted in one expression:
+    // the second is read as a difference. One step each avoids it.
+    "Cloud Base",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'Tdc=(Tdp_K)/(1_K)-273.15' "
+    "  '(Hcb_ft)=(Tc-Tdc)·(409.0909_ft)' "
+    "}",
+    "Aeronautics/Flight Management/Airspeeds", nullptr,
+    // Airspeeds: speed of sound at sea level 661.4786 kt, standard pressure
+    // 1 013.25 hPa, troposphere as above.
+    "True Airspeed",  "{ "
+    "  'DRat=(1-(Hp_ft)/(1_ft)/145442.16)^5.25588·(288.15_K)/(OAT_K)' "
+    "  '(TAS_knot)=(CAS_knot)/√(DRat)' "
+    "}",
+    "Mach & True Airspeed",  "{ "
+    "  '(qc_hPa)=(1013.25_hPa)·((1+0.2·((CAS_knot)/(661.4786_knot))²)^3.5-1)' "
+    "  '(Ps_hPa)=(1013.25_hPa)·(1-(Hp_ft)/(1_ft)/145442.16)^5.25588' "
+    "  'Mach=√(5·(((qc_hPa)/(Ps_hPa)+1)^(2/7)-1))' "
+    "  'Ti=(IAT_K)/(1_K)' "
+    "  '(OAT_K)=Ti/(1+0.2·Kr·(Mach)²)·(1_K)' "
+    "  '(TAS_knot)=Mach·(661.4786_knot)·√((OAT_K)/(288.15_K))' "
+    "}",
+    "Aeronautics/Flight Management/Climb & Descent", nullptr,
+    // Flight path angle FPA positive in climb, negative in descent; the
+    // vertical speed VS has the same sign. 1 nmi = 6 076.11549 ft.
+    "Climb & Descent Gradient",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  'GPct=100·Grd' "
+    "  'Gft=6076.11549·Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "}",
+    "Top of Descent",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  '(ΔH_ft)=(Hcr_ft)-(Htgt_ft)' "
+    "  '(DTOD_nmi)=-(ΔH_ft)/Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "  '(TTOD_min)=(DTOD_nmi)/(GS_knot)' "
+    "}",
+
+    "Aeronautics/Performance", nullptr,
+    // ------------------------------------------------------------------------
+    // The aircraft as it is: lift and drag from its drag polar, stall, load
+    // factor, turns, glide, climb, range and endurance, takeoff and landing.
+    // Wt is a mass, as in Flight Management; its weight is (Wt_lb)·Ⓒg.
+    // Equations are written force = force or speed = speed, so that the
+    // coefficients come out as plain numbers.
+    "Aeronautics/Performance/Lift & Drag", nullptr,
+    "Lift",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(qd_Pa)=(ρa_(kg/m^3))·(TAS_knot)²/2' "
+    "  '(Lift_lbf)=nLF·(Wt_lb)·Ⓒg' "
+    "  '(Lift_lbf)=(qd_Pa)·(Sw_ft²)·CL' "
+    "}",
+    "Drag Polar",  "{ "
+    "  'AR=(bw_ft)²/(Sw_ft²)' "
+    "  'Kind=1/(Ⓒπ·AR·eO)' "
+    "  'CD=CD0+Kind·(CL)²' "
+    "  'LD=CL/CD' "
+    "  '(Drag_lbf)=(Lift_lbf)/LD' "
+    "}",
+    "Characteristic Speeds",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'LDmax=1/(2·√(CD0·Kind))' "
+    "  'CLmd=√(CD0/Kind)' "
+    "  '(Vmd_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmd))' "
+    "  '(Vmp_knot)=(Vmd_knot)/(3^0.25)' "
+    "  '(Vbrj_knot)=(Vmd_knot)·(3^0.25)' "
+    "}",
+    "Aeronautics/Performance/Stall & Load Factor", nullptr,
+    "Stall Speed",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "}",
+    "Load Factor & Accelerated Stall",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(Vstn_knot)=(Vst_knot)·√(nLF)' "
+    "}",
+    "Maneuvering Speed & Weight",  "{ "
+    "  '(VA_knot)=(Vst_knot)·√(nlim)' "
+    "  '(Vadj_knot)=(Vref_knot)·√((Wt_lb)/(Wt0_lb))' "
+    "}",
+    "Pull Up",  "'(nPU-1)·Ⓒg·(Rpu_ft)=(TAS_knot)²'",
+    // 14 CFR 23.337(a)(1) before amendment 23-64 (2017), normal category
+    "Limit Load Factor",  "'nlim=MIN(3.8;2.1+24000/((Wt_lb)/(1_lb)+10000))'",
+
+    "Aeronautics/Performance/Turns", nullptr,
+    "Level Turn",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(TRad_ft)=(TAS_knot)²/(Ⓒg·TAN(φb_°))' "
+    "  '(TRate_°/s)=(1_r)·Ⓒg·TAN(φb_°)/(TAS_knot)' "
+    "  '(Ttrn_s)=(360_°)/(TRate_°/s)' "
+    "}",
+    "Pivotal Altitude",  "'(Hpv_ft)=(GS_knot)²/Ⓒg'",
+    "Aeronautics/Performance/Glide", nullptr,
+    "Glide Distance",  "{ "
+    "  'TAN(FPA_°)=-1/LD' "
+    "  '(Dgl_nmi)=(ΔH_ft)·LD·(GS_knot)/(TAS_knot)' "
+    "  '(VS_ft/min)=(TAS_knot)·SIN(FPA_°)' "
+    "  '(Tgl_min)=(Dgl_nmi)/(GS_knot)' "
+    "}",
+    "Minimum Sink",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'CLms=√(3·CD0/Kind)' "
+    "  'LDms=CLms/(CD0+Kind·(CLms)²)' "
+    "  '(Vms_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLms))' "
+    "  '(VSms_ft/min)=-(Vms_knot)·SIN(ATAN(1/LDms))' "
+    "}",
+    "Aeronautics/Performance/Climb & Power", nullptr,
+    "Power Required",  "{ "
+    "  '(Preq_hp)=(Drag_lbf)·(TAS_knot)' "
+    "  '(Psh_hp)=(Preq_hp)/ηp' "
+    "}",
+    "Rate & Angle of Climb",  "{ "
+    "  'ηp·(Pav_hp)-(Preq_hp)=(Wt_lb)·Ⓒg·(VS_ft/min)' "
+    "  '(Thr_lbf)-(Drag_lbf)=(Wt_lb)·Ⓒg·SIN(FPA_°)' "
+    "}",
+    // Rate of climb decreasing linearly with altitude, from ROC0 at sea level
+    // to zero at the absolute ceiling Habs
+    "Time to Climb & Ceilings",  "{ "
+    "  '(Hsc_ft)=(Habs_ft)·(1-(100_ft/min)/(ROC0_ft/min))' "
+    "  '(Tclb_min)=(Habs_ft)/(ROC0_ft/min)·LN(((Habs_ft)-(Hini_ft))/((Habs_ft)-(Hfin_ft)))' "
+    "}",
+    "Aeronautics/Performance/Range & Endurance", nullptr,
+    // TSFC is in 1/h: the weight of fuel per hour per unit of thrust, the
+    // value the handbooks give in lb/(lbf·h)
+    "Fuel Flow",  "{ "
+    "  '(FFm_lb/h)=(BSFC_lb/(hp*h))·(Psh_hp)' "
+    "  '(FFm_lb/h)·Ⓒg=(TSFC_1/h)·(Thr_lbf)' "
+    "  '(Endur_h)=(Wfuel_lb)/(FFm_lb/h)' "
+    "}",
+    "Breguet Range Propeller",  "'(Rng_nmi)=ηp·LD·LN((Wini_lb)/(Wfin_lb))/((BSFC_lb/(hp*h))·Ⓒg)'",
+    // Flown at a constant lift coefficient: the speed decreases with the
+    // square root of the weight
+    "Breguet Endurance Propeller",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Endur_h)=2·ηp·LD·(1/(Vfin_knot)-1/(Vini_knot))/((BSFC_lb/(hp*h))·Ⓒg)' "
+    "}",
+    // Cruise climb: constant speed and lift coefficient
+    "Breguet Jet",  "{ "
+    "  '(Endur_h)=LD·LN((Wini_lb)/(Wfin_lb))/(TSFC_1/h)' "
+    "  '(Rng_nmi)=(TAS_knot)·(Endur_h)' "
+    "}",
+    "Jet Range at Constant Altitude",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Rng_nmi)=2·LD·((Vini_knot)-(Vfin_knot))/(TSFC_1/h)' "
+    "}",
+    "Battery Range & Endurance",  "{ "
+    "  '(Endur_h)=ηe·(Ebat_(kW*h))/(Preq_hp)' "
+    "  '(Rng_nmi)=ηe·(Ebat_(kW*h))·LD/((Wt_lb)·Ⓒg)' "
+    "}",
+    "Aeronautics/Performance/Takeoff & Landing", nullptr,
+    // Forces averaged at fav·VLO (0.7 VLO, J. G. Leishman)
+    "Takeoff Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VLO_knot)=fLO·(Vst_knot)' "
+    "  '(qLO_Pa)=(ρa_(kg/m^3))·(fav·(VLO_knot))²/2' "
+    "  '(Rav_lbf)=(qLO_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qLO_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLO_ft)=(Wt_lb)·(VLO_knot)²/(2·((Thr_lbf)-(Rav_lbf)))' "
+    "}",
+    "Landing Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VTD_knot)=fTD·(Vst_knot)' "
+    "  '(qTD_Pa)=(ρa_(kg/m^3))·(fav·(VTD_knot))²/2' "
+    "  '(Rav_lbf)=(qTD_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qTD_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLD_ft)=(Wt_lb)·(VTD_knot)²/(2·(Rav_lbf))' "
+    "}",
+    "Wind on Runway Distances",  "'(sWnd_ft)=(s0_ft)·((Vref_knot)-(HW_knot))²/(Vref_knot)²'",
+    "Weight & Speed Corrections",  "{ "
+    "  'fW=((Wt_lb)/(Wt0_lb))^xW' "
+    "  'fV=((Vact_knot)/(Vref_knot))²' "
+    "  '(sCor_ft)=(s0_ft)·fW·fV' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
