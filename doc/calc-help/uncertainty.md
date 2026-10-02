@@ -32,6 +32,9 @@ Tools for measured values and their uncertainties, whether written as bounds
 * [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
   for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
   for how two intervals sit on the line.
+* [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
+  model by random draws, with any distribution for each input:
+  [MCPropagate](#mcpropagate).
 
 
 ## RoundingLibrary
@@ -460,3 +463,133 @@ the unit of X. `a±σb` values are refused, as for ΔConcord.
 2 1…3 ⓁRngRel
 @ Expecting "X containedBy Y"
 ```
+
+
+## Monte CarloLibrary
+
+When the model is not linear, when the inputs are not normal, or when the
+result is not symmetric, the usual propagation formula is only an
+approximation. The Monte Carlo method draws values of the inputs at random,
+computes the model for each draw, and reads the result on the values obtained.
+
+* [MCPropagate](#mcpropagate): the mean, the standard uncertainty and the 95 %
+  coverage interval of a model of several inputs, each with its own
+  distribution.
+
+## MCPropagate
+
+Propagation of uncertainty by the Monte Carlo method, as described in
+Supplement 1 of the GUM (JCGM 101:2008).
+
+This is a light version of what the NIST Uncertainty Machine does. That
+machine draws from 100 000 to 5 million values, which a calculator cannot do.
+MCPropagate is made for a few thousand draws, best run on the simulator, on a
+phone or on a computer. In return, each input can follow any of the 30
+distributions of the Probability section, where the Uncertainty Machine
+offers 16.
+
+Stack: F Vars Vals M ▶ N, the 95 % interval, Y±σu. F is the model, an
+expression of the names listed in Vars, or a program that takes one value per
+input from the stack. Vals lists the inputs in the same order, and M is the
+number of draws.
+
+The type of each input tells its distribution:
+
+* a standard deviation, like 10±σ1: normal;
+* bounds, like 9…11, 10±1 or 10±10%: rectangular between the bounds, the usual
+  choice for a Type B evaluation;
+* a program that returns one draw, like « 10 1 ⓁLgNrmRand »: any distribution;
+  every distribution of the Probability section has such a Rand function;
+* a plain number: an exact value.
+
+Inputs may carry units. The inputs are independent: correlations are not
+handled yet.
+
+The results are the number of draws used, tagged N; the interval that leaves
+2.5 % of the draws on each side, tagged 95%; and on the first level the mean
+and the standard deviation of the draws, as Y±σu.
+
+With M = 0, MCPropagate stops by itself when the mean and the uncertainty are
+stable to two significant digits of the uncertainty, after 20 000 draws, or
+after one minute, whichever comes first. A distribution with a long tail may
+never be stable: N then tells where it stopped.
+
+Each run gives a slightly different result, and this is how to judge its
+stability. The examples below first set the seed of the random generator, so
+that they always give the same result; leave that line out for real use.
+
+**Example 1.** One distribution alone: the model is the variable itself. A
+rectangular distribution between 9 and 11 has a mean of 10 and a standard
+deviation of 1/√3 = 0.577:
+
+```rpl
+12345 RDZ
+'x' { x } { '9…11' } →Num 2000 ⓁMCPropagate
+@ Expecting 10.02378 18042±σ0.58487 21349 4
+```
+
+**Example 2.** The sum of two normal inputs. The exact result is 30±σ2.236:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 2000 ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
+```
+
+**Example 3.** The product of a rectangular input and a normal one:
+
+```rpl
+12345 RDZ
+'a*b' { a b } { '9…11' 10±σ1 } →Num 2000 ⓁMCPropagate
+@ Expecting 100.26278 5406±σ11.39132 08051
+```
+
+**Example 4.** Inputs with units: a resistance from a voltage and a current.
+
+```rpl
+12345 RDZ
+'V/I' { V I } { '10±σ0.1_V' '5±σ0.05_A' } →Num 2000 ⓁMCPropagate
+@ Expecting 1.99888 76261 4±σ0.02860 28043 8 V/A
+```
+
+**Example 5.** A model that is not linear. For the square of a normal input
+centered on zero, the propagation formula gives 0±σ0, since the derivative is
+zero there. The true mean is 1, the standard deviation 1.414, and the interval
+is far from symmetric:
+
+```rpl
+12345 RDZ
+'x^2' { x } { 0±σ1 } 2000 ⓁMCPropagate
+@ Expecting 0.97201 48896 25±σ1.40367 28151 1
+```
+
+**Example 6.** Any distribution, through its draw program: here a lognormal
+distribution. The draw programs are slower than the normal and rectangular
+inputs, about 60 draws per second on the simulator:
+
+```rpl
+12345 RDZ
+'x' { x } { « 0 1 ⓁLgNrmRand » } 500 ⓁMCPropagate
+@ Expecting 1.88793 72628 2±σ2.38766 59582 6
+```
+
+The same distribution is obtained much faster as the exponential of a normal
+input, with the model 'exp(x)' and the input 0±σ1.
+
+**Example 7.** Automatic stop, with M = 0. Here the result is stable after
+8 500 draws:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 0 ⓁMCPropagate
+@ Expecting 30.03900 15233±σ2.25391 96331 3
+```
+
+A model given as a program takes its values from the stack, and the list of
+names is empty: « * » { } { 10±σ1 '4±0.5' } →Num 1000 ⓁMCPropagate.
+
+A model that contains a constant, like 'm*Ⓒg*h', is evaluated by
+substitution, which is slower.
+
+See also: the Rand functions of the Probability section, and the Rounding
+functions to present the result.
