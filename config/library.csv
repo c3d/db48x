@@ -429,6 +429,7 @@
 	"σRf",	"=/library/Uncertainty/SigRf.48s"
 	"σRFxjxi",	"=/library/Uncertainty/SigRFxjxi.48s"
 	"ΔRf",	"=/library/Uncertainty/DeltaRf.48s"
+	"ΔRFxjxi",	"=/library/Uncertainty/DeltaRFxjxi.48s"
 	"Exmnf",	"=/library/Uncertainty/Exmnf.48s"
 
 "Uncertainty/Monte Carlo"

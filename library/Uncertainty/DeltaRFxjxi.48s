@@ -1,0 +1,225 @@
+«
+@@ ============================================================
+@@ ΔRFxjxi — interval arithmetic for a function of several
+@@ variables: the range of F over a box.
+@@
+@@ Input:  'F' Xn … X2 X1, where F is an expression of the names
+@@         x1 … xn, and each Xj is an interval a…b, a±b or a±p%,
+@@         or a plain number for an exact value, with or without
+@@         units; X1 is on the first level.
+@@ Output: the smallest and largest values of F over the box, as
+@@         a…b when all the intervals are a…b, as a±b otherwise.
+@@ Method: F is evaluated at the 2^n vertices of the box; then a
+@@ coordinate search, from the centre and from the best vertex,
+@@ improves the minimum and the maximum one variable at a time
+@@ (a scan of 9 points along the whole interval of that variable,
+@@ refined by a golden section search), until nothing improves.
+@@ An extremum inside the box, on a face or on an edge is found
+@@ this way, one per subspace, as long as the intervals are small
+@@ enough for F to have few extrema; the search is not a proof.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ Find F: the first expression down the stack
+  0
+  Depth 1 - 1 Swap For j
+    If Dup 0 == Then
+      If j 1 + Pick TypeName "expression" == Then Drop j End
+    End
+  Next
+  If Dup 1 ≤ Then "ΔRFxjxi: an expression F, then its values" DoError End
+  1 -
+  → nv
+  «
+    nv →List Swap
+    → vls fx
+    «
+      @ The names x1 … xn of F, in order
+      0
+      { } 1 nv For j 0 + Next
+      'fx' Rcl XVars
+      → nms lnm
+      «
+        1 lnm Size For kk
+          lnm kk Get Dup →Text
+          → ev etx
+          «
+            1 30 For j
+              If etx "x" j →Text + == etx "'x" j →Text + "'" + == Or Then
+                j Max
+                If j nv ≤ Then nms j 'ev' Rcl Put 'nms' Store End
+              End
+            Next
+          »
+        Next
+        nms
+      »
+      Swap
+      If nv ≠ Then "ΔRFxjxi: F and the number of values differ" DoError End
+      → nms
+      «
+        @ The bounds of each variable, and the list x1 c1 … xn cn at the centre
+        { } { } { } 1
+        → lov hiv l0 allr
+        «
+          1 nv For j
+            vls nv j - 1 + Get
+            → xv
+            «
+              1 xv
+              If xv TypeName "unit" == Then Drop Drop 1 xv →Unit xv UVal End
+              Dup TypeName
+              → un iv tn
+              «
+                Case
+                  tn "range" == Then iv Explode End
+                  tn "drange" == Then
+                    iv Explode → cv dv « cv dv - cv dv + » 0 'allr' Store
+                  End
+                  tn "prange" == Then
+                    iv Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - cv dv + » »
+                    0 'allr' Store
+                  End
+                  tn "uncertain" == Then
+                    "ΔRFxjxi works on bounds; use σRFxjxi for a±σb" DoError
+                  End
+                  iv iv
+                End
+                un * Swap un * Swap
+                → lo hi
+                «
+                  lov lo + 'lov' Store
+                  hiv hi + 'hiv' Store
+                  l0 nms j Get + lo hi + 2 / + 'l0' Store
+                »
+              »
+            »
+          Next
+
+          @ The 2^n vertices
+          'fx' Rcl l0 Where →Num Dup l0 l0
+          → vmn vmx lmn lmx
+          «
+            0 2 nv ^ 1 - For vk
+              l0
+              1 nv For j
+                2 j *
+                If vk 2 j 1 - ^ / IP 2 Mod 1 == Then hiv j Get Else lov j Get End
+                Put
+              Next
+              → lcur
+              «
+                'fx' Rcl lcur Where →Num
+                → fv
+                «
+                  If fv vmn < Then fv 'vmn' Store lcur 'lmn' Store End
+                  If fv vmx > Then fv 'vmx' Store lcur 'lmx' Store End
+                »
+              »
+            Next
+
+            @ Coordinate search for the minimum (sgn = -1) and the maximum
+            -1 1 For sgn
+              l0
+              If sgn 0 > Then lmx Else lmn End
+              2 →List
+              → sts
+              «
+                1 2 For si
+                  sts si Get
+                  'fx' Rcl Over Where →Num sgn *
+                  → lcur bst
+                  «
+                    1 1
+                    → imp cyc
+                    «
+                      While imp cyc 6 ≤ And Repeat
+                        0 'imp' Store
+                        1 nv For j
+                          lov j Get hiv j Get
+                          → lo hi
+                          «
+                            If lo hi ≠ Then
+                              hi lo - 8 /
+                              → hs
+                              «
+                                @ Scan of 9 points along xj
+                                lcur 2 j * lo Put 'fx' Rcl Swap Where →Num sgn * 0
+                                → bg bk
+                                «
+                                  1 8 For tk
+                                    lcur 2 j * lo tk hs * + Put 'fx' Rcl Swap Where →Num sgn *
+                                    If Dup bg > Then 'bg' Store tk 'bk' Store Else Drop End
+                                  Next
+                                  @ Golden section around the best point
+                                  lo bk 1 - 0 Max hs * +
+                                  lo bk 1 + 8 Min hs * +
+                                  → xa xb
+                                  «
+                                    1 25 Start
+                                      xb xb xa - 0.618033988749895 * -
+                                      xa xb xa - 0.618033988749895 * +
+                                      → gx gd
+                                      «
+                                        If
+                                          lcur 2 j * gx Put 'fx' Rcl Swap Where →Num sgn *
+                                          lcur 2 j * gd Put 'fx' Rcl Swap Where →Num sgn *
+                                          >
+                                        Then gd 'xb' Store Else gx 'xa' Store End
+                                      »
+                                    Next
+                                    xa xb + 2 /
+                                    lcur 2 j * 3 Pick Put 'fx' Rcl Swap Where →Num sgn *
+                                    → tv gv
+                                    «
+                                      If gv bg < Then lo bk hs * + 'tv' Store bg 'gv' Store End
+                                      If gv bst - bst Abs 1E-12 * > Then
+                                        lcur 2 j * tv Put 'lcur' Store
+                                        gv 'bst' Store
+                                        1 'imp' Store
+                                      End
+                                    »
+                                  »
+                                »
+                              »
+                            End
+                          »
+                        Next
+                        cyc 1 + 'cyc' Store
+                      End
+                    »
+                    bst sgn *
+                    → fv
+                    «
+                      If sgn 0 < fv vmn < And Then fv 'vmn' Store End
+                      If sgn 0 > fv vmx > And Then fv 'vmx' Store End
+                    »
+                  »
+                Next
+              »
+            2 Step
+
+            @ The result, in the form of the inputs
+            If vmn TypeName "unit" == Then
+              1 vmn →Unit
+              → uf
+              «
+                vmn UVal vmx uf Convert UVal
+                If allr Then →Range Else
+                  → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+                End
+                uf →Unit
+              »
+            Else
+              vmn vmx
+              If allr Then →Range Else
+                → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+              End
+            End
+          »
+        »
+      »
+    »
+  »
+»
