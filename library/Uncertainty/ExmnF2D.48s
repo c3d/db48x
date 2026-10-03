@@ -1,0 +1,385 @@
+«
+@@ ============================================================
+@@ ExmnF2D — examine a function of several variables over a box:
+@@ the plane slice that contains its global minimum and maximum.
+@@
+@@ Input:  'F' Xn … X2 X1, as for ΔRFxjxi, with at least two
+@@         variables that are intervals.
+@@ Output: the drawing, and on the stack the result of ΔRFxjxi.
+@@ The minimum and the maximum are found as by ΔRFxjxi. The slice
+@@ is the plane that contains the segment joining them, and the
+@@ direction of the variable least involved in that segment; the
+@@ other degrees of freedom are fixed by the plane. Each variable
+@@ is scaled to its interval, the box becoming the cube [-1, 1]ⁿ.
+@@ The darker the hatching, the larger F; the part of the plane
+@@ outside the box is left white. The minimum and the maximum are
+@@ marked by squares, joined by the segment of ExmnFxjxi.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ Find F: the first expression down the stack
+  0
+  Depth 1 - 1 Swap For j
+    If Dup 0 == Then
+      If j 1 + Pick TypeName "expression" == Then Drop j End
+    End
+  Next
+  If Dup 1 ≤ Then "ExmnF2D: an expression F, then its values" DoError End
+  1 -
+  → nv
+  «
+    nv →List Swap
+    → vls fx
+    «
+      @ The names x1 … xn of F, in order
+      0
+      { } 1 nv For j 0 + Next
+      'fx' Rcl XVars
+      → nms lnm
+      «
+        1 lnm Size For kk
+          lnm kk Get Dup →Text
+          → ev etx
+          «
+            1 30 For j
+              If etx "x" j →Text + == etx "'x" j →Text + "'" + == Or Then
+                j Max
+                If j nv ≤ Then nms j 'ev' Rcl Put 'nms' Store End
+              End
+            Next
+          »
+        Next
+        nms
+      »
+      Swap
+      If nv ≠ Then "ΔRFxjxi: F and the number of values differ" DoError End
+      → nms
+      «
+        @ The bounds of each variable, and the list x1 c1 … xn cn at the centre
+        { } { } { } 1
+        → lov hiv l0 allr
+        «
+          1 nv For j
+            vls nv j - 1 + Get
+            → xv
+            «
+              1 xv
+              If xv TypeName "unit" == Then Drop Drop 1 xv →Unit xv UVal End
+              Dup TypeName
+              → un iv tn
+              «
+                Case
+                  tn "range" == Then iv Explode End
+                  tn "drange" == Then
+                    iv Explode → cv dv « cv dv - cv dv + » 0 'allr' Store
+                  End
+                  tn "prange" == Then
+                    iv Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - cv dv + » »
+                    0 'allr' Store
+                  End
+                  tn "uncertain" == Then
+                    "ΔRFxjxi works on bounds; use σRFxjxi for a±σb" DoError
+                  End
+                  iv iv
+                End
+                un * Swap un * Swap
+                → lo hi
+                «
+                  lov lo + 'lov' Store
+                  hiv hi + 'hiv' Store
+                  l0 nms j Get + lo hi + 2 / + 'l0' Store
+                »
+              »
+            »
+          Next
+
+          @ The 2^n vertices
+          'fx' Rcl l0 Where →Num Dup l0 l0
+          → vmn vmx lmn lmx
+          «
+            0 2 nv ^ 1 - For vk
+              l0
+              1 nv For j
+                2 j *
+                If vk 2 j 1 - ^ / IP 2 Mod 1 == Then hiv j Get Else lov j Get End
+                Put
+              Next
+              → lcur
+              «
+                'fx' Rcl lcur Where →Num
+                → fv
+                «
+                  If fv vmn < Then fv 'vmn' Store lcur 'lmn' Store End
+                  If fv vmx > Then fv 'vmx' Store lcur 'lmx' Store End
+                »
+              »
+            Next
+
+            @ Coordinate search for the minimum (sgn = -1) and the maximum
+            -1 1 For sgn
+              l0
+              If sgn 0 > Then lmx Else lmn End
+              2 →List
+              → sts
+              «
+                1 2 For si
+                  sts si Get
+                  'fx' Rcl Over Where →Num sgn *
+                  → lcur bst
+                  «
+                    1 1
+                    → imp cyc
+                    «
+                      While imp cyc 6 ≤ And Repeat
+                        0 'imp' Store
+                        1 nv For j
+                          lov j Get hiv j Get
+                          → lo hi
+                          «
+                            If lo hi ≠ Then
+                              hi lo - 8 /
+                              → hs
+                              «
+                                @ Scan of 9 points along xj
+                                lcur 2 j * lo Put 'fx' Rcl Swap Where →Num sgn * 0
+                                → bg bk
+                                «
+                                  1 8 For tk
+                                    lcur 2 j * lo tk hs * + Put 'fx' Rcl Swap Where →Num sgn *
+                                    If Dup bg > Then 'bg' Store tk 'bk' Store Else Drop End
+                                  Next
+                                  @ Golden section around the best point
+                                  lo bk 1 - 0 Max hs * +
+                                  lo bk 1 + 8 Min hs * +
+                                  → xa xb
+                                  «
+                                    1 25 Start
+                                      xb xb xa - 0.618033988749895 * -
+                                      xa xb xa - 0.618033988749895 * +
+                                      → gx gd
+                                      «
+                                        If
+                                          lcur 2 j * gx Put 'fx' Rcl Swap Where →Num sgn *
+                                          lcur 2 j * gd Put 'fx' Rcl Swap Where →Num sgn *
+                                          >
+                                        Then gd 'xb' Store Else gx 'xa' Store End
+                                      »
+                                    Next
+                                    xa xb + 2 /
+                                    lcur 2 j * 3 Pick Put 'fx' Rcl Swap Where →Num sgn *
+                                    → tv gv
+                                    «
+                                      If gv bg < Then lo bk hs * + 'tv' Store bg 'gv' Store End
+                                      If gv bst - bst Abs 1E-12 * > Then
+                                        lcur 2 j * tv Put 'lcur' Store
+                                        gv 'bst' Store
+                                        1 'imp' Store
+                                      End
+                                    »
+                                  »
+                                »
+                              »
+                            End
+                          »
+                        Next
+                        cyc 1 + 'cyc' Store
+                      End
+                    »
+                    bst sgn *
+                    → fv
+                    «
+                      If sgn 0 < fv vmn < And Then fv 'vmn' Store lcur 'lmn' Store End
+                      If sgn 0 > fv vmx > And Then fv 'vmx' Store lcur 'lmx' Store End
+                    »
+                  »
+                Next
+              »
+            2 Step
+
+            @ Centres, half widths, and the normalized points of the extrema
+            { } { } { } { } 0
+            → cs hw zn zx nfr
+            «
+              1 nv For j
+                lov j Get hiv j Get
+                → lo hi
+                «
+                  cs lo hi + 2 / + 'cs' Store
+                  hw hi lo - 2 / + 'hw' Store
+                  If lo hi == Then
+                    zn 0 + 'zn' Store zx 0 + 'zx' Store
+                  Else
+                    nfr 1 + 'nfr' Store
+                    zn lmn 2 j * Get lo hi + 2 / - hi lo - 2 / / UBase UVal + 'zn' Store
+                    zx lmx 2 j * Get lo hi + 2 / - hi lo - 2 / / UBase UVal + 'zx' Store
+                  End
+                »
+              Next
+              If nfr 2 < Then "ExmnF2D: needs two variables that are intervals" DoError End
+
+              @ The plane: middle point, unit vector u from min to max, unit
+              @ vector v along the variable least involved in u
+              { } 1 nv For j zn j Get zx j Get + 2 / + Next
+              { } 1 nv For j zx j Get zn j Get - + Next
+              → mdp uu
+              «
+                0 1 nv For j uu j Get Sq + Next √
+                → nu
+                «
+                  If nu 0 == Then "ExmnF2D: F is constant over the box" DoError End
+                  { } 1 nv For j uu j Get nu / + Next 'uu' Store
+                  @ The free variable with the smallest component in u
+                  0 2
+                  1 nv For j
+                    If lov j Get hiv j Get ≠ Then
+                      If uu j Get Abs Over < Then Drop Drop j uu j Get Abs End
+                    End
+                  Next
+                  Drop
+                  → kv
+                  «
+                    { } 1 nv For j
+                      j kv == 1 0 IFTE uu kv Get uu j Get * - +
+                    Next
+                    → vv
+                    «
+                      0 1 nv For j vv j Get Sq + Next √
+                      → nvv
+                      «
+                        { } 1 nv For j vv j Get nvv / + Next 'vv' Store
+                        @ Scale: the segment takes 80 % of the width
+                        FromLCD Size Drop B→R
+                        → wd
+                        «
+                          nu 0.8 / wd /
+                          → px
+                          «
+                            @ The level of hatching, 0 to 4, of each cell of
+                            @ 4×4 pixels, or -1 outside the box
+                            { }
+                            0 27 For cy
+                              { }
+                              0 wd 4 / 1 - For ccx
+                                ccx 4 * 2 + wd 2 / - px *
+                                82 cy 4 * 28 + - px *
+                                → ss tt
+                                «
+                                  1
+                                  { } 1 nv For j
+                                    mdp j Get ss uu j Get * + tt vv j Get * +
+                                    If Dup Abs 1.000001 > Then 3 Roll Drop 0 3 Rolld End
+                                    +
+                                  Next
+                                  → okp zz
+                                  «
+                                    If okp Then
+                                      'fx' Rcl
+                                      l0 1 nv For j
+                                        2 j * cs j Get zz j Get hw j Get * + Put
+                                      Next
+                                      Where →Num
+                                      vmn - vmx vmn - / UBase UVal 3.999 * IP 0 Max 3 Min 1 +
+                                    Else -1 End
+                                  »
+                                »
+                                +
+                              Next
+                              1 →List +
+                            Next
+                            → lvl
+                            «
+                              ClearLCD
+                              "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 1 true false } DrawText
+                              @ Hatching: pixel line r of a cell is drawn when the
+                              @ level reaches 1, 3, 2 or 4 for r = 0, 1, 2, 3
+                              0 27 For cy
+                                lvl cy 1 + Get
+                                → rw
+                                «
+                                  0 3 For pr
+                                    { 1 3 2 4 } pr 1 + Get
+                                    cy 4 * 26 + pr + R→B
+                                    → th py
+                                    «
+                                      -1
+                                      0 rw Size For ccx
+                                        If ccx rw Size < Then rw ccx 1 + Get th ≥ Else 0 End
+                                        If Then
+                                          If Dup 0 < Then Drop ccx End
+                                        Else
+                                          If Dup 0 ≥ Then
+                                            4 * R→B py 2 →List
+                                            ccx 4 * 1 - R→B py 2 →List DrawLine
+                                            -1
+                                          End
+                                        End
+                                      Next
+                                      Drop
+                                    »
+                                  Next
+                                »
+                              Next
+                              @ The minimum and the maximum: squares on the segment
+                              wd 2 / nu 2 / px / - 0 RND
+                              wd 2 / nu 2 / px / + 0 RND
+                              → cmn cmx
+                              «
+                                cmn R→B #82d 2 →List cmx R→B #82d 2 →List DrawLine
+                                cmn cmx 2 →List
+                                1 2 For jj
+                                  Dup jj Get
+                                  → cc
+                                  «
+                                    cc 4 - R→B #78d 2 →List cc 4 + R→B #78d 2 →List DrawLine
+                                    cc 4 - R→B #86d 2 →List cc 4 + R→B #86d 2 →List DrawLine
+                                    cc 4 - R→B #78d 2 →List cc 4 - R→B #86d 2 →List DrawLine
+                                    cc 4 + R→B #78d 2 →List cc 4 + R→B #86d 2 →List DrawLine
+                                  »
+                                Next
+                                Drop
+                                "min" cmn 10 - 0 Max R→B #140d 2 →List 0 true false 3 →List + DrawText
+                                "max" cmx 12 - wd 30 - Min R→B #140d 2 →List 0 true false 3 →List + DrawText
+                              »
+                              "darker = larger; outside the box: white" { #0d #160d 0 true false } DrawText
+                              "min = " vmn →Str + "  at " +
+                              { } 1 nv For j lmn 2 j * Get + Next →Str +
+                              { #0d #180d 0 true false } DrawText
+                              "max = " vmx →Str + "  at " +
+                              { } 1 nv For j lmx 2 j * Get + Next →Str +
+                              { #0d #200d 0 true false } DrawText
+                              "across: x" kv →Text + "; points as { x1 … xn }" +
+                              { #0d #220d 0 true false } DrawText
+                            »
+                          »
+                        »
+                      »
+                    »
+                  »
+                »
+              »
+            »
+
+            @ The result, in the form of the inputs
+            If vmn TypeName "unit" == Then
+              1 vmn →Unit
+              → uf
+              «
+                vmn UVal vmx uf Convert UVal
+                If allr Then →Range Else
+                  → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+                End
+                uf →Unit
+              »
+            Else
+              vmn vmx
+              If allr Then →Range Else
+                → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+              End
+            End
+          »
+        »
+      »
+    »
+  »
+»
