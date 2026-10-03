@@ -406,8 +406,6 @@
 
 "Uncertainty"
 
-	"Examples",	"=/library/Uncertainty/Examples.48s"
-
 "Uncertainty/Rounding"
 
 	"SciRngRnd",	"=/library/Uncertainty/SciRngRnd.48s"
@@ -439,6 +437,10 @@
 "Uncertainty/Monte Carlo"
 
 	"MCPropagate",	"=/library/Uncertainty/MCPropagate.48s"
+
+"Uncertainty/Applications"
+
+	"Projectile",	"=/library/Uncertainty/Projectile.48s"
 
 "Graphics"
 	"CurvePlottingExamples", "="

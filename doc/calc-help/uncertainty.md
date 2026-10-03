@@ -36,8 +36,8 @@ Tools for measured values and their uncertainties, whether written as bounds
   written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
   [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
   [Exmnf](#exmnf).
-* [Projectile experiment](#projectile-experiment) — a worked example of the
-  whole section, in seven steps.
+* [Applications](#applicationslibrary) — worked examples of the whole
+  section: [Projectile](#projectile), in seven steps.
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -940,16 +940,19 @@ circles around it, and the minimum at a far corner:
 ```
 
 
-## Examples
+## ApplicationsLibrary
 
-The Examples key of the Uncertainty menu opens the worked examples of the
-section: the [Projectile experiment](#projectile-experiment), in seven steps,
-from the Type B evaluation of the measurements to the Monte Carlo method.
+Worked examples of the whole section, after Part 2, Applications, of Jean
+Wilson's Proposition for interval implementation in the RPL environment
+(2025). Each key opens its example in the help.
+
+* [Projectile](#projectile): a projectile experiment, in seven steps, from the
+  Type B evaluation of the measurements to the Monte Carlo method.
 
 
-## Projectile experiment
+## Projectile
 
-A worked example of the whole Uncertainty section, in seven steps, after Part 2
+A projectile experiment: a worked example of the whole Uncertainty section, in seven steps, after Part 2
 of Jean Wilson's Proposition for interval implementation in the RPL
 environment (2025). A spring loaded gun launches a glass marble towards a
 target at the same height, 8 m away. Each step is a small experiment with its
