@@ -124,6 +124,12 @@
           IfErr 'ρij' Rcl Then Drop 0 End
           → ro
           «
+            @ A matrix left from an earlier call must match the variables
+            If ro TypeName "array" == Then
+              If ro Size 1 Get nv ≠ Then
+                "σRFxjxi: the size of ρij differs from the number of variables" DoError
+              End
+            End
             1 nv For i
               1 nv For j
                 cs i Get cs j Get *
