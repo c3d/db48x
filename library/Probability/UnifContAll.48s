@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  UnifContAll
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "UnifContAll: needs 3 arguments" DoError END Explode Drop END
+  → Xminv Xmaxv Xv « Xminv 0 + Xmaxv 0 + Xv 0 + → Xmin Xmax X « 'IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;(X-Xmin)/(Xmax-Xmin)))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X<Xmin;0;IFTE(X>Xmax;0;1/(Xmax-Xmin)))' →Num "PDF" →Tag '1-Kc' →Num "CDFc" →Tag '(Xmax+Xmin)/2' →Num "μ" →Tag '(Xmax-Xmin)/√(12)' →Num "sx" →Tag { Kc } PURGE Xminv Xmaxv Xv 3 →List Drop » »
+»

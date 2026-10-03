@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  WeiblSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "WeiblSx: needs 2 arguments" DoError END END END
+  → shv λv « shv 0 + λv 0 + → sh λ « 'λ*√(Γ(1+2/sh)-Γ(1+1/sh)^2)' →Num shv λv 2 →List Drop » »
+»

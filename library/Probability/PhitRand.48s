@@ -1,0 +1,10 @@
+«
+  @ ------------------------------------------------------------
+  @  PhitRand
+  @  Random draw by inversion: a uniform variate, then PhitQ.
+  @  Stack: (aucun parametre)
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ ------------------------------------------------------------
+  rand ⓁPhitQ
+»

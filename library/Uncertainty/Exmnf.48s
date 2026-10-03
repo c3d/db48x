@@ -1,0 +1,98 @@
+«
+@@ ============================================================
+@@ Exmnf — examine a function over an interval: draw f over X,
+@@ with the smallest and largest values found by ΔRf.
+@@
+@@ Input:  'f(x)' X, as for ΔRf.
+@@ Output: the drawing, and on the stack the result of ΔRf.
+@@ The curve uses 161 points; the dashed lines are the bounds
+@@ given by ΔRf. A bound that does not touch the curve, or a peak
+@@ of the curve beyond a line, shows an extremum that ΔRf missed.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → fx xv
+  «
+    'fx' Rcl xv ⓁΔRf
+    @ Bounds of X as numbers, and its unit
+    1 xv
+    If xv TypeName "unit" == Then Drop Drop 1 xv →Unit xv UVal End
+    Dup TypeName
+    → rsl un iv tn
+    «
+      Case
+        tn "range" == Then iv Explode End
+        tn "drange" == Then iv Explode → cv dv « cv dv - cv dv + » End
+        tn "prange" == Then
+          iv Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - cv dv + » »
+        End
+        iv iv
+      End
+      @ Bounds of the result as numbers, and its unit
+      1 rsl
+      If rsl TypeName "unit" == Then Drop Drop 1 rsl →Unit rsl UVal End
+      Dup TypeName
+      → lo hi uf rv rt
+      «
+        If rt "range" == Then rv Explode Else rv Explode → cv dv « cv dv - cv dv + » End
+        → rlo rhi
+        «
+          @ 161 values of f, as numbers in the unit of the result
+          0 160 For kk
+            { x 0 } 2 lo hi lo - kk * 160 / + un * Put
+            'fx' Rcl Swap Where →Num
+            If uf TypeName "unit" == Then uf Convert UVal End
+          Next
+          161 →List
+          → ys
+          «
+            @ Vertical scale: the curve and the bounds, with a margin
+            ys Sort Dup 1 Get rlo Min Swap Dup Size Get rhi Max
+            → ya yb
+            «
+              If yb ya == Then ya 1 - 'ya' Store yb 1 + 'yb' Store End
+              FromLCD Size Drop B→R
+              → wd
+              «
+                ClearLCD
+                "Exmnf: " 'fx' Rcl →Str + " over X" + { #0d #2d 1 true false } DrawText
+                @ Plot area: columns 24 to wd-12, rows 34 to 150
+                @ Frame
+                { #24d #34d } { #24d #150d } DrawLine
+                { #24d #150d } wd 12 - R→B #150d 2 →List DrawLine
+                @ The curve
+                0 160 For kk
+                  24 wd 36 - kk * 160 / + 0 RND R→B
+                  150 116 ys kk 1 + Get ya - * yb ya - / - 0 RND R→B
+                  2 →List
+                  If kk 0 > Then Dup Rot Swap DrawLine End
+                Next
+                Drop
+                @ The bounds found by ΔRf, dashed
+                rlo rhi 2 →List
+                1 2 For jj
+                  Dup jj Get
+                  150 116 Rot ya - * yb ya - / - 0 RND R→B
+                  → py
+                  «
+                    24 wd 12 - For cx
+                      cx R→B py 2 →List cx 4 + R→B py 2 →List DrawLine
+                    8 Step
+                  »
+                Next
+                Drop
+                @ The numbers
+                "x: " lo un * →Str + " … " + hi un * →Str +
+                { #0d #160d 0 true false } DrawText
+                "min = " rlo uf * →Str + { #0d #180d 0 true false } DrawText
+                "max = " rhi uf * →Str + { #0d #200d 0 true false } DrawText
+                rsl
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»
