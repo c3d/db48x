@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  NegBinomArgs
+  @  Returns the parameters tagged with their names.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "NegBinomArgs: needs 3 arguments" DoError END Explode Drop END
+  → rsv pv Xv « rsv 0 + pv 0 + Xv 0 + → rs p X « rs "rs" →Tag p "p" →Tag X "X" →Tag rsv pv Xv 3 →List Drop » »
+»

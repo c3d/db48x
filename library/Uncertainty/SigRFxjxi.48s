@@ -1,0 +1,211 @@
+«
+@@ ============================================================
+@@ σRFxjxi — propagation of uncertainty through a function of
+@@ several variables, by the law of propagation of the GUM.
+@@
+@@ Input:  'F' Xn … X2 X1, where F is an expression of the names
+@@         x1, x2, … xn, and each Xj is the value of xj: a±σb, a
+@@         plain number (exact), with or without units; X1 is on
+@@         the first level.
+@@ Output: F(X1 … Xn) as Y±σu.
+@@ Correlations: none, unless a global variable ρij holds either
+@@ one coefficient for all pairs, or the full correlation matrix
+@@ (n×n, in the order x1 … xn).
+@@ Method: each contribution cj = ∂F/∂xj·σj is obtained by five
+@@ point central differences on the values with their units, with
+@@ a step of σj/1000, so that it comes out in the unit of F; then
+@@ u² = Σ ci·cj·ρij. Works with constants, angles and any units.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ Find F: the first expression down the stack
+  0
+  Depth 1 - 1 Swap For j
+    If Dup 0 == Then
+      If j 1 + Pick TypeName "expression" == Then Drop j End
+    End
+  Next
+  If Dup 1 ≤ Then "σRFxjxi: an expression F, then its values" DoError End
+  1 -
+  → nv
+  «
+    nv →List Swap
+    → vls fx
+    «
+      @ Check that F uses x1 … xn
+      0
+      { } 1 nv For j 0 + Next
+      'fx' Rcl XVars
+      → nms lnm
+      «
+        1 lnm Size For kk
+          lnm kk Get Dup →Text
+          → ev etx
+          «
+            1 30 For j
+              If etx "x" j →Text + == etx "'x" j →Text + "'" + == Or Then
+                j Max
+                If j nv ≤ Then nms j 'ev' Rcl Put 'nms' Store End
+              End
+            Next
+          »
+        Next
+        nms
+      »
+      Swap
+      If nv ≠ Then "σRFxjxi: F and the number of values differ" DoError End
+      → nms
+      «
+
+      @ Central values, standard uncertainties and the list x1 v1 … xn vn
+      { } { } { }
+      → l0 vs ss
+      «
+        1 nv For j
+          vls nv j - 1 + Get
+          → xv
+          «
+            0 0
+            If xv TypeName "unit" == Then
+              Drop Drop
+              1 xv →Unit xv UVal
+              If Dup TypeName "uncertain" == Then
+                Explode 3 Pick * Swap 3 Pick * Swap Rot Drop
+              Else
+                * 0
+              End
+            Else
+              Drop Drop
+              If xv TypeName "uncertain" == Then xv Explode Else xv 0 End
+            End
+            → cv sv
+            «
+              l0 nms j Get + cv + 'l0' Store
+              vs cv + 'vs' Store
+              ss sv + 'ss' Store
+            »
+          »
+        Next
+
+        @ The value of F, and one contribution per uncertain variable
+        'fx' Rcl l0 Where →Num
+        { }
+        → y0c cs
+        «
+          1 nv For j
+            ss j Get
+            → sv
+            «
+              If sv 0 == Then
+                @ A zero in the unit of F, so that the sums below stay consistent
+                cs y0c 0 * + 'cs' Store
+              Else
+                sv 1000 /
+                → hs
+                «
+                  @ Five point central difference, as Christophe wrote it:
+                  @ (8·(F(x+h)−F(x−h)) + (F(x−2h)−F(x+2h)))/(12·h), times σ = 1000·h
+                  'fx' Rcl l0 2 j * vs j Get hs + Put Where →Num
+                  'fx' Rcl l0 2 j * vs j Get hs - Put Where →Num
+                  - 8 *
+                  'fx' Rcl l0 2 j * vs j Get 2 hs * - Put Where →Num
+                  'fx' Rcl l0 2 j * vs j Get 2 hs * + Put Where →Num
+                  - +
+                  1000 * 12 /
+                  cs Swap + 'cs' Store
+                »
+              End
+            »
+          Next
+
+          @ u² = Σ ci·cj·ρij
+          0
+          IfErr 'ρij' Rcl Then Drop 0 End
+          → ro
+          «
+            @ A matrix left from an earlier call must match the variables
+            If ro TypeName "array" == Then
+              If ro Size 1 Get nv ≠ Then
+                "σRFxjxi: the size of ρij differs from the number of variables" DoError
+              End
+              @ A correlation matrix must be symmetric and positive semidefinite:
+              @ a Cholesky factorization finds a combination of the variables
+              @ that would have a negative variance
+              1 nv For iq 1 nv For kc
+                If ro { } iq + kc + Get ro { } kc + iq + Get - Abs 1E-9 > Then
+                  "σRFxjxi: ρij is not symmetric" DoError
+                End
+              Next Next
+              { } nv + nv + 0 Con
+              → chl
+              «
+                1 nv For j
+                  ro { } j + j + Get
+                  If j 1 > Then 1 j 1 - For kc chl { } j + kc + Get Sq - Next End
+                  If Dup -1E-9 < Then "σRFxjxi: ρij is not a valid correlation matrix" DoError End
+                  0 Max √
+                  → ljj
+                  «
+                    chl { } j + j + ljj Put 'chl' Store
+                    If j nv < Then
+                      j 1 + nv For iq
+                        ro { } iq + j + Get
+                        If j 1 > Then
+                          1 j 1 - For kc chl { } iq + kc + Get chl { } j + kc + Get * - Next
+                        End
+                        If ljj 1E-9 > Then
+                          ljj / chl { } iq + j + 3 Roll Put 'chl' Store
+                        Else
+                          If Abs 1E-9 > Then "σRFxjxi: ρij is not a valid correlation matrix" DoError End
+                        End
+                      Next
+                    End
+                  »
+                Next
+              »
+            Else
+              @ One coefficient for all the pairs: from −1/(n−1) to 1
+              If nv 1 > Then
+                If ro 1 > ro -1 nv 1 - / 1E-12 - < Or Then
+                  "σRFxjxi: ρij is outside −1/(n−1)…1 for n variables" DoError
+                End
+              End
+            End
+            1 nv For i
+              1 nv For j
+                cs i Get cs j Get *
+                If i j ≠ Then
+                  If ro TypeName "list" == ro TypeName "array" == Or
+                  Then ro { } i + j + Get
+                  Else ro End
+                  *
+                Else
+                  1 *
+                End
+                +
+              Next
+            Next
+          »
+          @ Rounding may leave a tiny negative u²
+          Dup 0 * Max √
+          → uq
+          «
+            If y0c TypeName "unit" == Then
+              1 y0c →Unit
+              → yu
+              «
+                y0c UVal
+                If uq TypeName "unit" == Then uq yu Convert UVal Else uq End
+                →σRange yu →Unit
+              »
+            Else
+              y0c uq UVal →σRange
+            End
+          »
+        »
+      »
+      »
+    »
+  »
+»

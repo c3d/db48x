@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GammaPDF
+  @  Density (or mass) at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "GammaPDF: needs 3 arguments" DoError END Explode Drop END
+  → av scv Xv « av 0 + scv 0 + Xv 0 + → a sc X « 'IFTE(X≤0;0;(X^(a-1))*EXP(-X/sc)/((sc^a)*Γ(a)))' →Num av scv Xv 3 →List Drop » »
+»
