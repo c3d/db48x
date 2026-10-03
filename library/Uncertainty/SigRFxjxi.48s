@@ -1,0 +1,156 @@
+«
+@@ ============================================================
+@@ σRFxjxi — propagation of uncertainty through a function of
+@@ several variables, by the law of propagation of the GUM.
+@@
+@@ Input:  'F' Xn … X2 X1, where F is an expression of the names
+@@         x1, x2, … xn, and each Xj is the value of xj: a±σb, a
+@@         plain number (exact), with or without units; X1 is on
+@@         the first level.
+@@ Output: F(X1 … Xn) as Y±σu.
+@@ Correlations: none, unless a global variable ρij holds either
+@@ one coefficient for all pairs, or the full correlation matrix
+@@ (n×n, in the order x1 … xn).
+@@ Method: each contribution cj = ∂F/∂xj·σj is obtained by central
+@@ differences on the values with their units, with a step of
+@@ σj/1000, so that it comes out in the unit of F; then
+@@ u² = Σ ci·cj·ρij. Works with constants, angles and any units.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ Find F: the first expression down the stack
+  0
+  Depth 1 - 1 Swap For j
+    If Dup 0 == Then
+      If j 1 + Pick TypeName "expression" == Then Drop j End
+    End
+  Next
+  If Dup 1 ≤ Then "σRFxjxi: an expression F, then its values" DoError End
+  1 -
+  → nv
+  «
+    nv →List Swap
+    → vls fx
+    «
+      @ Check that F uses x1 … xn
+      0
+      { } 1 nv For j 0 + Next
+      'fx' Rcl XVars
+      → nms lnm
+      «
+        1 lnm Size For kk
+          lnm kk Get Dup →Text
+          → ev etx
+          «
+            1 30 For j
+              If etx "x" j →Text + == etx "'x" j →Text + "'" + == Or Then
+                j Max
+                If j nv ≤ Then nms j 'ev' Rcl Put 'nms' Store End
+              End
+            Next
+          »
+        Next
+        nms
+      »
+      Swap
+      If nv ≠ Then "σRFxjxi: F and the number of values differ" DoError End
+      → nms
+      «
+
+      @ Central values, standard uncertainties and the list x1 v1 … xn vn
+      { } { } { }
+      → l0 vs ss
+      «
+        1 nv For j
+          vls nv j - 1 + Get
+          → xv
+          «
+            0 0
+            If xv TypeName "unit" == Then
+              Drop Drop
+              1 xv →Unit xv UVal
+              If Dup TypeName "uncertain" == Then
+                Explode 3 Pick * Swap 3 Pick * Swap Rot Drop
+              Else
+                * 0
+              End
+            Else
+              Drop Drop
+              If xv TypeName "uncertain" == Then xv Explode Else xv 0 End
+            End
+            → cv sv
+            «
+              l0 nms j Get + cv + 'l0' Store
+              vs cv + 'vs' Store
+              ss sv + 'ss' Store
+            »
+          »
+        Next
+
+        @ The value of F, and one contribution per uncertain variable
+        'fx' Rcl l0 Where →Num
+        { }
+        → y0c cs
+        «
+          1 nv For j
+            ss j Get
+            → sv
+            «
+              If sv 0 == Then
+                @ A zero in the unit of F, so that the sums below stay consistent
+                cs y0c 0 * + 'cs' Store
+              Else
+                sv 1000 /
+                → hs
+                «
+                  'fx' Rcl l0 2 j * vs j Get hs + Put Where →Num
+                  'fx' Rcl l0 2 j * vs j Get hs - Put Where →Num
+                  - 500 *
+                  cs Swap + 'cs' Store
+                »
+              End
+            »
+          Next
+
+          @ u² = Σ ci·cj·ρij
+          0
+          IfErr 'ρij' Rcl Then Drop 0 End
+          → ro
+          «
+            1 nv For i
+              1 nv For j
+                cs i Get cs j Get *
+                If i j ≠ Then
+                  If ro TypeName "list" == ro TypeName "array" == Or
+                  Then ro { } i + j + Get
+                  Else ro End
+                  *
+                Else
+                  1 *
+                End
+                +
+              Next
+            Next
+          »
+          √
+          → uq
+          «
+            If y0c TypeName "unit" == Then
+              1 y0c →Unit
+              → yu
+              «
+                y0c UVal
+                If uq TypeName "unit" == Then uq yu Convert UVal Else uq End
+                →σRange yu →Unit
+              »
+            Else
+              y0c uq UVal →σRange
+            End
+          »
+        »
+      »
+      »
+    »
+  »
+»

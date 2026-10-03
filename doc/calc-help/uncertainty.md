@@ -32,6 +32,9 @@ Tools for measured values and their uncertainties, whether written as bounds
 * [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
   for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
   for how two intervals sit on the line.
+* [Functions](#functionslibrary) — propagate uncertainties through a function
+  written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
+  [σRFxjxi](#σrfxjxi).
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -593,3 +596,114 @@ substitution, which is slower.
 
 See also: the Rand functions of the Probability section, and the Rounding
 functions to present the result.
+
+
+## FunctionsLibrary
+
+Propagation of standard uncertainties through a function, by the law of
+propagation of the GUM (JCGM 100:2008, section 5), without any list to build:
+the function is written with the names x or x1, x2, …, and its values follow
+it on the stack.
+
+* [σRf](#σrf): a composite function of one variable, f(x);
+* [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
+  possibly correlated.
+
+Evaluating a function directly on uncertain numbers treats each occurrence of
+a variable as a new, independent variable: x·x does not get the uncertainty
+of x², and (x−1)·(x−2)·(x−3) gets twice its uncertainty. These functions count each
+variable once.
+
+The law of propagation is a first order approximation, good when the function
+is close to linear over the uncertainties. Otherwise, the Monte Carlo method of
+[MCPropagate](#mcpropagate) gives the reference result; comparing the two is
+the check recommended by Supplement 1 of the GUM.
+
+After the σRf, σRFx2x1 and σRFxjxi functions of Jean Wilson's Proposition for
+interval implementation in the RPL environment (2025).
+
+
+## σRf
+
+The uncertainty of a composite function of one variable.
+
+Stack: 'f(x)' X ▶ Y±σu, where f is an expression of the name x and X its
+value a±σb, with or without units.
+
+The contribution of x is the derivative of f times the standard deviation,
+obtained by central differences on the value with its unit: it comes out in
+the unit of f, and works with any function, constant or unit.
+
+**Example 1.** The gamma function at 7±σ0.05:
+
+```rpl
+'tgamma(x)' 7.0±σ0.05 ⓁσRf
+@ Expecting 720.±σ67.42023 61747
+```
+
+**Example 2.** A polynomial near one of its roots. Evaluated directly on
+2.755±σ0.05, it gets about twice this uncertainty, since its three factors are
+treated as independent:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' 2.755±σ0.05 ⓁσRf
+@ Expecting -0.32463 1125±σ0.03550 37501 25
+```
+
+**Example 3.** The difference of a quantity with itself is exactly zero:
+
+```rpl
+'x-x' 2.0±σ0.05_m ⓁσRf
+@ Expecting 0±σ0. m
+```
+
+
+## σRFxjxi
+
+The uncertainty of a function of several variables.
+
+Stack: 'F' Xn … X2 X1 ▶ Y±σu, where F is an expression of the names x1, x2, …
+xn, and each Xj is the value of xj: a±σb, or a plain number for an exact
+value, with or without units. X1 is on the first level, as in a formula read
+from the right.
+
+The variables are independent, unless a global variable ρij holds either one
+correlation coefficient for all the pairs, or the full correlation matrix, in
+the order x1 … xn. The contributions cj, derivative times standard deviation,
+are combined as u² = Σ ci·cj·ρij.
+
+**Example 1.** A mass from a linear density and a length, with units:
+
+```rpl
+'x2*x1' 2.5±σ0.5_g/cm 2.0±σ0.2_cm ⓁσRFxjxi
+@ Expecting 5.±σ1.11803 39887 5 g
+```
+
+**Example 2.** Three lengths fully correlated, for instance measured with the
+same rule: the uncertainties add instead of combining in quadrature.
+
+```rpl
+1 'ρij' Sto
+'x3+x2+x1' 1.2±σ0.002 2.5±σ0.005 1.600±σ0.012 ⓁσRFxjxi
+@ Expecting 5.3±σ0.019
+```
+
+**Example 3.** Two variables correlated at 0.5, given as a matrix: the
+uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
+
+```rpl
+[[ 1 0.5 ] [ 0.5 1 ]] 'ρij' Sto
+'x2+x1' 10±σ1 20±σ2 ⓁσRFxjxi
+@ Expecting 30±σ2.64575 13110 6
+```
+
+**Example 4.** The potential energy of a mass raised along a slope, with a
+constant and an angle in degrees:
+
+```rpl
+'x3*Ⓒg*x2*sin(x1)' 2±σ0.01_kg 10±σ0.1_m 30±σ0.5_° ⓁσRFxjxi
+@ Expecting 98.0665±σ1.84371 03556 kg·m↑2/s↑2
+```
+
+The same functions with MCPropagate take the names and the values as lists:
+'x2*x1' { x2 x1 } { 2.5±σ0.5 2.0±σ0.2 } 0 ⓁMCPropagate.
