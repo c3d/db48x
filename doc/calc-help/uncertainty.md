@@ -940,6 +940,13 @@ circles around it, and the minimum at a far corner:
 ```
 
 
+## Examples
+
+The Examples key of the Uncertainty menu opens the worked examples of the
+section: the [Projectile experiment](#projectile-experiment), in seven steps,
+from the Type B evaluation of the measurements to the Monte Carlo method.
+
+
 ## Projectile experiment
 
 A worked example of the whole Uncertainty section, in seven steps, after Part 2
