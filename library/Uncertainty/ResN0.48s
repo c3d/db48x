@@ -1,0 +1,19 @@
+«
+    @ ResN0: resolution of a reading, the unit of its last significant digit,
+    @ when N trailing zeros of the value are significant: X N → δ (unit of X).
+    @ 9.000_kg is stored as 9 kg; with N = 3 the resolution is 0.001 kg.
+    @ After Jean Wilson's ResN0→σR (2025-2026).
+    IF DUP TypeName "list" == THEN
+        IF DUP Size 2 ≠ THEN "ResN0: needs 2 arguments" DoError END
+        Explode DROP
+    END
+    → RsX RsN
+    «
+        IF RsX TypeName "unit" == THEN RsX UVAL 1 RsX →Unit ELSE RsX 1 END
+        → RsV RsU
+        «
+            IF RsV 0 = THEN "ResN0: the value is zero, its digits say nothing" DoError END
+            10. RsV XPON RsV SigDig - RsN - 1 + ^ RsU ×
+        »
+    »
+»

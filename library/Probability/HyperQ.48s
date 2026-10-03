@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  HyperQ
+  @  Discrete quantile. Stack: Np, Ks, nd, p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "HyperQ: needs 4 arguments" DoError END Explode Drop END
+  → Np Ks nd p « IF 'p<0 OR p>1' EVAL THEN Ⓒ? ELSE 0 0 → k c « WHILE 'c<p AND k≤nd' EVAL REPEAT 'c+COMB(Ks;k)*COMB(Np-Ks;nd-k)/COMB(Np;nd)' EVAL 'c' STO 'k+1' EVAL 'k' STO END 'IFTE(k≤0;0;k-1)' EVAL R→I » END Np Ks nd p 4 →List Drop »
+»

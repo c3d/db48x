@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  RayleighAll
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "RayleighAll: needs 2 arguments" DoError END Explode Drop END
+  → sv Xv « sv 0 + Xv 0 + → s X « 'IFTE(X<0;0;1-EXP(-(X^2)/(2*(s^2))))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X<0;0;(X/(s^2))*EXP(-(X^2)/(2*(s^2))))' →Num "PDF" →Tag 'IFTE(X<0;1;EXP(-(X^2)/(2*(s^2))))' →Num "CDFc" →Tag 's*√(Ⓒπ/2)' →Num "μ" →Tag 's*√(2-Ⓒπ/2)' →Num "sx" →Tag { Kc } PURGE sv Xv 2 →List Drop » »
+»
