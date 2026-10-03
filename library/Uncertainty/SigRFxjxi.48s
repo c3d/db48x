@@ -11,9 +11,9 @@
 @@ Correlations: none, unless a global variable ρij holds either
 @@ one coefficient for all pairs, or the full correlation matrix
 @@ (n×n, in the order x1 … xn).
-@@ Method: each contribution cj = ∂F/∂xj·σj is obtained by central
-@@ differences on the values with their units, with a step of
-@@ σj/1000, so that it comes out in the unit of F; then
+@@ Method: each contribution cj = ∂F/∂xj·σj is obtained by five
+@@ point central differences on the values with their units, with
+@@ a step of σj/1000, so that it comes out in the unit of F; then
 @@ u² = Σ ci·cj·ρij. Works with constants, angles and any units.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
@@ -104,9 +104,15 @@
                 sv 1000 /
                 → hs
                 «
+                  @ Five point central difference, as Christophe wrote it:
+                  @ (8·(F(x+h)−F(x−h)) + (F(x−2h)−F(x+2h)))/(12·h), times σ = 1000·h
                   'fx' Rcl l0 2 j * vs j Get hs + Put Where →Num
                   'fx' Rcl l0 2 j * vs j Get hs - Put Where →Num
-                  - 500 *
+                  - 8 *
+                  'fx' Rcl l0 2 j * vs j Get 2 hs * - Put Where →Num
+                  'fx' Rcl l0 2 j * vs j Get 2 hs * + Put Where →Num
+                  - +
+                  1000 * 12 /
                   cs Swap + 'cs' Store
                 »
               End

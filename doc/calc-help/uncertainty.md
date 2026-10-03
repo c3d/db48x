@@ -631,14 +631,17 @@ Stack: 'f(x)' X ▶ Y±σu, where f is an expression of the name x and X its
 value a±σb, with or without units.
 
 The contribution of x is the derivative of f times the standard deviation,
-obtained by central differences on the value with its unit: it comes out in
-the unit of f, and works with any function, constant or unit.
+obtained by five point central differences on the value with its unit, with a
+step of σ/1000: it comes out in the unit of f, works with any function,
+constant or unit, and also at x = 0.
 
-**Example 1.** The gamma function at 7±σ0.05:
+**Example 1.** The gamma function at 7±σ0.05. The exact uncertainty is
+Γ(7)·ψ(7)·0.05 = 720 × 1.87278 43351 × 0.05 = 67.42023 60636, where
+ψ(7) = −γ + 1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6 is the digamma function:
 
 ```rpl
 'tgamma(x)' 7.0±σ0.05 ⓁσRf
-@ Expecting 720.±σ67.42023 61747
+@ Expecting 720.±σ67.42023 60635
 ```
 
 **Example 2.** A polynomial near one of its roots. Evaluated directly on
@@ -647,7 +650,7 @@ treated as independent:
 
 ```rpl
 '(x-1)*(x-2)*(x-3)' 2.755±σ0.05 ⓁσRf
-@ Expecting -0.32463 1125±σ0.03550 37501 25
+@ Expecting -0.32463 1125±σ0.03550 375
 ```
 
 **Example 3.** The difference of a quantity with itself is exactly zero:
@@ -702,7 +705,7 @@ constant and an angle in degrees:
 
 ```rpl
 'x3*Ⓒg*x2*sin(x1)' 2±σ0.01_kg 10±σ0.1_m 30±σ0.5_° ⓁσRFxjxi
-@ Expecting 98.0665±σ1.84371 03556 kg·m↑2/s↑2
+@ Expecting 98.0665±σ1.84371 03556 2 kg·m↑2/s↑2
 ```
 
 The same functions with MCPropagate take the names and the values as lists:
