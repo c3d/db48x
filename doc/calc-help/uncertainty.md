@@ -903,8 +903,10 @@ at least two variables must be intervals.
 Each variable is scaled to its interval, the box becoming a cube. The slice is
 the plane that contains the segment from the minimum to the maximum, and the
 direction of the variable least involved in that segment, named on the last
-line; the other degrees of freedom are fixed by the plane. The darker the
-hatching, the larger F; the part of the plane outside the box is left white.
+line; the other degrees of freedom are fixed by the plane. Seven contour
+lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
+shape of F, as on a map: close together where F changes fast. The edge of the
+box is drawn too.
 The minimum and the maximum are marked by squares, joined by the segment that
 ExmnFxjxi draws. About a thousand values of F are computed: a few seconds on
 the simulator.
@@ -919,4 +921,18 @@ the simulator.
 
 ```rpl
 'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
+```
+
+**Example 3.** A saddle: the minimum −1 at x1 = 0, x2 = ±1, the maximum 1 at
+x1 = ±1, x2 = 0, and hyperbolas between them:
+
+```rpl
+'x1^2-x2^2' 0±1 0±1 ⓁExmnF2D
+```
+
+**Example 4.** A bump: the maximum 1 at the origin, inside the box, with
+circles around it, and the minimum at a far corner:
+
+```rpl
+'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
 ```

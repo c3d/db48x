@@ -11,8 +11,8 @@
 @@ direction of the variable least involved in that segment; the
 @@ other degrees of freedom are fixed by the plane. Each variable
 @@ is scaled to its interval, the box becoming the cube [-1, 1]ⁿ.
-@@ The darker the hatching, the larger F; the part of the plane
-@@ outside the box is left white. The minimum and the maximum are
+@@ Seven contour lines, at 1/8 … 7/8 of the way from the minimum
+@@ to the maximum, and the edge of the box. The minimum and the maximum are
 @@ marked by squares, joined by the segment of ExmnFxjxi.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
@@ -255,14 +255,15 @@
                           nu 0.8 / wd /
                           → px
                           «
-                            @ The level of hatching, 0 to 4, of each cell of
-                            @ 4×4 pixels, or -1 outside the box
+                            @ Values of F at the nodes of a grid of 6×6 pixels,
+                            @ scaled to 0…1 between the minimum and the maximum,
+                            @ or -1 outside the box
                             { }
-                            0 27 For cy
+                            0 19 For cy
                               { }
-                              0 wd 4 / 1 - For ccx
-                                ccx 4 * 2 + wd 2 / - px *
-                                82 cy 4 * 28 + - px *
+                              0 wd 6 / IP For ccx
+                                ccx 6 * wd 2 / - px *
+                                85 cy 6 * 28 + - px *
                                 → ss tt
                                 «
                                   1
@@ -279,8 +280,11 @@
                                         2 j * cs j Get zz j Get hw j Get * + Put
                                       Next
                                       Where →Num
-                                      vmn - vmx vmn - / UBase UVal 3.999 * IP 0 Max 3 Min 1 +
+                                      vmn - vmx vmn - / UBase UVal
                                     Else -1 End
+                                    @ Distance to the edge of the box, positive inside
+                                    1 0 1 nv For j zz j Get Abs Max Next -
+                                    2 →List 1 →List
                                   »
                                 »
                                 +
@@ -291,65 +295,112 @@
                             «
                               ClearLCD
                               "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 1 true false } DrawText
-                              @ Hatching: pixel line r of a cell is drawn when the
-                              @ level reaches 1, 3, 2 or 4 for r = 0, 1, 2, 3
-                              0 27 For cy
-                                lvl cy 1 + Get
-                                → rw
-                                «
-                                  0 3 For pr
-                                    { 1 3 2 4 } pr 1 + Get
-                                    cy 4 * 26 + pr + R→B
-                                    → th py
-                                    «
-                                      -1
-                                      0 rw Size For ccx
-                                        If ccx rw Size < Then rw ccx 1 + Get th ≥ Else 0 End
-                                        If Then
-                                          If Dup 0 < Then Drop ccx End
-                                        Else
-                                          If Dup 0 ≥ Then
-                                            4 * R→B py 2 →List
-                                            ccx 4 * 1 - R→B py 2 →List DrawLine
-                                            -1
-                                          End
-                                        End
-                                      Next
-                                      Drop
-                                    »
-                                  Next
-                                »
-                              Next
+                              @ Marching squares: for each cell and each level, the
+                              @ segment where the values cross it. Level -0.5 traces
+                              @ the edge of the box; levels 1/8 … 7/8 the contours.
+                              lvl 1 Get Size 1 -
+                              → ncol
+                              «
+                                0 18 For cy
+                                  lvl cy 1 + Get lvl cy 2 + Get
+                                  → ra rb
+                                  «
+                                    0 ncol 1 - For ccx
+                                      ra ccx 1 + Get ra ccx 2 + Get
+                                      rb ccx 2 + Get rb ccx 1 + Get
+                                      → n1 n2 n3 n4
+                                      «
+                                        n1 2 Get n2 2 Get n3 2 Get n4 2 Get
+                                        → g1 g2 g3 g4
+                                        «
+                                        @ Corners: v1 top left, v2 top right,
+                                        @ v3 bottom right, v4 bottom left
+                                        ccx 6 * cy 6 * 28 +
+                                        → x0 y0
+                                        «
+                                          0 1 7 For kl kl 8 / Next 8 →List
+                                          1 8 For kk
+                                            Dup kk Get
+                                            @ Level 1 is the edge of the box (g = 0);
+                                            @ the others are contours of F, drawn
+                                            @ where the four corners are inside
+                                            If kk 1 == Then g1 g2 g3 g4
+                                            Else n1 1 Get n2 1 Get n3 1 Get n4 1 Get End
+                                            → lv v1 v2 v3 v4
+                                            «
+                                              If kk 1 > g1 0 < g2 0 < Or g3 0 < Or g4 0 < Or And
+                                              Then
+                                              Else
+                                                0
+                                                @ Top edge
+                                                If v1 lv - v2 lv - * 0 < Then
+                                                  x0 6 lv v1 - * v2 v1 - / + y0 2 →List Swap 1 +
+                                                End
+                                                @ Right edge
+                                                If v2 lv - v3 lv - * 0 < Then
+                                                  x0 6 + y0 6 lv v2 - * v3 v2 - / + 2 →List Swap 1 +
+                                                End
+                                                @ Bottom edge
+                                                If v4 lv - v3 lv - * 0 < Then
+                                                  x0 6 lv v4 - * v3 v4 - / + y0 6 + 2 →List Swap 1 +
+                                                End
+                                                @ Left edge
+                                                If v1 lv - v4 lv - * 0 < Then
+                                                  x0 y0 6 lv v1 - * v4 v1 - / + 2 →List Swap 1 +
+                                                End
+                                                @ Draw the crossings two by two
+                                                While Dup 2 ≥ Repeat
+                                                  2 -
+                                                  → pa pb cnt
+                                                  «
+                                                    pa 1 Get 0 RND R→B pa 2 Get 0 RND R→B 2 →List
+                                                    pb 1 Get 0 RND R→B pb 2 Get 0 RND R→B 2 →List
+                                                    DrawLine
+                                                    cnt
+                                                  »
+                                                End
+                                                If Dup 1 == Then Drop Drop Else Drop End
+                                              End
+                                            »
+                                          Next
+                                          Drop
+                                        »
+                                        »
+                                      »
+                                    Next
+                                  »
+                                Next
+                              »
                               @ The minimum and the maximum: squares on the segment
                               wd 2 / nu 2 / px / - 0 RND
                               wd 2 / nu 2 / px / + 0 RND
                               → cmn cmx
                               «
-                                cmn R→B #82d 2 →List cmx R→B #82d 2 →List DrawLine
+                                cmn R→B #85d 2 →List cmx R→B #85d 2 →List DrawLine
                                 cmn cmx 2 →List
                                 1 2 For jj
                                   Dup jj Get
                                   → cc
                                   «
-                                    cc 4 - R→B #78d 2 →List cc 4 + R→B #78d 2 →List DrawLine
-                                    cc 4 - R→B #86d 2 →List cc 4 + R→B #86d 2 →List DrawLine
-                                    cc 4 - R→B #78d 2 →List cc 4 - R→B #86d 2 →List DrawLine
-                                    cc 4 + R→B #78d 2 →List cc 4 + R→B #86d 2 →List DrawLine
+                                    cc 4 - R→B #81d 2 →List cc 4 + R→B #81d 2 →List DrawLine
+                                    cc 4 - R→B #89d 2 →List cc 4 + R→B #89d 2 →List DrawLine
+                                    cc 4 - R→B #81d 2 →List cc 4 - R→B #89d 2 →List DrawLine
+                                    cc 4 + R→B #81d 2 →List cc 4 + R→B #89d 2 →List DrawLine
                                   »
                                 Next
                                 Drop
-                                "min" cmn 10 - 0 Max R→B #140d 2 →List 0 true false 3 →List + DrawText
-                                "max" cmx 12 - wd 30 - Min R→B #140d 2 →List 0 true false 3 →List + DrawText
+                                "min" cmn 10 - 0 Max R→B #145d 2 →List 0 true false 3 →List + DrawText
+                                "max" cmx 12 - wd 30 - Min R→B #145d 2 →List 0 true false 3 →List + DrawText
                               »
-                              "darker = larger; outside the box: white" { #0d #160d 0 true false } DrawText
+                              "contours at 1/8 … 7/8 of max − min" { #0d #161d 0 true false } DrawText
                               "min = " vmn →Str + "  at " +
                               { } 1 nv For j lmn 2 j * Get + Next →Str +
-                              { #0d #180d 0 true false } DrawText
+                              { #0d #179d 0 true false } DrawText
                               "max = " vmx →Str + "  at " +
                               { } 1 nv For j lmx 2 j * Get + Next →Str +
-                              { #0d #200d 0 true false } DrawText
+                              { #0d #197d 0 true false } DrawText
                               "across: x" kv →Text + "; points as { x1 … xn }" +
-                              { #0d #220d 0 true false } DrawText
+                              { #0d #215d 0 true false } DrawText
                             »
                           »
                         »
