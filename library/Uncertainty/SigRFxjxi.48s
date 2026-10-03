@@ -129,6 +129,48 @@
               If ro Size 1 Get nv ≠ Then
                 "σRFxjxi: the size of ρij differs from the number of variables" DoError
               End
+              @ A correlation matrix must be symmetric and positive semidefinite:
+              @ a Cholesky factorization finds a combination of the variables
+              @ that would have a negative variance
+              1 nv For iq 1 nv For kc
+                If ro { } iq + kc + Get ro { } kc + iq + Get - Abs 1E-9 > Then
+                  "σRFxjxi: ρij is not symmetric" DoError
+                End
+              Next Next
+              { } nv + nv + 0 Con
+              → chl
+              «
+                1 nv For j
+                  ro { } j + j + Get
+                  If j 1 > Then 1 j 1 - For kc chl { } j + kc + Get Sq - Next End
+                  If Dup -1E-9 < Then "σRFxjxi: ρij is not a valid correlation matrix" DoError End
+                  0 Max √
+                  → ljj
+                  «
+                    chl { } j + j + ljj Put 'chl' Store
+                    If j nv < Then
+                      j 1 + nv For iq
+                        ro { } iq + j + Get
+                        If j 1 > Then
+                          1 j 1 - For kc chl { } iq + kc + Get chl { } j + kc + Get * - Next
+                        End
+                        If ljj 1E-9 > Then
+                          ljj / chl { } iq + j + 3 Roll Put 'chl' Store
+                        Else
+                          If Abs 1E-9 > Then "σRFxjxi: ρij is not a valid correlation matrix" DoError End
+                        End
+                      Next
+                    End
+                  »
+                Next
+              »
+            Else
+              @ One coefficient for all the pairs: from −1/(n−1) to 1
+              If nv 1 > Then
+                If ro 1 > ro -1 nv 1 - / 1E-12 - < Or Then
+                  "σRFxjxi: ρij is outside −1/(n−1)…1 for n variables" DoError
+                End
+              End
             End
             1 nv For i
               1 nv For j
@@ -145,7 +187,8 @@
               Next
             Next
           »
-          √
+          @ Rounding may leave a tiny negative u²
+          Dup 0 * Max √
           → uq
           «
             If y0c TypeName "unit" == Then
