@@ -36,6 +36,8 @@ Tools for measured values and their uncertainties, whether written as bounds
   written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
   [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
   [Exmnf](#exmnf).
+* [Projectile experiment](#projectile-experiment) — a worked example of the
+  whole section, in seven steps.
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -936,3 +938,328 @@ circles around it, and the minimum at a far corner:
 ```rpl
 'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
 ```
+
+
+## Projectile experiment
+
+A worked example of the whole Uncertainty section, in seven steps, after Part 2
+of Jean Wilson's Proposition for interval implementation in the RPL
+environment (2025). A spring loaded gun launches a glass marble towards a
+target at the same height, 8 m away. Each step is a small experiment with its
+own uncertainty budget, and each one uses the result of the previous ones.
+
+At each step, the same tools are used in the same order:
+
+* the Type B evaluation of the data: a resolution or a tolerance is a bound,
+  hence a rectangular law of standard deviation bound/√3 (Bound→σ);
+* the law of propagation with independent inputs, ρ = 0, which is the
+  physical case: two inputs are correlated only when their measurements
+  share a cause of error, not because of the shape of the formula (σRFxjxi);
+* the bracket of the correlations, ρ = −1 and ρ = +1 for all the pairs, the
+  smallest and the largest uncertainty that correlations could give;
+* interval arithmetic on intervals of one standard deviation, as in the 2025
+  document, which contains the bracket (ΔRFxjxi);
+* the Monte Carlo method, which needs no linearization (MCPropagate);
+* the rounding of the result, and its comparison with a reference value
+  when there is one (SciRngRnd, σConcord).
+
+The data are those of 2025. Three Type B evaluations change: the diameter of
+step 1 was given its resolution δ divided by √3 instead of the half
+resolution, and the tolerances of steps 2, 4 and 5 were read as standard
+deviations instead of bounds.
+
+### Step 1: the mass of the marble
+
+M = ρ·(4/3)·π·(D/2)³, with a diameter D = 16.000 mm read on a micrometer of
+resolution 0.001 mm, a density ρ = 2.500 g/cm³ known to one unit of its last
+digit, and a reference mass Mref = 5.36±σ0.01 g.
+
+The diameter: its last digit is a resolution, the bound is half of it.
+```rpl
+16_mm 0.0005_mm 1 { } ⓁBound→σ
+@ Expecting 16.±σ2.88675 13459 5⁳⁻⁴ mm
+```
+
+The mass, inputs independent:
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert
+@ Expecting 5.36165 14621 3±σ2.16420 64708 4⁳⁻³ g
+```
+
+The bracket of the correlations, ρ = −1 then ρ = +1:
+```rpl
+-1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ1.85445 26865 8⁳⁻³ g
+```
+```rpl
+1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ2.43486 84831 2⁳⁻³ g
+```
+
+Interval arithmetic, and the Monte Carlo method with the diameter rectangular:
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±0.001_g/cm^3 16±0.00028867513459_mm ⓁΔRFxjxi
+1_g Convert
+@ Expecting 5.36165 15834 5±2.43486 84852 5⁳⁻³ g
+```
+```rpl
+12345 RDZ
+'r*4/3*Ⓒπ*(d/2)^3' { r d } { '2.5±σ0.001_g/cm^3' '15.9995…16.0005_mm' } →Num
+2000 ⓁMCPropagate 1_g Convert
+@ Expecting 5.36170 70590 3±σ2.14913 26272 8⁳⁻³ g
+```
+
+Rounded, the mass is 5.3617±σ0.0022 g; it agrees with the reference value:
+```rpl
+5.3616514621±σ0.0021642064708_g ⓁSciRngRnd
+@ Expecting 5.3617±σ0.0022 g
+```
+```rpl
+5.3617±σ0.0022_g 5.36±σ0.01_g ⓁσConcord
+```
+
+
+### Step 2: the spring constant
+
+The spring stores U = 0.22 J when it is compressed by x = 15.00 cm, read on a
+rule graduated in millimetres; k = 2·U/x². Its reference value is 20 N/m with
+a tolerance of ±2.5 %, a bound: 20±σ0.29 N/m, not 20±σ0.5 N/m.
+```rpl
+15_cm 0.05_cm 1 { } ⓁBound→σ
+@ Expecting 15.±σ2.88675 13459 5⁳⁻² cm
+```
+```rpl
+20_N/m 0.5_N/m 1 { } ⓁBound→σ
+@ Expecting 20.±σ0.28867 51345 95 N/m
+```
+
+The spring constant, independent inputs, then the bracket:
+```rpl
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi 1_N/m Convert
+@ Expecting 19.55555 55556±σ0.07527 46168 82 N/m
+```
+```rpl
+-1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07615 82573 15 N/m
+```
+```rpl
+1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07438 04795 38 N/m
+```
+
+Interval arithmetic and Monte Carlo:
+```rpl
+'2*x2/x1^2' 0.22±0.00001_J 15±0.028867513459_cm ⓁΔRFxjxi 1_N/m Convert
+@ Expecting 19.55577 62622±0.07615 88247 46 N/m
+```
+```rpl
+12345 RDZ
+'2*u/x^2' { u x } { '0.22±σ0.00001_J' '14.95…15.05_cm' } →Num
+2000 ⓁMCPropagate 1_N/m Convert
+@ Expecting 19.55534 095±σ0.07717 42988 1 N/m
+```
+
+19.556±σ0.075 N/m is 1.5 standard deviations of the difference below the
+reference 20±σ0.29 N/m: compatible.
+```rpl
+19.556±σ0.075_N/m 20±σ0.29_N/m ⓁσConcord
+```
+
+
+### Step 3: the ejection speed
+
+All the energy of the spring becomes kinetic energy of the marble:
+v = √(2·K/m), with K = U = 0.22 J and the mass of step 1.
+```rpl
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert
+@ Expecting 9.05893 30239 4±σ1.83985 45958 4⁳⁻³ m/s
+```
+```rpl
+-1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ2.03418 36042 1⁳⁻³ m/s
+```
+```rpl
+1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ1.62241 39213⁳⁻³ m/s
+```
+```rpl
+'√(2*x2/x1)' 0.22±0.00001_J 0.0053616514621±0.0000021642064708_kg
+ⓁΔRFxjxi 1_m/s Convert
+@ Expecting 9.05893 36166 4±2.03418 38025 4⁳⁻³ m/s
+```
+
+
+### Step 4: the ejection angle
+
+The marble must land at R = 8.00 m, the target accepting ±2 %, a bound:
+θ = ½·asin(R·g/v²).
+```rpl
+8_m 0.16_m 1 { } ⓁBound→σ
+@ Expecting 8.±σ0.09237 60430 7 m
+```
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±σ0.0923760430707_m 9.0589330239±σ0.0018398545958_m/s
+ⓁσRFxjxi
+@ Expecting 36.46990 40743±σ1.07860 45787 °
+```
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±0.0923760430707_m 9.0589330239±0.0018398545958_m/s
+ⓁΔRFxjxi
+@ Expecting 36.54274 28944±1.12547 27707 6 °
+```
+
+The Monte Carlo method shows what the linearization misses: its mean is
+0.05° higher, about three times its own standard error, and its uncertainty
+3 % larger. The arcsine curves over the range of R.
+```rpl
+12345 RDZ
+'0.5*asin(r*Ⓒg/v^2)' { r v } { '7.84…8.16_m' '9.0589330239±σ0.0018398545958_m/s' } →Num
+5000 ⓁMCPropagate
+@ Expecting 36.51925 9431±σ1.11125 26992 5 °
+```
+
+
+### Step 5: the height of the laser pointer
+
+The angle is set with a laser pointed at a mark x = 2.000 m away, within
+±0.1 %, a bound, at the height y = x·tanθ.
+```rpl
+2_m 0.002_m 1 { } ⓁBound→σ
+@ Expecting 2.±σ1.15470 05383 8⁳⁻³ m
+```
+```rpl
+'x2*tan(x1)' 2±σ0.0011547005384_m 36.4699040743±σ1.0786045787_° ⓁσRFxjxi
+@ Expecting 1.47829 70171 1±σ5.82265 98490 7⁳⁻² m
+```
+```rpl
+'x2*tan(x1)' 2±0.0011547005384_m 36.4699040743±1.0786045787_° ⓁΔRFxjxi
+@ Expecting 1.47914 11034 3±0.05909 24630 35 m
+```
+```rpl
+12345 RDZ
+'d*tan(t)' { d t } { '1.998…2.002_m' '36.4699040743±σ1.0786045787_°' } →Num
+2000 ⓁMCPropagate
+@ Expecting 1.48055 71150 4±σ0.05788 01664 32 m
+```
+
+Rounded, the laser must point 1.478±σ0.058 m high:
+```rpl
+1.4782970171±σ0.058226598491_m ⓁSciRngRnd
+@ Expecting 1.478±σ0.058 m
+```
+
+
+### Step 6: a more realistic experiment
+
+The logic is now reversed: which compression x of the spring gives the speed
+of step 3, when the marble also loses energy by friction along the barrel
+(μk = 0.5±σ0.005), rises in it, and keeps only a fraction f = 0.95±σ0.019 of
+the energy as translation? The energy balance gives a quadratic equation in x,
+whose positive root is
+
+x = m·g/k·(sin θ + μk·cos θ) + 1/k·√((m·g)²·(sin θ + μk·cos θ)² + 2·k·K/f)
+
+with six variables, x1 = m, x2 = k, x3 = θ, x4 = μk, x5 = K and x6 = f. They
+appear several times, which σRFxjxi handles and plain interval arithmetic
+would widen. This step is written in SI units without unit objects, except
+the angle: with six variables, units make the calculations about fifty times
+slower.
+
+Independent inputs:
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56925 12210 7⁳⁻³
+```
+
+The 2025 document chose ρ51 = ρ52 = ρ65 = +1 and ρ54 = −1. This is not a
+possible correlation matrix, and σRFxjxi refuses it: if K were perfectly
+correlated with m, k and f, these three would be perfectly correlated with
+each other, while the matrix says they are independent; one combination of
+the variables would have a negative variance. For the same reason, one
+coefficient for all the pairs cannot go below −1/(n−1), −0.2 here. The largest
+uncertainty that correlations can give is the one where all the
+contributions add up: interval arithmetic gives it.
+```rpl
+1 'ρij' Sto
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi 'ρij' Purge
+@ Expecting 0.15659 93648 36±σ1.80367 32962⁳⁻³
+```
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±0.019 0.22±0.00001 0.5±0.005 36.4699040743±1.0786045787_° 19.5555555556±0.075274616882 0.0053616514621±0.0000021642064708
+ⓁΔRFxjxi
+@ Expecting 0.15662 58788 25±1.88751 71425 7⁳⁻³
+```
+
+The Monte Carlo method:
+```rpl
+12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+2000 ⓁMCPropagate
+@ Expecting 0.15662 45397 98±σ1.61813 73075 7⁳⁻³
+```
+
+The compression must be 15.66±σ0.16 cm, not the 15.00 cm of step 2: the
+friction, the rise and the fraction f cost 0.66 cm of compression, about four
+standard deviations of x+. The experiment can be redone with this setting.
+
+### Step 7: from the measurements themselves
+
+The six variables of step 6 are not all measurements: k, θ and v were
+computed in steps 2 to 4 from the same energy U = K and the same mass m. Their
+errors are correlated for a real reason, a shared cause, and no ρij needs to be
+guessed if x+ is written directly as a function of the seven measurements,
+which are independent: x1 = D, x2 = ρ, x3 = U, x4 = the compression x0 of step
+2, x5 = R, x6 = μk and x7 = f, with m = ρ·(4/3)·π·(D/2)³, k = 2·U/x0² and
+θ = ½·asin(R·g·m/(2·U)).
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.00001 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56924 37991⁳⁻³
+```
+
+The result is the same as in step 6: with an energy known to 10⁻⁵ J, the
+correlations weigh nothing. The energy was chosen very precise in 2025, to keep
+the range under control; a spring gun rather gives about 2 %. With
+U = K = 0.22±σ0.0044 J, the calculation of step 6, which treats K as
+independent of k and θ, finds a much larger uncertainty:
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.0044 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ2.19778 08296 2⁳⁻³
+```
+
+while the calculation from the measurements hardly moves:
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.0044 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.57240 83931 7⁳⁻³
+```
+
+The energy enters k, K and θ, and its effects almost cancel: ignoring this
+correlation overestimates the uncertainty by 40 %. Going back to independent
+measurements is the right way to propagate through a chain of calculations.
