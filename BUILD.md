@@ -52,7 +52,7 @@ The project has the following pre-requisites:
 
 ## Build
 
-To build the simulator, simply use `make sim`.
+To build the simulators, simply use `make sims`.
 
 To build the firmware, use `make release` or `make debug`. There is also a
 macOS-specific target to directly copy on the DM42 filesystem, called
@@ -97,61 +97,75 @@ The [db48x.md](help/db48x.md) help file can be copied to the DM42's `/HELP`
 directory to act as the built-in help for the calculator. It is built
 from individual files in the [doc](doc/) directory.
 
-# Installation guide (step-by-step) to MS Windows users:
+# Installation guide (step-by-step) for MS Windows users:
 
-To run db48x on Windows you need a linux enviroment:
+You neet a Linux environment, to run db48x.
 You are better served with a good internet connection and some free space on your disc (3GB):
 
 ## How to install Fedora WSL on Windows
 
-https://apps.microsoft.com/detail/9npcp8drchsn?hl=en-US&gl=US
+https://www.google.com/search?client=firefox-b-d&q=Fedora+WSL
 
 Set username and password.
-Rember your password!!!
+Remember your password!!!
 
-To run Fedora, open your favorite Windows shell and run the `wsl` command.
+To run Fedora, open your favorite Windows shell and enter: `wsl`
 
 ## Prepare Fedora to run DB48x
 
-Run Fedora and enter:
-
 ```bash
+sudo dnf upgrade --refresh
 sudo dnf install make
 sudo dnf install arm-none-eabi-gcc arm-none-eabi-gcc-cs-c++ arm-none-eabi-newlib
 sudo dnf install qt-devel qt6-qtbase-devel qt6-qtdeclarative-devel qt6-qtmultimedia-devel
 sudo dnf install freetype-devel
 sudo dnf install rsync
+sudo dnf install git
 sudo dnf upgrade --refresh
 ```
 
-## Install and build DB48x
-
-Run Fedora and enter:
+## Install and build DB48x sims
 
 ```bash
 git clone https://github.com/c3d/db48x.git
 cd db48x
 git submodule update --init --recursive
+make sims
 ```
 
-And then run the following to build DB48x:
+before running the first time DB48x: logout
 ```bash
-make sim
+logout
 ```
 
-DB48x looks for `help` and `config` relative to your current directory, so you
-need to run it from the top-level directory if you want the built-in help files
-and the configuration files to be found:
+shutdown fedora (WSL) and restart fedora (WSL) - Windows Powershell
+```bash
+wsl --shutdown
+wsl
+```
+
+Enter in the linux terminal (WSL)
+```bash
+cd ~
+```
+
+1st run db48x:
 
 ```bash
-`./sim/db48x
+cd db48x
+ ./db48x
 ```
 
-DB48x should run now :-)
+1st run db50x:
+
+```bash
+cd db48x
+ ./db50x
+```
+
+db48x and db50x should run now :-)
 
 ## Update DB48x
-
-Run fedora and enter:
 
 ```bash
 cd db48x
@@ -160,54 +174,73 @@ git pull
 
 ## Reset DB48x branch
 
-Run fedora and enter:
-
 ```bash
 git reset --hard HEAD~1
 ```
 
-## Add Shortcut to Windows (Start-Menu):
+## Clean up local changes
 
-###  DB48x - WSL terminal
+```bash
+git clean -f
+git checkout .
+git restore .
+```
 
-To create a shortcut that lets you operate in the terminal in the DB48x
+## Add Shortcuts to Windows (Start-Menu):
+
+###  db48x   WSL terminal ONLY
+
+To create a shortcut that lets you operate in the terminal in the db48x
 directory:
 
-* Hit the windows key on your keyboard and enter `powershell`
-* Move the cursor over the Powershell icon, right-click and select
+* Hit the Windows key on your keyboard and enter `PowerShell`
+* Move the cursor over the PowerShell icon, right-click and select
   `Open file location`
-* Windows explorer opens
+* Windows Explorer opens
 * Copy the shortcut `Windows PowerShell (x86)`  and rename it to your liking,
-  e.g. `DB48x - WSL terminal`
+  e.g. `db48x   WSL terminal ONLY`
 * Right-click on the file and select `Properties`:
-* Change the target of the shortcut to
-  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x"`
+* Change "Target" to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\PowerShell.exe wsl --cd "~/db48x/"`
 
+###  db48x   WSL SHUTDOWN
 
-###  DB48x + WSL
+To create a shortcut that lets you shutdown WSL - Useful if WSL  crashes and Taskbar window caption shows the penguin [WARN: COPY MODE]
 
-This configuration launches DB48x through a terminal window, so that you can see
-DB48x's output, for example traces or error messages:
-
-* Hit the Windows key on your keyboard and enter `powershell`
-* Move the cursor over the Powershell icon, right-click and select
+* Hit the Windows key on your keyboard and enter `PowerShell`
+* Move the cursor over the PowerShell icon, right-click and select
   `Open file location`
-* Windows explorer opens
-* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `db48x + WSL`
-* Right-click on the file and select `Properties`
-* Change the target of the shortcut to
-  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe wsl --cd "~/db48x" -- ./sim/db48x`
+* Windows Explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to your liking,
+  e.g. `db48x   WSL SHUTDOWN`
+* Right-click on the file and select `Properties`:
+* Change "Target" to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\PowerShell.exe -Command "wsl --shutdown"`
 
-###  DB48x (without terminal)
+###  db48x   WSL & db50x
+
+This configuration launches db48x through a terminal window, so that you can see
+db48x's output, for example traces or error messages:
+
+* Hit the Windows key on your keyboard and enter `PowerShell`
+* Move the cursor over the PowerShell icon, right-click and select
+  `Open file location`
+* Windows Explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `db48x   WSL & db50x`
+* Right-click on the file and select `Properties`
+* Change "Target" to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\PowerShell.exe wsl --cd "~/db48x/" -- ./db50x`
+
+###  db50x (without terminal)
 
 In this configuration, the terminal is hidden and you will not see any error
-message emitted by DB48x.
+message emitted by db48x.
 
-* Hit the windows key on your keyboard and enter `powershell`
-* Move the cursor over the Powershell icon, right-click and and select
+* Hit the Windows key on your keyboard and enter `PowerShell`
+* Move the cursor over the PowerShell icon, right-click and and select
   `Open file location`
-* Windows explorer opens
-* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `DB48x`
+* Windows Explorer opens
+* Copy the shortcut `Windows PowerShell (x86)`  and rename it to `db50x`
 * Right-click on the file and `Properties`
-* Change the target of the shortcut to
-  `%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe PowerShell.exe -WindowStyle hidden wsl --cd "~/db48x" -- ./sim/db48x`
+* Change "Target" to
+  `%SystemRoot%\system32\WindowsPowerShell\v1.0\PowerShell.exe -Windowstyle hidden  wsl --cd "~/db48x/" -- ./db50x`
