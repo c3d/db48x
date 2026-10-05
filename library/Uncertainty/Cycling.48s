@@ -1,0 +1,32 @@
+«
+@@ Cycling — turn a bounded interval into its next equivalent form:
+@@ a…b → c±d → c±p% → a…b, keeping its unit. The three forms state
+@@ the same bounds. A value a±σb is refused: a standard deviation is
+@@ not a bound, and has no equivalent interval (see Bound→σ for the
+@@ link between a bound and a standard deviation).
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  → cyx
+  «
+    @ The value without its unit, and the unit as 1_unit (or 1)
+    1 cyx
+    If cyx TypeName "unit" == Then Drop Drop 1 cyx →Unit cyx UVal End
+    → cyu cyv
+    «
+      cyv TypeName
+      → cyt
+      «
+        Case
+          cyt "uncertain" == Then
+            "Cycling: a±σb is a standard deviation, not a bound; it has no equivalent interval" DoError
+          End
+          cyt "range" == cyt "drange" == Or cyt "prange" == Or Then
+            cyv Cycle
+          End
+          "Cycling: expects an interval a…b, a±b or a±p%" DoError
+        End
+        If cyu TypeName "unit" == Then cyu * End
+      »
+    »
+  »
+»

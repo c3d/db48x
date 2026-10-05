@@ -24,7 +24,8 @@ Tools for measured values and their uncertainties, whether written as bounds
 * [Rounding](#roundinglibrary) — present a result with the digits its
   uncertainty justifies: [SciRngRnd](#scirngrnd), and as text
   [SciRngText](#scirngtext) (`12.35±0.10`) or
-  [SciRngParen](#scirngparen) (`12.35(10)`).
+  [SciRngParen](#scirngparen) (`12.35(10)`), and give an interval its other
+  forms with [Cycling](#cycling).
 * [TypeB](#typeblibrary) — turn a resolution, a tolerance or a stated
   uncertainty into a standard uncertainty: [ResN0→σR](#resn0→σr) guides
   the choice step by step, [Bound→σ](#bound→σ) and [ResN0](#resn0) do the
@@ -73,6 +74,8 @@ same number to the calculator. [SciRngRnd](#scirngrnd) returns numbers to go
 on computing with; [SciRngText](#scirngtext) returns the same result written as
 text, zeros included, for a report or a label; [SciRngParen](#scirngparen)
 writes it in the concise notation of the GUM and CODATA, `12.35(10)`.
+[Cycling](#cycling) turns an interval into its other equivalent forms, `a…b`,
+`a±b` and `a±p%`, unit included.
 
 After Jean Wilson's SciRngRnd (2025–2026).
 
@@ -231,6 +234,60 @@ Stack: an interval, or `X` `U`, as for SciRngRnd.
 ```
 
 See also: [SciRngRnd](#scirngrnd), [SciRngText](#scirngtext).
+
+## Cycling
+
+Turn a bounded interval into its next equivalent form, keeping its unit:
+
+`a…b` → `c±d` → `c±p%` → `a…b`
+
+with c = (a + b)/2, d = (b − a)/2 and p = 100·d/|c|. The three forms state the
+same bounds, so going from one to the other is an equivalence: nothing is lost
+or added, and three presses bring the interval back.
+
+A value `a±σb` is refused. Its bars are a standard deviation, not bounds: the
+true value lies outside them one time in three, and there is no interval that
+means the same thing. Going from a bound to a standard deviation is a choice of
+distribution, which [Bound→σ](#bound→σ) makes explicit.
+
+The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
+but not when the value carries a unit; Cycling does.
+
+**1)** From bounds to a centre and a half width:
+
+```rpl
+9…11 ⓁCycling
+@ Expecting 10±1
+```
+
+**2)** From a half width to a percentage:
+
+```rpl
+10±1 ⓁCycling
+@ Expecting 10±10%
+```
+
+**3)** And back to the bounds:
+
+```rpl
+10±10% ⓁCycling
+@ Expecting 9…11
+```
+
+**4)** With a unit:
+
+```rpl
+1.0…2.0_m ⓁCycling
+@ Expecting 1.5±0.5 m
+```
+
+**5)** Three presses bring the interval back:
+
+```rpl
+1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling
+@ Expecting 1.…2. m
+```
+
 
 ## TypeBLibrary
 
