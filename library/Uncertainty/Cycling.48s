@@ -1,11 +1,16 @@
 «
-@@ Cycling — turn a bounded interval into its next equivalent form:
-@@ a…b → c±d → c±p% → a…b, keeping its unit. The three forms state
-@@ the same bounds. A value a±σb is refused: a standard deviation is
-@@ not a bound, and has no equivalent interval (see Bound→σ for the
-@@ link between a bound and a standard deviation).
+@@ Cycling — give a value with an uncertainty its next form, keeping
+@@ its unit: a…b → c±d → c±p% → c±σd → a…b.
+@@ The first three forms state the same bounds: these steps are
+@@ equivalences. The two steps to and from c±σd keep the same digits
+@@ but change their meaning, a bound becoming a standard deviation or
+@@ the reverse: they correct a value typed in the wrong form, and their
+@@ result is tagged "non-equivalent". To turn a bound into a standard
+@@ deviation by a law, use Bound→σ instead.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ A value tagged by an earlier press loses its tag
+  If Dup TypeName "tag" == Then DeleteTag End
   → cyx
   «
     @ The value without its unit, and the unit as 1_unit (or 1)
@@ -17,15 +22,22 @@
       → cyt
       «
         Case
+          cyt "range" == cyt "drange" == Or Then
+            cyv Cycle 0
+          End
+          cyt "prange" == Then
+            cyv Explode → cyc cyp « cyc cyc Abs cyp * 100 / →σRange » 1
+          End
           cyt "uncertain" == Then
-            "Cycling: a±σb is a standard deviation, not a bound; it has no equivalent interval" DoError
+            cyv Explode → cyc cyd « cyc cyd - cyc cyd + →Range » 1
           End
-          cyt "range" == cyt "drange" == Or cyt "prange" == Or Then
-            cyv Cycle
-          End
-          "Cycling: expects an interval a…b, a±b or a±p%" DoError
+          "Cycling: expects a…b, a±b, a±p% or a±σb" DoError
         End
-        If cyu TypeName "unit" == Then cyu * End
+        → cyn
+        «
+          If cyu TypeName "unit" == Then cyu * End
+          If cyn Then "non-equivalent" →Tag End
+        »
       »
     »
   »

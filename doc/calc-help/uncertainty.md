@@ -74,8 +74,8 @@ same number to the calculator. [SciRngRnd](#scirngrnd) returns numbers to go
 on computing with; [SciRngText](#scirngtext) returns the same result written as
 text, zeros included, for a report or a label; [SciRngParen](#scirngparen)
 writes it in the concise notation of the GUM and CODATA, `12.35(10)`.
-[Cycling](#cycling) turns an interval into its other equivalent forms, `a…b`,
-`a±b` and `a±p%`, unit included.
+[Cycling](#cycling) gives a value its other forms, `a…b`, `a±b`, `a±p%` and
+`a±σb`, unit included, and corrects a value typed in the wrong form.
 
 After Jean Wilson's SciRngRnd (2025–2026).
 
@@ -237,18 +237,23 @@ See also: [SciRngRnd](#scirngrnd), [SciRngText](#scirngtext).
 
 ## Cycling
 
-Turn a bounded interval into its next equivalent form, keeping its unit:
+Give a value with an uncertainty its next form, keeping its unit:
 
-`a…b` → `c±d` → `c±p%` → `a…b`
+`a…b` → `c±d` → `c±p%` → `c±σd` → `a…b`
 
-with c = (a + b)/2, d = (b − a)/2 and p = 100·d/|c|. The three forms state the
-same bounds, so going from one to the other is an equivalence: nothing is lost
-or added, and three presses bring the interval back.
+with c = (a + b)/2, d = (b − a)/2 and p = 100·d/|c|.
 
-A value `a±σb` is refused. Its bars are a standard deviation, not bounds: the
-true value lies outside them one time in three, and there is no interval that
-means the same thing. Going from a bound to a standard deviation is a choice of
-distribution, which [Bound→σ](#bound→σ) makes explicit.
+The first three forms state the same bounds: going from one to the other is an
+equivalence, nothing is lost or added.
+
+The two steps to and from `c±σd` are of another kind. They keep the same digits
+but change their meaning: a bound becomes a standard deviation, or the reverse.
+Their result is tagged `non-equivalent:` as a reminder. They are there to
+correct a value typed in the wrong form, `10±1` for `10±σ1` or the reverse, not
+to convert one into the other. A bound and a standard deviation are not the
+same thing: the true value lies outside ±σ one time in three. To turn a bound
+into a standard deviation, a law must be chosen, a rectangular one dividing the
+half width by √3: [Bound→σ](#bound→σ) does that.
 
 The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
 but not when the value carries a unit; Cycling does.
@@ -267,25 +272,32 @@ but not when the value carries a unit; Cycling does.
 @ Expecting 10±10%
 ```
 
-**3)** And back to the bounds:
+**3)** From a percentage to a standard deviation with the same digits, tagged as not equivalent:
 
 ```rpl
 10±10% ⓁCycling
-@ Expecting 9…11
+@ Expecting non-equivalent:10±σ1
 ```
 
-**4)** With a unit:
+**4)** A value typed as a standard deviation but meant as bounds:
+
+```rpl
+10±σ1 ⓁCycling
+@ Expecting non-equivalent:9…11
+```
+
+**5)** With a unit:
 
 ```rpl
 1.0…2.0_m ⓁCycling
 @ Expecting 1.5±0.5 m
 ```
 
-**5)** Three presses bring the interval back:
+**6)** Four presses bring the bounds back, tagged as not equivalent since the cycle went through a standard deviation:
 
 ```rpl
-1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling
-@ Expecting 1.…2. m
+1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling ⓁCycling
+@ Expecting non-equivalent:1.…2. m
 ```
 
 
