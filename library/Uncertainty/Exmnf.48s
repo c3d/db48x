@@ -56,14 +56,15 @@
               → wd
               «
                 ClearLCD
-                "Exmnf: " 'fx' Rcl →Str + " over X" + { #0d #2d 1 true false } DrawText
-                @ Plot area: columns 24 to wd-12, rows 34 to 150
-                @ Frame
-                { #24d #34d } { #24d #150d } DrawLine
-                { #24d #150d } wd 12 - R→B #150d 2 →List DrawLine
+                "Exmnf: " 'fx' Rcl →Str + " over X" + { #0d #2d 0 true false } DrawText
+                @ Plot area: columns 8 to wd-12, rows 34 to 150
+                @ Frame, closed at both ends of X
+                { #8d #34d } { #8d #150d } DrawLine
+                { #8d #150d } wd 12 - R→B #150d 2 →List DrawLine
+                wd 12 - R→B #34d 2 →List wd 12 - R→B #150d 2 →List DrawLine
                 @ The curve
                 0 160 For kk
-                  24 wd 36 - kk * 160 / + 0 RND R→B
+                  8 wd 20 - kk * 160 / + 0 RND R→B
                   150 116 ys kk 1 + Get ya - * yb ya - / - 0 RND R→B
                   2 →List
                   If kk 0 > Then Dup Rot Swap DrawLine End
@@ -76,7 +77,7 @@
                   150 116 Rot ya - * yb ya - / - 0 RND R→B
                   → py
                   «
-                    24 wd 12 - For cx
+                    8 wd 12 - For cx
                       cx R→B py 2 →List cx 4 + R→B py 2 →List DrawLine
                     8 Step
                   »

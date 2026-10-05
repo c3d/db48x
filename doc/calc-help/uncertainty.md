@@ -864,6 +864,29 @@ extrema inside the interval:
 'x^4' 1.10±1.15_m ⓁExmnf
 ```
 
+**A peak narrower than the sampling.** No search can promise an extremum
+narrower than the steps it takes. This function rises gently from 1 to 1.9,
+with a peak of height 3 and width 0.008 at x = 2.37:
+
+**3)** Over 0…3, the 161 points of the curve fall on the flank of the peak and
+show it as a small spike, but ΔRf misses it: the dashed line of the maximum
+stays at 1.9, below the spike.
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '0…3' →Num ⓁExmnf
+```
+
+**4)** A spike that the dashed lines do not explain calls for a closer look.
+Over 2.3…2.45, around the spike, the peak is drawn whole and ΔRf finds the
+true maximum, 4.56:
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '2.3…2.45' →Num ⓁExmnf
+```
+
+Over a wide interval, examine the drawing as well as the numbers, and narrow
+the interval around anything they do not account for.
+
 
 ## ΔRFxjxi
 
@@ -944,6 +967,15 @@ x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
 'sin(x1)*cos(x2)' 3±3_r 3±3_r ⓁExmnFxjxi
 ```
 
+**3)** Robustness: a bump and a dip right on the way from the minimum to the
+maximum. The profile shows both, a local maximum near (1, 1) and a local
+minimum near (2, 2), yet the search keeps the global extrema, at (0, 0) and
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnFxjxi
+```
+
 
 ## ExmnF2D
 
@@ -989,6 +1021,39 @@ circles around it, and the minimum at a far corner:
 ```rpl
 'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
 ```
+
+**5)** Robustness: the same bump and dip as in example 3 of ExmnFxjxi. The
+contours circle both of them, on the segment, and the search still finds the
+global minimum at (0, 0) and the global maximum 1.8 at (3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**A hidden peak, in two steps.** A peak of height 3 stands at x1 = 2.2,
+x2 = 0.9, on a gentle slope from 1 to 1.9:
+
+**6)** Over the whole box 0…3 × 0…3, the search misses the peak and gives the
+maximum 1.9 at (3, 3). The contours do not: they draw circles near the top of
+the slice, around a summit that the numbers do not account for.
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.2)^2+(x2-0.9)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**7)** A smaller box around the circles, x1 = 2.2±0.3 and x2 = 0.9±0.3, given
+as X2 X1: the peak is now inside the reach of the search, and the true maximum
+appears, 4.198 at (2.2, 0.9):
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.2)^2+(x2-0.9)^2)/0.03)' 0.9±0.3 2.2±0.3 ⓁExmnF2D
+```
+
+The search starts from the centre and from the best vertex of the box, one
+variable at a time; a summit narrow compared with the box, off the lines it
+follows, may escape it. When the
+contours show a summit or a pit that the squares do not mark, examine a
+smaller box around it.
 
 
 ## ApplicationsLibrary

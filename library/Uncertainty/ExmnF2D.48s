@@ -294,7 +294,7 @@
                             → lvl
                             «
                               ClearLCD
-                              "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 1 true false } DrawText
+                              "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 0 true false } DrawText
                               @ Marching squares: for each cell and each level, the
                               @ segment where the values cross it. Level -0.5 traces
                               @ the edge of the box; levels 1/8 … 7/8 the contours.
