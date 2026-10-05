@@ -220,7 +220,9 @@
                 → wd
                 «
                   ClearLCD
-                  "ExmnFxjxi: " 'fx' Rcl →Str + { #0d #2d 0 true false } DrawText
+                  "ExmnFxjxi: " 'fx' Rcl →Str +
+                  If Dup Size 46 > Then 1 45 Sub "…" + End
+                  { #0d #2d 0 true false } DrawText
                   @ Plot area: columns 8 to wd-12, rows 34 to 150, closed at both ends
                   { #8d #34d } { #8d #150d } DrawLine
                   { #8d #150d } wd 12 - R→B #150d 2 →List DrawLine
@@ -232,6 +234,25 @@
                     If kk 0 > Then Dup Rot Swap DrawLine End
                   Next
                   Drop
+                  @ Local extrema of the curve: ▲ above a point higher than its two
+                  @ neighbours, ▼ below a point lower than them (ties go to the left one)
+                  2 160 For kk
+                    ys kk 1 - Get ys kk Get ys kk 1 + Get
+                    → pa pv pc
+                    «
+                      8 wd 20 - kk 1 - * 160 / + 0 RND 4 -
+                      150 116 pv ya - * yb ya - / - 0 RND
+                      → mx my
+                      «
+                        If pv pa > pv pc ≥ And Then
+                          "▲" mx R→B my 15 - 34 Max R→B 2 →List 0 true false 3 →List + DrawText
+                        End
+                        If pv pa < pv pc ≤ And Then
+                          "▼" mx R→B my 2 + 137 Min R→B 2 →List 0 true false 3 →List + DrawText
+                        End
+                      »
+                    »
+                  Next
                   @ The minimum and the maximum, dashed
                   ya yb 2 →List
                   1 2 For jj
@@ -254,7 +275,7 @@
                   "max = " vmx →Str + "  at " +
                   { } 1 nv For j lmx 2 j * Get + Next →Str +
                   { #0d #192d 0 true false } DrawText
-                  "points as { x1 … xn }" { #0d #212d 0 true false } DrawText
+                  "points as { x1 … xn }   [▲: max ; ▼: min]" { #0d #212d 0 true false } DrawText
                 »
               »
             »

@@ -849,7 +849,8 @@ Stack: 'f(x)' X ▶ f(X), as ΔRf.
 
 The curve uses 161 points. Each dashed line should touch the curve; a line
 that does not, or a peak of the curve beyond a line, would show an extremum
-that ΔRf missed.
+that ΔRf missed. A point of the curve higher than its two neighbours is marked
+▲ above it, a point lower than them ▼ below it: the local maxima and minima.
 
 **1)** The polynomial of the first example of ΔRf, with its two
 extrema inside the interval:
@@ -869,8 +870,8 @@ narrower than the steps it takes. This function rises gently from 1 to 1.9,
 with a peak of height 3 and width 0.008 at x = 2.37:
 
 **3)** Over 0…3, the 161 points of the curve fall on the flank of the peak and
-show it as a small spike, but ΔRf misses it: the dashed line of the maximum
-stays at 1.9, below the spike.
+show it as a small spike, marked ▲, but ΔRf misses it: the dashed line of the
+maximum stays at 1.9, below the spike.
 
 ```rpl
 '1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '0…3' →Num ⓁExmnf
@@ -952,7 +953,8 @@ Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the sta
 The minimum and the maximum are found as by ΔRFxjxi; the segment that joins
 them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
 points, from the minimum on the left to the maximum on the right. The values
-and the points of both extrema are written below, as { x1 … xn }.
+and the points of both extrema are written below, as { x1 … xn }. Along the
+profile, ▲ marks a local maximum and ▼ a local minimum.
 
 **1)** A maximum on an edge of the box:
 
@@ -968,8 +970,7 @@ x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
 ```
 
 **3)** Robustness: a bump and a dip right on the way from the minimum to the
-maximum. The profile shows both, a local maximum near (1, 1) and a local
-minimum near (2, 2), yet the search keeps the global extrema, at (0, 0) and
+maximum. The profile shows both, with their marks ▲ and ▼, yet the search keeps the global extrema, at (0, 0) and
 (3, 3):
 
 ```rpl

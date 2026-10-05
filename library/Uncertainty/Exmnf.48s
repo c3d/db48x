@@ -56,7 +56,9 @@
               → wd
               «
                 ClearLCD
-                "Exmnf: " 'fx' Rcl →Str + " over X" + { #0d #2d 0 true false } DrawText
+                "Exmnf: " 'fx' Rcl →Str + " over X" +
+                If Dup Size 46 > Then 1 45 Sub "…" + End
+                { #0d #2d 0 true false } DrawText
                 @ Plot area: columns 8 to wd-12, rows 34 to 150
                 @ Frame, closed at both ends of X
                 { #8d #34d } { #8d #150d } DrawLine
@@ -70,6 +72,25 @@
                   If kk 0 > Then Dup Rot Swap DrawLine End
                 Next
                 Drop
+                @ Local extrema of the curve: ▲ above a point higher than its two
+                @ neighbours, ▼ below a point lower than them (ties go to the left one)
+                2 160 For kk
+                  ys kk 1 - Get ys kk Get ys kk 1 + Get
+                  → pa pv pc
+                  «
+                    8 wd 20 - kk 1 - * 160 / + 0 RND 4 -
+                    150 116 pv ya - * yb ya - / - 0 RND
+                    → mx my
+                    «
+                      If pv pa > pv pc ≥ And Then
+                        "▲" mx R→B my 15 - 34 Max R→B 2 →List 0 true false 3 →List + DrawText
+                      End
+                      If pv pa < pv pc ≤ And Then
+                        "▼" mx R→B my 2 + 137 Min R→B 2 →List 0 true false 3 →List + DrawText
+                      End
+                    »
+                  »
+                Next
                 @ The bounds found by ΔRf, dashed
                 rlo rhi 2 →List
                 1 2 For jj
@@ -84,7 +105,7 @@
                 Next
                 Drop
                 @ The numbers
-                "x: " lo un * →Str + " … " + hi un * →Str +
+                "x: " lo un * →Str + " … " + hi un * →Str + "   [▲: max ; ▼: min]" +
                 { #0d #160d 0 true false } DrawText
                 "min = " rlo uf * →Str + { #0d #180d 0 true false } DrawText
                 "max = " rhi uf * →Str + { #0d #200d 0 true false } DrawText
