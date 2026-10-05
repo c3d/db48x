@@ -774,6 +774,9 @@ are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
 directory and applies to the next calls: purge it when done, as the examples
 do.
 
+Thanks to Ed van Gasteren, whose Propagate program and discussions led to this
+function.
+
 **1)** A mass from a linear density and a length, with units:
 
 ```rpl
