@@ -42,6 +42,13 @@ Tools for measured values and their uncertainties, whether written as bounds
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
 
+Correlations are given by two global variables. `ρij` holds one coefficient
+for all the pairs, or the full correlation matrix, for the functions of
+several variables: σRFxjxi and MCPropagate. `ρ` holds a single coefficient
+between two values, for the arithmetic of the calculator on `a±σb` values, as
+in `10±σ1 12±σ1 +`, and for σConcord. Without them, the values are
+independent; purge them after use, or they will weigh on later calculations.
+
 
 ## RoundingLibrary
 
