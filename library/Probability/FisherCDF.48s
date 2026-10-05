@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  FisherCDF
+  @  Distribution function at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "FisherCDF: needs 3 arguments" DoError END Explode Drop END
+  → dfnv dfdv Xv « dfnv 0 + dfdv 0 + Xv 0 + → dfn dfd X « 'IFTE(X≤0;0;BetaI(dfn/2;dfd/2;dfn*X/(dfn*X+dfd)))' →Num dfnv dfdv Xv 3 →List Drop » »
+»
