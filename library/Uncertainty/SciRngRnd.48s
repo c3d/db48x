@@ -1,0 +1,56 @@
+«
+    @ SciRngRnd: round a measured value and its uncertainty by the NIST rule:
+    @ the uncertainty to 2 significant digits, the value to the same decimal place.
+    @ Accepts a±b, a±σb, a±p%, a…b, with or without units, or two values X U.
+    @ Returns the same type. A zero uncertainty leaves the value unchanged.
+    @ After Jean Wilson's SciRngRnd (2025-2026).
+
+    @ Rounding core: X U → Xr Ur, both plain numbers in the same unit
+    «
+        IF DUP 0 = THEN
+        ELSE
+            -2 RND DUP UNROT StdRnd SWAP
+        END
+    »
+    @ Split a value from its unit: Obj → Value 1_unit (or 1 without unit)
+    «
+        IF DUP TypeName "unit" == THEN
+            DUP UVAL SWAP 1 SWAP →Unit
+        ELSE
+            1
+        END
+    »
+    → SciCore SciSplit
+    «
+        IF DUP TypeName "unit" == THEN DUP UVAL ELSE DUP END
+        TypeName → SciKind
+        «
+            IF SciKind "drange" == SciKind "uncertain" == OR
+               SciKind "prange" == OR SciKind "range" == OR
+            THEN
+                @ One interval: separate its unit, then its two components
+                SciSplit SWAP Object→
+                CASE
+                    SciKind "drange" == THEN SciCore →∆Range END
+                    SciKind "uncertain" == THEN SciCore →σRange END
+                    SciKind "prange" == THEN
+                        → Xc Pc
+                        « Xc Xc ABS Pc × 100 ÷ SciCore DROP Pc -2 RND →%Range »
+                    END
+                    @ range: centre and half-width, rounded, then bounds again
+                    → Lo Hi
+                    « Lo Hi + 2 ÷ Hi Lo - 2 ÷ SciCore
+                      → Xc Ux « Xc Ux - Xc Ux + →Range » »
+                END
+                ×
+            ELSE
+                @ Two values X U: express U in the unit of X, then round as a±b
+                IF OVER TypeName "unit" == THEN
+                    IF DUP TypeName "unit" == THEN OVER Convert END
+                END
+                SciSplit DROP SWAP SciSplit UNROT SWAP
+                SciCore →∆Range ×
+            END
+        »
+    »
+»

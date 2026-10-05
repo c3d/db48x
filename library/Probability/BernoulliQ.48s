@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BernoulliQ
+  @  Discrete quantile. Stack: p0, p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "BernoulliQ: needs 2 arguments" DoError END Explode Drop END
+  → p0 p « IF 'p<0 OR p>1' EVAL THEN Ⓒ? ELSE 'IFTE(p≤1-p0;0;1)' EVAL END p0 p 2 →List Drop »
+»

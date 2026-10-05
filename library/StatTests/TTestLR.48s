@@ -1,0 +1,10 @@
+«
+  @ ------------------------------------------------------------
+  @  TTestLR
+  @  Slope of the linear regression on ΣData: is it different from zero?
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Takes no argument: it reads the current ΣData.
+  @ ------------------------------------------------------------
+  « ΣSize ΣX ΣY ΣXY ΣX² ΣY² → nn sumx sumy sumxy sumx2 sumy2 « 'sumx2-sumx^2/nn' →Num 'sumy2-sumy^2/nn' →Num 'sumxy-sumx*sumy/nn' →Num → sxx syy sxy « 'sxy/sxx' →Num → bhat « '(syy-bhat*sxy)/(nn-2)' →Num → se2 « 'bhat/√(se2/sxx)' →Num 'nn-2' →Num → tv dfv « tv "t" →Tag dfv "df" →Tag dfv 'ABS(tv)' →Num UTPT 2 * "p" →Tag » » » » » » EVAL
+»

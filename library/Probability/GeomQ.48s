@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GeomQ
+  @  Discrete quantile, support starting at 1. Stack: p0, p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "GeomQ: needs 2 arguments" DoError END Explode Drop END
+  → p0 p « IF 'p<0 OR p>1' EVAL THEN Ⓒ? ELSE 1 0 → k c « WHILE 'c<p AND k≤1+LN(0.0000000001)/LN(1-p0)' EVAL REPEAT 'c+p0*((1-p0)^(k-1))' EVAL 'c' STO 'k+1' EVAL 'k' STO END 'IFTE(k≤1;1;k-1)' EVAL R→I » END p0 p 2 →List Drop »
+»

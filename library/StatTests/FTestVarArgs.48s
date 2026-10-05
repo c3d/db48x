@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  FTestVarArgs
+  @  Labels a row of values with the parameter names of FTestVar.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "FTestVarArgs: needs 4 arguments" DoError END Explode Drop END
+  → n1v s1v n2v s2v « n1v 0 + s1v 0 + n2v 0 + s2v 0 + → n1 sd1 n2 sd2 « n1 "n1" →Tag sd1 "s1" →Tag n2 "n2" →Tag sd2 "s2" →Tag n1v s1v n2v s2v 4 →List Drop » »
+»
