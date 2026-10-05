@@ -445,6 +445,13 @@
 	"DMOΔConcord",	"=/library/Uncertainty/DMODeltaConcord.48s"
 	"DMOσConcord",	"=/library/Uncertainty/DMOSigmaConcord.48s"
 
+"Uncertainty/Applications/GUMS1"
+
+	"S1Additive",	"=/library/Uncertainty/S1Additive.48s"
+	"S1Mass",	"=/library/Uncertainty/S1Mass.48s"
+	"S1Power",	"=/library/Uncertainty/S1Power.48s"
+	"S1Gauge",	"=/library/Uncertainty/S1Gauge.48s"
+
 "Uncertainty/Applications/Projectile"
 
 	"StepA",	"=/library/Uncertainty/StepA.48s"
