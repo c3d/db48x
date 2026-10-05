@@ -1403,6 +1403,319 @@ static const cstring basic_equations[] =
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
+
+    // ------------------------------------------------------------------------
+    "Math", nullptr,
+    "Math/Probability", nullptr,
+    //T#*: 30 vars 203 eqns 38 sims 32 secs
+    // ------------------------------------------------------------------------
+    //   Probability distributions. Design: Jean Wilson
+    //   Co-authors & programming: Claude Code (Anthropic)
+    //
+    //   ORDERING RULE: a tautological line such as 'x=x' exists only to give a
+    //   menu key to a name that would otherwise collide with a constant.  Such
+    //   lines must ALWAYS come after the equations that really define the
+    //   quantities: the solver keeps the first eligible equation.
+    //
+    //   FORBIDDEN NAMES, because they resolve to constants: sigma, alpha, k,
+    //   gamma, g.  Hence sigma -> sx, alpha -> ap, k -> sh, gamma -> sc.
+
+    "Norml",  "{ "
+    "  'CDF=0.5*(1+erf((X-μ)/(sx*√(2))))' "
+    "  'PDF=1/(sx*√(2*Ⓒπ))*EXP(-((X-μ)²)/(2*sx²))' "
+    "  'CDFc=0.5*erfc((X-μ)/(sx*√(2)))' "
+    "  'μ=μ' "
+    "  'sx=sx' "
+    "}",
+
+    "LgNrm",  "{ "
+    "  'CDF=IFTE(X≤0;0;0.5*(1+erf((LN(X)-μl)/(σl*√(2)))))' "
+    "  'PDF=IFTE(X≤0;0;1/(X*σl*√(2*Ⓒπ))*EXP(-((LN(X)-μl)^2)/(2*(σl^2))))' "
+    "  'CDFc=IFTE(X≤0;1;0.5*erfc((LN(X)-μl)/(σl*√(2))))' "
+    "  'μl=μl' "
+    "  'σl=σl' "
+    "  'μ=EXP(μl+(σl^2)/2)' "
+    "  'sx=√((EXP(σl^2)-1)*EXP(2*μl+σl^2))' "
+    "}",
+
+    "Expon",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-λ*X))' "
+    "  'PDF=IFTE(X<0;0;λ*EXP(-λ*X))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-λ*X))' "
+    "  'λ=λ' "
+    "  'μ=1/λ' "
+    "  'sx=1/λ' "
+    "}",
+
+    "Weibl",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-((X/λ)^sh)))' "
+    "  'PDF=IFTE(X<0;0;(sh/λ)*((X/λ)^(sh-1))*EXP(-((X/λ)^sh)))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-((X/λ)^sh)))' "
+    "  'sh=sh' "
+    "  'λ=λ' "
+    "  'μ=λ*Γ(1+1/sh)' "
+    "  'sx=λ*√(Γ(1+2/sh)-Γ(1+1/sh)^2)' "
+    "}",
+
+    "Rayleigh",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-(X^2)/(2*(s^2))))' "
+    "  'PDF=IFTE(X<0;0;(X/(s^2))*EXP(-(X^2)/(2*(s^2))))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-(X^2)/(2*(s^2))))' "
+    "  's=s' "
+    "  'μ=s*√(Ⓒπ/2)' "
+    "  'sx=s*√(2-Ⓒπ/2)' "
+    "}",
+
+    "Logis",  "{ "
+    "  'CDF=1/(1+EXP(-(X-μ)/s))' "
+    "  'PDF=EXP(-(X-μ)/s)/(s*((1+EXP(-(X-μ)/s))^2))' "
+    "  'CDFc=1/(1+EXP((X-μ)/s))' "
+    "  'μ=μ' "
+    "  's=s' "
+    "  'sx=s*Ⓒπ/√(3)' "
+    "}",
+
+    "Pareto",  "{ "
+    "  'CDF=IFTE(X<xm;0;1-(xm/X)^ap)' "
+    "  'PDF=IFTE(X<xm;0;ap*(xm^ap)/(X^(ap+1)))' "
+    "  'CDFc=IFTE(X<xm;1;(xm/X)^ap)' "
+    "  'xm=xm' "
+    "  'ap=ap' "
+    "  'μ=IFTE(ap>1;ap*xm/(ap-1);Ⓒ∞)' "
+    "  'sx=IFTE(ap>2;(xm/(ap-1))*√(ap/(ap-2));IFTE(ap>1;Ⓒ∞;Ⓒ?))' "
+    "}",
+
+    "Cauch",  "{ "
+    "  'CDF=0.5+2*UVAL(UBASE(ATAN((X-x0)/sc)))' "
+    "  'PDF=1/(Ⓒπ*sc*(1+((X-x0)/sc)^2))' "
+    "  'CDFc=0.5-2*UVAL(UBASE(ATAN((X-x0)/sc)))' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'μ=Ⓒ?' "
+    "  'sx=Ⓒ?' "
+    "}",
+
+    "UnifCont",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;(X-Xmin)/(Xmax-Xmin)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;1/(Xmax-Xmin)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=(Xmax-Xmin)/√(12)' "
+    "}",
+
+    "TriSym",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≤(Xmax+Xmin)/2;2*(X-Xmin)²/(Xmax-Xmin)²;IFTE(X≤Xmax;1-2*(Xmax-X)²/(Xmax-Xmin)²;1)))' "
+    "  'PDF=IFTE(ABS(X-(Xmax+Xmin)/2)>(Xmax-Xmin)/2;0;4*((Xmax-Xmin)/2-ABS(X-(Xmax+Xmin)/2))/(Xmax-Xmin)²)' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=(Xmax-Xmin)/√(24)' "
+    "}",
+
+    "Chi2",  "{ "
+    "  'CDF=IFTE(X≤0;0;GammaP(df/2;X/2))' "
+    "  'PDF=IFTE(X≤0;0;(X^(df/2-1))*EXP(-X/2)/((2^(df/2))*Γ(df/2)))' "
+    "  'CDFc=1-CDF' "
+    "  'df=df' "
+    "  'μ=df' "
+    "  'sx=√(2*df)' "
+    "}",
+
+    "Beta",  "{ "
+    "  'CDF=IFTE(X≤0;0;IFTE(X≥1;1;BetaI(a;b;X)))' "
+    "  'PDF=IFTE(X≤0;0;IFTE(X≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(X^(a-1))*((1-X)^(b-1))))' "
+    "  'CDFc=1-CDF' "
+    "  'a=a' "
+    "  'b=b' "
+    "  'μ=a/(a+b)' "
+    "  'sx=√(a*b/(((a+b)^2)*(a+b+1)))' "
+    "}",
+
+
+    "Phit",  "{ "
+    "  'CDF=0.5*(1+erf(X/√(2)))' "
+    "  'PDF=EXP(-(X^2)/2)/√(2*Ⓒπ)' "
+    "  'CDFc=0.5*erfc(X/√(2))' "
+    "  'μ=0' "
+    "  'sx=1' "
+    "}",
+
+    "TriRight",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;((X-Xmin)^2)/((Xmax-Xmin)^2)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;2*(X-Xmin)/((Xmax-Xmin)^2)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmin+2*Xmax)/3' "
+    "  'sx=(Xmax-Xmin)/√(18)' "
+    "}",
+
+    "TriLeft",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;1-((Xmax-X)^2)/((Xmax-Xmin)^2)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;2*(Xmax-X)/((Xmax-Xmin)^2)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(2*Xmin+Xmax)/3' "
+    "  'sx=(Xmax-Xmin)/√(18)' "
+    "}",
+
+    "TriAsym",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≤xp;((X-Xmin)^2)/((Xmax-Xmin)*(xp-Xmin));IFTE(X≤Xmax;1-((Xmax-X)^2)/((Xmax-Xmin)*(Xmax-xp));1)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X≤xp;2*(X-Xmin)/((Xmax-Xmin)*(xp-Xmin));IFTE(X≤Xmax;2*(Xmax-X)/((Xmax-Xmin)*(Xmax-xp));0)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'xp=xp' "
+    "  'μ=(Xmin+Xmax+xp)/3' "
+    "  'sx=√((Xmin^2+Xmax^2+xp^2-Xmin*Xmax-Xmin*xp-Xmax*xp)/18)' "
+    "}",
+
+    "UShape",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;4*UVAL(UBASE(ASIN(√((X-Xmin)/(Xmax-Xmin)))))))' "
+    "  'PDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;0;1/(Ⓒπ*√((X-Xmin)*(Xmax-X)))))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmin+Xmax)/2' "
+    "  'sx=(Xmax-Xmin)/√(8)' "
+    "}",
+
+    "GEV",  "{ "
+    "  'CDF=EXP(-IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi)))' "
+    "  'PDF=(IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi))^(xi+1))*EXP(-IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi)))/sc' "
+    "  'CDFc=1-CDF' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'xi=xi' "
+    "  'μ=IFTE(ABS(xi)<0.000000001;x0+sc*0.5772156649015329;x0+sc*(Γ(1-xi)-1)/xi)' "
+    "  'sx=IFTE(ABS(xi)<0.000000001;sc*Ⓒπ/√(6);sc*√(Γ(1-2*xi)-Γ(1-xi)^2)/ABS(xi))' "
+    "}",
+
+
+    "Bernoulli",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X<1;1-p;1))' "
+    "  'PDF=IFTE(ABS(X)<0.5;1-p;IFTE(ABS(X-1)<0.5;p;0))' "
+    "  'CDFc=1-CDF' "
+    "  'p=p' "
+    "  'μ=p' "
+    "  'sx=√(p*(1-p))' "
+    "}",
+
+    "Binom",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X≥nt;1;Σ(Jx;0;IP(X);COMB(nt;Jx)*(p^Jx)*((1-p)^(nt-Jx)))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>nt;0;COMB(nt;IP(X))*(p^IP(X))*((1-p)^(nt-IP(X)))))' "
+    "  'CDFc=1-CDF' "
+    "  'nt=nt' "
+    "  'p=p' "
+    "  'μ=nt*p' "
+    "  'sx=√(nt*p*(1-p))' "
+    "}",
+
+    "Poiss",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X>λ+40*√(λ);1;Σ(Jx;0;IP(X);(λ^Jx)*EXP(-λ)/Jx!)))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>λ+40*√(λ);0;(λ^IP(X))*EXP(-λ)/(IP(X)!)))' "
+    "  'CDFc=1-CDF' "
+    "  'λ=λ' "
+    "  'μ=λ' "
+    "  'sx=√(λ)' "
+    "}",
+
+    "Geom",  "{ "
+    "  'CDF=IFTE(X<1;0;1-((1-p)^IP(X)))' "
+    "  'PDF=IFTE(X<1;0;((1-p)^(IP(X)-1))*p)' "
+    "  'CDFc=1-CDF' "
+    "  'p=p' "
+    "  'μ=1/p' "
+    "  'sx=√(1-p)/p' "
+    "}",
+
+    "Hyper",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X≥nd;1;Σ(Jx;0;IP(X);COMB(Ks;Jx)*COMB(Np-Ks;nd-Jx)/COMB(Np;nd))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>nd;0;COMB(Ks;IP(X))*COMB(Np-Ks;nd-IP(X))/COMB(Np;nd)))' "
+    "  'CDFc=1-CDF' "
+    "  'Np=Np' "
+    "  'Ks=Ks' "
+    "  'nd=nd' "
+    "  'μ=nd*Ks/Np' "
+    "  'sx=√(nd*(Ks/Np)*(1-Ks/Np)*(Np-nd)/(Np-1))' "
+    "}",
+
+    "UnifDis",  "{ "
+    "  'CDF=IFTE(X<Xmin;0;IFTE(X≥Xmax;1;(IP(X)-Xmin+1)/(Xmax-Xmin+1)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;1/(Xmax-Xmin+1)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=√((((Xmax-Xmin+1)^2)-1)/12)' "
+    "}",
+
+    "Gamma",  "{ "
+    "  'CDF=IFTE(X≤0;0;GammaP(a;X/sc))' "
+    "  'PDF=IFTE(X≤0;0;(X^(a-1))*EXP(-X/sc)/((sc^a)*Γ(a)))' "
+    "  'CDFc=1-CDF' "
+    "  'a=a' "
+    "  'sc=sc' "
+    "  'μ=a*sc' "
+    "  'sx=√(a)*sc' "
+    "}",
+
+    "NormTrunc",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;(erf((X-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))/(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;(EXP(-(((X-x0)/sc)^2)/2)/(sc*√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))))' "
+    "  'CDFc=1-CDF' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=x0+sc*((EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))' "
+    "  'sx=sc*√(1+(((Xmin-x0)/sc)*(EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-((Xmax-x0)/sc)*(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))-(((EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))))^2)' "
+    "}",
+
+    "NegBinom",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X>rs*(1-p)/p+40*√(rs*(1-p))/p;1;Σ(Jx;0;IP(X);COMB(Jx+rs-1;Jx)*(p^rs)*((1-p)^Jx))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>rs*(1-p)/p+40*√(rs*(1-p))/p;0;COMB(IP(X)+rs-1;IP(X))*(p^rs)*((1-p)^IP(X))))' "
+    "  'CDFc=1-CDF' "
+    "  'rs=rs' "
+    "  'p=p' "
+    "  'μ=rs*(1-p)/p' "
+    "  'sx=√(rs*(1-p))/p' "
+    "}",
+
+
+    "Student",  "{ "
+    "  'CDF=IFTE(X<0;0.5*BetaI(df/2;0.5;df/(df+X^2));1-0.5*BetaI(df/2;0.5;df/(df+X^2)))' "
+    "  'PDF=Γ((df+1)/2)/(√(df*Ⓒπ)*Γ(df/2))*((1+(X^2)/df)^(-(df+1)/2))' "
+    "  'CDFc=1-CDF' "
+    "  'df=df' "
+    "  'μ=IFTE(df>1;0;Ⓒ?)' "
+    "  'sx=IFTE(df>2;√(df/(df-2));Ⓒ?)' "
+    "}",
+
+    "Fisher",  "{ "
+    "  'CDF=IFTE(X≤0;0;BetaI(dfn/2;dfd/2;dfn*X/(dfn*X+dfd)))' "
+    "  'PDF=IFTE(X≤0;0;(Γ((dfn+dfd)/2)/(Γ(dfn/2)*Γ(dfd/2)))*((dfn/dfd)^(dfn/2))*(X^(dfn/2-1))*((1+dfn*X/dfd)^(-(dfn+dfd)/2)))' "
+    "  'CDFc=1-CDF' "
+    "  'dfn=dfn' "
+    "  'dfd=dfd' "
+    "  'μ=IFTE(dfd>2;dfd/(dfd-2);Ⓒ?)' "
+    "  'sx=IFTE(dfd>4;√(2*(dfd^2)*(dfn+dfd-2)/(dfn*((dfd-2)^2)*(dfd-4)));Ⓒ?)' "
+    "}",
+
+    "Levy",  "{ "
+    "  'CDF=IFTE(X≤x0;0;erfc(√(sc/(2*(X-x0)))))' "
+    "  'PDF=IFTE(X≤x0;0;√(sc/(2*Ⓒπ))*EXP(-sc/(2*(X-x0)))/((X-x0)^1.5))' "
+    "  'CDFc=IFTE(X≤x0;1;1-erfc(√(sc/(2*(X-x0)))))' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'μ=Ⓒ∞' "
+    "  'sx=Ⓒ∞' "
+    "}",
+
 };
 //   clang-format on
 
