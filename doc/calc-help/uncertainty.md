@@ -91,22 +91,28 @@ digits are meaningful.
 
 Stack: an interval, or `X` `U`.
 
+**1)**
+
 ```rpl
 12.34563±0.02347 ⓁSciRngRnd
 @ Expecting 12.346±0.023
 ```
+
+**2)**
 
 ```rpl
 12.3456±σ0.0234_m ⓁSciRngRnd
 @ Expecting 12.346±σ0.023 m
 ```
 
+**3)**
+
 ```rpl
 12.3456±1.5% ⓁSciRngRnd
 @ Expecting 12.35±1.5%
 ```
 
-A value in metres and an uncertainty in centimetres:
+**4)** A value in metres and an uncertainty in centimetres:
 
 ```rpl
 12.3456_m 2.34_cm ⓁSciRngRnd
@@ -116,6 +122,8 @@ A value in metres and an uncertainty in centimetres:
 When rounding the uncertainty reaches the next decade, the value follows it —
 and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
 0.10 is displayed as 0.1.
+
+**5)**
 
 ```rpl
 12.3456±0.0996 ⓁSciRngRnd
@@ -135,20 +143,28 @@ not read back.
 
 Stack: an interval, or `X` `U`, as for SciRngRnd.
 
+**1)**
+
 ```rpl
 12.3456±0.0996 ⓁSciRngText
 @ Expecting "12.35±0.10"
 ```
+
+**2)**
 
 ```rpl
 12.2…12.5678 ⓁSciRngText
 @ Expecting "12.20…12.56"
 ```
 
+**3)**
+
 ```rpl
 2±0.0234 ⓁSciRngText
 @ Expecting "2.000±0.023"
 ```
+
+**4)**
 
 ```rpl
 12.3456±σ0.0996_m ⓁSciRngText
@@ -179,20 +195,28 @@ The result is text, as for SciRngText; the display settings are not changed.
 
 Stack: an interval, or `X` `U`, as for SciRngRnd.
 
+**1)**
+
 ```rpl
 1.456±σ0.023 ⓁSciRngParen
 @ Expecting "1.456(23)"
 ```
+
+**2)**
 
 ```rpl
 6.67430±σ0.00015 ⓁSciRngParen
 @ Expecting "6.67430(15)"
 ```
 
+**3)**
+
 ```rpl
 12.3456±σ0.0996_m ⓁSciRngParen
 @ Expecting "12.35(10) m"
 ```
+
+**4)**
 
 ```rpl
 123456.7±σ789.1 ⓁSciRngParen
@@ -279,7 +303,7 @@ Laws 7 and 8 read ±U as a two-sided interval holding the probability p, as a
 certificate does; laws 9 and 0 read X+U as the one-sided quantile p, the value
 being a magnitude, or positive.
 
-A display reading 9.000 kg: the bound is ±0.0005 kg, and a rounded reading is
+**1)** A display reading 9.000 kg: the bound is ±0.0005 kg, and a rounded reading is
 rectangular:
 
 ```rpl
@@ -287,14 +311,14 @@ rectangular:
 @ Expecting 9.±σ0.00028 86751 35 kg
 ```
 
-A certificate gives ±0.2 at 95 % with 10 degrees of freedom:
+**2)** A certificate gives ±0.2 at 95 % with 10 degrees of freedom:
 
 ```rpl
 10. 0.2 8 { 10 0.95 } ⓁBound→σ
 @ Expecting 10.±σ0.08976 10127 94
 ```
 
-Unequal bounds move the value to the middle of the interval:
+**3)** Unequal bounds move the value to the middle of the interval:
 
 ```rpl
 10. { 0.1 0.3 } 1 { } ⓁBound→σ
@@ -311,10 +335,14 @@ says how many zeros the instrument actually showed.
 
 Stack: `X`, `N` — or `{ X N }`.
 
+**1)**
+
 ```rpl
 9._kg 3 ⓁResN0
 @ Expecting 0.001 kg
 ```
+
+**2)**
 
 ```rpl
 7000. 2 ⓁResN0
@@ -359,13 +387,15 @@ X and the part of Y that the intersection covers, in per cent, and the relation
 as RngRel names it. The drawing stays on screen until a key is
 pressed.
 
+**1)**
+
 ```rpl
 1…3 2…4 ⓁΔConcord
 ```
 
 It returns `X∩Y:2…3`, `X%:50`, `Y%:50` and `rel:"X overlaps Y"`.
 
-A mass measured to ±0.0023 g, against a reference given to ±0.005 g, in grams
+**2)** A mass measured to ±0.0023 g, against a reference given to ±0.005 g, in grams
 both:
 
 ```rpl
@@ -376,7 +406,7 @@ The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
 `Y%:46`, `rel:"X containedBy Y"`.
 
 
-Random pairs make a good exercise. This draws two intervals between −100 and
+**3)** Random pairs make a good exercise. This draws two intervals between −100 and
 100 and compares them; run it several times, or press DMOΔConcord in
 Applications/Demos:
 
@@ -408,6 +438,8 @@ thing. There is no verdict: the threshold belongs to the user. A small p
 says the measurements disagree; a large p does not prove they agree — it says
 the data cannot tell them apart.
 
+**1)**
+
 ```rpl
 10±σ1 12.2±σ1 ⓁσConcord
 ```
@@ -415,7 +447,7 @@ the data cannot tell them apart.
 It returns `d:2.2`, `σD:1.41421 35623 7`, `z:1.55563 49186 1` and
 `p:0.11979 49304 26`.
 
-The two ±σ bars do not touch, yet p = 0.12. With a correlation of 0.5, the
+**2)** The two ±σ bars do not touch, yet p = 0.12. With a correlation of 0.5, the
 difference is better known and the same gap weighs more:
 
 ```rpl
@@ -425,7 +457,7 @@ difference is better known and the same gap weighs more:
 Now `σD:1`, `z:2.2` and `p:0.02780 68950 27`. Purge `ρ` afterwards, or it will
 also weigh on the arithmetic of every uncertain value.
 
-Random measurements make a good exercise too. This draws two measurements of
+**3)** Random measurements make a good exercise too. This draws two measurements of
 the same true value 10, with standard deviations between 0.5 and 2; run it
 several times, or press DMOσConcord in Applications/Demos. About one run in
 twenty gives p < 0.05, although both measure the same thing:
@@ -468,15 +500,21 @@ before, after, starts, finishes, meets, then the others.
 Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number; Y is expressed in
 the unit of X. `a±σb` values are refused, as for ΔConcord.
 
+**1)**
+
 ```rpl
 1…3 2…4 ⓁRngRel
 @ Expecting "X overlaps Y"
 ```
 
+**2)**
+
 ```rpl
 1…3_m 100…300_cm ⓁRngRel
 @ Expecting "X equals Y"
 ```
+
+**3)**
 
 ```rpl
 2 1…3 ⓁRngRel
@@ -537,7 +575,7 @@ Each run gives a slightly different result, and this is how to judge its
 stability. The examples below first set the seed of the random generator, so
 that they always give the same result; leave that line out for real use.
 
-**Example 1.** One distribution alone: the model is the variable itself. A
+**1)** One distribution alone: the model is the variable itself. A
 rectangular distribution between 9 and 11 has a mean of 10 and a standard
 deviation of 1/√3 = 0.577:
 
@@ -547,7 +585,7 @@ deviation of 1/√3 = 0.577:
 @ Expecting 10.02378 18042±σ0.58487 21349 4
 ```
 
-**Example 2.** The sum of two normal inputs. The exact result is 30±σ2.236:
+**2)** The sum of two normal inputs. The exact result is 30±σ2.236:
 
 ```rpl
 12345 RDZ
@@ -555,7 +593,7 @@ deviation of 1/√3 = 0.577:
 @ Expecting 30.12500 40006±σ2.24588 10666 3
 ```
 
-**Example 3.** The product of a rectangular input and a normal one:
+**3)** The product of a rectangular input and a normal one:
 
 ```rpl
 12345 RDZ
@@ -563,7 +601,7 @@ deviation of 1/√3 = 0.577:
 @ Expecting 100.26278 5406±σ11.39132 08051
 ```
 
-**Example 4.** Inputs with units: a resistance from a voltage and a current.
+**4)** Inputs with units: a resistance from a voltage and a current.
 
 ```rpl
 12345 RDZ
@@ -571,7 +609,7 @@ deviation of 1/√3 = 0.577:
 @ Expecting 1.99888 76261 4±σ0.02860 28043 8 V/A
 ```
 
-**Example 5.** A model that is not linear. For the square of a normal input
+**5)** A model that is not linear. For the square of a normal input
 centered on zero, the propagation formula gives 0±σ0, since the derivative is
 zero there. The true mean is 1, the standard deviation 1.414, and the interval
 is far from symmetric:
@@ -582,7 +620,7 @@ is far from symmetric:
 @ Expecting 0.97201 48896 25±σ1.40367 28151 1
 ```
 
-**Example 6.** Any distribution, through its draw program: here a lognormal
+**6)** Any distribution, through its draw program: here a lognormal
 distribution. The draw programs are slower than the normal and rectangular
 inputs, about 60 draws per second on the simulator:
 
@@ -595,7 +633,7 @@ inputs, about 60 draws per second on the simulator:
 The same distribution is obtained much faster as the exponential of a normal
 input, with the model 'exp(x)' and the input 0±σ1.
 
-**Example 7.** Automatic stop, with M = 0. Here the result is stable after
+**7)** Automatic stop, with M = 0. Here the result is stable after
 8 500 draws:
 
 ```rpl
@@ -659,7 +697,7 @@ obtained by five point central differences on the value with its unit, with a
 step of σ/1000: it comes out in the unit of f, works with any function,
 constant or unit, and also at x = 0.
 
-**Example 1.** The gamma function at 7±σ0.05. The exact uncertainty is
+**1)** The gamma function at 7±σ0.05. The exact uncertainty is
 Γ(7)·ψ(7)·0.05 = 720 × 1.87278 43351 × 0.05 = 67.42023 60636, where
 ψ(7) = −γ + 1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6 is the digamma function:
 
@@ -668,7 +706,7 @@ constant or unit, and also at x = 0.
 @ Expecting 720.±σ67.42023 60635
 ```
 
-**Example 2.** A polynomial near one of its roots. Evaluated directly on
+**2)** A polynomial near one of its roots. Evaluated directly on
 2.755±σ0.05, it gets about twice this uncertainty, since its three factors are
 treated as independent:
 
@@ -677,7 +715,7 @@ treated as independent:
 @ Expecting -0.32463 1125±σ0.03550 375
 ```
 
-**Example 3.** The difference of a quantity with itself is exactly zero:
+**3)** The difference of a quantity with itself is exactly zero:
 
 ```rpl
 'x-x' 2.0±σ0.05_m ⓁσRf
@@ -701,14 +739,14 @@ are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
 directory and applies to the next calls: purge it when done, as the examples
 do.
 
-**Example 1.** A mass from a linear density and a length, with units:
+**1)** A mass from a linear density and a length, with units:
 
 ```rpl
 'x2*x1' 2.5±σ0.5_g/cm 2.0±σ0.2_cm ⓁσRFxjxi
 @ Expecting 5.±σ1.11803 39887 5 g
 ```
 
-**Example 2.** Three lengths fully correlated, for instance measured with the
+**2)** Three lengths fully correlated, for instance measured with the
 same rule: the uncertainties add instead of combining in quadrature.
 
 ```rpl
@@ -718,7 +756,7 @@ same rule: the uncertainties add instead of combining in quadrature.
 @ Expecting 5.3±σ0.019
 ```
 
-**Example 3.** Two variables correlated at 0.5, given as a matrix: the
+**3)** Two variables correlated at 0.5, given as a matrix: the
 uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
 
 ```rpl
@@ -728,7 +766,7 @@ uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
 @ Expecting 30±σ2.64575 13110 6
 ```
 
-**Example 4.** The potential energy of a mass raised along a slope, with a
+**4)** The potential energy of a mass raised along a slope, with a
 constant and an angle in degrees:
 
 ```rpl
@@ -756,7 +794,7 @@ ends included, and each local maximum or minimum of these values is refined
 by a golden section search. An extremum narrower than 1/64 of X could be
 missed; Exmnf draws the function to check it.
 
-**Example 1.** A polynomial with three occurrences of x. Evaluated directly on
+**1)** A polynomial with three occurrences of x. Evaluated directly on
 1…3, it gives −4…4, since its factors are taken as independent; the true
 range is ±2/(3√3):
 
@@ -765,35 +803,35 @@ range is ±2/(3√3):
 @ Expecting -0.38490 01794 6…0.38490 01794 6
 ```
 
-**Example 2.** A maximum inside the interval: sin reaches 1 at π/2.
+**2)** A maximum inside the interval: sin reaches 1 at π/2.
 
 ```rpl
 'sin(x)' 1.5±0.15_r ⓁΔRf
 @ Expecting 0.98786 16789 13±0.01213 83210 87
 ```
 
-**Example 3.** A minimum inside the interval, at x = 0:
+**3)** A minimum inside the interval, at x = 0:
 
 ```rpl
 'exp(x^2)' 0.5±0.9 ⓁΔRf
 @ Expecting 4.04966 35325 8±3.04966 35325 8
 ```
 
-**Example 4.** A function that is not differentiable at its minimum:
+**4)** A function that is not differentiable at its minimum:
 
 ```rpl
 'abs(x^3)' -0.25±0.35 ⓁΔRf
 @ Expecting 0.108±0.108
 ```
 
-**Example 5.** With units:
+**5)** With units:
 
 ```rpl
 'x^4' 1.10±1.15_m ⓁΔRf
 @ Expecting 12.81445 3125±12.81445 3125 m↑4
 ```
 
-**Example 6.** An interval given in percent gives a±b:
+**6)** An interval given in percent gives a±b:
 
 ```rpl
 'x^2' '10±10%' →Num ⓁΔRf
@@ -813,14 +851,14 @@ The curve uses 161 points. Each dashed line should touch the curve; a line
 that does not, or a peak of the curve beyond a line, would show an extremum
 that ΔRf missed.
 
-**Example 1.** The polynomial of the first example of ΔRf, with its two
+**1)** The polynomial of the first example of ΔRf, with its two
 extrema inside the interval:
 
 ```rpl
 '(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁExmnf
 ```
 
-**Example 2.** A power with units:
+**2)** A power with units:
 
 ```rpl
 'x^4' 1.10±1.15_m ⓁExmnf
@@ -844,7 +882,7 @@ improves. This finds an extremum inside the box, on a face or on an edge, one
 per subspace, which is what small intervals call for. It is a search, not a
 proof: a function with many extrema over a wide box could hide one.
 
-**Example 1.** Two occurrences of x1. Evaluated directly, x1·x2 − x1 on
+**1)** Two occurrences of x1. Evaluated directly, x1·x2 − x1 on
 x1 = 1…2 and x2 = 0…3 gives −2…5; the true range is −2…4:
 
 ```rpl
@@ -852,28 +890,28 @@ x1 = 1…2 and x2 = 0…3 gives −2…5; the true range is −2…4:
 @ Expecting 1.±3.
 ```
 
-**Example 2.** A minimum inside the box, at x1 = 1 and x2 = 2:
+**2)** A minimum inside the box, at x1 = 1 and x2 = 2:
 
 ```rpl
 '(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁΔRFxjxi
 @ Expecting 1±1
 ```
 
-**Example 3.** A maximum on an edge, at x1 = 0.5 and x2 = 1:
+**3)** A maximum on an edge, at x1 = 0.5 and x2 = 1:
 
 ```rpl
 'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁΔRFxjxi
 @ Expecting 0.625±0.625
 ```
 
-**Example 4.** Small intervals around a point where F changes slowly:
+**4)** Small intervals around a point where F changes slowly:
 
 ```rpl
 '(x1-1)*(x2-2)*(x1+x2-3)' 2.5±0.1 1.5±0.1 ⓁΔRFxjxi
 @ Expecting 0.28±0.152
 ```
 
-**Example 5.** With units and an angle in degrees:
+**5)** With units and an angle in degrees:
 
 ```rpl
 'x2*sin(x1)' 10±1_m 30±5_° ⓁΔRFxjxi
@@ -893,13 +931,13 @@ them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
 points, from the minimum on the left to the maximum on the right. The values
 and the points of both extrema are written below, as { x1 … xn }.
 
-**Example 1.** A maximum on an edge of the box:
+**1)** A maximum on an edge of the box:
 
 ```rpl
 'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁExmnFxjxi
 ```
 
-**Example 2.** Several extrema inside a wide box: the minimum −1 is found at
+**2)** Several extrema inside a wide box: the minimum −1 is found at
 x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
 
 ```rpl
@@ -926,26 +964,26 @@ The minimum and the maximum are marked by squares, joined by the segment that
 ExmnFxjxi draws. About a thousand values of F are computed: a few seconds on
 the simulator.
 
-**Example 1.** A minimum inside the box, a maximum at a vertex:
+**1)** A minimum inside the box, a maximum at a vertex:
 
 ```rpl
 '(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁExmnF2D
 ```
 
-**Example 2.** Three variables: the slice cuts the cube along a polygon:
+**2)** Three variables: the slice cuts the cube along a polygon:
 
 ```rpl
 'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
 ```
 
-**Example 3.** A saddle: the minimum −1 at x1 = 0, x2 = ±1, the maximum 1 at
+**3)** A saddle: the minimum −1 at x1 = 0, x2 = ±1, the maximum 1 at
 x1 = ±1, x2 = 0, and hyperbolas between them:
 
 ```rpl
 'x1^2-x2^2' 0±1 0±1 ⓁExmnF2D
 ```
 
-**Example 4.** A bump: the maximum 1 at the origin, inside the box, with
+**4)** A bump: the maximum 1 at the origin, inside the box, with
 circles around it, and the minimum at a far corner:
 
 ```rpl
