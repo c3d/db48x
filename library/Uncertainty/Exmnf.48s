@@ -72,25 +72,6 @@
                   If kk 0 > Then Dup Rot Swap DrawLine End
                 Next
                 Drop
-                @ Local extrema of the curve: ▲ above a point higher than its two
-                @ neighbours, ▼ below a point lower than them (ties go to the left one)
-                2 160 For kk
-                  ys kk 1 - Get ys kk Get ys kk 1 + Get
-                  → pa pv pc
-                  «
-                    8 wd 20 - kk 1 - * 160 / + 0 RND 4 -
-                    150 116 pv ya - * yb ya - / - 0 RND
-                    → mx my
-                    «
-                      If pv pa > pv pc ≥ And Then
-                        "▲" mx R→B my 15 - 34 Max R→B 2 →List 0 true false 3 →List + DrawText
-                      End
-                      If pv pa < pv pc ≤ And Then
-                        "▼" mx R→B my 2 + 137 Min R→B 2 →List 0 true false 3 →List + DrawText
-                      End
-                    »
-                  »
-                Next
                 @ The bounds found by ΔRf, dashed
                 rlo rhi 2 →List
                 1 2 For jj
@@ -104,8 +85,83 @@
                   »
                 Next
                 Drop
+                @ Marks: ▲ ▼ filled at the highest and lowest points of the curve,
+                @ △ ▽ hollow at the other points higher or lower than their two
+                @ neighbours (ties go to the left one)
+                1 1
+                → imn imx
+                «
+                  2 161 For kk
+                    If ys kk Get ys imx Get > Then kk 'imx' Store End
+                    If ys kk Get ys imn Get < Then kk 'imn' Store End
+                  Next
+                  2 160 For kk
+                    ys kk 1 - Get ys kk Get ys kk 1 + Get
+                    → pa pv pc
+                    «
+                      If kk imx ≠ kk imn ≠ And Then
+                        If pv pa > pv pc ≥ And Then
+                          8 wd 20 - kk 1 - * 160 / + 0 RND 150 116 ys kk Get ya - * yb ya - / - 0 RND 1 0
+                          → tx ty ts tf
+                          «
+                            tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                            tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                            tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                            If tf Then
+                              1 8 For ii
+                                tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                              Next
+                            End
+                          »
+                        End
+                        If pv pa < pv pc ≤ And Then
+                          8 wd 20 - kk 1 - * 160 / + 0 RND 150 116 ys kk Get ya - * yb ya - / - 0 RND -1 0
+                          → tx ty ts tf
+                          «
+                            tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                            tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                            tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                            If tf Then
+                              1 8 For ii
+                                tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                              Next
+                            End
+                          »
+                        End
+                      End
+                    »
+                  Next
+                  8 wd 20 - imx 1 - * 160 / + 0 RND 150 116 ys imx Get ya - * yb ya - / - 0 RND 1 1
+                  → tx ty ts tf
+                  «
+                    tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                    tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                    tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                    If tf Then
+                      1 8 For ii
+                        tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                        tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                      Next
+                    End
+                  »
+                  8 wd 20 - imn 1 - * 160 / + 0 RND 150 116 ys imn Get ya - * yb ya - / - 0 RND -1 1
+                  → tx ty ts tf
+                  «
+                    tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                    tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                    tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                    If tf Then
+                      1 8 For ii
+                        tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                        tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                      Next
+                    End
+                  »
+                »
                 @ The numbers
-                "x: " lo un * →Str + " … " + hi un * →Str + "   [▲: max ; ▼: min]" +
+                "x: " lo un * →Str + " … " + hi un * →Str + "   [▲▼: global; hollow: local]" +
                 { #0d #160d 0 true false } DrawText
                 "min = " rlo uf * →Str + { #0d #180d 0 true false } DrawText
                 "max = " rhi uf * →Str + { #0d #200d 0 true false } DrawText
