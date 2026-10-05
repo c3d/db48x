@@ -555,7 +555,9 @@ offers 16.
 Stack: F Vars Vals M ▶ N, the 95 % interval, Y±σu. F is the model, an
 expression of the names listed in Vars, or a program that takes one value per
 input from the stack. Vals lists the inputs in the same order, and M is the
-number of draws.
+number of draws. M may be omitted, F Vars Vals: 2 000 draws are then made,
+which give the standard uncertainty to about 2 %, in a few seconds on the
+simulator or a phone and in about a minute on a calculator.
 
 The type of each input tells its distribution:
 
@@ -665,6 +667,14 @@ million draws, and 2 000 draws give it to a few per cent:
 'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } 2000 ⓁMCPropagate
 'ρij' PURGE
 @ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+**9)** Without M: 2 000 draws, the sum of example 2:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
 ```
 
 A model given as a program takes its values from the stack, and the list of

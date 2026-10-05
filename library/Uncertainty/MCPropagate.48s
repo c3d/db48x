@@ -3,7 +3,7 @@
 @@ MCPropagate — propagation of uncertainty by the Monte Carlo
 @@ method (GUM Supplement 1, JCGM 101:2008).
 @@
-@@ Input:  F Vars Vals M
+@@ Input:  F Vars Vals M, or F Vars Vals for M = 2000
 @@   F     the model: an expression of the names in Vars, or a
 @@         program that takes one value per input from the stack;
 @@   Vars  the list of the input names, e.g. { a b };
@@ -16,7 +16,7 @@
 @@                    « 10 1 ⓁLgNrmRand », for any distribution;
 @@           10       an exact value.
 @@         Inputs may carry units.
-@@   M     the number of draws; 0 lets the program stop by itself
+@@   M     the number of draws, 2000 when omitted; 0 lets the program stop by itself
 @@         when the result is stable to two significant digits of
 @@         the uncertainty, after at most 20 000 draws or one minute.
 @@ Output: the number of draws used, tagged "N";
@@ -35,6 +35,8 @@
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
 @@ ============================================================
 
+  @ M omitted: the list of the inputs is on the first level
+  If Dup TypeName "list" == Then 2000 End
   "" "" { }
   → mdl vn vl ndr dcl drw prm
   «
