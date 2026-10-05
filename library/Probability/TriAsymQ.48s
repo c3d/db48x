@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TriAsymQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "TriAsymQ: needs 4 arguments" DoError END Explode Drop END
+  → Xminv Xmaxv xpv pv « Xminv 0 + Xmaxv 0 + xpv 0 + pv 0 + → Xmin Xmax xp p « 'Xmin' →Num 'Xmax' →Num 0 0 → lo hi x d « 1 45 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x≤Xmin;0;IFTE(x≤xp;((x-Xmin)^2)/((Xmax-Xmin)*(xp-Xmin));IFTE(x≤Xmax;1-((Xmax-x)^2)/((Xmax-Xmin)*(Xmax-xp));1))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x<Xmin;0;IFTE(x≤xp;2*(x-Xmin)/((Xmax-Xmin)*(xp-Xmin));IFTE(x≤Xmax;2*(Xmax-x)/((Xmax-Xmin)*(Xmax-xp));0))))>0.000000000000000000000000000001;x-((IFTE(x≤Xmin;0;IFTE(x≤xp;((x-Xmin)^2)/((Xmax-Xmin)*(xp-Xmin));IFTE(x≤Xmax;1-((Xmax-x)^2)/((Xmax-Xmin)*(Xmax-xp));1))))-p)/(IFTE(x<Xmin;0;IFTE(x≤xp;2*(x-Xmin)/((Xmax-Xmin)*(xp-Xmin));IFTE(x≤Xmax;2*(Xmax-x)/((Xmax-Xmin)*(Xmax-xp));0))));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x Xminv Xmaxv xpv pv 4 →List Drop » » »
+»
