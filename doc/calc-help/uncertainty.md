@@ -377,7 +377,8 @@ The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
 
 
 Random pairs make a good exercise. This draws two intervals between −100 and
-100 and compares them; run it several times:
+100 and compares them; run it several times, or press DMOΔConcord in
+Applications/Demos:
 
 ```rpl
 -100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
@@ -423,6 +424,18 @@ difference is better known and the same gap weighs more:
 
 Now `σD:1`, `z:2.2` and `p:0.02780 68950 27`. Purge `ρ` afterwards, or it will
 also weigh on the arithmetic of every uncertain value.
+
+Random measurements make a good exercise too. This draws two measurements of
+the same true value 10, with standard deviations between 0.5 and 2; run it
+several times, or press DMOσConcord in Applications/Demos. About one run in
+twenty gives p < 0.05, although both measure the same thing:
+
+```rpl
+'ρ' PURGE
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+ⓁσConcord
+```
 
 
 ## RngRel
@@ -944,10 +957,67 @@ circles around it, and the minimum at a far corner:
 
 Worked examples of the whole section, after Part 2, Applications, of Jean
 Wilson's Proposition for interval implementation in the RPL environment
-(2025). Each submenu holds one example, a key per step.
+(2025). Each submenu holds worked examples or demonstrations.
 
+* [Demos](#demoslibrary): commands of the section run on random inputs, a new
+  case at each press.
 * [Projectile](#projectilelibrary): a projectile experiment, in seven steps, from the
   Type B evaluation of the measurements to the Monte Carlo method.
+
+
+## DemosLibrary
+
+Demonstrations: each key runs a command of the section on inputs drawn at
+random, so that every press shows a new case. Seed the generator with RDZ to
+replay the same sequence.
+
+* DMOΔConcord: two bounded intervals, compared by ΔConcord;
+* DMOσConcord: two measurements of the same quantity, compared by σConcord.
+
+
+## DMOΔConcord
+
+Draws two intervals at random between −100 and 100 and compares them with
+ΔConcord: the drawing, the intersection, the parts covered and the relation.
+Press the key again for a new pair; in a few presses most of the thirteen
+relations of RngRel show up, the rare ones (meets, starts, equals…) excepted.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOΔConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOΔConcord
+```
+
+
+## DMOσConcord
+
+Two measurements of the same true value, 10. Each has a standard deviation
+drawn between 0.5 and 2, and a value drawn from the normal law around 10 with
+that standard deviation, as a real measurement would. σConcord then says
+whether the difference is compatible with zero.
+
+Since both measure the same thing, p is uniform between 0 and 1: it falls below
+0.05 about one press in twenty, and below 0.01 one in a hundred, although
+nothing is wrong. This is what a threshold of 5 % means, and why one small p
+alone does not prove a disagreement.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOσConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOσConcord
+```
 
 
 ## ProjectileLibrary

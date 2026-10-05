@@ -440,6 +440,11 @@
 
 "Uncertainty/Applications"
 
+"Uncertainty/Applications/Demos"
+
+	"DMOΔConcord",	"=/library/Uncertainty/DMODeltaConcord.48s"
+	"DMOσConcord",	"=/library/Uncertainty/DMOSigmaConcord.48s"
+
 "Uncertainty/Applications/Projectile"
 
 	"StepA",	"=/library/Uncertainty/StepA.48s"
