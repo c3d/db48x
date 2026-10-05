@@ -559,8 +559,13 @@ The type of each input tells its distribution:
   every distribution of the Probability section has such a Rand function;
 * a plain number: an exact value.
 
-Inputs may carry units. The inputs are independent: correlations are not
-handled yet.
+Inputs may carry units. They are independent, unless a global variable ρij
+holds correlations, as for σRFxjxi: one coefficient for all the pairs, or the
+full correlation matrix, in the order of Vals. Normal inputs are then
+correlated exactly, through the Cholesky factor of ρij; inputs given by bounds
+through a Gaussian copula, as in the NIST Uncertainty Machine. An input given
+by a program draws by itself and cannot be correlated. A matrix that is not
+symmetric, or that no set of quantities could have, is refused.
 
 The results are the number of draws used, tagged N; the interval that leaves
 2.5 % of the draws on each side, tagged 95%; and on the first level the mean
@@ -640,6 +645,19 @@ input, with the model 'exp(x)' and the input 0±σ1.
 12345 RDZ
 'a+b' { a b } { 10±σ1 20±σ2 } 0 ⓁMCPropagate
 @ Expecting 30.03900 15233±σ2.25391 96331 3
+```
+
+**8)** Correlated inputs: the comparison loss in microwave power meter
+calibration of JCGM 101 (9.4), δY = X1² + X2², with x1 = 0.010, x2 = 0,
+u = 0.005 for both and a correlation of 0.9. The propagation formula gives
+1.0×10⁻⁴; the Supplement finds 1.21×10⁻⁴ by the Monte Carlo method with a
+million draws, and 2 000 draws give it to a few per cent:
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } 2000 ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
 ```
 
 A model given as a program takes its values from the stack, and the list of
