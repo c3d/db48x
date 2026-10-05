@@ -4006,8 +4006,12 @@ restart:
             {
                 shown  = helpfile.position();
             }
-            else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H)
+            else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H &&
+                     style == NORMAL && !in_table)
             {
+                // Resume later drawings from here, but only outside of code
+                // blocks and tables: restarting inside a ``` block would
+                // swap code and text until the next fence
                 help = helpfile.position();
                 line = ytop + 2 - y;
             }
