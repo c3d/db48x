@@ -457,6 +457,7 @@
 	"S1Mass",	"=/library/Uncertainty/S1Mass.48s"
 	"S1Power",	"=/library/Uncertainty/S1Power.48s"
 	"S1Gauge",	"=/library/Uncertainty/S1Gauge.48s"
+	"S1Converge",	"=/library/Uncertainty/S1Converge.48s"
 
 "Uncertainty/Applications/Projectile"
 

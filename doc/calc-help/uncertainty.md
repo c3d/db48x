@@ -1216,6 +1216,8 @@ the first method may be trusted.
   (9.4), where it gives 0, with and without correlation;
 * [S1Gauge](#s1gauge): the gauge block calibration (9.5), nine inputs and five
   kinds of distributions.
+* [S1Converge](#s1converge): how the Monte Carlo result settles as the number of
+  draws grows, in 1/√M.
 
 The Supplement uses 10⁵ to 10⁶ draws, the pages below 1 000 to 2 000, so that
 each example runs in seconds: their Monte Carlo results come within a few per
@@ -1406,6 +1408,34 @@ then a value drawn in ±that half-width.
 
 With 10 000 draws, about two minutes on the simulator, the result is
 838.0±σ35.7 nm.
+
+
+## S1Converge
+
+How many draws? The Monte Carlo method gives an estimate of the standard
+uncertainty u that is itself uncertain: for a nearly normal result, its
+relative standard deviation is about 1/√(2M). Ten times more draws make it
+√10 ≈ 3.2 times more precise, at ten times the cost.
+
+S1Converge runs the mass calibration of [S1Mass](#s1mass) with 100, 1 000 and
+10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
+its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
+the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
+three values of u. About 13 seconds on the simulator; on a calculator, several
+minutes.
+
+**1)** The convergence, with the seed of the examples:
+
+```rpl
+ⓁS1Converge
+```
+
+The three values are 0.081, 0.0743 and 0.0746 mg. With 100 draws, u is known
+to about 7 %: enough to see that the first-order value 0.0539 mg is wrong, not
+enough to give two digits. With 10 000 draws, u is known to 0.7 %, close to the
+two significant digits of the published 0.0754 mg. This is the question that
+the adaptive procedure of the Supplement answers (7.9): draw until the digits
+wanted are stable, which MCPropagate does with M = 0.
 
 
 ## ProjectileLibrary
