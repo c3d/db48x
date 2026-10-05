@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  ParetoMu
+  @  Mean of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "ParetoMu: needs 2 arguments" DoError END END END
+  → xmv apv « xmv 0 + apv 0 + → xm ap « 'IFTE(ap>1;ap*xm/(ap-1);Ⓒ∞)' →Num xmv apv 2 →List Drop » »
+»
