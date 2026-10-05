@@ -73,7 +73,8 @@ the Args entries accept.
 Eleven tests built on the Student, chi-square and Fisher distributions, in three
 submenus: [StudentTests](#studenttestslibrary) compares means, [Chi2Tests](#chi2testslibrary) handles counts and
 variances, [FisherTests](#fishertestslibrary) compares variances and runs the analysis of
-variance.
+variance. A fourth submenu, [TestDemos](#testdemoslibrary), runs a test
+on random samples, to see the risk α and the power at work.
 
 Every entry returns the statistic, its degrees of freedom and the p-value,
 tagged, and **no verdict**. The rule is short, and its two halves are not
@@ -583,3 +584,70 @@ is which group differs from which — for that, compare pairs with `TTest2` or
 single test was designed to control.
 
 How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+
+## TestDemosLibrary
+
+Demonstrations of a test on random samples: each press draws a new sample of
+ten values from a normal law of standard deviation 1, and tests its mean with
+TTest1 against μ₀ = 10. Seed the generator with RDZ to replay a sample.
+
+* DMOTTest1: the true mean is 10, so H₀ is true; the test still rejects it
+  about one time in twenty — the risk α of a false alarm.
+* DMOTPower: the true mean is 10.5, so H₀ is false; the test detects it only
+  about three times in ten — its power, with ten values and a shift of half a
+  standard deviation.
+
+With the same seed, both draw the same ten values, shifted by 0.5.
+
+
+## DMOTTest1
+
+Ten values from a normal law of mean 10 and standard deviation 1, tested by
+TTest1 against μ₀ = 10. Returns the mean, the standard deviation s, the results
+of TTest1 and a verdict at α = 5 %.
+
+**1)** Usually H₀ is kept:
+
+```rpl
+1 RDZ ⓁDMOTTest1
+@ Expecting verdict:"H₀ kept"
+```
+
+**2)** Sometimes it is rejected, although it is true:
+
+```rpl
+11 RDZ ⓁDMOTTest1
+@ Expecting verdict:"H₀ rejected at 5 %, wrongly"
+```
+
+Over the first hundred seeds, H₀ was rejected five times: 5 %, the
+threshold itself. This is what α means: the rate of false alarms when nothing
+has changed, chosen before looking at the data.
+
+
+## DMOTPower
+
+Ten values from a normal law of mean 10.5 and standard deviation 1, tested by
+TTest1 against μ₀ = 10: H₀ is false, the mean has shifted by half a standard
+deviation.
+
+**1)** Here the shift is detected:
+
+```rpl
+1 RDZ ⓁDMOTPower
+@ Expecting verdict:"H₀ rejected: the shift is detected"
+```
+
+**2)** Here it is missed:
+
+```rpl
+2 RDZ ⓁDMOTPower
+@ Expecting verdict:"H₀ kept: the shift is missed"
+```
+
+Over the first hundred seeds, the shift was detected 28 times, close to
+the 29 % that theory gives: this is the power of the test. A test that keeps
+H₀ has not shown that nothing changed; with ten values it misses a shift of
+half a standard deviation seven times in ten. More values, or a larger shift,
+raise the power.

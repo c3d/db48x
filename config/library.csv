@@ -404,6 +404,11 @@
 	"Anova1",	"=/library/StatTests/Anova1.48s"
 	"FTestLR",	"=/library/StatTests/FTestLR.48s"
 
+"StatTests/TestDemos"
+
+	"DMOTTest1",	"=/library/StatTests/DMOTTest1.48s"
+	"DMOTPower",	"=/library/StatTests/DMOTPower.48s"
+
 "Uncertainty"
 
 "Uncertainty/Rounding"
@@ -444,6 +449,7 @@
 
 	"DMOΔConcord",	"=/library/Uncertainty/DMODeltaConcord.48s"
 	"DMOσConcord",	"=/library/Uncertainty/DMOSigmaConcord.48s"
+	"DMOExmnF2D",	"=/library/Uncertainty/DMOExmnF2D.48s"
 
 "Uncertainty/Applications/GUMS1"
 

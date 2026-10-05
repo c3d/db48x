@@ -1,0 +1,23 @@
+«
+@@ DMOTTest1 — demo of TTest1 when H₀ is true: ten values drawn from
+@@ a normal law of mean 10 and standard deviation 1, tested against
+@@ μ₀ = 10. H₀ is rejected at 5 % about one press in twenty, wrongly:
+@@ that is what α means. Press again for a new sample.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  10 0 0
+  → dtn dt1 dt2
+  «
+    1 dtn For dti
+      10 1 ⓁNormlRand
+      Dup dt1 + 'dt1' Store Sq dt2 + 'dt2' Store
+    Next
+    dt1 dtn / dt2 dt1 Sq dtn / - dtn 1 - / √
+    → dtm dts
+    «
+      dtm "mean" →Tag dts "s" →Tag
+      dtn dtm dts 10 ⓁTTest1
+      Dup DeleteTag 0.05 < "H₀ rejected at 5 %, wrongly" "H₀ kept" IFTE "verdict" →Tag
+    »
+  »
+»
