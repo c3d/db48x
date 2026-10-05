@@ -429,7 +429,7 @@
                                 "min" cmn 10 - 0 Max R→B #145d 2 →List 0 true false 3 →List + DrawText
                                 "max" cmx 12 - wd 30 - Min R→B #145d 2 →List 0 true false 3 →List + DrawText
                               »
-                              "contours 1/8 … 7/8 of max − min; ▲ ▼ local max, min" { #0d #161d 0 true false } DrawText
+                              "contours 1/8 … 7/8 of max − min  [▲: max ; ▼: min]" { #0d #161d 0 true false } DrawText
                               "min = " vmn →Str + "  at " +
                               { } 1 nv For j lmn 2 j * Get + Next →Str +
                               { #0d #179d 0 true false } DrawText
