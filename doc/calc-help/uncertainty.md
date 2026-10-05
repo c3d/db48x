@@ -37,7 +37,7 @@ Tools for measured values and their uncertainties, whether written as bounds
   [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
   [Exmnf](#exmnf).
 * [Applications](#applicationslibrary) — worked examples of the whole
-  section: [Projectile](#projectilelibrary), in seven steps.
+  section: [Projectile](#projectilelibrary), in eight steps.
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -999,7 +999,7 @@ Wilson's Proposition for interval implementation in the RPL environment
 
 * [Demos](#demoslibrary): commands of the section run on random inputs, a new
   case at each press.
-* [Projectile](#projectilelibrary): a projectile experiment, in seven steps, from the
+* [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
   Type B evaluation of the measurements to the Monte Carlo method.
 
 
@@ -1075,6 +1075,7 @@ alone.
 * [Step E](#stepe): the height of the laser pointer;
 * [Step F](#stepf): a more realistic experiment, with friction and losses;
 * [Step G](#stepg): the same result, from the measurements themselves.
+* [Step H](#steph): model validation, the predictions against the shots.
 
 At each step, the same tools are used in the same order:
 
@@ -1467,3 +1468,111 @@ x5 = R, x6 = μk and x7 = f, with m = ρ·(4/3)·π·(D/2)³, k = 2·U/x0² and
 The energy enters k, K and θ, and its effects almost cancel: ignoring this
 correlation overestimates the uncertainty by 40 %. Going back to independent
 measurements is the right way to propagate through a chain of calculations.
+
+
+## StepH
+
+Step H: model validation. The model predicts where the marble lands; the
+experiment says where it actually lands. Are the two compatible? The gun is
+set, ten shots are fired, and the range R of each is measured with a tape to
+the centimetre. The angle is set with the laser pointer of step E to ±0.5°, a
+bound, and the compression with the rule of step B.
+
+The range follows from the energy K of the marble at the exit of the barrel:
+R = 2·K·sin 2θ/(m·g). The ideal model of steps C and D takes K = ½·k·x²; the
+realistic model of step F takes K = f·(½·k·x² − m·g·(sin θ + μk·cos θ)·x).
+The shots scatter by about 10 cm from one to the next.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg; from step B:
+k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743°; from
+step F: x = 15.66 cm, μk = 0.5±σ0.005 and f = 0.95±σ0.019.
+
+**H-i) The ideal model, at x = 15.00 cm**
+
+**1)** The ideal model predicts the target, 8 m:
+
+```rpl
+'x2*x3^2*sin(2*x4)/(x1*9.80665)'
+36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00000 00000 9±σ5.01881 86642 8⁳⁻²
+```
+
+**2)** Ten shots at 15.00 cm: their mean, and its standard deviation s/√n:
+
+```rpl
+[[7.42] [7.41] [7.13] [7.31] [7.39] [7.37] [7.23] [7.25] [7.35] [7.21]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.307±σ0.03091 38588 12
+```
+
+**3)** Prediction and observation compared:
+
+```rpl
+8.00000000009±σ0.0501881866428 7.307±σ0.0309138588120 ⓁσConcord
+```
+
+The shots fall 69 cm short, about twelve standard deviations of the
+difference: p = 6.5·10⁻³². The ideal model is rejected. The
+realistic model, at the same compression, explains the short shots:
+
+**4)** The realistic model at 15.00 cm:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 7.32849 85110 7±σ0.15380 86796 2
+```
+
+**H-ii) The realistic model, at x = 15.66 cm**
+
+**5)** At the compression computed in step F, the realistic model predicts 8 m:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.1566±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00006 60455 6±σ0.16765 20304 97
+```
+
+**6)** Ten shots at 15.66 cm:
+
+```rpl
+[[7.98] [7.83] [8.00] [7.87] [8.01] [8.14] [8.14] [8.12] [7.83] [8.06]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.998±σ3.83492 72048 7⁳⁻²
+```
+
+**7)** Prediction and observation compared:
+
+```rpl
+8.00006604556±σ0.167652030497 7.998±σ0.0383492720487 ⓁσConcord
+```
+
+The difference is two millimetres, p is close to 1: the realistic model is
+confirmed. Its prediction is less precise than the ideal one, mostly because
+of the fraction f, known to 2 %: a series of shots like this one is also a way
+to measure f better.
+
+**Do the predictions frame the shots?** The prediction ±2 standard deviations
+is an interval of about 95 %. ΔConcord compares it with the range of the ten
+shots, from the shortest to the longest:
+
+**8)** The ideal model at 15.00 cm: no shot is in the predicted interval.
+
+```rpl
+7.13…7.42 8±0.10037637 ⓁΔConcord
+```
+
+**9)** The realistic model at 15.66 cm: all the shots are in it.
+
+```rpl
+7.83…8.14 8.00006604556±0.33530406 ⓁΔConcord
+```
+
+A model is never proven right: it is confirmed as long as it survives the
+comparison, and a test able to reject a model, as in H-i, is what gives weight
+to the agreement of the other one, in H-ii. The comparison of a prediction and a measurement, each with its uncertainty,
+is the core of the validation methods of metrology, such as the normalized
+error Eₙ of ISO 13528 and the validation comparison of ASME V&V 20.
