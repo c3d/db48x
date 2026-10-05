@@ -3303,10 +3303,6 @@ implemented by the time the project reaches version 1.0.
 * `UNASSIGN`
 * `UNASSUME`
 * `UNBIND`
-* `UTPC`
-* `UTPF`
-* `UTPN`
-* `UTPT`
 * `VANDERMONDE`
 * `VER`
 * `VISIT`
