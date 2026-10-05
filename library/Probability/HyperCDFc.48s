@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  HyperCDFc
+  @  Upper tail at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "HyperCDFc: needs 4 arguments" DoError END Explode Drop END
+  → Npv Ksv ndv Xv « Npv 0 + Ksv 0 + ndv 0 + Xv 0 + → Np Ks nd X « '1-(IFTE(X<0;0;IFTE(X≥nd;1;Σ(Jx;0;IP(X);COMB(Ks;Jx)*COMB(Np-Ks;nd-Jx)/COMB(Np;nd)))))' →Num Npv Ksv ndv Xv 4 →List Drop » »
+»

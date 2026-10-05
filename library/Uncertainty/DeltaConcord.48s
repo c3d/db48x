@@ -1,0 +1,126 @@
+«
+    @ ΔConcord: draws two bounded intervals X and Y on the same scale, with
+    @ their intersection, and says how much of each the intersection covers
+    @ and how they sit on the line (RngRel). Y is expressed in the unit of X.
+    @ Returns, tagged: X∩Y (a range, or "∅" when they do not meet), the part of
+    @ X and the part of Y it covers in %, and the relation.
+    @ A value a±σb is refused: its bars are not bounds; see σConcord.
+    @ After Jean Wilson's Concord (2025).
+
+    @ Bounds of a value without unit: V → lo hi
+    «
+        DUP TypeName → DcK
+        «
+            CASE
+                DcK "range" == THEN Object→ END
+                DcK "drange" == THEN Object→ → DcA DcH « DcA DcH - DcA DcH + » END
+                DcK "prange" == THEN
+                    Object→ → DcA DcP « DcA ABS DcP × 100 ÷ → DcH « DcA DcH - DcA DcH + » »
+                END
+                DcK "uncertain" == THEN
+                    DROP "ΔConcord: a±σb has no bounds, use σConcord" DoError
+                END
+                DcK "integer" == DcK "neg_integer" == OR DcK "decimal" == OR
+                DcK "neg_decimal" == OR DcK "fraction" == OR DcK "neg_fraction" == OR
+                DcK "bignum" == OR DcK "neg_bignum" == OR THEN DUP END
+                DROP "ΔConcord: X and Y must be intervals or numbers" DoError
+            END
+        »
+    »
+    @ Pixel column of a value: V Min Max Left Right → #x
+    «
+        → DcV DcMin DcMax DcL DcR
+        « DcV DcMin - DcMax DcMin - ÷ DcR DcL - × DcL + 0 RND R→B »
+    »
+    → DcBounds DcPix
+    «
+        → DcX DcY
+        «
+            @ Refuse ±σ values before anything is put on the stack
+            DcX DcY 2 →List 1 2
+            FOR DcJ
+                DUP DcJ GET IF DUP TypeName "unit" == THEN UVAL END TypeName
+                IF "uncertain" == THEN DROP "ΔConcord: a±σb has no bounds, use σConcord" DoError END
+            NEXT
+            DROP
+            @ Y in the unit of X; the unit kept aside as 1_unit (or 1)
+            IF DcX TypeName "unit" == THEN
+                IF DcY TypeName "unit" ≠ THEN "ΔConcord: X has a unit, Y has none" DoError END
+                DcY DcX Convert 'DcY' STO
+                1 DcX →Unit DcX UVAL DcY UVAL
+            ELSE
+                IF DcY TypeName "unit" == THEN "ΔConcord: Y has a unit, X has none" DoError END
+                1 DcX DcY
+            END
+            SWAP DcBounds ROT DcBounds
+            DcX DcY ⓁRngRel
+            → DcU DcX1 DcX2 DcY1 DcY2 DcRel
+            «
+                DcX1 DcY1 MAX DcX2 DcY2 MIN
+                DcX1 DcY1 MIN DcX2 DcY2 MAX
+                → DcZ1 DcZ2 DcLo DcHi
+                «
+                    @ Parts covered, in %: an interval of zero width is covered whole or not at all
+                    IF DcZ1 DcZ2 ≤ THEN
+                        IF DcX2 DcX1 > THEN DcZ2 DcZ1 - DcX2 DcX1 - ÷ 100 × ELSE 100 END 1 RND
+                        IF DcY2 DcY1 > THEN DcZ2 DcZ1 - DcY2 DcY1 - ÷ 100 × ELSE 100 END 1 RND
+                        DcZ1 DcZ2 →Range DcU ×
+                    ELSE
+                        0 0 "∅"
+                    END
+                    @ A whole percentage is written without its decimal point
+                    ROT IF DUP FP 0 = THEN R→I END ROT IF DUP FP 0 = THEN R→I END ROT
+                    → DcPX DcPY DcI
+                    «
+                        @ Scale: both intervals and a margin of 8 % on each side
+                        DcHi DcLo - IF DUP 0 = THEN DROP 1 END 0.08 ×
+                        DcLo OVER - SWAP DcHi +
+                        FromLCD Size DROP B→R
+                        'LineWidth' RCL
+                        → DcMin DcMax DcW DcLw
+                        «
+                            ClearLCD
+                            "ΔConcord: X and Y on one scale" { #0d #2d 1 true false } DrawText
+                            "X" { #4d #40d 1 true false } DrawText
+                            "Y" { #4d #72d 1 true false } DrawText
+                            @ Bars at rows 50 and 82, the intersection at row 114, end marks 8 px high
+                            DcX1 DcX2 50 3 →List DcY1 DcY2 82 3 →List 2 →List
+                            IF DcI TypeName "text" ≠ THEN
+                                "∩" { #4d #104d 1 true false } DrawText
+                                DcZ1 DcZ2 114 3 →List 1 →List +
+                            END
+                            → DcBars
+                            «
+                                1 DcBars Size
+                                FOR DcJ
+                                    DcBars DcJ GET Explode DROP → DcA DcB DcRow
+                                    «
+                                        DcA DcMin DcMax 24 DcW 12 - DcPix
+                                        DcB DcMin DcMax 24 DcW 12 - DcPix
+                                        → DcPA DcPB
+                                        «
+                                            3 LineWidth
+                                            DcPA DcRow R→B 2 →List DcPB DcRow R→B 2 →List DrawLine
+                                            1 LineWidth
+                                            DcPA DcRow 8 - R→B 2 →List DcPA DcRow 8 + R→B 2 →List DrawLine
+                                            DcPB DcRow 8 - R→B 2 →List DcPB DcRow 8 + R→B 2 →List DrawLine
+                                        »
+                                    »
+                                NEXT
+                            »
+                            DcLw LineWidth
+                            @ The numbers
+                            "X = " DcX →Str + { #0d #134d 0 true false } DrawText
+                            "Y = " DcY →Str + { #0d #154d 0 true false } DrawText
+                            "X∩Y = " DcI →Str + { #0d #174d 0 true false } DrawText
+                            "Covers " DcPX →Str + "% of X, " + DcPY →Str + "% of Y" +
+                            { #0d #194d 0 true false } DrawText
+                            "Relation: " DcRel + { #0d #214d 0 true false } DrawText
+                            DcI "X∩Y" →Tag DcPX "X%" →Tag DcPY "Y%" →Tag DcRel "rel" →Tag
+                        »
+                    »
+                »
+            »
+        »
+    »
+»

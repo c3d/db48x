@@ -1,0 +1,11 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2Indep
+  @  Independence of two qualitative variables, on a contingency table.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Takes one matrix: the contingency table of observed counts.
+  @  The same computation serves the test of homogeneity.
+  @ ------------------------------------------------------------
+  → mat « mat Size → dims « dims 1 GET dims 2 GET → nrow ncol « 0 → gtot « 1 nrow FOR ii 1 ncol FOR jj mat { ii jj } GET gtot + 'gtot' STO NEXT NEXT 0 → acc « 1 nrow FOR ii 0 → rsum « 1 ncol FOR jj mat { ii jj } GET rsum + 'rsum' STO NEXT 1 ncol FOR jj 0 → csum « 1 nrow FOR kk mat { kk jj } GET csum + 'csum' STO NEXT mat { ii jj } GET rsum csum * gtot / - DUP * rsum csum * gtot / / acc + 'acc' STO » NEXT » NEXT acc →Num nrow 1 - ncol 1 - * → xv dfv « xv "chi2" →Tag dfv "df" →Tag dfv xv UTPC "p" →Tag » » » » » »
+»

@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  FisherAll
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "FisherAll: needs 3 arguments" DoError END Explode Drop END
+  → dfnv dfdv Xv « dfnv 0 + dfdv 0 + Xv 0 + → dfn dfd X « 'IFTE(X≤0;0;BetaI(dfn/2;dfd/2;dfn*X/(dfn*X+dfd)))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X≤0;0;(Γ((dfn+dfd)/2)/(Γ(dfn/2)*Γ(dfd/2)))*((dfn/dfd)^(dfn/2))*(X^(dfn/2-1))*((1+dfn*X/dfd)^(-(dfn+dfd)/2)))' →Num "PDF" →Tag '1-Kc' →Num "CDFc" →Tag 'IFTE(dfd>2;dfd/(dfd-2);Ⓒ?)' →Num "μ" →Tag 'IFTE(dfd>4;√(2*(dfd^2)*(dfn+dfd-2)/(dfn*((dfd-2)^2)*(dfd-4)));Ⓒ?)' →Num "sx" →Tag { Kc } PURGE dfnv dfdv Xv 3 →List Drop » »
+»

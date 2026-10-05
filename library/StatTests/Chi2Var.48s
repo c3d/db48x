@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2Var
+  @  Variance of a normal population against a target value.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "Chi2Var: needs 3 arguments" DoError END Explode Drop END
+  → nv sdv sgv « nv 0 + sdv 0 + sgv 0 + → nn sd sg0 « '(nn-1)*sd^2/sg0^2' →Num 'nn-1' →Num → xv dfv « xv "chi2" →Tag dfv "df" →Tag dfv xv UTPC "p" →Tag nv sdv sgv 3 →List Drop » » »
+»
