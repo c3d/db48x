@@ -294,7 +294,10 @@
                             → lvl
                             «
                               ClearLCD
-                              "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 0 true false } DrawText
+                              @ The title on one line, shortened by … when too long
+                              "ExmnF2D: " 'fx' Rcl →Str +
+                              If Dup Size 46 > Then 1 45 Sub "…" + End
+                              { #0d #2d 0 true false } DrawText
                               @ Marching squares: for each cell and each level, the
                               @ segment where the values cross it. Level -0.5 traces
                               @ the edge of the box; levels 1/8 … 7/8 the contours.
@@ -370,6 +373,40 @@
                                     Next
                                   »
                                 Next
+                                @ Local extrema of the grid: a node inside the box that is
+                                @ higher (▲) or lower (▼) than its eight neighbours
+                                2 19 For ri
+                                  lvl ri 1 - Get lvl ri Get lvl ri 1 + Get
+                                  → ru rm rd
+                                  «
+                                    2 ncol For ci
+                                      rm ci Get 1 Get
+                                      ru ci 1 - Get 1 Get ru ci Get 1 Get ru ci 1 + Get 1 Get
+                                      rm ci 1 - Get 1 Get rm ci 1 + Get 1 Get
+                                      rd ci 1 - Get 1 Get rd ci Get 1 Get rd ci 1 + Get 1 Get
+                                      @ Ties between two nodes go to one of them only: strict
+                                      @ against the neighbours above and left, not below and right
+                                      4 →List Sort 5 Rolld 4 →List Sort
+                                      → nv0 nf nb
+                                      «
+                                      nb 1 Get nf 1 Get Min nb 4 Get nf 4 Get
+                                      → nmn bmx fmx
+                                      «
+                                        If nv0 0 ≥ nmn 0 ≥ And Then
+                                          If nv0 bmx > nv0 fmx ≥ And nv0 nmn > And Then
+                                            "▲" ci 1 - 6 * 4 - R→B ri 1 - 6 * 28 + 7 - R→B 2 →List
+                                            0 true false 3 →List + DrawText
+                                          End
+                                          If nv0 nb 1 Get < nv0 nf 1 Get ≤ And nv0 bmx fmx Max < And Then
+                                            "▼" ci 1 - 6 * 4 - R→B ri 1 - 6 * 28 + 7 - R→B 2 →List
+                                            0 true false 3 →List + DrawText
+                                          End
+                                        End
+                                      »
+                                      »
+                                    Next
+                                  »
+                                Next
                               »
                               @ The minimum and the maximum: squares on the segment
                               wd 2 / nu 2 / px / - 0 RND
@@ -392,7 +429,7 @@
                                 "min" cmn 10 - 0 Max R→B #145d 2 →List 0 true false 3 →List + DrawText
                                 "max" cmx 12 - wd 30 - Min R→B #145d 2 →List 0 true false 3 →List + DrawText
                               »
-                              "contours at 1/8 … 7/8 of max − min" { #0d #161d 0 true false } DrawText
+                              "contours 1/8 … 7/8 of max − min; ▲ ▼ local max, min" { #0d #161d 0 true false } DrawText
                               "min = " vmn →Str + "  at " +
                               { } 1 nv For j lmn 2 j * Get + Next →Str +
                               { #0d #179d 0 true false } DrawText

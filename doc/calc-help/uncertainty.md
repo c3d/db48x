@@ -993,7 +993,9 @@ lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
 shape of F, as on a map: close together where F changes fast. The edge of the
 box is drawn too.
 The minimum and the maximum are marked by squares, joined by the segment that
-ExmnFxjxi draws. About a thousand values of F are computed: a few seconds on
+ExmnFxjxi draws. A point of the grid higher than its eight neighbours is marked
+▲, a point lower than them ▼: the local summits and pits of the slice, which
+tell whether a ring of contours surrounds a bump or a dip. About a thousand values of F are computed: a few seconds on
 the simulator.
 
 **1)** A minimum inside the box, a maximum at a vertex:
@@ -1023,37 +1025,38 @@ circles around it, and the minimum at a far corner:
 ```
 
 **5)** Robustness: the same bump and dip as in example 3 of ExmnFxjxi. The
-contours circle both of them, on the segment, and the search still finds the
-global minimum at (0, 0) and the global maximum 1.8 at (3, 3):
+contours ring both of them, on the segment; ▲ marks the bump, ▼ the dip. The
+search still finds the global minimum at (0, 0) and the global maximum 1.8 at
+(3, 3):
 
 ```rpl
 '(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
 ```
 
-**A hidden peak, in two steps.** A peak of height 3 stands at x1 = 2.2,
-x2 = 0.9, on a gentle slope from 1 to 1.9:
+**A hidden peak, in two steps.** A narrow peak of height 3 stands at
+x1 = 2.4, x2 = 2.1, close to the corner (3, 3), on a gentle slope from 1 to 1.9:
 
 **6)** Over the whole box 0…3 × 0…3, the search misses the peak and gives the
-maximum 1.9 at (3, 3). The contours do not: they draw circles near the top of
-the slice, around a summit that the numbers do not account for.
+maximum 1.9 at the corner (3, 3). The drawing does not: rings of contours near
+the maximum, with a ▲ at their centre, show a summit that the numbers do not
+account for.
 
 ```rpl
-'1+x1*x2/10+3*exp(-((x1-2.2)^2+(x2-0.9)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+'1+x1*x2/10+3*exp(-((x1-2.4)^2+(x2-2.1)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
 ```
 
-**7)** A smaller box around the circles, x1 = 2.2±0.3 and x2 = 0.9±0.3, given
-as X2 X1: the peak is now inside the reach of the search, and the true maximum
-appears, 4.198 at (2.2, 0.9):
+**7)** A smaller box around the rings and the corner, x1 = 2.6±0.4 and
+x2 = 2.5±0.5, given as X2 X1: the peak is now within the reach of the search,
+and the true maximum appears, 4.504 at (2.40, 2.10):
 
 ```rpl
-'1+x1*x2/10+3*exp(-((x1-2.2)^2+(x2-0.9)^2)/0.03)' 0.9±0.3 2.2±0.3 ⓁExmnF2D
+'1+x1*x2/10+3*exp(-((x1-2.4)^2+(x2-2.1)^2)/0.03)' 2.5±0.5 2.6±0.4 ⓁExmnF2D
 ```
 
 The search starts from the centre and from the best vertex of the box, one
 variable at a time; a summit narrow compared with the box, off the lines it
-follows, may escape it. When the
-contours show a summit or a pit that the squares do not mark, examine a
-smaller box around it.
+follows, may escape it. When a ▲ or a ▼ appears where no square is, or rings
+of contours that the numbers do not explain, examine a smaller box around it.
 
 
 ## ApplicationsLibrary
