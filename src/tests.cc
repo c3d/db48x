@@ -2036,6 +2036,18 @@ void tests::arithmetic()
         .test(CLEAR, "-0.4 IP SQ 0 <", ENTER).expect("False")
         .test(CLEAR, "-0. 0. ≠", ENTER).expect("False")
         .test(CLEAR, "SFP 24 Precision", ENTER).noerror();
+    step("Symbolic xroot evaluates numerically")
+        .test(CLEAR, "8 'XrtX' STO 'XrtX' 3 xroot", ENTER)
+        .expect("'xroot(3;XrtX)'")
+        .test(ID_ToDecimal).expect("2.");
+    step("Symbolic xroot is the same as the parsed expression")
+        .test(CLEAR, "'XrtX' 3 xroot 'xroot(3;XrtX)' SAME", ENTER)
+        .expect("True");
+    step("Symbolic xroot survives a text round-trip")
+        .test(CLEAR, "'XrtX' 3 xroot DUP →STR STR→ SAME", ENTER)
+        .expect("True");
+    step("Cleanup xroot variable")
+        .test(CLEAR, "'XrtX' PURGE", ENTER).noerror();
 }
 
 
