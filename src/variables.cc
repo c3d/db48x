@@ -345,12 +345,15 @@ object_p directory::store(object_g name, object_g value)
         if (!rt.clone_global(evalue, es))
             return nullptr;     // Out of memory, bail out
 
-        // Clone input value if it is within object being replaced
-        if (+value >= +evalue && +value < +evalue + es)
+        // Clone input value if it overlaps the object being replaced,
+        // e.g. if it is within it, or if we store an enclosing directory
+        if (+value < +evalue + es && +value + vs > +evalue)
         {
             value = rt.clone(value);
             if (!value)
                 return nullptr;
+            if (vs > es && rt.available(vs - es) < vs - es)
+                return nullptr;         // Out of memory
         }
 
         // Move memory above storage if necessary
@@ -373,10 +376,25 @@ object_p directory::store(object_g name, object_g value)
         if (rt.available(requested) < requested)
             return nullptr;               // Out of memory
 
-        // Move memory from directory up
+        // Find where to insert in the directory
         object_p start = object_p(+body);
         if (Settings.StoreAtEnd())
             start += dirsize;
+
+        // If the value straddles the insertion point, e.g. when storing
+        // the current directory or one of its parents, clone it first,
+        // since moving memory would otherwise insert a gap in the value.
+        // Cloning only moves temporaries, so it does not move `start`.
+        if (+value < start && +value + vs > start)
+        {
+            value = rt.clone(value);
+            if (!value)
+                return nullptr;
+            if (rt.available(requested) < requested)
+                return nullptr;           // Out of memory
+        }
+
+        // Move memory from directory up
         rt.move_globals(start + requested, start);
 
         // Copy name and value at end of directory
