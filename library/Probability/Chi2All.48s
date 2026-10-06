@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  Chi2All
+  @  Everything about one point, tagged: CDF, PDF, CDFc, mean, deviation.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "Chi2All: needs 2 arguments" DoError END Explode Drop END
+  → dfv Xv « dfv 0 + Xv 0 + → df X « 'IFTE(X≤0;0;GammaP(df/2;X/2))' →Num 'Kc' STO Kc "CDF" →Tag 'IFTE(X≤0;0;(X^(df/2-1))*EXP(-X/2)/((2^(df/2))*Γ(df/2)))' →Num "PDF" →Tag '1-Kc' →Num "CDFc" →Tag 'df' →Num "μ" →Tag '√(2*df)' →Num "sx" →Tag { Kc } PURGE dfv Xv 2 →List Drop » »
+»

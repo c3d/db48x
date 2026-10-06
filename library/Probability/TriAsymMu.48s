@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TriAsymMu
+  @  Mean of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 == THEN Explode Drop ELSE IF DUP Size 4 == THEN Explode Drop Drop ELSE "TriAsymMu: needs 3 arguments" DoError END END END
+  → Xminv Xmaxv xpv « Xminv 0 + Xmaxv 0 + xpv 0 + → Xmin Xmax xp « '(Xmin+Xmax+xp)/3' →Num Xminv Xmaxv xpv 3 →List Drop » »
+»

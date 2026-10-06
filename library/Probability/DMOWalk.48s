@@ -1,0 +1,114 @@
+«
+@@ DMOWalk — demo of the Probability section: two random walks in the
+@@ plane, 200 steps each, in uniformly random directions, with the same
+@@ mean step length 3. Left, steps drawn from Expon (λ = 1/3): a Brownian
+@@ walk, the drunkard's walk. Right, steps drawn from Pareto, of exponent
+@@ α = 1.2 or the one given on the stack (1 < α ≤ 3), with xm = 3(α-1)/α:
+@@ for α < 2 the variance is infinite, a Lévy flight, clusters of short
+@@ steps joined by rare long jumps. Each walk is scaled to its own
+@@ panel; the start is marked by a square. Returns, for each walk, the
+@@ share of the whole path taken by its longest step.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ The exponent, if given; any other object is left alone
+  0
+  If Depth 1 > Then Drop Dup TypeName End
+  → dmwty
+  «
+  1.2
+  If dmwty "decimal" == dmwty "integer" == Or dmwty "fraction" == Or Then
+    Over Dup 1 > Swap 3 ≤ And
+    If Then Drop End
+  End
+  Dup 1 - 3 * Over /
+  → dmwal dmwxm
+  «
+  ClearLCD
+  { #199d #20d } { #199d #239d } DrawLine
+  "Brownian: Expon steps" { #4d #2d 0 true false } DrawText
+  "Lévy: Pareto α=" dmwal →Text + { #204d #2d 0 true false } DrawText
+  @ Panel 1, the Brownian walk; panel 2, the Lévy flight
+  1 2 For dmwh
+    @ The walk: 201 points, the longest step, the length of the path
+    0 0 0 0
+    → dmwx dmwy dmwm dmws
+    «
+      0 0 R→C
+      1 200 For dmwi
+        If dmwh 1 == Then 1 3 / ⓁExponRand Else dmwxm dmwal ⓁParetoRand End
+        RAND 360 * 1_° *
+        → dmwr dmwt
+        «
+          dmwx dmwr dmwt Cos * + 'dmwx' Sto
+          dmwy dmwr dmwt Sin * + 'dmwy' Sto
+          dmwm dmwr Max 'dmwm' Sto
+          dmws dmwr + 'dmws' Sto
+          dmwx dmwy R→C
+        »
+      Next
+      201 →List
+      dmwm dmws /
+    »
+    → dmwp dmwq
+    «
+      @ The bounding box, then the scale and centre of the panel
+      dmwp 1 Get Re Dup dmwp 1 Get Im Dup
+      → dmwx0 dmwx1 dmwy0 dmwy1
+      «
+        1 201 For dmwi
+          dmwp dmwi Get
+          → dmwz
+          «
+            dmwx0 dmwz Re Min 'dmwx0' Sto
+            dmwx1 dmwz Re Max 'dmwx1' Sto
+            dmwy0 dmwz Im Min 'dmwy0' Sto
+            dmwy1 dmwz Im Max 'dmwy1' Sto
+          »
+        Next
+        186 dmwx1 dmwx0 - / 186 dmwy1 dmwy0 - / Min
+        dmwx0 dmwx1 + 2 / dmwy0 dmwy1 + 2 /
+        dmwh 1 - 200 * 100 +
+        → dmwk dmwxc dmwyc dmwc
+        «
+          @ Every point to a pixel { #x #y }
+          1 201 For dmwi
+            dmwp dmwi Get
+            → dmwz
+            «
+              dmwc dmwz Re dmwxc - dmwk * + IP R→I R→B
+              122 dmwz Im dmwyc - dmwk * - IP R→I R→B
+              2 →List
+            »
+          Next
+          201 →List
+          → dmwpx
+          «
+            2 201 For dmwi
+              dmwpx dmwi 1 - Get dmwpx dmwi Get DrawLine
+            Next
+            @ The start, a small square
+            dmwpx 1 Get 1 Get B→R dmwpx 1 Get 2 Get B→R
+            → dmwu dmwv
+            «
+              dmwu 3 - R→B dmwv 3 - R→B 2 →List
+              dmwu 3 + R→B dmwv 3 - R→B 2 →List
+              dmwu 3 + R→B dmwv 3 + R→B 2 →List
+              dmwu 3 - R→B dmwv 3 + R→B 2 →List
+              → dmwa dmwb dmwe dmwf
+              «
+                dmwa dmwb DrawLine dmwb dmwe DrawLine
+                dmwe dmwf DrawLine dmwf dmwa DrawLine
+              »
+            »
+            "longest step " dmwq 100 * IP R→I →Text + "%" +
+            dmwh 1 - 200 * 4 + R→B #220d 2 →List { 0 true false } + DrawText
+            dmwq 3 RND
+          »
+        »
+      »
+    »
+  Next
+  2 →List "longest step / path" →Tag
+  »
+  »
+»

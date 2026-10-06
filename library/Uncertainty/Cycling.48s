@@ -1,0 +1,44 @@
+«
+@@ Cycling — give a value with an uncertainty its next form, keeping
+@@ its unit: a…b → c±d → c±p% → c±σd → a…b.
+@@ The first three forms state the same bounds: these steps are
+@@ equivalences. The two steps to and from c±σd keep the same digits
+@@ but change their meaning, a bound becoming a standard deviation or
+@@ the reverse: they correct a value typed in the wrong form, and their
+@@ result is tagged "non-equivalent". To turn a bound into a standard
+@@ deviation by a law, use Bound→σ instead.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ A value tagged by an earlier press loses its tag
+  If Dup TypeName "tag" == Then DeleteTag End
+  → cyx
+  «
+    @ The value without its unit, and the unit as 1_unit (or 1)
+    1 cyx
+    If cyx TypeName "unit" == Then Drop Drop 1 cyx →Unit cyx UVal End
+    → cyu cyv
+    «
+      cyv TypeName
+      → cyt
+      «
+        Case
+          cyt "range" == cyt "drange" == Or Then
+            cyv Cycle 0
+          End
+          cyt "prange" == Then
+            cyv Explode → cyc cyp « cyc cyc Abs cyp * 100 / →σRange » 1
+          End
+          cyt "uncertain" == Then
+            cyv Explode → cyc cyd « cyc cyd - cyc cyd + →Range » 1
+          End
+          "Cycling: expects a…b, a±b, a±p% or a±σb" DoError
+        End
+        → cyn
+        «
+          If cyu TypeName "unit" == Then cyu * End
+          If cyn Then "non-equivalent" →Tag End
+        »
+      »
+    »
+  »
+»

@@ -1,0 +1,15 @@
+«
+@@ DMOσConcord — demo of σConcord: two measurements of the same true value
+@@ 10, each with a standard deviation drawn between 0.5 and 2, and a value
+@@ drawn from the normal law around 10. Press the key again for a new pair:
+@@ p falls below 0.05 about one time in twenty, although nothing is wrong.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  0.5 2 Random 2 Round 0.5 2 Random 2 Round
+  → DmSx DmSy
+  «
+    10 DmSx ⓁNormlRand 2 Round DmSx →σRange
+    10 DmSy ⓁNormlRand 2 Round DmSy →σRange
+    ⓁσConcord
+  »
+»
