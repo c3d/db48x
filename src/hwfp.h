@@ -68,6 +68,8 @@ struct hwfp : hwfp_base
     //   Constructor from actual value
     // ------------------------------------------------------------------------
     {
+        if (value == hw(0))
+            value = hw(0);      // There is no -0 in RPL
         byte *p = (byte *) payload(this);
         memcpy(p, &value, sizeof(value));
     }
