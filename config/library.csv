@@ -519,6 +519,10 @@
 	"σConcord",	"=/library/Uncertainty/SigmaConcord.48s"
 	"RngRel",	"=/library/Uncertainty/RngRel.48s"
 
+"Uncertainty/Monte Carlo"
+
+	"MCPropagate",	"=/library/Uncertainty/MCPropagate.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="
