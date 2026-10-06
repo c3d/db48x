@@ -13784,6 +13784,21 @@ void tests::polynomial_roots()
         .expect("[ 1 2 -25 -26 120 ]")
         .test("PRoot", ENTER)
         .want("[ -5 -3 2 4 ]");
+    step("PCoef: complex conjugate roots give real coefficients")
+        .test(CLEAR, "CompatiblePolynomials [ 1ⅈ2 1ⅈ-2 ] PCoef", ENTER)
+        .want("[ 1 -2 5 ]");
+    step("PCoef: single complex root")
+        .test(CLEAR, "CompatiblePolynomials [ 1ⅈ2 ] PCoef", ENTER)
+        .want("[ 1 -1-2ⅈ ]");
+    step("PCoef: empty array is an error, not a crash")
+        .test(CLEAR, "CompatiblePolynomials [ ] PCoef", ENTER)
+        .error("Bad argument value");
+    step("PCoef: symbolic roots are rejected like on HP")
+        .test(CLEAR, "CompatiblePolynomials [ 'A' 'B' ] PCoef", ENTER)
+        .error("Bad argument type");
+    step("PCoef: unit roots are rejected")
+        .test(CLEAR, "CompatiblePolynomials [ 1_m 2_m ] PCoef", ENTER)
+        .error("Bad argument type");
     step("PCoef: new-style polynomial output")
         .test(CLEAR, "NewStylePolynomials [2 -3 4 -5] PCoef", ENTER)
         .expect("x↑4+2·x↑3-25·x↑2-26·x+120");
