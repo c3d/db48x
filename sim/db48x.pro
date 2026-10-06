@@ -154,7 +154,7 @@ ICON = db48x.icns
 
 DISTFILES += \
     android-db48x/AndroidManifest.xml \
-    android/build.gradle \
+    android-db48x/build.gradle \
     android/res/values/libs.xml \
     android/res/xml/qtprovider_paths.xml
 
