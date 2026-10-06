@@ -2516,6 +2516,26 @@ void tests::local_variables()
 
     step("Cleanup");
     test(CLEAR, "{ LocTest X } PurgeAll", ENTER).noerror();
+
+    step("Local name escaping its scope becomes a global name")
+        .test(CLEAR, "3 « → x « 'x^2' » » EVAL", ENTER)
+        .expect("'x↑2'");
+    step("Escaped local name evaluates as a global")
+        .test(CLEAR, "3 « → x « 'x^2' » » EVAL 4 'x' STO EVAL", ENTER)
+        .expect("16");
+    step("Local name escaping a user-defined function")
+        .test(CLEAR, "« → x « 'x^2' » » 'H' STO 'H(3)' EVAL", ENTER)
+        .expect("'x↑2'")
+        .test(CLEAR, "'H(3)' EVAL 5 'x' STO EVAL", ENTER)
+        .expect("25");
+    step("Escaping inner scope keeps references to outer locals")
+        .test(CLEAR, "7 2 « → a b « 5 → c « 'a*c+b' » EVAL » » EVAL", ENTER)
+        .expect("'7·c+2'");
+    step("Loop variable escaping a for loop")
+        .test(CLEAR, "1 2 FOR i 'i^2' NEXT", ENTER)
+        .expect("'i↑2'");
+    step("Cleanup escaped locals")
+        .test(CLEAR, "{ H x } PURGE", ENTER).noerror();
 }
 
 
