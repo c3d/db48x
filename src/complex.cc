@@ -581,10 +581,18 @@ PARSE_BODY(rectangular)
         offs = utf8_next(p.source, offs, max);
         cp = offs < max ? utf8_codepoint(p.source + offs) : 0;
     }
+    // After the ⅈ mark, only a value (number, name, parenthesized or
+    // quoted expression) can follow, otherwise 'ⅈ+1' would swallow '+1'
+    // as the imaginary part
     bool     sp    = utf8_whitespace(cp);
+    bool     dot   = cp == '.' || (cp == ',' && Settings.DecimalComma());
+    bool     more  = imark
+        ? (isdigit(cp) || dot || cp == '(' || cp == '\'' ||
+           is_valid_as_name_initial(cp))
+        : !sp;
     size_t   imsz  = max - offs;
-    object_p imobj = sp ? nullptr : parse(p.source + offs, imsz,
-                                          PARENTHESES, p.separator);
+    object_p imobj = more ? parse(p.source + offs, imsz,
+                                  PARENTHESES, p.separator) : nullptr;
     algebraic_g im;
     if (!imobj)
     {
@@ -602,6 +610,8 @@ PARSE_BODY(rectangular)
         p.length = offs;
         return p.out ? OK : ERROR;
     }
+    if (imobj->is_command())
+        return SKIP;            // Case of 2*ⅈ: × is a function, not a value
     im = imobj->as_algebraic();
     if (!im)
         return SKIP;            // Case of 3+"Hello"
