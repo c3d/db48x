@@ -849,7 +849,9 @@ Stack: 'f(x)' X ▶ f(X), as ΔRf.
 
 The curve uses 161 points. Each dashed line should touch the curve; a line
 that does not, or a peak of the curve beyond a line, would show an extremum
-that ΔRf missed.
+that ΔRf missed. The highest and the lowest points of the curve are marked by
+filled triangles ▲ ▼, the other local maxima and minima by hollow ones, each
+centred on its point.
 
 **1)** The polynomial of the first example of ΔRf, with its two
 extrema inside the interval:
@@ -863,6 +865,29 @@ extrema inside the interval:
 ```rpl
 'x^4' 1.10±1.15_m ⓁExmnf
 ```
+
+**A peak narrower than the sampling.** No search can promise an extremum
+narrower than the steps it takes. This function rises gently from 1 to 1.9,
+with a peak of height 3 and width 0.008 at x = 2.37:
+
+**3)** Over 0…3, the 161 points of the curve fall on the flank of the peak and
+show it as a small spike, marked by hollow triangles, but ΔRf misses it: the dashed line of the
+maximum stays at 1.9, below the spike.
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '0…3' →Num ⓁExmnf
+```
+
+**4)** A spike that the dashed lines do not explain calls for a closer look.
+Over 2.3…2.45, around the spike, the peak is drawn whole and ΔRf finds the
+true maximum, 4.56:
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '2.3…2.45' →Num ⓁExmnf
+```
+
+Over a wide interval, examine the drawing as well as the numbers, and narrow
+the interval around anything they do not account for.
 
 
 ## ΔRFxjxi
@@ -929,7 +954,9 @@ Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the sta
 The minimum and the maximum are found as by ΔRFxjxi; the segment that joins
 them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
 points, from the minimum on the left to the maximum on the right. The values
-and the points of both extrema are written below, as { x1 … xn }.
+and the points of both extrema are written below, as { x1 … xn }. The minimum
+and the maximum, at the ends, are marked by filled triangles ▼ ▲, the local
+extrema along the profile by hollow ones.
 
 **1)** A maximum on an edge of the box:
 
@@ -942,6 +969,14 @@ x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
 
 ```rpl
 'sin(x1)*cos(x2)' 3±3_r 3±3_r ⓁExmnFxjxi
+```
+
+**3)** Robustness: a bump and a dip right on the way from the minimum to the
+maximum. The profile shows both, with their hollow marks, yet the search keeps the global extrema, at (0, 0) and
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnFxjxi
 ```
 
 
@@ -960,8 +995,11 @@ line; the other degrees of freedom are fixed by the plane. Seven contour
 lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
 shape of F, as on a map: close together where F changes fast. The edge of the
 box is drawn too.
-The minimum and the maximum are marked by squares, joined by the segment that
-ExmnFxjxi draws. About a thousand values of F are computed: a few seconds on
+The minimum and the maximum are marked by filled triangles ▼ ▲, joined by the
+segment that ExmnFxjxi draws. A point of the grid higher than its eight
+neighbours, or lower, is marked by a hollow triangle pointing up or down: the
+local summits and pits of the slice, which tell whether a ring of contours
+surrounds a bump or a dip. About a thousand values of F are computed: a few seconds on
 the simulator.
 
 **1)** A minimum inside the box, a maximum at a vertex:
@@ -976,11 +1014,11 @@ the simulator.
 'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
 ```
 
-**3)** A saddle: the minimum −1 at x1 = 0, x2 = ±1, the maximum 1 at
-x1 = ±1, x2 = 0, and hyperbolas between them:
+**3)** A saddle, over a box longer in x1: the minimum −1 at x1 = 0,
+x2 = ±1, the maximum 2.25 at x1 = ±1.5, x2 = 0, and hyperbolas between them:
 
 ```rpl
-'x1^2-x2^2' 0±1 0±1 ⓁExmnF2D
+'x1^2-x2^2' 0±1 0±1.5 ⓁExmnF2D
 ```
 
 **4)** A bump: the maximum 1 at the origin, inside the box, with
@@ -989,6 +1027,42 @@ circles around it, and the minimum at a far corner:
 ```rpl
 'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
 ```
+
+**5)** Robustness: the same bump and dip as in example 3 of ExmnFxjxi. The
+contours ring both of them, on the segment, and hollow triangles mark the
+bump and the dip. The
+search still finds the global minimum at (0, 0) and the global maximum 1.8 at
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**A hidden peak, in two steps.** A narrow peak of height 3 stands at
+x1 = 2.5, x2 = 1.9, not far from the corner (3, 3), on a gentle slope from 1
+to 1.9:
+
+**6)** Over the whole box 0…3 × 0…3, the search misses the peak and gives the
+maximum 1.9 at the corner (3, 3). The drawing does not: rings of contours near
+the maximum, with a hollow triangle at their centre, show a summit that the numbers do not
+account for.
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**7)** A smaller box centred on the hollow triangle, x1 = 2.5±0.3 and
+x2 = 1.9±0.3, given as X2 X1: the peak is now within the reach of the search,
+and the true maximum appears, 4.475 at (2.5, 1.9):
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.9±0.3 2.5±0.3 ⓁExmnF2D
+```
+
+The search starts from the centre and from the best vertex of the box, one
+variable at a time; a summit narrow compared with the box, off the lines it
+follows, may escape it. When a hollow triangle appears away from the filled ones, or rings
+of contours that the numbers do not explain, examine a smaller box around it.
 
 
 ## ApplicationsLibrary

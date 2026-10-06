@@ -2792,13 +2792,13 @@ Standard deviation of the Student distribution, computed from its parameters alo
 
 ## StudentRand
 
-Random draw from the Student distribution. A uniform variate is drawn and fed to StudentQ, so the draw follows the law by inversion. Stack: `df` — or `{ df }`.
+Random draw from the Student distribution, by Bailey's polar method: two uniform variates U and V in (−1, 1), with W = U² + V² < 1, give the exact draw U·√(df·(W^(−2/df) − 1)/W). This is much faster than inversion through StudentQ, which matters for the Monte Carlo method (MCPropagate). Stack: `df` — or `{ df }`.
 
 Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
 
 ```rpl
 42 rdz 4 ⓁStudentRand
-@ Expecting 0.47600 95145 71
+@ Expecting 1.21429 99670 5
 ```
 
 ## StudentArgs

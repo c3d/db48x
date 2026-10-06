@@ -259,11 +259,11 @@
                             @ scaled to 0…1 between the minimum and the maximum,
                             @ or -1 outside the box
                             { }
-                            0 19 For cy
+                            0 21 For cy
                               { }
                               0 wd 6 / IP For ccx
                                 ccx 6 * wd 2 / - px *
-                                85 cy 6 * 28 + - px *
+                                91 cy 6 * 28 + - px *
                                 → ss tt
                                 «
                                   1
@@ -294,14 +294,17 @@
                             → lvl
                             «
                               ClearLCD
-                              "ExmnF2D: " 'fx' Rcl →Str + { #0d #2d 1 true false } DrawText
+                              @ The title on one line, shortened by … when too long
+                              "ExmnF2D: " 'fx' Rcl →Str +
+                              If Dup Size 46 > Then 1 45 Sub "…" + End
+                              { #0d #2d 0 true false } DrawText
                               @ Marching squares: for each cell and each level, the
                               @ segment where the values cross it. Level -0.5 traces
                               @ the edge of the box; levels 1/8 … 7/8 the contours.
                               lvl 1 Get Size 1 -
                               → ncol
                               «
-                                0 18 For cy
+                                0 20 For cy
                                   lvl cy 1 + Get lvl cy 2 + Get
                                   → ra rb
                                   «
@@ -370,29 +373,102 @@
                                     Next
                                   »
                                 Next
+                                @ Local extrema of the grid: △ ▽ hollow at the nodes inside the
+                                @ box higher or lower than their eight neighbours, except
+                                @ next to the global extrema, marked later
+                                wd 2 / nu 2 / px / - 0 RND wd 2 / nu 2 / px / + 0 RND
+                                → gmn gmx
+                                «
+                                2 21 For ri
+                                  lvl ri 1 - Get lvl ri Get lvl ri 1 + Get
+                                  → ru rm rd
+                                  «
+                                    2 ncol For ci
+                                      rm ci Get 1 Get
+                                      ru ci 1 - Get 1 Get ru ci Get 1 Get ru ci 1 + Get 1 Get
+                                      rm ci 1 - Get 1 Get rm ci 1 + Get 1 Get
+                                      rd ci 1 - Get 1 Get rd ci Get 1 Get rd ci 1 + Get 1 Get
+                                      @ Ties between two nodes go to one of them only: strict
+                                      @ against the neighbours above and left, not below and right
+                                      4 →List Sort 5 Rolld 4 →List Sort
+                                      → nv0 nf nb
+                                      «
+                                      nb 1 Get nf 1 Get Min nb 4 Get nf 4 Get
+                                      → nmn bmx fmx
+                                      «
+                                        If nv0 0 ≥ nmn 0 ≥ And Then
+                                          If nv0 bmx > nv0 fmx ≥ And nv0 nmn > And ci 1 - 6 * gmn - Abs 9 < ri 1 - 6 * 28 + 91 - Abs 9 < And ci 1 - 6 * gmx - Abs 9 < ri 1 - 6 * 28 + 91 - Abs 9 < And Or Not And Then
+                                            ci 1 - 6 * ri 1 - 6 * 28 + 1 0
+                                            → tx ty ts tf
+                                            «
+                                              tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              If tf Then
+                                                1 8 For ii
+                                                  tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                                  tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                                Next
+                                              End
+                                            »
+                                          End
+                                          If nv0 nb 1 Get < nv0 nf 1 Get ≤ And nv0 bmx fmx Max < And ci 1 - 6 * gmn - Abs 9 < ri 1 - 6 * 28 + 91 - Abs 9 < And ci 1 - 6 * gmx - Abs 9 < ri 1 - 6 * 28 + 91 - Abs 9 < And Or Not And Then
+                                            ci 1 - 6 * ri 1 - 6 * 28 + -1 0
+                                            → tx ty ts tf
+                                            «
+                                              tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                              If tf Then
+                                                1 8 For ii
+                                                  tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                                  tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                                Next
+                                              End
+                                            »
+                                          End
+                                        End
+                                      »
+                                      »
+                                    Next
+                                  »
+                                Next
+                                »
                               »
-                              @ The minimum and the maximum: squares on the segment
+                              @ The minimum and the maximum: ▼ ▲ filled, on the segment
                               wd 2 / nu 2 / px / - 0 RND
                               wd 2 / nu 2 / px / + 0 RND
                               → cmn cmx
                               «
-                                cmn R→B #85d 2 →List cmx R→B #85d 2 →List DrawLine
-                                cmn cmx 2 →List
-                                1 2 For jj
-                                  Dup jj Get
-                                  → cc
-                                  «
-                                    cc 4 - R→B #81d 2 →List cc 4 + R→B #81d 2 →List DrawLine
-                                    cc 4 - R→B #89d 2 →List cc 4 + R→B #89d 2 →List DrawLine
-                                    cc 4 - R→B #81d 2 →List cc 4 - R→B #89d 2 →List DrawLine
-                                    cc 4 + R→B #81d 2 →List cc 4 + R→B #89d 2 →List DrawLine
-                                  »
-                                Next
-                                Drop
-                                "min" cmn 10 - 0 Max R→B #145d 2 →List 0 true false 3 →List + DrawText
-                                "max" cmx 12 - wd 30 - Min R→B #145d 2 →List 0 true false 3 →List + DrawText
+                                cmn R→B #91d 2 →List cmx R→B #91d 2 →List DrawLine
+                                cmn 91 -1 1
+                                → tx ty ts tf
+                                «
+                                  tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  If tf Then
+                                    1 8 For ii
+                                      tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                      tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                    Next
+                                  End
+                                »
+                                cmx 91 1 1
+                                → tx ty ts tf
+                                «
+                                  tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                                  If tf Then
+                                    1 8 For ii
+                                      tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                      tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                    Next
+                                  End
+                                »
                               »
-                              "contours at 1/8 … 7/8 of max − min" { #0d #161d 0 true false } DrawText
+                              "contours 1/8 … 7/8 of max − min  [▲▼: global; hollow: local]" { #0d #161d 0 true false } DrawText
                               "min = " vmn →Str + "  at " +
                               { } 1 nv For j lmn 2 j * Get + Next →Str +
                               { #0d #179d 0 true false } DrawText
