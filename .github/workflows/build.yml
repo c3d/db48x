@@ -702,7 +702,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.3'
+        version: '6.10.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
@@ -713,7 +713,7 @@ jobs:
 
     - name: Install Android NDK
       run: |
-        sdkmanager --install "ndk;26.1.10909125"
+        sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
@@ -724,7 +724,7 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
         export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p "$HOME/.local"
@@ -774,7 +774,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.7.3'
+        version: '6.10.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
@@ -785,7 +785,7 @@ jobs:
 
     - name: Install Android NDK
       run: |
-        sdkmanager --install "ndk;26.1.10909125"
+        sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
@@ -796,7 +796,7 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
         export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p "$HOME/.local"
