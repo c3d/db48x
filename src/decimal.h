@@ -398,6 +398,7 @@ struct decimal : algebraic
     ularge   as_unsigned(bool magnitude = false) const;
     large    as_integer() const;
     int32_t  as_int32() const;
+    bool     is_integral() const;
     // ------------------------------------------------------------------------
     //   Conversion to machine values
     // ------------------------------------------------------------------------

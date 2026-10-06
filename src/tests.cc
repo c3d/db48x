@@ -15260,6 +15260,40 @@ void tests::regression_checks()
         .test(CLEAR, "{ {1 2} 3 } { 1 2 } 9 PUT", ENTER)
         .want("{ { 1 9 } 3 }");
 
+    step("→List with a count too large for 32 bits")
+        .test(CLEAR, "1 2 3 1E30 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with the largest 32-bit count")
+        .test(CLEAR, "1 2 3 4294967295 →LIST", ENTER)
+        .error("Too few arguments");
+    step("→List with a count that would truncate to 3")
+        .test(CLEAR, "1 2 3 4294967299 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with a count that would truncate to 0")
+        .test(CLEAR, "1 2 3 4294967296 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with a non-integer count")
+        .test(CLEAR, "1 2 3 2.5 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with an integral decimal count")
+        .test(CLEAR, "1 2 3 2. →LIST", ENTER)
+        .expect("{ 2 3 }");
+    step("→List with a negative count")
+        .test(CLEAR, "1 2 3 -1 →LIST", ENTER)
+        .error("Bad argument value");
+    step("GET with an index that would truncate to 2")
+        .test(CLEAR, "{1 2 3} 4294967298 GET", ENTER)
+        .error("Bad argument value");
+    step("SUB with indices that would truncate to 2 and 3")
+        .test(CLEAR, "{1 2 3 4 5} 4294967298 4294967299 SUB", ENTER)
+        .error("Bad argument value");
+    step("DUPN with the largest 32-bit count")
+        .test(CLEAR, "1 4294967295 DUPN", ENTER)
+        .error("Too few arguments");
+    step("DROPN with the largest 32-bit count")
+        .test(CLEAR, "1 2 4294967295 DROPN", ENTER)
+        .error("Too few arguments");
+
     step("Exit crash guard tests directory")
         .test(CLEAR, "UPDIR 'CrashGuards' PGDIR", ENTER).noerror();
 }
