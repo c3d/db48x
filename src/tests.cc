@@ -6939,6 +6939,14 @@ void tests::units_and_conversions()
         .test(CLEAR, "1_kg", ENTER)
         .type(ID_unit)
         .expect("1 kg");
+    step("Watt-hour and kilowatt-hour are units of energy")
+        .test(CLEAR, "1_kWh 1_J CONVERT", ENTER)
+        .type(ID_unit)
+        .expect("3 600 000 J");
+    step("Kilowatt-hour over kilowatt is a time")
+        .test(CLEAR, "60_kWh 40_kW / 1_h CONVERT", ENTER)
+        .type(ID_unit)
+        .expect("1 ¹/₂ h");
     step("Unit symbol from unit menu")
         .test(CLEAR, SHIFT, KEY5, KEY1, F1, LOWERCASE, M, S, ENTER)
         .type(ID_unit)
