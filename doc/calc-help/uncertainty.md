@@ -1260,7 +1260,7 @@ Mref = 5.36±σ0.01 g.
 ```rpl
 12345 RDZ
 'r*4/3*Ⓒπ*(d/2)^3' { r d } { '2.5±σ0.001_g/cm^3' '15.9995…16.0005_mm' } →Num
-2000 ⓁMCPropagate 1_g Convert
+ⓁMCPropagate 1_g Convert
 @ Expecting 5.36170 70590 3±σ2.14913 26272 8⁳⁻³ g
 ```
 
@@ -1335,7 +1335,7 @@ k = 2·U/x². Its reference value is 20 N/m with a tolerance of ±2.5 %, a bound
 ```rpl
 12345 RDZ
 '2*u/x^2' { u x } { '0.22±σ0.00001_J' '14.95…15.05_cm' } →Num
-2000 ⓁMCPropagate 1_N/m Convert
+ⓁMCPropagate 1_N/m Convert
 @ Expecting 19.55534 095±σ0.07717 42988 1 N/m
 ```
 
@@ -1462,7 +1462,7 @@ From step D: θ = 36.4699040743±σ1.0786045787°.
 ```rpl
 12345 RDZ
 'd*tan(t)' { d t } { '1.998…2.002_m' '36.4699040743±σ1.0786045787_°' } →Num
-2000 ⓁMCPropagate
+ⓁMCPropagate
 @ Expecting 1.48055 71150 4±σ0.05788 01664 32 m
 ```
 
@@ -1526,9 +1526,28 @@ k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743±σ1.07
 { m k t u e f }
 { 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
   '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
-2000 ⓁMCPropagate
+ⓁMCPropagate
 @ Expecting 0.15662 45397 98±σ1.61813 73075 7⁳⁻³
 ```
+
+**5)** The Monte Carlo method with the same correlation as in 2), ρ = +1 for all
+the pairs:
+
+```rpl
+1 'ρij' Sto 12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+ⓁMCPropagate 'ρij' Purge
+@ Expecting 0.15664 39577 78±σ1.77935 81418 4⁳⁻³
+```
+
+Both methods find that a correlation of +1 between all the inputs would raise
+the uncertainty of the compression from 1.62 mm to about 1.8 mm: 1.80 by the
+propagation formula, 1.78 by Monte Carlo. Unlike the angle of step D, the
+compression is nearly linear in its inputs over their range, and the
+propagation formula is enough here.
 
 The compression must be 15.66±σ0.16 cm, not the
 15.00 cm of step B: the friction, the rise and the fraction f cost 0.66 cm of
