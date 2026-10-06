@@ -1975,6 +1975,14 @@ void tests::arithmetic()
         .test(CLEAR, "'3^3^3'", ENTER, ID_ToDecimal)
         .expect("7 625 597 484 987");
 
+    step("Integer power too big for bignum falls back to decimal")
+        .test(CLEAR, "10 1000000 ^", ENTER).noerror().expect("1.⁳¹⁰⁰⁰⁰⁰⁰")
+        .test(CLEAR, "10 1000000 ^ DEPTH", ENTER).noerror().expect("1")
+        .test(CLEAR, "« 10 1000000 ^ » EVAL", ENTER)
+        .noerror().expect("1.⁳¹⁰⁰⁰⁰⁰⁰")
+        .test(CLEAR, "IFERR 10 1000000 ^ THEN 0 END DEPTH", ENTER)
+        .noerror().expect("1");
+
     step("xroot");
     test(CLEAR, "8 3 xroot", ENTER).expect("2.");
     test(CLEAR, "-8 3 xroot", ENTER).expect("-2.");
