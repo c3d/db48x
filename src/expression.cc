@@ -3951,15 +3951,151 @@ expression_p expression::isolate(symbol_r sym, bool error) const
             cbrt(N) == P,           N == cubed(P)
             );
 
-    if (+result == +eq)
-    {
-        if (error)
-            rt.cannot_isolate_error();
+    if (!result)
         return nullptr;
+
+    // If the rules did not isolate the variable, try as a polynomial
+    if (+result == +eq || !result->is_isolated(sym))
+    {
+        result = eq->isolate_polynomial(sym);
+        if (!result)
+        {
+            if (error && !rt.error())
+                rt.cannot_isolate_error();
+            return nullptr;
+        }
     }
     if (result && Settings.AutoSimplify())
         result = result->simplify();
     return result;
+}
+
+
+bool expression::is_isolated(symbol_r sym) const
+// ----------------------------------------------------------------------------
+//   Check if an equation is in the form `sym=value` with value independent
+// ----------------------------------------------------------------------------
+//   In library equations, the variable may carry a unit, as in `m_kg`
+{
+    expression_g left, right;
+    if (!split_equation(left, right))
+        return false;
+    object_p lobj = left->as_quoted(ID_object);
+    if (unit_p u = lobj ? lobj->as<unit>() : nullptr)
+        lobj = u->value();
+    symbol_p lsym = lobj ? lobj->as<symbol>() : nullptr;
+    record(expression, "is_isolated %t lobj %t", this, lobj);
+    if (!lsym || !lsym->is_same_as(+sym))
+        return false;
+    return !right->depends_on(sym);
+}
+
+
+expression_p expression::isolate_polynomial(symbol_r sym) const
+// ----------------------------------------------------------------------------
+//   Isolate a variable in a linear or quadratic polynomial equation
+// ----------------------------------------------------------------------------
+//   This collects `left-right` as a polynomial `a·X²+b·X+c` in the variable,
+//   where `a`, `b` and `c` may depend on other variables, and returns
+//   `X=-c/b` or the quadratic formula `X=(-b+s1·√(b²-4·a·c))/(2·a)`, where
+//   `s1` is a sign variable (omitted when `PrincipalSolution` is set).
+{
+    expression_g left, right;
+    if (!split_equation(left, right))
+        return nullptr;
+
+    algebraic_g  l    = +left;
+    algebraic_g  r    = +right;
+    algebraic_g  diff = l - r;
+    polynomial_g poly = diff ? polynomial::make(+diff) : nullptr;
+    if (!poly)
+    {
+        rt.clear_error();
+        return nullptr;
+    }
+
+    size_t vidx = poly->variable(+sym);
+    if (vidx == ~0UL)
+        return nullptr;
+
+    // Collect coefficients by power of the variable
+    size_t      nvars = poly->variables();
+    algebraic_g coef[3];
+    for (auto term : *poly)
+    {
+        algebraic_g factor = term.factor();
+        if (factor->is_zero(false))
+            continue;
+        ularge power = 0;
+        for (size_t v = 0; v < nvars; v++)
+        {
+            ularge exponent = term.exponent();
+            if (v == vidx)
+            {
+                power = exponent;
+                continue;
+            }
+            if (exponent)
+            {
+                algebraic_g var = poly->variable(v);
+                algebraic_g value = exponent == 1 ? var : ::pow(var, exponent);
+                factor = factor->is_one(false) ? value : factor * value;
+                if (!factor)
+                    return nullptr;
+            }
+        }
+        if (power > 2)
+            return nullptr;
+        coef[power] = coef[power] ? coef[power] + factor : factor;
+        if (!coef[power])
+            return nullptr;
+    }
+
+    algebraic_g zero = integer::make(0);
+    algebraic_g a = coef[2] ? coef[2] : zero;
+    algebraic_g b = coef[1] ? coef[1] : zero;
+    algebraic_g c = coef[0] ? coef[0] : zero;
+    algebraic_g value;
+    if (coef[2])
+    {
+        // Quadratic formula
+        algebraic_g two  = integer::make(2);
+        algebraic_g four = integer::make(4);
+        algebraic_g disc = b * b - four * a * c;
+        if (!disc)
+            return nullptr;
+        if (disc->is_zero(false))
+        {
+            value = -b / (two * a);
+        }
+        else
+        {
+            algebraic_g root;
+            if (disc->is_real() && !disc->is_negative(false))
+                root = sqrt::run(disc);
+            else
+                root = expression::make(ID_sqrt, disc);
+            if (!root)
+                return nullptr;
+            if (!Settings.PrincipalSolution())
+            {
+                char buf[24];
+                snprintf(buf, sizeof(buf), "s%u", ++constant_index);
+                algebraic_g sign = +symbol::make(buf);
+                root = sign * root;
+            }
+            value = (-b + root) / (two * a);
+        }
+    }
+    else if (coef[1])
+    {
+        value = -c / b;
+    }
+    if (!value)
+        return nullptr;
+
+    algebraic_g var = +sym;
+    return expression::make(ID_TestEQ, var, value);
 }
 
 

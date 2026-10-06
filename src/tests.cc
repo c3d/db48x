@@ -9899,9 +9899,19 @@ void tests::symbolic_operations()
         .expect("'X=B÷2'");
     step("Isolation failure")
         .test(CLEAR, "'X=sin X+1' 'X'", NOSHIFT, F3)
-        .expect("'X-sin X=1'")
-        .test("X", NOSHIFT, F3)
         .error("Unable to isolate");
+    step("Isolation failure when the variable cancels out")
+        .test(CLEAR, "'X-X=1' 'X' ISOL", ENTER)
+        .error("Unable to isolate");
+    step("Isolation of a quadratic equation")
+        .test(CLEAR, "'A*X^2+B*X+C=0' 'X' ISOL", ENTER)
+        .expect("'X=(-B+s1·√(B²-4·A·C))÷(2·A)'");
+    step("Isolation of a quadratic equation with a double root")
+        .test(CLEAR, "'X^2+2*X+1=0' 'X' ISOL", ENTER)
+        .expect("'X=-1'");
+    step("Isolation of a linear equation with the variable on both sides")
+        .test(CLEAR, "'2*X+3=X' 'X' ISOL", ENTER)
+        .expect("'X=-3'");
     step("Isolate a single variable, addition")
         .test(CLEAR, "'A=X+B' X", NOSHIFT, F3).expect("'X=A-B'")
         .test(CLEAR, "'A=B+X' X", NOSHIFT, F3).expect("'X=A-B'");

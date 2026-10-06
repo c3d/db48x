@@ -269,6 +269,8 @@ struct expression : program
                                   algebraic_g &exponent);
     expression_p       isolate(symbol_r sym, bool error) const;
     expression_p       isolate(symbol_r s) const { return isolate(s, true); }
+    expression_p       isolate_polynomial(symbol_r sym) const;
+    bool               is_isolated(symbol_r sym) const;
     expression_p       isolated(symbol_r sym) const;
     static list_p      zeros(object_p eq, symbol_r sym);
     expression_p       derivative(symbol_r sym) const;
