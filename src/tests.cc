@@ -5346,6 +5346,22 @@ void tests::complex_types()
 {
     BEGIN(ctypes);
 
+    step("Imaginary unit followed by an operator in an expression")
+        .test(CLEAR, "'ⅈ+1' EVAL", ENTER).expect("1+ⅈ")
+        .test(CLEAR, "'ⅈ-1' EVAL", ENTER).expect("-1+ⅈ")
+        .test(CLEAR, "'ⅈ^2' EVAL", ENTER).expect("-1")
+        .test(CLEAR, "'ⅈ/2' EVAL", ENTER).expect("¹/₂ⅈ");
+    step("Imaginary unit before an operand in an expression")
+        .test(CLEAR, "'ⅈ*2' EVAL", ENTER).expect("2ⅈ")
+        .test(CLEAR, "'ⅈ*X' EVAL", ENTER).expect("'(ⅈ)·X'");
+    step("Complex literal forms still parse")
+        .test(CLEAR, "1ⅈ3", ENTER).expect("1+3ⅈ")
+        .test(CLEAR, "1+ⅈ3", ENTER).expect("1+3ⅈ")
+        .test(CLEAR, "1-3ⅈ", ENTER).expect("1-3ⅈ")
+        .test(CLEAR, "ⅈ3", ENTER).expect("3ⅈ")
+        .test(CLEAR, "3+ⅈ", ENTER).expect("3+ⅈ")
+        .test(CLEAR, "aⅈb", ENTER).expect("a+bⅈ");
+
     step("Select degrees for the angle");
     test(CLEAR, "DEG", ENTER).noerror();
 
