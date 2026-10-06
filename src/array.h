@@ -132,6 +132,7 @@ struct array : list
                                 void *data);
     static array_p build(size_t rows, size_t columns,
                          item_fn items, void *data = nullptr);
+    static array_p identity(size_t n);
 
     algebraic_p         determinant() const;
     algebraic_p         norm_square() const;

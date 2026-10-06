@@ -1269,6 +1269,22 @@ algebraic_p arithmetic::non_numeric<struct pow>(algebraic_r x, algebraic_r y)
         // to the third power.
         if (!y->is_integer())
             return xa->map(pow::evaluate, y);
+
+        // X^0 is the identity matrix for a square matrix, not the scalar 1
+        if (y->is_zero(false))
+        {
+            size_t rows = 0, cols = 0;
+            if (xa->is_matrix(&rows, &cols, false))
+            {
+                if (rows != cols)
+                {
+                    rt.dimension_error();
+                    return nullptr;
+                }
+                return array::identity(rows);
+            }
+            return xa->map(pow::evaluate, y);
+        }
     }
     else if (array_g ya = y->as<array>())
     {
