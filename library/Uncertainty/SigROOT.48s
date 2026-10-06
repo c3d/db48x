@@ -2,7 +2,7 @@
 @@ σROOT — the uncertainty of the unknowns found by ROOT. Stack: the ROOT
 @@ call, quoted, as in the examples of the Equation Library ▶ a list of
 @@ the unknowns, each tagged with its name, as Y±σu.
-@@ The variables of the current directory that hold a value with an
+@@ The variables of the equations that hold a value with an
 @@ uncertainty, a±σb, or bounds a…b, a±b or a±p% (a rectangular law of
 @@ standard deviation width/√12), with or without unit, are the uncertain
 @@ inputs. ROOT is run with each input at its centre, then with each input
@@ -19,30 +19,12 @@
   1 →List
   → srtq
   «
-    @ The names of the unknowns, read in the call: the list between the
-    @ first [ and the next ]
-    srtq 1 Get →Text
-    → srtx
-    «
-      1 While srtx Over Dup Sub "[" ≠ Repeat 1 + End 1 +
-      Dup While srtx Over Dup Sub "]" ≠ Repeat 1 + End
-      srtx Rot Rot 1 - Sub ";" +
-      → srtz
-      «
-        0 1
-        → srtc srtb
-        «
-          1 srtz Size For srtj
-            If srtz srtj Dup Sub ";" == Then
-              "'" srtz srtb srtj 1 - Sub + "'" + Str→
-              srtc 1 + 'srtc' Sto srtj 1 + 'srtb' Sto
-            End
-          Next
-          srtc →List
-        »
-      »
-    »
-    → srtnames
+    @ The call apart: the equations, the unknowns, the guesses. Names are
+    @ kept in arrays, and arrays inside lists, never alone in a local.
+    srtq 1 Get Explode Drop Drop Drop
+    Explode Drop 1 →List
+    Swap Eval ListExpressionNames Swap Drop 1 →List
+    → srtnames srteqv
     «
       @ The uncertain inputs: { name centre σ original } for each
       0 Vars
@@ -50,10 +32,15 @@
       «
         1 srtvars Size For srti
           @ An unknown is not an input, even if it holds an uncertain value
-          0 1 srtnames Size For srtj
-            srtnames srtj Get →Text "'" srtvars srti Get →Text + "'" + == Or
+          0 1 srtnames 1 Get Size 1 Get For srtj
+            srtnames 1 Get srtj Get →Text srtvars srti Get →Text == Or
           Next
-          If Not Then
+          @ ... and a variable of the equations
+          0 1 srteqv 1 Get Size 1 Get For srtj
+            srteqv 1 Get srtj Get →Text srtvars srti Get →Text == Or
+          Next
+          Swap Not And
+          If Then
           srtvars srti Get Rcl
           Dup TypeName
           If Dup "unit" == Then Drop Dup UVAL TypeName End
@@ -96,15 +83,15 @@
         1 srtin Size For srti
           srtin srti Get Dup 2 Get Swap 1 Get Sto
         Next
-        1 srtnames Size For srtj IfErr srtnames srtj Get Purge Then End Next
+        1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next
         srtq 1 Get Eval Drop
         @ The values of the unknowns, as left by ROOT
-          1 srtnames Size For srtj srtnames srtj Get Rcl Next srtnames Size →List
+          1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
           → srty0
           «
             @ For each unknown, the sum of the squared contributions
-            1 srtnames Size For srtj 0 Next
-            srtnames Size →List
+            1 srtnames 1 Get Size 1 Get For srtj 0 Next
+            srtnames 1 Get Size 1 Get →List
             → srtu2
             «
               1 srtin Size For srti
@@ -112,14 +99,14 @@
                 → srta srts
                 «
                   srta srts 100 / + srtin srti Get 1 Get Sto
-                  1 srtnames Size For srtj IfErr srtnames srtj Get Purge Then End Next srtq 1 Get Eval Drop
-                  1 srtnames Size For srtj srtnames srtj Get Rcl Next srtnames Size →List
+                  1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
+                  1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
                   srta srts 100 / - srtin srti Get 1 Get Sto
-                  1 srtnames Size For srtj IfErr srtnames srtj Get Purge Then End Next srtq 1 Get Eval Drop
-                  1 srtnames Size For srtj srtnames srtj Get Rcl Next srtnames Size →List
+                  1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
+                  1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
                   → srtp srtn
                   «
-                    1 srtnames Size For srtj
+                    1 srtnames 1 Get Size 1 Get For srtj
                       srtp srtj Get srtn srtj Get - 50 * Sq
                       srtu2 srtj Get Swap
                       If Over 0 == Then Swap Drop Else + End
@@ -130,13 +117,13 @@
                 »
               Next
               @ The central run again, so that the unknowns keep their values
-              1 srtnames Size For srtj IfErr srtnames srtj Get Purge Then End Next srtq 1 Get Eval Drop
+              1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
               @ Every input gets back its original value
               1 srtin Size For srti
                 srtin srti Get Dup 4 Get Swap 1 Get Sto
               Next
               @ The results, Y±σu tagged with their names
-              1 srtnames Size For srtj
+              1 srtnames 1 Get Size 1 Get For srtj
                 srty0 srtj Get srtu2 srtj Get √
                 → srty srtu
                 «
@@ -145,10 +132,10 @@
                   Else
                     srty srtu →σRange
                   End
-                  srtnames srtj Get →Text Dup Size 1 - 2 Swap Sub →Tag
+                  srtnames 1 Get srtj Get →Text →Tag
                 »
               Next
-              srtnames Size →List
+              srtnames 1 Get Size 1 Get →List
             »
           »
       »

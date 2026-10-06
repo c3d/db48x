@@ -700,6 +700,8 @@ the global minimum and maximum of the function.
   possibly correlated;
 * [σROOT](#σroot): the unknowns of any simulation of the Equation Library,
   from inputs given with their uncertainty;
+* [ΔROOT](#Δroot): the range of the unknowns of any simulation of the Equation
+  Library, from inputs given by bounds;
 * [ΔRf](#Δrf): the range of a function of one variable over an interval;
 * [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
   box;
@@ -847,7 +849,8 @@ its central value. The unknowns are purged before each run, so that ROOT
 always starts from the guesses: a second ROOT on unknowns that already exist
 does not always solve them again.
 
-The result is a standard uncertainty, ±σ, even when the inputs are bounds. For
+The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
+the range of each unknown, see [ΔROOT](#Δroot). For
 the shape of the law of the result, see [DMOPendulum](#dmopendulum), which
 draws it by the Monte Carlo method.
 
@@ -888,6 +891,66 @@ a better clock.
 These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
+
+
+## ΔROOT
+
+The range of the unknowns found by ROOT, for any simulation of the Equation
+Library: interval arithmetic through the solver.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:lo1…hi1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their bounds: a…b, a±b or a±p%. A
+value a±σb is taken as the bounds a±√3·b of the rectangular law of the same
+standard deviation, the inverse of what Bound→σ does. Only the variables of
+the equations are inputs; units are welcome.
+
+ΔROOT runs ROOT on a grid over the box of the inputs: each input at its low
+bound, its centre and its high bound, 3ⁿ runs for n inputs; beyond five
+inputs, at its bounds only, 2ⁿ runs. It keeps the smallest and the largest
+value of each unknown. When each unknown varies in one direction with each
+input, its extremes lie at corners of the box, and the range is exact. When
+an extreme is only reached inside the box, the tag of that unknown says
+"(inner extremum?)": the true range may be wider, and a narrower box, or
+[Exmnf](#exmnf) on the equation, will tell.
+
+Afterwards, each input gets back its value, and each unknown holds its value
+at the centre of the box.
+
+**1)** The simple pendulum, its amplitude between 60° and 80°: the real
+period lies between its values at the two ends. ω, T and f do not depend on
+the amplitude.
+
+```rpl
+15_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁΔROOT
+@ Expecting { ω:8.08564 57173 6…8.08564 57173 6 r/s Treal:0.83393 48521 94…0.88361 42622 96 s T:0.77707 89775 87…0.77707 89775 87 s f:1.28687 04840 1…1.28687 04840 1 Hz }
+```
+
+**2)** The capacitor of [σROOT](#σroot), now by bounds: the supply known to
+±0.05 V, the resistor to 5 %, the voltage read between 3.28 V and 3.32 V. The
+capacitance is guaranteed within the range found.
+
+```rpl
+0_V 'Vi' Sto  10±0.05_V 'Vf' Sto  100±5%_Ω 'R' Sto  2_ms 't' Sto  '3.28…3.32_V' →Num 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁΔROOT
+@ Expecting { C:46.91904 5145…53.28814 92172 μF }
+```
+
+**3)** The limit of the method: the range of a projectile launched between
+35° and 65°. The range is largest at 45°, inside the box; the grid sees 35°,
+50° and 65°, and finds its largest value at 50°, 1 224 ft, where the true
+largest range is 1 243 ft. The tag warns of it.
+
+```rpl
+0_ft 'x0' Sto  0_ft 'y0' Sto  200_ft/s 'v0' Sto  10_s 't' Sto  '35…65_°' →Num 'θ0' Sto
+'ROOT(ⒺProjectile Motion;[R;vcx;vcy;x;y;hmax;tf];[1_ft;1_ft/s;1_ft/s;1_ft;1_ft;1_ft;1_s])' ⓁΔROOT 1 Get
+@ Expecting R (inner extremum?):952.37556 6631…1 224.35042 8 ft
+```
+
+The ranges of the first two examples were checked on a grid of eleven levels
+per input: they are exact to the digits shown.
 
 
 ## ΔRf

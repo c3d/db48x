@@ -1,0 +1,165 @@
+«
+@@ ΔROOT — the range of the unknowns found by ROOT. Stack: the ROOT call,
+@@ quoted, as in the examples of the Equation Library ▶ a list of the
+@@ unknowns, each tagged with its name, as lo…hi.
+@@ The inputs are the variables of the equations that hold bounds, a…b,
+@@ a±b or a±p%, or a value a±σb, taken as the bounds a±√3·b of the
+@@ rectangular law of the same standard deviation, the inverse of Bound→σ.
+@@ ROOT is run on a grid over the box of the inputs: each input at its low
+@@ bound, its centre and its high bound, 3^n runs for n inputs; beyond five
+@@ inputs, at its bounds only, 2^n runs. The smallest and largest values
+@@ of each unknown are kept. If each unknown varies in one direction with
+@@ each input, they lie at corners and the range is exact; if one of them
+@@ is only reached inside the box, the tag says "(inner extremum?)": the
+@@ true range may then be wider. Inputs get back their values; the unknowns
+@@ keep their central values, and are purged before each run of ROOT.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ Note: a local evaluates a name or a program that it holds, so names are
+@@ kept in lists, and only numbers, units and ranges go into locals.
+  1 →List
+  → drtq
+  «
+    @ The call apart: the equations, the unknowns, the guesses. Names are
+    @ kept in arrays, and arrays inside lists, never alone in a local.
+    drtq 1 Get Explode Drop Drop Drop
+    Explode Drop 1 →List
+    Swap Eval ListExpressionNames Swap Drop 1 →List
+    → drtnames drteqv
+    «
+      @ The inputs: { name low centre high original } for each
+      0 Vars
+      → drtk drtvars
+      «
+        1 drtvars Size For drti
+          @ A variable of the equations, which is not an unknown
+          0 1 drtnames 1 Get Size 1 Get For drtj
+            drtnames 1 Get drtj Get →Text drtvars drti Get →Text == Or
+          Next
+          0 1 drteqv 1 Get Size 1 Get For drtj
+            drteqv 1 Get drtj Get →Text drtvars drti Get →Text == Or
+          Next
+          Swap Not And
+          If Then
+            drtvars drti Get Rcl
+            Dup TypeName
+            If Dup "unit" == Then Drop Dup UVAL TypeName End
+            → drtt
+            «
+              If drtt "uncertain" == drtt "range" == Or drtt "drange" == Or drtt "prange" == Or Then
+                → drtv
+                «
+                  drtv
+                  If drtv TypeName "unit" == Then UVAL End
+                  If drtt "uncertain" == Then
+                    Range→ 3 √ * → drta drtd « drta drtd - drta drtd + »
+                  Else
+                    →Range Range→
+                  End
+                  If drtv TypeName "unit" == Then
+                    drtv →Unit Swap drtv →Unit Swap
+                  End
+                  → drtlo drthi
+                  «
+                    drtvars drti Get drtlo drtlo drthi + 2 / drthi drtv 5 →List
+                    drtk 1 + 'drtk' Sto
+                  »
+                »
+              Else
+                Drop
+              End
+            »
+          End
+        Next
+        drtk →List
+      »
+      → drtin
+      «
+        drtin Size
+        If Dup 5 > Then 2 Else 3 End
+        → drtn drtlev
+        «
+          drtlev drtn ^ R→I { } { } { } { }
+          → drtcount drtmin drtmax drtfmin drtfmax
+          «
+            @ Every combination of the levels of the inputs, counted in base drtlev
+            0 drtcount 1 - For drtc
+              drtc 1
+              → drtm drtcorner
+              «
+                1 drtn For drti
+                  drtm drtlev MOD
+                  drtm drtlev / IP R→I 'drtm' Sto
+                  → drtd
+                  «
+                    If drtlev 3 == drtd 1 == And Then 0 'drtcorner' Sto End
+                    drtin drti Get
+                    If drtlev 3 == Then drtd 2 + Else drtd 2 * 2 + End Get
+                    drtin drti Get 1 Get Sto
+                  »
+                Next
+                1 drtnames 1 Get Size 1 Get For drtj IfErr drtnames 1 Get drtj Get Purge Then End Next
+                drtq 1 Get Eval Drop
+                1 drtnames 1 Get Size 1 Get For drtj drtnames 1 Get drtj Get Rcl Next
+                drtnames 1 Get Size 1 Get →List
+                → drty
+                «
+                  If drtc 0 == Then
+                    drty 'drtmin' Sto drty 'drtmax' Sto
+                    1 drtnames 1 Get Size 1 Get For drtj drtcorner Next
+                    drtnames 1 Get Size 1 Get →List Dup 'drtfmin' Sto 'drtfmax' Sto
+                  Else
+                    1 drtnames 1 Get Size 1 Get For drtj
+                      drty drtj Get
+                      → drtv
+                      «
+                        If drtv drtmin drtj Get < Then
+                          drtmin drtj drtv Put 'drtmin' Sto
+                          drtfmin drtj drtcorner Put 'drtfmin' Sto
+                        Else
+                          If drtv drtmin drtj Get == drtcorner And Then
+                            drtfmin drtj 1 Put 'drtfmin' Sto
+                          End
+                        End
+                        If drtv drtmax drtj Get > Then
+                          drtmax drtj drtv Put 'drtmax' Sto
+                          drtfmax drtj drtcorner Put 'drtfmax' Sto
+                        Else
+                          If drtv drtmax drtj Get == drtcorner And Then
+                            drtfmax drtj 1 Put 'drtfmax' Sto
+                          End
+                        End
+                      »
+                    Next
+                  End
+                »
+              »
+            Next
+            @ The central run, so that the unknowns keep their central values
+            1 drtin Size For drti drtin drti Get Dup 3 Get Swap 1 Get Sto Next
+            1 drtnames 1 Get Size 1 Get For drtj IfErr drtnames 1 Get drtj Get Purge Then End Next
+            drtq 1 Get Eval Drop
+            @ Every input gets back its original value
+            1 drtin Size For drti drtin drti Get Dup 5 Get Swap 1 Get Sto Next
+            @ The results, lo…hi tagged with their names
+            1 drtnames 1 Get Size 1 Get For drtj
+              drtmin drtj Get drtmax drtj Get
+              → drta drtb
+              «
+                If drta TypeName "unit" == Then
+                  drta UVAL drtb drta Convert UVAL →Range drta →Unit
+                Else
+                  drta drtb →Range
+                End
+                drtnames 1 Get drtj Get →Text
+                If drtfmin drtj Get drtfmax drtj Get And Not Then " (inner extremum?)" + End
+                →Tag
+              »
+            Next
+            drtnames 1 Get Size 1 Get →List
+          »
+        »
+      »
+    »
+  »
+»
