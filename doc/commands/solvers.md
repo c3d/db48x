@@ -31,7 +31,7 @@ expression.
 
 ```rpl
 'zeros(sin(x)*cos(x);x)'
-@ Expecting { 'sin⁻¹ 0+2·i1·π' 'cos⁻¹ 0+2·i2·π' }
+@ Expecting { 'π÷2+s1·(π÷2)+2·i2·π' 's3·(π÷2)+2·i4·π' }
 ```
 
 When finding the roots of polynomials, if `SymbolicResults` and `AutoSimplify`
