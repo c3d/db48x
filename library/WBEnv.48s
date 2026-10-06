@@ -1,0 +1,52 @@
+«
+@@ ============================================================
+@@ WBEnv — is a loading within the center of gravity envelope?
+@@
+@@ Input:  the envelope, a list of { CG weight } points in order
+@@         around it; the weight W and the center of gravity CG of the
+@@         loading, for instance from WBLoad.
+@@ Output: the forward and aft CG limits at the weight W, and whether
+@@         CG lies between them, tagged Fwd, Aft and Inside (1 or 0).
+@@ The limits are where the horizontal line at W crosses the envelope,
+@@ interpolated linearly: the envelope must be convex, as CG envelopes
+@@ are. A weight above or below the envelope is an error.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → env w cg
+  «
+    { }
+    1 env SIZE FOR kk
+      env kk GET LIST→ DROP
+      env kk env SIZE MOD 1 + GET LIST→ DROP
+      → x1 y1 x2 y2
+      «
+        IF y1 y2 ≠ THEN
+          IF w y1 y2 MIN ≥ w y1 y2 MAX ≤ AND THEN
+            x1 w y1 - x2 x1 - × y2 y1 - / + +
+          END
+        END
+      »
+    NEXT
+    → xs
+    «
+      IF xs SIZE 0 == THEN
+        "WBEnv: weight outside the envelope" DOERR
+      END
+      xs 1 GET DUP
+      1 xs SIZE FOR kk
+        xs kk GET → xi
+        «
+          SWAP xi MIN SWAP xi MAX
+        »
+      NEXT
+      → fwd aft
+      «
+        fwd "Fwd" →TAG
+        aft "Aft" →TAG
+        IF cg fwd ≥ cg aft ≤ AND THEN 1 ELSE 0 END "Inside" →TAG
+      »
+    »
+  »
+»

@@ -593,3 +593,18 @@
 	"WPLegs",	"="
 	"WPNext",	"="
 	"WPDirect",	"="
+
+"Aeronautics"
+
+"Aeronautics/Flight Management"
+
+	"WBLoad",	"="
+	"WBEnv",		"="
+	"FPlan",		"="
+	"TAS3GS",	"="
+
+"Aeronautics/Aircraft Performance"
+
+	"PolarFit",	"="
+	"ClimbVxVy",	"="
+	"TORoll",	"="
