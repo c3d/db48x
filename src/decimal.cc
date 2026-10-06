@@ -218,8 +218,17 @@ PARSE_BODY(decimal)
                 exponent--;
             }
         }
-        else if (decimalDot < 0 && (cp == '.' || (cp == ',' && !p.precedence)))
+        else if (cp == '.' || (cp == ',' && !p.precedence))
         {
+            // A second decimal dot, e.g. `1.5.2`, is a syntax error
+            // A comma after a dot may be a separator, e.g. `{ 1.5,2 }`
+            if (decimalDot >= 0 && cp == ',')
+                break;
+            if (decimalDot >= 0)
+            {
+                rt.syntax_error().source(s);
+                return ERROR;
+            }
             decimalDot = +s - +source;
         }
         else
