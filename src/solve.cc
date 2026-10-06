@@ -110,15 +110,265 @@ static algebraic_p difference_for_solve(algebraic_r eq)
     return eq;
 }
 
+static algebraic_p term_magnitude(program_r eq, algebraic_r x, bool &sum)
+// ----------------------------------------------------------------------------
+//   Magnitude of the terms of `eq` at `x`, used to check residuals
+// ----------------------------------------------------------------------------
+//   For `A+B` or `A-B`, this is |A|+|B|, for `A*B` it is |A|*|B|, for `A/B`
+//   it is |A|/|B|, recursively. This gives an idea of the cancellation going
+//   on when computing `eq`, so that the residual can be checked relative to
+//   the size of the terms. `sum` is set if there was any addition or
+//   subtraction, i.e. if a relative check makes sense at all.
+{
+    if (expression_g expr = expression::get(+eq))
+    {
+        object_p   op = expr->outermost_operator();
+        object::id ty = op ? op->type() : object::ID_object;
+        if (ty == object::ID_add || ty == object::ID_subtract ||
+            ty == object::ID_multiply || ty == object::ID_divide)
+        {
+            expression_g left, right;
+            if (expr->split(ty, left, right))
+            {
+                program_g   lp = +left;
+                program_g   rp = +right;
+                algebraic_g lm = term_magnitude(lp, x, sum);
+                if (!lm)
+                    return nullptr;
+                algebraic_g rm = term_magnitude(rp, x, sum);
+                if (!rm)
+                    return nullptr;
+                switch (ty)
+                {
+                case object::ID_add:
+                case object::ID_subtract:       sum = true; return lm + rm;
+                case object::ID_multiply:       return lm * rm;
+                default:                        return lm / rm;
+                }
+            }
+        }
+    }
+    algebraic_g y = algebraic::evaluate_function(eq, x);
+    if (!y)
+        return nullptr;
+    return abs::run(y);
+}
+
+
+static bool residual_ok(program_r eq, algebraic_r x, algebraic_r y,
+                        algebraic_r eps)
+// ----------------------------------------------------------------------------
+//   Check if the residual `y=eq(x)` is small enough to be a root
+// ----------------------------------------------------------------------------
+//   If the equation is a sum or difference of terms, the residual must be
+//   below `eps` relative to the magnitude of the terms, otherwise it must be
+//   below `eps` in absolute value. For something that is not an expression
+//   (e.g. a program), we cannot estimate the magnitude of the terms, so we
+//   accept the residual.
+{
+    algebraic_g dy = y;
+    unit_g      yu = unit::get(dy);
+    if (yu)
+        dy = yu->value();
+    if (!dy)
+        return false;
+    if (dy->is_zero(false))
+        return true;
+    if (!expression::get(+eq))
+        return true;
+    bool        sum = false;
+    algebraic_g mag = term_magnitude(eq, x, sum);
+    if (!mag)
+    {
+        rt.clear_error();
+        return false;
+    }
+    if (!sum)
+        return smaller_magnitude(dy, eps);
+    if (yu && unit::get(mag) && !yu->convert(mag))
+    {
+        rt.clear_error();
+        return false;
+    }
+    if (unit_p mu = unit::get(mag))
+        mag = mu->value();
+    mag = mag * eps;
+    return mag && !smaller_magnitude(mag, dy);
+}
+
+
+static bool is_isolated(program_r pgm, symbol_r name)
+// ----------------------------------------------------------------------------
+//   Check if the equation has the form `name=expr`, with `name` not in `expr`
+// ----------------------------------------------------------------------------
+{
+    expression_g eq = expression::get(+pgm);
+    expression_g left, right;
+    if (!eq || !eq->split_equation(left, right))
+        return false;
+    algebraic_g la = +left;
+    if (unit_p lu = unit::get(la))
+        la = lu->value();
+    symbol_p lname = la ? la->as_quoted<symbol>() : nullptr;
+    return lname && lname->is_same_as(+name) && !right->depends_on(name);
+}
+
+
+static algebraic_p verify_epsilon()
+// ----------------------------------------------------------------------------
+//   Epsilon used to verify a solution, e.g. a symbolic one
+// ----------------------------------------------------------------------------
+//   This is looser than the solver's precision, as it is used to reject
+//   extraneous solutions, where the residual is large compared to the terms,
+//   without rejecting solutions that suffer from rounding, e.g. in units.
+{
+    int impr = Settings.SolverImprecision();
+    int half = Settings.Precision() / 2;
+    return algebraic::epsilon(impr > half ? impr : half);
+}
+
+
+static symbol_p solve_name(algebraic_r goal)
+// ----------------------------------------------------------------------------
+//   Find the name of the variable we solve for
+// ----------------------------------------------------------------------------
+{
+    if (symbol_p name = goal->as_quoted<symbol>())
+        return name;
+    if (unit_p uname = unit::get(goal))
+        if (object_p uval = uname->value())
+            return uval->as_quoted<symbol>();
+    return nullptr;
+}
+
+
+static algebraic_p guess_distance(algebraic_r value, algebraic_r guess)
+// ----------------------------------------------------------------------------
+//   Compute the distance between a value and the initial guess
+// ----------------------------------------------------------------------------
+{
+    algebraic_g ref = guess;
+    if (ref->is_array_or_list())
+    {
+        algebraic_g lo = guess->algebraic_child(0);
+        algebraic_g hi = guess->algebraic_child(1);
+        if (!lo || !hi)
+            return nullptr;
+        ref = (lo + hi) / integer::make(2);
+    }
+    algebraic_g v = value;
+    if (unit_p vu = unit::get(v))
+        v = vu->value();
+    if (unit_p ru = unit::get(ref))
+        ref = ru->value();
+    if (!v || !ref)
+        return nullptr;
+    return abs::run(v - ref);
+}
+
+
 algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 // ----------------------------------------------------------------------------
-//   The core of the solver, numerical solving for a single variable
+//   Solve for a single variable, symbolically if possible, then numerically
 // ----------------------------------------------------------------------------
+//   The symbolic solver only gives the principal solution, which may be
+//   far from the guess (e.g. 0 for `sin(X)=0` while the guess is 3).
+//   The numerical solver starting from the guess is used as well, and the
+//   verified solution closest to the guess wins. In case of a tie, the
+//   symbolic solution, which may be exact, is preferred.
+{
+    algebraic_g sym;
+    if (Settings.SymbolicSolver())
+    {
+        bool unique = false;
+        sym = solve(pgm, goal, guess, &unique);
+        if (rt.error())
+        {
+            // Errors in the symbolic pass are not fatal, try numerically
+            record(solve_error, "Symbolic solver error %+s", rt.error());
+            rt.clear_error();
+            sym = nullptr;
+        }
+        else if (sym && unique)
+        {
+            return sym;
+        }
+    }
+
+    algebraic_g num = solve(pgm, goal, guess, nullptr);
+    if (!sym)
+        return num;
+
+    symbol_g name = solve_name(goal);
+    if (num && !rt.error() && name)
+    {
+        // Check if the numerical solution is closer to the guess
+        algebraic_g dsym = guess_distance(sym, guess);
+        algebraic_g dnum = guess_distance(num, guess);
+        if (dsym && dnum && smaller_magnitude(dnum, dsym))
+        {
+            // Check if this is a different root, e.g. not an approximation
+            // of a multiple root like 0 for X^2. If the residual between
+            // the two is small, consider this is the same root.
+            settings::PrepareForSolveFunctionEvaluation willEvaluate;
+            settings::SaveNumericalConstants snc(true);
+            save<symbol_g *> iref(expression::independent, &name);
+            program_g   eq  = pgm;
+            if (expression_p eqeq = expression::get(eq))
+                if (expression_p diff = eqeq->as_difference_for_solve())
+                    eq = diff;
+            algebraic_g eps = verify_epsilon();
+            // If only one has a unit (e.g. angle from asin), strip it
+            algebraic_g nv = num;
+            algebraic_g sv = sym;
+            unit_p      nu = unit::get(nv);
+            unit_p      su = unit::get(sv);
+            if (nu && !su)
+                nv = nu->value();
+            else if (su && !nu)
+                sv = su->value();
+            algebraic_g mid = (nv + sv) / integer::make(2);
+            algebraic_g y = mid ? algebraic::evaluate_function(eq, mid)
+                                : nullptr;
+            if (y && !residual_ok(eq, mid, y, eps))
+            {
+                record(solve, "Numerical solution %t closer to guess than %t",
+                       +num, +sym);
+                rt.clear_error();
+                return num;
+            }
+        }
+    }
+
+    // Use the symbolic solution
+    rt.clear_error();
+    if (name)
+    {
+        save<symbol_g *> iref(expression::independent, &name);
+        store(sym);
+    }
+    return sym;
+}
+
+
+algebraic_p Root::solve(program_r   pgm,
+                        algebraic_r goal,
+                        algebraic_r guess,
+                        bool       *unique)
+// ----------------------------------------------------------------------------
+//   The core of the solver, solving for a single variable
+// ----------------------------------------------------------------------------
+//   If `unique` is set, only attempt to isolate the variable, and return
+//   the principal solution only if it satisfies the equation numerically.
+//   In that case, `*unique` is set if this is the only solution.
+//   Otherwise, run the numerical solver.
 {
     // Check if the guess is an algebraic or if we need to extract one
     algebraic_g x, dx, lx, hx;  // Current, delta, low, high for x
     algebraic_g y, dy, ly, hy;  // Current, delta, low, high for f(x)
     algebraic_g nx, px;         // x where f(x) is negative and positive
+    algebraic_g ny, py;         // Corresponding values of f(x)
+    bool        bisected = false;
     algebraic_g sy;
     id          gty = guess->type();
     save<bool>  nodates(unit::nodates, true);
@@ -235,12 +485,17 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
     algebraic_g      maxscale    = integer::make(63);
     int              degraded    = 0;
 
+    algebraic_g      yeps0       = yeps;
+    bool             is_expr     = expression::get(+eq) != nullptr;
+    algebraic_g      ycheck;
+
     // Check if we can isolate the variable algebraically
-    if (Settings.SymbolicSolver())
+    if (unique)
     {
-        if (expression_p eqeq = eq->as<expression>())
+        *unique = false;
+        if (expression_g eqeq = eq->as<expression>())
         {
-            if (expression_p isol = isolate(eqeq, name))
+            if (expression_g isol = isolate(eqeq, name))
             {
                 expression_g left, right;
                 if (isol->split_equation(left, right))
@@ -262,14 +517,54 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                                 else if (unit_g uv = value->as<unit>())
                                     if (algebraic_p num = uv->convert_to_real())
                                         value = num;
-                                store(value);
                             }
-                            return value;
+                            if (!value || rt.error())
+                                return nullptr;
+
+                            // Equations like `X=expr` need no verification
+                            if (is_isolated(pgm, name))
+                            {
+                                record(solve, "Isolated solution %t=%t",
+                                       +name, +value);
+                                *unique = true;
+                                store(value);
+                                return value;
+                            }
+
+                            // Check that the solution satisfies the equation
+                            algebraic_g nv = value;
+                            if (!algebraic::to_decimal(nv, true))
+                                nv = value;
+                            rt.clear_error();
+                            algebraic_g veps = verify_epsilon();
+                            y = algebraic::evaluate_function(eq, nv);
+                            record(solve, "Symbolic solution %t=%t f=%t",
+                                   +name, +value, +y);
+                            // If we cannot evaluate the equation at that
+                            // point, e.g. due to rounding at a singularity
+                            // (`β=1.` in `γ²=1/(1-β²)`), keep the solution
+                            if (!y ||
+                                (!y->is_symbolic() &&
+                                 residual_ok(eq, nv, y, veps)))
+                            {
+                                rt.clear_error();
+                                // Check if there are other solutions
+                                settings::SavePrincipalSolution sps(false);
+                                expression_g all = eqeq->isolate(name, false);
+                                rt.clear_error();
+                                *unique = all && all->is_same_as(+isol);
+                                store(value);
+                                return value;
+                            }
+                            record(solve_error,
+                                   "Rejected symbolic solution %t", +value);
+                            rt.clear_error();
                         }
                     }
                 }
             }
         }
+        return nullptr;
     }
 
     for (uint i = 0; i < max; i++)
@@ -281,6 +576,8 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
         }
 
         // If we failed during evaluation of x, break
+        bool bisecting = bisected;
+        bisected = false;
         if (!x)
         {
             if (!rt.error())
@@ -308,6 +605,11 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                 if (smaller_magnitude(yeps, neps))
                     yeps = neps;
             }
+
+            // Threshold below which we check residual relative to terms
+            ycheck = abs::run(y) * verify_epsilon();
+            if (unit_p cu = unit::get(ycheck))
+                ycheck = cu->value();
         }
         record(solve, "[%u] x=%t [%t, %t]  y=%t [%t, %t] err=%t",
                i, +x, +lx, +hx, +y, +ly, +hy, +yeps);
@@ -336,11 +638,39 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                 dy = yu->value();
             else
                 dy = y;
-            if (dy->is_zero() || smaller_magnitude(dy, yeps))
+            // For expressions, check the residual relative to the terms,
+            // otherwise relative to the initial value of the function.
+            // Computing the magnitude of terms is expensive, so only do it
+            // when the residual is small or for the initial guess.
+            bool good = dy->is_zero() || smaller_magnitude(dy, yeps);
+            if (is_expr && (good || !i ||
+                            (ycheck && smaller_magnitude(dy, ycheck))))
+                good = residual_ok(eq, x, dy, yeps0);
+            if (good)
             {
                 record(solve, "[%u] Solution=%t value=%t", i, +x, +y);
                 store(x);
                 return x;
+            }
+
+            // Record where the function is negative and positive, so that
+            // we can bisect if we see a sign change. Outside of bisection,
+            // keep the smallest values, to avoid bracketing a pole.
+            if (dy->is_negative(false))
+            {
+                if (!nx || bisecting || smaller_magnitude(dy, ny))
+                {
+                    nx = x;
+                    ny = dy;
+                }
+            }
+            else
+            {
+                if (!px || bisecting || smaller_magnitude(dy, py))
+                {
+                    px = x;
+                    py = dy;
+                }
             }
 
             if (!ly)
@@ -404,12 +734,6 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
             if (!degraded)
             {
                 // This was an improvement over at least one end
-                // Check if cross zero (change sign)
-                if (dy->is_negative(false))
-                    nx = x;
-                else
-                    px = x;
-
                 // Check the x interval
                 dx = hx - lx;
                 if (!dx)
@@ -417,15 +741,29 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                     store(x);
                     return nullptr;
                 }
-                dy = hx + lx;
-                if (!dy || dy->is_zero(false))
-                    dy = yeps;
-                else
-                    dy = dy * yeps;
-                if (dx->is_zero(false) || smaller_magnitude(dx, xeps))
+                // Relative precision on x
+                dy = abs::run(hx) + abs::run(lx);
+                if (dy)
+                    dy = dy * yeps0;
+
+                // Check if lx is acceptable as a solution, if imprecise
+                algebraic_g dly = ly;
+                if (unit_p lyu = unit::get(dly))
+                    dly = lyu->value();
+                bool lfair = dly && smaller_magnitude(dly, yeps);
+                bool xconv = dx->is_zero(false) ||
+                             (dy && smaller_magnitude(dx, dy));
+                if (xconv || (!lfair && smaller_magnitude(dx, xeps)))
                 {
                     x = lx;
                     record(solve, "[%u] Minimum=%t value=%t", i, +x, +y);
+                    if (lfair)
+                    {
+                        record(solve, "[%u] Best solution=%t value=%t",
+                               i, +x, +ly);
+                        store(x);
+                        return x;
+                    }
                     if (nx && px)
                         rt.sign_reversal_error();
                     else
@@ -452,10 +790,10 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
                 {
                     // Strong slope: Interpolate to find new position
                     record(solve, "[%u] Moving to %t - %t * %t / %t",
-                           i, +lx, +y, +dx, +dy);
+                           i, +lx, +ly, +dx, +dy);
                     is_constant = false;
 
-                    sy = y / dy;
+                    sy = ly / dy;
                     if (!sy || smaller_magnitude(maxscale, sy))
                     {
                         // Very weak slope: Avoid going deep into the woods
@@ -490,6 +828,7 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
             {
                 // Try to bisect
                 x = (nx + px) / two;
+                bisected = true;
                 if (!x)
                 {
                     store(nx);
@@ -528,6 +867,20 @@ algebraic_p Root::solve(program_r pgm, algebraic_r goal, algebraic_r guess)
 
     record(solve, "Exited after too many loops, x=%t y=%t lx=%t ly=%t",
            +x, +y, +lx, +ly);
+
+    // If the best value we found is acceptable, if imprecise, return it
+    if (ly && !rt.error())
+    {
+        dy = ly;
+        if (unit_p yu = unit::get(dy))
+            dy = yu->value();
+        if (dy && smaller_magnitude(dy, yeps))
+        {
+            record(solve, "Best solution=%t value=%t", +lx, +ly);
+            store(lx);
+            return lx;
+        }
+    }
 
     if (!is_valid)
         rt.invalid_function_error();
