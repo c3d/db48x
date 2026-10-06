@@ -10261,7 +10261,7 @@ void tests::symbolic_integration()
     step("Primitive of inverse hyperbolic sine, cosine, tangent")
         .test(CLEAR, "'asinh(1-2*X)+acosh(1+3*X)+atanh(4*X-1)' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tan⁻¹(4·X-1)-ln(1-(4·X-1)²)÷2)÷4'");
+        .expect("'((1-2·X)·sinh⁻¹(1-2·X)-√((1-2·X)²+1))÷2+((3·X+1)·cosh⁻¹(3·X+1)-√((3·X+1)²-1))÷3+((4·X-1)·tanh⁻¹(4·X-1)+ln(1-(4·X-1)²)÷2)÷4'");
 
     step("Primitive of log and exp")
         .test(CLEAR, "'ln(A*X+B)+exp(X*C-D)' 'X'",
@@ -10297,11 +10297,30 @@ void tests::symbolic_integration()
     step("Primitive of 1/(cosh(x)*sinh(x))")
         .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'ln (tan(3·X+2))÷3'");
-    step("Primitive of 1/(cosh(x)*sinh(x))")
+        .expect("'ln (tanh(3·X+2))÷3'");
+    step("Primitive of 1/(sinh(x)*cosh(x))")
+        .test(CLEAR, "'inv(sinh(3*X+2)*cosh(3*X+2))' 'X'",
+              LENGTHY(20000), ID_Primitive)
+        .expect("'ln (tanh(3·X+2))÷3'");
+    step("Primitive of 1/(cosh(x)*sinh(x)) matches numerical derivative")
         .test(CLEAR, "'inv(cosh(3*X+2)*sinh(3*X+2))' 'X'",
               LENGTHY(20000), ID_Primitive)
-        .expect("'ln (tan(3·X+2))÷3'");
+        .test("'PF' STO "
+              "0.101 'X' STO PF →NUM 0.099 'X' STO PF →NUM - 0.002 / "
+              "0.1 'X' STO 'inv(cosh(3*X+2)*sinh(3*X+2))' →NUM "
+              "- ABS 1E-6 <", ENTER)
+        .expect("True")
+        .test(CLEAR, "{ PF X } PURGE", ENTER).noerror();
+    step("Primitive of atanh")
+        .test(CLEAR, "'atanh(X)' 'X'", ID_Primitive)
+        .expect("'X·tanh⁻¹ X+ln(1-X²)÷2'");
+    step("Primitive of atanh matches numerical derivative")
+        .test(CLEAR, "'atanh(X)' 'X'", ID_Primitive)
+        .test("'PF' STO "
+              "0.301 'X' STO PF →NUM 0.299 'X' STO PF →NUM - 0.002 / "
+              "0.3 'X' STO 'atanh(X)' →NUM - ABS 1E-6 <", ENTER)
+        .expect("True")
+        .test(CLEAR, "{ PF X } PURGE", ENTER).noerror();
 
     step("Primitive of unknown form")
         .test(CLEAR, "'IP(X)' 'X'", ID_Primitive)
