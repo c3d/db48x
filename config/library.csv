@@ -535,6 +535,11 @@
 
 "Uncertainty/Applications"
 
+"Uncertainty/Applications/Demos"
+
+	"DMOΔConcord",	"=/library/Uncertainty/DMODeltaConcord.48s"
+	"DMOσConcord",	"=/library/Uncertainty/DMOSigmaConcord.48s"
+
 "Uncertainty/Applications/Projectile"
 
 	"StepA",	"=/library/Uncertainty/StepA.48s"
@@ -544,6 +549,7 @@
 	"StepE",	"=/library/Uncertainty/StepE.48s"
 	"StepF",	"=/library/Uncertainty/StepF.48s"
 	"StepG",	"=/library/Uncertainty/StepG.48s"
+	"StepH",	"=/library/Uncertainty/StepH.48s"
 
 "Graphics"
 	"CurvePlottingExamples", "="
