@@ -595,7 +595,7 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
 ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
-ANDROID_QT_BASE ?= /Volumes/Qt/6.8.1
+ANDROID_QT_BASE ?= /Volumes/Qt/6.9.2
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
 # Host kit: macOS uses .../macos/bin; Linux CI and typical offline installs use gcc_64
@@ -626,7 +626,8 @@ android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
 
 # Additional dependencies for Android build
-$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
+$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle \
+              sim/android-db48x/AndroidManifest.xml sim/android-db48x/build.gradle
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
 # expects a build directory as --output and the .so staged under
