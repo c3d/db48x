@@ -177,7 +177,7 @@ their histogram is drawn in gray by HistogramPlot, in 25 classes whatever the
 StatsPlotBins setting, and the density of the law is drawn over it in black by
 FunctionPlot, scaled to the counts: 300 times the width of a class times the
 density. The law and its parameters are written above, and returned on the
-stack, tagged `law`. The draws stay in ΣData, for MeanΣ or SDevΣ.
+stack, tagged `law`. The draws stay in ΣData, for Average or StandardDeviation.
 
 Press again for a new law: the tagged result of the previous run is not taken
 as an argument. To replay the same law on fresh draws, remove the tag first.
