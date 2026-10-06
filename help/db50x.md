@@ -3506,12 +3506,13 @@ R=20 H=18 SPH
 @ Expecting 14 250.26427 67
 ```
 
-Note that `R` is also the name of a built-in constant. If you type `R` and there
-is no variable by that name, this will be interpreted as the constant `ⒸR`.
-Setting the `ExplicitConstants` flag disables that automatic lookup of
-constants. Alternatively, you can use `Ⓥ` as a prefix to ensure that the
-following name is interpreted as a variable name. For example, while `Clone` is
-a built-in command, you can use a global variable named `ⓋClone`.
+Note that `R` is also the name of a built-in constant. If there is no variable
+by that name when a numerical value of `R` is needed, the constant `ⒸR` will be
+used. A variable named `R` always takes precedence over the constant. Setting
+the `ExplicitConstants` flag disables that automatic lookup of constants. You
+can also use `Ⓥ` as a prefix to ensure that the following name is interpreted
+as a variable name. For example, while `Clone` is a built-in command, you can
+use a global variable named `ⓋClone`.
 
 
 
@@ -18336,15 +18337,18 @@ This is the opposite of `AutomaticConstants`
 
 ## AutomaticConstants
 
-When parsing, identify the constants from the constants library without an
-explicit `Ⓒ` constant marker. For example, `G` will parse as `ⒸG`.
+When a numerical value is requested, for example with `→Num`, a name that has
+no matching variable is looked up in the constants library, as if it had an
+explicit `Ⓒ` constant marker. For example, `'2*G' →Num` evaluates using `ⒸG`.
+
+The name is kept as an ordinary name when typed, and the lookup happens each
+time it is evaluated. A local or global variable with the same name always
+takes precedence over the constant, even if it was created after the name was
+typed. Symbolic evaluation, for example with `Eval`, leaves the name unchanged.
 
 Note that constants, unlike symbols or commands, are always case sensitive,
 because there are constants that differ only in case, such as `ⒸG`
 (gravitational constant) and `Ⓒg` (gravitational acceleration on Earth).
-
-If a global variable with the same name exists at the time of parsing, it takes
-precedence over the constant.
 
 This is the opposite of `ExplicitConstants`
 
@@ -18355,8 +18359,9 @@ This is the opposite of `AutomaticConstants`
 
 ## AutomaticXLibs
 
-When parsing, identify the library entries from the library without an
-explicit `Ⓛ` library marker.
+When evaluating a name that has no matching variable, look it up in the
+library as if it had an explicit `Ⓛ` library marker. A local or global
+variable with the same name always takes precedence over the library entry.
 
 ```rpl
 AutomaticXlibs

@@ -8526,12 +8526,12 @@ void tests::solver_testing()
 
     step("Solver with expression")
         .test(CLEAR, "'X+3' 'X' 0 ROOT", ENTER)
-        .noerror().expect("x=-3");
+        .noerror().expect("X=-3");
     step("Solver with arithmetic syntax")
         .test(CLEAR, "'ROOT(X+3;X;0)'", ENTER)
-        .expect("'Root(x+3;x;0)'")
+        .expect("'Root(X+3;X;0)'")
         .test(RUNSTOP)
-        .expect("x=-3")
+        .expect("X=-3")
         .test("X", ENTER)
         .expect("-3")
         .test("'X' purge", ENTER)
@@ -8600,11 +8600,11 @@ void tests::solver_testing()
     step("Jacobian solver, linear case")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ x=0.2 Y=1.8 }");
+        .expect("{ X=0.2 Y=1.8 }");
     step("Jacobian solver, linear case with extra true equation")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y+10=0' }"
               "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
-        .expect("{ x=0.2 Y=1.8 }");
+        .expect("{ X=0.2 Y=1.8 }");
     step("Jacobian solver, linear case with extra false equation")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' '4*X-6*Y=10' }"
               "{ X Y } DUP PURGE { 0 0 } ROOT", ENTER)
@@ -8612,15 +8612,15 @@ void tests::solver_testing()
     step("Jacobian solver, two circles")
         .test(CLEAR, "{ 'X^2+Y^2=1' '(X-1)^2+Y^2=1' }"
               "{ X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ x=0.5 Y=0.86602 54037 84 }");
+        .expect("{ X=0.5 Y=0.86602 54037 84 }");
 
     step("Jacobian solver, circle and line with singular initial Jacobian")
         .test(CLEAR, "{ 'X^2+Y^2=1' 'X+Y=0' } { X Y } { 0 0 } ROOT", ENTER)
-        .expect("{ x=-0.70710 67811 87 Y=0.70710 67811 87 }");
+        .expect("{ X=-0.70710 67811 87 Y=0.70710 67811 87 }");
 
     step("Jacobian solver, ln equations with singular Jacobian at initial guess")
         .test(CLEAR, "{ 'LN(X)+Y=0' 'LN(Y)+X=0' } { X Y } { 1 1 } ROOT", ENTER)
-        .expect("{ x=0.56714 32904 1 Y=0.56714 32904 1 }");
+        .expect("{ X=0.56714 32904 1 Y=0.56714 32904 1 }");
     step("Solving when the variable is initialized with a constant")
         .test(CLEAR, ("m=Ⓒme "
                       "'MSlv(ⒺRelativityMassEnergy;[E];[1 eV])' "
@@ -8639,9 +8639,9 @@ void tests::solver_testing()
     step("Solver with high precision in FIX vs STD mode")
         .test(CLEAR, "128 PREC", ENTER).noerror()
         .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("x=0.99985")
+        .expect("X=0.99985")
         .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("x=0.99984 77415 31")
+        .expect("X=0.99984 77415 31")
         .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
         .expect("0");
 
@@ -8649,9 +8649,9 @@ void tests::solver_testing()
         .test(CLEAR, "{PREC} PURGE", ENTER)
         .noerror()
         .test(CLEAR, "5 FIX 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("x=0.99985")
+        .expect("X=0.99985")
         .test(CLEAR, "STD 'cos X-X' 'X' 0.7 Root", ENTER)
-        .expect("x=0.99984 77415 31")
+        .expect("X=0.99984 77415 31")
         .test("0.99984 77415 31088 11295 98107 68679 79979 91818 72586 15277 58837 54669 86114 29538 53312 16363 55789 58826 89799 31748 89494 44923 91316 88906 86648 2741", ID_subtract)
         .expect("-1.14803⁳⁻¹⁹");
 
@@ -14811,6 +14811,64 @@ void tests::automated_constant_and_library_parsing()
         .test(ID_ToDecimal)
         .expect("[ 3.14159 26535 9 2.71828 18284 6 "
                 "8.31446 26181 5 J/(mol·K) 6.6743⁳⁻¹¹ m↑3/(s↑2·kg) ]");
+
+    step("Implicit constants are symbolic until a numerical value is needed")
+        .test(CLEAR, "'2*c'", ENTER)
+        .expect("'2·c'")
+        .test(CLEAR, "c", ENTER)
+        .expect("'c'")
+        .test(CLEAR, "'2*c' EVAL", ENTER)
+        .expect("'2·c'")
+        .test(CLEAR, "c →NUM", ENTER)
+        .expect("299 792 458 m/s");
+    step("Implicit constant resolved at evaluation, regardless of position")
+        .test(CLEAR, "'2*c' →NUM", ENTER)
+        .expect("599 584 916 m/s")
+        .test(CLEAR, "'c*2' →NUM", ENTER)
+        .expect("599 584 916 m/s");
+    step("Same implicit constant used twice in an expression")
+        .test(CLEAR, "'2*h+h' →NUM", ENTER)
+        .expect("1.98782 1045⁳⁻³³ J·s");
+    step("Variable takes precedence over constant in expression")
+        .test(CLEAR, "9.8 'g' STO 'g*2' →NUM", ENTER)
+        .expect("19.6")
+        .test(CLEAR, "'g' PURGE", ENTER)
+        .noerror();
+    step("Variable takes precedence over constant as a name")
+        .test(CLEAR, "5 'c' STO c", ENTER)
+        .expect("5")
+        .test(CLEAR, "'c' PURGE", ENTER)
+        .noerror();
+    step("Variable created after expression was stored takes precedence")
+        .test(CLEAR, "'c*2' 'P' STO 5 'c' STO P →NUM", ENTER)
+        .expect("10.")
+        .test(CLEAR, "{ c P } PURGE", ENTER)
+        .noerror();
+    step("Constant visible again after purging the variable")
+        .test(CLEAR, "5 'c' STO 'c' PURGE 'c*2' →NUM", ENTER)
+        .expect("599 584 916 m/s");
+    step("Purging a constant name without a variable is harmless")
+        .test(CLEAR, "'c' PURGE", ENTER)
+        .noerror();
+    step("Variable takes precedence over library entry")
+        .test(CLEAR, "5 'Dedicace' STO Dedicace", ENTER)
+        .expect("5")
+        .test(CLEAR, "'Dedicace' PURGE", ENTER)
+        .noerror();
+    step("Library entry resolved implicitly when no variable exists")
+        .test(CLEAR, "Dedicace", ENTER)
+        .expect("\"À tous ceux qui se souviennent de Maubert électronique\"");
+    step("No implicit constants or library entries with explicit settings")
+        .test(CLEAR, "ExplicitConstants ExplicitXLibs", ENTER)
+        .noerror()
+        .test(CLEAR, "c", ENTER)
+        .expect("'c'")
+        .test(CLEAR, "'c*2' →NUM", ENTER)
+        .expect("'c·2'")
+        .test(CLEAR, "Dedicace", ENTER)
+        .expect("'Dedicace'")
+        .test(CLEAR, "{ ExplicitConstants ExplicitXLibs } PURGE", ENTER)
+        .noerror();
 }
 
 

@@ -45,6 +45,42 @@
 #include "variables.h"
 
 #include <stdio.h>
+#include <string.h>
+
+
+static object_p library_lookup(symbol_r name)
+// ----------------------------------------------------------------------------
+//   Find a library entry or constant for a name that has no variable
+// ----------------------------------------------------------------------------
+//   This is done at evaluation time so that a variable always takes
+//   precedence over a library entry or constant with the same name, even if
+//   the variable was created after the code referencing it was parsed.
+//   Constants are only substituted when a numerical value is requested,
+//   e.g. with `→NUM`, so that symbolic evaluation leaves an undefined name
+//   such as `G` alone instead of turning it into a unit object.
+{
+    bool xlibs  = Settings.AutomaticXLibs();
+    bool consts = Settings.AutomaticConstants() &&
+        (Settings.NumericalConstants() || Settings.NumericalResults());
+    if (!xlibs && !consts)
+        return nullptr;
+
+    // Copy the name, since the lookup allocates and may move the symbol
+    byte   buffer[64];
+    size_t len = 0;
+    utf8   txt = name->value(&len);
+    if (len > sizeof(buffer))
+        return nullptr;
+    memcpy(buffer, txt, len);
+
+    if (xlibs)
+        if (xlib_p xl = xlib::lookup(buffer, len, false))
+            return xl;
+    if (consts)
+        if (constant_p cst = constant::lookup(buffer, len, false))
+            return cst;
+    return nullptr;
+}
 
 
 EVAL_BODY(symbol)
@@ -63,6 +99,13 @@ EVAL_BODY(symbol)
         else if (object_p found = directory::recall_all(o, false))
         {
             return program::run_program(found);
+        }
+        else
+        {
+            symbol_g sym = o;
+            if (object_p found = library_lookup(sym))
+                return program::run_program(found);
+            o = sym;            // The lookup may have moved the symbol
         }
     }
     if (object_g eq = expression::make(o))

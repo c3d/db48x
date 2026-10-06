@@ -289,12 +289,13 @@ R=20 H=18 SPH
 @ Expecting 14 250.26427 67
 ```
 
-Note that `R` is also the name of a built-in constant. If you type `R` and there
-is no variable by that name, this will be interpreted as the constant `ⒸR`.
-Setting the `ExplicitConstants` flag disables that automatic lookup of
-constants. Alternatively, you can use `Ⓥ` as a prefix to ensure that the
-following name is interpreted as a variable name. For example, while `Clone` is
-a built-in command, you can use a global variable named `ⓋClone`.
+Note that `R` is also the name of a built-in constant. If there is no variable
+by that name when a numerical value of `R` is needed, the constant `ⒸR` will be
+used. A variable named `R` always takes precedence over the constant. Setting
+the `ExplicitConstants` flag disables that automatic lookup of constants. You
+can also use `Ⓥ` as a prefix to ensure that the following name is interpreted
+as a variable name. For example, while `Clone` is a built-in command, you can
+use a global variable named `ⓋClone`.
 
 
 

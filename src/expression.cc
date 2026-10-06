@@ -1049,6 +1049,8 @@ static size_t check_match(size_t eq, size_t eqsz,
             settings::SaveNumericalResults snr(true);
             settings::SaveNumericalConstants snc(true);
             settings::SaveAutoSimplify sas(true);
+            settings::SaveAutomaticConstants sac(false); // Names stay names
+            settings::SaveAutomaticXLibs     sax(false);
             size_t depth = rt.depth();
             if (program::run(+ftop) != object::OK)
                 return 0;
