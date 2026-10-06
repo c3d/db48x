@@ -47,6 +47,8 @@ The Geodesy subsection computes distances, directions and positions:
 The inverse geodetic problem: the distance between two points of the WGS-84
 ellipsoid, and the azimuth of the shortest route at each end.
 
+![Geodesic route](img/GreatCircleRoute.bmp)
+
 Stack: `φ1` `λ1` `φ2` `λ2` ▶ `s` `α1` `α2`, where `s` is the distance along the
 ellipsoid, `α1` the azimuth at departure and `α2` the azimuth on arrival, both
 from true North.
@@ -101,6 +103,8 @@ ellipsoid — to Earth-centred, Earth-fixed (ECEF) coordinates. `X` points to
 the equator on the prime meridian, `Y` to the equator at 90°E, `Z` to the North
 pole.
 
+![ECEF and geodetic coordinates](img/EcefCoordinates.bmp)
+
 Stack: `φ` `λ` `h` ▶ `X` `Y` `Z`.
 
 The example of IOGP Guidance Note 7-2, §4.1.1 (EPSG method 9602): 53°48′33.820″N,
@@ -139,6 +143,8 @@ The position where two radials cross: the bearings of the same point taken
 from two known stations, for instance two VOR beacons, or two landmarks seen
 from a ship. The Earth is taken as a sphere.
 
+![Fix by two radials](img/RadialFix.bmp)
+
 Stack: `φ1` `λ1` `C1` `φ2` `λ2` `C2` ▶ `φ` `λ`, where `C1` and `C2` are the true
 bearings of the sought position from the first and the second station.
 
@@ -162,6 +168,8 @@ A point along the great circle between two points of a sphere, at a given
 fraction of the route: 0 at departure, 1 at destination. Following a great
 circle usually means flying or steering straight legs between such points.
 
+![Great circle route](img/GreatCircleRoute.bmp)
+
 Stack: `φ1` `λ1` `φ2` `λ2` `f` ▶ `φ` `λ`.
 
 It is not defined for antipodal points, between which every great circle is a
@@ -180,6 +188,8 @@ Four tenths of the way from Los Angeles (LAX, 33°57′N, 118°24′W) to New Yo
 
 The Route subsection keeps a route — a list of waypoints — and follows it
 while travelling.
+
+![Route and waypoints](img/RouteWaypoints.bmp)
 
 * The route is the variable `Route` of the current directory: a list with one
   `{ "name" φ λ }` list per waypoint. It can be viewed and edited like any
@@ -220,6 +230,8 @@ Route « 1 GET » MAP
 @ Expecting { "LAX" "ABQ" "JFK" }
 ```
 
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
 
 ## WPIns
 
@@ -241,6 +253,8 @@ Route « 1 GET » MAP
 @ Expecting { "LAX" "ABQ" "DEN" "JFK" }
 ```
 
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
 
 ## WPDel
 
@@ -258,6 +272,8 @@ Stack: `n` ▶ nothing.
 Route « 1 GET » MAP
 @ Expecting { "LAX" "JFK" }
 ```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
 
 
 ## WPLegs
@@ -278,10 +294,14 @@ The example shows the total, then the distance of each leg:
 @ Expecting { Total:2 174.82710 563 nmi 588.50367 4436 nmi 1 586.32343 12 nmi }
 ```
 
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
 
 ## WPNext
 
 Where is the next waypoint, and how far off the route am I?
+
+![Route and waypoints](img/RouteWaypoints.bmp)
 
 Stack: `φ` `λ` `GS` ▶ `To` `Brg` `Dist` `XTD` `ETE` `ETA`, from the present
 position and the ground speed (knots if a plain number; 0 to skip `ETE` and
@@ -344,3 +364,7 @@ Over Los Angeles, cleared direct to New York; the route now goes through
 Route « 1 GET » MAP RouteLeg +
 @ Expecting { "LAX" "ABQ" "DCT" "JFK" 3 }
 ```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
