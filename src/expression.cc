@@ -1355,23 +1355,44 @@ expression_p expression::rewrite(expression_r from,
                                       cond, locals);
                 if (matchsz || interrupted())
                     break;
+
+                // Drop locals left behind by a failed partial match
+                rt.unlocals(rt.locals() - locals);
             }
         }
         else
         {
+            // Check if there is a match in sub-equations going up, i.e.
+            // find the smallest match, picking the first one in case of tie.
+            // A match starting at a given position has a size that does not
+            // depend on the window, so try each position only once.
             size_t eqstart = eqst;
-            // Check if there is a match in sub-equations going up
-            for (eqsz = fromsz; eqsz <= eqlen; eqsz++)
+            size_t beststart = 0;
+            size_t bestsize = 0;
+            for (eqst = eqstart; eqst + fromsz <= eqlen; eqst++)
             {
-                for (eqst = eqstart; eqst + eqsz <= eqlen; eqst++)
+                size_t sz = check_match(eqst, eqlen - eqst, fromst, fromsz,
+                                        cond, locals);
+                rt.unlocals(rt.locals() - locals);
+                if (interrupted())
+                    break;
+                if (sz && (!bestsize || sz < bestsize))
                 {
-                    matchsz = check_match(eqst, eqsz, fromst, fromsz,
-                                          cond, locals);
-                    if (matchsz || interrupted())
+                    beststart = eqst;
+                    bestsize = sz;
+                    if (sz == fromsz)
                         break;
                 }
-                if (matchsz || interrupted())
-                    break;
+            }
+
+            // Redo the best match to get the locals for that match
+            matchsz = 0;
+            if (bestsize && !interrupted())
+            {
+                eqst = beststart;
+                eqsz = bestsize;
+                matchsz = check_match(eqst, eqsz, fromst, fromsz,
+                                      cond, locals);
             }
         }
         if (interrupted())
