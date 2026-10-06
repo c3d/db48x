@@ -594,8 +594,8 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 
 ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
-ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
-ANDROID_QT_BASE ?= /Volumes/Qt/6.9.2
+ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/27.2.12479018
+ANDROID_QT_BASE ?= /Volumes/Qt/6.10.3
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
 # Host kit: macOS uses .../macos/bin; Linux CI and typical offline installs use gcc_64
@@ -639,6 +639,7 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		AAB="$(abspath $@)";					\
 		OUTDIR="$(abspath $(dir $@))";				\
 		mkdir -p "$$OUTDIR" &&					\
+		rm -f "$$OUTDIR/AndroidManifest.xml" &&			\
 		cd sim && 						\
 		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$OUTDIR" &&	\
 		$(QMAKE_ENV)						\

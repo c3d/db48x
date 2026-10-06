@@ -464,6 +464,11 @@ void extract_android_assets()
 
 static std::atomic<bool> is_dialog_open{false};
 
+#ifdef ANDROID
+// Key being held by a touch (0 = none); used for synthetic long-press timer.
+static volatile int androidHeldKey = 0;
+#endif // ANDROID
+
 void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 // ----------------------------------------------------------------------------
 //   Trigger background auto-save when Android suspends the app
@@ -476,20 +481,40 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 
     static bool isSaved = false;
 
+    record(sim_window, "App state %d visible=%d active=%d",
+           int(state), isVisible(), isActiveWindow());
+
     if (state == Qt::ApplicationActive)
     {
         isSaved = false;
+        record(sim_window, "Foreground: show/raise/invalidate geometry=%dx%d",
+               width(), height());
+        // Re-show the window in case Android hid it, then force full repaint.
+        show();
+        raise();
+        activateWindow();
+        // Mark every pixel as dirty so the RPL thread redraws everything.
+        // Then push a synthetic key-release (key=0) to wake the RPL thread;
+        // it will call redraw_lcd() → ui_refresh() → update_pixmap() on its
+        // own thread (safe), which then posts refresh_lcd() to the UI thread.
+        // We must NOT call update_pixmap() here because it races with the RPL
+        // thread and corrupts lcd_copy, causing missed updates after keystrokes.
+        SimScreen::invalidate();
+        key_push(0);
+        recorder_dump_for("sim_window");
     }
     else if ((state == Qt::ApplicationSuspended ||
               state == Qt::ApplicationHidden) &&
              !isSaved) // Check both suspend and hidden + avoid double save
     {
+        record(sim_window, "Background: auto-save state=%d", int(state));
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)
         extern bool save_system_state_silent();
         save_system_state_silent();
 
         record(sim_window, "Android auto-save triggered");
+        recorder_dump_for("sim_window");
 
 	isSaved = true;
     }
@@ -712,6 +737,17 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
     int k = ev->key();
     record(sim_keys, "Key press %d", k);
 
+#ifdef ANDROID
+    if (k == Qt::Key_Back)
+    {
+        // Android Back key would close/hide the window by default.
+        // Treat it as Backspace to dismiss menus/editors.
+        key_push(KB_BKS);
+        ev->accept();
+        return;
+    }
+#endif // ANDROID
+
     if (k == Qt::Key_F16)
         recorder_dump_for(tests::dump_on_fail);
 
@@ -918,7 +954,12 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                        k, relx, rely, pressed ? "pressed" : "released");
 
                 if (!pressed)
+                {
+#ifdef ANDROID
+                    androidHeldKey = 0;
+#endif // ANDROID
                     key_push(0);
+                }
                 else
                     for (mousemap *ptr = mouseMap; ptr->key; ptr++)
                         if ((relx >= ptr->left) && (relx <= ptr->right) &&
@@ -926,7 +967,23 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                         {
                             record(sim_keys, "  [%d] found at %d as %d",
                                    k, ptr - mouseMap, ptr->keynum);
-                            key_push(ptr->keynum);
+                            int keynum = ptr->keynum;
+                            key_push(keynum);
+#ifdef ANDROID
+                            // If the shared code does not start TIMER0 (e.g.
+                            // when help is showing), fire a synthetic repeat so
+                            // long-press help still works.
+                            androidHeldKey = keynum;
+                            QTimer::singleShot(500, this, [keynum]()
+                            {
+                                if (androidHeldKey == keynum &&
+                                    !sys_timer_active(TIMER0))
+                                {
+                                    sys_timer_start(TIMER0, 0);
+                                    key_push(keynum);
+                                }
+                            });
+#endif // ANDROID
                         }
             }
 
