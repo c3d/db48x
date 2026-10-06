@@ -774,6 +774,9 @@ are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
 directory and applies to the next calls: purge it when done, as the examples
 do.
 
+Thanks to Ed van Gasteren, whose Propagate program and discussions led to this
+function.
+
 **1)** A mass from a linear density and a length, with units:
 
 ```rpl
@@ -1106,6 +1109,8 @@ Worked examples of the whole section, after Part 2, Applications, of Jean
 Wilson's Proposition for interval implementation in the RPL environment
 (2025). Each submenu holds worked examples or demonstrations.
 
+* [GUMS1](#gums1library): the four examples of Supplement 1 to the GUM
+  (JCGM 101:2008), by the propagation formula and by Monte Carlo.
 * [Demos](#demoslibrary): commands of the section run on random inputs, a new
   case at each press.
 * [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
@@ -1165,6 +1170,214 @@ alone does not prove a disagreement.
 ```rpl
 ⓁDMOσConcord
 ```
+
+
+## GUMS1Library
+
+The four worked examples of Supplement 1 to the GUM, JCGM 101:2008 (clause 9),
+published by the BIPM with their data and results. Each one is solved twice:
+by the law of propagation of uncertainty, as the GUM does (σRFxjxi), and by
+the Monte Carlo method of the Supplement (MCPropagate). Comparing the two with
+the published tables is a validation of both, and each example teaches when
+the first method may be trusted.
+
+* [S1Additive](#s1additive): the additive model (9.2);
+* [S1Mass](#s1mass): the mass calibration (9.3), where the propagation formula
+  underestimates the uncertainty by 40 %;
+* [S1Power](#s1power): the comparison loss in microwave power meter calibration
+  (9.4), where it gives 0, with and without correlation;
+* [S1Gauge](#s1gauge): the gauge block calibration (9.5), nine inputs and five
+  kinds of distributions.
+
+The Supplement uses 10⁵ to 10⁶ draws, the pages below 1 000 to 2 000, so that
+each example runs in seconds: their Monte Carlo results come within a few per
+cent of the published ones. With 10 000 draws, DB48x gives:
+
+| Example | Propagation formula, u | Monte Carlo, u | JCGM 101, Monte Carlo |
+|---|---|---|---|
+| 9.2 normal inputs | 2 | 2.006 | 2.00 |
+| 9.2 rectangular inputs | 2 | 2.015 | 2.00 |
+| 9.2 one dominant input | 10.15 | 10.23 | 10.1–10.2 |
+| 9.3 mass | 0.0539 mg | 0.0744 mg | 0.0754 mg |
+| 9.4, x1 = 0.010 | 100 × 10⁻⁶ | 112 × 10⁻⁶ | 112 × 10⁻⁶ |
+| 9.4, x1 = 0.010, r = 0.9 | 100 × 10⁻⁶ | 120 × 10⁻⁶ | 121 × 10⁻⁶ |
+| 9.5 gauge block | 32.1 nm | 35.7 nm | 36 nm |
+
+
+## S1Additive
+
+JCGM 101, 9.2: the additive model Y = X1 + X2 + X3 + X4, with independent
+inputs of expectation 0. The exact answer is known, which makes it the test of
+the method itself.
+
+**1)** Four normal inputs of standard deviation 1: the propagation formula gives u = 2.
+
+```rpl
+'x1+x2+x3+x4' 0±σ1 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ2.
+```
+
+**2)** The Monte Carlo method agrees; the Supplement gives 0.00±σ2.00 and the 95 % interval [−3.92, 3.92]:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d } { 0±σ1 0±σ1 0±σ1 0±σ1 } ⓁMCPropagate
+@ Expecting 6.17138 85639 4⁳⁻²±σ2.00826 44578 6
+```
+
+**3)** Four rectangular inputs of standard deviation 1, between −√3 and √3. The propagation formula is the same, u = 2; the exact 95 % interval is [−3.88, 3.88], a little narrower than the Gaussian one:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±1.73205080757 } ⓁMCPropagate
+@ Expecting -0.01433 08706 8±σ1.98765 66807 8
+```
+
+**4)** The same, with a fourth input ten times wider. The propagation formula gives u = 10.15, and with k = 1.96 the interval ±19.9:
+
+```rpl
+'x1+x2+x3+x4' 0±σ10 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ10.14889 15651
+```
+
+**5)** The Monte Carlo method finds the interval ±17.0, as the Supplement does: when one rectangular input dominates, the result is not normal, and the Gaussian interval is far too wide.
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±17.3205080757 } ⓁMCPropagate
+@ Expecting 0.15361 87355 27±σ10.24279 74855
+```
+
+## S1Mass
+
+JCGM 101, 9.3: a weight W of nominal mass 100 g is calibrated against a
+reference weight R, in air of density ρa; the buoyancy depends on the densities
+ρW and ρR of the two weights. The deviation from the nominal mass is
+
+δm = (mR + δmR)·(1 + (ρa − ρa0)·(1/ρW − 1/ρR)) − 100 000 mg
+
+with ρa0 = 1.2 kg/m³, mR = 100 000±σ0.050 mg, δmR = 1.234±σ0.020 mg, and
+rectangular densities: ρa between 1.1 and 1.3, ρW between 7 000 and 9 000,
+ρR between 7 950 and 8 050 kg/m³ (table 5 of the Supplement).
+
+**1)** The propagation formula gives u = 0.0539 mg, as the GUM uncertainty framework of the Supplement (table 6):
+
+```rpl
+'(x1+x2)*(1+(x3-1.2)*(1/x4-1/x5))-100000'
+8000±σ28.8675134595 8000±σ577.350269190 1.2±σ0.0577350269190 1.234±σ0.020 100000±σ0.050
+ⓁσRFxjxi
+@ Expecting 1.234±σ5.38516 48071 3⁳⁻²
+```
+
+**2)** The Monte Carlo method gives about 0.075 mg; the Supplement finds 0.0754 mg:
+
+```rpl
+12345 RDZ
+'(m+d)*(1+(densA-1.2)*(1/densW-1/densR))-100000'
+{ m d densA densW densR }
+{ 100000±σ0.050 1.234±σ0.020 1.2±0.1 8000±1000 8000±50 } ⓁMCPropagate
+@ Expecting 1.23850 18718±σ0.07615 43941 04
+```
+
+The propagation formula underestimates the uncertainty by 40 %. At the
+estimates, ρa = ρa0, so the derivatives of δm with respect to the three
+densities are all zero: to first order, the densities do not count. They do,
+through the product of their deviations, which only a second order formula or
+the Monte Carlo method sees.
+
+
+## S1Power
+
+JCGM 101, 9.4: the comparison loss of a microwave power meter, δY = X1² + X2²,
+where X1 and X2 are the real and imaginary parts of a reflection coefficient,
+normal, with x2 = 0 and u(x1) = u(x2) = 0.005 (tables 8 and 9 of the
+Supplement).
+
+**1)** At x1 = 0, the derivatives are zero, and the propagation formula gives an uncertainty of 0, which is wrong:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0±σ0.005 ⓁσRFxjxi
+@ Expecting 0±σ1.17851 13019 8⁳⁻⁸
+```
+
+**2)** The Monte Carlo method gives δy ≈ 50×10⁻⁶ and u ≈ 50×10⁻⁶, as the Supplement and the exact solution:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 5.07012 99776 7⁳⁻⁵±σ5.03014 46082 1⁳⁻⁵
+```
+
+**3)** At x1 = 0.010, the propagation formula gives u = 100×10⁻⁶:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0.010±σ0.005 ⓁσRFxjxi
+@ Expecting 0.0001±σ1.00000 00034 7⁳⁻⁴
+```
+
+**4)** The Monte Carlo method finds about 112×10⁻⁶, as the Supplement:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 1.50469 96371 1⁳⁻⁴±σ1.14549 79356 9⁳⁻⁴
+```
+
+**5)** X1 and X2 correlated at 0.9: the Supplement finds 121×10⁻⁶ (table 9).
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+The distribution of δY is far from normal: at x1 = 0, it is a χ² law with
+two degrees of freedom, which starts at 0. The Supplement gives its shortest
+95 % interval, [0, 150]×10⁻⁶; MCPropagate gives the interval that leaves 2.5 %
+on each side, about [1.3, 184]×10⁻⁶ in theory. Both are right, for two
+definitions.
+
+
+## S1Gauge
+
+JCGM 101, 9.5: the length of a nominally 50 mm gauge block, compared with a
+reference block, the example H.1 of the GUM itself. In nm,
+
+δL = Ls + D + d1 + d2 − Ls·(δα·(θ0 + Δ) + αs·δθ) − 50 000 000
+
+with nine inputs of five kinds (table 10 of the Supplement): Ls, D, d1 and d2
+follow scaled and shifted t-distributions (StudentRand), αs is rectangular,
+θ0 normal, Δ follows an arc sine law (UShapeRand), and δα and δθ are
+rectangular with inexactly known limits: a half-width drawn in [w − d, w + d],
+then a value drawn in ±that half-width.
+
+**1)** The propagation formula gives 838±σ32 nm, as the Supplement (table 11):
+
+```rpl
+'x1+x2+x3+x4-x1*(x8*(x6+x7)+x5*x9)-50000000'
+0±σ0.0300462 0±σ5.78315E-7 0±σ0.353553390593 -0.1±σ0.2 11.5E-6±σ1.15470053838E-6
+0±σ7 0±σ4 215±σ6 50000623±σ25 ⓁσRFxjxi
+@ Expecting 838±σ32.13796 12095
+```
+
+**2)** The Monte Carlo method, with 1 000 draws for speed: the Supplement finds 838±σ36 nm. The difference with the propagation formula comes from the heavy tails of the t-distributions.
+
+```rpl
+12345 RDZ
+'gLs+gD+gd1+gd2-gLs*(gDa*(gT0+gDl)+gAs*gDt)-50000000'
+{ gLs gD gd1 gd2 gAs gT0 gDl gDa gDt }
+{ « 18 ⓁStudentRand 25 * 50000623 + » « 24 ⓁStudentRand 6 * 215 + »
+  « 5 ⓁStudentRand 4 * » « 8 ⓁStudentRand 7 * »
+  11.5E-6±2E-6 -0.1±σ0.2 « -0.5 0.5 ⓁUShapeRand »
+  « RAND 0.2E-6 * 0.9E-6 + RAND 2 * 1 - * » « RAND 0.05 * 0.025 + RAND 2 * 1 - * » } 1000 ⓁMCPropagate
+@ Expecting 838.99938 8993±σ37.24850 82155
+```
+
+With 10 000 draws, about two minutes on the simulator, the result is
+838.0±σ35.7 nm.
 
 
 ## ProjectileLibrary
