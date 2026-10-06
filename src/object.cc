@@ -373,13 +373,6 @@ retry:
             }
             if (r == SKIP)
                 r = local::do_parse(p);
-            if (!p.truenames)
-            {
-                if (r == SKIP && Settings.AutomaticXLibs())
-                    r = xlib::do_parse(p);
-                if (r == SKIP && Settings.AutomaticConstants())
-                    r = constant::do_parse(p);
-            }
             if (r == SKIP)
                 r = symbol::do_parse(p);
         }
