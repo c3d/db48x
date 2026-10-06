@@ -1283,6 +1283,12 @@ void tests::editor_operations()
         .test(CLEAR, "'2..3'", ENTER).error("Syntax error")
         .test(CLEAR, "'1.5.2+X'", ENTER).error("Syntax error")
         .test(CLEAR, "1.5.2", ENTER).error("Syntax error");
+    step("Comma as separator in builtin function calls")
+        .test(CLEAR, "'MAX(1,2)'", ENTER).expect("'Max(1;2)'")
+        .test(RUNSTOP).expect("2")
+        .test(CLEAR, "'COMB(5,2)' EVAL", ENTER).expect("10")
+        .test(CLEAR, "'PERM(5,2)' EVAL", ENTER).expect("20")
+        .test(CLEAR, "'∫(0,1,X^2,X)' EVAL", ENTER).expect("¹/₃");
 
     step("Graphical rendering of integrals - Simple expression")
         .test(CLEAR, "'integrate(A;B;sin(X);X)'", ENTER, EXIT)
@@ -13670,6 +13676,22 @@ void tests::sum_and_product()
         .expect("'Σ(x;0;5;2↑x÷(2·x!))'")
         .test(RUNSTOP)
         .expect("3 ¹⁹/₃₀");
+
+    step("Legacy sum and product syntax with name=start")
+        .test(CLEAR, "'Σ(I=1,10,I)'", ENTER)
+        .expect("'Σ(I;1;10;I)'")
+        .test(RUNSTOP)
+        .expect("55")
+        .test(CLEAR, "'Σ(I=1;10;I)' EVAL", ENTER)
+        .expect("55")
+        .test(CLEAR, "'∏(I=1,5,I)'", ENTER)
+        .expect("'∏(I;1;5;I)'")
+        .test(RUNSTOP)
+        .expect("120")
+        .test(CLEAR, "'Σ(I;1;10;I)' EVAL", ENTER)
+        .expect("55")
+        .test(CLEAR, "'Σ(I+1=1,10,I)'", ENTER)
+        .error("Expected variable name");
 }
 
 
