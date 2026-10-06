@@ -613,6 +613,8 @@ ANDROID_DEPLOY_SIGN_FLAGS = $(if $(ANDROID_CAN_SIGN),\
 	--sign $(ANDROID_KEYSTORE) $(NAME) --storepass '$(ANDROID_KEYSTORE_PASS)',)
 QMAKE = $(ANDROID_QT_BIN)/qmake
 QMAKE_SPECS = android-clang
+# 16K page alignment required for Android 15+ compliance
+LDFLAGS += -Wl,-z,max-page-size=16384
 QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
 		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
