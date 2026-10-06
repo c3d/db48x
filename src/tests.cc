@@ -8520,6 +8520,9 @@ void tests::solver_testing()
         .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
+    step("Solver error evaluating intermediate step")
+        .test(CLEAR, "'IFTE(X>1;1/(X-X);X-3)' 'X' 0 ROOT", ENTER)
+        .error("Divide by zero");
 
     step("Select algebraically-assisted solver")
         .test(CLEAR, "SymbolicSolver", ENTER).noerror();
