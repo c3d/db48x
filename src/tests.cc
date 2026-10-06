@@ -8322,6 +8322,41 @@ void tests::matrix_functions()
         .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_ColumnNorm)
         .expect("6");
 
+    step("Determinant of 1x1 matrix")
+        .test(CLEAR, "[[5]] DET", ENTER)
+        .expect("5")
+        .test(CLEAR, "[[-5]] DET", ENTER)
+        .expect("-5")
+        .test(CLEAR, "[[2.5]] DET", ENTER)
+        .expect("2.5")
+        .test(CLEAR, "[[0]] DET", ENTER)
+        .expect("0");
+    step("Symbolic determinant has no spurious divisor")
+        .test(CLEAR, "[[A B][C D]] DET", ENTER)
+        .expect("'A·D-B·C'")
+        .test(CLEAR, "[[X 1][1 X]] DET", ENTER)
+        .expect("'X²-1'")
+        .test(CLEAR, "[[A 0][0 B]] DET", ENTER)
+        .expect("'A·B'");
+    step("Symbolic determinant evaluated where the pivot is zero")
+        .test(CLEAR, "'DetTest' CRDIR DetTest "
+              "0 'X' STO [[X 1][1 X]] DET EVAL", ENTER)
+        .expect("-1");
+    step("Symbolic 3x3 determinant matches numerical determinant")
+        .test(CLEAR,
+              "1 'M11' STO 2 'M12' STO 3 'M13' STO "
+              "4 'M21' STO 5 'M22' STO 7 'M23' STO "
+              "2 'M31' STO 8 'M32' STO 9 'M33' STO "
+              "[[M11 M12 M13][M21 M22 M23][M31 M32 M33]] DET", ENTER)
+        .expect("'M11·(M22·M33-M23·M32)-M12·(M21·M33-M23·M31)"
+                "+M13·(M21·M32-M22·M31)'")
+        .test(ID_Run)
+        .expect("11")
+        .test(CLEAR, "[[1 2 3][4 5 7][2 8 9]] DET", ENTER)
+        .expect("11");
+    step("Cleanup determinant test directory")
+        .test(CLEAR, "UPDIR 'DetTest' PGDIR", ENTER).noerror();
+
     step("Inverse of fraction matrix has normalized integers")
         .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV", ENTER)
         .want("[[ 12 -20 ] [ -15 30 ]]")
