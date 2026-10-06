@@ -1184,6 +1184,8 @@ Wilson's Proposition for interval implementation in the RPL environment
   case at each press.
 * [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
   Type B evaluation of the measurements to the Monte Carlo method.
+* [EqDemos](#eqdemoslibrary): equations of the Equation Library with uncertain
+  inputs, by the Monte Carlo method and by the propagation formula.
 
 
 ## DemosLibrary
@@ -2044,3 +2046,68 @@ comparison, and a test able to reject a model, as in H-i, is what gives weight
 to the agreement of the other one, in H-ii. The comparison of a prediction and a measurement, each with its uncertainty,
 is the core of the validation methods of metrology, such as the normalized
 error Eₙ of ISO 13528 and the validation comparison of ASME V&V 20.
+
+
+## EqDemosLibrary
+
+Equations of the Equation Library with uncertain inputs.
+Each input is drawn from a law, a normal law for a measured value, a
+rectangular law for a quantity only known to lie within bounds, and the
+result is drawn many times: its histogram shows the law of the result, which
+the propagation formula of σRFxjxi sums up in two numbers. An
+input given as a range, like an amplitude between 60° and 80°, becomes in this
+way an input of the equation.
+
+* DMOPendulum: the period of the simple pendulum, for small and for large
+  amplitudes.
+
+
+## DMOPendulum
+
+The two periods of [Simple Pendulum](#Simple Pendulum) in the Equation
+Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
+amplitude, and the real period for a large amplitude θmax,
+`Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x))`, with `c(x) = (2x)!/(2^x·x!)²`.
+
+The length is measured, `L = 15±σ0.1 cm`, a normal law; the amplitude is only
+known to lie within a range of 20°, a rectangular law. The range is drawn at
+random at each press, from 0…20° up to 60…80°, or given on the stack as a list
+`{ lo hi }` in degrees; any other object is left alone.
+
+Three hundred pairs (L, θmax) are drawn, and both periods computed for each.
+The histogram of Treal is drawn in black, and that of T over it in gray, on
+the same axis, whose ends are written below in seconds. Above are the mean and
+standard deviation of each, and Treal by the propagation formula of
+σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The three
+results are returned, tagged. About 2 seconds on the simulator; on a
+calculator, a few minutes.
+
+**1)** A range at random:
+
+```rpl
+1 RDZ ⓁDMOPendulum
+```
+
+**2)** Small amplitudes, 5…15°: the two histograms almost coincide, and T is
+a good model.
+
+```rpl
+1 RDZ { 5 15 } ⓁDMOPendulum
+```
+
+**3)** Large amplitudes, 60…80°: Treal is longer than T by 0.08 s, thirty
+times the uncertainty of T, and its histogram is nearly flat.
+
+```rpl
+1 RDZ { 60 80 } ⓁDMOPendulum
+```
+
+Three lessons. First, the error of a model can be far larger than the
+uncertainty of the measurements: no care in measuring L makes T right at 70°.
+Second, the propagation formula gives here nearly the same mean and standard
+deviation as the Monte Carlo method, since Treal is almost linear in θmax over
+20°. Third, it does not give the shape: Treal inherits the flat law of θmax,
+whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws show
+it.
+
+
