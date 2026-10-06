@@ -2708,6 +2708,20 @@ void tests::conditionals()
     test(CLEAR, "'IFTE(1-1;ln(0);PASS+0)'", ENTER, RUNSTOP)
         .expect("'PASS'");
 
+    step("IFTE command with symbolic condition")
+        .test(CLEAR, "'IfteX' 1 2 IFTE", ENTER)
+        .expect("'IfThenElse(IfteX;1;2)'");
+    step("IFTE expression with symbolic condition")
+        .test(CLEAR, "'IFTE(IfteX;1;2)' EVAL", ENTER)
+        .expect("'IfThenElse(IfteX;1;2)'");
+    step("IFTE command with symbolic comparison")
+        .test(CLEAR, "'IfteX>2' 1 2 IFTE", ENTER)
+        .expect("'IfThenElse(IfteX>2;1;2)'");
+    step("IFTE command with comparison on defined variable")
+        .test(CLEAR, "3 'IfteX' STO 'IfteX>2' 1 2 IFTE", ENTER)
+        .expect("1")
+        .test(CLEAR, "'IfteX' PURGE", ENTER).noerror();
+
     step("Clear DebugOnError for IfErr tests")
         .test(CLEAR, "DebugOnError", ENTER).noerror();
     step("IfErr-Then (true)");

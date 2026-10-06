@@ -735,9 +735,9 @@ COMMAND_BODY(IFTE)
 //   Evaluate the 'IFTE' command
 // ----------------------------------------------------------------------------
 {
-    if (object_p iff = rt.pop())
+    if (object_g iff = rt.pop())
     {
-        if (object_p ift = rt.pop())
+        if (object_g ift = rt.pop())
         {
             if (object_g condition = rt.pop())
             {
@@ -747,9 +747,24 @@ COMMAND_BODY(IFTE)
                     if (!condition)
                         return ERROR;
                 }
+
+                // Symbolic condition: build `IFTE(cond;ift;iff)` like legacy
+                id cty = condition->type();
+                if ((cty == ID_expression || cty == ID_symbol) &&
+                    ift->is_algebraic() && iff->is_algebraic())
+                {
+                    algebraic_g args[3] = { algebraic_p(+iff),
+                                            algebraic_p(+ift),
+                                            algebraic_p(+condition) };
+                    if (algebraic_g expr = expression::make(ID_IFTE, args, 3))
+                        if (rt.push(+expr))
+                            return OK;
+                    return ERROR;
+                }
+
                 int cvalue = condition->as_truth(true);
                 if (cvalue >= 0)
-                    return program::run(cvalue ? ift : iff);
+                    return program::run(cvalue ? +ift : +iff);
             }
         }
     }
