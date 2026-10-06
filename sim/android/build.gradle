@@ -14,7 +14,7 @@ repositories {
     mavenCentral()
 }
 
-apply plugin: qtGradlePluginType
+apply plugin: (project.findProperty('qtGradlePluginType') ?: 'com.android.application')
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
