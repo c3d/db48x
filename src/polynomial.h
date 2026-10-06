@@ -112,7 +112,7 @@ struct polynomial : expression
     algebraic_p         evaluate(algebraic_r x) { return horner(x); }
     static algebraic_p  horner(stack_buffer &sbuf, algebraic_r x);
     algebraic_p         horner(algebraic_r x);
-    list_p              roots(id ty, symbol_p var) const;
+    list_p              roots(id ty, symbol_p var, bool unique = true) const;
     list_p              roots_internal(id ty, symbol_p var) const;
 
     // Return total length of the polynomial in bytes

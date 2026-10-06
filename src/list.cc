@@ -1915,12 +1915,16 @@ int value_compare(object_p *xp, object_p *yp)
     {
         algebraic_g xa     = algebraic_p(x);
         algebraic_g ya     = algebraic_p(y);
+        gcutf8      errm   = rt.error_message();
         int         result = 0;
         xa = xa->evaluate();
         ya = ya->evaluate();
         if (comparison::compare(&result, xa, ya))
             return result;
+
+        // Values that cannot be compared, e.g. complex, are not an error
         rt.clear_error();
+        rt.error_message(+errm);
     }
     return x->compare_to(y);
 }

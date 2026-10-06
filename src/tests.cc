@@ -13744,7 +13744,7 @@ void tests::polynomials()
         .test(CLEAR, "'X^3-5'", ENTER, ID_PolynomialsMenu, ID_ToPolynomial)
         .expect("ⓅX↑3-5")
         .test("3", ID_divide)
-        .expect("'(X·X²+-5)÷3'");
+        .expect("Ⓟ¹/₃·X↑3-1 ²/₃");
     step("Polynomial divided by constant polynomial")
         .test(CLEAR, "'X^3-5'", ENTER, ID_PolynomialsMenu, ID_ToPolynomial)
         .expect("ⓅX↑3-5")
@@ -13752,6 +13752,24 @@ void tests::polynomials()
         .expect("Ⓟ3")
         .test(ID_divide)
         .expect("Ⓟ¹/₃·X↑3-1 ²/₃");
+    step("Polynomial divided by integer divides all coefficients")
+        .test(CLEAR, "'2*X^2-4' →Poly 2 /", ENTER)
+        .expect("ⓅX↑2-2");
+    step("Polynomial divided by integer gives fractional coefficients")
+        .test(CLEAR, "'X^2-1' →Poly 2 /", ENTER)
+        .expect("Ⓟ¹/₂·X↑2-¹/₂");
+    step("Polynomial divided by decimal")
+        .test(CLEAR, "'X^2-1' →Poly 2. /", ENTER)
+        .expect("Ⓟ0.5·X↑2-0.5");
+    step("Polynomial divided by number converts back to expression")
+        .test(CLEAR, "'2*X^2-4' →Poly 2 / Poly→", ENTER)
+        .expect("'X²+-2'");
+    step("Polynomial divided by zero")
+        .test(CLEAR, "'X^2-1' →Poly 0 /", ENTER)
+        .error("Divide by zero");
+    step("Polynomial divided by symbol is an expression")
+        .test(CLEAR, "'X^2-1' →Poly 'A' /", ENTER)
+        .expect("'(X²+-1)÷A'");
 
 
     step("Restore default rendering for polynomials")
@@ -13799,6 +13817,240 @@ void tests::polynomial_roots()
     step("PRoot rejects symbolic coefficients")
         .test(CLEAR, "[ 'A' 'B' 'C' ] PRoot", ENTER)
         .error("Bad argument type");
+    step("PRoot: cubic with one irrational real and two complex roots")
+        .test(CLEAR, "[1 2 3 4] PRoot", ENTER)
+        .expect("[ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ ]");
+    step("PRoot: decimal cubic with complex roots")
+        .test(CLEAR, "[1. 2. 3. 4.] PRoot", ENTER)
+        .expect("[ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ ]");
+    step("PRoot: x^3-1 starting at a critical point")
+        .test(CLEAR, "[1 0 0 -1] PRoot", ENTER)
+        .expect("[ 1 -¹/₂+'√ 3÷2'ⅈ -¹/₂-'√ 3÷2'ⅈ ]");
+    step("PRoot: x^4-1")
+        .test(CLEAR, "[1 0 0 0 -1] PRoot", ENTER)
+        .expect("[ -1 1 ⅈ -ⅈ ]");
+    step("PRoot: quadratic with complex roots")
+        .test(CLEAR, "[1 0 1] PRoot", ENTER)
+        .expect("[ ⅈ -ⅈ ]");
+    step("PRoot: quartic with only complex roots")
+        .test(CLEAR, "[2 3 4 5 6] PRoot", ENTER)
+        .expect("[ 0.33691 53136 48+1.25867 45668 5ⅈ 0.33691 53136 48-1.25867 45668 5ⅈ -1.08691 53136 5+0.76526 80330 29ⅈ -1.08691 53136 5-0.76526 80330 29ⅈ ]");
+    step("PRoot: irrational roots are not rounded to fractions")
+        .test(CLEAR, "[1 0 0 -2] PRoot", ENTER)
+        .expect("[ 1.25992 10498 9 -0.62996 05249 47+1.09112 36359 7ⅈ -0.62996 05249 47-1.09112 36359 7ⅈ ]");
+    step("PRoot: double root is snapped to exact value")
+        .test(CLEAR, "[1 -1 -8 12] PRoot", ENTER)
+        .expect("[ -3 2 2 ]");
+    step("PRoot: double root of a quadratic is repeated")
+        .test(CLEAR, "[1 -2 1] PRoot", ENTER)
+        .expect("[ 1 1 ]");
+    step("PRoot: repeated roots round-trip through PCoef")
+        .test(CLEAR, "CompatiblePolynomials [1 -2 1] PRoot PCoef", ENTER)
+        .expect("[ 1 -2 1 ]");
+    step("PRoot: triple root")
+        .test(CLEAR, "[1 -3 3 -1] PRoot", ENTER)
+        .expect("[ 1 1 1 ]");
+    step("PRoot: quadruple root")
+        .test(CLEAR, "[1 -4 6 -4 1] PRoot", ENTER)
+        .expect("[ 1 1 1 1 ]");
+    step("PRoot: double root at zero")
+        .test(CLEAR, "[1 0 0] PRoot", ENTER)
+        .expect("[ 0 0 ]");
+    step("PRoot: two double roots")
+        .test(CLEAR, "[1 0 -2 0 1] PRoot", ENTER)
+        .expect("[ -1 -1 1 1 ]");
+    step("PRoot: close but distinct roots are not merged")
+        .test(CLEAR, "[1 -2.000001 1.000001] PRoot", ENTER)
+        .expect("[ 1 1.00000 1 ]");
+    step("PRoot: symbolic imaginary parts")
+        .test(CLEAR, "[1 0 2] PRoot", ENTER)
+        .expect("[ '√ 2'ⅈ -'√ 2'ⅈ ]");
+    step("PRoot: symbolic complex roots of x^2+x+1")
+        .test(CLEAR, "[1 1 1] PRoot", ENTER)
+        .expect("[ -¹/₂+'√ 3÷2'ⅈ -¹/₂-'√ 3÷2'ⅈ ]");
+    step("PRoot: symbolic complex roots of x^3+1")
+        .test(CLEAR, "[1 0 0 1] PRoot", ENTER)
+        .expect("[ -1 ¹/₂+'¹/₂·√ 3'ⅈ ¹/₂-'¹/₂·√ 3'ⅈ ]");
+    step("PRoot: symbolic complex roots of x^4+x^2+1")
+        .test(CLEAR, "[1 0 1 0 1] PRoot", ENTER)
+        .expect("[ ¹/₂+'¹/₂·√ 3'ⅈ ¹/₂-'¹/₂·√ 3'ⅈ "
+                "-¹/₂+'¹/₂·√ 3'ⅈ -¹/₂-'¹/₂·√ 3'ⅈ ]");
+    step("Rendering negative symbolic imaginary part")
+        .test(CLEAR, "(0;'-√2')", ENTER)
+        .expect("-'√2'ⅈ");
+    step("PRoot with surd roots leaves no pending error")
+        .test(CLEAR, "[1 0 -2] PRoot DROP 1 2 +", ENTER)
+        .expect("3");
+    step("PRoot with surd roots does not set the error message")
+        .test(CLEAR, "ERR0 [1 0 -2] PRoot ERRM", ENTER)
+        .expect("\"\"");
+    step("PRoot with surd roots inside a program")
+        .test(CLEAR, "« [1 0 -2] PRoot » EVAL", ENTER)
+        .noerror()
+        .expect("[ '-√ 2' '√ 2' ]");
+    step("PRoot with complex surd roots leaves no pending error")
+        .test(CLEAR, "[1 0 0 0 1] PRoot DROP 1 2 +", ENTER)
+        .expect("3");
+    step("Zeros with surd roots leaves no pending error")
+        .test(CLEAR, "'X^2-3' 'X' Zeros DROP 1 2 +", ENTER)
+        .expect("3");
+    step("Zeros with complex surd roots")
+        .test(CLEAR, "ComplexResults 'X^3-1' 'X' Zeros", ENTER)
+        .expect("{ 1 -¹/₂+'√ 3÷2'ⅈ -¹/₂-'√ 3÷2'ⅈ }")
+        .test(CLEAR, "'ComplexResults' PURGE", ENTER);
+    step("Zeros lists repeated roots once")
+        .test(CLEAR, "'X^2-2*X+1' 'X' Zeros", ENTER)
+        .expect("{ 1 }");
+    step("PRoot: complex roots even without ComplexResults")
+        .test(CLEAR, "'ComplexResults' PURGE [1 0 1] PRoot", ENTER)
+        .expect("[ ⅈ -ⅈ ]");
+    step("Zeros: only real roots of a cubic without ComplexResults")
+        .test(CLEAR, "'X^3+2*X^2+3*X+4' 'X' Zeros", ENTER)
+        .expect("{ -1.65062 91914 4 }");
+    step("Zeros: all roots of a cubic with ComplexResults")
+        .test(CLEAR, "ComplexResults 'X^3+2*X^2+3*X+4' 'X' Zeros", ENTER)
+        .expect("{ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ }")
+        .test(CLEAR, "'ComplexResults' PURGE", ENTER);
+    step("PRoot: x^20-1 has 20 roots")
+        .test(CLEAR, "[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1] "
+              "PRoot DUP SIZE", LENGTHY(5000), ENTER)
+        .expect("{ 20 }")
+        .test(BSP, "« 20 ^ 1 - ABS →NUM » MAP ΣLIST 1E-15 <", ENTER)
+        .expect("True");
+    step("PRoot: Wilkinson polynomial of degree 14 has exact roots")
+        .test(CLEAR,
+              "[1 -105 5005 -143325 2749747 -37312275 368411615 "
+              "-2681453775 14409322928 -56663366760 159721605680 "
+              "-310989260400 392156797824 -283465647360 87178291200]"
+              " PRoot SORT", ENTER)
+        .expect("[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ]");
+    step("PRoot: Wilkinson degree 14 numerically, error below 1E-12")
+        .test(CLEAR, "NumericalResults ",
+              "[1 -105 5005 -143325 2749747 -37312275 368411615 "
+              "-2681453775 14409322928 -56663366760 159721605680 "
+              "-310989260400 392156797824 -283465647360 87178291200]"
+              " PRoot SORT [1 2 3 4 5 6 7 8 9 10 11 12 13 14] - ABS ΣLIST "
+              "1E-12 <", ENTER)
+        .expect("True")
+        .test(CLEAR, "SymbolicResults", ENTER)
+        .noerror();
+    step("Zeros: Wilkinson polynomial of degree 14")
+        .test(CLEAR,
+              "[1 -105 5005 -143325 2749747 -37312275 368411615 "
+              "-2681453775 14409322928 -56663366760 159721605680 "
+              "-310989260400 392156797824 -283465647360 87178291200]"
+              " 'X' PEval 'X' Zeros", ENTER)
+        .expect("{ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 }");
+    step("PRoot: Wilkinson polynomial of degree 20 has exact roots")
+        .test(CLEAR,
+              "[1 -210 20615 -1256850 53327946 -1672280820 40171771630 "
+              "-756111184500 11310276995381 -135585182899530 "
+              "1307535010540395 -10142299865511450 63030812099294896 "
+              "-311333643161390640 1206647803780373360 "
+              "-3599979517947607200 8037811822645051776 "
+              "-12870931245150988800 13803759753640704000 "
+              "-8752948036761600000 2432902008176640000]"
+              " PRoot SORT", LENGTHY(3000), ENTER)
+        .expect("[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 ]");
+    step("PRoot: Wilkinson degree 20 numerically, total error below 0.05")
+        .test(CLEAR, "NumericalResults ",
+              "[1 -210 20615 -1256850 53327946 -1672280820 40171771630 "
+              "-756111184500 11310276995381 -135585182899530 "
+              "1307535010540395 -10142299865511450 63030812099294896 "
+              "-311333643161390640 1206647803780373360 "
+              "-3599979517947607200 8037811822645051776 "
+              "-12870931245150988800 13803759753640704000 "
+              "-8752948036761600000 2432902008176640000]"
+              " PRoot SORT "
+              "[1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20] - "
+              "ABS ΣLIST 0.05 <", LENGTHY(3000), ENTER)
+        .expect("True")
+        .test(CLEAR, "SymbolicResults", ENTER)
+        .noerror();
+    step("PRoot: x^21-1 has 21 roots")
+        .test(CLEAR, "[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -1] "
+              "PRoot DUP SIZE", LENGTHY(5000), ENTER)
+        .expect("{ 21 }")
+        .test(BSP, "« 21 ^ 1 - ABS →NUM » MAP ΣLIST 1E-15 <", ENTER)
+        .expect("True");
+    step("PRoot: (x-1)^8 gives eight exact roots 1")
+        .test(CLEAR, "[1 -8 28 -56 70 -56 28 -8 1] PRoot DUP SIZE", ENTER)
+        .expect("{ 8 }")
+        .test(BSP, "« 1 - ABS » MAP ΣLIST", ENTER)
+        .expect("0");
+    step("Zeros: (x-1)^8 lists the root once")
+        .test(CLEAR, "'(X-1)^8' 'X' Zeros", ENTER)
+        .expect("{ 1 }");
+    step("PRoot: (x-2)^3·(x+3)^4 keeps multiplicities")
+        .test(CLEAR, "[1 6 -6 -80 -15 378 108 -648] PRoot SORT", ENTER)
+        .expect("[ -3 -3 -3 -3 2 2 2 ]");
+    step("Zeros: (x-2)^3·(x+3)^4 lists each root once")
+        .test(CLEAR, "'X^7+6*X^6-6*X^5-80*X^4-15*X^3+378*X^2+108*X-648' "
+              "'X' Zeros", ENTER)
+        .expect("{ -3 2 }");
+    step("PRoot: roots ±1E20 of x^2-1E40")
+        .test(CLEAR, "[1 0 -1E40] PRoot SORT", ENTER)
+        .expect("[ -1.⁳²⁰ 1.⁳²⁰ ]");
+    step("PRoot: degree 10 with coefficients from 1E10 to 1E-10")
+        .test(CLEAR, "[1E10 0 0 0 0 0 0 0 0 0 -1E-10] PRoot DUP SIZE", ENTER)
+        .expect("{ 10 }")
+        .test(BSP, "DUP « ABS 0.01 - ABS » MAP ΣLIST 1E-13 <", ENTER)
+        .expect("True")
+        .test(BSP,
+              "« [1E10 0 0 0 0 0 0 0 0 0 -1E-10] SWAP PEval ABS » MAP "
+              "ΣLIST 1E-19 <", ENTER)
+        .expect("True");
+    step("PRoot: x^16+1 has 16 complex roots on the unit circle")
+        .test(CLEAR, "[1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1] PRoot DUP SIZE",
+              ENTER)
+        .expect("{ 16 }")
+        .test(BSP, "DUP « ABS 1 - ABS →NUM » MAP ΣLIST 1E-16 <", ENTER)
+        .expect("True")
+        .test(BSP, "« 16 ^ 1 + ABS →NUM » MAP ΣLIST 1E-15 <", ENTER)
+        .expect("True");
+    step("PRoot: x^12-1 with decimal coefficients has 12 roots")
+        .test(CLEAR, "[1. 0 0 0 0 0 0 0 0 0 0 0 -1.] PRoot DUP SIZE", ENTER)
+        .expect("{ 12 }")
+        .test(BSP, "« 12 ^ 1 - ABS →NUM » MAP ΣLIST 1E-20 <", ENTER)
+        .expect("True");
+    step("PRoot: degree 5 with bignum coefficients, roots 1 to 10000")
+        .test(CLEAR, "[1 -11111 11222110 -1122211000 11111000000 "
+              "-10000000000] PRoot SORT", ENTER)
+        .expect("[ 1 10 100 1 000 10 000 ]");
+    step("Zeros: degree 5 with bignum coefficients, roots 1 to 10000")
+        .test(CLEAR, "[1 -11111 11222110 -1122211000 11111000000 "
+              "-10000000000] 'X' PEval 'X' Zeros", ENTER)
+        .expect("{ 1 10 100 1 000 10 000 }");
+    step("PRoot: degree 5 with 1E30 decimal coefficients, roots 1 to 1E12")
+        .test(CLEAR, "[1. -1.001001001001E12 1.001002002002001001E21 "
+              "-1.001002002002001001E27 1.001001001001E30 -1.E30] "
+              "PRoot SORT", ENTER)
+        .expect("[ 1 1 000 1 000 000 1 000 000 000 1 000 000 000 000 ]");
+    step("PRoot: decimal quadratic with a 1E21 coefficient")
+        .test(CLEAR, "[1. -1.E21 0.] PRoot SORT", ENTER)
+        .expect("[ 0 1.⁳²¹ ]");
+    step("PRoot: quadratic with a 22-digit bignum coefficient")
+        .test(CLEAR, "[1 -1000000000000000000000 0] PRoot SORT", ENTER)
+        .expect("[ 0 1.⁳²¹ ]");
+    step("PRoot: degree 5 with 31-digit bignum coefficients")
+        .test(CLEAR, "[1 -1001001001001 1001002002002001001000 "
+              "-1001002002002001001000000000 "
+              "1001001001001000000000000000000 "
+              "-1000000000000000000000000000000] PRoot SORT", ENTER)
+        .expect("[ 1 1 000 1 000 000 1 000 000 000 1 000 000 000 000 ]");
+    step("PRoot: tiny leading coefficient keeps the small root")
+        .test(CLEAR, "[1E-30 1 1] PRoot SORT", ENTER)
+        .expect("[ -1.⁳³⁰ -1 ]");
+    step("PRoot: complex cubic leaves ERRM empty")
+        .test(CLEAR, "ERR0 [1 2 3 4] PRoot DROP ERRM", ENTER)
+        .expect("\"\"");
+    step("PRoot: x^3-1 leaves ERRM empty")
+        .test(CLEAR, "ERR0 [1 0 0 -1] PRoot DROP ERRM", ENTER)
+        .expect("\"\"");
+    step("Zeros: x^3-1 with ComplexResults leaves ERRM empty")
+        .test(CLEAR, "ERR0 ComplexResults 'X^3-1' 'X' Zeros DROP ERRM", ENTER)
+        .expect("\"\"")
+        .test(CLEAR, "'ComplexResults' PURGE", ENTER);
     step("PEval: coefficient vector")
         .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
         .expect("0");

@@ -697,6 +697,31 @@ algebraic_p rectangular::is_real() const
 }
 
 
+static algebraic_p strip_outer_neg(expression_r expr)
+// ----------------------------------------------------------------------------
+//   Return the argument of an expression like '-X' without computing
+// ----------------------------------------------------------------------------
+//   Using arithmetic negation here would simplify the expression while
+//   rendering, which can be slow and consume keystrokes through
+//   program::interrupted(), e.g. for the conjugate roots built by PRoot
+{
+    size_t   size  = 0;
+    object_p first = expr->objects(&size);
+    object_p last  = nullptr;
+    size_t   count = 0;
+    for (object_p o : *expr)
+    {
+        last = o;
+        count++;
+    }
+    if (!last || last->type() != object::ID_neg || count < 2)
+        return nullptr;
+    size_t  len   = last - first;
+    gcbytes bytes = byte_p(first);
+    return rt.make<expression>(object::ID_expression, bytes, len);
+}
+
+
 RENDER_BODY(rectangular)
 // ----------------------------------------------------------------------------
 //   Render a complex number in rectangular form
@@ -709,12 +734,18 @@ RENDER_BODY(rectangular)
         return r.printf("Invalid rectangular");
     bool ifirst = r.editing() || Settings.ComplexIBeforeImaginary();
     bool neg  = im->is_negative(false);
-    if (expression_p expr = im->as<expression>())
-        if (object_p obj = expr->outermost_operator())
-            if (obj->type() == ID_neg)
-                neg = true;
     if (neg)
+    {
         im = -im;
+    }
+    else if (expression_g expr = im->as<expression>())
+    {
+        if (algebraic_p arg = strip_outer_neg(expr))
+        {
+            im = arg;
+            neg = true;
+        }
+    }
     if (!re->is_zero(false))
     {
         re->render(r);
