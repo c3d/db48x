@@ -1380,7 +1380,18 @@ COMPLEX_BODY(atan)
 {
     // atan(z) = -i/2 ln((i-z) / (i + z))
     complex_g i = complex::make(0,1);
-    return complex::ln((i - z) / (i + z)) / complex_g(complex::make(0,2));
+    complex_g d = i + z;
+    if (!d)
+        return nullptr;
+    if (d->is_zero())
+    {
+        rt.domain_error();      // atan(-ⅈ), like atan(ⅈ)
+        return nullptr;
+    }
+    complex_g q = (i - z) / d;
+    if (!q)
+        return nullptr;
+    return complex::ln(q) / complex_g(complex::make(0,2));
 }
 
 

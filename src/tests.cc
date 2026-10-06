@@ -5930,6 +5930,11 @@ void tests::complex_functions()
     test(CLEAR, "9.+2ⅈ", ID_atan)
         .expect("1.46524 96601 83523 3458+0.02327 26057 66502 98838ⅈ");
 
+    step("Arc tangent at the singular points ±ⅈ")
+        .test(CLEAR, "ⅈ ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-ⅈ ATAN", ENTER).error("Argument outside domain");
+
     step("Hyperbolic sine");
     test(CLEAR, "4+2ⅈ", ID_HyperbolicMenu, ID_sinh)
         .expect("-11.35661 27112 18172 906+24.83130 58489 46379 372ⅈ");
