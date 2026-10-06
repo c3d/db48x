@@ -317,6 +317,15 @@ object::result list::list_parse(id      type,
             record(list_parse,
                    "Item parsed as %t length %u arity %u",
                    object_p(obj), length, arity);
+
+            // An operand directly following an operand, e.g. '2 3' or
+            // '(X+1)2', is a syntax error. Names and parentheses following
+            // an operand were already turned into implicit multiplication
+            if (obj && precedence < 0 && !alist && !obj->precedence())
+            {
+                rt.syntax_error().source(s, length);
+                return ERROR;
+            }
         }
         if (!obj)
             return ERROR;

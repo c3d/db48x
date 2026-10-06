@@ -1261,6 +1261,23 @@ void tests::editor_operations()
         .test(CLEAR, "'A²(A-B)'", ENTER).expect("'A²·(A-B)'")
         .test(CLEAR, "'(A+B)ln(C)(A-B)'", ENTER).expect("'(A+B)·(ln C·(A-B))'")
         .test(CLEAR, "'(A)(B)(C)'", ENTER).expect("'A·(B·C)'");
+    step("Implicit multiplication still accepted")
+        .test(CLEAR, "'2(X+1)'", ENTER).expect("'2·(X+1)'")
+        .test(CLEAR, "'(X+1)(X-1)'", ENTER).expect("'(X+1)·(X-1)'")
+        .test(CLEAR, "'2π'", ENTER).expect("'2·π'")
+        .test(CLEAR, "'A B'", ENTER).expect("'A·B'")
+        .test(CLEAR, "'2SIN(X)'", ENTER).expect("'2·sin X'")
+        .test(CLEAR, "'3E2X'", ENTER).expect("'300.·X'")
+        .test(CLEAR, "'X2'", ENTER).expect("'X2'")
+        .test(CLEAR, "'X(1)'", ENTER).expect("'X(1)'");
+    step("Number following an operand is a syntax error")
+        .test(CLEAR, "'2 3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X 2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'(X+1)2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'SIN(X)2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X²2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'2!3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X(1)2'", ENTER).error("Syntax error");
 
     step("Graphical rendering of integrals - Simple expression")
         .test(CLEAR, "'integrate(A;B;sin(X);X)'", ENTER, EXIT)
