@@ -176,6 +176,27 @@ fraction_p fraction::make(integer_r n, integer_r d)
 }
 
 
+algebraic_p fraction::simplify(fraction_r f)
+// ----------------------------------------------------------------------------
+//   Turn a fraction with a unit denominator into the equivalent integer
+// ----------------------------------------------------------------------------
+{
+    if (!f)
+        return nullptr;
+    id ty = f->type();
+    if (ty == ID_fraction || ty == ID_neg_fraction)
+    {
+        if (f->denominator_value() == 1)
+            return f->numerator(0);
+        return f;
+    }
+    bignum_g d = f->denominator();
+    if (d && d->is(1))
+        return bignum::smaller(f->numerator());
+    return f;
+}
+
+
 bignum_p fraction::numerator() const
 // ----------------------------------------------------------------------------
 //   Return the numerator as an integer
@@ -343,8 +364,8 @@ algebraic_p fraction_wrapper(algebraic_r x, algebraic_r y)
 {
     fraction_r xb = (fraction_r) x;
     fraction_r yb = (fraction_r) y;
-    fraction_p rb = code(xb, yb);
-    return rb;
+    fraction_g rb = code(xb, yb);
+    return fraction::simplify(rb);
 }
 
 

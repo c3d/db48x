@@ -95,6 +95,7 @@ struct fraction : algebraic
     }
 
     static fraction_p make(integer_r n, integer_r d);
+    static algebraic_p simplify(fraction_r f);
     static algebraic_p make(ularge n, ularge d)
     {
         return d == 1 ? algebraic_p(integer::make(n))

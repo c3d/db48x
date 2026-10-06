@@ -1037,7 +1037,7 @@ range is ±2/(3√3):
 
 ```rpl
 'x^2' '10±10%' →Num ⓁΔRf
-@ Expecting 101.±20.
+@ Expecting 101±20
 ```
 
 
