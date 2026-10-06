@@ -505,6 +505,59 @@ array_p operator-(array_r x)
 //
 // ============================================================================
 
+static algebraic_p laplace_determinant(size_t n, size_t row, ularge used)
+// ----------------------------------------------------------------------------
+//   Division-free cofactor expansion for the rows from 'row' downwards
+// ----------------------------------------------------------------------------
+//   The n x n matrix elements are on the stack, accessed as in determinant()
+//   'used' is the bit mask of columns already consumed by upper rows.
+//   This is O(n!) but only used for symbolic matrices, which are small,
+//   and avoids leaving uncancelled divisors in the symbolic result.
+{
+    algebraic_g det;
+    bool        neg = false;
+    size_t      nn  = n * n;
+    for (size_t c = 0; c < n; c++)
+    {
+        if (used & (ularge(1) << c))
+            continue;
+        if (program::interrupted())
+            return nullptr;
+
+        bool     tneg = neg;
+        size_t   ix   = row * n + c;
+        object_p e    = rt.stack(nn + ~ix);
+        neg = !neg;
+        if (!e)
+            return nullptr;
+        if (e->is_zero(false))
+            continue;
+        algebraic_g term = e->as_algebraic();
+        if (!term)
+            return nullptr;
+        if (row + 1 < n)
+        {
+            algebraic_g minor =
+                laplace_determinant(n, row + 1, used | (ularge(1) << c));
+            if (!minor)
+                return nullptr;
+            if (minor->is_zero(false))
+                continue;
+            term = term * minor;
+        }
+        if (det)
+            det = tneg ? det - term : det + term;
+        else
+            det = tneg ? -term : term;
+        if (!det)
+            return nullptr;
+    }
+    if (!det)
+        det = integer::make(0);
+    return det;
+}
+
+
 algebraic_p array::determinant() const
 // ----------------------------------------------------------------------------
 //   Compute the determinant of a square matrix
@@ -526,6 +579,19 @@ algebraic_p array::determinant() const
         size_t      px  = n * n + n;
         bool        neg = false;
         algebraic_g tot;
+
+        // Symbolic matrices: use division-free cofactor expansion
+        bool symbolic = false;
+        for (size_t i = 0; !symbolic && i < n * n; i++)
+            if (object_p e = rt.stack(i))
+                symbolic = e->is_symbolic();
+        if (symbolic && n < 8 * sizeof(ularge))
+        {
+            record(matrix, "Symbolic determinant of %ux%u matrix", n, n);
+            det = laplace_determinant(n, 0, 0);
+            rt.drop(rt.depth() - depth);
+            return det;
+        }
 
         // Make space for temporary elements
         for (size_t j = 0; j < n; j++)
@@ -698,7 +764,8 @@ algebraic_p array::determinant() const
 
         // Return result
         rt.drop(rt.depth() - depth);
-        det = det / tot;
+        if (tot)
+            det = det / tot;
         if (neg)
             det = -det;
         record(matrix, "Result det=%t", +det);
