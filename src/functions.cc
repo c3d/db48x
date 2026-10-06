@@ -346,7 +346,21 @@ algebraic_p function::evaluate_noclean(algebraic_r xr, id op, ops_t ops)
     {
         rt.clear_error();
         complex_g z = rectangular::make(x, integer::make(0));
-        result = ops.zop(z);
+        z = ops.zop(z);
+
+        // Complex inverse trigonometric functions return radians, but the
+        // real input expects a result in the current angle mode
+        if (z && ((op >= ID_asin && op <= ID_atan) ||
+                  (op >= ID_asec && op <= ID_acot)))
+        {
+            angle_unit  amode = Settings.AngleMode();
+            algebraic_g re    = z->re();
+            algebraic_g im    = z->im();
+            re = convert_angle(re, ID_Rad, amode, false, false);
+            im = convert_angle(im, ID_Rad, amode, false, false);
+            z = rectangular::make(re, im);
+        }
+        result = z;
     }
 
     return result;
@@ -1310,9 +1324,13 @@ NFUNCTION_BODY(xroot)
             is_neg = y->is_negative(false);
             if (is_neg && !is_odd)
             {
-                // Root of a negative number
-                rt.domain_error();
-                return nullptr;
+                // Even root of a negative number: principal complex value
+                if (!Settings.ComplexResults())
+                {
+                    rt.domain_error();
+                    return nullptr;
+                }
+                is_neg = false;
             }
         }
 
