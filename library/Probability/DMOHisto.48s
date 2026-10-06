@@ -1,0 +1,73 @@
+«
+@@ DMOHisto — demo of the Probability section: a law drawn at random
+@@ among nine, with random parameters; 300 values drawn from it by its
+@@ Rand entry into ΣData, their histogram in gray (HistogramPlot), and
+@@ the density of the law over it, scaled to the counts, in black.
+@@ Press again for a new law. The draws stay in ΣData.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  300 RAND 9 * IP R→I 1 +
+  → dhhcount dhhk
+  «
+    @ The law and its parameters
+    Case
+      dhhk 1 == Then "Norml" 0 RAND 1.5 * 0.5 + 2 RND 2 →List End
+      dhhk 2 == Then "LgNrm" 0 RAND 0.5 * 0.3 + 2 RND 2 →List End
+      dhhk 3 == Then "Expon" RAND 1.5 * 0.5 + 2 RND 1 →List End
+      dhhk 4 == Then "Weibl" RAND 2.5 * 1 + 1 RND 1 2 →List End
+      dhhk 5 == Then "TriSym" 0 RAND 2 * 1 + 1 RND 2 →List End
+      dhhk 6 == Then "UShape" 0 1 2 →List End
+      dhhk 7 == Then "Rayleigh" RAND 1.5 * 0.5 + 2 RND 1 →List End
+      dhhk 8 == Then "Logis" 0 RAND 0.5 + 2 RND 2 →List End
+      "Chi2" RAND 6 * IP R→I 2 + 1 →List
+    End
+    → dhhn dhhp
+    «
+      @ The parameters as text: "a b " for Rand, "a;b;" for PDF
+      "" "" 1 dhhp Size For dhhi
+        dhhp dhhi Get →Text
+        → dhhv « Swap dhhv + " " + Swap dhhv + ";" + »
+      Next
+      → dhhr dhhs
+      «
+        ClΣ
+        "« 1 " dhhcount →Text + " Start " + dhhr + "Ⓛ" + dhhn + "Rand Σ+ Next »" + Str→ Eval
+        MinΣ MaxΣ
+        → dhhlo dhhhi
+        «
+          dhhhi dhhlo - 0.05 *
+          → dhhm
+          «
+            dhhlo dhhm - dhhhi dhhm +
+            → dhha dhhb
+            «
+              dhhb dhha - 25 /
+              "« → dhhx « " dhhr + "dhhx Ⓛ" + dhhn + "PDF » »" + Str→
+              → dhhw dhhpdf
+              «
+                @ The highest density over the range, for the vertical scale
+                0 0 60 For dhhj
+                  dhha dhhb dhha - dhhj * 60 / + 'dhhpdf' Rcl Eval Max
+                Next
+                dhhcount dhhw * * 1.35 *
+                → dhhy
+                «
+                  @ 25 bins of width dhhw, whatever the StatsPlotBins setting
+                  dhha dhhb XRange dhhy -40 / dhhy YRange dhhw Res
+                  RclΣ 0.5 Gray Foreground HistogramPlot 'Foreground' Purge
+                  2 LineWidth
+                  "'" dhhcount →Text + "*" + dhhw →Text + "*Ⓛ" + dhhn + "PDF(" + dhhs + "X)'" + Str→
+                  FunctionPlot 'LineWidth' Purge
+                  dhhn "Rand " + dhhr + "— " + dhhcount →Text + " draws" +
+                  { #0d #2d 0 true false } DrawText
+                  'PPAR' Purge
+                  dhhn dhhp 2 →List "law" →Tag
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»

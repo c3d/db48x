@@ -140,10 +140,51 @@ entries that answer with names rather than bare numbers.
 Parameters go first and the varying argument last, bare or bundled in a list of
 the right length, whose length is checked before anything is computed.
 
+A first submenu, [LawDemos](#lawdemoslibrary), shows the laws at work on random
+draws.
+
 Three of these laws are not only models but instruments: [Student](#studentlibrary)
 measures means, [Chi2](#chi2library) measures counts and variances, and
 [Fisher](#fisherlibrary) compares variances. The tests that use them are in the
 StatTests section — see [StatTests](#stattestslibrary).
+
+## LawDemosLibrary
+
+Demonstrations of the distributions on random draws, a new case at each press.
+Seed the generator with RDZ to replay one.
+
+* DMOHisto: a law at random, its histogram and its density.
+
+
+## DMOHisto
+
+A law drawn at random among nine — Norml, LgNrm, Expon, Weibl, TriSym, UShape,
+Rayleigh, Logis and Chi2 — with random parameters. Three hundred values are
+drawn from it by its Rand entry into ΣData, their histogram is drawn in gray
+by HistogramPlot, in 25 classes, and the density of the law is drawn over it in
+black, by FunctionPlot, scaled to the counts: 300 times the width of a class
+times the density. The name of the law and its parameters are written above,
+and returned on the stack. The draws stay in ΣData, for MeanΣ or SDevΣ.
+
+**1)** A law and its histogram, reproducible with the seed:
+
+```rpl
+1 RDZ ⓁDMOHisto
+```
+
+**2)** Another one:
+
+```rpl
+4 RDZ ⓁDMOHisto
+```
+
+The bars wander around the curve: with 300 draws, a class that should hold
+12 values holds about 12 ± 3.5, the square root of 12. More draws make the
+histogram closer to the density, in 1/√N. The arc sine law (UShape), with its
+two peaks at the ends, and the exponential law, with its long tail, are the
+most striking. Gamma and Beta are not among the nine: their draws, by
+inversion, are too slow for a demonstration.
+
 
 ## NormlLibrary
 

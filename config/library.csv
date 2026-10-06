@@ -19,6 +19,10 @@
 
 "Probability"
 
+"Probability/LawDemos"
+
+	"DMOHisto",	"=/library/Probability/DMOHisto.48s"
+
 "Probability/Norml"
 
 	"NormlPDF",	"=/library/Probability/NormlPDF.48s"
