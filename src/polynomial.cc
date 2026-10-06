@@ -2357,7 +2357,11 @@ COMMAND_BODY(PEval)
         {
             size_t       sz = polynomial::expand(pobj, true);
             if (!sz)
+            {
+                if (!rt.error())
+                    rt.type_error();
                 return ERROR;
+            }
             stack_buffer s(sz);
             algebraic_p result = polynomial::horner(s, x);
             s.cleanup();
@@ -2365,6 +2369,8 @@ COMMAND_BODY(PEval)
                 return OK;
         }
     }
+    if (!rt.error())
+        rt.type_error();
     return ERROR;
 }
 
