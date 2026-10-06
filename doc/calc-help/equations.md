@@ -3431,6 +3431,33 @@ LNose=405_mm  dN=205_mm  dF=205_mm  dR=165_mm  LT=125_mm  XP=905_mm  CR=245_mm  
 
 ## Astronautics
 
+### Geocentric
+
+Earth-centred orbits, in two submenus: [Stationary](#geocentric-/-stationary),
+for orbits of fixed geometry, and [Trajectory](#geocentric-/-trajectory), for
+transfers between circular orbits.
+
+### Heliocentric
+
+Sun-centred orbits, in two submenus: [Stationary](#heliocentric-/-stationary),
+for stationary conditions and libration points, and
+[Trajectory](#heliocentric-/-trajectory), for interplanetary transfers and
+mission analysis.
+
+### Stationary
+
+Two submenus of Astronautics are named Stationary:
+[Geocentric / Stationary](#geocentric-/-stationary), for Earth-centred orbits
+of fixed geometry, and [Heliocentric / Stationary](#heliocentric-/-stationary),
+for Sun-referenced stationary conditions and libration points.
+
+### Trajectory
+
+Two submenus of Astronautics are named Trajectory:
+[Geocentric / Trajectory](#geocentric-/-trajectory), for transfers between
+circular Earth orbits, and [Heliocentric / Trajectory](#heliocentric-/-trajectory),
+for interplanetary transfers and mission analysis.
+
 ### Geocentric / Stationary
 
 Earth-centered (`♁`) orbits of fixed geometry, from the two-body results (circular

@@ -19,6 +19,123 @@ Two of the entries stand for a whole family — the eight planetary element
 functions (`…Φf`) and the six coordinate transforms — and list their
 other members in the entry body.
 
+## AstronomyLibrary
+
+The Astronomy section of the library: ephemerides of the planets and the Moon,
+and the atmospheres of three planets. It has three submenus:
+
+* [Ephemeris Orbital Elements](#ephemeris-orbital-elementslibrary): orbital
+  elements of the planets and the Moon at a given date;
+* [Heliocentric Coords](#heliocentric-coordslibrary): heliocentric positions
+  and velocities, and the coordinate transforms behind them;
+* [Planet Atmospheres](#planet-atmosphereslibrary): temperature, pressure and
+  density versus altitude on the Earth, Mars and Venus.
+
+## Ephemeris Orbital ElementsLibrary
+
+Orbital elements from a Julian Day, as vectors `[a e I L ϖ Ω]`:
+
+* the planets, `☿Φf` to `♆Φf`, documented together in [♁Φf](#♁Φf);
+* the Moon: its elements [☾Φf](#☾Φf), its geocentric position [☾Pos](#☾pos),
+  and its heliocentric position [☾Hf](#☾hf);
+* [PeriSel](#perisel): the date of the lunar perigee nearest a given date;
+* [MSumS](#msums) and [MSumC](#msumc): internal helpers of `☾Pos`.
+
+## Heliocentric CoordsLibrary
+
+Heliocentric ecliptic coordinates, in astronomical units:
+
+* [PosΦf](#posΦf): the position `[x y z]` from an orbital-element vector,
+  through six transforms: [EaΦf](#eaΦf), [νΦf](#νΦf), [rΦf](#rΦf),
+  [uΦf](#uΦf), [λΦf](#λΦf) and [βΦf](#βΦf);
+* position functions, from a date to a position: [♁Pf](#♁pf), [♂Pf](#♂pf) and
+  [♀Pf](#♀pf);
+* [VΦf](#vΦf): the velocity of a body, from its position function.
+
+## Planet AtmospheresLibrary
+
+Atmosphere profiles versus geometric altitude, in three submenus:
+[Earth](#earthlibrary), [Mars](#marslibrary) and [Venus](#venuslibrary).
+
+## EarthLibrary
+
+The Earth standard atmosphere (U.S. Standard Atmosphere 1976, extended to
+1000 km): temperature [T♁StdAtm](#t♁stdatm), pressure [P♁StdAtm](#p♁stdatm),
+density [ρ♁StdAtm](#ρ♁stdatm) and viscosity [μ♁StdAtm](#μ♁stdatm).
+
+## MarsLibrary
+
+The Mars atmosphere, with separate day (Viking) and night (Pathfinder) models
+below 120 km: [T♂DayAtm](#t♂dayatm), [P♂DayAtm](#p♂dayatm),
+[ρ♂DayAtm](#ρ♂dayatm), [T♂NightAtm](#t♂nightatm), [P♂NightAtm](#p♂nightatm)
+and [ρ♂NightAtm](#ρ♂nightatm).
+
+## VenusLibrary
+
+The Venus atmosphere, a single global model: [T♀Atm](#t♀atm),
+[P♀Atm](#p♀atm) and [ρ♀Atm](#ρ♀atm).
+
+## AstronauticsLibrary
+
+The Astronautics section of the library: distances between bodies and the
+design of interplanetary trajectories. It has two submenus:
+
+* [Flight Parameters](#flight-parameterslibrary): distances, closest
+  approaches and sidereal time;
+* [Trajectory](#trajectorylibrary): orbit transfers, Lambert's problem, launch
+  windows and gravity assists.
+
+## Flight ParametersLibrary
+
+* The distance between two bodies: [DABf](#dabf) from their element
+  functions, [DAToB](#datob) from two positions, and [DEarthToA](#dearthtoa)
+  from the Earth.
+* The date of closest approach: [T₀SDAToB](#t₀sdatob), and
+  [T₀SDEarthToA](#t₀sdearthtoa) from the Earth.
+* [θs](#θs): the mean sidereal time.
+
+## TrajectoryLibrary
+
+* Transfers between circular orbits: [Hohmann](#hohmann) and
+  [BiElliptic](#bielliptic); capture into orbit: [TrToOrbi](#trtoorbi).
+* Lambert's problem: [LambertU](#lambertu), with its helpers
+  [StumpC](#stumpc), [StumpS](#stumps) and [LamUF](#lamuf); from a state
+  vector to orbital elements: [rv2coe](#rv2coe).
+* The cost of an interplanetary transfer, [TrCost](#trcost), and its
+  optimisation: [MinTofDV](#mintofdv), [MinΔVTraj](#minΔvtraj),
+  [aTr](#atr), [MinΔDTraj](#minΔdtraj) and [MinΔtTraj](#minΔttraj), whose
+  search depth is set by [AstronTXPrecision](#astrontxprecision).
+* [GAssist](#gassist): a gravity assist.
+
+## AstroExamplesLibrary
+
+Four short programs showing how to build your own RPL program from the
+astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
+computes a value for today's date, displays it and leaves it tagged on the
+stack. They are meant to be read and adapted.
+
+### LightTime
+
+The one-way light time (OWLT) and round-trip time (RTT) from the Earth to a
+planet today: the Earth-to-planet distance, from [DAToB](#datob), divided by
+the speed of light.
+
+### Elongation
+
+The elongation of a planet today: the angle Sun-Earth-planet, that is how far
+from the Sun the planet appears in the sky. A small elongation means the
+planet is hard to see.
+
+### ApparentSize
+
+The apparent diameter of a planet today, in arcseconds: its equatorial radius
+over its distance from the Earth.
+
+### SkyCoords
+
+The geocentric equatorial coordinates of a planet today: right ascension, in
+hours, and declination, in degrees.
+
 ---
 
 ## ♁Φf
