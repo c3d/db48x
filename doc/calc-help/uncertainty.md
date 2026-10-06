@@ -1125,6 +1125,7 @@ replay the same sequence.
 
 * DMOΔConcord: two bounded intervals, compared by ΔConcord;
 * DMOσConcord: two measurements of the same quantity, compared by σConcord.
+* DMOExmnF2D: a narrow peak at random, examined by ExmnF2D.
 
 
 ## DMOΔConcord
@@ -1170,6 +1171,33 @@ alone does not prove a disagreement.
 ```rpl
 ⓁDMOσConcord
 ```
+
+
+## DMOExmnF2D
+
+A narrow peak at a random place of the box 0…3 × 0…3, with a random height
+between 1 and 3 and a random width, on a gentle slope from 1 to 1.9:
+1 + x1·x2/10 + h·exp(−((x1 − a)² + (x2 − b)²)/w). ExmnF2D examines it, and the
+demonstration returns, below its result, the summit (a, b), the true maximum
+1 + a·b/10 + h, and whether the search found it.
+
+**1)** A peak missed: the search gives the corner value 1.9, but the contours ring the summit and a hollow triangle marks it.
+
+```rpl
+1 RDZ ⓁDMOExmnF2D
+```
+
+**2)** A peak found, near the centre of the box:
+
+```rpl
+4 RDZ ⓁDMOExmnF2D
+```
+
+Over forty presses, the search found six peaks, about one in six. It
+starts from the centre and from the best vertex and follows lines parallel to
+the axes: it finds the peaks close to those lines. The others are not lost:
+they show as rings of contours with a hollow triangle at their centre, and a
+smaller box around them finds them, as in examples 6) and 7) of ExmnF2D.
 
 
 ## GUMS1Library

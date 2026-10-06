@@ -1,0 +1,23 @@
+«
+@@ DMOTPower — demo of the power of TTest1: ten values drawn from a
+@@ normal law of mean 10.5 and standard deviation 1, tested against
+@@ μ₀ = 10. H₀ is false, yet with ten values the shift of half a
+@@ standard deviation is detected only about three presses in ten.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  10 0 0
+  → dtn dt1 dt2
+  «
+    1 dtn For dti
+      10.5 1 ⓁNormlRand
+      Dup dt1 + 'dt1' Store Sq dt2 + 'dt2' Store
+    Next
+    dt1 dtn / dt2 dt1 Sq dtn / - dtn 1 - / √
+    → dtm dts
+    «
+      dtm "mean" →Tag dts "s" →Tag
+      dtn dtm dts 10 ⓁTTest1
+      Dup DeleteTag 0.05 < "H₀ rejected: the shift is detected" "H₀ kept: the shift is missed" IFTE "verdict" →Tag
+    »
+  »
+»

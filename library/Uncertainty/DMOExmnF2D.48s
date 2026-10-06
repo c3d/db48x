@@ -1,0 +1,25 @@
+«
+@@ DMOExmnF2D — demo of ExmnF2D: a narrow peak of random position,
+@@ height and width on a gentle slope over the box 0…3 × 0…3. Returns
+@@ the result of ExmnF2D, the summit, the true maximum, and whether
+@@ the search found it. Press again for a new peak.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  RAND 2.4 * 0.3 + 2 Round RAND 2.4 * 0.3 + 2 Round
+  RAND 2 * 1 + 1 Round RAND 0.045 * 0.005 + 3 Round
+  → dpa dpb dph dpw
+  «
+    "'1+x1*x2/10+" dph →Text + "*exp(-((x1-" + dpa →Text + ")^2+(x2-" + dpb →Text +
+    ")^2)/" + dpw →Text + ")'" + Str→
+    1.5±1.5 1.5±1.5 ⓁExmnF2D
+    @ The true maximum is the summit: 1 + a·b/10 + h, above the corner value 1.9
+    1 dpa dpb * 10 / + dph +
+    → dres dtm
+    «
+      dres
+      dpa dpb 2 →List "summit" →Tag
+      dtm "true max" →Tag
+      dres Explode + dtm 0.99 * ≥ "found" "missed" IFTE "peak" →Tag
+    »
+  »
+»
