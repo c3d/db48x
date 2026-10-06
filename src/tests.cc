@@ -8321,6 +8321,23 @@ void tests::matrix_functions()
     step("Column norm for vector")
         .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_ColumnNorm)
         .expect("6");
+
+    step("Inverse of fraction matrix has normalized integers")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV", ENTER)
+        .want("[[ 12 -20 ] [ -15 30 ]]")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV [[12 -20][-15 30]] ==", ENTER)
+        .expect("True")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV { 2 1 } GET -15 ==", ENTER)
+        .expect("True");
+    step("Fraction result with unit denominator is an integer")
+        .test(CLEAR, "-1/4 1/60 / -15 ==", ENTER)
+        .expect("True")
+        .test(CLEAR, "-1/4 1/60 / TYPENAME", ENTER)
+        .expect("\"neg_integer\"");
+    step("LU factors multiply back to the same object")
+        .test(CLEAR, "[[1 2][3 4]] LU ROT ROT * SWAP [[1 2][3 4]] * SAME",
+              ENTER)
+        .expect("True");
 }
 
 

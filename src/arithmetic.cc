@@ -1628,13 +1628,9 @@ algebraic_p arithmetic::evaluate(id          op,
             {
                 if (ops.fraction_ok(xf, yf))
                 {
-                    x = algebraic_p(fraction_p(xf));
-                    if (x)
-                    {
-                        bignum_g d = xf->denominator();
-                        if (d->is(1))
-                            return algebraic_p(bignum_p(xf->numerator()));
-                    }
+                    x = fraction::simplify(xf);
+                    if (x && !x->is_fraction())
+                        return x;
                     if (Settings.NumericalResults())
                         (void) to_decimal(x, true);
                     return x;
