@@ -1109,20 +1109,41 @@ COMMAND_BODY(Copy)
 }
 
 
+static bool is_variable_name(object_p obj)
+// ----------------------------------------------------------------------------
+//   Check if an object is a (possibly quoted) variable name
+// ----------------------------------------------------------------------------
+{
+    if (object_p quoted = obj->as_quoted(object::ID_object))
+        obj = quoted;
+    object::id ty = obj->type();
+    return ty == object::ID_symbol || ty == object::ID_local;
+}
+
+
 static object::result store_op(object::id op)
 // ----------------------------------------------------------------------------
 //   Store with a given operation
 // ----------------------------------------------------------------------------
+//   Like legacy RPL, accept both `value 'name' STO-`, which stores
+//   `value - name`, and `'name' value STO-`, which stores `name - value`
 {
     object_g name = rt.stack(0);
     object_g value = rt.stack(1);
     if (!name || !value)
         return object::ERROR;
+    bool name_first = !is_variable_name(name) && is_variable_name(value);
+    if (name_first)
+    {
+        object_g tmp = name;
+        name = value;
+        value = tmp;
+    }
     object_g existing = directory::recall_all(name, true);
     if (!existing)
         return object::ERROR;
-    rt.stack(1, existing);
-    rt.stack(0, value);
+    rt.stack(name_first ? 1 : 0, existing);
+    rt.stack(name_first ? 0 : 1, value);
     object_p cmd = object::static_object(op);
     if (object::result res = cmd->evaluate())
         return res;

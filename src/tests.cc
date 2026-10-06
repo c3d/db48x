@@ -1998,9 +1998,25 @@ void tests::global_variables()
 
     step("Store with arithmetic")
         .test(CLEAR, "12 'A' STO+ A", ENTER).expect("12 357")
-        .test(CLEAR, "13 'A' STO- A", ENTER).expect("12 344")
+        .test(CLEAR, "'A' 13 STO- A", ENTER).expect("12 344")
         .test(CLEAR, "5 'A' STO* A", ENTER).expect("61 720")
-        .test(CLEAR, "2 'A' STO/ A", ENTER).expect("30 860");
+        .test(CLEAR, "'A' 2 STO/ A", ENTER).expect("30 860");
+    step("Store with arithmetic, name first")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO+ B", ENTER).expect("7")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO- B", ENTER).expect("3")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO* B", ENTER).expect("10")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO/ B", ENTER).expect("2 ¹/₂");
+    step("Store with arithmetic, value first")
+        .test(CLEAR, "5 'B' STO 2 'B' STO+ B", ENTER).expect("7")
+        .test(CLEAR, "5 'B' STO 2 'B' STO- B", ENTER).expect("-3")
+        .test(CLEAR, "5 'B' STO 2 'B' STO* B", ENTER).expect("10")
+        .test(CLEAR, "5 'B' STO 2 'B' STO/ B", ENTER).expect("²/₅");
+    step("Store with arithmetic, order for non-commutative add")
+        .test(CLEAR, "{ 1 } 'B' STO 'B' \"x\" STO+ B", ENTER)
+        .expect("{ 1 \"x\" }")
+        .test(CLEAR, "\"y\" 'B' STO+ B", ENTER)
+        .expect("{ \"y\" 1 \"x\" }")
+        .test(CLEAR, "'B' PURGE", ENTER).noerror();
 
     step("Recall with arithmetic")
         .test(CLEAR, "12 'A' RCL+", ENTER).expect("30 872")
