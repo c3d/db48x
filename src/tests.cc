@@ -9587,6 +9587,16 @@ void tests::auto_simplification()
 
     step("Re-enable auto simplification");
     test(CLEAR, "AutoSimplify", ENTER).noerror();
+
+    step("Simplification keeps tiny decimals added to zero")
+        .test(CLEAR, "'1E-30-0' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'")
+        .test(CLEAR, "'1E-30+0' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'")
+        .test(CLEAR, "'0-1E-30' SIMPLIFY", ENTER).expect("'-1.⁳⁻³⁰'")
+        .test(CLEAR, "'1E-30+X-X' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'");
+    step("Decimal zero does not make a tiny operand negligible")
+        .test(CLEAR, "0. 1E-30 -", ENTER).expect("-1.⁳⁻³⁰")
+        .test(CLEAR, "0. 1E-30 +", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 0. -", ENTER).expect("1.⁳⁻³⁰");
 }
 
 

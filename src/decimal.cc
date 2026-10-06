@@ -1602,6 +1602,12 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
         return subtract(x, decimal_g(neg(y)));
     add::remember(target<add>);
 
+    // A zero has no meaningful exponent, so it can't make y negligible
+    if (x->is_zero())
+        return y;
+    if (y->is_zero())
+        return x;
+
     // Read information from both numbers
     info  xi = x->shape();
     info  yi = y->shape();
@@ -1716,6 +1722,12 @@ decimal_p decimal::subtract(decimal_r x, decimal_r y)
     if (xty != yty)
         return add(x, decimal_g(neg(y)));
     subtract::remember(target<subtract>);
+
+    // A zero has no meaningful exponent, so it can't make y negligible
+    if (x->is_zero())
+        return neg(y);
+    if (y->is_zero())
+        return x;
 
     // Read information from both numbers
     info  xi = x->shape();
