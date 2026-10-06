@@ -1818,6 +1818,8 @@ algebraic_p array::norm_square() const
         }
         else if (algebraic_g elem = obj->as_algebraic())
         {
+            if (elem->is_complex())
+                elem = abs::evaluate(elem);
             elem = sq::run(elem);
             sum = sum ? sum + elem : elem;
         }
