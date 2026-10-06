@@ -782,6 +782,8 @@ m1=2E15_kg  m2=2E18_kg  r=1000000_km  ri=1000000_km  rf=5000000_km
 'ROOT(ⒺGravitation Law;[F;UGf;UGi;W];[1_N;1_J;1_J;1_J])'
 ```
 
+### RelativityMassEnergy
+
 ### Relativity Mass Energy
 
 * To calculate `[E_J]` (Relativistic energy) from 1 known variable:
@@ -833,6 +835,8 @@ The 38 variables in the Gases section are:
 * `Z`: Gas compressibility correction factor
 * `Zi`: Initial gas compressibility correction factor
 * `Zf`: Final gas compressibility correction factor
+
+### IdealGas
 
 ### Ideal Gas
 
@@ -1372,6 +1376,8 @@ Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
+#### Escape & Orbital Velocity
+
 #### Escape and Orbital Velocities
 
 The escape velocity is the speed required to completely free oneself from the gravitational field of a star, planet, etc. It is defined as the initial speed allowing you to move away to infinity. The orbital velocity is the speed nneded to maintain a stable circular orbit in a gravitational field.
@@ -1582,6 +1588,8 @@ The 25 variables in the Oscillations section are:
 * `xm`: Displacement amplitude
 * `xh`: Displacement amplitude of harmonic motion
 * `xp`: Resulting displacement amplitude of driven & damped oscillations
+
+#### Mass‐Spring System
 
 #### Mass-Spring System
 
@@ -1837,6 +1845,8 @@ d=14_cm  m=3.75_kg  Id=486.5_lb*in^2
 'ROOT(ⒺSphere;[I;r;V;A];[1_kg*m^2;1_cm;1_cm^3;1_cm^2])'
 ```
 
+
+## Solid State Device
 
 ## Solid State Devices
 The 54 variables in the Solid State Devices section are:
@@ -2622,6 +2632,8 @@ T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964�
 @ Expecting [ fpeak=74.84754 32835 THz f1=106.11256 6547 THz f2=238.75327 4732 THz FrPl12=0.38336 04816 94 FrWn12=0.38088 77248 71 %rFr12=0.64502 13155 81 f3=0.26528 14163 69 THz f4=66.32035 40922 THz FrPl34=0.28402 76245 74 FrWn34=0.22398 47200 01 %rFr34=21.13981 15457 FrPlab=0.64388 90934 2 eb=148 980.70811 W/m↑2 ebfafb=95 927.05308 19 W/m↑2 q=959.27053 0819 W ]
 'ROOT(ⒺPlanck & Wien Comparison;[fpeak;f1;f2;FrPl12;FrWn12;%rFr12;f3;f4;FrPl34;FrWn34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
+
+#### Planck & Rayleigh‐Jeans Comparison
 
 #### Planck & Rayleigh-Jeans Comparison
 
