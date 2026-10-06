@@ -127,7 +127,7 @@ Stack: an interval, or `X` `U`.
 ```
 
 When rounding the uncertainty reaches the next decade, the value follows it —
-and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
+and the result shows why SciRngText exists: the uncertainty
 0.10 is displayed as 0.1.
 
 **5)**
@@ -137,7 +137,8 @@ and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
 @ Expecting 12.35±0.1
 ```
 
-See also: [Rounding](#roundinglibrary).
+See also: [Rounding](#roundinglibrary), [SciRngText](#scirngtext).
+
 
 ## SciRngText
 
@@ -850,8 +851,8 @@ always starts from the guesses: a second ROOT on unknowns that already exist
 does not always solve them again.
 
 The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
-the range of each unknown, see [ΔROOT](#Δroot). For
-the shape of the law of the result, see [DMOPendulum](#dmopendulum), which
+the range of each unknown, see ΔROOT. For
+the shape of the law of the result, see DMOPendulum, which
 draws it by the Monte Carlo method.
 
 **1)** The simple pendulum, its amplitude only known between 60° and 80°: the
@@ -892,6 +893,8 @@ These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
 
+See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+
 
 ## ΔROOT
 
@@ -913,7 +916,7 @@ value of each unknown. When each unknown varies in one direction with each
 input, its extremes lie at corners of the box, and the range is exact. When
 an extreme is only reached inside the box, the tag of that unknown says
 "(inner extremum?)": the true range may be wider, and a narrower box, or
-[Exmnf](#exmnf) on the equation, will tell.
+Exmnf on the equation, will tell.
 
 Afterwards, each input gets back its value, and each unknown holds its value
 at the centre of the box.
@@ -928,7 +931,7 @@ the amplitude.
 @ Expecting { ω:8.08564 57173 6…8.08564 57173 6 r/s Treal:0.83393 48521 94…0.88361 42622 96 s T:0.77707 89775 87…0.77707 89775 87 s f:1.28687 04840 1…1.28687 04840 1 Hz }
 ```
 
-**2)** The capacitor of [σROOT](#σroot), now by bounds: the supply known to
+**2)** The capacitor of σROOT, now by bounds: the supply known to
 ±0.05 V, the resistor to 5 %, the voltage read between 3.28 V and 3.32 V. The
 capacitance is guaranteed within the range found.
 
@@ -951,6 +954,8 @@ largest range is 1 243 ft. The tag warns of it.
 
 The ranges of the first two examples were checked on a grid of eleven levels
 per input: they are exact to the digits shown.
+
+See also: [Exmnf](#exmnf), [σROOT](#σroot).
 
 
 ## ΔRf
@@ -1258,7 +1263,7 @@ correct a value typed in the wrong form, `10±1` for `10±σ1` or the reverse, n
 to convert one into the other. A bound and a standard deviation are not the
 same thing: the true value lies outside ±σ one time in three. To turn a bound
 into a standard deviation, a law must be chosen, a rectangular one dividing the
-half width by √3: [Bound→σ](#bound→σ) does that.
+half width by √3: Bound→σ does that.
 
 The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
 but not when the value carries a unit; Cycling does.
@@ -1304,6 +1309,8 @@ but not when the value carries a unit; Cycling does.
 1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling ⓁCycling
 @ Expecting non-equivalent:1.…2. m
 ```
+
+See also: [Bound→σ](#bound→σ).
 
 
 ## ApplicationsLibrary
@@ -1622,7 +1629,7 @@ uncertainty u that is itself uncertain: for a nearly normal result, its
 relative standard deviation is about 1/√(2M). Ten times more draws make it
 √10 ≈ 3.2 times more precise, at ten times the cost.
 
-S1Converge runs the mass calibration of [S1Mass](#s1mass) with 100, 1 000 and
+S1Converge runs the mass calibration of S1Mass with 100, 1 000 and
 10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
 its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
 the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
@@ -1641,6 +1648,8 @@ enough to give two digits. With 10 000 draws, u is known to 0.7 %, close to the
 two significant digits of the published 0.0754 mg. This is the question that
 the adaptive procedure of the Supplement answers (7.9): draw until the digits
 wanted are stable, which MCPropagate does with M = 0.
+
+See also: [S1Mass](#s1mass).
 
 
 ## ProjectileLibrary
@@ -2198,7 +2207,7 @@ way an input of the equation.
 
 ## DMOPendulum
 
-The two periods of [Simple Pendulum](#Simple Pendulum) in the Equation
+The two periods of Simple Pendulum in the Equation
 Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
 amplitude, and the real period for a large amplitude θmax,
 `Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x))`, with `c(x) = (2x)!/(2^x·x!)²`.
@@ -2244,4 +2253,4 @@ deviation as the Monte Carlo method, since Treal is almost linear in θmax over
 whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws show
 it.
 
-
+See also: [Simple Pendulum](#Simple Pendulum).
