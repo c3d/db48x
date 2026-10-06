@@ -34,7 +34,8 @@ Tools for measured values and their uncertainties, whether written as bounds
   for how two intervals sit on the line.
 * [Functions](#functionslibrary) — propagate uncertainties through a function
   written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
-  [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf) and [Exmnf](#exmnf).
+  [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
+  [Exmnf](#exmnf).
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -610,7 +611,12 @@ the global minimum and maximum of the function.
 * [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
   possibly correlated;
 * [ΔRf](#Δrf): the range of a function of one variable over an interval;
+* [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
+  box;
 * [Exmnf](#exmnf): the drawing of a function over an interval, to check ΔRf.
+* [ExmnFxjxi](#exmnfxjxi) and [ExmnF2D](#exmnf2d): the profile and the plane
+  slice of a function of several variables through its extrema, to check
+  ΔRFxjxi.
 
 Evaluating a function directly on uncertain numbers treats each occurrence of
 a variable as a new, independent variable: x·x does not get the uncertainty
@@ -803,4 +809,130 @@ extrema inside the interval:
 
 ```rpl
 'x^4' 1.10±1.15_m ⓁExmnf
+```
+
+
+## ΔRFxjxi
+
+Interval arithmetic for a function of several variables: the smallest and
+largest values of F over a box, each variable in its own interval.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), where F is an expression of the names x1 … xn
+and each Xj an interval a…b, a±b or a±p%, or a plain number for an exact
+value, with or without units. X1 is on the first level, as for σRFxjxi. The
+result is a…b when all the intervals are a…b, a±b otherwise.
+
+F is first evaluated at the 2ⁿ vertices of the box. A coordinate search then
+starts from the centre and from the best vertex, and improves the minimum and
+the maximum one variable at a time, over its whole interval, until nothing
+improves. This finds an extremum inside the box, on a face or on an edge, one
+per subspace, which is what small intervals call for. It is a search, not a
+proof: a function with many extrema over a wide box could hide one.
+
+**Example 1.** Two occurrences of x1. Evaluated directly, x1·x2 − x1 on
+x1 = 1…2 and x2 = 0…3 gives −2…5; the true range is −2…4:
+
+```rpl
+'x1*x2-x1' 1.5±1.5 1.5±0.5 ⓁΔRFxjxi
+@ Expecting 1.±3.
+```
+
+**Example 2.** A minimum inside the box, at x1 = 1 and x2 = 2:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁΔRFxjxi
+@ Expecting 1±1
+```
+
+**Example 3.** A maximum on an edge, at x1 = 0.5 and x2 = 1:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁΔRFxjxi
+@ Expecting 0.625±0.625
+```
+
+**Example 4.** Small intervals around a point where F changes slowly:
+
+```rpl
+'(x1-1)*(x2-2)*(x1+x2-3)' 2.5±0.1 1.5±0.1 ⓁΔRFxjxi
+@ Expecting 0.28±0.152
+```
+
+**Example 5.** With units and an angle in degrees:
+
+```rpl
+'x2*sin(x1)' 10±1_m 30±5_° ⓁΔRFxjxi
+@ Expecting 5.05645 25777 6±1.25288 82221 m
+```
+
+
+## ExmnFxjxi
+
+Examine a function of several variables over a box: the profile of F along
+the straight segment that joins its global minimum to its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack.
+
+The minimum and the maximum are found as by ΔRFxjxi; the segment that joins
+them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
+points, from the minimum on the left to the maximum on the right. The values
+and the points of both extrema are written below, as { x1 … xn }.
+
+**Example 1.** A maximum on an edge of the box:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁExmnFxjxi
+```
+
+**Example 2.** Several extrema inside a wide box: the minimum −1 is found at
+x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
+
+```rpl
+'sin(x1)*cos(x2)' 3±3_r 3±3_r ⓁExmnFxjxi
+```
+
+
+## ExmnF2D
+
+Examine a function of several variables over a box: the plane slice that
+contains its global minimum and its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack;
+at least two variables must be intervals.
+
+Each variable is scaled to its interval, the box becoming a cube. The slice is
+the plane that contains the segment from the minimum to the maximum, and the
+direction of the variable least involved in that segment, named on the last
+line; the other degrees of freedom are fixed by the plane. Seven contour
+lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
+shape of F, as on a map: close together where F changes fast. The edge of the
+box is drawn too.
+The minimum and the maximum are marked by squares, joined by the segment that
+ExmnFxjxi draws. About a thousand values of F are computed: a few seconds on
+the simulator.
+
+**Example 1.** A minimum inside the box, a maximum at a vertex:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁExmnF2D
+```
+
+**Example 2.** Three variables: the slice cuts the cube along a polygon:
+
+```rpl
+'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
+```
+
+**Example 3.** A saddle: the minimum −1 at x1 = 0, x2 = ±1, the maximum 1 at
+x1 = ±1, x2 = 0, and hyperbolas between them:
+
+```rpl
+'x1^2-x2^2' 0±1 0±1 ⓁExmnF2D
+```
+
+**Example 4.** A bump: the maximum 1 at the origin, inside the box, with
+circles around it, and the minimum at a far corner:
+
+```rpl
+'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
 ```
