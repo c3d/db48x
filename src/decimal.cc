@@ -1469,9 +1469,19 @@ int decimal::compare(decimal_r x, decimal_r y, uint epsilon)
     id   xty = x->type();
     id   yty = y->type();
 
-    // Check negative vs. positive
+    // Check negative vs. positive (-0 and 0 compare equal)
     if (xty != yty)
+    {
+        bool xz = x->is_zero();
+        bool yz = y->is_zero();
+        if (xz && yz)
+            return 0;
+        if (xz)
+            xty = yty == ID_decimal ? ID_neg_decimal : ID_decimal;
+        if (yz)
+            yty = xty == ID_decimal ? ID_neg_decimal : ID_decimal;
         return (xty == ID_decimal) - (yty == ID_decimal);
+    }
 
     // Read information from both numbers
     int  sign = xty == ID_neg_decimal ? -1 : 1;
@@ -1548,10 +1558,12 @@ static inline object::id negtype(object::id type)
 }
 
 
-decimal_p decimal::neg(decimal_r x)
+static decimal_p flip_sign(decimal_r x)
 // ----------------------------------------------------------------------------
-//   Negation
+//   Flip the sign of x, including for zero (internal use by add / subtract)
 // ----------------------------------------------------------------------------
+//   This may build a transient -0, which add() and subtract() rely on to
+//   dispatch correctly; any result they build is normalized to +0
 {
     if (!x)
         return nullptr;
@@ -1560,6 +1572,19 @@ decimal_p decimal::neg(decimal_r x)
     gcbytes data = x->payload();
     size_t len = x->size() - leb128size(type);
     return rt.make<decimal>(ntype, len, data);
+}
+
+
+decimal_p decimal::neg(decimal_r x)
+// ----------------------------------------------------------------------------
+//   Negation - There is no -0 in RPL, so negating zero gives zero
+// ----------------------------------------------------------------------------
+{
+    if (!x)
+        return nullptr;
+    if (x->is_zero())
+        return rt.make<decimal>(ID_decimal, 0, 0, gcp<kint>());
+    return flip_sign(x);
 }
 
 
@@ -1599,7 +1624,7 @@ decimal_p decimal::add(decimal_r x, decimal_r y)
     id xty = x->type();
     id yty = y->type();
     if (xty != yty)
-        return subtract(x, decimal_g(neg(y)));
+        return subtract(x, decimal_g(flip_sign(y)));
     add::remember(target<add>);
 
     // Read information from both numbers
@@ -1714,7 +1739,7 @@ decimal_p decimal::subtract(decimal_r x, decimal_r y)
     id xty = x->type();
     id yty = y->type();
     if (xty != yty)
-        return add(x, decimal_g(neg(y)));
+        return add(x, decimal_g(flip_sign(y)));
     subtract::remember(target<subtract>);
 
     // Read information from both numbers

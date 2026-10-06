@@ -63,7 +63,11 @@ struct integer : algebraic
 // ----------------------------------------------------------------------------
 {
     template <typename Int>
-    integer(id type, Int value): algebraic(type)
+    integer(id type, Int value)
+    // ------------------------------------------------------------------------
+    //   Build an integer - Zero is always positive (there is no -0)
+    // ------------------------------------------------------------------------
+        : algebraic(type == ID_neg_integer && !value ? ID_integer : type)
     {
         byte *p = (byte *) payload(this);
         leb128(p, value);
@@ -75,7 +79,9 @@ struct integer : algebraic
         return leb128size(i) + leb128size(value);
     }
 
-    integer(id type, gcbytes ptr, size_t size): algebraic(type)
+    integer(id type, gcbytes ptr, size_t size)
+        : algebraic(type == ID_neg_integer && !*byte_p(ptr) ? ID_integer
+                                                             : type)
     {
         byte *p = (byte *) payload(this);
         memmove(p, byte_p(ptr), size);
