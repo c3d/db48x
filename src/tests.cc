@@ -7930,6 +7930,9 @@ void tests::vector_functions()
        .test(CLEAR, "[1][0]", ID_divide)
        .error("Divide by zero");
 
+   step("Fröbenius norm of complex vector uses the modulus")
+       .test(CLEAR, "[(3;4) (0;12)] NORM", ENTER)
+       .expect("13.");
    step("Vector to the power zero is element-wise")
        .test(CLEAR, "[1 2] 0 ^", ENTER)
        .expect("[ 1 1 ]");
