@@ -2918,7 +2918,14 @@ EVAL_BODY(funcall)
         if (object_g callee = fcall->head())
         {
             if (symbol_p sym = callee->as<symbol>())
+            {
                 callee = directory::recall_all(sym, false);
+                if (!callee)
+                {
+                    // Undefined function: keep 'G(2)' symbolic like HP does
+                    return rt.push(o) ? OK : ERROR;
+                }
+            }
             else if (local_p loc = callee->as<local>())
                 callee = loc->recall();
             if (callee)

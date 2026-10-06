@@ -14351,6 +14351,20 @@ void tests::expression_operations()
 {
     BEGIN(expr);
 
+    step("Calling an undefined function keeps the call symbolic")
+        .test(CLEAR, "'G(2)' EVAL", ENTER)
+        .expect("'G(2)'")
+        .test(CLEAR, "'G(2)+1' EVAL", ENTER)
+        .expect("'G(2)+1'")
+        .test(CLEAR, "'G(2;3)' EVAL", ENTER)
+        .expect("'G(2;3)'")
+        .test(CLEAR, "'G(X)' EVAL", ENTER)
+        .expect("'G(X)'");
+    step("Calling a defined function still evaluates it")
+        .test(CLEAR, "« → x « x 2 * » » 'G' STO 'G(3)+1' EVAL", ENTER)
+        .expect("7")
+        .test(CLEAR, "'G' PURGE", ENTER).noerror();
+
     step("List variables in expression with LNAME")
         .test(CLEAR, "'ABC+A+X+Foo(Z;B;A)'", ENTER)
         .expect("'ABC+A+X+Foo(Z;B;A)'")
