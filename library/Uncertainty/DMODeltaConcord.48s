@@ -1,0 +1,9 @@
+«
+@@ DMOΔConcord — demo of ΔConcord: two intervals drawn at random between
+@@ −100 and 100, compared on one scale. Press the key again for a new pair.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  -100 100 Random -100 100 Random Dup2 Min UnRot Max →Range
+  -100 100 Random -100 100 Random Dup2 Min UnRot Max →Range
+  ⓁΔConcord
+»

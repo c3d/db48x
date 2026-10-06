@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  BetaQ
+  @  Quantile: the X below which the probability is p.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "BetaQ: needs 3 arguments" DoError END Explode Drop END
+  → av bv pv « av 0 + bv 0 + pv 0 + → a b p « '0' →Num '1' →Num 0 0 → lo hi x d « 1 34 START '(lo+hi)/2' →Num 'x' STO '(IFTE(x≤0;0;IFTE(x≥1;1;BetaI(a;b;x))))' →Num 'd' STO 'IFTE(d<p;x;lo)' →Num 'lo' STO 'IFTE(d<p;hi;x)' →Num 'hi' STO NEXT '(lo+hi)/2' →Num 'x' STO 1 2 START 'IFTE(ABS(IFTE(x≤0;0;IFTE(x≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(x^(a-1))*((1-x)^(b-1)))))>0.000000000000000000000000000001;x-((IFTE(x≤0;0;IFTE(x≥1;1;BetaI(a;b;x))))-p)/(IFTE(x≤0;0;IFTE(x≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(x^(a-1))*((1-x)^(b-1)))));x)' →Num 'd' STO 'IFTE((d>lo) AND (d<hi);d;x)' →Num 'x' STO NEXT x av bv pv 3 →List Drop » » »
+»

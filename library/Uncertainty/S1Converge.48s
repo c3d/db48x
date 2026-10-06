@@ -1,0 +1,79 @@
+«
+@@ S1Converge — how the Monte Carlo result settles as the number of
+@@ draws M grows: the mass calibration of JCGM 101 (9.3) by MCPropagate
+@@ with M = 100, 1 000 and 10 000. Draws u(δm) against M on
+@@ a logarithmic scale, each point with the bar ±u/√(2M) that measures
+@@ the uncertainty of u itself, and the two values of the Supplement:
+@@ 0.0754 mg by Monte Carlo, 0.0539 mg by the first-order formula.
+@@ Returns the list of the three u. About 13 s on the simulator.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  12345 RDZ
+  { 100 1000 10000 } { }
+  → cvMs cvUs
+  «
+    1 3 For cvi
+      '(m+d)*(1+(densA-1.2)*(1/densW-1/densR))-100000' { m d densA densW densR }
+      { 100000±σ0.050 1.234±σ0.020 1.2±0.1 8000±1000 8000±50 } cvMs cvi Get ⓁMCPropagate
+      Explode Swap Drop
+      cvUs Swap + 'cvUs' Store
+      Drop Drop
+    Next
+    FromLCD Size Drop B→R
+    → cvW
+    «
+      ClearLCD
+      "S1Converge: u(δm) in mg against the number of draws M"
+      { #0d #2d 0 true false } DrawText
+      @ Plot area: columns 44 to wd-12, rows 30 to 150; y = 150 − (v − 0.045)·2400
+      { #44d #30d } { #44d #150d } DrawLine
+      { #44d #150d } cvW 12 - R→B #150d 2 →List DrawLine
+      @ The two values of the Supplement, dashed, with their labels
+      { 0.0754 0.0539 } 1 2 For cvj
+        Dup cvj Get
+        → cvv
+        «
+          150 cvv 0.045 - 2400 * - 0 RND
+          → cvy
+          «
+            44 cvW 12 - For cx
+              cx R→B cvy R→B 2 →List cx 4 + R→B cvy R→B 2 →List DrawLine
+            8 Step
+            cvv →Text { #0d } cvy 7 - R→B + { 0 true false } + DrawText
+          »
+        »
+      Next
+      Drop
+      @ The three points: M on a logarithmic scale, u with its bar ±u/√(2M)
+      1 3 For cvi
+        cvMs cvi Get cvUs cvi Get
+        → cvm cvu
+        «
+          cvu 2 cvm 1 - * √ /
+          44 cvm Log 2 - cvW 90 - * 2 / + 0 RND
+          → cve cvx
+          «
+            150 cvu cve + 0.045 - 2400 * - 0 RND
+            150 cvu cve - 0.045 - 2400 * - 0 RND
+            150 cvu 0.045 - 2400 * - 0 RND
+            → cyt cyb cyc
+            «
+              cvx R→B cyt R→B 2 →List cvx R→B cyb R→B 2 →List DrawLine
+              cvx 3 - R→B cyt R→B 2 →List cvx 3 + R→B cyt R→B 2 →List DrawLine
+              cvx 3 - R→B cyb R→B 2 →List cvx 3 + R→B cyb R→B 2 →List DrawLine
+              cyc 2 - cyc 2 + For cr
+                cvx 2 - R→B cr R→B 2 →List cvx 2 + R→B cr R→B 2 →List DrawLine
+              Next
+              cvm →Text cvx 14 - 0 Max cvW 56 - Min R→B #153d 2 →List 0 true false 3 →List + DrawText
+            »
+          »
+        »
+      Next
+      "dashed: JCGM 101, Monte Carlo 0.0754, first order 0.0539"
+      { #0d #175d 0 true false } DrawText
+      "bars: ±u/√(2M), the uncertainty of u itself"
+      { #0d #193d 0 true false } DrawText
+    »
+    cvUs "u" →Tag
+  »
+»

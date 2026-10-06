@@ -1,0 +1,359 @@
+«
+@@ ============================================================
+@@ ExmnFxjxi — examine a function of several variables over a box:
+@@ the profile of F along the segment from its global minimum to
+@@ its global maximum.
+@@
+@@ Input:  'F' Xn … X2 X1, as for ΔRFxjxi.
+@@ Output: the drawing, and on the stack the result of ΔRFxjxi.
+@@ The minimum and the maximum are found as by ΔRFxjxi; F is then
+@@ drawn at 161 points of the straight segment that joins them, the
+@@ n−1 other degrees of freedom being fixed by the segment. Both
+@@ ends must touch the dashed bounds; a part of the curve beyond a
+@@ bound would show an extremum that the search missed. The points
+@@ of the minimum and of the maximum are written below.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ Find F: the first expression down the stack
+  0
+  Depth 1 - 1 Swap For j
+    If Dup 0 == Then
+      If j 1 + Pick TypeName "expression" == Then Drop j End
+    End
+  Next
+  If Dup 1 ≤ Then "ΔRFxjxi: an expression F, then its values" DoError End
+  1 -
+  → nv
+  «
+    nv →List Swap
+    → vls fx
+    «
+      @ The names x1 … xn of F, in order
+      0
+      { } 1 nv For j 0 + Next
+      'fx' Rcl XVars
+      → nms lnm
+      «
+        1 lnm Size For kk
+          lnm kk Get Dup →Text
+          → ev etx
+          «
+            1 30 For j
+              If etx "x" j →Text + == etx "'x" j →Text + "'" + == Or Then
+                j Max
+                If j nv ≤ Then nms j 'ev' Rcl Put 'nms' Store End
+              End
+            Next
+          »
+        Next
+        nms
+      »
+      Swap
+      If nv ≠ Then "ΔRFxjxi: F and the number of values differ" DoError End
+      → nms
+      «
+        @ The bounds of each variable, and the list x1 c1 … xn cn at the centre
+        { } { } { } 1
+        → lov hiv l0 allr
+        «
+          1 nv For j
+            vls nv j - 1 + Get
+            → xv
+            «
+              1 xv
+              If xv TypeName "unit" == Then Drop Drop 1 xv →Unit xv UVal End
+              Dup TypeName
+              → un iv tn
+              «
+                Case
+                  tn "range" == Then iv Explode End
+                  tn "drange" == Then
+                    iv Explode → cv dv « cv dv - cv dv + » 0 'allr' Store
+                  End
+                  tn "prange" == Then
+                    iv Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - cv dv + » »
+                    0 'allr' Store
+                  End
+                  tn "uncertain" == Then
+                    "ΔRFxjxi works on bounds; use σRFxjxi for a±σb" DoError
+                  End
+                  iv iv
+                End
+                un * Swap un * Swap
+                → lo hi
+                «
+                  lov lo + 'lov' Store
+                  hiv hi + 'hiv' Store
+                  l0 nms j Get + lo hi + 2 / + 'l0' Store
+                »
+              »
+            »
+          Next
+
+          @ The 2^n vertices
+          'fx' Rcl l0 Where →Num Dup l0 l0
+          → vmn vmx lmn lmx
+          «
+            0 2 nv ^ 1 - For vk
+              l0
+              1 nv For j
+                2 j *
+                If vk 2 j 1 - ^ / IP 2 Mod 1 == Then hiv j Get Else lov j Get End
+                Put
+              Next
+              → lcur
+              «
+                'fx' Rcl lcur Where →Num
+                → fv
+                «
+                  If fv vmn < Then fv 'vmn' Store lcur 'lmn' Store End
+                  If fv vmx > Then fv 'vmx' Store lcur 'lmx' Store End
+                »
+              »
+            Next
+
+            @ Coordinate search for the minimum (sgn = -1) and the maximum
+            -1 1 For sgn
+              l0
+              If sgn 0 > Then lmx Else lmn End
+              2 →List
+              → sts
+              «
+                1 2 For si
+                  sts si Get
+                  'fx' Rcl Over Where →Num sgn *
+                  → lcur bst
+                  «
+                    1 1
+                    → imp cyc
+                    «
+                      While imp cyc 6 ≤ And Repeat
+                        0 'imp' Store
+                        1 nv For j
+                          lov j Get hiv j Get
+                          → lo hi
+                          «
+                            If lo hi ≠ Then
+                              hi lo - 8 /
+                              → hs
+                              «
+                                @ Scan of 9 points along xj
+                                lcur 2 j * lo Put 'fx' Rcl Swap Where →Num sgn * 0
+                                → bg bk
+                                «
+                                  1 8 For tk
+                                    lcur 2 j * lo tk hs * + Put 'fx' Rcl Swap Where →Num sgn *
+                                    If Dup bg > Then 'bg' Store tk 'bk' Store Else Drop End
+                                  Next
+                                  @ Golden section around the best point
+                                  lo bk 1 - 0 Max hs * +
+                                  lo bk 1 + 8 Min hs * +
+                                  → xa xb
+                                  «
+                                    1 25 Start
+                                      xb xb xa - 0.618033988749895 * -
+                                      xa xb xa - 0.618033988749895 * +
+                                      → gx gd
+                                      «
+                                        If
+                                          lcur 2 j * gx Put 'fx' Rcl Swap Where →Num sgn *
+                                          lcur 2 j * gd Put 'fx' Rcl Swap Where →Num sgn *
+                                          >
+                                        Then gd 'xb' Store Else gx 'xa' Store End
+                                      »
+                                    Next
+                                    xa xb + 2 /
+                                    lcur 2 j * 3 Pick Put 'fx' Rcl Swap Where →Num sgn *
+                                    → tv gv
+                                    «
+                                      If gv bg < Then lo bk hs * + 'tv' Store bg 'gv' Store End
+                                      If gv bst - bst Abs 1E-12 * > Then
+                                        lcur 2 j * tv Put 'lcur' Store
+                                        gv 'bst' Store
+                                        1 'imp' Store
+                                      End
+                                    »
+                                  »
+                                »
+                              »
+                            End
+                          »
+                        Next
+                        cyc 1 + 'cyc' Store
+                      End
+                    »
+                    bst sgn *
+                    → fv
+                    «
+                      If sgn 0 < fv vmn < And Then fv 'vmn' Store lcur 'lmn' Store End
+                      If sgn 0 > fv vmx > And Then fv 'vmx' Store lcur 'lmx' Store End
+                    »
+                  »
+                Next
+              »
+            2 Step
+
+            @ The profile of F from the minimum (t = 0) to the maximum (t = 1)
+            1
+            If vmn TypeName "unit" == Then Drop 1 vmn →Unit End
+            → uf
+            «
+              0 160 For kk
+                lmn
+                1 nv For j
+                  2 j *
+                  lmn 2 j * Get lmx 2 j * Get lmn 2 j * Get - kk * 160 / +
+                  Put
+                Next
+                'fx' Rcl Swap Where →Num
+                If uf TypeName "unit" == Then uf Convert UVal End
+              Next
+              161 →List
+              vmn vmx
+              If uf TypeName "unit" == Then uf Convert UVal Swap uf Convert UVal Swap End
+              → ys ya yb
+              «
+                If yb ya == Then ya 1 - 'ya' Store yb 1 + 'yb' Store End
+                FromLCD Size Drop B→R
+                → wd
+                «
+                  ClearLCD
+                  "ExmnFxjxi: " 'fx' Rcl →Str +
+                  If Dup Size 46 > Then 1 45 Sub "…" + End
+                  { #0d #2d 0 true false } DrawText
+                  @ Plot area: columns 8 to wd-12, rows 34 to 162, closed at both ends
+                  { #8d #34d } { #8d #162d } DrawLine
+                  { #8d #162d } wd 12 - R→B #162d 2 →List DrawLine
+                  wd 12 - R→B #34d 2 →List wd 12 - R→B #162d 2 →List DrawLine
+                  0 160 For kk
+                    8 wd 20 - kk * 160 / + 0 RND R→B
+                    162 128 ys kk 1 + Get ya - * yb ya - / - 0 RND R→B
+                    2 →List
+                    If kk 0 > Then Dup Rot Swap DrawLine End
+                  Next
+                  Drop
+                  @ The minimum and the maximum, dashed
+                  ya yb 2 →List
+                  1 2 For jj
+                    Dup jj Get
+                    162 128 Rot ya - * yb ya - / - 0 RND R→B
+                    → py
+                    «
+                      8 wd 12 - For cx
+                        cx R→B py 2 →List cx 4 + R→B py 2 →List DrawLine
+                      8 Step
+                    »
+                  Next
+                  Drop
+                  @ Marks: ▲ ▼ filled at the highest and lowest points of the curve,
+                  @ △ ▽ hollow at the other points higher or lower than their two
+                  @ neighbours (ties go to the left one)
+                  1 1
+                  → imn imx
+                  «
+                    2 161 For kk
+                      If ys kk Get ys imx Get > Then kk 'imx' Store End
+                      If ys kk Get ys imn Get < Then kk 'imn' Store End
+                    Next
+                    2 160 For kk
+                      ys kk 1 - Get ys kk Get ys kk 1 + Get
+                      → pa pv pc
+                      «
+                        If kk imx ≠ kk imn ≠ And Then
+                          If pv pa > pv pc ≥ And Then
+                            8 wd 20 - kk 1 - * 160 / + 0 RND 162 128 ys kk Get ya - * yb ya - / - 0 RND 1 0
+                            → tx ty ts tf
+                            «
+                              tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                              tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                              tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                              If tf Then
+                                1 8 For ii
+                                  tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                  tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                Next
+                              End
+                            »
+                          End
+                          If pv pa < pv pc ≤ And Then
+                            8 wd 20 - kk 1 - * 160 / + 0 RND 162 128 ys kk Get ya - * yb ya - / - 0 RND -1 0
+                            → tx ty ts tf
+                            «
+                              tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                              tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                              tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                              If tf Then
+                                1 8 For ii
+                                  tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                                  tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                                Next
+                              End
+                            »
+                          End
+                        End
+                      »
+                    Next
+                    8 wd 20 - imx 1 - * 160 / + 0 RND 162 128 ys imx Get ya - * yb ya - / - 0 RND 1 1
+                    → tx ty ts tf
+                    «
+                      tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                      tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                      tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                      If tf Then
+                        1 8 For ii
+                          tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                          tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                        Next
+                      End
+                    »
+                    8 wd 20 - imn 1 - * 160 / + 0 RND 162 128 ys imn Get ya - * yb ya - / - 0 RND -1 1
+                    → tx ty ts tf
+                    «
+                      tx R→B ty 5 ts * - R→B 2 →List tx 5 - R→B ty 4 ts * + R→B 2 →List DrawLine
+                      tx R→B ty 5 ts * - R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                      tx 5 - R→B ty 4 ts * + R→B 2 →List tx 5 + R→B ty 4 ts * + R→B 2 →List DrawLine
+                      If tf Then
+                        1 8 For ii
+                          tx ii 2 / 0 RND - R→B ty 5 ts * - ii ts * + R→B 2 →List
+                          tx ii 2 / 0 RND + R→B ty 5 ts * - ii ts * + R→B 2 →List DrawLine
+                        Next
+                      End
+                    »
+                  »
+                  @ The values and their points
+                  "min = " vmn →Str + "  at " +
+                  { } 1 nv For j lmn 2 j * Get + Next →Str +
+                  { #0d #172d 0 true false } DrawText
+                  "max = " vmx →Str + "  at " +
+                  { } 1 nv For j lmx 2 j * Get + Next →Str +
+                  { #0d #192d 0 true false } DrawText
+                  "points as { x1 … xn }   [▲▼: global; hollow: local]" { #0d #212d 0 true false } DrawText
+                »
+              »
+            »
+
+            @ The result, in the form of the inputs
+            If vmn TypeName "unit" == Then
+              1 vmn →Unit
+              → uf
+              «
+                vmn UVal vmx uf Convert UVal
+                If allr Then →Range Else
+                  → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+                End
+                uf →Unit
+              »
+            Else
+              vmn vmx
+              If allr Then →Range Else
+                → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+              End
+            End
+          »
+        »
+      »
+    »
+  »
+»
