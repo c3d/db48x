@@ -129,13 +129,15 @@ text_g operator+(text_r x, text_r y)
         return x;
     object::id type = x->type();
     size_t sx = 0, sy = 0;
-    utf8 tx = x->value(&sx);
-    utf8 ty = y->value(&sy);
+    // Allocating the result may run the garbage collector and move x and y:
+    // keep pointers to their contents that the collector updates
+    gcutf8 tx = x->value(&sx);
+    gcutf8 ty = y->value(&sy);
     text_g concat = rt.make<text>(type, tx, sx + sy);
     if (concat)
     {
         utf8 tc = concat->value();
-        memcpy((byte *) tc + sx, (byte *) ty, sy);
+        memcpy((byte *) tc + sx, (byte *) (utf8) ty, sy);
     }
     return concat;
 }
