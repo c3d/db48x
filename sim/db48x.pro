@@ -138,6 +138,7 @@ INCLUDEPATH += ../src/dm42 ../src/dmcp ../src ..
 
 win32:   LIBS += -lsetupapi -lgnurx
 android: LIBS +=
+android: QMAKE_LFLAGS += -Wl,-z,max-page-size=16384
 freebsd: LIBS += -lthr -liconv
 macx:    LIBS += -framework CoreFoundation -framework IOKit
 macx:    QMAKE_CFLAGS +=
