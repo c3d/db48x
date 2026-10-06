@@ -1956,6 +1956,13 @@ void tests::arithmetic()
     test(CLEAR, "360 -360 MOD", ENTER).expect("0");
     test(CLEAR, "-1/3 1/3 MOD", ENTER).expect("0");
 
+    step("Modulo by zero returns the value");
+    test(CLEAR, "7 0 MOD", ENTER).expect("7");
+    test(CLEAR, "-7 0 MOD", ENTER).expect("-7");
+    test(CLEAR, "7.5 0 MOD", ENTER).expect("7.5");
+    test(CLEAR, "1/3 0 MOD", ENTER).expect("¹/₃");
+    test(CLEAR, "0 0 MOD", ENTER).expect("0");
+
     step("Power");
     test(CLEAR, "2 3 ^", ENTER).expect("8");
     test(CLEAR, "-2 3 ^", ENTER).expect("-8");

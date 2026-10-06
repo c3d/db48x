@@ -985,9 +985,13 @@ algebraic_p arithmetic::optimize<mod>(algebraic_r x, algebraic_r y)
 //   Optimizations for modulo
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero
+    // Check divide by zero: like legacy RPL, `x 0 MOD` returns `x`
     if (y->is_zero(false))
+    {
+        if (x->is_real())
+            return x;
         return zero_divide(x, y);
+    }
     return nullptr;
 }
 
