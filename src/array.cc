@@ -2505,6 +2505,18 @@ object::result array::add_row_or_column(bool columnist)
                 goto type_error;
             if (!ia->is_matrix_or_vector(&irows, &icols, false))
                 goto dimension_error;
+            if (!icols && !columnist)
+            {
+                // Inserting a single vector as a row
+                if (irows != ocols)
+                    goto dimension_error;
+                if (row > orows)
+                    goto value_error;
+                il = ol->insert(inner, row);
+                if (il && rt.drop(2) && rt.top(il))
+                    return OK;
+                return ERROR;
+            }
             if (columnist ? (orows != irows) : (ocols != icols))
                 goto dimension_error;
             if (row > (columnist ? ocols : orows))
@@ -2577,10 +2589,35 @@ value_error:
 }
 
 
+static object_p removed_items(list_r lst, size_t first, size_t count)
+// ----------------------------------------------------------------------------
+//   Return the item, or the list of items, removed by ROW- / COL-
+// ----------------------------------------------------------------------------
+{
+    if (count == 1)
+        return lst->at(first);
+
+    scribble scr;
+    size_t   idx = 0;
+    for (object_p item : *lst)
+    {
+        if (idx >= first && idx < first + count)
+            if (!rt.append(item))
+                return nullptr;
+        idx++;
+    }
+    return list::make(lst->type(), scr.scratch(), scr.growth());
+}
+
+
 object::result array::delete_row_or_column(bool columnist)
 // ----------------------------------------------------------------------------
 //   Shared code to delete rows or columns (ROW-, COL-)
 // ----------------------------------------------------------------------------
+//   Like legacy RPL, this returns the reduced array in level 2 and the
+//   removed row, column or element in level 1.
+//   When removing multiple rows or columns, level 1 contains the removed
+//   sub-matrix (or sub-vector)
 {
     // First argument must give the index position
     size_t row = 0, count = 1;
@@ -2598,7 +2635,8 @@ object::result array::delete_row_or_column(bool columnist)
     object_p outer = rt.stack(1);
 
     // The input always needs to be an array, list or vector
-    list_g ol = outer->as_array_or_list();
+    list_g   ol = outer->as_array_or_list();
+    object_g removed;
     if (!ol)
         goto type_error;
 
@@ -2613,21 +2651,18 @@ object::result array::delete_row_or_column(bool columnist)
         if (!oa->is_matrix_or_vector(&orows, &ocols, false))
             goto dimension_error;
 
-        if (ocols)
-        {
-            if (row > (columnist ? ocols : orows))
-                goto value_error;
-        }
-        else if (row > orows)
-        {
+        size_t max = (ocols && columnist) ? ocols : orows;
+        if (row >= max || count > max - row)
             goto value_error;
-        }
-        else
+
+        if (!ocols)
         {
             // Delete from a vector
+            removed = removed_items(ol, row, count);
             ol = ol->remove(row, count);
-            if (ol && rt.drop() && rt.top(ol))
-                return OK;
+            if (ol && removed && rt.drop() && rt.top(ol))
+                if (rt.push(+removed))
+                    return OK;
             return ERROR;
         }
     }
@@ -2636,28 +2671,46 @@ object::result array::delete_row_or_column(bool columnist)
     if (columnist)
     {
         id       ty = ol->type();
-        scribble scr;
-        for (object_p orow : *ol)
         {
-            list_p orl = orow->as_array_or_list();
-            if (!orl)
-                goto dimension_error;
-            orl = orl->remove(row, count);
-            if (!orl || !rt.append(orl))
-                return ERROR;
+            scribble scr;
+            for (object_p orow : *ol)
+            {
+                list_g orl = orow->as_array_or_list();
+                if (!orl)
+                    goto dimension_error;
+                object_p item = removed_items(orl, row, count);
+                if (!item || !rt.append(item))
+                    return ERROR;
+            }
+            removed = list::make(ty, scr.scratch(), scr.growth());
         }
-        ol = list::make(ty, scr.scratch(), scr.growth());
+        {
+            scribble scr;
+            for (object_p orow : *ol)
+            {
+                list_p orl = orow->as_array_or_list();
+                if (!orl)
+                    goto dimension_error;
+                orl = orl->remove(row, count);
+                if (!orl || !rt.append(orl))
+                    return ERROR;
+            }
+            ol = list::make(ty, scr.scratch(), scr.growth());
+        }
     }
     else
     {
+        removed = removed_items(ol, row, count);
         ol = ol->remove(row, count);
     }
 
     // Put result on stack
-    if (ol && rt.drop() && rt.top(ol))
+    if (ol && removed && rt.drop() && rt.top(ol) && rt.push(+removed))
         return OK;
 
-    // Return whatever error failed above
+    // Return whatever error failed above, e.g. index out of range
+    if (!rt.error())
+        rt.value_error();
     return ERROR;
 dimension_error:
     rt.dimension_error();

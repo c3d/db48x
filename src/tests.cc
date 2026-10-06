@@ -8406,6 +8406,54 @@ void tests::matrix_functions()
         .want("[[ 7 10 ] [ 15 22 ]]")
         .test(CLEAR, "[[1 2][3 4]] -1 ^ [[1 2][3 4]] INV ==", ENTER)
         .expect("True");
+
+    step("ROW- returns the removed row")
+        .test(CLEAR, "[[1 2][3 4]] 1 ROW-", ENTER)
+        .got("[ 1 2 ]", "[[ 3 4 ]]")
+        .test(CLEAR, "[[1 2][3 4]] 1 ROW- DROP", ENTER)
+        .expect("[[ 3 4 ]]");
+    step("ROW- of multiple rows returns the removed rows")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [2 2] ROW-", ENTER)
+        .want("[[ 3 4 ] [ 5 6 ]]")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [2 2] ROW- DROP", ENTER)
+        .want("[[ 1 2 ]]");
+    step("ROW- in vector returns the removed element")
+        .test(CLEAR, "[1 2 3] 2 ROW-", ENTER)
+        .got("2", "[ 1 3 ]");
+    step("ROW- with index out of range")
+        .test(CLEAR, "[[1 2][3 4]] 3 ROW-", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] 0 ROW-", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] [2 2] ROW-", ENTER)
+        .error("Bad argument value");
+    step("COL- returns the removed column")
+        .test(CLEAR, "[[1 2][3 4]] 2 COL-", ENTER)
+        .want("[ 2 4 ]")
+        .test(CLEAR, "[[1 2][3 4]] 2 COL- DROP", ENTER)
+        .want("[[ 1 ] [ 3 ]]");
+    step("COL- of multiple columns returns the removed columns")
+        .test(CLEAR, "[[1 2 3][4 5 6]] [2 2] COL-", ENTER)
+        .want("[[ 2 3 ] [ 5 6 ]]")
+        .test(CLEAR, "[[1 2 3][4 5 6]] [2 2] COL- DROP", ENTER)
+        .want("[[ 1 ] [ 4 ]]");
+    step("COL- with index out of range")
+        .test(CLEAR, "[[1 2][3 4]] 3 COL-", ENTER)
+        .error("Bad argument value");
+    step("ROW+ inserting a vector in a matrix")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 1 ROW+", ENTER)
+        .want("[[ 5 6 ] [ 1 2 ] [ 3 4 ]]");
+    step("ROW+ appending a vector after the last row")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 3 ROW+", ENTER)
+        .want("[[ 1 2 ] [ 3 4 ] [ 5 6 ]]");
+    step("ROW+ errors")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 4 ROW+", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] [5 6 7] 1 ROW+", ENTER)
+        .error("Invalid dimension");
+    step("COL+ appending a column after the last column")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 3 COL+", ENTER)
+        .want("[[ 1 2 5 ] [ 3 4 6 ]]");
 }
 
 
