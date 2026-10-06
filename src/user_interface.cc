@@ -1899,6 +1899,29 @@ bool user_interface::draw_header()
         return false;
 
     bool changed = force;
+
+    // Redraw the whole header when a setting that changes it was modified:
+    // otherwise, hiding the time leaves the old time on screen, since nothing
+    // else triggers a redraw, and the other settings wait for the next minute
+    static uint lastStyle = ~0U;
+    uint style = (uint(Settings.ShowDate())       << 0)
+               | (uint(Settings.ShowTime())       << 1)
+               | (uint(Settings.ShowSeconds())    << 2)
+               | (uint(Settings.ShowMonthName())  << 3)
+               | (uint(Settings.TwoDigitYear())   << 4)
+               | (uint(Settings.ShowDayOfWeek())  << 5)
+               | (uint(Settings.YearFirst())      << 6)
+               | (uint(Settings.MonthBeforeDay()) << 7)
+               | (uint(Settings.Time24H())        << 8)
+               | (uint(Settings.ShowVoltage())    << 9)
+               | (uint(Settings.DateSeparator())  << 16);
+    bool restyle = style != lastStyle;
+    if (restyle)
+    {
+        lastStyle = style;
+        changed = true;
+    }
+
     if (!day || Settings.ShowDate() || Settings.ShowTime())
     {
         dt_t dt;
@@ -2015,6 +2038,9 @@ bool user_interface::draw_header()
         }
 
         coord  x  = 1;
+        if (restyle)
+            Screen.fill(0, 0, LCD_W - 1, hdr_bottom,
+                        pattern(Settings.HeaderBackground()));
         Screen.fill(header, pattern(Settings.HeaderBackground()));
 
         // Read the real-time clock
@@ -2078,6 +2104,18 @@ bool user_interface::draw_header()
         {
             stackTop = h;
             dirtyStack = true;
+        }
+
+        if (restyle)
+        {
+            // The battery and the annunciators move when the voltage is
+            // shown or hidden: redraw them at once
+            bool sf = force;
+            force = true;
+            draw_battery();
+            draw_annunciators();
+            force = sf;
+            draw_dirty(0, 0, LCD_W - 1, hdr_bottom);
         }
     }
     return changed;
