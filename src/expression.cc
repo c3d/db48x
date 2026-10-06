@@ -3644,7 +3644,21 @@ expression_p expression::simplify() const
         ln(exp(X)),     X,
         exp(ln(X)),     X,
         log10(exp10(X)),X,
-        exp10(log10(X)),X
+        exp10(log10(X)),X,
+
+        // Trivial function values
+        exp(k0),        k1,
+        ln(k1),         k0,
+        sin(k0),        k0,
+        cos(k0),        k1,
+        tan(k0),        k0,
+        asin(k0),       k0,
+        asin(k1),       kpi/k2,
+        acos(k1),       k0,
+        acos(k0),       kpi/k2,
+        atan(k0),       k0,
+        sqrt(k0),       k0,
+        sqrt(k1),       k1
         );
 }
 
@@ -3873,7 +3887,8 @@ expression_p expression::isolate(symbol_r sym, bool error) const
             sq(N) == P,             N == sqrt(P),
             sqrt(N) == P,           N == sq(P),
             cubed(N) == P,          N == cbrt(P),
-            cbrt(N) == P,           N == cubed(P)
+            cbrt(N) == P,           N == cubed(P),
+            abs(N) == P,            N == P
             )
         : eq->rewrites(
             // Move the independent variable to the left
@@ -3896,7 +3911,7 @@ expression_p expression::isolate(symbol_r sym, bool error) const
             Q * N == P,             N == P / Q,
             N / Q == P,             N == P * Q,
             Q / N == P,             N == Q / P,
-            (N ^ Q) == P,           N == (P ^ inv(Q)) + exp(intk*kpi*ki/Q),
+            (N ^ Q) == P,           N == (P ^ inv(Q)) * exp(k2*intk*kpi*ki/Q),
             (Q ^ N) == P,           N == ln(P) / ln(Q),
 
             // Basic simplifications
@@ -3911,11 +3926,14 @@ expression_p expression::isolate(symbol_r sym, bool error) const
 
             // Reversible functions
             inv(N) == P,            N == inv(P),
-            sin(N) == P,            N == asin(P) + k2*intk*kpi,
-            cos(N) == P,            N == acos(P) + k2*intk*kpi,
+            // Each indexed constant may only appear once per rule, so the
+            // two families of sin and csc are written through acos/asec:
+            // sin(N)=P <=> cos(N-π/2)=P
+            sin(N) == P,            N == kpi/k2 + signk*acos(P) + k2*intk*kpi,
+            cos(N) == P,            N == signk*acos(P) + k2*intk*kpi,
             tan(N) == P,            N == atan(P) + intk*kpi,
-            sec(N) == P,            N == asec(P) + k2*intk*kpi,
-            csc(N) == P,            N == acsc(P) + k2*intk*kpi,
+            sec(N) == P,            N == signk*asec(P) + k2*intk*kpi,
+            csc(N) == P,            N == kpi/k2 + signk*asec(P) + k2*intk*kpi,
             cot(N) == P,            N == acot(P) + intk*kpi,
             sinh(N) == P,           N == asinh(P) + k2*intk*kpi*ki,
             cosh(N) == P,           N == acosh(P) + k2*intk*kpi*ki,
@@ -3947,8 +3965,9 @@ expression_p expression::isolate(symbol_r sym, bool error) const
 
             sq(N) == P,             N == signk*sqrt(P),
             sqrt(N) == P,           N == sq(P),
-            cubed(N) == P,          N == cbrt(P) + exp(intk*kpi*ki/k3),
-            cbrt(N) == P,           N == cubed(P)
+            cubed(N) == P,          N == cbrt(P) * exp(k2*intk*kpi*ki/k3),
+            cbrt(N) == P,           N == cubed(P),
+            abs(N) == P,            N == signk*P
             );
 
     if (+result == +eq)
@@ -4573,7 +4592,11 @@ list_p expression::zeros(object_p eqobj, symbol_r var)
     // Check if we can isolate the variable
     rt.clear_error();
     if (expression_g isol = expr->isolated(var))
+    {
+        if (Settings.AutoSimplify())
+            isol = isol->simplify();
         return purge(list::make(ID_list, isol));
+    }
 
     // Check if we are multiplying or dividing two expressions
     object_p op = expr->outermost_operator();
