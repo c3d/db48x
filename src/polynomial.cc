@@ -2412,10 +2412,11 @@ COMMAND_BODY(PCoef)
         polynomial_g term = nullptr;
         for (object_p root : *roots)
         {
+            // Like HP's PCOEF, only accept real or complex numbers
             algebraic_p r = root->as_algebraic();
-            if (!r)
+            if (!r || !r->is_numeric_constant())
             {
-                rt.invalid_polynomial_error();
+                rt.type_error();
                 return ERROR;
             }
             term = polynomial::make(algebraic_p(r));
@@ -2423,6 +2424,12 @@ COMMAND_BODY(PCoef)
             poly = poly ? polynomial::mul(poly, term) : +term;
             if (!poly)
                 return ERROR;
+        }
+        if (!poly)
+        {
+            // Empty array of roots
+            rt.value_error();
+            return ERROR;
         }
 
         algebraic_p result = +poly;
