@@ -5,6 +5,10 @@ physics, chemistry and computer science. The built-in equations can be extended
 using the `config/equations.csv` configuration file.
 
 
+Any simulation of the library can also be run with uncertain inputs: the
+σROOT command, in the Functions submenu of the Uncertainty section of the
+Function Library, gives every unknown with its standard uncertainty.
+
 ## Columns and Beams
 
 The 21 variables in the Columns and Beams section are:

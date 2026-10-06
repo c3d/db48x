@@ -698,6 +698,8 @@ the global minimum and maximum of the function.
 * [σRf](#σrf): a composite function of one variable, f(x);
 * [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
   possibly correlated;
+* [σROOT](#σroot): the unknowns of any simulation of the Equation Library,
+  from inputs given with their uncertainty;
 * [ΔRf](#Δrf): the range of a function of one variable over an interval;
 * [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
   box;
@@ -817,6 +819,62 @@ constant and an angle in degrees:
 
 The same functions with MCPropagate take the names and the values as lists:
 'x2*x1' { x2 x1 } { 2.5±σ0.5 2.0±σ0.2 } 0 ⓁMCPropagate.
+
+
+## σROOT
+
+The uncertainty of the unknowns found by ROOT, for any simulation of the
+Equation Library.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:Y1±σu1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their values as usual, but with
+their uncertainty: a±σb for a standard uncertainty, or bounds a…b, a±b or a±p%
+when only the limits are known. Bounds are taken as a rectangular law, of
+standard deviation width/√12, as Bound→σ does. Units are welcome.
+
+σROOT finds these variables in the current directory, runs ROOT with each one
+at its centre, then moves each one in turn by ±σ/100 and runs ROOT again. The
+differences give the contribution of every input to every unknown, combined
+as by σRFxjxi, the inputs being taken as independent. With n uncertain inputs,
+ROOT runs 1 + 2n times: a fraction of a second on the simulator. It works even
+when an unknown cannot be isolated, since the derivatives are taken through
+the solver.
+
+Afterwards, each input gets back its uncertain value, and each unknown holds
+its central value. The unknowns are purged before each run, so that ROOT
+always starts from the guesses: a second ROOT on unknowns that already exist
+does not always solve them again.
+
+The result is a standard uncertainty, ±σ, even when the inputs are bounds. For
+the shape of the law of the result, see [DMOPendulum](#dmopendulum), which
+draws it by the Monte Carlo method.
+
+**1)** The simple pendulum, its amplitude only known between 60° and 80°: the
+four unknowns, each with its uncertainty. Treal agrees with σRFxjxi applied to
+the formula written out.
+
+```rpl
+15±σ0.1_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁσROOT
+@ Expecting { ω:8.08564 57173 6±σ0.02695 21524 66 r/s Treal:0.85638 34442 86±σ1.45730 83375 9⁳⁻² s T:0.77707 89775 87±σ2.59026 32600 6⁳⁻³ s f:1.28687 04840 1±σ4.28956 82919 4⁳⁻³ Hz }
+```
+
+**2)** The pendulum the other way round: from a measured period, its
+amplitude. θmax lies inside a series in sin²(θmax/2) and cannot be isolated:
+ROOT finds it, and σROOT its uncertainty. The length contributes 1.15° and the
+period only 0.40°: to know the amplitude better, measure the length better.
+
+```rpl
+15±σ0.1_cm 'L' Sto  0.8564±σ0.001_s 'Treal' Sto
+'ROOT(ⒺSimple Pendulum;[ω;θmax;T;f];[1_(r/s);50_°;1_s;1_Hz])' ⓁσROOT 2 Get
+@ Expecting θmax:70.00668 81164±σ1.22184 90395 5 °
+```
+
+These results were checked against an independent computation in double
+precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
+70.0067±σ1.2218° (Monte Carlo: 1.2194°).
 
 
 ## ΔRf
