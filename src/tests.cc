@@ -5150,6 +5150,47 @@ void tests::hyperbolic_reciprocals()
     step("∫ coth(X) dX")
         .test(CLEAR, "'coth(X)'", ENTER, "'X'", ENTER, ID_Primitive)
         .expect("'ln (abs (sinh X))'");
+
+    // Accuracy for small and large arguments
+    step("Hyperbolic functions of tiny arguments")
+        .test(CLEAR, "1E-30 SINH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "-1E-30 SINH", ENTER).expect("-1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 TANH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 ASINH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 ATANH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 COTH", ENTER).expect("1.⁳³⁰")
+        .test(CLEAR, "-1E-30 COTH", ENTER).expect("-1.⁳³⁰")
+        .test(CLEAR, "1E-30 CSCH", ENTER).expect("1.⁳³⁰");
+    step("Hyperbolic functions of extreme arguments")
+        .test(CLEAR, "-1E20 ASINH", ENTER).expect("-46.74484 90404")
+        .test(CLEAR, "1E20 ASINH", ENTER).expect("46.74484 90404")
+        .test(CLEAR, "-1E-20 ACSCH", ENTER).expect("-46.74484 90404")
+        .test(CLEAR, "1E-20 ACSCH", ENTER).expect("46.74484 90404")
+        .test(CLEAR, "1E30 ACSCH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E30 TANH", ENTER).expect("1.")
+        .test(CLEAR, "-1E30 TANH", ENTER).expect("-1.")
+        .test(CLEAR, "1E-15 TANH", ENTER).expect("1.⁳⁻¹⁵");
+    step("Hyperbolic functions at singular points")
+        .test(CLEAR, "0 CSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 COTH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "1. ATANH", ENTER).error("Divide by zero");
+    step("Hyperbolic functions keep 24-digit accuracy")
+        .test(CLEAR, "24 SIG", ENTER).noerror()
+        .test(CLEAR, "1 SINH", ENTER).expect("1.17520 11936 43801 45688 238")
+        .test(CLEAR, "-3 SINH", ENTER).expect("-10.01787 49274 09901 89897 46")
+        .test(CLEAR, "0.5 TANH", ENTER).expect("0.46211 71572 60009 75850 2318")
+        .test(CLEAR, "20 TANH", ENTER).expect("0.99999 99999 99999 99150 3291")
+        .test(CLEAR, "2 ASINH", ENTER).expect("1.44363 54751 78810 34249 328")
+        .test(CLEAR, "-0.7 ASINH", ENTER).expect("-0.65266 65660 82355 78680 8686")
+        .test(CLEAR, "0.5 ATANH", ENTER).expect("0.54930 61443 34054 84569 7623")
+        .test(CLEAR, "-0.3 ATANH", ENTER).expect("-0.30951 96042 03111 71547 4067")
+        .test(CLEAR, "1 COTH", ENTER).expect("1.31303 52854 99331 30363 616")
+        .test(CLEAR, "1 CSCH", ENTER).expect("0.85091 81282 39321 54513 3843")
+        .test(CLEAR, "2 ACSCH", ENTER).expect("0.48121 18250 59603 44749 7759")
+        .test(CLEAR, "-0.2 ACSCH", ENTER).expect("-2.31243 83412 72752 62025 356")
+        .test(CLEAR, "1E30 ASINH", ENTER).expect("69.77069 99703 81315 82995 7")
+        .test(CLEAR, "STD", ENTER).noerror();
 }
 
 
