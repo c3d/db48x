@@ -15308,6 +15308,19 @@ void tests::regression_checks()
               LENGTHY(30000), ENTER)
         .error("Out of memory");
 
+    step("Name whose value is itself")
+        .test(CLEAR, "'A' 'A' STO A", ENTER)
+        .error("Too many recursive calls");
+    step("Cycle of names")
+        .test(CLEAR, "'A' 'B' STO 'B' 'A' STO A", ENTER)
+        .error("Too many recursive calls");
+    step("Evaluating a name whose value is itself")
+        .test(CLEAR, "'Q' 'Q' STO 'Q' EVAL", ENTER)
+        .error("Too many recursive calls");
+    step("Chain of names without a cycle")
+        .test(CLEAR, "'B' 'A' STO 3 'B' STO A", ENTER)
+        .expect("3");
+
     step("Exit crash guard tests directory")
         .test(CLEAR, "UPDIR 'CrashGuards' PGDIR", ENTER).noerror();
 }
