@@ -1291,7 +1291,7 @@ NFUNCTION_BODY(xroot)
     {
         algebraic_g &y = args[1];
         if (x->is_symbolic() || y->is_symbolic())
-            return expression::make(ID_xroot, args, 2, ID_expression, true);
+            return expression::make(ID_xroot, args, 2);
 
         bool is_int = x->is_integer();
         bool is_neg = false;
