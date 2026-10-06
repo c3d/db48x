@@ -8362,7 +8362,37 @@ void tests::row_echelon()
     step("RREF on symbolic matrix")
         .test(CLEAR, "[[a b c][d e f]] RREF", ENTER)
         .want("[[ 1 0 'c÷a-b÷a·((a·f-d·c)÷(a·e-d·b))' ] "
-              "[ 'a·d-d·a' 1 '(a·f-d·c)÷(a·e-d·b)' ]]");
+              "[ 0 1 '(a·f-d·c)÷(a·e-d·b)' ]]");
+
+    step("RREF swaps rows when the pivot is zero")
+        .test(CLEAR, "[[0 1][1 0]] RREF", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]");
+    step("REF swaps rows when the pivot is zero")
+        .test(CLEAR, "[[0 1][1 0]] REF", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]");
+    step("RREF swaps rows for a zero pivot appearing during elimination")
+        .test(CLEAR, "[[1 1 1][1 1 2][1 2 3]] RREF", ENTER)
+        .want("[[ 1 0 0 ] [ 0 1 0 ] [ 0 0 1 ]]");
+    step("REF swaps rows for a zero pivot appearing during elimination")
+        .test(CLEAR, "[[1 1 1][1 1 2][1 2 3]] REF", ENTER)
+        .want("[[ 1 1 1 ] [ 0 1 2 ] [ 0 0 1 ]]");
+    step("RREF rank-deficient matrix needing a swap")
+        .test(CLEAR, "[[1 2 3][2 4 6][1 1 1]] RREF", ENTER)
+        .want("[[ 1 0 -1 ] [ 0 1 2 ] [ 0 0 0 ]]");
+    step("RREF of a permutation matrix is the identity")
+        .test(CLEAR, "[[0 0 1][0 1 0][1 0 0]] RREF", ENTER)
+        .want("[[ 1 0 0 ] [ 0 1 0 ] [ 0 0 1 ]]");
+    step("RREF augmented system needing a swap")
+        .test(CLEAR, "[[0 2 4][1 3 5]] RREF", ENTER)
+        .want("[[ 1 0 -1 ] [ 0 1 2 ]]");
+    step("RREFP with a row swap")
+        .test(CLEAR, "[[0 1][2 3]] RREFP", ENTER)
+        .want("[[ 2 0 ] [ 0 1 ]]")
+        .test(BSP)
+        .expect("{ 2 1 }");
+    step("RREF on symbolic square matrix eliminates exactly")
+        .test(CLEAR, "[[A B][C D]] RREF", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]");
 
 #if 0
     step("RREFMOD not implemented yet")
