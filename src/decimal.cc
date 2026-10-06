@@ -2766,12 +2766,25 @@ decimal_p decimal::sinh(decimal_r x)
 // ----------------------------------------------------------------------------
 //    Hyperbolic sine
 // ----------------------------------------------------------------------------
+//    Use sinh(|x|) = (e + e/(e+1)) / 2 with e = expm1(|x|), which does not
+//    cancel for small |x| like (exp(x) - exp(-x)) / 2 does
 {
+    if (!x)
+        return nullptr;
     precision_adjust prec;
+    bool      neg  = x->is_negative();
+    decimal_g ax   = neg ? decimal_g(-x) : decimal_g(x);
     decimal_g half = make(5,-1);
-    decimal_g ep = exp(x);
-    decimal_g em = exp(-x);
-    return prec((ep - em) * half);
+    decimal_g one  = make(1);
+    decimal_g e    = expm1(ax);
+    if (!e)
+        return nullptr;
+    if (e->is_infinity())
+        return prec(neg ? decimal_g(-e) : e);
+    decimal_g r = (e + decimal_g(e / decimal_g(e + one))) * half;
+    if (neg)
+        r = -r;
+    return prec(r);
 }
 
 
@@ -2792,11 +2805,35 @@ decimal_p decimal::tanh(decimal_r x)
 // ----------------------------------------------------------------------------
 //   Hyperbolic tangent
 // ----------------------------------------------------------------------------
+//   Use tanh(|x|) = e / (e + 2) with e = expm1(2|x|), which is accurate for
+//   small |x|. For large |x|, tanh(x) rounds to ±1.
 {
+    if (!x)
+        return nullptr;
     precision_adjust prec;
-    decimal_g hs = sinh(x);
-    decimal_g hc = cosh(x);
-    return prec(hs / hc);
+    bool      neg = x->is_negative();
+    decimal_g ax  = neg ? decimal_g(-x) : decimal_g(x);
+    decimal_g one = make(1);
+    decimal_g r;
+
+    // 1 - tanh(x) ≈ 2·exp(-2x) < 10^-(prec+3) when x > 1.2 * (prec+3)
+    decimal_g big = make(large(prec) + 3);
+    big = big + big;
+    if (!big)
+        return nullptr;
+    if (ax > big)
+    {
+        r = one;
+    }
+    else
+    {
+        decimal_g two = make(2);
+        decimal_g e   = expm1(decimal_g(ax + ax));
+        r = e / decimal_g(e + two);
+    }
+    if (r && neg)
+        r = -r;
+    return prec(r);
 }
 
 
@@ -2805,9 +2842,35 @@ decimal_p decimal::asinh(decimal_r x)
 //  Inverse hyperbolic sine
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return nullptr;
+    if (x->is_zero())
+        return x;
+
     precision_adjust prec;
+    bool      neg = x->is_negative();
+    decimal_g ax  = neg ? decimal_g(-x) : decimal_g(x);
     decimal_g one = make(1);
-    return prec(ln(x + decimal_g(sqrt(x*x + one))));
+    decimal_g r;
+
+    if (ax->exponent() > large(prec) + 3)
+    {
+        // Huge |x|: asinh(|x|) = ln(2|x|) since x² + 1 rounds to x²
+        decimal_g ln2 = constants().ln2();
+        r = ln(ax);
+        r = r + ln2;
+    }
+    else
+    {
+        // asinh(|x|) = ln1p(|x| + x² / (1 + √(x² + 1))), accurate near 0
+        decimal_g sq = ax * ax;
+        decimal_g root = sqrt(decimal_g(sq + one));
+        root = root + one;
+        r = ln1p(decimal_g(ax + decimal_g(sq / root)));
+    }
+    if (r && neg)
+        r = -r;
+    return prec(r);
 }
 
 
@@ -2827,10 +2890,19 @@ decimal_p decimal::atanh(decimal_r x)
 //   Inverse hyperbolic tangent
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return nullptr;
+    if (x->is_zero())
+        return x;
+
+    // atanh(x) = ln1p(2x / (1 - x)) / 2, accurate for small x
     precision_adjust prec;
-    decimal_g one = make(1);
+    decimal_g one  = make(1);
     decimal_g half = make(5, -1);
-    return prec(half * ln((one + x) / (one - x)));
+    decimal_g r    = x + x;
+    r = r / decimal_g(one - x);
+    r = ln1p(r);
+    return prec(half * r);
 }
 
 
@@ -2862,9 +2934,8 @@ decimal_p decimal::coth(decimal_r x)
 // ----------------------------------------------------------------------------
 {
     precision_adjust prec;
-    decimal_g s = sinh(x);
-    decimal_g c = cosh(x);
-    return prec(c / s);
+    decimal_g t = tanh(x);
+    return prec(inv(t));
 }
 
 
@@ -2882,11 +2953,10 @@ decimal_p decimal::acsch(decimal_r x)
         return nullptr;
     }
     precision_adjust prec;
-    decimal_g one = make(1);
     decimal_g inv_x = inv(x);
     if (!inv_x)
         return nullptr;
-    return prec(ln(inv_x + decimal_g(sqrt(inv_x*inv_x + one))));
+    return prec(asinh(inv_x));
 }
 
 
