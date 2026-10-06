@@ -13802,6 +13802,24 @@ void tests::polynomial_roots()
     step("PEval: coefficient vector")
         .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
         .expect("0");
+    step("PEval: HP AUR example")
+        .test(CLEAR, "[ 1 2 -25 -26 120 ] 8 PEval", ENTER)
+        .expect("3 432");
+    step("PEval: complex evaluation point")
+        .test(CLEAR, "[ 1 2 -25 -26 120 ] 1ⅈ1 PEval", ENTER)
+        .expect("86-72ⅈ");
+    step("PEval: empty coefficient array is an error")
+        .test(CLEAR, "[ ] 3 PEval", ENTER)
+        .error("Bad argument type");
+    step("PEval: matrix is not a polynomial")
+        .test(CLEAR, "[[ 1 2 ][ 3 4 ]] 2 PEval", ENTER)
+        .error("Bad argument type");
+    step("PEval: multivariate expression is an error")
+        .test(CLEAR, "'X^2+Y' 3 PEval", ENTER)
+        .error("Invalid polynomial");
+    step("PEval: text evaluation point is an error")
+        .test(CLEAR, "[ 1 2 3 ] \"abc\" PEval", ENTER)
+        .error("Bad argument type");
     step("PEval: expression input")
         .test(CLEAR, "'X^2-5*X+6' 3 PEval", ENTER)
         .expect("0");
