@@ -15238,6 +15238,30 @@ void tests::regression_checks()
         .test("ABC", ENTER).expect("'T'");
     step("Cleaning up #1670")
         .test(CLEAR, "{ CST ABC } PURGE", ENTER).noerror();
+
+    step("Enter directory for crash guard tests")
+        .test(CLEAR, "'CrashGuards' CRDIR CrashGuards", ENTER).noerror();
+    step("Nested PUT into a non-list item")
+        .test(CLEAR, "{1 2 3} { 1 1 } 9 PUT", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list list item")
+        .test(CLEAR, "{1 2 3} 'L' STO 9 'L(1;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list vector item")
+        .test(CLEAR, "[1 2 3] 'L' STO 9 'L(1;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list item of a nested list")
+        .test(CLEAR, "{ {1 2} 3 } 'L' STO 9 'L(2;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested GET from a non-list item")
+        .test(CLEAR, "{1 2 3} { 1 1 } GET", ENTER)
+        .error("Bad argument type");
+    step("Nested PUT into a list item still works")
+        .test(CLEAR, "{ {1 2} 3 } { 1 2 } 9 PUT", ENTER)
+        .want("{ { 1 9 } 3 }");
+
+    step("Exit crash guard tests directory")
+        .test(CLEAR, "UPDIR 'CrashGuards' PGDIR", ENTER).noerror();
 }
 
 

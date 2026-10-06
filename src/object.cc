@@ -870,7 +870,15 @@ object_p object::at(object_p index, object_p value) const
 
         // Check if we need to recurse
         if (tail && tail->length())
+        {
             item = first->at(tail, value);
+            if (!item)
+            {
+                if (!rt.error())
+                    rt.type_error();
+                return nullptr;
+            }
+        }
 
         // For a list, copy bytes before, value bytes, and bytes after
         size_t   size  = 0;
