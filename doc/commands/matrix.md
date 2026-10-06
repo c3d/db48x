@@ -132,26 +132,32 @@ COL+
 Delete Columns Command: Deletes one or more columns from an array.
 
 The `COL-` command takes an input array and a column index in the array, and
-returns an array with the given column removed.
+returns the array with the given column removed in level 2, and the removed
+column as a vector in level 1.
 
 ```rpl
 [[11 12 13 14 15 16]
  [21 22 23 24 25 26]
  [31 32 33 34 35 36]]
 3 COL-
-@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+2 →List
+@ Expecting { [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]] [ 13 23 33 ] }
 ```
 
 Multiple columns can be removed by giving the first one and the number of
-columns to remove.
+columns to remove. Level 1 then contains the removed columns as a matrix.
 
 ```rpl
 [[11 12 13 14 15 16]
  [21 22 23 24 25 26]
  [31 32 33 34 35 36]]
 [ 3 2 ] COL-
-@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+2 →List
+@ Expecting { [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]] [[ 13 14 ] [ 23 24 ] [ 33 34 ]] }
 ```
+
+If the input is a vector, level 1 contains the removed element.
+An index outside of the array causes a `Bad argument value` error.
 
 ## Columns→
 
@@ -212,30 +218,30 @@ If the input is a matrix, `→Rows` returns the individual rows.
 
 ## ROW+
 
-Insert Rows Command: Insert rows into an existing array. The `COL+`
+Insert Rows Command: Insert rows into an existing array. The `ROW+`
 command takes three arguments:
 * an input array or list where the rows will be inserted
 * the rows to insert
-* the insertion position
+* the insertion position, which can be one past the last row to append
 
 If the input is a matrix, the rows can be an individual vector:
 
 ```rpl
 [[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
-[ 22 33 ]              @ Row to insert
+[ 22 33 44 ]           @ Row to insert
 2                      @ Insertion position
-COL+
-@ Expecting [[ 1 22 2 3 ] [ 4 33 5 6 ]]
+ROW+
+@ Expecting [[ 1 2 3 ] [ 22 33 44 ] [ 4 5 6 ]]
 ```
 
-or a matrix with the same number of rows:
+or a matrix with the same number of columns:
 
 ```rpl
-[[ 1 2 3 ] [ 4 5 6 ]]  @ Input matrix
-[ [22 33 ] [ 44 55 ] ] @ Rows to insert
-2                      @ Insertion position
-COL+
-@ Expecting [[ 1 22 33 2 3 ] [ 4 44 55 5 6 ]]
+[[ 1 2 3 ] [ 4 5 6 ]]                @ Input matrix
+[ [ 22 33 44 ] [ 55 66 77 ] ]        @ Rows to insert
+3                                    @ Insertion position
+ROW+
+@ Expecting [[ 1 2 3 ] [ 4 5 6 ] [ 22 33 44 ] [ 55 66 77 ]]
 ```
 
 If the input is a vector, then the rows can be an individual value:
@@ -244,7 +250,7 @@ If the input is a vector, then the rows can be an individual value:
 [ 1 2 3 ]  @ Input vector
 4          @ Value to insert
 2          @ Insertion position
-COL+
+ROW+
 @ Expecting [ 1 4 2 3 ]
 ```
 
@@ -254,36 +260,41 @@ The rows can also be another vector:
 [ 1 2 3 ]  @ Input vector
 [ 4 5 ]    @ Values to insert
 2          @ Insertion position
-COL+
+ROW+
 @ Expecting [ 1 4 5 2 3 ]
 ```
-
 
 ## ROW-
 
 Delete Rows Command: Deletes one or more rows from an array.
 
-The `COL-` command takes an input array and a row index in the array, and
-returns an array with the given row removed.
+The `ROW-` command takes an input array and a row index in the array, and
+returns the array with the given row removed in level 2, and the removed row
+in level 1.
 
 ```rpl
 [[11 12 13 14 15 16]
  [21 22 23 24 25 26]
  [31 32 33 34 35 36]]
-3 COL-
-@ Expecting [[ 11 12 14 15 16 ] [ 21 22 24 25 26 ] [ 31 32 34 35 36 ]]
+3 ROW-
+2 →List
+@ Expecting { [[ 11 12 13 14 15 16 ] [ 21 22 23 24 25 26 ]] [ 31 32 33 34 35 36 ] }
 ```
 
 Multiple rows can be removed by giving the first one and the number of
-rows to remove.
+rows to remove. Level 1 then contains the removed rows as a matrix.
 
 ```rpl
 [[11 12 13 14 15 16]
  [21 22 23 24 25 26]
  [31 32 33 34 35 36]]
-[ 3 2 ] COL-
-@ Expecting [[ 11 12 15 16 ] [ 21 22 25 26 ] [ 31 32 35 36 ]]
+[ 2 2 ] ROW-
+2 →List
+@ Expecting { [[ 11 12 13 14 15 16 ]] [[ 21 22 23 24 25 26 ] [ 31 32 33 34 35 36 ]] }
 ```
+
+If the input is a vector, level 1 contains the removed element.
+An index outside of the array causes a `Bad argument value` error.
 
 ## Rows→
 
