@@ -2916,6 +2916,15 @@ static object_p item_from_identity(size_t, size_t,
 }
 
 
+array_p array::identity(size_t n)
+// ----------------------------------------------------------------------------
+//   Build an n x n identity matrix
+// ----------------------------------------------------------------------------
+{
+    return build(n, n, item_from_identity);
+}
+
+
 COMMAND_BODY(IdentityMatrix)
 // ----------------------------------------------------------------------------
 //   Build an identity matrix

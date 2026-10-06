@@ -7930,6 +7930,9 @@ void tests::vector_functions()
        .test(CLEAR, "[1][0]", ID_divide)
        .error("Divide by zero");
 
+   step("Vector to the power zero is element-wise")
+       .test(CLEAR, "[1 2] 0 ^", ENTER)
+       .expect("[ 1 1 ]");
 }
 
 
@@ -8372,6 +8375,17 @@ void tests::matrix_functions()
     step("LU factors multiply back to the same object")
         .test(CLEAR, "[[1 2][3 4]] LU ROT ROT * SWAP [[1 2][3 4]] * SAME",
               ENTER)
+        .expect("True");
+
+    step("Matrix to the power zero is the identity")
+        .test(CLEAR, "[[1 2][3 4]] 0 ^", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]")
+        .test(CLEAR, "[[1 2 3][4 5 6]] 0 ^", ENTER)
+        .error("Invalid dimension");
+    step("Matrix integer powers")
+        .test(CLEAR, "[[1 2][3 4]] 2 ^", ENTER)
+        .want("[[ 7 10 ] [ 15 22 ]]")
+        .test(CLEAR, "[[1 2][3 4]] -1 ^ [[1 2][3 4]] INV ==", ENTER)
         .expect("True");
 }
 
