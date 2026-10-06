@@ -1278,6 +1278,11 @@ void tests::editor_operations()
         .test(CLEAR, "'X²2'", ENTER).error("Syntax error")
         .test(CLEAR, "'2!3'", ENTER).error("Syntax error")
         .test(CLEAR, "'X(1)2'", ENTER).error("Syntax error");
+    step("Numbers with two decimal dots are a syntax error")
+        .test(CLEAR, "'1.5.2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'2..3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'1.5.2+X'", ENTER).error("Syntax error")
+        .test(CLEAR, "1.5.2", ENTER).error("Syntax error");
 
     step("Graphical rendering of integrals - Simple expression")
         .test(CLEAR, "'integrate(A;B;sin(X);X)'", ENTER, EXIT)
