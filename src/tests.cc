@@ -15294,6 +15294,20 @@ void tests::regression_checks()
         .test(CLEAR, "1 2 4294967295 DROPN", ENTER)
         .error("Too few arguments");
 
+    step("Infinitely recursive user-defined function call")
+        .test(CLEAR, "'F(X)' 'F' STO 'F(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Infinitely recursive function call through a name")
+        .test(CLEAR, "'Q(X)' 'Q' STO 'Q' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Function call evaluating to itself")
+        .test(CLEAR, "'Q(2)' 'Q' STO 'Q(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Mutually recursive function calls")
+        .test(CLEAR, "'R(Y)' 'Q' STO 'Q(Y)' 'R' STO 'Q(2)' EVAL",
+              LENGTHY(30000), ENTER)
+        .error("Out of memory");
+
     step("Exit crash guard tests directory")
         .test(CLEAR, "UPDIR 'CrashGuards' PGDIR", ENTER).noerror();
 }
