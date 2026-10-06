@@ -13799,6 +13799,40 @@ void tests::polynomial_roots()
     step("PRoot rejects symbolic coefficients")
         .test(CLEAR, "[ 'A' 'B' 'C' ] PRoot", ENTER)
         .error("Bad argument type");
+    step("PRoot: cubic with one irrational real and two complex roots")
+        .test(CLEAR, "[1 2 3 4] PRoot", ENTER)
+        .expect("[ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ ]");
+    step("PRoot: decimal cubic with complex roots")
+        .test(CLEAR, "[1. 2. 3. 4.] PRoot", ENTER)
+        .expect("[ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ ]");
+    step("PRoot: x^3-1 starting at a critical point")
+        .test(CLEAR, "[1 0 0 -1] PRoot", ENTER)
+        .expect("[ 1 -¹/₂+'√ 3÷2'ⅈ -¹/₂-'√ 3÷2'ⅈ ]");
+    step("PRoot: x^4-1")
+        .test(CLEAR, "[1 0 0 0 -1] PRoot", ENTER)
+        .expect("[ -1 1 ⅈ -ⅈ ]");
+    step("PRoot: quadratic with complex roots")
+        .test(CLEAR, "[1 0 1] PRoot", ENTER)
+        .expect("[ ⅈ -ⅈ ]");
+    step("PRoot: quartic with only complex roots")
+        .test(CLEAR, "[2 3 4 5 6] PRoot", ENTER)
+        .expect("[ 0.33691 53136 48+1.25867 45668 5ⅈ 0.33691 53136 48-1.25867 45668 5ⅈ -1.08691 53136 5+0.76526 80330 29ⅈ -1.08691 53136 5-0.76526 80330 29ⅈ ]");
+    step("PRoot: irrational roots are not rounded to fractions")
+        .test(CLEAR, "[1 0 0 -2] PRoot", ENTER)
+        .expect("[ 1.25992 10498 9 -0.62996 05249 47+1.09112 36359 7ⅈ -0.62996 05249 47-1.09112 36359 7ⅈ ]");
+    step("PRoot: double root is snapped to exact value")
+        .test(CLEAR, "[1 -1 -8 12] PRoot", ENTER)
+        .expect("[ -3 2 ]");
+    step("PRoot: complex roots even without ComplexResults")
+        .test(CLEAR, "'ComplexResults' PURGE [1 0 1] PRoot", ENTER)
+        .expect("[ ⅈ -ⅈ ]");
+    step("Zeros: only real roots of a cubic without ComplexResults")
+        .test(CLEAR, "'X^3+2*X^2+3*X+4' 'X' Zeros", ENTER)
+        .expect("{ -1.65062 91914 4 }");
+    step("Zeros: all roots of a cubic with ComplexResults")
+        .test(CLEAR, "ComplexResults 'X^3+2*X^2+3*X+4' 'X' Zeros", ENTER)
+        .expect("{ -1.65062 91914 4 -0.17468 54042 8+1.54686 88872 3ⅈ -0.17468 54042 8-1.54686 88872 3ⅈ }")
+        .test(CLEAR, "'ComplexResults' PURGE", ENTER);
     step("PEval: coefficient vector")
         .test(CLEAR, "[ 1 -5 6 ] 2 PEval", ENTER)
         .expect("0");

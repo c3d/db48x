@@ -2068,6 +2068,97 @@ polynomial_p polynomial::primitive(size_t var) const
 
 RECORDER(polyroots, 16, "Polynomial roots");
 
+static bool is_complex_value(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Check if a root is a complex value (to filter out in real mode)
+// ----------------------------------------------------------------------------
+{
+    object::id ty = x ? x->type() : object::ID_object;
+    return ty == object::ID_rectangular || ty == object::ID_polar;
+}
+
+
+static void drop_negligible_imaginary(algebraic_g &x, algebraic_r eps)
+// ----------------------------------------------------------------------------
+//   Numeric roots of real polynomials may carry a tiny imaginary residue
+// ----------------------------------------------------------------------------
+{
+    if (!x || x->type() != object::ID_rectangular)
+        return;
+    rectangular_p z   = rectangular_p(+x);
+    algebraic_g   re  = z->re();
+    algebraic_g   im  = z->im();
+    algebraic_g   tol = abs::run(re);
+    algebraic_g   one = integer::make(1);
+    if (!re || !im || !tol)
+        return;
+    tol = (tol + one) * eps;
+    if (tol && (im->is_zero(false) || smaller_magnitude(im, tol)))
+    {
+        record(polyroots, "Dropping imaginary part of %t", +x);
+        x = re;
+    }
+}
+
+
+static void to_exact_root(algebraic_g &pretty,
+                          algebraic_r  x,
+                          algebraic_r  eps,
+                          polynomial_r p)
+// ----------------------------------------------------------------------------
+//   Replace a numeric root with a symbolic form only if it is exact
+// ----------------------------------------------------------------------------
+//   to_sqrt guesses fractions and square roots loosely, which gives wrong
+//   results for irrational roots such as 99/64 for 1.54686..., so we only
+//   accept a guess that is an exact root of the polynomial, or that
+//   reproduces the numeric root at solver precision.
+{
+    algebraic_g guess = x;
+    if (!algebraic::to_sqrt(guess) || !guess)
+        return;
+
+    // Exact zero of the polynomial (e.g. a snapped double root)
+    if (p)
+    {
+        stack_buffer sbuf;
+        if (p->expand(sbuf, false))
+        {
+            algebraic_g value = polynomial::horner(sbuf, guess);
+            sbuf.cleanup();
+            if (value && value->is_zero(false))
+            {
+                record(polyroots, "Exact zero %t for %t", +guess, +x);
+                pretty = guess;
+                return;
+            }
+        }
+        if (rt.error())
+            rt.clear_error();
+    }
+
+    algebraic_g check = guess;
+    if (!algebraic::to_decimal(check, true) || !check)
+        return;
+    algebraic_g diff = check - x;
+    algebraic_g tol  = abs::run(x);
+    algebraic_g one  = integer::make(1);
+    if (!diff || !tol)
+        return;
+    tol = (tol + one) * eps;
+    if (!tol)
+        return;
+    if (diff->is_zero(false) || smaller_magnitude(diff, tol))
+    {
+        record(polyroots, "Exact root %t for %t", +guess, +x);
+        pretty = guess;
+    }
+    else
+    {
+        record(polyroots, "Rejected guess %t for %t", +guess, +x);
+    }
+}
+
+
 list_p polynomial::roots(object::id ty, symbol_p var) const
 // ----------------------------------------------------------------------------
 //   Compute roots for polynomial and cleanup
@@ -2095,6 +2186,10 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
     scribble     scr;
     record(polyroots, "Roots of %t for variable %t", +p, +vname);
     settings::SaveFractionDigits fd(4);
+    bool                         cplx = Settings.ComplexResults();
+    int                          impr = Settings.SolverImprecision();
+    algebraic_g                  eps  = algebraic::epsilon(impr);
+    polynomial_g                 orig = this;
 
     while (p && !program::interrupted())
     {
@@ -2188,14 +2283,20 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                     if (expression_p expr = x->as<expression>())
                         x = expr->simplify();
                 }
+                drop_negligible_imaginary(x, eps);
+                drop_negligible_imaginary(y, eps);
                 if (round && x && y)
                 {
-                    to_sqrt(x);
-                    to_sqrt(y);
+                    to_exact_root(x, x, eps, orig);
+                    to_exact_root(y, y, eps, orig);
                 }
                 record(polyroots, "Solutions %t and %t", +x, +y);
-                if (!rt.append(+x) || !rt.append(+y))
-                    goto error;
+                if (cplx || !is_complex_value(x))
+                    if (!rt.append(+x))
+                        goto error;
+                if (cplx || !is_complex_value(y))
+                    if (!rt.append(+y))
+                        goto error;
             }
             else if (a[1] && !a[1]->is_zero(false))
             {
@@ -2227,7 +2328,6 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
 
             settings::SaveComplexResults scr(true);
             size_t      max = Settings.SolverIterations();
-            algebraic_g eps = algebraic::epsilon();
             algebraic_g n   = integer::make(degree);
             algebraic_g n1  = integer::make(1);
             algebraic_g x   = integer::make(0);
@@ -2262,9 +2362,36 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                 record(polyroots, "denominators %t or %t", +a, +y);
                 if (smaller_magnitude(a, y))
                     a = y;
+                if (!a)
+                    goto error;
+                if (a->is_zero(false))
+                {
+                    // Critical point (e.g. x^3-1 at x=0): nudge instead of
+                    // dividing by zero
+                    n1 = integer::make(1);
+                    x  = x + n1;
+                    n1 = n - n1;
+                    record(polyroots, "Zero denominator, nudged x=%t", +x);
+                    continue;
+                }
                 a = n / a;
+                y = x;
                 x = x - a;
                 record(polyroots, "a=%t new x=%t", +a, +x);
+
+                // Converged when the step no longer moves x at precision
+                if (!x || !y)
+                    goto error;
+                g = y - x;
+                if (g && (g->is_zero(false) || !smaller_magnitude(eps, g)))
+                {
+                    y = horner(spoly, x);
+                    if (!y)
+                        goto error;
+                    found = true;
+                    record(polyroots, "Step converged x=%t y=%t", +x, +y);
+                    break;
+                }
             }
 
             sder1.cleanup();
@@ -2275,10 +2402,14 @@ list_p polynomial::roots_internal(object::id ty, symbol_p var) const
                 rt.no_solution_error();
                 goto error;
             }
-            if (round && x)
-                to_sqrt(x);
-            if (!rt.append(x))
-                goto error;
+            // Prettify a copy of the root, but deflate with the numeric value
+            y = x;
+            drop_negligible_imaginary(y, eps);
+            if (round)
+                to_exact_root(y, x, eps, orig);
+            if (cplx || !is_complex_value(y))
+                if (!rt.append(y))
+                    goto error;
 
             // Here p(x) is small enough, generate x-x0 polynomial
             der1 = make(vname);
@@ -2381,6 +2512,8 @@ COMMAND_BODY(PRoot)
 //   All roots of a polynomial from coefficient vector
 // ----------------------------------------------------------------------------
 {
+    // Like HP's PROOT, always return complex roots
+    settings::SaveComplexResults cplx(true);
     if (object_p pobj = rt.top())
         if (polynomial_p poly = polynomial::get(pobj))
             if (symbol_p var = polynomial::main_variable())
