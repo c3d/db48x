@@ -872,6 +872,19 @@ period only 0.40°: to know the amplitude better, measure the length better.
 @ Expecting θmax:70.00668 81164±σ1.22184 90395 5 °
 ```
 
+**3)** A lab experiment: an unknown capacitor, from the voltage across it
+after charging for a time t through a resistor R. The resistor is only known
+by its tolerance, 5 %, a bound; the other inputs are measured. C lies inside an
+exponential. The tolerance of R dominates: with a 1 % resistor, the
+uncertainty of C falls from 1.51 μF to 0.55 μF, without a better voltmeter or
+a better clock.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±5%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+@ Expecting { C:49.94037 53622±σ1.51471 94838 9 μF }
+```
+
 These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
