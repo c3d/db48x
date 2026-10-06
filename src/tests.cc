@@ -2396,6 +2396,24 @@ void tests::global_variables()
         .test(NOSHIFT, BSP).expect("11")
         .test(NOSHIFT, BSP).expect("{ 11 23 34 44 }");
 
+    step("Create directories from a list")
+        .test(CLEAR, "HOME 'CrDirTest' CRDIR CrDirTest", ENTER).noerror()
+        .test(CLEAR, "{ DA DB DC } CRDIR VARS", ENTER)
+        .expect("{ DC DB DA }")
+        .test(CLEAR, "{ ALPHA BETA GAMMA2 DELTA } CRDIR VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }");
+    step("Create directories from a list with an invalid name")
+        .test(CLEAR, "{ DD 3 DE } CRDIR", ENTER)
+        .error("Invalid name")
+        .test(CLEAR, "VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }");
+    step("Create directories from a list with an existing name")
+        .test(CLEAR, "{ DD DB DE } CRDIR", ENTER)
+        .error("Name already exists")
+        .test(CLEAR, "VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }")
+        .test(CLEAR, "HOME 'CrDirTest' PGDIR", ENTER).noerror();
+
     step("Store current directory into itself")
         .test(CLEAR, "HOME 'StoSelf' CRDIR StoSelf", ENTER).noerror()
         .test(CLEAR, "5 'A' STO { 1 2 3 } 'L' STO", ENTER).noerror()

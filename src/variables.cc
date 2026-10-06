@@ -1432,14 +1432,49 @@ COMMAND_BODY(Path)
 }
 
 
-static bool do_crdir(directory *dir, object_p name)
+static bool check_crdir(directory_r dir, object_p name)
 // ----------------------------------------------------------------------------
-//   Internal helper for CRDIR
+//   Check that we can create directories with the given name(s)
 // ----------------------------------------------------------------------------
+//   This makes sure that we do not create some directories in a list
+//   and then fail because a later name is invalid or already exists
 {
     if (object_p quoted = name->as_quoted(object::ID_object))
         name = quoted;
     if (list_p lst = name->as<list>())
+    {
+        for (object_p sub : *lst)
+            if (!check_crdir(dir, sub))
+                return false;
+        return true;
+    }
+
+    object::id ty = name->type();
+    if (ty != object::ID_symbol &&
+        !(ty == object::ID_integer && Settings.NumberedVariables()))
+    {
+        rt.invalid_name_error();
+        return false;
+    }
+    if (dir->recall(name))
+    {
+        rt.name_exists_error();
+        return false;
+    }
+    return true;
+}
+
+
+static bool do_crdir(directory_r dir, object_g name)
+// ----------------------------------------------------------------------------
+//   Internal helper for CRDIR
+// ----------------------------------------------------------------------------
+//   Creating a directory allocates memory and moves the globals, so `name`
+//   and the list iterator must be GC-safe across iterations
+{
+    if (object_p quoted = name->as_quoted(object::ID_object))
+        name = quoted;
+    if (list_g lst = name->as<list>())
     {
         for (object_p sub : *lst)
             if (!do_crdir(dir, sub))
@@ -1453,8 +1488,8 @@ static bool do_crdir(directory *dir, object_p name)
         return false;
     }
 
-    object_p newdir = rt.make<directory>();
-    return dir->store(name, newdir);
+    object_g newdir = rt.make<directory>();
+    return newdir && ((directory *) +dir)->store(name, newdir);
 }
 
 
@@ -1463,16 +1498,17 @@ COMMAND_BODY(CrDir)
 //   Create a directory
 // ----------------------------------------------------------------------------
 {
-    directory *dir = rt.variables(0);
+    directory_g dir = rt.variables(0);
     if (!dir)
     {
         rt.no_directory_error();
         return ERROR;
     }
 
-    if (object_p obj = rt.pop())
-        if (do_crdir(dir, obj))
-            return OK;
+    if (object_g obj = rt.top())
+        if (check_crdir(dir, obj) && do_crdir(dir, obj))
+            if (rt.drop())
+                return OK;
     return ERROR;
 }
 
