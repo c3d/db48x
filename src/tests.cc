@@ -5759,6 +5759,24 @@ void tests::complex_arithmetic()
         .expect("'e↑(ⅈ·π)'")
         .test(LSHIFT, KEY1)
         .expect("-1.");
+
+    step("Equality tests on complex numbers")
+        .test(CLEAR, "1+ⅈ 1+ⅈ =", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1-ⅈ =", ENTER).expect("False")
+        .test(CLEAR, "1+ⅈ 1-ⅈ ≠", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1+ⅈ ≠", ENTER).expect("False")
+        .test(CLEAR, "2 2+0ⅈ =", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1 =", ENTER).expect("False")
+        .test(CLEAR, "1+ⅈ 1+ⅈ ==", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1+ⅈ SAME", ENTER).expect("True");
+    step("Ordering complex numbers is an error that keeps the arguments")
+        .test(CLEAR, "1+ⅈ 1+ⅈ <", ENTER).error("Bad argument type")
+        .test(CLEAR, "1+ⅈ 1+ⅈ < DEPTH", ENTER).error("Bad argument type")
+        .test(CLEAR, "IFERR 1+ⅈ 2+ⅈ < THEN DEPTH END", ENTER).expect("2");
+    step("Ordering ranges is an error that keeps the arguments")
+        .test(CLEAR, "1…2 2…3 <", ENTER).error("Bad argument type")
+        .test(CLEAR, "IFERR 1…2 2…3 < THEN DEPTH END", ENTER).expect("2")
+        .test(CLEAR, "IFERR 1…2 2…3 < THEN DROP END", ENTER).expect("1…2");
 }
 
 
