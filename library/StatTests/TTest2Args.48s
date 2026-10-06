@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TTest2Args
+  @  Labels a row of values with the parameter names of TTest2.
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 6; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 6 ≠ THEN "TTest2Args: needs 6 arguments" DoError END Explode Drop END
+  → n1v x1v s1v n2v x2v s2v « n1v 0 + x1v 0 + s1v 0 + n2v 0 + x2v 0 + s2v 0 + → n1 xb1 sd1 n2 xb2 sd2 « n1 "n1" →Tag xb1 "xbar1" →Tag sd1 "s1" →Tag n2 "n2" →Tag xb2 "xbar2" →Tag sd2 "s2" →Tag n1v x1v s1v n2v x2v s2v 6 →List Drop » »
+»

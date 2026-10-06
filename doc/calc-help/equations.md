@@ -2893,3 +2893,688 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
+
+## Math
+
+Mathematical simulations that do not belong to a physical domain.
+
+### Probability
+
+The 30 variables in the Probability section are:
+
+* `λ`: Rate of the exponential law, scale of the Weibull, mean of the Poisson
+* `μ`: Mean of the distribution — a parameter for `Norml` and `Logis`, computed elsewhere
+* `μl`: Mean of the underlying normal (`LgNrm`)
+* `σl`: Standard deviation of the underlying normal (`LgNrm`)
+* `a`: Shape of the gamma law, first shape of the beta
+* `ap`: Shape α of the Pareto law
+* `b`: Second shape of the beta law
+* `CDF`: Distribution function, the probability of not exceeding `X`
+* `CDFc`: Complement of `CDF`, the upper tail
+* `df`: Degrees of freedom of the chi-square and Student laws
+* `dfd`: Degrees of freedom of Fisher's denominator
+* `dfn`: Degrees of freedom of Fisher's numerator
+* `Ks`: Number of successes in the population (`Hyper`)
+* `nd`: Number of items drawn without replacement (`Hyper`)
+* `Np`: Size of the population (`Hyper`)
+* `nt`: Number of trials (`Binom`)
+* `p`: Probability of success in one trial
+* `PDF`: Density, or probability mass where the law is discrete
+* `rs`: Number of successes sought (`NegBinom`)
+* `s`: Scale of the Rayleigh and logistic laws
+* `sc`: Scale of the Cauchy, GEV, gamma, truncated normal and Lévy laws
+* `sh`: Shape of the Weibull law
+* `sx`: Standard deviation of the distribution — a parameter for `Norml`, computed elsewhere
+* `X`: The point at which the law is evaluated
+* `x0`: Location of the Cauchy, GEV, truncated normal and Lévy laws
+* `xi`: Shape of the GEV, deciding which extreme-value family it is
+* `Xmax`: Upper bound of the support
+* `Xmin`: Lower bound of the support
+* `xm`: Scale of the Pareto law, and the smallest value it can take
+* `xp`: Mode of the asymmetric triangular law
+
+One more name appears inside the formulas but never in the solver menu:
+`Jx`, the index of summation used by the discrete laws.
+
+Probability distributions, written as equation systems solved by Root. Each
+entry exposes the same three quantities — `PDF` the density, `CDF` the
+distribution function, `CDFc` its complement `1-CDF`, which is the upper tail —
+together with the parameters of the law and, where they exist, its mean `μ` and
+standard deviation `sx`.
+
+**The inverse needs no separate entry.** Give `CDF` and ask for `X`, and the
+solver returns the quantile. This is why no `CDF⁻¹` appears here: such an entry
+would place a Root inside a Root, which the solver cannot do.
+
+It can, however, return No solution? for some starting guesses while succeeding
+from others on the same law with the same parameters, because a distribution
+function is flat at both ends and the search can be trapped there; move the
+guess and try again. Where the quantile has to be reliable, use the Probability
+section of the Function Library instead, whose entries bisect rather than search
+and so cannot be trapped.
+
+**Naming.** `sx` rather than σ, `ap` rather than α, `sh` rather than k,
+`sc` rather than γ: those four names resolve to built-in constants — σ is
+the Stefan-Boltzmann constant — and would silently return the constant instead
+of the value entered.
+
+**The mean and the standard deviation** are computed, not entered, except where
+they are also parameters of the law (`Norml`, `Logis`). The Cauchy distribution
+returns Ⓒ? for both, since it has neither: its moments do not converge.
+
+**Turn on `AllVars` first.** These are systems of several equations, and by
+default the solver menu shows only the variables of the first one — for `Norml`
+that is `PDF`, `sx`, `μ` and `X`, with `CDF` and `CDFc` missing and no way to
+reach them. The `AllVars` setting, in the `UserInterfaceModes` menu, makes the
+menu show every variable of the system. The AllEquationVariables command does
+the same from the command line. Without it, NextEq steps from one equation of
+the system to the next, which reaches the same variables one screen at a time.
+
+**Beware of values left over from a previous computation.** The solver takes the
+first equation in which every variable but the unknown is already defined, so a
+stale `PDF` will be used in preference to the `CDF` you have just entered. Asking
+for `X` with `PDF=0.3989` still in memory returns zero — which is correct, since
+zero is where the normal density reaches its maximum, but it is not the question
+you meant to ask. `CDF` is placed first in each system so that it wins when both
+are defined; when in doubt, purge the quantity you are not using.
+
+#### Norml
+
+Normal distribution of mean `μ` and standard deviation `sx`. In closed form
+through the error function: `CDF=0.5·(1+erf((X-μ)/(sx·√2)))`.
+
+![Normal Distribution](img/Norml_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `μ`, `sx`, `X`:
+```rpl
+μ=0  sx=1  X=1.645
+@ Expecting [ PDF=0.10311 08110 92 CDF=0.95001 50944 61 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺNorml;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+* To obtain the quantile, give `CDF` and ask for `X`:
+```rpl
+μ=0  sx=1  CDF=0.95
+@ Expecting [ X=1.64485 36269 5 ]
+'ROOT(ⒺNorml;[X];[1])'
+```
+
+#### LgNrm
+
+Log-normal distribution: `LN(X)` is normal of mean `μl` and standard deviation
+`σl`. Its own mean and standard deviation differ from its parameters, which is
+why both are given: `μ=EXP(μl+σl²/2)`.
+
+![Lognormal Distribution](img/LgNrm_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `μl`, `σl`, `X`:
+```rpl
+μl=0  σl=1  X=2
+@ Expecting [ PDF=0.15687 40192 79 CDF=0.75589 14042 14 CDFc=0.24410 85957 86 μ=1.64872 12707 sx=2.16119 74159 ]
+'ROOT(ⒺLgNrm;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Expon
+
+Exponential distribution of rate `λ`, on `X≥0`. Mean and standard deviation are
+both `1/λ`. The quantile also has a closed form, `X=-LN(1-CDF)/λ`, faster than
+solving.
+
+![Exponential Distribution](img/Expon_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=2  X=0.5
+@ Expecting [ PDF=0.73575 88823 43 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=0.5 sx=0.5 ]
+'ROOT(ⒺExpon;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Weibl
+
+Weibull distribution of shape `sh` and scale `λ`, on `X≥0`. Reduces to the
+exponential when `sh=1` and to Rayleigh when `sh=2`. Its moments use the gamma
+function: `μ=λ·Γ(1+1/sh)`.
+
+![Weibull Distribution](img/Weibl_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `sh`, `λ`, `X`:
+```rpl
+sh=2  λ=3  X=3
+@ Expecting [ PDF=0.24525 29607 81 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=2.65868 07763 6 sx=1.38975 41255 3 ]
+'ROOT(ⒺWeibl;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Rayleigh
+
+Rayleigh distribution of scale `s`, on `X≥0`. The law of the magnitude of a
+two-dimensional vector whose components are independent centred normals of the
+same variance — hence its use for wind speeds and for the modulus of a complex
+noise.
+
+![Rayleigh Distribution](img/Rayleigh_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `s`, `X`:
+```rpl
+s=2  X=2
+@ Expecting [ PDF=0.30326 53298 56 CDF=0.39346 93402 87 CDFc=0.60653 06597 13 μ=2.50662 82746 3 sx=1.31027 27551 2 ]
+'ROOT(ⒺRayleigh;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Logis
+
+Logistic distribution of location `μ` and scale `s`. Symmetric like the normal
+but with heavier tails, and its distribution function is elementary:
+`CDF=1/(1+EXP(-(X-μ)/s))`. Here `μ` is both a parameter and the mean; the
+standard deviation is `sx=s·π/√3`.
+
+![Logistic Distribution](img/Logis_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;sx]` from `μ`, `s`, `X`:
+```rpl
+μ=0  s=1  X=2
+@ Expecting [ PDF=0.10499 35854 04 CDF=0.88079 70779 78 CDFc=0.11920 29220 22 sx=1.81379 93642 3 ]
+'ROOT(ⒺLogis;[PDF;CDF;CDFc;sx];[1;0.5;0.5;1])'
+```
+
+#### Pareto
+
+Pareto distribution of minimum `xm` and index `ap`, on `X≥xm`. This is the power
+law: the density falls as `X^-(ap+1)`, so the tail is heavy and the moments exist
+only above certain values of `ap`. The section says which rather than returning a
+number that means nothing:
+
+* `ap>2` — both moments exist, and are the values below.
+* `1<ap≤2` — the mean exists; the variance integral diverges, so `sx` is infinite.
+* `ap≤1` — the mean is itself infinite, so there is nothing to take a deviation
+  from and `sx` is undefined. That is not the same as infinite: a Monte-Carlo
+  sample of an infinite mean grows without ever settling, whereas an undefined
+  deviation has no value to converge to at all.
+
+![Pareto Distribution](img/Pareto_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `xm`, `ap`, `X`:
+```rpl
+xm=1  ap=3  X=2
+@ Expecting [ PDF=0.1875 CDF=0.875 CDFc=0.125 μ=1.5 sx=0.86602 54037 84 ]
+'ROOT(ⒺPareto;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Cauch
+
+Cauchy distribution of location `x0` and scale `sc`. It has neither mean nor
+variance — both integrals diverge — so `μ` and `sx` return Ⓒ?, undefined. It
+cannot take part in an uncertainty propagation based on a standard deviation.
+
+The distribution function uses `UVAL(UBASE(ATAN(...)))` so that it does not
+depend on the current angle mode: ATAN returns an angle, which UBASE
+expresses in turns.
+
+![Cauchy Distribution](img/Cauch_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.15915 49430 92 CDF=0.75 CDFc=0.25 ]
+'ROOT(ⒺCauch;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+#### UnifCont
+
+Continuous uniform distribution on `[Xmin;Xmax]`. Density `1/(Xmax-Xmin)` inside
+the interval and zero outside.
+
+![Continuous Uniform Distribution](img/UnifCont_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=2  Xmax=6  X=3
+@ Expecting [ PDF=0.25 CDF=0.25 CDFc=0.75 μ=4 sx=1.15470 05383 8 ]
+'ROOT(ⒺUnifCont;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### TriSym
+
+Symmetric triangular distribution on `[Xmin;Xmax]`, peaking at the midpoint. The
+density vanishes at both ends, so the half-width `(Xmax-Xmin)/2` appears in it,
+not the midpoint. Its distribution function is given in closed form rather than
+as an integral: integrating a density that is identically zero over part of the
+range loses precision.
+
+![Symmetric Triangular Distribution](img/TriSym_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=3  X=2.5
+@ Expecting [ PDF=0.5 CDF=0.875 CDFc=0.125 μ=2 sx=0.40824 82904 64 ]
+'ROOT(ⒺTriSym;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Chi2
+
+Chi-square distribution with `df` degrees of freedom, on `X≥0`. Its distribution
+function has no elementary form and is obtained by integrating the density, so
+it costs more than the others: about 90 ms for a `CDF` and 700 ms for a
+quantile, which is the order of what the Planck fraction in `Fluids` already
+costs.
+
+![Chi-Square Distribution](img/Chi2_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=4
+@ Expecting [ PDF=0.13533 52832 37 CDF=0.59399 41502 9 CDFc=0.40600 58497 1 μ=4 sx=2.82842 71247 5 ]
+'ROOT(ⒺChi2;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+* The quantile, by giving `CDF` and asking for `X`. This is the slowest entry of
+  the section, about 700 ms, since each step of the search integrates the
+  density afresh:
+```rpl
+df=4  CDF=0.95
+@ Expecting [ X=9.48772 90367 8 ]
+'ROOT(ⒺChi2;[X];[8])'
+```
+
+#### Beta
+
+Beta distribution of shapes `a` and `b`, on `[0;1]`. Like the chi-square, its
+distribution function is an integral. It is fast when `a` and `b` are integers,
+the integrand then being polynomial, and much slower otherwise — an unusual
+behaviour worth knowing about.
+
+![Beta Distribution](img/Beta_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `a`, `b`, `X`:
+```rpl
+a=2  b=3  X=0.5
+@ Expecting [ PDF=1.5 CDF=0.6875 CDFc=0.3125 μ=0.4 sx=0.2 ]
+'ROOT(ⒺBeta;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+---
+
+#### Phit
+
+Standard normal distribution — mean zero, standard deviation one. The special
+case of Norml that statistical tables are built on, kept separate because it
+takes no parameter at all.
+
+![Standard Normal Distribution](img/Phit_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc]` from `X`:
+```rpl
+X=1.645
+@ Expecting [ CDF=0.95001 50944 61 PDF=0.10311 08110 92 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺPhit;[CDF;PDF;CDFc];[0.5;1;0.5])'
+```
+
+#### TriRight
+
+Right triangular distribution on `[Xmin;Xmax]` — density rising linearly from
+zero at `Xmin` to its maximum at `Xmax`. Useful when a quantity is more likely
+to sit near its upper bound.
+
+![Right Triangular Distribution](img/TriRight_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=2
+@ Expecting [ CDF=0.44444 44444 44 PDF=0.44444 44444 44 CDFc=0.55555 55555 56 μ=2 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriRight;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriLeft
+
+Left triangular distribution on `[Xmin;Xmax]` — the mirror of TriRight, its
+density falling from a maximum at `Xmin` to zero at `Xmax`.
+
+![Left Triangular Distribution](img/TriLeft_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=1
+@ Expecting [ CDF=0.55555 55555 56 PDF=0.44444 44444 44 CDFc=0.44444 44444 44 μ=1 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriLeft;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriAsym
+
+Asymmetric triangular distribution on `[Xmin;Xmax]` with its peak at `xp`. The
+three-point estimate of project planning: a minimum, a maximum, and a most
+likely value. TriSym, TriRight and TriLeft are its special cases.
+
+![Asymmetric Triangular Distribution](img/TriAsym_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `xp`, `X`:
+```rpl
+Xmin=0  Xmax=3  xp=1  X=1
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.66666 66666 67 CDFc=0.66666 66666 67 μ=1.33333 33333 3 sx=0.62360 95644 62 ]
+'ROOT(ⒺTriAsym;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### UShape
+
+Arcsine distribution on `[Xmin;Xmax]` — U-shaped, with the density diverging at
+both ends and a minimum in the middle. It describes a quantity that spends most
+of its time near its extremes, such as the position of a harmonic oscillator
+sampled at random times.
+
+Its distribution function uses UVAL(UBASE(ASIN(...))) so that the result does
+not depend on the current angle mode, exactly as Cauch does with the arc
+tangent.
+
+![U-Shaped Distribution](img/UShape_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=1  X=0.25
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.73510 51938 96 CDFc=0.66666 66666 67 μ=0.5 sx=0.35355 33905 93 ]
+'ROOT(ⒺUShape;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### GEV
+
+Generalised extreme value distribution of location `x0`, scale `sc` and shape
+`xi` — the limiting law of a maximum, and the tool of choice for floods, wind
+loads and record temperatures. The shape decides the family: `xi` positive gives
+Fréchet, negative gives Weibull, and zero gives Gumbel, which the system handles
+as a separate branch since the general formula divides by `xi`.
+
+The mean exists only for `xi` below 1 and the standard deviation only for `xi`
+below one half; at `xi=0.5` the variance already diverges, and the two last
+equations then return nothing rather than an error.
+
+![Generalized Extreme Value Distribution](img/GEV_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `xi`, `X`:
+```rpl
+x0=0  sc=1  xi=0.2  X=1
+@ Expecting [ CDF=0.66906 26526 68 PDF=0.22406 77286 51 CDFc=0.33093 73473 32 μ=0.82114 85686 27 sx=1.82867 04356 7 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+* The Gumbel case, `xi=0`, where the mean is Euler's constant and the standard
+  deviation is `sc·π/√6`:
+```rpl
+x0=0  sc=1  xi=0  X=1
+@ Expecting [ CDF=0.69220 06275 55 PDF=0.25464 63800 44 CDFc=0.30779 93724 45 μ=0.57721 56649 02 sx=1.28254 98301 6 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### Gamma
+
+Waiting time until the `a`-th event of a Poisson process of mean spacing `sc` —
+the sum of `a` exponential waits. Shape `a` and scale `sc` are both positive and
+`a` need not be an integer. Chi2 is the special case `a=df/2`, `sc=2`, and Expon
+the case `a=1`.
+
+Like Chi2 it has no closed form: the distribution function is obtained by
+integration, at about the same cost — a tenth of a second for a value, a second
+for a quantile.
+
+![Gamma Distribution](img/Gamma_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `a`, `sc`, `X`:
+```rpl
+a=2  sc=3  X=3
+@ Expecting [ CDF=0.26424 11176 57 PDF=0.12262 64803 9 CDFc=0.73575 88823 43 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The inverse, here the median, obtained by giving CDF and asking for X:
+```rpl
+a=2  sc=3  CDF=0.5
+@ Expecting [ X=5.03504 09700 5 PDF=0.10443 92303 83 CDFc=0.5 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[X;PDF;CDFc;μ;sx];[5;0.1;0.5;1;1])'
+```
+
+#### NormTrunc
+
+The normal law of location `x0` and scale `sc`, restricted to the interval from
+`Xmin` to `Xmax` and renormalised over it. This is the law the NIST Uncertainty
+Machine uses for a quantity known to be normal but physically bounded — a
+concentration that cannot be negative, a transmittance that cannot exceed one.
+
+Beware that `x0` and `sc` are the parameters of the parent normal law, not the
+mean and the standard deviation of the truncated one: truncation shifts the mean
+towards the middle of the interval and shrinks the spread, and it is μ and sx
+that report the real ones. In the example below the parent is centred on zero
+with unit width, but cutting it at −1 and 2 moves the mean to 0.23 and brings
+the standard deviation down to 0.72.
+
+![Truncated Normal Distribution](img/NormTrunc_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `Xmin`, `Xmax`, `X`:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  X=0
+@ Expecting [ CDF=0.41698 87514 29 PDF=0.48735 02384 7 CDFc=0.58301 12485 71 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+* The 95th percentile, which falls well short of the 1.645 of the parent law:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  CDF=0.95
+@ Expecting [ X=1.52459 66827 8 PDF=0.15244 22014 83 CDFc=0.05 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[X;PDF;CDFc;μ;sx];[1;0.1;0.05;0.5;0.5])'
+```
+
+---
+
+#### Student
+
+Student's t distribution with `df` degrees of freedom — the law of a sample mean
+when the variance is estimated from the sample itself, and the reason a small
+sample needs wider intervals than a large one. As `df` grows it approaches the
+normal law; at `df=1` it is the Cauchy law, with no mean at all.
+
+The distribution function is the regularised incomplete beta, so it is closed
+form and immediate. The mean exists only for `df` above 1 and the standard
+deviation only above 2; below those the two entries return Ⓒ?.
+
+![Student t Distribution](img/Student_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=1
+@ Expecting [ CDF=0.81304 95168 5 PDF=0.21466 25258 4 CDFc=0.18695 04831 5 μ=0 sx=1.41421 35623 7 ]
+'ROOT(ⒺStudent;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0;1])'
+```
+
+* The 97.5th percentile, the critical value of the two-sided test at 5 per cent:
+```rpl
+df=4  CDF=0.975
+@ Expecting [ X=2.77644 51052 ]
+'ROOT(ⒺStudent;[X];[2])'
+```
+
+#### Fisher
+
+Fisher's F distribution with `dfn` degrees of freedom in the numerator and `dfd`
+in the denominator — the ratio of two independent estimates of the same
+variance, and the law behind the analysis of variance.
+
+Its distribution function is the regularised incomplete beta as well. The mean
+exists only for `dfd` above 2 and the standard deviation only above 4.
+
+![Fisher F Distribution](img/Fisher_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `dfn`, `dfd`, `X`:
+```rpl
+dfn=4  dfd=6  X=1
+@ Expecting [ CDF=0.5248 PDF=0.41472 CDFc=0.4752 μ=1.5 sx=2.12132 03435 6 ]
+'ROOT(ⒺFisher;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The 95th percentile, the critical value of the test:
+```rpl
+dfn=4  dfd=6  CDF=0.95
+@ Expecting [ X=4.53367 69502 8 ]
+'ROOT(ⒺFisher;[X];[4])'
+```
+
+#### Levy
+
+Lévy distribution of location `x0` and scale `sc`, on `X>x0`. It is the stable
+law of index one half, and one of the few whose distribution function is exact
+in closed form: `CDF=erfc(√(sc/(2·(X-x0))))`.
+
+Its tail is heavy enough that **neither moment exists**: both `μ` and `sx` are
+infinite, and the section says so with the infinity constant rather than
+returning a number. Sampling it shows the same thing — a running mean that
+climbs without ever settling.
+
+![Levy Distribution](img/Levy_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.24197 07245 19 CDF=0.31731 05078 63 CDFc=0.68268 94921 37 ]
+'ROOT(ⒺLevy;[PDF;CDF;CDFc];[0.5;0.5;0.5])'
+```
+
+* To obtain the median, give `CDF` and ask for `X`:
+```rpl
+x0=0  sc=1  CDF=0.5
+@ Expecting [ X=2.19810 93383 2 ]
+'ROOT(ⒺLevy;[X];[2])'
+```
+
+
+### Discrete distributions
+
+For these seven laws PDF is the probability **mass** at X, not a density: the
+probability that the variable takes exactly that value. CDF sums the mass up to
+IP(X), so a non-integer X behaves as the step function does, and CDFc is the
+upper tail.
+
+They need no numerical integration. The sums are exact and quick — a Poisson
+tail of a hundred and twenty terms costs about sixteen milliseconds.
+
+The quantile, however, is **not** available here: giving CDF and asking for X
+fails on every one of these laws, and it is not a defect of any one of them. The
+distribution function of a discrete law is a staircase, flat between the
+integers, so its derivative is zero almost everywhere and the solver has nothing
+to follow; it returns Divide by zero.
+
+**Use the Function Library instead.** Its Probability section holds one quantile
+function per law — ⓁBernoulliQ, ⓁBinomQ, ⓁPoissQ, ⓁGeomQ, ⓁHyperQ, ⓁNegBinomQ
+and ⓁUnifDisQ — which sum the mass directly and return the integer, in a few
+milliseconds. Parameters go on the stack first and the probability last, so the
+95th percentile of twenty trials at three tenths reads `20 0.3 0.95 ⓁBinomQ`.
+See Probability functions for the convention they follow and for the boundary
+cases.
+
+Poiss and NegBinom, whose support has no upper end, stop summing beyond the
+mean plus forty standard deviations, where the distribution function is already
+one to every digit displayed; Hyper stops at nd, beyond which every draw is a
+success. Without those guards a solver sent wandering towards large X spends
+minutes on factorials that overflow anyway.
+
+#### Bernoulli
+
+A single trial with probability p of success. The building block of Binom, and
+the simplest law in the section.
+
+![Bernoulli Distribution](img/Bernoulli_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=0
+@ Expecting [ CDF=0.7 PDF=0.7 CDFc=0.3 μ=0.3 sx=0.45825 75694 96 ]
+'ROOT(ⒺBernoulli;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+#### Binom
+
+Number of successes in `nt` independent trials, each with probability `p`. The
+mass uses COMB and the distribution function sums it, so both are exact.
+
+![Binomial Distribution](img/Binom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `nt`, `p`, `X`:
+```rpl
+nt=20  p=0.3  X=8
+@ Expecting [ CDF=0.88666 85371 23 PDF=0.11439 67397 05 CDFc=0.11333 14628 77 μ=6. sx=2.04939 01531 9 ]
+'ROOT(ⒺBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Poiss
+
+Number of events in a fixed interval when they occur independently at mean rate
+`λ`. Mean and variance are both `λ`, which is the signature of the law.
+
+![Poisson Distribution](img/Poiss_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=10  X=10
+@ Expecting [ CDF=0.58303 97501 93 PDF=0.12511 00357 21 CDFc=0.41696 02498 07 μ=10 sx=3.16227 76601 7 ]
+'ROOT(ⒺPoiss;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Geom
+
+Number of trials up to and including the first success, each trial succeeding
+with probability `p`. Support starts at one, not zero. Its distribution function
+is elementary, `1-(1-p)^X`, so no sum is needed.
+
+![Geometric Distribution](img/Geom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=3
+@ Expecting [ CDF=0.657 PDF=0.147 CDFc=0.343 μ=3.33333 33333 3 sx=2.78886 67551 1 ]
+'ROOT(ⒺGeom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Hyper
+
+Number of successes when `nd` items are drawn **without replacement** from a
+population of `Np` containing `Ks` successes — the difference from Binom, which
+draws with replacement. Quality control and card games.
+
+![Hypergeometric Distribution](img/Hyper_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Np`, `Ks`, `nd`, `X`:
+```rpl
+Np=50  Ks=10  nd=5  X=1
+@ Expecting [ CDF=0.74189 99792 33 PDF=0.43133 71972 29 CDFc=0.25810 00207 67 μ=1 sx=0.85714 28571 43 ]
+'ROOT(ⒺHyper;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### UnifDis
+
+Discrete uniform law on the integers from `Xmin` to `Xmax`, each equally likely
+— a fair die is `Xmin=1`, `Xmax=6`. Note that the standard deviation is not the
+one of UnifCont over the same interval: counting `Xmax-Xmin+1` equally likely
+values is not the same as spreading the probability continuously between them.
+
+![Discrete Uniform Distribution](img/UnifDis_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=6  X=3
+@ Expecting [ CDF=0.5 PDF=0.16666 66666 67 CDFc=0.5 μ=3.5 sx=1.70782 51276 6 ]
+'ROOT(ⒺUnifDis;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### NegBinom
+
+Number of failures before the `rs`-th success, each trial succeeding with
+probability `p` — the mirror of Binom, which fixes the trials and counts the
+successes. It is the law the NIST Uncertainty Machine offers for overdispersed
+counts, where the variance exceeds the mean and Poisson will not do.
+
+Support starts at zero and has no upper end, so the sum is capped as described
+above. With `rs=1` it reduces to the geometric law counted from zero.
+
+![Negative Binomial Distribution](img/NegBinom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `rs`, `p`, `X`:
+```rpl
+rs=3  p=0.5  X=2
+@ Expecting [ CDF=0.5 PDF=0.1875 CDFc=0.5 μ=3. sx=2.44948 97427 8 ]
+'ROOT(ⒺNegBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+---
