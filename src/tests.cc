@@ -3053,6 +3053,17 @@ void tests::logical_operations()
     step("Convert True and False to decimal")
         .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
         .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
+
+    step("Symbolic == remains symbolic")
+        .test(CLEAR, "'X==Y' EVAL", ENTER).expect("'X==Y'")
+        .test(CLEAR, "'X+1==1+X' EVAL", ENTER).expect("'X+1==1+X'")
+        .test(CLEAR, "'X' 'Y' ==", ENTER).expect("'X==Y'")
+        .test(CLEAR, "'1==1' EVAL", ENTER).expect("True")
+        .test(CLEAR, "'1==2' EVAL", ENTER).expect("False")
+        .test(CLEAR, "\"AB\" \"AB\" ==", ENTER).expect("True")
+        .test(CLEAR, "{ 1 2 } { 1 3 } ==", ENTER).expect("False")
+        .test(CLEAR, "3 'X' STO 'X==3' EVAL", ENTER).expect("True")
+        .test(CLEAR, "'X' PURGE", ENTER).noerror();
 }
 
 
