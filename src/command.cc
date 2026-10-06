@@ -53,6 +53,7 @@
 #include "user_interface.h"
 #include "utf8.h"
 #include "util.h"
+#include "variables.h"
 
 #ifdef SIMULATOR
 #include "sim-dmcp.h"
@@ -701,6 +702,22 @@ COMMAND_BODY(SelfInsert)
         }
     }
     return OK;
+}
+
+
+object::result command::evaluate_reserved(object_p name)
+// ----------------------------------------------------------------------------
+//   Evaluate the variable for a reserved name, or push the name if undefined
+// ----------------------------------------------------------------------------
+//   In legacy RPL, names like `EQ`, `PPAR`, `ΣDAT` or `CST` are ordinary
+//   variables, so typing the name evaluates the content like for any other
+//   global variable. When the variable does not exist, push the name.
+{
+    if (object_p found = directory::recall_all(name, false))
+        return program::run_program(found);
+    if (rt.error())
+        return ERROR;
+    return rt.push(name) ? OK : ERROR;
 }
 
 

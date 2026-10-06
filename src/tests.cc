@@ -2425,6 +2425,26 @@ void tests::global_variables()
     step("Rejecting command names as variable names")
         .test(CLEAR, "124 'bar' STO", ENTER)
         .error("Invalid name");
+
+    step("Reserved names evaluate their content (sandbox)")
+        .test(CLEAR, "'RsvTest' CRDIR RsvTest", ENTER).noerror();
+    step("EQ evaluates the stored equation")
+        .test(CLEAR, "'X^2' 'EQ' STO 3 'X' STO EQ →NUM", ENTER)
+        .expect("9.");
+    step("ΣDAT recalls the statistics data")
+        .test(CLEAR, "[[1 2][3 4]] 'ΣDAT' STO ΣDAT", ENTER)
+        .want("[[ 1 2 ] [ 3 4 ]]");
+    step("PPAR recalls the plot parameters")
+        .test(CLEAR, "{ X 0 } 'PPAR' STO PPAR", ENTER)
+        .expect("{ X 0 }");
+    step("CST recalls the custom menu")
+        .test(CLEAR, "{ 1 2 3 } 'CST' STO CST", ENTER)
+        .expect("{ 1 2 3 }");
+    step("Reserved names without a variable push their name")
+        .test(CLEAR, "{ EQ PPAR } PURGE EQ", ENTER)
+        .expect("Equation");
+    step("Cleanup reserved names sandbox")
+        .test(CLEAR, "UPDIR 'RsvTest' PGDIR", ENTER).noerror();
 }
 
 
