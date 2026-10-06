@@ -32,6 +32,9 @@ Tools for measured values and their uncertainties, whether written as bounds
 * [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
   for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
   for how two intervals sit on the line.
+* [Functions](#functionslibrary) — propagate uncertainties through a function
+  written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
+  [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf) and [Exmnf](#exmnf).
 * [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
@@ -292,7 +295,7 @@ Unequal bounds move the value to the middle of the interval:
 
 ```rpl
 10. { 0.1 0.3 } 1 { } ⓁBound→σ
-@ Expecting 10.1±σ0.11547 00538 38
+@ Expecting 10.1±σ0.11547 00538 38
 ```
 
 See also: [ResN0→σR](#resn0→σr).
@@ -593,3 +596,211 @@ substitution, which is slower.
 
 See also: the Rand functions of the Probability section, and the Rounding
 functions to present the result.
+
+
+## FunctionsLibrary
+
+Functions of uncertain values and of intervals, without any list to build:
+the function is written with the names x or x1, x2, …, and its values follow
+it on the stack. Standard uncertainties are propagated by the law of
+propagation of the GUM (JCGM 100:2008, section 5), intervals by a search of
+the global minimum and maximum of the function.
+
+* [σRf](#σrf): a composite function of one variable, f(x);
+* [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
+  possibly correlated;
+* [ΔRf](#Δrf): the range of a function of one variable over an interval;
+* [Exmnf](#exmnf): the drawing of a function over an interval, to check ΔRf.
+
+Evaluating a function directly on uncertain numbers treats each occurrence of
+a variable as a new, independent variable: x·x does not get the uncertainty
+of x², and (x−1)·(x−2)·(x−3) gets twice its uncertainty. These functions count each
+variable once.
+
+The law of propagation is a first order approximation, good when the function
+is close to linear over the uncertainties. Otherwise, the Monte Carlo method of
+[MCPropagate](#mcpropagate) gives the reference result; comparing the two is
+the check recommended by Supplement 1 of the GUM.
+
+After the σRf, σRFx2x1, σRFxjxi, ΔRf and Exmnf functions of Jean Wilson's Proposition for
+interval implementation in the RPL environment (2025).
+
+
+## σRf
+
+The uncertainty of a composite function of one variable.
+
+Stack: 'f(x)' X ▶ Y±σu, where f is an expression of the name x and X its
+value a±σb, with or without units.
+
+The contribution of x is the derivative of f times the standard deviation,
+obtained by five point central differences on the value with its unit, with a
+step of σ/1000: it comes out in the unit of f, works with any function,
+constant or unit, and also at x = 0.
+
+**Example 1.** The gamma function at 7±σ0.05. The exact uncertainty is
+Γ(7)·ψ(7)·0.05 = 720 × 1.87278 43351 × 0.05 = 67.42023 60636, where
+ψ(7) = −γ + 1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6 is the digamma function:
+
+```rpl
+'tgamma(x)' 7.0±σ0.05 ⓁσRf
+@ Expecting 720.±σ67.42023 60635
+```
+
+**Example 2.** A polynomial near one of its roots. Evaluated directly on
+2.755±σ0.05, it gets about twice this uncertainty, since its three factors are
+treated as independent:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' 2.755±σ0.05 ⓁσRf
+@ Expecting -0.32463 1125±σ0.03550 375
+```
+
+**Example 3.** The difference of a quantity with itself is exactly zero:
+
+```rpl
+'x-x' 2.0±σ0.05_m ⓁσRf
+@ Expecting 0±σ0. m
+```
+
+
+## σRFxjxi
+
+The uncertainty of a function of several variables.
+
+Stack: 'F' Xn … X2 X1 ▶ Y±σu, where F is an expression of the names x1, x2, …
+xn, and each Xj is the value of xj: a±σb, or a plain number for an exact
+value, with or without units. X1 is on the first level, as in a formula read
+from the right.
+
+The variables are independent, unless a global variable ρij holds either one
+correlation coefficient for all the pairs, or the full correlation matrix, in
+the order x1 … xn. The contributions cj, derivative times standard deviation,
+are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
+directory and applies to the next calls: purge it when done, as the examples
+do.
+
+**Example 1.** A mass from a linear density and a length, with units:
+
+```rpl
+'x2*x1' 2.5±σ0.5_g/cm 2.0±σ0.2_cm ⓁσRFxjxi
+@ Expecting 5.±σ1.11803 39887 5 g
+```
+
+**Example 2.** Three lengths fully correlated, for instance measured with the
+same rule: the uncertainties add instead of combining in quadrature.
+
+```rpl
+1 'ρij' Sto
+'x3+x2+x1' 1.2±σ0.002 2.5±σ0.005 1.600±σ0.012 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 5.3±σ0.019
+```
+
+**Example 3.** Two variables correlated at 0.5, given as a matrix: the
+uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
+
+```rpl
+[[ 1 0.5 ] [ 0.5 1 ]] 'ρij' Sto
+'x2+x1' 10±σ1 20±σ2 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 30±σ2.64575 13110 6
+```
+
+**Example 4.** The potential energy of a mass raised along a slope, with a
+constant and an angle in degrees:
+
+```rpl
+'x3*Ⓒg*x2*sin(x1)' 2±σ0.01_kg 10±σ0.1_m 30±σ0.5_° ⓁσRFxjxi
+@ Expecting 98.0665±σ1.84371 03556 2 kg·m↑2/s↑2
+```
+
+The same functions with MCPropagate take the names and the values as lists:
+'x2*x1' { x2 x1 } { 2.5±σ0.5 2.0±σ0.2 } 0 ⓁMCPropagate.
+
+
+## ΔRf
+
+Interval arithmetic for a composite function of one variable: the smallest and
+largest values of f over an interval.
+
+Stack: 'f(x)' X ▶ f(X), where f is an expression of the name x and X an
+interval a…b, a±b or a±p%, with or without units. The result has the form of
+X, except that a±p% gives a±b.
+
+Evaluating f directly on an interval counts each occurrence of x as a new
+variable, and the result can be far too wide. ΔRf searches the global minimum
+and maximum of f over X instead: f is evaluated at 65 points spread over X,
+ends included, and each local maximum or minimum of these values is refined
+by a golden section search. An extremum narrower than 1/64 of X could be
+missed; Exmnf draws the function to check it.
+
+**Example 1.** A polynomial with three occurrences of x. Evaluated directly on
+1…3, it gives −4…4, since its factors are taken as independent; the true
+range is ±2/(3√3):
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁΔRf
+@ Expecting -0.38490 01794 6…0.38490 01794 6
+```
+
+**Example 2.** A maximum inside the interval: sin reaches 1 at π/2.
+
+```rpl
+'sin(x)' 1.5±0.15_r ⓁΔRf
+@ Expecting 0.98786 16789 13±0.01213 83210 87
+```
+
+**Example 3.** A minimum inside the interval, at x = 0:
+
+```rpl
+'exp(x^2)' 0.5±0.9 ⓁΔRf
+@ Expecting 4.04966 35325 8±3.04966 35325 8
+```
+
+**Example 4.** A function that is not differentiable at its minimum:
+
+```rpl
+'abs(x^3)' -0.25±0.35 ⓁΔRf
+@ Expecting 0.108±0.108
+```
+
+**Example 5.** With units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁΔRf
+@ Expecting 12.81445 3125±12.81445 3125 m↑4
+```
+
+**Example 6.** An interval given in percent gives a±b:
+
+```rpl
+'x^2' '10±10%' →Num ⓁΔRf
+@ Expecting 101.±20.
+```
+
+
+## Exmnf
+
+Examine a function over an interval: Exmnf draws f over X, with the smallest
+and largest values found by ΔRf as dashed lines, and leaves the result of ΔRf
+on the stack.
+
+Stack: 'f(x)' X ▶ f(X), as ΔRf.
+
+The curve uses 161 points. Each dashed line should touch the curve; a line
+that does not, or a peak of the curve beyond a line, would show an extremum
+that ΔRf missed.
+
+**Example 1.** The polynomial of the first example of ΔRf, with its two
+extrema inside the interval:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁExmnf
+```
+
+**Example 2.** A power with units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁExmnf
+```

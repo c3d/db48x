@@ -1,0 +1,23 @@
+«
+@@ ============================================================
+@@ σRf — propagation of uncertainty through a composite function
+@@ of one variable.
+@@
+@@ Input:  'f(x)' X, where f is an expression of the name x, and X
+@@         its value a±σb, with or without units.
+@@ Output: f(X) as Y±σu.
+@@ Unlike evaluating f on X directly, the variable is counted once,
+@@ however often it appears: 'x-x' gives 0±σ0, and
+@@ '(x-1)·(x-2)·(x-3)' the uncertainty of the function, not of
+@@ its three factors taken as independent.
+@@ Method: σRFxjxi with one variable (central differences).
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → fx xv
+  «
+    'fx' Rcl { x 'x1' } Where
+    xv ⓁσRFxjxi
+  »
+»
