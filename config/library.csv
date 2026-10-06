@@ -416,7 +416,6 @@
 	"SciRngRnd",	"=/library/Uncertainty/SciRngRnd.48s"
 	"SciRngText",	"=/library/Uncertainty/SciRngText.48s"
 	"SciRngParen",	"=/library/Uncertainty/SciRngParen.48s"
-	"Cycling",	"=/library/Uncertainty/Cycling.48s"
 
 "Uncertainty/TypeB"
 
@@ -439,6 +438,7 @@
 	"Exmnf",	"=/library/Uncertainty/Exmnf.48s"
 	"ExmnFxjxi",	"=/library/Uncertainty/ExmnFxjxi.48s"
 	"ExmnF2D",	"=/library/Uncertainty/ExmnF2D.48s"
+	"Cycling",	"=/library/Uncertainty/Cycling.48s"
 
 "Uncertainty/Monte Carlo"
 
