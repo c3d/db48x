@@ -7,8 +7,9 @@
 @@ standard deviation width/√12), with or without unit, are the uncertain
 @@ inputs. ROOT is run with each input at its centre, then with each input
 @@ moved by ±σ/100 in turn: the differences give the contribution of every
-@@ input to every unknown, combined as by σRFxjxi, the inputs being taken
-@@ as independent. 1 + 2n runs of ROOT for n uncertain inputs. Each input
+@@ input to every unknown, combined as by σRFxjxi: u² = Σ ci·ck·ρik, with
+@@ the correlations of ρij if it exists, one number for all the pairs, or a
+@@ list of pairs by name, { { x y ρ } … }; otherwise independent inputs. 1 + 2n runs of ROOT for n uncertain inputs. Each input
 @@ gets back the value it had; the unknowns keep their central values.
 @@ ROOT solves again an unknown that already exists only from its value,
 @@ so the unknowns are purged before each run.
@@ -89,53 +90,113 @@
           1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
           → srty0
           «
-            @ For each unknown, the sum of the squared contributions
-            1 srtnames 1 Get Size 1 Get For srtj 0 Next
-            srtnames 1 Get Size 1 Get →List
-            → srtu2
+            @ For each input, its signed contribution to each unknown,
+            @ derivative × σ by central differences: one list per input
+            1 srtin Size For srti
+              srtin srti Get Explode Drop Drop Rot Drop
+              → srta srts
+              «
+                srta srts 100 / + srtin srti Get 1 Get Sto
+                1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
+                1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
+                srta srts 100 / - srtin srti Get 1 Get Sto
+                1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
+                1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
+                → srtp srtn
+                «
+                  1 srtnames 1 Get Size 1 Get For srtj srtp srtj Get srtn srtj Get - 50 * Next
+                  srtnames 1 Get Size 1 Get →List
+                »
+                srta srtin srti Get 1 Get Sto
+              »
+            Next
+            srtin Size →List
+            @ The correlations: ρij, one number for all the pairs, or a list
+            @ of pairs by name, { { x y ρ } … }; the other pairs are 0
+            IfErr 'ρij' Rcl Then Drop 0 End
+            → srtcon srtr0
             «
-              1 srtin Size For srti
-                srtin srti Get Explode Drop Drop Rot Drop
-                → srta srts
-                «
-                  srta srts 100 / + srtin srti Get 1 Get Sto
-                  1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
-                  1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
-                  srta srts 100 / - srtin srti Get 1 Get Sto
-                  1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
-                  1 srtnames 1 Get Size 1 Get For srtj srtnames 1 Get srtj Get Rcl Next srtnames 1 Get Size 1 Get →List
-                  → srtp srtn
-                  «
-                    1 srtnames 1 Get Size 1 Get For srtj
-                      srtp srtj Get srtn srtj Get - 50 * Sq
-                      srtu2 srtj Get Swap
-                      If Over 0 == Then Swap Drop Else + End
-                      srtu2 srtj Rot Put 'srtu2' Sto
-                    Next
-                  »
-                  srta srtin srti Get 1 Get Sto
-                »
-              Next
-              @ The central run again, so that the unknowns keep their values
-              1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
-              @ Every input gets back its original value
-              1 srtin Size For srti
-                srtin srti Get Dup 4 Get Swap 1 Get Sto
-              Next
-              @ The results, Y±σu tagged with their names
-              1 srtnames 1 Get Size 1 Get For srtj
-                srty0 srtj Get srtu2 srtj Get √
-                → srty srtu
-                «
-                  If srty TypeName "unit" == Then
-                    srty UVAL srtu srty Convert UVAL →σRange srty →Unit
-                  Else
-                    srty srtu →σRange
+              If srtr0 TypeName "array" == Then
+                "σROOT: give ρij as a number, or as a list { { x y ρ } … }" DoError
+              End
+              If srtr0 TypeName "list" == Then
+                1 srtr0 Size For srtm
+                  If srtr0 srtm Get 3 Get Abs 1 > Then
+                    "σROOT: a coefficient of ρij is outside −1…1" DoError
                   End
-                  srtnames 1 Get srtj Get →Text →Tag
-                »
+                Next
+              Else
+                If srtin Size 1 > Then
+                  If srtr0 1 > srtr0 -1 srtin Size 1 - / < Or Then
+                    "σROOT: ρij is outside −1/(n−1)…1 for n inputs" DoError
+                  End
+                End
+              End
+              1 srtin Size For srti
+                1 srtin Size For srtk
+                  If srti srtk == Then
+                    1
+                  Else
+                    If srtr0 TypeName "list" == Then
+                      0
+                      1 srtr0 Size For srtm
+                        srtr0 srtm Get 1 Get →Text srtin srti Get 1 Get →Text ==
+                        srtr0 srtm Get 2 Get →Text srtin srtk Get 1 Get →Text == And
+                        srtr0 srtm Get 1 Get →Text srtin srtk Get 1 Get →Text ==
+                        srtr0 srtm Get 2 Get →Text srtin srti Get 1 Get →Text == And Or
+                        If Then Drop srtr0 srtm Get 3 Get End
+                      Next
+                    Else
+                      srtr0
+                    End
+                  End
+                Next
+                srtin Size →List
               Next
-              srtnames 1 Get Size 1 Get →List
+              srtin Size →List
+              → srtrho
+              «
+                @ The central run again, so that the unknowns keep their values
+                1 srtnames 1 Get Size 1 Get For srtj IfErr srtnames 1 Get srtj Get Purge Then End Next srtq 1 Get Eval Drop
+                @ Every input gets back its original value
+                1 srtin Size For srti
+                  srtin srti Get Dup 4 Get Swap 1 Get Sto
+                Next
+                @ The results: u² = Σ ci·ck·ρik, Y±σu tagged with their names
+                1 srtnames 1 Get Size 1 Get For srtj
+                  0
+                  1 srtin Size For srti
+                    1 srtin Size For srtk
+                      srtrho srti Get srtk Get
+                      → srtr
+                      «
+                        If srtr 0 ≠ Then
+                          srtcon srti Get srtj Get srtcon srtk Get srtj Get * srtr *
+                          If Over 0 == Then Swap Drop Else + End
+                        End
+                      »
+                    Next
+                  Next
+                  srty0 srtj Get
+                  → srtu2 srty
+                  «
+                    srtu2
+                    If srtu2 TypeName "unit" == Then UVAL End
+                    If 0 < Then "σROOT: no quantities could have the correlations of ρij" DoError End
+                    srtu2 √
+                    → srtu
+                    «
+                      If srty TypeName "unit" == Then
+                        srty UVAL srtu srty Convert UVAL →σRange srty →Unit
+                      Else
+                        srty srtu →σRange
+                      End
+                      srtnames 1 Get srtj Get →Text →Tag
+                    »
+                  »
+                Next
+                srtnames 1 Get Size 1 Get →List
+              »
             »
           »
       »

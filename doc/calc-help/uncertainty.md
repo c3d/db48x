@@ -840,7 +840,10 @@ standard deviation width/√12, as Bound→σ does. Units are welcome.
 σROOT finds these variables in the current directory, runs ROOT with each one
 at its centre, then moves each one in turn by ±σ/100 and runs ROOT again. The
 differences give the contribution of every input to every unknown, combined
-as by σRFxjxi, the inputs being taken as independent. With n uncertain inputs,
+as by σRFxjxi: u² = Σ ci·ck·ρik. The inputs are independent, unless the global
+variable ρij holds one coefficient for all the pairs, or a list of pairs by
+name, { { x y ρ } … }, the other pairs being 0; since σROOT finds the inputs
+itself, a matrix, whose order would be unknown, is refused. With n uncertain inputs,
 ROOT runs 1 + 2n times: a fraction of a second on the simulator. It works even
 when an unknown cannot be isolated, since the derivatives are taken through
 the solver.
@@ -887,6 +890,20 @@ a better clock.
 0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±5%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
 'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
 @ Expecting { C:49.94037 53622±σ1.51471 94838 9 μF }
+```
+
+**4)** The same capacitor with a 1 % resistor, Vf and V being read on the same
+voltmeter: an error of its calibration moves both the same way, a correlation
+of 0.9. C depends on their ratio, so the common error partly cancels, and the
+uncertainty of C falls from 0.547 μF to 0.466 μF. ρij stays in the directory
+and applies to the next calls: purge it when done.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±1%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+{ { Vf V 0.9 } } 'ρij' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+'ρij' Purge
+@ Expecting { C:49.94037 53622±σ0.46565 38593 03 μF }
 ```
 
 These results were checked against an independent computation in double
