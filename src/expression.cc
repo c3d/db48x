@@ -2960,7 +2960,7 @@ EVAL_BODY(funcall)
         }
     }
 
-    return o->run(true);
+    return o->run(false);
 }
 
 
