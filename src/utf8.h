@@ -381,7 +381,7 @@ inline bool is_valid_in_name(unicode cp)
         return false;
 
     static utf8 invalid = utf8("÷×·↑−∕∗∂⁻¹²³«»ⅈ∡ ;,.'\""
-                               "<=>≤≠≥[](){}«»\n\t⨯⋅▶ⒸⒹⒺⓁⓅⓋⓧ");
+                               "<=>≤≠≥[](){}«»\n\t⨯⋅▶ⒸⒹⒺⓁⓅⓋⓧ√∛");
     for (utf8 p = invalid; *p; p = utf8_next(p))
         if (cp == utf8_codepoint(p))
             return false;
