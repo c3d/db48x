@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  HyperSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 == THEN Explode Drop ELSE IF DUP Size 4 == THEN Explode Drop Drop ELSE "HyperSx: needs 3 arguments" DoError END END END
+  → Npv Ksv ndv « Npv 0 + Ksv 0 + ndv 0 + → Np Ks nd « '√(nd*(Ks/Np)*(1-Ks/Np)*(Np-nd)/(Np-1))' →Num Npv Ksv ndv 3 →List Drop » »
+»

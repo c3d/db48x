@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  TTest2
+  @  Two independent samples, equal variances assumed (pooled t test).
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 6; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 6 ≠ THEN "TTest2: needs 6 arguments" DoError END Explode Drop END
+  → n1v x1v s1v n2v x2v s2v « n1v 0 + x1v 0 + s1v 0 + n2v 0 + x2v 0 + s2v 0 + → n1 xb1 sd1 n2 xb2 sd2 « '((n1-1)*sd1^2+(n2-1)*sd2^2)/(n1+n2-2)' →Num 'n1+n2-2' →Num → sp2 dfv « '(xb1-xb2)/√(sp2*(1/n1+1/n2))' →Num → tv « tv "t" →Tag dfv "df" →Tag dfv 'ABS(tv)' →Num UTPT 2 * "p" →Tag n1v x1v s1v n2v x2v s2v 6 →List Drop » » » »
+»

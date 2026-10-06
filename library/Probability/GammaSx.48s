@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GammaSx
+  @  Standard deviation of the law.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "GammaSx: needs 2 arguments" DoError END END END
+  → av scv « av 0 + scv 0 + → a sc « '√(a)*sc' →Num av scv 2 →List Drop » »
+»
