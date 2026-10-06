@@ -412,7 +412,7 @@ algebraic_p arithmetic::optimize<subtract>(algebraic_r x, algebraic_r y)
         {
             if (y->is_zero(false) && !y->is_based()) // X - 0 = X
                 return x;
-            if (x->is_same_as(y))                   // X - X = 0
+            if (!x->is_range() && x->is_same_as(y)) // X - X = 0
                 return integer::make(0);
             if (x->is_zero(false) && !x->is_based() && y->is_symbolic())
                 return neg::run(y);                 // 0 - X = -X
@@ -808,7 +808,7 @@ algebraic_p arithmetic::optimize<divide>(algebraic_r x, algebraic_r y)
                 return x;
             if (x->is_one(false) && y->is_symbolic())
                 return inv::run(y);                 // 1 / X = X⁻¹
-            if (x->is_same_as(y))
+            if (!x->is_range() && x->is_same_as(y))
                 return integer::make(1);            // X / X = 1
         }
     }
@@ -2038,13 +2038,25 @@ algebraic_g pow(algebraic_r xr, ularge y)
             r = prec(decimal_p(+r));
         return r;
     }
+    if (x->type() == object::ID_uncertain)
+    {
+        // Uncertain numbers propagate the standard deviation, they are not
+        // intervals: use the same path as an explicit `y ^`
+        algebraic_g ya = integer::make(y);
+        return pow::evaluate(x, ya);
+    }
     if (x->is_range())
     {
-        algebraic_g lo = range_p(+x)->lo();
-        algebraic_g hi = range_p(+x)->hi();
+        algebraic_g lo   = range_p(+x)->lo();
+        algebraic_g hi   = range_p(+x)->hi();
+        bool        lneg = lo->is_negative(false);
+        bool        hneg = hi->is_negative(false);
+        bool        zero = lo->is_zero(false) || hi->is_zero(false);
         lo = pow(lo, y);
         hi = pow(hi, y);
         range::sort(lo, hi);
+        if (y && y % 2 == 0 && (zero || lneg != hneg))
+            lo = integer::make(0);      // Even power of a range containing 0
         return range::make(x->type(), lo, hi);
     }
     while (y)
