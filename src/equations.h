@@ -108,6 +108,8 @@ extern const eq_symbol<'-'> signk;
 extern const eq_symbol<'@'> kpi;
 extern const eq_symbol<'!'> ki;
 extern const eq_symbol<'='> indep;
+extern const eq_symbol<'%'> kangle;
+extern const eq_symbol<'$'> kiangle;
 
 } // namespace eq_wildcards
 

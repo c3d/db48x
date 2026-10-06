@@ -5110,7 +5110,10 @@ void tests::hyperbolic_reciprocals()
 
     step("∫ sech(X) dX")
         .test(CLEAR, "'sech(X)'", ENTER, "'X'", ENTER, ID_Primitive)
-        .expect("'tan⁻¹ (sinh X)'");
+        .expect("'π÷180·tan⁻¹ (sinh X)'")
+        .test(CLEAR, "RAD 'sech(X)'", ENTER, "'X'", ENTER, ID_Primitive)
+        .expect("'tan⁻¹ (sinh X)'")
+        .test(CLEAR, "DEG", ENTER).noerror();
 
     step("∫ coth(X) dX")
         .test(CLEAR, "'coth(X)'", ENTER, "'X'", ENTER, ID_Primitive)
@@ -9255,6 +9258,36 @@ void tests::symbolic_numerical_integration()
         .expect("'exp π-1.'")
         .test(ID_ToDecimal)
         .expect("22.14069 26328");
+    step("Symbolic integral of cosine in degrees")
+        .test(CLEAR, "DEG '∫(0;90;COS(X);X)' EVAL", ENTER)
+        .expect("'180·π⁻¹'")
+        .test(ID_ToDecimal)
+        .expect("57.29577 95131");
+    step("Symbolic integral of sine in degrees")
+        .test(CLEAR, "DEG '∫(0;π;SIN(X);X)' →NUM", ENTER)
+        .expect("0.08610 69700 41");
+    step("Symbolic integral of sine in degrees, exact")
+        .test(CLEAR, "DEG '∫(0;π;SIN(X);X)' EVAL", ENTER)
+        .expect("'180·(-cos π)·π⁻¹+180·π⁻¹'");
+    step("Numerical integral in degrees")
+        .test(CLEAR, "DEG '∫(0;1;SIN(X)^2;X)' EVAL", ENTER)
+        .expect("0.00010 15329 54");
+    step("Symbolic integral of cosine in radians")
+        .test(CLEAR, "RAD '∫(0;90;COS(X);X)' EVAL", ENTER)
+        .expect("0.89399 66636 01");
+    step("Symbolic integral of sine in radians (no double minus)")
+        .test(CLEAR, "RAD '∫(0;π;SIN(X);X)' EVAL", ENTER)
+        .expect("'-cos π+1'")
+        .test(CLEAR, "RAD '∫(0;π;SIN(X);X)' →NUM", ENTER)
+        .expect("2.");
+    step("Symbolic integral of cosine in grads")
+        .test(CLEAR, "GRAD '∫(0;100;COS(X);X)' EVAL", ENTER)
+        .expect("'200·π⁻¹'")
+        .test(ID_ToDecimal)
+        .expect("63.66197 72368");
+    step("Restore degrees mode")
+        .test(CLEAR, "DEG", ENTER).noerror();
+
     step("Cleanup & restore symbolic integration")
         .test(CLEAR, ("{ X NumericalIntegration } PURGE"), ENTER);
 }
@@ -9989,7 +10022,7 @@ void tests::symbolic_operations()
               "« → arcstart arcend arcexpr arcvar "
               "« arcstart arcend arcexpr arcvar ∂ SQ 1 + SQRT arcvar ∫ » "
               "» 'ArcLen' STO", ENTER).noerror()
-        .test("'ArcLen(0;π;QUOTE(SIN(X));QUOTE(X))'", ENTER)
+        .test(CLEAR, "RAD 'ArcLen(0;π;QUOTE(SIN(X));QUOTE(X))'", ENTER)
         .expect("'ArcLen(0;π;Quote (sin X);Quote X)'")
         .test(ID_Run)
         .expect("'∫(0;π;√((cos X)²+1);X)'")
@@ -10007,6 +10040,8 @@ void tests::symbolic_differentiation()
 {
     BEGIN(derivative);
 
+    step("Select radians mode for symbolic differentiation")
+        .test(CLEAR, "RAD", ENTER).noerror();
     step("Derivative of constant")
         .test(CLEAR, ID_IntegrationMenu, "42 'X'", ID_Derivative).expect("'0'");
     step("Derivative of a variable")
@@ -10118,6 +10153,38 @@ void tests::symbolic_differentiation()
     step("Derivative of polynomial")
         .test(CLEAR, "Ⓟ'2·X+3·A·X↑4-32' X", ID_IntegrationMenu, ID_Derivative)
         .expect("2+12·A·X↑3");
+
+    step("Derivative of sine in radians")
+        .test(CLEAR, "RAD 'SIN(X)' 'X' ∂", ENTER)
+        .expect("'cos X'");
+    step("Derivative of sine in degrees")
+        .test(CLEAR, "DEG 'SIN(X)' 'X' ∂", ENTER)
+        .expect("'cos X·π÷180'");
+    step("Derivative of cosine in degrees")
+        .test(CLEAR, "DEG 'COS(X)' 'X' ∂", ENTER)
+        .expect("'(-1)·sin X·π÷180'");
+    step("Derivative of tangent in degrees")
+        .test(CLEAR, "DEG 'TAN(X)' 'X' ∂", ENTER)
+        .expect("'π÷180÷(cos X)²'");
+    step("Derivative of arcsine in degrees")
+        .test(CLEAR, "DEG 'ASIN(X)' 'X' ∂", ENTER)
+        .expect("'180÷π÷√(1-X²)'");
+    step("Derivative of sine in grads")
+        .test(CLEAR, "GRAD 'SIN(X)' 'X' ∂", ENTER)
+        .expect("'cos X·π÷200'");
+    step("Derivative of sine in pi-radians")
+        .test(CLEAR, "πradians 'SIN(X)' 'X' ∂", ENTER)
+        .expect("'cos X·π'");
+    step("Derivative of sin² in degrees matches numerical derivative")
+        .test(CLEAR, "DEG 30 'X' STO 'SIN(X)^2' 'X' ∂ →NUM", ENTER)
+        .expect("0.01511 49947 02")
+        .test("'SIN(X)^2' 30.001 'X' STO →NUM "
+              "'SIN(X)^2' 29.999 'X' STO →NUM - 0.002 / - ABS 1E-9 <",
+              ENTER)
+        .expect("True")
+        .test(CLEAR, "'X' PURGE", ENTER).noerror();
+    step("Restore degrees mode")
+        .test(CLEAR, "DEG", ENTER).noerror();
 }
 
 
@@ -10128,6 +10195,8 @@ void tests::symbolic_integration()
 {
     BEGIN(primitive);
 
+    step("Select radians mode for symbolic integration")
+        .test(CLEAR, "RAD", ENTER).noerror();
     step("Primitive of constant")
         .test(CLEAR, ID_IntegrationMenu, "42 'X'", ID_Primitive)
         .expect("'42·X'");
@@ -10247,6 +10316,27 @@ void tests::symbolic_integration()
     step("Evaluate value matching integer constants - Check with division")
         .test(CLEAR, ("'A/B·Ⓒπ·x³' 'x' ∂"), ENTER)
         .expect("'3·A÷B·π·x²'");
+
+    step("Primitive of sine in radians")
+        .test(CLEAR, "RAD 'SIN(X)' 'X'", ID_Primitive)
+        .expect("'-cos X'");
+    step("Primitive of sine in degrees")
+        .test(CLEAR, "DEG 'SIN(X)' 'X'", ID_Primitive)
+        .expect("'180·(-cos X)·π⁻¹'");
+    step("Primitive of cosine in degrees")
+        .test(CLEAR, "DEG 'COS(X)' 'X'", ID_Primitive)
+        .expect("'180·sin X·π⁻¹'");
+    step("Primitive of arctangent in degrees")
+        .test(CLEAR, "DEG 'ATAN(X)' 'X'", ID_Primitive)
+        .expect("'X·tan⁻¹ X-180·ln(X²+1)·π⁻¹÷2'");
+    step("Primitive of 1/(1+x²) in degrees")
+        .test(CLEAR, "DEG 'INV(1+SQ(X))' 'X'", ID_Primitive)
+        .expect("'π÷180·tan⁻¹ X'");
+    step("Primitive of cosine in grads")
+        .test(CLEAR, "GRAD 'COS(X)' 'X'", ID_Primitive)
+        .expect("'200·sin X·π⁻¹'");
+    step("Restore degrees mode")
+        .test(CLEAR, "DEG", ENTER).noerror();
 }
 
 
