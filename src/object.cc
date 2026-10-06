@@ -541,13 +541,109 @@ text_p object::as_text(bool edit, bool equation) const
 }
 
 
-uint32_t object::as_uint32(uint32_t def, bool err) const
+static bool machine_integer_ok(object_p obj, bool sgn, bool integral)
+// ----------------------------------------------------------------------------
+//   Check that a numerical object fits in a 32-bit machine integer
+// ----------------------------------------------------------------------------
+//   Raises "Bad argument value" and returns false if the value is out of
+//   range, negative for an unsigned target, or non-integral when `integral`.
+//   Non-numerical types return true and are left to the caller's type check.
+{
+    ularge mag        = 0;
+    bool   neg        = false;
+    bool   overflow   = false;
+    bool   fractional = false;
+    object::id ty     = obj->type();
+    switch(ty)
+    {
+#if CONFIG_FIXED_BASED_OBJECTS
+    case object::ID_hex_integer:
+    case object::ID_dec_integer:
+    case object::ID_oct_integer:
+    case object::ID_bin_integer:
+#endif // CONFIG_FIXED_BASED_OBJECTS
+    case object::ID_based_integer:
+    case object::ID_integer:
+        mag = integer_p(obj)->value<ularge>();
+        break;
+    case object::ID_neg_integer:
+        neg = true;
+        mag = integer_p(obj)->value<ularge>();
+        break;
+#if CONFIG_FIXED_BASED_OBJECTS
+    case object::ID_hex_bignum:
+    case object::ID_dec_bignum:
+    case object::ID_oct_bignum:
+    case object::ID_bin_bignum:
+#endif // CONFIG_FIXED_BASED_OBJECTS
+    case object::ID_based_bignum:
+    case object::ID_bignum:
+    case object::ID_neg_bignum:
+    {
+        size_t size = 0;
+        byte_p bytes = bignum_p(obj)->value(&size);
+        for (size_t i = sizeof(ularge); i < size; i++)
+            if (bytes[i])
+                overflow = true;
+        neg = ty == object::ID_neg_bignum;
+        mag = bignum_p(obj)->value<ularge>();
+        break;
+    }
+    case object::ID_hwfloat:
+    case object::ID_hwdouble:
+    {
+        double fp = ty == object::ID_hwfloat
+            ? hwfloat_p(obj)->as_double()
+            : hwdouble_p(obj)->as_double();
+        neg = fp < 0.0;
+        if (neg)
+            fp = -fp;
+        if (!(fp < 18446744073709551616.0))
+            overflow = true;
+        else
+            mag = ularge(fp);
+        fractional = fp != double(mag);
+        break;
+    }
+    case object::ID_decimal:
+    case object::ID_neg_decimal:
+        neg = ty == object::ID_neg_decimal;
+        mag = decimal_p(obj)->as_unsigned(true);
+        overflow = mag == ~0ULL;
+        fractional = !decimal_p(obj)->is_integral();
+        break;
+    case object::ID_fraction:
+    case object::ID_big_fraction:
+    case object::ID_neg_fraction:
+    case object::ID_neg_big_fraction:
+        neg = ty == object::ID_neg_fraction ||
+              ty == object::ID_neg_big_fraction;
+        fractional = true;
+        break;
+    default:
+        return true;
+    }
+
+    ularge max = sgn ? (neg ? 0x80000000ULL : 0x7FFFFFFFULL) : 0xFFFFFFFFULL;
+    if (overflow || mag > max || (neg && !sgn) || (integral && fractional))
+    {
+        rt.value_error();
+        return false;
+    }
+    return true;
+}
+
+
+uint32_t object::as_uint32(uint32_t def, bool err, bool integral) const
 // ----------------------------------------------------------------------------
 //   Return the given object as an uint32
 // ----------------------------------------------------------------------------
 //   def is the default value if no valid value comes from object
 //   err indicates if we error out in that case
+//   integral indicates if non-integral values are an error (requires err)
 {
+    if (err && !machine_integer_ok(this, false, integral))
+        return def;
     id ty = type();
     switch(ty)
     {
@@ -597,11 +693,13 @@ uint32_t object::as_uint32(uint32_t def, bool err) const
 }
 
 
-int32_t object::as_int32 (int32_t  def, bool err)  const
+int32_t object::as_int32 (int32_t  def, bool err, bool integral)  const
 // ----------------------------------------------------------------------------
 //   Return the given object as an int32
 // ----------------------------------------------------------------------------
 {
+    if (err && !machine_integer_ok(this, true, integral))
+        return def;
     id ty = type();
     switch(ty)
     {

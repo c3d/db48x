@@ -76,6 +76,8 @@ COMMAND(DupN,~1)
 // ----------------------------------------------------------------------------
 {
     uint32_t depth = uint32_arg();
+    if (!rt.error() && depth >= rt.depth())
+        rt.missing_argument_error();
     if (!rt.error() && rt.args(depth+1) && rt.pop())
     {
         for (uint i = 0; i < depth; i++)
@@ -136,6 +138,8 @@ COMMAND(DropN,~1)
 // ----------------------------------------------------------------------------
 {
     uint32_t depth = uint32_arg();
+    if (!rt.error() && depth >= rt.depth())
+        rt.missing_argument_error();
     if (!rt.error())
         if (rt.args(depth+1))
             if (rt.pop())

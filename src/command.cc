@@ -306,7 +306,7 @@ uint32_t command::uint32_arg(uint level)
 // ----------------------------------------------------------------------------
 {
     if (object_p d = rt.stack(level))
-        return d->as_uint32(0, true);
+        return d->as_uint32(0, true, true);
     return 0;
 }
 
@@ -317,7 +317,7 @@ int32_t command::int32_arg(uint level)
 // ----------------------------------------------------------------------------
 {
     if (object_p d = rt.stack(level))
-        return d->as_int32(0, true);
+        return d->as_int32(0, true, true);
     return 0;
 }
 
