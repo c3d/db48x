@@ -57,3 +57,5 @@ DISTFILES += \
     android/build.gradle \
     android/res/values/libs.xml \
     android/res/xml/qtprovider_paths.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
