@@ -5196,6 +5196,8 @@ The 41 variables in the Navigation section are:
 
 The great circle is the shortest route between two points of a sphere.
 
+![Great circle route](img/GreatCircleRoute.bmp)
+
 * Main results: the distance `D` between departure `(φ1;λ1)` and destination
   `(φ2;λ2)`, the initial true course `TC1` to steer at departure, and the final
   true course `TC2` on arrival. On a great circle the course changes all along
@@ -5259,6 +5261,8 @@ great circle?
 
 How far is the present position from the planned route?
 
+![Cross-track distance](img/CrossTrackDistance.bmp)
+
 * Main results: the cross-track distance `XTD` between the present position
   `(φP;λP)` and the great circle leaving `(φ1;λ1)` on the initial course
   `TC1`, positive when right of the route; and the along-track distance `ATD`
@@ -5281,6 +5285,8 @@ The wind triangle: what heading to fly, or to steer, to follow a given track?
 The aircraft moves through the air, and the air moves over the ground; the
 ground speed vector is the sum of the own speed vector and of the wind. The
 same triangle serves a ship in a current.
+
+![Wind triangle](img/WindTriangle.bmp)
 
 * Main results: the true heading `TH` and the ground speed `GS` needed to
   follow the true course `TC` at the own speed `V`, with a wind of speed `WS`
