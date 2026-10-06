@@ -1537,6 +1537,35 @@ algebraic_p arithmetic::non_numeric<struct atan2>(algebraic_r x, algebraic_r y)
 //
 // ============================================================================
 
+static algebraic_p real_result_or_complex(object::id  op,
+                                          algebraic_p result,
+                                          algebraic_r x,
+                                          algebraic_r y)
+// ----------------------------------------------------------------------------
+//   With ComplexResults, compute x^y for x<0 as a complex principal value
+// ----------------------------------------------------------------------------
+//   Real power code rejects a negative base with a non-integer exponent.
+//   Like sqrt, promote to complex in that case when ComplexResults is set.
+{
+    if (result || op != object::ID_pow || !Settings.ComplexResults())
+        return result;
+    if (!x || !y || !x->is_real() || !y->is_real() || !x->is_negative(false))
+        return nullptr;
+    algebraic_g zero = integer::make(0);
+    complex_g   xc   = rectangular::make(x, zero);
+    complex_g   yc   = rectangular::make(y, zero);
+    if (!xc || !yc)
+        return nullptr;
+    rt.clear_error();
+    if (!pow::complex_ok(xc, yc))
+        return nullptr;
+    if (Settings.AutoSimplify())
+        if (algebraic_p re = xc->is_real())
+            return re;
+    return xc;
+}
+
+
 algebraic_p arithmetic::evaluate(id          op,
                                  algebraic_r xr,
                                  algebraic_r yr,
@@ -1648,10 +1677,10 @@ algebraic_p arithmetic::evaluate(id          op,
     {
         if (hwfloat_g fx = x->as<hwfloat>())
             if (hwfloat_g fy = y->as<hwfloat>())
-                return ops.fop(fx, fy);
+                return real_result_or_complex(op, ops.fop(fx, fy), x, y);
         if (hwdouble_g dx = x->as<hwdouble>())
             if (hwdouble_g dy = y->as<hwdouble>())
-                return ops.dop(dx, dy);
+                return real_result_or_complex(op, ops.dop(dx, dy), x, y);
     }
 
 
@@ -1669,7 +1698,7 @@ algebraic_p arithmetic::evaluate(id          op,
             rt.domain_error();
             return nullptr;
         }
-        return xv;
+        return real_result_or_complex(op, +xv, x, y);
     }
 
     // Complex data types
