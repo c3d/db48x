@@ -1050,6 +1050,14 @@ struct runtime
         return ErrorSave;
     }
 
+    void error_message(utf8 message)
+    // ------------------------------------------------------------------------
+    //   Restore the error message saved for errm
+    // ------------------------------------------------------------------------
+    {
+        ErrorSave = message;
+    }
+
     runtime &source(utf8 spos, size_t len = 0)
     // ------------------------------------------------------------------------
     //   Set the source location for the current error

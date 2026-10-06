@@ -648,11 +648,13 @@ algebraic_p algebraic::symbolic_sqrt() const
             return rectangular::make(integer::make(0), x);
         }
 
+        // Only values that fit in 64 bits can be factored natively
         if (integer_p i = x->as<integer>())
             return integer_sqrt(i->value<ularge>());
         if (bignum_p b = x->as<bignum>())
-            return integer_sqrt(b->value<ularge>());
-        if (x->is_fraction())
+            if (!b->more_bits_than(64))
+                return integer_sqrt(b->value<ularge>());
+        if (x->type() == ID_fraction)
         {
             fraction_p f = fraction_p(+x);
             ularge num = f->numerator_value();
