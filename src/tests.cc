@@ -1993,6 +1993,13 @@ void tests::arithmetic()
         .test(CLEAR,
               "ZeroPowerZeroIsOne", ENTER,
               "0 0 ^", ENTER).noerror().expect("1");
+    step("Zero to a positive non-integer power")
+        .test(CLEAR, "0 0.5 ^", ENTER).noerror().expect("0")
+        .test(CLEAR, "0 1/3 ^", ENTER).noerror().expect("0")
+        .test(CLEAR, "0. 0.25 ^", ENTER).noerror().expect("0.")
+        .test(CLEAR, "0 '1/2' EVAL ^", ENTER).noerror().expect("0");
+    step("Zero to a negative non-integer power")
+        .test(CLEAR, "0 -0.5 ^", ENTER).error("Divide by zero");
     step("Check that power is right associative")
         .test(CLEAR, "'3^3^3'", ENTER, ID_ToDecimal)
         .expect("7 625 597 484 987");
@@ -6489,7 +6496,7 @@ void tests::complex_promotion()
         .test(CLEAR, "-4 2 XROOT", ENTER).error("Argument outside domain")
         .test(CLEAR, "-8 2. ^", ENTER).expect("64.")
         .test(CLEAR, "-8 3. ^", ENTER).expect("-512.")
-        .test(CLEAR, "0 0.5 ^", ENTER).expect("0.")
+        .test(CLEAR, "0 0.5 ^", ENTER).expect("0")
         .test(CLEAR, "0 -0.5 ^", ENTER).error("Divide by zero");
     step("Complex poles do not crash when infinities are values")
         .test(CLEAR, "InfinityValue", ENTER).noerror()

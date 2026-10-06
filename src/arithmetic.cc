@@ -1247,6 +1247,14 @@ algebraic_p arithmetic::optimize<struct pow>(algebraic_r x, algebraic_r y)
         return r;
     }
 
+    // 0^y is 0 for real y>0, e.g. 0^(1/2), and a division by zero for y<0
+    if (x->is_zero(false) && x->is_real() && y->is_real())
+    {
+        if (y->is_negative(false))
+            return rt.zero_divide(false);
+        return x;
+    }
+
     // Not yet implemented
     return nullptr;
 }
