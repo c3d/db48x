@@ -344,7 +344,6 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
 
     gcmbytes gprev  = prev;
     size_t   ovars  = prev ? leb128<size_t>(prev) : 0;
-    size_t   ovoffs = prev - +gprev;
 
     byte_p   xp     = x->payload();
     size_t   xsz    = leb128<size_t>(xp);
@@ -366,18 +365,19 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
         int    cmp  = -1;
         if (prev)
         {
-            // Restart from beginning of variables
-            prev = gprev + ovoffs;
+            // Restart from beginning of variables, which may have moved
+            // if the count of variables grew (or was just created)
+            prev = gprev + leb128size(ovars);
             for (size_t ov = 0; ov < ovars; ov++)
             {
                 byte_p oldvar = prev;
                 size_t ovlen  = leb128<size_t>(prev);
                 cmp = symbol::compare(prev, xp, std::min(ovlen, vlen));
+                if (cmp == 0)
+                    cmp = ovlen < vlen ? -1 : ovlen > vlen ? 1 : 0;
                 if (cmp >= 0)
                 {
                     old = oldvar;
-                    if (cmp == 0)
-                        cmp = ovlen - vlen;
                     break;
                 }
                 prev += ovlen;
@@ -388,8 +388,8 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
         if (cmp)
         {
             // Size needed for variable
-            size_t offs   = old - +gprev;
             bool   vszchg = !prev || leb128size(ovars + 1) != leb128size(ovars);
+            size_t offs   = old ? old - +gprev + (prev && vszchg) : 0;
             byte  *copy   = rt.allocate(vsz + vszchg);
             if (!copy)
                 return nullptr;
@@ -402,7 +402,10 @@ byte *polynomial::copy_variables(polynomial_r x, byte *prev)
             else
             {
                 if (vszchg)
+                {
                     memmove((byte *) +gprev + 1, +gprev, copy - +gprev);
+                    copy++;
+                }
                 leb128(+gprev, ovars);
             }
             if (!old)

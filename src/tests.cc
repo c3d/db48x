@@ -13673,6 +13673,12 @@ void tests::polynomials()
     step("Create polynomial from an expression")
         .test(CLEAR, "'X-Y' →Poly", ENTER)
         .expect("ⓅX-Y");
+    step("Create polynomial with many variables")
+        .test(CLEAR, "'A+B+C+D+E+F' →Poly", ENTER)
+        .expect("ⓅA+B+C+D+E+F");
+    step("Polynomial variables that are prefix of one another")
+        .test(CLEAR, "'A1*A10+A10*A1' →Poly", ENTER)
+        .expect("Ⓟ2·A1·A10");
     step("Create polynomial from menu")
         .test(CLEAR, "'X-Y'", ENTER, ID_ToolsMenu, F4)
         .expect("ⓅX-Y");
