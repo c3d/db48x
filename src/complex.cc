@@ -1203,6 +1203,8 @@ COMPLEX_BODY(sqrt)
 //   Complex implementation of sqrt
 // ----------------------------------------------------------------------------
 {
+    if (!z)
+        return nullptr;
     id zt = z->type();
     if (zt == ID_polar)
     {
@@ -1251,6 +1253,8 @@ COMPLEX_BODY(cbrt)
 //   Complex implementation of cbrt
 // ----------------------------------------------------------------------------
 {
+    if (!z)
+        return nullptr;
     polar_g p = z->as_polar();
     if (!p)
         return nullptr;
@@ -1542,8 +1546,21 @@ COMPLEX_BODY(ln1p)
 // ----------------------------------------------------------------------------
 //   ln1p(a+bi) = 0.5*ln1p(a*(2+a)+b*b) + i*atan2(b, 1+a)
 {
+    if (!z)
+        return nullptr;
     algebraic_g a = z->re();
     algebraic_g b = z->im();
+
+    // Pole at z = -1: |1+z| = 0
+    algebraic_g one = integer::make(1);
+    algebraic_g opa = one + a;
+    if (!opa)
+        return nullptr;
+    if (opa->is_zero(false) && b->is_zero(false))
+    {
+        rt.zero_divide_error();
+        return nullptr;
+    }
 
     // Real part: 0.5 * ln1p(a*(2+a) + b*b)
     algebraic_g two = integer::make(2);
@@ -1551,8 +1568,7 @@ COMPLEX_BODY(ln1p)
 
     // Imaginary part: atan2(b, 1+a) — suppress angle unit on result
     settings::SaveSetAngleUnits ssau(false);
-    algebraic_g one = integer::make(1);
-    algebraic_g im  = atan2::evaluate(b, one + a);
+    algebraic_g im  = atan2::evaluate(b, opa);
 
     return rectangular::make(re, im);
 }
@@ -1591,7 +1607,18 @@ COMPLEX_BODY(ln)
 // ----------------------------------------------------------------------------
 {
     // log(a.exp(ib)) = log(a) + i b
+    if (!z)
+        return nullptr;
     algebraic_g mod = z->mod();
+    if (!mod)
+        return nullptr;
+    if (mod->is_zero(false))
+    {
+        // Pole at 0: do not hand ln(0) back to the real code, which would
+        // promote to complex again with ComplexResults and recurse forever
+        rt.zero_divide_error();
+        return nullptr;
+    }
     algebraic_g arg = z->arg(ID_Rad);
     return rectangular::make(ln::run(mod), arg);
 }
@@ -1626,6 +1653,8 @@ COMPLEX_BODY(exp)
 // ----------------------------------------------------------------------------
 {
     // exp(a+ib) = exp(a)*exp(ib)
+    if (!z)
+        return nullptr;
     algebraic_g re = z->re();
     algebraic_g im = z->im();
     return polar::make(exp::run(re), im, ID_Rad);

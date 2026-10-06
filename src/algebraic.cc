@@ -1302,6 +1302,8 @@ algebraic_p algebraic::convert_angle(algebraic_r ra,
 //   Otherwise, input is in fractions of pi (internal format for y() in polar).
 {
     algebraic_g a = ra;
+    if (!a)
+        return nullptr;
     if (a->is_real() && (from != to || negmod))
     {
         switch (from)

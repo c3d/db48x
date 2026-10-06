@@ -2141,7 +2141,43 @@ decimal_p decimal::pow(decimal_r x, decimal_r y)
     if (!x || !y)
         return nullptr;
     pow::remember(target<pow>);
+
+    // 0^y is 0 for y > 0 and a pole for y < 0 (0^0 is handled by caller)
+    if (x->is_zero())
+    {
+        if (y->is_negative())
+        {
+            rt.zero_divide_error();
+            return nullptr;
+        }
+        return x;
+    }
+
     precision_adjust prec;
+    if (x->is_negative())
+    {
+        // Negative base: only defined in the reals for an integral exponent
+        // The caller may promote to complex when ComplexResults is set
+        decimal_g ip, fp;
+        if (!y->split(ip, fp))
+            return nullptr;
+        if (!fp->is_zero())
+        {
+            rt.domain_error();
+            return nullptr;
+        }
+        decimal_g two = make(2);
+        decimal_g half = y / two;
+        if (!half || !half->split(ip, fp))
+            return nullptr;
+        bool odd = !fp->is_zero();
+        decimal_g ax = x;
+        ax = -ax;
+        decimal_g r = exp(y * ln(ax));
+        if (odd)
+            r = -r;
+        return prec(r);
+    }
     return prec(exp(y * ln(x)));
 }
 
@@ -2787,9 +2823,19 @@ decimal_p decimal::acsch(decimal_r x)
 //   Inverse hyperbolic cosecant
 // ----------------------------------------------------------------------------
 {
+    if (!x)
+        return nullptr;
+    if (x->is_zero())
+    {
+        // Pole at 0
+        rt.zero_divide_error();
+        return nullptr;
+    }
     precision_adjust prec;
     decimal_g one = make(1);
     decimal_g inv_x = inv(x);
+    if (!inv_x)
+        return nullptr;
     return prec(ln(inv_x + decimal_g(sqrt(inv_x*inv_x + one))));
 }
 

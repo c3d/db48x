@@ -6085,16 +6085,16 @@ void tests::complex_promotion()
         .expect("ⅈ");
     step("asin(-2) succeeds in complex mode")
         .test(CLEAR, "-2 asin", ENTER)
-        .expect("-1.57079 63267 9+1.31695 78969 2ⅈ °");
+        .expect("-90.+75.45612 92902ⅈ °");
     step("acos(-2) succeeds in complex mode")
         .test(CLEAR, "-2 acos", ENTER)
-        .expect("3.14159 26535 9-1.31695 78969 2ⅈ °");
+        .expect("180.-75.45612 92902ⅈ °");
     step("asin(-2) succeeds in complex mode")
         .test(CLEAR, "-2 asin", ENTER)
-        .expect("-1.57079 63267 9+1.31695 78969 2ⅈ °");
+        .expect("-90.+75.45612 92902ⅈ °");
     step("asin(-2) succeeds in complex mode")
         .test(CLEAR, "-2 asin", ENTER)
-        .expect("-1.57079 63267 9+1.31695 78969 2ⅈ °");
+        .expect("-90.+75.45612 92902ⅈ °");
     step("atanh(-2) succeeds in complex mode")
         .test(CLEAR, "-2 atanh", ENTER)
         .expect("-0.54930 61443 34+1.57079 63267 9ⅈ");
@@ -6102,9 +6102,103 @@ void tests::complex_promotion()
         .test(CLEAR, "-2 ln", ENTER)
         .expect("0.69314 71805 6+3.14159 26535 9ⅈ");
 
+    step("asin(2) converts both parts to degrees")
+        .test(CLEAR, "2 asin", ENTER)
+        .expect("90.-75.45612 92902ⅈ °");
+    step("asin(2) in grads")
+        .test(CLEAR, "GRAD 2 asin", ENTER)
+        .expect("100.-83.84014 36558ⅈ grad");
+    step("asin(2) in radians")
+        .test(CLEAR, "RAD 2 asin", ENTER)
+        .expect("1.57079 63267 9-1.31695 78969 2ⅈ r")
+        .test(CLEAR, "DEG", ENTER).noerror();
+    step("asin(2) without angle units")
+        .test(CLEAR, "NoAngleUnits 2 asin", ENTER)
+        .expect("90.-75.45612 92902ⅈ")
+        .test(CLEAR, "'NoAngleUnits' purge", ENTER).noerror();
+
+    step("Negative real base with fractional exponent")
+        .test(CLEAR, "-8 0.5 ^", ENTER)
+        .expect("2.82842 71247 5∡90.°");
+    step("Square root of -1 as power")
+        .test(CLEAR, "-1 0.5 ^", ENTER)
+        .expect("1.∡90.°");
+    step("Cube root of -8 as power with fraction")
+        .test(CLEAR, "-8 3 INV ^", ENTER)
+        .expect("2.∡60.°");
+    step("Even root of a negative number")
+        .test(CLEAR, "-4 2 XROOT", ENTER)
+        .expect("2.∡90.°");
+    step("Fractional power of negative variable in expression")
+        .test(CLEAR, "-1 'X' STO 'X^0.5' →NUM", ENTER)
+        .expect("1.∡90.°")
+        .test(CLEAR, "'X' PURGE", ENTER).noerror();
+
+    step("ln(0) is a pole, not an infinite recursion")
+        .test(CLEAR, "0 LN", ENTER).error("Divide by zero")
+        .test(CLEAR, "0. LN", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 LOG", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ LOG", ENTER).error("Divide by zero");
+    step("Complex powers of zero")
+        .test(CLEAR, "0 ⅈ ^", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ 0.5 ^", ENTER).error("Divide by zero");
+    step("lnp1(-1) is a pole")
+        .test(CLEAR, "-1 LNP1", ENTER).error("Divide by zero")
+        .test(CLEAR, "-1+0ⅈ LNP1", ENTER).error("Divide by zero");
+    step("atanh(-1) and acoth(-1) are poles")
+        .test(CLEAR, "-1 ATANH", ENTER).error("Divide by zero")
+        .test(CLEAR, "-1 ACOTH", ENTER).error("Divide by zero")
+        .test(CLEAR, "-1+0ⅈ ATANH", ENTER).error("Divide by zero")
+        .test(CLEAR, "-1+0ⅈ ACOTH", ENTER).error("Divide by zero");
+    step("atanh(1) and acoth(1) are poles")
+        .test(CLEAR, "1 ATANH", ENTER).error("Divide by zero")
+        .test(CLEAR, "1 ACOTH", ENTER).error("Divide by zero");
+    step("atan(i) and acot(-i) are poles")
+        .test(CLEAR, "0+1ⅈ ATAN", ENTER).error("Divide by zero")
+        .test(CLEAR, "0-1ⅈ ACOT", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ ACOT", ENTER).error("Divide by zero");
+    step("Inverse trig functions at 0 with complex results")
+        .test(CLEAR, "0 ASEC", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ACSC", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ASECH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero");
+    step("ln(0) in expression")
+        .test(CLEAR, "0 'X' STO 'LN(X)' →NUM", ENTER).error("Divide by zero")
+        .test(CLEAR, "'X' PURGE", ENTER).noerror();
+
     step("Restore complex mode")
         .test(CLEAR, "'ComplexResults' purge", ENTER).noerror()
         .test("-103 FS?", ENTER).expect("False");
+
+    step("acsch(0) is a pole")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0. ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "'ACSCH(0)' →NUM", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 1 →σRange ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0…1 ACSCH", ENTER).error("Divide by zero");
+    step("Complex inverse functions at their poles")
+        .test(CLEAR, "0+0ⅈ ASECH", ENTER).error("Divide by zero")
+        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Divide by zero")
+        .test(CLEAR, "1+0ⅈ ACOTH", ENTER).error("Divide by zero")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Divide by zero")
+        .test(CLEAR, "ⅈ ACOT", ENTER).error("Divide by zero")
+        .test(CLEAR, "0+0ⅈ LN", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ⅈ ^", ENTER).error("Divide by zero");
+    step("Real powers of negative and zero bases")
+        .test(CLEAR, "-8 0.5 ^", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-4 2 XROOT", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-8 2. ^", ENTER).expect("64.")
+        .test(CLEAR, "-8 3. ^", ENTER).expect("-512.")
+        .test(CLEAR, "0 0.5 ^", ENTER).expect("0.")
+        .test(CLEAR, "0 -0.5 ^", ENTER).error("Divide by zero");
+    step("Complex poles do not crash when infinities are values")
+        .test(CLEAR, "InfinityValue", ENTER).noerror()
+        .test(CLEAR, "1+0ⅈ ATANH", ENTER).error("Undefined operation")
+        .test(CLEAR, "0+0ⅈ ACSCH", ENTER).error("Undefined operation")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Undefined operation")
+        .test(CLEAR, "'InfinityValue' PURGE", ENTER).noerror();
 }
 
 
