@@ -9807,7 +9807,7 @@ void tests::symbolic_operations()
 
     step("Isolate a single variable, simple case")
         .test(CLEAR, "'A+1=sin(X+B)+C' 'X' ISOL", ENTER)
-        .expect("'X=sin⁻¹(A-C+1)+2·i1·π-B'")
+        .expect("'X=π÷2+s1·cos⁻¹(A-C+1)+2·i2·π-B'")
         .test(RSHIFT, KEY7, F6);
     step("Isolate an expression with implicit =0")
         .test(CLEAR, "'A+X*B-C' 'X'", NOSHIFT, F3)
@@ -9836,14 +9836,14 @@ void tests::symbolic_operations()
         .test(CLEAR, "'A=X/B' X", NOSHIFT, F3).expect("'X=A·B'")
         .test(CLEAR, "'A=B/X' X", NOSHIFT, F3).expect("'X=B÷A'");
     step("Isolate a single variable, power")
-        .test(CLEAR, "'A=X^B' X", NOSHIFT, F3).expect("'X=A↑B⁻¹+exp(i1·π·ⅈ÷B)'")
+        .test(CLEAR, "'A=X^B' X", NOSHIFT, F3).expect("'X=A↑B⁻¹·exp(2·i1·π·ⅈ÷B)'")
         .test(CLEAR, "'A=B^X' X", NOSHIFT, F3).expect("'X=ln A÷ln B'");
     step("Isolate sin")
         .test(CLEAR, "'sin X=A' X", NOSHIFT, F3)
-        .expect("'X=sin⁻¹ A+2·i1·π'");
+        .expect("'X=π÷2+s1·cos⁻¹ A+2·i2·π'");
     step("Isolate cos")
         .test(CLEAR, "'cos X=A' X", NOSHIFT, F3)
-        .expect("'X=cos⁻¹ A+2·i1·π'");
+        .expect("'X=s1·cos⁻¹ A+2·i2·π'");
     step("Isolate tan")
         .test(CLEAR, "'tan X=A' X", NOSHIFT, F3)
         .expect("'X=tan⁻¹ A+i1·π'");
@@ -9858,10 +9858,10 @@ void tests::symbolic_operations()
         .expect("'X=tan A'");
     step("Isolate sec")
         .test(CLEAR, "'sec X=A' X", NOSHIFT, F3)
-        .expect("'X=sec⁻¹ A+2·i1·π'");
+        .expect("'X=s1·sec⁻¹ A+2·i2·π'");
     step("Isolate csc")
         .test(CLEAR, "'csc X=A' X", NOSHIFT, F3)
-        .expect("'X=csc⁻¹ A+2·i1·π'");
+        .expect("'X=π÷2+s1·sec⁻¹ A+2·i2·π'");
     step("Isolate cot")
         .test(CLEAR, "'cot X=A' X", NOSHIFT, F3)
         .expect("'X=cot⁻¹ A+i1·π'");
@@ -9942,7 +9942,10 @@ void tests::symbolic_operations()
         .expect("'X=A²'");
     step("Isolate cubed")
         .test(CLEAR, "'A=cubed X' X", NOSHIFT, F3)
-        .expect("'X=∛ A+exp(i1·π·ⅈ÷3)'");
+        .expect("'X=∛ A·exp(2·i1·π·ⅈ÷3)'");
+    step("Isolate abs")
+        .test(CLEAR, "'A=abs X' X", NOSHIFT, F3)
+        .expect("'X=s1·A'");
     step("Isolate cbrt")
         .test(CLEAR, "'A=cbrt X' X", NOSHIFT, F3)
         .expect("'X=A³'");
@@ -13863,10 +13866,21 @@ void tests::polynomial_roots()
                 "'-(√(-(4·(A+B)·C))÷(2·(A+B)))' }");
     step("Zeros: multivariate isolated")
         .test(CLEAR, "'X^3*Y=1' 'X' Zeros", ENTER)
-        .expect("{ 'Y⁻¹↑3⁻¹+exp(i1·π·ⅈ÷3)' }");
+        .expect("{ 'Y⁻¹↑3⁻¹·exp(2·i1·π·ⅈ÷3)' }");
     step("Zeros: algebraic mode and multiple solutions")
         .test(CLEAR, "'zeros(sin(x)*cos(x);x)'", ENTER, ID_Run)
-        .expect("{ 'sin⁻¹ 0+2·i1·π' 'cos⁻¹ 0+2·i2·π' }");
+        .expect("{ 'π÷2+s1·(π÷2)+2·i2·π' 's3·(π÷2)+2·i4·π' }");
+    step("Zeros: both families of sin(x)=1/2")
+        .test(CLEAR, "'SIN(X)=0.5' 'X' Zeros", ENTER)
+        .expect("{ 'π÷2+s1·cos⁻¹ 0.5+2·i2·π' }");
+    step("Zeros: trivial function values are folded")
+        .test(CLEAR, "'EXP(X)-1' 'X' Zeros", ENTER)
+        .expect("{ '2·i1·π·ⅈ' }")
+        .test(CLEAR, "'LN(X)' 'X' Zeros", ENTER)
+        .expect("{ '1' }");
+    step("Zeros: absolute value")
+        .test(CLEAR, "'ABS(X)-1' 'X' Zeros", ENTER)
+        .expect("{ 's1' }");
     step("Zeros: Solutions in the real space vs complex space")
         .test(CLEAR, "'X^2+3=0' 'X' Zeros", ENTER)
         .expect("{ }")
