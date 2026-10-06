@@ -3093,7 +3093,8 @@ void tests::logical_operations()
         .test(CLEAR, "True 5 *", ENTER).expect("5")
         .test(CLEAR, "False 2 /", ENTER).expect("0")
         .test(CLEAR, "True 2 ^", ENTER).expect("1")
-        .test(CLEAR, "1 2 < 1 +", ENTER).expect("2");
+        .test(CLEAR, "1 2 < 1 +", ENTER).expect("2")
+        .test(CLEAR, "{} True + False +", ENTER).expect("{ True False }");
     step("Comparisons in arithmetic expressions")
         .test(CLEAR, "'(1<2)+1' EVAL", ENTER).expect("2")
         .test(CLEAR, "1 'TruthX' STO '(TruthX<2)*3' EVAL", ENTER).expect("3")

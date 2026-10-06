@@ -1826,10 +1826,20 @@ object::result arithmetic::evaluate(id op, ops_t ops)
     object_g xo = strip(rt.stack(0));
     if (!xo || !yo)
         return ERROR;
-    yo = truth_as_integer(yo);
-    xo = truth_as_integer(xo);
-    if (!xo || !yo)
-        return ERROR;
+
+    // Comparison results act as 1 or 0 with numbers, but not with lists
+    id xt = xo->type();
+    id yt = yo->type();
+    bool xtruth = xt == ID_True || xt == ID_False;
+    bool ytruth = yt == ID_True || yt == ID_False;
+    if ((xtruth || ytruth) &&
+        (xtruth || is_algebraic(xt)) && (ytruth || is_algebraic(yt)))
+    {
+        yo = truth_as_integer(yo);
+        xo = truth_as_integer(xo);
+        if (!xo || !yo)
+            return ERROR;
+    }
     algebraic_g y = yo->as_extended_algebraic();
     algebraic_g x = xo->as_extended_algebraic();
     if (!x || !y)
