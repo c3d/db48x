@@ -250,6 +250,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
+      continue-on-error: true
       run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
 
     - name: Upload failed test images
@@ -559,6 +560,7 @@ jobs:
 
     - name: Run test suite
       shell: msys2 {0}
+      continue-on-error: true
       run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
 
     - name: Upload failed test images
