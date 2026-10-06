@@ -127,7 +127,7 @@ Stack: an interval, or `X` `U`.
 ```
 
 When rounding the uncertainty reaches the next decade, the value follows it —
-and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
+and the result shows why SciRngText exists: the uncertainty
 0.10 is displayed as 0.1.
 
 **5)**
@@ -137,7 +137,8 @@ and the result shows why [SciRngText](#scirngtext) exists: the uncertainty
 @ Expecting 12.35±0.1
 ```
 
-See also: [Rounding](#roundinglibrary).
+See also: [Rounding](#roundinglibrary), [SciRngText](#scirngtext).
+
 
 ## SciRngText
 
@@ -700,6 +701,8 @@ the global minimum and maximum of the function.
   possibly correlated;
 * [σROOT](#σroot): the unknowns of any simulation of the Equation Library,
   from inputs given with their uncertainty;
+* [ΔROOT](#Δroot): the range of the unknowns of any simulation of the Equation
+  Library, from inputs given by bounds;
 * [ΔRf](#Δrf): the range of a function of one variable over an interval;
 * [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
   box;
@@ -837,7 +840,10 @@ standard deviation width/√12, as Bound→σ does. Units are welcome.
 σROOT finds these variables in the current directory, runs ROOT with each one
 at its centre, then moves each one in turn by ±σ/100 and runs ROOT again. The
 differences give the contribution of every input to every unknown, combined
-as by σRFxjxi, the inputs being taken as independent. With n uncertain inputs,
+as by σRFxjxi: u² = Σ ci·ck·ρik. The inputs are independent, unless the global
+variable ρij holds one coefficient for all the pairs, or a list of pairs by
+name, { { x y ρ } … }, the other pairs being 0; since σROOT finds the inputs
+itself, a matrix, whose order would be unknown, is refused. With n uncertain inputs,
 ROOT runs 1 + 2n times: a fraction of a second on the simulator. It works even
 when an unknown cannot be isolated, since the derivatives are taken through
 the solver.
@@ -847,8 +853,9 @@ its central value. The unknowns are purged before each run, so that ROOT
 always starts from the guesses: a second ROOT on unknowns that already exist
 does not always solve them again.
 
-The result is a standard uncertainty, ±σ, even when the inputs are bounds. For
-the shape of the law of the result, see [DMOPendulum](#dmopendulum), which
+The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
+the range of each unknown, see ΔROOT. For
+the shape of the law of the result, see DMOPendulum, which
 draws it by the Monte Carlo method.
 
 **1)** The simple pendulum, its amplitude only known between 60° and 80°: the
@@ -885,9 +892,87 @@ a better clock.
 @ Expecting { C:49.94037 53622±σ1.51471 94838 9 μF }
 ```
 
+**4)** The same capacitor with a 1 % resistor, Vf and V being read on the same
+voltmeter: an error of its calibration moves both the same way, a correlation
+of 0.9. C depends on their ratio, so the common error partly cancels, and the
+uncertainty of C falls from 0.547 μF to 0.466 μF. ρij stays in the directory
+and applies to the next calls: purge it when done.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±1%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+{ { Vf V 0.9 } } 'ρij' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+'ρij' Purge
+@ Expecting { C:49.94037 53622±σ0.46565 38593 03 μF }
+```
+
 These results were checked against an independent computation in double
 precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
 70.0067±σ1.2218° (Monte Carlo: 1.2194°).
+
+See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+
+
+## ΔROOT
+
+The range of the unknowns found by ROOT, for any simulation of the Equation
+Library: interval arithmetic through the solver.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:lo1…hi1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their bounds: a…b, a±b or a±p%. A
+value a±σb is taken as the bounds a±√3·b of the rectangular law of the same
+standard deviation, the inverse of what Bound→σ does. Only the variables of
+the equations are inputs; units are welcome.
+
+ΔROOT runs ROOT on a grid over the box of the inputs: each input at its low
+bound, its centre and its high bound, 3ⁿ runs for n inputs; beyond five
+inputs, at its bounds only, 2ⁿ runs. It keeps the smallest and the largest
+value of each unknown. When each unknown varies in one direction with each
+input, its extremes lie at corners of the box, and the range is exact. When
+an extreme is only reached inside the box, the tag of that unknown says
+"(inner extremum?)": the true range may be wider, and a narrower box, or
+Exmnf on the equation, will tell.
+
+Afterwards, each input gets back its value, and each unknown holds its value
+at the centre of the box.
+
+**1)** The simple pendulum, its amplitude between 60° and 80°: the real
+period lies between its values at the two ends. ω, T and f do not depend on
+the amplitude.
+
+```rpl
+15_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁΔROOT
+@ Expecting { ω:8.08564 57173 6…8.08564 57173 6 r/s Treal:0.83393 48521 94…0.88361 42622 96 s T:0.77707 89775 87…0.77707 89775 87 s f:1.28687 04840 1…1.28687 04840 1 Hz }
+```
+
+**2)** The capacitor of σROOT, now by bounds: the supply known to
+±0.05 V, the resistor to 5 %, the voltage read between 3.28 V and 3.32 V. The
+capacitance is guaranteed within the range found.
+
+```rpl
+0_V 'Vi' Sto  10±0.05_V 'Vf' Sto  100±5%_Ω 'R' Sto  2_ms 't' Sto  '3.28…3.32_V' →Num 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁΔROOT
+@ Expecting { C:46.91904 5145…53.28814 92172 μF }
+```
+
+**3)** The limit of the method: the range of a projectile launched between
+35° and 65°. The range is largest at 45°, inside the box; the grid sees 35°,
+50° and 65°, and finds its largest value at 50°, 1 224 ft, where the true
+largest range is 1 243 ft. The tag warns of it.
+
+```rpl
+0_ft 'x0' Sto  0_ft 'y0' Sto  200_ft/s 'v0' Sto  10_s 't' Sto  '35…65_°' →Num 'θ0' Sto
+'ROOT(ⒺProjectile Motion;[R;vcx;vcy;x;y;hmax;tf];[1_ft;1_ft/s;1_ft/s;1_ft;1_ft;1_ft;1_s])' ⓁΔROOT 1 Get
+@ Expecting R (inner extremum?):952.37556 6631…1 224.35042 8 ft
+```
+
+The ranges of the first two examples were checked on a grid of eleven levels
+per input: they are exact to the digits shown.
+
+See also: [Exmnf](#exmnf), [σROOT](#σroot).
 
 
 ## ΔRf
@@ -1195,7 +1280,7 @@ correct a value typed in the wrong form, `10±1` for `10±σ1` or the reverse, n
 to convert one into the other. A bound and a standard deviation are not the
 same thing: the true value lies outside ±σ one time in three. To turn a bound
 into a standard deviation, a law must be chosen, a rectangular one dividing the
-half width by √3: [Bound→σ](#bound→σ) does that.
+half width by √3: Bound→σ does that.
 
 The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
 but not when the value carries a unit; Cycling does.
@@ -1241,6 +1326,8 @@ but not when the value carries a unit; Cycling does.
 1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling ⓁCycling
 @ Expecting non-equivalent:1.…2. m
 ```
+
+See also: [Bound→σ](#bound→σ).
 
 
 ## ApplicationsLibrary
@@ -1559,7 +1646,7 @@ uncertainty u that is itself uncertain: for a nearly normal result, its
 relative standard deviation is about 1/√(2M). Ten times more draws make it
 √10 ≈ 3.2 times more precise, at ten times the cost.
 
-S1Converge runs the mass calibration of [S1Mass](#s1mass) with 100, 1 000 and
+S1Converge runs the mass calibration of S1Mass with 100, 1 000 and
 10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
 its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
 the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
@@ -1578,6 +1665,8 @@ enough to give two digits. With 10 000 draws, u is known to 0.7 %, close to the
 two significant digits of the published 0.0754 mg. This is the question that
 the adaptive procedure of the Supplement answers (7.9): draw until the digits
 wanted are stable, which MCPropagate does with M = 0.
+
+See also: [S1Mass](#s1mass).
 
 
 ## ProjectileLibrary
@@ -2135,7 +2224,7 @@ way an input of the equation.
 
 ## DMOPendulum
 
-The two periods of [Simple Pendulum](#Simple Pendulum) in the Equation
+The two periods of Simple Pendulum in the Equation
 Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
 amplitude, and the real period for a large amplitude θmax,
 `Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x))`, with `c(x) = (2x)!/(2^x·x!)²`.
@@ -2181,4 +2270,4 @@ deviation as the Monte Carlo method, since Treal is almost linear in θmax over
 whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws show
 it.
 
-
+See also: [Simple Pendulum](#Simple Pendulum).
