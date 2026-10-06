@@ -4179,8 +4179,12 @@ restart:
                 record(help_trace, "shown set: shown=%u y=%d line=%u pos=%u",
                        shown, int(y), line, helpfile.position());
             }
-            else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H)
+            else if (last == '\n' && line > 0 && y < ytop - 2*LCD_H &&
+                     style == NORMAL && !in_table)
             {
+                // Resume later drawings from here, but only outside of code
+                // blocks and tables: restarting inside a ``` block would
+                // swap code and text until the next fence
                 uint oldHelp = help;
                 uint oldLine = line;
                 help = helpfile.position();
