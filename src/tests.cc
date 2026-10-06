@@ -8480,7 +8480,7 @@ void tests::solver_testing()
         .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
         .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("-2.19049 50614 3⁳⁻¹³")
+        .expect("2.20786 61845 8⁳⁻¹²")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver with slow slope")
@@ -8497,7 +8497,7 @@ void tests::solver_testing()
         .expect("C=5.");
     step("Evaluate equation case Left=Right")
         .test(F1)
-        .expect("'25=25.-7.8⁳⁻²¹'");
+        .expect("'25=25.'");
 
     step("Verify that we display the equation after entering value")
         .test(CLEAR, "42", F4)
@@ -8527,6 +8527,18 @@ void tests::solver_testing()
         .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
+    step("Numerical solver does not return non-roots")
+        .test(CLEAR, "'Z' 'Z' 1E100 ROOT", ENTER)
+        .noerror().expect("Z=0");
+    step("Numerical solver checks residual relative to terms")
+        .test(CLEAR, "'Z^2-1E-30' 'Z' 1 ROOT", ENTER)
+        .noerror().expect("Z=1.⁳⁻¹⁵");
+    step("Numerical solver bisects on sign change")
+        .test(CLEAR, "'Z^3-Z-1' 'Z' 0 ROOT", ENTER)
+        .noerror().expect("Z=1.32471 79572 4");
+    step("Numerical solver uses the guess to select root")
+        .test(CLEAR, "'Z^2-4=0' 'Z' -1 ROOT", ENTER)
+        .noerror().expect("Z=-2.");
 
     step("Select algebraically-assisted solver")
         .test(CLEAR, "SymbolicSolver", ENTER).noerror();
@@ -8552,9 +8564,9 @@ void tests::solver_testing()
         .noerror();
     step("Solver without solution")
         .test(CLEAR, "'sq(x)+3=0' 'X' 1 ROOT", ENTER)
-        .error("Argument outside domain")
+        .error("No solution?")
         .test(CLEAR, "X", ENTER)
-        .expect("'X'")
+        .expect("2.20786 61845 8⁳⁻¹²")
         .test("'X'", ENTER, LSHIFT, BSP, F2)
         .noerror();
     step("Solver with slow slope")
@@ -8603,6 +8615,42 @@ void tests::solver_testing()
         .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
+
+    step("Symbolic solver: root closest to the guess")
+        .test(CLEAR, "'Z^2-4=0' 'Z' -1 ROOT", ENTER)
+        .noerror().expect("Z=-2.")
+        .test(CLEAR, "'Z^2-4=0' 'Z' -3 ROOT", ENTER)
+        .noerror().expect("Z=-2.")
+        .test(CLEAR, "'Z^2-4=0' 'Z' -2.1 ROOT", ENTER)
+        .noerror().expect("Z=-2.")
+        .test(CLEAR, "'Z^2-4' 'Z' 1 ROOT", ENTER)
+        .noerror().expect("Z=2.");
+    step("Symbolic solver: periodic solution closest to the guess")
+        .test(CLEAR, "RAD 'sin(Z)' 'Z' 3 ROOT DEG", ENTER)
+        .noerror().expect("Z=3.14159 26535 9");
+    step("Symbolic solver: reject extraneous solutions")
+        .test(CLEAR, "'sqrt(Z)+1' 'Z' 1 ROOT", ENTER)
+        .error("Argument outside domain")
+        .test(CLEAR, "'sqrt(Z)=-2' 'Z' 1 ROOT", ENTER)
+        .error("Argument outside domain");
+    step("Symbolic solver: multiple roots")
+        .test(CLEAR, "'Z^2' 'Z' 1 ROOT", ENTER)
+        .noerror().expect("Z=0")
+        .test(CLEAR, "'(Z-1)^2' 'Z' 0 ROOT", ENTER)
+        .noerror().expect("Z=1")
+        .test(CLEAR, "'Z^4' 'Z' 1 ROOT", ENTER)
+        .noerror().expect("Z=0");
+    step("Symbolic solver: verify residual relative to terms")
+        .test(CLEAR, "'Z^2-1E-30' 'Z' 1 ROOT", ENTER)
+        .noerror().expect("Z=1.⁳⁻¹⁵");
+    step("Symbolic solver: non-roots are not returned")
+        .test(CLEAR, "'Z' 'Z' 1E100 ROOT", ENTER)
+        .noerror().expect("Z=0");
+    step("Symbolic solver: fall back to numerical solver")
+        .test(CLEAR, "'Z^3-Z-1' 'Z' 0 ROOT", ENTER)
+        .noerror().expect("Z=1.32471 79572 4")
+        .test(CLEAR, "'Z' PURGE", ENTER)
+        .noerror();
 
     step("Jacobian solver, linear case")
         .test(CLEAR, "{ '3*X=2*Y-3' '2*X=3*Y-5' }"
