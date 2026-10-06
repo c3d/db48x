@@ -1375,10 +1375,13 @@ static uncertain_p bivariate(uncertain_r   x,
 
     algebraic_g fa  = f(xa, ya);
 
-    // An exact operand contributes nothing: skip its derivative, which may not
-    // exist, e.g. d(x^y)/dy = ln(x)·x^y for an exact integer power of x < 0
-    algebraic_g dxv = dfdx && !xs->is_zero() ? dfdx(xa, ya) : nullptr;
-    algebraic_g dyv = dfdy && !ys->is_zero() ? dfdy(xa, ya) : nullptr;
+    // Do not evaluate a partial derivative that is multiplied by a zero
+    // standard deviation: it contributes nothing, and may be undefined,
+    // e.g. ln(x) in d(x^y)/dy when computing `-2±σ1 2 ^`
+    bool        xz  = xs->is_zero(false);
+    bool        yz  = ys->is_zero(false);
+    algebraic_g dxv = dfdx && !xz ? dfdx(xa, ya) : nullptr;
+    algebraic_g dyv = dfdy && !yz ? dfdy(xa, ya) : nullptr;
     dxv             = dxv ? dxv * xs : xs;
     dyv             = dyv ? dyv * ys : ys;
     algebraic_g fs  = dxv * dxv + dyv * dyv;
@@ -1911,6 +1914,14 @@ UNCERTAIN_BODY(abs)
 // ----------------------------------------------------------------------------
 //   Uncertain Number implementation of abs
 // ----------------------------------------------------------------------------
+//   |x| has derivative ±1, so the standard deviation is unchanged
 {
-    return univariate(abs::evaluate, u);
+    if (!u)
+        return nullptr;
+    algebraic_g avg = u->average();
+    algebraic_g dev = u->stddev();
+    avg = abs::evaluate(avg);
+    if (!avg)
+        return nullptr;
+    return uncertain::make(avg, dev);
 }

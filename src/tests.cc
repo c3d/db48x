@@ -6937,7 +6937,17 @@ void tests::range_types()
     step("Range square")
         .test(CLEAR, "-1…3", ID_sq).expect("0…9")
         .test(CLEAR, "1±3", ID_sq).expect("8±8")
-        .test(CLEAR, "1±300%", ID_sq).expect("8±100%");
+        .test(CLEAR, "1±300%", ID_sq).expect("8±100%")
+        .test(CLEAR, "2…3", ID_sq).expect("4…9")
+        .test(CLEAR, "-3…-2", ID_sq).expect("4…9");
+    step("Range square containing zero")
+        .test(CLEAR, "-1…1", ID_sq).expect("0…1")
+        .test(CLEAR, "-2…1", ID_sq).expect("0…4")
+        .test(CLEAR, "0…2", ID_sq).expect("0…4")
+        .test(CLEAR, "0 1", ID_RangeMenu, ID_ToDeltaRange, ID_sq)
+        .expect("¹/₂±¹/₂")
+        .test(CLEAR, "0 50", ID_RangeMenu, ID_ToPercentRange, ID_sq)
+        .expect("¹/₈±100%");
     step("Range cubed")
         .test(CLEAR, "-1…3", ID_cubed).expect("-1…27")
         .test(CLEAR, "-2…6", ID_cubed).expect("-8…216")
@@ -6951,7 +6961,17 @@ void tests::range_types()
     step("Range power (even)")
         .test(CLEAR, "-1…3 6", ID_pow).expect("0…729")
         .test(CLEAR, "1±3 6", ID_pow).expect("2 048±2 048")
-        .test(CLEAR, "1±300% 6", ID_pow).expect("2 048±100%");
+        .test(CLEAR, "1±300% 6", ID_pow).expect("2 048±100%")
+        .test(CLEAR, "-1…1 2", ID_pow).expect("0…1")
+        .test(CLEAR, "-1…1 4", ID_pow).expect("0…1")
+        .test(CLEAR, "-3…-2 4", ID_pow).expect("16…81");
+    step("Range negative even power of range containing zero")
+        .test(CLEAR, "-1…2 -2", ID_pow).error("Divide by zero")
+        .test(CLEAR, "1…2 -2", ID_pow).expect("¹/₄…1");
+    step("Subtracting or dividing equal ranges")
+        .test(CLEAR, "1…2 1…2", NOSHIFT, SUB).expect("-1…1")
+        .test(CLEAR, "1…2 1…2", NOSHIFT, DIV).expect("¹/₂…2")
+        .test(CLEAR, "1…2", ENTER, ENTER, NOSHIFT, SUB).expect("-1…1");
 
     step("Exploding range objects")
         .test(CLEAR, "1…3", ID_ObjectMenu, ID_Explode)
@@ -7106,14 +7126,25 @@ void tests::uncertain_operations()
         .test(CLEAR, "2±σ3", NOSHIFT, ID_inv).expect("¹/₂±σ0.75");
     step("Negate uncertain numbers")
         .test(CLEAR, "1±σ3", ENTER, ID_neg).expect("-1±σ3");
-    step("Square and cube of uncertain numbers go through the derivative")
-        .test(CLEAR, "2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
-        .test(CLEAR, "-2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
-        .test(CLEAR, "0.5±σ2", ENTER, ID_sq).expect("0.25±σ2.")
-        .test(CLEAR, "2±σ0.05", ENTER, ID_cubed).expect("8±σ0.6");
-    step("Exact integer power of a negative uncertain number")
-        .test(CLEAR, "-2±σ0.05 2", NOSHIFT, ID_pow).expect("4±σ0.2")
-        .test(CLEAR, "-2±σ0.05 3", NOSHIFT, ID_pow).expect("-8±σ0.6");
+    step("Absolute value of uncertain numbers")
+        .test(CLEAR, "-3 1", ENTER, ID_ToUncertain, ID_abs).expect("3±σ1")
+        .test(CLEAR, "3 1", ENTER, ID_ToUncertain, ID_abs).expect("3±σ1")
+        .test(CLEAR, "0±σ1", ENTER, ID_abs).expect("0±σ1");
+    step("Square of uncertain numbers")
+        .test(CLEAR, "3 1", ENTER, ID_ToUncertain, ID_sq).expect("9±σ6.")
+        .test(CLEAR, "3±σ1 2", ENTER, ID_pow).expect("9±σ6.")
+        .test(CLEAR, "-2±σ0.5", ENTER, ID_sq).expect("4±σ2.");
+    step("Cube of uncertain numbers")
+        .test(CLEAR, "3±σ1", ENTER, ID_cubed).expect("27±σ27.")
+        .test(CLEAR, "3±σ1 3", ENTER, ID_pow).expect("27±σ27.")
+        .test(CLEAR, "-3±σ1", ENTER, ID_cubed).expect("-27±σ27.");
+    step("Subtracting or dividing equal uncertain numbers")
+        .test(CLEAR, "3±σ1 3±σ1", NOSHIFT, SUB)
+        .expect("0±σ1.41421 35623 7")
+        .test(CLEAR, "3±σ1 3±σ1", NOSHIFT, DIV)
+        .expect("1±σ0.47140 45207 91")
+        .test(CLEAR, "1 'ρ' STO 3±σ1 3±σ1 -", ENTER).expect("0")
+        .test(CLEAR, "'ρ' PURGE", ENTER).noerror();
 
     step("Add uncertain numbers with promotion")
         .test(CLEAR, "1±σ3 5", NOSHIFT, ADD).expect("6±σ3.");
