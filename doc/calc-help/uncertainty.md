@@ -42,6 +42,13 @@ Tools for measured values and their uncertainties, whether written as bounds
   model by random draws, with any distribution for each input:
   [MCPropagate](#mcpropagate).
 
+Correlations are given by two global variables. `ρij` holds one coefficient
+for all the pairs, or the full correlation matrix, for the functions of
+several variables: σRFxjxi and MCPropagate. `ρ` holds a single coefficient
+between two values, for the arithmetic of the calculator on `a±σb` values, as
+in `10±σ1 12±σ1 +`, and for σConcord. Without them, the values are
+independent; purge them after use, or they will weigh on later calculations.
+
 
 ## RoundingLibrary
 
@@ -548,7 +555,9 @@ offers 16.
 Stack: F Vars Vals M ▶ N, the 95 % interval, Y±σu. F is the model, an
 expression of the names listed in Vars, or a program that takes one value per
 input from the stack. Vals lists the inputs in the same order, and M is the
-number of draws.
+number of draws. M may be omitted, F Vars Vals: 2 000 draws are then made,
+which give the standard uncertainty to about 2 %, in a few seconds on the
+simulator or a phone and in about a minute on a calculator.
 
 The type of each input tells its distribution:
 
@@ -559,8 +568,13 @@ The type of each input tells its distribution:
   every distribution of the Probability section has such a Rand function;
 * a plain number: an exact value.
 
-Inputs may carry units. The inputs are independent: correlations are not
-handled yet.
+Inputs may carry units. They are independent, unless a global variable ρij
+holds correlations, as for σRFxjxi: one coefficient for all the pairs, or the
+full correlation matrix, in the order of Vals. Normal inputs are then
+correlated exactly, through the Cholesky factor of ρij; inputs given by bounds
+through a Gaussian copula, as in the NIST Uncertainty Machine. An input given
+by a program draws by itself and cannot be correlated. A matrix that is not
+symmetric, or that no set of quantities could have, is refused.
 
 The results are the number of draws used, tagged N; the interval that leaves
 2.5 % of the draws on each side, tagged 95%; and on the first level the mean
@@ -640,6 +654,27 @@ input, with the model 'exp(x)' and the input 0±σ1.
 12345 RDZ
 'a+b' { a b } { 10±σ1 20±σ2 } 0 ⓁMCPropagate
 @ Expecting 30.03900 15233±σ2.25391 96331 3
+```
+
+**8)** Correlated inputs: the comparison loss in microwave power meter
+calibration of JCGM 101 (9.4), δY = X1² + X2², with x1 = 0.010, x2 = 0,
+u = 0.005 for both and a correlation of 0.9. The propagation formula gives
+1.0×10⁻⁴; the Supplement finds 1.21×10⁻⁴ by the Monte Carlo method with a
+million draws, and 2 000 draws give it to a few per cent:
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } 2000 ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+**9)** Without M: 2 000 draws, the sum of example 2:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
 ```
 
 A model given as a program takes its values from the stack, and the list of

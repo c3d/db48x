@@ -3,7 +3,7 @@
 @@ MCPropagate — propagation of uncertainty by the Monte Carlo
 @@ method (GUM Supplement 1, JCGM 101:2008).
 @@
-@@ Input:  F Vars Vals M
+@@ Input:  F Vars Vals M, or F Vars Vals for M = 2000
 @@   F     the model: an expression of the names in Vars, or a
 @@         program that takes one value per input from the stack;
 @@   Vars  the list of the input names, e.g. { a b };
@@ -16,20 +16,27 @@
 @@                    « 10 1 ⓁLgNrmRand », for any distribution;
 @@           10       an exact value.
 @@         Inputs may carry units.
-@@   M     the number of draws; 0 lets the program stop by itself
+@@   M     the number of draws, 2000 when omitted; 0 lets the program stop by itself
 @@         when the result is stable to two significant digits of
 @@         the uncertainty, after at most 20 000 draws or one minute.
 @@ Output: the number of draws used, tagged "N";
 @@         the 95 % coverage interval, probabilistically symmetric
 @@         (2.5 % of the draws on each side), tagged "95%";
 @@         the mean and standard deviation of the draws, Y±σu.
-@@ Method: the inputs are independent. A program specialized for
+@@ Correlations: none, unless a global variable ρij holds one
+@@ coefficient for all the pairs or the full correlation matrix, in
+@@ the order of Vals, as for σRFxjxi. Normal inputs are then
+@@ correlated exactly (Cholesky factor of ρij), inputs given by
+@@ bounds through a Gaussian copula; a program input cannot be.
+@@ Method: a program specialized for
 @@ the model is compiled once, then run by batches. The normal
 @@ draws use the polar method, which needs no angle mode.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
 @@ ============================================================
 
+  @ M omitted: the list of the inputs is on the first level
+  If Dup TypeName "list" == Then 2000 End
   "" "" { }
   → mdl vn vl ndr dcl drw prm
   «
@@ -78,6 +85,114 @@
         »
       »
     Next
+
+    @ Correlations: a global variable ρij, as for σRFxjxi, holds one
+    @ coefficient for all the pairs or the full correlation matrix. Then
+    @ each draw takes n independent normal variates z, forms w = L·z with
+    @ L the Cholesky factor of ρij, and gives a±σb inputs a + b·wᵢ and
+    @ bounded inputs a + (b − a)·Φ(wᵢ) (Gaussian copula)
+    IfErr 'ρij' Rcl Then Drop 0 End
+    vl Size
+    → mcr nvi
+    «
+      @ The absolute value of a matrix is its norm, never 0 for ρij
+      If mcr Abs 0 ≠ nvi 1 > And Then
+        @ The full matrix, from one coefficient if needed
+        If mcr TypeName "array" == Then
+          If mcr Size 1 Get nvi ≠ Then
+            "MCPropagate: the size of ρij differs from the number of inputs" DoError
+          End
+          1 nvi For iq 1 nvi For kc
+            If mcr { } iq + kc + Get mcr { } kc + iq + Get - Abs 1E-9 > Then
+              "MCPropagate: ρij is not symmetric" DoError
+            End
+          Next Next
+          mcr
+        Else
+          If mcr 1 > mcr -1 nvi 1 - / 1E-12 - < Or Then
+            "MCPropagate: ρij is outside −1/(n−1)…1 for n inputs" DoError
+          End
+          { } nvi + nvi + mcr Con
+          1 nvi For iq { } iq + iq + 1 Put Next
+        End
+        → rmx
+        «
+          @ An input given by a program draws by itself: it cannot be correlated
+          1 nvi For iq
+            vl iq Get
+            If Dup TypeName "unit" == Then UVal End
+            If TypeName "program" == Then
+              1 nvi For kc
+                If kc iq ≠ Then
+                  If rmx { } iq + kc + Get Abs 1E-12 > Then
+                    "MCPropagate: a correlated input must be a±σb or bounds" DoError
+                  End
+                End
+              Next
+            End
+          Next
+          @ Cholesky factor L of ρij; a negative pivot means that some
+          @ combination of the inputs would have a negative variance
+          { } nvi + nvi + 0 Con
+          → chl
+          «
+            1 nvi For j
+              rmx { } j + j + Get
+              If j 1 > Then 1 j 1 - For kc chl { } j + kc + Get Sq - Next End
+              If Dup -1E-9 < Then "MCPropagate: ρij is not a valid correlation matrix" DoError End
+              0 Max √
+              → ljj
+              «
+                chl { } j + j + ljj Put 'chl' Store
+                If j nvi < Then
+                  j 1 + nvi For iq
+                    rmx { } iq + j + Get
+                    If j 1 > Then
+                      1 j 1 - For kc chl { } iq + kc + Get chl { } j + kc + Get * - Next
+                    End
+                    If ljj 1E-9 > Then
+                      ljj / chl { } iq + j + 3 Roll Put 'chl' Store
+                    Else
+                      If Abs 1E-9 > Then "MCPropagate: ρij is not a valid correlation matrix" DoError End
+                    End
+                  Next
+                End
+              »
+            Next
+            @ The draw recipe, rebuilt: n normal variates, w = L·z, then each input
+            ""
+            1 nvi For iq
+              " 0 0 2 Do Drop Drop Drop Rand 2 * 1 - Rand 2 * 1 - Dup2 Sq Swap Sq + Until Dup 1 < Over 0 > And End Dup Ln -2 * Swap / √ Swap Drop *" +
+            Next
+            " " + nvi →Text + " →Array mcL Swap * → mcZ «" +
+            1 nvi For iq
+              iq →Text
+              vl iq Get
+              → ix vq
+              «
+                vq If Dup TypeName "unit" == Then UVal End TypeName
+                → tq
+                «
+                  Case
+                    tq "uncertain" == Then
+                      " mcZ " + ix + " Get mcB" + ix + " * mcA" + ix + " +" +
+                    End
+                    tq "range" == tq "drange" == Or tq "prange" == Or Then
+                      " 0 1 mcZ " + ix + " Get UTPN Neg 1 + mcB" + ix + " * mcA" + ix + " +" +
+                    End
+                    " mcA" + ix +
+                  End
+                  If vq TypeName "unit" == Then " mcU" + ix + " *" + End
+                »
+              »
+            Next
+            " »" + 'drw' Store
+            dcl " mcL" + 'dcl' Store
+            prm chl 1 →List + 'prm' Store
+          »
+        »
+      End
+    »
 
     @ The evaluation of the model on one set of draws
     If 'mdl' Rcl TypeName "program" == Then
