@@ -1,0 +1,102 @@
+«
+@@ DMOPendulum — demo of uncertainty on an equation of the Equation
+@@ Library, Simple Pendulum: its period for small amplitudes,
+@@ T = 2π√(L/g), and its real period Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x)),
+@@ with c(x) = (2x)!/(2^x·x!)². L is drawn from a normal law, 15±σ0.1 cm,
+@@ and the amplitude θmax from a rectangular law over a range of 20°, drawn
+@@ at random from 0…20° to 60…80°, or given as { lo hi } in degrees.
+@@ 300 draws: the histograms of T (gray) and Treal (black) on the same
+@@ axis; Treal is then compared with the linear propagation of σRFxjxi.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ The range of θmax, if given; any other object is left alone
+  0
+  If Depth 1 > Then Drop Dup TypeName End
+  → dmpty
+  «
+  If dmpty "list" == Then
+    Dup 1 Get Swap 2 Get
+  Else
+    RAND 13 * IP R→I 5 * Dup 20 +
+  End
+  300 9.80665
+  @ The squared coefficients c(x)² of the series, x = 0 … 5
+  { 1 0.25 0.140625 0.09765625 0.07476806640625 0.0605621337890625 }
+  → dmpt0 dmpt1 dmpn dmpg dmpc
+  «
+    ClΣ
+    1 dmpn For dmpi
+      0.15 0.001 ⓁNormlRand
+      RAND dmpt1 dmpt0 - * dmpt0 + 1_° * 2 / Sin Sq
+      → dmpl dmpu
+      «
+        @ T, then the series by Horner's rule, from c(5)² down to c(0)²
+        2 π →Num * dmpl dmpg / √ *
+        Dup
+        0 6 1 For dmpj dmpu * dmpc dmpj Get + -1 Step
+        *
+        2 →Array Σ+
+      »
+    Next
+    @ The two columns: their means and standard deviations
+    Average StandardDeviation MinΣ MaxΣ
+    → dmpm dmpd dmplo dmphi
+    «
+      dmplo 1 Get dmphi 2 Get
+      → dmpa dmpb
+      «
+        dmpb dmpa - 0.04 *
+        → dmpe
+        «
+          dmpa dmpe - dmpb dmpe +
+          → dmpx0 dmpx1
+          «
+            dmpx1 dmpx0 - 40 /
+            → dmpw
+            «
+              dmpn dmpw * dmpd 1 Get 2.5066 * / 2.2 *
+              → dmpy
+              «
+                ClearLCD
+                dmpx0 dmpx1 XRange dmpy -12 / dmpy YRange dmpw Res
+                @ Each column alone: HistogramPlot takes the first column
+                @ Treal first, then T over it, which shows when they coincide
+                RclΣ TRN
+                Dup 2 Get HistogramPlot
+                1 Get 0.5 Gray Foreground HistogramPlot 'Foreground' Purge
+                'PPAR' Purge
+                @ Treal by the linear propagation of σRFxjxi: θmax as the
+                @ centre of its range ±σ its width/√12
+                '2*π*√(x2/9.80665)*(1+0.25*sin(x1/2)^2+0.140625*sin(x1/2)^4+0.09765625*sin(x1/2)^6+0.07476806640625*sin(x1/2)^8+0.0605621337890625*sin(x1/2)^10)'
+                0.15±σ0.001
+                dmpt0 dmpt1 + 2 / →Num →Text "±σ" + dmpt1 dmpt0 - 12 √ / →Num →Text + "_°" + Str→
+                ⓁσRFxjxi →Num
+                → dmplin
+                «
+                  "Pendulum: L=15±σ0.1 cm, θmax " dmpt0 →Text + "…" + dmpt1 →Text + "°" +
+                  { #0d #0d 0 true false } DrawText
+                  "T " dmpm 1 Get 3 RND →Text + "±σ" + dmpd 1 Get 4 RND →Text + " s (gray)" +
+                  { #0d #18d 0 true false } DrawText
+                  "Treal " dmpm 2 Get 3 RND →Text + "±σ" + dmpd 2 Get 4 RND →Text + " s (MC)" +
+                  { #0d #36d 0 true false } DrawText
+                  dmplin Explode
+                  → dmpla dmplb
+                  «
+                    "Treal " dmpla 3 RND →Text + "±σ" + dmplb 4 RND →Text + " s (linear)" +
+                    { #0d #54d 0 true false } DrawText
+                  »
+                  dmpx0 3 RND →Text " s" + { #0d #222d 0 true false } DrawText
+                  dmpx1 3 RND →Text " s" + { #340d #222d 0 true false } DrawText
+                  dmpm 1 Get dmpd 1 Get 2 →List "T MC" →Tag
+                  dmpm 2 Get dmpd 2 Get 2 →List "Treal MC" →Tag
+                  dmplin "Treal linear" →Tag
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+  »
+»

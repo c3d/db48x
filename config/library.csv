@@ -477,6 +477,10 @@
 	"StepG",	"=/library/Uncertainty/StepG.48s"
 	"StepH",	"=/library/Uncertainty/StepH.48s"
 
+"Uncertainty/Applications/EqDemos"
+
+	"DMOPendulum",	"=/library/Uncertainty/DMOPendulum.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="
