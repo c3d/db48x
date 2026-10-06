@@ -7445,6 +7445,22 @@ void tests::list_functions()
               ID_ListMenu, ID_Extract)
         .error("Invalid dimension");
 
+    step("REDUCE on empty list reports an error")
+        .test(CLEAR, "{ } « + » REDUCE", ENTER)
+        .error("Invalid dimension");
+    step("STREAM on empty list reports an error")
+        .test(CLEAR, "{ } « + » STREAM", ENTER)
+        .error("Invalid dimension");
+    step("Error message for STREAM on empty list is not empty")
+        .test(CLEAR, "« { } « + » IFERR STREAM THEN ERRM END » EVAL", ENTER)
+        .expect("\"Invalid dimension\"");
+    step("ΣLIST on empty list reports an error")
+        .test(CLEAR, "{ } ΣLIST", ENTER)
+        .error("Invalid dimension");
+    step("STREAM on non-empty list")
+        .test(CLEAR, "{ 1 2 3 } « + » STREAM", ENTER)
+        .expect("6");
+
     step("Cleanup")
         .test(CLEAR, "{ M L } Purge", ENTER).noerror();
 }
