@@ -50,3 +50,38 @@
 	"Eqns",		"=/config/equations.csv"
 	"Lib",		"=/config/library.csv"
 	"Units",	"=/config/units.csv"
+
+"Navigation"
+
+"Navigation/Geodesy"
+
+	"VincentyInv",	"="
+	"VincentyDir",	"="
+	"LLH→XYZ",	"=/library/LLHtoXYZ.48s"
+	"XYZ→LLH",	"=/library/XYZtoLLH.48s"
+	"RadialFix",	"="
+	"GCPoint",	"="
+
+"Navigation/Route"
+
+	"WPAdd",		"="
+	"WPIns",		"="
+	"WPDel",		"="
+	"WPLegs",	"="
+	"WPNext",	"="
+	"WPDirect",	"="
+
+"Aeronautics"
+
+"Aeronautics/Flight Management"
+
+	"WBLoad",	"="
+	"WBEnv",		"="
+	"FPlan",		"="
+	"TAS3GS",	"="
+
+"Aeronautics/Aircraft Performance"
+
+	"PolarFit",	"="
+	"ClimbVxVy",	"="
+	"TORoll",	"="

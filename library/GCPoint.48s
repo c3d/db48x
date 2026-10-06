@@ -1,0 +1,46 @@
+«
+@@ ============================================================
+@@ GCPoint — intermediate point on the great circle between two
+@@ points of a sphere, at a given fraction of the route.
+@@ Ed Williams, Aviation Formulary V1.47, "Intermediate points on a
+@@ great circle".
+@@
+@@ Input : φ1 λ1 φ2 λ2 f — departure and destination (East
+@@         positive), and the fraction of the route, 0 at departure,
+@@         1 at destination. Plain numbers are degrees; angles with a
+@@         unit are accepted.
+@@ Output: φ λ — latitude and longitude of the point.
+@@ Not defined for antipodal points, where every great circle through
+@@ both is a shortest route.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  → frac
+  «
+    4 →LIST
+    « IF DUP TypeName "unit" == THEN 1_r CONVERT UVAL ELSE Ⓒπ →Num * 180 / END »
+    MAP LIST→ DROP frac
+  »
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → p1 q1 p2 q2 frac amode aunits
+  «
+    '2*ASIN(√(SIN((p2-p1)/2)²+COS(p1)*COS(p2)*SIN((q2-q1)/2)²))' EVAL
+    → d12
+    «
+      'SIN((1-frac)*d12)/SIN(d12)' EVAL 'SIN(frac*d12)/SIN(d12)' EVAL
+      → wa wb
+      «
+        'wa*COS(p1)*COS(q1)+wb*COS(p2)*COS(q2)' EVAL
+        'wa*COS(p1)*SIN(q1)+wb*COS(p2)*SIN(q2)' EVAL
+        'wa*SIN(p1)+wb*SIN(p2)' EVAL
+        → xx yy zz
+        «
+          '(zz)∠(√(xx²+yy²))' EVAL 180 * Ⓒπ →Num / 1_° *
+          '(yy)∠(xx)' EVAL 180 * Ⓒπ →Num / 1_° *
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

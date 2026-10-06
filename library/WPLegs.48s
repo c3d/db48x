@@ -1,0 +1,34 @@
+«
+@@ ============================================================
+@@ WPLegs — the legs of the route, with their distance and course.
+@@
+@@ Output: a list with one { "A→B" distance course } list per leg,
+@@         then the total distance of the route. Distances are in
+@@         nautical miles, along the WGS-84 ellipsoid (VincentyInv);
+@@         the course is the initial true course of the leg.
+@@ ============================================================
+
+  'Route' RCL
+  → rtl
+  «
+    { } 0_nmi
+    1 rtl SIZE 1 - FOR ii
+      rtl ii GET LIST→ DROP
+      rtl ii 1 + GET LIST→ DROP
+      → na pa la nb pb lb
+      «
+        pa la pb lb ⓁVincentyInv DROP
+        → dst crs
+        «
+          dst 1_nmi CONVERT
+          → dnm
+          «
+            na "→" + nb + dnm crs 3 →LIST 1 →LIST
+            ROT SWAP + SWAP dnm +
+          »
+        »
+      »
+    NEXT
+    "Total" →TAG
+  »
+»

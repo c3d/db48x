@@ -1,0 +1,80 @@
+«
+@@ ============================================================
+@@ ClimbVxVy — speeds of best rate and best angle of climb of a
+@@ propeller airplane.
+@@
+@@ Input:  CD0 Kind — the drag polar CD = CD0 + Kind·CL²;
+@@         Wt Sw rho — the mass, the wing area and the air density;
+@@         Pav etap CLmax — the shaft power available, the propeller
+@@         efficiency and the maximum lift coefficient.
+@@         Values with units are converted; plain numbers are taken
+@@         in SI units (kg, m², kg/m³, W).
+@@ Output: Vy, the speed of best rate of climb, and VSmax, that rate;
+@@         Vx, the speed of best angle of climb, and FPAmax, that
+@@         angle; tagged.
+@@ Method: constant power, thrust = etap·Pav/V, drag = a·V² + b/V²
+@@ with a = rho·Sw·CD0/2 and b = 2·Kind·W²/(rho·Sw). Vy maximizes
+@@ the excess power: Vy⁴ = b/(3·a), the speed of minimum power. Vx
+@@ maximizes the excess thrust: 2·a·Vx⁴ + etap·Pav·Vx − 2·b = 0,
+@@ solved by Newton. When Vx falls below the stall speed, which is
+@@ frequent for a propeller airplane, Vx is the stall speed and the
+@@ tag reads VxStall.
+@@ Angle mode and angle units setting are restored before returning.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → cd0 kf wt sw rho pav etap clmax amode aunits
+  «
+    wt IF DUP TypeName "unit" == THEN UBASE UVAL END
+    sw IF DUP TypeName "unit" == THEN UBASE UVAL END
+    rho IF DUP TypeName "unit" == THEN UBASE UVAL END
+    pav IF DUP TypeName "unit" == THEN UBASE UVAL END
+    → mk sa ra pw
+    «
+      mk 9.80665 *  ra sa * cd0 * 2 /  etap pw *
+      → wn aq pe
+      «
+        2 kf * wn SQ * ra sa * /
+        → bq
+        «
+          wn 2 * ra sa * clmax * / √
+          bq 3 aq * / 0.25 ^
+          → vst vy
+          «
+            bq aq / 0.25 ^
+            DO
+              DUP 4 ^ aq * 2 * OVER pe * + bq 2 * -
+              OVER 3 ^ aq * 8 * pe + /
+              DUP ROT SWAP - SWAP
+            UNTIL ABS OVER 1E-12 * ≤ END
+            → vxc
+            «
+              pe aq vy 3 ^ * - bq vy / - wn /
+              → rc
+              «
+                vxc vst MAX
+                → vxb
+                «
+                  pe vxb / aq vxb SQ * - bq vxb SQ / - wn / ASIN
+                  180 * Ⓒπ →Num /
+                  → fpa
+                  «
+                    vy 1_m/s * 1_knot CONVERT "Vy" →TAG
+                    rc 1_m/s * 1_ft/min CONVERT "VSmax" →TAG
+                    vxb 1_m/s * 1_knot CONVERT
+                    IF vxc vst < THEN "VxStall" ELSE "Vx" END →TAG
+                    fpa 1_° * "FPAmax" →TAG
+                  »
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

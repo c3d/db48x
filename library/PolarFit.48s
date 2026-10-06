@@ -1,0 +1,47 @@
+«
+@@ ============================================================
+@@ PolarFit — fit a parabolic drag polar to measured points.
+@@
+@@ Input:  a list of points { CL CD }, lift and drag coefficients,
+@@         at least two with different lift coefficients.
+@@ Output: CD0 and Kind of the polar CD = CD0 + Kind·CL², fitted by
+@@         least squares on CL², then the maximum lift to drag ratio
+@@         LDmax = 1/(2·√(CD0·Kind)) and its lift coefficient
+@@         CLmd = √(CD0/Kind), tagged.
+@@ The points can come from a wind tunnel, or from flight tests
+@@ through the Lift and Drag Polar equations of the Equation Library.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → pts
+  «
+    pts « 1 GET SQ » MAP  pts « 2 GET » MAP  pts SIZE
+    → xs ys nn
+    «
+      IF nn 2 < THEN "PolarFit: at least two points" DOERR END
+      xs ΣLIST ys ΣLIST
+      0 1 nn FOR ii xs ii GET SQ + NEXT
+      0 1 nn FOR ii xs ii GET ys ii GET * + NEXT
+      → sx sy sxx sxy
+      «
+        nn sxx * sx SQ -
+        IF DUP 0 == THEN
+          "PolarFit: the lift coefficients must differ" DOERR
+        END
+        nn sxy * sx sy * - SWAP /
+        → kf
+        «
+          sy kf sx * - nn /
+          → c0
+          «
+            c0 "CD0" →TAG
+            kf "Kind" →TAG
+            1 2 c0 kf * √ * / "LDmax" →TAG
+            c0 kf / √ "CLmd" →TAG
+          »
+        »
+      »
+    »
+  »
+»

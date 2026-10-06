@@ -1,0 +1,41 @@
+«
+@@ ============================================================
+@@ XYZtoLLH — Earth-centred, Earth-fixed coordinates (ECEF) to
+@@ geodetic latitude, longitude and height on the WGS-84 ellipsoid.
+@@ B. R. Bowring, "Transformation from spatial to geographical
+@@ coordinates", Survey Review 23(181), 1976; one pass is accurate to
+@@ better than a millimetre for points near the Earth's surface.
+@@
+@@ Input : X Y Z — plain numbers are metres; lengths with a unit are
+@@         accepted.
+@@ Output: φ λ h — latitude and longitude (East positive) in degrees,
+@@         height above the ellipsoid in metres.
+@@ Angle mode and angle units setting are restored before returning.
+@@ ============================================================
+
+  3 →LIST
+  « IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END »
+  MAP LIST→ DROP
+  Ⓒa♁GPS →Num UVAL Ⓒf♁GPS →Num Ⓒe12♁GPS →Num Ⓒe22♁GPS →Num
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → xx yy zz axa fla ecc ecp amode aunits
+  «
+    'axa*(1-fla)' EVAL '√(xx²+yy²)' EVAL
+    → bxa pp
+    «
+      '(zz*axa)∠(pp*bxa)' EVAL
+      → qq
+      «
+        '(zz+ecp*bxa*SIN(qq)³)∠(pp-ecc*axa*COS(qq)³)' EVAL
+        → lat
+        «
+          lat 180 * Ⓒπ →Num / 1_° *
+          '(yy)∠(xx)' EVAL 180 * Ⓒπ →Num / 1_° *
+          'pp/COS(lat)-axa/√(1-ecc*SIN(lat)²)' EVAL 1_m *
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»
