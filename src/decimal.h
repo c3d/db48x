@@ -106,10 +106,12 @@ struct decimal : algebraic
             + (n * 10 + 7) / 8;
     }
 
-    decimal(id type, large exp, size_t nkigs, gcp<kint> kigs): algebraic(type)
+    decimal(id type, large exp, size_t nkigs, gcp<kint> kigs)
     // ------------------------------------------------------------------------
     //   Constructor from exponent and mantissa digits
     // ------------------------------------------------------------------------
+    //   Zero has no digits, and is always positive (there is no -0)
+        : algebraic(nkigs ? type : ID_decimal)
     {
         byte *p = (byte *) payload(this);
         p = leb128(p, exp);
@@ -127,10 +129,12 @@ struct decimal : algebraic
     }
 
     template <typename Int>
-    decimal(id type, Int value, large exp = 0): algebraic(type)
+    decimal(id type, Int value, large exp = 0)
     // ------------------------------------------------------------------------
     //   Constructor from (unsigned) integer value
     // ------------------------------------------------------------------------
+    //   Zero is always positive (there is no -0)
+        : algebraic(value ? type : ID_decimal)
     {
         while (value && value % 10 == 0)
         {
