@@ -4812,6 +4812,21 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
+
+    step("DFC on an undefined name is a type error")
+        .test(CLEAR, "'DfcX' DFC", ENTER).error("Bad argument type");
+    step("DFC on a list is a type error")
+        .test(CLEAR, "{ 1 2 } DFC", ENTER).error("Bad argument type");
+    step("DFC on a complex is a type error")
+        .test(CLEAR, "1+ⅈ DFC", ENTER).error("Bad argument type");
+    step("DFC on a unit is a type error")
+        .test(CLEAR, "1_m DFC", ENTER).error("Bad argument type");
+    step("DFC on a name evaluates it")
+        .test(CLEAR, "2 'DfcX' STO 'DfcX' DFC", ENTER).expect("{ 2 }");
+    step("DFC on an expression evaluates it")
+        .test(CLEAR, "1.5 'DfcX' STO 'DfcX+1' DFC", ENTER).expect("{ 2 2 }");
+    step("Cleanup DFC variable")
+        .test(CLEAR, "'DfcX' PURGE", ENTER).noerror();
     step("Restore default precision")
         .test(CLEAR, "'PRECISION' PURGE", ENTER).noerror();
 }
