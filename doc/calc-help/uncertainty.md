@@ -316,14 +316,14 @@ rectangular:
 
 ```rpl
 9._kg 0.0005_kg 1 { } ⓁBound→σ
-@ Expecting 9.±σ0.00028 86751 35 kg
+@ Expecting 9.±σ2.88675 13459 5⁳⁻⁴ kg
 ```
 
 **2)** A certificate gives ±0.2 at 95 % with 10 degrees of freedom:
 
 ```rpl
 10. 0.2 8 { 10 0.95 } ⓁBound→σ
-@ Expecting 10.±σ0.08976 10127 94
+@ Expecting 10.±σ8.97610 12794⁳⁻²
 ```
 
 **3)** Unequal bounds move the value to the middle of the interval:

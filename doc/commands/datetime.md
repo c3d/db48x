@@ -298,7 +298,7 @@ to noon, and midnight is half a day earlier. First day of the millenium, at noon
 This command can be used in algebraic expressions:
 
 ```rpl
-'JDN(20000101)'
+'JDN(20000101.120000)'
 @ Expecting 2 451 545
 ```
 
