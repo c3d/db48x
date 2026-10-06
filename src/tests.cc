@@ -9652,6 +9652,21 @@ void tests::symbolic_operations()
 {
     BEGIN(symbolic);
 
+    step("Root prefix directly before a number is a function, not a name")
+        .test(CLEAR, "'√4' EVAL", ENTER)
+        .expect("2.")
+        .test(CLEAR, "'∛8' EVAL", ENTER)
+        .expect("2.")
+        .test(CLEAR, "'√4+1' EVAL", ENTER)
+        .expect("3.")
+        .test(CLEAR, "'2*√4' EVAL", ENTER)
+        .expect("4.");
+    step("Root prefix directly before a name applies to that name")
+        .test(CLEAR, "'√X' OBJ→", ENTER)
+        .expect("2")
+        .test(CLEAR, "'√X' EVAL", ENTER)
+        .expect("'√ X'");
+
     step("Simple arithmetic - Symbol and constant")
         .test(CLEAR, "'A' 3 +", ENTER).expect("'A+3'")
         .test(CLEAR, "'A' 3 -", ENTER).expect("'A-3'")
