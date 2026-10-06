@@ -861,7 +861,10 @@ static bool echelon_combine_row(size_t target, size_t pivot, size_t col,
             return false;
         algebraic_g mjka = t_val;
         algebraic_g mika = p_val;
-        mjka = aa * mjka - ca * mika;
+        if (k == col)
+            mjka = integer::make(0);    // Eliminated by construction
+        else
+            mjka = aa * mjka - ca * mika;
         if (!mjka)
             return false;
         record(echelon,
@@ -991,6 +994,25 @@ echelon_result array::row_echelon(array_r m, echelon_options opt)
             goto err;
         if (pivot_obj->is_zero(false))
         {
+            // Partial pivoting: bring up the first row with a non-zero entry
+            size_t swap = row + 1;
+            while (swap < rows)
+            {
+                object_p below = echelon_element(swap, col, cols, base);
+                if (!below)
+                    goto err;
+                if (!below->is_zero(false))
+                    break;
+                swap++;
+            }
+            if (swap < rows)
+            {
+                record(echelon, "swap rows %zu and %zu for col=%zu",
+                       row, swap, col);
+                if (!echelon_swap_rows(row, swap, cols, base))
+                    goto err;
+                continue;
+            }
             record(echelon, "skip zero pivot at row=%zu col=%zu", row, col);
             col++;
             continue;
