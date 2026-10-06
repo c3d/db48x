@@ -22,6 +22,8 @@
 "Probability/LawDemos"
 
 	"DMOHisto",	"=/library/Probability/DMOHisto.48s"
+	"DMOWalk",	"=/library/Probability/DMOWalk.48s"
+	"DMOMarkov",	"=/library/Probability/DMOMarkov.48s"
 
 "Probability/Norml"
 

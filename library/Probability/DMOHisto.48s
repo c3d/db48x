@@ -1,27 +1,49 @@
 «
 @@ DMOHisto — demo of the Probability section: a law drawn at random
-@@ among nine, with random parameters; 300 values drawn from it by its
-@@ Rand entry into ΣData, their histogram in gray (HistogramPlot), and
-@@ the density of the law over it, scaled to the counts, in black.
-@@ Press again for a new law. The draws stay in ΣData.
+@@ among nine, with random parameters, or the one given: a law name
+@@ alone, "Gamma" or "Beta" included, or { law { params } }. 300 values
+@@ drawn from it by its Rand entry into ΣData, their histogram in gray
+@@ (HistogramPlot), and the density of the law over it, scaled to the
+@@ counts, in black. Press again for a new law: the tagged result left
+@@ on the stack is not taken as an argument (DeleteTag to replay it).
+@@ The draws stay in ΣData.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
-  300 RAND 9 * IP R→I 1 +
-  → dhhcount dhhk
+  @ The argument, if any: a list { law { params } } or a law name alone;
+  @ anything else, the tagged result of a previous run included, is left
+  0
+  If Depth 1 > Then Drop Dup TypeName End
+  → dhht
   «
-    @ The law and its parameters
-    Case
-      dhhk 1 == Then "Norml" 0 RAND 1.5 * 0.5 + 2 RND 2 →List End
-      dhhk 2 == Then "LgNrm" 0 RAND 0.5 * 0.3 + 2 RND 2 →List End
-      dhhk 3 == Then "Expon" RAND 1.5 * 0.5 + 2 RND 1 →List End
-      dhhk 4 == Then "Weibl" RAND 2.5 * 1 + 1 RND 1 2 →List End
-      dhhk 5 == Then "TriSym" 0 RAND 2 * 1 + 1 RND 2 →List End
-      dhhk 6 == Then "UShape" 0 1 2 →List End
-      dhhk 7 == Then "Rayleigh" RAND 1.5 * 0.5 + 2 RND 1 →List End
-      dhhk 8 == Then "Logis" 0 RAND 0.5 + 2 RND 2 →List End
-      "Chi2" RAND 6 * IP R→I 2 + 1 →List
+  Case
+    dhht "list" == Then Dup 1 Get Swap 2 Get End
+    dhht "text" == Then { } End
+    { "Norml" "LgNrm" "Expon" "Weibl" "TriSym" "UShape" "Rayleigh" "Logis" "Chi2" }
+    RAND 9 * IP R→I 1 + Get { }
+  End
+  300
+  → dhhn dhhq dhhcount
+  «
+    @ The parameters, at random when not given
+    dhhq
+    If dhhq Size 0 == Then
+      Drop
+      Case
+        dhhn "Norml" == Then 0 RAND 1.5 * 0.5 + 2 RND 2 →List End
+        dhhn "LgNrm" == Then 0 RAND 0.5 * 0.3 + 2 RND 2 →List End
+        dhhn "Expon" == Then RAND 1.5 * 0.5 + 2 RND 1 →List End
+        dhhn "Weibl" == Then RAND 2.5 * 1 + 1 RND 1 2 →List End
+        dhhn "TriSym" == Then 0 RAND 2 * 1 + 1 RND 2 →List End
+        dhhn "UShape" == Then 0 1 2 →List End
+        dhhn "Rayleigh" == Then RAND 1.5 * 0.5 + 2 RND 1 →List End
+        dhhn "Logis" == Then 0 RAND 0.5 + 2 RND 2 →List End
+        dhhn "Chi2" == Then RAND 6 * IP R→I 2 + 1 →List End
+        dhhn "Gamma" == Then RAND 4 * 1 + 1 RND RAND 1.5 * 0.5 + 1 RND 2 →List End
+        dhhn "Beta" == Then RAND 3.5 * 1.5 + 1 RND RAND 3.5 * 1.5 + 1 RND 2 →List End
+        "Give its parameters: { law { params } }" DoErr
+      End
     End
-    → dhhn dhhp
+    → dhhp
     «
       @ The parameters as text: "a b " for Rand, "a;b;" for PDF
       "" "" 1 dhhp Size For dhhi
@@ -53,6 +75,7 @@
                 → dhhy
                 «
                   @ 25 bins of width dhhw, whatever the StatsPlotBins setting
+                  ClearLCD
                   dhha dhhb XRange dhhy -40 / dhhy YRange dhhw Res
                   RclΣ 0.5 Gray Foreground HistogramPlot 'Foreground' Purge
                   2 LineWidth
@@ -69,5 +92,6 @@
         »
       »
     »
+  »
   »
 »

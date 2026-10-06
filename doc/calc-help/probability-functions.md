@@ -153,37 +153,160 @@ StatTests section — see [StatTests](#stattestslibrary).
 Demonstrations of the distributions on random draws, a new case at each press.
 Seed the generator with RDZ to replay one.
 
-* DMOHisto: a law at random, its histogram and its density.
+* DMOHisto: a law at random, or the one given, its histogram and its density.
+* DMOWalk: a Brownian walk and a Lévy flight side by side.
+* DMOMarkov: a Markov chain, its path and its stationary distribution.
 
 
 ## DMOHisto
 
 A law drawn at random among nine — Norml, LgNrm, Expon, Weibl, TriSym, UShape,
-Rayleigh, Logis and Chi2 — with random parameters. Three hundred values are
-drawn from it by its Rand entry into ΣData, their histogram is drawn in gray
-by HistogramPlot, in 25 classes, and the density of the law is drawn over it in
-black, by FunctionPlot, scaled to the counts: 300 times the width of a class
-times the density. The name of the law and its parameters are written above,
-and returned on the stack. The draws stay in ΣData, for MeanΣ or SDevΣ.
+Rayleigh, Logis and Chi2 — with random parameters, or the law given on the
+stack:
 
-**1)** A law and its histogram, reproducible with the seed:
+* a law name alone, such as `"UShape"`: that law, with random parameters.
+  `"Gamma"` and `"Beta"` are accepted too, though never drawn at random: their
+  draws, by inversion, are slow (about 20 seconds for Gamma in the simulator,
+  far longer on a calculator);
+* a list `{ law { parameters } }`, such as `{ "Expon" { 1.2 } }`: that law with
+  these parameters. Any law of the Probability menu with a Rand and a PDF entry
+  will do.
+
+Three hundred values are drawn from the law by its Rand entry into ΣData,
+their histogram is drawn in gray by HistogramPlot, in 25 classes whatever the
+StatsPlotBins setting, and the density of the law is drawn over it in black by
+FunctionPlot, scaled to the counts: 300 times the width of a class times the
+density. The law and its parameters are written above, and returned on the
+stack, tagged `law`. The draws stay in ΣData, for MeanΣ or SDevΣ.
+
+Press again for a new law: the tagged result of the previous run is not taken
+as an argument. To replay the same law on fresh draws, remove the tag first.
+
+**1)** A law at random, reproducible with the seed:
 
 ```rpl
 1 RDZ ⓁDMOHisto
 ```
 
-**2)** Another one:
+**2)** A law chosen by name, its parameters at random:
 
 ```rpl
-4 RDZ ⓁDMOHisto
+"UShape" ⓁDMOHisto
+```
+
+**3)** A law and its parameters:
+
+```rpl
+{ "Expon" { 1.2 } } ⓁDMOHisto
+```
+
+**4)** The same law twice, on fresh draws:
+
+```rpl
+1 RDZ ⓁDMOHisto DeleteTag ⓁDMOHisto
 ```
 
 The bars wander around the curve: with 300 draws, a class that should hold
 12 values holds about 12 ± 3.5, the square root of 12. More draws make the
 histogram closer to the density, in 1/√N. The arc sine law (UShape), with its
 two peaks at the ends, and the exponential law, with its long tail, are the
-most striking. Gamma and Beta are not among the nine: their draws, by
-inversion, are too slow for a demonstration.
+most striking.
+
+
+## DMOWalk
+
+Two random walks in the plane, 200 steps each, in uniformly random directions
+and with the same mean step length, 3. Each walk is scaled to its own panel,
+and its start is marked by a small square.
+
+* On the left, the steps are drawn from Expon, of rate 1/3: a Brownian walk,
+  the drunkard's walk of the textbooks. Karl Pearson put the problem in *Nature*
+  in 1905, and Lord Rayleigh answered it the next week.
+* On the right, the steps are drawn from Pareto, of exponent `α = 1.2` and
+  minimum `xm = 3(α-1)/α = 0.5`. For α < 2 the variance of the steps is
+  infinite: this is a Lévy flight. Clusters of short steps are joined by rare
+  long jumps, and the longest step alone may take a large share of the path.
+
+Below each panel is the share of the whole path taken by the longest step; both
+shares are returned, tagged. Another exponent may be given on the stack, with
+`1 < α ≤ 3`; any other object is left alone. As α grows, the Lévy flight comes
+closer to the Brownian walk.
+
+Lévy flights became famous in ecology when Viswanathan and co-authors
+(*Nature*, 1996) found them in the flights of wandering albatrosses, and argued
+that they make the best search for sparse prey. Edwards and co-authors
+(*Nature*, 2007) showed that the long flights came mostly from the way the
+time spent on the water had been counted. The hypothesis is still debated:
+Humphries and co-authors (*Nature*, 2010) found Lévy patterns in sharks and
+tunas where prey is sparse, and Brownian ones where it is plentiful.
+
+**1)** A walk and a flight:
+
+```rpl
+1 RDZ ⓁDMOWalk
+```
+
+**2)** The same seed, a lighter tail:
+
+```rpl
+1 RDZ 1.9 ⓁDMOWalk
+```
+
+**3)** With `α = 3` the variance is finite, and the flight is a walk:
+
+```rpl
+1 RDZ 3 ⓁDMOWalk
+```
+
+
+## DMOMarkov
+
+A Markov chain: the next state depends only on the present one, through a
+matrix of transition probabilities `P`, where `P(i,j)` is the probability of
+going from state `i` to state `j`, each row summing to 1.
+
+By default, an economy with three states, growth (G), stagnation (S) and
+recession (R), from quarter to quarter:
+
+| From → to | G    | S    | R    |
+|-----------|------|------|------|
+| G         | 0.85 | 0.10 | 0.05 |
+| S         | 0.30 | 0.55 | 0.15 |
+| R         | 0.20 | 0.30 | 0.50 |
+
+These probabilities are only illustrative, not estimated from data. Hamilton
+(*Econometrica*, 1989) made such regime-switching models a classic tool of the
+study of business cycles.
+
+Two hundred quarters are simulated from state 1 and drawn as steps. Below, the
+share of time spent in each state (gray bars) is compared with the stationary
+distribution π (black lines), the solution of `π·P = π` with `Σπ = 1`, found
+here by solving a linear system. Over a long run the shares tend to π, whatever
+the starting state: this is the ergodic theorem of Markov chains. Both are
+returned, tagged `observed` and `stationary`.
+
+Another square transition matrix may be given on the stack; its states are
+then numbered.
+
+**1)** The default economy:
+
+```rpl
+1 RDZ ⓁDMOMarkov
+```
+
+**2)** Two states; the stationary distribution is (5/6, 1/6):
+
+```rpl
+1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDMOMarkov
+```
+
+**3)** Four states in a row, each passing only to its neighbours:
+
+```rpl
+1 RDZ
+[[ 0.7 0.2 0.1 0 ][ 0.2 0.6 0.2 0 ][ 0 0.2 0.6 0.2 ][ 0 0 0.3 0.7 ]]
+ⓁDMOMarkov
+```
 
 
 ## NormlLibrary
