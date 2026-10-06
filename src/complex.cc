@@ -506,6 +506,18 @@ PARSE_BODY(rectangular)
     unicode cp  = utf8_codepoint(p.source + offs);
     bool    neg = false;
 
+    // Case of -ⅈ or +ⅈ: the sign was parsed as a command, not a real part
+    bool signonly = false;
+    if (re && re->is_command())
+    {
+        id ty = re->type();
+        if (cp != I_MARK || (ty != ID_add && ty != ID_subtract))
+            return SKIP;
+        neg = ty == ID_subtract;
+        signonly = true;
+        re = nullptr;
+    }
+
     // Cases 'a' and 'b'
     if (!re && cp == '(')
     {
@@ -565,8 +577,8 @@ PARSE_BODY(rectangular)
     }
 
     // Cases c, d, e or f
-    bool hadsign = re && (cp == '+' || cp == '-');
-    if (hadsign)
+    bool hadsign = signonly || (re && (cp == '+' || cp == '-'));
+    if (hadsign && !signonly)
     {
         neg = cp == '-';
         if (max <= 1)

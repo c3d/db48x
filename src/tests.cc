@@ -5618,6 +5618,17 @@ void tests::complex_types()
     step("Cycle complex units")
         .test(ID_Cycle).expect("5.46717 47731 3∡50.19442 89077° Ω")
         .test(ID_Cycle).expect("3.5+4.2ⅈ Ω");
+
+    step("Leading sign before imaginary unit")
+        .test(CLEAR, "-ⅈ", ENTER).type(ID_rectangular).expect("-ⅈ")
+        .test(CLEAR, "-ⅈ IM", ENTER).expect("-1")
+        .test(CLEAR, "-ⅈ RE", ENTER).expect("0")
+        .test(CLEAR, "-ⅈ ⅈ +", ENTER).expect("0")
+        .test(CLEAR, "+ⅈ", ENTER).type(ID_rectangular).expect("ⅈ")
+        .test(CLEAR, "+ⅈ IM", ENTER).expect("1")
+        .test(CLEAR, "-ⅈ3", ENTER).expect("-3ⅈ")
+        .test(CLEAR, "'-ⅈ' EVAL", ENTER).expect("-ⅈ")
+        .test(CLEAR, "'2-ⅈ' EVAL", ENTER).expect("2-ⅈ");
 }
 
 
