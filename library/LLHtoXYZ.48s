@@ -1,0 +1,32 @@
+«
+@@ ============================================================
+@@ LLHtoXYZ — geodetic latitude, longitude and height on the WGS-84
+@@ ellipsoid to Earth-centred, Earth-fixed coordinates (ECEF).
+@@ NGA.STND.0036 (2014), eq. 4-14 and 4-15; EPSG method 9602.
+@@
+@@ Input : φ λ h — latitude, longitude (East positive), height above
+@@         the ellipsoid. Plain numbers are degrees and metres; angles
+@@         and lengths with a unit are accepted.
+@@ Output: X Y Z in metres. X points to longitude 0 on the equator,
+@@         Y to longitude 90°E, Z to the North pole.
+@@ ============================================================
+
+  IF DUP TypeName "unit" == THEN 1_m CONVERT UVAL END
+  → hgt
+  «
+    2 →LIST
+    « IF DUP TypeName "unit" == THEN 1_° CONVERT UVAL END 1_° * »
+    MAP LIST→ DROP hgt
+  »
+  Ⓒa♁GPS →Num UVAL Ⓒe12♁GPS →Num
+  → lat lon hgt axa ecc
+  «
+    'axa/√(1-ecc*SIN(lat)²)' EVAL
+    → nrad
+    «
+      '(nrad+hgt)*COS(lat)*COS(lon)' EVAL 1_m *
+      '(nrad+hgt)*COS(lat)*SIN(lon)' EVAL 1_m *
+      '(nrad*(1-ecc)+hgt)*SIN(lat)' EVAL 1_m *
+    »
+  »
+»

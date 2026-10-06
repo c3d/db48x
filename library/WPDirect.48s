@@ -1,0 +1,18 @@
+«
+@@ ============================================================
+@@ WPDirect — "direct to": fly or steer straight from the present
+@@ position to waypoint n of the route.
+@@
+@@ Input : φ λ n — present latitude and longitude (East positive), and
+@@         the number of the waypoint to go to.
+@@ The present position is inserted in the route before waypoint n,
+@@ under the name "DCT", and the leg from it to waypoint n becomes the
+@@ active leg (RouteLeg). The waypoints before it stay in the route.
+@@ ============================================================
+
+  → pp lp pos
+  «
+    "DCT" pp lp pos ⓁWPIns
+    pos 'RouteLeg' STO
+  »
+»

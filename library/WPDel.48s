@@ -1,0 +1,22 @@
+«
+@@ ============================================================
+@@ WPDel — remove waypoint n from the route.
+@@
+@@ If the active leg (RouteLeg) comes after position n, it is moved up
+@@ by one, so that it keeps pointing to the same waypoints.
+@@ ============================================================
+
+  → pos
+  «
+    'Route' RCL
+    → rtl
+    «
+      IF pos 1 > THEN rtl 1 pos 1 - SUB ELSE { } END
+      rtl pos 1 + rtl SIZE SUB +
+      'Route' STO
+      IFERR 'RouteLeg' RCL THEN DROP ELSE
+        IF DUP pos ≥ OVER 1 > AND THEN 1 - 'RouteLeg' STO ELSE DROP END
+      END
+    »
+  »
+»
