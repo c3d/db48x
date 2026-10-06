@@ -1,0 +1,116 @@
+«
+@@ DMOMarkov — demo of the Probability section: a Markov chain. By
+@@ default an economy with three states, growth (G), stagnation (S) and
+@@ recession (R), and illustrative quarterly transition probabilities;
+@@ or the square transition matrix given on the stack, each row summing
+@@ to 1 (states then numbered). 200 quarters are simulated from state 1
+@@ and drawn as steps; below, the share of time spent in each state
+@@ (gray bars) against the stationary distribution π (black lines), the
+@@ solution of π·P = π with Σπ = 1. Returns both, observed and π.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ The transition matrix, if given; any other object is left alone
+  0
+  If Depth 1 > Then Drop Dup TypeName End
+  → dmmty
+  «
+  If dmmty "array" == Then
+    Dup Size 1 Get → dmmq « 1 dmmq For dmmj dmmj →Text Next dmmq →List »
+  Else
+    [[ 0.85 0.10 0.05 ] [ 0.30 0.55 0.15 ] [ 0.20 0.30 0.50 ]]
+    { "G" "S" "R" }
+  End
+  → dmmP dmml
+  «
+  dmmP Size 1 Get 200
+  → dmmn dmmlen
+  «
+    @ The stationary distribution: (Pᵀ - I)·π = 0, the last equation
+    @ replaced by Σπ = 1
+    dmmP TRN dmmn IDN -
+    1 dmmn For dmmj dmmn dmmj 2 →List 1 Put Next
+    dmmn 1 →List 0 CON dmmn 1 Put
+    Swap /
+    → dmmpi
+    «
+      @ The chain: dmmlen states, from state 1
+      1
+      → dmms
+      «
+        1 dmmlen For dmmt
+          RAND 0 1
+          → dmmu dmmc dmmk
+          «
+            dmmP dmms 1 2 →List Get 'dmmc' Sto
+            While dmmc dmmu < dmmk dmmn < And Repeat
+              dmmk 1 + 'dmmk' Sto
+              dmmc dmmP dmms dmmk 2 →List Get + 'dmmc' Sto
+            End
+            dmmk 'dmms' Sto
+          »
+          dmms
+        Next
+        dmmlen →List
+      »
+      → dmmtr
+      «
+        @ The share of time in each state
+        dmmn 1 →List 0 CON
+        1 dmmlen For dmmt
+          dmmtr dmmt Get → dmmk « Dup dmmk Get 1 + dmmk Swap Put »
+        Next
+        dmmlen 1. * /
+        → dmmf
+        «
+          ClearLCD
+          "Markov chain: " dmmlen →Text + " quarters" +
+          { #0d #0d 0 true false } DrawText
+          @ The path, in steps: state k at height 30 + 50(k-1)/(n-1)
+          1 dmmlen For dmmt
+            dmmt 1 - 376 * dmmlen / 20 + IP R→I
+            dmmt 376 * dmmlen / 20 + IP R→I
+            dmmtr dmmt Get 1 - 50 * dmmn 1 - / 30 + IP R→I
+            → dmmx0 dmmx1 dmmy
+            «
+              dmmx0 R→B dmmy R→B 2 →List dmmx1 R→B dmmy R→B 2 →List DrawLine
+              If dmmt dmmlen < Then
+                dmmx1 R→B dmmy R→B 2 →List
+                dmmx1 R→B dmmtr dmmt 1 + Get 1 - 50 * dmmn 1 - / 30 + IP R→I R→B 2 →List
+                DrawLine
+              End
+            »
+          Next
+          1 dmmn For dmmk
+            dmml dmmk Get
+            { #2d } dmmk 1 - 50 * dmmn 1 - / 22 + IP R→I R→B + { 0 true false } +
+            DrawText
+          Next
+          @ The shares: gray bars observed, black lines stationary
+          "Time share: observed (bars) / stationary π (lines)"
+          { #0d #100d 0 true false } DrawText
+          1 dmmn For dmmk
+            400 dmmn / dmmk 0.5 - * IP R→I
+            dmmf dmmk Get 100 * 220 Swap - IP R→I
+            dmmpi dmmk Get 100 * 220 Swap - IP R→I
+            → dmmx dmmyf dmmyp
+            «
+              0.5 Gray Foreground 16 LineWidth
+              dmmx R→B #220d 2 →List dmmx R→B dmmyf R→B 2 →List DrawLine
+              'Foreground' Purge 2 LineWidth
+              dmmx 24 - R→B dmmyp R→B 2 →List dmmx 24 + R→B dmmyp R→B 2 →List DrawLine
+              'LineWidth' Purge
+              dmml dmmk Get " " +
+              dmmf dmmk Get 100 * 0 RND R→I →Text + "/" +
+              dmmpi dmmk Get 100 * 0 RND R→I →Text + "%" +
+              dmmx 40 - R→B #222d 2 →List { 0 true false } + DrawText
+            »
+          Next
+          dmmf 3 RND "observed" →Tag
+          dmmpi 3 RND "stationary" →Tag
+        »
+      »
+    »
+  »
+  »
+  »
+»

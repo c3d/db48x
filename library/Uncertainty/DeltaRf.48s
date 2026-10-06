@@ -1,0 +1,125 @@
+«
+@@ ============================================================
+@@ ΔRf — interval arithmetic for a composite function of one
+@@ variable: the range of f over an interval.
+@@
+@@ Input:  'f(x)' X, where f is an expression of the name x, and X
+@@         an interval a…b, a±b or a±p%, with or without units.
+@@ Output: the smallest and largest values of f over X, as an
+@@         interval of the same form as X (a±p% gives a±b).
+@@ Unlike evaluating f on X directly, the variable is counted once,
+@@ however often it appears: '(x-1)·(x-2)·(x-3)' on 2±1 gives
+@@ -0.385…0.385, not -4…4.
+@@ Method: f is evaluated at 65 points spread over X, ends
+@@ included; each local maximum or minimum of these values is
+@@ refined by a golden section search, and the result is the
+@@ smallest and the largest of all the candidates. An extremum
+@@ narrower than 1/64 of X may be missed: Exmnf draws f to check.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  → fx xv
+  «
+    @ The bounds lo and hi of X, with its unit
+    1 xv
+    If xv TypeName "unit" == Then Drop Drop 1 xv →Unit xv UVal End
+    Dup TypeName
+    → un iv tn
+    «
+      Case
+        tn "range" == Then iv Explode End
+        tn "drange" == Then iv Explode → cv dv « cv dv - cv dv + » End
+        tn "prange" == Then
+          iv Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - cv dv + » »
+        End
+        tn "uncertain" == Then
+          "ΔRf works on bounds; use σRf for a±σb" DoError
+        End
+        iv iv
+      End
+      un * Swap un * Swap
+
+      → lo hi
+      «
+        @ f at one point x is written out each time: a program kept in a
+        @ local variable would recall the wrong local from a deeper block
+        hi lo - 64 /
+        → hs
+        «
+          @ The 65 values of f
+          0 64 For kk lo kk hs * + { x 0 } 2 Rot Put 'fx' Rcl Swap Where →Num Next
+          65 →List
+          → ys
+          «
+            @ Candidates: both ends, and the refined local extrema
+            ys 1 Get ys 65 Get 2 →List
+            → cds
+            «
+              2 64 For kk
+                ys kk Get
+                → yk
+                «
+                  @ +1 for a local maximum, -1 for a local minimum
+                  0
+                  If yk ys kk 1 - Get ≥ yk ys kk 1 + Get ≥ And Then Drop 1 End
+                  If yk ys kk 1 - Get ≤ yk ys kk 1 + Get ≤ And Then Drop -1 End
+                  → sg
+                  «
+                    If sg 0 ≠ Then
+                      @ Golden section search for the extremum of sg·f
+                      lo kk 2 - hs * + lo kk hs * +
+                      → xa xb
+                      «
+                        1 60 Start
+                          xb xb xa - 0.618033988749895 * -
+                          xa xb xa - 0.618033988749895 * +
+                          → gx gd
+                          «
+                            If gx { x 0 } 2 Rot Put 'fx' Rcl Swap Where →Num sg * gd { x 0 } 2 Rot Put 'fx' Rcl Swap Where →Num sg * > Then
+                              gd 'xb' Store
+                            Else
+                              gx 'xa' Store
+                            End
+                          »
+                        Next
+                        xa xb + 2 / { x 0 } 2 Rot Put 'fx' Rcl Swap Where →Num
+                      »
+                      cds Swap + yk + 'cds' Store
+                    End
+                  »
+                »
+              Next
+
+              @ The smallest and largest candidates
+              cds Sort
+              → srt
+              «
+                srt 1 Get srt srt Size Get
+                → rmn rmx
+                «
+                  If rmn TypeName "unit" == Then
+                    1 rmn →Unit
+                    → uf
+                    «
+                      rmn UVal rmx uf Convert UVal
+                      If tn "range" == Then →Range Else
+                        → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+                      End
+                      uf →Unit
+                    »
+                  Else
+                    rmn rmx
+                    If tn "range" == Then →Range Else
+                      → yl yh « yl yh + 2 / yh yl - 2 / →∆Range »
+                    End
+                  End
+                »
+              »
+            »
+          »
+        »
+      »
+    »
+  »
+»

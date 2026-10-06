@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  GEVArgs
+  @  Returns the parameters tagged with their names.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 4; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 4 ≠ THEN "GEVArgs: needs 4 arguments" DoError END Explode Drop END
+  → x0v scv xiv Xv « x0v 0 + scv 0 + xiv 0 + Xv 0 + → x0 sc xi X « x0 "x0" →Tag sc "sc" →Tag xi "xi" →Tag X "X" →Tag x0v scv xiv Xv 4 →List Drop » »
+»

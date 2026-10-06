@@ -1,0 +1,24 @@
+«
+  @ ------------------------------------------------------------
+  @  StudentRand
+  @  Random draw by Bailey's polar method (1994): two uniform
+  @  variates U, V in (−1, 1) with W = U² + V² < 1 give the exact
+  @  draw U·√(df·(W^(−2/df) − 1)/W). Much faster than inversion.
+  @  Stack: df
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 1; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 1 == THEN Explode Drop ELSE IF DUP Size 2 == THEN Explode Drop Drop ELSE "StudentRand: needs 1 arguments" DoError END END END
+  → dfv
+  «
+    0 0 2
+    WHILE DUP 1 ≥ OVER 0 == OR REPEAT
+      DROP DROP DROP
+      rand 2 * 1 - rand 2 * 1 - DUP2 SQ SWAP SQ +
+    END
+    → bu bv bw « bu bw -2 dfv / ^ 1 - dfv * bw / √ * »
+    dfv 1 →List Drop
+  »
+»
