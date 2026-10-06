@@ -1735,6 +1735,21 @@ algebraic_p arithmetic::evaluate(id          op,
                             return polynomial::pow(xp, yi);
                     if (op == ID_add || op == ID_subtract || op == ID_multiply)
                         yp = polynomial::make(y);
+
+                    // Dividing a polynomial by a number divides coefficients
+                    id yty = y->type();
+                    if (op == ID_divide && xpp && (is_real(yty) ||
+                                                   is_complex(yty)))
+                    {
+                        algebraic_g one = integer::make(1);
+                        algebraic_g inv = one / y;
+                        if (!inv)
+                            return nullptr;
+                        yp = polynomial::make(+inv);
+                        if (!yp)
+                            return nullptr;
+                        return polynomial::mul(xp, yp);
+                    }
                 }
                 if (yp)
                 {
