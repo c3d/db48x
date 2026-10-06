@@ -15,6 +15,8 @@
 ##    make dm42n          : Build for SwissMicros DM42n (called db50x)
 ##    make dm32           : Build for SwissMicros DM32 (called db50x)
 ##    make android        : Build Android App Bundle for Google Play
+##    make android-install: Install DB48x APK to connected Android device
+##    make color-dm32-android-install: Install DB50x APK to connected Android device
 ##    make wasm           : Build WebAssembly (Emscripten: wasm/$(NAME).js)
 ##    make tools          : Build the tools (decimize, crc32, etc)
 ##    make help           : List all targets
@@ -602,7 +604,7 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
 ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
-ANDROID_QT_BASE ?= /Volumes/Qt/6.8.1
+ANDROID_QT_BASE ?= /Volumes/Qt/6.9.2
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
 # Host kit: macOS uses .../macos/bin; Linux CI and typical offline installs use gcc_64
@@ -633,7 +635,8 @@ android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
 
 # Additional dependencies for Android build
-$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle
+$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle \
+              sim/android-db48x/AndroidManifest.xml sim/android-db48x/build.gradle
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
 # expects a build directory as --output and the .so staged under
@@ -654,12 +657,59 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		  $(ANDROID_DEPLOY_SIGN_FLAGS) &&			\
 		if [ ! -f "$$AAB" ]; then				\
 			BUILT_AAB="$$(find "$$OUTDIR" -type f -name '*.aab' | sort | tail -1)"; \
-			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB"; \
+			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB" || :; \
 		fi &&						\
+		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/android-debug.apk' | head -1)"; \
+		{ [ -n "$$BUILT_APK" ] && cp "$$BUILT_APK" "$(abspath $(ANDROID_OUTPUT_DIR)/$(NAME)-debug.apk)" || :; }; \
 		test -f "$$AAB"
 	$(if $(ANDROID_CAN_SIGN),,$(PRINT_COMMAND) $(INFO) "[WARNING]" "Android AAB is UNSIGNED (need $(ANDROID_KEYSTORE) and ANDROID_KEYSTORE_PASS). Not for Play Store.")
 
 endif
+
+
+#------------------------------------------------------------------------------
+# Android device installation
+#------------------------------------------------------------------------------
+
+ANDROID_SDK_ROOT_INSTALL ?= /opt/homebrew/share/android-commandlinetools
+ADB ?= $(ANDROID_SDK_ROOT_INSTALL)/platform-tools/adb
+ANDROID_APK_DB48X ?= android/db48x-debug.apk
+ANDROID_APK_DB50X ?= android/db50x-debug.apk
+
+define android_install
+	@if [ -n "$(ANDROID_SERIAL)" ]; then					\
+		DEVICE="$(ANDROID_SERIAL)";					\
+	else									\
+		DEVICES="$$($(ADB) devices 2>/dev/null | awk 'NR>1 && $$2=="device" {print $$1}')"; \
+		if [ -z "$$DEVICES" ]; then					\
+			echo "No authorized Android device found.";		\
+			echo "Check that:";					\
+			echo "  1. The phone is connected via USB";		\
+			echo "  2. USB debugging is enabled (Settings > Developer options)"; \
+			echo "  3. You have accepted the USB debugging dialog on the phone"; \
+			echo "     (run '$(ADB) devices' to trigger the prompt)"; \
+			exit 1;							\
+		fi;								\
+		COUNT=$$(echo "$$DEVICES" | wc -l | tr -d ' ');			\
+		if [ "$$COUNT" -gt 1 ]; then					\
+			echo "Multiple devices found:";				\
+			echo "$$DEVICES";					\
+			echo "Set ANDROID_SERIAL=<device-id> to select one.";	\
+			exit 1;							\
+		fi;								\
+		DEVICE=$$(echo "$$DEVICES" | head -1);				\
+	fi;									\
+	echo "Installing $(1) on $$DEVICE...";					\
+	$(ADB) -s "$$DEVICE" install -r $(1)
+endef
+
+android-install: $(ANDROID_APK_DB48X)
+	$(call android_install,$(ANDROID_APK_DB48X))
+
+color-dm32-android-install: $(ANDROID_APK_DB50X)
+	$(call android_install,$(ANDROID_APK_DB50X))
+
+.PHONY: android-install color-dm32-android-install
 
 
 # ------------------------------------------------------------------------------
