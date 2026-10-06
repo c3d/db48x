@@ -77,6 +77,23 @@ INSERT_BODY(algebraic)
 }
 
 
+object_p algebraic::truth_as_integer(object_p obj)
+// ----------------------------------------------------------------------------
+//   Return 1 or 0 for `True` and `False`, other objects unchanged
+// ----------------------------------------------------------------------------
+//   In legacy RPL, comparisons return 1 or 0, so that they can be used in
+//   arithmetic, as in `'(X<2)*3'`.
+{
+    if (obj)
+    {
+        id ty = obj->type();
+        if (ty == ID_True || ty == ID_False)
+            return integer::make(ty == ID_True);
+    }
+    return obj;
+}
+
+
 bool algebraic::decimal_promotion(algebraic_g &x)
 // ----------------------------------------------------------------------------
 //   Promote the value x to a decimal / floating-point type

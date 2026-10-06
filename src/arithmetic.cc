@@ -1818,8 +1818,12 @@ object::result arithmetic::evaluate(id op, ops_t ops)
     // Fetch arguments from the stack
     // Possibly wrong type, i.e. it migth not be an algebraic on the stack,
     // but since we tend to do extensive type checking later, don't overdo it
-    object_p yo = strip(rt.stack(1));
-    object_p xo = strip(rt.stack(0));
+    object_g yo = strip(rt.stack(1));
+    object_g xo = strip(rt.stack(0));
+    if (!xo || !yo)
+        return ERROR;
+    yo = truth_as_integer(yo);
+    xo = truth_as_integer(xo);
     if (!xo || !yo)
         return ERROR;
     algebraic_g y = yo->as_extended_algebraic();

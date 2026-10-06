@@ -3079,6 +3079,24 @@ void tests::logical_operations()
     step("Convert True and False to decimal")
         .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
         .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
+
+    step("True and False behave as 1 and 0 in arithmetic")
+        .test(CLEAR, "True 1 +", ENTER).expect("2")
+        .test(CLEAR, "3 False -", ENTER).expect("3")
+        .test(CLEAR, "True 5 *", ENTER).expect("5")
+        .test(CLEAR, "False 2 /", ENTER).expect("0")
+        .test(CLEAR, "True 2 ^", ENTER).expect("1")
+        .test(CLEAR, "1 2 < 1 +", ENTER).expect("2");
+    step("Comparisons in arithmetic expressions")
+        .test(CLEAR, "'(1<2)+1' EVAL", ENTER).expect("2")
+        .test(CLEAR, "1 'TruthX' STO '(TruthX<2)*3' EVAL", ENTER).expect("3")
+        .test(CLEAR, "'(TruthX<2)*3' →NUM", ENTER).expect("3")
+        .test(CLEAR, "'TruthX' PURGE", ENTER).noerror();
+    step("Logical operations on True and False are unchanged")
+        .test(CLEAR, "True False AND", ENTER).expect("False")
+        .test(CLEAR, "True False OR", ENTER).expect("True")
+        .test(CLEAR, "True NOT", ENTER).expect("False")
+        .test(CLEAR, "1 2 <", ENTER).expect("True");
 }
 
 
