@@ -202,9 +202,23 @@ COMMAND_BODY(DFC)
 //   Decompose a real number into its continued fraction coefficients
 // ----------------------------------------------------------------------------
 {
-    algebraic_g xo = algebraic_p(strip(rt.stack(0)));
-    if (!xo)
+    object_p obj = strip(rt.stack(0));
+    if (!obj)
         return ERROR;
+    if (!obj->is_extended_algebraic())
+    {
+        rt.type_error();
+        return ERROR;
+    }
+    algebraic_g xo = algebraic_p(obj);
+
+    // Names and expressions are evaluated to get the numerical value
+    if (xo->is_symbolic())
+    {
+        xo = xo->evaluate();
+        if (!xo)
+            return ERROR;
+    }
     object::id ty = xo->type();
 
     // Fast path 1: integer input → { n }
@@ -286,11 +300,16 @@ COMMAND_BODY(DFC)
     {
         if (!algebraic::to_decimal(xo))
         {
-            rt.type_error();
+            if (!rt.error())
+                rt.type_error();
             return ERROR;
         }
         ty = xo->type();
-        xo = algebraic_p(+xo);
+        if (ty != object::ID_decimal && ty != object::ID_neg_decimal)
+        {
+            rt.type_error();
+            return ERROR;
+        }
     }
 
     scribble  scr;

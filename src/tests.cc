@@ -1975,9 +1975,29 @@ void tests::arithmetic()
         .test(CLEAR, "'3^3^3'", ENTER, ID_ToDecimal)
         .expect("7 625 597 484 987");
 
+    step("Integer power too big for bignum falls back to decimal")
+        .test(CLEAR, "10 1000000 ^", ENTER).noerror().expect("1.⁳¹⁰⁰⁰⁰⁰⁰")
+        .test(CLEAR, "10 1000000 ^ DEPTH", ENTER).noerror().expect("1")
+        .test(CLEAR, "« 10 1000000 ^ » EVAL", ENTER)
+        .noerror().expect("1.⁳¹⁰⁰⁰⁰⁰⁰")
+        .test(CLEAR, "IFERR 10 1000000 ^ THEN 0 END DEPTH", ENTER)
+        .noerror().expect("1");
+
     step("xroot");
     test(CLEAR, "8 3 xroot", ENTER).expect("2.");
     test(CLEAR, "-8 3 xroot", ENTER).expect("-2.");
+    step("Symbolic xroot evaluates numerically")
+        .test(CLEAR, "8 'XrtX' STO 'XrtX' 3 xroot", ENTER)
+        .expect("'xroot(3;XrtX)'")
+        .test(ID_ToDecimal).expect("2.");
+    step("Symbolic xroot is the same as the parsed expression")
+        .test(CLEAR, "'XrtX' 3 xroot 'xroot(3;XrtX)' SAME", ENTER)
+        .expect("True");
+    step("Symbolic xroot survives a text round-trip")
+        .test(CLEAR, "'XrtX' 3 xroot DUP →STR STR→ SAME", ENTER)
+        .expect("True");
+    step("Cleanup xroot variable")
+        .test(CLEAR, "'XrtX' PURGE", ENTER).noerror();
 }
 
 
@@ -4812,6 +4832,21 @@ void tests::cfraction()
         .test(CLEAR, "1 5 sqrt + 2 / DFC { 1 1 1 1 1 1 1 }"
               " « DUP SIZE SWAP ROT ROT OVER SIZE DUP ROT - 1 + SWAP SUB == » EVAL",
               ENTER).expect("True");
+
+    step("DFC on an undefined name is a type error")
+        .test(CLEAR, "'DfcX' DFC", ENTER).error("Bad argument type");
+    step("DFC on a list is a type error")
+        .test(CLEAR, "{ 1 2 } DFC", ENTER).error("Bad argument type");
+    step("DFC on a complex is a type error")
+        .test(CLEAR, "1+ⅈ DFC", ENTER).error("Bad argument type");
+    step("DFC on a unit is a type error")
+        .test(CLEAR, "1_m DFC", ENTER).error("Bad argument type");
+    step("DFC on a name evaluates it")
+        .test(CLEAR, "2 'DfcX' STO 'DfcX' DFC", ENTER).expect("{ 2 }");
+    step("DFC on an expression evaluates it")
+        .test(CLEAR, "1.5 'DfcX' STO 'DfcX+1' DFC", ENTER).expect("{ 2 2 }");
+    step("Cleanup DFC variable")
+        .test(CLEAR, "'DfcX' PURGE", ENTER).noerror();
     step("Restore default precision")
         .test(CLEAR, "'PRECISION' PURGE", ENTER).noerror();
 }
@@ -5115,6 +5150,47 @@ void tests::hyperbolic_reciprocals()
     step("∫ coth(X) dX")
         .test(CLEAR, "'coth(X)'", ENTER, "'X'", ENTER, ID_Primitive)
         .expect("'ln (abs (sinh X))'");
+
+    // Accuracy for small and large arguments
+    step("Hyperbolic functions of tiny arguments")
+        .test(CLEAR, "1E-30 SINH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "-1E-30 SINH", ENTER).expect("-1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 TANH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 ASINH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 ATANH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 COTH", ENTER).expect("1.⁳³⁰")
+        .test(CLEAR, "-1E-30 COTH", ENTER).expect("-1.⁳³⁰")
+        .test(CLEAR, "1E-30 CSCH", ENTER).expect("1.⁳³⁰");
+    step("Hyperbolic functions of extreme arguments")
+        .test(CLEAR, "-1E20 ASINH", ENTER).expect("-46.74484 90404")
+        .test(CLEAR, "1E20 ASINH", ENTER).expect("46.74484 90404")
+        .test(CLEAR, "-1E-20 ACSCH", ENTER).expect("-46.74484 90404")
+        .test(CLEAR, "1E-20 ACSCH", ENTER).expect("46.74484 90404")
+        .test(CLEAR, "1E30 ACSCH", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E30 TANH", ENTER).expect("1.")
+        .test(CLEAR, "-1E30 TANH", ENTER).expect("-1.")
+        .test(CLEAR, "1E-15 TANH", ENTER).expect("1.⁳⁻¹⁵");
+    step("Hyperbolic functions at singular points")
+        .test(CLEAR, "0 CSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 COTH", ENTER).error("Divide by zero")
+        .test(CLEAR, "0 ACSCH", ENTER).error("Divide by zero")
+        .test(CLEAR, "1. ATANH", ENTER).error("Divide by zero");
+    step("Hyperbolic functions keep 24-digit accuracy")
+        .test(CLEAR, "24 SIG", ENTER).noerror()
+        .test(CLEAR, "1 SINH", ENTER).expect("1.17520 11936 43801 45688 238")
+        .test(CLEAR, "-3 SINH", ENTER).expect("-10.01787 49274 09901 89897 46")
+        .test(CLEAR, "0.5 TANH", ENTER).expect("0.46211 71572 60009 75850 2318")
+        .test(CLEAR, "20 TANH", ENTER).expect("0.99999 99999 99999 99150 3291")
+        .test(CLEAR, "2 ASINH", ENTER).expect("1.44363 54751 78810 34249 328")
+        .test(CLEAR, "-0.7 ASINH", ENTER).expect("-0.65266 65660 82355 78680 8686")
+        .test(CLEAR, "0.5 ATANH", ENTER).expect("0.54930 61443 34054 84569 7623")
+        .test(CLEAR, "-0.3 ATANH", ENTER).expect("-0.30951 96042 03111 71547 4067")
+        .test(CLEAR, "1 COTH", ENTER).expect("1.31303 52854 99331 30363 616")
+        .test(CLEAR, "1 CSCH", ENTER).expect("0.85091 81282 39321 54513 3843")
+        .test(CLEAR, "2 ACSCH", ENTER).expect("0.48121 18250 59603 44749 7759")
+        .test(CLEAR, "-0.2 ACSCH", ENTER).expect("-2.31243 83412 72752 62025 356")
+        .test(CLEAR, "1E30 ASINH", ENTER).expect("69.77069 99703 81315 82995 7")
+        .test(CLEAR, "STD", ENTER).noerror();
 }
 
 
@@ -5542,6 +5618,17 @@ void tests::complex_types()
     step("Cycle complex units")
         .test(ID_Cycle).expect("5.46717 47731 3∡50.19442 89077° Ω")
         .test(ID_Cycle).expect("3.5+4.2ⅈ Ω");
+
+    step("Leading sign before imaginary unit")
+        .test(CLEAR, "-ⅈ", ENTER).type(ID_rectangular).expect("-ⅈ")
+        .test(CLEAR, "-ⅈ IM", ENTER).expect("-1")
+        .test(CLEAR, "-ⅈ RE", ENTER).expect("0")
+        .test(CLEAR, "-ⅈ ⅈ +", ENTER).expect("0")
+        .test(CLEAR, "+ⅈ", ENTER).type(ID_rectangular).expect("ⅈ")
+        .test(CLEAR, "+ⅈ IM", ENTER).expect("1")
+        .test(CLEAR, "-ⅈ3", ENTER).expect("-3ⅈ")
+        .test(CLEAR, "'-ⅈ' EVAL", ENTER).expect("-ⅈ")
+        .test(CLEAR, "'2-ⅈ' EVAL", ENTER).expect("2-ⅈ");
 }
 
 
@@ -5672,6 +5759,24 @@ void tests::complex_arithmetic()
         .expect("'e↑(ⅈ·π)'")
         .test(LSHIFT, KEY1)
         .expect("-1.");
+
+    step("Equality tests on complex numbers")
+        .test(CLEAR, "1+ⅈ 1+ⅈ =", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1-ⅈ =", ENTER).expect("False")
+        .test(CLEAR, "1+ⅈ 1-ⅈ ≠", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1+ⅈ ≠", ENTER).expect("False")
+        .test(CLEAR, "2 2+0ⅈ =", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1 =", ENTER).expect("False")
+        .test(CLEAR, "1+ⅈ 1+ⅈ ==", ENTER).expect("True")
+        .test(CLEAR, "1+ⅈ 1+ⅈ SAME", ENTER).expect("True");
+    step("Ordering complex numbers is an error that keeps the arguments")
+        .test(CLEAR, "1+ⅈ 1+ⅈ <", ENTER).error("Bad argument type")
+        .test(CLEAR, "1+ⅈ 1+ⅈ < DEPTH", ENTER).error("Bad argument type")
+        .test(CLEAR, "IFERR 1+ⅈ 2+ⅈ < THEN DEPTH END", ENTER).expect("2");
+    step("Ordering ranges is an error that keeps the arguments")
+        .test(CLEAR, "1…2 2…3 <", ENTER).error("Bad argument type")
+        .test(CLEAR, "IFERR 1…2 2…3 < THEN DEPTH END", ENTER).expect("2")
+        .test(CLEAR, "IFERR 1…2 2…3 < THEN DROP END", ENTER).expect("1…2");
 }
 
 
@@ -5842,6 +5947,11 @@ void tests::complex_functions()
     step("Arc tangent");
     test(CLEAR, "9.+2ⅈ", ID_atan)
         .expect("1.46524 96601 83523 3458+0.02327 26057 66502 98838ⅈ");
+
+    step("Arc tangent at the singular points ±ⅈ")
+        .test(CLEAR, "ⅈ ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "ⅈ NEG ATAN", ENTER).error("Argument outside domain")
+        .test(CLEAR, "-ⅈ ATAN", ENTER).error("Argument outside domain");
 
     step("Hyperbolic sine");
     test(CLEAR, "4+2ⅈ", ID_HyperbolicMenu, ID_sinh)
@@ -9477,6 +9587,16 @@ void tests::auto_simplification()
 
     step("Re-enable auto simplification");
     test(CLEAR, "AutoSimplify", ENTER).noerror();
+
+    step("Simplification keeps tiny decimals added to zero")
+        .test(CLEAR, "'1E-30-0' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'")
+        .test(CLEAR, "'1E-30+0' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'")
+        .test(CLEAR, "'0-1E-30' SIMPLIFY", ENTER).expect("'-1.⁳⁻³⁰'")
+        .test(CLEAR, "'1E-30+X-X' SIMPLIFY", ENTER).expect("'1.⁳⁻³⁰'");
+    step("Decimal zero does not make a tiny operand negligible")
+        .test(CLEAR, "0. 1E-30 -", ENTER).expect("-1.⁳⁻³⁰")
+        .test(CLEAR, "0. 1E-30 +", ENTER).expect("1.⁳⁻³⁰")
+        .test(CLEAR, "1E-30 0. -", ENTER).expect("1.⁳⁻³⁰");
 }
 
 

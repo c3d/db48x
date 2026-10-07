@@ -307,13 +307,39 @@ algebraic_p comparison::compare(comparison_fn comparator,
 //   Compare two algebraic values without using the stack
 // ----------------------------------------------------------------------------
 {
+    if (!x || !y)
+        return nullptr;
+
     int cmp = 0;
-    if (compare(&cmp, x, y))
+    bool ok = false;
+
+    // Complex numbers can be tested for equality, but not ordered
+    if ((op == ID_TestEQ || op == ID_TestNE) &&
+        (x->is_complex() || y->is_complex()) &&
+        (x->is_complex() || x->is_real()) &&
+        (y->is_complex() || y->is_real()))
+    {
+        algebraic_g diff = x - y;
+        if (!diff)
+            return nullptr;
+        cmp = !diff->is_zero(false);
+        ok = true;
+    }
+    else
+    {
+        ok = compare(&cmp, x, y);
+    }
+
+    if (ok)
     {
         // Could evaluate the result, return True or False
         id type = comparator(cmp) ? ID_True : ID_False;
         return algebraic_p(command::static_object(type));
     }
+
+    // If the comparison failed with an error, e.g. ordering complex numbers
+    if (rt.error())
+        return nullptr;
 
     // Otherwise, need to build an equation with the comparison
     expression_p eq = expression::make(op, x, y);

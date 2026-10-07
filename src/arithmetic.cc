@@ -1342,7 +1342,14 @@ bool pow::bignum_ok(bignum_g &x, bignum_g &y)
     // Compute result, check that it does not overflow
     if (y->type() == ID_neg_bignum)
         return false;
+    bool based = is_based(x->type());
     x = bignum::pow(x, y);
+    if (!x && !based)
+    {
+        // Result too big for an integer: let the decimal code compute it
+        rt.clear_error();
+        return false;
+    }
     return x;
 }
 
