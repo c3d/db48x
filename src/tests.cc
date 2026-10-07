@@ -9705,7 +9705,7 @@ void tests::symbolic_operations()
 
     step("Multiple adds");
     test(CLEAR, "'3*(A+B+C)' expand ", ENTER)
-        .expect("'3·C+(3·A+3·B)'");
+        .expect("'3·A+3·B+3·C'");
 
     step("Single sub, right");
     test(CLEAR, "'(A-B)*C' expand ", ENTER)
@@ -9720,10 +9720,69 @@ void tests::symbolic_operations()
 
     step("Expand and collect a power");
     test(CLEAR, "'(A+B)^3' expand ", ENTER)
-        .expect("'A·(A·A)+A·(A·B)+(A·(A·B)+A·(B·B))+(B·(A·A)+B·(A·B)+(B·(A·B)+B·(B·B)))'");
+        .expect("'A³+3·A²·B+3·A·B²+B³'");
     test("collect ", ENTER)
+        .expect("'A³+3·A²·B+3·A·B²+B³'");
+    test(CLEAR, "'(A+B)^3' collect ", ENTER)
         .expect("'(A+B)↑3'");
-    // .expect("'(A+B)³'");
+
+    step("Expand collects like terms")
+        .test(CLEAR, "'(X+1)^2-(X^2+2*X+1)' EXPAND", ENTER)
+        .expect("'0'")
+        .test(CLEAR, "'(X+1)^2-(X^2+2*X+1)' EXPAND SIMPLIFY", ENTER)
+        .expect("'0'")
+        .test(CLEAR, "'(A+B)*(A-B)' EXPAND", ENTER)
+        .expect("'A²-B²'")
+        .test(CLEAR, "'(X-1)*(X+2)' EXPAND", ENTER)
+        .expect("'X²+X-2'")
+        .test(CLEAR, "'X/2+X/3' EXPAND", ENTER)
+        .expect("'⁵/₆·X'");
+    step("Expand larger powers")
+        .test(CLEAR, "'(X+1)^10' EXPAND", ENTER)
+        .expect("'X↑10+10·X↑9+45·X↑8+120·X↑7+210·X↑6+252·X↑5"
+                "+210·X↑4+120·X³+45·X²+10·X+1'");
+    step("Expand with non-polynomial terms")
+        .test(CLEAR, "'sin(X)*(A+B)+sin(X)' EXPAND", ENTER)
+        .expect("'A·sin X+B·sin X+sin X'")
+        .test(CLEAR, "'sin(X+X)-2*cos(Y)^2' EXPAND", ENTER)
+        .expect("'sin(2·X)-2·(cos Y)²'")
+        .test(CLEAR, "'(X*Y)^Z' EXPAND", ENTER)
+        .expect("'X↑Z·Y↑Z'");
+
+    step("Collect like terms")
+        .test(CLEAR, "'X+Y-X' COLLECT", ENTER).expect("'Y'")
+        .test(CLEAR, "'X+Y-X-Y' COLLECT", ENTER).expect("'0'")
+        .test(CLEAR, "'X*A+B*X' COLLECT", ENTER).expect("'(A+B)·X'")
+        .test(CLEAR, "'X*Y+Y*X' COLLECT", ENTER).expect("'2·X·Y'")
+        .test(CLEAR, "'A*X-X' COLLECT", ENTER).expect("'(A-1)·X'")
+        .test(CLEAR, "'X/2+X/3' COLLECT", ENTER).expect("'⁵/₆·X'")
+        .test(CLEAR, "'2*X-X-X' COLLECT", ENTER).expect("'0'");
+    step("Simplify like terms")
+        .test(CLEAR, "'X+Y-X' SIMPLIFY", ENTER).expect("'Y'")
+        .test(CLEAR, "'X+Y-X-Y' SIMPLIFY", ENTER).expect("'0'")
+        .test(CLEAR, "'X*A+B*X' SIMPLIFY", ENTER).expect("'(A+B)·X'")
+        .test(CLEAR, "'X*Y+Y*X' SIMPLIFY", ENTER).expect("'2·X·Y'")
+        .test(CLEAR, "'A*X-X' SIMPLIFY", ENTER).expect("'(A-1)·X'")
+        .test(CLEAR, "'X/2+X/3' SIMPLIFY", ENTER).expect("'⁵/₆·X'")
+        .test(CLEAR, "'2*X-X-X' SIMPLIFY", ENTER).expect("'0'");
+    step("Collect does not expand factored forms")
+        .test(CLEAR, "'(X+1)^10' COLLECT", ENTER).expect("'(X+1)↑10'")
+        .test(CLEAR, "'A*B+A*C' COLLECT", ENTER).expect("'A·(B+C)'");
+    step("Collect a sum with many terms")
+        .test(CLEAR,
+              "'A1+A2+A3+A4+A5+A6+A7+A8+A9+A10+A11+A12+A13+A14+A15+A16+A17"
+              "+A18+A19+A20+A21+A22+A23+A24+A25+A26+A27+A28+A29+A30+A31+A32"
+              "+A33+A34+A35+A36+A37+A38+A39+A40+A41+A42+A43+A44+A45+A46+A47"
+              "+A48+A49+A50+A51+A52+A53+A54+A55+A56+A57+A58+A59+A60' "
+              "DUP COLLECT SWAP - EXPAND", ENTER)
+        .expect("'0'");
+    step("Numerical evaluation of a sum with many terms")
+        .test(CLEAR,
+              "'A1+A2+A3+A4+A5+A6+A7+A8+A9+A10+A11+A12+A13+A14+A15+A16+A17"
+              "+A18+A19+A20+A21+A22+A23+A24+A25+A26+A27+A28+A29+A30' →Num",
+              ENTER)
+        .expect("'A1+A2+A3+A4+A5+A6+A7+A8+A9+A10+A11+A12+A13+A14+A15+A16+A17"
+                "+A18+A19+A20+A21+A22+A23+A24+A25+A26+A27+A28+A29+A30'");
 
     step("Apply function call for user-defined function")
         .test(CLEAR, "{ 1 2 3 } 'F' APPLY", ENTER)
@@ -13665,6 +13724,12 @@ void tests::polynomials()
     step("Create polynomial from an expression")
         .test(CLEAR, "'X-Y' →Poly", ENTER)
         .expect("ⓅX-Y");
+    step("Create polynomial with many variables")
+        .test(CLEAR, "'A+B+C+D+E+F' →Poly", ENTER)
+        .expect("ⓅA+B+C+D+E+F");
+    step("Polynomial variables that are prefix of one another")
+        .test(CLEAR, "'A1*A10+A10*A1' →Poly", ENTER)
+        .expect("Ⓟ2·A1·A10");
     step("Create polynomial from menu")
         .test(CLEAR, "'X-Y'", ENTER, ID_ToolsMenu, F4)
         .expect("ⓅX-Y");

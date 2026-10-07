@@ -53,6 +53,7 @@
 #include "tag.h"
 #include "unit.h"
 #include "user_interface.h"
+#include "variables.h"
 
 #include <cctype>
 #include <cmath>
@@ -978,6 +979,36 @@ static algebraic_p to_decimal_weak(algebraic_r x)
 }
 
 
+static bool is_inert_symbolic(expression_p eq)
+// ----------------------------------------------------------------------------
+//   Check if numerical evaluation would leave an expression unchanged
+// ----------------------------------------------------------------------------
+//   This is the case for sums and products of undefined names.
+//   Detecting this avoids re-evaluating the left argument of every addition
+//   in a sum, which made the numerical evaluation of `A1+A2+...+An`
+//   exponential in n.
+{
+    for (object_p obj : *eq)
+    {
+        switch (obj->type())
+        {
+        case object::ID_add:
+        case object::ID_subtract:
+        case object::ID_multiply:
+        case object::ID_neg:
+            break;
+        case object::ID_symbol:
+            if (directory::recall_all(obj, false))
+                return false;
+            break;
+        default:
+            return false;
+        }
+    }
+    return true;
+}
+
+
 bool algebraic::to_decimal(algebraic_g &x, bool weak)
 // ----------------------------------------------------------------------------
 //   Convert a value to decimal
@@ -1086,6 +1117,8 @@ bool algebraic::to_decimal(algebraic_g &x, bool weak)
     case ID_expression:
         if (!unit::mode)
         {
+            if (xt == ID_expression && is_inert_symbolic(expression_p(+x)))
+                return true;
             algebraic_p eq = algebraic_p(+x);
             settings::SaveNumericalResults save(true);
             x = eq->evaluate();
