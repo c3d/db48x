@@ -1170,8 +1170,8 @@ Mercury time of perihelion passage
 Computed, not stored: `T₀☿` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb☿`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`, so the constant displays as a date but tracks "now". Mercury passes
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`, so the constant displays as a date but tracks "now". Mercury passes
 perihelion roughly four times per year. [Reference 27](#reference-27)
 
 
@@ -1314,8 +1314,8 @@ Venus time of perihelion passage
 Computed, not stored: `T₀♀` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♀`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Venus passes perihelion about twice per year. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Venus passes perihelion about twice per year. [Reference 27](#reference-27)
 
 
 ## Earth constants
@@ -1461,7 +1461,8 @@ Computed, not stored: `T₀♁` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♁`, the
 anomalistic year) and returns the most recent perihelion passage at or before
 the current date (early January each year). The computation is carried out in
-Julian Day Number and converted to a date with `JDN→`. [Reference 27](#reference-27)
+Julian Date (JD = `JDN` − 0.5, since `JDN` counts from midnight) and
+converted to a date with `JDN→`. [Reference 27](#reference-27)
 
 
 ### a♁GPS constant
@@ -1669,7 +1670,7 @@ The value is the standard anomalistic month used by `ⓁPeriSel`. [Reference 27]
 
 Moon time of perigee passage
 
-Computed, not stored: `T₀☽` evaluates `JDN→(ⓁPeriSel(→Num(JDN(DateTime))))`,
+Computed, not stored: `T₀☽` evaluates `JDN→(0.5+ⓁPeriSel(→Num(JDN(DateTime)-0.5)))`,
 calling the library routine `ⓁPeriSel` on the current date to obtain the nearest
 lunar perigee, then converting the Julian Day Number to a date. `ⓁPeriSel`
 implements Meeus' Chapter 50 perigee formula in full — all 60 Table 50.A periodic
@@ -1821,8 +1822,8 @@ Mars time of perihelion passage
 Computed, not stored: `T₀♂` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♂`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Mars's orbital period is approximately 1.88 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Mars's orbital period is approximately 1.88 years. [Reference 27](#reference-27)
 
 
 ## Jupiter constants
@@ -1966,8 +1967,8 @@ Jupiter time of perihelion passage
 Computed, not stored: `T₀♃` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♃`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Jupiter's orbital period is approximately 11.86 years. [Reference 27](#reference-27)
 
 
 ## Saturn constants
@@ -2110,8 +2111,8 @@ Saturn time of perihelion passage
 Computed, not stored: `T₀♄` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♄`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Saturn's orbital period is approximately 29.46 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Saturn's orbital period is approximately 29.46 years. [Reference 27](#reference-27)
 
 
 ## Uranus constants
@@ -2255,8 +2256,8 @@ Uranus time of perihelion passage
 Computed, not stored: `T₀⛢` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb⛢`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
 was in 1966 and the next is around 2050, so the returned value can be decades in
 the past. [Reference 27](#reference-27)
 
@@ -2399,7 +2400,8 @@ Neptune time of perihelion passage
 Computed, not stored: `T₀♆` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♆`) and returns
 the most recent perihelion passage at or before the current date, carried out in
-Julian Day Number and converted to a date with `JDN→`. Neptune is a deliberate
+Julian Date (JD = `JDN` − 0.5, since `JDN` counts from midnight) and
+converted to a date with `JDN→`. Neptune is a deliberate
 exception to the "most recent past perihelion" convention: its true last
 perihelion (~1876) is uninformative and hard to source, so Tp is set to the next
 perihelion (2042-09-04). Because that date is in the future, the floor-IFTE
@@ -2544,8 +2546,8 @@ Pluto time of perihelion passage
 Computed, not stored: `T₀♇` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♇`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
 was in 1989 (Sep 05) and the next is around 2237, so the returned value can be
 decades in the past. [Reference 4](#reference-4)
 

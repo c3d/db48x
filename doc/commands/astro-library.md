@@ -209,7 +209,7 @@ Fixed check: `2459050.5 Ⓛ♁Pf` → `[0.468733637 -0.901591683 0.000042104]`.
 `JD` → `[x y z]`
 
 ```rpl
-DateTime JDN Ⓛ♁Pf     @ Earth's heliocentric position right now (au); its norm ≈ 1 au
+DateTime JDN 0.5 - Ⓛ♁Pf     @ Earth's heliocentric position right now (au); its norm ≈ 1 au
 ```
 
 ## VΦf
@@ -264,10 +264,11 @@ mean sidereal time. Sidereal time is the hour angle of the vernal equinox.
 @ Expecting 280.46061 837 °
 ```
 
-⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` gives the Julian Date
-directly (this build carries the JDN half-day fix). Convert your civil (local)
-clock time to UT first. For example `20201006.120000_date JDN` (2020-10-06
-12:00 UT) → `2459129`, which `-73.58 θs` turns into a local mean sidereal time.
+⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` counts the Julian
+day from midnight, so the astronomical Julian Date is `JDN 0.5 -`. Convert your
+civil (local) clock time to UT first. For example `20201006.120000_date JDN 0.5 -`
+(2020-10-06 12:00 UT) → `2459129`, which `-73.58 θs` turns into a local mean
+sidereal time.
 
 ---
 
@@ -710,7 +711,7 @@ Fixed check: `2459050.5 Ⓛ♂Pf` → `[1.159010882 -0.753079682 -0.044216374]`.
 `JD` → `[x y z]` (au)
 
 ```rpl
-DateTime JDN Ⓛ♂Pf     @ Mars' heliocentric position right now (au); its norm ~ 1.5 au
+DateTime JDN 0.5 - Ⓛ♂Pf     @ Mars' heliocentric position right now (au); its norm ~ 1.5 au
 ```
 
 ## DAToB
@@ -724,7 +725,7 @@ The live example chains `♁Pf` and `♂Pf` at today's date, so it returns the
 **current Earth-Mars distance** — the value changes every time you run it:
 
 ```rpl
-DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf ⓁDAToB   @ current Earth-Mars distance (au)
+DateTime JDN 0.5 - DUP Ⓛ♁Pf SWAP Ⓛ♂Pf ⓁDAToB   @ current Earth-Mars distance (au)
 ```
 
 ## DEarthToA
@@ -737,7 +738,7 @@ vectors. Fixed check: `2459050.5 'Ⓛ♂Φf' DEarthToA` → `0.707458 au` (Earth
 `JD  'Af'` → `d` (au)
 
 ```rpl
-DateTime JDN 'Ⓛ♀Φf' ⓁDEarthToA   @ current Earth-Venus distance (au)
+DateTime JDN 0.5 - 'Ⓛ♀Φf' ⓁDEarthToA   @ current Earth-Venus distance (au)
 ```
 
 ## T₀SDEarthToA

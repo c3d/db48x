@@ -25,7 +25,7 @@
       «
         IF n 0 ≠ THEN
           IF n 1 ≥ n 7 ≤ AND THEN
-            DateTime JDN → jd
+            DateTime JDN 0.5 - → jd
             «
               jd Ⓛ♁Pf jd { 'Ⓛ☿Φf' 'Ⓛ♀Φf' 'Ⓛ♂Φf' 'Ⓛ♃Φf' 'Ⓛ♄Φf' 'Ⓛ⛢Φf' 'Ⓛ♆Φf' } n GET EVAL ⓁPosΦf SWAP - → g
               «

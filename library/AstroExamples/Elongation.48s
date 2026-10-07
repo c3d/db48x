@@ -26,7 +26,7 @@
         IF n 0 ≠ THEN
           IF n 1 ≥ n 7 ≤ AND THEN
             DEG
-            DateTime JDN → jd
+            DateTime JDN 0.5 - → jd
             «
               jd Ⓛ♁Pf → E
               «

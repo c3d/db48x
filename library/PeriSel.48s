@@ -39,8 +39,9 @@
 	@@ Step 0: input preamble — accept a date OR a JDN (PR1701-conformance §4).
 	@@ A DB48x date is a `_date`-unit value; a JDN is a plain real. JDN() on a
 	@@ plain real ERRORS, so guard: if the input carries a unit (date), convert
-	@@ it with JDN; a plain real passes through unchanged. ( date|JDN -- JDN )
-	Duplicate TypeName "unit" == « JDN » IFT
+	@@ it with JDN; a plain real passes through unchanged. ( date|JD -- JD )
+	@@ DB48x's JDN counts the Julian day from midnight: JD = JDN − 0.5.
+	Duplicate TypeName "unit" == « JDN 0.5 - » IFT
 
 	@@ Step 1: k = nearest integer anomalistic-month count since the k=0 epoch.
 	@@ ( JDN -- k )
