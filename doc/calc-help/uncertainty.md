@@ -2240,13 +2240,21 @@ known to lie within a range of 20°, a rectangular law. The range is drawn at
 random at each press, from 0…20° up to 60…80°, or given on the stack as a list
 `{ lo hi }` in degrees; any other object is left alone.
 
-Three hundred pairs (L, θmax) are drawn, and both periods computed for each.
+Three hundred pairs (L, θmax) are drawn, fewer on a calculator (see below),
+and both periods computed for each.
 The histogram of Treal is drawn in black, and that of T over it in gray, on
 the same axis, whose ends are written below in seconds. Above are the mean and
 standard deviation of each, and Treal by the propagation formula of
-σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The three
-results are returned, tagged. About 2 seconds on the simulator; on a
-calculator, a few minutes.
+σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The inputs are
+independent: a variable ρij left by another calculation is set aside for
+σRFxjxi, then put back. The three results are returned, tagged.
+
+About 2 seconds on the simulator. On a calculator, where the normal draws of L
+are slow, the draws stop after about 30 seconds, with 30 of them at least, and
+the classes follow their number; the number of draws is written after the
+Monte Carlo result. To have the 300 draws whatever the time, a few minutes on
+a DM32, store a number other than 0 in the global variable ExtendedTrials,
+for instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
 
 **1)** A range at random:
 

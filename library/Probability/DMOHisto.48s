@@ -2,7 +2,9 @@
 @@ DMOHisto — demo of the Probability section: a law drawn at random
 @@ among nine, with random parameters, or the one given: a law name
 @@ alone, "Gamma" or "Beta" included, or { law { params } }. 300 values
-@@ drawn from it by its Rand entry into ΣData, their histogram in gray
+@@ (fewer if they take more than about 30 s, 30 at least, unless the
+@@ global variable ExtendedTrials is not 0) drawn from it by its Rand
+@@ entry into ΣData, their histogram in gray
 @@ (HistogramPlot), and the density of the law over it, scaled to the
 @@ counts, in black. Press again for a new law: the tagged result left
 @@ on the stack is not taken as an argument (DeleteTag to replay it).
@@ -53,7 +55,23 @@
       → dhhr dhhs
       «
         ClΣ
-        "« 1 " dhhcount →Text + " Start " + dhhr + "Ⓛ" + dhhn + "Rand Σ+ Next »" + Str→ Eval
+        @ Up to 300 draws, but no longer than about 30 s, and 30 at least:
+        @ some laws draw slowly on a calculator. ExtendedTrials other than 0
+        @ asks for the 300 draws whatever the time.
+        IfErr 'ExtendedTrials' Rcl Then Drop 0 End 0 ≠
+        "« " dhhr + "Ⓛ" + dhhn + "Rand »" + Str→
+        Ticks 0
+        → dhhext dhhdraw dhhtk0 dhhk
+        «
+          Do
+            dhhdraw Σ+
+            dhhk 1 + 'dhhk' Sto
+          Until
+            dhhk dhhcount ≥
+            dhhext Not dhhk 30 ≥ And Ticks dhhtk0 - 30000 > And Or
+          End
+          dhhk 'dhhcount' Sto
+        »
         MinΣ MaxΣ
         → dhhlo dhhhi
         «
@@ -63,7 +81,8 @@
             dhhlo dhhm - dhhhi dhhm +
             → dhha dhhb
             «
-              dhhb dhha - 25 /
+              @ 25 classes for 300 draws, fewer for fewer draws, 8 at least
+              dhhb dhha - dhhcount √ 1.5 * IP 8 Max 25 Min /
               "« → dhhx « " dhhr + "dhhx Ⓛ" + dhhn + "PDF » »" + Str→
               → dhhw dhhpdf
               «

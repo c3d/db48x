@@ -175,9 +175,19 @@ stack:
 Three hundred values are drawn from the law by its Rand entry into ΣData,
 their histogram is drawn in gray by HistogramPlot, in 25 classes whatever the
 StatsPlotBins setting, and the density of the law is drawn over it in black by
-FunctionPlot, scaled to the counts: 300 times the width of a class times the
-density. The law and its parameters are written above, and returned on the
-stack, tagged `law`. The draws stay in ΣData, for Average or StandardDeviation.
+FunctionPlot, scaled to the counts: the number of draws times the width of a
+class times the density. The law and its parameters are written above, and
+returned on the stack, tagged `law`. The draws stay in ΣData, for Average or
+StandardDeviation.
+
+Some laws draw slowly on a calculator: Norml, LgNrm, UShape or Chi2 would
+take several minutes for 300 draws on a DM32. The draws therefore stop after
+about 30 seconds, with 30 of them at least, and the classes follow their
+number: 25 classes for 300 draws, 8 for 30. The number of draws is written
+above the plot. To have the 300 draws whatever the time, store a number other
+than 0 in the global variable ExtendedTrials, for instance
+1 'ExtendedTrials' Sto; purge it to come back to the time limit. In the
+simulator or on a phone, all the laws draw their 300 values in a few seconds.
 
 Press again for a new law: the tagged result of the previous run is not taken
 as an argument. To replay the same law on fresh draws, remove the tag first.
@@ -207,7 +217,8 @@ as an argument. To replay the same law on fresh draws, remove the tag first.
 ```
 
 The bars wander around the curve: with 300 draws, a class that should hold
-12 values holds about 12 ± 3.5, the square root of 12. More draws make the
+12 values holds about 12 ± 3.5, the square root of 12. With the fewer draws of
+a slow law on a calculator, the bars wander more. More draws make the
 histogram closer to the density, in 1/√N. The arc sine law (UShape), with its
 two peaks at the ends, and the exponential law, with its long tail, are the
 most striking.

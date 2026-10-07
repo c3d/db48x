@@ -5,8 +5,11 @@
 @@ with c(x) = (2x)!/(2^x·x!)². L is drawn from a normal law, 15±σ0.1 cm,
 @@ and the amplitude θmax from a rectangular law over a range of 20°, drawn
 @@ at random from 0…20° to 60…80°, or given as { lo hi } in degrees.
-@@ 300 draws: the histograms of T (gray) and Treal (black) on the same
-@@ axis; Treal is then compared with the linear propagation of σRFxjxi.
+@@ 300 draws (fewer if they take more than about 30 s, 30 at least,
+@@ unless the global variable ExtendedTrials is not 0): the histograms of
+@@ T (gray) and Treal (black) on the same axis; Treal is then compared
+@@ with the linear propagation of σRFxjxi, for independent inputs whatever
+@@ the variable ρij holds.
 @@ Author & design          : Jean Wilson
 @@ Co-authors & programming  : Claude & Claude Code (Anthropic)
   @ The range of θmax, if given; any other object is left alone
@@ -25,19 +28,32 @@
   → dmpt0 dmpt1 dmpn dmpg dmpc
   «
     ClΣ
-    1 dmpn For dmpi
-      0.15 0.001 ⓁNormlRand
-      RAND dmpt1 dmpt0 - * dmpt0 + 1_° * 2 / Sin Sq
-      → dmpl dmpu
-      «
-        @ T, then the series by Horner's rule, from c(5)² down to c(0)²
-        2 π →Num * dmpl dmpg / √ *
-        Dup
-        0 6 1 For dmpj dmpu * dmpc dmpj Get + -1 Step
-        *
-        2 →Array Σ+
-      »
-    Next
+    @ Up to 300 draws, but no longer than about 30 s, and 30 at least:
+    @ NormlRand is slow on a calculator. ExtendedTrials other than 0 asks
+    @ for the 300 draws whatever the time.
+    IfErr 'ExtendedTrials' Rcl Then Drop 0 End 0 ≠
+    Ticks 0
+    → dmpext dmptk0 dmpk
+    «
+      Do
+        0.15 0.001 ⓁNormlRand
+        RAND dmpt1 dmpt0 - * dmpt0 + 1_° * 2 / Sin Sq
+        → dmpl dmpu
+        «
+          @ T, then the series by Horner's rule, from c(5)² down to c(0)²
+          2 π →Num * dmpl dmpg / √ *
+          Dup
+          0 6 1 For dmpj dmpu * dmpc dmpj Get + -1 Step
+          *
+          2 →Array Σ+
+        »
+        dmpk 1 + 'dmpk' Sto
+      Until
+        dmpk dmpn ≥
+        dmpext Not dmpk 30 ≥ And Ticks dmptk0 - 30000 > And Or
+      End
+      dmpk 'dmpn' Sto
+    »
     @ The two columns: their means and standard deviations
     Average StandardDeviation MinΣ MaxΣ
     → dmpm dmpd dmplo dmphi
@@ -51,7 +67,8 @@
           dmpa dmpe - dmpb dmpe +
           → dmpx0 dmpx1
           «
-            dmpx1 dmpx0 - 40 /
+            @ 40 classes for 300 draws, fewer for fewer draws, 8 at least
+            dmpx1 dmpx0 - dmpn √ 2.31 * IP 8 Max 40 Min /
             → dmpw
             «
               dmpn dmpw * dmpd 1 Get 2.5066 * / 2.2 *
@@ -65,28 +82,37 @@
                 Dup 2 Get HistogramPlot
                 1 Get 0.5 Gray Foreground HistogramPlot 'Foreground' Purge
                 'PPAR' Purge
+                @ The Monte Carlo results, written at once
+                "Pendulum: L=15±σ0.1 cm, θmax " dmpt0 →Text + "…" + dmpt1 →Text + "°" +
+                { #0d #0d 0 true false } DrawText
+                "T " dmpm 1 Get 3 RND →Text + "±σ" + dmpd 1 Get 4 RND →Text + " s (gray)" +
+                { #0d #18d 0 true false } DrawText
+                "Treal " dmpm 2 Get 3 RND →Text + "±σ" + dmpd 2 Get 4 RND →Text + " s (MC, " + dmpn →Text + " draws)" +
+                { #0d #36d 0 true false } DrawText
+                dmpx0 3 RND →Text " s" + { #0d #222d 0 true false } DrawText
+                dmpx1 3 RND →Text " s" + { #340d #222d 0 true false } DrawText
                 @ Treal by the linear propagation of σRFxjxi: θmax as the
-                @ centre of its range ±σ its width/√12
-                '2*π*√(x2/9.80665)*(1+0.25*sin(x1/2)^2+0.140625*sin(x1/2)^4+0.09765625*sin(x1/2)^6+0.07476806640625*sin(x1/2)^8+0.0605621337890625*sin(x1/2)^10)'
-                0.15±σ0.001
-                dmpt0 dmpt1 + 2 / →Num →Text "±σ" + dmpt1 dmpt0 - 12 √ / →Num →Text + "_°" + Str→
-                ⓁσRFxjxi →Num
+                @ centre of its range ±σ its width/√12. The inputs are
+                @ independent: a variable ρij left by another calculation
+                @ is set aside, then put back.
+                IfErr 'ρij' Rcl 1 Then Drop 0 0 End
+                → dmprho dmphad
+                «
+                  IfErr { ρij } Purge Then End
+                  '2*π*√(x2/9.80665)*(1+0.25*sin(x1/2)^2+0.140625*sin(x1/2)^4+0.09765625*sin(x1/2)^6+0.07476806640625*sin(x1/2)^8+0.0605621337890625*sin(x1/2)^10)'
+                  0.15±σ0.001
+                  dmpt0 dmpt1 + 2 / →Num →Text "±σ" + dmpt1 dmpt0 - 12 √ / →Num →Text + "_°" + Str→
+                  ⓁσRFxjxi →Num
+                  If dmphad Then dmprho 'ρij' Sto End
+                »
                 → dmplin
                 «
-                  "Pendulum: L=15±σ0.1 cm, θmax " dmpt0 →Text + "…" + dmpt1 →Text + "°" +
-                  { #0d #0d 0 true false } DrawText
-                  "T " dmpm 1 Get 3 RND →Text + "±σ" + dmpd 1 Get 4 RND →Text + " s (gray)" +
-                  { #0d #18d 0 true false } DrawText
-                  "Treal " dmpm 2 Get 3 RND →Text + "±σ" + dmpd 2 Get 4 RND →Text + " s (MC)" +
-                  { #0d #36d 0 true false } DrawText
                   dmplin Explode
                   → dmpla dmplb
                   «
                     "Treal " dmpla 3 RND →Text + "±σ" + dmplb 4 RND →Text + " s (linear)" +
                     { #0d #54d 0 true false } DrawText
                   »
-                  dmpx0 3 RND →Text " s" + { #0d #222d 0 true false } DrawText
-                  dmpx1 3 RND →Text " s" + { #340d #222d 0 true false } DrawText
                   dmpm 1 Get dmpd 1 Get 2 →List "T MC" →Tag
                   dmpm 2 Get dmpd 2 Get 2 →List "Treal MC" →Tag
                   dmplin "Treal linear" →Tag
