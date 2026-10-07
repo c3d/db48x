@@ -505,6 +505,59 @@ array_p operator-(array_r x)
 //
 // ============================================================================
 
+static algebraic_p laplace_determinant(size_t n, size_t row, ularge used)
+// ----------------------------------------------------------------------------
+//   Division-free cofactor expansion for the rows from 'row' downwards
+// ----------------------------------------------------------------------------
+//   The n x n matrix elements are on the stack, accessed as in determinant()
+//   'used' is the bit mask of columns already consumed by upper rows.
+//   This is O(n!) but only used for symbolic matrices, which are small,
+//   and avoids leaving uncancelled divisors in the symbolic result.
+{
+    algebraic_g det;
+    bool        neg = false;
+    size_t      nn  = n * n;
+    for (size_t c = 0; c < n; c++)
+    {
+        if (used & (ularge(1) << c))
+            continue;
+        if (program::interrupted())
+            return nullptr;
+
+        bool     tneg = neg;
+        size_t   ix   = row * n + c;
+        object_p e    = rt.stack(nn + ~ix);
+        neg = !neg;
+        if (!e)
+            return nullptr;
+        if (e->is_zero(false))
+            continue;
+        algebraic_g term = e->as_algebraic();
+        if (!term)
+            return nullptr;
+        if (row + 1 < n)
+        {
+            algebraic_g minor =
+                laplace_determinant(n, row + 1, used | (ularge(1) << c));
+            if (!minor)
+                return nullptr;
+            if (minor->is_zero(false))
+                continue;
+            term = term * minor;
+        }
+        if (det)
+            det = tneg ? det - term : det + term;
+        else
+            det = tneg ? -term : term;
+        if (!det)
+            return nullptr;
+    }
+    if (!det)
+        det = integer::make(0);
+    return det;
+}
+
+
 algebraic_p array::determinant() const
 // ----------------------------------------------------------------------------
 //   Compute the determinant of a square matrix
@@ -526,6 +579,19 @@ algebraic_p array::determinant() const
         size_t      px  = n * n + n;
         bool        neg = false;
         algebraic_g tot;
+
+        // Symbolic matrices: use division-free cofactor expansion
+        bool symbolic = false;
+        for (size_t i = 0; !symbolic && i < n * n; i++)
+            if (object_p e = rt.stack(i))
+                symbolic = e->is_symbolic();
+        if (symbolic && n < 8 * sizeof(ularge))
+        {
+            record(matrix, "Symbolic determinant of %ux%u matrix", n, n);
+            det = laplace_determinant(n, 0, 0);
+            rt.drop(rt.depth() - depth);
+            return det;
+        }
 
         // Make space for temporary elements
         for (size_t j = 0; j < n; j++)
@@ -698,7 +764,8 @@ algebraic_p array::determinant() const
 
         // Return result
         rt.drop(rt.depth() - depth);
-        det = det / tot;
+        if (tot)
+            det = det / tot;
         if (neg)
             det = -det;
         record(matrix, "Result det=%t", +det);
@@ -1751,6 +1818,8 @@ algebraic_p array::norm_square() const
         }
         else if (algebraic_g elem = obj->as_algebraic())
         {
+            if (elem->is_complex())
+                elem = abs::evaluate(elem);
             elem = sq::run(elem);
             sum = sum ? sum + elem : elem;
         }
@@ -2436,6 +2505,18 @@ object::result array::add_row_or_column(bool columnist)
                 goto type_error;
             if (!ia->is_matrix_or_vector(&irows, &icols, false))
                 goto dimension_error;
+            if (!icols && !columnist)
+            {
+                // Inserting a single vector as a row
+                if (irows != ocols)
+                    goto dimension_error;
+                if (row > orows)
+                    goto value_error;
+                il = ol->insert(inner, row);
+                if (il && rt.drop(2) && rt.top(il))
+                    return OK;
+                return ERROR;
+            }
             if (columnist ? (orows != irows) : (ocols != icols))
                 goto dimension_error;
             if (row > (columnist ? ocols : orows))
@@ -2508,10 +2589,35 @@ value_error:
 }
 
 
+static object_p removed_items(list_r lst, size_t first, size_t count)
+// ----------------------------------------------------------------------------
+//   Return the item, or the list of items, removed by ROW- / COL-
+// ----------------------------------------------------------------------------
+{
+    if (count == 1)
+        return lst->at(first);
+
+    scribble scr;
+    size_t   idx = 0;
+    for (object_p item : *lst)
+    {
+        if (idx >= first && idx < first + count)
+            if (!rt.append(item))
+                return nullptr;
+        idx++;
+    }
+    return list::make(lst->type(), scr.scratch(), scr.growth());
+}
+
+
 object::result array::delete_row_or_column(bool columnist)
 // ----------------------------------------------------------------------------
 //   Shared code to delete rows or columns (ROW-, COL-)
 // ----------------------------------------------------------------------------
+//   Like legacy RPL, this returns the reduced array in level 2 and the
+//   removed row, column or element in level 1.
+//   When removing multiple rows or columns, level 1 contains the removed
+//   sub-matrix (or sub-vector)
 {
     // First argument must give the index position
     size_t row = 0, count = 1;
@@ -2529,7 +2635,8 @@ object::result array::delete_row_or_column(bool columnist)
     object_p outer = rt.stack(1);
 
     // The input always needs to be an array, list or vector
-    list_g ol = outer->as_array_or_list();
+    list_g   ol = outer->as_array_or_list();
+    object_g removed;
     if (!ol)
         goto type_error;
 
@@ -2544,21 +2651,18 @@ object::result array::delete_row_or_column(bool columnist)
         if (!oa->is_matrix_or_vector(&orows, &ocols, false))
             goto dimension_error;
 
-        if (ocols)
-        {
-            if (row > (columnist ? ocols : orows))
-                goto value_error;
-        }
-        else if (row > orows)
-        {
+        size_t max = (ocols && columnist) ? ocols : orows;
+        if (row >= max || count > max - row)
             goto value_error;
-        }
-        else
+
+        if (!ocols)
         {
             // Delete from a vector
+            removed = removed_items(ol, row, count);
             ol = ol->remove(row, count);
-            if (ol && rt.drop() && rt.top(ol))
-                return OK;
+            if (ol && removed && rt.drop() && rt.top(ol))
+                if (rt.push(+removed))
+                    return OK;
             return ERROR;
         }
     }
@@ -2567,28 +2671,46 @@ object::result array::delete_row_or_column(bool columnist)
     if (columnist)
     {
         id       ty = ol->type();
-        scribble scr;
-        for (object_p orow : *ol)
         {
-            list_p orl = orow->as_array_or_list();
-            if (!orl)
-                goto dimension_error;
-            orl = orl->remove(row, count);
-            if (!orl || !rt.append(orl))
-                return ERROR;
+            scribble scr;
+            for (object_p orow : *ol)
+            {
+                list_g orl = orow->as_array_or_list();
+                if (!orl)
+                    goto dimension_error;
+                object_p item = removed_items(orl, row, count);
+                if (!item || !rt.append(item))
+                    return ERROR;
+            }
+            removed = list::make(ty, scr.scratch(), scr.growth());
         }
-        ol = list::make(ty, scr.scratch(), scr.growth());
+        {
+            scribble scr;
+            for (object_p orow : *ol)
+            {
+                list_p orl = orow->as_array_or_list();
+                if (!orl)
+                    goto dimension_error;
+                orl = orl->remove(row, count);
+                if (!orl || !rt.append(orl))
+                    return ERROR;
+            }
+            ol = list::make(ty, scr.scratch(), scr.growth());
+        }
     }
     else
     {
+        removed = removed_items(ol, row, count);
         ol = ol->remove(row, count);
     }
 
     // Put result on stack
-    if (ol && rt.drop() && rt.top(ol))
+    if (ol && removed && rt.drop() && rt.top(ol) && rt.push(+removed))
         return OK;
 
-    // Return whatever error failed above
+    // Return whatever error failed above, e.g. index out of range
+    if (!rt.error())
+        rt.value_error();
     return ERROR;
 dimension_error:
     rt.dimension_error();
@@ -2846,6 +2968,15 @@ static object_p item_from_identity(size_t, size_t,
 // ----------------------------------------------------------------------------
 {
     return integer::make(uint(r == c));
+}
+
+
+array_p array::identity(size_t n)
+// ----------------------------------------------------------------------------
+//   Build an n x n identity matrix
+// ----------------------------------------------------------------------------
+{
+    return build(n, n, item_from_identity);
 }
 
 

@@ -1409,7 +1409,12 @@ static object::result map_reduce_filter(object_p (list::*cmd)(object_p) const)
     {
         object_p result = (li->*cmd)(prg);
         if (!result)
+        {
+            // Reducing an empty list has no result
+            if (!rt.error())
+                rt.dimension_error();
             goto error;
+        }
         if (rt.drop() && rt.top(result))
             return object::OK;
     }
@@ -1473,6 +1478,8 @@ static object::result list_reduce(object::id cmd)
         object_p result = li->reduce(command::static_object(cmd));
         if (result && rt.top(result))
             return object::OK;
+        if (!result && !rt.error())
+            rt.dimension_error();
     }
     else
     {

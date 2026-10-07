@@ -7445,6 +7445,22 @@ void tests::list_functions()
               ID_ListMenu, ID_Extract)
         .error("Invalid dimension");
 
+    step("REDUCE on empty list reports an error")
+        .test(CLEAR, "{ } « + » REDUCE", ENTER)
+        .error("Invalid dimension");
+    step("STREAM on empty list reports an error")
+        .test(CLEAR, "{ } « + » STREAM", ENTER)
+        .error("Invalid dimension");
+    step("Error message for STREAM on empty list is not empty")
+        .test(CLEAR, "« { } « + » IFERR STREAM THEN ERRM END » EVAL", ENTER)
+        .expect("\"Invalid dimension\"");
+    step("ΣLIST on empty list reports an error")
+        .test(CLEAR, "{ } ΣLIST", ENTER)
+        .error("Invalid dimension");
+    step("STREAM on non-empty list")
+        .test(CLEAR, "{ 1 2 3 } « + » STREAM", ENTER)
+        .expect("6");
+
     step("Cleanup")
         .test(CLEAR, "{ M L } Purge", ENTER).noerror();
 }
@@ -7930,6 +7946,12 @@ void tests::vector_functions()
        .test(CLEAR, "[1][0]", ID_divide)
        .error("Divide by zero");
 
+   step("Fröbenius norm of complex vector uses the modulus")
+       .test(CLEAR, "[(3;4) (0;12)] NORM", ENTER)
+       .expect("13.");
+   step("Vector to the power zero is element-wise")
+       .test(CLEAR, "[1 2] 0 ^", ENTER)
+       .expect("[ 1 1 ]");
 }
 
 
@@ -8321,6 +8343,117 @@ void tests::matrix_functions()
     step("Column norm for vector")
         .test(CLEAR, "[[1 2] [3 4]]", ID_MatrixMenu, ID_ColumnNorm)
         .expect("6");
+
+    step("Determinant of 1x1 matrix")
+        .test(CLEAR, "[[5]] DET", ENTER)
+        .expect("5")
+        .test(CLEAR, "[[-5]] DET", ENTER)
+        .expect("-5")
+        .test(CLEAR, "[[2.5]] DET", ENTER)
+        .expect("2.5")
+        .test(CLEAR, "[[0]] DET", ENTER)
+        .expect("0");
+    step("Symbolic determinant has no spurious divisor")
+        .test(CLEAR, "[[A B][C D]] DET", ENTER)
+        .expect("'A·D-B·C'")
+        .test(CLEAR, "[[X 1][1 X]] DET", ENTER)
+        .expect("'X²-1'")
+        .test(CLEAR, "[[A 0][0 B]] DET", ENTER)
+        .expect("'A·B'");
+    step("Symbolic determinant evaluated where the pivot is zero")
+        .test(CLEAR, "'DetTest' CRDIR DetTest "
+              "0 'X' STO [[X 1][1 X]] DET EVAL", ENTER)
+        .expect("-1");
+    step("Symbolic 3x3 determinant matches numerical determinant")
+        .test(CLEAR,
+              "1 'M11' STO 2 'M12' STO 3 'M13' STO "
+              "4 'M21' STO 5 'M22' STO 7 'M23' STO "
+              "2 'M31' STO 8 'M32' STO 9 'M33' STO "
+              "[[M11 M12 M13][M21 M22 M23][M31 M32 M33]] DET", ENTER)
+        .expect("'M11·(M22·M33-M23·M32)-M12·(M21·M33-M23·M31)"
+                "+M13·(M21·M32-M22·M31)'")
+        .test(ID_Run)
+        .expect("11")
+        .test(CLEAR, "[[1 2 3][4 5 7][2 8 9]] DET", ENTER)
+        .expect("11");
+    step("Cleanup determinant test directory")
+        .test(CLEAR, "UPDIR 'DetTest' PGDIR", ENTER).noerror();
+
+    step("Inverse of fraction matrix has normalized integers")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV", ENTER)
+        .want("[[ 12 -20 ] [ -15 30 ]]")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV [[12 -20][-15 30]] ==", ENTER)
+        .expect("True")
+        .test(CLEAR, "[[1/2 1/3][1/4 1/5]] INV { 2 1 } GET -15 ==", ENTER)
+        .expect("True");
+    step("Fraction result with unit denominator is an integer")
+        .test(CLEAR, "-1/4 1/60 / -15 ==", ENTER)
+        .expect("True")
+        .test(CLEAR, "-1/4 1/60 / TYPENAME", ENTER)
+        .expect("\"neg_integer\"");
+    step("LU factors multiply back to the same object")
+        .test(CLEAR, "[[1 2][3 4]] LU ROT ROT * SWAP [[1 2][3 4]] * SAME",
+              ENTER)
+        .expect("True");
+
+    step("Matrix to the power zero is the identity")
+        .test(CLEAR, "[[1 2][3 4]] 0 ^", ENTER)
+        .want("[[ 1 0 ] [ 0 1 ]]")
+        .test(CLEAR, "[[1 2 3][4 5 6]] 0 ^", ENTER)
+        .error("Invalid dimension");
+    step("Matrix integer powers")
+        .test(CLEAR, "[[1 2][3 4]] 2 ^", ENTER)
+        .want("[[ 7 10 ] [ 15 22 ]]")
+        .test(CLEAR, "[[1 2][3 4]] -1 ^ [[1 2][3 4]] INV ==", ENTER)
+        .expect("True");
+
+    step("ROW- returns the removed row")
+        .test(CLEAR, "[[1 2][3 4]] 1 ROW-", ENTER)
+        .got("[ 1 2 ]", "[[ 3 4 ]]")
+        .test(CLEAR, "[[1 2][3 4]] 1 ROW- DROP", ENTER)
+        .expect("[[ 3 4 ]]");
+    step("ROW- of multiple rows returns the removed rows")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [2 2] ROW-", ENTER)
+        .want("[[ 3 4 ] [ 5 6 ]]")
+        .test(CLEAR, "[[1 2][3 4][5 6]] [2 2] ROW- DROP", ENTER)
+        .want("[[ 1 2 ]]");
+    step("ROW- in vector returns the removed element")
+        .test(CLEAR, "[1 2 3] 2 ROW-", ENTER)
+        .got("2", "[ 1 3 ]");
+    step("ROW- with index out of range")
+        .test(CLEAR, "[[1 2][3 4]] 3 ROW-", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] 0 ROW-", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] [2 2] ROW-", ENTER)
+        .error("Bad argument value");
+    step("COL- returns the removed column")
+        .test(CLEAR, "[[1 2][3 4]] 2 COL-", ENTER)
+        .want("[ 2 4 ]")
+        .test(CLEAR, "[[1 2][3 4]] 2 COL- DROP", ENTER)
+        .want("[[ 1 ] [ 3 ]]");
+    step("COL- of multiple columns returns the removed columns")
+        .test(CLEAR, "[[1 2 3][4 5 6]] [2 2] COL-", ENTER)
+        .want("[[ 2 3 ] [ 5 6 ]]")
+        .test(CLEAR, "[[1 2 3][4 5 6]] [2 2] COL- DROP", ENTER)
+        .want("[[ 1 ] [ 4 ]]");
+    step("COL- with index out of range")
+        .test(CLEAR, "[[1 2][3 4]] 3 COL-", ENTER)
+        .error("Bad argument value");
+    step("ROW+ inserting a vector in a matrix")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 1 ROW+", ENTER)
+        .want("[[ 5 6 ] [ 1 2 ] [ 3 4 ]]");
+    step("ROW+ appending a vector after the last row")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 3 ROW+", ENTER)
+        .want("[[ 1 2 ] [ 3 4 ] [ 5 6 ]]");
+    step("ROW+ errors")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 4 ROW+", ENTER)
+        .error("Bad argument value")
+        .test(CLEAR, "[[1 2][3 4]] [5 6 7] 1 ROW+", ENTER)
+        .error("Invalid dimension");
+    step("COL+ appending a column after the last column")
+        .test(CLEAR, "[[1 2][3 4]] [5 6] 3 COL+", ENTER)
+        .want("[[ 1 2 5 ] [ 3 4 6 ]]");
 }
 
 
