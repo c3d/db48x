@@ -745,6 +745,31 @@ large decimal::as_integer() const
 }
 
 
+bool decimal::is_integral() const
+// ----------------------------------------------------------------------------
+//   Check if a decimal value has no fractional part
+// ----------------------------------------------------------------------------
+{
+    info   s       = shape();
+    large  exp     = s.exponent;
+    size_t nkigits = s.nkigits;
+    byte_p bp      = s.base;
+    for (size_t m = 0; m < nkigits; m++)
+    {
+        kint d = kigit(bp, m);
+        if (!d)
+            continue;
+        // Power of ten of the lowest digit of this kigit
+        large low = exp - 3 * large(m + 1);
+        if (low >= 0)
+            continue;
+        if (low < -2 || d % (low == -1 ? 10 : 100))
+            return false;
+    }
+    return true;
+}
+
+
 int32_t decimal::as_int32() const
 // ----------------------------------------------------------------------------
 //   Convert a decimal value to an int32_t

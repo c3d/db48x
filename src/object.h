@@ -448,8 +448,8 @@ struct object
         return is_monochrome() ? grob_p(this) : nullptr;
     }
 
-    uint32_t as_uint32(uint32_t def, bool err) const;
-    int32_t  as_int32 (int32_t  def, bool err)  const;
+    uint32_t as_uint32(uint32_t def, bool err, bool integral = false) const;
+    int32_t  as_int32 (int32_t  def, bool err, bool integral = false) const;
     uint64_t as_uint64(uint64_t def, bool err) const;
     int64_t  as_int64 (int64_t  def, bool err)  const;
     // ------------------------------------------------------------------------

@@ -8520,6 +8520,9 @@ void tests::solver_testing()
         .test(CLEAR, ("'log10(P)=6.90565-1211.033/(98+220.73)' "
                             "'P' 1000 ROOT"), ENTER)
         .expect("P=1 276.71035 463");
+    step("Solver error evaluating intermediate step")
+        .test(CLEAR, "'IFTE(X>1;1/(X-X);X-3)' 'X' 0 ROOT", ENTER)
+        .error("Divide by zero");
 
     step("Select algebraically-assisted solver")
         .test(CLEAR, "SymbolicSolver", ENTER).noerror();
@@ -15238,6 +15241,91 @@ void tests::regression_checks()
         .test("ABC", ENTER).expect("'T'");
     step("Cleaning up #1670")
         .test(CLEAR, "{ CST ABC } PURGE", ENTER).noerror();
+
+    step("Enter directory for crash guard tests")
+        .test(CLEAR, "'CrashGuards' CRDIR CrashGuards", ENTER).noerror();
+    step("Nested PUT into a non-list item")
+        .test(CLEAR, "{1 2 3} { 1 1 } 9 PUT", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list list item")
+        .test(CLEAR, "{1 2 3} 'L' STO 9 'L(1;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list vector item")
+        .test(CLEAR, "[1 2 3] 'L' STO 9 'L(1;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested indexed store into a non-list item of a nested list")
+        .test(CLEAR, "{ {1 2} 3 } 'L' STO 9 'L(2;1)' STO", ENTER)
+        .error("Bad argument type");
+    step("Nested GET from a non-list item")
+        .test(CLEAR, "{1 2 3} { 1 1 } GET", ENTER)
+        .error("Bad argument type");
+    step("Nested PUT into a list item still works")
+        .test(CLEAR, "{ {1 2} 3 } { 1 2 } 9 PUT", ENTER)
+        .want("{ { 1 9 } 3 }");
+
+    step("→List with a count too large for 32 bits")
+        .test(CLEAR, "1 2 3 1E30 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with the largest 32-bit count")
+        .test(CLEAR, "1 2 3 4294967295 →LIST", ENTER)
+        .error("Too few arguments");
+    step("→List with a count that would truncate to 3")
+        .test(CLEAR, "1 2 3 4294967299 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with a count that would truncate to 0")
+        .test(CLEAR, "1 2 3 4294967296 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with a non-integer count")
+        .test(CLEAR, "1 2 3 2.5 →LIST", ENTER)
+        .error("Bad argument value");
+    step("→List with an integral decimal count")
+        .test(CLEAR, "1 2 3 2. →LIST", ENTER)
+        .expect("{ 2 3 }");
+    step("→List with a negative count")
+        .test(CLEAR, "1 2 3 -1 →LIST", ENTER)
+        .error("Bad argument value");
+    step("GET with an index that would truncate to 2")
+        .test(CLEAR, "{1 2 3} 4294967298 GET", ENTER)
+        .error("Bad argument value");
+    step("SUB with indices that would truncate to 2 and 3")
+        .test(CLEAR, "{1 2 3 4 5} 4294967298 4294967299 SUB", ENTER)
+        .error("Bad argument value");
+    step("DUPN with the largest 32-bit count")
+        .test(CLEAR, "1 4294967295 DUPN", ENTER)
+        .error("Too few arguments");
+    step("DROPN with the largest 32-bit count")
+        .test(CLEAR, "1 2 4294967295 DROPN", ENTER)
+        .error("Too few arguments");
+
+    step("Infinitely recursive user-defined function call")
+        .test(CLEAR, "'F(X)' 'F' STO 'F(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Infinitely recursive function call through a name")
+        .test(CLEAR, "'Q(X)' 'Q' STO 'Q' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Function call evaluating to itself")
+        .test(CLEAR, "'Q(2)' 'Q' STO 'Q(2)' EVAL", LENGTHY(30000), ENTER)
+        .error("Out of memory");
+    step("Mutually recursive function calls")
+        .test(CLEAR, "'R(Y)' 'Q' STO 'Q(Y)' 'R' STO 'Q(2)' EVAL",
+              LENGTHY(30000), ENTER)
+        .error("Out of memory");
+
+    step("Name whose value is itself")
+        .test(CLEAR, "'A' 'A' STO A", ENTER)
+        .error("Too many recursive calls");
+    step("Cycle of names")
+        .test(CLEAR, "'A' 'B' STO 'B' 'A' STO A", ENTER)
+        .error("Too many recursive calls");
+    step("Evaluating a name whose value is itself")
+        .test(CLEAR, "'Q' 'Q' STO 'Q' EVAL", ENTER)
+        .error("Too many recursive calls");
+    step("Chain of names without a cycle")
+        .test(CLEAR, "'B' 'A' STO 3 'B' STO A", ENTER)
+        .expect("3");
+
+    step("Exit crash guard tests directory")
+        .test(CLEAR, "UPDIR 'CrashGuards' PGDIR", ENTER).noerror();
 }
 
 

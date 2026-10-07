@@ -274,6 +274,12 @@ bool program::interrupted()
         int key = key_pop();
         record(tests_rpl,
                "Program runner popped key %d, last=%d", key, last_key);
+        if (key == tests::EXIT_PGM)
+        {
+            // Leave the simulator exit request for the main loop to process
+            key_push(key);
+            return true;
+        }
         process_test_key(key);
 #else
         key_pop();

@@ -1096,6 +1096,12 @@ COMMAND_BODY(ToList)
     uint32_t depth = uint32_arg();
     if (!rt.error())
     {
+        // Check before adding 1, which overflows for 0xFFFFFFFF
+        if (depth >= rt.depth())
+        {
+            rt.missing_argument_error();
+            return ERROR;
+        }
         if (!rt.args(depth + 1))
             return ERROR;
 
