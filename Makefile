@@ -617,9 +617,9 @@ QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
 		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
 		export JAVA_HOME=$(ANDROID_JAVA_HOME);
-# make-it-quick defaults OUTPUT to the workspace root; keep Android bundles
-# under android/ unless the caller overrides ANDROID_OUTPUT_DIR explicitly.
-ANDROID_OUTPUT_DIR ?= android
+# Each build (db48x, db50x) gets its own output directory so the Gradle
+# project, libs/, and res/ don't cross-contaminate each other.
+ANDROID_OUTPUT_DIR ?= android/$(NAME)
 AAB_FILE=$(ANDROID_OUTPUT_DIR:%=%/)$(NAME).aab
 
 android-$(TARGET): $(AAB_FILE)
@@ -651,7 +651,7 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 			BUILT_AAB="$$(find "$$OUTDIR" -type f -name '*.aab' | sort | tail -1)"; \
 			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB" || :; \
 		fi &&						\
-		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/android-debug.apk' | head -1)"; \
+		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/*-debug.apk' | head -1)"; \
 		{ [ -n "$$BUILT_APK" ] && cp "$$BUILT_APK" "$(abspath $(ANDROID_OUTPUT_DIR)/$(NAME)-debug.apk)" || :; }; \
 		test -f "$$AAB"
 	$(if $(ANDROID_CAN_SIGN),,$(PRINT_COMMAND) $(INFO) "[WARNING]" "Android AAB is UNSIGNED (need $(ANDROID_KEYSTORE) and ANDROID_KEYSTORE_PASS). Not for Play Store.")
@@ -665,8 +665,8 @@ endif
 
 ANDROID_SDK_ROOT_INSTALL ?= /opt/homebrew/share/android-commandlinetools
 ADB ?= $(ANDROID_SDK_ROOT_INSTALL)/platform-tools/adb
-ANDROID_APK_DB48X ?= android/db48x-debug.apk
-ANDROID_APK_DB50X ?= android/db50x-debug.apk
+ANDROID_APK_DB48X ?= android/db48x/build/outputs/apk/debug/db48x-debug.apk
+ANDROID_APK_DB50X ?= android/db50x/build/outputs/apk/debug/db50x-debug.apk
 
 define android_install
 	@if [ -n "$(ANDROID_SERIAL)" ]; then					\

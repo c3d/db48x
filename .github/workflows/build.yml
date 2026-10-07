@@ -740,7 +740,7 @@ jobs:
         find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Verify generated AAB
-      run: test -f android/db48x.aab
+      run: test -f android/db48x/db48x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7
@@ -812,7 +812,7 @@ jobs:
         find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Verify generated AAB
-      run: test -f android/db50x.aab
+      run: test -f android/db50x/db50x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7
