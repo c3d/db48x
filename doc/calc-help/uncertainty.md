@@ -2289,6 +2289,7 @@ of these exercises, as a model for your own.
 
 * Calorimetry: identify a metal by its specific heat.
 * WeakAcid: the pH of a weak acid, and when the school formula fails.
+* BeamYoung: the Young's modulus of a bar, from its deflection.
 
 
 ## Calorimetry
@@ -2474,3 +2475,88 @@ The equation of this exercise, in `config/equations.csv`:
 ```
 
 See also: [Calorimetry](#calorimetry), [σROOT](#σroot), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).
+
+
+## BeamYoung
+
+A classic of the laboratories of strength of materials: the Young's modulus E
+of a flat bar, from its deflection. The bar rests on two supports L apart, and
+carries a mass m at mid-span; a dial gauge reads the deflection δ at the
+centre. Two equations, BeamYoung in the section Labs of `config/equations.csv`:
+δ = m·g·L³/(48·E·I), with I = b·h³/12 the second moment of area of a
+rectangular section of width b and thickness h. The acceleration of gravity
+g comes from the constants library.
+
+The measurements, on a bar of an unknown light metal: L = 500 mm with a tape,
+±0.5 mm, a bound; b = 25.00 mm and h = 3.00 mm with a caliper, u = 0.02 mm;
+m = 0.500 kg, u = 0.001 kg; δ = 3.29 mm with a dial gauge, u = 0.01 mm.
+
+The key BeamYoung runs the whole exercise: it stores the measurements, finds
+E±σ by σROOT and the range of E by ΔROOT, and compares that range with the
+usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses 97…125 GPa,
+carbon steels 190…215 GPa. A material is compatible when the two ranges meet.
+With five inputs, ΔROOT runs ROOT 3⁵ = 243 times: about 5 seconds on the
+simulator, much longer on a calculator.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁBeamYoung
+@ Expecting material:"aluminium"
+```
+
+**2)** Step by step: E and its standard uncertainty, by σROOT.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ1.40878 87031 5 GPa I:56.25±σ1.12589 96419 5 mm↑4 }
+```
+
+**3)** The range of E, by ΔROOT:
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT
+@ Expecting { E:65.79463 64935…72.38884 63822 GPa I:54.24858 28957…58.30181 73443 mm↑4 }
+```
+
+**4)** The range of E against that of the aluminium alloys, by ΔConcord, which
+draws both: the range of the handbook lies within that of the measurement.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT 1 Get DeleteTag
+'68…72_GPa' →Num ⓁΔConcord
+```
+
+**5)** The thickness measured with a micrometer, u = 0.002 mm, instead of a
+caliper: the uncertainty of E falls from 1.41 GPa to about 0.32 GPa.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.002_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ0.31527 69128 72 GPa I:56.25±σ0.12116 62081 62 mm↑4 }
+```
+
+Three lessons. The thickness is cubed: its relative uncertainty of 0.7 %
+weighs 2.0 % on E, against 0.4 % for all the other inputs together. Measuring
+it with a micrometer rather than a caliper divides the uncertainty of E by
+four; measuring L, m or δ better would change almost nothing. Then, the bar is
+of an aluminium alloy, and clearly neither brass nor steel; but the alloys of
+aluminium all have nearly the same modulus, and this experiment cannot tell
+them apart. Last, E is found here from an equation that could be solved by
+hand, E = m·g·L³/(4·δ·b·h³): σROOT gives the same result as that formula would
+through σRFxjxi, 69.00 ± 1.41 GPa, a relative uncertainty of 2.04 %.
+
+The equations of this exercise, in `config/equations.csv`:
+
+```
+"BeamYoung",  "{ '(δ_mm)=(m_kg)*Ⓒg*(L_mm)^3/(48*(E_GPa)*(I_mm^4))' '(I_mm^4)=(b_mm)*(h_mm)^3/12' }"
+```
+
+See also: [Calorimetry](#calorimetry), [WeakAcid](#weakacid), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).

@@ -582,6 +582,7 @@
 
 	"Calorimetry",	"=/library/Uncertainty/Calorimetry.48s"
 	"WeakAcid",	"=/library/Uncertainty/WeakAcid.48s"
+	"BeamYoung",	"=/library/Uncertainty/BeamYoung.48s"
 
 "Graphics"
 	"CurvePlottingExamples", "="
