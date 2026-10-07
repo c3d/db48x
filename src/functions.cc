@@ -581,10 +581,14 @@ FUNCTION_BODY(abs)
     case ID_range:
     case ID_drange:
     case ID_prange:
-    case ID_uncertain:
     {
         range_g r = range_p(+x);
         return range::abs(r);
+    }
+    case ID_uncertain:
+    {
+        uncertain_g u = uncertain_p(+x);
+        return uncertain::abs(u);
     }
 
     case ID_unit:
