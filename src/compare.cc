@@ -356,10 +356,22 @@ object::result comparison::is_same(bool names)
             y = ys->recall();
             yt = y->type();
         }
-        else if (local_p yl = x->as_quoted<local>())
+        else if (local_p yl = y->as_quoted<local>())
         {
             y = yl->recall();
             yt = y->type();
+        }
+
+        // Like other comparisons, '==' remains symbolic if an argument is
+        if (x->is_extended_algebraic() && y->is_extended_algebraic() &&
+            (is_symbolic(xt) || is_symbolic(yt)))
+        {
+            algebraic_g ya = algebraic_p(rt.stack(1));
+            algebraic_g xa = algebraic_p(rt.stack(0));
+            algebraic_g ra = expression::make(ID_TestSame, ya, xa);
+            if (ra && rt.drop(2) && rt.push(+ra))
+                return OK;
+            return ERROR;
         }
     }
 

@@ -1261,6 +1261,34 @@ void tests::editor_operations()
         .test(CLEAR, "'A²(A-B)'", ENTER).expect("'A²·(A-B)'")
         .test(CLEAR, "'(A+B)ln(C)(A-B)'", ENTER).expect("'(A+B)·(ln C·(A-B))'")
         .test(CLEAR, "'(A)(B)(C)'", ENTER).expect("'A·(B·C)'");
+    step("Implicit multiplication still accepted")
+        .test(CLEAR, "'2(X+1)'", ENTER).expect("'2·(X+1)'")
+        .test(CLEAR, "'(X+1)(X-1)'", ENTER).expect("'(X+1)·(X-1)'")
+        .test(CLEAR, "'2π'", ENTER).expect("'2·π'")
+        .test(CLEAR, "'A B'", ENTER).expect("'A·B'")
+        .test(CLEAR, "'2SIN(X)'", ENTER).expect("'2·sin X'")
+        .test(CLEAR, "'3E2X'", ENTER).expect("'300.·X'")
+        .test(CLEAR, "'X2'", ENTER).expect("'X2'")
+        .test(CLEAR, "'X(1)'", ENTER).expect("'X(1)'");
+    step("Number following an operand is a syntax error")
+        .test(CLEAR, "'2 3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X 2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'(X+1)2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'SIN(X)2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X²2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'2!3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'X(1)2'", ENTER).error("Syntax error");
+    step("Numbers with two decimal dots are a syntax error")
+        .test(CLEAR, "'1.5.2'", ENTER).error("Syntax error")
+        .test(CLEAR, "'2..3'", ENTER).error("Syntax error")
+        .test(CLEAR, "'1.5.2+X'", ENTER).error("Syntax error")
+        .test(CLEAR, "1.5.2", ENTER).error("Syntax error");
+    step("Comma as separator in builtin function calls")
+        .test(CLEAR, "'MAX(1,2)'", ENTER).expect("'Max(1;2)'")
+        .test(RUNSTOP).expect("2")
+        .test(CLEAR, "'COMB(5,2)' EVAL", ENTER).expect("10")
+        .test(CLEAR, "'PERM(5,2)' EVAL", ENTER).expect("20")
+        .test(CLEAR, "'∫(0,1,X^2,X)' EVAL", ENTER).expect("¹/₃");
 
     step("Graphical rendering of integrals - Simple expression")
         .test(CLEAR, "'integrate(A;B;sin(X);X)'", ENTER, EXIT)
@@ -3025,6 +3053,17 @@ void tests::logical_operations()
     step("Convert True and False to decimal")
         .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
         .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
+
+    step("Symbolic == remains symbolic")
+        .test(CLEAR, "'X==Y' EVAL", ENTER).expect("'X==Y'")
+        .test(CLEAR, "'X+1==1+X' EVAL", ENTER).expect("'X+1==1+X'")
+        .test(CLEAR, "'X' 'Y' ==", ENTER).expect("'X==Y'")
+        .test(CLEAR, "'1==1' EVAL", ENTER).expect("True")
+        .test(CLEAR, "'1==2' EVAL", ENTER).expect("False")
+        .test(CLEAR, "\"AB\" \"AB\" ==", ENTER).expect("True")
+        .test(CLEAR, "{ 1 2 } { 1 3 } ==", ENTER).expect("False")
+        .test(CLEAR, "3 'X' STO 'X==3' EVAL", ENTER).expect("True")
+        .test(CLEAR, "'X' PURGE", ENTER).noerror();
 }
 
 
@@ -13648,6 +13687,22 @@ void tests::sum_and_product()
         .expect("'Σ(x;0;5;2↑x÷(2·x!))'")
         .test(RUNSTOP)
         .expect("3 ¹⁹/₃₀");
+
+    step("Legacy sum and product syntax with name=start")
+        .test(CLEAR, "'Σ(I=1,10,I)'", ENTER)
+        .expect("'Σ(I;1;10;I)'")
+        .test(RUNSTOP)
+        .expect("55")
+        .test(CLEAR, "'Σ(I=1;10;I)' EVAL", ENTER)
+        .expect("55")
+        .test(CLEAR, "'∏(I=1,5,I)'", ENTER)
+        .expect("'∏(I;1;5;I)'")
+        .test(RUNSTOP)
+        .expect("120")
+        .test(CLEAR, "'Σ(I;1;10;I)' EVAL", ENTER)
+        .expect("55")
+        .test(CLEAR, "'Σ(I+1=1,10,I)'", ENTER)
+        .error("Expected variable name");
 }
 
 

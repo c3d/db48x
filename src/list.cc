@@ -112,9 +112,12 @@ object::result list::list_parse(id      type,
     while (utf8_more(p.source, s, max))
     {
         cp = utf8_codepoint(s);
-        if (cp == close)
+        if (cp == close ||
+            (close == ';' && cp == ',' && !Settings.DecimalComma()))
         {
+            // Accept `,` as an argument separator, e.g. 'MAX(1,2)'
             s = +p.source + utf8_next(+p.source, s - +p.source, max);
+            cp = close;
             break;
         }
         bool separator = cp == ';' || (cp == ',' && !Settings.DecimalComma());
@@ -225,7 +228,24 @@ object::result list::list_parse(id      type,
                         id pty = prefix->type();
                         if (pty == ID_Sum || pty == ID_Product)
                         {
-                            if (obj->as_quoted<symbol>() == nullptr)
+                            // Accept legacy 'Σ(I=1,10,I)' as 'Σ(I;1;10;I)'
+                            expression_g left, right;
+                            expression_g eq = obj->as<expression>();
+                            if (eq && arity > 2 &&
+                                eq->split_equation(left, right) &&
+                                left->as_quoted<symbol>())
+                            {
+                                object_p lobj = +left;
+                                size_t   lsz  = left->size();
+                                if (!is_symbolic_argument(special, arg))
+                                    lobj = left->objects(&lsz);
+                                if (!rt.append(lobj, lsz))
+                                    return ERROR;
+                                objcount++;
+                                arg++;
+                                obj = +right;
+                            }
+                            else if (obj->as_quoted<symbol>() == nullptr)
                             {
                                 rt.missing_variable_error()
                                     .source(+s+1, child.length-2);
@@ -317,6 +337,15 @@ object::result list::list_parse(id      type,
             record(list_parse,
                    "Item parsed as %t length %u arity %u",
                    object_p(obj), length, arity);
+
+            // An operand directly following an operand, e.g. '2 3' or
+            // '(X+1)2', is a syntax error. Names and parentheses following
+            // an operand were already turned into implicit multiplication
+            if (obj && precedence < 0 && !alist && !obj->precedence())
+            {
+                rt.syntax_error().source(s, length);
+                return ERROR;
+            }
         }
         if (!obj)
             return ERROR;
