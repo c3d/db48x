@@ -5,9 +5,11 @@
 @@ The inputs are the variables of the equations that hold bounds, a…b,
 @@ a±b or a±p%, or a value a±σb, taken as the bounds a±√3·b of the
 @@ rectangular law of the same standard deviation, the inverse of Bound→σ.
-@@ ROOT is run on a grid over the box of the inputs: each input at its low
-@@ bound, its centre and its high bound, 3^n runs for n inputs; beyond five
-@@ inputs, at its bounds only, 2^n runs. The smallest and largest values
+@@ ROOT is run on a grid over the box of the inputs: up to three inputs,
+@@ each at its low bound, its centre and its high bound, 3^n runs; beyond,
+@@ at the corners of the box and at its centre, 2^n + 1 runs, unless the
+@@ global variable ΔROOTFullGrid holds a number other than 0, which asks for
+@@ the full grid of 3^n runs whatever n: slower, but searching inside. The smallest and largest values
 @@ of each unknown are kept. If each unknown varies in one direction with
 @@ each input, they lie at corners and the range is exact; if one of them
 @@ is only reached inside the box, the tag says "(inner extremum?)": the
@@ -76,28 +78,39 @@
       → drtin
       «
         drtin Size
-        If Dup 5 > Then 2 Else 3 End
+        @ The full grid up to three inputs, or when ΔROOTFullGrid asks for it
+        IfErr 'ΔROOTFullGrid' Rcl Then Drop 0 End 0 ≠
+        Over 3 ≤ Or
+        If Then 3 Else 2 End
         → drtn drtlev
         «
           drtlev drtn ^ R→I { } { } { } { }
           → drtcount drtmin drtmax drtfmin drtfmax
           «
-            @ Every combination of the levels of the inputs, counted in base drtlev
-            0 drtcount 1 - For drtc
+            @ Every combination of the levels of the inputs, counted in base
+            @ drtlev; with two levels, one run more, at the centre of the box
+            0 drtcount If drtlev 2 == Then 0 Else 1 End - For drtc
               drtc 1
               → drtm drtcorner
               «
-                1 drtn For drti
-                  drtm drtlev MOD
-                  drtm drtlev / IP R→I 'drtm' Sto
-                  → drtd
-                  «
-                    If drtlev 3 == drtd 1 == And Then 0 'drtcorner' Sto End
-                    drtin drti Get
-                    If drtlev 3 == Then drtd 2 + Else drtd 2 * 2 + End Get
-                    drtin drti Get 1 Get Sto
-                  »
-                Next
+                If drtc drtcount == Then
+                  0 'drtcorner' Sto
+                  1 drtn For drti
+                    drtin drti Get 3 Get drtin drti Get 1 Get Sto
+                  Next
+                Else
+                  1 drtn For drti
+                    drtm drtlev MOD
+                    drtm drtlev / IP R→I 'drtm' Sto
+                    → drtd
+                    «
+                      If drtlev 3 == drtd 1 == And Then 0 'drtcorner' Sto End
+                      drtin drti Get
+                      If drtlev 3 == Then drtd 2 + Else drtd 2 * 2 + End Get
+                      drtin drti Get 1 Get Sto
+                    »
+                  Next
+                End
                 1 drtnames 1 Get Size 1 Get For drtj IfErr drtnames 1 Get drtj Get Purge Then End Next
                 drtq 1 Get Eval Drop
                 1 drtnames 1 Get Size 1 Get For drtj drtnames 1 Get drtj Get Rcl Next

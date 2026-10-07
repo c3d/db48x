@@ -926,9 +926,13 @@ value a±σb is taken as the bounds a±√3·b of the rectangular law of the sam
 standard deviation, the inverse of what Bound→σ does. Only the variables of
 the equations are inputs; units are welcome.
 
-ΔROOT runs ROOT on a grid over the box of the inputs: each input at its low
-bound, its centre and its high bound, 3ⁿ runs for n inputs; beyond five
-inputs, at its bounds only, 2ⁿ runs. It keeps the smallest and the largest
+ΔROOT runs ROOT on a grid over the box of the inputs: up to three inputs,
+each at its low bound, its centre and its high bound, 3ⁿ runs; beyond, at the
+corners of the box and at its centre, 2ⁿ + 1 runs, which keeps the time
+reasonable on a calculator. To search inside the box with the full grid of
+3ⁿ runs whatever the number of inputs, store a number other than 0 in the
+global variable ΔROOTFullGrid, for instance 1 'ΔROOTFullGrid' Sto; purge it
+to come back to the corners. With five inputs, that is 243 runs instead of 33. It keeps the smallest and the largest
 value of each unknown. When each unknown varies in one direction with each
 input, its extremes lie at corners of the box, and the range is exact. When
 an extreme is only reached inside the box, the tag of that unknown says
@@ -2495,8 +2499,9 @@ The key BeamYoung runs the whole exercise: it stores the measurements, finds
 E±σ by σROOT and the range of E by ΔROOT, and compares that range with the
 usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses 97…125 GPa,
 carbon steels 190…215 GPa. A material is compatible when the two ranges meet.
-With five inputs, ΔROOT runs ROOT 3⁵ = 243 times: about 5 seconds on the
-simulator, much longer on a calculator.
+With five inputs, ΔROOT runs ROOT at the 2⁵ = 32 corners of the box and at
+its centre, 33 times: about a second on the simulator, about twenty seconds
+on a phone, a few minutes on a calculator.
 
 **1)** The whole exercise:
 
