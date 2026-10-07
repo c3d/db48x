@@ -4,7 +4,7 @@
     <!-- %%INSERT_FEATURES -->
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
     <application android:name="org.qtproject.qt.android.bindings.QtApplication" android:hardwareAccelerated="true" android:label="DB48x" android:requestLegacyExternalStorage="true" android:allowBackup="true" android:fullBackupOnly="false" android:icon="@drawable/icon">
-        <activity android:name="org.qtproject.qt.android.bindings.QtActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:launchMode="singleTop" android:screenOrientation="portrait" android:exported="true" android:label="" android:theme="@style/AppTheme" android:windowLayoutInDisplayCutoutMode="never">
+        <activity android:name="org.db48x.DB48xActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:launchMode="singleTop" android:screenOrientation="portrait" android:exported="true" android:label="" android:theme="@style/AppTheme" android:windowLayoutInDisplayCutoutMode="never">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
