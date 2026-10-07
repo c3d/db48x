@@ -95,8 +95,11 @@
     vl Size
     → mcr nvi
     «
-      @ The absolute value of a matrix is its norm, never 0 for ρij
-      If mcr Abs 0 ≠ nvi 1 > And Then
+      @ A matrix always counts; a number only when it is not 0 (the
+      @ absolute value of a matrix is not a number on every version)
+      mcr TypeName "array" ==
+      If Dup Not Then Drop mcr 0 ≠ End
+      If nvi 1 > And Then
         @ The full matrix, from one coefficient if needed
         If mcr TypeName "array" == Then
           If mcr Size 1 Get nvi ≠ Then

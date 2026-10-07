@@ -93,17 +93,27 @@
                 dmpx1 3 RND →Text " s" + { #340d #222d 0 true false } DrawText
                 @ Treal by the linear propagation of σRFxjxi: θmax as the
                 @ centre of its range ±σ its width/√12. The inputs are
-                @ independent: a variable ρij left by another calculation
-                @ is set aside, then put back.
-                IfErr 'ρij' Rcl 1 Then Drop 0 0 End
-                → dmprho dmphad
+                @ independent: a ρij = 0 in the current directory hides any
+                @ ρij left by another calculation, here or in a parent
+                @ directory; it is then purged, and a ρij that was in the
+                @ current directory is put back.
+                IfErr 'ρij' Rcl Then Drop 0 End
+                0 Vars
+                → dmprho dmphere dmpvars
                 «
-                  IfErr { ρij } Purge Then End
+                  @ Whether ρij is a variable of the current directory
+                  If dmpvars Size 0 > Then
+                    1 dmpvars Size For dmpv
+                      If dmpvars dmpv Get →Text "ρij" == Then 1 'dmphere' Sto End
+                    Next
+                  End
+                  0 'ρij' Sto
                   '2*π*√(x2/9.80665)*(1+0.25*sin(x1/2)^2+0.140625*sin(x1/2)^4+0.09765625*sin(x1/2)^6+0.07476806640625*sin(x1/2)^8+0.0605621337890625*sin(x1/2)^10)'
                   0.15±σ0.001
                   dmpt0 dmpt1 + 2 / →Num →Text "±σ" + dmpt1 dmpt0 - 12 √ / →Num →Text + "_°" + Str→
                   ⓁσRFxjxi →Num
-                  If dmphad Then dmprho 'ρij' Sto End
+                  { ρij } Purge
+                  If dmphere Then dmprho 'ρij' Sto End
                 »
                 → dmplin
                 «

@@ -2246,8 +2246,9 @@ The histogram of Treal is drawn in black, and that of T over it in gray, on
 the same axis, whose ends are written below in seconds. Above are the mean and
 standard deviation of each, and Treal by the propagation formula of
 σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The inputs are
-independent: a variable ρij left by another calculation is set aside for
-σRFxjxi, then put back. The three results are returned, tagged.
+independent: a variable ρij left by another calculation, in this directory or
+above it, is set aside for σRFxjxi, then put back. The three results are
+returned, tagged.
 
 About 2 seconds on the simulator. On a calculator, where the normal draws of L
 are slow, the draws stop after about 30 seconds, with 30 of them at least, and
