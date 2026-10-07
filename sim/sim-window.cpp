@@ -493,12 +493,15 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
         show();
         raise();
         activateWindow();
-        // Mark every pixel as dirty so the RPL thread redraws everything.
-        // Then push a synthetic key-release (key=0) to wake the RPL thread;
-        // it will call redraw_lcd() → ui_refresh() → update_pixmap() on its
-        // own thread (safe), which then posts refresh_lcd() to the UI thread.
-        // We must NOT call update_pixmap() here because it races with the RPL
-        // thread and corrupts lcd_copy, causing missed updates after keystrokes.
+        // After surface recreation Android invalidates the GL context, so the
+        // GPU texture backing mainPixmap is gone.  Call refresh_lcd() on the
+        // UI thread now so Qt marks the scene item dirty and re-uploads the
+        // pixmap when it draws frame 1 (before the RPL thread gets a chance).
+        // Without this the first frame after foregrounding is always black.
+        SimScreen::refresh_lcd();
+        // Also mark every pixel dirty and wake the RPL thread for a full
+        // repaint into mainPixmap; that produces frame 2 with current state.
+        // DO NOT call update_pixmap() here — it races with the RPL thread.
         SimScreen::invalidate();
         key_push(0);
         recorder_dump_for("sim_window");
@@ -970,16 +973,21 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                             int keynum = ptr->keynum;
                             key_push(keynum);
 #ifdef ANDROID
-                            // If the shared code does not start TIMER0 (e.g.
-                            // when help is showing), fire a synthetic repeat so
-                            // long-press help still works.
+                            // When shared code doesn't start TIMER0 (e.g.
+                            // help is showing), synthesise a long-press after
+                            // 500 ms so holding a key still navigates help.
+                            // android_next_key_repeating is consumed inside
+                            // key_pop() (RPL thread) which arms TIMER0 there,
+                            // avoiding the race where the main loop's else
+                            // branch could disable TIMER0 between arm and pop.
                             androidHeldKey = keynum;
                             QTimer::singleShot(500, this, [keynum]()
                             {
                                 if (androidHeldKey == keynum &&
                                     !sys_timer_active(TIMER0))
                                 {
-                                    sys_timer_start(TIMER0, 0);
+                                    extern volatile bool android_next_key_repeating;
+                                    android_next_key_repeating = true;
                                     key_push(keynum);
                                 }
                             });
