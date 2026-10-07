@@ -569,6 +569,7 @@ static object::result counted_loop(object::id type, object_p o)
     {
         // For debugging or conversion to text, ensure we track names
         locals_stack stack(p);
+        gcbytes      names = p;
 
         // Skip name
         if (p[0] != 1)
@@ -583,7 +584,8 @@ static object::result counted_loop(object::id type, object_p o)
         rt.locals(1);
 
         // Pop local after execution
-        if (!rt.run_push_data(nullptr, object_p(1)))
+        if (!rt.locals_scope(names) ||
+            !rt.run_push_data(nullptr, object_p(1)))
             return object::ERROR;
     }
 
@@ -610,6 +612,7 @@ static object::result list_loop(object::id type, object_p o)
     {
         // For debugging or conversion to text, ensure we track names
         locals_stack stack(p);
+        gcbytes      names = p;
 
         // Skip name
         if (p[0] != 1)
@@ -624,7 +627,8 @@ static object::result list_loop(object::id type, object_p o)
         rt.locals(1);
 
         // Pop local after execution
-        if (!rt.run_push_data(nullptr, object_p(1)))
+        if (!rt.locals_scope(names) ||
+            !rt.run_push_data(nullptr, object_p(1)))
             return object::ERROR;
     }
 

@@ -1956,6 +1956,13 @@ void tests::arithmetic()
     test(CLEAR, "360 -360 MOD", ENTER).expect("0");
     test(CLEAR, "-1/3 1/3 MOD", ENTER).expect("0");
 
+    step("Modulo by zero returns the value");
+    test(CLEAR, "7 0 MOD", ENTER).expect("7");
+    test(CLEAR, "-7 0 MOD", ENTER).expect("-7");
+    test(CLEAR, "7.5 0 MOD", ENTER).expect("7.5");
+    test(CLEAR, "1/3 0 MOD", ENTER).expect("¹/₃");
+    test(CLEAR, "0 0 MOD", ENTER).expect("0");
+
     step("Power");
     test(CLEAR, "2 3 ^", ENTER).expect("8");
     test(CLEAR, "-2 3 ^", ENTER).expect("-8");
@@ -2425,6 +2432,26 @@ void tests::global_variables()
     step("Rejecting command names as variable names")
         .test(CLEAR, "124 'bar' STO", ENTER)
         .error("Invalid name");
+
+    step("Reserved names evaluate their content (sandbox)")
+        .test(CLEAR, "'RsvTest' CRDIR RsvTest", ENTER).noerror();
+    step("EQ evaluates the stored equation")
+        .test(CLEAR, "'X^2' 'EQ' STO 3 'X' STO EQ →NUM", ENTER)
+        .expect("9.");
+    step("ΣDAT recalls the statistics data")
+        .test(CLEAR, "[[1 2][3 4]] 'ΣDAT' STO ΣDAT", ENTER)
+        .want("[[ 1 2 ] [ 3 4 ]]");
+    step("PPAR recalls the plot parameters")
+        .test(CLEAR, "{ X 0 } 'PPAR' STO PPAR", ENTER)
+        .expect("{ X 0 }");
+    step("CST recalls the custom menu")
+        .test(CLEAR, "{ 1 2 3 } 'CST' STO CST", ENTER)
+        .expect("{ 1 2 3 }");
+    step("Reserved names without a variable push their name")
+        .test(CLEAR, "{ EQ PPAR } PURGE EQ", ENTER)
+        .expect("Equation");
+    step("Cleanup reserved names sandbox")
+        .test(CLEAR, "UPDIR 'RsvTest' PGDIR", ENTER).noerror();
 }
 
 
@@ -2496,6 +2523,26 @@ void tests::local_variables()
 
     step("Cleanup");
     test(CLEAR, "{ LocTest X } PurgeAll", ENTER).noerror();
+
+    step("Local name escaping its scope becomes a global name")
+        .test(CLEAR, "3 « → x « 'x^2' » » EVAL", ENTER)
+        .expect("'x↑2'");
+    step("Escaped local name evaluates as a global")
+        .test(CLEAR, "3 « → x « 'x^2' » » EVAL 4 'x' STO EVAL", ENTER)
+        .expect("16");
+    step("Local name escaping a user-defined function")
+        .test(CLEAR, "« → x « 'x^2' » » 'H' STO 'H(3)' EVAL", ENTER)
+        .expect("'x↑2'")
+        .test(CLEAR, "'H(3)' EVAL 5 'x' STO EVAL", ENTER)
+        .expect("25");
+    step("Escaping inner scope keeps references to outer locals")
+        .test(CLEAR, "7 2 « → a b « 5 → c « 'a*c+b' » EVAL » » EVAL", ENTER)
+        .expect("'7·c+2'");
+    step("Loop variable escaping a for loop")
+        .test(CLEAR, "1 2 FOR i 'i^2' NEXT", ENTER)
+        .expect("'i↑2'");
+    step("Cleanup escaped locals")
+        .test(CLEAR, "{ H x } PURGE", ENTER).noerror();
 }
 
 
@@ -2667,6 +2714,20 @@ void tests::conditionals()
     step("IFTE expression (false case)");
     test(CLEAR, "'IFTE(1-1;ln(0);PASS+0)'", ENTER, RUNSTOP)
         .expect("'PASS'");
+
+    step("IFTE command with symbolic condition")
+        .test(CLEAR, "'IfteX' 1 2 IFTE", ENTER)
+        .expect("'IfThenElse(IfteX;1;2)'");
+    step("IFTE expression with symbolic condition")
+        .test(CLEAR, "'IFTE(IfteX;1;2)' EVAL", ENTER)
+        .expect("'IfThenElse(IfteX;1;2)'");
+    step("IFTE command with symbolic comparison")
+        .test(CLEAR, "'IfteX>2' 1 2 IFTE", ENTER)
+        .expect("'IfThenElse(IfteX>2;1;2)'");
+    step("IFTE command with comparison on defined variable")
+        .test(CLEAR, "3 'IfteX' STO 'IfteX>2' 1 2 IFTE", ENTER)
+        .expect("1")
+        .test(CLEAR, "'IfteX' PURGE", ENTER).noerror();
 
     step("Clear DebugOnError for IfErr tests")
         .test(CLEAR, "DebugOnError", ENTER).noerror();
@@ -3025,6 +3086,25 @@ void tests::logical_operations()
     step("Convert True and False to decimal")
         .test(CLEAR, "True",  ENTER, ID_ToDecimal).expect("True")
         .test(CLEAR, "False", ENTER, ID_ToDecimal).expect("False");
+
+    step("True and False behave as 1 and 0 in arithmetic")
+        .test(CLEAR, "True 1 +", ENTER).expect("2")
+        .test(CLEAR, "3 False -", ENTER).expect("3")
+        .test(CLEAR, "True 5 *", ENTER).expect("5")
+        .test(CLEAR, "False 2 /", ENTER).expect("0")
+        .test(CLEAR, "True 2 ^", ENTER).expect("1")
+        .test(CLEAR, "1 2 < 1 +", ENTER).expect("2")
+        .test(CLEAR, "{} True + False +", ENTER).expect("{ True False }");
+    step("Comparisons in arithmetic expressions")
+        .test(CLEAR, "'(1<2)+1' EVAL", ENTER).expect("2")
+        .test(CLEAR, "1 'TruthX' STO '(TruthX<2)*3' EVAL", ENTER).expect("3")
+        .test(CLEAR, "'(TruthX<2)*3' →NUM", ENTER).expect("3")
+        .test(CLEAR, "'TruthX' PURGE", ENTER).noerror();
+    step("Logical operations on True and False are unchanged")
+        .test(CLEAR, "True False AND", ENTER).expect("False")
+        .test(CLEAR, "True False OR", ENTER).expect("True")
+        .test(CLEAR, "True NOT", ENTER).expect("False")
+        .test(CLEAR, "1 2 <", ENTER).expect("True");
 }
 
 
@@ -9820,9 +9900,19 @@ void tests::symbolic_operations()
         .expect("'X=B÷2'");
     step("Isolation failure")
         .test(CLEAR, "'X=sin X+1' 'X'", NOSHIFT, F3)
-        .expect("'X-sin X=1'")
-        .test("X", NOSHIFT, F3)
         .error("Unable to isolate");
+    step("Isolation failure when the variable cancels out")
+        .test(CLEAR, "'X-X=1' 'X' ISOL", ENTER)
+        .error("Unable to isolate");
+    step("Isolation of a quadratic equation")
+        .test(CLEAR, "'A*X^2+B*X+C=0' 'X' ISOL", ENTER)
+        .expect("'X=(-B+s1·√(B²-4·A·C))÷(2·A)'");
+    step("Isolation of a quadratic equation with a double root")
+        .test(CLEAR, "'X^2+2*X+1=0' 'X' ISOL", ENTER)
+        .expect("'X=-1'");
+    step("Isolation of a linear equation with the variable on both sides")
+        .test(CLEAR, "'2*X+3=X' 'X' ISOL", ENTER)
+        .expect("'X=-3'");
     step("Isolate a single variable, addition")
         .test(CLEAR, "'A=X+B' X", NOSHIFT, F3).expect("'X=A-B'")
         .test(CLEAR, "'A=B+X' X", NOSHIFT, F3).expect("'X=A-B'");

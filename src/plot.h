@@ -48,6 +48,9 @@ struct Equation : command
 // ----------------------------------------------------------------------------
 {
     Equation(id ty = ID_Equation): command(ty) {}
+
+    OBJECT_DECL(Equation);
+    EVAL_DECL(Equation)         { return evaluate_reserved(o); }
 };
 
 #endif // PLOT_H

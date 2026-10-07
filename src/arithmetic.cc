@@ -985,9 +985,13 @@ algebraic_p arithmetic::optimize<mod>(algebraic_r x, algebraic_r y)
 //   Optimizations for modulo
 // ----------------------------------------------------------------------------
 {
-    // Check divide by zero
+    // Check divide by zero: like legacy RPL, `x 0 MOD` returns `x`
     if (y->is_zero(false))
+    {
+        if (x->is_real())
+            return x;
         return zero_divide(x, y);
+    }
     return nullptr;
 }
 
@@ -1818,10 +1822,24 @@ object::result arithmetic::evaluate(id op, ops_t ops)
     // Fetch arguments from the stack
     // Possibly wrong type, i.e. it migth not be an algebraic on the stack,
     // but since we tend to do extensive type checking later, don't overdo it
-    object_p yo = strip(rt.stack(1));
-    object_p xo = strip(rt.stack(0));
+    object_g yo = strip(rt.stack(1));
+    object_g xo = strip(rt.stack(0));
     if (!xo || !yo)
         return ERROR;
+
+    // Comparison results act as 1 or 0 with numbers, but not with lists
+    id xt = xo->type();
+    id yt = yo->type();
+    bool xtruth = xt == ID_True || xt == ID_False;
+    bool ytruth = yt == ID_True || yt == ID_False;
+    if ((xtruth || ytruth) &&
+        (xtruth || is_algebraic(xt)) && (ytruth || is_algebraic(yt)))
+    {
+        yo = truth_as_integer(yo);
+        xo = truth_as_integer(xo);
+        if (!xo || !yo)
+            return ERROR;
+    }
     algebraic_g y = yo->as_extended_algebraic();
     algebraic_g x = xo->as_extended_algebraic();
     if (!x || !y)

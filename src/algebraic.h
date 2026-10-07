@@ -52,6 +52,7 @@ struct algebraic : command
 
     // Promotion of integer / fractions / hwfp to decimal
     static bool decimal_promotion(algebraic_g &x);
+    static object_p truth_as_integer(object_p obj);
 
     // Promotion of integer / fractions / decimal to hwfp
     static bool hwfp_promotion(algebraic_g &x);

@@ -44,6 +44,9 @@ struct StatsParameters : command
 {
     StatsParameters(id type = ID_StatsParameters) : command(type) {}
 
+    OBJECT_DECL(StatsParameters);
+    EVAL_DECL(StatsParameters)  { return evaluate_reserved(o); }
+
     struct Access
     {
         Access();
@@ -73,6 +76,9 @@ struct StatsData : command
 // ----------------------------------------------------------------------------
 {
     StatsData(id type = ID_StatsData) : command(type) {}
+
+    OBJECT_DECL(StatsData);
+    EVAL_DECL(StatsData)        { return evaluate_reserved(o); }
 
     struct Access
     {

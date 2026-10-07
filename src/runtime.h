@@ -627,7 +627,7 @@ struct runtime
                         call_stack_drop(2);
                     return next;
                 }
-                unlocals(size_t(end) - 1);
+                unlocals_scope(size_t(end) - 1);
             }
 
             call_stack_drop(2);
@@ -868,6 +868,16 @@ struct runtime
     bool unlocals(size_t count);
     // ------------------------------------------------------------------------
     //    Free the number of locals
+    // ------------------------------------------------------------------------
+
+    bool locals_scope(byte_p names);
+    // ------------------------------------------------------------------------
+    //   Record the names of a local scope being entered on the return stack
+    // ------------------------------------------------------------------------
+
+    bool unlocals_scope(size_t count);
+    // ------------------------------------------------------------------------
+    //   Exit a local scope, turning escaping local names into global names
     // ------------------------------------------------------------------------
 
     size_t locals()

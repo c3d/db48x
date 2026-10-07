@@ -68,6 +68,9 @@ struct command : object
     // Execute a command
     static result   evaluate()    { return OK; }
 
+    // Evaluate a reserved variable name such as `EQ` or `PPAR`
+    static result   evaluate_reserved(object_p name);
+
     // Find the command object ID associated with a given spelling
     static id       lookup(utf8 name, size_t &len, bool eq=false);
 

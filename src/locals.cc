@@ -225,10 +225,12 @@ EVAL_BODY(locals)
     object_g end = p + len;
 
     // Copy local values from stack
-    size_t names   = leb128<size_t>(+p);
+    gcbytes nameptr = byte_p(+p);
+    size_t  names   = leb128<size_t>(+p);
     if (!rt.locals(names))
         return ERROR;
-    if (!rt.run_push_data(nullptr, object_p(names)))
+    if (!rt.locals_scope(nameptr) ||
+        !rt.run_push_data(nullptr, object_p(names)))
     {
         rt.unlocals(names);
         return ERROR;
@@ -373,4 +375,120 @@ EVAL_BODY(local)
         return program::run_program(obj);
     }
     return ERROR;
+}
+
+
+
+// ============================================================================
+//
+//   Exiting a local scope
+//
+// ============================================================================
+//
+//   When a local scope ends, objects it left on the stack may still contain
+//   references to its local variables, e.g. `3 « → x « 'x^2' » » EVAL`.
+//   In legacy RPL, local names are looked up by name, so such a reference
+//   simply becomes a reference to the global variable with the same name.
+//   DB48X uses indexes, so references to the exiting scope are replaced with
+//   global names, and references to enclosing scopes are re-indexed.
+//
+//   To do that, entering a scope pushes an inert frame on the return stack
+//   holding a pointer to the names and the stack depth on entry. Only
+//   objects added to the stack above that depth are converted.
+
+static const size_t LOCALS_SCOPE_MAX_DEPTH = 0x1000000;
+
+
+static bool has_locals(object_p obj)
+// ----------------------------------------------------------------------------
+//   Check if an object contains local variable references
+// ----------------------------------------------------------------------------
+{
+    object::id ty = obj->type();
+    if (ty == object::ID_local)
+        return true;
+    if (ty == object::ID_list || ty == object::ID_program ||
+        ty == object::ID_block || ty == object::ID_expression ||
+        ty == object::ID_funcall || ty == object::ID_array)
+        for (object_p item : *list_p(obj))
+            if (has_locals(item))
+                return true;
+    return false;
+}
+
+
+static object_p globalize(object_r obj, gcbytes names, size_t count)
+// ----------------------------------------------------------------------------
+//   Replace references to an exiting scope with global names
+// ----------------------------------------------------------------------------
+{
+    if (!has_locals(obj))
+        return obj;
+
+    object::id ty = obj->type();
+    if (ty == object::ID_local)
+    {
+        size_t index = local_p(+obj)->index();
+        if (index >= count)
+            return rt.make<local>(object::ID_local, uint(index - count));
+
+        byte_p p = names;
+        leb128<size_t>(p);
+        for (size_t n = 0; n < index; n++)
+            p += leb128<size_t>(p);
+        size_t len = leb128<size_t>(p);
+        gcutf8 name = utf8(p);
+        return symbol::make(name, len);
+    }
+
+    scribble scr;
+    for (object_p item : *list_p(+obj))
+    {
+        object_g conv = globalize(item, names, count);
+        if (!conv || !rt.append(+conv))
+            return nullptr;
+    }
+    return list::make(ty, scr.scratch(), scr.growth());
+}
+
+
+bool runtime::locals_scope(byte_p names)
+// ----------------------------------------------------------------------------
+//   Record the names and stack depth on entry to a local scope
+// ----------------------------------------------------------------------------
+{
+    return run_push_data(object_p(names), object_p(size_t(depth())));
+}
+
+
+bool runtime::unlocals_scope(size_t count)
+// ----------------------------------------------------------------------------
+//   Exit a local scope, turning references to its locals into global names
+// ----------------------------------------------------------------------------
+//   On entry, Returns[0] and Returns[1] are the marker for the locals, and
+//   Returns[2] and Returns[3] are the frame pushed by locals_scope()
+{
+    if (count && Returns + 4 <= HighMem && Returns[2] &&
+        size_t(Returns[3]) < LOCALS_SCOPE_MAX_DEPTH)
+    {
+        gcbytes names = byte_p(Returns[2]);
+        size_t  base  = size_t(Returns[3]);
+        byte_p  p     = names;
+        if (leb128<size_t>(p) == count)
+        {
+            size_t top = depth();
+            for (size_t level = 0; level + base < top; level++)
+            {
+                object_g obj = stack(level);
+                if (obj && has_locals(obj))
+                {
+                    object_p conv = globalize(obj, names, count);
+                    if (!conv)
+                        break;
+                    stack(level, conv);
+                }
+            }
+        }
+    }
+    return unlocals(count);
 }

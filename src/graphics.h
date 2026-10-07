@@ -49,6 +49,8 @@ struct PlotParameters : command
 {
     PlotParameters(id type = ID_PlotParameters) : command(type) {}
 
+    OBJECT_DECL(PlotParameters);
+    EVAL_DECL(PlotParameters)   { return evaluate_reserved(o); }
 };
 
 

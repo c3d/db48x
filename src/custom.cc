@@ -46,7 +46,7 @@ COMMAND_BODY(ToggleCustomMenu)
     if (m && m->type() == ID_VariablesMenu)
     {
         if (CustomMenu::custom())
-            return run<CustomMenu>();
+            return CustomMenu::show();
         if (rt.error())
             return ERROR;
     }
@@ -70,6 +70,28 @@ MENU_BODY(CustomMenu)
     items_init(mi, nitems);
     list_custom(mi);
     return OK;
+}
+
+
+EVAL_BODY(CustomMenu)
+// ----------------------------------------------------------------------------
+//   Evaluate `CST` as a variable if it exists, otherwise show the menu
+// ----------------------------------------------------------------------------
+{
+    if (object_p cst = directory::recall_all(o, false))
+        return program::run_program(cst);
+    if (rt.error())
+        return ERROR;
+    return show();
+}
+
+
+object::result CustomMenu::show()
+// ----------------------------------------------------------------------------
+//   Show the custom menu
+// ----------------------------------------------------------------------------
+{
+    return menu::do_evaluate(menu_p(static_object(ID_CustomMenu)));
 }
 
 
@@ -274,7 +296,7 @@ object::result CustomMenu::run_menu_command(bool tmp)
             object_p cst = static_object(ID_CustomMenu);
             if (directory::store_here(cst, obj))
             {
-                result rc = run<CustomMenu>();
+                result rc = show();
                 ui.menu_refresh(ID_CustomMenu);
                 return rc;
             }

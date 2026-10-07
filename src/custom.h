@@ -51,10 +51,12 @@ struct CustomMenu : menu
     static void   list_custom(info &mi, list_p cst = nullptr);
     static void   add_custom_item(info &mi, object_p obj);
     static result run_menu_command(bool tmp);
+    static result show();
 
   public:
     OBJECT_DECL(CustomMenu);
     MENU_DECL(CustomMenu);
+    EVAL_DECL(CustomMenu);
 };
 
 COMMAND_DECLARE(ToggleCustomMenu, 0);
