@@ -6,3 +6,4 @@
 "Labs"
 
 "Calorimetry",                  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"
+"WeakAcid",                     "{ 'C=C0*(V1_mL)/(V2_mL)' '10^(-pH)=C*10^(-pKa)/(10^(-pKa)+10^(-pH))+10^(-pKw)/10^(-pH)' }"

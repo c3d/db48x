@@ -2288,6 +2288,7 @@ The file shipped with the calculator holds a section Labs, with the equations
 of these exercises, as a model for your own.
 
 * Calorimetry: identify a metal by its specific heat.
+* WeakAcid: the pH of a weak acid, and when the school formula fails.
 
 
 ## Calorimetry
@@ -2373,3 +2374,103 @@ section of your choice, with the units of its variables, as this one:
 ```
 
 See also: [σROOT](#σroot), [ΔROOT](#Δroot), [σConcord](#σconcord).
+
+
+## WeakAcid
+
+The pH of a solution of acetic acid, a weak acid of pKa = 4.756 at 25 °C,
+prepared by dilution: a volume V1 of a standard solution of concentration C0
+is taken with a pipette, and made up to V2 in a volumetric flask. Two
+equations, WeakAcid in the section Labs of `config/equations.csv`: the dilution
+C = C0·V1/V2, and the charge balance [H⁺] = [A⁻] + [OH⁻], which with
+h = 10^(−pH), Ka = 10^(−pKa) and Kw = 10^(−pKw) reads
+h = C·Ka/(Ka + h) + Kw/h. Written in pH, this is an equation that has to be
+solved: ROOT does it. Concentrations are in mol/L, given as plain numbers.
+
+The measurements: C0 = 0.1000 mol/L, u = 0.0002; a pipette of class A,
+10 mL ± 0.02 mL, and a flask of class A, 100 mL ± 0.08 mL, two tolerances, that
+is bounds; pKa = 4.756, u = 0.010, and pKw = 14.00, u = 0.01, from tables.
+
+The key WeakAcid shows where the formula of the textbooks,
+pH ≈ ½(pKa − log C), holds: for C = 10⁻¹ … 10⁻⁸ mol/L it returns one line per
+concentration, tagged C=1E-k: { pH by ROOT, pH by the formula }. The last line,
+C=1E-8, is on the first level.
+
+**1)** The exact pH and the formula, from 0.1 to 10⁻⁸ mol/L:
+
+```rpl
+ⓁWeakAcid
+@ Expecting C=1E-8:{ 6.978 6.378 }
+```
+
+**2)** The dilution of the laboratory, 0.01 mol/L: the pH and its standard
+uncertainty, by σROOT.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁσROOT
+@ Expecting { C:0.01±σ2.35513 62310 2⁳⁻⁵ pH:3.38709 33091±σ4.92308 91271 9⁳⁻³ }
+```
+
+**3)** The same as bounds, by ΔROOT:
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT
+@ Expecting { C:9.93747 82832 5⁳⁻³…0.01006 27605 07 pH:3.37722 86399 3…3.39696 39512 8 }
+```
+
+**4)** A very dilute solution, 10⁻⁶ mol/L: the pH is 6.018, where the formula
+gives ½(4.756 + 6) = 5.378.
+
+```rpl
+0.0001 'C0' Sto  1_mL 'V1' Sto  100_mL 'V2' Sto  4.756 'pKa' Sto  14 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.000001;6])' Eval
+@ Expecting [ C=0.00000 1 pH=6.01835 89947 9 ]
+```
+
+**5)** The calculation checked by a measurement: a pH meter reads 3.40, to
+±0.02 according to its manual, a bound. ΔConcord compares this reading with the
+range of the pH found by ΔROOT, 3.377…3.397, and draws both: they overlap, and
+their intersection covers 86 % of the computed range. The measurement confirms
+the calculation.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.40±0.02 ⓁΔConcord
+```
+
+**6)** Had the meter read 3.45 ± 0.02, the two ranges would not meet: "X
+before Y". Either the pKa is not 4.756 at the temperature of the solution, or
+the solution was not prepared as intended; the calculation alone cannot tell
+which.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.45±0.02 ⓁΔConcord
+```
+
+Three lessons. The budget is all in the pKa: it contributes 0.0049 of the
+0.0049 of the pH, the glassware 0.0005 together, since the logarithm flattens
+the relative errors of the volumes. To know the pH better, know the pKa
+better, at the temperature of the solution, rather than measure the volumes
+more finely. Then, the formula of the textbooks errs by less than 0.03 down
+to 10⁻³ mol/L, but by 0.27 at 10⁻⁵ and 0.91 at 10⁻⁷: a dilute weak acid is
+almost wholly dissociated, and the water then gives as many ions as the acid.
+The exact pH never goes beyond 7, while the formula would. Last, an independent
+computation in double precision gives the same pH and the same uncertainty to
+the last digit shown.
+
+The equation of this exercise, in `config/equations.csv`:
+
+```
+"WeakAcid",  "{ 'C=C0*(V1_mL)/(V2_mL)' '10^(-pH)=C*10^(-pKa)/(10^(-pKa)+10^(-pH))+10^(-pKw)/10^(-pH)' }"
+```
+
+See also: [Calorimetry](#calorimetry), [σROOT](#σroot), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).

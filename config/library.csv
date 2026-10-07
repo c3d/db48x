@@ -581,6 +581,7 @@
 "Uncertainty/Applications/Labs"
 
 	"Calorimetry",	"=/library/Uncertainty/Calorimetry.48s"
+	"WeakAcid",	"=/library/Uncertainty/WeakAcid.48s"
 
 "Graphics"
 	"CurvePlottingExamples", "="
