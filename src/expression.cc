@@ -842,6 +842,8 @@ static inline char some_index(char first)
     case '@':   return '@';     // Pi
     case '!':   return '!';     // i
     case '=':   return '=';     // Current independent variable
+    case '%':   return '%';     // Angle mode factor, e.g. π/180 in Deg
+    case '$':   return '$';     // Inverse of angle mode factor
     default: return 0;
     }
 }
@@ -1108,6 +1110,56 @@ static size_t check_match(size_t eq, size_t eqsz,
 }
 
 
+static bool contains_unit(object_p obj)
+// ----------------------------------------------------------------------------
+//   Check if an object is or contains an object with units
+// ----------------------------------------------------------------------------
+{
+    if (!obj)
+        return false;
+    if (obj->type() == object::ID_unit)
+        return true;
+    if (expression_p eq = obj->as<expression>())
+        for (object_p item : *eq)
+            if (item->type() == object::ID_unit)
+                return true;
+    return false;
+}
+
+
+static algebraic_p angle_mode_factor(bool inverse, uint locals)
+// ----------------------------------------------------------------------------
+//   Return the factor to convert the current angle mode to radians
+// ----------------------------------------------------------------------------
+//   Trigonometric functions take their argument in the current angle mode,
+//   so that d(sin x)/dx = cos(x)·π/180 in degrees mode. In radians mode,
+//   this returns 1, which simplification rules then remove.
+//   If the matched sub-expressions carry units, e.g. sin(0.5_r/s·x), the
+//   argument is an explicit angle and the angle mode does not apply.
+{
+    size_t bound = rt.locals() - locals;
+    for (size_t l = 0; l < bound; l += 2)
+        if (contains_unit(rt.local(l+1)))
+            return integer::make(1);
+
+    uint unit = 0;
+    switch (Settings.AngleMode())
+    {
+    case object::ID_Deg:        unit = 180; break;
+    case object::ID_Grad:       unit = 200; break;
+    case object::ID_PiRadians:  unit = 1;   break;
+    default:                    return integer::make(1);
+    }
+    algebraic_g pi = constant::lookup("π");
+    if (!pi)
+        return nullptr;
+    if (unit == 1 && !inverse)
+        return pi;
+    algebraic_g u = integer::make(unit);
+    return inverse ? u / pi : pi / u;
+}
+
+
 static algebraic_p build_expr(expression_p eqin,
                               uint         eqst,
                               expression_r to,
@@ -1163,6 +1215,13 @@ static algebraic_p build_expr(expression_p eqin,
                             found = constant::lookup("ⅈ");
                             nvars++;
                             nconstants++;
+                        }
+                        else if (c == '%' || c == '$')
+                        {
+                            found = angle_mode_factor(c == '$', locals);
+                            if (!found)
+                                return nullptr;
+                            nvars++;
                         }
                         else if (c == '=')
                         {
@@ -3235,6 +3294,8 @@ const eq_symbol<'-'>     signk;
 const eq_symbol<'@'>     kpi;
 const eq_symbol<'!'>     ki;
 const eq_symbol<'='>     indep;
+const eq_symbol<'%'>     kangle;  // Angle mode factor, e.g. π/180 in Deg
+const eq_symbol<'$'>     kiangle; // Inverse of the angle mode factor
 
 // Constants
 const eq_pi pi;
@@ -4174,12 +4235,12 @@ expression_p expression::derivative(symbol_r sym) const
         abs(X)>>indep,          (X>>indep)*sign(X),
         sign(X)>>indep,         k0,
 
-        sin(X)>>indep,          (X>>indep)*cos(X),
-        cos(X)>>indep,          -(X>>indep)*sin(X),
-        tan(X)>>indep,          (X>>indep)/sq(cos(x)),
-        sec(X)>>indep,          (X>>indep)*sec(X)*tan(X),
-        csc(X)>>indep,          -(X>>indep)*csc(X)*cot(X),
-        cot(X)>>indep,          -(X>>indep)*sq(csc(X)),
+        sin(X)>>indep,          (X>>indep)*cos(X)*kangle,
+        cos(X)>>indep,          -(X>>indep)*sin(X)*kangle,
+        tan(X)>>indep,          (X>>indep)*kangle/sq(cos(X)),
+        sec(X)>>indep,          (X>>indep)*sec(X)*tan(X)*kangle,
+        csc(X)>>indep,          -(X>>indep)*csc(X)*cot(X)*kangle,
+        cot(X)>>indep,          -(X>>indep)*sq(csc(X))*kangle,
         sinh(X)>>indep,         (X>>indep)*cosh(X),
         cosh(X)>>indep,         (X>>indep)*sinh(X),
         tanh(X)>>indep,         (X>>indep)/sq(cosh(X)),
@@ -4187,12 +4248,12 @@ expression_p expression::derivative(symbol_r sym) const
         sech(X)>>indep,         -(X>>indep)*sech(X)*tanh(X),
         coth(X)>>indep,         -(X>>indep)/sq(sinh(X)),
 
-        asin(X)>>indep,         (X>>indep)/sqrt(k1-sq(X)),
-        acos(X)>>indep,         -(X>>indep)/sqrt(k1-sq(X)),
-        atan(X)>>indep,         (X>>indep)/(k1+sq(X)),
-        asec(X)>>indep,         (X>>indep)/(X*sqrt(sq(X)-k1)),
-        acsc(X)>>indep,         -(X>>indep)/(X*sqrt(sq(X)-k1)),
-        acot(X)>>indep,         -(X>>indep)/(k1+sq(X)),
+        asin(X)>>indep,         (X>>indep)*kiangle/sqrt(k1-sq(X)),
+        acos(X)>>indep,         -(X>>indep)*kiangle/sqrt(k1-sq(X)),
+        atan(X)>>indep,         (X>>indep)*kiangle/(k1+sq(X)),
+        asec(X)>>indep,         (X>>indep)*kiangle/(X*sqrt(sq(X)-k1)),
+        acsc(X)>>indep,         -(X>>indep)*kiangle/(X*sqrt(sq(X)-k1)),
+        acot(X)>>indep,         -(X>>indep)*kiangle/(k1+sq(X)),
         asinh(X)>>indep,        (X>>indep)/sqrt(k1+sq(X)),
         acosh(X)>>indep,        (X>>indep)/sqrt(sq(X)-k1),
         atanh(X)>>indep,        (X>>indep)/(k1-sq(X)),
@@ -4374,30 +4435,30 @@ expression_p expression::primitive(symbol_r sym) const
         X^k3,                           cubed(X),
 
         // Patterns below in the order of section E-2 of HP50G ARM
-        acos(L)<<indep,                 (L*acos(L)-sqrt(k1-sq(L)))/A,
+        acos(L)<<indep,                 (L*acos(L)-kiangle*sqrt(k1-sq(L)))/A,
         acosh(L)<<indep,                (L*acosh(L)-sqrt(sq(L)-k1))/A,
-        asin(L)<<indep,                 (L*asin(L)+sqrt(k1-sq(L)))/A,
+        asin(L)<<indep,                 (L*asin(L)+kiangle*sqrt(k1-sq(L)))/A,
         asinh(L)<<indep,                (L*asinh(L)-sqrt(k1+sq(L)))/A,
-        atan(L)<<indep,                 (L*atan(L)-ln(k1+sq(L))/k2)/A,
-        atanh(L)<<indep,                (L*atan(L)-ln(k1-sq(L))/k2)/A,
-        asec(L)<<indep,                 (L*asec(L)-sqrt(sq(L)-k1))/A,
-        acsc(L)<<indep,                 (L*acsc(L)+sqrt(sq(L)-k1))/A,
-        acot(L)<<indep,                 (L*acot(L)+ln(k1+sq(L))/k2)/A,
+        atan(L)<<indep,                 (L*atan(L)-ln(k1+sq(L))*kiangle/k2)/A,
+        atanh(L)<<indep,                (L*atanh(L)+ln(k1-sq(L))/k2)/A,
+        asec(L)<<indep,                 (L*asec(L)-kiangle*sqrt(sq(L)-k1))/A,
+        acsc(L)<<indep,                 (L*acsc(L)+kiangle*sqrt(sq(L)-k1))/A,
+        acot(L)<<indep,                 (L*acot(L)+ln(k1+sq(L))*kiangle/k2)/A,
         acsch(L)<<indep,                (L*acsch(L)+sqrt(sq(L)+k1))/A,
-        asech(L)<<indep,                (L*asech(L)-atan(sqrt(k1-sq(L))/L))/A,
+        asech(L)<<indep,                (L*asech(L)-kangle*atan(sqrt(k1-sq(L))/L))/A,
         acoth(L)<<indep,                (L*acoth(L)+ln(sq(L)-k1)/k2)/A,
-        sec(L)<<indep,                  ln(abs(sec(L)+tan(L)))/A,
-        csc(L)<<indep,                  ln(abs(tan(L/k2)))/A,
-        cot(L)<<indep,                  ln(abs(sin(L)))/A,
-        cos(L)<<indep,                  sin(L)/A,
-        inv(cos(L))<<indep,             ln(abs(tan(L)+inv(cos(L))))/A,
-        inv(cosh(L))<<indep,            atan(sinh(L))/A,
-        inv(sin(L))<<indep,             ln(abs(tan(L/k2)))/A,
+        sec(L)<<indep,                  ln(abs(sec(L)+tan(L)))*kiangle/A,
+        csc(L)<<indep,                  ln(abs(tan(L/k2)))*kiangle/A,
+        cot(L)<<indep,                  ln(abs(sin(L)))*kiangle/A,
+        cos(L)<<indep,                  sin(L)*kiangle/A,
+        inv(cos(L))<<indep,             ln(abs(tan(L)+inv(cos(L))))*kiangle/A,
+        inv(cosh(L))<<indep,            kangle*atan(sinh(L))/A,
+        inv(sin(L))<<indep,             ln(abs(tan(L/k2)))*kiangle/A,
         inv(sinh(L))<<indep,             ln(abs(tanh(L/k2)))/A,
-        inv(cos(L)*sin(L))<<indep,      ln(tan(L))/A,
+        inv(cos(L)*sin(L))<<indep,      ln(tan(L))*kiangle/A,
         cosh(L)<<indep,                 sinh(L)/A,
-        inv(cosh(L)*sinh(L))<<indep,    ln(tan(L))/A,
-        inv(sinh(L)*cosh(L))<<indep,    ln(tan(L))/A,
+        inv(cosh(L)*sinh(L))<<indep,    ln(tanh(L))/A,
+        inv(sinh(L)*cosh(L))<<indep,    ln(tanh(L))/A,
         inv(sq(cosh(L)))<<indep,        tanh(L)/A,
         exp(L)<<indep,                  exp(L)/A,
         exp10(L)<<indep,                exp10(L)/(A*ln(k10)),
@@ -4408,13 +4469,13 @@ expression_p expression::primitive(symbol_r sym) const
         log2(L)<<indep,                 (L*log2(L)-L/ln(k2))/A,
         ln1p(L)<<indep,                 ((L-k1)*ln1p(L)-(L-k1))/A,
         sign(L)<<indep,                 abs(L)/A,
-        sin(L)<<indep,                  -cos(L)/A,
-        inv(sin(L)*cos(L))<<indep,      ln(tan(L))/A,
-        inv(sin(L)*tan(L))<<indep,      -inv(sin(L))/A,
-        inv(sq(sin(L)))<<indep,         -inv(tan(L))/A,
+        sin(L)<<indep,                  -cos(L)*kiangle/A,
+        inv(sin(L)*cos(L))<<indep,      ln(tan(L))*kiangle/A,
+        inv(sin(L)*tan(L))<<indep,      -inv(sin(L))*kiangle/A,
+        inv(sq(sin(L)))<<indep,         -inv(tan(L))*kiangle/A,
         sinh(L)<<indep,                 cosh(L)/A,
         csch(L)<<indep,                 ln(abs(tanh(L/k2)))/A,
-        sech(L)<<indep,                 atan(sinh(L))/A,
+        sech(L)<<indep,                 kangle*atan(sinh(L))/A,
         coth(L)<<indep,                 ln(abs(sinh(L)))/A,
         inv(sinh(L)*csch(L))<<indep,    L/A,
         inv(cosh(L)*sech(L))<<indep,    L/A,
@@ -4424,11 +4485,11 @@ expression_p expression::primitive(symbol_r sym) const
         inv(sq(sinh(L)))<<indep,        -coth(L)/A,
         inv(sinh(L)*cosh(L))<<indep,    ln(tanh(L))/A,
         inv(sinh(L)*tanh(L))<<indep,    -inv(sinh(L))/A,
-        (sq(tan(L)))<<indep,            (tan(L)-L)/A,
-        tan(L)<<indep,                  -ln(cos(L))/A,
-        (tan(L)/cos(L))<<indep,         inv(cos(L))/A,
-        inv(tan(L))<<indep,             ln(sin(L))/A,
-        inv(tan(L)*sin(L))<<indep,      -inv(sin(L))/A,
+        (sq(tan(L)))<<indep,            (kiangle*tan(L)-L)/A,
+        tan(L)<<indep,                  -ln(cos(L))*kiangle/A,
+        (tan(L)/cos(L))<<indep,         inv(cos(L))*kiangle/A,
+        inv(tan(L))<<indep,             ln(sin(L))*kiangle/A,
+        inv(tan(L)*sin(L))<<indep,      -inv(sin(L))*kiangle/A,
         tanh(L)<<indep,                 ln(cosh(L))/A,
         (tanh(L)/cosh(L))<<indep,       inv(cosh(L))/A,
         inv(tanh(L))<<indep,            ln(sinh(L))/A,
@@ -4441,9 +4502,9 @@ expression_p expression::primitive(symbol_r sym) const
         (P^L)<<indep,                   (P^L)/(A*ln(P)),
         inv(L)<<indep,                  ln(abs(L))/A,
         inv(k1-(sq(L)))<<indep,         atanh(L)/A,
-        inv(k1+(sq(L)))<<indep,         atan(L)/A,
+        inv(k1+(sq(L)))<<indep,         kangle*atan(L)/A,
         inv(sqrt((sq(L))-k1))<<indep,   acosh(L)/A,
-        inv(sqrt(k1-(sq(L))))<<indep,   asin(L)/A,
+        inv(sqrt(k1-(sq(L))))<<indep,   kangle*asin(L)/A,
         inv(sqrt(k1+(sq(L))))<<indep,  asinh(L)/A,
         inv((sqrt(sq(L))+k1))<<indep,   asinh(L)/A,
         sq(L)<<indep,                   cubed(L)/(k3*A),

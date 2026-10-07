@@ -42,8 +42,49 @@
 #include "symbol.h"
 #include "tag.h"
 
+using namespace eq_wildcards;
+
 RECORDER(integrate, 16, "Numerical integration");
 RECORDER(integrate_error, 16, "Numerical integrationsol");
+
+
+static bool looks_negative(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Check if a value is negative or renders with a leading minus sign
+// ----------------------------------------------------------------------------
+{
+    if (x->is_real())
+        return x->is_negative(false);
+    if (!x->is_symbolic())
+        return false;
+    text_g txt = x->as_text(false, true);
+    if (!txt)
+        return false;
+    size_t sz = 0;
+    utf8   p  = txt->value(&sz);
+    if (sz && *p == '\'')
+    {
+        p++;
+        sz--;
+    }
+    return sz && *p == '-';
+}
+
+
+static algebraic_p negate(algebraic_r x)
+// ----------------------------------------------------------------------------
+//   Negate a value, folding the sign into a leading constant factor
+// ----------------------------------------------------------------------------
+{
+    algebraic_g nx = -x;
+    if (nx)
+        if (expression_p eq = nx->as<expression>())
+            nx = eq->rewrites(-(A*X),   (kn1*A)*X,
+                              -(A/X),   (kn1*A)/X,
+                              -(-X),    X,
+                              A*B,      A*B);
+    return nx;
+}
 
 
 NFUNCTION_BODY(Integrate)
@@ -112,9 +153,23 @@ NFUNCTION_BODY(Integrate)
             {
                 algebraic_g lop = prim->substitute(name, low);
                 algebraic_g hip = prim->substitute(name, high);
-                if (algebraic_p diff = hip - lop)
-                    if (algebraic_p eval = diff->evaluate())
-                        return eval;
+                if (lop && hip)
+                    lop = lop->evaluate();
+                if (lop && hip)
+                {
+                    // Render H-(-L) as H+L, not as 'H--L'
+                    algebraic_g diff;
+                    algebraic_g nlop;
+                    if (looks_negative(lop))
+                        nlop = negate(lop);
+                    if (nlop && !looks_negative(nlop))
+                        diff = hip + nlop;
+                    else
+                        diff = hip - lop;
+                    if (diff)
+                        if (algebraic_p eval = diff->evaluate())
+                            return eval;
+                }
             }
             if (low->is_symbolic() || high->is_symbolic())
                 return expression::make(ID_Integrate,
