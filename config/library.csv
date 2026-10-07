@@ -578,6 +578,10 @@
 
 	"DMOPendulum",	"=/library/Uncertainty/DMOPendulum.48s"
 
+"Uncertainty/Applications/Labs"
+
+	"Calorimetry",	"=/library/Uncertainty/Calorimetry.48s"
+
 "Graphics"
 	"CurvePlottingExamples", "="
 	"WalkMan", "="

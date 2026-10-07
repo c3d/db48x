@@ -2,3 +2,7 @@
 
 "RelativityMassEnergy",         "'(E_J)=(m_kg)*Ⓒc^2'"
 "IdealGas",                     "'(P_Pa)*(V_m^3)=(n_mol)*ⒸR*(T_K)'"
+
+"Labs"
+
+"Calorimetry",                  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"

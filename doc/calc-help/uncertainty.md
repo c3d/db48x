@@ -1344,6 +1344,8 @@ Wilson's Proposition for interval implementation in the RPL environment
   Type B evaluation of the measurements to the Monte Carlo method.
 * [EqDemos](#eqdemoslibrary): equations of the Equation Library with uncertain
   inputs, by the Monte Carlo method and by the propagation formula.
+* [Labs](#labslibrary): laboratory exercises on equations of your own, added to
+  the Equation Library through `config/equations.csv`.
 
 
 ## DemosLibrary
@@ -2271,3 +2273,103 @@ whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws s
 it.
 
 See also: [Simple Pendulum](#Simple Pendulum).
+
+
+## LabsLibrary
+
+Laboratory exercises, each on an equation of its own that is not in the
+Equation Library. Such an equation is added in the file
+`config/equations.csv`, which the calculator reads at start: each line gives a
+name and an equation, under the name of a section. It then appears in the
+Equation Library like the others, as Ⓔname, and the whole of the Uncertainty
+section applies to it: ROOT solves it, σROOT gives the uncertainty of its
+unknowns, ΔROOT their range, and σConcord compares a result with a reference.
+The file shipped with the calculator holds a section Labs, with the equations
+of these exercises, as a model for your own.
+
+* Calorimetry: identify a metal by its specific heat.
+
+
+## Calorimetry
+
+Identify a metal by its specific heat, by the method of mixtures. A sample of
+mass ms is heated in boiling water, at Ts, then dropped into a calorimeter
+that holds a mass mw of water at Tw; the mixture settles at Tf. The heat given
+by the sample is taken by the water and the calorimeter, of heat capacity
+Ccal: ms·cs·(Ts − Tf) = (mw·cw + Ccal)·(Tf − Tw). This is the equation Calorimetry of the section Labs of `config/equations.csv`.
+
+The measurements: ms = 100.00 g on a balance, u = 0.01 g; Ts, the boiling water,
+between 99.7 °C and 99.9 °C; mw = 200.00 g; Tw = 20.0 °C and Tf = 23.3 °C on a
+thermometer, u = 0.1 K; Ccal, known between 40 and 60 J/K. The specific heat of
+water cw comes from the constants library, ⒸcpH2O, with its standard
+uncertainty ⓈcpH2O: →Num gives their values, and →σRange joins them. The
+temperatures are in kelvins, as the specific heats of the constants library.
+
+The key Calorimetry runs the whole exercise: it stores the measurements, finds
+cs and its uncertainty with σROOT, compares it with the specific heats of
+copper, aluminium and iron of the constants library, ⒸcpCu, ⒸcpAl and ⒸcpFe,
+as σConcord does but without its drawing, and returns cs, the p-value of each
+comparison, and the metals compatible at the 5 % level.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁCalorimetry
+@ Expecting metal:"copper"
+```
+
+**2)** Step by step: the measurements, then cs and its standard uncertainty.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
+@ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
+```
+
+**3)** The same measurements as bounds, a±σb being taken as a±√3·b: ΔROOT gives
+the range of cs. Copper, 385 J/(kg·K), lies inside; iron, 450 J/(kg·K), and
+aluminium, 902 J/(kg·K), do not.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
+@ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
+```
+
+**4)** The comparison with copper, by σConcord, which draws the law of the
+difference D and returns d, σD, z and p: here z = 0.16 and p = 0.88.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT 1 Get DeleteTag
+ⒸcpCu →Num Dup UVAL ⓈcpCu →Num UVAL →σRange Swap →Unit
+ⓁσConcord
+```
+
+Three lessons. The budget of uncertainty is dominated by the thermometer: each
+of its two readings contributes about 12 J/(kg·K) to the 17 J/(kg·K) of cs, the
+calorimeter 2.5, and the specific heat of water less than 0.1. A thermometer
+read to 0.01 K would divide the uncertainty of cs by six; a larger rise of
+temperature, with less water, would help too. Then, the sample is compatible
+with copper, and clearly not with iron nor aluminium; but compatible is not
+identified: zinc, whose specific heat is about 388 J/(kg·K), would give the
+same answer. Last, the variables ms, Ts, mw, cw, Ccal, Tw and Tf stay in the
+current directory: change them to your own measurements, and run the steps
+again.
+
+To add an equation of your own, write it in `config/equations.csv`, under a
+section of your choice, with the units of its variables, as this one:
+
+```
+"Labs"
+
+"Calorimetry",  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"
+```
+
+See also: [σROOT](#σroot), [ΔROOT](#Δroot), [σConcord](#σconcord).
