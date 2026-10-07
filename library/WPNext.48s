@@ -1,0 +1,82 @@
+«
+@@ ============================================================
+@@ WPNext — where is the next waypoint, and how far off the route am I?
+@@
+@@ Input : φ λ GS — present latitude and longitude (East positive), and
+@@         ground speed. Plain numbers are degrees and knots; values
+@@         with a unit are accepted. GS = 0 skips the time estimate.
+@@ Output: tagged values — To: the next waypoint, Brg: its true
+@@         bearing, Dist: its distance (nmi), XTD: the cross-track
+@@         distance from the active leg, positive right of it (nmi),
+@@         ETE: the Estimated Time En route, the time left to reach it
+@@         at GS, and ETA: the Estimated Time of Arrival, by the clock of
+@@         the calculator.
+@@
+@@ The active leg, from waypoint RouteLeg to the next one, starts at 1.
+@@ When the present position is abeam or past the end of the leg, the
+@@ next leg becomes active, and the results refer to it.
+@@ Bearings and distances come from VincentyInv (WGS-84); the cross-
+@@ and along-track distances use a sphere of the mean radius,
+@@ 6 371 008.8 m, largely accurate at the scale of a leg.
+@@ The angle mode and the angle units setting are restored.
+@@ ============================================================
+
+  IF DUP TypeName "unit" ≠ THEN 1_knot * END
+  'Route' RCL
+  IFERR 'RouteLeg' RCL THEN DROP 1 END
+  'AngleMode' RCL 'SetAngleUnits' RCL
+  RAD NoAngleUnits
+  → pp lp gs rtl leg amode aunits
+  «
+    @ Advance past the legs whose end is already abeam or behind
+    WHILE
+      rtl leg GET LIST→ DROP rtl leg 1 + GET LIST→ DROP
+      → na pa la nb pb lb
+      «
+        pa la pb lb ⓁVincentyInv DROP
+        pa la pp lp ⓁVincentyInv DROP
+        → dab cab dap cap
+        «
+          dap UVAL 6371008.8 /
+          cap cab - 1_r CONVERT UVAL
+          → tap dcr
+          «
+            '6371008.8*ACOS(COS(tap)/COS(ASIN(SIN(tap)*SIN(dcr))))' EVAL
+            dab UVAL ≥
+          »
+        »
+      »
+      leg rtl SIZE 1 - < AND
+    REPEAT
+      leg 1 + 'leg' STO
+    END
+    leg 'RouteLeg' STO
+
+    rtl leg GET LIST→ DROP rtl leg 1 + GET LIST→ DROP
+    → na pa la nb pb lb
+    «
+      pp lp pb lb ⓁVincentyInv DROP
+      pa la pb lb ⓁVincentyInv DROP
+      pa la pp lp ⓁVincentyInv DROP
+      → dist brg dab cab dap cap
+      «
+        dap UVAL 6371008.8 /
+        cap cab - 1_r CONVERT UVAL
+        → tap dcr
+        «
+          nb "To" →TAG
+          brg "Brg" →TAG
+          dist 1_nmi CONVERT "Dist" →TAG
+          '6371008.8*ASIN(SIN(tap)*SIN(dcr))' EVAL
+          1_m * 1_nmi CONVERT "XTD" →TAG
+          IF gs UVAL 0 > THEN
+            dist gs / 1_h CONVERT UVAL 3600 * 0 RND 3600 /
+            DUP →HMS "ETE" →TAG
+            SWAP →HMS TIME HMS+ "ETA" →TAG
+          END
+        »
+      »
+    »
+    amode EVAL IF aunits THEN SetAngleUnits ELSE NoAngleUnits END
+  »
+»

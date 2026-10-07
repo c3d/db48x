@@ -1,0 +1,13 @@
+«
+  @ ------------------------------------------------------------
+  @  LgNrmRand
+  @  Random draw by inversion: a uniform variate, then LgNrmQ.
+  @  Stack: μl, σl
+  @  Author & design           : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 == THEN Explode Drop ELSE IF DUP Size 3 == THEN Explode Drop Drop ELSE "LgNrmRand: needs 2 arguments" DoError END END END
+  → μlv σlv « μlv σlv rand ⓁLgNrmQ μlv σlv 2 →List Drop »
+»

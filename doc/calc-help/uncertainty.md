@@ -1,0 +1,2576 @@
+# Uncertainty
+
+The Uncertainty section of the Function Library works on measured values and
+their uncertainties. The calculator already knows four ways of writing them,
+and they do not say the same thing:
+
+* **bounds** — `a…b`, `a±b`, `a±p%`: the true value lies somewhere in the
+  interval, for certain. No distribution is assumed; this is what a tolerance,
+  a resolution or a safety margin gives.
+* **statistics** — `a±σb`: the value is normally distributed with standard
+  deviation `b`. This is what a repeated measurement or a GUM uncertainty
+  budget gives.
+
+The core arithmetic already propagates both through a single operation. This
+section adds what the core leaves to the user, starting with the rounding of a
+result for presentation.
+
+
+## UncertaintyLibrary
+
+Tools for measured values and their uncertainties, whether written as bounds
+(`a…b`, `a±b`, `a±p%`) or as a standard deviation (`a±σb`).
+
+* [Rounding](#roundinglibrary) — present a result with the digits its
+  uncertainty justifies: [SciRngRnd](#scirngrnd), and as text
+  [SciRngText](#scirngtext) (`12.35±0.10`) or
+  [SciRngParen](#scirngparen) (`12.35(10)`).
+* [TypeB](#typeblibrary) — turn a resolution, a tolerance or a stated
+  uncertainty into a standard uncertainty: [ResN0→σR](#resn0→σr) guides
+  the choice step by step, [Bound→σ](#bound→σ) and [ResN0](#resn0) do the
+  same work from the stack.
+* [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
+  for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
+  for how two intervals sit on the line.
+* [Functions](#functionslibrary) — propagate uncertainties through a function
+  written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
+  [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
+  [Exmnf](#exmnf); [Cycling](#cycling) gives a value its other forms.
+* [Applications](#applicationslibrary) — worked examples of the whole
+  section: [Projectile](#projectilelibrary), in eight steps.
+* [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
+  model by random draws, with any distribution for each input:
+  [MCPropagate](#mcpropagate).
+
+Correlations are given by two global variables. `ρij` holds one coefficient
+for all the pairs, or the full correlation matrix, for the functions of
+several variables: σRFxjxi and MCPropagate. `ρ` holds a single coefficient
+between two values, for the arithmetic of the calculator on `a±σb` values, as
+in `10±σ1 12±σ1 +`, and for σConcord. Without them, the values are
+independent; purge them after use, or they will weigh on later calculations.
+
+
+## RoundingLibrary
+
+A result such as `12.34563±0.02347` claims more than anyone measured: the last
+digits of the value lie far below its own uncertainty. The rule followed here is
+the one NIST and the GUM (JCGM 100:2008, §7.2.6) recommend:
+
+* round the **uncertainty to two significant digits**;
+* round the **value to the same decimal place** as the rounded uncertainty.
+
+So `12.34563±0.02347` becomes `12.346±0.023`, and `123456.7±789.1` becomes
+`123460±790`. Two digits rather than one because rounding 0.15 to one digit
+would change it by a third.
+
+The value is rounded after the uncertainty, since rounding the uncertainty can
+move it to the next decade: 0.0996 becomes 0.10, which fixes the value to two
+decimals, not three.
+
+A zero is significant in these results: `12.35±0.10` says the uncertainty is
+known to the hundredth. A number cannot carry that zero — 0.10 and 0.1 are the
+same number to the calculator. [SciRngRnd](#scirngrnd) returns numbers to go
+on computing with; [SciRngText](#scirngtext) returns the same result written as
+text, zeros included, for a report or a label; [SciRngParen](#scirngparen)
+writes it in the concise notation of the GUM and CODATA, `12.35(10)`.
+
+After Jean Wilson's SciRngRnd (2025–2026).
+
+
+## SciRngRnd
+
+Rounds a measured value and its uncertainty by the NIST rule: the uncertainty
+to two significant digits, the value to the same decimal place. See
+Rounding for the rule and why.
+
+It accepts every interval type and returns the same type, units included:
+
+* `a±b`, `a±σb` — the uncertainty is `b`;
+* `a…b` — the uncertainty is the half-width, and the bounds are rounded through
+  the centre;
+* `a±p%` — the value is rounded by its absolute uncertainty, and the percentage
+  itself to two significant digits;
+* two values `X` `U` on the stack — read as `X±U`. If both carry units, `U` is
+  first expressed in the unit of `X`.
+
+An uncertainty of zero leaves the value unchanged: nothing then says which
+digits are meaningful.
+
+Stack: an interval, or `X` `U`.
+
+**1)**
+
+```rpl
+12.34563±0.02347 ⓁSciRngRnd
+@ Expecting 12.346±0.023
+```
+
+**2)**
+
+```rpl
+12.3456±σ0.0234_m ⓁSciRngRnd
+@ Expecting 12.346±σ0.023 m
+```
+
+**3)**
+
+```rpl
+12.3456±1.5% ⓁSciRngRnd
+@ Expecting 12.35±1.5%
+```
+
+**4)** A value in metres and an uncertainty in centimetres:
+
+```rpl
+12.3456_m 2.34_cm ⓁSciRngRnd
+@ Expecting 12.346±0.023 m
+```
+
+When rounding the uncertainty reaches the next decade, the value follows it —
+and the result shows why SciRngText exists: the uncertainty
+0.10 is displayed as 0.1.
+
+**5)**
+
+```rpl
+12.3456±0.0996 ⓁSciRngRnd
+@ Expecting 12.35±0.1
+```
+
+See also: [Rounding](#roundinglibrary), [SciRngText](#scirngtext).
+
+
+## SciRngText
+
+The result of SciRngRnd written as text, with the trailing zeros
+that the rounding makes significant and that a number cannot carry. The display
+settings are not changed. Use it for a report, a label or a printed table; use
+SciRngRnd to go on computing. Without a unit, the text reads back as a number
+with STR→; the unit is written after a plain space, as in a report, and does
+not read back.
+
+Stack: an interval, or `X` `U`, as for SciRngRnd.
+
+**1)**
+
+```rpl
+12.3456±0.0996 ⓁSciRngText
+@ Expecting "12.35±0.10"
+```
+
+**2)**
+
+```rpl
+12.2…12.5678 ⓁSciRngText
+@ Expecting "12.20…12.56"
+```
+
+**3)**
+
+```rpl
+2±0.0234 ⓁSciRngText
+@ Expecting "2.000±0.023"
+```
+
+**4)**
+
+```rpl
+12.3456±σ0.0996_m ⓁSciRngText
+@ Expecting "12.35±σ0.10 m"
+```
+
+See also: [SciRngRnd](#scirngrnd).
+
+## SciRngParen
+
+The result of SciRngRnd in concise notation, the form the GUM
+(JCGM 100:2008, §7.2.2) and the CODATA tables use: the digits in parentheses
+are the uncertainty, in units of the last digit of the value. `1.456±0.023` is
+written `1.456(23)`; the Newtonian constant of gravitation appears in the
+CODATA tables as `6.67430(15)×10⁻¹¹`.
+
+When the uncertainty reaches the tens, the last digits of the value are no
+longer significant and `123460(79)` would be ambiguous; a power of ten then
+keeps it clear, `1.2346(79)×10⁵`. A zero uncertainty gives the value alone.
+
+**By convention the parentheses denote a standard uncertainty, σ.** For `a±σb`
+the notation says exactly what the value is. For bounds, `a±b`, `a…b` or `a±p%`,
+the entry writes the half-width in the same way, but a reader will take it for a
+standard deviation: say so next to the value, or write it with
+SciRngText instead.
+
+The result is text, as for SciRngText; the display settings are not changed.
+
+Stack: an interval, or `X` `U`, as for SciRngRnd.
+
+**1)**
+
+```rpl
+1.456±σ0.023 ⓁSciRngParen
+@ Expecting "1.456(23)"
+```
+
+**2)**
+
+```rpl
+6.67430±σ0.00015 ⓁSciRngParen
+@ Expecting "6.67430(15)"
+```
+
+**3)**
+
+```rpl
+12.3456±σ0.0996_m ⓁSciRngParen
+@ Expecting "12.35(10) m"
+```
+
+**4)**
+
+```rpl
+123456.7±σ789.1 ⓁSciRngParen
+@ Expecting "1.2346(79)×10⁵"
+```
+
+See also: [SciRngRnd](#scirngrnd), [SciRngText](#scirngtext).
+
+## TypeBLibrary
+
+A standard uncertainty obtained otherwise than from the scatter of repeated
+readings is what the GUM calls a **Type B** evaluation (JCGM 100:2008, §4.3):
+the resolution of a display, the divisions of a scale, a manufacturer's
+tolerance, an uncertainty quoted in a certificate. What one knows is a bound;
+what the propagation needs is a standard deviation. Going from one to the other
+takes a law: the bound says where the value can be, the law says how it is
+spread inside.
+
+* [ResN0→σR](#resn0→σr) asks for the reading, where the bound comes from, and
+  the law, then returns `x±σu`.
+* [Bound→σ](#bound→σ) does the conversion from the stack, for programs.
+* [ResN0](#resn0) finds the resolution of a reading from its significant zeros.
+
+Every factor comes from the Probability section: the standard deviation of
+the chosen law on the bounds (its Sx entry), or the quantile that turns a
+confidence level into a coverage factor (its Q entry). The rectangular law gives
+the familiar a/√3, the triangular a/√6, the U-shaped a/√2; a normal at 95 %
+gives U/1.96, a Student law with 10 degrees of freedom U/2.228.
+
+A digital display that shows the last digit δ does not say the value is within
+±δ, but within **±δ/2**: the reading was rounded. The standard uncertainty is
+then δ/√12, not δ/√3.
+
+After Jean Wilson's ResN0→σR (2025–2026).
+
+
+## ResN0→σR
+
+A guided conversion of a reading into a value with its standard uncertainty.
+It asks three questions. A number already on the stack is offered as the
+answer to the first, to complete or confirm with ENTER.
+
+1. **The value, as the instrument shows it.** Type it with its zeros and its
+   unit — `9.000_kg`, `16.00_mm`, `7.00E3`. The calculator would store 9.000 as
+   9; typed here, it is kept as text, so that the zeros that were measured are
+   counted. Only an integer such as `7000` is ambiguous: the screen then asks
+   how many of its trailing zeros are significant, and a key from 0 to 3
+   answers. Typing `7.000E3`, or `7000.` with a point, says it in advance.
+2. **Where the bound comes from** — a key from 1 to 4: a digital display
+   (±half the last digit), a graduated scale (±half the smallest division,
+   which it asks for), a stated tolerance ±a (or two values when the bounds
+   are unequal), or an expanded uncertainty ±U at a confidence level p.
+3. **The law** — a key from 0 to 9, among those that fit: inside bounds,
+   rectangular, triangular, triangular with another mode, U-shaped, beta,
+   or a normal truncated at the bounds; for an expanded uncertainty, normal,
+   Student, Rayleigh or log-normal. It asks for the parameters a law needs.
+
+It returns `x±σu`, where x is the mean of the law — the reading itself, except
+for the asymmetric ones. Any other key cancels.
+
+The same work, without the questions, is done by [ResN0](#resn0) and
+[Bound→σ](#bound→σ).
+
+
+## Bound→σ
+
+Standard uncertainty from a bound, for a given law — the calculation behind
+ResN0→σR, for programs.
+
+Stack: `X`, `A`, `law`, `P`.
+
+* `X` — the value, with or without unit.
+* `A` — the half-width a of the bounds, or `{ a- a+ }` when they are unequal
+  below and above X; in any unit compatible with X. For laws 7 to 0, the
+  expanded uncertainty U.
+* `law` — 1 rectangular, 2 triangular, 3 triangular with mode, 4 U-shaped,
+  5 beta, 6 truncated normal, 7 normal, 8 Student, 9 Rayleigh, 0 log-normal.
+* `P` — a list of the parameters the law needs: `{ mode }` for 3, `{ α β }` for
+  5, `{ k }` for 6 (the bounds at k standard deviations, 2 by default),
+  `{ p }` for 7, 9 and 0, `{ ν p }` for 8. The level p is 0.95 by default and
+  the mode is X. Give `{ }` when nothing is needed.
+
+Laws 7 and 8 read ±U as a two-sided interval holding the probability p, as a
+certificate does; laws 9 and 0 read X+U as the one-sided quantile p, the value
+being a magnitude, or positive.
+
+**1)** A display reading 9.000 kg: the bound is ±0.0005 kg, and a rounded reading is
+rectangular:
+
+```rpl
+9._kg 0.0005_kg 1 { } ⓁBound→σ
+@ Expecting 9.±σ2.88675 13459 5⁳⁻⁴ kg
+```
+
+**2)** A certificate gives ±0.2 at 95 % with 10 degrees of freedom:
+
+```rpl
+10. 0.2 8 { 10 0.95 } ⓁBound→σ
+@ Expecting 10.±σ8.97610 12794⁳⁻²
+```
+
+**3)** Unequal bounds move the value to the middle of the interval:
+
+```rpl
+10. { 0.1 0.3 } 1 { } ⓁBound→σ
+@ Expecting 10.1±σ0.11547 00538 38
+```
+
+See also: [ResN0→σR](#resn0→σr).
+
+## ResN0
+
+The resolution of a reading: the unit of its last significant digit, when N of
+its trailing zeros are significant. A calculator stores 9.000 kg as 9 kg; N
+says how many zeros the instrument actually showed.
+
+Stack: `X`, `N` — or `{ X N }`.
+
+**1)**
+
+```rpl
+9._kg 3 ⓁResN0
+@ Expecting 0.001 kg
+```
+
+**2)**
+
+```rpl
+7000. 2 ⓁResN0
+@ Expecting 10.
+```
+
+A value of zero has no significant digit to count from: type its resolution
+directly.
+
+## CompareLibrary
+
+Do two measurements of the same quantity agree? The question has two forms,
+and they must not be confused.
+
+* With **bounds** — `a…b`, `a±b`, `a±p%` — the true value is somewhere inside
+  each interval, so the question is geometric: do the intervals meet, and by
+  how much? That is [ΔConcord](#Δconcord), and [RngRel](#rngrel) for the bare
+  relation.
+* With **standard deviations** — `a±σb` — the bars are not bounds: the value is
+  outside ±σ one time in three. The question is statistical: is the difference
+  D = Y − X compatible with zero? That is [σConcord](#σconcord).
+
+Reading ±σ bars as bounds is a classic error. 10±σ1 and 12.2±σ1 do not touch,
+yet the difference is only 1.56 standard deviations of D, and p = 0.12: the two
+measurements are compatible at any usual threshold. Two ±σ bars that just touch
+give p = 0.16; incompatibility at 5 % needs a gap of about 0.77σ between the
+bars. This is why ΔConcord refuses `a±σb` values, and σConcord refuses bounds.
+
+After Jean Wilson's Concord (2025).
+
+
+## ΔConcord
+
+Draws two bounded intervals X and Y on the same scale, with their intersection,
+and states how much of each it covers and how they sit on the line. Y is first
+expressed in the unit of X.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number.
+
+It returns, tagged: `X∩Y` (a range, or `"∅"` when they do not meet), the part of
+X and the part of Y that the intersection covers, in per cent, and the relation
+as RngRel names it. The drawing stays on screen until a key is
+pressed.
+
+**1)**
+
+```rpl
+1…3 2…4 ⓁΔConcord
+```
+
+It returns `X∩Y:2…3`, `X%:50`, `Y%:50` and `rel:"X overlaps Y"`.
+
+**2)** A mass measured to ±0.0023 g, against a reference given to ±0.005 g, in grams
+both:
+
+```rpl
+5.3617±0.0023_g 5.360±0.005_g ⓁΔConcord
+```
+
+The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
+`Y%:46`, `rel:"X containedBy Y"`.
+
+
+**3)** Random pairs make a good exercise. This draws two intervals between −100 and
+100 and compares them; run it several times, or press DMOΔConcord in
+Applications/Demos:
+
+```rpl
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+ⓁΔConcord
+```
+
+See also: [RngRel](#rngrel).
+
+## σConcord
+
+Are two measurements X = a±σb and Y = c±σd compatible? The answer is read on
+their difference D = Y − X, normal with mean d = c − a and standard deviation
+
+σD = √(σX² + σY² − 2ρ·σX·σY)
+
+where ρ is the global variable `ρ` that the arithmetic of the calculator also
+uses for correlated values (0 when it does not exist). The entry draws the law
+of D, marks zero, and shades the two tails beyond ±|d| around d: their area is
+the p-value.
+
+Stack: `X`, `Y` — each `a±σb` or a plain number, taken as exact.
+
+It returns, tagged: `d`, `σD`, `z` = |d|/σD, and `p` = 2·UTPN(0,1,z), the
+probability of a difference at least this large if the two measure the same
+thing. There is no verdict: the threshold belongs to the user. A small p
+says the measurements disagree; a large p does not prove they agree — it says
+the data cannot tell them apart.
+
+**1)**
+
+```rpl
+10±σ1 12.2±σ1 ⓁσConcord
+```
+
+It returns `d:2.2`, `σD:1.41421 35623 7`, `z:1.55563 49186 1` and
+`p:0.11979 49304 26`.
+
+**2)** The two ±σ bars do not touch, yet p = 0.12. With a correlation of 0.5, the
+difference is better known and the same gap weighs more:
+
+```rpl
+0.5 'ρ' STO 10±σ1 12.2±σ1 ⓁσConcord
+```
+
+Now `σD:1`, `z:2.2` and `p:0.02780 68950 27`. Purge `ρ` afterwards, or it will
+also weigh on the arithmetic of every uncertain value.
+
+**3)** Random measurements make a good exercise too. This draws two measurements of
+the same true value 10, with standard deviations between 0.5 and 2; run it
+several times, or press DMOσConcord in Applications/Demos. About one run in
+twenty gives p < 0.05, although both measure the same thing:
+
+```rpl
+'ρ' PURGE
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+ⓁσConcord
+```
+
+
+## RngRel
+
+How two bounded intervals X and Y sit on the line: one of the thirteen cases of
+Allen's interval algebra, which the IEEE 1788-2015 standard for interval
+arithmetic calls the *overlap* state, returned as a sentence that says which
+way it goes: `"X overlaps Y"`, `"X metBy Y"`. Exactly one case holds for any
+pair, which avoids the ambiguity of < between intervals.
+
+| Case | X = [a₁, a₂], Y = [b₁, b₂] |
+|---|---|
+| before | a₂ < b₁ |
+| meets | a₂ = b₁ |
+| overlaps | a₁ < b₁ < a₂ < b₂ |
+| starts | a₁ = b₁, a₂ < b₂ |
+| containedBy | b₁ < a₁, a₂ < b₂ |
+| finishes | b₁ < a₁, a₂ = b₂ |
+| equals | a₁ = b₁, a₂ = b₂ |
+| finishedBy | a₁ < b₁, a₂ = b₂ |
+| contains | a₁ < b₁, b₂ < a₂ |
+| startedBy | a₁ = b₁, b₂ < a₂ |
+| overlappedBy | b₁ < a₁ < b₂ < a₂ |
+| metBy | a₁ = b₂ |
+| after | b₂ < a₁ |
+
+A point interval takes the first case that matches, in the order equals,
+before, after, starts, finishes, meets, then the others.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number; Y is expressed in
+the unit of X. `a±σb` values are refused, as for ΔConcord.
+
+**1)**
+
+```rpl
+1…3 2…4 ⓁRngRel
+@ Expecting "X overlaps Y"
+```
+
+**2)**
+
+```rpl
+1…3_m 100…300_cm ⓁRngRel
+@ Expecting "X equals Y"
+```
+
+**3)**
+
+```rpl
+2 1…3 ⓁRngRel
+@ Expecting "X containedBy Y"
+```
+
+
+## Monte CarloLibrary
+
+When the model is not linear, when the inputs are not normal, or when the
+result is not symmetric, the usual propagation formula is only an
+approximation. The Monte Carlo method draws values of the inputs at random,
+computes the model for each draw, and reads the result on the values obtained.
+
+* [MCPropagate](#mcpropagate): the mean, the standard uncertainty and the 95 %
+  coverage interval of a model of several inputs, each with its own
+  distribution.
+
+## MCPropagate
+
+Propagation of uncertainty by the Monte Carlo method, as described in
+Supplement 1 of the GUM (JCGM 101:2008).
+
+This is a light version of what the NIST Uncertainty Machine does. That
+machine draws from 100 000 to 5 million values, which a calculator cannot do.
+MCPropagate is made for a few thousand draws, best run on the simulator, on a
+phone or on a computer. In return, each input can follow any of the 30
+distributions of the Probability section, where the Uncertainty Machine
+offers 16.
+
+Stack: F Vars Vals M ▶ N, the 95 % interval, Y±σu. F is the model, an
+expression of the names listed in Vars, or a program that takes one value per
+input from the stack. Vals lists the inputs in the same order, and M is the
+number of draws. M may be omitted, F Vars Vals: 2 000 draws are then made,
+which give the standard uncertainty to about 2 %, in a few seconds on the
+simulator or a phone and in about a minute on a calculator.
+
+The type of each input tells its distribution:
+
+* a standard deviation, like 10±σ1: normal;
+* bounds, like 9…11, 10±1 or 10±10%: rectangular between the bounds, the usual
+  choice for a Type B evaluation;
+* a program that returns one draw, like « 10 1 ⓁLgNrmRand »: any distribution;
+  every distribution of the Probability section has such a Rand function;
+* a plain number: an exact value.
+
+Inputs may carry units. They are independent, unless a global variable ρij
+holds correlations, as for σRFxjxi: one coefficient for all the pairs, or the
+full correlation matrix, in the order of Vals. Normal inputs are then
+correlated exactly, through the Cholesky factor of ρij; inputs given by bounds
+through a Gaussian copula, as in the NIST Uncertainty Machine. An input given
+by a program draws by itself and cannot be correlated. A matrix that is not
+symmetric, or that no set of quantities could have, is refused.
+
+The results are the number of draws used, tagged N; the interval that leaves
+2.5 % of the draws on each side, tagged 95%; and on the first level the mean
+and the standard deviation of the draws, as Y±σu.
+
+With M = 0, MCPropagate stops by itself when the mean and the uncertainty are
+stable to two significant digits of the uncertainty, after 20 000 draws, or
+after one minute, whichever comes first. A distribution with a long tail may
+never be stable: N then tells where it stopped.
+
+Each run gives a slightly different result, and this is how to judge its
+stability. The examples below first set the seed of the random generator, so
+that they always give the same result; leave that line out for real use.
+
+**1)** One distribution alone: the model is the variable itself. A
+rectangular distribution between 9 and 11 has a mean of 10 and a standard
+deviation of 1/√3 = 0.577:
+
+```rpl
+12345 RDZ
+'x' { x } { '9…11' } →Num 2000 ⓁMCPropagate
+@ Expecting 10.02378 18042±σ0.58487 21349 4
+```
+
+**2)** The sum of two normal inputs. The exact result is 30±σ2.236:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 2000 ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
+```
+
+**3)** The product of a rectangular input and a normal one:
+
+```rpl
+12345 RDZ
+'a*b' { a b } { '9…11' 10±σ1 } →Num 2000 ⓁMCPropagate
+@ Expecting 100.26278 5406±σ11.39132 08051
+```
+
+**4)** Inputs with units: a resistance from a voltage and a current.
+
+```rpl
+12345 RDZ
+'V/I' { V I } { '10±σ0.1_V' '5±σ0.05_A' } →Num 2000 ⓁMCPropagate
+@ Expecting 1.99888 76261 4±σ0.02860 28043 8 V/A
+```
+
+**5)** A model that is not linear. For the square of a normal input
+centered on zero, the propagation formula gives 0±σ0, since the derivative is
+zero there. The true mean is 1, the standard deviation 1.414, and the interval
+is far from symmetric:
+
+```rpl
+12345 RDZ
+'x^2' { x } { 0±σ1 } 2000 ⓁMCPropagate
+@ Expecting 0.97201 48896 25±σ1.40367 28151 1
+```
+
+**6)** Any distribution, through its draw program: here a lognormal
+distribution. The draw programs are slower than the normal and rectangular
+inputs, about 60 draws per second on the simulator:
+
+```rpl
+12345 RDZ
+'x' { x } { « 0 1 ⓁLgNrmRand » } 500 ⓁMCPropagate
+@ Expecting 1.88793 72628 2±σ2.38766 59582 6
+```
+
+The same distribution is obtained much faster as the exponential of a normal
+input, with the model 'exp(x)' and the input 0±σ1.
+
+**7)** Automatic stop, with M = 0. Here the result is stable after
+8 500 draws:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 0 ⓁMCPropagate
+@ Expecting 30.03900 15233±σ2.25391 96331 3
+```
+
+**8)** Correlated inputs: the comparison loss in microwave power meter
+calibration of JCGM 101 (9.4), δY = X1² + X2², with x1 = 0.010, x2 = 0,
+u = 0.005 for both and a correlation of 0.9. The propagation formula gives
+1.0×10⁻⁴; the Supplement finds 1.21×10⁻⁴ by the Monte Carlo method with a
+million draws, and 2 000 draws give it to a few per cent:
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } 2000 ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+**9)** Without M: 2 000 draws, the sum of example 2:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
+```
+
+A model given as a program takes its values from the stack, and the list of
+names is empty: « * » { } { 10±σ1 '4±0.5' } →Num 1000 ⓁMCPropagate.
+
+A model that contains a constant, like 'm*Ⓒg*h', is evaluated by
+substitution, which is slower.
+
+See also: the Rand functions of the Probability section, and the Rounding
+functions to present the result.
+
+
+## FunctionsLibrary
+
+Functions of uncertain values and of intervals, without any list to build:
+the function is written with the names x or x1, x2, …, and its values follow
+it on the stack. Standard uncertainties are propagated by the law of
+propagation of the GUM (JCGM 100:2008, section 5), intervals by a search of
+the global minimum and maximum of the function.
+
+* [σRf](#σrf): a composite function of one variable, f(x);
+* [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
+  possibly correlated;
+* [σROOT](#σroot): the unknowns of any simulation of the Equation Library,
+  from inputs given with their uncertainty;
+* [ΔROOT](#Δroot): the range of the unknowns of any simulation of the Equation
+  Library, from inputs given by bounds;
+* [ΔRf](#Δrf): the range of a function of one variable over an interval;
+* [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
+  box;
+* [Exmnf](#exmnf): the drawing of a function over an interval, to check ΔRf.
+* [ExmnFxjxi](#exmnfxjxi) and [ExmnF2D](#exmnf2d): the profile and the plane
+  slice of a function of several variables through its extrema, to check
+  ΔRFxjxi.
+* [Cycling](#cycling): the forms of a value with an uncertainty, `a…b`,
+  `a±b`, `a±p%` and `a±σb`, unit included, to correct a value typed in the
+  wrong form.
+
+Evaluating a function directly on uncertain numbers treats each occurrence of
+a variable as a new, independent variable: x·x does not get the uncertainty
+of x², and (x−1)·(x−2)·(x−3) gets twice its uncertainty. These functions count each
+variable once.
+
+The law of propagation is a first order approximation, good when the function
+is close to linear over the uncertainties. Otherwise, the Monte Carlo method of
+[MCPropagate](#mcpropagate) gives the reference result; comparing the two is
+the check recommended by Supplement 1 of the GUM.
+
+After the σRf, σRFx2x1, σRFxjxi, ΔRf and Exmnf functions of Jean Wilson's Proposition for
+interval implementation in the RPL environment (2025).
+
+
+## σRf
+
+The uncertainty of a composite function of one variable.
+
+Stack: 'f(x)' X ▶ Y±σu, where f is an expression of the name x and X its
+value a±σb, with or without units.
+
+The contribution of x is the derivative of f times the standard deviation,
+obtained by five point central differences on the value with its unit, with a
+step of σ/1000: it comes out in the unit of f, works with any function,
+constant or unit, and also at x = 0.
+
+**1)** The gamma function at 7±σ0.05. The exact uncertainty is
+Γ(7)·ψ(7)·0.05 = 720 × 1.87278 43351 × 0.05 = 67.42023 60636, where
+ψ(7) = −γ + 1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6 is the digamma function:
+
+```rpl
+'tgamma(x)' 7.0±σ0.05 ⓁσRf
+@ Expecting 720.±σ67.42023 60635
+```
+
+**2)** A polynomial near one of its roots. Evaluated directly on
+2.755±σ0.05, it gets about twice this uncertainty, since its three factors are
+treated as independent:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' 2.755±σ0.05 ⓁσRf
+@ Expecting -0.32463 1125±σ0.03550 375
+```
+
+**3)** The difference of a quantity with itself is exactly zero:
+
+```rpl
+'x-x' 2.0±σ0.05_m ⓁσRf
+@ Expecting 0±σ0. m
+```
+
+
+## σRFxjxi
+
+The uncertainty of a function of several variables.
+
+Stack: 'F' Xn … X2 X1 ▶ Y±σu, where F is an expression of the names x1, x2, …
+xn, and each Xj is the value of xj: a±σb, or a plain number for an exact
+value, with or without units. X1 is on the first level, as in a formula read
+from the right.
+
+The variables are independent, unless a global variable ρij holds either one
+correlation coefficient for all the pairs, or the full correlation matrix, in
+the order x1 … xn. The contributions cj, derivative times standard deviation,
+are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
+directory and applies to the next calls: purge it when done, as the examples
+do.
+
+Thanks to Ed van Gasteren, whose Propagate program and discussions led to this
+function.
+
+**1)** A mass from a linear density and a length, with units:
+
+```rpl
+'x2*x1' 2.5±σ0.5_g/cm 2.0±σ0.2_cm ⓁσRFxjxi
+@ Expecting 5.±σ1.11803 39887 5 g
+```
+
+**2)** Three lengths fully correlated, for instance measured with the
+same rule: the uncertainties add instead of combining in quadrature.
+
+```rpl
+1 'ρij' Sto
+'x3+x2+x1' 1.2±σ0.002 2.5±σ0.005 1.600±σ0.012 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 5.3±σ0.019
+```
+
+**3)** Two variables correlated at 0.5, given as a matrix: the
+uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
+
+```rpl
+[[ 1 0.5 ] [ 0.5 1 ]] 'ρij' Sto
+'x2+x1' 10±σ1 20±σ2 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 30±σ2.64575 13110 6
+```
+
+**4)** The potential energy of a mass raised along a slope, with a
+constant and an angle in degrees:
+
+```rpl
+'x3*Ⓒg*x2*sin(x1)' 2±σ0.01_kg 10±σ0.1_m 30±σ0.5_° ⓁσRFxjxi
+@ Expecting 98.0665±σ1.84371 03556 2 kg·m↑2/s↑2
+```
+
+The same functions with MCPropagate take the names and the values as lists:
+'x2*x1' { x2 x1 } { 2.5±σ0.5 2.0±σ0.2 } 0 ⓁMCPropagate.
+
+
+## σROOT
+
+The uncertainty of the unknowns found by ROOT, for any simulation of the
+Equation Library.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:Y1±σu1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their values as usual, but with
+their uncertainty: a±σb for a standard uncertainty, or bounds a…b, a±b or a±p%
+when only the limits are known. Bounds are taken as a rectangular law, of
+standard deviation width/√12, as Bound→σ does. Units are welcome.
+
+σROOT finds these variables in the current directory, runs ROOT with each one
+at its centre, then moves each one in turn by ±σ/100 and runs ROOT again. The
+differences give the contribution of every input to every unknown, combined
+as by σRFxjxi: u² = Σ ci·ck·ρik. The inputs are independent, unless the global
+variable ρij holds one coefficient for all the pairs, or a list of pairs by
+name, { { x y ρ } … }, the other pairs being 0; since σROOT finds the inputs
+itself, a matrix, whose order would be unknown, is refused. With n uncertain inputs,
+ROOT runs 1 + 2n times: a fraction of a second on the simulator. It works even
+when an unknown cannot be isolated, since the derivatives are taken through
+the solver.
+
+Afterwards, each input gets back its uncertain value, and each unknown holds
+its central value. The unknowns are purged before each run, so that ROOT
+always starts from the guesses: a second ROOT on unknowns that already exist
+does not always solve them again.
+
+The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
+the range of each unknown, see ΔROOT. For
+the shape of the law of the result, see DMOPendulum, which
+draws it by the Monte Carlo method.
+
+**1)** The simple pendulum, its amplitude only known between 60° and 80°: the
+four unknowns, each with its uncertainty. Treal agrees with σRFxjxi applied to
+the formula written out.
+
+```rpl
+15±σ0.1_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁσROOT
+@ Expecting { ω:8.08564 57173 6±σ0.02695 21524 66 r/s Treal:0.85638 34442 86±σ1.45730 83375 9⁳⁻² s T:0.77707 89775 87±σ2.59026 32600 6⁳⁻³ s f:1.28687 04840 1±σ4.28956 82919 4⁳⁻³ Hz }
+```
+
+**2)** The pendulum the other way round: from a measured period, its
+amplitude. θmax lies inside a series in sin²(θmax/2) and cannot be isolated:
+ROOT finds it, and σROOT its uncertainty. The length contributes 1.15° and the
+period only 0.40°: to know the amplitude better, measure the length better.
+
+```rpl
+15±σ0.1_cm 'L' Sto  0.8564±σ0.001_s 'Treal' Sto
+'ROOT(ⒺSimple Pendulum;[ω;θmax;T;f];[1_(r/s);50_°;1_s;1_Hz])' ⓁσROOT 2 Get
+@ Expecting θmax:70.00668 81164±σ1.22184 90395 5 °
+```
+
+**3)** A lab experiment: an unknown capacitor, from the voltage across it
+after charging for a time t through a resistor R. The resistor is only known
+by its tolerance, 5 %, a bound; the other inputs are measured. C lies inside an
+exponential. The tolerance of R dominates: with a 1 % resistor, the
+uncertainty of C falls from 1.51 μF to 0.55 μF, without a better voltmeter or
+a better clock.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±5%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+@ Expecting { C:49.94037 53622±σ1.51471 94838 9 μF }
+```
+
+**4)** The same capacitor with a 1 % resistor, Vf and V being read on the same
+voltmeter: an error of its calibration moves both the same way, a correlation
+of 0.9. C depends on their ratio, so the common error partly cancels, and the
+uncertainty of C falls from 0.547 μF to 0.466 μF. ρij stays in the directory
+and applies to the next calls: purge it when done.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±1%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+{ { Vf V 0.9 } } 'ρij' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+'ρij' Purge
+@ Expecting { C:49.94037 53622±σ0.46565 38593 03 μF }
+```
+
+These results were checked against an independent computation in double
+precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
+70.0067±σ1.2218° (Monte Carlo: 1.2194°).
+
+See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+
+
+## ΔROOT
+
+The range of the unknowns found by ROOT, for any simulation of the Equation
+Library: interval arithmetic through the solver.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:lo1…hi1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their bounds: a…b, a±b or a±p%. A
+value a±σb is taken as the bounds a±√3·b of the rectangular law of the same
+standard deviation, the inverse of what Bound→σ does. Only the variables of
+the equations are inputs; units are welcome.
+
+ΔROOT runs ROOT on a grid over the box of the inputs: up to three inputs,
+each at its low bound, its centre and its high bound, 3ⁿ runs; beyond, at the
+corners of the box and at its centre, 2ⁿ + 1 runs, which keeps the time
+reasonable on a calculator. To search inside the box with the full grid of
+3ⁿ runs whatever the number of inputs, store a number other than 0 in the
+global variable ΔROOTFullGrid, for instance 1 'ΔROOTFullGrid' Sto; purge it
+to come back to the corners. With five inputs, that is 243 runs instead of 33. It keeps the smallest and the largest
+value of each unknown. When each unknown varies in one direction with each
+input, its extremes lie at corners of the box, and the range is exact. When
+an extreme is only reached inside the box, the tag of that unknown says
+"(inner extremum?)": the true range may be wider, and a narrower box, or
+Exmnf on the equation, will tell.
+
+Afterwards, each input gets back its value, and each unknown holds its value
+at the centre of the box.
+
+**1)** The simple pendulum, its amplitude between 60° and 80°: the real
+period lies between its values at the two ends. ω, T and f do not depend on
+the amplitude.
+
+```rpl
+15_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁΔROOT
+@ Expecting { ω:8.08564 57173 6…8.08564 57173 6 r/s Treal:0.83393 48521 94…0.88361 42622 96 s T:0.77707 89775 87…0.77707 89775 87 s f:1.28687 04840 1…1.28687 04840 1 Hz }
+```
+
+**2)** The capacitor of σROOT, now by bounds: the supply known to
+±0.05 V, the resistor to 5 %, the voltage read between 3.28 V and 3.32 V. The
+capacitance is guaranteed within the range found.
+
+```rpl
+0_V 'Vi' Sto  10±0.05_V 'Vf' Sto  100±5%_Ω 'R' Sto  2_ms 't' Sto  '3.28…3.32_V' →Num 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁΔROOT
+@ Expecting { C:46.91904 5145…53.28814 92172 μF }
+```
+
+**3)** The limit of the method: the range of a projectile launched between
+35° and 65°. The range is largest at 45°, inside the box; the grid sees 35°,
+50° and 65°, and finds its largest value at 50°, 1 224 ft, where the true
+largest range is 1 243 ft. The tag warns of it.
+
+```rpl
+0_ft 'x0' Sto  0_ft 'y0' Sto  200_ft/s 'v0' Sto  10_s 't' Sto  '35…65_°' →Num 'θ0' Sto
+'ROOT(ⒺProjectile Motion;[R;vcx;vcy;x;y;hmax;tf];[1_ft;1_ft/s;1_ft/s;1_ft;1_ft;1_ft;1_s])' ⓁΔROOT 1 Get
+@ Expecting R (inner extremum?):952.37556 6631…1 224.35042 8 ft
+```
+
+The ranges of the first two examples were checked on a grid of eleven levels
+per input: they are exact to the digits shown.
+
+See also: [Exmnf](#exmnf), [σROOT](#σroot).
+
+
+## ΔRf
+
+Interval arithmetic for a composite function of one variable: the smallest and
+largest values of f over an interval.
+
+Stack: 'f(x)' X ▶ f(X), where f is an expression of the name x and X an
+interval a…b, a±b or a±p%, with or without units. The result has the form of
+X, except that a±p% gives a±b.
+
+Evaluating f directly on an interval counts each occurrence of x as a new
+variable, and the result can be far too wide. ΔRf searches the global minimum
+and maximum of f over X instead: f is evaluated at 65 points spread over X,
+ends included, and each local maximum or minimum of these values is refined
+by a golden section search. An extremum narrower than 1/64 of X could be
+missed; Exmnf draws the function to check it.
+
+**1)** A polynomial with three occurrences of x. Evaluated directly on
+1…3, it gives −4…4, since its factors are taken as independent; the true
+range is ±2/(3√3):
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁΔRf
+@ Expecting -0.38490 01794 6…0.38490 01794 6
+```
+
+**2)** A maximum inside the interval: sin reaches 1 at π/2.
+
+```rpl
+'sin(x)' 1.5±0.15_r ⓁΔRf
+@ Expecting 0.98786 16789 13±0.01213 83210 87
+```
+
+**3)** A minimum inside the interval, at x = 0:
+
+```rpl
+'exp(x^2)' 0.5±0.9 ⓁΔRf
+@ Expecting 4.04966 35325 8±3.04966 35325 8
+```
+
+**4)** A function that is not differentiable at its minimum:
+
+```rpl
+'abs(x^3)' -0.25±0.35 ⓁΔRf
+@ Expecting 0.108±0.108
+```
+
+**5)** With units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁΔRf
+@ Expecting 12.81445 3125±12.81445 3125 m↑4
+```
+
+**6)** An interval given in percent gives a±b:
+
+```rpl
+'x^2' '10±10%' →Num ⓁΔRf
+@ Expecting 101.±20.
+```
+
+
+## Exmnf
+
+Examine a function over an interval: Exmnf draws f over X, with the smallest
+and largest values found by ΔRf as dashed lines, and leaves the result of ΔRf
+on the stack.
+
+Stack: 'f(x)' X ▶ f(X), as ΔRf.
+
+The curve uses 161 points. Each dashed line should touch the curve; a line
+that does not, or a peak of the curve beyond a line, would show an extremum
+that ΔRf missed. The highest and the lowest points of the curve are marked by
+filled triangles ▲ ▼, the other local maxima and minima by hollow ones, each
+centred on its point.
+
+**1)** The polynomial of the first example of ΔRf, with its two
+extrema inside the interval:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁExmnf
+```
+
+**2)** A power with units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁExmnf
+```
+
+**A peak narrower than the sampling.** No search can promise an extremum
+narrower than the steps it takes. This function rises gently from 1 to 1.9,
+with a peak of height 3 and width 0.008 at x = 2.37:
+
+**3)** Over 0…3, the 161 points of the curve fall on the flank of the peak and
+show it as a small spike, marked by hollow triangles, but ΔRf misses it: the dashed line of the
+maximum stays at 1.9, below the spike.
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '0…3' →Num ⓁExmnf
+```
+
+**4)** A spike that the dashed lines do not explain calls for a closer look.
+Over 2.3…2.45, around the spike, the peak is drawn whole and ΔRf finds the
+true maximum, 4.56:
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '2.3…2.45' →Num ⓁExmnf
+```
+
+Over a wide interval, examine the drawing as well as the numbers, and narrow
+the interval around anything they do not account for.
+
+
+## ΔRFxjxi
+
+Interval arithmetic for a function of several variables: the smallest and
+largest values of F over a box, each variable in its own interval.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), where F is an expression of the names x1 … xn
+and each Xj an interval a…b, a±b or a±p%, or a plain number for an exact
+value, with or without units. X1 is on the first level, as for σRFxjxi. The
+result is a…b when all the intervals are a…b, a±b otherwise.
+
+F is first evaluated at the 2ⁿ vertices of the box. A coordinate search then
+starts from the centre and from the best vertex, and improves the minimum and
+the maximum one variable at a time, over its whole interval, until nothing
+improves. This finds an extremum inside the box, on a face or on an edge, one
+per subspace, which is what small intervals call for. It is a search, not a
+proof: a function with many extrema over a wide box could hide one.
+
+**1)** Two occurrences of x1. Evaluated directly, x1·x2 − x1 on
+x1 = 1…2 and x2 = 0…3 gives −2…5; the true range is −2…4:
+
+```rpl
+'x1*x2-x1' 1.5±1.5 1.5±0.5 ⓁΔRFxjxi
+@ Expecting 1.±3.
+```
+
+**2)** A minimum inside the box, at x1 = 1 and x2 = 2:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁΔRFxjxi
+@ Expecting 1±1
+```
+
+**3)** A maximum on an edge, at x1 = 0.5 and x2 = 1:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁΔRFxjxi
+@ Expecting 0.625±0.625
+```
+
+**4)** Small intervals around a point where F changes slowly:
+
+```rpl
+'(x1-1)*(x2-2)*(x1+x2-3)' 2.5±0.1 1.5±0.1 ⓁΔRFxjxi
+@ Expecting 0.28±0.152
+```
+
+**5)** With units and an angle in degrees:
+
+```rpl
+'x2*sin(x1)' 10±1_m 30±5_° ⓁΔRFxjxi
+@ Expecting 5.05645 25777 6±1.25288 82221 m
+```
+
+
+## ExmnFxjxi
+
+Examine a function of several variables over a box: the profile of F along
+the straight segment that joins its global minimum to its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack.
+
+The minimum and the maximum are found as by ΔRFxjxi; the segment that joins
+them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
+points, from the minimum on the left to the maximum on the right. The values
+and the points of both extrema are written below, as { x1 … xn }. The minimum
+and the maximum, at the ends, are marked by filled triangles ▼ ▲, the local
+extrema along the profile by hollow ones.
+
+**1)** A maximum on an edge of the box:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁExmnFxjxi
+```
+
+**2)** Several extrema inside a wide box: the minimum −1 is found at
+x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
+
+```rpl
+'sin(x1)*cos(x2)' 3±3_r 3±3_r ⓁExmnFxjxi
+```
+
+**3)** Robustness: a bump and a dip right on the way from the minimum to the
+maximum. The profile shows both, with their hollow marks, yet the search keeps the global extrema, at (0, 0) and
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnFxjxi
+```
+
+
+## ExmnF2D
+
+Examine a function of several variables over a box: the plane slice that
+contains its global minimum and its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack;
+at least two variables must be intervals.
+
+Each variable is scaled to its interval, the box becoming a cube. The slice is
+the plane that contains the segment from the minimum to the maximum, and the
+direction of the variable least involved in that segment, named on the last
+line; the other degrees of freedom are fixed by the plane. Seven contour
+lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
+shape of F, as on a map: close together where F changes fast. The edge of the
+box is drawn too.
+The minimum and the maximum are marked by filled triangles ▼ ▲, joined by the
+segment that ExmnFxjxi draws. A point of the grid higher than its eight
+neighbours, or lower, is marked by a hollow triangle pointing up or down: the
+local summits and pits of the slice, which tell whether a ring of contours
+surrounds a bump or a dip. About a thousand values of F are computed: a few seconds on
+the simulator.
+
+**1)** A minimum inside the box, a maximum at a vertex:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁExmnF2D
+```
+
+**2)** Three variables: the slice cuts the cube along a polygon:
+
+```rpl
+'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
+```
+
+**3)** A saddle, over a box longer in x1: the minimum −1 at x1 = 0,
+x2 = ±1, the maximum 2.25 at x1 = ±1.5, x2 = 0, and hyperbolas between them:
+
+```rpl
+'x1^2-x2^2' 0±1 0±1.5 ⓁExmnF2D
+```
+
+**4)** A bump: the maximum 1 at the origin, inside the box, with
+circles around it, and the minimum at a far corner:
+
+```rpl
+'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
+```
+
+**5)** Robustness: the same bump and dip as in example 3 of ExmnFxjxi. The
+contours ring both of them, on the segment, and hollow triangles mark the
+bump and the dip. The
+search still finds the global minimum at (0, 0) and the global maximum 1.8 at
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**A hidden peak, in two steps.** A narrow peak of height 3 stands at
+x1 = 2.5, x2 = 1.9, not far from the corner (3, 3), on a gentle slope from 1
+to 1.9:
+
+**6)** Over the whole box 0…3 × 0…3, the search misses the peak and gives the
+maximum 1.9 at the corner (3, 3). The drawing does not: rings of contours near
+the maximum, with a hollow triangle at their centre, show a summit that the numbers do not
+account for.
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**7)** A smaller box centred on the hollow triangle, x1 = 2.5±0.3 and
+x2 = 1.9±0.3, given as X2 X1: the peak is now within the reach of the search,
+and the true maximum appears, 4.475 at (2.5, 1.9):
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.9±0.3 2.5±0.3 ⓁExmnF2D
+```
+
+The search starts from the centre and from the best vertex of the box, one
+variable at a time; a summit narrow compared with the box, off the lines it
+follows, may escape it. When a hollow triangle appears away from the filled ones, or rings
+of contours that the numbers do not explain, examine a smaller box around it.
+
+
+## Cycling
+
+Give a value with an uncertainty its next form, keeping its unit:
+
+`a…b` → `c±d` → `c±p%` → `c±σd` → `a…b`
+
+with c = (a + b)/2, d = (b − a)/2 and p = 100·d/|c|.
+
+The first three forms state the same bounds: going from one to the other is an
+equivalence, nothing is lost or added.
+
+The two steps to and from `c±σd` are of another kind. They keep the same digits
+but change their meaning: a bound becomes a standard deviation, or the reverse.
+Their result is tagged `non-equivalent:` as a reminder. They are there to
+correct a value typed in the wrong form, `10±1` for `10±σ1` or the reverse, not
+to convert one into the other. A bound and a standard deviation are not the
+same thing: the true value lies outside ±σ one time in three. To turn a bound
+into a standard deviation, a law must be chosen, a rectangular one dividing the
+half width by √3: Bound→σ does that.
+
+The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
+but not when the value carries a unit; Cycling does.
+
+**1)** From bounds to a centre and a half width:
+
+```rpl
+9…11 ⓁCycling
+@ Expecting 10±1
+```
+
+**2)** From a half width to a percentage:
+
+```rpl
+10±1 ⓁCycling
+@ Expecting 10±10%
+```
+
+**3)** From a percentage to a standard deviation with the same digits, tagged as not equivalent:
+
+```rpl
+10±10% ⓁCycling
+@ Expecting non-equivalent:10±σ1
+```
+
+**4)** A value typed as a standard deviation but meant as bounds:
+
+```rpl
+10±σ1 ⓁCycling
+@ Expecting non-equivalent:9…11
+```
+
+**5)** With a unit:
+
+```rpl
+1.0…2.0_m ⓁCycling
+@ Expecting 1.5±0.5 m
+```
+
+**6)** Four presses bring the bounds back, tagged as not equivalent since the cycle went through a standard deviation:
+
+```rpl
+1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling ⓁCycling
+@ Expecting non-equivalent:1.…2. m
+```
+
+See also: [Bound→σ](#bound→σ).
+
+
+## ApplicationsLibrary
+
+Worked examples of the whole section, after Part 2, Applications, of Jean
+Wilson's Proposition for interval implementation in the RPL environment
+(2025). Each submenu holds worked examples or demonstrations.
+
+* [GUMS1](#gums1library): the four examples of Supplement 1 to the GUM
+  (JCGM 101:2008), by the propagation formula and by Monte Carlo.
+* [Demos](#demoslibrary): commands of the section run on random inputs, a new
+  case at each press.
+* [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
+  Type B evaluation of the measurements to the Monte Carlo method.
+* [EqDemos](#eqdemoslibrary): equations of the Equation Library with uncertain
+  inputs, by the Monte Carlo method and by the propagation formula.
+* [Labs](#labslibrary): laboratory exercises on equations of your own, added to
+  the Equation Library through `config/equations.csv`.
+
+
+## DemosLibrary
+
+Demonstrations: each key runs a command of the section on inputs drawn at
+random, so that every press shows a new case. Seed the generator with RDZ to
+replay the same sequence.
+
+* DMOΔConcord: two bounded intervals, compared by ΔConcord;
+* DMOσConcord: two measurements of the same quantity, compared by σConcord.
+* DMOExmnF2D: a narrow peak at random, examined by ExmnF2D.
+
+
+## DMOΔConcord
+
+Draws two intervals at random between −100 and 100 and compares them with
+ΔConcord: the drawing, the intersection, the parts covered and the relation.
+Press the key again for a new pair; in a few presses most of the thirteen
+relations of RngRel show up, the rare ones (meets, starts, equals…) excepted.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOΔConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOΔConcord
+```
+
+
+## DMOσConcord
+
+Two measurements of the same true value, 10. Each has a standard deviation
+drawn between 0.5 and 2, and a value drawn from the normal law around 10 with
+that standard deviation, as a real measurement would. σConcord then says
+whether the difference is compatible with zero.
+
+Since both measure the same thing, p is uniform between 0 and 1: it falls below
+0.05 about one press in twenty, and below 0.01 one in a hundred, although
+nothing is wrong. This is what a threshold of 5 % means, and why one small p
+alone does not prove a disagreement.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOσConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOσConcord
+```
+
+
+## DMOExmnF2D
+
+A narrow peak at a random place of the box 0…3 × 0…3, with a random height
+between 1 and 3 and a random width, on a gentle slope from 1 to 1.9:
+1 + x1·x2/10 + h·exp(−((x1 − a)² + (x2 − b)²)/w). ExmnF2D examines it, and the
+demonstration returns, below its result, the summit (a, b), the true maximum
+1 + a·b/10 + h, and whether the search found it.
+
+**1)** A peak missed: the search gives the corner value 1.9, but the contours ring the summit and a hollow triangle marks it.
+
+```rpl
+1 RDZ ⓁDMOExmnF2D
+```
+
+**2)** A peak found, near the centre of the box:
+
+```rpl
+4 RDZ ⓁDMOExmnF2D
+```
+
+Over forty presses, the search found six peaks, about one in six. It
+starts from the centre and from the best vertex and follows lines parallel to
+the axes: it finds the peaks close to those lines. The others are not lost:
+they show as rings of contours with a hollow triangle at their centre, and a
+smaller box around them finds them, as in examples 6) and 7) of ExmnF2D.
+
+
+## GUMS1Library
+
+The four worked examples of Supplement 1 to the GUM, JCGM 101:2008 (clause 9),
+published by the BIPM with their data and results. Each one is solved twice:
+by the law of propagation of uncertainty, as the GUM does (σRFxjxi), and by
+the Monte Carlo method of the Supplement (MCPropagate). Comparing the two with
+the published tables is a validation of both, and each example teaches when
+the first method may be trusted.
+
+* [S1Additive](#s1additive): the additive model (9.2);
+* [S1Mass](#s1mass): the mass calibration (9.3), where the propagation formula
+  underestimates the uncertainty by 40 %;
+* [S1Power](#s1power): the comparison loss in microwave power meter calibration
+  (9.4), where it gives 0, with and without correlation;
+* [S1Gauge](#s1gauge): the gauge block calibration (9.5), nine inputs and five
+  kinds of distributions.
+* [S1Converge](#s1converge): how the Monte Carlo result settles as the number of
+  draws grows, in 1/√M.
+
+The Supplement uses 10⁵ to 10⁶ draws, the pages below 1 000 to 2 000, so that
+each example runs in seconds: their Monte Carlo results come within a few per
+cent of the published ones. With 10 000 draws, DB48x gives:
+
+| Example | Propagation formula, u | Monte Carlo, u | JCGM 101, Monte Carlo |
+|---|---|---|---|
+| 9.2 normal inputs | 2 | 2.006 | 2.00 |
+| 9.2 rectangular inputs | 2 | 2.015 | 2.00 |
+| 9.2 one dominant input | 10.15 | 10.23 | 10.1–10.2 |
+| 9.3 mass | 0.0539 mg | 0.0744 mg | 0.0754 mg |
+| 9.4, x1 = 0.010 | 100 × 10⁻⁶ | 112 × 10⁻⁶ | 112 × 10⁻⁶ |
+| 9.4, x1 = 0.010, r = 0.9 | 100 × 10⁻⁶ | 120 × 10⁻⁶ | 121 × 10⁻⁶ |
+| 9.5 gauge block | 32.1 nm | 35.7 nm | 36 nm |
+
+
+## S1Additive
+
+JCGM 101, 9.2: the additive model Y = X1 + X2 + X3 + X4, with independent
+inputs of expectation 0. The exact answer is known, which makes it the test of
+the method itself.
+
+**1)** Four normal inputs of standard deviation 1: the propagation formula gives u = 2.
+
+```rpl
+'x1+x2+x3+x4' 0±σ1 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ2.
+```
+
+**2)** The Monte Carlo method agrees; the Supplement gives 0.00±σ2.00 and the 95 % interval [−3.92, 3.92]:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d } { 0±σ1 0±σ1 0±σ1 0±σ1 } ⓁMCPropagate
+@ Expecting 6.17138 85639 4⁳⁻²±σ2.00826 44578 6
+```
+
+**3)** Four rectangular inputs of standard deviation 1, between −√3 and √3. The propagation formula is the same, u = 2; the exact 95 % interval is [−3.88, 3.88], a little narrower than the Gaussian one:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±1.73205080757 } ⓁMCPropagate
+@ Expecting -0.01433 08706 8±σ1.98765 66807 8
+```
+
+**4)** The same, with a fourth input ten times wider. The propagation formula gives u = 10.15, and with k = 1.96 the interval ±19.9:
+
+```rpl
+'x1+x2+x3+x4' 0±σ10 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ10.14889 15651
+```
+
+**5)** The Monte Carlo method finds the interval ±17.0, as the Supplement does: when one rectangular input dominates, the result is not normal, and the Gaussian interval is far too wide.
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±17.3205080757 } ⓁMCPropagate
+@ Expecting 0.15361 87355 27±σ10.24279 74855
+```
+
+## S1Mass
+
+JCGM 101, 9.3: a weight W of nominal mass 100 g is calibrated against a
+reference weight R, in air of density ρa; the buoyancy depends on the densities
+ρW and ρR of the two weights. The deviation from the nominal mass is
+
+δm = (mR + δmR)·(1 + (ρa − ρa0)·(1/ρW − 1/ρR)) − 100 000 mg
+
+with ρa0 = 1.2 kg/m³, mR = 100 000±σ0.050 mg, δmR = 1.234±σ0.020 mg, and
+rectangular densities: ρa between 1.1 and 1.3, ρW between 7 000 and 9 000,
+ρR between 7 950 and 8 050 kg/m³ (table 5 of the Supplement).
+
+**1)** The propagation formula gives u = 0.0539 mg, as the GUM uncertainty framework of the Supplement (table 6):
+
+```rpl
+'(x1+x2)*(1+(x3-1.2)*(1/x4-1/x5))-100000'
+8000±σ28.8675134595 8000±σ577.350269190 1.2±σ0.0577350269190 1.234±σ0.020 100000±σ0.050
+ⓁσRFxjxi
+@ Expecting 1.234±σ5.38516 48071 3⁳⁻²
+```
+
+**2)** The Monte Carlo method gives about 0.075 mg; the Supplement finds 0.0754 mg:
+
+```rpl
+12345 RDZ
+'(m+d)*(1+(densA-1.2)*(1/densW-1/densR))-100000'
+{ m d densA densW densR }
+{ 100000±σ0.050 1.234±σ0.020 1.2±0.1 8000±1000 8000±50 } ⓁMCPropagate
+@ Expecting 1.23850 18718±σ0.07615 43941 04
+```
+
+The propagation formula underestimates the uncertainty by 40 %. At the
+estimates, ρa = ρa0, so the derivatives of δm with respect to the three
+densities are all zero: to first order, the densities do not count. They do,
+through the product of their deviations, which only a second order formula or
+the Monte Carlo method sees.
+
+
+## S1Power
+
+JCGM 101, 9.4: the comparison loss of a microwave power meter, δY = X1² + X2²,
+where X1 and X2 are the real and imaginary parts of a reflection coefficient,
+normal, with x2 = 0 and u(x1) = u(x2) = 0.005 (tables 8 and 9 of the
+Supplement).
+
+**1)** At x1 = 0, the derivatives are zero, and the propagation formula gives an uncertainty of 0, which is wrong:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0±σ0.005 ⓁσRFxjxi
+@ Expecting 0±σ1.17851 13019 8⁳⁻⁸
+```
+
+**2)** The Monte Carlo method gives δy ≈ 50×10⁻⁶ and u ≈ 50×10⁻⁶, as the Supplement and the exact solution:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 5.07012 99776 7⁳⁻⁵±σ5.03014 46082 1⁳⁻⁵
+```
+
+**3)** At x1 = 0.010, the propagation formula gives u = 100×10⁻⁶:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0.010±σ0.005 ⓁσRFxjxi
+@ Expecting 0.0001±σ1.00000 00034 7⁳⁻⁴
+```
+
+**4)** The Monte Carlo method finds about 112×10⁻⁶, as the Supplement:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 1.50469 96371 1⁳⁻⁴±σ1.14549 79356 9⁳⁻⁴
+```
+
+**5)** X1 and X2 correlated at 0.9: the Supplement finds 121×10⁻⁶ (table 9).
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+The distribution of δY is far from normal: at x1 = 0, it is a χ² law with
+two degrees of freedom, which starts at 0. The Supplement gives its shortest
+95 % interval, [0, 150]×10⁻⁶; MCPropagate gives the interval that leaves 2.5 %
+on each side, about [1.3, 184]×10⁻⁶ in theory. Both are right, for two
+definitions.
+
+
+## S1Gauge
+
+JCGM 101, 9.5: the length of a nominally 50 mm gauge block, compared with a
+reference block, the example H.1 of the GUM itself. In nm,
+
+δL = Ls + D + d1 + d2 − Ls·(δα·(θ0 + Δ) + αs·δθ) − 50 000 000
+
+with nine inputs of five kinds (table 10 of the Supplement): Ls, D, d1 and d2
+follow scaled and shifted t-distributions (StudentRand), αs is rectangular,
+θ0 normal, Δ follows an arc sine law (UShapeRand), and δα and δθ are
+rectangular with inexactly known limits: a half-width drawn in [w − d, w + d],
+then a value drawn in ±that half-width.
+
+**1)** The propagation formula gives 838±σ32 nm, as the Supplement (table 11):
+
+```rpl
+'x1+x2+x3+x4-x1*(x8*(x6+x7)+x5*x9)-50000000'
+0±σ0.0300462 0±σ5.78315E-7 0±σ0.353553390593 -0.1±σ0.2 11.5E-6±σ1.15470053838E-6
+0±σ7 0±σ4 215±σ6 50000623±σ25 ⓁσRFxjxi
+@ Expecting 838±σ32.13796 12095
+```
+
+**2)** The Monte Carlo method, with 1 000 draws for speed: the Supplement finds 838±σ36 nm. The difference with the propagation formula comes from the heavy tails of the t-distributions.
+
+```rpl
+12345 RDZ
+'gLs+gD+gd1+gd2-gLs*(gDa*(gT0+gDl)+gAs*gDt)-50000000'
+{ gLs gD gd1 gd2 gAs gT0 gDl gDa gDt }
+{ « 18 ⓁStudentRand 25 * 50000623 + » « 24 ⓁStudentRand 6 * 215 + »
+  « 5 ⓁStudentRand 4 * » « 8 ⓁStudentRand 7 * »
+  11.5E-6±2E-6 -0.1±σ0.2 « -0.5 0.5 ⓁUShapeRand »
+  « RAND 0.2E-6 * 0.9E-6 + RAND 2 * 1 - * » « RAND 0.05 * 0.025 + RAND 2 * 1 - * » } 1000 ⓁMCPropagate
+@ Expecting 838.99938 8993±σ37.24850 82155
+```
+
+With 10 000 draws, about two minutes on the simulator, the result is
+838.0±σ35.7 nm.
+
+
+## S1Converge
+
+How many draws? The Monte Carlo method gives an estimate of the standard
+uncertainty u that is itself uncertain: for a nearly normal result, its
+relative standard deviation is about 1/√(2M). Ten times more draws make it
+√10 ≈ 3.2 times more precise, at ten times the cost.
+
+S1Converge runs the mass calibration of S1Mass with 100, 1 000 and
+10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
+its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
+the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
+three values of u. About 13 seconds on the simulator; on a calculator, several
+minutes.
+
+**1)** The convergence, with the seed of the examples:
+
+```rpl
+ⓁS1Converge
+```
+
+The three values are 0.081, 0.0743 and 0.0746 mg. With 100 draws, u is known
+to about 7 %: enough to see that the first-order value 0.0539 mg is wrong, not
+enough to give two digits. With 10 000 draws, u is known to 0.7 %, close to the
+two significant digits of the published 0.0754 mg. This is the question that
+the adaptive procedure of the Supplement answers (7.9): draw until the digits
+wanted are stable, which MCPropagate does with M = 0.
+
+See also: [S1Mass](#s1mass).
+
+
+## ProjectileLibrary
+
+A worked example of the whole Uncertainty section, after Part 2 of Jean
+Wilson's Proposition for interval implementation in the RPL environment
+(2025). A spring loaded gun launches a glass marble towards a target at the
+same height, 8 m away. Each step is a small experiment with its own
+uncertainty budget, on its own page and under its own key; the results of the
+previous steps are written in its calculations, so that each step can be run
+alone.
+
+* [Step A](#stepa): the mass of the marble;
+* [Step B](#stepb): the constant of the spring;
+* [Step C](#stepc): the ejection speed;
+* [Step D](#stepd): the ejection angle;
+* [Step E](#stepe): the height of the laser pointer;
+* [Step F](#stepf): a more realistic experiment, with friction and losses;
+* [Step G](#stepg): the same result, from the measurements themselves.
+* [Step H](#steph): model validation, the predictions against the shots.
+
+At each step, the same tools are used in the same order:
+
+* the Type B evaluation of the data: a resolution or a tolerance is a bound,
+  hence a rectangular law of standard deviation bound/√3 (Bound→σ);
+* the law of propagation with independent inputs, ρ = 0, the physical case:
+  two inputs are correlated only when their measurements share a cause of
+  error, not because of the shape of the formula (σRFxjxi);
+* the bracket of the correlations, the smallest and the largest uncertainty
+  that correlations could give;
+* interval arithmetic on intervals of one standard deviation, as in the 2025
+  document, which contains the bracket (ΔRFxjxi);
+* the Monte Carlo method, which needs no linearization (MCPropagate);
+* the rounding of the result, and its comparison with a reference value when
+  there is one (SciRngRnd, σConcord).
+
+The data are those of 2025. Three Type B evaluations change: the diameter of
+step A was given its resolution divided by √3 instead of the half resolution,
+and the tolerances of steps B, D and E were read as standard deviations
+instead of bounds.
+
+
+## StepA
+
+Step A: the mass of the marble, M = ρ·(4/3)·π·(D/2)³, with a diameter
+D = 16.000 mm read on a micrometer of resolution 0.001 mm, a density
+ρ = 2.500 g/cm³ known to one unit of its last digit, and a reference mass
+Mref = 5.36±σ0.01 g.
+
+**1)** The diameter: its last digit is a resolution, the bound is half of it.
+
+```rpl
+16_mm 0.0005_mm 1 { } ⓁBound→σ
+@ Expecting 16.±σ2.88675 13459 5⁳⁻⁴ mm
+```
+
+**2)** The mass, inputs independent:
+
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert
+@ Expecting 5.36165 14621 3±σ2.16420 64708 4⁳⁻³ g
+```
+
+**3)** The bracket of the correlations, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ1.85445 26865 8⁳⁻³ g
+```
+
+**4)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ2.43486 84831 2⁳⁻³ g
+```
+
+**5)** Interval arithmetic:
+
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±0.001_g/cm^3 16±0.00028867513459_mm ⓁΔRFxjxi
+1_g Convert
+@ Expecting 5.36165 15834 5±2.43486 84852 5⁳⁻³ g
+```
+
+**6)** The Monte Carlo method, the diameter rectangular:
+
+```rpl
+12345 RDZ
+'r*4/3*Ⓒπ*(d/2)^3' { r d } { '2.5±σ0.001_g/cm^3' '15.9995…16.0005_mm' } →Num
+ⓁMCPropagate 1_g Convert
+@ Expecting 5.36170 70590 3±σ2.14913 26272 8⁳⁻³ g
+```
+
+**7)** Rounded, the mass is 5.3617±σ0.0022 g:
+
+```rpl
+5.3616514621±σ0.0021642064708_g ⓁSciRngRnd
+@ Expecting 5.3617±σ0.0022 g
+```
+
+**8)** It agrees with the reference value:
+
+```rpl
+5.3617±σ0.0022_g 5.36±σ0.01_g ⓁσConcord
+```
+
+
+## StepB
+
+Step B: the constant of the spring. It stores U = 0.22 J when it is
+compressed by x = 15.00 cm, read on a rule graduated in millimetres:
+k = 2·U/x². Its reference value is 20 N/m with a tolerance of ±2.5 %, a bound.
+
+**1)** The compression, read to the millimetre:
+
+```rpl
+15_cm 0.05_cm 1 { } ⓁBound→σ
+@ Expecting 15.±σ2.88675 13459 5⁳⁻² cm
+```
+
+**2)** The reference, ±2.5 % read as a bound: 20±σ0.29 N/m, not 20±σ0.5 N/m.
+
+```rpl
+20_N/m 0.5_N/m 1 { } ⓁBound→σ
+@ Expecting 20.±σ0.28867 51345 95 N/m
+```
+
+**3)** The spring constant, inputs independent:
+
+```rpl
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi 1_N/m Convert
+@ Expecting 19.55555 55556±σ0.07527 46168 82 N/m
+```
+
+**4)** The bracket, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07615 82573 15 N/m
+```
+
+**5)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07438 04795 38 N/m
+```
+
+**6)** Interval arithmetic:
+
+```rpl
+'2*x2/x1^2' 0.22±0.00001_J 15±0.028867513459_cm ⓁΔRFxjxi 1_N/m Convert
+@ Expecting 19.55577 62622±0.07615 88247 46 N/m
+```
+
+**7)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'2*u/x^2' { u x } { '0.22±σ0.00001_J' '14.95…15.05_cm' } →Num
+ⓁMCPropagate 1_N/m Convert
+@ Expecting 19.55534 095±σ0.07717 42988 1 N/m
+```
+
+**8)** 19.556±σ0.075 N/m is 1.5 standard deviations of the difference below the reference: compatible.
+
+```rpl
+19.556±σ0.075_N/m 20±σ0.29_N/m ⓁσConcord
+```
+
+
+## StepC
+
+Step C: the ejection speed. All the energy of the spring becomes kinetic
+energy of the marble: v = √(2·K/m), with K = U = 0.22 J.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg.
+
+**1)** The speed, inputs independent:
+
+```rpl
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert
+@ Expecting 9.05893 30239 4±σ1.83985 45958 4⁳⁻³ m/s
+```
+
+**2)** The bracket, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ2.03418 36042 1⁳⁻³ m/s
+```
+
+**3)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ1.62241 39213⁳⁻³ m/s
+```
+
+**4)** Interval arithmetic:
+
+```rpl
+'√(2*x2/x1)' 0.22±0.00001_J 0.0053616514621±0.0000021642064708_kg
+ⓁΔRFxjxi 1_m/s Convert
+@ Expecting 9.05893 36166 4±2.03418 38025 4⁳⁻³ m/s
+```
+
+
+## StepD
+
+Step D: the ejection angle. The marble must land at R = 8.00 m, the target
+accepting ±2 %, a bound: θ = ½·asin(R·g/v²).
+
+From step C: v = 9.0589330239±σ0.0018398545958 m/s.
+
+**1)** The range, ±2 % read as a bound:
+
+```rpl
+8_m 0.16_m 1 { } ⓁBound→σ
+@ Expecting 8.±σ0.09237 60430 7 m
+```
+
+**2)** The angle, inputs independent:
+
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±σ0.0923760430707_m 9.0589330239±σ0.0018398545958_m/s
+ⓁσRFxjxi
+@ Expecting 36.46990 40743±σ1.07860 45787 °
+```
+
+**3)** Interval arithmetic:
+
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±0.0923760430707_m 9.0589330239±0.0018398545958_m/s
+ⓁΔRFxjxi
+@ Expecting 36.54274 28944±1.12547 27707 6 °
+```
+
+**4)** The Monte Carlo method shows what the linearization misses: its mean is 0.05° higher, about three times its own standard error, and its uncertainty 3 % larger. The arcsine curves over the range of R.
+
+```rpl
+12345 RDZ
+'0.5*asin(r*Ⓒg/v^2)' { r v } { '7.84…8.16_m' '9.0589330239±σ0.0018398545958_m/s' } →Num
+5000 ⓁMCPropagate
+@ Expecting 36.51925 9431±σ1.11125 26992 5 °
+```
+
+
+## StepE
+
+Step E: the height of the laser pointer. The angle is set with a laser
+pointed at a mark x = 2.000 m away, within ±0.1 %, a bound, at the height
+y = x·tanθ.
+
+From step D: θ = 36.4699040743±σ1.0786045787°.
+
+**1)** The distance, ±0.1 % read as a bound:
+
+```rpl
+2_m 0.002_m 1 { } ⓁBound→σ
+@ Expecting 2.±σ1.15470 05383 8⁳⁻³ m
+```
+
+**2)** The height, inputs independent:
+
+```rpl
+'x2*tan(x1)' 2±σ0.0011547005384_m 36.4699040743±σ1.0786045787_° ⓁσRFxjxi
+@ Expecting 1.47829 70171 1±σ5.82265 98490 7⁳⁻² m
+```
+
+**3)** Interval arithmetic:
+
+```rpl
+'x2*tan(x1)' 2±0.0011547005384_m 36.4699040743±1.0786045787_° ⓁΔRFxjxi
+@ Expecting 1.47914 11034 3±0.05909 24630 35 m
+```
+
+**4)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'d*tan(t)' { d t } { '1.998…2.002_m' '36.4699040743±σ1.0786045787_°' } →Num
+ⓁMCPropagate
+@ Expecting 1.48055 71150 4±σ0.05788 01664 32 m
+```
+
+**5)** Rounded, the laser must point 1.478±σ0.058 m high:
+
+```rpl
+1.4782970171±σ0.058226598491_m ⓁSciRngRnd
+@ Expecting 1.478±σ0.058 m
+```
+
+
+## StepF
+
+Step F: a more realistic experiment. Which compression x of the spring gives
+the speed of step C, when the marble also loses energy by friction along the
+barrel (μk = 0.5±σ0.005), rises in it, and keeps only a fraction f = 0.95±σ0.019
+of the energy as translation? The energy balance gives
+
+x = m·g/k·(sin θ + μk·cos θ) + 1/k·√((m·g)²·(sin θ + μk·cos θ)² + 2·k·K/f)
+
+with x1 = m, x2 = k, x3 = θ, x4 = μk, x5 = K and x6 = f. This step is written
+in SI units without unit objects, except the angle: with six variables, units
+make the calculations about fifty times slower.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg; from step B:
+k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743±σ1.0786045787°.
+
+**1)** The compression, inputs independent:
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56925 12210 7⁳⁻³
+```
+
+**2)** The 2025 document chose ρ51 = ρ52 = ρ65 = +1 and ρ54 = −1. This is not a possible correlation matrix, and σRFxjxi refuses it: if K were perfectly correlated with m, k and f, these three would be perfectly correlated with each other, while the matrix says they are independent. One coefficient for all the pairs cannot go below −1/(n−1), −0.2 here. With ρ = +1 for all the pairs:
+
+```rpl
+1 'ρij' Sto
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi 'ρij' Purge
+@ Expecting 0.15659 93648 36±σ1.80367 32962⁳⁻³
+```
+
+**3)** The largest uncertainty that correlations can give is the one where all the contributions add up: interval arithmetic gives it.
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±0.019 0.22±0.00001 0.5±0.005 36.4699040743±1.0786045787_° 19.5555555556±0.075274616882 0.0053616514621±0.0000021642064708
+ⓁΔRFxjxi
+@ Expecting 0.15662 58788 25±1.88751 71425 7⁳⁻³
+```
+
+**4)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+ⓁMCPropagate
+@ Expecting 0.15662 45397 98±σ1.61813 73075 7⁳⁻³
+```
+
+**5)** The Monte Carlo method with the same correlation as in 2), ρ = +1 for all
+the pairs:
+
+```rpl
+1 'ρij' Sto 12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+ⓁMCPropagate 'ρij' Purge
+@ Expecting 0.15664 39577 78±σ1.77935 81418 4⁳⁻³
+```
+
+Both methods find that a correlation of +1 between all the inputs would raise
+the uncertainty of the compression from 1.62 mm to about 1.8 mm: 1.80 by the
+propagation formula, 1.78 by Monte Carlo. Unlike the angle of step D, the
+compression is nearly linear in its inputs over their range, and the
+propagation formula is enough here.
+
+The compression must be 15.66±σ0.16 cm, not the
+15.00 cm of step B: the friction, the rise and the fraction f cost 0.66 cm of
+compression, about four standard deviations. The experiment can be redone
+with this setting.
+
+
+## StepG
+
+Step G: the same compression, from the measurements themselves. The six
+variables of step F are not all measurements: k, θ and v were computed in
+steps B to D from the same energy U = K and the same mass m. Their errors are
+correlated for a real reason, a shared cause, and no ρij needs to be guessed
+if x is written as a function of the seven measurements, which are
+independent: x1 = D, x2 = ρ, x3 = U, x4 = the compression x0 of step B,
+x5 = R, x6 = μk and x7 = f, with m = ρ·(4/3)·π·(D/2)³, k = 2·U/x0² and
+θ = ½·asin(R·g·m/(2·U)).
+
+**1)** The compression from the measurements:
+
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.00001 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56924 37991⁳⁻³
+```
+
+**2)** The same as in step F: with an energy known to 10⁻⁵ J, the correlations weigh nothing. A spring gun rather gives about 2 %. With U = K = 0.22±σ0.0044 J, the calculation of step F, which treats K as independent of k and θ, finds a much larger uncertainty:
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.0044 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ2.19778 08296 2⁳⁻³
+```
+
+**3)** while the calculation from the measurements hardly moves:
+
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.0044 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.57240 83931 7⁳⁻³
+```
+
+The energy enters k, K and θ, and its effects almost cancel: ignoring this
+correlation overestimates the uncertainty by 40 %. Going back to independent
+measurements is the right way to propagate through a chain of calculations.
+
+
+## StepH
+
+Step H: model validation. The model predicts where the marble lands; the
+experiment says where it actually lands. Are the two compatible? The gun is
+set, ten shots are fired, and the range R of each is measured with a tape to
+the centimetre. The angle is set with the laser pointer of step E to ±0.5°, a
+bound, and the compression with the rule of step B.
+
+The range follows from the energy K of the marble at the exit of the barrel:
+R = 2·K·sin 2θ/(m·g). The ideal model of steps C and D takes K = ½·k·x²; the
+realistic model of step F takes K = f·(½·k·x² − m·g·(sin θ + μk·cos θ)·x).
+The shots scatter by about 10 cm from one to the next.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg; from step B:
+k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743°; from
+step F: x = 15.66 cm, μk = 0.5±σ0.005 and f = 0.95±σ0.019.
+
+**H-i) The ideal model, at x = 15.00 cm**
+
+**1)** The ideal model predicts the target, 8 m:
+
+```rpl
+'x2*x3^2*sin(2*x4)/(x1*9.80665)'
+36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00000 00000 9±σ5.01881 86642 8⁳⁻²
+```
+
+**2)** Ten shots at 15.00 cm: their mean, and its standard deviation s/√n:
+
+```rpl
+[[7.42] [7.41] [7.13] [7.31] [7.39] [7.37] [7.23] [7.25] [7.35] [7.21]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.307±σ0.03091 38588 12
+```
+
+**3)** Prediction and observation compared:
+
+```rpl
+8.00000000009±σ0.0501881866428 7.307±σ0.0309138588120 ⓁσConcord
+```
+
+The shots fall 69 cm short, about twelve standard deviations of the
+difference: p = 6.5·10⁻³². The ideal model is rejected. The
+realistic model, at the same compression, explains the short shots:
+
+**4)** The realistic model at 15.00 cm:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 7.32849 85110 7±σ0.15380 86796 2
+```
+
+**H-ii) The realistic model, at x = 15.66 cm**
+
+**5)** At the compression computed in step F, the realistic model predicts 8 m:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.1566±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00006 60455 6±σ0.16765 20304 97
+```
+
+**6)** Ten shots at 15.66 cm:
+
+```rpl
+[[7.98] [7.83] [8.00] [7.87] [8.01] [8.14] [8.14] [8.12] [7.83] [8.06]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.998±σ3.83492 72048 7⁳⁻²
+```
+
+**7)** Prediction and observation compared:
+
+```rpl
+8.00006604556±σ0.167652030497 7.998±σ0.0383492720487 ⓁσConcord
+```
+
+The difference is two millimetres, p is close to 1: the realistic model is
+confirmed. Its prediction is less precise than the ideal one, mostly because
+of the fraction f, known to 2 %: a series of shots like this one is also a way
+to measure f better.
+
+**Do the predictions frame the shots?** The prediction ±2 standard deviations
+is an interval of about 95 %. ΔConcord compares it with the range of the ten
+shots, from the shortest to the longest:
+
+**8)** The ideal model at 15.00 cm: no shot is in the predicted interval.
+
+```rpl
+7.13…7.42 8±0.10037637 ⓁΔConcord
+```
+
+**9)** The realistic model at 15.66 cm: all the shots are in it.
+
+```rpl
+7.83…8.14 8.00006604556±0.33530406 ⓁΔConcord
+```
+
+A model is never proven right: it is confirmed as long as it survives the
+comparison, and a test able to reject a model, as in H-i, is what gives weight
+to the agreement of the other one, in H-ii. The comparison of a prediction and a measurement, each with its uncertainty,
+is the core of the validation methods of metrology, such as the normalized
+error Eₙ of ISO 13528 and the validation comparison of ASME V&V 20.
+
+
+## EqDemosLibrary
+
+Equations of the Equation Library with uncertain inputs.
+Each input is drawn from a law, a normal law for a measured value, a
+rectangular law for a quantity only known to lie within bounds, and the
+result is drawn many times: its histogram shows the law of the result, which
+the propagation formula of σRFxjxi sums up in two numbers. An
+input given as a range, like an amplitude between 60° and 80°, becomes in this
+way an input of the equation.
+
+* DMOPendulum: the period of the simple pendulum, for small and for large
+  amplitudes.
+
+
+## DMOPendulum
+
+The two periods of Simple Pendulum in the Equation
+Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
+amplitude, and the real period for a large amplitude θmax,
+`Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x))`, with `c(x) = (2x)!/(2^x·x!)²`.
+
+The length is measured, `L = 15±σ0.1 cm`, a normal law; the amplitude is only
+known to lie within a range of 20°, a rectangular law. The range is drawn at
+random at each press, from 0…20° up to 60…80°, or given on the stack as a list
+`{ lo hi }` in degrees; any other object is left alone.
+
+Three hundred pairs (L, θmax) are drawn, fewer on a calculator (see below),
+and both periods computed for each.
+The histogram of Treal is drawn in black, and that of T over it in gray, on
+the same axis, whose ends are written below in seconds. Above are the mean and
+standard deviation of each, and Treal by the propagation formula of
+σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The inputs are
+independent: a variable ρij left by another calculation, in this directory or
+above it, is set aside for σRFxjxi, then put back. The three results are
+returned, tagged.
+
+About 2 seconds on the simulator. On a calculator, where the normal draws of L
+are slow, the draws stop after about 30 seconds, with 30 of them at least, and
+the classes follow their number; the number of draws is written after the
+Monte Carlo result. To have the 300 draws whatever the time, a few minutes on
+a DM32, store a number other than 0 in the global variable ExtendedTrials,
+for instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
+
+**1)** A range at random:
+
+```rpl
+1 RDZ ⓁDMOPendulum
+```
+
+**2)** Small amplitudes, 5…15°: the two histograms almost coincide, and T is
+a good model.
+
+```rpl
+1 RDZ { 5 15 } ⓁDMOPendulum
+```
+
+**3)** Large amplitudes, 60…80°: Treal is longer than T by 0.08 s, thirty
+times the uncertainty of T, and its histogram is nearly flat.
+
+```rpl
+1 RDZ { 60 80 } ⓁDMOPendulum
+```
+
+Three lessons. First, the error of a model can be far larger than the
+uncertainty of the measurements: no care in measuring L makes T right at 70°.
+Second, the propagation formula gives here nearly the same mean and standard
+deviation as the Monte Carlo method, since Treal is almost linear in θmax over
+20°. Third, it does not give the shape: Treal inherits the flat law of θmax,
+whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws show
+it.
+
+See also: [Simple Pendulum](#Simple Pendulum).
+
+
+## LabsLibrary
+
+Laboratory exercises, each on an equation of its own that is not in the
+Equation Library. Such an equation is added in the file
+`config/equations.csv`, which the calculator reads at start: each line gives a
+name and an equation, under the name of a section. It then appears in the
+Equation Library like the others, as Ⓔname, and the whole of the Uncertainty
+section applies to it: ROOT solves it, σROOT gives the uncertainty of its
+unknowns, ΔROOT their range, and σConcord compares a result with a reference.
+The file shipped with the calculator holds a section Labs, with the equations
+of these exercises, as a model for your own.
+
+* Calorimetry: identify a metal by its specific heat.
+* WeakAcid: the pH of a weak acid, and when the school formula fails.
+* BeamYoung: the Young's modulus of a bar, from its deflection.
+
+
+## Calorimetry
+
+Identify a metal by its specific heat, by the method of mixtures. A sample of
+mass ms is heated in boiling water, at Ts, then dropped into a calorimeter
+that holds a mass mw of water at Tw; the mixture settles at Tf. The heat given
+by the sample is taken by the water and the calorimeter, of heat capacity
+Ccal: ms·cs·(Ts − Tf) = (mw·cw + Ccal)·(Tf − Tw). This is the equation Calorimetry of the section Labs of `config/equations.csv`.
+
+The measurements: ms = 100.00 g on a balance, u = 0.01 g; Ts, the boiling water,
+between 99.7 °C and 99.9 °C; mw = 200.00 g; Tw = 20.0 °C and Tf = 23.3 °C on a
+thermometer, u = 0.1 K; Ccal, known between 40 and 60 J/K. The specific heat of
+water cw comes from the constants library, ⒸcpH2O, with its standard
+uncertainty ⓈcpH2O: →Num gives their values, and →σRange joins them. The
+temperatures are in kelvins, as the specific heats of the constants library.
+
+The key Calorimetry runs the whole exercise: it stores the measurements, finds
+cs and its uncertainty with σROOT, compares it with the specific heats of
+copper, aluminium and iron of the constants library, ⒸcpCu, ⒸcpAl and ⒸcpFe,
+as σConcord does but without its drawing, and returns cs, the p-value of each
+comparison, and the metals compatible at the 5 % level.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁCalorimetry
+@ Expecting metal:"copper"
+```
+
+**2)** Step by step: the measurements, then cs and its standard uncertainty.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
+@ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
+```
+
+**3)** The same measurements as bounds, a±σb being taken as a±√3·b: ΔROOT gives
+the range of cs. Copper, 385 J/(kg·K), lies inside; iron, 450 J/(kg·K), and
+aluminium, 902 J/(kg·K), do not.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
+@ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
+```
+
+**4)** The comparison with copper, by σConcord, which draws the law of the
+difference D and returns d, σD, z and p: here z = 0.16 and p = 0.88.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT 1 Get DeleteTag
+ⒸcpCu →Num Dup UVAL ⓈcpCu →Num UVAL →σRange Swap →Unit
+ⓁσConcord
+```
+
+Three lessons. The budget of uncertainty is dominated by the thermometer: each
+of its two readings contributes about 12 J/(kg·K) to the 17 J/(kg·K) of cs, the
+calorimeter 2.5, and the specific heat of water less than 0.1. A thermometer
+read to 0.01 K would divide the uncertainty of cs by six; a larger rise of
+temperature, with less water, would help too. Then, the sample is compatible
+with copper, and clearly not with iron nor aluminium; but compatible is not
+identified: zinc, whose specific heat is about 388 J/(kg·K), would give the
+same answer. Last, the variables ms, Ts, mw, cw, Ccal, Tw and Tf stay in the
+current directory: change them to your own measurements, and run the steps
+again.
+
+To add an equation of your own, write it in `config/equations.csv`, under a
+section of your choice, with the units of its variables, as this one:
+
+```
+"Labs"
+
+"Calorimetry",  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"
+```
+
+See also: [σROOT](#σroot), [ΔROOT](#Δroot), [σConcord](#σconcord).
+
+
+## WeakAcid
+
+The pH of a solution of acetic acid, a weak acid of pKa = 4.756 at 25 °C,
+prepared by dilution: a volume V1 of a standard solution of concentration C0
+is taken with a pipette, and made up to V2 in a volumetric flask. Two
+equations, WeakAcid in the section Labs of `config/equations.csv`: the dilution
+C = C0·V1/V2, and the charge balance [H⁺] = [A⁻] + [OH⁻], which with
+h = 10^(−pH), Ka = 10^(−pKa) and Kw = 10^(−pKw) reads
+h = C·Ka/(Ka + h) + Kw/h. Written in pH, this is an equation that has to be
+solved: ROOT does it. Concentrations are in mol/L, given as plain numbers.
+
+The measurements: C0 = 0.1000 mol/L, u = 0.0002; a pipette of class A,
+10 mL ± 0.02 mL, and a flask of class A, 100 mL ± 0.08 mL, two tolerances, that
+is bounds; pKa = 4.756, u = 0.010, and pKw = 14.00, u = 0.01, from tables.
+
+The key WeakAcid shows where the formula of the textbooks,
+pH ≈ ½(pKa − log C), holds: for C = 10⁻¹ … 10⁻⁸ mol/L it returns one line per
+concentration, tagged C=1E-k: { pH by ROOT, pH by the formula }. The last line,
+C=1E-8, is on the first level.
+
+**1)** The exact pH and the formula, from 0.1 to 10⁻⁸ mol/L:
+
+```rpl
+ⓁWeakAcid
+@ Expecting C=1E-8:{ 6.978 6.378 }
+```
+
+**2)** The dilution of the laboratory, 0.01 mol/L: the pH and its standard
+uncertainty, by σROOT.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁσROOT
+@ Expecting { C:0.01±σ2.35513 62310 2⁳⁻⁵ pH:3.38709 33091±σ4.92308 91271 9⁳⁻³ }
+```
+
+**3)** The same as bounds, by ΔROOT:
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT
+@ Expecting { C:9.93747 82832 5⁳⁻³…0.01006 27605 07 pH:3.37722 86399 3…3.39696 39512 8 }
+```
+
+**4)** A very dilute solution, 10⁻⁶ mol/L: the pH is 6.018, where the formula
+gives ½(4.756 + 6) = 5.378.
+
+```rpl
+0.0001 'C0' Sto  1_mL 'V1' Sto  100_mL 'V2' Sto  4.756 'pKa' Sto  14 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.000001;6])' Eval
+@ Expecting [ C=0.00000 1 pH=6.01835 89947 9 ]
+```
+
+**5)** The calculation checked by a measurement: a pH meter reads 3.40, to
+±0.02 according to its manual, a bound. ΔConcord compares this reading with the
+range of the pH found by ΔROOT, 3.377…3.397, and draws both: they overlap, and
+their intersection covers 86 % of the computed range. The measurement confirms
+the calculation.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.40±0.02 ⓁΔConcord
+```
+
+**6)** Had the meter read 3.45 ± 0.02, the two ranges would not meet: "X
+before Y". Either the pKa is not 4.756 at the temperature of the solution, or
+the solution was not prepared as intended; the calculation alone cannot tell
+which.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.45±0.02 ⓁΔConcord
+```
+
+Three lessons. The budget is all in the pKa: it contributes 0.0049 of the
+0.0049 of the pH, the glassware 0.0005 together, since the logarithm flattens
+the relative errors of the volumes. To know the pH better, know the pKa
+better, at the temperature of the solution, rather than measure the volumes
+more finely. Then, the formula of the textbooks errs by less than 0.03 down
+to 10⁻³ mol/L, but by 0.27 at 10⁻⁵ and 0.91 at 10⁻⁷: a dilute weak acid is
+almost wholly dissociated, and the water then gives as many ions as the acid.
+The exact pH never goes beyond 7, while the formula would. Last, an independent
+computation in double precision gives the same pH and the same uncertainty to
+the last digit shown.
+
+The equation of this exercise, in `config/equations.csv`:
+
+```
+"WeakAcid",  "{ 'C=C0*(V1_mL)/(V2_mL)' '10^(-pH)=C*10^(-pKa)/(10^(-pKa)+10^(-pH))+10^(-pKw)/10^(-pH)' }"
+```
+
+See also: [Calorimetry](#calorimetry), [σROOT](#σroot), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).
+
+
+## BeamYoung
+
+A classic of the laboratories of strength of materials: the Young's modulus E
+of a flat bar, from its deflection. The bar rests on two supports L apart, and
+carries a mass m at mid-span; a dial gauge reads the deflection δ at the
+centre. Two equations, BeamYoung in the section Labs of `config/equations.csv`:
+δ = m·g·L³/(48·E·I), with I = b·h³/12 the second moment of area of a
+rectangular section of width b and thickness h. The acceleration of gravity
+g comes from the constants library.
+
+The measurements, on a bar of an unknown light metal: L = 500 mm with a tape,
+±0.5 mm, a bound; b = 25.00 mm and h = 3.00 mm with a caliper, u = 0.02 mm;
+m = 0.500 kg, u = 0.001 kg; δ = 3.29 mm with a dial gauge, u = 0.01 mm.
+
+The key BeamYoung runs the whole exercise: it stores the measurements, finds
+E±σ by σROOT and the range of E by ΔROOT, and compares that range with the
+usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses 97…125 GPa,
+carbon steels 190…215 GPa. A material is compatible when the two ranges meet.
+With five inputs, ΔROOT runs ROOT at the 2⁵ = 32 corners of the box and at
+its centre, 33 times: about a second on the simulator, about twenty seconds
+on a phone, a few minutes on a calculator.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁBeamYoung
+@ Expecting material:"aluminium"
+```
+
+**2)** Step by step: E and its standard uncertainty, by σROOT.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ1.40878 87031 5 GPa I:56.25±σ1.12589 96419 5 mm↑4 }
+```
+
+**3)** The range of E, by ΔROOT:
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT
+@ Expecting { E:65.79463 64935…72.38884 63822 GPa I:54.24858 28957…58.30181 73443 mm↑4 }
+```
+
+**4)** The range of E against that of the aluminium alloys, by ΔConcord, which
+draws both: the range of the handbook lies within that of the measurement.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT 1 Get DeleteTag
+'68…72_GPa' →Num ⓁΔConcord
+```
+
+**5)** The thickness measured with a micrometer, u = 0.002 mm, instead of a
+caliper: the uncertainty of E falls from 1.41 GPa to about 0.32 GPa.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.002_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ0.31527 69128 72 GPa I:56.25±σ0.12116 62081 62 mm↑4 }
+```
+
+Three lessons. The thickness is cubed: its relative uncertainty of 0.7 %
+weighs 2.0 % on E, against 0.4 % for all the other inputs together. Measuring
+it with a micrometer rather than a caliper divides the uncertainty of E by
+four; measuring L, m or δ better would change almost nothing. Then, the bar is
+of an aluminium alloy, and clearly neither brass nor steel; but the alloys of
+aluminium all have nearly the same modulus, and this experiment cannot tell
+them apart. Last, E is found here from an equation that could be solved by
+hand, E = m·g·L³/(4·δ·b·h³): σROOT gives the same result as that formula would
+through σRFxjxi, 69.00 ± 1.41 GPa, a relative uncertainty of 2.04 %.
+
+The equations of this exercise, in `config/equations.csv`:
+
+```
+"BeamYoung",  "{ '(δ_mm)=(m_kg)*Ⓒg*(L_mm)^3/(48*(E_GPa)*(I_mm^4))' '(I_mm^4)=(b_mm)*(h_mm)^3/12' }"
+```
+
+See also: [Calorimetry](#calorimetry), [WeakAcid](#weakacid), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).

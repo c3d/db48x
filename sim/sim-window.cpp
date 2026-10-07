@@ -67,10 +67,13 @@
 #include <QtMath>
 #ifdef ANDROID
 #include <QDir>
+#include <QDirIterator>
 #include <QSettings>
+#include <QJniObject>
 #include <atomic>
 
 void extract_android_assets();
+static void android_haptic_tap();
 
 #endif // ANDROID
 #endif // WASM
@@ -372,6 +375,14 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     // Set screen ratio and geometry
     int xOffset      = (nw - scaledSW) / 2;
     int yOffset      = (nh - scaledSH - kh) / 2;
+#ifdef ANDROID
+    // The screen must also be at y=0. On Android, partial updates of a view
+    // placed lower reach the display shifted down by twice its offset
+    // instead of once, so its top rows (the header) are never refreshed
+    // until something repaints the whole window. Leave the spare space
+    // below the keyboard instead.
+    yOffset = 0;
+#endif
     int screenWidth  = scaledSW;
     int screenHeight = scaledSH;
 
@@ -403,7 +414,7 @@ void MainWindow::resizeEvent(QResizeEvent * event)
     }
 #endif // ANDROID
 
-    // Position the screen view (always at x=0 on Android)
+    // Position the screen view (always at 0,0 on Android)
     QRect sframe(xOffset, yOffset, screenWidth, screenHeight);
     ui.screen->setGeometry(sframe);
     ui.screen->setScale(sr);
@@ -431,26 +442,33 @@ void extract_android_assets()
 
     if (savedAssetVersion != currentAssetVersion)
     {
-        QStringList filesToExtract = {"db48x.idx", "db48x.md"};
-
-        for (const QString &fileName : filesToExtract)
+        // The RPL engine opens its files with fopen(), so Qt resources are
+        // invisible to it: they must exist as real files. Extract the whole
+        // resource tree, not just the help. Without config/library.csv and
+        // library/*.48s on disk, the only reachable library entries are the
+        // ones compiled into basic_library[], i.e. Secrets and Physics.
+        auto perms = QFileDevice::ReadOwner | QFileDevice::WriteOwner
+            | QFileDevice::ReadUser;
+        QDir from(":/");
+        QDir to(sandboxDir);
+        QDirIterator it(":/", QDirIterator::Subdirectories);
+        while (it.hasNext())
         {
-            // Check your Qt resource prefix
-            QString assetPath = ":/help/" + fileName;
-            QString targetPath = sandboxDir + "/help/" + fileName;
-
-            if (QFile::exists(targetPath)) {
-                QFile::remove(targetPath);
+            QFileInfo fi(it.next());
+            QString relPath = from.relativeFilePath(fi.absoluteFilePath());
+            QString absPath = to.filePath(relPath);
+            if (fi.isDir())
+            {
+                QDir().mkpath(absPath);
             }
-
-	    // Create the directory structure if it doesn't exist
-	    QFileInfo targetInfo(targetPath);
-	    QDir().mkpath(targetInfo.absolutePath());
-
-            auto perms = QFileDevice::ReadOwner | QFileDevice::WriteOwner
-                | QFileDevice::ReadUser;
-            sim_install_copy_file(assetPath, targetPath,
-                                  "help/" + fileName, perms);
+            else if (fi.isFile())
+            {
+                QFileInfo targetInfo(absPath);
+                QDir().mkpath(targetInfo.absolutePath());
+                QFile::remove(absPath);
+                sim_install_copy_file(fi.absoluteFilePath(), absPath,
+                                      relPath, perms);
+            }
         }
 
         sim_install_regenerate_help_indices(sandboxDir);
@@ -588,59 +606,153 @@ struct mousemap
     qreal left, right, top, bot;
 } mouseMap[] = {
 
-    { Qt::Key_F1,        38, 0.03, 0.15, 0.03, 0.10 },
-    { Qt::Key_F2,        39, 0.20, 0.32, 0.03, 0.10 },
-    { Qt::Key_F3,        40, 0.345, 0.47, 0.03, 0.10 },
-    { Qt::Key_F4,        41, 0.52, 0.63, 0.03, 0.10 },
-    { Qt::Key_F5,        42, 0.68, 0.80, 0.03, 0.10 },
-    { Qt::Key_F6,        43, 0.83, 0.95, 0.03, 0.10 },
+    // Rectangles of the key caps as drawn in keyboard-db48x.png (698x878),
+    // measured on the image. A press goes to the nearest cap, see findKey
 
-    { Qt::Key_A,          1, 0.03, 0.15, 0.15, 0.22 },
-    { Qt::Key_B,          2, 0.20, 0.32, 0.15, 0.22 },
-    { Qt::Key_C,          3, 0.345, 0.47, 0.15, 0.22 },
-    { Qt::Key_D,          4, 0.52, 0.63, 0.15, 0.22 },
-    { Qt::Key_E,          5, 0.68, 0.80, 0.15, 0.22 },
-    { Qt::Key_F,          6, 0.83, 0.95, 0.15, 0.22 },
+    { Qt::Key_F1,         38, 0.047, 0.149, 0.040, 0.099 },
+    { Qt::Key_F2,         39, 0.209, 0.311, 0.040, 0.099 },
+    { Qt::Key_F3,         40, 0.371, 0.474, 0.040, 0.099 },
+    { Qt::Key_F4,         41, 0.532, 0.635, 0.040, 0.099 },
+    { Qt::Key_F5,         42, 0.692, 0.795, 0.040, 0.099 },
+    { Qt::Key_F6,         43, 0.852, 0.956, 0.040, 0.099 },
 
-    { Qt::Key_G,          7, 0.03, 0.15, 0.275, 0.345 },
-    { Qt::Key_H,          8, 0.20, 0.32, 0.275, 0.345 },
-    { Qt::Key_I,          9, 0.345, 0.47, 0.275, 0.345 },
-    { Qt::Key_J,         10, 0.52, 0.63, 0.275, 0.345 },
-    { Qt::Key_K,         11, 0.68, 0.80, 0.275, 0.345 },
-    { Qt::Key_L,         12, 0.83, 0.95, 0.275, 0.345 },
+    { Qt::Key_A,           1, 0.047, 0.149, 0.172, 0.222 },
+    { Qt::Key_B,           2, 0.209, 0.311, 0.172, 0.222 },
+    { Qt::Key_C,           3, 0.371, 0.474, 0.172, 0.222 },
+    { Qt::Key_D,           4, 0.532, 0.635, 0.172, 0.222 },
+    { Qt::Key_E,           5, 0.692, 0.795, 0.172, 0.222 },
+    { Qt::Key_F,           6, 0.852, 0.956, 0.172, 0.222 },
 
-    { Qt::Key_Return,    13, 0.03, 0.32, 0.40, 0.47 },
-    { Qt::Key_M,         14, 0.345, 0.47, 0.40, 0.47 },
-    { Qt::Key_N,         15, 0.51, 0.64, 0.40, 0.47 },
-    { Qt::Key_O,         16, 0.68, 0.80, 0.40, 0.47 },
-    { Qt::Key_Backspace, 17, 0.83, 0.95, 0.40, 0.47 },
+    { Qt::Key_G,           7, 0.047, 0.149, 0.293, 0.345 },
+    { Qt::Key_H,           8, 0.209, 0.311, 0.293, 0.345 },
+    { Qt::Key_I,           9, 0.371, 0.474, 0.293, 0.345 },
+    { Qt::Key_J,          10, 0.532, 0.635, 0.293, 0.345 },
+    { Qt::Key_K,          11, 0.692, 0.795, 0.293, 0.345 },
+    { Qt::Key_L,          12, 0.852, 0.956, 0.293, 0.345 },
 
-    { Qt::Key_Up,        18, 0.03, 0.15, 0.52, 0.59 },
-    { Qt::Key_7,         19, 0.23, 0.36, 0.52, 0.59 },
-    { Qt::Key_8,         20, 0.42, 0.56, 0.52, 0.59 },
-    { Qt::Key_9,         21, 0.62, 0.75, 0.52, 0.59 },
-    { Qt::Key_Slash,     22, 0.81, 0.95, 0.52, 0.59 },
+    { Qt::Key_Return,     13, 0.047, 0.309, 0.410, 0.466 },
+    { Qt::Key_M,          14, 0.370, 0.473, 0.410, 0.466 },
+    { Qt::Key_N,          15, 0.532, 0.633, 0.410, 0.466 },
+    { Qt::Key_O,          16, 0.692, 0.794, 0.410, 0.466 },
+    { Qt::Key_Backspace,  17, 0.854, 0.956, 0.410, 0.466 },
 
-    { Qt::Key_Down,      23, 0.03, 0.15, 0.645, 0.715 },
-    { Qt::Key_4,         24, 0.23, 0.36, 0.645, 0.715 },
-    { Qt::Key_5,         25, 0.42, 0.56, 0.645, 0.715 },
-    { Qt::Key_6,         26, 0.62, 0.75, 0.645, 0.715 },
-    { Qt::Key_Asterisk,  27, 0.81, 0.95, 0.645, 0.715 },
+    { Qt::Key_Up,         18, 0.047, 0.149, 0.534, 0.590 },
+    { Qt::Key_7,          19, 0.242, 0.368, 0.534, 0.590 },
+    { Qt::Key_8,          20, 0.438, 0.563, 0.534, 0.590 },
+    { Qt::Key_9,          21, 0.635, 0.761, 0.534, 0.590 },
+    { Qt::Key_Slash,      22, 0.834, 0.956, 0.534, 0.590 },
 
-    { Qt::Key_Alt,       28, 0.028, 0.145, 0.77, 0.84 },
-    { Qt::Key_1,         29, 0.23, 0.36, 0.77, 0.84 },
-    { Qt::Key_2,         30, 0.42, 0.56, 0.77, 0.84 },
-    { Qt::Key_3,         31, 0.62, 0.75, 0.77, 0.84 },
-    { Qt::Key_Minus,     32, 0.81, 0.95, 0.77, 0.84 },
+    { Qt::Key_Down,       23, 0.047, 0.149, 0.656, 0.712 },
+    { Qt::Key_4,          24, 0.242, 0.368, 0.656, 0.712 },
+    { Qt::Key_5,          25, 0.438, 0.563, 0.656, 0.712 },
+    { Qt::Key_6,          26, 0.635, 0.761, 0.656, 0.712 },
+    { Qt::Key_Asterisk,   27, 0.834, 0.956, 0.656, 0.712 },
 
-    { Qt::Key_Escape,    33, 0.03, 0.15, 0.89, 0.97 },
-    { Qt::Key_0,         34, 0.23, 0.36, 0.89, 0.97 },
-    { Qt::Key_Period,    35, 0.42, 0.55, 0.89, 0.97 },
-    { Qt::Key_Question,  36, 0.62, 0.74, 0.89, 0.97 },
-    { Qt::Key_Plus,      37, 0.81, 0.95, 0.89, 0.97 },
+    { Qt::Key_Alt,        28, 0.047, 0.149, 0.778, 0.835 },
+    { Qt::Key_1,          29, 0.242, 0.368, 0.778, 0.835 },
+    { Qt::Key_2,          30, 0.438, 0.563, 0.778, 0.835 },
+    { Qt::Key_3,          31, 0.635, 0.761, 0.778, 0.835 },
+    { Qt::Key_Minus,      32, 0.834, 0.956, 0.778, 0.835 },
+
+    { Qt::Key_Escape,     33, 0.047, 0.149, 0.899, 0.957 },
+    { Qt::Key_0,          34, 0.242, 0.368, 0.899, 0.957 },
+    { Qt::Key_Period,     35, 0.438, 0.563, 0.899, 0.957 },
+    { Qt::Key_Question,   36, 0.635, 0.761, 0.899, 0.957 },
+    { Qt::Key_Plus,       37, 0.834, 0.956, 0.899, 0.957 },
 
     {                0,  0,      0.0,      0.0,      0.0,      0.0}
 };
+
+
+static mousemap *findKey(qreal relx, qreal rely, qreal w, qreal h)
+// ----------------------------------------------------------------------------
+//   Find the key cap nearest to a press, so that no gap is a dead zone
+// ----------------------------------------------------------------------------
+{
+    mousemap *best = nullptr;
+    qreal     bestDist = 0;
+    for (mousemap *ptr = mouseMap; ptr->key; ptr++)
+    {
+        qreal dx = qMax(qMax(ptr->left - relx, relx - ptr->right), 0.0) * w;
+        qreal dy = qMax(qMax(ptr->top - rely, rely - ptr->bot), 0.0) * h;
+        qreal dist = dx * dx + dy * dy;
+        if (!best || dist < bestDist)
+        {
+            best = ptr;
+            bestDist = dist;
+        }
+    }
+    return best;
+}
+
+
+#ifdef ANDROID
+static void android_haptic_tap()
+// ----------------------------------------------------------------------------
+//   Short vibration when a key is pressed, like the phone's own keyboard
+// ----------------------------------------------------------------------------
+//   View.performHapticFeedback needs no permission and honours the phone's
+//   "vibrate on touch" setting. Like any call into the Android view system,
+//   it must run on the Android main thread, not on Qt's.
+{
+    QNativeInterface::QAndroidApplication::runOnAndroidMainThread([]() {
+        QJniObject activity(QNativeInterface::QAndroidApplication::context());
+        if (!activity.isValid())
+            return;
+        QJniObject window =
+            activity.callObjectMethod("getWindow", "()Landroid/view/Window;");
+        if (!window.isValid())
+            return;
+        QJniObject decor =
+            window.callObjectMethod("getDecorView", "()Landroid/view/View;");
+        if (!decor.isValid())
+            return;
+        // performHapticFeedback leaves the strength to the phone, and on a
+        // Galaxy S20 FE even VIRTUAL_KEY can barely be felt. Drive the
+        // vibrator directly instead, with our own duration and amplitude
+        // (needs the VIBRATE permission, granted at install time).
+        // Driving the vibrator directly bypasses the phone's "touch feedback"
+        // setting, so honour it by hand: no vibration when it is off
+        QJniObject resolver = activity.callObjectMethod(
+            "getContentResolver", "()Landroid/content/ContentResolver;");
+        jint haptics = QJniObject::callStaticMethod<jint>(
+            "android/provider/Settings$System", "getInt",
+            "(Landroid/content/ContentResolver;Ljava/lang/String;I)I",
+            resolver.object(),
+            QJniObject::fromString("haptic_feedback_enabled").object<jstring>(),
+            jint(1));
+        static QJniObject vibrator;
+        if (haptics && !vibrator.isValid())
+            vibrator = activity.callObjectMethod(
+                "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;",
+                QJniObject::fromString("vibrator").object<jstring>());
+        if (haptics && vibrator.isValid())
+        {
+            const jlong duration  = 20;  // ms
+            const jint  amplitude = 255; // 1..255
+            QJniObject effect = QJniObject::callStaticObjectMethod(
+                "android/os/VibrationEffect", "createOneShot",
+                "(JI)Landroid/os/VibrationEffect;", duration, amplitude);
+            if (effect.isValid())
+                vibrator.callMethod<void>("vibrate",
+                                          "(Landroid/os/VibrationEffect;)V",
+                                          effect.object());
+        }
+        // The standard key click, honouring the "touch sounds" setting. The
+        // volume argument asks for full level instead of Android's default,
+        // which is attenuated; the system volume still applies.
+        QJniObject audio = activity.callObjectMethod(
+            "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;",
+            QJniObject::fromString("audio").object<jstring>());
+        if (audio.isValid())
+        {
+            const jint FX_KEY_CLICK = 0;  // AudioManager.FX_KEY_CLICK
+            audio.callMethod<void>("playSoundEffect", "(IF)V",
+                                   FX_KEY_CLICK, jfloat(1.0f));
+        }
+    });
+}
+#endif // ANDROID
 
 
 void MainWindow::pushKey(int key)
@@ -657,6 +769,8 @@ void MainWindow::pushKey(int key)
             int h = ui.keyboard->height();
             rect.setCoords(ptr->left * w, ptr->top * h,
                            ptr->right * w, ptr->bot * h);
+            // Frame the cap rather than draw over its edge
+            rect.adjust(-5, -5, 5, 5);
             break;
         }
     }
@@ -919,15 +1033,17 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 
                 if (!pressed)
                     key_push(0);
-                else
-                    for (mousemap *ptr = mouseMap; ptr->key; ptr++)
-                        if ((relx >= ptr->left) && (relx <= ptr->right) &&
-                            (rely >= ptr->top) && (rely <= ptr->bot))
-                        {
-                            record(sim_keys, "  [%d] found at %d as %d",
-                                   k, ptr - mouseMap, ptr->keynum);
-                            key_push(ptr->keynum);
-                        }
+                else if (mousemap *ptr = findKey(relx, rely,
+                                                 ui.keyboard->width(),
+                                                 ui.keyboard->height()))
+                {
+                    record(sim_keys, "  [%d] found at %d as %d",
+                           k, ptr - mouseMap, ptr->keynum);
+                    key_push(ptr->keynum);
+#ifdef ANDROID
+                    android_haptic_tap();
+#endif
+                }
             }
 
             return true;
@@ -948,15 +1064,18 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 #endif // Qt vertsion 6
 
             record(sim_keys, "Mouse button press at (%f, %f)", relx, rely);
-            for (mousemap *ptr = mouseMap; ptr->key; ptr++)
-                if ((relx >= ptr->left) && (relx <= ptr->right) &&
-                    (rely >= ptr->top) && (rely <= ptr->bot))
-                {
-                    record(sim_keys, "Mouse coordinates found at %d as %d",
-                           ptr - mouseMap, ptr->keynum);
+            if (mousemap *ptr = findKey(relx, rely,
+                                        ui.keyboard->width(),
+                                        ui.keyboard->height()))
+            {
+                record(sim_keys, "Mouse coordinates found at %d as %d",
+                       ptr - mouseMap, ptr->keynum);
 
-                    key_push(ptr->keynum);
-                }
+                key_push(ptr->keynum);
+#ifdef ANDROID
+                android_haptic_tap();
+#endif
+            }
 
             return true;
         }

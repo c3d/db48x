@@ -548,9 +548,10 @@ sim/%.qrc: $(MIQ_MAKEDEPS)
 	@mkdir -p $(@D)
 	$(PRINT_GENERATE) (echo '<RCC>';			\
 	 echo ' <qresource prefix="/'$*'">';			\
-	 for I in $(wildcard $(QRC_EXT_$*:%=$*/%)); do		\
-		J=$$(basename $$I);				\
-		echo '  <file alias="'$$J'">../'$(QRC_DOT_$*)$*'/'$$J'</file>';	\
+	 for I in $(patsubst %,'%',$(wildcard $(QRC_EXT_$*:%=$*/%))); do	\
+		J=$${I#$*/};					\
+		E=$$(printf '%s' "$$J" | sed -e 's/&/\&amp;/g');	\
+		echo '  <file alias="'"$$E"'">../'$(QRC_DOT_$*)$*'/'"$$E"'</file>';	\
 	 done;							\
 	 echo ' </qresource>';					\
 	 echo '</RCC>')						\
@@ -561,8 +562,16 @@ QRC_EXT_config=*.csv *.cfg *.48k
 QRC_EXT_help=$(NAME).md $(NAME).idx
 QRC_EXT_help/img=*.bmp
 QRC_DOT_help/img=../
-QRC_EXT_library=*.48[sS]
+QRC_EXT_library=*.48[sS] */*.48[sS]
 QRC_EXT_state=*.48[sS]
+
+# The pattern rule above lists a directory, but make cannot know that from
+# the rule alone: without these, adding a file leaves the .qrc untouched and
+# the new resource silently absent from the binary.
+sim/config.qrc:   $(wildcard $(QRC_EXT_config:%=config/%))
+sim/state.qrc:    $(wildcard $(QRC_EXT_state:%=state/%))
+sim/library.qrc:  $(wildcard $(QRC_EXT_library:%=library/%))
+sim/help/img.qrc: $(wildcard $(QRC_EXT_help/img:%=help/img/%))
 
 keyboard:				\
 	Keyboard-Layout.png 		\
@@ -775,7 +784,7 @@ TAR_EXTRA_FILES=	   				\
 	    help/*.bmp help/*/*.bmp			\
 	    state/*.48[sSbB]				\
 	    config/*.csv config/*.48k config/*.cfg	\
-	    library/*.48[sSbB]
+	    library/*.48[sSbB] library/*/*.48[sSbB]
 
 PRINT_INSTALL=$(PRINT_COMMAND) $(INFO) "[INSTALL]" "$(NAME) => $(MOUNTPOINT)/" $(COLOR_FILTER);
 PRINT_PACKAGE=$(PRINT_COMMAND) $(INFO) "[PACKAGE]" "$(NAME)-$(VERSION)" $(COLOR_FILTER);

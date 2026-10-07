@@ -1,0 +1,49 @@
+«
+ 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH
+ « HFP 15 Precision
+@@ ============================================================
+@@ RTPlan — conjunction-class Earth⇄Mars round-trip optimiser (heliocentric ΔV)
+@@ Optimises the outbound Earth→Mars leg (MinΔVTraj), then the return Mars→Earth
+@@ leg departing after a minimum surface stay. Patched-conic, pedagogical.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : t1lo t1hi stay   ( t1lo t1hi stay -- { t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot } )
+@@   t1lo t1hi : Earth-departure search window (Julian Day)
+@@   stay      : minimum Mars surface stay before the return search (days)
+@@ Output : { t1 t2 stay t3 t4 (JD)  ΔVout ΔVret ΔVtot (km/s) }
+@@ NOTE: set  1 'AstronTXPrecision' STO  for a fast pedagogical run (slow otherwise).
+@@ VALIDATION (device-confirmed, AstronTXPrecision 1):
+@@   2459030 2459075 500 RTPlan ->
+@@     { 2459055.617 2459259.801 517.558 2459777.359 2460049.376
+@@       6.31786 6.50523 12.82309 }
+@@   Conjunction Earth⇄Mars: depart 2020-07-25, arrive Mars 2021-02-14 (the
+@@   Perseverance window), return 2022-07-16, home 2023-04-14; 2.72 yr; ΔVtot 12.82 km/s.
+@@ ============================================================
+ → t1lo t1hi stay
+ «
+    'Ⓛ♁Pf' 'Ⓛ♂Pf' t1lo t1hi 150 250 ⓁMinΔVTraj
+    → outb
+    «
+       outb 1 GET outb 2 GET outb 3 GET
+       → dVo t1 tofo
+       «
+          t1 tofo +
+          → t2
+          «
+             'Ⓛ♂Pf' 'Ⓛ♁Pf' t2 stay + t2 stay + 400 + 200 350 ⓁMinΔVTraj
+             → retn
+             «
+                retn 1 GET retn 2 GET retn 3 GET
+                → dVr t3 tofr
+                «
+                   t1 t2 t3 t2 - t3 t3 tofr + dVo dVr dVo dVr + 8 →List
+                »
+             »
+          »
+       »
+    »
+ »
+savP Precision  IF savH THEN HFP ELSE SFP END
+ »
+»

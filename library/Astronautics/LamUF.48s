@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ LamUF — universal-variable Lambert time-of-flight residual F(z)
+@@ Root target for LambertU (uses StumpC/StumpS).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : z r1 r2 A μ dt   ( z r1 r2 A μ dt -- F(z) )
+@@ Output : scalar residual
+@@ VALIDATION (device-confirmed):
+@@   1.0 11375.85162 16383.22313 12372.27203 398600 3600 LamUF -> -192258.13
+@@ ============================================================
+ → z r1 r2 Aa μ dt
+  « z ⓁStumpC z ⓁStumpS → cz sz
+    « 'r1+r2+Aa·(z·sz-1)/√(cz)' EVAL → y
+      « '(y/cz)^1.5·sz+Aa·√(y)-√(μ)·dt' EVAL » » »
+»

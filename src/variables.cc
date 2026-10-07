@@ -756,9 +756,12 @@ size_t directory::purge(object_p name, bool allowdir)
     case ID_list:
     case ID_array:
     {
+        // Purging an item can shrink the size header of an enclosing
+        // directory, which moves this one: do not keep using `this`
+        directory_g self = this;
         size_t size = 0;
         for (object_p obj : *list_p(name))
-            size += purge(obj, allowdir);
+            size += ((directory *) +self)->purge(obj, allowdir);
         return size;
     }
 

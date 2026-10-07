@@ -1170,8 +1170,8 @@ Mercury time of perihelion passage
 Computed, not stored: `T₀☿` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb☿`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`, so the constant displays as a date but tracks "now". Mercury passes
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`, so the constant displays as a date but tracks "now". Mercury passes
 perihelion roughly four times per year. [Reference 27](#reference-27)
 
 
@@ -1314,8 +1314,8 @@ Venus time of perihelion passage
 Computed, not stored: `T₀♀` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♀`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Venus passes perihelion about twice per year. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Venus passes perihelion about twice per year. [Reference 27](#reference-27)
 
 
 ## Earth constants
@@ -1461,7 +1461,8 @@ Computed, not stored: `T₀♁` evaluates an expression (IFTE) that advances fro
 reference perihelion passage (Tp) by whole orbital periods (`Porb♁`, the
 anomalistic year) and returns the most recent perihelion passage at or before
 the current date (early January each year). The computation is carried out in
-Julian Day Number and converted to a date with `JDN→`. [Reference 27](#reference-27)
+Julian Date (JD = `JDN` − 0.5, since `JDN` counts from midnight) and
+converted to a date with `JDN→`. [Reference 27](#reference-27)
 
 
 ### a♁GPS constant
@@ -1669,7 +1670,7 @@ The value is the standard anomalistic month used by `ⓁPeriSel`. [Reference 27]
 
 Moon time of perigee passage
 
-Computed, not stored: `T₀☽` evaluates `JDN→(ⓁPeriSel(→Num(JDN(DateTime))))`,
+Computed, not stored: `T₀☽` evaluates `JDN→(0.5+ⓁPeriSel(→Num(JDN(DateTime)-0.5)))`,
 calling the library routine `ⓁPeriSel` on the current date to obtain the nearest
 lunar perigee, then converting the Julian Day Number to a date. `ⓁPeriSel`
 implements Meeus' Chapter 50 perigee formula in full — all 60 Table 50.A periodic
@@ -1821,8 +1822,8 @@ Mars time of perihelion passage
 Computed, not stored: `T₀♂` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♂`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Mars's orbital period is approximately 1.88 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Mars's orbital period is approximately 1.88 years. [Reference 27](#reference-27)
 
 
 ## Jupiter constants
@@ -1966,8 +1967,8 @@ Jupiter time of perihelion passage
 Computed, not stored: `T₀♃` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♃`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Jupiter's orbital period is approximately 11.86 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Jupiter's orbital period is approximately 11.86 years. [Reference 27](#reference-27)
 
 
 ## Saturn constants
@@ -2110,8 +2111,8 @@ Saturn time of perihelion passage
 Computed, not stored: `T₀♄` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♄`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Saturn's orbital period is approximately 29.46 years. [Reference 27](#reference-27)
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Saturn's orbital period is approximately 29.46 years. [Reference 27](#reference-27)
 
 
 ## Uranus constants
@@ -2255,8 +2256,8 @@ Uranus time of perihelion passage
 Computed, not stored: `T₀⛢` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb⛢`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Uranus's orbital period is approximately 84 years; the last perihelion
 was in 1966 and the next is around 2050, so the returned value can be decades in
 the past. [Reference 27](#reference-27)
 
@@ -2399,7 +2400,8 @@ Neptune time of perihelion passage
 Computed, not stored: `T₀♆` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♆`) and returns
 the most recent perihelion passage at or before the current date, carried out in
-Julian Day Number and converted to a date with `JDN→`. Neptune is a deliberate
+Julian Date (JD = `JDN` − 0.5, since `JDN` counts from midnight) and
+converted to a date with `JDN→`. Neptune is a deliberate
 exception to the "most recent past perihelion" convention: its true last
 perihelion (~1876) is uninformative and hard to source, so Tp is set to the next
 perihelion (2042-09-04). Because that date is in the future, the floor-IFTE
@@ -2544,8 +2546,8 @@ Pluto time of perihelion passage
 Computed, not stored: `T₀♇` evaluates an expression (IFTE) that advances from a
 reference perihelion passage (Tp) by whole orbital periods (`Porb♇`) and returns
 the most recent perihelion passage at or before the current date. The
-computation is carried out in Julian Day Number and converted to a date with
-`JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
+computation is carried out in Julian Date (JD = `JDN` − 0.5, since `JDN`
+counts from midnight) and converted to a date with `JDN→`. Pluto's orbital period is approximately 248 years; the last perihelion
 was in 1989 (Sep 05) and the next is around 2237, so the returned value can be
 decades in the past. [Reference 4](#reference-4)
 
@@ -2898,7 +2900,7 @@ Above this threshold, dry air undergoes avalanche ionisation
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-## N2 constant
+## N2 constants
 
 Gas
 
@@ -2979,7 +2981,7 @@ Measured. Dielectric breakdown field of N2 at STP. Slightly higher
 than dry air; preferred for high-voltage insulation. It is the electric
 field threshold above which an avalanche ionisation occurs. [Materials 2](#materials-2)
 
-## O2 constant
+## O2 constants
 
 Gas
 
@@ -3058,7 +3060,7 @@ Dielectric rigidity of O2
 Measured. Dielectric breakdown electric field of O2 at STP.
 Slightly lower than N2. [Materials 2](#materials-2)
 
-## Argon constant
+## Argon constants
 
 Gas
 
@@ -3128,7 +3130,7 @@ Dielectric rigidity of Ar
 Measured. Dielectric breakdown electric field of argon at STP. Lower than
 air due to absence of polar molecules. [Materials 2](#materials-2)
 
-## CO2 constant
+## CO2 constants
 
 Gas
 
@@ -3218,7 +3220,7 @@ air. [Materials 2](#materials-2)
   For liquids: `cv ≈ `cp (difference < 1%), `γ ≈ 1`, `R = cp - cv ≈ 0`.
   These parameters are therefore not listed for liquids.
 
-## H2O constant
+## H2O constants
 
 Liquid
 
@@ -3260,7 +3262,7 @@ quantifies how strongly a material opposes the flow of electric current.
 
 ## C1. Materials for optical fibers and waveguides
 
-## Silicon constant
+## Silicon constants
 
 Dielectric
 
@@ -3302,7 +3304,7 @@ Semiconductor; resistivity varies over many orders of magnitude with doping.
 It quantifies how strongly a material opposes the flow of electric current.
 [Materials 10](#materials-10) [Materials 11](#materials-11)
 
-## SiO2 constant
+## SiO2 constants
 
 Dielectric
 
@@ -3351,11 +3353,11 @@ Dielectric rigidity of fused silica
 Measured. Dielectric breakdown electric field of fused silica. Very high;
 SiO2 is the standard gate dielectric in MOSFET technology. [Materials 7](#materials-7)
 
-## GeO2 constant
+## GeO2 constants
 
 Dielectric
 
-## ρvGeO2 constant
+### ρvGeO2 constant
 
 Germanate glass density
 
@@ -3392,7 +3394,7 @@ Dielectric rigidity of germanate glass
 Measured. Dielectric breakdown electric field of GeO2 glass. Similar
 order of magnitude to SiO2; varies with purity. [Materials 9](#materials-9)
 
-## Si3N4 constant
+## Si3N4 constants
 
 Dielectric
 
@@ -3436,7 +3438,7 @@ SiO2; used as storage dielectric in SONOS flash memory. [Materials 19](#material
 
 ## C2. Reference optical glasses
 
-##BK7 Glass constant
+## BK7 Glass constants
 
 Dielectric
 
@@ -3479,7 +3481,7 @@ crystalline dielectrics due to its amorphous microstructure. [Materials 15](#mat
 
 ## C3. Optical crystals (UV & IR)
 
-## Al2O3 Sapphire constant
+## Al2O3 Sapphire constants
 
 Dielectric
 
@@ -3520,7 +3522,7 @@ Dielectric rigidity of sapphire
 Measured. Dielectric breakdown electric field of sapphire. High strength;
 enables use in high-field capacitors and microwave devices. [Materials 16](#materials-16)
 
-## CaF2 constant
+## CaF2 constants
 
 Dielectric
 
@@ -3561,7 +3563,7 @@ Dielectric rigidity of CaF2
 Measured. Dielectric breakdown electric field of CaF2 crystal. Very high;
 consistent with use in high-power UV laser optics. [Materials 17](#materials-17)
 
-## C Diamond constant
+## C Diamond constants
 
 Dielectric
 
@@ -3608,7 +3610,7 @@ electronics. [Materials 13](#materials-13) [Materials 14](#materials-14)
     For metals: `n` not listed (complex `n`, strongly wavelength-dependent).
     `cv ≈ cp` for all metals at room temperature (difference < 0.5%).
 
-## Al constant
+## Al Metal constants
 
 Metal
 
@@ -3625,7 +3627,7 @@ Specific heat of aluminium
 
 Measured. Specific heat of pure aluminium at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Cu constant
+## Cu Metal constants
 
 Metal
 
@@ -3642,7 +3644,7 @@ Specific heat of copper
 
 Measured. Specific heat of copper at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Fe constant
+## Fe Metal constants
 
 Metal
 
@@ -3662,6 +3664,33 @@ Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
 
 
 ## Dates constants
+
+### America constants
+
+[IndigenousPeoplesDay](#indigenouspeoplesday-constant).
+
+### IndigenousPeoplesDay constant
+
+Indigenous Peoples' Day recalls the arrival of Christopher Columbus in the
+Americas on October 12, 1492, and honours the peoples who lived there.
+
+### Australia constants
+
+[AustraliaDay](#australiaday-constant).
+
+### AustraliaDay constant
+
+Australia Day commemorates the arrival of the First Fleet at Sydney Cove on
+January 26, 1788.
+
+### France constants
+
+[BastilleDay](#bastilleday-constant).
+
+### USA constants
+
+[IndependenceDay](#independenceday-constant) and
+[MartinLutherKingDeath](#martinlutherkingdeath-constant).
 
 ### BastilleDay constant
 

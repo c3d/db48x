@@ -2038,6 +2038,13 @@ algebraic_g pow(algebraic_r xr, ularge y)
             r = prec(decimal_p(+r));
         return r;
     }
+    if (x->type() == object::ID_uncertain)
+    {
+        // Not an interval: its components are a value and a standard
+        // deviation, which only the derivative-based operator can combine
+        algebraic_g n = integer::make(y);
+        return pow::evaluate(x, n);
+    }
     if (x->is_range())
     {
         algebraic_g lo = range_p(+x)->lo();

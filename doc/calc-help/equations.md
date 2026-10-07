@@ -5,11 +5,15 @@ physics, chemistry and computer science. The built-in equations can be extended
 using the `config/equations.csv` configuration file.
 
 
+Any simulation of the library can also be run with uncertain inputs: the
+σROOT command, in the Functions submenu of the Uncertainty section of the
+Function Library, gives every unknown with its standard uncertainty.
+
 ## Columns and Beams
 
 The 21 variables in the Columns and Beams section are:
 
-* `o`: Eccentricity (offset) of load (dim.: length)
+* `ε`: Eccentricity (offset) of load (dim.: length)
 * `σcr`: Critical stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `σmax`: Maximum stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `θ`: Slope at `x` (dim.: angle)
@@ -160,7 +164,7 @@ L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
 
 The 78 variables in the Electricity section are:
 
-* `∈r`: Relative permittivity
+* `εr`: Relative permittivity
 * `μr`: Relative permeability
 * `ω`: Angular frequency (dim.: angle/time)
 * `ω₀`: Resonant angular frequency (dim.: angle/time)
@@ -280,7 +284,7 @@ Er0=Er
 
 The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
-![E field finite line](img/EFieldFiniteLine.bmp)
+![E field finite line](img/E_Field_Finite_Line.bmp)
 
 * **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
@@ -369,7 +373,7 @@ The electrical resistivity `ρ` of most materials changes with temperature. If t
 
 ### Series & Parallel R
 
-![Series & Parallel R](img/Series&ParallelR.bmp)
+![Series & Parallel R](img/SeriesAndParallelR.bmp)
 
 * To calculate `[Rs_Ω;Rp_Ω]` (Series & Parallel Resistances) from 2 known variables:
 ```rpl
@@ -380,7 +384,7 @@ R1=2_Ω  R2=3_Ω
 
 ### Series & Parallel C
 
-![Series & Parallel C](img/Series&ParallelC.bmp)
+![Series & Parallel C](img/SeriesAndParallelC.bmp)
 
 * To calculate `[Cs_μF;Cp_μF]` (Series & Parallel Capacitances) from 2 known variables:
 ```rpl
@@ -391,7 +395,7 @@ C1=2_μF  C2=3_μF
 
 ### Series & Parallel L
 
-![Series & Parallel L](img/Series&ParallelL.bmp)
+![Series & Parallel L](img/SeriesAndParallelL.bmp)
 
 * To calculate `[Ls_mH;Lp_mH]` (Series & Parallel Inductances) from 2 known variables:
 ```rpl
@@ -461,8 +465,6 @@ C=20_μF  V=100_V
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
-
-![DC Inductor Voltage](img/DCInductorVoltage.bmp)
 
 * To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference; Final current; Final time) from 5 known variables:
 ```rpl
@@ -681,7 +683,7 @@ The 37 variables in the Force and Energy section are:
 * `ωf`: Final angular velocitie (dim.: angle/time, in SI: r/s)
 * `ρ`: Fluid density (dim.: mass/volume, in SI: kg/m^3)
 * `τ`: Torque (dim.: force·length, in SI: N·m)
-* `Θ`: Angular displacement (dim.: angle, in SI: r)
+* `θ`: Angular displacement (dim.: angle, in SI: r)
 * `A`: Projected area relative to flow
 * `ar`: Centripetal acceleration at `r`
 * `at`: Tangential acceleration at `r`
@@ -746,7 +748,7 @@ m=1_kg  r=5_cm  N=2000_Hz
 
 The force is that exerted by the spring.
 
-![Hooke’s Law](img/Missing name.bmp)
+![Hooke’s Law](img/HookesLaw.bmp)
 
 * To calculate `[F_lbf;W_ft*lbf]` (Force; Work) from 2 known variables:
 ```rpl
@@ -783,6 +785,8 @@ m1=2E15_kg  m2=2E18_kg  r=1000000_km  ri=1000000_km  rf=5000000_km
 @ Expecting [ F=266 972. N UGf=-5.33944⁳¹³ J UGi=-2.66972⁳¹⁴ J W=2.13577 6⁳¹⁴ J ]
 'ROOT(ⒺGravitation Law;[F;UGf;UGi;W];[1_N;1_J;1_J;1_J])'
 ```
+
+### RelativityMassEnergy
 
 ### Relativity Mass Energy
 
@@ -835,6 +839,8 @@ The 38 variables in the Gases section are:
 * `Z`: Gas compressibility correction factor
 * `Zi`: Initial gas compressibility correction factor
 * `Zf`: Final gas compressibility correction factor
+
+### IdealGas
 
 ### Ideal Gas
 
@@ -1066,7 +1072,7 @@ The 28 variables in the Magnetism section are:
 The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L` providing that `r < L/10` (see the following example 2 compared to example 2 of "Straight Wire Finite"). Note that if an electric current passes through a straight wire, one must use the following right-hand rule te determine the direction of the `B` field: when the thumb is pointed in the direction of conventional current (from positive to negative), the curled fingers will then point in the direction of the magnetic field (see fig.).
 
 
-![Straight Wire Infinite](img/StraightWireInfinite.bmp)
+![Straight Wire Infinite](img/StraightWire.bmp)
 
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
@@ -1136,7 +1142,7 @@ Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
 
 The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`. The right-hand rule applies also here: when the fingers curl around the solenoid in the sense of the current, the thumb points in the direction of the magnetic field (see fig.).
 
-![B Field In Infinite Solenoid](img/BFieldInInfiniteSolenoid.bmp)
+![B Field In Infinite Solenoid](img/MagneticFieldInSolenoid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 3 known variables:
 ```rpl
@@ -1186,7 +1192,7 @@ B0 B %Ch
 
 The magnetic field `B` is calculated in the center of the torroid. The right-hand rule applies also here: when the fingers curl around the outer circle of the torroid following the sense of the current, the thumb points in the direction of the central magnetic field (see fig.).
 
-![B Field In Toroid](img/BFieldInToroid.bmp)
+![B Field In Toroid](img/MagneticFieldInToroid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
@@ -1199,7 +1205,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 
 When a conductor carrying a current (to the right) is suddenly plunged into a perpendicular magnetic field (towards the bottom), there is a deviation (towards the top) of the free electrons which unbalances the distribution of electric charges. This transfer of charges from top to bottom gives rise to an electric force which in return balances the magnetic force. And it is precisely the appearance of this new electric field which is revealed by the Hall voltage `VH` measured between the top and the bottom of the conductor (small multimeter on the right).
 
-![Hall Effect](img/Hall Effect VH.bmp)
+![Hall Effect](img/HallEffectVH.bmp)
 
 * To calculate `[VH_V]` (Hall tension) from 5 known variables:
 ```rpl
@@ -1212,7 +1218,7 @@ n=5e28_(1/m^3)  B=0.641_T  q=1.60217 6634e-19_C  L=2_mm  I=10_A
 
 Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
-![Cyclotron Motion](img/Cyclotron_BW.bmp)
+![Cyclotron Motion](img/CyclotronBW.bmp)
 
 * To calculate `[Rc_m;fc_Hz;T_s]` (Radius of the circular path; Cyclotron frequency; Period) from 4 known variables:
 ```rpl
@@ -1225,7 +1231,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s
 
 Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
-![Helicoidal Motion](img/Helicoidal Motion BW.bmp)
+![Helicoidal Motion](img/HelicoidalMotionBW.bmp)
 
 * To calculate `[Rc_m;T_s;Dpitch_m]` (Radius of the circular path; Period, pitch of the helicoidal motion) from 4 known variables:
 ```rpl
@@ -1311,7 +1317,7 @@ y0=1000_ft  y=0_ft  v0=0_ft/s  gloc=9.80665_m/s↑2  φ=45_°  h=1000_m  Mp=5.97
 
 During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
-![Projectile Motion](img/Projectile_BW.bmp)
+![Projectile Motion](img/ProjectileMotion.bmp)
 
 * To calculate `[R_ft;vcx_ft/s;vcy_ft/s;x_ft;y_ft;hmax_ft;tf_s]` (Range, Components `x` & `y` of velocity at time `t`; Positions `x` & `y` at time `t`; Maximum height; Time of flight) from 5 known variables:
 ```rpl
@@ -1374,6 +1380,8 @@ Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
+#### Escape & Orbital Velocity
+
 #### Escape and Orbital Velocities
 
 The escape velocity is the speed required to completely free oneself from the gravitational field of a star, planet, etc. It is defined as the initial speed allowing you to move away to infinity. The orbital velocity is the speed nneded to maintain a stable circular orbit in a gravitational field.
@@ -1411,7 +1419,7 @@ The 40 variables in the Optics section are:
 * `I`: Transmitted irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `I₀`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix`: Transmitted irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
-* `Ix0`: Incident irradiance or polarized X rayx radiance flux (dim.: power/area, in SI: W/m^2)
+* `I₀x`: Incident irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
 * `m`: Magnification
 * `n`: Index of refraction
 * `n1`: Index of refraction of medium 1
@@ -1435,7 +1443,7 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 #### Refraction Law
 
-![Refraction Law](img/RefractionLaw.bmp)
+![Refraction Law](img/LawOfRefraction.bmp)
 
 * To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
@@ -1457,7 +1465,7 @@ n1=1  n2=1.5
 
 #### Fiber Optic
 
-![Fiber Optic](img/Fiber Optic BW.bmp)
+![Fiber Optic](img/FiberOpticBW.bmp)
 
 * To calculate `[vf0_m/s;vf1_m/s;vf2_m/s;NA;θ0_°]` (Speed of light in media of refraction index `n1f` & `n2f`; Numerical aperture; Acceptance angle) from 3 known variables:
 ```rpl
@@ -1470,7 +1478,7 @@ nf0=1.2  nf1=1.5  nf2=1.45
 
 The Brewster angle is the angle of incidence at which the reflected wave is completely polarized.
 
-![Brewster’s Law](img/Brewster’sLaw.bmp)
+![Brewster’s Law](img/BrewstersLaw.bmp)
 
 * To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
@@ -1514,7 +1522,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Rayleigh’s Criterion
 
-![Rayleigh’s Criterion](img/Rayleigh's Criterion_BW.bmp)
+![Rayleigh’s Criterion](img/RayleighsCriterionBW.bmp)
 
 * To calculate `[θr_°;y_m]` (Rayleigh’s criterion angle; Distance between two point source) from 3 known variables:
 ```rpl
@@ -1527,7 +1535,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
-![Malus Law](img/Malus Law BW.bmp)
+![Malus Law](img/MalusLawBW.bmp)
 
 * To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
@@ -1585,9 +1593,11 @@ The 25 variables in the Oscillations section are:
 * `xh`: Displacement amplitude of harmonic motion
 * `xp`: Resulting displacement amplitude of driven & damped oscillations
 
+#### Mass‐Spring System
+
 #### Mass-Spring System
 
-![Mass-Spring System](img/Mass-SpringSystem.bmp)
+![Mass-Spring System](img/MassSpringSystem.bmp)
 
 * To calculate `[ω_(r/s);T_s;f_Hz]` (Angular frequency; Oscillation period; Frequency) from 2 known variables:
 ```rpl
@@ -1667,7 +1677,7 @@ E₀=E
 
 We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
-![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
+![Driven Damped Oscillations](img/DrivenDampedOscillations2BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
@@ -1840,6 +1850,8 @@ d=14_cm  m=3.75_kg  Id=486.5_lb*in^2
 ```
 
 
+## Solid State Device
+
 ## Solid State Devices
 The 54 variables in the Solid State Devices section are:
 
@@ -1867,7 +1879,8 @@ The 54 variables in the Solid State Devices section are:
 * `ICEO`: Collector current (collector-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICO`: Collector current (emitter-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICS`: Collector-to-base saturation current (dim.: charge/time, in SI: ampere, A)
-* `ID, IDS`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `ID`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `IDS`: Drain-to-source current (dim.: charge/time, in SI: ampere, A)
 * `IE`: Total emitter current (dim.: charge/time, in SI: ampere, A)
 * `IES`: Emitter-to-base saturation current (dim.: charge/time, in SI: ampere, A)
 * `IS`: Transistor saturation current (dim.: charge/time, in SI: ampere, A)
@@ -1901,7 +1914,7 @@ The 54 variables in the Solid State Devices section are:
 
 These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes abruptly at the junction. The equation assume the current density is determined by minority carries injected across the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500 K.
 
-![PN Step Junctions](img/PNStepJunctions.bmp)
+![PN Step Junctions](img/PNStepJunction.bmp)
 
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
@@ -1927,7 +1940,7 @@ tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=
 
 These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The equations also include the special conditions when the emitter-base or collector-base junction is open, which are convenient for measuring transistor parameters.
 
-![Bipolar Transistors](img/BipolarTransistors.bmp)
+![Bipolar Transistors](img/BipolarTransistor.bmp)
 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
@@ -2023,7 +2036,7 @@ Stresses and strains are positive in the directions shown in the picture.
 
 #### Mohr’s Circle
 
-![Mohr’s Circle](img/Mohr’sCircle.bmp) ```![Mohr’s Circle](img/Mohr’sCircle.bmp)```
+![Mohr’s Circle](img/MohrsCircle.bmp) ```![Mohr’s Circle](img/MohrsCircle.bmp)```
 
 * To calculate `[σ1_psi;σ2_psi;θp1_°;θp2_°;τmax_psi;θs_°;σavg_psi]` (Maximum principal normal stress; Minimum principal normal stress; Angle to plane of maximum principal normal stress; Angle to plane of minimum principal normal stress; Maximum shear stress; Angle to plane of maximum shear stress; Normal stress on place of maximum shear stress) from 3 known variables:
 ```rpl
@@ -2624,6 +2637,8 @@ T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964�
 'ROOT(ⒺPlanck & Wien Comparison;[fpeak;f1;f2;FrPl12;FrWn12;%rFr12;f3;f4;FrPl34;FrWn34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
+#### Planck & Rayleigh‐Jeans Comparison
+
 #### Planck & Rayleigh-Jeans Comparison
 
 In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, For the Planck distribution, one could choose any other values for `fa` & `fb` and computes the corresponding `FrPlab`, `ebfafb` and `q`.
@@ -2892,4 +2907,3861 @@ Time value of money equation when payments are made at the end of the period.
 n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
+```
+
+## Rocketry
+
+The 110 variables in the Rocketry section are:
+
+* `α`: Divergent cone half-angle
+* `Δt`: Elapsed time or Burn duration time
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First stage velocity change (dim.: speed)
+* `ΔV2`: Second stage velocity change (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `ε`: Expansion ratio
+* `λ`: Exit-gas momentum correction factor
+* `ρp`: Solid rocket propellant density (dim.: mass/volume, in SI: g/ml)
+* `ρAl`: Solid rocket propellant Aluminium density (dim.: mass/volume, in SI: g/ml)
+* `ρAP`: Solid rocket propellant Ammonium Perchlorate density (dim.: mass/volume, in SI: g/ml)
+* `ρHTPB`: Solid rocket propellant HTPB density (dim.: mass/volume, in SI: g/ml)
+* `θ`: Convergent cone half-angle
+* `a`: Solid rocket propellant burn rate coefficient
+* `Ab`: Area of the cylindrical burning surface (in solid rocket motor)
+* `Ae`: Nozzle exit area 
+* `AeAt`: Ratio of nozzle exit area over sonic throat area
+* `At`: Nozzle sonic throat area
+* `C`: Effective exhaust gas velocity (dim.: speed)
+* `C1`: Stage 1 effective exhaust gas velocity (dim.: speed)
+* `C2`: Stage 2 effective exhaust gas velocity (dim.: speed)
+* `D`: Solid Rocket combustion diameter
+* `Dc`: Combustion chamber diameter
+* `Cstar`: Characteristic exhaust velocity (dim.: speed)
+* `CtnRatio`: Contraction ratio of the major cross-sectional area of the combuster divided by the throat area
+* `Dt`: Throat diameter
+* `Fnet`: Net engine thrust (dim.: force, in SI: N)
+* `H`: Starting height of rocket engine 
+* `Isp`: Specific impulse (dim.: time, in SI: s)
+* `Isp1`: First stage specific impulse (dim.: time, in SI: s)
+* `Isp2`: Second stage specific impulse (dim.: time, in SI: s)
+* `k`: Specific heat ratio
+* `L`: Solid Rocket combustion length
+* `Lc`: Combustion chamber length
+* `Li`: Fractional axial length based on a 15-degree conical nozzle
+* `Lstar`: Combustion chamber characteristic length for a given propellant
+* `M`: average molecular weight of the exhaust gases
+* `Md`: Spacecraft's dry mass
+* `Md1`: Spacecraft's stage 1 dry mass 
+* `Md2`: Spacecraft's stage 2 dry mass
+* `Mf`: Spacecraft's total mass
+* `Mf1`: Total vehicle mass when stage 1 is burned out but not yet discarded
+* `Mf2`: Total vehicle mass when stage 2 is burned out but not yet discarded
+* `Mo`: Spacecraft's initial mass 
+* `Mo1`: Total vehicle mass when stage 1 is ignited 
+* `Mo2`: Total vehicle mass when stage 2 is ignited 
+* `Mp`: Spacecraft's propellant mass
+* `Mp1`: Spacecraft's stage 1 propellant mass
+* `Mp2`: Spacecraft's stage 2 propellant mass
+* `Mpl`: Spacecraft's payload mass
+* `MplMo`: Ratio of payload to initial masses
+* `Nm`: Mach number as the ratio of the gas velocity to the local speed of sound
+* `Pa`: Ambient external pressure (dim.: force/area, in SI: kPa) 
+* `Pc`: Combustion chamber pressure (dim.: force/area, in SI: MPa)
+* `Pe`: Pressure at the nozzle exit (dim.: force/area, in SI: MPa)
+* `Pt`: Gas pressure at the nozzle throat (dim.: force/area, in SI: MPa)
+* `Q`: Propellant consumption mass flow rate (dim.: mass/time, in SI: kg/s)
+* `Qs`: Solid rocket combustion product generation rate (dim.: mass/time, in SI: kg/s)
+* `R`: Conical nozzle circular arc radius (dim.: length, in SI: m)
+* `r`: Solid rocket propellant burn rate (dim.: mass/time, in SI: kg/s)
+* `ts`: Propellant stay-time
+* `Tc`: Combustion chamber temperature 
+* `Tt`: Gas temperature at the nozzle throat
+* `V`: Average specific volume
+* `Vc`: Combustion chamber volume
+* `Ve`: Exhaust gas velocity (dim.: speed)
+* `Vi`: Initial rocket velocity (dim.: speed)
+* `Vf`: Final rocket velocity (dim.: speed)
+* `wAl`: Solid rocket propellant Aluminium fraction by mass
+* `wAP`: Solid rocket propellant Ammonium Perchlorate fraction by mass
+* `wHTPB`: Solid rocket propellant HTPB fraction by mass
+
+* `Cfx`: Thrust coefficient (dim.: dimensionless)
+* `It`: Total impulse (dim.: force*time, in SI: N*s)
+* `Vbo`: Burnout velocity (dim.: speed)
+* `n`: Number of rocket stages ([Optimal Staging](#Optimal Staging)), or Solid propellant burn-rate pressure exponent ([Solid Rocket Burn Rate](#Solid Rocket Burn Rate))
+* `MR`: Per-stage mass ratio (dim.: dimensionless)
+* `Rt`: Nozzle throat radius (dim.: length)
+* `Rex`: Nozzle exit radius (dim.: length)
+* `Rarc`: Nozzle throat downstream circular-arc radius (dim.: length)
+* `Lnz`: Bell nozzle length from throat to exit plane (dim.: length)
+* `Fsl`: Sea-level thrust (dim.: force, in SI: N)
+* `Fvac`: Vacuum thrust (dim.: force, in SI: N)
+* `ΔF`: Thrust gain from sea level to vacuum (dim.: force, in SI: N)
+* `horb`: Orbital altitude above the surface (dim.: length)
+* `rorb`: Orbital radius from the body center (dim.: length)
+* `Vcirc`: Circular-orbit velocity (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `gsurf`: Surface gravity (dim.: length/time^2, in SI: m/s^2)
+* `LNose`: Length of nose (dim.: length)
+* `dN`: Diameter at base of nose (dim.: length)
+* `dF`: Diameter at front of transition (dim.: length)
+* `dR`: Diameter at rear of transition (dim.: length)
+* `LT`: Length of transition (dim.: length)
+* `XP`: Distance from tip of nose to front of transition (dim.: length)
+* `CR`: Fin root chord (dim.: length)
+* `CT`: Fin tip chord (dim.: length)
+* `SFs`: Fin semispan (dim.: length)
+* `LF`: Length of fin mid-chord line (dim.: length)
+* `RB`: Radius of body at aft end (dim.: length)
+* `XR`: Distance between fin root leading edge and fin tip leading edge parallel to body (dim.: length)
+* `XB`: Distance from nose tip to fin root chord leading edge (dim.: length)
+* `NF`: Number of fins
+* `XN`: Center of pressure of the nose, from the nose tip (dim.: length)
+* `CNN`: Force coefficient of the nose
+* `CNT`: Force coefficient of the transition
+* `XT`: Center of pressure of the transition, from the nose tip (dim.: length)
+* `CNF`: Force coefficient of the fins
+* `XF`: Center of pressure of the fins, from the nose tip (dim.: length)
+* `CNR`: Force coefficient of the rocket
+* `XCP`: Center of pressure of the rocket, from the nose tip (dim.: length)
+
+* References: [1]: http://www.braeunig.us/space/problem.htm
+& [2] http://www.braeunig.us/space/sup1.htm
+The 24 simulations are inspired from the solutions of P#1 to #12 of [1] and ex. 1 to 3 of [2].
+
+#### Thrust
+
+These equations derive from the conservation of momentum during the propulsion phase of a rocket whose engine ejects gas at velocity `Ve`, consuming fuel at rate `Q` to produce thrust `Fnet`. After burn duration `Δt` this results in a change in velocity, `ΔV`, for the rocket. 
+
+![Thrust](img/RocketPropulsion.bmp)
+
+* To calculate: `[Fnet_kN]` (Rocket thrust) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ Fnet=96.5 kN ] 
+'ROOT(ⒺThrust;[Fnet];[1_kN])'
+```
+
+#### Rocket ΔV
+
+* To calculate: `[ΔV_m/s]` (Velocity change) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ ΔV=191.81375 1526 m/s ]
+'ROOT(ⒺRocket ΔV;[ΔV];[1_m/s])'
+
+```
+#### Tsiolkovsky & Propellant Mass
+
+* To calculate: `[Mo_kg;Mp_kg]` (Spacecraft's Initial & Propellant mass) from 3 known variables:
+```rpl
+Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
+@ Expecting [ Mo=93 999.97959 06 kg Mp=18 999.97959 06 kg ]
+'ROOT(ⒺTsiolkovsky & Propellant Mass;[Mo;Mp];[1_kg;1_kg])' 
+```
+
+#### Burn Duration
+
+![Burn Duration](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[ΔV_m/s;Δt_s]` (Velocity change; Burn duration) from 5 known variables:
+```rpl
+Mo=5000_kg  C=3000_m/s  Vf=12000_m/s  Vi=7790_m/s  Q=10_kg/s
+@ Expecting [ ΔV=4 210 m/s Δt=377.11182 8738 s ]
+'ROOT(ⒺBurn Duration;[ΔV;Δt];[1_m/s;1_s])' 
+```
+
+#### Rocket Engine Exhaust Velocity
+
+* To calculate: `[Ve_m/s]` (Exhaust velocity) from 5 known variables:
+```rpl
+Pc=50_atm  Pe=1_atm  Tc=3470_K  M=21.40_(g/mol)   k=1.221
+@ Expecting [ Ve=2 749.35021 959 m/s ]
+'ROOT(ⒺRocket Engine Exhaust Velocity;[Ve];[1_m/s])'
+```
+
+#### Rocket Engine Specific Impulse
+
+* To calculate: `[Isp_s]` (Specific impulse) from 2 known variables:
+```rpl
+Fnet=1000000_N  Q=400_kg/s
+@ Expecting [ Isp=254.92905 3244 s ]
+'ROOT(ⒺRocket Engine Specific Impulse;[Isp];[1_s])'
+```
+
+#### Exhaust Nozzle Throat Parameters
+
+* To calculate: `[Pt_MPa  Tt_K  At_m↑2]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area) from 5 known variables: 
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 ]
+'ROOT(ⒺExhaust Nozzle Throat Parameters;[Pt;Tt;At];[1_MPa;1_K;1_m²])'
+```
+
+#### Exhaust Nozzle Characteristic Velocity
+
+* To calculate: `[Pt_MPa;Tt_K;At_m↑2;Cstar_m/s]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area;Characteristic velocity) from 5 known variables:
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 Cstar=1 779.27362 321 m/s ]
+'ROOT(ⒺExhaust Nozzle Characteristic Velocity;[Pt;Tt;At;Cstar];[1_MPa;1_K;1_m²;1_m/s])'
+```
+
+#### Nozzle Mach number & Optimal Exit Area
+
+* The following simulations explore the optimization of rocket engines allowing them to function in different planetary atmospheric conditions, either on Earth (`♁`), Mars (`♂`) or Venus (`♀`).
+
+![Nozzle Mach number & Optimal Exit Area](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Nm_1;Ae_m²;AeAt_1;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 Pe=0.0795 MPa ]
+'ROOT(ⒺNozzle Mach number & Optimal Exit Area;[Nm;Ae;AeAt;Pe];[1_1;1_m²;1_1;1_MPa])'
+```
+
+#### Optimised Third Stage Rocket Nozzle
+
+* For a third stage rocket nozzle optimised for `H=5000_m` in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221  H=5000_m 
+@ Expecting [ Nm=3.39632 79963 7 Ae=1.89765 87728 9 m↑2 AeAt=10.80671 28297 Pa=5.40482 54060 8⁳⁻² MPa Pe=5.40482 54060 8⁳⁻² MPa ]
+'ROOT(ⒺOptimised Third Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised First Stage Rocket Nozzle
+
+* For a first stage rocket nozzle optimised for `H=3_m` on Earth (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa  At=0.1756_m↑2  k=1.221  H=3_m
+@ Expecting [ Nm=3.05335 36461 Ae=1.19222 07953 2 m↑2 AeAt=6.78941 22740 3 Pa=0.10128 89657 59 MPa Pe=0.10128 89657 59 MPa ]
+'ROOT(ⒺOptimised First Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised Second Stage Rocket Nozzle
+
+* For a second stage rocket nozzle optimised for `H` unknown in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]`  (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 H=2 000.14258 71 m Pe=0.0795 MPa ]
+'ROOT(ⒺOptimised Second Stage Rocket Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Unrealistic Nozzle Optimised for Mars
+
+* This simulation shows that it is unrealistic to have a first stage rocket nozzle optimised in Mars atmosphere (`♂`) during day time.
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 H=2_m
+@ Expecting [ Nm=6.10680 95604 3 Ae=62.28237 61777 m↑2 AeAt=354.68323 5636 Pa=6.10396 15628 2⁳⁻⁴ MPa Pe=6.10396 15628 2⁳⁻⁴ MPa ]
+'ROOT(ⒺUnrealistic Nozzle Optimised for Mars;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Mars Day Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at day time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=9.63271 37837 7 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Day Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Mars Night Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at night time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=8.34690 83813 4 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Night Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+
+```
+#### Venus First stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=25_MPa At=0.1756_m↑2  k=1.221 Pa=9.33_MPa
+@ Expecting [ Nm=1.32945 59203 Ae=0.19118 07663 16 m↑2 AeAt=1.08872 87375 6 H=3.39862 99663 6 m Pe=9.33 MPa ]
+'ROOT(ⒺVenus First stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Venus Second Stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=10.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.08_MPa  @Pa='P♀Atm(52.1_km)' Eval
+@ Expecting [ Nm=3.55835 99705 9 Ae=2.36748 85818 9 m↑2 AeAt=13.48228 12181 H=52.09922 71871 km Pe=0.08 MPa ]
+'ROOT(ⒺVenus Second Stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_km;1_MPa])'
+```
+
+#### Properly Adapted Conic Nozzle
+
+* The following three simulations explore the optimization of rocket engines in terms of their conic nozzle geometry.
+
+![Properly Adapted Conic Nozzle](img/VariousConicNozzles.bmp)
+
+* When the exhaust nozzle pressure `Pe` equals the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.05_MPa
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.39769 72938 Ae=0.40883 75186 38 m↑2 Ve=2 831.85728 461 m/s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺProperly Adapted Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Under Extended Conic Nozzle
+
+* The previous and the next 2 simulations prove that the highest value of thrust Fnet is found with adapted Conic Nozzle (Pa/Pe=1) as shown in the figure.
+
+![Under-Extended Conic Nozzle](img/OptimalThrust.bmp)
+
+* When the exhaust nozzle pressure `Pe` is greater than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.03213 30836 Ae=0.24268 50403 71 m↑2 Ve=2 677.44630 755 m/s Fnet=279.87888 2774 kN ]
+'ROOT(ⒺUnder Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Over Extended Conic Nozzle
+
+* When the exhaust nozzle pressure `Pe` is less than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.76599 41252 2 Ae=0.69630 57034 83 m↑2 Ve=2 962.65092 497 m/s Fnet=278.85744 991 kN ]
+'ROOT(ⒺOver Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Characteristic Nozzle Geometry
+
+![Characteristic Nozzle Geometry](img/RocketEgineGeometry.bmp)
+
+![Characteristic Nozzle Geometry](img/ChamberLengthVSThroatDiameter.bmp)
+
+- To calculate: `[Dt_m;Vc_cm³;Lc_cm;Dc_cm;Ac_cm²;CtnRatio]` (Throat diameter; Combustion chamber volume; Combustion chamber length; Combustion chamber diameter; Contraction ratio of the major cross-sectional area of the combuster divided by the throat area) from 3 known variables:
+```rpl
+At=1756_cm↑2  θ=20_°  Lstar=110_cm @For LOX/RP-1 propellant combination
+@ Expecting [ Dt=47.28433 82163 cm Vc=193 160 cm↑3 Lc=65.60406 06668 cm Dc=56.69736 55569 cm Ac=2 524.73407 254 cm↑2 CtnRatio=1.43777 56677 3 ]
+'ROOT(ⒺCharacteristic Nozzle Geometry;[Dt;Vc;Lc;Dc;Ac;CtnRatio];[1_cm;1_cm³;1_cm;1_cm;1_cm²;1_1])'
+```
+
+#### Solid Rocket Burn Rate
+
+![Solid Rocket Burn Rate](img/SolidRocket1.bmp)
+
+- For a solid rocket motor, we search the combustion product generation rate `Qs` and the propellant burn rate `r` when the chamber pressure is `Pc=5.0 MPa`. 
+To calculate: `[Ab_m²;r_mm/s;Qs_kg/s]` (Solid rocket: Area of the cylindrical burning surface & Propellant burn rate; Combustion product generation rate) from 6 known variables.
+```rpl
+a=0.1  n=0.3  Pc=5_MPa  ρp=1.7_g/ml  L=10_m  D=1_m
+@ Expecting [ Ab=31.41592 65359 m↑2 r=10.22565 18256 mm/s Qs=546.12215 5111 kg/s ]
+'ROOT(ⒺSolid Rocket Burn Rate;[Ab;r;Qs];[1_m²;1_mm/s;1_kg/s])'
+```
+
+#### Solid Rocket Propellant Ideal Density
+
+* To calculate: `[ρp_g/ml]` (Solid rocket propellant ideal density) from 6 known variables.
+```rpl
+ρAl=2.70_g/ml  ρAP=1.95_g/ml  ρHTPB=0.93_g/ml  wAl=0.18  wAP=0.68  wHTPB=0.14
+@ Expecting [ ρp=1.76702 71850 3 g/ml ]
+'ROOT(ⒺSolid Rocket Propellant Ideal Density;[ρp];[1_g/ml])'
+```
+
+#### Multi Stages Rocket ΔV
+
+* To calculate: `[C1_m/s; C2_m/s; Mo1_kg; Mf1_kg; Mo2_kg; Mf2_kg; Mo_kg; MplMo; ΔV1_m/s; ΔV2_m/s; ΔVtot_m/s]` (Stage 1 & 2 effective exhaust gas velocity; Stage 1 initial & final mass; Stage 2 initial & final mass; Total initial mass; Payload over initial mass ratio; Stage 1 & 2 velocity change; Total velocity change) from 7 known variables.
+```rpl
+Isp1=260_s  Isp2=320_s  Mp1=120000_kg  Md1=9000_kg  Mp2=30000_kg  Md2=3000_kg  Mpl=3000_kg
+@ Expecting [ C1=2 549.729 m/s C2=3 138.128 m/s Mo1=165 000 kg Mf1=45 000 kg Mo2=36 000 kg Mf2=6 000 kg Mo=201 000 kg MplMo=1.49253 73134 3⁳⁻² ΔV1=3 312.81950 384 m/s ΔV2=5 622.77055 965 m/s ΔVtot=8 935.59006 349 m/s ]
+'ROOT(ⒺMulti Stages Rocket ΔV;[C1;C2;Mo1;Mf1;Mo2;Mf2;Mo;MplMo;ΔV1;ΔV2;ΔVtot];[1_m/s;1_m/s;1_kg;1_kg;1_kg;1_kg;1_kg;1_1;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Conical Nozzle Divergence Loss
+
+A conical nozzle's exhaust momentum is reduced by its divergence half-angle `α` through the
+correction factor `λ=(1+cos α)/2`; the net thrust falls by that factor. Shown for the adapted case
+(`Pe=Pa`), where the pressure term vanishes.
+
+![Conical Nozzle Divergence Loss](img/VariousConicNozzles.bmp)
+
+* To calculate: `[λ;Fnet_kN]` (Divergence-loss factor; Net engine thrust) from 6 known variables:
+```rpl
+α=15_°  Q=100_kg/s  Ve=2831.85728_m/s  Pe=0.05_MPa  Pa=0.05_MPa  Ae=0.40883751863782_m↑2
+@ Expecting [ λ=0.98296 29131 45 Fnet=278.36106 8156 kN ]
+'ROOT(ⒺConical Nozzle Divergence Loss;[λ;Fnet];[1_1;1_kN])'
+```
+
+#### Bell Nozzle Contour
+
+Geometry of a thrust-optimised parabolic (bell) nozzle after Rao: throat and exit areas from the
+expansion ratio `ε` and throat radius `Rt`, the downstream throat arc `Rarc=0.382·Rt`, and the bell
+length `Lnz` as the fraction `Li` of the reference 15° conical length. The wall angles `θn` (initial)
+and `θe` (exit) are read from the Rao chart and label the figure.
+
+![Bell Nozzle Contour](img/BellNozzle.bmp)
+
+* To calculate: `[At_cm↑2;Ae_cm↑2;Rex_cm;Rarc_cm;Lnz_cm]` (Throat & exit areas; Exit radius; Throat arc radius; Bell length) from 3 known variables:
+```rpl
+ε=11.87  Rt=10.470225_cm  Li=0.8
+@ Expecting [ At=344.39901 5893 cm↑2 Ae=4 088.01631 865 cm↑2 Rex=36.07292 6262 cm Rarc=3.99962 595 cm Lnz=76.44046 55367 cm ]
+'ROOT(ⒺBell Nozzle Contour;[At;Ae;Rex;Rarc;Lnz];[1_cm↑2;1_cm↑2;1_cm;1_cm;1_cm])'
+```
+
+#### Combustion Chamber Stay Time
+
+Propellant residence time `ts` in the chamber, from the ideal-gas specific volume `V` (chamber `Tc`,
+`Pc`, mean molar mass `M`), the chamber volume `Vc=Lstar·At`, and the mass flow `Q`.
+
+![Combustion Chamber Stay-Time](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[V_m↑3/kg;Vc_m↑3;ts_ms]` (Specific volume; Chamber volume; Stay-time) from 6 known variables:
+```rpl
+Lstar=1.1_m  At=0.0344398985_m↑2  Q=100_kg/s  Tc=3600_K  Pc=5_MPa  M=24_(g/mol)
+@ Expecting [ V=0.24943 38785 45 m↑3/kg Vc=0.03788 38883 5 m↑3 ts=1.51879 48233 4 ms ]
+'ROOT(ⒺCombustion Chamber Stay Time;[V;Vc;ts];[1_m↑3/kg;1_m↑3;1_ms])'
+```
+
+#### Thrust Coefficient
+
+The dimensionless thrust coefficient `Cfx` isolates the nozzle's contribution to thrust; it links the
+throat (characteristic velocity `Cstar`) and the nozzle to specific impulse via `Isp=Cfx·Cstar/Ⓒg`,
+and gives `Fnet=Cfx·Pc·At`. Shown for the adapted case — reproducing the thrust of « Properly Adapted
+Conic Nozzle ».
+
+![Thrust Coefficient](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Cfx;Cstar_m/s;Isp_s;Fnet_kN]` (Thrust coefficient; Characteristic velocity; Specific impulse; Thrust) from 7 known variables:
+```rpl
+k=1.2  Pc=5_MPa  Pe=0.05_MPa  Pa=0.05_MPa  At=0.03443989851769_m↑2  Ae=0.40883751863782_m↑2  Q=100_kg/s
+@ Expecting [ Cfx=1.64452 12712 6 Cstar=1 721.99492 588 m/s Isp=288.76907 8596 s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺThrust Coefficient;[Cfx;Cstar;Isp;Fnet];[1_1;1_m/s;1_s;1_kN])'
+```
+
+#### Total Impulse
+
+Total impulse delivered by a burn: `It=Isp·Ⓒg·Mp` (specific impulse × standard gravity × propellant
+mass), equivalently `Fnet·Δt`; the mean thrust over the burn is `Fnet=It/Δt`.
+
+* To calculate: `[It_N·s;Fnet_kN]` (Total impulse; Mean thrust) from 3 known variables:
+```rpl
+Isp=300_s  Mp=10000_kg  Δt=120_s
+@ Expecting [ It=29 419 950. N·s Fnet=245.16625 kN ]
+'ROOT(ⒺTotal Impulse;[It;Fnet];[1_N·s;1_kN])'
+```
+
+#### Vertical Ascent with Gravity Loss
+
+Burnout velocity of a vertically-launched stage: the ideal Tsiolkovsky increment `C·ln(Mo/Mf)` minus
+the constant-gravity loss `Ⓒg·Δt`, with effective exhaust velocity `C=Isp·Ⓒg` and burn time
+`Δt=Mp/Q`.
+
+![Vertical Ascent with Gravity Loss](img/RocketPropulsion.bmp)
+
+* To calculate: `[C_m/s;Mf_kg;Δt_s;Vbo_m/s]` (Exhaust velocity; Final mass; Burn time; Burnout velocity) from 4 known variables:
+```rpl
+Isp=300_s  Mo=50000_kg  Mp=40000_kg  Q=500_kg/s
+@ Expecting [ C=2 941.995 m/s Mf=10 000 kg Δt=80 s Vbo=3 950.42629 119 m/s ]
+'ROOT(ⒺVertical Ascent with Gravity Loss;[C;Mf;Δt;Vbo];[1_m/s;1_kg;1_s;1_m/s])'
+```
+
+#### Optimal Staging
+
+For a multi-stage vehicle with equal specific impulse across stages, the minimum-mass strategy is an
+**equal split of ΔV** among the `n` stages; each then carries the same mass ratio `MR=exp(ΔV1/C)`,
+with `ΔV1=ΔVtot/n` and `C=Isp·Ⓒg`.
+
+* To calculate: `[C_m/s;ΔV1_m/s;MR]` (Exhaust velocity; Per-stage ΔV; Stage mass ratio) from 3 known variables:
+```rpl
+ΔVtot=9400_m/s  n=2  Isp=320_s
+@ Expecting [ C=3 138.128 m/s ΔV1=4 700 m/s MR=4.47142 96415 3 ]
+'ROOT(ⒺOptimal Staging;[C;ΔV1;MR];[1_m/s;1_m/s;1_1])'
+```
+
+#### Sea level vs Vacuum Thrust
+
+The same fixed engine loses thrust at sea level through the ambient back-pressure term `Pa·Ae`; the
+gain from sea level to vacuum is exactly `ΔF=Pa·Ae`. `Pa` may be supplied by the atmosphere function
+`P♁StdAtm(0_m)`.
+
+![Sea-level vs Vacuum Thrust](img/OptimalThrust.bmp)
+
+* To calculate: `[Fsl_kN;Fvac_kN;ΔF_kN]` (Sea-level thrust; Vacuum thrust; Thrust gain) from 5 known variables:
+```rpl
+Q=100_kg/s  Ve=2831.85728_m/s  Ae=0.40883751863782_m↑2  Pe=0.05_MPa  Pa=0.101325_MPa
+@ Expecting [ Fsl=262.20214 2356 kN Fvac=303.62760 3932 kN ΔF=41.42546 1576 kN ]
+'ROOT(ⒺSea level vs Vacuum Thrust;[Fsl;Fvac;ΔF];[1_kN;1_kN;1_kN])'
+```
+
+#### Multi Planet Launch ΔV
+
+The circular-orbit velocity `Vcirc` at a low orbit **is** the ideal launch ΔV to reach that orbit;
+`Vesc` is the escape speed there and `gsurf` the surface gravity. The central-body constant selects
+the planet — swap `ⒸGM♁/ⒸReq♁` for `♂` or `♀` to compare Earth, Mars and Venus. Bridges Rocketry with
+the planetary constants and, for drag/thermal loss, the atmosphere functions `ρ♁/♂/♀StdAtm`.
+
+![Multi-Planet Launch ΔV](img/LaunchToSpace.bmp)
+
+* To calculate: `[rorb_km;Vcirc_m/s;Vesc_m/s;gsurf_m/s↑2]` (Orbital radius; Circular-orbit velocity; Escape velocity; Surface gravity) from 1 known variable:
+```rpl
+horb=200_km
+@ Expecting [ rorb=6 578.1 km Vcirc=7 784.28323 254 m/s Vesc=11 008.63892 08 m/s gsurf=9.79839 81336 7 m/s↑2 ]
+'ROOT(ⒺMulti Planet Launch ΔV;[rorb;Vcirc;Vesc;gsurf];[1_km;1_m/s;1_m/s;1_m/s↑2])'
+```
+Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
+#### Barrowman Method
+
+Subsonic centre of pressure of a finned rocket, by the algebraic method James S. Barrowman published
+in 1967 at NASA's Sounding Rocket Branch. Each part contributes a normal-force coefficient and its own
+centre of pressure, measured from the nose tip; the rocket's `XCP` is their coefficient-weighted mean.
+The nose always contributes `CNN=2`, and a transition that narrows rearward gives a **negative** `CNT`.
+Shown for an ogive nose — for a conical nose replace `0.466` by `0.666` in `XN`. The vehicle is stable
+when its centre of gravity lies ahead of `XCP`, conventionally by one to two body calibers `dN`.
+
+`LF` is not independent: it is the fin mid-chord length `√(SFs↑2+(XR+CT/2-CR/2)↑2)`, here `√(245↑2+65↑2)`.
+
+![Barrowman Method](img/BarrowmanMethod.bmp)
+
+* To calculate: `[XN_mm;CNN;CNT;XT_mm;CNF;XF_mm;CNR;XCP_mm]` (Nose CP; Nose, transition and fin force coefficients; Transition and fin CP; Rocket force coefficient; Rocket centre of pressure) from 14 known variables:
+```rpl
+LNose=405_mm  dN=205_mm  dF=205_mm  dR=165_mm  LT=125_mm  XP=905_mm  CR=245_mm  CT=125_mm  SFs=245_mm  LF=253.475837112732_mm  RB=85_mm  XR=125_mm  XB=1765_mm  NF=3
+@ Expecting [ XN=188.73 mm CNN=2 CNT=-0.70434 26531 83 XT=965.24774 7748 mm CNF=7.99426 99069 4 XF=1 868.61486 486 mm CNR=9.28992 72537 6 XCP=1 575.44898 065 mm ]
+'ROOT(ⒺBarrowman Method;[XN;CNN;CNT;XT;CNF;XF;CNR;XCP];[1_mm;1_1;1_1;1_mm;1_1;1_mm;1_1;1_mm])'
+```
+
+## Astronautics
+
+### Geocentric
+
+Earth-centred orbits, in two submenus: [Stationary](#geocentric-/-stationary),
+for orbits of fixed geometry, and [Trajectory](#geocentric-/-trajectory), for
+transfers between circular orbits.
+
+### Heliocentric
+
+Sun-centred orbits, in two submenus: [Stationary](#heliocentric-/-stationary),
+for stationary conditions and libration points, and
+[Trajectory](#heliocentric-/-trajectory), for interplanetary transfers and
+mission analysis.
+
+### Stationary
+
+Two submenus of Astronautics are named Stationary:
+[Geocentric / Stationary](#geocentric-/-stationary), for Earth-centred orbits
+of fixed geometry, and [Heliocentric / Stationary](#heliocentric-/-stationary),
+for Sun-referenced stationary conditions and libration points.
+
+### Trajectory
+
+Two submenus of Astronautics are named Trajectory:
+[Geocentric / Trajectory](#geocentric-/-trajectory), for transfers between
+circular Earth orbits, and [Heliocentric / Trajectory](#heliocentric-/-trajectory),
+for interplanetary transfers and mission analysis.
+
+### Geocentric / Stationary
+
+Earth-centered (`♁`) orbits of fixed geometry, from the two-body results (circular
+velocity, Kepler's third law, angular momentum, vis-viva). Radii geocentric, referenced
+to `ⒸReq♁`.
+
+The variables of the Geocentric / Stationary section are:
+
+* `Δa`: Semi-major-axis decay per revolution (atmospheric drag)
+* `ΔP`: Orbital-period decrease per revolution (atmospheric drag)
+* `Δt`: Elapsed time
+* `Δv`: Velocity gain per revolution (atmospheric drag) (dim.: speed)
+* `ρa`: Atmospheric density at the orbit altitude (dim.: mass/volume, in SI: kg/m^3)
+* `ν`: True anomaly
+* `ν0`: Initial true anomaly
+* `ω`: Argument of perigee
+* `Ω`: Right ascension of the ascending node (celestial)
+* `a`: Semi-major axis
+* `Ad`: Drag (frontal) area
+* `argLat`: Argument of latitude (`ω`+`ν`)
+* `Az`: Burnout azimuth
+* `C`: Launch quadratic parameter (`2·ⒸGM♁/(r1·v1²)`)
+* `Cd`: Drag coefficient
+* `dlon`: Longitude increment from the node to burnout
+* `dΩJ2`: Nodal-regression rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dΩM`: Nodal-regression rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dΩS`: Nodal-regression rate from the Sun (dim.: angle/time, in SI: °/d)
+* `dωJ2`: Apsidal-precession rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dωM`: Apsidal-precession rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dωS`: Apsidal-precession rate from the Sun (dim.: angle/time, in SI: °/d)
+* `Ea`: Eccentric anomaly
+* `Ea0`: Initial eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `fpa`: Flight-path angle
+* `H`: Altitude above the equatorial radius
+* `H1`: Burnout altitude
+* `Ha`: Altitude at apogee
+* `Hp`: Altitude at perigee
+* `Hs`: Atmospheric scale height
+* `inc`: Inclination
+* `lat`: Burnout latitude
+* `Life`: Orbital lifetime
+* `lon2`: Burnout longitude
+* `lonAN`: Longitude of the ascending node
+* `M`: Mean anomaly
+* `M0`: Initial mean anomaly
+* `msat`: Satellite mass
+* `n`: Revolutions per day
+* `P`: Orbital period
+* `r`: Geocentric orbital radius (circular orbit)
+* `r1`: Geocentric radius at burnout
+* `Ra`: Geocentric radius at apogee
+* `Rp`: Geocentric radius at perigee
+* `Rsoi`: Sphere-of-influence radius
+* `v`: Circular orbital velocity (dim.: speed)
+* `v1`: Burnout speed (dim.: speed)
+* `Va`: Velocity at apogee (dim.: speed)
+* `Vc`: Reference circular velocity at perigee radius (dim.: speed)
+* `Vc1`: Circular velocity at the burnout radius (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `Vp`: Velocity at perigee (dim.: speed)
+* `zen`: Zenith angle at burnout
+
+* Reference: [1] http://www.braeunig.us/space/problem.htm — problems 4.1–4.7, 4.25, 4.30.
+
+#### Circular Orbit
+
+Circular velocity `v=√(ⒸGM♁/r)` and period `P=2π√(r³/ⒸGM♁)`, with `r=ⒸReq♁+H`.
+
+![Conic Sections](img/ConicSections.bmp)
+
+* To calculate: `[v_m/s;P_s]` (Circular velocity; Orbital period) from 1 known variable:
+```rpl
+H=200_km
+@ Expecting [ v=7 784.28323 254 m/s P=5 309.59884 609 s ]
+'ROOT(ⒺCircular Orbit;[v;P];[1_m/s;1_s])'
+```
+
+#### Geosynchronous Orbit
+
+Period = sidereal day `ⒸProt♁`; Kepler's third law inverted gives radius, altitude and
+speed (geostationary if inclination = 0).
+
+* To calculate: `[r_km;H_km;v_m/s]` (Orbital radius; Altitude; Circular velocity) from 1 known variable:
+```rpl
+P=ⒸProt♁
+@ Expecting [ r=42 164.16815 02 km H=35 786.06815 02 km v=3 074.65999 204 m/s ]
+'ROOT(ⒺGeosynchronous Orbit;[r;H;v];[1_km;1_km;1_m/s])'
+```
+
+#### Elliptic Orbit Velocities
+
+Perigee/apogee speeds from angular momentum + energy: `Vp=√(2·ⒸGM♁·Ra/(Rp·(Ra+Rp)))`,
+`Va` symmetric.
+
+![Elliptic Kinematics](img/EllipticKinematics.bmp)
+
+* To calculate: `[Rp_km;Ra_km;Vp_m/s;Va_m/s]` (Perigee & apogee radii; Perigee & apogee velocities) from 2 known variables:
+```rpl
+Hp=250_km  Ha=500_km
+@ Expecting [ Rp=6 628.1 km Ra=6 878.1 km Vp=7 826.30901 201 m/s Va=7 541.84422 479 m/s ]
+'ROOT(ⒺElliptic Orbit Velocities;[Rp;Ra;Vp;Va];[1_km;1_km;1_m/s;1_m/s])'
+```
+
+#### Elliptic Orbit from Perigee State
+
+From perigee state, via `Vc=√(ⒸGM♁/Rp)`: `a=ⒸGM♁/(2·Vc²−Vp²)`, `Ra=2a−Rp`,
+`ecc=(Ra−Rp)/(Ra+Rp)`. (Vc first → toutes soustractions de même unité.)
+
+* To calculate: `[Rp_km;Vc_m/s;a_km;Ra_km;Ha_km;ecc]` (Perigee radius; Reference circular velocity; Semi-major axis; Apogee radius & altitude; Eccentricity) from 2 known variables:
+```rpl
+Hp=200_km  Vp=7850_m/s
+@ Expecting [ Rp=6 578.1 km Vc=7 784.28323 254 m/s a=6 691.56040 037 km Ra=6 805.02080 075 km Ha=426.92080 0749 km ecc=1.69557 46281 2⁳⁻² ]
+'ROOT(ⒺElliptic Orbit from Perigee State;[Rp;Vc;a;Ra;Ha;ecc];[1_km;1_m/s;1_km;1_km;1_km;1_1])'
+```
+
+#### Elliptic Orbit Apsides
+
+Apsidal radii `Rp=a·(1−ecc)`, `Ra=a·(1+ecc)`; altitudes minus `ⒸReq♁`.
+
+* To calculate: `[Rp_km;Ra_km;Hp_km;Ha_km]` (Perigee & apogee radii; Perigee & apogee altitudes) from 2 known variables:
+```rpl
+a=6700_km  ecc=0.01
+@ Expecting [ Rp=6 633. km Ra=6 767. km Hp=254.9 km Ha=388.9 km ]
+'ROOT(ⒺElliptic Orbit Apsides;[Rp;Ra;Hp;Ha];[1_km;1_km;1_km;1_km])'
+```
+
+#### Escape Velocity
+
+`Vesc=√(2·ⒸGM♁/r)` — a factor √2 above circular velocity.
+
+* To calculate: `[Vesc_m/s]` (Escape velocity) from 1 known variable:
+```rpl
+H=200_km
+@ Expecting [ Vesc=11 008.63892 08 m/s ]
+'ROOT(ⒺEscape Velocity;[Vesc];[1_m/s])'
+```
+
+#### Earth’s Sphere Of Influence
+
+`Rsoi=Dsp·(Mp/Ms)^(2/5)`, using the GM ratio `ⒸGM♁/ⒸGM☉` (G cancels → no G-uncertainty).
+Same formula for a moon (moon↔planet, planet↔Sun).
+
+* To calculate: `[Rsoi_km]` (Sphere-of-influence radius) from constants only:
+```rpl
+@ Expecting [ Rsoi=924 646.75636 9 km ]
+'ROOT(ⒺEarth’s Sphere Of Influence;[Rsoi];[1_km])'
+```
+
+---
+
+#### Launch to Orbit
+
+From the burnout state — altitude `H1`, speed `v1`, zenith angle `zen` — the launch
+quadratic (roots of `Rp/r1`) gives perigee and apogee, then `ecc`, true anomaly `ν`
+and semi-major axis `a`. `C=2·ⒸGM♁/(r1·v1²)`; smaller root = `Rp`, larger = `Ra`.
+
+![Launch to space](img/LaunchToSpace.bmp)
+
+* To calculate: `[r1_km;Vc1_m/s;C;Rp_km;Ra_km;Hp_km;Ha_km;a_km;ecc;ν_°]` from `H1`, `v1`, `zen`:
+```rpl
+H1=250_km  v1=7900_m/s  zen=89_°
+@ Expecting [ r1=6 628.1 km Vc1=7 754.86673 564 m/s C=1.92718 98121 3 Rp=6 601.71066 64 km Ra=7 174.97952 871 km Hp=223.61066 6398 km Ha=796.87952 8709 km a=6 888.34509 755 km ecc=0.04161 15085 84 ν=25.79753 14366 ° ]
+'ROOT(ⒺLaunch to Orbit;[r1;Vc1;C;Rp;Ra;Hp;Ha;a;ecc;ν];[1_km;1_m/s;1_1;1_km;1_km;1_km;1_km;1_km;1_1;1_°])'
+```
+
+---
+
+#### Orbit Orientation
+
+From burnout azimuth `Az`, latitude `lat`, longitude `lon2` and true anomaly `ν`:
+`cos(inc)=cos(lat)·sin(Az)`; `argLat=atan(tan(lat)/cos(Az))=ω+ν`; `ω=argLat−ν`;
+`dlon=atan(sin(lat)·tan(Az))`; ascending-node longitude `lonAN=lon2−dlon`.
+Celestial `Ω` = local sidereal time at `lonAN` (see Time functions).
+
+![Orbital elements](img/OrbitalElements.bmp)
+
+* To calculate: `[inc_°;argLat_°;ω_°;dlon_°;lonAN_°;Ω_°]` from `Az`, `lat`, `lon2`, `ν`:
+```rpl
+Az=86_°  lat=32_°  lon2=-60_°  ν=25.7975314366_°  JDbo=2451838.125
+@ Expecting [ inc=32.22266 62584 ° argLat=83.63023 3328 ° ω=57.83270 18914 ° dlon=82.48282 4052 ° lonAN=-142.48282 4052 ° Ω=111.89567 8587 ° ]
+'ROOT(ⒺOrbit Orientation;[inc;argLat;ω;dlon;lonAN;Ω];[1_°;1_°;1_°;1_°;1_°;1_°])'
+```
+
+---
+
+#### Time in Elliptic 1
+
+Time from `ν0` to `ν`: eccentric anomaly `cos(Ea)=(ecc+cos ν)/(1+ecc·cos ν)`; mean anomaly
+`M=Ea−ecc·sin(Ea)` (deg via `180/π`); period `P=2π√(a³/ⒸGM♁)`; `Δt=(M−M0)/360·P`.
+(`acos()` branch valid for `ν` in 0…180°.)
+
+* To calculate: `[Ea0_°;Ea_°;M0_°;M_°;P_s;Δt_s]` from `a`, `ecc`, `ν0`, `ν`:
+```rpl
+a=7500_km  ecc=0.1  ν0=30_°  ν=90_°
+@ Expecting [ Ea0=27.24802 84436 ° Ea=84.26082 95227 ° M0=24.62477 94313 ° M=78.55997 14413 ° P=6 464.02307 884 s Δt=968.43979 4205 s ]
+'ROOT(ⒺTime in Elliptic 1;[Ea0;Ea;M0;M;P;Δt];[1_°;1_°;1_°;1_°;1_s;1_s])'
+```
+
+#### Time in Elliptic 2
+
+True anomaly after `Δt`: `M=M0+Δt/P·360`; Kepler `Ea=M+ecc·sin(Ea)` (deg, solved by `Root(...)`);
+then `ν` from `Ea` via `→Polar(ℝ→ℂ(...))` (correct quadrant).
+
+* To calculate: `[Ea0_°;M0_°;P_s;M_°;Ea_°;ν_°]` from `a`, `ecc`, `ν0`, `Δt`:
+```rpl
+a=7500_km  ecc=0.1  ν0=90_°  Δt=1200_s
+@ Expecting [ Ea0=84.26082 95227 ° M0=78.55997 14413 ° P=6 464.02307 884 s M=145.39141 5997 ° Ea=148.39413 3722 ° ν=151.28053 6894 ° ]
+'ROOT(ⒺTime in Elliptic 2;[Ea0;M0;P;M;Ea;ν];[1_°;1_°;1_s;1_°;1_°;1_°])'
+```
+
+#### Elliptic Position
+
+At true anomaly `ν`: radius `r=a(1−ecc²)/(1+ecc·cos ν)`; flight-path angle
+`fpa=atan(ecc·sin ν/(1+ecc·cos ν))`; speed `v=√(ⒸGM♁(2/r−1/a))` (vis-viva).
+
+* To calculate: `[r_km;fpa_°;v_m/s]` from `a`, `ecc`, `ν`:
+```rpl
+a=7500_km  ecc=0.1  ν=225_°
+@ Expecting [ r=7 989.97666 837 km fpa=-4.35131 59135 9 ° v=6 828.49836 178 m/s ]
+'ROOT(ⒺElliptic Position;[r;fpa;v];[1_km;1_°;1_m/s])'
+```
+
+---
+
+#### Luni Solar Perturbations
+
+Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circular orbit,
+`n` revolutions/day: `dΩ=−k·cos(inc)/n`, `dω=k'·(4−5·sin²inc)/n`.
+
+* To calculate: `[dΩM_°/d;dΩS_°/d;dωM_°/d;dωS_°/d]` from `inc`, `n`:
+```rpl
+inc=51.6_°  n=15.5
+@ Expecting [ dΩM=-1.35450 29015 1⁳⁻⁴ °/d dΩS=-6.17140 37524 4⁳⁻⁵ °/d dωM=1.01304 35959 9⁳⁻⁴ °/d dωS=4.61564 24195 9⁳⁻⁵ °/d ]
+'ROOT(ⒺLuni Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
+```
+
+#### J2 Perturbations
+
+Secular rates (°/day) from Earth oblateness (`J₂`), `a` in km:
+`dΩ=−2.06474E14·a^(−7/2)·cos(inc)·(1−ecc²)^(−2)`, `dω` with `(4−5·sin²inc)`.
+
+* To calculate: `[dΩJ2_°/d;dωJ2_°/d]` from `a`, `inc`, `ecc`:
+```rpl
+a=7500_km  inc=28.5_°  ecc=0.1
+@ Expecting [ dΩJ2=-5.06732 85721 1 °/d dωJ2=8.25009 83471 3 °/d ]
+'ROOT(ⒺJ2 Perturbations;[dΩJ2;dωJ2];[1_°/d;1_°/d])'
+```
+
+#### Atmospheric Drag
+
+Per-revolution decay for a circular orbit (`v=√(ⒸGM♁/a)`): `Δa=−2π·Cd·Ad·ρa·a²/msat`;
+`ΔP`, `Δv` likewise; rough lifetime `Life=−Hs/Δa` (revolutions). `ρa`, `Hs` from an
+atmosphere model at altitude `H`.
+
+* To calculate: `[a_km;v_m/s;Δa_m;ΔP_s;Δv_m/s;Life]` from `H`, `Cd`, `Ad`, `ρa`, `msat`, `Hs`:
+```rpl
+H=400_km  Cd=2.67  Ad=8_m↑2  ρa=2.62E-12_kg/m³  msat=1000_kg  Hs=58.2_km
+@ Expecting [ a=6 778.1 km v=7 668.57870 369 m/s Δa=-16.15467 97044 m ΔP=-1.98543 00923 9⁳⁻² s Δv=9.13850 73063 3⁳⁻³ m/s Life=3 602.67124 232 ]
+'ROOT(ⒺAtmospheric Drag;[a;v;Δa;ΔP;Δv;Life];[1_km;1_m/s;1_m;1_s;1_m/s;1_1])'
+```
+
+---
+
+### Geocentric / Trajectory
+
+In-plane transfers between two circular geocentric orbits (radii from altitudes over
+`ⒸReq♁`). Velocities from vis-viva; total cost is the sum of the two burns.
+
+The variables of the Geocentric / Trajectory section are:
+
+* `Δinc`: Plane-change angle
+* `Δt`: Time of flight along the hyperbolic arc
+* `Δθ`: Lead angle to a co-orbital target
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First burn velocity change (dim.: speed)
+* `ΔV2`: Second burn velocity change (dim.: speed)
+* `ΔVA`: Departure burn at A (dim.: speed)
+* `ΔVB`: Arrival burn at B (dim.: speed)
+* `ΔVT`: Total transfer velocity change (dim.: speed)
+* `ΔVtli`: Translunar-injection burn (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `θ`: Angle between the two orbital planes
+* `ν`: True anomaly at arrival
+* `ν0`: Initial true anomaly
+* `Ωf`: Final right ascension of the ascending node
+* `Ωi`: Initial right ascension of the ascending node
+* `a`: Semi-major axis (negative for a hyperbola)
+* `a1`: X-component of the initial plane's unit normal
+* `a2`: Y-component of the initial plane's unit normal
+* `a3`: Z-component of the initial plane's unit normal
+* `ad`: Semi-major axis of the deorbit transfer ellipse
+* `aph`: Semi-major axis of the phasing orbit
+* `atx`: Transfer-orbit semi-major axis
+* `AtoM`: Area-to-mass ratio (dim.: area/mass, in SI: m^2/kg)
+* `b1`: X-component of the final plane's unit normal
+* `b2`: Y-component of the final plane's unit normal
+* `b3`: Z-component of the final plane's unit normal
+* `CR`: Radiation-pressure coefficient
+* `cx`: X-component of the line-of-nodes vector
+* `cy`: Y-component of the line-of-nodes vector
+* `cz`: Z-component of the line-of-nodes vector
+* `dHmin`: Minimum graveyard rise above GEO
+* `dmoon`: Earth-Moon distance
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `Fh`: Hyperbolic eccentric anomaly at `ν`
+* `Fh0`: Hyperbolic eccentric anomaly at `ν0`
+* `fpa`: Flight-path angle
+* `H`: Orbit altitude above the equatorial radius
+* `H1`: Initial orbit altitude
+* `HA`: Altitude of the departure (inner) orbit
+* `HB`: Altitude of the destination (outer) orbit
+* `Hp`: Parking-orbit altitude
+* `hp`: Perigee altitude after the deorbit burn
+* `incf`: Final inclination
+* `inci`: Initial inclination
+* `latN1`: Latitude of the first node
+* `latN2`: Latitude of the second node
+* `lonN1`: Longitude of the first node
+* `lonN2`: Longitude of the second node
+* `M`: Mean anomaly
+* `Nrev`: Number of phasing revolutions
+* `P`: Orbital period
+* `Pph`: Phasing-orbit period
+* `Ptgt`: Target-orbit period
+* `r`: Orbital radius
+* `r1`: Initial orbital radius
+* `rA`: Radius of the departure (inner) orbit
+* `rB`: Radius of the destination (outer) orbit
+* `rgeo`: Geostationary-orbit radius
+* `rgrave`: Graveyard-orbit radius
+* `rp`: Perigee radius
+* `TOF`: Time of flight
+* `tof`: Time of flight (translunar transfer)
+* `v1`: Circular speed on the initial orbit (dim.: speed)
+* `va`: Speed at the phasing-orbit apogee (dim.: speed)
+* `varr`: Geocentric arrival speed at the Moon (dim.: speed)
+* `Vbo`: Burnout speed (dim.: speed)
+* `vcg`: Circular speed at GEO (dim.: speed)
+* `vdo`: Speed after the deorbit burn (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `VfB`: Circular speed on the destination orbit (dim.: speed)
+* `vgr`: Circular speed at the graveyard radius (dim.: speed)
+* `Vi`: Circular orbital speed (dim.: speed)
+* `ViA`: Circular speed on the departure orbit (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vp`: Speed at the transfer perigee (dim.: speed)
+* `vtli`: Speed after translunar injection (dim.: speed)
+* `VtxA`: Transfer-orbit speed at A (dim.: speed)
+* `VtxB`: Transfer-orbit speed at B (dim.: speed)
+
+#### Hohmann Transfer
+
+Minimum-energy coplanar transfer: `atx=(rA+rB)/2`; burns `ΔVA=VtxA−ViA`, `ΔVB=VfB−VtxB`;
+`ΔVT=ΔVA+ΔVB`.
+
+![Hohmann transfer](img/HohmannTransfer.bmp)
+
+* To calculate: `[rA_km;rB_km;atx_km;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s]` from `HA`, `HB`:
+```rpl
+HA=200_km  HB=35786.06815021_km
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km atx=24 371.13407 51 km ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 238.88177 3 m/s VtxB=1 597.38448 891 m/s ΔVA=2 454.59854 043 m/s ΔVB=1 477.27550 313 m/s ΔVT=3 931.87404 357 m/s ]
+'ROOT(ⒺHohmann Transfer;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### One Tangent Burn
+
+Faster transfer with a chosen `atx` (> Hohmann's). Ellipse `ecc=1−rA/atx`; true anomaly
+`ν` and flight-path angle `fpa` at B; `ΔVB` by the law of cosines; time of flight from
+Kepler (`Ea`, `M`, `P`).
+
+![Orbit altitude change](img/OrbitAltitudeChange.bmp)
+
+* To calculate: `[rA_km;rB_km;ecc;ν_°;fpa_°;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s;Ea_°;M_°;P_s;TOF_s]` from `HA`, `HB`, `atx`:
+```rpl
+HA=200_km  HB=35786.06815021_km  atx=30000_km
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km ecc=0.78073 ν=157.67032 2313 ° fpa=46.87570 62536 ° ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 387.65858 55 m/s VtxB=2 370.73577 889 m/s ΔVA=2 603.37535 296 m/s ΔVB=2 260.16869 321 m/s ΔVT=4 863.54404 616 m/s Ea=121.28867 343 ° M=83.06197 14539 ° P=51 712.18463 07 s TOF=11 931.43334 34 s ]
+'ROOT(ⒺOne Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
+```
+
+---
+
+#### Simple Plane Change
+
+Rotate the plane of a circular orbit by `Δinc` at fixed size: `ΔV=2·Vi·sin(Δinc/2)`,
+with `Vi=√(ⒸGM♁/r)`. Very costly — do it where `Vi` is smallest.
+
+![Orbit plane change](img/OrbitPlaneChange.bmp)
+
+* To calculate: `[r_km;Vi_m/s;ΔV_m/s]` from `H`, `Δinc`:
+```rpl
+H=600_km  Δinc=8_°
+@ Expecting [ r=6 978.1 km Vi=7 557.88484 727 m/s ΔV=1 054.42279 182 m/s ]
+'ROOT(ⒺSimple Plane Change;[r;Vi;ΔV];[1_km;1_m/s;1_m/s])'
+```
+
+#### Combined Plane Change & Hohmann
+
+Hohmann to geo with the whole plane change `Δinc` folded into the apogee burn (law of
+cosines): `ΔVB=√(VtxB²+VfB²−2·VtxB·VfB·cos Δinc)`. Cheaper than doing them separately.
+
+* To calculate: `[rA_km;rB_km;atx_km;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s]` from `HA`, `HB`, `Δinc`:
+```rpl
+HA=200_km  HB=35786.06815021_km  Δinc=28_°
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km atx=24 371.13407 51 km ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 238.88177 3 m/s VtxB=1 597.38448 891 m/s ΔVA=2 454.59854 043 m/s ΔVB=1 825.41190 327 m/s ΔVT=4 280.01044 371 m/s ]
+'ROOT(ⒺCombined Plane Change & Hohmann;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Plane Change Between Orbits
+
+Angle `θ` between two orbits (given `inci,Ωi` and `incf,Ωf`) by the dot product of their
+normals; the two intersection nodes by the cross product `(cx,cy,cz)`.
+
+* To calculate: `[a1;a2;a3;b1;b2;b3;θ_°;cx;cy;cz;latN1_°;lonN1_°;latN2_°;lonN2_°]` from `inci`, `Ωi`, `incf`, `Ωf`:
+```rpl
+inci=30_°  Ωi=75_°  incf=32_°  Ωf=80_°
+@ Expecting [ a1=0.12940 95225 51 a2=0.48296 29131 45 a3=0.86602 54037 84 b1=0.09201 95145 45 b2=0.52186 85998 87 b3=0.84804 80961 56 θ=3.25917 87194 3 ° cx=-4.23756 85933 5⁳⁻² cy=-0.03005 42619 84 cz=2.30927 53535 3⁳⁻² latN1=23.96543 77646 ° lonN1=125.34554 8282 ° latN2=-23.96543 77646 ° lonN2=305.34554 8282 ° ]
+'ROOT(ⒺPlane Change Between Orbits;[a1;a2;a3;b1;b2;b3;θ;cx;cy;cz;latN1;lonN1;latN2;lonN2];[1_1;1_1;1_1;1_1;1_1;1_1;1_°;1_1;1_1;1_1;1_°;1_°;1_°;1_°])'
+```
+
+---
+
+#### Hyperbolic Time of Flight
+
+For a hyperbolic arc (`a<0`, `ecc>1`), time between two true anomalies via the hyperbolic
+eccentric anomaly `Fh`: `cosh(Fh)=(ecc+cos ν)/(1+ecc·cos ν)`;
+`Δt=√((−a)³/ⒸGM♁)·((ecc·sinh Fh−Fh)−(ecc·sinh Fh0−Fh0))`. `Fh` is a pure number.
+
+![Conic sections](img/ConicSections.bmp)
+
+* To calculate: `[Fh0;Fh;Δt_s]` from `a`, `ecc`, `ν0`, `ν`:
+```rpl
+a=-36000_km  ecc=1.1823  ν0=15_°  ν=120_°
+@ Expecting [ Fh0=0.07613 86091 05 Fh=1.10023 10489 Δt=5 035.06871 43 s ]
+'ROOT(ⒺHyperbolic Time of Flight;[Fh0;Fh;Δt];[1_1;1_1;1_s])'
+```
+
+#### Hyperbolic Excess Velocity
+
+Speed remaining at infinity on a hyperbolic escape: `vinf²=Vbo²−Vesc²`, with local escape
+speed `Vesc=√(2·ⒸGM♁/r)` and `r=ⒸReq♁+H`.
+
+![Hyperbolic excess velocity v∞](img/HyperbolicVelocityV∞.bmp)
+
+* To calculate: `[r_km;Vesc_m/s;vinf_m/s]` from `H`, `Vbo`:
+```rpl
+H=200_km  Vbo=11500_m/s
+@ Expecting [ r=6 578.1 km Vesc=11 008.63892 08 m/s vinf=3 325.63815 096 m/s ]
+'ROOT(ⒺHyperbolic Excess Velocity;[r;Vesc;vinf];[1_km;1_m/s;1_m/s])'
+```
+
+---
+
+#### Coplanar Phasing
+
+Rendezvous with a co-orbital target ahead by `Δθ`: enter a smaller phasing orbit (period
+`Pph=Ptgt·(1−Δθ/(360·Nrev))`, made up over `Nrev` revs), `aph` from `Pph`, and
+`ΔV=2·(v1−va)` (two vis-viva burns at the common point). Also GEO slot relocation.
+
+* To calculate: `[r_km;v1_m/s;Ptgt_s;Pph_s;aph_km;va_m/s;ΔV_m/s]` from `H`, `Δθ`, `Nrev`:
+```rpl
+H=400_km  Δθ=20_°  Nrev=3
+@ Expecting [ r=6 778.1 km v1=7 668.57870 369 m/s Ptgt=5 553.57908 893 s Pph=5 450.73503 173 s aph=6 694.15933 177 km va=7 620.34738 297 m/s ΔV=96.46264 14344 m/s ]
+'ROOT(ⒺCoplanar Phasing;[r;v1;Ptgt;Pph;aph;va;ΔV];[1_km;1_m/s;1_s;1_s;1_km;1_m/s;1_m/s])'
+```
+
+#### Controlled Deorbit
+
+End-of-life / debris disposal: one retrograde burn at altitude `H1` drops perigee to `hp`
+for reentry. `ad=(r1+rp)/2`, `ΔV=v1−vdo` (vis-viva at the burn point).
+
+* To calculate: `[r1_km;rp_km;ad_km;v1_m/s;vdo_m/s;ΔV_m/s]` from `H1`, `hp`:
+```rpl
+H1=400_km  hp=50_km
+@ Expecting [ r1=6 778.1 km rp=6 428.1 km ad=6 603.1 km v1=7 668.57870 369 m/s vdo=7 566.27730 33 m/s ΔV=102.30140 0385 m/s ]
+'ROOT(ⒺControlled Deorbit;[r1;rp;ad;v1;vdo;ΔV];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s])'
+```
+
+#### GEO Graveyard Disposal
+
+Reorbit a GEO satellite to the disposal ("graveyard") region. IADC minimum rise
+`dHmin=235+1000·CR·(A/m)` km; then a two-burn Hohmann from `rgeo` to `rgrave`. Only a few
+m/s — hence disposal above GEO rather than deorbit.
+
+* To calculate: `[rgeo_km;dHmin_km;rgrave_km;atx_km;vcg_m/s;vp_m/s;vgr_m/s;va_m/s;ΔV1_m/s;ΔV2_m/s;ΔVtot_m/s]` from `CR`, `AtoM`:
+```rpl
+CR=1.3  AtoM=0.015
+@ Expecting [ rgeo=42 164.16815 02 km dHmin=254.5 km rgrave=42 418.66815 02 km atx=42 291.41815 02 km vcg=3 074.65999 204 m/s vp=3 079.28216 642 m/s vgr=3 065.42257 097 m/s va=3 060.80734 518 m/s ΔV1=4.62217 43810 9 m/s ΔV2=4.61522 57856 1 m/s ΔVtot=9.23740 01667 m/s ]
+'ROOT(ⒺGEO Graveyard Disposal;[rgeo;dHmin;rgrave;atx;vcg;vp;vgr;va;ΔV1;ΔV2;ΔVtot];[1_km;1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Translunar Injection
+
+Inject from a parking orbit `Hp` onto a geocentric transfer whose apogee reaches the Moon's
+distance `dmoon` (simplified patched conic). `ΔVtli=vtli−v1`; `tof=π·√(atx³/ⒸGM♁)` (≈5 d);
+`varr` is the geocentric speed on arrival.
+
+* To calculate: `[r1_km;atx_km;v1_m/s;vtli_m/s;ΔVtli_m/s;varr_m/s;tof_s]` from `Hp`, `dmoon`:
+```rpl
+Hp=185_km  dmoon='Ⓒa☽'
+@ Expecting [ r1=6 563.1 km atx=195 481.05 km v1=7 793.17366 605 m/s vtli=10 928.31355 71 m/s ΔVtli=3 135.13989 107 m/s varr=186.58637 173 m/s tof=430 068.86450 5 s ]
+'ROOT(ⒺTranslunar Injection;[r1;atx;v1;vtli;ΔVtli;varr;tof];[1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+---
+
+### Heliocentric / Stationary
+
+Sun-referenced (`☉`) stationary conditions and libration points: the Sun-synchronous nodal-regression condition, the collinear Lagrange points, and the JWST halo orbit at the Sun–Earth L2 point.
+
+The variables of the Heliocentric / Stationary section are:
+
+* `a`: Semi-major axis
+* `dSunL2`: Sun-L2 distance
+* `dΩsun`: Nodal-regression rate matching the Sun (dim.: angle/time, in SI: °/d)
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `H`: Orbit altitude above the equatorial radius
+* `inc`: Inclination
+* `P`: Orbital period
+* `PL2`: Orbital period about the Sun at L2
+* `rapp`: First-approximation L1/L2 distance from Earth
+* `rL1`: Sun-Earth L1 distance from Earth
+* `rL2`: Sun-Earth L2 distance from Earth
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+
+#### Sun Synchronous Orbit
+
+Inclination that makes the node precess at the Sun's rate (360°/yr) via J2, so the local
+solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))`, needs `inc>90°`.
+
+* To calculate: `[a_km;dΩsun_°/d;inc_°;P_s]` from `H`, `ecc`:
+```rpl
+H=700_km  ecc=0
+@ Expecting [ a=7 078.1 km dΩsun=0.98564 73320 99 °/d inc=98.18778 45391 ° P=5 926.33291 292 s ]
+'ROOT(ⒺSun Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
+```
+
+#### Collinear Lagrange Points
+
+Sun-Earth L1/L2 from the rotating-frame equilibrium (Sun gravity + Earth gravity =
+centrifugal). `rapp=Ⓒa♁·(ⒸGM♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved implicitly. JWST sits at L2.
+
+* To calculate: `[rapp_km;rL2_km;rL1_km]` (constants only):
+```rpl
+@ Expecting [ rapp=1 496 558.48134 km rL2=1 501 531.72084 km rL1=1 491 550.96228 km ]
+'ROOT(ⒺCollinear Lagrange Points;[rapp;rL2;rL1];[1_km;1500000_km;1500000_km])'
+```
+
+#### JWST at Sun Earth L2
+
+L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGM♁))` (≈1 yr, so
+it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body periodic orbit.
+
+* To calculate: `[dSunL2_km;PL2_s;VL2_m/s]` from `rL2`:
+```rpl
+rL2=1501531.72084_km
+@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s ]
+'ROOT(ⒺJWST at Sun Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
+```
+
+---
+
+### Heliocentric / Trajectory
+
+Sun-centered (`☉`) interplanetary transfers and mission analysis: heliocentric Hohmann and one-tangent transfers, departure and arrival hyperbolae, gravity-assist swing-bys, launch windows, and patched-conic mission capstones.
+
+The variables of the Heliocentric / Trajectory section are:
+
+* `Δν`: Transfer's change in true anomaly
+* `ΔVinj`: Injection burn onto the departure hyperbola (dim.: speed)
+* `φ`: Departure phase angle (target lead angle)
+* `ν`: True anomaly at arrival
+* `ωt`: Target planet's mean angular rate (dim.: angle/time, in SI: °/s)
+* `ρa`: Atmospheric density at the descent altitude (dim.: mass/volume, in SI: kg/m^3)
+* `a`: Semi-major axis of the arrival hyperbola (negative)
+* `abe1`: First bi-elliptic transfer semi-major axis
+* `abe2`: Second bi-elliptic transfer semi-major axis
+* `acap`: Capture-orbit semi-major axis
+* `Ad`: Drag (frontal) area
+* `aEM`: Earth-Mercury transfer semi-major axis
+* `aES`: Earth-Saturn transfer semi-major axis
+* `aEV`: Earth-Venus transfer semi-major axis
+* `amax`: Peak entry deceleration (dim.: acceleration, in SI: m/s^2)
+* `amaxg`: Peak entry deceleration in g
+* `aobj`: Incoming object's orbit semi-major axis
+* `atx`: Transfer-orbit semi-major axis
+* `atxJ`: Jupiter-system transfer semi-major axis
+* `atxS`: Saturn-system transfer semi-major axis
+* `bimp`: Impact parameter (aiming distance)
+* `C3`: Characteristic energy (dim.: speed^2, in SI: km^2/s^2)
+* `Cd`: Drag coefficient
+* `dgain`: Bi-elliptic Δv saving over Hohmann (dim.: speed)
+* `dmiss`: Targeted miss distance
+* `dOmega`: Node offset to the target plane
+* `dSunL2`: Sun-L2 distance
+* `dturn`: Hyperbolic turn angle
+* `dv1`: First burn (dim.: speed)
+* `dv2`: Second burn (dim.: speed)
+* `dv3`: Third burn (dim.: speed)
+* `dvBE`: Total bi-elliptic Δv (dim.: speed)
+* `dVdep`: Departure-injection burn (dim.: speed)
+* `dVesc`: Escape burn from the parking orbit (dim.: speed)
+* `dvH`: Total Hohmann Δv (dim.: speed)
+* `dVint`: Interception Δv relative to Earth (dim.: speed)
+* `dVtot`: Total velocity change (dim.: speed)
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `eccV`: Eccentricity of the Venus flyby hyperbola
+* `eobj`: Incoming object's orbit eccentricity
+* `fpa`: Flight-path angle
+* `fpaP`: Planet's heliocentric flight-path angle
+* `fpaSf`: Spacecraft's outgoing flight-path angle
+* `fpaSi`: Spacecraft's incoming flight-path angle
+* `gam`: Approach asymptote angle
+* `gmars`: Mars surface gravity (dim.: acceleration, in SI: m/s^2)
+* `H`: Parking-orbit altitude (departure hyperbola)
+* `Hp`: Parking-orbit altitude
+* `Hs`: Atmospheric scale height
+* `JD0`: Reference Julian date
+* `LST`: Local sidereal time
+* `lonE`: East longitude of the launch site
+* `MOI`: Mars orbit-insertion burn (dim.: speed)
+* `MOIsat`: Saturn orbit-insertion burn (dim.: speed)
+* `msat`: Spacecraft mass
+* `OmegaT`: Target right ascension of the ascending node
+* `P1`: Period of the inner planet
+* `P2`: Period of the outer planet
+* `PL2`: Orbital period about the Sun at L2
+* `r0`: Parking-orbit radius
+* `rA`: Departure planet's orbital radius
+* `rapo`: Capture-orbit apoapsis radius
+* `rB`: Destination planet's orbital radius
+* `rEar`: Earth's orbital radius
+* `rL2`: Sun-Earth L2 distance from Earth
+* `rm`: Capture-orbit radius at the target planet
+* `rMars`: Mars's orbital radius
+* `rmars`: Mars's physical radius
+* `rMe`: Mercury's orbital radius
+* `rmoon`: Target moon's orbital radius
+* `rp`: Periapsis / parking-orbit radius
+* `rpV`: Venus flyby periapsis radius
+* `rSa`: Saturn's orbital radius
+* `rstar`: Bi-elliptic far turning-point radius
+* `rV`: Venus's orbital radius
+* `rX`: Radius at which the object crosses Earth's orbit
+* `TEI`: Trans-Earth injection burn (dim.: speed)
+* `thf`: Outgoing relative-velocity direction angle
+* `thi`: Incoming relative-velocity direction angle
+* `TMI`: Trans-Mars injection burn (dim.: speed)
+* `TOF`: Time of flight
+* `tofd`: Transfer time of flight (departure phasing)
+* `Tsyn`: Synodic period
+* `turnV`: Venus flyby turn angle
+* `twait`: Wait time until the launch window
+* `Varr`: Heliocentric arrival speed (dim.: speed)
+* `Vcap`: Capture-orbit periapsis speed (dim.: speed)
+* `Vcirc`: Circular speed at the parking orbit (dim.: speed)
+* `VcsA`: Departure planet's circular speed (dim.: speed)
+* `VcsB`: Destination planet's circular speed (dim.: speed)
+* `vEarth`: Earth's heliocentric speed (dim.: speed)
+* `Ventry`: Atmospheric entry speed (dim.: speed)
+* `vfly`: Flyby (encounter) speed (dim.: speed)
+* `Vhyp`: Hyperbolic arrival speed at periapsis (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vinfA`: Arrival excess speed (dim.: speed)
+* `vinfD`: Departure excess speed (dim.: speed)
+* `vinfEar`: Excess speed at Earth arrival (dim.: speed)
+* `vinfMars`: Excess speed at Mars departure (dim.: speed)
+* `vinfMe`: Excess speed at Mercury (dim.: speed)
+* `vinfSa`: Excess speed at Saturn (dim.: speed)
+* `vinfV`: Excess speed at Venus (dim.: speed)
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+* `Vmoon`: Moon's circular orbital speed (dim.: speed)
+* `Vo`: Periapsis speed on the departure hyperbola (dim.: speed)
+* `vobj`: Incoming object's heliocentric speed (dim.: speed)
+* `Vpark`: Parking-orbit circular speed (dim.: speed)
+* `Vplanet`: Planet's heliocentric speed (dim.: speed)
+* `Vpln`: Planet's heliocentric speed at flyby (dim.: speed)
+* `VPx`: Planet velocity, X-component (dim.: speed)
+* `VPy`: Planet velocity, Y-component (dim.: speed)
+* `vr`: Radial velocity component (dim.: speed)
+* `Vrfx`: Outgoing relative velocity, X-component (dim.: speed)
+* `Vrfy`: Outgoing relative velocity, Y-component (dim.: speed)
+* `Vrix`: Incoming relative velocity, X-component (dim.: speed)
+* `Vriy`: Incoming relative velocity, Y-component (dim.: speed)
+* `VSf`: Spacecraft outgoing heliocentric speed (dim.: speed)
+* `VSfx`: Spacecraft outgoing velocity, X-component (dim.: speed)
+* `VSfy`: Spacecraft outgoing velocity, Y-component (dim.: speed)
+* `VSi`: Spacecraft incoming heliocentric speed (dim.: speed)
+* `VSix`: Spacecraft incoming velocity, X-component (dim.: speed)
+* `VSiy`: Spacecraft incoming velocity, Y-component (dim.: speed)
+* `Vsun`: Local solar-escape speed (dim.: speed)
+* `vt`: Tangential velocity component (dim.: speed)
+* `vterm`: Terminal descent speed (dim.: speed)
+* `VtxA`: Transfer speed at departure (dim.: speed)
+* `VtxB`: Transfer speed at arrival (dim.: speed)
+
+#### Heliocentric Hohmann Transfer
+
+Minimum-energy heliocentric transfer between planetary orbits `rA` and `rB`: transfer
+`atx=(rA+rB)/2`, planet circular speeds `Vcs=√(ⒸGM☉/r)`, transfer speeds by vis-viva, and
+`vinf=|Vtx−Vcs|` at each end (feeds the departure/arrival hyperbolae). `TOF=π·√(atx³/ⒸGM☉)`.
+
+![Heliocentric Hohmann Earth→Mars](img/HohmannTransferEarthToMars.bmp)
+
+* To calculate: `[atx_au;VcsA_m/s;VcsB_m/s;VtxA_m/s;VtxB_m/s;vinfD_m/s;vinfA_m/s;TOF_s]` from `rA`, `rB`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'
+@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VcsB=24 129.38801 33 m/s VtxA=32 729.38296 23 m/s VtxB=21 480.49129 1 m/s vinfD=2 944.69113 264 m/s vinfA=2 648.89672 221 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺHeliocentric Hohmann Transfer;[atx;VcsA;VcsB;VtxA;VtxB;vinfD;vinfA;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### One Tangent Interplanetary Transfer
+
+Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly at arrival
+`ν=acos((atx(1−ecc²)/rB−1)/ecc)`, eccentric anomaly `Ea`, and `TOF` from Kepler's equation.
+
+![One-tangent interplanetary transfer](img/OneTangentBurnEarthToMars.bmp)
+
+* To calculate: `[ecc;ν_°;Ea_°;TOF_s]` from `rA`, `rB`, `atx`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'  atx=1.3_au
+@ Expecting [ ecc=0.23076 92307 69 ν=146.41173 0654 ° Ea=138.21050 0084 ° TOF=16 813 447.6987 s ]
+'ROOT(ⒺOne Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
+```
+
+#### Departure Phase Angle
+
+Angle by which the target planet must lead at departure: `φ=Δν−ωt·tofd`, with `Δν` the
+transfer's change in true anomaly and `ωt` the target's mean angular rate.
+
+* To calculate: `[φ_°]` from `Δν`, `ωt`, `tofd`:
+```rpl
+Δν=146.488_°  ωt=0.5240_°/d  tofd=194.77_d
+@ Expecting [ φ=44.42852 ° ]
+'ROOT(ⒺDeparture Phase Angle;[φ];[1_°])'
+```
+
+---
+
+#### Departure Hyperbola & Injection
+
+From a parking orbit `H` and the required excess speed `vinf`: periapsis speed
+`Vo=√(vinf²+2·ⒸGM♁/r0)`, injection `ΔVinj=Vo−√(ⒸGM♁/r0)`, and characteristic energy
+`C3=vinf²`.
+
+![Departure hyperbola](img/HyperbolicParameters.bmp)
+
+* To calculate: `[r0_km;Vo_m/s;Vcirc_m/s;ΔVinj_m/s;C3_km²/s²]` from `vinf`, `H`:
+```rpl
+vinf=3683_m/s  H=200_km
+@ Expecting [ r0=6 578.1 km Vo=11 608.38575 72 m/s Vcirc=7 784.28323 254 m/s ΔVinj=3 824.10252 47 m/s C3=13.56448 9 km↑2/s↑2 ]
+'ROOT(ⒺDeparture Hyperbola & Injection;[r0;Vo;Vcirc;ΔVinj;C3];[1_km;1_m/s;1_m/s;1_m/s;1_km²/s²])'
+```
+
+#### Arrival Hyperbola
+
+Approach hyperbola at the target planet from `vinf` and a targeted miss distance `dmiss`:
+impact parameter `bimp=dmiss·sin(gam)`, `a=−ⒸGM♂/vinf²` (<0), `ecc=√(1+bimp²/a²)` (>1),
+closest approach `rp=a(1−ecc)`, turn angle `dturn=2·asin(1/ecc)`.
+
+![Arrival hyperbola](img/HyperbolicTrajectory.bmp)
+
+* To calculate: `[bimp_km;a_km;ecc;rp_km;dturn_°]` from `vinf`, `dmiss`, `gam`:
+```rpl
+vinf=2438.2_m/s  dmiss=18500_km  gam=150.451_°
+@ Expecting [ bimp=9 123.60278 285 km a=-7 204.31927 146 km ecc=1.61362 55894 7 rp=4 420.75465 968 km dturn=76.59173 79349 ° ]
+'ROOT(ⒺArrival Hyperbola;[bimp;a;ecc;rp;dturn];[1_km;1_km;1_1;1_km;1_°])'
+```
+
+---
+
+#### Gravity Assist Swing By
+
+Planetary flyby: the spacecraft's velocity relative to the planet keeps its magnitude
+`vinf` but rotates by the hyperbolic turn angle `dturn=−2·asin(1/ecc)`. Decompose incoming
+velocities into X,Y about the planet's velocity, rotate, recompose. `thi`/`fpaSf` need
+`arg(→Polar(ℝ→ℂ(x;y)))` for the correct quadrant.
+
+* To calculate: `[…19 unknowns…]` from `Vpln`, `fpaP`, `VSi`, `fpaSi`, `dmiss`:
+```rpl
+Vpln=12740_m/s  fpaP=2.40_°  VSi=9470_m/s  fpaSi=39.2_°  dmiss=-2500000_km
+@ Expecting [ VPx=12 728.82485 55 m/s VPy=533.49582 851 m/s VSix=7 338.72430 803 m/s VSiy=5 985.31749 624 m/s Vrix=-5 390.10054 743 m/s Vriy=5 451.82166 773 m/s vinf=7 666.52094 552 m/s thi=134.67382 8918 ° bimp=-1 777 801.72599 km a=-2 155 429.39553 km ecc=1.29626 29999 3 dturn=-100.96826 292 ° thf=33.70556 59978 ° Vrfx=6 377.78044 473 m/s Vrfy=4 254.34601 401 m/s VSfx=19 106.60530 02 m/s VSfy=4 787.84184 252 m/s VSf=19 697.35504 09 m/s fpaSf=14.06782 26183 ° ]
+'ROOT(ⒺGravity Assist Swing By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
+```
+
+---
+
+#### Patched Conic Mission Capstone
+
+Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → departure hyperbola
+(`TMI` from a parking orbit) + arrival capture (`MOI` into `rm`). `dVtot=TMI+MOI`.
+
+* To calculate: `[atx_au;VcsA_m/s;VtxA_m/s;vinfD_m/s;VcsB_m/s;VtxB_m/s;vinfA_m/s;r0_km;Vo_m/s;TMI_m/s;Varr_m/s;MOI_m/s;dVtot_m/s;TOF_s]` from `rA`, `rB`, `Hp`, `rm`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'  Hp=200_km  'ⒸReq♂+500_km' →NUM 'rm' STO
+@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VtxA=32 729.38296 23 m/s vinfD=2 944.69113 264 m/s VcsB=24 129.38801 33 m/s VtxB=21 480.49129 1 m/s vinfA=2 648.89672 221 m/s r0=6 578.1 km Vo=11 395.67184 31 m/s TMI=3 611.38861 055 m/s Varr=5 385.28963 704 m/s MOI=2 069.81903 47 m/s dVtot=5 681.20764 526 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺPatched Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Synodic Period & Launch Window
+
+Time between launch windows to a planet: `Tsyn=1/|1/P1−1/P2|`, with periods from mean
+distances. Earth-Mars ≈ 780 d.
+
+* To calculate: `[P1_d;P2_d;Tsyn_d]` from `rA`, `rB`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'
+@ Expecting [ P1=365.25689 8384 d P2=686.97168 7142 d Tsyn=779.94906 1999 d ]
+'ROOT(ⒺSynodic Period & Launch Window;[P1;P2;Tsyn];[1_d;1_d;1_d])'
+```
+
+#### Bi Elliptic vs Hohmann
+
+Compare a Hohmann (`dvH`) to a bi-elliptic transfer via a far turning point `rstar` (`dvBE`).
+Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of much longer time.
+
+![Bi-elliptic](img/BiEllipticTransfer.bmp)
+
+* To calculate: `[atx_au;dvH_m/s;abe1_au;abe2_au;dv1_m/s;dv2_m/s;dv3_m/s;dvBE_m/s;dgain_m/s]` from `rA`, `rB`, `rstar`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♆'  rstar=50_au
+@ Expecting [ atx=15.52381 00949 au dvH=15 707.85453 85 m/s abe1=25.5 au abe2=40.02381 00949 au dv1=11 922.21894 83 m/s dv2=2 815.53461 655 m/s dv3=639.54282 2258 m/s dvBE=15 377.29638 71 m/s dgain=330.55815 1368 m/s ]
+'ROOT(ⒺBi Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Solar System Escape
+
+Δv to leave the solar system from a planet's orbit: `vinf=Vsun−Vplanet` (with
+`Vsun=√(2ⒸGM☉/rA)`), then `dVesc` from a parking orbit and `C3=vinf²`. The Oberth effect
+makes `dVesc≪vinf`.
+
+* To calculate: `[Vsun_m/s;Vplanet_m/s;vinf_m/s;r0_km;Vo_m/s;dVesc_m/s;C3_km²/s²]` from `rA`, `Hp`:
+```rpl
+rA='Ⓒa♁'  Hp=200_km
+@ Expecting [ Vsun=42 121.91513 66 m/s Vplanet=29 784.69182 97 m/s vinf=12 337.22330 7 m/s r0=6 578.1 km Vo=16 534.72738 86 m/s dVesc=8 750.44415 603 m/s C3=152.20707 8926 km↑2/s↑2 ]
+'ROOT(ⒺSolar System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
+```
+
+---
+
+#### Interception Of Incoming Object
+
+Object on orbit `(aobj,eobj)` crossing Earth's orbit `rX`: speed by vis-viva, tangential
+part `vt=√(ⒸGM☉·aobj·(1−eobj²))/rX`, `fpa=atan(vr/vt)`, and `dVint` (law of cosines) = the
+relative speed to Earth an interceptor must supply.
+
+* To calculate: `[vobj_m/s;vEarth_m/s;vt_m/s;vr_m/s;fpa_°;dVint_m/s]` from `aobj`, `eobj`, `rX`:
+```rpl
+aobj=2_au  eobj=0.6  rX='Ⓒa♁'
+@ Expecting [ vobj=36 478.64856 44 m/s vEarth=29 784.69182 97 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° dVint=14 507.87544 33 m/s ]
+'ROOT(ⒺInterception Of Incoming Object;[vobj;vEarth;vt;vr;fpa;dVint];[1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_m/s])'
+```
+
+#### Asteroid Belt Injection Orbit
+
+Hohmann transfer Earth→asteroid belt (`rB`≈2.77 au): departure/arrival v∞, injection `dVdep`
+from a parking orbit, `TOF`.
+
+* To calculate: `[atx_au;vinfD_m/s;vinfA_m/s;r0_km;Vo_m/s;dVdep_m/s;TOF_s]` from `rA`, `rB`, `Hp`:
+```rpl
+rA='Ⓒa♁'  rB=2.766_au  Hp=200_km
+@ Expecting [ atx=1.883 au vinfD=6 314.21403 121 m/s vinfA=4 857.88002 653 m/s r0=6 578.1 km Vo=12 690.91918 34 m/s dVdep=4 906.63595 091 m/s TOF=40 771 590.5155 s ]
+'ROOT(ⒺAsteroid Belt Injection Orbit;[atx;vinfD;vinfA;r0;Vo;dVdep;TOF];[1_au;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_s])'
+```
+
+#### To Mercury Through Venus
+
+Why route via Venus: a direct Earth→Mercury transfer arrives at `vinfMe`≈9.6 km/s (costly to
+capture), whereas Earth→Venus arrives at only `vinfV`≈2.7 km/s, and a close Venus flyby (`rpV`)
+can turn the relative velocity up to `turnV` to shed energy toward Mercury.
+
+* To calculate: `[aEM_au;vinfMe_m/s;aEV_au;vinfV_m/s;eccV;turnV_°]` from `rEar`, `rV`, `rMe`, `rpV`:
+```rpl
+rEar='Ⓒa♁'  rV='Ⓒa♀'  rMe='Ⓒa☿'  'ⒸReq♀+300_km' →NUM 'rpV' STO
+@ Expecting [ aEM=0.69354 90449 46 au vinfMe=9 611.49352 042 m/s aEV=0.86166 29016 63 au vinfV=2 706.64286 924 m/s eccV=1.14324 00188 6 turnV=122.02062 6488 ° ]
+'ROOT(ⒺTo Mercury Through Venus;[aEM;vinfMe;aEV;vinfV;eccV;turnV];[1_au;1_m/s;1_au;1_m/s;1_1;1_°])'
+```
+
+---
+
+#### Saturn Injection Orbit
+
+Earth→Saturn arrival (`vinfSa`), then capture at periapsis `rp` into an ellipse whose
+apoapsis reaches a moon (`rapo`): `MOIsat=Vhyp−Vcap`. Very elliptic capture ⇒ modest braking.
+
+* To calculate: `[aES_au;vinfSa_m/s;Vhyp_m/s;acap_km;Vcap_m/s;MOIsat_m/s]` from `rEar`, `rSa`, `rp`, `rapo`:
+```rpl
+rEar='Ⓒa♁'  rSa='Ⓒa♄'  'ⒸReq♄+2000_km' →NUM 'rp' STO  rapo=1221870_km
+@ Expecting [ aES=5.29127 80886 9 au vinfSa=5 438.86510 887 m/s Vhyp=35 329.92349 79 m/s acap=642 069 km Vcap=34 051.88845 62 m/s MOIsat=1 278.03504 169 m/s ]
+'ROOT(ⒺSaturn Injection Orbit;[aES;vinfSa;Vhyp;acap;Vcap;MOIsat];[1_au;1_m/s;1_m/s;1_km;1_m/s;1_m/s])'
+```
+
+#### Path to Jupiter Satellites
+
+In-system Hohmann from a low Jupiter orbit `rp` to a Galilean moon `rmoon`: `dVtot=dv1+dv2`.
+Huge Δv (Jupiter is massive). Io/Ganymede/Callisto: swap `rmoon`.
+
+* To calculate: `[atxJ_km;Vpark_m/s;dv1_m/s;Vmoon_m/s;dv2_m/s;dVtot_m/s;TOF_s]` from `rp`, `rmoon`:
+```rpl
+'ⒸReq♃+400_km' →NUM 'rp' STO  rmoon=670900_km
+@ Expecting [ atxJ=371 396 km Vpark=41 978.30942 45 m/s dv1=14 441.96956 84 m/s Vmoon=13 741.56926 59 m/s dv2=7 695.71042 355 m/s dVtot=22 137.67999 2 m/s TOF=63 174.30581 96 s ]
+'ROOT(ⒺPath to Jupiter Satellites;[atxJ;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Path to Saturn Satellites
+
+In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea: swap `rmoon`.
+
+* To calculate: `[atxS_km;Vpark_m/s;dv1_m/s;Vmoon_m/s;dv2_m/s;dVtot_m/s;TOF_s]` from `rp`, `rmoon`:
+```rpl
+'ⒸReq♄+2000_km' →NUM 'rp' STO  rmoon=1221870_km
+@ Expecting [ atxS=642 069 km Vpark=24 684.22817 m/s dv1=9 367.66028 623 m/s Vmoon=5 572.36440 777 m/s dv2=3 837.03823 527 m/s dVtot=13 204.69852 15 m/s TOF=262 403.97839 8 s ]
+'ROOT(ⒺPath to Saturn Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+---
+
+#### From Mars to Earth
+
+Return transfer Mars→Earth (heliocentric Hohmann) + trans-Earth injection `TEI` from a Mars
+parking orbit `rp`. Symmetric to the outbound leg.
+
+* To calculate: `[atx_au;vinfMars_m/s;vinfEar_m/s;Vo_m/s;TEI_m/s;TOF_s]` from `rMars`, `rEar`, `rp`:
+```rpl
+rMars='Ⓒa♂'  rEar='Ⓒa♁'  'ⒸReq♂+500_km' →NUM 'rp' STO
+@ Expecting [ atx=1.26183 97204 9 au vinfMars=2 648.89672 221 m/s vinfEar=2 944.69113 264 m/s Vo=5 385.28963 704 m/s TEI=2 069.81903 47 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺFrom Mars to Earth;[atx;vinfMars;vinfEar;Vo;TEI;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Mars Landing
+
+Martian EDL: gravity `gmars=ⒸGM♂/rmars²`, peak entry deceleration (Allen-Eggers)
+`amax=Ventry²·sin(fpa)/(2e·Hs)` (independent of ballistic coefficient), terminal descent
+`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`). This entry-descent-
+landing sequence is the one a **Mars 2020 (Perseverance)**-class spacecraft flies on
+arrival — hypersonic entry, peak-g, then terminal descent — as at Jezero crater.
+
+* To calculate: `[gmars_m/s^2;amax_m/s^2;amaxg;vterm_m/s]` from `Ventry`, `fpa`, `Hs`, `ρa`, `Cd`, `Ad`, `msat`, `rmars`:
+```rpl
+Ventry=6000_m/s  fpa=12_°  Hs=11.1_km  ρa=0.015_kg/m³  Cd=1.5  Ad=10_m↑2  msat=1000_kg  rmars='(ⒸReq♂^2*ⒸRp♂)^(1/3)'
+@ Expecting [ gmars=3.72782 18628 2 m/s↑2 amax=124.03205 9402 m/s↑2 amaxg=12.64775 01901 vterm=182.03349 7841 m/s ]
+'ROOT(ⒺMars Landing;[gmars;amax;amaxg;vterm];[1_m/s^2;1_m/s^2;1_1;1_m/s])'
+```
+
+#### Launch Window from a Site
+
+Wait until Earth's rotation brings the site into the target orbital plane: local sidereal
+time `LST=θs(JD0;lonE)`, wait `twait=(OmegaT−LST)/360.98565°·d`. Inverse of **Orbit Orientation**:
+with `OmegaT` = that sim's RAAN Ω (and its site), `twait`=0.125 d recovers its burnout instant
+(JD 2451838.125). The same wait-time logic sets the daily launch instant from a pad — e.g. timing a departure from Cape
+Canaveral into the **Mars 2020 (Perseverance)** window.
+
+* To calculate: `[LST_°;dOmega_°;twait_d]` from `JD0`, `lonE`, `OmegaT`:
+```rpl
+JD0=2451838.0  lonE=-142.483_°  OmegaT=111.89550263874_°
+@ Expecting [ LST=66.77229 67179 ° dOmega=45.12320 59208 ° twait=0.12499 99990 88 d ]
+'ROOT(ⒺLaunch Window from a Site;[LST;dOmega;twait];[1_°;1_°;1_d])'
+```
+
+#### Comet Interceptor
+
+Waiting at Sun-Earth L2 (`dSunL2`,`VL2`), then intercepting a newly-found object crossing at
+`rX`: encounter (flyby) speed `vfly=|v_obj−v_L2|`. Couples the L2 geometry and the incoming object.
+
+* To calculate: `[dSunL2_km;PL2_s;VL2_m/s;vobj_m/s;vt_m/s;vr_m/s;fpa_°;vfly_m/s]` from `rL2`, `aobj`, `eobj`, `rX`:
+```rpl
+rL2=1501531.72084_km  aobj=2_au  eobj=0.6  rX='Ⓒa♁'
+@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s vobj=36 478.64856 44 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° vfly=14 430.10703 61 m/s ]
+'ROOT(ⒺComet Interceptor;[dSunL2;PL2;VL2;vobj;vt;vr;fpa;vfly];[1_km;1_s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_m/s])'
+```
+
+---
+
+## Math
+
+Mathematical simulations that do not belong to a physical domain.
+
+### Probability
+
+The 30 variables in the Probability section are:
+
+* `λ`: Rate of the exponential law, scale of the Weibull, mean of the Poisson
+* `μ`: Mean of the distribution — a parameter for `Norml` and `Logis`, computed elsewhere
+* `μl`: Mean of the underlying normal (`LgNrm`)
+* `σl`: Standard deviation of the underlying normal (`LgNrm`)
+* `a`: Shape of the gamma law, first shape of the beta
+* `ap`: Shape α of the Pareto law
+* `b`: Second shape of the beta law
+* `CDF`: Distribution function, the probability of not exceeding `X`
+* `CDFc`: Complement of `CDF`, the upper tail
+* `df`: Degrees of freedom of the chi-square and Student laws
+* `dfd`: Degrees of freedom of Fisher's denominator
+* `dfn`: Degrees of freedom of Fisher's numerator
+* `Ks`: Number of successes in the population (`Hyper`)
+* `nd`: Number of items drawn without replacement (`Hyper`)
+* `Np`: Size of the population (`Hyper`)
+* `nt`: Number of trials (`Binom`)
+* `p`: Probability of success in one trial
+* `PDF`: Density, or probability mass where the law is discrete
+* `rs`: Number of successes sought (`NegBinom`)
+* `s`: Scale of the Rayleigh and logistic laws
+* `sc`: Scale of the Cauchy, GEV, gamma, truncated normal and Lévy laws
+* `sh`: Shape of the Weibull law
+* `sx`: Standard deviation of the distribution — a parameter for `Norml`, computed elsewhere
+* `X`: The point at which the law is evaluated
+* `x0`: Location of the Cauchy, GEV, truncated normal and Lévy laws
+* `xi`: Shape of the GEV, deciding which extreme-value family it is
+* `Xmax`: Upper bound of the support
+* `Xmin`: Lower bound of the support
+* `xm`: Scale of the Pareto law, and the smallest value it can take
+* `xp`: Mode of the asymmetric triangular law
+
+One more name appears inside the formulas but never in the solver menu:
+`Jx`, the index of summation used by the discrete laws.
+
+Probability distributions, written as equation systems solved by Root. Each
+entry exposes the same three quantities — `PDF` the density, `CDF` the
+distribution function, `CDFc` its complement `1-CDF`, which is the upper tail —
+together with the parameters of the law and, where they exist, its mean `μ` and
+standard deviation `sx`.
+
+**The inverse needs no separate entry.** Give `CDF` and ask for `X`, and the
+solver returns the quantile. This is why no `CDF⁻¹` appears here: such an entry
+would place a Root inside a Root, which the solver cannot do.
+
+It can, however, return No solution? for some starting guesses while succeeding
+from others on the same law with the same parameters, because a distribution
+function is flat at both ends and the search can be trapped there; move the
+guess and try again. Where the quantile has to be reliable, use the Probability
+section of the Function Library instead, whose entries bisect rather than search
+and so cannot be trapped.
+
+**Naming.** `sx` rather than σ, `ap` rather than α, `sh` rather than k,
+`sc` rather than γ: those four names resolve to built-in constants — σ is
+the Stefan-Boltzmann constant — and would silently return the constant instead
+of the value entered.
+
+**The mean and the standard deviation** are computed, not entered, except where
+they are also parameters of the law (`Norml`, `Logis`). The Cauchy distribution
+returns Ⓒ? for both, since it has neither: its moments do not converge.
+
+**Turn on `AllVars` first.** These are systems of several equations, and by
+default the solver menu shows only the variables of the first one — for `Norml`
+that is `PDF`, `sx`, `μ` and `X`, with `CDF` and `CDFc` missing and no way to
+reach them. The `AllVars` setting, in the `UserInterfaceModes` menu, makes the
+menu show every variable of the system. The AllEquationVariables command does
+the same from the command line. Without it, NextEq steps from one equation of
+the system to the next, which reaches the same variables one screen at a time.
+
+**Beware of values left over from a previous computation.** The solver takes the
+first equation in which every variable but the unknown is already defined, so a
+stale `PDF` will be used in preference to the `CDF` you have just entered. Asking
+for `X` with `PDF=0.3989` still in memory returns zero — which is correct, since
+zero is where the normal density reaches its maximum, but it is not the question
+you meant to ask. `CDF` is placed first in each system so that it wins when both
+are defined; when in doubt, purge the quantity you are not using.
+
+#### Norml
+
+Normal distribution of mean `μ` and standard deviation `sx`. In closed form
+through the error function: `CDF=0.5·(1+erf((X-μ)/(sx·√2)))`.
+
+![Normal Distribution](img/Norml_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `μ`, `sx`, `X`:
+```rpl
+μ=0  sx=1  X=1.645
+@ Expecting [ PDF=0.10311 08110 92 CDF=0.95001 50944 61 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺNorml;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+* To obtain the quantile, give `CDF` and ask for `X`:
+```rpl
+μ=0  sx=1  CDF=0.95
+@ Expecting [ X=1.64485 36269 5 ]
+'ROOT(ⒺNorml;[X];[1])'
+```
+
+#### LgNrm
+
+Log-normal distribution: `LN(X)` is normal of mean `μl` and standard deviation
+`σl`. Its own mean and standard deviation differ from its parameters, which is
+why both are given: `μ=EXP(μl+σl²/2)`.
+
+![Lognormal Distribution](img/LgNrm_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `μl`, `σl`, `X`:
+```rpl
+μl=0  σl=1  X=2
+@ Expecting [ PDF=0.15687 40192 79 CDF=0.75589 14042 14 CDFc=0.24410 85957 86 μ=1.64872 12707 sx=2.16119 74159 ]
+'ROOT(ⒺLgNrm;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Expon
+
+Exponential distribution of rate `λ`, on `X≥0`. Mean and standard deviation are
+both `1/λ`. The quantile also has a closed form, `X=-LN(1-CDF)/λ`, faster than
+solving.
+
+![Exponential Distribution](img/Expon_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=2  X=0.5
+@ Expecting [ PDF=0.73575 88823 43 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=0.5 sx=0.5 ]
+'ROOT(ⒺExpon;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Weibl
+
+Weibull distribution of shape `sh` and scale `λ`, on `X≥0`. Reduces to the
+exponential when `sh=1` and to Rayleigh when `sh=2`. Its moments use the gamma
+function: `μ=λ·Γ(1+1/sh)`.
+
+![Weibull Distribution](img/Weibl_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `sh`, `λ`, `X`:
+```rpl
+sh=2  λ=3  X=3
+@ Expecting [ PDF=0.24525 29607 81 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=2.65868 07763 6 sx=1.38975 41255 3 ]
+'ROOT(ⒺWeibl;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Rayleigh
+
+Rayleigh distribution of scale `s`, on `X≥0`. The law of the magnitude of a
+two-dimensional vector whose components are independent centred normals of the
+same variance — hence its use for wind speeds and for the modulus of a complex
+noise.
+
+![Rayleigh Distribution](img/Rayleigh_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `s`, `X`:
+```rpl
+s=2  X=2
+@ Expecting [ PDF=0.30326 53298 56 CDF=0.39346 93402 87 CDFc=0.60653 06597 13 μ=2.50662 82746 3 sx=1.31027 27551 2 ]
+'ROOT(ⒺRayleigh;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Logis
+
+Logistic distribution of location `μ` and scale `s`. Symmetric like the normal
+but with heavier tails, and its distribution function is elementary:
+`CDF=1/(1+EXP(-(X-μ)/s))`. Here `μ` is both a parameter and the mean; the
+standard deviation is `sx=s·π/√3`.
+
+![Logistic Distribution](img/Logis_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;sx]` from `μ`, `s`, `X`:
+```rpl
+μ=0  s=1  X=2
+@ Expecting [ PDF=0.10499 35854 04 CDF=0.88079 70779 78 CDFc=0.11920 29220 22 sx=1.81379 93642 3 ]
+'ROOT(ⒺLogis;[PDF;CDF;CDFc;sx];[1;0.5;0.5;1])'
+```
+
+#### Pareto
+
+Pareto distribution of minimum `xm` and index `ap`, on `X≥xm`. This is the power
+law: the density falls as `X^-(ap+1)`, so the tail is heavy and the moments exist
+only above certain values of `ap`. The section says which rather than returning a
+number that means nothing:
+
+* `ap>2` — both moments exist, and are the values below.
+* `1<ap≤2` — the mean exists; the variance integral diverges, so `sx` is infinite.
+* `ap≤1` — the mean is itself infinite, so there is nothing to take a deviation
+  from and `sx` is undefined. That is not the same as infinite: a Monte-Carlo
+  sample of an infinite mean grows without ever settling, whereas an undefined
+  deviation has no value to converge to at all.
+
+![Pareto Distribution](img/Pareto_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `xm`, `ap`, `X`:
+```rpl
+xm=1  ap=3  X=2
+@ Expecting [ PDF=0.1875 CDF=0.875 CDFc=0.125 μ=1.5 sx=0.86602 54037 84 ]
+'ROOT(ⒺPareto;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Cauch
+
+Cauchy distribution of location `x0` and scale `sc`. It has neither mean nor
+variance — both integrals diverge — so `μ` and `sx` return Ⓒ?, undefined. It
+cannot take part in an uncertainty propagation based on a standard deviation.
+
+The distribution function uses `UVAL(UBASE(ATAN(...)))` so that it does not
+depend on the current angle mode: ATAN returns an angle, which UBASE
+expresses in turns.
+
+![Cauchy Distribution](img/Cauch_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.15915 49430 92 CDF=0.75 CDFc=0.25 ]
+'ROOT(ⒺCauch;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+#### UnifCont
+
+Continuous uniform distribution on `[Xmin;Xmax]`. Density `1/(Xmax-Xmin)` inside
+the interval and zero outside.
+
+![Continuous Uniform Distribution](img/UnifCont_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=2  Xmax=6  X=3
+@ Expecting [ PDF=0.25 CDF=0.25 CDFc=0.75 μ=4 sx=1.15470 05383 8 ]
+'ROOT(ⒺUnifCont;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### TriSym
+
+Symmetric triangular distribution on `[Xmin;Xmax]`, peaking at the midpoint. The
+density vanishes at both ends, so the half-width `(Xmax-Xmin)/2` appears in it,
+not the midpoint. Its distribution function is given in closed form rather than
+as an integral: integrating a density that is identically zero over part of the
+range loses precision.
+
+![Symmetric Triangular Distribution](img/TriSym_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=3  X=2.5
+@ Expecting [ PDF=0.5 CDF=0.875 CDFc=0.125 μ=2 sx=0.40824 82904 64 ]
+'ROOT(ⒺTriSym;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Chi2
+
+Chi-square distribution with `df` degrees of freedom, on `X≥0`. Its distribution
+function has no elementary form and is obtained by integrating the density, so
+it costs more than the others: about 90 ms for a `CDF` and 700 ms for a
+quantile, which is the order of what the Planck fraction in `Fluids` already
+costs.
+
+![Chi-Square Distribution](img/Chi2_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=4
+@ Expecting [ PDF=0.13533 52832 37 CDF=0.59399 41502 9 CDFc=0.40600 58497 1 μ=4 sx=2.82842 71247 5 ]
+'ROOT(ⒺChi2;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+* The quantile, by giving `CDF` and asking for `X`. This is the slowest entry of
+  the section, about 700 ms, since each step of the search integrates the
+  density afresh:
+```rpl
+df=4  CDF=0.95
+@ Expecting [ X=9.48772 90367 8 ]
+'ROOT(ⒺChi2;[X];[8])'
+```
+
+#### Beta
+
+Beta distribution of shapes `a` and `b`, on `[0;1]`. Like the chi-square, its
+distribution function is an integral. It is fast when `a` and `b` are integers,
+the integrand then being polynomial, and much slower otherwise — an unusual
+behaviour worth knowing about.
+
+![Beta Distribution](img/Beta_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `a`, `b`, `X`:
+```rpl
+a=2  b=3  X=0.5
+@ Expecting [ PDF=1.5 CDF=0.6875 CDFc=0.3125 μ=0.4 sx=0.2 ]
+'ROOT(ⒺBeta;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+---
+
+#### Phit
+
+Standard normal distribution — mean zero, standard deviation one. The special
+case of Norml that statistical tables are built on, kept separate because it
+takes no parameter at all.
+
+![Standard Normal Distribution](img/Phit_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc]` from `X`:
+```rpl
+X=1.645
+@ Expecting [ CDF=0.95001 50944 61 PDF=0.10311 08110 92 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺPhit;[CDF;PDF;CDFc];[0.5;1;0.5])'
+```
+
+#### TriRight
+
+Right triangular distribution on `[Xmin;Xmax]` — density rising linearly from
+zero at `Xmin` to its maximum at `Xmax`. Useful when a quantity is more likely
+to sit near its upper bound.
+
+![Right Triangular Distribution](img/TriRight_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=2
+@ Expecting [ CDF=0.44444 44444 44 PDF=0.44444 44444 44 CDFc=0.55555 55555 56 μ=2 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriRight;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriLeft
+
+Left triangular distribution on `[Xmin;Xmax]` — the mirror of TriRight, its
+density falling from a maximum at `Xmin` to zero at `Xmax`.
+
+![Left Triangular Distribution](img/TriLeft_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=1
+@ Expecting [ CDF=0.55555 55555 56 PDF=0.44444 44444 44 CDFc=0.44444 44444 44 μ=1 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriLeft;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriAsym
+
+Asymmetric triangular distribution on `[Xmin;Xmax]` with its peak at `xp`. The
+three-point estimate of project planning: a minimum, a maximum, and a most
+likely value. TriSym, TriRight and TriLeft are its special cases.
+
+![Asymmetric Triangular Distribution](img/TriAsym_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `xp`, `X`:
+```rpl
+Xmin=0  Xmax=3  xp=1  X=1
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.66666 66666 67 CDFc=0.66666 66666 67 μ=1.33333 33333 3 sx=0.62360 95644 62 ]
+'ROOT(ⒺTriAsym;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### UShape
+
+Arcsine distribution on `[Xmin;Xmax]` — U-shaped, with the density diverging at
+both ends and a minimum in the middle. It describes a quantity that spends most
+of its time near its extremes, such as the position of a harmonic oscillator
+sampled at random times.
+
+Its distribution function uses UVAL(UBASE(ASIN(...))) so that the result does
+not depend on the current angle mode, exactly as Cauch does with the arc
+tangent.
+
+![U-Shaped Distribution](img/UShape_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=1  X=0.25
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.73510 51938 96 CDFc=0.66666 66666 67 μ=0.5 sx=0.35355 33905 93 ]
+'ROOT(ⒺUShape;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### GEV
+
+Generalised extreme value distribution of location `x0`, scale `sc` and shape
+`xi` — the limiting law of a maximum, and the tool of choice for floods, wind
+loads and record temperatures. The shape decides the family: `xi` positive gives
+Fréchet, negative gives Weibull, and zero gives Gumbel, which the system handles
+as a separate branch since the general formula divides by `xi`.
+
+The mean exists only for `xi` below 1 and the standard deviation only for `xi`
+below one half; at `xi=0.5` the variance already diverges, and the two last
+equations then return nothing rather than an error.
+
+![Generalized Extreme Value Distribution](img/GEV_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `xi`, `X`:
+```rpl
+x0=0  sc=1  xi=0.2  X=1
+@ Expecting [ CDF=0.66906 26526 68 PDF=0.22406 77286 51 CDFc=0.33093 73473 32 μ=0.82114 85686 27 sx=1.82867 04356 7 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+* The Gumbel case, `xi=0`, where the mean is Euler's constant and the standard
+  deviation is `sc·π/√6`:
+```rpl
+x0=0  sc=1  xi=0  X=1
+@ Expecting [ CDF=0.69220 06275 55 PDF=0.25464 63800 44 CDFc=0.30779 93724 45 μ=0.57721 56649 02 sx=1.28254 98301 6 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### Gamma
+
+Waiting time until the `a`-th event of a Poisson process of mean spacing `sc` —
+the sum of `a` exponential waits. Shape `a` and scale `sc` are both positive and
+`a` need not be an integer. Chi2 is the special case `a=df/2`, `sc=2`, and Expon
+the case `a=1`.
+
+Like Chi2 it has no closed form: the distribution function is obtained by
+integration, at about the same cost — a tenth of a second for a value, a second
+for a quantile.
+
+![Gamma Distribution](img/Gamma_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `a`, `sc`, `X`:
+```rpl
+a=2  sc=3  X=3
+@ Expecting [ CDF=0.26424 11176 57 PDF=0.12262 64803 9 CDFc=0.73575 88823 43 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The inverse, here the median, obtained by giving CDF and asking for X:
+```rpl
+a=2  sc=3  CDF=0.5
+@ Expecting [ X=5.03504 09700 5 PDF=0.10443 92303 83 CDFc=0.5 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[X;PDF;CDFc;μ;sx];[5;0.1;0.5;1;1])'
+```
+
+#### NormTrunc
+
+The normal law of location `x0` and scale `sc`, restricted to the interval from
+`Xmin` to `Xmax` and renormalised over it. This is the law the NIST Uncertainty
+Machine uses for a quantity known to be normal but physically bounded — a
+concentration that cannot be negative, a transmittance that cannot exceed one.
+
+Beware that `x0` and `sc` are the parameters of the parent normal law, not the
+mean and the standard deviation of the truncated one: truncation shifts the mean
+towards the middle of the interval and shrinks the spread, and it is μ and sx
+that report the real ones. In the example below the parent is centred on zero
+with unit width, but cutting it at −1 and 2 moves the mean to 0.23 and brings
+the standard deviation down to 0.72.
+
+![Truncated Normal Distribution](img/NormTrunc_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `Xmin`, `Xmax`, `X`:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  X=0
+@ Expecting [ CDF=0.41698 87514 29 PDF=0.48735 02384 7 CDFc=0.58301 12485 71 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+* The 95th percentile, which falls well short of the 1.645 of the parent law:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  CDF=0.95
+@ Expecting [ X=1.52459 66827 8 PDF=0.15244 22014 83 CDFc=0.05 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[X;PDF;CDFc;μ;sx];[1;0.1;0.05;0.5;0.5])'
+```
+
+---
+
+#### Student
+
+Student's t distribution with `df` degrees of freedom — the law of a sample mean
+when the variance is estimated from the sample itself, and the reason a small
+sample needs wider intervals than a large one. As `df` grows it approaches the
+normal law; at `df=1` it is the Cauchy law, with no mean at all.
+
+The distribution function is the regularised incomplete beta, so it is closed
+form and immediate. The mean exists only for `df` above 1 and the standard
+deviation only above 2; below those the two entries return Ⓒ?.
+
+![Student t Distribution](img/Student_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=1
+@ Expecting [ CDF=0.81304 95168 5 PDF=0.21466 25258 4 CDFc=0.18695 04831 5 μ=0 sx=1.41421 35623 7 ]
+'ROOT(ⒺStudent;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0;1])'
+```
+
+* The 97.5th percentile, the critical value of the two-sided test at 5 per cent:
+```rpl
+df=4  CDF=0.975
+@ Expecting [ X=2.77644 51052 ]
+'ROOT(ⒺStudent;[X];[2])'
+```
+
+#### Fisher
+
+Fisher's F distribution with `dfn` degrees of freedom in the numerator and `dfd`
+in the denominator — the ratio of two independent estimates of the same
+variance, and the law behind the analysis of variance.
+
+Its distribution function is the regularised incomplete beta as well. The mean
+exists only for `dfd` above 2 and the standard deviation only above 4.
+
+![Fisher F Distribution](img/Fisher_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `dfn`, `dfd`, `X`:
+```rpl
+dfn=4  dfd=6  X=1
+@ Expecting [ CDF=0.5248 PDF=0.41472 CDFc=0.4752 μ=1.5 sx=2.12132 03435 6 ]
+'ROOT(ⒺFisher;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The 95th percentile, the critical value of the test:
+```rpl
+dfn=4  dfd=6  CDF=0.95
+@ Expecting [ X=4.53367 69502 8 ]
+'ROOT(ⒺFisher;[X];[4])'
+```
+
+#### Levy
+
+Lévy distribution of location `x0` and scale `sc`, on `X>x0`. It is the stable
+law of index one half, and one of the few whose distribution function is exact
+in closed form: `CDF=erfc(√(sc/(2·(X-x0))))`.
+
+Its tail is heavy enough that **neither moment exists**: both `μ` and `sx` are
+infinite, and the section says so with the infinity constant rather than
+returning a number. Sampling it shows the same thing — a running mean that
+climbs without ever settling.
+
+![Levy Distribution](img/Levy_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.24197 07245 19 CDF=0.31731 05078 63 CDFc=0.68268 94921 37 ]
+'ROOT(ⒺLevy;[PDF;CDF;CDFc];[0.5;0.5;0.5])'
+```
+
+* To obtain the median, give `CDF` and ask for `X`:
+```rpl
+x0=0  sc=1  CDF=0.5
+@ Expecting [ X=2.19810 93383 2 ]
+'ROOT(ⒺLevy;[X];[2])'
+```
+
+
+### Discrete distributions
+
+For these seven laws PDF is the probability **mass** at X, not a density: the
+probability that the variable takes exactly that value. CDF sums the mass up to
+IP(X), so a non-integer X behaves as the step function does, and CDFc is the
+upper tail.
+
+They need no numerical integration. The sums are exact and quick — a Poisson
+tail of a hundred and twenty terms costs about sixteen milliseconds.
+
+The quantile, however, is **not** available here: giving CDF and asking for X
+fails on every one of these laws, and it is not a defect of any one of them. The
+distribution function of a discrete law is a staircase, flat between the
+integers, so its derivative is zero almost everywhere and the solver has nothing
+to follow; it returns Divide by zero.
+
+**Use the Function Library instead.** Its Probability section holds one quantile
+function per law — ⓁBernoulliQ, ⓁBinomQ, ⓁPoissQ, ⓁGeomQ, ⓁHyperQ, ⓁNegBinomQ
+and ⓁUnifDisQ — which sum the mass directly and return the integer, in a few
+milliseconds. Parameters go on the stack first and the probability last, so the
+95th percentile of twenty trials at three tenths reads `20 0.3 0.95 ⓁBinomQ`.
+See Probability functions for the convention they follow and for the boundary
+cases.
+
+Poiss and NegBinom, whose support has no upper end, stop summing beyond the
+mean plus forty standard deviations, where the distribution function is already
+one to every digit displayed; Hyper stops at nd, beyond which every draw is a
+success. Without those guards a solver sent wandering towards large X spends
+minutes on factorials that overflow anyway.
+
+#### Bernoulli
+
+A single trial with probability p of success. The building block of Binom, and
+the simplest law in the section.
+
+![Bernoulli Distribution](img/Bernoulli_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=0
+@ Expecting [ CDF=0.7 PDF=0.7 CDFc=0.3 μ=0.3 sx=0.45825 75694 96 ]
+'ROOT(ⒺBernoulli;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+#### Binom
+
+Number of successes in `nt` independent trials, each with probability `p`. The
+mass uses COMB and the distribution function sums it, so both are exact.
+
+![Binomial Distribution](img/Binom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `nt`, `p`, `X`:
+```rpl
+nt=20  p=0.3  X=8
+@ Expecting [ CDF=0.88666 85371 23 PDF=0.11439 67397 05 CDFc=0.11333 14628 77 μ=6. sx=2.04939 01531 9 ]
+'ROOT(ⒺBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Poiss
+
+Number of events in a fixed interval when they occur independently at mean rate
+`λ`. Mean and variance are both `λ`, which is the signature of the law.
+
+![Poisson Distribution](img/Poiss_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=10  X=10
+@ Expecting [ CDF=0.58303 97501 93 PDF=0.12511 00357 21 CDFc=0.41696 02498 07 μ=10 sx=3.16227 76601 7 ]
+'ROOT(ⒺPoiss;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Geom
+
+Number of trials up to and including the first success, each trial succeeding
+with probability `p`. Support starts at one, not zero. Its distribution function
+is elementary, `1-(1-p)^X`, so no sum is needed.
+
+![Geometric Distribution](img/Geom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=3
+@ Expecting [ CDF=0.657 PDF=0.147 CDFc=0.343 μ=3.33333 33333 3 sx=2.78886 67551 1 ]
+'ROOT(ⒺGeom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Hyper
+
+Number of successes when `nd` items are drawn **without replacement** from a
+population of `Np` containing `Ks` successes — the difference from Binom, which
+draws with replacement. Quality control and card games.
+
+![Hypergeometric Distribution](img/Hyper_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Np`, `Ks`, `nd`, `X`:
+```rpl
+Np=50  Ks=10  nd=5  X=1
+@ Expecting [ CDF=0.74189 99792 33 PDF=0.43133 71972 29 CDFc=0.25810 00207 67 μ=1 sx=0.85714 28571 43 ]
+'ROOT(ⒺHyper;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### UnifDis
+
+Discrete uniform law on the integers from `Xmin` to `Xmax`, each equally likely
+— a fair die is `Xmin=1`, `Xmax=6`. Note that the standard deviation is not the
+one of UnifCont over the same interval: counting `Xmax-Xmin+1` equally likely
+values is not the same as spreading the probability continuously between them.
+
+![Discrete Uniform Distribution](img/UnifDis_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=6  X=3
+@ Expecting [ CDF=0.5 PDF=0.16666 66666 67 CDFc=0.5 μ=3.5 sx=1.70782 51276 6 ]
+'ROOT(ⒺUnifDis;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### NegBinom
+
+Number of failures before the `rs`-th success, each trial succeeding with
+probability `p` — the mirror of Binom, which fixes the trials and counts the
+successes. It is the law the NIST Uncertainty Machine offers for overdispersed
+counts, where the variance exceeds the mean and Poisson will not do.
+
+Support starts at zero and has no upper end, so the sum is capped as described
+above. With `rs=1` it reduces to the geometric law counted from zero.
+
+![Negative Binomial Distribution](img/NegBinom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `rs`, `p`, `X`:
+```rpl
+rs=3  p=0.5  X=2
+@ Expecting [ CDF=0.5 PDF=0.1875 CDFc=0.5 μ=3. sx=2.44948 97427 8 ]
+'ROOT(ⒺNegBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+---
+
+
+## Navigation
+
+The `Navigation` section computes routes, positions and distances on the
+surface of the earth. It serves air, marine and land navigation alike: a great
+circle is the shortest route for an aircraft, a ship or a traveller.
+
+The equations use a spherical earth. They are exact on the sphere, and within
+about 0.5% of the ellipsoidal (WGS-84) answer.
+
+**Conventions.** Latitudes are positive North. **Longitudes are positive East**,
+as in GPS coordinates: West longitudes are negative. True courses are measured
+clockwise from true North, from 0° to 360°. Angles can be entered in any
+angular unit, for instance `'33_°+57_arcmin'` for 33°57′.
+
+**Earth radius.** The radius `Rs` of the sphere is a variable. With
+`Rs='(10800_nmi)/Ⓒπ'`, one arc-minute of a great circle is exactly one
+nautical mile, the convention of the navigation references below. The WGS-84
+mean radius, `(2a+b)/3`, is 6 371 008.8 m.
+
+**Results and steps.** Each entry computes a few main results, listed first
+below. The other variables are intermediate steps: they keep each equation
+short enough to be shown on the screen of the solver, and they let you follow
+the calculation. A course, for instance, is the direction of a vector whose
+North component is `x` and East component is `y`; `180°+(-y)∠(-x)` gives
+that direction between 0° and 360°. Solving for all the variables of an
+entry, steps included, is the simplest way to use it.
+
+The 41 variables in the Navigation section are:
+
+*Positions, courses and distances*
+
+* `φ1`, `λ1`: Latitude and longitude of the departure point
+* `φ2`, `λ2`: Latitude and longitude of the destination
+* `φP`, `λP`: Latitude and longitude of the present position
+* `φv`, `λv`: Latitude and longitude of the northern vertex, the point of highest latitude of the great circle
+* `D`: Great-circle distance from departure to destination (dim.: length, in SI: m)
+* `Dv`: Great-circle distance from the departure point to the vertex (dim.: length, in SI: m)
+* `TC1`: Initial true course, at departure
+* `TC2`: Final true course, on arrival
+* `XTD`: Cross-track distance: how far the present position is from the route, positive when right of it (dim.: length, in SI: m)
+* `ATD`: Along-track distance: how far along the route the present position is (dim.: length, in SI: m)
+* `Rs`: Radius of the spherical earth (dim.: length, in SI: m)
+* `TC`: True course, or track: the direction actually followed over the ground (for a ship: course made good)
+* `TH`: True heading: the direction the aircraft or ship points to
+* `V`: Own speed through the air or the water: true airspeed of an aircraft, speed of a ship (dim.: speed)
+* `GS`: Ground speed (for a ship: speed made good) (dim.: speed)
+* `WD`: Direction the wind comes **from**. A current setting towards `set` acts as a wind from `set+180°`
+* `WS`: Wind speed, or drift of the current (dim.: speed)
+* `WCA`: Wind correction angle, `TH-TC`: negative when heading left of the track
+
+*Intermediate steps*
+
+* `θ`: Central angle between departure and destination; `D` is the arc `Rs·θ`
+* `θ1P`: Central angle between the departure point and the present position
+* `θv`: Central angle between the departure point and the vertex
+* `θXT`, `θAT`: Central angles across and along the track
+* `Δφ`, `Δλ`: Latitude and longitude differences
+* `Δλv`: Longitude difference from the departure point to the vertex
+* `hav`: Haversine of the central angle, `SIN(θ/2)²`
+* `x1`: North component of the initial course
+* `x2`: North component of the final course
+* `xP`: North component of the course towards the present position
+* `TC1P`: True course from the departure point towards the present position
+* `gN`, `gE`: North and East components of the ground speed vector
+* `wN`, `wE`: North and East components of the wind, pointing where it comes from
+* `aN`, `aE`: North and East components of the own speed vector
+
+* References:
+  [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings* ;
+  [3] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C, chapter 16, *Navigation* ;
+  [4] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2024), chapter 10, *Dead Reckoning*, §1008.
+
+#### Great Circle
+
+The great circle is the shortest route between two points of a sphere.
+
+![Great circle route](img/GreatCircleRoute.bmp)
+
+* Main results: the distance `D` between departure `(φ1;λ1)` and destination
+  `(φ2;λ2)`, the initial true course `TC1` to steer at departure, and the final
+  true course `TC2` on arrival. On a great circle the course changes all along
+  the route, so `TC1` and `TC2` differ, except along a meridian or the equator.
+* Steps: the central angle `θ` comes from the haversine `hav`, which stays
+  accurate for short distances; each course comes from its North component,
+  `x1` or `x2`.
+
+* To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi x1=0.23851 69937 16 TC1=65.89216 65527 ° x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+* To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
+```rpl
+φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=2 ° Δλ=-85 ° hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi x1=-0.28643 54215 54 TC1=252.98680 2724 ° x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+#### Great Circle Vertex
+
+The vertex is the point of highest latitude of a great circle. It tells how far
+toward the pole a great-circle route goes, which matters in high latitudes, in
+ice or in bad weather.
+
+* Main results: the latitude `φv` and longitude `λv` of the vertex, and the
+  distance `Dv` from the departure point to it, for a great circle leaving
+  `(φ1;λ1)` on the initial true course `TC1`.
+* Steps: `φv` follows from Clairaut's relation, `COS(φ)·SIN(TC)` being constant
+  along a great circle; `Δλv` is the longitude difference to the vertex.
+* The equations give the northern vertex; the southern one lies at `-φv`,
+  180° of longitude away.
+
+* To calculate: `[φv;λv;Dv]` (Vertex latitude and longitude; Distance to the vertex) from 28°N, 125°W, initial course 291° [2, §1210, example 1]:
+```rpl
+φ1=28_° λ1=-125_° TC1=291_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ φv=34.48215 17436 ° Δλv=-39.27119 44547 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
+'ROOT(ⒺGreat Circle Vertex;[φv;Δλv;λv;θv;Dv];[1_°;1_°;1_°;1_°;1_nmi])'
+```
+
+#### Great Circle Destination
+
+The *direct* problem: where does one arrive after a given distance along a
+great circle?
+
+* Main results: the latitude `φ2` and longitude `λ2` reached after a distance
+  `D` from `(φ1;λ1)`, on the initial true course `TC1`.
+* Steps: `θ` is the distance as an angle, and `Δλ` the change of longitude.
+
+* To calculate: `[φ2;λ2]` (Destination latitude and longitude) 100 nmi from LAX on the initial course from LAX to JFK, 1.150035 radians [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r D=100_nmi Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=1.66666 66666 7 ° φ2=34.61697 31196 ° Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
+'ROOT(ⒺGreat Circle Destination;[θ;φ2;Δλ;λ2];[1_°;1_°;1_°;1_°])'
+```
+
+#### Cross Track Error
+
+How far is the present position from the planned route?
+
+![Cross-track distance](img/CrossTrackDistance.bmp)
+
+* Main results: the cross-track distance `XTD` between the present position
+  `(φP;λP)` and the great circle leaving `(φ1;λ1)` on the initial course
+  `TC1`, positive when right of the route; and the along-track distance `ATD`
+  already covered along the route. `TC1` can come from the `Great Circle`
+  equations.
+* Steps: the distance `θ1P` and course `TC1P` from the departure point to the
+  present position, computed as in `Great Circle`; then the angles `θXT` and
+  `θAT` across and along the route.
+
+* To calculate: `[XTD;ATD]` (Cross-track and along-track distances) on the route from LAX to JFK (initial course 1.150035 radians), from the present position 34°30′N, 116°30′W [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
+'ROOT(ⒺCross Track Error;[Δφ;Δλ;hav;θ1P;xP;TC1P;θXT;θAT;XTD;ATD];[1_°;1_°;0;1_°;0;1_°;1_°;1_°;1_nmi;1_nmi])'
+```
+
+#### Wind Correction
+
+The wind triangle: what heading to fly, or to steer, to follow a given track?
+The aircraft moves through the air, and the air moves over the ground; the
+ground speed vector is the sum of the own speed vector and of the wind. The
+same triangle serves a ship in a current.
+
+![Wind triangle](img/WindTriangle.bmp)
+
+* Main results: the true heading `TH` and the ground speed `GS` needed to
+  follow the true course `TC` at the own speed `V`, with a wind of speed `WS`
+  coming from `WD`.
+* Steps: the wind correction angle `WCA` between heading and track.
+* For a current, give its drift as `WS`, and as `WD` the direction opposite to
+  its set: a current setting towards 170° acts as a wind from 350°.
+
+* To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
+```rpl
+TC=90_° V=120_knot WD=45_° WS=40_knot
+@ Expecting [ WCA=-13.63302 22254 ° TH=76.36697 77746 ° GS=88.33476 66494 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
+```rpl
+TC=31_° V=115_knot WD=360_° WS=10_knot
+@ Expecting [ WCA=-2.56690 27668 6 ° TH=28.43309 72331 ° GS=106.31293 6833 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` (Course to steer; Speed made good) for a ship at 12 kt which must make good 095°, in a current setting towards 170° at 2.5 kt, that is a wind from 350°. The book gives 083.5° and 12.4 kt [4, example 2]:
+```rpl
+TC=95_° V=12_knot WD=350_° WS=2.5_knot
+@ Expecting [ WCA=-11.60916 12726 ° TH=83.39083 87274 ° GS=12.40156 4643 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+#### Ground Track
+
+Where does a heading lead? The ground track and speed that result from a
+heading and a speed through a moving air or water.
+
+* Main results: the true course `TC` actually followed over the ground, and
+  the ground speed `GS`, when heading `TH` at the own speed `V` with a wind of
+  speed `WS` coming from `WD`.
+* Steps: the North and East components `gN` and `gE` of the ground speed, and
+  the wind correction angle `WCA`, here the drift to be expected.
+
+* To calculate: `[TC;GS]` (Course and speed made good) for a ship steering 080° at 10 kt in a current setting towards 140° at 2 kt, that is a wind from 320°. The book reads 089° and 11.2 kt on its plot [4, example 1]:
+```rpl
+TH=80_° V=10_knot WD=320_° WS=2_knot
+@ Expecting [ gN=0.20439 28904 31 knot gE=11.13365 27495 knot GS=11.13552 87257 knot TC=88.94827 55646 ° WCA=-8.94827 55646 3 ° ]
+'ROOT(ⒺGround Track;[gN;gE;GS;TC;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+#### Wind Finding
+
+What is the wind? A pilot who knows the heading and airspeed, and measures the
+track and ground speed (with a GPS, for instance), can deduce the wind. The
+same calculation gives the set and drift of a current, the direction of which
+is then `WD-180°`.
+
+* Main results: the direction `WD` the wind comes from, and its speed `WS`.
+* Steps: the North and East components `wN` and `wE` of the wind.
+
+* To calculate: `[WD;WS]` (Wind direction and speed) from the heading 076.37° and airspeed 120 kt, with a track of 090° and a ground speed of 88.33 kt; this is the first `Wind Correction` example in reverse, and gives back the wind from 045° at 40 kt:
+```rpl
+TH=76.37_° V=120_knot TC=90_° GS=88.33_knot
+@ Expecting [ wN=28.27811 98124 knot wE=28.29052 96673 knot WS=40.00007 66122 knot WD=45.01256 93702 ° ]
+'ROOT(ⒺWind Finding;[wN;wE;WS;WD];[1_knot;1_knot;1_knot;1_°])'
+```
+
+#### Required Heading & Speed
+
+What heading and own speed are needed to make good both a given track and a
+given ground speed, for instance to reach a waypoint at a set time?
+
+* Main results: the true heading `TH` and the own speed `V` that make good the
+  true course `TC` at the ground speed `GS`, with a wind of speed `WS` coming
+  from `WD`.
+* Steps: the North and East components `aN` and `aE` of the own speed vector,
+  and the wind correction angle `WCA`.
+
+* To calculate: `[TH;V]` (Course and speed to steer) for a ship which must make good 265° at 15 kt, in a current setting towards 185° at 3 kt, that is a wind from 005°. The book reads 276° and 14.8 kt on its plot [4, example 3]:
+```rpl
+TC=265_° GS=15_knot WD=5_° WS=3_knot
+@ Expecting [ aN=1.68124 79530 6 knot aE=-14.68145 32431 knot V=14.77740 38319 knot TH=276.53277 4288 ° WCA=11.53277 42876 ° ]
+'ROOT(ⒺRequired Heading & Speed;[aN;aE;V;TH;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+
+## Aeronautics
+
+The `Aeronautics` section gathers the calculations of aircraft operation. Its
+first part, [Flight Management](#flight management), holds the pilot's
+calculations from the flight manual and the weather: wind components on a
+runway, time, speed and distance, fuel, weight and balance, altitudes,
+airspeeds, climb and descent, and the decision points of a flight. Its second
+part, [Performance](#performance), gives the performance of the aircraft from
+its drag polar: lift and drag, stall, turns, glide, climb, range and
+endurance, takeoff and landing.
+
+**Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
+lb, ft, inHg); every equation also accepts SI units.
+
+**Temperatures.** `°C` and `°F` are units with an offset: `20_°C` is
+293.15 K. A temperature **difference**, such as the deviation `ΔISA` from
+the standard temperature, must therefore be entered in `K` (or in `°R` for
+Fahrenheit degrees): 36 °F above standard is `20_K`, while `36_°F` is
+275.37 K.
+
+**Standard atmosphere.** The altitude entries use the troposphere of the
+standard atmosphere, valid up to 36 089 ft. Wind directions are where the wind
+comes **from**, as in [Navigation](#navigation), and the same names are used
+for the same quantities: `WD`, `WS`, `GS`, `D`.
+
+The 84 variables in the Flight Management section are:
+
+* `WS`: Wind speed (dim.: speed)
+* `WD`: Direction the wind comes **from**
+* `RWY`: Runway heading: runway 17 is 170°. Tower and ATIS winds are magnetic,
+  like runway headings; METAR and TAF winds are true
+* `HW`: Headwind component; negative for a tailwind (dim.: speed)
+* `XW`: Crosswind component; positive for a wind from the right (dim.: speed)
+* `D`: Distance (dim.: length)
+* `GS`: Ground speed (dim.: speed)
+* `ETE`: Estimated time en route (dim.: time)
+* `FFR`: Fuel flow (dim.: volume/time)
+* `Trip`: Fuel for the trip (dim.: volume)
+* `TRes`: Reserve time: under VFR in the United States, 30 min by day and
+  45 min by night [3] (dim.: time)
+* `Rsv`: Reserve fuel (dim.: volume)
+* `Taxi`: Fuel for start-up and taxi (dim.: volume)
+* `FReq`: Fuel required for the flight (dim.: volume)
+* `FOB`: Fuel on board (dim.: volume)
+* `Extra`: Fuel on board beyond what is required (dim.: volume)
+* `Endur`: Endurance, the flight time with the fuel on board (dim.: time)
+* `SpR`: Specific range, the distance flown per unit of fuel
+  (dim.: length/volume)
+* `Rng`: Range with the fuel on board (dim.: length)
+* `ρfuel`: Fuel density: 6 lb/gal for AVGAS, 6.8 lb/gal for Jet A and Jet A-1,
+  6.5 lb/gal for Jet B [1, chapter 10] (dim.: mass/volume)
+* `Wfuel`: Weight of the fuel on board (dim.: mass)
+* `Wt`: Weight of the aircraft (dim.: mass)
+* `CG`: Center of gravity, as an arm from the datum, positive aft (dim.: length)
+* `Wsh`: Weight shifted (dim.: mass)
+* `Dsh`: Distance it is shifted, negative forward (dim.: length)
+* `ΔCG`: Change of the center of gravity (dim.: length)
+* `CGn`: New center of gravity (dim.: length)
+* `Wch`: Weight added, negative when removed (dim.: mass)
+* `Arm`: Arm of the weight added or removed (dim.: length)
+* `Wn`: New weight of the aircraft (dim.: mass)
+* `MAC`: Mean aerodynamic chord (dim.: length)
+* `LEMAC`: Arm of the leading edge of the mean aerodynamic chord (dim.: length)
+* `PMAC`: Center of gravity in percent of the mean aerodynamic chord
+* `QNH`: Altimeter setting (dim.: pressure)
+* `Hind`: Indicated altitude, read on the altimeter set to `QNH`; on the ground, the elevation of the field (dim.: length)
+* `ΔHp`: Correction from the indicated altitude to the pressure altitude (dim.: length)
+* `Hp`: Pressure altitude, the altitude in the standard atmosphere where the pressure is the same (dim.: length)
+* `OAT`: Outside air temperature (dim.: temperature)
+* `Tstd`: Standard temperature at the pressure altitude (dim.: temperature)
+* `ΔISA`: Deviation from the standard temperature, a temperature difference: enter it in K, never in °C or °F (dim.: temperature)
+* `θr`: Temperature ratio `Tstd/OAT`
+* `Hd`: Density altitude, the altitude in the standard atmosphere where the air density is the same (dim.: length)
+* `RH`: Relative humidity, as a fraction: 0.8 for 80 %
+* `Tc`: Outside air temperature in °C, as a plain number
+* `fe`, `fHp`: Vapor pressure and altitude factors of the humidity correction
+* `ΔHd`: Increase of the density altitude due to humidity (dim.: length)
+* `Hstn`: Elevation of the altimeter setting station (dim.: length)
+* `ΔTA`: Correction from the indicated to the true altitude, negative in cold air (dim.: length)
+* `TA`: True altitude, above mean sea level (dim.: length)
+* `Tdp`: Dew point (dim.: temperature)
+* `Tdc`: Dew point in °C, as a plain number
+* `Hcb`: Height of the base of cumulus clouds above the ground (dim.: length)
+* `CAS`: Calibrated airspeed (dim.: speed)
+* `TAS`: True airspeed (dim.: speed)
+* `DRat`: Density ratio, the air density over its sea level standard value
+* `qc`: Impact pressure, total minus static pressure (dim.: pressure)
+* `Ps`: Static pressure (dim.: pressure)
+* `Mach`: Mach number
+* `IAT`: Indicated air temperature, read in flight (dim.: temperature)
+* `Kr`: Recovery factor of the temperature probe, 0.7 to 1
+* `Ti`: Indicated air temperature in K, as a plain number
+* `FPA`: Flight path angle, positive in climb, negative in descent
+* `Grd`: Gradient, the tangent of the flight path angle
+* `GPct`: Gradient in percent
+* `Gft`: Gradient in feet per nautical mile
+* `VS`: Vertical speed, with the sign of `FPA` (dim.: speed)
+* `Hcr`: Cruise altitude (dim.: length)
+* `Htgt`: Target altitude, at the end of the descent (dim.: length)
+* `ΔH`: Height to lose (dim.: length)
+* `DTOD`: Distance of the top of descent from the target (dim.: length)
+* `TTOD`: Time from the top of descent to the target (dim.: time)
+* `GSO`: Ground speed going on to the destination (dim.: speed)
+* `GSH`: Ground speed returning home (dim.: speed)
+* `DETP`, `TETP`: Distance and time from departure to the equal time point (dim.: length; time)
+* `TPNR`, `DPNR`: Time and distance from departure to the point of no return (dim.: time; length)
+* `Tbc`: Time for the bearing of a station to change by `ΔBrg` (dim.: time)
+* `ΔBrg`: Change of the bearing of the station
+* `TSta`, `DSta`: Time and distance to the station (dim.: time; length)
+* `Ptire`: Tire pressure of the main wheels (dim.: pressure)
+* `Vhp`: Speed above which dynamic hydroplaning can start (dim.: speed)
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 10, *Weight and Balance*, 11, *Aircraft Performance*, and 16,
+  *Navigation* ;
+  [2] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions* ;
+  [4] FAA, *Aircraft Weight and Balance Handbook*, FAA-H-8083-1B ;
+  [5] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 8, *Flight Instruments*, and 12, *Weather Theory* ;
+  [6] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, *Determination of Altitude* and
+  *Airspeed* ;
+  [7] FAA, *Terminal Procedures Publication*, legend, tables *Rate of Climb*
+  and *Rate of Descent* ;
+  [8] E. Davenport, *Equal Time Points*, code7700.com.
+
+### Flight Management
+
+The pilot's calculations from the flight manual and the weather, in
+seven submenus:
+[Runway](#runway),
+[Time & Distance](#time & distance),
+[Fuel & Endurance](#fuel & endurance),
+[Weight & Balance](#weight & balance),
+[Altitudes](#altitudes),
+[Airspeeds](#airspeeds) and
+[Climb & Descent](#climb & descent).
+
+#### Runway
+
+The wind on the runway, and the risk of hydroplaning on a wet one.
+
+Entries: [Headwind & Crosswind](#headwind & crosswind) and [Hydroplaning Speed](#hydroplaning speed).
+
+#### Headwind & Crosswind
+
+The components of the wind along and across a runway, which decide whether a
+takeoff or a landing stays within the crosswind the aircraft can handle.
+
+![Runway wind](img/RunwayWind.bmp)
+
+* Main results: the headwind `HW`, negative for a tailwind, and the crosswind
+  `XW`, positive for a wind from the right, for a wind of speed `WS` coming
+  from `WD` on a runway of heading `RWY`.
+* Solved the other way, the entry gives the strongest wind acceptable from a
+  given direction for a given crosswind limit.
+
+* To calculate: `[HW;XW]` (Headwind; Crosswind) for a wind from 060° at 20 kt on runway 03 [2]:
+```rpl
+WS=20_knot WD=60_° RWY=30_°
+@ Expecting [ HW=17.32050 80757 knot XW=10. knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[HW;XW]` for a wind from 140° at 25 kt on runway 17. The book reads 22 kt and 13 kt on its crosswind chart; the crosswind comes from the left [1, chapter 11, sample problem 10]:
+```rpl
+WS=25_knot WD=140_° RWY=170_°
+@ Expecting [ HW=21.65063 50946 knot XW=-12.5 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[WS;HW]` (Strongest wind; its headwind) for a demonstrated crosswind of 15 kt, with the wind 30° off the runway:
+```rpl
+XW=15_knot WD=30_° RWY=0_°
+@ Expecting [ WS=30. knot HW=25.98076 21135 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[WS;HW];[10_knot;1_knot])'
+```
+
+#### Hydroplaning Speed
+
+On a wet runway, above a speed that depends on the tire pressure, the tires
+can ride on a film of water and lose all braking.
+
+* Main result: the speed `Vhp` above which dynamic hydroplaning can start, for
+  the tire pressure `Ptire` of the main wheels.
+
+* To calculate: `Vhp` (Hydroplaning speed) for tires inflated to 36 psi. The book gives 54 kt [1, chapter 11]:
+```rpl
+Ptire=36_psi
+@ Expecting Vhp=54. knot
+'ROOT(ⒺHydroplaning Speed;Vhp;1_knot)'
+```
+
+#### Time & Distance
+
+Time, speed and distance, and the time to a radio station.
+
+Entries: [Time Speed & Distance](#time speed & distance) and [Time & Distance to Station](#time & distance to station).
+
+#### Time Speed & Distance
+
+The distance `D` flown at the ground speed `GS` during the time en route
+`ETE`. Solve it for whichever of the three is unknown.
+
+* To calculate: `ETE` (Time en route) for 210 nmi at a ground speed of 140 kt [1, chapter 16]:
+```rpl
+D=210_nmi GS=140_knot
+@ Expecting ETE=1.5 h
+'ROOT(ⒺTime Speed & Distance;ETE;1_h)'
+```
+
+#### Time & Distance to Station
+
+Flying across a radial, the time for the bearing of a station to change gives
+the time to fly to it: the "1 in 60" rule.
+
+* Main results: the time `TSta` and distance `DSta` to the station, when its
+  bearing changes by `ΔBrg` in the time `Tbc`, at the ground speed `GS`.
+
+* To calculate: `[TSta;DSta]` (Time; Distance to the station) when the bearing changes by 10° in 2 min, at 120 kt. The book gives 12 min [1, chapter 16]:
+```rpl
+Tbc=120_s ΔBrg=10_° GS=120_knot
+@ Expecting [ TSta=12. min DSta=24. nmi ]
+'ROOT(ⒺTime & Distance to Station;[TSta;DSta];[1_min;1_nmi])'
+```
+
+#### Fuel & Endurance
+
+The fuel for a flight, how long and how far it lasts, and the points
+that decide whether to go on or turn back.
+
+Entries: [Fuel Required](#fuel required), [Endurance & Range](#endurance & range), [Equal Time Point](#equal time point) and [Point of No Return](#point of no return).
+
+#### Fuel Required
+
+The fuel needed for a flight: the trip at the fuel flow `FFR` during `ETE`,
+a reserve for the time `TRes`, and the fuel for start-up and taxi.
+
+* Main results: the trip fuel `Trip`, the reserve `Rsv`, the fuel required
+  `FReq`, and `Extra`, the fuel on board `FOB` beyond what is required.
+
+* To calculate: `Trip` (Trip fuel) for 400 nmi at 100 kt, that is 4 h, at 5 gal/h [1, chapter 16]:
+```rpl
+FFR=5_gal/h ETE=4_h
+@ Expecting Trip=20 gal
+'ROOT(ⒺFuel Required;Trip;1_gal)'
+```
+
+* To calculate: `[Trip;Rsv;FReq;Extra]` (Trip fuel; Reserve; Fuel required; Extra fuel) for a 30 min flight at 8 gal/h, with the 30 min VFR day reserve, 1 gal for taxi and 38 gal on board [1, chapter 16; 3]:
+```rpl
+FFR=8_gal/h ETE=0.5_h TRes=0.5_h Taxi=1_gal FOB=38_gal
+@ Expecting [ Trip=4. gal Rsv=4. gal FReq=9. gal Extra=29. gal ]
+'ROOT(ⒺFuel Required;[Trip;Rsv;FReq;Extra];[1_gal;1_gal;1_gal;1_gal])'
+```
+
+#### Endurance & Range
+
+How long, and how far, the fuel on board lasts.
+
+* Main results: the endurance `Endur` at the fuel flow `FFR`, the specific
+  range `SpR` at the ground speed `GS`, the range `Rng`, and the weight
+  `Wfuel` of the fuel on board for a fuel density `ρfuel`.
+
+* To calculate: `[Endur;SpR;Rng;Wfuel]` (Endurance; Specific range; Range; Fuel weight) with 38 gal of AVGAS at 6.9 gal/h and 116 mph. The book's table gives 5.5 h and 635 mi; the exact values are 5.51 h and 555.1 nmi, that is 638.8 mi [1, chapter 11, sample problem 6]:
+```rpl
+FOB=38_gal FFR=6.9_gal/h GS=116_mph ρfuel=6_lb/gal
+@ Expecting [ Endur=5.50724 63768 1 h SpR=14.60887 59508 nmi/gal Rng=555.13728 613 nmi Wfuel=228 lb ]
+'ROOT(ⒺEndurance & Range;[Endur;SpR;Rng;Wfuel];[1_h;1_nmi/gal;1_nmi;1_lb])'
+```
+
+#### Equal Time Point
+
+The equal time point is the point of a route from which it takes as long to
+go on to the destination as to return: the point that decides whether to
+continue or turn back after an engine failure or a medical emergency.
+
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
+
+* Main results: the distance `DETP` and time `TETP` from departure to the
+  equal time point, on a route of length `D`, with the ground speeds `GSO`
+  going on and `GSH` returning.
+
+* To calculate: `[DETP;TETP]` (Distance; Time to the equal time point) for a crossing of 1 722 nmi, at 502 kt going on and 384 kt returning. The source gives 746 nmi [8]:
+```rpl
+D=1722_nmi GSO=502_knot GSH=384_knot
+@ Expecting [ DETP=746.32957 1106 nmi TETP=1.48671 22930 4 h ]
+'ROOT(ⒺEqual Time Point;[DETP;TETP];[1_nmi;1_h])'
+```
+
+#### Point of No Return
+
+The point of no return is the farthest point from which the aircraft can
+still return to its departure with the fuel on board.
+
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
+
+* Main results: the time `TPNR` and distance `DPNR` from departure to the
+  point of no return, for an endurance `Endur`, the usable fuel without the
+  reserve, and the ground speeds `GSO` going out and `GSH` returning.
+
+* To calculate: `[TPNR;DPNR]` (Time; Distance to the point of no return) with 5 h of usable fuel, at 120 kt going out and 180 kt returning. Check: 3 h out, then 360 nmi back at 180 kt in 2 h:
+```rpl
+Endur=5_h GSO=120_knot GSH=180_knot
+@ Expecting [ TPNR=3 h DPNR=360. nmi ]
+'ROOT(ⒺPoint of No Return;[TPNR;DPNR];[1_h;1_nmi])'
+```
+
+#### Weight & Balance
+
+The center of gravity when weights move, are added or removed, and its
+position on the mean aerodynamic chord.
+
+Entries: [Weight Shift](#weight shift), [Weight Change](#weight change) and [CG in % MAC](#cg in % mac).
+
+#### Weight Shift
+
+Moving a weight inside the aircraft moves its center of gravity, the weight
+of the aircraft staying the same. Arms are measured from the datum, positive
+aft.
+
+* Main results: the change `ΔCG` and the new center of gravity `CGn` when a
+  weight `Wsh` moves by `Dsh`, negative forward, in an aircraft of weight `Wt`
+  whose center of gravity is at `CG`.
+* Solved for `Wsh`, the entry gives the weight to move to bring the center of
+  gravity back within a limit.
+
+* To calculate: `[ΔCG;CGn]` (Change of CG; New CG) when 100 lb move from station 30 to station 150, in an aircraft of 8 000 lb with its CG at 77 in [1, chapter 10]:
+```rpl
+Wsh=100_lb Dsh=120_in Wt=8000_lb CG=77_in
+@ Expecting [ ΔCG=1.5 in CGn=78.5 in ]
+'ROOT(ⒺWeight Shift;[ΔCG;CGn];[1_in;1_in])'
+```
+
+* To calculate: `[ΔCG;Wsh]` (Change of CG; Weight to move) to bring the CG of a 7 800 lb aircraft from 81.5 in back to its aft limit of 80.5 in, by moving cargo 120 in forward [1, chapter 10]:
+```rpl
+Dsh=-120_in Wt=7800_lb CG=81.5_in CGn=80.5_in
+@ Expecting [ ΔCG=-1. in Wsh=65. lb ]
+'ROOT(ⒺWeight Shift;[ΔCG;Wsh];[1_in;1_lb])'
+```
+
+#### Weight Change
+
+Adding or removing a weight changes both the weight of the aircraft and its
+center of gravity.
+
+* Main results: the new weight `Wn` and the new center of gravity `CGn` when
+  a weight `Wch`, negative when removed, is added at the arm `Arm` to an
+  aircraft of weight `Wt` whose center of gravity is at `CG`.
+
+* To calculate: `[Wn;CGn]` (New weight; New CG) when 140 lb are added at station 150 to an aircraft of 6 860 lb with its CG at 80 in [1, chapter 10]:
+```rpl
+Wt=6860_lb CG=80_in Wch=140_lb Arm=150_in
+@ Expecting [ Wn=7 000 lb CGn=81.4 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+* To calculate: `[Wn;CGn]` when 100 lb are removed from station 150 in an aircraft of 6 100 lb with its CG at 80 in. The book rounds the change of CG to 1.2 in, and finds 78.8 in [1, chapter 10]:
+```rpl
+Wt=6100_lb CG=80_in Wch=-100_lb Arm=150_in
+@ Expecting [ Wn=6 000 lb CGn=78.83333 33333 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+#### CG in % MAC
+
+Large aircraft give the position of their center of gravity as a percentage
+of the mean aerodynamic chord `MAC`, counted from its leading edge `LEMAC`.
+
+![Mean aerodynamic chord](img/MeanAerodynamicChord.bmp)
+
+* Main result: `PMAC`, the center of gravity `CG` in percent of `MAC`.
+
+* To calculate: `PMAC` (CG in % MAC) for a CG at 161 in, with the leading edge of the MAC at 144 in and a MAC of 62 in. The book gives 27.4 % [4, chapter 3]:
+```rpl
+CG=161_in LEMAC=144_in MAC=62_in
+@ Expecting PMAC=27.41935 48387
+'ROOT(ⒺCG in % MAC;PMAC;1)'
+```
+
+* To calculate: `CG` for a CG at 27.4 % of the same MAC. The book writes 160.9 in, cutting off the digits instead of rounding them [4, chapter 3]:
+```rpl
+PMAC=27.4 LEMAC=144_in MAC=62_in
+@ Expecting CG=160.988 in
+'ROOT(ⒺCG in % MAC;CG;150_in)'
+```
+
+#### Altitudes
+
+Pressure and density altitude, the standard temperature, the cold
+temperature correction, and the base of cumulus clouds.
+
+Entries: [Pressure Altitude](#pressure altitude), [ISA Deviation](#isa deviation), [Density Altitude](#density altitude), [Humidity Correction](#humidity correction), [True Altitude](#true altitude) and [Cloud Base](#cloud base).
+
+#### Pressure Altitude
+
+The pressure altitude `Hp` is what the altimeter reads when set to the
+standard pressure, 29.92 inHg or 1 013.25 hPa. It is the starting point of
+the performance charts, and the flight level above the transition altitude.
+
+* Main results: the correction `ΔHp` and the pressure altitude `Hp` for an
+  indicated altitude `Hind` read with the altimeter set to `QNH`. On the
+  ground, `Hind` is the elevation of the field.
+* The rule of thumb, 1 000 ft per inHg or about 27 ft per hPa, is close to
+  this exact formula near sea level.
+
+* To calculate: `[ΔHp;Hp]` (Correction; Pressure altitude) for a field at 5 883 ft with an altimeter setting of 30.10 inHg. The book finds 5 718 ft [1, chapter 11, sample problem 1]:
+```rpl
+Hind=5883_ft QNH=30.10_inHg
+@ Expecting [ ΔHp=-164.90698 7072 ft Hp=5 718.09301 293 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+* To calculate: `[ΔHp;Hp]` at sea level with an altimeter setting of 28.0 inHg. The table of the book gives +1 824 ft [1, chapter 11, figure 11-3]:
+```rpl
+Hind=0_ft QNH=28.0_inHg
+@ Expecting [ ΔHp=1 824.91706 57 ft Hp=1 824.91706 57 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+#### ISA Deviation
+
+The standard temperature `Tstd` at a pressure altitude, and the deviation
+`ΔISA` of the outside air temperature `OAT` from it. Performance charts are
+often entered with `ΔISA`.
+
+* `ΔISA` is a temperature difference: enter it in `K`, never in `°C` or
+  `°F`.
+
+* To calculate: `[Tstd;OAT]` (Standard temperature; Outside air temperature) at 6 000 ft, 36 °F above standard, that is 20 K. The result, 296.26 K, is 23.11 °C [1, chapter 11, sample problem 7]:
+```rpl
+Hp=6000_ft ΔISA=20_K
+@ Expecting [ Tstd=276.2628 K OAT=296.2628 K ]
+'ROOT(ⒺISA Deviation;[Tstd;OAT];[1_K;1_K])'
+```
+
+* To calculate: `[Tstd;ΔISA]` (Standard temperature; Deviation) at sea level with 22 °C [1, chapter 11, sample problem 5]:
+```rpl
+Hp=0_ft OAT=22_°C
+@ Expecting [ Tstd=288.15 K ΔISA=7. K ]
+'ROOT(ⒺISA Deviation;[Tstd;ΔISA];[1_K;1_K])'
+```
+
+#### Density Altitude
+
+The density altitude `Hd` is the altitude in the standard atmosphere where
+the air has the same density. It governs engine power, lift and propeller
+thrust: on a hot day at a high field, the aircraft performs as if it were
+much higher.
+
+* Main results: the density altitude `Hd` for a pressure altitude `Hp` and an
+  outside air temperature `OAT`, with the standard temperature `Tstd` and the
+  temperature ratio `θr` as steps. The formula is exact in the troposphere.
+* The rule of thumb, `Hd ≈ Hp + 118.6 ft/K·ΔISA` (the FAA rounds it to
+  120 ft per °C), is close to it for moderate deviations.
+
+* To calculate: `[Tstd;θr;Hd]` (Standard temperature; Temperature ratio; Density altitude) at a pressure altitude of 8 000 ft and 18 °C. The source gives 10 145 ft, and 10 236 ft by the rule of thumb [2]:
+```rpl
+Hp=8000_ft OAT=18_°C
+@ Expecting [ Tstd=272.3004 K θr=0.93525 81143 74 Hd=10 144.65994 68 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+* To calculate: `[Tstd;θr;Hd]` at a pressure altitude of 6 300 m and 32 °C. The result, 26 693.5 ft, is 8 136 m, as in the source [6]:
+```rpl
+Hp=6300_m OAT=32_°C
+@ Expecting [ Tstd=247.2 K θr=0.81009 33966 9 Hd=26 693.49310 57 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+#### Humidity Correction
+
+Humid air is lighter than dry air: it raises the density altitude. This
+empirical correction by Ed Williams gives the increase `ΔHd` to add to the
+density altitude computed for dry air.
+
+* Main result: `ΔHd` for a relative humidity `RH`, given as a fraction (0.8
+  for 80 %), an outside air temperature `OAT` and a pressure altitude `Hp`.
+* Steps: `Tc`, the temperature in °C as a plain number, and the factors `fe`
+  and `fHp` of the formula.
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` (Temperature; Factors; Humidity correction) at sea level, 30 °C and 100 % humidity. The source gives 565 ft [2]:
+```rpl
+Hp=0_ft OAT=30_°C RH=1
+@ Expecting [ Tc=30. fe=6.98538 58062 5 fHp=1. ΔHd=565.12469 7111 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` at 5 000 ft, 40 °C and 80 % humidity. The source gives 977 ft [2]:
+```rpl
+Hp=5000_ft OAT=40_°C RH=0.8
+@ Expecting [ Tc=40. fe=12.16052 37341 fHp=1.20217 14995 ΔHd=977.38190 267 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+#### True Altitude
+
+In cold air, the atmosphere is compressed, and the aircraft is lower than its
+altimeter shows: a hazard over terrain, which approach procedures correct.
+This is the form given by Ed Williams.
+
+* Main results: the correction `ΔTA`, negative in cold air, and the true
+  altitude `TA` for an indicated altitude `Hind`, with the altimeter set at a
+  station of elevation `Hstn`, a deviation `ΔISA` from the standard
+  temperature and an outside air temperature `OAT`, both at the aircraft.
+
+* To calculate: `[ΔTA;TA]` (Correction; True altitude) 1 000 ft above a sea level station where it is −10 °C, that is −11.98 °C and 25 K below standard at the aircraft. The ICAO cold temperature table, rounded up to tens, gives 100 ft [2; 5, chapter 8]:
+```rpl
+Hind=1000_ft Hstn=0_ft ΔISA=-25_K OAT=-11.98_°C
+@ Expecting [ ΔTA=-95.72309 22388 ft TA=904.27690 7761 ft ]
+'ROOT(ⒺTrue Altitude;[ΔTA;TA];[1_ft;1_ft])'
+```
+
+#### Cloud Base
+
+The base of cumulus clouds, where rising air cools down to its dew point:
+the temperature and the dew point converge by about 4.4 °F per 1 000 ft.
+
+* Main result: the height `Hcb` of the cloud base above the ground, for an
+  outside air temperature `OAT` and a dew point `Tdp` measured at the ground.
+* Steps: `Tc` and `Tdc`, both temperatures in °C as plain numbers.
+
+* To calculate: `[Tc;Tdc;Hcb]` (Temperature; Dew point; Cloud base) for 85 °F and a dew point of 71 °F. The book gives 3 180 ft, cutting off the digits of 14/4.4 [5, chapter 12]:
+```rpl
+OAT=85_°F Tdp=71_°F
+@ Expecting [ Tc=29.44444 44444 Tdc=21.66666 66667 Hcb=3 181.81811 111 ft ]
+'ROOT(ⒺCloud Base;[Tc;Tdc;Hcb];[1;1;1_ft])'
+```
+
+#### Airspeeds
+
+From the calibrated airspeed to the true airspeed, at low speed and with
+the compressibility of the air.
+
+Entries: [True Airspeed](#true airspeed) and [Mach & True Airspeed](#mach & true airspeed).
+
+#### True Airspeed
+
+The true airspeed `TAS` from the calibrated airspeed `CAS`, at low speed
+(Mach below 0.3, where the calibrated and equivalent airspeeds are the same).
+The airspeed indicator measures the dynamic pressure, which depends on the
+air density: the thinner the air, the faster the aircraft for the same
+reading.
+
+* Main result: `TAS` for a pressure altitude `Hp` and an outside air
+  temperature `OAT`, with the density ratio `DRat` as a step.
+* The rule of thumb adds 2 % per 1 000 ft. The correction from indicated to
+  calibrated airspeed comes from the table of the flight manual.
+
+* To calculate: `[DRat;TAS]` (Density ratio; True airspeed) at 4 200 ft and 68.4 °F, for a calibrated airspeed of 134.9 kt. The source rounds the density ratio to 0.841, and finds 147.1 kt [6]:
+```rpl
+Hp=4200_ft OAT=68.4_°F CAS=134.9_knot
+@ Expecting [ DRat=0.84200 27064 51 TAS=147.01281 9202 knot ]
+'ROOT(ⒺTrue Airspeed;[DRat;TAS];[1;1_knot])'
+```
+
+#### Mach & True Airspeed
+
+The Mach number and the true airspeed from the calibrated airspeed, with the
+compressibility of the air, as an air data computer does. Above about 200 kt
+the low speed formula of True Airspeed is no longer accurate.
+
+* Main results: the Mach number `Mach`, the outside air temperature `OAT` and
+  the true airspeed `TAS`, for a calibrated airspeed `CAS`, a pressure
+  altitude `Hp` and the indicated air temperature `IAT` read by a probe of
+  recovery factor `Kr`.
+* Steps: the impact pressure `qc`, the static pressure `Ps`, and `Ti`, the
+  indicated temperature in K as a plain number.
+* The `Mach Number` equation of the Waves section computes the same Mach
+  number from the speed of sound.
+
+* To calculate: `[qc;Ps;Mach;Ti;OAT;TAS]` (Impact pressure; Static pressure; Mach; Temperatures; True airspeed) at 250 kt, 10 000 ft, with an indicated temperature of 2 °C and a recovery factor of 0.8. The source gives Mach 0.4523, −6.72 °C and 287.7 kt [2]:
+```rpl
+CAS=250_knot Hp=10000_ft IAT=2_°C Kr=0.8
+@ Expecting [ qc=104.98222 864 hPa Ps=696.81641 3877 hPa Mach=0.45227 51142 87 Ti=275.15 OAT=266.43015 5408 K TAS=287.67416 9311 knot ]
+'ROOT(ⒺMach & True Airspeed;[qc;Ps;Mach;Ti;OAT;TAS];[1_hPa;1_hPa;0.5;1;1_K;1_knot])'
+```
+
+#### Climb & Descent
+
+The gradient of a climb or a descent, the vertical speed, and where to
+start a descent.
+
+Entries: [Climb & Descent Gradient](#climb & descent gradient) and [Top of Descent](#top of descent).
+
+#### Climb & Descent Gradient
+
+The gradient of a flight path, in its three usual forms, and the vertical
+speed that follows it at a given ground speed.
+
+* Main results: the gradient `Grd`, in percent `GPct` and in feet per
+  nautical mile `Gft`, and the vertical speed `VS`, for a flight path angle
+  `FPA` at a ground speed `GS`.
+* `FPA` and `VS` are positive in climb and negative in descent: one entry
+  serves both.
+* The rules of thumb: a 3° glide path is about 318 ft per nautical mile, and
+  its vertical speed about 5 times the ground speed.
+
+* To calculate: `[Grd;GPct;Gft;VS]` (Gradient; Percent; ft/nmi; Vertical speed) for a 3° climb at 120 kt. The FAA table gives 318 ft/nmi and 637 ft/min [7]:
+```rpl
+FPA=3_° GS=120_knot
+@ Expecting [ Grd=0.05240 77792 83 GPct=5.24077 79283 Gft=318.43571 9498 VS=636.87143 8531 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;FPA;GPct;VS]` for a departure procedure requiring 200 ft/nmi, at 120 kt. The FAA table gives 3.29 % and 400 ft/min [7]:
+```rpl
+Gft=200 GS=120_knot
+@ Expecting [ Grd=0.03291 57667 15 FPA=1.88525 38508 1 ° GPct=3.29157 66714 6 VS=399.99999 9708 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;FPA;GPct;VS];[0.1;1_°;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;GPct;Gft;VS]` for a 3° descent at 90 kt. The FAA table gives 478 ft/min [7]:
+```rpl
+FPA=-3_° GS=90_knot
+@ Expecting [ Grd=-0.05240 77792 83 GPct=-5.24077 79283 Gft=-318.43571 9498 VS=-477.65357 8899 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+#### Top of Descent
+
+Where to start the descent, to reach a target altitude along a given flight
+path angle, or at a given vertical speed.
+
+![Top of descent](img/TopOfDescent.bmp)
+
+* Main results: the distance `DTOD` of the top of descent before the target,
+  the vertical speed `VS` and the time `TTOD`, for a descent from `Hcr` to
+  `Htgt` at a ground speed `GS` along the flight path angle `FPA`, negative
+  in descent. Give `VS` instead of `FPA` to descend at a set vertical speed.
+* The rule of thumb, 3 nmi per 1 000 ft, corresponds to a 3° path.
+
+* To calculate: `[Grd;ΔH;DTOD;VS;TTOD]` (Gradient; Height to lose; Distance; Vertical speed; Time) for a descent from 9 500 to 2 000 ft on a 3° path at 120 kt. The rule of thumb gives 22.5 nmi:
+```rpl
+Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
+@ Expecting [ Grd=-0.05240 77792 83 ΔH=7 500 ft DTOD=23.55263 41621 nmi VS=-636.87143 8531 ft/min TTOD=11.77631 7081 min ]
+'ROOT(ⒺTop of Descent;[Grd;ΔH;DTOD;VS;TTOD];[0.1;1_ft;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[Grd;FPA;ΔH;DTOD;TTOD]` for the same descent at 500 ft/min and 150 kt:
+```rpl
+Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
+@ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
+'ROOT(ⒺTop of Descent;[Grd;FPA;ΔH;DTOD;TTOD];[0.1;1_°;1_ft;1_nmi;1_min])'
+```
+
+### Performance
+
+The aircraft as it is, from its drag polar: lift and drag, stall and load
+factor, turns, glide, climb, range and endurance, takeoff and landing, in
+seven submenus:
+[Lift & Drag](#lift & drag),
+[Stall & Load Factor](#stall & load factor),
+[Turns](#turns),
+[Glide](#glide),
+[Climb & Power](#climb & power),
+[Range & Endurance](#range & endurance) and
+[Takeoff & Landing](#takeoff & landing).
+
+**Mass and weight.** As in [Flight Management](#flight management), `Wt` is
+the **mass** of the aircraft, in lb or kg; its weight is the force
+`(Wt_lb)·Ⓒg`. Lift, drag and thrust are forces, in lbf or N.
+
+**Air density.** The entries that need the air density `ρa` compute it from
+the density ratio `DRat` of [True Airspeed](#true airspeed): `ρa` is
+1.225 kg/m³ times `DRat`. Give `DRat=1` for the sea level standard air, the
+density at which the flight manual gives its stall speeds; they are then
+calibrated airspeeds. Or give `ρa` directly: the `ρ♁StdAtm` function of the
+library gives it in the standard atmosphere, for a geometric altitude.
+
+**Coefficients.** The lift and drag coefficients `CL` and `CD` are plain
+numbers. The drag polar is parabolic: `CD` is `CD0+Kind·CL²`, the drag at
+zero lift plus the drag induced by the lift.
+
+**Sources.** The FAA handbook often rounds its figures, and a few of them are
+wrong; the examples give the book value next to the computed one.
+
+The 78 variables in the Performance section are:
+
+* `ρa`: Air density (dim.: mass/volume)
+* `qd`: Dynamic pressure, `ρa·TAS²/2` (dim.: pressure)
+* `Lift`: Lift (dim.: force)
+* `nLF`: Load factor, lift over weight: 1 in level flight
+* `Sw`: Wing area (dim.: area)
+* `CL`: Lift coefficient
+* `bw`: Wingspan (dim.: length)
+* `AR`: Aspect ratio of the wing, span squared over area
+* `eO`: Oswald efficiency factor, 0.7 to 0.85 for most airplanes
+* `Kind`: Induced drag factor of the drag polar
+* `CD0`: Drag coefficient at zero lift
+* `CD`: Drag coefficient
+* `LD`: Lift to drag ratio, also called the glide ratio or finesse
+* `Drag`: Drag (dim.: force)
+* `LDmax`: Maximum lift to drag ratio
+* `CLmd`: Lift coefficient of minimum drag, at `LDmax`
+* `Vmd`: Speed of minimum drag (dim.: speed)
+* `Vmp`: Speed of minimum power (dim.: speed)
+* `Vbrj`: Speed of best range of a jet at constant altitude (dim.: speed)
+* `CLmax`: Maximum lift coefficient, for the configuration of flaps and gear
+* `Vst`: Stall speed (dim.: speed)
+* `φb`: Bank angle
+* `Vstn`: Stall speed at the load factor `nLF` (dim.: speed)
+* `nlim`: Limit load factor
+* `VA`: Maneuvering speed (dim.: speed)
+* `Vref`: Reference speed, given for the weight `Wt0` or planned for the
+  takeoff or the landing (dim.: speed)
+* `Wt0`: Reference weight of the aircraft (dim.: mass)
+* `Vadj`: Speed adjusted to the weight `Wt` (dim.: speed)
+* `nPU`: Load factor at the bottom of a pull up
+* `Rpu`: Radius of the pull up (dim.: length)
+* `TRad`: Radius of turn (dim.: length)
+* `TRate`: Rate of turn (dim.: angular speed)
+* `Ttrn`: Time for a full turn (dim.: time)
+* `Hpv`: Pivotal altitude, above the ground (dim.: length)
+* `Dgl`: Distance of the glide over the ground (dim.: length)
+* `Tgl`: Time of the glide (dim.: time)
+* `CLms`: Lift coefficient of minimum sink
+* `LDms`: Lift to drag ratio at minimum sink
+* `Vms`: Speed of minimum sink (dim.: speed)
+* `VSms`: Minimum sink rate, negative (dim.: speed)
+* `Preq`: Power required, drag times speed (dim.: power)
+* `ηp`: Propeller efficiency, 0.8 to 0.85 in cruise
+* `Psh`: Shaft power of the engine (dim.: power)
+* `Pav`: Shaft power available (dim.: power)
+* `Thr`: Thrust (dim.: force)
+* `ROC0`: Rate of climb at sea level (dim.: speed)
+* `Habs`: Absolute ceiling, where the rate of climb falls to zero
+  (dim.: length)
+* `Hsc`: Service ceiling, where the rate of climb falls to 100 ft/min
+  (dim.: length)
+* `Hini`, `Hfin`: Initial and final altitudes (dim.: length)
+* `Tclb`: Time to climb (dim.: time)
+* `BSFC`: Brake specific fuel consumption of a piston engine, the mass of
+  fuel per unit of energy (dim.: mass/energy)
+* `TSFC`: Thrust specific fuel consumption of a jet engine, in `1/h`: the
+  value the handbooks give in lb/(lbf·h) (dim.: 1/time)
+* `FFm`: Fuel flow, as a mass (dim.: mass/time)
+* `Wini`, `Wfin`: Initial and final weights of the aircraft (dim.: mass)
+* `Vini`, `Vfin`: Initial and final speeds (dim.: speed)
+* `Ebat`: Usable energy of the battery (dim.: energy)
+* `ηe`: Efficiency from the battery to the propeller thrust
+* `fLO`: Liftoff speed over stall speed, about 1.2
+* `fTD`: Touchdown speed over stall speed, about 1.3
+* `fav`: Fraction of the liftoff or touchdown speed where the forces are
+  averaged, about 0.7
+* `μr`: Rolling friction coefficient: 0.02 on a dry paved runway, 0.04 to
+  0.06 on short grass, 0.08 to 0.12 on long or wet grass; 0.4 when braking
+  on a dry runway
+* `VLO`: Liftoff speed (dim.: speed)
+* `VTD`: Touchdown speed (dim.: speed)
+* `qLO`, `qTD`: Dynamic pressure at `fav·VLO` or `fav·VTD` (dim.: pressure)
+* `Rav`: Average resistance, drag plus rolling friction (dim.: force)
+* `sLO`: Takeoff ground roll (dim.: length)
+* `sLD`: Landing ground roll (dim.: length)
+* `s0`: Distance in the reference conditions (dim.: length)
+* `sWnd`: Distance corrected for the wind (dim.: length)
+* `xW`: Exponent of the weight: 2 for a takeoff, 1 for a landing
+* `fW`: Weight factor
+* `Vact`: Actual speed, compared to the reference speed `Vref`
+  (dim.: speed)
+* `fV`: Speed factor
+* `sCor`: Distance corrected for weight and speed (dim.: length)
+
+The entries also use `Wt`, `TAS`, `GS`, `DRat`, `FPA`, `VS`, `ΔH`, `HW`,
+`Endur`, `Rng` and `Wfuel`, with the same meaning as in Flight Management.
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 5, *Aerodynamics of Flight*, and 11, *Aircraft Performance* ;
+  [2] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, chapters *Flight Range & Endurance*,
+  *Climbing, Ceiling & Gliding*, *Takeoff & Landing Performance*, *Maximum
+  Lift, Stalling & Spinning*, *Finite Wing Characteristics*, *Maneuvers &
+  Gusts* and *Worked Examples: Airplane Performance* ;
+  [3] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [4] 14 CFR 23.337, *Limit maneuvering load factors*, before amendment 23-64
+  of 2017.
+
+#### Lift & Drag
+
+The lift and the drag of the aircraft from its drag polar, and the speeds that
+follow from it.
+
+Entries: [Lift](#lift), [Drag Polar](#drag polar) and [Characteristic Speeds](#characteristic speeds).
+
+#### Lift
+
+The lift equals the weight times the load factor; it is the dynamic pressure
+times the wing area times the lift coefficient.
+
+* Main results: the lift coefficient `CL` needed to fly the mass `Wt` at the
+  true airspeed `TAS`, with the wing area `Sw`, at the load factor `nLF`, 1 in
+  level flight; or the speed for a given `CL`.
+* Steps: the air density `ρa` and the dynamic pressure `qd`.
+* At the same lift coefficient, twice the speed gives four times the lift.
+* The handbook says that at 18 000 ft the air has half the density of sea
+  level [1, chapter 5]: it is the pressure that is halved there. The density
+  ratio of the standard atmosphere is 0.57.
+
+* To calculate: `[DRat;qd;Lift;CL]` (Density ratio; Dynamic pressure; Lift; Lift coefficient) for a Cessna 172 of 2 100 lb at 120 kt, in air of 0.00216 slug/ft³, with a wing of 174 ft². The source gives 0.272 [2]:
+```rpl
+Wt=2100_lb TAS=120_knot ρa=0.00216_slug/ft^3 Sw=174_ft^2 nLF=1
+@ Expecting [ DRat=0.90874 95899 83 qd=2 121.23984 487 Pa Lift=2 100. lbf CL=0.27241 86027 28 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[DRat;qd;Lift;CL]` for an airliner of 16 000 kg at 253 kt, in air of 0.9048 kg/m³, with a wing of 60 m². The source gives 0.341 [2]:
+```rpl
+Wt=16000_kg TAS=253_knot ρa=0.9048_kg/m^3 Sw=60_m^2 nLF=1
+@ Expecting [ DRat=0.73861 22448 98 qd=7 663.73716 447 Pa Lift=35 273.96194 96 lbf CL=0.34123 12570 94 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[ρa;Lift;qd;TAS]` (Density; Lift; Dynamic pressure; True airspeed) to fly the same Cessna at a lift coefficient of 0.5, at a density ratio of 0.7385:
+```rpl
+Wt=2100_lb DRat=0.7385 Sw=174_ft^2 nLF=1 CL=0.5
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Lift=2 100. lbf qd=1 155.73038 918 Pa TAS=98.25654 49074 knot ]
+'ROOT(ⒺLift;[ρa;Lift;qd;TAS];[1_kg/m^3;1_lbf;1_Pa;100_knot])'
+```
+
+#### Drag Polar
+
+The parabolic drag polar: the drag coefficient is the drag at zero lift plus
+the drag induced by the lift, which decreases with the aspect ratio of the
+wing.
+
+![Drag polar](img/DragPolar.bmp)
+
+* Main results: the aspect ratio `AR`, the induced drag factor `Kind`, the
+  drag coefficient `CD`, the lift to drag ratio `LD` and the drag `Drag`, for
+  a wingspan `bw`, a wing area `Sw`, an Oswald factor `eO`, a drag
+  coefficient at zero lift `CD0`, and the lift coefficient `CL` and lift
+  `Lift` of the Lift entry.
+* Solved the other way, a measured drag gives `CD0`.
+* The Drag Force equation of the Forces and Energy section gives the drag
+  of any body from its drag coefficient.
+
+* To calculate: `[AR;Kind;CD;LD;Drag]` (Aspect ratio; Induced drag factor; Drag coefficient; Lift to drag ratio; Drag) for the Cessna 172 of the Lift entry: 36 ft of span, `CD0` 0.02 and an Oswald factor of 0.81. The source gives 7.45, 0.0239 and 11.38, from rounded coefficients [2]:
+```rpl
+bw=36_ft Sw=174_ft^2 CD0=0.02 eO=0.81 CL=0.272419 Lift=2100_lbf
+@ Expecting [ AR=7.44827 58620 7 Kind=0.05276 05549 8 CD=2.39154 72192 2⁳⁻² LD=11.39091 03617 Drag=184.35752 1332 lbf ]
+'ROOT(ⒺDrag Polar;[AR;Kind;CD;LD;Drag];[1;0.1;0.1;10;1_lbf])'
+```
+
+* To calculate: `[AR;Kind;LD;CD;CD0]` for an airplane of 2 105 lb that needs 245 lbf of thrust in level flight at a lift coefficient of 0.315, with a wing of 30 ft by 5.25 ft and an Oswald factor of 0.75. The source gives `CD0` 0.0293 [2]:
+```rpl
+Lift=2105_lbf Drag=245_lbf CL=0.315 bw=30_ft Sw=157.5_ft^2 eO=0.75
+@ Expecting [ AR=5.71428 57142 9 Kind=0.07427 23067 76 LD=8.59183 67346 9 CD=0.03666 27078 38 CD0=0.02929 30381 99 ]
+'ROOT(ⒺDrag Polar;[AR;Kind;LD;CD;CD0];[1;0.1;10;0.1;0.01])'
+```
+
+#### Characteristic Speeds
+
+The speeds that follow from the drag polar.
+
+* Main results: the maximum lift to drag ratio `LDmax`, reached at the lift
+  coefficient `CLmd` and the speed of minimum drag `Vmd`; the speed of
+  minimum power `Vmp`; the speed of best range of a jet at constant altitude
+  `Vbrj`.
+* `Vmd` gives the longest glide, the best range of a propeller airplane and
+  the longest endurance of a jet. `Vmp` gives the longest endurance of a
+  propeller airplane and the minimum sink rate; it is about 76 % of `Vmd`.
+* These speeds are true airspeeds; with `DRat=1`, calibrated airspeeds.
+
+* To calculate: `[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj]` (Density; Maximum lift to drag ratio; Its lift coefficient; Speeds of minimum drag, of minimum power, of best jet range) for an airplane of 2 550 lb with a wing of 174 ft², `CD0` 0.0319 and `Kind` 0.0610515, at sea level. The source gives `Vmp` 58.8 kt, with a density of 0.002378 slug/ft³ [2]:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 LDmax=11.32991 08712 CLmd=0.72284 83135 81 Vmd=77.38532 25844 knot Vmp=58.80012 96453 knot Vbrj=101.84481 2037 knot ]
+'ROOT(ⒺCharacteristic Speeds;[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj];[1_kg/m^3;10;1;100_knot;100_knot;100_knot])'
+```
+
+* To calculate: `[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj]` for a jet of 5 000 lb with a wing of 180 ft², `CD0` 0.018 and `Kind` 0.095, in air of 0.001066 slug/ft³. The source gives 270 kt for the best range [2]:
+```rpl
+Wt=5000_lb Sw=180_ft^2 CD0=0.018 Kind=0.095 ρa=0.001066_slug/ft^3
+@ Expecting [ DRat=0.44848 47513 53 LDmax=12.09127 08352 CLmd=0.43528 57500 66 Vmd=205.00969 5811 knot Vmp=155.77368 2781 knot Vbrj=269.80793 306 knot ]
+'ROOT(ⒺCharacteristic Speeds;[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj];[1;10;1;100_knot;100_knot;100_knot])'
+```
+
+#### Stall & Load Factor
+
+The stall speed, how it grows with the load factor and changes with the
+weight, the maneuvering speed, and the limit load factor.
+
+Entries: [Stall Speed](#stall speed), [Load Factor & Accelerated Stall](#load factor & accelerated stall), [Maneuvering Speed & Weight](#maneuvering speed & weight), [Pull Up](#pull up) and [Limit Load Factor](#limit load factor).
+
+#### Stall Speed
+
+The speed at which the wing reaches its maximum lift coefficient in level
+flight.
+
+* Main result: the stall speed `Vst` for the mass `Wt`, the wing area `Sw` and
+  the maximum lift coefficient `CLmax` of the configuration of flaps and gear.
+* With `DRat=1`, the stall speed is a calibrated airspeed, the one of the
+  flight manual; with the density of the day, a true airspeed.
+
+* To calculate: `[ρa;Vst]` (Density; Stall speed) for an airplane of 20 000 lb with a wing of 340 ft² and a `CLmax` of 1.7, at a density ratio of 0.7385. The source gives 117.6 kt [2]:
+```rpl
+Wt=20000_lb Sw=340_ft^2 CLmax=1.7 DRat=0.7385
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Vst=117.64203 9787 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+* To calculate: `[ρa;Vst]` for an airplane of 5 200 lb with a wing of 160 ft² and a `CLmax` of 2.1 in landing configuration, at sea level. The source gives 67.6 kt [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+#### Load Factor & Accelerated Stall
+
+In a level turn, the lift must hold up the weight and turn the aircraft: the
+load factor grows with the bank angle, and the stall speed with the square
+root of the load factor.
+
+* Main results: the load factor `nLF` for the bank angle `φb`, and the stall
+  speed `Vstn` at that load factor, from the stall speed `Vst` in level
+  flight.
+* 60° of bank gives 2 G; a stall speed of 50 kt becomes 100 kt at 4 G.
+
+* To calculate: `[nLF;Vstn]` (Load factor; Stall speed) at 45° of bank, for a stall speed of 57 kt. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+φb=45_° Vst=57_knot
+@ Expecting [ nLF=1.41421 35623 7 Vstn=67.78480 55552 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[nLF;Vstn];[1;100_knot])'
+```
+
+* To calculate: `[φb;Vstn]` (Bank angle; Stall speed) for a load factor of 3, with a stall speed of 45 kt. The handbook says that a bank of 72° gives 3 G, and that the speed must stay above 75 kt; 72° gives 3.24 G [1, chapter 5]:
+```rpl
+nLF=3 Vst=45_knot
+@ Expecting [ φb=70.52877 93655 ° Vstn=77.94228 63406 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[φb;Vstn];[45_°;100_knot])'
+```
+
+#### Maneuvering Speed & Weight
+
+Below the maneuvering speed, the wing stalls before the load factor reaches its
+limit. All the speeds flown at a given lift coefficient (stall, maneuvering,
+best glide, approach) change with the square root of the weight.
+
+* Main results: the maneuvering speed `VA` for a stall speed `Vst` and a limit
+  load factor `nlim`; and the speed `Vadj` at the weight `Wt`, from the speed
+  `Vref` given for the weight `Wt0`.
+* A lighter aircraft has a lower maneuvering speed.
+
+* To calculate: `nlim` (Limit load factor) when the maneuvering speed is 1.7 times the stall speed. The handbook says 3 G [1, chapter 5]:
+```rpl
+Vst=60_knot VA=102_knot
+@ Expecting nlim=2.89
+'ROOT(ⒺManeuvering Speed & Weight;nlim;3)'
+```
+
+* To calculate: `Vadj` (Adjusted speed) at 2 800 lb, for an approach speed of 70 kt at 2 950 lb. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+Vref=70_knot Wt=2800_lb Wt0=2950_lb
+@ Expecting Vadj=68.19712 20626 knot
+'ROOT(ⒺManeuvering Speed & Weight;Vadj;70_knot)'
+```
+
+#### Pull Up
+
+At the bottom of a pull up or of a loop, the lift must hold up the weight and
+curve the path.
+
+* Main result: the load factor `nPU` for the true airspeed `TAS` and the
+  radius `Rpu`.
+* At the top of a loop, the weight helps curve the path: the load factor is
+  `nPU-2`.
+
+* To calculate: `nPU` (Load factor) at 120 kt, on a radius of 1 000 ft:
+```rpl
+TAS=120_knot Rpu=1000_ft
+@ Expecting nPU=2.27498 13056 9
+'ROOT(ⒺPull Up;nPU;2)'
+```
+
+#### Limit Load Factor
+
+The limit load factor of the normal category of 14 CFR part 23, before its
+rewrite of 2017: the certification of older light airplanes.
+
+* Main result: the limit load factor `nlim` for the maximum weight `Wt`: 3.8,
+  or less above 4 118 lb. The utility category requires 4.4, the acrobatic
+  category 6.
+
+* To calculate: `nlim` for a maximum weight of 6 000 lb [4]:
+```rpl
+Wt=6000_lb
+@ Expecting nlim=3.6
+'ROOT(ⒺLimit Load Factor;nlim;3)'
+```
+
+#### Turns
+
+The radius and rate of a level turn, and the pivotal altitude.
+
+Entries: [Level Turn](#level turn) and [Pivotal Altitude](#pivotal altitude).
+
+#### Level Turn
+
+A coordinated turn at constant altitude: the horizontal part of the lift turns
+the aircraft.
+
+![Level turn](img/LevelTurn.bmp)
+
+* Main results: the load factor `nLF`, the radius `TRad`, the rate `TRate` and
+  the time `Ttrn` of a full turn, for a true airspeed `TAS` and a bank angle
+  `φb`. Give `TRate=3_°/s` for the bank of a standard rate turn.
+* The radius grows with the square of the speed; the rate falls with it.
+* The rules of thumb divide the square of the speed in knots by 11.26 times
+  the tangent of the bank [1, chapter 5] or by 11.23 [3], for a radius in
+  feet: the exact constant is 11.294, and the radii of the handbook are 0.3 %
+  too large.
+
+* To calculate: `[nLF;TRad;TRate;Ttrn]` (Load factor; Radius; Rate; Time for 360°) at 120 kt and 30° of bank. The handbook gives 2 215 ft, 5.25 °/s and 68.6 s [1, chapter 5]:
+```rpl
+TAS=120_knot φb=30_°
+@ Expecting [ nLF=1.15470 05383 8 TRad=2 208.33240 015 ft TRate=5.25488 18154 °/s Ttrn=68.50772 53203 s ]
+'ROOT(ⒺLevel Turn;[nLF;TRad;TRate;Ttrn];[1;1_ft;1_°/s;1_s])'
+```
+
+* To calculate: `[φb;nLF;TRad;Ttrn]` (Bank angle; Load factor; Radius; Time) for a standard rate turn at 100 kt. The source gives 15.4° [3]:
+```rpl
+TAS=100_knot TRate=3_°/s
+@ Expecting [ φb=15.35884 67547 ° nLF=1.03703 68440 1 TRad=3 223.47938 108 ft Ttrn=120 s ]
+'ROOT(ⒺLevel Turn;[φb;nLF;TRad;Ttrn];[10_°;1;1_ft;1_s])'
+```
+
+#### Pivotal Altitude
+
+The height above the ground at which a point on the ground seems to stay fixed
+behind the wingtip, whatever the bank: the eights on pylons are flown there.
+
+* Main result: the pivotal altitude `Hpv` for the ground speed `GS`.
+
+* To calculate: `Hpv` (Pivotal altitude) at a ground speed of 100 kt. The source gives 890 ft [3]:
+```rpl
+GS=100_knot
+@ Expecting Hpv=885.40368 4504 ft
+'ROOT(ⒺPivotal Altitude;Hpv;1_ft)'
+```
+
+#### Glide
+
+The distance of a glide, and the speed of the least sink rate.
+
+Entries: [Glide Distance](#glide distance) and [Minimum Sink](#minimum sink).
+
+#### Glide Distance
+
+Without engine, the aircraft glides along a path whose slope is the inverse of
+its lift to drag ratio: the glide ratio is the lift to drag ratio.
+
+![Glide](img/GlideDistance.bmp)
+
+* Main results: the flight path angle `FPA`, negative, the distance over the
+  ground `Dgl`, the vertical speed `VS` and the time `Tgl`, for a height to
+  lose `ΔH`, a lift to drag ratio `LD`, a true airspeed `TAS` and a ground
+  speed `GS`.
+* The longest glide is at `LDmax`, flown at the speed of minimum drag `Vmd`
+  of Characteristic Speeds. A headwind shortens it.
+* The time is the distance over the ground speed; the time along the path,
+  `ΔH` over `VS`, is 0.2 % longer at a glide ratio of 15.
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` (Flight path angle; Distance; Vertical speed; Time) for Air Transat flight 236, the Airbus A330 that ran out of fuel over the Atlantic on 24 August 2001 and that captain Robert Piché glided to Lajes, in the Azores. The source models it as a glide from 30 000 ft at 195 kt, at a lift to drag ratio of 15, and finds about 74 nmi and 22.8 min [2]:
+```rpl
+LD=15 ΔH=30000_ft TAS=195_knot GS=195_knot
+@ Expecting [ FPA=-3.81407 48342 9 ° Dgl=74.06047 5162 nmi VS=-1 313.57586 727 ft/min Tgl=22.78783 85114 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` for a glider at a glide ratio of 30, losing 3 400 ft at 50 kt against a headwind of 10 kt:
+```rpl
+LD=30 ΔH=3400_ft TAS=50_knot GS=40_knot
+@ Expecting [ FPA=-1.90915 2433 ° Dgl=13.42963 28294 nmi VS=-168.68729 6563 ft/min Tgl=20.14444 92441 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+#### Minimum Sink
+
+The speed at which a glider, or an airplane without engine, loses height the
+most slowly: it stays longest in the air, but does not go farthest.
+
+* Main results: the lift coefficient `CLms`, the lift to drag ratio `LDms`,
+  the speed `Vms` and the sink rate `VSms` at minimum sink, from the drag
+  polar `CD0` and `Kind`, the mass `Wt` and the wing area `Sw`.
+* The speed of minimum sink is the speed of minimum power of Characteristic
+  Speeds.
+
+* To calculate: `[ρa;CLms;LDms;Vms;VSms]` (Density; Lift coefficient; Lift to drag ratio; Speed; Sink rate) for the airplane of 2 550 lb of Characteristic Speeds, engine off, at sea level:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 CLms=1.25201 00052 9 LDms=9.81199 06370 5 Vms=58.80012 96453 knot VSms=-603.74295 4129 ft/min ]
+'ROOT(ⒺMinimum Sink;[ρa;CLms;LDms;Vms;VSms];[1_kg/m^3;1;10;60_knot;-500_ft/min])'
+```
+
+#### Climb & Power
+
+The power the aircraft needs, the rate and angle of climb it gets from its
+engine, and the time to climb.
+
+Entries: [Power Required](#power required), [Rate & Angle of Climb](#rate & angle of climb) and [Time to Climb & Ceilings](#time to climb & ceilings).
+
+#### Power Required
+
+The power needed to fly is the drag times the speed; the engine must give more,
+since the propeller does not turn all of its power into thrust.
+
+* Main results: the power required `Preq` for the drag `Drag` at the true
+  airspeed `TAS`, and the shaft power `Psh` with a propeller efficiency `ηp`.
+* From 100 to 200 kt, the parasite drag grows four times and its power eight
+  times; the induced drag and its power fall to a fourth and to a half
+  [1, chapter 11].
+
+* To calculate: `[Preq;Psh]` (Power required; Shaft power) for a Cessna 172 with 183.7 lbf of drag at 120 kt, and a propeller efficiency of 0.85. The source gives 79.6 hp [2]:
+```rpl
+Drag=183.672_lbf TAS=120_knot ηp=0.85
+@ Expecting [ Preq=67.63710 80888 hp Psh=79.57306 83397 hp ]
+'ROOT(ⒺPower Required;[Preq;Psh];[1_hp;1_hp])'
+```
+
+#### Rate & Angle of Climb
+
+The excess power gives the rate of climb, the excess thrust the angle of
+climb.
+
+![Climb speeds](img/ClimbSpeeds.bmp)
+
+* Main results: the vertical speed `VS` from the power available `Pav` of the
+  engine, the propeller efficiency `ηp` and the power required `Preq`; and
+  the flight path angle `FPA` from the thrust `Thr` and the drag `Drag`.
+* The best rate of climb, at the speed Vy, gains the most height in a given
+  time; the best angle, at the speed Vx, in a given distance. For a
+  propeller airplane, Vy is about the speed of minimum power.
+* A climb at 10° needs a thrust equal to the drag plus 17 % of the weight
+  [1, chapter 5].
+
+* To calculate: `VS` (Vertical speed) for an airplane of 2 550 lb with 180 hp at 0.8 of propeller efficiency, needing 46.9 hp at its speed of minimum power. The source gives 1 257 ft/min [2]:
+```rpl
+Pav=180_hp ηp=0.8 Preq=46.8836_hp Wt=2550_lb
+@ Expecting VS=1 256.80047 059 ft/min
+'ROOT(ⒺRate & Angle of Climb;VS;1000_ft/min)'
+```
+
+* To calculate: `FPA` (Flight path angle) for an airplane of 2 000 lb with 400 lbf of thrust and 200 lbf of drag:
+```rpl
+Wt=2000_lb Thr=400_lbf Drag=200_lbf
+@ Expecting FPA=5.73917 04772 7 °
+'ROOT(ⒺRate & Angle of Climb;FPA;5_°)'
+```
+
+#### Time to Climb & Ceilings
+
+When the rate of climb falls linearly with altitude, from `ROC0` at sea level
+to zero at the absolute ceiling `Habs`, the time to climb has a closed form.
+
+* Main results: the service ceiling `Hsc`, where the rate of climb is
+  100 ft/min, and the time `Tclb` to climb from `Hini` to `Hfin`.
+* Two rates of climb read in the flight manual at two altitudes give `ROC0`
+  and `Habs`.
+
+* To calculate: `[Hsc;Tclb]` (Service ceiling; Time to climb) from 1 000 to 9 000 ft, for a rate of climb of 973.5 ft/min at sea level and an absolute ceiling of 20 072 ft. The source gives 11.2 min [2]:
+```rpl
+ROC0=973.5_ft/min Habs=20072.2_ft Hini=1000_ft Hfin=9000_ft
+@ Expecting [ Hsc=18 010.34072 93 ft Tclb=11.21227 34995 min ]
+'ROOT(ⒺTime to Climb & Ceilings;[Hsc;Tclb];[1_ft;1_min])'
+```
+
+* To calculate: `Hsc` (Service ceiling) for a rate of climb of 1 235 ft/min at sea level and an absolute ceiling of 14 790 ft. The source gives 13 593 ft [2]:
+```rpl
+ROC0=1235_ft/min Habs=14790.4_ft
+@ Expecting Hsc=13 592.79676 11 ft
+'ROOT(ⒺTime to Climb & Ceilings;Hsc;1_ft)'
+```
+
+#### Range & Endurance
+
+The fuel flow of piston and jet engines, the Breguet equations for the range
+and the endurance, and the range of an electric airplane.
+
+Entries: [Fuel Flow](#fuel flow), [Breguet Range Propeller](#breguet range propeller), [Breguet Endurance Propeller](#breguet endurance propeller), [Breguet Jet](#breguet jet), [Jet Range at Constant Altitude](#jet range at constant altitude) and [Battery Range & Endurance](#battery range & endurance).
+
+#### Fuel Flow
+
+The fuel flow from the specific consumption of the engine, and the endurance
+of the fuel on board.
+
+* Main results: the fuel flow `FFm`, as a mass, of a piston engine from its
+  specific consumption `BSFC` and its shaft power `Psh`, or of a jet engine
+  from its specific consumption `TSFC` and its thrust `Thr`; and the endurance
+  `Endur` of the fuel `Wfuel`.
+* `TSFC` is entered in `1/h`: the 0.5 lb/(lbf·h) of the handbooks is
+  `0.5_h^-1`.
+* The Endurance & Range entry of Flight Management works with a volume of
+  fuel; `ρfuel` converts.
+
+* To calculate: `[FFm;Endur]` (Fuel flow; Endurance) for a Cessna 172 using 79.6 hp at 0.45 lb/(hp·h), with 48 lb of fuel. The source gives 35.8 lb/h and 1.34 h [2]:
+```rpl
+BSFC=0.45_lb/(hp*h) Psh=79.573_hp Wfuel=48_lb
+@ Expecting [ FFm=35.80785 lb/h Endur=1.34048 81890 4 h ]
+'ROOT(ⒺFuel Flow;[FFm;Endur];[1_lb/h;1_h])'
+```
+
+* To calculate: `FFm` for a jet with 1 374 lbf of thrust at 0.5 lb/(lbf·h). The source gives 687 lb/h [2]:
+```rpl
+TSFC=0.5_h^-1 Thr=1373.97_lbf
+@ Expecting FFm=686.985 lb/h
+'ROOT(ⒺFuel Flow;FFm;1_lb/h)'
+```
+
+#### Breguet Range Propeller
+
+The range of a propeller airplane that flies at its best lift to drag ratio
+while it burns its fuel.
+
+* Main result: the range `Rng` from the propeller efficiency `ηp`, the lift to
+  drag ratio `LD`, the specific consumption `BSFC`, and the initial and final
+  weights `Wini` and `Wfin`.
+* One source finds 170 nmi for a Cessna 172 where the formula gives 162, and
+  160.9 nmi by the hourly consumption [2].
+
+* To calculate: `Rng` (Range) for an airplane of the class of the Cessna 182, from 2 890 to 2 620 lb, with a lift to drag ratio of 13.6, a propeller efficiency of 0.8 and 0.45 lb/(hp·h). The source gives 889 statute miles, or 772.5 nmi [2]:
+```rpl
+ηp=0.8 LD=13.6 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting Rng=772.76186 4125 nmi
+'ROOT(ⒺBreguet Range Propeller;Rng;1_nmi)'
+```
+
+#### Breguet Endurance Propeller
+
+The endurance of a propeller airplane flown at a constant lift coefficient:
+the speed falls with the square root of the weight as the fuel burns.
+
+* Main results: the final speed `Vfin` and the endurance `Endur`, from the
+  initial speed `Vini`, the lift to drag ratio `LD` at that lift coefficient,
+  the propeller efficiency `ηp`, the specific consumption `BSFC`, and the
+  weights `Wini` and `Wfin`.
+* For the longest endurance, start at the speed of minimum power `Vmp`, with
+  the lift to drag ratio `LDms` of Minimum Sink.
+
+* To calculate: `[Vfin;Endur]` (Final speed; Endurance) for the same airplane, from 117.3 ft/s at a lift to drag ratio of 11.79. The source gives 9.9 h [2]:
+```rpl
+Vini=117.309_ft/s ηp=0.8 LD=11.7865 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting [ Vfin=66.17737 52512 knot Endur=9.87589 53051 2 h ]
+'ROOT(ⒺBreguet Endurance Propeller;[Vfin;Endur];[1_knot;1_h])'
+```
+
+#### Breguet Jet
+
+The endurance of a jet, and its range in a cruise climb: at constant speed and
+lift coefficient, the jet climbs as it gets lighter.
+
+* Main results: the endurance `Endur` from the lift to drag ratio `LD`, the
+  specific consumption `TSFC` and the weights `Wini` and `Wfin`; and the range
+  `Rng` at the true airspeed `TAS`.
+
+* To calculate: `Endur` (Endurance) for a business jet from 18 815 to 13 215 lb, with a lift to drag ratio of 16.85 and 0.6 lb/(lbf·h). The source gives 9.9 h [2]:
+```rpl
+LD=16.85 Wini=18815_lb Wfin=13215_lb TSFC=0.6_h^-1
+@ Expecting Endur=9.92189 43507 h
+'ROOT(ⒺBreguet Jet;Endur;1_h)'
+```
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) in a cruise climb for the jet of Jet Range at Constant Altitude, at 269.8 kt, from 5 000 to 4 000 lb. At constant altitude it flies 596.5 nmi:
+```rpl
+LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1 TAS=269.808_knot
+@ Expecting [ Endur=2.33660 30688 8 h Rng=630.43420 0807 nmi ]
+'ROOT(ⒺBreguet Jet;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Jet Range at Constant Altitude
+
+The range of a jet that keeps its altitude and its lift coefficient: it must
+slow down as it gets lighter.
+
+* Main results: the final speed `Vfin` and the range `Rng`, from the initial
+  speed `Vini`, the lift to drag ratio `LD`, the specific consumption `TSFC`
+  and the weights `Wini` and `Wfin`.
+* For the best range, start at the speed `Vbrj` of Characteristic Speeds.
+* One source finds that drop tanks add 10.4 % to the range, where its own
+  figures give 9.8 % [2].
+
+* To calculate: `[Vfin;Rng]` (Final speed; Range) for a jet of 5 000 lb that burns 1 000 lb of fuel from 269.8 kt, with a lift to drag ratio of 10.47 and 1 lb/(lbf·h). The source gives 596 nmi [2]:
+```rpl
+Vini=269.808_knot LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1
+@ Expecting [ Vfin=241.32361 1549 knot Rng=596.53715 3568 nmi ]
+'ROOT(ⒺJet Range at Constant Altitude;[Vfin;Rng];[1_knot;1_nmi])'
+```
+
+#### Battery Range & Endurance
+
+An electric airplane does not get lighter as it flies: its range and its
+endurance follow from the energy of its battery.
+
+* Main results: the endurance `Endur` from the usable energy `Ebat`, the
+  efficiency `ηe` from the battery to the thrust, and the power required
+  `Preq`; and the range `Rng` from the lift to drag ratio `LD` and the mass
+  `Wt`.
+* The efficiency `ηe` is the product of the efficiencies of the battery, the
+  motor and the propeller, about 0.95, 0.95 and 0.8.
+* Enter the energy in `kW*h`.
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) for an electric airplane of 1 300 kg with 60 kWh, an efficiency of 0.75, a lift to drag ratio of 15, needing 40 hp at 68 kt:
+```rpl
+Ebat=60_(kW*h) ηe=0.75 Preq=40_hp LD=15 Wt=1300_kg
+@ Expecting [ Endur=1.50864 98507 9 h Rng=102.92035 2116 nmi ]
+'ROOT(ⒺBattery Range & Endurance;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Takeoff & Landing
+
+The ground roll at takeoff and landing, and how the wind, the weight and the
+speed change the distances of the flight manual.
+
+Entries: [Takeoff Ground Roll](#takeoff ground roll), [Landing Ground Roll](#landing ground roll), [Wind on Runway Distances](#wind on runway distances) and [Weight & Speed Corrections](#weight & speed corrections).
+
+#### Takeoff Ground Roll
+
+An estimate of the ground roll to liftoff, with the forces averaged at 70 % of
+the liftoff speed.
+
+![Takeoff roll](img/TakeoffRoll.bmp)
+
+* Main results: the stall speed `Vst`, the liftoff speed `VLO`, the average
+  resistance `Rav` and the ground roll `sLO`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in takeoff configuration, the thrust `Thr`, the
+  coefficients `CL` and `CD` during the roll, and the rolling friction `μr`.
+* `fLO` is usually 1.2, `fav` 0.7.
+
+* To calculate: `[ρa;Vst;VLO;qLO;Rav;sLO]` (Density; Stall speed; Liftoff speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², a `CLmax` of 1.6, rolling at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway. The source finds 3 247 ft, with the stall speed of 6 000 lb instead of 6 600 [2]:
+```rpl
+Wt=6600_lb Thr=1200_lbf Sw=160_ft^2 CLmax=1.6 CD=0.0388 CL=0.4 μr=0.02 DRat=1 fLO=1.2 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=87.26472 05797 knot VLO=104.71766 4696 knot qLO=871.00176 1176 Pa Rav=221.64648 lbf sLO=3 274.90985 284 ft ]
+'ROOT(ⒺTakeoff Ground Roll;[ρa;Vst;VLO;qLO;Rav;sLO];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Landing Ground Roll
+
+An estimate of the ground roll from touchdown to stop, with the brakes and
+the forces averaged at 70 % of the touchdown speed.
+
+* Main results: the stall speed `Vst`, the touchdown speed `VTD`, the average
+  resistance `Rav` and the ground roll `sLD`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in landing configuration, the coefficients `CL` and `CD`
+  during the roll, and the braking friction `μr`.
+* `fTD` is usually 1.3, `fav` 0.7. Spoilers bring `CL` near zero and put the
+  weight on the wheels.
+
+* To calculate: `[ρa;Vst;VTD;qTD;Rav;sLD]` (Density; Stall speed; Touchdown speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 5 200 lb with a wing of 160 ft², a `CLmax` of 2.1, spoilers out, braking at 0.4. The source gives 814.6 ft [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 CD=0.05 CL=0 μr=0.4 DRat=1 fTD=1.3 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot VTD=87.89458 15196 knot qTD=613.62541 9049 Pa Rav=2 182.52666 667 lbf sLD=814.85309 5344 ft ]
+'ROOT(ⒺLanding Ground Roll;[ρa;Vst;VTD;qTD;Rav;sLD];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Wind on Runway Distances
+
+A headwind shortens the takeoff and landing distances, a tailwind lengthens
+them more.
+
+* Main result: the distance `sWnd` for the headwind `HW` of Headwind &
+  Crosswind, negative for a tailwind, from the distance `s0` without wind
+  and the liftoff or touchdown speed `Vref`.
+* A headwind of 10 % of the speed shortens the distance by 19 %, a tailwind of
+  10 % lengthens it by 21 % [1, chapter 11].
+
+* To calculate: `sWnd` (Distance with wind) for a distance of 1 000 ft without wind and a tailwind of 10 kt, at a touchdown speed of 100 kt. The handbook says that 10 kt of tailwind add about 21 % [1, chapter 11], which holds at 100 kt:
+```rpl
+s0=1000_ft HW=-10_knot Vref=100_knot
+@ Expecting sWnd=1 210 ft
+'ROOT(ⒺWind on Runway Distances;sWnd;1_ft)'
+```
+
+#### Weight & Speed Corrections
+
+The takeoff distance grows with the square of the weight, the landing distance
+in proportion to it, and both with the square of the speed.
+
+* Main results: the weight factor `fW`, the speed factor `fV` and the
+  distance `sCor`, from the distance `s0` of the flight manual at the weight
+  `Wt0` and the speed `Vref`, for the weight `Wt` and the speed `Vact`.
+* Give `xW=2` for a takeoff, `xW=1` for a landing.
+* 10 % more weight at takeoff means 21 % more distance [1, chapter 11].
+
+* To calculate: `[fW;fV;sCor]` (Weight factor; Speed factor; Distance) for a landing of 1 600 ft at 70 kt, flown at 80 kt. The handbook counts 20 % more, 1 920 ft [1, chapter 11]:
+```rpl
+s0=1600_ft Wt=2400_lb Wt0=2400_lb xW=1 Vact=80_knot Vref=70_knot
+@ Expecting [ fW=1 fV=1.30612 24489 8 sCor=2 089.79591 837 ft ]
+'ROOT(ⒺWeight & Speed Corrections;[fW;fV;sCor];[1;1;1_ft])'
 ```

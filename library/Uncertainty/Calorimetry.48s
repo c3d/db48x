@@ -1,0 +1,58 @@
+«
+@@ Calorimetry — a laboratory exercise: identify a metal by its specific
+@@ heat, by the method of mixtures. A sample of mass ms, heated in boiling
+@@ water to Ts, is dropped into a calorimeter holding a mass mw of water at
+@@ Tw; the mixture settles at Tf. The equation Calorimetry, of the Labs
+@@ section of config/equations.csv:
+@@   ms·cs·(Ts − Tf) = (mw·cw + Ccal)·(Tf − Tw)
+@@ gives the specific heat cs of the sample. The data of the help page are
+@@ stored, with their uncertainties; cw is the specific heat of water of the
+@@ constants library, ⒸcpH2O, with its standard uncertainty ⓈcpH2O. σROOT
+@@ gives cs±σu, compared with copper, aluminium and iron, whose specific
+@@ heats ⒸcpCu, ⒸcpAl, ⒸcpFe also come with their uncertainties, as
+@@ σConcord does, but without its drawing. Returns cs, the p-value of each
+@@ comparison, and the metals compatible at the 5 % level.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ The measurements
+  0.1±σ0.00001_kg 'ms' Sto
+  '372.85…373.05_K' →Num 'Ts' Sto
+  0.2±σ0.00001_kg 'mw' Sto
+  ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+  '40…60_J/K' →Num 'Ccal' Sto
+  293.15±σ0.1_K 'Tw' Sto
+  296.45±σ0.1_K 'Tf' Sto
+  @ The specific heat of the sample, with its uncertainty
+  'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT 1 Get DeleteTag
+  @ The three reference metals of the constants library, value ± σ
+  ⒸcpCu →Num Dup UVAL ⓈcpCu →Num UVAL →σRange Swap →Unit
+  ⒸcpAl →Num Dup UVAL ⓈcpAl →Num UVAL →σRange Swap →Unit
+  ⒸcpFe →Num Dup UVAL ⓈcpFe →Num UVAL →σRange Swap →Unit
+  → clcs clcu clal clfe
+  «
+    @ The p-value of each comparison, as σConcord gives it, without its
+    @ drawing: d = cs − cref, σD = √(u² + uref²), z = |d|/σD, p = 2·UTPN(0,1,z)
+    clcs UVAL Range→
+    → cla clu
+    «
+      clcu UVAL Range→ → clb clv « cla clb - Abs clu Sq clv Sq + √ / » 0 1 Rot UTPN 2 *
+      clal UVAL Range→ → clb clv « cla clb - Abs clu Sq clv Sq + √ / » 0 1 Rot UTPN 2 *
+      clfe UVAL Range→ → clb clv « cla clb - Abs clu Sq clv Sq + √ / » 0 1 Rot UTPN 2 *
+    »
+    → clpcu clpal clpfe
+    «
+      clcs "cs" →Tag
+      clpcu 3 RND "p Cu" →Tag
+      clpal 3 RND "p Al" →Tag
+      clpfe 3 RND "p Fe" →Tag
+      @ The metal whose specific heat is compatible, at the 5 % level
+      ""
+      If clpcu 0.05 ≥ Then "copper " + End
+      If clpal 0.05 ≥ Then "aluminium " + End
+      If clpfe 0.05 ≥ Then "iron " + End
+      If Dup "" == Then Drop "none of the three " End
+      Dup Size 1 - 1 Swap Sub
+      "metal" →Tag
+    »
+  »
+»

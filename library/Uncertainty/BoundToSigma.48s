@@ -1,0 +1,63 @@
+«
+    @ Bound→σ: standard uncertainty from a bound (GUM Type B evaluation).
+    @ Stack: X A law P → X'±σu
+    @   X    the value read, with or without unit
+    @   A    the half-width a, or { a- a+ } for unequal bounds below and above;
+    @        for laws 7 to 0, the expanded uncertainty U at confidence p
+    @   law  1 rectangular  2 triangular  3 triangular with mode  4 U-shaped
+    @        5 beta  6 truncated normal  7 normal  8 Student  9 Rayleigh  0 log-normal
+    @   P    list of extra parameters: 3 { mode }  5 { α β }  6 { k }
+    @        7 { p }  8 { ν p }  9 { p }  0 { p }   (p = 0.95, k = 2, mode = X if omitted)
+    @ X' is the mean of the law: X itself, except for the asymmetric ones.
+    @ Every factor comes from the Probability section (…Mu, …Sx, …Q).
+    @ After Jean Wilson's ResN0→σR (2025-2026).
+    → BsX BsA BsLaw BsP
+    «
+        IF BsX TypeName "unit" == THEN BsX UVAL 1 BsX →Unit ELSE BsX 1 END
+        @ Half-widths below and above, as plain numbers in the unit of X
+        IF BsA TypeName "list" == THEN BsA 1 GET BsA 2 GET ELSE BsA BsA END
+        IF DUP TypeName "unit" == THEN BsX Convert UVAL END SWAP
+        IF DUP TypeName "unit" == THEN BsX Convert UVAL END SWAP
+        @ Confidence level for laws 7 to 0: last element of P, 0.95 by default
+        IF BsP Size 0 = BsLaw 8 = BsP Size 1 = AND OR THEN 0.95 ELSE BsP BsP Size GET END
+        → BsV BsU BsAm BsAp BsPr
+        «
+            BsV BsAm - BsV BsAp +
+            → BsLo BsHi
+            «
+                CASE
+                    BsLaw 1 = THEN BsLo BsHi ⓁUnifContMu BsLo BsHi ⓁUnifContSx END
+                    BsLaw 2 = THEN BsLo BsHi ⓁTriSymMu BsLo BsHi ⓁTriSymSx END
+                    BsLaw 3 = THEN
+                        IF BsP Size 0 = THEN BsV ELSE BsP 1 GET END
+                        IF DUP TypeName "unit" == THEN BsX Convert UVAL END
+                        → BsMo « BsLo BsHi BsMo ⓁTriAsymMu BsLo BsHi BsMo ⓁTriAsymSx »
+                    END
+                    BsLaw 4 = THEN BsLo BsHi ⓁUShapeMu BsLo BsHi ⓁUShapeSx END
+                    BsLaw 5 = THEN
+                        BsP 1 GET BsP 2 GET → BsAl BsBe
+                        « BsLo BsHi BsLo - BsAl BsBe ⓁBetaMu × +
+                          BsHi BsLo - BsAl BsBe ⓁBetaSx × »
+                    END
+                    BsLaw 6 = THEN
+                        IF BsP Size 0 = THEN 2 ELSE BsP 1 GET END
+                        BsHi BsLo - 2 ÷ SWAP ÷ → BsSg
+                        « BsV BsSg BsLo BsHi ⓁNormTruncMu BsV BsSg BsLo BsHi ⓁNormTruncSx »
+                    END
+                    @ Laws 7 and 8: a two-sided interval ±U holding the probability p
+                    BsLaw 7 = THEN BsV BsAp 0 1 1 BsPr + 2 ÷ ⓁNormlQ ÷ END
+                    BsLaw 8 = THEN BsV BsAp BsP 1 GET 1 BsPr + 2 ÷ ⓁStudentQ ÷ END
+                    @ Laws 9 and 0: X + U is the quantile p, one-sided
+                    BsLaw 9 = THEN BsV BsAp 1 BsPr ⓁRayleighQ ÷ 1 ⓁRayleighSx × END
+                    BsLaw 0 = THEN
+                        IF BsV 0 ≤ THEN "Bound→σ: a log-normal value must be positive" DoError END
+                        BsV BsAp + BsV ÷ LN 0 1 BsPr ⓁNormlQ ÷ → BsSl
+                        « BsV 0 BsSl ⓁLgNrmMu × BsV 0 BsSl ⓁLgNrmSx × »
+                    END
+                    "Bound→σ: law must be 0 to 9" DoError
+                END
+                →σRange BsU ×
+            »
+        »
+    »
+»

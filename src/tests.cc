@@ -2402,6 +2402,16 @@ void tests::global_variables()
     step("Cleanup")
         .test(CLEAR, "'Foo' Purge", ENTER).noerror();
 
+    step("Purge a list while the enclosing directory size header shrinks")
+        .test(CLEAR,
+              "« 0 100 140 FOR n "
+              "'P' CRDIR P 'Q' CRDIR Q "
+              "\"\" 1 n START \"x\" + NEXT 'A' STO 1 'B' STO "
+              "{ A B } PURGE variables SIZE + "
+              "UPDIR UPDIR 'P' PGDIR "
+              "NEXT » EVAL", LENGTHY(5000), ENTER)
+        .expect("0");
+
     step("Make sure elements are cloned when purging (#854)")
         .test(CLEAR, "{ 11 23 34 44 } 'X' Sto", ENTER).noerror()
         .test("X", ENTER).expect("{ 11 23 34 44 }")
@@ -6768,6 +6778,14 @@ void tests::uncertain_operations()
         .test(CLEAR, "2±σ3", NOSHIFT, ID_inv).expect("¹/₂±σ0.75");
     step("Negate uncertain numbers")
         .test(CLEAR, "1±σ3", ENTER, ID_neg).expect("-1±σ3");
+    step("Square and cube of uncertain numbers go through the derivative")
+        .test(CLEAR, "2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
+        .test(CLEAR, "-2±σ0.05", ENTER, ID_sq).expect("4±σ0.2")
+        .test(CLEAR, "0.5±σ2", ENTER, ID_sq).expect("0.25±σ2.")
+        .test(CLEAR, "2±σ0.05", ENTER, ID_cubed).expect("8±σ0.6");
+    step("Exact integer power of a negative uncertain number")
+        .test(CLEAR, "-2±σ0.05 2", NOSHIFT, ID_pow).expect("4±σ0.2")
+        .test(CLEAR, "-2±σ0.05 3", NOSHIFT, ID_pow).expect("-8±σ0.6");
 
     step("Add uncertain numbers with promotion")
         .test(CLEAR, "1±σ3 5", NOSHIFT, ADD).expect("6±σ3.");
@@ -6921,6 +6939,14 @@ void tests::units_and_conversions()
         .test(CLEAR, "1_kg", ENTER)
         .type(ID_unit)
         .expect("1 kg");
+    step("Watt-hour and kilowatt-hour are units of energy")
+        .test(CLEAR, "1_kWh 1_J CONVERT", ENTER)
+        .type(ID_unit)
+        .expect("3 600 000 J");
+    step("Kilowatt-hour over kilowatt is a time")
+        .test(CLEAR, "60_kWh 40_kW / 1_h CONVERT", ENTER)
+        .type(ID_unit)
+        .expect("1 ¹/₂ h");
     step("Unit symbol from unit menu")
         .test(CLEAR, SHIFT, KEY5, KEY1, F1, LOWERCASE, M, S, ENTER)
         .type(ID_unit)
@@ -15007,7 +15033,7 @@ void tests::library()
 
 
     step("Math: Collatz conjecture benchmark")
-        .test(CLEAR, RSHIFT, H, F4, LENGTHY(5000), F1, ENTER, SWAP)
+        .test(CLEAR, RSHIFT, H, F5, LENGTHY(5000), F1, ENTER, SWAP)
         .expect("1")
         .test(BSP)
         .match("duration:[1-9].*ms");

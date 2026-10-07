@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  LogisPDF
+  @  Density (or mass) at X.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 3; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 3 ≠ THEN "LogisPDF: needs 3 arguments" DoError END Explode Drop END
+  → μv sv Xv « μv 0 + sv 0 + Xv 0 + → μ s X « 'EXP(-(X-μ)/s)/(s*((1+EXP(-(X-μ)/s))^2))' →Num μv sv Xv 3 →List Drop » »
+»

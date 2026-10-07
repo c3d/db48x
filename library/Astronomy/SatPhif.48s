@@ -1,0 +1,17 @@
+«
+@@ ============================================================
+@@ ♄Φf — mean orbital elements of Saturn (Standish/JPL, 1800-2050)
+@@ T=(JD-2451545)/36525. L not reduced. a in au, angles in °, e dimensionless.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [a e I L ϖ Ω] )
+@@ Output : [a e I L ϖ Ω]
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♄Φf -> [ 9.53641895 0.05375701 2.48638972 301.163714 92.51278398 113.6031042 ]
+@@ ============================================================
+ → JD « JD Uval 2451545 - 36525 / → T
+  « '9.53667594-0.00125060·T' EVAL '0.05386179-0.00050991·T' EVAL '2.48599187+0.00193609·T' EVAL
+    '49.95424423+1222.49362201·T' EVAL '92.59887831-0.41897216·T' EVAL '113.66242448-0.28867794·T' EVAL
+    6 →ARRY » » 
+»

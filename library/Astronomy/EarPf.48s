@@ -1,0 +1,14 @@
+«
+@@ ============================================================
+@@ ♁Pf — Earth position function (element function composed with PosΦf)
+@@ One call maps a date to a heliocentric [x y z]. Feed to transfer functions.
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@
+@@ Input  : JD   ( JD -- [x y z] )
+@@ Output : [x y z] in au
+@@ VALIDATION (device-confirmed):
+@@   2459050.5 ♁Pf -> [ 0.468733637 -0.901591683 0.000042104 ]
+@@ ============================================================
+ → JD « JD Ⓛ♁Φf ⓁPosΦf » 
+»

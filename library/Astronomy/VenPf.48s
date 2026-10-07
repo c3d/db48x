@@ -1,0 +1,6 @@
+«
+@@ ♀Pf — Venus heliocentric position [x y z] (au) from a Julian Day
+@@ Author & design: Jean Wilson · Programming: Claude & Claude Code
+@@ Input : JD  ( JD -- [x y z] )
+ → JD « JD Ⓛ♀Φf ⓁPosΦf »
+»

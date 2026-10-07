@@ -1,0 +1,304 @@
+«
+@@ ============================================================
+@@ MCPropagate — propagation of uncertainty by the Monte Carlo
+@@ method (GUM Supplement 1, JCGM 101:2008).
+@@
+@@ Input:  F Vars Vals M, or F Vars Vals for M = 2000
+@@   F     the model: an expression of the names in Vars, or a
+@@         program that takes one value per input from the stack;
+@@   Vars  the list of the input names, e.g. { a b };
+@@   Vals  the list of the inputs, in the same order. The type of
+@@         each one tells its distribution:
+@@           10±σ1    normal, mean 10, standard deviation 1;
+@@           9…11     rectangular between 9 and 11 (also 10±1
+@@                    and 10±10%);
+@@           « … »    a program that returns one draw, for instance
+@@                    « 10 1 ⓁLgNrmRand », for any distribution;
+@@           10       an exact value.
+@@         Inputs may carry units.
+@@   M     the number of draws, 2000 when omitted; 0 lets the program stop by itself
+@@         when the result is stable to two significant digits of
+@@         the uncertainty, after at most 20 000 draws or one minute.
+@@ Output: the number of draws used, tagged "N";
+@@         the 95 % coverage interval, probabilistically symmetric
+@@         (2.5 % of the draws on each side), tagged "95%";
+@@         the mean and standard deviation of the draws, Y±σu.
+@@ Correlations: none, unless a global variable ρij holds one
+@@ coefficient for all the pairs or the full correlation matrix, in
+@@ the order of Vals, as for σRFxjxi. Normal inputs are then
+@@ correlated exactly (Cholesky factor of ρij), inputs given by
+@@ bounds through a Gaussian copula; a program input cannot be.
+@@ Method: a program specialized for
+@@ the model is compiled once, then run by batches. The normal
+@@ draws use the polar method, which needs no angle mode.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+@@ ============================================================
+
+  @ M omitted: the list of the inputs is on the first level
+  If Dup TypeName "list" == Then 2000 End
+  "" "" { }
+  → mdl vn vl ndr dcl drw prm
+  «
+    @ One declaration, one draw recipe and three parameters per input
+    1 vl Size For i
+      vl i Get 0
+      → v un
+      «
+        If 'v' Rcl TypeName "unit" == Then
+          1 v →Unit 'un' Store
+          v UVal 'v' Store
+        End
+        'v' Rcl TypeName i →Text
+        → tn ix
+        «
+          dcl " mcA" + ix + " mcB" + ix + " mcU" + ix + 'dcl' Store
+          Case
+            tn "uncertain" == Then
+              v Explode
+              drw " 0 0 2 Do Drop Drop Drop Rand 2 * 1 - Rand 2 * 1 - Dup2 Sq Swap Sq + Until Dup 1 < Over 0 > And End Dup Ln -2 * Swap / √ Swap Drop * mcB" +
+              ix + " * mcA" + ix + " +" + 'drw' Store
+            End
+            tn "range" == Then
+              v Explode Over -
+              drw " Rand mcB" + ix + " * mcA" + ix + " +" + 'drw' Store
+            End
+            tn "drange" == Then
+              v Explode → cv dv « cv dv - 2 dv * »
+              drw " Rand mcB" + ix + " * mcA" + ix + " +" + 'drw' Store
+            End
+            tn "prange" == Then
+              v Explode → cv pv « cv Abs pv * 100 / → dv « cv dv - 2 dv * » »
+              drw " Rand mcB" + ix + " * mcA" + ix + " +" + 'drw' Store
+            End
+            tn "program" == Then
+              'v' Rcl 0
+              drw " mcA" + ix + 'drw' Store
+            End
+            v 0
+            drw " mcA" + ix + 'drw' Store
+          End
+          If un TypeName "unit" == Then
+            drw " mcU" + ix + " *" + 'drw' Store
+          End
+          2 →List prm Swap + un + 'prm' Store
+        »
+      »
+    Next
+
+    @ Correlations: a global variable ρij, as for σRFxjxi, holds one
+    @ coefficient for all the pairs or the full correlation matrix. Then
+    @ each draw takes n independent normal variates z, forms w = L·z with
+    @ L the Cholesky factor of ρij, and gives a±σb inputs a + b·wᵢ and
+    @ bounded inputs a + (b − a)·Φ(wᵢ) (Gaussian copula)
+    IfErr 'ρij' Rcl Then Drop 0 End
+    vl Size
+    → mcr nvi
+    «
+      @ A matrix always counts; a number only when it is not 0 (the
+      @ absolute value of a matrix is not a number on every version)
+      mcr TypeName "array" ==
+      If Dup Not Then Drop mcr 0 ≠ End
+      If nvi 1 > And Then
+        @ The full matrix, from one coefficient if needed
+        If mcr TypeName "array" == Then
+          If mcr Size 1 Get nvi ≠ Then
+            "MCPropagate: the size of ρij differs from the number of inputs" DoError
+          End
+          1 nvi For iq 1 nvi For kc
+            If mcr { } iq + kc + Get mcr { } kc + iq + Get - Abs 1E-9 > Then
+              "MCPropagate: ρij is not symmetric" DoError
+            End
+          Next Next
+          mcr
+        Else
+          If mcr 1 > mcr -1 nvi 1 - / 1E-12 - < Or Then
+            "MCPropagate: ρij is outside −1/(n−1)…1 for n inputs" DoError
+          End
+          { } nvi + nvi + mcr Con
+          1 nvi For iq { } iq + iq + 1 Put Next
+        End
+        → rmx
+        «
+          @ An input given by a program draws by itself: it cannot be correlated
+          1 nvi For iq
+            vl iq Get
+            If Dup TypeName "unit" == Then UVal End
+            If TypeName "program" == Then
+              1 nvi For kc
+                If kc iq ≠ Then
+                  If rmx { } iq + kc + Get Abs 1E-12 > Then
+                    "MCPropagate: a correlated input must be a±σb or bounds" DoError
+                  End
+                End
+              Next
+            End
+          Next
+          @ Cholesky factor L of ρij; a negative pivot means that some
+          @ combination of the inputs would have a negative variance
+          { } nvi + nvi + 0 Con
+          → chl
+          «
+            1 nvi For j
+              rmx { } j + j + Get
+              If j 1 > Then 1 j 1 - For kc chl { } j + kc + Get Sq - Next End
+              If Dup -1E-9 < Then "MCPropagate: ρij is not a valid correlation matrix" DoError End
+              0 Max √
+              → ljj
+              «
+                chl { } j + j + ljj Put 'chl' Store
+                If j nvi < Then
+                  j 1 + nvi For iq
+                    rmx { } iq + j + Get
+                    If j 1 > Then
+                      1 j 1 - For kc chl { } iq + kc + Get chl { } j + kc + Get * - Next
+                    End
+                    If ljj 1E-9 > Then
+                      ljj / chl { } iq + j + 3 Roll Put 'chl' Store
+                    Else
+                      If Abs 1E-9 > Then "MCPropagate: ρij is not a valid correlation matrix" DoError End
+                    End
+                  Next
+                End
+              »
+            Next
+            @ The draw recipe, rebuilt: n normal variates, w = L·z, then each input
+            ""
+            1 nvi For iq
+              " 0 0 2 Do Drop Drop Drop Rand 2 * 1 - Rand 2 * 1 - Dup2 Sq Swap Sq + Until Dup 1 < Over 0 > And End Dup Ln -2 * Swap / √ Swap Drop *" +
+            Next
+            " " + nvi →Text + " →Array mcL Swap * → mcZ «" +
+            1 nvi For iq
+              iq →Text
+              vl iq Get
+              → ix vq
+              «
+                vq If Dup TypeName "unit" == Then UVal End TypeName
+                → tq
+                «
+                  Case
+                    tq "uncertain" == Then
+                      " mcZ " + ix + " Get mcB" + ix + " * mcA" + ix + " +" +
+                    End
+                    tq "range" == tq "drange" == Or tq "prange" == Or Then
+                      " 0 1 mcZ " + ix + " Get UTPN Neg 1 + mcB" + ix + " * mcA" + ix + " +" +
+                    End
+                    " mcA" + ix +
+                  End
+                  If vq TypeName "unit" == Then " mcU" + ix + " *" + End
+                »
+              »
+            Next
+            " »" + 'drw' Store
+            dcl " mcL" + 'dcl' Store
+            prm chl 1 →List + 'prm' Store
+          »
+        »
+      End
+    »
+
+    @ The evaluation of the model on one set of draws
+    If 'mdl' Rcl TypeName "program" == Then
+      " mcF"
+    Else
+      vn →Text Dup Size 2 - 3 Swap Sub
+      @ The text of the model, to compile it with the inputs as local
+      @ variables: the fast path. A constant loses its marker in the text;
+      @ when the text does not read back as the model, substitute instead
+      'mdl' Rcl →Text 0
+      → nms tx okf
+      «
+        IfErr tx Compile 'mdl' Rcl Same 'okf' Store Then End
+        If okf Then
+          " → " nms + " « " + tx + " →Num »" +
+        Else
+          " " vn Size →Text + " →List → mcV « mcF { } 1 " + vn Size →Text +
+          " For mcI mcW mcI Get + mcV mcI Get + Next Where →Num »" +
+        End
+      »
+    End
+    → ev
+    «
+      @ A first compiled program without unit conversion, for one probe
+      "« →" dcl + " mcF mcW mcY mcN « 1 mcN Start" + drw + ev + " Next » »" + Compile
+      → pg0
+      «
+        prm List→ Drop 'mdl' Rcl vn 1 1 pg0
+        → y0
+        «
+          If y0 TypeName → tn « tn "expression" == tn "symbol" == Or » Then
+            "MCPropagate: the model does not give a number" DoError
+          End
+          0 'pg0' Rcl
+          If y0 TypeName "unit" == Then
+            Drop Drop
+            1 y0 →Unit
+            "« →" dcl + " mcF mcW mcY mcN « 1 mcN Start" + drw + ev + " mcY Convert UVal Next » »" + Compile
+          End
+          { } 0 0 0 0  0 0 0 0
+          y0 If Dup TypeName "unit" == Then UVal End
+          Ticks
+          → yu pg all nn ymn sdv done s1 s2 s3 s4 yrf tk0
+          «
+            Do
+              If ndr 0 > Then ndr nn - 500 Min Else 500 End
+              → nb
+              «
+                prm List→ Drop 'mdl' Rcl vn yu nb pg
+                nb →List
+                Dup all Swap + 'all' Store
+                @ Running sums of the powers of the draws, less a reference
+                « yrf - » Map
+                → dl
+                «
+                  dl ΣList 's1' Store+
+                  dl « Sq » Map ΣList 's2' Store+
+                  dl « Dup Sq * » Map ΣList 's3' Store+
+                  dl « Sq Sq » Map ΣList 's4' Store+
+                »
+                nn nb + 'nn' Store
+              »
+              s1 nn / yrf + 'ymn' Store
+              If nn 1 > Then
+                s2 s1 Sq nn / - nn 1 - / 0 Max √ 'sdv' Store
+              End
+              If ndr 0 > Then
+                If nn ndr ≥ Then 1 'done' Store End
+              Else
+                If sdv 0 == nn 20000 ≥ Or Ticks tk0 - 60000 > Or Then
+                  1 'done' Store
+                Else
+                  If nn 1000 ≥ Then
+                    @ Kurtosis from the running sums, on the stack only
+                    s4 nn / s1 nn / 4 * s3 * nn / - s1 nn / Sq 6 * s2 * nn / + s1 nn / Sq Sq 3 * -
+                    s2 nn / s1 nn / Sq - Sq /
+                    @ Standard errors of the mean and of the standard deviation;
+                    @ no local block here: one inside this loop corrupts objects
+                    @ when memory is short
+                    1 - 4 nn * / √ sdv *
+                    sdv nn √ / Max 2 *
+                    0.5 10 sdv Log10 Floor 1 - ^ *
+                    If ≤ Then 1 'done' Store End
+                  End
+                End
+              End
+            Until done End
+
+            all Sort
+            → srt
+            «
+              nn "N" →Tag
+              srt 0.025 nn * 0.5 + IP 1 Max Get
+              srt 0.975 nn * 0.5 + IP nn Min Get
+              →Range
+              If yu TypeName "unit" == Then yu →Unit End
+              "95%" →Tag
+              ymn sdv →σRange
+              If yu TypeName "unit" == Then yu →Unit End
+            »
+          »
+        »
+      »
+    »
+  »
+»

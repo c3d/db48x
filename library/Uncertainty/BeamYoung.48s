@@ -1,0 +1,37 @@
+«
+@@ BeamYoung — a laboratory exercise of strength of materials: the Young's
+@@ modulus E of a flat bar, from its deflection. The bar rests on two
+@@ supports L apart and carries a mass m at mid-span; a dial gauge reads the
+@@ deflection δ. The equations BeamYoung, of the Labs section of
+@@ config/equations.csv:
+@@   δ = m·g·L³/(48·E·I)      I = b·h³/12   (rectangular section b × h)
+@@ The data of the help page are stored, with their uncertainties; g comes
+@@ from the constants library. ΔROOT gives the range of E, compared with the
+@@ usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses
+@@ 97…125 GPa, carbon steels 190…215 GPa, a material being compatible when
+@@ the two ranges meet. Returns E±σ by σROOT, the range of E by ΔROOT, and
+@@ the compatible materials.
+@@ Author & design          : Jean Wilson
+@@ Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @ The measurements
+  '500±0.5_mm' →Num 'L' Sto
+  25±σ0.02_mm 'b' Sto
+  3±σ0.02_mm 'h' Sto
+  0.5±σ0.001_kg 'm' Sto
+  3.29±σ0.01_mm 'δ' Sto
+  @ E with its standard uncertainty, then its range
+  'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT 1 Get
+  'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT 1 Get
+  Dup DeleteTag UVAL Range→
+  → bylo byhi
+  «
+    @ A material is compatible when its range meets that of E
+    ""
+    If bylo 72 ≤ byhi 68 ≥ And Then "aluminium " + End
+    If bylo 125 ≤ byhi 97 ≥ And Then "brass " + End
+    If bylo 215 ≤ byhi 190 ≥ And Then "steel " + End
+    If Dup "" == Then Drop "none of the three " End
+    Dup Size 1 - 1 Swap Sub
+    "material" →Tag
+  »
+»

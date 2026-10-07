@@ -2,3 +2,9 @@
 
 "RelativityMassEnergy",         "'(E_J)=(m_kg)*Ⓒc^2'"
 "IdealGas",                     "'(P_Pa)*(V_m^3)=(n_mol)*ⒸR*(T_K)'"
+
+"Labs"
+
+"Calorimetry",                  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"
+"WeakAcid",                     "{ 'C=C0*(V1_mL)/(V2_mL)' '10^(-pH)=C*10^(-pKa)/(10^(-pKa)+10^(-pH))+10^(-pKw)/10^(-pH)' }"
+"BeamYoung",                    "{ '(δ_mm)=(m_kg)*Ⓒg*(L_mm)^3/(48*(E_GPa)*(I_mm^4))' '(I_mm^4)=(b_mm)*(h_mm)^3/12' }"

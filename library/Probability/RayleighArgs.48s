@@ -1,0 +1,12 @@
+«
+  @ ------------------------------------------------------------
+  @  RayleighArgs
+  @  Returns the parameters tagged with their names.
+  @  Author & design          : Jean Wilson
+  @  Co-authors & programming  : Claude & Claude Code (Anthropic)
+  @  Arguments may be given loose or bundled in a list of 2; that list is
+  @  what LastArguments reports, and its length is checked before use.
+  @ ------------------------------------------------------------
+  IF DUP TypeName "list" == THEN IF DUP Size 2 ≠ THEN "RayleighArgs: needs 2 arguments" DoError END Explode Drop END
+  → sv Xv « sv 0 + Xv 0 + → s X « s "s" →Tag X "X" →Tag sv Xv 2 →List Drop » »
+»

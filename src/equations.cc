@@ -1400,9 +1400,1379 @@ static const cstring basic_equations[] =
     "TVMBeg", "'(1+I%Yr/(100*PYr))*(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
     "TVMEnd", "'(100*PYr)/I%Yr*Pmt*(1-(1+I%Yr/(100*PYr))^(-n))+FV*(1+I%Yr/(100*PYr))^(-n)+PV'",
 
+    // ------------------------------------------------------------------------
+    "Rocketry", nullptr,
+    // ------------------------------------------------------------------------
+    //T#*: 34 simulations (ROOT), 140 equations, 111 variables, 16 figures
+    //1a.
+    "Thrust",  "{ "
+    "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_kPa)-(Pa_kPa))·(Ae_m↑2)' "
+    "}",
+    //1b.
+    "Rocket ΔV",  "{ "
+    "  'ΔV=(Ve_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(Δt_s)))' "
+    "}",
+    //2.
+    "Tsiolkovsky & Propellant Mass",  "{ "
+    "  'Mf=(Mo_kg)·exp(-(ΔV_m/s)/(C_m/s))' "
+    "  'Mp=(Mo_kg)-(Mf_kg)' "
+    "}",
+    //3.
+    "Burn Duration",  "{ "
+    "  'ΔV=(C_m/s)·ln((Mo_kg)/((Mo_kg)-(Q_kg/s)·(Δt_s)))' "
+    "  'ΔV=(Vf_m/s)-(Vi_m/s)' "
+    "}",
+    //4.
+    "Rocket Engine Exhaust Velocity",  "{ "
+    "  'Ve=SQRT((2·k/(k-1))·(ⒸR·(Tc_K)/(M_(g/mol)))·(1-((Pe_atm)/(Pc_atm))↑((k-1)/k)))' "
+    "}",
+    //5.
+    "Rocket Engine Specific Impulse",  "{ "
+    "  'Isp=(Fnet_N)/((Q_kg/s)·Ⓒg)' "
+    "}",
+    //6.
+    "Exhaust Nozzle Throat Parameters",  "{ "
+    "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
+    "  'Tt=(Tc_K)/(1+(k-1)/2)' "
+    "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
+    "}",
+    //7.
+    "Exhaust Nozzle Characteristic Velocity",  "{ "
+    "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
+    "  'Tt=(Tc_K)/(1+(k-1)/2)' "
+    "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
+    "  'Cstar=(Pc_MPa)·(At_m↑2)/(Q_kg/s)' "
+    "}",
+    //8.
+    "Nozzle Mach number & Optimal Exit Area",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //9.
+    "Optimised Third Stage Rocket Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //10.
+    "Optimised First Stage Rocket Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //11.
+    "Optimised Second Stage Rocket Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♁StdAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //12.
+    "Unrealistic Nozzle Optimised for Mars",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♂DayAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //13.
+    "Mars Day Time Optimized Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♂DayAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //14.
+    "Mars Night Time Optimized Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♂NightAtm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //15.
+    "Venus First stage Optimized Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♀Atm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //16.
+    "Venus Second Stage Optimized Nozzle",  "{ "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'AeAt=(Ae_m↑2)/(At_m↑2)' "
+    "  'Pa=ⓁP♀Atm(H_m)' "
+    "  'Pe=Pa_MPa' "
+    "}",
+    //17.
+    "Properly Adapted Conic Nozzle",  "{ "
+    "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
+    "  'Tt=(Tc_K)/(1+(k-1)/2)' "
+    "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'Ve=SQRT((2·k/(k-1))·(ⒸR·(Tc_K)/(M_(g/mol)))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))' "
+    "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
+    "}",
+    //18.
+    "Under Extended Conic Nozzle",  "{ "
+    "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
+    "  'Tt=(Tc_K)/(1+(k-1)/2)' "
+    "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'Ve=SQRT((2·k/(k-1))·(ⒸR·(Tc_K)/(M_(g/mol)))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))' "
+    "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
+    "}",
+    //19.
+    "Over Extended Conic Nozzle",  "{ "
+    "  'Pt=(Pc_MPa)·(1+(k-1)/2)↑(-k/(k-1))' "
+    "  'Tt=(Tc_K)/(1+(k-1)/2)' "
+    "  'At=((Q_kg/s)/(Pt_MPa))·SQRT((ⒸR·(Tt_K))/((M_(g/mol))·k))' "
+    "  'Nm=SQRT((2/(k-1))·(((Pc_MPa)/(Pe_MPa))↑((k-1)/k)-1))' "
+    "  'Ae=((At_m↑2)/Nm)·((1+(k-1)/2·Nm↑2)/((k+1)/2))↑((k+1)/(2·(k-1)))' "
+    "  'Ve=SQRT((2·k/(k-1))·(ⒸR·(Tc_K)/(M_(g/mol)))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))' "
+    "  'Fnet=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
+    "}",
+    //20.
+    "Characteristic Nozzle Geometry",  "{ "
+    "  'Dt=2·SQRT((At_cm↑2)/Ⓒπ)' "
+    "  'Vc=(At_cm↑2)·(Lstar_cm)' "
+    "  'Lc=(1_cm)·(exp(0.029·(ln((Dt_cm)/(1_cm)))²+0.47·ln((Dt_cm)/(1_cm))+1.94))' "
+    "  'Dc=SQRT(((Dt_m)³+24/Ⓒπ·tan(θ_°)·(Vc_cm³))/((Dc_m)+6·tan(θ_°)·(Lc_cm)))' "
+    "  'Ac=Ⓒπ·((Dc_cm)/2)↑2' "
+    "  'CtnRatio=(Ac_cm²)/(At_cm²)' "
+    "}",
+    //21.
+    "Solid Rocket Burn Rate",  "{ "
+    "  'Ab=Ⓒπ·(L_m)·(D_m)' "
+    "  'r=(1_mm/s)·a·((Pc_Pa)/(1_Pa))↑n' "
+    "  'Qs=(ρp_g/ml)·(Ab_m²)·(r_mm/s)' "
+    "}",
+    //22.
+    "Solid Rocket Propellant Ideal Density",  "{ "
+    "  'ρp=1/(wAl/(ρAl_g/ml)+wAP/(ρAP_g/ml)+wHTPB/(ρHTPB_g/ml))' "
+    "}",
+    //23.
+    "Multi Stages Rocket ΔV",  "{ "
+    "  'C1=(Isp1_s)·Ⓒg' "
+    "  'C2=(Isp2_s)·Ⓒg' "
+    "  'Mo1=Mp1_kg+Md1_kg+Mp2_kg+Md2_kg+Mpl_kg' "
+    "  'Mf1=Md1_kg+Mp2_kg+Md2_kg+Mpl_kg' "
+    "  'Mo2=Mp2_kg+Md2_kg+Mpl_kg' "
+    "  'Mf2=Md2_kg+Mpl_kg' "
+    "  'Mo=Mo1_kg+Mo2_kg' "
+    "  'MplMo=(Mpl_kg)/(Mo_kg)' "
+    "  'ΔV1=(C1_m/s)·ln((Mo1_kg)/(Mf1_kg))' "
+    "  'ΔV2=(C2_m/s)·ln((Mo2_kg)/(Mf2_kg))' "
+    "  'ΔVtot=ΔV1_m/s+ΔV2_m/s' "
+    "}",
+
+// --- Complementary 9 (R25–R33) ---
+    //A-1.
+    "Conical Nozzle Divergence Loss",  "{ "
+    "  'λ=(1+cos(α_°))/2' "
+    "  'Fnet=λ·(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
+    "}",
+    //A-2.
+    "Bell Nozzle Contour",  "{ "
+    "  'At=Ⓒπ·(Rt_cm)↑2' "
+    "  'Ae=ε·(At_cm↑2)' "
+    "  'Rex=SQRT((Ae_cm↑2)/Ⓒπ)' "
+    "  'Rarc=0.382·(Rt_cm)' "
+    "  'Lnz=Li·(SQRT(ε)-1)·(Rt_cm)/tan(15_°)' "
+    "}",
+    //A-3.
+    "Combustion Chamber Stay Time",  "{ "
+    "  'V=ⒸR·(Tc_K)/((Pc_Pa)·(M_(g/mol)))' "
+    "  'Vc=(Lstar_m)·(At_m↑2)' "
+    "  'ts=(Vc_m↑3)/((V_m↑3/kg)·(Q_kg/s))' "
+    "}",
+    //B-1.
+    "Thrust Coefficient",  "{ "
+    "  'Cfx=SQRT((2·k↑2/(k-1))·(2/(k+1))↑((k+1)/(k-1))·(1-((Pe_MPa)/(Pc_MPa))↑((k-1)/k)))+((Pe_MPa)-(Pa_MPa))/(Pc_MPa)·(Ae_m↑2)/(At_m↑2)' "
+    "  'Cstar=(Pc_MPa)·(At_m↑2)/(Q_kg/s)' "
+    "  'Isp=(Pc_MPa)·(At_m↑2)/((Q_kg/s)·Ⓒg)·Cfx' "
+    "  'Fnet=(Pc_MPa)·(At_m↑2)·Cfx' "
+    "}",
+    //B-2.
+    "Total Impulse",  "{ "
+    "  'It=(Isp_s)·Ⓒg·(Mp_kg)' "
+    "  'Fnet=(It_N·s)/(Δt_s)' "
+    "}",
+    //B-3.
+    "Vertical Ascent with Gravity Loss",  "{ "
+    "  'C=(Isp_s)·Ⓒg' "
+    "  'Mf=(Mo_kg)-(Mp_kg)' "
+    "  'Δt=(Mp_kg)/(Q_kg/s)' "
+    "  'Vbo=(C_m/s)·ln((Mo_kg)/(Mf_kg))-Ⓒg·(Δt_s)' "
+    "}",
+    //B-4.
+    "Optimal Staging",  "{ "
+    "  'C=(Isp_s)·Ⓒg' "
+    "  'ΔV1=(ΔVtot_m/s)/n' "
+    "  'MR=exp((ΔV1_m/s)/(C_m/s))' "
+    "}",
+    //C-1.
+    "Sea level vs Vacuum Thrust",  "{ "
+    "  'Fsl=(Q_kg/s)·(Ve_m/s)+((Pe_MPa)-(Pa_MPa))·(Ae_m↑2)' "
+    "  'Fvac=(Q_kg/s)·(Ve_m/s)+(Pe_MPa)·(Ae_m↑2)' "
+    "  'ΔF=(Pa_MPa)·(Ae_m↑2)' "
+    "}",
+    //C-2.  (Earth shown; swap ⒸGM♁/ⒸReq♁ → ♂ or ♀ for Mars/Venus)
+    "Multi Planet Launch ΔV",  "{ "
+    "  'rorb=(ⒸReq♁)+(horb_km)' "
+    "  'Vcirc=SQRT(ⒸGM♁/(rorb_km))' "
+    "  'Vesc=SQRT(2·ⒸGM♁/(rorb_km))' "
+    "  'gsurf=ⒸGM♁/(ⒸReq♁)↑2' "
+    "}",
+    //C-3.  (ogive nose shown; for a conical nose use 'XN=0.666·(LNose_mm)')
+    "Barrowman Method",  "{ "
+    "  'XN=0.466·(LNose_mm)' "
+    "  'CNN=2' "
+    "  'CNT=2·(((dR_mm)/(dN_mm))↑2-((dF_mm)/(dN_mm))↑2)' "
+    "  'XT=(XP_mm)+(LT_mm)/3·(1+(1-(dF_mm)/(dR_mm))/(1-((dF_mm)/(dR_mm))↑2))' "
+    "  'CNF=(1+(RB_mm)/((SFs_mm)+(RB_mm)))·(4·NF·((SFs_mm)/(dN_mm))↑2/(1+SQRT(1+(2·(LF_mm)/((CR_mm)+(CT_mm)))↑2)))' "
+    "  'XF=(XB_mm)+(XR_mm)/3·((CR_mm)+2·(CT_mm))/((CR_mm)+(CT_mm))+1/6·((CR_mm)+(CT_mm)-(CR_mm)·(CT_mm)/((CR_mm)+(CT_mm)))' "
+    "  'CNR=CNN+CNT+CNF' "
+    "  'XCP=(CNN·(XN_mm)+CNT·(XT_mm)+CNF·(XF_mm))/CNR' "
+    "}",
+    "Astronautics", nullptr,
+    "Astronautics/Geocentric", nullptr,
+    "Astronautics/Geocentric/Stationary", nullptr,
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    //1.
+    "Circular Orbit",  "{ "
+    "  'v=SQRT(ⒸGM♁/((ⒸReq♁)+(H_km)))' "
+    "  'P=2·Ⓒπ·SQRT(((ⒸReq♁)+(H_km))↑3/ⒸGM♁)' "
+    "}",
+    //2.
+    "Geosynchronous Orbit",  "{ "
+    "  'r=(ⒸGM♁·(P_s)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'H=(r_km)-(ⒸReq♁)' "
+    "  'v=SQRT(ⒸGM♁/(r_km))' "
+    "}",
+    //3.
+    "Elliptic Orbit Velocities",  "{ "
+    "  'Rp=(ⒸReq♁)+(Hp_km)' "
+    "  'Ra=(ⒸReq♁)+(Ha_km)' "
+    "  'Vp=SQRT(2·ⒸGM♁·(Ra_km)/((Rp_km)·((Ra_km)+(Rp_km))))' "
+    "  'Va=SQRT(2·ⒸGM♁·(Rp_km)/((Ra_km)·((Ra_km)+(Rp_km))))' "
+    "}",
+    //4.
+    "Elliptic Orbit from Perigee State",  "{ "
+    "  'Rp=(ⒸReq♁)+(Hp_km)' "
+    "  'Vc=SQRT(ⒸGM♁/(Rp_km))' "
+    "  'a=ⒸGM♁/(2·(Vc_m/s)↑2-(Vp_m/s)↑2)' "
+    "  'Ra=2·(a_km)-(Rp_km)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "  'ecc=((Ra_km)-(Rp_km))/((Ra_km)+(Rp_km))' "
+    "}",
+    //5.
+    "Elliptic Orbit Apsides",  "{ "
+    "  'Rp=(a_km)·(1-ecc)' "
+    "  'Ra=(a_km)·(1+ecc)' "
+    "  'Hp=(Rp_km)-(ⒸReq♁)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "}",
+    //6.
+    "Escape Velocity",  "{ "
+    "  'Vesc=SQRT(2·ⒸGM♁/((ⒸReq♁)+(H_km)))' "
+    "}",
+    //7.
+    "Earth’s Sphere Of Influence",  "{ "
+    "  'Rsoi=(Ⓒa♁)·(ⒸGM♁/ⒸGM☉)↑(2/5)' "
+    "}",
+
+    //8.
+    "Launch to Orbit",  "{ "
+    "  'r1=(ⒸReq♁)+(H1_km)' "
+    "  'Vc1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'C=2·((Vc1_m/s)/(v1_m/s))↑2' "
+    "  'Rp=(r1_km)·(-C+SQRT(C↑2-4·(1-C)·(-sin(zen_°)↑2)))/(2·(1-C))' "
+    "  'Ra=(r1_km)·(-C-SQRT(C↑2-4·(1-C)·(-sin(zen_°)↑2)))/(2·(1-C))' "
+    "  'Hp=(Rp_km)-(ⒸReq♁)' "
+    "  'Ha=(Ra_km)-(ⒸReq♁)' "
+    "  'a=(r1_km)/(2-2/C)' "
+    "  'ecc=SQRT((2/C-1)↑2·sin(zen_°)↑2+cos(zen_°)↑2)' "
+    "  'ν=atan((2/C)·sin(zen_°)·cos(zen_°)/((2/C)·sin(zen_°)↑2-1))' "
+    "}",
+
+    //9.
+    "Orbit Orientation",  "{ "
+    "  'inc=acos(cos(lat_°)·sin(Az_°))' "
+    "  'argLat=atan(tan(lat_°)/cos(Az_°))' "
+    "  'ω=atan(tan(lat_°)/cos(Az_°))-(ν_°)' "
+    "  'dlon=atan(sin(lat_°)·tan(Az_°))' "
+    "  'lonAN=(lon2_°)-atan(sin(lat_°)·tan(Az_°))' "
+    "  'Ω=Ⓛθs(JDbo;lonAN)' "
+    "}",
+
+    //10.
+    "Time in Elliptic 1",  "{ "
+    "  'Ea0=acos((ecc+cos(ν0_°))/(1+ecc·cos(ν0_°)))' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'M0=(Ea0_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea0_°)' "
+    "  'M=(Ea_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "  'Δt=((M_°)-(M0_°))/(360_°)·(P_s)' "
+    "}",
+    //11.
+    "Time in Elliptic 2",  "{ "
+    "  'Ea0=acos((ecc+cos(ν0_°))/(1+ecc·cos(ν0_°)))' "
+    "  'M0=(Ea0_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea0_°)' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "  'M=(M0_°)+((Δt_s)/(P_s))·(360_°)' "
+    "  'Ea=(M_°)+ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'ν=2·arg(→Polar(ℝ→ℂ(√(1-ecc)·cos((Ea_°)/2);√(1+ecc)·sin((Ea_°)/2))))' "
+    "}",
+    //12.
+    "Elliptic Position",  "{ "
+    "  'r=(a_km)·(1-ecc↑2)/(1+ecc·cos(ν_°))' "
+    "  'fpa=atan(ecc·sin(ν_°)/(1+ecc·cos(ν_°)))' "
+    "  'v=SQRT(ⒸGM♁·(2/(r_km)-1/(a_km)))' "
+    "}",
+
+    //13.
+    "Luni Solar Perturbations",  "{ "
+    "  'dΩM=-0.00338·cos(inc_°)/n·(1_°/d)' "
+    "  'dΩS=-0.00154·cos(inc_°)/n·(1_°/d)' "
+    "  'dωM=0.00169·(4-5·sin(inc_°)↑2)/n·(1_°/d)' "
+    "  'dωS=0.00077·(4-5·sin(inc_°)↑2)/n·(1_°/d)' "
+    "}",
+    //14.
+    "J2 Perturbations",  "{ "
+    "  'dΩJ2=-2.06474E14·((a_km)/(1_km))↑(-7/2)·cos(inc_°)·(1-ecc↑2)↑(-2)·(1_°/d)' "
+    "  'dωJ2=1.03237E14·((a_km)/(1_km))↑(-7/2)·(4-5·sin(inc_°)↑2)·(1-ecc↑2)↑(-2)·(1_°/d)' "
+    "}",
+    //15.
+    "Atmospheric Drag",  "{ "
+    "  'a=(ⒸReq♁)+(H_km)' "
+    "  'v=SQRT(ⒸGM♁/(a_km))' "
+    "  'Δa=-2·Ⓒπ·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)↑2/(msat_kg)' "
+    "  'ΔP=-6·Ⓒπ↑2·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)↑2/((msat_kg)·(v_m/s))' "
+    "  'Δv=Ⓒπ·Cd·(Ad_m↑2)·(ρa_kg/m³)·(a_km)·(v_m/s)/(msat_kg)' "
+    "  'Life=-(Hs_km)/(Δa_m)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Geocentric/Trajectory", nullptr,
+    // ------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    //16.
+    "Hohmann Transfer",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'atx=((rA_km)+(rB_km))/2' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=(VfB_m/s)-(VtxB_m/s)' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "}",
+    //17.
+    "One Tangent Burn",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'ecc=1-(rA_km)/(atx_km)' "
+    "  'ν=acos(((atx_km)·(1-ecc↑2)/(rB_km)-1)/ecc)' "
+    "  'fpa=atan(ecc·sin(ν_°)/(1+ecc·cos(ν_°)))' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=SQRT((VtxB_m/s)↑2+(VfB_m/s)↑2-2·(VtxB_m/s)·(VfB_m/s)·cos(fpa_°))' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'M=(Ea_°)-ecc·(180_°)/→Num(Ⓒπ)·sin(Ea_°)' "
+    "  'P=2·Ⓒπ·SQRT((atx_km)↑3/ⒸGM♁)' "
+    "  'TOF=((M_°)/(360_°))·(P_s)' "
+    "}",
+
+    //18.
+    "Simple Plane Change",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'Vi=SQRT(ⒸGM♁/(r_km))' "
+    "  'ΔV=2·(Vi_m/s)·sin((Δinc_°)/2)' "
+    "}",
+    //19.
+    "Combined Plane Change & Hohmann",  "{ "
+    "  'rA=(ⒸReq♁)+(HA_km)' "
+    "  'rB=(ⒸReq♁)+(HB_km)' "
+    "  'atx=((rA_km)+(rB_km))/2' "
+    "  'ViA=SQRT(ⒸGM♁/(rA_km))' "
+    "  'VfB=SQRT(ⒸGM♁/(rB_km))' "
+    "  'VtxA=SQRT(ⒸGM♁·(2/(rA_km)-1/(atx_km)))' "
+    "  'VtxB=SQRT(ⒸGM♁·(2/(rB_km)-1/(atx_km)))' "
+    "  'ΔVA=(VtxA_m/s)-(ViA_m/s)' "
+    "  'ΔVB=SQRT((VtxB_m/s)↑2+(VfB_m/s)↑2-2·(VtxB_m/s)·(VfB_m/s)·cos(Δinc_°))' "
+    "  'ΔVT=(ΔVA_m/s)+(ΔVB_m/s)' "
+    "}",
+    //20.
+    "Plane Change Between Orbits",  "{ "
+    "  'a1=sin(inci_°)·cos(Ωi_°)' "
+    "  'a2=sin(inci_°)·sin(Ωi_°)' "
+    "  'a3=cos(inci_°)' "
+    "  'b1=sin(incf_°)·cos(Ωf_°)' "
+    "  'b2=sin(incf_°)·sin(Ωf_°)' "
+    "  'b3=cos(incf_°)' "
+    "  'θ=acos(a1·b1+a2·b2+a3·b3)' "
+    "  'cx=a2·b3-a3·b2' "
+    "  'cy=a3·b1-a1·b3' "
+    "  'cz=a1·b2-a2·b1' "
+    "  'latN1=atan(cz/SQRT(cx↑2+cy↑2))' "
+    "  'lonN1=atan(cy/cx)+(90_°)' "
+    "  'latN2=-(latN1_°)' "
+    "  'lonN2=(lonN1_°)+(180_°)' "
+    "}",
+
+    //21.
+    "Hyperbolic Time of Flight",  "{ "
+    "  'Fh0=acosh(((ecc)+cos(ν0_°))/(1+(ecc)·cos(ν0_°)))' "
+    "  'Fh=acosh(((ecc)+cos(ν_°))/(1+(ecc)·cos(ν_°)))' "
+    "  'Δt=SQRT((-(a_km))↑3/ⒸGM♁)·(((ecc)·sinh(Fh)-Fh)-((ecc)·sinh(Fh0)-Fh0))' "
+    "}",
+    //22.
+    "Hyperbolic Excess Velocity",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'Vesc=SQRT(2·ⒸGM♁/(r_km))' "
+    "  'vinf=SQRT((Vbo_m/s)↑2-(Vesc_m/s)↑2)' "
+    "}",
+
+    //23.
+    "Coplanar Phasing",  "{ "
+    "  'r=(ⒸReq♁)+(H_km)' "
+    "  'v1=SQRT(ⒸGM♁/(r_km))' "
+    "  'Ptgt=2·Ⓒπ·SQRT((r_km)↑3/ⒸGM♁)' "
+    "  'Pph=(Ptgt_s)·(1-(Δθ_°)/((360_°)·Nrev))' "
+    "  'aph=(ⒸGM♁·(Pph_s)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'va=SQRT(ⒸGM♁·(2/(r_km)-1/(aph_km)))' "
+    "  'ΔV=2·((v1_m/s)-(va_m/s))' "
+    "}",
+    //24.
+    "Controlled Deorbit",  "{ "
+    "  'r1=(ⒸReq♁)+(H1_km)' "
+    "  'rp=(ⒸReq♁)+(hp_km)' "
+    "  'ad=((r1_km)+(rp_km))/2' "
+    "  'v1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'vdo=SQRT(ⒸGM♁·(2/(r1_km)-1/(ad_km)))' "
+    "  'ΔV=(v1_m/s)-(vdo_m/s)' "
+    "}",
+    //25.
+    "GEO Graveyard Disposal",  "{ "
+    "  'rgeo=(ⒸGM♁·(ⒸProt♁)↑2/(4·Ⓒπ↑2))↑(1/3)' "
+    "  'dHmin=((235)+(1000·CR·AtoM))·(1_km)' "
+    "  'rgrave=(rgeo_km)+(dHmin_km)' "
+    "  'atx=((rgeo_km)+(rgrave_km))/2' "
+    "  'vcg=SQRT(ⒸGM♁/(rgeo_km))' "
+    "  'vp=SQRT(ⒸGM♁·(2/(rgeo_km)-1/(atx_km)))' "
+    "  'vgr=SQRT(ⒸGM♁/(rgrave_km))' "
+    "  'va=SQRT(ⒸGM♁·(2/(rgrave_km)-1/(atx_km)))' "
+    "  'ΔV1=(vp_m/s)-(vcg_m/s)' "
+    "  'ΔV2=(vgr_m/s)-(va_m/s)' "
+    "  'ΔVtot=(ΔV1_m/s)+(ΔV2_m/s)' "
+    "}",
+    //26.
+    "Translunar Injection",  "{ "
+    "  'r1=(ⒸReq♁)+(Hp_km)' "
+    "  'atx=((r1_km)+(dmoon_km))/2' "
+    "  'v1=SQRT(ⒸGM♁/(r1_km))' "
+    "  'vtli=SQRT(ⒸGM♁·(2/(r1_km)-1/(atx_km)))' "
+    "  'ΔVtli=(vtli_m/s)-(v1_m/s)' "
+    "  'varr=SQRT(ⒸGM♁·(2/(dmoon_km)-1/(atx_km)))' "
+    "  'tof=Ⓒπ·SQRT((atx_km)↑3/ⒸGM♁)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Heliocentric", nullptr,
+    "Astronautics/Heliocentric/Stationary", nullptr,
+    // ------------------------------------------------------------------------
+
+    //33.
+    "Sun Synchronous Orbit",  "{ "
+    "  'a=(ⒸReq♁)+(H_km)' "
+    "  'dΩsun=(360_°)/(365.2422_d)' "
+    "  'inc=acos((dΩsun_°/d)/(-2.06474E14·((a_km)/(1_km))↑(-7/2)·(1-ecc↑2)↑(-2)·(1_°/d)))' "
+    "  'P=2·Ⓒπ·SQRT((a_km)↑3/ⒸGM♁)' "
+    "}",
+    //34.
+    "Collinear Lagrange Points",  "{ "
+    "  'rapp=(Ⓒa♁)·(ⒸGM♁/(3·ⒸGM☉))↑(1/3)' "
+    "  'rL2=SQRT(ⒸGM♁/(((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)+(rL2_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3-ⒸGM☉/((Ⓒa♁)+(rL2_km))↑2))' "
+    "  'rL1=SQRT(ⒸGM♁/(ⒸGM☉/((Ⓒa♁)-(rL1_km))↑2-((Ⓒa♁)·ⒸGM☉/(ⒸGM☉+ⒸGM♁)-(rL1_km))·(ⒸGM☉+ⒸGM♁)/(Ⓒa♁)↑3))' "
+    "}",
+    //35.
+    "JWST at Sun Earth L2",  "{ "
+    "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Astronautics/Heliocentric/Trajectory", nullptr,
+    // ------------------------------------------------------------------------
+
+    //27.
+    "Heliocentric Hohmann Transfer",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'VcsA=SQRT(ⒸGM☉/(rA_au))' "
+    "  'VcsB=SQRT(ⒸGM☉/(rB_au))' "
+    "  'VtxA=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))' "
+    "  'VtxB=SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'vinfD=(VtxA_m/s)-(VcsA_m/s)' "
+    "  'vinfA=(VcsB_m/s)-(VtxB_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //28.
+    "One Tangent Interplanetary Transfer",  "{ "
+    "  'ecc=1-((rA_au)/(atx_au))' "
+    "  'ν=acos(((atx_au)·(1-ecc↑2)/(rB_au)-1)/ecc)' "
+    "  'Ea=acos((ecc+cos(ν_°))/(1+ecc·cos(ν_°)))' "
+    "  'TOF=((Ea_°)/(180_°)·→Num(Ⓒπ)-ecc·sin(Ea_°))·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //29.
+    "Departure Phase Angle",  "{ "
+    "  'φ=(Δν_°)-((ωt_°/d)·(tofd_d))' "
+    "}",
+
+    //30.
+    "Departure Hyperbola & Injection",  "{ "
+    "  'r0=(ⒸReq♁)+(H_km)' "
+    "  'Vo=SQRT((vinf_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'Vcirc=SQRT(ⒸGM♁/(r0_km))' "
+    "  'ΔVinj=(Vo_m/s)-(Vcirc_m/s)' "
+    "  'C3=(vinf_m/s)↑2' "
+    "}",
+    //31.
+    "Arrival Hyperbola",  "{ "
+    "  'bimp=(dmiss_km)·sin(gam_°)' "
+    "  'a=-ⒸGM♂/((vinf_m/s)↑2)' "
+    "  'ecc=SQRT(1+((bimp_km)↑2)/((a_km)↑2))' "
+    "  'rp=(a_km)·(1-ecc)' "
+    "  'dturn=2·asin(1/ecc)' "
+    "}",
+
+    //32.
+    "Gravity Assist Swing By",  "{ "
+    "  'VPx=(Vpln_m/s)·cos(fpaP_°)' "
+    "  'VPy=(Vpln_m/s)·sin(fpaP_°)' "
+    "  'VSix=(VSi_m/s)·cos(fpaSi_°)' "
+    "  'VSiy=(VSi_m/s)·sin(fpaSi_°)' "
+    "  'Vrix=(VSix_m/s)-(VPx_m/s)' "
+    "  'Vriy=(VSiy_m/s)-(VPy_m/s)' "
+    "  'vinf=SQRT((Vrix_m/s)↑2+(Vriy_m/s)↑2)' "
+    "  'thi=arg(→Polar(ℝ→ℂ((Vrix_m/s)/(1_m/s);(Vriy_m/s)/(1_m/s))))' "
+    "  'bimp=(dmiss_km)·sin(thi_°)' "
+    "  'a=-ⒸGM♃/((vinf_m/s)↑2)' "
+    "  'ecc=SQRT(1+((bimp_km)↑2)/((a_km)↑2))' "
+    "  'dturn=-2·asin(1/ecc)' "
+    "  'thf=(thi_°)+(dturn_°)' "
+    "  'Vrfx=(vinf_m/s)·cos(thf_°)' "
+    "  'Vrfy=(vinf_m/s)·sin(thf_°)' "
+    "  'VSfx=(Vrfx_m/s)+(VPx_m/s)' "
+    "  'VSfy=(Vrfy_m/s)+(VPy_m/s)' "
+    "  'VSf=SQRT((VSfx_m/s)↑2+(VSfy_m/s)↑2)' "
+    "  'fpaSf=arg(→Polar(ℝ→ℂ((VSfx_m/s)/(1_m/s);(VSfy_m/s)/(1_m/s))))' "
+    "}",
+
+    //36.
+    "Patched Conic Mission Capstone",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'VcsA=SQRT(ⒸGM☉/(rA_au))' "
+    "  'VtxA=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))' "
+    "  'vinfD=(VtxA_m/s)-(VcsA_m/s)' "
+    "  'VcsB=SQRT(ⒸGM☉/(rB_au))' "
+    "  'VtxB=SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'vinfA=(VcsB_m/s)-(VtxB_m/s)' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinfD_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'TMI=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'Varr=SQRT((vinfA_m/s)↑2+2·ⒸGM♂/(rm_km))' "
+    "  'MOI=(Varr_m/s)-SQRT(ⒸGM♂/(rm_km))' "
+    "  'dVtot=(TMI_m/s)+(MOI_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //37.
+    "Synodic Period & Launch Window",  "{ "
+    "  'P1=2·Ⓒπ·SQRT((rA_au)↑3/ⒸGM☉)' "
+    "  'P2=2·Ⓒπ·SQRT((rB_au)↑3/ⒸGM☉)' "
+    "  'Tsyn=1/(1/(P1_d)-1/(P2_d))' "
+    "}",
+    //38.
+    "Bi Elliptic vs Hohmann",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'dvH=(SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rA_au)))+(SQRT(ⒸGM☉/(rB_au))-SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au))))' "
+    "  'abe1=((rA_au)+(rstar_au))/2' "
+    "  'abe2=((rB_au)+(rstar_au))/2' "
+    "  'dv1=SQRT(ⒸGM☉·(2/(rA_au)-1/(abe1_au)))-SQRT(ⒸGM☉/(rA_au))' "
+    "  'dv2=SQRT(ⒸGM☉·(2/(rstar_au)-1/(abe2_au)))-SQRT(ⒸGM☉·(2/(rstar_au)-1/(abe1_au)))' "
+    "  'dv3=SQRT(ⒸGM☉·(2/(rB_au)-1/(abe2_au)))-SQRT(ⒸGM☉/(rB_au))' "
+    "  'dvBE=(dv1_m/s)+(dv2_m/s)+(dv3_m/s)' "
+    "  'dgain=(dvH_m/s)-(dvBE_m/s)' "
+    "}",
+    //39.
+    "Solar System Escape",  "{ "
+    "  'Vsun=SQRT(2·ⒸGM☉/(rA_au))' "
+    "  'Vplanet=SQRT(ⒸGM☉/(rA_au))' "
+    "  'vinf=(Vsun_m/s)-(Vplanet_m/s)' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinf_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'dVesc=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'C3=(vinf_m/s)↑2' "
+    "}",
+
+    //40.
+    "Interception Of Incoming Object",  "{ "
+    "  'vobj=SQRT(ⒸGM☉·(2/(rX_au)-1/(aobj_au)))' "
+    "  'vEarth=SQRT(ⒸGM☉/(rX_au))' "
+    "  'vt=SQRT(ⒸGM☉·(aobj_au)·(1-eobj↑2))/(rX_au)' "
+    "  'vr=SQRT((vobj_m/s)↑2-(vt_m/s)↑2)' "
+    "  'fpa=atan((vr_m/s)/(vt_m/s))' "
+    "  'dVint=SQRT((vobj_m/s)↑2+(vEarth_m/s)↑2-2·(vobj_m/s)·(vEarth_m/s)·cos(fpa_°))' "
+    "}",
+    //41.
+    "Asteroid Belt Injection Orbit",  "{ "
+    "  'atx=((rA_au)+(rB_au))/2' "
+    "  'vinfD=SQRT(ⒸGM☉·(2/(rA_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rA_au))' "
+    "  'vinfA=SQRT(ⒸGM☉/(rB_au))-SQRT(ⒸGM☉·(2/(rB_au)-1/(atx_au)))' "
+    "  'r0=(ⒸReq♁)+(Hp_km)' "
+    "  'Vo=SQRT((vinfD_m/s)↑2+2·ⒸGM♁/(r0_km))' "
+    "  'dVdep=(Vo_m/s)-SQRT(ⒸGM♁/(r0_km))' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //42.
+    "To Mercury Through Venus",  "{ "
+    "  'aEM=((rEar_au)+(rMe_au))/2' "
+    "  'vinfMe=SQRT(ⒸGM☉·(2/(rMe_au)-1/(aEM_au)))-SQRT(ⒸGM☉/(rMe_au))' "
+    "  'aEV=((rEar_au)+(rV_au))/2' "
+    "  'vinfV=SQRT(ⒸGM☉·(2/(rV_au)-1/(aEV_au)))-SQRT(ⒸGM☉/(rV_au))' "
+    "  'eccV=1+(rpV_km)·(vinfV_m/s)↑2/ⒸGM♀' "
+    "  'turnV=2·asin(1/eccV)' "
+    "}",
+
+    //43.
+    "Saturn Injection Orbit",  "{ "
+    "  'aES=((rEar_au)+(rSa_au))/2' "
+    "  'vinfSa=SQRT(ⒸGM☉/(rSa_au))-SQRT(ⒸGM☉·(2/(rSa_au)-1/(aES_au)))' "
+    "  'Vhyp=SQRT((vinfSa_m/s)↑2+2·ⒸGM♄/(rp_km))' "
+    "  'acap=((rp_km)+(rapo_km))/2' "
+    "  'Vcap=SQRT(ⒸGM♄·(2/(rp_km)-1/(acap_km)))' "
+    "  'MOIsat=(Vhyp_m/s)-(Vcap_m/s)' "
+    "}",
+    //44.
+    "Path to Jupiter Satellites",  "{ "
+    "  'atxJ=((rp_km)+(rmoon_km))/2' "
+    "  'Vpark=SQRT(ⒸGM♃/(rp_km))' "
+    "  'dv1=SQRT(ⒸGM♃·(2/(rp_km)-1/(atxJ_km)))-SQRT(ⒸGM♃/(rp_km))' "
+    "  'Vmoon=SQRT(ⒸGM♃/(rmoon_km))' "
+    "  'dv2=SQRT(ⒸGM♃/(rmoon_km))-SQRT(ⒸGM♃·(2/(rmoon_km)-1/(atxJ_km)))' "
+    "  'dVtot=(dv1_m/s)+(dv2_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atxJ_km)↑3/ⒸGM♃)' "
+    "}",
+    //45.
+    "Path to Saturn Satellites",  "{ "
+    "  'atxS=((rp_km)+(rmoon_km))/2' "
+    "  'Vpark=SQRT(ⒸGM♄/(rp_km))' "
+    "  'dv1=SQRT(ⒸGM♄·(2/(rp_km)-1/(atxS_km)))-SQRT(ⒸGM♄/(rp_km))' "
+    "  'Vmoon=SQRT(ⒸGM♄/(rmoon_km))' "
+    "  'dv2=SQRT(ⒸGM♄/(rmoon_km))-SQRT(ⒸGM♄·(2/(rmoon_km)-1/(atxS_km)))' "
+    "  'dVtot=(dv1_m/s)+(dv2_m/s)' "
+    "  'TOF=Ⓒπ·SQRT((atxS_km)↑3/ⒸGM♄)' "
+    "}",
+
+    //46.
+    "From Mars to Earth",  "{ "
+    "  'atx=((rMars_au)+(rEar_au))/2' "
+    "  'vinfMars=SQRT(ⒸGM☉/(rMars_au))-SQRT(ⒸGM☉·(2/(rMars_au)-1/(atx_au)))' "
+    "  'vinfEar=SQRT(ⒸGM☉·(2/(rEar_au)-1/(atx_au)))-SQRT(ⒸGM☉/(rEar_au))' "
+    "  'Vo=SQRT((vinfMars_m/s)↑2+2·ⒸGM♂/(rp_km))' "
+    "  'TEI=(Vo_m/s)-SQRT(ⒸGM♂/(rp_km))' "
+    "  'TOF=Ⓒπ·SQRT((atx_au)↑3/ⒸGM☉)' "
+    "}",
+    //47.
+    "Mars Landing",  "{ "
+    "  'gmars=ⒸGM♂/((rmars_km)↑2)' "
+    "  'amax=((Ventry_m/s)↑2·sin(fpa_°))/(2·EXP(1)·(Hs_km))' "
+    "  'amaxg=(amax_m/s^2)/Ⓒg' "
+    "  'vterm=SQRT(2·(msat_kg)·(gmars_m/s^2)/((ρa_kg/m³)·Cd·(Ad_m↑2)))' "
+    "}",
+    //48.
+    "Launch Window from a Site",  "{ "
+    "  'LST=Ⓛθs(JD0;(lonE_°))' "
+    "  'dOmega=(OmegaT_°)-(LST_°)' "
+    "  'twait=(dOmega_°)/(360.98565_°/d)' "
+    "}",
+    //49.
+    "Comet Interceptor",  "{ "
+    "  'dSunL2=(Ⓒa♁)+(rL2_km)' "
+    "  'PL2=2·Ⓒπ·SQRT((Ⓒa♁)↑3/(ⒸGM☉+ⒸGM♁))' "
+    "  'VL2=2·Ⓒπ·(dSunL2_km)/(PL2_s)' "
+    "  'vobj=SQRT(ⒸGM☉·(2/(rX_au)-1/(aobj_au)))' "
+    "  'vt=SQRT(ⒸGM☉·(aobj_au)·(1-eobj↑2))/(rX_au)' "
+    "  'vr=SQRT((vobj_m/s)↑2-(vt_m/s)↑2)' "
+    "  'fpa=atan((vr_m/s)/(vt_m/s))' "
+    "  'vfly=SQRT((vobj_m/s)↑2+(VL2_m/s)↑2-2·(vobj_m/s)·(VL2_m/s)·cos(fpa_°))' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Navigation", nullptr,
+    // ------------------------------------------------------------------------
+    // Air, marine and land navigation on a spherical earth of radius Rs.
+    // Longitudes positive East, courses in [0°;360°) from true North.
+    // 180°+(-y)∠(-x) is atan2(y,x) in [0°;360°), and (SIN(λ))∠(COS(λ))
+    // brings a longitude back into ]-180°;180°]. Each step is kept short
+    // enough to be shown by the solver above the stack.
+    "Great Circle",  "{ "
+    "  '(Δφ_°)=(φ2_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λ2_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φ2_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ_°)=2·ASIN(√(hav))' "
+    "  '(D_nmi)=(Rs_nmi)·(θ_r)/(1_r)' "
+    "  'x1=COS(φ1_°)·SIN(φ2_°)-SIN(φ1_°)·COS(φ2_°)·COS(Δλ_°)' "
+    "  '(TC1_°)=180_°+(-SIN(Δλ_°)·COS(φ2_°))∠(-x1)' "
+    "  'x2=SIN(φ1_°)·COS(φ2_°)-COS(φ1_°)·SIN(φ2_°)·COS(Δλ_°)' "
+    "  '(TC2_°)=180_°+(-SIN(Δλ_°)·COS(φ1_°))∠(x2)' "
+    "}",
+    "Great Circle Vertex",  "{ "
+    "  '(φv_°)=ACOS(ABS(COS(φ1_°)·SIN(TC1_°)))' "
+    "  '(Δλv_°)=(SIN(TC1_°)·COS(TC1_°))∠(SIN(TC1_°)²·SIN(φ1_°))' "
+    "  '(λv_°)=(SIN((λ1_°)+(Δλv_°)))∠(COS((λ1_°)+(Δλv_°)))' "
+    "  '(θv_°)=ACOS(SIN(φ1_°)/SIN(φv_°))' "
+    "  '(Dv_nmi)=(Rs_nmi)·(θv_r)/(1_r)' "
+    "}",
+    "Great Circle Destination",  "{ "
+    "  '(θ_°)=(1_r)·(D_nmi)/(Rs_nmi)' "
+    "  '(φ2_°)=ASIN(SIN(φ1_°)·COS(θ_°)+COS(φ1_°)·SIN(θ_°)·COS(TC1_°))' "
+    "  '(Δλ_°)=(SIN(TC1_°)·SIN(θ_°)·COS(φ1_°))∠(COS(θ_°)-SIN(φ1_°)·SIN(φ2_°))' "
+    "  '(λ2_°)=(SIN((λ1_°)+(Δλ_°)))∠(COS((λ1_°)+(Δλ_°)))' "
+    "}",
+    "Cross Track Error",  "{ "
+    "  '(Δφ_°)=(φP_°)-(φ1_°)' "
+    "  '(Δλ_°)=(λP_°)-(λ1_°)' "
+    "  'hav=SIN((Δφ_°)/2)²+COS(φ1_°)·COS(φP_°)·SIN((Δλ_°)/2)²' "
+    "  '(θ1P_°)=2·ASIN(√(hav))' "
+    "  'xP=COS(φ1_°)·SIN(φP_°)-SIN(φ1_°)·COS(φP_°)·COS(Δλ_°)' "
+    "  '(TC1P_°)=180_°+(-SIN(Δλ_°)·COS(φP_°))∠(-xP)' "
+    "  '(θXT_°)=ASIN(SIN(θ1P_°)·SIN((TC1P_°)-(TC1_°)))' "
+    "  '(θAT_°)=ACOS(COS(θ1P_°)/COS(θXT_°))' "
+    "  '(XTD_nmi)=(Rs_nmi)·(θXT_r)/(1_r)' "
+    "  '(ATD_nmi)=(Rs_nmi)·(θAT_r)/(1_r)' "
+    "}",
+    "Wind Correction",  "{ "
+    "  '(WCA_°)=ASIN((WS_knot)·SIN((WD_°)-(TC_°))/(V_knot))' "
+    "  '(TH_°)=180_°+(-SIN((TC_°)+(WCA_°)))∠(-COS((TC_°)+(WCA_°)))' "
+    "  '(GS_knot)=(V_knot)·COS(WCA_°)-(WS_knot)·COS((WD_°)-(TC_°))' "
+    "}",
+    "Ground Track",  "{ "
+    "  '(gN_knot)=(V_knot)·COS(TH_°)-(WS_knot)·COS(WD_°)' "
+    "  '(gE_knot)=(V_knot)·SIN(TH_°)-(WS_knot)·SIN(WD_°)' "
+    "  '(GS_knot)=√((gN_knot)²+(gE_knot)²)' "
+    "  '(TC_°)=180_°+(-(gE_knot)/(GS_knot))∠(-(gN_knot)/(GS_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+    "Wind Finding",  "{ "
+    "  '(wN_knot)=(V_knot)·COS(TH_°)-(GS_knot)·COS(TC_°)' "
+    "  '(wE_knot)=(V_knot)·SIN(TH_°)-(GS_knot)·SIN(TC_°)' "
+    "  '(WS_knot)=√((wN_knot)²+(wE_knot)²)' "
+    "  '(WD_°)=180_°+(-(wE_knot)/(WS_knot))∠(-(wN_knot)/(WS_knot))' "
+    "}",
+    "Required Heading & Speed",  "{ "
+    "  '(aN_knot)=(GS_knot)·COS(TC_°)+(WS_knot)·COS(WD_°)' "
+    "  '(aE_knot)=(GS_knot)·SIN(TC_°)+(WS_knot)·SIN(WD_°)' "
+    "  '(V_knot)=√((aN_knot)²+(aE_knot)²)' "
+    "  '(TH_°)=180_°+(-(aE_knot)/(V_knot))∠(-(aN_knot)/(V_knot))' "
+    "  '(WCA_°)=(SIN((TH_°)-(TC_°)))∠(COS((TH_°)-(TC_°)))' "
+    "}",
+
+    // ------------------------------------------------------------------------
+    "Aeronautics", nullptr,
+    "Aeronautics/Flight Management", nullptr,
+    // ------------------------------------------------------------------------
+    // The pilot's calculations, from the flight manual and the weather, in
+    // the units of the FAA handbooks; every equation also accepts SI units.
+    // Wind directions are where the wind comes from, as in Navigation.
+    "Aeronautics/Flight Management/Runway", nullptr,
+    "Headwind & Crosswind",  "{ "
+    "  '(HW_knot)=(WS_knot)·COS((WD_°)-(RWY_°))' "
+    "  '(XW_knot)=(WS_knot)·SIN((WD_°)-(RWY_°))' "
+    "}",
+    "Hydroplaning Speed",  "'(Vhp_knot)=(9_knot)·√((Ptire_psi)/(1_psi))'",
+    "Aeronautics/Flight Management/Time & Distance", nullptr,
+    "Time Speed & Distance",  "'(D_nmi)=(GS_knot)·(ETE_h)'",
+    "Time & Distance to Station",  "{ "
+    "  '(TSta_min)=(Tbc_s)·(60_°)/(ΔBrg_°)' "
+    "  '(DSta_nmi)=(GS_knot)·(TSta_min)' "
+    "}",
+    "Aeronautics/Flight Management/Fuel & Endurance", nullptr,
+    "Fuel Required",  "{ "
+    "  '(Trip_gal)=(FFR_gal/h)·(ETE_h)' "
+    "  '(Rsv_gal)=(FFR_gal/h)·(TRes_h)' "
+    "  '(FReq_gal)=(Taxi_gal)+(Trip_gal)+(Rsv_gal)' "
+    "  '(Extra_gal)=(FOB_gal)-(FReq_gal)' "
+    "}",
+    "Endurance & Range",  "{ "
+    "  '(Endur_h)=(FOB_gal)/(FFR_gal/h)' "
+    "  '(SpR_nmi/gal)=(GS_knot)/(FFR_gal/h)' "
+    "  '(Rng_nmi)=(SpR_nmi/gal)·(FOB_gal)' "
+    "  '(Wfuel_lb)=(FOB_gal)·(ρfuel_lb/gal)' "
+    "}",
+    "Equal Time Point",  "{ "
+    "  '(DETP_nmi)=(D_nmi)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(TETP_h)=(DETP_nmi)/(GSO_knot)' "
+    "}",
+    "Point of No Return",  "{ "
+    "  '(TPNR_h)=(Endur_h)·(GSH_knot)/((GSO_knot)+(GSH_knot))' "
+    "  '(DPNR_nmi)=(TPNR_h)·(GSO_knot)' "
+    "}",
+    "Aeronautics/Flight Management/Weight & Balance", nullptr,
+    // Weight and balance: arms in inches from the datum, positive aft;
+    // a weight shifted forward has a negative distance, a weight removed a
+    // negative weight.
+    "Weight Shift",  "{ "
+    "  '(ΔCG_in)=(Wsh_lb)·(Dsh_in)/(Wt_lb)' "
+    "  '(CGn_in)=(CG_in)+(ΔCG_in)' "
+    "}",
+    "Weight Change",  "{ "
+    "  '(Wn_lb)=(Wt_lb)+(Wch_lb)' "
+    "  '(CGn_in)=((Wt_lb)·(CG_in)+(Wch_lb)·(Arm_in))/(Wn_lb)' "
+    "}",
+    "CG in % MAC",  "'PMAC=100·((CG_in)-(LEMAC_in))/(MAC_in)'",
+    "Aeronautics/Flight Management/Altitudes", nullptr,
+    // Altitudes and temperatures, in the troposphere of the standard
+    // atmosphere (below 36 089 ft): T0/L = 288.15/0.0065 m = 145 442.16 ft,
+    // L = 0.0065 K/m = 0.0019812 K/ft. Temperature differences are in K.
+    "Pressure Altitude",  "{ "
+    "  '(ΔHp_ft)=(145442.16_ft)·(1-((QNH_hPa)/(1013.25_hPa))^0.190263)' "
+    "  '(Hp_ft)=(Hind_ft)+(ΔHp_ft)' "
+    "}",
+    "ISA Deviation",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  '(ΔISA_K)=(OAT_K)-(Tstd_K)' "
+    "}",
+    "Density Altitude",  "{ "
+    "  '(Tstd_K)=288.15_K-(0.0019812_K/ft)·(Hp_ft)' "
+    "  'θr=(Tstd_K)/(OAT_K)' "
+    "  '(Hd_ft)=(Hp_ft)+(Tstd_K)/(0.0019812_K/ft)·(1-θr^0.234969)' "
+    "}",
+    "Humidity Correction",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'fe=EXP(17.3·Tc/(Tc+237))' "
+    "  'fHp=(1-6.88E-6·(Hp_ft)/(1_ft))^-5.26' "
+    "  '(ΔHd_ft)=(0.267_ft)·RH·(Tc+273)·fe·fHp' "
+    "}",
+    "True Altitude",  "{ "
+    "  '(ΔTA_ft)=((Hind_ft)-(Hstn_ft))·(ΔISA_K)/(OAT_K)' "
+    "  '(TA_ft)=(Hind_ft)+(ΔTA_ft)' "
+    "}",
+    // Two temperatures with offset units subtracted in one expression:
+    // the second is read as a difference. One step each avoids it.
+    "Cloud Base",  "{ "
+    "  'Tc=(OAT_K)/(1_K)-273.15' "
+    "  'Tdc=(Tdp_K)/(1_K)-273.15' "
+    "  '(Hcb_ft)=(Tc-Tdc)·(409.0909_ft)' "
+    "}",
+    "Aeronautics/Flight Management/Airspeeds", nullptr,
+    // Airspeeds: speed of sound at sea level 661.4786 kt, standard pressure
+    // 1 013.25 hPa, troposphere as above.
+    "True Airspeed",  "{ "
+    "  'DRat=(1-(Hp_ft)/(1_ft)/145442.16)^5.25588·(288.15_K)/(OAT_K)' "
+    "  '(TAS_knot)=(CAS_knot)/√(DRat)' "
+    "}",
+    "Mach & True Airspeed",  "{ "
+    "  '(qc_hPa)=(1013.25_hPa)·((1+0.2·((CAS_knot)/(661.4786_knot))²)^3.5-1)' "
+    "  '(Ps_hPa)=(1013.25_hPa)·(1-(Hp_ft)/(1_ft)/145442.16)^5.25588' "
+    "  'Mach=√(5·(((qc_hPa)/(Ps_hPa)+1)^(2/7)-1))' "
+    "  'Ti=(IAT_K)/(1_K)' "
+    "  '(OAT_K)=Ti/(1+0.2·Kr·(Mach)²)·(1_K)' "
+    "  '(TAS_knot)=Mach·(661.4786_knot)·√((OAT_K)/(288.15_K))' "
+    "}",
+    "Aeronautics/Flight Management/Climb & Descent", nullptr,
+    // Flight path angle FPA positive in climb, negative in descent; the
+    // vertical speed VS has the same sign. 1 nmi = 6 076.11549 ft.
+    "Climb & Descent Gradient",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  'GPct=100·Grd' "
+    "  'Gft=6076.11549·Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "}",
+    "Top of Descent",  "{ "
+    "  'Grd=TAN(FPA_°)' "
+    "  '(ΔH_ft)=(Hcr_ft)-(Htgt_ft)' "
+    "  '(DTOD_nmi)=-(ΔH_ft)/Grd' "
+    "  '(VS_ft/min)=(GS_knot)·Grd' "
+    "  '(TTOD_min)=(DTOD_nmi)/(GS_knot)' "
+    "}",
+
+    "Aeronautics/Performance", nullptr,
+    // ------------------------------------------------------------------------
+    // The aircraft as it is: lift and drag from its drag polar, stall, load
+    // factor, turns, glide, climb, range and endurance, takeoff and landing.
+    // Wt is a mass, as in Flight Management; its weight is (Wt_lb)·Ⓒg.
+    // Equations are written force = force or speed = speed, so that the
+    // coefficients come out as plain numbers.
+    "Aeronautics/Performance/Lift & Drag", nullptr,
+    "Lift",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(qd_Pa)=(ρa_(kg/m^3))·(TAS_knot)²/2' "
+    "  '(Lift_lbf)=nLF·(Wt_lb)·Ⓒg' "
+    "  '(Lift_lbf)=(qd_Pa)·(Sw_ft²)·CL' "
+    "}",
+    "Drag Polar",  "{ "
+    "  'AR=(bw_ft)²/(Sw_ft²)' "
+    "  'Kind=1/(Ⓒπ·AR·eO)' "
+    "  'CD=CD0+Kind·(CL)²' "
+    "  'LD=CL/CD' "
+    "  '(Drag_lbf)=(Lift_lbf)/LD' "
+    "}",
+    "Characteristic Speeds",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'LDmax=1/(2·√(CD0·Kind))' "
+    "  'CLmd=√(CD0/Kind)' "
+    "  '(Vmd_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmd))' "
+    "  '(Vmp_knot)=(Vmd_knot)/(3^0.25)' "
+    "  '(Vbrj_knot)=(Vmd_knot)·(3^0.25)' "
+    "}",
+    "Aeronautics/Performance/Stall & Load Factor", nullptr,
+    "Stall Speed",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "}",
+    "Load Factor & Accelerated Stall",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(Vstn_knot)=(Vst_knot)·√(nLF)' "
+    "}",
+    "Maneuvering Speed & Weight",  "{ "
+    "  '(VA_knot)=(Vst_knot)·√(nlim)' "
+    "  '(Vadj_knot)=(Vref_knot)·√((Wt_lb)/(Wt0_lb))' "
+    "}",
+    "Pull Up",  "'(nPU-1)·Ⓒg·(Rpu_ft)=(TAS_knot)²'",
+    // 14 CFR 23.337(a)(1) before amendment 23-64 (2017), normal category
+    "Limit Load Factor",  "'nlim=MIN(3.8;2.1+24000/((Wt_lb)/(1_lb)+10000))'",
+
+    "Aeronautics/Performance/Turns", nullptr,
+    "Level Turn",  "{ "
+    "  'nLF=1/COS(φb_°)' "
+    "  '(TRad_ft)=(TAS_knot)²/(Ⓒg·TAN(φb_°))' "
+    "  '(TRate_°/s)=(1_r)·Ⓒg·TAN(φb_°)/(TAS_knot)' "
+    "  '(Ttrn_s)=(360_°)/(TRate_°/s)' "
+    "}",
+    "Pivotal Altitude",  "'(Hpv_ft)=(GS_knot)²/Ⓒg'",
+    "Aeronautics/Performance/Glide", nullptr,
+    "Glide Distance",  "{ "
+    "  'TAN(FPA_°)=-1/LD' "
+    "  '(Dgl_nmi)=(ΔH_ft)·LD·(GS_knot)/(TAS_knot)' "
+    "  '(VS_ft/min)=(TAS_knot)·SIN(FPA_°)' "
+    "  '(Tgl_min)=(Dgl_nmi)/(GS_knot)' "
+    "}",
+    "Minimum Sink",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  'CLms=√(3·CD0/Kind)' "
+    "  'LDms=CLms/(CD0+Kind·(CLms)²)' "
+    "  '(Vms_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLms))' "
+    "  '(VSms_ft/min)=-(Vms_knot)·SIN(ATAN(1/LDms))' "
+    "}",
+    "Aeronautics/Performance/Climb & Power", nullptr,
+    "Power Required",  "{ "
+    "  '(Preq_hp)=(Drag_lbf)·(TAS_knot)' "
+    "  '(Psh_hp)=(Preq_hp)/ηp' "
+    "}",
+    "Rate & Angle of Climb",  "{ "
+    "  'ηp·(Pav_hp)-(Preq_hp)=(Wt_lb)·Ⓒg·(VS_ft/min)' "
+    "  '(Thr_lbf)-(Drag_lbf)=(Wt_lb)·Ⓒg·SIN(FPA_°)' "
+    "}",
+    // Rate of climb decreasing linearly with altitude, from ROC0 at sea level
+    // to zero at the absolute ceiling Habs
+    "Time to Climb & Ceilings",  "{ "
+    "  '(Hsc_ft)=(Habs_ft)·(1-(100_ft/min)/(ROC0_ft/min))' "
+    "  '(Tclb_min)=(Habs_ft)/(ROC0_ft/min)·LN(((Habs_ft)-(Hini_ft))/((Habs_ft)-(Hfin_ft)))' "
+    "}",
+    "Aeronautics/Performance/Range & Endurance", nullptr,
+    // TSFC is in 1/h: the weight of fuel per hour per unit of thrust, the
+    // value the handbooks give in lb/(lbf·h)
+    "Fuel Flow",  "{ "
+    "  '(FFm_lb/h)=(BSFC_lb/(hp*h))·(Psh_hp)' "
+    "  '(FFm_lb/h)·Ⓒg=(TSFC_1/h)·(Thr_lbf)' "
+    "  '(Endur_h)=(Wfuel_lb)/(FFm_lb/h)' "
+    "}",
+    "Breguet Range Propeller",  "'(Rng_nmi)=ηp·LD·LN((Wini_lb)/(Wfin_lb))/((BSFC_lb/(hp*h))·Ⓒg)'",
+    // Flown at a constant lift coefficient: the speed decreases with the
+    // square root of the weight
+    "Breguet Endurance Propeller",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Endur_h)=2·ηp·LD·(1/(Vfin_knot)-1/(Vini_knot))/((BSFC_lb/(hp*h))·Ⓒg)' "
+    "}",
+    // Cruise climb: constant speed and lift coefficient
+    "Breguet Jet",  "{ "
+    "  '(Endur_h)=LD·LN((Wini_lb)/(Wfin_lb))/(TSFC_1/h)' "
+    "  '(Rng_nmi)=(TAS_knot)·(Endur_h)' "
+    "}",
+    "Jet Range at Constant Altitude",  "{ "
+    "  '(Vfin_knot)=(Vini_knot)·√((Wfin_lb)/(Wini_lb))' "
+    "  '(Rng_nmi)=2·LD·((Vini_knot)-(Vfin_knot))/(TSFC_1/h)' "
+    "}",
+    "Battery Range & Endurance",  "{ "
+    "  '(Endur_h)=ηe·(Ebat_(kW*h))/(Preq_hp)' "
+    "  '(Rng_nmi)=ηe·(Ebat_(kW*h))·LD/((Wt_lb)·Ⓒg)' "
+    "}",
+    "Aeronautics/Performance/Takeoff & Landing", nullptr,
+    // Forces averaged at fav·VLO (0.7 VLO, J. G. Leishman)
+    "Takeoff Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VLO_knot)=fLO·(Vst_knot)' "
+    "  '(qLO_Pa)=(ρa_(kg/m^3))·(fav·(VLO_knot))²/2' "
+    "  '(Rav_lbf)=(qLO_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qLO_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLO_ft)=(Wt_lb)·(VLO_knot)²/(2·((Thr_lbf)-(Rav_lbf)))' "
+    "}",
+    "Landing Ground Roll",  "{ "
+    "  '(ρa_(kg/m^3))=(1.225_(kg/m^3))·DRat' "
+    "  '(Vst_knot)=√(2·(Wt_lb)·Ⓒg/((ρa_(kg/m^3))·(Sw_ft²)·CLmax))' "
+    "  '(VTD_knot)=fTD·(Vst_knot)' "
+    "  '(qTD_Pa)=(ρa_(kg/m^3))·(fav·(VTD_knot))²/2' "
+    "  '(Rav_lbf)=(qTD_Pa)·(Sw_ft²)·CD+μr·((Wt_lb)·Ⓒg-(qTD_Pa)·(Sw_ft²)·CL)' "
+    "  '(sLD_ft)=(Wt_lb)·(VTD_knot)²/(2·(Rav_lbf))' "
+    "}",
+    "Wind on Runway Distances",  "'(sWnd_ft)=(s0_ft)·((Vref_knot)-(HW_knot))²/(Vref_knot)²'",
+    "Weight & Speed Corrections",  "{ "
+    "  'fW=((Wt_lb)/(Wt0_lb))^xW' "
+    "  'fV=((Vact_knot)/(Vref_knot))²' "
+    "  '(sCor_ft)=(s0_ft)·fW·fV' "
+    "}",
+
     // As of 24-11-12: Total 695 vars, 614 eqns, 163 sims in 18 sections (eqns: 614/315=1.95; vars: 693/397=1.75 )
     // As of 24-12-11: Total 724 vars, 644 eqns, 182 sims in 158 subsections, 18 sections (644/315=2.04; 724/397=1.82)
     // As of 24-12-18: Total 725 vars, 669 eqns, 188 sims in 158 subsections, 18 sections (669/315=2.12; 725/397=1.83)
+
+    // ------------------------------------------------------------------------
+    "Math", nullptr,
+    "Math/Probability", nullptr,
+    //T#*: 30 vars 203 eqns 38 sims 32 secs
+    // ------------------------------------------------------------------------
+    //   Probability distributions. Design: Jean Wilson
+    //   Co-authors & programming: Claude Code (Anthropic)
+    //
+    //   ORDERING RULE: a tautological line such as 'x=x' exists only to give a
+    //   menu key to a name that would otherwise collide with a constant.  Such
+    //   lines must ALWAYS come after the equations that really define the
+    //   quantities: the solver keeps the first eligible equation.
+    //
+    //   FORBIDDEN NAMES, because they resolve to constants: sigma, alpha, k,
+    //   gamma, g.  Hence sigma -> sx, alpha -> ap, k -> sh, gamma -> sc.
+
+    "Norml",  "{ "
+    "  'CDF=0.5*(1+erf((X-μ)/(sx*√(2))))' "
+    "  'PDF=1/(sx*√(2*Ⓒπ))*EXP(-((X-μ)²)/(2*sx²))' "
+    "  'CDFc=0.5*erfc((X-μ)/(sx*√(2)))' "
+    "  'μ=μ' "
+    "  'sx=sx' "
+    "}",
+
+    "LgNrm",  "{ "
+    "  'CDF=IFTE(X≤0;0;0.5*(1+erf((LN(X)-μl)/(σl*√(2)))))' "
+    "  'PDF=IFTE(X≤0;0;1/(X*σl*√(2*Ⓒπ))*EXP(-((LN(X)-μl)^2)/(2*(σl^2))))' "
+    "  'CDFc=IFTE(X≤0;1;0.5*erfc((LN(X)-μl)/(σl*√(2))))' "
+    "  'μl=μl' "
+    "  'σl=σl' "
+    "  'μ=EXP(μl+(σl^2)/2)' "
+    "  'sx=√((EXP(σl^2)-1)*EXP(2*μl+σl^2))' "
+    "}",
+
+    "Expon",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-λ*X))' "
+    "  'PDF=IFTE(X<0;0;λ*EXP(-λ*X))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-λ*X))' "
+    "  'λ=λ' "
+    "  'μ=1/λ' "
+    "  'sx=1/λ' "
+    "}",
+
+    "Weibl",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-((X/λ)^sh)))' "
+    "  'PDF=IFTE(X<0;0;(sh/λ)*((X/λ)^(sh-1))*EXP(-((X/λ)^sh)))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-((X/λ)^sh)))' "
+    "  'sh=sh' "
+    "  'λ=λ' "
+    "  'μ=λ*Γ(1+1/sh)' "
+    "  'sx=λ*√(Γ(1+2/sh)-Γ(1+1/sh)^2)' "
+    "}",
+
+    "Rayleigh",  "{ "
+    "  'CDF=IFTE(X<0;0;1-EXP(-(X^2)/(2*(s^2))))' "
+    "  'PDF=IFTE(X<0;0;(X/(s^2))*EXP(-(X^2)/(2*(s^2))))' "
+    "  'CDFc=IFTE(X<0;1;EXP(-(X^2)/(2*(s^2))))' "
+    "  's=s' "
+    "  'μ=s*√(Ⓒπ/2)' "
+    "  'sx=s*√(2-Ⓒπ/2)' "
+    "}",
+
+    "Logis",  "{ "
+    "  'CDF=1/(1+EXP(-(X-μ)/s))' "
+    "  'PDF=EXP(-(X-μ)/s)/(s*((1+EXP(-(X-μ)/s))^2))' "
+    "  'CDFc=1/(1+EXP((X-μ)/s))' "
+    "  'μ=μ' "
+    "  's=s' "
+    "  'sx=s*Ⓒπ/√(3)' "
+    "}",
+
+    "Pareto",  "{ "
+    "  'CDF=IFTE(X<xm;0;1-(xm/X)^ap)' "
+    "  'PDF=IFTE(X<xm;0;ap*(xm^ap)/(X^(ap+1)))' "
+    "  'CDFc=IFTE(X<xm;1;(xm/X)^ap)' "
+    "  'xm=xm' "
+    "  'ap=ap' "
+    "  'μ=IFTE(ap>1;ap*xm/(ap-1);Ⓒ∞)' "
+    "  'sx=IFTE(ap>2;(xm/(ap-1))*√(ap/(ap-2));IFTE(ap>1;Ⓒ∞;Ⓒ?))' "
+    "}",
+
+    "Cauch",  "{ "
+    "  'CDF=0.5+2*UVAL(UBASE(ATAN((X-x0)/sc)))' "
+    "  'PDF=1/(Ⓒπ*sc*(1+((X-x0)/sc)^2))' "
+    "  'CDFc=0.5-2*UVAL(UBASE(ATAN((X-x0)/sc)))' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'μ=Ⓒ?' "
+    "  'sx=Ⓒ?' "
+    "}",
+
+    "UnifCont",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;(X-Xmin)/(Xmax-Xmin)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;1/(Xmax-Xmin)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=(Xmax-Xmin)/√(12)' "
+    "}",
+
+    "TriSym",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≤(Xmax+Xmin)/2;2*(X-Xmin)²/(Xmax-Xmin)²;IFTE(X≤Xmax;1-2*(Xmax-X)²/(Xmax-Xmin)²;1)))' "
+    "  'PDF=IFTE(ABS(X-(Xmax+Xmin)/2)>(Xmax-Xmin)/2;0;4*((Xmax-Xmin)/2-ABS(X-(Xmax+Xmin)/2))/(Xmax-Xmin)²)' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=(Xmax-Xmin)/√(24)' "
+    "}",
+
+    "Chi2",  "{ "
+    "  'CDF=IFTE(X≤0;0;GammaP(df/2;X/2))' "
+    "  'PDF=IFTE(X≤0;0;(X^(df/2-1))*EXP(-X/2)/((2^(df/2))*Γ(df/2)))' "
+    "  'CDFc=1-CDF' "
+    "  'df=df' "
+    "  'μ=df' "
+    "  'sx=√(2*df)' "
+    "}",
+
+    "Beta",  "{ "
+    "  'CDF=IFTE(X≤0;0;IFTE(X≥1;1;BetaI(a;b;X)))' "
+    "  'PDF=IFTE(X≤0;0;IFTE(X≥1;0;(Γ(a+b)/(Γ(a)*Γ(b)))*(X^(a-1))*((1-X)^(b-1))))' "
+    "  'CDFc=1-CDF' "
+    "  'a=a' "
+    "  'b=b' "
+    "  'μ=a/(a+b)' "
+    "  'sx=√(a*b/(((a+b)^2)*(a+b+1)))' "
+    "}",
+
+
+    "Phit",  "{ "
+    "  'CDF=0.5*(1+erf(X/√(2)))' "
+    "  'PDF=EXP(-(X^2)/2)/√(2*Ⓒπ)' "
+    "  'CDFc=0.5*erfc(X/√(2))' "
+    "  'μ=0' "
+    "  'sx=1' "
+    "}",
+
+    "TriRight",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;((X-Xmin)^2)/((Xmax-Xmin)^2)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;2*(X-Xmin)/((Xmax-Xmin)^2)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmin+2*Xmax)/3' "
+    "  'sx=(Xmax-Xmin)/√(18)' "
+    "}",
+
+    "TriLeft",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;1-((Xmax-X)^2)/((Xmax-Xmin)^2)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;2*(Xmax-X)/((Xmax-Xmin)^2)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(2*Xmin+Xmax)/3' "
+    "  'sx=(Xmax-Xmin)/√(18)' "
+    "}",
+
+    "TriAsym",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≤xp;((X-Xmin)^2)/((Xmax-Xmin)*(xp-Xmin));IFTE(X≤Xmax;1-((Xmax-X)^2)/((Xmax-Xmin)*(Xmax-xp));1)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X≤xp;2*(X-Xmin)/((Xmax-Xmin)*(xp-Xmin));IFTE(X≤Xmax;2*(Xmax-X)/((Xmax-Xmin)*(Xmax-xp));0)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'xp=xp' "
+    "  'μ=(Xmin+Xmax+xp)/3' "
+    "  'sx=√((Xmin^2+Xmax^2+xp^2-Xmin*Xmax-Xmin*xp-Xmax*xp)/18)' "
+    "}",
+
+    "UShape",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;4*UVAL(UBASE(ASIN(√((X-Xmin)/(Xmax-Xmin)))))))' "
+    "  'PDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;0;1/(Ⓒπ*√((X-Xmin)*(Xmax-X)))))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmin+Xmax)/2' "
+    "  'sx=(Xmax-Xmin)/√(8)' "
+    "}",
+
+    "GEV",  "{ "
+    "  'CDF=EXP(-IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi)))' "
+    "  'PDF=(IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi))^(xi+1))*EXP(-IFTE(ABS(xi)<0.000000001;EXP(-(X-x0)/sc);(1+xi*(X-x0)/sc)^(-1/xi)))/sc' "
+    "  'CDFc=1-CDF' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'xi=xi' "
+    "  'μ=IFTE(ABS(xi)<0.000000001;x0+sc*0.5772156649015329;x0+sc*(Γ(1-xi)-1)/xi)' "
+    "  'sx=IFTE(ABS(xi)<0.000000001;sc*Ⓒπ/√(6);sc*√(Γ(1-2*xi)-Γ(1-xi)^2)/ABS(xi))' "
+    "}",
+
+
+    "Bernoulli",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X<1;1-p;1))' "
+    "  'PDF=IFTE(ABS(X)<0.5;1-p;IFTE(ABS(X-1)<0.5;p;0))' "
+    "  'CDFc=1-CDF' "
+    "  'p=p' "
+    "  'μ=p' "
+    "  'sx=√(p*(1-p))' "
+    "}",
+
+    "Binom",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X≥nt;1;Σ(Jx;0;IP(X);COMB(nt;Jx)*(p^Jx)*((1-p)^(nt-Jx)))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>nt;0;COMB(nt;IP(X))*(p^IP(X))*((1-p)^(nt-IP(X)))))' "
+    "  'CDFc=1-CDF' "
+    "  'nt=nt' "
+    "  'p=p' "
+    "  'μ=nt*p' "
+    "  'sx=√(nt*p*(1-p))' "
+    "}",
+
+    "Poiss",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X>λ+40*√(λ);1;Σ(Jx;0;IP(X);(λ^Jx)*EXP(-λ)/Jx!)))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>λ+40*√(λ);0;(λ^IP(X))*EXP(-λ)/(IP(X)!)))' "
+    "  'CDFc=1-CDF' "
+    "  'λ=λ' "
+    "  'μ=λ' "
+    "  'sx=√(λ)' "
+    "}",
+
+    "Geom",  "{ "
+    "  'CDF=IFTE(X<1;0;1-((1-p)^IP(X)))' "
+    "  'PDF=IFTE(X<1;0;((1-p)^(IP(X)-1))*p)' "
+    "  'CDFc=1-CDF' "
+    "  'p=p' "
+    "  'μ=1/p' "
+    "  'sx=√(1-p)/p' "
+    "}",
+
+    "Hyper",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X≥nd;1;Σ(Jx;0;IP(X);COMB(Ks;Jx)*COMB(Np-Ks;nd-Jx)/COMB(Np;nd))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>nd;0;COMB(Ks;IP(X))*COMB(Np-Ks;nd-IP(X))/COMB(Np;nd)))' "
+    "  'CDFc=1-CDF' "
+    "  'Np=Np' "
+    "  'Ks=Ks' "
+    "  'nd=nd' "
+    "  'μ=nd*Ks/Np' "
+    "  'sx=√(nd*(Ks/Np)*(1-Ks/Np)*(Np-nd)/(Np-1))' "
+    "}",
+
+    "UnifDis",  "{ "
+    "  'CDF=IFTE(X<Xmin;0;IFTE(X≥Xmax;1;(IP(X)-Xmin+1)/(Xmax-Xmin+1)))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;1/(Xmax-Xmin+1)))' "
+    "  'CDFc=1-CDF' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=(Xmax+Xmin)/2' "
+    "  'sx=√((((Xmax-Xmin+1)^2)-1)/12)' "
+    "}",
+
+    "Gamma",  "{ "
+    "  'CDF=IFTE(X≤0;0;GammaP(a;X/sc))' "
+    "  'PDF=IFTE(X≤0;0;(X^(a-1))*EXP(-X/sc)/((sc^a)*Γ(a)))' "
+    "  'CDFc=1-CDF' "
+    "  'a=a' "
+    "  'sc=sc' "
+    "  'μ=a*sc' "
+    "  'sx=√(a)*sc' "
+    "}",
+
+    "NormTrunc",  "{ "
+    "  'CDF=IFTE(X≤Xmin;0;IFTE(X≥Xmax;1;(erf((X-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))/(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))))' "
+    "  'PDF=IFTE(X<Xmin;0;IFTE(X>Xmax;0;(EXP(-(((X-x0)/sc)^2)/2)/(sc*√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))))' "
+    "  'CDFc=1-CDF' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'Xmin=Xmin' "
+    "  'Xmax=Xmax' "
+    "  'μ=x0+sc*((EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))' "
+    "  'sx=sc*√(1+(((Xmin-x0)/sc)*(EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-((Xmax-x0)/sc)*(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2)))))-(((EXP(-(((Xmin-x0)/sc)^2)/2)/√(2*Ⓒπ))-(EXP(-(((Xmax-x0)/sc)^2)/2)/√(2*Ⓒπ)))/(0.5*(erf((Xmax-x0)/(sc*√(2)))-erf((Xmin-x0)/(sc*√(2))))))^2)' "
+    "}",
+
+    "NegBinom",  "{ "
+    "  'CDF=IFTE(X<0;0;IFTE(X>rs*(1-p)/p+40*√(rs*(1-p))/p;1;Σ(Jx;0;IP(X);COMB(Jx+rs-1;Jx)*(p^rs)*((1-p)^Jx))))' "
+    "  'PDF=IFTE(X<0;0;IFTE(X>rs*(1-p)/p+40*√(rs*(1-p))/p;0;COMB(IP(X)+rs-1;IP(X))*(p^rs)*((1-p)^IP(X))))' "
+    "  'CDFc=1-CDF' "
+    "  'rs=rs' "
+    "  'p=p' "
+    "  'μ=rs*(1-p)/p' "
+    "  'sx=√(rs*(1-p))/p' "
+    "}",
+
+
+    "Student",  "{ "
+    "  'CDF=IFTE(X<0;0.5*BetaI(df/2;0.5;df/(df+X^2));1-0.5*BetaI(df/2;0.5;df/(df+X^2)))' "
+    "  'PDF=Γ((df+1)/2)/(√(df*Ⓒπ)*Γ(df/2))*((1+(X^2)/df)^(-(df+1)/2))' "
+    "  'CDFc=1-CDF' "
+    "  'df=df' "
+    "  'μ=IFTE(df>1;0;Ⓒ?)' "
+    "  'sx=IFTE(df>2;√(df/(df-2));Ⓒ?)' "
+    "}",
+
+    "Fisher",  "{ "
+    "  'CDF=IFTE(X≤0;0;BetaI(dfn/2;dfd/2;dfn*X/(dfn*X+dfd)))' "
+    "  'PDF=IFTE(X≤0;0;(Γ((dfn+dfd)/2)/(Γ(dfn/2)*Γ(dfd/2)))*((dfn/dfd)^(dfn/2))*(X^(dfn/2-1))*((1+dfn*X/dfd)^(-(dfn+dfd)/2)))' "
+    "  'CDFc=1-CDF' "
+    "  'dfn=dfn' "
+    "  'dfd=dfd' "
+    "  'μ=IFTE(dfd>2;dfd/(dfd-2);Ⓒ?)' "
+    "  'sx=IFTE(dfd>4;√(2*(dfd^2)*(dfn+dfd-2)/(dfn*((dfd-2)^2)*(dfd-4)));Ⓒ?)' "
+    "}",
+
+    "Levy",  "{ "
+    "  'CDF=IFTE(X≤x0;0;erfc(√(sc/(2*(X-x0)))))' "
+    "  'PDF=IFTE(X≤x0;0;√(sc/(2*Ⓒπ))*EXP(-sc/(2*(X-x0)))/((X-x0)^1.5))' "
+    "  'CDFc=IFTE(X≤x0;1;1-erfc(√(sc/(2*(X-x0)))))' "
+    "  'x0=x0' "
+    "  'sc=sc' "
+    "  'μ=Ⓒ∞' "
+    "  'sx=Ⓒ∞' "
+    "}",
+
 };
 //   clang-format on
 
@@ -1451,6 +2821,40 @@ const equation::config equation::equations =
 };
 
 
+
+// ==========================================================================
+//   Equation Library - grand total of variables
+//   (from doc/calc-help/equations.md; each name is counted once per section
+//   that uses it - the same name recurring in another section is expected and
+//   counted again, since every section carries its own variable list.)
+// --------------------------------------------------------------------------
+//     Columns and Beams                    21
+//     Electricity                          78
+//     Fluids                               30
+//     Forces and Energy                    37
+//     Gases                                38
+//     Heat transfer                        31
+//     Magnetism                            28
+//     Motion                               38
+//     Optics                               40
+//     Oscillations                         25
+//     Plane Geometry                       21
+//     Solid geometry                       12
+//     Solid State Devices                  54
+//     Stress Analysis                      28
+//     Waves                                40
+//     Relativity                          109
+//     Modern Physics                       43
+//     Nuclear Physics                      52
+//     Finance                               6
+//     Rocketry                             110
+//     Geocentric / Stationary              54
+//     Geocentric / Trajectory              80
+//     Heliocentric / Stationary            12
+//     Heliocentric / Trajectory           128
+// --------------------------------------------------------------------------
+//     GRAND TOTAL                        1115
+// ==========================================================================
 
 // ============================================================================
 //

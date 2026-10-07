@@ -1,0 +1,28 @@
+«
+@@ ============================================================
+@@ ETMB4 — Earth-To-Mars-&-Back mission (2048): Venus-flyby return (worked example)
+@@ Fixed dates for the validated opposition-class return (Mars->Venus->Earth). Calls
+@@ OppRoute and returns the return-leg itinerary as tagged values. The fiche figure shows
+@@ the full to-scale trajectory (outbound + Venus-assisted return).
+@@ Author & design         : Jean Wilson
+@@ Co-authors & programming : Claude & Claude Code (Anthropic)
+@@ Input  : (none)
+@@   ( -- MarsDeparture VenusFlyby EarthArrival ReturnDays dVTEI turnReq EarthEntry )  tagged
+@@ ============================================================
+ 2469315 2469470 2469535 → t3 tv t4 «
+   t3 tv t4 ⓁOppRoute → R «
+     t3 "MarsDeparture" →Tag
+     tv "VenusFlyby" →Tag
+     t4 "EarthArrival" →Tag
+     R 5 GET "ReturnDays" →Tag
+     R 1 GET "dVTEI_kms" →Tag
+     R 3 GET "turnReq_deg" →Tag
+     R 6 GET "EarthEntry_kms" →Tag
+   »
+ »
+»
+
+@@ ============================================================
+@@ Astronomy, Astrodynamics, AstroExamples & Missions Function Library
+@@ As of 26-08-13: Total 72 numerical examples (64 functions + 8 dedicated examples) in 10 subsections, 4 sections
+@@ ============================================================
