@@ -1998,9 +1998,25 @@ void tests::global_variables()
 
     step("Store with arithmetic")
         .test(CLEAR, "12 'A' STO+ A", ENTER).expect("12 357")
-        .test(CLEAR, "13 'A' STO- A", ENTER).expect("12 344")
+        .test(CLEAR, "'A' 13 STO- A", ENTER).expect("12 344")
         .test(CLEAR, "5 'A' STO* A", ENTER).expect("61 720")
-        .test(CLEAR, "2 'A' STO/ A", ENTER).expect("30 860");
+        .test(CLEAR, "'A' 2 STO/ A", ENTER).expect("30 860");
+    step("Store with arithmetic, name first")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO+ B", ENTER).expect("7")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO- B", ENTER).expect("3")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO* B", ENTER).expect("10")
+        .test(CLEAR, "5 'B' STO 'B' 2 STO/ B", ENTER).expect("2 ¹/₂");
+    step("Store with arithmetic, value first")
+        .test(CLEAR, "5 'B' STO 2 'B' STO+ B", ENTER).expect("7")
+        .test(CLEAR, "5 'B' STO 2 'B' STO- B", ENTER).expect("-3")
+        .test(CLEAR, "5 'B' STO 2 'B' STO* B", ENTER).expect("10")
+        .test(CLEAR, "5 'B' STO 2 'B' STO/ B", ENTER).expect("²/₅");
+    step("Store with arithmetic, order for non-commutative add")
+        .test(CLEAR, "{ 1 } 'B' STO 'B' \"x\" STO+ B", ENTER)
+        .expect("{ 1 \"x\" }")
+        .test(CLEAR, "\"y\" 'B' STO+ B", ENTER)
+        .expect("{ \"y\" 1 \"x\" }")
+        .test(CLEAR, "'B' PURGE", ENTER).noerror();
 
     step("Recall with arithmetic")
         .test(CLEAR, "12 'A' RCL+", ENTER).expect("30 872")
@@ -2395,6 +2411,76 @@ void tests::global_variables()
         .test(NOSHIFT, BSP).expect("23")
         .test(NOSHIFT, BSP).expect("11")
         .test(NOSHIFT, BSP).expect("{ 11 23 34 44 }");
+
+    step("Create directories from a list")
+        .test(CLEAR, "HOME 'CrDirTest' CRDIR CrDirTest", ENTER).noerror()
+        .test(CLEAR, "{ DA DB DC } CRDIR VARS", ENTER)
+        .expect("{ DC DB DA }")
+        .test(CLEAR, "{ ALPHA BETA GAMMA2 DELTA } CRDIR VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }");
+    step("Create directories from a list with an invalid name")
+        .test(CLEAR, "{ DD 3 DE } CRDIR", ENTER)
+        .error("Invalid name")
+        .test(CLEAR, "VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }");
+    step("Create directories from a list with an existing name")
+        .test(CLEAR, "{ DD DB DE } CRDIR", ENTER)
+        .error("Name already exists")
+        .test(CLEAR, "VARS", ENTER)
+        .expect("{ DELTA GAMMA2 BETA ALPHA DC DB DA }")
+        .test(CLEAR, "HOME 'CrDirTest' PGDIR", ENTER).noerror();
+
+    step("Store current directory into itself")
+        .test(CLEAR, "HOME 'StoSelf' CRDIR StoSelf", ENTER).noerror()
+        .test(CLEAR, "5 'A' STO { 1 2 3 } 'L' STO", ENTER).noerror()
+        .test(CLEAR, "{ HOME StoSelf } RCL 'H' STO", ENTER).noerror()
+        .test(CLEAR, "{ H L } RCL { H A } RCL", ENTER).expect("5")
+        .test(BSP).expect("{ 1 2 3 }")
+        .test(CLEAR, "VARS", ENTER).expect("{ H L A }")
+        .test(CLEAR, "H VARS UPDIR", ENTER).expect("{ L A }")
+        .test(CLEAR, "'H' PGDIR VARS", ENTER).expect("{ L A }");
+    step("Store current directory into itself with a long name")
+        .test(CLEAR, "7 'B' STO 8 'C' STO 9 'E' STO", ENTER).noerror()
+        .test(CLEAR, "{ HOME StoSelf } RCL 'LONGERNAME' STO", ENTER)
+        .noerror()
+        .test(CLEAR, "LONGERNAME VARS UPDIR", ENTER)
+        .expect("{ E C B L A }")
+        .test(CLEAR, "{ LONGERNAME E } RCL { LONGERNAME B } RCL", ENTER)
+        .expect("7")
+        .test(BSP).expect("9")
+        .test(CLEAR, "VARS", ENTER).expect("{ LONGERNAME E C B L A }")
+        .test(CLEAR, "'LONGERNAME' PGDIR", ENTER).noerror();
+    step("Store current directory containing a large list into itself")
+        .test(CLEAR, "1 100 FOR i i NEXT 100 →LIST 'L' STO", ENTER)
+        .noerror()
+        .test(CLEAR, "{ HOME StoSelf } RCL 'BIG' STO VARS", ENTER)
+        .expect("{ BIG E C B L A }")
+        .test(CLEAR, "{ BIG L } RCL SIZE", ENTER).expect("100")
+        .test(CLEAR, "{ BIG L } RCL 100 GET", ENTER).expect("100")
+        .test(CLEAR, "BIG VARS UPDIR", ENTER).expect("{ E C B L A }")
+        .test(CLEAR, "'BIG' PGDIR", ENTER).noerror();
+    step("Store parent directory into a subdirectory")
+        .test(CLEAR, "'Kid' CRDIR Kid", ENTER).noerror()
+        .test(CLEAR, "{ HOME StoSelf } RCL 'P' STO VARS", ENTER)
+        .expect("{ P }")
+        .test(CLEAR, "P VARS", ENTER).expect("{ Kid E C B L A }")
+        .test(CLEAR, "Kid VARS", ENTER).expect("{ }")
+        .test(CLEAR, "UPDIR UPDIR UPDIR VARS", ENTER)
+        .expect("{ Kid E C B L A }");
+    step("Store directory into existing variable in itself")
+        .test(CLEAR, "{ HOME StoSelf } RCL 'H' STO", ENTER).noerror()
+        .test(CLEAR, "{ HOME StoSelf } RCL 'H' STO VARS", ENTER)
+        .expect("{ H Kid E C B L A }")
+        .test(CLEAR, "H VARS", ENTER).expect("{ H Kid E C B L A }")
+        .test(CLEAR, "H VARS", ENTER).expect("{ Kid E C B L A }")
+        .test(CLEAR, "UPDIR UPDIR VARS", ENTER)
+        .expect("{ H Kid E C B L A }");
+    step("Store home directory into itself is an exact snapshot")
+        .test(CLEAR, "HOME 'StoSelf' PGDIR", ENTER).noerror()
+        .test(CLEAR, "{ HOME } RCL →STR { HOME } RCL 'HomeCopy' STO", ENTER)
+        .test("'HomeCopy' RCL →STR SAME", ENTER)
+        .expect("True")
+        .test(CLEAR, "'HomeCopy' PGDIR", ENTER).noerror();
 
     step("Save to file as text")
         .test(CLEAR, "1.42 \"Hello.txt\"", NOSHIFT, G).noerror();

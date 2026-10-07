@@ -59,17 +59,34 @@ The format of the file depends on how the name ends:
 ## STO+
 Add a value to the content of a variable
 
+The variable name can be either in level 1 or level 2. The operation is
+performed in stack order, replacing the name with the variable's content:
+`'L' "x" STO+` appends `"x"` to the list in `L`, whereas `"x" 'L' STO+`
+prepends it.
+
 
 ## STO-
 Subtract a value from the contents of a variable
+
+The variable name can be either in level 1 or level 2. The operation is
+performed in stack order: if `A` contains `5`, `'A' 2 STO-` stores `3` in `A`,
+whereas `2 'A' STO-` stores `-3`.
 
 
 ## STO×
 Multiply the contents of a variable by a value
 
+The variable name can be either in level 1 or level 2. The operation is
+performed in stack order, which matters for non-commutative multiplications,
+e.g. matrix multiplication.
+
 
 ## STO÷
 Divide the contents of a variable by a value
+
+The variable name can be either in level 1 or level 2. The operation is
+performed in stack order: if `A` contains `5`, `'A' 2 STO÷` stores `5/2` in `A`,
+whereas `2 'A' STO÷` stores `2/5`.
 
 
 ## RCL+

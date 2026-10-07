@@ -345,12 +345,15 @@ object_p directory::store(object_g name, object_g value)
         if (!rt.clone_global(evalue, es))
             return nullptr;     // Out of memory, bail out
 
-        // Clone input value if it is within object being replaced
-        if (+value >= +evalue && +value < +evalue + es)
+        // Clone input value if it overlaps the object being replaced,
+        // e.g. if it is within it, or if we store an enclosing directory
+        if (+value < +evalue + es && +value + vs > +evalue)
         {
             value = rt.clone(value);
             if (!value)
                 return nullptr;
+            if (vs > es && rt.available(vs - es) < vs - es)
+                return nullptr;         // Out of memory
         }
 
         // Move memory above storage if necessary
@@ -373,10 +376,25 @@ object_p directory::store(object_g name, object_g value)
         if (rt.available(requested) < requested)
             return nullptr;               // Out of memory
 
-        // Move memory from directory up
+        // Find where to insert in the directory
         object_p start = object_p(+body);
         if (Settings.StoreAtEnd())
             start += dirsize;
+
+        // If the value straddles the insertion point, e.g. when storing
+        // the current directory or one of its parents, clone it first,
+        // since moving memory would otherwise insert a gap in the value.
+        // Cloning only moves temporaries, so it does not move `start`.
+        if (+value < start && +value + vs > start)
+        {
+            value = rt.clone(value);
+            if (!value)
+                return nullptr;
+            if (rt.available(requested) < requested)
+                return nullptr;           // Out of memory
+        }
+
+        // Move memory from directory up
         rt.move_globals(start + requested, start);
 
         // Copy name and value at end of directory
@@ -1091,20 +1109,41 @@ COMMAND_BODY(Copy)
 }
 
 
+static bool is_variable_name(object_p obj)
+// ----------------------------------------------------------------------------
+//   Check if an object is a (possibly quoted) variable name
+// ----------------------------------------------------------------------------
+{
+    if (object_p quoted = obj->as_quoted(object::ID_object))
+        obj = quoted;
+    object::id ty = obj->type();
+    return ty == object::ID_symbol || ty == object::ID_local;
+}
+
+
 static object::result store_op(object::id op)
 // ----------------------------------------------------------------------------
 //   Store with a given operation
 // ----------------------------------------------------------------------------
+//   Like legacy RPL, accept both `value 'name' STO-`, which stores
+//   `value - name`, and `'name' value STO-`, which stores `name - value`
 {
     object_g name = rt.stack(0);
     object_g value = rt.stack(1);
     if (!name || !value)
         return object::ERROR;
+    bool name_first = !is_variable_name(name) && is_variable_name(value);
+    if (name_first)
+    {
+        object_g tmp = name;
+        name = value;
+        value = tmp;
+    }
     object_g existing = directory::recall_all(name, true);
     if (!existing)
         return object::ERROR;
-    rt.stack(1, existing);
-    rt.stack(0, value);
+    rt.stack(name_first ? 1 : 0, existing);
+    rt.stack(name_first ? 0 : 1, value);
     object_p cmd = object::static_object(op);
     if (object::result res = cmd->evaluate())
         return res;
@@ -1414,14 +1453,49 @@ COMMAND_BODY(Path)
 }
 
 
-static bool do_crdir(directory *dir, object_p name)
+static bool check_crdir(directory_r dir, object_p name)
 // ----------------------------------------------------------------------------
-//   Internal helper for CRDIR
+//   Check that we can create directories with the given name(s)
 // ----------------------------------------------------------------------------
+//   This makes sure that we do not create some directories in a list
+//   and then fail because a later name is invalid or already exists
 {
     if (object_p quoted = name->as_quoted(object::ID_object))
         name = quoted;
     if (list_p lst = name->as<list>())
+    {
+        for (object_p sub : *lst)
+            if (!check_crdir(dir, sub))
+                return false;
+        return true;
+    }
+
+    object::id ty = name->type();
+    if (ty != object::ID_symbol &&
+        !(ty == object::ID_integer && Settings.NumberedVariables()))
+    {
+        rt.invalid_name_error();
+        return false;
+    }
+    if (dir->recall(name))
+    {
+        rt.name_exists_error();
+        return false;
+    }
+    return true;
+}
+
+
+static bool do_crdir(directory_r dir, object_g name)
+// ----------------------------------------------------------------------------
+//   Internal helper for CRDIR
+// ----------------------------------------------------------------------------
+//   Creating a directory allocates memory and moves the globals, so `name`
+//   and the list iterator must be GC-safe across iterations
+{
+    if (object_p quoted = name->as_quoted(object::ID_object))
+        name = quoted;
+    if (list_g lst = name->as<list>())
     {
         for (object_p sub : *lst)
             if (!do_crdir(dir, sub))
@@ -1435,8 +1509,8 @@ static bool do_crdir(directory *dir, object_p name)
         return false;
     }
 
-    object_p newdir = rt.make<directory>();
-    return dir->store(name, newdir);
+    object_g newdir = rt.make<directory>();
+    return newdir && ((directory *) +dir)->store(name, newdir);
 }
 
 
@@ -1445,16 +1519,17 @@ COMMAND_BODY(CrDir)
 //   Create a directory
 // ----------------------------------------------------------------------------
 {
-    directory *dir = rt.variables(0);
+    directory_g dir = rt.variables(0);
     if (!dir)
     {
         rt.no_directory_error();
         return ERROR;
     }
 
-    if (object_p obj = rt.pop())
-        if (do_crdir(dir, obj))
-            return OK;
+    if (object_g obj = rt.top())
+        if (check_crdir(dir, obj) && do_crdir(dir, obj))
+            if (rt.drop())
+                return OK;
     return ERROR;
 }
 
