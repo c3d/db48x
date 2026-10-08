@@ -461,8 +461,10 @@ void extract_android_assets()
 //   On Android, the online help needs to be put in assets
 // ----------------------------------------------------------------------------
 {
+    // On Android the AppDataLocation is completely inaccessible to the user.
+    // Use GenericDataLocation so the user can access and handle the files.
     QString sandboxDir =
-        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
     QDir().mkpath(sandboxDir);
 
     QSettings settings("DB48X", "Emulator");
@@ -501,6 +503,7 @@ void extract_android_assets()
         }
 
         sim_install_regenerate_help_indices(sandboxDir);
+
 
         settings.setValue("AssetVersion", currentAssetVersion);
     }
@@ -1603,7 +1606,11 @@ int ui_file_selector(const char *title,
 #ifdef ANDROID
         // Create a persistent, private sandbox path that standard C++ can read/write
         // This requires no permissions and survives app restarts.
-        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+        // On Android the AppDataLocation is completely inaccessible to the user.
+        // In stead, use what is effectively equivalent to other platforms.
+        // Allow the user to access and handle the files.
+        QString sandboxDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
         QDir().mkpath(sandboxDir); // Ensure the directory exists
         QString sandboxPath = sandboxDir + "/" + name;
 

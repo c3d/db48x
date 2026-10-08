@@ -556,8 +556,16 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("48calc.org");
     QCoreApplication::setApplicationName("DB48X");
 
+#ifdef ANDROID
+    // On Android the AppDataLocation is completely inaccessible to the user.
+    // In stead, use what is effectively equivalent to other platforms.
+    // Allow the user to access and handle the files.
+    QString files =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+#else
     QString files =
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#endif
 
     // On Android the mere existence of the application data directory does not
     // mean the resources were extracted: the Qt bootstrap creates it before we
