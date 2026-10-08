@@ -626,8 +626,10 @@ android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
 
 # Additional dependencies for Android build
-$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle \
-              sim/android-db48x/AndroidManifest.xml sim/android-db48x/build.gradle
+$(QMAKEFILE):	sim/android/db48x/AndroidManifest.xml	\
+		sim/android/db48x/build.gradle		\
+		sim/android/db50x/AndroidManifest.xml	\
+		sim/android/db50x/build.gradle
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
 # expects a build directory as --output and the .so staged under

@@ -52,10 +52,10 @@ isEmpty(OBJECTS_DIR):OBJECTS_DIR=db50x-build
 
 ICON = db50x.icns
 
-DISTFILES += \
-    android/AndroidManifest.xml \
-    android/build.gradle \
-    android/res/values/libs.xml \
-    android/res/xml/qtprovider_paths.xml
+DISTFILES +=                                    \
+    android/db50x/AndroidManifest.xml           \
+    android/db50x/build.gradle                  \
+    android/db50x/res/values/libs.xml           \
+    android/db50x/res/xml/qtprovider_paths.xml
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/db50x
