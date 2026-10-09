@@ -345,7 +345,7 @@ bool load_saved_keymap(cstring name)
     {
         kcfg.read(keymap_name, sizeof(keymap_name)-1);
         for (size_t i = 0; i < sizeof(keymap_name); i++)
-            if (keymap_name[i] == '\n')
+            if (keymap_name[i] == '\n' || keymap_name[i] == '\r')
                 keymap_name[i] = 0;
     }
     else
