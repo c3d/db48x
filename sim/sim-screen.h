@@ -74,6 +74,7 @@ public:
     static void update_pixmap() { theScreen->updatePixmap(); }
     static void refresh_lcd()   { theScreen->refreshScreen(); }
     static uint redraw_count()  { return theScreen->redraws; }
+    static void invalidate();
     void        setPixmapGeometry(int totalWidth, int xOffset);
 };
 

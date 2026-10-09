@@ -489,21 +489,30 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 
     static bool isSaved = false;
 
+    record(sim_window, "App state %d visible=%d active=%d",
+           int(state), isVisible(), isActiveWindow());
+
     if (state == Qt::ApplicationActive)
     {
         isSaved = false;
+        record(sim_window, "Foreground: show/raise/invalidate geometry=%dx%d",
+               width(), height());
+
+        // Mark every pixel as dirty so the RPL thread redraws everything.
+        SimScreen::invalidate();
+        key_push(0);
     }
     else if ((state == Qt::ApplicationSuspended ||
               state == Qt::ApplicationHidden) &&
              !isSaved) // Check both suspend and hidden + avoid double save
     {
+        record(sim_window, "Background: auto-save state=%d", int(state));
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)
         extern bool save_system_state_silent();
         save_system_state_silent();
 
         record(sim_window, "Android auto-save triggered");
-
 	isSaved = true;
     }
 }
