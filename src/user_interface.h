@@ -330,6 +330,8 @@ protected:
     bool     blink        : 1;  // Cursor blink indicator
     bool     follow       : 1;  // Follow a help topic
     uint     skipTopicSync;     // Skip topic=highlight sync for N redraws
+    uint     helpUpTarget;      // Help position to place after an up scroll
+    int      helpUpOffset;      // Where it goes, in pixels below the top
     bool     force        : 1;  // Force a redraw of everything
     bool     dirtyMenu    : 1;  // Menu label needs redraw
     bool     dirtyStack   : 1;  // Need to redraw the stack
