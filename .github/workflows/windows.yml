@@ -1,0 +1,238 @@
+name: Build DB48X (Windows)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-simulator-windows:
+    name: Build Simulator (Windows)
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libsystre
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+          mingw-w64-x86_64-qt6-translations
+          mingw-w64-x86_64-qt6-tools
+          mingw-w64-x86_64-libgfortran
+
+    - name: Build simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make sim
+
+    - name: Run test suite
+      shell: msys2 {0}
+      continue-on-error: true
+      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
+
+    - name: Upload failed test images
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-test-images-windows
+        path: images/bad/*.png
+        if-no-files-found: ignore
+        retention-days: 1
+
+    - name: Upload Windows help file for debugging
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-help-windows
+        path: help/db48x.md
+        if-no-files-found: error
+        retention-days: 1
+
+    - name: Deploy Qt dependencies
+      shell: msys2 {0}
+      run: |
+        windeployqt6 db48x.exe
+        # Copy MinGW runtime and MSYS2 dependencies
+        cp /mingw64/bin/libgcc_s_seh-1.dll .
+        cp /mingw64/bin/libstdc++-6.dll .
+        cp /mingw64/bin/libwinpthread-1.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libintl-8.dll .
+        cp /mingw64/bin/libiconv-2.dll .
+        # Copy all Qt dependency DLLs
+        cp /mingw64/bin/libb2-1.dll .
+        cp /mingw64/bin/libdouble-conversion.dll .
+        cp /mingw64/bin/libicuin*.dll .
+        cp /mingw64/bin/libicuuc*.dll .
+        cp /mingw64/bin/libicudt*.dll .
+        cp /mingw64/bin/libpcre2-16-0.dll .
+        cp /mingw64/bin/zlib1.dll .
+        cp /mingw64/bin/libzstd.dll .
+        cp /mingw64/bin/libfreetype-6.dll .
+        cp /mingw64/bin/libharfbuzz-0.dll .
+        cp /mingw64/bin/libmd4c.dll .
+        cp /mingw64/bin/libpng16-16.dll .
+        cp /mingw64/bin/libbrotlidec.dll .
+        cp /mingw64/bin/libbrotlicommon.dll .
+        cp /mingw64/bin/libbz2-1.dll .
+        cp /mingw64/bin/libglib-2.0-0.dll .
+        cp /mingw64/bin/libgraphite2.dll .
+        cp /mingw64/bin/libpcre2-8-0.dll .
+
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: db48x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+
+    - name: Upload simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db48x-simulator-windows
+        path: |
+          db48x.exe
+          *.dll
+          platforms/
+          imageformats/
+          tls/
+          translations/
+          help/
+        retention-days: 7
+
+  build-color-simulator-windows:
+    name: Build Color DM32 Simulator (Windows)
+    runs-on: windows-latest
+    env:
+      WINDOWS_CERT_DATA: ${{ secrets.WINDOWS_CERT_DATA }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+      with:
+        submodules: recursive
+
+    - name: Setup MSYS2 with Qt6
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        cache: true
+        install: >-
+          git
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-make
+          mingw-w64-x86_64-freetype
+          mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-libsystre
+          mingw-w64-x86_64-qt6-base
+          mingw-w64-x86_64-qt6-declarative
+          mingw-w64-x86_64-qt6-multimedia
+          mingw-w64-x86_64-qt6-translations
+          mingw-w64-x86_64-qt6-tools
+          mingw-w64-x86_64-libgfortran
+
+    - name: Build color DM32 simulator
+      shell: msys2 {0}
+      run: |
+        echo "${{ github.run_number }}" > .build_id
+        mingw32-make color-dm32-sim
+
+    - name: Run test suite
+      shell: msys2 {0}
+      continue-on-error: true
+      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
+
+    - name: Upload failed test images
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-test-images-windows
+        path: color-images/bad/*.png
+        if-no-files-found: ignore
+        retention-days: 1
+
+    - name: Upload Windows help file for debugging
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-help-windows
+        path: help/db50x.md
+        if-no-files-found: error
+        retention-days: 1
+
+    - name: Deploy Qt dependencies
+      shell: msys2 {0}
+      run: |
+        windeployqt6 db50x.exe
+        # Copy MinGW runtime and MSYS2 dependencies
+        cp /mingw64/bin/libgcc_s_seh-1.dll .
+        cp /mingw64/bin/libstdc++-6.dll .
+        cp /mingw64/bin/libwinpthread-1.dll .
+        cp /mingw64/bin/libsystre-0.dll .
+        cp /mingw64/bin/libtre-5.dll .
+        cp /mingw64/bin/libintl-8.dll .
+        cp /mingw64/bin/libiconv-2.dll .
+        # Copy all Qt dependency DLLs
+        cp /mingw64/bin/libb2-1.dll .
+        cp /mingw64/bin/libdouble-conversion.dll .
+        cp /mingw64/bin/libicuin*.dll .
+        cp /mingw64/bin/libicuuc*.dll .
+        cp /mingw64/bin/libicudt*.dll .
+        cp /mingw64/bin/libpcre2-16-0.dll .
+        cp /mingw64/bin/zlib1.dll .
+        cp /mingw64/bin/libzstd.dll .
+        cp /mingw64/bin/libfreetype-6.dll .
+        cp /mingw64/bin/libharfbuzz-0.dll .
+        cp /mingw64/bin/libmd4c.dll .
+        cp /mingw64/bin/libpng16-16.dll .
+        cp /mingw64/bin/libbrotlidec.dll .
+        cp /mingw64/bin/libbrotlicommon.dll .
+        cp /mingw64/bin/libbz2-1.dll .
+        cp /mingw64/bin/libglib-2.0-0.dll .
+        cp /mingw64/bin/libgraphite2.dll .
+        cp /mingw64/bin/libpcre2-8-0.dll .
+
+    - name: Code sign Windows executable
+      if: ${{ env.WINDOWS_CERT_DATA != '' }}
+      uses: lando/code-sign-action@v3
+      with:
+        file: db50x.exe
+        certificate-data: ${{ secrets.WINDOWS_CERT_DATA }}
+        certificate-password: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+
+    - name: Upload color simulator artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: db50x-color-simulator-windows
+        path: |
+          db50x.exe
+          *.dll
+          platforms/
+          imageformats/
+          tls/
+          translations/
+          help/
+        retention-days: 7

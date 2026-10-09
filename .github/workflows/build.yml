@@ -248,29 +248,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make sim
 
-    - name: Run test suite
-      shell: msys2 {0}
-      continue-on-error: true
-      run: ./db48x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
-
-    - name: Upload failed test images
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db48x-test-images-windows
-        path: images/bad/*.png
-        if-no-files-found: ignore
-        retention-days: 1
-
-    - name: Upload Windows help file for debugging
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db48x-help-windows
-        path: help/db48x.md
-        if-no-files-found: error
-        retention-days: 1
-
     - name: Deploy Qt dependencies
       shell: msys2 {0}
       run: |
@@ -558,29 +535,6 @@ jobs:
         echo "${{ github.run_number }}" > .build_id
         mingw32-make color-dm32-sim
 
-    - name: Run test suite
-      shell: msys2 {0}
-      continue-on-error: true
-      run: ./db50x.exe -H -I -w 25000 -r 100 -D help,file,sim_help -Tall
-
-    - name: Upload failed test images
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db50x-test-images-windows
-        path: color-images/bad/*.png
-        if-no-files-found: ignore
-        retention-days: 1
-
-    - name: Upload Windows help file for debugging
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: db50x-help-windows
-        path: help/db50x.md
-        if-no-files-found: error
-        retention-days: 1
-
     - name: Deploy Qt dependencies
       shell: msys2 {0}
       run: |
@@ -702,7 +656,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.10.3'
+        version: '6.7.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
@@ -774,7 +728,7 @@ jobs:
     - name: Install Qt for Android
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.10.3'
+        version: '6.7.3'
         host: 'linux'
         target: 'android'
         arch: 'android_arm64_v8a'
