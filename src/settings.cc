@@ -210,7 +210,24 @@ void settings::save(renderer &out, bool show_defaults)
     // Save the current menu
     if (menu_p menu = ui.menu())
     {
-        menu->render(out);
+        // Menus numbered on the fly, like LibraryMenu00 or ConstantsMenu03,
+        // are not commands: read back with the state, their name would land
+        // on the stack. Save the menu they belong to instead.
+        object::id mty = menu->type();
+        if (mty >= object::ID_UnitMenu00 && mty <= object::ID_CharactersMenu99)
+        {
+            object::id parent =
+                mty >= object::ID_CharactersMenu00 ? object::ID_CharactersMenu
+              : mty >= object::ID_LibraryMenu00    ? object::ID_Library
+              : mty >= object::ID_EquationsMenu00  ? object::ID_EquationsMenu
+              : mty >= object::ID_ConstantsMenu00  ? object::ID_ConstantsMenu
+              :                                      object::ID_UnitsMenu;
+            object::static_object(parent)->render(out);
+        }
+        else
+        {
+            menu->render(out);
+        }
         out.put('\n');
     }
 }
