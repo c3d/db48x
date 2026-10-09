@@ -1656,8 +1656,14 @@ S1Converge runs the mass calibration of S1Mass with 100, 1 000 and
 10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
 its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
 the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
-three values of u. About 13 seconds on the simulator; on a calculator, several
-minutes.
+three values of u. About 13 seconds on the simulator.
+
+On a calculator, the 10 000 draws alone would take some twenty minutes (21 on
+a DM32). They are timed by the 1 000 before them, ten times fewer: when they
+would take more than two minutes, they are skipped, the plot shows the first
+two points and says so, and two values of u are returned. To run them all the
+same, store a number other than 0 in the global variable ExtendedTrials, for
+instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
 
 **1)** The convergence, with the seed of the examples:
 
