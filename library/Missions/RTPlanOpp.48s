@@ -8,44 +8,80 @@
 @@ Co-authors & programming : Claude & Claude Code (Anthropic)
 @@
 @@ Input  : t3lo t3hi   ( t3lo t3hi -- { t3 tv t4 ΔVTEI matchErr turnReq turnMax tof } )
-@@   t3lo t3hi : Mars-departure search window (JD). Keep it narrow (~60 d) — slow.
+@@   t3lo t3hi : Mars-departure search window (JD). Keep it narrow (~60 d).
 @@ Output : the best return itinerary. Feasible ⇔ matchErr≈0 AND turnReq ≤ turnMax.
 @@ VALIDATION (device-confirmed): 2459920 2459980 RTPlanOpp ->
 @@   { 2459930 2460150 2460220  5.90 0.00084 30.93° 49.72° 290 }  (Mars dep 2022-12-16,
 @@   Venus 2023-07-24, Earth 2023-10-02; near-ballistic matchErr<1 m/s, turnReq ≤ turnMax ✓).
+@@ Each itinerary joins two legs: Mars → Venus depends on (t3, tv) only, Venus →
+@@ Earth on (tv, t4) only. Each leg is computed once and kept, then the 343
+@@ points of the refinement only combine them: 98 Lambert solutions instead of
+@@ 686, and the same result to the last digit, about six times faster.
 @@ ============================================================
  → t3lo t3hi
- « 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH « HFP 15 Precision 1000000 'zzP' STO  0 'zzt3' STO  0 'zztv' STO  0 'zzt4' STO
-   t3lo t3hi FOR t3
-     130 290 FOR d1
-       60 200 FOR d2
-         t3  t3 d1 +  t3 d1 + d2 +  ⓁOppRoute
-         → R
-         « R 2 GET  R 3 GET Uval R 4 GET Uval - 0 MAX 0.1 · +
-           → P
-           « P zzP <
-             « P 'zzP' STO  t3 'zzt3' STO  t3 d1 + 'zztv' STO  t3 d1 + d2 + 'zzt4' STO » IFT »
-         »
-       35 STEP
-     40 STEP
-   25 STEP
-   zzt3 zztv zzt4
-   → b3 bv b4
-   « b3 15 - b3 15 + FOR t3
+ « 'Precision' RCL 'HardwareFloatingPoint' RCL → savP savH « HFP 15 Precision DEG
+   @ The two legs of an itinerary, each computed once per pair of dates:
+   @ Mars → Venus depends on (t3, tv) only, Venus → Earth on (tv, t4) only.
+   @ The penalty then combines them as OppRoute does, in the same order.
+   @ These programs are kept in locals: they must name no other local.
+   @ ( t3 tv -- { viVi tMax } )
+   « → a3 av
+     « a3 Ⓛ♂Pf  av Ⓛ♀Pf  av a3 -  0.00029591220828559 ⓁLambertU 2 GET  av 'Ⓛ♀Pf' ⓁVΦf -
+       → vi « vi
+              vi DUP DOT √ 1731.4568 · 1_km/s ·   6351.8 1_km ·   ⒸGM♀  ⓁGAssist  1 GET Uval
+              2 →List » » »
+   @ ( tv t4 -- viVo )
+   « → bv b4 « bv Ⓛ♀Pf  b4 Ⓛ♁Pf  b4 bv -  0.00029591220828559 ⓁLambertU 1 GET  bv 'Ⓛ♀Pf' ⓁVΦf - » »
+   @ ( { viVi tMax } viVo -- P )
+   « → l1 vo
+     « l1 1 GET l1 2 GET → vi tmx
+       « vi DUP DOT √  vo DUP DOT √  -  ABS  1731.4568 ·
+         vi vo DOT  vi DUP DOT √  vo DUP DOT √  ·  /  ACOS Uval
+         tmx - 0 MAX 0.1 · + » » »
+   1000000 0 0 0
+   → leg1 leg2 pen zzP zzt3 zztv zzt4
+   «
+     @ Coarse grid, in the order of the former loops
+     t3lo t3hi FOR t3
+       130 290 FOR d1
+         t3 t3 d1 + leg1
+         → L1
+         « 60 200 FOR d2
+             L1  t3 d1 +  t3 d1 + d2 +  leg2  pen
+             → P « P zzP < « P 'zzP' STO  t3 'zzt3' STO  t3 d1 + 'zztv' STO  t3 d1 + d2 + 'zzt4' STO » IFT »
+           35 STEP »
+       40 STEP
+     25 STEP
+     @ Refinement, ±15 days by 5 around the coarse best: the 49 legs
+     @ Venus → Earth first, then for each (t3, tv) its leg Mars → Venus
+     zzt3 zztv zzt4
+     → b3 bv b4
+     « { }
        bv 15 - bv 15 + FOR tv
          b4 15 - b4 15 + FOR t4
-           t3 tv t4 ⓁOppRoute
-           → R
-           « R 2 GET  R 3 GET Uval R 4 GET Uval - 0 MAX 0.1 · +
-             → P
-             « P zzP <
-               « P 'zzP' STO  t3 'zzt3' STO  tv 'zztv' STO  t4 'zzt4' STO » IFT »
-           »
+           tv t4 leg2 1 →List +
          5 STEP
        5 STEP
-     5 STEP
+       → L2s
+       « b3 15 - b3 15 + FOR t3
+           0 bv 15 - bv 15 + FOR tv
+             1 +
+             t3 tv leg1
+             → iv L1
+             « 0 b4 15 - b4 15 + FOR t4
+                 1 +
+                 → it
+                 « L1  L2s iv 1 - 7 * it + GET  pen
+                   → P « P zzP < « P 'zzP' STO  t3 'zzt3' STO  tv 'zztv' STO  t4 'zzt4' STO » IFT »
+                   it »
+               5 STEP DROP
+               iv »
+           5 STEP DROP
+         5 STEP
+       »
+     »
+     zzt3 zztv zzt4 3 →List   zzt3 zztv zzt4 ⓁOppRoute  +
    »
-   zzt3 zztv zzt4 3 →List   zzt3 zztv zzt4 ⓁOppRoute  +
    savP Precision  IF savH THEN HFP ELSE SFP END »
  »
 »

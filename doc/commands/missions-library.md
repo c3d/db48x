@@ -63,7 +63,8 @@ precision first. It reproduces the real Perseverance outbound window.
 Best Venus-flyby Mars→Earth return over a Mars-departure window (opposition class). A
 two-stage search (coarse grid then local refine) that minimises a combined cost
 favouring a ballistic and turn-feasible Venus swing-by. Keep the window narrow (~60 d);
-it is slow (~2-4 min). The result is feasible when matchErr is near zero and turnReq
+each leg of the itineraries is computed once, so it takes about 2 s on the
+simulator, a few minutes on a calculator. The result is feasible when matchErr is near zero and turnReq
 does not exceed turnMax.
 
 `t3lo t3hi` → `{ t3 tv t4 ΔVTEI matchErr turnReq turnMax tof }`
@@ -108,7 +109,8 @@ sibling of the Earth and Mars position functions used by the transfer tools.
 Compare a conjunction versus an opposition Earth⇄Mars round trip. It runs RTPlan
 (conjunction) and RTPlanOpp (opposition Venus-flyby return), computes the opposition
 Earth-entry speed, and leaves five tagged values on the stack for a side-by-side read.
-Slow (~90 s) — it chains both optimisers. Then explore your own windows with RTPlan and
+It chains both optimisers: about 5 s on the simulator, several minutes on a
+calculator. Then explore your own windows with RTPlan and
 RTPlanOpp directly.
 
 (no input) → `Conj_years Conj_dVtot Opp_return_d Opp_TEI Opp_entry`
