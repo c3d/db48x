@@ -295,6 +295,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //  Persist window geometry across runs
 // ----------------------------------------------------------------------------
 {
+    record(sim_window, "closeEvent");
 #ifndef ANDROID
     QSettings settings;
     settings.setValue("MainWindow/geometry", saveGeometry());
@@ -600,6 +601,11 @@ const int keyMap[] =
     Qt::Key_F11,        KB_HELP,
 #endif // KB_HELP
 
+#ifdef ANDROID
+    Qt::Key_Back,       KB_BKS,
+#endif // ANDROID
+
+
     0,0
 };
 
@@ -725,14 +731,15 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 //   Got a key - Push it to the simulator
 // ----------------------------------------------------------------------------
 {
-    if (ev->isAutoRepeat())
+    int  k   = ev->key();
+    bool rep = ev->isAutoRepeat();
+    record(sim_keys, "Key press %d%+s", k, rep ? " (autorepeat)" : "");
+
+    if (rep)
     {
         ev->accept();
         return;
     }
-
-    int k = ev->key();
-    record(sim_keys, "Key press %d", k);
 
     if (k == Qt::Key_F16)
         recorder_dump_for(tests::dump_on_fail);
