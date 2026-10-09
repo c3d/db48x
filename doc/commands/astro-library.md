@@ -365,20 +365,20 @@ The Moon plugs in identically:
 ## MinTofDV
 
 For a fixed departure date, the flight time that minimises `TrCost` ΔV
-(ternary search).
+(golden-section search).
 
 `t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ ΔV  tof }`
 
 ```rpl
 1 'AstronTXPrecision' STO
 2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 ⓁMinTofDV
-@ Expecting { 6.32098 67868 5 205.65843 6214 }
+@ Expecting { 6.32101 29203 3 205.69843 3969 }
 ```
 
 ## MinΔVTraj
 
 Optimal launch window: minimise ΔV over **both** departure date and flight time
-(2-D ternary search over `TrCost`). Keep the window under the 180° ridge. The
+(2-D golden-section search over `TrCost`). Keep the window under the 180° ridge. The
 example scans the real **Mars 2020 (Perseverance)** launch window of late July 2020.
 
 `'Af'  'Bf'  t₁_lo  t₁_hi  tof_lo  tof_hi` → `{ ΔV  t₁  tof }`
@@ -386,14 +386,22 @@ example scans the real **Mars 2020 (Perseverance)** launch window of late July 2
 ```rpl
 1 'AstronTXPrecision' STO
 'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 ⓁMinΔVTraj     @ (Mars 2020 = Perseverance window; level 1)
-@ Expecting { 6.31701 94166 9 2 459 055.61728 205.65843 6214 }
+@ Expecting { 6.31702 96434 2 459 055.66964 205.69843 3969 }
 ```
 
 Runtime is set by the variable `AstronTXPrecision` (below): with the native
 `PosPhifN` / `LambertUN` commands of this branch, this example runs at level 1 in
 ≈ 70 ms on the simulator, level 3 in ≈ 220 ms. Level 3 only sharpens the dates —
-the minimum ΔV is nearly identical at every level (6.31702 at level 1 versus
-6.31693 at level 3, i.e. 1e-4 km/s, while t₁ moves by 0.08 d and tof by 0.28 d).
+the minimum ΔV is nearly identical at every level (6.31703 at level 1 versus
+6.31693 at level 3, i.e. 1e-4 km/s, while t₁ moves by 0.03 d and tof by 0.38 d).
+Without the variable, level 1 is used.
+
+The golden-section search keeps one point of each step and computes one new
+point, where the former ternary search computed two, with an error bound at
+least as small: 81 calls to `TrCost` at level 1 instead of 169. Measured on
+this example against level 6: at level 1, ΔV within 1e-4 km/s as before, and
+twice as fast; at level 3, ΔV within 3e-8 km/s instead of 2e-6, three times
+as fast.
 
 ## MinΔDTraj
 

@@ -16,8 +16,8 @@
 @@            entry speed (km/s) — the swing-by makes entry gentle (~5 vs ~15 km/s)
 @@ NOTE: slow (~90 s) — it chains both optimisers at AstronTXPrecision 1.
 @@ VALIDATION (device-confirmed): MarsRoundTrip ->
-@@   Conj_years:2.7208  Conj_dVtot:12.8231  Opp_return_d:290  Opp_TEI:5.9004  Opp_entry:5.4416
-@@   Conjunction 2.72 yr / 12.82 km/s ; opposition Venus return, Earth entry only 5.44 km/s.
+@@   Conj_years:2.7089  Conj_dVtot:12.7982  Opp_return_d:290  Opp_TEI:5.9004  Opp_entry:5.4416
+@@   Conjunction 2.71 yr / 12.80 km/s ; opposition Venus return, Earth entry only 5.44 km/s.
 @@ ============================================================
  1 'AstronTXPrecision' STO
  2459030 2459075 500 ⓁRTPlan → rC «

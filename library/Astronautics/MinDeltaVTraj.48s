@@ -1,31 +1,52 @@
 «
 @@ ============================================================
 @@ MinΔVTraj — optimal launch window (min ΔV over departure date AND flight time)
-@@ 2-D ternary search over TrCost. Keep the window under the 180° ridge. Slow (see AstronTXPrecision).
+@@ 2-D golden-section search over TrCost: on the departure date, each point
+@@ being the best flight time found by MinTofDV. Keep the window under the
+@@ 180° ridge. Iteration count set by AstronTXPrecision (1 when the variable
+@@ does not exist): 81 TrCost at 1, where the former ternary search took 169,
+@@ for an error bound at least as small.
 @@ Author & design         : Jean Wilson
 @@ Co-authors & programming : Claude & Claude Code (Anthropic)
 @@
 @@ Input  : 'Af' 'Bf' t1_lo t1_hi tof_lo tof_hi   ( 'Af' 'Bf' t1_lo t1_hi tof_lo tof_hi -- { ΔV t₁ tof } )
 @@ Output : { ΔV t₁ tof }
-@@ VALIDATION (device-confirmed):
+@@ VALIDATION (simulator):
 @@   1 'AstronTXPrecision' STO
 @@   'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 MinΔVTraj -> { 6.31702 2459055.62 205.66 }  (Mars 2020, level 1)
 @@ ============================================================
  → Af Bf t1lo t1hi toflo tofhi
-  « 0 0 0 0 0 0 0 0 → lo hi m1 m2 dv1 dv2 t1opt niter
-    «
-      '3·AstronTXPrecision+3' EVAL 'niter' STO
-      t1lo →Num 'lo' STO  t1hi →Num 'hi' STO
-      1 niter START
-        'lo+(hi-lo)/3' EVAL 'm1' STO
-        'hi-(hi-lo)/3' EVAL 'm2' STO
-        m1 Af Bf toflo tofhi ⓁMinTofDV 1 GET 'dv1' STO
-        m2 Af Bf toflo tofhi ⓁMinTofDV 1 GET 'dv2' STO
-        IF dv1 dv2 < THEN m2 'hi' STO ELSE m1 'lo' STO END
-      NEXT
-      'lo+(hi-lo)/2' EVAL 't1opt' STO
-      t1opt Af Bf toflo tofhi ⓁMinTofDV
-      DUP 1 GET  t1opt  ROT 2 GET  3 →LIST
-    »
-  »
+ «
+   @ nstep = ⌈(n·ln 1.5 + ln 2) / ln(1/gold)⌉, n the former ternary step count
+   IfErr 'AstronTXPrecision' Rcl Then Drop 1 End →Num 3 * 3 +
+   1.5 Ln * 2 Ln + 0.6180339887498949 Inv Ln / Ceil
+   t1lo →Num t1hi →Num 0.6180339887498949
+   → nstep lo hi gold
+   «
+     hi hi lo - gold * -  lo hi lo - gold * +
+     → x1 x2
+     «
+       x1 Af Bf toflo tofhi ⓁMinTofDV
+       x2 Af Bf toflo tofhi ⓁMinTofDV
+       → mvR1 mvR2
+       «
+         1 nstep Start
+           If mvR1 1 Get mvR2 1 Get < Then
+             @ The minimum lies in [lo, x2]
+             x2 'hi' Sto  x1 'x2' Sto  mvR1 'mvR2' Sto
+             hi hi lo - gold * - 'x1' Sto
+             x1 Af Bf toflo tofhi ⓁMinTofDV 'mvR1' Sto
+           Else
+             @ The minimum lies in [x1, hi]
+             x1 'lo' Sto  x2 'x1' Sto  mvR2 'mvR1' Sto
+             lo hi lo - gold * + 'x2' Sto
+             x2 Af Bf toflo tofhi ⓁMinTofDV 'mvR2' Sto
+           End
+         Next
+         If mvR1 1 Get mvR2 1 Get < Then mvR1 x1 Else mvR2 x2 End
+         → mvR mvt « mvR 1 Get mvt mvR 2 Get 3 →List »
+       »
+     »
+   »
+ »
 »

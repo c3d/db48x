@@ -54,8 +54,8 @@ precision first. It reproduces the real Perseverance outbound window.
 ```rpl
 1 'AstronTXPrecision' STO
 2459030 2459075 500 ⓁRTPlan
-@ Expecting { 2 459 055.61728D 2 459 259.8011D 517.55829 904D 2 459 777.3594D 2 460 049.37586D 6.31785 61619D 6.50523 29888 4D 12.82308 91507D }
-@ Earth 2020-07-25 → Mars 2021-02-14, stay 517 d, home 2023-04-14; ΔVtot 12.82 km/s
+@ Expecting { 2 459 055.66964D 2 459 260.58467D 508.51449 4501D 2 459 769.09917D 2 460 045.08584D 6.31705 18103 9D 6.48113 49517 3D 12.79818 67621D }
+@ Earth 2020-07-25 → Mars 2021-02-15, stay 509 d, home 2023-04-10; ΔVtot 12.80 km/s
 ```
 
 ## RTPlanOpp
@@ -115,9 +115,9 @@ RTPlanOpp directly.
 
 ```rpl
 ⓁMarsRoundTrip
-@ affichage complet : Conj_years:2.72 Conj_dVtot:12.82 Opp_return_d:290 Opp_TEI:5.90 Opp_entry:5.44
+@ affichage complet : Conj_years:2.71 Conj_dVtot:12.80 Opp_return_d:290 Opp_TEI:5.90 Opp_entry:5.44
 @ Expecting Opp_entry:5.44155 12278 3D
-@ Conjunction 2.72 yr / 12.82 km/s; opposition Venus return, Earth entry only 5.4 km/s.
+@ Conjunction 2.71 yr / 12.80 km/s; opposition Venus return, Earth entry only 5.4 km/s.
 ```
 
 ## MissionΔV
@@ -126,7 +126,10 @@ End-to-end propulsive ΔV budget of a conjunction round trip. Feed it an RTPlan 
 it recomputes the two transfer legs (TrCost) for their departure/arrival v∞, converts the
 space burns from parking orbits with TrToOrbi, and adds representative atmospheric phases.
 It returns eight tagged ΔV values (seven phases plus the total), in km/s. Chains after
-RTPlan; the example uses a fixed conjunction itinerary so it runs instantly.
+RTPlan; the example uses a fixed conjunction itinerary, that of the RTPlan example,
+so it runs instantly. RTPlan minimises the heliocentric ΔV, not this budget, whose
+burns start from parking orbits: an itinerary cheaper for one may cost a little more
+for the other.
 
 The seven propulsive phases, in chronological order:
 
@@ -145,9 +148,9 @@ ascent 4.1, Earth entry 0 km/s), with parking orbits LEO 6678 km and Mars 3689 k
 `{ itinerary }` → `1_AscentEarth … 8_TOTAL`
 
 ```rpl
-{ 2459055.617 2459259.801 517.558 2459777.359 2460049.376 6.31786 6.50523 12.82309 } ⓁMissionΔV     @ AscentEarth 9.4, TMI 3.81, MOI 2.07, EDL 0.6,
-@ Expecting 8_TOTAL:22.46514 53281D
-@ AscentMars 4.1, TEI 2.48, Entry 0. A typical chemical Mars round-trip budget.
+{ 2459055.670 2459260.585 508.514 2459769.099 2460045.086 6.31705 6.48113 12.79819 } ⓁMissionΔV     @ AscentEarth 9.4, TMI 3.81, MOI 2.07, EDL 0.6,
+@ Expecting 8_TOTAL:22.48135 24918D
+@ AscentMars 4.1, TEI 2.50, Entry 0. A typical chemical Mars round-trip budget.
 ```
 
 ## ETMB1

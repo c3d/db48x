@@ -13,12 +13,15 @@
 @@   stay      : minimum Mars surface stay before the return search (days)
 @@ Output : { t1 t2 stay t3 t4 (JD)  ΔVout ΔVret ΔVtot (km/s) }
 @@ NOTE: set  1 'AstronTXPrecision' STO  for a fast pedagogical run (slow otherwise).
-@@ VALIDATION (device-confirmed, AstronTXPrecision 1):
+@@ VALIDATION (simulator, AstronTXPrecision 1, golden-section searches):
 @@   2459030 2459075 500 RTPlan ->
-@@     { 2459055.617 2459259.801 517.558 2459777.359 2460049.376
-@@       6.31786 6.50523 12.82309 }
-@@   Conjunction Earth⇄Mars: depart 2020-07-25, arrive Mars 2021-02-14 (the
-@@   Perseverance window), return 2022-07-16, home 2023-04-14; 2.72 yr; ΔVtot 12.82 km/s.
+@@     { 2459055.670 2459260.585 508.514 2459769.099 2460045.086
+@@       6.31705 6.48113 12.79819 }
+@@   Conjunction Earth⇄Mars: depart 2020-07-25, arrive Mars 2021-02-15 (the
+@@   Perseverance window), return 2022-07-08, home 2023-04-10; 2.71 yr; ΔVtot 12.80 km/s.
+@@   Level 6 gives ΔVtot 12.79681: within 1.4 m/s at level 1, where the former
+@@   ternary searches gave 12.82309, 26 m/s above.
+@@   AstronTXPrecision is 1 when the variable does not exist.
 @@ ============================================================
  → t1lo t1hi stay
  «
