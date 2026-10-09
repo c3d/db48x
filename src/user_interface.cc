@@ -3222,8 +3222,8 @@ void user_interface::load_help(utf8 topic, size_t len)
                 // Index header match is authoritative; rescanning can leave
                 // the file pointer mid-section on defective platforms (Lose).
                 topicpos = idxpos;
-                record(help, "index match %+.*s idxpos=%u",
-                        int(len), topic, idxpos);
+            record(help, "index match %+.*s idxpos=%u",
+                   int(len), topic, idxpos);
         }
     }
 
