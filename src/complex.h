@@ -63,18 +63,20 @@ struct complex : algebraic
         return leb128size(i) + x->size() + y->size();
     }
 
-    algebraic_g x() const
+    algebraic_p xp() const
     {
         algebraic_p p = algebraic_p(payload(this));
         return p;
     }
-    algebraic_g y() const
+    algebraic_p yp() const
     {
         algebraic_p p = algebraic_p(payload(this));
         algebraic_p n = algebraic_p(byte_p(p) + p->size());
         return n;
     }
 
+    algebraic_g         x() const    { return xp(); }
+    algebraic_g         y() const    { return yp(); }
     algebraic_g         re() const;
     algebraic_g         im() const;
     algebraic_g         mod() const;

@@ -1707,8 +1707,8 @@ bool object::is_number() const
 {
     return is_real() ||
         (is_complex() &&
-         complex_p(this)->x()->is_real() &&
-         complex_p(this)->y()->is_real());
+         complex_p(this)->xp()->is_real() &&
+         complex_p(this)->yp()->is_real());
 }
 
 
