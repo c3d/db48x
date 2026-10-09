@@ -425,11 +425,28 @@ static void configure_fonts(QApplication &app)
 }
 
 
+#ifdef ANDROID
+#include <android/log.h>
+static unsigned android_recorder_show(const char *text, size_t len, void *)
+// ----------------------------------------------------------------------------
+//   Redirect recorder output to Android logcat
+// ----------------------------------------------------------------------------
+{
+    __android_log_write(ANDROID_LOG_DEBUG, "db48x", text);
+    return len;
+}
+#endif // ANDROID
+
+
 int main(int argc, char *argv[])
 // ----------------------------------------------------------------------------
 //   Main entry point for the simulator
 // ----------------------------------------------------------------------------
 {
+#ifdef ANDROID
+    recorder_configure_show(android_recorder_show);
+#endif // ANDROID
+
     const char *traces = getenv("DB48X_TRACES");
     recorder_trace_set(".*(error|warn(ing)?)s?");
     if (traces)
