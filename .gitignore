@@ -40,7 +40,16 @@
 /help/*.idx
 /.build/
 /.build_id
+/builds/
+/sim/*build/
 /.logs/
+/.tmp-win-ci/
 /sim/*.qrc
 /sim/qrc_*.cpp
 /sim/config.qrc
+/sim/android-*-deployment-settings.json
+/db48x.app
+/db50x.app
+/lib*.so
+/aqtinstqll.log
+/android
