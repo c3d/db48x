@@ -1,4 +1,4 @@
-name: Build DB48X (Windows)
+name: DB48X Windows Tests
 
 on:
   workflow_dispatch:
