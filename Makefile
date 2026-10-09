@@ -604,10 +604,20 @@ ANDROID_QT_HOST_SUBDIR_Linux = gcc_64
 ANDROID_QT_HOST_SUBDIR ?= $(or $(ANDROID_QT_HOST_SUBDIR_$(HOST_OS_NAME)),gcc_64)
 ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/$(ANDROID_QT_HOST_SUBDIR)/bin/androiddeployqt
 ANDROID_KEYSTORE ?= $(HOME)/.local/android_release.keystore
-ANDROID_JAVA_HOME ?= $(or $(JAVA_HOME),					    \
-			$(shell /usr/libexec/java_home -v 17 2>/dev/null || \
-				/usr/libexec/java_home -v 21 2>/dev/null || \
-				true))
+ANDROID_JAVA_DIRS := 							\
+	$(JAVA_HOME)							\
+	$(shell /usr/libexec/java_home -v 17 2>/dev/null) 		\
+	$(shell /usr/libexec/java_home -v 21 2>/dev/null) 		\
+	/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home	\
+	/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
+
+ANDROID_JAVA_HOME := $(subst /bin/java,,$(firstword $(wildcard $(ANDROID_JAVA_DIRS:%=%/bin/java))))
+
+ifeq ($(ANDROID_JAVA_HOME),)
+$(error Android build requires Java 17 or later. \
+	Install with: brew install openjdk@17 \
+	Or set JAVA_HOME explicitly.)
+endif
 ANDROID_CAN_SIGN := $(and $(wildcard $(ANDROID_KEYSTORE)),$(strip $(ANDROID_KEYSTORE_PASS)))
 ANDROID_DEPLOY_SIGN_FLAGS = $(if $(ANDROID_CAN_SIGN),\
 	--sign $(ANDROID_KEYSTORE) $(NAME) --storepass '$(ANDROID_KEYSTORE_PASS)',)
@@ -626,10 +636,12 @@ android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
 
 # Additional dependencies for Android build
-$(QMAKEFILE):	sim/android/db48x/AndroidManifest.xml	\
-		sim/android/db48x/build.gradle		\
-		sim/android/db50x/AndroidManifest.xml	\
-		sim/android/db50x/build.gradle
+$(QMAKEFILE):	sim/android/db48x/AndroidManifest.xml			\
+		sim/android/db48x/build.gradle				\
+		sim/android/db48x/src/org/db48x/DB48xActivity.java	\
+		sim/android/db50x/AndroidManifest.xml			\
+		sim/android/db50x/build.gradle				\
+		sim/android/db50x/src/org/db50x/DB50xActivity.java
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
 # expects a build directory as --output and the .so staged under
@@ -652,7 +664,8 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		if [ ! -f "$$AAB" ]; then				\
 			BUILT_AAB="$$(find "$$OUTDIR" -type f -name '*.aab' | sort | tail -1)"; \
 			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB" || :; \
-		fi &&						\
+		fi &&							\
+		(cd "$$OUTDIR" && ./gradlew assembleDebug) &&		\
 		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/*-debug.apk' | head -1)"; \
 		{ [ -n "$$BUILT_APK" ] && cp "$$BUILT_APK" "$(abspath $(ANDROID_OUTPUT_DIR)/$(NAME)-debug.apk)" || :; }; \
 		test -f "$$AAB"
@@ -694,6 +707,8 @@ define android_install
 		DEVICE=$$(echo "$$DEVICES" | head -1);				\
 	fi;									\
 	echo "Installing $(1) on $$DEVICE...";					\
+	$(ADB) -s "$$DEVICE" shell am force-stop org.db48x 2>/dev/null || true;	\
+	$(ADB) -s "$$DEVICE" shell am force-stop org.db50x 2>/dev/null || true;	\
 	$(ADB) -s "$$DEVICE" install -r $(1)
 endef
 

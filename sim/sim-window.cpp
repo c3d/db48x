@@ -70,8 +70,24 @@
 #include <QDir>
 #include <QSettings>
 #include <atomic>
+#include <jni.h>
 
 void extract_android_assets();
+
+extern "C"
+{
+JNIEXPORT void JNICALL
+Java_org_db48x_DB48xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+{
+    key_push(key);
+}
+
+JNIEXPORT void JNICALL
+Java_org_db50x_DB50xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+{
+    key_push(key);
+}
+} // extern "C"
 
 #endif // ANDROID
 #endif // WASM
@@ -877,6 +893,7 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 
     if (obj == ui.keyboard)
     {
+        record(sim_window, "Keyboard event type=%d", int(ev->type()));
         if ((ev->type() == QEvent::TouchBegin) ||
             (ev->type() == QEvent::TouchUpdate) ||
             (ev->type() == QEvent::TouchEnd) ||
