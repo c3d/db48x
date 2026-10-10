@@ -8881,7 +8881,7 @@ void tests::eqnlib_columns_and_beams()
         .test(CLEAR, "CurrentEquationVariables", ENTER);
 
     step("Solving Elastic Buckling")
-        .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F1)
+        .test(CLEAR, ID_EquationsMenu, F3, RSHIFT, F1)
         .test("53.0967", NOSHIFT, F3)
         .expect("A=53.0967 cm↑2")
         .test("199947961.502", NOSHIFT, F4)
@@ -8912,7 +8912,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("'16.93157 904 cm↑2=169 315.7904 mm↑4/cm↑2+5.⁳⁻¹⁸ mm↑4/cm↑2'");
 
     step("Solving Eccentric Columns")
-        .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F2)
+        .test(CLEAR, ID_EquationsMenu, F3, RSHIFT, F2)
         .test("1.1806", NOSHIFT, F3)
         .expect("ε=1.1806 cm")
         .test("187.9351", NOSHIFT, F4)
@@ -8936,7 +8936,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("I=135 259 652.161 mm↑4");
 
     step("Solving Simple Deflection")
-        .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F3)
+        .test(CLEAR, ID_EquationsMenu, F3, RSHIFT, F3)
         .test("10_ft", NOSHIFT, F2)
         .expect("a=10 ft")
         .test("17_ft", NOSHIFT, F3)
@@ -8963,7 +8963,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("y=-0.60048 54094 96 in");
 
     step("Solving Simple Slope")
-        .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F4)
+        .test(CLEAR, ID_EquationsMenu, F3, RSHIFT, F4)
         .test("10_ft", NOSHIFT, F3)
         .expect("a=10 ft")
         .test("17_ft", NOSHIFT, F4)
@@ -8986,7 +8986,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("θ=-0.08763 17825 27 °");
 
     step("Solving Simple Moment")
-        .test(CLEAR, ID_EquationsMenu, F2, RSHIFT, F5)
+        .test(CLEAR, ID_EquationsMenu, F3, RSHIFT, F5)
         .test("20_ft", NOSHIFT, F5)
         .expect("L=20 ft")
         .test("10_ft", NOSHIFT, F3)
@@ -9009,7 +9009,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("Mx=9 782.1945 ft·lbf");
 
     step("Solving Simple Shear")
-        .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F1)
+        .test(CLEAR, EXIT, ID_EquationsMenu, F3, F6, RSHIFT, F1)
         .test("20_ft", NOSHIFT, F3)
         .expect("L=20 ft")
         .test("10_ft", NOSHIFT, F2)
@@ -9030,7 +9030,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("V=624.387 lbf");
 
     step("Solving Cantilever Deflection")
-        .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F2)
+        .test(CLEAR, EXIT, ID_EquationsMenu, F3, F6, RSHIFT, F2)
         .test("10_ft", NOSHIFT, F6, F1)
         .expect("L=10 ft")
         .test("29000000_psi", NOSHIFT, F6, F6, F4)
@@ -9059,7 +9059,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("y=-0.84234 10758 62 cm");
 
     step("Solving Cantilever Slope")
-        .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F3)
+        .test(CLEAR, EXIT, ID_EquationsMenu, F3, F6, RSHIFT, F3)
         .test("10_ft", NOSHIFT, F6, F2)
         .expect("L=10 ft")
         .test("29000000_psi", LSHIFT, F6, F5)
@@ -9082,7 +9082,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("θ=-0.26522 01876 49 °");
 
     step("Solving Cantilever Moment")
-        .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F4)
+        .test(CLEAR, EXIT, ID_EquationsMenu, F3, F6, RSHIFT, F4)
         .test("10_ft", NOSHIFT, F5)
         .expect("L=10 ft")
         .test("500_lbf", NOSHIFT, F6, F2)
@@ -9101,7 +9101,7 @@ void tests::eqnlib_columns_and_beams()
         .expect("Mx=-200 ft·lbf");
 
     step("Solving Cantilever Shear")
-        .test(CLEAR, EXIT, ID_EquationsMenu, F2, F6, RSHIFT, F5)
+        .test(CLEAR, EXIT, ID_EquationsMenu, F3, F6, RSHIFT, F5)
         .test("10_ft", NOSHIFT, F3)
         .expect("L=10 ft")
         .test("500_lbf", NOSHIFT, F4)
