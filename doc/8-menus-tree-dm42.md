@@ -925,7 +925,7 @@ Access: 🟦 N (+/-); [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F5; [
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [TextRenderingSizeLimit](#textrenderingsizelimit) | [GraphRenderingSizeLimit](#graphrenderingsizelimit) | PlotRefreshRate | AllVars | [SIPrefixCycle](#unitssiprefixcycle) |   |
 | [ResultGraphingTimeLimit](#resultgraphingtimelimit) | [StackGraphingTimeLimit](#stackgraphingtimelimit) | [GraphingTimeLimit](#graphingtimelimit) | [ShowTimeLimit](#showtimelimit) | [MinimumBatteryVoltage](#minimumbatteryvoltage) | ◀ |
-| [Units](#showbuiltinunits) | Const | Eqns | [Libs](#libs) | Chars | ▶ |
+| [Units](#showbuiltinunits) | Const | [Eqns](#eqns) | [Libs](#libs) | Chars | ▶ |
 
 **Page 4**
 

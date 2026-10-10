@@ -20,9 +20,10 @@
 @@         when the result is stable to two significant digits of
 @@         the uncertainty, after at most 20 000 draws or one minute.
 @@ Output: the number of draws used, tagged "N";
-@@         the 95 % coverage interval, probabilistically symmetric
-@@         (2.5 % of the draws on each side), tagged "95%";
+@@         the 95 % coverage interval (normal approximation,
+@@         mean ± 1.96 σ), tagged "95%";
 @@         the mean and standard deviation of the draws, Y±σu.
+@@ The mean and variance are computed by Welford's online algorithm.
 @@ Correlations: none, unless a global variable ρij holds one
 @@ coefficient for all the pairs or the full correlation matrix, in
 @@ the order of Vals, as for σRFxjxi. Normal inputs are then
@@ -235,32 +236,32 @@
             1 y0 →Unit
             "« →" dcl + " mcF mcW mcY mcN « 1 mcN Start" + drw + ev + " mcY Convert UVal Next » »" + Compile
           End
-          { } 0 0 0 0  0 0 0 0
+          0 0 0 0  0 0 0 0  0 0
           y0 If Dup TypeName "unit" == Then UVal End
           Ticks
-          → yu pg all nn ymn sdv done s1 s2 s3 s4 yrf tk0
+          → yu pg nn ymn sdv done s1 s2 s3 s4 wmn wm2 yrf tk0
           «
             Do
               If ndr 0 > Then ndr nn - 500 Min Else 500 End
               → nb
               «
-                prm List→ Drop 'mdl' Rcl vn yu nb pg
-                nb →List
-                Dup all Swap + 'all' Store
-                @ Running sums of the powers of the draws, less a reference
-                « yrf - » Map
-                → dl
-                «
-                  dl ΣList 's1' Store+
-                  dl « Sq » Map ΣList 's2' Store+
-                  dl « Dup Sq * » Map ΣList 's3' Store+
-                  dl « Sq Sq » Map ΣList 's4' Store+
-                »
-                nn nb + 'nn' Store
+                @ Welford online mean/variance and running sums for kurtosis
+                1 nb For i
+                  prm List→ Drop 'mdl' Rcl vn yu 1 pg
+                  nn 1 + 'nn' Store
+                  Dup wmn -
+                  Dup nn / wmn + 'wmn' Store
+                  Over wmn - * wm2 + 'wm2' Store
+                  yrf -
+                  Dup 's1' Store+
+                  Dup Sq 's2' Store+
+                  Dup Dup Sq * 's3' Store+
+                  Sq Sq 's4' Store+
+                Next
               »
-              s1 nn / yrf + 'ymn' Store
+              wmn 'ymn' Store
               If nn 1 > Then
-                s2 s1 Sq nn / - nn 1 - / 0 Max √ 'sdv' Store
+                wm2 nn 1 - / 0 Max √ 'sdv' Store
               End
               If ndr 0 > Then
                 If nn ndr ≥ Then 1 'done' Store End
@@ -284,18 +285,13 @@
               End
             Until done End
 
-            all Sort
-            → srt
-            «
-              nn "N" →Tag
-              srt 0.025 nn * 0.5 + IP 1 Max Get
-              srt 0.975 nn * 0.5 + IP nn Min Get
-              →Range
-              If yu TypeName "unit" == Then yu →Unit End
-              "95%" →Tag
-              ymn sdv →σRange
-              If yu TypeName "unit" == Then yu →Unit End
-            »
+            nn "N" →Tag
+            @ 95 % coverage interval: normal approximation from Welford mean/sdv
+            ymn 1.96 sdv * - ymn 1.96 sdv * + →Range
+            If yu TypeName "unit" == Then yu →Unit End
+            "95%" →Tag
+            ymn sdv →σRange
+            If yu TypeName "unit" == Then yu →Unit End
           »
         »
       »

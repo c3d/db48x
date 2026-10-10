@@ -577,9 +577,10 @@ through a Gaussian copula, as in the NIST Uncertainty Machine. An input given
 by a program draws by itself and cannot be correlated. A matrix that is not
 symmetric, or that no set of quantities could have, is refused.
 
-The results are the number of draws used, tagged N; the interval that leaves
-2.5 % of the draws on each side, tagged 95%; and on the first level the mean
-and the standard deviation of the draws, as Y±σu.
+The results are the number of draws used, tagged N; the 95 % coverage interval
+(normal approximation, mean ± 1.96 σ), tagged 95%; and on the first level the
+mean and the standard deviation of the draws, as Y±σu. The mean and variance
+are computed by Welford's online algorithm, which uses O(1) memory.
 
 With M = 0, MCPropagate stops by itself when the mean and the uncertainty are
 stable to two significant digits of the uncertainty, after 20 000 draws, or
@@ -621,7 +622,7 @@ deviation of 1/√3 = 0.577:
 ```rpl
 12345 RDZ
 'V/I' { V I } { '10±σ0.1_V' '5±σ0.05_A' } →Num 2000 ⓁMCPropagate
-@ Expecting 1.99888 76261 4±σ0.02860 28043 8 V/A
+@ Expecting 1.99888 76261 4±σ2.86028 04379 6⁳⁻² V/A
 ```
 
 **5)** A model that is not linear. For the square of a normal input
@@ -1487,7 +1488,7 @@ the method itself.
 ```rpl
 12345 RDZ
 'a+b+c+d' { a b c d } { 0±σ1 0±σ1 0±σ1 0±σ1 } ⓁMCPropagate
-@ Expecting 6.17138 85639 4⁳⁻²±σ2.00826 44578 6
+@ Expecting 0.06171 38856 39±σ2.00826 44578 6
 ```
 
 **3)** Four rectangular inputs of standard deviation 1, between −√3 and √3. The propagation formula is the same, u = 2; the exact 95 % interval is [−3.88, 3.88], a little narrower than the Gaussian one:
@@ -1543,7 +1544,7 @@ rectangular densities: ρa between 1.1 and 1.3, ρW between 7 000 and 9 000,
 '(m+d)*(1+(densA-1.2)*(1/densW-1/densR))-100000'
 { m d densA densW densR }
 { 100000±σ0.050 1.234±σ0.020 1.2±0.1 8000±1000 8000±50 } ⓁMCPropagate
-@ Expecting 1.23850 18718±σ0.07615 43941 04
+@ Expecting 1.23850 18718±σ7.61543 94104⁳⁻²
 ```
 
 The propagation formula underestimates the uncertainty by 40 %. At the
@@ -1652,33 +1653,32 @@ uncertainty u that is itself uncertain: for a nearly normal result, its
 relative standard deviation is about 1/√(2M). Ten times more draws make it
 √10 ≈ 3.2 times more precise, at ten times the cost.
 
-S1Converge runs the mass calibration of S1Mass with 100, 1 000 and
-10 000 draws, and draws u(δm) against M on a logarithmic scale, each point with
-its bar ±u/√(2M). The two values of the Supplement are dashed: 0.0754 mg by
-the Monte Carlo method, 0.0539 mg by the first-order formula. It returns the
-three values of u. About 13 seconds on the simulator.
+S1Converge takes a list of cumulative draw counts from the stack and runs the
+mass calibration of S1Mass with those draw counts. It draws u(δm) against M on
+a logarithmic scale, each point with its bar ±u/√(2M). The two values of the
+Supplement are dashed: 0.0754 mg by the Monte Carlo method, 0.0539 mg by the
+first-order formula. It returns the list of u values.
 
-On a calculator, the 10 000 draws alone would take some twenty minutes (21 on
-a DM32). They are timed by the 1 000 before them, ten times fewer: when they
-would take more than two minutes, they are skipped, the plot shows the first
-two points and says so, and two values of u are returned. To run them all the
-same, store a number other than 0 in the global variable ExtendedTrials, for
-instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
+S1Converge uses Welford's online algorithm to compute the running standard
+deviation with O(1) memory, so it works even with 42 KB of available memory.
+The model is inlined and evaluated in RPN for speed.
 
-**1)** The convergence, with the seed of the examples:
+The convergence, with the seed of the examples:
 
 ```rpl
-ⓁS1Converge
+{ 10 20 50 100 } ⓁS1Converge
 ```
 
-The three values are 0.081, 0.0743 and 0.0746 mg. With 100 draws, u is known
-to about 7 %: enough to see that the first-order value 0.0539 mg is wrong, not
-enough to give two digits. With 10 000 draws, u is known to 0.7 %, close to the
-two significant digits of the published 0.0754 mg. This is the question that
-the adaptive procedure of the Supplement answers (7.9): draw until the digits
-wanted are stable, which MCPropagate does with M = 0.
+With 10 draws, u is a rough estimate; with 100 draws, u is known to about
+7 %: enough to see that the first-order value 0.0539 mg is wrong, not enough
+to give two digits. For higher precision, use larger draw counts such as
+`{ 100 1000 10000 }` (about 13 seconds on the simulator). With 10 000 draws,
+u is known to 0.7 %, close to the two significant digits of the published
+0.0754 mg. This is the question that the adaptive procedure of the Supplement
+answers (7.9): draw until the digits wanted are stable, which `MCPropagate`
+does with M = 0.
 
-See also: [S1Mass](#s1mass).
+See also: `S1Mass`.
 
 
 ## ProjectileLibrary

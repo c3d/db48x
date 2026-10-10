@@ -3113,9 +3113,9 @@ for the units file.
 On the command-line, constant names are prefixed with _CST_, which is a way to
 distinguish them from normal symbols.
 
-You can edit the constants catalog by recalling its content on the stack using
-`"config:equations.csv" RCL`, editing the values, and then storing the content
-back to disk using `"config:equations.csv" STO`.
+You can edit the additional constants by recalling the content of that file on
+the stack using `"config:constants.csv" RCL`, editing the values, and then
+storing the content back to disk using `"config:constants.csv" STO`.
 
 
 ## Infinite results
@@ -3211,12 +3211,14 @@ update the library content.
 
 ## Equations Library
 
-The equations library is a catalog of common equations that are stored on disk
-in the `config/equations.csv` file.
+The equations library is a catalog of common equations covering mathematics,
+physics, chemistry and computer science. Like the constants, the equations are
+built in, and additional equations can be provided by a
+`config/equations.csv` file.
 
-You can edit it by recalling its content on the stack using
-`"config:equations.csv" RCL`, editing the values, and then storing the content
-back to disk using `"config:equations.csv" STO`.
+You can edit the additional equations by recalling the content of that file on
+the stack using `"config:equations.csv" RCL`, editing the values, and then
+storing the content back to disk using `"config:equations.csv" STO`.
 # RPL Programming
 
 If you’ve used a calculator or computer before, you’re probably familiar with
@@ -6222,10 +6224,6 @@ implemented by the time the project reaches version 1.0.
 * `UNASSIGN`
 * `UNASSUME`
 * `UNBIND`
-* `UTPC`
-* `UTPF`
-* `UTPN`
-* `UTPT`
 * `VANDERMONDE`
 * `VER`
 * `VISIT`
@@ -6310,6 +6308,313 @@ As a result, they behave like normal names on DB50X.
 
 This sections tracks some performance measurements across releases.
 
+# Aeronautics functions
+
+## AeronauticsLibrary
+
+The Aeronautics section of the library holds programs for the calculations of
+aircraft operation that need lists, loops or comparisons, and do not fit the
+equation solver. Its equations are in the Aeronautics section of the Equation
+Library.
+
+* [Flight Management](#flight-managementlibrary): weight and balance, and
+  the flight plan, and the check of the airspeed indicator.
+* [Aircraft Performance](#aircraft-performancelibrary): the drag polar
+  from measurements, the speeds of best climb, and the takeoff roll.
+
+## Flight ManagementLibrary
+
+Weight and balance, from the load sheet to the envelope, and the flight
+plan along a route:
+
+* [WBLoad](#wbload): the total weight, moment and center of gravity of a
+  loading, station by station;
+* [WBEnv](#wbenv): whether a loading lies within the center of gravity
+  envelope, and the forward and aft limits at its weight;
+* [FPlan](#fplan): the flight plan along the route, leg by leg, with the
+  wind: courses, headings, ground speeds, times and fuel;
+* [TAS3GS](#tas3gs): the true airspeed and the wind from three GPS ground
+  speeds, to check the airspeed indicator.
+
+## WBLoad
+
+The weight and balance of a loading: the total weight `Wt`, the total moment
+`Mom` and the center of gravity `CG = Mom/Wt`.
+
+Stack: a list of stations, one `{ "name" weight arm }` list each ▶ `Wt` `Mom`
+`CG`, tagged. Arms are measured from the datum, positive aft, and may be
+negative. A negative weight removes a load, for instance the fuel burnt
+before landing. Weights and arms may carry units, or be plain numbers in
+consistent units.
+
+The loading of the FAA example: empty aircraft 2 100 lb at 78.3 in, front
+seats 340 lb at 85 in, rear seats 350 lb at 121 in, 75 gal of fuel, that is
+450 lb, at 75 in, and 80 lb of baggage at 150 in. The book finds 3 320 lb and
+a CG of 84.8 in (*Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+chapter 10):
+
+```rpl
+{ { "Empty" 2100_lb 78.3_in } { "Front" 340_lb 85_in } { "Rear" 350_lb 121_in } { "Fuel" 450_lb 75_in } { "Baggage" 80_lb 150_in } } ⓁWBLoad
+@ Expecting CG:84.76807 22892 in
+```
+
+With plain numbers, and the negative arm of an oil tank ahead of the datum.
+The book prints a moment of 122 086 and a CG of 74.0, because its moment of
+the empty aircraft, 69 393, differs from 1 011.9 × 68.6 = 69 416.34 (same
+handbook):
+
+```rpl
+{ { "Empty" 1011.9 68.6 } { "Oil" 11 -31 } { "Fuel" 108 84 } { "Aux" 108 84 } { "Pilot" 170 81 } { "Pax" 170 81 } { "Bag" 70 105 } } ⓁWBLoad
+@ Expecting CG:74.05503 06265
+```
+
+See also: [WBEnv](#wbenv), and the equations Weight Shift, Weight Change and
+CG in % MAC of the Equation Library.
+
+## WBEnv
+
+Whether a loading lies within the center of gravity envelope, and the forward
+and aft limits at its weight.
+
+Stack: the envelope, a list of `{ CG weight }` points in order around it, the
+weight `W` and the center of gravity `CG` of the loading ▶ `Fwd` `Aft`
+`Inside`, tagged, with `Inside` 1 when `CG` lies between the limits and 0
+otherwise.
+
+The limits are where the envelope crosses the weight `W`, interpolated
+linearly between its points: the envelope must be convex, as center of
+gravity envelopes are. A weight above or below the envelope is an error.
+
+The envelope of the FAA example: from 77.0 to 85.7 in up to 2 475 lb, then a
+forward limit rising to 77.5 in at 2 525 lb and to 82.1 in at 2 950 lb, and
+an aft limit of 85.7 in at 2 525 lb and 84.7 in at 2 950 lb; the lower edge,
+1 500 lb, is chosen for the example. At 2 799 lb, the limits are 80.47 and
+85.06 in, and a CG of 81.39 in is within them (*Pilot's Handbook of
+Aeronautical Knowledge*, chapter 10):
+
+```rpl
+{ { 77.0 1500 } { 77.0 2475 } { 77.5 2525 } { 82.1 2950 } { 84.7 2950 } { 85.7 2525 } { 85.7 1500 } } 2799 81.3862 ⓁWBEnv
+@ Expecting Inside:1
+```
+
+The same loading with its CG at 80 in is too far forward:
+
+```rpl
+{ { 77.0 1500 } { 77.0 2475 } { 77.5 2525 } { 82.1 2950 } { 84.7 2950 } { 85.7 2525 } { 85.7 1500 } } 2799 80 ⓁWBEnv
+@ Expecting Inside:0
+```
+
+See also: [WBLoad](#wbload).
+
+## FPlan
+
+The flight plan along the route, leg by leg: for each leg, its distance, its
+course, the heading to fly and the ground speed with the wind, the time en
+route and the fuel; then the totals.
+
+Stack: `TAS` `FFR` `wind` ▶ the list of legs, `Dist`, `ETE` and `Fuel`,
+tagged. `TAS` is the true airspeed, in knots if a plain number. `FFR` is the
+fuel flow, per hour if a plain number, for instance `12_gal/h`. The wind is
+one `{ WD WS }` list for the whole route, or a list with one `{ WD WS }` per
+leg, `WD` being where the wind comes from, in degrees if a plain number, and
+`WS` its speed, in knots if a plain number. Each leg is a list
+`{ "A→B" D TC TH GS ETE fuel }`.
+
+The route is the variable `Route`, built with the Route functions of the
+Navigation section, and its distances and courses are those of the WGS-84
+ellipsoid. On a long leg the course changes along the way: the wind is
+corrected on the mean course of each leg, the average of its initial and
+final courses. From Albuquerque to New York the course goes from 67.9° to
+88.4°, and the mean, 78.2°, gives 1.8 gal less than the initial course. The
+fuel for taxi and the reserve are in the Fuel Required equation of the
+Equation Library; `→HMS` shows a time in hours, minutes and seconds.
+
+From Los Angeles to New York through Albuquerque, at 250 kt and 12 gal/h,
+with a wind from 270° at 30 kt on the first leg and from 300° at 50 kt on
+the second:
+
+```rpl
+{ { "LAX" 33.9425 -118.4081 } { "ABQ" 35.0402 -106.6090 } { "JFK" 40.6398 -73.7789 } } 'Route' STO
+250 12_gal/h { { 270 30 } { 300 50 } } ⓁFPlan
+@ Expecting Fuel:92.02427 83446 gal
+```
+
+The same route with one wind, from 270° at 30 kt, for the whole flight:
+
+```rpl
+{ { "LAX" 33.9425 -118.4081 } { "ABQ" 35.0402 -106.6090 } { "JFK" 40.6398 -73.7789 } } 'Route' STO
+250_knot 12 { 270 30 } ⓁFPlan
+@ Expecting Fuel:93.39856 62566
+```
+
+See also: [WPLegs](#wplegs), the legs of the route without the wind.
+
+## TAS3GS
+
+The true airspeed and the wind from three GPS ground speeds: a way to check
+the airspeed indicator in flight, with nothing but a GPS. Fly three legs at
+the same indicated airspeed and altitude, on headings 120° apart, and note
+the ground speed of each.
+
+Stack: `H1` `GS1` `GS2` `GS3` ▶ `TAS` `WD` `WS`, tagged. `H1` is the first
+heading, in degrees if a plain number, and `GS1`, `GS2`, `GS3` the ground
+speeds on `H1`, `H1+120°` and `H1+240°`, in knots if plain numbers. `TAS` is
+the true airspeed, `WD` the direction the wind comes from and `WS` its
+speed.
+
+The true airspeed and the wind speed come from the method of Ed Williams
+(*Aviation Formulary*); the wind direction then follows from the ground
+speed along each heading. Ground speeds too far from each other to come
+from one airspeed and one wind are an error.
+
+At 120 kt, with a wind from 040° at 20 kt, the ground speeds on 000°, 120°
+and 240° are 105.47, 118.18 and 138.96 kt:
+
+```rpl
+0 105.4659 118.17975 138.96218 ⓁTAS3GS
+@ Expecting WS:19.99976 68283 knot
+```
+
+The same flight on 030°, 150° and 270°:
+
+```rpl
+30_° 100.36395 128.22518 133.73623 ⓁTAS3GS
+@ Expecting WS:19.99999 89702 knot
+```
+
+## Aircraft PerformanceLibrary
+
+The performance of the aircraft from its drag polar, where the equation
+solver is not enough: a least squares fit, an optimum, an integration.
+
+* [PolarFit](#polarfit): the drag polar fitted to measured points;
+* [ClimbVxVy](#climbvxvy): the speeds of best rate and of best angle of
+  climb of a propeller airplane;
+* [TORoll](#toroll): the takeoff ground roll, integrated step by step, with
+  the wind and a thrust that falls with the speed.
+
+## PolarFit
+
+The parabolic drag polar `CD = CD0 + Kind·CL²` that best fits a list of
+measured lift and drag coefficients, by least squares on `CL²`, and the
+maximum lift to drag ratio that follows.
+
+Stack: a list of points, one `{ CL CD }` list each ▶ `CD0` `Kind` `LDmax`
+`CLmd`, tagged. At least two points must have different lift coefficients.
+Flight test measurements give the coefficients through the Lift and Drag
+Polar equations of the Equation Library: the lift is the weight, the drag is
+the thrust in level flight.
+
+Three points taken exactly on the polar `CD = 0.03 + 0.055·CL²` of a
+textbook example give it back (J. G. Leishman, *Introduction to Aerospace
+Flight Vehicles*, Embry-Riddle Aeronautical University, *Takeoff & Landing
+Performance*):
+
+```rpl
+{ { 0.2 0.0322 } { 0.4 0.0388 } { 0.6 0.0498 } } ⓁPolarFit
+@ Expecting CLmd:0.73854 89458 76
+```
+
+Five points of a light airplane, read to three significant digits:
+
+```rpl
+{ { 0.3 0.0248 } { 0.5 0.0332 } { 0.7 0.0459 } { 0.9 0.0628 } { 1.1 0.0839 } } ⓁPolarFit
+@ Expecting CLmd:0.61600 61969 29
+```
+
+See also: the Drag Polar and Characteristic Speeds equations of the Equation
+Library.
+
+## ClimbVxVy
+
+The speed `Vy` of the best rate of climb, which gains the most height in a
+given time, and the speed Vx of the best angle of climb, which gains the
+most height in a given distance, for a propeller airplane whose engine gives
+a constant power.
+
+![Climb speeds](img/ClimbSpeeds.bmp)
+
+Stack: `CD0` `Kind` `Wt` `Sw` `ρa` `Pav` `ηp` `CLmax` ▶ `Vy` `VSmax` Vx
+`FPAmax`, tagged: the drag polar, the mass, the wing area, the air density,
+the shaft power available, the propeller efficiency and the maximum lift
+coefficient. Values with units are converted; plain numbers are in SI units.
+
+`Vy` is the speed of minimum power. Vx is the root of
+`2·a·Vx⁴ + ηp·Pav·Vx − 2·b = 0`, where the drag is `a·V² + b/V²`. With this
+model, Vx often falls below the stall speed: the result is then the stall
+speed, tagged `VxStall`, as the handbook says that Vx is frequently just
+above the stall speed (*Pilot's Handbook of Aeronautical Knowledge*,
+FAA-H-8083-25C, chapter 11).
+
+An airplane of 2 550 lb, with a wing of 174 ft², a polar of `CD0` 0.0319 and
+`Kind` 0.0610515, 180 hp at 0.8 of efficiency, at sea level. The source finds
+1 257 ft/min at 58.8 kt (J. G. Leishman, *Climbing, Ceiling & Gliding*); the
+best angle is at the stall speed:
+
+```rpl
+0.0319 0.0610515 2550_lb 174_ft^2 1.225 180_hp 0.8 1.6 ⓁClimbVxVy
+@ Expecting FPAmax:13.66030 53597 °
+```
+
+The same airplane with half the power, in air of 0.9 kg/m³: Vx is now
+above the stall speed of 60.7 kt:
+
+```rpl
+0.0319 0.0610515 2550_lb 174_ft^2 0.9 90_hp 0.8 1.6 ⓁClimbVxVy
+DROP SWAP DROP
+@ Expecting Vx:61.43051 8191 knot
+```
+
+See also: the Rate & Angle of Climb and Characteristic Speeds equations of
+the Equation Library.
+
+## TORoll
+
+The takeoff ground roll, integrated step by step over the ground speed, with
+the wind and a thrust that changes with the airspeed, as a propeller thrust
+does.
+
+Stack: `Wt` `Sw` `ρa` `CL` `CD` `μr` `Thr` `VLO` `HW` ▶ `GSLO` `tLO` `sLO`,
+tagged: the mass, the wing area, the air density, the lift and drag
+coefficients during the roll, the rolling friction, the thrust, the liftoff
+airspeed and the headwind, negative for a tailwind. `Thr` is a thrust, or a
+list `{ T0 TLO }` of the thrust at rest and at liftoff. Values with units are
+converted; plain numbers are in SI units. The results are the ground speed
+at liftoff, the duration and the length of the roll.
+
+The acceleration is `(T − D − μr·(W − L))/m`; the distance and the time are
+the integrals of `GS/a` and `1/a` over the ground speed, by Simpson's rule.
+The Takeoff Ground Roll equation estimates the same distance with the forces
+averaged at 70 % of the liftoff speed.
+
+An airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², rolling
+at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway, lifting off at
+176.7 ft/s. The exact solution for a constant thrust is 3 289.2 ft and
+36.1 s:
+
+```rpl
+6600_lb 160_ft^2 0.002378_slug/ft^3 0.4 0.0388 0.02 1200_lbf 176.702_ft/s 0_knot ⓁTORoll
+@ Expecting sLO:3 289.14666 856 ft
+```
+
+The same takeoff against a headwind of 10 kt. The rule of the square of the
+speed ratio gives 2 678 ft:
+
+```rpl
+6600_lb 160_ft^2 0.002378_slug/ft^3 0.4 0.0388 0.02 1200_lbf 176.702_ft/s 10_knot ⓁTORoll
+@ Expecting sLO:2 707.12691 754 ft
+```
+
+With a propeller thrust falling from 1 300 lbf at rest to 1 000 lbf at
+liftoff, at sea level:
+
+```rpl
+6600_lb 160_ft^2 1.225 0.4 0.0388 0.02 { 1300_lbf 1000_lbf } 104.7_knot 0 ⓁTORoll
+@ Expecting sLO:3 725.45580 94 ft
+```
+
+See also: the Takeoff Ground Roll and Wind on Runway Distances equations of
+the Equation Library.
 mple # Constants library
 
 The DB50X calculator features a library of constants covering mathematics,
@@ -9210,7 +9515,7 @@ Above this threshold, dry air undergoes avalanche ionisation
 [Materials 1](#materials-1)
 [Materials 2](#materials-2)
 
-## N2 constant
+## N2 constants
 
 Gas
 
@@ -9291,7 +9596,7 @@ Measured. Dielectric breakdown field of N2 at STP. Slightly higher
 than dry air; preferred for high-voltage insulation. It is the electric
 field threshold above which an avalanche ionisation occurs. [Materials 2](#materials-2)
 
-## O2 constant
+## O2 constants
 
 Gas
 
@@ -9370,7 +9675,7 @@ Dielectric rigidity of O2
 Measured. Dielectric breakdown electric field of O2 at STP.
 Slightly lower than N2. [Materials 2](#materials-2)
 
-## Argon constant
+## Argon constants
 
 Gas
 
@@ -9440,7 +9745,7 @@ Dielectric rigidity of Ar
 Measured. Dielectric breakdown electric field of argon at STP. Lower than
 air due to absence of polar molecules. [Materials 2](#materials-2)
 
-## CO2 constant
+## CO2 constants
 
 Gas
 
@@ -9530,7 +9835,7 @@ air. [Materials 2](#materials-2)
   For liquids: `cv ≈ `cp (difference < 1%), `γ ≈ 1`, `R = cp - cv ≈ 0`.
   These parameters are therefore not listed for liquids.
 
-## H2O constant
+## H2O constants
 
 Liquid
 
@@ -9572,7 +9877,7 @@ quantifies how strongly a material opposes the flow of electric current.
 
 ## C1. Materials for optical fibers and waveguides
 
-## Silicon constant
+## Silicon constants
 
 Dielectric
 
@@ -9614,7 +9919,7 @@ Semiconductor; resistivity varies over many orders of magnitude with doping.
 It quantifies how strongly a material opposes the flow of electric current.
 [Materials 10](#materials-10) [Materials 11](#materials-11)
 
-## SiO2 constant
+## SiO2 constants
 
 Dielectric
 
@@ -9663,11 +9968,11 @@ Dielectric rigidity of fused silica
 Measured. Dielectric breakdown electric field of fused silica. Very high;
 SiO2 is the standard gate dielectric in MOSFET technology. [Materials 7](#materials-7)
 
-## GeO2 constant
+## GeO2 constants
 
 Dielectric
 
-## ρvGeO2 constant
+### ρvGeO2 constant
 
 Germanate glass density
 
@@ -9704,7 +10009,7 @@ Dielectric rigidity of germanate glass
 Measured. Dielectric breakdown electric field of GeO2 glass. Similar
 order of magnitude to SiO2; varies with purity. [Materials 9](#materials-9)
 
-## Si3N4 constant
+## Si3N4 constants
 
 Dielectric
 
@@ -9748,7 +10053,7 @@ SiO2; used as storage dielectric in SONOS flash memory. [Materials 19](#material
 
 ## C2. Reference optical glasses
 
-##BK7 Glass constant
+## BK7 Glass constants
 
 Dielectric
 
@@ -9791,7 +10096,7 @@ crystalline dielectrics due to its amorphous microstructure. [Materials 15](#mat
 
 ## C3. Optical crystals (UV & IR)
 
-## Al2O3 Sapphire constant
+## Al2O3 Sapphire constants
 
 Dielectric
 
@@ -9832,7 +10137,7 @@ Dielectric rigidity of sapphire
 Measured. Dielectric breakdown electric field of sapphire. High strength;
 enables use in high-field capacitors and microwave devices. [Materials 16](#materials-16)
 
-## CaF2 constant
+## CaF2 constants
 
 Dielectric
 
@@ -9873,7 +10178,7 @@ Dielectric rigidity of CaF2
 Measured. Dielectric breakdown electric field of CaF2 crystal. Very high;
 consistent with use in high-power UV laser optics. [Materials 17](#materials-17)
 
-## C Diamond constant
+## C Diamond constants
 
 Dielectric
 
@@ -9920,7 +10225,7 @@ electronics. [Materials 13](#materials-13) [Materials 14](#materials-14)
     For metals: `n` not listed (complex `n`, strongly wavelength-dependent).
     `cv ≈ cp` for all metals at room temperature (difference < 0.5%).
 
-## Al constant
+## Al Metal constants
 
 Metal
 
@@ -9937,7 +10242,7 @@ Specific heat of aluminium
 
 Measured. Specific heat of pure aluminium at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Cu constant
+## Cu Metal constants
 
 Metal
 
@@ -9954,7 +10259,7 @@ Specific heat of copper
 
 Measured. Specific heat of copper at `20°C`. [Materials 12](#materials-12) [Materials 2](#materials-2)
 
-## Fe constant
+## Fe Metal constants
 
 Metal
 
@@ -9974,6 +10279,33 @@ Measured (alpha phase). Specific heat of iron (alpha phase) at `20°C`.
 
 
 ## Dates constants
+
+### America constants
+
+[IndigenousPeoplesDay](#indigenouspeoplesday-constant).
+
+### IndigenousPeoplesDay constant
+
+Indigenous Peoples' Day recalls the arrival of Christopher Columbus in the
+Americas on October 12, 1492, and honours the peoples who lived there.
+
+### Australia constants
+
+[AustraliaDay](#australiaday-constant).
+
+### AustraliaDay constant
+
+Australia Day commemorates the arrival of the First Fleet at Sydney Cove on
+January 26, 1788.
+
+### France constants
+
+[BastilleDay](#bastilleday-constant).
+
+### USA constants
+
+[IndependenceDay](#independenceday-constant) and
+[MartinLutherKingDeath](#martinlutherkingdeath-constant).
 
 ### BastilleDay constant
 
@@ -10251,11 +10583,15 @@ physics, chemistry and computer science. The built-in equations can be extended
 using the `config/equations.csv` configuration file.
 
 
+Any simulation of the library can also be run with uncertain inputs: the
+σROOT command, in the Functions submenu of the Uncertainty section of the
+Function Library, gives every unknown with its standard uncertainty.
+
 ## Columns and Beams
 
 The 21 variables in the Columns and Beams section are:
 
-* `o`: Eccentricity (offset) of load (dim.: length)
+* `ε`: Eccentricity (offset) of load (dim.: length)
 * `σcr`: Critical stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `σmax`: Maximum stress (dim.: pressure=force/area, in SI: pascal, Pa)
 * `θ`: Slope at `x` (dim.: angle)
@@ -10406,7 +10742,7 @@ L=10_ft  P=500_lbf  a=3_ft  x=8_ft  w=100_lbf/ft
 
 The 78 variables in the Electricity section are:
 
-* `∈r`: Relative permittivity
+* `εr`: Relative permittivity
 * `μr`: Relative permeability
 * `ω`: Angular frequency (dim.: angle/time)
 * `ω₀`: Resonant angular frequency (dim.: angle/time)
@@ -10526,7 +10862,7 @@ Er0=Er
 
 The expression of the radial electric field at the distance `r` depends on the subtended angles `θ₁` and `θ₂` relative to the ends of the wire of finite length `L`.
 
-![E field finite line](img/EFieldFiniteLine.bmp)
+![E field finite line](img/E_Field_Finite_Line.bmp)
 
 * **Example 1.** To calculate `[λ_C/m;Er_N/C]` (Linear charge density; Electric Field at position `r`) from 6 known variables and also with the distance `r=(L/2)/tanθ₁` and angle `θ₂=360°-θ₁` (see figure):
 ```rpl
@@ -10615,7 +10951,7 @@ The electrical resistivity `ρ` of most materials changes with temperature. If t
 
 ### Series & Parallel R
 
-![Series & Parallel R](img/Series&ParallelR.bmp)
+![Series & Parallel R](img/SeriesAndParallelR.bmp)
 
 * To calculate `[Rs_Ω;Rp_Ω]` (Series & Parallel Resistances) from 2 known variables:
 ```rpl
@@ -10626,7 +10962,7 @@ R1=2_Ω  R2=3_Ω
 
 ### Series & Parallel C
 
-![Series & Parallel C](img/Series&ParallelC.bmp)
+![Series & Parallel C](img/SeriesAndParallelC.bmp)
 
 * To calculate `[Cs_μF;Cp_μF]` (Series & Parallel Capacitances) from 2 known variables:
 ```rpl
@@ -10637,7 +10973,7 @@ C1=2_μF  C2=3_μF
 
 ### Series & Parallel L
 
-![Series & Parallel L](img/Series&ParallelL.bmp)
+![Series & Parallel L](img/SeriesAndParallelL.bmp)
 
 * To calculate `[Ls_mH;Lp_mH]` (Series & Parallel Inductances) from 2 known variables:
 ```rpl
@@ -10707,8 +11043,6 @@ C=20_μF  V=100_V
 ### DC Inductor Voltage
 
 These equations approximate the dc voltage induced in an inductor by a change in current in a certain time interval.
-
-![DC Inductor Voltage](img/DCInductorVoltage.bmp)
 
 * To calculate `[ΔIL_A;ILf_A;tf_μs]` (Current difference; Final current; Final time) from 5 known variables:
 ```rpl
@@ -10927,7 +11261,7 @@ The 37 variables in the Force and Energy section are:
 * `ωf`: Final angular velocitie (dim.: angle/time, in SI: r/s)
 * `ρ`: Fluid density (dim.: mass/volume, in SI: kg/m^3)
 * `τ`: Torque (dim.: force·length, in SI: N·m)
-* `Θ`: Angular displacement (dim.: angle, in SI: r)
+* `θ`: Angular displacement (dim.: angle, in SI: r)
 * `A`: Projected area relative to flow
 * `ar`: Centripetal acceleration at `r`
 * `at`: Tangential acceleration at `r`
@@ -10992,7 +11326,7 @@ m=1_kg  r=5_cm  N=2000_Hz
 
 The force is that exerted by the spring.
 
-![Hooke’s Law](img/Missing name.bmp)
+![Hooke’s Law](img/HookesLaw.bmp)
 
 * To calculate `[F_lbf;W_ft*lbf]` (Force; Work) from 2 known variables:
 ```rpl
@@ -11029,6 +11363,8 @@ m1=2E15_kg  m2=2E18_kg  r=1000000_km  ri=1000000_km  rf=5000000_km
 @ Expecting [ F=266 972. N UGf=-5.33944⁳¹³ J UGi=-2.66972⁳¹⁴ J W=2.13577 6⁳¹⁴ J ]
 'ROOT(ⒺGravitation Law;[F;UGf;UGi;W];[1_N;1_J;1_J;1_J])'
 ```
+
+### RelativityMassEnergy
 
 ### Relativity Mass Energy
 
@@ -11081,6 +11417,8 @@ The 38 variables in the Gases section are:
 * `Z`: Gas compressibility correction factor
 * `Zi`: Initial gas compressibility correction factor
 * `Zf`: Final gas compressibility correction factor
+
+### IdealGas
 
 ### Ideal Gas
 
@@ -11312,7 +11650,7 @@ The 28 variables in the Magnetism section are:
 The magnetic field expression differs depending upon whether the point at `r` is inside or outside the wire of radius `rw` and the calculations are done accordingly. The expression for the magnetic field at the distance `r` is approximately valid if the distance is such that `r << L` and therefore also applies for a wire of finite length `L` providing that `r < L/10` (see the following example 2 compared to example 2 of "Straight Wire Finite"). Note that if an electric current passes through a straight wire, one must use the following right-hand rule te determine the direction of the `B` field: when the thumb is pointed in the direction of conventional current (from positive to negative), the curled fingers will then point in the direction of the magnetic field (see fig.).
 
 
-![Straight Wire Infinite](img/StraightWireInfinite.bmp)
+![Straight Wire Infinite](img/StraightWire.bmp)
 
 * **Example 1.** Inside the wire, to calculate `[B_T]` (Magnetic field) from 4 known variables:
 ```rpl
@@ -11382,7 +11720,7 @@ Ia=10_A  Ib=20_A  μr=1  L=50_cm  d=1_cm
 
 The expression for the magnetic field in the center is approximately valid if the radius of the solenoid < `L` and therefore also applies inside a solenoid of finite length `L`. The right-hand rule applies also here: when the fingers curl around the solenoid in the sense of the current, the thumb points in the direction of the magnetic field (see fig.).
 
-![B Field In Infinite Solenoid](img/BFieldInInfiniteSolenoid.bmp)
+![B Field In Infinite Solenoid](img/MagneticFieldInSolenoid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 3 known variables:
 ```rpl
@@ -11432,7 +11770,7 @@ B0 B %Ch
 
 The magnetic field `B` is calculated in the center of the torroid. The right-hand rule applies also here: when the fingers curl around the outer circle of the torroid following the sense of the current, the thumb points in the direction of the central magnetic field (see fig.).
 
-![B Field In Toroid](img/BFieldInToroid.bmp)
+![B Field In Toroid](img/MagneticFieldInToroid.bmp)
 
 * To calculate `[B_T]` (Magnetic field) from 5 known variables:
 ```rpl
@@ -11445,7 +11783,7 @@ The magnetic field `B` is calculated in the center of the torroid. The right-han
 
 When a conductor carrying a current (to the right) is suddenly plunged into a perpendicular magnetic field (towards the bottom), there is a deviation (towards the top) of the free electrons which unbalances the distribution of electric charges. This transfer of charges from top to bottom gives rise to an electric force which in return balances the magnetic force. And it is precisely the appearance of this new electric field which is revealed by the Hall voltage `VH` measured between the top and the bottom of the conductor (small multimeter on the right).
 
-![Hall Effect](img/Hall Effect VH.bmp)
+![Hall Effect](img/HallEffectVH.bmp)
 
 * To calculate `[VH_V]` (Hall tension) from 5 known variables:
 ```rpl
@@ -11458,7 +11796,7 @@ n=5e28_(1/m^3)  B=0.641_T  q=1.60217 6634e-19_C  L=2_mm  I=10_A
 
 Under the perpendicular magnetic field, the moving charge has a circular trajectory and turns at the cyclotron frequency with the rotation period `T`.
 
-![Cyclotron Motion](img/Cyclotron_BW.bmp)
+![Cyclotron Motion](img/CyclotronBW.bmp)
 
 * To calculate `[Rc_m;fc_Hz;T_s]` (Radius of the circular path; Cyclotron frequency; Period) from 4 known variables:
 ```rpl
@@ -11471,7 +11809,7 @@ m=1.67262 19259 5e-27_kg  B=0.8_T  q=1.60217 6634e-19_C  v=4.6e7_m/s
 
 Under the magnetic field lines (at angle `θ` with the speed vector), the moving charge has an helicoidal trajectory of pitch `Dpitch`, radius `Rc` and period `T`.
 
-![Helicoidal Motion](img/Helicoidal Motion BW.bmp)
+![Helicoidal Motion](img/HelicoidalMotionBW.bmp)
 
 * To calculate `[Rc_m;T_s;Dpitch_m]` (Radius of the circular path; Period, pitch of the helicoidal motion) from 4 known variables:
 ```rpl
@@ -11557,7 +11895,7 @@ y0=1000_ft  y=0_ft  v0=0_ft/s  gloc=9.80665_m/s↑2  φ=45_°  h=1000_m  Mp=5.97
 
 During the time of flight `tf`, the motion of a projectile follows a symetric parabole of horizontal range `R` and of maximum height `hmax`.
 
-![Projectile Motion](img/Projectile_BW.bmp)
+![Projectile Motion](img/ProjectileMotion.bmp)
 
 * To calculate `[R_ft;vcx_ft/s;vcy_ft/s;x_ft;y_ft;hmax_ft;tf_s]` (Range, Components `x` & `y` of velocity at time `t`; Positions `x` & `y` at time `t`; Maximum height; Time of flight) from 5 known variables:
 ```rpl
@@ -11620,6 +11958,8 @@ Cd=0.01  ρ=1.98_(kg/m^3)  ρf=998_(kg/m^3)  d=0.1_cm  Ah=7.85398 16339 7e-3
 'ROOT(ⒺBuoyancy & Terminal Velocity;[vt;v;tfr;xfr];[1_m/s;1_m/s;1_s;1_m])'
 ```
 
+#### Escape & Orbital Velocity
+
 #### Escape and Orbital Velocities
 
 The escape velocity is the speed required to completely free oneself from the gravitational field of a star, planet, etc. It is defined as the initial speed allowing you to move away to infinity. The orbital velocity is the speed nneded to maintain a stable circular orbit in a gravitational field.
@@ -11657,7 +11997,7 @@ The 40 variables in the Optics section are:
 * `I`: Transmitted irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `I₀`: Incident irradiance or polarized light radiance flux (dim.: power/area, in SI: W/m^2)
 * `Ix`: Transmitted irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
-* `Ix0`: Incident irradiance or polarized X rayx radiance flux (dim.: power/area, in SI: W/m^2)
+* `I₀x`: Incident irradiance or polarized X rays radiance flux (dim.: power/area, in SI: W/m^2)
 * `m`: Magnification
 * `n`: Index of refraction
 * `n1`: Index of refraction of medium 1
@@ -11681,7 +12021,7 @@ For reflection and refraction problems, the focal length and radius of curvature
 
 #### Refraction Law
 
-![Refraction Law](img/RefractionLaw.bmp)
+![Refraction Law](img/LawOfRefraction.bmp)
 
 * To calculate `[θ₂_°;v1_m/s;v2_m/s]` (Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 3 known variables:
 ```rpl
@@ -11703,7 +12043,7 @@ n1=1  n2=1.5
 
 #### Fiber Optic
 
-![Fiber Optic](img/Fiber Optic BW.bmp)
+![Fiber Optic](img/FiberOpticBW.bmp)
 
 * To calculate `[vf0_m/s;vf1_m/s;vf2_m/s;NA;θ0_°]` (Speed of light in media of refraction index `n1f` & `n2f`; Numerical aperture; Acceptance angle) from 3 known variables:
 ```rpl
@@ -11716,7 +12056,7 @@ nf0=1.2  nf1=1.5  nf2=1.45
 
 The Brewster angle is the angle of incidence at which the reflected wave is completely polarized.
 
-![Brewster’s Law](img/Brewster’sLaw.bmp)
+![Brewster’s Law](img/BrewstersLaw.bmp)
 
 * To calculate `[θB_°;θ₂_°;v1_m/s;v2_m/s]` (Brewster input angle; Refraction angle; Speed of light in media of refraction index `n1` & `n2`) from 2 known variables:
 ```rpl
@@ -11760,7 +12100,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 #### Rayleigh’s Criterion
 
-![Rayleigh’s Criterion](img/Rayleigh's Criterion_BW.bmp)
+![Rayleigh’s Criterion](img/RayleighsCriterionBW.bmp)
 
 * To calculate `[θr_°;y_m]` (Rayleigh’s criterion angle; Distance between two point source) from 3 known variables:
 ```rpl
@@ -11773,7 +12113,7 @@ r1=5_cm  r2=20_cm  n=1.5  u=50_cm
 
 If lineraly polarized light is incident on a perfect linear polarizer the transmitted light is the component at angle `θ` between the light polarisation direction and the polarizer transmission axis. The Malus law is given in terms of light irradiances. A relavistic version of the laws applies for X rays and more energetic electromagnetic radiations (with loss up to 10% in irradiance). The decrease in frequency (`fx < fx₀`) and therefore in energy (`h·fx`) of a transmitted photon is due to the movement of the interacting electron of the polarizer (Compton scattering).
 
-![Malus Law](img/Malus Law BW.bmp)
+![Malus Law](img/MalusLawBW.bmp)
 
 * To calculate `[I_(W/m^2);Ix_(W/m^2),E₀_V/m]` (Polarized light radiance flux; Polarized radiance flux of emitted Xrays; Electric field) from 5 known variables:
 ```rpl
@@ -11831,9 +12171,11 @@ The 25 variables in the Oscillations section are:
 * `xh`: Displacement amplitude of harmonic motion
 * `xp`: Resulting displacement amplitude of driven & damped oscillations
 
+#### Mass‐Spring System
+
 #### Mass-Spring System
 
-![Mass-Spring System](img/Mass-SpringSystem.bmp)
+![Mass-Spring System](img/MassSpringSystem.bmp)
 
 * To calculate `[ω_(r/s);T_s;f_Hz]` (Angular frequency; Oscillation period; Frequency) from 2 known variables:
 ```rpl
@@ -11913,7 +12255,7 @@ E₀=E
 
 We are considering here a damped mass-spring oscillator where the external driving force is of the form `Fdriving = Fd*cos(ω*t)` acting at the angular frequency `ω`. The corresponding differential equation : `−k*x − b*dx/dt + Fd*cos(ω*t) = m*d^2x/dt^2` describes the driven damped oscillations. When the driving frequency `ω` comes close to the natural frequency `ω₀` this is the onset of resonance with amplitude increase and the total energy accumulates up to a possible catastrophy when the structure is overcome (see fig)
 
-![Driven Damped Oscillations](img/Driven Damped Oscillations2_BW.bmp)
+![Driven Damped Oscillations](img/DrivenDampedOscillations2BW.bmp)
 
 * To calculate `[m_kg;γ_(r/s);ωu_(r/s);φ_°;xp_m;x_cm;v_cm/s;a_m/s^2;E_J;Q]` (Mass; Reduced damping coefficient; Underdamped angular frequency; Phase angle; Resulting amplitude; Displacement; Velocity & Acceleration at `t`; Total energy at `t`; Quality factor) from 9 known variables which correspond to the values of the previous section:
 ```rpl
@@ -12086,6 +12428,8 @@ d=14_cm  m=3.75_kg  Id=486.5_lb*in^2
 ```
 
 
+## Solid State Device
+
 ## Solid State Devices
 The 54 variables in the Solid State Devices section are:
 
@@ -12113,7 +12457,8 @@ The 54 variables in the Solid State Devices section are:
 * `ICEO`: Collector current (collector-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICO`: Collector current (emitter-to-base open) (dim.: charge/time, in SI: ampere, A)
 * `ICS`: Collector-to-base saturation current (dim.: charge/time, in SI: ampere, A)
-* `ID, IDS`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `ID`: Drain current (dim.: charge/time, in SI: ampere, A)
+* `IDS`: Drain-to-source current (dim.: charge/time, in SI: ampere, A)
 * `IE`: Total emitter current (dim.: charge/time, in SI: ampere, A)
 * `IES`: Emitter-to-base saturation current (dim.: charge/time, in SI: ampere, A)
 * `IS`: Transistor saturation current (dim.: charge/time, in SI: ampere, A)
@@ -12147,7 +12492,7 @@ The 54 variables in the Solid State Devices section are:
 
 These equations for a silicon PN-junction diode use a “two-sided step-junction” model–the doping density changes abruptly at the junction. The equation assume the current density is determined by minority carries injected across the depletion region and the PN junction is rectangular in its layout, The temperature should be between 77 and 500 K.
 
-![PN Step Junctions](img/PNStepJunctions.bmp)
+![PN Step Junctions](img/PNStepJunction.bmp)
 
 * To calculate `[ni_m^-3;Vbi_V;xd_μ;Cj_pF/cm^2;Emax_V/cm;BV_V;J_A/cm^2;Aj_cm^2;I_mA]` (Silicon density; Built-in voltage; Depletion-region width; Junction capacitance per unit area; Maximum electric field; Breakdown voltage; Current density; Effective junction area; Diode current) from 11 known variables:
 ```rpl
@@ -12173,7 +12518,7 @@ tox=700_Å  NA=1e15_1/cm^3  μn=600_(cm^2)/(V*s)  T=26.85_°C  Vt0=0.75_V  VGS=
 
 These equations for an NPN silicon bipolar transistor are based on large-signal models developed by J.J. Ebers and J.L. Moll. The offset-voltage calculation differs depending on whether the transistor is saturated or not. The equations also include the special conditions when the emitter-base or collector-base junction is open, which are convenient for measuring transistor parameters.
 
-![Bipolar Transistors](img/BipolarTransistors.bmp)
+![Bipolar Transistors](img/BipolarTransistor.bmp)
 
 * To calculate `[VBE_V;IS_nA;ICO_nA;ICEO_nA;IE_mA;IC_mA;IB_mA;VCEsat_V]` (Base-to-emitter voltage; Transistor saturation current; Collector current (emitter-to-base open); Collector current (collector-to-base open); Total emitter current; Total collector current; Total base current; Collector-to-emitter saturation voltage) from 7 known variables:
 ```rpl
@@ -12269,7 +12614,7 @@ Stresses and strains are positive in the directions shown in the picture.
 
 #### Mohr’s Circle
 
-![Mohr’s Circle](img/Mohr’sCircle.bmp) ```![Mohr’s Circle](img/Mohr’sCircle.bmp)```
+![Mohr’s Circle](img/MohrsCircle.bmp) ```![Mohr’s Circle](img/MohrsCircle.bmp)```
 
 * To calculate `[σ1_psi;σ2_psi;θp1_°;θp2_°;τmax_psi;θs_°;σavg_psi]` (Maximum principal normal stress; Minimum principal normal stress; Angle to plane of maximum principal normal stress; Angle to plane of minimum principal normal stress; Maximum shear stress; Angle to plane of maximum shear stress; Normal stress on place of maximum shear stress) from 3 known variables:
 ```rpl
@@ -12870,6 +13215,8 @@ T=1273.15_K  A=100_cm^2  fa=7.48475 43283 5⁳¹³ Hz  fb=3.18337 69964�
 'ROOT(ⒺPlanck & Wien Comparison;[fpeak;f1;f2;FrPl12;FrWn12;%rFr12;f3;f4;FrPl34;FrWn34;%rFr34;FrPlab;eb;ebfafb;q];[1_THz;1_THz;1_THz;1;1;1;1_THz;1_THz;1;1;1;1;1_(W/m^2);1_(W/m^2);1_W])'
 ```
 
+#### Planck & Rayleigh‐Jeans Comparison
+
 #### Planck & Rayleigh-Jeans Comparison
 
 In this section, two comparisons are done between the Planck and Rayleigh-Jeans spectral distributiona. Based on the equipartition theorem argument, the latter is an approximation of the true Planck law describing the spectral distribution for the light emitted by a black-body. The choice of temperature `T` determines the frequency ranges for integration between `f1` & `f2`, or between `f3` & `f4`. One shall determine in which frequency interval both distribution agree or differs considerably, leading to a divergence called UV catastrophy corresponding to unphysical fractions greather than one. The asymptotic agreement for small frequency is clearly illustrated in the picture. The user is free to choose one or the other comparison fractions (replacing it in `Frfafb`) to compute the corresponding enissive power `ebfafb` and the heat transfer rate `q` from the black-body. Or, For the Planck distribution, one could choose any other values for `fa` & `fb` and computes the corresponding `FrPlab`, `ebfafb` and `q`.
@@ -13139,6 +13486,3863 @@ n='5*12' I%Yr=13 PV=-63000 FV=10000 PYr=12
 @ Expecting Pmt=1 314.24620 468
 'ROOT(ⒺTVMEnd;Pmt;0)'
 ```
+
+## Rocketry
+
+The 110 variables in the Rocketry section are:
+
+* `α`: Divergent cone half-angle
+* `Δt`: Elapsed time or Burn duration time
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First stage velocity change (dim.: speed)
+* `ΔV2`: Second stage velocity change (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `ε`: Expansion ratio
+* `λ`: Exit-gas momentum correction factor
+* `ρp`: Solid rocket propellant density (dim.: mass/volume, in SI: g/ml)
+* `ρAl`: Solid rocket propellant Aluminium density (dim.: mass/volume, in SI: g/ml)
+* `ρAP`: Solid rocket propellant Ammonium Perchlorate density (dim.: mass/volume, in SI: g/ml)
+* `ρHTPB`: Solid rocket propellant HTPB density (dim.: mass/volume, in SI: g/ml)
+* `θ`: Convergent cone half-angle
+* `a`: Solid rocket propellant burn rate coefficient
+* `Ab`: Area of the cylindrical burning surface (in solid rocket motor)
+* `Ae`: Nozzle exit area 
+* `AeAt`: Ratio of nozzle exit area over sonic throat area
+* `At`: Nozzle sonic throat area
+* `C`: Effective exhaust gas velocity (dim.: speed)
+* `C1`: Stage 1 effective exhaust gas velocity (dim.: speed)
+* `C2`: Stage 2 effective exhaust gas velocity (dim.: speed)
+* `D`: Solid Rocket combustion diameter
+* `Dc`: Combustion chamber diameter
+* `Cstar`: Characteristic exhaust velocity (dim.: speed)
+* `CtnRatio`: Contraction ratio of the major cross-sectional area of the combuster divided by the throat area
+* `Dt`: Throat diameter
+* `Fnet`: Net engine thrust (dim.: force, in SI: N)
+* `H`: Starting height of rocket engine 
+* `Isp`: Specific impulse (dim.: time, in SI: s)
+* `Isp1`: First stage specific impulse (dim.: time, in SI: s)
+* `Isp2`: Second stage specific impulse (dim.: time, in SI: s)
+* `k`: Specific heat ratio
+* `L`: Solid Rocket combustion length
+* `Lc`: Combustion chamber length
+* `Li`: Fractional axial length based on a 15-degree conical nozzle
+* `Lstar`: Combustion chamber characteristic length for a given propellant
+* `M`: average molecular weight of the exhaust gases
+* `Md`: Spacecraft's dry mass
+* `Md1`: Spacecraft's stage 1 dry mass 
+* `Md2`: Spacecraft's stage 2 dry mass
+* `Mf`: Spacecraft's total mass
+* `Mf1`: Total vehicle mass when stage 1 is burned out but not yet discarded
+* `Mf2`: Total vehicle mass when stage 2 is burned out but not yet discarded
+* `Mo`: Spacecraft's initial mass 
+* `Mo1`: Total vehicle mass when stage 1 is ignited 
+* `Mo2`: Total vehicle mass when stage 2 is ignited 
+* `Mp`: Spacecraft's propellant mass
+* `Mp1`: Spacecraft's stage 1 propellant mass
+* `Mp2`: Spacecraft's stage 2 propellant mass
+* `Mpl`: Spacecraft's payload mass
+* `MplMo`: Ratio of payload to initial masses
+* `Nm`: Mach number as the ratio of the gas velocity to the local speed of sound
+* `Pa`: Ambient external pressure (dim.: force/area, in SI: kPa) 
+* `Pc`: Combustion chamber pressure (dim.: force/area, in SI: MPa)
+* `Pe`: Pressure at the nozzle exit (dim.: force/area, in SI: MPa)
+* `Pt`: Gas pressure at the nozzle throat (dim.: force/area, in SI: MPa)
+* `Q`: Propellant consumption mass flow rate (dim.: mass/time, in SI: kg/s)
+* `Qs`: Solid rocket combustion product generation rate (dim.: mass/time, in SI: kg/s)
+* `R`: Conical nozzle circular arc radius (dim.: length, in SI: m)
+* `r`: Solid rocket propellant burn rate (dim.: mass/time, in SI: kg/s)
+* `ts`: Propellant stay-time
+* `Tc`: Combustion chamber temperature 
+* `Tt`: Gas temperature at the nozzle throat
+* `V`: Average specific volume
+* `Vc`: Combustion chamber volume
+* `Ve`: Exhaust gas velocity (dim.: speed)
+* `Vi`: Initial rocket velocity (dim.: speed)
+* `Vf`: Final rocket velocity (dim.: speed)
+* `wAl`: Solid rocket propellant Aluminium fraction by mass
+* `wAP`: Solid rocket propellant Ammonium Perchlorate fraction by mass
+* `wHTPB`: Solid rocket propellant HTPB fraction by mass
+
+* `Cfx`: Thrust coefficient (dim.: dimensionless)
+* `It`: Total impulse (dim.: force*time, in SI: N*s)
+* `Vbo`: Burnout velocity (dim.: speed)
+* `n`: Number of rocket stages ([Optimal Staging](#Optimal Staging)), or Solid propellant burn-rate pressure exponent ([Solid Rocket Burn Rate](#Solid Rocket Burn Rate))
+* `MR`: Per-stage mass ratio (dim.: dimensionless)
+* `Rt`: Nozzle throat radius (dim.: length)
+* `Rex`: Nozzle exit radius (dim.: length)
+* `Rarc`: Nozzle throat downstream circular-arc radius (dim.: length)
+* `Lnz`: Bell nozzle length from throat to exit plane (dim.: length)
+* `Fsl`: Sea-level thrust (dim.: force, in SI: N)
+* `Fvac`: Vacuum thrust (dim.: force, in SI: N)
+* `ΔF`: Thrust gain from sea level to vacuum (dim.: force, in SI: N)
+* `horb`: Orbital altitude above the surface (dim.: length)
+* `rorb`: Orbital radius from the body center (dim.: length)
+* `Vcirc`: Circular-orbit velocity (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `gsurf`: Surface gravity (dim.: length/time^2, in SI: m/s^2)
+* `LNose`: Length of nose (dim.: length)
+* `dN`: Diameter at base of nose (dim.: length)
+* `dF`: Diameter at front of transition (dim.: length)
+* `dR`: Diameter at rear of transition (dim.: length)
+* `LT`: Length of transition (dim.: length)
+* `XP`: Distance from tip of nose to front of transition (dim.: length)
+* `CR`: Fin root chord (dim.: length)
+* `CT`: Fin tip chord (dim.: length)
+* `SFs`: Fin semispan (dim.: length)
+* `LF`: Length of fin mid-chord line (dim.: length)
+* `RB`: Radius of body at aft end (dim.: length)
+* `XR`: Distance between fin root leading edge and fin tip leading edge parallel to body (dim.: length)
+* `XB`: Distance from nose tip to fin root chord leading edge (dim.: length)
+* `NF`: Number of fins
+* `XN`: Center of pressure of the nose, from the nose tip (dim.: length)
+* `CNN`: Force coefficient of the nose
+* `CNT`: Force coefficient of the transition
+* `XT`: Center of pressure of the transition, from the nose tip (dim.: length)
+* `CNF`: Force coefficient of the fins
+* `XF`: Center of pressure of the fins, from the nose tip (dim.: length)
+* `CNR`: Force coefficient of the rocket
+* `XCP`: Center of pressure of the rocket, from the nose tip (dim.: length)
+
+* References: [1]: http://www.braeunig.us/space/problem.htm
+& [2] http://www.braeunig.us/space/sup1.htm
+The 24 simulations are inspired from the solutions of P#1 to #12 of [1] and ex. 1 to 3 of [2].
+
+#### Thrust
+
+These equations derive from the conservation of momentum during the propulsion phase of a rocket whose engine ejects gas at velocity `Ve`, consuming fuel at rate `Q` to produce thrust `Fnet`. After burn duration `Δt` this results in a change in velocity, `ΔV`, for the rocket. 
+
+![Thrust](img/RocketPropulsion.bmp)
+
+* To calculate: `[Fnet_kN]` (Rocket thrust) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ Fnet=96.5 kN ] 
+'ROOT(ⒺThrust;[Fnet];[1_kN])'
+```
+
+#### Rocket ΔV
+
+* To calculate: `[ΔV_m/s]` (Velocity change) from 7 known variables:
+```rpl
+Q=30_kg/s  Ve=3100_m/s  Ae=0.7_m↑2  Pe=5_kPa  Pa=0_kPa  Δt=60_s  Mo=30000_kg
+@ Expecting [ ΔV=191.81375 1526 m/s ]
+'ROOT(ⒺRocket ΔV;[ΔV];[1_m/s])'
+
+```
+#### Tsiolkovsky & Propellant Mass
+
+* To calculate: `[Mo_kg;Mp_kg]` (Spacecraft's Initial & Propellant mass) from 3 known variables:
+```rpl
+Mf=75000_kg  C=3100_m/s  ΔV=700_m/s
+@ Expecting [ Mo=93 999.97959 06 kg Mp=18 999.97959 06 kg ]
+'ROOT(ⒺTsiolkovsky & Propellant Mass;[Mo;Mp];[1_kg;1_kg])' 
+```
+
+#### Burn Duration
+
+![Burn Duration](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[ΔV_m/s;Δt_s]` (Velocity change; Burn duration) from 5 known variables:
+```rpl
+Mo=5000_kg  C=3000_m/s  Vf=12000_m/s  Vi=7790_m/s  Q=10_kg/s
+@ Expecting [ ΔV=4 210 m/s Δt=377.11182 8738 s ]
+'ROOT(ⒺBurn Duration;[ΔV;Δt];[1_m/s;1_s])' 
+```
+
+#### Rocket Engine Exhaust Velocity
+
+* To calculate: `[Ve_m/s]` (Exhaust velocity) from 5 known variables:
+```rpl
+Pc=50_atm  Pe=1_atm  Tc=3470_K  M=21.40_(g/mol)   k=1.221
+@ Expecting [ Ve=2 749.35021 959 m/s ]
+'ROOT(ⒺRocket Engine Exhaust Velocity;[Ve];[1_m/s])'
+```
+
+#### Rocket Engine Specific Impulse
+
+* To calculate: `[Isp_s]` (Specific impulse) from 2 known variables:
+```rpl
+Fnet=1000000_N  Q=400_kg/s
+@ Expecting [ Isp=254.92905 3244 s ]
+'ROOT(ⒺRocket Engine Specific Impulse;[Isp];[1_s])'
+```
+
+#### Exhaust Nozzle Throat Parameters
+
+* To calculate: `[Pt_MPa  Tt_K  At_m↑2]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area) from 5 known variables: 
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 ]
+'ROOT(ⒺExhaust Nozzle Throat Parameters;[Pt;Tt;At];[1_MPa;1_K;1_m²])'
+```
+
+#### Exhaust Nozzle Characteristic Velocity
+
+* To calculate: `[Pt_MPa;Tt_K;At_m↑2;Cstar_m/s]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area;Characteristic velocity) from 5 known variables:
+```rpl
+Pc=5.066_MPa  Tc=3470_K  M=21.40_(g/mol)  k=1.221  Q=500_kg/s
+@ Expecting [ Pt=2.83909 72868 7 MPa Tt=3 124.71859 523 K At=0.17560 93193 07 m↑2 Cstar=1 779.27362 321 m/s ]
+'ROOT(ⒺExhaust Nozzle Characteristic Velocity;[Pt;Tt;At;Cstar];[1_MPa;1_K;1_m²;1_m/s])'
+```
+
+#### Nozzle Mach number & Optimal Exit Area
+
+* The following simulations explore the optimization of rocket engines allowing them to function in different planetary atmospheric conditions, either on Earth (`♁`), Mars (`♂`) or Venus (`♀`).
+
+![Nozzle Mach number & Optimal Exit Area](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Nm_1;Ae_m²;AeAt_1;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 Pe=0.0795 MPa ]
+'ROOT(ⒺNozzle Mach number & Optimal Exit Area;[Nm;Ae;AeAt;Pe];[1_1;1_m²;1_1;1_MPa])'
+```
+
+#### Optimised Third Stage Rocket Nozzle
+
+* For a third stage rocket nozzle optimised for `H=5000_m` in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221  H=5000_m 
+@ Expecting [ Nm=3.39632 79963 7 Ae=1.89765 87728 9 m↑2 AeAt=10.80671 28297 Pa=5.40482 54060 8⁳⁻² MPa Pe=5.40482 54060 8⁳⁻² MPa ]
+'ROOT(ⒺOptimised Third Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised First Stage Rocket Nozzle
+
+* For a first stage rocket nozzle optimised for `H=3_m` on Earth (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa  At=0.1756_m↑2  k=1.221  H=3_m
+@ Expecting [ Nm=3.05335 36461 Ae=1.19222 07953 2 m↑2 AeAt=6.78941 22740 3 Pa=0.10128 89657 59 MPa Pe=0.10128 89657 59 MPa ]
+'ROOT(ⒺOptimised First Stage Rocket Nozzle;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Optimised Second Stage Rocket Nozzle
+
+* For a second stage rocket nozzle optimised for `H` unknown in Earth atmosphere (`♁`).
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]`  (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.0795_MPa  
+@ Expecting [ Nm=3.18533 80971 1 Ae=1.42446 95429 9 m↑2 AeAt=8.11201 33427 5 H=2 000.14258 71 m Pe=0.0795 MPa ]
+'ROOT(ⒺOptimised Second Stage Rocket Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Unrealistic Nozzle Optimised for Mars
+
+* This simulation shows that it is unrealistic to have a first stage rocket nozzle optimised in Mars atmosphere (`♂`) during day time.
+To calculate: `[Nm_1;Ae_m²;AeAt_1;Pa_MPa;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Ambient pressure; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 H=2_m
+@ Expecting [ Nm=6.10680 95604 3 Ae=62.28237 61777 m↑2 AeAt=354.68323 5636 Pa=6.10396 15628 2⁳⁻⁴ MPa Pe=6.10396 15628 2⁳⁻⁴ MPa ]
+'ROOT(ⒺUnrealistic Nozzle Optimised for Mars;[Nm;Ae;AeAt;Pa;Pe];[1_1;1_m²;1_1;1_MPa;1_MPa])'
+```
+
+#### Mars Day Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at day time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=9.63271 37837 7 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Day Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Mars Night Time Optimized Nozzle
+
+* At what height in Mars atmosphere (`♂`) at night time a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=5.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.00061_MPa
+@ Expecting [ Nm=6.10725 54433 1 Ae=62.31461 31367 m↑2 AeAt=354.86681 7407 H=8.34690 83813 4 m Pe=0.00061 MPa ]
+'ROOT(ⒺMars Night Time Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+
+```
+#### Venus First stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=25_MPa At=0.1756_m↑2  k=1.221 Pa=9.33_MPa
+@ Expecting [ Nm=1.32945 59203 Ae=0.19118 07663 16 m↑2 AeAt=1.08872 87375 6 H=3.39862 99663 6 m Pe=9.33 MPa ]
+'ROOT(ⒺVenus First stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_m;1_MPa])'
+```
+
+#### Venus Second Stage Optimized Nozzle
+
+* At what height in Venus atmosphere (`♀`) a given rocket nozzle will be optimised ?
+To calculate: `[Nm_1;Ae_m²;AeAt_1;H_m;Pe_MPa]` (Nozzle Mach number; Nozzle exit area; Ratio of nozzle exit area over sonic throat area; Starting height of rocket engine; Pressure at the nozzle exit) from 4 known variables:
+```rpl
+Pc=10.066_MPa At=0.1756_m↑2  k=1.221 Pa=0.08_MPa  @Pa='P♀Atm(52.1_km)' Eval
+@ Expecting [ Nm=3.55835 99705 9 Ae=2.36748 85818 9 m↑2 AeAt=13.48228 12181 H=52.09922 71871 km Pe=0.08 MPa ]
+'ROOT(ⒺVenus Second Stage Optimized Nozzle;[Nm;Ae;AeAt;H;Pe];[1_1;1_m²;1_1;1_km;1_MPa])'
+```
+
+#### Properly Adapted Conic Nozzle
+
+* The following three simulations explore the optimization of rocket engines in terms of their conic nozzle geometry.
+
+![Properly Adapted Conic Nozzle](img/VariousConicNozzles.bmp)
+
+* When the exhaust nozzle pressure `Pe` equals the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.05_MPa
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.39769 72938 Ae=0.40883 75186 38 m↑2 Ve=2 831.85728 461 m/s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺProperly Adapted Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Under Extended Conic Nozzle
+
+* The previous and the next 2 simulations prove that the highest value of thrust Fnet is found with adapted Conic Nozzle (Pa/Pe=1) as shown in the figure.
+
+![Under-Extended Conic Nozzle](img/OptimalThrust.bmp)
+
+* When the exhaust nozzle pressure `Pe` is greater than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.10_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.03213 30836 Ae=0.24268 50403 71 m↑2 Ve=2 677.44630 755 m/s Fnet=279.87888 2774 kN ]
+'ROOT(ⒺUnder Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Over Extended Conic Nozzle
+
+* When the exhaust nozzle pressure `Pe` is less than the ambient pressure `Pa`.
+To calculate: `[Pt_MPa;Tt_K;At_m↑2;Nm;Ae_m↑2;Ve_m/s;Fnet_kN]` (Gas Pressure & Temperature at the nozzle throat; Nozzle sonic throat area; Mach number as the ratio of the gas velocity to the local speed of sound; Nozzle exhaust velocity;  Net engine thrust) from 7 known variables:
+```rpl
+Q=100_kg/s  k=1.2  M=24_(g/mol)  Tc=3600_K  Pc=5_MPa  Pa=0.05_MPa  Pe=0.025_MPa  
+@ Expecting [ Pt=2.82236 96502 7 MPa Tt=3 272.72727 273 K At=0.03443 98985 18 m↑2 Nm=3.76599 41252 2 Ae=0.69630 57034 83 m↑2 Ve=2 962.65092 497 m/s Fnet=278.85744 991 kN ]
+'ROOT(ⒺOver Extended Conic Nozzle;[Pt;Tt;At;Nm;Ae;Ve;Fnet];[1_MPa;1_K;1_m↑2;1_1;1_m↑2;1_m/s;1_kN])'
+```
+
+#### Characteristic Nozzle Geometry
+
+![Characteristic Nozzle Geometry](img/RocketEgineGeometry.bmp)
+
+![Characteristic Nozzle Geometry](img/ChamberLengthVSThroatDiameter.bmp)
+
+- To calculate: `[Dt_m;Vc_cm³;Lc_cm;Dc_cm;Ac_cm²;CtnRatio]` (Throat diameter; Combustion chamber volume; Combustion chamber length; Combustion chamber diameter; Contraction ratio of the major cross-sectional area of the combuster divided by the throat area) from 3 known variables:
+```rpl
+At=1756_cm↑2  θ=20_°  Lstar=110_cm @For LOX/RP-1 propellant combination
+@ Expecting [ Dt=47.28433 82163 cm Vc=193 160 cm↑3 Lc=65.60406 06668 cm Dc=56.69736 55569 cm Ac=2 524.73407 254 cm↑2 CtnRatio=1.43777 56677 3 ]
+'ROOT(ⒺCharacteristic Nozzle Geometry;[Dt;Vc;Lc;Dc;Ac;CtnRatio];[1_cm;1_cm³;1_cm;1_cm;1_cm²;1_1])'
+```
+
+#### Solid Rocket Burn Rate
+
+![Solid Rocket Burn Rate](img/SolidRocket1.bmp)
+
+- For a solid rocket motor, we search the combustion product generation rate `Qs` and the propellant burn rate `r` when the chamber pressure is `Pc=5.0 MPa`. 
+To calculate: `[Ab_m²;r_mm/s;Qs_kg/s]` (Solid rocket: Area of the cylindrical burning surface & Propellant burn rate; Combustion product generation rate) from 6 known variables.
+```rpl
+a=0.1  n=0.3  Pc=5_MPa  ρp=1.7_g/ml  L=10_m  D=1_m
+@ Expecting [ Ab=31.41592 65359 m↑2 r=10.22565 18256 mm/s Qs=546.12215 5111 kg/s ]
+'ROOT(ⒺSolid Rocket Burn Rate;[Ab;r;Qs];[1_m²;1_mm/s;1_kg/s])'
+```
+
+#### Solid Rocket Propellant Ideal Density
+
+* To calculate: `[ρp_g/ml]` (Solid rocket propellant ideal density) from 6 known variables.
+```rpl
+ρAl=2.70_g/ml  ρAP=1.95_g/ml  ρHTPB=0.93_g/ml  wAl=0.18  wAP=0.68  wHTPB=0.14
+@ Expecting [ ρp=1.76702 71850 3 g/ml ]
+'ROOT(ⒺSolid Rocket Propellant Ideal Density;[ρp];[1_g/ml])'
+```
+
+#### Multi Stages Rocket ΔV
+
+* To calculate: `[C1_m/s; C2_m/s; Mo1_kg; Mf1_kg; Mo2_kg; Mf2_kg; Mo_kg; MplMo; ΔV1_m/s; ΔV2_m/s; ΔVtot_m/s]` (Stage 1 & 2 effective exhaust gas velocity; Stage 1 initial & final mass; Stage 2 initial & final mass; Total initial mass; Payload over initial mass ratio; Stage 1 & 2 velocity change; Total velocity change) from 7 known variables.
+```rpl
+Isp1=260_s  Isp2=320_s  Mp1=120000_kg  Md1=9000_kg  Mp2=30000_kg  Md2=3000_kg  Mpl=3000_kg
+@ Expecting [ C1=2 549.729 m/s C2=3 138.128 m/s Mo1=165 000 kg Mf1=45 000 kg Mo2=36 000 kg Mf2=6 000 kg Mo=201 000 kg MplMo=1.49253 73134 3⁳⁻² ΔV1=3 312.81950 384 m/s ΔV2=5 622.77055 965 m/s ΔVtot=8 935.59006 349 m/s ]
+'ROOT(ⒺMulti Stages Rocket ΔV;[C1;C2;Mo1;Mf1;Mo2;Mf2;Mo;MplMo;ΔV1;ΔV2;ΔVtot];[1_m/s;1_m/s;1_kg;1_kg;1_kg;1_kg;1_kg;1_1;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Conical Nozzle Divergence Loss
+
+A conical nozzle's exhaust momentum is reduced by its divergence half-angle `α` through the
+correction factor `λ=(1+cos α)/2`; the net thrust falls by that factor. Shown for the adapted case
+(`Pe=Pa`), where the pressure term vanishes.
+
+![Conical Nozzle Divergence Loss](img/VariousConicNozzles.bmp)
+
+* To calculate: `[λ;Fnet_kN]` (Divergence-loss factor; Net engine thrust) from 6 known variables:
+```rpl
+α=15_°  Q=100_kg/s  Ve=2831.85728_m/s  Pe=0.05_MPa  Pa=0.05_MPa  Ae=0.40883751863782_m↑2
+@ Expecting [ λ=0.98296 29131 45 Fnet=278.36106 8156 kN ]
+'ROOT(ⒺConical Nozzle Divergence Loss;[λ;Fnet];[1_1;1_kN])'
+```
+
+#### Bell Nozzle Contour
+
+Geometry of a thrust-optimised parabolic (bell) nozzle after Rao: throat and exit areas from the
+expansion ratio `ε` and throat radius `Rt`, the downstream throat arc `Rarc=0.382·Rt`, and the bell
+length `Lnz` as the fraction `Li` of the reference 15° conical length. The wall angles `θn` (initial)
+and `θe` (exit) are read from the Rao chart and label the figure.
+
+![Bell Nozzle Contour](img/BellNozzle.bmp)
+
+* To calculate: `[At_cm↑2;Ae_cm↑2;Rex_cm;Rarc_cm;Lnz_cm]` (Throat & exit areas; Exit radius; Throat arc radius; Bell length) from 3 known variables:
+```rpl
+ε=11.87  Rt=10.470225_cm  Li=0.8
+@ Expecting [ At=344.39901 5893 cm↑2 Ae=4 088.01631 865 cm↑2 Rex=36.07292 6262 cm Rarc=3.99962 595 cm Lnz=76.44046 55367 cm ]
+'ROOT(ⒺBell Nozzle Contour;[At;Ae;Rex;Rarc;Lnz];[1_cm↑2;1_cm↑2;1_cm;1_cm;1_cm])'
+```
+
+#### Combustion Chamber Stay Time
+
+Propellant residence time `ts` in the chamber, from the ideal-gas specific volume `V` (chamber `Tc`,
+`Pc`, mean molar mass `M`), the chamber volume `Vc=Lstar·At`, and the mass flow `Q`.
+
+![Combustion Chamber Stay-Time](img/CombustionChamberNozzle.bmp)
+
+* To calculate: `[V_m↑3/kg;Vc_m↑3;ts_ms]` (Specific volume; Chamber volume; Stay-time) from 6 known variables:
+```rpl
+Lstar=1.1_m  At=0.0344398985_m↑2  Q=100_kg/s  Tc=3600_K  Pc=5_MPa  M=24_(g/mol)
+@ Expecting [ V=0.24943 38785 45 m↑3/kg Vc=0.03788 38883 5 m↑3 ts=1.51879 48233 4 ms ]
+'ROOT(ⒺCombustion Chamber Stay Time;[V;Vc;ts];[1_m↑3/kg;1_m↑3;1_ms])'
+```
+
+#### Thrust Coefficient
+
+The dimensionless thrust coefficient `Cfx` isolates the nozzle's contribution to thrust; it links the
+throat (characteristic velocity `Cstar`) and the nozzle to specific impulse via `Isp=Cfx·Cstar/Ⓒg`,
+and gives `Fnet=Cfx·Pc·At`. Shown for the adapted case — reproducing the thrust of « Properly Adapted
+Conic Nozzle ».
+
+![Thrust Coefficient](img/RocketEgineGeometry2.bmp)
+
+* To calculate: `[Cfx;Cstar_m/s;Isp_s;Fnet_kN]` (Thrust coefficient; Characteristic velocity; Specific impulse; Thrust) from 7 known variables:
+```rpl
+k=1.2  Pc=5_MPa  Pe=0.05_MPa  Pa=0.05_MPa  At=0.03443989851769_m↑2  Ae=0.40883751863782_m↑2  Q=100_kg/s
+@ Expecting [ Cfx=1.64452 12712 6 Cstar=1 721.99492 588 m/s Isp=288.76907 8596 s Fnet=283.18572 8461 kN ]
+'ROOT(ⒺThrust Coefficient;[Cfx;Cstar;Isp;Fnet];[1_1;1_m/s;1_s;1_kN])'
+```
+
+#### Total Impulse
+
+Total impulse delivered by a burn: `It=Isp·Ⓒg·Mp` (specific impulse × standard gravity × propellant
+mass), equivalently `Fnet·Δt`; the mean thrust over the burn is `Fnet=It/Δt`.
+
+* To calculate: `[It_N·s;Fnet_kN]` (Total impulse; Mean thrust) from 3 known variables:
+```rpl
+Isp=300_s  Mp=10000_kg  Δt=120_s
+@ Expecting [ It=29 419 950. N·s Fnet=245.16625 kN ]
+'ROOT(ⒺTotal Impulse;[It;Fnet];[1_N·s;1_kN])'
+```
+
+#### Vertical Ascent with Gravity Loss
+
+Burnout velocity of a vertically-launched stage: the ideal Tsiolkovsky increment `C·ln(Mo/Mf)` minus
+the constant-gravity loss `Ⓒg·Δt`, with effective exhaust velocity `C=Isp·Ⓒg` and burn time
+`Δt=Mp/Q`.
+
+![Vertical Ascent with Gravity Loss](img/RocketPropulsion.bmp)
+
+* To calculate: `[C_m/s;Mf_kg;Δt_s;Vbo_m/s]` (Exhaust velocity; Final mass; Burn time; Burnout velocity) from 4 known variables:
+```rpl
+Isp=300_s  Mo=50000_kg  Mp=40000_kg  Q=500_kg/s
+@ Expecting [ C=2 941.995 m/s Mf=10 000 kg Δt=80 s Vbo=3 950.42629 119 m/s ]
+'ROOT(ⒺVertical Ascent with Gravity Loss;[C;Mf;Δt;Vbo];[1_m/s;1_kg;1_s;1_m/s])'
+```
+
+#### Optimal Staging
+
+For a multi-stage vehicle with equal specific impulse across stages, the minimum-mass strategy is an
+**equal split of ΔV** among the `n` stages; each then carries the same mass ratio `MR=exp(ΔV1/C)`,
+with `ΔV1=ΔVtot/n` and `C=Isp·Ⓒg`.
+
+* To calculate: `[C_m/s;ΔV1_m/s;MR]` (Exhaust velocity; Per-stage ΔV; Stage mass ratio) from 3 known variables:
+```rpl
+ΔVtot=9400_m/s  n=2  Isp=320_s
+@ Expecting [ C=3 138.128 m/s ΔV1=4 700 m/s MR=4.47142 96415 3 ]
+'ROOT(ⒺOptimal Staging;[C;ΔV1;MR];[1_m/s;1_m/s;1_1])'
+```
+
+#### Sea level vs Vacuum Thrust
+
+The same fixed engine loses thrust at sea level through the ambient back-pressure term `Pa·Ae`; the
+gain from sea level to vacuum is exactly `ΔF=Pa·Ae`. `Pa` may be supplied by the atmosphere function
+`P♁StdAtm(0_m)`.
+
+![Sea-level vs Vacuum Thrust](img/OptimalThrust.bmp)
+
+* To calculate: `[Fsl_kN;Fvac_kN;ΔF_kN]` (Sea-level thrust; Vacuum thrust; Thrust gain) from 5 known variables:
+```rpl
+Q=100_kg/s  Ve=2831.85728_m/s  Ae=0.40883751863782_m↑2  Pe=0.05_MPa  Pa=0.101325_MPa
+@ Expecting [ Fsl=262.20214 2356 kN Fvac=303.62760 3932 kN ΔF=41.42546 1576 kN ]
+'ROOT(ⒺSea level vs Vacuum Thrust;[Fsl;Fvac;ΔF];[1_kN;1_kN;1_kN])'
+```
+
+#### Multi Planet Launch ΔV
+
+The circular-orbit velocity `Vcirc` at a low orbit **is** the ideal launch ΔV to reach that orbit;
+`Vesc` is the escape speed there and `gsurf` the surface gravity. The central-body constant selects
+the planet — swap `ⒸGM♁/ⒸReq♁` for `♂` or `♀` to compare Earth, Mars and Venus. Bridges Rocketry with
+the planetary constants and, for drag/thermal loss, the atmosphere functions `ρ♁/♂/♀StdAtm`.
+
+![Multi-Planet Launch ΔV](img/LaunchToSpace.bmp)
+
+* To calculate: `[rorb_km;Vcirc_m/s;Vesc_m/s;gsurf_m/s↑2]` (Orbital radius; Circular-orbit velocity; Escape velocity; Surface gravity) from 1 known variable:
+```rpl
+horb=200_km
+@ Expecting [ rorb=6 578.1 km Vcirc=7 784.28323 254 m/s Vesc=11 008.63892 08 m/s gsurf=9.79839 81336 7 m/s↑2 ]
+'ROOT(ⒺMulti Planet Launch ΔV;[rorb;Vcirc;Vesc;gsurf];[1_km;1_m/s;1_m/s;1_m/s↑2])'
+```
+Swap the body constant to compare: **Mars** (♂) → `[ 3 596.2 km; 3 450.99146 m/s; 4 880.43892 m/s; 3.71317 22 m/s↑2 ]` · **Venus** (♀) → `[ 6 251.8 km; 7 208.49565 m/s; 10 194.35231 m/s; 8.87003 28 m/s↑2 ]`.
+#### Barrowman Method
+
+Subsonic centre of pressure of a finned rocket, by the algebraic method James S. Barrowman published
+in 1967 at NASA's Sounding Rocket Branch. Each part contributes a normal-force coefficient and its own
+centre of pressure, measured from the nose tip; the rocket's `XCP` is their coefficient-weighted mean.
+The nose always contributes `CNN=2`, and a transition that narrows rearward gives a **negative** `CNT`.
+Shown for an ogive nose — for a conical nose replace `0.466` by `0.666` in `XN`. The vehicle is stable
+when its centre of gravity lies ahead of `XCP`, conventionally by one to two body calibers `dN`.
+
+`LF` is not independent: it is the fin mid-chord length `√(SFs↑2+(XR+CT/2-CR/2)↑2)`, here `√(245↑2+65↑2)`.
+
+![Barrowman Method](img/BarrowmanMethod.bmp)
+
+* To calculate: `[XN_mm;CNN;CNT;XT_mm;CNF;XF_mm;CNR;XCP_mm]` (Nose CP; Nose, transition and fin force coefficients; Transition and fin CP; Rocket force coefficient; Rocket centre of pressure) from 14 known variables:
+```rpl
+LNose=405_mm  dN=205_mm  dF=205_mm  dR=165_mm  LT=125_mm  XP=905_mm  CR=245_mm  CT=125_mm  SFs=245_mm  LF=253.475837112732_mm  RB=85_mm  XR=125_mm  XB=1765_mm  NF=3
+@ Expecting [ XN=188.73 mm CNN=2 CNT=-0.70434 26531 83 XT=965.24774 7748 mm CNF=7.99426 99069 4 XF=1 868.61486 486 mm CNR=9.28992 72537 6 XCP=1 575.44898 065 mm ]
+'ROOT(ⒺBarrowman Method;[XN;CNN;CNT;XT;CNF;XF;CNR;XCP];[1_mm;1_1;1_1;1_mm;1_1;1_mm;1_1;1_mm])'
+```
+
+## Astronautics
+
+### Geocentric
+
+Earth-centred orbits, in two submenus: [Stationary](#geocentric-/-stationary),
+for orbits of fixed geometry, and [Trajectory](#geocentric-/-trajectory), for
+transfers between circular orbits.
+
+### Heliocentric
+
+Sun-centred orbits, in two submenus: [Stationary](#heliocentric-/-stationary),
+for stationary conditions and libration points, and
+[Trajectory](#heliocentric-/-trajectory), for interplanetary transfers and
+mission analysis.
+
+### Stationary
+
+Two submenus of Astronautics are named Stationary:
+[Geocentric / Stationary](#geocentric-/-stationary), for Earth-centred orbits
+of fixed geometry, and [Heliocentric / Stationary](#heliocentric-/-stationary),
+for Sun-referenced stationary conditions and libration points.
+
+### Trajectory
+
+Two submenus of Astronautics are named Trajectory:
+[Geocentric / Trajectory](#geocentric-/-trajectory), for transfers between
+circular Earth orbits, and [Heliocentric / Trajectory](#heliocentric-/-trajectory),
+for interplanetary transfers and mission analysis.
+
+### Geocentric / Stationary
+
+Earth-centered (`♁`) orbits of fixed geometry, from the two-body results (circular
+velocity, Kepler's third law, angular momentum, vis-viva). Radii geocentric, referenced
+to `ⒸReq♁`.
+
+The variables of the Geocentric / Stationary section are:
+
+* `Δa`: Semi-major-axis decay per revolution (atmospheric drag)
+* `ΔP`: Orbital-period decrease per revolution (atmospheric drag)
+* `Δt`: Elapsed time
+* `Δv`: Velocity gain per revolution (atmospheric drag) (dim.: speed)
+* `ρa`: Atmospheric density at the orbit altitude (dim.: mass/volume, in SI: kg/m^3)
+* `ν`: True anomaly
+* `ν0`: Initial true anomaly
+* `ω`: Argument of perigee
+* `Ω`: Right ascension of the ascending node (celestial)
+* `a`: Semi-major axis
+* `Ad`: Drag (frontal) area
+* `argLat`: Argument of latitude (`ω`+`ν`)
+* `Az`: Burnout azimuth
+* `C`: Launch quadratic parameter (`2·ⒸGM♁/(r1·v1²)`)
+* `Cd`: Drag coefficient
+* `dlon`: Longitude increment from the node to burnout
+* `dΩJ2`: Nodal-regression rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dΩM`: Nodal-regression rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dΩS`: Nodal-regression rate from the Sun (dim.: angle/time, in SI: °/d)
+* `dωJ2`: Apsidal-precession rate from J₂ (dim.: angle/time, in SI: °/d)
+* `dωM`: Apsidal-precession rate from the Moon (dim.: angle/time, in SI: °/d)
+* `dωS`: Apsidal-precession rate from the Sun (dim.: angle/time, in SI: °/d)
+* `Ea`: Eccentric anomaly
+* `Ea0`: Initial eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `fpa`: Flight-path angle
+* `H`: Altitude above the equatorial radius
+* `H1`: Burnout altitude
+* `Ha`: Altitude at apogee
+* `Hp`: Altitude at perigee
+* `Hs`: Atmospheric scale height
+* `inc`: Inclination
+* `lat`: Burnout latitude
+* `Life`: Orbital lifetime
+* `lon2`: Burnout longitude
+* `lonAN`: Longitude of the ascending node
+* `M`: Mean anomaly
+* `M0`: Initial mean anomaly
+* `msat`: Satellite mass
+* `n`: Revolutions per day
+* `P`: Orbital period
+* `r`: Geocentric orbital radius (circular orbit)
+* `r1`: Geocentric radius at burnout
+* `Ra`: Geocentric radius at apogee
+* `Rp`: Geocentric radius at perigee
+* `Rsoi`: Sphere-of-influence radius
+* `v`: Circular orbital velocity (dim.: speed)
+* `v1`: Burnout speed (dim.: speed)
+* `Va`: Velocity at apogee (dim.: speed)
+* `Vc`: Reference circular velocity at perigee radius (dim.: speed)
+* `Vc1`: Circular velocity at the burnout radius (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `Vp`: Velocity at perigee (dim.: speed)
+* `zen`: Zenith angle at burnout
+
+* Reference: [1] http://www.braeunig.us/space/problem.htm — problems 4.1–4.7, 4.25, 4.30.
+
+#### Circular Orbit
+
+Circular velocity `v=√(ⒸGM♁/r)` and period `P=2π√(r³/ⒸGM♁)`, with `r=ⒸReq♁+H`.
+
+![Conic Sections](img/ConicSections.bmp)
+
+* To calculate: `[v_m/s;P_s]` (Circular velocity; Orbital period) from 1 known variable:
+```rpl
+H=200_km
+@ Expecting [ v=7 784.28323 254 m/s P=5 309.59884 609 s ]
+'ROOT(ⒺCircular Orbit;[v;P];[1_m/s;1_s])'
+```
+
+#### Geosynchronous Orbit
+
+Period = sidereal day `ⒸProt♁`; Kepler's third law inverted gives radius, altitude and
+speed (geostationary if inclination = 0).
+
+* To calculate: `[r_km;H_km;v_m/s]` (Orbital radius; Altitude; Circular velocity) from 1 known variable:
+```rpl
+P=ⒸProt♁
+@ Expecting [ r=42 164.16815 02 km H=35 786.06815 02 km v=3 074.65999 204 m/s ]
+'ROOT(ⒺGeosynchronous Orbit;[r;H;v];[1_km;1_km;1_m/s])'
+```
+
+#### Elliptic Orbit Velocities
+
+Perigee/apogee speeds from angular momentum + energy: `Vp=√(2·ⒸGM♁·Ra/(Rp·(Ra+Rp)))`,
+`Va` symmetric.
+
+![Elliptic Kinematics](img/EllipticKinematics.bmp)
+
+* To calculate: `[Rp_km;Ra_km;Vp_m/s;Va_m/s]` (Perigee & apogee radii; Perigee & apogee velocities) from 2 known variables:
+```rpl
+Hp=250_km  Ha=500_km
+@ Expecting [ Rp=6 628.1 km Ra=6 878.1 km Vp=7 826.30901 201 m/s Va=7 541.84422 479 m/s ]
+'ROOT(ⒺElliptic Orbit Velocities;[Rp;Ra;Vp;Va];[1_km;1_km;1_m/s;1_m/s])'
+```
+
+#### Elliptic Orbit from Perigee State
+
+From perigee state, via `Vc=√(ⒸGM♁/Rp)`: `a=ⒸGM♁/(2·Vc²−Vp²)`, `Ra=2a−Rp`,
+`ecc=(Ra−Rp)/(Ra+Rp)`. (Vc first → toutes soustractions de même unité.)
+
+* To calculate: `[Rp_km;Vc_m/s;a_km;Ra_km;Ha_km;ecc]` (Perigee radius; Reference circular velocity; Semi-major axis; Apogee radius & altitude; Eccentricity) from 2 known variables:
+```rpl
+Hp=200_km  Vp=7850_m/s
+@ Expecting [ Rp=6 578.1 km Vc=7 784.28323 254 m/s a=6 691.56040 037 km Ra=6 805.02080 075 km Ha=426.92080 0749 km ecc=1.69557 46281 2⁳⁻² ]
+'ROOT(ⒺElliptic Orbit from Perigee State;[Rp;Vc;a;Ra;Ha;ecc];[1_km;1_m/s;1_km;1_km;1_km;1_1])'
+```
+
+#### Elliptic Orbit Apsides
+
+Apsidal radii `Rp=a·(1−ecc)`, `Ra=a·(1+ecc)`; altitudes minus `ⒸReq♁`.
+
+* To calculate: `[Rp_km;Ra_km;Hp_km;Ha_km]` (Perigee & apogee radii; Perigee & apogee altitudes) from 2 known variables:
+```rpl
+a=6700_km  ecc=0.01
+@ Expecting [ Rp=6 633. km Ra=6 767. km Hp=254.9 km Ha=388.9 km ]
+'ROOT(ⒺElliptic Orbit Apsides;[Rp;Ra;Hp;Ha];[1_km;1_km;1_km;1_km])'
+```
+
+#### Escape Velocity
+
+`Vesc=√(2·ⒸGM♁/r)` — a factor √2 above circular velocity.
+
+* To calculate: `[Vesc_m/s]` (Escape velocity) from 1 known variable:
+```rpl
+H=200_km
+@ Expecting [ Vesc=11 008.63892 08 m/s ]
+'ROOT(ⒺEscape Velocity;[Vesc];[1_m/s])'
+```
+
+#### Earth’s Sphere Of Influence
+
+`Rsoi=Dsp·(Mp/Ms)^(2/5)`, using the GM ratio `ⒸGM♁/ⒸGM☉` (G cancels → no G-uncertainty).
+Same formula for a moon (moon↔planet, planet↔Sun).
+
+* To calculate: `[Rsoi_km]` (Sphere-of-influence radius) from constants only:
+```rpl
+@ Expecting [ Rsoi=924 646.75636 9 km ]
+'ROOT(ⒺEarth’s Sphere Of Influence;[Rsoi];[1_km])'
+```
+
+---
+
+#### Launch to Orbit
+
+From the burnout state — altitude `H1`, speed `v1`, zenith angle `zen` — the launch
+quadratic (roots of `Rp/r1`) gives perigee and apogee, then `ecc`, true anomaly `ν`
+and semi-major axis `a`. `C=2·ⒸGM♁/(r1·v1²)`; smaller root = `Rp`, larger = `Ra`.
+
+![Launch to space](img/LaunchToSpace.bmp)
+
+* To calculate: `[r1_km;Vc1_m/s;C;Rp_km;Ra_km;Hp_km;Ha_km;a_km;ecc;ν_°]` from `H1`, `v1`, `zen`:
+```rpl
+H1=250_km  v1=7900_m/s  zen=89_°
+@ Expecting [ r1=6 628.1 km Vc1=7 754.86673 564 m/s C=1.92718 98121 3 Rp=6 601.71066 64 km Ra=7 174.97952 871 km Hp=223.61066 6398 km Ha=796.87952 8709 km a=6 888.34509 755 km ecc=0.04161 15085 84 ν=25.79753 14366 ° ]
+'ROOT(ⒺLaunch to Orbit;[r1;Vc1;C;Rp;Ra;Hp;Ha;a;ecc;ν];[1_km;1_m/s;1_1;1_km;1_km;1_km;1_km;1_km;1_1;1_°])'
+```
+
+---
+
+#### Orbit Orientation
+
+From burnout azimuth `Az`, latitude `lat`, longitude `lon2` and true anomaly `ν`:
+`cos(inc)=cos(lat)·sin(Az)`; `argLat=atan(tan(lat)/cos(Az))=ω+ν`; `ω=argLat−ν`;
+`dlon=atan(sin(lat)·tan(Az))`; ascending-node longitude `lonAN=lon2−dlon`.
+Celestial `Ω` = local sidereal time at `lonAN` (see Time functions).
+
+![Orbital elements](img/OrbitalElements.bmp)
+
+* To calculate: `[inc_°;argLat_°;ω_°;dlon_°;lonAN_°;Ω_°]` from `Az`, `lat`, `lon2`, `ν`:
+```rpl
+Az=86_°  lat=32_°  lon2=-60_°  ν=25.7975314366_°  JDbo=2451838.125
+@ Expecting [ inc=32.22266 62584 ° argLat=83.63023 3328 ° ω=57.83270 18914 ° dlon=82.48282 4052 ° lonAN=-142.48282 4052 ° Ω=111.89567 8587 ° ]
+'ROOT(ⒺOrbit Orientation;[inc;argLat;ω;dlon;lonAN;Ω];[1_°;1_°;1_°;1_°;1_°;1_°])'
+```
+
+---
+
+#### Time in Elliptic 1
+
+Time from `ν0` to `ν`: eccentric anomaly `cos(Ea)=(ecc+cos ν)/(1+ecc·cos ν)`; mean anomaly
+`M=Ea−ecc·sin(Ea)` (deg via `180/π`); period `P=2π√(a³/ⒸGM♁)`; `Δt=(M−M0)/360·P`.
+(`acos()` branch valid for `ν` in 0…180°.)
+
+* To calculate: `[Ea0_°;Ea_°;M0_°;M_°;P_s;Δt_s]` from `a`, `ecc`, `ν0`, `ν`:
+```rpl
+a=7500_km  ecc=0.1  ν0=30_°  ν=90_°
+@ Expecting [ Ea0=27.24802 84436 ° Ea=84.26082 95227 ° M0=24.62477 94313 ° M=78.55997 14413 ° P=6 464.02307 884 s Δt=968.43979 4205 s ]
+'ROOT(ⒺTime in Elliptic 1;[Ea0;Ea;M0;M;P;Δt];[1_°;1_°;1_°;1_°;1_s;1_s])'
+```
+
+#### Time in Elliptic 2
+
+True anomaly after `Δt`: `M=M0+Δt/P·360`; Kepler `Ea=M+ecc·sin(Ea)` (deg, solved by `Root(...)`);
+then `ν` from `Ea` via `→Polar(ℝ→ℂ(...))` (correct quadrant).
+
+* To calculate: `[Ea0_°;M0_°;P_s;M_°;Ea_°;ν_°]` from `a`, `ecc`, `ν0`, `Δt`:
+```rpl
+a=7500_km  ecc=0.1  ν0=90_°  Δt=1200_s
+@ Expecting [ Ea0=84.26082 95227 ° M0=78.55997 14413 ° P=6 464.02307 884 s M=145.39141 5997 ° Ea=148.39413 3722 ° ν=151.28053 6894 ° ]
+'ROOT(ⒺTime in Elliptic 2;[Ea0;M0;P;M;Ea;ν];[1_°;1_°;1_s;1_°;1_°;1_°])'
+```
+
+#### Elliptic Position
+
+At true anomaly `ν`: radius `r=a(1−ecc²)/(1+ecc·cos ν)`; flight-path angle
+`fpa=atan(ecc·sin ν/(1+ecc·cos ν))`; speed `v=√(ⒸGM♁(2/r−1/a))` (vis-viva).
+
+* To calculate: `[r_km;fpa_°;v_m/s]` from `a`, `ecc`, `ν`:
+```rpl
+a=7500_km  ecc=0.1  ν=225_°
+@ Expecting [ r=7 989.97666 837 km fpa=-4.35131 59135 9 ° v=6 828.49836 178 m/s ]
+'ROOT(ⒺElliptic Position;[r;fpa;v];[1_km;1_°;1_m/s])'
+```
+
+---
+
+#### Luni Solar Perturbations
+
+Secular rates (°/day) of ascending node and perigee from Moon/Sun, near-circular orbit,
+`n` revolutions/day: `dΩ=−k·cos(inc)/n`, `dω=k'·(4−5·sin²inc)/n`.
+
+* To calculate: `[dΩM_°/d;dΩS_°/d;dωM_°/d;dωS_°/d]` from `inc`, `n`:
+```rpl
+inc=51.6_°  n=15.5
+@ Expecting [ dΩM=-1.35450 29015 1⁳⁻⁴ °/d dΩS=-6.17140 37524 4⁳⁻⁵ °/d dωM=1.01304 35959 9⁳⁻⁴ °/d dωS=4.61564 24195 9⁳⁻⁵ °/d ]
+'ROOT(ⒺLuni Solar Perturbations;[dΩM;dΩS;dωM;dωS];[1_°/d;1_°/d;1_°/d;1_°/d])'
+```
+
+#### J2 Perturbations
+
+Secular rates (°/day) from Earth oblateness (`J₂`), `a` in km:
+`dΩ=−2.06474E14·a^(−7/2)·cos(inc)·(1−ecc²)^(−2)`, `dω` with `(4−5·sin²inc)`.
+
+* To calculate: `[dΩJ2_°/d;dωJ2_°/d]` from `a`, `inc`, `ecc`:
+```rpl
+a=7500_km  inc=28.5_°  ecc=0.1
+@ Expecting [ dΩJ2=-5.06732 85721 1 °/d dωJ2=8.25009 83471 3 °/d ]
+'ROOT(ⒺJ2 Perturbations;[dΩJ2;dωJ2];[1_°/d;1_°/d])'
+```
+
+#### Atmospheric Drag
+
+Per-revolution decay for a circular orbit (`v=√(ⒸGM♁/a)`): `Δa=−2π·Cd·Ad·ρa·a²/msat`;
+`ΔP`, `Δv` likewise; rough lifetime `Life=−Hs/Δa` (revolutions). `ρa`, `Hs` from an
+atmosphere model at altitude `H`.
+
+* To calculate: `[a_km;v_m/s;Δa_m;ΔP_s;Δv_m/s;Life]` from `H`, `Cd`, `Ad`, `ρa`, `msat`, `Hs`:
+```rpl
+H=400_km  Cd=2.67  Ad=8_m↑2  ρa=2.62E-12_kg/m³  msat=1000_kg  Hs=58.2_km
+@ Expecting [ a=6 778.1 km v=7 668.57870 369 m/s Δa=-16.15467 97044 m ΔP=-1.98543 00923 9⁳⁻² s Δv=9.13850 73063 3⁳⁻³ m/s Life=3 602.67124 232 ]
+'ROOT(ⒺAtmospheric Drag;[a;v;Δa;ΔP;Δv;Life];[1_km;1_m/s;1_m;1_s;1_m/s;1_1])'
+```
+
+---
+
+### Geocentric / Trajectory
+
+In-plane transfers between two circular geocentric orbits (radii from altitudes over
+`ⒸReq♁`). Velocities from vis-viva; total cost is the sum of the two burns.
+
+The variables of the Geocentric / Trajectory section are:
+
+* `Δinc`: Plane-change angle
+* `Δt`: Time of flight along the hyperbolic arc
+* `Δθ`: Lead angle to a co-orbital target
+* `ΔV`: Velocity change (dim.: speed)
+* `ΔV1`: First burn velocity change (dim.: speed)
+* `ΔV2`: Second burn velocity change (dim.: speed)
+* `ΔVA`: Departure burn at A (dim.: speed)
+* `ΔVB`: Arrival burn at B (dim.: speed)
+* `ΔVT`: Total transfer velocity change (dim.: speed)
+* `ΔVtli`: Translunar-injection burn (dim.: speed)
+* `ΔVtot`: Total velocity change (dim.: speed)
+* `θ`: Angle between the two orbital planes
+* `ν`: True anomaly at arrival
+* `ν0`: Initial true anomaly
+* `Ωf`: Final right ascension of the ascending node
+* `Ωi`: Initial right ascension of the ascending node
+* `a`: Semi-major axis (negative for a hyperbola)
+* `a1`: X-component of the initial plane's unit normal
+* `a2`: Y-component of the initial plane's unit normal
+* `a3`: Z-component of the initial plane's unit normal
+* `ad`: Semi-major axis of the deorbit transfer ellipse
+* `aph`: Semi-major axis of the phasing orbit
+* `atx`: Transfer-orbit semi-major axis
+* `AtoM`: Area-to-mass ratio (dim.: area/mass, in SI: m^2/kg)
+* `b1`: X-component of the final plane's unit normal
+* `b2`: Y-component of the final plane's unit normal
+* `b3`: Z-component of the final plane's unit normal
+* `CR`: Radiation-pressure coefficient
+* `cx`: X-component of the line-of-nodes vector
+* `cy`: Y-component of the line-of-nodes vector
+* `cz`: Z-component of the line-of-nodes vector
+* `dHmin`: Minimum graveyard rise above GEO
+* `dmoon`: Earth-Moon distance
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `Fh`: Hyperbolic eccentric anomaly at `ν`
+* `Fh0`: Hyperbolic eccentric anomaly at `ν0`
+* `fpa`: Flight-path angle
+* `H`: Orbit altitude above the equatorial radius
+* `H1`: Initial orbit altitude
+* `HA`: Altitude of the departure (inner) orbit
+* `HB`: Altitude of the destination (outer) orbit
+* `Hp`: Parking-orbit altitude
+* `hp`: Perigee altitude after the deorbit burn
+* `incf`: Final inclination
+* `inci`: Initial inclination
+* `latN1`: Latitude of the first node
+* `latN2`: Latitude of the second node
+* `lonN1`: Longitude of the first node
+* `lonN2`: Longitude of the second node
+* `M`: Mean anomaly
+* `Nrev`: Number of phasing revolutions
+* `P`: Orbital period
+* `Pph`: Phasing-orbit period
+* `Ptgt`: Target-orbit period
+* `r`: Orbital radius
+* `r1`: Initial orbital radius
+* `rA`: Radius of the departure (inner) orbit
+* `rB`: Radius of the destination (outer) orbit
+* `rgeo`: Geostationary-orbit radius
+* `rgrave`: Graveyard-orbit radius
+* `rp`: Perigee radius
+* `TOF`: Time of flight
+* `tof`: Time of flight (translunar transfer)
+* `v1`: Circular speed on the initial orbit (dim.: speed)
+* `va`: Speed at the phasing-orbit apogee (dim.: speed)
+* `varr`: Geocentric arrival speed at the Moon (dim.: speed)
+* `Vbo`: Burnout speed (dim.: speed)
+* `vcg`: Circular speed at GEO (dim.: speed)
+* `vdo`: Speed after the deorbit burn (dim.: speed)
+* `Vesc`: Escape velocity (dim.: speed)
+* `VfB`: Circular speed on the destination orbit (dim.: speed)
+* `vgr`: Circular speed at the graveyard radius (dim.: speed)
+* `Vi`: Circular orbital speed (dim.: speed)
+* `ViA`: Circular speed on the departure orbit (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vp`: Speed at the transfer perigee (dim.: speed)
+* `vtli`: Speed after translunar injection (dim.: speed)
+* `VtxA`: Transfer-orbit speed at A (dim.: speed)
+* `VtxB`: Transfer-orbit speed at B (dim.: speed)
+
+#### Hohmann Transfer
+
+Minimum-energy coplanar transfer: `atx=(rA+rB)/2`; burns `ΔVA=VtxA−ViA`, `ΔVB=VfB−VtxB`;
+`ΔVT=ΔVA+ΔVB`.
+
+![Hohmann transfer](img/HohmannTransfer.bmp)
+
+* To calculate: `[rA_km;rB_km;atx_km;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s]` from `HA`, `HB`:
+```rpl
+HA=200_km  HB=35786.06815021_km
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km atx=24 371.13407 51 km ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 238.88177 3 m/s VtxB=1 597.38448 891 m/s ΔVA=2 454.59854 043 m/s ΔVB=1 477.27550 313 m/s ΔVT=3 931.87404 357 m/s ]
+'ROOT(ⒺHohmann Transfer;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### One Tangent Burn
+
+Faster transfer with a chosen `atx` (> Hohmann's). Ellipse `ecc=1−rA/atx`; true anomaly
+`ν` and flight-path angle `fpa` at B; `ΔVB` by the law of cosines; time of flight from
+Kepler (`Ea`, `M`, `P`).
+
+![Orbit altitude change](img/OrbitAltitudeChange.bmp)
+
+* To calculate: `[rA_km;rB_km;ecc;ν_°;fpa_°;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s;Ea_°;M_°;P_s;TOF_s]` from `HA`, `HB`, `atx`:
+```rpl
+HA=200_km  HB=35786.06815021_km  atx=30000_km
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km ecc=0.78073 ν=157.67032 2313 ° fpa=46.87570 62536 ° ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 387.65858 55 m/s VtxB=2 370.73577 889 m/s ΔVA=2 603.37535 296 m/s ΔVB=2 260.16869 321 m/s ΔVT=4 863.54404 616 m/s Ea=121.28867 343 ° M=83.06197 14539 ° P=51 712.18463 07 s TOF=11 931.43334 34 s ]
+'ROOT(ⒺOne Tangent Burn;[rA;rB;ecc;ν;fpa;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT;Ea;M;P;TOF];[1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_°;1_s;1_s])'
+```
+
+---
+
+#### Simple Plane Change
+
+Rotate the plane of a circular orbit by `Δinc` at fixed size: `ΔV=2·Vi·sin(Δinc/2)`,
+with `Vi=√(ⒸGM♁/r)`. Very costly — do it where `Vi` is smallest.
+
+![Orbit plane change](img/OrbitPlaneChange.bmp)
+
+* To calculate: `[r_km;Vi_m/s;ΔV_m/s]` from `H`, `Δinc`:
+```rpl
+H=600_km  Δinc=8_°
+@ Expecting [ r=6 978.1 km Vi=7 557.88484 727 m/s ΔV=1 054.42279 182 m/s ]
+'ROOT(ⒺSimple Plane Change;[r;Vi;ΔV];[1_km;1_m/s;1_m/s])'
+```
+
+#### Combined Plane Change & Hohmann
+
+Hohmann to geo with the whole plane change `Δinc` folded into the apogee burn (law of
+cosines): `ΔVB=√(VtxB²+VfB²−2·VtxB·VfB·cos Δinc)`. Cheaper than doing them separately.
+
+* To calculate: `[rA_km;rB_km;atx_km;ViA_m/s;VfB_m/s;VtxA_m/s;VtxB_m/s;ΔVA_m/s;ΔVB_m/s;ΔVT_m/s]` from `HA`, `HB`, `Δinc`:
+```rpl
+HA=200_km  HB=35786.06815021_km  Δinc=28_°
+@ Expecting [ rA=6 578.1 km rB=42 164.16815 02 km atx=24 371.13407 51 km ViA=7 784.28323 254 m/s VfB=3 074.65999 204 m/s VtxA=10 238.88177 3 m/s VtxB=1 597.38448 891 m/s ΔVA=2 454.59854 043 m/s ΔVB=1 825.41190 327 m/s ΔVT=4 280.01044 371 m/s ]
+'ROOT(ⒺCombined Plane Change & Hohmann;[rA;rB;atx;ViA;VfB;VtxA;VtxB;ΔVA;ΔVB;ΔVT];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Plane Change Between Orbits
+
+Angle `θ` between two orbits (given `inci,Ωi` and `incf,Ωf`) by the dot product of their
+normals; the two intersection nodes by the cross product `(cx,cy,cz)`.
+
+* To calculate: `[a1;a2;a3;b1;b2;b3;θ_°;cx;cy;cz;latN1_°;lonN1_°;latN2_°;lonN2_°]` from `inci`, `Ωi`, `incf`, `Ωf`:
+```rpl
+inci=30_°  Ωi=75_°  incf=32_°  Ωf=80_°
+@ Expecting [ a1=0.12940 95225 51 a2=0.48296 29131 45 a3=0.86602 54037 84 b1=0.09201 95145 45 b2=0.52186 85998 87 b3=0.84804 80961 56 θ=3.25917 87194 3 ° cx=-4.23756 85933 5⁳⁻² cy=-0.03005 42619 84 cz=2.30927 53535 3⁳⁻² latN1=23.96543 77646 ° lonN1=125.34554 8282 ° latN2=-23.96543 77646 ° lonN2=305.34554 8282 ° ]
+'ROOT(ⒺPlane Change Between Orbits;[a1;a2;a3;b1;b2;b3;θ;cx;cy;cz;latN1;lonN1;latN2;lonN2];[1_1;1_1;1_1;1_1;1_1;1_1;1_°;1_1;1_1;1_1;1_°;1_°;1_°;1_°])'
+```
+
+---
+
+#### Hyperbolic Time of Flight
+
+For a hyperbolic arc (`a<0`, `ecc>1`), time between two true anomalies via the hyperbolic
+eccentric anomaly `Fh`: `cosh(Fh)=(ecc+cos ν)/(1+ecc·cos ν)`;
+`Δt=√((−a)³/ⒸGM♁)·((ecc·sinh Fh−Fh)−(ecc·sinh Fh0−Fh0))`. `Fh` is a pure number.
+
+![Conic sections](img/ConicSections.bmp)
+
+* To calculate: `[Fh0;Fh;Δt_s]` from `a`, `ecc`, `ν0`, `ν`:
+```rpl
+a=-36000_km  ecc=1.1823  ν0=15_°  ν=120_°
+@ Expecting [ Fh0=0.07613 86091 05 Fh=1.10023 10489 Δt=5 035.06871 43 s ]
+'ROOT(ⒺHyperbolic Time of Flight;[Fh0;Fh;Δt];[1_1;1_1;1_s])'
+```
+
+#### Hyperbolic Excess Velocity
+
+Speed remaining at infinity on a hyperbolic escape: `vinf²=Vbo²−Vesc²`, with local escape
+speed `Vesc=√(2·ⒸGM♁/r)` and `r=ⒸReq♁+H`.
+
+![Hyperbolic excess velocity v∞](img/HyperbolicVelocityV∞.bmp)
+
+* To calculate: `[r_km;Vesc_m/s;vinf_m/s]` from `H`, `Vbo`:
+```rpl
+H=200_km  Vbo=11500_m/s
+@ Expecting [ r=6 578.1 km Vesc=11 008.63892 08 m/s vinf=3 325.63815 096 m/s ]
+'ROOT(ⒺHyperbolic Excess Velocity;[r;Vesc;vinf];[1_km;1_m/s;1_m/s])'
+```
+
+---
+
+#### Coplanar Phasing
+
+Rendezvous with a co-orbital target ahead by `Δθ`: enter a smaller phasing orbit (period
+`Pph=Ptgt·(1−Δθ/(360·Nrev))`, made up over `Nrev` revs), `aph` from `Pph`, and
+`ΔV=2·(v1−va)` (two vis-viva burns at the common point). Also GEO slot relocation.
+
+* To calculate: `[r_km;v1_m/s;Ptgt_s;Pph_s;aph_km;va_m/s;ΔV_m/s]` from `H`, `Δθ`, `Nrev`:
+```rpl
+H=400_km  Δθ=20_°  Nrev=3
+@ Expecting [ r=6 778.1 km v1=7 668.57870 369 m/s Ptgt=5 553.57908 893 s Pph=5 450.73503 173 s aph=6 694.15933 177 km va=7 620.34738 297 m/s ΔV=96.46264 14344 m/s ]
+'ROOT(ⒺCoplanar Phasing;[r;v1;Ptgt;Pph;aph;va;ΔV];[1_km;1_m/s;1_s;1_s;1_km;1_m/s;1_m/s])'
+```
+
+#### Controlled Deorbit
+
+End-of-life / debris disposal: one retrograde burn at altitude `H1` drops perigee to `hp`
+for reentry. `ad=(r1+rp)/2`, `ΔV=v1−vdo` (vis-viva at the burn point).
+
+* To calculate: `[r1_km;rp_km;ad_km;v1_m/s;vdo_m/s;ΔV_m/s]` from `H1`, `hp`:
+```rpl
+H1=400_km  hp=50_km
+@ Expecting [ r1=6 778.1 km rp=6 428.1 km ad=6 603.1 km v1=7 668.57870 369 m/s vdo=7 566.27730 33 m/s ΔV=102.30140 0385 m/s ]
+'ROOT(ⒺControlled Deorbit;[r1;rp;ad;v1;vdo;ΔV];[1_km;1_km;1_km;1_m/s;1_m/s;1_m/s])'
+```
+
+#### GEO Graveyard Disposal
+
+Reorbit a GEO satellite to the disposal ("graveyard") region. IADC minimum rise
+`dHmin=235+1000·CR·(A/m)` km; then a two-burn Hohmann from `rgeo` to `rgrave`. Only a few
+m/s — hence disposal above GEO rather than deorbit.
+
+* To calculate: `[rgeo_km;dHmin_km;rgrave_km;atx_km;vcg_m/s;vp_m/s;vgr_m/s;va_m/s;ΔV1_m/s;ΔV2_m/s;ΔVtot_m/s]` from `CR`, `AtoM`:
+```rpl
+CR=1.3  AtoM=0.015
+@ Expecting [ rgeo=42 164.16815 02 km dHmin=254.5 km rgrave=42 418.66815 02 km atx=42 291.41815 02 km vcg=3 074.65999 204 m/s vp=3 079.28216 642 m/s vgr=3 065.42257 097 m/s va=3 060.80734 518 m/s ΔV1=4.62217 43810 9 m/s ΔV2=4.61522 57856 1 m/s ΔVtot=9.23740 01667 m/s ]
+'ROOT(ⒺGEO Graveyard Disposal;[rgeo;dHmin;rgrave;atx;vcg;vp;vgr;va;ΔV1;ΔV2;ΔVtot];[1_km;1_km;1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Translunar Injection
+
+Inject from a parking orbit `Hp` onto a geocentric transfer whose apogee reaches the Moon's
+distance `dmoon` (simplified patched conic). `ΔVtli=vtli−v1`; `tof=π·√(atx³/ⒸGM♁)` (≈5 d);
+`varr` is the geocentric speed on arrival.
+
+* To calculate: `[r1_km;atx_km;v1_m/s;vtli_m/s;ΔVtli_m/s;varr_m/s;tof_s]` from `Hp`, `dmoon`:
+```rpl
+Hp=185_km  dmoon='Ⓒa☽'
+@ Expecting [ r1=6 563.1 km atx=195 481.05 km v1=7 793.17366 605 m/s vtli=10 928.31355 71 m/s ΔVtli=3 135.13989 107 m/s varr=186.58637 173 m/s tof=430 068.86450 5 s ]
+'ROOT(ⒺTranslunar Injection;[r1;atx;v1;vtli;ΔVtli;varr;tof];[1_km;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+---
+
+### Heliocentric / Stationary
+
+Sun-referenced (`☉`) stationary conditions and libration points: the Sun-synchronous nodal-regression condition, the collinear Lagrange points, and the JWST halo orbit at the Sun–Earth L2 point.
+
+The variables of the Heliocentric / Stationary section are:
+
+* `a`: Semi-major axis
+* `dSunL2`: Sun-L2 distance
+* `dΩsun`: Nodal-regression rate matching the Sun (dim.: angle/time, in SI: °/d)
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `H`: Orbit altitude above the equatorial radius
+* `inc`: Inclination
+* `P`: Orbital period
+* `PL2`: Orbital period about the Sun at L2
+* `rapp`: First-approximation L1/L2 distance from Earth
+* `rL1`: Sun-Earth L1 distance from Earth
+* `rL2`: Sun-Earth L2 distance from Earth
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+
+#### Sun Synchronous Orbit
+
+Inclination that makes the node precess at the Sun's rate (360°/yr) via J2, so the local
+solar time is fixed: `inc=acos(dΩsun/(coeffJ2·a^(−7/2)·(1−ecc²)^(−2)))`, needs `inc>90°`.
+
+* To calculate: `[a_km;dΩsun_°/d;inc_°;P_s]` from `H`, `ecc`:
+```rpl
+H=700_km  ecc=0
+@ Expecting [ a=7 078.1 km dΩsun=0.98564 73320 99 °/d inc=98.18778 45391 ° P=5 926.33291 292 s ]
+'ROOT(ⒺSun Synchronous Orbit;[a;dΩsun;inc;P];[1_km;1_°/d;1_°;1_s])'
+```
+
+#### Collinear Lagrange Points
+
+Sun-Earth L1/L2 from the rotating-frame equilibrium (Sun gravity + Earth gravity =
+centrifugal). `rapp=Ⓒa♁·(ⒸGM♁/3ⒸGM☉)^⅓`; `rL1`/`rL2` solved implicitly. JWST sits at L2.
+
+* To calculate: `[rapp_km;rL2_km;rL1_km]` (constants only):
+```rpl
+@ Expecting [ rapp=1 496 558.48134 km rL2=1 501 531.72084 km rL1=1 491 550.96228 km ]
+'ROOT(ⒺCollinear Lagrange Points;[rapp;rL2;rL1];[1_km;1500000_km;1500000_km])'
+```
+
+#### JWST at Sun Earth L2
+
+L2 geometry: `dSunL2=Ⓒa♁+rL2`, period about the Sun `PL2=2π√(Ⓒa♁³/(ⒸGM☉+ⒸGM♁))` (≈1 yr, so
+it tracks Earth), heliocentric speed `VL2`. The real halo orbit is a 3-body periodic orbit.
+
+* To calculate: `[dSunL2_km;PL2_s;VL2_m/s]` from `rL2`:
+```rpl
+rL2=1501531.72084_km
+@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s ]
+'ROOT(ⒺJWST at Sun Earth L2;[dSunL2;PL2;VL2];[1_km;1_s;1_m/s])'
+```
+
+---
+
+### Heliocentric / Trajectory
+
+Sun-centered (`☉`) interplanetary transfers and mission analysis: heliocentric Hohmann and one-tangent transfers, departure and arrival hyperbolae, gravity-assist swing-bys, launch windows, and patched-conic mission capstones.
+
+The variables of the Heliocentric / Trajectory section are:
+
+* `Δν`: Transfer's change in true anomaly
+* `ΔVinj`: Injection burn onto the departure hyperbola (dim.: speed)
+* `φ`: Departure phase angle (target lead angle)
+* `ν`: True anomaly at arrival
+* `ωt`: Target planet's mean angular rate (dim.: angle/time, in SI: °/s)
+* `ρa`: Atmospheric density at the descent altitude (dim.: mass/volume, in SI: kg/m^3)
+* `a`: Semi-major axis of the arrival hyperbola (negative)
+* `abe1`: First bi-elliptic transfer semi-major axis
+* `abe2`: Second bi-elliptic transfer semi-major axis
+* `acap`: Capture-orbit semi-major axis
+* `Ad`: Drag (frontal) area
+* `aEM`: Earth-Mercury transfer semi-major axis
+* `aES`: Earth-Saturn transfer semi-major axis
+* `aEV`: Earth-Venus transfer semi-major axis
+* `amax`: Peak entry deceleration (dim.: acceleration, in SI: m/s^2)
+* `amaxg`: Peak entry deceleration in g
+* `aobj`: Incoming object's orbit semi-major axis
+* `atx`: Transfer-orbit semi-major axis
+* `atxJ`: Jupiter-system transfer semi-major axis
+* `atxS`: Saturn-system transfer semi-major axis
+* `bimp`: Impact parameter (aiming distance)
+* `C3`: Characteristic energy (dim.: speed^2, in SI: km^2/s^2)
+* `Cd`: Drag coefficient
+* `dgain`: Bi-elliptic Δv saving over Hohmann (dim.: speed)
+* `dmiss`: Targeted miss distance
+* `dOmega`: Node offset to the target plane
+* `dSunL2`: Sun-L2 distance
+* `dturn`: Hyperbolic turn angle
+* `dv1`: First burn (dim.: speed)
+* `dv2`: Second burn (dim.: speed)
+* `dv3`: Third burn (dim.: speed)
+* `dvBE`: Total bi-elliptic Δv (dim.: speed)
+* `dVdep`: Departure-injection burn (dim.: speed)
+* `dVesc`: Escape burn from the parking orbit (dim.: speed)
+* `dvH`: Total Hohmann Δv (dim.: speed)
+* `dVint`: Interception Δv relative to Earth (dim.: speed)
+* `dVtot`: Total velocity change (dim.: speed)
+* `Ea`: Eccentric anomaly
+* `ecc`: Eccentricity (not `e`, reserved for Euler's number)
+* `eccV`: Eccentricity of the Venus flyby hyperbola
+* `eobj`: Incoming object's orbit eccentricity
+* `fpa`: Flight-path angle
+* `fpaP`: Planet's heliocentric flight-path angle
+* `fpaSf`: Spacecraft's outgoing flight-path angle
+* `fpaSi`: Spacecraft's incoming flight-path angle
+* `gam`: Approach asymptote angle
+* `gmars`: Mars surface gravity (dim.: acceleration, in SI: m/s^2)
+* `H`: Parking-orbit altitude (departure hyperbola)
+* `Hp`: Parking-orbit altitude
+* `Hs`: Atmospheric scale height
+* `JD0`: Reference Julian date
+* `LST`: Local sidereal time
+* `lonE`: East longitude of the launch site
+* `MOI`: Mars orbit-insertion burn (dim.: speed)
+* `MOIsat`: Saturn orbit-insertion burn (dim.: speed)
+* `msat`: Spacecraft mass
+* `OmegaT`: Target right ascension of the ascending node
+* `P1`: Period of the inner planet
+* `P2`: Period of the outer planet
+* `PL2`: Orbital period about the Sun at L2
+* `r0`: Parking-orbit radius
+* `rA`: Departure planet's orbital radius
+* `rapo`: Capture-orbit apoapsis radius
+* `rB`: Destination planet's orbital radius
+* `rEar`: Earth's orbital radius
+* `rL2`: Sun-Earth L2 distance from Earth
+* `rm`: Capture-orbit radius at the target planet
+* `rMars`: Mars's orbital radius
+* `rmars`: Mars's physical radius
+* `rMe`: Mercury's orbital radius
+* `rmoon`: Target moon's orbital radius
+* `rp`: Periapsis / parking-orbit radius
+* `rpV`: Venus flyby periapsis radius
+* `rSa`: Saturn's orbital radius
+* `rstar`: Bi-elliptic far turning-point radius
+* `rV`: Venus's orbital radius
+* `rX`: Radius at which the object crosses Earth's orbit
+* `TEI`: Trans-Earth injection burn (dim.: speed)
+* `thf`: Outgoing relative-velocity direction angle
+* `thi`: Incoming relative-velocity direction angle
+* `TMI`: Trans-Mars injection burn (dim.: speed)
+* `TOF`: Time of flight
+* `tofd`: Transfer time of flight (departure phasing)
+* `Tsyn`: Synodic period
+* `turnV`: Venus flyby turn angle
+* `twait`: Wait time until the launch window
+* `Varr`: Heliocentric arrival speed (dim.: speed)
+* `Vcap`: Capture-orbit periapsis speed (dim.: speed)
+* `Vcirc`: Circular speed at the parking orbit (dim.: speed)
+* `VcsA`: Departure planet's circular speed (dim.: speed)
+* `VcsB`: Destination planet's circular speed (dim.: speed)
+* `vEarth`: Earth's heliocentric speed (dim.: speed)
+* `Ventry`: Atmospheric entry speed (dim.: speed)
+* `vfly`: Flyby (encounter) speed (dim.: speed)
+* `Vhyp`: Hyperbolic arrival speed at periapsis (dim.: speed)
+* `vinf`: Hyperbolic excess speed (dim.: speed)
+* `vinfA`: Arrival excess speed (dim.: speed)
+* `vinfD`: Departure excess speed (dim.: speed)
+* `vinfEar`: Excess speed at Earth arrival (dim.: speed)
+* `vinfMars`: Excess speed at Mars departure (dim.: speed)
+* `vinfMe`: Excess speed at Mercury (dim.: speed)
+* `vinfSa`: Excess speed at Saturn (dim.: speed)
+* `vinfV`: Excess speed at Venus (dim.: speed)
+* `VL2`: Heliocentric speed at L2 (dim.: speed)
+* `Vmoon`: Moon's circular orbital speed (dim.: speed)
+* `Vo`: Periapsis speed on the departure hyperbola (dim.: speed)
+* `vobj`: Incoming object's heliocentric speed (dim.: speed)
+* `Vpark`: Parking-orbit circular speed (dim.: speed)
+* `Vplanet`: Planet's heliocentric speed (dim.: speed)
+* `Vpln`: Planet's heliocentric speed at flyby (dim.: speed)
+* `VPx`: Planet velocity, X-component (dim.: speed)
+* `VPy`: Planet velocity, Y-component (dim.: speed)
+* `vr`: Radial velocity component (dim.: speed)
+* `Vrfx`: Outgoing relative velocity, X-component (dim.: speed)
+* `Vrfy`: Outgoing relative velocity, Y-component (dim.: speed)
+* `Vrix`: Incoming relative velocity, X-component (dim.: speed)
+* `Vriy`: Incoming relative velocity, Y-component (dim.: speed)
+* `VSf`: Spacecraft outgoing heliocentric speed (dim.: speed)
+* `VSfx`: Spacecraft outgoing velocity, X-component (dim.: speed)
+* `VSfy`: Spacecraft outgoing velocity, Y-component (dim.: speed)
+* `VSi`: Spacecraft incoming heliocentric speed (dim.: speed)
+* `VSix`: Spacecraft incoming velocity, X-component (dim.: speed)
+* `VSiy`: Spacecraft incoming velocity, Y-component (dim.: speed)
+* `Vsun`: Local solar-escape speed (dim.: speed)
+* `vt`: Tangential velocity component (dim.: speed)
+* `vterm`: Terminal descent speed (dim.: speed)
+* `VtxA`: Transfer speed at departure (dim.: speed)
+* `VtxB`: Transfer speed at arrival (dim.: speed)
+
+#### Heliocentric Hohmann Transfer
+
+Minimum-energy heliocentric transfer between planetary orbits `rA` and `rB`: transfer
+`atx=(rA+rB)/2`, planet circular speeds `Vcs=√(ⒸGM☉/r)`, transfer speeds by vis-viva, and
+`vinf=|Vtx−Vcs|` at each end (feeds the departure/arrival hyperbolae). `TOF=π·√(atx³/ⒸGM☉)`.
+
+![Heliocentric Hohmann Earth→Mars](img/HohmannTransferEarthToMars.bmp)
+
+* To calculate: `[atx_au;VcsA_m/s;VcsB_m/s;VtxA_m/s;VtxB_m/s;vinfD_m/s;vinfA_m/s;TOF_s]` from `rA`, `rB`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'
+@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VcsB=24 129.38801 33 m/s VtxA=32 729.38296 23 m/s VtxB=21 480.49129 1 m/s vinfD=2 944.69113 264 m/s vinfA=2 648.89672 221 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺHeliocentric Hohmann Transfer;[atx;VcsA;VcsB;VtxA;VtxB;vinfD;vinfA;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### One Tangent Interplanetary Transfer
+
+Faster-than-Hohmann transfer with a chosen `atx`: `ecc=1−rA/atx`, true anomaly at arrival
+`ν=acos((atx(1−ecc²)/rB−1)/ecc)`, eccentric anomaly `Ea`, and `TOF` from Kepler's equation.
+
+![One-tangent interplanetary transfer](img/OneTangentBurnEarthToMars.bmp)
+
+* To calculate: `[ecc;ν_°;Ea_°;TOF_s]` from `rA`, `rB`, `atx`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'  atx=1.3_au
+@ Expecting [ ecc=0.23076 92307 69 ν=146.41173 0654 ° Ea=138.21050 0084 ° TOF=16 813 447.6987 s ]
+'ROOT(ⒺOne Tangent Interplanetary Transfer;[ecc;ν;Ea;TOF];[1_1;1_°;1_°;1_s])'
+```
+
+#### Departure Phase Angle
+
+Angle by which the target planet must lead at departure: `φ=Δν−ωt·tofd`, with `Δν` the
+transfer's change in true anomaly and `ωt` the target's mean angular rate.
+
+* To calculate: `[φ_°]` from `Δν`, `ωt`, `tofd`:
+```rpl
+Δν=146.488_°  ωt=0.5240_°/d  tofd=194.77_d
+@ Expecting [ φ=44.42852 ° ]
+'ROOT(ⒺDeparture Phase Angle;[φ];[1_°])'
+```
+
+---
+
+#### Departure Hyperbola & Injection
+
+From a parking orbit `H` and the required excess speed `vinf`: periapsis speed
+`Vo=√(vinf²+2·ⒸGM♁/r0)`, injection `ΔVinj=Vo−√(ⒸGM♁/r0)`, and characteristic energy
+`C3=vinf²`.
+
+![Departure hyperbola](img/HyperbolicParameters.bmp)
+
+* To calculate: `[r0_km;Vo_m/s;Vcirc_m/s;ΔVinj_m/s;C3_km²/s²]` from `vinf`, `H`:
+```rpl
+vinf=3683_m/s  H=200_km
+@ Expecting [ r0=6 578.1 km Vo=11 608.38575 72 m/s Vcirc=7 784.28323 254 m/s ΔVinj=3 824.10252 47 m/s C3=13.56448 9 km↑2/s↑2 ]
+'ROOT(ⒺDeparture Hyperbola & Injection;[r0;Vo;Vcirc;ΔVinj;C3];[1_km;1_m/s;1_m/s;1_m/s;1_km²/s²])'
+```
+
+#### Arrival Hyperbola
+
+Approach hyperbola at the target planet from `vinf` and a targeted miss distance `dmiss`:
+impact parameter `bimp=dmiss·sin(gam)`, `a=−ⒸGM♂/vinf²` (<0), `ecc=√(1+bimp²/a²)` (>1),
+closest approach `rp=a(1−ecc)`, turn angle `dturn=2·asin(1/ecc)`.
+
+![Arrival hyperbola](img/HyperbolicTrajectory.bmp)
+
+* To calculate: `[bimp_km;a_km;ecc;rp_km;dturn_°]` from `vinf`, `dmiss`, `gam`:
+```rpl
+vinf=2438.2_m/s  dmiss=18500_km  gam=150.451_°
+@ Expecting [ bimp=9 123.60278 285 km a=-7 204.31927 146 km ecc=1.61362 55894 7 rp=4 420.75465 968 km dturn=76.59173 79349 ° ]
+'ROOT(ⒺArrival Hyperbola;[bimp;a;ecc;rp;dturn];[1_km;1_km;1_1;1_km;1_°])'
+```
+
+---
+
+#### Gravity Assist Swing By
+
+Planetary flyby: the spacecraft's velocity relative to the planet keeps its magnitude
+`vinf` but rotates by the hyperbolic turn angle `dturn=−2·asin(1/ecc)`. Decompose incoming
+velocities into X,Y about the planet's velocity, rotate, recompose. `thi`/`fpaSf` need
+`arg(→Polar(ℝ→ℂ(x;y)))` for the correct quadrant.
+
+* To calculate: `[…19 unknowns…]` from `Vpln`, `fpaP`, `VSi`, `fpaSi`, `dmiss`:
+```rpl
+Vpln=12740_m/s  fpaP=2.40_°  VSi=9470_m/s  fpaSi=39.2_°  dmiss=-2500000_km
+@ Expecting [ VPx=12 728.82485 55 m/s VPy=533.49582 851 m/s VSix=7 338.72430 803 m/s VSiy=5 985.31749 624 m/s Vrix=-5 390.10054 743 m/s Vriy=5 451.82166 773 m/s vinf=7 666.52094 552 m/s thi=134.67382 8918 ° bimp=-1 777 801.72599 km a=-2 155 429.39553 km ecc=1.29626 29999 3 dturn=-100.96826 292 ° thf=33.70556 59978 ° Vrfx=6 377.78044 473 m/s Vrfy=4 254.34601 401 m/s VSfx=19 106.60530 02 m/s VSfy=4 787.84184 252 m/s VSf=19 697.35504 09 m/s fpaSf=14.06782 26183 ° ]
+'ROOT(ⒺGravity Assist Swing By;[VPx;VPy;VSix;VSiy;Vrix;Vriy;vinf;thi;bimp;a;ecc;dturn;thf;Vrfx;Vrfy;VSfx;VSfy;VSf;fpaSf];[1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_km;1_km;1_1;1_°;1_°;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_°])'
+```
+
+---
+
+#### Patched Conic Mission Capstone
+
+Full interplanetary Δv budget: heliocentric Hohmann → `vinfD`/`vinfA` → departure hyperbola
+(`TMI` from a parking orbit) + arrival capture (`MOI` into `rm`). `dVtot=TMI+MOI`.
+
+* To calculate: `[atx_au;VcsA_m/s;VtxA_m/s;vinfD_m/s;VcsB_m/s;VtxB_m/s;vinfA_m/s;r0_km;Vo_m/s;TMI_m/s;Varr_m/s;MOI_m/s;dVtot_m/s;TOF_s]` from `rA`, `rB`, `Hp`, `rm`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'  Hp=200_km  'ⒸReq♂+500_km' →NUM 'rm' STO
+@ Expecting [ atx=1.26183 97204 9 au VcsA=29 784.69182 97 m/s VtxA=32 729.38296 23 m/s vinfD=2 944.69113 264 m/s VcsB=24 129.38801 33 m/s VtxB=21 480.49129 1 m/s vinfA=2 648.89672 221 m/s r0=6 578.1 km Vo=11 395.67184 31 m/s TMI=3 611.38861 055 m/s Varr=5 385.28963 704 m/s MOI=2 069.81903 47 m/s dVtot=5 681.20764 526 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺPatched Conic Mission Capstone;[atx;VcsA;VtxA;vinfD;VcsB;VtxB;vinfA;r0;Vo;TMI;Varr;MOI;dVtot;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Synodic Period & Launch Window
+
+Time between launch windows to a planet: `Tsyn=1/|1/P1−1/P2|`, with periods from mean
+distances. Earth-Mars ≈ 780 d.
+
+* To calculate: `[P1_d;P2_d;Tsyn_d]` from `rA`, `rB`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♂'
+@ Expecting [ P1=365.25689 8384 d P2=686.97168 7142 d Tsyn=779.94906 1999 d ]
+'ROOT(ⒺSynodic Period & Launch Window;[P1;P2;Tsyn];[1_d;1_d;1_d])'
+```
+
+#### Bi Elliptic vs Hohmann
+
+Compare a Hohmann (`dvH`) to a bi-elliptic transfer via a far turning point `rstar` (`dvBE`).
+Bi-elliptic wins (`dgain>0`) for radius ratios above ≈11.94, at the cost of much longer time.
+
+![Bi-elliptic](img/BiEllipticTransfer.bmp)
+
+* To calculate: `[atx_au;dvH_m/s;abe1_au;abe2_au;dv1_m/s;dv2_m/s;dv3_m/s;dvBE_m/s;dgain_m/s]` from `rA`, `rB`, `rstar`:
+```rpl
+rA='Ⓒa♁'  rB='Ⓒa♆'  rstar=50_au
+@ Expecting [ atx=15.52381 00949 au dvH=15 707.85453 85 m/s abe1=25.5 au abe2=40.02381 00949 au dv1=11 922.21894 83 m/s dv2=2 815.53461 655 m/s dv3=639.54282 2258 m/s dvBE=15 377.29638 71 m/s dgain=330.55815 1368 m/s ]
+'ROOT(ⒺBi Elliptic vs Hohmann;[atx;dvH;abe1;abe2;dv1;dv2;dv3;dvBE;dgain];[1_au;1_m/s;1_au;1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s])'
+```
+
+#### Solar System Escape
+
+Δv to leave the solar system from a planet's orbit: `vinf=Vsun−Vplanet` (with
+`Vsun=√(2ⒸGM☉/rA)`), then `dVesc` from a parking orbit and `C3=vinf²`. The Oberth effect
+makes `dVesc≪vinf`.
+
+* To calculate: `[Vsun_m/s;Vplanet_m/s;vinf_m/s;r0_km;Vo_m/s;dVesc_m/s;C3_km²/s²]` from `rA`, `Hp`:
+```rpl
+rA='Ⓒa♁'  Hp=200_km
+@ Expecting [ Vsun=42 121.91513 66 m/s Vplanet=29 784.69182 97 m/s vinf=12 337.22330 7 m/s r0=6 578.1 km Vo=16 534.72738 86 m/s dVesc=8 750.44415 603 m/s C3=152.20707 8926 km↑2/s↑2 ]
+'ROOT(ⒺSolar System Escape;[Vsun;Vplanet;vinf;r0;Vo;dVesc;C3];[1_m/s;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_km²/s²])'
+```
+
+---
+
+#### Interception Of Incoming Object
+
+Object on orbit `(aobj,eobj)` crossing Earth's orbit `rX`: speed by vis-viva, tangential
+part `vt=√(ⒸGM☉·aobj·(1−eobj²))/rX`, `fpa=atan(vr/vt)`, and `dVint` (law of cosines) = the
+relative speed to Earth an interceptor must supply.
+
+* To calculate: `[vobj_m/s;vEarth_m/s;vt_m/s;vr_m/s;fpa_°;dVint_m/s]` from `aobj`, `eobj`, `rX`:
+```rpl
+aobj=2_au  eobj=0.6  rX='Ⓒa♁'
+@ Expecting [ vobj=36 478.64856 44 m/s vEarth=29 784.69182 97 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° dVint=14 507.87544 33 m/s ]
+'ROOT(ⒺInterception Of Incoming Object;[vobj;vEarth;vt;vr;fpa;dVint];[1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_m/s])'
+```
+
+#### Asteroid Belt Injection Orbit
+
+Hohmann transfer Earth→asteroid belt (`rB`≈2.77 au): departure/arrival v∞, injection `dVdep`
+from a parking orbit, `TOF`.
+
+* To calculate: `[atx_au;vinfD_m/s;vinfA_m/s;r0_km;Vo_m/s;dVdep_m/s;TOF_s]` from `rA`, `rB`, `Hp`:
+```rpl
+rA='Ⓒa♁'  rB=2.766_au  Hp=200_km
+@ Expecting [ atx=1.883 au vinfD=6 314.21403 121 m/s vinfA=4 857.88002 653 m/s r0=6 578.1 km Vo=12 690.91918 34 m/s dVdep=4 906.63595 091 m/s TOF=40 771 590.5155 s ]
+'ROOT(ⒺAsteroid Belt Injection Orbit;[atx;vinfD;vinfA;r0;Vo;dVdep;TOF];[1_au;1_m/s;1_m/s;1_km;1_m/s;1_m/s;1_s])'
+```
+
+#### To Mercury Through Venus
+
+Why route via Venus: a direct Earth→Mercury transfer arrives at `vinfMe`≈9.6 km/s (costly to
+capture), whereas Earth→Venus arrives at only `vinfV`≈2.7 km/s, and a close Venus flyby (`rpV`)
+can turn the relative velocity up to `turnV` to shed energy toward Mercury.
+
+* To calculate: `[aEM_au;vinfMe_m/s;aEV_au;vinfV_m/s;eccV;turnV_°]` from `rEar`, `rV`, `rMe`, `rpV`:
+```rpl
+rEar='Ⓒa♁'  rV='Ⓒa♀'  rMe='Ⓒa☿'  'ⒸReq♀+300_km' →NUM 'rpV' STO
+@ Expecting [ aEM=0.69354 90449 46 au vinfMe=9 611.49352 042 m/s aEV=0.86166 29016 63 au vinfV=2 706.64286 924 m/s eccV=1.14324 00188 6 turnV=122.02062 6488 ° ]
+'ROOT(ⒺTo Mercury Through Venus;[aEM;vinfMe;aEV;vinfV;eccV;turnV];[1_au;1_m/s;1_au;1_m/s;1_1;1_°])'
+```
+
+---
+
+#### Saturn Injection Orbit
+
+Earth→Saturn arrival (`vinfSa`), then capture at periapsis `rp` into an ellipse whose
+apoapsis reaches a moon (`rapo`): `MOIsat=Vhyp−Vcap`. Very elliptic capture ⇒ modest braking.
+
+* To calculate: `[aES_au;vinfSa_m/s;Vhyp_m/s;acap_km;Vcap_m/s;MOIsat_m/s]` from `rEar`, `rSa`, `rp`, `rapo`:
+```rpl
+rEar='Ⓒa♁'  rSa='Ⓒa♄'  'ⒸReq♄+2000_km' →NUM 'rp' STO  rapo=1221870_km
+@ Expecting [ aES=5.29127 80886 9 au vinfSa=5 438.86510 887 m/s Vhyp=35 329.92349 79 m/s acap=642 069 km Vcap=34 051.88845 62 m/s MOIsat=1 278.03504 169 m/s ]
+'ROOT(ⒺSaturn Injection Orbit;[aES;vinfSa;Vhyp;acap;Vcap;MOIsat];[1_au;1_m/s;1_m/s;1_km;1_m/s;1_m/s])'
+```
+
+#### Path to Jupiter Satellites
+
+In-system Hohmann from a low Jupiter orbit `rp` to a Galilean moon `rmoon`: `dVtot=dv1+dv2`.
+Huge Δv (Jupiter is massive). Io/Ganymede/Callisto: swap `rmoon`.
+
+* To calculate: `[atxJ_km;Vpark_m/s;dv1_m/s;Vmoon_m/s;dv2_m/s;dVtot_m/s;TOF_s]` from `rp`, `rmoon`:
+```rpl
+'ⒸReq♃+400_km' →NUM 'rp' STO  rmoon=670900_km
+@ Expecting [ atxJ=371 396 km Vpark=41 978.30942 45 m/s dv1=14 441.96956 84 m/s Vmoon=13 741.56926 59 m/s dv2=7 695.71042 355 m/s dVtot=22 137.67999 2 m/s TOF=63 174.30581 96 s ]
+'ROOT(ⒺPath to Jupiter Satellites;[atxJ;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Path to Saturn Satellites
+
+In-system Hohmann to a Saturnian moon `rmoon` (Titan by default). Enceladus/Rhea: swap `rmoon`.
+
+* To calculate: `[atxS_km;Vpark_m/s;dv1_m/s;Vmoon_m/s;dv2_m/s;dVtot_m/s;TOF_s]` from `rp`, `rmoon`:
+```rpl
+'ⒸReq♄+2000_km' →NUM 'rp' STO  rmoon=1221870_km
+@ Expecting [ atxS=642 069 km Vpark=24 684.22817 m/s dv1=9 367.66028 623 m/s Vmoon=5 572.36440 777 m/s dv2=3 837.03823 527 m/s dVtot=13 204.69852 15 m/s TOF=262 403.97839 8 s ]
+'ROOT(ⒺPath to Saturn Satellites;[atxS;Vpark;dv1;Vmoon;dv2;dVtot;TOF];[1_km;1_m/s;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+---
+
+#### From Mars to Earth
+
+Return transfer Mars→Earth (heliocentric Hohmann) + trans-Earth injection `TEI` from a Mars
+parking orbit `rp`. Symmetric to the outbound leg.
+
+* To calculate: `[atx_au;vinfMars_m/s;vinfEar_m/s;Vo_m/s;TEI_m/s;TOF_s]` from `rMars`, `rEar`, `rp`:
+```rpl
+rMars='Ⓒa♂'  rEar='Ⓒa♁'  'ⒸReq♂+500_km' →NUM 'rp' STO
+@ Expecting [ atx=1.26183 97204 9 au vinfMars=2 648.89672 221 m/s vinfEar=2 944.69113 264 m/s Vo=5 385.28963 704 m/s TEI=2 069.81903 47 m/s TOF=22 366 007.4343 s ]
+'ROOT(ⒺFrom Mars to Earth;[atx;vinfMars;vinfEar;Vo;TEI;TOF];[1_au;1_m/s;1_m/s;1_m/s;1_m/s;1_s])'
+```
+
+#### Mars Landing
+
+Martian EDL: gravity `gmars=ⒸGM♂/rmars²`, peak entry deceleration (Allen-Eggers)
+`amax=Ventry²·sin(fpa)/(2e·Hs)` (independent of ballistic coefficient), terminal descent
+`vterm=√(2·msat·gmars/(ρa·Cd·Ad))` (`ρa` from `ρ♂DayAtm`). This entry-descent-
+landing sequence is the one a **Mars 2020 (Perseverance)**-class spacecraft flies on
+arrival — hypersonic entry, peak-g, then terminal descent — as at Jezero crater.
+
+* To calculate: `[gmars_m/s^2;amax_m/s^2;amaxg;vterm_m/s]` from `Ventry`, `fpa`, `Hs`, `ρa`, `Cd`, `Ad`, `msat`, `rmars`:
+```rpl
+Ventry=6000_m/s  fpa=12_°  Hs=11.1_km  ρa=0.015_kg/m³  Cd=1.5  Ad=10_m↑2  msat=1000_kg  rmars='(ⒸReq♂^2*ⒸRp♂)^(1/3)'
+@ Expecting [ gmars=3.72782 18628 2 m/s↑2 amax=124.03205 9402 m/s↑2 amaxg=12.64775 01901 vterm=182.03349 7841 m/s ]
+'ROOT(ⒺMars Landing;[gmars;amax;amaxg;vterm];[1_m/s^2;1_m/s^2;1_1;1_m/s])'
+```
+
+#### Launch Window from a Site
+
+Wait until Earth's rotation brings the site into the target orbital plane: local sidereal
+time `LST=θs(JD0;lonE)`, wait `twait=(OmegaT−LST)/360.98565°·d`. Inverse of **Orbit Orientation**:
+with `OmegaT` = that sim's RAAN Ω (and its site), `twait`=0.125 d recovers its burnout instant
+(JD 2451838.125). The same wait-time logic sets the daily launch instant from a pad — e.g. timing a departure from Cape
+Canaveral into the **Mars 2020 (Perseverance)** window.
+
+* To calculate: `[LST_°;dOmega_°;twait_d]` from `JD0`, `lonE`, `OmegaT`:
+```rpl
+JD0=2451838.0  lonE=-142.483_°  OmegaT=111.89550263874_°
+@ Expecting [ LST=66.77229 67179 ° dOmega=45.12320 59208 ° twait=0.12499 99990 88 d ]
+'ROOT(ⒺLaunch Window from a Site;[LST;dOmega;twait];[1_°;1_°;1_d])'
+```
+
+#### Comet Interceptor
+
+Waiting at Sun-Earth L2 (`dSunL2`,`VL2`), then intercepting a newly-found object crossing at
+`rX`: encounter (flyby) speed `vfly=|v_obj−v_L2|`. Couples the L2 geometry and the incoming object.
+
+* To calculate: `[dSunL2_km;PL2_s;VL2_m/s;vobj_m/s;vt_m/s;vr_m/s;fpa_°;vfly_m/s]` from `rL2`, `aobj`, `eobj`, `rX`:
+```rpl
+rL2=1501531.72084_km  aobj=2_au  eobj=0.6  rX='Ⓒa♁'
+@ Expecting [ dSunL2=151 099 402.421 km PL2=31 558 148.6281 s VL2=30 083.68952 19 m/s vobj=36 478.64856 44 m/s vt=33 697.53210 93 m/s vr=13 970.25879 59 m/s fpa=22.51782 53582 ° vfly=14 430.10703 61 m/s ]
+'ROOT(ⒺComet Interceptor;[dSunL2;PL2;VL2;vobj;vt;vr;fpa;vfly];[1_km;1_s;1_m/s;1_m/s;1_m/s;1_m/s;1_°;1_m/s])'
+```
+
+---
+
+## Math
+
+Mathematical simulations that do not belong to a physical domain.
+
+### Probability
+
+The 30 variables in the Probability section are:
+
+* `λ`: Rate of the exponential law, scale of the Weibull, mean of the Poisson
+* `μ`: Mean of the distribution — a parameter for `Norml` and `Logis`, computed elsewhere
+* `μl`: Mean of the underlying normal (`LgNrm`)
+* `σl`: Standard deviation of the underlying normal (`LgNrm`)
+* `a`: Shape of the gamma law, first shape of the beta
+* `ap`: Shape α of the Pareto law
+* `b`: Second shape of the beta law
+* `CDF`: Distribution function, the probability of not exceeding `X`
+* `CDFc`: Complement of `CDF`, the upper tail
+* `df`: Degrees of freedom of the chi-square and Student laws
+* `dfd`: Degrees of freedom of Fisher's denominator
+* `dfn`: Degrees of freedom of Fisher's numerator
+* `Ks`: Number of successes in the population (`Hyper`)
+* `nd`: Number of items drawn without replacement (`Hyper`)
+* `Np`: Size of the population (`Hyper`)
+* `nt`: Number of trials (`Binom`)
+* `p`: Probability of success in one trial
+* `PDF`: Density, or probability mass where the law is discrete
+* `rs`: Number of successes sought (`NegBinom`)
+* `s`: Scale of the Rayleigh and logistic laws
+* `sc`: Scale of the Cauchy, GEV, gamma, truncated normal and Lévy laws
+* `sh`: Shape of the Weibull law
+* `sx`: Standard deviation of the distribution — a parameter for `Norml`, computed elsewhere
+* `X`: The point at which the law is evaluated
+* `x0`: Location of the Cauchy, GEV, truncated normal and Lévy laws
+* `xi`: Shape of the GEV, deciding which extreme-value family it is
+* `Xmax`: Upper bound of the support
+* `Xmin`: Lower bound of the support
+* `xm`: Scale of the Pareto law, and the smallest value it can take
+* `xp`: Mode of the asymmetric triangular law
+
+One more name appears inside the formulas but never in the solver menu:
+`Jx`, the index of summation used by the discrete laws.
+
+Probability distributions, written as equation systems solved by Root. Each
+entry exposes the same three quantities — `PDF` the density, `CDF` the
+distribution function, `CDFc` its complement `1-CDF`, which is the upper tail —
+together with the parameters of the law and, where they exist, its mean `μ` and
+standard deviation `sx`.
+
+**The inverse needs no separate entry.** Give `CDF` and ask for `X`, and the
+solver returns the quantile. This is why no `CDF⁻¹` appears here: such an entry
+would place a Root inside a Root, which the solver cannot do.
+
+It can, however, return No solution? for some starting guesses while succeeding
+from others on the same law with the same parameters, because a distribution
+function is flat at both ends and the search can be trapped there; move the
+guess and try again. Where the quantile has to be reliable, use the Probability
+section of the Function Library instead, whose entries bisect rather than search
+and so cannot be trapped.
+
+**Naming.** `sx` rather than σ, `ap` rather than α, `sh` rather than k,
+`sc` rather than γ: those four names resolve to built-in constants — σ is
+the Stefan-Boltzmann constant — and would silently return the constant instead
+of the value entered.
+
+**The mean and the standard deviation** are computed, not entered, except where
+they are also parameters of the law (`Norml`, `Logis`). The Cauchy distribution
+returns Ⓒ? for both, since it has neither: its moments do not converge.
+
+**Turn on `AllVars` first.** These are systems of several equations, and by
+default the solver menu shows only the variables of the first one — for `Norml`
+that is `PDF`, `sx`, `μ` and `X`, with `CDF` and `CDFc` missing and no way to
+reach them. The `AllVars` setting, in the `UserInterfaceModes` menu, makes the
+menu show every variable of the system. The AllEquationVariables command does
+the same from the command line. Without it, NextEq steps from one equation of
+the system to the next, which reaches the same variables one screen at a time.
+
+**Beware of values left over from a previous computation.** The solver takes the
+first equation in which every variable but the unknown is already defined, so a
+stale `PDF` will be used in preference to the `CDF` you have just entered. Asking
+for `X` with `PDF=0.3989` still in memory returns zero — which is correct, since
+zero is where the normal density reaches its maximum, but it is not the question
+you meant to ask. `CDF` is placed first in each system so that it wins when both
+are defined; when in doubt, purge the quantity you are not using.
+
+#### Norml
+
+Normal distribution of mean `μ` and standard deviation `sx`. In closed form
+through the error function: `CDF=0.5·(1+erf((X-μ)/(sx·√2)))`.
+
+![Normal Distribution](img/Norml_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `μ`, `sx`, `X`:
+```rpl
+μ=0  sx=1  X=1.645
+@ Expecting [ PDF=0.10311 08110 92 CDF=0.95001 50944 61 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺNorml;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+* To obtain the quantile, give `CDF` and ask for `X`:
+```rpl
+μ=0  sx=1  CDF=0.95
+@ Expecting [ X=1.64485 36269 5 ]
+'ROOT(ⒺNorml;[X];[1])'
+```
+
+#### LgNrm
+
+Log-normal distribution: `LN(X)` is normal of mean `μl` and standard deviation
+`σl`. Its own mean and standard deviation differ from its parameters, which is
+why both are given: `μ=EXP(μl+σl²/2)`.
+
+![Lognormal Distribution](img/LgNrm_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `μl`, `σl`, `X`:
+```rpl
+μl=0  σl=1  X=2
+@ Expecting [ PDF=0.15687 40192 79 CDF=0.75589 14042 14 CDFc=0.24410 85957 86 μ=1.64872 12707 sx=2.16119 74159 ]
+'ROOT(ⒺLgNrm;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Expon
+
+Exponential distribution of rate `λ`, on `X≥0`. Mean and standard deviation are
+both `1/λ`. The quantile also has a closed form, `X=-LN(1-CDF)/λ`, faster than
+solving.
+
+![Exponential Distribution](img/Expon_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=2  X=0.5
+@ Expecting [ PDF=0.73575 88823 43 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=0.5 sx=0.5 ]
+'ROOT(ⒺExpon;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Weibl
+
+Weibull distribution of shape `sh` and scale `λ`, on `X≥0`. Reduces to the
+exponential when `sh=1` and to Rayleigh when `sh=2`. Its moments use the gamma
+function: `μ=λ·Γ(1+1/sh)`.
+
+![Weibull Distribution](img/Weibl_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `sh`, `λ`, `X`:
+```rpl
+sh=2  λ=3  X=3
+@ Expecting [ PDF=0.24525 29607 81 CDF=0.63212 05588 29 CDFc=0.36787 94411 71 μ=2.65868 07763 6 sx=1.38975 41255 3 ]
+'ROOT(ⒺWeibl;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Rayleigh
+
+Rayleigh distribution of scale `s`, on `X≥0`. The law of the magnitude of a
+two-dimensional vector whose components are independent centred normals of the
+same variance — hence its use for wind speeds and for the modulus of a complex
+noise.
+
+![Rayleigh Distribution](img/Rayleigh_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `s`, `X`:
+```rpl
+s=2  X=2
+@ Expecting [ PDF=0.30326 53298 56 CDF=0.39346 93402 87 CDFc=0.60653 06597 13 μ=2.50662 82746 3 sx=1.31027 27551 2 ]
+'ROOT(ⒺRayleigh;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Logis
+
+Logistic distribution of location `μ` and scale `s`. Symmetric like the normal
+but with heavier tails, and its distribution function is elementary:
+`CDF=1/(1+EXP(-(X-μ)/s))`. Here `μ` is both a parameter and the mean; the
+standard deviation is `sx=s·π/√3`.
+
+![Logistic Distribution](img/Logis_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;sx]` from `μ`, `s`, `X`:
+```rpl
+μ=0  s=1  X=2
+@ Expecting [ PDF=0.10499 35854 04 CDF=0.88079 70779 78 CDFc=0.11920 29220 22 sx=1.81379 93642 3 ]
+'ROOT(ⒺLogis;[PDF;CDF;CDFc;sx];[1;0.5;0.5;1])'
+```
+
+#### Pareto
+
+Pareto distribution of minimum `xm` and index `ap`, on `X≥xm`. This is the power
+law: the density falls as `X^-(ap+1)`, so the tail is heavy and the moments exist
+only above certain values of `ap`. The section says which rather than returning a
+number that means nothing:
+
+* `ap>2` — both moments exist, and are the values below.
+* `1<ap≤2` — the mean exists; the variance integral diverges, so `sx` is infinite.
+* `ap≤1` — the mean is itself infinite, so there is nothing to take a deviation
+  from and `sx` is undefined. That is not the same as infinite: a Monte-Carlo
+  sample of an infinite mean grows without ever settling, whereas an undefined
+  deviation has no value to converge to at all.
+
+![Pareto Distribution](img/Pareto_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `xm`, `ap`, `X`:
+```rpl
+xm=1  ap=3  X=2
+@ Expecting [ PDF=0.1875 CDF=0.875 CDFc=0.125 μ=1.5 sx=0.86602 54037 84 ]
+'ROOT(ⒺPareto;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Cauch
+
+Cauchy distribution of location `x0` and scale `sc`. It has neither mean nor
+variance — both integrals diverge — so `μ` and `sx` return Ⓒ?, undefined. It
+cannot take part in an uncertainty propagation based on a standard deviation.
+
+The distribution function uses `UVAL(UBASE(ATAN(...)))` so that it does not
+depend on the current angle mode: ATAN returns an angle, which UBASE
+expresses in turns.
+
+![Cauchy Distribution](img/Cauch_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.15915 49430 92 CDF=0.75 CDFc=0.25 ]
+'ROOT(ⒺCauch;[PDF;CDF;CDFc];[1;0.5;0.5])'
+```
+
+#### UnifCont
+
+Continuous uniform distribution on `[Xmin;Xmax]`. Density `1/(Xmax-Xmin)` inside
+the interval and zero outside.
+
+![Continuous Uniform Distribution](img/UnifCont_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=2  Xmax=6  X=3
+@ Expecting [ PDF=0.25 CDF=0.25 CDFc=0.75 μ=4 sx=1.15470 05383 8 ]
+'ROOT(ⒺUnifCont;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### TriSym
+
+Symmetric triangular distribution on `[Xmin;Xmax]`, peaking at the midpoint. The
+density vanishes at both ends, so the half-width `(Xmax-Xmin)/2` appears in it,
+not the midpoint. Its distribution function is given in closed form rather than
+as an integral: integrating a density that is identically zero over part of the
+range loses precision.
+
+![Symmetric Triangular Distribution](img/TriSym_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=3  X=2.5
+@ Expecting [ PDF=0.5 CDF=0.875 CDFc=0.125 μ=2 sx=0.40824 82904 64 ]
+'ROOT(ⒺTriSym;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+#### Chi2
+
+Chi-square distribution with `df` degrees of freedom, on `X≥0`. Its distribution
+function has no elementary form and is obtained by integrating the density, so
+it costs more than the others: about 90 ms for a `CDF` and 700 ms for a
+quantile, which is the order of what the Planck fraction in `Fluids` already
+costs.
+
+![Chi-Square Distribution](img/Chi2_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=4
+@ Expecting [ PDF=0.13533 52832 37 CDF=0.59399 41502 9 CDFc=0.40600 58497 1 μ=4 sx=2.82842 71247 5 ]
+'ROOT(ⒺChi2;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+* The quantile, by giving `CDF` and asking for `X`. This is the slowest entry of
+  the section, about 700 ms, since each step of the search integrates the
+  density afresh:
+```rpl
+df=4  CDF=0.95
+@ Expecting [ X=9.48772 90367 8 ]
+'ROOT(ⒺChi2;[X];[8])'
+```
+
+#### Beta
+
+Beta distribution of shapes `a` and `b`, on `[0;1]`. Like the chi-square, its
+distribution function is an integral. It is fast when `a` and `b` are integers,
+the integrand then being polynomial, and much slower otherwise — an unusual
+behaviour worth knowing about.
+
+![Beta Distribution](img/Beta_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc;μ;sx]` from `a`, `b`, `X`:
+```rpl
+a=2  b=3  X=0.5
+@ Expecting [ PDF=1.5 CDF=0.6875 CDFc=0.3125 μ=0.4 sx=0.2 ]
+'ROOT(ⒺBeta;[PDF;CDF;CDFc;μ;sx];[1;0.5;0.5;1;1])'
+```
+
+---
+
+#### Phit
+
+Standard normal distribution — mean zero, standard deviation one. The special
+case of Norml that statistical tables are built on, kept separate because it
+takes no parameter at all.
+
+![Standard Normal Distribution](img/Phit_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc]` from `X`:
+```rpl
+X=1.645
+@ Expecting [ CDF=0.95001 50944 61 PDF=0.10311 08110 92 CDFc=0.04998 49055 39 ]
+'ROOT(ⒺPhit;[CDF;PDF;CDFc];[0.5;1;0.5])'
+```
+
+#### TriRight
+
+Right triangular distribution on `[Xmin;Xmax]` — density rising linearly from
+zero at `Xmin` to its maximum at `Xmax`. Useful when a quantity is more likely
+to sit near its upper bound.
+
+![Right Triangular Distribution](img/TriRight_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=2
+@ Expecting [ CDF=0.44444 44444 44 PDF=0.44444 44444 44 CDFc=0.55555 55555 56 μ=2 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriRight;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriLeft
+
+Left triangular distribution on `[Xmin;Xmax]` — the mirror of TriRight, its
+density falling from a maximum at `Xmin` to zero at `Xmax`.
+
+![Left Triangular Distribution](img/TriLeft_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=3  X=1
+@ Expecting [ CDF=0.55555 55555 56 PDF=0.44444 44444 44 CDFc=0.44444 44444 44 μ=1 sx=0.70710 67811 87 ]
+'ROOT(ⒺTriLeft;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### TriAsym
+
+Asymmetric triangular distribution on `[Xmin;Xmax]` with its peak at `xp`. The
+three-point estimate of project planning: a minimum, a maximum, and a most
+likely value. TriSym, TriRight and TriLeft are its special cases.
+
+![Asymmetric Triangular Distribution](img/TriAsym_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `xp`, `X`:
+```rpl
+Xmin=0  Xmax=3  xp=1  X=1
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.66666 66666 67 CDFc=0.66666 66666 67 μ=1.33333 33333 3 sx=0.62360 95644 62 ]
+'ROOT(ⒺTriAsym;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### UShape
+
+Arcsine distribution on `[Xmin;Xmax]` — U-shaped, with the density diverging at
+both ends and a minimum in the middle. It describes a quantity that spends most
+of its time near its extremes, such as the position of a harmonic oscillator
+sampled at random times.
+
+Its distribution function uses UVAL(UBASE(ASIN(...))) so that the result does
+not depend on the current angle mode, exactly as Cauch does with the arc
+tangent.
+
+![U-Shaped Distribution](img/UShape_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=0  Xmax=1  X=0.25
+@ Expecting [ CDF=0.33333 33333 33 PDF=0.73510 51938 96 CDFc=0.66666 66666 67 μ=0.5 sx=0.35355 33905 93 ]
+'ROOT(ⒺUShape;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### GEV
+
+Generalised extreme value distribution of location `x0`, scale `sc` and shape
+`xi` — the limiting law of a maximum, and the tool of choice for floods, wind
+loads and record temperatures. The shape decides the family: `xi` positive gives
+Fréchet, negative gives Weibull, and zero gives Gumbel, which the system handles
+as a separate branch since the general formula divides by `xi`.
+
+The mean exists only for `xi` below 1 and the standard deviation only for `xi`
+below one half; at `xi=0.5` the variance already diverges, and the two last
+equations then return nothing rather than an error.
+
+![Generalized Extreme Value Distribution](img/GEV_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `xi`, `X`:
+```rpl
+x0=0  sc=1  xi=0.2  X=1
+@ Expecting [ CDF=0.66906 26526 68 PDF=0.22406 77286 51 CDFc=0.33093 73473 32 μ=0.82114 85686 27 sx=1.82867 04356 7 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+* The Gumbel case, `xi=0`, where the mean is Euler's constant and the standard
+  deviation is `sc·π/√6`:
+```rpl
+x0=0  sc=1  xi=0  X=1
+@ Expecting [ CDF=0.69220 06275 55 PDF=0.25464 63800 44 CDFc=0.30779 93724 45 μ=0.57721 56649 02 sx=1.28254 98301 6 ]
+'ROOT(ⒺGEV;[CDF;PDF;CDFc;μ;sx];[0.5;1;0.5;1;1])'
+```
+
+#### Gamma
+
+Waiting time until the `a`-th event of a Poisson process of mean spacing `sc` —
+the sum of `a` exponential waits. Shape `a` and scale `sc` are both positive and
+`a` need not be an integer. Chi2 is the special case `a=df/2`, `sc=2`, and Expon
+the case `a=1`.
+
+Like Chi2 it has no closed form: the distribution function is obtained by
+integration, at about the same cost — a tenth of a second for a value, a second
+for a quantile.
+
+![Gamma Distribution](img/Gamma_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `a`, `sc`, `X`:
+```rpl
+a=2  sc=3  X=3
+@ Expecting [ CDF=0.26424 11176 57 PDF=0.12262 64803 9 CDFc=0.73575 88823 43 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The inverse, here the median, obtained by giving CDF and asking for X:
+```rpl
+a=2  sc=3  CDF=0.5
+@ Expecting [ X=5.03504 09700 5 PDF=0.10443 92303 83 CDFc=0.5 μ=6 sx=4.24264 06871 2 ]
+'ROOT(ⒺGamma;[X;PDF;CDFc;μ;sx];[5;0.1;0.5;1;1])'
+```
+
+#### NormTrunc
+
+The normal law of location `x0` and scale `sc`, restricted to the interval from
+`Xmin` to `Xmax` and renormalised over it. This is the law the NIST Uncertainty
+Machine uses for a quantity known to be normal but physically bounded — a
+concentration that cannot be negative, a transmittance that cannot exceed one.
+
+Beware that `x0` and `sc` are the parameters of the parent normal law, not the
+mean and the standard deviation of the truncated one: truncation shifts the mean
+towards the middle of the interval and shrinks the spread, and it is μ and sx
+that report the real ones. In the example below the parent is centred on zero
+with unit width, but cutting it at −1 and 2 moves the mean to 0.23 and brings
+the standard deviation down to 0.72.
+
+![Truncated Normal Distribution](img/NormTrunc_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `x0`, `sc`, `Xmin`, `Xmax`, `X`:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  X=0
+@ Expecting [ CDF=0.41698 87514 29 PDF=0.48735 02384 7 CDFc=0.58301 12485 71 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+* The 95th percentile, which falls well short of the 1.645 of the parent law:
+```rpl
+x0=0  sc=1  Xmin=-1  Xmax=2  CDF=0.95
+@ Expecting [ X=1.52459 66827 8 PDF=0.15244 22014 83 CDFc=0.05 μ=0.22963 71790 91 sx=0.72094 55868 59 ]
+'ROOT(ⒺNormTrunc;[X;PDF;CDFc;μ;sx];[1;0.1;0.05;0.5;0.5])'
+```
+
+---
+
+#### Student
+
+Student's t distribution with `df` degrees of freedom — the law of a sample mean
+when the variance is estimated from the sample itself, and the reason a small
+sample needs wider intervals than a large one. As `df` grows it approaches the
+normal law; at `df=1` it is the Cauchy law, with no mean at all.
+
+The distribution function is the regularised incomplete beta, so it is closed
+form and immediate. The mean exists only for `df` above 1 and the standard
+deviation only above 2; below those the two entries return Ⓒ?.
+
+![Student t Distribution](img/Student_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `df`, `X`:
+```rpl
+df=4  X=1
+@ Expecting [ CDF=0.81304 95168 5 PDF=0.21466 25258 4 CDFc=0.18695 04831 5 μ=0 sx=1.41421 35623 7 ]
+'ROOT(ⒺStudent;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0;1])'
+```
+
+* The 97.5th percentile, the critical value of the two-sided test at 5 per cent:
+```rpl
+df=4  CDF=0.975
+@ Expecting [ X=2.77644 51052 ]
+'ROOT(ⒺStudent;[X];[2])'
+```
+
+#### Fisher
+
+Fisher's F distribution with `dfn` degrees of freedom in the numerator and `dfd`
+in the denominator — the ratio of two independent estimates of the same
+variance, and the law behind the analysis of variance.
+
+Its distribution function is the regularised incomplete beta as well. The mean
+exists only for `dfd` above 2 and the standard deviation only above 4.
+
+![Fisher F Distribution](img/Fisher_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `dfn`, `dfd`, `X`:
+```rpl
+dfn=4  dfd=6  X=1
+@ Expecting [ CDF=0.5248 PDF=0.41472 CDFc=0.4752 μ=1.5 sx=2.12132 03435 6 ]
+'ROOT(ⒺFisher;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+* The 95th percentile, the critical value of the test:
+```rpl
+dfn=4  dfd=6  CDF=0.95
+@ Expecting [ X=4.53367 69502 8 ]
+'ROOT(ⒺFisher;[X];[4])'
+```
+
+#### Levy
+
+Lévy distribution of location `x0` and scale `sc`, on `X>x0`. It is the stable
+law of index one half, and one of the few whose distribution function is exact
+in closed form: `CDF=erfc(√(sc/(2·(X-x0))))`.
+
+Its tail is heavy enough that **neither moment exists**: both `μ` and `sx` are
+infinite, and the section says so with the infinity constant rather than
+returning a number. Sampling it shows the same thing — a running mean that
+climbs without ever settling.
+
+![Levy Distribution](img/Levy_Distribution.bmp)
+
+* To calculate: `[PDF;CDF;CDFc]` from `x0`, `sc`, `X`:
+```rpl
+x0=0  sc=1  X=1
+@ Expecting [ PDF=0.24197 07245 19 CDF=0.31731 05078 63 CDFc=0.68268 94921 37 ]
+'ROOT(ⒺLevy;[PDF;CDF;CDFc];[0.5;0.5;0.5])'
+```
+
+* To obtain the median, give `CDF` and ask for `X`:
+```rpl
+x0=0  sc=1  CDF=0.5
+@ Expecting [ X=2.19810 93383 2 ]
+'ROOT(ⒺLevy;[X];[2])'
+```
+
+
+### Discrete distributions
+
+For these seven laws PDF is the probability **mass** at X, not a density: the
+probability that the variable takes exactly that value. CDF sums the mass up to
+IP(X), so a non-integer X behaves as the step function does, and CDFc is the
+upper tail.
+
+They need no numerical integration. The sums are exact and quick — a Poisson
+tail of a hundred and twenty terms costs about sixteen milliseconds.
+
+The quantile, however, is **not** available here: giving CDF and asking for X
+fails on every one of these laws, and it is not a defect of any one of them. The
+distribution function of a discrete law is a staircase, flat between the
+integers, so its derivative is zero almost everywhere and the solver has nothing
+to follow; it returns Divide by zero.
+
+**Use the Function Library instead.** Its Probability section holds one quantile
+function per law — ⓁBernoulliQ, ⓁBinomQ, ⓁPoissQ, ⓁGeomQ, ⓁHyperQ, ⓁNegBinomQ
+and ⓁUnifDisQ — which sum the mass directly and return the integer, in a few
+milliseconds. Parameters go on the stack first and the probability last, so the
+95th percentile of twenty trials at three tenths reads `20 0.3 0.95 ⓁBinomQ`.
+See Probability functions for the convention they follow and for the boundary
+cases.
+
+Poiss and NegBinom, whose support has no upper end, stop summing beyond the
+mean plus forty standard deviations, where the distribution function is already
+one to every digit displayed; Hyper stops at nd, beyond which every draw is a
+success. Without those guards a solver sent wandering towards large X spends
+minutes on factorials that overflow anyway.
+
+#### Bernoulli
+
+A single trial with probability p of success. The building block of Binom, and
+the simplest law in the section.
+
+![Bernoulli Distribution](img/Bernoulli_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=0
+@ Expecting [ CDF=0.7 PDF=0.7 CDFc=0.3 μ=0.3 sx=0.45825 75694 96 ]
+'ROOT(ⒺBernoulli;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;0.5;0.5])'
+```
+
+#### Binom
+
+Number of successes in `nt` independent trials, each with probability `p`. The
+mass uses COMB and the distribution function sums it, so both are exact.
+
+![Binomial Distribution](img/Binom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `nt`, `p`, `X`:
+```rpl
+nt=20  p=0.3  X=8
+@ Expecting [ CDF=0.88666 85371 23 PDF=0.11439 67397 05 CDFc=0.11333 14628 77 μ=6. sx=2.04939 01531 9 ]
+'ROOT(ⒺBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Poiss
+
+Number of events in a fixed interval when they occur independently at mean rate
+`λ`. Mean and variance are both `λ`, which is the signature of the law.
+
+![Poisson Distribution](img/Poiss_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `λ`, `X`:
+```rpl
+λ=10  X=10
+@ Expecting [ CDF=0.58303 97501 93 PDF=0.12511 00357 21 CDFc=0.41696 02498 07 μ=10 sx=3.16227 76601 7 ]
+'ROOT(ⒺPoiss;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Geom
+
+Number of trials up to and including the first success, each trial succeeding
+with probability `p`. Support starts at one, not zero. Its distribution function
+is elementary, `1-(1-p)^X`, so no sum is needed.
+
+![Geometric Distribution](img/Geom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `p`, `X`:
+```rpl
+p=0.3  X=3
+@ Expecting [ CDF=0.657 PDF=0.147 CDFc=0.343 μ=3.33333 33333 3 sx=2.78886 67551 1 ]
+'ROOT(ⒺGeom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### Hyper
+
+Number of successes when `nd` items are drawn **without replacement** from a
+population of `Np` containing `Ks` successes — the difference from Binom, which
+draws with replacement. Quality control and card games.
+
+![Hypergeometric Distribution](img/Hyper_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Np`, `Ks`, `nd`, `X`:
+```rpl
+Np=50  Ks=10  nd=5  X=1
+@ Expecting [ CDF=0.74189 99792 33 PDF=0.43133 71972 29 CDFc=0.25810 00207 67 μ=1 sx=0.85714 28571 43 ]
+'ROOT(ⒺHyper;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### UnifDis
+
+Discrete uniform law on the integers from `Xmin` to `Xmax`, each equally likely
+— a fair die is `Xmin=1`, `Xmax=6`. Note that the standard deviation is not the
+one of UnifCont over the same interval: counting `Xmax-Xmin+1` equally likely
+values is not the same as spreading the probability continuously between them.
+
+![Discrete Uniform Distribution](img/UnifDis_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `Xmin`, `Xmax`, `X`:
+```rpl
+Xmin=1  Xmax=6  X=3
+@ Expecting [ CDF=0.5 PDF=0.16666 66666 67 CDFc=0.5 μ=3.5 sx=1.70782 51276 6 ]
+'ROOT(ⒺUnifDis;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+#### NegBinom
+
+Number of failures before the `rs`-th success, each trial succeeding with
+probability `p` — the mirror of Binom, which fixes the trials and counts the
+successes. It is the law the NIST Uncertainty Machine offers for overdispersed
+counts, where the variance exceeds the mean and Poisson will not do.
+
+Support starts at zero and has no upper end, so the sum is capped as described
+above. With `rs=1` it reduces to the geometric law counted from zero.
+
+![Negative Binomial Distribution](img/NegBinom_Distribution.bmp)
+
+* To calculate: `[CDF;PDF;CDFc;μ;sx]` from `rs`, `p`, `X`:
+```rpl
+rs=3  p=0.5  X=2
+@ Expecting [ CDF=0.5 PDF=0.1875 CDFc=0.5 μ=3. sx=2.44948 97427 8 ]
+'ROOT(ⒺNegBinom;[CDF;PDF;CDFc;μ;sx];[0.5;0.5;0.5;1;1])'
+```
+
+---
+
+
+## Navigation
+
+The `Navigation` section computes routes, positions and distances on the
+surface of the earth. It serves air, marine and land navigation alike: a great
+circle is the shortest route for an aircraft, a ship or a traveller.
+
+The equations use a spherical earth. They are exact on the sphere, and within
+about 0.5% of the ellipsoidal (WGS-84) answer.
+
+**Conventions.** Latitudes are positive North. **Longitudes are positive East**,
+as in GPS coordinates: West longitudes are negative. True courses are measured
+clockwise from true North, from 0° to 360°. Angles can be entered in any
+angular unit, for instance `'33_°+57_arcmin'` for 33°57′.
+
+**Earth radius.** The radius `Rs` of the sphere is a variable. With
+`Rs='(10800_nmi)/Ⓒπ'`, one arc-minute of a great circle is exactly one
+nautical mile, the convention of the navigation references below. The WGS-84
+mean radius, `(2a+b)/3`, is 6 371 008.8 m.
+
+**Results and steps.** Each entry computes a few main results, listed first
+below. The other variables are intermediate steps: they keep each equation
+short enough to be shown on the screen of the solver, and they let you follow
+the calculation. A course, for instance, is the direction of a vector whose
+North component is `x` and East component is `y`; `180°+(-y)∠(-x)` gives
+that direction between 0° and 360°. Solving for all the variables of an
+entry, steps included, is the simplest way to use it.
+
+The 41 variables in the Navigation section are:
+
+*Positions, courses and distances*
+
+* `φ1`, `λ1`: Latitude and longitude of the departure point
+* `φ2`, `λ2`: Latitude and longitude of the destination
+* `φP`, `λP`: Latitude and longitude of the present position
+* `φv`, `λv`: Latitude and longitude of the northern vertex, the point of highest latitude of the great circle
+* `D`: Great-circle distance from departure to destination (dim.: length, in SI: m)
+* `Dv`: Great-circle distance from the departure point to the vertex (dim.: length, in SI: m)
+* `TC1`: Initial true course, at departure
+* `TC2`: Final true course, on arrival
+* `XTD`: Cross-track distance: how far the present position is from the route, positive when right of it (dim.: length, in SI: m)
+* `ATD`: Along-track distance: how far along the route the present position is (dim.: length, in SI: m)
+* `Rs`: Radius of the spherical earth (dim.: length, in SI: m)
+* `TC`: True course, or track: the direction actually followed over the ground (for a ship: course made good)
+* `TH`: True heading: the direction the aircraft or ship points to
+* `V`: Own speed through the air or the water: true airspeed of an aircraft, speed of a ship (dim.: speed)
+* `GS`: Ground speed (for a ship: speed made good) (dim.: speed)
+* `WD`: Direction the wind comes **from**. A current setting towards `set` acts as a wind from `set+180°`
+* `WS`: Wind speed, or drift of the current (dim.: speed)
+* `WCA`: Wind correction angle, `TH-TC`: negative when heading left of the track
+
+*Intermediate steps*
+
+* `θ`: Central angle between departure and destination; `D` is the arc `Rs·θ`
+* `θ1P`: Central angle between the departure point and the present position
+* `θv`: Central angle between the departure point and the vertex
+* `θXT`, `θAT`: Central angles across and along the track
+* `Δφ`, `Δλ`: Latitude and longitude differences
+* `Δλv`: Longitude difference from the departure point to the vertex
+* `hav`: Haversine of the central angle, `SIN(θ/2)²`
+* `x1`: North component of the initial course
+* `x2`: North component of the final course
+* `xP`: North component of the course towards the present position
+* `TC1P`: True course from the departure point towards the present position
+* `gN`, `gE`: North and East components of the ground speed vector
+* `wN`, `wE`: North and East components of the wind, pointing where it comes from
+* `aN`, `aE`: North and East components of the own speed vector
+
+* References:
+  [1] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [2] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2017), chapter 12, *The Sailings* ;
+  [3] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C, chapter 16, *Navigation* ;
+  [4] N. Bowditch, *The American Practical Navigator*, NGA Pub. 9 (2024), chapter 10, *Dead Reckoning*, §1008.
+
+#### Great Circle
+
+The great circle is the shortest route between two points of a sphere.
+
+![Great circle route](img/GreatCircleRoute.bmp)
+
+* Main results: the distance `D` between departure `(φ1;λ1)` and destination
+  `(φ2;λ2)`, the initial true course `TC1` to steer at departure, and the final
+  true course `TC2` on arrival. On a great circle the course changes all along
+  the route, so `TC1` and `TC2` differ, except along a meridian or the equator.
+* Steps: the central angle `θ` comes from the haversine `hav`, which stays
+  accurate for short distances; each course comes from its North component,
+  `x1` or `x2`.
+
+* To calculate: `[D;TC1;TC2]` (Distance; Initial and final true courses) from Los Angeles (LAX, 33°57′N, 118°24′W) to New York (JFK, 40°38′N, 73°47′W) [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' φ2='40_°+38_arcmin' λ2='-(73_°+47_arcmin)' Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=6.68333 33333 3 ° Δλ=44.61666 66667 ° hav=0.09410 47864 82 θ=35.72876 83542 ° D=2 143.72610 125 nmi x1=0.23851 69937 16 TC1=65.89216 65527 ° x2=3.92920 42824 5⁳⁻² TC2=93.85816 38167 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+* To calculate: `[D;TC1;TC2]` from 22°S, 116°E to 20°S, 31°E [2, §1208, examples 1 and 3]. Note: the final course printed in [2], 287.4°, comes from an arithmetic slip in the book; the formula given there yields 289.35°.
+```rpl
+φ1=-22_° λ1=116_° φ2=-20_° λ2=31_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=2 ° Δλ=-85 ° hav=0.39797 05023 5 θ=78.22558 092 ° D=4 693.53485 52 nmi x1=-0.28643 54215 54 TC1=252.98680 2724 ° x2=-0.32437 66098 13 TC2=289.35065 3611 ° ]
+'ROOT(ⒺGreat Circle;[Δφ;Δλ;hav;θ;D;x1;TC1;x2;TC2];[1_°;1_°;0;1_°;1_nmi;0;1_°;0;1_°])'
+```
+
+#### Great Circle Vertex
+
+The vertex is the point of highest latitude of a great circle. It tells how far
+toward the pole a great-circle route goes, which matters in high latitudes, in
+ice or in bad weather.
+
+* Main results: the latitude `φv` and longitude `λv` of the vertex, and the
+  distance `Dv` from the departure point to it, for a great circle leaving
+  `(φ1;λ1)` on the initial true course `TC1`.
+* Steps: `φv` follows from Clairaut's relation, `COS(φ)·SIN(TC)` being constant
+  along a great circle; `Δλv` is the longitude difference to the vertex.
+* The equations give the northern vertex; the southern one lies at `-φv`,
+  180° of longitude away.
+
+* To calculate: `[φv;λv;Dv]` (Vertex latitude and longitude; Distance to the vertex) from 28°N, 125°W, initial course 291° [2, §1210, example 1]:
+```rpl
+φ1=28_° λ1=-125_° TC1=291_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ φv=34.48215 17436 ° Δλv=-39.27119 44547 ° λv=-164.27119 4455 ° θv=33.97965 83431 ° Dv=2 038.77950 059 nmi ]
+'ROOT(ⒺGreat Circle Vertex;[φv;Δλv;λv;θv;Dv];[1_°;1_°;1_°;1_°;1_nmi])'
+```
+
+#### Great Circle Destination
+
+The *direct* problem: where does one arrive after a given distance along a
+great circle?
+
+* Main results: the latitude `φ2` and longitude `λ2` reached after a distance
+  `D` from `(φ1;λ1)`, on the initial true course `TC1`.
+* Steps: `θ` is the distance as an angle, and `Δλ` the change of longitude.
+
+* To calculate: `[φ2;λ2]` (Destination latitude and longitude) 100 nmi from LAX on the initial course from LAX to JFK, 1.150035 radians [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r D=100_nmi Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ θ=1.66666 66666 7 ° φ2=34.61697 31196 ° Δλ=1.84860 92394 8 ° λ2=-116.55139 0761 ° ]
+'ROOT(ⒺGreat Circle Destination;[θ;φ2;Δλ;λ2];[1_°;1_°;1_°;1_°])'
+```
+
+#### Cross Track Error
+
+How far is the present position from the planned route?
+
+![Cross-track distance](img/CrossTrackDistance.bmp)
+
+* Main results: the cross-track distance `XTD` between the present position
+  `(φP;λP)` and the great circle leaving `(φ1;λ1)` on the initial course
+  `TC1`, positive when right of the route; and the along-track distance `ATD`
+  already covered along the route. `TC1` can come from the `Great Circle`
+  equations.
+* Steps: the distance `θ1P` and course `TC1P` from the departure point to the
+  present position, computed as in `Great Circle`; then the angles `θXT` and
+  `θAT` across and along the route.
+
+* To calculate: `[XTD;ATD]` (Cross-track and along-track distances) on the route from LAX to JFK (initial course 1.150035 radians), from the present position 34°30′N, 116°30′W [1]:
+```rpl
+φ1='33_°+57_arcmin' λ1='-(118_°+24_arcmin)' TC1=1.150035_r φP=34.5_° λP=-116.5_° Rs='(10800_nmi)/Ⓒπ'
+@ Expecting [ Δφ=0.55 ° Δλ=1.9 ° hav=2.10961 90949 2⁳⁻⁴ θ1P=1.66444 68173 2 ° xP=9.85220 10852 5⁳⁻³ TC1P=70.17227 64696 ° θXT=0.12420 49673 24 ° θAT=1.65980 74133 7 ° XTD=7.45229 80394 5 nmi ATD=99.58844 48023 nmi ]
+'ROOT(ⒺCross Track Error;[Δφ;Δλ;hav;θ1P;xP;TC1P;θXT;θAT;XTD;ATD];[1_°;1_°;0;1_°;0;1_°;1_°;1_°;1_nmi;1_nmi])'
+```
+
+#### Wind Correction
+
+The wind triangle: what heading to fly, or to steer, to follow a given track?
+The aircraft moves through the air, and the air moves over the ground; the
+ground speed vector is the sum of the own speed vector and of the wind. The
+same triangle serves a ship in a current.
+
+![Wind triangle](img/WindTriangle.bmp)
+
+* Main results: the true heading `TH` and the ground speed `GS` needed to
+  follow the true course `TC` at the own speed `V`, with a wind of speed `WS`
+  coming from `WD`.
+* Steps: the wind correction angle `WCA` between heading and track.
+* For a current, give its drift as `WS`, and as `WD` the direction opposite to
+  its set: a current setting towards 170° acts as a wind from 350°.
+
+* To calculate: `[WCA;TH;GS]` (Wind correction angle; True heading; Ground speed) for a true course of 090° at 120 kt, with a wind from 045° at 40 kt. The book finds 14° left, 076° and 88 kt with the flight computer [3, figures 16-21 to 16-23]:
+```rpl
+TC=90_° V=120_knot WD=45_° WS=40_knot
+@ Expecting [ WCA=-13.63302 22254 ° TH=76.36697 77746 ° GS=88.33476 66494 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` for the flight from Chickasha to Guthrie, true course 031° at 115 kt, wind from 360° at 10 kt. The book gives 3° left, 028° and 106 kt [3, pages 16-19 and 16-20]:
+```rpl
+TC=31_° V=115_knot WD=360_° WS=10_knot
+@ Expecting [ WCA=-2.56690 27668 6 ° TH=28.43309 72331 ° GS=106.31293 6833 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+* To calculate: `[WCA;TH;GS]` (Course to steer; Speed made good) for a ship at 12 kt which must make good 095°, in a current setting towards 170° at 2.5 kt, that is a wind from 350°. The book gives 083.5° and 12.4 kt [4, example 2]:
+```rpl
+TC=95_° V=12_knot WD=350_° WS=2.5_knot
+@ Expecting [ WCA=-11.60916 12726 ° TH=83.39083 87274 ° GS=12.40156 4643 knot ]
+'ROOT(ⒺWind Correction;[WCA;TH;GS];[1_°;1_°;1_knot])'
+```
+
+#### Ground Track
+
+Where does a heading lead? The ground track and speed that result from a
+heading and a speed through a moving air or water.
+
+* Main results: the true course `TC` actually followed over the ground, and
+  the ground speed `GS`, when heading `TH` at the own speed `V` with a wind of
+  speed `WS` coming from `WD`.
+* Steps: the North and East components `gN` and `gE` of the ground speed, and
+  the wind correction angle `WCA`, here the drift to be expected.
+
+* To calculate: `[TC;GS]` (Course and speed made good) for a ship steering 080° at 10 kt in a current setting towards 140° at 2 kt, that is a wind from 320°. The book reads 089° and 11.2 kt on its plot [4, example 1]:
+```rpl
+TH=80_° V=10_knot WD=320_° WS=2_knot
+@ Expecting [ gN=0.20439 28904 31 knot gE=11.13365 27495 knot GS=11.13552 87257 knot TC=88.94827 55646 ° WCA=-8.94827 55646 3 ° ]
+'ROOT(ⒺGround Track;[gN;gE;GS;TC;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+#### Wind Finding
+
+What is the wind? A pilot who knows the heading and airspeed, and measures the
+track and ground speed (with a GPS, for instance), can deduce the wind. The
+same calculation gives the set and drift of a current, the direction of which
+is then `WD-180°`.
+
+* Main results: the direction `WD` the wind comes from, and its speed `WS`.
+* Steps: the North and East components `wN` and `wE` of the wind.
+
+* To calculate: `[WD;WS]` (Wind direction and speed) from the heading 076.37° and airspeed 120 kt, with a track of 090° and a ground speed of 88.33 kt; this is the first `Wind Correction` example in reverse, and gives back the wind from 045° at 40 kt:
+```rpl
+TH=76.37_° V=120_knot TC=90_° GS=88.33_knot
+@ Expecting [ wN=28.27811 98124 knot wE=28.29052 96673 knot WS=40.00007 66122 knot WD=45.01256 93702 ° ]
+'ROOT(ⒺWind Finding;[wN;wE;WS;WD];[1_knot;1_knot;1_knot;1_°])'
+```
+
+#### Required Heading & Speed
+
+What heading and own speed are needed to make good both a given track and a
+given ground speed, for instance to reach a waypoint at a set time?
+
+* Main results: the true heading `TH` and the own speed `V` that make good the
+  true course `TC` at the ground speed `GS`, with a wind of speed `WS` coming
+  from `WD`.
+* Steps: the North and East components `aN` and `aE` of the own speed vector,
+  and the wind correction angle `WCA`.
+
+* To calculate: `[TH;V]` (Course and speed to steer) for a ship which must make good 265° at 15 kt, in a current setting towards 185° at 3 kt, that is a wind from 005°. The book reads 276° and 14.8 kt on its plot [4, example 3]:
+```rpl
+TC=265_° GS=15_knot WD=5_° WS=3_knot
+@ Expecting [ aN=1.68124 79530 6 knot aE=-14.68145 32431 knot V=14.77740 38319 knot TH=276.53277 4288 ° WCA=11.53277 42876 ° ]
+'ROOT(ⒺRequired Heading & Speed;[aN;aE;V;TH;WCA];[1_knot;1_knot;1_knot;1_°;1_°])'
+```
+
+
+## Aeronautics
+
+The `Aeronautics` section gathers the calculations of aircraft operation. Its
+first part, [Flight Management](#flight management), holds the pilot's
+calculations from the flight manual and the weather: wind components on a
+runway, time, speed and distance, fuel, weight and balance, altitudes,
+airspeeds, climb and descent, and the decision points of a flight. Its second
+part, [Performance](#performance), gives the performance of the aircraft from
+its drag polar: lift and drag, stall, turns, glide, climb, range and
+endurance, takeoff and landing.
+
+**Units.** The examples use the units of the FAA handbooks (knot, nmi, gal,
+lb, ft, inHg); every equation also accepts SI units.
+
+**Temperatures.** `°C` and `°F` are units with an offset: `20_°C` is
+293.15 K. A temperature **difference**, such as the deviation `ΔISA` from
+the standard temperature, must therefore be entered in `K` (or in `°R` for
+Fahrenheit degrees): 36 °F above standard is `20_K`, while `36_°F` is
+275.37 K.
+
+**Standard atmosphere.** The altitude entries use the troposphere of the
+standard atmosphere, valid up to 36 089 ft. Wind directions are where the wind
+comes **from**, as in [Navigation](#navigation), and the same names are used
+for the same quantities: `WD`, `WS`, `GS`, `D`.
+
+The 84 variables in the Flight Management section are:
+
+* `WS`: Wind speed (dim.: speed)
+* `WD`: Direction the wind comes **from**
+* `RWY`: Runway heading: runway 17 is 170°. Tower and ATIS winds are magnetic,
+  like runway headings; METAR and TAF winds are true
+* `HW`: Headwind component; negative for a tailwind (dim.: speed)
+* `XW`: Crosswind component; positive for a wind from the right (dim.: speed)
+* `D`: Distance (dim.: length)
+* `GS`: Ground speed (dim.: speed)
+* `ETE`: Estimated time en route (dim.: time)
+* `FFR`: Fuel flow (dim.: volume/time)
+* `Trip`: Fuel for the trip (dim.: volume)
+* `TRes`: Reserve time: under VFR in the United States, 30 min by day and
+  45 min by night [3] (dim.: time)
+* `Rsv`: Reserve fuel (dim.: volume)
+* `Taxi`: Fuel for start-up and taxi (dim.: volume)
+* `FReq`: Fuel required for the flight (dim.: volume)
+* `FOB`: Fuel on board (dim.: volume)
+* `Extra`: Fuel on board beyond what is required (dim.: volume)
+* `Endur`: Endurance, the flight time with the fuel on board (dim.: time)
+* `SpR`: Specific range, the distance flown per unit of fuel
+  (dim.: length/volume)
+* `Rng`: Range with the fuel on board (dim.: length)
+* `ρfuel`: Fuel density: 6 lb/gal for AVGAS, 6.8 lb/gal for Jet A and Jet A-1,
+  6.5 lb/gal for Jet B [1, chapter 10] (dim.: mass/volume)
+* `Wfuel`: Weight of the fuel on board (dim.: mass)
+* `Wt`: Weight of the aircraft (dim.: mass)
+* `CG`: Center of gravity, as an arm from the datum, positive aft (dim.: length)
+* `Wsh`: Weight shifted (dim.: mass)
+* `Dsh`: Distance it is shifted, negative forward (dim.: length)
+* `ΔCG`: Change of the center of gravity (dim.: length)
+* `CGn`: New center of gravity (dim.: length)
+* `Wch`: Weight added, negative when removed (dim.: mass)
+* `Arm`: Arm of the weight added or removed (dim.: length)
+* `Wn`: New weight of the aircraft (dim.: mass)
+* `MAC`: Mean aerodynamic chord (dim.: length)
+* `LEMAC`: Arm of the leading edge of the mean aerodynamic chord (dim.: length)
+* `PMAC`: Center of gravity in percent of the mean aerodynamic chord
+* `QNH`: Altimeter setting (dim.: pressure)
+* `Hind`: Indicated altitude, read on the altimeter set to `QNH`; on the ground, the elevation of the field (dim.: length)
+* `ΔHp`: Correction from the indicated altitude to the pressure altitude (dim.: length)
+* `Hp`: Pressure altitude, the altitude in the standard atmosphere where the pressure is the same (dim.: length)
+* `OAT`: Outside air temperature (dim.: temperature)
+* `Tstd`: Standard temperature at the pressure altitude (dim.: temperature)
+* `ΔISA`: Deviation from the standard temperature, a temperature difference: enter it in K, never in °C or °F (dim.: temperature)
+* `θr`: Temperature ratio `Tstd/OAT`
+* `Hd`: Density altitude, the altitude in the standard atmosphere where the air density is the same (dim.: length)
+* `RH`: Relative humidity, as a fraction: 0.8 for 80 %
+* `Tc`: Outside air temperature in °C, as a plain number
+* `fe`, `fHp`: Vapor pressure and altitude factors of the humidity correction
+* `ΔHd`: Increase of the density altitude due to humidity (dim.: length)
+* `Hstn`: Elevation of the altimeter setting station (dim.: length)
+* `ΔTA`: Correction from the indicated to the true altitude, negative in cold air (dim.: length)
+* `TA`: True altitude, above mean sea level (dim.: length)
+* `Tdp`: Dew point (dim.: temperature)
+* `Tdc`: Dew point in °C, as a plain number
+* `Hcb`: Height of the base of cumulus clouds above the ground (dim.: length)
+* `CAS`: Calibrated airspeed (dim.: speed)
+* `TAS`: True airspeed (dim.: speed)
+* `DRat`: Density ratio, the air density over its sea level standard value
+* `qc`: Impact pressure, total minus static pressure (dim.: pressure)
+* `Ps`: Static pressure (dim.: pressure)
+* `Mach`: Mach number
+* `IAT`: Indicated air temperature, read in flight (dim.: temperature)
+* `Kr`: Recovery factor of the temperature probe, 0.7 to 1
+* `Ti`: Indicated air temperature in K, as a plain number
+* `FPA`: Flight path angle, positive in climb, negative in descent
+* `Grd`: Gradient, the tangent of the flight path angle
+* `GPct`: Gradient in percent
+* `Gft`: Gradient in feet per nautical mile
+* `VS`: Vertical speed, with the sign of `FPA` (dim.: speed)
+* `Hcr`: Cruise altitude (dim.: length)
+* `Htgt`: Target altitude, at the end of the descent (dim.: length)
+* `ΔH`: Height to lose (dim.: length)
+* `DTOD`: Distance of the top of descent from the target (dim.: length)
+* `TTOD`: Time from the top of descent to the target (dim.: time)
+* `GSO`: Ground speed going on to the destination (dim.: speed)
+* `GSH`: Ground speed returning home (dim.: speed)
+* `DETP`, `TETP`: Distance and time from departure to the equal time point (dim.: length; time)
+* `TPNR`, `DPNR`: Time and distance from departure to the point of no return (dim.: time; length)
+* `Tbc`: Time for the bearing of a station to change by `ΔBrg` (dim.: time)
+* `ΔBrg`: Change of the bearing of the station
+* `TSta`, `DSta`: Time and distance to the station (dim.: time; length)
+* `Ptire`: Tire pressure of the main wheels (dim.: pressure)
+* `Vhp`: Speed above which dynamic hydroplaning can start (dim.: speed)
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 10, *Weight and Balance*, 11, *Aircraft Performance*, and 16,
+  *Navigation* ;
+  [2] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [3] 14 CFR 91.151, *Fuel requirements for flight in VFR conditions* ;
+  [4] FAA, *Aircraft Weight and Balance Handbook*, FAA-H-8083-1B ;
+  [5] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 8, *Flight Instruments*, and 12, *Weather Theory* ;
+  [6] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, *Determination of Altitude* and
+  *Airspeed* ;
+  [7] FAA, *Terminal Procedures Publication*, legend, tables *Rate of Climb*
+  and *Rate of Descent* ;
+  [8] E. Davenport, *Equal Time Points*, code7700.com.
+
+### Flight Management
+
+The pilot's calculations from the flight manual and the weather, in
+seven submenus:
+[Runway](#runway),
+[Time & Distance](#time & distance),
+[Fuel & Endurance](#fuel & endurance),
+[Weight & Balance](#weight & balance),
+[Altitudes](#altitudes),
+[Airspeeds](#airspeeds) and
+[Climb & Descent](#climb & descent).
+
+#### Runway
+
+The wind on the runway, and the risk of hydroplaning on a wet one.
+
+Entries: [Headwind & Crosswind](#headwind & crosswind) and [Hydroplaning Speed](#hydroplaning speed).
+
+#### Headwind & Crosswind
+
+The components of the wind along and across a runway, which decide whether a
+takeoff or a landing stays within the crosswind the aircraft can handle.
+
+![Runway wind](img/RunwayWind.bmp)
+
+* Main results: the headwind `HW`, negative for a tailwind, and the crosswind
+  `XW`, positive for a wind from the right, for a wind of speed `WS` coming
+  from `WD` on a runway of heading `RWY`.
+* Solved the other way, the entry gives the strongest wind acceptable from a
+  given direction for a given crosswind limit.
+
+* To calculate: `[HW;XW]` (Headwind; Crosswind) for a wind from 060° at 20 kt on runway 03 [2]:
+```rpl
+WS=20_knot WD=60_° RWY=30_°
+@ Expecting [ HW=17.32050 80757 knot XW=10. knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[HW;XW]` for a wind from 140° at 25 kt on runway 17. The book reads 22 kt and 13 kt on its crosswind chart; the crosswind comes from the left [1, chapter 11, sample problem 10]:
+```rpl
+WS=25_knot WD=140_° RWY=170_°
+@ Expecting [ HW=21.65063 50946 knot XW=-12.5 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[HW;XW];[1_knot;1_knot])'
+```
+
+* To calculate: `[WS;HW]` (Strongest wind; its headwind) for a demonstrated crosswind of 15 kt, with the wind 30° off the runway:
+```rpl
+XW=15_knot WD=30_° RWY=0_°
+@ Expecting [ WS=30. knot HW=25.98076 21135 knot ]
+'ROOT(ⒺHeadwind & Crosswind;[WS;HW];[10_knot;1_knot])'
+```
+
+#### Hydroplaning Speed
+
+On a wet runway, above a speed that depends on the tire pressure, the tires
+can ride on a film of water and lose all braking.
+
+* Main result: the speed `Vhp` above which dynamic hydroplaning can start, for
+  the tire pressure `Ptire` of the main wheels.
+
+* To calculate: `Vhp` (Hydroplaning speed) for tires inflated to 36 psi. The book gives 54 kt [1, chapter 11]:
+```rpl
+Ptire=36_psi
+@ Expecting Vhp=54. knot
+'ROOT(ⒺHydroplaning Speed;Vhp;1_knot)'
+```
+
+#### Time & Distance
+
+Time, speed and distance, and the time to a radio station.
+
+Entries: [Time Speed & Distance](#time speed & distance) and [Time & Distance to Station](#time & distance to station).
+
+#### Time Speed & Distance
+
+The distance `D` flown at the ground speed `GS` during the time en route
+`ETE`. Solve it for whichever of the three is unknown.
+
+* To calculate: `ETE` (Time en route) for 210 nmi at a ground speed of 140 kt [1, chapter 16]:
+```rpl
+D=210_nmi GS=140_knot
+@ Expecting ETE=1.5 h
+'ROOT(ⒺTime Speed & Distance;ETE;1_h)'
+```
+
+#### Time & Distance to Station
+
+Flying across a radial, the time for the bearing of a station to change gives
+the time to fly to it: the "1 in 60" rule.
+
+* Main results: the time `TSta` and distance `DSta` to the station, when its
+  bearing changes by `ΔBrg` in the time `Tbc`, at the ground speed `GS`.
+
+* To calculate: `[TSta;DSta]` (Time; Distance to the station) when the bearing changes by 10° in 2 min, at 120 kt. The book gives 12 min [1, chapter 16]:
+```rpl
+Tbc=120_s ΔBrg=10_° GS=120_knot
+@ Expecting [ TSta=12. min DSta=24. nmi ]
+'ROOT(ⒺTime & Distance to Station;[TSta;DSta];[1_min;1_nmi])'
+```
+
+#### Fuel & Endurance
+
+The fuel for a flight, how long and how far it lasts, and the points
+that decide whether to go on or turn back.
+
+Entries: [Fuel Required](#fuel required), [Endurance & Range](#endurance & range), [Equal Time Point](#equal time point) and [Point of No Return](#point of no return).
+
+#### Fuel Required
+
+The fuel needed for a flight: the trip at the fuel flow `FFR` during `ETE`,
+a reserve for the time `TRes`, and the fuel for start-up and taxi.
+
+* Main results: the trip fuel `Trip`, the reserve `Rsv`, the fuel required
+  `FReq`, and `Extra`, the fuel on board `FOB` beyond what is required.
+
+* To calculate: `Trip` (Trip fuel) for 400 nmi at 100 kt, that is 4 h, at 5 gal/h [1, chapter 16]:
+```rpl
+FFR=5_gal/h ETE=4_h
+@ Expecting Trip=20 gal
+'ROOT(ⒺFuel Required;Trip;1_gal)'
+```
+
+* To calculate: `[Trip;Rsv;FReq;Extra]` (Trip fuel; Reserve; Fuel required; Extra fuel) for a 30 min flight at 8 gal/h, with the 30 min VFR day reserve, 1 gal for taxi and 38 gal on board [1, chapter 16; 3]:
+```rpl
+FFR=8_gal/h ETE=0.5_h TRes=0.5_h Taxi=1_gal FOB=38_gal
+@ Expecting [ Trip=4. gal Rsv=4. gal FReq=9. gal Extra=29. gal ]
+'ROOT(ⒺFuel Required;[Trip;Rsv;FReq;Extra];[1_gal;1_gal;1_gal;1_gal])'
+```
+
+#### Endurance & Range
+
+How long, and how far, the fuel on board lasts.
+
+* Main results: the endurance `Endur` at the fuel flow `FFR`, the specific
+  range `SpR` at the ground speed `GS`, the range `Rng`, and the weight
+  `Wfuel` of the fuel on board for a fuel density `ρfuel`.
+
+* To calculate: `[Endur;SpR;Rng;Wfuel]` (Endurance; Specific range; Range; Fuel weight) with 38 gal of AVGAS at 6.9 gal/h and 116 mph. The book's table gives 5.5 h and 635 mi; the exact values are 5.51 h and 555.1 nmi, that is 638.8 mi [1, chapter 11, sample problem 6]:
+```rpl
+FOB=38_gal FFR=6.9_gal/h GS=116_mph ρfuel=6_lb/gal
+@ Expecting [ Endur=5.50724 63768 1 h SpR=14.60887 59508 nmi/gal Rng=555.13728 613 nmi Wfuel=228 lb ]
+'ROOT(ⒺEndurance & Range;[Endur;SpR;Rng;Wfuel];[1_h;1_nmi/gal;1_nmi;1_lb])'
+```
+
+#### Equal Time Point
+
+The equal time point is the point of a route from which it takes as long to
+go on to the destination as to return: the point that decides whether to
+continue or turn back after an engine failure or a medical emergency.
+
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
+
+* Main results: the distance `DETP` and time `TETP` from departure to the
+  equal time point, on a route of length `D`, with the ground speeds `GSO`
+  going on and `GSH` returning.
+
+* To calculate: `[DETP;TETP]` (Distance; Time to the equal time point) for a crossing of 1 722 nmi, at 502 kt going on and 384 kt returning. The source gives 746 nmi [8]:
+```rpl
+D=1722_nmi GSO=502_knot GSH=384_knot
+@ Expecting [ DETP=746.32957 1106 nmi TETP=1.48671 22930 4 h ]
+'ROOT(ⒺEqual Time Point;[DETP;TETP];[1_nmi;1_h])'
+```
+
+#### Point of No Return
+
+The point of no return is the farthest point from which the aircraft can
+still return to its departure with the fuel on board.
+
+![Equal time point and point of no return](img/EqualTimePoint.bmp)
+
+* Main results: the time `TPNR` and distance `DPNR` from departure to the
+  point of no return, for an endurance `Endur`, the usable fuel without the
+  reserve, and the ground speeds `GSO` going out and `GSH` returning.
+
+* To calculate: `[TPNR;DPNR]` (Time; Distance to the point of no return) with 5 h of usable fuel, at 120 kt going out and 180 kt returning. Check: 3 h out, then 360 nmi back at 180 kt in 2 h:
+```rpl
+Endur=5_h GSO=120_knot GSH=180_knot
+@ Expecting [ TPNR=3 h DPNR=360. nmi ]
+'ROOT(ⒺPoint of No Return;[TPNR;DPNR];[1_h;1_nmi])'
+```
+
+#### Weight & Balance
+
+The center of gravity when weights move, are added or removed, and its
+position on the mean aerodynamic chord.
+
+Entries: [Weight Shift](#weight shift), [Weight Change](#weight change) and [CG in % MAC](#cg in % mac).
+
+#### Weight Shift
+
+Moving a weight inside the aircraft moves its center of gravity, the weight
+of the aircraft staying the same. Arms are measured from the datum, positive
+aft.
+
+* Main results: the change `ΔCG` and the new center of gravity `CGn` when a
+  weight `Wsh` moves by `Dsh`, negative forward, in an aircraft of weight `Wt`
+  whose center of gravity is at `CG`.
+* Solved for `Wsh`, the entry gives the weight to move to bring the center of
+  gravity back within a limit.
+
+* To calculate: `[ΔCG;CGn]` (Change of CG; New CG) when 100 lb move from station 30 to station 150, in an aircraft of 8 000 lb with its CG at 77 in [1, chapter 10]:
+```rpl
+Wsh=100_lb Dsh=120_in Wt=8000_lb CG=77_in
+@ Expecting [ ΔCG=1.5 in CGn=78.5 in ]
+'ROOT(ⒺWeight Shift;[ΔCG;CGn];[1_in;1_in])'
+```
+
+* To calculate: `[ΔCG;Wsh]` (Change of CG; Weight to move) to bring the CG of a 7 800 lb aircraft from 81.5 in back to its aft limit of 80.5 in, by moving cargo 120 in forward [1, chapter 10]:
+```rpl
+Dsh=-120_in Wt=7800_lb CG=81.5_in CGn=80.5_in
+@ Expecting [ ΔCG=-1. in Wsh=65. lb ]
+'ROOT(ⒺWeight Shift;[ΔCG;Wsh];[1_in;1_lb])'
+```
+
+#### Weight Change
+
+Adding or removing a weight changes both the weight of the aircraft and its
+center of gravity.
+
+* Main results: the new weight `Wn` and the new center of gravity `CGn` when
+  a weight `Wch`, negative when removed, is added at the arm `Arm` to an
+  aircraft of weight `Wt` whose center of gravity is at `CG`.
+
+* To calculate: `[Wn;CGn]` (New weight; New CG) when 140 lb are added at station 150 to an aircraft of 6 860 lb with its CG at 80 in [1, chapter 10]:
+```rpl
+Wt=6860_lb CG=80_in Wch=140_lb Arm=150_in
+@ Expecting [ Wn=7 000 lb CGn=81.4 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+* To calculate: `[Wn;CGn]` when 100 lb are removed from station 150 in an aircraft of 6 100 lb with its CG at 80 in. The book rounds the change of CG to 1.2 in, and finds 78.8 in [1, chapter 10]:
+```rpl
+Wt=6100_lb CG=80_in Wch=-100_lb Arm=150_in
+@ Expecting [ Wn=6 000 lb CGn=78.83333 33333 in ]
+'ROOT(ⒺWeight Change;[Wn;CGn];[1_lb;1_in])'
+```
+
+#### CG in % MAC
+
+Large aircraft give the position of their center of gravity as a percentage
+of the mean aerodynamic chord `MAC`, counted from its leading edge `LEMAC`.
+
+![Mean aerodynamic chord](img/MeanAerodynamicChord.bmp)
+
+* Main result: `PMAC`, the center of gravity `CG` in percent of `MAC`.
+
+* To calculate: `PMAC` (CG in % MAC) for a CG at 161 in, with the leading edge of the MAC at 144 in and a MAC of 62 in. The book gives 27.4 % [4, chapter 3]:
+```rpl
+CG=161_in LEMAC=144_in MAC=62_in
+@ Expecting PMAC=27.41935 48387
+'ROOT(ⒺCG in % MAC;PMAC;1)'
+```
+
+* To calculate: `CG` for a CG at 27.4 % of the same MAC. The book writes 160.9 in, cutting off the digits instead of rounding them [4, chapter 3]:
+```rpl
+PMAC=27.4 LEMAC=144_in MAC=62_in
+@ Expecting CG=160.988 in
+'ROOT(ⒺCG in % MAC;CG;150_in)'
+```
+
+#### Altitudes
+
+Pressure and density altitude, the standard temperature, the cold
+temperature correction, and the base of cumulus clouds.
+
+Entries: [Pressure Altitude](#pressure altitude), [ISA Deviation](#isa deviation), [Density Altitude](#density altitude), [Humidity Correction](#humidity correction), [True Altitude](#true altitude) and [Cloud Base](#cloud base).
+
+#### Pressure Altitude
+
+The pressure altitude `Hp` is what the altimeter reads when set to the
+standard pressure, 29.92 inHg or 1 013.25 hPa. It is the starting point of
+the performance charts, and the flight level above the transition altitude.
+
+* Main results: the correction `ΔHp` and the pressure altitude `Hp` for an
+  indicated altitude `Hind` read with the altimeter set to `QNH`. On the
+  ground, `Hind` is the elevation of the field.
+* The rule of thumb, 1 000 ft per inHg or about 27 ft per hPa, is close to
+  this exact formula near sea level.
+
+* To calculate: `[ΔHp;Hp]` (Correction; Pressure altitude) for a field at 5 883 ft with an altimeter setting of 30.10 inHg. The book finds 5 718 ft [1, chapter 11, sample problem 1]:
+```rpl
+Hind=5883_ft QNH=30.10_inHg
+@ Expecting [ ΔHp=-164.90698 7072 ft Hp=5 718.09301 293 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+* To calculate: `[ΔHp;Hp]` at sea level with an altimeter setting of 28.0 inHg. The table of the book gives +1 824 ft [1, chapter 11, figure 11-3]:
+```rpl
+Hind=0_ft QNH=28.0_inHg
+@ Expecting [ ΔHp=1 824.91706 57 ft Hp=1 824.91706 57 ft ]
+'ROOT(ⒺPressure Altitude;[ΔHp;Hp];[1_ft;1_ft])'
+```
+
+#### ISA Deviation
+
+The standard temperature `Tstd` at a pressure altitude, and the deviation
+`ΔISA` of the outside air temperature `OAT` from it. Performance charts are
+often entered with `ΔISA`.
+
+* `ΔISA` is a temperature difference: enter it in `K`, never in `°C` or
+  `°F`.
+
+* To calculate: `[Tstd;OAT]` (Standard temperature; Outside air temperature) at 6 000 ft, 36 °F above standard, that is 20 K. The result, 296.26 K, is 23.11 °C [1, chapter 11, sample problem 7]:
+```rpl
+Hp=6000_ft ΔISA=20_K
+@ Expecting [ Tstd=276.2628 K OAT=296.2628 K ]
+'ROOT(ⒺISA Deviation;[Tstd;OAT];[1_K;1_K])'
+```
+
+* To calculate: `[Tstd;ΔISA]` (Standard temperature; Deviation) at sea level with 22 °C [1, chapter 11, sample problem 5]:
+```rpl
+Hp=0_ft OAT=22_°C
+@ Expecting [ Tstd=288.15 K ΔISA=7. K ]
+'ROOT(ⒺISA Deviation;[Tstd;ΔISA];[1_K;1_K])'
+```
+
+#### Density Altitude
+
+The density altitude `Hd` is the altitude in the standard atmosphere where
+the air has the same density. It governs engine power, lift and propeller
+thrust: on a hot day at a high field, the aircraft performs as if it were
+much higher.
+
+* Main results: the density altitude `Hd` for a pressure altitude `Hp` and an
+  outside air temperature `OAT`, with the standard temperature `Tstd` and the
+  temperature ratio `θr` as steps. The formula is exact in the troposphere.
+* The rule of thumb, `Hd ≈ Hp + 118.6 ft/K·ΔISA` (the FAA rounds it to
+  120 ft per °C), is close to it for moderate deviations.
+
+* To calculate: `[Tstd;θr;Hd]` (Standard temperature; Temperature ratio; Density altitude) at a pressure altitude of 8 000 ft and 18 °C. The source gives 10 145 ft, and 10 236 ft by the rule of thumb [2]:
+```rpl
+Hp=8000_ft OAT=18_°C
+@ Expecting [ Tstd=272.3004 K θr=0.93525 81143 74 Hd=10 144.65994 68 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+* To calculate: `[Tstd;θr;Hd]` at a pressure altitude of 6 300 m and 32 °C. The result, 26 693.5 ft, is 8 136 m, as in the source [6]:
+```rpl
+Hp=6300_m OAT=32_°C
+@ Expecting [ Tstd=247.2 K θr=0.81009 33966 9 Hd=26 693.49310 57 ft ]
+'ROOT(ⒺDensity Altitude;[Tstd;θr;Hd];[1_K;1;1_ft])'
+```
+
+#### Humidity Correction
+
+Humid air is lighter than dry air: it raises the density altitude. This
+empirical correction by Ed Williams gives the increase `ΔHd` to add to the
+density altitude computed for dry air.
+
+* Main result: `ΔHd` for a relative humidity `RH`, given as a fraction (0.8
+  for 80 %), an outside air temperature `OAT` and a pressure altitude `Hp`.
+* Steps: `Tc`, the temperature in °C as a plain number, and the factors `fe`
+  and `fHp` of the formula.
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` (Temperature; Factors; Humidity correction) at sea level, 30 °C and 100 % humidity. The source gives 565 ft [2]:
+```rpl
+Hp=0_ft OAT=30_°C RH=1
+@ Expecting [ Tc=30. fe=6.98538 58062 5 fHp=1. ΔHd=565.12469 7111 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+* To calculate: `[Tc;fe;fHp;ΔHd]` at 5 000 ft, 40 °C and 80 % humidity. The source gives 977 ft [2]:
+```rpl
+Hp=5000_ft OAT=40_°C RH=0.8
+@ Expecting [ Tc=40. fe=12.16052 37341 fHp=1.20217 14995 ΔHd=977.38190 267 ft ]
+'ROOT(ⒺHumidity Correction;[Tc;fe;fHp;ΔHd];[1;1;1;1_ft])'
+```
+
+#### True Altitude
+
+In cold air, the atmosphere is compressed, and the aircraft is lower than its
+altimeter shows: a hazard over terrain, which approach procedures correct.
+This is the form given by Ed Williams.
+
+* Main results: the correction `ΔTA`, negative in cold air, and the true
+  altitude `TA` for an indicated altitude `Hind`, with the altimeter set at a
+  station of elevation `Hstn`, a deviation `ΔISA` from the standard
+  temperature and an outside air temperature `OAT`, both at the aircraft.
+
+* To calculate: `[ΔTA;TA]` (Correction; True altitude) 1 000 ft above a sea level station where it is −10 °C, that is −11.98 °C and 25 K below standard at the aircraft. The ICAO cold temperature table, rounded up to tens, gives 100 ft [2; 5, chapter 8]:
+```rpl
+Hind=1000_ft Hstn=0_ft ΔISA=-25_K OAT=-11.98_°C
+@ Expecting [ ΔTA=-95.72309 22388 ft TA=904.27690 7761 ft ]
+'ROOT(ⒺTrue Altitude;[ΔTA;TA];[1_ft;1_ft])'
+```
+
+#### Cloud Base
+
+The base of cumulus clouds, where rising air cools down to its dew point:
+the temperature and the dew point converge by about 4.4 °F per 1 000 ft.
+
+* Main result: the height `Hcb` of the cloud base above the ground, for an
+  outside air temperature `OAT` and a dew point `Tdp` measured at the ground.
+* Steps: `Tc` and `Tdc`, both temperatures in °C as plain numbers.
+
+* To calculate: `[Tc;Tdc;Hcb]` (Temperature; Dew point; Cloud base) for 85 °F and a dew point of 71 °F. The book gives 3 180 ft, cutting off the digits of 14/4.4 [5, chapter 12]:
+```rpl
+OAT=85_°F Tdp=71_°F
+@ Expecting [ Tc=29.44444 44444 Tdc=21.66666 66667 Hcb=3 181.81811 111 ft ]
+'ROOT(ⒺCloud Base;[Tc;Tdc;Hcb];[1;1;1_ft])'
+```
+
+#### Airspeeds
+
+From the calibrated airspeed to the true airspeed, at low speed and with
+the compressibility of the air.
+
+Entries: [True Airspeed](#true airspeed) and [Mach & True Airspeed](#mach & true airspeed).
+
+#### True Airspeed
+
+The true airspeed `TAS` from the calibrated airspeed `CAS`, at low speed
+(Mach below 0.3, where the calibrated and equivalent airspeeds are the same).
+The airspeed indicator measures the dynamic pressure, which depends on the
+air density: the thinner the air, the faster the aircraft for the same
+reading.
+
+* Main result: `TAS` for a pressure altitude `Hp` and an outside air
+  temperature `OAT`, with the density ratio `DRat` as a step.
+* The rule of thumb adds 2 % per 1 000 ft. The correction from indicated to
+  calibrated airspeed comes from the table of the flight manual.
+
+* To calculate: `[DRat;TAS]` (Density ratio; True airspeed) at 4 200 ft and 68.4 °F, for a calibrated airspeed of 134.9 kt. The source rounds the density ratio to 0.841, and finds 147.1 kt [6]:
+```rpl
+Hp=4200_ft OAT=68.4_°F CAS=134.9_knot
+@ Expecting [ DRat=0.84200 27064 51 TAS=147.01281 9202 knot ]
+'ROOT(ⒺTrue Airspeed;[DRat;TAS];[1;1_knot])'
+```
+
+#### Mach & True Airspeed
+
+The Mach number and the true airspeed from the calibrated airspeed, with the
+compressibility of the air, as an air data computer does. Above about 200 kt
+the low speed formula of True Airspeed is no longer accurate.
+
+* Main results: the Mach number `Mach`, the outside air temperature `OAT` and
+  the true airspeed `TAS`, for a calibrated airspeed `CAS`, a pressure
+  altitude `Hp` and the indicated air temperature `IAT` read by a probe of
+  recovery factor `Kr`.
+* Steps: the impact pressure `qc`, the static pressure `Ps`, and `Ti`, the
+  indicated temperature in K as a plain number.
+* The `Mach Number` equation of the Waves section computes the same Mach
+  number from the speed of sound.
+
+* To calculate: `[qc;Ps;Mach;Ti;OAT;TAS]` (Impact pressure; Static pressure; Mach; Temperatures; True airspeed) at 250 kt, 10 000 ft, with an indicated temperature of 2 °C and a recovery factor of 0.8. The source gives Mach 0.4523, −6.72 °C and 287.7 kt [2]:
+```rpl
+CAS=250_knot Hp=10000_ft IAT=2_°C Kr=0.8
+@ Expecting [ qc=104.98222 864 hPa Ps=696.81641 3877 hPa Mach=0.45227 51142 87 Ti=275.15 OAT=266.43015 5408 K TAS=287.67416 9311 knot ]
+'ROOT(ⒺMach & True Airspeed;[qc;Ps;Mach;Ti;OAT;TAS];[1_hPa;1_hPa;0.5;1;1_K;1_knot])'
+```
+
+#### Climb & Descent
+
+The gradient of a climb or a descent, the vertical speed, and where to
+start a descent.
+
+Entries: [Climb & Descent Gradient](#climb & descent gradient) and [Top of Descent](#top of descent).
+
+#### Climb & Descent Gradient
+
+The gradient of a flight path, in its three usual forms, and the vertical
+speed that follows it at a given ground speed.
+
+* Main results: the gradient `Grd`, in percent `GPct` and in feet per
+  nautical mile `Gft`, and the vertical speed `VS`, for a flight path angle
+  `FPA` at a ground speed `GS`.
+* `FPA` and `VS` are positive in climb and negative in descent: one entry
+  serves both.
+* The rules of thumb: a 3° glide path is about 318 ft per nautical mile, and
+  its vertical speed about 5 times the ground speed.
+
+* To calculate: `[Grd;GPct;Gft;VS]` (Gradient; Percent; ft/nmi; Vertical speed) for a 3° climb at 120 kt. The FAA table gives 318 ft/nmi and 637 ft/min [7]:
+```rpl
+FPA=3_° GS=120_knot
+@ Expecting [ Grd=0.05240 77792 83 GPct=5.24077 79283 Gft=318.43571 9498 VS=636.87143 8531 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;FPA;GPct;VS]` for a departure procedure requiring 200 ft/nmi, at 120 kt. The FAA table gives 3.29 % and 400 ft/min [7]:
+```rpl
+Gft=200 GS=120_knot
+@ Expecting [ Grd=0.03291 57667 15 FPA=1.88525 38508 1 ° GPct=3.29157 66714 6 VS=399.99999 9708 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;FPA;GPct;VS];[0.1;1_°;1;1_ft/min])'
+```
+
+* To calculate: `[Grd;GPct;Gft;VS]` for a 3° descent at 90 kt. The FAA table gives 478 ft/min [7]:
+```rpl
+FPA=-3_° GS=90_knot
+@ Expecting [ Grd=-0.05240 77792 83 GPct=-5.24077 79283 Gft=-318.43571 9498 VS=-477.65357 8899 ft/min ]
+'ROOT(ⒺClimb & Descent Gradient;[Grd;GPct;Gft;VS];[0.1;1;1;1_ft/min])'
+```
+
+#### Top of Descent
+
+Where to start the descent, to reach a target altitude along a given flight
+path angle, or at a given vertical speed.
+
+![Top of descent](img/TopOfDescent.bmp)
+
+* Main results: the distance `DTOD` of the top of descent before the target,
+  the vertical speed `VS` and the time `TTOD`, for a descent from `Hcr` to
+  `Htgt` at a ground speed `GS` along the flight path angle `FPA`, negative
+  in descent. Give `VS` instead of `FPA` to descend at a set vertical speed.
+* The rule of thumb, 3 nmi per 1 000 ft, corresponds to a 3° path.
+
+* To calculate: `[Grd;ΔH;DTOD;VS;TTOD]` (Gradient; Height to lose; Distance; Vertical speed; Time) for a descent from 9 500 to 2 000 ft on a 3° path at 120 kt. The rule of thumb gives 22.5 nmi:
+```rpl
+Hcr=9500_ft Htgt=2000_ft FPA=-3_° GS=120_knot
+@ Expecting [ Grd=-0.05240 77792 83 ΔH=7 500 ft DTOD=23.55263 41621 nmi VS=-636.87143 8531 ft/min TTOD=11.77631 7081 min ]
+'ROOT(ⒺTop of Descent;[Grd;ΔH;DTOD;VS;TTOD];[0.1;1_ft;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[Grd;FPA;ΔH;DTOD;TTOD]` for the same descent at 500 ft/min and 150 kt:
+```rpl
+Hcr=9500_ft Htgt=2000_ft VS=-500_ft/min GS=150_knot
+@ Expecting [ Grd=-0.03291 57667 39 FPA=-1.88525 38521 8 ° ΔH=7 500 ft DTOD=37.5 nmi TTOD=15. min ]
+'ROOT(ⒺTop of Descent;[Grd;FPA;ΔH;DTOD;TTOD];[0.1;1_°;1_ft;1_nmi;1_min])'
+```
+
+### Performance
+
+The aircraft as it is, from its drag polar: lift and drag, stall and load
+factor, turns, glide, climb, range and endurance, takeoff and landing, in
+seven submenus:
+[Lift & Drag](#lift & drag),
+[Stall & Load Factor](#stall & load factor),
+[Turns](#turns),
+[Glide](#glide),
+[Climb & Power](#climb & power),
+[Range & Endurance](#range & endurance) and
+[Takeoff & Landing](#takeoff & landing).
+
+**Mass and weight.** As in [Flight Management](#flight management), `Wt` is
+the **mass** of the aircraft, in lb or kg; its weight is the force
+`(Wt_lb)·Ⓒg`. Lift, drag and thrust are forces, in lbf or N.
+
+**Air density.** The entries that need the air density `ρa` compute it from
+the density ratio `DRat` of [True Airspeed](#true airspeed): `ρa` is
+1.225 kg/m³ times `DRat`. Give `DRat=1` for the sea level standard air, the
+density at which the flight manual gives its stall speeds; they are then
+calibrated airspeeds. Or give `ρa` directly: the `ρ♁StdAtm` function of the
+library gives it in the standard atmosphere, for a geometric altitude.
+
+**Coefficients.** The lift and drag coefficients `CL` and `CD` are plain
+numbers. The drag polar is parabolic: `CD` is `CD0+Kind·CL²`, the drag at
+zero lift plus the drag induced by the lift.
+
+**Sources.** The FAA handbook often rounds its figures, and a few of them are
+wrong; the examples give the book value next to the computed one.
+
+The 78 variables in the Performance section are:
+
+* `ρa`: Air density (dim.: mass/volume)
+* `qd`: Dynamic pressure, `ρa·TAS²/2` (dim.: pressure)
+* `Lift`: Lift (dim.: force)
+* `nLF`: Load factor, lift over weight: 1 in level flight
+* `Sw`: Wing area (dim.: area)
+* `CL`: Lift coefficient
+* `bw`: Wingspan (dim.: length)
+* `AR`: Aspect ratio of the wing, span squared over area
+* `eO`: Oswald efficiency factor, 0.7 to 0.85 for most airplanes
+* `Kind`: Induced drag factor of the drag polar
+* `CD0`: Drag coefficient at zero lift
+* `CD`: Drag coefficient
+* `LD`: Lift to drag ratio, also called the glide ratio or finesse
+* `Drag`: Drag (dim.: force)
+* `LDmax`: Maximum lift to drag ratio
+* `CLmd`: Lift coefficient of minimum drag, at `LDmax`
+* `Vmd`: Speed of minimum drag (dim.: speed)
+* `Vmp`: Speed of minimum power (dim.: speed)
+* `Vbrj`: Speed of best range of a jet at constant altitude (dim.: speed)
+* `CLmax`: Maximum lift coefficient, for the configuration of flaps and gear
+* `Vst`: Stall speed (dim.: speed)
+* `φb`: Bank angle
+* `Vstn`: Stall speed at the load factor `nLF` (dim.: speed)
+* `nlim`: Limit load factor
+* `VA`: Maneuvering speed (dim.: speed)
+* `Vref`: Reference speed, given for the weight `Wt0` or planned for the
+  takeoff or the landing (dim.: speed)
+* `Wt0`: Reference weight of the aircraft (dim.: mass)
+* `Vadj`: Speed adjusted to the weight `Wt` (dim.: speed)
+* `nPU`: Load factor at the bottom of a pull up
+* `Rpu`: Radius of the pull up (dim.: length)
+* `TRad`: Radius of turn (dim.: length)
+* `TRate`: Rate of turn (dim.: angular speed)
+* `Ttrn`: Time for a full turn (dim.: time)
+* `Hpv`: Pivotal altitude, above the ground (dim.: length)
+* `Dgl`: Distance of the glide over the ground (dim.: length)
+* `Tgl`: Time of the glide (dim.: time)
+* `CLms`: Lift coefficient of minimum sink
+* `LDms`: Lift to drag ratio at minimum sink
+* `Vms`: Speed of minimum sink (dim.: speed)
+* `VSms`: Minimum sink rate, negative (dim.: speed)
+* `Preq`: Power required, drag times speed (dim.: power)
+* `ηp`: Propeller efficiency, 0.8 to 0.85 in cruise
+* `Psh`: Shaft power of the engine (dim.: power)
+* `Pav`: Shaft power available (dim.: power)
+* `Thr`: Thrust (dim.: force)
+* `ROC0`: Rate of climb at sea level (dim.: speed)
+* `Habs`: Absolute ceiling, where the rate of climb falls to zero
+  (dim.: length)
+* `Hsc`: Service ceiling, where the rate of climb falls to 100 ft/min
+  (dim.: length)
+* `Hini`, `Hfin`: Initial and final altitudes (dim.: length)
+* `Tclb`: Time to climb (dim.: time)
+* `BSFC`: Brake specific fuel consumption of a piston engine, the mass of
+  fuel per unit of energy (dim.: mass/energy)
+* `TSFC`: Thrust specific fuel consumption of a jet engine, in `1/h`: the
+  value the handbooks give in lb/(lbf·h) (dim.: 1/time)
+* `FFm`: Fuel flow, as a mass (dim.: mass/time)
+* `Wini`, `Wfin`: Initial and final weights of the aircraft (dim.: mass)
+* `Vini`, `Vfin`: Initial and final speeds (dim.: speed)
+* `Ebat`: Usable energy of the battery (dim.: energy)
+* `ηe`: Efficiency from the battery to the propeller thrust
+* `fLO`: Liftoff speed over stall speed, about 1.2
+* `fTD`: Touchdown speed over stall speed, about 1.3
+* `fav`: Fraction of the liftoff or touchdown speed where the forces are
+  averaged, about 0.7
+* `μr`: Rolling friction coefficient: 0.02 on a dry paved runway, 0.04 to
+  0.06 on short grass, 0.08 to 0.12 on long or wet grass; 0.4 when braking
+  on a dry runway
+* `VLO`: Liftoff speed (dim.: speed)
+* `VTD`: Touchdown speed (dim.: speed)
+* `qLO`, `qTD`: Dynamic pressure at `fav·VLO` or `fav·VTD` (dim.: pressure)
+* `Rav`: Average resistance, drag plus rolling friction (dim.: force)
+* `sLO`: Takeoff ground roll (dim.: length)
+* `sLD`: Landing ground roll (dim.: length)
+* `s0`: Distance in the reference conditions (dim.: length)
+* `sWnd`: Distance corrected for the wind (dim.: length)
+* `xW`: Exponent of the weight: 2 for a takeoff, 1 for a landing
+* `fW`: Weight factor
+* `Vact`: Actual speed, compared to the reference speed `Vref`
+  (dim.: speed)
+* `fV`: Speed factor
+* `sCor`: Distance corrected for weight and speed (dim.: length)
+
+The entries also use `Wt`, `TAS`, `GS`, `DRat`, `FPA`, `VS`, `ΔH`, `HW`,
+`Endur`, `Rng` and `Wfuel`, with the same meaning as in Flight Management.
+
+* References:
+  [1] FAA, *Pilot's Handbook of Aeronautical Knowledge*, FAA-H-8083-25C,
+  chapters 5, *Aerodynamics of Flight*, and 11, *Aircraft Performance* ;
+  [2] J. G. Leishman, *Introduction to Aerospace Flight Vehicles*,
+  Embry-Riddle Aeronautical University, chapters *Flight Range & Endurance*,
+  *Climbing, Ceiling & Gliding*, *Takeoff & Landing Performance*, *Maximum
+  Lift, Stalling & Spinning*, *Finite Wing Characteristics*, *Maneuvers &
+  Gusts* and *Worked Examples: Airplane Performance* ;
+  [3] Ed Williams, *Aviation Formulary V1.47*, https://edwilliams.org/avform147.htm ;
+  [4] 14 CFR 23.337, *Limit maneuvering load factors*, before amendment 23-64
+  of 2017.
+
+#### Lift & Drag
+
+The lift and the drag of the aircraft from its drag polar, and the speeds that
+follow from it.
+
+Entries: [Lift](#lift), [Drag Polar](#drag polar) and [Characteristic Speeds](#characteristic speeds).
+
+#### Lift
+
+The lift equals the weight times the load factor; it is the dynamic pressure
+times the wing area times the lift coefficient.
+
+* Main results: the lift coefficient `CL` needed to fly the mass `Wt` at the
+  true airspeed `TAS`, with the wing area `Sw`, at the load factor `nLF`, 1 in
+  level flight; or the speed for a given `CL`.
+* Steps: the air density `ρa` and the dynamic pressure `qd`.
+* At the same lift coefficient, twice the speed gives four times the lift.
+* The handbook says that at 18 000 ft the air has half the density of sea
+  level [1, chapter 5]: it is the pressure that is halved there. The density
+  ratio of the standard atmosphere is 0.57.
+
+* To calculate: `[DRat;qd;Lift;CL]` (Density ratio; Dynamic pressure; Lift; Lift coefficient) for a Cessna 172 of 2 100 lb at 120 kt, in air of 0.00216 slug/ft³, with a wing of 174 ft². The source gives 0.272 [2]:
+```rpl
+Wt=2100_lb TAS=120_knot ρa=0.00216_slug/ft^3 Sw=174_ft^2 nLF=1
+@ Expecting [ DRat=0.90874 95899 83 qd=2 121.23984 487 Pa Lift=2 100. lbf CL=0.27241 86027 28 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[DRat;qd;Lift;CL]` for an airliner of 16 000 kg at 253 kt, in air of 0.9048 kg/m³, with a wing of 60 m². The source gives 0.341 [2]:
+```rpl
+Wt=16000_kg TAS=253_knot ρa=0.9048_kg/m^3 Sw=60_m^2 nLF=1
+@ Expecting [ DRat=0.73861 22448 98 qd=7 663.73716 447 Pa Lift=35 273.96194 96 lbf CL=0.34123 12570 94 ]
+'ROOT(ⒺLift;[DRat;qd;Lift;CL];[1;1_Pa;1_lbf;0.5])'
+```
+
+* To calculate: `[ρa;Lift;qd;TAS]` (Density; Lift; Dynamic pressure; True airspeed) to fly the same Cessna at a lift coefficient of 0.5, at a density ratio of 0.7385:
+```rpl
+Wt=2100_lb DRat=0.7385 Sw=174_ft^2 nLF=1 CL=0.5
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Lift=2 100. lbf qd=1 155.73038 918 Pa TAS=98.25654 49074 knot ]
+'ROOT(ⒺLift;[ρa;Lift;qd;TAS];[1_kg/m^3;1_lbf;1_Pa;100_knot])'
+```
+
+#### Drag Polar
+
+The parabolic drag polar: the drag coefficient is the drag at zero lift plus
+the drag induced by the lift, which decreases with the aspect ratio of the
+wing.
+
+![Drag polar](img/DragPolar.bmp)
+
+* Main results: the aspect ratio `AR`, the induced drag factor `Kind`, the
+  drag coefficient `CD`, the lift to drag ratio `LD` and the drag `Drag`, for
+  a wingspan `bw`, a wing area `Sw`, an Oswald factor `eO`, a drag
+  coefficient at zero lift `CD0`, and the lift coefficient `CL` and lift
+  `Lift` of the Lift entry.
+* Solved the other way, a measured drag gives `CD0`.
+* The Drag Force equation of the Forces and Energy section gives the drag
+  of any body from its drag coefficient.
+
+* To calculate: `[AR;Kind;CD;LD;Drag]` (Aspect ratio; Induced drag factor; Drag coefficient; Lift to drag ratio; Drag) for the Cessna 172 of the Lift entry: 36 ft of span, `CD0` 0.02 and an Oswald factor of 0.81. The source gives 7.45, 0.0239 and 11.38, from rounded coefficients [2]:
+```rpl
+bw=36_ft Sw=174_ft^2 CD0=0.02 eO=0.81 CL=0.272419 Lift=2100_lbf
+@ Expecting [ AR=7.44827 58620 7 Kind=0.05276 05549 8 CD=2.39154 72192 2⁳⁻² LD=11.39091 03617 Drag=184.35752 1332 lbf ]
+'ROOT(ⒺDrag Polar;[AR;Kind;CD;LD;Drag];[1;0.1;0.1;10;1_lbf])'
+```
+
+* To calculate: `[AR;Kind;LD;CD;CD0]` for an airplane of 2 105 lb that needs 245 lbf of thrust in level flight at a lift coefficient of 0.315, with a wing of 30 ft by 5.25 ft and an Oswald factor of 0.75. The source gives `CD0` 0.0293 [2]:
+```rpl
+Lift=2105_lbf Drag=245_lbf CL=0.315 bw=30_ft Sw=157.5_ft^2 eO=0.75
+@ Expecting [ AR=5.71428 57142 9 Kind=0.07427 23067 76 LD=8.59183 67346 9 CD=0.03666 27078 38 CD0=0.02929 30381 99 ]
+'ROOT(ⒺDrag Polar;[AR;Kind;LD;CD;CD0];[1;0.1;10;0.1;0.01])'
+```
+
+#### Characteristic Speeds
+
+The speeds that follow from the drag polar.
+
+* Main results: the maximum lift to drag ratio `LDmax`, reached at the lift
+  coefficient `CLmd` and the speed of minimum drag `Vmd`; the speed of
+  minimum power `Vmp`; the speed of best range of a jet at constant altitude
+  `Vbrj`.
+* `Vmd` gives the longest glide, the best range of a propeller airplane and
+  the longest endurance of a jet. `Vmp` gives the longest endurance of a
+  propeller airplane and the minimum sink rate; it is about 76 % of `Vmd`.
+* These speeds are true airspeeds; with `DRat=1`, calibrated airspeeds.
+
+* To calculate: `[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj]` (Density; Maximum lift to drag ratio; Its lift coefficient; Speeds of minimum drag, of minimum power, of best jet range) for an airplane of 2 550 lb with a wing of 174 ft², `CD0` 0.0319 and `Kind` 0.0610515, at sea level. The source gives `Vmp` 58.8 kt, with a density of 0.002378 slug/ft³ [2]:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 LDmax=11.32991 08712 CLmd=0.72284 83135 81 Vmd=77.38532 25844 knot Vmp=58.80012 96453 knot Vbrj=101.84481 2037 knot ]
+'ROOT(ⒺCharacteristic Speeds;[ρa;LDmax;CLmd;Vmd;Vmp;Vbrj];[1_kg/m^3;10;1;100_knot;100_knot;100_knot])'
+```
+
+* To calculate: `[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj]` for a jet of 5 000 lb with a wing of 180 ft², `CD0` 0.018 and `Kind` 0.095, in air of 0.001066 slug/ft³. The source gives 270 kt for the best range [2]:
+```rpl
+Wt=5000_lb Sw=180_ft^2 CD0=0.018 Kind=0.095 ρa=0.001066_slug/ft^3
+@ Expecting [ DRat=0.44848 47513 53 LDmax=12.09127 08352 CLmd=0.43528 57500 66 Vmd=205.00969 5811 knot Vmp=155.77368 2781 knot Vbrj=269.80793 306 knot ]
+'ROOT(ⒺCharacteristic Speeds;[DRat;LDmax;CLmd;Vmd;Vmp;Vbrj];[1;10;1;100_knot;100_knot;100_knot])'
+```
+
+#### Stall & Load Factor
+
+The stall speed, how it grows with the load factor and changes with the
+weight, the maneuvering speed, and the limit load factor.
+
+Entries: [Stall Speed](#stall speed), [Load Factor & Accelerated Stall](#load factor & accelerated stall), [Maneuvering Speed & Weight](#maneuvering speed & weight), [Pull Up](#pull up) and [Limit Load Factor](#limit load factor).
+
+#### Stall Speed
+
+The speed at which the wing reaches its maximum lift coefficient in level
+flight.
+
+* Main result: the stall speed `Vst` for the mass `Wt`, the wing area `Sw` and
+  the maximum lift coefficient `CLmax` of the configuration of flaps and gear.
+* With `DRat=1`, the stall speed is a calibrated airspeed, the one of the
+  flight manual; with the density of the day, a true airspeed.
+
+* To calculate: `[ρa;Vst]` (Density; Stall speed) for an airplane of 20 000 lb with a wing of 340 ft² and a `CLmax` of 1.7, at a density ratio of 0.7385. The source gives 117.6 kt [2]:
+```rpl
+Wt=20000_lb Sw=340_ft^2 CLmax=1.7 DRat=0.7385
+@ Expecting [ ρa=0.90466 25 kg/m↑3 Vst=117.64203 9787 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+* To calculate: `[ρa;Vst]` for an airplane of 5 200 lb with a wing of 160 ft² and a `CLmax` of 2.1 in landing configuration, at sea level. The source gives 67.6 kt [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot ]
+'ROOT(ⒺStall Speed;[ρa;Vst];[1_kg/m^3;100_knot])'
+```
+
+#### Load Factor & Accelerated Stall
+
+In a level turn, the lift must hold up the weight and turn the aircraft: the
+load factor grows with the bank angle, and the stall speed with the square
+root of the load factor.
+
+* Main results: the load factor `nLF` for the bank angle `φb`, and the stall
+  speed `Vstn` at that load factor, from the stall speed `Vst` in level
+  flight.
+* 60° of bank gives 2 G; a stall speed of 50 kt becomes 100 kt at 4 G.
+
+* To calculate: `[nLF;Vstn]` (Load factor; Stall speed) at 45° of bank, for a stall speed of 57 kt. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+φb=45_° Vst=57_knot
+@ Expecting [ nLF=1.41421 35623 7 Vstn=67.78480 55552 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[nLF;Vstn];[1;100_knot])'
+```
+
+* To calculate: `[φb;Vstn]` (Bank angle; Stall speed) for a load factor of 3, with a stall speed of 45 kt. The handbook says that a bank of 72° gives 3 G, and that the speed must stay above 75 kt; 72° gives 3.24 G [1, chapter 5]:
+```rpl
+nLF=3 Vst=45_knot
+@ Expecting [ φb=70.52877 93655 ° Vstn=77.94228 63406 knot ]
+'ROOT(ⒺLoad Factor & Accelerated Stall;[φb;Vstn];[45_°;100_knot])'
+```
+
+#### Maneuvering Speed & Weight
+
+Below the maneuvering speed, the wing stalls before the load factor reaches its
+limit. All the speeds flown at a given lift coefficient (stall, maneuvering,
+best glide, approach) change with the square root of the weight.
+
+* Main results: the maneuvering speed `VA` for a stall speed `Vst` and a limit
+  load factor `nlim`; and the speed `Vadj` at the weight `Wt`, from the speed
+  `Vref` given for the weight `Wt0`.
+* A lighter aircraft has a lower maneuvering speed.
+
+* To calculate: `nlim` (Limit load factor) when the maneuvering speed is 1.7 times the stall speed. The handbook says 3 G [1, chapter 5]:
+```rpl
+Vst=60_knot VA=102_knot
+@ Expecting nlim=2.89
+'ROOT(ⒺManeuvering Speed & Weight;nlim;3)'
+```
+
+* To calculate: `Vadj` (Adjusted speed) at 2 800 lb, for an approach speed of 70 kt at 2 950 lb. The table of the handbook gives 68 kt [1, chapter 11]:
+```rpl
+Vref=70_knot Wt=2800_lb Wt0=2950_lb
+@ Expecting Vadj=68.19712 20626 knot
+'ROOT(ⒺManeuvering Speed & Weight;Vadj;70_knot)'
+```
+
+#### Pull Up
+
+At the bottom of a pull up or of a loop, the lift must hold up the weight and
+curve the path.
+
+* Main result: the load factor `nPU` for the true airspeed `TAS` and the
+  radius `Rpu`.
+* At the top of a loop, the weight helps curve the path: the load factor is
+  `nPU-2`.
+
+* To calculate: `nPU` (Load factor) at 120 kt, on a radius of 1 000 ft:
+```rpl
+TAS=120_knot Rpu=1000_ft
+@ Expecting nPU=2.27498 13056 9
+'ROOT(ⒺPull Up;nPU;2)'
+```
+
+#### Limit Load Factor
+
+The limit load factor of the normal category of 14 CFR part 23, before its
+rewrite of 2017: the certification of older light airplanes.
+
+* Main result: the limit load factor `nlim` for the maximum weight `Wt`: 3.8,
+  or less above 4 118 lb. The utility category requires 4.4, the acrobatic
+  category 6.
+
+* To calculate: `nlim` for a maximum weight of 6 000 lb [4]:
+```rpl
+Wt=6000_lb
+@ Expecting nlim=3.6
+'ROOT(ⒺLimit Load Factor;nlim;3)'
+```
+
+#### Turns
+
+The radius and rate of a level turn, and the pivotal altitude.
+
+Entries: [Level Turn](#level turn) and [Pivotal Altitude](#pivotal altitude).
+
+#### Level Turn
+
+A coordinated turn at constant altitude: the horizontal part of the lift turns
+the aircraft.
+
+![Level turn](img/LevelTurn.bmp)
+
+* Main results: the load factor `nLF`, the radius `TRad`, the rate `TRate` and
+  the time `Ttrn` of a full turn, for a true airspeed `TAS` and a bank angle
+  `φb`. Give `TRate=3_°/s` for the bank of a standard rate turn.
+* The radius grows with the square of the speed; the rate falls with it.
+* The rules of thumb divide the square of the speed in knots by 11.26 times
+  the tangent of the bank [1, chapter 5] or by 11.23 [3], for a radius in
+  feet: the exact constant is 11.294, and the radii of the handbook are 0.3 %
+  too large.
+
+* To calculate: `[nLF;TRad;TRate;Ttrn]` (Load factor; Radius; Rate; Time for 360°) at 120 kt and 30° of bank. The handbook gives 2 215 ft, 5.25 °/s and 68.6 s [1, chapter 5]:
+```rpl
+TAS=120_knot φb=30_°
+@ Expecting [ nLF=1.15470 05383 8 TRad=2 208.33240 015 ft TRate=5.25488 18154 °/s Ttrn=68.50772 53203 s ]
+'ROOT(ⒺLevel Turn;[nLF;TRad;TRate;Ttrn];[1;1_ft;1_°/s;1_s])'
+```
+
+* To calculate: `[φb;nLF;TRad;Ttrn]` (Bank angle; Load factor; Radius; Time) for a standard rate turn at 100 kt. The source gives 15.4° [3]:
+```rpl
+TAS=100_knot TRate=3_°/s
+@ Expecting [ φb=15.35884 67547 ° nLF=1.03703 68440 1 TRad=3 223.47938 108 ft Ttrn=120 s ]
+'ROOT(ⒺLevel Turn;[φb;nLF;TRad;Ttrn];[10_°;1;1_ft;1_s])'
+```
+
+#### Pivotal Altitude
+
+The height above the ground at which a point on the ground seems to stay fixed
+behind the wingtip, whatever the bank: the eights on pylons are flown there.
+
+* Main result: the pivotal altitude `Hpv` for the ground speed `GS`.
+
+* To calculate: `Hpv` (Pivotal altitude) at a ground speed of 100 kt. The source gives 890 ft [3]:
+```rpl
+GS=100_knot
+@ Expecting Hpv=885.40368 4504 ft
+'ROOT(ⒺPivotal Altitude;Hpv;1_ft)'
+```
+
+#### Glide
+
+The distance of a glide, and the speed of the least sink rate.
+
+Entries: [Glide Distance](#glide distance) and [Minimum Sink](#minimum sink).
+
+#### Glide Distance
+
+Without engine, the aircraft glides along a path whose slope is the inverse of
+its lift to drag ratio: the glide ratio is the lift to drag ratio.
+
+![Glide](img/GlideDistance.bmp)
+
+* Main results: the flight path angle `FPA`, negative, the distance over the
+  ground `Dgl`, the vertical speed `VS` and the time `Tgl`, for a height to
+  lose `ΔH`, a lift to drag ratio `LD`, a true airspeed `TAS` and a ground
+  speed `GS`.
+* The longest glide is at `LDmax`, flown at the speed of minimum drag `Vmd`
+  of Characteristic Speeds. A headwind shortens it.
+* The time is the distance over the ground speed; the time along the path,
+  `ΔH` over `VS`, is 0.2 % longer at a glide ratio of 15.
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` (Flight path angle; Distance; Vertical speed; Time) for Air Transat flight 236, the Airbus A330 that ran out of fuel over the Atlantic on 24 August 2001 and that captain Robert Piché glided to Lajes, in the Azores. The source models it as a glide from 30 000 ft at 195 kt, at a lift to drag ratio of 15, and finds about 74 nmi and 22.8 min [2]:
+```rpl
+LD=15 ΔH=30000_ft TAS=195_knot GS=195_knot
+@ Expecting [ FPA=-3.81407 48342 9 ° Dgl=74.06047 5162 nmi VS=-1 313.57586 727 ft/min Tgl=22.78783 85114 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+* To calculate: `[FPA;Dgl;VS;Tgl]` for a glider at a glide ratio of 30, losing 3 400 ft at 50 kt against a headwind of 10 kt:
+```rpl
+LD=30 ΔH=3400_ft TAS=50_knot GS=40_knot
+@ Expecting [ FPA=-1.90915 2433 ° Dgl=13.42963 28294 nmi VS=-168.68729 6563 ft/min Tgl=20.14444 92441 min ]
+'ROOT(ⒺGlide Distance;[FPA;Dgl;VS;Tgl];[-3_°;1_nmi;1_ft/min;1_min])'
+```
+
+#### Minimum Sink
+
+The speed at which a glider, or an airplane without engine, loses height the
+most slowly: it stays longest in the air, but does not go farthest.
+
+* Main results: the lift coefficient `CLms`, the lift to drag ratio `LDms`,
+  the speed `Vms` and the sink rate `VSms` at minimum sink, from the drag
+  polar `CD0` and `Kind`, the mass `Wt` and the wing area `Sw`.
+* The speed of minimum sink is the speed of minimum power of Characteristic
+  Speeds.
+
+* To calculate: `[ρa;CLms;LDms;Vms;VSms]` (Density; Lift coefficient; Lift to drag ratio; Speed; Sink rate) for the airplane of 2 550 lb of Characteristic Speeds, engine off, at sea level:
+```rpl
+Wt=2550_lb Sw=174_ft^2 CD0=0.0319 Kind=0.0610515 DRat=1
+@ Expecting [ ρa=1.225 kg/m↑3 CLms=1.25201 00052 9 LDms=9.81199 06370 5 Vms=58.80012 96453 knot VSms=-603.74295 4129 ft/min ]
+'ROOT(ⒺMinimum Sink;[ρa;CLms;LDms;Vms;VSms];[1_kg/m^3;1;10;60_knot;-500_ft/min])'
+```
+
+#### Climb & Power
+
+The power the aircraft needs, the rate and angle of climb it gets from its
+engine, and the time to climb.
+
+Entries: [Power Required](#power required), [Rate & Angle of Climb](#rate & angle of climb) and [Time to Climb & Ceilings](#time to climb & ceilings).
+
+#### Power Required
+
+The power needed to fly is the drag times the speed; the engine must give more,
+since the propeller does not turn all of its power into thrust.
+
+* Main results: the power required `Preq` for the drag `Drag` at the true
+  airspeed `TAS`, and the shaft power `Psh` with a propeller efficiency `ηp`.
+* From 100 to 200 kt, the parasite drag grows four times and its power eight
+  times; the induced drag and its power fall to a fourth and to a half
+  [1, chapter 11].
+
+* To calculate: `[Preq;Psh]` (Power required; Shaft power) for a Cessna 172 with 183.7 lbf of drag at 120 kt, and a propeller efficiency of 0.85. The source gives 79.6 hp [2]:
+```rpl
+Drag=183.672_lbf TAS=120_knot ηp=0.85
+@ Expecting [ Preq=67.63710 80888 hp Psh=79.57306 83397 hp ]
+'ROOT(ⒺPower Required;[Preq;Psh];[1_hp;1_hp])'
+```
+
+#### Rate & Angle of Climb
+
+The excess power gives the rate of climb, the excess thrust the angle of
+climb.
+
+![Climb speeds](img/ClimbSpeeds.bmp)
+
+* Main results: the vertical speed `VS` from the power available `Pav` of the
+  engine, the propeller efficiency `ηp` and the power required `Preq`; and
+  the flight path angle `FPA` from the thrust `Thr` and the drag `Drag`.
+* The best rate of climb, at the speed Vy, gains the most height in a given
+  time; the best angle, at the speed Vx, in a given distance. For a
+  propeller airplane, Vy is about the speed of minimum power.
+* A climb at 10° needs a thrust equal to the drag plus 17 % of the weight
+  [1, chapter 5].
+
+* To calculate: `VS` (Vertical speed) for an airplane of 2 550 lb with 180 hp at 0.8 of propeller efficiency, needing 46.9 hp at its speed of minimum power. The source gives 1 257 ft/min [2]:
+```rpl
+Pav=180_hp ηp=0.8 Preq=46.8836_hp Wt=2550_lb
+@ Expecting VS=1 256.80047 059 ft/min
+'ROOT(ⒺRate & Angle of Climb;VS;1000_ft/min)'
+```
+
+* To calculate: `FPA` (Flight path angle) for an airplane of 2 000 lb with 400 lbf of thrust and 200 lbf of drag:
+```rpl
+Wt=2000_lb Thr=400_lbf Drag=200_lbf
+@ Expecting FPA=5.73917 04772 7 °
+'ROOT(ⒺRate & Angle of Climb;FPA;5_°)'
+```
+
+#### Time to Climb & Ceilings
+
+When the rate of climb falls linearly with altitude, from `ROC0` at sea level
+to zero at the absolute ceiling `Habs`, the time to climb has a closed form.
+
+* Main results: the service ceiling `Hsc`, where the rate of climb is
+  100 ft/min, and the time `Tclb` to climb from `Hini` to `Hfin`.
+* Two rates of climb read in the flight manual at two altitudes give `ROC0`
+  and `Habs`.
+
+* To calculate: `[Hsc;Tclb]` (Service ceiling; Time to climb) from 1 000 to 9 000 ft, for a rate of climb of 973.5 ft/min at sea level and an absolute ceiling of 20 072 ft. The source gives 11.2 min [2]:
+```rpl
+ROC0=973.5_ft/min Habs=20072.2_ft Hini=1000_ft Hfin=9000_ft
+@ Expecting [ Hsc=18 010.34072 93 ft Tclb=11.21227 34995 min ]
+'ROOT(ⒺTime to Climb & Ceilings;[Hsc;Tclb];[1_ft;1_min])'
+```
+
+* To calculate: `Hsc` (Service ceiling) for a rate of climb of 1 235 ft/min at sea level and an absolute ceiling of 14 790 ft. The source gives 13 593 ft [2]:
+```rpl
+ROC0=1235_ft/min Habs=14790.4_ft
+@ Expecting Hsc=13 592.79676 11 ft
+'ROOT(ⒺTime to Climb & Ceilings;Hsc;1_ft)'
+```
+
+#### Range & Endurance
+
+The fuel flow of piston and jet engines, the Breguet equations for the range
+and the endurance, and the range of an electric airplane.
+
+Entries: [Fuel Flow](#fuel flow), [Breguet Range Propeller](#breguet range propeller), [Breguet Endurance Propeller](#breguet endurance propeller), [Breguet Jet](#breguet jet), [Jet Range at Constant Altitude](#jet range at constant altitude) and [Battery Range & Endurance](#battery range & endurance).
+
+#### Fuel Flow
+
+The fuel flow from the specific consumption of the engine, and the endurance
+of the fuel on board.
+
+* Main results: the fuel flow `FFm`, as a mass, of a piston engine from its
+  specific consumption `BSFC` and its shaft power `Psh`, or of a jet engine
+  from its specific consumption `TSFC` and its thrust `Thr`; and the endurance
+  `Endur` of the fuel `Wfuel`.
+* `TSFC` is entered in `1/h`: the 0.5 lb/(lbf·h) of the handbooks is
+  `0.5_h^-1`.
+* The Endurance & Range entry of Flight Management works with a volume of
+  fuel; `ρfuel` converts.
+
+* To calculate: `[FFm;Endur]` (Fuel flow; Endurance) for a Cessna 172 using 79.6 hp at 0.45 lb/(hp·h), with 48 lb of fuel. The source gives 35.8 lb/h and 1.34 h [2]:
+```rpl
+BSFC=0.45_lb/(hp*h) Psh=79.573_hp Wfuel=48_lb
+@ Expecting [ FFm=35.80785 lb/h Endur=1.34048 81890 4 h ]
+'ROOT(ⒺFuel Flow;[FFm;Endur];[1_lb/h;1_h])'
+```
+
+* To calculate: `FFm` for a jet with 1 374 lbf of thrust at 0.5 lb/(lbf·h). The source gives 687 lb/h [2]:
+```rpl
+TSFC=0.5_h^-1 Thr=1373.97_lbf
+@ Expecting FFm=686.985 lb/h
+'ROOT(ⒺFuel Flow;FFm;1_lb/h)'
+```
+
+#### Breguet Range Propeller
+
+The range of a propeller airplane that flies at its best lift to drag ratio
+while it burns its fuel.
+
+* Main result: the range `Rng` from the propeller efficiency `ηp`, the lift to
+  drag ratio `LD`, the specific consumption `BSFC`, and the initial and final
+  weights `Wini` and `Wfin`.
+* One source finds 170 nmi for a Cessna 172 where the formula gives 162, and
+  160.9 nmi by the hourly consumption [2].
+
+* To calculate: `Rng` (Range) for an airplane of the class of the Cessna 182, from 2 890 to 2 620 lb, with a lift to drag ratio of 13.6, a propeller efficiency of 0.8 and 0.45 lb/(hp·h). The source gives 889 statute miles, or 772.5 nmi [2]:
+```rpl
+ηp=0.8 LD=13.6 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting Rng=772.76186 4125 nmi
+'ROOT(ⒺBreguet Range Propeller;Rng;1_nmi)'
+```
+
+#### Breguet Endurance Propeller
+
+The endurance of a propeller airplane flown at a constant lift coefficient:
+the speed falls with the square root of the weight as the fuel burns.
+
+* Main results: the final speed `Vfin` and the endurance `Endur`, from the
+  initial speed `Vini`, the lift to drag ratio `LD` at that lift coefficient,
+  the propeller efficiency `ηp`, the specific consumption `BSFC`, and the
+  weights `Wini` and `Wfin`.
+* For the longest endurance, start at the speed of minimum power `Vmp`, with
+  the lift to drag ratio `LDms` of Minimum Sink.
+
+* To calculate: `[Vfin;Endur]` (Final speed; Endurance) for the same airplane, from 117.3 ft/s at a lift to drag ratio of 11.79. The source gives 9.9 h [2]:
+```rpl
+Vini=117.309_ft/s ηp=0.8 LD=11.7865 Wini=2890_lb Wfin=2620_lb BSFC=0.45_lb/(hp*h)
+@ Expecting [ Vfin=66.17737 52512 knot Endur=9.87589 53051 2 h ]
+'ROOT(ⒺBreguet Endurance Propeller;[Vfin;Endur];[1_knot;1_h])'
+```
+
+#### Breguet Jet
+
+The endurance of a jet, and its range in a cruise climb: at constant speed and
+lift coefficient, the jet climbs as it gets lighter.
+
+* Main results: the endurance `Endur` from the lift to drag ratio `LD`, the
+  specific consumption `TSFC` and the weights `Wini` and `Wfin`; and the range
+  `Rng` at the true airspeed `TAS`.
+
+* To calculate: `Endur` (Endurance) for a business jet from 18 815 to 13 215 lb, with a lift to drag ratio of 16.85 and 0.6 lb/(lbf·h). The source gives 9.9 h [2]:
+```rpl
+LD=16.85 Wini=18815_lb Wfin=13215_lb TSFC=0.6_h^-1
+@ Expecting Endur=9.92189 43507 h
+'ROOT(ⒺBreguet Jet;Endur;1_h)'
+```
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) in a cruise climb for the jet of Jet Range at Constant Altitude, at 269.8 kt, from 5 000 to 4 000 lb. At constant altitude it flies 596.5 nmi:
+```rpl
+LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1 TAS=269.808_knot
+@ Expecting [ Endur=2.33660 30688 8 h Rng=630.43420 0807 nmi ]
+'ROOT(ⒺBreguet Jet;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Jet Range at Constant Altitude
+
+The range of a jet that keeps its altitude and its lift coefficient: it must
+slow down as it gets lighter.
+
+* Main results: the final speed `Vfin` and the range `Rng`, from the initial
+  speed `Vini`, the lift to drag ratio `LD`, the specific consumption `TSFC`
+  and the weights `Wini` and `Wfin`.
+* For the best range, start at the speed `Vbrj` of Characteristic Speeds.
+* One source finds that drop tanks add 10.4 % to the range, where its own
+  figures give 9.8 % [2].
+
+* To calculate: `[Vfin;Rng]` (Final speed; Range) for a jet of 5 000 lb that burns 1 000 lb of fuel from 269.8 kt, with a lift to drag ratio of 10.47 and 1 lb/(lbf·h). The source gives 596 nmi [2]:
+```rpl
+Vini=269.808_knot LD=10.4713 Wini=5000_lb Wfin=4000_lb TSFC=1_h^-1
+@ Expecting [ Vfin=241.32361 1549 knot Rng=596.53715 3568 nmi ]
+'ROOT(ⒺJet Range at Constant Altitude;[Vfin;Rng];[1_knot;1_nmi])'
+```
+
+#### Battery Range & Endurance
+
+An electric airplane does not get lighter as it flies: its range and its
+endurance follow from the energy of its battery.
+
+* Main results: the endurance `Endur` from the usable energy `Ebat`, the
+  efficiency `ηe` from the battery to the thrust, and the power required
+  `Preq`; and the range `Rng` from the lift to drag ratio `LD` and the mass
+  `Wt`.
+* The efficiency `ηe` is the product of the efficiencies of the battery, the
+  motor and the propeller, about 0.95, 0.95 and 0.8.
+* Enter the energy in `kW*h`.
+
+* To calculate: `[Endur;Rng]` (Endurance; Range) for an electric airplane of 1 300 kg with 60 kWh, an efficiency of 0.75, a lift to drag ratio of 15, needing 40 hp at 68 kt:
+```rpl
+Ebat=60_(kW*h) ηe=0.75 Preq=40_hp LD=15 Wt=1300_kg
+@ Expecting [ Endur=1.50864 98507 9 h Rng=102.92035 2116 nmi ]
+'ROOT(ⒺBattery Range & Endurance;[Endur;Rng];[1_h;1_nmi])'
+```
+
+#### Takeoff & Landing
+
+The ground roll at takeoff and landing, and how the wind, the weight and the
+speed change the distances of the flight manual.
+
+Entries: [Takeoff Ground Roll](#takeoff ground roll), [Landing Ground Roll](#landing ground roll), [Wind on Runway Distances](#wind on runway distances) and [Weight & Speed Corrections](#weight & speed corrections).
+
+#### Takeoff Ground Roll
+
+An estimate of the ground roll to liftoff, with the forces averaged at 70 % of
+the liftoff speed.
+
+![Takeoff roll](img/TakeoffRoll.bmp)
+
+* Main results: the stall speed `Vst`, the liftoff speed `VLO`, the average
+  resistance `Rav` and the ground roll `sLO`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in takeoff configuration, the thrust `Thr`, the
+  coefficients `CL` and `CD` during the roll, and the rolling friction `μr`.
+* `fLO` is usually 1.2, `fav` 0.7.
+
+* To calculate: `[ρa;Vst;VLO;qLO;Rav;sLO]` (Density; Stall speed; Liftoff speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 6 600 lb with 1 200 lbf of thrust, a wing of 160 ft², a `CLmax` of 1.6, rolling at a `CL` of 0.4 and a `CD` of 0.0388 on a dry runway. The source finds 3 247 ft, with the stall speed of 6 000 lb instead of 6 600 [2]:
+```rpl
+Wt=6600_lb Thr=1200_lbf Sw=160_ft^2 CLmax=1.6 CD=0.0388 CL=0.4 μr=0.02 DRat=1 fLO=1.2 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=87.26472 05797 knot VLO=104.71766 4696 knot qLO=871.00176 1176 Pa Rav=221.64648 lbf sLO=3 274.90985 284 ft ]
+'ROOT(ⒺTakeoff Ground Roll;[ρa;Vst;VLO;qLO;Rav;sLO];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Landing Ground Roll
+
+An estimate of the ground roll from touchdown to stop, with the brakes and
+the forces averaged at 70 % of the touchdown speed.
+
+* Main results: the stall speed `Vst`, the touchdown speed `VTD`, the average
+  resistance `Rav` and the ground roll `sLD`, for the mass `Wt`, the wing area
+  `Sw`, the `CLmax` in landing configuration, the coefficients `CL` and `CD`
+  during the roll, and the braking friction `μr`.
+* `fTD` is usually 1.3, `fav` 0.7. Spoilers bring `CL` near zero and put the
+  weight on the wheels.
+
+* To calculate: `[ρa;Vst;VTD;qTD;Rav;sLD]` (Density; Stall speed; Touchdown speed; Dynamic pressure; Resistance; Ground roll) for an airplane of 5 200 lb with a wing of 160 ft², a `CLmax` of 2.1, spoilers out, braking at 0.4. The source gives 814.6 ft [2]:
+```rpl
+Wt=5200_lb Sw=160_ft^2 CLmax=2.1 CD=0.05 CL=0 μr=0.4 DRat=1 fTD=1.3 fav=0.7
+@ Expecting [ ρa=1.225 kg/m↑3 Vst=67.61121 65536 knot VTD=87.89458 15196 knot qTD=613.62541 9049 Pa Rav=2 182.52666 667 lbf sLD=814.85309 5344 ft ]
+'ROOT(ⒺLanding Ground Roll;[ρa;Vst;VTD;qTD;Rav;sLD];[1_kg/m^3;1_knot;1_knot;1_Pa;1_lbf;1_ft])'
+```
+
+#### Wind on Runway Distances
+
+A headwind shortens the takeoff and landing distances, a tailwind lengthens
+them more.
+
+* Main result: the distance `sWnd` for the headwind `HW` of Headwind &
+  Crosswind, negative for a tailwind, from the distance `s0` without wind
+  and the liftoff or touchdown speed `Vref`.
+* A headwind of 10 % of the speed shortens the distance by 19 %, a tailwind of
+  10 % lengthens it by 21 % [1, chapter 11].
+
+* To calculate: `sWnd` (Distance with wind) for a distance of 1 000 ft without wind and a tailwind of 10 kt, at a touchdown speed of 100 kt. The handbook says that 10 kt of tailwind add about 21 % [1, chapter 11], which holds at 100 kt:
+```rpl
+s0=1000_ft HW=-10_knot Vref=100_knot
+@ Expecting sWnd=1 210 ft
+'ROOT(ⒺWind on Runway Distances;sWnd;1_ft)'
+```
+
+#### Weight & Speed Corrections
+
+The takeoff distance grows with the square of the weight, the landing distance
+in proportion to it, and both with the square of the speed.
+
+* Main results: the weight factor `fW`, the speed factor `fV` and the
+  distance `sCor`, from the distance `s0` of the flight manual at the weight
+  `Wt0` and the speed `Vref`, for the weight `Wt` and the speed `Vact`.
+* Give `xW=2` for a takeoff, `xW=1` for a landing.
+* 10 % more weight at takeoff means 21 % more distance [1, chapter 11].
+
+* To calculate: `[fW;fV;sCor]` (Weight factor; Speed factor; Distance) for a landing of 1 600 ft at 70 kt, flown at 80 kt. The handbook counts 20 % more, 1 920 ft [1, chapter 11]:
+```rpl
+s0=1600_ft Wt=2400_lb Wt0=2400_lb xW=1 Vact=80_knot Vref=70_knot
+@ Expecting [ fW=1 fV=1.30612 24489 8 sCor=2 089.79591 837 ft ]
+'ROOT(ⒺWeight & Speed Corrections;[fW;fV;sCor];[1;1;1_ft])'
+```
 # Menus
 
 Menus display at the bottom of the screen, and can be activated using the keys
@@ -13210,6 +17414,6778 @@ stack.
 ## LastMenu
 
 The `LastMenu` function (🟨 _A_), returns back in the history of past visited menus. The history contains up to 8 entries.
+# Navigation functions
+
+## NavigationLibrary
+
+The Navigation section of the Function Library computes positions, distances
+and directions on the Earth, for air, marine and land navigation.
+
+The [Geodesy](#geodesylibrary) subsection computes on the Earth itself:
+
+* On the **WGS-84 ellipsoid**, the reference surface of GPS, to the millimetre:
+  [VincentyInv](#vincentyinv) gives the distance and azimuths between two
+  points, [VincentyDir](#vincentydir) the point reached from a given point,
+  azimuth and distance, and [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh)
+  convert GPS coordinates to and from Earth-centred Cartesian coordinates.
+* On a **sphere**, where the formulas are shorter and angles are enough:
+  [RadialFix](#radialfix) finds a position from two bearings, and
+  [GCPoint](#gcpoint) a point along a great-circle route.
+
+The [Route](#routelibrary) subsection keeps a route of waypoints and follows
+it while travelling.
+
+**Conventions.** Latitudes are positive North, longitudes positive East, as in
+GPS coordinates: West longitudes are negative. Azimuths and bearings are
+measured clockwise from true North. Plain numbers are read as degrees and
+metres; angles and lengths with a unit are accepted as well, for instance
+`'33_°+57_arcmin'`. Results carry their units.
+
+The functions work in radians internally; the angle mode and the angle units
+setting are left as they were found.
+
+The ellipsoid functions use the constants `Ⓒa♁GPS`, `Ⓒf♁GPS`, `Ⓒe12♁GPS` and
+`Ⓒe22♁GPS`. The `Navigation` section of the Equation Library holds the
+spherical equations of great circles and of the wind and current triangles.
+
+
+## GeodesyLibrary
+
+The Geodesy subsection computes distances, directions and positions:
+
+* on the WGS-84 ellipsoid: [VincentyInv](#vincentyinv),
+  [VincentyDir](#vincentydir), [LLH→XYZ](#llh→xyz) and [XYZ→LLH](#xyz→llh);
+* on a sphere: [RadialFix](#radialfix) and [GCPoint](#gcpoint).
+
+
+## VincentyInv
+
+The inverse geodetic problem: the distance between two points of the WGS-84
+ellipsoid, and the azimuth of the shortest route at each end.
+
+![Geodesic route](img/GreatCircleRoute.bmp)
+
+Stack: `φ1` `λ1` `φ2` `λ2` ▶ `s` `α1` `α2`, where `s` is the distance along the
+ellipsoid, `α1` the azimuth at departure and `α2` the azimuth on arrival, both
+from true North.
+
+The method is T. Vincenty's iteration (Survey Review 23(176), 1975), which
+converges to about 0.006 mm. It does not converge for nearly antipodal points,
+about 20 000 km apart: the function then stops with an error rather than return
+a wrong value.
+
+From Flinders Peak to Buninyong, in Australia, the classic test of
+Geoscience Australia: 54 972.271 m, azimuth 306°52′05.37″:
+
+```rpl
+-37.95103341666667 144.42486788888889 -37.65282113888889 143.92649552777778
+ⓁVincentyInv 3 →LIST
+@ Expecting { 54 972.27113 87 m 306.86815 9203 ° 307.17363 0629 ° }
+```
+
+From New York (JFK, 40°38′23″N, 73°46′44″W) to Singapore (Changi, 1°21′33″N,
+103°59′22″E); GeographicLib gives 15 347 628 m and 3°18′29.9″:
+
+```rpl
+'40_°+38_arcmin+23_arcs' '-(73_°+46_arcmin+44_arcs)'
+'1_°+21_arcmin+33_arcs' '103_°+59_arcmin+22_arcs'
+4 →LIST →Num LIST→ DROP
+ⓁVincentyInv 3 →LIST
+@ Expecting { 15 347 627.6596 m 3.30831 24000 9 ° 177.48590 2144 ° }
+```
+
+
+## VincentyDir
+
+The direct geodetic problem: the point reached on the WGS-84 ellipsoid from a
+given point, initial azimuth and distance.
+
+Stack: `φ1` `λ1` `α1` `s` ▶ `φ2` `λ2` `α2`, where `α2` is the azimuth on arrival.
+
+From 40°N on the prime meridian, 10 000 km on azimuth 30°; C. F. F. Karney
+(Journal of Geodesy 87, 2013) gives 41.793310205°, 137.844900044° and
+149.090169318°:
+
+```rpl
+40 0 30 10000_km ⓁVincentyDir 3 →LIST
+@ Expecting { 41.79331 0205 ° 137.84490 0044 ° 149.09016 9318 ° }
+```
+
+
+## LLH→XYZ
+
+Converts a GPS position — latitude, longitude and height above the WGS-84
+ellipsoid — to Earth-centred, Earth-fixed (ECEF) coordinates. `X` points to
+the equator on the prime meridian, `Y` to the equator at 90°E, `Z` to the North
+pole.
+
+![ECEF and geodetic coordinates](img/EcefCoordinates.bmp)
+
+Stack: `φ` `λ` `h` ▶ `X` `Y` `Z`.
+
+The example of IOGP Guidance Note 7-2, §4.1.1 (EPSG method 9602): 53°48′33.820″N,
+2°07′46.380″E, 73 m give 3 771 793.968 m, 140 253.342 m and 5 124 304.349 m:
+
+```rpl
+'53_°+48_arcmin+33.820_arcs' '2_°+7_arcmin+46.380_arcs' 2 →LIST →Num LIST→ DROP
+73_m ⓁLLH→XYZ 3 →LIST
+@ Expecting { 3 771 793.96764 m 140 253.3419 m 5 124 304.34935 m }
+```
+
+
+## XYZ→LLH
+
+Converts Earth-centred, Earth-fixed (ECEF) coordinates to latitude, longitude
+and height above the WGS-84 ellipsoid, by the method of B. R. Bowring (Survey
+Review 23(181), 1976), accurate to better than a millimetre near the Earth's
+surface.
+
+Stack: `X` `Y` `Z` ▶ `φ` `λ` `h`.
+
+The example of LLH→XYZ in reverse; the coordinates, rounded to the
+millimetre, give back 53°48′33.820″N, 2°07′46.380″E and 73 m:
+
+```rpl
+3771793.968 140253.342 5124304.349 ⓁXYZ→LLH 3 →LIST
+@ Expecting { 53.80939 444 ° 2.12955 00013 2 ° 72.99993 06719 m }
+```
+
+See also: [LLH→XYZ](#llh→xyz), the conversion in the other direction.
+
+
+## RadialFix
+
+The position where two radials cross: the bearings of the same point taken
+from two known stations, for instance two VOR beacons, or two landmarks seen
+from a ship. The Earth is taken as a sphere.
+
+![Fix by two radials](img/RadialFix.bmp)
+
+Stack: `φ1` `λ1` `C1` `φ2` `λ2` `C2` ▶ `φ` `λ`, where `C1` and `C2` are the true
+bearings of the sought position from the first and the second station.
+
+The function stops with an error when the two radials lie on the same great
+circle ("Infinity of intersections"), or when they diverge, so that their great
+circles only meet on the far side of the Earth ("Intersection ambiguous").
+
+From Ed Williams' *Aviation Formulary*: the radial 051° from Rome (REO,
+42.600°N, 117.866°W) and the radial 137° from Baker City (BKE, 44.840°N,
+117.806°W) cross over Boise (BOI, 43.572°N, 116.189°W):
+
+```rpl
+42.600 -117.866 51 44.840 -117.806 137 ⓁRadialFix 2 →LIST
+@ Expecting { 43.57190 03837 ° -116.18875 7484 ° }
+```
+
+
+## GCPoint
+
+A point along the great circle between two points of a sphere, at a given
+fraction of the route: 0 at departure, 1 at destination. Following a great
+circle usually means flying or steering straight legs between such points.
+
+![Great circle route](img/GreatCircleRoute.bmp)
+
+Stack: `φ1` `λ1` `φ2` `λ2` `f` ▶ `φ` `λ`.
+
+It is not defined for antipodal points, between which every great circle is a
+shortest route.
+
+Four tenths of the way from Los Angeles (LAX, 33°57′N, 118°24′W) to New York
+(JFK, 40°38′N, 73°47′W); Ed Williams gives 38°40.167′N, 101°37.570′W:
+
+```rpl
+33.95 -118.4 40.63333333333333 -73.78333333333333 0.4 ⓁGCPoint 2 →LIST
+@ Expecting { 38.66944 7748 ° -101.62616 0313 ° }
+```
+
+
+## RouteLibrary
+
+The Route subsection keeps a route — a list of waypoints — and follows it
+while travelling.
+
+![Route and waypoints](img/RouteWaypoints.bmp)
+
+* The route is the variable `Route` of the current directory: a list with one
+  `{ "name" φ λ }` list per waypoint. It can be viewed and edited like any
+  list.
+* The active leg is the variable `RouteLeg`: leg 1 goes from the first to the
+  second waypoint.
+
+To build a route: [WPAdd](#wpadd) adds a waypoint at the end,
+[WPIns](#wpins) inserts one, for instance to divert, and [WPDel](#wpdel)
+removes one. [WPLegs](#wplegs) lists the legs with their distance and course.
+
+On the way: [WPNext](#wpnext) gives, from the present position, the bearing,
+distance and time to the next waypoint, and how far off the route one is; it
+moves to the next leg by itself once a waypoint is passed.
+[WPDirect](#wpdirect) goes straight from the present position to a chosen
+waypoint.
+
+Distances and bearings are computed on the WGS-84 ellipsoid with
+[VincentyInv](#vincentyinv).
+
+
+## WPAdd
+
+Adds a waypoint at the end of the route, and creates the route if needed.
+
+Stack: `"name"` `φ` `λ` ▶ nothing; the waypoint is added to `Route`.
+
+The examples of this subsection first purge any previous route, build a
+route from Los Angeles to New York through Albuquerque, then show the names of
+its waypoints, with `Route « 1 GET » MAP`:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+Route « 1 GET » MAP
+@ Expecting { "LAX" "ABQ" "JFK" }
+```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
+## WPIns
+
+Inserts a waypoint into the route: it becomes waypoint `n`, and the following
+ones move down by one. This is how to divert, or to add a turning point. The
+active leg follows the waypoints it pointed to.
+
+Stack: `"name"` `φ` `λ` `n` ▶ nothing.
+
+A stop at Denver, inserted between Albuquerque and New York:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+"DEN" 39.8561 -104.6737 3 ⓁWPIns
+Route « 1 GET » MAP
+@ Expecting { "LAX" "ABQ" "DEN" "JFK" }
+```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
+## WPDel
+
+Removes waypoint `n` from the route. The active leg follows the waypoints it
+pointed to.
+
+Stack: `n` ▶ nothing.
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+2 ⓁWPDel
+Route « 1 GET » MAP
+@ Expecting { "LAX" "JFK" }
+```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
+## WPLegs
+
+Lists the legs of the route: for each leg, `"A→B"`, its distance in nautical
+miles and its initial true course; then the total distance.
+
+Stack: ▶ `{ legs }` `Total`.
+
+The example shows the total, then the distance of each leg:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+ⓁWPLegs SWAP « 2 GET » MAP LIST→ DROP 3 →LIST
+@ Expecting { Total:2 174.82710 563 nmi 588.50367 4436 nmi 1 586.32343 12 nmi }
+```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
+## WPNext
+
+Where is the next waypoint, and how far off the route am I?
+
+![Route and waypoints](img/RouteWaypoints.bmp)
+
+Stack: `φ` `λ` `GS` ▶ `To` `Brg` `Dist` `XTD` `ETE` `ETA`, from the present
+position and the ground speed (knots if a plain number; 0 to skip `ETE` and
+`ETA`):
+
+* `To`: the next waypoint, the end of the active leg;
+* `Brg` and `Dist`: its true bearing and its distance in nautical miles;
+* `XTD`: the cross-track distance from the active leg, positive when right of
+  it;
+* `ETE`: the Estimated Time En route, the time left to reach it at the
+  ground speed, in hours, minutes and seconds;
+* `ETA`: the Estimated Time of Arrival, the time by the clock of the
+  calculator when it will be reached.
+
+When the present position is abeam or past the end of the active leg, the
+next leg becomes active, and the results refer to it.
+
+Over the Mojave desert, at 450 kt, on the way from Los Angeles to Albuquerque.
+The examples drop the `ETA`, which depends on the time they are run:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+34.3 -114.0 450 ⓁWPNext DROP 5 →LIST
+@ Expecting { To:"ABQ" Brg:80.99381 77706 ° Dist:368.36060 6014 nmi XTD:11.28267 43886 nmi ETE:0:49:07 }
+```
+
+East of Albuquerque, the first leg is behind: the second leg, to New York,
+becomes active, and `RouteLeg`, added at the end, is 2:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+35.3 -104.0 450 ⓁWPNext DROP 5 →LIST RouteLeg +
+@ Expecting { To:"JFK" Brg:68.26395 64658 ° Dist:1 461.44173 207 nmi XTD:32.14230 0708 nmi ETE:3:14:52 2 }
+```
+
+
+## WPDirect
+
+"Direct to": go straight from the present position to waypoint `n` of the
+route. The present position is inserted before waypoint `n` under the name
+`"DCT"`, and the leg from it to waypoint `n` becomes the active leg.
+
+Stack: `φ` `λ` `n` ▶ nothing.
+
+Over Los Angeles, cleared direct to New York; the route now goes through
+`"DCT"`, and the active leg is the third, from `"DCT"` to New York:
+
+```rpl
+{ Route RouteLeg } PURGE
+"LAX" 33.9425 -118.4081 ⓁWPAdd
+"ABQ" 35.0402 -106.6090 ⓁWPAdd
+"JFK" 40.6398 -73.7789 ⓁWPAdd
+34.0 -118.0 3 ⓁWPDirect
+Route « 1 GET » MAP RouteLeg +
+@ Expecting { "LAX" "ABQ" "DCT" "JFK" 3 }
+```
+
+See the figure in [Route](#routelibrary): waypoints, legs and the active leg.
+
+
+# Probability functions
+
+The Probability section of the Function Library holds the thirty
+distributions of the Equation Library, one submenu per law, as ordinary
+functions callable from a program. Each law offers its density, its distribution
+function, the upper tail, the quantile, a random draw, its two moments, and two
+entries that answer with names rather than with bare numbers.
+
+They exist because an equation system is not always what one wants: a value
+needed inside a computation is easier to obtain from a function than from a
+solve, and the quantile of a discrete law cannot be obtained by solving at all,
+a staircase having no slope for the solver to follow.
+
+Parameters go on the stack first, in the order the Equation Library lists them,
+and the varying argument last — X for the three direct functions, a probability
+for the quantile. The two moment functions and the draw take the parameters
+alone, since that is all they depend on.
+
+**Tags, and the two entries that use them.** A five-parameter law leaves five
+bare numbers on the stack and nothing says which is which. `<Law>Args` gives
+them their names back: `0 1 -1 2 0.5 ⓁNormTruncArgs` returns `x0:0 sc:1
+Xmin:-1 Xmax:2 X:0.5`.
+
+Args labels; it does not recall. A distribution function consumes its arguments
+like any other, so calling Args straight after one finds nothing left to label
+and says Too few arguments. Undo is what brings the values back, and the two
+belong together:
+
+    0 ENTER 1 ENTER 1.5 ENTER
+    ⓁNormlPDF       gives 0.12951 75956 66
+    Undo            brings back 0, 1 and 1.5
+    ⓁNormlArgs      gives μ:0 sx:1 X:1.5
+
+This works on values you enter yourself, one line at a time. It does not work on
+an example transferred from this help: the whole block arrives in the editor at
+once and runs as a single command line, and the stack is saved once per command
+line, so there is nothing between the values and the result for Undo to return
+to. Nothing in RPL can force a save either — it is a gesture of the editor, not
+of the language.
+
+**Recalling the arguments themselves.** `LastArguments` reports what a call
+consumed, as a list, and unlike Undo it works inside a single command line -
+including a block transferred from this help:
+
+```rpl
+0 1 1.5 ⓁNormlPDF LastArguments
+@ Expecting { 0 1 1.5 }
+```
+
+The density is left on the stack below.
+
+**Loose or bundled.** Every entry accepts its arguments either way: five bare
+numbers, or one list of five. So the list travels, and can be named:
+
+```rpl
+0 1 1.5 ⓁNormlPDF LastArguments ⓁNormlArgs
+@ Expecting X:1.5
+```
+
+μ:0 and sx:1 are left below it. Stored under a name, the same bundle serves
+every entry of that law - `'P' STO` then `P ⓁNormlCDF`, `P ⓁNormlQ`.
+
+A list is checked for length before use, which bare values cannot be. A bundle
+of the wrong size says so and stays on the stack for you to redirect, instead
+of being consumed to compute something nobody asked for.
+
+`<Law>Mu`, `<Law>Sx` and `<Law>Rand` take the parameters alone, so they accept
+a bundle of their own size or one element longer, dropping the trailing varying
+argument. A point computed with `ⓁNormlPDF` can therefore be drawn from without
+retyping anything:
+
+```rpl
+0 1 1.5 ⓁNormlPDF LastArguments ⓁNormlArgs 3 →List
+@ Expecting { μ:0 sx:1 X:1.5 }
+```
+
+That works only because the parameters come first and the varying argument
+last, so the surplus element is always the one to drop. Anything shorter, or
+longer by more than one, is refused by name.
+
+This is why the entries end by pushing their own arguments and dropping them
+again. Without that suffix `LastArguments` reports the last value the program
+computed internally - an expression full of `LocalVariable0` - rather than what
+the caller supplied. That is issue #1738. `PhitMu`, `PhitSx` and `PhitRand` take
+no arguments, so there is nothing for them to report.
+
+`<Law>All` goes further and answers everything about one point in a single call,
+tagged the same way — distribution function, density, upper tail, mean and
+standard deviation.
+
+Tagged values are accepted everywhere in this section: each entry strips the
+tags from its arguments before using them, so a labelled row can be passed
+straight back in. `50 10 5 1 ⓁHyperArgs ⓁHyperCDF` gives 0.74189 99792 33,
+exactly as the unlabelled call does.
+
+**The moments are the reason to prefer these to a table.** Mean and standard
+deviation are computed from the parameters rather than looked up, which is what
+makes the section usable for propagating uncertainty: the mean and deviation of
+a truncated normal are not those of the normal it was cut from, and the two
+functions say so. Where a law has no moments the function returns the undefined
+constant rather than a plausible number — Cauchy is the case that matters.
+
+**How the quantiles are obtained.** Nine laws have a closed-form inverse and use
+it: Expon, Weibl, Rayleigh, Logis, Pareto, UnifCont, GEV, Bernoulli and UnifDis.
+Those are exact and instant. Sixteen bisect over an interval that brackets the
+whole support, then take two Newton steps with the density as the derivative;
+they cannot fail, since a monotone function from zero to one is bracketed by
+construction. The remaining five are discrete and add up the mass function until
+it reaches the requested probability.
+
+Chi2, Gamma and Beta once had no closed-form distribution function, integrated at
+every step, and cost seconds. They now call the GammaP and BetaI primitives and
+return in about a tenth of a second, like most of the others. Student and Fisher
+are the slowest at roughly four tenths.
+
+**Drawing from a law.** `<Law>Rand` takes the parameters alone and returns one
+draw. It works by inversion: a uniform variate is fed to the law's own quantile,
+so nothing new is assumed about the law and every guard already built into the
+quantile still applies. The cost is therefore the cost of that quantile.
+
+Seed the generator with RDZ to make a sequence reproducible. The examples in this
+section all seed with 42, which is why their results can be checked at all;
+without a seed every run differs. To collect several draws, put the call in a
+loop: `42 rdz 1 5 START 0 1 ⓁNormlRand NEXT 5 →List` returns five standard
+normal variates.
+
+For the seven discrete laws the quantile returns the smallest integer m for
+which CDF(m) is at least the probability given, as R's qbinom does.
+
+These entries live on the calculator's disk, under Probability in the LIB menu:
+the files are library/Probability/*.48s and config/library.csv declares them.
+They therefore cost no program memory at all.
+
+## ProbabilityLibrary
+
+Thirty distributions, one submenu each, holding the density, the distribution
+function, the upper tail, the quantile, a random draw, the two moments, and two
+entries that answer with names rather than bare numbers.
+
+Parameters go first and the varying argument last, bare or bundled in a list of
+the right length, whose length is checked before anything is computed.
+
+A first submenu, [LawDemos](#lawdemoslibrary), shows the laws at work on random
+draws.
+
+Three of these laws are not only models but instruments: [Student](#studentlibrary)
+measures means, [Chi2](#chi2library) measures counts and variances, and
+[Fisher](#fisherlibrary) compares variances. The tests that use them are in the
+StatTests section — see [StatTests](#stattestslibrary).
+
+## LawDemosLibrary
+
+Demonstrations of the distributions on random draws, a new case at each press.
+Seed the generator with RDZ to replay one.
+
+* DMOHisto: a law at random, or the one given, its histogram and its density.
+* DMOWalk: a Brownian walk and a Lévy flight side by side.
+* DMOMarkov: a Markov chain, its path and its stationary distribution.
+
+
+## DMOHisto
+
+A law drawn at random among nine — Norml, LgNrm, Expon, Weibl, TriSym, UShape,
+Rayleigh, Logis and Chi2 — with random parameters, or the law given on the
+stack:
+
+* a law name alone, such as `"UShape"`: that law, with random parameters.
+  `"Gamma"` and `"Beta"` are accepted too, though never drawn at random: their
+  draws, by inversion, are slow (about 20 seconds for Gamma in the simulator,
+  far longer on a calculator);
+* a list `{ law { parameters } }`, such as `{ "Expon" { 1.2 } }`: that law with
+  these parameters. Any law of the Probability menu with a Rand and a PDF entry
+  will do.
+
+Three hundred values are drawn from the law by its Rand entry into ΣData,
+their histogram is drawn in gray by HistogramPlot, in 25 classes whatever the
+StatsPlotBins setting, and the density of the law is drawn over it in black by
+FunctionPlot, scaled to the counts: the number of draws times the width of a
+class times the density. The law and its parameters are written above, and
+returned on the stack, tagged `law`. The draws stay in ΣData, for Average or
+StandardDeviation.
+
+Some laws draw slowly on a calculator: Norml, LgNrm, UShape or Chi2 would
+take several minutes for 300 draws on a DM32. The draws therefore stop after
+about 30 seconds, with 30 of them at least, and the classes follow their
+number: 25 classes for 300 draws, 8 for 30. The number of draws is written
+above the plot. To have the 300 draws whatever the time, store a number other
+than 0 in the global variable ExtendedTrials, for instance
+1 'ExtendedTrials' Sto; purge it to come back to the time limit. In the
+simulator or on a phone, all the laws draw their 300 values in a few seconds.
+
+Press again for a new law: the tagged result of the previous run is not taken
+as an argument. To replay the same law on fresh draws, remove the tag first.
+
+**1)** A law at random, reproducible with the seed:
+
+```rpl
+1 RDZ ⓁDMOHisto
+```
+
+**2)** A law chosen by name, its parameters at random:
+
+```rpl
+"UShape" ⓁDMOHisto
+```
+
+**3)** A law and its parameters:
+
+```rpl
+{ "Expon" { 1.2 } } ⓁDMOHisto
+```
+
+**4)** The same law twice, on fresh draws:
+
+```rpl
+1 RDZ ⓁDMOHisto DeleteTag ⓁDMOHisto
+```
+
+The bars wander around the curve: with 300 draws, a class that should hold
+12 values holds about 12 ± 3.5, the square root of 12. With the fewer draws of
+a slow law on a calculator, the bars wander more. More draws make the
+histogram closer to the density, in 1/√N. The arc sine law (UShape), with its
+two peaks at the ends, and the exponential law, with its long tail, are the
+most striking.
+
+
+## DMOWalk
+
+Two random walks in the plane, 200 steps each, in uniformly random directions
+and with the same mean step length, 3. Each walk is scaled to its own panel,
+and its start is marked by a small square.
+
+* On the left, the steps are drawn from Expon, of rate 1/3: a Brownian walk,
+  the drunkard's walk of the textbooks. Karl Pearson put the problem in *Nature*
+  in 1905, and Lord Rayleigh answered it the next week.
+* On the right, the steps are drawn from Pareto, of exponent `α = 1.2` and
+  minimum `xm = 3(α-1)/α = 0.5`. For α < 2 the variance of the steps is
+  infinite: this is a Lévy flight. Clusters of short steps are joined by rare
+  long jumps, and the longest step alone may take a large share of the path.
+
+Below each panel is the share of the whole path taken by the longest step; both
+shares are returned, tagged. Another exponent may be given on the stack, with
+`1 < α ≤ 3`; any other object is left alone. As α grows, the Lévy flight comes
+closer to the Brownian walk.
+
+Lévy flights became famous in ecology when Viswanathan and co-authors
+(*Nature*, 1996) found them in the flights of wandering albatrosses, and argued
+that they make the best search for sparse prey. Edwards and co-authors
+(*Nature*, 2007) showed that the long flights came mostly from the way the
+time spent on the water had been counted. The hypothesis is still debated:
+Humphries and co-authors (*Nature*, 2010) found Lévy patterns in sharks and
+tunas where prey is sparse, and Brownian ones where it is plentiful.
+
+**1)** A walk and a flight:
+
+```rpl
+1 RDZ ⓁDMOWalk
+```
+
+**2)** The same seed, a lighter tail:
+
+```rpl
+1 RDZ 1.9 ⓁDMOWalk
+```
+
+**3)** With `α = 3` the variance is finite, and the flight is a walk:
+
+```rpl
+1 RDZ 3 ⓁDMOWalk
+```
+
+
+## DMOMarkov
+
+A Markov chain: the next state depends only on the present one, through a
+matrix of transition probabilities `P`, where `P(i,j)` is the probability of
+going from state `i` to state `j`, each row summing to 1.
+
+By default, an economy with three states, growth (G), stagnation (S) and
+recession (R), from quarter to quarter:
+
+| From → to | G    | S    | R    |
+|-----------|------|------|------|
+| G         | 0.85 | 0.10 | 0.05 |
+| S         | 0.30 | 0.55 | 0.15 |
+| R         | 0.20 | 0.30 | 0.50 |
+
+These probabilities are only illustrative, not estimated from data. Hamilton
+(*Econometrica*, 1989) made such regime-switching models a classic tool of the
+study of business cycles.
+
+Two hundred quarters are simulated from state 1 and drawn as steps. Below, the
+share of time spent in each state (gray bars) is compared with the stationary
+distribution π (black lines), the solution of `π·P = π` with `Σπ = 1`, found
+here by solving a linear system. Over a long run the shares tend to π, whatever
+the starting state: this is the ergodic theorem of Markov chains. Both are
+returned, tagged `observed` and `stationary`.
+
+Another square transition matrix may be given on the stack; its states are
+then numbered.
+
+**1)** The default economy:
+
+```rpl
+1 RDZ ⓁDMOMarkov
+```
+
+**2)** Two states; the stationary distribution is (5/6, 1/6):
+
+```rpl
+1 RDZ [[ 0.9 0.1 ][ 0.5 0.5 ]] ⓁDMOMarkov
+```
+
+**3)** Four states in a row, each passing only to its neighbours:
+
+```rpl
+1 RDZ
+[[ 0.7 0.2 0.1 0 ][ 0.2 0.6 0.2 0 ][ 0 0.2 0.6 0.2 ][ 0 0 0.3 0.7 ]]
+ⓁDMOMarkov
+```
+
+
+## NormlLibrary
+
+The normal law, the reference against which the others are read: the limit
+toward which a sum of many small independent causes tends, whatever their own
+laws. Its two parameters are its two moments, which is true of almost no other
+law here.
+
+Parameters: `μ`, `sx`, then the point.
+
+Entries: NormlPDF, NormlCDF, NormlCDFc, NormlQ, NormlRand, NormlArgs, NormlAll.
+
+It is also the law behind the Student tests — see [StudentTests](#studenttestslibrary).
+
+## LgNrmLibrary
+
+A quantity whose **logarithm** is normal — what one gets when causes multiply
+instead of adding. Particle sizes, incomes, times to failure. Beware the
+parameters: μl and σl are the mean and deviation of the logarithm, not of the
+quantity.
+
+Parameters: `μl`, `σl`, then the point.
+
+Entries: LgNrmPDF, LgNrmCDF, LgNrmCDFc, LgNrmQ, LgNrmRand, LgNrmMu, LgNrmSx, LgNrmArgs, LgNrmAll.
+
+## ExponLibrary
+
+Waiting time when the hazard is constant: the chance of the event in the next
+minute does not depend on how long one has already waited. It is the **only**
+continuous law with that property, and that is what makes it the default model
+of a lifetime with no wear and no infancy.
+
+Parameters: `λ`, then the point.
+
+Entries: ExponPDF, ExponCDF, ExponCDFc, ExponQ, ExponRand, ExponMu, ExponSx, ExponArgs, ExponAll.
+
+## WeiblLibrary
+
+Waiting time when the hazard is **not** constant — the working tool of
+reliability. The shape sh says which regime: below 1 the hazard falls (infant
+mortality), at 1 it is the exponential exactly, above 1 it rises (wear-out).
+
+Parameters: `sh`, `λ`, then the point.
+
+Entries: WeiblPDF, WeiblCDF, WeiblCDFc, WeiblQ, WeiblRand, WeiblMu, WeiblSx, WeiblArgs, WeiblAll.
+
+## RayleighLibrary
+
+The length of a two-dimensional vector whose two components are independent
+normals of the same deviation: wind speed from its components, radial error of
+a shot, amplitude of a signal with random phase.
+
+Parameters: `s`, then the point.
+
+Entries: RayleighPDF, RayleighCDF, RayleighCDFc, RayleighQ, RayleighRand, RayleighMu, RayleighSx, RayleighArgs, RayleighAll.
+
+## LogisLibrary
+
+Shaped like the normal but with heavier tails, and unlike it possessing a
+distribution function in closed form — which is why growth curves and logistic
+regression use it. Note that s is a scale, not the standard deviation: the
+deviation is sπ/√3.
+
+Parameters: `μ`, `s`, then the point.
+
+Entries: LogisPDF, LogisCDF, LogisCDFc, LogisQ, LogisRand, LogisSx, LogisArgs, LogisAll.
+
+## ParetoLibrary
+
+The power law: a few very large values and a crowd of small ones. The
+exponent ap decides what exists at all — the mean is infinite when ap ≤ 1, and
+the variance when ap ≤ 2. Read those returns as a statement about the model,
+not as a defect of the arithmetic.
+
+Parameters: `xm`, `ap`, then the point.
+
+Entries: ParetoPDF, ParetoCDF, ParetoCDFc, ParetoQ, ParetoRand, ParetoMu, ParetoSx, ParetoArgs, ParetoAll.
+
+## CauchLibrary
+
+The ratio of two independent normals. It has **no mean and no variance**: the
+average of a thousand draws is no better than a single draw, and the usual
+tests do not apply to it. It is here as much as a warning as a model.
+
+Parameters: `x0`, `sc`, then the point.
+
+Entries: CauchPDF, CauchCDF, CauchCDFc, CauchQ, CauchRand, CauchMu, CauchSx, CauchArgs, CauchAll.
+
+## UnifContLibrary
+
+Equal density over an interval — the raw material of simulation, since a
+uniform passed through the quantile of any law returns a draw from that law.
+That is exactly how every Rand entry of this section works.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UnifContPDF, UnifContCDF, UnifContCDFc, UnifContQ, UnifContRand, UnifContMu, UnifContSx, UnifContArgs, UnifContAll.
+
+## TriSymLibrary
+
+The symmetric triangular law, which is the sum of two uniforms. Used as a
+rough stand-in for the normal when only a minimum, a maximum and a centre are
+known.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriSymPDF, TriSymCDF, TriSymCDFc, TriSymQ, TriSymRand, TriSymMu, TriSymSx, TriSymArgs, TriSymAll.
+
+## Chi2Library
+
+The sum of df squared standard normals — and therefore the law of an estimated
+variance. It is what turns a sample deviation into a statement about the
+population.
+
+Parameters: `df`, then the point.
+
+Entries: Chi2PDF, Chi2CDF, Chi2CDFc, Chi2Q, Chi2Rand, Chi2Mu, Chi2Sx, Chi2Args, Chi2All.
+
+It is also the law behind the chi-square tests — see [Chi2Tests](#chi2testslibrary).
+
+## BetaLibrary
+
+Defined on the interval from zero to one, which makes it the natural law of a
+proportion. Its two shapes a and b bend it into almost anything: uniform, bell,
+U, or a spike at either end.
+
+Parameters: `a`, `b`, then the point.
+
+Entries: BetaPDF, BetaCDF, BetaCDFc, BetaQ, BetaRand, BetaMu, BetaSx, BetaArgs, BetaAll.
+
+## PhitLibrary
+
+The standard normal, μ = 0 and sx = 1 — the tabulated one. It takes **no
+parameter**, only the point, which is why its Mu, Sx and Rand entries take
+nothing at all.
+
+No parameter: only the point.
+
+Entries: PhitPDF, PhitCDF, PhitCDFc, PhitQ, PhitRand, PhitMu, PhitSx, PhitArgs, PhitAll.
+
+## TriRightLibrary
+
+A triangular law whose mode sits at its maximum: rising density, abrupt end.
+Three-point estimates in project planning, where the optimistic case is also
+the likeliest.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriRightPDF, TriRightCDF, TriRightCDFc, TriRightQ, TriRightRand, TriRightMu, TriRightSx, TriRightArgs, TriRightAll.
+
+## TriLeftLibrary
+
+A triangular law whose mode sits at its minimum: the mirror of TriRight, for
+the case where the pessimistic end is the likeliest and a long tail stretches
+toward the optimistic one.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: TriLeftPDF, TriLeftCDF, TriLeftCDFc, TriLeftQ, TriLeftRand, TriLeftMu, TriLeftSx, TriLeftArgs, TriLeftAll.
+
+## TriAsymLibrary
+
+The general triangular law, with the mode xp anywhere between the two bounds.
+The honest form of a three-point estimate — minimum, maximum, most likely —
+when nothing more is known.
+
+Parameters: `Xmin`, `Xmax`, `xp`, then the point.
+
+Entries: TriAsymPDF, TriAsymCDF, TriAsymCDFc, TriAsymQ, TriAsymRand, TriAsymMu, TriAsymSx, TriAsymArgs, TriAsymAll.
+
+## UShapeLibrary
+
+Density highest at **both** edges and lowest in the middle: the law of a
+quantity that spends its time near its extremes, like the position of a
+pendulum sampled at random instants.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UShapePDF, UShapeCDF, UShapeCDFc, UShapeQ, UShapeRand, UShapeMu, UShapeSx, UShapeArgs, UShapeAll.
+
+## GEVLibrary
+
+The law of **maxima**: whatever the underlying law, the largest of many draws
+tends to this one. The shape xi selects the family — Gumbel at zero, Fréchet
+above, reversed Weibull below. The tool of flood and gust engineering.
+
+Parameters: `x0`, `sc`, `xi`, then the point.
+
+Entries: GEVPDF, GEVCDF, GEVCDFc, GEVQ, GEVRand, GEVMu, GEVSx, GEVArgs, GEVAll.
+
+## BernoulliLibrary
+
+One trial, one success or one failure. The atom from which Binom, Geom and
+NegBinom are built.
+
+Parameters: `p`, then the point.
+
+Entries: BernoulliPDF, BernoulliCDF, BernoulliCDFc, BernoulliQ, BernoulliRand, BernoulliMu, BernoulliSx, BernoulliArgs, BernoulliAll.
+
+## BinomLibrary
+
+The number of successes in nt independent trials of probability p. Note that
+its quantile is a staircase, which is why it is computed by summation and not
+by a solver — a step has no slope to follow.
+
+Parameters: `nt`, `p`, then the point.
+
+Entries: BinomPDF, BinomCDF, BinomCDFc, BinomQ, BinomRand, BinomMu, BinomSx, BinomArgs, BinomAll.
+
+## PoissLibrary
+
+Rare events in a fixed window when they arrive independently at a constant
+rate: its mean and its variance are both λ, which is the quickest test of
+whether real counts are Poisson at all.
+
+Parameters: `λ`, then the point.
+
+Entries: PoissPDF, PoissCDF, PoissCDFc, PoissQ, PoissRand, PoissMu, PoissSx, PoissArgs, PoissAll.
+
+## GeomLibrary
+
+The number of trials up to the first success. The discrete memoryless law —
+the exponential's counterpart, and like it indifferent to how long one has
+already waited.
+
+Parameters: `p`, then the point.
+
+Entries: GeomPDF, GeomCDF, GeomCDFc, GeomQ, GeomRand, GeomMu, GeomSx, GeomArgs, GeomAll.
+
+## HyperLibrary
+
+Sampling **without** replacement: Ks favourable items among Np, of which nd are
+drawn. Where Binom would apply if the draws were put back. The difference
+matters when the sample is a noticeable fraction of the population.
+
+Parameters: `Np`, `Ks`, `nd`, then the point.
+
+Entries: HyperPDF, HyperCDF, HyperCDFc, HyperQ, HyperRand, HyperMu, HyperSx, HyperArgs, HyperAll.
+
+## UnifDisLibrary
+
+Equally likely integers between two bounds — the die, the lottery, the random
+index.
+
+Parameters: `Xmin`, `Xmax`, then the point.
+
+Entries: UnifDisPDF, UnifDisCDF, UnifDisCDFc, UnifDisQ, UnifDisRand, UnifDisMu, UnifDisSx, UnifDisArgs, UnifDisAll.
+
+## GammaLibrary
+
+The waiting time until the a-th event of a Poisson process, hence the sum of a
+exponentials. With a = 1 it is the exponential, and with a half-integer shape
+it is the chi-square in disguise.
+
+Parameters: `a`, `sc`, then the point.
+
+Entries: GammaPDF, GammaCDF, GammaCDFc, GammaQ, GammaRand, GammaMu, GammaSx, GammaArgs, GammaAll.
+
+## NormTruncLibrary
+
+A normal restricted to an interval and renormalised. What one needs when a
+quantity is normal in principle but cannot be negative, or cannot exceed a
+tolerance.
+
+Parameters: `x0`, `sc`, `Xmin`, `Xmax`, then the point.
+
+Entries: NormTruncPDF, NormTruncCDF, NormTruncCDFc, NormTruncQ, NormTruncRand, NormTruncMu, NormTruncSx, NormTruncArgs, NormTruncAll.
+
+## NegBinomLibrary
+
+The number of trials until the rs-th success. Also used, with a real rs, as an
+over-dispersed Poisson — counts whose variance exceeds their mean.
+
+Parameters: `rs`, `p`, then the point.
+
+Entries: NegBinomPDF, NegBinomCDF, NegBinomCDFc, NegBinomQ, NegBinomRand, NegBinomMu, NegBinomSx, NegBinomArgs, NegBinomAll.
+
+## StudentLibrary
+
+The normal with its standard deviation **estimated** rather than known. The
+extra uncertainty widens the tails, and df governs how much: at df = 30 it is
+already close to the normal, at df = 2 it barely has a variance.
+
+Parameters: `df`, then the point.
+
+Entries: StudentPDF, StudentCDF, StudentCDFc, StudentQ, StudentRand, StudentMu, StudentSx, StudentArgs, StudentAll.
+
+It is also the law behind the Student tests — see [StudentTests](#studenttestslibrary).
+
+## FisherLibrary
+
+The ratio of two chi-squares, each divided by its degrees of freedom — hence
+the law of a **ratio of variances**, and the foundation of the analysis of
+variance.
+
+Parameters: `dfn`, `dfd`, then the point.
+
+Entries: FisherPDF, FisherCDF, FisherCDFc, FisherQ, FisherRand, FisherMu, FisherSx, FisherArgs, FisherAll.
+
+It is also the law behind the tests built on it — see [FisherTests](#fishertestslibrary).
+
+## LevyLibrary
+
+A stable law with a tail so heavy that its mean is infinite. It is the law of
+the first time a Brownian motion reaches a level, and it appears wherever a
+sum of heavy-tailed quantities refuses to become normal.
+
+Parameters: `x0`, `sc`, then the point.
+
+Entries: LevyPDF, LevyCDF, LevyCDFc, LevyQ, LevyRand, LevyMu, LevySx, LevyArgs, LevyAll.
+
+
+## NormlPDF
+
+Density of the Norml distribution at X. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+
+![Normal Distribution](img/Norml_Distribution.bmp)
+
+```rpl
+0 1 1.5 ⓁNormlPDF
+@ Expecting 0.12951 75956 66
+```
+
+## NormlCDF
+
+Distribution function of Norml: the probability of not exceeding X. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+
+```rpl
+0 1 1.5 ⓁNormlCDF
+@ Expecting 0.93319 27987 31
+```
+
+## NormlCDFc
+
+Upper tail of Norml, the complement of its distribution function. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+
+```rpl
+0 1 1.5 ⓁNormlCDFc
+@ Expecting 0.06680 72012 69
+```
+
+## NormlQ
+
+Quantile of Norml: the value below which the probability is the one given. Stack: `μ`, `sx`, `p` — or `{ μ sx p }`.
+
+```rpl
+0 1 0.933192798731 ⓁNormlQ
+@ Expecting 1.5
+```
+
+## NormlRand
+
+Random draw from the Norml distribution. A uniform variate is drawn and fed to NormlQ, so the draw follows the law by inversion. Stack: `μ`, `sx` — or `{ μ sx }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁNormlRand
+@ Expecting 0.44143 17567 34
+```
+
+## NormlArgs
+
+Labels a row of values with the parameter names of Norml. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+
+```rpl
+0 1 1.5 ⓁNormlArgs 3 →List
+@ Expecting { μ:0 sx:1 X:1.5 }
+```
+
+## NormlAll
+
+Everything Norml has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `μ`, `sx`, `X` — or `{ μ sx X }`.
+
+```rpl
+0 1 1.5 ⓁNormlAll 5 →List
+@ Expecting { CDF:0.93319 27987 31 PDF:0.12951 75956 66 CDFc:0.06680 72012 69 μ:0 sx:1 }
+```
+
+## LgNrmPDF
+
+Density of the LgNrm distribution at X. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+
+![Lognormal Distribution](img/LgNrm_Distribution.bmp)
+
+```rpl
+0 1 1.5 ⓁLgNrmPDF
+@ Expecting 0.24497 36517 11
+```
+
+## LgNrmCDF
+
+Distribution function of LgNrm: the probability of not exceeding X. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+
+```rpl
+0 1 1.5 ⓁLgNrmCDF
+@ Expecting 0.65743 21694 85
+```
+
+## LgNrmCDFc
+
+Upper tail of LgNrm, the complement of its distribution function. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+
+```rpl
+0 1 1.5 ⓁLgNrmCDFc
+@ Expecting 0.34256 78305 15
+```
+
+## LgNrmQ
+
+Quantile of LgNrm: the value below which the probability is the one given. Stack: `μl`, `σl`, `p` — or `{ μl σl p }`.
+
+```rpl
+0 1 0.657432169485 ⓁLgNrmQ
+@ Expecting 1.5
+```
+
+## LgNrmMu
+
+Mean of the LgNrm distribution, computed from its parameters alone. Stack: `μl`, `σl` — or `{ μl σl }`.
+
+```rpl
+0 1 ⓁLgNrmMu
+@ Expecting 1.64872 12707
+```
+
+## LgNrmSx
+
+Standard deviation of the LgNrm distribution, computed from its parameters alone. Stack: `μl`, `σl` — or `{ μl σl }`.
+
+```rpl
+0 1 ⓁLgNrmSx
+@ Expecting 2.16119 74159
+```
+
+## LgNrmRand
+
+Random draw from the LgNrm distribution. A uniform variate is drawn and fed to LgNrmQ, so the draw follows the law by inversion. Stack: `μl`, `σl` — or `{ μl σl }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁLgNrmRand
+@ Expecting 1.55493 19097 6
+```
+
+## LgNrmArgs
+
+Labels a row of values with the parameter names of LgNrm. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+
+```rpl
+0 1 1.5 ⓁLgNrmArgs 3 →List
+@ Expecting { μl:0 σl:1 X:1.5 }
+```
+
+## LgNrmAll
+
+Everything LgNrm has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `μl`, `σl`, `X` — or `{ μl σl X }`.
+
+```rpl
+0 1 1.5 ⓁLgNrmAll 5 →List
+@ Expecting { CDF:0.65743 21694 85 PDF:0.24497 36517 11 CDFc:0.34256 78305 15 μ:1.64872 12707 sx:2.16119 74159 }
+```
+
+## ExponPDF
+
+Density of the Expon distribution at X. Stack: `λ`, `X` — or `{ λ X }`.
+
+![Exponential Distribution](img/Expon_Distribution.bmp)
+
+```rpl
+2 0.5 ⓁExponPDF
+@ Expecting 0.73575 88823 43
+```
+
+## ExponCDF
+
+Distribution function of Expon: the probability of not exceeding X. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+2 0.5 ⓁExponCDF
+@ Expecting 0.63212 05588 29
+```
+
+## ExponCDFc
+
+Upper tail of Expon, the complement of its distribution function. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+2 0.5 ⓁExponCDFc
+@ Expecting 0.36787 94411 71
+```
+
+## ExponQ
+
+Quantile of Expon: the value below which the probability is the one given. Stack: `λ`, `p` — or `{ λ p }`.
+
+```rpl
+2 0.632120558829 ⓁExponQ
+@ Expecting 0.50000 00000 01
+```
+
+## ExponMu
+
+Mean of the Expon distribution, computed from its parameters alone. Stack: `λ` — or `{ λ }`.
+
+```rpl
+2 ⓁExponMu
+@ Expecting 0.5
+```
+
+## ExponSx
+
+Standard deviation of the Expon distribution, computed from its parameters alone. Stack: `λ` — or `{ λ }`.
+
+```rpl
+2 ⓁExponSx
+@ Expecting 0.5
+```
+
+## ExponRand
+
+Random draw from the Expon distribution. A uniform variate is drawn and fed to ExponQ, so the draw follows the law by inversion. Stack: `λ` — or `{ λ }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 2 ⓁExponRand
+@ Expecting 0.55516 49946 83
+```
+
+## ExponArgs
+
+Labels a row of values with the parameter names of Expon. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+2 0.5 ⓁExponArgs 2 →List
+@ Expecting { λ:2 X:0.5 }
+```
+
+## ExponAll
+
+Everything Expon has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+2 0.5 ⓁExponAll 5 →List
+@ Expecting { CDF:0.63212 05588 29 PDF:0.73575 88823 43 CDFc:0.36787 94411 71 μ:0.5 sx:0.5 }
+```
+
+## WeiblPDF
+
+Density of the Weibl distribution at X. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+
+![Weibull Distribution](img/Weibl_Distribution.bmp)
+
+```rpl
+2 1 1 ⓁWeiblPDF
+@ Expecting 0.73575 88823 43
+```
+
+## WeiblCDF
+
+Distribution function of Weibl: the probability of not exceeding X. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+
+```rpl
+2 1 1 ⓁWeiblCDF
+@ Expecting 0.63212 05588 29
+```
+
+## WeiblCDFc
+
+Upper tail of Weibl, the complement of its distribution function. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+
+```rpl
+2 1 1 ⓁWeiblCDFc
+@ Expecting 0.36787 94411 71
+```
+
+## WeiblQ
+
+Quantile of Weibl: the value below which the probability is the one given. Stack: `sh`, `λ`, `p` — or `{ sh λ p }`.
+
+```rpl
+2 1 0.632120558829 ⓁWeiblQ
+@ Expecting 1.
+```
+
+## WeiblMu
+
+Mean of the Weibl distribution, computed from its parameters alone. Stack: `sh`, `λ` — or `{ sh λ }`.
+
+```rpl
+2 1 ⓁWeiblMu
+@ Expecting 0.88622 69254 53
+```
+
+## WeiblSx
+
+Standard deviation of the Weibl distribution, computed from its parameters alone. Stack: `sh`, `λ` — or `{ sh λ }`.
+
+```rpl
+2 1 ⓁWeiblSx
+@ Expecting 0.46325 13751 76
+```
+
+## WeiblRand
+
+Random draw from the Weibl distribution. A uniform variate is drawn and fed to WeiblQ, so the draw follows the law by inversion. Stack: `sh`, `λ` — or `{ sh λ }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 2 1 ⓁWeiblRand
+@ Expecting 1.05372 19696 7
+```
+
+## WeiblArgs
+
+Labels a row of values with the parameter names of Weibl. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+
+```rpl
+2 1 1 ⓁWeiblArgs 3 →List
+@ Expecting { sh:2 λ:1 X:1 }
+```
+
+## WeiblAll
+
+Everything Weibl has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `sh`, `λ`, `X` — or `{ sh λ X }`.
+
+```rpl
+2 1 1 ⓁWeiblAll 5 →List
+@ Expecting { CDF:0.63212 05588 29 PDF:0.73575 88823 43 CDFc:0.36787 94411 71 μ:0.88622 69254 53 sx:0.46325 13751 76 }
+```
+
+## RayleighPDF
+
+Density of the Rayleigh distribution at X. Stack: `s`, `X` — or `{ s X }`.
+
+![Rayleigh Distribution](img/Rayleigh_Distribution.bmp)
+
+```rpl
+1 1 ⓁRayleighPDF
+@ Expecting 0.60653 06597 13
+```
+
+## RayleighCDF
+
+Distribution function of Rayleigh: the probability of not exceeding X. Stack: `s`, `X` — or `{ s X }`.
+
+```rpl
+1 1 ⓁRayleighCDF
+@ Expecting 0.39346 93402 87
+```
+
+## RayleighCDFc
+
+Upper tail of Rayleigh, the complement of its distribution function. Stack: `s`, `X` — or `{ s X }`.
+
+```rpl
+1 1 ⓁRayleighCDFc
+@ Expecting 0.60653 06597 13
+```
+
+## RayleighQ
+
+Quantile of Rayleigh: the value below which the probability is the one given. Stack: `s`, `p` — or `{ s p }`.
+
+```rpl
+1 0.393469340287 ⓁRayleighQ
+@ Expecting 0.99999 99999 99
+```
+
+## RayleighMu
+
+Mean of the Rayleigh distribution, computed from its parameters alone. Stack: `s` — or `{ s }`.
+
+```rpl
+1 ⓁRayleighMu
+@ Expecting 1.25331 41373 2
+```
+
+## RayleighSx
+
+Standard deviation of the Rayleigh distribution, computed from its parameters alone. Stack: `s` — or `{ s }`.
+
+```rpl
+1 ⓁRayleighSx
+@ Expecting 0.65513 63775 62
+```
+
+## RayleighRand
+
+Random draw from the Rayleigh distribution. A uniform variate is drawn and fed to RayleighQ, so the draw follows the law by inversion. Stack: `s` — or `{ s }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 1 ⓁRayleighRand
+@ Expecting 1.49018 79004 8
+```
+
+## RayleighArgs
+
+Labels a row of values with the parameter names of Rayleigh. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `s`, `X` — or `{ s X }`.
+
+```rpl
+1 1 ⓁRayleighArgs 2 →List
+@ Expecting { s:1 X:1 }
+```
+
+## RayleighAll
+
+Everything Rayleigh has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `s`, `X` — or `{ s X }`.
+
+```rpl
+1 1 ⓁRayleighAll 5 →List
+@ Expecting { CDF:0.39346 93402 87 PDF:0.60653 06597 13 CDFc:0.60653 06597 13 μ:1.25331 41373 2 sx:0.65513 63775 62 }
+```
+
+## LogisPDF
+
+Density of the Logis distribution at X. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+
+![Logistic Distribution](img/Logis_Distribution.bmp)
+
+```rpl
+0 1 1 ⓁLogisPDF
+@ Expecting 0.19661 19332 41
+```
+
+## LogisCDF
+
+Distribution function of Logis: the probability of not exceeding X. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+
+```rpl
+0 1 1 ⓁLogisCDF
+@ Expecting 0.73105 85786 3
+```
+
+## LogisCDFc
+
+Upper tail of Logis, the complement of its distribution function. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+
+```rpl
+0 1 1 ⓁLogisCDFc
+@ Expecting 0.26894 14213 7
+```
+
+## LogisQ
+
+Quantile of Logis: the value below which the probability is the one given. Stack: `μ`, `s`, `p` — or `{ μ s p }`.
+
+```rpl
+0 1 0.73105857863 ⓁLogisQ
+@ Expecting 1.
+```
+
+## LogisSx
+
+Standard deviation of the Logis distribution, computed from its parameters alone. Stack: `μ`, `s` — or `{ μ s }`.
+
+```rpl
+0 1 ⓁLogisSx
+@ Expecting 1.81379 93642 3
+```
+
+## LogisRand
+
+Random draw from the Logis distribution. A uniform variate is drawn and fed to LogisQ, so the draw follows the law by inversion. Stack: `μ`, `s` — or `{ μ s }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁLogisRand
+@ Expecting 0.71067 26414 26
+```
+
+## LogisArgs
+
+Labels a row of values with the parameter names of Logis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+
+```rpl
+0 1 1 ⓁLogisArgs 3 →List
+@ Expecting { μ:0 s:1 X:1 }
+```
+
+## LogisAll
+
+Everything Logis has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `μ`, `s`, `X` — or `{ μ s X }`.
+
+```rpl
+0 1 1 ⓁLogisAll 5 →List
+@ Expecting { CDF:0.73105 85786 3 PDF:0.19661 19332 41 CDFc:0.26894 14213 7 μ:0 sx:1.81379 93642 3 }
+```
+
+## ParetoPDF
+
+Density of the Pareto distribution at X. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+
+![Pareto Distribution](img/Pareto_Distribution.bmp)
+
+```rpl
+1 3 2 ⓁParetoPDF
+@ Expecting 0.1875
+```
+
+## ParetoCDF
+
+Distribution function of Pareto: the probability of not exceeding X. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+
+```rpl
+1 3 2 ⓁParetoCDF
+@ Expecting 0.875
+```
+
+## ParetoCDFc
+
+Upper tail of Pareto, the complement of its distribution function. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+
+```rpl
+1 3 2 ⓁParetoCDFc
+@ Expecting 0.125
+```
+
+## ParetoQ
+
+Quantile of Pareto: the value below which the probability is the one given. Stack: `xm`, `ap`, `p` — or `{ xm ap p }`.
+
+```rpl
+1 3 0.875 ⓁParetoQ
+@ Expecting 2.
+```
+
+## ParetoMu
+
+Mean of the Pareto distribution, computed from its parameters alone. Stack: `xm`, `ap` — or `{ xm ap }`.
+
+The power law has a heavy tail, so the mean exists only above a certain index.
+For `ap>1` it is `ap*xm/(ap-1)`; at `ap≤1` the integral diverges and the entry
+answers with the infinite constant rather than a number that means nothing.
+
+```rpl
+1 3 ⓁParetoMu
+@ Expecting 1.5
+```
+
+## ParetoSx
+
+Standard deviation of the Pareto distribution, computed from its parameters alone. Stack: `xm`, `ap` — or `{ xm ap }`.
+
+Three regimes, as in the Equation Library section. For `ap>2` the deviation is
+the value below. For `1<ap≤2` the mean is finite but the variance integral
+diverges, so the answer is the infinite constant. For `ap≤1` the mean is itself
+infinite and there is nothing to take a deviation from: the answer is the
+undefined constant, which is not the same as infinite.
+
+```rpl
+1 3 ⓁParetoSx
+@ Expecting 0.86602 54037 84
+```
+
+## ParetoRand
+
+Random draw from the Pareto distribution. A uniform variate is drawn and fed to ParetoQ, so the draw follows the law by inversion. Stack: `xm`, `ap` — or `{ xm ap }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 1 3 ⓁParetoRand
+@ Expecting 1.44789 38691
+```
+
+## ParetoArgs
+
+Labels a row of values with the parameter names of Pareto. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+
+```rpl
+1 3 2 ⓁParetoArgs 3 →List
+@ Expecting { xm:1 ap:3 X:2 }
+```
+
+## ParetoAll
+
+Everything Pareto has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `xm`, `ap`, `X` — or `{ xm ap X }`.
+
+```rpl
+1 3 2 ⓁParetoAll 5 →List
+@ Expecting { CDF:0.875 PDF:0.1875 CDFc:0.125 μ:1.5 sx:0.86602 54037 84 }
+```
+
+## CauchPDF
+
+Density of the Cauch distribution at X. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+![Cauchy Distribution](img/Cauch_Distribution.bmp)
+
+```rpl
+0 1 1 ⓁCauchPDF
+@ Expecting 0.15915 49430 92
+```
+
+## CauchCDF
+
+Distribution function of Cauch: the probability of not exceeding X. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁCauchCDF
+@ Expecting 0.75
+```
+
+## CauchCDFc
+
+Upper tail of Cauch, the complement of its distribution function. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁCauchCDFc
+@ Expecting 0.25
+```
+
+## CauchQ
+
+Quantile of Cauch: the value below which the probability is the one given. Stack: `x0`, `sc`, `p` — or `{ x0 sc p }`.
+
+```rpl
+0 1 0.75 ⓁCauchQ
+@ Expecting 1.
+```
+
+## CauchMu
+
+Mean of the Cauch distribution, computed from its parameters alone. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+```rpl
+0 1 ⓁCauchMu
+@ Expecting 'Undefined'
+```
+
+## CauchSx
+
+Standard deviation of the Cauch distribution, computed from its parameters alone. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+```rpl
+0 1 ⓁCauchSx
+@ Expecting 'Undefined'
+```
+
+## CauchRand
+
+Random draw from the Cauch distribution. A uniform variate is drawn and fed to CauchQ, so the draw follows the law by inversion. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁCauchRand
+@ Expecting 0.59373 19743 47
+```
+
+## CauchArgs
+
+Labels a row of values with the parameter names of Cauch. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁCauchArgs 3 →List
+@ Expecting { x0:0 sc:1 X:1 }
+```
+
+## CauchAll
+
+Everything Cauch has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁCauchAll 5 →List
+@ Expecting { CDF:0.75 PDF:0.15915 49430 92 CDFc:0.25 μ:'Undefined' sx:'Undefined' }
+```
+
+## UnifContPDF
+
+Density of the UnifCont distribution at X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![Continuous Uniform Distribution](img/UnifCont_Distribution.bmp)
+
+```rpl
+0 1 0.4 ⓁUnifContPDF
+@ Expecting 1
+```
+
+## UnifContCDF
+
+Distribution function of UnifCont: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.4 ⓁUnifContCDF
+@ Expecting 0.4
+```
+
+## UnifContCDFc
+
+Upper tail of UnifCont, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.4 ⓁUnifContCDFc
+@ Expecting 0.6
+```
+
+## UnifContQ
+
+Quantile of UnifCont: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+0 1 0.4 ⓁUnifContQ
+@ Expecting 0.4
+```
+
+## UnifContMu
+
+Mean of the UnifCont distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁUnifContMu
+@ Expecting 0.5
+```
+
+## UnifContSx
+
+Standard deviation of the UnifCont distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁUnifContSx
+@ Expecting 0.28867 51345 95
+```
+
+## UnifContRand
+
+Random draw from the UnifCont distribution. A uniform variate is drawn and fed to UnifContQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁUnifContRand
+@ Expecting 0.67054 97719 36
+```
+
+## UnifContArgs
+
+Labels a row of values with the parameter names of UnifCont. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.4 ⓁUnifContArgs 3 →List
+@ Expecting { Xmin:0 Xmax:1 X:0.4 }
+```
+
+## UnifContAll
+
+Everything UnifCont has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.4 ⓁUnifContAll 5 →List
+@ Expecting { CDF:0.4 PDF:1 CDFc:0.6 μ:0.5 sx:0.28867 51345 95 }
+```
+
+## TriSymPDF
+
+Density of the TriSym distribution at X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![Symmetric Triangular Distribution](img/TriSym_Distribution.bmp)
+
+```rpl
+0 1 0.3 ⓁTriSymPDF
+@ Expecting 1.2
+```
+
+## TriSymCDF
+
+Distribution function of TriSym: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.3 ⓁTriSymCDF
+@ Expecting 0.18
+```
+
+## TriSymCDFc
+
+Upper tail of TriSym, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.3 ⓁTriSymCDFc
+@ Expecting 0.82
+```
+
+## TriSymQ
+
+Quantile of TriSym: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+0 1 0.18 ⓁTriSymQ
+@ Expecting 0.3
+```
+
+## TriSymMu
+
+Mean of the TriSym distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁTriSymMu
+@ Expecting 0.5
+```
+
+## TriSymSx
+
+Standard deviation of the TriSym distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁTriSymSx
+@ Expecting 0.20412 41452 32
+```
+
+## TriSymRand
+
+Random draw from the TriSym distribution. A uniform variate is drawn and fed to TriSymQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁTriSymRand
+@ Expecting 0.59413 65820 48
+```
+
+## TriSymArgs
+
+Labels a row of values with the parameter names of TriSym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.3 ⓁTriSymArgs 3 →List
+@ Expecting { Xmin:0 Xmax:1 X:0.3 }
+```
+
+## TriSymAll
+
+Everything TriSym has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.3 ⓁTriSymAll 5 →List
+@ Expecting { CDF:0.18 PDF:1.2 CDFc:0.82 μ:0.5 sx:0.20412 41452 32 }
+```
+
+## Chi2PDF
+
+Density of the Chi2 distribution at X. Stack: `df`, `X` — or `{ df X }`.
+
+![Chi-Square Distribution](img/Chi2_Distribution.bmp)
+
+```rpl
+4 3 ⓁChi2PDF
+@ Expecting 0.16734 76201 11
+```
+
+## Chi2CDF
+
+Distribution function of Chi2: the probability of not exceeding X. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 3 ⓁChi2CDF
+@ Expecting 0.44217 45996 29
+```
+
+## Chi2CDFc
+
+Upper tail of Chi2, the complement of its distribution function. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 3 ⓁChi2CDFc
+@ Expecting 0.55782 54003 71
+```
+
+## Chi2Q
+
+Quantile of Chi2: the value below which the probability is the one given. Stack: `df`, `p` — or `{ df p }`.
+
+```rpl
+4 0.442174599629 ⓁChi2Q
+@ Expecting 3.
+```
+
+## Chi2Mu
+
+Mean of the Chi2 distribution, computed from its parameters alone. Stack: `df` — or `{ df }`.
+
+```rpl
+4 ⓁChi2Mu
+@ Expecting 4
+```
+
+## Chi2Sx
+
+Standard deviation of the Chi2 distribution, computed from its parameters alone. Stack: `df` — or `{ df }`.
+
+```rpl
+4 ⓁChi2Sx
+@ Expecting 2.82842 71247 5
+```
+
+## Chi2Rand
+
+Random draw from the Chi2 distribution. A uniform variate is drawn and fed to Chi2Q, so the draw follows the law by inversion. Stack: `df` — or `{ df }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 4 ⓁChi2Rand
+@ Expecting 4.61219 78103 9
+```
+
+## Chi2Args
+
+Labels a row of values with the parameter names of Chi2. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 3 ⓁChi2Args 2 →List
+@ Expecting { df:4 X:3 }
+```
+
+## Chi2All
+
+Everything Chi2 has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 3 ⓁChi2All 5 →List
+@ Expecting { CDF:0.44217 45996 29 PDF:0.16734 76201 11 CDFc:0.55782 54003 71 μ:4 sx:2.82842 71247 5 }
+```
+
+## BetaPDF
+
+Density of the Beta distribution at X. Stack: `a`, `b`, `X` — or `{ a b X }`.
+
+![Beta Distribution](img/Beta_Distribution.bmp)
+
+```rpl
+2 3 0.4 ⓁBetaPDF
+@ Expecting 1.728
+```
+
+## BetaCDF
+
+Distribution function of Beta: the probability of not exceeding X. Stack: `a`, `b`, `X` — or `{ a b X }`.
+
+```rpl
+2 3 0.4 ⓁBetaCDF
+@ Expecting 0.5248
+```
+
+## BetaCDFc
+
+Upper tail of Beta, the complement of its distribution function. Stack: `a`, `b`, `X` — or `{ a b X }`.
+
+```rpl
+2 3 0.4 ⓁBetaCDFc
+@ Expecting 0.4752
+```
+
+## BetaQ
+
+Quantile of Beta: the value below which the probability is the one given. Stack: `a`, `b`, `p` — or `{ a b p }`.
+
+```rpl
+2 3 0.5248 ⓁBetaQ
+@ Expecting 0.4
+```
+
+## BetaMu
+
+Mean of the Beta distribution, computed from its parameters alone. Stack: `a`, `b` — or `{ a b }`.
+
+```rpl
+2 3 ⓁBetaMu
+@ Expecting 0.4
+```
+
+## BetaSx
+
+Standard deviation of the Beta distribution, computed from its parameters alone. Stack: `a`, `b` — or `{ a b }`.
+
+```rpl
+2 3 ⓁBetaSx
+@ Expecting 0.2
+```
+
+## BetaRand
+
+Random draw from the Beta distribution. A uniform variate is drawn and fed to BetaQ, so the draw follows the law by inversion. Stack: `a`, `b` — or `{ a b }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 2 3 ⓁBetaRand
+@ Expecting 0.48882 28829 11
+```
+
+## BetaArgs
+
+Labels a row of values with the parameter names of Beta. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `b`, `X` — or `{ a b X }`.
+
+```rpl
+2 3 0.4 ⓁBetaArgs 3 →List
+@ Expecting { a:2 b:3 X:0.4 }
+```
+
+## BetaAll
+
+Everything Beta has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `a`, `b`, `X` — or `{ a b X }`.
+
+```rpl
+2 3 0.4 ⓁBetaAll 5 →List
+@ Expecting { CDF:0.5248 PDF:1.728 CDFc:0.4752 μ:0.4 sx:0.2 }
+```
+
+## PhitPDF
+
+Density of the Phit distribution at X. Stack: `X` — or `{ X }`.
+
+![Standard Normal Distribution](img/Phit_Distribution.bmp)
+
+```rpl
+1 ⓁPhitPDF
+@ Expecting 0.24197 07245 19
+```
+
+## PhitCDF
+
+Distribution function of Phit: the probability of not exceeding X. Stack: `X` — or `{ X }`.
+
+```rpl
+1 ⓁPhitCDF
+@ Expecting 0.84134 47460 69
+```
+
+## PhitCDFc
+
+Upper tail of Phit, the complement of its distribution function. Stack: `X` — or `{ X }`.
+
+```rpl
+1 ⓁPhitCDFc
+@ Expecting 0.15865 52539 31
+```
+
+## PhitQ
+
+Quantile of Phit: the value below which the probability is the one given. Stack: `p` — or `{ p }`.
+
+```rpl
+0.841344746069 ⓁPhitQ
+@ Expecting 1.
+```
+
+## PhitMu
+
+Mean of the Phit distribution, computed from its parameters alone. Stack: nothing.
+
+```rpl
+ⓁPhitMu
+@ Expecting 0
+```
+
+## PhitSx
+
+Standard deviation of the Phit distribution, computed from its parameters alone. Stack: nothing.
+
+```rpl
+ⓁPhitSx
+@ Expecting 1
+```
+
+## PhitRand
+
+Random draw from the Phit distribution. A uniform variate is drawn and fed to PhitQ, so the draw follows the law by inversion. Stack: nothing.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz ⓁPhitRand
+@ Expecting 0.44143 17567 34
+```
+
+## PhitArgs
+
+Labels a row of values with the parameter names of Phit. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `X` — or `{ X }`.
+
+```rpl
+1 ⓁPhitArgs 1 →List
+@ Expecting { X:1 }
+```
+
+## PhitAll
+
+Everything Phit has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `X` — or `{ X }`.
+
+```rpl
+1 ⓁPhitAll 5 →List
+@ Expecting { CDF:0.84134 47460 69 PDF:0.24197 07245 19 CDFc:0.15865 52539 31 μ:0 sx:1 }
+```
+
+## TriRightPDF
+
+Density of the TriRight distribution at X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![Right Triangular Distribution](img/TriRight_Distribution.bmp)
+
+```rpl
+0 3 2 ⓁTriRightPDF
+@ Expecting 0.44444 44444 44
+```
+
+## TriRightCDF
+
+Distribution function of TriRight: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 2 ⓁTriRightCDF
+@ Expecting 0.44444 44444 44
+```
+
+## TriRightCDFc
+
+Upper tail of TriRight, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 2 ⓁTriRightCDFc
+@ Expecting 0.55555 55555 56
+```
+
+## TriRightQ
+
+Quantile of TriRight: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+0 3 0.444444444444 ⓁTriRightQ
+@ Expecting 2.
+```
+
+## TriRightMu
+
+Mean of the TriRight distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 3 ⓁTriRightMu
+@ Expecting 2
+```
+
+## TriRightSx
+
+Standard deviation of the TriRight distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 3 ⓁTriRightSx
+@ Expecting 0.70710 67811 87
+```
+
+## TriRightRand
+
+Random draw from the TriRight distribution. A uniform variate is drawn and fed to TriRightQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 3 ⓁTriRightRand
+@ Expecting 2.45661 31049 5
+```
+
+## TriRightArgs
+
+Labels a row of values with the parameter names of TriRight. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 2 ⓁTriRightArgs 3 →List
+@ Expecting { Xmin:0 Xmax:3 X:2 }
+```
+
+## TriRightAll
+
+Everything TriRight has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 2 ⓁTriRightAll 5 →List
+@ Expecting { CDF:0.44444 44444 44 PDF:0.44444 44444 44 CDFc:0.55555 55555 56 μ:2 sx:0.70710 67811 87 }
+```
+
+## TriLeftPDF
+
+Density of the TriLeft distribution at X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![Left Triangular Distribution](img/TriLeft_Distribution.bmp)
+
+```rpl
+0 3 1 ⓁTriLeftPDF
+@ Expecting 0.44444 44444 44
+```
+
+## TriLeftCDF
+
+Distribution function of TriLeft: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 1 ⓁTriLeftCDF
+@ Expecting 0.55555 55555 56
+```
+
+## TriLeftCDFc
+
+Upper tail of TriLeft, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 1 ⓁTriLeftCDFc
+@ Expecting 0.44444 44444 44
+```
+
+## TriLeftQ
+
+Quantile of TriLeft: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+0 3 0.555555555556 ⓁTriLeftQ
+@ Expecting 1.
+```
+
+## TriLeftMu
+
+Mean of the TriLeft distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 3 ⓁTriLeftMu
+@ Expecting 1
+```
+
+## TriLeftSx
+
+Standard deviation of the TriLeft distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 3 ⓁTriLeftSx
+@ Expecting 0.70710 67811 87
+```
+
+## TriLeftRand
+
+Random draw from the TriLeft distribution. A uniform variate is drawn and fed to TriLeftQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 3 ⓁTriLeftRand
+@ Expecting 1.27806 73495 8
+```
+
+## TriLeftArgs
+
+Labels a row of values with the parameter names of TriLeft. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 1 ⓁTriLeftArgs 3 →List
+@ Expecting { Xmin:0 Xmax:3 X:1 }
+```
+
+## TriLeftAll
+
+Everything TriLeft has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 3 1 ⓁTriLeftAll 5 →List
+@ Expecting { CDF:0.55555 55555 56 PDF:0.44444 44444 44 CDFc:0.44444 44444 44 μ:1 sx:0.70710 67811 87 }
+```
+
+## TriAsymPDF
+
+Density of the TriAsym distribution at X. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+
+![Asymmetric Triangular Distribution](img/TriAsym_Distribution.bmp)
+
+```rpl
+0 3 1 0.8 ⓁTriAsymPDF
+@ Expecting 0.53333 33333 33
+```
+
+## TriAsymCDF
+
+Distribution function of TriAsym: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+
+```rpl
+0 3 1 0.8 ⓁTriAsymCDF
+@ Expecting 0.21333 33333 33
+```
+
+## TriAsymCDFc
+
+Upper tail of TriAsym, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+
+```rpl
+0 3 1 0.8 ⓁTriAsymCDFc
+@ Expecting 0.78666 66666 67
+```
+
+## TriAsymQ
+
+Quantile of TriAsym: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `xp`, `p` — or `{ Xmin Xmax xp p }`.
+
+```rpl
+0 3 1 0.213333333333 ⓁTriAsymQ
+@ Expecting 0.79999 99999 99
+```
+
+## TriAsymMu
+
+Mean of the TriAsym distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax`, `xp` — or `{ Xmin Xmax xp }`.
+
+```rpl
+0 3 1 ⓁTriAsymMu
+@ Expecting 1.33333 33333 3
+```
+
+## TriAsymSx
+
+Standard deviation of the TriAsym distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax`, `xp` — or `{ Xmin Xmax xp }`.
+
+```rpl
+0 3 1 ⓁTriAsymSx
+@ Expecting 0.62360 95644 62
+```
+
+## TriAsymRand
+
+Random draw from the TriAsym distribution. A uniform variate is drawn and fed to TriAsymQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax`, `xp` — or `{ Xmin Xmax xp }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 3 1 ⓁTriAsymRand
+@ Expecting 1.59404 78783 5
+```
+
+## TriAsymArgs
+
+Labels a row of values with the parameter names of TriAsym. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+
+```rpl
+0 3 1 0.8 ⓁTriAsymArgs 4 →List
+@ Expecting { Xmin:0 Xmax:3 xp:1 X:0.8 }
+```
+
+## TriAsymAll
+
+Everything TriAsym has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `xp`, `X` — or `{ Xmin Xmax xp X }`.
+
+```rpl
+0 3 1 0.8 ⓁTriAsymAll 5 →List
+@ Expecting { CDF:0.21333 33333 33 PDF:0.53333 33333 33 CDFc:0.78666 66666 67 μ:1.33333 33333 3 sx:0.62360 95644 62 }
+```
+
+## UShapePDF
+
+Density of the UShape distribution at X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![U-Shaped Distribution](img/UShape_Distribution.bmp)
+
+```rpl
+0 1 0.25 ⓁUShapePDF
+@ Expecting 0.73510 51938 96
+```
+
+## UShapeCDF
+
+Distribution function of UShape: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.25 ⓁUShapeCDF
+@ Expecting 0.33333 33333 33
+```
+
+## UShapeCDFc
+
+Upper tail of UShape, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.25 ⓁUShapeCDFc
+@ Expecting 0.66666 66666 67
+```
+
+## UShapeQ
+
+Quantile of UShape: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+0 1 0.333333333333 ⓁUShapeQ
+@ Expecting 0.25
+```
+
+## UShapeMu
+
+Mean of the UShape distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁUShapeMu
+@ Expecting 0.5
+```
+
+## UShapeSx
+
+Standard deviation of the UShape distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+0 1 ⓁUShapeSx
+@ Expecting 0.35355 33905 93
+```
+
+## UShapeRand
+
+Random draw from the UShape distribution. A uniform variate is drawn and fed to UShapeQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁUShapeRand
+@ Expecting 0.75526 36472 52
+```
+
+## UShapeArgs
+
+Labels a row of values with the parameter names of UShape. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.25 ⓁUShapeArgs 3 →List
+@ Expecting { Xmin:0 Xmax:1 X:0.25 }
+```
+
+## UShapeAll
+
+Everything UShape has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+0 1 0.25 ⓁUShapeAll 5 →List
+@ Expecting { CDF:0.33333 33333 33 PDF:0.73510 51938 96 CDFc:0.66666 66666 67 μ:0.5 sx:0.35355 33905 93 }
+```
+
+## GEVPDF
+
+Density of the GEV distribution at X. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+
+![Generalized Extreme Value Distribution](img/GEV_Distribution.bmp)
+
+```rpl
+0 1 0.2 1 ⓁGEVPDF
+@ Expecting 0.22406 77286 51
+```
+
+## GEVCDF
+
+Distribution function of GEV: the probability of not exceeding X. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+
+```rpl
+0 1 0.2 1 ⓁGEVCDF
+@ Expecting 0.66906 26526 68
+```
+
+## GEVCDFc
+
+Upper tail of GEV, the complement of its distribution function. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+
+```rpl
+0 1 0.2 1 ⓁGEVCDFc
+@ Expecting 0.33093 73473 32
+```
+
+## GEVQ
+
+Quantile of GEV: the value below which the probability is the one given. Stack: `x0`, `sc`, `xi`, `p` — or `{ x0 sc xi p }`.
+
+```rpl
+0 1 0.2 0.669062652668 ⓁGEVQ
+@ Expecting 1.
+```
+
+## GEVMu
+
+Mean of the GEV distribution, computed from its parameters alone. Stack: `x0`, `sc`, `xi` — or `{ x0 sc xi }`.
+
+```rpl
+0 1 0.2 ⓁGEVMu
+@ Expecting 0.82114 85686 27
+```
+
+## GEVSx
+
+Standard deviation of the GEV distribution, computed from its parameters alone. Stack: `x0`, `sc`, `xi` — or `{ x0 sc xi }`.
+
+```rpl
+0 1 0.2 ⓁGEVSx
+@ Expecting 1.82867 04356 7
+```
+
+## GEVRand
+
+Random draw from the GEV distribution. A uniform variate is drawn and fed to GEVQ, so the draw follows the law by inversion. Stack: `x0`, `sc`, `xi` — or `{ x0 sc xi }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 0.2 ⓁGEVRand
+@ Expecting 1.00665 16184 9
+```
+
+## GEVArgs
+
+Labels a row of values with the parameter names of GEV. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+
+```rpl
+0 1 0.2 1 ⓁGEVArgs 4 →List
+@ Expecting { x0:0 sc:1 xi:0.2 X:1 }
+```
+
+## GEVAll
+
+Everything GEV has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `x0`, `sc`, `xi`, `X` — or `{ x0 sc xi X }`.
+
+```rpl
+0 1 0.2 1 ⓁGEVAll 5 →List
+@ Expecting { CDF:0.66906 26526 68 PDF:0.22406 77286 51 CDFc:0.33093 73473 32 μ:0.82114 85686 27 sx:1.82867 04356 7 }
+```
+
+## BernoulliPDF
+
+Probability mass of the Bernoulli distribution at X: the probability of exactly that value. Stack: `p`, `X` — or `{ p X }`.
+
+![Bernoulli Distribution](img/Bernoulli_Distribution.bmp)
+
+```rpl
+0.3 0 ⓁBernoulliPDF
+@ Expecting 0.7
+```
+
+## BernoulliCDF
+
+Distribution function of Bernoulli: the probability of not exceeding X. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 0 ⓁBernoulliCDF
+@ Expecting 0.7
+```
+
+## BernoulliCDFc
+
+Upper tail of Bernoulli, the complement of its distribution function. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 0 ⓁBernoulliCDFc
+@ Expecting 0.3
+```
+
+## BernoulliQ
+
+Quantile of Bernoulli: the value below which the probability is the one given. Stack: `p`, `prob` — or `{ p prob }`.
+
+```rpl
+0.3 0.7 ⓁBernoulliQ
+@ Expecting 0
+```
+
+## BernoulliMu
+
+Mean of the Bernoulli distribution, computed from its parameters alone. Stack: `p` — or `{ p }`.
+
+```rpl
+0.3 ⓁBernoulliMu
+@ Expecting 0.3
+```
+
+## BernoulliSx
+
+Standard deviation of the Bernoulli distribution, computed from its parameters alone. Stack: `p` — or `{ p }`.
+
+```rpl
+0.3 ⓁBernoulliSx
+@ Expecting 0.45825 75694 96
+```
+
+## BernoulliRand
+
+Random draw from the Bernoulli distribution. A uniform variate is drawn and fed to BernoulliQ, so the draw follows the law by inversion. Stack: `p0` — or `{ p0 }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0.3 ⓁBernoulliRand
+@ Expecting 0
+```
+
+## BernoulliArgs
+
+Labels a row of values with the parameter names of Bernoulli. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 0 ⓁBernoulliArgs 2 →List
+@ Expecting { p:0.3 X:0 }
+```
+
+## BernoulliAll
+
+Everything Bernoulli has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 0 ⓁBernoulliAll 5 →List
+@ Expecting { CDF:0.7 PDF:0.7 CDFc:0.3 μ:0.3 sx:0.45825 75694 96 }
+```
+
+## BinomPDF
+
+Probability mass of the Binom distribution at X: the probability of exactly that value. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+
+![Binomial Distribution](img/Binom_Distribution.bmp)
+
+```rpl
+20 0.3 8 ⓁBinomPDF
+@ Expecting 0.11439 67397 05
+```
+
+## BinomCDF
+
+Distribution function of Binom: the probability of not exceeding X. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+
+```rpl
+20 0.3 8 ⓁBinomCDF
+@ Expecting 0.88666 85371 23
+```
+
+## BinomCDFc
+
+Upper tail of Binom, the complement of its distribution function. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+
+```rpl
+20 0.3 8 ⓁBinomCDFc
+@ Expecting 0.11333 14628 77
+```
+
+## BinomQ
+
+Quantile of Binom: the value below which the probability is the one given. Stack: `nt`, `p`, `prob` — or `{ nt p prob }`.
+
+```rpl
+20 0.3 0.886668537123 ⓁBinomQ
+@ Expecting 8
+```
+
+## BinomMu
+
+Mean of the Binom distribution, computed from its parameters alone. Stack: `nt`, `p` — or `{ nt p }`.
+
+```rpl
+20 0.3 ⓁBinomMu
+@ Expecting 6.
+```
+
+## BinomSx
+
+Standard deviation of the Binom distribution, computed from its parameters alone. Stack: `nt`, `p` — or `{ nt p }`.
+
+```rpl
+20 0.3 ⓁBinomSx
+@ Expecting 2.04939 01531 9
+```
+
+## BinomRand
+
+Random draw from the Binom distribution. A uniform variate is drawn and fed to BinomQ, so the draw follows the law by inversion. Stack: `nt`, `p0` — or `{ nt p0 }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 20 0.3 ⓁBinomRand
+@ Expecting 7
+```
+
+## BinomArgs
+
+Labels a row of values with the parameter names of Binom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+
+```rpl
+20 0.3 8 ⓁBinomArgs 3 →List
+@ Expecting { nt:20 p:0.3 X:8 }
+```
+
+## BinomAll
+
+Everything Binom has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `nt`, `p`, `X` — or `{ nt p X }`.
+
+```rpl
+20 0.3 8 ⓁBinomAll 5 →List
+@ Expecting { CDF:0.88666 85371 23 PDF:0.11439 67397 05 CDFc:0.11333 14628 77 μ:6. sx:2.04939 01531 9 }
+```
+
+## PoissPDF
+
+Probability mass of the Poiss distribution at X: the probability of exactly that value. Stack: `λ`, `X` — or `{ λ X }`.
+
+![Poisson Distribution](img/Poiss_Distribution.bmp)
+
+```rpl
+10 10 ⓁPoissPDF
+@ Expecting 0.12511 00357 21
+```
+
+## PoissCDF
+
+Distribution function of Poiss: the probability of not exceeding X. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+10 10 ⓁPoissCDF
+@ Expecting 0.58303 97501 93
+```
+
+## PoissCDFc
+
+Upper tail of Poiss, the complement of its distribution function. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+10 10 ⓁPoissCDFc
+@ Expecting 0.41696 02498 07
+```
+
+## PoissQ
+
+Quantile of Poiss: the value below which the probability is the one given. Stack: `λ`, `p` — or `{ λ p }`.
+
+```rpl
+10 0.583039750193 ⓁPoissQ
+@ Expecting 11
+```
+
+## PoissMu
+
+Mean of the Poiss distribution, computed from its parameters alone. Stack: `λ` — or `{ λ }`.
+
+```rpl
+10 ⓁPoissMu
+@ Expecting 10
+```
+
+## PoissSx
+
+Standard deviation of the Poiss distribution, computed from its parameters alone. Stack: `λ` — or `{ λ }`.
+
+```rpl
+10 ⓁPoissSx
+@ Expecting 3.16227 76601 7
+```
+
+## PoissRand
+
+Random draw from the Poiss distribution. A uniform variate is drawn and fed to PoissQ, so the draw follows the law by inversion. Stack: `lb` — or `{ lb }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 10 ⓁPoissRand
+@ Expecting 11
+```
+
+## PoissArgs
+
+Labels a row of values with the parameter names of Poiss. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+10 10 ⓁPoissArgs 2 →List
+@ Expecting { λ:10 X:10 }
+```
+
+## PoissAll
+
+Everything Poiss has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `λ`, `X` — or `{ λ X }`.
+
+```rpl
+10 10 ⓁPoissAll 5 →List
+@ Expecting { CDF:0.58303 97501 93 PDF:0.12511 00357 21 CDFc:0.41696 02498 07 μ:10 sx:3.16227 76601 7 }
+```
+
+## GeomPDF
+
+Probability mass of the Geom distribution at X: the probability of exactly that value. Stack: `p`, `X` — or `{ p X }`.
+
+![Geometric Distribution](img/Geom_Distribution.bmp)
+
+```rpl
+0.3 3 ⓁGeomPDF
+@ Expecting 0.147
+```
+
+## GeomCDF
+
+Distribution function of Geom: the probability of not exceeding X. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 3 ⓁGeomCDF
+@ Expecting 0.657
+```
+
+## GeomCDFc
+
+Upper tail of Geom, the complement of its distribution function. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 3 ⓁGeomCDFc
+@ Expecting 0.343
+```
+
+## GeomQ
+
+Quantile of Geom: the value below which the probability is the one given. Stack: `p`, `prob` — or `{ p prob }`.
+
+```rpl
+0.3 0.657 ⓁGeomQ
+@ Expecting 3
+```
+
+## GeomMu
+
+Mean of the Geom distribution, computed from its parameters alone. Stack: `p` — or `{ p }`.
+
+```rpl
+0.3 ⓁGeomMu
+@ Expecting 3.33333 33333 3
+```
+
+## GeomSx
+
+Standard deviation of the Geom distribution, computed from its parameters alone. Stack: `p` — or `{ p }`.
+
+```rpl
+0.3 ⓁGeomSx
+@ Expecting 2.78886 67551 1
+```
+
+## GeomRand
+
+Random draw from the Geom distribution. A uniform variate is drawn and fed to GeomQ, so the draw follows the law by inversion. Stack: `p0` — or `{ p0 }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0.3 ⓁGeomRand
+@ Expecting 4
+```
+
+## GeomArgs
+
+Labels a row of values with the parameter names of Geom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 3 ⓁGeomArgs 2 →List
+@ Expecting { p:0.3 X:3 }
+```
+
+## GeomAll
+
+Everything Geom has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `p`, `X` — or `{ p X }`.
+
+```rpl
+0.3 3 ⓁGeomAll 5 →List
+@ Expecting { CDF:0.657 PDF:0.147 CDFc:0.343 μ:3.33333 33333 3 sx:2.78886 67551 1 }
+```
+
+## HyperPDF
+
+Probability mass of the Hyper distribution at X: the probability of exactly that value. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+
+![Hypergeometric Distribution](img/Hyper_Distribution.bmp)
+
+```rpl
+50 10 5 1 ⓁHyperPDF
+@ Expecting 0.43133 71972 29
+```
+
+## HyperCDF
+
+Distribution function of Hyper: the probability of not exceeding X. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+
+```rpl
+50 10 5 1 ⓁHyperCDF
+@ Expecting 0.74189 99792 33
+```
+
+## HyperCDFc
+
+Upper tail of Hyper, the complement of its distribution function. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+
+```rpl
+50 10 5 1 ⓁHyperCDFc
+@ Expecting 0.25810 00207 67
+```
+
+## HyperQ
+
+Quantile of Hyper: the value below which the probability is the one given. Stack: `Np`, `Ks`, `nd`, `p` — or `{ Np Ks nd p }`.
+
+```rpl
+50 10 5 0.741899979233 ⓁHyperQ
+@ Expecting 1
+```
+
+## HyperMu
+
+Mean of the Hyper distribution, computed from its parameters alone. Stack: `Np`, `Ks`, `nd` — or `{ Np Ks nd }`.
+
+```rpl
+50 10 5 ⓁHyperMu
+@ Expecting 1
+```
+
+## HyperSx
+
+Standard deviation of the Hyper distribution, computed from its parameters alone. Stack: `Np`, `Ks`, `nd` — or `{ Np Ks nd }`.
+
+```rpl
+50 10 5 ⓁHyperSx
+@ Expecting 0.85714 28571 43
+```
+
+## HyperRand
+
+Random draw from the Hyper distribution. A uniform variate is drawn and fed to HyperQ, so the draw follows the law by inversion. Stack: `Np`, `Ks`, `nd` — or `{ Np Ks nd }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 50 10 5 ⓁHyperRand
+@ Expecting 1
+```
+
+## HyperArgs
+
+Labels a row of values with the parameter names of Hyper. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+
+```rpl
+50 10 5 1 ⓁHyperArgs 4 →List
+@ Expecting { Np:50 Ks:10 nd:5 X:1 }
+```
+
+## HyperAll
+
+Everything Hyper has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Np`, `Ks`, `nd`, `X` — or `{ Np Ks nd X }`.
+
+```rpl
+50 10 5 1 ⓁHyperAll 5 →List
+@ Expecting { CDF:0.74189 99792 33 PDF:0.43133 71972 29 CDFc:0.25810 00207 67 μ:1 sx:0.85714 28571 43 }
+```
+
+## UnifDisPDF
+
+Probability mass of the UnifDis distribution at X: the probability of exactly that value. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+![Discrete Uniform Distribution](img/UnifDis_Distribution.bmp)
+
+```rpl
+1 6 3 ⓁUnifDisPDF
+@ Expecting 0.16666 66666 67
+```
+
+## UnifDisCDF
+
+Distribution function of UnifDis: the probability of not exceeding X. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+1 6 3 ⓁUnifDisCDF
+@ Expecting 0.5
+```
+
+## UnifDisCDFc
+
+Upper tail of UnifDis, the complement of its distribution function. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+1 6 3 ⓁUnifDisCDFc
+@ Expecting 0.5
+```
+
+## UnifDisQ
+
+Quantile of UnifDis: the value below which the probability is the one given. Stack: `Xmin`, `Xmax`, `p` — or `{ Xmin Xmax p }`.
+
+```rpl
+1 6 0.5 ⓁUnifDisQ
+@ Expecting 3
+```
+
+## UnifDisMu
+
+Mean of the UnifDis distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+1 6 ⓁUnifDisMu
+@ Expecting 3.5
+```
+
+## UnifDisSx
+
+Standard deviation of the UnifDis distribution, computed from its parameters alone. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+```rpl
+1 6 ⓁUnifDisSx
+@ Expecting 1.70782 51276 6
+```
+
+## UnifDisRand
+
+Random draw from the UnifDis distribution. A uniform variate is drawn and fed to UnifDisQ, so the draw follows the law by inversion. Stack: `Xmin`, `Xmax` — or `{ Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 1 6 ⓁUnifDisRand
+@ Expecting 5
+```
+
+## UnifDisArgs
+
+Labels a row of values with the parameter names of UnifDis. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+1 6 3 ⓁUnifDisArgs 3 →List
+@ Expecting { Xmin:1 Xmax:6 X:3 }
+```
+
+## UnifDisAll
+
+Everything UnifDis has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `Xmin`, `Xmax`, `X` — or `{ Xmin Xmax X }`.
+
+```rpl
+1 6 3 ⓁUnifDisAll 5 →List
+@ Expecting { CDF:0.5 PDF:0.16666 66666 67 CDFc:0.5 μ:3.5 sx:1.70782 51276 6 }
+```
+
+## GammaPDF
+
+Density of the Gamma distribution at X. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+
+![Gamma Distribution](img/Gamma_Distribution.bmp)
+
+```rpl
+2 3 3 ⓁGammaPDF
+@ Expecting 0.12262 64803 9
+```
+
+## GammaCDF
+
+Distribution function of Gamma: the probability of not exceeding X. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+
+```rpl
+2 3 3 ⓁGammaCDF
+@ Expecting 0.26424 11176 57
+```
+
+## GammaCDFc
+
+Upper tail of Gamma, the complement of its distribution function. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+
+```rpl
+2 3 3 ⓁGammaCDFc
+@ Expecting 0.73575 88823 43
+```
+
+## GammaQ
+
+Quantile of Gamma: the value below which the probability is the one given. Stack: `a`, `sc`, `p` — or `{ a sc p }`.
+
+```rpl
+2 3 0.264241117657 ⓁGammaQ
+@ Expecting 3.
+```
+
+## GammaMu
+
+Mean of the Gamma distribution, computed from its parameters alone. Stack: `a`, `sc` — or `{ a sc }`.
+
+```rpl
+2 3 ⓁGammaMu
+@ Expecting 6
+```
+
+## GammaSx
+
+Standard deviation of the Gamma distribution, computed from its parameters alone. Stack: `a`, `sc` — or `{ a sc }`.
+
+```rpl
+2 3 ⓁGammaSx
+@ Expecting 4.24264 06871 2
+```
+
+## GammaRand
+
+Random draw from the Gamma distribution. A uniform variate is drawn and fed to GammaQ, so the draw follows the law by inversion. Stack: `a`, `sc` — or `{ a sc }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 2 3 ⓁGammaRand
+@ Expecting 6.91829 67155 8
+```
+
+## GammaArgs
+
+Labels a row of values with the parameter names of Gamma. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+
+```rpl
+2 3 3 ⓁGammaArgs 3 →List
+@ Expecting { a:2 sc:3 X:3 }
+```
+
+## GammaAll
+
+Everything Gamma has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `a`, `sc`, `X` — or `{ a sc X }`.
+
+```rpl
+2 3 3 ⓁGammaAll 5 →List
+@ Expecting { CDF:0.26424 11176 57 PDF:0.12262 64803 9 CDFc:0.73575 88823 43 μ:6 sx:4.24264 06871 2 }
+```
+
+## NormTruncPDF
+
+Density of the NormTrunc distribution at X. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+
+![Truncated Normal Distribution](img/NormTrunc_Distribution.bmp)
+
+```rpl
+0 1 -1 2 0.5 ⓁNormTruncPDF
+@ Expecting 0.43008 50759 23
+```
+
+## NormTruncCDF
+
+Distribution function of NormTrunc: the probability of not exceeding X. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+
+```rpl
+0 1 -1 2 0.5 ⓁNormTruncCDF
+@ Expecting 0.65088 04213 37
+```
+
+## NormTruncCDFc
+
+Upper tail of NormTrunc, the complement of its distribution function. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+
+```rpl
+0 1 -1 2 0.5 ⓁNormTruncCDFc
+@ Expecting 0.34911 95786 63
+```
+
+## NormTruncQ
+
+Quantile of NormTrunc: the value below which the probability is the one given. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `p` — or `{ x0 sc Xmin Xmax p }`.
+
+```rpl
+0 1 -1 2 0.650880421337 ⓁNormTruncQ
+@ Expecting 0.50000 00000 01
+```
+
+## NormTruncMu
+
+Mean of the NormTrunc distribution, computed from its parameters alone. Stack: `x0`, `sc`, `Xmin`, `Xmax` — or `{ x0 sc Xmin Xmax }`.
+
+```rpl
+0 1 -1 2 ⓁNormTruncMu
+@ Expecting 0.22963 71790 91
+```
+
+## NormTruncSx
+
+Standard deviation of the NormTrunc distribution, computed from its parameters alone. Stack: `x0`, `sc`, `Xmin`, `Xmax` — or `{ x0 sc Xmin Xmax }`.
+
+```rpl
+0 1 -1 2 ⓁNormTruncSx
+@ Expecting 0.72094 55868 59
+```
+
+## NormTruncRand
+
+Random draw from the NormTrunc distribution. A uniform variate is drawn and fed to NormTruncQ, so the draw follows the law by inversion. Stack: `x0`, `sc`, `Xmin`, `Xmax` — or `{ x0 sc Xmin Xmax }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 -1 2 ⓁNormTruncRand
+@ Expecting 0.54628 12417 04
+```
+
+## NormTruncArgs
+
+Labels a row of values with the parameter names of NormTrunc. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+
+```rpl
+0 1 -1 2 0.5 ⓁNormTruncArgs 5 →List
+@ Expecting { x0:0 sc:1 Xmin:-1 Xmax:2 X:0.5 }
+```
+
+## NormTruncAll
+
+Everything NormTrunc has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `x0`, `sc`, `Xmin`, `Xmax`, `X` — or `{ x0 sc Xmin Xmax X }`.
+
+```rpl
+0 1 -1 2 0.5 ⓁNormTruncAll 5 →List
+@ Expecting { CDF:0.65088 04213 37 PDF:0.43008 50759 23 CDFc:0.34911 95786 63 μ:0.22963 71790 91 sx:0.72094 55868 59 }
+```
+
+## NegBinomPDF
+
+Probability mass of the NegBinom distribution at X: the probability of exactly that value. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+
+![Negative Binomial Distribution](img/NegBinom_Distribution.bmp)
+
+```rpl
+3 0.5 2 ⓁNegBinomPDF
+@ Expecting 0.1875
+```
+
+## NegBinomCDF
+
+Distribution function of NegBinom: the probability of not exceeding X. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+
+```rpl
+3 0.5 2 ⓁNegBinomCDF
+@ Expecting 0.5
+```
+
+## NegBinomCDFc
+
+Upper tail of NegBinom, the complement of its distribution function. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+
+```rpl
+3 0.5 2 ⓁNegBinomCDFc
+@ Expecting 0.5
+```
+
+## NegBinomQ
+
+Quantile of NegBinom: the value below which the probability is the one given. Stack: `rs`, `p`, `prob` — or `{ rs p prob }`.
+
+```rpl
+3 0.5 0.5 ⓁNegBinomQ
+@ Expecting 2
+```
+
+## NegBinomMu
+
+Mean of the NegBinom distribution, computed from its parameters alone. Stack: `rs`, `p` — or `{ rs p }`.
+
+```rpl
+3 0.5 ⓁNegBinomMu
+@ Expecting 3.
+```
+
+## NegBinomSx
+
+Standard deviation of the NegBinom distribution, computed from its parameters alone. Stack: `rs`, `p` — or `{ rs p }`.
+
+```rpl
+3 0.5 ⓁNegBinomSx
+@ Expecting 2.44948 97427 8
+```
+
+## NegBinomRand
+
+Random draw from the NegBinom distribution. A uniform variate is drawn and fed to NegBinomQ, so the draw follows the law by inversion. Stack: `rs`, `p0` — or `{ rs p0 }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 3 0.5 ⓁNegBinomRand
+@ Expecting 4
+```
+
+## NegBinomArgs
+
+Labels a row of values with the parameter names of NegBinom. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+
+```rpl
+3 0.5 2 ⓁNegBinomArgs 3 →List
+@ Expecting { rs:3 p:0.5 X:2 }
+```
+
+## NegBinomAll
+
+Everything NegBinom has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `rs`, `p`, `X` — or `{ rs p X }`.
+
+```rpl
+3 0.5 2 ⓁNegBinomAll 5 →List
+@ Expecting { CDF:0.5 PDF:0.1875 CDFc:0.5 μ:3. sx:2.44948 97427 8 }
+```
+
+## StudentPDF
+
+Density of the Student distribution at X. Stack: `df`, `X` — or `{ df X }`.
+
+![Student t Distribution](img/Student_Distribution.bmp)
+
+```rpl
+4 1 ⓁStudentPDF
+@ Expecting 0.21466 25258 4
+```
+
+## StudentCDF
+
+Distribution function of Student: the probability of not exceeding X. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 1 ⓁStudentCDF
+@ Expecting 0.81304 95168 5
+```
+
+## StudentCDFc
+
+Upper tail of Student, the complement of its distribution function. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 1 ⓁStudentCDFc
+@ Expecting 0.18695 04831 5
+```
+
+## StudentQ
+
+Quantile of Student: the value below which the probability is the one given. Stack: `df`, `p` — or `{ df p }`.
+
+```rpl
+4 0.81304951685 ⓁStudentQ
+@ Expecting 1.
+```
+
+## StudentMu
+
+Mean of the Student distribution, computed from its parameters alone. Stack: `df` — or `{ df }`.
+
+```rpl
+4 ⓁStudentMu
+@ Expecting 0
+```
+
+## StudentSx
+
+Standard deviation of the Student distribution, computed from its parameters alone. Stack: `df` — or `{ df }`.
+
+```rpl
+4 ⓁStudentSx
+@ Expecting 1.41421 35623 7
+```
+
+## StudentRand
+
+Random draw from the Student distribution, by Bailey's polar method: two uniform variates U and V in (−1, 1), with W = U² + V² < 1, give the exact draw U·√(df·(W^(−2/df) − 1)/W). This is much faster than inversion through StudentQ, which matters for the Monte Carlo method (MCPropagate). Stack: `df` — or `{ df }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 4 ⓁStudentRand
+@ Expecting 1.21429 99670 5
+```
+
+## StudentArgs
+
+Labels a row of values with the parameter names of Student. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 1 ⓁStudentArgs 2 →List
+@ Expecting { df:4 X:1 }
+```
+
+## StudentAll
+
+Everything Student has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `df`, `X` — or `{ df X }`.
+
+```rpl
+4 1 ⓁStudentAll 5 →List
+@ Expecting { CDF:0.81304 95168 5 PDF:0.21466 25258 4 CDFc:0.18695 04831 5 μ:0 sx:1.41421 35623 7 }
+```
+
+## FisherPDF
+
+Density of the Fisher distribution at X. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+
+![Fisher F Distribution](img/Fisher_Distribution.bmp)
+
+```rpl
+4 6 1 ⓁFisherPDF
+@ Expecting 0.41472
+```
+
+## FisherCDF
+
+Distribution function of Fisher: the probability of not exceeding X. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+
+```rpl
+4 6 1 ⓁFisherCDF
+@ Expecting 0.5248
+```
+
+## FisherCDFc
+
+Upper tail of Fisher, the complement of its distribution function. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+
+```rpl
+4 6 1 ⓁFisherCDFc
+@ Expecting 0.4752
+```
+
+## FisherQ
+
+Quantile of Fisher: the value below which the probability is the one given. Stack: `dfn`, `dfd`, `p` — or `{ dfn dfd p }`.
+
+```rpl
+4 6 0.5248 ⓁFisherQ
+@ Expecting 1.
+```
+
+## FisherMu
+
+Mean of the Fisher distribution, computed from its parameters alone. Stack: `dfn`, `dfd` — or `{ dfn dfd }`.
+
+```rpl
+4 6 ⓁFisherMu
+@ Expecting 1.5
+```
+
+## FisherSx
+
+Standard deviation of the Fisher distribution, computed from its parameters alone. Stack: `dfn`, `dfd` — or `{ dfn dfd }`.
+
+```rpl
+4 6 ⓁFisherSx
+@ Expecting 2.12132 03435 6
+```
+
+## FisherRand
+
+Random draw from the Fisher distribution. A uniform variate is drawn and fed to FisherQ, so the draw follows the law by inversion. Stack: `dfn`, `dfd` — or `{ dfn dfd }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 4 6 ⓁFisherRand
+@ Expecting 1.43440 36535 5
+```
+
+## FisherArgs
+
+Labels a row of values with the parameter names of Fisher. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+
+```rpl
+4 6 1 ⓁFisherArgs 3 →List
+@ Expecting { dfn:4 dfd:6 X:1 }
+```
+
+## FisherAll
+
+Everything Fisher has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. The example collects them into a list to be checked here; from the keyboard they arrive one per stack level. Stack: `dfn`, `dfd`, `X` — or `{ dfn dfd X }`.
+
+```rpl
+4 6 1 ⓁFisherAll 5 →List
+@ Expecting { CDF:0.5248 PDF:0.41472 CDFc:0.4752 μ:1.5 sx:2.12132 03435 6 }
+```
+
+## LevyPDF
+
+Density of the Levy distribution at X. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+![Levy Distribution](img/Levy_Distribution.bmp)
+
+```rpl
+0 1 1 ⓁLevyPDF
+@ Expecting 0.24197 07245 19
+```
+
+## LevyCDF
+
+Distribution function of Levy: the probability of not exceeding X. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁLevyCDF
+@ Expecting 0.31731 05078 63
+```
+
+## LevyCDFc
+
+Upper tail of Levy, the complement of its distribution function. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁLevyCDFc
+@ Expecting 0.68268 94921 37
+```
+
+## LevyQ
+
+Quantile of Levy: the value below which the probability is the one given. Stack: `x0`, `sc`, `p` — or `{ x0 sc p }`.
+
+The tail is heavy, so the quantile climbs steeply: the median is near 2.2, but nine tenths of the mass lies below 63.
+
+```rpl
+0 1 0.5 ⓁLevyQ
+@ Expecting 2.19810 93383 2
+```
+
+## LevyMu
+
+Mean of the Levy distribution. It is infinite: the law has no mean, and the entry says so with the infinity constant rather than returning a number. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+```rpl
+0 1 ⓁLevyMu
+@ Expecting 9.99999⁳⁹⁹⁹⁹⁹⁹
+```
+
+## LevySx
+
+Standard deviation of the Levy distribution. Infinite for the same reason as the mean. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+```rpl
+0 1 ⓁLevySx
+@ Expecting 9.99999⁳⁹⁹⁹⁹⁹⁹
+```
+
+## LevyRand
+
+Random draw from the Levy distribution. A uniform variate is drawn and fed to LevyQ, so the draw follows the law by inversion. Stack: `x0`, `sc` — or `{ x0 sc }`.
+
+Seed the generator with RDZ to make a sequence reproducible; without a seed each run differs.
+
+```rpl
+42 rdz 0 1 ⓁLevyRand
+@ Expecting 5.52609 18603 8
+```
+
+## LevyArgs
+
+Labels a row of values with the parameter names of Levy. It takes the same arguments the other entries take, and hands them straight back with their names attached — it recalls nothing by itself, so the way to see what a call consumed is `LastArguments` straight before it - the list it reports is accepted here as readily as bare values - or Undo first and then this. The example collects the result into a list to be checked here; from the keyboard the values arrive one per stack level. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁLevyArgs 3 →List
+@ Expecting { x0:0 sc:1 X:1 }
+```
+
+## LevyAll
+
+Everything Levy has to say about one point, tagged: distribution function, density, upper tail, mean and standard deviation. Stack: `x0`, `sc`, `X` — or `{ x0 sc X }`.
+
+```rpl
+0 1 1 ⓁLevyAll 5 →List
+@ Expecting { CDF:0.31731 05078 63 PDF:0.24197 07245 19 CDFc:0.68268 94921 37 μ:9.99999⁳⁹⁹⁹⁹⁹⁹ sx:9.99999⁳⁹⁹⁹⁹⁹⁹ }
+```
+# Statistical tests
+
+The StatTests section of the Function Library turns the Student, chi-square and
+Fisher distributions into the tests that are actually performed with them. The
+machinery was already there: ΣData and its sums, LR, Corr on one side,
+and the three upper tails UTPT, UTPC and UTPF on the other. What was
+missing was the bridge — the statistic to form, and which tail to read.
+
+Entries are grouped by the distribution they lean on, which is also how one
+remembers them: a comparison of means is a Student test, a count or a variance
+is a chi-square, a ratio of variances is a Fisher.
+
+**What they return.** The statistic, its degrees of freedom, and the p-value,
+tagged, one per stack level. **No verdict.** A test does not decide; it
+measures how surprising the data would be if the null hypothesis were true.
+Whether 0.035 is small enough is a question about the cost of being wrong, and
+that belongs to the person, not to the calculator. The examples below say what
+the number means at the usual thresholds, and where the answer would change.
+
+**What they take.** Summary statistics — a count, a mean, a standard deviation
+— because that is what one reads off a table or a report. As with the
+Probability section, the values may be given bare or bundled in a list of the
+right length, and the length is checked before anything is computed. Three
+entries need the data themselves and say so: `Chi2GOF` takes two lists,
+`Chi2Indep` a matrix, `Anova1` a list of lists. Two more take nothing at all and
+read the current ΣData: `TTestLR` and `FTestLR`.
+
+The p-value is two-sided for the Student tests, since the usual question is
+whether two things differ rather than which is larger; halve it for a one-sided
+question. For chi-square and for the analysis of variance it is the upper tail,
+which is the only direction those tests can point.
+
+**How to read the p-value.** It is the probability of observing data at least
+as extreme as those at hand **if H₀ were true**. A threshold α is fixed
+beforehand, and the rule is short:
+
+* **p < α** — reject H₀, and conclude in favour of H₁. The data would be
+  surprising if H₀ held.
+* **p ≥ α** — do **not** reject H₀. That is not the same as concluding that H₀
+  is true: a test that sees nothing may be looking at too few observations.
+  Absence of evidence is not evidence of absence.
+
+That asymmetry is the whole discipline of the exercise. A test can convict; it
+cannot acquit.
+
+α = 0.05 is a **convention, not a law** — it descends from a remark of Fisher's
+and from the tables that could be printed in 1925. Choose it by what the two
+mistakes cost: rejecting a true H₀ (a false alarm) against failing to reject a
+false one (a miss). A screening test that must miss nothing wants a generous
+α; a claim that will be expensive to act on wants 0.01 or less. Fix it
+**before** looking at the data — choosing the threshold afterwards, so that the
+answer comes out right, is the oldest way to fool oneself with statistics.
+
+Two misreadings worth naming. The p-value is **not** the probability that H₀ is
+true; it is computed by assuming H₀ and asking about the data, not the reverse.
+And a result that is statistically significant is not thereby important: with a
+large enough sample, a difference too small to matter will cross any threshold.
+Read the statistic as well as its p-value.
+
+**A word about the examples.** Each one ends with `3 →List` or `4 →List`. That
+is an artifice of this documentation, which needs a single value to check
+against, and it is **not to be typed**: called from the keyboard, an entry
+leaves its results one per stack level, which is what one wants. Typing it
+anyway costs more than an odd display — →List becomes the last command to
+declare an arity, so LastArguments reports what →List consumed, the results
+and the count, instead of what the test consumed. Call the test by itself and
+LastArguments answers with the list of its own arguments, which is also what
+the Args entries accept.
+
+
+## StatTestsLibrary
+
+Eleven tests built on the Student, chi-square and Fisher distributions, in three
+submenus: [StudentTests](#studenttestslibrary) compares means, [Chi2Tests](#chi2testslibrary) handles counts and
+variances, [FisherTests](#fishertestslibrary) compares variances and runs the analysis of
+variance. A fourth submenu, [TestDemos](#testdemoslibrary), runs a test
+on random samples, to see the risk α and the power at work.
+
+Every entry returns the statistic, its degrees of freedom and the p-value,
+tagged, and **no verdict**. The rule is short, and its two halves are not
+symmetric:
+
+* **p < α** — reject H₀, conclude in favour of H₁.
+* **p ≥ α** — do **not** reject H₀. That is not the same as establishing it: a
+  test that sees nothing may be looking at too few observations.
+
+A test can convict; it cannot acquit.
+
+α = 0.05 is a **convention, not a law**. Choose it by what the two mistakes
+cost — a false alarm against a miss — and fix it **before** looking at the data.
+Choosing the threshold afterwards, so that the answer comes out right, is the
+oldest way to fool oneself with statistics.
+
+Two misreadings worth naming. The p-value is **not** the probability that H₀ is
+true: it is computed by assuming H₀ and asking about the data, not the reverse.
+And statistical significance is not importance — with a large enough sample, a
+difference too small to matter crosses any threshold. Read the statistic as
+well as its p-value.
+
+Arguments follow the convention of the Probability section: bare or bundled in
+a list of the right length, whose length is checked before anything is
+computed. In the examples a trailing →List gathers the results so that one
+value can be checked; it is not to be typed.
+
+
+## StudentTestsLibrary
+
+Tests that compare means, when the standard deviation of the population is
+unknown and estimated from the sample — which is what separates them from the
+normal test. Which one to reach for:
+
+* one sample against a reference value — [TTest1](#ttest1);
+* two independent samples — [TTest2](#ttest2) if their variances may be taken
+  as equal, [TTestW](#ttestw) otherwise. When in doubt use TTestW: assuming a
+  common variance that does not exist is the usual way to get this wrong, and
+  [FTestVar](#ftestvar) is there to check;
+* the same subjects measured twice — [TTestP](#ttestp), never TTest2;
+* the slope of a regression — [TTestLR](#ttestlr).
+
+All of them return a two-sided p-value; halve it for a one-sided question.
+See [StatTests](#stattestslibrary) for what that p-value does and does not say.
+
+
+## Chi2TestsLibrary
+
+Tests on counts and on variance. The statistic is a sum of squared departures
+divided by what was expected, and the p-value is the upper tail — the only
+direction these tests can point.
+
+* observed counts against a theoretical distribution — [Chi2GOF](#chi2gof);
+* two qualitative variables in a contingency table — [Chi2Indep](#chi2indep),
+  which also answers the test of homogeneity, the arithmetic being the same;
+* a variance against a target — [Chi2Var](#chi2var).
+
+The customary condition for the first two is an expected count of at least five
+in every cell. The third is unusually sensitive to non-normality, more so than
+the tests of means.
+
+See [StatTests](#stattestslibrary) for how to read the p-value.
+
+
+## FisherTestsLibrary
+
+Tests built on a ratio of variances.
+
+* two variances against each other — [FTestVar](#ftestvar), larger one first;
+* three or more group means at once — [Anova1](#anova1), which asks the
+  question once instead of running several Student tests, each with its own
+  risk of a false alarm;
+* the regression as a whole — [FTestLR](#ftestlr), which in a simple regression
+  is [TTestLR](#ttestlr) written twice: F is exactly t².
+
+The analysis of variance says that the groups differ, never which one differs.
+For that, compare pairs afterwards — and remember that several comparisons
+inflate the very risk Anova1 was chosen to control.
+
+See [StatTests](#stattestslibrary) for how to read the p-value.
+
+
+## TTest1
+
+One-sample **t** test: is the mean of a sample compatible with a reference
+value? Use it when the standard deviation of the population is unknown and
+estimated from the sample itself — the usual case, and what separates **t**
+from the normal test.
+
+* **H₀**: μ = μ₀, the sample comes from a population whose mean is the reference.
+* **H₁**: μ ≠ μ₀.
+
+Conditions: a random sample, and either a roughly normal population or a sample
+large enough for its mean to be normal.
+
+t = (x̄ − μ₀) / (s/√n), with n − 1 degrees of freedom.
+Stack: `n`, `xbar`, `s`, `mu0` — or `{ n xbar s mu0 }`.
+
+**Example.** A filling machine is set to 500 mL. Sixteen bottles are measured:
+mean 498.2 mL, standard deviation 3.1 mL. Is the machine off target?
+
+```rpl
+{ 16 498.2 3.1 500 } ⓁTTest1 3 →List
+@ Expecting { t:-2.32258 06451 6 df:15 p:0.03467 53357 28 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.035 is below 0.05: at the five per cent level the difference is
+significant, H₀ is rejected, the machine fills short. At one per cent it is not
+— 0.035 > 0.01 — and the evidence is too thin to conclude. That the verdict
+turns on the threshold is precisely why this entry returns a p-value.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## TTest1Args
+
+Labels a row of values with the parameter names of `TTest1`. It takes what the
+test takes and hands it back named, which is the way to see what a call
+consumed: LastArguments immediately before it, or Undo and then this.
+Stack: `n`, `xbar`, `s`, `mu0` — or `{ n xbar s mu0 }`.
+
+```rpl
+{ 16 498.2 3.1 500 } ⓁTTest1Args 4 →List
+@ Expecting { n:16 xbar:498.2 s:3.1 mu0:500 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## TTest2
+
+Two independent samples, assuming the two populations share one variance
+(pooled **t** test). The variance is estimated once from both samples, which is
+why it is the more powerful of the two when the assumption holds — and
+misleading when it does not. `FTestVar` is there to check it; `TTestW` is there
+when it fails.
+
+* **H₀**: μ₁ = μ₂.
+* **H₁**: μ₁ ≠ μ₂.
+
+Conditions: two independent random samples, roughly normal populations, and
+comparable variances.
+
+s²ₚ = ((n₁−1)s₁² + (n₂−1)s₂²)/(n₁+n₂−2), t = (x̄₁ − x̄₂)/√(s²ₚ(1/n₁ + 1/n₂)),
+with n₁ + n₂ − 2 degrees of freedom.
+Stack: `n1`, `xbar1`, `s1`, `n2`, `xbar2`, `s2` — or the same six in a list.
+
+**Example.** A treated group of twelve averages 102.4 with standard deviation
+4.1; a control group of fifteen averages 98.7 with 3.6. Does the treatment
+change the mean?
+
+```rpl
+{ 12 102.4 4.1 15 98.7 3.6 } ⓁTTest2 3 →List
+@ Expecting { t:2.49561 73768 5 df:25 p:0.01953 43252 08 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.020 rejects H₀ at five per cent, and stays significant at 2.5 per cent.
+Compare with `TTestW` on the same data below: the conclusion holds either way,
+which is the comfortable case.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## TTest2Args
+
+Labels a row of values with the parameter names of `TTest2`.
+Stack: `n1`, `xbar1`, `s1`, `n2`, `xbar2`, `s2` — or the same six in a list.
+
+```rpl
+{ 12 102.4 4.1 15 98.7 3.6 } ⓁTTest2Args 6 →List
+@ Expecting { n1:12 xbar1:102.4 s1:4.1 n2:15 xbar2:98.7 s2:3.6 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## TTestW
+
+Two independent samples **without** assuming equal variances — the Welch test.
+It takes the same six numbers as `TTest2` and differs only in how it weighs
+them, and in the degrees of freedom, which are no longer a whole number.
+
+* **H₀**: μ₁ = μ₂.
+* **H₁**: μ₁ ≠ μ₂.
+
+Prefer it whenever the variances are visibly unequal or the samples are of very
+different sizes. Assuming a common variance that does not exist is the most
+common way to get a two-sample test wrong.
+
+t = (x̄₁ − x̄₂)/√(s₁²/n₁ + s₂²/n₂), with the Welch–Satterthwaite degrees of
+freedom (s₁²/n₁ + s₂²/n₂)² / ((s₁²/n₁)²/(n₁−1) + (s₂²/n₂)²/(n₂−1)).
+Stack: `n1`, `xbar1`, `s1`, `n2`, `xbar2`, `s2` — or the same six in a list.
+
+**Example.** The same two groups as `TTest2`.
+
+```rpl
+{ 12 102.4 4.1 15 98.7 3.6 } ⓁTTestW 3 →List
+@ Expecting { t:2.45857 57854 8 df:22.13696 48467 p:2.22338 52905 6⁳⁻² }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+The degrees of freedom are 22.14 rather than 25, and the p-value rises from
+0.020 to 0.022 — the price of not assuming what was not verified. Both reject
+H₀ at five per cent here. When the two disagree, trust this one.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## TTestWArgs
+
+Labels a row of values with the parameter names of `TTestW`.
+Stack: `n1`, `xbar1`, `s1`, `n2`, `xbar2`, `s2` — or the same six in a list.
+
+```rpl
+{ 12 102.4 4.1 15 98.7 3.6 } ⓁTTestWArgs 6 →List
+@ Expecting { n1:12 xbar1:102.4 s1:4.1 n2:15 xbar2:98.7 s2:3.6 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## TTestP
+
+Paired samples: the same subjects measured twice, before and after. What is
+tested is the mean of the **differences**, not the difference of the means — so
+the entry takes the count, the mean difference and the standard deviation of the
+differences, which is one sample's worth of numbers.
+
+* **H₀**: the mean difference is zero.
+* **H₁**: it is not.
+
+Pairing is what makes the test powerful: each subject is its own control, and
+the variability between subjects drops out. Never feed paired data to `TTest2`.
+
+t = d̄/(s_d/√n), with n − 1 degrees of freedom.
+Stack: `n`, `dbar`, `sd` — or `{ n dbar sd }`.
+
+**Example.** Ten patients are weighed before and after a diet. The mean change
+is −1.85 kg with a standard deviation of 2.34 kg. Did the diet do anything?
+
+```rpl
+{ 10 -1.85 2.34 } ⓁTTestP 3 →List
+@ Expecting { t:-2.50009 13125 3 df:9 p:0.03385 67547 17 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.034 rejects H₀ at five per cent: the loss is more than the scatter would
+produce by chance. Note that the same 1.85 kg with ten *unpaired* patients
+would say much less, because the spread between people would swamp it.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## TTestPArgs
+
+Labels a row of values with the parameter names of `TTestP`.
+Stack: `n`, `dbar`, `sd` — or `{ n dbar sd }`.
+
+```rpl
+{ 10 -1.85 2.34 } ⓁTTestPArgs 3 →List
+@ Expecting { n:10 dbar:-1.85 sd:2.34 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## TTestLR
+
+Is the slope of the linear regression different from zero? It takes no
+argument and reads the current ΣData, the same data LR works on, so the
+usual sequence is to fill ΣData with Σ+ or STOΣ and then call this.
+
+* **H₀**: the slope is zero — x tells nothing about y.
+* **H₁**: it is not.
+
+Conditions: the usual ones of linear regression — a linear relation, residuals
+of constant spread and roughly normal.
+
+With Sₓₓ = Σx² − (Σx)²/n and the like, b = Sₓᵧ/Sₓₓ and
+s²ₑ = (Sᵧᵧ − bSₓᵧ)/(n−2), the statistic is t = b/√(s²ₑ/Sₓₓ) with n − 2 degrees
+of freedom.
+
+**Example.** Six points that rise almost in a straight line.
+
+```rpl
+[[ 1 2.1 ][ 2 3.9 ][ 3 6.2 ][ 4 7.8 ][ 5 10.3 ][ 6 11.7 ]] STOΣ
+ⓁTTestLR 3 →List
+@ Expecting { t:32.28943 99071 df:4 p:5.48450 3526⁳⁻⁶ }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p is five parts in a million: a slope that flat a chance would almost never
+produce. LR on the same data reports a slope near 1.966 — this entry says how
+firmly that number stands.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## FTestLR
+
+Overall significance of the linear regression on ΣData: does the model
+explain a real share of the variance of y? Like `TTestLR` it takes no argument.
+
+* **H₀**: the model explains nothing.
+* **H₁**: it explains something.
+
+F = b²Sₓₓ/s²ₑ with 1 and n − 2 degrees of freedom.
+
+**Example.** The same six points.
+
+```rpl
+[[ 1 2.1 ][ 2 3.9 ][ 3 6.2 ][ 4 7.8 ][ 5 10.3 ][ 6 11.7 ]] STOΣ
+ⓁFTestLR 4 →List
+@ Expecting { F:1 042.60792 952 df1:1 df2:4 p:5.48450 3526⁳⁻⁶ }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+In a simple regression this test and `TTestLR` are the same test written
+twice: F is exactly t², and the two p-values agree to the last digit. The
+distinction only becomes real with several predictors, where F asks about the
+model as a whole and each t asks about one coefficient.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## Chi2GOF
+
+Goodness of fit: do the observed counts follow the expected ones? Takes two
+lists of the same length — observed first, then expected — and refuses them if
+the lengths differ.
+
+* **H₀**: the counts follow the expected distribution.
+* **H₁**: they do not.
+
+Conditions: counts, not measurements, and expected values large enough — the
+customary rule is at least five in every cell. The degrees of freedom are
+k − 1; subtract one more for every parameter estimated from the same data, which
+this entry cannot know about and leaves to the user.
+
+χ² = Σ (O − E)²/E.
+
+**Example.** A die is thrown sixty times and gives 8, 12, 9, 14, 7, 10. Is it
+loaded?
+
+```rpl
+{ 8 12 9 14 7 10 } { 10 10 10 10 10 10 } ⓁChi2GOF 3 →List
+@ Expecting { chi2:3.4 df:5 p:0.63856 99231 04 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.64: a fair die produces a departure this large about two times in
+three. Nothing here suggests loading. A large p-value is not proof of fairness
+— sixty throws simply cannot see a small bias.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## Chi2Indep
+
+Independence of two qualitative variables, from a contingency table given as a
+matrix of observed counts. The expected count of a cell is its row total times
+its column total divided by the grand total — what independence would predict.
+
+* **H₀**: the two variables are independent.
+* **H₁**: they are associated.
+
+The same computation answers the test of **homogeneity** — whether several
+samples come from the same population — which differs from independence in how
+the data were collected, not in the arithmetic.
+
+χ² = ΣΣ (O − E)²/E, with (r − 1)(c − 1) degrees of freedom.
+
+**Example.** Two groups and three preferences: 30, 20, 50 in the first row and
+20, 30, 30 in the second.
+
+```rpl
+[[ 30 20 50 ][ 20 30 30 ]] ⓁChi2Indep 3 →List
+@ Expecting { chi2:6.8625 df:2 p:0.03234 64823 89 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.032 rejects independence at five per cent: preference and group are
+associated. The test says that they are, never how — look back at the table,
+where the first group prefers the third column and the second the second.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## Chi2Var
+
+Variance of a normal population against a target value. The test a machinist
+wants when the average is right but the scatter is suspect.
+
+* **H₀**: σ = σ₀.
+* **H₁**: σ ≠ σ₀.
+
+This test is unusually sensitive to non-normality — more so than the tests of
+means — so a visibly skewed sample makes it unreliable.
+
+χ² = (n−1)s²/σ₀², with n − 1 degrees of freedom. The p-value returned is the
+upper tail, which answers “is the spread larger than the target?”; for the
+two-sided question double the smaller of the two tails.
+Stack: `n`, `s`, `sigma0` — or `{ n s sigma0 }`.
+
+**Example.** Twenty parts show a standard deviation of 5.6 μm where the process
+is supposed to hold 4.5 μm.
+
+```rpl
+{ 20 5.6 4.5 } ⓁChi2Var 3 →List
+@ Expecting { chi2:29.42419 75309 df:19 p:0.05959 90104 14 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.060, just above five per cent. The process looks worse than its target
+but not yet provably so — the honest answer is to measure more parts rather
+than to argue about the threshold.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## Chi2VarArgs
+
+Labels a row of values with the parameter names of `Chi2Var`.
+Stack: `n`, `s`, `sigma0` — or `{ n s sigma0 }`.
+
+```rpl
+{ 20 5.6 4.5 } ⓁChi2VarArgs 3 →List
+@ Expecting { n:20 s:5.6 sigma0:4.5 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## FTestVar
+
+Equality of two variances, the ratio of one to the other. Often run before a
+two-sample **t** test, to choose between `TTest2` and `TTestW`.
+
+* **H₀**: σ₁ = σ₂.
+* **H₁**: they differ.
+
+**Put the larger variance first.** The entry forms s₁²/s₂² as given and reads
+the upper tail, doubled for the two-sided question; with the smaller on top the
+p-value would be meaningless. Like `Chi2Var`, this test is sensitive to
+departures from normality.
+
+F = s₁²/s₂², with n₁ − 1 and n₂ − 1 degrees of freedom.
+Stack: `n1`, `s1`, `n2`, `s2` — or `{ n1 s1 n2 s2 }`.
+
+**Example.** Sixteen measurements scatter by 7.4, twenty-one others by 4.9.
+
+```rpl
+{ 16 7.4 21 4.9 } ⓁFTestVar 4 →List
+@ Expecting { F:2.28071 63681 8 df1:15 df2:20 p:8.63010 89576 4⁳⁻² }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.086: the ratio is not significant at five per cent, so the equal-variance
+assumption of `TTest2` survives — though 0.086 is close enough to be uneasy
+about, and `TTestW` costs nothing.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+## FTestVarArgs
+
+Labels a row of values with the parameter names of `FTestVar`.
+Stack: `n1`, `s1`, `n2`, `s2` — or `{ n1 s1 n2 s2 }`.
+
+```rpl
+{ 16 7.4 21 4.9 } ⓁFTestVarArgs 4 →List
+@ Expecting { n1:16 s1:7.4 n2:21 s2:4.9 }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+## Anova1
+
+One-way analysis of variance: are three or more group means equal? Takes one
+list of lists, one inner list per group, and the groups need not be the same
+size.
+
+* **H₀**: all the group means are equal.
+* **H₁**: at least one differs.
+
+The idea is a ratio: the variance **between** the group means against the
+variance **within** the groups. If the groups really came from one population,
+the two estimate the same thing and the ratio sits near one.
+
+Why not several **t** tests? Because each one carries its own risk of a false
+alarm, and three tests at five per cent give better than one chance in seven of
+crying wolf. The analysis of variance asks the question once.
+
+F = (SS_B/(k−1)) / (SS_W/(N−k)), with k − 1 and N − k degrees of freedom.
+
+Conditions: independent groups, roughly normal, of comparable variance.
+
+**Example.** Three groups of four: 5 7 6 9, then 8 9 11 10, then 12 10 13 11.
+
+```rpl
+{ { 5 7 6 9 } { 8 9 11 10 } { 12 10 13 11 } } ⓁAnova1 4 →List
+@ Expecting { F:10.92 df1:2 df2:9 p:3.91811 00516 8⁳⁻³ }
+```
+
+The trailing →List only gathers the results so that one value can be checked here — do not type it: from the keyboard they arrive one per stack level, and it would displace LastArguments.
+
+p = 0.0039 rejects equality well below one per cent. What it does **not** say
+is which group differs from which — for that, compare pairs with `TTest2` or
+`TTestW`, and remember that several comparisons inflate the risk that this
+single test was designed to control.
+
+How to read this p-value, and why α = 0.05 is a choice rather than a law: see [StatTests](#stattestslibrary).
+
+
+## TestDemosLibrary
+
+Demonstrations of a test on random samples: each press draws a new sample of
+ten values from a normal law of standard deviation 1, and tests its mean with
+TTest1 against μ₀ = 10. Seed the generator with RDZ to replay a sample.
+
+* DMOTTest1: the true mean is 10, so H₀ is true; the test still rejects it
+  about one time in twenty — the risk α of a false alarm.
+* DMOTPower: the true mean is 10.5, so H₀ is false; the test detects it only
+  about three times in ten — its power, with ten values and a shift of half a
+  standard deviation.
+
+With the same seed, both draw the same ten values, shifted by 0.5.
+
+
+## DMOTTest1
+
+Ten values from a normal law of mean 10 and standard deviation 1, tested by
+TTest1 against μ₀ = 10. Returns the mean, the standard deviation s, the results
+of TTest1 and a verdict at α = 5 %.
+
+**1)** Usually H₀ is kept:
+
+```rpl
+1 RDZ ⓁDMOTTest1
+@ Expecting verdict:"H₀ kept"
+```
+
+**2)** Sometimes it is rejected, although it is true:
+
+```rpl
+11 RDZ ⓁDMOTTest1
+@ Expecting verdict:"H₀ rejected at 5 %, wrongly"
+```
+
+Over the first hundred seeds, H₀ was rejected five times: 5 %, the
+threshold itself. This is what α means: the rate of false alarms when nothing
+has changed, chosen before looking at the data.
+
+
+## DMOTPower
+
+Ten values from a normal law of mean 10.5 and standard deviation 1, tested by
+TTest1 against μ₀ = 10: H₀ is false, the mean has shifted by half a standard
+deviation.
+
+**1)** Here the shift is detected:
+
+```rpl
+1 RDZ ⓁDMOTPower
+@ Expecting verdict:"H₀ rejected: the shift is detected"
+```
+
+**2)** Here it is missed:
+
+```rpl
+2 RDZ ⓁDMOTPower
+@ Expecting verdict:"H₀ kept: the shift is missed"
+```
+
+Over the first hundred seeds, the shift was detected 28 times, close to
+the 29 % that theory gives: this is the power of the test. A test that keeps
+H₀ has not shown that nothing changed; with ten values it misses a shift of
+half a standard deviation seven times in ten. More values, or a larger shift,
+raise the power.
+# Uncertainty
+
+The Uncertainty section of the Function Library works on measured values and
+their uncertainties. The calculator already knows four ways of writing them,
+and they do not say the same thing:
+
+* **bounds** — `a…b`, `a±b`, `a±p%`: the true value lies somewhere in the
+  interval, for certain. No distribution is assumed; this is what a tolerance,
+  a resolution or a safety margin gives.
+* **statistics** — `a±σb`: the value is normally distributed with standard
+  deviation `b`. This is what a repeated measurement or a GUM uncertainty
+  budget gives.
+
+The core arithmetic already propagates both through a single operation. This
+section adds what the core leaves to the user, starting with the rounding of a
+result for presentation.
+
+
+## UncertaintyLibrary
+
+Tools for measured values and their uncertainties, whether written as bounds
+(`a…b`, `a±b`, `a±p%`) or as a standard deviation (`a±σb`).
+
+* [Rounding](#roundinglibrary) — present a result with the digits its
+  uncertainty justifies: [SciRngRnd](#scirngrnd), and as text
+  [SciRngText](#scirngtext) (`12.35±0.10`) or
+  [SciRngParen](#scirngparen) (`12.35(10)`).
+* [TypeB](#typeblibrary) — turn a resolution, a tolerance or a stated
+  uncertainty into a standard uncertainty: [ResN0→σR](#resn0→σr) guides
+  the choice step by step, [Bound→σ](#bound→σ) and [ResN0](#resn0) do the
+  same work from the stack.
+* [Compare](#comparelibrary) — do two measurements agree? [ΔConcord](#Δconcord)
+  for bounds, [σConcord](#σconcord) for standard deviations, [RngRel](#rngrel)
+  for how two intervals sit on the line.
+* [Functions](#functionslibrary) — propagate uncertainties through a function
+  written with x, or x1, x2…, followed by its values: [σRf](#σrf) and
+  [σRFxjxi](#σrfxjxi), and for intervals [ΔRf](#Δrf), [ΔRFxjxi](#Δrfxjxi) and
+  [Exmnf](#exmnf); [Cycling](#cycling) gives a value its other forms.
+* [Applications](#applicationslibrary) — worked examples of the whole
+  section: [Projectile](#projectilelibrary), in eight steps.
+* [Monte Carlo](#monte-carlolibrary) — propagate uncertainties through any
+  model by random draws, with any distribution for each input:
+  [MCPropagate](#mcpropagate).
+
+Correlations are given by two global variables. `ρij` holds one coefficient
+for all the pairs, or the full correlation matrix, for the functions of
+several variables: σRFxjxi and MCPropagate. `ρ` holds a single coefficient
+between two values, for the arithmetic of the calculator on `a±σb` values, as
+in `10±σ1 12±σ1 +`, and for σConcord. Without them, the values are
+independent; purge them after use, or they will weigh on later calculations.
+
+
+## RoundingLibrary
+
+A result such as `12.34563±0.02347` claims more than anyone measured: the last
+digits of the value lie far below its own uncertainty. The rule followed here is
+the one NIST and the GUM (JCGM 100:2008, §7.2.6) recommend:
+
+* round the **uncertainty to two significant digits**;
+* round the **value to the same decimal place** as the rounded uncertainty.
+
+So `12.34563±0.02347` becomes `12.346±0.023`, and `123456.7±789.1` becomes
+`123460±790`. Two digits rather than one because rounding 0.15 to one digit
+would change it by a third.
+
+The value is rounded after the uncertainty, since rounding the uncertainty can
+move it to the next decade: 0.0996 becomes 0.10, which fixes the value to two
+decimals, not three.
+
+A zero is significant in these results: `12.35±0.10` says the uncertainty is
+known to the hundredth. A number cannot carry that zero — 0.10 and 0.1 are the
+same number to the calculator. [SciRngRnd](#scirngrnd) returns numbers to go
+on computing with; [SciRngText](#scirngtext) returns the same result written as
+text, zeros included, for a report or a label; [SciRngParen](#scirngparen)
+writes it in the concise notation of the GUM and CODATA, `12.35(10)`.
+
+After Jean Wilson's SciRngRnd (2025–2026).
+
+
+## SciRngRnd
+
+Rounds a measured value and its uncertainty by the NIST rule: the uncertainty
+to two significant digits, the value to the same decimal place. See
+Rounding for the rule and why.
+
+It accepts every interval type and returns the same type, units included:
+
+* `a±b`, `a±σb` — the uncertainty is `b`;
+* `a…b` — the uncertainty is the half-width, and the bounds are rounded through
+  the centre;
+* `a±p%` — the value is rounded by its absolute uncertainty, and the percentage
+  itself to two significant digits;
+* two values `X` `U` on the stack — read as `X±U`. If both carry units, `U` is
+  first expressed in the unit of `X`.
+
+An uncertainty of zero leaves the value unchanged: nothing then says which
+digits are meaningful.
+
+Stack: an interval, or `X` `U`.
+
+**1)**
+
+```rpl
+12.34563±0.02347 ⓁSciRngRnd
+@ Expecting 12.346±0.023
+```
+
+**2)**
+
+```rpl
+12.3456±σ0.0234_m ⓁSciRngRnd
+@ Expecting 12.346±σ0.023 m
+```
+
+**3)**
+
+```rpl
+12.3456±1.5% ⓁSciRngRnd
+@ Expecting 12.35±1.5%
+```
+
+**4)** A value in metres and an uncertainty in centimetres:
+
+```rpl
+12.3456_m 2.34_cm ⓁSciRngRnd
+@ Expecting 12.346±0.023 m
+```
+
+When rounding the uncertainty reaches the next decade, the value follows it —
+and the result shows why SciRngText exists: the uncertainty
+0.10 is displayed as 0.1.
+
+**5)**
+
+```rpl
+12.3456±0.0996 ⓁSciRngRnd
+@ Expecting 12.35±0.1
+```
+
+See also: [Rounding](#roundinglibrary), [SciRngText](#scirngtext).
+
+
+## SciRngText
+
+The result of SciRngRnd written as text, with the trailing zeros
+that the rounding makes significant and that a number cannot carry. The display
+settings are not changed. Use it for a report, a label or a printed table; use
+SciRngRnd to go on computing. Without a unit, the text reads back as a number
+with STR→; the unit is written after a plain space, as in a report, and does
+not read back.
+
+Stack: an interval, or `X` `U`, as for SciRngRnd.
+
+**1)**
+
+```rpl
+12.3456±0.0996 ⓁSciRngText
+@ Expecting "12.35±0.10"
+```
+
+**2)**
+
+```rpl
+12.2…12.5678 ⓁSciRngText
+@ Expecting "12.20…12.56"
+```
+
+**3)**
+
+```rpl
+2±0.0234 ⓁSciRngText
+@ Expecting "2.000±0.023"
+```
+
+**4)**
+
+```rpl
+12.3456±σ0.0996_m ⓁSciRngText
+@ Expecting "12.35±σ0.10 m"
+```
+
+See also: [SciRngRnd](#scirngrnd).
+
+## SciRngParen
+
+The result of SciRngRnd in concise notation, the form the GUM
+(JCGM 100:2008, §7.2.2) and the CODATA tables use: the digits in parentheses
+are the uncertainty, in units of the last digit of the value. `1.456±0.023` is
+written `1.456(23)`; the Newtonian constant of gravitation appears in the
+CODATA tables as `6.67430(15)×10⁻¹¹`.
+
+When the uncertainty reaches the tens, the last digits of the value are no
+longer significant and `123460(79)` would be ambiguous; a power of ten then
+keeps it clear, `1.2346(79)×10⁵`. A zero uncertainty gives the value alone.
+
+**By convention the parentheses denote a standard uncertainty, σ.** For `a±σb`
+the notation says exactly what the value is. For bounds, `a±b`, `a…b` or `a±p%`,
+the entry writes the half-width in the same way, but a reader will take it for a
+standard deviation: say so next to the value, or write it with
+SciRngText instead.
+
+The result is text, as for SciRngText; the display settings are not changed.
+
+Stack: an interval, or `X` `U`, as for SciRngRnd.
+
+**1)**
+
+```rpl
+1.456±σ0.023 ⓁSciRngParen
+@ Expecting "1.456(23)"
+```
+
+**2)**
+
+```rpl
+6.67430±σ0.00015 ⓁSciRngParen
+@ Expecting "6.67430(15)"
+```
+
+**3)**
+
+```rpl
+12.3456±σ0.0996_m ⓁSciRngParen
+@ Expecting "12.35(10) m"
+```
+
+**4)**
+
+```rpl
+123456.7±σ789.1 ⓁSciRngParen
+@ Expecting "1.2346(79)×10⁵"
+```
+
+See also: [SciRngRnd](#scirngrnd), [SciRngText](#scirngtext).
+
+## TypeBLibrary
+
+A standard uncertainty obtained otherwise than from the scatter of repeated
+readings is what the GUM calls a **Type B** evaluation (JCGM 100:2008, §4.3):
+the resolution of a display, the divisions of a scale, a manufacturer's
+tolerance, an uncertainty quoted in a certificate. What one knows is a bound;
+what the propagation needs is a standard deviation. Going from one to the other
+takes a law: the bound says where the value can be, the law says how it is
+spread inside.
+
+* [ResN0→σR](#resn0→σr) asks for the reading, where the bound comes from, and
+  the law, then returns `x±σu`.
+* [Bound→σ](#bound→σ) does the conversion from the stack, for programs.
+* [ResN0](#resn0) finds the resolution of a reading from its significant zeros.
+
+Every factor comes from the Probability section: the standard deviation of
+the chosen law on the bounds (its Sx entry), or the quantile that turns a
+confidence level into a coverage factor (its Q entry). The rectangular law gives
+the familiar a/√3, the triangular a/√6, the U-shaped a/√2; a normal at 95 %
+gives U/1.96, a Student law with 10 degrees of freedom U/2.228.
+
+A digital display that shows the last digit δ does not say the value is within
+±δ, but within **±δ/2**: the reading was rounded. The standard uncertainty is
+then δ/√12, not δ/√3.
+
+After Jean Wilson's ResN0→σR (2025–2026).
+
+
+## ResN0→σR
+
+A guided conversion of a reading into a value with its standard uncertainty.
+It asks three questions. A number already on the stack is offered as the
+answer to the first, to complete or confirm with ENTER.
+
+1. **The value, as the instrument shows it.** Type it with its zeros and its
+   unit — `9.000_kg`, `16.00_mm`, `7.00E3`. The calculator would store 9.000 as
+   9; typed here, it is kept as text, so that the zeros that were measured are
+   counted. Only an integer such as `7000` is ambiguous: the screen then asks
+   how many of its trailing zeros are significant, and a key from 0 to 3
+   answers. Typing `7.000E3`, or `7000.` with a point, says it in advance.
+2. **Where the bound comes from** — a key from 1 to 4: a digital display
+   (±half the last digit), a graduated scale (±half the smallest division,
+   which it asks for), a stated tolerance ±a (or two values when the bounds
+   are unequal), or an expanded uncertainty ±U at a confidence level p.
+3. **The law** — a key from 0 to 9, among those that fit: inside bounds,
+   rectangular, triangular, triangular with another mode, U-shaped, beta,
+   or a normal truncated at the bounds; for an expanded uncertainty, normal,
+   Student, Rayleigh or log-normal. It asks for the parameters a law needs.
+
+It returns `x±σu`, where x is the mean of the law — the reading itself, except
+for the asymmetric ones. Any other key cancels.
+
+The same work, without the questions, is done by [ResN0](#resn0) and
+[Bound→σ](#bound→σ).
+
+
+## Bound→σ
+
+Standard uncertainty from a bound, for a given law — the calculation behind
+ResN0→σR, for programs.
+
+Stack: `X`, `A`, `law`, `P`.
+
+* `X` — the value, with or without unit.
+* `A` — the half-width a of the bounds, or `{ a- a+ }` when they are unequal
+  below and above X; in any unit compatible with X. For laws 7 to 0, the
+  expanded uncertainty U.
+* `law` — 1 rectangular, 2 triangular, 3 triangular with mode, 4 U-shaped,
+  5 beta, 6 truncated normal, 7 normal, 8 Student, 9 Rayleigh, 0 log-normal.
+* `P` — a list of the parameters the law needs: `{ mode }` for 3, `{ α β }` for
+  5, `{ k }` for 6 (the bounds at k standard deviations, 2 by default),
+  `{ p }` for 7, 9 and 0, `{ ν p }` for 8. The level p is 0.95 by default and
+  the mode is X. Give `{ }` when nothing is needed.
+
+Laws 7 and 8 read ±U as a two-sided interval holding the probability p, as a
+certificate does; laws 9 and 0 read X+U as the one-sided quantile p, the value
+being a magnitude, or positive.
+
+**1)** A display reading 9.000 kg: the bound is ±0.0005 kg, and a rounded reading is
+rectangular:
+
+```rpl
+9._kg 0.0005_kg 1 { } ⓁBound→σ
+@ Expecting 9.±σ2.88675 13459 5⁳⁻⁴ kg
+```
+
+**2)** A certificate gives ±0.2 at 95 % with 10 degrees of freedom:
+
+```rpl
+10. 0.2 8 { 10 0.95 } ⓁBound→σ
+@ Expecting 10.±σ8.97610 12794⁳⁻²
+```
+
+**3)** Unequal bounds move the value to the middle of the interval:
+
+```rpl
+10. { 0.1 0.3 } 1 { } ⓁBound→σ
+@ Expecting 10.1±σ0.11547 00538 38
+```
+
+See also: [ResN0→σR](#resn0→σr).
+
+## ResN0
+
+The resolution of a reading: the unit of its last significant digit, when N of
+its trailing zeros are significant. A calculator stores 9.000 kg as 9 kg; N
+says how many zeros the instrument actually showed.
+
+Stack: `X`, `N` — or `{ X N }`.
+
+**1)**
+
+```rpl
+9._kg 3 ⓁResN0
+@ Expecting 0.001 kg
+```
+
+**2)**
+
+```rpl
+7000. 2 ⓁResN0
+@ Expecting 10.
+```
+
+A value of zero has no significant digit to count from: type its resolution
+directly.
+
+## CompareLibrary
+
+Do two measurements of the same quantity agree? The question has two forms,
+and they must not be confused.
+
+* With **bounds** — `a…b`, `a±b`, `a±p%` — the true value is somewhere inside
+  each interval, so the question is geometric: do the intervals meet, and by
+  how much? That is [ΔConcord](#Δconcord), and [RngRel](#rngrel) for the bare
+  relation.
+* With **standard deviations** — `a±σb` — the bars are not bounds: the value is
+  outside ±σ one time in three. The question is statistical: is the difference
+  D = Y − X compatible with zero? That is [σConcord](#σconcord).
+
+Reading ±σ bars as bounds is a classic error. 10±σ1 and 12.2±σ1 do not touch,
+yet the difference is only 1.56 standard deviations of D, and p = 0.12: the two
+measurements are compatible at any usual threshold. Two ±σ bars that just touch
+give p = 0.16; incompatibility at 5 % needs a gap of about 0.77σ between the
+bars. This is why ΔConcord refuses `a±σb` values, and σConcord refuses bounds.
+
+After Jean Wilson's Concord (2025).
+
+
+## ΔConcord
+
+Draws two bounded intervals X and Y on the same scale, with their intersection,
+and states how much of each it covers and how they sit on the line. Y is first
+expressed in the unit of X.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number.
+
+It returns, tagged: `X∩Y` (a range, or `"∅"` when they do not meet), the part of
+X and the part of Y that the intersection covers, in per cent, and the relation
+as RngRel names it. The drawing stays on screen until a key is
+pressed.
+
+**1)**
+
+```rpl
+1…3 2…4 ⓁΔConcord
+```
+
+It returns `X∩Y:2…3`, `X%:50`, `Y%:50` and `rel:"X overlaps Y"`.
+
+**2)** A mass measured to ±0.0023 g, against a reference given to ±0.005 g, in grams
+both:
+
+```rpl
+5.3617±0.0023_g 5.360±0.005_g ⓁΔConcord
+```
+
+The first interval lies inside the second: `X∩Y:5.3594…5.364 g`, `X%:100`,
+`Y%:46`, `rel:"X containedBy Y"`.
+
+
+**3)** Random pairs make a good exercise. This draws two intervals between −100 and
+100 and compares them; run it several times, or press DMOΔConcord in
+Applications/Demos:
+
+```rpl
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+-100 100 RANDOM -100 100 RANDOM DUP2 MIN UNROT MAX →Range
+ⓁΔConcord
+```
+
+See also: [RngRel](#rngrel).
+
+## σConcord
+
+Are two measurements X = a±σb and Y = c±σd compatible? The answer is read on
+their difference D = Y − X, normal with mean d = c − a and standard deviation
+
+σD = √(σX² + σY² − 2ρ·σX·σY)
+
+where ρ is the global variable `ρ` that the arithmetic of the calculator also
+uses for correlated values (0 when it does not exist). The entry draws the law
+of D, marks zero, and shades the two tails beyond ±|d| around d: their area is
+the p-value.
+
+Stack: `X`, `Y` — each `a±σb` or a plain number, taken as exact.
+
+It returns, tagged: `d`, `σD`, `z` = |d|/σD, and `p` = 2·UTPN(0,1,z), the
+probability of a difference at least this large if the two measure the same
+thing. There is no verdict: the threshold belongs to the user. A small p
+says the measurements disagree; a large p does not prove they agree — it says
+the data cannot tell them apart.
+
+**1)**
+
+```rpl
+10±σ1 12.2±σ1 ⓁσConcord
+```
+
+It returns `d:2.2`, `σD:1.41421 35623 7`, `z:1.55563 49186 1` and
+`p:0.11979 49304 26`.
+
+**2)** The two ±σ bars do not touch, yet p = 0.12. With a correlation of 0.5, the
+difference is better known and the same gap weighs more:
+
+```rpl
+0.5 'ρ' STO 10±σ1 12.2±σ1 ⓁσConcord
+```
+
+Now `σD:1`, `z:2.2` and `p:0.02780 68950 27`. Purge `ρ` afterwards, or it will
+also weigh on the arithmetic of every uncertain value.
+
+**3)** Random measurements make a good exercise too. This draws two measurements of
+the same true value 10, with standard deviations between 0.5 and 2; run it
+several times, or press DMOσConcord in Applications/Demos. About one run in
+twenty gives p < 0.05, although both measure the same thing:
+
+```rpl
+'ρ' PURGE
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+0.5 2 RANDOM 2 Round DUP 10 SWAP ⓁNormlRand 2 Round SWAP →σRange
+ⓁσConcord
+```
+
+
+## RngRel
+
+How two bounded intervals X and Y sit on the line: one of the thirteen cases of
+Allen's interval algebra, which the IEEE 1788-2015 standard for interval
+arithmetic calls the *overlap* state, returned as a sentence that says which
+way it goes: `"X overlaps Y"`, `"X metBy Y"`. Exactly one case holds for any
+pair, which avoids the ambiguity of < between intervals.
+
+| Case | X = [a₁, a₂], Y = [b₁, b₂] |
+|---|---|
+| before | a₂ < b₁ |
+| meets | a₂ = b₁ |
+| overlaps | a₁ < b₁ < a₂ < b₂ |
+| starts | a₁ = b₁, a₂ < b₂ |
+| containedBy | b₁ < a₁, a₂ < b₂ |
+| finishes | b₁ < a₁, a₂ = b₂ |
+| equals | a₁ = b₁, a₂ = b₂ |
+| finishedBy | a₁ < b₁, a₂ = b₂ |
+| contains | a₁ < b₁, b₂ < a₂ |
+| startedBy | a₁ = b₁, b₂ < a₂ |
+| overlappedBy | b₁ < a₁ < b₂ < a₂ |
+| metBy | a₁ = b₂ |
+| after | b₂ < a₁ |
+
+A point interval takes the first case that matches, in the order equals,
+before, after, starts, finishes, meets, then the others.
+
+Stack: `X`, `Y` — each `a…b`, `a±b`, `a±p%` or a plain number; Y is expressed in
+the unit of X. `a±σb` values are refused, as for ΔConcord.
+
+**1)**
+
+```rpl
+1…3 2…4 ⓁRngRel
+@ Expecting "X overlaps Y"
+```
+
+**2)**
+
+```rpl
+1…3_m 100…300_cm ⓁRngRel
+@ Expecting "X equals Y"
+```
+
+**3)**
+
+```rpl
+2 1…3 ⓁRngRel
+@ Expecting "X containedBy Y"
+```
+
+
+## Monte CarloLibrary
+
+When the model is not linear, when the inputs are not normal, or when the
+result is not symmetric, the usual propagation formula is only an
+approximation. The Monte Carlo method draws values of the inputs at random,
+computes the model for each draw, and reads the result on the values obtained.
+
+* [MCPropagate](#mcpropagate): the mean, the standard uncertainty and the 95 %
+  coverage interval of a model of several inputs, each with its own
+  distribution.
+
+## MCPropagate
+
+Propagation of uncertainty by the Monte Carlo method, as described in
+Supplement 1 of the GUM (JCGM 101:2008).
+
+This is a light version of what the NIST Uncertainty Machine does. That
+machine draws from 100 000 to 5 million values, which a calculator cannot do.
+MCPropagate is made for a few thousand draws, best run on the simulator, on a
+phone or on a computer. In return, each input can follow any of the 30
+distributions of the Probability section, where the Uncertainty Machine
+offers 16.
+
+Stack: F Vars Vals M ▶ N, the 95 % interval, Y±σu. F is the model, an
+expression of the names listed in Vars, or a program that takes one value per
+input from the stack. Vals lists the inputs in the same order, and M is the
+number of draws. M may be omitted, F Vars Vals: 2 000 draws are then made,
+which give the standard uncertainty to about 2 %, in a few seconds on the
+simulator or a phone and in about a minute on a calculator.
+
+The type of each input tells its distribution:
+
+* a standard deviation, like 10±σ1: normal;
+* bounds, like 9…11, 10±1 or 10±10%: rectangular between the bounds, the usual
+  choice for a Type B evaluation;
+* a program that returns one draw, like « 10 1 ⓁLgNrmRand »: any distribution;
+  every distribution of the Probability section has such a Rand function;
+* a plain number: an exact value.
+
+Inputs may carry units. They are independent, unless a global variable ρij
+holds correlations, as for σRFxjxi: one coefficient for all the pairs, or the
+full correlation matrix, in the order of Vals. Normal inputs are then
+correlated exactly, through the Cholesky factor of ρij; inputs given by bounds
+through a Gaussian copula, as in the NIST Uncertainty Machine. An input given
+by a program draws by itself and cannot be correlated. A matrix that is not
+symmetric, or that no set of quantities could have, is refused.
+
+The results are the number of draws used, tagged N; the 95 % coverage interval
+(normal approximation, mean ± 1.96 σ), tagged 95%; and on the first level the
+mean and the standard deviation of the draws, as Y±σu. The mean and variance
+are computed by Welford's online algorithm, which uses O(1) memory.
+
+With M = 0, MCPropagate stops by itself when the mean and the uncertainty are
+stable to two significant digits of the uncertainty, after 20 000 draws, or
+after one minute, whichever comes first. A distribution with a long tail may
+never be stable: N then tells where it stopped.
+
+Each run gives a slightly different result, and this is how to judge its
+stability. The examples below first set the seed of the random generator, so
+that they always give the same result; leave that line out for real use.
+
+**1)** One distribution alone: the model is the variable itself. A
+rectangular distribution between 9 and 11 has a mean of 10 and a standard
+deviation of 1/√3 = 0.577:
+
+```rpl
+12345 RDZ
+'x' { x } { '9…11' } →Num 2000 ⓁMCPropagate
+@ Expecting 10.02378 18042±σ0.58487 21349 4
+```
+
+**2)** The sum of two normal inputs. The exact result is 30±σ2.236:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 2000 ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
+```
+
+**3)** The product of a rectangular input and a normal one:
+
+```rpl
+12345 RDZ
+'a*b' { a b } { '9…11' 10±σ1 } →Num 2000 ⓁMCPropagate
+@ Expecting 100.26278 5406±σ11.39132 08051
+```
+
+**4)** Inputs with units: a resistance from a voltage and a current.
+
+```rpl
+12345 RDZ
+'V/I' { V I } { '10±σ0.1_V' '5±σ0.05_A' } →Num 2000 ⓁMCPropagate
+@ Expecting 1.99888 76261 4±σ2.86028 04379 6⁳⁻² V/A
+```
+
+**5)** A model that is not linear. For the square of a normal input
+centered on zero, the propagation formula gives 0±σ0, since the derivative is
+zero there. The true mean is 1, the standard deviation 1.414, and the interval
+is far from symmetric:
+
+```rpl
+12345 RDZ
+'x^2' { x } { 0±σ1 } 2000 ⓁMCPropagate
+@ Expecting 0.97201 48896 25±σ1.40367 28151 1
+```
+
+**6)** Any distribution, through its draw program: here a lognormal
+distribution. The draw programs are slower than the normal and rectangular
+inputs, about 60 draws per second on the simulator:
+
+```rpl
+12345 RDZ
+'x' { x } { « 0 1 ⓁLgNrmRand » } 500 ⓁMCPropagate
+@ Expecting 1.88793 72628 2±σ2.38766 59582 6
+```
+
+The same distribution is obtained much faster as the exponential of a normal
+input, with the model 'exp(x)' and the input 0±σ1.
+
+**7)** Automatic stop, with M = 0. Here the result is stable after
+8 500 draws:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } 0 ⓁMCPropagate
+@ Expecting 30.03900 15233±σ2.25391 96331 3
+```
+
+**8)** Correlated inputs: the comparison loss in microwave power meter
+calibration of JCGM 101 (9.4), δY = X1² + X2², with x1 = 0.010, x2 = 0,
+u = 0.005 for both and a correlation of 0.9. The propagation formula gives
+1.0×10⁻⁴; the Supplement finds 1.21×10⁻⁴ by the Monte Carlo method with a
+million draws, and 2 000 draws give it to a few per cent:
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } 2000 ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+**9)** Without M: 2 000 draws, the sum of example 2:
+
+```rpl
+12345 RDZ
+'a+b' { a b } { 10±σ1 20±σ2 } ⓁMCPropagate
+@ Expecting 30.12500 40006±σ2.24588 10666 3
+```
+
+A model given as a program takes its values from the stack, and the list of
+names is empty: « * » { } { 10±σ1 '4±0.5' } →Num 1000 ⓁMCPropagate.
+
+A model that contains a constant, like 'm*Ⓒg*h', is evaluated by
+substitution, which is slower.
+
+See also: the Rand functions of the Probability section, and the Rounding
+functions to present the result.
+
+
+## FunctionsLibrary
+
+Functions of uncertain values and of intervals, without any list to build:
+the function is written with the names x or x1, x2, …, and its values follow
+it on the stack. Standard uncertainties are propagated by the law of
+propagation of the GUM (JCGM 100:2008, section 5), intervals by a search of
+the global minimum and maximum of the function.
+
+* [σRf](#σrf): a composite function of one variable, f(x);
+* [σRFxjxi](#σrfxjxi): a function of several variables, F(x1, x2, …),
+  possibly correlated;
+* [σROOT](#σroot): the unknowns of any simulation of the Equation Library,
+  from inputs given with their uncertainty;
+* [ΔROOT](#Δroot): the range of the unknowns of any simulation of the Equation
+  Library, from inputs given by bounds;
+* [ΔRf](#Δrf): the range of a function of one variable over an interval;
+* [ΔRFxjxi](#Δrfxjxi): the range of a function of several variables over a
+  box;
+* [Exmnf](#exmnf): the drawing of a function over an interval, to check ΔRf.
+* [ExmnFxjxi](#exmnfxjxi) and [ExmnF2D](#exmnf2d): the profile and the plane
+  slice of a function of several variables through its extrema, to check
+  ΔRFxjxi.
+* [Cycling](#cycling): the forms of a value with an uncertainty, `a…b`,
+  `a±b`, `a±p%` and `a±σb`, unit included, to correct a value typed in the
+  wrong form.
+
+Evaluating a function directly on uncertain numbers treats each occurrence of
+a variable as a new, independent variable: x·x does not get the uncertainty
+of x², and (x−1)·(x−2)·(x−3) gets twice its uncertainty. These functions count each
+variable once.
+
+The law of propagation is a first order approximation, good when the function
+is close to linear over the uncertainties. Otherwise, the Monte Carlo method of
+[MCPropagate](#mcpropagate) gives the reference result; comparing the two is
+the check recommended by Supplement 1 of the GUM.
+
+After the σRf, σRFx2x1, σRFxjxi, ΔRf and Exmnf functions of Jean Wilson's Proposition for
+interval implementation in the RPL environment (2025).
+
+
+## σRf
+
+The uncertainty of a composite function of one variable.
+
+Stack: 'f(x)' X ▶ Y±σu, where f is an expression of the name x and X its
+value a±σb, with or without units.
+
+The contribution of x is the derivative of f times the standard deviation,
+obtained by five point central differences on the value with its unit, with a
+step of σ/1000: it comes out in the unit of f, works with any function,
+constant or unit, and also at x = 0.
+
+**1)** The gamma function at 7±σ0.05. The exact uncertainty is
+Γ(7)·ψ(7)·0.05 = 720 × 1.87278 43351 × 0.05 = 67.42023 60636, where
+ψ(7) = −γ + 1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6 is the digamma function:
+
+```rpl
+'tgamma(x)' 7.0±σ0.05 ⓁσRf
+@ Expecting 720.±σ67.42023 60635
+```
+
+**2)** A polynomial near one of its roots. Evaluated directly on
+2.755±σ0.05, it gets about twice this uncertainty, since its three factors are
+treated as independent:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' 2.755±σ0.05 ⓁσRf
+@ Expecting -0.32463 1125±σ0.03550 375
+```
+
+**3)** The difference of a quantity with itself is exactly zero:
+
+```rpl
+'x-x' 2.0±σ0.05_m ⓁσRf
+@ Expecting 0±σ0. m
+```
+
+
+## σRFxjxi
+
+The uncertainty of a function of several variables.
+
+Stack: 'F' Xn … X2 X1 ▶ Y±σu, where F is an expression of the names x1, x2, …
+xn, and each Xj is the value of xj: a±σb, or a plain number for an exact
+value, with or without units. X1 is on the first level, as in a formula read
+from the right.
+
+The variables are independent, unless a global variable ρij holds either one
+correlation coefficient for all the pairs, or the full correlation matrix, in
+the order x1 … xn. The contributions cj, derivative times standard deviation,
+are combined as u² = Σ ci·cj·ρij. The variable ρij stays in the current
+directory and applies to the next calls: purge it when done, as the examples
+do.
+
+Thanks to Ed van Gasteren, whose Propagate program and discussions led to this
+function.
+
+**1)** A mass from a linear density and a length, with units:
+
+```rpl
+'x2*x1' 2.5±σ0.5_g/cm 2.0±σ0.2_cm ⓁσRFxjxi
+@ Expecting 5.±σ1.11803 39887 5 g
+```
+
+**2)** Three lengths fully correlated, for instance measured with the
+same rule: the uncertainties add instead of combining in quadrature.
+
+```rpl
+1 'ρij' Sto
+'x3+x2+x1' 1.2±σ0.002 2.5±σ0.005 1.600±σ0.012 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 5.3±σ0.019
+```
+
+**3)** Two variables correlated at 0.5, given as a matrix: the
+uncertainty is √(1² + 2² + 2·0.5·1·2) = √7:
+
+```rpl
+[[ 1 0.5 ] [ 0.5 1 ]] 'ρij' Sto
+'x2+x1' 10±σ1 20±σ2 ⓁσRFxjxi
+'ρij' Purge
+@ Expecting 30±σ2.64575 13110 6
+```
+
+**4)** The potential energy of a mass raised along a slope, with a
+constant and an angle in degrees:
+
+```rpl
+'x3*Ⓒg*x2*sin(x1)' 2±σ0.01_kg 10±σ0.1_m 30±σ0.5_° ⓁσRFxjxi
+@ Expecting 98.0665±σ1.84371 03556 2 kg·m↑2/s↑2
+```
+
+The same functions with MCPropagate take the names and the values as lists:
+'x2*x1' { x2 x1 } { 2.5±σ0.5 2.0±σ0.2 } 0 ⓁMCPropagate.
+
+
+## σROOT
+
+The uncertainty of the unknowns found by ROOT, for any simulation of the
+Equation Library.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:Y1±σu1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their values as usual, but with
+their uncertainty: a±σb for a standard uncertainty, or bounds a…b, a±b or a±p%
+when only the limits are known. Bounds are taken as a rectangular law, of
+standard deviation width/√12, as Bound→σ does. Units are welcome.
+
+σROOT finds these variables in the current directory, runs ROOT with each one
+at its centre, then moves each one in turn by ±σ/100 and runs ROOT again. The
+differences give the contribution of every input to every unknown, combined
+as by σRFxjxi: u² = Σ ci·ck·ρik. The inputs are independent, unless the global
+variable ρij holds one coefficient for all the pairs, or a list of pairs by
+name, { { x y ρ } … }, the other pairs being 0; since σROOT finds the inputs
+itself, a matrix, whose order would be unknown, is refused. With n uncertain inputs,
+ROOT runs 1 + 2n times: a fraction of a second on the simulator. It works even
+when an unknown cannot be isolated, since the derivatives are taken through
+the solver.
+
+Afterwards, each input gets back its uncertain value, and each unknown holds
+its central value. The unknowns are purged before each run, so that ROOT
+always starts from the guesses: a second ROOT on unknowns that already exist
+does not always solve them again.
+
+The result is a standard uncertainty, ±σ, even when the inputs are bounds; for
+the range of each unknown, see ΔROOT. For
+the shape of the law of the result, see DMOPendulum, which
+draws it by the Monte Carlo method.
+
+**1)** The simple pendulum, its amplitude only known between 60° and 80°: the
+four unknowns, each with its uncertainty. Treal agrees with σRFxjxi applied to
+the formula written out.
+
+```rpl
+15±σ0.1_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁσROOT
+@ Expecting { ω:8.08564 57173 6±σ0.02695 21524 66 r/s Treal:0.85638 34442 86±σ1.45730 83375 9⁳⁻² s T:0.77707 89775 87±σ2.59026 32600 6⁳⁻³ s f:1.28687 04840 1±σ4.28956 82919 4⁳⁻³ Hz }
+```
+
+**2)** The pendulum the other way round: from a measured period, its
+amplitude. θmax lies inside a series in sin²(θmax/2) and cannot be isolated:
+ROOT finds it, and σROOT its uncertainty. The length contributes 1.15° and the
+period only 0.40°: to know the amplitude better, measure the length better.
+
+```rpl
+15±σ0.1_cm 'L' Sto  0.8564±σ0.001_s 'Treal' Sto
+'ROOT(ⒺSimple Pendulum;[ω;θmax;T;f];[1_(r/s);50_°;1_s;1_Hz])' ⓁσROOT 2 Get
+@ Expecting θmax:70.00668 81164±σ1.22184 90395 5 °
+```
+
+**3)** A lab experiment: an unknown capacitor, from the voltage across it
+after charging for a time t through a resistor R. The resistor is only known
+by its tolerance, 5 %, a bound; the other inputs are measured. C lies inside an
+exponential. The tolerance of R dominates: with a 1 % resistor, the
+uncertainty of C falls from 1.51 μF to 0.55 μF, without a better voltmeter or
+a better clock.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±5%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+@ Expecting { C:49.94037 53622±σ1.51471 94838 9 μF }
+```
+
+**4)** The same capacitor with a 1 % resistor, Vf and V being read on the same
+voltmeter: an error of its calibration moves both the same way, a correlation
+of 0.9. C depends on their ratio, so the common error partly cancels, and the
+uncertainty of C falls from 0.547 μF to 0.466 μF. ρij stays in the directory
+and applies to the next calls: purge it when done.
+
+```rpl
+0_V 'Vi' Sto  10±σ0.02_V 'Vf' Sto  100±1%_Ω 'R' Sto  2±σ0.01_ms 't' Sto  3.30±σ0.02_V 'V' Sto
+{ { Vf V 0.9 } } 'ρij' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁσROOT
+'ρij' Purge
+@ Expecting { C:49.94037 53622±σ0.46565 38593 03 μF }
+```
+
+These results were checked against an independent computation in double
+precision, and against Monte Carlo runs of 100 000 draws or more: θmax =
+70.0067±σ1.2218° (Monte Carlo: 1.2194°).
+
+See also: [ΔROOT](#Δroot), [DMOPendulum](#dmopendulum).
+
+
+## ΔROOT
+
+The range of the unknowns found by ROOT, for any simulation of the Equation
+Library: interval arithmetic through the solver.
+
+Stack: 'ROOT(Ⓔname;[unknowns];[guesses])' ▶ { y1:lo1…hi1 … }, the call to
+ROOT quoted exactly as in the examples of the Equation Library.
+
+Before the call, give the known variables their bounds: a…b, a±b or a±p%. A
+value a±σb is taken as the bounds a±√3·b of the rectangular law of the same
+standard deviation, the inverse of what Bound→σ does. Only the variables of
+the equations are inputs; units are welcome.
+
+ΔROOT runs ROOT on a grid over the box of the inputs: up to three inputs,
+each at its low bound, its centre and its high bound, 3ⁿ runs; beyond, at the
+corners of the box and at its centre, 2ⁿ + 1 runs, which keeps the time
+reasonable on a calculator. To search inside the box with the full grid of
+3ⁿ runs whatever the number of inputs, store a number other than 0 in the
+global variable ΔROOTFullGrid, for instance 1 'ΔROOTFullGrid' Sto; purge it
+to come back to the corners. With five inputs, that is 243 runs instead of 33. It keeps the smallest and the largest
+value of each unknown. When each unknown varies in one direction with each
+input, its extremes lie at corners of the box, and the range is exact. When
+an extreme is only reached inside the box, the tag of that unknown says
+"(inner extremum?)": the true range may be wider, and a narrower box, or
+Exmnf on the equation, will tell.
+
+Afterwards, each input gets back its value, and each unknown holds its value
+at the centre of the box.
+
+**1)** The simple pendulum, its amplitude between 60° and 80°: the real
+period lies between its values at the two ends. ω, T and f do not depend on
+the amplitude.
+
+```rpl
+15_cm 'L' Sto  '60…80_°' →Num 'θmax' Sto
+'ROOT(ⒺSimple Pendulum;[ω;Treal;T;f];[1_(r/s);1_s;1_s;1_Hz])' ⓁΔROOT
+@ Expecting { ω:8.08564 57173 6…8.08564 57173 6 r/s Treal:0.83393 48521 94…0.88361 42622 96 s T:0.77707 89775 87…0.77707 89775 87 s f:1.28687 04840 1…1.28687 04840 1 Hz }
+```
+
+**2)** The capacitor of σROOT, now by bounds: the supply known to
+±0.05 V, the resistor to 5 %, the voltage read between 3.28 V and 3.32 V. The
+capacitance is guaranteed within the range found.
+
+```rpl
+0_V 'Vi' Sto  10±0.05_V 'Vf' Sto  100±5%_Ω 'R' Sto  2_ms 't' Sto  '3.28…3.32_V' →Num 'V' Sto
+'ROOT(ⒺRC Transient;[C];[10_μF])' ⓁΔROOT
+@ Expecting { C:46.91904 5145…53.28814 92172 μF }
+```
+
+**3)** The limit of the method: the range of a projectile launched between
+35° and 65°. The range is largest at 45°, inside the box; the grid sees 35°,
+50° and 65°, and finds its largest value at 50°, 1 224 ft, where the true
+largest range is 1 243 ft. The tag warns of it.
+
+```rpl
+0_ft 'x0' Sto  0_ft 'y0' Sto  200_ft/s 'v0' Sto  10_s 't' Sto  '35…65_°' →Num 'θ0' Sto
+'ROOT(ⒺProjectile Motion;[R;vcx;vcy;x;y;hmax;tf];[1_ft;1_ft/s;1_ft/s;1_ft;1_ft;1_ft;1_s])' ⓁΔROOT 1 Get
+@ Expecting R (inner extremum?):952.37556 6631…1 224.35042 8 ft
+```
+
+The ranges of the first two examples were checked on a grid of eleven levels
+per input: they are exact to the digits shown.
+
+See also: [Exmnf](#exmnf), [σROOT](#σroot).
+
+
+## ΔRf
+
+Interval arithmetic for a composite function of one variable: the smallest and
+largest values of f over an interval.
+
+Stack: 'f(x)' X ▶ f(X), where f is an expression of the name x and X an
+interval a…b, a±b or a±p%, with or without units. The result has the form of
+X, except that a±p% gives a±b.
+
+Evaluating f directly on an interval counts each occurrence of x as a new
+variable, and the result can be far too wide. ΔRf searches the global minimum
+and maximum of f over X instead: f is evaluated at 65 points spread over X,
+ends included, and each local maximum or minimum of these values is refined
+by a golden section search. An extremum narrower than 1/64 of X could be
+missed; Exmnf draws the function to check it.
+
+**1)** A polynomial with three occurrences of x. Evaluated directly on
+1…3, it gives −4…4, since its factors are taken as independent; the true
+range is ±2/(3√3):
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁΔRf
+@ Expecting -0.38490 01794 6…0.38490 01794 6
+```
+
+**2)** A maximum inside the interval: sin reaches 1 at π/2.
+
+```rpl
+'sin(x)' 1.5±0.15_r ⓁΔRf
+@ Expecting 0.98786 16789 13±0.01213 83210 87
+```
+
+**3)** A minimum inside the interval, at x = 0:
+
+```rpl
+'exp(x^2)' 0.5±0.9 ⓁΔRf
+@ Expecting 4.04966 35325 8±3.04966 35325 8
+```
+
+**4)** A function that is not differentiable at its minimum:
+
+```rpl
+'abs(x^3)' -0.25±0.35 ⓁΔRf
+@ Expecting 0.108±0.108
+```
+
+**5)** With units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁΔRf
+@ Expecting 12.81445 3125±12.81445 3125 m↑4
+```
+
+**6)** An interval given in percent gives a±b:
+
+```rpl
+'x^2' '10±10%' →Num ⓁΔRf
+@ Expecting 101.±20.
+```
+
+
+## Exmnf
+
+Examine a function over an interval: Exmnf draws f over X, with the smallest
+and largest values found by ΔRf as dashed lines, and leaves the result of ΔRf
+on the stack.
+
+Stack: 'f(x)' X ▶ f(X), as ΔRf.
+
+The curve uses 161 points. Each dashed line should touch the curve; a line
+that does not, or a peak of the curve beyond a line, would show an extremum
+that ΔRf missed. The highest and the lowest points of the curve are marked by
+filled triangles ▲ ▼, the other local maxima and minima by hollow ones, each
+centred on its point.
+
+**1)** The polynomial of the first example of ΔRf, with its two
+extrema inside the interval:
+
+```rpl
+'(x-1)*(x-2)*(x-3)' '1…3' →Num ⓁExmnf
+```
+
+**2)** A power with units:
+
+```rpl
+'x^4' 1.10±1.15_m ⓁExmnf
+```
+
+**A peak narrower than the sampling.** No search can promise an extremum
+narrower than the steps it takes. This function rises gently from 1 to 1.9,
+with a peak of height 3 and width 0.008 at x = 2.37:
+
+**3)** Over 0…3, the 161 points of the curve fall on the flank of the peak and
+show it as a small spike, marked by hollow triangles, but ΔRf misses it: the dashed line of the
+maximum stays at 1.9, below the spike.
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '0…3' →Num ⓁExmnf
+```
+
+**4)** A spike that the dashed lines do not explain calls for a closer look.
+Over 2.3…2.45, around the spike, the peak is drawn whole and ΔRf finds the
+true maximum, 4.56:
+
+```rpl
+'1+x^2/10+3*exp(-((x-2.37)/0.004)^2)' '2.3…2.45' →Num ⓁExmnf
+```
+
+Over a wide interval, examine the drawing as well as the numbers, and narrow
+the interval around anything they do not account for.
+
+
+## ΔRFxjxi
+
+Interval arithmetic for a function of several variables: the smallest and
+largest values of F over a box, each variable in its own interval.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), where F is an expression of the names x1 … xn
+and each Xj an interval a…b, a±b or a±p%, or a plain number for an exact
+value, with or without units. X1 is on the first level, as for σRFxjxi. The
+result is a…b when all the intervals are a…b, a±b otherwise.
+
+F is first evaluated at the 2ⁿ vertices of the box. A coordinate search then
+starts from the centre and from the best vertex, and improves the minimum and
+the maximum one variable at a time, over its whole interval, until nothing
+improves. This finds an extremum inside the box, on a face or on an edge, one
+per subspace, which is what small intervals call for. It is a search, not a
+proof: a function with many extrema over a wide box could hide one.
+
+**1)** Two occurrences of x1. Evaluated directly, x1·x2 − x1 on
+x1 = 1…2 and x2 = 0…3 gives −2…5; the true range is −2…4:
+
+```rpl
+'x1*x2-x1' 1.5±1.5 1.5±0.5 ⓁΔRFxjxi
+@ Expecting 1.±3.
+```
+
+**2)** A minimum inside the box, at x1 = 1 and x2 = 2:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁΔRFxjxi
+@ Expecting 1±1
+```
+
+**3)** A maximum on an edge, at x1 = 0.5 and x2 = 1:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁΔRFxjxi
+@ Expecting 0.625±0.625
+```
+
+**4)** Small intervals around a point where F changes slowly:
+
+```rpl
+'(x1-1)*(x2-2)*(x1+x2-3)' 2.5±0.1 1.5±0.1 ⓁΔRFxjxi
+@ Expecting 0.28±0.152
+```
+
+**5)** With units and an angle in degrees:
+
+```rpl
+'x2*sin(x1)' 10±1_m 30±5_° ⓁΔRFxjxi
+@ Expecting 5.05645 25777 6±1.25288 82221 m
+```
+
+
+## ExmnFxjxi
+
+Examine a function of several variables over a box: the profile of F along
+the straight segment that joins its global minimum to its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack.
+
+The minimum and the maximum are found as by ΔRFxjxi; the segment that joins
+them fixes the n−1 other degrees of freedom, and F is drawn at 161 of its
+points, from the minimum on the left to the maximum on the right. The values
+and the points of both extrema are written below, as { x1 … xn }. The minimum
+and the maximum, at the ends, are marked by filled triangles ▼ ▲, the local
+extrema along the profile by hollow ones.
+
+**1)** A maximum on an edge of the box:
+
+```rpl
+'x1*(1-x1)+x2' 0.5±0.5 0.5±0.5 ⓁExmnFxjxi
+```
+
+**2)** Several extrema inside a wide box: the minimum −1 is found at
+x1 = 3π/2, the maximum 1 at x1 = π/2, both with x2 = 0:
+
+```rpl
+'sin(x1)*cos(x2)' 3±3_r 3±3_r ⓁExmnFxjxi
+```
+
+**3)** Robustness: a bump and a dip right on the way from the minimum to the
+maximum. The profile shows both, with their hollow marks, yet the search keeps the global extrema, at (0, 0) and
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnFxjxi
+```
+
+
+## ExmnF2D
+
+Examine a function of several variables over a box: the plane slice that
+contains its global minimum and its global maximum.
+
+Stack: 'F' Xn … X2 X1 ▶ F(X), as ΔRFxjxi, whose result it leaves on the stack;
+at least two variables must be intervals.
+
+Each variable is scaled to its interval, the box becoming a cube. The slice is
+the plane that contains the segment from the minimum to the maximum, and the
+direction of the variable least involved in that segment, named on the last
+line; the other degrees of freedom are fixed by the plane. Seven contour
+lines, at 1/8, 2/8 … 7/8 of the way from the minimum to the maximum, show the
+shape of F, as on a map: close together where F changes fast. The edge of the
+box is drawn too.
+The minimum and the maximum are marked by filled triangles ▼ ▲, joined by the
+segment that ExmnFxjxi draws. A point of the grid higher than its eight
+neighbours, or lower, is marked by a hollow triangle pointing up or down: the
+local summits and pits of the slice, which tell whether a ring of contours
+surrounds a bump or a dip. About a thousand values of F are computed: a few seconds on
+the simulator.
+
+**1)** A minimum inside the box, a maximum at a vertex:
+
+```rpl
+'(x1-1)^2+(x2-2)^2' 2±1 1±1 ⓁExmnF2D
+```
+
+**2)** Three variables: the slice cuts the cube along a polygon:
+
+```rpl
+'x3*(x1-1)^2+x2' 1±0.5 0.5±0.5 1±1 ⓁExmnF2D
+```
+
+**3)** A saddle, over a box longer in x1: the minimum −1 at x1 = 0,
+x2 = ±1, the maximum 2.25 at x1 = ±1.5, x2 = 0, and hyperbolas between them:
+
+```rpl
+'x1^2-x2^2' 0±1 0±1.5 ⓁExmnF2D
+```
+
+**4)** A bump: the maximum 1 at the origin, inside the box, with
+circles around it, and the minimum at a far corner:
+
+```rpl
+'exp(-(x1^2+x2^2))' 0.5±1.5 0±1.5 ⓁExmnF2D
+```
+
+**5)** Robustness: the same bump and dip as in example 3 of ExmnFxjxi. The
+contours ring both of them, on the segment, and hollow triangles mark the
+bump and the dip. The
+search still finds the global minimum at (0, 0) and the global maximum 1.8 at
+(3, 3):
+
+```rpl
+'(x1^2+x2^2)/10+0.4*exp(-((x1-1)^2+(x2-1)^2)/0.1)-0.4*exp(-((x1-2)^2+(x2-2)^2)/0.1)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**A hidden peak, in two steps.** A narrow peak of height 3 stands at
+x1 = 2.5, x2 = 1.9, not far from the corner (3, 3), on a gentle slope from 1
+to 1.9:
+
+**6)** Over the whole box 0…3 × 0…3, the search misses the peak and gives the
+maximum 1.9 at the corner (3, 3). The drawing does not: rings of contours near
+the maximum, with a hollow triangle at their centre, show a summit that the numbers do not
+account for.
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.5±1.5 1.5±1.5 ⓁExmnF2D
+```
+
+**7)** A smaller box centred on the hollow triangle, x1 = 2.5±0.3 and
+x2 = 1.9±0.3, given as X2 X1: the peak is now within the reach of the search,
+and the true maximum appears, 4.475 at (2.5, 1.9):
+
+```rpl
+'1+x1*x2/10+3*exp(-((x1-2.5)^2+(x2-1.9)^2)/0.03)' 1.9±0.3 2.5±0.3 ⓁExmnF2D
+```
+
+The search starts from the centre and from the best vertex of the box, one
+variable at a time; a summit narrow compared with the box, off the lines it
+follows, may escape it. When a hollow triangle appears away from the filled ones, or rings
+of contours that the numbers do not explain, examine a smaller box around it.
+
+
+## Cycling
+
+Give a value with an uncertainty its next form, keeping its unit:
+
+`a…b` → `c±d` → `c±p%` → `c±σd` → `a…b`
+
+with c = (a + b)/2, d = (b − a)/2 and p = 100·d/|c|.
+
+The first three forms state the same bounds: going from one to the other is an
+equivalence, nothing is lost or added.
+
+The two steps to and from `c±σd` are of another kind. They keep the same digits
+but change their meaning: a bound becomes a standard deviation, or the reverse.
+Their result is tagged `non-equivalent:` as a reminder. They are there to
+correct a value typed in the wrong form, `10±1` for `10±σ1` or the reverse, not
+to convert one into the other. A bound and a standard deviation are not the
+same thing: the true value lies outside ±σ one time in three. To turn a bound
+into a standard deviation, a law must be chosen, a rectangular one dividing the
+half width by √3: Bound→σ does that.
+
+The Cycle command (EEX) also turns `a…b`, `a±b` and `a±p%` into each other,
+but not when the value carries a unit; Cycling does.
+
+**1)** From bounds to a centre and a half width:
+
+```rpl
+9…11 ⓁCycling
+@ Expecting 10±1
+```
+
+**2)** From a half width to a percentage:
+
+```rpl
+10±1 ⓁCycling
+@ Expecting 10±10%
+```
+
+**3)** From a percentage to a standard deviation with the same digits, tagged as not equivalent:
+
+```rpl
+10±10% ⓁCycling
+@ Expecting non-equivalent:10±σ1
+```
+
+**4)** A value typed as a standard deviation but meant as bounds:
+
+```rpl
+10±σ1 ⓁCycling
+@ Expecting non-equivalent:9…11
+```
+
+**5)** With a unit:
+
+```rpl
+1.0…2.0_m ⓁCycling
+@ Expecting 1.5±0.5 m
+```
+
+**6)** Four presses bring the bounds back, tagged as not equivalent since the cycle went through a standard deviation:
+
+```rpl
+1.0…2.0_m ⓁCycling ⓁCycling ⓁCycling ⓁCycling
+@ Expecting non-equivalent:1.…2. m
+```
+
+See also: [Bound→σ](#bound→σ).
+
+
+## ApplicationsLibrary
+
+Worked examples of the whole section, after Part 2, Applications, of Jean
+Wilson's Proposition for interval implementation in the RPL environment
+(2025). Each submenu holds worked examples or demonstrations.
+
+* [GUMS1](#gums1library): the four examples of Supplement 1 to the GUM
+  (JCGM 101:2008), by the propagation formula and by Monte Carlo.
+* [Demos](#demoslibrary): commands of the section run on random inputs, a new
+  case at each press.
+* [Projectile](#projectilelibrary): a projectile experiment, in eight steps, from the
+  Type B evaluation of the measurements to the Monte Carlo method.
+* [EqDemos](#eqdemoslibrary): equations of the Equation Library with uncertain
+  inputs, by the Monte Carlo method and by the propagation formula.
+* [Labs](#labslibrary): laboratory exercises on equations of your own, added to
+  the Equation Library through `config/equations.csv`.
+
+
+## DemosLibrary
+
+Demonstrations: each key runs a command of the section on inputs drawn at
+random, so that every press shows a new case. Seed the generator with RDZ to
+replay the same sequence.
+
+* DMOΔConcord: two bounded intervals, compared by ΔConcord;
+* DMOσConcord: two measurements of the same quantity, compared by σConcord.
+* DMOExmnF2D: a narrow peak at random, examined by ExmnF2D.
+
+
+## DMOΔConcord
+
+Draws two intervals at random between −100 and 100 and compares them with
+ΔConcord: the drawing, the intersection, the parts covered and the relation.
+Press the key again for a new pair; in a few presses most of the thirteen
+relations of RngRel show up, the rare ones (meets, starts, equals…) excepted.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOΔConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOΔConcord
+```
+
+
+## DMOσConcord
+
+Two measurements of the same true value, 10. Each has a standard deviation
+drawn between 0.5 and 2, and a value drawn from the normal law around 10 with
+that standard deviation, as a real measurement would. σConcord then says
+whether the difference is compatible with zero.
+
+Since both measure the same thing, p is uniform between 0 and 1: it falls below
+0.05 about one press in twenty, and below 0.01 one in a hundred, although
+nothing is wrong. This is what a threshold of 5 % means, and why one small p
+alone does not prove a disagreement.
+
+**1)** A pair, reproducible with its seed:
+
+```rpl
+42 RDZ ⓁDMOσConcord
+```
+
+**2)** Then as many new pairs as wanted:
+
+```rpl
+ⓁDMOσConcord
+```
+
+
+## DMOExmnF2D
+
+A narrow peak at a random place of the box 0…3 × 0…3, with a random height
+between 1 and 3 and a random width, on a gentle slope from 1 to 1.9:
+1 + x1·x2/10 + h·exp(−((x1 − a)² + (x2 − b)²)/w). ExmnF2D examines it, and the
+demonstration returns, below its result, the summit (a, b), the true maximum
+1 + a·b/10 + h, and whether the search found it.
+
+**1)** A peak missed: the search gives the corner value 1.9, but the contours ring the summit and a hollow triangle marks it.
+
+```rpl
+1 RDZ ⓁDMOExmnF2D
+```
+
+**2)** A peak found, near the centre of the box:
+
+```rpl
+4 RDZ ⓁDMOExmnF2D
+```
+
+Over forty presses, the search found six peaks, about one in six. It
+starts from the centre and from the best vertex and follows lines parallel to
+the axes: it finds the peaks close to those lines. The others are not lost:
+they show as rings of contours with a hollow triangle at their centre, and a
+smaller box around them finds them, as in examples 6) and 7) of ExmnF2D.
+
+
+## GUMS1Library
+
+The four worked examples of Supplement 1 to the GUM, JCGM 101:2008 (clause 9),
+published by the BIPM with their data and results. Each one is solved twice:
+by the law of propagation of uncertainty, as the GUM does (σRFxjxi), and by
+the Monte Carlo method of the Supplement (MCPropagate). Comparing the two with
+the published tables is a validation of both, and each example teaches when
+the first method may be trusted.
+
+* [S1Additive](#s1additive): the additive model (9.2);
+* [S1Mass](#s1mass): the mass calibration (9.3), where the propagation formula
+  underestimates the uncertainty by 40 %;
+* [S1Power](#s1power): the comparison loss in microwave power meter calibration
+  (9.4), where it gives 0, with and without correlation;
+* [S1Gauge](#s1gauge): the gauge block calibration (9.5), nine inputs and five
+  kinds of distributions.
+* [S1Converge](#s1converge): how the Monte Carlo result settles as the number of
+  draws grows, in 1/√M.
+
+The Supplement uses 10⁵ to 10⁶ draws, the pages below 1 000 to 2 000, so that
+each example runs in seconds: their Monte Carlo results come within a few per
+cent of the published ones. With 10 000 draws, DB48x gives:
+
+| Example | Propagation formula, u | Monte Carlo, u | JCGM 101, Monte Carlo |
+|---|---|---|---|
+| 9.2 normal inputs | 2 | 2.006 | 2.00 |
+| 9.2 rectangular inputs | 2 | 2.015 | 2.00 |
+| 9.2 one dominant input | 10.15 | 10.23 | 10.1–10.2 |
+| 9.3 mass | 0.0539 mg | 0.0744 mg | 0.0754 mg |
+| 9.4, x1 = 0.010 | 100 × 10⁻⁶ | 112 × 10⁻⁶ | 112 × 10⁻⁶ |
+| 9.4, x1 = 0.010, r = 0.9 | 100 × 10⁻⁶ | 120 × 10⁻⁶ | 121 × 10⁻⁶ |
+| 9.5 gauge block | 32.1 nm | 35.7 nm | 36 nm |
+
+
+## S1Additive
+
+JCGM 101, 9.2: the additive model Y = X1 + X2 + X3 + X4, with independent
+inputs of expectation 0. The exact answer is known, which makes it the test of
+the method itself.
+
+**1)** Four normal inputs of standard deviation 1: the propagation formula gives u = 2.
+
+```rpl
+'x1+x2+x3+x4' 0±σ1 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ2.
+```
+
+**2)** The Monte Carlo method agrees; the Supplement gives 0.00±σ2.00 and the 95 % interval [−3.92, 3.92]:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d } { 0±σ1 0±σ1 0±σ1 0±σ1 } ⓁMCPropagate
+@ Expecting 0.06171 38856 39±σ2.00826 44578 6
+```
+
+**3)** Four rectangular inputs of standard deviation 1, between −√3 and √3. The propagation formula is the same, u = 2; the exact 95 % interval is [−3.88, 3.88], a little narrower than the Gaussian one:
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±1.73205080757 } ⓁMCPropagate
+@ Expecting -0.01433 08706 8±σ1.98765 66807 8
+```
+
+**4)** The same, with a fourth input ten times wider. The propagation formula gives u = 10.15, and with k = 1.96 the interval ±19.9:
+
+```rpl
+'x1+x2+x3+x4' 0±σ10 0±σ1 0±σ1 0±σ1 ⓁσRFxjxi
+@ Expecting 0±σ10.14889 15651
+```
+
+**5)** The Monte Carlo method finds the interval ±17.0, as the Supplement does: when one rectangular input dominates, the result is not normal, and the Gaussian interval is far too wide.
+
+```rpl
+12345 RDZ
+'a+b+c+d' { a b c d }
+{ 0±1.73205080757 0±1.73205080757 0±1.73205080757 0±17.3205080757 } ⓁMCPropagate
+@ Expecting 0.15361 87355 27±σ10.24279 74855
+```
+
+## S1Mass
+
+JCGM 101, 9.3: a weight W of nominal mass 100 g is calibrated against a
+reference weight R, in air of density ρa; the buoyancy depends on the densities
+ρW and ρR of the two weights. The deviation from the nominal mass is
+
+δm = (mR + δmR)·(1 + (ρa − ρa0)·(1/ρW − 1/ρR)) − 100 000 mg
+
+with ρa0 = 1.2 kg/m³, mR = 100 000±σ0.050 mg, δmR = 1.234±σ0.020 mg, and
+rectangular densities: ρa between 1.1 and 1.3, ρW between 7 000 and 9 000,
+ρR between 7 950 and 8 050 kg/m³ (table 5 of the Supplement).
+
+**1)** The propagation formula gives u = 0.0539 mg, as the GUM uncertainty framework of the Supplement (table 6):
+
+```rpl
+'(x1+x2)*(1+(x3-1.2)*(1/x4-1/x5))-100000'
+8000±σ28.8675134595 8000±σ577.350269190 1.2±σ0.0577350269190 1.234±σ0.020 100000±σ0.050
+ⓁσRFxjxi
+@ Expecting 1.234±σ5.38516 48071 3⁳⁻²
+```
+
+**2)** The Monte Carlo method gives about 0.075 mg; the Supplement finds 0.0754 mg:
+
+```rpl
+12345 RDZ
+'(m+d)*(1+(densA-1.2)*(1/densW-1/densR))-100000'
+{ m d densA densW densR }
+{ 100000±σ0.050 1.234±σ0.020 1.2±0.1 8000±1000 8000±50 } ⓁMCPropagate
+@ Expecting 1.23850 18718±σ7.61543 94104⁳⁻²
+```
+
+The propagation formula underestimates the uncertainty by 40 %. At the
+estimates, ρa = ρa0, so the derivatives of δm with respect to the three
+densities are all zero: to first order, the densities do not count. They do,
+through the product of their deviations, which only a second order formula or
+the Monte Carlo method sees.
+
+
+## S1Power
+
+JCGM 101, 9.4: the comparison loss of a microwave power meter, δY = X1² + X2²,
+where X1 and X2 are the real and imaginary parts of a reflection coefficient,
+normal, with x2 = 0 and u(x1) = u(x2) = 0.005 (tables 8 and 9 of the
+Supplement).
+
+**1)** At x1 = 0, the derivatives are zero, and the propagation formula gives an uncertainty of 0, which is wrong:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0±σ0.005 ⓁσRFxjxi
+@ Expecting 0±σ1.17851 13019 8⁳⁻⁸
+```
+
+**2)** The Monte Carlo method gives δy ≈ 50×10⁻⁶ and u ≈ 50×10⁻⁶, as the Supplement and the exact solution:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 5.07012 99776 7⁳⁻⁵±σ5.03014 46082 1⁳⁻⁵
+```
+
+**3)** At x1 = 0.010, the propagation formula gives u = 100×10⁻⁶:
+
+```rpl
+'x1^2+x2^2' 0±σ0.005 0.010±σ0.005 ⓁσRFxjxi
+@ Expecting 0.0001±σ1.00000 00034 7⁳⁻⁴
+```
+
+**4)** The Monte Carlo method finds about 112×10⁻⁶, as the Supplement:
+
+```rpl
+12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+@ Expecting 1.50469 96371 1⁳⁻⁴±σ1.14549 79356 9⁳⁻⁴
+```
+
+**5)** X1 and X2 correlated at 0.9: the Supplement finds 121×10⁻⁶ (table 9).
+
+```rpl
+0.9 'ρij' STO 12345 RDZ
+'a^2+b^2' { a b } { 0.010±σ0.005 0±σ0.005 } ⓁMCPropagate
+'ρij' PURGE
+@ Expecting 1.49769 28210 1⁳⁻⁴±σ1.25092 01608 2⁳⁻⁴
+```
+
+The distribution of δY is far from normal: at x1 = 0, it is a χ² law with
+two degrees of freedom, which starts at 0. The Supplement gives its shortest
+95 % interval, [0, 150]×10⁻⁶; MCPropagate gives the interval that leaves 2.5 %
+on each side, about [1.3, 184]×10⁻⁶ in theory. Both are right, for two
+definitions.
+
+
+## S1Gauge
+
+JCGM 101, 9.5: the length of a nominally 50 mm gauge block, compared with a
+reference block, the example H.1 of the GUM itself. In nm,
+
+δL = Ls + D + d1 + d2 − Ls·(δα·(θ0 + Δ) + αs·δθ) − 50 000 000
+
+with nine inputs of five kinds (table 10 of the Supplement): Ls, D, d1 and d2
+follow scaled and shifted t-distributions (StudentRand), αs is rectangular,
+θ0 normal, Δ follows an arc sine law (UShapeRand), and δα and δθ are
+rectangular with inexactly known limits: a half-width drawn in [w − d, w + d],
+then a value drawn in ±that half-width.
+
+**1)** The propagation formula gives 838±σ32 nm, as the Supplement (table 11):
+
+```rpl
+'x1+x2+x3+x4-x1*(x8*(x6+x7)+x5*x9)-50000000'
+0±σ0.0300462 0±σ5.78315E-7 0±σ0.353553390593 -0.1±σ0.2 11.5E-6±σ1.15470053838E-6
+0±σ7 0±σ4 215±σ6 50000623±σ25 ⓁσRFxjxi
+@ Expecting 838±σ32.13796 12095
+```
+
+**2)** The Monte Carlo method, with 1 000 draws for speed: the Supplement finds 838±σ36 nm. The difference with the propagation formula comes from the heavy tails of the t-distributions.
+
+```rpl
+12345 RDZ
+'gLs+gD+gd1+gd2-gLs*(gDa*(gT0+gDl)+gAs*gDt)-50000000'
+{ gLs gD gd1 gd2 gAs gT0 gDl gDa gDt }
+{ « 18 ⓁStudentRand 25 * 50000623 + » « 24 ⓁStudentRand 6 * 215 + »
+  « 5 ⓁStudentRand 4 * » « 8 ⓁStudentRand 7 * »
+  11.5E-6±2E-6 -0.1±σ0.2 « -0.5 0.5 ⓁUShapeRand »
+  « RAND 0.2E-6 * 0.9E-6 + RAND 2 * 1 - * » « RAND 0.05 * 0.025 + RAND 2 * 1 - * » } 1000 ⓁMCPropagate
+@ Expecting 838.99938 8993±σ37.24850 82155
+```
+
+With 10 000 draws, about two minutes on the simulator, the result is
+838.0±σ35.7 nm.
+
+
+## S1Converge
+
+How many draws? The Monte Carlo method gives an estimate of the standard
+uncertainty u that is itself uncertain: for a nearly normal result, its
+relative standard deviation is about 1/√(2M). Ten times more draws make it
+√10 ≈ 3.2 times more precise, at ten times the cost.
+
+S1Converge takes a list of cumulative draw counts from the stack and runs the
+mass calibration of S1Mass with those draw counts. It draws u(δm) against M on
+a logarithmic scale, each point with its bar ±u/√(2M). The two values of the
+Supplement are dashed: 0.0754 mg by the Monte Carlo method, 0.0539 mg by the
+first-order formula. It returns the list of u values.
+
+S1Converge uses Welford's online algorithm to compute the running standard
+deviation with O(1) memory, so it works even with 42 KB of available memory.
+The model is inlined and evaluated in RPN for speed.
+
+The convergence, with the seed of the examples:
+
+```rpl
+{ 10 20 50 100 } ⓁS1Converge
+```
+
+With 10 draws, u is a rough estimate; with 100 draws, u is known to about
+7 %: enough to see that the first-order value 0.0539 mg is wrong, not enough
+to give two digits. For higher precision, use larger draw counts such as
+`{ 100 1000 10000 }` (about 13 seconds on the simulator). With 10 000 draws,
+u is known to 0.7 %, close to the two significant digits of the published
+0.0754 mg. This is the question that the adaptive procedure of the Supplement
+answers (7.9): draw until the digits wanted are stable, which `MCPropagate`
+does with M = 0.
+
+See also: `S1Mass`.
+
+
+## ProjectileLibrary
+
+A worked example of the whole Uncertainty section, after Part 2 of Jean
+Wilson's Proposition for interval implementation in the RPL environment
+(2025). A spring loaded gun launches a glass marble towards a target at the
+same height, 8 m away. Each step is a small experiment with its own
+uncertainty budget, on its own page and under its own key; the results of the
+previous steps are written in its calculations, so that each step can be run
+alone.
+
+* [Step A](#stepa): the mass of the marble;
+* [Step B](#stepb): the constant of the spring;
+* [Step C](#stepc): the ejection speed;
+* [Step D](#stepd): the ejection angle;
+* [Step E](#stepe): the height of the laser pointer;
+* [Step F](#stepf): a more realistic experiment, with friction and losses;
+* [Step G](#stepg): the same result, from the measurements themselves.
+* [Step H](#steph): model validation, the predictions against the shots.
+
+At each step, the same tools are used in the same order:
+
+* the Type B evaluation of the data: a resolution or a tolerance is a bound,
+  hence a rectangular law of standard deviation bound/√3 (Bound→σ);
+* the law of propagation with independent inputs, ρ = 0, the physical case:
+  two inputs are correlated only when their measurements share a cause of
+  error, not because of the shape of the formula (σRFxjxi);
+* the bracket of the correlations, the smallest and the largest uncertainty
+  that correlations could give;
+* interval arithmetic on intervals of one standard deviation, as in the 2025
+  document, which contains the bracket (ΔRFxjxi);
+* the Monte Carlo method, which needs no linearization (MCPropagate);
+* the rounding of the result, and its comparison with a reference value when
+  there is one (SciRngRnd, σConcord).
+
+The data are those of 2025. Three Type B evaluations change: the diameter of
+step A was given its resolution divided by √3 instead of the half resolution,
+and the tolerances of steps B, D and E were read as standard deviations
+instead of bounds.
+
+
+## StepA
+
+Step A: the mass of the marble, M = ρ·(4/3)·π·(D/2)³, with a diameter
+D = 16.000 mm read on a micrometer of resolution 0.001 mm, a density
+ρ = 2.500 g/cm³ known to one unit of its last digit, and a reference mass
+Mref = 5.36±σ0.01 g.
+
+**1)** The diameter: its last digit is a resolution, the bound is half of it.
+
+```rpl
+16_mm 0.0005_mm 1 { } ⓁBound→σ
+@ Expecting 16.±σ2.88675 13459 5⁳⁻⁴ mm
+```
+
+**2)** The mass, inputs independent:
+
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert
+@ Expecting 5.36165 14621 3±σ2.16420 64708 4⁳⁻³ g
+```
+
+**3)** The bracket of the correlations, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ1.85445 26865 8⁳⁻³ g
+```
+
+**4)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±σ0.001_g/cm^3 16±σ0.00028867513459_mm ⓁσRFxjxi
+1_g Convert 'ρij' Purge
+@ Expecting 5.36165 14621 3±σ2.43486 84831 2⁳⁻³ g
+```
+
+**5)** Interval arithmetic:
+
+```rpl
+'x2*4/3*Ⓒπ*(x1/2)^3' 2.5±0.001_g/cm^3 16±0.00028867513459_mm ⓁΔRFxjxi
+1_g Convert
+@ Expecting 5.36165 15834 5±2.43486 84852 5⁳⁻³ g
+```
+
+**6)** The Monte Carlo method, the diameter rectangular:
+
+```rpl
+12345 RDZ
+'r*4/3*Ⓒπ*(d/2)^3' { r d } { '2.5±σ0.001_g/cm^3' '15.9995…16.0005_mm' } →Num
+ⓁMCPropagate 1_g Convert
+@ Expecting 5.36170 70590 3±σ2.14913 26272 8⁳⁻³ g
+```
+
+**7)** Rounded, the mass is 5.3617±σ0.0022 g:
+
+```rpl
+5.3616514621±σ0.0021642064708_g ⓁSciRngRnd
+@ Expecting 5.3617±σ0.0022 g
+```
+
+**8)** It agrees with the reference value:
+
+```rpl
+5.3617±σ0.0022_g 5.36±σ0.01_g ⓁσConcord
+```
+
+
+## StepB
+
+Step B: the constant of the spring. It stores U = 0.22 J when it is
+compressed by x = 15.00 cm, read on a rule graduated in millimetres:
+k = 2·U/x². Its reference value is 20 N/m with a tolerance of ±2.5 %, a bound.
+
+**1)** The compression, read to the millimetre:
+
+```rpl
+15_cm 0.05_cm 1 { } ⓁBound→σ
+@ Expecting 15.±σ2.88675 13459 5⁳⁻² cm
+```
+
+**2)** The reference, ±2.5 % read as a bound: 20±σ0.29 N/m, not 20±σ0.5 N/m.
+
+```rpl
+20_N/m 0.5_N/m 1 { } ⓁBound→σ
+@ Expecting 20.±σ0.28867 51345 95 N/m
+```
+
+**3)** The spring constant, inputs independent:
+
+```rpl
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi 1_N/m Convert
+@ Expecting 19.55555 55556±σ0.07527 46168 82 N/m
+```
+
+**4)** The bracket, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07615 82573 15 N/m
+```
+
+**5)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'2*x2/x1^2' 0.22±σ0.00001_J 15±σ0.028867513459_cm ⓁσRFxjxi
+1_N/m Convert 'ρij' Purge
+@ Expecting 19.55555 55556±σ0.07438 04795 38 N/m
+```
+
+**6)** Interval arithmetic:
+
+```rpl
+'2*x2/x1^2' 0.22±0.00001_J 15±0.028867513459_cm ⓁΔRFxjxi 1_N/m Convert
+@ Expecting 19.55577 62622±0.07615 88247 46 N/m
+```
+
+**7)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'2*u/x^2' { u x } { '0.22±σ0.00001_J' '14.95…15.05_cm' } →Num
+ⓁMCPropagate 1_N/m Convert
+@ Expecting 19.55534 095±σ0.07717 42988 1 N/m
+```
+
+**8)** 19.556±σ0.075 N/m is 1.5 standard deviations of the difference below the reference: compatible.
+
+```rpl
+19.556±σ0.075_N/m 20±σ0.29_N/m ⓁσConcord
+```
+
+
+## StepC
+
+Step C: the ejection speed. All the energy of the spring becomes kinetic
+energy of the marble: v = √(2·K/m), with K = U = 0.22 J.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg.
+
+**1)** The speed, inputs independent:
+
+```rpl
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert
+@ Expecting 9.05893 30239 4±σ1.83985 45958 4⁳⁻³ m/s
+```
+
+**2)** The bracket, ρ = −1:
+
+```rpl
+-1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ2.03418 36042 1⁳⁻³ m/s
+```
+
+**3)** and ρ = +1:
+
+```rpl
+1 'ρij' Sto
+'√(2*x2/x1)' 0.22±σ0.00001_J 0.0053616514621±σ0.0000021642064708_kg
+ⓁσRFxjxi 1_m/s Convert 'ρij' Purge
+@ Expecting 9.05893 30239 4±σ1.62241 39213⁳⁻³ m/s
+```
+
+**4)** Interval arithmetic:
+
+```rpl
+'√(2*x2/x1)' 0.22±0.00001_J 0.0053616514621±0.0000021642064708_kg
+ⓁΔRFxjxi 1_m/s Convert
+@ Expecting 9.05893 36166 4±2.03418 38025 4⁳⁻³ m/s
+```
+
+
+## StepD
+
+Step D: the ejection angle. The marble must land at R = 8.00 m, the target
+accepting ±2 %, a bound: θ = ½·asin(R·g/v²).
+
+From step C: v = 9.0589330239±σ0.0018398545958 m/s.
+
+**1)** The range, ±2 % read as a bound:
+
+```rpl
+8_m 0.16_m 1 { } ⓁBound→σ
+@ Expecting 8.±σ0.09237 60430 7 m
+```
+
+**2)** The angle, inputs independent:
+
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±σ0.0923760430707_m 9.0589330239±σ0.0018398545958_m/s
+ⓁσRFxjxi
+@ Expecting 36.46990 40743±σ1.07860 45787 °
+```
+
+**3)** Interval arithmetic:
+
+```rpl
+'0.5*asin(x2*Ⓒg/x1^2)' 8±0.0923760430707_m 9.0589330239±0.0018398545958_m/s
+ⓁΔRFxjxi
+@ Expecting 36.54274 28944±1.12547 27707 6 °
+```
+
+**4)** The Monte Carlo method shows what the linearization misses: its mean is 0.05° higher, about three times its own standard error, and its uncertainty 3 % larger. The arcsine curves over the range of R.
+
+```rpl
+12345 RDZ
+'0.5*asin(r*Ⓒg/v^2)' { r v } { '7.84…8.16_m' '9.0589330239±σ0.0018398545958_m/s' } →Num
+5000 ⓁMCPropagate
+@ Expecting 36.51925 9431±σ1.11125 26992 5 °
+```
+
+
+## StepE
+
+Step E: the height of the laser pointer. The angle is set with a laser
+pointed at a mark x = 2.000 m away, within ±0.1 %, a bound, at the height
+y = x·tanθ.
+
+From step D: θ = 36.4699040743±σ1.0786045787°.
+
+**1)** The distance, ±0.1 % read as a bound:
+
+```rpl
+2_m 0.002_m 1 { } ⓁBound→σ
+@ Expecting 2.±σ1.15470 05383 8⁳⁻³ m
+```
+
+**2)** The height, inputs independent:
+
+```rpl
+'x2*tan(x1)' 2±σ0.0011547005384_m 36.4699040743±σ1.0786045787_° ⓁσRFxjxi
+@ Expecting 1.47829 70171 1±σ5.82265 98490 7⁳⁻² m
+```
+
+**3)** Interval arithmetic:
+
+```rpl
+'x2*tan(x1)' 2±0.0011547005384_m 36.4699040743±1.0786045787_° ⓁΔRFxjxi
+@ Expecting 1.47914 11034 3±0.05909 24630 35 m
+```
+
+**4)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'d*tan(t)' { d t } { '1.998…2.002_m' '36.4699040743±σ1.0786045787_°' } →Num
+ⓁMCPropagate
+@ Expecting 1.48055 71150 4±σ0.05788 01664 32 m
+```
+
+**5)** Rounded, the laser must point 1.478±σ0.058 m high:
+
+```rpl
+1.4782970171±σ0.058226598491_m ⓁSciRngRnd
+@ Expecting 1.478±σ0.058 m
+```
+
+
+## StepF
+
+Step F: a more realistic experiment. Which compression x of the spring gives
+the speed of step C, when the marble also loses energy by friction along the
+barrel (μk = 0.5±σ0.005), rises in it, and keeps only a fraction f = 0.95±σ0.019
+of the energy as translation? The energy balance gives
+
+x = m·g/k·(sin θ + μk·cos θ) + 1/k·√((m·g)²·(sin θ + μk·cos θ)² + 2·k·K/f)
+
+with x1 = m, x2 = k, x3 = θ, x4 = μk, x5 = K and x6 = f. This step is written
+in SI units without unit objects, except the angle: with six variables, units
+make the calculations about fifty times slower.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg; from step B:
+k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743±σ1.0786045787°.
+
+**1)** The compression, inputs independent:
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56925 12210 7⁳⁻³
+```
+
+**2)** The 2025 document chose ρ51 = ρ52 = ρ65 = +1 and ρ54 = −1. This is not a possible correlation matrix, and σRFxjxi refuses it: if K were perfectly correlated with m, k and f, these three would be perfectly correlated with each other, while the matrix says they are independent. One coefficient for all the pairs cannot go below −1/(n−1), −0.2 here. With ρ = +1 for all the pairs:
+
+```rpl
+1 'ρij' Sto
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.00001 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi 'ρij' Purge
+@ Expecting 0.15659 93648 36±σ1.80367 32962⁳⁻³
+```
+
+**3)** The largest uncertainty that correlations can give is the one where all the contributions add up: interval arithmetic gives it.
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±0.019 0.22±0.00001 0.5±0.005 36.4699040743±1.0786045787_° 19.5555555556±0.075274616882 0.0053616514621±0.0000021642064708
+ⓁΔRFxjxi
+@ Expecting 0.15662 58788 25±1.88751 71425 7⁳⁻³
+```
+
+**4)** The Monte Carlo method:
+
+```rpl
+12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+ⓁMCPropagate
+@ Expecting 0.15662 45397 98±σ1.61813 73075 7⁳⁻³
+```
+
+**5)** The Monte Carlo method with the same correlation as in 2), ρ = +1 for all
+the pairs:
+
+```rpl
+1 'ρij' Sto 12345 RDZ
+'m*9.80665/k*(sin(t)+u*cos(t))+1/k*√((m*9.80665)^2*(sin(t)+u*cos(t))^2+2*k*e/f)'
+{ m k t u e f }
+{ 0.0053616514621±σ0.0000021642064708 19.5555555556±σ0.075274616882
+  '36.4699040743±σ1.0786045787_°' 0.5±σ0.005 0.22±σ0.00001 0.95±σ0.019 } →Num
+ⓁMCPropagate 'ρij' Purge
+@ Expecting 0.15664 39577 78±σ1.77935 81418 4⁳⁻³
+```
+
+Both methods find that a correlation of +1 between all the inputs would raise
+the uncertainty of the compression from 1.62 mm to about 1.8 mm: 1.80 by the
+propagation formula, 1.78 by Monte Carlo. Unlike the angle of step D, the
+compression is nearly linear in its inputs over their range, and the
+propagation formula is enough here.
+
+The compression must be 15.66±σ0.16 cm, not the
+15.00 cm of step B: the friction, the rise and the fraction f cost 0.66 cm of
+compression, about four standard deviations. The experiment can be redone
+with this setting.
+
+
+## StepG
+
+Step G: the same compression, from the measurements themselves. The six
+variables of step F are not all measurements: k, θ and v were computed in
+steps B to D from the same energy U = K and the same mass m. Their errors are
+correlated for a real reason, a shared cause, and no ρij needs to be guessed
+if x is written as a function of the seven measurements, which are
+independent: x1 = D, x2 = ρ, x3 = U, x4 = the compression x0 of step B,
+x5 = R, x6 = μk and x7 = f, with m = ρ·(4/3)·π·(D/2)³, k = 2·U/x0² and
+θ = ½·asin(R·g·m/(2·U)).
+
+**1)** The compression from the measurements:
+
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.00001 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.56924 37991⁳⁻³
+```
+
+**2)** The same as in step F: with an energy known to 10⁻⁵ J, the correlations weigh nothing. A spring gun rather gives about 2 %. With U = K = 0.22±σ0.0044 J, the calculation of step F, which treats K as independent of k and θ, finds a much larger uncertainty:
+
+```rpl
+'x1*9.80665/x2*(sin(x3)+x4*cos(x3))+1/x2*√((x1*9.80665)^2*(sin(x3)+x4*cos(x3))^2+2*x2*x5/x6)'
+0.95±σ0.019 0.22±σ0.0044 0.5±σ0.005 36.4699040743±σ1.0786045787_° 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ2.19778 08296 2⁳⁻³
+```
+
+**3)** while the calculation from the measurements hardly moves:
+
+```rpl
+'(x2*4/3*Ⓒπ*(x1/2)^3)*9.80665/(2*x3/x4^2)*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))+1/(2*x3/x4^2)*√(((x2*4/3*Ⓒπ*(x1/2)^3)*9.80665)^2*(sin(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3)))+x6*cos(0.5*asin(x5*9.80665*(x2*4/3*Ⓒπ*(x1/2)^3)/(2*x3))))^2+2*(2*x3/x4^2)*x3/x7)'
+0.95±σ0.019 0.5±σ0.005 8±σ0.0923760430707 0.15±σ0.00028867513459 0.22±σ0.0044 2500±σ1 0.016±σ0.00000028867513459
+ⓁσRFxjxi
+@ Expecting 0.15659 93648 36±σ1.57240 83931 7⁳⁻³
+```
+
+The energy enters k, K and θ, and its effects almost cancel: ignoring this
+correlation overestimates the uncertainty by 40 %. Going back to independent
+measurements is the right way to propagate through a chain of calculations.
+
+
+## StepH
+
+Step H: model validation. The model predicts where the marble lands; the
+experiment says where it actually lands. Are the two compatible? The gun is
+set, ten shots are fired, and the range R of each is measured with a tape to
+the centimetre. The angle is set with the laser pointer of step E to ±0.5°, a
+bound, and the compression with the rule of step B.
+
+The range follows from the energy K of the marble at the exit of the barrel:
+R = 2·K·sin 2θ/(m·g). The ideal model of steps C and D takes K = ½·k·x²; the
+realistic model of step F takes K = f·(½·k·x² − m·g·(sin θ + μk·cos θ)·x).
+The shots scatter by about 10 cm from one to the next.
+
+From step A: m = 0.0053616514621±σ0.0000021642064708 kg; from step B:
+k = 19.5555555556±σ0.075274616882 N/m; from step D: θ = 36.4699040743°; from
+step F: x = 15.66 cm, μk = 0.5±σ0.005 and f = 0.95±σ0.019.
+
+**H-i) The ideal model, at x = 15.00 cm**
+
+**1)** The ideal model predicts the target, 8 m:
+
+```rpl
+'x2*x3^2*sin(2*x4)/(x1*9.80665)'
+36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00000 00000 9±σ5.01881 86642 8⁳⁻²
+```
+
+**2)** Ten shots at 15.00 cm: their mean, and its standard deviation s/√n:
+
+```rpl
+[[7.42] [7.41] [7.13] [7.31] [7.39] [7.37] [7.23] [7.25] [7.35] [7.21]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.307±σ0.03091 38588 12
+```
+
+**3)** Prediction and observation compared:
+
+```rpl
+8.00000000009±σ0.0501881866428 7.307±σ0.0309138588120 ⓁσConcord
+```
+
+The shots fall 69 cm short, about twelve standard deviations of the
+difference: p = 6.5·10⁻³². The ideal model is rejected. The
+realistic model, at the same compression, explains the short shots:
+
+**4)** The realistic model at 15.00 cm:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.15±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 7.32849 85110 7±σ0.15380 86796 2
+```
+
+**H-ii) The realistic model, at x = 15.66 cm**
+
+**5)** At the compression computed in step F, the realistic model predicts 8 m:
+
+```rpl
+'x6*(x2*x3^2-2*x1*9.80665*(sin(x4)+x5*cos(x4))*x3)*sin(2*x4)/(x1*9.80665)'
+0.95±σ0.019 0.5±σ0.005 36.4699040743±σ0.28867513459_° 0.1566±σ0.00028867513459 19.5555555556±σ0.075274616882 0.0053616514621±σ0.0000021642064708
+ⓁσRFxjxi
+@ Expecting 8.00006 60455 6±σ0.16765 20304 97
+```
+
+**6)** Ten shots at 15.66 cm:
+
+```rpl
+[[7.98] [7.83] [8.00] [7.87] [8.01] [8.14] [8.14] [8.12] [7.83] [8.06]] 'ΣData' STO
+Average SDev 10 √ / →σRange
+@ Expecting 7.998±σ3.83492 72048 7⁳⁻²
+```
+
+**7)** Prediction and observation compared:
+
+```rpl
+8.00006604556±σ0.167652030497 7.998±σ0.0383492720487 ⓁσConcord
+```
+
+The difference is two millimetres, p is close to 1: the realistic model is
+confirmed. Its prediction is less precise than the ideal one, mostly because
+of the fraction f, known to 2 %: a series of shots like this one is also a way
+to measure f better.
+
+**Do the predictions frame the shots?** The prediction ±2 standard deviations
+is an interval of about 95 %. ΔConcord compares it with the range of the ten
+shots, from the shortest to the longest:
+
+**8)** The ideal model at 15.00 cm: no shot is in the predicted interval.
+
+```rpl
+7.13…7.42 8±0.10037637 ⓁΔConcord
+```
+
+**9)** The realistic model at 15.66 cm: all the shots are in it.
+
+```rpl
+7.83…8.14 8.00006604556±0.33530406 ⓁΔConcord
+```
+
+A model is never proven right: it is confirmed as long as it survives the
+comparison, and a test able to reject a model, as in H-i, is what gives weight
+to the agreement of the other one, in H-ii. The comparison of a prediction and a measurement, each with its uncertainty,
+is the core of the validation methods of metrology, such as the normalized
+error Eₙ of ISO 13528 and the validation comparison of ASME V&V 20.
+
+
+## EqDemosLibrary
+
+Equations of the Equation Library with uncertain inputs.
+Each input is drawn from a law, a normal law for a measured value, a
+rectangular law for a quantity only known to lie within bounds, and the
+result is drawn many times: its histogram shows the law of the result, which
+the propagation formula of σRFxjxi sums up in two numbers. An
+input given as a range, like an amplitude between 60° and 80°, becomes in this
+way an input of the equation.
+
+* DMOPendulum: the period of the simple pendulum, for small and for large
+  amplitudes.
+
+
+## DMOPendulum
+
+The two periods of Simple Pendulum in the Equation
+Library: the period for small amplitudes, `T = 2π·√(L/g)`, which ignores the
+amplitude, and the real period for a large amplitude θmax,
+`Treal = T·Σ(x;0;5;c(x)²·sin(θmax/2)^(2x))`, with `c(x) = (2x)!/(2^x·x!)²`.
+
+The length is measured, `L = 15±σ0.1 cm`, a normal law; the amplitude is only
+known to lie within a range of 20°, a rectangular law. The range is drawn at
+random at each press, from 0…20° up to 60…80°, or given on the stack as a list
+`{ lo hi }` in degrees; any other object is left alone.
+
+Three hundred pairs (L, θmax) are drawn, fewer on a calculator (see below),
+and both periods computed for each.
+The histogram of Treal is drawn in black, and that of T over it in gray, on
+the same axis, whose ends are written below in seconds. Above are the mean and
+standard deviation of each, and Treal by the propagation formula of
+σRFxjxi, with θmax as the centre of its range ±σ its width/√12. The inputs are
+independent: a variable ρij left by another calculation, in this directory or
+above it, is set aside for σRFxjxi, then put back. The three results are
+returned, tagged.
+
+About 2 seconds on the simulator. On a calculator, where the normal draws of L
+are slow, the draws stop after about 30 seconds, with 30 of them at least, and
+the classes follow their number; the number of draws is written after the
+Monte Carlo result. To have the 300 draws whatever the time, a few minutes on
+a DM32, store a number other than 0 in the global variable ExtendedTrials,
+for instance 1 'ExtendedTrials' Sto; purge it to come back to the time limit.
+
+**1)** A range at random:
+
+```rpl
+1 RDZ ⓁDMOPendulum
+```
+
+**2)** Small amplitudes, 5…15°: the two histograms almost coincide, and T is
+a good model.
+
+```rpl
+1 RDZ { 5 15 } ⓁDMOPendulum
+```
+
+**3)** Large amplitudes, 60…80°: Treal is longer than T by 0.08 s, thirty
+times the uncertainty of T, and its histogram is nearly flat.
+
+```rpl
+1 RDZ { 60 80 } ⓁDMOPendulum
+```
+
+Three lessons. First, the error of a model can be far larger than the
+uncertainty of the measurements: no care in measuring L makes T right at 70°.
+Second, the propagation formula gives here nearly the same mean and standard
+deviation as the Monte Carlo method, since Treal is almost linear in θmax over
+20°. Third, it does not give the shape: Treal inherits the flat law of θmax,
+whose 95 % interval is ±1.65σ, not the ±2σ of a normal law. Only the draws show
+it.
+
+See also: [Simple Pendulum](#Simple Pendulum).
+
+
+## LabsLibrary
+
+Laboratory exercises, each on an equation of its own that is not in the
+Equation Library. Such an equation is added in the file
+`config/equations.csv`, which the calculator reads at start: each line gives a
+name and an equation, under the name of a section. It then appears in the
+Equation Library like the others, as Ⓔname, and the whole of the Uncertainty
+section applies to it: ROOT solves it, σROOT gives the uncertainty of its
+unknowns, ΔROOT their range, and σConcord compares a result with a reference.
+The file shipped with the calculator holds a section Labs, with the equations
+of these exercises, as a model for your own.
+
+* Calorimetry: identify a metal by its specific heat.
+* WeakAcid: the pH of a weak acid, and when the school formula fails.
+* BeamYoung: the Young's modulus of a bar, from its deflection.
+
+
+## Calorimetry
+
+Identify a metal by its specific heat, by the method of mixtures. A sample of
+mass ms is heated in boiling water, at Ts, then dropped into a calorimeter
+that holds a mass mw of water at Tw; the mixture settles at Tf. The heat given
+by the sample is taken by the water and the calorimeter, of heat capacity
+Ccal: ms·cs·(Ts − Tf) = (mw·cw + Ccal)·(Tf − Tw). This is the equation Calorimetry of the section Labs of `config/equations.csv`.
+
+The measurements: ms = 100.00 g on a balance, u = 0.01 g; Ts, the boiling water,
+between 99.7 °C and 99.9 °C; mw = 200.00 g; Tw = 20.0 °C and Tf = 23.3 °C on a
+thermometer, u = 0.1 K; Ccal, known between 40 and 60 J/K. The specific heat of
+water cw comes from the constants library, ⒸcpH2O, with its standard
+uncertainty ⓈcpH2O: →Num gives their values, and →σRange joins them. The
+temperatures are in kelvins, as the specific heats of the constants library.
+
+The key Calorimetry runs the whole exercise: it stores the measurements, finds
+cs and its uncertainty with σROOT, compares it with the specific heats of
+copper, aluminium and iron of the constants library, ⒸcpCu, ⒸcpAl and ⒸcpFe,
+as σConcord does but without its drawing, and returns cs, the p-value of each
+comparison, and the metals compatible at the 5 % level.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁCalorimetry
+@ Expecting metal:"copper"
+```
+
+**2)** Step by step: the measurements, then cs and its standard uncertainty.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT
+@ Expecting { cs:382.36862 7451±σ16.93050 00535 J/(kg·K) }
+```
+
+**3)** The same measurements as bounds, a±σb being taken as a±√3·b: ΔROOT gives
+the range of cs. Copper, 385 J/(kg·K), lies inside; iron, 450 J/(kg·K), and
+aluminium, 902 J/(kg·K), do not.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁΔROOT
+@ Expecting { cs:336.94582 2619…429.07956 0365 J/(kg·K) }
+```
+
+**4)** The comparison with copper, by σConcord, which draws the law of the
+difference D and returns d, σD, z and p: here z = 0.16 and p = 0.88.
+
+```rpl
+0.1±σ0.00001_kg 'ms' Sto  '372.85…373.05_K' →Num 'Ts' Sto  0.2±σ0.00001_kg 'mw' Sto
+ⒸcpH2O →Num Dup UVAL ⓈcpH2O →Num UVAL →σRange Swap →Unit 'cw' Sto
+'40…60_J/K' →Num 'Ccal' Sto  293.15±σ0.1_K 'Tw' Sto  296.45±σ0.1_K 'Tf' Sto
+'ROOT(ⒺCalorimetry;[cs];[400_J/(kg*K)])' ⓁσROOT 1 Get DeleteTag
+ⒸcpCu →Num Dup UVAL ⓈcpCu →Num UVAL →σRange Swap →Unit
+ⓁσConcord
+```
+
+Three lessons. The budget of uncertainty is dominated by the thermometer: each
+of its two readings contributes about 12 J/(kg·K) to the 17 J/(kg·K) of cs, the
+calorimeter 2.5, and the specific heat of water less than 0.1. A thermometer
+read to 0.01 K would divide the uncertainty of cs by six; a larger rise of
+temperature, with less water, would help too. Then, the sample is compatible
+with copper, and clearly not with iron nor aluminium; but compatible is not
+identified: zinc, whose specific heat is about 388 J/(kg·K), would give the
+same answer. Last, the variables ms, Ts, mw, cw, Ccal, Tw and Tf stay in the
+current directory: change them to your own measurements, and run the steps
+again.
+
+To add an equation of your own, write it in `config/equations.csv`, under a
+section of your choice, with the units of its variables, as this one:
+
+```
+"Labs"
+
+"Calorimetry",  "'(ms_kg)*(cs_(J/(kg*K)))*((Ts_K)-(Tf_K))=((mw_kg)*(cw_(J/(kg*K)))+(Ccal_(J/K)))*((Tf_K)-(Tw_K))'"
+```
+
+See also: [σROOT](#σroot), [ΔROOT](#Δroot), [σConcord](#σconcord).
+
+
+## WeakAcid
+
+The pH of a solution of acetic acid, a weak acid of pKa = 4.756 at 25 °C,
+prepared by dilution: a volume V1 of a standard solution of concentration C0
+is taken with a pipette, and made up to V2 in a volumetric flask. Two
+equations, WeakAcid in the section Labs of `config/equations.csv`: the dilution
+C = C0·V1/V2, and the charge balance [H⁺] = [A⁻] + [OH⁻], which with
+h = 10^(−pH), Ka = 10^(−pKa) and Kw = 10^(−pKw) reads
+h = C·Ka/(Ka + h) + Kw/h. Written in pH, this is an equation that has to be
+solved: ROOT does it. Concentrations are in mol/L, given as plain numbers.
+
+The measurements: C0 = 0.1000 mol/L, u = 0.0002; a pipette of class A,
+10 mL ± 0.02 mL, and a flask of class A, 100 mL ± 0.08 mL, two tolerances, that
+is bounds; pKa = 4.756, u = 0.010, and pKw = 14.00, u = 0.01, from tables.
+
+The key WeakAcid shows where the formula of the textbooks,
+pH ≈ ½(pKa − log C), holds: for C = 10⁻¹ … 10⁻⁸ mol/L it returns one line per
+concentration, tagged C=1E-k: { pH by ROOT, pH by the formula }. The last line,
+C=1E-8, is on the first level.
+
+**1)** The exact pH and the formula, from 0.1 to 10⁻⁸ mol/L:
+
+```rpl
+ⓁWeakAcid
+@ Expecting C=1E-8:{ 6.978 6.378 }
+```
+
+**2)** The dilution of the laboratory, 0.01 mol/L: the pH and its standard
+uncertainty, by σROOT.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁσROOT
+@ Expecting { C:0.01±σ2.35513 62310 2⁳⁻⁵ pH:3.38709 33091±σ4.92308 91271 9⁳⁻³ }
+```
+
+**3)** The same as bounds, by ΔROOT:
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT
+@ Expecting { C:9.93747 82832 5⁳⁻³…0.01006 27605 07 pH:3.37722 86399 3…3.39696 39512 8 }
+```
+
+**4)** A very dilute solution, 10⁻⁶ mol/L: the pH is 6.018, where the formula
+gives ½(4.756 + 6) = 5.378.
+
+```rpl
+0.0001 'C0' Sto  1_mL 'V1' Sto  100_mL 'V2' Sto  4.756 'pKa' Sto  14 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.000001;6])' Eval
+@ Expecting [ C=0.00000 1 pH=6.01835 89947 9 ]
+```
+
+**5)** The calculation checked by a measurement: a pH meter reads 3.40, to
+±0.02 according to its manual, a bound. ΔConcord compares this reading with the
+range of the pH found by ΔROOT, 3.377…3.397, and draws both: they overlap, and
+their intersection covers 86 % of the computed range. The measurement confirms
+the calculation.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.40±0.02 ⓁΔConcord
+```
+
+**6)** Had the meter read 3.45 ± 0.02, the two ranges would not meet: "X
+before Y". Either the pKa is not 4.756 at the temperature of the solution, or
+the solution was not prepared as intended; the calculation alone cannot tell
+which.
+
+```rpl
+0.1000±σ0.0002 'C0' Sto  10±0.02_mL 'V1' Sto  100±0.08_mL 'V2' Sto
+4.756±σ0.010 'pKa' Sto  14±σ0.01 'pKw' Sto
+'ROOT(ⒺWeakAcid;[C;pH];[0.01;3])' ⓁΔROOT 2 Get DeleteTag
+3.45±0.02 ⓁΔConcord
+```
+
+Three lessons. The budget is all in the pKa: it contributes 0.0049 of the
+0.0049 of the pH, the glassware 0.0005 together, since the logarithm flattens
+the relative errors of the volumes. To know the pH better, know the pKa
+better, at the temperature of the solution, rather than measure the volumes
+more finely. Then, the formula of the textbooks errs by less than 0.03 down
+to 10⁻³ mol/L, but by 0.27 at 10⁻⁵ and 0.91 at 10⁻⁷: a dilute weak acid is
+almost wholly dissociated, and the water then gives as many ions as the acid.
+The exact pH never goes beyond 7, while the formula would. Last, an independent
+computation in double precision gives the same pH and the same uncertainty to
+the last digit shown.
+
+The equation of this exercise, in `config/equations.csv`:
+
+```
+"WeakAcid",  "{ 'C=C0*(V1_mL)/(V2_mL)' '10^(-pH)=C*10^(-pKa)/(10^(-pKa)+10^(-pH))+10^(-pKw)/10^(-pH)' }"
+```
+
+See also: [Calorimetry](#calorimetry), [σROOT](#σroot), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).
+
+
+## BeamYoung
+
+A classic of the laboratories of strength of materials: the Young's modulus E
+of a flat bar, from its deflection. The bar rests on two supports L apart, and
+carries a mass m at mid-span; a dial gauge reads the deflection δ at the
+centre. Two equations, BeamYoung in the section Labs of `config/equations.csv`:
+δ = m·g·L³/(48·E·I), with I = b·h³/12 the second moment of area of a
+rectangular section of width b and thickness h. The acceleration of gravity
+g comes from the constants library.
+
+The measurements, on a bar of an unknown light metal: L = 500 mm with a tape,
+±0.5 mm, a bound; b = 25.00 mm and h = 3.00 mm with a caliper, u = 0.02 mm;
+m = 0.500 kg, u = 0.001 kg; δ = 3.29 mm with a dial gauge, u = 0.01 mm.
+
+The key BeamYoung runs the whole exercise: it stores the measurements, finds
+E±σ by σROOT and the range of E by ΔROOT, and compares that range with the
+usual ranges of handbooks: aluminium alloys 68…72 GPa, brasses 97…125 GPa,
+carbon steels 190…215 GPa. A material is compatible when the two ranges meet.
+With five inputs, ΔROOT runs ROOT at the 2⁵ = 32 corners of the box and at
+its centre, 33 times: about a second on the simulator, about twenty seconds
+on a phone, a few minutes on a calculator.
+
+**1)** The whole exercise:
+
+```rpl
+ⓁBeamYoung
+@ Expecting material:"aluminium"
+```
+
+**2)** Step by step: E and its standard uncertainty, by σROOT.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ1.40878 87031 5 GPa I:56.25±σ1.12589 96419 5 mm↑4 }
+```
+
+**3)** The range of E, by ΔROOT:
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT
+@ Expecting { E:65.79463 64935…72.38884 63822 GPa I:54.24858 28957…58.30181 73443 mm↑4 }
+```
+
+**4)** The range of E against that of the aluminium alloys, by ΔConcord, which
+draws both: the range of the handbook lies within that of the measurement.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.02_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁΔROOT 1 Get DeleteTag
+'68…72_GPa' →Num ⓁΔConcord
+```
+
+**5)** The thickness measured with a micrometer, u = 0.002 mm, instead of a
+caliper: the uncertainty of E falls from 1.41 GPa to about 0.32 GPa.
+
+```rpl
+'500±0.5_mm' →Num 'L' Sto  25±σ0.02_mm 'b' Sto  3±σ0.002_mm 'h' Sto
+0.5±σ0.001_kg 'm' Sto  3.29±σ0.01_mm 'δ' Sto
+'ROOT(ⒺBeamYoung;[E;I];[50_GPa;50_mm^4])' ⓁσROOT
+@ Expecting { E:68.99871 94641±σ0.31527 69128 72 GPa I:56.25±σ0.12116 62081 62 mm↑4 }
+```
+
+Three lessons. The thickness is cubed: its relative uncertainty of 0.7 %
+weighs 2.0 % on E, against 0.4 % for all the other inputs together. Measuring
+it with a micrometer rather than a caliper divides the uncertainty of E by
+four; measuring L, m or δ better would change almost nothing. Then, the bar is
+of an aluminium alloy, and clearly neither brass nor steel; but the alloys of
+aluminium all have nearly the same modulus, and this experiment cannot tell
+them apart. Last, E is found here from an equation that could be solved by
+hand, E = m·g·L³/(4·δ·b·h³): σROOT gives the same result as that formula would
+through σRFxjxi, 69.00 ± 1.41 GPa, a relative uncertainty of 2.04 %.
+
+The equations of this exercise, in `config/equations.csv`:
+
+```
+"BeamYoung",  "{ '(δ_mm)=(m_kg)*Ⓒg*(L_mm)^3/(48*(E_GPa)*(I_mm^4))' '(I_mm^4)=(b_mm)*(h_mm)^3/12' }"
+```
+
+See also: [Calorimetry](#calorimetry), [WeakAcid](#weakacid), [ΔROOT](#Δroot), [ΔConcord](#Δconcord).
 # Operations with Angles
 
 ## →Degrees
@@ -13779,6 +24755,889 @@ Return the largest prime strictly smaller than the input.
 ```rpl
 3 PreviousPrime
 @ Expecting 2
+```
+# Astronomy & Astronautics Library
+
+RPL library functions for Solar-System ephemerides, coordinate transforms and
+interplanetary trajectory design. Every function is a library item (prefix `Ⓛ`),
+loaded on demand like `PeriSel`. Angles are handled in **degrees**; heliocentric
+quantities use **astronomical units and days** (`1 au/day = 1731.4568 km/s`,
+`μ☉ = 2.9591220828559e-4 au³/day²`). Central-body functions are universal: the
+gravitational-parameter argument (`ⒸGM♁`, `ⒸGM☉`, `ⒸGM♂`, `ⒸGM☾`…) selects the body.
+
+Two input conventions coexist and must not be mixed:
+
+* **Element functions** `♁Φf`/`♂Φf`… return an orbital-element vector
+  `[a e I L ϖ Ω]`. Used by the *distance* functions (`DABf`, `T₀SDAToB`).
+* **Position functions** `♁Pf`/`♂Pf`/`☾Hf` return a heliocentric position
+  `[x y z]`. Used by the *transfer* functions (`VΦf`, `TrCost`, `Min…`, `aTr`).
+
+Each `##` heading is the exact function name, so long-press help resolves it.
+Two of the entries stand for a whole family — the eight planetary element
+functions (`…Φf`) and the six coordinate transforms — and list their
+other members in the entry body.
+
+## AstronomyLibrary
+
+The Astronomy section of the library: ephemerides of the planets and the Moon,
+and the atmospheres of three planets. It has three submenus:
+
+* [Ephemeris Orbital Elements](#ephemeris-orbital-elementslibrary): orbital
+  elements of the planets and the Moon at a given date;
+* [Heliocentric Coords](#heliocentric-coordslibrary): heliocentric positions
+  and velocities, and the coordinate transforms behind them;
+* [Planet Atmospheres](#planet-atmosphereslibrary): temperature, pressure and
+  density versus altitude on the Earth, Mars and Venus.
+
+## Ephemeris Orbital ElementsLibrary
+
+Orbital elements from a Julian Day, as vectors `[a e I L ϖ Ω]`:
+
+* the planets, `☿Φf` to `♆Φf`, documented together in [♁Φf](#♁Φf);
+* the Moon: its elements [☾Φf](#☾Φf), its geocentric position [☾Pos](#☾pos),
+  and its heliocentric position [☾Hf](#☾hf);
+* [PeriSel](#perisel): the date of the lunar perigee nearest a given date;
+* [MSumS](#msums) and [MSumC](#msumc): internal helpers of `☾Pos`.
+
+## Heliocentric CoordsLibrary
+
+Heliocentric ecliptic coordinates, in astronomical units:
+
+* [PosΦf](#posΦf): the position `[x y z]` from an orbital-element vector,
+  through six transforms: [EaΦf](#eaΦf), [νΦf](#νΦf), [rΦf](#rΦf),
+  [uΦf](#uΦf), [λΦf](#λΦf) and [βΦf](#βΦf);
+* position functions, from a date to a position: [♁Pf](#♁pf), [♂Pf](#♂pf) and
+  [♀Pf](#♀pf);
+* [VΦf](#vΦf): the velocity of a body, from its position function.
+
+## Planet AtmospheresLibrary
+
+Atmosphere profiles versus geometric altitude, in three submenus:
+[Earth](#earthlibrary), [Mars](#marslibrary) and [Venus](#venuslibrary).
+
+## EarthLibrary
+
+The Earth standard atmosphere (U.S. Standard Atmosphere 1976, extended to
+1000 km): temperature [T♁StdAtm](#t♁stdatm), pressure [P♁StdAtm](#p♁stdatm),
+density [ρ♁StdAtm](#ρ♁stdatm) and viscosity [μ♁StdAtm](#μ♁stdatm).
+
+## MarsLibrary
+
+The Mars atmosphere, with separate day (Viking) and night (Pathfinder) models
+below 120 km: [T♂DayAtm](#t♂dayatm), [P♂DayAtm](#p♂dayatm),
+[ρ♂DayAtm](#ρ♂dayatm), [T♂NightAtm](#t♂nightatm), [P♂NightAtm](#p♂nightatm)
+and [ρ♂NightAtm](#ρ♂nightatm).
+
+## VenusLibrary
+
+The Venus atmosphere, a single global model: [T♀Atm](#t♀atm),
+[P♀Atm](#p♀atm) and [ρ♀Atm](#ρ♀atm).
+
+## AstronauticsLibrary
+
+The Astronautics section of the library: distances between bodies and the
+design of interplanetary trajectories. It has two submenus:
+
+* [Flight Parameters](#flight-parameterslibrary): distances, closest
+  approaches and sidereal time;
+* [Trajectory](#trajectorylibrary): orbit transfers, Lambert's problem, launch
+  windows and gravity assists.
+
+## Flight ParametersLibrary
+
+* The distance between two bodies: [DABf](#dabf) from their element
+  functions, [DAToB](#datob) from two positions, and [DEarthToA](#dearthtoa)
+  from the Earth.
+* The date of closest approach: [T₀SDAToB](#t₀sdatob), and
+  [T₀SDEarthToA](#t₀sdearthtoa) from the Earth.
+* [θs](#θs): the mean sidereal time.
+
+## TrajectoryLibrary
+
+* Transfers between circular orbits: [Hohmann](#hohmann) and
+  [BiElliptic](#bielliptic); capture into orbit: [TrToOrbi](#trtoorbi).
+* Lambert's problem: [LambertU](#lambertu), with its helpers
+  [StumpC](#stumpc), [StumpS](#stumps) and [LamUF](#lamuf); from a state
+  vector to orbital elements: [rv2coe](#rv2coe).
+* The cost of an interplanetary transfer, [TrCost](#trcost), and its
+  optimisation: [MinTofDV](#mintofdv), [MinΔVTraj](#minΔvtraj),
+  [aTr](#atr), [MinΔDTraj](#minΔdtraj) and [MinΔtTraj](#minΔttraj), whose
+  search depth is set by [AstronTXPrecision](#astrontxprecision).
+* [GAssist](#gassist): a gravity assist.
+
+## AstroExamplesLibrary
+
+Four short programs showing how to build your own RPL program from the
+astronomy library. Each asks for a planet (type 1 to 7, `ENTER`, then `=`),
+computes a value for today's date, displays it and leaves it tagged on the
+stack. They are meant to be read and adapted.
+
+### LightTime
+
+The one-way light time (OWLT) and round-trip time (RTT) from the Earth to a
+planet today: the Earth-to-planet distance, from [DAToB](#datob), divided by
+the speed of light.
+
+### Elongation
+
+The elongation of a planet today: the angle Sun-Earth-planet, that is how far
+from the Sun the planet appears in the sky. A small elongation means the
+planet is hard to see.
+
+### ApparentSize
+
+The apparent diameter of a planet today, in arcseconds: its equatorial radius
+over its distance from the Earth.
+
+### SkyCoords
+
+The geocentric equatorial coordinates of a planet today: right ascension, in
+hours, and declination, in degrees.
+
+---
+
+## ♁Φf
+
+Mean orbital elements of a planet from a Julian Day (Standish/JPL), returned as
+`[a e I L ϖ Ω]` (au and degrees). The full family shares this format:
+`☿Φf` `♀Φf` `♁Φf` `♂Φf` `♃Φf` `♄Φf` `⛢Φf` `♆Φf`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2451545 Ⓛ♁Φf        @ Earth mean elements at J2000 → [ a e I L ϖ Ω ]
+```
+
+## ☾Φf
+
+Mean orbital elements of the Moon (geocentric), same output shape as a planet.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2451545 Ⓛ☾Φf        @ Moon mean elements at J2000
+```
+
+## ☾Pos
+
+Geocentric ecliptic position of the Moon from the Meeus lunar theory (longitude
+`λ`, latitude `β`, distance `Δ`), accurate to ≈ 1′. Sums the periodic terms via
+the helpers `MSumS`/`MSumC`.
+
+`JD` → `[ λ β Δ ]`   (deg, deg, km)
+
+```rpl
+2451545 Ⓛ☾Pos       @ Moon geocentric ecliptic longitude / latitude / distance
+```
+
+## ☾Hf
+
+Heliocentric ecliptic position of the Moon `[x y z]` in au — the Moon expressed
+as a **position function**, so it plugs into the transfer machinery exactly like
+a planet.
+
+`JD` → `[x y z]`   (au)
+
+```rpl
+2459050.5 Ⓛ☾Hf      @ Moon heliocentric position (au)
+```
+
+---
+
+## PosΦf
+
+Heliocentric ecliptic position `[x y z]` (au) from an orbital-element vector.
+Solves Kepler's equation and chains the six coordinate transforms. Guards the
+angle mode to degrees. The transforms are also callable individually: `EaΦf`
+(eccentric anomaly, Kepler root), `νΦf` (true anomaly), `rΦf` (radius), `uΦf`
+(argument of latitude), `λΦf` (ecliptic longitude), `βΦf` (ecliptic latitude).
+
+`[a e I L ϖ Ω]` → `[x y z]`
+
+```rpl
+2459050.5 Ⓛ♁Φf ⓁPosΦf     @ Earth heliocentric position on that date (au)
+```
+
+## ♁Pf
+
+Position-function wrapper: element function composed with `PosΦf`, mapping a date
+directly to a heliocentric `[x y z]`. Define one per body as needed (`♂Pf`, …).
+Fixed check: `2459050.5 Ⓛ♁Pf` → `[0.468733637 -0.901591683 0.000042104]`.
+
+`JD` → `[x y z]`
+
+```rpl
+DateTime JDN Ⓛ♁Pf     @ Earth's heliocentric position right now (au); its norm ≈ 1 au
+```
+
+## VΦf
+
+Heliocentric velocity of a body by centred finite difference of a **position
+function** (`h = 0.5 day`).
+
+`JD  'Pf'` → `[vx vy vz]`   (au/day)
+
+```rpl
+2459050.5 'Ⓛ♁Pf' ⓁVΦf     @ (= 29.307 km/s)
+@ Expecting [ 0.01498 46942 23 7.87138 25698 8⁳⁻³ -3.62016 40016 7⁳⁻⁷ ]
+```
+
+---
+
+## DABf
+
+Distance between two bodies at one date, from their **element functions**.
+
+`JD  'Af'  'Bf'` → `distance`   (au)
+
+```rpl
+2459050.5 'Ⓛ♁Φf' 'Ⓛ♂Φf' ⓁDABf     @ (Earth–Mars, 2020-07-20)
+@ Expecting 0.70745 83398 38 au
+```
+
+## T₀SDAToB
+
+Julian Day of closest approach between two bodies inside a search window
+(minimum-distance date). `T₀SDEarthToA` is the Earth-referenced variant.
+
+`'Af'  'Bf'  JD_lo  JD_hi` → `JD_min`
+
+```rpl
+'Ⓛ♁Φf' 'Ⓛ♂Φf' 2459120 2459140 ⓁT₀SDAToB     @ (2020-10-06)
+@ Expecting 2 459 129.07195
+```
+
+## θs
+
+Mean sidereal time from a **Universal-Time** Julian Date `JD` and a longitude
+`L`, using the IAU sidereal-time polynomial: `θs = GMST(JD) + L`, reduced to
+`[0, 360)°`. With `L = 0` this returns Greenwich mean sidereal time (GMST); with
+the observer’s longitude (East positive, West negative) it returns the local
+mean sidereal time. Sidereal time is the hour angle of the vernal equinox.
+
+`JD  L` → `θs` (°)
+
+```rpl
+2451545 0 Ⓛθs     @ (GMST at the J2000.0 epoch, 2000-01-01 12:00 UT)
+@ Expecting 280.46061 837 °
+```
+
+⚠️ Feed `θs` a **Universal-Time** Julian Date. DB48x’s `JDN` gives the Julian Date
+directly (this build carries the JDN half-day fix). Convert your civil (local)
+clock time to UT first. For example `20201006.120000_date JDN` (2020-10-06
+12:00 UT) → `2459129`, which `-73.58 θs` turns into a local mean sidereal time.
+
+---
+
+## Hohmann
+
+Two-impulse Hohmann transfer between two circular orbits of radii `r₁`, `r₂`
+about a body of parameter `μ`.
+
+`r₁  r₂  μ` → `{ ΔV₁  ΔV₂  ΔV_tot  tof }`
+
+```rpl
+6678_km 42164_km ⒸGM♁ ⓁHohmann     @ (LEO→GEO)
+@ Expecting { 2 425.76890 112 m/s 1 466.83863 837 m/s 3 892.60753 949 m/s 18 990.05283 42 s }
+```
+
+## BiElliptic
+
+Three-impulse bi-elliptic transfer via an intermediate apoapsis `r_b`.
+
+`r₁  r₂  r_b  μ` → `{ ΔV₁  ΔV₂  ΔV₃  ΔV_tot  tof }`
+
+```rpl
+6678_km 42164_km 200000_km ⒸGM♁ ⓁBiElliptic
+@ Expecting { 3 022.18246 923 m/s 474.20023 8827 m/s 876.93561 391 m/s 4 373.31832 197 m/s 374 954.39105 8 s }
+```
+
+## TrToOrbi
+
+Orbital insertion / capture from a hyperbolic approach: burn from the arrival
+hyperbola into a capture orbit (set `r_a = r_p` for circular capture).
+
+`v∞  r_p  r_a  μ` → `{ ΔV_ins  v_hyp  v_cap }`
+
+```rpl
+2.5_km/s 3689_km 3689_km ⒸGM♂ ⓁTrToOrbi     @ (circular capture)
+@ Expecting { 2 021.27352 7 m/s 5 428.58216 969 m/s 3 407.30864 269 m/s }
+```
+
+## LambertU
+
+Lambert's problem by the **universal-variable** formulation (Stumpff functions),
+robust for elliptic, parabolic and hyperbolic transfers including near-180°
+geometry. Given two position vectors and a time of flight, returns the terminal
+velocity vectors.
+
+`[r₁]  [r₂]  tof  μ` → `{ [v₁]  [v₂] }`
+
+```rpl
+[ 5000 10000 2100 ] [ -14600 2500 7000 ] 3600 398600 ⓁLambertU
+@ full result: { [ -5.99249 46396 7 1.92536 34152 8 3.24563 65284 9 ] [ -3.31246 03109 4 -4.19661 73079 3 -0.38528 76170 68 ] }
+1 GET     @ departure velocity, the vector the test compares
+@ Expecting [ -5.99249 46396 7 1.92536 34152 8 3.24563 65284 9 ]
+@ (Curtis, Example 5.2)
+```
+
+Helpers: `StumpC` (`z` → C(z)), `StumpS` (`z` → S(z)), `LamUF` (universal Kepler
+residual used by the internal root).
+
+## rv2coe
+
+State vector to classical orbital elements.
+
+`[r]  [v]  μ` → `{ a  e  i  Ω  ω  ν }`
+
+```rpl
+[ -6045 -3490 2500 ] [ -3.457 6.618 2.533 ] 398600 Ⓛrv2coe
+@ Expecting { 8 788.09511 738 0.17121 23462 84 153.24922 8518 255.27928 5334 20.06831 66506 28.44562 83066 }
+```
+
+---
+
+## TrCost
+
+ΔV cost of a ballistic transfer between two dates, using **position functions**
+for the departure and arrival bodies. Solves Lambert between the two positions
+and differences against each body's velocity. The example below reproduces the
+Earth→Mars leg of NASA's **Mars 2020 (Perseverance)** mission — departure in the
+late-July 2020 window, ~200-day cruise.
+
+`t₁  t₂  'Af'  'Bf'` → `{ ΔV_tot  ΔV_dep  ΔV_arr }`   (km/s)
+
+```rpl
+2459050.5 2459250.5 'Ⓛ♁Pf' 'Ⓛ♂Pf' ⓁTrCost     @ (Earth→Mars ~200 d — Mars 2020 / Perseverance)
+@ Expecting { 6.37381 3392 3.64458 48380 2 2.72922 85539 7 }
+```
+
+The Moon plugs in identically:
+
+```rpl
+2459050.5 2459250.5 'Ⓛ☾Hf' 'Ⓛ♂Pf' ⓁTrCost     @ (Moon→Mars)
+@ Expecting { 7.40385 78493 9 4.67123 39159 3 2.73262 39334 5 }
+```
+
+## MinTofDV
+
+For a fixed departure date, the flight time that minimises `TrCost` ΔV
+(golden-section search).
+
+`t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ ΔV  tof }`
+
+```rpl
+1 'AstronTXPrecision' STO
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 150 225 ⓁMinTofDV
+@ Expecting { 6.32101 29203 3 205.69843 3969 }
+```
+
+## MinΔVTraj
+
+Optimal launch window: minimise ΔV over **both** departure date and flight time
+(2-D golden-section search over `TrCost`). Keep the window under the 180° ridge. The
+example scans the real **Mars 2020 (Perseverance)** launch window of late July 2020.
+
+`'Af'  'Bf'  t₁_lo  t₁_hi  tof_lo  tof_hi` → `{ ΔV  t₁  tof }`
+
+```rpl
+1 'AstronTXPrecision' STO
+'Ⓛ♁Pf' 'Ⓛ♂Pf' 2459030 2459075 150 225 ⓁMinΔVTraj     @ (Mars 2020 = Perseverance window; level 1)
+@ Expecting { 6.31702 96434 2 459 055.66964 205.69843 3969 }
+```
+
+Runtime is set by the variable `AstronTXPrecision` (below): with the native
+`PosPhifN` / `LambertUN` commands of this branch, this example runs at level 1 in
+≈ 70 ms on the simulator, level 3 in ≈ 220 ms. Level 3 only sharpens the dates —
+the minimum ΔV is nearly identical at every level (6.31703 at level 1 versus
+6.31693 at level 3, i.e. 1e-4 km/s, while t₁ moves by 0.03 d and tof by 0.38 d).
+Without the variable, level 1 is used.
+
+The golden-section search keeps one point of each step and computes one new
+point, where the former ternary search computed two, with an error bound at
+least as small: 81 calls to `TrCost` at level 1 instead of 169. Measured on
+this example against level 6: at level 1, ΔV within 1e-4 km/s as before, and
+twice as fast; at level 3, ΔV within 3e-8 km/s instead of 2e-6, three times
+as fast.
+
+## MinΔDTraj
+
+Minimum-energy transfer for a departure date: the flight time giving the
+smallest semi-major axis `a` (via `aTr`). A 1-D optimum by geometry.
+
+`t₁  'Af'  'Bf'  tof_lo  tof_hi` → `{ a  tof }`
+
+```rpl
+1 'AstronTXPrecision' STO
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 180 270 ⓁMinΔDTraj
+@ Expecting { 1.31742 87172 4 228.76543 2099 }
+```
+
+## aTr
+
+Semi-major axis of the transfer between two dates (vis-viva on the `LambertU`
+solution). Used by `MinΔDTraj`.
+
+`t₁  t₂  'Af'  'Bf'` → `a`   (au)
+
+```rpl
+2459054 2459282 'Ⓛ♁Pf' 'Ⓛ♂Pf' ⓁaTr
+@ Expecting 1.31742 78755 9
+```
+
+## MinΔtTraj
+
+Fastest transfer under a ΔV budget: smallest flight time whose `TrCost` stays
+within `budget` (bisection).
+
+`t₁  'Af'  'Bf'  budget  tof_lo  tof_hi` → `{ tof  ΔV }`
+
+```rpl
+1 'AstronTXPrecision' STO
+2459054 'Ⓛ♁Pf' 'Ⓛ♂Pf' 7 150 205 ⓁMinΔtTraj     @ (7 km/s budget)
+@ Expecting { 173.63281 25 6.98966 53628 5 }
+```
+
+## AstronTXPrecision
+
+Global variable controlling the iteration count of the window optimizers
+(`MinTofDV`, `MinΔVTraj`, `MinΔtTraj`, `MinΔDTraj`): `1`/`2`/`3` → `6`/`9`/`12`
+iterations. The search is 2-D, so the cost grows as the *square* of the iteration
+count: measured simulator runtime for `MinΔVTraj` ≈ 70 / 130 / 220 ms with the
+native `PosPhifN` / `LambertUN` commands of this branch (hardware ≈ ×8). On the
+pure-RPL path (branches without those commands) the same three runs take
+≈ 16 / 35 / 63 s.
+Use level 1 to explore, level 3 to refine. Set it before calling an optimizer
+(`1 'AstronTXPrecision' STO`); the routines read it to size their search and
+provide no built-in default.
+
+---
+
+## GAssist
+
+Gravity-assist (swing-by) in the patched-conic model. In the planet frame the
+hyperbolic excess speed `v∞` keeps its magnitude but turns by `δ`, with
+`sin(δ/2) = 1/e` and `e = 1 + r_p·v∞²/μ`. The free heliocentric velocity change
+is `Δv = 2·v∞/e`, maximal near `v∞ ≈ √(μ/r_p)`.
+
+`v∞  r_p  μ` → `{ δ  Δv  e }`   (deg, m/s, –)
+
+```rpl
+5_km/s 3500_km ⒸGM♂ ⓁGAssist     @ (Mars flyby, 3500 km periapsis)
+@ Expecting { 38.36994 72818 ° 3 286.18963 813 m/s 3.04303 80170 3 }
+```
+
+---
+
+## T♁StdAtm
+
+Earth atmosphere profiles versus **geometric altitude** `Z` (a length: `2000_m`,
+`60_km`…). U.S. Standard Atmosphere 1976 — analytic and exact for `−5 km ≤ Z ≤
+86 km` — extended to `1000 km` by R. Braeunig's engineering fit (≈4 significant
+figures above 86 km). The Earth family:
+
+* `T♁StdAtm` → temperature (`K`)
+* `P♁StdAtm` → pressure (`MPa`)
+* `ρ♁StdAtm` → density (`kg/m³`), from `P/(R·T)` in the homosphere
+* `μ♁StdAtm` → dynamic viscosity (`Pa·s`), Sutherland's law, `−5 km ≤ Z ≤ 86 km`
+
+Out-of-range `Z` raises an error.
+
+`Z` → value with unit
+
+```rpl
+2000_m ⓁT♁StdAtm     @ Expecting 275.154088844 K
+60_km  ⓁP♁StdAtm     @ Expecting 2.195879E-5 MPa
+2000_m Ⓛρ♁StdAtm     @ Expecting 1.00655 36966 7 kg/m↑3
+60_km  Ⓛμ♁StdAtm     @ Expecting 1.58371 893⁳⁻⁵ Pa·s
+```
+
+## T♂DayAtm
+
+Mars atmosphere profiles versus geometric altitude `Z`, valid `−8 km ≤ Z ≤
+300 km` (R. Braeunig, Tables 11–15). Two independent diurnal models below
+120 km — dayside from Viking 1&2, nightside from Mars Pathfinder — sharing the
+single Table-15 upper model above 120 km (a small step appears there on the
+night curves). The Mars family:
+
+* Day:   `T♂DayAtm` (`K`) · `P♂DayAtm` (`Pa`) · `ρ♂DayAtm` (`kg/m³`)
+* Night: `T♂NightAtm` (`K`) · `P♂NightAtm` (`Pa`) · `ρ♂NightAtm` (`kg/m³`)
+
+Density below 120 km is `P/(R·TM)` with `R = 191.181 J/(kg·K)`.
+
+`Z` → value with unit
+
+```rpl
+0_m    ⓁT♂DayAtm      @ Expecting 228.50 K
+50_km  ⓁP♂DayAtm      @ Expecting 3.28196 Pa
+0_m    ⓁT♂NightAtm    @ Expecting 198. K
+50_km  Ⓛρ♂NightAtm    @ Expecting 9.19789 41696 2⁳⁻⁵ kg/m↑3
+```
+
+## T♀Atm
+
+Venus atmosphere profiles versus geometric altitude `Z`, valid `−3 km ≤ Z ≤
+300 km` (R. Braeunig, Tables 16–20). Venus has negligible day/night contrast in
+the lower atmosphere, so a single global trio is provided (no diurnal split):
+
+* `T♀Atm` → temperature (`K`)
+* `P♀Atm` → pressure (`Pa`)
+* `ρ♀Atm` → density (`kg/m³`), `P/(R·TM)` with `R = 191.357 J/(kg·K)` below 100 km
+
+A small documented step appears at the 100 km boundary (`TM` below → kinetic `T`
+above). Pioneer-Venus data below 100 km; Bougher et al. 1986 above.
+
+`Z` → value with unit
+
+```rpl
+0_m    ⓁT♀Atm         @ Expecting 735.000 K
+50_km  ⓁP♀Atm         @ Expecting 106176 Pa
+87_km  Ⓛρ♀Atm         @ Expecting 2.39307 64108 9⁳⁻³ kg/m↑3
+```
+
+
+<!-- ========== Per-function reference fiches (added 2026-08-08) ========== -->
+
+## P♂DayAtm
+
+Mars **dayside** (Viking) pressure vs geometric altitude `Z`, Braeunig Tables 13/15 (−8…300 km).
+
+`Z` → pressure (`Pa`)
+
+```rpl
+0_m ⓁP♂DayAtm     @ Expecting 610.5 Pa
+```
+
+## ρ♂DayAtm
+
+Mars **dayside** density vs `Z`, `ρ=P/(R·T)` ≤120 km + Braeunig Table 15 (−8…300 km).
+
+`Z` → density (`kg/m³`)
+
+```rpl
+0_m Ⓛρ♂DayAtm     @ Expecting 0.01397 50939 1 kg/m↑3
+```
+
+## T♂NightAtm
+
+Mars **nightside** (Pathfinder) temperature vs `Z`, Braeunig Tables 12/13.
+
+`Z` → temperature (`K`)
+
+```rpl
+0_m ⓁT♂NightAtm     @ Expecting 198. K
+```
+
+## P♂NightAtm
+
+Mars **nightside** (Pathfinder) pressure vs `Z`, Braeunig Table 13.
+
+`Z` → pressure (`Pa`)
+
+```rpl
+0_m ⓁP♂NightAtm     @ Expecting 610.5 Pa
+```
+
+## ρ♂NightAtm
+
+Mars **nightside** density vs `Z`, `ρ=P/(R·T)` ≤120 km.
+
+`Z` → density (`kg/m³`)
+
+```rpl
+0_m Ⓛρ♂NightAtm     @ Expecting 1.61278 23022 9⁳⁻² kg/m↑3
+```
+
+## P♀Atm
+
+Venus pressure (single global model) vs `Z`, Braeunig Tables 18/20 (−3…300 km).
+
+`Z` → pressure (`Pa`)
+
+```rpl
+0_m ⓁP♀Atm     @ Expecting 9 332 000 Pa
+```
+
+## ρ♀Atm
+
+Venus density vs `Z`, `ρ=P/(R·T)` ≤100 km + Braeunig Table 20 (−3…300 km).
+
+`Z` → density (`kg/m³`)
+
+```rpl
+0_m Ⓛρ♀Atm     @ Expecting 66.35032 23789 kg/m↑3
+```
+
+## P♁StdAtm
+
+Earth pressure vs geometric altitude `Z` — U.S. Standard Atmosphere 1976 (≤86 km) + Braeunig fit to 1000 km. Part of the Earth family (`T/P/ρ/μ♁StdAtm`).
+
+`Z` → pressure (`MPa`)
+
+```rpl
+2000_m ⓁP♁StdAtm     @ Expecting 0.07950 14065 71 MPa
+```
+
+## ρ♁StdAtm
+
+Earth density vs `Z`, `ρ=P/(R·T)` in the homosphere (USSA 1976). Earth family (`T/P/ρ/μ♁StdAtm`).
+
+`Z` → density (`kg/m³`)
+
+```rpl
+2000_m Ⓛρ♁StdAtm     @ Expecting 1.00655 36966 7 kg/m↑3
+```
+
+## μ♁StdAtm
+
+Earth dynamic viscosity vs `Z` (Sutherland law on USSA-1976 temperature), valid −5…86 km. Earth family.
+
+`Z` → viscosity (`Pa·s`)
+
+```rpl
+2000_m Ⓛμ♁StdAtm     @ Expecting 1.72598 1622⁳⁻⁵ Pa·s
+```
+
+## ☿Φf
+
+Mercury mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]` (au, degrees). Planet family: `☿♀♁♂♃♄⛢♆Φf`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ☿Φf     @ Expecting [ 0.38709 93460 31 0.20563 98466 28 7.00375 68739 30 967.29907 22 77.49077 25784 48.30500 97233 ]
+```
+
+## ♀Φf
+
+Venus mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ♀Φf     @ Expecting [ 0.72333 64614 09 6.76828 05507 2⁳⁻³ 3.39451 39394 2 12 206.76933 6 131.60301 8568 76.62277 93421 ]
+```
+
+## ♂Φf
+
+Mars mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ♂Φf     @ Expecting [ 1.52371 41353 9 9.34102 96673 8⁳⁻² 1.84802 05220 6 3 928.57570 696 -23.85230 7869 49.49941 81741 ]
+```
+
+## ♃Φf
+
+Jupiter mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ♃Φf     @ Expecting [ 5.20286 31488 5 4.83590 06491⁳⁻² 1.30401 94372 2 658.00457 362 14.77215 1808 100.51597 0931 ]
+```
+
+## ♄Φf
+
+Saturn mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ♄Φf     @ Expecting [ 9.53641 89549 7 0.05375 70089 05 2.48638 97159 5 301.16371 3908 92.51278 39761 113.60310 4226 ]
+```
+
+## ⛢Φf
+
+Uranus mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ⛢Φf     @ Expecting [ 19.18876 15191 4.72484 04631 5⁳⁻² 0.77213 86161 29 401.28661 5394 171.03812 6823 74.02563 89905 ]
+```
+
+## ♆Φf
+
+Neptune mean orbital elements from a Julian Day (Standish/JPL), `[a e I L ϖ Ω]`.
+
+`JD` → `[a e I L ϖ Ω]`
+
+```rpl
+2459050.5 Ⓛ♆Φf     @ Expecting [ 30.06997 67852 8.60097 02334⁳⁻³ 1.77011 61557 1 -10.22892 9721 44.89850 9482 131.78318 0489 ]
+```
+
+## ♂Pf
+
+Mars heliocentric ecliptic position from a Julian Day (`♂Φf` composed with `PosΦf`). Companion of `♁Pf`.
+Fixed check: `2459050.5 Ⓛ♂Pf` → `[1.159010882 -0.753079682 -0.044216374]`.
+
+`JD` → `[x y z]` (au)
+
+```rpl
+DateTime JDN Ⓛ♂Pf     @ Mars' heliocentric position right now (au); its norm ~ 1.5 au
+```
+
+## DAToB
+
+Distance between two heliocentric position vectors, `|A−B|`, reduced to au. Primitive used by `DABf`/`T₀SD*`.
+Primitive check: `[1 0 0] [0 1 0] DAToB` → `1.41421356 au`.
+
+`[A] [B]` → `d` (au)
+
+The live example chains `♁Pf` and `♂Pf` at today's date, so it returns the
+**current Earth-Mars distance** — the value changes every time you run it:
+
+```rpl
+DateTime JDN DUP Ⓛ♁Pf SWAP Ⓛ♂Pf ⓁDAToB   @ current Earth-Mars distance (au)
+```
+
+## DEarthToA
+
+Earth-to-body distance at one date, with **Earth built in**: give the date and
+the target's element function (like `DABf`, but the first body is always Earth).
+That is exactly what makes it different from `DAToB`, which takes two arbitrary
+vectors. Fixed check: `2459050.5 'Ⓛ♂Φf' DEarthToA` → `0.707458 au` (Earth-Mars).
+
+`JD  'Af'` → `d` (au)
+
+```rpl
+DateTime JDN 'Ⓛ♀Φf' ⓁDEarthToA   @ current Earth-Venus distance (au)
+```
+
+## T₀SDEarthToA
+
+Julian Day of closest approach **from Earth** to a body, over `[JD1 JD2]` (Earth-referenced `T₀SDAToB`; pass the body element fn as `'Ⓛ…'`).
+
+`'Ⓛ♂Φf' JD1 JD2` → `JDmin`
+
+```rpl
+'Ⓛ♂Φf' 2459120 2459140 ⓁT₀SDEarthToA     @ (Mars, 2020-10-06)
+@ Expecting 2 459 129.07195
+```
+
+## EaΦf
+
+Eccentric anomaly `E` by solving Kepler's equation (Root). Building block of `PosΦf`.
+
+`e M` → `E` (°)
+
+```rpl
+0.0167 5.0 ⓁEaΦf     @ Expecting EaLΦ=5.08480 48182 5 °
+```
+
+## νΦf
+
+True anomaly `ν` from eccentricity and eccentric anomaly. Building block of `PosΦf`.
+
+`e E` → `ν` (°)
+
+```rpl
+0.0167 5.0848 ⓁνΦf     @ Expecting 5.17032 19838 5 °
+```
+
+## rΦf
+
+Heliocentric distance `r` from semi-major axis, eccentricity and eccentric anomaly. Building block of `PosΦf`.
+
+`a e E` → `r` (au)
+
+```rpl
+1.0 0.0167 5.0848 ⓁrΦf     @ Expecting 0.98336 57209 61
+```
+
+## uΦf
+
+Argument of latitude `u` from argument of perihelion and true anomaly. Building block of `PosΦf`.
+
+`ω ν` → `u` (°)
+
+```rpl
+30 60 ⓁuΦf     @ Expecting 90
+```
+
+## λΦf
+
+Ecliptic longitude `λ` from node, inclination and argument of latitude. Building block of `PosΦf`.
+
+`Ω I u` → `λ` (°)
+
+```rpl
+100 7 50 ⓁλΦf     @ Expecting 149.78878 4155 °
+```
+
+## βΦf
+
+Ecliptic latitude `β` from inclination and argument of latitude. Building block of `PosΦf`.
+
+`I u` → `β` (°)
+
+```rpl
+7.0 50 ⓁβΦf     @ Expecting 5.35678 17402 6 °
+```
+
+## MSumC
+
+Σ of `c·cos(row·av)` over a Meeus periodic-term table. Internal helper of `☾Pos` (Moon), rarely called alone; input `tbl` is a term matrix.
+
+`av tbl` → `Σ`
+
+```
+(internal — see Ⓛ☾Pos)
+```
+
+## MSumS
+
+Σ of `c·sin(row·av)` over a Meeus periodic-term table. Internal helper of `☾Pos` (Moon).
+
+`av tbl` → `Σ`
+
+```
+(internal — see Ⓛ☾Pos)
+```
+
+## StumpC
+
+Stumpff function `C(z)` (three numerical regimes). Building block of the universal-variable Lambert solver.
+
+`z` → `C(z)`
+
+```rpl
+1.539854 ⓁStumpC     @ Expecting 0.43904 36562 93
+```
+
+## StumpS
+
+Stumpff function `S(z)` (three numerical regimes). Building block of the Lambert solver.
+
+`z` → `S(z)`
+
+```rpl
+1.539854 ⓁStumpS     @ Expecting 0.15429 50940 11
+```
+
+## LamUF
+
+Universal-variable Lambert time-of-flight residual `F(z)` (root-solved by `LambertU`). Args `z r1 r2 A μ dt`.
+
+`z r1 r2 A μ dt` → `F(z)`
+
+```rpl
+1.0 11375.85162 16383.22313 12372.27203 398600 3600 ⓁLamUF     @ Expecting -192 258.13236 1
+```
+
+## PeriSel
+
+Time of the lunar perigee passage (Selene) nearest a given date, from Meeus' *Astronomical
+Algorithms* (2nd ed., ch. 50, full Table 50.A). The input is a Julian Day (or a date value);
+the result is the Julian Day of the perigee.
+
+`JD` → `JDperigee`
+
+```rpl
+2464291.5 ⓁPeriSel     @ (lunar perigee 2034-Nov-25)
+@ Expecting 2 464 292.42195
 ```
 # Base functions
 
@@ -14934,16 +26793,17 @@ The Gregorian calendar jumps from 1582-10-04 to 1582-10-15.
 This command ignores that gap, so the Julian day number given by this command for dates on or before 1582-10-14 may deviate from other converters like
 [The NASA Julian Date/Time Converter](https://ssd.jpl.nasa.gov/tools/jdc).
 
-To compute the Julian Day Number for the first day of the millenium:
+A Julian Date begins at **noon** Universal Time: the whole day number belongs
+to noon, and midnight is half a day earlier. First day of the millenium, at noon:
 ```rpl
-20000101 JDN
+20000101.120000 JDN
 @ Expecting 2 451 545
 ```
 
 This command can be used in algebraic expressions:
 
 ```rpl
-'JDN(20000101)'
+'JDN(20000101.120000)'
 @ Expecting 2 451 545
 ```
 
@@ -14956,14 +26816,14 @@ It is the opposite of the `JDN` command.
 
 ```rpl
 2451545 JDN→
-@ Expecting Sat 1/Jan/2000
+@ Expecting Sat 1/Jan/2000, 12:00:00
 ```
 
 This command can be used in algebraic expressions:
 
 ```rpl
 'JDN→(2451545)'
-@ Expecting Sat 1/Jan/2000
+@ Expecting Sat 1/Jan/2000, 12:00:00
 ```
 # Debugging
 
@@ -16446,10 +28306,14 @@ The libraries to attach can be identified by one of:
 For example, to preload the `Dedicace` library item, you can use one of:
 
 ```rpl
+Libs Detach
 'Dedicace' Attach
 Libs
-@ Expecting { Dedicace SiDensity PeriSel }
+@ Expecting { Dedicace }
 ```
+
+The first line detaches whatever was loaded before, so that `Libs` only shows
+what this example attached.
 
 
 ## Detach
@@ -16465,9 +28329,11 @@ The libraries to attach can be identified by one of:
 For example, to unload the `Dedicace` and `KineticEnergy` library item, you can use one of:
 
 ```rpl
+Libs Detach
+{ Dedicace SiDensity "KineticEnergy" } Attach
 { Dedicace "KineticEnergy" } Detach
 Libs
-@ Expecting { SiDensity PeriSel }
+@ Expecting { SiDensity }
 ```
 
 ## Libs
@@ -16480,6 +28346,174 @@ on disk is:
 ```rpl
 Libs Duplicate Detach Attach
 ```
+
+
+## SecretsLibrary
+
+The Secrets section of the library, a small example of library entries that
+are plain values rather than programs.
+
+### Dedicace
+
+A dedication, in French, to all those who remember Maubert Électronique.
+
+### LibraryHelp
+
+A reminder that the library is defined by the file `config/library.csv`,
+which can be edited to add your own entries.
+
+## PhysicsLibrary
+
+Physics programs and formulas.
+
+### KineticEnergy
+
+Plots the relativistic and the classical kinetic energy side by side, to
+compare them as the speed approaches the speed of light.
+
+### SiDensity
+
+The intrinsic carrier density of silicon at a temperature `T`:
+`8.35123E20 cm⁻³·exp(-7555.17 K/T)`.
+
+`T` ▶ density
+
+### Fanning
+
+The Fanning friction factor of a pipe, from its relative roughness and the
+Reynolds number: `16/Reynolds` in laminar flow (Reynolds up to 2100), an
+explicit approximation of the Colebrook equation above.
+
+`Roughness` `Reynolds` ▶ friction factor
+
+## MathematicsLibrary
+
+Mathematical programs, several of which double as benchmarks.
+
+### CollatzBenchmark
+
+Times `CollatzConjecture` from 989345275647. Tail recursion lets the
+calculator run it without using memory for each step.
+
+### CollatzConjecture
+
+Follows the Collatz sequence from the number on the stack down to 1, showing
+each value. Numbers with a long sequence include 1161, 2223 and 6171. It
+checks tail recursion inside a test.
+
+### CountPrimes
+
+Counts the prime numbers below a given value, 1000 if the stack is empty.
+
+### TriangleEquations
+
+Solves a triangle with the multiple-equation solver, from a system of
+equations such as Pythagoras' theorem and the law of sines.
+
+### RombergPlot
+
+Plots the function `x³·(sin(5x)+1)/(eˣ-1)`.
+
+## GraphicsLibrary
+
+Examples of graphics programs.
+
+### CurvePlottingExamples
+
+A tour of curve plotting: functions, polar curves and other plot types, with
+various line widths.
+
+### WalkMan
+
+A small character walking across the screen, from page 2-39 of the HP 50G
+Advanced Reference. It checks compatibility with the HP `GROB` format.
+
+### DrawingLines
+
+Draws a moving pattern of lines.
+
+### DrawingText
+
+Displays lines of text in varying shades of gray.
+
+### DrawingShapes
+
+Draws a moving pattern of shapes, filled with changing patterns.
+
+### DrawingPatterns
+
+Draws rounded rectangles in 256 levels of gray.
+
+### RandomPlot
+
+Draws one random point in each column of the screen.
+
+### RandomXYPlot
+
+Draws 25 000 random points on the screen.
+
+## SoundLibrary
+
+Examples of sound programs.
+
+### Beeps
+
+Plays a rising sequence of 51 notes, each a semitone above the previous one.
+
+## PerformanceLibrary
+
+Benchmarks, most of them timed with `TEval`.
+
+### NQueens
+
+Solves the eight queens problem, a classic calculator benchmark, with a User
+RPL program taken from the HP Museum.
+
+### SumTestWithFunction
+
+Sums `∛(exp(sin(atan(x))))` for `x` from 1 to 1000 with the `Σ` function,
+and times it. See also `SumTestWithLoop`.
+
+### SumTestWithLoop
+
+The same sum as `SumTestWithFunction`, computed with a `FOR` loop, and timed.
+
+### Recursion
+
+Calls itself endlessly, showing the depth reached and the free memory, which
+does not decrease: tail recursion uses no memory. Stop it with `EXIT`.
+
+### UnitsBenchmark
+
+Times 26 conversions of speeds from `m/s` to `km/yr`.
+
+### InteractiveMenu
+
+An example of interactive program, in the Examples section: it stops in the
+solver menu for `C=√(A²+B²)`; once `A`, `B` and `C` are solved, `=` resumes
+it, and it displays the results.
+
+## ConfigsLibrary
+
+The configuration files of the calculator, which define its catalogues. Each
+entry shows the content of one file:
+
+* `Cst`: `config/constants.csv`, the constants;
+* `Eqns`: `config/equations.csv`, the equations;
+* `Lib`: `config/library.csv`, the library;
+* `Units`: `config/units.csv`, the units.
+
+Edit these files to add your own entries.
+
+### Eqns
+
+The content of `config/equations.csv`, which defines the equations added to
+the Equation Library. See [ConfigsLibrary](#configslibrary).
+
+### Lib
+
+The content of `config/library.csv`, which defines the Function Library. See
+[ConfigsLibrary](#configslibrary).
 # Operations with data
 
 Data in RPL is generally represented using lists, such as `{ {1 2 } 3 "A"}`.
@@ -17611,6 +29645,230 @@ TMENU
 
 Return the last menu entry, or `0` if there is no current menu. The returned
 value can be used as an argument to `Menu` or `TMenu`.
+# Missions — Earth To Mars & Back
+
+Pedagogical Earth⇄Mars round-trip planners, built on the Astronautics transfer
+machinery (universal-variable Lambert, gravity assist) and the heliocentric ephemerides.
+Dates are Julian Days; ΔV in km/s. Two mission classes are covered: **conjunction** (long
+stay, lowest ΔV) with `RTPlan`, and **opposition** (short stay, Venus gravity-assist
+return) with `OppRoute` and `RTPlanOpp`. `MarsRoundTrip` compares the two side by side,
+and `MissionΔV` gives an end-to-end propulsive ΔV budget.
+
+An **Examples** submenu holds **four named worked missions**, each a specific Venus-flyby
+return shown with its to-scale trajectory figure: **ETMB1** (2022), **ETMB2** (2035 — the
+featured soft-entry twin, where the Venus swing-by does the most work), **ETMB3** (2042)
+and **ETMB4** (2048).
+
+## MissionsLibrary
+
+The Missions section of the library: complete interplanetary missions, planned
+with the Astronomy and Astronautics functions. It holds one family of
+missions, [Earth To Mars & Back](#earth-to-mars-&-backlibrary).
+
+## Earth To Mars & BackLibrary
+
+Earth⇄Mars round trips, in two submenus: [Planners](#plannerslibrary), the
+planning tools, and [Examples](#exampleslibrary), four worked missions.
+
+## PlannersLibrary
+
+* [RTPlan](#rtplan): a conjunction-class round trip, with a long stay and the
+  lowest ΔV.
+* [OppRoute](#opproute) and [RTPlanOpp](#rtplanopp): an opposition-class
+  return through a Venus gravity assist.
+* [MarsRoundTrip](#marsroundtrip): the two classes side by side.
+* [MissionΔV](#missionΔv): the end-to-end propulsive ΔV budget.
+
+## ExamplesLibrary
+
+Two menus of the library are named Examples:
+
+* in Missions, Earth To Mars & Back: four worked missions with a Venus-flyby
+  return, [ETMB1](#etmb1) (2022), [ETMB2](#etmb2) (2035), [ETMB3](#etmb3)
+  (2042) and [ETMB4](#etmb4) (2048);
+* the Examples section: [InteractiveMenu](#interactivemenu), a program that
+  stops in the solver menu, then resumes with `=` to show the results.
+
+## RTPlan
+
+Conjunction-class Earth⇄Mars round-trip optimiser (heliocentric ΔV). It optimises the
+outbound Earth→Mars leg, then the return Mars→Earth leg departing after a minimum Mars
+surface stay, and returns the full itinerary. Slow, so the example sets a fast search
+precision first. It reproduces the real Perseverance outbound window.
+
+`t1lo t1hi stay` → `{ t1 t2 stay t3 t4 ΔVout ΔVret ΔVtot }`
+
+```rpl
+1 'AstronTXPrecision' STO
+2459030 2459075 500 ⓁRTPlan
+@ Expecting { 2 459 055.66964D 2 459 260.58467D 508.51449 4501D 2 459 769.09917D 2 460 045.08584D 6.31705 18103 9D 6.48113 49517 3D 12.79818 67621D }
+@ Earth 2020-07-25 → Mars 2021-02-15, stay 509 d, home 2023-04-10; ΔVtot 12.80 km/s
+```
+
+## RTPlanOpp
+
+Best Venus-flyby Mars→Earth return over a Mars-departure window (opposition class). A
+two-stage search (coarse grid then local refine) that minimises a combined cost
+favouring a ballistic and turn-feasible Venus swing-by. Keep the window narrow (~60 d);
+each leg of the itineraries is computed once, so it takes about 2 s on the
+simulator, a few minutes on a calculator. The result is feasible when matchErr is near zero and turnReq
+does not exceed turnMax.
+
+`t3lo t3hi` → `{ t3 tv t4 ΔVTEI matchErr turnReq turnMax tof }`
+
+```rpl
+2459920 2459980 ⓁRTPlanOpp
+@ affichage complet : { 2459930 2460150 2460220 5.90 0.00084 30.93 49.72 290 }
+@ Expecting { 2 459 930 2 460 150 2 460 220 5.90036 89128 9D 8.44315 38744 9⁳⁻⁴D 30.92503 57352D ° 49.71715 56229D 290 5.44155 12278 3D }
+@ Mars 2022-12-16 → Venus 2023-07-24 → Earth 2023-10-02; Earth entry only ~4.9 km/s
+```
+
+## OppRoute
+
+Evaluate one Mars→Venus→Earth gravity-assist return: two Lambert arcs patched by a Venus
+swing-by. It returns the Mars-departure ΔV, the v∞ mismatch at Venus (near zero for a
+valid ballistic flyby), the required versus achievable turn angle, the return time, and the
+Earth entry speed. Instant, no search. A route is feasible when matchErr is near zero and
+turnReq does not exceed turnMax; a low EarthEntry marks a strong Venus assist (soft entry).
+
+`t3 tv t4` → `{ ΔVTEI matchErr turnReq turnMax tof EarthEntry }`
+
+```rpl
+2459950 2460160 2460240 ⓁOppRoute     @ feasible (turnReq 29.6 ≤ turnMax 37.7);
+@ Expecting { 6.85680 22977 2 0.26798 63486 98 29.61008 76473 ° 37.69932 0865 290 4.87223 59083 7 }
+@ EarthEntry only 4.87 km/s = a soft, Venus-assisted entry
+```
+
+## ♀Pf
+
+Venus heliocentric position vector (au) from a Julian Day — the Venus position function,
+sibling of the Earth and Mars position functions used by the transfer tools.
+
+`JD` → `[x y z]`
+
+```rpl
+2459950 Ⓛ♀Pf     @ (au, 2023-01-05)
+@ Expecting [ 0.61400 36319 03 -0.38907 09841 12 -4.07721 22786 7⁳⁻² ]
+```
+
+## MarsRoundTrip
+
+Compare a conjunction versus an opposition Earth⇄Mars round trip. It runs RTPlan
+(conjunction) and RTPlanOpp (opposition Venus-flyby return), computes the opposition
+Earth-entry speed, and leaves five tagged values on the stack for a side-by-side read.
+It chains both optimisers: about 5 s on the simulator, several minutes on a
+calculator. Then explore your own windows with RTPlan and
+RTPlanOpp directly.
+
+(no input) → `Conj_years Conj_dVtot Opp_return_d Opp_TEI Opp_entry`
+
+```rpl
+ⓁMarsRoundTrip
+@ affichage complet : Conj_years:2.71 Conj_dVtot:12.80 Opp_return_d:290 Opp_TEI:5.90 Opp_entry:5.44
+@ Expecting Opp_entry:5.44155 12278 3D
+@ Conjunction 2.71 yr / 12.80 km/s; opposition Venus return, Earth entry only 5.4 km/s.
+```
+
+## MissionΔV
+
+End-to-end propulsive ΔV budget of a conjunction round trip. Feed it an RTPlan itinerary;
+it recomputes the two transfer legs (TrCost) for their departure/arrival v∞, converts the
+space burns from parking orbits with TrToOrbi, and adds representative atmospheric phases.
+It returns eight tagged ΔV values (seven phases plus the total), in km/s. Chains after
+RTPlan; the example uses a fixed conjunction itinerary, that of the RTPlan example,
+so it runs instantly. RTPlan minimises the heliocentric ΔV, not this budget, whose
+burns start from parking orbits: an itinerary cheaper for one may cost a little more
+for the other.
+
+The seven propulsive phases, in chronological order:
+
+* **AscentEarth** — Earth surface to Low Earth Orbit (the launch to a parking orbit).
+* **TMI** — Trans-Mars Injection: from LEO onto the interplanetary transfer to Mars.
+* **MOI** — Mars Orbit Insertion: braking capture from the arrival hyperbola into Mars orbit.
+* **EDL_Mars** — Entry, Descent and Landing: from Mars orbit down to the surface.
+* **AscentMars** — Mars surface back up to Mars orbit.
+* **TEI** — Trans-Earth Injection: from Mars orbit onto the return transfer to Earth.
+* **EntryEarth** — Earth atmospheric entry on return (aerobraked, so ~0).
+
+The space phases (TMI, MOI, TEI) are computed rigorously; the atmospheric phases
+(ascents, EDL, entry) are representative values (Earth ascent 9.4, Mars EDL 0.6, Mars
+ascent 4.1, Earth entry 0 km/s), with parking orbits LEO 6678 km and Mars 3689 km.
+
+`{ itinerary }` → `1_AscentEarth … 8_TOTAL`
+
+```rpl
+{ 2459055.670 2459260.585 508.514 2459769.099 2460045.086 6.31705 6.48113 12.79819 } ⓁMissionΔV     @ AscentEarth 9.4, TMI 3.81, MOI 2.07, EDL 0.6,
+@ Expecting 8_TOTAL:22.48135 24918D
+@ AscentMars 4.1, TEI 2.50, Entry 0. A typical chemical Mars round-trip budget.
+```
+
+## ETMB1
+
+Earth-To-Mars-&-Back mission 2022 (launch), Venus-flyby return — a worked example. It runs
+the validated opposition-class return (Mars→Venus→Earth) at fixed dates via OppRoute and
+returns the return-leg itinerary as tagged values. The original 2022 mission. Venus turns ~31°, giving a gentle Earth entry of ~5.4 km/s. Its outbound Earth→Mars leg follows the Mars 2020 / Perseverance window (optimised by `RTPlan`).
+
+![ETMB1 trajectory](img/etmb1.bmp)
+
+`(no input)` → `MarsDeparture VenusFlyby EarthArrival ReturnDays dVTEI turnReq EarthEntry`
+
+```rpl
+ⓁETMB1
+@ affichage complet : MarsDeparture:2459930 VenusFlyby:2460150 EarthArrival:2460220 ReturnDays:290
+@ Expecting EarthEntry_kms:5.44155 12169 6
+@ dVTEI_kms:5.90 turnReq_deg:30.9° EarthEntry_kms:5.44
+```
+
+## ETMB2
+
+Earth-To-Mars-&-Back mission 2035 (launch), Venus-flyby return — a worked example. It runs
+the validated opposition-class return (Mars→Venus→Earth) at fixed dates via OppRoute and
+returns the return-leg itinerary as tagged values. **★ Featured mission.** The strongest twin found: Venus works even harder than in ETMB1 (~39° turn) for the *softest* entry — ~4.0 km/s, gentler than ETMB1 itself. It uniquely combines the Venus synodic resonance with a **perihelic Mars opposition** (Mars near the Sun), which is what makes the swing-by so strong — the best future crewed-return candidate in the ephemeris range.
+
+![ETMB2 trajectory](img/etmb2.bmp)
+
+`(no input)` → `MarsDeparture VenusFlyby EarthArrival ReturnDays dVTEI turnReq EarthEntry`
+
+```rpl
+ⓁETMB2
+@ affichage complet : MarsDeparture:2464635 VenusFlyby:2464825 EarthArrival:2464915 ReturnDays:280
+@ Expecting EarthEntry_kms:3.97248 80606 2
+@ dVTEI_kms:7.14 turnReq_deg:39.3° EarthEntry_kms:3.97
+```
+
+## ETMB3
+
+Earth-To-Mars-&-Back mission 2042 (launch), Venus-flyby return — a worked example. It runs
+the validated opposition-class return (Mars→Venus→Earth) at fixed dates via OppRoute and
+returns the return-leg itinerary as tagged values. Venus-light: the 6.4-year resonance yields a feasible passage but a weak assist (~7° turn), leaving a brutal ~14.7 km/s entry.
+
+![ETMB3 trajectory](img/etmb3.bmp)
+
+`(no input)` → `MarsDeparture VenusFlyby EarthArrival ReturnDays dVTEI turnReq EarthEntry`
+
+```rpl
+ⓁETMB3
+@ affichage complet : MarsDeparture:2466965 VenusFlyby:2467105 EarthArrival:2467170 ReturnDays:205
+@ Expecting EarthEntry_kms:14.68803 65576
+@ dVTEI_kms:9.19 turnReq_deg:7.5° EarthEntry_kms:14.69
+```
+
+## ETMB4
+
+Earth-To-Mars-&-Back mission 2048 (launch), Venus-flyby return — a worked example. It runs
+the validated opposition-class return (Mars→Venus→Earth) at fixed dates via OppRoute and
+returns the return-leg itinerary as tagged values. The cheapest full mission (outbound v∞ only ~3.6 km/s), with a moderate ~9.6 km/s entry.
+
+![ETMB4 trajectory](img/etmb4.bmp)
+
+`(no input)` → `MarsDeparture VenusFlyby EarthArrival ReturnDays dVTEI turnReq EarthEntry`
+
+```rpl
+ⓁETMB4
+@ affichage complet : MarsDeparture:2469315 VenusFlyby:2469470 EarthArrival:2469535 ReturnDays:220
+@ Expecting EarthEntry_kms:9.57918 83462 1
+@ dVTEI_kms:6.24 turnReq_deg:9.7° EarthEntry_kms:9.58
+```
 # Numerical integration
 
 ## Integrate
@@ -20277,6 +32535,98 @@ Set both the independent and dependent data columns in the reserved variable
 `ΣParameters`.
 
 `XCol` `YCol` ▶ (Update `ΣParameters`)
+
+## GammaP
+
+Regularised lower incomplete gamma function, `P(a,x)`: the probability that a
+gamma variable of shape `a` and unit scale does not exceed `x`. The shape must
+be positive and `x` must not be negative.
+
+`a` `x` ▶ `P(a,x)`
+
+Evaluated by a series below `a+1` and by a continued fraction above it, in the
+precision currently in force. It is the primitive behind the chi-square and
+gamma distributions and behind `UTPC`.
+
+```rpl
+2 1.5 GammaP
+@ Expecting 0.44217 45996 29
+```
+
+## BetaI
+
+Regularised incomplete beta function, `I(x;a,b)`. Both shapes must be positive
+and `x` must lie between zero and one.
+
+`a` `b` `x` ▶ `I(x;a,b)`
+
+Evaluated by a continued fraction, using the symmetry `I(x;a,b) = 1-I(1-x;b,a)`
+where that converges faster. It is the primitive behind the beta, Student and
+Fisher distributions and behind `UTPT` and `UTPF`.
+
+```rpl
+2 3 0.4 BetaI
+@ Expecting 0.5248
+```
+
+## UTPC
+
+Upper tail of the chi-square distribution with `n` degrees of freedom: the
+probability that the variable exceeds `x`.
+
+`n` `x` ▶ `P(X>x)`
+
+```rpl
+4 3 UTPC
+@ Expecting 0.55782 54003 71
+```
+
+At the 95th percentile it would return 0.05, which is the critical value of
+the test at five per cent.
+
+## UTPN
+
+Upper tail of the normal distribution of mean `m` and **variance** `v` — the
+variance, as on the HP50G, not the standard deviation.
+
+`m` `v` `x` ▶ `P(X>x)`
+
+```rpl
+0 1 1 UTPN
+@ Expecting 0.15865 52539 31
+```
+
+One standard deviation above the mean leaves about a sixth of the
+distribution above it.
+
+## UTPT
+
+Upper tail of the Student distribution with `n` degrees of freedom. Negative
+values of `t` are handled by symmetry.
+
+`n` `t` ▶ `P(T>t)`
+
+```rpl
+4 1 UTPT
+@ Expecting 0.18695 04831 5
+```
+
+At t = 2.7764451052 it would return 0.025, the critical value of the
+two-sided test at five per cent.
+
+## UTPF
+
+Upper tail of the Fisher distribution with `n` degrees of freedom in the
+numerator and `d` in the denominator.
+
+`n` `d` `x` ▶ `P(F>x)`
+
+```rpl
+4 6 1 UTPF
+@ Expecting 0.4752
+```
+
+At x = 4.5336769502 8 it would return 0.05.
 # Operations with Symbolic Expressions
 
 ## ↑Match
@@ -23045,7 +35395,7 @@ Access: 🟦 N (+/-); [DisplayModesMenu](#displaymodesmenu-reference) 🟦 F5; [
 |:--:|:--:|:--:|:--:|:--:|:--:|
 | [TextRenderingSizeLimit](#textrenderingsizelimit) | [GraphRenderingSizeLimit](#graphrenderingsizelimit) | PlotRefreshRate | AllVars | [SIPrefixCycle](#unitssiprefixcycle) |   |
 | [ResultGraphingTimeLimit](#resultgraphingtimelimit) | [StackGraphingTimeLimit](#stackgraphingtimelimit) | [GraphingTimeLimit](#graphingtimelimit) | [ShowTimeLimit](#showtimelimit) | [MinimumBatteryVoltage](#minimumbatteryvoltage) | ◀ |
-| [Units](#showbuiltinunits) | Const | Eqns | [Libs](#libs) | Chars | ▶ |
+| [Units](#showbuiltinunits) | Const | [Eqns](#eqns) | [Libs](#libs) | Chars | ▶ |
 
 **Page 4**
 
