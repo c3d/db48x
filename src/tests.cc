@@ -11591,10 +11591,10 @@ void tests::date_operations()
 
     step("Converting from a date to a Julian day number")
         .test(CLEAR, "20250919_date", ENTER, ID_JulianDayNumber)
-        .expect("2 460 938");
+        .expect("2 460 937 ¹/₂");
     step("Converting from a Julian day number to a date")
         .test(CLEAR, "1 000 000", ENTER, ID_DateFromJulianDayNumber)
-        .expect("Tue 21/Oct/1975 BC");
+        .expect("Tue 21/Oct/1975 BC, 12:00:00");
     step("Adding invalid dates")
         .test(CLEAR, "1 2 DATE+", ENTER)
         .error("Invalid date");
@@ -11602,11 +11602,11 @@ void tests::date_operations()
     step("JDN in algebraic expressions (issue #1710)")
         .test(CLEAR, "'JDN(20250919_date)'", ENTER)
         .expect("'JDN Fri 19/Sep/2025'")
-        .test(ID_Run).expect("2 460 938");
+        .test(ID_Run).expect("2 460 937 ¹/₂");
     step("JDN→ in algebraic expressions (issue #1710)")
         .test(CLEAR, "'JDN→(2461178.5)'", ENTER)
         .expect("'JDN→ 2 461 178.5'")
-        .test(ID_Run).expect("Sun 17/May/2026, 12:00:00");
+        .test(ID_Run).expect("Mon 18/May/2026");
     step("ToHMS in algebraic expressions")
         .test(CLEAR, "'ToHMS(10.5)'", ENTER)
         .expect("'→HMS 10.5'")
