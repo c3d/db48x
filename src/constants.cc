@@ -3237,6 +3237,7 @@ static uint path_count_direct_children(constant::config_r cfg,
 //   Count category headers that are direct children of parent
 // ----------------------------------------------------------------------------
 {
+    gcutf8    gparent = parent;
     uint      count = 0;
     unit_file cfile(cfg.file);
 
@@ -3249,7 +3250,7 @@ static uint path_count_direct_children(constant::config_r cfg,
                 continue;
             size_t mlen = 0;
             utf8   path = mname->value(&mlen);
-            if (path_is_direct_child(path, mlen, parent, plen))
+            if (path_is_direct_child(path, mlen, gparent, plen))
                 count++;
         }
     }
@@ -3264,7 +3265,7 @@ static uint path_count_direct_children(constant::config_r cfg,
             {
                 utf8   child = utf8(builtins[b]);
                 size_t clen  = strlen(builtins[b]);
-                if (path_is_direct_child(child, clen, parent, plen))
+                if (path_is_direct_child(child, clen, gparent, plen))
                     count++;
             }
         }
