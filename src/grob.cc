@@ -113,8 +113,8 @@ PARSE_BODY(grob)
 //  Parse a graphic object
 // ----------------------------------------------------------------------------
 {
-    utf8    src    = p.source;
-    cstring s      = cstring(src);
+    gcutf8  src    = p.source;
+    cstring s      = cstring(utf8(src));
     cstring e      = s + p.length;
     bool    grob   = strncasecmp(s, "grob ", 5) == 0;
     bool    bitmap = strncasecmp(s, "bitmap ", 7) == 0;
@@ -137,6 +137,7 @@ PARSE_BODY(grob)
     while (s < e && isspace(*s))
         s++;
 
+    size_t data_offs = s - cstring(utf8(src));
     grob_g g = bitmap ? bitmap::make(w, h)
 #ifdef CONFIG_COLOR
              : pixmap ? pixmap::make(w, h)
@@ -145,6 +146,10 @@ PARSE_BODY(grob)
 
     if (!g)
         return ERROR;
+
+    // Re-derive source pointers from GC-safe src after allocation
+    s = cstring(utf8(src)) + data_offs;
+    e = cstring(utf8(src)) + p.length;
 
     id     ty    = g->type();
     size_t len   = grob::datasize(ty, w, h);
@@ -172,7 +177,7 @@ PARSE_BODY(grob)
     if (grob)
         bitflip(d0, w, h, true);
 
-    p.length = s - cstring(src);
+    p.length = s - cstring(utf8(src));
     p.out    = +g;
 
     return OK;
