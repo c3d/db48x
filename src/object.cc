@@ -797,9 +797,14 @@ object_p object::at(object_p index) const
 {
     if (list_p idxlist = index->as_array_or_list())
     {
-        object_p result = this;
-        for (object_p idxobj : *idxlist)
+        list_g   safe_idx = idxlist;
+        object_g result   = this;
+        size_t   count    = idxlist->items();
+        for (size_t i = 0; i < count; i++)
         {
+            object_p idxobj = list_p(+safe_idx)->at(i);
+            if (!idxobj)
+                return nullptr;
             result = result->at(idxobj);
             if (!result)
                 return nullptr;
@@ -807,6 +812,7 @@ object_p object::at(object_p index) const
         return result;
     }
 
+    object_g self = this;
     if (algebraic_p alg = index->as_extended_algebraic())
         if (algebraic_p idalg = alg->evaluate())
             index = idalg;
@@ -816,7 +822,7 @@ object_p object::at(object_p index) const
         rt.index_error();
     if (rt.error())
         return nullptr;
-    return at(idx - 1);
+    return self->at(idx - 1);
 }
 
 
