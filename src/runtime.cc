@@ -205,6 +205,12 @@ size_t runtime::available(size_t size)
     {
         gc();
         avail = available();
+        if (avail < size && xlibs())
+        {
+            attach(0);
+            gc();
+            avail = available();
+        }
         if (avail < size)
             out_of_memory_error();
     }
