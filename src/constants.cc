@@ -3293,7 +3293,7 @@ bool constant_menu::do_submenu(constant::config_r cfg, menu_info &mi) const
 {
     id     type    = this->type();
     size_t curlen  = 0;
-    utf8   current = path_for_menu(cfg, type, &curlen);
+    gcutf8 current = path_for_menu(cfg, type, &curlen);
     if (!current)
         return false;
 
