@@ -27,6 +27,7 @@
 //   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // ****************************************************************************
 
+#include "command.h"
 #include "dmcp.h"
 #include "equations.h"
 #include "list.h"
@@ -43,6 +44,7 @@
 
 #include <regex.h>
 #include <stdio.h>
+#include <thread>
 
 // Windows compatibility for POSIX random number functions
 #ifdef _WIN32
@@ -65,6 +67,7 @@ cstring     tests::dump_on_fail       = nullptr;
 std::string tests::testing_path       = ".";
 bool        tests::running            = false;
 bool        tests::simulate_typing    = false;
+volatile bool tests::abort_requested  = false;
 
 #define TEST_CATEGORY(name, enabled, descr)                     \
     RECORDER_TWEAK_DEFINE(est_##name, enabled, "Test " descr);  \
@@ -85,7 +88,7 @@ bool        tests::simulate_typing    = false;
     do                                          \
     {                                           \
         position(__FILE__, __LINE__);           \
-        if (!check_##name(*this))               \
+        if (abort_requested || !check_##name(*this)) \
             return;                             \
     } while (0)
 
@@ -17803,6 +17806,9 @@ tests &tests::itest(tests::key k, bool release)
 //   Type a given key directly
 // ----------------------------------------------------------------------------
 {
+    if (abort_requested)
+        return *this;
+
     extern int key_remaining();
 
     // Check for special key sequences
@@ -18002,6 +18008,8 @@ tests &tests::itest(cstring txt)
 //   Insert text directly (fast path, default)
 // ----------------------------------------------------------------------------
 {
+    if (abort_requested)
+        return *this;
     nokeys(2000);
     if (simulate_typing)
         type_keys(txt);
@@ -19024,4 +19032,78 @@ tests &tests::source(cstring ref, uint extrawait)
 
     fail();
     return *this;
+}
+
+
+
+// ============================================================================
+//
+//   SelfTest and SelfTests RPL commands
+//
+// ============================================================================
+
+static void run_self_test_thread()
+// ----------------------------------------------------------------------------
+//   Thread function that runs the test suite
+// ----------------------------------------------------------------------------
+{
+    tests::abort_requested = false;
+    ui_ms_sleep(500);
+    tests t;
+    t.run(0);
+}
+
+
+COMMAND_BODY(SelfTest)
+// ----------------------------------------------------------------------------
+//   Run a named test suite
+// ----------------------------------------------------------------------------
+{
+    if (tests::running)
+    {
+        rt.error("Tests already running");
+        return ERROR;
+    }
+
+    if (object_p obj = rt.top())
+    {
+        if (text_p tobj = obj->as<text>())
+        {
+            size_t len = 0;
+            utf8   name = tobj->value(&len);
+            char   tname[256];
+
+            recorder_trace_set("est_.*=0");
+            snprintf(tname, sizeof(tname) - 1, "est_%.*s", int(len), name);
+            recorder_trace_set(tname);
+
+            if (rt.drop())
+            {
+                std::thread(run_self_test_thread).detach();
+                return OK;
+            }
+        }
+        else
+        {
+            rt.type_error();
+        }
+    }
+    return ERROR;
+}
+
+
+COMMAND_BODY(SelfTests)
+// ----------------------------------------------------------------------------
+//   Run the entire test suite
+// ----------------------------------------------------------------------------
+{
+    if (tests::running)
+    {
+        rt.error("Tests already running");
+        return ERROR;
+    }
+
+    recorder_trace_set("est_.*");
+    std::thread(run_self_test_thread).detach();
+    return OK;
 }

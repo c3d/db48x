@@ -516,6 +516,7 @@ public:
     static std::string   testing_path;
     static bool          running;
     static bool          simulate_typing;
+    static volatile bool abort_requested;
 };
 
 #define here()          position(__FILE__, __LINE__)

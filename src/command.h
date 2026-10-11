@@ -189,6 +189,11 @@ COMMAND_DECLARE(LastArg,-1);            // Return last arguments
 COMMAND_DECLARE(LastX,-1);              // Return last X argument
 COMMAND_DECLARE(Undo,-1);               // Revert to the Undo stack
 
+#if SIMULATOR
+COMMAND_DECLARE(SelfTest,1);            // Run a named test suite
+COMMAND_DECLARE(SelfTests,0);           // Run the entire test suite
+#endif // SIMULATOR
+
 COMMAND_DECLARE(EditorSelect,-1);       // Select from current cursor position
 COMMAND_DECLARE(EditorWordLeft,-1);     // Move cursor one word left
 COMMAND_DECLARE(EditorWordRight,-1);    // Move cursor one word right
