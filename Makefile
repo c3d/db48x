@@ -603,8 +603,8 @@ sim/keyboard-db48x-old.png: DB48X-Keys/DB48X-Keys.005.png
 
 ifeq ($(KIND),android)
 ANDROID_SDK_ROOT ?= /opt/homebrew/share/android-commandlinetools
-ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/26.1.10909125
-ANDROID_QT_BASE ?= /Volumes/Qt/6.9.2
+ANDROID_NDK_ROOT ?= $(ANDROID_SDK_ROOT)/ndk/27.2.12479018
+ANDROID_QT_BASE ?= /Volumes/Qt/6.10.3
 ANDROID_QT ?= $(ANDROID_QT_BASE)/android_arm64_v8a
 ANDROID_QT_BIN ?= $(ANDROID_QT)/bin
 # Host kit: macOS uses .../macos/bin; Linux CI and typical offline installs use gcc_64
@@ -613,10 +613,20 @@ ANDROID_QT_HOST_SUBDIR_Linux = gcc_64
 ANDROID_QT_HOST_SUBDIR ?= $(or $(ANDROID_QT_HOST_SUBDIR_$(HOST_OS_NAME)),gcc_64)
 ANDROID_DEPLOY_QT ?= $(ANDROID_QT_BASE)/$(ANDROID_QT_HOST_SUBDIR)/bin/androiddeployqt
 ANDROID_KEYSTORE ?= $(HOME)/.local/android_release.keystore
-ANDROID_JAVA_HOME ?= $(or $(JAVA_HOME),					    \
-			$(shell /usr/libexec/java_home -v 17 2>/dev/null || \
-				/usr/libexec/java_home -v 21 2>/dev/null || \
-				true))
+ANDROID_JAVA_DIRS := 							\
+	$(JAVA_HOME)							\
+	$(shell /usr/libexec/java_home -v 17 2>/dev/null) 		\
+	$(shell /usr/libexec/java_home -v 21 2>/dev/null) 		\
+	/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home	\
+	/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home
+
+ANDROID_JAVA_HOME := $(subst /bin/java,,$(firstword $(wildcard $(ANDROID_JAVA_DIRS:%=%/bin/java))))
+
+ifeq ($(ANDROID_JAVA_HOME),)
+$(error Android build requires Java 17 or later. \
+	Install with: brew install openjdk@17 \
+	Or set JAVA_HOME explicitly.)
+endif
 ANDROID_CAN_SIGN := $(and $(wildcard $(ANDROID_KEYSTORE)),$(strip $(ANDROID_KEYSTORE_PASS)))
 ANDROID_DEPLOY_SIGN_FLAGS = $(if $(ANDROID_CAN_SIGN),\
 	--sign $(ANDROID_KEYSTORE) $(NAME) --storepass '$(ANDROID_KEYSTORE_PASS)',)
@@ -626,17 +636,21 @@ QMAKE_ENV = 	export ANDROID_SDK_ROOT=$(ANDROID_SDK_ROOT) ;	\
 		export ANDROID_NDK_ROOT=$(ANDROID_NDK_ROOT) ;	\
 		export KEYSTORE_PATH=$(ANDROID_KEYSTORE) ;	\
 		export JAVA_HOME=$(ANDROID_JAVA_HOME);
-# make-it-quick defaults OUTPUT to the workspace root; keep Android bundles
-# under android/ unless the caller overrides ANDROID_OUTPUT_DIR explicitly.
-ANDROID_OUTPUT_DIR ?= android
+# Each build (db48x, db50x) gets its own output directory so the Gradle
+# project, libs/, and res/ don't cross-contaminate each other.
+ANDROID_OUTPUT_DIR ?= android/$(NAME)
 AAB_FILE=$(ANDROID_OUTPUT_DIR:%=%/)$(NAME).aab
 
 android-$(TARGET): $(AAB_FILE)
 android-%: qt-%
 
 # Additional dependencies for Android build
-$(QMAKEFILE): sim/android/AndroidManifest.xml sim/android/build.gradle \
-              sim/android-db48x/AndroidManifest.xml sim/android-db48x/build.gradle
+$(QMAKEFILE):	sim/android/db48x/AndroidManifest.xml			\
+		sim/android/db48x/build.gradle				\
+		sim/android/db48x/src/org/db48x/DB48xActivity.java	\
+		sim/android/db50x/AndroidManifest.xml			\
+		sim/android/db50x/build.gradle				\
+		sim/android/db50x/src/org/db50x/DB50xActivity.java
 
 # Deploy (and optionally sign) the AAB via androiddeployqt. androiddeployqt
 # expects a build directory as --output and the .so staged under
@@ -648,6 +662,7 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		AAB="$(abspath $@)";					\
 		OUTDIR="$(abspath $(dir $@))";				\
 		mkdir -p "$$OUTDIR" &&					\
+		rm -f "$$OUTDIR/AndroidManifest.xml" &&			\
 		cd sim && 						\
 		$(MAKE) -f $(<F)  install INSTALL_ROOT="$$OUTDIR" &&	\
 		$(QMAKE_ENV)						\
@@ -658,8 +673,9 @@ $(AAB_FILE): $(QMAKEFILE) qt-$(TARGET)
 		if [ ! -f "$$AAB" ]; then				\
 			BUILT_AAB="$$(find "$$OUTDIR" -type f -name '*.aab' | sort | tail -1)"; \
 			[ -n "$$BUILT_AAB" ] && cp "$$BUILT_AAB" "$$AAB" || :; \
-		fi &&						\
-		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/android-debug.apk' | head -1)"; \
+		fi &&							\
+		(cd "$$OUTDIR" && ./gradlew assembleDebug) &&		\
+		BUILT_APK="$$(find "$$OUTDIR" -path '*/apk/debug/*-debug.apk' | head -1)"; \
 		{ [ -n "$$BUILT_APK" ] && cp "$$BUILT_APK" "$(abspath $(ANDROID_OUTPUT_DIR)/$(NAME)-debug.apk)" || :; }; \
 		test -f "$$AAB"
 	$(if $(ANDROID_CAN_SIGN),,$(PRINT_COMMAND) $(INFO) "[WARNING]" "Android AAB is UNSIGNED (need $(ANDROID_KEYSTORE) and ANDROID_KEYSTORE_PASS). Not for Play Store.")
@@ -673,8 +689,8 @@ endif
 
 ANDROID_SDK_ROOT_INSTALL ?= /opt/homebrew/share/android-commandlinetools
 ADB ?= $(ANDROID_SDK_ROOT_INSTALL)/platform-tools/adb
-ANDROID_APK_DB48X ?= android/db48x-debug.apk
-ANDROID_APK_DB50X ?= android/db50x-debug.apk
+ANDROID_APK_DB48X ?= android/db48x/build/outputs/apk/debug/db48x-debug.apk
+ANDROID_APK_DB50X ?= android/db50x/build/outputs/apk/debug/db50x-debug.apk
 
 define android_install
 	@if [ -n "$(ANDROID_SERIAL)" ]; then					\
@@ -700,6 +716,8 @@ define android_install
 		DEVICE=$$(echo "$$DEVICES" | head -1);				\
 	fi;									\
 	echo "Installing $(1) on $$DEVICE...";					\
+	$(ADB) -s "$$DEVICE" shell am force-stop org.db48x 2>/dev/null || true;	\
+	$(ADB) -s "$$DEVICE" shell am force-stop org.db50x 2>/dev/null || true;	\
 	$(ADB) -s "$$DEVICE" install -r $(1)
 endef
 

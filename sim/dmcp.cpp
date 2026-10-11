@@ -285,6 +285,16 @@ volatile uint    keyrd   = 0;
 volatile uint    keywr   = 0;
 enum {  nkeys = sizeof(keys) / sizeof(keys[0]) };
 
+#ifdef ANDROID
+// Set by the UI thread; consumed in key_pop() (RPL thread).
+// key_pop() calls sys_timer_start(TIMER0,0) and sets android_timer0_force_timeout
+// so that sys_timer_timeout returns true immediately, making repeating=true.
+volatile bool android_next_key_repeating    = false;
+// Set by key_pop(); cleared by sys_timer_timeout(); makes TIMER0 time out
+// immediately even when 0ms has not yet elapsed.
+volatile bool android_timer0_force_timeout  = false;
+#endif // ANDROID
+
 int key_empty()
 {
     static bool empty = true;
@@ -312,6 +322,17 @@ int key_pop()
         int key = keys[keyrd++ % nkeys];
         record(keys, "Key %d (rd %u wr %u)", key, keyrd, keywr);
         record(tests_rpl, "Key %d (rd %u wr %u)", key, keyrd, keywr);
+#ifdef ANDROID
+        if (android_next_key_repeating && key > 0)
+        {
+            android_next_key_repeating   = false;
+            android_timer0_force_timeout = true;
+            // sys_timer_start declared in dmcp.h; timers[] defined later in
+            // this file but the call resolves at link time.
+            sys_timer_start(TIMER0, 0);
+            record(keys, "Android synthetic repeat for key %d", key);
+        }
+#endif // ANDROID
         return key;
     }
     return -1;
@@ -929,6 +950,13 @@ int sys_timer_timeout(int timer_ix)
 {
     if (timers[timer_ix].enabled)
     {
+#ifdef ANDROID
+        if (timer_ix == TIMER0 && android_timer0_force_timeout)
+        {
+            android_timer0_force_timeout = false;
+            return 1;
+        }
+#endif // ANDROID
         uint32_t now = sys_current_ms();
         return int(timers[timer_ix].deadline - now) < 0;
     }

@@ -71,9 +71,25 @@
 #include <QSettings>
 #include <QJniObject>
 #include <atomic>
+#include <jni.h>
 
 void extract_android_assets();
 static void android_haptic_tap();
+
+extern "C"
+{
+JNIEXPORT void JNICALL
+Java_org_db48x_DB48xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+{
+    key_push(key);
+}
+
+JNIEXPORT void JNICALL
+Java_org_db50x_DB50xActivity_nativeKeyPush(JNIEnv *, jobject, jint key)
+{
+    key_push(key);
+}
+} // extern "C"
 
 #endif // ANDROID
 #endif // WASM
@@ -281,6 +297,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //  Persist window geometry across runs
 // ----------------------------------------------------------------------------
 {
+    record(sim_window, "closeEvent");
 #ifndef ANDROID
     QSettings settings;
     settings.setValue("MainWindow/geometry", saveGeometry());
@@ -494,21 +511,30 @@ void MainWindow::handleAppStateChange(Qt::ApplicationState state)
 
     static bool isSaved = false;
 
+    record(sim_window, "App state %d visible=%d active=%d",
+           int(state), isVisible(), isActiveWindow());
+
     if (state == Qt::ApplicationActive)
     {
         isSaved = false;
+        record(sim_window, "Foreground: show/raise/invalidate geometry=%dx%d",
+               width(), height());
+
+        // Mark every pixel as dirty so the RPL thread redraws everything.
+        SimScreen::invalidate();
+        key_push(0);
     }
     else if ((state == Qt::ApplicationSuspended ||
               state == Qt::ApplicationHidden) &&
              !isSaved) // Check both suspend and hidden + avoid double save
     {
+        record(sim_window, "Background: auto-save state=%d", int(state));
         // Call the core DB48X save function directly
         // (This function is defined in sysmenu.cc)
         extern bool save_system_state_silent();
         save_system_state_silent();
 
         record(sim_window, "Android auto-save triggered");
-
 	isSaved = true;
     }
 }
@@ -595,6 +621,11 @@ const int keyMap[] =
 #ifdef KB_HELP
     Qt::Key_F11,        KB_HELP,
 #endif // KB_HELP
+
+#ifdef ANDROID
+    Qt::Key_Back,       KB_BKS,
+#endif // ANDROID
+
 
     0,0
 };
@@ -817,14 +848,15 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
 //   Got a key - Push it to the simulator
 // ----------------------------------------------------------------------------
 {
-    if (ev->isAutoRepeat())
+    int  k   = ev->key();
+    bool rep = ev->isAutoRepeat();
+    record(sim_keys, "Key press %d%+s", k, rep ? " (autorepeat)" : "");
+
+    if (rep)
     {
         ev->accept();
         return;
     }
-
-    int k = ev->key();
-    record(sim_keys, "Key press %d", k);
 
     if (k == Qt::Key_F16)
         recorder_dump_for(tests::dump_on_fail);
@@ -994,6 +1026,7 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 
     if (obj == ui.keyboard)
     {
+        record(sim_window, "Keyboard event type=%d", int(ev->type()));
         if ((ev->type() == QEvent::TouchBegin) ||
             (ev->type() == QEvent::TouchUpdate) ||
             (ev->type() == QEvent::TouchEnd) ||

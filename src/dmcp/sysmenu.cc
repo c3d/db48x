@@ -253,8 +253,11 @@ static int state_save_callback(cstring fpath, cstring fname, void *data)
     file prog(fpath, file::WRITING);
     if (!prog.valid())
     {
-        ui.draw_message("State save failed", prog.error(), fpath);
-        wait_for_key_press();
+        if (data != STATE_IO_SILENT)
+        {
+            ui.draw_message("State save failed", prog.error(), fpath);
+            wait_for_key_press();
+        }
         return 1;
     }
 

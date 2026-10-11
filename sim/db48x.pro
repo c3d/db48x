@@ -152,10 +152,10 @@ isEmpty(OBJECTS_DIR): OBJECTS_DIR=db48x-build
 
 ICON = db48x.icns
 
-DISTFILES += \
-    android-db48x/AndroidManifest.xml \
-    android-db48x/build.gradle \
-    android/res/values/libs.xml \
-    android/res/xml/qtprovider_paths.xml
+DISTFILES +=                                    \
+    android/db48x/AndroidManifest.xml           \
+    android/db48x/build.gradle                  \
+    android/db48x/res/values/libs.xml           \
+    android/db48x/res/xml/qtprovider_paths.xml
 
-ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android-db48x
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android/db48x

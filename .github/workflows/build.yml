@@ -713,7 +713,7 @@ jobs:
 
     - name: Install Android NDK
       run: |
-        sdkmanager --install "ndk;26.1.10909125"
+        sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
@@ -724,7 +724,7 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
         export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p "$HOME/.local"
@@ -740,7 +740,7 @@ jobs:
         find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Verify generated AAB
-      run: test -f android/db48x.aab
+      run: test -f android/db48x/db48x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7
@@ -786,7 +786,7 @@ jobs:
 
     - name: Install Android NDK
       run: |
-        sdkmanager --install "ndk;26.1.10909125"
+        sdkmanager --install "ndk;27.2.12479018"
 
     - name: Install build dependencies
       run: |
@@ -797,7 +797,7 @@ jobs:
       run: |
         echo "${{ github.run_number }}" > .build_id
         export ANDROID_SDK_ROOT=$ANDROID_HOME
-        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/26.1.10909125
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.2.12479018
         export ANDROID_QT_BASE="$(dirname "$QT_ROOT_DIR")"
         if [ -n "$ANDROID_KEYSTORE_DATA" ]; then
           mkdir -p "$HOME/.local"
@@ -813,7 +813,7 @@ jobs:
         find . -name "*.aab" -type f 2>/dev/null || echo "No AAB files found"
 
     - name: Verify generated AAB
-      run: test -f android/db50x.aab
+      run: test -f android/db50x/db50x.aab
 
     - name: Upload Android artifacts
       uses: actions/upload-artifact@v7

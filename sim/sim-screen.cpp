@@ -249,4 +249,14 @@ void SimScreen::refreshScreen()
     QGraphicsView::update();
     redraws++;
 }
+
+
+void SimScreen::invalidate()
+// ----------------------------------------------------------------------------
+//   Force all pixels to be redrawn on the next updatePixmap() call
+// ----------------------------------------------------------------------------
+{
+    for (size_t i = 0; i < sizeof(lcd_copy) / sizeof(*lcd_copy); i++)
+        lcd_copy[i] = ~lcd_buffer[i];
+}
 #endif // WASM

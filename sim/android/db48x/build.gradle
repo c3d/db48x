@@ -78,6 +78,7 @@ android {
 
     defaultConfig {
         resConfig "en"
+        applicationId "org.db48x"
         minSdkVersion qtMinSdkVersion
         // Use Qt's target SDK, but ensure minimum of 35 for Google Play Store (Android 15)
         targetSdkVersion Math.max(qtTargetSdkVersion as Integer, 35)
