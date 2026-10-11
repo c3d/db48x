@@ -2937,6 +2937,7 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
     if (unit::mode)
         return nullptr;
 
+    gcutf8    name     = txt;
     unit_file cfile(cfg.file);
     size_t    maxb     = cfg.nbuiltins;
     auto      builtins = cfg.builtins;
@@ -2952,12 +2953,12 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
         cfile.seek(0);
         while (cfile.next(true))                        // Category
         {
-            while (symbol_p name = cfile.next(false))
+            while (symbol_p cname = cfile.next(false))
             {
-                ctxt = name->value(&clen);
+                ctxt = cname->value(&clen);
 
                 // Constant name comparison is case-sensitive
-                if (len == clen && symbol::compare(txt, ctxt, len) == 0)
+                if (len == clen && symbol::compare(name, ctxt, len) == 0)
                     return constant::make(cfg.type, idx);
                 idx++;
             }
@@ -2970,14 +2971,14 @@ constant_p constant::do_lookup(config_r cfg, utf8 txt, size_t len, bool error)
         if (builtins[b+1] && *builtins[b+1])
         {
             ctxt = utf8(builtins[b]);
-            if (ctxt[len] == 0 && symbol::compare(ctxt, txt, len) == 0)
+            if (ctxt[len] == 0 && symbol::compare(ctxt, name, len) == 0)
                 return constant::make(cfg.type, idx);
             idx++;
         }
     }
 
     if (error)
-        cfg.error().source(txt, len);
+        cfg.error().source(name, len);
     return nullptr;
 }
 
