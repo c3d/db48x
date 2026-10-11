@@ -966,6 +966,8 @@ void MainWindow::keyPressEvent(QKeyEvent * ev)
         {
             record(sim_keys, "Key %d found at %d, DM42 key is %d",
                    k, i, keyMap[i+1]);
+            if (tests::running)
+                tests::abort_requested = true;
             key_push(keyMap[i+1]);
             ev->accept();
             return;
@@ -1065,17 +1067,24 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
                        k, relx, rely, pressed ? "pressed" : "released");
 
                 if (!pressed)
-                    key_push(0);
-                else if (mousemap *ptr = findKey(relx, rely,
-                                                 ui.keyboard->width(),
-                                                 ui.keyboard->height()))
                 {
-                    record(sim_keys, "  [%d] found at %d as %d",
-                           k, ptr - mouseMap, ptr->keynum);
-                    key_push(ptr->keynum);
+                    key_push(0);
+                }
+                else
+                {
+                    if (tests::running)
+                        tests::abort_requested = true;
+                    if (mousemap *ptr = findKey(relx, rely,
+                                                ui.keyboard->width(),
+                                                ui.keyboard->height()))
+                    {
+                        record(sim_keys, "  [%d] found at %d as %d",
+                               k, ptr - mouseMap, ptr->keynum);
+                        key_push(ptr->keynum);
 #ifdef ANDROID
-                    android_haptic_tap();
+                        android_haptic_tap();
 #endif
+                    }
                 }
             }
 
@@ -1097,6 +1106,8 @@ bool MainWindow::eventFilter(QObject * obj, QEvent * ev)
 #endif // Qt vertsion 6
 
             record(sim_keys, "Mouse button press at (%f, %f)", relx, rely);
+            if (tests::running)
+                tests::abort_requested = true;
             if (mousemap *ptr = findKey(relx, rely,
                                         ui.keyboard->width(),
                                         ui.keyboard->height()))

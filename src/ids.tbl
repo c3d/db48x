@@ -747,6 +747,11 @@ CMD(ScreenCapture)
 CMD(KeyEval)
 CMD(KeyCode)
 
+#ifdef SIMULATOR
+CMD(SelfTest)                           ALIAS(SelfTest, "AutoTest")
+CMD(SelfTests)                          ALIAS(SelfTests, "AutoTests")
+#endif // SIMULATOR
+
 #ifdef HAS_CHUCK
 OP(ChuckNorris, "Chuck")
 #endif // HAS_CHUCK
