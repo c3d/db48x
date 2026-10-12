@@ -241,7 +241,7 @@ object::result list::list_parse(id      type,
                                 size_t   lsz  = left->size();
                                 if (!is_symbolic_argument(special, arg))
                                     lobj = left->objects(&lsz);
-                                if (!rt.append(lobj, lsz))
+                                if (!scr.append(lobj, lsz))
                                     return ERROR;
                                 objcount++;
                                 arg++;
