@@ -616,7 +616,8 @@ PARSE_BODY(rectangular)
     bool     dot   = cp == '.' || (cp == ',' && Settings.DecimalComma());
     bool     more  = imark
         ? (isdigit(cp) || dot || cp == '(' || cp == '\'' ||
-           is_valid_as_name_initial(cp))
+           is_valid_as_name_initial(cp) ||
+           (re && !hadsign && (cp == '-' || cp == '+')))
         : !sp;
     size_t   imsz  = max - offs;
     object_p imobj = more ? parse(p.source + offs, imsz,
